@@ -7,7 +7,9 @@ The symmetric ciphers are some of the fastest and most flexible implementations 
 Not everything is tested, or final, and changes will be made for 1.1 release.
 
 CEX .Net Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
+
 API Help: http://www.vtdev.com/CEX++/Help/html/index.html
+
 Homepage: http://www.vtdev.com/cexhome.html
 
 This project contains strong cryptography, before downloading the source files, 
