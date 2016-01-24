@@ -1,0 +1,12 @@
+﻿START
+2013-11-29	03:06:35:812	 568	c2c	Handler	:::::::::::::
+2013-11-29	03:06:35:816	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {6FC739FB-E7FE-4859-9281-C9DA6C385886}.204]  ***********
+2013-11-29	03:06:35:816	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {785A87E7-E4D4-4480-B28F-DC6F1CDCEB96}.205]  ***********
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {64027A15-E6AE-4133-B904-18F5F61461BE}.205]  ***********
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+END

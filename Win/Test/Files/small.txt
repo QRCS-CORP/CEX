@@ -1,0 +1,273 @@
+ÔªøSTART
+2013-11-29	03:06:35:812	 568	c2c	Handler	:::::::::::::
+2013-11-29	03:06:35:816	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {6FC739FB-E7FE-4859-9281-C9DA6C385886}.204]  ***********
+2013-11-29	03:06:35:816	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {785A87E7-E4D4-4480-B28F-DC6F1CDCEB96}.205]  ***********
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {64027A15-E6AE-4133-B904-18F5F61461BE}.205]  ***********
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {25599F80-DB8A-47B3-8DED-AD19E03A6BFA}.205]  ***********
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	***********  DnldMgr: New download job [UpdateId = {91932CFB-C396-44C7-95ED-C1AB4357D950}.200]  ***********
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:817	 460	d94	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	***********  DnldMgr: New download job [UpdateId = {6FC739FB-E7FE-4859-9281-C9DA6C385886}.204]  ***********
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	***********  DnldMgr: New download job [UpdateId = {785A87E7-E4D4-4480-B28F-DC6F1CDCEB96}.205]  ***********
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	***********  DnldMgr: New download job [UpdateId = {64027A15-E6AE-4133-B904-18F5F61461BE}.205]  ***********
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	***********  DnldMgr: New download job [UpdateId = {25599F80-DB8A-47B3-8DED-AD19E03A6BFA}.205]  ***********
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	***********  DnldMgr: New download job [UpdateId = {91932CFB-C396-44C7-95ED-C1AB4357D950}.200]  ***********
+2013-11-29	03:06:35:818	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	03:06:35:819	 460	90c	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:06:35:819	 460	90c	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	03:06:35:856	 460	d94	Agent	*********
+2013-11-29	03:06:35:856	 460	d24	AU	Triggering Offline detection (non-interactive)
+2013-11-29	03:06:35:856	 460	d94	Agent	**  END  **  Agent: Installing updates [CallerId = Windows Defender]
+2013-11-29	03:06:35:856	 460	d24	AU	#############
+2013-11-29	03:06:35:856	 460	d24	AU	## START ##  AU: Search for updates
+2013-11-29	03:06:35:856	 460	d94	Agent	*************
+2013-11-29	03:06:35:856	 460	d24	AU	#########
+2013-11-29	03:06:35:856	3368	15bc	COMAPI	>>--  RESUMED  -- COMAPI: Install [ClientId = Windows Defender]
+2013-11-29	03:06:35:856	3368	15bc	COMAPI	  - Install call complete (succeeded = 1, succeeded with errors = 0, failed = 0, unaccounted = 0)
+2013-11-29	03:06:35:857	3368	15bc	COMAPI	  - Reboot required = No
+2013-11-29	03:06:35:857	3368	15bc	COMAPI	---------
+2013-11-29	03:06:35:857	3368	15bc	COMAPI	--  END  --  COMAPI: Install [ClientId = Windows Defender]
+2013-11-29	03:06:35:857	3368	15bc	COMAPI	-------------
+2013-11-29	03:06:35:861	 460	d24	AU	<<## SUBMITTED ## AU: Search for updates [CallId = {C976B417-4BB9-4F1F-AA9D-A8E9462299A9}]
+2013-11-29	03:06:35:861	 460	90c	Agent	*************
+2013-11-29	03:06:35:861	 460	90c	Agent	** START **  Agent: Finding updates [CallerId = AutomaticUpdates]
+2013-11-29	03:06:35:861	 460	90c	Agent	*********
+2013-11-29	03:06:35:861	 460	90c	Agent	  * Online = No; Ignore download priority = No
+2013-11-29	03:06:35:861	 460	90c	Agent	  * Criteria = "IsInstalled=0 and DeploymentAction='Installation' or IsPresent=1 and DeploymentAction='Uninstallation' or IsInstalled=1 and DeploymentAction='Installation' and RebootRequired=1 or IsInstalled=0 and DeploymentAction='Uninstallation' and RebootRequired=1"
+2013-11-29	03:06:35:861	 460	90c	Agent	  * ServiceID = {7971F918-A847-4430-9279-4A52D1EFE18D} Third party service
+2013-11-29	03:06:35:861	 460	90c	Agent	  * Search Scope = {Machine}
+2013-11-29	03:06:37:206	 460	90c	Driver	Matched driver to device PCI\VEN_1814&DEV_3090&SUBSYS_662211AD&REV_00
+2013-11-29	03:06:37:206	 460	90c	Driver	Status: 0x180200a, ProblemNumber: 00000000
+2013-11-29	03:06:37:207	 460	90c	Driver	Matched driver to device PCI\VEN_1002&DEV_964A&SUBSYS_06421025&REV_00
+2013-11-29	03:06:37:207	 460	90c	Driver	Status: 0x180200a, ProblemNumber: 00000000
+2013-11-29	03:06:48:366	 460	90c	Agent	  * Added update {3ACA18A8-7998-4436-AA7B-B72B8C50908B}.100 to search result
+2013-11-29	03:06:48:366	 460	90c	Agent	Update {414642E2-5F20-4AD1-AA5A-773061238B5F}.103 is pruned out due to potential supersedence
+2013-11-29	03:06:48:367	 460	90c	Agent	  * Added update {F278F751-8670-477E-8DBB-F5C4DEAF5EA6}.102 to search result
+2013-11-29	03:06:48:367	 460	90c	Agent	  * Added update {24E6CA50-6C6B-4098-B5DC-FEA1115B117B}.200 to search result
+2013-11-29	03:06:48:367	 460	90c	Agent	Update {037A60AA-425B-497C-9FF0-EF85547911E5}.203 is pruned out due to potential supersedence
+2013-11-29	03:06:48:367	 460	90c	Agent	Update {D528D50B-791A-4567-A497-ADEB35EA645B}.200 is pruned out due to potential supersedence
+2013-11-29	03:06:48:367	 460	90c	Agent	  * Added update {7B3369E2-5608-495B-AF58-A9F66C0676D2}.205 to search result
+2013-11-29	03:06:48:367	 460	90c	Agent	  * Added update {400D135F-03E5-45B5-A44B-16EF70722C4F}.201 to search result
+2013-11-29	03:06:48:367	 460	90c	Agent	  * Added update {5EB03BEA-4F70-4136-9529-3BA5015AEE9A}.200 to search result
+2013-11-29	03:06:48:367	 460	90c	Agent	  * Found 6 updates and 80 categories in search; evaluated appl. rules of 2137 out of 3586 deployed entities
+2013-11-29	03:06:48:367	 460	90c	Agent	*********
+2013-11-29	03:06:48:367	 460	90c	Agent	**  END  **  Agent: Finding updates [CallerId = AutomaticUpdates]
+2013-11-29	03:06:48:367	 460	90c	Agent	*************
+2013-11-29	03:06:48:419	 460	156c	AU	>>##  RESUMED  ## AU: Search for updates [CallId = {C976B417-4BB9-4F1F-AA9D-A8E9462299A9}]
+2013-11-29	03:06:48:419	 460	156c	AU	  # 6 updates detected
+2013-11-29	03:06:48:419	 460	90c	Report	REPORT EVENT: {CA6E8AAC-E98A-446F-9721-7086BF05D6B0}	2013-11-29 03:06:35:818-0500	1	183	101	{49FD8DAD-52FA-4170-93C9-D8721AC5B152}	200	0	Windows Defender	Success	Content Install	Installation Successful: Windows successfully installed the following update: Definition Update for Windows Defender - KB915597 (Definition 1.163.863.0)
+2013-11-29	03:06:48:419	 460	90c	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	03:06:48:419	 460	156c	AU	#########
+2013-11-29	03:06:48:419	 460	156c	AU	##  END  ##  AU: Search for updates [CallId = {C976B417-4BB9-4F1F-AA9D-A8E9462299A9}]
+2013-11-29	03:06:48:419	 460	156c	AU	#############
+2013-11-29	03:06:48:419	 460	156c	AU	No featured updates notifications to show
+2013-11-29	03:06:48:420	 460	156c	AU	Setting AU scheduled install time to 2013-11-30 08:00:00
+2013-11-29	03:06:48:420	 460	156c	AU	Successfully wrote event for AU health state:0
+2013-11-29	03:06:48:430	 460	156c	AU	Successfully wrote event for AU health state:0
+2013-11-29	03:06:53:419	 460	90c	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	03:37:28:016	 460	2a4	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	03:37:33:019	 460	2a4	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	03:51:46:463	 460	2a4	DnldMgr	***********  DnldMgr: Regulation Refresh [Svc: {7971F918-A847-4430-9279-4A52D1EFE18D}]  ***********
+2013-11-29	03:51:46:463	 460	2a4	DnldMgr	Contacting regulation server for 5 updates.
+2013-11-29	03:51:46:532	 460	2a4	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\wuredir.cab:
+2013-11-29	03:51:46:539	 460	2a4	Misc	 Microsoft signed: Yes
+2013-11-29	03:51:46:542	 460	2a4	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\wuredir.cab:
+2013-11-29	03:51:46:547	 460	2a4	Misc	 Microsoft signed: Yes
+2013-11-29	03:51:46:548	 460	2a4	DnldMgr	Regulation server path: https://update.microsoft.com/v6/UpdateRegulationService/UpdateRegulation.asmx.
+2013-11-29	03:51:49:378	 460	2a4	DnldMgr	  Per-Update: 64027a15-e6ae-4133-b904-18f5f61461be at rate 5000
+2013-11-29	03:51:49:378	 460	2a4	DnldMgr	  Per-Update: 25599f80-db8a-47b3-8ded-ad19e03a6bfa at rate 5000
+2013-11-29	03:51:49:378	 460	2a4	DnldMgr	  Per-Update: 785a87e7-e4d4-4480-b28f-dc6f1cdceb96 at rate 5000
+2013-11-29	03:51:49:378	 460	2a4	DnldMgr	  Per-Update: 91932cfb-c396-44c7-95ed-c1ab4357d950 at rate 0
+2013-11-29	03:51:49:378	 460	2a4	DnldMgr	  Per-Update: 6fc739fb-e7fe-4859-9281-c9da6c385886 at rate 5000
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	  * Regulation call complete. 0x00000000
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	***********  DnldMgr: New download job [UpdateId = {6FC739FB-E7FE-4859-9281-C9DA6C385886}.204]  ***********
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	***********  DnldMgr: New download job [UpdateId = {785A87E7-E4D4-4480-B28F-DC6F1CDCEB96}.205]  ***********
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	***********  DnldMgr: New download job [UpdateId = {64027A15-E6AE-4133-B904-18F5F61461BE}.205]  ***********
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	***********  DnldMgr: New download job [UpdateId = {25599F80-DB8A-47B3-8DED-AD19E03A6BFA}.205]  ***********
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	***********  DnldMgr: New download job [UpdateId = {91932CFB-C396-44C7-95ED-C1AB4357D950}.200]  ***********
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	03:51:49:379	 460	2a4	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	04:11:13:618	 460	91c	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	04:11:19:023	 460	91c	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	04:28:13:029	 460	1428	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	04:28:18:024	 460	1428	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	04:51:49:378	 460	1334	DnldMgr	***********  DnldMgr: Regulation Refresh [Svc: {7971F918-A847-4430-9279-4A52D1EFE18D}]  ***********
+2013-11-29	04:51:49:378	 460	1334	DnldMgr	Contacting regulation server for 5 updates.
+2013-11-29	04:51:49:445	 460	1334	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\wuredir.cab:
+2013-11-29	04:51:49:452	 460	1334	Misc	 Microsoft signed: Yes
+2013-11-29	04:51:49:455	 460	1334	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\wuredir.cab:
+2013-11-29	04:51:49:462	 460	1334	Misc	 Microsoft signed: Yes
+2013-11-29	04:51:49:464	 460	1334	DnldMgr	Regulation server path: https://update.microsoft.com/v6/UpdateRegulationService/UpdateRegulation.asmx.
+2013-11-29	04:51:52:569	 460	1334	DnldMgr	  Per-Update: 64027a15-e6ae-4133-b904-18f5f61461be at rate 5000
+2013-11-29	04:51:52:569	 460	1334	DnldMgr	  Per-Update: 25599f80-db8a-47b3-8ded-ad19e03a6bfa at rate 5000
+2013-11-29	04:51:52:569	 460	1334	DnldMgr	  Per-Update: 785a87e7-e4d4-4480-b28f-dc6f1cdceb96 at rate 5000
+2013-11-29	04:51:52:570	 460	1334	DnldMgr	  Per-Update: 91932cfb-c396-44c7-95ed-c1ab4357d950 at rate 0
+2013-11-29	04:51:52:570	 460	1334	DnldMgr	  Per-Update: 6fc739fb-e7fe-4859-9281-c9da6c385886 at rate 5000
+2013-11-29	04:51:52:570	 460	1334	DnldMgr	  * Regulation call complete. 0x00000000
+2013-11-29	04:51:52:606	 460	1334	DnldMgr	***********  DnldMgr: New download job [UpdateId = {6FC739FB-E7FE-4859-9281-C9DA6C385886}.204]  ***********
+2013-11-29	04:51:52:606	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:606	 460	1334	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	04:51:52:614	 460	1334	DnldMgr	***********  DnldMgr: New download job [UpdateId = {785A87E7-E4D4-4480-B28F-DC6F1CDCEB96}.205]  ***********
+2013-11-29	04:51:52:614	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:614	 460	1334	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	04:51:52:653	 460	1334	DnldMgr	***********  DnldMgr: New download job [UpdateId = {64027A15-E6AE-4133-B904-18F5F61461BE}.205]  ***********
+2013-11-29	04:51:52:653	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:653	 460	1334	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	***********  DnldMgr: New download job [UpdateId = {25599F80-DB8A-47B3-8DED-AD19E03A6BFA}.205]  ***********
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:657	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	04:51:52:676	 460	1334	DnldMgr	***********  DnldMgr: New download job [UpdateId = {91932CFB-C396-44C7-95ED-C1AB4357D950}.200]  ***********
+2013-11-29	04:51:52:676	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	04:51:52:676	 460	1334	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	04:51:52:676	 460	1334	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	06:07:09:215	 460	e40	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	06:07:14:636	 460	e40	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	06:07:19:634	 460	e40	Report	CWERReporter finishing event handling. (00000000)
+2013-11-29	06:09:52:570	 460	e40	DnldMgr	***********  DnldMgr: Regulation Refresh [Svc: {7971F918-A847-4430-9279-4A52D1EFE18D}]  ***********
+2013-11-29	06:09:52:570	 460	e40	DnldMgr	Contacting regulation server for 5 updates.
+2013-11-29	06:09:52:636	 460	e40	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\wuredir.cab:
+2013-11-29	06:09:52:642	 460	e40	Misc	 Microsoft signed: Yes
+2013-11-29	06:09:52:645	 460	e40	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\wuredir.cab:
+2013-11-29	06:09:52:651	 460	e40	Misc	 Microsoft signed: Yes
+2013-11-29	06:09:52:653	 460	e40	DnldMgr	Regulation server path: https://update.microsoft.com/v6/UpdateRegulationService/UpdateRegulation.asmx.
+2013-11-29	06:09:55:609	 460	e40	DnldMgr	  Per-Update: 64027a15-e6ae-4133-b904-18f5f61461be at rate 5000
+2013-11-29	06:09:55:609	 460	e40	DnldMgr	  Per-Update: 25599f80-db8a-47b3-8ded-ad19e03a6bfa at rate 5000
+2013-11-29	06:09:55:609	 460	e40	DnldMgr	  Per-Update: 785a87e7-e4d4-4480-b28f-dc6f1cdceb96 at rate 5000
+2013-11-29	06:09:55:609	 460	e40	DnldMgr	  Per-Update: 91932cfb-c396-44c7-95ed-c1ab4357d950 at rate 0
+2013-11-29	06:09:55:609	 460	e40	DnldMgr	  Per-Update: 6fc739fb-e7fe-4859-9281-c9da6c385886 at rate 5000
+2013-11-29	06:09:55:609	 460	e40	DnldMgr	  * Regulation call complete. 0x00000000
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	***********  DnldMgr: New download job [UpdateId = {6FC739FB-E7FE-4859-9281-C9DA6C385886}.204]  ***********
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	***********  DnldMgr: New download job [UpdateId = {785A87E7-E4D4-4480-B28F-DC6F1CDCEB96}.205]  ***********
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	***********  DnldMgr: New download job [UpdateId = {64027A15-E6AE-4133-B904-18F5F61461BE}.205]  ***********
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	***********  DnldMgr: New download job [UpdateId = {25599F80-DB8A-47B3-8DED-AD19E03A6BFA}.205]  ***********
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 6FC739FB-E7FE-4859-9281-C9DA6C385886 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 785A87E7-E4D4-4480-B28F-DC6F1CDCEB96 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 64027A15-E6AE-4133-B904-18F5F61461BE is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 25599F80-DB8A-47B3-8DED-AD19E03A6BFA is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 5000.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	***********  DnldMgr: New download job [UpdateId = {91932CFB-C396-44C7-95ED-C1AB4357D950}.200]  ***********
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	  * Update is not allowed to download due to regulation.
+2013-11-29	06:09:55:610	 460	e40	DnldMgr	Regulation: {7971F918-A847-4430-9279-4A52D1EFE18D} - Update 91932CFB-C396-44C7-95ED-C1AB4357D950 is "PerUpdate" regulated and can NOT download. Sequence 5902 vs AcceptRate 0.
+2013-11-29	07:10:40:000	 460	d24	AU	#############
+2013-11-29	07:10:40:000	 460	d24	AU	## START ##  AU: Search for updates
+2013-11-29	07:10:40:000	 460	d24	AU	#########
+2013-11-29	07:10:40:051	 460	d24	AU	<<## SUBMITTED ## AU: Search for updates [CallId = {97EF5D63-A4F0-4B43-B8CA-3F2D4415C96C}]
+2013-11-29	07:10:40:051	 460	118c	Agent	*************
+2013-11-29	07:10:40:051	 460	118c	Agent	** START **  Agent: Finding updates [CallerId = AutomaticUpdates]
+2013-11-29	07:10:40:051	 460	118c	Agent	*********
+2013-11-29	07:10:40:051	 460	118c	Agent	  * Online = Yes; Ignore download priority = No
+2013-11-29	07:10:40:051	 460	118c	Agent	  * Criteria = "IsInstalled=0 and DeploymentAction='Installation' or IsPresent=1 and DeploymentAction='Uninstallation' or IsInstalled=1 and DeploymentAction='Installation' and RebootRequired=1 or IsInstalled=0 and DeploymentAction='Uninstallation' and RebootRequired=1"
+2013-11-29	07:10:40:052	 460	118c	Agent	  * ServiceID = {7971F918-A847-4430-9279-4A52D1EFE18D} Third party service
+2013-11-29	07:10:40:052	 460	118c	Agent	  * Search Scope = {Machine}
+2013-11-29	07:10:40:161	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\9482F4B4-E343-43B6-B170-9A65BC822C77\muv4wuredir.cab:
+2013-11-29	07:10:40:182	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:42:864	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\9482F4B4-E343-43B6-B170-9A65BC822C77\muv4wuredir.cab:
+2013-11-29	07:10:42:876	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:42:906	 460	118c	Agent	Checking for updated auth cab for service 7971f918-a847-4430-9279-4a52d1efe18d at http://ds.download.windowsupdate.com/v10/1/microsoftupdate/redir/muauth.cab
+2013-11-29	07:10:42:906	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\AuthCabs\authcab.cab:
+2013-11-29	07:10:42:920	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:45:677	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\AuthCabs\authcab.cab:
+2013-11-29	07:10:45:682	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:45:692	 460	118c	Setup	Checking for agent SelfUpdate
+2013-11-29	07:10:45:700	 460	118c	Setup	Client version: Core: 7.6.7600.256  Aux: 7.6.7600.256
+2013-11-29	07:10:45:702	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\9482F4B4-E343-43B6-B170-9A65BC822C77\muv4wuredir.cab:
+2013-11-29	07:10:45:707	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:45:783	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\9482F4B4-E343-43B6-B170-9A65BC822C77\muv4wuredir.cab:
+2013-11-29	07:10:45:795	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:45:810	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\SelfUpdate\wuident.cab:
+2013-11-29	07:10:45:824	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:48:498	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\SelfUpdate\wuident.cab:
+2013-11-29	07:10:48:504	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:48:506	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\SelfUpdate\wsus3setup.cab:
+2013-11-29	07:10:48:524	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:48:564	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\SelfUpdate\wsus3setup.cab:
+2013-11-29	07:10:48:570	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:48:588	 460	118c	Setup	Determining whether a new setup handler needs to be downloaded
+2013-11-29	07:10:48:588	 460	118c	Setup	SelfUpdate handler is not found.  It will be downloaded
+2013-11-29	07:10:48:588	 460	118c	Setup	Evaluating applicability of setup package "WUClient-SelfUpdate-ActiveX~31bf3856ad364e35~amd64~~7.6.7600.256"
+2013-11-29	07:10:50:093	 460	118c	Setup	Setup package "WUClient-SelfUpdate-ActiveX~31bf3856ad364e35~amd64~~7.6.7600.256" is already installed.
+2013-11-29	07:10:50:093	 460	118c	Setup	Evaluating applicability of setup package "WUClient-SelfUpdate-Aux-TopLevel~31bf3856ad364e35~amd64~~7.6.7600.256"
+2013-11-29	07:10:50:121	 460	118c	Setup	Setup package "WUClient-SelfUpdate-Aux-TopLevel~31bf3856ad364e35~amd64~~7.6.7600.256" is already installed.
+2013-11-29	07:10:50:121	 460	118c	Setup	Evaluating applicability of setup package "WUClient-SelfUpdate-Core-TopLevel~31bf3856ad364e35~amd64~~7.6.7600.256"
+2013-11-29	07:10:50:158	 460	118c	Setup	Setup package "WUClient-SelfUpdate-Core-TopLevel~31bf3856ad364e35~amd64~~7.6.7600.256" is already installed.
+2013-11-29	07:10:50:158	 460	118c	Setup	SelfUpdate check completed.  SelfUpdate is NOT required.
+2013-11-29	07:10:55:574	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\muredir.cab:
+2013-11-29	07:10:55:590	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:55:632	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\muredir.cab:
+2013-11-29	07:10:55:644	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:10:55:652	 460	118c	PT	+++++++++++  PT: Synchronizing server updates  +++++++++++
+2013-11-29	07:10:55:652	 460	118c	PT	  + ServiceId = {7971F918-A847-4430-9279-4A52D1EFE18D}, Server URL = https://update.microsoft.com/v6/ClientWebService/client.asmx
+2013-11-29	07:11:03:600	 460	118c	Driver	Matched driver to device PCI\VEN_1814&DEV_3090&SUBSYS_662211AD&REV_00
+2013-11-29	07:11:03:600	 460	118c	Driver	Status: 0x180200a, ProblemNumber: 00000000
+2013-11-29	07:11:03:600	 460	118c	Driver	Matched driver to device PCI\VEN_1002&DEV_964A&SUBSYS_06421025&REV_00
+2013-11-29	07:11:03:600	 460	118c	Driver	Status: 0x180200a, ProblemNumber: 00000000
+2013-11-29	07:11:17:131	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\muredir.cab:
+2013-11-29	07:11:17:140	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:11:17:182	 460	118c	Misc	Validating signature for C:\Windows\SoftwareDistribution\WuRedir\7971F918-A847-4430-9279-4A52D1EFE18D\muredir.cab:
+2013-11-29	07:11:17:194	 460	118c	Misc	 Microsoft signed: Yes
+2013-11-29	07:11:17:201	 460	118c	PT	+++++++++++  PT: Synchronizing extended update info  +++++++++++
+2013-11-29	07:11:17:201	 460	118c	PT	  + ServiceId = {7971F918-A847-4430-9279-4A52D1EFE18D}, Server URL = https://update.microsoft.com/v6/ClientWebService/client.asmx
+2013-11-29	07:11:18:779	 460	118c	Agent	  * Added update {3ACA18A8-7998-4436-AA7B-B72B8C50908B}.100 to search result
+2013-11-29	07:11:18:779	 460	118c	Agent	Update {414642E2-5F20-4AD1-AA5A-773061238B5F}.103 is pruned out due to potential supersedence
+2013-11-29	07:11:18:779	 460	118c	Agent	  * Added update {F278F751-8670-477E-8DBB-F5C4DEAF5EA6}.102 to search result
+2013-11-29	07:11:18:779	 460	118c	Agent	  * Added update {24E6CA50-6C6B-4098-B5DC-FEA1115B117B}.200 to search result
+2013-11-29	07:11:18:779	 460	118c	Agent	Update {037A60AA-425B-497C-9FF0-EF85547911E5}.203 is pruned out due to potential supersedence
+2013-11-29	07:11:18:779	 460	118c	Agent	Update {D528D50B-791A-4567-A497-ADEB35EA645B}.200 is pruned out due to potential supersedence
+2013-11-29	07:11:18:779	 460	118c	Agent	  * Added update {7B3369E2-5608-495B-AF58-A9F66C0676D2}.205 to search result
+2013-11-29	07:11:18:780	 460	118c	Agent	  * Added update {400D135F-03E5-45B5-A44B-16EF70722C4F}.201 to search result
+2013-11-29	07:11:18:780	 460	118c	Agent	  * Added update {5EB03BEA-4F70-4136-9529-3BA5015AEE9A}.200 to search result
+2013-11-29	07:11:18:780	 460	118c	Agent	  * Found 6 updates and 80 categories in search; evaluated appl. rules of 2585 out of 3586 deployed entities
+2013-11-29	07:11:18:793	 460	118c	Agent	*********
+2013-11-29	07:11:18:793	 460	118c	Agent	**  END  **  Agent: Finding updates
+END 	
+ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÄÅÇÉÑÖÜáàâäãåçéèêëíìîïñóòôöõúùûü†°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁﬂ‡·‚„‰ÂÊÁËÈÍÎÏÌÓÔÒÚÛÙıˆ˜¯˘˙˚¸˝˛
