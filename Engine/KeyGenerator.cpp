@@ -14,8 +14,11 @@ void KeyGenerator::Destroy()
 		_isDestroyed = true;
 		_ctrLength = 0;
 		CEX::Utility::IntUtils::ClearVector(_ctrVector);
-		delete _hashEngine;
-		delete _seedEngine;
+
+		if (_hashEngine != 0)
+			delete _hashEngine;
+		if (_seedEngine != 0)
+			delete _seedEngine;
 	}
 }
 
