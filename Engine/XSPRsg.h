@@ -35,6 +35,7 @@ class XSPRsg : public ISeed
 protected:
 	static constexpr int SIZE32 = 4;
 	static constexpr int SIZE64 = 8;
+	static constexpr int MAXSEED = 16;
 	static constexpr ulong Z1 = 0x9E3779B97F4A7C15;
 	static constexpr ulong Z2 = 0xBF58476D1CE4E5B9;
 	static constexpr ulong Z3 = 0x94D049BB133111EB;
@@ -64,7 +65,32 @@ public:
 	// *** Constructor *** //
 
 	/// <summary>
-	/// Initialize this class.
+	/// Initialize this class using the default random provider to generate 16 ulongs and invoke the 1024 bit function
+	/// </summary>
+	XSPRsg()
+		:
+		_isDestroyed(false),
+		_isShift1024(false),
+		_stateOffset(0),
+		_stateSeed(MAXSEED),
+		_wrkBuffer(MAXSEED)
+	{
+		unsigned int len = MAXSEED * sizeof(ulong);
+		GetSeed(len);
+		_isShift1024 = true;
+
+		JMP1024 = { 
+			0x84242f96eca9c41dULL, 0xa3c65b8776f96855ULL, 0x5b34a39f070b5837ULL, 0x4489affce4f31a1eULL, 
+			0x2ffeeb0a48316f40ULL, 0xdc2d9891fe68c022ULL, 0x3659132bb12fea70ULL, 0xaac17d8efa43cab8ULL, 
+			0xc4cb815590989b13ULL, 0x5ee975283d71c93bULL, 0x691548c86c1bd540ULL, 0x7910c41d10a1e6a5ULL, 
+			0x0b5fc64563b3e2a8ULL, 0x047f7684e9fc949dULL, 0xb99181f2d8f685caULL, 0x284600e3f30e38c3ULL
+		};
+
+		Reset();
+	}
+
+	/// <summary>
+	/// Initialize this class with a random seed array.
 	/// <para>Initializing with 2 ulongs invokes the 128 bit function, initializing with 16 ulongs
 	/// invokes the 1024 bit function.</para>
 	/// </summary>
@@ -89,18 +115,18 @@ public:
 				throw CryptoRandomException("XSPRsg:CTor", "Seed values can not be zero!");
 		}
 
-		memcpy(&_stateSeed[0], &Seed[0], Seed.size() * sizeof(ulong));
+		unsigned int len = Seed.size() * sizeof(ulong);
+		memcpy(&_stateSeed[0], &Seed[0], len);
 		_isShift1024 = (Seed.size() == 16);
 
 		if (!_isShift1024)
 			JMP128 = { 0x8a5cd789635d2dffULL, 0x121fd2155c472f96ULL };
 		else
-			JMP1024 = { 0x84242f96eca9c41dULL,
-				0xa3c65b8776f96855ULL, 0x5b34a39f070b5837ULL, 0x4489affce4f31a1eULL,
-				0x2ffeeb0a48316f40ULL, 0xdc2d9891fe68c022ULL, 0x3659132bb12fea70ULL,
-				0xaac17d8efa43cab8ULL, 0xc4cb815590989b13ULL, 0x5ee975283d71c93bULL,
-				0x691548c86c1bd540ULL, 0x7910c41d10a1e6a5ULL, 0x0b5fc64563b3e2a8ULL,
-				0x047f7684e9fc949dULL, 0xb99181f2d8f685caULL, 0x284600e3f30e38c3ULL
+			JMP1024 = { 
+				0x84242f96eca9c41dULL, 0xa3c65b8776f96855ULL, 0x5b34a39f070b5837ULL, 0x4489affce4f31a1eULL,
+				0x2ffeeb0a48316f40ULL, 0xdc2d9891fe68c022ULL, 0x3659132bb12fea70ULL, 0xaac17d8efa43cab8ULL,
+				0xc4cb815590989b13ULL, 0x5ee975283d71c93bULL, 0x691548c86c1bd540ULL, 0x7910c41d10a1e6a5ULL,
+				0x0b5fc64563b3e2a8ULL, 0x047f7684e9fc949dULL, 0xb99181f2d8f685caULL, 0x284600e3f30e38c3ULL
 			};
 
 		Reset();
@@ -167,6 +193,7 @@ protected:
 	void Jump128();
 	void Jump1024();
 	void Generate(std::vector<byte> &Output, unsigned int Size);
+	void GetSeed(unsigned int Size);
 	ulong Shift128();
 	ulong Shift1024();
 };

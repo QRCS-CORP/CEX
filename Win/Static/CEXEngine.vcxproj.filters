@@ -130,6 +130,12 @@
     <Filter Include="Source Files\IO">
       <UniqueIdentifier>{9dc772a6-6635-4dd3-99db-e47c092c0bb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Processing\Factory">
+      <UniqueIdentifier>{66280d1f-c332-411d-9323-dc07e81ff4d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Processing\Structure">
+      <UniqueIdentifier>{4459698f-6898-4440-a4c2-97bf7d480e83}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Engine\CBC.h">
@@ -471,6 +477,18 @@
     <ClInclude Include="..\..\Engine\XSPRsg.h">
       <Filter>Header Files\Seed</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherKey.h">
+      <Filter>Header Files\Processing\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MessageHeader.h">
+      <Filter>Header Files\Processing\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KeyFactory.h">
+      <Filter>Header Files\Processing\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SeedFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Engine\CBC.cpp">
@@ -658,6 +676,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\XSPRsg.cpp">
       <Filter>Source Files\Seed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SeedFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

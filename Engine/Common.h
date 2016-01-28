@@ -7,7 +7,6 @@
 #include <assert.h>
 #include <exception>
 
-
 #define NAMESPACE_ROOT namespace CEX {
 #define NAMESPACE_ROOTEND }
 #define NAMESPACE_CIPHER namespace CEX { namespace Cipher {
@@ -93,11 +92,11 @@ If you use this code, please do so responsibly and in accordance to law in your 
 \section intro_link Links
 Get the latest version from the CEX Home page: http://www.vtdev.com/cexhome.html
 
-The CEX++ Help pages: http://www.vtdev.com/CEX++/Help/html/index.html
+The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html
 
-CEX++ on Github: https://github.com/Steppenwolfe65/CEX++
+CEX++ on Github: https://github.com/Steppenwolfe65/CEX
 
-CEX .NET on Github: https://github.com/Steppenwolfe65/CEX
+CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET
 
 The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 */

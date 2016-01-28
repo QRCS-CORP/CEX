@@ -12,15 +12,15 @@ void StreamWriter::Destroy()
 	_streamPosition = 0;
 }
 
-std::vector<byte> StreamWriter::GetBytes()
+std::vector<byte>& StreamWriter::GetBytes()
 {
 	return _streamData;
 }
 
-MemoryStream StreamWriter::GetStream()
+MemoryStream* StreamWriter::GetStream()
 {
 	_streamData.resize(_streamPosition);
-	return MemoryStream(_streamData);
+	return new MemoryStream(_streamData);
 }
 
 NAMESPACE_IOEND

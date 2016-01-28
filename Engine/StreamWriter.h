@@ -18,13 +18,47 @@ protected:
 public:
 
 	/// <summary>
-	/// Initialize this class with a byte array
+	/// The length of the data
+	/// </summary>
+	const unsigned int Length() const { return _streamData.size(); }
+
+	/// <summary>
+	/// The current position within the data
+	/// </summary>
+	const unsigned int Position() const { return _streamPosition; }
+
+	/// <summary>
+	/// Initialize this class
 	/// </summary>
 	///
-	/// <param name="Offset">Length of the array</param>
+	/// <param name="Length">The length of the underlying stream</param>
 	StreamWriter(unsigned int Length)
 		:
 		_streamData(Length),
+		_streamPosition(0)
+	{
+	}
+
+	/// <summary>
+	/// Initialize this class with a byte array
+	/// </summary>
+	///
+	/// <param name="StreamData">The byte array to write data to</param>
+	StreamWriter(std::vector<byte> &DataArray)
+		:
+		_streamData(DataArray),
+		_streamPosition(0)
+	{
+	}
+
+	/// <summary>
+	/// Initialize this class with a MemoryStream
+	/// </summary>
+	///
+	/// <param name="DataStream">The MemoryStream to write data to</param>
+	StreamWriter(MemoryStream &DataStream)
+		:
+		_streamData(DataStream.ToArray()),
 		_streamPosition(0)
 	{
 	}
@@ -45,12 +79,12 @@ public:
 	/// <summary>
 	/// Returns the entire array of raw bytes from the stream
 	/// </summary>
-	std::vector<byte> GetBytes();
+	std::vector<byte>& GetBytes();
 
 	/// <summary>
 	/// Returns the base MemoryStream object
 	/// </summary>
-	MemoryStream GetStream();
+	MemoryStream* GetStream();
 
 	/// <summary>
 	/// Write an integer array to the base stream

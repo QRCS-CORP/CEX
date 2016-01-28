@@ -1,4 +1,5 @@
 #include "XSPRsg.h"
+#include "CSPRsg.h"
 #include "IntUtils.h"
 
 NAMESPACE_SEED
@@ -156,6 +157,14 @@ ulong XSPRsg::Shift1024()
 	_wrkBuffer[_stateOffset] = Y ^ X ^ (Y >> 11) ^ (X >> 30); // b,c
 
 	return _wrkBuffer[_stateOffset] * Z4;
+}
+
+void XSPRsg::GetSeed(unsigned int Size)
+{
+	CSPRsg rnd;
+	std::vector<byte> seed(Size);
+	seed = rnd.GetBytes(Size);
+	memcpy(&_stateSeed[0], &seed[0], Size);
 }
 
 NAMESPACE_SEEDEND

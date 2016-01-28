@@ -39,6 +39,8 @@
 
 #include "KeyGenerator.h"
 #include "MemoryStream.h"
+#include "CipherKey.h"
+#include "MessageHeader.h"
 
 using namespace Test;
 
@@ -169,8 +171,9 @@ void TestKeyGen()
 	kg.GetBytes(d);
 	KeyParams* kp;
 	kp = kg.GetKeyParams(32, 0, 0);
-	MemoryStream m = KeyParams::Serialize(*kp);
-	KeyParams kpc = KeyParams::DeSerialize(m);
+	MemoryStream* m = KeyParams::Serialize(*kp);
+	KeyParams kpc = KeyParams::DeSerialize(*m);
+	delete m;
 	if (!kp->Equals(kpc))
 		throw;
 	kp = kg.GetKeyParams(32, 0, 16);
@@ -183,7 +186,7 @@ int main(int argc, const char * argv[])
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-
+	TestKeyGen();
 	try
 	{
 		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))

@@ -180,6 +180,7 @@
     <ClInclude Include="..\..\Engine\CBC.h" />
     <ClInclude Include="..\..\Engine\CipherDescription.h" />
     <ClInclude Include="..\..\Engine\BlockCipherFromName.h" />
+    <ClInclude Include="..\..\Engine\CipherKey.h" />
     <ClInclude Include="..\..\Engine\CipherModes.h" />
     <ClInclude Include="..\..\Engine\CMAC.h" />
     <ClInclude Include="..\..\Engine\Common.h" />
@@ -231,6 +232,7 @@
     <ClInclude Include="..\..\Engine\Keccak.h" />
     <ClInclude Include="..\..\Engine\Keccak256.h" />
     <ClInclude Include="..\..\Engine\Keccak512.h" />
+    <ClInclude Include="..\..\Engine\KeyFactory.h" />
     <ClInclude Include="..\..\Engine\KeyGenerator.h" />
     <ClInclude Include="..\..\Engine\KeyParams.h" />
     <ClInclude Include="..\..\Engine\KeySizes.h" />
@@ -238,6 +240,7 @@
     <ClInclude Include="..\..\Engine\MacStream.h" />
     <ClInclude Include="..\..\Engine\MemoryStream.h" />
     <ClInclude Include="..\..\Engine\CipherModeFromName.h" />
+    <ClInclude Include="..\..\Engine\MessageHeader.h" />
     <ClInclude Include="..\..\Engine\OFB.h" />
     <ClInclude Include="..\..\Engine\PaddingFromName.h" />
     <ClInclude Include="..\..\Engine\PaddingModes.h" />
@@ -253,6 +256,7 @@
     <ClInclude Include="..\..\Engine\ISCRsg.h" />
     <ClInclude Include="..\..\Engine\Salsa20.h" />
     <ClInclude Include="..\..\Engine\SecureRandom.h" />
+    <ClInclude Include="..\..\Engine\SeedFromName.h" />
     <ClInclude Include="..\..\Engine\SeedGenerators.h" />
     <ClInclude Include="..\..\Engine\SeekOrigin.h" />
     <ClInclude Include="..\..\Engine\Serpent.h" />
@@ -326,6 +330,7 @@
     <ClCompile Include="..\..\Engine\RHX.cpp" />
     <ClCompile Include="..\..\Engine\Salsa20.cpp" />
     <ClCompile Include="..\..\Engine\SecureRandom.cpp" />
+    <ClCompile Include="..\..\Engine\SeedFromName.cpp" />
     <ClCompile Include="..\..\Engine\SHA256.cpp" />
     <ClCompile Include="..\..\Engine\SHA512.cpp" />
     <ClCompile Include="..\..\Engine\SHX.cpp" />

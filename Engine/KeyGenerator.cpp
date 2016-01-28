@@ -1,9 +1,10 @@
+
 #include "KeyGenerator.h"
 #include "CSPRsg.h"
 #include "DigestFromName.h"
 #include "HMAC.h"
 #include "IntUtils.h"
-#include "PrngFromName.h"
+#include "SeedFromName.h"
 
 NAMESPACE_COMMON
 
@@ -97,7 +98,10 @@ std::vector<byte> KeyGenerator::Generate(unsigned int Size)
 
 		// process unaligned block
 		if (alnSize < Size)
-			memcpy(&key[offset], &GetBlock(), Size - offset);
+		{
+			std::vector<byte> tmpr = GetBlock();
+			memcpy(&key[offset], &tmpr[0], Size - offset);
+		}
 	}
 
 	return key;
@@ -151,11 +155,11 @@ IDigest* KeyGenerator::GetDigestEngine(Digests DigsetType)
 	}
 }
 
-IRandom* KeyGenerator::GetSeedEngine(Prngs PrngType)
+ISeed* KeyGenerator::GetSeedEngine(SeedGenerators SeedType)
 {
 	try
 	{
-		return CEX::Helper::PrngFromName::GetInstance(PrngType);
+		return CEX::Helper::SeedFromName::GetInstance(SeedType);
 	}
 	catch (...)
 	{

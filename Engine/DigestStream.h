@@ -27,6 +27,7 @@
 #ifndef _CEXENGINE_DIGESTSTREAM_H
 #define _CEXENGINE_DIGESTSTREAM_H
 
+#include "Common.h"
 #include "IDigest.h"
 #include "Digests.h"
 #include "DigestFromName.h"

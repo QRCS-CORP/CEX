@@ -855,7 +855,7 @@ namespace Test
 				64,
 				Digests::SHA512);
 
-			CipherDescription cy(cd.ToStream());
+			CipherDescription cy(*cd.ToStream());
 
 			if (!cy.Equals(cd))
 				throw;

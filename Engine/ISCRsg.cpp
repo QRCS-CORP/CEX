@@ -1,5 +1,6 @@
 #include "ISCRsg.h"
 #include "IntUtils.h"
+#include "CSPRsg.h"
 
 NAMESPACE_SEED
 
@@ -200,6 +201,14 @@ void ISCRsg::Initialize(bool MixState)
 	}
 
 	Generate();
+}
+
+void ISCRsg::GetSeed(unsigned int Size)
+{
+	CSPRsg rnd;
+	std::vector<byte> seed(Size);
+	seed = rnd.GetBytes(Size);
+	memcpy(&_rndResult[0], &seed[0], Size);
 }
 
 NAMESPACE_SEEDEND

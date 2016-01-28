@@ -176,7 +176,7 @@ public:
 	/// <param name="KeyStream">Stream containing the KeyParams data</param>
 	/// 
 	/// <returns>A populated KeyParams class</returns>
-	static KeyParams DeSerialize(CEX::IO::MemoryStream KeyStream)
+	static KeyParams DeSerialize(CEX::IO::MemoryStream &KeyStream)
 	{
 		CEX::IO::StreamReader reader(KeyStream);
 		short keyLen = reader.ReadInt16();
@@ -203,7 +203,7 @@ public:
 	/// <param name="KeyObj">A KeyParams class</param>
 	/// 
 	/// <returns>A stream containing the KeyParams data</returns>
-	static CEX::IO::MemoryStream Serialize(KeyParams KeyObj)
+	static CEX::IO::MemoryStream* Serialize(KeyParams &KeyObj)
 	{
 		short klen = (short)KeyObj.Key().size();
 		short vlen = (short)KeyObj.IV().size();
@@ -223,8 +223,8 @@ public:
 		if (KeyObj.Ikm().size() != 0)
 			writer.Write(KeyObj.Ikm());
 
-		CEX::IO::MemoryStream strm = writer.GetStream();
-		strm.Seek(0, CEX::IO::SeekOrigin::Begin);
+		CEX::IO::MemoryStream* strm = writer.GetStream();
+		strm->Seek(0, CEX::IO::SeekOrigin::Begin);
 
 		return strm;
 	}

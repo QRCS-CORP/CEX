@@ -17,6 +17,17 @@ private:
 	StreamReader() {}
 
 public:
+
+	/// <summary>
+	/// The length of the data
+	/// </summary>
+	const unsigned int Length() const { return _streamData.size(); }
+
+	/// <summary>
+	/// The current position within the data
+	/// </summary>
+	const unsigned int Position() const { return _streamPosition; }
+
 	/// <summary>
 	/// Initialize this class with a byte array
 	/// </summary>
@@ -34,7 +45,7 @@ public:
 	///
 	/// <param name="Data">Byte array data to read</param>
 	/// <param name="Offset">Starting position within the array</param>
-	StreamReader(const std::vector<byte> Data, unsigned int Offset = 0)
+	StreamReader(const std::vector<byte> &Data, unsigned int Offset = 0)
 		:
 		_streamData(Data),
 		_streamPosition(Offset)

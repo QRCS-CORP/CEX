@@ -2,7 +2,6 @@
 #define _CEXENGINE_CIPHERDESCRIPTION_H
 
 #include "Common.h"
-
 #include "BlockSizes.h"
 #include "CipherModes.h"
 #include "Digests.h"
@@ -203,7 +202,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionArray">The byte array containing the CipherDescription</param>
-	CipherDescription(std::vector<byte> DescriptionArray)
+	CipherDescription(std::vector<byte> &DescriptionArray)
 	{
 		CEX::IO::StreamReader reader(DescriptionArray);
 
@@ -224,7 +223,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the CipherDescription</param>
-	CipherDescription(CEX::IO::MemoryStream DescriptionStream)
+	CipherDescription(CEX::IO::MemoryStream &DescriptionStream)
 	{
 		CEX::IO::StreamReader reader(DescriptionStream);
 
@@ -295,7 +294,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The MemoryStream containing the CipherDescription</returns>
-	CEX::IO::MemoryStream ToStream()
+	CEX::IO::MemoryStream* ToStream()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 
@@ -342,7 +341,7 @@ public:
 	/// <param name="Obj">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(CipherDescription Obj)
+	bool Equals(CipherDescription &Obj)
 	{
 		if (_engineType != (unsigned int)Obj.EngineType())
 			return false;

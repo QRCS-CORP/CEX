@@ -27,6 +27,7 @@
 #ifndef _CEXENGINE_MACSTREAM_H
 #define _CEXENGINE_MACSTREAM_H
 
+#include "Common.h"
 #include "IMac.h"
 #include "Macs.h"
 #include "Event.h"

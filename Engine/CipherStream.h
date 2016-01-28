@@ -29,6 +29,7 @@
 
 #include "CipherDescription.h"
 #include "CipherModes.h"
+#include "Common.h"
 #include "CryptoProcessingException.h"
 #include "Digests.h"
 #include "Event.h"
