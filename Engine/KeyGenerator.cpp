@@ -92,15 +92,14 @@ std::vector<byte> KeyGenerator::Generate(unsigned int Size)
 		// fill the key array
 		while (offset < alnSize)
 		{
-			memcpy(&key[offset], &GetBlock(), blockSize);
+			memcpy(&key[offset], &GetBlock()[0], blockSize);
 			offset += blockSize;
 		}
 
 		// process unaligned block
 		if (alnSize < Size)
 		{
-			std::vector<byte> tmpr = GetBlock();
-			memcpy(&key[offset], &tmpr[0], Size - offset);
+			memcpy(&key[offset], &GetBlock()[0], Size - offset);
 		}
 	}
 

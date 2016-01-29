@@ -81,10 +81,10 @@ public:
 	/// <summary>
 	/// Initialize this class; setting a byte array as the streams content
 	/// </summary>
-	MemoryStream(std::vector<byte> &Data)
+	MemoryStream(std::vector<byte> &DataArray)
 		:
 		_isDestroyed(false),
-		_streamData(Data),
+		_streamData(DataArray),
 		_streamPosition(0)
 	{
 	}

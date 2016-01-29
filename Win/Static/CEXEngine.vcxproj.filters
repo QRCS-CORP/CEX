@@ -136,6 +136,9 @@
     <Filter Include="Header Files\Processing\Structure">
       <UniqueIdentifier>{4459698f-6898-4440-a4c2-97bf7d480e83}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Processing\Factory">
+      <UniqueIdentifier>{8909b3c3-c9e0-4e2f-952e-90568ce5b33f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Engine\CBC.h">
@@ -679,6 +682,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\SeedFromName.cpp">
       <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\KeyFactory.cpp">
+      <Filter>Source Files\Processing\Factory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

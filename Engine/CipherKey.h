@@ -11,7 +11,7 @@
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
-NAMESPACE_PROCESSING
+NAMESPACE_PRCSTRUCT
 
 using CEX::Common::CipherDescription;
 using CEX::Exception::CryptoProcessingException;
@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	/// The <see cref="CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance
 	/// </summary>
-	const CipherDescription &Description() const { return _cprDsc; }
+	CipherDescription Description() const { return _cprDsc; }
 
 	/// <summary>
 	/// The unique 16 byte ID field used to identify this key. A null value auto generates this field
@@ -66,6 +66,17 @@ public:
 	/// An array of random bytes used to encrypt a message file extension. A null value auto generates this field
 	/// </summary>
 	const std::vector<byte> &ExtensionKey() { return _extKey; }
+
+	/// <summary>
+	/// Default constructor
+	/// </summary>
+	CipherKey()
+		:
+		_cprDsc(),
+		_extKey(0),
+		_keyID(0)
+	{
+	}
 
 	/// <summary>
 	/// CipherKey structure constructor.
@@ -98,7 +109,7 @@ public:
 		}
 		else
 		{
-			this->_keyID = KeyId;
+			_keyID = KeyId;
 		}
 
 		if (ExtensionKey.size() == 0)
@@ -123,10 +134,10 @@ public:
 	/// <param name="KeyStream">The Stream containing the CipherKey</param>
 	CipherKey(CEX::IO::MemoryStream &KeyStream)
 		:
-		_cprDsc(KeyStream),
 		_extKey(0),
 		_keyID(0)
 	{
+		_cprDsc = CipherDescription(KeyStream);
 		CEX::IO::StreamReader reader(KeyStream);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
@@ -139,11 +150,12 @@ public:
 	/// <param name="KeyArray">The byte array containing the CipherKey</param>
 	CipherKey(std::vector<byte> &KeyArray)
 		:
-		_cprDsc(KeyArray),
 		_extKey(0),
 		_keyID(0)
 	{
-		CEX::IO::StreamReader reader(KeyArray);
+		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(KeyArray);
+		_cprDsc = CipherDescription(KeyArray);
+		CEX::IO::StreamReader reader(ms);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
 	}
@@ -167,7 +179,13 @@ public:
 	/// <returns>The byte array containing the CipherKey</returns>
 	std::vector<byte> ToBytes()
 	{
-		return ToStream()->ToArray();
+		CEX::IO::StreamWriter writer(GetHeaderSize());
+		std::vector<byte> tmp = _cprDsc.ToBytes();
+		writer.Write(tmp);
+		writer.Write(_extKey);
+		writer.Write(_keyID);
+
+		return writer.GetBytes();
 	}
 
 	/// <summary>
@@ -178,7 +196,8 @@ public:
 	CEX::IO::MemoryStream* ToStream()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		writer.Write(_cprDsc.ToBytes());
+		std::vector<byte> tmp = _cprDsc.ToBytes();
+		writer.Write(tmp);
 		writer.Write(_extKey);
 		writer.Write(_keyID);
 
@@ -304,5 +323,5 @@ public:
 	}
 };
 
-NAMESPACE_PROCESSINGEND
+NAMESPACE_PRCSTRUCTEND
 #endif

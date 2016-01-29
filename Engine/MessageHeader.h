@@ -11,7 +11,7 @@
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
-NAMESPACE_PROCESSING
+NAMESPACE_PRCSTRUCT
 
 using CEX::Exception::CryptoProcessingException;
 
@@ -64,6 +64,15 @@ public:
 	/// </summary>
 	const std::vector<byte> ExtensionKey() { return _extKey; }
 
+	/// <summary>
+	/// Default constructor
+	/// </summary>
+	MessageHeader() 
+		:
+		_keyID(0),
+		_extKey(0),
+		_msgMac(0)
+	{}
 
 	/// <summary>
 	/// MessageHeader constructor
@@ -110,7 +119,8 @@ public:
 	/// <param name="HeaderArray">The byte array containing the MessageHeader</param>
 	MessageHeader(std::vector<byte> &HeaderArray)
 	{
-		CEX::IO::StreamReader reader(HeaderArray);
+		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(HeaderArray);
+		CEX::IO::StreamReader reader(ms);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		unsigned int len = reader.Length() - reader.Position();
@@ -138,7 +148,12 @@ public:
 	/// <returns>The byte array containing the MessageHeader</returns>
 	std::vector<byte> ToBytes()
 	{
-		return ToStream()->ToArray();
+		CEX::IO::StreamWriter writer(GetHeaderSize());
+		writer.Write(_keyID);
+		writer.Write(_extKey);
+		writer.Write(_msgMac);
+
+		return writer.GetBytes();
 	}
 
 	/// <summary>
@@ -169,7 +184,7 @@ public:
 	/// <param name="ExtKey">Random byte array used to encrypt the extension</param>
 	/// 
 	/// <returns>Encrypted file extension</returns>
-	static std::vector<byte> GetEncryptedExtension(std::string &Extension, std::vector<byte> &Key)
+	static std::vector<byte> EncryptExtension(std::string &Extension, std::vector<byte> &Key)
 	{
 		if (Extension.size() > EXTKEY_SIZE)
 			throw CEX::Exception::CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the extension string is too long!");
@@ -194,7 +209,7 @@ public:
 	/// <param name="ExtKey">Random byte array used to encrypt the extension</param>
 	/// 
 	/// <returns>File extension</returns>
-	static std::string GetDecryptedExtension(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &ExtKey)
+	static std::string DecryptExtension(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &ExtKey)
 	{
 		std::vector<byte> data(16);
 		CEX::IO::StreamReader reader(MessageStream);
@@ -210,6 +225,19 @@ public:
 		letters.erase(std::remove(letters.begin(), letters.end(), '0'), letters.end());
 
 		return letters;
+	}
+
+	/// <summary>
+	/// Get the file extension key
+	/// </summary>
+	/// 
+	/// <param name="MessageStream">Stream containing a message header</param>
+	/// 
+	/// <returns>The 16 byte extension key field</returns>
+	static std::vector<byte> GetExtensionKey(CEX::IO::MemoryStream &MessageStream)
+	{
+		MessageStream.Seek(SEEKTO_EXT, CEX::IO::SeekOrigin::Begin);
+		return CEX::IO::StreamReader(MessageStream).ReadBytes(EXTKEY_SIZE);
 	}
 
 	/// <summary>
@@ -258,7 +286,7 @@ public:
 	/// 
 	/// <param name="MessageStream">The message stream</param>
 	/// <param name="Extension">The message file extension</param>
-	static void SetExtension(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &Extension)
+	static void SetExtensionKey(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &Extension)
 	{
 		MessageStream.Seek(SEEKTO_EXT, CEX::IO::SeekOrigin::Begin);
 		MessageStream.Write(Extension, 0, EXTKEY_SIZE);
@@ -331,5 +359,5 @@ public:
 	}
 };
 
-NAMESPACE_PROCESSINGEND
+NAMESPACE_PRCSTRUCTEND
 #endif

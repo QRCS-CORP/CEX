@@ -41,6 +41,7 @@
 #include "MemoryStream.h"
 #include "CipherKey.h"
 #include "MessageHeader.h"
+#include "KeyFactory.h"
 
 using namespace Test;
 
@@ -164,29 +165,63 @@ void RunTest(Test::ITest* Test)
 	}
 }
 
-void TestKeyGen()
+/**/void TestKeyGen()
 {
 	KeyGenerator kg;
 	std::vector<byte> d(100);
 	kg.GetBytes(d);
-	KeyParams* kp;
-	kp = kg.GetKeyParams(32, 0, 0);
-	MemoryStream* m = KeyParams::Serialize(*kp);
-	KeyParams kpc = KeyParams::DeSerialize(*m);
-	delete m;
-	if (!kp->Equals(kpc))
+	// out-bound funcs return pointer to obj
+	KeyParams kp = *kg.GetKeyParams(32, 0, 0);
+	MemoryStream m = *KeyParams::Serialize(kp);
+	KeyParams kpc = *KeyParams::DeSerialize(m);
+
+	if (!kp.Equals(kpc))
 		throw;
-	kp = kg.GetKeyParams(32, 0, 16);
-	kp = kg.GetKeyParams(32, 16, 16);
-	kp = kg.GetKeyParams(0, 16, 16);
-	kp = kg.GetKeyParams(0, 0, 16);
+}
+
+void TestCipherKey()
+{
+	KeyGenerator kg;
+	KeyParams kp = *kg.GetKeyParams(192, 16, 64);
+	CipherDescription ds(
+		SymmetricEngines::RHX,
+		192,
+		IVSizes::V128,
+		CipherModes::CTR,
+		PaddingModes::PKCS7,
+		BlockSizes::B128,
+		RoundCounts::R22,
+		Digests::Skein512,
+		64,
+		Digests::SHA512);
+
+	// in/out funcs use a pointer
+	MemoryStream* m =  new MemoryStream;
+	CEX::Processing::Factory::KeyFactory kf(m);
+	kf.Create(ds, kp);
+
+	KeyParams kp2;
+	CEX::Processing::Structure::CipherKey ck;
+	// new instance w/ populated stream
+	m->Seek(0, CEX::IO::SeekOrigin::Begin);
+	CEX::Processing::Factory::KeyFactory kf2(m);
+	// get key and desc from stream
+	kf2.Extract(ck, kp2);
+
+	if (!ds.Equals(ck.Description()))
+		throw;
+	if (!kp.Equals(kp2))
+		throw;
+
+	delete m;
 }
 
 int main(int argc, const char * argv[])
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	TestKeyGen();
+	//TestCipherKey();
+
 	try
 	{
 		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))

@@ -6,68 +6,97 @@
 #include "CipherKey.h"
 #include "CryptoProcessingException.h"
 #include "CSPRsg.h"
-#include "Digests.h"
-#include "KeyGenerator.h"
 #include "KeyParams.h"
 #include "MemoryStream.h"
-#include "SeedGenerators.h"
+#include "BlockSizes.h"
+#include "CipherModes.h"
+#include "Digests.h"
+#include "IVSizes.h"
+#include "MemoryStream.h"
+#include "PaddingModes.h"
+#include "RoundCounts.h"
+#include "SymmetricEngines.h"
 
-NAMESPACE_PROCESSING
+NAMESPACE_PRCFACTORY
 
 using CEX::Common::CipherDescription;
 using CEX::Common::KeyParams;
 using CEX::Exception::CryptoProcessingException;
-using CEX::Enumeration::Digests;
-using CEX::Enumeration::SeedGenerators;
 using CEX::IO::MemoryStream;
-using namespace CEX::Enumeration;
+using CEX::Processing::Structure::CipherKey;
+using CEX::Enumeration::BlockSizes;
+using CEX::Enumeration::CipherModes;
+using CEX::Enumeration::Digests;
+using CEX::Enumeration::IVSizes;
+using CEX::Enumeration::PaddingModes;
+using CEX::Enumeration::RoundCounts;
+using CEX::Enumeration::SymmetricEngines;
 
 /// <summary>
-/// <h5>KeyFactory: Used to create or extract a CipherKey file.</h5>
+/// KeyFactory: Used to create or extract a CipherKey file.
 /// 
 /// <list type="bullet">
-/// <item><description>Constructors may use a fully qualified path to a key file, or the keys file stream.</description></item>
-/// <item><description>The <see cref="Create(CipherDescription, KeyParams)"/> method requires a populated KeyParams class.</description></item>
-/// <item><description>The <see cref="Create(CipherDescription, SeedGenerators, Digests)"/> method auto-generate keying material.</description></item>
-/// <item><description>The Extract() method retrieves a populated cipher key (CipherKey), and key material (KeyParams), from the key file.</description></item>
+/// <item><description>The Constructor requires a pointer to a MemoryStream for reading or writing; using Create() objects are written to the stream, with Extract() objects are read from the stream.</description></item>
+/// <item><description>The <see cref="Create(CipherDescription, KeyParams)"/> method requires a populated CipherDescription and KeyParams class.</description></item>
+/// <item><description>The <see cref="Create(CipherDescription, SeedGenerators, Digests)"/> method will auto-generate keying material.</description></item>
+/// <item><description>The Extract() method retrieves a populated cipher key (CipherKey), and key material (KeyParams), from the key stream.</description></item>
 /// </list>
 /// </summary>
 /// 
 /// <example>
-/// <description>Example using the <see cref="Create(CipherDescription, SeedGenerators, Digests)"/> overload:</description>
+/// <description>Example using the Create() and Extract methods:</description>
 /// <code>
-/// // create the key file
-/// new KeyFactory(KeyPath).Create(description);
-/// </code>
+/// KeyGenerator kg;
+/// KeyParams kp = *kg.GetKeyParams(192, 16, 64);
+/// // out-bound funcs use pointer
+/// MemoryStream* m = new MemoryStream;
+/// CEX::Processing::KeyFactory kf(m);
 /// 
-/// <description>Example using the <see cref="Extract(out CipherKey, out KeyParams)"/> method:</description>
-/// <code>
-/// // local vars
-/// keyparam KeyParams;
-/// CipherKey header;
+/// CipherDescription ds(
+/// 	SymmetricEngines::RHX,
+/// 	192,
+/// 	IVSizes::V128,
+/// 	CipherModes::CTR,
+/// 	PaddingModes::PKCS7,
+/// 	BlockSizes::B128,
+/// 	RoundCounts::R22,
+/// 	Digests::Skein512,
+/// 	64,
+/// 	Digests::SHA512);
 /// 
-/// new KeyFactory(KeyPath).Extract(out header, out keyparam);
+/// kf.Create(ds, kp);
+/// KeyParams kp2;
+/// m->Seek(0, CEX::IO::SeekOrigin::Begin);
+/// CEX::Processing::CipherKey ck;
+/// kf.Extract(ck, kp2);
+/// 
+/// if (!ds.Equals(ck.Description()))
+///		throw;
+/// if (!kp.Equals(kp2))
+///		throw;
+/// 
+/// delete m;
 /// </code>
 /// </example>
 /// 
 /// <revisionHistory>
-/// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
-/// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
+/// <revision date="2015/01/23" version="1.9.0.0">Initial release</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Structure.CipherKey">VTDev.Libraries.CEXEngine.Crypto.Processing.Structures CipherKey Structure</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.CipherDescription">VTDev.Libraries.CEXEngine.Crypto.Processing.Structures CipherDescription Structure</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Prngs">VTDev.Libraries.CEXEngine.Crypto.Enumeration.Prngs Enumeration</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests Enumeration</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.KeyGenerator">VTDev.Libraries.CEXEngine.Crypto.Processing.Factory KeyGenerator class</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.KeyParams">VTDev.Libraries.CEXEngine.Crypto.Processing.Structure KeyParams class</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.CipherStream">VTDev.Libraries.CEXEngine.Crypto.Processing CipherStream class</seealso>
+/// <seealso cref="CEX::Processing::CipherKey">CEX::Processing CipherKey Structure</seealso>
+/// <seealso cref="CEX::Common::CipherDescription">CEX::Common CipherDescription Structure</seealso>
+/// <seealso cref="CEX::Enumeration::Prngs">CEX::Enumeration Prngs Enumeration</seealso>
+/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration Digests Enumeration</seealso>
+/// <seealso cref="CEX::Common::KeyGenerator">CEX::Common KeyGenerator class</seealso>
+/// <seealso cref="CEX::Common::KeyParams">CEX::Common KeyParams class</seealso>
+/// <seealso cref="CEX::Processing::CipherStream">CEX::Processing CipherStream class</seealso>
 class KeyFactory
 {
 private:
 	bool _isDestroyed;
-	CEX::IO::MemoryStream _keyStream;
-	KeyFactory() { }
+	MemoryStream* _keyStream;
+
+	KeyFactory();
 
 public:
 
@@ -78,20 +107,18 @@ public:
 	/// <param name="KeyStream">The fully qualified path to the key file to be read or created</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if a null stream is passed</exception>
-	KeyFactory(MemoryStream &KeyStream)
+	KeyFactory(MemoryStream* KeyStream)
 		:
 		_isDestroyed(false),
 		_keyStream(KeyStream)
 	{
 	}
 
-
 	/// <summary>
 	/// Finalizer: ensure resources are destroyed
 	/// </summary>
 	~KeyFactory()
 	{
-		Destroy();
 	}
 
 	/// <summary>
@@ -118,11 +145,9 @@ public:
 				throw CryptoProcessingException("KeyFactory:Create", "Header MacSize does not align with the size of the KeyParam IKM!");
 		}
 
-		if (_keyStream == 0)
-			_keyStream = new MemoryStream();
-
 		CEX::Seed::CSPRsg rnd;
-		std::vector<byte> hdr = CipherKey(&Description, rnd.GetBytes(16), rnd.GetBytes(16)).ToBytes();
+		CipherKey ck(Description, rnd.GetBytes(16), rnd.GetBytes(16));
+		std::vector<byte> hdr = ck.ToBytes();
 		_keyStream->Write(hdr, 0, hdr.size());
 		MemoryStream* tmp = KeyParams::Serialize(KeyParam);
 		std::vector<byte> key = tmp->ToArray();
@@ -176,30 +201,16 @@ public:
 	/// <exception cref="CryptoProcessingException">Thrown if the key file could not be found or a Header parameter does not match the keystream length</exception>
 	void Extract(CipherKey &KeyHeader, KeyParams &KeyParam)
 	{
-		KeyHeader = CipherKey(_keyStream);
-		CipherDescription dsc = KeyHeader.Description;
+		KeyHeader = CipherKey(*_keyStream);
+		const CipherDescription dsc = KeyHeader.Description();
 
-		if (_keyStream.Length() < dsc.KeySize() + (unsigned int)dsc.IvSize() + dsc.MacSize() + KeyHeader.GetHeaderSize())
-			throw new CryptoProcessingException("KeyFactory:Extract", "The size of the key file does not align with the CipherKey sizes! Key is corrupt.");
+		if (_keyStream->Length() < dsc.KeySize() + (unsigned int)dsc.IvSize() + dsc.MacSize() + KeyHeader.GetHeaderSize())
+			throw CryptoProcessingException("KeyFactory:Extract", "The size of the key file does not align with the CipherKey sizes! Key is corrupt.");
 
-		_keyStream.Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);
-		KeyParam = KeyParams::DeSerialize(&_keyStream);
-	}
-
-	void Destroy()
-	{
-		if (!_isDestroyed)
-		{
-			try
-			{
-				
-			}
-			catch { }
-
-			_isDestroyed = true;
-		}
+		_keyStream->Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);
+		KeyParam = *KeyParams::DeSerialize(*_keyStream);
 	}
 };
 
-NAMESPACE_PROCESSINGEND
+NAMESPACE_PRCFACTORYEND
 #endif

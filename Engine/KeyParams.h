@@ -116,7 +116,7 @@ public:
 	/// <summary>
 	/// Create a deep copy of this KeyParams class
 	/// </summary>
-	KeyParams DeepCopy()
+	KeyParams* DeepCopy()
 	{
 		std::vector<byte> key(_key.size());
 		std::vector<byte> iv(_iv.size());
@@ -129,7 +129,7 @@ public:
 		if (_ikm.capacity() > 0)
 			memcpy(&ikm[0], &_ikm[0], ikm.size());
 
-		return KeyParams(key, iv, ikm);
+		return new KeyParams(key, iv, ikm);
 	}
 
 	/// <summary>
@@ -157,7 +157,7 @@ public:
 	/// <param name="Obj">KeyParams to compare</param>
 	/// 
 	/// <returns>Returns true if equal</returns>
-	bool Equals(KeyParams Obj)
+	bool Equals(KeyParams &Obj)
 	{
 		if (Obj.Key() != _key)
 			return false;
@@ -176,7 +176,7 @@ public:
 	/// <param name="KeyStream">Stream containing the KeyParams data</param>
 	/// 
 	/// <returns>A populated KeyParams class</returns>
-	static KeyParams DeSerialize(CEX::IO::MemoryStream &KeyStream)
+	static KeyParams* DeSerialize(CEX::IO::MemoryStream &KeyStream)
 	{
 		CEX::IO::StreamReader reader(KeyStream);
 		short keyLen = reader.ReadInt16();
@@ -193,7 +193,7 @@ public:
 		if (ikmLen > 0)
 			ikm = reader.ReadBytes(ikmLen);
 
-		return KeyParams(key, iv, ikm);
+		return new KeyParams(key, iv, ikm);
 	}
 
 	/// <summary>

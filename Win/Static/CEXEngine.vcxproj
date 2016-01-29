@@ -317,6 +317,7 @@
     <ClCompile Include="..\..\Engine\Keccak.cpp" />
     <ClCompile Include="..\..\Engine\Keccak256.cpp" />
     <ClCompile Include="..\..\Engine\Keccak512.cpp" />
+    <ClCompile Include="..\..\Engine\KeyFactory.cpp" />
     <ClCompile Include="..\..\Engine\KeyGenerator.cpp" />
     <ClCompile Include="..\..\Engine\MacStream.cpp" />
     <ClCompile Include="..\..\Engine\MemoryStream.cpp" />

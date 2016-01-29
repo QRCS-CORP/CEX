@@ -12,8 +12,7 @@ NAMESPACE_IO
 class StreamReader
 {
 private:
-	unsigned int _streamPosition;
-	std::vector<byte> _streamData;
+	CEX::IO::MemoryStream _streamData;
 	StreamReader() {}
 
 public:
@@ -21,34 +20,21 @@ public:
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const unsigned int Length() const { return _streamData.size(); }
+	const unsigned int Length() { return _streamData.Length(); }
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const unsigned int Position() const { return _streamPosition; }
+	const unsigned int Position() { return _streamData.Position(); }
 
 	/// <summary>
 	/// Initialize this class with a byte array
 	/// </summary>
 	///
-	/// <param name="Data">Byte stream to read</param>
-	StreamReader(CEX::IO::MemoryStream &Data)
-	{
-		_streamData = Data.ToArray();
-		_streamPosition = Data.Position();
-	}
-
-	/// <summary>
-	/// Initialize this class with a byte array
-	/// </summary>
-	///
-	/// <param name="Data">Byte array data to read</param>
-	/// <param name="Offset">Starting position within the array</param>
-	StreamReader(const std::vector<byte> &Data, unsigned int Offset = 0)
+	/// <param name="DataStream">MemoryStream to read</param>
+	StreamReader(CEX::IO::MemoryStream &DataStream)
 		:
-		_streamData(Data),
-		_streamPosition(Offset)
+		_streamData(DataStream)
 	{
 	}
 
@@ -57,13 +43,7 @@ public:
 	/// </summary>
 	~StreamReader()
 	{
-		Destroy();
 	}
-
-	/// <summary>
-	/// Release all resources associated with the object
-	/// </summary>
-	void Destroy();
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -121,7 +101,7 @@ public:
 	/// </summary>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	ulong ReadUInt64();
+	unsigned long long ReadUInt64();
 
 	/// <summary>
 	/// Reads an unsigned 32 bit integer from the stream

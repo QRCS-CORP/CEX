@@ -53,6 +53,12 @@
 #define NAMESPACE_PRNGEND } } 
 #define NAMESPACE_PROCESSING namespace CEX { namespace Processing {
 #define NAMESPACE_PROCESSINGEND } } 
+
+#define NAMESPACE_PRCFACTORY namespace CEX { namespace Processing { namespace Factory {
+#define NAMESPACE_PRCFACTORYEND } } }
+#define NAMESPACE_PRCSTRUCT namespace CEX { namespace Processing { namespace Structure {
+#define NAMESPACE_PRCSTRUCTEND } } }
+
 #define NAMESPACE_SEED namespace CEX { namespace Seed {
 #define NAMESPACE_SEEDEND } } 
 #define NAMESPACE_UTILITY namespace CEX { namespace Utility {

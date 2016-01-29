@@ -32,7 +32,7 @@ using CEX::Enumeration::SymmetricEngines;
 /// <example>
 /// <description>Example of populating a <c>CipherDescription</c> structure:</description>
 /// <code>
-///    CipherDescription cdsc = new CipherDescription(
+///    CipherDescription dsc(
 ///        Engines.RHX,             // cipher engine
 ///        192,                     // key size in bytes
 ///        IVSizes.V128,            // cipher iv size enum
@@ -93,9 +93,6 @@ private:
 	unsigned int _kdfEngine;
 	unsigned int _macSize;
 	unsigned int _macEngine;
-	bool _isInitialized;
-
-	CipherDescription() {}
 
 public:
 
@@ -151,9 +148,21 @@ public:
 	const Digests MacEngine() const { return (Digests)_macEngine; }
 
 	/// <summary>
-	/// The cipher initialization status
+	/// Default constructor
 	/// </summary>
-	const bool IsInitialized() { return _isInitialized; }
+	CipherDescription() 
+		:
+		_engineType(0),
+		_keySize(0),
+		_ivSize(0),
+		_cipherType(0),
+		_paddingType(0),
+		_blockSize(0),
+		_roundCount(0),
+		_kdfEngine(0),
+		_macSize(0),
+		_macEngine(0)
+	{}
 
 	/// <summary>
 	/// CipherDescription constructor
@@ -171,17 +180,6 @@ public:
 	/// <param name="MacEngine">The HMAC <see cref="CEX::Enumeration::Digests">Digest</see> engine used to authenticate a message file encrypted with this key</param>
 	CipherDescription(SymmetricEngines EngineType, unsigned int KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, BlockSizes BlockSize, 
 		RoundCounts RoundCount, Digests KdfEngine = Digests::SHA512, unsigned int MacSize = 64, Digests MacEngine = Digests::SHA512)
-		:
-		_engineType(0), 
-		_keySize(0),
-		_ivSize(0),
-		_cipherType(0),
-		_paddingType(0),
-		_blockSize(0),
-		_roundCount(0),
-		_kdfEngine(0),
-		_macSize(0),
-		_macEngine(0)
 	{
 		this->_engineType = (unsigned int)EngineType;
 		this->_keySize = KeySize;
@@ -193,8 +191,6 @@ public:
 		this->_kdfEngine = (unsigned int)KdfEngine;
 		this->_macSize = MacSize;
 		this->_macEngine = (unsigned int)MacEngine;
-
-		_isInitialized = true;
 	}
 
 	/// <summary>
@@ -204,7 +200,8 @@ public:
 	/// <param name="DescriptionArray">The byte array containing the CipherDescription</param>
 	CipherDescription(std::vector<byte> &DescriptionArray)
 	{
-		CEX::IO::StreamReader reader(DescriptionArray);
+		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(DescriptionArray);
+		CEX::IO::StreamReader reader(ms);
 
 		_engineType = reader.ReadByte();
 		_keySize = reader.ReadInt16();
@@ -343,25 +340,7 @@ public:
 	/// <returns>True if equal, otherwise false</returns>
 	bool Equals(CipherDescription &Obj)
 	{
-		if (_engineType != (unsigned int)Obj.EngineType())
-			return false;
-		if (_keySize != Obj.KeySize())
-			return false;
-		if (_ivSize != (unsigned int)Obj.IvSize())
-			return false;
-		if (_cipherType != (unsigned int)Obj.CipherType())
-			return false;
-		if (_paddingType != (unsigned int)Obj.PaddingType())
-			return false;
-		if (_blockSize != (unsigned int)Obj.BlockSize())
-			return false;
-		if (_roundCount != (unsigned int)Obj.RoundCount())
-			return false;
-		if (_kdfEngine != (unsigned int)Obj.KdfEngine())
-			return false;
-		if (_macSize != Obj.MacSize())
-			return false;
-		if (_macEngine != (unsigned int)Obj.MacEngine())
+		if (this->GetHashCode() != Obj.GetHashCode())
 			return false;
 
 		return true;
