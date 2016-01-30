@@ -13,8 +13,6 @@
 
 NAMESPACE_PRCSTRUCT
 
-using CEX::Exception::CryptoProcessingException;
-
 /// <summary>
 /// An encrypted message file header structure. 
 /// <para>Used in conjunction with the <see cref="VTDev.Libraries.CEXEngine.Crypto.Processing.CipherStream"/> class.
@@ -52,17 +50,17 @@ public:
 	/// <summary>
 	/// The HMAC hash value of the encrypted file
 	/// </summary>
-	const std::vector<byte> MessageMac() const { return _msgMac; }
+	const std::vector<byte> &MessageMac() const { return _msgMac; }
 
 	/// <summary>
 	/// The 16 byte key identifier
 	/// </summary>
-	const std::vector<byte> KeyId() { return _keyID; }
+	const std::vector<byte> &KeyId() const { return _keyID; }
 
 	/// <summary>
 	/// The encrypted message file extension
 	/// </summary>
-	const std::vector<byte> ExtensionKey() { return _extKey; }
+	const std::vector<byte> &ExtensionKey() const { return _extKey; }
 
 	/// <summary>
 	/// Default constructor
@@ -104,7 +102,7 @@ public:
 		_msgMac(0)
 	{
 		if (HeaderStream.Length() < SIZE_BASEHEADER)
-			throw new CryptoProcessingException("MessageHeader:CTor", "MessageHeader stream is too small!");
+			throw CEX::Exception::CryptoProcessingException("MessageHeader:CTor", "MessageHeader stream is too small!");
 
 		CEX::IO::StreamReader reader(HeaderStream);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
@@ -151,7 +149,8 @@ public:
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 		writer.Write(_keyID);
 		writer.Write(_extKey);
-		writer.Write(_msgMac);
+		if (_msgMac.size() > 0)
+			writer.Write(_msgMac);
 
 		return writer.GetBytes();
 	}
@@ -166,7 +165,8 @@ public:
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 		writer.Write(_keyID);
 		writer.Write(_extKey);
-		writer.Write(_msgMac);
+		if (_msgMac.size() > 0)
+			writer.Write(_msgMac);
 
 		return writer.GetStream();
 	}
@@ -177,14 +177,36 @@ public:
 	static int GetHeaderSize() { return SIZE_BASEHEADER; }
 
 	/// <summary>
+	/// Get decrypted file extension
+	/// </summary>
+	/// 
+	/// <param name="MessageStream">Stream containing a message header</param>
+	/// <param name="Key">Random byte array used to encrypt the extension</param>
+	/// 
+	/// <returns>File extension</returns>
+	static std::string DecryptExtension(const std::vector<byte> &Extension, const std::vector<byte> &Key)
+	{
+		std::vector<byte> data(Extension.size());
+		memcpy(&data[0], &Extension[0], Extension.size());
+		// xor the buffer and hash
+		for (int i = 0; i < Extension.size(); i++)
+			data[i] ^= Key[i];
+
+		std::string letters(data.begin(), data.end());
+		letters.erase(std::remove(letters.begin(), letters.end(), '\0'), letters.end());
+
+		return letters;
+	}
+
+	/// <summary>
 	/// Encrypt the file extension
 	/// </summary>
 	/// 
 	/// <param name="Extension">The message file extension</param>
-	/// <param name="ExtKey">Random byte array used to encrypt the extension</param>
+	/// <param name="Key">Random byte array used to encrypt the extension</param>
 	/// 
 	/// <returns>Encrypted file extension</returns>
-	static std::vector<byte> EncryptExtension(std::string &Extension, std::vector<byte> &Key)
+	static std::vector<byte> EncryptExtension(const std::string &Extension, const std::vector<byte> &Key)
 	{
 		if (Extension.size() > EXTKEY_SIZE)
 			throw CEX::Exception::CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the extension string is too long!");
@@ -199,32 +221,6 @@ public:
 			data[i] ^= Key[i];
 
 		return data;
-	}
-
-	/// <summary>
-	/// Get decrypted file extension
-	/// </summary>
-	/// 
-	/// <param name="MessageStream">Stream containing a message header</param>
-	/// <param name="ExtKey">Random byte array used to encrypt the extension</param>
-	/// 
-	/// <returns>File extension</returns>
-	static std::string DecryptExtension(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &ExtKey)
-	{
-		std::vector<byte> data(16);
-		CEX::IO::StreamReader reader(MessageStream);
-
-		MessageStream.Seek(SEEKTO_EXT, CEX::IO::SeekOrigin::Begin);
-		data = reader.ReadBytes(EXTKEY_SIZE);
-
-		// xor the buffer and hash
-		for (int i = 0; i < data.size(); i++)
-			data[i] ^= ExtKey[i];
-
-		std::string letters(data.begin(), data.end());
-		letters.erase(std::remove(letters.begin(), letters.end(), '0'), letters.end());
-
-		return letters;
 	}
 
 	/// <summary>

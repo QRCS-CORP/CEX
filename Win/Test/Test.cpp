@@ -17,6 +17,7 @@
 #include "ITest.h"
 #include "HKDFTest.h"
 #include "KDF2DrbgTest.h"
+#include "KeyFactoryTest.h"
 #include "HMACTest.h"
 #include "HXCipherTest.h"
 #include "ISCRsgTest.h"
@@ -36,12 +37,6 @@
 #include "TwofishTest.h"
 #include "VMACTest.h"
 #include "XSPRsgTest.h"
-
-#include "KeyGenerator.h"
-#include "MemoryStream.h"
-#include "CipherKey.h"
-#include "MessageHeader.h"
-#include "KeyFactory.h"
 
 using namespace Test;
 
@@ -165,62 +160,11 @@ void RunTest(Test::ITest* Test)
 	}
 }
 
-/**/void TestKeyGen()
-{
-	KeyGenerator kg;
-	std::vector<byte> d(100);
-	kg.GetBytes(d);
-	// out-bound funcs return pointer to obj
-	KeyParams kp = *kg.GetKeyParams(32, 0, 0);
-	MemoryStream m = *KeyParams::Serialize(kp);
-	KeyParams kpc = *KeyParams::DeSerialize(m);
-
-	if (!kp.Equals(kpc))
-		throw;
-}
-
-void TestCipherKey()
-{
-	KeyGenerator kg;
-	KeyParams kp = *kg.GetKeyParams(192, 16, 64);
-	CipherDescription ds(
-		SymmetricEngines::RHX,
-		192,
-		IVSizes::V128,
-		CipherModes::CTR,
-		PaddingModes::PKCS7,
-		BlockSizes::B128,
-		RoundCounts::R22,
-		Digests::Skein512,
-		64,
-		Digests::SHA512);
-
-	// in/out funcs use a pointer
-	MemoryStream* m =  new MemoryStream;
-	CEX::Processing::Factory::KeyFactory kf(m);
-	kf.Create(ds, kp);
-
-	KeyParams kp2;
-	CEX::Processing::Structure::CipherKey ck;
-	// new instance w/ populated stream
-	m->Seek(0, CEX::IO::SeekOrigin::Begin);
-	CEX::Processing::Factory::KeyFactory kf2(m);
-	// get key and desc from stream
-	kf2.Extract(ck, kp2);
-
-	if (!ds.Equals(ck.Description()))
-		throw;
-	if (!kp.Equals(kp2))
-		throw;
-
-	delete m;
-}
-
 int main(int argc, const char * argv[])
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	//TestCipherKey();
+	//RunTest(new KeyFactoryTest());
 
 	try
 	{
@@ -263,6 +207,7 @@ int main(int argc, const char * argv[])
 		RunTest(new CipherStreamTest());
 		RunTest(new DigestStreamTest());
 		RunTest(new MacStreamTest());
+		RunTest(new KeyFactoryTest());
 		PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
 		RunTest(new BlakeTest());
 		RunTest(new KeccakTest());

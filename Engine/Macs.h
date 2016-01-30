@@ -22,6 +22,6 @@ enum class Macs : unsigned int
 	/// </summary>
 	VMAC = 4
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

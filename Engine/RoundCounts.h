@@ -85,8 +85,8 @@ enum class RoundCounts : unsigned int
 	/// <summary>
 	/// 64 Rounds: SHX
 	/// </summary>
-	R64 = 64,
+	R64 = 64
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

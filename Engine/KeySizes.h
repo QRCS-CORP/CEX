@@ -103,6 +103,6 @@ enum class KeySizes : unsigned int
 	/// </summary>
 	K5120 = 640
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

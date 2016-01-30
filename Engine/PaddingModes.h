@@ -30,6 +30,6 @@ enum class PaddingModes : unsigned int
 	/// </summary>
 	X923 = 8
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

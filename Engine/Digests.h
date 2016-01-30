@@ -46,6 +46,6 @@ enum class Digests : unsigned int
 	/// </summary>
 	Skein1024 = 9
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

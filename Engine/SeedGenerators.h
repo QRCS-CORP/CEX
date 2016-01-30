@@ -22,6 +22,6 @@ enum class SeedGenerators : unsigned int
 	/// </summary>
 	XSPRsg = 4
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

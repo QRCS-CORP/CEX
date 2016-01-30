@@ -30,6 +30,6 @@ enum class CipherModes : unsigned int
 	/// </summary>
 	OFB = 8
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

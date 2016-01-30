@@ -30,6 +30,6 @@ enum class Prngs : unsigned int
 	/// </summary>
 	SP20Prng = 16
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

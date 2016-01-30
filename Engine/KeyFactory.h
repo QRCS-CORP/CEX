@@ -4,33 +4,17 @@
 #include "Common.h"
 #include "CipherDescription.h"
 #include "CipherKey.h"
-#include "CryptoProcessingException.h"
-#include "CSPRsg.h"
 #include "KeyParams.h"
 #include "MemoryStream.h"
 #include "BlockSizes.h"
 #include "CipherModes.h"
 #include "Digests.h"
 #include "IVSizes.h"
-#include "MemoryStream.h"
 #include "PaddingModes.h"
 #include "RoundCounts.h"
 #include "SymmetricEngines.h"
 
 NAMESPACE_PRCFACTORY
-
-using CEX::Common::CipherDescription;
-using CEX::Common::KeyParams;
-using CEX::Exception::CryptoProcessingException;
-using CEX::IO::MemoryStream;
-using CEX::Processing::Structure::CipherKey;
-using CEX::Enumeration::BlockSizes;
-using CEX::Enumeration::CipherModes;
-using CEX::Enumeration::Digests;
-using CEX::Enumeration::IVSizes;
-using CEX::Enumeration::PaddingModes;
-using CEX::Enumeration::RoundCounts;
-using CEX::Enumeration::SymmetricEngines;
 
 /// <summary>
 /// KeyFactory: Used to create or extract a CipherKey file.
@@ -94,9 +78,9 @@ class KeyFactory
 {
 private:
 	bool _isDestroyed;
-	MemoryStream* _keyStream;
+	CEX::IO::MemoryStream* _keyStream;
 
-	KeyFactory();
+	KeyFactory() {}
 
 public:
 
@@ -107,7 +91,7 @@ public:
 	/// <param name="KeyStream">The fully qualified path to the key file to be read or created</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if a null stream is passed</exception>
-	KeyFactory(MemoryStream* KeyStream)
+	KeyFactory(CEX::IO::MemoryStream* KeyStream)
 		:
 		_isDestroyed(false),
 		_keyStream(KeyStream)
@@ -128,32 +112,8 @@ public:
 	/// <param name="Description">The <see cref="CipherDescription">Cipher Description</see> containing the cipher details</param>
 	/// <param name="KeyParam">An initialized and populated key material container</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if a KeyParams member is null, but specified in the Header or a Header parameter does not match a KeyParams value</exception>
-	void Create(CipherDescription &Description, KeyParams &KeyParam)
-	{
-		if (KeyParam.Key().size() != Description.KeySize())
-			throw CryptoProcessingException("KeyFactory:Create", "The key parameter does not match the key size specified in the Header!");
-
-		if ((unsigned int)Description.IvSize() > 0)
-		{
-			if (KeyParam.IV().size() != (unsigned int)Description.IvSize())
-				throw CryptoProcessingException("KeyFactory:Create", "The KeyParam IV size does not align with the IVSize setting in the Header!");
-		}
-		if (Description.MacSize() > 0)
-		{
-			if (KeyParam.Ikm().size() != Description.MacSize())
-				throw CryptoProcessingException("KeyFactory:Create", "Header MacSize does not align with the size of the KeyParam IKM!");
-		}
-
-		CEX::Seed::CSPRsg rnd;
-		CipherKey ck(Description, rnd.GetBytes(16), rnd.GetBytes(16));
-		std::vector<byte> hdr = ck.ToBytes();
-		_keyStream->Write(hdr, 0, hdr.size());
-		MemoryStream* tmp = KeyParams::Serialize(KeyParam);
-		std::vector<byte> key = tmp->ToArray();
-		_keyStream->Write(key, 0, key.size());
-		delete tmp;
-	}
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a KeyParams member is null, but specified in the Header or a Header parameter does not match a KeyParams value</exception>
+	void Create(CEX::Common::CipherDescription &Description, CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
 	/// Create a single use Key file using a manual description of the cipher parameters.
@@ -170,26 +130,7 @@ public:
 	/// <param name="KdfEngine">The <see cref="Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	/// <param name="MacSize">The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC <see cref="Digests">Digest</see> engine used to authenticate a message file encrypted with this key</param>
-	/// 
-	/// <exception cref="System.ArgumentNullException">Thrown if a KeyParams member is null, but specified in the Header</exception>
-	/// <exception cref="System.ArgumentOutOfRangeException">Thrown if a Header parameter does not match a KeyParams value</exception>
-	void Create(KeyParams &KeyParam, SymmetricEngines EngineType, int KeySize, IVSizes IvSize, CipherModes CipherType,
-		PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts Rounds, Digests KdfEngine, int MacSize, Digests MacEngine)
-	{
-		CipherDescription dsc(
-			EngineType,
-			KeySize,
-			IvSize,
-			CipherType,
-			PaddingType,
-			BlockSize,
-			Rounds,
-			KdfEngine,
-			MacSize,
-			MacEngine);
-
-		Create(dsc, KeyParam);
-	}
+	void Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::SymmetricEngines EngineType, int KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacSize, CEX::Enumeration::Digests MacEngine);
 
 	/// <summary>
 	/// Extract a KeyParams and CipherKey
@@ -198,18 +139,8 @@ public:
 	/// <param name="KeyHeader">The <see cref="CipherKey"/> that receives the cipher description, key id, and extension key</param>
 	/// <param name="KeyParam">The <see cref="KeyParams"/> container that receives the key material from the file</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the key file could not be found or a Header parameter does not match the keystream length</exception>
-	void Extract(CipherKey &KeyHeader, KeyParams &KeyParam)
-	{
-		KeyHeader = CipherKey(*_keyStream);
-		const CipherDescription dsc = KeyHeader.Description();
-
-		if (_keyStream->Length() < dsc.KeySize() + (unsigned int)dsc.IvSize() + dsc.MacSize() + KeyHeader.GetHeaderSize())
-			throw CryptoProcessingException("KeyFactory:Extract", "The size of the key file does not align with the CipherKey sizes! Key is corrupt.");
-
-		_keyStream->Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);
-		KeyParam = *KeyParams::DeSerialize(*_keyStream);
-	}
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the key file could not be found or a Header parameter does not match the keystream length</exception>
+	void Extract(CEX::Processing::Structure::CipherKey &KeyHeader, CEX::Common::KeyParams &KeyParam);
 };
 
 NAMESPACE_PRCFACTORYEND

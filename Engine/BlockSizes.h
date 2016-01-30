@@ -27,6 +27,6 @@ enum class BlockSizes : unsigned int
 	/// </summary>
 	B1024 = 128
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

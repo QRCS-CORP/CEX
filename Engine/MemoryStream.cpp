@@ -80,10 +80,12 @@ void MemoryStream::Write(const std::vector<byte> &Buffer, unsigned int Offset, u
 	if (Offset + Count > Buffer.size())
 		throw CryptoProcessingException("MemoryStream:Write", "The output array is too short!");
 
+	unsigned int len = _streamPosition + Count;
 	if (_streamData.capacity() - _streamPosition < Count)
-		_streamData.reserve(_streamPosition + Count);
+		_streamData.reserve(len);
+	if (_streamData.size() < len)
+		_streamData.resize(len);
 
-	_streamData.resize(_streamPosition + Count);
 	memcpy(&_streamData[_streamPosition], &Buffer[Offset], Count);
 	_streamPosition += Count;
 }

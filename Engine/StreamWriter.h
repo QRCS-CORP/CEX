@@ -87,6 +87,41 @@ public:
 	MemoryStream* GetStream();
 
 	/// <summary>
+	/// Write an 8bit integer to the base stream
+	/// </summary>
+	void Write(byte Data);
+
+	/// <summary>
+	/// Write a 16bit integer to the base stream
+	/// </summary>
+	void Write(short Data);
+
+	/// <summary>
+	/// Write a 16bit unsigned integer to the base stream
+	/// </summary>
+	void Write(ushort Data);
+
+	/// <summary>
+	/// Write a 32bit integer to the base stream
+	/// </summary>
+	void Write(int Data);
+
+	/// <summary>
+	/// Write a 32bit unsigned integer to the base stream
+	/// </summary>
+	void Write(uint Data);
+
+	/// <summary>
+	/// Write a 64bit integer to the base stream
+	/// </summary>
+	void Write(long Data);
+
+	/// <summary>
+	/// Write a 64bit unsigned integer to the base stream
+	/// </summary>
+	void Write(ulong Data);
+
+	/// <summary>
 	/// Write an integer array to the base stream
 	/// </summary>
 	template <class T>
@@ -97,20 +132,6 @@ public:
 			_streamData.resize(_streamPosition + sze);
 
 		memcpy(&_streamData[_streamPosition], &Data[0], sze);
-		_streamPosition += sze;
-	}
-
-	/// <summary>
-	/// Write an integer to the base stream
-	/// </summary>
-	template <class T>
-	void Write(T Data)
-	{
-		unsigned int sze = sizeof(T);
-		if (_streamPosition + sze > _streamData.size())
-			_streamData.resize(_streamPosition + sze);
-
-		memcpy(&_streamData[_streamPosition], &Data, sze);
 		_streamPosition += sze;
 	}
 };

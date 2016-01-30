@@ -39,16 +39,16 @@ using CEX::Exception::CryptoProcessingException;
 struct CipherKey
 {
 private:
-	static constexpr unsigned int DESC_SIZE = 11;
 	static constexpr unsigned int KEYID_SIZE = 16;
 	static constexpr unsigned int EXTKEY_SIZE = 16;
-	static constexpr unsigned long DESC_SEEK = 0;
-	static constexpr unsigned long EXTKEY_SEEK = DESC_SEEK;
-	static constexpr unsigned long KEYID_SEEK = DESC_SEEK + KEYID_SIZE;
+	static constexpr unsigned int DESC_SIZE = 11;
+	static constexpr unsigned long KEYID_SEEK = 0;
+	static constexpr unsigned long EXTKEY_SEEK = DESC_SIZE;
+	static constexpr unsigned long DESC_SEEK = DESC_SIZE + EXTKEY_SIZE;
 
-	CipherDescription _cprDsc;
 	std::vector<byte> _keyID;
 	std::vector<byte> _extKey;
+	CipherDescription _cprDsc;
 
 public:
 
@@ -137,10 +137,10 @@ public:
 		_extKey(0),
 		_keyID(0)
 	{
-		_cprDsc = CipherDescription(KeyStream);
 		CEX::IO::StreamReader reader(KeyStream);
-		_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
+		_extKey = reader.ReadBytes(EXTKEY_SIZE);
+		_cprDsc = CipherDescription(reader.ReadBytes(CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -154,10 +154,10 @@ public:
 		_keyID(0)
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(KeyArray);
-		_cprDsc = CipherDescription(KeyArray);
 		CEX::IO::StreamReader reader(ms);
-		_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
+		_extKey = reader.ReadBytes(EXTKEY_SIZE);
+		_cprDsc = CipherDescription(reader.ReadBytes(CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -180,10 +180,9 @@ public:
 	std::vector<byte> ToBytes()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		std::vector<byte> tmp = _cprDsc.ToBytes();
-		writer.Write(tmp);
-		writer.Write(_extKey);
 		writer.Write(_keyID);
+		writer.Write(_extKey);
+		writer.Write(_cprDsc.ToBytes());
 
 		return writer.GetBytes();
 	}
@@ -196,10 +195,9 @@ public:
 	CEX::IO::MemoryStream* ToStream()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		std::vector<byte> tmp = _cprDsc.ToBytes();
-		writer.Write(tmp);
-		writer.Write(_extKey);
 		writer.Write(_keyID);
+		writer.Write(_extKey);
+		writer.Write(_cprDsc.ToBytes());
 
 		return writer.GetStream();
 	}
@@ -262,7 +260,7 @@ public:
 	static void SetCipherDescription(CEX::IO::MemoryStream &KeyStream, CipherDescription &Description)
 	{
 		KeyStream.Seek(DESC_SEEK, CEX::IO::SeekOrigin::Begin);
-		KeyStream.Write(Description.ToBytes(), KeyStream.Position(), DESC_SIZE);
+		KeyStream.Write(Description.ToBytes(), 0, DESC_SIZE);
 	}
 
 	/// <summary>
@@ -274,7 +272,7 @@ public:
 	static void SetExtensionKey(CEX::IO::MemoryStream &KeyStream, std::vector<byte> &ExtensionKey)
 	{
 		KeyStream.Seek(EXTKEY_SEEK, CEX::IO::SeekOrigin::Begin);
-		KeyStream.Write(ExtensionKey, KeyStream.Position(), EXTKEY_SIZE);
+		KeyStream.Write(ExtensionKey, 0, EXTKEY_SIZE);
 	}
 
 	/// <summary>
@@ -286,7 +284,7 @@ public:
 	static void SetKeyId(CEX::IO::MemoryStream &KeyStream, std::vector<byte> &KeyId)
 	{
 		KeyStream.Seek(KEYID_SEEK, CEX::IO::SeekOrigin::Begin);
-		KeyStream.Write(KeyId, KeyStream.Position(), KEYID_SIZE);
+		KeyStream.Write(KeyId, 0, KEYID_SIZE);
 	}
 
 	/// <summary>

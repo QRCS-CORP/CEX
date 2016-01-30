@@ -198,7 +198,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionArray">The byte array containing the CipherDescription</param>
-	CipherDescription(std::vector<byte> &DescriptionArray)
+	CipherDescription(const std::vector<byte> &DescriptionArray)
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(DescriptionArray);
 		CEX::IO::StreamReader reader(ms);
@@ -220,7 +220,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the CipherDescription</param>
-	CipherDescription(CEX::IO::MemoryStream &DescriptionStream)
+	CipherDescription(const CEX::IO::MemoryStream &DescriptionStream)
 	{
 		CEX::IO::StreamReader reader(DescriptionStream);
 
@@ -308,6 +308,7 @@ public:
 
 		return writer.GetStream();
 	}
+
 	/// <summary>
 	/// Get the hash code for this object
 	/// </summary>

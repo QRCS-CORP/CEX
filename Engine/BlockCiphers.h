@@ -22,7 +22,7 @@ enum class BlockCiphers : unsigned int
 	/// </summary>
 	THX = 32
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif
 

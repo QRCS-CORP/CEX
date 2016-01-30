@@ -28,8 +28,8 @@ enum class SymmetricEngines : unsigned int
 	/// <summary>
 	/// A Salsa20 Stream Cipher
 	/// </summary>
-	Salsa = 128,
+	Salsa = 128
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

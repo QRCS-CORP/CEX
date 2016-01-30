@@ -26,6 +26,7 @@ enum class AsymmetricEngines : unsigned int
 	/// </summary>
 	SIDH = 8
 };
+
 NAMESPACE_ENUMERATIONEND
 #endif
 

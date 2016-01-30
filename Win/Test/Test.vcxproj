@@ -194,6 +194,7 @@
     <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\HMACTest.h" />
     <ClInclude Include="..\..\Test\ISCRsgTest.h" />
+    <ClInclude Include="..\..\Test\KeyFactoryTest.h" />
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />

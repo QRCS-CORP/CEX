@@ -251,6 +251,9 @@
     <ClInclude Include="..\..\Test\TestException.h">
       <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\KeyFactoryTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">

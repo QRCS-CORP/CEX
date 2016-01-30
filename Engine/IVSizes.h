@@ -23,6 +23,6 @@ enum class IVSizes : unsigned int
 	/// </summary>
 	V256 = 32
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

@@ -18,6 +18,6 @@ enum class StreamCiphers : unsigned int
 	/// </summary>
 	Salsa = 128
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif

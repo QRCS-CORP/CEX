@@ -32,7 +32,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="DataStream">MemoryStream to read</param>
-	StreamReader(CEX::IO::MemoryStream &DataStream)
+	StreamReader(const CEX::IO::MemoryStream &DataStream)
 		:
 		_streamData(DataStream)
 	{

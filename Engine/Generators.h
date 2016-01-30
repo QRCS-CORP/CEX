@@ -34,6 +34,6 @@ enum class Generators : unsigned int
 	/// </summary>
 	SP20Drbg = 32
 };
-NAMESPACE_ENUMERATIONEND
 
+NAMESPACE_ENUMERATIONEND
 #endif
