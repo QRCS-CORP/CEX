@@ -6,8 +6,6 @@
 #include "CryptoProcessingException.h"
 #include "CSPPrng.h"
 #include "IntUtils.h"
-#include "MemoryStream.h"
-#include "SeekOrigin.h"
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
@@ -20,17 +18,8 @@ NAMESPACE_PRCSTRUCT
 /// </summary>
 /// 
 /// <revisionHistory>
-/// <revision date="2015/03/12" version="1.3.2.0">Initial release</revision>
-/// <revision date="2015/07/02" version="1.4.0.0">Changes to documentation and method structure</revision>
+/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
-/// 
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.CipherStream">VTDev.Libraries.CEXEngine.Crypto.Processing CipherStream class</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Factory.PackageFactory">VTDev.Libraries.CEXEngine.Crypto PackageFactory class</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Structure.PackageKey">VTDev.Libraries.CEXEngine.Crypto.Processing.Structures PackageKey structure</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Structure.KeyAuthority">VTDev.Libraries.CEXEngine.Crypto.Processing.Structures KeyAuthority structure</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.CipherDescription">VTDev.Libraries.CEXEngine.Crypto.Processing.Structures CipherDescription structure</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.KeyPolicies">VTDev.Libraries.CEXEngine.Crypto.Enumeration KeyPolicies Enumeration</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.PackageKeyStates">VTDev.Libraries.CEXEngine.Crypto KeyStates Enumeration</seealso>
 struct MessageHeader
 {
 private:
@@ -107,7 +96,8 @@ public:
 		CEX::IO::StreamReader reader(HeaderStream);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		_msgMac = reader.ReadBytes(MacLength);
+		if (MacLength > 0)
+			_msgMac = reader.ReadBytes(MacLength);
 	}
 
 	/// <summary>
@@ -174,13 +164,13 @@ public:
 	/// <summary>
 	/// Get the size of a MessageHeader
 	/// </summary>
-	static int GetHeaderSize() { return SIZE_BASEHEADER; }
+	static unsigned int GetHeaderSize() { return SIZE_BASEHEADER; }
 
 	/// <summary>
 	/// Get decrypted file extension
 	/// </summary>
 	/// 
-	/// <param name="MessageStream">Stream containing a message header</param>
+	/// <param name="Extension">The encrypted file extension</param>
 	/// <param name="Key">Random byte array used to encrypt the extension</param>
 	/// 
 	/// <returns>File extension</returns>
@@ -189,7 +179,7 @@ public:
 		std::vector<byte> data(Extension.size());
 		memcpy(&data[0], &Extension[0], Extension.size());
 		// xor the buffer and hash
-		for (int i = 0; i < Extension.size(); i++)
+		for (unsigned int i = 0; i < Extension.size(); i++)
 			data[i] ^= Key[i];
 
 		std::string letters(data.begin(), data.end());
@@ -217,7 +207,7 @@ public:
 		memcpy(&data[0], Extension.data(), Extension.length());
 
 		// xor the buffer and hash
-		for (int i = 0; i < data.size(); ++i)
+		for (unsigned int i = 0; i < data.size(); ++i)
 			data[i] ^= Key[i];
 
 		return data;
@@ -322,18 +312,18 @@ public:
 		int result = 1;
 		if (_keyID.size() != 0)
 		{
-			for (int i = 0; i < _keyID.size(); i++)
-				result += 31 * _keyID[i];
+			for (unsigned int i = 0; i < _keyID.size(); i++)
+				result += (int)(31 * _keyID[i]);
 		}
 		if (_extKey.size() != 0)
 		{
-			for (int i = 0; i < _extKey.size(); i++)
-				result += 31 * _extKey[i];
+			for (unsigned int i = 0; i < _extKey.size(); i++)
+				result += (int)(31 * _extKey[i]);
 		}
 		if (_msgMac.size() != 0)
 		{
-			for (int i = 0; i < _msgMac.size(); ++i)
-				result += 31 * _msgMac[i];
+			for (unsigned int i = 0; i < _msgMac.size(); ++i)
+				result += (int)(31 * _msgMac[i]);
 		}
 
 		return result;

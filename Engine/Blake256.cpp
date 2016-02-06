@@ -3,8 +3,6 @@
 
 NAMESPACE_DIGEST
 
-using CEX::Utility::IntUtils;
-
 static constexpr uint _C32[] =
 {
 	0x243F6A88U, 0x85A308D3U, 0x13198A2EU, 0x03707344U,
@@ -85,10 +83,10 @@ void Blake256::Destroy()
 		_isNullT = false;
 		_T = 0;
 
-		IntUtils::ClearVector(_HashVal);
-		IntUtils::ClearVector(_salt32);
-		IntUtils::ClearVector(_M);
-		IntUtils::ClearVector(_V);
+		CEX::Utility::IntUtils::ClearVector(_HashVal);
+		CEX::Utility::IntUtils::ClearVector(_salt32);
+		CEX::Utility::IntUtils::ClearVector(_M);
+		CEX::Utility::IntUtils::ClearVector(_V);
 	}
 }
 
@@ -99,8 +97,8 @@ unsigned int Blake256::DoFinal(std::vector<byte> &Output, const unsigned int Out
 
 	std::vector<byte> msgLen(8);
 	uint64_t len = _T + ((uint64_t)_dataLen << 3);
-	IntUtils::Be32ToBytes((uint)(len >> 32) & 0xFFFFFFFFU, msgLen, 0);
-	IntUtils::Be32ToBytes((uint)(len & 0xFFFFFFFFU), msgLen, 4);
+	CEX::Utility::IntUtils::Be32ToBytes((uint)(len >> 32) & 0xFFFFFFFFU, msgLen, 0);
+	CEX::Utility::IntUtils::Be32ToBytes((uint)(len & 0xFFFFFFFFU), msgLen, 4);
 
 	// special case of one padding byte
 	if (_dataLen == PAD_LENGTH)
@@ -139,14 +137,14 @@ unsigned int Blake256::DoFinal(std::vector<byte> &Output, const unsigned int Out
 	BlockUpdate(msgLen, 0, 8);
 	std::vector<byte> digest(32, 0);
 
-	IntUtils::Be32ToBytes(_HashVal[0], digest, 0);
-	IntUtils::Be32ToBytes(_HashVal[1], digest, 4);
-	IntUtils::Be32ToBytes(_HashVal[2], digest, 8);
-	IntUtils::Be32ToBytes(_HashVal[3], digest, 12);
-	IntUtils::Be32ToBytes(_HashVal[4], digest, 16);
-	IntUtils::Be32ToBytes(_HashVal[5], digest, 20);
-	IntUtils::Be32ToBytes(_HashVal[6], digest, 24);
-	IntUtils::Be32ToBytes(_HashVal[7], digest, 28);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[0], digest, 0);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[1], digest, 4);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[2], digest, 8);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[3], digest, 12);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[4], digest, 16);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[5], digest, 20);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[6], digest, 24);
+	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[7], digest, 28);
 
 	memcpy(&Output[OutOffset], &digest[0], digest.size());
 	Reset();
@@ -174,33 +172,33 @@ void Blake256::G32(unsigned int A, unsigned int B, unsigned int C, unsigned int 
 	int P1 = _ftSigma[P + 1];
 
 	_V[A] += _V[B] + (_M[P0] ^ _C32[P1]);
-	_V[D] = IntUtils::RotateRight(_V[D] ^ _V[A], 16);
+	_V[D] = CEX::Utility::IntUtils::RotateRight(_V[D] ^ _V[A], 16);
 	_V[C] += _V[D];
-	_V[B] = IntUtils::RotateRight(_V[B] ^ _V[C], 12);
+	_V[B] = CEX::Utility::IntUtils::RotateRight(_V[B] ^ _V[C], 12);
 	_V[A] += _V[B] + (_M[P1] ^ _C32[P0]);
-	_V[D] = IntUtils::RotateRight(_V[D] ^ _V[A], 8);
+	_V[D] = CEX::Utility::IntUtils::RotateRight(_V[D] ^ _V[A], 8);
 	_V[C] += _V[D];
-	_V[B] = IntUtils::RotateRight(_V[B] ^ _V[C], 7);
+	_V[B] = CEX::Utility::IntUtils::RotateRight(_V[B] ^ _V[C], 7);
 }
 
 void Blake256::Compress32(const std::vector<byte> &Block, unsigned int Offset)
 {
-	_M[0] = IntUtils::BytesToBe32(Block, Offset);
-	_M[1] = IntUtils::BytesToBe32(Block, Offset + 4);
-	_M[2] = IntUtils::BytesToBe32(Block, Offset + 8);
-	_M[3] = IntUtils::BytesToBe32(Block, Offset + 12);
-	_M[4] = IntUtils::BytesToBe32(Block, Offset + 16);
-	_M[5] = IntUtils::BytesToBe32(Block, Offset + 20);
-	_M[6] = IntUtils::BytesToBe32(Block, Offset + 24);
-	_M[7] = IntUtils::BytesToBe32(Block, Offset + 28);
-	_M[8] = IntUtils::BytesToBe32(Block, Offset + 32);
-	_M[9] = IntUtils::BytesToBe32(Block, Offset + 36);
-	_M[10] = IntUtils::BytesToBe32(Block, Offset + 40);
-	_M[11] = IntUtils::BytesToBe32(Block, Offset + 44);
-	_M[12] = IntUtils::BytesToBe32(Block, Offset + 48);
-	_M[13] = IntUtils::BytesToBe32(Block, Offset + 52);
-	_M[14] = IntUtils::BytesToBe32(Block, Offset + 56);
-	_M[15] = IntUtils::BytesToBe32(Block, Offset + 60);
+	_M[0] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset);
+	_M[1] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 4);
+	_M[2] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 8);
+	_M[3] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 12);
+	_M[4] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 16);
+	_M[5] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 20);
+	_M[6] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 24);
+	_M[7] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 28);
+	_M[8] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 32);
+	_M[9] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 36);
+	_M[10] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 40);
+	_M[11] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 44);
+	_M[12] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 48);
+	_M[13] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 52);
+	_M[14] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 56);
+	_M[15] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 60);
 
 	_V[0] = _HashVal[0];
 	_V[1] = _HashVal[1];

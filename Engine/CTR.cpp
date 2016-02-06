@@ -4,9 +4,6 @@
 
 NAMESPACE_MODE
 
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
-
 void CTR::Destroy()
 {
 	if (!_isDestroyed)
@@ -19,12 +16,12 @@ void CTR::Destroy()
 		_isParallel = false;
 		_parallelBlockSize = 0;
 
-		IntUtils::ClearVector(_ctrVector);
-		IntUtils::ClearArray(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(_ctrVector);
+		CEX::Utility::IntUtils::ClearArray(_threadVectors);
 	}
 }
 
-void CTR::Initialize(bool Encryption, const KeyParams &KeyParam)
+void CTR::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	_blockCipher->Initialize(true, KeyParam);
 	_ctrVector = KeyParam.IV();
@@ -74,7 +71,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		unsigned int sze = Output.size() - (Output.size() % _blockCipher->BlockSize());
 
 		if (sze != 0)
-			IntUtils::XORBLK(Input, 0, Output, 0, sze);
+			CEX::Utility::IntUtils::XORBLK(Input, 0, Output, 0, sze);
 
 		// get the remaining bytes
 		if (sze != Output.size())
@@ -92,7 +89,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](unsigned int i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -100,7 +97,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 			// create random at offset position
 			this->Generate(cnkSize, thdVec, Output, (i * cnkSize));
 			// xor the block
-			IntUtils::XORBLK(Input, i * cnkSize, Output, i * cnkSize, cnkSize);
+			CEX::Utility::IntUtils::XORBLK(Input, i * cnkSize, Output, i * cnkSize, cnkSize);
 		});
 
 		// last block processing
@@ -131,7 +128,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, st
 		unsigned int sze = outSize - (outSize % _blockCipher->BlockSize());
 
 		if (sze != 0)
-			IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
+			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
 
 		// get the remaining bytes
 		if (sze != outSize)
@@ -149,7 +146,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, st
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](unsigned int i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -157,7 +154,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, st
 			// create random at offset position
 			this->Generate(cnkSize, thdVec, Output, (i * cnkSize));
 			// xor with input at offset
-			IntUtils::XORBLK(Input, InOffset + (i * cnkSize), Output, OutOffset + (i * cnkSize), cnkSize);
+			CEX::Utility::IntUtils::XORBLK(Input, InOffset + (i * cnkSize), Output, OutOffset + (i * cnkSize), cnkSize);
 		});
 
 		// copy the last counter position to class variable
@@ -196,7 +193,7 @@ void CTR::Increase(const std::vector<byte> &Counter, const unsigned int Size, st
 
 void CTR::SetScope()
 {
-	_processorCount = ParallelUtils::ProcessorCount();
+	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 	if (_processorCount % 2 != 0)
 		_processorCount--;
 	if (_processorCount > 1)

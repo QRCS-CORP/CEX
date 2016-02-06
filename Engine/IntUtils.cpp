@@ -54,7 +54,7 @@ void IntUtils::XOR32(const byte* &Input, byte* &Output)
 	Output[1] ^= Input[1];
 	Output[2] ^= Input[2];
 	Output[3] ^= Input[3];
-};
+}
 
 void IntUtils::XOR32(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -62,7 +62,7 @@ void IntUtils::XOR32(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Output[1] ^= Input[1];
 	Output[2] ^= Input[2];
 	Output[3] ^= Input[3];
-};
+}
 
 void IntUtils::XOR32(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
 {
@@ -70,7 +70,7 @@ void IntUtils::XOR32(const std::vector<byte> &Input, uint InOffset, std::vector<
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
-};
+}
 
 void IntUtils::XOR64(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -82,7 +82,7 @@ void IntUtils::XOR64(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Output[5] ^= Input[5];
 	Output[6] ^= Input[6];
 	Output[7] ^= Input[7];
-};
+}
 
 void IntUtils::XOR64(const byte* &Input, byte* &Output)
 {
@@ -94,7 +94,7 @@ void IntUtils::XOR64(const byte* &Input, byte* &Output)
 	Output[5] ^= Input[5];
 	Output[6] ^= Input[6];
 	Output[7] ^= Input[7];
-};
+}
 
 void IntUtils::XOR64(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
 {
@@ -106,7 +106,7 @@ void IntUtils::XOR64(const std::vector<byte> &Input, uint InOffset, std::vector<
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
-};
+}
 
 void IntUtils::XOR128(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -126,7 +126,7 @@ void IntUtils::XOR128(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Output[13] ^= Input[13];
 	Output[14] ^= Input[14];
 	Output[15] ^= Input[15];
-};
+}
 
 void IntUtils::XOR128(const byte* &Input, byte* &Output)
 {
@@ -146,7 +146,7 @@ void IntUtils::XOR128(const byte* &Input, byte* &Output)
 	Output[13] ^= Input[13];
 	Output[14] ^= Input[14];
 	Output[15] ^= Input[15];
-};
+}
 
 void IntUtils::XOR128(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
 {
@@ -166,7 +166,7 @@ void IntUtils::XOR128(const std::vector<byte> &Input, uint InOffset, std::vector
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
-};
+}
 
 void IntUtils::XOR256(const byte* &Input, byte* &Output)
 {
@@ -202,7 +202,7 @@ void IntUtils::XOR256(const byte* &Input, byte* &Output)
 	Output[29] ^= Input[29];
 	Output[30] ^= Input[30];
 	Output[31] ^= Input[21];
-};
+}
 
 void IntUtils::XOR256(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -238,7 +238,7 @@ void IntUtils::XOR256(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Output[29] ^= Input[29];
 	Output[30] ^= Input[30];
 	Output[31] ^= Input[21];
-};
+}
 
 void IntUtils::XOR256(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
 {
@@ -274,7 +274,7 @@ void IntUtils::XOR256(const std::vector<byte> &Input, uint InOffset, std::vector
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
-};
+}
 
 void IntUtils::XORBLK(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset, const uint Size)
 {

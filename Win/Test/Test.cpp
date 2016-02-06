@@ -42,45 +42,16 @@ using namespace Test;
 
 // *** CEX 1.0 TODO ***
 //
-// add generators									-done
-// add prngs										-done
-// use test interface and local RunTest()			-done
-// add padding tests								-done
-// finish cmac and test								-done
-// finish vmac and test								-done
-// implement ex. CipherFromName helper classes		-done
-// add DigestStream and MacStream + tests			-done
-// fix cipherstream test							-done
-// add progress events to xStream processors		-done
-// sort out enum values and numbering				-done
-// optimize chacha/salsa							-done
-// add ISAAC and XSP seed generators				-done
-// verify XSP + ISAAC vectors						-done
-// serpent sboxes in serpent.h						-done
-// Twofish Mix() function							-done
-// implement XORBLK in modes (& mac?)				-done
-// add all necessary cpp files						-done
-// add keygenerator									-done
-// all tests must throw on fail						-done
-// add object enumeration type property				-done
-// merge RDX+RHX, TFX+THX, SPX+SHX					-done
-// add entropypool									-?
-// add volumecipher									-?
-// add keyfactory? 									-?
-// add packagefactory?								-?
+// EntropyPool			-?
+// VolumeCipher			-?
+// KeyFactory 			-?
+// PackageFactory		-?
 //
-
-// change over test progress methods				-done
-// cleanup tests (consolidate methods and style)	-done
-// split test files and organize					-why split?
-//
-// fix sub-namespaces lookups						-?
-// full code review									-almost
-// review all documentation							-?
-// update .Net CEX									-done
-//
-// classes left: 8?
-// ETA: 2/1/16
+// *** CEX 2.0 TODO ***
+// RingLWE				-?
+// NTRU					-?
+// Networking			-?
+// DTM-KEX				-?
 
 std::string GetResponse()
 {
@@ -114,7 +85,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0: CEX Library in C++      *");
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0                            *");
-	ConsoleUtils::WriteLine("* Date:      Jan 24, 2016                    *");
+	ConsoleUtils::WriteLine("* Date:      Feb 06, 2016                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -164,7 +135,6 @@ int main(int argc, const char * argv[])
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	//RunTest(new KeyFactoryTest());
 
 	try
 	{
@@ -242,6 +212,3 @@ int main(int argc, const char * argv[])
 		return 0;
 	}
 }
-
-
-

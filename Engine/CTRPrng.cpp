@@ -5,10 +5,6 @@
 
 NAMESPACE_PRNG
 
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
-using CEX::Seed::ISeed;
-using CEX::Utility::IntUtils;
-
 /// <summary>
 /// Release all resources associated with the object
 /// </summary>
@@ -16,14 +12,14 @@ void CTRPrng::Destroy()
 {
 	if (!_isDestroyed)
 	{
-		_engineType = BlockCiphers::RHX;
-		_seedType = SeedGenerators::CSPRsg;
+		_engineType = CEX::Enumeration::BlockCiphers::RHX;
+		_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
 		_bufferIndex = 0;
 		_bufferSize = 0;
 		_keySize = 0;
 
-		IntUtils::ClearVector(_stateSeed);
-		IntUtils::ClearVector(_byteBuffer);
+		CEX::Utility::IntUtils::ClearVector(_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(_byteBuffer);
 
 		if (_seedGenerator != 0)
 		{
@@ -111,7 +107,7 @@ void CTRPrng::GetBytes(std::vector<byte> &Output)
 /// <returns>Random UInt32</returns>
 unsigned int CTRPrng::Next()
 {
-	return IntUtils::ToInt32(GetBytes(4));
+	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
 /// <summary>
@@ -158,7 +154,7 @@ unsigned int CTRPrng::Next(unsigned int Minimum, unsigned int Maximum)
 /// <returns>Random UInt64</returns>
 ulong CTRPrng::NextLong()
 {
-	return IntUtils::ToInt64(GetBytes(8));
+	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
 /// <summary>
@@ -281,29 +277,29 @@ std::vector<byte> CTRPrng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-IBlockCipher* CTRPrng::GetCipher(BlockCiphers RngEngine)
+CEX::Cipher::Symmetric::Block::IBlockCipher* CTRPrng::GetCipher(CEX::Enumeration::BlockCiphers RngEngine)
 {
 	return CEX::Helper::BlockCipherFromName::GetInstance(RngEngine);
 }
 
-unsigned int CTRPrng::GetKeySize(BlockCiphers CipherEngine)
+unsigned int CTRPrng::GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine)
 {
 	switch (CipherEngine)
 	{
-	case BlockCiphers::RHX:
-	case BlockCiphers::SHX:
-	case BlockCiphers::THX:
+	case CEX::Enumeration::BlockCiphers::RHX:
+	case CEX::Enumeration::BlockCiphers::SHX:
+	case CEX::Enumeration::BlockCiphers::THX:
 		return 320;
 	default:
 		return 32;
 	}
 }
 
-ISeed* CTRPrng::GetSeedGenerator(SeedGenerators SeedEngine)
+CEX::Seed::ISeed* CTRPrng::GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine)
 {
 	switch (SeedEngine)
 	{
-		/*case SeedGenerators::XSPRsg:
+		/*case CEX::Enumeration::SeedGenerators::XSPRsg:
 		return new CEX::Seed::XSPRsg();*/ //ToDo?
 	default:
 		return new CEX::Seed::CSPRsg();

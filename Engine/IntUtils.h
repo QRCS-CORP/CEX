@@ -764,21 +764,21 @@ public:
 		std::vector<byte> data(2);
 		Le16ToBytes(Word, data, 0);
 		return data;	
-	};
+	}
 
 	static inline std::vector<byte> ToBit32(uint Word)
 	{
 		std::vector<byte> data(4);
 		Le32ToBytes(Word, data, 0);
 		return data;
-	};
+	}
 
 	static inline std::vector<byte> ToBit64(ulong QWord)
 	{
 		std::vector<byte> data(8);
 		Le64ToBytes(QWord, data, 0);
 		return data;
-	};
+	}
 
 	template<typename T>
 	static inline char* ToChar(const T& Value)
@@ -791,32 +791,32 @@ public:
 	static inline unsigned short ToInt16(std::vector<byte> Block)
 	{
 		return BytesToLe16(Block, 0);
-	};
+	}
 
 	static inline uint ToInt32(std::vector<byte> Block)
 	{
 		return BytesToLe32(Block, 0);
-	};
+	}
 
 	static inline ulong ToInt64(std::vector<byte> Block)
 	{
 		return BytesToLe64(Block, 0);
-	};
+	}
 
 	static inline unsigned short ToInt16(std::vector<byte> Block, uint Offset)
 	{
 		return BytesToLe16(Block, Offset);
-	};
+	}
 
 	static inline uint ToInt32(std::vector<byte> Block, uint Offset)
 	{
 		return BytesToLe32(Block, Offset);
-	};
+	}
 
 	static inline ulong ToInt64(std::vector<byte> Block, uint Offset)
 	{
 		return BytesToLe64(Block, Offset);
-	};
+	}
 
 	template<typename T>
 	static inline std::string ToString(const T& Value)

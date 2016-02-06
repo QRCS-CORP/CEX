@@ -3,8 +3,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Utility::IntUtils;
-
 void KDF2Drbg::Destroy()
 {
 	if (!_isDestroyed)
@@ -12,8 +10,8 @@ void KDF2Drbg::Destroy()
 		_blockSize = 0;
 		_hashSize = 0;
 		_isInitialized = false;
-		IntUtils::ClearVector(_IV);
-		IntUtils::ClearVector(_Salt);
+		CEX::Utility::IntUtils::ClearVector(_IV);
+		CEX::Utility::IntUtils::ClearVector(_Salt);
 	}
 }
 

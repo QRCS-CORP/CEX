@@ -53,11 +53,11 @@ NAMESPACE_MODE
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">CEX::Cipher::Symmetric::Block::Mode::ICipherMode Interface</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>In CFB mode, only decryption can be processed in parallel.</description></item>
 /// <item><description>Parallel processing is enabled on decryption by passing a block size of ParallelBlockSize to the transform.</description></item>
@@ -65,7 +65,7 @@ NAMESPACE_MODE
 /// <item><description>Parallel block calculation ex. <c>int blocklen = (data.size() / cipher.ParallelMinimumSize()) * 100</c></description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
 /// </list>
@@ -201,8 +201,8 @@ public:
 	// *** Public Methods *** //
 
 	/// <summary>
-	/// <para>Decrypt a block of bytes.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Decrypt a block of bytes.
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
@@ -210,8 +210,8 @@ public:
 	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
-	/// <para>Decrypt a block of bytes with offset parameters. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Decrypt a block of bytes with offset parameters. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
@@ -226,8 +226,8 @@ public:
 	virtual void Destroy();
 
 	/// <summary>
-	/// <para>Encrypt a block of bytes. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Encrypt a block of bytes. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>
@@ -235,8 +235,8 @@ public:
 	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
-	/// <para>Encrypt a block of bytes with offset parameters. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Encrypt a block of bytes with offset parameters. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>
@@ -249,13 +249,13 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Cipher is used. for encryption, false to decrypt</param>
+	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 	/// <param name="KeyParam">KeyParam containing key and std::vector</param>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
-	/// <para>Transform a block of bytes. Parallel capable in Decryption mode.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Transform a block of bytes. Parallel capable in Decryption mode.
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	///
 	/// <param name="Input">Input bytes to Transform</param>
@@ -265,7 +265,7 @@ public:
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
 	/// <para> Parallel capable in Decryption mode.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	///
 	/// <param name="Input">Input bytes to Transform</param>
@@ -280,7 +280,6 @@ protected:
 	void ProcessDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset, std::vector<byte> &Iv, const unsigned int BlockCount);
 	void SetScope();
 };
-
 
 NAMESPACE_MODEEND
 #endif

@@ -27,17 +27,13 @@
 #include "Common.h"
 #include "BlockCiphers.h"
 #include "CryptoSymmetricCipherException.h"
-#include "Digests.h"
 #include "IDigest.h"
 #include "KeyParams.h"
 
 NAMESPACE_BLOCK
 
-using CEX::Common::KeyParams;
-using CEX::Digest::IDigest;
-using CEX::Enumeration::BlockCiphers;
-using CEX::Enumeration::Digests;
 using CEX::Exception::CryptoSymmetricCipherException;
+using CEX::Enumeration::Digests; // TODO: can't get rid of this.. why!?!
 
 /// <summary>
 /// Block Cipher Interface
@@ -60,19 +56,17 @@ public:
 	// *** Properties *** //
 
 	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes.
-	/// <para>Block size must be 16 or 32 bytes wide. 
-	/// Value set in class constructor.</para>
+	/// Get: Unit block size of internal cipher in bytes
 	/// </summary>
 	virtual const unsigned int BlockSize() = 0;
 
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const BlockCiphers Enumeral() = 0;
+	virtual const CEX::Enumeration::BlockCiphers Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Initialized for encryption, false for decryption.
+	/// Get: True is initialized for encryption, false for decryption.
 	/// <para>Value set in <see cref="Initialize(bool, KeyParams)"/>.</para>
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
@@ -161,7 +155,7 @@ public:
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam) = 0;
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes.

@@ -2,16 +2,10 @@
 #define _CEXTEST_PBKDF2DRBGTEST_H
 
 #include "ITest.h"
-#include "SHA256.h"
-#include "SHA512.h"
-#include "PBKDF2.h"
+#include "IDigest.h"
 
 namespace Test
 {
-	using CEX::Digest::SHA256;
-	using CEX::Digest::SHA512;
-	using CEX::Generator::PBKDF2;
-
 	/// <summary>
 	/// Tests the PBKDF2 implementation using vector comparisons.
 	/// <para>Vectors generated via verified version in .Net CEX.</para>
@@ -43,12 +37,6 @@ namespace Test
 		/// </summary>
 		PBKDF2Test()
 		{
-			const char* outputEncoded[2] =
-			{
-				("a2ab21c1ffd7455f76924b8be3ebb43bc03c591e8d309fc87a8a2483bf4c52d3"),
-				("cc46b9de43b3e3eac0685e5f945458e5da835851645c520f9c8edc91a5da28ee")
-			};
-			HexConverter::Decode(outputEncoded, 2, _output);
 		}
 
 		/// <summary>
@@ -61,57 +49,12 @@ namespace Test
 		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run()
-		{
-			try
-			{
-				SHA256* eng256 = new SHA256();
-				CompareVector(eng256, _output[0]);
-				delete eng256;
-				OnProgress("PBKDF2Test: Passed 256 bit vectors test..");
-
-				SHA512* eng512 = new SHA512();
-				CompareVector(eng512, _output[1]);
-				delete eng512;
-				OnProgress("PBKDF2Test: Passed 512 bit vectors test..");
-
-				return SUCCESS;
-			}
-			catch (std::string const& ex)
-			{
-				throw TestException(std::string(FAILURE + " : " + ex));
-			}
-			catch (...)
-			{
-				throw TestException(std::string(FAILURE + " : Internal Error"));
-			}
-		}
+		virtual std::string Run();
 
 	private:
-		void CompareVector(IDigest* Engine, std::vector<byte> &Output)
-		{
-			std::vector<byte> outBytes(1024);
-			int keySize = Engine->BlockSize();
-			std::vector<byte> salt(keySize);
-			PBKDF2 gen(Engine, 100);
-
-			for (unsigned int i = 0; i < salt.size(); i++)
-				salt[i] = (byte)i;
-
-			gen.Initialize(salt);
-			gen.Generate(outBytes);
-
-			while (outBytes.size() > 32)
-				outBytes = TestUtils::Reduce(outBytes);
-
-			if (outBytes != Output)
-				throw std::string("PBKDF2: Values are not equal!");
-		}
-
-		void OnProgress(char* Data)
-		{
-			_progressEvent(Data);
-		}
+		void CompareVector(CEX::Digest::IDigest* Engine, std::vector<byte> &Output);
+		void Initialize();
+		void OnProgress(char* Data);
 	};
 }
 

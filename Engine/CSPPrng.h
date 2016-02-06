@@ -52,7 +52,7 @@ NAMESPACE_PRNG
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Guiding Publications:</h4>:</description>
+/// <description>Guiding Publications::</description>
 /// <list type="number">
 /// <item><description>NIST SP800-90B: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
 /// <item><description>NIST Fips 140-2: Security Requirments For Cryptographic Modules.</description></item>
@@ -72,7 +72,7 @@ public:
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const Prngs Enumeral() { return Prngs::CSPPrng; }
+	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::CSPPrng; }
 
 	/// <summary>
 	/// Get: Digest name

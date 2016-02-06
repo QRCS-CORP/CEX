@@ -7,7 +7,6 @@
 
 NAMESPACE_PADDING
 
-using CEX::Enumeration::PaddingModes;
 using CEX::Exception::CryptoPaddingException;
 
 /// <summary>
@@ -33,7 +32,7 @@ public:
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const PaddingModes Enumeral() = 0;
+	virtual const CEX::Enumeration::PaddingModes Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Padding name

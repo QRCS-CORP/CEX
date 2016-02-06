@@ -7,8 +7,6 @@
 
 NAMESPACE_BLOCK
 
-using CEX::Utility::IntUtils;
-
 void THX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Decrypt16(Input, 0, Output, 0);
@@ -29,11 +27,11 @@ void THX::Destroy()
 		_isEncryption = false;
 		_isInitialized = false;
 
-		IntUtils::ClearVector(_expKey);
-		IntUtils::ClearVector(_sprBox);
-		IntUtils::ClearVector(_hkdfInfo);
-		IntUtils::ClearVector(_legalKeySizes);
-		IntUtils::ClearVector(_legalRounds);
+		CEX::Utility::IntUtils::ClearVector(_expKey);
+		CEX::Utility::IntUtils::ClearVector(_sprBox);
+		CEX::Utility::IntUtils::ClearVector(_hkdfInfo);
+		CEX::Utility::IntUtils::ClearVector(_legalKeySizes);
+		CEX::Utility::IntUtils::ClearVector(_legalRounds);
 
 		if (_kdfEngine != 0)
 		{
@@ -54,13 +52,12 @@ void THX::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffs
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
 
-void THX::Initialize(bool Encryption, const KeyParams &KeyParam)
+void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	int dgtsze = GetIkmSize(_kdfEngineType);
 	int dgtblk = GetSaltSize(_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, (length - IKm length: {" +
-		IntUtils::ToString(dgtsze) + "} bytes) + multiple of {" + IntUtils::ToString(dgtblk) + "} block size.";
+	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, (length - IKm length: {" + CEX::Utility::IntUtils::ToString(dgtsze) + "} bytes) + multiple of {" + CEX::Utility::IntUtils::ToString(dgtblk) + "} block size.";
 
 	if (key.size() < _legalKeySizes[0])
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
@@ -84,24 +81,6 @@ void THX::Initialize(bool Encryption, const KeyParams &KeyParam)
 	ExpandKey(key);
 	// ready to transform data
 	_isInitialized = true;
-
-
-	/*const std::vector<byte> &Key = KeyParam.Key();
-
-	if (Key.size() < _legalKeySizes[0])
-	{
-		std::string message = "Invalid key size! Key must be at least {" + IntUtils::ToString(_legalKeySizes[0]) + "} bytes ({" + IntUtils::ToString(_legalKeySizes[0] * 8) + "} bit).";
-		throw CryptoSymmetricCipherException("RHX:Initialize", message);
-	}
-	if ((Key.size() - _kdfEngine->DigestSize()) % _kdfEngine->BlockSize() != 0)
-	{
-		std::string message = "Invalid key size! Key must be (length - IKm length: {" + IntUtils::ToString(_kdfEngine->DigestSize()) + "} bytes) + multiple of {" + IntUtils::ToString(_kdfEngine->BlockSize()) + "} block size.";
-		throw CryptoSymmetricCipherException("RHX:Initialize", message);
-	}
-
-	_isEncryption = Encryption;
-	ExpandKey(KeyParam.Key());
-	_isInitialized = true;*/
 }
 
 void THX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -173,12 +152,12 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 	for (unsigned int i = 0; i < k64Cnt; i++)
 	{
 		// round key material
-		eKm[i] = IntUtils::BytesToLe32(rawKey, keyCtr);
+		eKm[i] = CEX::Utility::IntUtils::BytesToLe32(rawKey, keyCtr);
 		keyCtr += 4;
-		oKm[i] = IntUtils::BytesToLe32(rawKey, keyCtr);
+		oKm[i] = CEX::Utility::IntUtils::BytesToLe32(rawKey, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		IntUtils::Le32ToBytes(MDSEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		CEX::Utility::IntUtils::Le32ToBytes(MDSEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	keyCtr = 0;
@@ -220,15 +199,15 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	std::vector<byte> sbKey(Key.size() == 64 ? 32 : 16, 0);
 	std::vector<uint> wK(_dfnRounds * 2 + 8, 0);
 
-	for (unsigned int i = 0; i < k64Cnt; i++)
+	for (unsigned int i = 0; i < k64Cnt; ++i)
 	{
 		// round key material
-		eKm[i] = IntUtils::BytesToLe32(Key, keyCtr);
+		eKm[i] = CEX::Utility::IntUtils::BytesToLe32(Key, keyCtr);
 		keyCtr += 4;
-		oKm[i] = IntUtils::BytesToLe32(Key, keyCtr);
+		oKm[i] = CEX::Utility::IntUtils::BytesToLe32(Key, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		IntUtils::Le32ToBytes(MDSEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		CEX::Utility::IntUtils::Le32ToBytes(MDSEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	keyCtr = 0;
@@ -308,10 +287,10 @@ void THX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 {
 	const unsigned int LRD = 8;
 	unsigned int keyCtr = 4;
-	uint X2 = IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X3 = IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X0 = IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X1 = IntUtils::BytesToLe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = _expKey.size();
@@ -333,20 +312,20 @@ void THX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	} while (keyCtr != LRD);
 
 	keyCtr = 0;
-	IntUtils::Le32ToBytes(X0 ^ _expKey[keyCtr], Output, OutOffset);
-	IntUtils::Le32ToBytes(X1 ^ _expKey[++keyCtr], Output, OutOffset + 4);
-	IntUtils::Le32ToBytes(X2 ^ _expKey[++keyCtr], Output, OutOffset + 8);
-	IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ _expKey[keyCtr], Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ _expKey[++keyCtr], Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ _expKey[++keyCtr], Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 12);
 }
 
 void THX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
 {
 	const unsigned int LRD = _expKey.size() - 1;
 	unsigned int keyCtr = 0;
-	uint X0 = IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X1 = IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X2 = IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X3 = IntUtils::BytesToLe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = 7;
@@ -367,10 +346,10 @@ void THX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	} while (keyCtr != LRD);
 
 	keyCtr = 4;
-	IntUtils::Le32ToBytes(X2 ^ _expKey[keyCtr], Output, OutOffset);
-	IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 4);
-	IntUtils::Le32ToBytes(X0 ^ _expKey[++keyCtr], Output, OutOffset + 8);
-	IntUtils::Le32ToBytes(X1 ^ _expKey[++keyCtr], Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ _expKey[keyCtr], Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ _expKey[++keyCtr], Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ _expKey[++keyCtr], Output, OutOffset + 12);
 }
 
 // *** Helpers *** //
@@ -415,7 +394,7 @@ uint THX::MDSEncode(uint K0, uint K1)
 	return rt;
 }
 
-IDigest* THX::GetDigest(Digests DigestType)
+CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
 {
 	try
 	{
@@ -427,44 +406,44 @@ IDigest* THX::GetDigest(Digests DigestType)
 	}
 }
 
-int THX::GetIkmSize(Digests DigestType)
+int THX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 {
 	switch (DigestType)
 	{
-	case Digests::Blake256:
-	case Digests::Keccak256:
-	case Digests::SHA256:
-	case Digests::Skein256:
+	case CEX::Enumeration::Digests::Blake256:
+	case CEX::Enumeration::Digests::Keccak256:
+	case CEX::Enumeration::Digests::SHA256:
+	case CEX::Enumeration::Digests::Skein256:
 		return 32;
-	case Digests::Blake512:
-	case Digests::Keccak512:
-	case Digests::SHA512:
-	case Digests::Skein512:
+	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::Keccak512:
+	case CEX::Enumeration::Digests::SHA512:
+	case CEX::Enumeration::Digests::Skein512:
 		return 64;
-	case Digests::Skein1024:
+	case CEX::Enumeration::Digests::Skein1024:
 		return 128;
 	default:
 		throw CryptoSymmetricCipherException("RHX:GetDigestSize", "The digest type is not supported!");
 	}
 }
 
-int THX::GetSaltSize(Digests DigestType)
+int THX::GetSaltSize(CEX::Enumeration::Digests DigestType)
 {
 	switch (DigestType)
 	{
-	case Digests::Blake256:
-	case Digests::Skein256:
+	case CEX::Enumeration::Digests::Blake256:
+	case CEX::Enumeration::Digests::Skein256:
 		return 32;
-	case Digests::Blake512:
-	case Digests::SHA256:
-	case Digests::Skein512:
+	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::SHA256:
+	case CEX::Enumeration::Digests::Skein512:
 		return 64;
-	case Digests::SHA512:
-	case Digests::Skein1024:
+	case CEX::Enumeration::Digests::SHA512:
+	case CEX::Enumeration::Digests::Skein1024:
 		return 128;
-	case Digests::Keccak256:
+	case CEX::Enumeration::Digests::Keccak256:
 		return 136;
-	case Digests::Keccak512:
+	case CEX::Enumeration::Digests::Keccak512:
 		return 72;
 	default:
 		throw CryptoSymmetricCipherException("RHX:GetBlockSize", "The digest type is not supported!");

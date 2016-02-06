@@ -5,35 +5,33 @@
 
 NAMESPACE_HELPER
 
-using namespace CEX::Cipher::Symmetric::Block;
-
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers EngineType)
+CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType)
 {
 	switch (EngineType)
 	{
-		case BlockCiphers::RHX:
-			return new RHX();
-		case BlockCiphers::SHX:
-			return new SHX();
-		case BlockCiphers::THX:
-			return new THX();
+		case CEX::Enumeration::BlockCiphers::RHX:
+			return new CEX::Cipher::Symmetric::Block::RHX();
+		case CEX::Enumeration::BlockCiphers::SHX:
+			return new CEX::Cipher::Symmetric::Block::SHX();
+		case CEX::Enumeration::BlockCiphers::THX:
+			return new CEX::Cipher::Symmetric::Block::THX();
 		default:
-			throw CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
+			throw CEX::Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
 	}
 }
 
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine)
+CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine)
 {
 	switch (EngineType)
 	{
-		case BlockCiphers::RHX:
-			return new RHX(BlockSize, RoundCount, KdfEngine);
-		case BlockCiphers::SHX:
-			return new SHX(RoundCount, KdfEngine);
-		case BlockCiphers::THX:
-			return new THX(RoundCount, KdfEngine);
+		case CEX::Enumeration::BlockCiphers::RHX:
+			return new CEX::Cipher::Symmetric::Block::RHX(BlockSize, RoundCount, KdfEngine);
+		case CEX::Enumeration::BlockCiphers::SHX:
+			return new CEX::Cipher::Symmetric::Block::SHX(RoundCount, KdfEngine);
+		case CEX::Enumeration::BlockCiphers::THX:
+			return new CEX::Cipher::Symmetric::Block::THX(RoundCount, KdfEngine);
 		default:
-			throw CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
+			throw CEX::Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
 	}
 }
 

@@ -53,12 +53,12 @@ NAMESPACE_MODE
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">CEX::Cipher::Symmetric::Block::Mode::ICipherMode Interface</seealso>
-/// <seealso cref="CEX::Enumeration::BlockCiphers">CEX::Enumeration BlockCiphers Enumeration</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>In CTR mode, both encryption and decryption can be processed in parallel.</description></item>
 /// <item><description>Parallel processing is enabled by passing a block size of <see cref="ParallelBlockSize"/> to the transform.</description></item>
@@ -66,7 +66,7 @@ NAMESPACE_MODE
 /// <item><description>Parallel block calculation ex. <c>int blocklen = (data.size() / cipher.ParallelMinimumSize()) * 100</c></description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
 /// </list>
@@ -206,17 +206,17 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Cipher is used. for encryption, false to decrypt</param>
+	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 	/// <param name="KeyParam">The KeyParams containing key and std::vector</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or IV is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
 	/// Process an array of bytes. 
 	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>. 
 	/// This method processes the entire array; used when processing small data or buffers from a larger source.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>
@@ -228,7 +228,7 @@ public:
 	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>. 
 	/// Method will process a single block from the array of either ParallelBlockSize or Blocksize depending on IsParallel property setting.
 	/// Partial blocks are permitted with both parallel and linear operation modes.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>

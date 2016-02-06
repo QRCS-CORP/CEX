@@ -64,13 +64,15 @@ NAMESPACE_BLOCK
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest IDigest Interface</seealso>
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>HKDF Digest <see cref="Digests">engine</see> is definable through the <see cref="SHX(unsigned int, Digests)">Constructor</see> parameter: KeyEngine.</description></item>
-/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a definable <see cref="IDigest">Digest</see>.</description></item>
+/// <item><description>HKDF Digest <see cref="CEX::Enumeration::Digests">engine</see> is definable through the SHX(uint, Digests) Constructor parameter: KeyEngine.</description></item>
+/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a definable <see cref="CEX::Digest::IDigest">Digest</see>.</description></item>
 /// <item><description>Minimum key size is (IKm + Salt) (N * Digest State Size) + (Digest Hash Size) in bytes.</description></item>
 /// <item><description>Valid block size is 16 bytes wide.</description></item>
 /// <item><description>Valid Rounds assignments are 32, 40, 48, 56, 64, 80, 96 and 128, default is 64.</description></item>
@@ -100,7 +102,7 @@ NAMESPACE_BLOCK
 /// SHX is capable of processing up to 128 rounds, that is four times the number of rounds used in a standard implementation of Serpent. 
 /// Valid rounds assignments can be found in the <see cref="LegalRounds"/> static property.</para>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Serpent: <see href="http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf">Specification</see>.</description></item>
 /// <item><description>HMAC: <see href="http://tools.ietf.org/html/rfc2104">RFC 2104</see>.</description></item>
@@ -128,8 +130,8 @@ protected:
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
-	IDigest* _kdfEngine;
-	Digests _kdfEngineType;
+	CEX::Digest::IDigest* _kdfEngine;
+	CEX::Enumeration::Digests _kdfEngineType;
 	std::vector<unsigned int> _legalKeySizes;
 	std::vector<unsigned int> _legalRounds;
 
@@ -157,7 +159,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const BlockCiphers Enumeral() { return BlockCiphers::SHX; }
+	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::SHX; }
 
 	/// <summary>
 	/// Get/Set: Specify the size of the HMAC key; extracted from the cipher key.
@@ -205,11 +207,11 @@ public:
 	/// Initialize the class with a Digest instance
 	/// </summary>
 	///
-	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the message <see cref="Digests">Digest</see> implementations..</param>
+	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the message <see cref="CEX::Enumeration::Digests">Digest</see> implementations..</param>
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 32 rounds.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	SHX(IDigest *KdfEngine, unsigned int Rounds = ROUNDS32)
+	SHX(CEX::Digest::IDigest *KdfEngine, unsigned int Rounds = ROUNDS32)
 		:
 		_destroyEngine(false),
 		_isDestroyed(false),
@@ -249,10 +251,10 @@ public:
 	/// </summary>
 	///
 	///<param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 32 rounds.</param>
-	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the <see cref="Digests">Digest</see> implementations. The default engine is SHA512.</param>
+	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations. The default engine is SHA512.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	SHX(unsigned int Rounds = ROUNDS32, Digests KdfEngineType = Digests::SHA512)
+	SHX(unsigned int Rounds = ROUNDS32, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)
 		:
 		_isDestroyed(false),
 		_destroyEngine(true),
@@ -356,7 +358,7 @@ public:
 	/// <param name="KeyParam">Cipher key container.<para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -384,9 +386,9 @@ protected:
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	int GetIkmSize(Digests DigestType);
-	int GetSaltSize(Digests DigestType);
-	IDigest* GetDigest(Digests DigestType);
+	int GetIkmSize(CEX::Enumeration::Digests DigestType);
+	int GetSaltSize(CEX::Enumeration::Digests DigestType);
+	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	void InverseTransform(uint &R0, uint &R1, uint &R2, uint &R3);
 	void LinearTransform(uint &R0, uint &R1, uint &R2, uint &R3);
 	void SecureExpand(const std::vector<byte> &Key);

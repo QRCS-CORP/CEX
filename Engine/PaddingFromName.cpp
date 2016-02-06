@@ -6,22 +6,20 @@
 
 NAMESPACE_HELPER
 
-using namespace CEX::Cipher::Symmetric::Block::Padding;
-
-IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
+CEX::Cipher::Symmetric::Block::Padding::IPadding* PaddingFromName::GetInstance(CEX::Enumeration::PaddingModes PaddingType)
 {
 	switch (PaddingType)
 	{
-		case PaddingModes::ISO7816:
-			return new ISO7816();
-		case PaddingModes::PKCS7:
-			return new PKCS7();
-		case PaddingModes::TBC:
-			return new TBC();
-		case PaddingModes::X923:
-			return new X923();
+		case CEX::Enumeration::PaddingModes::ISO7816:
+			return new CEX::Cipher::Symmetric::Block::Padding::ISO7816();
+		case CEX::Enumeration::PaddingModes::PKCS7:
+			return new CEX::Cipher::Symmetric::Block::Padding::PKCS7();
+		case CEX::Enumeration::PaddingModes::TBC:
+			return new CEX::Cipher::Symmetric::Block::Padding::TBC();
+		case CEX::Enumeration::PaddingModes::X923:
+			return new CEX::Cipher::Symmetric::Block::Padding::X923();
 		default:
-			throw CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
+			throw CEX::Exception::CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
 	}
 }
 

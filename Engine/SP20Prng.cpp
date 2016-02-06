@@ -4,9 +4,6 @@
 
 NAMESPACE_PRNG
 
-using CEX::Seed::ISeed;
-using CEX::Utility::IntUtils;
-
 // *** Public Methods *** //
 
 /// <summary>
@@ -21,8 +18,8 @@ void SP20Prng::Destroy()
 		_dfnRounds = 0;
 		_keySize = 0;
 
-		IntUtils::ClearVector(_byteBuffer);
-		IntUtils::ClearVector(_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(_byteBuffer);
+		CEX::Utility::IntUtils::ClearVector(_stateSeed);
 
 		if (_seedGenerator != 0)
 		{
@@ -104,7 +101,7 @@ void SP20Prng::GetBytes(std::vector<byte> &Output)
 /// <returns>Random UInt32</returns>
 unsigned int SP20Prng::Next()
 {
-	return IntUtils::ToInt32(GetBytes(4));
+	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
 /// <summary>
@@ -151,7 +148,7 @@ unsigned int SP20Prng::Next(unsigned int Minimum, unsigned int Maximum)
 /// <returns>Random UInt64</returns>
 ulong SP20Prng::NextLong()
 {
-	return IntUtils::ToInt64(GetBytes(8));
+	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
 /// <summary>
@@ -269,11 +266,11 @@ std::vector<byte> SP20Prng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-ISeed* SP20Prng::GetSeedGenerator(SeedGenerators SeedEngine)
+CEX::Seed::ISeed* SP20Prng::GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine)
 {
 	switch (SeedEngine)
 	{
-		/*case SeedGenerators::XSPRsg:
+		/*case CEX::Enumeration::SeedGenerators::XSPRsg:
 		return new CEX::Seed::XSPRsg();*/ //ToDo?
 	default:
 		return new CEX::Seed::CSPRsg();

@@ -3,8 +3,6 @@
 
 NAMESPACE_DIGEST
 
-using CEX::Utility::IntUtils;
-
 static constexpr ulong _C64[] =
 {
 	0x243F6A8885A308D3UL, 0x13198A2E03707344UL, 0xA4093822299F31D0UL, 0x082EFA98EC4E6C89UL,
@@ -87,10 +85,10 @@ void Blake512::Destroy()
 		_isNullT = false;
 		_T = 0;
 
-		IntUtils::ClearVector(_HashVal);
-		IntUtils::ClearVector(_salt64);
-		IntUtils::ClearVector(_M);
-		IntUtils::ClearVector(_V);
+		CEX::Utility::IntUtils::ClearVector(_HashVal);
+		CEX::Utility::IntUtils::ClearVector(_salt64);
+		CEX::Utility::IntUtils::ClearVector(_M);
+		CEX::Utility::IntUtils::ClearVector(_V);
 	}
 }
 
@@ -100,7 +98,7 @@ unsigned int Blake512::DoFinal(std::vector<byte> &Output, const unsigned int Out
 		throw CryptoDigestException("Blake512:DoFinal", "The Output buffer is too short!");
 
 	std::vector<byte> msgLen(16);
-	IntUtils::Be64ToBytes(_T + ((ulong)_dataLen << 3), msgLen, 8);
+	CEX::Utility::IntUtils::Be64ToBytes(_T + ((ulong)_dataLen << 3), msgLen, 8);
 
 	// special case of one padding byte
 	if (_dataLen == PAD_LENGTH)
@@ -140,16 +138,16 @@ unsigned int Blake512::DoFinal(std::vector<byte> &Output, const unsigned int Out
 	std::vector<byte> digest(64, 0);
 
 	//for (int i = 0; i < 8; ++i)
-	//	IntUtils::Be64ToBytes(_HashVal[i], digest, i << 3);
+	//	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[i], digest, i << 3);
 
-	IntUtils::Be64ToBytes(_HashVal[0], digest, 0);
-	IntUtils::Be64ToBytes(_HashVal[1], digest, 8);
-	IntUtils::Be64ToBytes(_HashVal[2], digest, 16);
-	IntUtils::Be64ToBytes(_HashVal[3], digest, 24);
-	IntUtils::Be64ToBytes(_HashVal[4], digest, 32);
-	IntUtils::Be64ToBytes(_HashVal[5], digest, 40);
-	IntUtils::Be64ToBytes(_HashVal[6], digest, 48);
-	IntUtils::Be64ToBytes(_HashVal[7], digest, 56);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[0], digest, 0);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[1], digest, 8);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[2], digest, 16);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[3], digest, 24);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[4], digest, 32);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[5], digest, 40);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[6], digest, 48);
+	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[7], digest, 56);
 
 	memcpy(&Output[OutOffset], &digest[0], digest.size());
 	Reset();
@@ -172,22 +170,22 @@ void Blake512::Update(byte Input)
 
 void Blake512::Compress64(const std::vector<byte> &pbBlock, unsigned int Offset)
 {
-	_M[0] = IntUtils::BytesToBe64(pbBlock, Offset);
-	_M[1] = IntUtils::BytesToBe64(pbBlock, Offset + 8);
-	_M[2] = IntUtils::BytesToBe64(pbBlock, Offset + 16);
-	_M[3] = IntUtils::BytesToBe64(pbBlock, Offset + 24);
-	_M[4] = IntUtils::BytesToBe64(pbBlock, Offset + 32);
-	_M[5] = IntUtils::BytesToBe64(pbBlock, Offset + 40);
-	_M[6] = IntUtils::BytesToBe64(pbBlock, Offset + 48);
-	_M[7] = IntUtils::BytesToBe64(pbBlock, Offset + 56);
-	_M[8] = IntUtils::BytesToBe64(pbBlock, Offset + 64);
-	_M[9] = IntUtils::BytesToBe64(pbBlock, Offset + 72);
-	_M[10] = IntUtils::BytesToBe64(pbBlock, Offset + 80);
-	_M[11] = IntUtils::BytesToBe64(pbBlock, Offset + 88);
-	_M[12] = IntUtils::BytesToBe64(pbBlock, Offset + 96);
-	_M[13] = IntUtils::BytesToBe64(pbBlock, Offset + 104);
-	_M[14] = IntUtils::BytesToBe64(pbBlock, Offset + 112);
-	_M[15] = IntUtils::BytesToBe64(pbBlock, Offset + 120);
+	_M[0] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset);
+	_M[1] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 8);
+	_M[2] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 16);
+	_M[3] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 24);
+	_M[4] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 32);
+	_M[5] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 40);
+	_M[6] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 48);
+	_M[7] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 56);
+	_M[8] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 64);
+	_M[9] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 72);
+	_M[10] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 80);
+	_M[11] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 88);
+	_M[12] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 96);
+	_M[13] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 104);
+	_M[14] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 112);
+	_M[15] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 120);
 
 	_V[0] = _HashVal[0];
 	_V[1] = _HashVal[1];
@@ -270,13 +268,13 @@ void Blake512::G64(unsigned int A, unsigned int B, unsigned int C, unsigned int 
 
 	// initialization
 	_V[A] += _V[B] + (_M[P0] ^ _C64[P1]);
-	_V[D] = IntUtils::RotrFixed64(_V[D] ^ _V[A], 32);
+	_V[D] = CEX::Utility::IntUtils::RotrFixed64(_V[D] ^ _V[A], 32);
 	_V[C] += _V[D];
-	_V[B] = IntUtils::RotrFixed64(_V[B] ^ _V[C], 25);
+	_V[B] = CEX::Utility::IntUtils::RotrFixed64(_V[B] ^ _V[C], 25);
 	_V[A] += _V[B] + (_M[P1] ^ _C64[P0]);
-	_V[D] = IntUtils::RotrFixed64(_V[D] ^ _V[A], 16);
+	_V[D] = CEX::Utility::IntUtils::RotrFixed64(_V[D] ^ _V[A], 16);
 	_V[C] += _V[D];
-	_V[B] = IntUtils::RotrFixed64(_V[B] ^ _V[C], 11);
+	_V[B] = CEX::Utility::IntUtils::RotrFixed64(_V[B] ^ _V[C], 11);
 }
 
 void Blake512::Initialize()

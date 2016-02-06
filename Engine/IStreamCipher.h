@@ -9,8 +9,6 @@
 
 NAMESPACE_STREAM
 
-using CEX::Common::KeyParams;
-using CEX::Enumeration::StreamCiphers;
 using CEX::Exception::CryptoSymmetricCipherException;
 
 /// <summary>
@@ -43,7 +41,7 @@ public:
 	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
-	virtual const StreamCiphers Enumeral() = 0;
+	virtual const CEX::Enumeration::StreamCiphers Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
@@ -114,7 +112,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParam">Cipher key container. The LegalKeySizes property contains valid sizes</param>
-	virtual void Initialize(const KeyParams &KeyParam) = 0;
+	virtual void Initialize(const CEX::Common::KeyParams &KeyParam) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes

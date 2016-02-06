@@ -4,13 +4,8 @@
 #include "Common.h"
 #include "CryptoException.h"
 #include "IDigest.h"
-#include "Digests.h"
 
 NAMESPACE_HELPER
-
-using CEX::Digest::IDigest;
-using CEX::Enumeration::Digests;
-using CEX::Exception::CryptoException;
 
 /// <summary>
 /// DigestFromName: Get a Message Digest instance from it's enumeration name.
@@ -26,8 +21,8 @@ public:
 	/// 
 	/// <returns>An initialized digest</returns>
 	/// 
-	/// <exception cref="CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IDigest* GetInstance(Digests DigestType);
+	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static  CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests DigestType);
 };
 
 NAMESPACE_HELPEREND

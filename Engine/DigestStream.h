@@ -28,18 +28,12 @@
 #define _CEXENGINE_DIGESTSTREAM_H
 
 #include "Common.h"
-#include "IDigest.h"
-#include "Digests.h"
+#include "CryptoProcessingException.h"
 #include "DigestFromName.h"
 #include "Event.h"
 #include "IByteStream.h"
-#include "CryptoProcessingException.h"
 
 NAMESPACE_PROCESSING
-
-using CEX::Enumeration::Digests;
-using CEX::Event::Event;
-using CEX::Exception::CryptoProcessingException;
 
 /// <summary>
 /// Digest stream helper class.
@@ -62,12 +56,12 @@ using CEX::Exception::CryptoProcessingException;
 /// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration Digests Enumeration</seealso>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Uses any of the implemented <see cref="CEX::Enumeration::Digests">Digests</see> using either the IDigest interface, or a Digests enumeration member</see>.</description></item>
+/// <item><description>Uses any of the implemented <see cref="CEX::Enumeration::Digests">Digests</see> using either the IDigest interface, or a Digests enumeration member.</description></item>
 /// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either of the ComputeHash() calls.</description></item>
 /// </list>
 /// </remarks>
@@ -86,7 +80,7 @@ protected:
 	DigestStream() { }
 
 public:
-	Event<int> ProgressPercent;
+	CEX::Event::Event<int> ProgressPercent;
 
 	/// <summary>
 	/// Initialize the class with a digest instance
@@ -95,7 +89,7 @@ public:
 	/// 
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if a null Digest is used</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
 	DigestStream(CEX::Digest::IDigest* Digest)
 		:
 		_blockSize(Digest->BlockSize()),
@@ -137,7 +131,7 @@ public:
 	/// 
 	/// <returns>The Message Digest</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeHash(CEX::IO::IByteStream* InStream);
 
 	/// <summary>
@@ -149,7 +143,7 @@ public:
 	/// <param name="InOffset">The Input array starting offset</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeHash(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
 
 protected:

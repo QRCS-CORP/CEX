@@ -4,8 +4,6 @@
 
 NAMESPACE_SEED
 
-using CEX::Utility::IntUtils;
-
 //** Public Methods **//
 
 void ISCRsg::Destroy()
@@ -16,8 +14,8 @@ void ISCRsg::Destroy()
 		_cycCounter = 0;
 		_rndCount = 0;
 		_rslCounter = 0;
-		IntUtils::ClearVector(_rndResult);
-		IntUtils::ClearVector(_wrkBuffer);
+		CEX::Utility::IntUtils::ClearVector(_rndResult);
+		CEX::Utility::IntUtils::ClearVector(_wrkBuffer);
 		_isDestroyed = true;
 	}
 }

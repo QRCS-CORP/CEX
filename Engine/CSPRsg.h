@@ -1,6 +1,8 @@
 #ifndef _CEXENGINE_CSPRSG_H
 #define _CEXENGINE_CSPRSG_H
 
+#include "ISeed.h"
+
 #ifdef _WIN32
 #include <Windows.h>
 #pragma comment(lib, "advapi32.lib")
@@ -8,9 +10,6 @@
 #include <sys/types.h>
 #include <thread>
 #endif
-
-#include <stdlib.h>
-#include "ISeed.h"
 
 NAMESPACE_SEED
 
@@ -43,7 +42,7 @@ public:
 	/// <summary>
 	/// Get: The seed generators type name
 	/// </summary>
-	virtual const SeedGenerators Enumeral() { return SeedGenerators::CSPRsg; }
+	virtual const CEX::Enumeration::SeedGenerators Enumeral() { return CEX::Enumeration::SeedGenerators::CSPRsg; }
 
 	/// <summary>
 	/// Get: Cipher name

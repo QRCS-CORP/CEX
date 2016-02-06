@@ -1,21 +1,8 @@
 #include "SHA256.h"
+#include "SHA.h"
 #include "IntUtils.h"
 
 NAMESPACE_DIGEST
-
-using CEX::Utility::IntUtils;
-
-constexpr uint K32[] =
-{
-	0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
-	0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
-	0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
-	0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
-	0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
-	0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
-	0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
-	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
-};
 
 void SHA256::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
 {
@@ -66,8 +53,8 @@ void SHA256::Destroy()
 		_H0 = 0, _H1 = 0, _H2 = 0, _H3 = 0, _H4 = 0, _H5 = 0, _H6 = 0, _H7 = 0;
 		_wordOffset = 0;
 
-		IntUtils::ClearVector(_prcBuffer);
-		IntUtils::ClearVector(_wordBuffer);
+		CEX::Utility::IntUtils::ClearVector(_prcBuffer);
+		CEX::Utility::IntUtils::ClearVector(_wordBuffer);
 	}
 }
 
@@ -77,14 +64,14 @@ unsigned int SHA256::DoFinal(std::vector<byte> &Output, const unsigned int OutOf
 		throw CryptoDigestException("SHA256:DoFinal", "The Output buffer is too short!");
 
 	Finish();
-	IntUtils::Be32ToBytes(_H0, Output, OutOffset);
-	IntUtils::Be32ToBytes(_H1, Output, OutOffset + 4);
-	IntUtils::Be32ToBytes(_H2, Output, OutOffset + 8);
-	IntUtils::Be32ToBytes(_H3, Output, OutOffset + 12);
-	IntUtils::Be32ToBytes(_H4, Output, OutOffset + 16);
-	IntUtils::Be32ToBytes(_H5, Output, OutOffset + 20);
-	IntUtils::Be32ToBytes(_H6, Output, OutOffset + 24);
-	IntUtils::Be32ToBytes(_H7, Output, OutOffset + 28);
+	CEX::Utility::IntUtils::Be32ToBytes(_H0, Output, OutOffset);
+	CEX::Utility::IntUtils::Be32ToBytes(_H1, Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Be32ToBytes(_H2, Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Be32ToBytes(_H3, Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Be32ToBytes(_H4, Output, OutOffset + 16);
+	CEX::Utility::IntUtils::Be32ToBytes(_H5, Output, OutOffset + 20);
+	CEX::Utility::IntUtils::Be32ToBytes(_H6, Output, OutOffset + 24);
+	CEX::Utility::IntUtils::Be32ToBytes(_H7, Output, OutOffset + 28);
 
 	Reset();
 
@@ -436,7 +423,7 @@ void SHA256::ProcessLength(ulong BitLength)
 
 void SHA256::ProcessWord(const std::vector<byte> &Input, unsigned int Offset)
 {
-	_wordBuffer[_wordOffset] = IntUtils::BytesToBe32(Input, Offset);
+	_wordBuffer[_wordOffset] = CEX::Utility::IntUtils::BytesToBe32(Input, Offset);
 
 	if (++_wordOffset == 16)
 		ProcessBlock();

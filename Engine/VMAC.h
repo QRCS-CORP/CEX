@@ -35,7 +35,7 @@ NAMESPACE_MAC
 
 /// <summary>
 /// An implementation of a Variably Modified Permutation Composition based Message Authentication Code: VMPC-MAC.
-/// <para>A VMPC-MAC as outlined in the VMPC-MAC Specification</para>
+/// <para>A VMPC message code generator as outlined in the VMPC-MAC Specification</para>
 /// </summary>
 /// 
 /// <example>
@@ -54,16 +54,16 @@ NAMESPACE_MAC
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>No fixed block size is used.</description></item>
 /// <item><description>MAC return size is 20 bytes.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>VMPC-MAC Specification: <see href="http://www.vmpcfunction.com/vmpc_mac.pdf"/> VMPC-MAC: A Stream Cipher Based Authenticated Encryption Scheme.</description></item>
-/// <item><description>VMPC Paper: <see href="http://www.vmpcfunction.com/vmpcmac.htm>VMPC-MAC"/> VMPC-MAC Authenticated Encryption Scheme.</description></item>
+/// <item><description>VMPC Paper: <see href="http://www.vmpcfunction.com/vmpcmac.htm"/> VMPC-MAC Authenticated Encryption Scheme.</description></item>
 /// <item><description>IETF: <see href="http://www.okna.wroc.pl/vmpc.pdf"/> VMPC One-Way Function and Stream Cipher.</description></item>
 /// </list>
 /// </remarks>
@@ -102,7 +102,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const Macs Enumeral() { return Macs::VMAC; }
+	virtual const CEX::Enumeration::Macs Enumeral() { return CEX::Enumeration::Macs::VMAC; }
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes

@@ -3,16 +3,9 @@
 
 #include "Common.h"
 #include "CryptoException.h"
-#include "IBlockCipher.h"
 #include "ICipherMode.h"
-#include "CipherModes.h"
 
 NAMESPACE_HELPER
-
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
-using CEX::Cipher::Symmetric::Block::Mode::ICipherMode;
-using CEX::Enumeration::CipherModes;
-using CEX::Exception::CryptoException;
 
 /// <summary>
 /// CipherModeFromName: Get a Cipher Mode instance from it's enumeration name.
@@ -29,8 +22,8 @@ public:
 	/// 
 	/// <returns>An initialized digest</returns>
 	/// 
-	/// <exception cref="CryptoException">Thrown if the enumeration name is not supported</exception>
-	static ICipherMode* GetInstance(CipherModes CipherType, IBlockCipher* Engine);
+	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static CEX::Cipher::Symmetric::Block::Mode::ICipherMode* GetInstance(CEX::Enumeration::CipherModes CipherType, CEX::Cipher::Symmetric::Block::IBlockCipher* Engine);
 };
 
 NAMESPACE_HELPEREND

@@ -41,10 +41,13 @@
 NAMESPACE_BLOCK
 
 /// <summary>
-/// THX: An extended implementation of the Twofish encryption cipher.
-/// <para>THX is an implementation of the Twofish block cipher, extended to use a 512 bit key.</para>
+/// THX: A Twofish Cipher extended with an (optional) HKDF powered Key Schedule.
+/// <para>THX is a Twofish: <see href="https://www.schneier.com/paper-twofish-paper.pdf"/> implementation that can use a standard configuration on key sizes up to 256 bits, 
+/// an extended key size of 512 bits, or unlimited key sizes greater than 64 bytes. 
+/// On <see cref="LegalKeySizes"/> larger than 64 bytes, an HKDF bytes generator is used to expand the <c>working key</c> integer array.
+/// In extended mode, the number of <c>transformation rounds</c> can be user assigned (through the constructor) to between 16 and 32 rounds.</para>
 /// </summary>
-///
+/// 
 /// <example>
 /// <description>Example using an <c>ICipherMode</c> interface:</description>
 /// <code>
@@ -55,29 +58,61 @@ NAMESPACE_BLOCK
 /// cipher.Transform(Input, Output);
 /// </code>
 /// </example>
-///
+/// 
 /// <revisionHistory>
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// 
 /// <remarks>
 /// <description><h4>Implementation Notes:</h4></description>
 /// <list type="bullet">
-/// <item><description>Valid Key sizes are 128, 192, 256 and 512 bits (16, 24, 32 and 64 bytes).</description></item>
-/// <item><description>Block size is 16 bytes wide.</description></item>
+/// <item><description>HKDF Digest <see cref="CEX::Enumeration::Digests">engine</see> is definable through the <see cref="THX(unsigned int, Digests)">Constructor</see> parameter: KeyEngine.</description></item>
+/// <item><description>Key Schedule is (optionally) powered by a Hash based Key Derivation Function using a definable <see cref="CEX::Digest::IDigest">Digest</see>.</description></item>
+/// <item><description>Minimum key size is (IKm + Salt) (N * Digest State Size) + (Digest Hash Size) in bytes.</description></item>
+/// <item><description>Valid block size is 16 bytes wide.</description></item>
+/// <item><description>Valid Rounds assignments are set at 16 in standard mode, and 32, 40, 48, 56, and 64 in extended mode.</description></item>
 /// <item><description>Valid Rounds assignments are 16, 18, 20, 22, 24, 26, 28, 30 and 32, default is 16.</description></item>
 /// </list>
 /// 
-/// <para>THX extends the original design allowing it to accept the longer key length (512 bits).</para>
+/// <para>The number of transformation rounds processed is also user definable; from the standard 16 rounds, to a full 32 rounds of transformation.</para>
 /// 
-/// <para>The number of diffusion rounds processed in the ciphers transformation method has also been extended, and is user configurable; 
-/// from the original 16 rounds, to a full 32 rounds of transformation. 
-/// This increase in key size eliminates brute force attacks, and the increase in the number of diffusion rounds makes cryptanalysis far more difficult.</para>
+/// <para>The key schedule in THX powered by an HKDF: <see href="http://tools.ietf.org/html/rfc5869"/> generator, using a Digest HMAC: <see href="http://tools.ietf.org/html/rfc2104"/> (Hash based Message Authentication Code) as its random engine. 
+/// This is one of the strongest: <see href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf"/> methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even the Twofish key schedule. HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
+/// The HMAC RFC 2104, recommends a key size equal to the digest output, in the case of SHA512, 64 bytes, anything larger gets passed through the hash function to get the required 512 bit key size. 
+/// The Salt size is a minimum of the hash functions block size, with SHA-2 512 that is 128 bytes.</para>
+/// 
+/// <para>When using SHA-2 512, a minimum key size for THX is 192 bytes, further blocks of salt can be added to the key so long as they align; ikm + (n * blocksize), ex. 192, 320, 448 bytes.. there is no upper maximum. 
+/// This means that you can create keys as large as you like so long as it falls on these boundaries, this effectively eliminates brute force as a means of attack on the cipher, even in quantum terms.</para> 
+/// 
+/// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake: <see href="https://131002.net/blake/blake.pdf"/>, 
+/// Keccak: <see href="http://keccak.noekeon.org/Keccak-submission-3.pdf"/>, SHA-2: <see href="http://keccak.noekeon.org/Keccak-submission-3.pdf"/>, 
+/// or Skein: <see href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf"/>.
+/// The default Digest Engine is SHA-2 512.</para>
+/// 
+/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <math>klen = h + (n * s)</math>, this will vary between Digest implementations. 
+/// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property.</para>
+/// 
+/// <para>The number of diffusion rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. 
+/// THX is capable of processing up to 32 rounds, that is twice the number of rounds used in a standard implementation of Twofish. 
+/// Valid rounds assignments can be found in the <see cref="LegalRounds"/> static property.</para>
 /// 
 /// <description><h4>Guiding Publications:</h4></description>
 /// <list type="number">
-/// <item><description>Twofish: <see href="https://www.schneier.com/paper-twofish-paper.pdf">A 128-Bit Block Cipher</see>.</description></item>
+/// <item><description>Twofish: <see href="https://www.schneier.com/paper-twofish-paper.pdf">Specification</see>.</description></item>
+/// <item><description>HMAC: <see href="http://tools.ietf.org/html/rfc2104">RFC 2104</see>.</description></item>
+/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">Fips 198.1</see>.</description></item>
+/// <item><description>HKDF: <see href="http://tools.ietf.org/html/rfc5869">RFC 5869</see>.</description></item>
+/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</see>.</description></item>
 /// </list>
+/// 
+/// <description><h4>Code Base Guides:</h4></description>
+/// <list type="table">
+/// <item><description>Inspired in part by the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see>.</description></item>
+/// </list> 
 /// </remarks>
 class THX : public IBlockCipher
 {
@@ -105,8 +140,8 @@ protected:
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
-	IDigest* _kdfEngine;
-	Digests _kdfEngineType;
+	CEX::Digest::IDigest* _kdfEngine;
+	CEX::Enumeration::Digests _kdfEngineType;
 	std::vector<unsigned int> _legalKeySizes;
 	std::vector<unsigned int> _legalRounds;
 	std::vector<uint> _sprBox;
@@ -135,7 +170,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const BlockCiphers Enumeral() { return BlockCiphers::THX; }
+	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::THX; }
 
 	/// <summary>
 	/// Get/Set: Specify the size of the HMAC key; extracted from the cipher key.
@@ -183,15 +218,15 @@ public:
 	/// Initialize the class with a Digest instance
 	/// </summary>
 	/// 
-	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the <see cref="Digests">Digest</see> implementations.</param>
+	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations.</param>
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 16 rounds.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	THX(IDigest *KdfEngine, unsigned int Rounds = ROUNDS16)
+	THX(CEX::Digest::IDigest *KdfEngine, unsigned int Rounds = ROUNDS16)
 		:
 		_destroyEngine(false),
 		_dfnRounds(Rounds),
-		_hkdfInfo(0, 0),
+		_hkdfInfo(0),
 		_ikmSize(0),
 		_isDestroyed(false),
 		_isEncryption(false),
@@ -228,14 +263,14 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 16 rounds.</param>
-	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the <see cref="Digests">Digest</see> implementations. The default engine is SHA512.</param>
+	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations. The default engine is SHA512.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	THX(unsigned int Rounds = ROUNDS16, Digests KdfEngineType = Digests::SHA512)
+	THX(unsigned int Rounds = ROUNDS16, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)
 		:
 		_destroyEngine(true),
 		_dfnRounds(Rounds),
-		_hkdfInfo(0, 0),
+		_hkdfInfo(0),
 		_ikmSize(0),
 		_isDestroyed(false),
 		_isEncryption(false),
@@ -336,7 +371,7 @@ public:
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -364,9 +399,9 @@ protected:
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	IDigest* GetDigest(Digests DigestType);
-	int GetIkmSize(Digests DigestType);
-	int GetSaltSize(Digests DigestType);
+	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
+	int GetIkmSize(CEX::Enumeration::Digests DigestType);
+	int GetSaltSize(CEX::Enumeration::Digests DigestType);
 	uint MDSEncode(uint K0, uint K1);
 	uint THX::Mix32(const uint X, const std::vector<uint> &Key, const unsigned int Count);
 	void SecureExpand(const std::vector<byte> &Key);
@@ -374,18 +409,12 @@ protected:
 
 	inline uint Fe0(uint X)
 	{
-		return _sprBox[2 * (byte)X] ^
-			_sprBox[2 * (byte)(X >> 8) + 0x001] ^
-			_sprBox[2 * (byte)(X >> 16) + 0x200] ^
-			_sprBox[2 * (byte)(X >> 24) + 0x201];
+		return _sprBox[2 * (byte)X] ^ _sprBox[2 * (byte)(X >> 8) + 0x001] ^ _sprBox[2 * (byte)(X >> 16) + 0x200] ^ _sprBox[2 * (byte)(X >> 24) + 0x201];
 	}
 
 	inline uint Fe3(uint X)
 	{
-		return _sprBox[2 * (byte)(X >> 24)] ^
-			_sprBox[2 * (byte)X + 0x001] ^
-			_sprBox[2 * (byte)(X >> 8) + 0x200] ^
-			_sprBox[2 * (byte)(X >> 16) + 0x201];
+		return _sprBox[2 * (byte)(X >> 24)] ^ _sprBox[2 * (byte)X + 0x001] ^ _sprBox[2 * (byte)(X >> 8) + 0x200] ^ _sprBox[2 * (byte)(X >> 16) + 0x201];
 	}
 
 	inline uint LFSR1(uint X)
@@ -395,8 +424,7 @@ protected:
 
 	inline uint LFSR2(uint X)
 	{
-		return (X >> 2) ^ (((X & 0x02) != 0) ? GF256_FDBK_2 : 0) ^
-			(((X & 0x01) != 0) ? GF256_FDBK_4 : 0);
+		return (X >> 2) ^ (((X & 0x02) != 0) ? GF256_FDBK_2 : 0) ^ (((X & 0x01) != 0) ? GF256_FDBK_4 : 0);
 	}
 
 	inline uint MX(uint X)
@@ -408,7 +436,6 @@ protected:
 	{
 		return X ^ LFSR1(X) ^ LFSR2(X);
 	}
-
 };
 
 NAMESPACE_BLOCKEND

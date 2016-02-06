@@ -4,13 +4,8 @@
 #include "Common.h"
 #include "CryptoException.h"
 #include "IRandom.h"
-#include "Prngs.h"
 
 NAMESPACE_HELPER
-
-using CEX::Prng::IRandom;
-using CEX::Enumeration::Prngs;
-using CEX::Exception::CryptoException;
 
 /// <summary>
 /// PrngFromName: Get a Prng instance from it's enumeration name.
@@ -26,8 +21,8 @@ public:
 	/// 
 	/// <returns>An initialized prng</returns>
 	/// 
-	/// <exception cref="CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IRandom* GetInstance(Prngs PrngType);
+	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static CEX::Prng::IRandom* GetInstance(CEX::Enumeration::Prngs PrngType);
 };
 
 NAMESPACE_HELPEREND

@@ -24,7 +24,7 @@ NAMESPACE_SEED
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Further scramblings of Marsaglia’s xorshift generators <see href="http://vigna.di.unimi.it/ftp/papers/xorshiftplus.pdf"/>.</description></item>
 /// <item><description>Xorshift+ generators and the PRNG shootout: <see href="http://xorshift.di.unimi.it/"/>.</description></item>
@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	/// Get: The seed generators type name
 	/// </summary>
-	virtual const SeedGenerators Enumeral() { return SeedGenerators::XSPRsg; }
+	virtual const CEX::Enumeration::SeedGenerators Enumeral() { return CEX::Enumeration::SeedGenerators::XSPRsg; }
 
 	/// <summary>
 	/// Get: Cipher name

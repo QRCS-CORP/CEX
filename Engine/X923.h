@@ -1,7 +1,6 @@
 #ifndef _CEXENGINE_X923_H
 #define _CEXENGINE_X923_H
 
-#include "CSPRsg.h"
 #include "IPadding.h"
 
 NAMESPACE_PADDING
@@ -29,7 +28,7 @@ public:
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const PaddingModes Enumeral() { return PaddingModes::X923; }
+	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::X923; }
 
 	/// <summary>
 	/// Get: Padding name

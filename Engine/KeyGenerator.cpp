@@ -1,4 +1,3 @@
-
 #include "KeyGenerator.h"
 #include "CSPRsg.h"
 #include "DigestFromName.h"
@@ -23,9 +22,9 @@ void KeyGenerator::Destroy()
 	}
 }
 
-KeyParams* KeyGenerator::GetKeyParams(const unsigned int KeySize, const unsigned int IVSize, unsigned int IKMSize)
+CEX::Common::KeyParams* KeyGenerator::GetKeyParams(const unsigned int KeySize, const unsigned int IVSize, unsigned int IKMSize)
 {
-	KeyParams* kp = new KeyParams();
+	CEX::Common::KeyParams* kp = new CEX::Common::KeyParams();
 
 	if (KeySize > 0)
 		kp->Key() = Generate(KeySize);
@@ -123,7 +122,7 @@ std::vector<byte> KeyGenerator::GetBlock()
 	memcpy(&seed[_ctrLength], &stmp[0], saltLen);
 
 	// special case for sha-2
-	if (_dgtType == Digests::SHA256 || _dgtType == Digests::SHA512)
+	if (_dgtType == CEX::Enumeration::Digests::SHA256 || _dgtType == CEX::Enumeration::Digests::SHA512)
 	{
 		// hmac key size is digest return size per rfc 2104
 		std::vector<byte> key = _seedEngine->GetBytes(_hashEngine->DigestSize());
@@ -142,7 +141,7 @@ std::vector<byte> KeyGenerator::GetBlock()
 	}
 }
 
-IDigest* KeyGenerator::GetDigestEngine(Digests DigsetType)
+CEX::Digest::IDigest* KeyGenerator::GetDigestEngine(CEX::Enumeration::Digests DigsetType)
 {
 	try
 	{
@@ -150,11 +149,11 @@ IDigest* KeyGenerator::GetDigestEngine(Digests DigsetType)
 	}
 	catch (...)
 	{
-		throw CryptoGeneratorException("KeyGenerator:GetDigestEngine", "The digest could not be instantiated!");
+		throw CEX::Exception::CryptoGeneratorException("KeyGenerator:GetDigestEngine", "The digest could not be instantiated!");
 	}
 }
 
-ISeed* KeyGenerator::GetSeedEngine(SeedGenerators SeedType)
+CEX::Seed::ISeed* KeyGenerator::GetSeedEngine(CEX::Enumeration::SeedGenerators SeedType)
 {
 	try
 	{
@@ -162,7 +161,7 @@ ISeed* KeyGenerator::GetSeedEngine(SeedGenerators SeedType)
 	}
 	catch (...)
 	{
-		throw CryptoGeneratorException("KeyGenerator:GetSeedEngine", "The prng could not be instantiated!");
+		throw CEX::Exception::CryptoGeneratorException("KeyGenerator:GetSeedEngine", "The prng could not be instantiated!");
 	}
 }
 

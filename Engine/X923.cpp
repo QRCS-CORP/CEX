@@ -3,8 +3,6 @@
 
 NAMESPACE_PADDING
 
-using CEX::Seed::CSPRsg;
-
 unsigned int X923::AddPadding(std::vector<byte> &Input, unsigned int Offset)
 {
 	if (Offset > Input.size())
@@ -16,7 +14,7 @@ unsigned int X923::AddPadding(std::vector<byte> &Input, unsigned int Offset)
 	if (len > 0)
 	{
 		std::vector<byte> data(len);
-		CSPRsg rnd;
+		CEX::Seed::CSPRsg rnd;
 		rnd.GetBytes(data);
 		memcpy(&Input[Offset], &data[0], len);
 	}

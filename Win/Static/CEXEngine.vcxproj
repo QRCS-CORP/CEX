@@ -260,6 +260,7 @@
     <ClInclude Include="..\..\Engine\SeedGenerators.h" />
     <ClInclude Include="..\..\Engine\SeekOrigin.h" />
     <ClInclude Include="..\..\Engine\Serpent.h" />
+    <ClInclude Include="..\..\Engine\SHA.h" />
     <ClInclude Include="..\..\Engine\SHA256.h" />
     <ClInclude Include="..\..\Engine\SHA512.h" />
     <ClInclude Include="..\..\Engine\SHX.h" />
@@ -353,9 +354,6 @@
     <ClCompile Include="..\..\Engine\X923.cpp" />
     <ClCompile Include="..\..\Engine\XSPRsg.cpp" />
     <ClCompile Include="..\..\Engine\ZeroPad.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="bibliography.xml" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="license.txt" />

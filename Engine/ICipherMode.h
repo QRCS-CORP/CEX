@@ -24,16 +24,12 @@
 #ifndef _CEXENGINE_ICIPHERMODE_H
 #define _CEXENGINE_ICIPHERMODE_H
 
-#include "Common.h"
-#include "CipherModes.h"
 #include "CryptoCipherModeException.h"
+#include "CipherModes.h"
 #include "IBlockCipher.h"
-#include "KeyParams.h"
 
 NAMESPACE_MODE
 
-using CEX::Common::KeyParams;
-using CEX::Enumeration::CipherModes;
 using CEX::Exception::CryptoCipherModeException;
 
 /// <summary>
@@ -69,7 +65,7 @@ public:
 	/// <summary>
 	/// Get: The cipher modes type name
 	/// </summary>
-	virtual const CipherModes Enumeral() = 0;
+	virtual const CEX::Enumeration::CipherModes Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption
@@ -134,12 +130,13 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	///
-	/// <param name="Encryption">Cipher is used. for encryption, false to decrypt</param>
+	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 	/// <param name="KeyParam">The KeyParams containing key and vector</param>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam) = 0;
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam) = 0;
 
 	/// <summary>
-	/// <para>Transform a block of bytes. Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>.
+	/// Transform a block of bytes. 
+	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>.
 	/// Initialize() must be called before this method can be used.</para>
 	/// </summary>
 	///
@@ -148,7 +145,8 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// <para>Transform a block of bytes with offset parameters.  Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>.
+	/// Transform a block of bytes with offset parameters.  
+	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>.
 	/// Initialize() must be called before this method can be used.</para>
 	/// </summary>
 	///

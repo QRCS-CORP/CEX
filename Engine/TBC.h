@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const PaddingModes Enumeral() { return PaddingModes::TBC; }
+	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::TBC; }
 
 	/// <summary>
 	/// Get: Padding name

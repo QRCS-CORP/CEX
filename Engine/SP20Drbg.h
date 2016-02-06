@@ -54,7 +54,7 @@ NAMESPACE_GENERATOR
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
 /// <item><description>Block size is 64 bytes wide.</description></item>
@@ -62,7 +62,7 @@ NAMESPACE_GENERATOR
 /// <item><description>Parallel block size is 64,000 bytes by default; but is configurable.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
 /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
@@ -107,7 +107,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() { return Generators::SP20Drbg; }
+	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::SP20Drbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data

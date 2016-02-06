@@ -23,7 +23,7 @@ NAMESPACE_SEED
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>ISAAC: a fast cryptographic random number generator: <see href="http://www.burtleburtle.net/bob/rand/isaacafa.html"/>.</description></item>
 /// <item><description>Rossettacode example implementations: <see href="http://rosettacode.org/wiki/The_ISAAC_Cipher"/>.</description></item>
@@ -54,7 +54,7 @@ public:
 	/// <summary>
 	/// Get: The seed generators type name
 	/// </summary>
-	virtual const SeedGenerators Enumeral() { return SeedGenerators::ISCRsg; }
+	virtual const CEX::Enumeration::SeedGenerators Enumeral() { return CEX::Enumeration::SeedGenerators::ISCRsg; }
 
 	/// <summary>
 	/// Get: Cipher name

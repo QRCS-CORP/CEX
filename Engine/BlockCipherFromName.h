@@ -4,15 +4,8 @@
 #include "Common.h"
 #include "CryptoException.h"
 #include "IBlockCipher.h"
-#include "Digests.h"
-#include "BlockCiphers.h"
 
 NAMESPACE_HELPER
-
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
-using CEX::Enumeration::Digests;
-using CEX::Enumeration::BlockCiphers;
-using CEX::Exception::CryptoException;
 
 /// <summary>
 /// BlockCipherFromName: Get a Block Cipher instance from it's enumeration name.
@@ -28,8 +21,8 @@ public:
 	/// 
 	/// <returns>An initialized block cipher</returns>
 	/// 
-	/// <exception cref="CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers EngineType);
+	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType);
 
 	/// <summary>
 	/// Get a block cipher instance with specified initialization parameters
@@ -42,8 +35,8 @@ public:
 	/// 
 	/// <returns>An initialized block cipher</returns>
 	/// 
-	/// <exception cref="CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* GetInstance(BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine);
+	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static CEX::Cipher::Symmetric::Block::IBlockCipher* GetInstance(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine);
 };
 
 NAMESPACE_HELPEREND

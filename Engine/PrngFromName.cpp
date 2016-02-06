@@ -1,5 +1,4 @@
 #include "PrngFromName.h"
-#include "IRandom.h"
 #include "CSPPrng.h"
 #include "CTRPrng.h"
 #include "SP20Prng.h"
@@ -7,22 +6,20 @@
 
 NAMESPACE_HELPER
 
-using namespace CEX::Prng;
-
-IRandom* PrngFromName::GetInstance(Prngs PrngType)
+CEX::Prng::IRandom* PrngFromName::GetInstance(CEX::Enumeration::Prngs PrngType)
 {
 	switch (PrngType)
 	{
-		case Prngs::CSPPrng:
-			return new CSPPrng();
-		case Prngs::CTRPrng:
-			return new CTRPrng();
-		case Prngs::SP20Prng:
-			return new SP20Prng();
-		case Prngs::DGCPrng:
-			return new DGCPrng();
+		case CEX::Enumeration::Prngs::CSPPrng:
+			return new CEX::Prng::CSPPrng();
+		case CEX::Enumeration::Prngs::CTRPrng:
+			return new CEX::Prng::CTRPrng();
+		case CEX::Enumeration::Prngs::DGCPrng:
+			return new CEX::Prng::DGCPrng();
+		case CEX::Enumeration::Prngs::SP20Prng:
+			return new CEX::Prng::SP20Prng();
 		default:
-			throw CryptoException("PrngFromName:GetPrng", "The specified PRNG type is unrecognized!");
+			throw CEX::Exception::CryptoException("PrngFromName:GetPrng", "The specified PRNG type is unrecognized!");
 	}
 }
 

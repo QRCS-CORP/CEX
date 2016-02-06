@@ -4,15 +4,12 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
-
 void DGCDrbg::Destroy()
 {
 	if (!_isDestroyed)
 	{
-		IntUtils::ClearVector(_dgtSeed);
-		IntUtils::ClearVector(_dgtState);
+		CEX::Utility::IntUtils::ClearVector(_dgtSeed);
+		CEX::Utility::IntUtils::ClearVector(_dgtState);
 
 		_isInitialized = true;
 		_keySize = 0;
@@ -147,7 +144,7 @@ void DGCDrbg::IncrementCounter(long Counter)
 
 void DGCDrbg::GenerateState()
 {
-	ParallelUtils::lock<std::mutex> lock(_mtxLock);
+	CEX::Utility::ParallelUtils::lock<std::mutex> lock(_mtxLock);
 	IncrementCounter(_stateCtr++);
 	_msgDigest->BlockUpdate(_dgtState, 0, _dgtState.size());
 	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
@@ -159,7 +156,7 @@ void DGCDrbg::GenerateState()
 
 void DGCDrbg::UpdateCounter(long Counter)
 {
-	ParallelUtils::lock<std::mutex> lock(_mtxLock);
+	CEX::Utility::ParallelUtils::lock<std::mutex> lock(_mtxLock);
 	IncrementCounter(Counter);
 	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
 	_msgDigest->DoFinal(_dgtSeed, 0);
@@ -167,7 +164,7 @@ void DGCDrbg::UpdateCounter(long Counter)
 
 void DGCDrbg::UpdateSeed(std::vector<byte> Seed)
 {
-	ParallelUtils::lock<std::mutex> lock(_mtxLock);
+	CEX::Utility::ParallelUtils::lock<std::mutex> lock(_mtxLock);
 	_msgDigest->BlockUpdate(Seed, 0, Seed.size());
 	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
 	_msgDigest->DoFinal(_dgtSeed, 0);

@@ -396,12 +396,6 @@
     <ClInclude Include="..\..\Engine\IByteStream.h">
       <Filter>Header Files\IO</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Rijndael.h">
-      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Engine\Twofish.h">
-      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\SkeinInitializationType.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
@@ -462,9 +456,6 @@
     <ClInclude Include="..\..\Engine\EntropyPool.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Engine\Serpent.h">
-      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Engine\ArrayUtils.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
@@ -491,6 +482,18 @@
     </ClInclude>
     <ClInclude Include="..\..\Engine\SeedFromName.h">
       <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SHA.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Serpent.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Twofish.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Rijndael.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -686,9 +689,6 @@
     <ClCompile Include="..\..\Engine\KeyFactory.cpp">
       <Filter>Source Files\Processing\Factory</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="bibliography.xml" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="license.txt" />

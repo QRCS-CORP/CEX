@@ -34,8 +34,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
-
 /// <summary>
 /// CTRDrbg: An implementation of a Encryption Counter based Deterministic Random Byte Generator.
 /// <para>A Block Cipher Counter DRBG as outlined in NIST document: SP800-90A</para>
@@ -56,11 +54,11 @@ using CEX::Cipher::Symmetric::Block::IBlockCipher;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Enumeration::BlockCiphers">CEX::Enumeration::BlockCiphers Enumeration</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Can be initialized with any block <see cref="CEX::Enumeration::BlockCiphers">cipher</see>.</description></item>
 /// <item><description>Parallelized by default on a multi processer system when an input byte array of <see cref="ParallelMinimumSize"/> bytes or larger is used.</description></item>
@@ -69,7 +67,7 @@ using CEX::Cipher::Symmetric::Block::IBlockCipher;
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
 /// <item><description>NIST Fips 140-2: <see href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Security Requirments For Cryptographic Modules</see>.</description></item>
@@ -84,7 +82,7 @@ protected:
 	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
 	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
 
-	IBlockCipher* _blockCipher;
+	CEX::Cipher::Symmetric::Block::IBlockCipher* _blockCipher;
 	unsigned int _blockSize;
 	std::vector<byte> _ctrVector;
 	bool _isDestroyed;
@@ -103,7 +101,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() { return Generators::CTRDrbg; }
+	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::CTRDrbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -161,7 +159,7 @@ public:
 	/// <param name="KeySize">The internal ciphers key size; calculated automatically if this value is zero</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null cipher is used</exception>
-	CTRDrbg(IBlockCipher* Cipher, const unsigned int KeySize = 0)
+	CTRDrbg(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, const unsigned int KeySize = 0)
 		:
 		_blockCipher(Cipher),
 		_blockSize(Cipher->BlockSize()),

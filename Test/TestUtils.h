@@ -17,9 +17,6 @@
 
 namespace Test
 {
-	using CEX::Seed::CSPRsg;
-	using CEX::Common::KeyParams;
-
 	class TestUtils
 	{
 	public:
@@ -95,9 +92,9 @@ namespace Test
 		/// <summary>
 		/// Initializes a KeyParams structure with pseudo random data
 		/// </summary>
-		static void GetRandomKey(KeyParams &keyParams, int keySize, int ivSize)
+		static void GetRandomKey(CEX::Common::KeyParams &keyParams, int keySize, int ivSize)
 		{
-			CSPRsg rng;
+			CEX::Seed::CSPRsg rng;
 			std::vector<byte> key(keySize, 0);
 			std::vector<byte> iv(ivSize, 0);
 			rng.GetBytes(key);

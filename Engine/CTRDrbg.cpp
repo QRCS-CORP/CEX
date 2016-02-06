@@ -4,10 +4,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Utility::IntUtils;
-using CEX::Common::KeyParams;
-using CEX::Utility::ParallelUtils;
-
 void CTRDrbg::Destroy()
 {
 	if (!_isDestroyed)
@@ -20,8 +16,8 @@ void CTRDrbg::Destroy()
 		_keySize = 0;
 		_parallelBlockSize = 0;
 
-		IntUtils::ClearVector(_ctrVector);
-		IntUtils::ClearVector(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(_ctrVector);
+		CEX::Utility::IntUtils::ClearVector(_threadVectors);
 
 		_isDestroyed = true;
 	}
@@ -54,7 +50,7 @@ void CTRDrbg::Initialize(const std::vector<byte> &Salt)
 	std::vector<byte> key(keyLen);
 	memcpy(&key[0], &Salt[_blockSize], keyLen);
 
-	_blockCipher->Initialize(true, KeyParams(key));
+	_blockCipher->Initialize(true, CEX::Common::KeyParams(key));
 	_isInitialized = true;
 }
 
@@ -162,7 +158,7 @@ bool CTRDrbg::IsValidKeySize(const unsigned int KeySize)
 
 void CTRDrbg::SetScope()
 {
-	_processorCount = ParallelUtils::ProcessorCount();
+	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 
 	if (_processorCount % 2 != 0)
 		_processorCount--;
@@ -188,7 +184,7 @@ void CTRDrbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](unsigned int i)
 		{
 			std::vector<byte> &iv = _threadVectors[i];
 			// offset counter by chunk size / block size

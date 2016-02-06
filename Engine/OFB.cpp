@@ -4,9 +4,6 @@
 
 NAMESPACE_MODE
 
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
-
 void OFB::Destroy()
 {
 	if (!_isDestroyed)
@@ -19,12 +16,12 @@ void OFB::Destroy()
 		_isParallel = false;
 		_parallelBlockSize = 0;
 
-		IntUtils::ClearVector(_ofbIv);
-		IntUtils::ClearVector(_ofbBuffer);
+		CEX::Utility::IntUtils::ClearVector(_ofbIv);
+		CEX::Utility::IntUtils::ClearVector(_ofbBuffer);
 	}
 }
 
-void OFB::Initialize(bool Encryption, const KeyParams &KeyParam)
+void OFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	std::vector<byte> iv = KeyParam.IV();
 	unsigned int diff = _ofbIv.size() - iv.size();
@@ -74,7 +71,7 @@ void OFB::ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffs
 
 void OFB::SetScope()
 {
-	_processorCount = ParallelUtils::ProcessorCount();
+	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 	if (_processorCount % 2 != 0)
 		_processorCount--;
 	if (_processorCount > 1)

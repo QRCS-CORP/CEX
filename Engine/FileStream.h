@@ -1,41 +1,39 @@
 #ifndef _CEXENGINE_FILESTREAM_H
 #define _CEXENGINE_FILESTREAM_H
 
-#include "Common.h"
 #include "IByteStream.h"
 #include <iostream>
 #include <fstream>
 
 NAMESPACE_IO
 
-// *** Flags *** //
-
-/// <summary>
-/// File access type flags
-/// </summary>
-enum FileAccess : int
-{
-	Read = std::ios::in,
-	ReadWrite = std::ios::out | std::ios::in,
-	Write = std::ios::out
-};
-
-/// <summary>
-/// File operation mode flags
-/// </summary>
-enum FileMode: int
-{
-	Append = std::ios::app,
-	AtEnd = std::ios::ate,
-	Binary = std::ios::binary,
-	Truncate = std::ios::trunc
-};
-
 /// <summary>
 /// Write data values to a file
 /// </summary>
 class FileStream : public IByteStream
 {
+public:
+	/// <summary>
+	/// File access type flags
+	/// </summary>
+	enum class FileAccess : int
+	{
+		Read = std::ios::in,
+		ReadWrite = std::ios::out | std::ios::in,
+		Write = std::ios::out
+	};
+
+	/// <summary>
+	/// File operation mode flags
+	/// </summary>
+	enum class FileMode : int
+	{
+		Append = std::ios::app,
+		AtEnd = std::ios::ate,
+		Binary = std::ios::binary,
+		Truncate = std::ios::trunc
+	};
+
 private:
 	static constexpr unsigned int BLOCK_SIZE = 4096;
 
@@ -106,7 +104,7 @@ public:
 
 		try
 		{
-			_fileStream.open(_filename, Access | Mode);
+			_fileStream.open(_filename, (int)Access | (int)Mode);
 			_fileStream.unsetf(std::ios::skipws);
 		}
 		catch (...)

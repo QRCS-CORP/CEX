@@ -3,8 +3,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Utility::IntUtils;
-
 void PBKDF2::Destroy()
 {
 	if (!_isDestroyed)
@@ -14,8 +12,8 @@ void PBKDF2::Destroy()
 		_isInitialized = false;
 		_prcIterations = 0;
 
-		IntUtils::ClearVector(_macKey);
-		IntUtils::ClearVector(_macSalt);
+		CEX::Utility::IntUtils::ClearVector(_macKey);
+		CEX::Utility::IntUtils::ClearVector(_macSalt);
 
 		_isDestroyed = true;
 	}

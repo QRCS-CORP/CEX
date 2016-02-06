@@ -4,9 +4,6 @@
 
 NAMESPACE_MODE
 
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
-
 void CFB::Destroy()
 {
 	if (!_isDestroyed)
@@ -19,13 +16,13 @@ void CFB::Destroy()
 		_isParallel = false;
 		_parallelBlockSize = 0;
 
-		IntUtils::ClearVector(_cfbIv);
-		IntUtils::ClearVector(_cfbBuffer);
-		IntUtils::ClearArray(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(_cfbIv);
+		CEX::Utility::IntUtils::ClearVector(_cfbBuffer);
+		CEX::Utility::IntUtils::ClearArray(_threadVectors);
 	}
 }
 
-void CFB::Initialize(bool Encryption, const KeyParams &KeyParam)
+void CFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	std::vector<byte> iv = KeyParam.IV();
 	unsigned int diff = _cfbIv.size() - iv.size();
@@ -158,7 +155,7 @@ void CFB::ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Out
 				memcpy(&_threadVectors[i][0], &_cfbIv[0], blkSize);
 		}
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](unsigned int i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			this->ProcessDecrypt(Input, i * cnkSize, Output, i * cnkSize, thdVec, blkCount);
@@ -199,7 +196,7 @@ void CFB::ParallelDecrypt(const std::vector<byte> &Input, const unsigned int InO
 				memcpy(&_threadVectors[i][0], &_cfbIv[0], blkSize);
 		}
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](unsigned int i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			this->ProcessDecrypt(Input, InOffset + i * cnkSize, Output, OutOffset + i * cnkSize, thdVec, blkCount);
@@ -233,7 +230,7 @@ void CFB::ProcessDecrypt(const std::vector<byte> &Input, unsigned int InOffset, 
 
 void CFB::SetScope()
 {
-	_processorCount = ParallelUtils::ProcessorCount();
+	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 	if (_processorCount % 2 != 0)
 		_processorCount--;
 	if (_processorCount > 1)

@@ -6,19 +6,14 @@
 #include "CryptoProcessingException.h"
 #include "CSPPrng.h"
 #include "IntUtils.h"
-#include "MemoryStream.h"
-#include "SeekOrigin.h"
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
 NAMESPACE_PRCSTRUCT
 
-using CEX::Common::CipherDescription;
-using CEX::Exception::CryptoProcessingException;
-
 /// <summary>
 /// The CipherKey structure.
-/// <para>Used in conjunction with the <see cref="CipherStream"/> class. 
+/// <para>Used in conjunction with the CipherStream class. 
 /// This structure is used as the header for a single use key and vector set.</para>
 /// </summary>
 /// 
@@ -33,9 +28,7 @@ using CEX::Exception::CryptoProcessingException;
 /// <revision date="2015/05/22" version="1.3.6.0">Initial release</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Factory.PackageFactory">VTDev.Libraries.CEXEngine.Crypto KeyFactory class</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.CipherDescription">VTDev.Libraries.CEXEngine.Crypto.Processing.Structures CipherDescription structure</seealso>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.CipherStream">VTDev.Libraries.CEXEngine.Crypto.Processing CipherStream class</seealso>
+/// <seealso cref="CEX::Common::CipherDescription"/>
 struct CipherKey
 {
 private:
@@ -48,14 +41,14 @@ private:
 
 	std::vector<byte> _keyID;
 	std::vector<byte> _extKey;
-	CipherDescription _cprDsc;
+	CEX::Common::CipherDescription _cprDsc;
 
 public:
 
 	/// <summary>
-	/// The <see cref="CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance
+	/// The <see cref="CEX::Common::CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance
 	/// </summary>
-	CipherDescription Description() const { return _cprDsc; }
+	CEX::Common::CipherDescription Description() const { return _cprDsc; }
 
 	/// <summary>
 	/// The unique 16 byte ID field used to identify this key. A null value auto generates this field
@@ -84,12 +77,12 @@ public:
 	/// If they are not specified they will be populated automatically.</para>
 	/// </summary>
 	/// 
-	/// <param name="Description">The <see cref="CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance</param>
+	/// <param name="Description">The <see cref="CEX::Common::CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance</param>
 	/// <param name="KeyId">The unique 16 byte ID field used to identify this key. A null value auto generates this field</param>
 	/// <param name="ExtensionKey">An array of random bytes used to encrypt a message file extension. A null value auto generates this field</param>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if either the KeyId or ExtensionKey fields are null or invalid</exception>
-	CipherKey(CipherDescription &Description, std::vector<byte> &KeyId, std::vector<byte> &ExtensionKey)
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if either the KeyId or ExtensionKey fields are null or invalid</exception>
+	CipherKey(CEX::Common::CipherDescription &Description, std::vector<byte> &KeyId, std::vector<byte> &ExtensionKey)
 		:
 		_cprDsc(Description),
 		_extKey(0),
@@ -105,7 +98,7 @@ public:
 		}
 		else if (KeyId.size() != KEYID_SIZE)
 		{
-			throw new CryptoProcessingException("CipherKey:CTor", "The KeyId must be exactly 16 bytes!");
+			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The KeyId must be exactly 16 bytes!");
 		}
 		else
 		{
@@ -119,7 +112,7 @@ public:
 		}
 		else if (ExtensionKey.size() != EXTKEY_SIZE)
 		{
-			throw new CryptoProcessingException("CipherKey:CTor", "The random extension field must be exactly 16 bytes!");
+			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The random extension field must be exactly 16 bytes!");
 		}
 		else
 		{
@@ -140,7 +133,7 @@ public:
 		CEX::IO::StreamReader reader(KeyStream);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		_cprDsc = CipherDescription(reader.ReadBytes(CipherDescription::GetHeaderSize()));
+		_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -157,7 +150,7 @@ public:
 		CEX::IO::StreamReader reader(ms);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		_cprDsc = CipherDescription(reader.ReadBytes(CipherDescription::GetHeaderSize()));
+		_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -219,10 +212,10 @@ public:
 	/// <param name="KeyStream">The stream containing a key package</param>
 	/// 
 	/// <returns>CipherDescription structure</returns>
-	static CipherDescription* GetCipherDescription(CEX::IO::MemoryStream &KeyStream)
+	static CEX::Common::CipherDescription* GetCipherDescription(CEX::IO::MemoryStream &KeyStream)
 	{
 		KeyStream.Seek(DESC_SEEK, CEX::IO::SeekOrigin::Begin);
-		return new CipherDescription(KeyStream);
+		return new CEX::Common::CipherDescription(KeyStream);
 	}
 
 	/// <summary>
@@ -257,7 +250,7 @@ public:
 	/// 
 	/// <param name="KeyStream">The stream containing a key package</param>
 	/// <param name="Description">The CipherDescription structure</param>
-	static void SetCipherDescription(CEX::IO::MemoryStream &KeyStream, CipherDescription &Description)
+	static void SetCipherDescription(CEX::IO::MemoryStream &KeyStream, CEX::Common::CipherDescription &Description)
 	{
 		KeyStream.Seek(DESC_SEEK, CEX::IO::SeekOrigin::Begin);
 		KeyStream.Write(Description.ToBytes(), 0, DESC_SIZE);
@@ -294,13 +287,11 @@ public:
 	/// <returns>Hash code</returns>
 	int GetHashCode()
 	{
-		int result = 1;
-
-		result += 31 * _cprDsc.GetHashCode();
-		for (int i = 0; i < _keyID.size(); ++i)
-			result += 31 * _keyID[i];
-		for (int i = 0; i < _extKey.size(); ++i)
-			result += 31 * _extKey[i];
+		int result = _cprDsc.GetHashCode();
+		for (unsigned int i = 0; i < _keyID.size(); ++i)
+			result += (int)(31 * _keyID[i]);
+		for (unsigned int i = 0; i < _extKey.size(); ++i)
+			result += (int)(31 * _extKey[i]);
 
 		return result;
 	}

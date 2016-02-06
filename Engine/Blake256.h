@@ -56,11 +56,11 @@ NAMESPACE_DIGEST
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest::IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration::Digests Enumeration</seealso>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Block size is 32 bytes, (256 bits).</description></item>
 /// <item><description>Digest size is 32 bytes, (256 bits).</description></item>
@@ -68,7 +68,7 @@ NAMESPACE_DIGEST
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>SHA3 Proposal <see href="https://131002.net/blake">Blake</see>.</description></item>
 /// <item><description>SHA3: <see href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report of the SHA-3 Cryptographic Hash Algorithm Competition</see>.</description></item>
@@ -114,7 +114,7 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual Digests Enumeral() { return Digests::Blake256; }
+	virtual CEX::Enumeration::Digests Enumeral() { return CEX::Enumeration::Digests::Blake256; }
 
 	/// <summary>
 	/// Get: Digest name

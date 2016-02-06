@@ -7,7 +7,6 @@
 
 NAMESPACE_MAC
 
-using CEX::Enumeration::Macs;
 using CEX::Exception::CryptoMacException;
 
 /// <summary>
@@ -33,7 +32,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const Macs Enumeral() = 0;
+	virtual const CEX::Enumeration::Macs Enumeral() = 0;
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes

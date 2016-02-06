@@ -49,13 +49,11 @@ NAMESPACE_BLOCK
 /// <example>
 /// <description>Example using an <c>ICipherMode</c> interface:</description>
 /// <code>
-/// using (ICipherMode cipher = new CTR(new RHX()))
-/// {
-///     // initialize for encryption
-///     cipher.Initialize(true, new KeyParams(Key, IV));
-///     // encrypt a block
-///     cipher.Transform(Input, Output);
-/// }
+/// CTR cipher(new RHX());
+/// // initialize for encryption
+/// cipher.Initialize(true, KeyParams(Key, IV));
+/// // encrypt a block
+/// cipher.Transform(Input, Output);
 /// </code>
 /// </example>
 /// 
@@ -63,10 +61,12 @@ NAMESPACE_BLOCK
 /// <revision date="2014/09/18" version="1.5.0.0">Initial release</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest IDigest Interface</seealso>
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <para>The key schedule in RHX is the defining difference between this and a standard version of Rijndael.
 /// if the cipher key input is beyond the standard lengths used in Rijndael (128-512 bits), instead of using an inline function to expand the user supplied key into a larger working array, 
 /// RHX uses a hash based pseudo-random generator to create the internal working key array.
@@ -75,14 +75,14 @@ NAMESPACE_BLOCK
 /// 
 /// <list type="bullet">
 /// <item><description>When using a standard cipher key length the rounds calculation is done automatically: 10, 12, 14, and 22, for key sizes 126, 192, 256, and 512 bits.</description></item>
-/// <item><description>HKDF Digest <see cref="Digests">engine</see> is definable through the <see cref="RHX(unsigned int, unsigned int, Digests)">Constructor</see> parameter: KeyEngine.</description></item>
-/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a user definable <see cref="IDigest">Digest</see>.</description></item>
+/// <item><description>HKDF Digest <see cref="CEX::Enumeration::Digests">engine</see> is definable through the RHX(uint, uint, Digests) Constructor parameter: KeyEngine.</description></item>
+/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a user definable <see cref="CEX::Digest::IDigest">Digest</see>.</description></item>
 /// <item><description>Minimum key size is (IKm + Salt) (N * Digest State Size) + (Digest Hash Size) in bytes.</description></item>
 /// <item><description>Valid block sizes are 16 and 32 byte wide.</description></item>
 /// <item><description>Valid Rounds are 10 to 38, default is 22.</description></item>
 /// </list>
 /// 
-/// <description><h4>HKDF Bytes Generator:</h4></description>
+/// <description>HKDF Bytes Generator:</description>
 /// <para>HKDF is a key derivation function that uses a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
 /// This is one of the strongest methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even Serpents key schedule. 
 /// HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
@@ -102,7 +102,7 @@ NAMESPACE_BLOCK
 /// RHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256. 
 /// Valid rounds assignments can be found in the <see cref="LegalRounds"/> static property.</para>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST: <see href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</see>.</description></item>
 /// <item><description>HMAC: <see href="http://tools.ietf.org/html/rfc2104">RFC 2104</see>.</description></item>
@@ -132,8 +132,8 @@ protected:
 	bool _isEncryption;
 	bool _isInitialized;
 	unsigned int _ikmSize;
-	Digests _kdfEngineType;
-	IDigest* _kdfEngine;
+	CEX::Enumeration::Digests _kdfEngineType;
+	CEX::Digest::IDigest* _kdfEngine;
 	std::vector<unsigned int> _legalKeySizes;
 	std::vector<unsigned int> _legalRounds;
 
@@ -161,7 +161,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const BlockCiphers Enumeral() { return BlockCiphers::RHX; }
+	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::RHX; }
 
 	/// <summary>
 	/// Get/Set: Specify the size of the HMAC key; extracted from the cipher key.
@@ -214,7 +214,7 @@ public:
 	/// <param name="BlockSize">Cipher input <see cref="BlockSize"/>. Default is 16 bytes.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(IDigest *KdfEngine, unsigned int Rounds = ROUNDS22, unsigned int BlockSize = BLOCK16)
+	RHX(CEX::Digest::IDigest *KdfEngine, unsigned int Rounds = ROUNDS22, unsigned int BlockSize = BLOCK16)
 		:
 		_blockSize(BlockSize),
 		_destroyEngine(false),
@@ -261,7 +261,7 @@ public:
 	/// implementations. The default engine is SHA512</para>.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(unsigned int BlockSize = BLOCK16, unsigned int Rounds = ROUNDS22, Digests KdfEngineType = Digests::SHA512)
+	RHX(unsigned int BlockSize = BLOCK16, unsigned int Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)
 		:
 		_blockSize(BlockSize),
 		_destroyEngine(true),
@@ -367,7 +367,7 @@ public:
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -397,9 +397,9 @@ protected:
 	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Encrypt32(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
-	IDigest* GetDigest(Digests DigestType);
-	int GetIkmSize(Digests DigestType);
-	int GetSaltSize(Digests DigestType);
+	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
+	int GetIkmSize(CEX::Enumeration::Digests DigestType);
+	int GetSaltSize(CEX::Enumeration::Digests DigestType);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 	uint SubByte(uint Rot);

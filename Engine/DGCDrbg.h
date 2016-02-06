@@ -35,8 +35,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Digest::IDigest;
-
 /// <summary>
 /// DGTDRBG: An implementation of a Digest Counter based Deterministic Random Byte Generator.
 /// <para>A Digest Counter DRBG as outlined in NIST document: SP800-90A</para>
@@ -57,12 +55,12 @@ using CEX::Digest::IDigest;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest">CEX::Digest Namespace</seealso>
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest::IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration::Digests Enumeration</seealso>
+/// <seealso cref="CEX::Digest"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Can be initialized with any <see cref="CEX::Enumeration::Digests">digest</see>.</description></item>
 /// <item><description>Combination of [Salt, Ikm, Nonce] must be at least: digest block size + counter (8 bytes) size in length.</description></item>
@@ -70,7 +68,7 @@ using CEX::Digest::IDigest;
 /// <item><description>Output buffer is 4 * the digest return size.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST SP800-90A: <see href="http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf">Appendix E1.</see></description></item>
 /// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
@@ -90,7 +88,7 @@ protected:
 	bool _isDestroyed;
 	bool _isInitialized;
 	unsigned int _keySize;
-	IDigest* _msgDigest;
+	CEX::Digest::IDigest* _msgDigest;
 	std::mutex _mtxLock;
 	long _seedCtr;
 	long _stateCtr;
@@ -102,7 +100,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() { return Generators::DGCDrbg; }
+	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::DGCDrbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -129,7 +127,7 @@ public:
 	/// <param name="Digest">Hash function</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	DGCDrbg(IDigest* Digest)
+	DGCDrbg(CEX::Digest::IDigest* Digest)
 		:
 		_dgtSeed(Digest->DigestSize()),
 		_dgtState(Digest->DigestSize()),

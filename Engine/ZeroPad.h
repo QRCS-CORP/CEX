@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const PaddingModes Enumeral() { return PaddingModes::None; }
+	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::None; }
 
 	/// <summary>
 	/// Get: Padding name

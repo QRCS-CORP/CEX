@@ -7,7 +7,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Enumeration::Generators;
 using CEX::Exception::CryptoGeneratorException;
 
 /// <summary>
@@ -34,7 +33,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() = 0;
+	virtual const CEX::Enumeration::Generators Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Generator is ready to produce data

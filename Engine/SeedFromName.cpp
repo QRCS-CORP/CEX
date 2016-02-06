@@ -5,20 +5,18 @@
 
 NAMESPACE_HELPER
 
-using namespace CEX::Seed;
-
-ISeed* SeedFromName::GetInstance(SeedGenerators SeedType)
+CEX::Seed::ISeed* SeedFromName::GetInstance(CEX::Enumeration::SeedGenerators SeedType)
 {
 	switch (SeedType)
 	{
-	case SeedGenerators::CSPRsg:
-		return new CSPRsg();
-	case SeedGenerators::ISCRsg:
-		return new ISCRsg();
-	case SeedGenerators::XSPRsg:
-		return new XSPRsg();
+	case CEX::Enumeration::SeedGenerators::CSPRsg:
+		return new CEX::Seed::CSPRsg();
+	case CEX::Enumeration::SeedGenerators::ISCRsg:
+		return new CEX::Seed::ISCRsg();
+	case CEX::Enumeration::SeedGenerators::XSPRsg:
+		return new CEX::Seed::XSPRsg();
 	default:
-		throw CryptoException("SeedFromName:GetInstance", "The specified seed generator type is unrecognized!");
+		throw CEX::Exception::CryptoException("SeedFromName:GetInstance", "The specified seed generator type is unrecognized!");
 	}
 }
 

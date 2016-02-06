@@ -5,7 +5,7 @@
 
 namespace TestFiles
 {
-	namespace TestFiles
+	namespace StreamTestFiles
 	{
 		const std::string tinyFileIn = "Files/tiny.txt";
 		const std::string smallFileIn = "Files/small.txt";

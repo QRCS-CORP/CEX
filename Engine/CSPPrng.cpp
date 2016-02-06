@@ -3,8 +3,6 @@
 
 NAMESPACE_PRNG
 
-using CEX::Utility::IntUtils;
-
 void CSPPrng::Destroy()
 {
 	if (!_isDestroyed)
@@ -34,7 +32,7 @@ void CSPPrng::GetBytes(std::vector<byte> &Output)
 
 unsigned int CSPPrng::Next()
 {
-	return IntUtils::ToInt32(GetBytes(4));
+	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
 unsigned int CSPPrng::Next(unsigned int Maximum)
@@ -61,7 +59,7 @@ unsigned int CSPPrng::Next(unsigned int Minimum, unsigned int Maximum)
 
 ulong CSPPrng::NextLong()
 {
-	return IntUtils::ToInt64(GetBytes(8));
+	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
 ulong CSPPrng::NextLong(ulong Maximum)

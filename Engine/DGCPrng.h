@@ -25,16 +25,11 @@
 #define _CEXENGINE_DGCPRNG_H
 
 #include "IRandom.h"
+#include "DGCDrbg.h"
 #include "IDigest.h"
 #include "ISeed.h"
-#include "DGCDrbg.h"
-#include "Digests.h"
-#include "SeedGenerators.h"
 
 NAMESPACE_PRNG
-
-using CEX::Enumeration::Digests;
-using CEX::Enumeration::SeedGenerators;
 
 /// <summary>
 /// DGCPrng: An implementation of a Digest Counter based Random Number Generator.
@@ -53,19 +48,19 @@ using CEX::Enumeration::SeedGenerators;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest">CEX::Digest Namespace</seealso>
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest::IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration::Digests Enumeration</seealso>
+/// <seealso cref="CEX::Digest"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Can be initialized with any <see cref="Digests">digest</see>.</description></item>
+/// <item><description>Can be initialized with any <see cref="CEX::Enumeration::Digests">digest</see>.</description></item>
 /// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
 /// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST SP800-90A: <see href="http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf">Appendix E1.</see></description></item>
 /// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
@@ -84,11 +79,11 @@ protected:
 	unsigned int _bufferSize = 0;
 	std::vector<byte> _byteBuffer;
 	CEX::Digest::IDigest* _digestEngine;
-	Digests _digestType;
+	CEX::Enumeration::Digests _digestType;
 	bool _isDestroyed;
 	CEX::Generator::DGCDrbg* _rngGenerator;
 	CEX::Seed::ISeed* _seedGenerator;
-	SeedGenerators _seedType;
+	CEX::Enumeration::SeedGenerators _seedType;
 	std::vector<byte> _stateSeed;
 
 public:
@@ -98,7 +93,7 @@ public:
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const Prngs Enumeral() { return Prngs::DGCPrng; }
+	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::DGCPrng; }
 
 	/// <summary>
 	/// Get: Algorithm name
@@ -116,7 +111,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	DGCPrng(Digests DigestEngine = Digests::Keccak512, SeedGenerators SeedEngine = SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE)
+	DGCPrng(CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::Keccak512, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -140,7 +135,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
-	DGCPrng(std::vector<byte> Seed, Digests DigestEngine = Digests::Keccak512, unsigned int BufferSize = BUFFER_SIZE)
+	DGCPrng(std::vector<byte> Seed, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::Keccak512, unsigned int BufferSize = BUFFER_SIZE)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -155,7 +150,7 @@ public:
 		if (BufferSize < 128)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 128 bytes!");
 
-		_seedType = SeedGenerators::CSPRsg;
+		_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
 		Reset();
 	}
 
@@ -250,9 +245,9 @@ public:
 protected:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Digest::IDigest* GetInstance(Digests RngEngine);
-	unsigned int GetMinimumSeedSize(Digests RngEngine);
-	CEX::Seed::ISeed* GetSeedGenerator(SeedGenerators SeedEngine);
+	CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests RngEngine);
+	unsigned int GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine);
+	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
 };
 
 NAMESPACE_PRNGEND

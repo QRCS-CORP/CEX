@@ -30,17 +30,12 @@
 #define _CEXENGINE_CTRPRNG_H
 
 #include "IRandom.h"
-#include "BlockCiphers.h"
-#include "SeedGenerators.h"
-#include "IBlockCipher.h"
-#include "ISeed.h"
-#include "IRandom.h"
 #include "CTRDrbg.h"
+#include "IBlockCipher.h"
+#include "IRandom.h"
+#include "ISeed.h"
 
 NAMESPACE_PRNG
-
-using CEX::Enumeration::BlockCiphers;
-using CEX::Enumeration::SeedGenerators;
 
 /// <summary>
 /// CTRPrng: An implementation of a Encryption Counter based Deterministic Random Number Generator.
@@ -60,19 +55,19 @@ using CEX::Enumeration::SeedGenerators;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Seed">CEX::Seed ISeed Interface</seealso>
-/// <seealso cref="CEX::Enumeration::BlockCiphers">CEX::Enumeration::BlockCiphers Enumeration</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Seed"/>
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Can be initialized with any block <see cref="CEX::Enumeration::BlockCiphers">cipher</see>.</description></item>
 /// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
 /// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
 /// <item><description>NIST Fips 140-2: <see href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Security Requirments For Cryptographic Modules</see>.</description></item>
@@ -90,11 +85,11 @@ protected:
 	unsigned int _bufferSize = 0;
 	unsigned int _keySize = 0;
 	bool _isDestroyed;
-	BlockCiphers _engineType;
+	CEX::Enumeration::BlockCiphers _engineType;
 	CEX::Cipher::Symmetric::Block::IBlockCipher* _rngEngine;
 	CEX::Generator::CTRDrbg* _rngGenerator;
 	CEX::Seed::ISeed* _seedGenerator;
-	SeedGenerators _seedType;
+	CEX::Enumeration::SeedGenerators _seedType;
 	std::vector<byte>  _stateSeed;
 
 public:
@@ -104,7 +99,7 @@ public:
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const Prngs Enumeral() { return Prngs::CTRPrng; }
+	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::CTRPrng; }
 
 	/// <summary>
 	/// Get: Digest name
@@ -123,7 +118,7 @@ public:
 	/// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	CTRPrng(BlockCiphers BlockEngine = BlockCiphers::RHX, SeedGenerators SeedEngine = SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE, unsigned int KeySize = 0)
+	CTRPrng(CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE, unsigned int KeySize = 0)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -152,7 +147,7 @@ public:
 	/// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or too small</exception>
-	CTRPrng(std::vector<byte> &Seed, BlockCiphers BlockEngine = BlockCiphers::RHX, unsigned int BufferSize = 4096)
+	CTRPrng(std::vector<byte> &Seed, CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, unsigned int BufferSize = 4096)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -264,9 +259,9 @@ public:
 protected:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Cipher::Symmetric::Block::IBlockCipher* GetCipher(BlockCiphers RngEngine);
-	unsigned int GetKeySize(BlockCiphers CipherEngine);
-	CEX::Seed::ISeed* GetSeedGenerator(SeedGenerators SeedEngine);
+	CEX::Cipher::Symmetric::Block::IBlockCipher* GetCipher(CEX::Enumeration::BlockCiphers RngEngine);
+	unsigned int GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine);
+	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
 };
 
 NAMESPACE_PRNGEND

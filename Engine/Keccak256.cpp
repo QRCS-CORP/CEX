@@ -4,8 +4,6 @@
 
 NAMESPACE_DIGEST
 
-using CEX::Utility::IntUtils;
-
 void Keccak256::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
 {
 	if ((InOffset + Length) > Input.size())
@@ -54,8 +52,8 @@ void Keccak256::Destroy()
 		_digestSize = 0;
 		_blockSize = 0;
 
-		IntUtils::ClearVector(_buffer);
-		IntUtils::ClearVector(_state);
+		CEX::Utility::IntUtils::ClearVector(_buffer);
+		CEX::Utility::IntUtils::ClearVector(_state);
 	}
 }
 

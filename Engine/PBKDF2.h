@@ -30,9 +30,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Mac::HMAC;
-using CEX::Digest::IDigest;
-
 /// <summary>
 /// PBKDF2 V2: An implementation of an Hash based Key Derivation Function.
 /// <para>PBKDF2 Version 2, as outlined in RFC 2898</para>
@@ -53,12 +50,12 @@ using CEX::Digest::IDigest;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Mac::HMAC">CEX::Mac HMAC</seealso>
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration Digests Enumeration</seealso>
+/// <seealso cref="CEX::Mac::HMAC"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Can be initialized with a <see cref="CEX::Enumeration::Digests">Digest</see> or a <see cref="CEX::Enumeration::Macs">Mac</see>.</description></item>
 /// <item><description>Salt size should be multiple of Digest block size.</description></item>
@@ -66,7 +63,7 @@ using CEX::Digest::IDigest;
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
 /// </list>
@@ -77,12 +74,12 @@ protected:
 	static constexpr unsigned int PKCS_ITERATIONS = 1000;
 
 	unsigned int _blockSize;
-	HMAC* _digestMac;
+	CEX::Mac::HMAC* _digestMac;
 	unsigned int _hashSize;
 	bool _isDestroyed;
 	bool _isInitialized;
 	std::vector<byte> _macKey;
-	IDigest* _msgDigest;
+	CEX::Digest::IDigest* _msgDigest;
 	unsigned int _prcIterations;
 	std::vector<byte> _macSalt;
 
@@ -93,7 +90,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() { return Generators::PBKDF2; }
+	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::PBKDF2; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -126,7 +123,7 @@ public:
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or Iterations count is used</exception>
-	PBKDF2(IDigest* Digest, unsigned int Iterations = PKCS_ITERATIONS)
+	PBKDF2(CEX::Digest::IDigest* Digest, unsigned int Iterations = PKCS_ITERATIONS)
 		:
 		_blockSize(Digest->BlockSize()),
 		_hashSize(Digest->DigestSize()),
@@ -140,7 +137,7 @@ public:
 		if (_prcIterations == 0)
 			throw CryptoGeneratorException("PBKDF2:CTor", "Iterations count can not be zero!");
 
-		_digestMac = new HMAC(_msgDigest);
+		_digestMac = new CEX::Mac::HMAC(_msgDigest);
 	}
 
 	/// <summary>
@@ -151,7 +148,7 @@ public:
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or invalid Iterations count is used</exception>
-	PBKDF2(HMAC* Hmac, unsigned int Iterations = PKCS_ITERATIONS)
+	PBKDF2(CEX::Mac::HMAC* Hmac, unsigned int Iterations = PKCS_ITERATIONS)
 		:
 		_blockSize(Hmac->BlockSize()),
 		_digestMac(Hmac),

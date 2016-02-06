@@ -4,9 +4,6 @@
 
 NAMESPACE_MODE
 
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
-
 void CBC::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	// copy input to temp iv
@@ -14,7 +11,7 @@ void CBC::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	// decrypt input
 	_blockCipher->DecryptBlock(Input, Output);
 	// xor output and iv
-	IntUtils::XORBLK(_cbcIv, 0, Output, 0, _cbcIv.size());
+	CEX::Utility::IntUtils::XORBLK(_cbcIv, 0, Output, 0, _cbcIv.size());
 	// copy forward iv
 	memcpy(&_cbcIv[0], &_cbcNextIv[0], _cbcIv.size());
 }
@@ -26,7 +23,7 @@ void CBC::DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffs
 	// decrypt input
 	_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
 	// xor output and iv
-	IntUtils::XORBLK(_cbcIv, 0, Output, OutOffset, _cbcIv.size());
+	CEX::Utility::IntUtils::XORBLK(_cbcIv, 0, Output, OutOffset, _cbcIv.size());
 	// copy forward iv
 	memcpy(&_cbcIv[0], &_cbcNextIv[0], _cbcIv.size());
 }
@@ -43,16 +40,16 @@ void CBC::Destroy()
 		_isParallel = false;
 		_parallelBlockSize = 0;
 
-		IntUtils::ClearVector(_cbcIv);
-		IntUtils::ClearVector(_cbcNextIv);
-		IntUtils::ClearArray(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(_cbcIv);
+		CEX::Utility::IntUtils::ClearVector(_cbcNextIv);
+		CEX::Utility::IntUtils::ClearArray(_threadVectors);
 	}
 }
 
 void CBC::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	// xor iv and input
-	IntUtils::XORBLK(Input, 0, _cbcIv, 0, _cbcIv.size());
+	CEX::Utility::IntUtils::XORBLK(Input, 0, _cbcIv, 0, _cbcIv.size());
 	// encrypt iv
 	_blockCipher->EncryptBlock(_cbcIv, Output);
 	// copy output to iv
@@ -62,14 +59,14 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 void CBC::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
 {
 	// xor iv and input
-	IntUtils::XORBLK(Input, InOffset, _cbcIv, 0, _cbcIv.size());
+	CEX::Utility::IntUtils::XORBLK(Input, InOffset, _cbcIv, 0, _cbcIv.size());
 	// encrypt iv
 	_blockCipher->EncryptBlock(_cbcIv, 0, Output, OutOffset);
 	// copy output to iv
 	memcpy(&_cbcIv[0], &Output[OutOffset], _blockSize);
 }
 
-void CBC::Initialize(bool Encryption, const KeyParams &KeyParam)
+void CBC::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	_blockCipher->Initialize(Encryption, KeyParam);
 	_cbcIv = KeyParam.IV();
@@ -137,7 +134,7 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Out
 				memcpy(&_threadVectors[i][0], &_cbcIv[0], blkSize);
 		}
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](unsigned int i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			this->ProcessDecrypt(Input, i * cnkSize, Output, i * cnkSize, thdVec, blkCount);
@@ -179,7 +176,7 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, const unsigned int InO
 		}
 
 
-		ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](unsigned int i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			this->ProcessDecrypt(Input, InOffset + i * cnkSize, Output, OutOffset + i * cnkSize, thdVec, blkCount);
@@ -199,7 +196,7 @@ void CBC::ProcessDecrypt(const std::vector<byte> &Input, unsigned int InOffset, 
 		// decrypt input
 		_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
 		// xor output and iv
-		IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size());
+		CEX::Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size());
 		memcpy(&Iv[0], &nextIv[0], nextIv.size());
 		InOffset += Iv.size();
 		OutOffset += Iv.size();
@@ -208,7 +205,7 @@ void CBC::ProcessDecrypt(const std::vector<byte> &Input, unsigned int InOffset, 
 
 void CBC::SetScope()
 {
-	_processorCount = ParallelUtils::ProcessorCount();
+	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 	if (_processorCount % 2 != 0)
 		_processorCount--;
 	if (_processorCount > 1)

@@ -31,12 +31,8 @@
 
 #include "IMac.h"
 #include "ICipherMode.h"
-#include "IBlockCipher.h"
-#include "KeyParams.h"
 
 NAMESPACE_MAC
-
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
 
 /// <summary>
 /// An implementation of a Cipher based Message Authentication Code: CMAC.
@@ -58,18 +54,18 @@ using CEX::Cipher::Symmetric::Block::IBlockCipher;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">CEX::Cipher::Symmetric::Block::Mode::ICipherMode Interface</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>MAC return size must be a divisible of 8.</description></item>
 /// <item><description>MAC return size can be no longer than the Cipher Block size.</description></item>
 /// <item><description>Valid Cipher block sizes are 8 and 16 byte wide.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST SP800-38B: <see href="http://csrc.nist.gov/publications/nistpubs/800-38B/SP_800-38B.pdf">The CMAC Mode for Authentication</see>.</description></item>
 /// <item><description>RFC 4493: <see href="http://tools.ietf.org/html/rfc4493">The AES-CMAC Algorithm</see>.</description></item>
@@ -107,7 +103,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const Macs Enumeral() { return Macs::CMAC; }
+	virtual const CEX::Enumeration::Macs Enumeral() { return CEX::Enumeration::Macs::CMAC; }
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
@@ -133,7 +129,7 @@ public:
 	/// <param name="MacBits">Expected MAC return size in Bits; must be less or equal to Cipher Block size in bits</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
-	CMAC(IBlockCipher* Cipher, unsigned int MacBits)
+	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, unsigned int MacBits)
 		:
 		_blockSize(Cipher->BlockSize()),
 		_cipherKey(),
@@ -229,7 +225,7 @@ public:
 
 protected:
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
-	void LoadCipher(IBlockCipher* Cipher);
+	void LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher);
 };
 
 NAMESPACE_MACEND

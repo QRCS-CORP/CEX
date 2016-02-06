@@ -72,24 +72,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(SourcePath)</SourcePath>
-    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(SourcePath)</SourcePath>
-    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
@@ -104,7 +106,7 @@
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
@@ -117,7 +119,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
@@ -224,10 +226,41 @@
     <ClInclude Include="..\..\Test\XSPRsgTest.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
+    <ClCompile Include="..\..\Test\AesFipsTest.cpp" />
+    <ClCompile Include="..\..\Test\BlakeTest.cpp" />
+    <ClCompile Include="..\..\Test\ChaChaTest.cpp" />
+    <ClCompile Include="..\..\Test\CipherModeTest.cpp" />
+    <ClCompile Include="..\..\Test\CipherStreamTest.cpp" />
+    <ClCompile Include="..\..\Test\CMACTest.cpp" />
+    <ClCompile Include="..\..\Test\CTRDrbgTest.cpp" />
+    <ClCompile Include="..\..\Test\DigestStreamTest.cpp" />
+    <ClCompile Include="..\..\Test\HKDFTest.cpp" />
+    <ClCompile Include="..\..\Test\HMACTest.cpp" />
+    <ClCompile Include="..\..\Test\HXCipherTest.cpp" />
+    <ClCompile Include="..\..\Test\ISCRsgTest.cpp" />
+    <ClCompile Include="..\..\Test\KDF2DrbgTest.cpp" />
+    <ClCompile Include="..\..\Test\KeccakTest.cpp" />
+    <ClCompile Include="..\..\Test\KeyFactoryTest.cpp" />
+    <ClCompile Include="..\..\Test\MacStreamTest.cpp" />
+    <ClCompile Include="..\..\Test\PaddingTest.cpp" />
+    <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
+    <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
+    <ClCompile Include="..\..\Test\RangedRngTest.cpp" />
+    <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
+    <ClCompile Include="..\..\Test\SalsaTest.cpp" />
+    <ClCompile Include="..\..\Test\SerpentTest.cpp" />
+    <ClCompile Include="..\..\Test\Sha2Test.cpp" />
+    <ClCompile Include="..\..\Test\SkeinTest.cpp" />
+    <ClCompile Include="..\..\Test\SP20DrbgTest.cpp" />
     <ClCompile Include="..\..\Test\SP20DrbgTest.h">
       <FileType>CppHeader</FileType>
     </ClCompile>
+    <ClCompile Include="..\..\Test\SpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\VMACTest.cpp" />
+    <ClCompile Include="..\..\Test\XSPRsgTest.cpp" />
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="TwofishTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Static\CEXEngine.vcxproj">

@@ -5,10 +5,6 @@
 
 NAMESPACE_PRNG
 
-using CEX::Digest::IDigest;
-using CEX::Seed::ISeed;
-using CEX::Utility::IntUtils;
-
 // *** Public Methods *** //
 
 /// <summary>
@@ -21,8 +17,8 @@ void DGCPrng::Destroy()
 		_bufferIndex = 0;
 		_bufferSize = 0;
 
-		IntUtils::ClearVector(_byteBuffer);
-		IntUtils::ClearVector(_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(_byteBuffer);
+		CEX::Utility::IntUtils::ClearVector(_stateSeed);
 
 		if (_seedGenerator != 0)
 		{
@@ -110,7 +106,7 @@ void DGCPrng::GetBytes(std::vector<byte> &Output)
 /// <returns>Random UInt32</returns>
 unsigned int DGCPrng::Next()
 {
-	return IntUtils::ToInt32(GetBytes(4));
+	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
 /// <summary>
@@ -157,7 +153,7 @@ unsigned int DGCPrng::Next(unsigned int Minimum, unsigned int Maximum)
 /// <returns>Random UInt64</returns>
 ulong DGCPrng::NextLong()
 {
-	return IntUtils::ToInt64(GetBytes(8));
+	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
 /// <summary>
@@ -283,46 +279,46 @@ std::vector<byte> DGCPrng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-IDigest* DGCPrng::GetInstance(Digests RngEngine)
+CEX::Digest::IDigest* DGCPrng::GetInstance(CEX::Enumeration::Digests RngEngine)
 {
 	return CEX::Helper::DigestFromName::GetInstance(RngEngine);
 }
 
-unsigned int DGCPrng::GetMinimumSeedSize(Digests RngEngine)
+unsigned int DGCPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
 {
 	int ctrLen = 8;
 
 	switch (RngEngine)
 	{
-		case Digests::Blake256:
+		case CEX::Enumeration::Digests::Blake256:
 			return ctrLen + 32;
-		case Digests::Blake512:
+		case CEX::Enumeration::Digests::Blake512:
 			return ctrLen + 64;
-		case Digests::Keccak256:
+		case CEX::Enumeration::Digests::Keccak256:
 			return ctrLen + 136;
-		case Digests::Keccak512:
+		case CEX::Enumeration::Digests::Keccak512:
 			return ctrLen + 72;
-		case Digests::SHA256:
+		case CEX::Enumeration::Digests::SHA256:
 			return ctrLen + 64;
-		case Digests::SHA512:
+		case CEX::Enumeration::Digests::SHA512:
 			return ctrLen + 128;
-		case Digests::Skein1024:
+		case CEX::Enumeration::Digests::Skein1024:
 			return ctrLen + 128;
-		case Digests::Skein256:
+		case CEX::Enumeration::Digests::Skein256:
 			return ctrLen + 32;
-		case Digests::Skein512:
+		case CEX::Enumeration::Digests::Skein512:
 			return ctrLen + 64;
 		default:
 			return ctrLen + 128;
 	}
 }
 
-ISeed* DGCPrng::GetSeedGenerator(SeedGenerators SeedEngine)
+CEX::Seed::ISeed* DGCPrng::GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine)
 {
 
 	switch (SeedEngine)
 	{
-		/*case SeedGenerators::XSPRsg:
+		/*case CEX::Enumeration::SeedGenerators::XSPRsg:
 		return new CEX::Seed::XSPRsg();*/ //ToDo?
 	default:
 		return new CEX::Seed::CSPRsg();

@@ -38,7 +38,6 @@
 #define _CEXENGINE_SALSA20_H
 
 #include "IStreamCipher.h"
-#include "ParallelUtils.h"
 
 NAMESPACE_STREAM
 
@@ -64,7 +63,7 @@ NAMESPACE_STREAM
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
 /// <item><description>Block size is 64 bytes wide.</description></item>
@@ -72,7 +71,7 @@ NAMESPACE_STREAM
 /// <item><description>Parallel block size is 64,000 bytes by default; but is configurable.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
 /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
@@ -134,7 +133,7 @@ public:
 	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
-	virtual const StreamCiphers Enumeral() { return StreamCiphers::Salsa; }
+	virtual const CEX::Enumeration::StreamCiphers Enumeral() { return CEX::Enumeration::StreamCiphers::Salsa; }
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
@@ -149,7 +148,7 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int>&LegalKeySizes() { return _legalKeySizes; };
+	virtual const std::vector<unsigned int>&LegalKeySizes() { return _legalKeySizes; }
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
@@ -179,7 +178,7 @@ public:
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return CEX::Utility::ParallelUtils::ProcessorCount(); }
+	virtual const unsigned int ProcessorCount() { return GetProcessorCount(); }
 
 	/// <summary>
 	/// Get: Number of rounds
@@ -245,7 +244,7 @@ public:
 	/// The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
 	/// IV must be 8 bytes in size.</para>
 	/// </param>
-	virtual void Initialize(const KeyParams &KeyParam);
+	virtual void Initialize(const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
 	/// Reset the primary internal counter
@@ -288,6 +287,7 @@ protected:
 	void Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);
 	void Generate(const unsigned int Size, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
+	unsigned int GetProcessorCount();
 	void ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 	void ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length);

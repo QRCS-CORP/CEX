@@ -1,7 +1,6 @@
 #ifndef _CEXENGINE_STREAMREADER_H
 #define _CEXENGINE_STREAMREADER_H
 
-#include "Common.h"
 #include "MemoryStream.h"
 
 NAMESPACE_IO

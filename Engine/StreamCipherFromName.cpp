@@ -4,18 +4,16 @@
 
 NAMESPACE_HELPER
 
-using namespace CEX::Cipher::Symmetric::Stream;
-
-IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers EngineType, int RoundCount)
+CEX::Cipher::Symmetric::Stream::IStreamCipher* StreamCipherFromName::GetInstance(CEX::Enumeration::StreamCiphers EngineType, int RoundCount)
 {
 	switch (EngineType)
 	{
-		case StreamCiphers::ChaCha:
-			return new ChaCha(RoundCount);
-		case StreamCiphers::Salsa:
-			return new Salsa20(RoundCount);
+		case CEX::Enumeration::StreamCiphers::ChaCha:
+			return new CEX::Cipher::Symmetric::Stream::ChaCha(RoundCount);
+		case CEX::Enumeration::StreamCiphers::Salsa:
+			return new CEX::Cipher::Symmetric::Stream::Salsa20(RoundCount);
 		default:
-			throw CryptoException("StreamCipherFromName:GetStreamEngine", "The stream cipher is not recognized!");
+			throw CEX::Exception::CryptoException("StreamCipherFromName:GetStreamEngine", "The stream cipher is not recognized!");
 	}
 }
 

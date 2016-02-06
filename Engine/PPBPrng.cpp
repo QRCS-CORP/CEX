@@ -1,11 +1,7 @@
 #include "PPBPrng.h"
-#include "DigestFromName.h"
 #include "IntUtils.h"
 
 NAMESPACE_PRNG
-
-using CEX::Digest::IDigest;
-using CEX::Utility::IntUtils;
 
 // *** Public Methods *** //
 
@@ -20,8 +16,8 @@ void PPBPrng::Destroy()
 		_bufferSize = 0;
 		_digestIterations = 0;
 
-		IntUtils::ClearVector(_byteBuffer);
-		IntUtils::ClearVector(_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(_byteBuffer);
+		CEX::Utility::IntUtils::ClearVector(_stateSeed);
 
 		if (_rngGenerator != 0)
 		{
@@ -104,7 +100,7 @@ void PPBPrng::GetBytes(std::vector<byte> &Output)
 /// <returns>Random UInt32</returns>
 unsigned int PPBPrng::Next()
 {
-	return IntUtils::ToInt32(GetBytes(4));
+	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
 /// <summary>
@@ -151,7 +147,7 @@ unsigned int PPBPrng::Next(unsigned int Minimum, unsigned int Maximum)
 /// <returns>Random UInt64</returns>
 ulong PPBPrng::NextLong()
 {
-	return IntUtils::ToInt64(GetBytes(8));
+	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
 /// <summary>
@@ -258,32 +254,32 @@ std::vector<byte> PPBPrng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-IDigest* PPBPrng::GetInstance(Digests RngEngine)
+CEX::Digest::IDigest* PPBPrng::GetInstance(CEX::Enumeration::Digests RngEngine)
 {
 	return CEX::Helper::DigestFromName::GetInstance(RngEngine);
 }
 
-unsigned int PPBPrng::GetMinimumSeedSize(Digests RngEngine)
+unsigned int PPBPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
 {
 	switch (RngEngine)
 	{
-		case Digests::Blake256:
+		case CEX::Enumeration::Digests::Blake256:
 			return 32;
-		case Digests::Blake512:
+		case CEX::Enumeration::Digests::Blake512:
 			return 64;
-		case Digests::Keccak256:
+		case CEX::Enumeration::Digests::Keccak256:
 			return 136;
-		case Digests::Keccak512:
+		case CEX::Enumeration::Digests::Keccak512:
 			return 72;
-		case Digests::SHA256:
+		case CEX::Enumeration::Digests::SHA256:
 			return 64;
-		case Digests::SHA512:
+		case CEX::Enumeration::Digests::SHA512:
 			return 128;
-		case Digests::Skein1024:
+		case CEX::Enumeration::Digests::Skein1024:
 			return 128;
-		case Digests::Skein256:
+		case CEX::Enumeration::Digests::Skein256:
 			return 32;
-		case Digests::Skein512:
+		case CEX::Enumeration::Digests::Skein512:
 			return 64;
 		default:
 			return 128;

@@ -56,11 +56,11 @@ NAMESPACE_DIGEST
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest::IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration::Digests Enumeration</seealso>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Block size is 128 bytes, (1024 bits).</description></item>
 /// <item><description>Digest size is 128 bytes, (1024 bits).</description></item>
@@ -68,7 +68,7 @@ NAMESPACE_DIGEST
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method does NOT reset the internal state; call <see cref="Reset()"/> to reinitialize.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>The Skein Hash Function Family: <see href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">Skein V1.1</see>.</description></item>
 /// <item><description>Skein <see href="http://www.skein-hash.info/sites/default/files/skein-proofs.pdf">Provable Security</see> Support for the Skein Hash Family.</description></item>
@@ -113,7 +113,7 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual Digests Enumeral() { return Digests::Skein1024; }
+	virtual CEX::Enumeration::Digests Enumeral() { return CEX::Enumeration::Digests::Skein1024; }
 
 	/// <summary>
 	/// Get: Digest name

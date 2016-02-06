@@ -3,8 +3,6 @@
 
 NAMESPACE_DIGEST
 
-using CEX::Utility::IntUtils;
-
 void Skein256::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
 {
 	if ((InOffset + Length) > Input.size())
@@ -20,7 +18,7 @@ void Skein256::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset
 		{
 			// moves the byte input buffer to the UInt64 cipher input
 			for (int i = 0; i < STATE_WORDS; i++)
-				_cipherInput[i] = IntUtils::BytesToLe64(_inputBuffer, i * 8);
+				_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(_inputBuffer, i * 8);
 
 			// process the block
 			ProcessBlock(STATE_BYTES);
@@ -52,11 +50,11 @@ void Skein256::Destroy()
 		_blockCipher.Clear();
 		_ubiParameters.Clear();
 
-		IntUtils::ClearVector(_cipherInput);
-		IntUtils::ClearVector(_configString);
-		IntUtils::ClearVector(_configValue);
-		IntUtils::ClearVector(_digestState);
-		IntUtils::ClearVector(_inputBuffer);
+		CEX::Utility::IntUtils::ClearVector(_cipherInput);
+		CEX::Utility::IntUtils::ClearVector(_configString);
+		CEX::Utility::IntUtils::ClearVector(_configValue);
+		CEX::Utility::IntUtils::ClearVector(_digestState);
+		CEX::Utility::IntUtils::ClearVector(_inputBuffer);
 	}
 }
 
@@ -70,7 +68,7 @@ unsigned int Skein256::DoFinal(std::vector<byte> &Output, const unsigned int Out
 		_inputBuffer[i] = 0;
 	// copy to cipher input buffer
 	for (unsigned int i = 0; i < STATE_WORDS; i++)
-		_cipherInput[i] = IntUtils::BytesToLe64(_inputBuffer, i * 8);
+		_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(_inputBuffer, i * 8);
 
 	// process final message block
 	_ubiParameters.SetIsFinalBlock(true);

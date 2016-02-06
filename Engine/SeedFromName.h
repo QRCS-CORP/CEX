@@ -4,13 +4,8 @@
 #include "Common.h"
 #include "CryptoException.h"
 #include "ISeed.h"
-#include "SeedGenerators.h"
 
 NAMESPACE_HELPER
-
-using CEX::Seed::ISeed;
-using CEX::Enumeration::SeedGenerators;
-using CEX::Exception::CryptoException;
 
 /// <summary>
 /// SeedFromName: Get a seed generator instance from it's enumeration name
@@ -26,8 +21,8 @@ public:
 	/// 
 	/// <returns>An initialized seed generator</returns>
 	/// 
-	/// <exception cref="CryptoException">Thrown if the enumeration name is not supported</exception>
-	static ISeed* GetInstance(SeedGenerators SeedType);
+	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static CEX::Seed::ISeed* GetInstance(CEX::Enumeration::SeedGenerators SeedType);
 };
 
 NAMESPACE_HELPEREND

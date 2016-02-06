@@ -1,13 +1,9 @@
 #ifndef _CEXENGINE_MEMORYSTREAM_H
 #define _CEXENGINE_MEMORYSTREAM_H
 
-#include "Common.h"
 #include "IByteStream.h"
-#include "SeekOrigin.h"
 
 NAMESPACE_IO
-
-using CEX::IO::SeekOrigin;
 
 /// <summary>
 /// Write data to a byte array

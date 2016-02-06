@@ -25,13 +25,11 @@
 #define _CEXENGINE_PBPRNG_H
 
 #include "IRandom.h"
-#include "IDigest.h"
-#include "PBKDF2.h"
-#include "Digests.h"
+#include "DigestFromName.h"
 #include "IntUtils.h"
-NAMESPACE_PRNG
+#include "PBKDF2.h"
 
-using CEX::Enumeration::Digests;
+NAMESPACE_PRNG
 
 /// <summary>
 /// PBPRng: An implementation of a passphrase based PKCS#5 random number generator.
@@ -50,12 +48,12 @@ using CEX::Enumeration::Digests;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Mac::HMAC">CEX::Mac HMAC</seealso>
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration Digests Enumeration</seealso>
+/// <seealso cref="CEX::Mac::HMAC"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
 /// </list>
@@ -71,7 +69,7 @@ protected:
 	std::vector<byte> _byteBuffer;
 	CEX::Digest::IDigest* _digestEngine;
 	unsigned int _digestIterations;
-	Digests _digestType;
+	CEX::Enumeration::Digests _digestType;
 	bool _isDestroyed;
 	CEX::Generator::PBKDF2* _rngGenerator;
 	std::vector<byte> _stateSeed;
@@ -83,7 +81,7 @@ public:
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const Prngs Enumeral() { return Prngs::PPBPrng; }
+	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::PPBPrng; }
 
 	/// <summary>
 	/// Get: Algorithm name
@@ -102,7 +100,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
-	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, Digests DigestEngine = Digests::SHA512, unsigned int BufferSize = BUFFER_SIZE)
+	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::SHA512, unsigned int BufferSize = BUFFER_SIZE)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -213,8 +211,8 @@ public:
 protected:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Digest::IDigest* GetInstance(Digests RngEngine);
-	unsigned int GetMinimumSeedSize(Digests RngEngine);
+	CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests RngEngine);
+	unsigned int GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine);
 };
 
 NAMESPACE_PRNGEND

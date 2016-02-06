@@ -25,14 +25,10 @@
 #define _CEXENGINE_SP20PRNG_H
 
 #include "IRandom.h"
-#include "SeedGenerators.h"
 #include "ISeed.h"
-#include "IRandom.h"
 #include "SP20Drbg.h"
 
 NAMESPACE_PRNG
-
-using CEX::Enumeration::SeedGenerators;
 
 /// <summary>
 /// SP20Prng: An implementation of a Encryption Counter based Deterministic Random Number Generator.
@@ -53,7 +49,7 @@ using CEX::Enumeration::SeedGenerators;
 /// </revisionHistory>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
 /// <item><description>Block size is 64 bytes wide.</description></item>
@@ -61,7 +57,7 @@ using CEX::Enumeration::SeedGenerators;
 /// <item><description>Parallel block size is 64,000 bytes by default; but is configurable.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
 /// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
@@ -81,7 +77,7 @@ protected:
 	bool _isDestroyed;
 	CEX::Generator::SP20Drbg* _rngGenerator;
 	CEX::Seed::ISeed* _seedGenerator;
-	SeedGenerators _seedType;
+	CEX::Enumeration::SeedGenerators _seedType;
 	std::vector<byte>  _stateSeed;
 
 public:
@@ -91,7 +87,7 @@ public:
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const Prngs Enumeral() { return Prngs::SP20Prng; }
+	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::SP20Prng; }
 
 	/// <summary>
 	/// Get: Algorithm name
@@ -110,7 +106,7 @@ public:
 	/// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range (rounds 10-30, min. buffer 64 bytes)</exception>
-	SP20Prng(SeedGenerators SeedEngine = SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE, unsigned int KeySize = 40, unsigned int Rounds = 20)
+	SP20Prng(CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE, unsigned int KeySize = 40, unsigned int Rounds = 20)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -250,7 +246,7 @@ public:
 protected:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Seed::ISeed* GetSeedGenerator(SeedGenerators SeedEngine);
+	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
 };
 
 NAMESPACE_PRNGEND

@@ -1,7 +1,6 @@
 #ifndef _CEXENGINE_STREAMWRITER_H
 #define _CEXENGINE_STREAMWRITER_H
 
-#include "Common.h"
 #include "MemoryStream.h"
 
 NAMESPACE_IO

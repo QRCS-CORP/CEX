@@ -29,8 +29,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Digest::IDigest;
-
 /// <summary>
 /// KDF2Drbg: An implementation of an Hash based Key Derivation Function.
 /// <para>KDF2Drbg as outlined in ISO 18033-2 based on ISO 18033/P1363a.</para>
@@ -51,11 +49,11 @@ using CEX::Digest::IDigest;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration Digests Enumeration</seealso>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Can be initialized with a <see cref="CEX::Enumeration::Digests">Digest</see>.</description></item>
 /// <item><description>Salt size should be multiple of Digest block size.</description></item>
@@ -63,7 +61,7 @@ using CEX::Digest::IDigest;
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="table">
 /// <item><description>ISO-18033-2: <see href="http://www.shoup.net/iso/std6.pdf">Specification</see>.</description></item>
 /// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
@@ -77,7 +75,7 @@ protected:
 	bool _isInitialized;
 	std::vector<byte> _IV;
 	unsigned int _blockSize;
-	IDigest* _msgDigest;
+	CEX::Digest::IDigest* _msgDigest;
 	std::vector<byte> _Salt;
 
 public:
@@ -87,7 +85,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() { return Generators::KDF2Drbg; }
+	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::KDF2Drbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -119,7 +117,7 @@ public:
 	/// <param name="Digest">The digest used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	KDF2Drbg(IDigest* Digest)
+	KDF2Drbg(CEX::Digest::IDigest* Digest)
 		:
 		_blockSize(Digest->BlockSize()),
 		_hashSize(Digest->DigestSize()),

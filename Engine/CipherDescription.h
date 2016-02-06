@@ -15,14 +15,6 @@
 
 NAMESPACE_COMMON
 
-using CEX::Enumeration::BlockSizes;
-using CEX::Enumeration::CipherModes;
-using CEX::Enumeration::Digests;
-using CEX::Enumeration::IVSizes;
-using CEX::Enumeration::PaddingModes;
-using CEX::Enumeration::RoundCounts;
-using CEX::Enumeration::SymmetricEngines;
-
 /// <summary>
 /// The CipherDescription structure.
 /// <para>Used in conjunction with the CipherStream class.
@@ -46,13 +38,13 @@ using CEX::Enumeration::SymmetricEngines;
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="CEX::Enumeration::BlockSizes">CEX::Enumeration BlockSizes Enumeration</seealso>
-/// <seealso cref="CEX::Enumeration::CipherModes">CEX::Enumeration CipherModes Enumeration</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration Digests Enumeration</seealso>
-/// <seealso cref="CEX::Enumeration::IVSizes">CEX::Enumeration IVSizes Enumeration</seealso>
-/// <seealso cref="CEX::Enumeration::PaddingModes">CEX::Enumeration PaddingModes Enumeration</seealso>
-/// <seealso cref="CEX::Enumeration::RoundCounts">CEX::Enumeration RoundCounts Enumeration</seealso>
-/// <seealso cref="CEX::Enumeration::SymmetricEngines">CEX::Enumeration SymmetricEngines Enumeration</seealso>
+/// <seealso cref="CEX::Enumeration::BlockSizes"/>
+/// <seealso cref="CEX::Enumeration::CipherModes"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
+/// <seealso cref="CEX::Enumeration::IVSizes"/>
+/// <seealso cref="CEX::Enumeration::PaddingModes"/>
+/// <seealso cref="CEX::Enumeration::RoundCounts"/>
+/// <seealso cref="CEX::Enumeration::SymmetricEngines"/>
 /// 
 /// <revisionHistory>
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
@@ -99,7 +91,7 @@ public:
 	/// <summary>
 	/// The Cryptographic <see cref="CEX::Enumeration::SymmetricEngines">Engine</see> type
 	/// </summary>
-	const SymmetricEngines EngineType() const { return (SymmetricEngines)_engineType; }
+	const CEX::Enumeration::SymmetricEngines EngineType() const { return (CEX::Enumeration::SymmetricEngines)_engineType; }
 
 	/// <summary>
 	/// The cipher Key Size
@@ -110,32 +102,32 @@ public:
 	/// <summary>
 	/// Size of the cipher <see cref="CEX::Enumeration::IVSizes">Initialization Vector</see>
 	/// </summary>
-	const IVSizes IvSize() const { return (IVSizes)_ivSize; }
+	const CEX::Enumeration::IVSizes IvSize() const { return (CEX::Enumeration::IVSizes)_ivSize; }
 
 	/// <summary>
 	/// The type of <see cref="CEX::Enumeration::CipherModes">Cipher Mode</see>
 	/// </summary>
-	const CipherModes CipherType() const { return (CipherModes)_cipherType; }
+	const CEX::Enumeration::CipherModes CipherType() const { return (CEX::Enumeration::CipherModes)_cipherType; }
 
 	/// <summary>
 	/// The type of cipher <see cref="CEX::Enumeration::PaddingModes">Padding Mode</see>
 	/// </summary>
-	const PaddingModes PaddingType() const { return (PaddingModes)_paddingType; }
+	const CEX::Enumeration::PaddingModes PaddingType() const { return (CEX::Enumeration::PaddingModes)_paddingType; }
 
 	/// <summary>
 	/// The cipher <see cref="CEX::Enumeration::BlockSizes">Block Size</see>
 	/// </summary>
-	const BlockSizes BlockSize() const { return (BlockSizes)_blockSize; }
+	const CEX::Enumeration::BlockSizes BlockSize() const { return (CEX::Enumeration::BlockSizes)_blockSize; }
 
 	/// <summary>
 	/// The number of diffusion <see cref="CEX::Enumeration::RoundCounts">Rounds</see>
 	/// </summary>
-	const RoundCounts RoundCount() const { return (RoundCounts)_roundCount; }
+	const CEX::Enumeration::RoundCounts RoundCount() const { return (CEX::Enumeration::RoundCounts)_roundCount; }
 
 	/// <summary>
 	/// The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers
 	/// </summary>
-	const Digests KdfEngine() const { return (Digests)_kdfEngine; }
+	const CEX::Enumeration::Digests KdfEngine() const { return (CEX::Enumeration::Digests)_kdfEngine; }
 
 	/// <summary>
 	/// The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key
@@ -145,7 +137,7 @@ public:
 	/// <summary>
 	/// The HMAC <see cref="CEX::Enumeration::Digests">Digest</see> engine used to authenticate a message file encrypted with this key
 	/// </summary>
-	const Digests MacEngine() const { return (Digests)_macEngine; }
+	const CEX::Enumeration::Digests MacEngine() const { return (CEX::Enumeration::Digests)_macEngine; }
 
 	/// <summary>
 	/// Default constructor
@@ -178,8 +170,8 @@ public:
 	/// <param name="KdfEngine">The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	/// <param name="MacSize">The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC <see cref="CEX::Enumeration::Digests">Digest</see> engine used to authenticate a message file encrypted with this key</param>
-	CipherDescription(SymmetricEngines EngineType, unsigned int KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, BlockSizes BlockSize, 
-		RoundCounts RoundCount, Digests KdfEngine = Digests::SHA512, unsigned int MacSize = 64, Digests MacEngine = Digests::SHA512)
+	CipherDescription(CEX::Enumeration::SymmetricEngines EngineType, unsigned int KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
+		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, unsigned int MacSize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
 	{
 		this->_engineType = (unsigned int)EngineType;
 		this->_keySize = KeySize;

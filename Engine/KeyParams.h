@@ -3,7 +3,6 @@
 
 #include "Common.h"
 #include "IntUtils.h"
-#include "MemoryStream.h"
 #include "StreamWriter.h"
 #include "StreamReader.h"
 
@@ -211,7 +210,6 @@ public:
 		int len = 6 + klen + vlen + mlen;
 
 		CEX::IO::StreamWriter writer(len);
-
 		writer.Write(klen);
 		writer.Write(vlen);
 		writer.Write(mlen);

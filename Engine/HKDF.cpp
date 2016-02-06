@@ -3,8 +3,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Utility::IntUtils;
-
 void HKDF::Destroy()
 {
 	if (!_isDestroyed)
@@ -15,8 +13,8 @@ void HKDF::Destroy()
 		_keySize = 0;
 		_generatedBytes = 0;
 
-		IntUtils::ClearVector(_currentT);
-		IntUtils::ClearVector(_digestInfo);
+		CEX::Utility::IntUtils::ClearVector(_currentT);
+		CEX::Utility::IntUtils::ClearVector(_digestInfo);
 	}
 }
 
@@ -39,7 +37,7 @@ unsigned int HKDF::Generate(std::vector<byte> &Output, unsigned int OutOffset, u
 	unsigned int toGenerate = Size;
 	unsigned int posInT = _generatedBytes % _hashSize;
 	unsigned int leftInT = _hashSize - _generatedBytes % _hashSize;
-	unsigned int toCopy = IntUtils::Min(leftInT, toGenerate);
+	unsigned int toCopy = CEX::Utility::IntUtils::Min(leftInT, toGenerate);
 
 	memcpy(&Output[OutOffset], &_currentT[posInT], toCopy);
 	_generatedBytes += toCopy;
@@ -49,7 +47,7 @@ unsigned int HKDF::Generate(std::vector<byte> &Output, unsigned int OutOffset, u
 	while (toGenerate != 0)
 	{
 		ExpandNext();
-		toCopy = IntUtils::Min(_hashSize, toGenerate);
+		toCopy = CEX::Utility::IntUtils::Min(_hashSize, toGenerate);
 		memcpy(&Output[OutOffset], &_currentT[0], toCopy);
 		_generatedBytes += toCopy;
 		toGenerate -= toCopy;

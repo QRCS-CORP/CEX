@@ -1,8 +1,20 @@
 #include "KeyFactory.h"
 #include "CryptoProcessingException.h"
 #include "CSPRsg.h"
+#include "KeyGenerator.h"
 
 NAMESPACE_PRCFACTORY
+
+/*void KeyFactory::Create(CEX::Common::CipherDescription Description, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, 
+	CEX::Enumeration::Digests HashEngine = CEX::Enumeration::Digests::SHA512)
+{
+	CEX::Common::KeyParams* keyParam;
+	CEX::Seed::CSPRsg rnd;
+	CEX::Common::KeyGenerator keyGen(SeedEngine, HashEngine, rnd.GetBytes(16));
+	keyParam = keyGen.GetKeyParams(Description.KeySize, Description.IvSize, Description::MacSize);
+
+	Create(Description, *keyParam);
+}*/
 
 void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common::KeyParams &KeyParam)
 {
@@ -30,7 +42,9 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common
 	delete tmp;
 }
 
-void KeyFactory::Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::SymmetricEngines EngineType, int KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacSize, CEX::Enumeration::Digests MacEngine)
+void KeyFactory::Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::SymmetricEngines EngineType, int KeySize, CEX::Enumeration::IVSizes IvSize, 
+	CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
+	CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacSize, CEX::Enumeration::Digests MacEngine)
 {
 	CEX::Common::CipherDescription dsc(
 		EngineType,

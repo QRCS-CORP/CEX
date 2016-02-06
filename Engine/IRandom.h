@@ -8,7 +8,6 @@
 NAMESPACE_PRNG
 
 using CEX::Exception::CryptoRandomException;
-using CEX::Enumeration::Prngs;
 
 /// <summary>
 /// Psuedo Random Number Generator interface
@@ -33,7 +32,7 @@ public:
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const Prngs Enumeral() = 0;
+	virtual const CEX::Enumeration::Prngs Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Algorithm name

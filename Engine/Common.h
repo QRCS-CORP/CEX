@@ -105,5 +105,4 @@ CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET
 The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 */
 NAMESPACE_ROOTEND
-
 #endif

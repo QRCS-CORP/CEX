@@ -7,8 +7,6 @@
 
 NAMESPACE_BLOCK
 
-using CEX::Utility::IntUtils;
-
 void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (_blockSize == BLOCK16)
@@ -36,10 +34,10 @@ void RHX::Destroy()
 		_isEncryption = false;
 		_isInitialized = false;
 
-		IntUtils::ClearVector(_expKey);
-		IntUtils::ClearVector(_hkdfInfo);
-		IntUtils::ClearVector(_legalKeySizes);
-		IntUtils::ClearVector(_legalRounds);
+		CEX::Utility::IntUtils::ClearVector(_expKey);
+		CEX::Utility::IntUtils::ClearVector(_hkdfInfo);
+		CEX::Utility::IntUtils::ClearVector(_legalKeySizes);
+		CEX::Utility::IntUtils::ClearVector(_legalRounds);
 
 		if (_kdfEngine != 0)
 		{
@@ -66,13 +64,13 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffs
 		Encrypt32(Input, InOffset, Output, OutOffset);
 }
 
-void RHX::Initialize(bool Encryption, const KeyParams &KeyParam)
+void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	int dgtsze = GetIkmSize(_kdfEngineType);
 	int dgtblk = GetSaltSize(_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, (length - IKm length: {" + 
-		IntUtils::ToString(dgtsze) + "} bytes) + multiple of {" + IntUtils::ToString(dgtblk) + "} block size.";
+		CEX::Utility::IntUtils::ToString(dgtsze) + "} bytes) + multiple of {" + CEX::Utility::IntUtils::ToString(dgtblk) + "} block size.";
 	
 	if (key.size() < _legalKeySizes[0])
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
@@ -273,10 +271,10 @@ void RHX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	unsigned int keyCtr = 0;
 
 	// round 0
-	uint X0 = IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X1 = IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X2 = IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X3 = IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
 
 	// round 1
 	uint Y0 = T0[(byte)(X0 >> 24)] ^ T1[(byte)(X1 >> 16)] ^ T2[(byte)(X2 >> 8)] ^ T3[(byte)X3] ^ _expKey[++keyCtr];
@@ -324,14 +322,14 @@ void RHX::Encrypt32(const std::vector<byte> &Input, const unsigned int InOffset,
 	unsigned int keyCtr = 0;
 
 	// round 0
-	uint X0 = IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X1 = IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X2 = IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X3 = IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
-	uint X4 = IntUtils::BytesToBe32(Input, InOffset + 16) ^ _expKey[++keyCtr];
-	uint X5 = IntUtils::BytesToBe32(Input, InOffset + 20) ^ _expKey[++keyCtr];
-	uint X6 = IntUtils::BytesToBe32(Input, InOffset + 24) ^ _expKey[++keyCtr];
-	uint X7 = IntUtils::BytesToBe32(Input, InOffset + 28) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X4 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 16) ^ _expKey[++keyCtr];
+	uint X5 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 20) ^ _expKey[++keyCtr];
+	uint X6 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 24) ^ _expKey[++keyCtr];
+	uint X7 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 28) ^ _expKey[++keyCtr];
 
 	// round 1
 	uint Y0 = T0[(byte)(X0 >> 24)] ^ T1[(byte)(X1 >> 16)] ^ T2[(byte)(X3 >> 8)] ^ T3[(byte)X4] ^ _expKey[++keyCtr];
@@ -413,10 +411,10 @@ void RHX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	unsigned int keyCtr = 0;
 
 	// round 0
-	uint X0 = IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X1 = IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X2 = IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X3 = IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
 
 	// round 1
 	uint Y0 = IT0[(X0 >> 24)] ^ IT1[(byte)(X3 >> 16)] ^ IT2[(byte)(X2 >> 8)] ^ IT3[(byte)X1] ^ _expKey[++keyCtr];
@@ -466,14 +464,14 @@ void RHX::Decrypt32(const std::vector<byte> &Input, const unsigned int InOffset,
 	unsigned int keyCtr = 0;
 
 	// round 0
-	uint X0 = IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X1 = IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X2 = IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X3 = IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
-	uint X4 = IntUtils::BytesToBe32(Input, InOffset + 16) ^ _expKey[++keyCtr];
-	uint X5 = IntUtils::BytesToBe32(Input, InOffset + 20) ^ _expKey[++keyCtr];
-	uint X6 = IntUtils::BytesToBe32(Input, InOffset + 24) ^ _expKey[++keyCtr];
-	uint X7 = IntUtils::BytesToBe32(Input, InOffset + 28) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X4 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 16) ^ _expKey[++keyCtr];
+	uint X5 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 20) ^ _expKey[++keyCtr];
+	uint X6 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 24) ^ _expKey[++keyCtr];
+	uint X7 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 28) ^ _expKey[++keyCtr];
 
 	// round 1
 	uint Y0 = IT0[(byte)(X0 >> 24)] ^ IT1[(byte)(X7 >> 16)] ^ IT2[(byte)(X5 >> 8)] ^ IT3[(byte)X4] ^ _expKey[++keyCtr];
@@ -551,28 +549,28 @@ void RHX::Decrypt32(const std::vector<byte> &Input, const unsigned int InOffset,
 
 // *** Helpers *** //
 
-int RHX::GetIkmSize(Digests DigestType)
+int RHX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 {
 	switch (DigestType)
 	{
-	case Digests::Blake256:
-	case Digests::Keccak256:
-	case Digests::SHA256:
-	case Digests::Skein256:
+	case CEX::Enumeration::Digests::Blake256:
+	case CEX::Enumeration::Digests::Keccak256:
+	case CEX::Enumeration::Digests::SHA256:
+	case CEX::Enumeration::Digests::Skein256:
 		return 32;
-	case Digests::Blake512:
-	case Digests::Keccak512:
-	case Digests::SHA512:
-	case Digests::Skein512:
+	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::Keccak512:
+	case CEX::Enumeration::Digests::SHA512:
+	case CEX::Enumeration::Digests::Skein512:
 		return 64;
-	case Digests::Skein1024:
+	case CEX::Enumeration::Digests::Skein1024:
 		return 128;
 	default:
 		throw CryptoSymmetricCipherException("RHX:GetDigestSize", "The digest type is not supported!");
 	}
 }
 
-IDigest* RHX::GetDigest(Digests DigestType)
+CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
 {
 	try
 	{
@@ -584,23 +582,23 @@ IDigest* RHX::GetDigest(Digests DigestType)
 	}
 }
 
-int RHX::GetSaltSize(Digests DigestType)
+int RHX::GetSaltSize(CEX::Enumeration::Digests DigestType)
 {
 	switch (DigestType)
 	{
-	case Digests::Blake256:
-	case Digests::Skein256:
+	case CEX::Enumeration::Digests::Blake256:
+	case CEX::Enumeration::Digests::Skein256:
 		return 32;
-	case Digests::Blake512:
-	case Digests::SHA256:
-	case Digests::Skein512:
+	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::SHA256:
+	case CEX::Enumeration::Digests::Skein512:
 		return 64;
-	case Digests::SHA512:
-	case Digests::Skein1024:
+	case CEX::Enumeration::Digests::SHA512:
+	case CEX::Enumeration::Digests::Skein1024:
 		return 128;
-	case Digests::Keccak256:
+	case CEX::Enumeration::Digests::Keccak256:
 		return 136;
-	case Digests::Keccak512:
+	case CEX::Enumeration::Digests::Keccak512:
 		return 72;
 	default:
 		throw CryptoSymmetricCipherException("RHX:GetBlockSize", "The digest type is not supported!");

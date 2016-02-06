@@ -34,8 +34,6 @@
 
 NAMESPACE_MAC
 
-using CEX::Digest::IDigest;
-
 /// <summary>
 /// An implementation of a Hash based Message Authentication Code: HMAC.
 /// <para>A HMAC as outlined in the NIST document: Fips 198-1</para>
@@ -56,11 +54,11 @@ using CEX::Digest::IDigest;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Digest">CEX::Digest Namespace</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration::Digests Enumeration</seealso>
+/// <seealso cref="CEX::Digest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Key size should be equal to digest output size.</description></item>
 /// <item><description>Block size is the Digests engines block size.</description></item>
@@ -69,7 +67,7 @@ using CEX::Digest::IDigest;
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>RFC 2104: <see href="http://tools.ietf.org/html/rfc2104">HMAC: Keyed-Hashing for Message Authentication</see>.</description></item>
 /// <item><description>Fips 198-1: <see href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">The Keyed-Hash Message Authentication Code (HMAC)</see>.</description></item>
@@ -88,7 +86,7 @@ protected:
 	unsigned int _digestSize;
 	bool _isInitialized;
 	std::vector<byte> _inputPad;
-	IDigest *_msgDigest;
+	CEX::Digest::IDigest *_msgDigest;
 	std::vector<byte> _outputPad;
 
 public:
@@ -103,7 +101,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const Macs Enumeral() { return Macs::HMAC; }
+	virtual const CEX::Enumeration::Macs Enumeral() { return CEX::Enumeration::Macs::HMAC; }
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
@@ -129,7 +127,7 @@ public:
 	/// <param name="Digest">Message Digest instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if a null digest is used</exception>
-	HMAC(IDigest *Digest)
+	HMAC(CEX::Digest::IDigest *Digest)
 		:
 		_msgDigest(Digest),
 		_blockSize(Digest->BlockSize()),

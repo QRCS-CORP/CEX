@@ -3,8 +3,6 @@
 
 NAMESPACE_MAC
 
-using CEX::Utility::IntUtils;
-
 void VMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
 {
 	if ((InOffset + Length) > Input.size())
@@ -39,10 +37,10 @@ void VMAC::Destroy()
 		_X2 = 0;
 		_X3 = 0;
 		_X4 = 0;
-		IntUtils::ClearVector(_P);
-		IntUtils::ClearVector(_T);
-		IntUtils::ClearVector(_workingKey);
-		IntUtils::ClearVector(_workingIV);
+		CEX::Utility::IntUtils::ClearVector(_P);
+		CEX::Utility::IntUtils::ClearVector(_T);
+		CEX::Utility::IntUtils::ClearVector(_workingKey);
+		CEX::Utility::IntUtils::ClearVector(_workingIV);
 		_isDestroyed = true;
 	}
 }

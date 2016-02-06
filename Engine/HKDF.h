@@ -39,9 +39,6 @@
 
 NAMESPACE_GENERATOR
 
-using CEX::Mac::HMAC;
-using CEX::Digest::IDigest;
-
 /// <summary>
 /// HKDF: An implementation of an Hash based Key Derivation Function.
 /// <para>HKDF as outlined in RFC 5869</para>
@@ -52,13 +49,13 @@ using CEX::Digest::IDigest;
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Mac::HMAC">CEX::Mac::HMAC HMAC</seealso>
-/// <seealso cref="CEX::Digest">CEX::Digest Namespace</seealso>
-/// <seealso cref="CEX::Digest::IDigest">CEX::Digest::IDigest Interface</seealso>
-/// <seealso cref="CEX::Enumeration::Digests">CEX::Enumeration::Digests Enumeration</seealso>
+/// <seealso cref="CEX::Mac::HMAC"/>
+/// <seealso cref="CEX::Digest"/>
+/// <seealso cref="CEX::Digest::IDigest"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Can be initialized with a Digest or a Mac.</description></item>
 /// <item><description>Salt size should be multiple of Digest block size.</description></item>
@@ -66,7 +63,7 @@ using CEX::Digest::IDigest;
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>RFC 5869: <see href="http://tools.ietf.org/html/rfc5869">Specification</see>.</description></item>
 /// <item><description>HKDF Scheme: <see href="http://tools.ietf.org/html/rfc5869">Whitepaper</see>.</description></item>
@@ -77,13 +74,13 @@ class HKDF : public IGenerator
 protected:
 	std::vector<byte> _currentT;
 	std::vector<byte> _digestInfo;
-	HMAC *_digestMac;
+	CEX::Mac::HMAC *_digestMac;
 	unsigned int _generatedBytes;
 	unsigned int _hashSize;
 	bool _isDestroyed;
 	bool _isInitialized;
 	unsigned int _keySize;
-	IDigest* _msgDigest;
+	CEX::Digest::IDigest* _msgDigest;
 
 public:
 
@@ -92,7 +89,7 @@ public:
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const Generators Enumeral() { return Generators::HKDF; }
+	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::HKDF; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -119,7 +116,7 @@ public:
 	/// <param name="Digest">The initialized message digest to be used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	HKDF(IDigest* Digest)
+	HKDF(CEX::Digest::IDigest* Digest)
 		:
 		_isDestroyed(false),
 		_currentT(Digest->DigestSize(), 0),
@@ -130,7 +127,7 @@ public:
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
 
-		 _digestMac = new HMAC(Digest);
+		 _digestMac = new CEX::Mac::HMAC(Digest);
 	}
 
 	/// <summary>
@@ -140,7 +137,7 @@ public:
 	/// <param name="Hmac">The initialized HMAC to be used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null HMAC is used</exception>
-	HKDF(HMAC* Hmac)
+	HKDF(CEX::Mac::HMAC* Hmac)
 		:
 		_digestMac(Hmac),
 		_isDestroyed(false),

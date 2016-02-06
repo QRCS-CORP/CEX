@@ -4,8 +4,6 @@
 
 NAMESPACE_SEED
 
-using CEX::Utility::IntUtils;
-
 //** Public Methods **//
 
 void XSPRsg::Destroy()
@@ -14,8 +12,8 @@ void XSPRsg::Destroy()
 	{
 		_isShift1024 = false;
 		_stateOffset = 0;
-		IntUtils::ClearVector(_stateSeed);
-		IntUtils::ClearVector(_wrkBuffer);
+		CEX::Utility::IntUtils::ClearVector(_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(_wrkBuffer);
 		_isDestroyed = true;
 	}
 }

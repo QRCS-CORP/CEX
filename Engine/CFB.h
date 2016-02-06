@@ -53,11 +53,11 @@ NAMESPACE_MODE
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">CEX::Cipher::Symmetric::Block::Mode::ICipherMode Interface</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>In CFB mode, only decryption can be processed in parallel.</description></item>
 /// <item><description>Parallel processing is enabled on decryption by passing a block size of ParallelBlockSize to the transform.</description></item>
@@ -65,7 +65,7 @@ NAMESPACE_MODE
 /// <item><description>Parallel block calculation ex. <c>int blocklen = (data.size() / cipher.ParallelMinimumSize()) * 100</c></description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
 /// </list>
@@ -211,15 +211,15 @@ class CFB : public ICipherMode
 		/// Initialize the Cipher
 		/// </summary>
 		/// 
-		/// <param name="Encryption">Cipher is used. for encryption, false to decrypt</param>
+		/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 		/// <param name="KeyParam">KeyParams containing key and std::vector</param>
 		/// 
 		/// <exception cref="CryptoCipherModeException">Thrown if a null Key or IV is used</exception>
-		virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+		virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 		/// <summary>
-		/// <para>Transform a block of bytes. 
-		/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+		/// Transform a block of bytes. 
+		/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 		/// </summary>
 		/// 
 		/// <param name="Input">Input bytes to Transform</param>
@@ -227,8 +227,8 @@ class CFB : public ICipherMode
 		virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 		/// <summary>
-		/// <para>Transform a block of bytes with offset parameters. 
-		/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+		/// Transform a block of bytes with offset parameters. 
+		/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 		/// </summary>
 		/// 
 		/// <param name="Input">Input bytes to Transform</param>
@@ -238,8 +238,8 @@ class CFB : public ICipherMode
 		virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
 		/// <summary>
-		/// <para>Decrypt a single block of bytes.
-		/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+		/// Decrypt a single block of bytes.
+		/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 		/// </summary>
 		///
 		/// <param name="Input">Encrypted bytes</param>
@@ -247,8 +247,8 @@ class CFB : public ICipherMode
 		void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 		/// <summary>
-		/// <para>Decrypt a block of bytes with offset parameters.
-		/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+		/// Decrypt a block of bytes with offset parameters.
+		/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 		/// </summary>
 		///
 		/// <param name="Input">Encrypted bytes</param>
@@ -258,8 +258,8 @@ class CFB : public ICipherMode
 		void DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
 		/// <summary>
-		/// <para>Encrypt a block of bytes.
-		/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+		/// Encrypt a block of bytes.
+		/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 		/// </summary>
 		///
 		/// <param name="Input">Input bytes to Transform</param>
@@ -267,8 +267,8 @@ class CFB : public ICipherMode
 		void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 		/// <summary>
-		/// <para>Encrypt a block of bytes with offset parameters.
-		/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+		/// Encrypt a block of bytes with offset parameters.
+		/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 		/// </summary>
 		///
 		/// <param name="Input">Input bytes to Transform</param>

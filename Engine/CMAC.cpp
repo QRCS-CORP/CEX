@@ -5,10 +5,6 @@
 
 NAMESPACE_MAC
 
-using CEX::Cipher::Symmetric::Block::Padding::ISO7816;
-using CEX::Common::KeyParams;
-using CEX::Utility::IntUtils;
-
 void CMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
 {
 	if ((InOffset + Length) > Input.size())
@@ -62,10 +58,10 @@ void CMAC::Destroy()
 	{
 		_blockSize = 0;
 		_isInitialized = false;
-		IntUtils::ClearVector(_K1);
-		IntUtils::ClearVector(_K2);
-		IntUtils::ClearVector(_msgCode);
-		IntUtils::ClearVector(_wrkBuffer);
+		CEX::Utility::IntUtils::ClearVector(_K1);
+		CEX::Utility::IntUtils::ClearVector(_K2);
+		CEX::Utility::IntUtils::ClearVector(_msgCode);
+		CEX::Utility::IntUtils::ClearVector(_wrkBuffer);
 		_macSize = 0;
 		_wrkOffset = 0;
 		_isDestroyed = true;
@@ -79,13 +75,13 @@ unsigned int CMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
 
 	if (_wrkOffset != _blockSize)
 	{
-		ISO7816 pad;
+		CEX::Cipher::Symmetric::Block::Padding::ISO7816 pad;
 		pad.AddPadding(_wrkBuffer, _wrkOffset);
-		IntUtils::XORBLK(_K2, 0, _wrkBuffer, 0, _macSize);
+		CEX::Utility::IntUtils::XORBLK(_K2, 0, _wrkBuffer, 0, _macSize);
 	}
 	else
 	{
-		IntUtils::XORBLK(_K1, 0, _wrkBuffer, 0, _macSize);
+		CEX::Utility::IntUtils::XORBLK(_K1, 0, _wrkBuffer, 0, _macSize);
 	}
 
 	_cipherMode->Transform(_wrkBuffer, 0, _msgCode, 0);
@@ -149,7 +145,7 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 	return tmpk;
 }
 
-void CMAC::LoadCipher(IBlockCipher* Cipher)
+void CMAC::LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher)
 {
 	_cipherMode = new CEX::Cipher::Symmetric::Block::Mode::CBC(Cipher);
 }

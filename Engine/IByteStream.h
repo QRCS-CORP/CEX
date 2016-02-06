@@ -6,6 +6,7 @@
 #include "CryptoProcessingException.h"
 
 NAMESPACE_IO
+
 using CEX::Exception::CryptoProcessingException;
 
 /// <summary>
@@ -125,7 +126,7 @@ public:
 	///
 	/// <returns>The number of bytes written</returns>
 	///
-	/// <exception cref="CryptoProcessingException">Thrown if Output array is too small</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
 	virtual void Write(const std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count) = 0;
 
 	/// <summary>

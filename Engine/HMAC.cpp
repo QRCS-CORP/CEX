@@ -3,8 +3,6 @@
 
 NAMESPACE_MAC
 
-using CEX::Utility::IntUtils;
-
 void HMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
 {
 	if (InOffset + Length > Input.size())
@@ -28,8 +26,8 @@ void HMAC::Destroy()
 		_blockSize = 0;
 		_digestSize = 0;
 		_isInitialized = false;
-		IntUtils::ClearVector(_inputPad);
-		IntUtils::ClearVector(_outputPad);
+		CEX::Utility::IntUtils::ClearVector(_inputPad);
+		CEX::Utility::IntUtils::ClearVector(_outputPad);
 	}
 }
 

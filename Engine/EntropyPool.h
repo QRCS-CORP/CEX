@@ -37,11 +37,7 @@ public:
 	void Destroy()
 	{
 		if (!_isDestroyed)
-		{
-			//CEX::Utility::IntUtils::ClearVector(_key);
-
 			_isDestroyed = true;
-		}
 	}
 };
 

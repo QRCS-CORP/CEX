@@ -53,17 +53,17 @@ NAMESPACE_MODE
 /// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
 /// </revisionHistory>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block">CEX::Cipher::Symmetric::Block Namespace</seealso>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">CEX::Cipher::Symmetric::Block::Mode ICipherMode Interface</seealso>
-/// <seealso cref="CEX::Enumeration::BlockCiphers">CEX::Enumeration BlockCiphers Enumeration</seealso>
+/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
+/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
+/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>ECB is not a secure mode, and should only be used for testing.</description></item>
 /// </list>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
 /// </list>
@@ -188,8 +188,8 @@ public:
 	// *** Public Methods *** //
 
 	/// <summary>
-	/// <para>Decrypt a single block of bytes.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Decrypt a single block of bytes.
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
@@ -197,8 +197,8 @@ public:
 	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
-	/// <para>Decrypt a block of bytes with offset parameters.
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Decrypt a block of bytes with offset parameters.
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
@@ -213,8 +213,8 @@ public:
 	virtual void Destroy();
 
 	/// <summary>
-	/// <para>Encrypt a block of bytes. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Encrypt a block of bytes. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>
@@ -222,8 +222,8 @@ public:
 	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
-	/// <para>Encrypt a block of bytes with offset parameters. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Encrypt a block of bytes with offset parameters. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>
@@ -236,23 +236,23 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Cipher is used. for encryption, false to decrypt</param>
+	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 	/// <param name="KeyParam">KeyParam containing key and vector</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or IV is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
 
 	/// <summary>
-	/// <para>Transform a block of bytes. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Transform a block of bytes. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// <param name="Input">Input bytes to Transform</param>
 	/// <param name="Output">Output product of Transform</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
-	/// <para>Transform a block of bytes with offset parameters. 
-	/// <see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.</para>
+	/// Transform a block of bytes with offset parameters. 
+	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Input bytes to Transform</param>

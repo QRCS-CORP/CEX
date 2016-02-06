@@ -7,7 +7,6 @@
 
 NAMESPACE_SEED
 
-using CEX::Enumeration::SeedGenerators;
 using CEX::Exception::CryptoRandomException;
 
 /// <summary>
@@ -33,7 +32,7 @@ public:
 	/// <summary>
 	/// Get: The seed generators type name
 	/// </summary>
-	virtual const SeedGenerators Enumeral() = 0;
+	virtual const CEX::Enumeration::SeedGenerators Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Algorithm name

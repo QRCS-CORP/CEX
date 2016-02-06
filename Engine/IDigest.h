@@ -8,7 +8,6 @@
 NAMESPACE_DIGEST
 
 using CEX::Exception::CryptoDigestException;
-using CEX::Enumeration::Digests;
 
 /// <summary>
 /// Hash Digest Interface
@@ -31,7 +30,7 @@ public:
 	// *** Properties *** //
 
 	/// <summary>
-	/// Get: The Digests internal blocksize in bytes
+	/// Get: The Digests internal block size in bytes
 	/// </summary>
 	virtual unsigned int BlockSize() = 0;
 
@@ -43,7 +42,7 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual Digests Enumeral() = 0;
+	virtual CEX::Enumeration::Digests Enumeral() = 0;
 
 	/// <summary>
 	/// Get: The Digest name
