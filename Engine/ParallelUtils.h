@@ -42,7 +42,14 @@ public:
 		}
 	};
 
+	/// <summary>
+	/// Get The number of processors available on the system
+	/// </summary>
 	static int ProcessorCount();
+
+	/// <summary>
+	/// A multi platform Parallel For loop
+	/// </summary>
 	static void ParallelFor(int From, int To, const std::function<void(int)> &F);
 };
 

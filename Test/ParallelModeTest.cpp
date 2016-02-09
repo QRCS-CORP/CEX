@@ -377,7 +377,7 @@ namespace Test
 		_decText.reserve(MAX_ALLOC);
 		_plnText.reserve(MAX_ALLOC);
 
-		for (int i = 0; i < 32; i++)
+		for (unsigned int i = 0; i < 32; i++)
 			_key[i] = (byte)i;
 		for (int i = 15; i != 0; i--)
 			_iv[i] = (byte)i;
@@ -437,7 +437,6 @@ namespace Test
 
 		if (alnSize != inpSize)
 		{
-			unsigned int cnkSize = inpSize - alnSize;
 			BlockDecrypt(Cipher, Padding, Input, InOffset, Output, OutOffset);
 		}
 	}
@@ -461,7 +460,7 @@ namespace Test
 			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
 			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
 
-			for (int i = 0; i < 10; i++)
+			for (unsigned int i = 0; i < 10; i++)
 			{
 				unsigned int sze = rng.Next(MIN_ALLOC, MAX_ALLOC);
 				_cipherText.resize(sze);
@@ -503,7 +502,7 @@ namespace Test
 			cipher.IsParallel() = false;
 			CEX::Cipher::Symmetric::Block::Padding::ISO7816 pad;
 
-			for (int i = 0; i < 10; i++)
+			for (unsigned int i = 0; i < 10; i++)
 			{
 				unsigned int sze = rng.Next(MIN_ALLOC, MAX_ALLOC);
 				_cipherText.resize(sze);
@@ -533,7 +532,7 @@ namespace Test
 			cipher.IsParallel() = false;
 			CEX::Cipher::Symmetric::Block::Padding::ISO7816 pad;
 
-			for (int i = 0; i < 10; i++)
+			for (unsigned int i = 0; i < 10; i++)
 			{
 				unsigned int sze = rng.Next(MIN_ALLOC, MAX_ALLOC);
 				_cipherText.resize(sze);

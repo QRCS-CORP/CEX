@@ -16,12 +16,12 @@ namespace Test
 		const std::string DESCRIPTION = "Cipher Speed Tests.";
 		const std::string FAILURE = "FAILURE! ";
 		const std::string MESSAGE = "COMPLETE! HX tests have executed succesfully.";
-		const unsigned int MB1 = 1000000;
-		const unsigned int MB10 = 10000000;
-		const unsigned int MB100 = 100000000;
-		const unsigned int GB1 = 1000000000;
-		const unsigned int DATA_SIZE = MB100;
-		const unsigned int LOOPS = 10;
+		static constexpr unsigned int MB1 = 1000000;
+		static constexpr unsigned int MB10 = 10000000;
+		static constexpr unsigned int MB100 = 100000000;
+		static constexpr unsigned int GB1 = 1000000000;
+		static constexpr unsigned int DATA_SIZE = MB100;
+		static constexpr unsigned int DEFITER = 10;
 
 		TestEventHandler _progressEvent;
 		std::vector<byte> _key256;
@@ -54,11 +54,11 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CipherModeLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, bool Parallel = false, int KeySize = 32, int IvSize = 16, int Loops = 10);
+		void CipherModeLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, bool Parallel = false, int KeySize = 32, int IvSize = 16, unsigned int Loops = DEFITER);
 		std::string GetRate(uint64_t StartTime, uint64_t DataSize);
 		void Initialize();
-		void ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode *Cipher, unsigned int SampleSize, unsigned int KeySize, unsigned int IvSize = 16);
-		void ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher *Cipher, int KeySize, int IvSize = 16);
+		void ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, unsigned int KeySize, unsigned int IvSize = 16, unsigned int Loops = DEFITER);
+		void ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, int KeySize, int IvSize = 16, unsigned int Loops = DEFITER);
 		void OnProgress(char* Data);
 		void RDXSpeedTest();
 		void RHXSpeedTest(int Rounds = 22);

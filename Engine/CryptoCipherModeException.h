@@ -16,11 +16,14 @@ private:
 
 public:
 	/// <summary>
-	/// The origin of the exception in the format Class:Method
+	/// The origin of the exception in the format Class
 	/// </summary>
 	const std::string &Origin() const { return _origin; }
 	std::string &Origin() { return _origin; }
 
+	/// <summary>
+	/// The message associated with the error
+	/// </summary>
 	const std::string &Message() const { return _message; }
 	std::string &Message() { return _message; }
 

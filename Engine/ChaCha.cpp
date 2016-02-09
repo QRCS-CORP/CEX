@@ -119,7 +119,7 @@ void ChaCha::Increase(const std::vector<uint> &Counter, const unsigned int Size,
 		Increment(Buffer);
 }
 
-void ChaCha::ChaCha::Increment(std::vector<uint> &Counter)
+void ChaCha::Increment(std::vector<uint> &Counter)
 {
 	if (++Counter[0] == 0)
 		++Counter[1];

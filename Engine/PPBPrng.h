@@ -32,8 +32,7 @@
 NAMESPACE_PRNG
 
 /// <summary>
-/// PBPRng: An implementation of a passphrase based PKCS#5 random number generator.
-/// <para>Implements PKCS#5 as defined in RFC 2898</para>
+/// PBPRng: An implementation of a passphrase based PKCS#5 random number generator
 /// </summary>
 /// 
 /// <example>
@@ -44,10 +43,6 @@ NAMESPACE_PRNG
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Mac::HMAC"/>
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
@@ -55,12 +50,17 @@ NAMESPACE_PRNG
 /// <remarks>
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2898">2898</a>: Password-Based Cryptography Specification Version 2.0.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2898">2898</a>: Specification.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">SP800-22 1a</a>, Section D.3: A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Fips 140-2</a>: Security Requirments For Cryptographic Modules.</description></item>
+/// <item><description>RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requirements for Security.</description></item>
 /// </list>
 /// </remarks>
 class PPBPrng : public IRandom
 {
-protected:
+private:
 	static constexpr unsigned int PKCS_ITERATIONS = 2;
 	static constexpr unsigned int BUFFER_SIZE = 1024;
 
@@ -208,7 +208,7 @@ public:
 	/// </summary>
 	virtual void Reset();
 
-protected:
+private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests RngEngine);

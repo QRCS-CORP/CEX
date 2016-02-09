@@ -6,9 +6,15 @@
 NAMESPACE_PADDING
 
 /// <summary>
-/// The PKCS7 Padding Scheme.
-/// <para>PKCS7 as outlined in RFC 5652: <see href="http://tools.ietf.org/html/rfc5652"/></para>
+/// The PKCS7 Padding Scheme
 /// </summary>
+/// 
+/// <remarks>
+/// <description>Guiding Publications:</description>
+/// <list type="number">
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc5652">5652</a>.</description></item>
+/// </list>
+/// </remarks>
 class PKCS7 : public IPadding
 {
 public:

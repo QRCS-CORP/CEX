@@ -31,8 +31,7 @@
 NAMESPACE_GENERATOR
 
 /// <summary>
-/// PBKDF2 V2: An implementation of an Hash based Key Derivation Function.
-/// <para>PBKDF2 Version 2, as outlined in RFC 2898</para>
+/// PBKDF2 V2: An implementation of an Hash based Key Derivation Function
 /// </summary> 
 /// 
 /// <example>
@@ -45,10 +44,6 @@ NAMESPACE_GENERATOR
 /// rnd.Generate(Output, [Offset], [Size]);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Mac::HMAC"/>
 /// <seealso cref="CEX::Digest::IDigest"/>
@@ -65,12 +60,12 @@ NAMESPACE_GENERATOR
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
+/// <item><description>RFC 2898: <a href="http://tools.ietf.org/html/rfc2898">Specification</a>.</description></item>
 /// </list>
 /// </remarks>
 class PBKDF2 : public IGenerator
 {
-protected:
+private:
 	static constexpr unsigned int PKCS_ITERATIONS = 1000;
 
 	unsigned int _blockSize;
@@ -119,7 +114,7 @@ public:
 	/// Creates a PBKDF2 Bytes Generator based on the given hash function
 	/// </summary>
 	/// 
-	/// <param name="Digest">The digest used</param>
+	/// <param name="Digest">The digest instance</param>
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or Iterations count is used</exception>
@@ -144,7 +139,7 @@ public:
 	/// Creates a PBKDF2 Bytes Generator based on the given hash function
 	/// </summary>
 	/// 
-	/// <param name="Digest">The digest used</param>
+	/// <param name="Hmac">The Hmac instance</param>
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or invalid Iterations count is used</exception>
@@ -237,7 +232,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Salt value is too small</exception>
 	virtual void Update(const std::vector<byte> &Salt);
 
-protected:
+private:
 	unsigned int GenerateKey(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
 	void IntToOctet(std::vector<byte> &Output, unsigned int Counter);
 	void Process(std::vector<byte> Input, std::vector<byte> &Output, unsigned int OutOffset);

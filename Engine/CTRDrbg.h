@@ -35,8 +35,7 @@
 NAMESPACE_GENERATOR
 
 /// <summary>
-/// CTRDrbg: An implementation of a Encryption Counter based Deterministic Random Byte Generator.
-/// <para>A Block Cipher Counter DRBG as outlined in NIST document: SP800-90A</para>
+/// CTRDrbg: An implementation of a Encryption Counter based Deterministic Random Byte Generator
 /// </summary> 
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_GENERATOR
 /// rnd.Generate(Output, [Offset], [Size]);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Cipher::Symmetric::Block"/>
 /// <seealso cref="CEX::Enumeration::BlockCiphers"/>
@@ -69,15 +64,15 @@ NAMESPACE_GENERATOR
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
-/// <item><description>NIST Fips 140-2: <see href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Security Requirments For Cryptographic Modules</see>.</description></item>
-/// <item><description>NIST SP800-22 1a: <see href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</see>.</description></item>
-/// <item><description>Security Bounds for the NIST Codebook-based: <see href="http://eprint.iacr.org/2006/379.pdf">Deterministic Random Bit Generator</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Fips 140-2</a>: Security Requirments For Cryptographic Modules.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">SP800-22 1a</a>: A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications.</description></item>
+/// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
 class CTRDrbg : public IGenerator
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 1024;
 	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
 	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
@@ -155,7 +150,7 @@ public:
 	/// Creates a HKDF Bytes Generator using the given HMAC function
 	/// </summary>
 	/// 
-	/// <param name="Hmac">The HMAC digest used</param>
+	/// <param name="Cipher">The Block Cipher instance</param>
 	/// <param name="KeySize">The internal ciphers key size; calculated automatically if this value is zero</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null cipher is used</exception>
@@ -262,7 +257,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Salt is too small</exception>
 	virtual void Update(const std::vector<byte> &Salt);
 
-protected:
+private:
 	void Generate(const unsigned int Length, std::vector<byte> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Increment(std::vector<byte> &Counter);
 	void Increase(const std::vector<byte> &Counter, const unsigned int Size, std::vector<byte> &Buffer);

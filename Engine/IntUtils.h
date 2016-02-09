@@ -23,7 +23,7 @@ public:
 	{
 		Value = ((Value & 0xAA) >> 1) | ((Value & 0x55) << 1);
 		Value = ((Value & 0xCC) >> 2) | ((Value & 0x33) << 2);
-		return RotlFixed(Value, 4);
+		return (byte)RotlFixed(Value, 4);
 	}
 
 	static inline ushort BitReverse(ushort Value)
@@ -96,7 +96,7 @@ public:
 
 	static inline ushort ByteReverse(ushort Value)
 	{
-		return RotlFixed(Value, 8U);
+		return (ushort)RotlFixed(Value, 8U);
 	}
 
 	static inline uint ByteReverse(uint Value)
@@ -250,7 +250,7 @@ public:
 	/// Convert a Little Endian 64 bit dword to bytes
 	/// </summary>
 	/// 
-	/// <param name="Word">The 64 bit word</param>
+	/// <param name="DWord">The 64 bit word</param>
 	/// <param name="Block">The destination bytes</param>
 	/// <param name="Offset">Offset within the destination block</param>
 	static inline void Le64ToBytes(const ulong DWord, std::vector<byte> &Block, const uint Offset)
@@ -395,28 +395,28 @@ public:
 		Block[Offset + 3] = (byte)(Word >> 24);
 	}
 
-	static inline void Word64ToBytes(const ulong Word, std::vector<byte> &Block)
+	static inline void Word64ToBytes(const ulong DWord, std::vector<byte> &Block)
 	{
-		Block[0] = (byte)Word;
-		Block[1] = (byte)(Word >> 8);
-		Block[2] = (byte)(Word >> 16);
-		Block[3] = (byte)(Word >> 24);
-		Block[4] = (byte)(Word >> 32);
-		Block[5] = (byte)(Word >> 40);
-		Block[6] = (byte)(Word >> 48);
-		Block[7] = (byte)(Word >> 56);
+		Block[0] = (byte)DWord;
+		Block[1] = (byte)(DWord >> 8);
+		Block[2] = (byte)(DWord >> 16);
+		Block[3] = (byte)(DWord >> 24);
+		Block[4] = (byte)(DWord >> 32);
+		Block[5] = (byte)(DWord >> 40);
+		Block[6] = (byte)(DWord >> 48);
+		Block[7] = (byte)(DWord >> 56);
 	}
 
-	static inline void Word64ToBytes(const ulong Word, std::vector<byte> &Block, uint Offset)
+	static inline void Word64ToBytes(const ulong DWord, std::vector<byte> &Block, uint Offset)
 	{
-		Block[Offset] = (byte)Word;
-		Block[Offset + 1] = (byte)(Word >> 8);
-		Block[Offset + 2] = (byte)(Word >> 16);
-		Block[Offset + 3] = (byte)(Word >> 24);
-		Block[Offset + 4] = (byte)(Word >> 32);
-		Block[Offset + 5] = (byte)(Word >> 40);
-		Block[Offset + 6] = (byte)(Word >> 48);
-		Block[Offset + 7] = (byte)(Word >> 56);
+		Block[Offset] = (byte)DWord;
+		Block[Offset + 1] = (byte)(DWord >> 8);
+		Block[Offset + 2] = (byte)(DWord >> 16);
+		Block[Offset + 3] = (byte)(DWord >> 24);
+		Block[Offset + 4] = (byte)(DWord >> 32);
+		Block[Offset + 5] = (byte)(DWord >> 40);
+		Block[Offset + 6] = (byte)(DWord >> 48);
+		Block[Offset + 7] = (byte)(DWord >> 56);
 	}
 #else
 	static inline unsigned short BytesToWord16(const std::vector<byte> &Block)
@@ -505,28 +505,28 @@ public:
 		Block[Offset] = (byte)(Word >> 24);
 	}
 
-	static inline void Word64ToBytes(const ulong Word, std::vector<byte> &Block)
+	static inline void Word64ToBytes(const ulong DWord, std::vector<byte> &Block)
 	{
-		Block[7] = (byte)Word;
-		Block[6] = (byte)(Word >> 8);
-		Block[5] = (byte)(Word >> 16);
-		Block[4] = (byte)(Word >> 24);
-		Block[3] = (byte)(Word >> 32);
-		Block[2] = (byte)(Word >> 40);
-		Block[1] = (byte)(Word >> 48);
-		Block[0] = (byte)(Word >> 56);
+		Block[7] = (byte)DWord;
+		Block[6] = (byte)(DWord >> 8);
+		Block[5] = (byte)(DWord >> 16);
+		Block[4] = (byte)(DWord >> 24);
+		Block[3] = (byte)(DWord >> 32);
+		Block[2] = (byte)(DWord >> 40);
+		Block[1] = (byte)(DWord >> 48);
+		Block[0] = (byte)(DWord >> 56);
 	}
 
-	static inline void Word64ToBytes(const ulong Word, std::vector<byte> &Block, uint Offset)
+	static inline void Word64ToBytes(const ulong DWord, std::vector<byte> &Block, uint Offset)
 	{
-		Block[Offset + 7] = (byte)Word;
-		Block[Offset + 6] = (byte)(Word >> 8);
-		Block[Offset + 5] = (byte)(Word >> 16);
-		Block[Offset + 4] = (byte)(Word >> 24);
-		Block[Offset + 3] = (byte)(Word >> 32);
-		Block[Offset + 2] = (byte)(Word >> 40);
-		Block[Offset + 1] = (byte)(Word >> 48);
-		Block[Offset] = (byte)(Word >> 56);
+		Block[Offset + 7] = (byte)DWord;
+		Block[Offset + 6] = (byte)(DWord >> 8);
+		Block[Offset + 5] = (byte)(DWord >> 16);
+		Block[Offset + 4] = (byte)(DWord >> 24);
+		Block[Offset + 3] = (byte)(DWord >> 32);
+		Block[Offset + 2] = (byte)(DWord >> 40);
+		Block[Offset + 1] = (byte)(DWord >> 48);
+		Block[Offset] = (byte)(DWord >> 56);
 	}
 #endif
 

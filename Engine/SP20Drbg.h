@@ -34,8 +34,7 @@
 NAMESPACE_GENERATOR
 
 /// <summary>
-/// SP20Drbg: A parallelized Salsa20 deterministic random byte generator implementation.
-/// <para>A Salsa20 key stream, parallelized and extended to use up to 30 rounds of diffusion.</para>
+/// SP20Drbg: A parallelized Salsa20 deterministic random byte generator implementation
 /// </summary>
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_GENERATOR
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -64,15 +59,15 @@ NAMESPACE_GENERATOR
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
+/// <item><description>Salsa20 <a href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/design.pdf">Design</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/security.pdf">Security</a>.</description></item>
 /// </list>
 /// 
 /// </remarks>
 class SP20Drbg : public IGenerator
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 64;
 	static constexpr unsigned int DEFAULT_ROUNDS = 20;
 	static constexpr unsigned int KEY_SIZE = 32;
@@ -173,11 +168,10 @@ public:
 	// *** Constructor *** //
 
 	/// <summary>
-	/// Creates a HKDF Bytes Generator based on the given HMAC function
+	/// Initialize the SP20 generator
 	/// </summary>
 	/// 
-	/// <param name="Hmac">The HMAC digest used</param>
-	/// <param name="DestroyEngine">Destroy the digest engine when the finalizer is called</param>
+	/// <param name="Rounds">The number of transformation rounds</param>
 	SP20Drbg(unsigned int Rounds = 20)
 		:
 		_ctrVector(2, 0),
@@ -267,7 +261,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Salt value is too small</exception>
 	virtual void Update(const std::vector<byte> &Salt);
 
-protected:
+private:
 	void Generate(const unsigned int Length, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);

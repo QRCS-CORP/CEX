@@ -28,11 +28,11 @@ namespace Test
 	{
 		CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
 		CEX::Generator::CTRDrbg ctd(eng);
-		int ksze = 48;
+		unsigned int ksze = 48;
 		std::vector<byte> key(ksze);
 		std::vector<byte> output(1024);
 
-		for (int i = 0; i < ksze; i++)
+		for (unsigned int i = 0; i < ksze; i++)
 			key[i] = (byte)i;
 
 		ctd.Initialize(key);

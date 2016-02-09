@@ -113,7 +113,7 @@ public:
 	/// Set the length of the stream
 	/// </summary>
 	/// 
-	/// <param name="Offset">The desired length</param>
+	/// <param name="Length">The desired length</param>
 	virtual void SetLength(unsigned int Length) = 0;
 
 	/// <summary>

@@ -24,10 +24,6 @@ NAMESPACE_PRCSTRUCT
 /// </code>
 /// </example>
 ///
-/// <revisionHistory>
-/// <revision date="2015/05/22" version="1.3.6.0">Initial release</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Common::CipherDescription"/>
 struct CipherKey
 {

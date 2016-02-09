@@ -23,7 +23,7 @@
 // 
 // Implementation Details:
 // An implementation of a Cryptographically Secure Pseudo Random Number Generator (RCSP). 
-// Uses the <see href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</see> class to produce pseudo random output.
+// Uses the <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</a> class to produce pseudo random output.
 // Written by John Underhill, January 6, 2014
 // contact: develop@vtdev.com
 
@@ -36,7 +36,7 @@
 NAMESPACE_PRNG
 
 /// <summary>
-/// An implementation of a Cryptographically Secure PRNG using the the operating system random provider.
+/// An implementation of a Cryptographically Secure PRNG using the the operating system random provider
 /// </summary>
 /// 
 /// <example>
@@ -47,21 +47,18 @@ NAMESPACE_PRNG
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Guiding Publications::</description>
 /// <list type="number">
-/// <item><description>NIST SP800-90B: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
-/// <item><description>NIST Fips 140-2: Security Requirments For Cryptographic Modules.</description></item>
-/// <item><description>RFC 4086: Randomness Requirements for Security.</description></item>
+/// <item><description>Microsoft <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</a>: class documentation.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Fips 140-2</a>: Security Requirments For Cryptographic Modules.</description></item>
+/// <item><description>RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requirements for Security.</description></item>
 /// </list> 
 /// </remarks>
 class CSPPrng : public IRandom
 {
-protected:
+private:
 	bool _isDestroyed;
 	CEX::Seed::CSPRsg* _rngCrypto;
 
@@ -120,7 +117,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	virtual void GetBytes(std::vector<byte> &Data);
+	virtual void GetBytes(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -179,7 +176,7 @@ public:
 	/// </summary>
 	virtual void Reset();
 
-protected:
+private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 };

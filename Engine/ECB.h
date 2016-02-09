@@ -34,8 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements an Electronic Cookbook Mode: ECB (Insecure Mode; For Testing Only!).
-/// <para>ECB as outlined in the NIST document: SP800-38A</para>
+/// Implements an Electronic Cookbook Mode: ECB (Insecure Mode; For Testing Only!)
 /// </summary> 
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_MODE
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Cipher::Symmetric::Block"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
 /// <seealso cref="CEX::Enumeration::BlockCiphers"/>
@@ -65,12 +60,12 @@ NAMESPACE_MODE
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</a>.</description></item>
 /// </list>
 /// </remarks>
 class ECB : public ICipherMode
 {
-protected:
+private:
 	IBlockCipher* _blockCipher;
 	unsigned int _blockSize;
 	bool _isDestroyed;
@@ -261,7 +256,7 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
-protected:
+private:
 	void SetScope();
 };
 

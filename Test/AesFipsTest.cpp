@@ -9,7 +9,7 @@ namespace Test
 		{
 			Initialize();
 
-			for (int i = 0; i < 12; i++)
+			for (unsigned int i = 0; i < 12; i++)
 				CompareVector(_keys[i], _plainText[i], _cipherText[i]);
 
 			OnProgress("AesFipsTest: Passed FIPS 197 Monte Carlo tests..");
@@ -61,7 +61,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key);
 			engine.Initialize(true, k);
 
-			for (int i = 0; i != 10000; i++)
+			for (unsigned int i = 0; i != 10000; i++)
 				engine.Transform(outBytes, outBytes);
 		}
 
@@ -73,7 +73,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key);
 			engine.Initialize(false, k);
 
-			for (int i = 0; i != 10000; i++)
+			for (unsigned int i = 0; i != 10000; i++)
 				engine.Transform(outBytes, outBytes);
 		}
 

@@ -170,7 +170,7 @@ namespace Test
 		}
 	}
 
-	void SerpentTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, int Count)
+	void SerpentTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, unsigned int Count)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
@@ -179,7 +179,7 @@ namespace Test
 
 		eng.Initialize(true, k);
 
-		for (int i = 0; i != Count; i++)
+		for (unsigned int i = 0; i != Count; i++)
 			eng.Transform(outBytes, outBytes);
 
 		if (outBytes != Output)
@@ -193,10 +193,10 @@ namespace Test
 		std::vector<byte> decBytes(16, 0);
 		std::vector<byte> key(64, 0);
 
-		for (int i = 0; i < 16; i++)
-			inBytes[i] = i;
-		for (int i = 0; i < 64; i++)
-			key[i] = i;
+		for (unsigned int i = 0; i < 16; i++)
+			inBytes[i] = (byte)i;
+		for (unsigned int i = 0; i < 64; i++)
+			key[i] = (byte)i;
 
 		CEX::Cipher::Symmetric::Block::SHX eng;
 		CEX::Common::KeyParams k(key);

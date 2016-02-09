@@ -23,10 +23,10 @@
 // 
 // Principal Algorithms:
 // Portions of this cipher based on Serpent written by Ross Anderson, Eli Biham and Lars Knudsen:
-// Serpent <see href="http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf">Specification</see>.
+// Serpent <a href="http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf">Specification</a>.
 // 
 // The sboxes are based on the work of Brian Gladman and Sam Simpson.
-// <see href="http://fp.gladman.plus.com/cryptography_technology/serpent/">Specification</see>.
+// <a href="http://fp.gladman.plus.com/cryptography_technology/serpent/">Specification</a>.
 // Copyright: Dr B. R Gladman (gladman@seven77.demon.co.uk) and 
 // Sam Simpson (s.simpson@mia.co.uk), 17th December 1998.
 // 
@@ -60,10 +60,6 @@ NAMESPACE_BLOCK
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
 /// <seealso cref="CEX::Digest::IDigest"/>
@@ -81,11 +77,12 @@ NAMESPACE_BLOCK
 /// <para>It also takes a user defined number of rounds between 32 (the standard number of rounds), all the way up to 128 rounds in 8 round sets. 
 /// A round count of 40 or 48 is more than sufficient, as theoretical attacks to date are only able to break up to 12 rounds; and would require an enormous amount of memory and processing power.
 /// The transform in SHX is identical to the Serpent implementation SPX, it process rounds by first moving the byte input array into 4 integers, then processing the rounds in a while loop. 
-/// Each round consists of an XOR of each state word (<math>Rn</math>) with a key, an S-Box transformation of those words, and then a linear transformation. 
+/// Each round consists of an XOR of each state word (<c>Rn</c>) with a key, an S-Box transformation of those words, and then a linear transformation. 
 /// Each of the 8 S-Boxes are used in succession within a loop cycle. The final round XORs the last 4 keys with the state and shifts them back into the output byte array.</para>
 /// 
-/// <para>The key schedule in SHX powered by an HKDF generator, using a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
-/// This is one of the strongest methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even Serpents key schedule. HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
+/// <para>The key schedule in SHX powered by an HKDF bytes generator, using a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
+/// This is one of the strongest: methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even Serpents key schedule. 
+/// HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
 /// The HMAC RFC 2104, recommends a key size equal to the digest output, in the case of SHA512, 64 bytes, anything larger gets passed through the hash function to get the required 512 bit key size. 
 /// The Salt size is a minimum of the hash functions block size, with SHA-2 512 that is 128 bytes.</para>
 /// 
@@ -95,7 +92,7 @@ NAMESPACE_BLOCK
 /// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake, Keccak, SHA-2, or Skein.
 /// The default Digest Engine is SHA-2 512.</para>
 /// 
-/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <math>klen = h + (n * s)</math>, this will vary between Digest implementations. 
+/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <c>klen = h + (n * s)</c>, this will vary between Digest implementations. 
 /// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property.</para>
 /// 
 /// <para>The number of diffusion rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. 
@@ -104,16 +101,19 @@ NAMESPACE_BLOCK
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>Serpent: <see href="http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf">Specification</see>.</description></item>
-/// <item><description>HMAC: <see href="http://tools.ietf.org/html/rfc2104">RFC 2104</see>.</description></item>
-/// <item><description>Fips: <see href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198.1</see>.</description></item>
-/// <item><description>HKDF: <see href="http://tools.ietf.org/html/rfc5869">RFC 5869</see>.</description></item>
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</see>.</description></item>
+/// <item><description>Serpent: <a href="http://www.cl.cam.ac.uk/~rja14/Papers/serpent.pdf">Specification</a>.</description></item>
+/// <item><description>HMAC <a href="http://tools.ietf.org/html/rfc2104">RFC 2104</a>.</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198.1</a>.</description></item>
+/// <item><description>HKDF <a href="http://tools.ietf.org/html/rfc5869">RFC 5869</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>.</description></item>
+/// <item><description>SHA3 <a href="https://131002.net/blake/blake.pdf">The Blake digest</a>.</description></item>
+/// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">The Keccak digest</a>.</description></item>
+/// <item><description>SHA3 <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">The Skein digest</a>.</description></item>
 /// </list>
 /// </remarks>
 class SHX : public IBlockCipher
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 16;
 	static constexpr unsigned int LEGAL_KEYS = 14;
 	static constexpr unsigned int MAX_ROUNDS = 64;
@@ -250,7 +250,7 @@ public:
 	/// Initialize the class
 	/// </summary>
 	///
-	///<param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 32 rounds.</param>
+	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 32 rounds.</param>
 	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations. The default engine is SHA512.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
@@ -382,7 +382,7 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
-protected:
+private:
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);

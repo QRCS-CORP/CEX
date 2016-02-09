@@ -86,6 +86,10 @@ public:
 	/// <summary>
 	/// Initialize this class
 	/// </summary>
+	///
+	/// <param name="FileName">The full path to the file</param>
+	/// <param name="Access">The level of access requested</param>
+	/// <param name="Mode">The file processing mode</param>
 	FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileMode Mode = FileMode::Binary)
 		:
 		_fileAccess(Access),
@@ -184,7 +188,7 @@ public:
 	/// Set the length of the stream
 	/// </summary>
 	/// 
-	/// <param name="Offset">The desired length</param>
+	/// <param name="Length">The desired length</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the file is read only</exception>
 	virtual void SetLength(unsigned int Length);

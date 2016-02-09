@@ -18,20 +18,16 @@ NAMESPACE_SEED
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/06/09" version="1.0.0.0">Initial release</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>ISAAC: a fast cryptographic random number generator: <see href="http://www.burtleburtle.net/bob/rand/isaacafa.html"/>.</description></item>
-/// <item><description>Rossettacode example implementations: <see href="http://rosettacode.org/wiki/The_ISAAC_Cipher"/>.</description></item>
+/// <item><description>ISAAC a fast cryptographic <a href="http://www.burtleburtle.net/bob/rand/isaacafa.html">Random Number Generator</a>.</description></item>
+/// <item><description>Rossettacode <a href="http://rosettacode.org/wiki/The_ISAAC_Cipher">Example implementations</a>.</description></item>
 /// </list>
 /// </remarks>
 class ISCRsg : public ISeed
 {
-protected:
+private:
 	static constexpr int SIZE32 = 4;
 	static constexpr int SIZE64 = 8;
 	static constexpr int MAXSEED = 256;
@@ -127,7 +123,7 @@ public:
 	/// Fill the buffer with random bytes
 	/// </summary>
 	///
-	/// <param name="Input">The array to fill</param>
+	/// <param name="Output">The array to fill</param>
 	virtual void GetBytes(std::vector<byte> &Output);
 
 	/// <summary>
@@ -156,7 +152,7 @@ public:
 	/// </summary>
 	virtual void Reset();
 	
-protected:
+private:
 	void Generate();
 	void GetSeed(unsigned int Size);
 

@@ -38,7 +38,7 @@ namespace Test
 		rng.GetBytes(fill);
 		const unsigned int BLOCK = 16;
 
-		for (int i = 0; i < BLOCK; i++)
+		for (unsigned int i = 0; i < BLOCK; i++)
 		{
 			std::vector<byte> data(BLOCK);
 			// fill with rand

@@ -15,6 +15,14 @@
 
 NAMESPACE_COMMON
 
+using CEX::Enumeration::BlockSizes; //TODO ?
+using CEX::Enumeration::CipherModes;
+using CEX::Enumeration::Digests;
+using CEX::Enumeration::IVSizes;
+using CEX::Enumeration::PaddingModes;
+using CEX::Enumeration::RoundCounts;
+using CEX::Enumeration::SymmetricEngines;
+
 /// <summary>
 /// The CipherDescription structure.
 /// <para>Used in conjunction with the CipherStream class.
@@ -45,10 +53,6 @@ NAMESPACE_COMMON
 /// <seealso cref="CEX::Enumeration::PaddingModes"/>
 /// <seealso cref="CEX::Enumeration::RoundCounts"/>
 /// <seealso cref="CEX::Enumeration::SymmetricEngines"/>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 class CipherDescription
 {
 private:

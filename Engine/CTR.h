@@ -34,8 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements a Parallel Segmented Counter Mode: CTR.
-/// <para>CTR as outlined in the NIST document: SP800-38A</para>
+/// Implements a Parallel Segmented Counter Mode: CTR
 /// </summary> 
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_MODE
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Cipher::Symmetric::Block"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
 /// <seealso cref="CEX::Enumeration::BlockCiphers"/>
@@ -62,18 +57,18 @@ NAMESPACE_MODE
 /// <list type="bullet">
 /// <item><description>In CTR mode, both encryption and decryption can be processed in parallel.</description></item>
 /// <item><description>Parallel processing is enabled by passing a block size of <see cref="ParallelBlockSize"/> to the transform.</description></item>
-/// <item><description><see cref="ParallelBlockSize"/> must be divisible by <see cref="ParallelMinimumSize"/>.</description></item>
+/// <item><description>ParallelBlockSize must be divisible by <see cref="ParallelMinimumSize"/>.</description></item>
 /// <item><description>Parallel block calculation ex. <c>int blocklen = (data.size() / cipher.ParallelMinimumSize()) * 100</c></description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</a>.</description></item>
 /// </list>
 /// </remarks>
 class CTR : public ICipherMode
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 1024;
 	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
 	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
@@ -237,7 +232,7 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
-protected:
+private:
 	void Generate(const unsigned int Length, std::vector<byte> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
 	static void Increase(const std::vector<byte> &Counter, const unsigned int Size, std::vector<byte> &Buffer);
 	static void Increment(std::vector<byte> &Counter);

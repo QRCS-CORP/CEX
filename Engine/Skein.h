@@ -162,7 +162,8 @@ public:
 	/// <summary>
 	/// Starts a new UBI block type by setting BitsProcessed to zero, setting the first flag, and setting the block type
 	/// </summary>
-	/// <param name="type">The UBI block type of the new block</param>
+	///
+	/// <param name="Value">The UBI block type of the new block</param>
 	void StartNewBlockType(const UbiType Value)
 	{
 		SetBitsProcessed(0);

@@ -16,10 +16,6 @@ NAMESPACE_PRCSTRUCT
 /// <para>Used in conjunction with the <see cref="VTDev.Libraries.CEXEngine.Crypto.Processing.CipherStream"/> class.
 /// KeyID and Extension values must each be 16 bytes in length. Message MAC code is optional.</para>
 /// </summary>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 struct MessageHeader
 {
 private:

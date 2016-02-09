@@ -43,10 +43,6 @@ NAMESPACE_PROCESSING
 /// <para>Wraps encryption stream functions in an easy to use interface.</para>
 /// </summary> 
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Common::CipherDescription"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Stream"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
@@ -64,6 +60,7 @@ NAMESPACE_PROCESSING
 class CipherStream
 {
 public:
+
 	/// <summary>
 	/// ParallelBlockProfile enumeration
 	/// </summary>
@@ -83,7 +80,7 @@ public:
 		UserDefined = 4
 	};
 
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 1024;
 	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
 	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
@@ -108,6 +105,9 @@ protected:
 	CipherStream() {}
 
 public:
+	/// <summary>
+	/// The Progress Percent event
+	/// </summary>
 	CEX::Event::Event<int> ProgressPercent;
 
 	// *** Properties *** //
@@ -352,7 +352,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Write is called before Initialize(), or if array sizes are misaligned</exception>
 	void Write(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
 
-protected:
+private:
 
 	void BlockCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
 	void BlockCTR(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);

@@ -38,8 +38,7 @@
 NAMESPACE_PRNG
 
 /// <summary>
-/// CTRPrng: An implementation of a Encryption Counter based Deterministic Random Number Generator.
-/// <para>A Block Cipher Counter DRBG as outlined in NIST document: SP800-90A</para>
+/// CTRPrng: An implementation of a Encryption Counter based Deterministic Random Number Generator
 /// </summary> 
 /// 
 /// <example>
@@ -50,10 +49,6 @@ NAMESPACE_PRNG
 /// int num = rnd.Next([Minimum], [Maximum]);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Cipher::Symmetric::Block"/>
 /// <seealso cref="CEX::Seed"/>
@@ -69,15 +64,15 @@ NAMESPACE_PRNG
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST SP800-90B: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">Recommendation for the Entropy Sources Used for Random Bit Generation</see>.</description></item>
-/// <item><description>NIST Fips 140-2: <see href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Security Requirments For Cryptographic Modules</see>.</description></item>
-/// <item><description>NIST SP800-22 1a: <see href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications</see>.</description></item>
-/// <item><description>Security Bounds for the NIST Codebook-based: <see href="http://eprint.iacr.org/2006/379.pdf">Deterministic Random Bit Generator</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90</a>B: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
+/// <item><description>NIST Fips 140-2: <a href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Security Requirments For Cryptographic Modules</a>.</description></item>
+/// <item><description>NIST SP800-22 1a: <a href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications.</description></item>
+/// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator</a>.</description></item>
 /// </list>
 /// </remarks>
 class CTRPrng : public IRandom
 {
-protected:
+private:
 	static constexpr unsigned int BUFFER_SIZE = 4096;
 
 	std::vector<byte>  _byteBuffer;
@@ -256,7 +251,7 @@ public:
 	/// </summary>
 	virtual void Reset();
 
-protected:
+private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	CEX::Cipher::Symmetric::Block::IBlockCipher* GetCipher(CEX::Enumeration::BlockCiphers RngEngine);

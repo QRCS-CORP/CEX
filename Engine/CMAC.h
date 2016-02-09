@@ -35,8 +35,7 @@
 NAMESPACE_MAC
 
 /// <summary>
-/// An implementation of a Cipher based Message Authentication Code: CMAC.
-/// <para>A CMAC as outlined in the NIST document: SP800-38B</para>
+/// An implementation of a Cipher based Message Authentication Code
 /// </summary>
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_MAC
 /// delete cpr;
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Cipher::Symmetric::Block"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
@@ -67,15 +62,16 @@ NAMESPACE_MAC
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST SP800-38B: <see href="http://csrc.nist.gov/publications/nistpubs/800-38B/SP_800-38B.pdf">The CMAC Mode for Authentication</see>.</description></item>
-/// <item><description>RFC 4493: <see href="http://tools.ietf.org/html/rfc4493">The AES-CMAC Algorithm</see>.</description></item>
-/// <item><description>RFC 4494: <see href="http://tools.ietf.org/html/rfc4494">The AES-CMAC-96 Algorithm and Its Use with IPsec</see>.</description></item>
-/// <item><description>RFC 4493: <see href="http://tools.ietf.org/html/rfc4615">The AES-CMAC-PRF-128 Algorithm for the Internet Key Exchange Protocol (IKE)</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38B/SP_800-38B.pdf">SP800-38B</a>: The CMAC Mode for Authentication.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4493">4493</a>: The AES-CMAC Algorithm.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4494">4494</a>: The AES-CMAC-96 Algorithm and Its Use with IPsec.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4615">4493</a>: The AES-CMAC-PRF-128 Algorithm for the Internet Key Exchange Protocol (IKE).</description></item>
 /// </list>
 /// </remarks>
 class CMAC : public IMac
 {
-protected:
+private:
 	static constexpr byte CT87 = (byte)0x87;
 	static constexpr byte CT1B = (byte)0x1b;
 
@@ -125,6 +121,7 @@ public:
 	/// <summary>
 	/// Initialize the class
 	/// </summary>
+	///
 	/// <param name="Cipher">Instance of the block cipher</param>
 	/// <param name="MacBits">Expected MAC return size in Bits; must be less or equal to Cipher Block size in bits</param>
 	/// 
@@ -176,8 +173,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">Input data</param>
-	/// 
-	/// <returns>Mac Hash value</returns>
+	/// <param name="Output">The output message code</param>
 	virtual void ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
@@ -223,7 +219,7 @@ public:
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input);
 
-protected:
+private:
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
 	void LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher);
 };

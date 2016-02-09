@@ -110,7 +110,7 @@ namespace Test
 			OnProgress("Passed SHX CipherStream test..");
 
 			_key.resize(192);
-			for (int i = 0; i < 192; i++)
+			for (unsigned int i = 0; i < 192; i++)
 				_key[i] = (byte)i;
 
 			// test extended ciphers
@@ -154,7 +154,7 @@ namespace Test
 		cipher.IsParallel() = false;
 		CEX::Processing::CipherStream cs(&cipher2, padding);
 
-		for (int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 10; i++)
 		{
 			unsigned int sze = AllocateRandom(_plnText, 0, cipher.BlockSize());
 			unsigned int prlBlock = sze - (sze % (cipher.BlockSize() * _processorCount));
@@ -251,7 +251,7 @@ namespace Test
 		cipher.IsParallel() = false;
 		CEX::Processing::CipherStream cs(&cipher2, padding);
 
-		for (int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 10; i++)
 		{
 			unsigned int sze = AllocateRandom(_plnText, 0, cipher.BlockSize());
 			unsigned int prlBlock = sze - (sze % (cipher.BlockSize() * _processorCount));
@@ -348,7 +348,7 @@ namespace Test
 		cipher.IsParallel() = false;
 
 		// ctr test
-		for (int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 10; i++)
 		{
 			unsigned int sze = AllocateRandom(_plnText);
 			unsigned int prlBlock = sze - (sze % (cipher.BlockSize() * _processorCount));
@@ -493,7 +493,7 @@ namespace Test
 	fsr.Close();
 
 	std::vector<byte> buff2(255);
-	for (int i = 0; i < 255; i++)
+	for (unsigned int i = 0; i < 255; i++)
 	buff2[i] = (byte)i;
 
 	Delete(mediumFileEnc.c_str());
@@ -528,7 +528,7 @@ namespace Test
 		ms.WriteByte((byte)12);
 
 		std::vector<byte> data(255);
-		for (int i = 0; i < 255; i++)
+		for (unsigned int i = 0; i < 255; i++)
 			data[i] = (byte)i;
 		ms.Write(data, 0, 255);
 
@@ -645,7 +645,7 @@ namespace Test
 
 		// random block sizes w/ byte arrays
 		{
-			for (int i = 0; i < 100; i++)
+			for (unsigned int i = 0; i < 100; i++)
 			{
 				CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 
@@ -668,7 +668,7 @@ namespace Test
 		}
 		// random block sizes w/ stream
 		{
-			for (int i = 0; i < 100; i++)
+			for (unsigned int i = 0; i < 100; i++)
 			{
 				CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 				unsigned int sze = AllocateRandom(_plnText);
@@ -709,7 +709,7 @@ namespace Test
 		cipher.IsParallel() = false;
 		CEX::Processing::CipherStream cs(&cipher2, padding);
 
-		for (int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 10; i++)
 		{
 			unsigned int sze = AllocateRandom(_plnText, 0, cipher.BlockSize());
 			unsigned int prlBlock = sze - (sze % (cipher.BlockSize() * _processorCount));
@@ -813,7 +813,7 @@ namespace Test
 		cipher->IsParallel() = false;
 
 		// ctr test
-		for (int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 10; i++)
 		{
 			unsigned int sze = AllocateRandom(_plnText);
 			unsigned int prlBlock = sze - (sze % (cipher->BlockSize() * _processorCount));
@@ -1169,7 +1169,6 @@ namespace Test
 
 		if (alnSize != inpSize)
 		{
-			unsigned int cnkSize = inpSize - alnSize;
 			BlockDecrypt(Cipher, Padding, Input, InOffset, Output, OutOffset);
 		}
 	}

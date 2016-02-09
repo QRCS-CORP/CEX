@@ -36,24 +36,22 @@ namespace Test
 			SalsaSpeedTest();
 
 			OnProgress("### CBC and CFB Parallel Decryption Speed Tests: 10 loops * 100MB ###");
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
+			CEX::Cipher::Symmetric::Block::IBlockCipher* engine =  new CEX::Cipher::Symmetric::Block::RHX();
 			OnProgress("***RHX: CBC Decryption test (K=256; R=14)***");
-
-			CipherModeLoop(&CEX::Cipher::Symmetric::Block::Mode::CBC(eng), MB100, true, 32, 16);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, true, 32, 16);
 			OnProgress("***RHX: CFB Decryption test (K=256; R=14)***");
-			CipherModeLoop(&CEX::Cipher::Symmetric::Block::Mode::CFB(eng), MB100, true, 32, 16);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, true, 32, 16);
 
 			OnProgress("### RHX Standard Mode Speed Tests: 1 loop * 100MB ###");
 			OnProgress("***RHX: CTR Encrypt test (K=256; R=14)***");
-			CipherModeLoop(&CEX::Cipher::Symmetric::Block::Mode::CTR(eng), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CTR(engine), MB100, false, 32, 16, 1);
 			OnProgress("***RHX: CBC Encrypt test (K=256; R=14)***");
-			CipherModeLoop(&CEX::Cipher::Symmetric::Block::Mode::CBC(eng), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, false, 32, 16, 1);
 			OnProgress("***RHX: CFB Encrypt test (K=256; R=14)***");
-			CipherModeLoop(&CEX::Cipher::Symmetric::Block::Mode::CFB(eng), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, false, 32, 16, 1);
 			OnProgress("***RHX: OFB Encrypt test (K=256; R=14)***");
-			CipherModeLoop(&CEX::Cipher::Symmetric::Block::Mode::OFB(eng), MB100, false, 32, 16, 1);
-
-			delete eng;
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::OFB(engine), MB100, false, 32, 16, 1);
+			delete engine;
 
 			return MESSAGE;
 		}
@@ -67,13 +65,13 @@ namespace Test
 		}
 	}
 
-	void SpeedTest::CipherModeLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, bool Parallel, int KeySize, int IvSize, int Loops)
+	void SpeedTest::CipherModeLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, bool Parallel, int KeySize, int IvSize, unsigned int Loops)
 	{
 		CEX::Common::KeyParams keyParams;
 		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
 		std::vector<byte> buffer1(16, 0);
 		std::vector<byte> buffer2(16, 0);
-		const char *name = Cipher->Engine()->Name();
+		const char* name = Cipher->Engine()->Name();
 		SampleSize -= (SampleSize % 16);
 
 		if (!Parallel)
@@ -93,7 +91,7 @@ namespace Test
 		uint64_t start = TestUtils::GetTimeMs64();
 		uint32_t rounds = Cipher->Engine()->Rounds();
 
-		for (unsigned int i = 0; i < LOOPS; ++i)
+		for (unsigned int i = 0; i < Loops; ++i)
 		{
 			unsigned int counter = 0;
 			uint64_t lstart = TestUtils::GetTimeMs64();
@@ -108,7 +106,8 @@ namespace Test
 			OnProgress(const_cast<char*>(resp.c_str()));
 		}
 
-		uint64_t dlen = (LOOPS * DATA_SIZE) / GB1;
+		delete Cipher;
+		uint64_t dlen = (Loops * DATA_SIZE) / GB1;
 		std::string calc = GetRate(start, dlen);
 		std::string klen = CEX::Utility::IntUtils::ToString(KeySize * 8);
 		std::string resp = name + std::string(" (key=") + klen + std::string("-bit, rounds=") + CEX::Utility::IntUtils::ToString(rounds) + ") -> " + calc + " gb/minute]";
@@ -128,12 +127,12 @@ namespace Test
 	void SpeedTest::Initialize()
 	{
 		for (unsigned int i = 0; i < _key256.size(); i++)
-			_key256[i] = i;
+			_key256[i] = (byte)i;
 		for (unsigned int i = 15; i > 0; i--)
-			_iv[i] = i;
+			_iv[i] = (byte)i;
 	}
 
-	void SpeedTest::ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode *Cipher, unsigned int SampleSize, unsigned int KeySize, unsigned int IvSize)
+	void SpeedTest::ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, unsigned int KeySize, unsigned int IvSize, unsigned int Loops)
 	{
 		CEX::Common::KeyParams keyParams;
 		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
@@ -143,10 +142,10 @@ namespace Test
 		std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
 		std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
 		uint64_t start = TestUtils::GetTimeMs64();
-		const char *name = Cipher->Engine()->Name();
+		const char* name = Cipher->Engine()->Name();
 		uint32_t rounds = Cipher->Engine()->Rounds();
 
-		for (unsigned int i = 0; i < LOOPS; ++i)
+		for (unsigned int i = 0; i < Loops; ++i)
 		{
 			unsigned int counter = 0;
 			uint64_t lstart = TestUtils::GetTimeMs64();
@@ -161,7 +160,7 @@ namespace Test
 			OnProgress(const_cast<char*>(resp.c_str()));
 		}
 
-		uint64_t dlen = (LOOPS * DATA_SIZE) / GB1;
+		uint64_t dlen = (Loops * DATA_SIZE) / GB1;
 		std::string calc = GetRate(start, dlen);
 		std::string klen = CEX::Utility::IntUtils::ToString(KeySize * 8);
 		std::string resp = name + std::string(" (key=") + klen + std::string("-bit, rounds=") + CEX::Utility::IntUtils::ToString(rounds) + ") -> " + calc + " gb/minute]";
@@ -169,7 +168,7 @@ namespace Test
 		OnProgress("");
 	}
 
-	void SpeedTest::ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher *Cipher, int KeySize, int IvSize)
+	void SpeedTest::ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, int KeySize, int IvSize, unsigned int Loops)
 	{
 		CEX::Common::KeyParams keyParams;
 		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
@@ -182,7 +181,7 @@ namespace Test
 		const char *name = Cipher->Name();
 		uint64_t rounds = Cipher->Rounds();
 
-		for (unsigned int i = 0; i < LOOPS; ++i)
+		for (unsigned int i = 0; i < Loops; ++i)
 		{
 			unsigned int counter = 0;
 			uint64_t lstart = TestUtils::GetTimeMs64();
@@ -197,7 +196,7 @@ namespace Test
 			OnProgress(const_cast<char*>(resp.c_str()));
 		}
 
-		uint64_t dlen = (LOOPS * DATA_SIZE) / GB1;
+		uint64_t dlen = (Loops * DATA_SIZE) / GB1;
 		std::string calc = GetRate(start, dlen);
 		std::string klen = CEX::Utility::IntUtils::ToString(KeySize * 8);
 		std::string resp = name + std::string(" (key=") + klen + std::string("-bit, rounds=") + CEX::Utility::IntUtils::ToString(rounds) + ") -> " + calc + " gb/minute]";
@@ -212,52 +211,68 @@ namespace Test
 
 	void SpeedTest::RDXSpeedTest()
 	{
-		CEX::Cipher::Symmetric::Block::RHX cipher;
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipherMode(&cipher);
-		ParallelBlockLoop(&cipherMode, MB100, 32);
+		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX();
+		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
+		ParallelBlockLoop(cipher, MB100, 192);
+		delete cipher;
+		delete engine;
 	}
 
 	void SpeedTest::RHXSpeedTest(int Rounds)
 	{
-		CEX::Digest::SHA512 sha512;
-		CEX::Cipher::Symmetric::Block::RHX cipher(&sha512, Rounds);
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipherMode(&cipher);
-		ParallelBlockLoop(&cipherMode, MB100, 192);
+		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
+		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX(sha512, Rounds);
+		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
+		ParallelBlockLoop(cipher, MB100, 192);
+		delete cipher;
+		delete sha512;
+		delete engine;
 	}
 
 	void SpeedTest::SalsaSpeedTest()
 	{
-		CEX::Cipher::Symmetric::Stream::Salsa20 cipher;
-		ParallelStreamLoop(&cipher, 32, 8);
+		CEX::Cipher::Symmetric::Stream::Salsa20* cipher = new CEX::Cipher::Symmetric::Stream::Salsa20();
+		ParallelStreamLoop(cipher, 32, 8);
+		delete cipher;
 	}
 
 	void SpeedTest::SHXSpeedTest(int Rounds)
 	{
-		CEX::Digest::SHA512 sha512;
-		CEX::Cipher::Symmetric::Block::SHX cipher(&sha512, Rounds);
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipherMode(&cipher);
-		ParallelBlockLoop(&cipherMode, MB100, 192);
+		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
+		CEX::Cipher::Symmetric::Block::SHX* engine = new CEX::Cipher::Symmetric::Block::SHX(sha512, Rounds);
+		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
+		ParallelBlockLoop(cipher, MB100, 192);
+		delete cipher;
+		delete sha512;
+		delete engine;
 	}
 
 	void SpeedTest::SPXSpeedTest()
 	{
-		CEX::Cipher::Symmetric::Block::SHX cipher;
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipherMode(&cipher);
-		ParallelBlockLoop(&cipherMode, MB100, 32);
+		CEX::Cipher::Symmetric::Block::SHX* engine = new CEX::Cipher::Symmetric::Block::SHX();
+		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
+		ParallelBlockLoop(cipher, MB100, 192);
+		delete cipher;
+		delete engine;
 	}
 
 	void SpeedTest::THXSpeedTest(int Rounds)
 	{
-		CEX::Digest::SHA512 sha512;
-		CEX::Cipher::Symmetric::Block::THX cipher(&sha512, Rounds);
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipherMode(&cipher);
-		ParallelBlockLoop(&cipherMode, MB100, 192);
+		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
+		CEX::Cipher::Symmetric::Block::THX* engine = new CEX::Cipher::Symmetric::Block::THX(sha512, Rounds);
+		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
+		ParallelBlockLoop(cipher, MB100, 192);
+		delete cipher;
+		delete sha512;
+		delete engine;
 	}
 
 	void SpeedTest::TFXSpeedTest()
 	{
-		CEX::Cipher::Symmetric::Block::THX cipher;
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipherMode(&cipher);
-		ParallelBlockLoop(&cipherMode, MB100, 32);
+		CEX::Cipher::Symmetric::Block::THX* engine = new CEX::Cipher::Symmetric::Block::THX();
+		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
+		ParallelBlockLoop(cipher, MB100, 192);
+		delete cipher;
+		delete engine;
 	}
 }

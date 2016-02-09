@@ -24,7 +24,7 @@
 // Principal Algorithms:
 // Portions of this cipher partially based on the Twofish block cipher designed by Bruce Schneier, John Kelsey, 
 // Doug Whiting, David Wagner, Chris Hall, and Niels Ferguson.
-// Twofish: <see href="https://www.schneier.com/paper-twofish-paper.pdf">Specification</see>.
+// Twofish: <a href="https://www.schneier.com/paper-twofish-paper.pdf">Specification</a>.
 // 
 // Implementation Details:
 // An implementation based on the Twofish block cipher,
@@ -42,7 +42,7 @@ NAMESPACE_BLOCK
 
 /// <summary>
 /// THX: A Twofish Cipher extended with an (optional) HKDF powered Key Schedule.
-/// <para>THX is a Twofish: <see href="https://www.schneier.com/paper-twofish-paper.pdf"/> implementation that can use a standard configuration on key sizes up to 256 bits, 
+/// <para>THX is a Twofish implementation that can use a standard configuration on key sizes up to 256 bits, 
 /// an extended key size of 512 bits, or unlimited key sizes greater than 64 bytes. 
 /// On <see cref="LegalKeySizes"/> larger than 64 bytes, an HKDF bytes generator is used to expand the <c>working key</c> integer array.
 /// In extended mode, the number of <c>transformation rounds</c> can be user assigned (through the constructor) to between 16 and 32 rounds.</para>
@@ -59,16 +59,12 @@ NAMESPACE_BLOCK
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// 
 /// <remarks>
-/// <description><h4>Implementation Notes:</h4></description>
+/// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>HKDF Digest <see cref="CEX::Enumeration::Digests">engine</see> is definable through the <see cref="THX(unsigned int, Digests)">Constructor</see> parameter: KeyEngine.</description></item>
 /// <item><description>Key Schedule is (optionally) powered by a Hash based Key Derivation Function using a definable <see cref="CEX::Digest::IDigest">Digest</see>.</description></item>
@@ -78,45 +74,42 @@ NAMESPACE_BLOCK
 /// <item><description>Valid Rounds assignments are 16, 18, 20, 22, 24, 26, 28, 30 and 32, default is 16.</description></item>
 /// </list>
 /// 
-/// <para>The number of transformation rounds processed is also user definable; from the standard 16 rounds, to a full 32 rounds of transformation.</para>
-/// 
-/// <para>The key schedule in THX powered by an HKDF: <see href="http://tools.ietf.org/html/rfc5869"/> generator, using a Digest HMAC: <see href="http://tools.ietf.org/html/rfc2104"/> (Hash based Message Authentication Code) as its random engine. 
-/// This is one of the strongest: <see href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf"/> methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even the Twofish key schedule. HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
+/// <description>HKDF Bytes Generator:</description>
+/// <para>HKDF: is a key derivation function that uses a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
+/// This is one of the strongest methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even Serpents key schedule. 
+/// HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
 /// The HMAC RFC 2104, recommends a key size equal to the digest output, in the case of SHA512, 64 bytes, anything larger gets passed through the hash function to get the required 512 bit key size. 
 /// The Salt size is a minimum of the hash functions block size, with SHA-2 512 that is 128 bytes.</para>
 /// 
-/// <para>When using SHA-2 512, a minimum key size for THX is 192 bytes, further blocks of salt can be added to the key so long as they align; ikm + (n * blocksize), ex. 192, 320, 448 bytes.. there is no upper maximum. 
-/// This means that you can create keys as large as you like so long as it falls on these boundaries, this effectively eliminates brute force as a means of attack on the cipher, even in quantum terms.</para> 
+/// <para>When using SHA-2 512, a minimum key size for RHX is 192 bytes, further blocks of salt can be added to the key so long as they align; ikm + (n * blocksize), ex. 192, 320, 448 bytes.. there is no upper maximum. 
+/// This means that you can create keys as large as you like so long as it falls on these boundaries, this effectively eliminates brute force as a means of attack on the cipher, even in post-quantum terms.</para> 
 /// 
-/// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake: <see href="https://131002.net/blake/blake.pdf"/>, 
-/// Keccak: <see href="http://keccak.noekeon.org/Keccak-submission-3.pdf"/>, SHA-2: <see href="http://keccak.noekeon.org/Keccak-submission-3.pdf"/>, 
-/// or Skein: <see href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf"/>.
+/// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake, Keccak, SHA-2 or Skein.
 /// The default Digest Engine is SHA-2 512.</para>
 /// 
-/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <math>klen = h + (n * s)</math>, this will vary between Digest implementations. 
+/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <c>klen = h + (n * s)</c>, this will vary between Digest implementations. 
 /// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property.</para>
 /// 
 /// <para>The number of diffusion rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. 
-/// THX is capable of processing up to 32 rounds, that is twice the number of rounds used in a standard implementation of Twofish. 
+/// RHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256. 
 /// Valid rounds assignments can be found in the <see cref="LegalRounds"/> static property.</para>
 /// 
-/// <description><h4>Guiding Publications:</h4></description>
+/// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>Twofish: <see href="https://www.schneier.com/paper-twofish-paper.pdf">Specification</see>.</description></item>
-/// <item><description>HMAC: <see href="http://tools.ietf.org/html/rfc2104">RFC 2104</see>.</description></item>
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">Fips 198.1</see>.</description></item>
-/// <item><description>HKDF: <see href="http://tools.ietf.org/html/rfc5869">RFC 5869</see>.</description></item>
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
+/// <item><description>HMAC <a href="http://tools.ietf.org/html/rfc2104">RFC 2104</a>.</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198.1</a>.</description></item>
+/// <item><description>HKDF <a href="http://tools.ietf.org/html/rfc5869">RFC 5869</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>.</description></item>
+/// <item><description>SHA3 <a href="https://131002.net/blake/blake.pdf">The Blake digest</a>.</description></item>
+/// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">The Keccak digest</a>.</description></item>
+/// <item><description>SHA3 <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">The Skein digest</a>.</description></item>
 /// </list>
-/// 
-/// <description><h4>Code Base Guides:</h4></description>
-/// <list type="table">
-/// <item><description>Inspired in part by the Bouncy Castle Java <see href="http://bouncycastle.org/latest_releases.html">Release 1.51</see>.</description></item>
-/// </list> 
 /// </remarks>
 class THX : public IBlockCipher
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 16;
 	static constexpr unsigned int DEFAULT_SUBKEYS = 40;
 	static constexpr unsigned int GF256_FDBK = 0x169; // primitive polynomial for GF(256)
@@ -395,7 +388,7 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
-protected:
+private:
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);

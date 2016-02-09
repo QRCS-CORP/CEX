@@ -56,9 +56,9 @@ namespace Test
 		HexConverter::Decode(thxEncoded, 2, _thxExpected);
 
 		for (unsigned int i = 0; i < _key.size(); i++)
-			_key[i] = i;
+			_key[i] = (byte)i;
 		for (unsigned int i = 0; i < _iv.size(); i++)
-			_iv[i] = i;
+			_iv[i] = (byte)i;
 	}
 
 	void HXCipherTest::OnProgress(char* Data)
@@ -80,7 +80,7 @@ namespace Test
 			CEX::Common::KeyParams k(_key, _iv);
 			cipher.Initialize(true, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
@@ -90,7 +90,7 @@ namespace Test
 
 			cipher.Initialize(false, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, inpBytes);
 				memcpy(&outBytes[0], &inpBytes[0], 16);
@@ -108,7 +108,7 @@ namespace Test
 			CEX::Common::KeyParams k(_key, _iv);
 			cipher.Initialize(true, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
@@ -119,7 +119,7 @@ namespace Test
 
 			cipher.Initialize(false, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, inpBytes);
 				memcpy(&outBytes[0], &inpBytes[0], 16);
@@ -145,7 +145,7 @@ namespace Test
 			CEX::Common::KeyParams k(_key, _iv);
 			engine.Initialize(true, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
@@ -156,7 +156,7 @@ namespace Test
 
 			engine.Initialize(false, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, inpBytes);
 				memcpy(&outBytes[0], &inpBytes[0], 16);
@@ -174,7 +174,7 @@ namespace Test
 			CEX::Common::KeyParams k(_key, _iv);
 			engine.Initialize(true, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
@@ -185,7 +185,7 @@ namespace Test
 
 			engine.Initialize(false, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, inpBytes);
 				memcpy(&outBytes[0], &inpBytes[0], 16);
@@ -211,7 +211,7 @@ namespace Test
 			CEX::Common::KeyParams k(_key, _iv);
 			engine.Initialize(true, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
@@ -222,7 +222,7 @@ namespace Test
 
 			engine.Initialize(false, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, inpBytes);
 				memcpy(&outBytes[0], &inpBytes[0], 16);
@@ -240,7 +240,7 @@ namespace Test
 			CEX::Common::KeyParams k(_key, _iv);
 			engine.Initialize(true, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
@@ -251,7 +251,7 @@ namespace Test
 
 			engine.Initialize(false, k);
 
-			for (int i = 0; i != 100; i++)
+			for (unsigned int i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, inpBytes);
 				memcpy(&outBytes[0], &inpBytes[0], 16);

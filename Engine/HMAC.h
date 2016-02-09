@@ -35,8 +35,7 @@
 NAMESPACE_MAC
 
 /// <summary>
-/// An implementation of a Hash based Message Authentication Code: HMAC.
-/// <para>A HMAC as outlined in the NIST document: Fips 198-1</para>
+/// An implementation of a Hash based Message Authentication Code
 /// </summary>
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_MAC
 /// delete eng;
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Digest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
@@ -69,15 +64,15 @@ NAMESPACE_MAC
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>RFC 2104: <see href="http://tools.ietf.org/html/rfc2104">HMAC: Keyed-Hashing for Message Authentication</see>.</description></item>
-/// <item><description>Fips 198-1: <see href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">The Keyed-Hash Message Authentication Code (HMAC)</see>.</description></item>
-/// <item><description>Fips 180-4: <see href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Secure Hash Standard (SHS)</see>.</description></item>
-/// <item><description>NMAC and HMAC Security: <see href="http://cseweb.ucsd.edu/~mihir/papers/hmac-new.pdf">NMAC and HMAC Security Proofs</see>.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2104">2104</a>: HMAC: Keyed-Hashing for Message Authentication.</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198-1</a>: The Keyed-Hash Message Authentication Code (HMAC).</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">180-4</a>: Secure Hash Standard (SHS).</description></item>
+/// <item><description>CRYPTO '06, Lecture <a href="http://cseweb.ucsd.edu/~mihir/papers/hmac-new.pdf">NMAC and HMAC Security</a>: NMAC and HMAC Security Proofs.</description></item>
 /// </list>
 /// </remarks>
 class HMAC : public IMac
 {
-protected:
+private:
 	static constexpr byte IPAD = 0x36;
 	static constexpr byte OPAD = 0x5C;
 
@@ -164,8 +159,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">Input data</param>
-	/// 
-	/// <returns>HMAC hash value</returns>
+	/// <param name="Output">The output message code</param>
 	virtual void ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
@@ -204,7 +198,7 @@ public:
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input);
 
-protected:
+private:
 	inline void XOr(std::vector<byte> &A, byte N)
 	{
 		for (unsigned int i = 0; i < A.size(); ++i)

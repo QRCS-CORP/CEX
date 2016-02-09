@@ -19,20 +19,16 @@ NAMESPACE_SEED
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/06/09" version="1.0.0.0">Initial release</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>Further scramblings of Marsaglia’s xorshift generators <see href="http://vigna.di.unimi.it/ftp/papers/xorshiftplus.pdf"/>.</description></item>
-/// <item><description>Xorshift+ generators and the PRNG shootout: <see href="http://xorshift.di.unimi.it/"/>.</description></item>
+/// <item><description>Further scramblings of Marsaglia’s <a href="http://vigna.di.unimi.it/ftp/papers/xorshiftplus.pdf">Xorshift Generators</a>.</description></item>
+/// <item><description><a href="http://xorshift.di.unimi.it/">Xorshift+ generators</a> and the PRNG shootout.</description></item>
 /// </list>
 /// </remarks>
 class XSPRsg : public ISeed
 {
-protected:
+private:
 	static constexpr int SIZE32 = 4;
 	static constexpr int SIZE64 = 8;
 	static constexpr int MAXSEED = 16;
@@ -189,7 +185,7 @@ public:
 	/// <returns>A processed long integer</returns>
 	ulong Split(ulong X);
 
-protected:
+private:
 	void Jump128();
 	void Jump1024();
 	void Generate(std::vector<byte> &Output, unsigned int Size);

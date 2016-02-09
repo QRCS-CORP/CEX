@@ -7,8 +7,14 @@ NAMESPACE_PADDING
 
 /// <summary>
 /// The ISO7816 Padding Scheme
-/// <para>ISO7816d as outlined in ISO/IEC 7816-4:2005: <see href="http://www.iso.org/iso/home/store/catalogue_tc/catalogue_detail.htm?csnumber=36134"/></para>
 /// </summary>
+///
+/// <remarks>
+/// <description>Guiding Publications:</description>
+/// <list type="number">
+/// <item><description>ISO/IEC <a href="http://www.iso.org/iso/home/store/catalogue_tc/catalogue_detail.htm?csnumber=36134">7816-4:2005</a>.</description></item>
+/// </list>
+/// </remarks>
 class ISO7816 : public IPadding
 {
 private:

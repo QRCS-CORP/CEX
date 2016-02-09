@@ -10,7 +10,7 @@ NAMESPACE_IO
 /// </summary>
 class StreamWriter
 {
-protected:
+private:
 	unsigned int _streamPosition;
 	std::vector<byte> _streamData;
 
@@ -42,7 +42,7 @@ public:
 	/// Initialize this class with a byte array
 	/// </summary>
 	///
-	/// <param name="StreamData">The byte array to write data to</param>
+	/// <param name="DataArray">The byte array to write data to</param>
 	StreamWriter(std::vector<byte> &DataArray)
 		:
 		_streamData(DataArray),

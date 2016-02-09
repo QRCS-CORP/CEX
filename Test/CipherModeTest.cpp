@@ -69,7 +69,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -86,7 +86,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(false, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -114,7 +114,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0);
 
@@ -132,7 +132,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(false, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -160,7 +160,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -177,7 +177,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(false, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -204,11 +204,11 @@ namespace Test
 			CEX::Common::KeyParams k(Key);
 			mode.Initialize(true, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
-				if (outBytes != _output[index][i])
+				if (outBytes != Output[index][i])
 					throw std::string("ECB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
@@ -222,7 +222,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key);
 			mode.Initialize(false, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -250,7 +250,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 
@@ -268,7 +268,7 @@ namespace Test
 			CEX::Common::KeyParams k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (int i = 0; i < 4; i++)
+			for (unsigned int i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], outBytes);
 

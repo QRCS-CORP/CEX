@@ -28,7 +28,7 @@ void MemoryStream::Flush()
 	throw CryptoProcessingException("MemoryStream:Flush", "Not implemented in MemoryStream!");
 }
 
-int MemoryStream::MemoryStream::Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count)
+int MemoryStream::Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count)
 {
 	if (Offset + Count > _streamData.size() - _streamPosition)
 		Count = _streamData.size() - _streamPosition;

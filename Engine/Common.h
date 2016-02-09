@@ -66,32 +66,18 @@ NAMESPACE_ROOT
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-What follows is the product of my study of several encryption algorithms. 
-As I was writing the base classes, I began thinking about various attack vectors, and how they might be mitigated, 
-and also how the existing primitives might be improved upon from a security perspective.
+Welcome to the CEX Cryptographic Library, version 1.5.0.6.
+\brief 
+CEX is a library built for both speed and maximum security. 
+This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
-It is important to note, that using the base ciphers with their original key sizes, 
-output from those classes will be exactly the same as any other valid implementation of that cipher; 
-RDX (Rijndael) with a 256 bit key is Rijndael, as TFX (Twofish) with a standard key size is Twofish, 
-and SPX (Serpent) is a valid Serpent implementation. This is proven. 
-The Tests section contains the most complete and authoritative test suites available for each of these ciphers. 
-So if you choose to remain with standard key lengths, you can use configurations that have been thoroughly cryptanalyzed.
 
-One has to consider that these ciphers were designed almost 20 years ago; 
-at the time, Windows 95 was the predominant operating system, and computer hardware was quite primitive by today's standards. 
-So, concessions had to be made in cipher design in regards to speed and memory footprint. 
-We are not so constrained with the hardware of today, so adding rounds to a cipher, or using a larger key size is less a consideration now, 
-and will have even less impact in the future.
+\details   This class is used to demonstrate a number of section commands.
+\author    John Underhill
+\version   1.0.0.6
+\date      February 10, 2016
+\copyright MIT public license
 
-Speed is an important design criterion with this project. 
-The CTR mode and the decryption function of the CBC and CFB modes have been parallelized. 
-If a block size of ParallelBlockSize (64000 by default, but configurable) bytes is passed to the mode, and the hardware utilizes multiple processor cores, 
-the processing is automatically parallelized. 
-
-Documentation has been added as an optional download with the project distribution, though the website link on the sample forms Help menu, or directly at: CEX Help.
-
-Before downloading the source files, it is your responsibility to check if these extended key lengths (512 bit and higher) are legal in your country. 
-If you use this code, please do so responsibly and in accordance to law in your region.
 
 \section intro_link Links
 Get the latest version from the CEX Home page: http://www.vtdev.com/cexhome.html

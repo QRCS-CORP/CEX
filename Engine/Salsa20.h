@@ -23,7 +23,7 @@
 // 
 // Principal Algorithms:
 // Portions of this cipher based on the Salsa20 stream cipher designed by Daniel J. Bernstein:
-// Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.
+// Salsa20 <a href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</a>.
 // 
 // Implementation Details:
 // Salsa20+
@@ -42,8 +42,7 @@
 NAMESPACE_STREAM
 
 /// <summary>
-/// Salsa20+: A parallelized Salsa20 stream cipher implementation.
-/// <para>A Salsa20 cipher extended to use up to 30 rounds.</para>
+/// Salsa20+: A parallelized Salsa20 stream cipher implementation
 /// </summary>
 /// 
 /// <example>
@@ -58,10 +57,6 @@ NAMESPACE_STREAM
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -73,15 +68,15 @@ NAMESPACE_STREAM
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
+/// <item><description>Salsa20 <a href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/design.pdf">Design</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/security.pdf">Security</a>.</description></item>
 /// </list>
 /// 
 /// </remarks>
 class Salsa20 : public IStreamCipher
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 64;
 	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
 	static constexpr unsigned int MAX_ROUNDS = 30;
@@ -283,7 +278,7 @@ public:
 	/// <param name="Length">Number of bytes to process</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length);
 
-protected:
+private:
 	void Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);
 	void Generate(const unsigned int Size, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);

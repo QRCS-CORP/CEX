@@ -17,7 +17,7 @@ public:
 	/// Get a Prng instance with default initialization parameters
 	/// </summary>
 	/// 
-	/// <param name="EngineType">The prng enumeration name</param>
+	/// <param name="PrngType">The prng enumeration name</param>
 	/// 
 	/// <returns>An initialized prng</returns>
 	/// 

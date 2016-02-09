@@ -23,7 +23,7 @@
 // 
 // Principal Algorithms:
 // An implementation of the SHA-2 digest with a 512 bit return size.
-// SHA-2 <see href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</see>.
+// SHA-2 <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</a>.
 // 
 // Implementation Details:
 // An implementation of an Hash based Key Derivation Function (HKDF). 
@@ -40,14 +40,9 @@
 NAMESPACE_GENERATOR
 
 /// <summary>
-/// HKDF: An implementation of an Hash based Key Derivation Function.
-/// <para>HKDF as outlined in RFC 5869</para>
+/// HKDF: An implementation of an Hash based Key Derivation Function
 /// </summary> 
 /// 
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Mac::HMAC"/>
 /// <seealso cref="CEX::Digest"/>
@@ -65,13 +60,13 @@ NAMESPACE_GENERATOR
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>RFC 5869: <see href="http://tools.ietf.org/html/rfc5869">Specification</see>.</description></item>
-/// <item><description>HKDF Scheme: <see href="http://tools.ietf.org/html/rfc5869">Whitepaper</see>.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2104">2104</a>: HMAC: Keyed-Hashing for Message Authentication.</description></item>
+/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc5869">5869</a>: HMAC-based Extract-and-Expand Key Derivation Function.</description></item>
 /// </list>
 /// </remarks>
 class HKDF : public IGenerator
 {
-protected:
+private:
 	std::vector<byte> _currentT;
 	std::vector<byte> _digestInfo;
 	CEX::Mac::HMAC *_digestMac;
@@ -222,7 +217,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Salt value is too small</exception>
 	virtual void Update(const std::vector<byte> &Salt);
 
-protected:
+private:
 	void ExpandNext();
 	void Extract(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, std::vector<byte> &Prk);
 };

@@ -23,7 +23,7 @@
 // 
 // Principal Algorithms:
 // An implementation of the SHA3 digest finalist, Blake, designed by Jean-Philippe Aumasson, Luca Henzen, Willi Meier, and Raphael C.-W. Phan. 
-// SHA3 Proposal <see href="https://131002.net/blake/blake.pdf">Blake</see>.
+// SHA3 Proposal <a href="https://131002.net/blake/blake.pdf">Blake</a>.
 // 
 // Implementation Details:
 // An implementation of the Blake digest with a 512 bit digest size.
@@ -39,8 +39,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// Blake512: An implementation of the Blake digest with a 512 bit return size.
-/// <para>SHA-3 finalist: The Blake digest</para>
+/// Blake512: An implementation of the Blake digest with a 512 bit return size
 /// </summary> 
 /// 
 /// <example>
@@ -52,10 +51,6 @@ NAMESPACE_DIGEST
 /// digest.ComputeHash(Input, hash);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
@@ -71,15 +66,14 @@ NAMESPACE_DIGEST
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>SHA3 Proposal <see href="https://131002.net/blake">Blake</see>.</description></item>
-/// <item><description>SHA3: <see href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report of the SHA-3 Cryptographic Hash Algorithm Competition</see>.</description></item>
-/// <item><description>SHA3 Submission in C: <see href="https://131002.net/blake/blake_ref.c">blake_ref.c</see>.</description></item>
-/// <item><description>The: <see href="http://hashlib.codeplex.com/">HashLib</see> Project (test vectors).</description></item>
+/// <item><description>NIST <a href="https://131002.net/blake">SHA3 Proposal Blake</a>.</description></item>
+/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3: Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition.</description></item>
+/// <item><description>SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c</a>.</description></item>
 /// </list>
 /// </remarks>
 class Blake512 : public IDigest
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 64;
 	static constexpr unsigned int DIGEST_SIZE = 64;
 	static constexpr unsigned int PAD_LENGTH = 111;
@@ -226,7 +220,7 @@ public:
 	/// <param name="Input">Input byte</param>
 	void Update(byte Input);
 
-protected:
+private:
 	void Compress64(const std::vector<byte> &pbBlock, unsigned int Offset);
 	void G64(unsigned int A, unsigned int B, unsigned int C, unsigned int D, unsigned int R, unsigned int I);
 	void G64BLK(unsigned int Index);

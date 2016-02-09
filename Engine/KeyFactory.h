@@ -56,10 +56,6 @@ NAMESPACE_PRCFACTORY
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/01/23" version="1.9.0.0">Initial release</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Processing::Structure::CipherKey"/>
 /// <seealso cref="CEX::Common::CipherDescription"/>
 /// <seealso cref="CEX::Enumeration::Prngs"/>
@@ -94,19 +90,18 @@ public:
 	{
 	}
 
-	/*/// <summary>
+	/// <summary>
 	/// Create a single use key file using automatic key material generation.
 	/// <para>The Key, and optional IV and IKM are generated automatically using the cipher description contained in the <see cref="CipherDescription"/>.
 	/// This overload creates keying material using the seed and digest engines specified with the <see cref="KeyGenerator"/> class</para>
 	/// </summary>
 	/// 
-	/// <param name="Description">The <see cref="CipherDescription">Cipher Description</see> containing the cipher implementation details</param>
-	/// <param name="SeedEngine">The <see cref="SeedGenerators">Random Generator</see> used to create the stage I seed material during key generation.</param>
-	/// <param name="HashEngine">The <see cref="Digests">Digest Engine</see> used in the stage II phase of key generation.</param>
+	/// <param name="Description">The <see cref="CEX::Common::CipherDescription">Cipher Description</see> containing the cipher implementation details</param>
+	/// <param name="SeedEngine">The <see cref="CEX::Enumeration::SeedGenerators">Random Generator</see> used to create the stage I seed material during key generation.</param>
+	/// <param name="HashEngine">The <see cref="CEX::Enumeration::Digests">Digest Engine</see> used in the stage II phase of key generation.</param>
 	/// 
-	/// <exception cref="System.ArgumentNullException">Thrown if a KeyParams member is null, but specified in the Header</exception>
-	/// <exception cref="System.ArgumentOutOfRangeException">Thrown if a Header parameter does not match a KeyParams value</exception>
-	void Create(CEX::Common::CipherDescription Description, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, CEX::Enumeration::Digests HashEngine = CEX::Enumeration::Digests::SHA512);*/
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a KeyParams member is null, but specified in the Header</exception>
+	void Create(CEX::Common::CipherDescription &Description, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, CEX::Enumeration::Digests HashEngine = CEX::Enumeration::Digests::SHA512);
 
 	/// <summary>
 	/// Create a single use key file using a <see cref="CEX::Common::KeyParams"/> containing the key material, and a <see cref="CEX::Common::CipherDescription"/> containing the cipher implementation details

@@ -281,13 +281,13 @@
     <ClInclude Include="..\..\Test\KeyFactoryTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\SP20DrbgTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\SP20DrbgTest.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
@@ -370,9 +370,6 @@
     <ClCompile Include="..\..\Test\SkeinTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\SP20DrbgTest.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\SpeedTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
@@ -381,6 +378,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\XSPRsgTest.cpp">
       <Filter>Source Files\Test\SeedTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SP20DrbgTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

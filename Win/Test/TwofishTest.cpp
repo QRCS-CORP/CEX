@@ -113,7 +113,7 @@ namespace Test
 		}
 	}
 
-	void TwofishTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, bool Encrypt, int Count)
+	void TwofishTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, bool Encrypt, unsigned int Count)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
@@ -122,7 +122,7 @@ namespace Test
 		CEX::Common::KeyParams k(Key);
 		engine.Initialize(Encrypt, k);
 
-		for (int i = 0; i < Count; i++)
+		for (unsigned int i = 0; i < Count; i++)
 			engine.Transform(outBytes, outBytes);
 
 		if (outBytes != Output)

@@ -48,7 +48,7 @@ namespace Test
 	{
 		std::vector<byte> hash(Digest.DigestSize(), 0);
 
-		for (int i = 0; i != _messages.size(); i++)
+		for (unsigned int i = 0; i != _messages.size(); i++)
 		{
 			if (_messages[i].size() != 0)
 				Digest.BlockUpdate(_messages[i], 0, _messages[i].size());
@@ -61,7 +61,7 @@ namespace Test
 
 		std::vector<byte> k64(1024 * 64, 0);
 
-		for (int i = 0; i != k64.size(); i++)
+		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)'a';
 
 		Digest.BlockUpdate(k64, 0, k64.size());
@@ -70,7 +70,7 @@ namespace Test
 		if (Expected[_messages.size()] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
-		for (int i = 0; i != k64.size(); i++)
+		for (unsigned int i = 0; i != k64.size(); i++)
 			Digest.Update((byte)'a');
 
 		Digest.DoFinal(hash, 0);
@@ -78,7 +78,7 @@ namespace Test
 		if (Expected[_messages.size()] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
-		for (int i = 0; i != k64.size(); i++)
+		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)('a' + (i % 26));
 
 		Digest.BlockUpdate(k64, 0, k64.size());
@@ -87,7 +87,7 @@ namespace Test
 		if (Expected[_messages.size() + 1] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
-		for (int i = 0; i != 64; i++)
+		for (unsigned int i = 0; i != 64; i++)
 		{
 			Digest.Update(k64[i * 1024]);
 			Digest.BlockUpdate(k64, i * 1024 + 1, 1023);
@@ -101,7 +101,7 @@ namespace Test
 		CompareDoFinal(Digest);
 
 		/*// very long test (it passes)
-		for (int i = 0; i != 16384; i++)
+		for (unsigned int i = 0; i != 16384; i++)
 		{
 		for (int j = 0; j != 1024; j++)
 		Digest->BlockUpdate(_xtremeData, 0, _xtremeData.size());
@@ -137,7 +137,7 @@ namespace Test
 		CEX::Mac::HMAC mac(&Digest);
 		std::vector<byte> macV2(mac.MacSize(), 0);
 
-		for (int i = 0; i != _macKeys.size(); i++)
+		for (unsigned int i = 0; i != _macKeys.size(); i++)
 		{
 			mac.Initialize(_macKeys[i]);
 			mac.BlockUpdate(_macData[i], 0, _macData[i].size());
@@ -154,7 +154,7 @@ namespace Test
 		mac2.BlockUpdate(_truncData, 0, _truncData.size());
 		mac2.DoFinal(macV2, 0);
 
-		for (int i = 0; i != TruncExpected.size(); i++)
+		for (unsigned int i = 0; i != TruncExpected.size(); i++)
 		{
 			if (macV2[i] != TruncExpected[i])
 				throw std::string("Keccak HMAC: Expected hash is not equal!");

@@ -23,7 +23,7 @@
 // 
 // Principal Algorithms:
 // An implementation of the SHA-3 digest based on Keccak, designed by Guido Bertoni, Joan Daemen, Michaël Peeters, and Gilles Van Assche. 
-// SHA3 <see href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</see>.
+// SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</a>.
 // 
 // Implementation Details:
 // An implementation of the SHA-3 digest with a 256 bit return size. 
@@ -39,8 +39,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// Keccak256: An implementation of the SHA-3 Keccak digest.
-/// <para>SHA-3 competition winner: The Keccak digest</para>
+/// Keccak256: An implementation of the SHA-3 Keccak digest
 /// </summary>
 ///
 /// <example>
@@ -53,10 +52,6 @@ NAMESPACE_DIGEST
 /// </code>
 /// </example>
 ///
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
@@ -70,15 +65,15 @@ NAMESPACE_DIGEST
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
 /// </list>
 /// 
-/// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>SHA3 <see href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</see>.</description></item>
-/// <item><description>SHA3: <see href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report of the SHA-3 Cryptographic Hash Algorithm Competition</see>.</description></item>
+/// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</a>.</description></item>
+/// <item><description>SHA3 <a href="http://csrc.nist.gov/groups/ST/hash/sha-3/documents/Keccak-slides-at-NIST.pdf">Keccak Slides</a>.</description></item>
+/// <item><description>SHA3 <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition.</description></item>
 /// </list>
 /// </remarks>
 class Keccak256 : public IDigest
 {
-protected:
+private:
 	unsigned int _blockSize;
 	std::vector<byte> _buffer;
 	unsigned int _bufferIndex;
@@ -197,7 +192,7 @@ public:
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input);
 
-protected:
+private:
 	void Initialize();
 };
 

@@ -24,15 +24,14 @@ namespace Test
 		{
 			throw TestException(std::string(FAILURE + " : Internal Error"));
 		}
-		return "";
 	}
 
-	void SP20DrbgTest::CompareVector(int KeySize, std::vector<byte> Expected)
+	void SP20DrbgTest::CompareVector(unsigned int KeySize, std::vector<byte> Expected)
 	{
 		std::vector<byte> key(KeySize);
 		std::vector<byte> output(1024);
 
-		for (int i = 0; i < KeySize; i++)
+		for (unsigned int i = 0; i < KeySize; i++)
 			key[i] = (byte)i;
 
 		CEX::Generator::SP20Drbg spd(20);

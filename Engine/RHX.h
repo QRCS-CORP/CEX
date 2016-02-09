@@ -23,8 +23,8 @@
 // 
 // Principal Algorithms:
 // Cipher implementation based on the Rijndael block cipher designed by Joan Daemen and Vincent Rijmen:
-// Rijndael <see href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Specification</see>.
-// AES specification <see href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">Fips 197</see>.
+// Rijndael <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Specification</a>.
+// AES specification <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">Fips 197</a>.
 // 
 // Implementation Details:
 // An implementation based on the Rijndael block cipher, 
@@ -57,10 +57,6 @@ NAMESPACE_BLOCK
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2014/09/18" version="1.5.0.0">Initial release</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Enumeration::BlockCiphers"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
 /// <seealso cref="CEX::Digest::IDigest"/>
@@ -83,7 +79,7 @@ NAMESPACE_BLOCK
 /// </list>
 /// 
 /// <description>HKDF Bytes Generator:</description>
-/// <para>HKDF is a key derivation function that uses a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
+/// <para>HKDF: is a key derivation function that uses a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
 /// This is one of the strongest methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even Serpents key schedule. 
 /// HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
 /// The HMAC RFC 2104, recommends a key size equal to the digest output, in the case of SHA512, 64 bytes, anything larger gets passed through the hash function to get the required 512 bit key size. 
@@ -92,10 +88,10 @@ NAMESPACE_BLOCK
 /// <para>When using SHA-2 512, a minimum key size for RHX is 192 bytes, further blocks of salt can be added to the key so long as they align; ikm + (n * blocksize), ex. 192, 320, 448 bytes.. there is no upper maximum. 
 /// This means that you can create keys as large as you like so long as it falls on these boundaries, this effectively eliminates brute force as a means of attack on the cipher, even in post-quantum terms.</para> 
 /// 
-/// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake, Keccak, SHA-2, or Skein.
+/// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake, Keccak, SHA-2 or Skein.
 /// The default Digest Engine is SHA-2 512.</para>
 /// 
-/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <math>klen = h + (n * s)</math>, this will vary between Digest implementations. 
+/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <c>klen = h + (n * s)</c>, this will vary between Digest implementations. 
 /// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property.</para>
 /// 
 /// <para>The number of diffusion rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. 
@@ -104,17 +100,20 @@ NAMESPACE_BLOCK
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</see>.</description></item>
-/// <item><description>HMAC: <see href="http://tools.ietf.org/html/rfc2104">RFC 2104</see>.</description></item>
-/// <item><description>Fips: <see href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198.1</see>.</description></item>
-/// <item><description>HKDF: <see href="http://tools.ietf.org/html/rfc5869">RFC 5869</see>.</description></item>
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
+/// <item><description>HMAC <a href="http://tools.ietf.org/html/rfc2104">RFC 2104</a>.</description></item>
+/// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198.1</a>.</description></item>
+/// <item><description>HKDF <a href="http://tools.ietf.org/html/rfc5869">RFC 5869</a>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>.</description></item>
+/// <item><description>SHA3 <a href="https://131002.net/blake/blake.pdf">The Blake digest</a>.</description></item>
+/// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">The Keccak digest</a>.</description></item>
+/// <item><description>SHA3 <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">The Skein digest</a>.</description></item>
 /// </list>
-/// 
 /// </remarks>
 class RHX : public IBlockCipher
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK16 = 16;
 	static constexpr unsigned int BLOCK32 = 32;
 	static constexpr unsigned int LEGAL_KEYS = 14;
@@ -391,7 +390,7 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
-protected:
+private:
 	void Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Decrypt32(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);

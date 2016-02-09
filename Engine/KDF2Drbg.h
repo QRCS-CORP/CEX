@@ -30,8 +30,7 @@
 NAMESPACE_GENERATOR
 
 /// <summary>
-/// KDF2Drbg: An implementation of an Hash based Key Derivation Function.
-/// <para>KDF2Drbg as outlined in ISO 18033-2 based on ISO 18033/P1363a.</para>
+/// KDF2Drbg: An implementation of an Hash based Key Derivation Function
 /// </summary> 
 /// 
 /// <example>
@@ -44,10 +43,6 @@ NAMESPACE_GENERATOR
 ///  rnd.Generate(Output, [Offset], [Size]);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
@@ -63,13 +58,12 @@ NAMESPACE_GENERATOR
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="table">
-/// <item><description>ISO-18033-2: <see href="http://www.shoup.net/iso/std6.pdf">Specification</see>.</description></item>
-/// <item><description>RFC 2898: <see href="http://tools.ietf.org/html/rfc2898">Specification</see>.</description></item>
+/// <item><description>RFC 2898: <a href="http://tools.ietf.org/html/rfc2898">Password-Based Cryptography Specification Version 2.0</a>.</description></item>
 /// </list>
 /// </remarks>
 class KDF2Drbg : public IGenerator
 {
-protected:
+private:
 	unsigned int _hashSize;
 	bool _isDestroyed;
 	bool _isInitialized;
@@ -203,7 +197,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Salt value is too small</exception>
 	virtual void Update(const std::vector<byte> &Salt);
 
-protected:
+private:
 	unsigned int GenerateKey(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
 };
 

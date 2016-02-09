@@ -51,7 +51,7 @@ namespace Test
 		virtual std::string Run();
 
     private:
-		void CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, bool Encrypt = true, int Count = 10000);
+		void CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, bool Encrypt = true, unsigned int Count = 10000);
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void Initialize();
 		void OnProgress(char* Data);

@@ -51,11 +51,6 @@ NAMESPACE_PROCESSING
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/01/23" version="1.3.0.0">Initial release</revision>
-/// <revision date="2015/07/01" version="1.4.0.0">Added library exceptions</revision>
-/// </revisionHistory>
-/// 
 /// <seealso cref="CEX::Enumeration::Digests"/>
 /// 
 /// <remarks>
@@ -67,7 +62,7 @@ NAMESPACE_PROCESSING
 /// </remarks>
 class DigestStream
 {
-protected:
+private:
 	static constexpr unsigned int BUFFER_SIZE = 64 * 1024;
 
 	unsigned int _blockSize;
@@ -80,6 +75,10 @@ protected:
 	DigestStream() { }
 
 public:
+
+	/// <summary>
+	/// The Progress Percent event
+	/// </summary>
 	CEX::Event::Event<int> ProgressPercent;
 
 	/// <summary>
@@ -146,7 +145,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeHash(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
 
-protected:
+private:
 	void CalculateInterval(unsigned int Length);
 	void CalculateProgress(unsigned int Length, bool Completed = false);
 	std::vector<byte> Compute(unsigned int Length);

@@ -200,6 +200,7 @@
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
+    <ClInclude Include="..\..\Test\SP20DrbgTest.h" />
     <ClInclude Include="..\..\Test\TestEventHandler.h" />
     <ClInclude Include="..\..\Test\TestEvent.h" />
     <ClInclude Include="..\..\Test\HexConverter.h" />
@@ -253,9 +254,6 @@
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />
     <ClCompile Include="..\..\Test\SP20DrbgTest.cpp" />
-    <ClCompile Include="..\..\Test\SP20DrbgTest.h">
-      <FileType>CppHeader</FileType>
-    </ClCompile>
     <ClCompile Include="..\..\Test\SpeedTest.cpp" />
     <ClCompile Include="..\..\Test\VMACTest.cpp" />
     <ClCompile Include="..\..\Test\XSPRsgTest.cpp" />

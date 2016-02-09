@@ -34,8 +34,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements a Cipher Block Chaining Mode: CBC.
-/// <para>CBC as outlined in the NIST document: SP800-38A</para>
+/// Implements a Cipher Block Chaining Mode: CBC
 /// </summary> 
 /// 
 /// <example>
@@ -48,10 +47,6 @@ NAMESPACE_MODE
 /// cipher.Transform(Input, Output);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Cipher::Symmetric::Block"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
@@ -67,12 +62,12 @@ NAMESPACE_MODE
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST: <see href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</a>.</description></item>
 /// </list>
 /// </remarks>
 class CBC : public ICipherMode
 {
-protected:
+private:
 	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
 	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
 
@@ -274,7 +269,7 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 
-protected:
+private:
 	void ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Output);
 	void ParallelDecrypt(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
 	void ProcessDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset, std::vector<byte> &Iv, const unsigned int BlockCount);

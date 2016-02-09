@@ -31,8 +31,7 @@
 NAMESPACE_PRNG
 
 /// <summary>
-/// SP20Prng: An implementation of a Encryption Counter based Deterministic Random Number Generator.
-/// <para>Uses the Salsa20 Key stream as a source of random input.</para>
+/// SP20Prng: An implementation of a Encryption Counter based Deterministic Random Number Generator
 /// </summary> 
 /// 
 /// <example>
@@ -43,10 +42,6 @@ NAMESPACE_PRNG
 /// int num = rnd.Next([Minimum], [Maximum]);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
@@ -59,14 +54,14 @@ NAMESPACE_PRNG
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>Salsa20 <see href="http://www.ecrypt.eu.org/stream/salsa20pf.html">Specification</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
+/// <item><description>Salsa20 <a href="http://www.ecrypt.eu.org/stream/salsa20pf.html">eSTREAM Phase 3</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/design.pdf">Design</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/security.pdf">Security</a>.</description></item>
 /// </list>
 /// </remarks>
 class SP20Prng : public IRandom
 {
-protected:
+private:
 	static constexpr unsigned int BUFFER_SIZE = 4096;
 
 	unsigned int _bufferIndex;
@@ -102,7 +97,7 @@ public:
 	/// 
 	/// <param name="SeedEngine">The Seed engine used to create keyng material (default is CSPRsg)</param>
 	/// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
-	/// <param name="SeedSize">The size of the seed to generate in bytes; can be 32 for a 128 bit key or 48 for a 256 bit key</param>
+	/// <param name="KeySize">The size of the seed to generate in bytes; can be 32 for a 128 bit key or 48 for a 256 bit key</param>
 	/// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range (rounds 10-30, min. buffer 64 bytes)</exception>
@@ -243,7 +238,7 @@ public:
 	/// </summary>
 	virtual void Reset();
 
-protected:
+private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);

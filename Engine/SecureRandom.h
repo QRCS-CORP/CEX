@@ -23,7 +23,7 @@
 // 
 // Implementation Details:
 // An implementation of a Cryptographically Secure Pseudo Random Number Generator (SecureRandom). 
-// Uses the <see href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</see> class to produce pseudo random output.
+// Uses the <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</a> class to produce pseudo random output.
 // Written by John Underhill, January 6, 2014
 // contact: develop@vtdev.com
 
@@ -51,13 +51,9 @@ using CEX::Exception::CryptoRandomException;
 /// int x = rnd.NextInt32();
 /// </c>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 class SecureRandom
 {
-protected:
+private:
 	static constexpr unsigned int BUFFER_SIZE = 4096;
 	static constexpr unsigned int MAXD16 = 16368;
 
@@ -128,7 +124,7 @@ public:
 	ulong NextUInt64(ulong Minimum, ulong Maximum);
 	void Reset();
 
-protected:
+private:
 	std::vector<byte> GetByteRange(ulong Maximum);
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 };

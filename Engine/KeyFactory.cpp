@@ -5,16 +5,14 @@
 
 NAMESPACE_PRCFACTORY
 
-/*void KeyFactory::Create(CEX::Common::CipherDescription Description, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, 
-	CEX::Enumeration::Digests HashEngine = CEX::Enumeration::Digests::SHA512)
+void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Enumeration::SeedGenerators SeedEngine, CEX::Enumeration::Digests HashEngine)
 {
-	CEX::Common::KeyParams* keyParam;
 	CEX::Seed::CSPRsg rnd;
 	CEX::Common::KeyGenerator keyGen(SeedEngine, HashEngine, rnd.GetBytes(16));
-	keyParam = keyGen.GetKeyParams(Description.KeySize, Description.IvSize, Description::MacSize);
+	CEX::Common::KeyParams* key = keyGen.GetKeyParams(Description.KeySize(), (unsigned int)Description.IvSize(), Description.MacSize());
 
-	Create(Description, *keyParam);
-}*/
+	Create(Description, *key);
+}
 
 void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common::KeyParams &KeyParam)
 {

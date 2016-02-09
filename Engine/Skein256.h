@@ -22,7 +22,7 @@
 // SOFTWARE.
 // 
 // Principal Algorithms:
-// The Skein Hash Function Family: <see href="https://www.schneier.com/skein1.3.pdf">Skein V1.1</see>.
+// The Skein Hash Function Family: <a href="https://www.schneier.com/skein1.3.pdf">Skein V1.1</a>.
 // Implementation Details:
 // An implementation of the Skein digest with a 256 bit digest size. 
 // Written by John Underhill, January 13, 2015
@@ -38,8 +38,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// Skein256: An implementation of the Skein digest with a 256 bit digest return size.
-/// <para>SHA-3 finalist: The Skein digest</para>
+/// Skein256: An implementation of the Skein digest with a 256 bit digest return size
 /// </summary>
 /// 
 /// <example>
@@ -51,10 +50,6 @@ NAMESPACE_DIGEST
 /// digest.ComputeHash(Input, hash);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
@@ -70,14 +65,15 @@ NAMESPACE_DIGEST
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>The Skein Hash Function Family: <see href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">Skein V1.1</see>.</description></item>
-/// <item><description>Skein <see href="http://www.skein-hash.info/sites/default/files/skein-proofs.pdf">Provable Security</see> Support for the Skein Hash Family.</description></item>
-/// <item><description>SHA3: <see href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report of the SHA-3 Cryptographic Hash Algorithm Competition</see>.</description></item>
+/// <item><description>Skein <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">The Skein digest</a>.</description></item>
+/// <item><description>The Skein Hash Function Family <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">Skein V1.1</a>.</description></item>
+/// <item><description>Skein <a href="http://www.skein-hash.info/sites/default/files/skein-proofs.pdf">Provable Security</a> Support for the Skein Hash Family.</description></item>
+/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition>.</description></item>
 /// </list>
 /// </remarks>
 class Skein256 : public IDigest
 {
-protected:
+private:
 	static constexpr uint BLOCK_SIZE = 32;
 	static constexpr uint DIGEST_SIZE = 32;
 	static constexpr uint STATE_SIZE = 256;
@@ -307,7 +303,7 @@ public:
 	/// <param name="Input">Input byte</param>
 	void Update(byte Input);
 
-protected:
+private:
 	void GenerateConfiguration();
 	void Initialize();
 	void ProcessBlock(int bytes);

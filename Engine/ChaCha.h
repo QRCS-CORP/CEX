@@ -23,7 +23,7 @@
 // 
 // Principal Algorithms:
 // Portions of this cipher based on the ChaCha stream cipher designed by Daniel J. Bernstein:
-// ChaCha20 <see href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</see>.
+// ChaCha20 <a href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</a>.
 // 
 // Implementation Details:
 // ChaCha20+
@@ -42,9 +42,7 @@
 NAMESPACE_STREAM
 
 /// <summary>
-/// ChaCha+: A parallelized ChaCha stream cipher implementation.
-/// <para>A ChaCha cipher extended to use up to 30 rounds.</para>
-/// </summary>
+/// ChaCha+: A parallelized ChaCha stream cipher implementation
 /// 
 /// <example>
 /// <description>Encrypt an array with ChaCha:</description>
@@ -58,10 +56,6 @@ NAMESPACE_STREAM
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -72,14 +66,14 @@ NAMESPACE_STREAM
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>ChaCha20 <see href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/design.pdf">Design</see>.</description></item>
-/// <item><description>Salsa20 <see href="http://cr.yp.to/snuffle/security.pdf">Security</see>.</description></item>
+/// <item><description>ChaCha20 <a href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/design.pdf">Design</a>.</description></item>
+/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/security.pdf">Security</a>.</description></item>
 /// </list>
 /// </remarks>
 class ChaCha : public IStreamCipher
 {
-protected:
+private:
 	static constexpr unsigned int ROUNDS20 = 20;
 	static constexpr unsigned int MAX_ROUNDS = 30;
 	static constexpr unsigned int MIN_ROUNDS = 8;
@@ -282,7 +276,7 @@ public:
 	/// <param name="Length">Number of bytes to process</param>
 	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length);
 
-protected:
+private:
 	void ChaChaCore(std::vector<byte> &Output, const unsigned int OutOffset, std::vector<uint> &Counter);
 	void Generate(const unsigned int Size, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
 	unsigned int GetProcessorCount();

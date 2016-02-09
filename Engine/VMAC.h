@@ -34,8 +34,7 @@
 NAMESPACE_MAC
 
 /// <summary>
-/// An implementation of a Variably Modified Permutation Composition based Message Authentication Code: VMPC-MAC.
-/// <para>A VMPC message code generator as outlined in the VMPC-MAC Specification</para>
+/// An implementation of a Variably Modified Permutation Composition based Message Authentication Code
 /// </summary>
 /// 
 /// <example>
@@ -49,10 +48,6 @@ NAMESPACE_MAC
 /// </code>
 /// </example>
 /// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -62,14 +57,14 @@ NAMESPACE_MAC
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>VMPC-MAC Specification: <see href="http://www.vmpcfunction.com/vmpc_mac.pdf"/> VMPC-MAC: A Stream Cipher Based Authenticated Encryption Scheme.</description></item>
-/// <item><description>VMPC Paper: <see href="http://www.vmpcfunction.com/vmpcmac.htm"/> VMPC-MAC Authenticated Encryption Scheme.</description></item>
-/// <item><description>IETF: <see href="http://www.okna.wroc.pl/vmpc.pdf"/> VMPC One-Way Function and Stream Cipher.</description></item>
+/// <item><description>VMPC <a href="http://www.vmpcfunction.com/vmpc_mac.pdf">MAC Specification</a>:  VMPC-MAC: A Stream Cipher Based Authenticated Encryption Scheme.</description></item>
+/// <item><description>VMPC <a href="http://www.vmpcfunction.com/vmpcmac.htm">VMPC-MAC</a> Authenticated Encryption Scheme.</description></item>
+/// <item><description>IETF <a href="http://www.okna.wroc.pl/vmpc.pdf">VMPC One-Way Function</a> and Stream Cipher.</description></item>
 /// </list>
 /// </remarks>
 class VMAC : public IMac
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 256;
 	static constexpr unsigned int MAC_SIZE = 20;
 	static constexpr byte CT1F = (byte)0x1F;
@@ -169,8 +164,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">Input data</param>
-	/// 
-	/// <returns>Mac Hash value</returns>
+	/// <param name="Output">The output message code</param>
 	virtual void ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
@@ -213,10 +207,10 @@ public:
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input);
 
-protected:
+private:
 	/// <remarks>
-	/// Section 3.2, table 2 <see href="http://vmpcfunction.com/vmpc_mac.pdf">VMPC-MAC: 
-	/// A Stream Cipher Based Authenticated Encryption Scheme</see>
+	/// Section 3.2, table 2 <a href="http://vmpcfunction.com/vmpc_mac.pdf">VMPC-MAC: 
+	/// A Stream Cipher Based Authenticated Encryption Scheme</a>
 	/// </remarks>
 	void InitKey(std::vector<byte> &KeyBytes, std::vector<byte> &IvBytes);
 };

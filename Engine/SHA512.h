@@ -23,7 +23,7 @@
 // 
 // Principal Algorithms:
 // An implementation of the SHA-2 digest with a 512 bit return size.
-// SHA-2 <see href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</see>.
+// SHA-2 <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</a>.
 // 
 // Implementation Details:
 // An implementation of the SHA-2 digest with a 512 bit return size. 
@@ -39,8 +39,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// SHA512: An implementation of the SHA-2 digest with a 512 bit digest return size.
-/// <para>The SHA-2 512 digest</para>
+/// SHA512: An implementation of the SHA-2 digest with a 512 bit digest return size
 /// </summary> 
 /// 
 /// <example>
@@ -52,10 +51,6 @@ NAMESPACE_DIGEST
 /// digest.ComputeHash(Input, hash);
 /// </code>
 /// </example>
-/// 
-/// <revisionHistory>
-/// <revision date="2015/11/20" version="1.0.0.0">Initial C++ Library implemention</revision>
-/// </revisionHistory>
 /// 
 /// <seealso cref="CEX::Digest::IDigest"/>
 /// <seealso cref="CEX::Enumeration::Digests"/>
@@ -71,12 +66,12 @@ NAMESPACE_DIGEST
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>SHA-2 <see href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</see>.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">SHA-2 Specification</a>.</description></item>
 /// </list>
 /// </remarks>
 class SHA512 : public IDigest
 {
-protected:
+private:
 	static constexpr unsigned int BLOCK_SIZE = 128;
 	static constexpr unsigned int DIGEST_SIZE = 64;
 
@@ -197,7 +192,7 @@ public:
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input);
 
-protected:
+private:
 	void AdjustByteCounts();
 	void Finish();
 	void Initialize();

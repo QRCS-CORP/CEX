@@ -42,7 +42,7 @@ namespace Test
 		CEX::Prng::CSPPrng rnd;
 		CEX::Common::KeyGenerator kg;
 
-		for (int i = 0; i < 10; ++i)
+		for (unsigned int i = 0; i < 10; ++i)
 		{
 			// out-bound funcs return pointer to obj
 			CEX::Common::KeyParams* kp = kg.GetKeyParams(rnd.Next(1, 1024), rnd.Next(1, 128), rnd.Next(1, 128));

@@ -65,6 +65,8 @@ public:
 	/// <summary>
 	/// Initialize this class; setting the streams length
 	/// </summary>
+	///
+	/// <param name="Length">The reserved length of the stream</param>
 	MemoryStream(unsigned int Length)
 		:
 		_isDestroyed(false),
@@ -77,6 +79,8 @@ public:
 	/// <summary>
 	/// Initialize this class; setting a byte array as the streams content
 	/// </summary>
+	///
+	/// <param name="DataArray">The array used to initialize the stream</param>
 	MemoryStream(const std::vector<byte> &DataArray)
 		:
 		_isDestroyed(false),
@@ -89,21 +93,22 @@ public:
 	/// Initialize this class (Copy constructor); copy a portion of a byte array to the streams content
 	/// </summary>
 	/// 
+	/// <param name="DataArray">The array used to initialize the stream</param>
 	/// <param name="Offset">The offset in the Data array at which to begin copying</param>
 	/// <param name="Length">The number of bytes to copy</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
-	MemoryStream(std::vector<byte> &Data, unsigned int Offset, unsigned int Length)
+	MemoryStream(std::vector<byte> &DataArray, unsigned int Offset, unsigned int Length)
 		:
 		_isDestroyed(false),
 		_streamData(0),
 		_streamPosition(0)
 	{
-		if (Length > Data.size() - Offset)
+		if (Length > DataArray.size() - Offset)
 			throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
 
 		_streamData.reserve(Length);
-		_streamData.insert(_streamData.begin(), Data.begin() + Offset, Data.begin() + Length);
+		_streamData.insert(_streamData.begin(), DataArray.begin() + Offset, DataArray.begin() + Length);
 	}
 
 	// *** Public Methods *** //
@@ -180,7 +185,7 @@ public:
 	/// Set the length of the stream
 	/// </summary>
 	/// 
-	/// <param name="Offset">The desired length</param>
+	/// <param name="Length">The desired length</param>
 	virtual void SetLength(unsigned int Length);
 
 	/// <summary>

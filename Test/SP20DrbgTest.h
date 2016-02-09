@@ -59,7 +59,7 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareVector(int KeySize, std::vector<byte> Expected);
+		void CompareVector(unsigned int KeySize, std::vector<byte> Expected);
 		void Initialize();
 		void OnProgress(char* Data);
 	};
