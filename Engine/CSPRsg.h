@@ -83,7 +83,7 @@ public:
 	/// Fill the buffer with random bytes
 	/// </summary>
 	///
-	/// <param name="Input">The array to fill</param>
+	/// <param name="Output">The array to fill</param>
 	virtual void GetBytes(std::vector<byte> &Output);
 
 	/// <summary>

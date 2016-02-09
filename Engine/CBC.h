@@ -116,12 +116,11 @@ public:
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
 	virtual bool &IsParallel() { return _isParallel; }
-	void IsParallel(const bool Value) { _isParallel = Value; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> IV() { return _cbcIv; }
+	virtual const std::vector<byte> &IV() { return _cbcIv; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
@@ -141,7 +140,6 @@ public:
 	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
 	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
 	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
-	void ParallelBlockSize(const int Value) { _parallelBlockSize = Value; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing

@@ -76,7 +76,7 @@ unsigned int Keccak512::DoFinal(std::vector<byte> &Output, const unsigned int Ou
 	_state[17] = ~_state[17];
 
 	std::vector<byte> longBytes;
-	Keccak::Word64sToBytes(_state, longBytes);
+	CEX::Utility::IntUtils::Word64sToBytes(_state, longBytes);
 	memcpy(&Output[OutOffset], &longBytes[0], _digestSize);
 	Initialize();
 

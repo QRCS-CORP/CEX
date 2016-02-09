@@ -145,7 +145,7 @@ public:
 	// *** Constructor *** //
 
 	/// <summary>
-	/// Initialize the class with a CipherDescription Structure; containing the cipher implementation details, and a <see cref="CEX::Common::KeyParams"/> class containing the Key material.
+	/// Initialize the class with a CipherDescription Structure; containing the cipher implementation details, and a KeyParams class containing the Key material.
 	/// <para>This constructor creates and configures cryptographic instances based on the cipher description contained in a CipherDescription. 
 	/// Cipher modes, padding, and engines are destroyed automatically through this classes Destroy() method.</para>
 	/// </summary>
@@ -157,7 +157,7 @@ public:
 	/// <param name="BlockSize">The cipher blocksize</param>
 	/// <param name="KdfEngine">The HX ciphers key schedule engine</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid <see cref="CEX::Common::CipherDescription">CipherDescription</see> or <see cref="CEX::Common::KeyParams">KeyParams</see> is used</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid CipherDescription or KeyParams is used</exception>
 	CipherStream(CEX::Enumeration::SymmetricEngines EngineType, int RoundCount = 22, CEX::Enumeration::CipherModes CipherType = CEX::Enumeration::CipherModes::CTR, CEX::Enumeration::PaddingModes PaddingType = CEX::Enumeration::PaddingModes::PKCS7, int BlockSize = 16, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
 		:
 		_destroyEngine(true),
@@ -204,9 +204,9 @@ public:
 	/// Cipher modes, padding, and engines are destroyed automatically through this classes Destruct() method.</para>
 	/// </summary>
 	/// 
-	/// <param name="Header">A <see cref="CEX::Common::CipherDescription"/> containing the cipher description</param>
+	/// <param name="Header">A CipherDescription containing the cipher description</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid <see cref="CEX::Common::CipherDescription">CipherDescription</see> is used</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid CipherDescription is used</exception>
 	CipherStream(CEX::Common::CipherDescription* Header)
 		:
 		_destroyEngine(true),
@@ -251,15 +251,15 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize the class with a Block <see cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">Cipher</see> and optional <see cref="CEX::Cipher::Symmetric::Block::Padding::IPadding">Padding</see> instances.
-	/// <para>This constructor requires a fully initialized <see cref="CEX::Enumeration::CipherModes">CipherMode</see> instance.
-	/// If the <see cref="CEX::Enumeration::PaddingModes">PaddingMode</see> parameter is null, X9.23 padding will be used if required.</para>
+	/// Initialize the class with a Block Cipherand optional Padding instances.
+	/// <para>This constructor requires an uninitialized CipherMode instance.
+	/// If the PaddingMode parameter is null, X9.23 padding will be used if required.</para>
 	/// </summary>
 	/// 
-	/// <param name="Cipher">The <see cref="CEX::Enumeration::SymmetricEngines">Block Cipher</see> wrapped in a <see cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">Cipher</see> mode</param>
-	/// <param name="Padding">The <see cref="CEX::Cipher::Symmetric::Block::Padding::IPadding">Padding</see> instance</param>
+	/// <param name="Cipher">The Block Cipher wrapped in a Cipher mode</param>
+	/// <param name="Padding">The Block Cipher Padding instance</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized <see cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode">Cipher</see> is used</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Cipher is used</exception>
 	CipherStream(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding = 0)
 		:
 		_cipherEngine(Cipher),
@@ -282,13 +282,13 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize the class with a <see cref="CEX::Cipher::Symmetric::Stream::IStreamCipher">Stream Cipher</see> instance.
-	/// <para>This constructor requires a fully initialized <see cref="CEX::Enumeration::SymmetricEngines">CipherStream</see> instance.</para>
+	/// Initialize the class with a Stream Cipher instance.
+	/// <para>This constructor requires an uninitialized CipherStream instance.</para>
 	/// </summary>
 	/// 
-	/// <param name="Cipher">The initialized <see cref="CEX::Cipher::Symmetric::Stream::IStreamCipher">Stream Cipher</see> instance</param>
+	/// <param name="Cipher">The uninitialized Stream Cipher instance</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized <see cref="CEX::Cipher::Symmetric::Stream::IStreamCipher">Stream Cipher</see> is used</exception>
+	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Stream Cipher is used</exception>
 	CipherStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher)
 		:
 		_destroyEngine(false),

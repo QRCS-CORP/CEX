@@ -19,6 +19,9 @@ private:
 	std::vector<ulong>  _expandedTweak;
 
 public:
+	/// <summary>
+	/// Threefish with a 512 bit block
+	/// </summary>
 	Threefish512()
 		:
 		_expandedTweak(ExpandedTweakSize, 0),
@@ -28,10 +31,32 @@ public:
 		_expandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
 	}
 
+	/// <summary>
+	/// Reset the state
+	/// </summary>
 	void Clear();
-	void Encrypt(const std::vector<ulong> Input, std::vector<ulong> &Output);
-	void SetKey(const std::vector<ulong> Key);
-	void SetTweak(const std::vector<ulong> Tweak);
+
+	/// <summary>
+	/// Encrypt a block
+	/// </summary>
+	/// 
+	/// <param name="Input">Input array</param>
+	/// <param name="Output">Processed bytes</param>
+	void Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &Output);
+
+	/// <summary>
+	/// Initialize the key
+	/// </summary>
+	/// 
+	/// <param name="Key">The cipher key</param>
+	void SetKey(const std::vector<ulong> &Key);
+
+	/// <summary>
+	/// Initialize the tweak
+	/// </summary>
+	/// 
+	/// <param name="Tweak">The cipher tweak</param>
+	void SetTweak(const std::vector<ulong> &Tweak);
 
 private:
 	static inline void Mix(ulong &A, ulong &B, unsigned int R)

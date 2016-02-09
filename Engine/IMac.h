@@ -92,7 +92,7 @@ public:
 	/// Initialize the MAC generator.
 	/// </summary>
 	///
-	/// <param name="KeyParam">The HMAC Key</param>
+	/// <param name="MacKey">The HMAC Key</param>
 	/// <param name="IV">The optional IV</param>
 	virtual void Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV) = 0;
 

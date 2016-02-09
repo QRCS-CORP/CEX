@@ -106,7 +106,7 @@ public:
 	/// Update the Seed material
 	/// </summary>
 	/// 
-	/// <param name="Seed">Pseudo random seed material</param>
+	/// <param name="Salt">Pseudo random seed material</param>
 	virtual void Update(const std::vector<byte> &Salt) = 0;
 };
 

@@ -21,17 +21,22 @@ class ParallelUtils
 {
 public:
 
+	template <class Lockable>
 	/// <summary>
 	/// Lock a thread instance.
 	/// <para>ex. lock<std::mutex> lock(mtx);</para>
 	/// </summary> 
-	template <class Lockable>
 	class lock 
 	{
 	private:
 		Lockable &mtx;
 
 	public:
+		/// <summary>
+		/// Lock a thread instance
+		/// </summary> 
+		/// 
+		/// <param name="m">The thread</param>
 		lock(Lockable & m) : mtx(m) 
 		{
 			mtx.lock();
@@ -50,6 +55,10 @@ public:
 	/// <summary>
 	/// A multi platform Parallel For loop
 	/// </summary>
+	/// 
+	/// <param name="From">The starting position</param> 
+	/// <param name="To">The ending position</param>
+	/// <param name="F">The function delegate</param>
 	static void ParallelFor(int From, int To, const std::function<void(int)> &F);
 };
 

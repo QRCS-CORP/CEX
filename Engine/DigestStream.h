@@ -56,7 +56,7 @@ NAMESPACE_PROCESSING
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Uses any of the implemented <see cref="CEX::Enumeration::Digests">Digests</see> using either the IDigest interface, or a Digests enumeration member.</description></item>
+/// <item><description>Uses any of the implemented Digests using either the IDigest interface, or a Digests enumeration member.</description></item>
 /// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either of the ComputeHash() calls.</description></item>
 /// </list>
 /// </remarks>

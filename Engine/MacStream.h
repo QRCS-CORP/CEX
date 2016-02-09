@@ -60,7 +60,7 @@ NAMESPACE_PROCESSING
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Uses any of the implemented <see cref="CEX::Enumeration::Macs">Macs</see> using the IMac interface.</description></item>
+/// <item><description>Uses any of the implemented Macs using the IMac interface.</description></item>
 /// <item><description>Mac must be fully initialized before passed to the constructor.</description></item>
 /// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either ComputeMac() calls.</description></item>
 /// </list>

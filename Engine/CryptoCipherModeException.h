@@ -16,16 +16,14 @@ private:
 
 public:
 	/// <summary>
-	/// The origin of the exception in the format Class
+	/// Get/Set: The message associated with the error
 	/// </summary>
-	const std::string &Origin() const { return _origin; }
-	std::string &Origin() { return _origin; }
+	std::string &Message() { return _message; }
 
 	/// <summary>
-	/// The message associated with the error
+	/// Get/Set: The origin of the exception in the format Class
 	/// </summary>
-	const std::string &Message() const { return _message; }
-	std::string &Message() { return _message; }
+	std::string &Origin() { return _origin; }
 
 	/// <summary>
 	/// Exception constructor

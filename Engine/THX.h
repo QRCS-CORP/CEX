@@ -66,8 +66,8 @@ NAMESPACE_BLOCK
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>HKDF Digest <see cref="CEX::Enumeration::Digests">engine</see> is definable through the <see cref="THX(unsigned int, Digests)">Constructor</see> parameter: KeyEngine.</description></item>
-/// <item><description>Key Schedule is (optionally) powered by a Hash based Key Derivation Function using a definable <see cref="CEX::Digest::IDigest">Digest</see>.</description></item>
+/// <item><description>HKDF Digest engine is definable through the <see cref="THX(unsigned int, Digests)">Constructor</see> parameter: KeyEngine.</description></item>
+/// <item><description>Key Schedule is (optionally) powered by a Hash based Key Derivation Function using a definable Digest.</description></item>
 /// <item><description>Minimum key size is (IKm + Salt) (N * Digest State Size) + (Digest Hash Size) in bytes.</description></item>
 /// <item><description>Valid block size is 16 bytes wide.</description></item>
 /// <item><description>Valid Rounds assignments are set at 16 in standard mode, and 32, 40, 48, 56, and 64 in extended mode.</description></item>
@@ -211,7 +211,7 @@ public:
 	/// Initialize the class with a Digest instance
 	/// </summary>
 	/// 
-	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations.</param>
+	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the Digest implementations.</param>
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 16 rounds.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
@@ -256,7 +256,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 16 rounds.</param>
-	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations. The default engine is SHA512.</param>
+	/// <param name="KdfEngineType">The Key Schedule KDF digest engine; can be any one of the Digest implementations. The default engine is SHA512.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
 	THX(unsigned int Rounds = ROUNDS16, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)

@@ -55,7 +55,7 @@ NAMESPACE_GENERATOR
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Can be initialized with any block <see cref="CEX::Enumeration::BlockCiphers">cipher</see>.</description></item>
+/// <item><description>Can be initialized with any block cipher.</description></item>
 /// <item><description>Parallelized by default on a multi processer system when an input byte array of <see cref="ParallelMinimumSize"/> bytes or larger is used.</description></item>
 /// <item><description>Parallelization can be disabled using the <see cref="IsParallel"/> property.</description></item>
 /// <item><description>Combination of [Salt, Ikm, Nonce] must be: cipher key size +  cipher block size in length.</description></item>
@@ -106,12 +106,12 @@ public:
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	virtual bool &IsParallel() { return _isParallel; }
+	bool &IsParallel() { return _isParallel; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> IV() { return _ctrVector; }
+	const std::vector<byte> IV() { return _ctrVector; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
@@ -120,29 +120,29 @@ public:
 	virtual unsigned int KeySize() { return _keySize; }
 
 	/// <summary>
+	/// Get: Cipher name
+	/// </summary>
+	virtual const char *Name() { return "CTRDrbg"; }
+
+	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() { return _processorCount * _blockSize; }
+	const unsigned int ParallelMinimumSize() { return _processorCount * _blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return _processorCount; }
-
-	/// <summary>
-	/// Get: Cipher name
-	/// </summary>
-	virtual const char *Name() { return "CTRDrbg"; }
+	const unsigned int ProcessorCount() { return _processorCount; }
 
 	// *** Constructor *** //
 

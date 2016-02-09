@@ -34,6 +34,9 @@ public:
 		Destroy();
 	}
 
+	/// <summary>
+	/// Destroy this class
+	/// </summary>
 	void Destroy()
 	{
 		if (!_isDestroyed)

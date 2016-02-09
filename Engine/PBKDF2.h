@@ -52,7 +52,7 @@ NAMESPACE_GENERATOR
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Can be initialized with a <see cref="CEX::Enumeration::Digests">Digest</see> or a <see cref="CEX::Enumeration::Macs">Mac</see>.</description></item>
+/// <item><description>Can be initialized with a Digest or a Mac<.</description></item>
 /// <item><description>Salt size should be multiple of Digest block size.</description></item>
 /// <item><description>Ikm size should be Digest hash return size.</description></item>
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>

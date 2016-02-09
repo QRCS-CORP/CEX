@@ -119,7 +119,7 @@ public:
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> IV() { return _cfbIv; }
+	virtual const std::vector<byte> &IV() { return _cfbIv; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
@@ -135,8 +135,9 @@ public:
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// <para>The parallel block size is calculated automatically based on the number of available processors on the system (n * 64kb).</para>
 	/// </summary>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, or  block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
+	/// 
+	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
+	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
 	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>

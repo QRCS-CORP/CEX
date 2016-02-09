@@ -22,23 +22,34 @@ private:
 public:
 
 	/// <summary>
-	/// Get/Set: Cipher Key
+	/// Get: The cipher Key
 	/// </summary>
 	const std::vector<byte> &Key() const { return _key; }
+
+	/// <summary>
+	/// Set: The cipher Key
+	/// </summary>
 	std::vector<byte> &Key() { return _key; }
 
 	/// <summary>
-	/// Get/Set: Cipher Initialization Vector
+	/// Get: Cipher Initialization Vector
 	/// </summary>
 	const std::vector<byte> &IV() const { return _iv; }
+
+	/// <summary>
+	/// Set: Cipher Initialization Vector
+	/// </summary>
 	std::vector<byte> &IV() { return _iv; }
 
 	/// <summary>
-	/// Get/Set: Input Keying Material
+	/// Get: Input Keying Material
 	/// </summary>
 	const std::vector<byte> &Ikm() const { return _ikm; }
-	std::vector<byte> &Ikm() { return _ikm; }
 
+	/// <summary>
+	/// Set: Input Keying Material
+	/// </summary>
+	std::vector<byte> &Ikm() { return _ikm; }
 
 	/// <summary>
 	/// Initialize this class

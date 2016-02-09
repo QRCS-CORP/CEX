@@ -59,6 +59,10 @@ private:
 	std::vector< Delegate<T>* > _delegates;
 
 public:
+
+	/// <summary>
+	/// 
+	/// </summary>
 	inline void operator+=(Delegate<T>* delegate)
 	{
 		// an object can only subscribe once
@@ -66,6 +70,9 @@ public:
 			_delegates.push_back(delegate);
 	}
 
+	/// <summary>
+	/// The -= operator
+	/// </summary>
 	inline void operator-=(Delegate<T>* delegate)
 	{
 		typedef typename std::vector< Delegate<T>* >::iterator iter;
@@ -80,6 +87,9 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// The virtual operator
+	/// </summary>
 	inline void operator()(T param)
 	{
 		typedef typename std::vector< Delegate<T>* >::iterator iter;

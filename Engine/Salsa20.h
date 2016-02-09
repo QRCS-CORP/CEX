@@ -136,7 +136,7 @@ public:
 	virtual const bool IsInitialized() { return _isInitialized; }
 
 	/// <summary>
-	/// Get/Set: Automatic processor parallelization
+	/// Get: Automatic processor parallelization
 	/// </summary>
 	virtual bool &IsParallel() { return _isParallel; }
 

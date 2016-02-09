@@ -50,7 +50,7 @@ NAMESPACE_PRNG
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Can be initialized with any <see cref="CEX::Enumeration::Digests">digest</see>.</description></item>
+/// <item><description>Can be initialized with any digest.</description></item>
 /// <item><description>Can use either a random seed generator for initialization, or a user supplied Seed array.</description></item>
 /// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
 /// </list>

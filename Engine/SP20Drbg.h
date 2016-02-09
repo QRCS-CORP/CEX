@@ -112,12 +112,12 @@ public:
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	virtual bool &IsParallel() { return _isParallel; }
+	bool &IsParallel() { return _isParallel; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<uint> IV() { return _ctrVector; }
+	const std::vector<uint> IV() { return _ctrVector; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
@@ -128,12 +128,12 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int>&LegalKeySizes() { return _legalKeySizes; };
+	const std::vector<unsigned int>&LegalKeySizes() { return _legalKeySizes; };
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalRounds() { return _legalRounds; }
+	const std::vector<unsigned int> &LegalRounds() { return _legalRounds; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -143,27 +143,27 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
+	const unsigned int ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return _processorCount; }
+	const unsigned int ProcessorCount() { return _processorCount; }
 
 	/// <summary>
 	/// Get: Initialization vector size
 	/// </summary>
-	virtual const unsigned int VectorSize() { return VECTOR_SIZE; }
+	const unsigned int VectorSize() { return VECTOR_SIZE; }
 
 	// *** Constructor *** //
 

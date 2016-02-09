@@ -8,7 +8,7 @@ void Threefish256::Clear()
 		fill(_expandedTweak.begin(), _expandedTweak.end(), 0);
 }
 
-void Threefish256::Encrypt(const std::vector<ulong> Input, std::vector<ulong> &Output)
+void Threefish256::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &Output)
 {
 	// Cache the block, key, and tweak
 	ulong b0 = Input[0];
@@ -175,7 +175,7 @@ void Threefish256::Encrypt(const std::vector<ulong> Input, std::vector<ulong> &O
 	Output[3] = b3 + k1 + 18;
 }
 
-void Threefish256::SetKey(const std::vector<ulong> Key)
+void Threefish256::SetKey(const std::vector<ulong> &Key)
 {
 	unsigned int i;
 	ulong parity = KeyScheduleConst;
@@ -189,7 +189,7 @@ void Threefish256::SetKey(const std::vector<ulong> Key)
 	_expandedKey[i] = parity;
 }
 
-void Threefish256::SetTweak(const std::vector<ulong> Tweak)
+void Threefish256::SetTweak(const std::vector<ulong> &Tweak)
 {
 	_expandedTweak[0] = Tweak[0];
 	_expandedTweak[1] = Tweak[1];

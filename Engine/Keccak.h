@@ -35,19 +35,15 @@ private:
 	static constexpr ulong C23 = 0x8000000080008008;
 
 public:
-	static void TransformBlock(const std::vector<byte> &Data, unsigned int Index, std::vector<ulong> &State, unsigned int BlockSize);
-
-	static inline void Word64sToBytes(const std::vector<ulong> &Input, std::vector<byte> &Output)
-	{
-		Output.resize(Input.size() * sizeof(ulong), 0);
-		memcpy(&Output[0], &Input[0], Output.size());
-	}
-
-	static inline void BytesToWord64s(const std::vector<byte> &Input, unsigned int Index, unsigned int Length, std::vector<ulong> &Output)
-	{
-		Output.resize(Length / sizeof(ulong));
-		memcpy(&Output[0], &Input[Index], Length);
-	}
+	/// <summary>
+	/// Process a block of bytes
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array</param>
+	/// <param name="Offset">The offset index</param>
+	/// <param name="State">The state array</param>
+	/// <param name="Size">The size of the transform</param>
+	static void TransformBlock(const std::vector<byte> &Input, unsigned int Offset, std::vector<ulong> &State, unsigned int Size);
 };
 
 #endif

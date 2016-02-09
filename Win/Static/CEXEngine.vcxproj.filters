@@ -641,9 +641,6 @@
     <ClCompile Include="..\..\Engine\MacStream.cpp">
       <Filter>Source Files\Processing</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\Keccak.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\Threefish256.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
@@ -688,6 +685,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\KeyFactory.cpp">
       <Filter>Source Files\Processing\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Keccak.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

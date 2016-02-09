@@ -42,7 +42,7 @@ private:
 public:
 
 	/// <summary>
-	/// The <see cref="CEX::Common::CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance
+	/// The CipherDescription structure containing a complete description of the cipher instance
 	/// </summary>
 	CEX::Common::CipherDescription Description() const { return _cprDsc; }
 
@@ -73,7 +73,7 @@ public:
 	/// If they are not specified they will be populated automatically.</para>
 	/// </summary>
 	/// 
-	/// <param name="Description">The <see cref="CEX::Common::CipherDescription">CipherDescription</see> structure containing a complete description of the cipher instance</param>
+	/// <param name="Description">The CipherDescriptionstructure containing a complete description of the cipher instance</param>
 	/// <param name="KeyId">The unique 16 byte ID field used to identify this key. A null value auto generates this field</param>
 	/// <param name="ExtensionKey">An array of random bytes used to encrypt a message file extension. A null value auto generates this field</param>
 	/// 

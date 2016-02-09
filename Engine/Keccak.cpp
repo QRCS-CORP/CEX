@@ -1,11 +1,12 @@
 #include "Keccak.h"
+#include "IntUtils.h"
 
-void Keccak::TransformBlock(const std::vector<byte> &Data, unsigned int Index, std::vector<ulong> &State, unsigned int BlockSize)
+void Keccak::TransformBlock(const std::vector<byte> &Input, unsigned int Offset, std::vector<ulong> &State, unsigned int Size)
 {
 	std::vector<ulong> data;
-	BytesToWord64s(Data, Index, BlockSize, data);
+	CEX::Utility::IntUtils::BytesToWord64s(Input, Offset, Size, data);
 
-	for (unsigned int j = 0; j < BlockSize / 8; j++)
+	for (unsigned int j = 0; j < Size / 8; j++)
 		State[j] ^= data[j];
 
 	ulong Aba, Abe, Abi, Abo, Abu;
@@ -2603,3 +2604,4 @@ void Keccak::TransformBlock(const std::vector<byte> &Data, unsigned int Index, s
 	State[23] = Aso;
 	State[24] = Asu;
 }
+

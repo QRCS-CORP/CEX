@@ -5,6 +5,9 @@
 
 NAMESPACE_EVENT
 
+/// <summary>
+/// The Delegate Listener interface definition
+/// </summary>
 #define LISTENER(thisType, handler, type)\
     class __L##handler##__ : public Delegate< type >\
     {\
@@ -26,6 +29,10 @@ template <typename T>
 class Delegate
 {
 public:
+
+	/// <summary>
+	/// The virtual operator
+	/// </summary>
 	virtual void operator()(T param) = 0;
 };
 

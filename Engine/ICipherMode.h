@@ -78,14 +78,14 @@ public:
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get/Set: Automatic processor parallelization
+	/// Get: Automatic processor parallelization
 	/// </summary>
 	virtual bool &IsParallel() = 0;
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> IV() = 0;
+	virtual const std::vector<byte> &IV() = 0;
 
 	/// <summary>
 	/// Get: List of available legal key sizes
@@ -98,10 +98,8 @@ public:
 	virtual const char* Name() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, or  block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
 	virtual unsigned int &ParallelBlockSize() = 0;
 
 	/// <summary>

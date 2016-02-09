@@ -71,8 +71,8 @@ NAMESPACE_BLOCK
 /// 
 /// <list type="bullet">
 /// <item><description>When using a standard cipher key length the rounds calculation is done automatically: 10, 12, 14, and 22, for key sizes 126, 192, 256, and 512 bits.</description></item>
-/// <item><description>HKDF Digest <see cref="CEX::Enumeration::Digests">engine</see> is definable through the RHX(uint, uint, Digests) Constructor parameter: KeyEngine.</description></item>
-/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a user definable <see cref="CEX::Digest::IDigest">Digest</see>.</description></item>
+/// <item><description>HKDF Digest engine is definable through the RHX(uint, uint, Digests) Constructor parameter: KeyEngine.</description></item>
+/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a user definable Digest.</description></item>
 /// <item><description>Minimum key size is (IKm + Salt) (N * Digest State Size) + (Digest Hash Size) in bytes.</description></item>
 /// <item><description>Valid block sizes are 16 and 32 byte wide.</description></item>
 /// <item><description>Valid Rounds are 10 to 38, default is 22.</description></item>
@@ -208,9 +208,9 @@ public:
 	/// Initialize the class with a Digest instance
 	/// </summary>
 	///
-	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> implementations.</param>
+	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the Digest implementations.</param>
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
-	/// <param name="BlockSize">Cipher input <see cref="BlockSize"/>. Default is 16 bytes.</param>
+	/// <param name="BlockSize">Cipher input Block Size. Default is 16 bytes.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
 	RHX(CEX::Digest::IDigest *KdfEngine, unsigned int Rounds = ROUNDS22, unsigned int BlockSize = BLOCK16)
@@ -255,9 +255,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
-	/// <param name="BlockSize">Cipher input <see cref="BlockSize"/>. Default is 16 bytes.</param>
-	/// <param name="KdfEngineType"><para>The Key Schedule KDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> 
-	/// implementations. The default engine is SHA512</para>.</param>
+	/// <param name="BlockSize">Cipher input Block Size. Default is 16 bytes.</param>
+	/// <param name="KdfEngineType"><para>The Key Schedule KDF digest engine; can be any one of the Digest implementations. The default engine is SHA512</para>.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
 	RHX(unsigned int BlockSize = BLOCK16, unsigned int Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)

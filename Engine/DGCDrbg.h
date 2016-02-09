@@ -57,7 +57,7 @@ NAMESPACE_GENERATOR
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Can be initialized with any <see cref="CEX::Enumeration::Digests">digest</see>.</description></item>
+/// <item><description>Can be initialized with any digest.</description></item>
 /// <item><description>Combination of [Salt, Ikm, Nonce] must be at least: digest block size + counter (8 bytes) size in length.</description></item>
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
 /// <item><description>Output buffer is 4 * the digest return size.</description></item>

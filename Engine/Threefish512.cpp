@@ -8,7 +8,7 @@ void Threefish512::Clear()
 		fill(_expandedTweak.begin(), _expandedTweak.end(), 0);
 }
 
-void Threefish512::Encrypt(const std::vector<ulong> Input, std::vector<ulong> &Output)
+void Threefish512::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &Output)
 {
 	// cache the block, key, and tweak
 	ulong B0 = Input[0];
@@ -332,7 +332,7 @@ void Threefish512::Encrypt(const std::vector<ulong> Input, std::vector<ulong> &O
 	Output[7] = B7 + K7 + 18;
 }
 
-void Threefish512::SetKey(const std::vector<ulong> Key)
+void Threefish512::SetKey(const std::vector<ulong> &Key)
 {
 	unsigned int i;
 	ulong parity = KeyScheduleConst;
@@ -346,7 +346,7 @@ void Threefish512::SetKey(const std::vector<ulong> Key)
 	_expandedKey[i] = parity;
 }
 
-void Threefish512::SetTweak(const std::vector<ulong> Tweak)
+void Threefish512::SetTweak(const std::vector<ulong> &Tweak)
 {
 	_expandedTweak[0] = Tweak[0];
 	_expandedTweak[1] = Tweak[1];

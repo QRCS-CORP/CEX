@@ -93,43 +93,47 @@ private:
 public:
 
 	/// <summary>
-	/// The Cryptographic <see cref="CEX::Enumeration::SymmetricEngines">Engine</see> type
+	/// The Cryptographic Engine type
 	/// </summary>
 	const CEX::Enumeration::SymmetricEngines EngineType() const { return (CEX::Enumeration::SymmetricEngines)_engineType; }
 
 	/// <summary>
-	/// The cipher Key Size
+	/// Get: The cipher Key Size
 	/// </summary>
 	const unsigned int KeySize() const { return _keySize; }
+
+	/// <summary>
+	/// Set: The cipher Key Size
+	/// </summary>
 	unsigned int &KeySize() { return _keySize; }
 
 	/// <summary>
-	/// Size of the cipher <see cref="CEX::Enumeration::IVSizes">Initialization Vector</see>
+	/// Size of the cipher Initialization Vector
 	/// </summary>
 	const CEX::Enumeration::IVSizes IvSize() const { return (CEX::Enumeration::IVSizes)_ivSize; }
 
 	/// <summary>
-	/// The type of <see cref="CEX::Enumeration::CipherModes">Cipher Mode</see>
+	/// The type of Cipher Mode
 	/// </summary>
 	const CEX::Enumeration::CipherModes CipherType() const { return (CEX::Enumeration::CipherModes)_cipherType; }
 
 	/// <summary>
-	/// The type of cipher <see cref="CEX::Enumeration::PaddingModes">Padding Mode</see>
+	/// The type of cipher Padding Mode
 	/// </summary>
 	const CEX::Enumeration::PaddingModes PaddingType() const { return (CEX::Enumeration::PaddingModes)_paddingType; }
 
 	/// <summary>
-	/// The cipher <see cref="CEX::Enumeration::BlockSizes">Block Size</see>
+	/// The cipher Block Size
 	/// </summary>
 	const CEX::Enumeration::BlockSizes BlockSize() const { return (CEX::Enumeration::BlockSizes)_blockSize; }
 
 	/// <summary>
-	/// The number of diffusion <see cref="CEX::Enumeration::RoundCounts">Rounds</see>
+	/// The number of diffusion Rounds
 	/// </summary>
 	const CEX::Enumeration::RoundCounts RoundCount() const { return (CEX::Enumeration::RoundCounts)_roundCount; }
 
 	/// <summary>
-	/// The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers
+	/// The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
 	/// </summary>
 	const CEX::Enumeration::Digests KdfEngine() const { return (CEX::Enumeration::Digests)_kdfEngine; }
 
@@ -139,7 +143,7 @@ public:
 	const unsigned int MacSize() const { return _macSize; }
 
 	/// <summary>
-	/// The HMAC <see cref="CEX::Enumeration::Digests">Digest</see> engine used to authenticate a message file encrypted with this key
+	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
 	/// </summary>
 	const CEX::Enumeration::Digests MacEngine() const { return (CEX::Enumeration::Digests)_macEngine; }
 
@@ -164,16 +168,16 @@ public:
 	/// CipherDescription constructor
 	/// </summary>
 	/// 
-	/// <param name="EngineType">The Cryptographic <see cref="CEX::Enumeration::SymmetricEngines">Engine</see> type</param>
+	/// <param name="EngineType">The Cryptographic Engine type</param>
 	/// <param name="KeySize">The cipher Key Size in bytes</param>
-	/// <param name="IvSize">Size of the cipher <see cref="CEX::Enumeration::IVSizes">Initialization Vector</see></param>
-	/// <param name="CipherType">The type of <see cref="CEX::Enumeration::CipherModes">Cipher Mode</see></param>
-	/// <param name="PaddingType">The type of cipher <see cref="CEX::Enumeration::PaddingModes">Padding Mode</see></param>
-	/// <param name="BlockSize">The cipher <see cref="CEX::Enumeration::BlockSizes">Block Size</see></param>
-	/// <param name="RoundCount">The number of diffusion <see cref="CEX::Enumeration::RoundCounts">Rounds</see></param>
-	/// <param name="KdfEngine">The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
+	/// <param name="IvSize">Size of the cipher Initialization Vector</param>
+	/// <param name="CipherType">The type of Cipher Mode</param>
+	/// <param name="PaddingType">The type of cipher Padding Mode</param>
+	/// <param name="BlockSize">The cipher Block Size</param>
+	/// <param name="RoundCount">The number of diffusion Rounds</param>
+	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	/// <param name="MacSize">The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key</param>
-	/// <param name="MacEngine">The HMAC <see cref="CEX::Enumeration::Digests">Digest</see> engine used to authenticate a message file encrypted with this key</param>
+	/// <param name="MacEngine">The HMAC Digest engine used to authenticate a message file encrypted with this key</param>
 	CipherDescription(CEX::Enumeration::SymmetricEngines EngineType, unsigned int KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
 		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, unsigned int MacSize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
 	{
