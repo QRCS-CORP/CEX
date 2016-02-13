@@ -41,7 +41,7 @@ void PPBPrng::Destroy()
 /// <param name="Size">Size of requested byte array</param>
 /// 
 /// <returns>Random byte array</returns>
-std::vector<byte> PPBPrng::GetBytes(unsigned int Size)
+std::vector<byte> PPBPrng::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
@@ -60,12 +60,12 @@ void PPBPrng::GetBytes(std::vector<byte> &Output)
 
 	if (_byteBuffer.size() - _bufferIndex < Output.size())
 	{
-		unsigned int bufSize = _byteBuffer.size() - _bufferIndex;
+		size_t bufSize = _byteBuffer.size() - _bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
 			memcpy(&Output[0], &_byteBuffer[_bufferIndex], bufSize);
 
-		unsigned int rem = Output.size() - bufSize;
+		size_t rem = Output.size() - bufSize;
 
 		while (rem != 0)
 		{
@@ -98,7 +98,7 @@ void PPBPrng::GetBytes(std::vector<byte> &Output)
 /// </summary>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int PPBPrng::Next()
+uint PPBPrng::Next()
 {
 	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
@@ -110,10 +110,10 @@ unsigned int PPBPrng::Next()
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int PPBPrng::Next(unsigned int Maximum)
+uint PPBPrng::Next(uint Maximum)
 {
 	std::vector<byte> rand;
-	unsigned int num(0);
+	uint num(0);
 
 	do
 	{
@@ -133,9 +133,9 @@ unsigned int PPBPrng::Next(unsigned int Maximum)
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int PPBPrng::Next(unsigned int Minimum, unsigned int Maximum)
+uint PPBPrng::Next(uint Minimum, uint Maximum)
 {
-	unsigned int num = 0;
+	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
@@ -216,7 +216,7 @@ std::vector<byte> PPBPrng::GetBits(std::vector<byte> Data, ulong Maximum)
 {
 	ulong val = 0;
 	memcpy(&val, &Data[0], Data.size());
-	int bits = Data.size() * 8;
+	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
 	{
@@ -259,7 +259,7 @@ CEX::Digest::IDigest* PPBPrng::GetInstance(CEX::Enumeration::Digests RngEngine)
 	return CEX::Helper::DigestFromName::GetInstance(RngEngine);
 }
 
-unsigned int PPBPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
+uint PPBPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
 {
 	switch (RngEngine)
 	{

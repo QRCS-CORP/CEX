@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <para>IV Sizes in bits. Can be cast as IV byte size integers, 
 /// i.e. (int sz = IVSizes.V128) is equal to 16.</para>
 /// </summary>
-enum class IVSizes : unsigned int
+enum class IVSizes : uint
 {
 	/// <summary>
 	/// 64 bit IV

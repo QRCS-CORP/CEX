@@ -40,13 +40,13 @@ public:
 	/// <param name="Value">initial value</param>
 	/// 
 	/// <returns>Bit precision</returns>
-	static unsigned int BitPrecision(ulong Value);
+	static uint BitPrecision(ulong Value);
 
 	/// <summary>
 	/// Reverse a byte
 	/// </summary>
 	/// 
-	/// <param name="Value">Initial value</param>
+	/// <param name="Value">The initial value</param>
 	/// 
 	/// <returns>The revered byte</returns>
 	static inline byte BitReverse(byte Value)
@@ -116,7 +116,7 @@ public:
 	/// <param name="Value">The sample value</param>
 	/// 
 	/// <returns>The byte precision</returns>
-	static unsigned int BytePrecision(ulong Value);
+	static uint BytePrecision(ulong Value);
 
 	/// <summary>
 	/// Reverse a 16 bit integer
@@ -189,7 +189,7 @@ public:
 	/// <param name="Value">The 16 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination array</param>
-	static inline void Be16ToBytes(const ushort Value, std::vector<byte> &Output, const uint OutOffset)
+	static inline void Be16ToBytes(const ushort Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
 		Output[OutOffset + 1] = (byte)Value;
 		Output[OutOffset] = (byte)(Value >> 8);
@@ -202,7 +202,7 @@ public:
 	/// <param name="Value">The 32 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination array</param>
-	static inline void Be32ToBytes(const uint Value, std::vector<byte> &Output, const uint OutOffset)
+	static inline void Be32ToBytes(const uint Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
 		Output[OutOffset + 3] = (byte)Value;
 		Output[OutOffset + 2] = (byte)(Value >> 8);
@@ -217,7 +217,7 @@ public:
 	/// <param name="Value">The 64 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination array</param>
-	static inline void Be64ToBytes(const ulong Value, std::vector<byte> &Output, const uint OutOffset)
+	static inline void Be64ToBytes(const ulong Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
 		Output[OutOffset + 7] = (byte)Value;
 		Output[OutOffset + 6] = (byte)(Value >> 8);
@@ -236,7 +236,7 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <returns>A 16 bit word in Big Endian format</returns>
-	static inline ushort BytesToBe16(const std::vector<byte> &Input, const uint InOffset)
+	static inline ushort BytesToBe16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((ushort)Input[InOffset] << 8) |
@@ -250,7 +250,7 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <returns>A 32 bit word in Big Endian format</returns>
-	static inline uint BytesToBe32(const std::vector<byte> &Input, const uint InOffset)
+	static inline uint BytesToBe32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((uint)Input[InOffset] << 24) |
@@ -266,7 +266,7 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <returns>A 64 bit word in Big Endian format</returns>
-	static inline ulong BytesToBe64(const std::vector<byte> &Input, const uint InOffset)
+	static inline ulong BytesToBe64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((ulong)Input[InOffset] << 56) |
@@ -288,7 +288,7 @@ public:
 	/// <param name="Value">The 16 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Le16ToBytes(const ushort Value, std::vector<byte> &Output, const uint OutOffset)
+	static inline void Le16ToBytes(const ushort Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
 		Output[OutOffset] = (byte)Value;
 		Output[OutOffset + 1] = (byte)(Value >> 8);
@@ -301,7 +301,7 @@ public:
 	/// <param name="Value">The 32 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Le32ToBytes(const uint Value, std::vector<byte> &Output, const uint OutOffset)
+	static inline void Le32ToBytes(const uint Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
 		Output[OutOffset] = (byte)Value;
 		Output[OutOffset + 1] = (byte)(Value >> 8);
@@ -316,7 +316,7 @@ public:
 	/// <param name="DWord">The 64 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Le64ToBytes(const ulong DWord, std::vector<byte> &Output, const uint OutOffset)
+	static inline void Le64ToBytes(const ulong DWord, std::vector<byte> &Output, const size_t OutOffset)
 	{
 		Output[OutOffset] = (byte)DWord;
 		Output[OutOffset + 1] = (byte)(DWord >> 8);
@@ -335,7 +335,7 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <returns>A 16 bit word in Little Endian format</returns>
-	static inline ushort BytesToLe16(const std::vector<byte> &Input, const uint InOffset)
+	static inline ushort BytesToLe16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((ushort)Input[InOffset] |
@@ -349,7 +349,7 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <returns>A 32 bit word in Little Endian format</returns>
-	static inline uint BytesToLe32(const std::vector<byte> &Input, const uint InOffset)
+	static inline uint BytesToLe32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((uint)Input[InOffset] |
@@ -365,7 +365,7 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <returns>A 64 bit word in Little Endian format</returns>
-	static inline ulong BytesToLe64(const std::vector<byte> &Input, const uint InOffset)
+	static inline ulong BytesToLe64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((ulong)Input[InOffset] |
@@ -386,11 +386,11 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// 
 	/// <returns>A 16 bit word in native Endian format</returns>
-	static inline unsigned short BytesToWord16(const std::vector<byte> &Input)
+	static inline ushort BytesToWord16(const std::vector<byte> &Input)
 	{
 		return
-			((unsigned short)Input[0] |
-			((unsigned short)Input[1] << 8));
+			((ushort)Input[0] |
+			((ushort)Input[1] << 8));
 	}
 
 	/// <summary>
@@ -401,11 +401,11 @@ public:
 	/// <param name="InOffset">InOffset within the source array</param>
 	///
 	/// <returns>A 16 bit word in native Endian format</returns>
-	static inline unsigned short BytesToWord16(const std::vector<byte> &Input, const uint InOffset)
+	static inline ushort BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((unsigned short)Input[InOffset] |
-			((unsigned short)Input[InOffset + 1] << 8));
+			((ushort)Input[InOffset] |
+			((ushort)Input[InOffset + 1] << 8));
 	}
 
 	/// <summary>
@@ -432,7 +432,7 @@ public:
 	/// <param name="InOffset">InOffset within the source array</param>
 	///
 	/// <returns>A 32 bit word in native Endian format</returns>
-	static inline uint BytesToWord32(const std::vector<byte> &Input, const uint InOffset)
+	static inline uint BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((uint)Input[InOffset] |
@@ -469,7 +469,7 @@ public:
 	/// <param name="InOffset">InOffset within the source array</param>
 	///
 	/// <returns>A 64 bit word in native Endian format</returns>
-	static inline ulong BytesToWord64(const std::vector<byte> &Input, const uint InOffset)
+	static inline ulong BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((ulong)Input[InOffset] |
@@ -488,7 +488,7 @@ public:
 	/// 
 	/// <param name="Value">The 16 bit word</param>
 	/// <param name="Output">The destination bytes</param>
-	static inline void Word16ToBytes(const unsigned short Value, std::vector<byte> &Output)
+	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output)
 	{
 		Output[0] = (byte)Value;
 		Output[1] = (byte)(Value >> 8);
@@ -501,7 +501,7 @@ public:
 	/// <param name="Value">The 16 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Word16ToBytes(const unsigned short Value, std::vector<byte> &Output, uint OutOffset)
+	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
 	{
 		Output[OutOffset] = (byte)Value;
 		Output[OutOffset + 1] = (byte)(Value >> 8);
@@ -528,7 +528,7 @@ public:
 	/// <param name="Value">The 32 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output, uint OutOffset)
+	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
 	{
 		Output[OutOffset] = (byte)Value;
 		Output[OutOffset + 1] = (byte)(Value >> 8);
@@ -561,7 +561,7 @@ public:
 	/// <param name="Value">The 64 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output, uint OutOffset)
+	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
 	{
 		Output[OutOffset] = (byte)Value;
 		Output[OutOffset + 1] = (byte)(Value >> 8);
@@ -580,11 +580,11 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// 
 	/// <returns>A 16 bit word in native Endian format</returns>
-	static inline unsigned short BytesToWord16(const std::vector<byte> &Input)
+	static inline ushort BytesToWord16(const std::vector<byte> &Input)
 	{
 		return
-			((unsigned short)Input[1] |
-			((unsigned short)Input[0] << 8));
+			((ushort)Input[1] |
+			((ushort)Input[0] << 8));
 	}
 
 	/// <summary>
@@ -595,11 +595,11 @@ public:
 	/// <param name="InOffset">InOffset within the source array</param>
 	///
 	/// <returns>A 16 bit word in native Endian format</returns>
-	static inline unsigned short BytesToWord16(const std::vector<byte> &Input, const uint InOffset)
+	static inline ushort BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((unsigned short)Input[InOffset + 1] |
-			((unsigned short)Input[InOffset] << 8));
+			((ushort)Input[InOffset + 1] |
+			((ushort)Input[InOffset] << 8));
 	}
 
 	/// <summary>
@@ -626,7 +626,7 @@ public:
 	/// <param name="InOffset">InOffset within the source array</param>
 	///
 	/// <returns>A 32 bit word in native Endian format</returns>
-	static inline uint BytesToWord32(const std::vector<byte> &Input, const uint InOffset)
+	static inline uint BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((uint)Input[InOffset + 3] |
@@ -663,7 +663,7 @@ public:
 	/// <param name="InOffset">InOffset within the source array</param>
 	///
 	/// <returns>A 64 bit word in native Endian format</returns>
-	static inline ulong BytesToWord64(const std::vector<byte> &Input, const uint InOffset)
+	static inline ulong BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
 			((ulong)Input[InOffset + 7] |
@@ -682,7 +682,7 @@ public:
 	/// 
 	/// <param name="Value">The 16 bit word</param>
 	/// <param name="Output">The destination bytes</param>
-	static inline void Word16ToBytes(const unsigned short Value, std::vector<byte> &Output)
+	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output)
 	{
 		Output[1] = (byte)Value;
 		Output[0] = (byte)(Value >> 8);
@@ -695,7 +695,7 @@ public:
 	/// <param name="Value">The 16 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Word16ToBytes(const unsigned short Value, std::vector<byte> &Output, uint OutOffset)
+	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
 	{
 		Output[OutOffset + 1] = (byte)Value;
 		Output[OutOffset] = (byte)(Value >> 8);
@@ -722,7 +722,7 @@ public:
 	/// <param name="Value">The 32 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output, uint OutOffset)
+	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
 	{
 		Output[OutOffset + 3] = (byte)Value;
 		Output[OutOffset + 2] = (byte)(Value >> 8);
@@ -755,7 +755,7 @@ public:
 	/// <param name="Value">The 32 bit word</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">OutOffset within the destination block</param>
-	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output, uint OutOffset)
+	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
 	{
 		Output[OutOffset + 7] = (byte)Value;
 		Output[OutOffset + 6] = (byte)(Value >> 8);
@@ -776,7 +776,7 @@ public:
 	/// <param name="Obj">A byte vector array</param>
 	static inline void ClearArray(std::vector<std::vector<T>> &Obj)
 	{
-		for (unsigned int i = 0; i < Obj.size(); i++)
+		for (size_t i = 0; i < Obj.size(); i++)
 		{
 			if (Obj[i].capacity() > 0)
 				memset(Obj[i].data(), 0, Obj[i].capacity() * sizeof(T));
@@ -808,7 +808,7 @@ public:
 	/// <param name="Size">The number of bits in the new integer</param>
 	/// 
 	/// <returns>The cropped integer</returns>
-	static ulong Crop(ulong Value, unsigned int Size);
+	static ulong Crop(ulong Value, uint Size);
 
 	template <class T>
 	/// <summary>
@@ -841,6 +841,7 @@ public:
 		return Value > 0 && (Value & (Value - 1)) == 0;
 	}
 
+	template <class T>
 	/// <summary>
 	/// Return the smaller of two values
 	/// </summary>
@@ -849,7 +850,7 @@ public:
 	/// <param name="B">The second comparison value</param>
 	/// 
 	/// <returns>The smaller value</returns>
-	static inline uint Min(uint A, uint B)
+	static inline T Min(T A, T B)
 	{
 		return ((A) < (B) ? (A) : (B));
 	}
@@ -876,7 +877,7 @@ public:
 	/// <param name="Value">The initial value</param>
 	/// 
 	/// <returns>The parity value</returns>
-	static unsigned int Parity(ulong Value);
+	static uint Parity(ulong Value);
 
 	// ** Rotate ** //
 
@@ -891,7 +892,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateLeft(uint Value, int Shift)
+	static inline uint RotateLeft(uint Value, uint Shift)
 	{
 		return Shift ? _rotl(Value, Shift) : Value;
 	}
@@ -904,7 +905,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft(ulong Value, int Shift)
+	static inline ulong RotateLeft(ulong Value, uint Shift)
 	{
 		return Shift ? _rotl64(Value, Shift) : Value;
 	}
@@ -917,7 +918,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateRight(uint Value, int Shift)
+	static inline uint RotateRight(uint Value, uint Shift)
 	{
 		return Shift ? _rotr(Value, Shift) : Value;
 	}
@@ -930,7 +931,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight(ulong Value, int Shift)
+	static inline ulong RotateRight(ulong Value, uint Shift)
 	{
 		return Shift ? _rotr64(Value, Shift) : Value;
 	}
@@ -969,7 +970,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotlFixed64(ulong Value, int Shift)
+	static inline ulong RotlFixed64(ulong Value, uint Shift)
 	{
 		return Shift ? _rotl64(Value, Shift) : Value;
 	}
@@ -982,7 +983,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotrFixed64(ulong Value, int Shift)
+	static inline ulong RotrFixed64(ulong Value, uint Shift)
 	{
 		return Shift ? _rotr64(Value, Shift) : Value;
 	}
@@ -996,7 +997,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateLeft(uint Value, int Shift)
+	static inline uint RotateLeft(uint Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, Shift, 0, 31) : Value;
 	}
@@ -1009,7 +1010,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft(ulong Value, int Shift)
+	static inline ulong RotateLeft(ulong Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, Shift, 0, 63) : Value;
 	}
@@ -1022,7 +1023,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateRight(uint Value, int Shift)
+	static inline uint RotateRight(uint Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, 32 - Shift, 0, 31) : Value;
 	}
@@ -1035,7 +1036,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight(ulong Value, int Shift)
+	static inline ulong RotateRight(ulong Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, 64 - Shift, 0, 63) : Value;
 	}
@@ -1074,7 +1075,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotlFixed64(ulong Value, int Shift)
+	static inline ulong RotlFixed64(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | ((long)((ulong)Value >> -Shift));
 	}
@@ -1087,7 +1088,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotrFixed64(ulong Value, int Shift)
+	static inline ulong RotrFixed64(ulong Value, uint Shift)
 	{
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
@@ -1100,7 +1101,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateLeft(uint Value, int Shift)
+	static inline uint RotateLeft(uint Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
 	}
@@ -1113,7 +1114,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft(ulong Value, int Shift)
+	static inline ulong RotateLeft(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (sizeof(ulong) * 8 - Shift));
 	}
@@ -1126,7 +1127,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateRight(uint Value, int Shift)
+	static inline uint RotateRight(uint Value, uint Shift)
 	{
 		return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
 	}
@@ -1139,7 +1140,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight(ulong Value, int Shift)
+	static inline ulong RotateRight(ulong Value, uint Shift)
 	{
 		return (Value >> Shift) | (Value << (sizeof(ulong) * 8 - Shift));
 	}
@@ -1178,7 +1179,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotlFixed64(ulong Value, int Shift)
+	static inline ulong RotlFixed64(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | ((long)((ulong)Value >> -Shift));
 	}
@@ -1191,7 +1192,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotrFixed64(ulong Value, int Shift)
+	static inline ulong RotrFixed64(ulong Value, uint Shift)
 	{
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
@@ -1206,7 +1207,7 @@ public:
 	/// <param name="Value">The initial value</param>
 	/// 
 	/// <returns></returns>
-	static inline std::vector<byte> ToBit16(unsigned short Value)
+	static inline std::vector<byte> ToBit16(ushort Value)
 	{
 		std::vector<byte> data(2);
 		Le16ToBytes(Value, data, 0);
@@ -1241,21 +1242,6 @@ public:
 		return data;
 	}
 
-	template<typename T>
-	/// <summary>
-	/// Convert an integer to a char array
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	/// 
-	/// <returns>The char array</returns>
-	static inline char* ToChar(const T& Value)
-	{
-		std::ostringstream oss;
-		oss << Value;
-		return oss.str().c_str();
-	}
-
 	/// <summary>
 	/// Convert bytes to a Little Endian 16 bit word
 	/// </summary>
@@ -1263,7 +1249,7 @@ public:
 	/// <param name="Input">The input bytes</param>
 	/// 
 	/// <returns>The 16 bit integer</returns>
-	static inline unsigned short ToInt16(std::vector<byte> Input)
+	static inline ushort ToInt16(std::vector<byte> Input)
 	{
 		return BytesToLe16(Input, 0);
 	}
@@ -1300,7 +1286,7 @@ public:
 	/// <param name="InOffset">The starting offset within the input array</param>
 	/// 
 	/// <returns>The 16 bit integer</returns>
-	static inline unsigned short ToInt16(std::vector<byte> Input, uint InOffset)
+	static inline ushort ToInt16(std::vector<byte> Input, size_t InOffset)
 	{
 		return BytesToLe16(Input, InOffset);
 	}
@@ -1313,7 +1299,7 @@ public:
 	/// <param name="InOffset">The starting offset within the input array</param>
 	/// 
 	/// <returns>The 32bit integer</returns>
-	static inline uint ToInt32(std::vector<byte> Input, uint InOffset)
+	static inline uint ToInt32(std::vector<byte> Input, size_t InOffset)
 	{
 		return BytesToLe32(Input, InOffset);
 	}
@@ -1326,7 +1312,7 @@ public:
 	/// <param name="InOffset">The starting offset within the input array</param>
 	/// 
 	/// <returns>The 64 bit integer</returns>
-	static inline ulong ToInt64(std::vector<byte> Input, uint InOffset)
+	static inline ulong ToInt64(std::vector<byte> Input, size_t InOffset)
 	{
 		return BytesToLe64(Input, InOffset);
 	}
@@ -1367,7 +1353,7 @@ public:
 	/// <param name="InOffset">The input arrays starting offset</param>
 	/// <param name="Length">The number of bytes to return</param>
 	/// <param name="Output">The input integer array</param>
-	static inline void BytesToWord64s(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length, std::vector<ulong> &Output)
+	static inline void BytesToWord64s(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &Output)
 	{
 		if (Output.size() != (Input.size() - InOffset) * sizeof(ulong))
 			Output.resize(Length / sizeof(ulong));
@@ -1400,7 +1386,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR32(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset);
+	static void XOR32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 8 bytes
@@ -1426,7 +1412,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR64(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset);
+	static void XOR64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 16 bytes
@@ -1452,7 +1438,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR128(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset);
+	static void XOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 32 bytes
@@ -1478,7 +1464,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR256(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset);
+	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// XOR contiguous 16 byte blocks in an array.
@@ -1490,7 +1476,7 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Size">The number of (16 byte block aligned) bytes to process</param>
-	static void XORBLK(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset, const uint Size);
+	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size);
 };
 
 NAMESPACE_UTILITYEND

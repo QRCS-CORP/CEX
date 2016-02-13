@@ -37,12 +37,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual const unsigned int BlockSize() = 0;
+	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const unsigned int MacSize() = 0;
+	virtual const size_t MacSize() = 0;
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
@@ -63,7 +63,7 @@ public:
 	/// <param name="Input">Hash input data</param>
 	/// <param name="InOffset">Starting position with the Input array</param>
 	/// <param name="Length">Length of data to process</param>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length) = 0;
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Get the MAC value
@@ -86,7 +86,7 @@ public:
 	/// <param name="OutOffset">Offset within Output array</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, unsigned int OutOffset) = 0;
+	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the MAC generator.
@@ -94,7 +94,7 @@ public:
 	///
 	/// <param name="MacKey">The HMAC Key</param>
 	/// <param name="IV">The optional IV</param>
-	virtual void Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV) = 0;
+	virtual void Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV) = 0;
 
 	/// <summary>
 	/// Reset and initialize the underlying digest

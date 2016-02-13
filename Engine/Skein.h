@@ -110,7 +110,7 @@ public:
 	/// </summary>
 	void SetBitsProcessed(const ulong Value)
 	{
-		_tweak[0] = (ulong)Value;
+		_tweak[0] = Value;
 	}
 
 	/// <summary>
@@ -154,7 +154,7 @@ public:
 	/// <summary>
 	/// Sets the tweak value array
 	/// </summary>
-	void SetTweak(const std::vector<ulong> Value)
+	void SetTweak(const std::vector<ulong> &Value)
 	{
 		_tweak = Value;
 	}

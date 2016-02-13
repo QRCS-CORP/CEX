@@ -70,11 +70,11 @@ private:
 	std::vector<byte> _currentT;
 	std::vector<byte> _digestInfo;
 	CEX::Mac::HMAC *_digestMac;
-	unsigned int _generatedBytes;
-	unsigned int _hashSize;
+	size_t _generatedBytes;
+	size_t _hashSize;
 	bool _isDestroyed;
 	bool _isInitialized;
-	unsigned int _keySize;
+	size_t _keySize;
 	CEX::Digest::IDigest* _msgDigest;
 
 public:
@@ -95,7 +95,7 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() { return _keySize; }
+	virtual size_t KeySize() { return _keySize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -111,18 +111,20 @@ public:
 	/// <param name="Digest">The initialized message digest to be used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	HKDF(CEX::Digest::IDigest* Digest)
+	explicit HKDF(CEX::Digest::IDigest* Digest)
 		:
 		_isDestroyed(false),
 		_currentT(Digest->DigestSize(), 0),
+		_generatedBytes(0),
 		_hashSize(Digest->DigestSize()),
 		_isInitialized(false),
-		_keySize(Digest->BlockSize())
+		_keySize(Digest->BlockSize()),
+		_msgDigest(Digest)
 	{
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
 
-		 _digestMac = new CEX::Mac::HMAC(Digest);
+		 _digestMac = new CEX::Mac::HMAC(_msgDigest);
 	}
 
 	/// <summary>
@@ -132,14 +134,16 @@ public:
 	/// <param name="Hmac">The initialized HMAC to be used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null HMAC is used</exception>
-	HKDF(CEX::Mac::HMAC* Hmac)
+	explicit HKDF(CEX::Mac::HMAC* Hmac)
 		:
-		_digestMac(Hmac),
-		_isDestroyed(false),
 		_currentT(Hmac->MacSize(), 0),
+		_digestMac(Hmac),
+		_generatedBytes(0),
 		_hashSize(Hmac->MacSize()),
+		_isDestroyed(false),
 		_isInitialized(false),
-		_keySize(Hmac->BlockSize())
+		_keySize(Hmac->BlockSize()),
+		_msgDigest(0)
 	{
 		if (Hmac == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Hmac can not be null!");
@@ -167,7 +171,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output);
+	virtual size_t Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -180,7 +184,7 @@ public:
 	/// <returns>Number of bytes generated</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the output buffer is too small, or the size requested exceeds maximum: 255 * HashLen bytes</exception>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
 	/// Initialize the generator

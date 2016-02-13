@@ -52,7 +52,7 @@ NAMESPACE_GENERATOR
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Can be initialized with a Digest or a Mac<.</description></item>
+/// <item><description>Can be initialized with a Digest or a Mac.</description></item>
 /// <item><description>Salt size should be multiple of Digest block size.</description></item>
 /// <item><description>Ikm size should be Digest hash return size.</description></item>
 /// <item><description>Nonce and Ikm are optional, (but recommended).</description></item>
@@ -66,16 +66,16 @@ NAMESPACE_GENERATOR
 class PBKDF2 : public IGenerator
 {
 private:
-	static constexpr unsigned int PKCS_ITERATIONS = 1000;
+	static constexpr size_t PKCS_ITERATIONS = 1000;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	CEX::Mac::HMAC* _digestMac;
-	unsigned int _hashSize;
+	size_t _hashSize;
 	bool _isDestroyed;
 	bool _isInitialized;
 	std::vector<byte> _macKey;
 	CEX::Digest::IDigest* _msgDigest;
-	unsigned int _prcIterations;
+	size_t _prcIterations;
 	std::vector<byte> _macSalt;
 
 public:
@@ -101,7 +101,7 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() { return _blockSize; }
+	virtual size_t KeySize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -118,7 +118,7 @@ public:
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or Iterations count is used</exception>
-	PBKDF2(CEX::Digest::IDigest* Digest, unsigned int Iterations = PKCS_ITERATIONS)
+	PBKDF2(CEX::Digest::IDigest* Digest, size_t Iterations = PKCS_ITERATIONS)
 		:
 		_blockSize(Digest->BlockSize()),
 		_hashSize(Digest->DigestSize()),
@@ -143,7 +143,7 @@ public:
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or invalid Iterations count is used</exception>
-	PBKDF2(CEX::Mac::HMAC* Hmac, unsigned int Iterations = PKCS_ITERATIONS)
+	PBKDF2(CEX::Mac::HMAC* Hmac, size_t Iterations = PKCS_ITERATIONS)
 		:
 		_blockSize(Hmac->BlockSize()),
 		_digestMac(Hmac),
@@ -152,6 +152,7 @@ public:
 		_isInitialized(false),
 		_macKey(0),
 		_macSalt(0),
+		_msgDigest(0),
 		_prcIterations(Iterations)
 	{
 		if (_prcIterations == 0)
@@ -182,7 +183,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output);
+	virtual size_t Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -195,7 +196,7 @@ public:
 	/// <returns>Number of bytes generated</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the output buffer is too small</exception>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
 	/// Initialize the generator
@@ -233,9 +234,9 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
-	unsigned int GenerateKey(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
-	void IntToOctet(std::vector<byte> &Output, unsigned int Counter);
-	void Process(std::vector<byte> Input, std::vector<byte> &Output, unsigned int OutOffset);
+	size_t GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size);
+	void IntToOctet(std::vector<byte> &Output, uint Counter);
+	void Process(std::vector<byte> Input, std::vector<byte> &Output, size_t OutOffset);
 };
 
 NAMESPACE_GENERATOREND

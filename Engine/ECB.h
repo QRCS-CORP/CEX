@@ -67,13 +67,14 @@ class ECB : public ICipherMode
 {
 private:
 	IBlockCipher* _blockCipher;
-	unsigned int _blockSize;
+	size_t _blockSize;
+	std::vector<byte> _ecbIv;
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
 	bool _isParallel;
-	unsigned int _processorCount;
-	unsigned int _parallelBlockSize;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
 
 public:
 
@@ -82,7 +83,7 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher
 	/// </summary>
-	virtual const unsigned int BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: Underlying Cipher
@@ -112,12 +113,12 @@ public:
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> &IV() { return std::vector<byte>(0); }
+	virtual const std::vector<byte> &IV() { return _ecbIv; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
+	virtual const std::vector<size_t> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -131,22 +132,22 @@ public:
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
 	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
-	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() { return 0; }
+	virtual const size_t ParallelMaximumSize() { return 0; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() { return 0; }
+	virtual const size_t ParallelMinimumSize() { return 0; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return _processorCount; }
+	virtual const size_t ProcessorCount() { return _processorCount; }
 
 	// *** Constructor *** //
 
@@ -157,10 +158,11 @@ public:
 	/// <param name="Cipher">Underlying encryption algorithm</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
-	ECB(IBlockCipher* Cipher)
+	explicit ECB(IBlockCipher* Cipher)
 		:
 		_blockCipher(Cipher),
 		_blockSize(Cipher->BlockSize()),
+		_ecbIv(0),
 		_isDestroyed(false),
 		_isEncryption(false),
 		_isInitialized(false),
@@ -202,7 +204,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	void DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -227,7 +229,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	void EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the Cipher
@@ -256,7 +258,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
 	void SetScope();

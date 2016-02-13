@@ -68,19 +68,19 @@ NAMESPACE_MODE
 class CFB : public ICipherMode
 {
 private:
-	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
-	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
 	IBlockCipher* _blockCipher;
-	unsigned int _blockSize;
+	size_t _blockSize;
 	std::vector<byte> _cfbIv;
 	std::vector<byte> _cfbBuffer;
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
 	bool _isParallel;
-	unsigned int _parallelBlockSize;
-	unsigned int _processorCount;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
 	std::vector<std::vector<byte>> _threadVectors;
 
 public:
@@ -89,7 +89,7 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher
 	/// </summary>
-	virtual const unsigned int BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: Underlying Cipher
@@ -124,7 +124,7 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
+	virtual const std::vector<size_t> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -138,22 +138,22 @@ public:
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
 	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
-	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	virtual const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() { return _processorCount * _blockSize; }
+	virtual const size_t ParallelMinimumSize() { return _processorCount * _blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return _processorCount; }
+	virtual const size_t ProcessorCount() { return _processorCount; }
 
 	// *** Constructor *** //
 
@@ -165,7 +165,7 @@ public:
 	/// <param name="BlockSizeBits">Block size in bits; minimum is 8, or 1 byte. Maximum is Cipher block size in bits</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
-	CFB(IBlockCipher* Cipher, unsigned int BlockSizeBits = 128)
+	explicit CFB(IBlockCipher* Cipher, size_t BlockSizeBits = 128)
 		:
 		_blockCipher(Cipher),
 		_blockSize(BlockSizeBits / 8),
@@ -231,7 +231,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
@@ -251,7 +251,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	void DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Encrypt a block of bytes.
@@ -271,12 +271,12 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	void EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
 	void ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ParallelDecrypt(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	void ProcessDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset, std::vector<byte> &Iv, const unsigned int BlockCount);
+	void ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
 	void SetScope();
 };
 

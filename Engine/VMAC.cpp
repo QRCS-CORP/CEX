@@ -3,12 +3,12 @@
 
 NAMESPACE_MAC
 
-void VMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void VMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if ((InOffset + Length) > Input.size())
 		throw CryptoMacException("VMAC:Ctor", "The Input buffer is too short!");
 
-	for (unsigned int i = 0; i < Length; ++i)
+	for (size_t i = 0; i < Length; ++i)
 		Update(Input[InOffset + i]);
 }
 
@@ -45,12 +45,12 @@ void VMAC::Destroy()
 	}
 }
 
-unsigned int VMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
+size_t VMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < MAC_SIZE)
 		throw CryptoMacException("VMAC:DoFinal", "The Output buffer is too short!");
 
-	unsigned int ctr = 1;
+	size_t ctr = 1;
 	byte ptmp;
 
 	// execute the post-processing phase
@@ -107,7 +107,7 @@ unsigned int VMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
 	return M.size();
 }
 
-void VMAC::Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV)
+void VMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
 {
 	if (MacKey.size() == 0)
 		throw CryptoMacException("VMAC:Initialize", "Key can not be zero length!");
@@ -154,7 +154,7 @@ void VMAC::Update(byte Input)
 
 void VMAC::InitKey(std::vector<byte> &Key, std::vector<byte> &Iv)
 {
-	unsigned int ctr = 0;
+	size_t ctr = 0;
 
 	while (ctr != 256)
 	{

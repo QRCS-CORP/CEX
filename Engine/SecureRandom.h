@@ -54,14 +54,14 @@ using CEX::Exception::CryptoRandomException;
 class SecureRandom
 {
 private:
-	static constexpr unsigned int BUFFER_SIZE = 4096;
-	static constexpr unsigned int MAXD16 = 16368;
+	static constexpr size_t BUFFER_SIZE = 4096;
+	static constexpr size_t MAXD16 = 16368;
 
 	bool _isDestroyed;
 	CEX::Seed::CSPRsg* _rngGenerator;
 	std::vector<byte> _byteBuffer;
-	unsigned int _bufferIndex;
-	unsigned int _bufferSize;
+	size_t _bufferIndex;
+	size_t _bufferSize;
 
 public:
 
@@ -74,7 +74,7 @@ public:
 	/// <param name="BufferSize">Size of the internal buffer; must be at least 64 bytes</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if buffer size is too small</exception>
-	SecureRandom(unsigned int BufferSize = BUFFER_SIZE)
+	explicit SecureRandom(size_t BufferSize = BUFFER_SIZE)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -97,7 +97,7 @@ public:
 
 
 	void Destroy();
-	std::vector<byte> GetBytes(unsigned int Size);
+	std::vector<byte> GetBytes(size_t Size);
 	void GetBytes(std::vector<byte> &Output);
 	char NextChar();
 	unsigned char NextUChar();
@@ -112,9 +112,9 @@ public:
 	int NextInt32();
 	int NextInt32(int Maximum);
 	int NextInt32(int Minimum, int Maximum);
-	unsigned int NextUInt32();
-	unsigned int NextUInt32(unsigned int Maximum);
-	unsigned int NextUInt32(unsigned int Minimum, unsigned int Maximum);
+	uint NextUInt32();
+	uint NextUInt32(uint Maximum);
+	uint NextUInt32(uint Minimum, uint Maximum);
 	long NextLong();
 	long NextInt64();
 	long NextInt64(long Maximum);

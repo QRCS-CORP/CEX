@@ -17,7 +17,7 @@ void CSPPrng::Destroy()
 	}
 }
 
-std::vector<byte> CSPPrng::GetBytes(unsigned int Size)
+std::vector<byte> CSPPrng::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	_rngCrypto->GetBytes(data);
@@ -30,15 +30,15 @@ void CSPPrng::GetBytes(std::vector<byte> &Output)
 	_rngCrypto->GetBytes(Output);
 }
 
-unsigned int CSPPrng::Next()
+uint CSPPrng::Next()
 {
 	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
-unsigned int CSPPrng::Next(unsigned int Maximum)
+uint CSPPrng::Next(uint Maximum)
 {
 	std::vector<byte> rand;
-	unsigned int num(0);
+	uint num(0);
 
 	do
 	{
@@ -50,9 +50,9 @@ unsigned int CSPPrng::Next(unsigned int Maximum)
 	return num;
 }
 
-unsigned int CSPPrng::Next(unsigned int Minimum, unsigned int Maximum)
+uint CSPPrng::Next(uint Minimum, uint Maximum)
 {
-	unsigned int num = 0;
+	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
@@ -125,7 +125,7 @@ std::vector<byte> CSPPrng::GetBits(std::vector<byte> Data, ulong Maximum)
 {
 	ulong val = 0;
 	memcpy(&val, &Data[0], Data.size());
-	int bits = Data.size() * 8;
+	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
 	{

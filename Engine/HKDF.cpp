@@ -18,12 +18,12 @@ void HKDF::Destroy()
 	}
 }
 
-unsigned int HKDF::Generate(std::vector<byte> &Output)
+size_t HKDF::Generate(std::vector<byte> &Output)
 {
 	return Generate(Output, 0, Output.size());
 }
 
-unsigned int HKDF::Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("HKDF:Generate", "Output buffer too small!");
@@ -34,10 +34,10 @@ unsigned int HKDF::Generate(std::vector<byte> &Output, unsigned int OutOffset, u
 		ExpandNext();
 
 	// copy what is left in the buffer
-	unsigned int toGenerate = Size;
-	unsigned int posInT = _generatedBytes % _hashSize;
-	unsigned int leftInT = _hashSize - _generatedBytes % _hashSize;
-	unsigned int toCopy = CEX::Utility::IntUtils::Min(leftInT, toGenerate);
+	size_t toGenerate = Size;
+	size_t posInT = _generatedBytes % _hashSize;
+	size_t leftInT = _hashSize - _generatedBytes % _hashSize;
+	size_t toCopy = CEX::Utility::IntUtils::Min(leftInT, toGenerate);
 
 	memcpy(&Output[OutOffset], &_currentT[posInT], toCopy);
 	_generatedBytes += toCopy;
@@ -118,7 +118,7 @@ void HKDF::Extract(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, 
 
 void HKDF::ExpandNext()
 {
-	unsigned int n = _generatedBytes / _hashSize + 1;
+	size_t n = _generatedBytes / _hashSize + 1;
 
 	if (n >= 256)
 		throw CryptoGeneratorException("HKDF:ExpandNext", "HKDF cannot generate more than 255 blocks of HashLen size");

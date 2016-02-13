@@ -12,25 +12,37 @@ namespace Test
 		{
 			Initialize();
 
-			CompareVector(CEX::Digest::Keccak256(224), _expected224);
+			CEX::Digest::Keccak256* kc224 = new CEX::Digest::Keccak256(224);
+			CEX::Digest::Keccak256* kc256 = new CEX::Digest::Keccak256(256);
+			CEX::Digest::Keccak256* kc288 = new CEX::Digest::Keccak256(288);
+			CEX::Digest::Keccak512* kc384 = new CEX::Digest::Keccak512(384);
+			CEX::Digest::Keccak512* kc512 = new CEX::Digest::Keccak512(512);
+
+			CompareVector(kc224, _expected224);
 			OnProgress("Passed Keccak 224 bit digest vector tests..");
-			CompareVector(CEX::Digest::Keccak256(256), _expected256);
+			CompareVector(kc256, _expected256);
 			OnProgress("Passed Keccak 256 bit digest vector tests..");
-			CompareVector(CEX::Digest::Keccak256(288), _expected288);
+			CompareVector(kc288, _expected288);
 			OnProgress("Passed Keccak 288 bit digest vector tests..");
-			CompareVector(CEX::Digest::Keccak512(384), _expected384);
+			CompareVector(kc384, _expected384);
 			OnProgress("KeccakTest: Passed Keccak 384 bit digest vector tests..");
-			CompareVector(CEX::Digest::Keccak512(512), _expected512);
+			CompareVector(kc512, _expected512);
 			OnProgress("KeccakTest: Passed Keccak 512 bit digest vector tests..");
 
-			CompareHMAC(CEX::Digest::Keccak256(224), _mac224, _trunc224);
+			CompareHMAC(kc224, _mac224, _trunc224);
 			OnProgress("Passed Keccak 224 bit digest HMAC tests..");
-			CompareHMAC(CEX::Digest::Keccak256(256), _mac256, _trunc256);
+			CompareHMAC(kc256, _mac256, _trunc256);
 			OnProgress("Passed Keccak 256 bit digest HMAC tests..");
-			CompareHMAC(CEX::Digest::Keccak512(384), _mac384, _trunc384);
+			CompareHMAC(kc384, _mac384, _trunc384);
 			OnProgress("KeccakTest: Passed Keccak 384 bit digest HMAC tests..");
-			CompareHMAC(CEX::Digest::Keccak512(512), _mac512, _trunc512);
+			CompareHMAC(kc512, _mac512, _trunc512);
 			OnProgress("KeccakTest: Passed Keccak 512 bit digest HMAC tests..");
+
+			delete kc224;
+			delete kc256;
+			delete kc288;
+			delete kc384;
+			delete kc512;
 
 			return SUCCESS;
 		}
@@ -44,16 +56,16 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::CompareVector(CEX::Digest::IDigest &Digest, std::vector<std::vector<byte>> &Expected)
+	void KeccakTest::CompareVector(CEX::Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected)
 	{
-		std::vector<byte> hash(Digest.DigestSize(), 0);
+		std::vector<byte> hash(Digest->DigestSize(), 0);
 
 		for (unsigned int i = 0; i != _messages.size(); i++)
 		{
 			if (_messages[i].size() != 0)
-				Digest.BlockUpdate(_messages[i], 0, _messages[i].size());
+				Digest->BlockUpdate(_messages[i], 0, _messages[i].size());
 
-			Digest.DoFinal(hash, 0);
+			Digest->DoFinal(hash, 0);
 
 			if (Expected[i] != hash)
 				throw std::string("Keccak: Expected hash is not equal!");
@@ -64,16 +76,16 @@ namespace Test
 		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)'a';
 
-		Digest.BlockUpdate(k64, 0, k64.size());
-		Digest.DoFinal(hash, 0);
+		Digest->BlockUpdate(k64, 0, k64.size());
+		Digest->DoFinal(hash, 0);
 
 		if (Expected[_messages.size()] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
-			Digest.Update((byte)'a');
+			Digest->Update((byte)'a');
 
-		Digest.DoFinal(hash, 0);
+		Digest->DoFinal(hash, 0);
 
 		if (Expected[_messages.size()] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
@@ -81,19 +93,19 @@ namespace Test
 		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)('a' + (i % 26));
 
-		Digest.BlockUpdate(k64, 0, k64.size());
-		Digest.DoFinal(hash, 0);
+		Digest->BlockUpdate(k64, 0, k64.size());
+		Digest->DoFinal(hash, 0);
 
 		if (Expected[_messages.size() + 1] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != 64; i++)
 		{
-			Digest.Update(k64[i * 1024]);
-			Digest.BlockUpdate(k64, i * 1024 + 1, 1023);
+			Digest->Update(k64[i * 1024]);
+			Digest->BlockUpdate(k64, i * 1024 + 1, 1023);
 		}
 
-		Digest.DoFinal(hash, 0);
+		Digest->DoFinal(hash, 0);
 
 		if (Expected[_messages.size() + 1] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
@@ -113,28 +125,28 @@ namespace Test
 		throw std::string("Keccak: Expected hash is not equal!");*/
 	}
 
-	void KeccakTest::CompareDoFinal(CEX::Digest::IDigest &Digest)
+	void KeccakTest::CompareDoFinal(CEX::Digest::IDigest* Digest)
 	{
-		std::vector<byte> hash(Digest.DigestSize(), 0);
+		std::vector<byte> hash(Digest->DigestSize(), 0);
 
-		Digest.DoFinal(hash, 0);
+		Digest->DoFinal(hash, 0);
 
-		for (unsigned int i = 0; i <= Digest.DigestSize(); ++i)
+		for (unsigned int i = 0; i <= Digest->DigestSize(); ++i)
 		{
-			std::vector<byte> expected(2 * Digest.DigestSize(), 0);
+			std::vector<byte> expected(2 * Digest->DigestSize(), 0);
 			memcpy(&expected[i], &hash[0], hash.size());
-			std::vector<byte> outBytes(2 * Digest.DigestSize(), 0);
+			std::vector<byte> outBytes(2 * Digest->DigestSize(), 0);
 
-			Digest.DoFinal(outBytes, i);
+			Digest->DoFinal(outBytes, i);
 
 			if (expected != outBytes)
 				throw std::string("Keccak DoFinal: Expected hash is not equal!");
 		}
 	}
 
-	void KeccakTest::CompareHMAC(CEX::Digest::IDigest &Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected)
+	void KeccakTest::CompareHMAC(CEX::Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected)
 	{
-		CEX::Mac::HMAC mac(&Digest);
+		CEX::Mac::HMAC mac(Digest);
 		std::vector<byte> macV2(mac.MacSize(), 0);
 
 		for (unsigned int i = 0; i != _macKeys.size(); i++)
@@ -149,7 +161,7 @@ namespace Test
 		}
 
 		// test truncated keys
-		CEX::Mac::HMAC mac2(&Digest);
+		CEX::Mac::HMAC mac2(Digest);
 		mac2.Initialize(_truncKey);
 		mac2.BlockUpdate(_truncData, 0, _truncData.size());
 		mac2.DoFinal(macV2, 0);

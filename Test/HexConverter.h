@@ -19,10 +19,9 @@ namespace Test
         static void Decode(const std::string &Data, std::vector<byte> &temp)
         {
             Initialize();
-            
-            byte b1, b2;
-            int length = 0;
-            int end = Data.size();
+
+            unsigned int length = 0;
+			unsigned int end = (unsigned int)Data.size();
             
             temp.resize(end / 2,0);
 
@@ -34,20 +33,21 @@ namespace Test
                 end--;
             }
 
-            int i = 0;
-            int ct = 0;
+			unsigned int i = 0;
+			unsigned int ct = 0;
 
             while (i < end)
             {
-                while (i < end && Ignore(Data[i]))
-                    i++;
-
-                b1 = _decodingTable[Data[i++]];
 
                 while (i < end && Ignore(Data[i]))
                     i++;
 
-                b2 = _decodingTable[Data[i++]];
+				byte b1 = _decodingTable[Data[i++]];
+
+                while (i < end && Ignore(Data[i]))
+                    i++;
+
+				byte b2 = _decodingTable[Data[i++]];
                 temp[ct++] = (byte)((b1 << 4) | b2);
                 length++;
             }
@@ -59,7 +59,8 @@ namespace Test
             
             result.clear();
             
-            for (unsigned int i = 0; i < Data.size(); ++i) {
+            for (unsigned int i = 0; i < (unsigned int)Data.size(); ++i)
+			{
                 const std::string str=Data[i];
                 std::vector<byte> temp;
                 Decode(str, temp);
@@ -80,7 +81,7 @@ namespace Test
             }
         }
 
-		static void Encode(const std::vector<byte> &Data, int Offset, int Length, std::vector<byte> &temp)
+		static void Encode(const std::vector<byte> &Data, unsigned int Offset, unsigned int Length, std::vector<byte> &temp)
 		{
 			Initialize();
 
@@ -88,7 +89,7 @@ namespace Test
 
 			int counter = 0;
 
-			for (int i = Offset; i < (Offset + Length); i++)
+			for (unsigned int i = Offset; i < (Offset + Length); i++)
 			{
 				int v = Data[i];
 				temp[counter++] = _encodingTable[v >> 4];
@@ -101,7 +102,7 @@ namespace Test
 			Initialize();
 
 			std::vector<byte> encoded;
-			Encode(Data, 0, Data.size(), encoded);
+			Encode(Data, 0, (unsigned int)Data.size(), encoded);
 			result.assign((char*)&encoded[0], encoded.size());
 		}
 

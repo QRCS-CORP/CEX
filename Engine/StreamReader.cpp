@@ -15,7 +15,7 @@ byte StreamReader::ReadByte()
 	throw CEX::Exception::CryptoProcessingException("StreamReader:ReadByte", "The array does not contain enough data!");
 }
 
-std::vector<byte> StreamReader::ReadBytes(unsigned int Length)
+std::vector<byte> StreamReader::ReadBytes(size_t Length)
 {
 	if (_streamData.Position() + Length <= _streamData.Length())
 	{
@@ -31,7 +31,7 @@ std::vector<byte> StreamReader::ReadBytes(unsigned int Length)
 
 short StreamReader::ReadInt16()
 {
-	unsigned int sze = sizeof(short);
+	uint sze = sizeof(short);
 
 	if (_streamData.Position() + sze < _streamData.Length())
 	{
@@ -47,15 +47,15 @@ short StreamReader::ReadInt16()
 	}
 }
 
-unsigned short StreamReader::ReadUInt16()
+ushort StreamReader::ReadUInt16()
 {
-	unsigned int sze = sizeof(unsigned short);
+	uint sze = sizeof(ushort);
 
 	if (_streamData.Position() + sze < _streamData.Length())
 	{
 		std::vector<byte> data(sze);
 		_streamData.Read(data, 0, sze);
-		unsigned short num(0);
+		ushort num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
@@ -67,7 +67,7 @@ unsigned short StreamReader::ReadUInt16()
 
 int StreamReader::ReadInt32()
 {
-	unsigned int sze = sizeof(int);
+	uint sze = sizeof(int);
 
 	if (_streamData.Position() + sze < _streamData.Length())
 	{
@@ -83,15 +83,15 @@ int StreamReader::ReadInt32()
 	}
 }
 
-unsigned int StreamReader::ReadUInt32()
+uint StreamReader::ReadUInt32()
 {
-	unsigned int sze = sizeof(unsigned int);
+	uint sze = sizeof(uint);
 
 	if (_streamData.Position() + sze < _streamData.Length())
 	{
 		std::vector<byte> data(sze);
 		_streamData.Read(data, 0, sze);
-		unsigned int num(0);
+		uint num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
@@ -103,7 +103,7 @@ unsigned int StreamReader::ReadUInt32()
 
 long StreamReader::ReadInt64()
 {
-	unsigned int sze = sizeof(long);
+	uint sze = sizeof(long);
 
 	if (_streamData.Position() + sze < _streamData.Length())
 	{
@@ -119,45 +119,9 @@ long StreamReader::ReadInt64()
 	}
 }
 
-unsigned long long StreamReader::ReadUInt64()
+ulong StreamReader::ReadUInt64()
 {
-	unsigned int sze = sizeof(unsigned long long);
-
-	if (_streamData.Position() + sze < _streamData.Length())
-	{
-		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
-		unsigned long long num(0);
-		memcpy(&num, &data[0], sze);
-		return num;
-	}
-	else
-	{
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
-	}
-}
-
-uint StreamReader::ReadWord32()
-{
-	unsigned int sze = sizeof(uint);
-
-	if (_streamData.Position() + sze < _streamData.Length())
-	{
-		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
-		uint num(0);
-		memcpy(&num, &data[0], sze);
-		return num;
-	}
-	else
-	{
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadWord32", "The array does not contain enough data!");
-	}
-}
-
-ulong StreamReader::ReadWord64()
-{
-	unsigned int sze = sizeof(ulong);
+	uint sze = sizeof(ulong);
 
 	if (_streamData.Position() + sze < _streamData.Length())
 	{
@@ -169,7 +133,7 @@ ulong StreamReader::ReadWord64()
 	}
 	else
 	{
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadWord64", "The array does not contain enough data!");
+		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
 	}
 }
 

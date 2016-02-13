@@ -76,9 +76,9 @@ namespace Test
 		virtual std::string Run();
 
     private:
-		void CompareVector(CEX::Digest::IDigest &Digest, std::vector<std::vector<byte>> &Expected);
-		void CompareDoFinal(CEX::Digest::IDigest &Digest);
-		void CompareHMAC(CEX::Digest::IDigest &Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected);
+		void CompareVector(CEX::Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected);
+		void CompareDoFinal(CEX::Digest::IDigest* Digest);
+		void CompareHMAC(CEX::Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected);
 		void Initialize();
 		void OnProgress(char* Data);
     };

@@ -3,7 +3,7 @@
 
 NAMESPACE_MAC
 
-void HMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void HMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if (InOffset + Length > Input.size())
 		throw CryptoMacException("HMAC:BlockUpdate", "The Input buffer is too short!");
@@ -31,7 +31,7 @@ void HMAC::Destroy()
 	}
 }
 
-unsigned int HMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
+size_t HMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
 	if (Output.size() - OutOffset < _msgDigest->DigestSize())
 		throw CryptoMacException("HMAC:DoFinal", "The Output buffer is too short!");
@@ -41,17 +41,17 @@ unsigned int HMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
 	_msgDigest->DoFinal(tmpv, 0);
 	_msgDigest->BlockUpdate(_outputPad, 0, _outputPad.size());
 	_msgDigest->BlockUpdate(tmpv, 0, tmpv.size());
-	unsigned int msgLen = _msgDigest->DoFinal(Output, OutOffset);
+	size_t msgLen = _msgDigest->DoFinal(Output, OutOffset);
 	_msgDigest->BlockUpdate(_inputPad, 0, _inputPad.size());
 	Reset();
 
 	return msgLen;
 }
 
-void HMAC::Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV)
+void HMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
 {
 	_msgDigest->Reset();
-	unsigned int keyLength = MacKey.size() + IV.size();
+	size_t keyLength = MacKey.size() + IV.size();
 
 	// combine and compress
 	if (IV.size() > 0)

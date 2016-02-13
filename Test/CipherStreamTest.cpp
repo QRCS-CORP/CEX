@@ -471,46 +471,6 @@ namespace Test
 			throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
 	}
 
-	/*void CipherStreamTest::FileStreamTest() // requires path parameters
-	{
-	std::vector<byte> buff(255);
-	CEX::IO::FileStream fsr(mediumFileIn, CEX::IO::FileStream::FileAccess::Read, CEX::IO::FileStream::FileMode::Binary);
-	fsr.Read(buff, 0, 100);
-	bool exc = true;
-
-	// test exception
-	try
-	{
-	fsr.WriteByte((byte)1);
-	}
-	catch (...)
-	{
-	exc = false;
-	}
-	if (exc)
-	throw;
-
-	fsr.Close();
-
-	std::vector<byte> buff2(255);
-	for (unsigned int i = 0; i < 255; i++)
-	buff2[i] = (byte)i;
-
-	Delete(mediumFileEnc.c_str());
-
-	CEX::IO::FileStream fsw(mediumFileEnc, CEX::IO::FileStream::FileAccess::ReadWrite, (CEX::IO::FileStream::FileMode)((int)CEX::IO::FileStream::FileMode::Append | (int)CEX::IO::FileStream::FileMode::Binary));
-	long len = fsw.Length();
-
-	fsw.Write(buff2, 0, buff2.size());
-	fsw.Seek(len, CEX::IO::SeekOrigin::Begin);
-	std::vector<byte> buff3(255);
-	fsw.Read(buff3, 0, 255);
-	fsw.Close();
-
-	if (buff3 != buff2)
-	throw;
-	}*/
-
 	void CipherStreamTest::Initialize()
 	{
 		_encText.reserve(MAX_ALLOC);
@@ -995,14 +955,14 @@ namespace Test
 		}
 
 		rng.GetBytes(Data);
-		return Data.size();
+		return (int)Data.size();
 	}
 
 	void CipherStreamTest::BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
 	{
 		const unsigned int blkSize = Cipher->BlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = inpSize - (inpSize % blkSize);
+		const unsigned int inpSize = (unsigned int)(Input.size() - InOffset);
+		const unsigned int alnSize = inpSize - (unsigned int)(inpSize % blkSize);
 		unsigned long count = 0;
 
 		Cipher->IsParallel() = false;
@@ -1024,15 +984,14 @@ namespace Test
 			std::vector<byte> outBuffer(blkSize);
 			Cipher->Transform(inpBuffer, 0, outBuffer, 0);
 			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-			count += cnkSize;
 		}
 	}
 
 	void CipherStreamTest::BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
 	{
 		const unsigned int blkSize = Cipher->BlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = inpSize - blkSize;
+		const unsigned int inpSize = (unsigned int)(Input.size() - InOffset);
+		const unsigned int alnSize = inpSize - blkSize;
 		unsigned long count = 0;
 
 		Cipher->IsParallel() = false;
@@ -1050,7 +1009,7 @@ namespace Test
 		memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
 		std::vector<byte> outBuffer(blkSize);
 		Cipher->Transform(inpBuffer, 0, outBuffer, 0);
-		unsigned int fnlSize = blkSize - Padding->GetPaddingLength(outBuffer, 0);
+		unsigned int fnlSize = blkSize - (unsigned int)Padding->GetPaddingLength(outBuffer, 0);
 		memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
 		OutOffset += fnlSize;
 
@@ -1061,8 +1020,8 @@ namespace Test
 	void CipherStreamTest::BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
 	{
 		const unsigned int blkSize = Cipher->BlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = inpSize - (inpSize % blkSize);
+		const unsigned int inpSize = (unsigned int)(Input.size() - InOffset);
+		const unsigned int alnSize = inpSize - (inpSize % blkSize);
 		unsigned long count = 0;
 
 		Cipher->IsParallel() = false;
@@ -1087,28 +1046,6 @@ namespace Test
 			if (Output.size() != OutOffset + blkSize)
 				Output.resize(OutOffset + blkSize);
 			memcpy(&Output[OutOffset], &outBuffer[0], blkSize);
-			count += blkSize;
-		}
-	}
-
-	void CipherStreamTest::Delete(const char* FileName)
-	{
-		if (FileExists(FileName))
-			std::remove(FileName);
-	}
-
-	bool CipherStreamTest::FileExists(const char* FileName)
-	{
-		try
-		{
-			std::ifstream infile(FileName);
-			bool valid = infile.good();
-			infile.close();
-			return valid;
-		}
-		catch (...)
-		{
-			return false;
 		}
 	}
 
@@ -1117,99 +1054,12 @@ namespace Test
 		_progressEvent(Data);
 	}
 
-	void CipherStreamTest::ParallelCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
-	{
-		const unsigned int blkSize = Cipher->ParallelBlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = (inpSize / blkSize) * blkSize;
-		unsigned long count = 0;
-
-		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
-
-		// parallel blocks
-		while (count != alnSize)
-		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
-			InOffset += blkSize;
-			OutOffset += blkSize;
-			count += blkSize;
-		}
-
-		if (alnSize != inpSize)
-		{
-			unsigned int cnkSize = inpSize - alnSize;
-			std::vector<byte> inpBuffer(cnkSize);
-			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-			std::vector<byte> outBuffer(cnkSize);
-			Cipher->Transform(inpBuffer, outBuffer);
-			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-			count += cnkSize;
-		}
-	}
-
-	void CipherStreamTest::ParallelDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
-	{
-		const unsigned int blkSize = Cipher->ParallelBlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = (inpSize / blkSize) * blkSize;
-		unsigned long count = 0;
-
-		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
-
-		// parallel
-		while (count != alnSize)
-		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
-			InOffset += blkSize;
-			OutOffset += blkSize;
-			count += blkSize;
-		}
-
-		if (alnSize != inpSize)
-		{
-			BlockDecrypt(Cipher, Padding, Input, InOffset, Output, OutOffset);
-		}
-	}
-
-	void CipherStreamTest::ParallelStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
-	{
-		const unsigned int blkSize = Cipher->ParallelBlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = (inpSize / blkSize) * blkSize;
-		unsigned long count = 0;
-
-		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
-
-		// parallel blocks
-		while (count != alnSize)
-		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
-			InOffset += blkSize;
-			OutOffset += blkSize;
-			count += blkSize;
-		}
-
-		if (alnSize != inpSize)
-		{
-			unsigned int cnkSize = inpSize - alnSize;
-			std::vector<byte> inpBuffer(cnkSize);
-			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-			std::vector<byte> outBuffer(cnkSize);
-			Cipher->Transform(inpBuffer, outBuffer);
-			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-			count += cnkSize;
-		}
-	}
-
 	void CipherStreamTest::ProcessStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
 	{
 		const unsigned int blkSize = Cipher->BlockSize();
-		const unsigned long inpSize = (Input.size() - InOffset);
-		const unsigned long alnSize = (inpSize / blkSize) * blkSize;
-		unsigned long count = 0;
+		const unsigned int inpSize = (unsigned int)(Input.size() - InOffset);
+		const unsigned int alnSize = (unsigned int)(inpSize / blkSize) * blkSize;
+		unsigned int count = 0;
 
 		Cipher->IsParallel() = false;
 
@@ -1230,7 +1080,6 @@ namespace Test
 			std::vector<byte> outBuffer(cnkSize);
 			Cipher->Transform(inpBuffer, outBuffer);
 			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-			count += cnkSize;
 		}
 	}
 }

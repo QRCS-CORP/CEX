@@ -110,7 +110,7 @@ public:
 	/// <param name="Size">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	virtual std::vector<byte> GetBytes(unsigned int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
@@ -124,7 +124,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Get an pseudo random unsigned 32bit integer
@@ -133,7 +133,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Maximum);
+	virtual uint Next(uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -143,7 +143,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Minimum, unsigned int Maximum);
+	virtual uint Next(uint Minimum, uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer

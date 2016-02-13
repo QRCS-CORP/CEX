@@ -61,14 +61,14 @@ NAMESPACE_PRNG
 class PPBPrng : public IRandom
 {
 private:
-	static constexpr unsigned int PKCS_ITERATIONS = 2;
-	static constexpr unsigned int BUFFER_SIZE = 1024;
+	static constexpr size_t PKCS_ITERATIONS = 2;
+	static constexpr size_t BUFFER_SIZE = 1024;
 
-	unsigned int _bufferIndex;
-	unsigned int _bufferSize;
+	size_t _bufferIndex;
+	size_t _bufferSize;
 	std::vector<byte> _byteBuffer;
 	CEX::Digest::IDigest* _digestEngine;
-	unsigned int _digestIterations;
+	size_t _digestIterations;
 	CEX::Enumeration::Digests _digestType;
 	bool _isDestroyed;
 	CEX::Generator::PBKDF2* _rngGenerator;
@@ -100,7 +100,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
-	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::SHA512, unsigned int BufferSize = BUFFER_SIZE)
+	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::SHA512, size_t BufferSize = BUFFER_SIZE)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -142,7 +142,7 @@ public:
 	/// <param name="Size">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	virtual std::vector<byte> GetBytes(unsigned int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
@@ -156,7 +156,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Get an pseudo random unsigned 32bit integer
@@ -165,7 +165,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Maximum);
+	virtual uint Next(uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -175,7 +175,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Minimum, unsigned int Maximum);
+	virtual uint Next(uint Minimum, uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
@@ -212,7 +212,7 @@ private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests RngEngine);
-	unsigned int GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine);
+	uint GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine);
 };
 
 NAMESPACE_PRNGEND

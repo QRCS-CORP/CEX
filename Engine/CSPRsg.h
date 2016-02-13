@@ -93,7 +93,7 @@ public:
 	/// <param name="Size">The size of the expected seed returned</param>
 	/// 
 	/// <returns>A pseudo random seed</returns>
-	virtual std::vector<byte> GetBytes(int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// Returns the next pseudo random 32bit integer

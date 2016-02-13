@@ -56,39 +56,39 @@ using CEX::Enumeration::SymmetricEngines;
 class CipherDescription
 {
 private:
-	static constexpr unsigned int ENGTPE_SIZE = 1;
-	static constexpr unsigned int KEYSZE_SIZE = 2;
-	static constexpr unsigned int IVSIZE_SIZE = 1;
-	static constexpr unsigned int CPRTPE_SIZE = 1;
-	static constexpr unsigned int PADTPE_SIZE = 1;
-	static constexpr unsigned int BLKSZE_SIZE = 1;
-	static constexpr unsigned int RNDCNT_SIZE = 1;
-	static constexpr unsigned int KDFENG_SIZE = 1;
-	static constexpr unsigned int MACSZE_SIZE = 1;
-	static constexpr unsigned int MACENG_SIZE = 1;
-	static constexpr unsigned int HDR_SIZE = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE + MACSZE_SIZE + MACENG_SIZE;
+	static constexpr uint ENGTPE_SIZE = 1;
+	static constexpr uint KEYSZE_SIZE = 2;
+	static constexpr uint IVSIZE_SIZE = 1;
+	static constexpr uint CPRTPE_SIZE = 1;
+	static constexpr uint PADTPE_SIZE = 1;
+	static constexpr uint BLKSZE_SIZE = 1;
+	static constexpr uint RNDCNT_SIZE = 1;
+	static constexpr uint KDFENG_SIZE = 1;
+	static constexpr uint MACSZE_SIZE = 1;
+	static constexpr uint MACENG_SIZE = 1;
+	static constexpr uint HDR_SIZE = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE + MACSZE_SIZE + MACENG_SIZE;
 
-	static constexpr unsigned int ENGTPE_SEEK = 0;
-	static constexpr unsigned int KEYSZE_SEEK = ENGTPE_SIZE;
-	static constexpr unsigned int IVSIZE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE;
-	static constexpr unsigned int CPRTPE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE;
-	static constexpr unsigned int PADTPE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE;
-	static constexpr unsigned int BLKSZE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE;
-	static constexpr unsigned int RNDCNT_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE;
-	static constexpr unsigned int KDFENG_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE;
-	static constexpr unsigned int MACSZE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE;
-	static constexpr unsigned int MACENG_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE + MACSZE_SIZE;
+	static constexpr uint ENGTPE_SEEK = 0;
+	static constexpr uint KEYSZE_SEEK = ENGTPE_SIZE;
+	static constexpr uint IVSIZE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE;
+	static constexpr uint CPRTPE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE;
+	static constexpr uint PADTPE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE;
+	static constexpr uint BLKSZE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE;
+	static constexpr uint RNDCNT_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE;
+	static constexpr uint KDFENG_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE;
+	static constexpr uint MACSZE_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE;
+	static constexpr uint MACENG_SEEK = ENGTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + CPRTPE_SIZE + PADTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE + MACSZE_SIZE;
 
-	unsigned int _engineType;
-	unsigned int _keySize;
-	unsigned int _ivSize;
-	unsigned int _cipherType;
-	unsigned int _paddingType;
-	unsigned int _blockSize;
-	unsigned int _roundCount;
-	unsigned int _kdfEngine;
-	unsigned int _macSize;
-	unsigned int _macEngine;
+	uint _engineType;
+	uint _keySize;
+	uint _ivSize;
+	uint _cipherType;
+	uint _paddingType;
+	uint _blockSize;
+	uint _roundCount;
+	uint _kdfEngine;
+	uint _macSize;
+	uint _macEngine;
 
 public:
 
@@ -100,12 +100,12 @@ public:
 	/// <summary>
 	/// Get: The cipher Key Size
 	/// </summary>
-	const unsigned int KeySize() const { return _keySize; }
+	const uint KeySize() const { return _keySize; }
 
 	/// <summary>
 	/// Set: The cipher Key Size
 	/// </summary>
-	unsigned int &KeySize() { return _keySize; }
+	uint &KeySize() { return _keySize; }
 
 	/// <summary>
 	/// Size of the cipher Initialization Vector
@@ -140,7 +140,7 @@ public:
 	/// <summary>
 	/// The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key
 	/// </summary>
-	const unsigned int MacSize() const { return _macSize; }
+	const uint MacSize() const { return _macSize; }
 
 	/// <summary>
 	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
@@ -178,19 +178,19 @@ public:
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	/// <param name="MacSize">The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC Digest engine used to authenticate a message file encrypted with this key</param>
-	CipherDescription(CEX::Enumeration::SymmetricEngines EngineType, unsigned int KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
-		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, unsigned int MacSize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
+	CipherDescription(CEX::Enumeration::SymmetricEngines EngineType, uint KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize,
+		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, uint MacSize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
 	{
-		this->_engineType = (unsigned int)EngineType;
+		this->_engineType = (uint)EngineType;
 		this->_keySize = KeySize;
-		this->_ivSize = (unsigned int)IvSize;
-		this->_cipherType = (unsigned int)CipherType;
-		this->_paddingType = (unsigned int)PaddingType;
-		this->_blockSize = (unsigned int)BlockSize;
-		this->_roundCount = (unsigned int)RoundCount;
-		this->_kdfEngine = (unsigned int)KdfEngine;
+		this->_ivSize = (uint)IvSize;
+		this->_cipherType = (uint)CipherType;
+		this->_paddingType = (uint)PaddingType;
+		this->_blockSize = (uint)BlockSize;
+		this->_roundCount = (uint)RoundCount;
+		this->_kdfEngine = (uint)KdfEngine;
 		this->_macSize = MacSize;
-		this->_macEngine = (unsigned int)MacEngine;
+		this->_macEngine = (uint)MacEngine;
 	}
 
 	/// <summary>
@@ -198,7 +198,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionArray">The byte array containing the CipherDescription</param>
-	CipherDescription(const std::vector<byte> &DescriptionArray)
+	explicit CipherDescription(const std::vector<byte> &DescriptionArray)
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(DescriptionArray);
 		CEX::IO::StreamReader reader(ms);
@@ -220,7 +220,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the CipherDescription</param>
-	CipherDescription(const CEX::IO::MemoryStream &DescriptionStream)
+	explicit CipherDescription(const CEX::IO::MemoryStream &DescriptionStream)
 	{
 		CEX::IO::StreamReader reader(DescriptionStream);
 

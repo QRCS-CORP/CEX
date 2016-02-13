@@ -32,12 +32,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal block size in bytes
 	/// </summary>
-	virtual unsigned int BlockSize() = 0;
+	virtual size_t BlockSize() = 0;
 
 	/// <summary>
 	/// Get: Size of returned hash value in bytes
 	/// </summary>
-	virtual unsigned int DigestSize() = 0;
+	virtual size_t DigestSize() = 0;
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -58,7 +58,7 @@ public:
 	/// <param name="Input">Input data</param>
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="Length">Amount of data to process in bytes</param>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length) = 0;
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
 
 	/// <summary>
 	/// Get the Hash value
@@ -81,7 +81,7 @@ public:
 	/// <param name="OutOffset">The starting offset within the Output array</param>
 	/// 
 	/// <returns>Size of Hash value</returns>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, const unsigned int OutOffset) = 0;
+	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Reset the internal state

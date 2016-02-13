@@ -73,7 +73,7 @@ public:
 		_rslCounter(0),
 		_wrkBuffer(MSIZE)
 	{
-		unsigned int len = MAXSEED * sizeof(int);
+		size_t len = MAXSEED * sizeof(int);
 		GetSeed(len);
 		Initialize(true);
 	}
@@ -85,7 +85,7 @@ public:
 	/// <param name="Seed">The initial state values; must be between 2 and 256, 32bit values</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if an invalid seed size is used</exception>
-	ISCRsg(const std::vector<int> &Seed)
+	explicit ISCRsg(const std::vector<int> &Seed)
 		:
 		_accululator(0),
 		_cycCounter(0),
@@ -96,10 +96,10 @@ public:
 		_rslCounter(0),
 		_wrkBuffer(MSIZE)
 	{
-		if (Seed.size() < 1 && Seed.size() > 256)
+		if (Seed.size() < 1 || Seed.size() > 256)
 			throw CryptoRandomException("ISCRsg:CTor", "The seed array length must be between 1 and 256 int32 values!");
 
-		unsigned int len = Seed.size() > MAXSEED ? MAXSEED : Seed.size();
+		size_t len = Seed.size() > MAXSEED ? MAXSEED : Seed.size();
 		memcpy(&_rndResult[0], &Seed[0], len * sizeof(int));
 		Initialize(true);
 	}
@@ -133,7 +133,7 @@ public:
 	/// <param name="Size">The size of the expected seed returned</param>
 	/// 
 	/// <returns>A pseudo random seed</returns>
-	virtual std::vector<byte> GetBytes(int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// initializes the generator with new state
@@ -154,7 +154,7 @@ public:
 	
 private:
 	void Generate();
-	void GetSeed(unsigned int Size);
+	void GetSeed(size_t Size);
 
 	inline void Mix(int &A, int &B, int &C, int &D, int &E, int &F, int &G, int &H)
 	{

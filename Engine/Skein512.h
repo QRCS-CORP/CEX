@@ -75,15 +75,15 @@ NAMESPACE_DIGEST
 class Skein512 : public IDigest
 {
 private:
-	static constexpr uint BLOCK_SIZE = 64;
-	static constexpr uint DIGEST_SIZE = 64;
-	static constexpr uint STATE_SIZE = 512;
-	static constexpr uint STATE_BYTES = STATE_SIZE / 8;
-	static constexpr uint STATE_WORDS = STATE_SIZE / 64;
-	static constexpr uint STATE_OUTPUT = (STATE_SIZE + 7) / 8;
+	static constexpr size_t BLOCK_SIZE = 64;
+	static constexpr size_t DIGEST_SIZE = 64;
+	static constexpr size_t STATE_SIZE = 512;
+	static constexpr size_t STATE_BYTES = STATE_SIZE / 8;
+	static constexpr size_t STATE_WORDS = STATE_SIZE / 64;
+	static constexpr size_t STATE_OUTPUT = (STATE_SIZE + 7) / 8;
 
 	Threefish512 _blockCipher;
-	uint _bytesFilled;
+	size_t _bytesFilled;
 	std::vector<ulong> _cipherInput;
 	std::vector<ulong> _configString;
 	std::vector<ulong> _configValue;
@@ -100,12 +100,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual unsigned int BlockSize() { return BLOCK_SIZE; }
+	virtual size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual unsigned int DigestSize() { return DIGEST_SIZE; }
+	virtual size_t DigestSize() { return DIGEST_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -139,7 +139,7 @@ public:
 	/// <summary>
 	/// Get the state size in bits
 	/// </summary>
-	uint GetStateSize()
+	size_t GetStateSize()
 	{
 		return STATE_SIZE;
 	}
@@ -162,21 +162,20 @@ public:
 	/// <summary>
 	/// Initialize the digest
 	/// </summary>
-	Skein512(SkeinInitializationType InitializationType = SkeinInitializationType::Normal)
+	explicit Skein512(SkeinInitializationType InitializationType = SkeinInitializationType::Normal)
 		:
+		_blockCipher(),
 		_cipherInput(STATE_WORDS),
 		_configString(STATE_SIZE),
 		_configValue(STATE_SIZE),
 		_isDestroyed(false),
 		_digestState(STATE_WORDS),
-		_inputBuffer(STATE_BYTES)
+		_inputBuffer(STATE_BYTES),
+		_ubiParameters()
 	{
 		_initializationType = InitializationType;
-		Threefish512 _blockCipher;
-		// allocate tweak
-		UbiTweak _ubiParameters;
 		// generate the configuration string
-		_configString[1] = (ulong)DigestSize() * 8;
+		_configString[1] = (ulong)(DigestSize() * 8);
 		// "SHA3"
 		std::vector<byte> schema(4, 0);
 		schema[0] = 83;
@@ -208,7 +207,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Hash value
@@ -233,7 +232,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Generate a configuration using a state key
@@ -272,7 +271,7 @@ public:
 	/// <param name="Schema">Schema Configuration string</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoDigestException">Thrown if an invalid schema is used</exception>
-	void SetSchema(const std::vector<byte> Schema);
+	void SetSchema(const std::vector<byte> &Schema);
 
 	/// <summary>
 	/// Set the tree fan out size
@@ -295,7 +294,7 @@ public:
 	/// <param name="Version">Version string</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoDigestException">Thrown if an invalid version is used</exception>
-	void SetVersion(const unsigned int Version);
+	void SetVersion(const uint Version);
 
 	/// <summary>
 	/// Update the message digest with a single byte
@@ -307,8 +306,8 @@ public:
 private:
 	void GenerateConfiguration();
 	void Initialize();
-	void ProcessBlock(int bytes);
-	static void PutBytes(std::vector<ulong> Input, std::vector<byte> &Output, unsigned int Offset, unsigned int ByteCount);
+	void ProcessBlock(uint Value);
+	static void PutBytes(std::vector<ulong> Input, std::vector<byte> &Output, size_t Offset, size_t ByteCount);
 };
 
 NAMESPACE_DIGESTEND

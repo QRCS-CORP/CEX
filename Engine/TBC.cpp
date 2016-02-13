@@ -2,13 +2,13 @@
 
 NAMESPACE_PADDING
 
-unsigned int TBC::AddPadding(std::vector<byte> &Input, unsigned int Offset)
+size_t TBC::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
 		throw CryptoPaddingException("TBC:AddPadding", "The padding offset value is longer than the array length!");
 
-	unsigned int olen = (Offset > 0) ? Offset - 1 : 0;
-	unsigned int plen = Input.size() - Offset;
+	size_t olen = (Offset > 0) ? Offset - 1 : 0;
+	size_t plen = Input.size() - Offset;
 	byte code;
 
 	if ((Input[olen] & 0x01) == 0)
@@ -22,9 +22,9 @@ unsigned int TBC::AddPadding(std::vector<byte> &Input, unsigned int Offset)
 	return plen;
 }
 
-unsigned int TBC::GetPaddingLength(const std::vector<byte> &Input)
+size_t TBC::GetPaddingLength(const std::vector<byte> &Input)
 {
-	unsigned int len = Input.size();
+	size_t len = Input.size();
 	byte code = Input[len - 1];
 
 	if (code != MKCODE && code != ZBCODE)
@@ -36,9 +36,9 @@ unsigned int TBC::GetPaddingLength(const std::vector<byte> &Input)
 	return Input.size() - len;
 }
 
-unsigned int TBC::GetPaddingLength(const std::vector<byte> &Input, unsigned int Offset)
+size_t TBC::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	unsigned int len = Input.size() - Offset;
+	size_t len = Input.size() - Offset;
 	byte code = Input[Input.size() - 1];
 
 	if (code != MKCODE && code != ZBCODE)

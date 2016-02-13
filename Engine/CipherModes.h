@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Cipher Modes
 /// </summary>
-enum class CipherModes : unsigned int
+enum class CipherModes : uint
 {
 	/// <summary>
 	/// Electronic CodeBook Mode (not secure, testing only)

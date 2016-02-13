@@ -49,7 +49,7 @@ public:
 	/// <param name="Offset">Offset into array</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual unsigned int AddPadding(std::vector<byte> &Input, unsigned int Offset) = 0;
+	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset) = 0;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -58,7 +58,7 @@ public:
 	/// <param name="Input">Padded array of bytes</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual unsigned int GetPaddingLength(const std::vector<byte> &Input) = 0;
+	virtual size_t GetPaddingLength(const std::vector<byte> &Input) = 0;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -68,7 +68,7 @@ public:
 	/// <param name="Offset">Offset into array</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual unsigned int GetPaddingLength(const std::vector<byte> &Input, unsigned int Offset) = 0;
+	virtual size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset) = 0;
 };
 
 NAMESPACE_PADDINGEND

@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Message">A custom message or error data</param>
-	CryptoProcessingException(const std::string &Message) 
+	explicit CryptoProcessingException(const std::string &Message)
 		: 
 		_message(Message)
 	{

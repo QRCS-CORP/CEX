@@ -77,28 +77,28 @@ NAMESPACE_STREAM
 class Salsa20 : public IStreamCipher
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 64;
-	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
-	static constexpr unsigned int MAX_ROUNDS = 30;
-	static constexpr unsigned int MIN_ROUNDS = 8;
-	static constexpr unsigned int PARALLEL_CHUNK = 1024;
-	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
-	static constexpr unsigned int ROUNDS20 = 20;
+	static constexpr size_t BLOCK_SIZE = 64;
+	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t MAX_ROUNDS = 30;
+	static constexpr size_t MIN_ROUNDS = 8;
+	static constexpr size_t PARALLEL_CHUNK = 1024;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t ROUNDS20 = 20;
 	static constexpr const char *SIGMA = "expand 32-byte k";
-	static constexpr unsigned int STATE_SIZE = 16;
+	static constexpr size_t STATE_SIZE = 16;
 	static constexpr const char *TAU = "expand 16-byte k";
-	static constexpr unsigned int VECTOR_SIZE = 8;
+	static constexpr size_t VECTOR_SIZE = 8;
 
 	std::vector<uint> _ctrVector;
 	std::vector<byte> _dstCode;
 	bool _isDestroyed;
 	bool _isInitialized;
 	bool _isParallel;
-	std::vector<unsigned int> _legalKeySizes;
-	std::vector<unsigned int> _legalRounds;
-	unsigned int _parallelBlockSize;
-	unsigned int _processorCount;
-	unsigned int _rndCount;
+	std::vector<size_t> _legalKeySizes;
+	std::vector<size_t> _legalRounds;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
+	size_t _rndCount;
 	std::vector<std::vector<uint>> _threadVectors;
 	std::vector<uint> _wrkState;
 
@@ -110,7 +110,7 @@ public:
 	/// Get: Unit block size of internal cipher in bytes.
 	/// <para>Block size is 64 bytes wide.</para>
 	/// </summary>
-	virtual const unsigned int BlockSize() { return BLOCK_SIZE; }
+	virtual const size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get the current counter value
@@ -143,12 +143,12 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int>&LegalKeySizes() { return _legalKeySizes; }
+	virtual const std::vector<size_t>&LegalKeySizes() { return _legalKeySizes; }
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalRounds() { return _legalRounds; }
+	virtual const std::vector<size_t> &LegalRounds() { return _legalRounds; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -158,32 +158,32 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	virtual const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
+	virtual const size_t ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return GetProcessorCount(); }
+	virtual const size_t ProcessorCount() { return GetProcessorCount(); }
 
 	/// <summary>
 	/// Get: Number of rounds
 	/// </summary>
-	virtual const unsigned int Rounds() { return _rndCount; }
+	virtual const size_t Rounds() { return _rndCount; }
 
 	/// <summary>
 	/// Get: Initialization vector size
 	/// </summary>
-	virtual const unsigned int VectorSize() { return VECTOR_SIZE; }
+	virtual const size_t VectorSize() { return VECTOR_SIZE; }
 
 	// *** Constructor *** //
 
@@ -194,7 +194,7 @@ public:
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 20 rounds.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	Salsa20(unsigned int Rounds = ROUNDS20)
+	explicit Salsa20(size_t Rounds = ROUNDS20)
 		:
 		_ctrVector(2, 0),
 		_isDestroyed(false),
@@ -204,7 +204,7 @@ public:
 		_rndCount(Rounds),
 		_wrkState(14, 0)
 	{
-		if (Rounds <= 0 || (Rounds & 1) != 0)
+		if (Rounds == 0 || (Rounds & 1) != 0)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be between 8 and 30!");
@@ -264,7 +264,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
@@ -276,17 +276,17 @@ public:
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
 	/// <param name="Length">Number of bytes to process</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length);
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 private:
-	void Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector);
+	void Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);
-	void Generate(const unsigned int Size, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
-	unsigned int GetProcessorCount();
+	void Generate(const size_t Size, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset);
+	uint GetProcessorCount();
 	void ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	void ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length);
-	void SalsaCore(std::vector<byte> &Output, const unsigned int OutOffset, const std::vector<uint> &Counter);
+	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+	void SalsaCore(std::vector<byte> &Output, const size_t OutOffset, const std::vector<uint> &Counter);
 	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);
 	void SetScope();
 };

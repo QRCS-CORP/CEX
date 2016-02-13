@@ -33,7 +33,6 @@
 NAMESPACE_BLOCK
 
 using CEX::Exception::CryptoSymmetricCipherException;
-using CEX::Enumeration::Digests; // TODO: can't get rid of this.. why!?!
 
 /// <summary>
 /// Block Cipher Interface
@@ -58,7 +57,7 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes
 	/// </summary>
-	virtual const unsigned int BlockSize() = 0;
+	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
 	/// Get: The block ciphers type name
@@ -79,12 +78,12 @@ public:
 	/// <summary>
 	/// Get: List of available legal key sizes
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalKeySizes() = 0;
+	virtual const std::vector<size_t> &LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalRounds() = 0;
+	virtual const std::vector<size_t> &LegalRounds() = 0;
 
 	/// <summary>
 	/// Get: Cipher name
@@ -94,7 +93,7 @@ public:
 	/// <summary>
 	/// Get: The number of diffusion rounds processed by the transform
 	/// </summary>
-	virtual const unsigned int Rounds() = 0;
+	virtual const size_t Rounds() = 0;
 
 	// *** Public Methods *** //
 
@@ -118,7 +117,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset) = 0;
+	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -145,7 +144,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset) = 0;
+	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the Cipher
@@ -177,7 +176,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset) = 0;
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 
 NAMESPACE_BLOCKEND

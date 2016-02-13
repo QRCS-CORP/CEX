@@ -15,21 +15,21 @@ int ParallelUtils::ProcessorCount()
 #endif
 }
 
-void ParallelUtils::ParallelFor(int From, int To, const std::function<void(int)> &F)
+void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F)
 {
 #if defined(_WIN32)
-	concurrency::parallel_for(From, To, [&](unsigned int i)
+	concurrency::parallel_for(From, To, [&](size_t i)
 	{
 		F(i);
 	});
 #elif defined(ANDROID) && defined(_OPENMP)
 	#pragma omp parallel for
-	for (int i = From; i < To; i++)
+	for (size_t i = From; i < To; i++)
 		F(i);
 #else
 	std::vector<std::future<void>> futures;
 
-	for (int i = From; i < To; i++)
+	for (size_t i = From; i < To; i++)
 	{
 		auto fut = std::async([i, F]()
 		{
@@ -38,7 +38,7 @@ void ParallelUtils::ParallelFor(int From, int To, const std::function<void(int)>
 		futures.push_back(std::move(fut));
 	}
 
-	for (int i = 0; i < futures.size(); ++i)
+	for (size_t i = 0; i < futures.size(); ++i)
 		futures[i].wait();
 
 	futures.clear();

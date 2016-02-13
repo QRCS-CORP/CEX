@@ -37,7 +37,7 @@ public:
 		/// </summary> 
 		/// 
 		/// <param name="m">The thread</param>
-		lock(Lockable & m) : mtx(m) 
+		explicit lock(Lockable & m) : mtx(m)
 		{
 			mtx.lock();
 		}
@@ -59,7 +59,7 @@ public:
 	/// <param name="From">The starting position</param> 
 	/// <param name="To">The ending position</param>
 	/// <param name="F">The function delegate</param>
-	static void ParallelFor(int From, int To, const std::function<void(int)> &F);
+	static void ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F);
 };
 
 NAMESPACE_UTILITYEND

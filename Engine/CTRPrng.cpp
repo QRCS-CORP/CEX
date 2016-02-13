@@ -48,7 +48,7 @@ void CTRPrng::Destroy()
 /// <param name="Size">Size of requested byte array</param>
 /// 
 /// <returns>Random byte array</returns>
-std::vector<byte> CTRPrng::GetBytes(unsigned int Size)
+std::vector<byte> CTRPrng::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
@@ -67,12 +67,12 @@ void CTRPrng::GetBytes(std::vector<byte> &Output)
 
 	if (_byteBuffer.size() - _bufferIndex < Output.size())
 	{
-		unsigned int bufSize = _byteBuffer.size() - _bufferIndex;
+		size_t bufSize = _byteBuffer.size() - _bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
 			memcpy(&Output[0], &_byteBuffer[_bufferIndex], bufSize);
 
-		unsigned int rem = Output.size() - bufSize;
+		size_t rem = Output.size() - bufSize;
 
 		while (rem > 0)
 		{
@@ -105,7 +105,7 @@ void CTRPrng::GetBytes(std::vector<byte> &Output)
 /// </summary>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int CTRPrng::Next()
+uint CTRPrng::Next()
 {
 	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
@@ -117,10 +117,10 @@ unsigned int CTRPrng::Next()
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int CTRPrng::Next(unsigned int Maximum)
+uint CTRPrng::Next(uint Maximum)
 {
 	std::vector<byte> rand;
-	unsigned int num(0);
+	uint num(0);
 
 	do
 	{
@@ -140,9 +140,9 @@ unsigned int CTRPrng::Next(unsigned int Maximum)
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int CTRPrng::Next(unsigned int Minimum, unsigned int Maximum)
+uint CTRPrng::Next(uint Minimum, uint Maximum)
 {
-	unsigned int num = 0;
+	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
@@ -225,7 +225,7 @@ void CTRPrng::Reset()
 	else
 	{
 		_seedGenerator = GetSeedGenerator(_seedType);
-		int len = _rngEngine->BlockSize() + _keySize;
+		size_t len = _rngEngine->BlockSize() + _keySize;
 		std::vector<byte> seed(len);
 		_seedGenerator->GetBytes(seed);
 		_rngGenerator->Initialize(seed);
@@ -239,7 +239,7 @@ std::vector<byte> CTRPrng::GetBits(std::vector<byte> Data, ulong Maximum)
 {
 	ulong val = 0;
 	memcpy(&val, &Data[0], Data.size());
-	int bits = Data.size() * 8;
+	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
 	{
@@ -282,7 +282,7 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* CTRPrng::GetCipher(CEX::Enumeration
 	return CEX::Helper::BlockCipherFromName::GetInstance(RngEngine);
 }
 
-unsigned int CTRPrng::GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine)
+uint CTRPrng::GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine)
 {
 	switch (CipherEngine)
 	{

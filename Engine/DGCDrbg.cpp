@@ -19,22 +19,22 @@ void DGCDrbg::Destroy()
 	}
 }
 
-unsigned int DGCDrbg::Generate(std::vector<byte> &Output)
+size_t DGCDrbg::Generate(std::vector<byte> &Output)
 {
 	return Generate(Output, 0, Output.size());
 }
 
-unsigned int DGCDrbg::Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t DGCDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("DGCDrbg:Generate", "Output buffer too small!");
 
-	unsigned int offset = 0;
-	unsigned int len = OutOffset + Size;
+	size_t offset = 0;
+	size_t len = OutOffset + Size;
 
 	GenerateState();
 
-	for (unsigned int i = OutOffset; i < len; ++i)
+	for (size_t i = OutOffset; i < len; ++i)
 	{
 		if (offset == _dgtState.size())
 		{
@@ -53,9 +53,9 @@ void DGCDrbg::Initialize(const std::vector<byte> &Salt)
 	if (Salt.size() < COUNTER_SIZE)
 		throw CryptoGeneratorException("DGCDrbg:Initialize", "Salt must be at least 8 bytes!");
 
-	const unsigned int ctrSize = sizeof(long);
+	const size_t ctrSize = sizeof(long);
 	std::vector<long> counter(1);
-	unsigned int keyLen = (Salt.size() - ctrSize) < 0 ? 0 : Salt.size() - ctrSize;
+	size_t keyLen = (Salt.size() - ctrSize) < 0 ? 0 : Salt.size() - ctrSize;
 	std::vector<byte> key(keyLen);
 	memcpy(&counter[0], &Salt[0], ctrSize);
 
@@ -97,7 +97,7 @@ void DGCDrbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> 
 
 void DGCDrbg::Update(const std::vector<byte> &Salt)
 {
-	const unsigned int ctrSize = sizeof(long);
+	const size_t ctrSize = sizeof(long);
 
 	if (Salt.size() < ctrSize)
 		throw CryptoGeneratorException("DGCDrbg:Update", "Minimum key size has not been added. Size must be at least 8 bytes!");

@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Block Cipher Padding Modes
 /// </summary>
-enum class PaddingModes : unsigned int
+enum class PaddingModes : uint
 {
 	/// <summary>
 	/// Specify None if the input should not require padding (block aligned)

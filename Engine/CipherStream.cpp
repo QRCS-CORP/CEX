@@ -78,12 +78,12 @@ void CipherStream::Write(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* O
 		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The Input stream is too short!");
 
 	// parallel min check and calc block size
-	long dlen = InStream->Length() - InStream->Position();
+	size_t dlen = InStream->Length() - InStream->Position();
 	CalculateBlockSize(dlen);
 
 	if (_isEncryption && dlen % _blockSize != 0)
 	{
-		long alen = (dlen - (dlen % _blockSize)) + _blockSize;
+		size_t alen = (dlen - (dlen % _blockSize)) + _blockSize;
 		OutStream->SetLength(alen);
 	}
 	else
@@ -133,7 +133,7 @@ void CipherStream::Write(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* O
 	OutStream->SetLength(OutStream->Position());
 }
 
-void CipherStream::Write(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	if (!_isInitialized)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
@@ -143,7 +143,7 @@ void CipherStream::Write(const std::vector<byte> &Input, unsigned int InOffset, 
 		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The Output array is too short!");
 
 	// parallel min check and calc block size
-	unsigned int dlen = Input.size() - InOffset;
+	size_t dlen = Input.size() - InOffset;
 	CalculateBlockSize(dlen);
 
 	if (!_isStreamCipher)
@@ -188,9 +188,9 @@ void CipherStream::Write(const std::vector<byte> &Input, unsigned int InOffset, 
 
 // *** Protected Methods *** //
 
-void CipherStream::CalculateBlockSize(unsigned int Length)
+void CipherStream::CalculateBlockSize(size_t Length)
 {
-	unsigned int cipherBlock = 0;
+	size_t cipherBlock = 0;
 
 	if (_isStreamCipher)
 		cipherBlock = _streamCipher->BlockSize();
@@ -206,23 +206,23 @@ void CipherStream::CalculateBlockSize(unsigned int Length)
 	if (_parallelBlockProfile == BlockProfiles::ProgressProfile)
 	{
 		// get largest 10 base block 
-		unsigned int dsr = 10;
+		size_t dsr = 10;
 		while (Length / dsr > ParallelMaximumSize())
 			dsr *= 2;
 
-		_parallelBlockSize = (unsigned int)(Length / dsr);
+		_parallelBlockSize = Length / dsr;
 	}
 	else if (_parallelBlockProfile == BlockProfiles::SpeedProfile)
 	{
 		if (Length < PARALLEL_DEFBLOCK)
 		{
 			// small block
-			_parallelBlockSize = (unsigned int)Length;
+			_parallelBlockSize = Length;
 		}
 		else
 		{
 			// get largest 64kb base block
-			unsigned int dsr = Length - (Length % PARALLEL_DEFBLOCK);
+			size_t dsr = Length - (Length % PARALLEL_DEFBLOCK);
 
 			if (Length > ParallelMaximumSize())
 			{
@@ -261,7 +261,7 @@ void CipherStream::CalculateBlockSize(unsigned int Length)
 	}
 }
 
-void CipherStream::CalculateProgress(unsigned int Length, unsigned int Processed)
+void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 {
 	if (Length >= Processed)
 	{
@@ -275,7 +275,7 @@ void CipherStream::CalculateProgress(unsigned int Length, unsigned int Processed
 		}
 		else
 		{
-			long chunk = Length / 100;
+			size_t chunk = Length / 100;
 			if (chunk == 0)
 				ProgressPercent((int)progress);
 			else if (Processed % chunk == 0)
@@ -286,10 +286,10 @@ void CipherStream::CalculateProgress(unsigned int Length, unsigned int Processed
 
 void CipherStream::BlockCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _cipherEngine->BlockSize();
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _cipherEngine->BlockSize();
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -306,22 +306,21 @@ void CipherStream::BlockCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream
 
 	if (alnSize != inpSize)
 	{
-		unsigned int fnlSize = (unsigned int)(inpSize - alnSize);
+		size_t fnlSize = inpSize - alnSize;
 		InStream->Read(inpBuffer, 0, fnlSize);
 		_cipherEngine->Transform(inpBuffer, outBuffer);
 		OutStream->Write(outBuffer, 0, fnlSize);
-		count += fnlSize;
 	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::BlockCTR(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::BlockCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _cipherEngine->BlockSize();
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _cipherEngine->BlockSize();
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 
 	_cipherEngine->IsParallel() = false;
 
@@ -337,7 +336,7 @@ void CipherStream::BlockCTR(const std::vector<byte> &Input, unsigned int InOffse
 	// partial
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		std::vector<byte> inpBuffer(blkSize);
 		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 		std::vector<byte> outBuffer(blkSize);
@@ -351,10 +350,10 @@ void CipherStream::BlockCTR(const std::vector<byte> &Input, unsigned int InOffse
 
 void CipherStream::BlockDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _cipherEngine->BlockSize();
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize < blkSize) ? 0 : inpSize - blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _cipherEngine->BlockSize();
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize < blkSize) ? 0 : inpSize - blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -371,23 +370,22 @@ void CipherStream::BlockDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteSt
 
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		InStream->Read(inpBuffer, 0, cnkSize);
 		_cipherEngine->Transform(inpBuffer, outBuffer);
-		unsigned int fnlSize = blkSize - _cipherPadding->GetPaddingLength(outBuffer, 0);
+		size_t fnlSize = blkSize - _cipherPadding->GetPaddingLength(outBuffer, 0);
 		OutStream->Write(outBuffer, 0, fnlSize);
-		count += fnlSize;
 	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::BlockDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::BlockDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _cipherEngine->BlockSize();
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize < blkSize) ? 0 : inpSize - blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _cipherEngine->BlockSize();
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize < blkSize) ? 0 : inpSize - blkSize;
+	size_t count = 0;
 
 	_cipherEngine->IsParallel() = false;
 
@@ -405,7 +403,7 @@ void CipherStream::BlockDecrypt(const std::vector<byte> &Input, unsigned int InO
 	memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
 	std::vector<byte> outBuffer(blkSize);
 	_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
-	unsigned int fnlSize = blkSize - _cipherPadding->GetPaddingLength(outBuffer, 0);
+	size_t fnlSize = blkSize - _cipherPadding->GetPaddingLength(outBuffer, 0);
 	memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
 	OutOffset += fnlSize;
 
@@ -417,10 +415,10 @@ void CipherStream::BlockDecrypt(const std::vector<byte> &Input, unsigned int InO
 
 void CipherStream::BlockEncrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _cipherEngine->BlockSize();
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _cipherEngine->BlockSize();
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -437,23 +435,22 @@ void CipherStream::BlockEncrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteSt
 
 	if (alnSize != inpSize)
 	{
-		unsigned int fnlSize = inpSize - alnSize;
+		size_t fnlSize = inpSize - alnSize;
 		InStream->Read(inpBuffer, 0, fnlSize);
 		_cipherPadding->AddPadding(inpBuffer, fnlSize);
 		_cipherEngine->Transform(inpBuffer, outBuffer);
 		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
 	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::BlockEncrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::BlockEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _cipherEngine->BlockSize();
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _cipherEngine->BlockSize();
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 
 	_cipherEngine->IsParallel() = false;
 
@@ -469,7 +466,7 @@ void CipherStream::BlockEncrypt(const std::vector<byte> &Input, unsigned int InO
 	// partial
 	if (alnSize != inpSize)
 	{
-		unsigned int fnlSize = inpSize - alnSize;
+		size_t fnlSize = inpSize - alnSize;
 		std::vector<byte> inpBuffer(blkSize);
 		memcpy(&inpBuffer[0], &Input[InOffset], fnlSize);
 		_cipherPadding->AddPadding(inpBuffer, fnlSize);
@@ -534,18 +531,12 @@ CEX::Cipher::Symmetric::Stream::IStreamCipher* CipherStream::GetStreamEngine(CEX
 	}
 }
 
-bool CipherStream::IsStreamCipher(CEX::Enumeration::SymmetricEngines EngineType)
-{
-	return EngineType == CEX::Enumeration::SymmetricEngines::ChaCha ||
-		EngineType == CEX::Enumeration::SymmetricEngines::Salsa;
-}
-
 void CipherStream::ParallelCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _parallelBlockSize;
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _parallelBlockSize;
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -563,24 +554,23 @@ void CipherStream::ParallelCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStr
 
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		inpBuffer.resize(cnkSize);
 		InStream->Read(inpBuffer, 0, cnkSize);
 		outBuffer.resize(cnkSize);
 		_cipherEngine->Transform(inpBuffer, outBuffer);
 		OutStream->Write(outBuffer, 0, cnkSize);
-		count += cnkSize;
 	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::ParallelCTR(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::ParallelCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _parallelBlockSize;
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _parallelBlockSize;
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 
 	_cipherEngine->IsParallel() = true;
 	_cipherEngine->ParallelBlockSize() = blkSize;
@@ -597,7 +587,7 @@ void CipherStream::ParallelCTR(const std::vector<byte> &Input, unsigned int InOf
 
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		std::vector<byte> inpBuffer(cnkSize);
 		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 		std::vector<byte> outBuffer(cnkSize);
@@ -611,10 +601,10 @@ void CipherStream::ParallelCTR(const std::vector<byte> &Input, unsigned int InOf
 
 void CipherStream::ParallelDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _parallelBlockSize;
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _parallelBlockSize;
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -631,20 +621,17 @@ void CipherStream::ParallelDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByt
 	}
 
 	if (alnSize != inpSize)
-	{
 		BlockDecrypt(InStream, OutStream);
-		count += (inpSize - alnSize);
-	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::ParallelDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _parallelBlockSize;
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _parallelBlockSize;
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 
 	_cipherEngine->IsParallel() = true;
 	_cipherEngine->ParallelBlockSize() = blkSize;
@@ -670,10 +657,10 @@ void CipherStream::ParallelDecrypt(const std::vector<byte> &Input, unsigned int 
 
 void CipherStream::ParallelStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _parallelBlockSize;
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _parallelBlockSize;
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -691,24 +678,23 @@ void CipherStream::ParallelStream(CEX::IO::IByteStream* InStream, CEX::IO::IByte
 
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		inpBuffer.resize(cnkSize);
 		InStream->Read(inpBuffer, 0, cnkSize);
 		outBuffer.resize(cnkSize);
 		_streamCipher->Transform(inpBuffer, outBuffer);
 		OutStream->Write(outBuffer, 0, cnkSize);
-		count += cnkSize;
 	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::ParallelStream(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::ParallelStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _parallelBlockSize;
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _parallelBlockSize;
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 
 	_streamCipher->IsParallel() = true;
 	_streamCipher->ParallelBlockSize() = blkSize;
@@ -725,7 +711,7 @@ void CipherStream::ParallelStream(const std::vector<byte> &Input, unsigned int I
 
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		std::vector<byte> inpBuffer(cnkSize);
 		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 		std::vector<byte> outBuffer(cnkSize);
@@ -739,10 +725,10 @@ void CipherStream::ParallelStream(const std::vector<byte> &Input, unsigned int I
 
 void CipherStream::ProcessStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-	const unsigned int blkSize = _streamCipher->BlockSize();
-	const unsigned int inpSize = (InStream->Length() - InStream->Position());
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _streamCipher->BlockSize();
+	const size_t inpSize = (InStream->Length() - InStream->Position());
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 	std::vector<byte> inpBuffer(blkSize);
 	std::vector<byte> outBuffer(blkSize);
 
@@ -759,24 +745,23 @@ void CipherStream::ProcessStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteS
 
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		inpBuffer.resize(cnkSize);
 		InStream->Read(inpBuffer, 0, cnkSize);
 		outBuffer.resize(cnkSize);
 		_streamCipher->Transform(inpBuffer, outBuffer);
 		OutStream->Write(outBuffer, 0, cnkSize);
-		count += cnkSize;
 	}
 
 	CalculateProgress(inpSize, OutStream->Position());
 }
 
-void CipherStream::ProcessStream(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CipherStream::ProcessStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	const unsigned int blkSize = _streamCipher->BlockSize();
-	const unsigned int inpSize = (Input.size() - InOffset);
-	const unsigned int alnSize = (inpSize / blkSize) * blkSize;
-	unsigned int count = 0;
+	const size_t blkSize = _streamCipher->BlockSize();
+	const size_t inpSize = (Input.size() - InOffset);
+	const size_t alnSize = (inpSize / blkSize) * blkSize;
+	size_t count = 0;
 
 	_streamCipher->IsParallel() = false;
 
@@ -792,7 +777,7 @@ void CipherStream::ProcessStream(const std::vector<byte> &Input, unsigned int In
 	// partial
 	if (alnSize != inpSize)
 	{
-		unsigned int cnkSize = inpSize - alnSize;
+		size_t cnkSize = inpSize - alnSize;
 		std::vector<byte> inpBuffer(cnkSize);
 		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 		std::vector<byte> outBuffer(cnkSize);
@@ -804,7 +789,7 @@ void CipherStream::ProcessStream(const std::vector<byte> &Input, unsigned int In
 	CalculateProgress(inpSize, count);
 }
 
-bool CipherStream::IsParallelMin(unsigned int Length)
+bool CipherStream::IsParallelMin(size_t Length)
 {
 	return (Length >= ParallelMinimumSize());
 }

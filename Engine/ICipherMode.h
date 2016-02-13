@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher
 	/// </summary>
-	virtual const unsigned int BlockSize() = 0;
+	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
 	/// Get: Underlying Cipher
@@ -90,7 +90,7 @@ public:
 	/// <summary>
 	/// Get: List of available legal key sizes
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalKeySizes() = 0;
+	virtual const std::vector<size_t> &LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Get: Cipher name
@@ -100,22 +100,22 @@ public:
 	/// <summary>
 	/// Get: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual unsigned int &ParallelBlockSize() = 0;
+	virtual size_t &ParallelBlockSize() = 0;
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() = 0;
+	virtual const size_t ParallelMaximumSize() = 0;
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() = 0;
+	virtual const size_t ParallelMinimumSize() = 0;
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() = 0;
+	virtual const size_t ProcessorCount() = 0;
 
 	// *** Public Methods *** //
 
@@ -152,7 +152,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset) = 0;
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 
 NAMESPACE_MODEEND

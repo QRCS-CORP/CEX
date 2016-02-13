@@ -72,16 +72,16 @@ NAMESPACE_DIGEST
 class SHA256 : public IDigest
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 64;
-	static constexpr unsigned int DIGEST_SIZE = 32;
+	static constexpr size_t BLOCK_SIZE = 64;
+	static constexpr size_t DIGEST_SIZE = 32;
 
-	uint _bufferOffset;
-	uint _byteCount;
+	size_t _bufferOffset;
+	size_t _byteCount;
 	bool _isDestroyed;
 	uint _H0, _H1, _H2, _H3, _H4, _H5, _H6, _H7;
 	std::vector<byte> _prcBuffer;
 	std::vector<uint> _wordBuffer;
-	uint _wordOffset = 0;
+	size_t _wordOffset = 0;
 
 public:
 
@@ -90,12 +90,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual unsigned int BlockSize() { return BLOCK_SIZE; }
+	virtual size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual unsigned int DigestSize() { return DIGEST_SIZE; }
+	virtual size_t DigestSize() { return DIGEST_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -143,7 +143,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Hash value
@@ -168,7 +168,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Reset the internal state
@@ -187,7 +187,7 @@ private:
 	void Initialize();
 	void ProcessBlock();
 	void ProcessLength(ulong BitLength);
-	void ProcessWord(const std::vector<byte> &Input, unsigned int Offset);
+	void ProcessWord(const std::vector<byte> &Input, size_t Offset);
 
 	inline static uint Sum1Ch(uint X, uint Y, uint Z)
 	{

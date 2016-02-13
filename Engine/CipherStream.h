@@ -81,12 +81,12 @@ public:
 	};
 
 private:
-	static constexpr unsigned int BLOCK_SIZE = 1024;
-	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
-	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t BLOCK_SIZE = 1024;
+	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
 	CEX::Cipher::Symmetric::Block::IBlockCipher* _blockCipher;
-	unsigned int _blockSize;
+	size_t _blockSize;
 	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* _cipherEngine;
 	CEX::Cipher::Symmetric::Block::Padding::IPadding* _cipherPadding;
 	bool _destroyEngine;
@@ -97,8 +97,8 @@ private:
 	bool _isInitialized;
 	bool _isParallel;
 	bool _isStreamCipher;
-	unsigned int _parallelBlockSize;
-	unsigned int _processorCount;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
 	BlockProfiles _parallelBlockProfile;
 	CEX::Cipher::Symmetric::Stream::IStreamCipher* _streamCipher;
 
@@ -125,22 +125,22 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	const unsigned int ParallelMinimumSize() { return _processorCount * _blockSize; }
+	const size_t ParallelMinimumSize() { return _processorCount * _blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	const unsigned int ProcessorCount() { return _processorCount; }
+	const size_t ProcessorCount() { return _processorCount; }
 
 	// *** Constructor *** //
 
@@ -160,7 +160,12 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid CipherDescription or KeyParams is used</exception>
 	CipherStream(CEX::Enumeration::SymmetricEngines EngineType, int RoundCount = 22, CEX::Enumeration::CipherModes CipherType = CEX::Enumeration::CipherModes::CTR, CEX::Enumeration::PaddingModes PaddingType = CEX::Enumeration::PaddingModes::PKCS7, int BlockSize = 16, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
 		:
+		_blockCipher(0),
 		_destroyEngine(true),
+		_isBufferedIO(false),
+		_isDestroyed(false),
+		_isEncryption(false),
+		_isInitialized(false),
 		_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
 		SetScope();
@@ -207,9 +212,14 @@ public:
 	/// <param name="Header">A CipherDescription containing the cipher description</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid CipherDescription is used</exception>
-	CipherStream(CEX::Common::CipherDescription* Header)
+	explicit CipherStream(CEX::Common::CipherDescription* Header)
 		:
+		_blockCipher(0),
 		_destroyEngine(true),
+		_isBufferedIO(false),
+		_isDestroyed(false),
+		_isEncryption(false),
+		_isInitialized(false),
 		_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
 		if (Header == 0)
@@ -262,9 +272,13 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Cipher is used</exception>
 	CipherStream(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding = 0)
 		:
+		_blockCipher(0),
 		_cipherEngine(Cipher),
 		_destroyEngine(false),
+		_isBufferedIO(false),
+		_isDestroyed(false),
 		_isEncryption(Cipher->IsEncryption()),
+		_isInitialized(false),
 		_isStreamCipher(false),
 		_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
@@ -289,9 +303,15 @@ public:
 	/// <param name="Cipher">The uninitialized Stream Cipher instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Stream Cipher is used</exception>
-	CipherStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher)
+	explicit CipherStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher)
 		:
+		_blockCipher(0),
+		_cipherPadding(0),
 		_destroyEngine(false),
+		_isBufferedIO(false),
+		_isDestroyed(false),
+		_isEncryption(),
+		_isInitialized(false),
 		_isStreamCipher(true),
 		_parallelBlockProfile(BlockProfiles::SpeedProfile),
 		_streamCipher(Cipher)
@@ -350,32 +370,31 @@ public:
 	/// <param name="OutOffset">The starting offset within the Output array</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Write is called before Initialize(), or if array sizes are misaligned</exception>
-	void Write(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+	void Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 
 private:
 
 	void BlockCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void BlockCTR(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+	void BlockCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void BlockDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void BlockDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+	void BlockDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void BlockEncrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void BlockEncrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
-	void CalculateBlockSize(unsigned int Length);
-	void CalculateProgress(unsigned int Length, unsigned int Processed);
+	void BlockEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	void CalculateBlockSize(size_t Length);
+	void CalculateProgress(size_t Length, size_t Processed);
 	CEX::Cipher::Symmetric::Block::IBlockCipher* GetBlockEngine(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine);
 	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* GetCipherMode(CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine);
 	CEX::Cipher::Symmetric::Block::Padding::IPadding* GetPaddingMode(CEX::Enumeration::PaddingModes PaddingType);
 	CEX::Cipher::Symmetric::Stream::IStreamCipher* GetStreamEngine(CEX::Enumeration::StreamCiphers EngineType, int RoundCount);
-	bool IsStreamCipher(CEX::Enumeration::SymmetricEngines EngineType);
 	void ParallelCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void ParallelCTR(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+	void ParallelCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void ParallelDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void ParallelDecrypt(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+	void ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void ParallelStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void ParallelStream(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+	void ParallelStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void ProcessStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
-	void ProcessStream(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
-	bool IsParallelMin(unsigned int Length);
+	void ProcessStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+	bool IsParallelMin(size_t Length);
 	void ParametersCheck();
 	void SetScope();
 };

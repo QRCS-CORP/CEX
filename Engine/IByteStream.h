@@ -47,12 +47,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const unsigned int Length() = 0;
+	virtual const size_t Length() = 0;
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const unsigned int Position() = 0;
+	virtual const size_t Position() = 0;
 
 	// *** Public Methods *** //
 
@@ -87,7 +87,7 @@ public:
 	/// <param name="Count">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual int Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count) = 0;
+	virtual size_t Read(std::vector<byte> &Buffer, size_t Offset, size_t Count) = 0;
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -107,14 +107,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(unsigned int Offset, SeekOrigin Origin) = 0;
+	virtual void Seek(size_t Offset, SeekOrigin Origin) = 0;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(unsigned int Length) = 0;
+	virtual void SetLength(size_t Length) = 0;
 
 	/// <summary>
 	/// Writes a buffer into the stream
@@ -127,7 +127,7 @@ public:
 	/// <returns>The number of bytes written</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
-	virtual void Write(const std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count) = 0;
+	virtual void Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count) = 0;
 
 	/// <summary>
 	/// Write a single byte from the stream

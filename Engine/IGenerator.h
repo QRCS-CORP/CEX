@@ -44,7 +44,7 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() = 0;
+	virtual size_t KeySize() = 0;
 
 	/// <summary>
 	/// Algorithm name
@@ -65,7 +65,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output) = 0;
+	virtual size_t Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -76,7 +76,7 @@ public:
 	/// <param name="Size">Number of bytes to generate</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size) = 0;
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size) = 0;
 
 	/// <summary>
 	/// Initialize the generator

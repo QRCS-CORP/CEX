@@ -31,18 +31,18 @@ void XSPRsg::Jump()
 		Jump128();
 }
 
-std::vector<byte> XSPRsg::GetBytes(int Size)
+std::vector<byte> XSPRsg::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
 	return data;
 }
 
-void XSPRsg::Generate(std::vector<byte> &Output, unsigned int Size)
+void XSPRsg::Generate(std::vector<byte> &Output, size_t Size)
 {
-	unsigned int offset = 0;
+	size_t offset = 0;
 	ulong X;
-	unsigned int ulen = sizeof(ulong);
+	size_t ulen = sizeof(ulong);
 
 	while (offset < Size)
 	{
@@ -95,9 +95,9 @@ void XSPRsg::Jump128()
 	ulong s0 = 0;
 	ulong s1 = 0;
 
-	for (unsigned int i = 0; i < JMP128.size(); i++)
+	for (size_t i = 0; i < JMP128.size(); i++)
 	{
-		for (int b = 0; b < 64; b++)
+		for (size_t b = 0; b < 64; b++)
 		{
 			if (JMP128[i] & 1ULL << b)
 			{
@@ -117,9 +117,9 @@ void XSPRsg::Jump1024()
 {
 	std::vector<ulong> T(16, 0);
 
-	for (unsigned int i = 0; i < JMP1024.size(); i++)
+	for (size_t i = 0; i < JMP1024.size(); i++)
 	{
-		for (unsigned int b = 0; b < 64; b++)
+		for (size_t b = 0; b < 64; b++)
 		{
 			if (JMP1024[i] & 1ULL << b)
 			{
@@ -157,7 +157,7 @@ ulong XSPRsg::Shift1024()
 	return _wrkBuffer[_stateOffset] * Z4;
 }
 
-void XSPRsg::GetSeed(unsigned int Size)
+void XSPRsg::GetSeed(size_t Size)
 {
 	CSPRsg rnd;
 	std::vector<byte> seed(Size);

@@ -67,18 +67,18 @@ NAMESPACE_PRNG
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>: Recommendation for the Entropy Sources Used for Random Bit Generation.</description></item>
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips140-2/fips1402.pdf">Fips 140-2</a>: Security Requirments For Cryptographic Modules.</description></item>
 /// <item><description>NIST <a href="http://csrc.nist.gov/groups/ST/toolkit/rng/documents/SP800-22rev1a.pdf">SP800-22 1a</a>: A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications.</description></item>
-/// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator</a>.</description></item>
+/// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
 class CTRPrng : public IRandom
 {
 private:
-	static constexpr unsigned int BUFFER_SIZE = 4096;
+	static constexpr size_t BUFFER_SIZE = 4096;
 
 	std::vector<byte>  _byteBuffer;
-	unsigned int _bufferIndex;
-	unsigned int _bufferSize = 0;
-	unsigned int _keySize = 0;
+	size_t _bufferIndex;
+	size_t _bufferSize = 0;
+	size_t _keySize = 0;
 	bool _isDestroyed;
 	CEX::Enumeration::BlockCiphers _engineType;
 	CEX::Cipher::Symmetric::Block::IBlockCipher* _rngEngine;
@@ -113,7 +113,7 @@ public:
 	/// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	CTRPrng(CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE, unsigned int KeySize = 0)
+	CTRPrng(CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 0)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -142,7 +142,7 @@ public:
 	/// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or too small</exception>
-	CTRPrng(std::vector<byte> &Seed, CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, unsigned int BufferSize = 4096)
+	CTRPrng(std::vector<byte> &Seed, CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, size_t BufferSize = 4096)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -185,7 +185,7 @@ public:
 	/// <param name="Size">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	virtual std::vector<byte> GetBytes(unsigned int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
@@ -199,7 +199,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Get an pseudo random unsigned 32bit integer
@@ -208,7 +208,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Maximum);
+	virtual uint Next(uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -218,7 +218,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Minimum, unsigned int Maximum);
+	virtual uint Next(uint Minimum, uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
@@ -255,7 +255,7 @@ private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	CEX::Cipher::Symmetric::Block::IBlockCipher* GetCipher(CEX::Enumeration::BlockCiphers RngEngine);
-	unsigned int GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine);
+	uint GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine);
 	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
 };
 

@@ -202,12 +202,11 @@ static void Sb6(uint &R0, uint &R1, uint &R2, uint &R3)
 	uint t2 = R1 ^ t1;
 	uint t3 = R2 ^ (~R0 | t1);
 	R1 ^= t3;
-	uint t4 = t1 | R1;
-	uint t5 = R3 ^ (t1 | R1);
-	R2 = t2 ^ (t3 & t5);
-	uint t6 = t3 ^ t5;
-	R0 = R2 ^ t6;
-	R3 = (~t3) ^ (t2 & t6);
+	uint t4 = R3 ^ (t1 | R1);
+	R2 = t2 ^ (t3 & t4);
+	uint t5 = t3 ^ t4;
+	R0 = R2 ^ t5;
+	R3 = (~t3) ^ (t2 & t5);
 }
 
 static void Ib6(uint &R0, uint &R1, uint &R2, uint &R3)

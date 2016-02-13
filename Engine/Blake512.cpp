@@ -31,12 +31,12 @@ static constexpr uint _ftSigma[] =
 	2, 12, 6, 10, 0, 11, 8, 3, 4, 13, 7, 5, 15, 14, 1, 9
 };
 
-void Blake512::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void Blake512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake512:BlockUpdate", "The Input buffer is too short!");
 
-	unsigned int fill = 128 - _dataLen;
+	size_t fill = 128 - _dataLen;
 
 	// compress remaining data filled with new bits
 	if ((_dataLen != 0) && (Length >= fill))
@@ -92,7 +92,7 @@ void Blake512::Destroy()
 	}
 }
 
-unsigned int Blake512::DoFinal(std::vector<byte> &Output, const unsigned int OutOffset)
+size_t Blake512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Blake512:DoFinal", "The Output buffer is too short!");
@@ -137,9 +137,6 @@ unsigned int Blake512::DoFinal(std::vector<byte> &Output, const unsigned int Out
 	BlockUpdate(msgLen, 0, 16);
 	std::vector<byte> digest(64, 0);
 
-	//for (int i = 0; i < 8; ++i)
-	//	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[i], digest, i << 3);
-
 	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[0], digest, 0);
 	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[1], digest, 8);
 	CEX::Utility::IntUtils::Be64ToBytes(_HashVal[2], digest, 16);
@@ -168,7 +165,7 @@ void Blake512::Update(byte Input)
 
 // *** Protected Methods *** //
 
-void Blake512::Compress64(const std::vector<byte> &pbBlock, unsigned int Offset)
+void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 {
 	_M[0] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset);
 	_M[1] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 8);
@@ -211,7 +208,7 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, unsigned int Offset)
 	}
 
 	//  do 16 rounds
-	unsigned int index = 0;
+	uint index = 0;
 	do
 	{
 		G64BLK(index);
@@ -248,7 +245,7 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, unsigned int Offset)
 	_HashVal[7] ^= _salt64[3];
 }
 
-void Blake512::G64BLK(unsigned int Index)
+void Blake512::G64BLK(uint Index)
 {
 	G64(0, 4, 8, 12, Index, 0);
 	G64(1, 5, 9, 13, Index, 2);
@@ -260,7 +257,7 @@ void Blake512::G64BLK(unsigned int Index)
 	G64(1, 6, 11, 12, Index, 10);
 }
 
-void Blake512::G64(unsigned int A, unsigned int B, unsigned int C, unsigned int D, unsigned int R, unsigned int I)
+void Blake512::G64(uint A, uint B, uint C, uint D, uint R, uint I)
 {
 	int P = (R << 4) + I;
 	int P0 = _ftSigma[P];

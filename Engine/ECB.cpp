@@ -9,7 +9,7 @@ void ECB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	_blockCipher->DecryptBlock(Input, Output);
 }
 
-void ECB::DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void ECB::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
 }
@@ -32,7 +32,7 @@ void ECB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	_blockCipher->EncryptBlock(Input, Output);
 }
 
-void ECB::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void ECB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	_blockCipher->EncryptBlock(Input, InOffset, Output, OutOffset);
 }
@@ -52,7 +52,7 @@ void ECB::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 		DecryptBlock(Input, Output);
 }
 
-void ECB::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (_isEncryption)
 		EncryptBlock(Input, InOffset, Output, OutOffset);

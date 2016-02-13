@@ -9,7 +9,7 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Enumer
 {
 	CEX::Seed::CSPRsg rnd;
 	CEX::Common::KeyGenerator keyGen(SeedEngine, HashEngine, rnd.GetBytes(16));
-	CEX::Common::KeyParams* key = keyGen.GetKeyParams(Description.KeySize(), (unsigned int)Description.IvSize(), Description.MacSize());
+	CEX::Common::KeyParams* key = keyGen.GetKeyParams(Description.KeySize(), (uint)Description.IvSize(), Description.MacSize());
 
 	Create(Description, *key);
 }
@@ -19,9 +19,9 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common
 	if (KeyParam.Key().size() != Description.KeySize())
 		throw CEX::Exception::CryptoProcessingException("KeyFactory:Create", "The key parameter does not match the key size specified in the Header!");
 
-	if ((unsigned int)Description.IvSize() > 0)
+	if ((uint)Description.IvSize() > 0)
 	{
-		if (KeyParam.IV().size() != (unsigned int)Description.IvSize())
+		if (KeyParam.IV().size() != (uint)Description.IvSize())
 			throw CEX::Exception::CryptoProcessingException("KeyFactory:Create", "The KeyParam IV size does not align with the IVSize setting in the Header!");
 	}
 	if (Description.MacSize() > 0)
@@ -64,7 +64,7 @@ void KeyFactory::Extract(CEX::Processing::Structure::CipherKey &KeyHeader, CEX::
 	KeyHeader = CEX::Processing::Structure::CipherKey(*_keyStream);
 	const CEX::Common::CipherDescription dsc = KeyHeader.Description();
 
-	if (_keyStream->Length() < dsc.KeySize() + (unsigned int)dsc.IvSize() + dsc.MacSize() + KeyHeader.GetHeaderSize())
+	if (_keyStream->Length() < dsc.KeySize() + (uint)dsc.IvSize() + dsc.MacSize() + KeyHeader.GetHeaderSize())
 		throw CEX::Exception::CryptoProcessingException("KeyFactory:Extract", "The size of the key file does not align with the CipherKey sizes! Key is corrupt.");
 
 	_keyStream->Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);

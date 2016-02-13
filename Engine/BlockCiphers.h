@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Block Ciphers
 /// </summary>
-enum class BlockCiphers : unsigned int
+enum class BlockCiphers : uint
 {
 	/// <summary>
 	/// An implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation

@@ -4,16 +4,16 @@ NAMESPACE_UTILITY
 
 byte OAEP_P_DEFAULT[1];
 
-unsigned int IntUtils::BitPrecision(ulong Value)
+uint IntUtils::BitPrecision(ulong Value)
 {
 	if (!Value)
 		return 0;
 
-	unsigned int l = 0, h = 8 * sizeof(Value);
+	uint l = 0, h = 8 * sizeof(Value);
 
 	while (h - l > 1)
 	{
-		unsigned int t = (l + h) / 2;
+		uint t = (l + h) / 2;
 		if (Value >> t)
 			l = t;
 		else
@@ -23,9 +23,9 @@ unsigned int IntUtils::BitPrecision(ulong Value)
 	return h;
 }
 
-unsigned int IntUtils::BytePrecision(ulong Value)
+uint IntUtils::BytePrecision(ulong Value)
 {
-	unsigned int i;
+	uint i;
 	for (i = sizeof(Value); i; --i)
 		if (Value >> (i - 1) * 8)
 			break;
@@ -33,7 +33,7 @@ unsigned int IntUtils::BytePrecision(ulong Value)
 	return i;
 }
 
-ulong IntUtils::Crop(ulong Value, unsigned int size)
+ulong IntUtils::Crop(ulong Value, uint size)
 {
 	if (size < 8 * sizeof(Value))
 		return (Value & ((1L << size) - 1));
@@ -41,11 +41,11 @@ ulong IntUtils::Crop(ulong Value, unsigned int size)
 		return Value;
 }
 
-unsigned int IntUtils::Parity(ulong Value)
+uint IntUtils::Parity(ulong Value)
 {
-	for (unsigned int i = 8 * sizeof(Value) / 2; i>0; i /= 2)
+	for (size_t i = 8 * sizeof(Value) / 2; i>0; i /= 2)
 		Value ^= Value >> i;
-	return (unsigned int)Value & 1;
+	return (uint)Value & 1;
 }
 
 void IntUtils::XOR32(const byte* &Input, byte* &Output)
@@ -64,7 +64,7 @@ void IntUtils::XOR32(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Output[3] ^= Input[3];
 }
 
-void IntUtils::XOR32(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
+void IntUtils::XOR32(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Output[OutOffset] ^= Input[InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
@@ -96,7 +96,7 @@ void IntUtils::XOR64(const byte* &Input, byte* &Output)
 	Output[7] ^= Input[7];
 }
 
-void IntUtils::XOR64(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
+void IntUtils::XOR64(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Output[OutOffset] ^= Input[InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
@@ -148,7 +148,7 @@ void IntUtils::XOR128(const byte* &Input, byte* &Output)
 	Output[15] ^= Input[15];
 }
 
-void IntUtils::XOR128(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
+void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Output[OutOffset] ^= Input[InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
@@ -240,7 +240,7 @@ void IntUtils::XOR256(const std::vector<byte> &Input, std::vector<byte> &Output)
 	Output[31] ^= Input[21];
 }
 
-void IntUtils::XOR256(const std::vector<byte> &Input, uint InOffset, std::vector<byte> &Output, uint OutOffset)
+void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Output[OutOffset] ^= Input[InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
@@ -276,16 +276,15 @@ void IntUtils::XOR256(const std::vector<byte> &Input, uint InOffset, std::vector
 	Output[++OutOffset] ^= Input[++InOffset];
 }
 
-void IntUtils::XORBLK(const std::vector<byte> &Input, const uint InOffset, std::vector<byte> &Output, const uint OutOffset, const uint Size)
+void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size)
 {
-	const uint BLOCK = 16;
-
-	uint ctr = 0;
-	const byte* x1;
-	byte* x2;
+	const size_t BLOCK = 16;
+	size_t ctr = 0;
 
 	do
 	{
+		const byte* x1;
+		byte* x2;
 		x1 = (byte*)&Input[InOffset + ctr];
 		x2 = (byte*)&Output[OutOffset + ctr];
 		XOR128(x1, x2);

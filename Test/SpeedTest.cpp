@@ -55,7 +55,7 @@ namespace Test
 
 			return MESSAGE;
 		}
-		catch (std::string ex)
+		catch (std::string &ex)
 		{
 			return FAILURE + " : " + ex;
 		}
@@ -99,7 +99,7 @@ namespace Test
 			while (counter < SampleSize)
 			{
 				Cipher->Transform(buffer1, buffer2);
-				counter += buffer1.size();
+				counter += (unsigned int)buffer1.size();
 			}
 			std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			std::string resp = name + std::string(" Loop: ") + calc + "s";
@@ -153,7 +153,7 @@ namespace Test
 			while (counter < SampleSize)
 			{
 				Cipher->Transform(buffer1, buffer2);
-				counter += buffer1.size();
+				counter += (unsigned int)buffer1.size();
 			}
 			std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			std::string resp = name + std::string(" Loop: ") + calc + "s";
@@ -189,7 +189,7 @@ namespace Test
 			while (counter < DATA_SIZE)
 			{
 				Cipher->Transform(buffer1, buffer2);
-				counter += buffer1.size();
+				counter += (unsigned int)buffer1.size();
 			}
 			std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			std::string resp = name + std::string(" Loop: ") + calc + "s";
@@ -211,7 +211,7 @@ namespace Test
 
 	void SpeedTest::RDXSpeedTest()
 	{
-		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX();
+		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX(16, 14);//b16, r14
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 		ParallelBlockLoop(cipher, MB100, 192);
 		delete cipher;
@@ -221,7 +221,7 @@ namespace Test
 	void SpeedTest::RHXSpeedTest(int Rounds)
 	{
 		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
-		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX(sha512, Rounds);
+		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX(sha512, Rounds);//b16, r22
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 		ParallelBlockLoop(cipher, MB100, 192);
 		delete cipher;

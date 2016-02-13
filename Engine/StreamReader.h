@@ -19,19 +19,19 @@ public:
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const unsigned int Length() { return _streamData.Length(); }
+	const size_t Length() { return _streamData.Length(); }
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const unsigned int Position() { return _streamData.Position(); }
+	const size_t Position() { return _streamData.Position(); }
 
 	/// <summary>
 	/// Initialize this class with a byte array
 	/// </summary>
 	///
 	/// <param name="DataStream">MemoryStream to read</param>
-	StreamReader(const CEX::IO::MemoryStream &DataStream)
+	explicit StreamReader(const CEX::IO::MemoryStream &DataStream)
 		:
 		_streamData(DataStream)
 	{
@@ -58,7 +58,7 @@ public:
 	/// <param name="Length">The number of bytes to read</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	std::vector<byte> ReadBytes(unsigned int Length);
+	std::vector<byte> ReadBytes(size_t Length);
 
 	/// <summary>
 	/// Reads a 16 bit integer from the stream
@@ -72,7 +72,7 @@ public:
 	/// </summary>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	unsigned short ReadUInt16();
+	ushort ReadUInt16();
 
 	/// <summary>
 	/// Reads a 32 bit integer from the stream
@@ -86,7 +86,7 @@ public:
 	/// </summary>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	unsigned int ReadUInt32();
+	uint ReadUInt32();
 
 	/// <summary>
 	/// Reads a 64 bit integer from the stream
@@ -100,21 +100,7 @@ public:
 	/// </summary>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	unsigned long long ReadUInt64();
-
-	/// <summary>
-	/// Reads an unsigned 32 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	uint ReadWord32();
-
-	/// <summary>
-	/// Reads an unsigned 64 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	ulong ReadWord64();
+	ulong ReadUInt64();
 };
 
 NAMESPACE_IOEND

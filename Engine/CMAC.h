@@ -75,17 +75,17 @@ private:
 	static constexpr byte CT87 = (byte)0x87;
 	static constexpr byte CT1B = (byte)0x1b;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	CEX::Common::KeyParams _cipherKey;
 	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* _cipherMode;
 	bool _isDestroyed;
 	bool _isInitialized;
 	std::vector<byte>_K1; 
 	std::vector<byte>_K2;
-	unsigned int _macSize;
+	size_t _macSize;
 	std::vector<byte> _msgCode;
 	std::vector<byte> _wrkBuffer;
-	unsigned int _wrkOffset;
+	size_t _wrkOffset;
 
 public:
 
@@ -94,7 +94,7 @@ public:
 	/// <summary>
 	/// Get: The Macs internal blocksize in bytes
 	/// </summary>
-	virtual const unsigned int BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: The macs type name
@@ -104,7 +104,7 @@ public:
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const unsigned int MacSize() { return _macSize; }
+	virtual const size_t MacSize() { return _macSize; }
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
@@ -126,7 +126,7 @@ public:
 	/// <param name="MacBits">Expected MAC return size in Bits; must be less or equal to Cipher Block size in bits</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
-	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, unsigned int MacBits)
+	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, size_t MacBits)
 		:
 		_blockSize(Cipher->BlockSize()),
 		_cipherKey(),
@@ -166,7 +166,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid Input size is chosen</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Mac hash value
@@ -191,7 +191,7 @@ public:
 	/// <returns>The number of bytes processed</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the Cipher MAC generator.
@@ -205,7 +205,7 @@ public:
 	/// <para>IV size must be the ciphers blocksize.</para></param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid Key size is chosen</exception>
-	virtual void Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV = std::vector<byte>());
+	virtual void Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV);
 
 	/// <summary>
 	/// Reset the internal state

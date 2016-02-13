@@ -29,12 +29,12 @@ static constexpr uint _ftSigma[] =
 	7, 9, 3, 1, 13, 12, 11, 14, 2, 6, 5, 10, 4, 0, 15, 8
 };
 
-void Blake256::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void Blake256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake256:BlockUpdate", "The Input buffer is too short!");
 
-	unsigned int fill = 64 - _dataLen;
+	size_t fill = 64 - _dataLen;
 
 	// compress remaining data filled with new bits
 	if (_dataLen != 0 && (Length >= fill))
@@ -90,13 +90,13 @@ void Blake256::Destroy()
 	}
 }
 
-unsigned int Blake256::DoFinal(std::vector<byte> &Output, const unsigned int OutOffset)
+size_t Blake256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Blake256:DoFinal", "The Output buffer is too short!");
 
 	std::vector<byte> msgLen(8);
-	uint64_t len = _T + ((uint64_t)_dataLen << 3);
+	ulong len = _T + ((uint64_t)_dataLen << 3);
 	CEX::Utility::IntUtils::Be32ToBytes((uint)(len >> 32) & 0xFFFFFFFFU, msgLen, 0);
 	CEX::Utility::IntUtils::Be32ToBytes((uint)(len & 0xFFFFFFFFU), msgLen, 4);
 
@@ -165,7 +165,7 @@ void Blake256::Update(byte Input)
 
 // *** Protected Methods *** //
 
-void Blake256::G32(unsigned int A, unsigned int B, unsigned int C, unsigned int D, unsigned int R, unsigned int I)
+void Blake256::G32(uint A, uint B, uint C, uint D, uint R, uint I)
 {
 	int P = (R << 4) + I;
 	int P0 = _ftSigma[P];
@@ -181,7 +181,7 @@ void Blake256::G32(unsigned int A, unsigned int B, unsigned int C, unsigned int 
 	_V[B] = CEX::Utility::IntUtils::RotateRight(_V[B] ^ _V[C], 7);
 }
 
-void Blake256::Compress32(const std::vector<byte> &Block, unsigned int Offset)
+void Blake256::Compress32(const std::vector<byte> &Block, size_t Offset)
 {
 	_M[0] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset);
 	_M[1] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 4);
@@ -227,7 +227,7 @@ void Blake256::Compress32(const std::vector<byte> &Block, unsigned int Offset)
 		_V[15] ^= uLen;
 	}
 
-	unsigned int index = 0;
+	uint index = 0;
 	do
 	{
 		G32BLK(index);
@@ -261,7 +261,7 @@ void Blake256::Compress32(const std::vector<byte> &Block, unsigned int Offset)
 	_HashVal[7] ^= _salt32[3];
 }
 
-void Blake256::G32BLK(unsigned int Index)
+void Blake256::G32BLK(uint Index)
 {
 	G32(0, 4, 8, 12, Index, 0);
 	G32(1, 5, 9, 13, Index, 2);

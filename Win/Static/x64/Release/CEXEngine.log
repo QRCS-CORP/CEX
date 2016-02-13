@@ -1,1 +1,450 @@
-﻿
+﻿  Blake256.cpp
+..\..\Engine\Blake256.cpp(73): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Blake256.cpp(152): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Blake512.cpp
+..\..\Engine\Blake512.cpp(75): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Blake512.cpp(155): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  BlockCipherFromName.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CBC.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CBC.cpp(14): warning C4267: 'argument': conversion from 'size_t' to 'const uint', possible loss of data
+..\..\Engine\CBC.cpp(26): warning C4267: 'argument': conversion from 'size_t' to 'const uint', possible loss of data
+..\..\Engine\CBC.cpp(52): warning C4267: 'argument': conversion from 'size_t' to 'const uint', possible loss of data
+..\..\Engine\CBC.cpp(62): warning C4267: 'argument': conversion from 'size_t' to 'const uint', possible loss of data
+..\..\Engine\CBC.cpp(112): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CBC.cpp(152): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CBC.cpp(199): warning C4267: 'argument': conversion from 'size_t' to 'const uint', possible loss of data
+..\..\Engine\CBC.cpp(201): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CBC.cpp(202): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CFB.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CFB.cpp(28): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CFB.cpp(132): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CFB.cpp(173): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CFB.cpp(226): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CFB.cpp(227): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  ChaCha.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\ChaCha.h(44): warning C4635: XML document comment applied to 'CEX.Cipher.Symmetric.Stream.ChaCha': badly-formed XML: The following tags were not closed: summary.
+  
+..\..\Engine\ChaCha.cpp(160): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\ChaCha.cpp(162): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ChaCha.cpp(177): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ChaCha.cpp(211): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CipherModeFromName.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\OFB.h(140): warning C4114: same type qualifier used more than once
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CMAC.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CMAC.cpp(51): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CSPPrng.cpp
+..\..\Engine\CSPPrng.cpp(128): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  CSPRsg.cpp
+  CTR.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CTR.cpp(69): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CTR.cpp(71): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTR.cpp(86): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTR.cpp(86): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CTR.cpp(120): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTR.cpp(167): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\CTR.cpp(177): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CTRDrbg.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CTRDrbg.cpp(30): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTRDrbg.cpp(49): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\CTRDrbg.cpp(118): warning C4267: 'initializing': conversion from 'size_t' to 'long', possible loss of data
+..\..\Engine\CTRDrbg.cpp(127): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\CTRDrbg.cpp(171): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  CTRPrng.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\CTRPrng.h(40): warning C4635: XML document comment applied to 'CEX.Prng.CTRPrng': badly-formed XML: Only one top level element is allowed in an XML document.
+  
+..\..\Engine\CTRPrng.cpp(70): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTRPrng.cpp(75): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTRPrng.cpp(85): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTRPrng.cpp(86): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTRPrng.cpp(99): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CTRPrng.cpp(242): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  DGCDrbg.cpp
+..\..\Engine\DGCDrbg.cpp(24): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(58): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(131): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(149): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(150): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(161): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(168): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCDrbg.cpp(169): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  DGCPrng.cpp
+..\..\Engine\DGCPrng.cpp(69): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCPrng.cpp(74): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCPrng.cpp(84): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCPrng.cpp(85): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCPrng.cpp(98): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DGCPrng.cpp(244): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  DigestFromName.cpp
+  DigestStream.cpp
+..\..\Engine\DigestStream.cpp(74): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DigestStream.cpp(75): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\DigestStream.cpp(76): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  ECB.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  FileStream.cpp
+  HKDF.cpp
+..\..\Engine\HKDF.cpp(23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HKDF.cpp(115): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HKDF.cpp(130): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Generating Code...
+  Compiling...
+  HMAC.cpp
+..\..\Engine\HMAC.cpp(17): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(43): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(45): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(54): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(62): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(69): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(86): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\HMAC.cpp(93): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  IntUtils.cpp
+  ISCRsg.cpp
+c:\users\john\documents\github\cex\engine\ISCRsg.h(102): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ISCRsg.cpp(34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  ISO7816.cpp
+..\..\Engine\ISO7816.cpp(10): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ISO7816.cpp(22): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ISO7816.cpp(32): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ISO7816.cpp(37): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ISO7816.cpp(47): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  KDF2Drbg.cpp
+..\..\Engine\KDF2Drbg.cpp(20): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\KDF2Drbg.cpp(21): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\KDF2Drbg.cpp(116): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\KDF2Drbg.cpp(123): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Keccak.cpp
+  Keccak256.cpp
+..\..\Engine\Keccak256.cpp(28): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Keccak256.cpp(29): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Keccak256.cpp(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Keccak512.cpp
+..\..\Engine\Keccak512.cpp(28): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Keccak512.cpp(29): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Keccak512.cpp(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  KeyFactory.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\KeyGenerator.h(99): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\KeyFactory.cpp(36): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\KeyFactory.cpp(39): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\CipherKey.h(172): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  KeyGenerator.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\KeyGenerator.h(99): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\KeyGenerator.cpp(41): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\KeyGenerator.cpp(77): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\KeyGenerator.cpp(170): warning C4267: 'initializing': conversion from 'size_t' to 'long', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  MacStream.cpp
+..\..\Engine\MacStream.cpp(74): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\MacStream.cpp(75): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\MacStream.cpp(76): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  MemoryStream.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\MemoryStream.cpp(13): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\MemoryStream.cpp(34): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\MemoryStream.cpp(68): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  OFB.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\OFB.h(140): warning C4114: same type qualifier used more than once
+..\..\Engine\OFB.cpp(27): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  PaddingFromName.cpp
+  ParallelUtils.cpp
+  PBKDF2.cpp
+c:\users\john\documents\github\cex\engine\PBKDF2.h(33): warning C4635: XML document comment applied to 'CEX.Generator.PBKDF2': badly-formed XML: Only one top level element is allowed in an XML document.
+  
+..\..\Engine\PBKDF2.cpp(24): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PBKDF2.cpp(26): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PBKDF2.cpp(143): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PBKDF2.cpp(145): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PBKDF2.cpp(153): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  PKCS7.cpp
+..\..\Engine\PKCS7.cpp(23): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PKCS7.cpp(33): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PKCS7.cpp(48): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PKCS7.cpp(57): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  PPBPrng.cpp
+c:\users\john\documents\github\cex\engine\PBKDF2.h(33): warning C4635: XML document comment applied to 'CEX.Generator.PBKDF2': badly-formed XML: Only one top level element is allowed in an XML document.
+  
+..\..\Engine\PPBPrng.cpp(63): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PPBPrng.cpp(68): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PPBPrng.cpp(78): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PPBPrng.cpp(79): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PPBPrng.cpp(92): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\PPBPrng.cpp(219): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  PrngFromName.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\CTRPrng.h(40): warning C4635: XML document comment applied to 'CEX.Prng.CTRPrng': badly-formed XML: Only one top level element is allowed in an XML document.
+  
+c:\users\john\documents\github\cex\engine\SP20Prng.h(141): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  RHX.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(168): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(270): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(270): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(321): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(321): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(410): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(410): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(463): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\RHX.cpp(463): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  Generating Code...
+  Compiling...
+  Salsa20.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\Salsa20.cpp(159): warning C4267: 'argument': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\Salsa20.cpp(161): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Salsa20.cpp(176): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Salsa20.cpp(210): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  SecureRandom.cpp
+..\..\Engine\SecureRandom.cpp(59): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SecureRandom.cpp(64): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SecureRandom.cpp(74): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SecureRandom.cpp(75): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SecureRandom.cpp(88): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SecureRandom.cpp(488): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  SeedFromName.cpp
+c:\users\john\documents\github\cex\engine\ISCRsg.h(102): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\XSPRsg.h(114): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  SHA256.cpp
+..\..\Engine\SHA256.cpp(25): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHA256.cpp(26): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHA256.cpp(27): warning C4267: '+=': conversion from 'size_t' to 'uint', possible loss of data
+..\..\Engine\SHA256.cpp(42): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  SHA512.cpp
+..\..\Engine\SHA512.cpp(24): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHA512.cpp(25): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHA512.cpp(41): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  SHX.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\SHX.cpp(127): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHX.cpp(159): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHX.cpp(170): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHX.cpp(234): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SHX.cpp(317): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\SHX.cpp(317): warning C4267: 'initializing': conversion from 'size_t' to 'const int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  Skein1024.cpp
+..\..\Engine\Skein1024.cpp(39): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Skein1024.cpp(108): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Skein256.cpp
+..\..\Engine\Skein256.cpp(39): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Skein256.cpp(108): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Skein512.cpp
+..\..\Engine\Skein512.cpp(39): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\Skein512.cpp(109): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  SP20Drbg.cpp
+..\..\Engine\SP20Drbg.cpp(30): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Drbg.cpp(59): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+..\..\Engine\SP20Drbg.cpp(259): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  SP20Prng.cpp
+c:\users\john\documents\github\cex\engine\SP20Prng.h(141): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Prng.cpp(64): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Prng.cpp(69): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Prng.cpp(79): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Prng.cpp(80): warning C4267: '-=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Prng.cpp(93): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\SP20Prng.cpp(231): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  CipherStream.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(146): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(322): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(322): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(388): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(388): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(454): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(454): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(581): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(581): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(645): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(645): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(709): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(709): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(777): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\CipherStream.cpp(777): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  StreamCipherFromName.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\ChaCha.h(44): warning C4635: XML document comment applied to 'CEX.Cipher.Symmetric.Stream.ChaCha': badly-formed XML: The following tags were not closed: summary.
+  
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  StreamReader.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+  StreamWriter.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+  TBC.cpp
+..\..\Engine\TBC.cpp(11): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\TBC.cpp(27): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\TBC.cpp(36): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\TBC.cpp(41): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\TBC.cpp(50): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Threefish1024.cpp
+  Threefish256.cpp
+  Threefish512.cpp
+  THX.cpp
+c:\users\john\documents\github\cex\engine\MemoryStream.h(40): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(22): warning C4267: 'return': conversion from 'size_t' to 'const unsigned int', possible loss of data
+..\..\Engine\THX.cpp(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\THX.cpp(192): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\THX.cpp(296): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\THX.cpp(323): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\THX.cpp(323): warning C4267: 'initializing': conversion from 'size_t' to 'const unsigned int', possible loss of data
+c:\users\john\documents\github\cex\engine\StreamWriter.h(129): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  c:\users\john\documents\github\cex\engine\KeyParams.h(229): note: see reference to function template instantiation 'void CEX::IO::StreamWriter::Write<byte>(std::vector<byte,std::allocator<_Ty>> &)' being compiled
+          with
+          [
+              _Ty=byte
+          ]
+  Generating Code...
+  Compiling...
+  VMAC.cpp
+..\..\Engine\VMAC.cpp(107): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  X923.cpp
+..\..\Engine\X923.cpp(11): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  XSPRsg.cpp
+c:\users\john\documents\github\cex\engine\XSPRsg.h(114): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\XSPRsg.cpp(23): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+  ZeroPad.cpp
+..\..\Engine\ZeroPad.cpp(18): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ZeroPad.cpp(23): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+..\..\Engine\ZeroPad.cpp(37): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Generating Code...
+  CEXEngine.vcxproj -> C:\Users\John\Documents\GitHub\CEX\Win\x64\Release\Engine.lib

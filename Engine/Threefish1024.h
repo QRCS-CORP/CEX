@@ -15,8 +15,8 @@ private:
 	static constexpr uint ExpandedTweakSize = 3;
 	static constexpr ulong KeyScheduleConst = 0x1BD11BDAA9FC1A22;
 
-	std::vector<ulong>  _expandedKey;
-	std::vector<ulong>  _expandedTweak;
+	std::vector<ulong> _expandedKey;
+	std::vector<ulong> _expandedTweak;
 
 public:
 	/// <summary>
@@ -59,20 +59,20 @@ public:
 	void SetTweak(const std::vector<ulong> &Tweak);
 
 private:
-	static inline void Mix(ulong &A, ulong &B, unsigned int R)
+	static inline void Mix(ulong &A, ulong &B, uint R)
 	{
 		A += B;
 		B = RotateLeft64(B, R) ^ A;
 	}
 
-	static inline void Mix(ulong &A, ulong &B, unsigned int R, ulong K0, ulong K1)
+	static inline void Mix(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
 	{
 		B += K1;
 		A += B + K0;
 		B = RotateLeft64(B, R) ^ A;
 	}
 
-	static inline ulong RotateLeft64(ulong V, unsigned int B)
+	static inline ulong RotateLeft64(ulong V, uint B)
 	{
 		return (V << B) | (V >> (64 - B));
 	}

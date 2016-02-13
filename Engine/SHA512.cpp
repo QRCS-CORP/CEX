@@ -4,7 +4,7 @@
 
 NAMESPACE_DIGEST
 
-void SHA512::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void SHA512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("SHA512:BlockUpdate", "The Input buffer is too short!");
@@ -58,7 +58,7 @@ void SHA512::Destroy()
 	}
 }
 
-unsigned int SHA512::DoFinal(std::vector<byte> &Output, const unsigned int OutOffset)
+size_t SHA512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("SHA512:DoFinal", "The Output buffer is too short!");
@@ -222,7 +222,7 @@ void SHA512::ProcessBlock()
 	ulong w5 = _H5;
 	ulong w6 = _H6;
 	ulong w7 = _H7;
-	unsigned int ctr = 0;
+	size_t ctr = 0;
 
 	// t = 8 * i
 	w7 += Sum1(w4) + Ch(w4, w5, w6) + K64[ctr] + _wordBuffer[ctr];
@@ -504,7 +504,7 @@ void SHA512::ProcessLength(ulong LowWord, ulong HiWord)
 	_wordBuffer[15] = (ulong)LowWord;
 }
 
-void SHA512::ProcessWord(const std::vector<byte> &Input, unsigned int InOffset)
+void SHA512::ProcessWord(const std::vector<byte> &Input, size_t InOffset)
 {
 	_wordBuffer[_wordOffset] = CEX::Utility::IntUtils::BytesToBe64(Input, InOffset);
 

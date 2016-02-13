@@ -88,8 +88,9 @@ namespace Test
 		CEX::Processing::Structure::CipherKey ck;
 		CEX::Common::KeyParams kp2;
 		kf2.Extract(ck, kp2);
+		CEX::Common::CipherDescription ds2 = ck.Description();
 
-		if (!ds.Equals(ck.Description()))
+		if (!ds.Equals(ds2))
 			throw std::string("KeyFactoryTest: Description extraction has failed!");
 		if (!kp->Equals(kp2))
 			throw std::string("KeyFactoryTest: Key extraction has failed!");
@@ -103,8 +104,9 @@ namespace Test
 		m2->Seek(0, CEX::IO::SeekOrigin::Begin);
 		CEX::Processing::Factory::KeyFactory kf4(m2);
 		kf4.Extract(ck, kp2);
+		CEX::Common::CipherDescription ds3 = ck.Description();
 
-		if (!ds.Equals(ck.Description()))
+		if (!ds.Equals(ds2))
 			throw std::string("KeyFactoryTest: Description extraction has failed!");
 		if (!kp->Equals(kp2))
 			throw std::string("KeyFactoryTest: Key extraction has failed!");

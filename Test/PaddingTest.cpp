@@ -48,7 +48,7 @@ namespace Test
 			// pad array
 			Padding->AddPadding(data, i);
 			// verify length
-			unsigned int len = Padding->GetPaddingLength(data);
+			unsigned int len = (unsigned int)Padding->GetPaddingLength(data);
 			if (len == 0 && i != 0)
 				throw std::string("PaddingTest: Failed the padding value return check!");
 			else if (i != 0 && len != BLOCK - i)
@@ -57,7 +57,7 @@ namespace Test
 			// test offset method
 			if (i > 0 && i < 15)
 			{
-				len = Padding->GetPaddingLength(data, i);
+				len = (unsigned int)Padding->GetPaddingLength(data, i);
 
 				if (len == 0 && i != 0)
 					throw std::string("PaddingTest: Failed the padding value return check!");

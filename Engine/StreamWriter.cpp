@@ -22,73 +22,73 @@ MemoryStream* StreamWriter::GetStream()
 	return new MemoryStream(_streamData);
 }
 
-void StreamWriter::Write(byte Data)
+void StreamWriter::Write(byte Value)
 {
-	unsigned int sze = sizeof(byte);
+	size_t sze = sizeof(byte);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 
-void StreamWriter::Write(short Data)
+void StreamWriter::Write(short Value)
 {
-	unsigned int sze = sizeof(short);
+	size_t sze = sizeof(short);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 
-void StreamWriter::Write(ushort Data)
+void StreamWriter::Write(ushort Value)
 {
-	unsigned int sze = sizeof(ushort);
+	size_t sze = sizeof(ushort);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 
-void StreamWriter::Write(int Data)
+void StreamWriter::Write(int Value)
 {
-	unsigned int sze = sizeof(int);
+	size_t sze = sizeof(int);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 
-void StreamWriter::Write(uint Data)
+void StreamWriter::Write(uint Value)
 {
-	unsigned int sze = sizeof(uint);
+	size_t sze = sizeof(uint);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 
-void StreamWriter::Write(long Data)
+void StreamWriter::Write(long Value)
 {
-	unsigned int sze = sizeof(long);
+	size_t sze = sizeof(long);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 
-void StreamWriter::Write(ulong Data)
+void StreamWriter::Write(ulong Value)
 {
-	unsigned int sze = sizeof(ulong);
+	size_t sze = sizeof(ulong);
 	if (_streamPosition + sze > _streamData.size())
 		_streamData.resize(_streamPosition + sze);
 
-	memcpy(&_streamData[_streamPosition], &Data, sze);
+	memcpy(&_streamData[_streamPosition], &Value, sze);
 	_streamPosition += sze;
 }
 

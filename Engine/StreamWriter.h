@@ -11,7 +11,7 @@ NAMESPACE_IO
 class StreamWriter
 {
 private:
-	unsigned int _streamPosition;
+	size_t _streamPosition;
 	std::vector<byte> _streamData;
 
 public:
@@ -19,19 +19,19 @@ public:
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const unsigned int Length() const { return _streamData.size(); }
+	const size_t Length() const { return _streamData.size(); }
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const unsigned int Position() const { return _streamPosition; }
+	const size_t Position() const { return _streamPosition; }
 
 	/// <summary>
 	/// Initialize this class
 	/// </summary>
 	///
 	/// <param name="Length">The length of the underlying stream</param>
-	StreamWriter(unsigned int Length)
+	explicit StreamWriter(size_t Length)
 		:
 		_streamData(Length),
 		_streamPosition(0)
@@ -43,7 +43,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="DataArray">The byte array to write data to</param>
-	StreamWriter(std::vector<byte> &DataArray)
+	explicit StreamWriter(std::vector<byte> &DataArray)
 		:
 		_streamData(DataArray),
 		_streamPosition(0)
@@ -55,7 +55,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="DataStream">The MemoryStream to write data to</param>
-	StreamWriter(MemoryStream &DataStream)
+	explicit StreamWriter(MemoryStream &DataStream)
 		:
 		_streamData(DataStream.ToArray()),
 		_streamPosition(0)
@@ -78,59 +78,78 @@ public:
 	/// <summary>
 	/// Returns the entire array of raw bytes from the stream
 	/// </summary>
-	std::vector<byte>& GetBytes();
+	/// <returns>The array of bytes</returns>
+	std::vector<byte> &GetBytes();
 
 	/// <summary>
 	/// Returns the base MemoryStream object
 	/// </summary>
+	/// <returns>The state as a MemoryStream</returns>
 	MemoryStream* GetStream();
 
 	/// <summary>
 	/// Write an 8bit integer to the base stream
 	/// </summary>
-	void Write(byte Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(byte Value);
 
 	/// <summary>
 	/// Write a 16bit integer to the base stream
 	/// </summary>
-	void Write(short Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(short Value);
 
 	/// <summary>
 	/// Write a 16bit unsigned integer to the base stream
 	/// </summary>
-	void Write(ushort Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(ushort Value);
 
 	/// <summary>
 	/// Write a 32bit integer to the base stream
 	/// </summary>
-	void Write(int Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(int Value);
 
 	/// <summary>
 	/// Write a 32bit unsigned integer to the base stream
 	/// </summary>
-	void Write(uint Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(uint Value);
 
 	/// <summary>
 	/// Write a 64bit integer to the base stream
 	/// </summary>
-	void Write(long Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(long Value);
 
 	/// <summary>
 	/// Write a 64bit unsigned integer to the base stream
 	/// </summary>
-	void Write(ulong Data);
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(ulong Value);
 
+
+	template <class T>
 	/// <summary>
 	/// Write an integer array to the base stream
 	/// </summary>
-	template <class T>
-	void Write(std::vector<T> &Data)
+	/// 
+	/// <param name="Value">The integer value</param>
+	void Write(std::vector<T> &Value)
 	{
-		unsigned int sze = sizeof(T) * Data.size();
+		size_t sze = sizeof(T) * Value.size();
 		if (_streamPosition + sze > _streamData.size())
 			_streamData.resize(_streamPosition + sze);
 
-		memcpy(&_streamData[_streamPosition], &Data[0], sze);
+		memcpy(&_streamData[_streamPosition], &Value[0], sze);
 		_streamPosition += sze;
 	}
 };

@@ -5,7 +5,7 @@
 
 NAMESPACE_MAC
 
-void CMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void CMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if ((InOffset + Length) > Input.size())
 		throw CryptoMacException("CMAC:BlockUpdate", "The Input buffer is too short!");
@@ -16,7 +16,7 @@ void CMAC::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, un
 		_wrkOffset = 0;
 	}
 
-	unsigned int diff = _blockSize - _wrkOffset;
+	size_t diff = _blockSize - _wrkOffset;
 	if (Length > diff)
 	{
 		memcpy(&_wrkBuffer[_wrkOffset], &Input[InOffset], diff);
@@ -68,7 +68,7 @@ void CMAC::Destroy()
 	}
 }
 
-unsigned int CMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
+size_t CMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
 	if ((Output.size() - OutOffset) < _macSize)
 		throw CryptoMacException("CMAC:DoFinal", "The Output buffer is too short!");
@@ -91,13 +91,15 @@ unsigned int CMAC::DoFinal(std::vector<byte> &Output, unsigned int OutOffset)
 	return _macSize;
 }
 
-void CMAC::Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV)
+void CMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
 {
 	if (MacKey.size() == 0)
 		throw CryptoMacException("CMAC:Initialize", "Key can not be null!");
 
-	if (IV.size() != _blockSize)
-		IV.resize(_blockSize);
+	size_t ivSze = IV.size() > _blockSize ? _blockSize : IV.size();
+	std::vector<byte> vec(_blockSize);
+	if (ivSze != 0)
+		memcpy(&vec[0], &IV[0], ivSze);
 
 	_cipherKey.Key() = MacKey;
 	_cipherKey.IV() = IV;
@@ -134,7 +136,7 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 	int fbit = (Input[0] & 0xFF) >> 7;
 	std::vector<byte> tmpk(Input.size());
 
-	for (unsigned int i = 0; i < Input.size() - 1; i++)
+	for (size_t i = 0; i < Input.size() - 1; i++)
 		tmpk[i] = (byte)((Input[i] << 1) + ((Input[i + 1] & 0xFF) >> 7));
 
 	tmpk[Input.size() - 1] = (byte)(Input[Input.size() - 1] << 1);

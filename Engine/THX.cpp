@@ -12,7 +12,7 @@ void THX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Decrypt16(Input, 0, Output, 0);
 }
 
-void THX::DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void THX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Decrypt16(Input, InOffset, Output, OutOffset);
 }
@@ -47,7 +47,7 @@ void THX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt16(Input, 0, Output, 0);
 }
 
-void THX::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void THX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
@@ -64,7 +64,7 @@ void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	if (key.size() > _legalKeySizes[3] && (key.size() - dgtsze) % dgtblk != 0)
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
 
-	for (unsigned int i = 0; i < _legalKeySizes.size(); ++i)
+	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
 	{
 		if (key.size() == _legalKeySizes[i])
 			break;
@@ -91,7 +91,7 @@ void THX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 		DecryptBlock(Input, Output);
 }
 
-void THX::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void THX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (_isEncryption)
 		EncryptBlock(Input, InOffset, Output, OutOffset);
@@ -116,17 +116,17 @@ void THX::ExpandKey(const std::vector<byte> &Key)
 
 void THX::SecureExpand(const std::vector<byte> &Key)
 {
-	unsigned int k64Cnt = 4;
-	unsigned int keyCtr = 0;
-	unsigned int keySize = _dfnRounds * 2 + 8;
-	unsigned int kbtSize = keySize * 4;
+	size_t k64Cnt = 4;
+	size_t keyCtr = 0;
+	size_t keySize = _dfnRounds * 2 + 8;
+	size_t kbtSize = keySize * 4;
 	uint Y0, Y1, Y2, Y3;
 	std::vector<byte> rawKey(kbtSize, 0);
 	std::vector<byte> sbKey(16, 0);
 	std::vector<uint> eKm(k64Cnt, 0);
 	std::vector<uint> oKm(k64Cnt, 0);
 	std::vector<uint> wK(keySize, 0);
-	unsigned int saltSize = Key.size() - _ikmSize;
+	size_t saltSize = Key.size() - _ikmSize;
 
 	// salt must be divisible of hash blocksize
 	if (saltSize % _kdfEngine->BlockSize() != 0)
@@ -149,7 +149,7 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 	// copy bytes to working key
 	memcpy(&wK[0], &rawKey[0], kbtSize);
 
-	for (unsigned int i = 0; i < k64Cnt; i++)
+	for (uint i = 0; i < k64Cnt; i++)
 	{
 		// round key material
 		eKm[i] = CEX::Utility::IntUtils::BytesToLe32(rawKey, keyCtr);
@@ -164,7 +164,7 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 
 	while (keyCtr < KEY_BITS)
 	{
-		Y0 = Y1 = Y2 = Y3 = keyCtr;
+		Y0 = Y1 = Y2 = Y3 = (uint)keyCtr;
 
 		Y0 = (byte)Q1[Y0] ^ sbKey[12];
 		Y1 = (byte)Q0[Y1] ^ sbKey[13];
@@ -189,9 +189,9 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 
 void THX::StandardExpand(const std::vector<byte> &Key)
 {
-	unsigned int k64Cnt = Key.size() / 8;
-	unsigned int kmLen = k64Cnt > 4 ? 8 : 4;
-	unsigned int keyCtr = 0;
+	size_t k64Cnt = (Key.size() / 8);
+	size_t kmLen = k64Cnt > 4 ? 8 : 4;
+	size_t keyCtr = 0;
 	uint A, B, Q;
 	uint Y0, Y1, Y2, Y3;
 	std::vector<uint> eKm(kmLen, 0);
@@ -199,7 +199,7 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	std::vector<byte> sbKey(Key.size() == 64 ? 32 : 16, 0);
 	std::vector<uint> wK(_dfnRounds * 2 + 8, 0);
 
-	for (unsigned int i = 0; i < k64Cnt; ++i)
+	for (size_t i = 0; i < k64Cnt; ++i)
 	{
 		// round key material
 		eKm[i] = CEX::Utility::IntUtils::BytesToLe32(Key, keyCtr);
@@ -217,7 +217,7 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 		// create the expanded keys
 		if (keyCtr < (int)(wK.size() / 2))
 		{
-			Q = keyCtr * SK_STEP;
+			Q = (uint)(keyCtr * SK_STEP);
 			A = Mix32(Q, eKm, k64Cnt);
 			B = Mix32(Q + SK_BUMP, oKm, k64Cnt);
 			B = B << 8 | (uint)(B >> 24);
@@ -228,7 +228,7 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 		}
 
 		// gen s-box members
-		Y0 = Y1 = Y2 = Y3 = keyCtr;
+		Y0 = Y1 = Y2 = Y3 = (uint)keyCtr;
 
 		// 512 key
 		if (Key.size() == 64)
@@ -283,10 +283,10 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 
 // *** Rounds Processing *** //
 
-void THX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = 8;
-	unsigned int keyCtr = 4;
+	const size_t LRD = 8;
+	size_t keyCtr = 4;
 	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
 	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
 	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
@@ -318,10 +318,10 @@ void THX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 12);
 }
 
-void THX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = _expKey.size() - 1;
-	unsigned int keyCtr = 0;
+	const size_t LRD = _expKey.size() - 1;
+	size_t keyCtr = 0;
 	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
 	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
 	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
@@ -450,7 +450,7 @@ int THX::GetSaltSize(CEX::Enumeration::Digests DigestType)
 	}
 }
 
-uint THX::Mix32(const uint X, const std::vector<uint> &Key, const unsigned int Count)
+uint THX::Mix32(const uint X, const std::vector<uint> &Key, const size_t Count)
 {
 	uint Y0 = (byte)X;
 	uint Y1 = (byte)(X >> 8);

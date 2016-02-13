@@ -63,14 +63,14 @@ NAMESPACE_PROCESSING
 class DigestStream
 {
 private:
-	static constexpr unsigned int BUFFER_SIZE = 64 * 1024;
+	static constexpr size_t BUFFER_SIZE = 64 * 1024;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	CEX::Digest::IDigest* _digestEngine;
 	bool _destroyEngine;
 	CEX::IO::IByteStream* _inStream;
 	bool _isDestroyed = false;
-	long _progressInterval;
+	size_t _progressInterval;
 
 	DigestStream() { }
 
@@ -89,11 +89,12 @@ public:
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
-	DigestStream(CEX::Digest::IDigest* Digest)
+	explicit DigestStream(CEX::Digest::IDigest* Digest)
 		:
 		_blockSize(Digest->BlockSize()),
 		_destroyEngine(false),
 		_digestEngine(Digest),
+		_inStream(0),
 		_isDestroyed(false),
 		_progressInterval(0)
 	{
@@ -106,9 +107,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Digest">The digest enumeration member</param>
-	DigestStream(CEX::Enumeration::Digests Digest)
+	explicit DigestStream(CEX::Enumeration::Digests Digest)
 		:
 		_destroyEngine(true),
+		_inStream(0),
 		_isDestroyed(false),
 		_progressInterval(0)
 	{
@@ -143,13 +145,13 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> ComputeHash(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	std::vector<byte> ComputeHash(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
-	void CalculateInterval(unsigned int Length);
-	void CalculateProgress(unsigned int Length, bool Completed = false);
-	std::vector<byte> Compute(unsigned int Length);
-	std::vector<byte> Compute(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	void CalculateInterval(size_t Length);
+	void CalculateProgress(size_t Length, bool Completed = false);
+	std::vector<byte> Compute(size_t Length);
+	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Destroy();
 };
 

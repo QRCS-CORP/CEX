@@ -114,27 +114,27 @@ NAMESPACE_BLOCK
 class RHX : public IBlockCipher
 {
 private:
-	static constexpr unsigned int BLOCK16 = 16;
-	static constexpr unsigned int BLOCK32 = 32;
-	static constexpr unsigned int LEGAL_KEYS = 14;
-	static constexpr unsigned int MAX_ROUNDS = 38;
-	static constexpr unsigned int MAX_STDKEY = 64;
-	static constexpr unsigned int MIN_ROUNDS = 10;
-	static constexpr unsigned int ROUNDS22 = 22;
+	static constexpr size_t BLOCK16 = 16;
+	static constexpr size_t BLOCK32 = 32;
+	static constexpr size_t LEGAL_KEYS = 14;
+	static constexpr size_t MAX_ROUNDS = 38;
+	static constexpr size_t MAX_STDKEY = 64;
+	static constexpr size_t MIN_ROUNDS = 10;
+	static constexpr size_t ROUNDS22 = 22;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	bool _destroyEngine;
-	unsigned int _dfnRounds;
+	size_t _dfnRounds;
 	std::vector<uint> _expKey;
 	std::vector<byte> _hkdfInfo;
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
-	unsigned int _ikmSize;
+	size_t _ikmSize;
 	CEX::Enumeration::Digests _kdfEngineType;
 	CEX::Digest::IDigest* _kdfEngine;
-	std::vector<unsigned int> _legalKeySizes;
-	std::vector<unsigned int> _legalRounds;
+	std::vector<size_t> _legalKeySizes;
+	std::vector<size_t> _legalRounds;
 
 public:
 
@@ -145,7 +145,7 @@ public:
 	/// <para>Block size must be 16 or 32 bytes wide.
 	/// Value set in class constructor.</para>
 	/// </summary>
-	virtual const unsigned int BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return _blockSize; }
 
 	/// <summary>
 	/// Get/Set: Sets the Info value in the HKDF initialization parameters.
@@ -169,7 +169,7 @@ public:
 	/// Maximum size is the digests underlying block size; if the key
 	/// is longer than this, the size will default to the block size.</para>
 	/// </summary>
-	unsigned int &IkmSize() { return _ikmSize; }
+	size_t &IkmSize() { return _ikmSize; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -185,12 +185,12 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalKeySizes() { return _legalKeySizes; }
+	virtual const std::vector<size_t> &LegalKeySizes() { return _legalKeySizes; }
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalRounds() { return _legalRounds; }
+	virtual const std::vector<size_t> &LegalRounds() { return _legalRounds; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -200,7 +200,7 @@ public:
 	/// <summary>
 	/// Get: The number of diffusion rounds processed by the transform
 	/// </summary>
-	virtual const unsigned int Rounds() { return _dfnRounds; }
+	virtual const size_t Rounds() { return _dfnRounds; }
 
 	// *** Constructor *** //
 
@@ -213,16 +213,18 @@ public:
 	/// <param name="BlockSize">Cipher input Block Size. Default is 16 bytes.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(CEX::Digest::IDigest *KdfEngine, unsigned int Rounds = ROUNDS22, unsigned int BlockSize = BLOCK16)
+	RHX(CEX::Digest::IDigest *KdfEngine, size_t Rounds = ROUNDS22, size_t BlockSize = BLOCK16)
 		:
 		_blockSize(BlockSize),
 		_destroyEngine(false),
 		_dfnRounds(Rounds),
 		_hkdfInfo(0, 0),
 		_ikmSize(0),
-		_kdfEngine(KdfEngine),
+		_isDestroyed(false),
 		_isEncryption(false),
 		_isInitialized(false),
+		_kdfEngine(KdfEngine),
+		_kdfEngineType(CEX::Enumeration::Digests::SHA512),
 		_legalKeySizes(LEGAL_KEYS, 0),
 		_legalRounds(15, 0)
 	{
@@ -233,7 +235,7 @@ public:
 
 		std::string info = "information string RHX version 1";
 		_hkdfInfo.reserve(info.size());
-		for (unsigned int i = 0; i < info.size(); ++i)
+		for (size_t i = 0; i < info.size(); ++i)
 			_hkdfInfo.push_back(info[i]);
 
 		_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
@@ -246,7 +248,7 @@ public:
 		_legalKeySizes[2] = 32;
 		_legalKeySizes[3] = 64;
 
-		for (unsigned int i = 4; i < _legalKeySizes.size(); i++)
+		for (size_t i = 4; i < _legalKeySizes.size(); i++)
 			_legalKeySizes[i] = (_kdfEngine->BlockSize() * (i - 3)) + _ikmSize;
 	}
 
@@ -259,15 +261,17 @@ public:
 	/// <param name="KdfEngineType"><para>The Key Schedule KDF digest engine; can be any one of the Digest implementations. The default engine is SHA512</para>.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(unsigned int BlockSize = BLOCK16, unsigned int Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)
+	RHX(size_t BlockSize = BLOCK16, size_t Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)
 		:
 		_blockSize(BlockSize),
 		_destroyEngine(true),
 		_dfnRounds(Rounds),
 		_hkdfInfo(0, 0),
 		_ikmSize(0),
+		_isDestroyed(false),
 		_isEncryption(false),
 		_isInitialized(false),
+		_kdfEngine(0),
 		_kdfEngineType(KdfEngineType),
 		_legalKeySizes(LEGAL_KEYS, 0),
 		_legalRounds(15, 0)
@@ -279,7 +283,7 @@ public:
 
 		std::string info = "information string RHX version 1";
 		_hkdfInfo.reserve(info.size());
-		for (unsigned int i = 0; i < info.size(); ++i)
+		for (size_t i = 0; i < info.size(); ++i)
 			_hkdfInfo.push_back(info[i]);
 
 		_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
@@ -294,7 +298,7 @@ public:
 		int dgtblock = GetSaltSize(KdfEngineType);
 
 		// hkdf extended key sizes
-		for (unsigned int i = 4; i < _legalKeySizes.size(); ++i)
+		for (size_t i = 4; i < _legalKeySizes.size(); ++i)
 			_legalKeySizes[i] = (dgtblock * (i - 3)) + _ikmSize;
 	}
 
@@ -328,7 +332,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Clear the buffers and reset
@@ -355,7 +359,7 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the Cipher.
@@ -387,13 +391,13 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	void Decrypt32(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	void Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
-	void Encrypt32(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);

@@ -14,14 +14,14 @@
 #include "ConsoleUtils.h"
 #include "CTRDrbgTest.h"
 #include "DigestStreamTest.h"
-#include "ITest.h"
 #include "HKDFTest.h"
-#include "KDF2DrbgTest.h"
-#include "KeyFactoryTest.h"
 #include "HMACTest.h"
 #include "HXCipherTest.h"
+#include "ITest.h"
+#include "KDF2DrbgTest.h"
 #include "ISCRsgTest.h"
 #include "KeccakTest.h"
+#include "KeyFactoryTest.h"
 #include "MacStreamTest.h"
 #include "PaddingTest.h"
 #include "ParallelModeTest.h"
@@ -41,7 +41,10 @@
 using namespace Test;
 
 // *** CEX 1.0 TODO ***
-//
+// internal counters  +4GB
+// size_t on loops
+// verify digest int types
+// 
 // EntropyPool			-?
 // VolumeCipher			-?
 // KeyFactory 			-?
@@ -111,7 +114,7 @@ void RunTest(Test::ITest* Test)
 
 		delete Test;
 	}
-	catch (TestException ex)
+	catch (TestException &ex)
 	{
 		ConsoleUtils::WriteLine("An error has occured!");
 
@@ -131,7 +134,7 @@ void RunTest(Test::ITest* Test)
 	}
 }
 
-int main(int argc, const char * argv[])
+int main(/*int argc, const char * argv[]*/)
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();

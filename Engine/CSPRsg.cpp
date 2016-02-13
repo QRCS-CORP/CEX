@@ -73,7 +73,7 @@ void CSPRsg::GetBytes(std::vector<byte> &Output)
 #endif
 }
 
-std::vector<byte> CSPRsg::GetBytes(int Size)
+std::vector<byte> CSPRsg::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);

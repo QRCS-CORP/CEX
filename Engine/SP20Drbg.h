@@ -68,30 +68,30 @@ NAMESPACE_GENERATOR
 class SP20Drbg : public IGenerator
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 64;
-	static constexpr unsigned int DEFAULT_ROUNDS = 20;
-	static constexpr unsigned int KEY_SIZE = 32;
-	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
-	static constexpr unsigned int MAX_PARALLEL = 1024000;
-	static constexpr unsigned int MAX_ROUNDS = 30;
-	static constexpr unsigned int MIN_PARALLEL = 1024;
-	static constexpr unsigned int MIN_ROUNDS = 8;
-	static constexpr unsigned int PARALLEL_CHUNK = 1024;
-	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t BLOCK_SIZE = 64;
+	static constexpr size_t DEFAULT_ROUNDS = 20;
+	static constexpr size_t KEY_SIZE = 32;
+	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t MAX_PARALLEL = 1024000;
+	static constexpr size_t MAX_ROUNDS = 30;
+	static constexpr size_t MIN_PARALLEL = 1024;
+	static constexpr size_t MIN_ROUNDS = 8;
+	static constexpr size_t PARALLEL_CHUNK = 1024;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 	static constexpr const char *SIGMA = "expand 32-byte k";
-	static constexpr unsigned int STATE_SIZE = 16;
-	static constexpr unsigned int VECTOR_SIZE = 8;
+	static constexpr size_t STATE_SIZE = 16;
+	static constexpr size_t VECTOR_SIZE = 8;
 
 	std::vector<uint> _ctrVector;
 	std::vector<byte> _dstCode;
 	bool _isDestroyed;
 	bool _isInitialized;
 	bool _isParallel;
-	std::vector<unsigned int> _legalKeySizes;
-	std::vector<unsigned int> _legalRounds;
-	unsigned int _parallelBlockSize;
-	unsigned int _processorCount;
-	unsigned int _rndCount;
+	std::vector<size_t> _legalKeySizes;
+	std::vector<size_t> _legalRounds;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
+	size_t _rndCount;
 	std::vector<std::vector<uint>> _threadVectors;
 	std::vector<uint> _wrkState;
 
@@ -123,17 +123,17 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() { return KEY_SIZE; }
+	virtual size_t KeySize() { return KEY_SIZE; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	const std::vector<unsigned int>&LegalKeySizes() { return _legalKeySizes; };
+	const std::vector<size_t>&LegalKeySizes() { return _legalKeySizes; };
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	const std::vector<unsigned int> &LegalRounds() { return _legalRounds; }
+	const std::vector<size_t> &LegalRounds() { return _legalRounds; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -143,27 +143,27 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	const unsigned int ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
+	const size_t ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	const unsigned int ProcessorCount() { return _processorCount; }
+	const size_t ProcessorCount() { return _processorCount; }
 
 	/// <summary>
 	/// Get: Initialization vector size
 	/// </summary>
-	const unsigned int VectorSize() { return VECTOR_SIZE; }
+	const size_t VectorSize() { return VECTOR_SIZE; }
 
 	// *** Constructor *** //
 
@@ -172,13 +172,15 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Rounds">The number of transformation rounds</param>
-	SP20Drbg(unsigned int Rounds = 20)
+	explicit SP20Drbg(size_t Rounds = 20)
 		:
 		_ctrVector(2, 0),
 		_dstCode(0),
 		_isDestroyed(false),
 		_isInitialized(false),
 		_isParallel(false),
+		_legalKeySizes(2),
+		_legalRounds(12),
 		_parallelBlockSize(PARALLEL_DEFBLOCK),
 		_processorCount(0),
 		_rndCount(Rounds),
@@ -211,7 +213,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output);
+	virtual size_t Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -224,7 +226,7 @@ public:
 	/// <returns>Number of bytes generated</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the output buffer is too small</exception>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
 	/// Initialize the generator
@@ -262,13 +264,13 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
-	void Generate(const unsigned int Length, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
-	void Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector);
+	void Generate(const size_t Length, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset);
+	void Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);
-	void SalsaCore(std::vector<byte> &Output, const unsigned int OutOffset, const std::vector<uint> &Counter);
+	void SalsaCore(std::vector<byte> &Output, const size_t OutOffset, const std::vector<uint> &Counter);
 	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);
 	void SetScope();
-	void Transform(std::vector<byte> &Output, unsigned int OutOffset);
+	void Transform(std::vector<byte> &Output, size_t OutOffset);
 };
 
 NAMESPACE_GENERATOREND

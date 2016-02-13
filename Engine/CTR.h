@@ -69,19 +69,19 @@ NAMESPACE_MODE
 class CTR : public ICipherMode
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 1024;
-	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
-	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t BLOCK_SIZE = 1024;
+	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
 	IBlockCipher* _blockCipher;
-	unsigned int _blockSize;
+	size_t _blockSize;
 	std::vector<byte> _ctrVector;
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
 	bool _isParallel;
-	unsigned int _parallelBlockSize;
-	unsigned int _processorCount;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
 	std::vector<std::vector<byte>> _threadVectors;
 
 public:
@@ -91,7 +91,7 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher
 	/// </summary>
-	virtual const unsigned int BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: Underlying Cipher
@@ -126,7 +126,7 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<unsigned int> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
+	virtual const std::vector<size_t> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -140,22 +140,22 @@ public:
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
 	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
-	virtual unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	virtual const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	virtual const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const unsigned int ParallelMinimumSize() { return _processorCount * _blockSize; }
+	virtual const size_t ParallelMinimumSize() { return _processorCount * _blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const unsigned int ProcessorCount() { return _processorCount; }
+	virtual const size_t ProcessorCount() { return _processorCount; }
 
 	// *** Constructor *** //
 
@@ -166,7 +166,7 @@ public:
 	/// <param name="Cipher">Underlying encryption algorithm</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher is used</exception>
-	CTR(IBlockCipher* Cipher)
+	explicit CTR(IBlockCipher* Cipher)
 		:
 		_blockCipher(Cipher),
 		_blockSize(Cipher->BlockSize()),
@@ -231,14 +231,14 @@ public:
 	/// <param name="InOffset">Offset in the Input array</param>
 	/// <param name="Output">Transformed bytes</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void Generate(const unsigned int Length, std::vector<byte> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
-	static void Increase(const std::vector<byte> &Counter, const unsigned int Size, std::vector<byte> &Buffer);
+	void Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset);
+	static void Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer);
 	static void Increment(std::vector<byte> &Counter);
 	void ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset);
+	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void SetScope();
 };
 

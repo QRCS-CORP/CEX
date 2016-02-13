@@ -19,14 +19,14 @@ void PBKDF2::Destroy()
 	}
 }
 
-unsigned int PBKDF2::Generate(std::vector<byte> &Output)
+size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
 	GenerateKey(Output, 0, Output.size());
 
 	return Output.size();
 }
 
-unsigned int PBKDF2::Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("PBKDF2:Generate", "Output buffer too small!");
@@ -98,15 +98,15 @@ void PBKDF2::Update(const std::vector<byte> &Salt)
 
 // *** Protected *** //
 
-unsigned int PBKDF2::GenerateKey(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t PBKDF2::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-	int diff = Size % _hashSize;
-	int max = Size / _hashSize;
-	int ctr = 0;
+	size_t diff = Size % _hashSize;
+	size_t max = Size / _hashSize;
+	uint ctr = 0;
 	std::vector<byte> buffer(4);
 	std::vector<byte> outBytes(Size);
 
-	for (ctr = 0; ctr < max; ctr++)
+	for (ctr = 0; ctr < max; ++ctr)
 	{
 		IntToOctet(buffer, ctr + 1);
 		Process(buffer, outBytes, ctr * _hashSize);
@@ -125,15 +125,15 @@ unsigned int PBKDF2::GenerateKey(std::vector<byte> &Output, unsigned int OutOffs
 	return Size;
 }
 
-void PBKDF2::IntToOctet(std::vector<byte> &Output, unsigned int Counter)
+void PBKDF2::IntToOctet(std::vector<byte> &Output, uint Counter)
 {
-	Output[0] = (byte)((unsigned int)Counter >> 24);
-	Output[1] = (byte)((unsigned int)Counter >> 16);
-	Output[2] = (byte)((unsigned int)Counter >> 8);
+	Output[0] = (byte)((uint)Counter >> 24);
+	Output[1] = (byte)((uint)Counter >> 16);
+	Output[2] = (byte)((uint)Counter >> 8);
 	Output[3] = (byte)Counter;
 }
 
-void PBKDF2::Process(std::vector<byte> Input, std::vector<byte> &Output, unsigned int OutOffset)
+void PBKDF2::Process(std::vector<byte> Input, std::vector<byte> &Output, size_t OutOffset)
 {
 	std::vector<byte> state(_hashSize);
 

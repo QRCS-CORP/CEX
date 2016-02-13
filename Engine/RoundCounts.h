@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// Rounds Count. Can be cast as round count integers, 
 /// i.e. (int ct = RoundCounts.R12) is equal to 12.
 /// </summary>
-enum class RoundCounts : unsigned int
+enum class RoundCounts : uint
 {
 	/// <summary>
 	/// 8 Rounds: ChaCha

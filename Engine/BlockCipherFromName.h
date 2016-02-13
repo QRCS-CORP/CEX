@@ -36,7 +36,7 @@ public:
 	/// <returns>An initialized block cipher</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static CEX::Cipher::Symmetric::Block::IBlockCipher* GetInstance(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine);
+	static CEX::Cipher::Symmetric::Block::IBlockCipher* GetInstance(CEX::Enumeration::BlockCiphers EngineType, uint BlockSize, uint RoundCount, CEX::Enumeration::Digests KdfEngine);
 };
 
 NAMESPACE_HELPEREND

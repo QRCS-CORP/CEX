@@ -28,7 +28,7 @@ void MemoryStream::Flush()
 	throw CryptoProcessingException("MemoryStream:Flush", "Not implemented in MemoryStream!");
 }
 
-int MemoryStream::Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count)
+size_t MemoryStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
 	if (Offset + Count > _streamData.size() - _streamPosition)
 		Count = _streamData.size() - _streamPosition;
@@ -50,6 +50,7 @@ byte MemoryStream::ReadByte()
 	byte data(1);
 	memcpy(&data, &_streamData[_streamPosition], 1);
 	_streamPosition += 1;
+
 	return data;
 }
 
@@ -60,7 +61,7 @@ void MemoryStream::Reset()
 	_streamPosition = 0;
 }
 
-void MemoryStream::Seek(unsigned int Offset, SeekOrigin Origin)
+void MemoryStream::Seek(size_t Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 		_streamPosition = Offset;
@@ -70,17 +71,17 @@ void MemoryStream::Seek(unsigned int Offset, SeekOrigin Origin)
 		_streamPosition += Offset;
 }
 
-void MemoryStream::SetLength(unsigned int Length)
+void MemoryStream::SetLength(size_t Length)
 {
 	_streamData.reserve(Length);
 }
 
-void MemoryStream::Write(const std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count)
+void MemoryStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
 	if (Offset + Count > Buffer.size())
 		throw CryptoProcessingException("MemoryStream:Write", "The output array is too short!");
 
-	unsigned int len = _streamPosition + Count;
+	size_t len = _streamPosition + Count;
 	if (_streamData.capacity() - _streamPosition < Count)
 		_streamData.reserve(len);
 	if (_streamData.size() < len)

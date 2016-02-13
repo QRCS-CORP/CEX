@@ -31,7 +31,7 @@ namespace Test
 		/// </summary>
 		///
 		/// <param name="Message">A custom message or error data</param>
-		TestException(const std::string &Message)
+		explicit TestException(const std::string &Message)
 			:
 			_message(Message)
 		{

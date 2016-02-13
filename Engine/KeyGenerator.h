@@ -48,9 +48,9 @@ NAMESPACE_COMMON
 class KeyGenerator
 {
 private:
-	static constexpr unsigned int DEFCTR_SIZE = 32;
+	static constexpr uint DEFCTR_SIZE = 32;
 
-	int _ctrLength;
+	uint _ctrLength;
 	std::vector<byte> _ctrVector;
 	CEX::Enumeration::Digests _dgtType;
 	CEX::Digest::IDigest* _hashEngine;
@@ -91,7 +91,7 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the counter is not <c>0</c>, or a value between <c>4</c> and <c>32</c></exception>
 	KeyGenerator(const CEX::Enumeration::SeedGenerators SeedType, const CEX::Enumeration::Digests DigestType, const std::vector<byte> &Counter)
 		:
-		_ctrLength(Counter.size()),
+		_ctrLength((uint)Counter.size()),
 		_ctrVector(Counter),
 		_dgtType(DigestType),
 		_isDestroyed(false),
@@ -126,7 +126,7 @@ public:
 	/// <param name="IKMSize">Size of IKM to generate in bytes</param>
 	/// 
 	/// <returns>A populated <see cref="CEX::Common::KeyParams"/> class</returns>
-	CEX::Common::KeyParams* GetKeyParams(const unsigned int KeySize, const unsigned int IVSize = 0, unsigned int IKMSize = 0);
+	CEX::Common::KeyParams* GetKeyParams(const uint KeySize, const uint IVSize = 0, uint IKMSize = 0);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
@@ -142,7 +142,7 @@ public:
 	/// <param name="Size">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	std::vector<byte> GetBytes(unsigned int Size);
+	std::vector<byte> GetBytes(uint Size);
 
 	/// <summary>
 	/// Reset the seed Seed Generators and the Digest engine
@@ -150,7 +150,7 @@ public:
 	void Reset();
 
 private:
-	std::vector<byte> Generate(unsigned int Size);
+	std::vector<byte> Generate(size_t Size);
 	std::vector<byte> GetBlock();
 	CEX::Digest::IDigest* GetDigestEngine(CEX::Enumeration::Digests DigsetType);
 	CEX::Seed::ISeed* GetSeedEngine(CEX::Enumeration::SeedGenerators SeedType);

@@ -15,7 +15,7 @@ void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		Decrypt32(Input, 0, Output, 0);
 }
 
-void RHX::DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (_blockSize == BLOCK16)
 		Decrypt16(Input, InOffset, Output, OutOffset);
@@ -56,7 +56,7 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		Encrypt32(Input, 0, Output, 0);
 }
 
-void RHX::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (_blockSize == BLOCK16)
 		Encrypt16(Input, InOffset, Output, OutOffset);
@@ -77,7 +77,7 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	if (key.size() > _legalKeySizes[3] && (key.size() - dgtsze) % dgtblk != 0)
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
 
-	for (unsigned int i = 0; i < _legalKeySizes.size(); ++i)
+	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
 	{
 		if (key.size() == _legalKeySizes[i])
 			break;
@@ -104,7 +104,7 @@ void RHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 		DecryptBlock(Input, Output);
 }
 
-void RHX::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (_isEncryption)
 		EncryptBlock(Input, InOffset, Output, OutOffset);
@@ -129,16 +129,16 @@ void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 	}
 
 	// block in 32 bit words
-	unsigned int blkWords = _blockSize / 4;
-	unsigned int expSize = blkWords * (_dfnRounds + 1);
+	size_t blkWords = _blockSize / 4;
+	size_t expSize = blkWords * (_dfnRounds + 1);
 
 	// inverse cipher
 	if (!Encryption)
 	{
 		// reverse key
-		for (unsigned int i = 0, k = expSize - blkWords; i < k; i += blkWords, k -= blkWords)
+		for (size_t i = 0, k = expSize - blkWords; i < k; i += blkWords, k -= blkWords)
 		{
-			for (unsigned int j = 0; j < blkWords; j++)
+			for (size_t j = 0; j < blkWords; j++)
 			{
 				uint temp = _expKey[i + j];
 				_expKey[i + j] = _expKey[k + j];
@@ -146,7 +146,7 @@ void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 			}
 		}
 		// sbox inversion
-		for (unsigned int i = blkWords; i < expSize - blkWords; i++)
+		for (size_t i = blkWords; i < expSize - blkWords; i++)
 		{
 			_expKey[i] = IT0[SBox[(_expKey[i] >> 24)]] ^
 				IT1[SBox[(byte)(_expKey[i] >> 16)]] ^
@@ -159,13 +159,13 @@ void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 void RHX::SecureExpand(const std::vector<byte> &Key)
 {
 	// block and key in 32 bit words
-	unsigned int blkWords = _blockSize / 4;
+	size_t blkWords = _blockSize / 4;
 	// expanded key size
-	unsigned int keySize = blkWords * (_dfnRounds + 1);
+	size_t keySize = blkWords * (_dfnRounds + 1);
 	// kdf return array
-	unsigned int keyBytes = keySize * 4;
+	size_t keyBytes = keySize * 4;
 	std::vector<byte> rawKey(keyBytes, 0);
-	unsigned int saltSize = Key.size() - _ikmSize;
+	size_t saltSize = Key.size() - _ikmSize;
 
 	// salt must be divisible of hash blocksize
 	if (saltSize % _kdfEngine->BlockSize() != 0)
@@ -193,8 +193,8 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 void RHX::StandardExpand(const std::vector<byte> &Key)
 {
 	// block and key in 32 bit words
-	unsigned int blkWords = _blockSize / 4;
-	unsigned int keyWords = (unsigned int)(Key.size() / 4);
+	size_t blkWords = _blockSize / 4;
+	size_t keyWords = (uint)(Key.size() / 4);
 
 	// rounds calculation
 	if (keyWords == 16)
@@ -207,12 +207,12 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_dfnRounds = 10;
 
 	// setup expanded key
-	unsigned int keySize = blkWords * (_dfnRounds + 1);
+	size_t keySize = blkWords * (_dfnRounds + 1);
 	_expKey.resize(keySize, 0);
 
 	int pos = -1;
 	// add bytes to beginning of working key array
-	for (unsigned int i = 0; i < keyWords; i++)
+	for (size_t i = 0; i < keyWords; i++)
 	{
 		uint value = (uint)(Key[++pos] << 24);
 		value |= (uint)(Key[++pos] << 16);
@@ -222,7 +222,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	}
 
 	// build the remaining round keys
-	for (unsigned int i = keyWords; i < keySize; i++)
+	for (size_t i = keyWords; i < keySize; i++)
 	{
 		uint temp = _expKey[i - 1];
 
@@ -265,10 +265,10 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 
 // *** Rounds Processing *** //
 
-void RHX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = _expKey.size() - 5;
-	unsigned int keyCtr = 0;
+	const size_t LRD = _expKey.size() - 5;
+	size_t keyCtr = 0;
 
 	// round 0
 	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
@@ -316,10 +316,10 @@ void RHX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	Output[OutOffset + 15] = (byte)(SBox[(byte)Y2] ^ (byte)_expKey[keyCtr]);
 }
 
-void RHX::Encrypt32(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::Encrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = _expKey.size() - 9;
-	unsigned int keyCtr = 0;
+	const size_t LRD = _expKey.size() - 9;
+	size_t keyCtr = 0;
 
 	// round 0
 	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
@@ -405,10 +405,10 @@ void RHX::Encrypt32(const std::vector<byte> &Input, const unsigned int InOffset,
 	Output[OutOffset + 31] = (byte)(SBox[(byte)Y3] ^ (byte)_expKey[keyCtr]);
 }
 
-void RHX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = _expKey.size() - 5;
-	unsigned int keyCtr = 0;
+	const size_t LRD = _expKey.size() - 5;
+	size_t keyCtr = 0;
 
 	// round 0
 	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];
@@ -458,10 +458,10 @@ void RHX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	Output[OutOffset + 15] = (byte)(ISBox[(byte)Y0] ^ (byte)_expKey[keyCtr]);
 }
 
-void RHX::Decrypt32(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void RHX::Decrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = _expKey.size() - 9;
-	unsigned int keyCtr = 0;
+	const size_t LRD = _expKey.size() - 9;
+	size_t keyCtr = 0;
 
 	// round 0
 	uint X0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset) ^ _expKey[keyCtr];

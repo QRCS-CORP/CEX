@@ -4,7 +4,7 @@
 
 NAMESPACE_HELPER
 
-CEX::Cipher::Symmetric::Stream::IStreamCipher* StreamCipherFromName::GetInstance(CEX::Enumeration::StreamCiphers EngineType, int RoundCount)
+CEX::Cipher::Symmetric::Stream::IStreamCipher* StreamCipherFromName::GetInstance(CEX::Enumeration::StreamCiphers EngineType, uint RoundCount)
 {
 	switch (EngineType)
 	{

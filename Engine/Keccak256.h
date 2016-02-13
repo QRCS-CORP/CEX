@@ -74,10 +74,10 @@ NAMESPACE_DIGEST
 class Keccak256 : public IDigest
 {
 private:
-	unsigned int _blockSize;
+	size_t _blockSize;
 	std::vector<byte> _buffer;
-	unsigned int _bufferIndex;
-	unsigned int _digestSize;
+	size_t _bufferIndex;
+	size_t _digestSize;
 	bool _isDestroyed;
 	std::vector<ulong> _state;
 
@@ -88,12 +88,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual unsigned int BlockSize() { return _blockSize; }
+	virtual size_t BlockSize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual unsigned int DigestSize() { return _digestSize; }
+	virtual size_t DigestSize() { return _digestSize; }
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -112,7 +112,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="DigestSize">Digest return size in bits</param>
-	Keccak256(int DigestSize = 256)
+	explicit Keccak256(int DigestSize = 256)
 		:
 		_isDestroyed(false),
 		_blockSize(0),
@@ -153,7 +153,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Hash value
@@ -178,7 +178,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Reset the internal state

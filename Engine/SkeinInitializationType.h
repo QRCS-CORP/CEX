@@ -4,7 +4,7 @@
 /// <summary>
 /// Specifies the Skein initialization type
 /// </summary>
-enum class SkeinInitializationType : unsigned int
+enum class SkeinInitializationType : uint
 {
 	/// <summary>
 	/// Identical to the standard Skein initialization.

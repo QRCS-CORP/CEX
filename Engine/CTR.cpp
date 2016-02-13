@@ -34,15 +34,15 @@ void CTR::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 	ProcessBlock(Input, Output);
 }
 
-void CTR::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	ProcessBlock(Input, InOffset, Output, OutOffset);
 }
 
-void CTR::Generate(const unsigned int Length, std::vector<byte> &Counter, std::vector<byte> &Output, const unsigned int OutOffset)
+void CTR::Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
-	unsigned int aln = Length - (Length % _blockSize);
-	unsigned int ctr = 0;
+	size_t aln = Length - (Length % _blockSize);
+	size_t ctr = 0;
 
 	while (ctr != aln)
 	{
@@ -55,7 +55,7 @@ void CTR::Generate(const unsigned int Length, std::vector<byte> &Counter, std::v
 	{
 		std::vector<byte> outputBlock(_blockSize, 0);
 		_blockCipher->EncryptBlock(Counter, outputBlock);
-		unsigned int fnlSize = Length % _blockSize;
+		size_t fnlSize = Length % _blockSize;
 		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
 	}
@@ -68,7 +68,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		// generate random
 		Generate(Output.size(), _ctrVector, Output, 0);
 		// output is input xor with random
-		unsigned int sze = Output.size() - (Output.size() % _blockCipher->BlockSize());
+		size_t sze = Output.size() - (Output.size() % _blockCipher->BlockSize());
 
 		if (sze != 0)
 			CEX::Utility::IntUtils::XORBLK(Input, 0, Output, 0, sze);
@@ -76,20 +76,20 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		// get the remaining bytes
 		if (sze != Output.size())
 		{
-			for (unsigned int i = sze; i < Output.size(); ++i)
+			for (size_t i = sze; i < Output.size(); ++i)
 				Output[i] ^= Input[i];
 		}
 	}
 	else
 	{
 		// parallel CTR processing //
-		const unsigned int cnkSize = (Output.size() / _blockSize / _processorCount) * _blockSize;
-		const unsigned int rndSize = cnkSize * _processorCount;
-		const unsigned int subSize = (cnkSize / _blockSize);
+		const size_t cnkSize = (Output.size() / _blockSize / _processorCount) * _blockSize;
+		const size_t rndSize = cnkSize * _processorCount;
+		const size_t subSize = (cnkSize / _blockSize);
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](size_t i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -103,10 +103,10 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		// last block processing
 		if (rndSize < Output.size())
 		{
-			unsigned int fnlSize = Output.size() % rndSize;
+			size_t fnlSize = Output.size() % rndSize;
 			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, rndSize);
 
-			for (unsigned int i = rndSize; i < Output.size(); i++)
+			for (size_t i = rndSize; i < Output.size(); i++)
 				Output[i] ^= Input[i];
 		}
 
@@ -115,9 +115,9 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	}
 }
 
-void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset)
+void CTR::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	unsigned int outSize = _isParallel ? (Output.size() - OutOffset) : _blockCipher->BlockSize();
+	size_t outSize = _isParallel ? (Output.size() - OutOffset) : _blockCipher->BlockSize();
 
 	// process either a partial parallel or linear block
 	if (outSize < _parallelBlockSize)
@@ -125,7 +125,7 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, st
 		// generate random
 		Generate(outSize, _ctrVector, Output, OutOffset);
 		// process block aligned
-		unsigned int sze = outSize - (outSize % _blockCipher->BlockSize());
+		size_t sze = outSize - (outSize % _blockCipher->BlockSize());
 
 		if (sze != 0)
 			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
@@ -133,20 +133,20 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, st
 		// get the remaining bytes
 		if (sze != outSize)
 		{
-			for (unsigned int i = sze; i < outSize; ++i)
+			for (size_t i = sze; i < outSize; ++i)
 				Output[i + OutOffset] ^= Input[i + InOffset];
 		}
 	}
 	else
 	{
 		// parallel CTR processing //
-		const unsigned int cnkSize = _parallelBlockSize / _processorCount;
-		const unsigned int rndSize = cnkSize * _processorCount;
-		const unsigned int subSize = (cnkSize / _blockSize);
+		const size_t cnkSize = _parallelBlockSize / _processorCount;
+		const size_t rndSize = cnkSize * _processorCount;
+		const size_t subSize = (cnkSize / _blockSize);
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
 		{
 			std::vector<byte> &thdVec = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -164,25 +164,25 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, unsigned int InOffset, st
 
 void CTR::Increment(std::vector<byte> &Counter)
 {
-	int i = Counter.size();
+	size_t i = Counter.size();
 	while (--i >= 0 && ++Counter[i] == 0) {}
 }
 
-void CTR::Increase(const std::vector<byte> &Counter, const unsigned int Size, std::vector<byte> &Buffer)
+void CTR::Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer)
 {
 	if (Buffer.size() != Counter.size())
 		Buffer.resize(Counter.size(), 0);
 
-	int carry = 0;
-	int offset = Buffer.size() - 1;
-	const int cntSize = sizeof(Size);
+	size_t carry = 0;
+	size_t offset = Buffer.size() - 1;
+	const long cntSize = sizeof(Size);
 	std::vector<byte> cnt(cntSize, 0);
 	memcpy(&cnt[0], &Size, cntSize);
-	byte osrc, odst, ndst;
 	memcpy(&Buffer[0], &Counter[0], Counter.size());
 
-	for (unsigned int i = offset; i > 0; i--)
+	for (size_t i = offset; i > 0; i--)
 	{
+		byte osrc, odst, ndst;
 		odst = Buffer[i];
 		osrc = offset - i < cnt.size() ? cnt[offset - i] : (byte)0;
 		ndst = (byte)(odst + osrc + carry);

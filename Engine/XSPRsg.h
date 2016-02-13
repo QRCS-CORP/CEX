@@ -39,7 +39,7 @@ private:
 
 	bool _isDestroyed;
 	bool _isShift1024;
-	unsigned int _stateOffset;
+	size_t _stateOffset;
 	std::vector<ulong> _stateSeed;
 	std::vector<ulong> _wrkBuffer;
 	std::vector<ulong> JMP128;
@@ -71,7 +71,7 @@ public:
 		_stateSeed(MAXSEED),
 		_wrkBuffer(MAXSEED)
 	{
-		unsigned int len = MAXSEED * sizeof(ulong);
+		size_t len = MAXSEED * sizeof(ulong);
 		GetSeed(len);
 		_isShift1024 = true;
 
@@ -94,7 +94,7 @@ public:
 	/// <param name="Seed">The initial state values; can be either 2, or 16, 64bit values</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if an invalid seed size is used</exception>
-	XSPRsg(const std::vector<ulong> &Seed)
+	explicit XSPRsg(const std::vector<ulong> &Seed)
 		:
 		_isDestroyed(false),
 		_isShift1024(false),
@@ -105,13 +105,13 @@ public:
 		if (Seed.size() != 2 && Seed.size() != 16)
 			throw CryptoRandomException("XSPRsg:CTor", "The seed array length must be either 2 or 16 long values!");
 
-		for (unsigned int i = 0; i < Seed.size(); ++i)
+		for (size_t i = 0; i < Seed.size(); ++i)
 		{
 			if (Seed[i] == 0)
 				throw CryptoRandomException("XSPRsg:CTor", "Seed values can not be zero!");
 		}
 
-		unsigned int len = Seed.size() * sizeof(ulong);
+		size_t len = Seed.size() * sizeof(ulong);
 		memcpy(&_stateSeed[0], &Seed[0], len);
 		_isShift1024 = (Seed.size() == 16);
 
@@ -157,7 +157,7 @@ public:
 	/// <param name="Size">The size of the expected seed returned</param>
 	/// 
 	/// <returns>A pseudo random seed</returns>
-	virtual std::vector<byte> GetBytes(int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// Increment the state by 64 blocks; used with the 128 and 1024 implementations
@@ -188,8 +188,8 @@ public:
 private:
 	void Jump128();
 	void Jump1024();
-	void Generate(std::vector<byte> &Output, unsigned int Size);
-	void GetSeed(unsigned int Size);
+	void Generate(std::vector<byte> &Output, size_t Size);
+	void GetSeed(size_t Size);
 	ulong Shift128();
 	ulong Shift1024();
 };

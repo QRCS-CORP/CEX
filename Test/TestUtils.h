@@ -142,7 +142,7 @@ namespace Test
 
 		static std::vector<byte> Reduce(std::vector<byte> Seed)
 		{
-			unsigned int len = Seed.size() / 2;
+			unsigned int len = (unsigned int)(Seed.size() / 2);
 			std::vector<byte> data(len);
 
 			for (unsigned int i = 0; i < len; i++)

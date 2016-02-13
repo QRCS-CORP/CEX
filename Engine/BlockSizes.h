@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <para>Block cipher sizes in bits. Can be cast as Block byte size integers, 
 /// i.e. (int sz = BlockSizes.B512) is equal to 64.</para>
 /// </summary>
-enum class BlockSizes : unsigned int
+enum class BlockSizes : uint
 {
 	/// <summary>
 	/// 128 bit block size

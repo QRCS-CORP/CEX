@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Message">A custom message or error data</param>
-	CryptoDigestException(const std::string &Message) 
+	explicit CryptoDigestException(const std::string &Message) 
 		: 
 		_message(Message)
 	{

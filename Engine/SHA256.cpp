@@ -4,7 +4,7 @@
 
 NAMESPACE_DIGEST
 
-void SHA256::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void SHA256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("SHA256:BlockUpdate", "The Input buffer is too short!");
@@ -58,7 +58,7 @@ void SHA256::Destroy()
 	}
 }
 
-unsigned int SHA256::DoFinal(std::vector<byte> &Output, const unsigned int OutOffset)
+size_t SHA256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DigestSize())
 		throw CryptoDigestException("SHA256:DoFinal", "The Output buffer is too short!");
@@ -421,7 +421,7 @@ void SHA256::ProcessLength(ulong BitLength)
 	_wordBuffer[15] = (uint)((uint64_t)BitLength);
 }
 
-void SHA256::ProcessWord(const std::vector<byte> &Input, unsigned int Offset)
+void SHA256::ProcessWord(const std::vector<byte> &Input, size_t Offset)
 {
 	_wordBuffer[_wordOffset] = CEX::Utility::IntUtils::BytesToBe32(Input, Offset);
 

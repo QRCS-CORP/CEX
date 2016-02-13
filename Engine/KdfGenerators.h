@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Random Generator Digest KDFs
 /// </summary>
-enum class KdfGenerators : unsigned int
+enum class KdfGenerators : uint
 {
 	/// <summary>
 	/// A Block Cipher CTR generator

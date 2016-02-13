@@ -47,7 +47,7 @@ void DGCPrng::Destroy()
 /// <param name="Size">Size of requested byte array</param>
 /// 
 /// <returns>Random byte array</returns>
-std::vector<byte> DGCPrng::GetBytes(unsigned int Size)
+std::vector<byte> DGCPrng::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
@@ -66,12 +66,12 @@ void DGCPrng::GetBytes(std::vector<byte> &Output)
 
 	if (_byteBuffer.size() - _bufferIndex < Output.size())
 	{
-		unsigned int bufSize = _byteBuffer.size() - _bufferIndex;
+		size_t bufSize = _byteBuffer.size() - _bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
 			memcpy(&Output[0], &_byteBuffer[_bufferIndex], bufSize);
 
-		unsigned int rem = Output.size() - bufSize;
+		size_t rem = Output.size() - bufSize;
 
 		while (rem > 0)
 		{
@@ -104,7 +104,7 @@ void DGCPrng::GetBytes(std::vector<byte> &Output)
 /// </summary>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int DGCPrng::Next()
+uint DGCPrng::Next()
 {
 	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
 }
@@ -116,10 +116,10 @@ unsigned int DGCPrng::Next()
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int DGCPrng::Next(unsigned int Maximum)
+uint DGCPrng::Next(uint Maximum)
 {
 	std::vector<byte> rand;
-	unsigned int num(0);
+	uint num(0);
 
 	do
 	{
@@ -139,9 +139,9 @@ unsigned int DGCPrng::Next(unsigned int Maximum)
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int DGCPrng::Next(unsigned int Minimum, unsigned int Maximum)
+uint DGCPrng::Next(uint Minimum, uint Maximum)
 {
-	unsigned int num = 0;
+	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
@@ -225,7 +225,7 @@ void DGCPrng::Reset()
 	else
 	{
 		_seedGenerator = GetSeedGenerator(_seedType);
-		int len = (_digestEngine->BlockSize() * 2) + 8;
+		size_t len = (_digestEngine->BlockSize() * 2) + 8;
 		std::vector<byte> seed(len);
 		_seedGenerator->GetBytes(seed);
 		_rngGenerator->Initialize(seed);   // 2 * block + counter (2*bsz+8)
@@ -241,7 +241,7 @@ std::vector<byte> DGCPrng::GetBits(std::vector<byte> Data, ulong Maximum)
 {
 	ulong val = 0;
 	memcpy(&val, &Data[0], Data.size());
-	int bits = Data.size() * 8;
+	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
 	{
@@ -284,7 +284,7 @@ CEX::Digest::IDigest* DGCPrng::GetInstance(CEX::Enumeration::Digests RngEngine)
 	return CEX::Helper::DigestFromName::GetInstance(RngEngine);
 }
 
-unsigned int DGCPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
+uint DGCPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
 {
 	int ctrLen = 8;
 

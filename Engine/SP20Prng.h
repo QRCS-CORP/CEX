@@ -62,13 +62,13 @@ NAMESPACE_PRNG
 class SP20Prng : public IRandom
 {
 private:
-	static constexpr unsigned int BUFFER_SIZE = 4096;
+	static constexpr size_t BUFFER_SIZE = 4096;
 
-	unsigned int _bufferIndex;
-	unsigned int _bufferSize = 0;
+	size_t _bufferIndex;
+	size_t _bufferSize = 0;
 	std::vector<byte>  _byteBuffer;
-	unsigned int _dfnRounds;
-	unsigned int _keySize = 0;
+	size_t _dfnRounds;
+	size_t _keySize = 0;
 	bool _isDestroyed;
 	CEX::Generator::SP20Drbg* _rngGenerator;
 	CEX::Seed::ISeed* _seedGenerator;
@@ -101,7 +101,7 @@ public:
 	/// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range (rounds 10-30, min. buffer 64 bytes)</exception>
-	SP20Prng(CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, unsigned int BufferSize = BUFFER_SIZE, unsigned int KeySize = 40, unsigned int Rounds = 20)
+	SP20Prng(CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 40, size_t Rounds = 20)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -130,7 +130,7 @@ public:
 	/// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range</exception>
-	SP20Prng(std::vector<byte> Seed, unsigned int BufferSize = BUFFER_SIZE, unsigned int Rounds = 20)
+	SP20Prng(std::vector<byte> Seed, size_t BufferSize = BUFFER_SIZE, size_t Rounds = 20)
 		:
 		_bufferIndex(0),
 		_bufferSize(BufferSize),
@@ -172,7 +172,7 @@ public:
 	/// <param name="Size">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	virtual std::vector<byte> GetBytes(unsigned int Size);
+	virtual std::vector<byte> GetBytes(size_t Size);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
@@ -186,7 +186,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Get an pseudo random unsigned 32bit integer
@@ -195,7 +195,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Maximum);
+	virtual uint Next(uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -205,7 +205,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual unsigned int Next(unsigned int Minimum, unsigned int Maximum);
+	virtual uint Next(uint Minimum, uint Maximum);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer

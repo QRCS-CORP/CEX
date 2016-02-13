@@ -64,11 +64,11 @@ NAMESPACE_GENERATOR
 class KDF2Drbg : public IGenerator
 {
 private:
-	unsigned int _hashSize;
+	size_t _hashSize;
 	bool _isDestroyed;
 	bool _isInitialized;
 	std::vector<byte> _IV;
-	unsigned int _blockSize;
+	size_t _blockSize;
 	CEX::Digest::IDigest* _msgDigest;
 	std::vector<byte> _Salt;
 
@@ -95,7 +95,7 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() { return _blockSize; }
+	virtual size_t KeySize() { return _blockSize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -111,7 +111,7 @@ public:
 	/// <param name="Digest">The digest used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	KDF2Drbg(CEX::Digest::IDigest* Digest)
+	explicit KDF2Drbg(CEX::Digest::IDigest* Digest)
 		:
 		_blockSize(Digest->BlockSize()),
 		_hashSize(Digest->DigestSize()),
@@ -147,7 +147,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output);
+	virtual size_t Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -160,7 +160,7 @@ public:
 	/// <returns>Number of bytes generated</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the output buffer is too small</exception>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
 	/// Initialize the generator
@@ -198,7 +198,7 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
-	unsigned int GenerateKey(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	size_t GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 };
 
 NAMESPACE_GENERATOREND

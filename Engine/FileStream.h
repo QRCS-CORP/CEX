@@ -35,12 +35,12 @@ public:
 	};
 
 private:
-	static constexpr unsigned int BLOCK_SIZE = 4096;
+	static constexpr uint BLOCK_SIZE = 4096;
 
 	bool _isDestroyed;
 	const char* _filename;
-	unsigned int _filePosition;
-	unsigned int _fileSize;
+	size_t _filePosition;
+	size_t _fileSize;
 	std::fstream _fileStream;
 	FileAccess _fileAccess;
 	FileMode _fileMode;
@@ -69,12 +69,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const unsigned int Length() { return _fileSize; }
+	virtual const size_t Length() { return _fileSize; }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const unsigned int Position() { return _filePosition; }
+	virtual const size_t Position() { return _filePosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
@@ -90,7 +90,7 @@ public:
 	/// <param name="FileName">The full path to the file</param>
 	/// <param name="Access">The level of access requested</param>
 	/// <param name="Mode">The file processing mode</param>
-	FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileMode Mode = FileMode::Binary)
+	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileMode Mode = FileMode::Binary)
 		:
 		_fileAccess(Access),
 		_fileMode(Mode),
@@ -104,7 +104,7 @@ public:
 		if (Access == FileAccess::Read && !FileExists(_filename))
 			throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
 
-		_fileSize = (unsigned int)FileSize(_filename);
+		_fileSize = (size_t)FileSize(_filename);
 
 		try
 		{
@@ -160,7 +160,7 @@ public:
 	/// <param name="Count">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual int Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count);
+	virtual size_t Read(std::vector<byte> &Buffer, size_t Offset, size_t Count);
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -182,7 +182,7 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(unsigned int Offset, SeekOrigin Origin);
+	virtual void Seek(size_t Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
@@ -191,7 +191,7 @@ public:
 	/// <param name="Length">The desired length</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void SetLength(unsigned int Length);
+	virtual void SetLength(size_t Length);
 
 	/// <summary>
 	/// Writes a buffer into the stream
@@ -204,7 +204,7 @@ public:
 	/// <returns>The number of bytes processed</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void Write(const std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count);
+	virtual void Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count);
 
 	/// <summary>
 	/// Write a single byte from the stream

@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Stream Ciphers
 /// </summary>
-enum class StreamCiphers : unsigned int
+enum class StreamCiphers : uint
 {
 	/// <summary>
 	/// An implementation of the ChaCha Stream Cipher

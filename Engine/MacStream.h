@@ -68,14 +68,14 @@ NAMESPACE_PROCESSING
 class MacStream
 {
 private:
-	static constexpr unsigned int BUFFER_SIZE = 64 * 1024;
+	static constexpr size_t BUFFER_SIZE = 64 * 1024;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	bool _destroyEngine;
 	CEX::IO::IByteStream* _inStream;
 	bool _isDestroyed = false;
 	CEX::Mac::IMac* _macEngine;
-	long _progressInterval;
+	size_t _progressInterval;
 
 	MacStream() { }
 
@@ -93,10 +93,11 @@ public:
 	/// <param name="Mac">The initialized <see cref="CEX::Mac::IMac"/> instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
-	MacStream(CEX::Mac::IMac* Mac)
+	explicit MacStream(CEX::Mac::IMac* Mac)
 		:
 		_blockSize(Mac->BlockSize()),
 		_destroyEngine(false),
+		_inStream(0),
 		_isDestroyed(false),
 		_macEngine(Mac),
 		_progressInterval(0)
@@ -134,13 +135,13 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> ComputeMac(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	std::vector<byte> ComputeMac(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
-	void CalculateInterval(unsigned int Length);
-	void CalculateProgress(unsigned int Length, bool Completed = false);
-	std::vector<byte> Compute(unsigned int Length);
-	std::vector<byte> Compute(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	void CalculateInterval(size_t Length);
+	void CalculateProgress(size_t Length, bool Completed = false);
+	std::vector<byte> Compute(size_t Length);
+	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Destroy();
 };
 

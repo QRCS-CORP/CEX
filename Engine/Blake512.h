@@ -74,14 +74,14 @@ NAMESPACE_DIGEST
 class Blake512 : public IDigest
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 64;
-	static constexpr unsigned int DIGEST_SIZE = 64;
-	static constexpr unsigned int PAD_LENGTH = 111;
-	static constexpr unsigned int ROUNDS = 16;
+	static constexpr size_t BLOCK_SIZE = 64;
+	static constexpr size_t DIGEST_SIZE = 64;
+	static constexpr size_t PAD_LENGTH = 111;
+	static constexpr size_t ROUNDS = 16;
 	static constexpr ulong TN_888 = 888;
 	static constexpr ulong TN_1024 = 1024;
 
-	unsigned int _dataLen = 0;
+	size_t _dataLen = 0;
 	std::vector<byte> _digestState;
 	std::vector<ulong> _HashVal;
 	bool _isDestroyed;
@@ -99,12 +99,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual unsigned int BlockSize() { return BLOCK_SIZE; }
+	virtual size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual unsigned int DigestSize() { return DIGEST_SIZE; }
+	virtual size_t DigestSize() { return DIGEST_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -142,7 +142,7 @@ public:
 	/// <param name="Salt">The optional salt value; must be 4 unsigned longs in length</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the salt length is invalid</exception>
-	Blake512(std::vector<ulong> Salt)
+	explicit Blake512(std::vector<ulong> Salt)
 		:
 		_HashVal(8, 0),
 		_salt64(4, 0),
@@ -155,7 +155,7 @@ public:
 		if (Salt.size() != 4)
 			throw CryptoDigestException("Blake512:Ctor", "The Salt array length must be 4!");
 
-		for (unsigned int i = 0; i < Salt.size(); i++)
+		for (size_t i = 0; i < Salt.size(); i++)
 			_salt64[i] = Salt[i];
 
 		_Padding[0] = 0x80;
@@ -181,7 +181,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Hash value
@@ -206,7 +206,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Reset the internal state
@@ -221,9 +221,9 @@ public:
 	void Update(byte Input);
 
 private:
-	void Compress64(const std::vector<byte> &pbBlock, unsigned int Offset);
-	void G64(unsigned int A, unsigned int B, unsigned int C, unsigned int D, unsigned int R, unsigned int I);
-	void G64BLK(unsigned int Index);
+	void Compress64(const std::vector<byte> &pbBlock, size_t Offset);
+	void G64(uint A, uint B, uint C, uint D, uint R, uint I);
+	void G64BLK(uint Index);
 	void Initialize();
 };
 

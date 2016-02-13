@@ -19,12 +19,12 @@ NAMESPACE_PRCSTRUCT
 struct MessageHeader
 {
 private:
-	static constexpr unsigned int KEYID_SIZE = 16;
-	static constexpr unsigned int EXTKEY_SIZE = 16;
-	static constexpr unsigned int SIZE_BASEHEADER = 32;
-	static constexpr unsigned int SEEKTO_ID = 0;
-	static constexpr unsigned int SEEKTO_EXT = 16;
-	static constexpr unsigned int SEEKTO_HASH = 32;
+	static constexpr uint KEYID_SIZE = 16;
+	static constexpr uint EXTKEY_SIZE = 16;
+	static constexpr uint SIZE_BASEHEADER = 32;
+	static constexpr uint SEEKTO_ID = 0;
+	static constexpr uint SEEKTO_EXT = 16;
+	static constexpr uint SEEKTO_HASH = 32;
 
 	std::vector<byte> _keyID;
 	std::vector<byte> _extKey;
@@ -80,7 +80,7 @@ public:
 	/// <param name="MacLength">Length in bytes of the Message Authentication Code; must align to MacLength property in <see cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Structure.PackageKey"/></param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if the DataStream is too small</exception>
-	MessageHeader(CEX::IO::MemoryStream &HeaderStream, unsigned int MacLength = 0)
+	MessageHeader(CEX::IO::MemoryStream &HeaderStream, uint MacLength = 0)
 		:
 		_keyID(0),
 		_extKey(0),
@@ -101,13 +101,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="HeaderArray">The byte array containing the MessageHeader</param>
-	MessageHeader(std::vector<byte> &HeaderArray)
+	explicit MessageHeader(std::vector<byte> &HeaderArray)
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(HeaderArray);
 		CEX::IO::StreamReader reader(ms);
 		_keyID = reader.ReadBytes(KEYID_SIZE);
 		_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		unsigned int len = reader.Length() - reader.Position();
+		size_t len = (reader.Length() - reader.Position());
 		if (len > 0)
 			_msgMac = reader.ReadBytes(len);
 	}
@@ -160,7 +160,7 @@ public:
 	/// <summary>
 	/// Get the size of a MessageHeader
 	/// </summary>
-	static unsigned int GetHeaderSize() { return SIZE_BASEHEADER; }
+	static uint GetHeaderSize() { return SIZE_BASEHEADER; }
 
 	/// <summary>
 	/// Get decrypted file extension
@@ -175,7 +175,7 @@ public:
 		std::vector<byte> data(Extension.size());
 		memcpy(&data[0], &Extension[0], Extension.size());
 		// xor the buffer and hash
-		for (unsigned int i = 0; i < Extension.size(); i++)
+		for (size_t i = 0; i < Extension.size(); i++)
 			data[i] ^= Key[i];
 
 		std::string letters(data.begin(), data.end());
@@ -203,7 +203,7 @@ public:
 		memcpy(&data[0], Extension.data(), Extension.length());
 
 		// xor the buffer and hash
-		for (unsigned int i = 0; i < data.size(); ++i)
+		for (size_t i = 0; i < data.size(); ++i)
 			data[i] ^= Key[i];
 
 		return data;
@@ -308,18 +308,18 @@ public:
 		int result = 1;
 		if (_keyID.size() != 0)
 		{
-			for (unsigned int i = 0; i < _keyID.size(); i++)
-				result += (int)(31 * _keyID[i]);
+			for (size_t i = 0; i < _keyID.size(); i++)
+				result += (31 * _keyID[i]);
 		}
 		if (_extKey.size() != 0)
 		{
-			for (unsigned int i = 0; i < _extKey.size(); i++)
-				result += (int)(31 * _extKey[i]);
+			for (size_t i = 0; i < _extKey.size(); i++)
+				result += (31 * _extKey[i]);
 		}
 		if (_msgMac.size() != 0)
 		{
-			for (unsigned int i = 0; i < _msgMac.size(); ++i)
-				result += (int)(31 * _msgMac[i]);
+			for (size_t i = 0; i < _msgMac.size(); ++i)
+				result += (31 * _msgMac[i]);
 		}
 
 		return result;

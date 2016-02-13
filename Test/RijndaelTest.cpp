@@ -30,7 +30,7 @@ namespace Test
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		std::vector<byte> outBytes2(Input.size(), 0);
-		CEX::Cipher::Symmetric::Block::RHX engine(Input.size());
+		CEX::Cipher::Symmetric::Block::RHX engine((unsigned int)Input.size());
 		CEX::Common::KeyParams k(Key);
 
 		engine.Initialize(true, k);

@@ -20,10 +20,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>A char value</returns>
-	static char ToChar(const std::vector<byte> &Input, const unsigned int InOffset)
+	static char ToChar(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		char d = 0;
-		int sze = sizeof(char);
+		size_t sze = sizeof(char);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -36,10 +36,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>An unsigned char value</returns>
-	static unsigned char ToUChar(const std::vector<byte> &Input, const unsigned int InOffset)
+	static unsigned char ToUChar(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		unsigned char d = 0;
-		int sze = sizeof(unsigned char);
+		size_t sze = sizeof(unsigned char);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -52,10 +52,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>A double value</returns>
-	static double ToDouble(const std::vector<byte> &Input, const unsigned int InOffset)
+	static double ToDouble(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		double d = 0;
-		int sze = sizeof(double);
+		size_t sze = sizeof(double);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -68,10 +68,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>A float value</returns>
-	static float ToFloat(const std::vector<byte> &Input, const unsigned int InOffset)
+	static float ToFloat(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		float d = 0;
-		int sze = sizeof(float);
+		size_t sze = sizeof(float);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -84,10 +84,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>A 16 bit integer value</returns>
-	static short ToInt16(const std::vector<byte> &Input, const unsigned int InOffset)
+	static short ToInt16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		short d = 0;
-		int sze = sizeof(short);
+		size_t sze = sizeof(short);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -100,10 +100,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>An unsigned 16 bit integer value</returns>
-	static unsigned short ToUInt16(const std::vector<byte> &Input, const unsigned int InOffset)
+	static ushort ToUInt16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		unsigned short d = 0;
-		int sze = sizeof(unsigned short);
+		size_t sze = sizeof(unsigned short);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -116,10 +116,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>A 32 bit integer value</returns>
-	static int ToInt32(const std::vector<byte> &Input, const unsigned int InOffset)
+	static int ToInt32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		int d = 0;
-		int sze = sizeof(int);
+		size_t sze = sizeof(int);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -132,10 +132,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>An unsigned 32 bit integer value</returns>
-	static unsigned int ToUInt32(const std::vector<byte> &Input, const unsigned int InOffset)
+	static uint ToUInt32(const std::vector<byte> &Input, const uint InOffset)
 	{
-		unsigned int d = 0;
-		int sze = sizeof(unsigned int);
+		uint d = 0;
+		size_t sze = sizeof(uint);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -148,10 +148,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>A 64 bit integer value</returns>
-	static long ToInt64(const std::vector<byte> &Input, const unsigned int InOffset)
+	static long ToInt64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		long d = 0;
-		int sze = sizeof(long);
+		size_t sze = sizeof(long);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}
@@ -164,10 +164,10 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>An unsigned 64 bit integer value</returns>
-	static ulong ToUInt64(const std::vector<byte> &Input, const unsigned int InOffset)
+	static ulong ToUInt64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		ulong d = 0;
-		int sze = sizeof(ulong);
+		size_t sze = sizeof(ulong);
 		memcpy(&d, &Input[InOffset], sze);
 		return d;
 	}

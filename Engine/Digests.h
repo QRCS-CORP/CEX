@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Message Digests
 /// </summary>
-enum class Digests : unsigned int
+enum class Digests : uint
 {
 	/// <summary>
 	/// The Blake digest with a 256 bit return size

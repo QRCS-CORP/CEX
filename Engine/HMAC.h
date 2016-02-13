@@ -76,9 +76,9 @@ private:
 	static constexpr byte IPAD = 0x36;
 	static constexpr byte OPAD = 0x5C;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	bool _isDestroyed;
-	unsigned int _digestSize;
+	size_t _digestSize;
 	bool _isInitialized;
 	std::vector<byte> _inputPad;
 	CEX::Digest::IDigest *_msgDigest;
@@ -91,7 +91,7 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual const unsigned int BlockSize() { return _msgDigest->BlockSize(); }
+	virtual const size_t BlockSize() { return _msgDigest->BlockSize(); }
 
 	/// <summary>
 	/// Get: The macs type name
@@ -101,7 +101,7 @@ public:
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const unsigned int MacSize() { return _msgDigest->DigestSize(); }
+	virtual const size_t MacSize() { return _msgDigest->DigestSize(); }
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
@@ -122,12 +122,13 @@ public:
 	/// <param name="Digest">Message Digest instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if a null digest is used</exception>
-	HMAC(CEX::Digest::IDigest *Digest)
+	explicit HMAC(CEX::Digest::IDigest *Digest)
 		:
-		_msgDigest(Digest),
 		_blockSize(Digest->BlockSize()),
 		_digestSize(Digest->DigestSize()),
 		_inputPad(Digest->BlockSize(), 0),
+		_isDestroyed(false),
+		_msgDigest(Digest),
 		_outputPad(Digest->BlockSize(), 0),
 		_isInitialized(false)
 	{
@@ -152,7 +153,7 @@ public:
 	/// <param name="Input">Hash input data</param>
 	/// <param name="InOffset">Starting position with the Input array</param>
 	/// <param name="Length">Length of data to process</param>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Hash value
@@ -175,7 +176,7 @@ public:
 	/// <param name="OutOffset">Offset within Output array</param>
 	/// 
 	/// <returns>The number of bytes processed</returns>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the HMAC generator
@@ -184,7 +185,7 @@ public:
 	/// 
 	/// <param name="MacKey">A byte array containing the primary Key</param>
 	/// <param name="IV">A byte array containing a secondary Initialization Vector</param>
-	virtual void Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV = std::vector<byte>());
+	virtual void Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV = std::vector<byte>(0));
 
 	/// <summary>
 	/// Reset and initialize the underlying digest
@@ -201,7 +202,7 @@ public:
 private:
 	inline void XOr(std::vector<byte> &A, byte N)
 	{
-		for (unsigned int i = 0; i < A.size(); ++i)
+		for (size_t i = 0; i < A.size(); ++i)
 			A[i] ^= N;
 	}
 };

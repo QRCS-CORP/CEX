@@ -15,13 +15,13 @@ void KDF2Drbg::Destroy()
 	}
 }
 
-unsigned int KDF2Drbg::Generate(std::vector<byte> &Output)
+size_t KDF2Drbg::Generate(std::vector<byte> &Output)
 {
 	GenerateKey(Output, 0, Output.size());
 	return Output.size();
 }
 
-unsigned int KDF2Drbg::Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t KDF2Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("KDF2Drbg:Generate", "Output buffer too small!");
@@ -44,7 +44,6 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Salt)
 	}
 	else
 	{
-		std::vector<byte> keyBytes(_hashSize);
 		_Salt.resize(Salt.size() - _hashSize);
 		_IV.resize(_blockSize);
 		memcpy(&_Salt[0], &Salt[0], Salt.size() - _hashSize);
@@ -104,14 +103,14 @@ void KDF2Drbg::Update(const std::vector<byte> &Salt)
 
 // *** Protected *** //
 
-unsigned int KDF2Drbg::GenerateKey(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t KDF2Drbg::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-	unsigned int maxCtr = (int)((Size + _hashSize - 1) / _hashSize);
+	size_t maxCtr = (size_t)((Size + _hashSize - 1) / _hashSize);
 	// only difference between v1 & v2; starts at 0 or 1
-	unsigned int counter = 1;
+	uint counter = 1;
 	std::vector<byte> hash(_hashSize);
 
-	for (unsigned int i = 0; i < maxCtr; i++)
+	for (size_t i = 0; i < maxCtr; i++)
 	{
 		_msgDigest->BlockUpdate(_Salt, 0, _Salt.size());
 		_msgDigest->Update((byte)(counter >> 24));

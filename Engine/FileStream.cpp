@@ -18,11 +18,11 @@ void FileStream::CopyTo(IByteStream* Destination)
 
 	if (_fileSize > BLOCK_SIZE)
 	{
-		unsigned int aln = _fileSize - (_fileSize % BLOCK_SIZE);
+		size_t aln = _fileSize - (_fileSize % BLOCK_SIZE);
 		std::vector<byte> buffer(BLOCK_SIZE);
 		_fileStream.seekg(0, std::ios::beg);
 
-		unsigned int ctr = 0;
+		uint ctr = 0;
 		do
 		{
 			_fileStream.read((char*)&buffer, BLOCK_SIZE);
@@ -61,7 +61,7 @@ void FileStream::Flush()
 		_fileStream.flush();
 }
 
-int FileStream::Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count)
+size_t FileStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
 	if (_fileAccess == FileAccess::Write)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
@@ -99,7 +99,7 @@ void FileStream::Reset()
 	_filePosition = 0;
 }
 
-void FileStream::Seek(unsigned int Offset, SeekOrigin Origin)
+void FileStream::Seek(size_t Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 		_fileStream.seekg(Offset, std::ios::beg);
@@ -108,10 +108,10 @@ void FileStream::Seek(unsigned int Offset, SeekOrigin Origin)
 	else
 		_fileStream.seekg(Offset, std::ios::cur);
 
-	_filePosition = (unsigned int)_fileStream.tellg();
+	_filePosition = (uint)_fileStream.tellg();
 }
 
-void FileStream::SetLength(unsigned int Length)
+void FileStream::SetLength(size_t Length)
 {
 	if (_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:SetLength", "The file was opened as read only!");
@@ -121,7 +121,7 @@ void FileStream::SetLength(unsigned int Length)
 	_fileStream.seekg(0, std::ios::beg);
 }
 
-void FileStream::Write(const std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count)
+void FileStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
 	if (_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
@@ -159,7 +159,7 @@ bool FileStream::FileExists(const char* FileName)
 std::ifstream::pos_type FileStream::FileSize(const char* FileName)
 {
 	std::ifstream in(FileName, std::ifstream::ate | std::ifstream::binary);
-	ulong size = in.tellg();
+	size_t size = (size_t)in.tellg();
 	in.close();
 	return size;
 }

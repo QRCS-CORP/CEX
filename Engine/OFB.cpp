@@ -24,7 +24,6 @@ void OFB::Destroy()
 void OFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	std::vector<byte> iv = KeyParam.IV();
-	unsigned int diff = _ofbIv.size() - iv.size();
 	_blockCipher->Initialize(true, KeyParam);
 
 	if (iv.size() < _ofbIv.size())
@@ -32,7 +31,7 @@ void OFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 		// prepend the supplied IV with zeros per FIPS PUB 81
 		memcpy(&_ofbIv[_ofbIv.size() - iv.size()], &iv[0], iv.size());
 
-		for (unsigned int i = 0; i < _ofbIv.size() - iv.size(); i++)
+		for (size_t i = 0; i < _ofbIv.size() - iv.size(); i++)
 			_ofbIv[i] = 0;
 	}
 	else
@@ -49,17 +48,17 @@ void OFB::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 	ProcessBlock(Input, 0, Output, 0);
 }
 
-void OFB::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	ProcessBlock(Input, InOffset, Output, OutOffset);
 }
 
-void OFB::ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void OFB::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	_blockCipher->Transform(_ofbIv, 0, _ofbBuffer, 0);
 
 	// xor the _ofbIv with the plaintext producing the cipher text and the next Input block
-	for (unsigned int i = 0; i < _blockSize; i++)
+	for (size_t i = 0; i < _blockSize; i++)
 		Output[OutOffset + i] = (byte)(_ofbBuffer[i] ^ Input[InOffset + i]);
 
 	// change over the Input block
@@ -67,15 +66,6 @@ void OFB::ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffs
 		memcpy(&_ofbIv[0], &_ofbIv[_blockSize], _ofbIv.size() - _blockSize);
 
 	memcpy(&_ofbIv[_ofbIv.size() - _blockSize], &_ofbBuffer[0], _blockSize);
-}
-
-void OFB::SetScope()
-{
-	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
-	if (_processorCount % 2 != 0)
-		_processorCount--;
-	if (_processorCount > 1)
-		_isParallel = true;
 }
 
 NAMESPACE_MODEEND

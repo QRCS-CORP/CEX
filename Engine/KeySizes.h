@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <para>Key Sizes in bits. Can be cast as Key byte size integers, 
 /// i.e. (int sz = KeySizes.K256) is equal to 32.</para>
 /// </summary>
-enum class KeySizes : unsigned int
+enum class KeySizes : uint
 {
 	/// <summary>
 	/// 128 bit Key

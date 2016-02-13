@@ -12,7 +12,7 @@ void SHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Decrypt16(Input, 0, Output, 0);
 }
 
-void SHX::DecryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void SHX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Decrypt16(Input, InOffset, Output, OutOffset);
 }
@@ -46,7 +46,7 @@ void SHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 	Encrypt16(Input, 0, Output, 0);
 }
 
-void SHX::EncryptBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void SHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
@@ -64,7 +64,7 @@ void SHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	if (key.size() > _legalKeySizes[3] && (key.size() - dgtsze) % dgtblk != 0)
 		throw CryptoSymmetricCipherException("SHX:Initialize", msg);
 
-	for (unsigned int i = 0; i < _legalKeySizes.size(); ++i)
+	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
 	{
 		if (key.size() == _legalKeySizes[i])
 			break;
@@ -91,7 +91,7 @@ void SHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 		Decrypt16(Input, 0, Output, 0);
 }
 
-void SHX::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void SHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (_isEncryption)
 		Encrypt16(Input, InOffset, Output, OutOffset);
@@ -119,12 +119,11 @@ void SHX::ExpandKey(const std::vector<byte> &Key)
 void SHX::SecureExpand(const std::vector<byte> &Key)
 {
 	// expanded key size
-	unsigned int keySize = 4 * (_dfnRounds + 1);
-
+	size_t keySize = 4 * (_dfnRounds + 1);
 	// hkdf return array
-	unsigned int keyBytes = keySize * 4;
+	size_t keyBytes = keySize * 4;
 	std::vector<byte> rawKey(keyBytes, 0);
-	unsigned int saltSize = Key.size() - _ikmSize;
+	size_t saltSize = Key.size() - _ikmSize;
 
 	// salt must be divisible of hash blocksize
 	if (saltSize % _kdfEngine->BlockSize() != 0)
@@ -154,17 +153,17 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 
 void SHX::StandardExpand(const std::vector<byte> &Key)
 {
-	unsigned int cnt = 0;
-	unsigned int index = 0;
-	unsigned int padSize = Key.size() < 32 ? 16 : Key.size() / 2;
+	uint cnt = 0;
+	uint index = 0;
+	size_t padSize = Key.size() < 32 ? 16 : Key.size() / 2;
 	std::vector<uint> Wp(padSize, 0);
-	unsigned int offset = 0;
+	size_t offset = 0;
 
 	// less than 512 is default rounds
 	if (Key.size() < 64)
 		_dfnRounds = ROUNDS32;
 
-	unsigned int keySize = 4 * (_dfnRounds + 1);
+	size_t keySize = 4 * (_dfnRounds + 1);
 
 	// step 1: reverse copy key to temp array
 	for (offset = Key.size(); offset > 0; offset -= 4)
@@ -181,30 +180,30 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 	{
 		// 32 byte key
 		// step 2: rotate k into w(k) ints
-		for (unsigned int i = 8; i < 16; i++)
-			Wp[i] = CEX::Utility::IntUtils::RotateLeft((Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
+		for (size_t i = 8; i < 16; i++)
+			Wp[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
 
 		// copy to expanded key
 		CopyVector(Wp, 8, Wk, 0, 8);
 
 		// step 3: calculate remainder of rounds with rotating primitive
-		for (unsigned int i = 8; i < keySize; i++)
-			Wk[i] = CEX::Utility::IntUtils::RotateLeft((Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+		for (size_t i = 8; i < keySize; i++)
+			Wk[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 	}
 	else
 	{
 		// *extended*: 64 byte key
 		// step 3: rotate k into w(k) ints, with extended polynominal
 		// Wp := (Wp-16 ^ Wp-13 ^ Wp-11 ^ Wp-10 ^ Wp-8 ^ Wp-5 ^ Wp-3 ^ Wp-1 ^ PHI ^ i) <<< 11
-		for (unsigned int i = 16; i < 32; i++)
-			Wp[i] = CEX::Utility::IntUtils::RotateLeft((Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
+		for (size_t i = 16; i < 32; i++)
+			Wp[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
 
 		// copy to expanded key
 		CopyVector(Wp, 16, Wk, 0, 16);
 
 		// step 3: calculate remainder of rounds with rotating primitive
-		for (unsigned int i = 16; i < keySize; i++)
-			Wk[i] = CEX::Utility::IntUtils::RotateLeft((Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+		for (size_t i = 16; i < keySize; i++)
+			Wk[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 	}
 
 	// step 4: create the working keys by processing with the Sbox and IP
@@ -228,10 +227,10 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 
 // *** Rounds Processing *** //
 
-void SHX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void SHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const unsigned int LRD = 4;
-	unsigned int keyCtr = _expKey.size();
+	const size_t LRD = 4;
+	size_t keyCtr = _expKey.size();
 
 	// input round
 	uint R3 = _expKey[--keyCtr] ^ CEX::Utility::IntUtils::BytesToBe32(Input, InOffset);
@@ -312,9 +311,9 @@ void SHX::Decrypt16(const std::vector<byte> &Input, const unsigned int InOffset,
 	CEX::Utility::IntUtils::Be32ToBytes(R0 ^ _expKey[--keyCtr], Output, OutOffset + 12);
 }
 
-void SHX::Encrypt16(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const int LRD = _expKey.size() - 5;
+	const size_t LRD = _expKey.size() - 5;
 	int keyCtr = -1;
 
 	// input round

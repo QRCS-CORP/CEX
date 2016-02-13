@@ -59,20 +59,20 @@ public:
 	void SetTweak(const std::vector<ulong> &Tweak);
 
 private:
-	inline static void Mix(ulong &A, ulong &B, unsigned int R)
+	inline static void Mix(ulong &A, ulong &B, uint R)
 	{
 		A += B;
 		B = RotateLeft64(B, R) ^ A;
 	}
 
-	inline static void Mix(ulong &A, ulong &B, unsigned R, ulong K0, ulong K1)
+	inline static void Mix(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
 	{
 		B += K1;
 		A += B + K0;
 		B = RotateLeft64(B, R) ^ A;
 	}
 
-	inline static ulong RotateLeft64(ulong V, unsigned B)
+	inline static ulong RotateLeft64(ulong V, uint B)
 	{
 		return (V << B) | (V >> (64 - B));
 	}

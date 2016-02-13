@@ -76,7 +76,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The fully qualified path to the key file to be read or created</param>
-	KeyFactory(CEX::IO::MemoryStream* KeyStream)
+	explicit KeyFactory(CEX::IO::MemoryStream* KeyStream)
 		:
 		_isDestroyed(false),
 		_keyStream(KeyStream)

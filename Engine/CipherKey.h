@@ -28,9 +28,9 @@ NAMESPACE_PRCSTRUCT
 struct CipherKey
 {
 private:
-	static constexpr unsigned int KEYID_SIZE = 16;
-	static constexpr unsigned int EXTKEY_SIZE = 16;
-	static constexpr unsigned int DESC_SIZE = 11;
+	static constexpr uint KEYID_SIZE = 16;
+	static constexpr uint EXTKEY_SIZE = 16;
+	static constexpr uint DESC_SIZE = 11;
 	static constexpr unsigned long KEYID_SEEK = 0;
 	static constexpr unsigned long EXTKEY_SEEK = DESC_SIZE;
 	static constexpr unsigned long DESC_SEEK = DESC_SIZE + EXTKEY_SIZE;
@@ -84,9 +84,6 @@ public:
 		_extKey(0),
 		_keyID(0)
 	{
-
-		_cprDsc = Description;
-
 		if (KeyId.size() == 0)
 		{
 			CEX::Prng::CSPPrng rnd;
@@ -121,7 +118,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The Stream containing the CipherKey</param>
-	CipherKey(CEX::IO::MemoryStream &KeyStream)
+	explicit CipherKey(CEX::IO::MemoryStream &KeyStream)
 		:
 		_extKey(0),
 		_keyID(0)
@@ -137,7 +134,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyArray">The byte array containing the CipherKey</param>
-	CipherKey(std::vector<byte> &KeyArray)
+	explicit CipherKey(std::vector<byte> &KeyArray)
 		:
 		_extKey(0),
 		_keyID(0)
@@ -171,7 +168,8 @@ public:
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 		writer.Write(_keyID);
 		writer.Write(_extKey);
-		writer.Write(_cprDsc.ToBytes());
+		std::vector<byte> cpr = _cprDsc.ToBytes();
+		writer.Write(cpr);
 
 		return writer.GetBytes();
 	}
@@ -186,7 +184,8 @@ public:
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 		writer.Write(_keyID);
 		writer.Write(_extKey);
-		writer.Write(_cprDsc.ToBytes());
+		std::vector<byte> cpr = _cprDsc.ToBytes();
+		writer.Write(cpr);
 
 		return writer.GetStream();
 	}
@@ -284,10 +283,10 @@ public:
 	int GetHashCode()
 	{
 		int result = _cprDsc.GetHashCode();
-		for (unsigned int i = 0; i < _keyID.size(); ++i)
-			result += (int)(31 * _keyID[i]);
-		for (unsigned int i = 0; i < _extKey.size(); ++i)
-			result += (int)(31 * _extKey[i]);
+		for (size_t i = 0; i < _keyID.size(); ++i)
+			result += (31 * _keyID[i]);
+		for (size_t i = 0; i < _extKey.size(); ++i)
+			result += (31 * _extKey[i]);
 
 		return result;
 	}

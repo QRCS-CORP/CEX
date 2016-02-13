@@ -3,12 +3,12 @@
 
 NAMESPACE_PADDING
 
-unsigned int X923::AddPadding(std::vector<byte> &Input, unsigned int Offset)
+size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
 		throw CryptoPaddingException("X923:AddPadding", "The padding offset value is longer than the array length!");
 
-	unsigned int len = (Input.size() - Offset) - 1;
+	size_t len = (Input.size() - Offset) - 1;
 	byte code = (byte)(Input.size() - Offset);
 
 	if (len > 0)
@@ -24,9 +24,9 @@ unsigned int X923::AddPadding(std::vector<byte> &Input, unsigned int Offset)
 	return code;
 }
 
-unsigned int X923::GetPaddingLength(const std::vector<byte> &Input)
+size_t X923::GetPaddingLength(const std::vector<byte> &Input)
 {
-	unsigned int code = Input[Input.size() - 1] & 0xff;
+	size_t code = Input[Input.size() - 1] & 0xff;
 
 	if (code > Input.size() - 1)
 		code = 0;
@@ -34,9 +34,9 @@ unsigned int X923::GetPaddingLength(const std::vector<byte> &Input)
 	return code;
 }
 
-unsigned int X923::GetPaddingLength(const std::vector<byte> &Input, unsigned int Offset)
+size_t X923::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	unsigned int code = Input[Input.size() - 1] & 0xff;
+	size_t code = Input[Input.size() - 1] & 0xff;
 
 	if (code > Input.size() - 1)
 		code = 0;

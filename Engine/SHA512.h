@@ -72,17 +72,17 @@ NAMESPACE_DIGEST
 class SHA512 : public IDigest
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 128;
-	static constexpr unsigned int DIGEST_SIZE = 64;
+	static constexpr size_t BLOCK_SIZE = 128;
+	static constexpr size_t DIGEST_SIZE = 64;
 
 	ulong _btCounter1;
 	ulong _btCounter2;
-	unsigned int _bufferOffset;
+	size_t _bufferOffset;
 	ulong _H0, _H1, _H2, _H3, _H4, _H5, _H6, _H7;
 	bool _isDestroyed;
 	std::vector<byte> _prcBuffer;
 	std::vector<ulong> _wordBuffer;
-	unsigned int _wordOffset;
+	size_t _wordOffset;
 
 public:
 
@@ -91,12 +91,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual unsigned int BlockSize() { return BLOCK_SIZE; }
+	virtual size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual unsigned int DigestSize() { return DIGEST_SIZE; }
+	virtual size_t DigestSize() { return DIGEST_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -153,7 +153,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Hash value
@@ -178,7 +178,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, const unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Reset the internal state
@@ -198,7 +198,7 @@ private:
 	void Initialize();
 	void ProcessBlock();
 	void ProcessLength(ulong LowWord, ulong HiWord);
-	void ProcessWord(const std::vector<byte> &Input, unsigned int InOffset);
+	void ProcessWord(const std::vector<byte> &Input, size_t InOffset);
 
 	inline static ulong Ch(ulong X, ulong Y, ulong Z)
 	{

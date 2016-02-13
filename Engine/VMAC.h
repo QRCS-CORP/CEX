@@ -65,12 +65,12 @@ NAMESPACE_MAC
 class VMAC : public IMac
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 256;
-	static constexpr unsigned int MAC_SIZE = 20;
+	static constexpr size_t BLOCK_SIZE = 256;
+	static constexpr size_t MAC_SIZE = 20;
 	static constexpr byte CT1F = (byte)0x1F;
 	static constexpr byte CTFF = (byte)0xFF;
 
-	unsigned int _blockSize;
+	size_t _blockSize;
 	bool _isDestroyed;
 	bool _isInitialized;
 	byte _G;
@@ -92,7 +92,7 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual const unsigned int BlockSize() { return BLOCK_SIZE; }
+	virtual const size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: The macs type name
@@ -102,7 +102,7 @@ public:
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const unsigned int MacSize() { return MAC_SIZE; }
+	virtual const size_t MacSize() { return MAC_SIZE; }
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
@@ -157,7 +157,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid Input size is chosen</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length);
+	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
 	/// Get the Mac hash value
@@ -182,7 +182,7 @@ public:
 	/// <returns>The number of bytes processed</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual unsigned int DoFinal(std::vector<byte> &Output, unsigned int OutOffset);
+	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the VMPC MAC.
@@ -193,7 +193,7 @@ public:
 	/// <param name="IV">A byte array containing the Initialization Vector</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if a null or invalid Key, or IV is used</exception>
-	virtual void Initialize(const std::vector<byte> &MacKey, std::vector<byte> &IV);
+	virtual void Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV);
 
 	/// <summary>
 	/// Reset the internal state

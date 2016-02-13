@@ -51,7 +51,7 @@ public:
 	/// <returns>Length of padding</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
-	virtual unsigned int AddPadding(std::vector<byte> &Input, unsigned int Offset);
+	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -60,7 +60,7 @@ public:
 	/// <param name="Input">Padded array of bytes</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual unsigned int GetPaddingLength(const std::vector<byte> &Input);
+	virtual size_t GetPaddingLength(const std::vector<byte> &Input);
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -70,7 +70,7 @@ public:
 	/// <param name="Offset">Offset into array</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual unsigned int GetPaddingLength(const std::vector<byte> &Input, unsigned int Offset);
+	virtual size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset);
 };
 
 NAMESPACE_PADDINGEND

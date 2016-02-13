@@ -24,13 +24,13 @@ void SP20Drbg::Destroy()
 	}
 }
 
-unsigned int SP20Drbg::Generate(std::vector<byte> &Output)
+size_t SP20Drbg::Generate(std::vector<byte> &Output)
 {
 	Transform(Output, 0);
 	return Output.size();
 }
 
-unsigned int SP20Drbg::Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("SP20Drbg:Generate", "Output buffer too small!");
@@ -51,12 +51,12 @@ void SP20Drbg::Initialize(const std::vector<byte> &Salt)
 		info = "expand 32-byte k";
 
 	_dstCode.reserve(info.size());
-	for (unsigned int i = 0; i < info.size(); ++i)
+	for (size_t i = 0; i < info.size(); ++i)
 		_dstCode.push_back(info[i]);
 
 	std::vector<byte> iv(VECTOR_SIZE);
 	memcpy(&iv[0], &Salt[0], VECTOR_SIZE);
-	int keyLen = Salt.size() - VECTOR_SIZE;
+	size_t keyLen = Salt.size() - VECTOR_SIZE;
 	std::vector<byte> key(keyLen);
 	memcpy(&key[0], &Salt[VECTOR_SIZE], keyLen);
 	SetKey(key, iv);
@@ -95,10 +95,10 @@ void SP20Drbg::Update(const std::vector<byte> &Salt)
 
 // *** Protected *** //
 
-void SP20Drbg::Generate(const unsigned int Length, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset)
+void SP20Drbg::Generate(const size_t Length, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
-	unsigned int aln = Length - (Length % BLOCK_SIZE);
-	unsigned int ctr = 0;
+	size_t aln = Length - (Length % BLOCK_SIZE);
+	size_t ctr = 0;
 
 	while (ctr != aln)
 	{
@@ -111,17 +111,17 @@ void SP20Drbg::Generate(const unsigned int Length, std::vector<uint> &Counter, s
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
 		SalsaCore(outputBlock, 0, Counter);
-		unsigned int fnlSize = Length % BLOCK_SIZE;
+		size_t fnlSize = Length % BLOCK_SIZE;
 		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
 	}
 }
 
-void SP20Drbg::Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector)
+void SP20Drbg::Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector)
 {
 	Vector = Counter;
 
-	for (unsigned int i = 0; i < Size; i++)
+	for (size_t i = 0; i < Size; i++)
 		Increment(Vector);
 }
 
@@ -131,9 +131,9 @@ void SP20Drbg::Increment(std::vector<uint> &Counter)
 		++Counter[1];
 }
 
-void SP20Drbg::SalsaCore(std::vector<byte> &Output, unsigned int OutOffset, const std::vector<uint> &Counter)
+void SP20Drbg::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std::vector<uint> &Counter)
 {
-	unsigned int ctr = 0;
+	size_t ctr = 0;
 	uint X0 = _wrkState[ctr];
 	uint X1 = _wrkState[++ctr];
 	uint X2 = _wrkState[++ctr];
@@ -254,9 +254,9 @@ void SP20Drbg::SetScope()
 		_isParallel = true;
 }
 
-void SP20Drbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
+void SP20Drbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 {
-	unsigned int outSize = Output.size() - OutOffset;
+	size_t outSize = Output.size() - OutOffset;
 
 	if (!_isParallel || outSize < _parallelBlockSize)
 	{
@@ -266,13 +266,13 @@ void SP20Drbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
 	else
 	{
 		// parallel CTR processing //
-		unsigned int cnkSize = (outSize / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
-		unsigned int rndSize = cnkSize * _processorCount;
-		unsigned int subSize = (cnkSize / BLOCK_SIZE);
+		size_t cnkSize = (outSize / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
+		size_t rndSize = cnkSize * _processorCount;
+		size_t subSize = (cnkSize / BLOCK_SIZE);
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
 		{
 			std::vector<uint> &iv = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -284,7 +284,7 @@ void SP20Drbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
 		// last block processing
 		if (rndSize < outSize)
 		{
-			unsigned int fnlSize = outSize % rndSize;
+			size_t fnlSize = outSize % rndSize;
 			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, OutOffset + rndSize);
 		}
 

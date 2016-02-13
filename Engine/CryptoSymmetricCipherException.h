@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Message">A custom message or error data</param>
-	CryptoSymmetricCipherException(const std::string &Message) 
+	explicit CryptoSymmetricCipherException(const std::string &Message)
 		: 
 		_message(Message)
 	{

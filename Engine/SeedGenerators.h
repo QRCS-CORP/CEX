@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Seed Generators
 /// </summary>
-enum class SeedGenerators : unsigned int
+enum class SeedGenerators : uint
 {
 	/// <summary>
 	/// A Secure Seed Generator using RNGCryptoServiceProvider

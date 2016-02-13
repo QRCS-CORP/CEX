@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Message Authentication Code Generators
 /// </summary>
-enum class Macs : unsigned int
+enum class Macs : uint
 {
 	/// <summary>
 	/// A Cipher based Message Authentication Code wrapper (CMAC)

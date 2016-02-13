@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Random Generators
 /// </summary>
-enum class Generators : unsigned int
+enum class Generators : uint
 {
 	/// <summary>
 	/// An implementation of a Encryption Counter based DRBG

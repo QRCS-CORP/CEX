@@ -4,7 +4,7 @@
 /// <summary>
 /// Specifies the Skein Ubi type
 /// </summary>
-enum UbiType : ulong
+enum UbiType : uint
 {
 	/// <summary>
 	/// A key that turns Skein into a MAC or KDF function.

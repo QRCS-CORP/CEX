@@ -30,7 +30,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Message">A custom message or error data</param>
-	CryptoCipherModeException(const std::string &Message) 
+	explicit CryptoCipherModeException(const std::string &Message)
 		: 
 		_message(Message)
 	{

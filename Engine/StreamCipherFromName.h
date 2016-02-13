@@ -23,7 +23,7 @@ public:
 	/// <returns>An initialized stream cipher</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static CEX::Cipher::Symmetric::Stream::IStreamCipher* GetInstance(CEX::Enumeration::StreamCiphers EngineType, int RoundCount);
+	static CEX::Cipher::Symmetric::Stream::IStreamCipher* GetInstance(CEX::Enumeration::StreamCiphers EngineType, uint RoundCount);
 };
 
 NAMESPACE_HELPEREND

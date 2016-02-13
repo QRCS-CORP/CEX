@@ -2,7 +2,7 @@
 
 NAMESPACE_PADDING
 
-unsigned int ZeroPad::AddPadding(std::vector<byte> &Input, unsigned int Offset)
+size_t ZeroPad::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
 		throw CEX::Exception::CryptoPaddingException("ZeroPad:AddPadding", "The padding offset value is longer than the array length!");
@@ -18,12 +18,12 @@ unsigned int ZeroPad::AddPadding(std::vector<byte> &Input, unsigned int Offset)
 	return (Input.size() - Offset);
 }
 
-unsigned int ZeroPad::GetPaddingLength(const std::vector<byte> &Input)
+size_t ZeroPad::GetPaddingLength(const std::vector<byte> &Input)
 {
-	unsigned int len = Input.size() - 1;
+	size_t len = Input.size() - 1;
 	byte code = (byte)0;
 
-	for (unsigned int i = len; i > 0; i--)
+	for (size_t i = len; i > 0; i--)
 	{
 		if (Input[i] != code)
 			return (len - i);
@@ -32,12 +32,12 @@ unsigned int ZeroPad::GetPaddingLength(const std::vector<byte> &Input)
 	return 0;
 }
 
-unsigned int ZeroPad::GetPaddingLength(const std::vector<byte> &Input, unsigned int Offset)
+size_t ZeroPad::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	unsigned int len = Input.size() - 1;
+	size_t len = Input.size() - 1;
 	byte code = (byte)0;
 
-	for (unsigned int i = len; i > 0; i--)
+	for (size_t i = len; i > 0; i--)
 	{
 		if (Input[Offset + i] != code)
 			return (len - i);

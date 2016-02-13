@@ -76,14 +76,14 @@ NAMESPACE_GENERATOR
 class DGCDrbg : public IGenerator
 {
 private:
-	static constexpr unsigned int COUNTER_SIZE = 8;
-	static constexpr unsigned int CYCLE_COUNT = 10;
+	static constexpr size_t COUNTER_SIZE = 8;
+	static constexpr size_t CYCLE_COUNT = 10;
 
 	std::vector<byte> _dgtSeed;
 	std::vector<byte> _dgtState;
 	bool _isDestroyed;
 	bool _isInitialized;
-	unsigned int _keySize;
+	size_t _keySize;
 	CEX::Digest::IDigest* _msgDigest;
 	std::mutex _mtxLock;
 	long _seedCtr;
@@ -107,7 +107,7 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() { return _keySize; }
+	virtual size_t KeySize() { return _keySize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -123,7 +123,7 @@ public:
 	/// <param name="Digest">Hash function</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	DGCDrbg(CEX::Digest::IDigest* Digest)
+	explicit DGCDrbg(CEX::Digest::IDigest* Digest)
 		:
 		_dgtSeed(Digest->DigestSize()),
 		_dgtState(Digest->DigestSize()),
@@ -160,7 +160,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output);
+	virtual size_t Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -173,7 +173,7 @@ public:
 	/// <returns>Number of bytes generated</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the output buffer is too small</exception>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
 	/// Initialize the generator

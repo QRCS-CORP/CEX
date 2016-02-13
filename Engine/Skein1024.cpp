@@ -3,12 +3,12 @@
 
 NAMESPACE_DIGEST
 
-void Skein1024::BlockUpdate(const std::vector<byte> &Input, unsigned int InOffset, unsigned int Length)
+void Skein1024::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if ((unsigned int)(InOffset + Length) > Input.size())
+	if ((size_t)(InOffset + Length) > Input.size())
 		throw CryptoDigestException("Skein1024:BlockUpdate", "The Input buffer is too short!");
 
-	unsigned int bytesDone = 0;
+	size_t bytesDone = 0;
 
 	// fill input buffer
 	while (bytesDone < Length && InOffset < Input.size())
@@ -58,21 +58,21 @@ void Skein1024::Destroy()
 	}
 }
 
-unsigned int Skein1024::DoFinal(std::vector<byte> &Output, const unsigned int OutOffset)
+size_t Skein1024::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Skein1024:DoFinal", "The Output buffer is too short!");
 
 	// pad left over space in input buffer with zeros
-	for (unsigned int i = _bytesFilled; i < _inputBuffer.size(); i++)
+	for (size_t i = _bytesFilled; i < _inputBuffer.size(); i++)
 		_inputBuffer[i] = 0;
 	// copy to cipher input buffer
-	for (unsigned int i = 0; i < STATE_WORDS; i++)
+	for (size_t i = 0; i < STATE_WORDS; i++)
 		_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(_inputBuffer, i * 8);
 
 	// process final message block
 	_ubiParameters.SetIsFinalBlock(true);
-	ProcessBlock(_bytesFilled);
+	ProcessBlock((uint)_bytesFilled);
 	// clear cipher input
 	std::fill(_cipherInput.begin(), _cipherInput.end(), 0);
 	// do output block counter mode output 
@@ -80,24 +80,24 @@ unsigned int Skein1024::DoFinal(std::vector<byte> &Output, const unsigned int Ou
 	std::vector<ulong> oldState(STATE_WORDS);
 
 	// save old state
-	for (unsigned int j = 0; j < _digestState.size(); j++)
+	for (size_t j = 0; j < _digestState.size(); j++)
 		oldState[j] = _digestState[j];
 
-	for (unsigned int i = 0; i < STATE_OUTPUT; i += STATE_BYTES)
+	for (size_t i = 0; i < STATE_OUTPUT; i += STATE_BYTES)
 	{
 		_ubiParameters.StartNewBlockType((UbiType)Out);
 		_ubiParameters.SetIsFinalBlock(true);
 		ProcessBlock(8);
 
 		// output a chunk of the hash
-		unsigned int outputSize = STATE_OUTPUT - i;
+		size_t outputSize = STATE_OUTPUT - i;
 		if (outputSize > STATE_BYTES)
 			outputSize = STATE_BYTES;
 
 		PutBytes(_digestState, hash, i, outputSize);
 
 		// restore old state
-		for (unsigned int j = 0; j < _digestState.size(); j++)
+		for (size_t j = 0; j < _digestState.size(); j++)
 			_digestState[j] = oldState[j];
 
 		// Increment counter
@@ -142,7 +142,7 @@ void Skein1024::Initialize(SkeinInitializationType InitializationType)
 	case SkeinInitializationType::ZeroedState:
 	{
 		// copy the configuration value to the state
-		for (unsigned int i = 0; i < _digestState.size(); i++)
+		for (size_t i = 0; i < _digestState.size(); i++)
 			_digestState[i] = 0;
 		break;
 	}
@@ -176,7 +176,7 @@ void Skein1024::SetMaxTreeHeight(const byte Height)
 	_configString[2] |= (ulong)Height << 16;
 }
 
-void Skein1024::SetSchema(const std::vector<byte> Schema)
+void Skein1024::SetSchema(const std::vector<byte> &Schema)
 {
 	if (Schema.size() != 4)
 		throw CryptoDigestException("Skein1024:SetSchema", "Schema must be 4 bytes.");
@@ -206,9 +206,9 @@ void Skein1024::SetTreeLeafSize(const byte Size)
 	_configString[2] |= (ulong)Size;
 }
 
-void Skein1024::SetVersion(const unsigned int Version)
+void Skein1024::SetVersion(const uint Version)
 {
-	if (Version < 0 || Version > 3)
+	if (Version > 3)
 		throw CryptoDigestException("Skein1024:SetVersion", "Version must be between 0 and 3, inclusive.");
 
 	_configString[0] &= ~((ulong)0x03 << 32);
@@ -245,7 +245,7 @@ void Skein1024::GenerateConfiguration()
 void Skein1024::Initialize()
 {
 	// copy the configuration value to the state
-	for (unsigned int i = 0; i < _digestState.size(); i++)
+	for (size_t i = 0; i < _digestState.size(); i++)
 		_digestState[i] = _configValue[i];
 
 	// set up tweak for message block
@@ -254,26 +254,26 @@ void Skein1024::Initialize()
 	_bytesFilled = 0;
 }
 
-void Skein1024::ProcessBlock(int bytes)
+void Skein1024::ProcessBlock(uint Value)
 {
 	// set the key to the current state
 	_blockCipher.SetKey(_digestState);
 	// update tweak
-	long bits = _ubiParameters.GetBitsProcessed() + (long)bytes;
+	ulong bits = _ubiParameters.GetBitsProcessed() + Value;
 	_ubiParameters.SetBitsProcessed(bits);
 	_blockCipher.SetTweak(_ubiParameters.GetTweak());
 	// encrypt block
 	_blockCipher.Encrypt(_cipherInput, _digestState);
 
 	// feed-forward input with state
-	for (unsigned int i = 0; i < _cipherInput.size(); i++)
+	for (size_t i = 0; i < _cipherInput.size(); i++)
 		_digestState[i] ^= _cipherInput[i];
 }
 
-void Skein1024::PutBytes(std::vector<ulong> Input, std::vector<byte> &Output, unsigned int Offset, unsigned int ByteCount)
+void Skein1024::PutBytes(std::vector<ulong> Input, std::vector<byte> &Output, size_t Offset, size_t ByteCount)
 {
-	unsigned int j = 0;
-	for (unsigned int i = 0; i < ByteCount; i++)
+	ulong j = 0;
+	for (size_t i = 0; i < ByteCount; i++)
 	{
 		Output[Offset + i] = (byte)((Input[i / 8] >> j) & 0xff);
 		j = (j + 8) % 64;

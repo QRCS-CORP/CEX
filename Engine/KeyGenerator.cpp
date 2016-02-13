@@ -22,7 +22,7 @@ void KeyGenerator::Destroy()
 	}
 }
 
-CEX::Common::KeyParams* KeyGenerator::GetKeyParams(const unsigned int KeySize, const unsigned int IVSize, unsigned int IKMSize)
+CEX::Common::KeyParams* KeyGenerator::GetKeyParams(const uint KeySize, const uint IVSize, uint IKMSize)
 {
 	CEX::Common::KeyParams* kp = new CEX::Common::KeyParams();
 
@@ -42,7 +42,7 @@ void KeyGenerator::GetBytes(std::vector<byte> &Data)
 	memcpy(&Data[0], &rand[0], rand.size());
 }
 
-std::vector<byte> KeyGenerator::GetBytes(unsigned int Size)
+std::vector<byte> KeyGenerator::GetBytes(uint Size)
 {
 	return Generate(Size);
 }
@@ -69,12 +69,12 @@ void KeyGenerator::Reset()
 	}
 }
 
-std::vector<byte> KeyGenerator::Generate(unsigned int Size)
+std::vector<byte> KeyGenerator::Generate(size_t Size)
 {
 	std::vector<byte> key(Size);
 	// get the first block
 	std::vector<byte> rand = GetBlock();
-	unsigned int blockSize = rand.size();
+	uint blockSize = (uint)rand.size();
 
 	if (Size < blockSize)
 	{
@@ -85,8 +85,8 @@ std::vector<byte> KeyGenerator::Generate(unsigned int Size)
 		// copy first block
 		memcpy(&key[0], &rand[0], blockSize);
 
-		unsigned int offset = blockSize;
-		unsigned int alnSize = Size - (Size % blockSize);
+		uint offset = blockSize;
+		uint alnSize = (uint)(Size - (Size % blockSize));
 
 		// fill the key array
 		while (offset < alnSize)
@@ -108,9 +108,9 @@ std::vector<byte> KeyGenerator::Generate(unsigned int Size)
 std::vector<byte> KeyGenerator::GetBlock()
 {
 	// generate seed; 2x input block size per NIST sp800-90b
-	unsigned int seedLen = _hashEngine->BlockSize() * 2;
+	size_t seedLen = _hashEngine->BlockSize() * 2;
 	std::vector<byte> seed(seedLen);
-	unsigned int saltLen = seedLen - _ctrLength;
+	size_t saltLen = seedLen - _ctrLength;
 
 	// increment the counter
 	Increment(_ctrVector);
@@ -167,7 +167,7 @@ CEX::Seed::ISeed* KeyGenerator::GetSeedEngine(CEX::Enumeration::SeedGenerators S
 
 void KeyGenerator::Increment(std::vector<byte> &Counter)
 {
-	long i = Counter.size();
+	size_t i = Counter.size();
 	while (--i >= 0 && ++Counter[i] == 0) {}
 }
 

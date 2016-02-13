@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Asymmetric Encryption Ciphers
 /// </summary>
-enum class AsymmetricEngines : unsigned int
+enum class AsymmetricEngines : uint
 {
 	/// <summary>
 	/// An NTRU cipher implementation

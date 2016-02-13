@@ -20,7 +20,7 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 	}
 }
 
-CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine)
+CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType, uint BlockSize, uint RoundCount, CEX::Enumeration::Digests KdfEngine)
 {
 	switch (EngineType)
 	{

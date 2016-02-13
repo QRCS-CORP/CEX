@@ -2,12 +2,12 @@
 
 NAMESPACE_PADDING
 
-unsigned int ISO7816::AddPadding(std::vector<byte> &Input, unsigned int Offset)
+size_t ISO7816::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
 		throw CryptoPaddingException("ISO7816:AddPadding", "The padding offset value is longer than the array length!");
 
-	unsigned int len = (Input.size() - Offset);
+	size_t len = (Input.size() - Offset);
 
 	Input[Offset++] = MKCODE;
 
@@ -17,9 +17,9 @@ unsigned int ISO7816::AddPadding(std::vector<byte> &Input, unsigned int Offset)
 	return len;
 }
 
-unsigned int ISO7816::GetPaddingLength(const std::vector<byte> &Input)
+size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input)
 {
-	unsigned int len = Input.size() - 1;
+	size_t len = Input.size() - 1;
 
 	if (Input[len] == MKCODE)
 		return 1;
@@ -32,9 +32,9 @@ unsigned int ISO7816::GetPaddingLength(const std::vector<byte> &Input)
 	return Input.size() - len;
 }
 
-unsigned int ISO7816::GetPaddingLength(const std::vector<byte> &Input, unsigned int Offset)
+size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	unsigned int len = Input.size() - (Offset + 1);
+	size_t len = Input.size() - (Offset + 1);
 
 	if (Input[Offset + len] == MKCODE)
 		return 1;

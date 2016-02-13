@@ -7,7 +7,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Pseudo Random Generators
 /// </summary>
-enum class Prngs : unsigned int
+enum class Prngs : uint
 {
 	/// <summary>
 	///  A Secure PRNG using RNGCryptoServiceProvider

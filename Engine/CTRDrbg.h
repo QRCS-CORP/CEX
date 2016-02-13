@@ -73,20 +73,20 @@ NAMESPACE_GENERATOR
 class CTRDrbg : public IGenerator
 {
 private:
-	static constexpr unsigned int BLOCK_SIZE = 1024;
-	static constexpr unsigned int MAXALLOC_MB100 = 100000000;
-	static constexpr unsigned int PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t BLOCK_SIZE = 1024;
+	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
 	CEX::Cipher::Symmetric::Block::IBlockCipher* _blockCipher;
-	unsigned int _blockSize;
+	size_t _blockSize;
 	std::vector<byte> _ctrVector;
 	bool _isDestroyed;
 	bool _isEncryption;
 	bool _isInitialized;
-	unsigned int _keySize;
+	size_t _keySize;
 	bool _isParallel;
-	unsigned int _parallelBlockSize;
-	unsigned int _processorCount;
+	size_t _parallelBlockSize;
+	size_t _processorCount;
 	std::vector<std::vector<byte>> _threadVectors;
 
 public:
@@ -117,7 +117,7 @@ public:
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual unsigned int KeySize() { return _keySize; }
+	virtual size_t KeySize() { return _keySize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -127,22 +127,22 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	unsigned int &ParallelBlockSize() { return _parallelBlockSize; }
+	size_t &ParallelBlockSize() { return _parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
 	/// </summary>
-	const unsigned int ParallelMaximumSize() { return MAXALLOC_MB100; }
+	const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
 
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	const unsigned int ParallelMinimumSize() { return _processorCount * _blockSize; }
+	const size_t ParallelMinimumSize() { return _processorCount * _blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	const unsigned int ProcessorCount() { return _processorCount; }
+	const size_t ProcessorCount() { return _processorCount; }
 
 	// *** Constructor *** //
 
@@ -154,7 +154,7 @@ public:
 	/// <param name="KeySize">The internal ciphers key size; calculated automatically if this value is zero</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null cipher is used</exception>
-	CTRDrbg(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, const unsigned int KeySize = 0)
+	CTRDrbg(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, const size_t KeySize = 0)
 		:
 		_blockCipher(Cipher),
 		_blockSize(Cipher->BlockSize()),
@@ -207,7 +207,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>Number of bytes generated</returns>
-	virtual unsigned int Generate(std::vector<byte> &Output);
+	virtual size_t Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Generate pseudo random bytes
@@ -220,7 +220,7 @@ public:
 	/// <returns>Number of bytes generated</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the output buffer is too small</exception>
-	virtual unsigned int Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size);
+	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
 	/// Initialize the generator
@@ -258,12 +258,12 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
-	void Generate(const unsigned int Length, std::vector<byte> &Counter, std::vector<byte> &Output, const unsigned int OutOffset);
+	void Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset);
 	void Increment(std::vector<byte> &Counter);
-	void Increase(const std::vector<byte> &Counter, const unsigned int Size, std::vector<byte> &Buffer);
-	bool IsValidKeySize(const unsigned int KeySize = 0);
+	void Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer);
+	bool IsValidKeySize(const size_t KeySize = 0);
 	void SetScope();
-	void Transform(std::vector<byte> &Output, unsigned int OutOffset);
+	void Transform(std::vector<byte> &Output, size_t OutOffset);
 };
 
 NAMESPACE_GENERATOREND

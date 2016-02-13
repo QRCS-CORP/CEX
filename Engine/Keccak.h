@@ -43,7 +43,7 @@ public:
 	/// <param name="Offset">The offset index</param>
 	/// <param name="State">The state array</param>
 	/// <param name="Size">The size of the transform</param>
-	static void TransformBlock(const std::vector<byte> &Input, unsigned int Offset, std::vector<ulong> &State, unsigned int Size);
+	static void TransformBlock(const std::vector<byte> &Input, size_t Offset, std::vector<ulong> &State, size_t Size);
 };
 
 #endif

@@ -334,7 +334,7 @@ void Threefish512::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &
 
 void Threefish512::SetKey(const std::vector<ulong> &Key)
 {
-	unsigned int i;
+	size_t i;
 	ulong parity = KeyScheduleConst;
 
 	for (i = 0; i < _expandedKey.size() - 1; i++)

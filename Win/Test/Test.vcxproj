@@ -156,12 +156,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="..\Vectors\AESAVS\keyvect128.txt" />
-    <Text Include="..\Vectors\AESAVS\keyvect192.txt" />
-    <Text Include="..\Vectors\AESAVS\keyvect256.txt" />
-    <Text Include="..\Vectors\AESAVS\plainvect128.txt" />
-    <Text Include="..\Vectors\AESAVS\plainvect192.txt" />
-    <Text Include="..\Vectors\AESAVS\plainvect256.txt" />
+    <Text Include="..\Vectors\AESAVS\keyvect128.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\keyvect192.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\keyvect256.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\plainvect128.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\plainvect192.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\plainvect256.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
     <Text Include="..\Vectors\Counterpane\twofishcipher128.txt" />
     <Text Include="..\Vectors\Counterpane\twofishcipher192.txt" />
     <Text Include="..\Vectors\Counterpane\twofishcipher256.txt" />

@@ -68,7 +68,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Key">Cipher Key</param>
-	KeyParams(const std::vector<byte> &Key)
+	explicit KeyParams(const std::vector<byte> &Key)
 		:
 		_key(Key),
 		_iv(0),
@@ -83,7 +83,7 @@ public:
 	///
 	/// <param name="Key">Cipher Key</param>
 	/// <param name="IV">Cipher IV</param>
-	KeyParams(const std::vector<byte> &Key, const std::vector<byte> &IV)
+	explicit KeyParams(const std::vector<byte> &Key, const std::vector<byte> &IV)
 		:
 		_key(Key),
 		_iv(IV),
@@ -98,7 +98,7 @@ public:
 	/// <param name="Key">Cipher Key</param>
 	/// <param name="IV">Cipher IV</param>
 	/// <param name="Ikm">Input Key Material</param>
-	KeyParams(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Ikm)
+	explicit KeyParams(const std::vector<byte> &Key, const std::vector<byte> &IV, const std::vector<byte> &Ikm)
 		:
 		_key(Key),
 		_iv(IV),

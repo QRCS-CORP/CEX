@@ -29,13 +29,15 @@ namespace Test
 		CEX::Seed::ISCRsg* gen = new CEX::Seed::ISCRsg(seed);
 		gen->Reset();
 
-		int x, e;
 		for (unsigned int i = 0; i < _expected.size(); i++)
 		{
-			x = gen->Next();
-			e = (int)_expected[i];
+			int x = gen->Next();
+			int e = (int)_expected[i];
 			if (x != e)
+			{
+				delete gen;
 				throw std::string("ISCRsgTest: array is not equal!");
+			}
 		}
 		delete gen;
 	}

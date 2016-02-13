@@ -22,9 +22,9 @@ void ISCRsg::Destroy()
 
 void ISCRsg::GetBytes(std::vector<byte> &Output)
 {
-	unsigned int offset = 0;
+	size_t offset = 0;
 	int X;
-	unsigned int len = SIZE32;
+	size_t len = SIZE32;
 
 	while (offset < Output.size())
 	{
@@ -38,7 +38,7 @@ void ISCRsg::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-std::vector<byte> ISCRsg::GetBytes(int Size)
+std::vector<byte> ISCRsg::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
@@ -201,7 +201,7 @@ void ISCRsg::Initialize(bool MixState)
 	Generate();
 }
 
-void ISCRsg::GetSeed(unsigned int Size)
+void ISCRsg::GetSeed(size_t Size)
 {
 	CSPRsg rnd;
 	std::vector<byte> seed(Size);

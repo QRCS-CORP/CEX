@@ -38,7 +38,7 @@ void Salsa20::Initialize(const CEX::Common::KeyParams &KeyParam)
 			info = "expand 32-byte k";
 
 		_dstCode.reserve(info.size());
-		for (unsigned int i = 0; i < info.size(); ++i)
+		for (size_t i = 0; i < info.size(); ++i)
 			_dstCode.push_back(info[i]);
 	}
 
@@ -58,12 +58,12 @@ void Salsa20::Transform(const std::vector<byte> &Input, std::vector<byte> &Outpu
 	ProcessBlock(Input, Output);
 }
 
-void Salsa20::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void Salsa20::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	ProcessBlock(Input, InOffset, Output, OutOffset);
 }
 
-void Salsa20::Transform(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length)
+void Salsa20::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	ProcessBlock(Input, InOffset, Output, OutOffset, Length);
 }
@@ -110,11 +110,11 @@ void Salsa20::SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 
 // ** Processing ** //
 
-void Salsa20::Increase(const std::vector<uint> &Counter, const unsigned int Size, std::vector<uint> &Vector)
+void Salsa20::Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector)
 {
 	Vector = Counter;
 
-	for (unsigned int i = 0; i < Size; i++)
+	for (size_t i = 0; i < Size; i++)
 		Increment(Vector);
 }
 
@@ -124,10 +124,10 @@ void Salsa20::Increment(std::vector<uint> &Counter)
 		++Counter[1];
 }
 
-void Salsa20::Generate(const unsigned int Size, std::vector<uint> &Counter, std::vector<byte> &Output, const unsigned int OutOffset)
+void Salsa20::Generate(const size_t Size, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
-	unsigned int aln = Size - (Size % BLOCK_SIZE);
-	unsigned int ctr = 0;
+	size_t aln = Size - (Size % BLOCK_SIZE);
+	size_t ctr = 0;
 
 	while (ctr != aln)
 	{
@@ -146,7 +146,7 @@ void Salsa20::Generate(const unsigned int Size, std::vector<uint> &Counter, std:
 	}
 }
 
-unsigned int Salsa20::GetProcessorCount()
+uint Salsa20::GetProcessorCount()
 {
 	return CEX::Utility::ParallelUtils::ProcessorCount();
 }
@@ -158,7 +158,7 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Ou
 		// generate random
 		Generate(Output.size(), _ctrVector, Output, 0);
 		// output is input xor with random
-		unsigned int sze = Output.size() - (Output.size() % BLOCK_SIZE);
+		size_t sze = (Output.size() - (Output.size() % BLOCK_SIZE));
 
 		if (sze != 0)
 			CEX::Utility::IntUtils::XORBLK(Input, 0, Output, 0, sze);
@@ -166,20 +166,20 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Ou
 		// get the remaining bytes
 		if (sze != Output.size())
 		{
-			for (unsigned int i = sze; i < Output.size(); ++i)
+			for (size_t i = sze; i < Output.size(); ++i)
 				Output[i] ^= Input[i];
 		}
 	}
 	else
 	{
 		// parallel CTR processing //
-		unsigned int cnkSize = (Output.size() / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
-		unsigned int rndSize = cnkSize * _processorCount;
-		unsigned int subSize = (cnkSize / BLOCK_SIZE);
+		size_t cnkSize = (Output.size() / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
+		size_t rndSize = cnkSize * _processorCount;
+		size_t subSize = (cnkSize / BLOCK_SIZE);
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](size_t i)
 		{
 			std::vector<uint> &iv = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -193,10 +193,10 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Ou
 		// last block processing
 		if (rndSize < Output.size())
 		{
-			unsigned int fnlSize = Output.size() % rndSize;
+			size_t fnlSize = Output.size() % rndSize;
 			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, rndSize);
 
-			for (unsigned int i = rndSize; i < Output.size(); ++i)
+			for (size_t i = rndSize; i < Output.size(); ++i)
 				Output[i] ^= Input[i];
 		}
 
@@ -205,16 +205,16 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Ou
 	}
 }
 
-void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset)
+void Salsa20::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	unsigned int outSize = _isParallel ? (Output.size() - OutOffset) : BLOCK_SIZE;
+	size_t outSize = _isParallel ? (Output.size() - OutOffset) : BLOCK_SIZE;
 
 	if (outSize < _parallelBlockSize)
 	{
 		// generate random
 		Generate(outSize, _ctrVector, Output, OutOffset);
 		// output is input xor with random
-		unsigned int sze = outSize - (outSize % BLOCK_SIZE);
+		size_t sze = outSize - (outSize % BLOCK_SIZE);
 
 		if (sze != 0)
 			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
@@ -222,21 +222,21 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int In
 		// get the remaining bytes
 		if (sze != outSize)
 		{
-			for (unsigned int i = sze; i < outSize; ++i)
+			for (size_t i = sze; i < outSize; ++i)
 				Output[i + OutOffset] ^= Input[i + InOffset];
 		}
 	}
 	else
 	{
 		// parallel CTR processing //
-		unsigned int cnkSize = _parallelBlockSize / _processorCount;
-		unsigned int rndSize = cnkSize * _processorCount;
-		unsigned int subSize = cnkSize / BLOCK_SIZE;
+		size_t cnkSize = _parallelBlockSize / _processorCount;
+		size_t rndSize = cnkSize * _processorCount;
+		size_t subSize = cnkSize / BLOCK_SIZE;
 
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
 		{
 			std::vector<uint> &iv = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -252,16 +252,16 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int In
 	}
 }
 
-void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int InOffset, std::vector<byte> &Output, const unsigned int OutOffset, const unsigned int Length)
+void Salsa20::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	unsigned int outSize = Length;
+	size_t outSize = Length;
 
 	if (!_isParallel || outSize < _parallelBlockSize)
 	{
 		// generate random
 		Generate(outSize, _ctrVector, Output, OutOffset);
 		// output is input xor with random
-		unsigned int sze = Length - (Length % BLOCK_SIZE);
+		size_t sze = Length - (Length % BLOCK_SIZE);
 
 		if (sze != 0)
 			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
@@ -269,21 +269,21 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int In
 		// get the remaining bytes
 		if (sze != OutOffset + Length)
 		{
-			for (unsigned int i = sze; i < Output.size(); ++i)
+			for (size_t i = sze; i < Output.size(); ++i)
 				Output[i + OutOffset] ^= Input[i + InOffset];
 		}
 	}
 	else
 	{
 		// parallel CTR processing //
-		unsigned int cnkSize = (Length / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
-		unsigned int rndSize = cnkSize * _processorCount;
-		unsigned int subSize = (cnkSize / BLOCK_SIZE);
+		size_t cnkSize = (Length / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
+		size_t rndSize = cnkSize * _processorCount;
+		size_t subSize = (cnkSize / BLOCK_SIZE);
 
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
 		{
 			std::vector<uint> &Vec = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -297,10 +297,10 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int In
 		// last block processing
 		if (rndSize < Length)
 		{
-			unsigned int fnlSize = Length % rndSize;
+			size_t fnlSize = Length % rndSize;
 			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, rndSize);
 
-			for (unsigned int i = 0; i < fnlSize; ++i)
+			for (size_t i = 0; i < fnlSize; ++i)
 				Output[i + OutOffset + rndSize] ^= (byte)(Input[i + InOffset + rndSize]);
 		}
 
@@ -309,9 +309,9 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const unsigned int In
 	}
 }
 
-void Salsa20::SalsaCore(std::vector<byte> &Output, unsigned int OutOffset, const std::vector<uint> &Counter)
+void Salsa20::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std::vector<uint> &Counter)
 {
-	unsigned int ctr = 0;
+	size_t ctr = 0;
 	uint X0 = _wrkState[ctr];
 	uint X1 = _wrkState[++ctr];
 	uint X2 = _wrkState[++ctr];

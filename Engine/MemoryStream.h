@@ -13,7 +13,7 @@ class MemoryStream : public IByteStream
 private:
 	bool _isDestroyed;
 	std::vector<byte> _streamData;
-	unsigned int _streamPosition;
+	size_t _streamPosition;
 
 public:
 
@@ -37,12 +37,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const unsigned int Length() { return _streamData.size(); }
+	virtual const size_t Length() { return _streamData.size(); }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const unsigned int Position() { return _streamPosition; }
+	virtual const size_t Position() { return _streamPosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
@@ -67,7 +67,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Length">The reserved length of the stream</param>
-	MemoryStream(unsigned int Length)
+	explicit MemoryStream(size_t Length)
 		:
 		_isDestroyed(false),
 		_streamData(0),
@@ -81,7 +81,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="DataArray">The array used to initialize the stream</param>
-	MemoryStream(const std::vector<byte> &DataArray)
+	explicit MemoryStream(const std::vector<byte> &DataArray)
 		:
 		_isDestroyed(false),
 		_streamData(DataArray),
@@ -98,7 +98,7 @@ public:
 	/// <param name="Length">The number of bytes to copy</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
-	MemoryStream(std::vector<byte> &DataArray, unsigned int Offset, unsigned int Length)
+	explicit MemoryStream(std::vector<byte> &DataArray, size_t Offset, size_t Length)
 		:
 		_isDestroyed(false),
 		_streamData(0),
@@ -157,7 +157,7 @@ public:
 	/// <param name="Count">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual int Read(std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count);
+	virtual size_t Read(std::vector<byte> &Buffer, size_t Offset, size_t Count);
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -179,14 +179,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(unsigned int Offset, SeekOrigin Origin);
+	virtual void Seek(size_t Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(unsigned int Length);
+	virtual void SetLength(size_t Length);
 
 	/// <summary>
 	/// Writes a buffer into the stream
@@ -199,7 +199,7 @@ public:
 	/// <returns>The number of bytes processed</returns>
 	///
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
-	virtual void Write(const std::vector<byte> &Buffer, unsigned int Offset, unsigned int Count);
+	virtual void Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count);
 
 	/// <summary>
 	/// Write a single byte from the stream

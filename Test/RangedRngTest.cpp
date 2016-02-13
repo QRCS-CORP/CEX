@@ -24,7 +24,7 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string ex)
+		catch (std::string &ex)
 		{
 			throw FAILURE + " : " + ex;
 		}

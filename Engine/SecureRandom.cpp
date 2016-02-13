@@ -37,7 +37,7 @@ void SecureRandom::Destroy()
 /// <param name="Size">Size of requested byte array</param>
 /// 
 /// <returns>Random byte array</returns>
-std::vector<byte> SecureRandom::GetBytes(unsigned int Size)
+std::vector<byte> SecureRandom::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
@@ -56,12 +56,12 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 
 	if (_byteBuffer.size() - _bufferIndex < Output.size())
 	{
-		unsigned int bufSize = _byteBuffer.size() - _bufferIndex;
+		size_t bufSize = _byteBuffer.size() - _bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
 			memcpy(&Output[0], &_byteBuffer[_bufferIndex], bufSize);
 
-		unsigned int rem = Output.size() - bufSize;
+		size_t rem = Output.size() - bufSize;
 
 		while (rem > 0)
 		{
@@ -290,7 +290,7 @@ int SecureRandom::NextInt32(int Minimum, int Maximum)
 /// </summary>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int SecureRandom::NextUInt32()
+uint SecureRandom::NextUInt32()
 {
 	return CEX::IO::BitConverter::ToUInt32(GetBytes(4), 0);
 }
@@ -302,10 +302,10 @@ unsigned int SecureRandom::NextUInt32()
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int SecureRandom::NextUInt32(unsigned int Maximum)
+uint SecureRandom::NextUInt32(uint Maximum)
 {
 	std::vector<byte> rand;
-	unsigned int num(0);
+	uint num(0);
 
 	do
 	{
@@ -325,9 +325,9 @@ unsigned int SecureRandom::NextUInt32(unsigned int Maximum)
 /// <param name="Maximum">Maximum value</param>
 /// 
 /// <returns>Random UInt32</returns>
-unsigned int SecureRandom::NextUInt32(unsigned int Minimum, unsigned int Maximum)
+uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
 {
-	unsigned int num = 0;
+	uint num = 0;
 	while ((num = NextUInt32(Maximum)) < Minimum) {}
 	return num;
 }
@@ -485,7 +485,7 @@ std::vector<byte> SecureRandom::GetBits(std::vector<byte> Data, ulong Maximum)
 {
 	ulong val = 0;
 	memcpy(&val, &Data[0], Data.size());
-	int bits = Data.size() * 8;
+	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
 	{

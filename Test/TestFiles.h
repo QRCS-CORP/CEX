@@ -5,24 +5,6 @@
 
 namespace TestFiles
 {
-	namespace StreamTestFiles
-	{
-		const std::string tinyFileIn = "Files/tiny.txt";
-		const std::string smallFileIn = "Files/small.txt";
-		const std::string mediumFileIn = "Files/medium.txt";
-		const std::string largeFileIn = "Files/large.txt";
-
-		const std::string tinyFileEnc = "Files/tinyenc.txt";
-		const std::string smallFileEnc = "Files/smallenc.txt";
-		const std::string mediumFileEnc = "Files/mediumenc.txt";
-		const std::string largeFileEnc = "Files/largeenc.txt";
-
-		const std::string tinyFileDec = "Files/tinydec.txt";
-		const std::string smallFileDec = "Files/smalldec.txt";
-		const std::string mediumFileDec = "Files/mediumdec.txt";
-		const std::string largeFileDec = "Files/largedec.txt";
-	}
-
     namespace AESAVS 
 	{
         const std::string keyvect128 = "Vectors/AESAVS/keyvect128.txt";

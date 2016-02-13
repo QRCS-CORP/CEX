@@ -23,14 +23,14 @@ void CTRDrbg::Destroy()
 	}
 }
 
-unsigned int CTRDrbg::Generate(std::vector<byte> &Output)
+size_t CTRDrbg::Generate(std::vector<byte> &Output)
 {
 	Transform(Output, 0);
 
 	return Output.size();
 }
 
-unsigned int CTRDrbg::Generate(std::vector<byte> &Output, unsigned int OutOffset, unsigned int Size)
+size_t CTRDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("CTRDrbg:Generate", "Output buffer too small!");
@@ -46,7 +46,7 @@ void CTRDrbg::Initialize(const std::vector<byte> &Salt)
 		throw CryptoGeneratorException("CTRDrbg:Initialize", "Salt size is too small; must be key size plus the blocksize!");
 
 	memcpy(&_ctrVector[0], &Salt[0], _blockSize);
-	int keyLen = Salt.size() - _blockSize;
+	size_t keyLen = Salt.size() - _blockSize;
 	std::vector<byte> key(keyLen);
 	memcpy(&key[0], &Salt[_blockSize], keyLen);
 
@@ -91,10 +91,10 @@ void CTRDrbg::Update(const std::vector<byte> &Salt)
 
 // *** Protected *** //
 
-void CTRDrbg::Generate(const unsigned int Length, std::vector<byte> &Counter, std::vector<byte> &Output, const unsigned int OutOffset)
+void CTRDrbg::Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
-	unsigned int aln = Length - (Length % _blockSize);
-	unsigned int ctr = 0;
+	size_t aln = Length - (Length % _blockSize);
+	size_t ctr = 0;
 
 	while (ctr != aln)
 	{
@@ -107,7 +107,7 @@ void CTRDrbg::Generate(const unsigned int Length, std::vector<byte> &Counter, st
 	{
 		std::vector<byte> outputBlock(_blockSize, 0);
 		_blockCipher->EncryptBlock(Counter, outputBlock);
-		unsigned int fnlSize = Length % _blockSize;
+		size_t fnlSize = Length % _blockSize;
 		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
 	}
@@ -115,27 +115,25 @@ void CTRDrbg::Generate(const unsigned int Length, std::vector<byte> &Counter, st
 
 void CTRDrbg::Increment(std::vector<byte> &Counter)
 {
-	long i = Counter.size();
+	size_t i = Counter.size();
 	while (--i >= 0 && ++Counter[i] == 0) {}
 }
 
-void CTRDrbg::Increase(const std::vector<byte> &Counter, const unsigned int Size, std::vector<byte> &Buffer)
+void CTRDrbg::Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer)
 {
 	Buffer.resize(Counter.size(), 0);
 
-	int carry = 0;
-	int offset = Buffer.size() - 1;
+	size_t carry = 0;
+	size_t offset = Buffer.size() - 1;
 
 	const int cntSize = sizeof(Size);
 	std::vector<byte> cnt(cntSize, 0);
 	memcpy(&cnt[0], &Size, cntSize);
-
-	byte osrc, odst, ndst;
-
 	memcpy(&Buffer[0], &Counter[0], Counter.size());
 
-	for (unsigned int i = offset; i > 0; i--)
+	for (size_t i = offset; i > 0; i--)
 	{
+		byte osrc, odst, ndst;
 		odst = Buffer[i];
 		osrc = offset - i < cnt.size() ? cnt[offset - i] : (byte)0;
 		ndst = (byte)(odst + osrc + carry);
@@ -144,9 +142,9 @@ void CTRDrbg::Increase(const std::vector<byte> &Counter, const unsigned int Size
 	}
 }
 
-bool CTRDrbg::IsValidKeySize(const unsigned int KeySize)
+bool CTRDrbg::IsValidKeySize(const size_t KeySize)
 {
-	for (unsigned int i = 0; i < _blockCipher->LegalKeySizes().size(); ++i)
+	for (size_t i = 0; i < _blockCipher->LegalKeySizes().size(); ++i)
 	{
 		if (KeySize == _blockCipher->LegalKeySizes()[i])
 			break;
@@ -166,9 +164,9 @@ void CTRDrbg::SetScope()
 		_isParallel = true;
 }
 
-void CTRDrbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
+void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 {
-	unsigned int outSize = Output.size() - OutOffset;
+	size_t outSize = Output.size() - OutOffset;
 
 	if (!_isParallel || outSize < _parallelBlockSize)
 	{
@@ -178,13 +176,13 @@ void CTRDrbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
 	else
 	{
 		// parallel CTR processing //
-		unsigned int cnkSize = (outSize / _blockSize / _processorCount) * _blockSize;
-		unsigned int rndSize = cnkSize * _processorCount;
-		unsigned int subSize = (cnkSize / _blockSize);
+		size_t cnkSize = (outSize / _blockSize / _processorCount) * _blockSize;
+		size_t rndSize = cnkSize * _processorCount;
+		size_t subSize = (cnkSize / _blockSize);
 		// create jagged array of 'sub counters'
 		_threadVectors.resize(_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](unsigned int i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
 		{
 			std::vector<byte> &iv = _threadVectors[i];
 			// offset counter by chunk size / block size
@@ -196,7 +194,7 @@ void CTRDrbg::Transform(std::vector<byte> &Output, unsigned int OutOffset)
 		// last block processing
 		if (rndSize < outSize)
 		{
-			unsigned int fnlSize = outSize % rndSize;
+			size_t fnlSize = outSize % rndSize;
 			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, OutOffset + rndSize);
 		}
 
