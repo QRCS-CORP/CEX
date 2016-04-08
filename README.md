@@ -13,6 +13,6 @@ API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html
 Homepage: http://www.vtdev.com/cexhome.html
 
 This project contains strong cryptography, before downloading the source files, 
-it is your responsibility to check if these extended key lengths (512 bit and higher), 
-and algorithms are legal in your country. 
+it is your responsibility to check if these extended symmetric cipher key lengths (512 bit and higher), 
+and other implemented algorithms are legal in your country. 
 If you use this code, please do so responsibly and in accordance to law in your region.
