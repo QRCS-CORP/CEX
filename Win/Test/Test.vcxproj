@@ -267,10 +267,10 @@
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />
     <ClCompile Include="..\..\Test\SP20DrbgTest.cpp" />
     <ClCompile Include="..\..\Test\SpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\TwofishTest.cpp" />
     <ClCompile Include="..\..\Test\VMACTest.cpp" />
     <ClCompile Include="..\..\Test\XSPRsgTest.cpp" />
     <ClCompile Include="Test.cpp" />
-    <ClCompile Include="TwofishTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Static\CEXEngine.vcxproj">

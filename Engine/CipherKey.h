@@ -47,12 +47,12 @@ public:
 	CEX::Common::CipherDescription Description() const { return _cprDsc; }
 
 	/// <summary>
-	/// The unique 16 byte ID field used to identify this key. A null value auto generates this field
+	/// The unique 16 byte ID field used to identify this key.
 	/// </summary>
 	const std::vector<byte> &KeyId() { return _keyID; }
 
 	/// <summary>
-	/// An array of random bytes used to encrypt a message file extension. A null value auto generates this field
+	/// An array of random bytes used to encrypt a message file extension.
 	/// </summary>
 	const std::vector<byte> &ExtensionKey() { return _extKey; }
 

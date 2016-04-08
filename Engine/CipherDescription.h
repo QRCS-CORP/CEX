@@ -87,7 +87,7 @@ private:
 	uint _blockSize;
 	uint _roundCount;
 	uint _kdfEngine;
-	uint _macSize;
+	uint _macKeySize;
 	uint _macEngine;
 
 public:
@@ -138,9 +138,9 @@ public:
 	const CEX::Enumeration::Digests KdfEngine() const { return (CEX::Enumeration::Digests)_kdfEngine; }
 
 	/// <summary>
-	/// The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key
+	/// The size of the HMAC key in bytes; a zeroed parameter means authentication is not enabled with this key
 	/// </summary>
-	const uint MacSize() const { return _macSize; }
+	const uint MacKeySize() const { return _macKeySize; }
 
 	/// <summary>
 	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
@@ -160,7 +160,7 @@ public:
 		_blockSize(0),
 		_roundCount(0),
 		_kdfEngine(0),
-		_macSize(0),
+		_macKeySize(0),
 		_macEngine(0)
 	{}
 
@@ -176,10 +176,10 @@ public:
 	/// <param name="BlockSize">The cipher Block Size</param>
 	/// <param name="RoundCount">The number of diffusion Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	/// <param name="MacSize">The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key</param>
+	/// <param name="MacKeySize">The size of the HMAC key in bytes; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC Digest engine used to authenticate a message file encrypted with this key</param>
 	CipherDescription(CEX::Enumeration::SymmetricEngines EngineType, uint KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize,
-		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, uint MacSize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
+		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, uint MacKeySize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
 	{
 		this->_engineType = (uint)EngineType;
 		this->_keySize = KeySize;
@@ -189,7 +189,7 @@ public:
 		this->_blockSize = (uint)BlockSize;
 		this->_roundCount = (uint)RoundCount;
 		this->_kdfEngine = (uint)KdfEngine;
-		this->_macSize = MacSize;
+		this->_macKeySize = MacKeySize;
 		this->_macEngine = (uint)MacEngine;
 	}
 
@@ -211,7 +211,7 @@ public:
 		_blockSize = reader.ReadByte();
 		_roundCount = reader.ReadByte();
 		_kdfEngine = reader.ReadByte();
-		_macSize = reader.ReadByte();
+		_macKeySize = reader.ReadByte();
 		_macEngine = reader.ReadByte();
 	}
 
@@ -232,7 +232,7 @@ public:
 		_blockSize = reader.ReadByte();
 		_roundCount = reader.ReadByte();
 		_kdfEngine = reader.ReadByte();
-		_macSize = reader.ReadByte();
+		_macKeySize = reader.ReadByte();
 		_macEngine = reader.ReadByte();
 	}
 
@@ -259,7 +259,7 @@ public:
 		_blockSize = 0;
 		_roundCount = 0;
 		_kdfEngine = 0;
-		_macSize = 0;
+		_macKeySize = 0;
 		_macEngine = 0;
 	}
 
@@ -280,7 +280,7 @@ public:
 		writer.Write((byte)_blockSize);
 		writer.Write((byte)_roundCount);
 		writer.Write((byte)_kdfEngine);
-		writer.Write((byte)_macSize);
+		writer.Write((byte)_macKeySize);
 		writer.Write((byte)_macEngine);
 
 		return writer.GetBytes();
@@ -303,7 +303,7 @@ public:
 		writer.Write((byte)_blockSize);
 		writer.Write((byte)_roundCount);
 		writer.Write((byte)_kdfEngine);
-		writer.Write((byte)_macSize);
+		writer.Write((byte)_macKeySize);
 		writer.Write((byte)_macEngine);
 
 		return writer.GetStream();
@@ -326,7 +326,7 @@ public:
 		result += 31 * _blockSize;
 		result += 31 * _roundCount;
 		result += 31 * _kdfEngine;
-		result += 31 * _macSize;
+		result += 31 * _macKeySize;
 		result += 31 * _macEngine;
 
 		return result;

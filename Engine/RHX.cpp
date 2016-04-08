@@ -128,15 +128,13 @@ void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 		StandardExpand(Key);
 	}
 
-	// block in 32 bit words
-	size_t blkWords = _blockSize / 4;
-	size_t expSize = blkWords * (_dfnRounds + 1);
-
 	// inverse cipher
 	if (!Encryption)
 	{
+		size_t blkWords = _blockSize / 4;
+
 		// reverse key
-		for (size_t i = 0, k = expSize - blkWords; i < k; i += blkWords, k -= blkWords)
+		for (size_t i = 0, k = _expKey.size() - blkWords; i < k; i += blkWords, k -= blkWords)
 		{
 			for (size_t j = 0; j < blkWords; j++)
 			{
@@ -146,7 +144,7 @@ void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 			}
 		}
 		// sbox inversion
-		for (size_t i = blkWords; i < expSize - blkWords; i++)
+		for (size_t i = blkWords; i < _expKey.size() - blkWords; i++)
 		{
 			_expKey[i] = IT0[SBox[(_expKey[i] >> 24)]] ^
 				IT1[SBox[(byte)(_expKey[i] >> 16)]] ^
@@ -192,75 +190,260 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 
 void RHX::StandardExpand(const std::vector<byte> &Key)
 {
-	// block and key in 32 bit words
-	size_t blkWords = _blockSize / 4;
-	size_t keyWords = (uint)(Key.size() / 4);
-
+	// block in 32 bit words
+	int blkWords = _blockSize / 4;
+	// key in 32 bit words
+	int keyWords = Key.size() / 4;
 	// rounds calculation
-	if (keyWords == 16)
-		_dfnRounds = 22;
-	else if (blkWords == 8 || keyWords == 8)
-		_dfnRounds = 14;
-	else if (keyWords == 6)
-		_dfnRounds = 12;
-	else
-		_dfnRounds = 10;
-
+	_dfnRounds = (blkWords == 8 || keyWords == 8) ? 14 : keyWords + 6;
 	// setup expanded key
-	size_t keySize = blkWords * (_dfnRounds + 1);
-	_expKey.resize(keySize, 0);
+	_expKey.resize(blkWords * (_dfnRounds + 1), 0);
 
-	int pos = -1;
-	// add bytes to beginning of working key array
-	for (size_t i = 0; i < keyWords; i++)
+	if (keyWords == 16)
 	{
-		uint value = (uint)(Key[++pos] << 24);
-		value |= (uint)(Key[++pos] << 16);
-		value |= (uint)(Key[++pos] << 8);
-		value |= (uint)(Key[++pos]);
-		_expKey[i] = value;
-	}
+		_expKey[0] = CEX::Utility::IntUtils::BytesToBe32(Key, 0);
+		_expKey[1] = CEX::Utility::IntUtils::BytesToBe32(Key, 4);
+		_expKey[2] = CEX::Utility::IntUtils::BytesToBe32(Key, 8);
+		_expKey[3] = CEX::Utility::IntUtils::BytesToBe32(Key, 12);
+		_expKey[4] = CEX::Utility::IntUtils::BytesToBe32(Key, 16);
+		_expKey[5] = CEX::Utility::IntUtils::BytesToBe32(Key, 20);
+		_expKey[6] = CEX::Utility::IntUtils::BytesToBe32(Key, 24);
+		_expKey[7] = CEX::Utility::IntUtils::BytesToBe32(Key, 28);
+		_expKey[8] = CEX::Utility::IntUtils::BytesToBe32(Key, 32);
+		_expKey[9] = CEX::Utility::IntUtils::BytesToBe32(Key, 36);
+		_expKey[10] = CEX::Utility::IntUtils::BytesToBe32(Key, 40);
+		_expKey[11] = CEX::Utility::IntUtils::BytesToBe32(Key, 44);
+		_expKey[12] = CEX::Utility::IntUtils::BytesToBe32(Key, 48);
+		_expKey[13] = CEX::Utility::IntUtils::BytesToBe32(Key, 52);
+		_expKey[14] = CEX::Utility::IntUtils::BytesToBe32(Key, 56);
+		_expKey[15] = CEX::Utility::IntUtils::BytesToBe32(Key, 60);
 
-	// build the remaining round keys
-	for (size_t i = keyWords; i < keySize; i++)
+		//512R: 16,24,32,40,48,56,64,72,80,88, S: 20,28,36,44,52,60,68,76,84
+		ExpandRotBlock(_expKey, 16, 16);
+		ExpandSubBlock(_expKey, 20, 16);
+		ExpandRotBlock(_expKey, 24, 16);
+		ExpandSubBlock(_expKey, 28, 16);
+		ExpandRotBlock(_expKey, 32, 16);
+		ExpandSubBlock(_expKey, 36, 16);
+		ExpandRotBlock(_expKey, 40, 16);
+		ExpandSubBlock(_expKey, 44, 16);
+		ExpandRotBlock(_expKey, 48, 16);
+		ExpandSubBlock(_expKey, 52, 16);
+		ExpandRotBlock(_expKey, 56, 16);
+		ExpandSubBlock(_expKey, 60, 16);
+		ExpandRotBlock(_expKey, 64, 16);
+		ExpandSubBlock(_expKey, 68, 16);
+		ExpandRotBlock(_expKey, 72, 16);
+		ExpandSubBlock(_expKey, 76, 16);
+		ExpandRotBlock(_expKey, 80, 16);
+		ExpandSubBlock(_expKey, 84, 16);
+		ExpandRotBlock(_expKey, 88, 16);
+
+		if (blkWords == 8)
+		{
+			ExpandSubBlock(_expKey, 92, 16);
+			ExpandRotBlock(_expKey, 96, 16);
+			ExpandSubBlock(_expKey, 100, 16);
+			ExpandRotBlock(_expKey, 104, 16);
+			ExpandSubBlock(_expKey, 108, 16);
+			ExpandRotBlock(_expKey, 112, 16);
+			ExpandSubBlock(_expKey, 116, 16);
+			ExpandRotBlock(_expKey, 120, 16);
+			ExpandSubBlock(_expKey, 124, 16);
+			ExpandRotBlock(_expKey, 128, 16);
+			ExpandSubBlock(_expKey, 132, 16);
+			ExpandRotBlock(_expKey, 136, 16);
+			ExpandSubBlock(_expKey, 140, 16);
+			ExpandRotBlock(_expKey, 144, 16);
+			ExpandSubBlock(_expKey, 148, 16);
+			ExpandRotBlock(_expKey, 152, 16);
+			ExpandSubBlock(_expKey, 156, 16);
+			ExpandRotBlock(_expKey, 160, 16);
+			ExpandSubBlock(_expKey, 164, 16);
+			ExpandRotBlock(_expKey, 168, 16);
+			ExpandSubBlock(_expKey, 172, 16);
+		}
+	}
+	else if (keyWords == 8)
 	{
-		uint temp = _expKey[i - 1];
+		_expKey[0] = CEX::Utility::IntUtils::BytesToBe32(Key, 0);
+		_expKey[1] = CEX::Utility::IntUtils::BytesToBe32(Key, 4);
+		_expKey[2] = CEX::Utility::IntUtils::BytesToBe32(Key, 8);
+		_expKey[3] = CEX::Utility::IntUtils::BytesToBe32(Key, 12);
+		_expKey[4] = CEX::Utility::IntUtils::BytesToBe32(Key, 16);
+		_expKey[5] = CEX::Utility::IntUtils::BytesToBe32(Key, 20);
+		_expKey[6] = CEX::Utility::IntUtils::BytesToBe32(Key, 24);
+		_expKey[7] = CEX::Utility::IntUtils::BytesToBe32(Key, 28);
 
-		// if it is a 512 bit key, maintain step 8 interval for 
-		// additional processing steps, equal to a 256 bit key distribution
-		if (keyWords > 8)
+		// 256 R: 8,16,24,32,40,48,56 S: 12,20,28,36,44,52
+		ExpandRotBlock(_expKey, 8, 8);
+		ExpandSubBlock(_expKey, 12, 8);
+		ExpandRotBlock(_expKey, 16, 8);
+		ExpandSubBlock(_expKey, 20, 8);
+		ExpandRotBlock(_expKey, 24, 8);
+		ExpandSubBlock(_expKey, 28, 8);
+		ExpandRotBlock(_expKey, 32, 8);
+		ExpandSubBlock(_expKey, 36, 8);
+		ExpandRotBlock(_expKey, 40, 8);
+		ExpandSubBlock(_expKey, 44, 8);
+		ExpandRotBlock(_expKey, 48, 8);
+		ExpandSubBlock(_expKey, 52, 8);
+		ExpandRotBlock(_expKey, 56, 8);
+
+		if (blkWords == 8)
 		{
-			if (i % keyWords == 0 || i % keyWords == 8)
-			{
-				// round the key
-				uint rot = (uint)((temp << 8) | ((temp >> 24) & 0xff));
-				// subbyte step
-				temp = SubByte(rot) ^ Rcon[i / keyWords];
-			}
-			// step ik + 4 and 12
-			else if ((i % keyWords) == 4 || (i % keyWords) == 12)
-			{
-				temp = SubByte(temp);
-			}
+			ExpandSubBlock(_expKey, 60, 8);
+			ExpandRotBlock(_expKey, 64, 8);
+			ExpandSubBlock(_expKey, 68, 8);
+			ExpandRotBlock(_expKey, 72, 8);
+			ExpandSubBlock(_expKey, 76, 8);
+			ExpandRotBlock(_expKey, 80, 8);
+			ExpandSubBlock(_expKey, 84, 8);
+			ExpandRotBlock(_expKey, 88, 8);
+			ExpandSubBlock(_expKey, 92, 8);
+			ExpandRotBlock(_expKey, 96, 8);
+			ExpandSubBlock(_expKey, 100, 8);
+			ExpandRotBlock(_expKey, 104, 8);
+			ExpandSubBlock(_expKey, 108, 8);
+			ExpandRotBlock(_expKey, 112, 8);
+			ExpandSubBlock(_expKey, 116, 8);
 		}
-		else
-		{
-			if (i % keyWords == 0)
-			{
-				// round the key
-				uint rot = (uint)((temp << 8) | ((temp >> 24) & 0xff));
-				// subbyte step
-				temp = SubByte(rot) ^ Rcon[i / keyWords];
-			}
-			// step ik + 4
-			else if (keyWords > 6 && (i % keyWords) == 4)
-			{
-				temp = SubByte(temp);
-			}
-		}
-		// w[i-Nk] ^ w[i]
-		_expKey[i] = (uint)(_expKey[i - keyWords] ^ temp);
 	}
+	else if (keyWords == 6)
+	{
+		_expKey[0] = CEX::Utility::IntUtils::BytesToBe32(Key, 0);
+		_expKey[1] = CEX::Utility::IntUtils::BytesToBe32(Key, 4);
+		_expKey[2] = CEX::Utility::IntUtils::BytesToBe32(Key, 8);
+		_expKey[3] = CEX::Utility::IntUtils::BytesToBe32(Key, 12);
+		_expKey[4] = CEX::Utility::IntUtils::BytesToBe32(Key, 16);
+		_expKey[5] = CEX::Utility::IntUtils::BytesToBe32(Key, 20);
+
+		// 192: 6,12,18,24,30,36,42,48
+		ExpandRotBlock(_expKey, 6, 6);
+		_expKey[10] = _expKey[4] ^ _expKey[9];
+		_expKey[11] = _expKey[5] ^ _expKey[10];
+		ExpandRotBlock(_expKey, 12, 6);
+		_expKey[16] = _expKey[10] ^ _expKey[15];
+		_expKey[17] = _expKey[11] ^ _expKey[16];
+		ExpandRotBlock(_expKey, 18, 6);
+		_expKey[22] = _expKey[16] ^ _expKey[21];
+		_expKey[23] = _expKey[17] ^ _expKey[22];
+		ExpandRotBlock(_expKey, 24, 6);
+		_expKey[28] = _expKey[22] ^ _expKey[27];
+		_expKey[29] = _expKey[23] ^ _expKey[28];
+		ExpandRotBlock(_expKey, 30, 6);
+		_expKey[34] = _expKey[28] ^ _expKey[33];
+		_expKey[35] = _expKey[29] ^ _expKey[34];
+		ExpandRotBlock(_expKey, 36, 6);
+		_expKey[40] = _expKey[34] ^ _expKey[39];
+		_expKey[41] = _expKey[35] ^ _expKey[40];
+		ExpandRotBlock(_expKey, 42, 6);
+		_expKey[46] = _expKey[40] ^ _expKey[45];
+		_expKey[47] = _expKey[41] ^ _expKey[46];
+		ExpandRotBlock(_expKey, 48, 6);
+
+		if (blkWords == 8)
+		{
+			_expKey[52] = _expKey[46] ^ _expKey[51];
+			_expKey[53] = _expKey[47] ^ _expKey[52];
+			ExpandRotBlock(_expKey, 54, 6);
+			_expKey[58] = _expKey[52] ^ _expKey[57];
+			_expKey[59] = _expKey[53] ^ _expKey[58];
+			ExpandRotBlock(_expKey, 60, 6);
+			_expKey[64] = _expKey[58] ^ _expKey[63];
+			_expKey[65] = _expKey[59] ^ _expKey[64];
+			ExpandRotBlock(_expKey, 66, 6);
+			_expKey[70] = _expKey[64] ^ _expKey[69];
+			_expKey[71] = _expKey[65] ^ _expKey[70];
+			ExpandRotBlock(_expKey, 72, 6);
+			_expKey[76] = _expKey[70] ^ _expKey[75];
+			_expKey[77] = _expKey[71] ^ _expKey[76];
+			ExpandRotBlock(_expKey, 78, 6);
+			_expKey[82] = _expKey[76] ^ _expKey[81];
+			_expKey[83] = _expKey[77] ^ _expKey[82];
+			ExpandRotBlock(_expKey, 84, 6);
+			_expKey[88] = _expKey[82] ^ _expKey[87];
+			_expKey[89] = _expKey[83] ^ _expKey[88];
+			ExpandRotBlock(_expKey, 90, 6);
+			_expKey[94] = _expKey[88] ^ _expKey[93];
+			_expKey[95] = _expKey[89] ^ _expKey[94];
+			ExpandRotBlock(_expKey, 96, 6);
+			_expKey[100] = _expKey[94] ^ _expKey[99];
+			_expKey[101] = _expKey[95] ^ _expKey[100];
+			ExpandRotBlock(_expKey, 102, 6);
+			_expKey[106] = _expKey[100] ^ _expKey[105];
+			_expKey[107] = _expKey[101] ^ _expKey[106];
+			ExpandRotBlock(_expKey, 108, 6);
+			_expKey[112] = _expKey[106] ^ _expKey[111];
+			_expKey[113] = _expKey[107] ^ _expKey[112];
+			ExpandRotBlock(_expKey, 114, 6);
+			_expKey[118] = _expKey[112] ^ _expKey[117];
+			_expKey[119] = _expKey[113] ^ _expKey[118];
+		}
+	}
+	else
+	{
+		_expKey[0] = CEX::Utility::IntUtils::BytesToBe32(Key, 0);
+		_expKey[1] = CEX::Utility::IntUtils::BytesToBe32(Key, 4);
+		_expKey[2] = CEX::Utility::IntUtils::BytesToBe32(Key, 8);
+		_expKey[3] = CEX::Utility::IntUtils::BytesToBe32(Key, 12);
+
+		// 128R: 4,8,12,16,20,24,28,32,36,40
+		ExpandRotBlock(_expKey, 4, 4);
+		ExpandRotBlock(_expKey, 8, 4);
+		ExpandRotBlock(_expKey, 12, 4);
+		ExpandRotBlock(_expKey, 16, 4);
+		ExpandRotBlock(_expKey, 20, 4);
+		ExpandRotBlock(_expKey, 24, 4);
+		ExpandRotBlock(_expKey, 28, 4);
+		ExpandRotBlock(_expKey, 32, 4);
+		ExpandRotBlock(_expKey, 36, 4);
+		ExpandRotBlock(_expKey, 40, 4);
+
+		if (blkWords == 8)
+		{
+			ExpandRotBlock(_expKey, 44, 4);
+			ExpandRotBlock(_expKey, 48, 4);
+			ExpandRotBlock(_expKey, 52, 4);
+			ExpandRotBlock(_expKey, 56, 4);
+			ExpandRotBlock(_expKey, 60, 4);
+			ExpandRotBlock(_expKey, 64, 4);
+			ExpandRotBlock(_expKey, 68, 4);
+			ExpandRotBlock(_expKey, 72, 4);
+			ExpandRotBlock(_expKey, 76, 4);
+			ExpandRotBlock(_expKey, 80, 4);
+			ExpandRotBlock(_expKey, 84, 4);
+			ExpandRotBlock(_expKey, 88, 4);
+			ExpandRotBlock(_expKey, 92, 4);
+			ExpandRotBlock(_expKey, 96, 4);
+			ExpandRotBlock(_expKey, 100, 4);
+			ExpandRotBlock(_expKey, 104, 4);
+			ExpandRotBlock(_expKey, 108, 4);
+			ExpandRotBlock(_expKey, 112, 4);
+			ExpandRotBlock(_expKey, 116, 4);
+		}
+	}
+}
+
+void RHX::ExpandRotBlock(std::vector<uint> &Key, int Index, int Offset)
+{
+	int sub = Index - Offset;
+
+	Key[Index] = Key[sub] ^ SubByte((Key[Index - 1] << 8) | ((Key[Index - 1] >> 24) & 0xFF)) ^ Rcon[(Index / Offset)];
+	// note: you can insert noise before each mix to further equalize timing, i.e: uint tmp = SubByte(Key[Index - 1]);
+	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+}
+
+void RHX::ExpandSubBlock(std::vector<uint> &Key, int Index, int Offset)
+{
+	int sub = Index - Offset;
+
+	Key[Index] = SubByte(Key[Index - 1]) ^ Key[sub];
+	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+	Key[++Index] = Key[++sub] ^ Key[Index - 1];
 }
 
 // *** Rounds Processing *** //
@@ -551,23 +734,7 @@ void RHX::Decrypt32(const std::vector<byte> &Input, const size_t InOffset, std::
 
 int RHX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 {
-	switch (DigestType)
-	{
-	case CEX::Enumeration::Digests::Blake256:
-	case CEX::Enumeration::Digests::Keccak256:
-	case CEX::Enumeration::Digests::SHA256:
-	case CEX::Enumeration::Digests::Skein256:
-		return 32;
-	case CEX::Enumeration::Digests::Blake512:
-	case CEX::Enumeration::Digests::Keccak512:
-	case CEX::Enumeration::Digests::SHA512:
-	case CEX::Enumeration::Digests::Skein512:
-		return 64;
-	case CEX::Enumeration::Digests::Skein1024:
-		return 128;
-	default:
-		throw CryptoSymmetricCipherException("RHX:GetDigestSize", "The digest type is not supported!");
-	}
+	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
 }
 
 CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
@@ -584,25 +751,7 @@ CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
 
 int RHX::GetSaltSize(CEX::Enumeration::Digests DigestType)
 {
-	switch (DigestType)
-	{
-	case CEX::Enumeration::Digests::Blake256:
-	case CEX::Enumeration::Digests::Skein256:
-		return 32;
-	case CEX::Enumeration::Digests::Blake512:
-	case CEX::Enumeration::Digests::SHA256:
-	case CEX::Enumeration::Digests::Skein512:
-		return 64;
-	case CEX::Enumeration::Digests::SHA512:
-	case CEX::Enumeration::Digests::Skein1024:
-		return 128;
-	case CEX::Enumeration::Digests::Keccak256:
-		return 136;
-	case CEX::Enumeration::Digests::Keccak512:
-		return 72;
-	default:
-		throw CryptoSymmetricCipherException("RHX:GetBlockSize", "The digest type is not supported!");
-	}
+	return CEX::Helper::DigestFromName::GetBlockSize(DigestType);
 }
 
 uint RHX::SubByte(uint Rot)

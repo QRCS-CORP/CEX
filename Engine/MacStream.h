@@ -32,6 +32,8 @@
 #include "Event.h"
 #include "IByteStream.h"
 #include "IMac.h"
+#include "MacDescription.h"
+#include "KeyParams.h"
 
 NAMESPACE_PROCESSING
 
@@ -85,6 +87,30 @@ public:
 	/// The Progress Percent event
 	/// </summary>
 	CEX::Event::Event<int> ProgressPercent;
+
+	/// <summary>
+	/// Initialize the class with an 
+	/// </summary>
+	/// 
+	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
+	/// <param name="MacKey">A KeyParams containing the Mac key and Iv; note the Ikm parameter in KeyParams is not used</param>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if an uninitialized Mac is used</exception>
+	explicit MacStream(CEX::Common::MacDescription &Description, CEX::Common::KeyParams &MacKey)
+		:
+		_blockSize(0),
+		_destroyEngine(false),
+		_inStream(0),
+		_isDestroyed(false),
+		_progressInterval(0)
+	{
+		CreateMac(Description);
+		if (_macEngine == 0)
+			throw CEX::Exception::CryptoProcessingException("MacStream:CTor", "The Mac could not be created!");
+
+		_macEngine->Initialize(MacKey.Key(), MacKey.IV());
+		_blockSize = _macEngine->BlockSize();
+	}
 
 	/// <summary>
 	/// Initialize the class with an initialized Mac instance
@@ -142,6 +168,7 @@ private:
 	void CalculateProgress(size_t Length, bool Completed = false);
 	std::vector<byte> Compute(size_t Length);
 	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void CreateMac(CEX::Common::MacDescription &Description);
 	void Destroy();
 };
 

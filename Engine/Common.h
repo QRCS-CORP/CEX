@@ -61,34 +61,4 @@
 #define NAMESPACE_SEEDEND } } 
 #define NAMESPACE_UTILITY namespace CEX { namespace Utility {
 #define NAMESPACE_UTILITYEND } } 
-
-NAMESPACE_ROOT
-/*! \mainpage A programmers guide to the CEX++ Cryptographic library
-
-\section intro_sec Welcome
-Welcome to the CEX Cryptographic Library, version 1.5.0.6.
-\brief 
-CEX is a library built for both speed and maximum security. 
-This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
-
-
-\details   This class is used to demonstrate a number of section commands.
-\author    John Underhill
-\version   1.0.0.6
-\date      February 10, 2016
-\copyright MIT public license
-
-
-\section intro_link Links
-Get the latest version from the CEX Home page: http://www.vtdev.com/cexhome.html
-
-The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html
-
-CEX++ on Github: https://github.com/Steppenwolfe65/CEX
-
-CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET
-
-The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
-*/
-NAMESPACE_ROOTEND
 #endif

@@ -38,6 +38,9 @@
 #include "VMACTest.h"
 #include "XSPRsgTest.h"
 
+#include "CipherKey.h"
+#include "MacKey.h"
+
 using namespace Test;
 
 // *** CEX 1.0 TODO ***
@@ -134,8 +137,23 @@ void RunTest(Test::ITest* Test)
 	}
 }
 
-int main(/*int argc, const char * argv[]*/)
+/*static bool GetNNICapability()
 {
+	unsigned int b;
+
+	__asm
+	{
+		mov		eax, 1
+		cpuid
+		mov		b, ecx
+	}
+
+	return (b & (1 << 25)) != 0;
+}*/
+
+int main()
+{
+	//RunTest(new MacStreamTest());
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 

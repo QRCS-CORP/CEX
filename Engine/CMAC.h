@@ -31,6 +31,7 @@
 
 #include "IMac.h"
 #include "ICipherMode.h"
+#include "BlockCiphers.h"
 
 NAMESPACE_MAC
 
@@ -117,32 +118,53 @@ public:
 	virtual const char *Name() { return "CMAC"; }
 
 	// *** Constructor *** //
+	/// <summary>
+	/// Initialize the class with the block cipher enumeration name
+	/// </summary>
+	/// <param name="EngineType">The block cipher enumeration name</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if an invalid block size is used</exception>
+	CMAC(CEX::Enumeration::BlockCiphers EngineType)
+		:
+		_blockSize(0),
+		_cipherKey(),
+		_isDestroyed(false),
+		_isInitialized(false),
+		_macSize(0),
+		_msgCode(0),
+		_wrkBuffer(0),
+		_wrkOffset(0)
+	{
+		CreateCipher(EngineType);
+		if (_cipherMode == 0)
+			throw CryptoMacException("CMAC:Ctor", "Could not create the cipher!");
+
+		_blockSize = _cipherMode->BlockSize();
+		_macSize = _cipherMode->BlockSize();
+		_msgCode.resize(_cipherMode->BlockSize());
+		_wrkBuffer.resize(_cipherMode->BlockSize());
+	}
 
 	/// <summary>
 	/// Initialize the class
 	/// </summary>
 	///
 	/// <param name="Cipher">Instance of the block cipher</param>
-	/// <param name="MacBits">Expected MAC return size in Bits; must be less or equal to Cipher Block size in bits</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
-	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, size_t MacBits)
+	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher)
 		:
 		_blockSize(Cipher->BlockSize()),
 		_cipherKey(),
 		_isDestroyed(false),
 		_isInitialized(false),
-		_macSize(MacBits / 8),
+		_macSize(Cipher->BlockSize()),
 		_msgCode(Cipher->BlockSize()),
 		_wrkBuffer(Cipher->BlockSize()),
 		_wrkOffset(0)
 	{
-		if ((MacBits % 8) != 0)
-			throw CryptoMacException("CMAC:Ctor", "MAC size must be multiple of 8!");
-		if (MacBits > (Cipher->BlockSize() * 8))
-			throw CryptoMacException("CMAC:Ctor", "MAC size must be less or equal to Cipher BlockSize * 8!");
-		if (Cipher->BlockSize() != 8 && Cipher->BlockSize() != 16)
-			throw CryptoMacException("CMAC:Ctor", "Block size must be either 64 or 128 bits!");
+		if (Cipher == 0)
+			throw CryptoMacException("CMAC:Ctor", "Cipher can not be null!");
 
 		LoadCipher(Cipher);
 	}
@@ -221,6 +243,7 @@ public:
 
 private:
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
+	void CreateCipher(CEX::Enumeration::BlockCiphers Cipher);
 	void LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher);
 };
 

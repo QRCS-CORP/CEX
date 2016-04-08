@@ -44,7 +44,7 @@ namespace Test
 	{
 		CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
 		std::vector<byte> iv(eng->BlockSize());
-		CEX::Mac::CMAC mac(eng, 128);
+		CEX::Mac::CMAC mac(eng);
 
 		mac.Initialize(Key, iv);
 		std::vector<byte> input(64);
@@ -64,7 +64,7 @@ namespace Test
 		std::vector<byte> hash(16);
 		CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
 		std::vector<byte> iv(eng->BlockSize());
-		CEX::Mac::CMAC mac(eng, 128);
+		CEX::Mac::CMAC mac(eng);
 
 		mac.Initialize(Key, iv);
 		mac.BlockUpdate(Input, 0, Input.size());

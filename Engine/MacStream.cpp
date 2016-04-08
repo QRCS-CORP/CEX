@@ -1,5 +1,6 @@
 #include "Common.h"
 #include "MacStream.h"
+#include "MacFromDescription.h"
 
 NAMESPACE_PROCESSING
 
@@ -123,6 +124,11 @@ void MacStream::Destroy()
 		delete _macEngine;
 
 	_isDestroyed = true;
+}
+
+void MacStream::CreateMac(CEX::Common::MacDescription &Description)
+{
+	_macEngine = CEX::Helper::MacFromDescription::GetInstance(Description);
 }
 
 NAMESPACE_PROCESSINGEND

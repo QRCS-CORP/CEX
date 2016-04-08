@@ -18,7 +18,6 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\speedtest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\vmactest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\xsprsgtest.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\test.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\twofishtest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\aesavstest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\aesfipstest.obj
@@ -32,6 +31,7 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hkdftest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hmactest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hxciphertest.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\test.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\test.ilk
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\test.exe
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\test.pdb

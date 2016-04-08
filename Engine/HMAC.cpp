@@ -1,4 +1,5 @@
 #include "HMAC.h"
+#include "DigestFromName.h"
 #include "IntUtils.h"
 
 NAMESPACE_MAC
@@ -79,8 +80,8 @@ void HMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &
 		memset(&_inputPad[keyLength], (byte)0, _blockSize - keyLength);
 
 	memcpy(&_outputPad[0], &_inputPad[0], _blockSize);
-	XOr(_inputPad, IPAD);
-	XOr(_outputPad, OPAD);
+	XorPad(_inputPad, IPAD);
+	XorPad(_outputPad, OPAD);
 
 	// initialise the digest
 	_msgDigest->BlockUpdate(_inputPad, 0, _inputPad.size());
@@ -96,6 +97,11 @@ void HMAC::Reset()
 void HMAC::Update(byte Input)
 {
 	_msgDigest->Update(Input);
+}
+
+void HMAC::CreateDigest(CEX::Enumeration::Digests DigestType)
+{
+	_msgDigest = Helper::DigestFromName::GetInstance(DigestType);
 }
 
 NAMESPACE_MACEND

@@ -31,6 +31,7 @@
 
 #include "IMac.h"
 #include "IDigest.h"
+#include "Digests.h"
 
 NAMESPACE_MAC
 
@@ -114,6 +115,29 @@ public:
 	virtual const char *Name() { return "HMAC"; }
 
 	// *** Constructor *** //
+	/// <summary>
+	/// Initialize this class using the digest enumeration name
+	/// </summary>
+	/// 
+	/// <param name="Digests">The message digest enumeration name</param>
+	explicit HMAC(CEX::Enumeration::Digests DigestType)
+		:
+		_blockSize(0),
+		_digestSize(0),
+		_inputPad(0),
+		_outputPad(0),
+		_isDestroyed(false),
+		_isInitialized(false)
+	{
+		CreateDigest(DigestType);
+		if (_msgDigest == 0)
+			throw CryptoMacException("HMAC:Ctor", "Could not create the digest!");
+
+		_blockSize = _msgDigest->BlockSize();
+		_digestSize = _msgDigest->DigestSize();
+		_inputPad.resize(_msgDigest->BlockSize());
+		_outputPad.resize(_msgDigest->BlockSize());
+	}
 
 	/// <summary>
 	/// Initialize the class
@@ -133,7 +157,7 @@ public:
 		_isInitialized(false)
 	{
 		if (Digest == 0)
-			throw CryptoMacException("HMAC:Ctor", "The digest has not been not initialized!");
+			throw CryptoMacException("HMAC:Ctor", "The digest can not be null!");
 	}
 
 	/// <summary>
@@ -200,7 +224,9 @@ public:
 	virtual void Update(byte Input);
 
 private:
-	inline void XOr(std::vector<byte> &A, byte N)
+	void CreateDigest(CEX::Enumeration::Digests DigestType);
+
+	inline void XorPad(std::vector<byte> &A, byte N)
 	{
 		for (size_t i = 0; i < A.size(); ++i)
 			A[i] ^= N;

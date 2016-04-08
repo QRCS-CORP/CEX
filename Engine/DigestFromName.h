@@ -22,7 +22,25 @@ public:
 	/// <returns>An initialized digest</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static  CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests DigestType);
+	static CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests DigestType);
+
+	/// <summary>
+	/// Get the input block size of a message digest
+	/// </summary>
+	/// 
+	/// <param name="DigestType">The Digest enumeration member</param>
+	/// 
+	/// <returns>The block size in bytes</returns>
+	static int GetBlockSize(CEX::Enumeration::Digests DigestType);
+
+	/// <summary>
+	/// Get the hash size of a message digest
+	/// </summary>
+	/// 
+	/// <param name="DigestType">The Digest enumeration member</param>
+	/// 
+	/// <returns>The hash size size in bytes</returns>
+	static int GetDigestSize(CEX::Enumeration::Digests DigestType);
 };
 
 NAMESPACE_HELPEREND

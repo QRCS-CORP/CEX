@@ -1,4 +1,5 @@
 #include "CMAC.h"
+#include "BlockCipherFromName.h"
 #include "CBC.h"
 #include "ISO7816.h"
 #include "IntUtils.h"
@@ -145,6 +146,11 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 		tmpk[Input.size() - 1] ^= Input.size() == _blockSize ? CT87 : CT1B;
 
 	return tmpk;
+}
+
+void CMAC::CreateCipher(CEX::Enumeration::BlockCiphers EngineType)
+{
+	_cipherMode = new CEX::Cipher::Symmetric::Block::Mode::CBC(CEX::Helper::BlockCipherFromName::GetInstance(EngineType));
 }
 
 void CMAC::LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher)

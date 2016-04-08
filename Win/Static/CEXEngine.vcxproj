@@ -180,6 +180,7 @@
     <ClInclude Include="..\..\Engine\CBC.h" />
     <ClInclude Include="..\..\Engine\CipherDescription.h" />
     <ClInclude Include="..\..\Engine\BlockCipherFromName.h" />
+    <ClInclude Include="..\..\Engine\CipherFromDescription.h" />
     <ClInclude Include="..\..\Engine\CipherKey.h" />
     <ClInclude Include="..\..\Engine\CipherModes.h" />
     <ClInclude Include="..\..\Engine\CMAC.h" />
@@ -207,6 +208,7 @@
     <ClInclude Include="..\..\Engine\DigestFromName.h" />
     <ClInclude Include="..\..\Engine\Digests.h" />
     <ClInclude Include="..\..\Engine\DigestStream.h" />
+    <ClInclude Include="..\..\Engine\Documentation.h" />
     <ClInclude Include="..\..\Engine\ECB.h" />
     <ClInclude Include="..\..\Engine\EntropyPool.h" />
     <ClInclude Include="..\..\Engine\Event.h" />
@@ -236,6 +238,9 @@
     <ClInclude Include="..\..\Engine\KeyGenerator.h" />
     <ClInclude Include="..\..\Engine\KeyParams.h" />
     <ClInclude Include="..\..\Engine\KeySizes.h" />
+    <ClInclude Include="..\..\Engine\MacDescription.h" />
+    <ClInclude Include="..\..\Engine\MacFromDescription.h" />
+    <ClInclude Include="..\..\Engine\MacKey.h" />
     <ClInclude Include="..\..\Engine\Macs.h" />
     <ClInclude Include="..\..\Engine\MacStream.h" />
     <ClInclude Include="..\..\Engine\MemoryStream.h" />
@@ -296,6 +301,7 @@
     <ClCompile Include="..\..\Engine\CBC.cpp" />
     <ClCompile Include="..\..\Engine\CFB.cpp" />
     <ClCompile Include="..\..\Engine\ChaCha.cpp" />
+    <ClCompile Include="..\..\Engine\CipherFromDescription.cpp" />
     <ClCompile Include="..\..\Engine\CipherModeFromName.cpp" />
     <ClCompile Include="..\..\Engine\CMAC.cpp" />
     <ClCompile Include="..\..\Engine\CSPPrng.cpp" />
@@ -320,6 +326,7 @@
     <ClCompile Include="..\..\Engine\Keccak512.cpp" />
     <ClCompile Include="..\..\Engine\KeyFactory.cpp" />
     <ClCompile Include="..\..\Engine\KeyGenerator.cpp" />
+    <ClCompile Include="..\..\Engine\MacFromDescription.cpp" />
     <ClCompile Include="..\..\Engine\MacStream.cpp" />
     <ClCompile Include="..\..\Engine\MemoryStream.cpp" />
     <ClCompile Include="..\..\Engine\OFB.cpp" />

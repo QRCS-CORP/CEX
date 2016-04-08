@@ -495,6 +495,21 @@
     <ClInclude Include="..\..\Engine\Rijndael.h">
       <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\Documentation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacDescription.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherFromDescription.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacFromDescription.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacKey.h">
+      <Filter>Header Files\Processing\Structure</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Engine\CBC.cpp">
@@ -629,9 +644,6 @@
     <ClCompile Include="..\..\Engine\BlockCipherFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Engine\CipherModeFromName.cpp">
-      <Filter>Source Files\Helper</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Engine\DigestFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
@@ -688,6 +700,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\Keccak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CipherModeFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CipherFromDescription.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\MacFromDescription.cpp">
+      <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

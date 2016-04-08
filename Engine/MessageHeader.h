@@ -240,13 +240,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="MessageStream">Stream containing a message header</param>
-	/// <param name="MacSize">Size of the Message Authentication Code</param>
+	/// <param name="MacKeySize">Size of the Message Authentication Code key</param>
 	/// 
 	/// <returns>64 byte Hash value</returns>
-	static std::vector<byte> GetMessageMac(CEX::IO::MemoryStream &MessageStream, int MacSize)
+	static std::vector<byte> GetMessageMac(CEX::IO::MemoryStream &MessageStream, int MacKeySize)
 	{
 		MessageStream.Seek(SEEKTO_HASH, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(MessageStream).ReadBytes(MacSize);
+		return CEX::IO::StreamReader(MessageStream).ReadBytes(MacKeySize);
 	}
 
 	/// <summary>

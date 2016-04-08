@@ -126,11 +126,11 @@ public:
 	/// <param name="BlockSize">The cipher Block Size</param>
 	/// <param name="Rounds">The number of diffusion Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX ciphers</param>
-	/// <param name="MacSize">The size of the HMAC message authentication code; a zeroed parameter means authentication is not enabled with this key</param>
+	/// <param name="MacKeySize">The size of the HMAC key in bytes; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC Digest engine used to authenticate a message file encrypted with this key</param>
 	void Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::SymmetricEngines EngineType, int KeySize, CEX::Enumeration::IVSizes IvSize, 
 		CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
-		CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacSize, CEX::Enumeration::Digests MacEngine);
+		CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacKeySize, CEX::Enumeration::Digests MacEngine);
 
 	/// <summary>
 	/// Extract a KeyParams and CipherKey

@@ -408,46 +408,12 @@ CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
 
 int THX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 {
-	switch (DigestType)
-	{
-	case CEX::Enumeration::Digests::Blake256:
-	case CEX::Enumeration::Digests::Keccak256:
-	case CEX::Enumeration::Digests::SHA256:
-	case CEX::Enumeration::Digests::Skein256:
-		return 32;
-	case CEX::Enumeration::Digests::Blake512:
-	case CEX::Enumeration::Digests::Keccak512:
-	case CEX::Enumeration::Digests::SHA512:
-	case CEX::Enumeration::Digests::Skein512:
-		return 64;
-	case CEX::Enumeration::Digests::Skein1024:
-		return 128;
-	default:
-		throw CryptoSymmetricCipherException("RHX:GetDigestSize", "The digest type is not supported!");
-	}
+	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
 }
 
 int THX::GetSaltSize(CEX::Enumeration::Digests DigestType)
 {
-	switch (DigestType)
-	{
-	case CEX::Enumeration::Digests::Blake256:
-	case CEX::Enumeration::Digests::Skein256:
-		return 32;
-	case CEX::Enumeration::Digests::Blake512:
-	case CEX::Enumeration::Digests::SHA256:
-	case CEX::Enumeration::Digests::Skein512:
-		return 64;
-	case CEX::Enumeration::Digests::SHA512:
-	case CEX::Enumeration::Digests::Skein1024:
-		return 128;
-	case CEX::Enumeration::Digests::Keccak256:
-		return 136;
-	case CEX::Enumeration::Digests::Keccak512:
-		return 72;
-	default:
-		throw CryptoSymmetricCipherException("RHX:GetBlockSize", "The digest type is not supported!");
-	}
+	return CEX::Helper::DigestFromName::GetBlockSize(DigestType);
 }
 
 uint THX::Mix32(const uint X, const std::vector<uint> &Key, const size_t Count)

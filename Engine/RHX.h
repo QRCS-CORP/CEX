@@ -399,6 +399,8 @@ private:
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
+	void ExpandRotBlock(std::vector<uint> &Key, int Index, int Offset);
+	void ExpandSubBlock(std::vector<uint> &Key, int Index, int Offset);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
 	int GetSaltSize(CEX::Enumeration::Digests DigestType);

@@ -19,19 +19,31 @@ namespace Test
 			HMAC* hmac = new HMAC(sha);
 			hmac->Initialize(key, iv);
 			CompareOutput(hmac);
-			delete sha;
-			delete hmac;
 			OnProgress("Passed MacStream HMAC comparison tests..");
+			// test enum initialization
+			HMAC* hmac2 = new HMAC(CEX::Enumeration::Digests::SHA256);
+			hmac2->Initialize(key, iv);
+			CompareOutput(hmac2);
+			delete hmac;
+			delete hmac2;
+			delete sha;
+			OnProgress("Passed HMAC enum initialization test..");
 
 			key.resize(32);
 			iv.resize(16);
 			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CMAC* cmac = new CMAC(eng, 128);
+			CMAC* cmac = new CMAC(eng);
 			cmac->Initialize(key, iv);
 			CompareOutput(cmac);
-			delete eng;
-			delete cmac;
 			OnProgress("Passed MacStream CMAC comparison tests..");
+			// test enum initialization
+			CMAC* cmac2 = new CMAC(CEX::Enumeration::BlockCiphers::RHX);
+			cmac2->Initialize(key, iv);
+			CompareOutput(cmac2);
+			delete cmac;
+			delete cmac2;
+			delete eng;
+			OnProgress("Passed CMAC enum initialization test..");
 
 			iv.resize(32);
 			rnd.GetBytes(iv);

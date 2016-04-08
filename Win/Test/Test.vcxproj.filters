@@ -313,9 +313,6 @@
     <ClCompile Include="..\..\Test\RijndaelTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
-    <ClCompile Include="TwofishTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\CMACTest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
     </ClCompile>
@@ -381,6 +378,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\SP20DrbgTest.cpp">
       <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\TwofishTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

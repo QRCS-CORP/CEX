@@ -9,7 +9,7 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Enumer
 {
 	CEX::Seed::CSPRsg rnd;
 	CEX::Common::KeyGenerator keyGen(SeedEngine, HashEngine, rnd.GetBytes(16));
-	CEX::Common::KeyParams* key = keyGen.GetKeyParams(Description.KeySize(), (uint)Description.IvSize(), Description.MacSize());
+	CEX::Common::KeyParams* key = keyGen.GetKeyParams(Description.KeySize(), (uint)Description.IvSize(), Description.MacKeySize());
 
 	Create(Description, *key);
 }
@@ -24,10 +24,10 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common
 		if (KeyParam.IV().size() != (uint)Description.IvSize())
 			throw CEX::Exception::CryptoProcessingException("KeyFactory:Create", "The KeyParam IV size does not align with the IVSize setting in the Header!");
 	}
-	if (Description.MacSize() > 0)
+	if (Description.MacKeySize() > 0)
 	{
-		if (KeyParam.Ikm().size() != Description.MacSize())
-			throw CEX::Exception::CryptoProcessingException("KeyFactory:Create", "Header MacSize does not align with the size of the KeyParam IKM!");
+		if (KeyParam.Ikm().size() != Description.MacKeySize())
+			throw CEX::Exception::CryptoProcessingException("KeyFactory:Create", "Header MacKeySize does not align with the size of the KeyParam IKM!");
 	}
 
 	CEX::Seed::CSPRsg rnd;
@@ -42,7 +42,7 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common
 
 void KeyFactory::Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::SymmetricEngines EngineType, int KeySize, CEX::Enumeration::IVSizes IvSize, 
 	CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
-	CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacSize, CEX::Enumeration::Digests MacEngine)
+	CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacKeySize, CEX::Enumeration::Digests MacEngine)
 {
 	CEX::Common::CipherDescription dsc(
 		EngineType,
@@ -53,7 +53,7 @@ void KeyFactory::Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::Symm
 		BlockSize,
 		Rounds,
 		KdfEngine,
-		MacSize,
+		MacKeySize,
 		MacEngine);
 
 	Create(dsc, KeyParam);
@@ -64,7 +64,7 @@ void KeyFactory::Extract(CEX::Processing::Structure::CipherKey &KeyHeader, CEX::
 	KeyHeader = CEX::Processing::Structure::CipherKey(*_keyStream);
 	const CEX::Common::CipherDescription dsc = KeyHeader.Description();
 
-	if (_keyStream->Length() < dsc.KeySize() + (uint)dsc.IvSize() + dsc.MacSize() + KeyHeader.GetHeaderSize())
+	if (_keyStream->Length() < dsc.KeySize() + (uint)dsc.IvSize() + dsc.MacKeySize() + KeyHeader.GetHeaderSize())
 		throw CEX::Exception::CryptoProcessingException("KeyFactory:Extract", "The size of the key file does not align with the CipherKey sizes! Key is corrupt.");
 
 	_keyStream->Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);
