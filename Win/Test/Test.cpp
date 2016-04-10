@@ -38,7 +38,6 @@
 #include "VMACTest.h"
 #include "XSPRsgTest.h"
 
-#include "SP20Drbg.h"
 using namespace Test;
 
 // *** CEX 1.0 TODO ***
@@ -146,21 +145,11 @@ void RunTest(Test::ITest* Test)
 	return (b & (1 << 25)) != 0;
 }*/
 
-static void TestSalsa()
-{
-	CEX::Generator::SP20Drbg dg;
-	std::vector<byte> k(40);
-	dg.Initialize(k);
-
-	std::vector<byte> d(dg.ParallelBlockSize() * 4);
-	dg.Generate(d);
-}
-
 int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	TestSalsa();
+
 	try
 	{
 		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))

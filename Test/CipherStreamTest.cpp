@@ -821,11 +821,11 @@ namespace Test
 				throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
 
 			// byte array interface
-			cs.Initialize(true, kp);
-			cs.Write(_plnText, 0, _cmpText, 0);
+			//cs.Initialize(true, kp);
+			//cs.Write(_plnText, 0, _cmpText, 0);
 
-			if (_cmpText != _encText)
-				throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
+			//if (_cmpText != _encText)
+			//	throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
 
 			// ***compare decryption output *** //
 

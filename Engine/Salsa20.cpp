@@ -201,7 +201,7 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Ou
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
 	}
 }
 
@@ -248,7 +248,7 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset
 		});
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
 	}
 }
 
@@ -306,7 +306,7 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset
 
 		// copy the last counter position to class variable
 		size_t x = sizeof(_ctrVector);
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
 	}
 }
 

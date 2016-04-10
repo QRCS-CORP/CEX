@@ -1,73 +1,73 @@
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\filestream.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ecb.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\digeststream.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\digestfromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\dgcprng.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\dgcdrbg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ctrprng.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ctrdrbg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ctr.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\csprsg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cspprng.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ciphermodefromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cipherfromdescription.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\chacha.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cfb.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cbc.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\blockcipherfromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\blake512.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\blake256.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ppbprng.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\pkcs7.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\pbkdf2.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\parallelutils.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\paddingfromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ofb.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\memorystream.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\macstream.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keygenerator.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keyfactory.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keccak512.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keccak256.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keccak.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\kdf2drbg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\iso7816.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\iscrsg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\intutils.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\hmac.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\hkdf.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\threefish256.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\threefish1024.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\tbc.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\streamwriter.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\streamreader.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\streamcipherfromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cipherstream.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\sp20prng.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\sp20drbg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\skein512.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\skein256.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\skein1024.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\shx.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\sha512.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\sha256.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\seedfromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\securerandom.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\salsa20.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\rhx.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\prngfromname.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\zeropad.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\xsprsg.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\x923.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\vmac.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\thx.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\threefish512.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\macfromdescription.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cmac.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\x64\release\engine.lib
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\cl.command.1.tlog
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\cl.read.1.tlog
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\cl.write.1.tlog
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\lib-link.read.1.tlog
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\lib-link.write.1.tlog
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\lib.command.1.tlog
+c:\users\john\documents\github\cex\win\static\x64\release\filestream.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ecb.obj
+c:\users\john\documents\github\cex\win\static\x64\release\digeststream.obj
+c:\users\john\documents\github\cex\win\static\x64\release\digestfromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\dgcprng.obj
+c:\users\john\documents\github\cex\win\static\x64\release\dgcdrbg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ctrprng.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ctrdrbg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ctr.obj
+c:\users\john\documents\github\cex\win\static\x64\release\csprsg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\cspprng.obj
+c:\users\john\documents\github\cex\win\static\x64\release\cmac.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ciphermodefromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\cipherfromdescription.obj
+c:\users\john\documents\github\cex\win\static\x64\release\chacha.obj
+c:\users\john\documents\github\cex\win\static\x64\release\cfb.obj
+c:\users\john\documents\github\cex\win\static\x64\release\cbc.obj
+c:\users\john\documents\github\cex\win\static\x64\release\blockcipherfromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\blake512.obj
+c:\users\john\documents\github\cex\win\static\x64\release\blake256.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ppbprng.obj
+c:\users\john\documents\github\cex\win\static\x64\release\pkcs7.obj
+c:\users\john\documents\github\cex\win\static\x64\release\pbkdf2.obj
+c:\users\john\documents\github\cex\win\static\x64\release\parallelutils.obj
+c:\users\john\documents\github\cex\win\static\x64\release\paddingfromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\ofb.obj
+c:\users\john\documents\github\cex\win\static\x64\release\memorystream.obj
+c:\users\john\documents\github\cex\win\static\x64\release\macstream.obj
+c:\users\john\documents\github\cex\win\static\x64\release\macfromdescription.obj
+c:\users\john\documents\github\cex\win\static\x64\release\keygenerator.obj
+c:\users\john\documents\github\cex\win\static\x64\release\keyfactory.obj
+c:\users\john\documents\github\cex\win\static\x64\release\keccak512.obj
+c:\users\john\documents\github\cex\win\static\x64\release\keccak256.obj
+c:\users\john\documents\github\cex\win\static\x64\release\keccak.obj
+c:\users\john\documents\github\cex\win\static\x64\release\kdf2drbg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\iso7816.obj
+c:\users\john\documents\github\cex\win\static\x64\release\iscrsg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\intutils.obj
+c:\users\john\documents\github\cex\win\static\x64\release\hmac.obj
+c:\users\john\documents\github\cex\win\static\x64\release\hkdf.obj
+c:\users\john\documents\github\cex\win\static\x64\release\threefish256.obj
+c:\users\john\documents\github\cex\win\static\x64\release\threefish1024.obj
+c:\users\john\documents\github\cex\win\static\x64\release\tbc.obj
+c:\users\john\documents\github\cex\win\static\x64\release\streamwriter.obj
+c:\users\john\documents\github\cex\win\static\x64\release\streamreader.obj
+c:\users\john\documents\github\cex\win\static\x64\release\streamcipherfromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\cipherstream.obj
+c:\users\john\documents\github\cex\win\static\x64\release\sp20prng.obj
+c:\users\john\documents\github\cex\win\static\x64\release\sp20drbg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\skein512.obj
+c:\users\john\documents\github\cex\win\static\x64\release\skein256.obj
+c:\users\john\documents\github\cex\win\static\x64\release\skein1024.obj
+c:\users\john\documents\github\cex\win\static\x64\release\shx.obj
+c:\users\john\documents\github\cex\win\static\x64\release\sha512.obj
+c:\users\john\documents\github\cex\win\static\x64\release\sha256.obj
+c:\users\john\documents\github\cex\win\static\x64\release\seedfromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\securerandom.obj
+c:\users\john\documents\github\cex\win\static\x64\release\salsa20.obj
+c:\users\john\documents\github\cex\win\static\x64\release\rhx.obj
+c:\users\john\documents\github\cex\win\static\x64\release\prngfromname.obj
+c:\users\john\documents\github\cex\win\static\x64\release\zeropad.obj
+c:\users\john\documents\github\cex\win\static\x64\release\xsprsg.obj
+c:\users\john\documents\github\cex\win\static\x64\release\x923.obj
+c:\users\john\documents\github\cex\win\static\x64\release\vmac.obj
+c:\users\john\documents\github\cex\win\static\x64\release\thx.obj
+c:\users\john\documents\github\cex\win\static\x64\release\threefish512.obj
+c:\users\john\documents\github\cex\win\x64\release\engine.lib
+c:\users\john\documents\github\cex\win\static\x64\release\engine.tlog\cl.command.1.tlog
+c:\users\john\documents\github\cex\win\static\x64\release\engine.tlog\cl.read.1.tlog
+c:\users\john\documents\github\cex\win\static\x64\release\engine.tlog\cl.write.1.tlog
+c:\users\john\documents\github\cex\win\static\x64\release\engine.tlog\lib-link.read.1.tlog
+c:\users\john\documents\github\cex\win\static\x64\release\engine.tlog\lib-link.write.1.tlog
+c:\users\john\documents\github\cex\win\static\x64\release\engine.tlog\lib.command.1.tlog

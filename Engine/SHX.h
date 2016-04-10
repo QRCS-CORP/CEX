@@ -46,11 +46,11 @@ NAMESPACE_BLOCK
 
 /// <summary>
 /// SHX: A Serpent cipher extended with an HKDF powered Key Schedule.
-/// <para>SHX is a Serpent implementation that uses an HKDF generator to expand the user supplied key into a working key integer array.</para>
+/// <para>SHX is a Serpent implementation that (optionally) uses an HKDF generator to expand the user supplied key into a working key integer array.</para>
 /// </summary>
 /// 
 /// <example>
-/// <description>Example using an <c>ICipherMode</c> interface:</description>
+/// <description>Example of encrypting a block:</description>
 /// <code>
 /// CTR cipher(new SHX());
 /// // initialize for encryption

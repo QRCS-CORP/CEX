@@ -49,7 +49,7 @@ NAMESPACE_BLOCK
 /// </summary>
 /// 
 /// <example>
-/// <description>Example using an <c>ICipherMode</c> interface:</description>
+/// <description>Example of encrypting a block:</description>
 /// <code>
 /// CTR cipher(new THX());
 /// // initialize for encryption

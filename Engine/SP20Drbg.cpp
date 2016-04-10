@@ -289,7 +289,7 @@ void SP20Drbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
 	}
 }
 
