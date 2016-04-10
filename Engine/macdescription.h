@@ -161,7 +161,7 @@ public:
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
 	/// <param name="HmacEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used in the Hmac</param>
-	MacDescription(uint KeySize, CEX::Enumeration::Digests HmacEngine = CEX::Enumeration::Digests::SHA512)
+	MacDescription(uint KeySize, CEX::Enumeration::Digests HmacEngine)
 	{
 		_macType = (uint)CEX::Enumeration::Macs::HMAC;
 		_keySize = KeySize;
@@ -178,13 +178,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="IvSize">Size of the cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.IVSizes">Initialization Vector</see></param>
 	/// <param name="EngineType">The symmetric block cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.SymmetricEngines">Engine</see> type</param>
+	/// <param name="IvSize">Size of the cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.IVSizes">Initialization Vector</see></param>
 	/// <param name="BlockSize">The cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockSizes">Block Size</see></param>
 	/// <param name="RoundCount">The number of diffusion <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.RoundCounts">Rounds</see></param>
 	/// <param name="KdfEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	MacDescription(uint KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::BlockCiphers EngineType, CEX::Enumeration::BlockSizes BlockSize, 
-		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
+	MacDescription(uint KeySize, CEX::Enumeration::BlockCiphers EngineType, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::BlockSizes BlockSize = CEX::Enumeration::BlockSizes::B128,
+		CEX::Enumeration::RoundCounts RoundCount = CEX::Enumeration::RoundCounts::R14, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
 	{
 		_macType = (uint)CEX::Enumeration::Macs::CMAC;
 		_keySize = KeySize;
@@ -201,13 +201,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="HmacEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used in the Hmac</param>
-	MacDescription(uint KeySize)
+	/// <param name="VectorSize">Size of the VMAC initialization vector in bytes</param>
+	MacDescription(uint KeySize, uint VectorSize)
 	{
 		_macType = (uint)CEX::Enumeration::Macs::VMAC;
 		_keySize = KeySize;
+		_ivSize = VectorSize;
 		_hmacEngine = 0;
-		_ivSize = 0;
 		_engineType = 0;
 		_blockSize = 0;
 		_roundCount = 0;

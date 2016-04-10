@@ -38,16 +38,10 @@
 #include "VMACTest.h"
 #include "XSPRsgTest.h"
 
-#include "CipherKey.h"
-#include "MacKey.h"
-
+#include "SP20Drbg.h"
 using namespace Test;
 
 // *** CEX 1.0 TODO ***
-// internal counters  +4GB
-// size_t on loops
-// verify digest int types
-// 
 // EntropyPool			-?
 // VolumeCipher			-?
 // KeyFactory 			-?
@@ -58,6 +52,7 @@ using namespace Test;
 // NTRU					-?
 // Networking			-?
 // DTM-KEX				-?
+// TLS					-?
 
 std::string GetResponse()
 {
@@ -88,10 +83,10 @@ void PrintHeader(std::string Data, std::string Decoration = "******")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0: CEX Library in C++      *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.1a: CEX Library in C++     *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.0                            *");
-	ConsoleUtils::WriteLine("* Date:      Feb 06, 2016                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.1                            *");
+	ConsoleUtils::WriteLine("* Date:      Apr 09, 2016                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -151,12 +146,21 @@ void RunTest(Test::ITest* Test)
 	return (b & (1 << 25)) != 0;
 }*/
 
+static void TestSalsa()
+{
+	CEX::Generator::SP20Drbg dg;
+	std::vector<byte> k(40);
+	dg.Initialize(k);
+
+	std::vector<byte> d(dg.ParallelBlockSize() * 4);
+	dg.Generate(d);
+}
+
 int main()
 {
-	//RunTest(new MacStreamTest());
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-
+	TestSalsa();
 	try
 	{
 		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))

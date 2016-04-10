@@ -1,4 +1,12 @@
 #include "MacStreamTest.h"
+#include "CSPPrng.h"
+#include "CMAC.h"
+#include "HMAC.h"
+#include "VMAC.h"
+#include "BlockCiphers.h"
+#include "MacDescription.h"
+#include "IVSizes.h"
+#include "KeyParams.h"
 
 namespace Test
 {
@@ -53,6 +61,13 @@ namespace Test
 			delete vmac;
 			OnProgress("Passed MacStream VMAC comparison tests..");
 
+			CmacDescriptionTest();
+			OnProgress("Passed MacStream CMAC test..");
+			HmacDescriptionTest();
+			OnProgress("Passed MacStream HMAC tests..");
+			VmacDescriptionTest();
+			OnProgress("Passed MacStream VMAC tests..");
+
 			return SUCCESS;
 		}
 		catch (std::string const& ex)
@@ -93,6 +108,69 @@ namespace Test
 
 		if (code1 != code2)
 			throw std::string("MacStreamTest: Expected hash is not equal!");
+
+		delete ms;
+	}
+
+	void MacStreamTest::CmacDescriptionTest()
+	{
+		CEX::Prng::CSPPrng rng;
+		std::vector<byte> data = rng.GetBytes(rng.Next(100, 400));
+		std::vector<byte> key = rng.GetBytes(32);
+		std::vector<byte> iv = rng.GetBytes(16);
+		CEX::Mac::CMAC mac(CEX::Enumeration::BlockCiphers::RHX);
+		mac.Initialize(key, iv);
+		std::vector<byte> c1(mac.MacSize());
+		mac.ComputeMac(data, c1);
+
+		CEX::Common::MacDescription mds(32, CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::IVSizes::V128);
+		CEX::Processing::MacStream mst(mds, CEX::Common::KeyParams(key, iv));
+		CEX::IO::IByteStream* ms = new CEX::IO::MemoryStream(data);
+		std::vector<byte> c2 = mst.ComputeMac(ms);
+		delete ms;
+
+		if (c1 != c2)
+			throw std::string("MacStreamTest: CMAC code arrays are not equal!");
+	}
+
+	void MacStreamTest::HmacDescriptionTest()
+	{
+		CEX::Prng::CSPPrng rng;
+		std::vector<byte> data = rng.GetBytes(rng.Next(100, 400));
+		std::vector<byte> key = rng.GetBytes(64);
+		CEX::Mac::HMAC mac(CEX::Enumeration::Digests::SHA256);
+		mac.Initialize(key);
+		std::vector<byte> c1(mac.MacSize());
+		mac.ComputeMac(data, c1);
+
+		CEX::Common::MacDescription mds(64, CEX::Enumeration::Digests::SHA256);
+		CEX::Processing::MacStream mst(mds, CEX::Common::KeyParams(key));
+		CEX::IO::IByteStream* ms = new CEX::IO::MemoryStream(data);
+		std::vector<byte> c2 = mst.ComputeMac(ms);
+		delete ms;
+
+		if (c1 != c2)
+			throw std::string("MacStreamTest: HMAC code arrays are not equal!");
+	}
+
+	void MacStreamTest::VmacDescriptionTest()
+	{
+		CEX::Prng::CSPPrng rng;
+		std::vector<byte> data = rng.GetBytes(rng.Next(100, 400));
+		std::vector<byte> key = rng.GetBytes(64);
+		std::vector<byte> iv = rng.GetBytes(16);
+		CEX::Mac::VMAC mac;
+		mac.Initialize(key, iv);
+		std::vector<byte> c1(mac.MacSize());
+		mac.ComputeMac(data, c1);
+
+		CEX::Common::MacDescription mds(64, 16);
+		CEX::Processing::MacStream mst(mds, CEX::Common::KeyParams(key, iv));
+		CEX::IO::IByteStream* ms = new CEX::IO::MemoryStream(data);
+		std::vector<byte> c2 = mst.ComputeMac(ms);
+
+		if (c1 != c2)
+			throw std::string("MacStreamTest: VMAC code arrays are not equal!");
 	}
 
 	void MacStreamTest::OnProgress(char* Data)

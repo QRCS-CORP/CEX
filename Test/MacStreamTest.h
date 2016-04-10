@@ -59,7 +59,10 @@ namespace Test
 
 	private:
 		void CompareOutput(CEX::Mac::IMac* Engine);
+		void CmacDescriptionTest();
+		void HmacDescriptionTest();
 		void OnProgress(char* Data);
+		void VmacDescriptionTest();
 	};
 }
 

@@ -138,6 +138,8 @@ public:
 		CreateCipher(EngineType);
 		if (_cipherMode == 0)
 			throw CryptoMacException("CMAC:Ctor", "Could not create the cipher!");
+		if (_cipherMode->BlockSize() != 16 && _cipherMode->BlockSize() != 32)
+			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
 
 		_blockSize = _cipherMode->BlockSize();
 		_macSize = _cipherMode->BlockSize();
@@ -165,6 +167,8 @@ public:
 	{
 		if (Cipher == 0)
 			throw CryptoMacException("CMAC:Ctor", "Cipher can not be null!");
+		if (Cipher->BlockSize() != 16 && Cipher->BlockSize() != 32)
+			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
 
 		LoadCipher(Cipher);
 	}

@@ -202,7 +202,7 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Out
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size());
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
 	}
 }
 
@@ -249,7 +249,7 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 		});
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size());
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
 	}
 }
 
@@ -306,7 +306,7 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size());
+		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], sizeof(_ctrVector));
 	}
 }
 

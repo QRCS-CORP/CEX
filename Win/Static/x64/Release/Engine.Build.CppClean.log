@@ -9,7 +9,6 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ctr.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\csprsg.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cspprng.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cmac.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ciphermodefromname.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cipherfromdescription.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\chacha.obj
@@ -26,7 +25,6 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\ofb.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\memorystream.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\macstream.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\macfromdescription.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keygenerator.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keyfactory.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\keccak512.obj
@@ -64,6 +62,8 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\vmac.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\thx.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\threefish512.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\macfromdescription.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\cmac.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\x64\release\engine.lib
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\cl.command.1.tlog
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\x64\release\engine.tlog\cl.read.1.tlog

@@ -28,7 +28,7 @@ void CSPRsg::GetBytes(std::vector<byte> &Output)
 	}
 	catch (...)
 	{
-		throw CryptoRandomException("CSPRsg:GetBytes", "Call to CryptAcquireContextW failed; random provider is not available!");
+		throw CryptoRandomException("CSPRsg:GetBytes", "Call to CryptGenRandom failed; random provider is not available!");
 	}
 #else
 	size_t size = Output.size();
@@ -96,7 +96,7 @@ void CSPRsg::Reset()
 {
 #ifdef _WIN32
 	if (!::CryptAcquireContextW(&_hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
-		throw CryptoRandomException("CSPRsg:CTor", "Call to CryptAcquireContextW failed; random provider is not available!");
+		throw CryptoRandomException("CSPRsg:Reset", "Call to CryptAcquireContextW failed; random provider is not available!");
 #endif
 }
 
