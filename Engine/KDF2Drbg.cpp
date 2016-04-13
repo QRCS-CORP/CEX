@@ -30,24 +30,24 @@ size_t KDF2Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 	return Size;
 }
 
-void KDF2Drbg::Initialize(const std::vector<byte> &Salt)
+void KDF2Drbg::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Salt.size() < _hashSize)
+	if (Ikm.size() < _hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 
-	if (Salt.size() < _blockSize + _hashSize)
+	if (Ikm.size() < _blockSize + _hashSize)
 	{
-		_Salt.resize(Salt.size());
+		_Salt.resize(Ikm.size());
 		_IV.resize(0);
 		// interpret as ISO18033, no IV
-		memcpy(&_Salt[0], &Salt[0], Salt.size());
+		memcpy(&_Salt[0], &Ikm[0], Ikm.size());
 	}
 	else
 	{
-		_Salt.resize(Salt.size() - _hashSize);
+		_Salt.resize(Ikm.size() - _hashSize);
 		_IV.resize(_blockSize);
-		memcpy(&_Salt[0], &Salt[0], Salt.size() - _hashSize);
-		memcpy(&_IV[0], &Salt[_Salt.size()], _blockSize);
+		memcpy(&_Salt[0], &Ikm[0], Ikm.size() - _hashSize);
+		memcpy(&_IV[0], &Ikm[_Salt.size()], _blockSize);
 	}
 
 	_isInitialized = true;

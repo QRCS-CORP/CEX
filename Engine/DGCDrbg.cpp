@@ -48,20 +48,20 @@ size_t DGCDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Siz
 	return Size;
 }
 
-void DGCDrbg::Initialize(const std::vector<byte> &Salt)
+void DGCDrbg::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Salt.size() < COUNTER_SIZE)
+	if (Ikm.size() < COUNTER_SIZE)
 		throw CryptoGeneratorException("DGCDrbg:Initialize", "Salt must be at least 8 bytes!");
 
 	const size_t ctrSize = sizeof(long);
 	std::vector<long> counter(1);
-	size_t keyLen = (Salt.size() - ctrSize) < 0 ? 0 : Salt.size() - ctrSize;
+	size_t keyLen = (Ikm.size() - ctrSize) < 0 ? 0 : Ikm.size() - ctrSize;
 	std::vector<byte> key(keyLen);
-	memcpy(&counter[0], &Salt[0], ctrSize);
+	memcpy(&counter[0], &Ikm[0], ctrSize);
 
 	if (keyLen != 0)
 	{
-		memcpy(&key[0], &Salt[ctrSize], keyLen);
+		memcpy(&key[0], &Ikm[ctrSize], keyLen);
 		UpdateSeed(key);
 	}
 

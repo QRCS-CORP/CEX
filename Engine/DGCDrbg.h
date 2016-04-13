@@ -176,20 +176,21 @@ public:
 	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size);
 
 	/// <summary>
-	/// Initialize the generator
+	/// Initialize the generator with a Key
 	/// </summary>
 	/// 
-	/// <param name="Salt">Salt value; salt must be at least 1* block size + counter size of 8 bytes</param>
+	/// <param name="Ikm">The Key value; minimum size is 2* the digests output size</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Salt is too small</exception>
-	virtual void Initialize(const std::vector<byte> &Salt);
+	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Key is too small</exception>
+	virtual void Initialize(const std::vector<byte> &Ikm);
 
 	/// <summary>
-	/// Initialize the generator
+	/// Initialize the generator with a Salt value, a Key, and an Information nonce
 	/// </summary>
 	/// 
-	/// <param name="Salt">Salt value</param>
-	/// <param name="Ikm">Key material</param>
+	/// <param name="Salt">The Salt value</param>
+	/// <param name="Ikm">The Key value</param>
+	/// <param name="Nonce">The Nonce value</param>
 	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm);
 
 	/// <summary>

@@ -39,13 +39,13 @@ size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 	return Size;
 }
 
-void SP20Drbg::Initialize(const std::vector<byte> &Salt)
+void SP20Drbg::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Salt.size() != _legalKeySizes[0] + VECTOR_SIZE && Salt.size() != _legalKeySizes[1] + VECTOR_SIZE)
+	if (Ikm.size() != _legalKeySizes[0] + VECTOR_SIZE && Ikm.size() != _legalKeySizes[1] + VECTOR_SIZE)
 		throw CryptoGeneratorException("SP20Drbg:Initialize", "Key material size is too small; must be exactly 24 (128 bit key) or 40 bytes (256 bit key)!");
 
 	std::string info;
-	if (Salt.size() == 24)
+	if (Ikm.size() == 24)
 		info = "expand 16-byte k";
 	else
 		info = "expand 32-byte k";
@@ -55,10 +55,10 @@ void SP20Drbg::Initialize(const std::vector<byte> &Salt)
 		_dstCode.push_back(info[i]);
 
 	std::vector<byte> iv(VECTOR_SIZE);
-	memcpy(&iv[0], &Salt[0], VECTOR_SIZE);
-	size_t keyLen = Salt.size() - VECTOR_SIZE;
+	memcpy(&iv[0], &Ikm[0], VECTOR_SIZE);
+	size_t keyLen = Ikm.size() - VECTOR_SIZE;
 	std::vector<byte> key(keyLen);
-	memcpy(&key[0], &Salt[VECTOR_SIZE], keyLen);
+	memcpy(&key[0], &Ikm[VECTOR_SIZE], keyLen);
 	SetKey(key, iv);
 	_isInitialized = true;
 }

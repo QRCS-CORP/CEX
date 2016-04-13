@@ -283,8 +283,6 @@ private:
 	void Increment(std::vector<uint> &Counter);
 	void Generate(const size_t Size, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset);
 	uint GetProcessorCount();
-	void ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void SalsaCore(std::vector<byte> &Output, const size_t OutOffset, const std::vector<uint> &Counter);
 	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);

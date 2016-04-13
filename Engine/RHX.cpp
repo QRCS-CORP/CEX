@@ -67,14 +67,12 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	int dgtsze = GetIkmSize(_kdfEngineType);
-	int dgtblk = GetSaltSize(_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, (length - IKm length: {" + 
-		CEX::Utility::IntUtils::ToString(dgtsze) + "} bytes) + multiple of {" + CEX::Utility::IntUtils::ToString(dgtblk) + "} block size.";
+	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 	
 	if (key.size() < _legalKeySizes[0])
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
-	if (key.size() > _legalKeySizes[3] && (key.size() - dgtsze) % dgtblk != 0)
+	if (key.size() > _legalKeySizes[3] && (key.size() % dgtsze) != 0)
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
 
 	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
@@ -86,8 +84,13 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	}
 
 	// get the kdf digest engine
-	if (key.size() > MAX_STDKEY)
+	if (_kdfEngineType != CEX::Enumeration::Digests::None)
+	{
+		if (key.size() < _ikmSize)
+			throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
+
 		_kdfEngine = GetDigest(_kdfEngineType);
+	}
 
 	_isEncryption = Encryption;
 	// expand the key
@@ -116,8 +119,7 @@ void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 {
-	// min possible size for hkdf extended is 768 bit (96 bytes)
-	if (Key.size() > MAX_STDKEY)
+	if (_kdfEngineType != CEX::Enumeration::Digests::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
@@ -165,16 +167,16 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 	std::vector<byte> rawKey(keyBytes, 0);
 	size_t saltSize = Key.size() - _ikmSize;
 
-	// salt must be divisible of hash blocksize
-	if (saltSize % _kdfEngine->BlockSize() != 0)
-		saltSize = saltSize - saltSize % _kdfEngine->BlockSize();
-
 	// hkdf input
 	std::vector<byte> kdfKey(_ikmSize, 0);
-	std::vector<byte> kdfSalt(saltSize, 0);
+	std::vector<byte> kdfSalt(0, 0);
 	// copy hkdf key and salt from user key
 	memcpy(&kdfKey[0], &Key[0], _ikmSize);
-	memcpy(&kdfSalt[0], &Key[_ikmSize], saltSize);
+	if (saltSize > 0)
+	{
+		kdfSalt.resize(saltSize);
+		memcpy(&kdfSalt[0], &Key[_ikmSize], saltSize);
+	}
 
 	// HKDF generator expands array 
 	CEX::Mac::HMAC hmac(_kdfEngine);
@@ -194,7 +196,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	int blkWords = _blockSize / 4;
 	// key in 32 bit words
 	int keyWords = Key.size() / 4;
-	// rounds calculation
+	// rounds calculation, 512 gets 22 rounds
 	_dfnRounds = (blkWords == 8 || keyWords == 8) ? 14 : keyWords + 6;
 	// setup expanded key
 	_expKey.resize(blkWords * (_dfnRounds + 1), 0);
@@ -218,7 +220,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[14] = CEX::Utility::IntUtils::BytesToBe32(Key, 56);
 		_expKey[15] = CEX::Utility::IntUtils::BytesToBe32(Key, 60);
 
-		//512R: 16,24,32,40,48,56,64,72,80,88, S: 20,28,36,44,52,60,68,76,84
+		// k512 R: 16,24,32,40,48,56,64,72,80,88, S: 20,28,36,44,52,60,68,76,84
 		ExpandRotBlock(_expKey, 16, 16);
 		ExpandSubBlock(_expKey, 20, 16);
 		ExpandRotBlock(_expKey, 24, 16);
@@ -275,7 +277,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[6] = CEX::Utility::IntUtils::BytesToBe32(Key, 24);
 		_expKey[7] = CEX::Utility::IntUtils::BytesToBe32(Key, 28);
 
-		// 256 R: 8,16,24,32,40,48,56 S: 12,20,28,36,44,52
+		// k256 R: 8,16,24,32,40,48,56 S: 12,20,28,36,44,52
 		ExpandRotBlock(_expKey, 8, 8);
 		ExpandSubBlock(_expKey, 12, 8);
 		ExpandRotBlock(_expKey, 16, 8);
@@ -318,7 +320,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[4] = CEX::Utility::IntUtils::BytesToBe32(Key, 16);
 		_expKey[5] = CEX::Utility::IntUtils::BytesToBe32(Key, 20);
 
-		// 192: 6,12,18,24,30,36,42,48
+		// // k192 R: 6,12,18,24,30,36,42,48
 		ExpandRotBlock(_expKey, 6, 6);
 		_expKey[10] = _expKey[4] ^ _expKey[9];
 		_expKey[11] = _expKey[5] ^ _expKey[10];
@@ -388,7 +390,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[2] = CEX::Utility::IntUtils::BytesToBe32(Key, 8);
 		_expKey[3] = CEX::Utility::IntUtils::BytesToBe32(Key, 12);
 
-		// 128R: 4,8,12,16,20,24,28,32,36,40
+		// k128 R: 4,8,12,16,20,24,28,32,36,40
 		ExpandRotBlock(_expKey, 4, 4);
 		ExpandRotBlock(_expKey, 8, 4);
 		ExpandRotBlock(_expKey, 12, 4);
@@ -747,11 +749,6 @@ CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	{
 		throw CryptoSymmetricCipherException("CipherStream:KdfEngine", "The digest could not be instantiated!");
 	}
-}
-
-int RHX::GetSaltSize(CEX::Enumeration::Digests DigestType)
-{
-	return CEX::Helper::DigestFromName::GetBlockSize(DigestType);
 }
 
 uint RHX::SubByte(uint Rot)

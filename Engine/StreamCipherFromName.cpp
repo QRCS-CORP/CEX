@@ -4,9 +4,9 @@
 
 NAMESPACE_HELPER
 
-CEX::Cipher::Symmetric::Stream::IStreamCipher* StreamCipherFromName::GetInstance(CEX::Enumeration::StreamCiphers EngineType, uint RoundCount)
+CEX::Cipher::Symmetric::Stream::IStreamCipher* StreamCipherFromName::GetInstance(CEX::Enumeration::StreamCiphers StreamCipherType, uint RoundCount)
 {
-	switch (EngineType)
+	switch (StreamCipherType)
 	{
 		case CEX::Enumeration::StreamCiphers::ChaCha:
 			return new CEX::Cipher::Symmetric::Stream::ChaCha(RoundCount);

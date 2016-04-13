@@ -22,15 +22,15 @@ namespace Test
 			OnProgress("### Parallel CTR Mode Speed Tests: 10 loops * 100MB ###");
 			OnProgress("***RHX: Monte Carlo test (K=256; R=14)***");
 			RDXSpeedTest();
-			OnProgress("***RHX: Monte Carlo test (K=1920; R=22)***");
+			OnProgress("***RHX: Monte Carlo test (K=512; R=22)***");
 			RHXSpeedTest();
 			OnProgress("***SHX: Monte Carlo test (K=256; R=32)***");
 			SPXSpeedTest();
-			OnProgress("***SHX: Monte Carlo test (K=1920; R=40)***");
+			OnProgress("***SHX: Monte Carlo test (K=512; R=40)***");
 			SHXSpeedTest();
 			OnProgress("***THX: Monte Carlo test (K=256; R=16)***");
 			TFXSpeedTest();
-			OnProgress("***THX: Monte Carlo test (K=1920; R=20)***");
+			OnProgress("***THX: Monte Carlo test (K=512; R=20)***");
 			THXSpeedTest();
 			OnProgress("***Salsa20: Monte Carlo test (K=256; R=20)***");
 			SalsaSpeedTest();
@@ -42,15 +42,15 @@ namespace Test
 			OnProgress("***RHX: CFB Decryption test (K=256; R=14)***");
 			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, true, 32, 16);
 
-			OnProgress("### RHX Standard Mode Speed Tests: 1 loop * 100MB ###");
+			OnProgress("### RHX Standard Mode Speed Tests: 10 loops * 100MB ###");
 			OnProgress("***RHX: CTR Encrypt test (K=256; R=14)***");
-			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CTR(engine), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CTR(engine), MB100, false, 32, 16, 10);
 			OnProgress("***RHX: CBC Encrypt test (K=256; R=14)***");
-			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, false, 32, 16, 10);
 			OnProgress("***RHX: CFB Encrypt test (K=256; R=14)***");
-			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, false, 32, 16, 10);
 			OnProgress("***RHX: OFB Encrypt test (K=256; R=14)***");
-			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::OFB(engine), MB100, false, 32, 16, 1);
+			CipherModeLoop(new CEX::Cipher::Symmetric::Block::Mode::OFB(engine), MB100, false, 32, 16, 10);
 			delete engine;
 
 			return MESSAGE;
@@ -213,7 +213,7 @@ namespace Test
 	{
 		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX(16, 14);//b16, r14
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
-		ParallelBlockLoop(cipher, MB100, 192);
+		ParallelBlockLoop(cipher, MB100, 32);
 		delete cipher;
 		delete engine;
 	}
@@ -223,7 +223,7 @@ namespace Test
 		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
 		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX(sha512, Rounds);//b16, r22
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
-		ParallelBlockLoop(cipher, MB100, 192);
+		ParallelBlockLoop(cipher, MB100, 64);
 		delete cipher;
 		delete sha512;
 		delete engine;
@@ -241,7 +241,7 @@ namespace Test
 		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
 		CEX::Cipher::Symmetric::Block::SHX* engine = new CEX::Cipher::Symmetric::Block::SHX(sha512, Rounds);
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
-		ParallelBlockLoop(cipher, MB100, 192);
+		ParallelBlockLoop(cipher, MB100, 64);
 		delete cipher;
 		delete sha512;
 		delete engine;
@@ -251,7 +251,7 @@ namespace Test
 	{
 		CEX::Cipher::Symmetric::Block::SHX* engine = new CEX::Cipher::Symmetric::Block::SHX();
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
-		ParallelBlockLoop(cipher, MB100, 192);
+		ParallelBlockLoop(cipher, MB100, 32);
 		delete cipher;
 		delete engine;
 	}
@@ -261,7 +261,7 @@ namespace Test
 		CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
 		CEX::Cipher::Symmetric::Block::THX* engine = new CEX::Cipher::Symmetric::Block::THX(sha512, Rounds);
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
-		ParallelBlockLoop(cipher, MB100, 192);
+		ParallelBlockLoop(cipher, MB100, 64);
 		delete cipher;
 		delete sha512;
 		delete engine;
@@ -271,7 +271,7 @@ namespace Test
 	{
 		CEX::Cipher::Symmetric::Block::THX* engine = new CEX::Cipher::Symmetric::Block::THX();
 		CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
-		ParallelBlockLoop(cipher, MB100, 192);
+		ParallelBlockLoop(cipher, MB100, 32);
 		delete cipher;
 		delete engine;
 	}

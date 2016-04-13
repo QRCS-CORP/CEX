@@ -26,7 +26,7 @@ void CTRDrbg::Destroy()
 size_t CTRDrbg::Generate(std::vector<byte> &Output)
 {
 	Transform(Output, 0);
-
+	
 	return Output.size();
 }
 
@@ -40,15 +40,15 @@ size_t CTRDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Siz
 	return Size;
 }
 
-void CTRDrbg::Initialize(const std::vector<byte> &Salt)
+void CTRDrbg::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Salt.size() != _keySize + _blockSize)
+	if (Ikm.size() != _keySize + _blockSize)
 		throw CryptoGeneratorException("CTRDrbg:Initialize", "Salt size is too small; must be key size plus the blocksize!");
 
-	memcpy(&_ctrVector[0], &Salt[0], _blockSize);
-	size_t keyLen = Salt.size() - _blockSize;
+	memcpy(&_ctrVector[0], &Ikm[0], _blockSize);
+	size_t keyLen = Ikm.size() - _blockSize;
 	std::vector<byte> key(keyLen);
-	memcpy(&key[0], &Salt[_blockSize], keyLen);
+	memcpy(&key[0], &Ikm[_blockSize], keyLen);
 
 	_blockCipher->Initialize(true, CEX::Common::KeyParams(key));
 	_isInitialized = true;

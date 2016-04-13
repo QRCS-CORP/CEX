@@ -21,6 +21,7 @@ namespace Test
 		std::vector<std::vector<byte>> _shxExpected;
 		std::vector<std::vector<byte>> _thxExpected;
 		std::vector<byte> _key;
+		std::vector<byte> _key2;
 		std::vector<byte> _iv;
 
 	public:
@@ -39,7 +40,8 @@ namespace Test
 		/// </summary>
 		HXCipherTest()
 			:
-			_key(192, 0),
+			_key(128, 0),
+			_key2(64, 0),
 			_iv(16, 0)
 		{
 		}

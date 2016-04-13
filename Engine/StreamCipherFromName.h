@@ -17,13 +17,13 @@ public:
 	/// Get a stream cipher instance with specified initialization parameters
 	/// </summary>
 	/// 
-	/// <param name="EngineType">The stream cipher enumeration name</param>
+	/// <param name="StreamCipherType">The stream cipher enumeration name</param>
 	/// <param name="RoundCount">The number of cipher rounds</param>
 	/// 
 	/// <returns>An initialized stream cipher</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static CEX::Cipher::Symmetric::Stream::IStreamCipher* GetInstance(CEX::Enumeration::StreamCiphers EngineType, uint RoundCount);
+	static CEX::Cipher::Symmetric::Stream::IStreamCipher* GetInstance(CEX::Enumeration::StreamCiphers StreamCipherType, uint RoundCount);
 };
 
 NAMESPACE_HELPEREND

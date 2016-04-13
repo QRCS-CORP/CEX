@@ -82,10 +82,10 @@ void PrintHeader(std::string Data, std::string Decoration = "******")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.1a: CEX Library in C++     *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.1b: CEX Library in C++     *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.1                            *");
-	ConsoleUtils::WriteLine("* Date:      Apr 09, 2016                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.1d                           *");
+	ConsoleUtils::WriteLine("* Date:      Apr 13, 2016                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");

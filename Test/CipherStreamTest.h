@@ -44,12 +44,12 @@ namespace Test
 
 		CipherStreamTest()
 			:
-			_encText(0),
-			_cmpText(0),
-			_decText(0),
+			_encText(MAX_ALLOC),
+			_cmpText(MAX_ALLOC),
+			_decText(MAX_ALLOC),
 			_iv(16),
 			_key(32),
-			_plnText(0),
+			_plnText(MAX_ALLOC),
 			_processorCount(1)
 		{
 		}

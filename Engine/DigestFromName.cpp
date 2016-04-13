@@ -56,6 +56,8 @@ int DigestFromName::GetBlockSize(CEX::Enumeration::Digests DigestType)
 		return 136;
 	case CEX::Enumeration::Digests::Keccak512:
 		return 72;
+	case CEX::Enumeration::Digests::None:
+		return 0;
 	default:
 		throw CEX::Exception::CryptoException("DigestFromName:GetBlockSize", "The digest type is not supported!");
 	}
@@ -77,6 +79,8 @@ int DigestFromName::GetDigestSize(CEX::Enumeration::Digests DigestType)
 		return 64;
 	case CEX::Enumeration::Digests::Skein1024:
 		return 128;
+	case CEX::Enumeration::Digests::None:
+		return 0;
 	default:
 		throw CEX::Exception::CryptoException("DigestFromName:GetDigestSize", "The digest type is not supported!");
 	}

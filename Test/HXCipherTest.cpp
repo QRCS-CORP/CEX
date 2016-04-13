@@ -34,29 +34,34 @@ namespace Test
 
 	void HXCipherTest::Initialize()
 	{
-		const char* rhxEncoded[2] =
+		const char* rhxEncoded[3] =
 		{
-			("531c234dfda625dc69eb31c86d895636"),	// 14 rounds
-			("841c351399beef66939367b551bf7a2f")	// 22 rounds
+			("2ac5dd436cb2a1c976b25a1edaf1f650"),	// hkdf extended 14 rounds
+			("497bef5ccb4faee957b7946705c3dc10"),	// hkdf extended 22 rounds 
+			("7380a2ca37d034a34d0af97eb46caede")	// standard 512 key, 22 rounds
 		};
-		HexConverter::Decode(rhxEncoded, 2, _rhxExpected);
+		HexConverter::Decode(rhxEncoded, 3, _rhxExpected);
 
-		const char* shxEncoded[2] =
+		const char* shxEncoded[3] =
 		{
-			("e814f2bb7c55974020820d7f294b6bb0"),	// 32 rounds
-			("96e3a5d177fd1b46efc976bdc4d54e44")	// 40 rounds
+			("6f4309f375cad2e65fcfa28091ceed17"),	// hkdf extended 32 rounds
+			("9dcd48706592211eb48d659b9df8824f"),	// hkdf extended 40 rounds
+			("9c41b8c6fba7154b95afc7c8a5449687")	// standard 512 key, 40 rounds
 		};
-		HexConverter::Decode(shxEncoded, 2, _shxExpected);
+		HexConverter::Decode(shxEncoded, 3, _shxExpected);
 
-		const char* thxEncoded[2] =
+		const char* thxEncoded[3] =
 		{
-			("e97a3d1a8b61b0a939a3b95397f9b97a"),	// 16 rounds
-			("00ee8bc0cb127f5af682872266a4f57f")	// 20 rounds
+			("0b97de0f11367d25ad45d3293072e2bb"),	// hkdf extended 16 rounds
+			("e0ec1b5807ed879a88a18244237e8bad"),	// hkdf extended 20 rounds
+			("32626075c43a30a56aa4cc5ddbf58179")	// standard 512 key, 20 rounds
 		};
-		HexConverter::Decode(thxEncoded, 2, _thxExpected);
+		HexConverter::Decode(thxEncoded, 3, _thxExpected);
 
 		for (unsigned int i = 0; i < _key.size(); i++)
 			_key[i] = (byte)i;
+		for (unsigned int i = 0; i < _key2.size(); i++)
+			_key2[i] = (byte)i;
 		for (unsigned int i = 0; i < _iv.size(); i++)
 			_iv[i] = (byte)i;
 	}
@@ -115,6 +120,35 @@ namespace Test
 			}
 
 			if (outBytes != _rhxExpected[1])
+				throw std::string("RHX: Failed encryption test!");
+
+			cipher.Initialize(false, k);
+
+			for (unsigned int i = 0; i != 100; i++)
+			{
+				cipher.Transform(outBytes, inpBytes);
+				memcpy(&outBytes[0], &inpBytes[0], 16);
+			}
+			delete eng;
+
+			if (outBytes != decBytes)
+				throw std::string("RHX: Failed decryption test!");
+		}
+
+		// RHX, 22 rounds, standard key schedule
+		{
+			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(16, 22);
+			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
+			CEX::Common::KeyParams k(_key2, _iv);
+			cipher.Initialize(true, k);
+
+			for (unsigned int i = 0; i != 100; i++)
+			{
+				cipher.Transform(inpBytes, outBytes);
+				memcpy(&inpBytes[0], &outBytes[0], 16);
+			}
+
+			if (outBytes != _rhxExpected[2])
 				throw std::string("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
@@ -195,6 +229,34 @@ namespace Test
 			if (outBytes != decBytes)
 				throw std::string("SHX: Failed decryption test!");
 		}
+		// SHX, 40 rounds, standard key schedule
+		{
+			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(40);
+			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
+			CEX::Common::KeyParams k(_key2, _iv);
+			engine.Initialize(true, k);
+
+			for (unsigned int i = 0; i != 100; i++)
+			{
+				engine.Transform(inpBytes, outBytes);
+				memcpy(&inpBytes[0], &outBytes[0], 16);
+			}
+
+			if (outBytes != _shxExpected[2])
+				throw std::string("SHX: Failed encryption test!");
+
+			engine.Initialize(false, k);
+
+			for (unsigned int i = 0; i != 100; i++)
+			{
+				engine.Transform(outBytes, inpBytes);
+				memcpy(&outBytes[0], &inpBytes[0], 16);
+			}
+			delete eng;
+
+			if (outBytes != decBytes)
+				throw std::string("SHX: Failed decryption test!");
+		}
 	}
 
 	void HXCipherTest::THXMonteCarlo()
@@ -247,6 +309,34 @@ namespace Test
 			}
 
 			if (outBytes != _thxExpected[1])
+				throw std::string("THX: Failed encryption test!");
+
+			engine.Initialize(false, k);
+
+			for (unsigned int i = 0; i != 100; i++)
+			{
+				engine.Transform(outBytes, inpBytes);
+				memcpy(&outBytes[0], &inpBytes[0], 16);
+			}
+			delete eng;
+
+			if (outBytes != decBytes)
+				throw std::string("THX: Failed decryption test!");
+		}
+		// THX, 20 rounds, standard key schedule
+		{
+			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(20);
+			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
+			CEX::Common::KeyParams k(_key2, _iv);
+			engine.Initialize(true, k);
+
+			for (unsigned int i = 0; i != 100; i++)
+			{
+				engine.Transform(inpBytes, outBytes);
+				memcpy(&inpBytes[0], &outBytes[0], 16);
+			}
+
+			if (outBytes != _thxExpected[2])
 				throw std::string("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);

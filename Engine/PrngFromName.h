@@ -17,9 +17,9 @@ public:
 	/// Get a Prng instance with default initialization parameters
 	/// </summary>
 	/// 
-	/// <param name="PrngType">The prng enumeration name</param>
+	/// <param name="PrngType">The Prng enumeration name</param>
 	/// 
-	/// <returns>An initialized prng</returns>
+	/// <returns>An initialized Prng</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
 	static CEX::Prng::IRandom* GetInstance(CEX::Enumeration::Prngs PrngType);

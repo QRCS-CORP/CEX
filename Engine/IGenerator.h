@@ -79,27 +79,27 @@ public:
 	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size) = 0;
 
 	/// <summary>
-	/// Initialize the generator
+	/// Initialize the generator with a Key
 	/// </summary>
 	/// 
-	/// <param name="Salt">Salt value</param>
-	virtual void Initialize(const std::vector<byte> &Salt) = 0;
+	/// <param name="Ikm">The Key value</param>
+	virtual void Initialize(const std::vector<byte> &Ikm) = 0;
 
 	/// <summary>
-	/// Initialize the generator
+	/// Initialize the generator with a Salt value and a Key
 	/// </summary>
 	/// 
-	/// <param name="Salt">Salt value</param>
-	/// <param name="Ikm">Key material</param>
+	/// <param name="Salt">The Salt value</param>
+	/// <param name="Ikm">The Key value</param>
 	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm) = 0;
 
 	/// <summary>
-	/// Initialize the generator
+	/// Initialize the generator with a Salt value, a Key, and an Information nonce
 	/// </summary>
 	/// 
-	/// <param name="Salt">Salt value</param>
-	/// <param name="Ikm">Key material</param>
-	/// <param name="Nonce">Nonce value</param>
+	/// <param name="Salt">The Salt value</param>
+	/// <param name="Ikm">The Key value</param>
+	/// <param name="Nonce">The Nonce value</param>
 	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce) = 0;
 
 	/// <summary>

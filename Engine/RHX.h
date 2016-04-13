@@ -43,7 +43,8 @@ NAMESPACE_BLOCK
 /// <summary>
 /// RHX: A Rijndael Cipher extended with an (optional) HKDF powered Key Schedule.
 /// <para>RHX is a Rijndael implementation that uses a standard configuration on key sizes up to 64 bytes (512 bits). 
-/// On keys larger than 64 bytes, an HKDF bytes generator is used to expand the user supplied key into a working key integer array.</para>
+/// An optional HKDF Expand bytes generator can be used to expand the user supplied key into a working key integer array
+/// for increased rounds and additional security.</para>
 /// </summary> 
 /// 
 /// <example>
@@ -64,35 +65,27 @@ NAMESPACE_BLOCK
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <para>The key schedule in RHX is the defining difference between this and a standard version of Rijndael.
-/// if the cipher key input is beyond the standard lengths used in Rijndael (128-512 bits), instead of using an inline function to expand the user supplied key into a larger working array, 
-/// RHX uses a hash based pseudo-random generator to create the internal working key array.
-/// When using a non-standard key size, the number of diffusion rounds can be set by the user (through the class constructor). RHX can run between 10 and 38 rounds.
-/// </para>
+/// The standard Rijndael Key Schedule (128-256 bits), has been extended to accomodate a 512 bit key size.
+/// RHX can (optionally) use an HMAC based Key Derivation Function (HKDF) to expand the cipher key to create the internal round key integer array. 
+/// This provides better security, and allows for a user assignable number of transformation rounds.
+/// When using a the HKDF extended mode, the number of diffusion rounds can be set by the user (through the class constructor). 
+/// RHX can run between 10 and 38 rounds.</para>
 /// 
 /// <list type="bullet">
-/// <item><description>When using a standard cipher key length the rounds calculation is done automatically: 10, 12, 14, and 22, for key sizes 126, 192, 256, and 512 bits.</description></item>
-/// <item><description>HKDF Digest engine is definable through the RHX(uint, uint, Digests) Constructor parameter: KeyEngine.</description></item>
+/// <item><description>When using the standard cipher, the key length the rounds calculation is done automatically: 10, 12, 14, and 22, for key sizes 126, 192, 256, and 512 bits.</description></item>
+/// <item><description>HKDF Digest engine is definable through the RHX(uint, uint, Digests) Constructor parameter: KDFEngine.</description></item>
 /// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a user definable Digest.</description></item>
-/// <item><description>Minimum key size is (IKm + Salt) (N * Digest State Size) + (Digest Hash Size) in bytes.</description></item>
+/// <item><description>Minimum key size is the Digests hash return size, and extendable in blocks of (N * Hash Size) bytes.</description></item>
 /// <item><description>Valid block sizes are 16 and 32 byte wide.</description></item>
-/// <item><description>Valid Rounds are 10 to 38, default is 22.</description></item>
+/// <item><description>The rounds can only be assigned if using the HKDF extended mode. Valid Rounds are 10 to 38, default is 22.</description></item>
 /// </list>
 /// 
-/// <description>HKDF Bytes Generator:</description>
-/// <para>HKDF: is a key derivation function that uses a Digest HMAC (Hash based Message Authentication Code) as its random engine. 
-/// This is one of the strongest methods available for generating pseudo-random keying material, and far superior in entropy dispersion to Rijndael, or even Serpents key schedule. 
-/// HKDF uses up to three inputs; a nonce value called an information string, an Ikm (Input keying material), and a Salt value. 
-/// The HMAC RFC 2104, recommends a key size equal to the digest output, in the case of SHA512, 64 bytes, anything larger gets passed through the hash function to get the required 512 bit key size. 
-/// The Salt size is a minimum of the hash functions block size, with SHA-2 512 that is 128 bytes.</para>
-/// 
-/// <para>When using SHA-2 512, a minimum key size for RHX is 192 bytes, further blocks of salt can be added to the key so long as they align; ikm + (n * blocksize), ex. 192, 320, 448 bytes.. there is no upper maximum. 
-/// This means that you can create keys as large as you like so long as it falls on these boundaries, this effectively eliminates brute force as a means of attack on the cipher, even in post-quantum terms.</para> 
+/// <para>When using SHA-2 256, a minimum key size for RHX is 32 bytes, further blocks of can be added to the key so long as they align; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.</para> 
 /// 
 /// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake, Keccak, SHA-2 or Skein.
-/// The default Digest Engine is SHA-2 512.</para>
-/// 
-/// <para>The legal key sizes are determined by a combination of the (Hash Size + a Multiplier * the Digest State Size); <c>klen = h + (n * s)</c>, this will vary between Digest implementations. 
-/// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property.</para>
+/// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property, based on the digest selected.
+/// When using the extended mode, the legal key sizes are determined based on the selected digests hash output size, 
+/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes).</para>
 /// 
 /// <para>The number of diffusion rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. 
 /// RHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256. 
@@ -116,9 +109,8 @@ class RHX : public IBlockCipher
 private:
 	static constexpr size_t BLOCK16 = 16;
 	static constexpr size_t BLOCK32 = 32;
-	static constexpr size_t LEGAL_KEYS = 14;
+	static constexpr size_t LEGAL_KEYS = 10;
 	static constexpr size_t MAX_ROUNDS = 38;
-	static constexpr size_t MAX_STDKEY = 64;
 	static constexpr size_t MIN_ROUNDS = 10;
 	static constexpr size_t ROUNDS22 = 22;
 
@@ -163,15 +155,6 @@ public:
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::RHX; }
 
 	/// <summary>
-	/// Get/Set: Specify the size of the HMAC key; extracted from the cipher key.
-	/// <para>This property can only be changed before the Initialize function is called.</para>
-	/// <para>Default is the digest return size; can only be a multiple of that length.
-	/// Maximum size is the digests underlying block size; if the key
-	/// is longer than this, the size will default to the block size.</para>
-	/// </summary>
-	size_t &IkmSize() { return _ikmSize; }
-
-	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
 	/// <para>Value set in <see cref="Initialize(bool, KeyParams)"/>.</para>
 	/// </summary>
@@ -205,10 +188,10 @@ public:
 	// *** Constructor *** //
 
 	/// <summary>
-	/// Initialize the class with a Digest instance
+	/// Initialize the class with a Digest instance (HKDF mode)
 	/// </summary>
 	///
-	/// <param name="KdfEngine">The Key Schedule KDF digest engine; can be any one of the Digest implementations.</param>
+	/// <param name="KdfEngine">The Key Schedule KDF digest engine instance; can be any one of the Digest implementations.</param>
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
 	/// <param name="BlockSize">Cipher input Block Size. Default is 16 bytes.</param>
 	///
@@ -228,6 +211,8 @@ public:
 		_legalKeySizes(LEGAL_KEYS, 0),
 		_legalRounds(15, 0)
 	{
+		if (KdfEngine == 0)
+			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
@@ -241,27 +226,30 @@ public:
 		_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
 		_kdfEngineType = KdfEngine->Enumeral();
 		// set the hmac key size
-		_ikmSize = _ikmSize == 0 ? _kdfEngine->DigestSize() : _ikmSize;
+		_ikmSize = _kdfEngine->DigestSize();
+
 		// add standard key lengths
 		_legalKeySizes[0] = 16;
 		_legalKeySizes[1] = 24;
 		_legalKeySizes[2] = 32;
 		_legalKeySizes[3] = 64;
 
-		for (size_t i = 4; i < _legalKeySizes.size(); i++)
-			_legalKeySizes[i] = (_kdfEngine->BlockSize() * (i - 3)) + _ikmSize;
+		for (size_t i = 4; i < _legalKeySizes.size(); ++i)
+			_legalKeySizes[i] = (_legalKeySizes[3] + _ikmSize * (i - 3));
 	}
 
 	/// <summary>
 	/// Initialize the class
 	/// </summary>
 	/// 
-	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
-	/// <param name="BlockSize">Cipher input Block Size. Default is 16 bytes.</param>
-	/// <param name="KdfEngineType"><para>The Key Schedule KDF digest engine; can be any one of the Digest implementations. The default engine is SHA512</para>.</param>
+	/// <param name="BlockSize">Cipher input <see cref="BlockSize"/>. The <see cref="LegalBlockSizes"/> property contains available sizes. Default is 16 bytes.</param>
+	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. 
+	/// Default is based on the key size; defining rounds requires HKDF extended mode.</param>
+	/// <param name="KDFEngine">The Key Schedule HKDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> 
+	/// implementations. The default engine is None, which invokes the standard key schedule mechanism.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(size_t BlockSize = BLOCK16, size_t Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::SHA512)
+	RHX(size_t BlockSize = BLOCK16, size_t Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::None)
 		:
 		_blockSize(BlockSize),
 		_destroyEngine(true),
@@ -274,32 +262,42 @@ public:
 		_kdfEngine(0),
 		_kdfEngineType(KdfEngineType),
 		_legalKeySizes(LEGAL_KEYS, 0),
-		_legalRounds(15, 0)
+		_legalRounds(0, 0)
 	{
 		if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
-		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
-			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
 
-		std::string info = "information string RHX version 1";
-		_hkdfInfo.reserve(info.size());
-		for (size_t i = 0; i < info.size(); ++i)
-			_hkdfInfo.push_back(info[i]);
-
-		_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
-		// set the hmac key size
-		_ikmSize = _ikmSize == 0 ? GetIkmSize(KdfEngineType) : _ikmSize;
 		// add standard key lengths
 		_legalKeySizes[0] = 16;
 		_legalKeySizes[1] = 24;
 		_legalKeySizes[2] = 32;
 		_legalKeySizes[3] = 64;
 
-		int dgtblock = GetSaltSize(KdfEngineType);
+		if (KdfEngineType != CEX::Enumeration::Digests::None)
+		{
+			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
+				throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
 
-		// hkdf extended key sizes
-		for (size_t i = 4; i < _legalKeySizes.size(); ++i)
-			_legalKeySizes[i] = (dgtblock * (i - 3)) + _ikmSize;
+			std::string info = "information string RHX version 1";
+			_hkdfInfo.reserve(info.size());
+			for (size_t i = 0; i < info.size(); ++i)
+				_hkdfInfo.push_back(info[i]);
+
+			_legalRounds.resize(15);
+			_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
+			// set the hmac key size
+			_ikmSize = GetIkmSize(KdfEngineType);
+
+			// hkdf extended key sizes
+			for (size_t i = 4; i < _legalKeySizes.size(); ++i)
+				_legalKeySizes[i] = (_legalKeySizes[3] + _ikmSize * (i - 3));
+		}
+		else
+		{
+			_legalKeySizes.resize(4);
+			_legalRounds.resize(4);
+			_legalRounds = { 10, 12, 14, 22 };
+		}
 	}
 
 	/// <summary>
@@ -403,7 +401,6 @@ private:
 	void ExpandSubBlock(std::vector<uint> &Key, int Index, int Offset);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
-	int GetSaltSize(CEX::Enumeration::Digests DigestType);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 	uint SubByte(uint Rot);

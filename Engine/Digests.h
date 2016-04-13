@@ -10,6 +10,10 @@ NAMESPACE_ENUMERATION
 enum class Digests : uint
 {
 	/// <summary>
+	/// No digest selected
+	/// </summary>
+	None = 0,
+	/// <summary>
 	/// The Blake digest with a 256 bit return size
 	/// </summary>
 	Blake256 = 1,

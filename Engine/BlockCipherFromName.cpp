@@ -5,9 +5,9 @@
 
 NAMESPACE_HELPER
 
-CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType)
+CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers BlockCipherType)
 {
-	switch (EngineType)
+	switch (BlockCipherType)
 	{
 		case CEX::Enumeration::BlockCiphers::RHX:
 			return new CEX::Cipher::Symmetric::Block::RHX();
@@ -20,16 +20,16 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 	}
 }
 
-CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers EngineType, uint BlockSize, uint RoundCount, CEX::Enumeration::Digests KdfEngine)
+CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers BlockCipherType, uint BlockSize, uint RoundCount, CEX::Enumeration::Digests KdfEngineType)
 {
-	switch (EngineType)
+	switch (BlockCipherType)
 	{
 		case CEX::Enumeration::BlockCiphers::RHX:
-			return new CEX::Cipher::Symmetric::Block::RHX(BlockSize, RoundCount, KdfEngine);
+			return new CEX::Cipher::Symmetric::Block::RHX(BlockSize, RoundCount, KdfEngineType);
 		case CEX::Enumeration::BlockCiphers::SHX:
-			return new CEX::Cipher::Symmetric::Block::SHX(RoundCount, KdfEngine);
+			return new CEX::Cipher::Symmetric::Block::SHX(RoundCount, KdfEngineType);
 		case CEX::Enumeration::BlockCiphers::THX:
-			return new CEX::Cipher::Symmetric::Block::THX(RoundCount, KdfEngine);
+			return new CEX::Cipher::Symmetric::Block::THX(RoundCount, KdfEngineType);
 		default:
 			throw CEX::Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
 	}

@@ -12,3 +12,10 @@ Changes April 08, 2016:
 Changes April 10, 2016:
 * Fixed a bug in counter copy in Salsa, Chacha, and SP20Drbg
 * Updated documentation
+
+Changes April 13, 2016:
+* Minimum key sizes for symmetric ciphers using the HKDF key schedule have been reduced, minimum is now hash output size, recommended 2x hash size ex. SHA256 min. 32 bytes, rec. 64.
+* Updated documentation through out the library
+* updated tests to reflect new minimum secure key sizes
+* Removed unnecessary loop processors from Salsa20 and ChaCha
+* Updated the Speed Test

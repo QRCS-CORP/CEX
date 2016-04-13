@@ -46,12 +46,12 @@ namespace Test
 		/// </remarks>
 		ParallelModeTest() 
 			:
-			_cipherText(0),
-			_decText(0),
+			_cipherText(MAX_ALLOC),
+			_decText(MAX_ALLOC),
 			_iv(16),
 			_key(32),
 			_parallelBlockSize(DEF_BLOCK),
-			_plnText(0),
+			_plnText(MAX_ALLOC),
 			_processorCount(1)
 		{
 

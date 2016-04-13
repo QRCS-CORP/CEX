@@ -36,15 +36,15 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size
 	return Size;
 }
 
-void PBKDF2::Initialize(const std::vector<byte> &Salt)
+void PBKDF2::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Salt.size() < _hashSize * 2)
+	if (Ikm.size() < _hashSize * 2)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 
 	_macKey.resize(_hashSize);
-	memcpy(&_macKey[0], &Salt[0], _hashSize);
-	_macSalt.resize(Salt.size() - _hashSize);
-	memcpy(&_macSalt[0], &Salt[_hashSize], Salt.size() - _hashSize);
+	memcpy(&_macKey[0], &Ikm[0], _hashSize);
+	_macSalt.resize(Ikm.size() - _hashSize);
+	memcpy(&_macSalt[0], &Ikm[_hashSize], Ikm.size() - _hashSize);
 
 	_isInitialized = true;
 }

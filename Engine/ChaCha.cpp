@@ -55,12 +55,12 @@ void ChaCha::Reset()
 
 void ChaCha::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	ProcessBlock(Input, Output);
+	ProcessBlock(Input, 0, Output, 0, Input.size());
 }
 
 void ChaCha::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	ProcessBlock(Input, InOffset, Output, OutOffset);
+	ProcessBlock(Input, InOffset, Output, OutOffset, _isParallel ? _parallelBlockSize : BLOCK_SIZE);
 }
 
 void ChaCha::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
@@ -152,123 +152,24 @@ uint ChaCha::GetProcessorCount()
 	return CEX::Utility::ParallelUtils::ProcessorCount();
 }
 
-void ChaCha::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	if (!_isParallel || Output.size() < _parallelBlockSize)
-	{
-		// generate random
-		Generate(Output.size(), _ctrVector, Output, 0);
-		// output is input xor with random
-		size_t sze = (Output.size() - (Output.size() % BLOCK_SIZE));
-
-		if (sze != 0)
-			CEX::Utility::IntUtils::XORBLK(Input, 0, Output, 0, sze);
-
-		// get the remaining bytes
-		if (sze != Output.size())
-		{
-			for (size_t i = sze; i < Output.size(); i++)
-				Output[i] ^= Input[i];
-		}
-	}
-	else
-	{
-		// parallel CTR processing //
-		size_t cnkSize = (Output.size() / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
-		size_t rndSize = cnkSize * _processorCount;
-		size_t subSize = (cnkSize / BLOCK_SIZE);
-		// create jagged array of 'sub counters'
-		_threadVectors.resize(_processorCount);
-
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](size_t i)
-		{
-			std::vector<uint> &iv = _threadVectors[i];
-			// offset counter by chunk size / block size
-			this->Increase(_ctrVector, subSize * i, iv);
-			// create random at offset position
-			this->Generate(cnkSize, iv, Output, (i * cnkSize));
-			// xor with input at offset
-			CEX::Utility::IntUtils::XORBLK(Input, i * cnkSize, Output, i * cnkSize, cnkSize);
-		});
-
-		// last block processing
-		if (rndSize < Output.size())
-		{
-			size_t fnlSize = Output.size() % rndSize;
-			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, rndSize);
-
-			for (size_t i = rndSize; i < Output.size(); ++i)
-				Output[i] ^= Input[i];
-		}
-
-		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
-	}
-}
-
-void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	size_t outSize = _isParallel ? (Output.size() - OutOffset) : BLOCK_SIZE;
-
-	if (outSize < _parallelBlockSize)
-	{
-		// generate random
-		Generate(outSize, _ctrVector, Output, OutOffset);
-		// output is input xor with random
-		size_t sze = (outSize - (outSize % BLOCK_SIZE));
-
-		if (sze != 0)
-			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
-
-		// get the remaining bytes
-		if (sze != outSize)
-		{
-			for (size_t i = sze; i < outSize; ++i)
-				Output[i + OutOffset] ^= Input[i + InOffset];
-		}
-	}
-	else
-	{
-		// parallel CTR processing //
-		size_t cnkSize = _parallelBlockSize / _processorCount;
-		size_t rndSize = cnkSize * _processorCount;
-		size_t subSize = (cnkSize / BLOCK_SIZE);
-
-		// create jagged array of 'sub counters'
-		_threadVectors.resize(_processorCount);
-
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
-		{
-			std::vector<uint> &iv = _threadVectors[i];
-			// offset counter by chunk size / block size
-			this->Increase(_ctrVector, subSize * i, iv);
-			// create random at offset position
-			this->Generate(cnkSize, iv, Output, (i * cnkSize));
-			// xor with input at offset
-			CEX::Utility::IntUtils::XORBLK(Input, InOffset + (i * cnkSize), Output, OutOffset + (i * cnkSize), cnkSize);
-		});
-
-		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
-	}
-}
-
 void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	size_t outSize = Length;
+	size_t blkSize = (Length > Input.size() - InOffset) ? Input.size() - InOffset : Length;
+	if (blkSize > Output.size() - OutOffset)
+		blkSize = Output.size() - OutOffset;
 
-	if (!_isParallel || outSize < _parallelBlockSize)
+	if (!_isParallel || blkSize < _parallelBlockSize)
 	{
 		// generate random
-		Generate(outSize, _ctrVector, Output, OutOffset);
+		Generate(blkSize, _ctrVector, Output, OutOffset);
 		// output is input xor with random
-		size_t sze = Length - (Length % BLOCK_SIZE);
+		size_t sze = blkSize - (blkSize % BLOCK_SIZE);
 
 		if (sze != 0)
 			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
 
 		// get the remaining bytes
-		if (sze != OutOffset + Length)
+		if (sze != OutOffset + blkSize)
 		{
 			for (size_t i = sze; i < Output.size(); ++i)
 				Output[i + OutOffset] ^= Input[i + InOffset];
@@ -277,7 +178,7 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 	else
 	{
 		// parallel CTR processing //
-		size_t cnkSize = (Length / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
+		size_t cnkSize = (blkSize / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
 		size_t rndSize = cnkSize * _processorCount;
 		size_t subSize = (cnkSize / BLOCK_SIZE);
 
@@ -296,9 +197,9 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 		});
 
 		// last block processing
-		if (rndSize < Length)
+		if (rndSize < blkSize)
 		{
-			size_t fnlSize = Length % rndSize;
+			size_t fnlSize = blkSize % rndSize;
 			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, rndSize);
 
 			for (size_t i = 0; i < fnlSize; ++i)

@@ -54,14 +54,12 @@ void SHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 void SHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	int dgtsze = GetIkmSize(_kdfEngineType);
-	int dgtblk = GetSaltSize(_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, (length - IKm length: {" +
-		CEX::Utility::IntUtils::ToString(dgtsze) + "} bytes) + multiple of {" + CEX::Utility::IntUtils::ToString(dgtblk) + "} block size.";
+	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 
 	if (key.size() < _legalKeySizes[0])
 		throw CryptoSymmetricCipherException("SHX:Initialize", msg);
-	if (key.size() > _legalKeySizes[3] && (key.size() - dgtsze) % dgtblk != 0)
+	if (key.size() > _legalKeySizes[3] && (key.size() % dgtsze) != 0)
 		throw CryptoSymmetricCipherException("SHX:Initialize", msg);
 
 	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
@@ -73,8 +71,13 @@ void SHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	}
 
 	// get the kdf digest engine
-	if (key.size() > MAX_STDKEY)
+	if (_kdfEngineType != CEX::Enumeration::Digests::None)
+	{
+		if (key.size() < _ikmSize)
+			throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
+
 		_kdfEngine = GetDigest(_kdfEngineType);
+	}
 
 	_isEncryption = Encryption;
 	// expand the key
@@ -103,15 +106,14 @@ void SHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void SHX::ExpandKey(const std::vector<byte> &Key)
 {
-	// min possible size for hkdf extended is 768 bit (96 bytes)
-	if (Key.size() > MAX_STDKEY)
+	if (_kdfEngineType != CEX::Enumeration::Digests::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
 	}
 	else
 	{
-		// standard rijndael key expansion + k512
+		// standard serpent key expansion + k512
 		StandardExpand(Key);
 	}
 }
@@ -125,29 +127,29 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 	std::vector<byte> rawKey(keyBytes, 0);
 	size_t saltSize = Key.size() - _ikmSize;
 
-	// salt must be divisible of hash blocksize
-	if (saltSize % _kdfEngine->BlockSize() != 0)
-		saltSize = saltSize - saltSize % _kdfEngine->BlockSize();
-
 	// hkdf input
-	std::vector<byte> hkdfKey(_ikmSize, 0);
-	std::vector<byte> hkdfSalt(saltSize, 0);
+	std::vector<byte> kdfKey(_ikmSize, 0);
+	std::vector<byte> kdfSalt(0, 0);
 
 	// copy hkdf key and salt from user key
-	memcpy(&hkdfKey[0], &Key[0], _ikmSize);
-	memcpy(&hkdfSalt[0], &Key[_ikmSize], saltSize);
+	memcpy(&kdfKey[0], &Key[0], _ikmSize);
+	if (saltSize > 0)
+	{
+		kdfSalt.resize(saltSize);
+		memcpy(&kdfSalt[0], &Key[_ikmSize], saltSize);
+	}
 
 	// HKDF generator expands array using an SHA512 HMAC
 	CEX::Mac::HMAC hmac(_kdfEngine);
 	CEX::Generator::HKDF gen(&hmac);
-	gen.Initialize(hkdfSalt, hkdfKey, _hkdfInfo);
+	gen.Initialize(kdfSalt, kdfKey, _hkdfInfo);
 	gen.Generate(rawKey);
 
 	// initialize working key
 	std::vector<uint> wK(keySize, 0);
 	// copy bytes to working key
 	memcpy(&wK[0], &rawKey[0], keyBytes);
-
+	// set the expanded key
 	_expKey = wK;
 }
 
@@ -159,10 +161,8 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 	std::vector<uint> Wp(padSize, 0);
 	size_t offset = 0;
 
-	// less than 512 is default rounds
-	if (Key.size() < 64)
-		_dfnRounds = ROUNDS32;
-
+	// CHANGE: 512 key gets 8 extra rounds
+	_dfnRounds = (Key.size() == 64) ? 40 : ROUNDS32;
 	size_t keySize = 4 * (_dfnRounds + 1);
 
 	// step 1: reverse copy key to temp array
@@ -440,11 +440,6 @@ CEX::Digest::IDigest* SHX::GetDigest(CEX::Enumeration::Digests DigestType)
 int SHX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 {
 	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
-}
-
-int SHX::GetSaltSize(CEX::Enumeration::Digests DigestType)
-{
-	return CEX::Helper::DigestFromName::GetBlockSize(DigestType);
 }
 
 NAMESPACE_BLOCKEND

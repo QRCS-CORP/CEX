@@ -776,6 +776,9 @@ public:
 	/// <param name="Obj">A byte vector array</param>
 	static inline void ClearArray(std::vector<std::vector<T>> &Obj)
 	{
+		if (Obj.size() == 0)
+			return;
+
 		for (size_t i = 0; i < Obj.size(); i++)
 		{
 			if (Obj[i].capacity() > 0)
@@ -794,9 +797,10 @@ public:
 	/// <param name="Obj">A byte vector array</param>
 	static void ClearVector(std::vector<T> &Obj)
 	{
-		if (Obj.capacity() > 0)
-			memset(Obj.data(), 0, Obj.capacity() * sizeof(T));
-        
+		if (Obj.capacity() == 0)
+			return;
+
+		memset(Obj.data(), 0, Obj.capacity() * sizeof(T));
 		Obj.clear();
 	}
 

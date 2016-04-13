@@ -57,12 +57,12 @@ size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 	return Size;
 }
 
-void HKDF::Initialize(const std::vector<byte> &Salt)
+void HKDF::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Salt.size() < _keySize)
+	if (Ikm.size() < _keySize)
 		throw CryptoGeneratorException("DGCDrbg:Initialize", "Salt value is too small!");
 
-	_digestMac->Initialize(Salt);
+	_digestMac->Initialize(Ikm);
 	_generatedBytes = 0;
 	_currentT.resize(_hashSize, 0);
 	_isInitialized = true;

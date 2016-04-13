@@ -289,8 +289,6 @@ uint CTRPrng::GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine)
 	case CEX::Enumeration::BlockCiphers::RHX:
 	case CEX::Enumeration::BlockCiphers::SHX:
 	case CEX::Enumeration::BlockCiphers::THX:
-		return 320;
-	default:
 		return 32;
 	}
 }
