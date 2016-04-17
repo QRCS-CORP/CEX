@@ -197,7 +197,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	// key in 32 bit words
 	int keyWords = Key.size() / 4;
 	// rounds calculation, 512 gets 22 rounds
-	_dfnRounds = (blkWords == 8 || keyWords == 8) ? 14 : keyWords + 6;
+	_dfnRounds = (blkWords == 8 && Key.size() != 64) ? 14 : keyWords + 6;
 	// setup expanded key
 	_expKey.resize(blkWords * (_dfnRounds + 1), 0);
 
