@@ -19,3 +19,6 @@ Changes April 13, 2016:
 * updated tests to reflect new minimum secure key sizes
 * Removed unnecessary loop processors from Salsa20 and ChaCha
 * Updated the Speed Test
+
+Changes May 20, 2016:
+* RHX k512 key schedule change (recommended)
