@@ -72,7 +72,7 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	
 	if (key.size() < _legalKeySizes[0])
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
-	if (key.size() > _legalKeySizes[3] && (key.size() % dgtsze) != 0)
+	if (dgtsze != 0 && key.size() > _legalKeySizes[3] && (key.size() % dgtsze) != 0)
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
 
 	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
@@ -197,7 +197,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	// key in 32 bit words
 	int keyWords = Key.size() / 4;
 	// rounds calculation, 512 gets 22 rounds
-	_dfnRounds = (blkWords == 8 && Key.size() != 64) ? 14 : keyWords + 6;
+	_dfnRounds = (blkWords == 8 && keyWords != 16) ? 14 : keyWords + 6;
 	// setup expanded key
 	_expKey.resize(blkWords * (_dfnRounds + 1), 0);
 
@@ -221,48 +221,48 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[15] = CEX::Utility::IntUtils::BytesToBe32(Key, 60);
 
 		// k512 R: 16,24,32,40,48,56,64,72,80,88, S: 20,28,36,44,52,60,68,76,84
-		ExpandRotBlock(_expKey, 16, 16);
+		ExpandRotBlock(_expKey, 16, 16, 1);
 		ExpandSubBlock(_expKey, 20, 16);
-		ExpandRotBlock(_expKey, 24, 16);
+		ExpandRotBlock(_expKey, 24, 16, 2);
 		ExpandSubBlock(_expKey, 28, 16);
-		ExpandRotBlock(_expKey, 32, 16);
+		ExpandRotBlock(_expKey, 32, 16, 3);
 		ExpandSubBlock(_expKey, 36, 16);
-		ExpandRotBlock(_expKey, 40, 16);
+		ExpandRotBlock(_expKey, 40, 16, 4);
 		ExpandSubBlock(_expKey, 44, 16);
-		ExpandRotBlock(_expKey, 48, 16);
+		ExpandRotBlock(_expKey, 48, 16, 5);
 		ExpandSubBlock(_expKey, 52, 16);
-		ExpandRotBlock(_expKey, 56, 16);
+		ExpandRotBlock(_expKey, 56, 16, 6);
 		ExpandSubBlock(_expKey, 60, 16);
-		ExpandRotBlock(_expKey, 64, 16);
+		ExpandRotBlock(_expKey, 64, 16, 7);
 		ExpandSubBlock(_expKey, 68, 16);
-		ExpandRotBlock(_expKey, 72, 16);
+		ExpandRotBlock(_expKey, 72, 16, 8);
 		ExpandSubBlock(_expKey, 76, 16);
-		ExpandRotBlock(_expKey, 80, 16);
+		ExpandRotBlock(_expKey, 80, 16, 9);
 		ExpandSubBlock(_expKey, 84, 16);
-		ExpandRotBlock(_expKey, 88, 16);
+		ExpandRotBlock(_expKey, 88, 16, 10);
 
 		if (blkWords == 8)
 		{
 			ExpandSubBlock(_expKey, 92, 16);
-			ExpandRotBlock(_expKey, 96, 16);
+			ExpandRotBlock(_expKey, 96, 16, 11);
 			ExpandSubBlock(_expKey, 100, 16);
-			ExpandRotBlock(_expKey, 104, 16);
+			ExpandRotBlock(_expKey, 104, 16, 12);
 			ExpandSubBlock(_expKey, 108, 16);
-			ExpandRotBlock(_expKey, 112, 16);
+			ExpandRotBlock(_expKey, 112, 16, 13);
 			ExpandSubBlock(_expKey, 116, 16);
-			ExpandRotBlock(_expKey, 120, 16);
+			ExpandRotBlock(_expKey, 120, 16, 14);
 			ExpandSubBlock(_expKey, 124, 16);
-			ExpandRotBlock(_expKey, 128, 16);
+			ExpandRotBlock(_expKey, 128, 16, 15);
 			ExpandSubBlock(_expKey, 132, 16);
-			ExpandRotBlock(_expKey, 136, 16);
+			ExpandRotBlock(_expKey, 136, 16, 16);
 			ExpandSubBlock(_expKey, 140, 16);
-			ExpandRotBlock(_expKey, 144, 16);
+			ExpandRotBlock(_expKey, 144, 16, 17);
 			ExpandSubBlock(_expKey, 148, 16);
-			ExpandRotBlock(_expKey, 152, 16);
+			ExpandRotBlock(_expKey, 152, 16, 18);
 			ExpandSubBlock(_expKey, 156, 16);
-			ExpandRotBlock(_expKey, 160, 16);
+			ExpandRotBlock(_expKey, 160, 16, 19);
 			ExpandSubBlock(_expKey, 164, 16);
-			ExpandRotBlock(_expKey, 168, 16);
+			ExpandRotBlock(_expKey, 168, 16, 20);
 			ExpandSubBlock(_expKey, 172, 16);
 		}
 	}
@@ -278,36 +278,36 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[7] = CEX::Utility::IntUtils::BytesToBe32(Key, 28);
 
 		// k256 R: 8,16,24,32,40,48,56 S: 12,20,28,36,44,52
-		ExpandRotBlock(_expKey, 8, 8);
+		ExpandRotBlock(_expKey, 8, 8, 1);
 		ExpandSubBlock(_expKey, 12, 8);
-		ExpandRotBlock(_expKey, 16, 8);
+		ExpandRotBlock(_expKey, 16, 8, 2);
 		ExpandSubBlock(_expKey, 20, 8);
-		ExpandRotBlock(_expKey, 24, 8);
+		ExpandRotBlock(_expKey, 24, 8, 3);
 		ExpandSubBlock(_expKey, 28, 8);
-		ExpandRotBlock(_expKey, 32, 8);
+		ExpandRotBlock(_expKey, 32, 8, 4);
 		ExpandSubBlock(_expKey, 36, 8);
-		ExpandRotBlock(_expKey, 40, 8);
+		ExpandRotBlock(_expKey, 40, 8, 5);
 		ExpandSubBlock(_expKey, 44, 8);
-		ExpandRotBlock(_expKey, 48, 8);
+		ExpandRotBlock(_expKey, 48, 8, 6);
 		ExpandSubBlock(_expKey, 52, 8);
-		ExpandRotBlock(_expKey, 56, 8);
+		ExpandRotBlock(_expKey, 56, 8, 7);
 
 		if (blkWords == 8)
 		{
 			ExpandSubBlock(_expKey, 60, 8);
-			ExpandRotBlock(_expKey, 64, 8);
+			ExpandRotBlock(_expKey, 64, 8, 8);
 			ExpandSubBlock(_expKey, 68, 8);
-			ExpandRotBlock(_expKey, 72, 8);
+			ExpandRotBlock(_expKey, 72, 8, 9);
 			ExpandSubBlock(_expKey, 76, 8);
-			ExpandRotBlock(_expKey, 80, 8);
+			ExpandRotBlock(_expKey, 80, 8, 10);
 			ExpandSubBlock(_expKey, 84, 8);
-			ExpandRotBlock(_expKey, 88, 8);
+			ExpandRotBlock(_expKey, 88, 8, 11);
 			ExpandSubBlock(_expKey, 92, 8);
-			ExpandRotBlock(_expKey, 96, 8);
+			ExpandRotBlock(_expKey, 96, 8, 12);
 			ExpandSubBlock(_expKey, 100, 8);
-			ExpandRotBlock(_expKey, 104, 8);
+			ExpandRotBlock(_expKey, 104, 8, 13);
 			ExpandSubBlock(_expKey, 108, 8);
-			ExpandRotBlock(_expKey, 112, 8);
+			ExpandRotBlock(_expKey, 112, 8, 14);
 			ExpandSubBlock(_expKey, 116, 8);
 		}
 	}
@@ -321,64 +321,64 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[5] = CEX::Utility::IntUtils::BytesToBe32(Key, 20);
 
 		// // k192 R: 6,12,18,24,30,36,42,48
-		ExpandRotBlock(_expKey, 6, 6);
+		ExpandRotBlock(_expKey, 6, 6, 1);
 		_expKey[10] = _expKey[4] ^ _expKey[9];
 		_expKey[11] = _expKey[5] ^ _expKey[10];
-		ExpandRotBlock(_expKey, 12, 6);
+		ExpandRotBlock(_expKey, 12, 6, 2);
 		_expKey[16] = _expKey[10] ^ _expKey[15];
 		_expKey[17] = _expKey[11] ^ _expKey[16];
-		ExpandRotBlock(_expKey, 18, 6);
+		ExpandRotBlock(_expKey, 18, 6, 3);
 		_expKey[22] = _expKey[16] ^ _expKey[21];
 		_expKey[23] = _expKey[17] ^ _expKey[22];
-		ExpandRotBlock(_expKey, 24, 6);
+		ExpandRotBlock(_expKey, 24, 6, 4);
 		_expKey[28] = _expKey[22] ^ _expKey[27];
 		_expKey[29] = _expKey[23] ^ _expKey[28];
-		ExpandRotBlock(_expKey, 30, 6);
+		ExpandRotBlock(_expKey, 30, 6, 5);
 		_expKey[34] = _expKey[28] ^ _expKey[33];
 		_expKey[35] = _expKey[29] ^ _expKey[34];
-		ExpandRotBlock(_expKey, 36, 6);
+		ExpandRotBlock(_expKey, 36, 6, 6);
 		_expKey[40] = _expKey[34] ^ _expKey[39];
 		_expKey[41] = _expKey[35] ^ _expKey[40];
-		ExpandRotBlock(_expKey, 42, 6);
+		ExpandRotBlock(_expKey, 42, 6, 7);
 		_expKey[46] = _expKey[40] ^ _expKey[45];
 		_expKey[47] = _expKey[41] ^ _expKey[46];
-		ExpandRotBlock(_expKey, 48, 6);
+		ExpandRotBlock(_expKey, 48, 6, 8);
 
 		if (blkWords == 8)
 		{
 			_expKey[52] = _expKey[46] ^ _expKey[51];
 			_expKey[53] = _expKey[47] ^ _expKey[52];
-			ExpandRotBlock(_expKey, 54, 6);
+			ExpandRotBlock(_expKey, 54, 6, 9);
 			_expKey[58] = _expKey[52] ^ _expKey[57];
 			_expKey[59] = _expKey[53] ^ _expKey[58];
-			ExpandRotBlock(_expKey, 60, 6);
+			ExpandRotBlock(_expKey, 60, 6, 10);
 			_expKey[64] = _expKey[58] ^ _expKey[63];
 			_expKey[65] = _expKey[59] ^ _expKey[64];
-			ExpandRotBlock(_expKey, 66, 6);
+			ExpandRotBlock(_expKey, 66, 6, 11);
 			_expKey[70] = _expKey[64] ^ _expKey[69];
 			_expKey[71] = _expKey[65] ^ _expKey[70];
-			ExpandRotBlock(_expKey, 72, 6);
+			ExpandRotBlock(_expKey, 72, 6, 12);
 			_expKey[76] = _expKey[70] ^ _expKey[75];
 			_expKey[77] = _expKey[71] ^ _expKey[76];
-			ExpandRotBlock(_expKey, 78, 6);
+			ExpandRotBlock(_expKey, 78, 6, 13);
 			_expKey[82] = _expKey[76] ^ _expKey[81];
 			_expKey[83] = _expKey[77] ^ _expKey[82];
-			ExpandRotBlock(_expKey, 84, 6);
+			ExpandRotBlock(_expKey, 84, 6, 14);
 			_expKey[88] = _expKey[82] ^ _expKey[87];
 			_expKey[89] = _expKey[83] ^ _expKey[88];
-			ExpandRotBlock(_expKey, 90, 6);
+			ExpandRotBlock(_expKey, 90, 6, 15);
 			_expKey[94] = _expKey[88] ^ _expKey[93];
 			_expKey[95] = _expKey[89] ^ _expKey[94];
-			ExpandRotBlock(_expKey, 96, 6);
+			ExpandRotBlock(_expKey, 96, 6, 16);
 			_expKey[100] = _expKey[94] ^ _expKey[99];
 			_expKey[101] = _expKey[95] ^ _expKey[100];
-			ExpandRotBlock(_expKey, 102, 6);
+			ExpandRotBlock(_expKey, 102, 6, 17);
 			_expKey[106] = _expKey[100] ^ _expKey[105];
 			_expKey[107] = _expKey[101] ^ _expKey[106];
-			ExpandRotBlock(_expKey, 108, 6);
+			ExpandRotBlock(_expKey, 108, 6, 18);
 			_expKey[112] = _expKey[106] ^ _expKey[111];
 			_expKey[113] = _expKey[107] ^ _expKey[112];
-			ExpandRotBlock(_expKey, 114, 6);
+			ExpandRotBlock(_expKey, 114, 6, 19);
 			_expKey[118] = _expKey[112] ^ _expKey[117];
 			_expKey[119] = _expKey[113] ^ _expKey[118];
 		}
@@ -391,61 +391,61 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		_expKey[3] = CEX::Utility::IntUtils::BytesToBe32(Key, 12);
 
 		// k128 R: 4,8,12,16,20,24,28,32,36,40
-		ExpandRotBlock(_expKey, 4, 4);
-		ExpandRotBlock(_expKey, 8, 4);
-		ExpandRotBlock(_expKey, 12, 4);
-		ExpandRotBlock(_expKey, 16, 4);
-		ExpandRotBlock(_expKey, 20, 4);
-		ExpandRotBlock(_expKey, 24, 4);
-		ExpandRotBlock(_expKey, 28, 4);
-		ExpandRotBlock(_expKey, 32, 4);
-		ExpandRotBlock(_expKey, 36, 4);
-		ExpandRotBlock(_expKey, 40, 4);
+		ExpandRotBlock(_expKey, 4, 4, 1);
+		ExpandRotBlock(_expKey, 8, 4, 2);
+		ExpandRotBlock(_expKey, 12, 4, 3);
+		ExpandRotBlock(_expKey, 16, 4, 4);
+		ExpandRotBlock(_expKey, 20, 4, 5);
+		ExpandRotBlock(_expKey, 24, 4, 6);
+		ExpandRotBlock(_expKey, 28, 4, 7);
+		ExpandRotBlock(_expKey, 32, 4, 8);
+		ExpandRotBlock(_expKey, 36, 4, 9);
+		ExpandRotBlock(_expKey, 40, 4, 10);
 
 		if (blkWords == 8)
 		{
-			ExpandRotBlock(_expKey, 44, 4);
-			ExpandRotBlock(_expKey, 48, 4);
-			ExpandRotBlock(_expKey, 52, 4);
-			ExpandRotBlock(_expKey, 56, 4);
-			ExpandRotBlock(_expKey, 60, 4);
-			ExpandRotBlock(_expKey, 64, 4);
-			ExpandRotBlock(_expKey, 68, 4);
-			ExpandRotBlock(_expKey, 72, 4);
-			ExpandRotBlock(_expKey, 76, 4);
-			ExpandRotBlock(_expKey, 80, 4);
-			ExpandRotBlock(_expKey, 84, 4);
-			ExpandRotBlock(_expKey, 88, 4);
-			ExpandRotBlock(_expKey, 92, 4);
-			ExpandRotBlock(_expKey, 96, 4);
-			ExpandRotBlock(_expKey, 100, 4);
-			ExpandRotBlock(_expKey, 104, 4);
-			ExpandRotBlock(_expKey, 108, 4);
-			ExpandRotBlock(_expKey, 112, 4);
-			ExpandRotBlock(_expKey, 116, 4);
+			ExpandRotBlock(_expKey, 44, 4, 11);
+			ExpandRotBlock(_expKey, 48, 4, 12);
+			ExpandRotBlock(_expKey, 52, 4, 13);
+			ExpandRotBlock(_expKey, 56, 4, 14);
+			ExpandRotBlock(_expKey, 60, 4, 15);
+			ExpandRotBlock(_expKey, 64, 4, 16);
+			ExpandRotBlock(_expKey, 68, 4, 17);
+			ExpandRotBlock(_expKey, 72, 4, 18);
+			ExpandRotBlock(_expKey, 76, 4, 19);
+			ExpandRotBlock(_expKey, 80, 4, 20);
+			ExpandRotBlock(_expKey, 84, 4, 21);
+			ExpandRotBlock(_expKey, 88, 4, 22);
+			ExpandRotBlock(_expKey, 92, 4, 23);
+			ExpandRotBlock(_expKey, 96, 4, 24);
+			ExpandRotBlock(_expKey, 100, 4, 25);
+			ExpandRotBlock(_expKey, 104, 4, 26);
+			ExpandRotBlock(_expKey, 108, 4, 27);
+			ExpandRotBlock(_expKey, 112, 4, 28);
+			ExpandRotBlock(_expKey, 116, 4, 29);
 		}
 	}
 }
 
-void RHX::ExpandRotBlock(std::vector<uint> &Key, int Index, int Offset)
+void RHX::ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex)
 {
-	int sub = Index - Offset;
+	size_t sub = KeyIndex - KeyOffset;
 
-	Key[Index] = Key[sub] ^ SubByte((Key[Index - 1] << 8) | ((Key[Index - 1] >> 24) & 0xFF)) ^ Rcon[(Index / Offset)];
-	// note: you can insert noise before each mix to further equalize timing, i.e: uint tmp = SubByte(Key[Index - 1]);
-	Key[++Index] = Key[++sub] ^ Key[Index - 1];
-	Key[++Index] = Key[++sub] ^ Key[Index - 1];
-	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+	Key[KeyIndex] = Key[sub] ^ SubByte((Key[KeyIndex - 1] << 8) | ((Key[KeyIndex - 1] >> 24) & 0xFF)) ^ Rcon[RconIndex];
+	// note: you can insert noise before each mix to further equalize timing, i.e: uint tmp = SubByte(Key[KeyIndex - 1]);
+	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
 }
 
-void RHX::ExpandSubBlock(std::vector<uint> &Key, int Index, int Offset)
+void RHX::ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset)
 {
-	int sub = Index - Offset;
+	size_t sub = KeyIndex - KeyOffset;
 
-	Key[Index] = SubByte(Key[Index - 1]) ^ Key[sub];
-	Key[++Index] = Key[++sub] ^ Key[Index - 1];
-	Key[++Index] = Key[++sub] ^ Key[Index - 1];
-	Key[++Index] = Key[++sub] ^ Key[Index - 1];
+	Key[KeyIndex] = SubByte(Key[KeyIndex - 1]) ^ Key[sub];
+	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
 }
 
 // *** Rounds Processing *** //
