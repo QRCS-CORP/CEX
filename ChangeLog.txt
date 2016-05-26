@@ -1,0 +1,24 @@
+Version 1.1
+
+Changes April 08, 2016:
+* Unrolled Rijndael key schedule StandardExpand() routine, removed all branches and loops from the key expansion function.
+* Added new constructors to CMAC and HMAC, they can now be initialized with the engines enumeration member.
+* Added MacDescription  structure, similar useage to CipherDescription.
+* Added new constructor to MacStream, can now initialize any supported Mac generator with a MacDescription structure.
+* Expanded DigestFromName helper class with GetDigestSise() and GetBlockSize() functions.
+* Added new helper classes CipherFromDescription, and MacFromDescription.
+
+
+Changes April 10, 2016:
+* Fixed a bug in counter copy in Salsa, Chacha, and SP20Drbg
+* Updated documentation
+
+Changes April 13, 2016:
+* Minimum key sizes for symmetric ciphers using the HKDF key schedule have been reduced, minimum is now hash output size, recommended 2x hash size ex. SHA256 min. 32 bytes, rec. 64.
+* Updated documentation through out the library
+* updated tests to reflect new minimum secure key sizes
+* Removed unnecessary loop processors from Salsa20 and ChaCha
+* Updated the Speed Test
+
+Changes May 20, 2016:
+* RHX k512 key schedule change (recommended)

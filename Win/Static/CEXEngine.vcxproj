@@ -1,0 +1,371 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FF7AB9CB-BF7B-4E0E-A3EF-F4141810B24A}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>CEXEngine</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Engine</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile />
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalOptions>/FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile />
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile />
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <PrecompiledHeaderFile />
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Engine\ArrayUtils.h" />
+    <ClInclude Include="..\..\Engine\AsymmetricEngines.h" />
+    <ClInclude Include="..\..\Engine\BitConverter.h" />
+    <ClInclude Include="..\..\Engine\Blake256.h" />
+    <ClInclude Include="..\..\Engine\Blake512.h" />
+    <ClInclude Include="..\..\Engine\BlockCiphers.h" />
+    <ClInclude Include="..\..\Engine\BlockSizes.h" />
+    <ClInclude Include="..\..\Engine\CBC.h" />
+    <ClInclude Include="..\..\Engine\CipherDescription.h" />
+    <ClInclude Include="..\..\Engine\BlockCipherFromName.h" />
+    <ClInclude Include="..\..\Engine\CipherFromDescription.h" />
+    <ClInclude Include="..\..\Engine\CipherKey.h" />
+    <ClInclude Include="..\..\Engine\CipherModes.h" />
+    <ClInclude Include="..\..\Engine\CMAC.h" />
+    <ClInclude Include="..\..\Engine\Common.h" />
+    <ClInclude Include="..\..\Engine\CFB.h" />
+    <ClInclude Include="..\..\Engine\ChaCha.h" />
+    <ClInclude Include="..\..\Engine\Config.h" />
+    <ClInclude Include="..\..\Engine\CryptoCipherModeException.h" />
+    <ClInclude Include="..\..\Engine\CryptoDigestException.h" />
+    <ClInclude Include="..\..\Engine\CryptoException.h" />
+    <ClInclude Include="..\..\Engine\CryptoGeneratorException.h" />
+    <ClInclude Include="..\..\Engine\CryptoMacException.h" />
+    <ClInclude Include="..\..\Engine\CryptoPaddingException.h" />
+    <ClInclude Include="..\..\Engine\CryptoProcessingException.h" />
+    <ClInclude Include="..\..\Engine\CryptoRandomException.h" />
+    <ClInclude Include="..\..\Engine\CryptoSymmetricCipherException.h" />
+    <ClInclude Include="..\..\Engine\CSPPrng.h" />
+    <ClInclude Include="..\..\Engine\CSPRsg.h" />
+    <ClInclude Include="..\..\Engine\CTR.h" />
+    <ClInclude Include="..\..\Engine\CTRDrbg.h" />
+    <ClInclude Include="..\..\Engine\CTRPrng.h" />
+    <ClInclude Include="..\..\Engine\Delegate.h" />
+    <ClInclude Include="..\..\Engine\DGCDrbg.h" />
+    <ClInclude Include="..\..\Engine\DGCPrng.h" />
+    <ClInclude Include="..\..\Engine\DigestFromName.h" />
+    <ClInclude Include="..\..\Engine\Digests.h" />
+    <ClInclude Include="..\..\Engine\DigestStream.h" />
+    <ClInclude Include="..\..\Engine\Documentation.h" />
+    <ClInclude Include="..\..\Engine\ECB.h" />
+    <ClInclude Include="..\..\Engine\EntropyPool.h" />
+    <ClInclude Include="..\..\Engine\Event.h" />
+    <ClInclude Include="..\..\Engine\FileStream.h" />
+    <ClInclude Include="..\..\Engine\Generators.h" />
+    <ClInclude Include="..\..\Engine\HKDF.h" />
+    <ClInclude Include="..\..\Engine\HMAC.h" />
+    <ClInclude Include="..\..\Engine\IBlockCipher.h" />
+    <ClInclude Include="..\..\Engine\ICipherMode.h" />
+    <ClInclude Include="..\..\Engine\IDigest.h" />
+    <ClInclude Include="..\..\Engine\IGenerator.h" />
+    <ClInclude Include="..\..\Engine\IMac.h" />
+    <ClInclude Include="..\..\Engine\IntUtils.h" />
+    <ClInclude Include="..\..\Engine\IPadding.h" />
+    <ClInclude Include="..\..\Engine\IRandom.h" />
+    <ClInclude Include="..\..\Engine\ISeed.h" />
+    <ClInclude Include="..\..\Engine\ISO7816.h" />
+    <ClInclude Include="..\..\Engine\IByteStream.h" />
+    <ClInclude Include="..\..\Engine\IStreamCipher.h" />
+    <ClInclude Include="..\..\Engine\IVSizes.h" />
+    <ClInclude Include="..\..\Engine\KDF2Drbg.h" />
+    <ClInclude Include="..\..\Engine\KdfGenerators.h" />
+    <ClInclude Include="..\..\Engine\Keccak.h" />
+    <ClInclude Include="..\..\Engine\Keccak256.h" />
+    <ClInclude Include="..\..\Engine\Keccak512.h" />
+    <ClInclude Include="..\..\Engine\KeyFactory.h" />
+    <ClInclude Include="..\..\Engine\KeyGenerator.h" />
+    <ClInclude Include="..\..\Engine\KeyParams.h" />
+    <ClInclude Include="..\..\Engine\KeySizes.h" />
+    <ClInclude Include="..\..\Engine\MacDescription.h" />
+    <ClInclude Include="..\..\Engine\MacFromDescription.h" />
+    <ClInclude Include="..\..\Engine\MacKey.h" />
+    <ClInclude Include="..\..\Engine\Macs.h" />
+    <ClInclude Include="..\..\Engine\MacStream.h" />
+    <ClInclude Include="..\..\Engine\MemoryStream.h" />
+    <ClInclude Include="..\..\Engine\CipherModeFromName.h" />
+    <ClInclude Include="..\..\Engine\MessageHeader.h" />
+    <ClInclude Include="..\..\Engine\OFB.h" />
+    <ClInclude Include="..\..\Engine\PaddingFromName.h" />
+    <ClInclude Include="..\..\Engine\PaddingModes.h" />
+    <ClInclude Include="..\..\Engine\ParallelUtils.h" />
+    <ClInclude Include="..\..\Engine\PBKDF2.h" />
+    <ClInclude Include="..\..\Engine\PPBPrng.h" />
+    <ClInclude Include="..\..\Engine\PKCS7.h" />
+    <ClInclude Include="..\..\Engine\PrngFromName.h" />
+    <ClInclude Include="..\..\Engine\Prngs.h" />
+    <ClInclude Include="..\..\Engine\RHX.h" />
+    <ClInclude Include="..\..\Engine\Rijndael.h" />
+    <ClInclude Include="..\..\Engine\RoundCounts.h" />
+    <ClInclude Include="..\..\Engine\ISCRsg.h" />
+    <ClInclude Include="..\..\Engine\Salsa20.h" />
+    <ClInclude Include="..\..\Engine\SecureRandom.h" />
+    <ClInclude Include="..\..\Engine\SeedFromName.h" />
+    <ClInclude Include="..\..\Engine\SeedGenerators.h" />
+    <ClInclude Include="..\..\Engine\SeekOrigin.h" />
+    <ClInclude Include="..\..\Engine\Serpent.h" />
+    <ClInclude Include="..\..\Engine\SHA.h" />
+    <ClInclude Include="..\..\Engine\SHA256.h" />
+    <ClInclude Include="..\..\Engine\SHA512.h" />
+    <ClInclude Include="..\..\Engine\SHX.h" />
+    <ClInclude Include="..\..\Engine\Skein.h" />
+    <ClInclude Include="..\..\Engine\Skein1024.h" />
+    <ClInclude Include="..\..\Engine\Skein256.h" />
+    <ClInclude Include="..\..\Engine\Skein512.h" />
+    <ClInclude Include="..\..\Engine\SkeinInitializationType.h" />
+    <ClInclude Include="..\..\Engine\SP20Drbg.h" />
+    <ClInclude Include="..\..\Engine\SP20Prng.h" />
+    <ClInclude Include="..\..\Engine\CipherStream.h" />
+    <ClInclude Include="..\..\Engine\StreamCipherFromName.h" />
+    <ClInclude Include="..\..\Engine\StreamCiphers.h" />
+    <ClInclude Include="..\..\Engine\StreamReader.h" />
+    <ClInclude Include="..\..\Engine\StreamWriter.h" />
+    <ClInclude Include="..\..\Engine\SymmetricEngines.h" />
+    <ClInclude Include="..\..\Engine\TBC.h" />
+    <ClInclude Include="..\..\Engine\Threefish1024.h" />
+    <ClInclude Include="..\..\Engine\Threefish256.h" />
+    <ClInclude Include="..\..\Engine\Threefish512.h" />
+    <ClInclude Include="..\..\Engine\THX.h" />
+    <ClInclude Include="..\..\Engine\Twofish.h" />
+    <ClInclude Include="..\..\Engine\UbiType.h" />
+    <ClInclude Include="..\..\Engine\VMAC.h" />
+    <ClInclude Include="..\..\Engine\X923.h" />
+    <ClInclude Include="..\..\Engine\XSPRsg.h" />
+    <ClInclude Include="..\..\Engine\ZeroPad.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Engine\Blake256.cpp" />
+    <ClCompile Include="..\..\Engine\Blake512.cpp" />
+    <ClCompile Include="..\..\Engine\BlockCipherFromName.cpp" />
+    <ClCompile Include="..\..\Engine\CBC.cpp" />
+    <ClCompile Include="..\..\Engine\CFB.cpp" />
+    <ClCompile Include="..\..\Engine\ChaCha.cpp" />
+    <ClCompile Include="..\..\Engine\CipherFromDescription.cpp" />
+    <ClCompile Include="..\..\Engine\CipherModeFromName.cpp" />
+    <ClCompile Include="..\..\Engine\CMAC.cpp" />
+    <ClCompile Include="..\..\Engine\CSPPrng.cpp" />
+    <ClCompile Include="..\..\Engine\CSPRsg.cpp" />
+    <ClCompile Include="..\..\Engine\CTR.cpp" />
+    <ClCompile Include="..\..\Engine\CTRDrbg.cpp" />
+    <ClCompile Include="..\..\Engine\CTRPrng.cpp" />
+    <ClCompile Include="..\..\Engine\DGCDrbg.cpp" />
+    <ClCompile Include="..\..\Engine\DGCPrng.cpp" />
+    <ClCompile Include="..\..\Engine\DigestFromName.cpp" />
+    <ClCompile Include="..\..\Engine\DigestStream.cpp" />
+    <ClCompile Include="..\..\Engine\ECB.cpp" />
+    <ClCompile Include="..\..\Engine\FileStream.cpp" />
+    <ClCompile Include="..\..\Engine\HKDF.cpp" />
+    <ClCompile Include="..\..\Engine\HMAC.cpp" />
+    <ClCompile Include="..\..\Engine\IntUtils.cpp" />
+    <ClCompile Include="..\..\Engine\ISCRsg.cpp" />
+    <ClCompile Include="..\..\Engine\ISO7816.cpp" />
+    <ClCompile Include="..\..\Engine\KDF2Drbg.cpp" />
+    <ClCompile Include="..\..\Engine\Keccak.cpp" />
+    <ClCompile Include="..\..\Engine\Keccak256.cpp" />
+    <ClCompile Include="..\..\Engine\Keccak512.cpp" />
+    <ClCompile Include="..\..\Engine\KeyFactory.cpp" />
+    <ClCompile Include="..\..\Engine\KeyGenerator.cpp" />
+    <ClCompile Include="..\..\Engine\MacFromDescription.cpp" />
+    <ClCompile Include="..\..\Engine\MacStream.cpp" />
+    <ClCompile Include="..\..\Engine\MemoryStream.cpp" />
+    <ClCompile Include="..\..\Engine\OFB.cpp" />
+    <ClCompile Include="..\..\Engine\PaddingFromName.cpp" />
+    <ClCompile Include="..\..\Engine\ParallelUtils.cpp" />
+    <ClCompile Include="..\..\Engine\PBKDF2.cpp" />
+    <ClCompile Include="..\..\Engine\PKCS7.cpp" />
+    <ClCompile Include="..\..\Engine\PPBPrng.cpp" />
+    <ClCompile Include="..\..\Engine\PrngFromName.cpp" />
+    <ClCompile Include="..\..\Engine\RHX.cpp" />
+    <ClCompile Include="..\..\Engine\Salsa20.cpp" />
+    <ClCompile Include="..\..\Engine\SecureRandom.cpp" />
+    <ClCompile Include="..\..\Engine\SeedFromName.cpp" />
+    <ClCompile Include="..\..\Engine\SHA256.cpp" />
+    <ClCompile Include="..\..\Engine\SHA512.cpp" />
+    <ClCompile Include="..\..\Engine\SHX.cpp" />
+    <ClCompile Include="..\..\Engine\Skein1024.cpp" />
+    <ClCompile Include="..\..\Engine\Skein256.cpp" />
+    <ClCompile Include="..\..\Engine\Skein512.cpp" />
+    <ClCompile Include="..\..\Engine\SP20Drbg.cpp" />
+    <ClCompile Include="..\..\Engine\SP20Prng.cpp" />
+    <ClCompile Include="..\..\Engine\CipherStream.cpp" />
+    <ClCompile Include="..\..\Engine\StreamCipherFromName.cpp" />
+    <ClCompile Include="..\..\Engine\StreamReader.cpp" />
+    <ClCompile Include="..\..\Engine\StreamWriter.cpp" />
+    <ClCompile Include="..\..\Engine\TBC.cpp" />
+    <ClCompile Include="..\..\Engine\Threefish1024.cpp" />
+    <ClCompile Include="..\..\Engine\Threefish256.cpp" />
+    <ClCompile Include="..\..\Engine\Threefish512.cpp" />
+    <ClCompile Include="..\..\Engine\THX.cpp" />
+    <ClCompile Include="..\..\Engine\VMAC.cpp" />
+    <ClCompile Include="..\..\Engine\X923.cpp" />
+    <ClCompile Include="..\..\Engine\XSPRsg.cpp" />
+    <ClCompile Include="..\..\Engine\ZeroPad.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="license.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

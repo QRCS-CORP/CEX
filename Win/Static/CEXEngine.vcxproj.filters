@@ -1,0 +1,717 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Common">
+      <UniqueIdentifier>{91947a1b-d3f6-4a7f-a3a9-6de694e63399}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher">
+      <UniqueIdentifier>{3e867afb-ede8-4386-a643-7358ab99421b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric">
+      <UniqueIdentifier>{f3b8fab8-138f-4b57-a103-cdd242687cb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Block">
+      <UniqueIdentifier>{e637b47e-025b-4443-b0ba-3a855c5fbe06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Block\Mode">
+      <UniqueIdentifier>{e44f5c4c-0a55-4350-8e7d-fa8860908759}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Block\Padding">
+      <UniqueIdentifier>{b2968ebd-3f68-4691-8abb-cde01c1b02c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Stream">
+      <UniqueIdentifier>{5c1b5499-55d3-40f8-b3f4-649220c37bf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Digest">
+      <UniqueIdentifier>{1672c46d-d51c-48dd-88af-6e81b33808f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Generator">
+      <UniqueIdentifier>{4ca95536-18f1-432b-8a06-699033dcadba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mac">
+      <UniqueIdentifier>{c040e8f6-f991-4abc-985d-69f7ece4cfa4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Prng">
+      <UniqueIdentifier>{44ef2270-c023-414a-a2a2-571e02a515c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Utility">
+      <UniqueIdentifier>{287ad61e-232f-4914-8dbb-b0bcafb821c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher">
+      <UniqueIdentifier>{b086c7ae-ed26-4ebf-ace7-0a00d747a2ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Symmetric">
+      <UniqueIdentifier>{36f761f1-56b1-4ec2-a88c-fd706450acd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Symmetric\Block">
+      <UniqueIdentifier>{81a27dfb-8cb5-4ab1-831d-85e93d63cca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Symmetric\Block\Mode">
+      <UniqueIdentifier>{6622f282-badf-4db9-b6e5-6ed92873858e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Symmetric\Block\Padding">
+      <UniqueIdentifier>{f82616cf-29c0-4278-87c4-467b8b35e47e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Symmetric\Stream">
+      <UniqueIdentifier>{6a668064-fa08-4db8-b393-764235c874d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{590a8fb3-2d8d-4dc2-97d2-f3b7354d8c2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CryptoException">
+      <UniqueIdentifier>{1a9e4120-3020-4d50-810a-9407e6bbac86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Digest">
+      <UniqueIdentifier>{080f52a4-81f5-4f7a-b1ad-6ba942789bf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Generator">
+      <UniqueIdentifier>{5e4f2c67-9347-414a-9258-1abff310dbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Mac">
+      <UniqueIdentifier>{d6dc62eb-fec3-4420-9309-5be05315faa6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Utility">
+      <UniqueIdentifier>{e4a8b128-ede7-47bd-8df0-91bf89e23c00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Prng">
+      <UniqueIdentifier>{c15bfdc9-684d-4444-8795-91df89388aed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Seed">
+      <UniqueIdentifier>{45737c37-8c1e-4cb6-b871-0f9b4f5b214b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Seed">
+      <UniqueIdentifier>{1303b164-5c34-4fba-9cdb-b4ed4a34455c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Enumeration">
+      <UniqueIdentifier>{46bf6934-1945-432e-a27e-0d21bab62341}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Processing">
+      <UniqueIdentifier>{e8dcf801-1990-4580-913c-60120bae2c98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Processing">
+      <UniqueIdentifier>{8a83d7a9-f3ad-4e1a-ab2c-c138da7686b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{8690bc59-6dca-42a8-ae72-a9541167bf4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Block\Support">
+      <UniqueIdentifier>{41e3c3fe-04c9-4529-9c73-6016401dc8ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Digest\Support">
+      <UniqueIdentifier>{f5d3b4d1-ad76-4a4b-a072-529a67190b29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Event">
+      <UniqueIdentifier>{8d6837de-6f36-4c90-8084-1d3da1a21501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helper">
+      <UniqueIdentifier>{2a549b89-8eae-416f-91b9-b9723f44ea84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Exception">
+      <UniqueIdentifier>{7eeba58b-8009-4403-9149-d6a7bcc53dbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helper">
+      <UniqueIdentifier>{b89e50e0-3e4a-49cf-b937-658444726c55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Digest\Support">
+      <UniqueIdentifier>{a12ab2a9-daa9-45aa-bb9e-f564cc5779bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{9dc772a6-6635-4dd3-99db-e47c092c0bb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Processing\Factory">
+      <UniqueIdentifier>{66280d1f-c332-411d-9323-dc07e81ff4d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Processing\Structure">
+      <UniqueIdentifier>{4459698f-6898-4440-a4c2-97bf7d480e83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Processing\Factory">
+      <UniqueIdentifier>{8909b3c3-c9e0-4e2f-952e-90568ce5b33f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Engine\CBC.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CFB.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CTR.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ECB.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\OFB.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ICipherMode.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IPadding.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ISO7816.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\PKCS7.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\X923.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ZeroPad.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IBlockCipher.h">
+      <Filter>Header Files\Cipher\Symmetric\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\RHX.h">
+      <Filter>Header Files\Cipher\Symmetric\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SHX.h">
+      <Filter>Header Files\Cipher\Symmetric\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\THX.h">
+      <Filter>Header Files\Cipher\Symmetric\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ChaCha.h">
+      <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IStreamCipher.h">
+      <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Salsa20.h">
+      <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Config.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KeyParams.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoCipherModeException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoDigestException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoGeneratorException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoMacException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoPaddingException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoRandomException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoSymmetricCipherException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Blake256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Blake512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Keccak256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Keccak512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SHA256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SHA512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Skein512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Skein1024.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\HKDF.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IGenerator.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\HMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IMac.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ISeed.h">
+      <Filter>Header Files\Seed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IntUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ParallelUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Common.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\AsymmetricEngines.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\BlockCiphers.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\BlockSizes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Digests.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Generators.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IVSizes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KdfGenerators.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KeySizes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Macs.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\PaddingModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Prngs.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\RoundCounts.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SeedGenerators.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\StreamCiphers.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SymmetricEngines.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherDescription.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KeyGenerator.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IDigest.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IRandom.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CTRPrng.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CTRDrbg.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\DGCDrbg.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KDF2Drbg.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\PBKDF2.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SP20Drbg.h">
+      <Filter>Header Files\Generator</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\DGCPrng.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SP20Prng.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SecureRandom.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\StreamReader.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\StreamWriter.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\FileStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MemoryStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CryptoProcessingException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SeekOrigin.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\TBC.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CSPPrng.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\PPBPrng.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\BitConverter.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\IByteStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SkeinInitializationType.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\UbiType.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Threefish256.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Threefish512.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Threefish1024.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Skein256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Skein.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Keccak.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\VMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherStream.h">
+      <Filter>Header Files\Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\DigestStream.h">
+      <Filter>Header Files\Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Event.h">
+      <Filter>Header Files\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Delegate.h">
+      <Filter>Header Files\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\DigestFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\PaddingFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\BlockCipherFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherModeFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\StreamCipherFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacStream.h">
+      <Filter>Header Files\Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\EntropyPool.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ArrayUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\PrngFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CSPRsg.h">
+      <Filter>Header Files\Seed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\ISCRsg.h">
+      <Filter>Header Files\Seed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\XSPRsg.h">
+      <Filter>Header Files\Seed</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherKey.h">
+      <Filter>Header Files\Processing\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MessageHeader.h">
+      <Filter>Header Files\Processing\Structure</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\KeyFactory.h">
+      <Filter>Header Files\Processing\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SeedFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\SHA.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Serpent.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Twofish.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Rijndael.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Documentation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacDescription.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\CipherFromDescription.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacFromDescription.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\MacKey.h">
+      <Filter>Header Files\Processing\Structure</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Engine\CBC.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CFB.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CTR.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\ECB.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\OFB.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\ISO7816.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\PKCS7.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\X923.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\ZeroPad.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\ChaCha.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Salsa20.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Blake256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Blake512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Keccak256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Keccak512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SHA256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SHA512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Skein256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Skein512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Skein1024.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\HKDF.cpp">
+      <Filter>Source Files\Generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\HMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\IntUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\RHX.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SHX.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\THX.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CTRDrbg.cpp">
+      <Filter>Source Files\Generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SP20Drbg.cpp">
+      <Filter>Source Files\Generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\KDF2Drbg.cpp">
+      <Filter>Source Files\Generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\PBKDF2.cpp">
+      <Filter>Source Files\Generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\TBC.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CTRPrng.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CSPPrng.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\DGCDrbg.cpp">
+      <Filter>Source Files\Generator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\DGCPrng.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\PPBPrng.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SP20Prng.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SecureRandom.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\VMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CipherStream.cpp">
+      <Filter>Source Files\Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\PaddingFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\StreamCipherFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\BlockCipherFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\DigestFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\DigestStream.cpp">
+      <Filter>Source Files\Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\MacStream.cpp">
+      <Filter>Source Files\Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Threefish256.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Threefish512.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Threefish1024.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\FileStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\MemoryStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\StreamReader.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\ParallelUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\PrngFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\KeyGenerator.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\StreamWriter.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CSPRsg.cpp">
+      <Filter>Source Files\Seed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\ISCRsg.cpp">
+      <Filter>Source Files\Seed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\XSPRsg.cpp">
+      <Filter>Source Files\Seed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\SeedFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\KeyFactory.cpp">
+      <Filter>Source Files\Processing\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\Keccak.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CipherModeFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\CipherFromDescription.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\MacFromDescription.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="license.txt" />
+  </ItemGroup>
+</Project>

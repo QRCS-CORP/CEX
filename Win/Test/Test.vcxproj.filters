@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Test">
+      <UniqueIdentifier>{d0936e02-c165-4804-8b49-46dca2939f65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Vectors">
+      <UniqueIdentifier>{96674cd0-aede-4dc9-892f-639c14c22916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Vectors\AESAVS">
+      <UniqueIdentifier>{7dd2852b-6b61-472c-816a-4a7e07f239e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Vectors\Counterpane">
+      <UniqueIdentifier>{4d120511-a44b-4a22-8f4f-bfd93702297a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Vectors\Nessie">
+      <UniqueIdentifier>{1549ee52-678a-4d5b-84c1-9d4a1d757052}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\CipherTest">
+      <UniqueIdentifier>{416bef18-73dc-485c-9835-77f9975413d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\DigestTest">
+      <UniqueIdentifier>{a79a6c52-3af4-47dd-be62-4a26d1d56657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\GeneratorTest">
+      <UniqueIdentifier>{118a25bd-ce79-48a9-9502-6ecb49ab5552}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\MacTest">
+      <UniqueIdentifier>{cce8889d-16c4-4ff6-9bd8-9a84693ad782}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Common">
+      <UniqueIdentifier>{c211bc53-6ee2-42bf-9515-ef7f7147a739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\ProcessorTest">
+      <UniqueIdentifier>{c1f92de4-0b88-47b3-8659-c344c730f333}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\PrngTest">
+      <UniqueIdentifier>{d6ff0042-a489-45e3-9749-732aa03d51d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\SeedTest">
+      <UniqueIdentifier>{67030bb3-f94e-427c-ba05-2e53605c75cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test">
+      <UniqueIdentifier>{f99e4b43-43b7-4ed2-b9a3-9a33df4df93a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\CipherTest">
+      <UniqueIdentifier>{d08b3715-4367-4581-b871-228237531643}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\Common">
+      <UniqueIdentifier>{8a3cb425-db48-4fd1-8d1c-a868004736b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\DigestTest">
+      <UniqueIdentifier>{a71af0e1-95df-4c79-ba69-371a66e93ef2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\GeneratorTest">
+      <UniqueIdentifier>{bb1b8b44-3915-441e-820b-83d7dd867986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\MacTest">
+      <UniqueIdentifier>{dfd2f34c-f11c-4149-b7ce-926b06cff512}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\PrngTest">
+      <UniqueIdentifier>{ac413792-5835-46f5-b11c-cc3b9ee6fbe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\ProcessorTest">
+      <UniqueIdentifier>{aa3431cb-f6fd-4a5c-959c-77ec1aa133d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\SeedTest">
+      <UniqueIdentifier>{88de1aa6-d081-44ec-80bc-ce3b6da30a34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Vectors\AESAVS\keyvect128.txt">
+      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\keyvect192.txt">
+      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\keyvect256.txt">
+      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\plainvect128.txt">
+      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\plainvect192.txt">
+      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
+    </Text>
+    <Text Include="..\Vectors\AESAVS\plainvect256.txt">
+      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
+    </Text>
+    <Text Include="..\Vectors\Counterpane\twofishcipher128.txt">
+      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
+    </Text>
+    <Text Include="..\Vectors\Counterpane\twofishcipher192.txt">
+      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
+    </Text>
+    <Text Include="..\Vectors\Counterpane\twofishcipher256.txt">
+      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
+    </Text>
+    <Text Include="..\Vectors\Counterpane\twofishkey128.txt">
+      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
+    </Text>
+    <Text Include="..\Vectors\Counterpane\twofishkey192.txt">
+      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
+    </Text>
+    <Text Include="..\Vectors\Counterpane\twofishkey256.txt">
+      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentcipher128.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentcipher192.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentcipher256.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentkey128.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentkey192.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentkey256.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentmonte100-128.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentmonte100-192.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentmonte100-256.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentmonte1000-128.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentmonte1000-192.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentmonte1000-256.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentplain128.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentplain192.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+    <Text Include="..\Vectors\Nessie\serpentplain256.txt">
+      <Filter>Header Files\Test\Vectors\Nessie</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Test\AesAvsTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\AesFipsTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ChaChaTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CipherModeTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HXCipherTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ParallelModeTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RijndaelTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SalsaTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SerpentTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\BlakeTest.h">
+      <Filter>Header Files\Test\DigestTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\KeccakTest.h">
+      <Filter>Header Files\Test\DigestTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\Sha2Test.h">
+      <Filter>Header Files\Test\DigestTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SkeinTest.h">
+      <Filter>Header Files\Test\DigestTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\KDF2DrbgTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TwofishTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HexConverter.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TestCommon.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TestFiles.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TestUtils.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SpeedTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\PBKDF2Test.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CTRDrbgTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ITest.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ConsoleUtils.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RangedRNGTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TestEvent.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TestEventHandler.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\PaddingTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CMACTest.h">
+      <Filter>Header Files\Test\MacTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HMACTest.h">
+      <Filter>Header Files\Test\MacTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HKDFTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\VMACTest.h">
+      <Filter>Header Files\Test\MacTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CipherStreamTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\MacStreamTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\DigestStreamTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ISCRsgTest.h">
+      <Filter>Header Files\Test\SeedTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\XSPRsgTest.h">
+      <Filter>Header Files\Test\SeedTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\TestException.h">
+      <Filter>Header Files\Test\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\KeyFactoryTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SP20DrbgTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\AesAvsTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\AesFipsTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ChaChaTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CipherModeTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\HXCipherTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\PaddingTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ParallelModeTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RijndaelTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CMACTest.cpp">
+      <Filter>Source Files\Test\MacTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\HMACTest.cpp">
+      <Filter>Source Files\Test\MacTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\VMACTest.cpp">
+      <Filter>Source Files\Test\MacTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RangedRngTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CipherStreamTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\MacStreamTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\BlakeTest.cpp">
+      <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CTRDrbgTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\DigestStreamTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\HKDFTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\KDF2DrbgTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\KeccakTest.cpp">
+      <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\KeyFactoryTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\PBKDF2Test.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SalsaTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SerpentTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\Sha2Test.cpp">
+      <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SkeinTest.cpp">
+      <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SpeedTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ISCRsgTest.cpp">
+      <Filter>Source Files\Test\SeedTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\XSPRsgTest.cpp">
+      <Filter>Source Files\Test\SeedTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SP20DrbgTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\TwofishTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
