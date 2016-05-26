@@ -7,7 +7,7 @@ NAMESPACE_SEED
 void CSPRsg::Destroy()
 {
 #ifdef _WIN32
-	if (!::CryptReleaseContext(_hProvider, 0))
+	if (!::CryptReleaseContext(m_hProvider, 0))
 		return;
 #endif
 }
@@ -20,9 +20,9 @@ void CSPRsg::GetBytes(std::vector<byte> &Output)
 
 	try
 	{
-		if (!::CryptGenRandom(_hProvider, dwLength, ptr))
+		if (!::CryptGenRandom(m_hProvider, dwLength, ptr))
 		{
-			::CryptReleaseContext(_hProvider, 0);
+			::CryptReleaseContext(m_hProvider, 0);
 			throw;
 		}
 	}
@@ -95,7 +95,7 @@ int CSPRsg::Next()
 void CSPRsg::Reset()
 {
 #ifdef _WIN32
-	if (!::CryptAcquireContextW(&_hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
+	if (!::CryptAcquireContextW(&m_hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
 		throw CryptoRandomException("CSPRsg:Reset", "Call to CryptAcquireContextW failed; random provider is not available!");
 #endif
 }

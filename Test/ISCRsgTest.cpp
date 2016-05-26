@@ -29,10 +29,10 @@ namespace Test
 		CEX::Seed::ISCRsg* gen = new CEX::Seed::ISCRsg(seed);
 		gen->Reset();
 
-		for (unsigned int i = 0; i < _expected.size(); i++)
+		for (unsigned int i = 0; i < m_expected.size(); i++)
 		{
 			int x = gen->Next();
-			int e = (int)_expected[i];
+			int e = (int)m_expected[i];
 			if (x != e)
 			{
 				delete gen;
@@ -44,7 +44,7 @@ namespace Test
 
 	void ISCRsgTest::Initialize()
 	{
-		_expected =
+		m_expected =
 		{
 			0x7a68710f, 0x6554abda, 0x90c10757, 0x0b5e435f, 0xaf7d1fb8, 0x01913fd3, 0x6a158d10, 0xb8f6fd4a,
 			0xc2b9aa36, 0x96da2655, 0xfe1e42d5, 0x56e6cd21, 0xd5b2d750, 0x7229ea81, 0x5de87abb, 0xb6b9d766,
@@ -116,6 +116,6 @@ namespace Test
 
 	void ISCRsgTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

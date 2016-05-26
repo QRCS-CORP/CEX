@@ -161,6 +161,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -170,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Engine\AHX.h" />
     <ClInclude Include="..\..\Engine\ArrayUtils.h" />
     <ClInclude Include="..\..\Engine\AsymmetricEngines.h" />
     <ClInclude Include="..\..\Engine\BitConverter.h" />
@@ -188,6 +190,7 @@
     <ClInclude Include="..\..\Engine\CFB.h" />
     <ClInclude Include="..\..\Engine\ChaCha.h" />
     <ClInclude Include="..\..\Engine\Config.h" />
+    <ClInclude Include="..\..\Engine\Cpu.h" />
     <ClInclude Include="..\..\Engine\CryptoCipherModeException.h" />
     <ClInclude Include="..\..\Engine\CryptoDigestException.h" />
     <ClInclude Include="..\..\Engine\CryptoException.h" />
@@ -221,6 +224,7 @@
     <ClInclude Include="..\..\Engine\IDigest.h" />
     <ClInclude Include="..\..\Engine\IGenerator.h" />
     <ClInclude Include="..\..\Engine\IMac.h" />
+    <ClInclude Include="..\..\Engine\Int128.h" />
     <ClInclude Include="..\..\Engine\IntUtils.h" />
     <ClInclude Include="..\..\Engine\IPadding.h" />
     <ClInclude Include="..\..\Engine\IRandom.h" />
@@ -295,6 +299,7 @@
     <ClInclude Include="..\..\Engine\ZeroPad.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Engine\AHX.cpp" />
     <ClCompile Include="..\..\Engine\Blake256.cpp" />
     <ClCompile Include="..\..\Engine\Blake512.cpp" />
     <ClCompile Include="..\..\Engine\BlockCipherFromName.cpp" />

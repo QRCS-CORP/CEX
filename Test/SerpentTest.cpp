@@ -233,6 +233,6 @@ namespace Test
 
 	void SerpentTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

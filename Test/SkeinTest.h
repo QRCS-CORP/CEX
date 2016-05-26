@@ -18,13 +18,13 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All Skein tests have executed succesfully.";
 
-		std::vector<std::vector<byte>> _expected256;
-		std::vector<std::vector<byte>> _expected512;
-		std::vector<std::vector<byte>> _expected1024;
-		std::vector<std::vector<byte>> _message256;
-		std::vector<std::vector<byte>> _message512;
-		std::vector<std::vector<byte>> _message1024;
-		TestEventHandler _progressEvent;
+		std::vector<std::vector<byte>> m_expected256;
+		std::vector<std::vector<byte>> m_expected512;
+		std::vector<std::vector<byte>> m_expected1024;
+		std::vector<std::vector<byte>> m_message256;
+		std::vector<std::vector<byte>> m_message512;
+		std::vector<std::vector<byte>> m_message1024;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -35,7 +35,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Known answer tests for the 256, 512, and 1024 bit versions of Skein

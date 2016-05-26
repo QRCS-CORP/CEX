@@ -18,10 +18,10 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All SHA-2 tests have executed succesfully.";
 
-		std::vector<std::vector<byte>> _expected256;
-		std::vector<std::vector<byte>> _expected512;
-		std::vector<std::vector<byte>> _message;
-		TestEventHandler _progressEvent;
+		std::vector<std::vector<byte>> m_expected256;
+		std::vector<std::vector<byte>> m_expected512;
+		std::vector<std::vector<byte>> m_message;
+		TestEventHandler m_progressEvent;
 
     public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Known answer tests using the NIST SHA-2 KAT vectors

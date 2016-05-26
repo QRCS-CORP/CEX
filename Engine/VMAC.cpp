@@ -14,7 +14,7 @@ void VMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 void VMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!_isInitialized)
+	if (!m_isInitialized)
 		throw CryptoMacException("VMAC:ComputeMac", "The Mac is not initialized!");
 
 	if (Output.size() != MAC_SIZE)
@@ -26,22 +26,22 @@ void VMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void VMAC::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_blockSize = 0;
-		_isInitialized = false;
-		_G = 0;
-		_N = 0;
-		_S = 0;
-		_X1 = 0;
-		_X2 = 0;
-		_X3 = 0;
-		_X4 = 0;
-		CEX::Utility::IntUtils::ClearVector(_P);
-		CEX::Utility::IntUtils::ClearVector(_T);
-		CEX::Utility::IntUtils::ClearVector(_workingKey);
-		CEX::Utility::IntUtils::ClearVector(_workingIV);
-		_isDestroyed = true;
+		m_blockSize = 0;
+		m_isInitialized = false;
+		G = 0;
+		N = 0;
+		S = 0;
+		X1 = 0;
+		X2 = 0;
+		X3 = 0;
+		X4 = 0;
+		CEX::Utility::IntUtils::ClearVector(P);
+		CEX::Utility::IntUtils::ClearVector(T);
+		CEX::Utility::IntUtils::ClearVector(m_workingKey);
+		CEX::Utility::IntUtils::ClearVector(m_workingIV);
+		m_isDestroyed = true;
 	}
 }
 
@@ -56,21 +56,21 @@ size_t VMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 	// execute the post-processing phase
 	while (ctr != 25)
 	{
-		_S = _P[(_S + _P[_N & CTFF]) & CTFF];
-		_X4 = _P[(_X4 + _X3 + ctr) & CTFF];
-		_X3 = _P[(_X3 + _X2 + ctr) & CTFF];
-		_X2 = _P[(_X2 + _X1 + ctr) & CTFF];
-		_X1 = _P[(_X1 + _S + ctr) & CTFF];
-		_T[_G & CT1F] = (byte)(_T[_G & CT1F] ^ _X1);
-		_T[(_G + 1) & CT1F] = (byte)(_T[(_G + 1) & CT1F] ^ _X2);
-		_T[(_G + 2) & CT1F] = (byte)(_T[(_G + 2) & CT1F] ^ _X3);
-		_T[(_G + 3) & CT1F] = (byte)(_T[(_G + 3) & CT1F] ^ _X4);
-		_G = (byte)((_G + 4) & CT1F);
+		S = P[(S + P[N & CTFF]) & CTFF];
+		X4 = P[(X4 + X3 + ctr) & CTFF];
+		X3 = P[(X3 + X2 + ctr) & CTFF];
+		X2 = P[(X2 + X1 + ctr) & CTFF];
+		X1 = P[(X1 + S + ctr) & CTFF];
+		T[G & CT1F] = (byte)(T[G & CT1F] ^ X1);
+		T[(G + 1) & CT1F] = (byte)(T[(G + 1) & CT1F] ^ X2);
+		T[(G + 2) & CT1F] = (byte)(T[(G + 2) & CT1F] ^ X3);
+		T[(G + 3) & CT1F] = (byte)(T[(G + 3) & CT1F] ^ X4);
+		G = (byte)((G + 4) & CT1F);
 
-		ptmp = _P[_N & CTFF];
-		_P[_N & CTFF] = _P[_S & CTFF];
-		_P[_S & CTFF] = ptmp;
-		_N = (byte)((_N + 1) & CTFF);
+		ptmp = P[N & CTFF];
+		P[N & CTFF] = P[S & CTFF];
+		P[S & CTFF] = ptmp;
+		N = (byte)((N + 1) & CTFF);
 
 		++ctr;
 	}
@@ -79,10 +79,10 @@ size_t VMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 	ctr = 0;
 	while (ctr != 768)
 	{
-		_S = _P[(_S + _P[ctr & CTFF] + _T[ctr & CT1F]) & CTFF];
-		ptmp = _P[ctr & CTFF];
-		_P[ctr & CTFF] = _P[_S & CTFF];
-		_P[_S & CTFF] = ptmp;
+		S = P[(S + P[ctr & CTFF] + T[ctr & CT1F]) & CTFF];
+		ptmp = P[ctr & CTFF];
+		P[ctr & CTFF] = P[S & CTFF];
+		P[S & CTFF] = ptmp;
 
 		++ctr;
 	}
@@ -92,11 +92,11 @@ size_t VMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 	ctr = 0;
 	while (ctr != 20)
 	{
-		_S = _P[(_S + _P[ctr & CTFF]) & CTFF];
-		M[ctr] = _P[(_P[(_P[_S & CTFF]) & CTFF] + 1) & CTFF];
-		ptmp = _P[ctr & CTFF];
-		_P[ctr & CTFF] = _P[_S & CTFF];
-		_P[_S & CTFF] = ptmp;
+		S = P[(S + P[ctr & CTFF]) & CTFF];
+		M[ctr] = P[(P[(P[S & CTFF]) & CTFF] + 1) & CTFF];
+		ptmp = P[ctr & CTFF];
+		P[ctr & CTFF] = P[S & CTFF];
+		P[S & CTFF] = ptmp;
 
 		++ctr;
 	}
@@ -114,42 +114,42 @@ void VMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &
 	if (IV.size() < 1 || IV.size() > 768)
 		throw CryptoMacException("VMAC:Initialize", "VMAC requires 1 to 768 bytes of IV!");
 
-	_workingIV.resize(IV.size());
-	memcpy(&_workingIV[0], &IV[0], IV.size());
-	_workingKey.resize(MacKey.size());
-	memcpy(&_workingKey[0], &MacKey[0], MacKey.size());
+	m_workingIV.resize(IV.size());
+	memcpy(&m_workingIV[0], &IV[0], IV.size());
+	m_workingKey.resize(MacKey.size());
+	memcpy(&m_workingKey[0], &MacKey[0], MacKey.size());
 
 	Reset();
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void VMAC::Reset()
 {
-	_G = _N = _S = _X1 = _X2 = _X3 = _X4 = 0;
-	_T.clear();
-	_T.resize(32, (byte)0);
-	InitKey(_workingKey, _workingIV);
+	G = N = S = X1 = X2 = X3 = X4 = 0;
+	T.clear();
+	T.resize(32, (byte)0);
+	InitKey(m_workingKey, m_workingIV);
 }
 
 void VMAC::Update(byte Input)
 {
-	_S = _P[(_S + _P[_N & CTFF]) & CTFF];
-	byte btmp = (byte)(Input ^ _P[(_P[(_P[_S & CTFF]) & CTFF] + 1) & CTFF]);
+	S = P[(S + P[N & CTFF]) & CTFF];
+	byte btmp = (byte)(Input ^ P[(P[(P[S & CTFF]) & CTFF] + 1) & CTFF]);
 
-	_X4 = _P[(_X4 + _X3) & CTFF];
-	_X3 = _P[(_X3 + _X2) & CTFF];
-	_X2 = _P[(_X2 + _X1) & CTFF];
-	_X1 = _P[(_X1 + _S + btmp) & CTFF];
-	_T[_G & CT1F] = (byte)(_T[_G & CT1F] ^ _X1);
-	_T[(_G + 1) & CT1F] = (byte)(_T[(_G + 1) & CT1F] ^ _X2);
-	_T[(_G + 2) & CT1F] = (byte)(_T[(_G + 2) & CT1F] ^ _X3);
-	_T[(_G + 3) & CT1F] = (byte)(_T[(_G + 3) & CT1F] ^ _X4);
-	_G = (byte)((_G + 4) & CT1F);
+	X4 = P[(X4 + X3) & CTFF];
+	X3 = P[(X3 + X2) & CTFF];
+	X2 = P[(X2 + X1) & CTFF];
+	X1 = P[(X1 + S + btmp) & CTFF];
+	T[G & CT1F] = (byte)(T[G & CT1F] ^ X1);
+	T[(G + 1) & CT1F] = (byte)(T[(G + 1) & CT1F] ^ X2);
+	T[(G + 2) & CT1F] = (byte)(T[(G + 2) & CT1F] ^ X3);
+	T[(G + 3) & CT1F] = (byte)(T[(G + 3) & CT1F] ^ X4);
+	G = (byte)((G + 4) & CT1F);
 
-	btmp = _P[_N & CTFF];
-	_P[_N & CTFF] = _P[_S & CTFF];
-	_P[_S & CTFF] = btmp;
-	_N = (byte)((_N + 1) & CTFF);
+	btmp = P[N & CTFF];
+	P[N & CTFF] = P[S & CTFF];
+	P[S & CTFF] = btmp;
+	N = (byte)((N + 1) & CTFF);
 }
 
 void VMAC::InitKey(std::vector<byte> &Key, std::vector<byte> &Iv)
@@ -158,7 +158,7 @@ void VMAC::InitKey(std::vector<byte> &Key, std::vector<byte> &Iv)
 
 	while (ctr != 256)
 	{
-		_P[ctr] = (byte)ctr;
+		P[ctr] = (byte)ctr;
 		++ctr;
 	}
 
@@ -167,24 +167,24 @@ void VMAC::InitKey(std::vector<byte> &Key, std::vector<byte> &Iv)
 	ctr = 0;
 	while (ctr != 768)
 	{
-		_S = _P[(_S + _P[ctr & CTFF] + Key[ctr % Key.size()]) & CTFF];
-		btmp = _P[ctr & CTFF];
-		_P[ctr & CTFF] = _P[_S & CTFF];
-		_P[_S & CTFF] = btmp;
+		S = P[(S + P[ctr & CTFF] + Key[ctr % Key.size()]) & CTFF];
+		btmp = P[ctr & CTFF];
+		P[ctr & CTFF] = P[S & CTFF];
+		P[S & CTFF] = btmp;
 		++ctr;
 	}
 
 	ctr = 0;
 	while (ctr != 768)
 	{
-		_S = _P[(_S + _P[ctr & CTFF] + Iv[ctr % Iv.size()]) & CTFF];
-		btmp = _P[ctr & CTFF];
-		_P[ctr & CTFF] = _P[_S & CTFF];
-		_P[_S & CTFF] = btmp;
+		S = P[(S + P[ctr & CTFF] + Iv[ctr % Iv.size()]) & CTFF];
+		btmp = P[ctr & CTFF];
+		P[ctr & CTFF] = P[S & CTFF];
+		P[S & CTFF] = btmp;
 		++ctr;
 	}
 
-	_N = 0;
+	N = 0;
 }
 
 NAMESPACE_MACEND

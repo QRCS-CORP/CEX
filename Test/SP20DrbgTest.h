@@ -16,11 +16,11 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All SP20DRBG tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _iv;
-		std::vector<byte> _key;
-		std::vector<byte> _output128;
-		std::vector<byte> _output256;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_iv;
+		std::vector<byte> m_key;
+		std::vector<byte> m_output128;
+		std::vector<byte> m_output256;
 
 	public:		
 		/// <summary>
@@ -31,17 +31,17 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer SP20DRBG Drbg vectors for equality
 		/// </summary>
 		SP20DrbgTest()
 			:
-			_key(16, 0),
-			_iv(16, 0),
-			_output128(0),
-			_output256(0)
+			m_key(16, 0),
+			m_iv(16, 0),
+			m_output128(0),
+			m_output256(0)
 		{
 		}
 

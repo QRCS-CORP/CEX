@@ -17,11 +17,11 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All HKDF tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-        std::vector<std::vector<byte>> _ikm;
-        std::vector<std::vector<byte>> _info;
-        std::vector<std::vector<byte>> _output;
-        std::vector<std::vector<byte>> _salt;
+		TestEventHandler m_progressEvent;
+        std::vector<std::vector<byte>> m_ikm;
+        std::vector<std::vector<byte>> m_info;
+        std::vector<std::vector<byte>> m_output;
+        std::vector<std::vector<byte>> m_salt;
         
     public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer HKDF Drbg vectors for equality

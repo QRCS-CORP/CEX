@@ -72,12 +72,12 @@ class MacStream
 private:
 	static constexpr size_t BUFFER_SIZE = 64 * 1024;
 
-	size_t _blockSize;
-	bool _destroyEngine;
-	CEX::IO::IByteStream* _inStream;
-	bool _isDestroyed = false;
-	CEX::Mac::IMac* _macEngine;
-	size_t _progressInterval;
+	size_t m_blockSize;
+	bool m_destroyEngine;
+	CEX::IO::IByteStream* m_inStream;
+	bool m_isDestroyed = false;
+	CEX::Mac::IMac* m_macEngine;
+	size_t m_progressInterval;
 
 	MacStream() { }
 
@@ -98,18 +98,18 @@ public:
 	/// <exception cref="CryptoProcessingException">Thrown if an uninitialized Mac is used</exception>
 	explicit MacStream(CEX::Common::MacDescription &Description, CEX::Common::KeyParams &MacKey)
 		:
-		_blockSize(0),
-		_destroyEngine(false),
-		_inStream(0),
-		_isDestroyed(false),
-		_progressInterval(0)
+		m_blockSize(0),
+		m_destroyEngine(false),
+		m_inStream(0),
+		m_isDestroyed(false),
+		m_progressInterval(0)
 	{
 		CreateMac(Description);
-		if (_macEngine == 0)
+		if (m_macEngine == 0)
 			throw CEX::Exception::CryptoProcessingException("MacStream:CTor", "The Mac could not be created!");
 
-		_macEngine->Initialize(MacKey.Key(), MacKey.IV());
-		_blockSize = _macEngine->BlockSize();
+		m_macEngine->Initialize(MacKey.Key(), MacKey.IV());
+		m_blockSize = m_macEngine->BlockSize();
 	}
 
 	/// <summary>
@@ -121,12 +121,12 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
 	explicit MacStream(CEX::Mac::IMac* Mac)
 		:
-		_blockSize(Mac->BlockSize()),
-		_destroyEngine(false),
-		_inStream(0),
-		_isDestroyed(false),
-		_macEngine(Mac),
-		_progressInterval(0)
+		m_blockSize(Mac->BlockSize()),
+		m_destroyEngine(false),
+		m_inStream(0),
+		m_isDestroyed(false),
+		m_macEngine(Mac),
+		m_progressInterval(0)
 	{
 		if (Mac == 0)
 			throw CEX::Exception::CryptoProcessingException("MacStream:CTor", "The Mac can not be null!");

@@ -11,43 +11,43 @@ void CMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t L
 	if ((InOffset + Length) > Input.size())
 		throw CryptoMacException("CMAC:BlockUpdate", "The Input buffer is too short!");
 
-	if (_wrkOffset == _blockSize)
+	if (m_wrkOffset == m_blockSize)
 	{
-		_cipherMode->Transform(_wrkBuffer, 0, _msgCode, 0);
-		_wrkOffset = 0;
+		m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+		m_wrkOffset = 0;
 	}
 
-	size_t diff = _blockSize - _wrkOffset;
+	size_t diff = m_blockSize - m_wrkOffset;
 	if (Length > diff)
 	{
-		memcpy(&_wrkBuffer[_wrkOffset], &Input[InOffset], diff);
-		_cipherMode->Transform(_wrkBuffer, 0, _msgCode, 0);
-		_wrkOffset = 0;
+		memcpy(&m_wrkBuffer[m_wrkOffset], &Input[InOffset], diff);
+		m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+		m_wrkOffset = 0;
 		Length -= diff;
 		InOffset += diff;
 
-		while (Length > _blockSize)
+		while (Length > m_blockSize)
 		{
-			_cipherMode->Transform(Input, InOffset, _msgCode, 0);
-			Length -= _blockSize;
-			InOffset += _blockSize;
+			m_cipherMode->Transform(Input, InOffset, m_msgCode, 0);
+			Length -= m_blockSize;
+			InOffset += m_blockSize;
 		}
 	}
 
 	if (Length > 0)
 	{
-		memcpy(&_wrkBuffer[_wrkOffset], &Input[InOffset], Length);
-		_wrkOffset += Length;
+		memcpy(&m_wrkBuffer[m_wrkOffset], &Input[InOffset], Length);
+		m_wrkOffset += Length;
 	}
 }
 
 void CMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!_isInitialized)
+	if (!m_isInitialized)
 		throw CryptoMacException("CMAC:ComputeMac", "The Mac is not initialized!");
 
-	if (Output.size() != _macSize)
-		Output.resize(_macSize);
+	if (Output.size() != m_macSize)
+		Output.resize(m_macSize);
 
 	BlockUpdate(Input, 0, Input.size());
 	DoFinal(Output, 0);
@@ -55,41 +55,41 @@ void CMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CMAC::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_blockSize = 0;
-		_isInitialized = false;
-		CEX::Utility::IntUtils::ClearVector(_K1);
-		CEX::Utility::IntUtils::ClearVector(_K2);
-		CEX::Utility::IntUtils::ClearVector(_msgCode);
-		CEX::Utility::IntUtils::ClearVector(_wrkBuffer);
-		_macSize = 0;
-		_wrkOffset = 0;
-		_isDestroyed = true;
+		m_blockSize = 0;
+		m_isInitialized = false;
+		CEX::Utility::IntUtils::ClearVector(K1);
+		CEX::Utility::IntUtils::ClearVector(K2);
+		CEX::Utility::IntUtils::ClearVector(m_msgCode);
+		CEX::Utility::IntUtils::ClearVector(m_wrkBuffer);
+		m_macSize = 0;
+		m_wrkOffset = 0;
+		m_isDestroyed = true;
 	}
 }
 
 size_t CMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
-	if ((Output.size() - OutOffset) < _macSize)
+	if ((Output.size() - OutOffset) < m_macSize)
 		throw CryptoMacException("CMAC:DoFinal", "The Output buffer is too short!");
 
-	if (_wrkOffset != _blockSize)
+	if (m_wrkOffset != m_blockSize)
 	{
 		CEX::Cipher::Symmetric::Block::Padding::ISO7816 pad;
-		pad.AddPadding(_wrkBuffer, _wrkOffset);
-		CEX::Utility::IntUtils::XORBLK(_K2, 0, _wrkBuffer, 0, _macSize);
+		pad.AddPadding(m_wrkBuffer, m_wrkOffset);
+		CEX::Utility::IntUtils::XORBLK(K2, 0, m_wrkBuffer, 0, m_macSize);
 	}
 	else
 	{
-		CEX::Utility::IntUtils::XORBLK(_K1, 0, _wrkBuffer, 0, _macSize);
+		CEX::Utility::IntUtils::XORBLK(K1, 0, m_wrkBuffer, 0, m_macSize);
 	}
 
-	_cipherMode->Transform(_wrkBuffer, 0, _msgCode, 0);
-	memcpy(&Output[OutOffset], &_msgCode[0], _macSize);
+	m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+	memcpy(&Output[OutOffset], &m_msgCode[0], m_macSize);
 	Reset();
 
-	return _macSize;
+	return m_macSize;
 }
 
 void CMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
@@ -97,39 +97,39 @@ void CMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &
 	if (MacKey.size() == 0)
 		throw CryptoMacException("CMAC:Initialize", "Key can not be null!");
 
-	size_t ivSze = IV.size() > _blockSize ? _blockSize : IV.size();
-	std::vector<byte> vec(_blockSize);
+	size_t ivSze = IV.size() > m_blockSize ? m_blockSize : IV.size();
+	std::vector<byte> vec(m_blockSize);
 	if (ivSze != 0)
 		memcpy(&vec[0], &IV[0], ivSze);
 
-	_cipherKey.Key() = MacKey;
-	_cipherKey.IV() = IV;
-	_cipherMode->Initialize(true, _cipherKey);
-	std::vector<byte> lu(_blockSize);
-	std::vector<byte> tmpz(_blockSize, (byte)0);
-	_cipherMode->Transform(tmpz, 0, lu, 0);
-	_K1 = GenerateSubkey(lu);
-	_K2 = GenerateSubkey(_K1);
-	_cipherMode->Initialize(true, _cipherKey);
-	_isInitialized = true;
+	m_cipherKey.Key() = MacKey;
+	m_cipherKey.IV() = IV;
+	m_cipherMode->Initialize(true, m_cipherKey);
+	std::vector<byte> lu(m_blockSize);
+	std::vector<byte> tmpz(m_blockSize, (byte)0);
+	m_cipherMode->Transform(tmpz, 0, lu, 0);
+	K1 = GenerateSubkey(lu);
+	K2 = GenerateSubkey(K1);
+	m_cipherMode->Initialize(true, m_cipherKey);
+	m_isInitialized = true;
 }
 
 void CMAC::Reset()
 {
-	_cipherMode->Initialize(true, _cipherKey);
-	std::fill(_wrkBuffer.begin(), _wrkBuffer.end(), 0);
-	_wrkOffset = 0;
+	m_cipherMode->Initialize(true, m_cipherKey);
+	std::fill(m_wrkBuffer.begin(), m_wrkBuffer.end(), 0);
+	m_wrkOffset = 0;
 }
 
 void CMAC::Update(byte Input)
 {
-	if (_wrkOffset == _wrkBuffer.size())
+	if (m_wrkOffset == m_wrkBuffer.size())
 	{
-		_cipherMode->Transform(_wrkBuffer, 0, _msgCode, 0);
-		_wrkOffset = 0;
+		m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+		m_wrkOffset = 0;
 	}
 
-	_wrkBuffer[_wrkOffset++] = Input;
+	m_wrkBuffer[m_wrkOffset++] = Input;
 }
 
 std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
@@ -143,19 +143,19 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 	tmpk[Input.size() - 1] = (byte)(Input[Input.size() - 1] << 1);
 
 	if (fbit == 1)
-		tmpk[Input.size() - 1] ^= Input.size() == _blockSize ? CT87 : CT1B;
+		tmpk[Input.size() - 1] ^= Input.size() == m_blockSize ? CT87 : CT1B;
 
 	return tmpk;
 }
 
 void CMAC::CreateCipher(CEX::Enumeration::BlockCiphers EngineType)
 {
-	_cipherMode = new CEX::Cipher::Symmetric::Block::Mode::CBC(CEX::Helper::BlockCipherFromName::GetInstance(EngineType));
+	m_cipherMode = new CEX::Cipher::Symmetric::Block::Mode::CBC(CEX::Helper::BlockCipherFromName::GetInstance(EngineType));
 }
 
 void CMAC::LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher)
 {
-	_cipherMode = new CEX::Cipher::Symmetric::Block::Mode::CBC(Cipher);
+	m_cipherMode = new CEX::Cipher::Symmetric::Block::Mode::CBC(Cipher);
 }
 
 NAMESPACE_MACEND

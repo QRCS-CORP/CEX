@@ -6,20 +6,20 @@ NAMESPACE_GENERATOR
 
 void CTRDrbg::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_blockSize = 0;
-		_isEncryption = false;
-		_isInitialized = false;
-		_processorCount = 0;
-		_isParallel = false;
-		_keySize = 0;
-		_parallelBlockSize = 0;
+		m_blockSize = 0;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_processorCount = 0;
+		m_isParallel = false;
+		m_keySize = 0;
+		m_parallelBlockSize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_ctrVector);
-		CEX::Utility::IntUtils::ClearVector(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(m_ctrVector);
+		CEX::Utility::IntUtils::ClearVector(m_threadVectors);
 
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 
@@ -42,16 +42,16 @@ size_t CTRDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Siz
 
 void CTRDrbg::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Ikm.size() != _keySize + _blockSize)
+	if (Ikm.size() != m_keySize + m_blockSize)
 		throw CryptoGeneratorException("CTRDrbg:Initialize", "Salt size is too small; must be key size plus the blocksize!");
 
-	memcpy(&_ctrVector[0], &Ikm[0], _blockSize);
-	size_t keyLen = Ikm.size() - _blockSize;
+	memcpy(&m_ctrVector[0], &Ikm[0], m_blockSize);
+	size_t keyLen = Ikm.size() - m_blockSize;
 	std::vector<byte> key(keyLen);
-	memcpy(&key[0], &Ikm[_blockSize], keyLen);
+	memcpy(&key[0], &Ikm[m_blockSize], keyLen);
 
-	_blockCipher->Initialize(true, CEX::Common::KeyParams(key));
-	_isInitialized = true;
+	m_blockCipher->Initialize(true, CEX::Common::KeyParams(key));
+	m_isInitialized = true;
 }
 
 void CTRDrbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
@@ -83,31 +83,31 @@ void CTRDrbg::Update(const std::vector<byte> &Salt)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("CTRDrbg:Update", "Salt is too small!");
 
-	if (Salt.size() >= _keySize)
+	if (Salt.size() >= m_keySize)
 		Initialize(Salt);
-	else if (Salt.size() >= _blockSize)
-		memcpy(&_ctrVector[0], &Salt[0], _ctrVector.size());
+	else if (Salt.size() >= m_blockSize)
+		memcpy(&m_ctrVector[0], &Salt[0], m_ctrVector.size());
 }
 
 // *** Protected *** //
 
 void CTRDrbg::Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
-	size_t aln = Length - (Length % _blockSize);
+	size_t aln = Length - (Length % m_blockSize);
 	size_t ctr = 0;
 
 	while (ctr != aln)
 	{
-		_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + ctr);
+		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + ctr);
 		Increment(Counter);
-		ctr += _blockSize;
+		ctr += m_blockSize;
 	}
 
 	if (ctr != Length)
 	{
-		std::vector<byte> outputBlock(_blockSize, 0);
-		_blockCipher->EncryptBlock(Counter, outputBlock);
-		size_t fnlSize = Length % _blockSize;
+		std::vector<byte> outputBlock(m_blockSize, 0);
+		m_blockCipher->EncryptBlock(Counter, outputBlock);
+		size_t fnlSize = Length % m_blockSize;
 		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
 	}
@@ -144,11 +144,11 @@ void CTRDrbg::Increase(const std::vector<byte> &Counter, const size_t Size, std:
 
 bool CTRDrbg::IsValidKeySize(const size_t KeySize)
 {
-	for (size_t i = 0; i < _blockCipher->LegalKeySizes().size(); ++i)
+	for (size_t i = 0; i < m_blockCipher->LegalKeySizes().size(); ++i)
 	{
-		if (KeySize == _blockCipher->LegalKeySizes()[i])
+		if (KeySize == m_blockCipher->LegalKeySizes()[i])
 			break;
-		if (i == _blockCipher->LegalKeySizes().size() - 1)
+		if (i == m_blockCipher->LegalKeySizes().size() - 1)
 			return false;
 	}
 	return true;
@@ -156,37 +156,37 @@ bool CTRDrbg::IsValidKeySize(const size_t KeySize)
 
 void CTRDrbg::SetScope()
 {
-	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 
-	if (_processorCount % 2 != 0)
-		_processorCount--;
-	if (_processorCount > 1)
-		_isParallel = true;
+	if (m_processorCount % 2 != 0)
+		m_processorCount--;
+	if (m_processorCount > 1)
+		m_isParallel = true;
 }
 
 void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 {
 	size_t outSize = Output.size() - OutOffset;
 
-	if (!_isParallel || outSize < _parallelBlockSize)
+	if (!m_isParallel || outSize < m_parallelBlockSize)
 	{
 		// generate random
-		Generate(outSize, _ctrVector, Output, OutOffset);
+		Generate(outSize, m_ctrVector, Output, OutOffset);
 	}
 	else
 	{
 		// parallel CTR processing //
-		size_t cnkSize = (outSize / _blockSize / _processorCount) * _blockSize;
-		size_t rndSize = cnkSize * _processorCount;
-		size_t subSize = (cnkSize / _blockSize);
+		size_t cnkSize = (outSize / m_blockSize / m_processorCount) * m_blockSize;
+		size_t rndSize = cnkSize * m_processorCount;
+		size_t subSize = (cnkSize / m_blockSize);
 		// create jagged array of 'sub counters'
-		_threadVectors.resize(_processorCount);
+		m_threadVectors.resize(m_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
 		{
-			std::vector<byte> &iv = _threadVectors[i];
+			std::vector<byte> &iv = m_threadVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(_ctrVector, subSize * i, iv);
+			this->Increase(m_ctrVector, subSize * i, iv);
 			// create random at offset position
 			this->Generate(cnkSize, iv, Output, OutOffset + (i * cnkSize));
 		});
@@ -195,11 +195,11 @@ void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 		if (rndSize < outSize)
 		{
 			size_t fnlSize = outSize % rndSize;
-			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, OutOffset + rndSize);
+			Generate(fnlSize, m_threadVectors[m_processorCount - 1], Output, OutOffset + rndSize);
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size());
+		memcpy(&m_ctrVector[0], &m_threadVectors[m_processorCount - 1][0], m_ctrVector.size());
 	}
 }
 

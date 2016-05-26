@@ -6,44 +6,44 @@ NAMESPACE_MODE
 
 void CFB::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isDestroyed = true;
-		_blockSize = 0;
-		_isEncryption = false;
-		_isInitialized = false;
-		_processorCount = 0;
-		_isParallel = false;
-		_parallelBlockSize = 0;
+		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_processorCount = 0;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_cfbIv);
-		CEX::Utility::IntUtils::ClearVector(_cfbBuffer);
-		CEX::Utility::IntUtils::ClearArray(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(m_cfbIv);
+		CEX::Utility::IntUtils::ClearVector(m_cfbBuffer);
+		CEX::Utility::IntUtils::ClearArray(m_threadVectors);
 	}
 }
 
 void CFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	std::vector<byte> iv = KeyParam.IV();
-	size_t diff = _cfbIv.size() - iv.size();
+	size_t diff = m_cfbIv.size() - iv.size();
 
-	memcpy(&_cfbIv[diff], &iv[0], iv.size());
-	memset(&_cfbIv[0], 0, diff);
+	memcpy(&m_cfbIv[diff], &iv[0], iv.size());
+	memset(&m_cfbIv[0], 0, diff);
 
-	_blockCipher->Initialize(true, KeyParam);
-	_isEncryption = Encryption;
-	_isInitialized = true;
+	m_blockCipher->Initialize(true, KeyParam);
+	m_isEncryption = Encryption;
+	m_isInitialized = true;
 }
 
 void CFB::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (_isEncryption)
+	if (m_isEncryption)
 	{
 		EncryptBlock(Input, Output);
 	}
 	else
 	{
-		if (_isParallel)
+		if (m_isParallel)
 			ParallelDecrypt(Input, Output);
 		else
 			DecryptBlock(Input, Output);
@@ -52,13 +52,13 @@ void CFB::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (_isEncryption)
+	if (m_isEncryption)
 	{
 		EncryptBlock(Input, InOffset, Output, OutOffset);
 	}
 	else
 	{
-		if (_isParallel)
+		if (m_isParallel)
 			ParallelDecrypt(Input, InOffset, Output, OutOffset);
 		else
 			DecryptBlock(Input, InOffset, Output, OutOffset);
@@ -67,143 +67,143 @@ void CFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void CFB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	_blockCipher->Transform(_cfbIv, 0, Output, 0);
+	m_blockCipher->Transform(m_cfbIv, 0, Output, 0);
 
 	// change over the input block
-	if (_cfbIv.size() - _blockSize > 0)
-		memcpy(&_cfbIv[0], &_cfbIv[_blockSize], _cfbIv.size() - _blockSize);
+	if (m_cfbIv.size() - m_blockSize > 0)
+		memcpy(&m_cfbIv[0], &m_cfbIv[m_blockSize], m_cfbIv.size() - m_blockSize);
 
-	memcpy(&_cfbIv[_cfbIv.size() - _blockSize], &Input[0], _blockSize);
+	memcpy(&m_cfbIv[m_cfbIv.size() - m_blockSize], &Input[0], m_blockSize);
 
 	// XOR the IV with the ciphertext producing the plaintext
-	for (size_t i = 0; i < _blockSize; i++)
+	for (size_t i = 0; i < m_blockSize; i++)
 		Output[i] ^= Input[i];
 }
 
 void CFB::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	_blockCipher->Transform(_cfbIv, 0, Output, OutOffset);
+	m_blockCipher->Transform(m_cfbIv, 0, Output, OutOffset);
 
 	// change over the input block
-	if (_cfbIv.size() - _blockSize > 0)
-		memcpy(&_cfbIv[0], &_cfbIv[_blockSize], _cfbIv.size() - _blockSize);
+	if (m_cfbIv.size() - m_blockSize > 0)
+		memcpy(&m_cfbIv[0], &m_cfbIv[m_blockSize], m_cfbIv.size() - m_blockSize);
 
-	memcpy(&_cfbIv[_cfbIv.size() - _blockSize], &Input[InOffset], _blockSize);
+	memcpy(&m_cfbIv[m_cfbIv.size() - m_blockSize], &Input[InOffset], m_blockSize);
 
 	// XOR the IV with the ciphertext producing the plaintext
-	for (size_t i = 0; i < _blockSize; i++)
+	for (size_t i = 0; i < m_blockSize; i++)
 		Output[OutOffset + i] ^= Input[InOffset + i];
 }
 
 void CFB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	_blockCipher->Transform(_cfbIv, 0, Output, 0);
+	m_blockCipher->Transform(m_cfbIv, 0, Output, 0);
 
 	// XOR the IV with the plaintext producing the ciphertext
-	for (size_t i = 0; i < _blockSize; i++)
+	for (size_t i = 0; i < m_blockSize; i++)
 		Output[i] ^= Input[i];
 
 	// change over the input block
-	if (_cfbIv.size() - _blockSize > 0)
-		memcpy(&_cfbIv[0], &_cfbIv[_blockSize], _cfbIv.size() - _blockSize);
+	if (m_cfbIv.size() - m_blockSize > 0)
+		memcpy(&m_cfbIv[0], &m_cfbIv[m_blockSize], m_cfbIv.size() - m_blockSize);
 
-	memcpy(&_cfbIv[_cfbIv.size() - _blockSize], &Output[0], _blockSize);
+	memcpy(&m_cfbIv[m_cfbIv.size() - m_blockSize], &Output[0], m_blockSize);
 }
 
 void CFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	_blockCipher->Transform(_cfbIv, 0, Output, OutOffset);
+	m_blockCipher->Transform(m_cfbIv, 0, Output, OutOffset);
 
 	// XOR the IV with the plaintext producing the ciphertext
-	for (size_t i = 0; i < _blockSize; i++)
+	for (size_t i = 0; i < m_blockSize; i++)
 		Output[OutOffset + i] ^= Input[InOffset + i];
 
 	// change over the input block.
-	if (_cfbIv.size() - _blockSize > 0)
-		memcpy(&_cfbIv[0], &_cfbIv[_blockSize], _cfbIv.size() - _blockSize);
+	if (m_cfbIv.size() - m_blockSize > 0)
+		memcpy(&m_cfbIv[0], &m_cfbIv[m_blockSize], m_cfbIv.size() - m_blockSize);
 
-	memcpy(&_cfbIv[_cfbIv.size() - _blockSize], &Output[OutOffset], _blockSize);
+	memcpy(&m_cfbIv[m_cfbIv.size() - m_blockSize], &Output[OutOffset], m_blockSize);
 }
 
 void CFB::ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (Output.size() < _parallelBlockSize)
+	if (Output.size() < m_parallelBlockSize)
 	{
-		size_t blocks = Output.size() / _blockSize;
+		size_t blocks = Output.size() / m_blockSize;
 
 		// output is input xor with random
 		for (size_t i = 0; i < blocks; i++)
-			DecryptBlock(Input, i * _blockSize, Output, i * _blockSize);
+			DecryptBlock(Input, i * m_blockSize, Output, i * m_blockSize);
 	}
 	else
 	{
 		// parallel CFB decryption
-		size_t cnkSize = _parallelBlockSize / _processorCount;
-		const size_t blkSize = _blockSize;
+		size_t cnkSize = m_parallelBlockSize / m_processorCount;
+		const size_t blkSize = m_blockSize;
 		size_t blkCount = (cnkSize / blkSize);
 
-		_threadVectors.resize(_processorCount);
+		m_threadVectors.resize(m_processorCount);
 
-		for (size_t i = 0; i < _processorCount; i++)
+		for (size_t i = 0; i < m_processorCount; i++)
 		{
-			_threadVectors[i].resize(blkSize, 0);
+			m_threadVectors[i].resize(blkSize, 0);
 
 			// get the first iv
 			if (i != 0)
-				memcpy(&_threadVectors[i][0], &Input[(i * cnkSize) - blkSize], blkSize);
+				memcpy(&m_threadVectors[i][0], &Input[(i * cnkSize) - blkSize], blkSize);
 			else
-				memcpy(&_threadVectors[i][0], &_cfbIv[0], blkSize);
+				memcpy(&m_threadVectors[i][0], &m_cfbIv[0], blkSize);
 		}
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](size_t i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](size_t i)
 		{
-			std::vector<byte> &thdVec = _threadVectors[i];
+			std::vector<byte> &thdVec = m_threadVectors[i];
 			this->ProcessDecrypt(Input, i * cnkSize, Output, i * cnkSize, thdVec, blkCount);
 		});
 
 		// copy the last vector to class variable
-		memcpy(&_cfbIv[0], &_threadVectors[_processorCount - 1][0], _cfbIv.size());
+		memcpy(&m_cfbIv[0], &m_threadVectors[m_processorCount - 1][0], m_cfbIv.size());
 	}
 }
 
 void CFB::ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if ((Output.size() - OutOffset) < _parallelBlockSize)
+	if ((Output.size() - OutOffset) < m_parallelBlockSize)
 	{
-		size_t blocks = (Output.size() - OutOffset) / _blockSize;
+		size_t blocks = (Output.size() - OutOffset) / m_blockSize;
 
 		// output is input xor with random
 		for (size_t i = 0; i < blocks; i++)
-			DecryptBlock(Input, (i * _blockSize) + InOffset, Output, (i * _blockSize) + OutOffset);
+			DecryptBlock(Input, (i * m_blockSize) + InOffset, Output, (i * m_blockSize) + OutOffset);
 	}
 	else
 	{
 		// parallel CFB decryption //
-		size_t cnkSize = _parallelBlockSize / _processorCount;
-		const size_t blkSize = _blockSize;
+		size_t cnkSize = m_parallelBlockSize / m_processorCount;
+		const size_t blkSize = m_blockSize;
 		size_t blkCount = (cnkSize / blkSize);
 
-		_threadVectors.resize(_processorCount);
+		m_threadVectors.resize(m_processorCount);
 
-		for (size_t i = 0; i < _processorCount; i++)
+		for (size_t i = 0; i < m_processorCount; i++)
 		{
-			_threadVectors[i].resize(blkSize, 0);
+			m_threadVectors[i].resize(blkSize, 0);
 
 			// get the first iv 
 			if (i != 0)
-				memcpy(&_threadVectors[i][0], &Input[(InOffset + (i * cnkSize) - blkSize)], blkSize);
+				memcpy(&m_threadVectors[i][0], &Input[(InOffset + (i * cnkSize) - blkSize)], blkSize);
 			else
-				memcpy(&_threadVectors[i][0], &_cfbIv[0], blkSize);
+				memcpy(&m_threadVectors[i][0], &m_cfbIv[0], blkSize);
 		}
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](size_t i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](size_t i)
 		{
-			std::vector<byte> &thdVec = _threadVectors[i];
+			std::vector<byte> &thdVec = m_threadVectors[i];
 			this->ProcessDecrypt(Input, InOffset + i * cnkSize, Output, OutOffset + i * cnkSize, thdVec, blkCount);
 		});
 
 		// copy the last vector to class variable 
-		memcpy(&_cfbIv[0], &_threadVectors[_processorCount - 1][0], _cfbIv.size());
+		memcpy(&m_cfbIv[0], &m_threadVectors[m_processorCount - 1][0], m_cfbIv.size());
 	}
 }
 
@@ -211,16 +211,16 @@ void CFB::ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::v
 {
 	for (size_t i = 0; i < BlockCount; i++)
 	{ 
-		_blockCipher->Transform(Iv, 0, Output, OutOffset);
+		m_blockCipher->Transform(Iv, 0, Output, OutOffset);
 
 		// change over the input block
-		if (Iv.size() - _blockSize > 0)
-			memcpy(&Iv[0], &Iv[_blockSize], Iv.size() - _blockSize);
+		if (Iv.size() - m_blockSize > 0)
+			memcpy(&Iv[0], &Iv[m_blockSize], Iv.size() - m_blockSize);
 
-		memcpy(&Iv[Iv.size() - _blockSize], &Input[InOffset], _blockSize);
+		memcpy(&Iv[Iv.size() - m_blockSize], &Input[InOffset], m_blockSize);
 
 		// XOR the IV with the ciphertext producing the plaintext
-		for (size_t i = 0; i < _blockSize; i++)
+		for (size_t i = 0; i < m_blockSize; i++)
 			Output[OutOffset + i] ^= Input[InOffset + i];
 
 		InOffset += Iv.size();
@@ -230,14 +230,14 @@ void CFB::ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::v
 
 void CFB::SetScope()
 {
-	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
-	if (_processorCount % 2 != 0)
-		_processorCount--;
-	if (_processorCount > 1)
-		_isParallel = true;
+	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	if (m_processorCount % 2 != 0)
+		m_processorCount--;
+	if (m_processorCount > 1)
+		m_isParallel = true;
 
 	// calc default parallel block size as n * 64kb
-	_parallelBlockSize = _processorCount * PARALLEL_DEFBLOCK;
+	m_parallelBlockSize = m_processorCount * PARALLEL_DEFBLOCK;
 }
 
 NAMESPACE_MODEEND

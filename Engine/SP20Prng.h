@@ -64,16 +64,16 @@ class SP20Prng : public IRandom
 private:
 	static constexpr size_t BUFFER_SIZE = 4096;
 
-	size_t _bufferIndex;
-	size_t _bufferSize = 0;
-	std::vector<byte>  _byteBuffer;
-	size_t _dfnRounds;
-	size_t _keySize = 0;
-	bool _isDestroyed;
-	CEX::Generator::SP20Drbg* _rngGenerator;
-	CEX::Seed::ISeed* _seedGenerator;
-	CEX::Enumeration::SeedGenerators _seedType;
-	std::vector<byte>  _stateSeed;
+	size_t m_bufferIndex;
+	size_t m_bufferSize = 0;
+	std::vector<byte>  m_byteBuffer;
+	size_t m_dfnRounds;
+	size_t m_keySize = 0;
+	bool m_isDestroyed;
+	CEX::Generator::SP20Drbg* m_rngGenerator;
+	CEX::Seed::ISeed* m_seedGenerator;
+	CEX::Enumeration::SeedGenerators m_seedType;
+	std::vector<byte>  m_stateSeed;
 
 public:
 
@@ -103,13 +103,13 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range (rounds 10-30, min. buffer 64 bytes)</exception>
 	SP20Prng(CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 40, size_t Rounds = 20)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_dfnRounds(Rounds),
-		_keySize(KeySize),
-		_isDestroyed(false),
-		_seedType(SeedEngine)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_dfnRounds(Rounds),
+		m_keySize(KeySize),
+		m_isDestroyed(false),
+		m_seedType(SeedEngine)
 	{
 		if (BufferSize < 64)
 			throw CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!");
@@ -132,12 +132,12 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range</exception>
 	SP20Prng(std::vector<byte> Seed, size_t BufferSize = BUFFER_SIZE, size_t Rounds = 20)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_dfnRounds(Rounds),
-		_keySize(Seed.size()),
-		_isDestroyed(false)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_dfnRounds(Rounds),
+		m_keySize(Seed.size()),
+		m_isDestroyed(false)
 	{
 		if (BufferSize < 64)
 			throw CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!");

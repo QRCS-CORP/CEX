@@ -16,10 +16,10 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All CTRDRBG tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _iv;
-		std::vector<byte> _key;
-		std::vector<byte> _output;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_iv;
+		std::vector<byte> m_key;
+		std::vector<byte> m_output;
 
 	public:
 		/// <summary>
@@ -30,15 +30,15 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
 		/// </summary>
 		CTRDrbgTest()
 			:
-			_iv(16, 0),
-			_key(16, 0)
+			m_iv(16, 0),
+			m_key(16, 0)
 		{
 		}
 

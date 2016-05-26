@@ -11,14 +11,14 @@ namespace Test
 			Initialize();
 
 			// test vectors with 8/12/20 rounds and 128/256 keys
-			CompareVector(20, _key[0], _iv[0], _plainText, _cipherText[0]);
-			CompareVector(20, _key[1], _iv[0], _plainText, _cipherText[1]);
+			CompareVector(20, m_key[0], m_iv[0], m_plainText, m_cipherText[0]);
+			CompareVector(20, m_key[1], m_iv[0], m_plainText, m_cipherText[1]);
 			OnProgress("ChaChaTest: Passed 20 round vector tests..");
-			CompareVector(12, _key[0], _iv[0], _plainText, _cipherText[2]);
-			CompareVector(8, _key[0], _iv[0], _plainText, _cipherText[3]);
+			CompareVector(12, m_key[0], m_iv[0], m_plainText, m_cipherText[2]);
+			CompareVector(8, m_key[0], m_iv[0], m_plainText, m_cipherText[3]);
 			OnProgress("ChaChaTest: Passed 8 and 12 round vector tests..");
-			CompareVector(20, _key[2], _iv[1], _plainText, _cipherText[4]);
-			CompareVector(20, _key[3], _iv[2], _plainText, _cipherText[5]);
+			CompareVector(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
+			CompareVector(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
 			OnProgress("ChaChaTest: Passed 256 bit key vector tests..");
 			CompareParallel();
 			OnProgress("ChaChaTest: Passed parallel/linear equality tests..");
@@ -42,10 +42,10 @@ namespace Test
 		rng.GetBytes(key);
 		std::vector<byte> iv(8);
 		rng.GetBytes(iv);
-		std::vector<byte> data(2048);
+		std::vector<byte> data(10240);
 		rng.GetBytes(data);
-		std::vector<byte> enc(2048, 0);
-		std::vector<byte> dec(2048, 0);
+		std::vector<byte> enc(10240, 0);
+		std::vector<byte> dec(10240, 0);
 		CEX::Common::KeyParams k(key, iv);
 		CEX::Cipher::Symmetric::Stream::ChaCha cipher(20);
 
@@ -56,7 +56,7 @@ namespace Test
 		// decrypt parallel
 		cipher.Initialize(k);
 		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = 2048;
+		cipher.ParallelBlockSize() = cipher.ParallelMinimumSize();
 		cipher.Transform(enc, dec);
 
 		if (data != dec)
@@ -84,7 +84,7 @@ namespace Test
 
 	void ChaChaTest::Initialize()
 	{
-		HexConverter::Decode("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", _plainText);
+		HexConverter::Decode("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", m_plainText);
 
 		const char* keyEncoded[4] =
 		{
@@ -93,7 +93,7 @@ namespace Test
 			("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D"),
 			("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12")
 		};
-		HexConverter::Decode(keyEncoded, 4, _key);
+		HexConverter::Decode(keyEncoded, 4, m_key);
 
 		const char* ivEncoded[3] =
 		{
@@ -101,7 +101,7 @@ namespace Test
 			("0D74DB42A91077DE"),
 			("167DE44BB21980E7")
 		};
-		HexConverter::Decode(ivEncoded, 3, _iv);
+		HexConverter::Decode(ivEncoded, 3, m_iv);
 
 		const char* cipherTextEncoded[6] =
 		{
@@ -112,11 +112,11 @@ namespace Test
 			("57459975BC46799394788DE80B928387862985A269B9E8E77801DE9D874B3F51AC4610B9F9BEE8CF8CACD8B5AD0BF17D3DDF23FD7424887EB3F81405BD498CC3"), //20r-256k
 			("92A2508E2C4084567195F2A1005E552B4874EC0504A9CD5E4DAF739AB553D2E783D79C5BA11E0653BEBB5C116651302E8D381CB728CA627B0B246E83942A2B99")  //20r-256k
 		};
-		HexConverter::Decode(cipherTextEncoded, 6, _cipherText);
+		HexConverter::Decode(cipherTextEncoded, 6, m_cipherText);
 	}
 
 	void ChaChaTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

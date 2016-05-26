@@ -11,20 +11,20 @@ NAMESPACE_IO
 class StreamWriter
 {
 private:
-	size_t _streamPosition;
-	std::vector<byte> _streamData;
+	size_t m_streamPosition;
+	std::vector<byte> m_streamData;
 
 public:
 
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const size_t Length() const { return _streamData.size(); }
+	const size_t Length() const { return m_streamData.size(); }
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const size_t Position() const { return _streamPosition; }
+	const size_t Position() const { return m_streamPosition; }
 
 	/// <summary>
 	/// Initialize this class
@@ -33,8 +33,8 @@ public:
 	/// <param name="Length">The length of the underlying stream</param>
 	explicit StreamWriter(size_t Length)
 		:
-		_streamData(Length),
-		_streamPosition(0)
+		m_streamData(Length),
+		m_streamPosition(0)
 	{
 	}
 
@@ -45,8 +45,8 @@ public:
 	/// <param name="DataArray">The byte array to write data to</param>
 	explicit StreamWriter(std::vector<byte> &DataArray)
 		:
-		_streamData(DataArray),
-		_streamPosition(0)
+		m_streamData(DataArray),
+		m_streamPosition(0)
 	{
 	}
 
@@ -57,8 +57,8 @@ public:
 	/// <param name="DataStream">The MemoryStream to write data to</param>
 	explicit StreamWriter(MemoryStream &DataStream)
 		:
-		_streamData(DataStream.ToArray()),
-		_streamPosition(0)
+		m_streamData(DataStream.ToArray()),
+		m_streamPosition(0)
 	{
 	}
 
@@ -146,11 +146,11 @@ public:
 	void Write(std::vector<T> &Value)
 	{
 		size_t sze = sizeof(T) * Value.size();
-		if (_streamPosition + sze > _streamData.size())
-			_streamData.resize(_streamPosition + sze);
+		if (m_streamPosition + sze > m_streamData.size())
+			m_streamData.resize(m_streamPosition + sze);
 
-		memcpy(&_streamData[_streamPosition], &Value[0], sze);
-		_streamPosition += sze;
+		memcpy(&m_streamData[m_streamPosition], &Value[0], sze);
+		m_streamPosition += sze;
 	}
 };
 

@@ -28,7 +28,7 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(i, 32), key);
 
 				// vector comparison
-				CompareVector(key, _plainText, cip);
+				CompareVector(key, m_plainText, cip);
 			}
 			OnProgress("TwofishTest: Passed Twofish 128 bit key vector tests..");
 
@@ -42,7 +42,7 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(j, 48), key);
 
 				// vector comparison
-				CompareVector(key, _plainText, cip);
+				CompareVector(key, m_plainText, cip);
 			}
 			OnProgress("TwofishTest: Passed Twofish 192 bit key vector tests..");
 
@@ -56,7 +56,7 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(j, 64), key);
 
 				// vector comparison
-				CompareVector(key, _plainText, cip);
+				CompareVector(key, m_plainText, cip);
 			}
 			OnProgress("TwofishTest: Passed Twofish 256 bit key vector tests..");
 
@@ -67,38 +67,38 @@ namespace Test
 
 			HexConverter::Decode("282BE7E4FA1FBDC29661286F1F310B7E", output);
 			// 128 key
-			CompareMonteCarlo(key, _plainText, output);
+			CompareMonteCarlo(key, m_plainText, output);
 			OnProgress("TwofishTest: Passed 10,000 round 128 bit key Monte Carlo encryption test..");
 
 			// 192 key
 			key.resize(24, 0);
 			HexConverter::Decode("9AB71D7F280FF79F0D135BBD5FAB7E37", output);
-			CompareMonteCarlo(key, _plainText, output);
+			CompareMonteCarlo(key, m_plainText, output);
 			OnProgress("TwofishTest: Passed 10,000 round 192 bit key Monte Carlo encryption test..");
 
 			// 256 key
 			key.resize(32, 0);
 			HexConverter::Decode("04F2F36CA927AE506931DE8F78B2513C", output);
-			CompareMonteCarlo(key, _plainText, output);
+			CompareMonteCarlo(key, m_plainText, output);
 			OnProgress("TwofishTest: Passed 10,000 round 256 bit key Monte Carlo encryption test..");
 
 			// decrypt 10,000 rounds
 			key.resize(16, 0);
 			HexConverter::Decode("21D3F7F6724513946B72CFAE47DA2EED", output);
 			// 128 key
-			CompareMonteCarlo(key, _plainText, output, false);
+			CompareMonteCarlo(key, m_plainText, output, false);
 			OnProgress("TwofishTest: Passed 10,000 round 128 bit key Monte Carlo decryption test..");
 
 			// 192 key
 			key.resize(24, 0);
 			HexConverter::Decode("B4582FA55072FCFEF538F39072F234A9", output);
-			CompareMonteCarlo(key, _plainText, output, false);
+			CompareMonteCarlo(key, m_plainText, output, false);
 			OnProgress("TwofishTest: Passed 10,000 round 192 bit key Monte Carlo decryption test..");
 
 			// 256 key
 			key.resize(32, 0);
 			HexConverter::Decode("BC7D078C4872063869DEAB891FB42761", output);
-			CompareMonteCarlo(key, _plainText, output, false);
+			CompareMonteCarlo(key, m_plainText, output, false);
 			OnProgress("TwofishTest: Passed 10,000 round 256 bit key Monte Carlo decryption test..");
 
 			return SUCCESS;
@@ -150,11 +150,11 @@ namespace Test
 
 	void TwofishTest::Initialize()
 	{
-		HexConverter::Decode("00000000000000000000000000000000", _plainText);
+		HexConverter::Decode("00000000000000000000000000000000", m_plainText);
 	}
 
 	void TwofishTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

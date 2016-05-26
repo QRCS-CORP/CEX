@@ -1,4 +1,7 @@
 #include "IntUtils.h"
+#if defined(INTEL_INTRINSICS)
+	#include <emmintrin.h>
+#endif
 
 NAMESPACE_UTILITY
 
@@ -148,6 +151,12 @@ void IntUtils::XOR128(const byte* &Input, byte* &Output)
 	Output[15] ^= Input[15];
 }
 
+#if defined(INTEL_INTRINSICS)
+void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
+}
+#elif
 void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	Output[OutOffset] ^= Input[InOffset];
@@ -167,6 +176,7 @@ void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vect
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 }
+#endif
 
 void IntUtils::XOR256(const byte* &Input, byte* &Output)
 {
@@ -283,12 +293,12 @@ void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std
 
 	do
 	{
-		const byte* x1;
+		/*const byte* x1;
 		byte* x2;
 		x1 = (byte*)&Input[InOffset + ctr];
 		x2 = (byte*)&Output[OutOffset + ctr];
-		XOR128(x1, x2);
-		//XOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
+		XOR128(x1, x2);*/
+		XOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
 		ctr += BLOCK;
 
 	} while (ctr != Size);

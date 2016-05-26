@@ -65,12 +65,12 @@ class DigestStream
 private:
 	static constexpr size_t BUFFER_SIZE = 64 * 1024;
 
-	size_t _blockSize;
-	CEX::Digest::IDigest* _digestEngine;
-	bool _destroyEngine;
-	CEX::IO::IByteStream* _inStream;
-	bool _isDestroyed = false;
-	size_t _progressInterval;
+	size_t m_blockSize;
+	CEX::Digest::IDigest* m_digestEngine;
+	bool m_destroyEngine;
+	CEX::IO::IByteStream* m_inStream;
+	bool m_isDestroyed = false;
+	size_t m_progressInterval;
 
 	DigestStream() { }
 
@@ -91,12 +91,12 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
 	explicit DigestStream(CEX::Digest::IDigest* Digest)
 		:
-		_blockSize(Digest->BlockSize()),
-		_destroyEngine(false),
-		_digestEngine(Digest),
-		_inStream(0),
-		_isDestroyed(false),
-		_progressInterval(0)
+		m_blockSize(Digest->BlockSize()),
+		m_destroyEngine(false),
+		m_digestEngine(Digest),
+		m_inStream(0),
+		m_isDestroyed(false),
+		m_progressInterval(0)
 	{
 		if (Digest == 0)
 			throw CEX::Exception::CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!");
@@ -109,13 +109,13 @@ public:
 	/// <param name="Digest">The digest enumeration member</param>
 	explicit DigestStream(CEX::Enumeration::Digests Digest)
 		:
-		_destroyEngine(true),
-		_inStream(0),
-		_isDestroyed(false),
-		_progressInterval(0)
+		m_destroyEngine(true),
+		m_inStream(0),
+		m_isDestroyed(false),
+		m_progressInterval(0)
 	{
-		_digestEngine = CEX::Helper::DigestFromName::GetInstance(Digest);
-		_blockSize = _digestEngine->BlockSize();
+		m_digestEngine = CEX::Helper::DigestFromName::GetInstance(Digest);
+		m_blockSize = m_digestEngine->BlockSize();
 	}
 
 	/// <summary>

@@ -15,9 +15,9 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All KDF2 Drbg tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _output;
-		std::vector<byte> _salt;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_output;
+		std::vector<byte> m_salt;
 
 	public:
 		/// <summary>
@@ -28,7 +28,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer KDF2 Drbg vectors for equality

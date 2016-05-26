@@ -90,7 +90,7 @@ namespace Test
 		rnd.GetBytes(data);
 
 		// mac instance for baseline
-		unsigned int macSze = Engine->MacSize();
+		size_t macSze = Engine->MacSize();
 		std::vector<byte> code1(macSze);
 		Engine->ComputeMac(data, code1);
 
@@ -122,9 +122,10 @@ namespace Test
 		mac.Initialize(key, iv);
 		std::vector<byte> c1(mac.MacSize());
 		mac.ComputeMac(data, c1);
+		CEX::Common::KeyParams kp(key, iv);
 
 		CEX::Common::MacDescription mds(32, CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::IVSizes::V128);
-		CEX::Processing::MacStream mst(mds, CEX::Common::KeyParams(key, iv));
+		CEX::Processing::MacStream mst(mds, kp);
 		CEX::IO::IByteStream* ms = new CEX::IO::MemoryStream(data);
 		std::vector<byte> c2 = mst.ComputeMac(ms);
 		delete ms;
@@ -142,9 +143,10 @@ namespace Test
 		mac.Initialize(key);
 		std::vector<byte> c1(mac.MacSize());
 		mac.ComputeMac(data, c1);
+		CEX::Common::KeyParams kp(key);
 
 		CEX::Common::MacDescription mds(64, CEX::Enumeration::Digests::SHA256);
-		CEX::Processing::MacStream mst(mds, CEX::Common::KeyParams(key));
+		CEX::Processing::MacStream mst(mds, kp);
 		CEX::IO::IByteStream* ms = new CEX::IO::MemoryStream(data);
 		std::vector<byte> c2 = mst.ComputeMac(ms);
 		delete ms;
@@ -163,9 +165,10 @@ namespace Test
 		mac.Initialize(key, iv);
 		std::vector<byte> c1(mac.MacSize());
 		mac.ComputeMac(data, c1);
+		CEX::Common::KeyParams kp(key, iv);
 
 		CEX::Common::MacDescription mds(64, 16);
-		CEX::Processing::MacStream mst(mds, CEX::Common::KeyParams(key, iv));
+		CEX::Processing::MacStream mst(mds, kp);
 		CEX::IO::IByteStream* ms = new CEX::IO::MemoryStream(data);
 		std::vector<byte> c2 = mst.ComputeMac(ms);
 
@@ -175,6 +178,6 @@ namespace Test
 
 	void MacStreamTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

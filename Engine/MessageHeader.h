@@ -26,35 +26,35 @@ private:
 	static constexpr uint SEEKTO_EXT = 16;
 	static constexpr uint SEEKTO_HASH = 32;
 
-	std::vector<byte> _keyID;
-	std::vector<byte> _extKey;
-	std::vector<byte> _msgMac;
+	std::vector<byte> m_keyID;
+	std::vector<byte> m_extKey;
+	std::vector<byte> m_msgMac;
 
 public:
 
 	/// <summary>
 	/// The HMAC hash value of the encrypted file
 	/// </summary>
-	const std::vector<byte> &MessageMac() const { return _msgMac; }
+	const std::vector<byte> &MessageMac() const { return m_msgMac; }
 
 	/// <summary>
 	/// The 16 byte key identifier
 	/// </summary>
-	const std::vector<byte> &KeyId() const { return _keyID; }
+	const std::vector<byte> &KeyId() const { return m_keyID; }
 
 	/// <summary>
 	/// The encrypted message file extension
 	/// </summary>
-	const std::vector<byte> &ExtensionKey() const { return _extKey; }
+	const std::vector<byte> &ExtensionKey() const { return m_extKey; }
 
 	/// <summary>
 	/// Default constructor
 	/// </summary>
 	MessageHeader() 
 		:
-		_keyID(0),
-		_extKey(0),
-		_msgMac(0)
+		m_keyID(0),
+		m_extKey(0),
+		m_msgMac(0)
 	{}
 
 	/// <summary>
@@ -66,9 +66,9 @@ public:
 	/// <param name="MessageHash">A message hash value, can be null</param>
 	MessageHeader(std::vector<byte> &KeyId, std::vector<byte> &Extension, std::vector<byte> &MessageHash)
 		:
-		_keyID(KeyId),
-		_extKey(Extension),
-		_msgMac(MessageHash)
+		m_keyID(KeyId),
+		m_extKey(Extension),
+		m_msgMac(MessageHash)
 	{
 	}
 
@@ -82,18 +82,18 @@ public:
 	/// <exception cref="CryptoProcessingException">Thrown if the DataStream is too small</exception>
 	MessageHeader(CEX::IO::MemoryStream &HeaderStream, uint MacLength = 0)
 		:
-		_keyID(0),
-		_extKey(0),
-		_msgMac(0)
+		m_keyID(0),
+		m_extKey(0),
+		m_msgMac(0)
 	{
 		if (HeaderStream.Length() < SIZE_BASEHEADER)
 			throw CEX::Exception::CryptoProcessingException("MessageHeader:CTor", "MessageHeader stream is too small!");
 
 		CEX::IO::StreamReader reader(HeaderStream);
-		_keyID = reader.ReadBytes(KEYID_SIZE);
-		_extKey = reader.ReadBytes(EXTKEY_SIZE);
+		m_keyID = reader.ReadBytes(KEYID_SIZE);
+		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		if (MacLength > 0)
-			_msgMac = reader.ReadBytes(MacLength);
+			m_msgMac = reader.ReadBytes(MacLength);
 	}
 
 	/// <summary>
@@ -105,11 +105,11 @@ public:
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(HeaderArray);
 		CEX::IO::StreamReader reader(ms);
-		_keyID = reader.ReadBytes(KEYID_SIZE);
-		_extKey = reader.ReadBytes(EXTKEY_SIZE);
+		m_keyID = reader.ReadBytes(KEYID_SIZE);
+		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		size_t len = (reader.Length() - reader.Position());
 		if (len > 0)
-			_msgMac = reader.ReadBytes(len);
+			m_msgMac = reader.ReadBytes(len);
 	}
 
 	/// <summary>
@@ -117,12 +117,12 @@ public:
 	/// </summary>
 	void Reset()
 	{
-		if (_keyID.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(_keyID);
-		if (_extKey.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(_extKey);
-		if (_msgMac.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(_msgMac);
+		if (m_keyID.size() != 0)
+			CEX::Utility::IntUtils::ClearVector(m_keyID);
+		if (m_extKey.size() != 0)
+			CEX::Utility::IntUtils::ClearVector(m_extKey);
+		if (m_msgMac.size() != 0)
+			CEX::Utility::IntUtils::ClearVector(m_msgMac);
 	}
 
 	/// <summary>
@@ -133,10 +133,10 @@ public:
 	std::vector<byte> ToBytes()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		writer.Write(_keyID);
-		writer.Write(_extKey);
-		if (_msgMac.size() > 0)
-			writer.Write(_msgMac);
+		writer.Write(m_keyID);
+		writer.Write(m_extKey);
+		if (m_msgMac.size() > 0)
+			writer.Write(m_msgMac);
 
 		return writer.GetBytes();
 	}
@@ -149,10 +149,10 @@ public:
 	CEX::IO::MemoryStream* ToStream()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		writer.Write(_keyID);
-		writer.Write(_extKey);
-		if (_msgMac.size() > 0)
-			writer.Write(_msgMac);
+		writer.Write(m_keyID);
+		writer.Write(m_extKey);
+		if (m_msgMac.size() > 0)
+			writer.Write(m_msgMac);
 
 		return writer.GetStream();
 	}
@@ -306,20 +306,20 @@ public:
 	int GetHashCode()
 	{
 		int result = 1;
-		if (_keyID.size() != 0)
+		if (m_keyID.size() != 0)
 		{
-			for (size_t i = 0; i < _keyID.size(); i++)
-				result += (31 * _keyID[i]);
+			for (size_t i = 0; i < m_keyID.size(); i++)
+				result += (31 * m_keyID[i]);
 		}
-		if (_extKey.size() != 0)
+		if (m_extKey.size() != 0)
 		{
-			for (size_t i = 0; i < _extKey.size(); i++)
-				result += (31 * _extKey[i]);
+			for (size_t i = 0; i < m_extKey.size(); i++)
+				result += (31 * m_extKey[i]);
 		}
-		if (_msgMac.size() != 0)
+		if (m_msgMac.size() != 0)
 		{
-			for (size_t i = 0; i < _msgMac.size(); ++i)
-				result += (31 * _msgMac[i]);
+			for (size_t i = 0; i < m_msgMac.size(); ++i)
+				result += (31 * m_msgMac[i]);
 		}
 
 		return result;

@@ -6,16 +6,16 @@ NAMESPACE_GENERATOR
 
 void DGCDrbg::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		CEX::Utility::IntUtils::ClearVector(_dgtSeed);
-		CEX::Utility::IntUtils::ClearVector(_dgtState);
+		CEX::Utility::IntUtils::ClearVector(m_dgtSeed);
+		CEX::Utility::IntUtils::ClearVector(m_dgtState);
 
-		_isInitialized = true;
-		_keySize = 0;
-		_stateCtr = 0;
-		_seedCtr = 0;
-		_isDestroyed = true;
+		m_isInitialized = true;
+		m_keySize = 0;
+		m_stateCtr = 0;
+		m_seedCtr = 0;
+		m_isDestroyed = true;
 	}
 }
 
@@ -36,13 +36,13 @@ size_t DGCDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Siz
 
 	for (size_t i = OutOffset; i < len; ++i)
 	{
-		if (offset == _dgtState.size())
+		if (offset == m_dgtState.size())
 		{
 			GenerateState();
 			offset = 0;
 		}
 
-		Output[i] = _dgtState[offset++];
+		Output[i] = m_dgtState[offset++];
 	}
 
 	return Size;
@@ -66,7 +66,7 @@ void DGCDrbg::Initialize(const std::vector<byte> &Ikm)
 	}
 
 	UpdateCounter(counter[0]);
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void DGCDrbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
@@ -103,11 +103,11 @@ void DGCDrbg::Update(const std::vector<byte> &Salt)
 		throw CryptoGeneratorException("DGCDrbg:Update", "Minimum key size has not been added. Size must be at least 8 bytes!");
 
 	// update seed and counter
-	if (Salt.size() >= _msgDigest->BlockSize() + ctrSize)
+	if (Salt.size() >= m_msgDigest->BlockSize() + ctrSize)
 	{
 		Initialize(Salt);
 	}
-	else if (Salt.size() == _msgDigest->BlockSize())
+	else if (Salt.size() == m_msgDigest->BlockSize())
 	{
 		UpdateSeed(Salt);
 	}
@@ -128,46 +128,46 @@ void DGCDrbg::Update(const std::vector<byte> &Salt)
 
 void DGCDrbg::CycleSeed()
 {
-	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
-	IncrementCounter(_seedCtr++);
-	_msgDigest->DoFinal(_dgtSeed, 0);
+	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
+	IncrementCounter(m_seedCtr++);
+	m_msgDigest->DoFinal(m_dgtSeed, 0);
 }
 
 void DGCDrbg::IncrementCounter(long Counter)
 {
 	for (int i = 0; i < 8; i++)
 	{
-		_msgDigest->Update((byte)Counter);
+		m_msgDigest->Update((byte)Counter);
 		Counter >>= 8;
 	}
 }
 
 void DGCDrbg::GenerateState()
 {
-	CEX::Utility::ParallelUtils::lock<std::mutex> lock(_mtxLock);
-	IncrementCounter(_stateCtr++);
-	_msgDigest->BlockUpdate(_dgtState, 0, _dgtState.size());
-	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
-	_msgDigest->DoFinal(_dgtState, 0);
+	CEX::Utility::ParallelUtils::lock<std::mutex> lock(m_mtxLock);
+	IncrementCounter(m_stateCtr++);
+	m_msgDigest->BlockUpdate(m_dgtState, 0, m_dgtState.size());
+	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
+	m_msgDigest->DoFinal(m_dgtState, 0);
 
-	if ((_stateCtr % CYCLE_COUNT) == 0)
+	if ((m_stateCtr % CYCLE_COUNT) == 0)
 		CycleSeed();
 }
 
 void DGCDrbg::UpdateCounter(long Counter)
 {
-	CEX::Utility::ParallelUtils::lock<std::mutex> lock(_mtxLock);
+	CEX::Utility::ParallelUtils::lock<std::mutex> lock(m_mtxLock);
 	IncrementCounter(Counter);
-	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
-	_msgDigest->DoFinal(_dgtSeed, 0);
+	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
+	m_msgDigest->DoFinal(m_dgtSeed, 0);
 }
 
 void DGCDrbg::UpdateSeed(std::vector<byte> Seed)
 {
-	CEX::Utility::ParallelUtils::lock<std::mutex> lock(_mtxLock);
-	_msgDigest->BlockUpdate(Seed, 0, Seed.size());
-	_msgDigest->BlockUpdate(_dgtSeed, 0, _dgtSeed.size());
-	_msgDigest->DoFinal(_dgtSeed, 0);
+	CEX::Utility::ParallelUtils::lock<std::mutex> lock(m_mtxLock);
+	m_msgDigest->BlockUpdate(Seed, 0, Seed.size());
+	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
+	m_msgDigest->DoFinal(m_dgtSeed, 0);
 }
 
 NAMESPACE_GENERATOREND

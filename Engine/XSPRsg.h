@@ -37,11 +37,11 @@ private:
 	static constexpr ulong Z3 = 0x94D049BB133111EB;
 	static constexpr ulong Z4 = 1181783497276652981;
 
-	bool _isDestroyed;
-	bool _isShift1024;
-	size_t _stateOffset;
-	std::vector<ulong> _stateSeed;
-	std::vector<ulong> _wrkBuffer;
+	bool m_isDestroyed;
+	bool m_isShift1024;
+	size_t m_stateOffset;
+	std::vector<ulong> m_stateSeed;
+	std::vector<ulong> m_wrkBuffer;
 	std::vector<ulong> JMP128;
 	std::vector<ulong> JMP1024;
 
@@ -65,15 +65,15 @@ public:
 	/// </summary>
 	XSPRsg()
 		:
-		_isDestroyed(false),
-		_isShift1024(false),
-		_stateOffset(0),
-		_stateSeed(MAXSEED),
-		_wrkBuffer(MAXSEED)
+		m_isDestroyed(false),
+		m_isShift1024(false),
+		m_stateOffset(0),
+		m_stateSeed(MAXSEED),
+		m_wrkBuffer(MAXSEED)
 	{
 		size_t len = MAXSEED * sizeof(ulong);
 		GetSeed(len);
-		_isShift1024 = true;
+		m_isShift1024 = true;
 
 		JMP1024 = { 
 			0x84242f96eca9c41dULL, 0xa3c65b8776f96855ULL, 0x5b34a39f070b5837ULL, 0x4489affce4f31a1eULL, 
@@ -96,11 +96,11 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if an invalid seed size is used</exception>
 	explicit XSPRsg(const std::vector<ulong> &Seed)
 		:
-		_isDestroyed(false),
-		_isShift1024(false),
-		_stateOffset(0),
-		_stateSeed(Seed.size()),
-		_wrkBuffer(Seed.size())
+		m_isDestroyed(false),
+		m_isShift1024(false),
+		m_stateOffset(0),
+		m_stateSeed(Seed.size()),
+		m_wrkBuffer(Seed.size())
 	{
 		if (Seed.size() != 2 && Seed.size() != 16)
 			throw CryptoRandomException("XSPRsg:CTor", "The seed array length must be either 2 or 16 long values!");
@@ -112,10 +112,10 @@ public:
 		}
 
 		size_t len = Seed.size() * sizeof(ulong);
-		memcpy(&_stateSeed[0], &Seed[0], len);
-		_isShift1024 = (Seed.size() == 16);
+		memcpy(&m_stateSeed[0], &Seed[0], len);
+		m_isShift1024 = (Seed.size() == 16);
 
-		if (!_isShift1024)
+		if (!m_isShift1024)
 			JMP128 = { 0x8a5cd789635d2dffULL, 0x121fd2155c472f96ULL };
 		else
 			JMP1024 = { 

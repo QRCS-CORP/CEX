@@ -71,17 +71,17 @@ private:
 	static constexpr size_t MAXALLOC_MB100 = 100000000;
 	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
-	IBlockCipher* _blockCipher;
-	size_t _blockSize;
-	std::vector<byte> _cfbIv;
-	std::vector<byte> _cfbBuffer;
-	bool _isDestroyed;
-	bool _isEncryption;
-	bool _isInitialized;
-	bool _isParallel;
-	size_t _parallelBlockSize;
-	size_t _processorCount;
-	std::vector<std::vector<byte>> _threadVectors;
+	IBlockCipher* m_blockCipher;
+	size_t m_blockSize;
+	std::vector<byte> m_cfbIv;
+	std::vector<byte> m_cfbBuffer;
+	bool m_isDestroyed;
+	bool m_isEncryption;
+	bool m_isInitialized;
+	bool m_isParallel;
+	size_t m_parallelBlockSize;
+	size_t m_processorCount;
+	std::vector<std::vector<byte>> m_threadVectors;
 
 public:
 	// *** Properties *** //
@@ -89,12 +89,12 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher
 	/// </summary>
-	virtual const size_t BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return m_blockSize; }
 
 	/// <summary>
 	/// Get: Underlying Cipher
 	/// </summary>
-	virtual IBlockCipher* Engine() { return _blockCipher; }
+	virtual IBlockCipher* Engine() { return m_blockCipher; }
 
 	/// <summary>
 	/// Get: The cipher modes type name
@@ -104,27 +104,27 @@ public:
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption
 	/// </summary>
-	virtual const bool IsEncryption() { return _isEncryption; }
+	virtual const bool IsEncryption() { return m_isEncryption; }
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	virtual bool &IsParallel() { return _isParallel; }
+	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> &IV() { return _cfbIv; }
+	virtual const std::vector<byte> &IV() { return m_cfbIv; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
+	virtual const std::vector<size_t> &LegalKeySizes() { return m_blockCipher->LegalKeySizes(); }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -138,7 +138,7 @@ public:
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
 	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
-	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -148,12 +148,12 @@ public:
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return _processorCount * _blockSize; }
+	virtual const size_t ParallelMinimumSize() { return m_processorCount * m_blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const size_t ProcessorCount() { return _processorCount; }
+	virtual const size_t ProcessorCount() { return m_processorCount; }
 
 	// *** Constructor *** //
 
@@ -167,16 +167,16 @@ public:
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
 	explicit CFB(IBlockCipher* Cipher, size_t BlockSizeBits = 128)
 		:
-		_blockCipher(Cipher),
-		_blockSize(BlockSizeBits / 8),
-		_cfbBuffer(Cipher->BlockSize()),
-		_cfbIv(Cipher->BlockSize()),
-		_isDestroyed(false),
-		_isEncryption(false),
-		_isInitialized(false),
-		_isParallel(false),
-		_processorCount(1),
-		_parallelBlockSize(PARALLEL_DEFBLOCK)
+		m_blockCipher(Cipher),
+		m_blockSize(BlockSizeBits / 8),
+		m_cfbBuffer(Cipher->BlockSize()),
+		m_cfbIv(Cipher->BlockSize()),
+		m_isDestroyed(false),
+		m_isEncryption(false),
+		m_isInitialized(false),
+		m_isParallel(false),
+		m_processorCount(1),
+		m_parallelBlockSize(PARALLEL_DEFBLOCK)
 	{
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CFB:CTor", "The Cipher can not be null!");

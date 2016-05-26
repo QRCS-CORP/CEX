@@ -24,26 +24,26 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All Keccak tests have executed succesfully.";
 
-        std::vector<std::vector<byte>> _messages;
-        std::vector<std::vector<byte>> _expected224;
-        std::vector<std::vector<byte>> _expected256;
-        std::vector<std::vector<byte>> _expected288;
-        std::vector<std::vector<byte>> _expected384;
-        std::vector<std::vector<byte>> _expected512;
-        std::vector<std::vector<byte>> _macKeys;
-        std::vector<std::vector<byte>> _macData;
-        std::vector<std::vector<byte>> _mac224;
-        std::vector<std::vector<byte>> _mac256;
-        std::vector<std::vector<byte>> _mac384;
-        std::vector<std::vector<byte>> _mac512;
-        std::vector<byte> _truncKey;
-        std::vector<byte> _truncData;
-        std::vector<byte> _trunc224;
-        std::vector<byte> _trunc256;
-        std::vector<byte> _trunc384;
-        std::vector<byte> _trunc512;
-        std::vector<byte> _xtremeData;
-		TestEventHandler _progressEvent;
+        std::vector<std::vector<byte>> m_messages;
+        std::vector<std::vector<byte>> m_expected224;
+        std::vector<std::vector<byte>> m_expected256;
+        std::vector<std::vector<byte>> m_expected288;
+        std::vector<std::vector<byte>> m_expected384;
+        std::vector<std::vector<byte>> m_expected512;
+        std::vector<std::vector<byte>> m_macKeys;
+        std::vector<std::vector<byte>> m_macData;
+        std::vector<std::vector<byte>> m_mac224;
+        std::vector<std::vector<byte>> m_mac256;
+        std::vector<std::vector<byte>> m_mac384;
+        std::vector<std::vector<byte>> m_mac512;
+        std::vector<byte> m_truncKey;
+        std::vector<byte> m_truncData;
+        std::vector<byte> m_trunc224;
+        std::vector<byte> m_trunc256;
+        std::vector<byte> m_trunc384;
+        std::vector<byte> m_trunc512;
+        std::vector<byte> m_xtremeData;
+		TestEventHandler m_progressEvent;
 
     public:
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
         /// <summary>
         /// A range of Vector KATs; tests SHA-3 224/256/384/512 and HMACs

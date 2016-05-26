@@ -56,7 +56,7 @@ template <typename T>
 class Event
 {
 private:
-	std::vector< Delegate<T>* > _delegates;
+	std::vector< Delegate<T>* > m_delegates;
 
 public:
 
@@ -66,8 +66,8 @@ public:
 	inline void operator+=(Delegate<T>* delegate)
 	{
 		// an object can only subscribe once
-		if (find(_delegates.begin(), _delegates.end(), delegate) == _delegates.end())
-			_delegates.push_back(delegate);
+		if (find(m_delegates.begin(), m_delegates.end(), delegate) == m_delegates.end())
+			m_delegates.push_back(delegate);
 	}
 
 	/// <summary>
@@ -76,12 +76,12 @@ public:
 	inline void operator-=(Delegate<T>* delegate)
 	{
 		typedef typename std::vector< Delegate<T>* >::iterator iter;
-		iter i = _delegates.begin();
+		iter i = m_delegates.begin();
 
-		while (i != _delegates.end())
+		while (i != m_delegates.end())
 		{
 			if (*i == delegate)
-				i = _delegates.erase(i);
+				i = m_delegates.erase(i);
 			else
 				++i;
 		}
@@ -94,7 +94,7 @@ public:
 	{
 		typedef typename std::vector< Delegate<T>* >::iterator iter;
 
-		for (iter i = _delegates.begin(); i != _delegates.end(); ++i)
+		for (iter i = m_delegates.begin(); i != m_delegates.end(); ++i)
 			(*i)->operator()(param);
 	}
 };

@@ -64,8 +64,8 @@ NAMESPACE_PRCFACTORY
 class KeyFactory
 {
 private:
-	bool _isDestroyed;
-	CEX::IO::MemoryStream* _keyStream;
+	bool m_isDestroyed;
+	CEX::IO::MemoryStream* m_keyStream;
 
 	KeyFactory() {}
 
@@ -78,8 +78,8 @@ public:
 	/// <param name="KeyStream">The fully qualified path to the key file to be read or created</param>
 	explicit KeyFactory(CEX::IO::MemoryStream* KeyStream)
 		:
-		_isDestroyed(false),
-		_keyStream(KeyStream)
+		m_isDestroyed(false),
+		m_keyStream(KeyStream)
 	{
 	}
 

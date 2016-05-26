@@ -10,16 +10,16 @@ void MemoryStream::Close()
 
 void MemoryStream::CopyTo(IByteStream* Destination)
 {
-	Destination->Write(_streamData, 0, _streamData.size());
+	Destination->Write(m_streamData, 0, m_streamData.size());
 }
 
 void MemoryStream::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_streamPosition = 0;
-		CEX::Utility::IntUtils::ClearVector(_streamData);
-		_isDestroyed = true;
+		m_streamPosition = 0;
+		CEX::Utility::IntUtils::ClearVector(m_streamData);
+		m_isDestroyed = true;
 	}
 }
 
@@ -30,13 +30,13 @@ void MemoryStream::Flush()
 
 size_t MemoryStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
-	if (Offset + Count > _streamData.size() - _streamPosition)
-		Count = _streamData.size() - _streamPosition;
+	if (Offset + Count > m_streamData.size() - m_streamPosition)
+		Count = m_streamData.size() - m_streamPosition;
 
 	if (Count > 0)
 	{
-		memcpy(&Buffer[Offset], &_streamData[_streamPosition], Count);
-		_streamPosition += Count;
+		memcpy(&Buffer[Offset], &m_streamData[m_streamPosition], Count);
+		m_streamPosition += Count;
 	}
 
 	return Count;
@@ -44,36 +44,36 @@ size_t MemoryStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count
 
 byte MemoryStream::ReadByte()
 {
-	if (_streamData.size() - _streamPosition < 1)
+	if (m_streamData.size() - m_streamPosition < 1)
 		throw CryptoProcessingException("MemoryStream:ReadByte", "The output array is too short!");
 
 	byte data(1);
-	memcpy(&data, &_streamData[_streamPosition], 1);
-	_streamPosition += 1;
+	memcpy(&data, &m_streamData[m_streamPosition], 1);
+	m_streamPosition += 1;
 
 	return data;
 }
 
 void MemoryStream::Reset()
 {
-	_streamData.clear();
-	_streamData.resize(0);
-	_streamPosition = 0;
+	m_streamData.clear();
+	m_streamData.resize(0);
+	m_streamPosition = 0;
 }
 
 void MemoryStream::Seek(size_t Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
-		_streamPosition = Offset;
+		m_streamPosition = Offset;
 	else if (Origin == SeekOrigin::End)
-		_streamPosition = _streamData.size() - Offset;
+		m_streamPosition = m_streamData.size() - Offset;
 	else
-		_streamPosition += Offset;
+		m_streamPosition += Offset;
 }
 
 void MemoryStream::SetLength(size_t Length)
 {
-	_streamData.reserve(Length);
+	m_streamData.reserve(Length);
 }
 
 void MemoryStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count)
@@ -81,23 +81,23 @@ void MemoryStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t 
 	if (Offset + Count > Buffer.size())
 		throw CryptoProcessingException("MemoryStream:Write", "The output array is too short!");
 
-	size_t len = _streamPosition + Count;
-	if (_streamData.capacity() - _streamPosition < Count)
-		_streamData.reserve(len);
-	if (_streamData.size() < len)
-		_streamData.resize(len);
+	size_t len = m_streamPosition + Count;
+	if (m_streamData.capacity() - m_streamPosition < Count)
+		m_streamData.reserve(len);
+	if (m_streamData.size() < len)
+		m_streamData.resize(len);
 
-	memcpy(&_streamData[_streamPosition], &Buffer[Offset], Count);
-	_streamPosition += Count;
+	memcpy(&m_streamData[m_streamPosition], &Buffer[Offset], Count);
+	m_streamPosition += Count;
 }
 
 void MemoryStream::WriteByte(byte Data)
 {
-	if (_streamData.size() - _streamPosition < 1)
-		_streamData.resize(_streamData.size() + 1);
+	if (m_streamData.size() - m_streamPosition < 1)
+		m_streamData.resize(m_streamData.size() + 1);
 
-	memcpy(&_streamData[_streamPosition], &Data, 1);
-	_streamPosition += 1;
+	memcpy(&m_streamData[m_streamPosition], &Data, 1);
+	m_streamPosition += 1;
 }
 
 NAMESPACE_IOEND

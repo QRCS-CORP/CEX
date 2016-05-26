@@ -37,7 +37,7 @@ private:
 	static constexpr ulong T1FlagFinal = (ulong)1 << 63;
 	static constexpr ulong T1FlagFirst = (ulong)1 << 62;
 
-	std::vector<ulong> _tweak;
+	std::vector<ulong> m_tweak;
 
 public:
 	/// <summary>
@@ -45,7 +45,7 @@ public:
 	/// </summary>
 	UbiTweak()
 		:
-		_tweak(2, 0)
+		m_tweak(2, 0)
 	{
 	}
 
@@ -54,7 +54,7 @@ public:
 	/// </summary>
 	void Clear()
 	{
-		memset(&_tweak, 0, sizeof(_tweak));
+		memset(&m_tweak, 0, sizeof(m_tweak));
 	}
 
 	/// <summary>
@@ -62,7 +62,7 @@ public:
 	/// </summary>
 	long GetBitsProcessed()
 	{
-		return (long)_tweak[0];
+		return (long)m_tweak[0];
 	}
 
 	/// <summary>
@@ -70,7 +70,7 @@ public:
 	/// </summary>
 	UbiType GetBlockType()
 	{
-		return (UbiType)(_tweak[1] >> 56);
+		return (UbiType)(m_tweak[1] >> 56);
 	}
 
 	/// <summary>
@@ -78,7 +78,7 @@ public:
 	/// </summary>
 	bool GetIsFinalBlock()
 	{
-		return (_tweak[1] & T1FlagFinal) != 0;
+		return (m_tweak[1] & T1FlagFinal) != 0;
 	}
 
 	/// <summary>
@@ -86,7 +86,7 @@ public:
 	/// </summary>
 	bool GetIsFirstBlock()
 	{
-		return (_tweak[1] & T1FlagFirst) != 0;
+		return (m_tweak[1] & T1FlagFirst) != 0;
 	}
 
 	/// <summary>
@@ -94,7 +94,7 @@ public:
 	/// </summary>
 	byte GetTreeLevel()
 	{
-		return (byte)((_tweak[1] >> 48) & 0x3f);
+		return (byte)((m_tweak[1] >> 48) & 0x3f);
 	}
 
 	/// <summary>
@@ -102,7 +102,7 @@ public:
 	/// </summary>
 	std::vector<ulong> GetTweak()
 	{
-		return _tweak;
+		return m_tweak;
 	}
 
 	/// <summary>
@@ -110,7 +110,7 @@ public:
 	/// </summary>
 	void SetBitsProcessed(const ulong Value)
 	{
-		_tweak[0] = Value;
+		m_tweak[0] = Value;
 	}
 
 	/// <summary>
@@ -118,7 +118,7 @@ public:
 	/// </summary>
 	void SetBlockType(const UbiType Value)
 	{
-		_tweak[1] = (ulong)Value << 56;
+		m_tweak[1] = (ulong)Value << 56;
 	}
 
 	/// <summary>
@@ -127,7 +127,7 @@ public:
 	void SetIsFirstBlock(const bool Value)
 	{
 		long mask = Value ? 1 : 0;
-		_tweak[1] = (_tweak[1] & ~T1FlagFirst) | ((ulong)-mask & T1FlagFirst);
+		m_tweak[1] = (m_tweak[1] & ~T1FlagFirst) | ((ulong)-mask & T1FlagFirst);
 	}
 
 	/// <summary>
@@ -136,7 +136,7 @@ public:
 	void SetIsFinalBlock(const ulong Value)
 	{
 		long mask = Value ? 1 : 0;
-		_tweak[1] = (_tweak[1] & ~T1FlagFinal) | ((ulong)-mask & T1FlagFinal);
+		m_tweak[1] = (m_tweak[1] & ~T1FlagFinal) | ((ulong)-mask & T1FlagFinal);
 	}
 
 	/// <summary>
@@ -147,8 +147,8 @@ public:
 		if (Value > 63)
 			throw CEX::Exception::CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
 
-		_tweak[1] &= ~((ulong)0x3f << 48);
-		_tweak[1] |= (ulong)Value << 48;
+		m_tweak[1] &= ~((ulong)0x3f << 48);
+		m_tweak[1] |= (ulong)Value << 48;
 	}
 
 	/// <summary>
@@ -156,7 +156,7 @@ public:
 	/// </summary>
 	void SetTweak(const std::vector<ulong> &Value)
 	{
-		_tweak = Value;
+		m_tweak = Value;
 	}
 
 	/// <summary>

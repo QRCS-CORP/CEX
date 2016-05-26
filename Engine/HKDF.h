@@ -67,15 +67,15 @@ NAMESPACE_GENERATOR
 class HKDF : public IGenerator
 {
 private:
-	std::vector<byte> _currentT;
-	std::vector<byte> _digestInfo;
-	CEX::Mac::HMAC *_digestMac;
-	size_t _generatedBytes;
-	size_t _hashSize;
-	bool _isDestroyed;
-	bool _isInitialized;
-	size_t _keySize;
-	CEX::Digest::IDigest* _msgDigest;
+	std::vector<byte> m_currentT;
+	std::vector<byte> m_digestInfo;
+	CEX::Mac::HMAC *m_digestMac;
+	size_t m_generatedBytes;
+	size_t m_hashSize;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	size_t m_keySize;
+	CEX::Digest::IDigest* m_msgDigest;
 
 public:
 
@@ -89,13 +89,13 @@ public:
 	/// <summary>
 	/// Get: Generator is ready to produce data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual size_t KeySize() { return _keySize; }
+	virtual size_t KeySize() { return m_keySize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -113,18 +113,18 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
 	explicit HKDF(CEX::Digest::IDigest* Digest)
 		:
-		_isDestroyed(false),
-		_currentT(Digest->DigestSize(), 0),
-		_generatedBytes(0),
-		_hashSize(Digest->DigestSize()),
-		_isInitialized(false),
-		_keySize(Digest->BlockSize()),
-		_msgDigest(Digest)
+		m_isDestroyed(false),
+		m_currentT(Digest->DigestSize(), 0),
+		m_generatedBytes(0),
+		m_hashSize(Digest->DigestSize()),
+		m_isInitialized(false),
+		m_keySize(Digest->BlockSize()),
+		m_msgDigest(Digest)
 	{
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
 
-		 _digestMac = new CEX::Mac::HMAC(_msgDigest);
+		 m_digestMac = new CEX::Mac::HMAC(m_msgDigest);
 	}
 
 	/// <summary>
@@ -136,14 +136,14 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null HMAC is used</exception>
 	explicit HKDF(CEX::Mac::HMAC* Hmac)
 		:
-		_currentT(Hmac->MacSize(), 0),
-		_digestMac(Hmac),
-		_generatedBytes(0),
-		_hashSize(Hmac->MacSize()),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_keySize(Hmac->BlockSize()),
-		_msgDigest(0)
+		m_currentT(Hmac->MacSize(), 0),
+		m_digestMac(Hmac),
+		m_generatedBytes(0),
+		m_hashSize(Hmac->MacSize()),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_keySize(Hmac->BlockSize()),
+		m_msgDigest(0)
 	{
 		if (Hmac == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Hmac can not be null!");
@@ -193,7 +193,7 @@ public:
 	/// <param name="Ikm">The Key value; minimum size is 2* the digests output size</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if the Key is too small</exception>
-	virtual void Initialize(const std::vector<byte> &Key);
+	virtual void Initialize(const std::vector<byte> &Ikm);
 
 	/// <summary>
 	/// Initialize the generator with a Salt value and a Key
@@ -210,7 +210,7 @@ public:
 	/// <param name="Salt">The Salt value</param>
 	/// <param name="Ikm">The Key value</param>
 	/// <param name="Nonce">The Nonce value</param>
-	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Info);
+	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce);
 
 	/// <summary>
 	/// Update the Salt material

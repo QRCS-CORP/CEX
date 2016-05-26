@@ -75,14 +75,14 @@ private:
 	static constexpr size_t BLOCK_SIZE = 128;
 	static constexpr size_t DIGEST_SIZE = 64;
 
-	ulong _btCounter1;
-	ulong _btCounter2;
-	size_t _bufferOffset;
-	ulong _H0, _H1, _H2, _H3, _H4, _H5, _H6, _H7;
-	bool _isDestroyed;
-	std::vector<byte> _prcBuffer;
-	std::vector<ulong> _wordBuffer;
-	size_t _wordOffset;
+	ulong H0, H1, H2, H3, H4, H5, H6, H7;
+	ulong m_btCounter1;
+	ulong m_btCounter2;
+	size_t m_bufferOffset;
+	bool m_isDestroyed;
+	std::vector<byte> m_prcBuffer;
+	std::vector<ulong> m_wordBuffer;
+	size_t m_wordOffset;
 
 public:
 
@@ -115,21 +115,21 @@ public:
 	/// </summary>
 	SHA512()
 		:
-		_btCounter1(0),
-		_btCounter2(0),
-		_bufferOffset(0),
-		_isDestroyed(false),
-		_H0(0),
-		_H1(0),
-		_H2(0),
-		_H3(0),
-		_H4(0),
-		_H5(0),
-		_H6(0),
-		_H7(0),
-		_prcBuffer(8, 0),
-		_wordBuffer(80, 0),
-		_wordOffset(0)
+		m_btCounter1(0),
+		m_btCounter2(0),
+		m_bufferOffset(0),
+		m_isDestroyed(false),
+		H0(0),
+		H1(0),
+		H2(0),
+		H3(0),
+		H4(0),
+		H5(0),
+		H6(0),
+		H7(0),
+		m_prcBuffer(8, 0),
+		m_wordBuffer(80, 0),
+		m_wordOffset(0)
 	{
 		Reset();
 	}

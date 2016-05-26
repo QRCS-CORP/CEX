@@ -77,13 +77,13 @@ private:
 	static constexpr byte IPAD = 0x36;
 	static constexpr byte OPAD = 0x5C;
 
-	size_t _blockSize;
-	bool _isDestroyed;
-	size_t _digestSize;
-	bool _isInitialized;
-	std::vector<byte> _inputPad;
-	CEX::Digest::IDigest *_msgDigest;
-	std::vector<byte> _outputPad;
+	size_t m_blockSize;
+	bool m_isDestroyed;
+	size_t m_digestSize;
+	bool m_isInitialized;
+	std::vector<byte> m_inputPad;
+	CEX::Digest::IDigest* m_msgDigest;
+	std::vector<byte> m_outputPad;
 
 public:
 
@@ -92,7 +92,7 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return _msgDigest->BlockSize(); }
+	virtual const size_t BlockSize() { return m_msgDigest->BlockSize(); }
 
 	/// <summary>
 	/// Get: The macs type name
@@ -102,12 +102,12 @@ public:
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const size_t MacSize() { return _msgDigest->DigestSize(); }
+	virtual const size_t MacSize() { return m_msgDigest->DigestSize(); }
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: Algorithm name
@@ -119,24 +119,24 @@ public:
 	/// Initialize this class using the digest enumeration name
 	/// </summary>
 	/// 
-	/// <param name="Digests">The message digest enumeration name</param>
+	/// <param name="DigestType">The message digest enumeration name</param>
 	explicit HMAC(CEX::Enumeration::Digests DigestType)
 		:
-		_blockSize(0),
-		_digestSize(0),
-		_inputPad(0),
-		_outputPad(0),
-		_isDestroyed(false),
-		_isInitialized(false)
+		m_blockSize(0),
+		m_digestSize(0),
+		m_inputPad(0),
+		m_outputPad(0),
+		m_isDestroyed(false),
+		m_isInitialized(false)
 	{
 		CreateDigest(DigestType);
-		if (_msgDigest == 0)
+		if (m_msgDigest == 0)
 			throw CryptoMacException("HMAC:Ctor", "Could not create the digest!");
 
-		_blockSize = _msgDigest->BlockSize();
-		_digestSize = _msgDigest->DigestSize();
-		_inputPad.resize(_msgDigest->BlockSize());
-		_outputPad.resize(_msgDigest->BlockSize());
+		m_blockSize = m_msgDigest->BlockSize();
+		m_digestSize = m_msgDigest->DigestSize();
+		m_inputPad.resize(m_msgDigest->BlockSize());
+		m_outputPad.resize(m_msgDigest->BlockSize());
 	}
 
 	/// <summary>
@@ -148,13 +148,13 @@ public:
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if a null digest is used</exception>
 	explicit HMAC(CEX::Digest::IDigest *Digest)
 		:
-		_blockSize(Digest->BlockSize()),
-		_digestSize(Digest->DigestSize()),
-		_inputPad(Digest->BlockSize(), 0),
-		_isDestroyed(false),
-		_msgDigest(Digest),
-		_outputPad(Digest->BlockSize(), 0),
-		_isInitialized(false)
+		m_blockSize(Digest->BlockSize()),
+		m_digestSize(Digest->DigestSize()),
+		m_inputPad(Digest->BlockSize(), 0),
+		m_isDestroyed(false),
+		m_msgDigest(Digest),
+		m_outputPad(Digest->BlockSize(), 0),
+		m_isInitialized(false)
 	{
 		if (Digest == 0)
 			throw CryptoMacException("HMAC:Ctor", "The digest can not be null!");

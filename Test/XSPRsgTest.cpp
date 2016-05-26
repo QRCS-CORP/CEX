@@ -8,10 +8,10 @@ namespace Test
 		{
 			Initialize();
 
-			CompareVector(_input[0], _expected[0]);
-			CompareVector(_input[1], _expected[1]);
-			CompareVector(_input[2], _expected[2]);
-			CompareVector(_input[3], _expected[3]);
+			CompareVector(m_input[0], m_expected[0]);
+			CompareVector(m_input[1], m_expected[1]);
+			CompareVector(m_input[2], m_expected[2]);
+			CompareVector(m_input[3], m_expected[3]);
 			OnProgress("Passed XorShift+ vector tests..");
 
 			return SUCCESS;
@@ -39,7 +39,7 @@ namespace Test
 
 	void XSPRsgTest::Initialize()
 	{
-		_input =
+		m_input =
 		{
 			{ 123456789, 987654321 },
 			{ 11111111, 22222222 },
@@ -54,11 +54,11 @@ namespace Test
 			("1ff967b4312e56c0d4f6afadab6f2b096afbbf716c7da30631e2b74bc8ff34d5"), //1024
 			("ebb8179801eeedad9bdd3750cb5b93bd0000c0473c64cf5a24d2df9b96c40248")
 		};
-		HexConverter::Decode(expectedEncoded, 4, _expected);
+		HexConverter::Decode(expectedEncoded, 4, m_expected);
 	}
 
 	void XSPRsgTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

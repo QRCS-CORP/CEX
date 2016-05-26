@@ -1,5 +1,6 @@
 #include "AesFipsTest.h"
 #include "RHX.h"
+#include "AHX.h"
 
 namespace Test
 {
@@ -10,12 +11,22 @@ namespace Test
 			Initialize();
 
 			for (unsigned int i = 0; i < 12; i++)
-				CompareVector(_keys[i], _plainText[i], _cipherText[i]);
+			{
+				if (m_testNI)
+					CompareVectorNI(m_keys[i], m_plainText[i], m_cipherText[i]);
+				else
+					CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
+			}
 
 			OnProgress("AesFipsTest: Passed FIPS 197 Monte Carlo tests..");
 
-			for (unsigned int i = 12; i < _plainText.size(); i++)
-				CompareMonteCarlo(_keys[i], _plainText[i], _cipherText[i]);
+			for (unsigned int i = 12; i < m_plainText.size(); i++)
+			{
+				if (m_testNI)
+					CompareMonteCarloNI(m_keys[i], m_plainText[i], m_cipherText[i]);
+				else
+					CompareMonteCarlo(m_keys[i], m_plainText[i], m_cipherText[i]);
+			}
 
 			OnProgress("AesFipsTest: Passed Extended Monte Carlo tests..");
 
@@ -34,22 +45,38 @@ namespace Test
 	void AesFipsTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
+		CEX::Cipher::Symmetric::Block::RHX engine(16);
+		CEX::Common::KeyParams k(Key);
+		engine.Initialize(true, k);
+		engine.Transform(Input, outBytes);
 
-		{
-			CEX::Cipher::Symmetric::Block::RHX engine(16);
-			CEX::Common::KeyParams k(Key);
-			engine.Initialize(true, k);
-			engine.Transform(Input, outBytes);
+		if (outBytes != Output)
+			throw std::string("AesFipsTest: AES: Encrypted arrays are not equal!");
 
-			if (outBytes != Output)
-				throw std::string("AesFipsTest: AES: Encrypted arrays are not equal!");
+		engine.Initialize(false, k);
+		engine.Transform(Output, outBytes);
 
-			engine.Initialize(false, k);
-			engine.Transform(Output, outBytes);
+		if (outBytes != Input)
+			throw std::string("AesFipsTest: AES: Decrypted arrays are not equal!");
+	}
 
-			if (outBytes != Input)
-				throw std::string("AesFipsTest: AES: Decrypted arrays are not equal!");
-		}
+	void AesFipsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	{
+		std::vector<byte> outBytes(Input.size(), 0);
+
+		CEX::Cipher::Symmetric::Block::AHX engine;
+		CEX::Common::KeyParams k(Key);
+		engine.Initialize(true, k);
+		engine.Transform(Input, outBytes);
+
+		if (outBytes != Output)
+			throw std::string("AesFipsTest: AES: Encrypted arrays are not equal!");
+
+		engine.Initialize(false, k);
+		engine.Transform(Output, outBytes);
+
+		if (outBytes != Input)
+			throw std::string("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -70,6 +97,35 @@ namespace Test
 
 		{
 			CEX::Cipher::Symmetric::Block::RHX engine(16);
+			CEX::Common::KeyParams k(Key);
+			engine.Initialize(false, k);
+
+			for (unsigned int i = 0; i != 10000; i++)
+				engine.Transform(outBytes, outBytes);
+		}
+
+		if (outBytes != Input)
+			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+	}
+
+	void AesFipsTest::CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	{
+		std::vector<byte> outBytes(Input.size(), 0);
+		memcpy(&outBytes[0], &Input[0], outBytes.size());
+		{
+			CEX::Cipher::Symmetric::Block::AHX engine;
+			CEX::Common::KeyParams k(Key);
+			engine.Initialize(true, k);
+
+			for (unsigned int i = 0; i != 10000; i++)
+				engine.Transform(outBytes, outBytes);
+		}
+
+		if (outBytes != Output)
+			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+
+		{
+			CEX::Cipher::Symmetric::Block::AHX engine;
 			CEX::Common::KeyParams k(Key);
 			engine.Initialize(false, k);
 
@@ -112,7 +168,7 @@ namespace Test
 			("AAFE47EE82411A2BF3F6752AE8D7831138F041560631B114"),
 			("28E79E2AFC5F7745FCCABE2F6257C2EF4C4EDFB37324814ED4137C288711A386")
 		};
-		HexConverter::Decode(keysEncoded, 24, _keys);
+		HexConverter::Decode(keysEncoded, 24, m_keys);
 
 		const char* plainTextEncoded[24] =
 		{
@@ -141,7 +197,7 @@ namespace Test
 			("F3F6752AE8D7831138F041560631B114"),
 			("C737317FE0846F132B23C8C2A672CE22")
 		};
-		HexConverter::Decode(plainTextEncoded, 24, _plainText);
+		HexConverter::Decode(plainTextEncoded, 24, m_plainText);
 
 		const char* cipherTextEncoded[24] =
 		{
@@ -170,11 +226,11 @@ namespace Test
 			("77BA00ED5412DFF27C8ED91F3C376172"),
 			("E58B82BFBA53C0040DC610C642121168")
 		};
-		HexConverter::Decode(cipherTextEncoded, 24, _cipherText);
+		HexConverter::Decode(cipherTextEncoded, 24, m_cipherText);
 	}
 
 	void AesFipsTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

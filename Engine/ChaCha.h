@@ -87,18 +87,18 @@ private:
 	static constexpr const char *SIGMA = "expand 32-byte k";
 	static constexpr const char *TAU = "expand 16-byte k";
 
-	std::vector<uint> _ctrVector;
-	bool _isDestroyed;
-	std::vector<byte> _dstCode;
-	bool _isInitialized;
-	bool _isParallel;
-	std::vector<size_t> _legalKeySizes;
-	std::vector<size_t> _legalRounds;
-	size_t _parallelBlockSize;
-	size_t _processorCount;
-	size_t _rndCount;
-	std::vector<std::vector<uint>> _threadVectors;
-	std::vector<uint> _wrkState;
+	std::vector<uint> m_ctrVector;
+	bool m_isDestroyed;
+	std::vector<byte> m_dstCode;
+	bool m_isInitialized;
+	bool m_isParallel;
+	std::vector<size_t> m_legalKeySizes;
+	std::vector<size_t> m_legalRounds;
+	size_t m_parallelBlockSize;
+	size_t m_processorCount;
+	size_t m_rndCount;
+	std::vector<std::vector<uint>> m_threadVectors;
+	std::vector<uint> m_wrkState;
 
 public:
 
@@ -113,7 +113,7 @@ public:
 	/// <summary>
 	/// Get the current counter value
 	/// </summary>
-	virtual ulong Counter() { return ((ulong)_ctrVector[1] << 32) | (_ctrVector[0] & 0xffffffffL); }
+	virtual ulong Counter() { return ((ulong)m_ctrVector[1] << 32) | (m_ctrVector[0] & 0xffffffffL); }
 
 	/// <summary>
 	/// Get/Set: Sets the Nonce value in the initialization parameters (Tau-Sigma).
@@ -121,7 +121,7 @@ public:
 	/// Changing this code will create a unique distribution of the cipher.
 	/// Code must be 16 bytes in length and sufficiently asymmetric (no more than 2 repeating characters, at a distance of 2 intervals).</para>
 	/// </summary>
-	virtual std::vector<byte> &DistributionCode() { return _dstCode; }
+	virtual std::vector<byte> &DistributionCode() { return m_dstCode; }
 
 	/// <summary>
 	/// Get: The stream ciphers type name
@@ -131,27 +131,27 @@ public:
 	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<size_t>&LegalKeySizes() { return _legalKeySizes; }
+	virtual const std::vector<size_t>&LegalKeySizes() { return m_legalKeySizes; }
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() { return _legalRounds; }
+	virtual const std::vector<size_t> &LegalRounds() { return m_legalRounds; }
 
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	virtual bool &IsParallel() { return _isParallel; }
+	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -162,7 +162,7 @@ public:
 	/// Get: The smallest parallel block size. 
 	/// <para>Parallel blocks must be a multiple of this size.</para>
 	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
+	virtual const size_t ParallelMinimumSize() { return m_processorCount * (STATE_SIZE * 4); }
 
 	/// <remarks>
 	/// Get: Processor count
@@ -177,7 +177,7 @@ public:
 	/// <summary>
 	/// Get: Number of rounds
 	/// </summary>
-	virtual const size_t Rounds() { return _rndCount; }
+	virtual const size_t Rounds() { return m_rndCount; }
 
 	/// <summary>
 	/// Get: Initialization vector size
@@ -195,21 +195,21 @@ public:
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
 	explicit ChaCha(size_t Rounds = ROUNDS20)
 		:
-		_ctrVector(2, 0),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_isParallel(false),
-		_parallelBlockSize(PARALLEL_DEFBLOCK),
-		_rndCount(Rounds),
-		_wrkState(14, 0)
+		m_ctrVector(2, 0),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_isParallel(false),
+		m_parallelBlockSize(PARALLEL_DEFBLOCK),
+		m_rndCount(Rounds),
+		m_wrkState(14, 0)
 	{
 		if (Rounds == 0 || (Rounds & 1) != 0)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be between 8 and 30!");
 
-		_legalKeySizes = { 16, 32 };
-		_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
+		m_legalKeySizes = { 16, 32 };
+		m_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
 
 		SetScope();
 	}

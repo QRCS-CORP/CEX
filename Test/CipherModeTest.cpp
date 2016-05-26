@@ -15,29 +15,29 @@ namespace Test
 			Initialize();
 
 			// test modes with each key (128/192/256)
-			CompareCBC(_keys[0], _input, _output);
-			CompareCBC(_keys[1], _input, _output);
-			CompareCBC(_keys[2], _input, _output);
+			CompareCBC(m_keys[0], m_input, m_output);
+			CompareCBC(m_keys[1], m_input, m_output);
+			CompareCBC(m_keys[2], m_input, m_output);
 			OnProgress("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests..");
 
-			CompareCFB(_keys[0], _input, _output);
-			CompareCFB(_keys[1], _input, _output);
-			CompareCFB(_keys[2], _input, _output);
+			CompareCFB(m_keys[0], m_input, m_output);
+			CompareCFB(m_keys[1], m_input, m_output);
+			CompareCFB(m_keys[2], m_input, m_output);
 			OnProgress("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests..");
 
-			CompareCTR(_keys[0], _input, _output);
-			CompareCTR(_keys[1], _input, _output);
-			CompareCTR(_keys[2], _input, _output);
+			CompareCTR(m_keys[0], m_input, m_output);
+			CompareCTR(m_keys[1], m_input, m_output);
+			CompareCTR(m_keys[2], m_input, m_output);
 			OnProgress("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests..");
 
-			CompareECB(_keys[0], _input, _output);
-			CompareECB(_keys[1], _input, _output);
-			CompareECB(_keys[2], _input, _output);
+			CompareECB(m_keys[0], m_input, m_output);
+			CompareECB(m_keys[1], m_input, m_output);
+			CompareECB(m_keys[2], m_input, m_output);
 			OnProgress("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests..");
 
-			CompareOFB(_keys[0], _input, _output);
-			CompareOFB(_keys[1], _input, _output);
-			CompareOFB(_keys[2], _input, _output);
+			CompareOFB(m_keys[0], m_input, m_output);
+			CompareOFB(m_keys[1], m_input, m_output);
+			CompareOFB(m_keys[2], m_input, m_output);
 			OnProgress("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests..");
 
 			return SUCCESS;
@@ -55,7 +55,7 @@ namespace Test
 	void CipherModeTest::CompareCBC(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
 	{
 		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = _vectors[0];
+		std::vector<byte> &iv = m_vectors[0];
 		int index = 6;
 
 		if (Key.size() == 24)
@@ -90,7 +90,7 @@ namespace Test
 			{
 				mode.Transform(Input[index][i], outBytes);
 
-				if (outBytes != _output[index][i])
+				if (outBytes != m_output[index][i])
 					throw std::string("CBC Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
@@ -100,7 +100,7 @@ namespace Test
 	void CipherModeTest::CompareCFB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
 	{
 		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = _vectors[0];
+		std::vector<byte> &iv = m_vectors[0];
 		int index = 12;
 
 		if (Key.size() == 24)
@@ -136,7 +136,7 @@ namespace Test
 			{
 				mode.Transform(Input[index][i], outBytes);
 
-				if (outBytes != _output[index][i])
+				if (outBytes != m_output[index][i])
 					throw std::string("CFB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
@@ -146,7 +146,7 @@ namespace Test
 	void CipherModeTest::CompareCTR(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
 	{
 		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = _vectors[1];
+		std::vector<byte> &iv = m_vectors[1];
 		int index = 24;
 
 		if (Key.size() == 24)
@@ -181,7 +181,7 @@ namespace Test
 			{
 				mode.Transform(Input[index][i], outBytes);
 
-				if (outBytes != _output[index][i])
+				if (outBytes != m_output[index][i])
 					throw std::string("CTR Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
@@ -226,7 +226,7 @@ namespace Test
 			{
 				mode.Transform(Input[index][i], outBytes);
 
-				if (outBytes != _output[index][i])
+				if (outBytes != m_output[index][i])
 					throw std::string("ECB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
@@ -236,7 +236,7 @@ namespace Test
 	void CipherModeTest::CompareOFB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
 	{
 		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = _vectors[0];
+		std::vector<byte> &iv = m_vectors[0];
 		int index = 18;
 
 		if (Key.size() == 24)
@@ -272,7 +272,7 @@ namespace Test
 			{
 				mode.Transform(Input[index][i], outBytes);
 
-				if (outBytes != _output[index][i])
+				if (outBytes != m_output[index][i])
 					throw std::string("OFB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
@@ -287,14 +287,14 @@ namespace Test
 			("8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b"),//F.1/F.2/F.3/F.5 -192
 			("603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4"),//F.1/F.2/F.3/F.5 -256
 		};
-		HexConverter::Decode(keysEncoded, 3, _keys);
+		HexConverter::Decode(keysEncoded, 3, m_keys);
 
 		const char* vectorsEncoded[2] =
 		{
 			("000102030405060708090a0b0c0d0e0f"),//F.1/F.2/F.3
 			("f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff")//F.5
 		};
-		HexConverter::Decode(vectorsEncoded, 2, _vectors);
+		HexConverter::Decode(vectorsEncoded, 2, m_vectors);
 
 		const char* inputEncoded[][4] =
 		{
@@ -486,10 +486,10 @@ namespace Test
 		};
 
 		size_t inputSize = sizeof(inputEncoded) / sizeof(inputEncoded[0]);
-		_input.resize(inputSize);
+		m_input.resize(inputSize);
 
 		for (unsigned int i = 0; i < inputSize; ++i)
-			HexConverter::Decode(inputEncoded[i], 4, _input[i]);
+			HexConverter::Decode(inputEncoded[i], 4, m_input[i]);
 
 		const char *outputEncoded[][4] =
 		{
@@ -681,14 +681,14 @@ namespace Test
 		};
 
 		size_t outputSize = sizeof(outputEncoded) / sizeof(outputEncoded[0]);
-		_output.resize(outputSize);
+		m_output.resize(outputSize);
 
 		for (unsigned int i = 0; i < outputSize; ++i)
-			HexConverter::Decode(outputEncoded[i], 4, _output[i]);
+			HexConverter::Decode(outputEncoded[i], 4, m_output[i]);
 	}
 
 	void CipherModeTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

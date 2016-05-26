@@ -70,20 +70,20 @@ private:
 	static constexpr byte CT1F = (byte)0x1F;
 	static constexpr byte CTFF = (byte)0xFF;
 
-	size_t _blockSize;
-	bool _isDestroyed;
-	bool _isInitialized;
-	byte _G;
-	byte _N;
-	std::vector<byte> _P;
-	byte _S;
-	std::vector<byte> _T;
-	std::vector<byte> _workingKey;
-	std::vector<byte> _workingIV;
-	byte _X1;
-	byte _X2;
-	byte _X3;
-	byte _X4;
+	size_t m_blockSize;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	byte G;
+	byte N;
+	std::vector<byte> P;
+	byte S;
+	std::vector<byte> T;
+	std::vector<byte> m_workingKey;
+	std::vector<byte> m_workingIV;
+	byte X1;
+	byte X2;
+	byte X3;
+	byte X4;
 
 public:
 
@@ -107,7 +107,7 @@ public:
 	/// <summary>
 	/// Get: Mac is ready to digest data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: Algorithm name
@@ -121,20 +121,20 @@ public:
 	/// </summary>
 	VMAC()
 		:
-		_blockSize(BLOCK_SIZE),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_G(0),
-		_N(0),
-		_P(256),
-		_S(0),
-		_T(32),
-		_workingKey(0),
-		_workingIV(0),
-		_X1(0),
-		_X2(0),
-		_X3(0),
-		_X4(0)
+		m_blockSize(BLOCK_SIZE),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		G(0),
+		N(0),
+		P(256),
+		S(0),
+		T(32),
+		m_workingKey(0),
+		m_workingIV(0),
+		X1(0),
+		X2(0),
+		X3(0),
+		X4(0)
 	{
 	}
 

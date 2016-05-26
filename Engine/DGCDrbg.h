@@ -79,15 +79,15 @@ private:
 	static constexpr size_t COUNTER_SIZE = 8;
 	static constexpr size_t CYCLE_COUNT = 10;
 
-	std::vector<byte> _dgtSeed;
-	std::vector<byte> _dgtState;
-	bool _isDestroyed;
-	bool _isInitialized;
-	size_t _keySize;
-	CEX::Digest::IDigest* _msgDigest;
-	std::mutex _mtxLock;
-	long _seedCtr;
-	long _stateCtr;
+	std::vector<byte> m_dgtSeed;
+	std::vector<byte> m_dgtState;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	size_t m_keySize;
+	CEX::Digest::IDigest* m_msgDigest;
+	std::mutex m_mtxLock;
+	long m_seedCtr;
+	long m_stateCtr;
 
 public:
 
@@ -101,13 +101,13 @@ public:
 	/// <summary>
 	/// Get: Generator is ready to produce data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual size_t KeySize() { return _keySize; }
+	virtual size_t KeySize() { return m_keySize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -125,14 +125,14 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
 	explicit DGCDrbg(CEX::Digest::IDigest* Digest)
 		:
-		_dgtSeed(Digest->DigestSize()),
-		_dgtState(Digest->DigestSize()),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_keySize(Digest->BlockSize() + COUNTER_SIZE),
-		_msgDigest(Digest),
-		_stateCtr(1),
-		_seedCtr(1)
+		m_dgtSeed(Digest->DigestSize()),
+		m_dgtState(Digest->DigestSize()),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_keySize(Digest->BlockSize() + COUNTER_SIZE),
+		m_msgDigest(Digest),
+		m_stateCtr(1),
+		m_seedCtr(1)
 	{
 		if (Digest == 0)
 			throw CryptoGeneratorException("DGCDrbg:Ctor", "Digest can not be null!");

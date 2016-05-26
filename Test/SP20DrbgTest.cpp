@@ -9,9 +9,9 @@ namespace Test
 		{
 			Initialize();
 
-			CompareVector(24, _output128);
+			CompareVector(24, m_output128);
 			OnProgress("SP20Drbg: Passed 128bit vector comparison tests..");
-			CompareVector(40, _output256);
+			CompareVector(40, m_output256);
 			OnProgress("SP20Drbg: Passed 256bit vector comparison tests..");
 
 			return SUCCESS;
@@ -47,12 +47,12 @@ namespace Test
 
 	void SP20DrbgTest::Initialize()
 	{
-		HexConverter::Decode("0323103b248efe859cd4ca57559a1c4aa4f9320635bac3807d93b7bcfbad14d1", _output128);
-		HexConverter::Decode("d00b46e37495862e642c35be3a1149a8562ee50cdafe3a5f4b26a5c579a45c36", _output256);
+		HexConverter::Decode("0323103b248efe859cd4ca57559a1c4aa4f9320635bac3807d93b7bcfbad14d1", m_output128);
+		HexConverter::Decode("d00b46e37495862e642c35be3a1149a8562ee50cdafe3a5f4b26a5c579a45c36", m_output256);
 	}
 
 	void SP20DrbgTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

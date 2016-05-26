@@ -17,11 +17,11 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! ChaCha tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _plainText;
-		std::vector<std::vector<byte>> _key;
-		std::vector<std::vector<byte>> _iv;
-		std::vector<std::vector<byte>> _cipherText;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_plainText;
+		std::vector<std::vector<byte>> m_key;
+		std::vector<std::vector<byte>> m_iv;
+		std::vector<std::vector<byte>> m_cipherText;
 
 	public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer ChaCha vectors for equality

@@ -75,13 +75,13 @@ private:
 	static constexpr size_t BLOCK_SIZE = 64;
 	static constexpr size_t DIGEST_SIZE = 32;
 
-	size_t _bufferOffset;
+	size_t m_bufferOffset;
 	size_t _byteCount;
-	bool _isDestroyed;
-	uint _H0, _H1, _H2, _H3, _H4, _H5, _H6, _H7;
-	std::vector<byte> _prcBuffer;
-	std::vector<uint> _wordBuffer;
-	size_t _wordOffset = 0;
+	bool m_isDestroyed;
+	uint H0, H1, H2, H3, H4, H5, H6, H7;
+	std::vector<byte> m_prcBuffer;
+	std::vector<uint> m_wordBuffer;
+	size_t m_wordOffset = 0;
 
 public:
 
@@ -114,12 +114,12 @@ public:
 	/// </summary>
 	SHA256()
 		:
-		_bufferOffset(0),
+		m_bufferOffset(0),
 		_byteCount(0),
-		_prcBuffer(4, 0),
-		_wordBuffer(64, 0),
-		_wordOffset(0),
-		_isDestroyed(false)
+		m_prcBuffer(4, 0),
+		m_wordBuffer(64, 0),
+		m_wordOffset(0),
+		m_isDestroyed(false)
 	{
 		Initialize();
 	}

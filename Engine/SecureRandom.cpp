@@ -12,19 +12,19 @@ NAMESPACE_PRNG
 /// </summary>
 void SecureRandom::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_bufferIndex = 0;
-		_bufferSize = 0;
+		m_bufferIndex = 0;
+		m_bufferSize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_byteBuffer);
+		CEX::Utility::IntUtils::ClearVector(m_byteBuffer);
 
-		if (_rngGenerator != 0)
+		if (m_rngGenerator != 0)
 		{
-			_rngGenerator->Destroy();
-			delete _rngGenerator;
+			m_rngGenerator->Destroy();
+			delete m_rngGenerator;
 		}
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 
@@ -54,38 +54,38 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 	if (Output.size() == 0)
 		throw CryptoRandomException("CTRPrng:GetBytes", "Buffer size must be at least 1 byte!");
 
-	if (_byteBuffer.size() - _bufferIndex < Output.size())
+	if (m_byteBuffer.size() - m_bufferIndex < Output.size())
 	{
-		size_t bufSize = _byteBuffer.size() - _bufferIndex;
+		size_t bufSize = m_byteBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			memcpy(&Output[0], &_byteBuffer[_bufferIndex], bufSize);
+			memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], bufSize);
 
 		size_t rem = Output.size() - bufSize;
 
 		while (rem > 0)
 		{
 			// fill buffer
-			_rngGenerator->GetBytes(_byteBuffer);
+			m_rngGenerator->GetBytes(m_byteBuffer);
 
-			if (rem > _byteBuffer.size())
+			if (rem > m_byteBuffer.size())
 			{
-				memcpy(&Output[bufSize], &_byteBuffer[0], _byteBuffer.size());
-				bufSize += _byteBuffer.size();
-				rem -= _byteBuffer.size();
+				memcpy(&Output[bufSize], &m_byteBuffer[0], m_byteBuffer.size());
+				bufSize += m_byteBuffer.size();
+				rem -= m_byteBuffer.size();
 			}
 			else
 			{
-				memcpy(&Output[bufSize], &_byteBuffer[0], rem);
-				_bufferIndex = rem;
+				memcpy(&Output[bufSize], &m_byteBuffer[0], rem);
+				m_bufferIndex = rem;
 				rem = 0;
 			}
 		}
 	}
 	else
 	{
-		memcpy(&Output[0], &_byteBuffer[_bufferIndex], Output.size());
-		_bufferIndex += Output.size();
+		memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], Output.size());
+		m_bufferIndex += Output.size();
 	}
 }
 
@@ -445,14 +445,14 @@ ulong SecureRandom::NextUInt64(ulong Minimum, ulong Maximum)
 /// </summary>
 void SecureRandom::Reset()
 {
-	if (_rngGenerator != 0)
+	if (m_rngGenerator != 0)
 	{
-		_rngGenerator->Destroy();
-		delete _rngGenerator;
+		m_rngGenerator->Destroy();
+		delete m_rngGenerator;
 	}
-	_rngGenerator = new CEX::Seed::CSPRsg;
-	_rngGenerator->GetBytes(_byteBuffer);
-	_bufferIndex = 0;
+	m_rngGenerator = new CEX::Seed::CSPRsg;
+	m_rngGenerator->GetBytes(m_byteBuffer);
+	m_bufferIndex = 0;
 }
 
 // *** Protected Methods *** //

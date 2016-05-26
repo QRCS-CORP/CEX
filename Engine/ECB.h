@@ -66,15 +66,15 @@ NAMESPACE_MODE
 class ECB : public ICipherMode
 {
 private:
-	IBlockCipher* _blockCipher;
-	size_t _blockSize;
-	std::vector<byte> _ecbIv;
-	bool _isDestroyed;
-	bool _isEncryption;
-	bool _isInitialized;
-	bool _isParallel;
-	size_t _parallelBlockSize;
-	size_t _processorCount;
+	IBlockCipher* m_blockCipher;
+	size_t m_blockSize;
+	std::vector<byte> m_ecbIv;
+	bool m_isDestroyed;
+	bool m_isEncryption;
+	bool m_isInitialized;
+	bool m_isParallel;
+	size_t m_parallelBlockSize;
+	size_t m_processorCount;
 
 public:
 
@@ -83,12 +83,12 @@ public:
 	/// <summary>
 	/// Get: Unit block size of internal cipher
 	/// </summary>
-	virtual const size_t BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return m_blockSize; }
 
 	/// <summary>
 	/// Get: Underlying Cipher
 	/// </summary>
-	virtual IBlockCipher* Engine() { return _blockCipher; }
+	virtual IBlockCipher* Engine() { return m_blockCipher; }
 
 	/// <summary>
 	/// Get: The cipher modes type name
@@ -98,27 +98,27 @@ public:
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption
 	/// </summary>
-	virtual const bool IsEncryption() { return _isEncryption; }
+	virtual const bool IsEncryption() { return m_isEncryption; }
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	virtual bool &IsParallel() { return _isParallel; }
+	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> &IV() { return _ecbIv; }
+	virtual const std::vector<byte> &IV() { return m_ecbIv; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return _blockCipher->LegalKeySizes(); }
+	virtual const std::vector<size_t> &LegalKeySizes() { return m_blockCipher->LegalKeySizes(); }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -132,7 +132,7 @@ public:
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
 	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
-	virtual size_t &ParallelBlockSize() { return _parallelBlockSize; }
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -147,7 +147,7 @@ public:
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const size_t ProcessorCount() { return _processorCount; }
+	virtual const size_t ProcessorCount() { return m_processorCount; }
 
 	// *** Constructor *** //
 
@@ -160,15 +160,15 @@ public:
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
 	explicit ECB(IBlockCipher* Cipher)
 		:
-		_blockCipher(Cipher),
-		_blockSize(Cipher->BlockSize()),
-		_ecbIv(0),
-		_isDestroyed(false),
-		_isEncryption(false),
-		_isInitialized(false),
-		_isParallel(false),
-		_parallelBlockSize(0),
-		_processorCount(0)
+		m_blockCipher(Cipher),
+		m_blockSize(Cipher->BlockSize()),
+		m_ecbIv(0),
+		m_isDestroyed(false),
+		m_isEncryption(false),
+		m_isInitialized(false),
+		m_isParallel(false),
+		m_parallelBlockSize(0),
+		m_processorCount(0)
 	{
 		if (Cipher == 0)
 			throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!");

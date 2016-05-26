@@ -8,13 +8,13 @@ NAMESPACE_SEED
 
 void XSPRsg::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isShift1024 = false;
-		_stateOffset = 0;
-		CEX::Utility::IntUtils::ClearVector(_stateSeed);
-		CEX::Utility::IntUtils::ClearVector(_wrkBuffer);
-		_isDestroyed = true;
+		m_isShift1024 = false;
+		m_stateOffset = 0;
+		CEX::Utility::IntUtils::ClearVector(m_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(m_wrkBuffer);
+		m_isDestroyed = true;
 	}
 }
 
@@ -25,7 +25,7 @@ void XSPRsg::GetBytes(std::vector<byte> &Output)
 
 void XSPRsg::Jump()
 {
-	if (_isShift1024)
+	if (m_isShift1024)
 		Jump1024();
 	else
 		Jump128();
@@ -46,7 +46,7 @@ void XSPRsg::Generate(std::vector<byte> &Output, size_t Size)
 
 	while (offset < Size)
 	{
-		if (_isShift1024)
+		if (m_isShift1024)
 			X = Shift1024();
 		else
 			X = Shift128();
@@ -62,7 +62,7 @@ void XSPRsg::Generate(std::vector<byte> &Output, size_t Size)
 int XSPRsg::Next()
 {
 	ulong X;
-	if (_isShift1024)
+	if (m_isShift1024)
 		X = Shift1024();
 	else
 		X = Shift128();
@@ -75,8 +75,8 @@ int XSPRsg::Next()
 
 void XSPRsg::Reset()
 {
-	memset(&_wrkBuffer[0], 0, sizeof _wrkBuffer);
-	memcpy(&_wrkBuffer[0], &_stateSeed[0], _stateSeed.size() * sizeof(ulong));
+	memset(&m_wrkBuffer[0], 0, sizeof m_wrkBuffer);
+	memcpy(&m_wrkBuffer[0], &m_stateSeed[0], m_stateSeed.size() * sizeof(ulong));
 }
 
 ulong XSPRsg::Split(ulong X)
@@ -101,16 +101,16 @@ void XSPRsg::Jump128()
 		{
 			if (JMP128[i] & 1ULL << b)
 			{
-				s0 ^= _wrkBuffer[0];
-				s1 ^= _wrkBuffer[1];
+				s0 ^= m_wrkBuffer[0];
+				s1 ^= m_wrkBuffer[1];
 			}
 
 			Shift128();
 		}
 	}
 
-	_wrkBuffer[0] = s0;
-	_wrkBuffer[1] = s1;
+	m_wrkBuffer[0] = s0;
+	m_wrkBuffer[1] = s1;
 }
 
 void XSPRsg::Jump1024()
@@ -124,37 +124,37 @@ void XSPRsg::Jump1024()
 			if (JMP1024[i] & 1ULL << b)
 			{
 				for (int j = 0; j < 16; j++)
-					T[j] ^= _wrkBuffer[(j + _stateOffset) & 15];
+					T[j] ^= m_wrkBuffer[(j + m_stateOffset) & 15];
 			}
 
 			Shift1024();
 		}
 	}
 
-	memcpy(&_wrkBuffer[0], &T[0], sizeof T);
+	memcpy(&m_wrkBuffer[0], &T[0], sizeof T);
 }
 
 ulong XSPRsg::Shift128()
 {
-	ulong X = _wrkBuffer[0];
-	const ulong Y = _wrkBuffer[1];
+	ulong X = m_wrkBuffer[0];
+	const ulong Y = m_wrkBuffer[1];
 
-	_wrkBuffer[0] = Y;
+	m_wrkBuffer[0] = Y;
 	X ^= X << 23; // a
-	_wrkBuffer[1] = X ^ Y ^ (X >> 18) ^ (Y >> 5); // b, c
+	m_wrkBuffer[1] = X ^ Y ^ (X >> 18) ^ (Y >> 5); // b, c
 
-	return _wrkBuffer[1] + Y; // +
+	return m_wrkBuffer[1] + Y; // +
 }
 
 ulong XSPRsg::Shift1024()
 {
-	const ulong X = _wrkBuffer[_stateOffset];
-	ulong Y = _wrkBuffer[_stateOffset = (_stateOffset + 1) & 15];
+	const ulong X = m_wrkBuffer[m_stateOffset];
+	ulong Y = m_wrkBuffer[m_stateOffset = (m_stateOffset + 1) & 15];
 
 	Y ^= Y << 31; // a
-	_wrkBuffer[_stateOffset] = Y ^ X ^ (Y >> 11) ^ (X >> 30); // b,c
+	m_wrkBuffer[m_stateOffset] = Y ^ X ^ (Y >> 11) ^ (X >> 30); // b,c
 
-	return _wrkBuffer[_stateOffset] * Z4;
+	return m_wrkBuffer[m_stateOffset] * Z4;
 }
 
 void XSPRsg::GetSeed(size_t Size)
@@ -162,7 +162,7 @@ void XSPRsg::GetSeed(size_t Size)
 	CSPRsg rnd;
 	std::vector<byte> seed(Size);
 	seed = rnd.GetBytes(Size);
-	memcpy(&_stateSeed[0], &seed[0], Size);
+	memcpy(&m_stateSeed[0], &seed[0], Size);
 }
 
 NAMESPACE_SEEDEND

@@ -123,19 +123,19 @@ private:
 	static constexpr uint SK_STEP = 0x02020202;
 	static constexpr size_t SBOX_SIZE = 1024;
 
-	bool _destroyEngine;
-	size_t _dfnRounds;
-	std::vector<uint> _expKey;
-	std::vector<byte> _hkdfInfo;
-	size_t _ikmSize;
-	bool _isDestroyed;
-	bool _isEncryption;
-	bool _isInitialized;
-	CEX::Digest::IDigest* _kdfEngine;
-	CEX::Enumeration::Digests _kdfEngineType;
-	std::vector<size_t> _legalKeySizes;
-	std::vector<size_t> _legalRounds;
-	std::vector<uint> _sprBox;
+	bool m_destroyEngine;
+	size_t m_dfnRounds;
+	std::vector<uint> m_expKey;
+	std::vector<byte> m_hkdfInfo;
+	size_t m_ikmSize;
+	bool m_isDestroyed;
+	bool m_isEncryption;
+	bool m_isInitialized;
+	CEX::Digest::IDigest* m_kdfEngine;
+	CEX::Enumeration::Digests m_kdfEngineType;
+	std::vector<size_t> m_legalKeySizes;
+	std::vector<size_t> m_legalRounds;
+	std::vector<uint> m_sprBox;
 
 public:
 
@@ -156,7 +156,7 @@ public:
 	/// </summary>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid distribution code is used</exception>
-	const std::vector<byte> &DistributionCode() { return _hkdfInfo; }
+	const std::vector<byte> &DistributionCode() { return m_hkdfInfo; }
 
 	/// <summary>
 	/// Get: The block ciphers type name
@@ -167,22 +167,22 @@ public:
 	/// Get: Initialized for encryption, false for decryption.
 	/// <para>Value set in <see cref="Initialize(bool, KeyParams)"/>.</para>
 	/// </summary>
-	virtual const bool IsEncryption() { return _isEncryption; }
+	virtual const bool IsEncryption() { return m_isEncryption; }
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return _legalKeySizes; }
+	virtual const std::vector<size_t> &LegalKeySizes() { return m_legalKeySizes; }
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() { return _legalRounds; }
+	virtual const std::vector<size_t> &LegalRounds() { return m_legalRounds; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -192,7 +192,7 @@ public:
 	/// <summary>
 	/// Get: The number of diffusion rounds processed by the transform
 	/// </summary>
-	virtual const size_t Rounds() { return _dfnRounds; }
+	virtual const size_t Rounds() { return m_dfnRounds; }
 
 	// *** Constructor *** //
 
@@ -206,17 +206,17 @@ public:
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
 	THX(CEX::Digest::IDigest *KdfEngine, size_t Rounds = ROUNDS20)
 		:
-		_destroyEngine(false),
-		_dfnRounds(Rounds),
-		_hkdfInfo(0),
-		_ikmSize(0),
-		_isDestroyed(false),
-		_isEncryption(false),
-		_isInitialized(false),
-		_kdfEngine(KdfEngine),
-		_legalKeySizes(LEGAL_KEYS, 0),
-		_legalRounds(9, 0),
-		_sprBox(SBOX_SIZE, 0)
+		m_destroyEngine(false),
+		m_dfnRounds(Rounds),
+		m_hkdfInfo(0),
+		m_ikmSize(0),
+		m_isDestroyed(false),
+		m_isEncryption(false),
+		m_isInitialized(false),
+		m_kdfEngine(KdfEngine),
+		m_legalKeySizes(LEGAL_KEYS, 0),
+		m_legalRounds(9, 0),
+		m_sprBox(SBOX_SIZE, 0)
 	{
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("THX:CTor", "Invalid null parameter! The digest instance can not be null.");
@@ -224,23 +224,23 @@ public:
 			throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
 
 		std::string info = "THX version 1 information string";
-		_hkdfInfo.reserve(info.size());
+		m_hkdfInfo.reserve(info.size());
 		for (size_t i = 0; i < info.size(); ++i)
-			_hkdfInfo.push_back(info[i]);
+			m_hkdfInfo.push_back(info[i]);
 
-		_legalRounds = { 16, 18, 20, 22, 24, 26, 28, 30, 32 };
-		_kdfEngineType = KdfEngine->Enumeral();
+		m_legalRounds = { 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+		m_kdfEngineType = KdfEngine->Enumeral();
 		// set the hmac key size
-		_ikmSize = _kdfEngine->DigestSize();
+		m_ikmSize = m_kdfEngine->DigestSize();
 
 		// add standard key lengths
-		_legalKeySizes[0] = 16;
-		_legalKeySizes[1] = 24;
-		_legalKeySizes[2] = 32;
-		_legalKeySizes[3] = 64;
+		m_legalKeySizes[0] = 16;
+		m_legalKeySizes[1] = 24;
+		m_legalKeySizes[2] = 32;
+		m_legalKeySizes[3] = 64;
 
-		for (size_t i = 4; i < _legalKeySizes.size(); i++)
-			_legalKeySizes[i] = (_legalKeySizes[3] + _ikmSize * (i - 3));
+		for (size_t i = 4; i < m_legalKeySizes.size(); i++)
+			m_legalKeySizes[i] = (m_legalKeySizes[3] + m_ikmSize * (i - 3));
 	}
 
 	/// <summary>
@@ -255,24 +255,24 @@ public:
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
 	THX(uint Rounds = ROUNDS16, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::None)
 		:
-		_destroyEngine(true),
-		_dfnRounds(Rounds),
-		_hkdfInfo(0),
-		_ikmSize(0),
-		_isDestroyed(false),
-		_isEncryption(false),
-		_isInitialized(false),
-		_kdfEngine(0),
-		_kdfEngineType(KdfEngineType),
-		_legalKeySizes(LEGAL_KEYS, 0),
-		_legalRounds(0, 0),
-		_sprBox(SBOX_SIZE, 0)
+		m_destroyEngine(true),
+		m_dfnRounds(Rounds),
+		m_hkdfInfo(0),
+		m_ikmSize(0),
+		m_isDestroyed(false),
+		m_isEncryption(false),
+		m_isInitialized(false),
+		m_kdfEngine(0),
+		m_kdfEngineType(KdfEngineType),
+		m_legalKeySizes(LEGAL_KEYS, 0),
+		m_legalRounds(0, 0),
+		m_sprBox(SBOX_SIZE, 0)
 	{
 		// add standard key lengths
-		_legalKeySizes[0] = 16;
-		_legalKeySizes[1] = 24;
-		_legalKeySizes[2] = 32;
-		_legalKeySizes[3] = 64;
+		m_legalKeySizes[0] = 16;
+		m_legalKeySizes[1] = 24;
+		m_legalKeySizes[2] = 32;
+		m_legalKeySizes[3] = 64;
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
@@ -280,24 +280,24 @@ public:
 				throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
 
 			std::string info = "THX version 1 information string";
-			_hkdfInfo.reserve(info.size());
+			m_hkdfInfo.reserve(info.size());
 			for (size_t i = 0; i < info.size(); ++i)
-				_hkdfInfo.push_back(info[i]);
+				m_hkdfInfo.push_back(info[i]);
 
-			_legalRounds.resize(9);
-			_legalRounds = { 16, 18, 20, 22, 24, 26, 28, 30, 32 };
+			m_legalRounds.resize(9);
+			m_legalRounds = { 16, 18, 20, 22, 24, 26, 28, 30, 32 };
 			// set the hmac key size
-			_ikmSize = GetIkmSize(KdfEngineType);
+			m_ikmSize = GetIkmSize(KdfEngineType);
 
 			// hkdf extended key sizes
-			for (size_t i = 4; i < _legalKeySizes.size(); ++i)
-				_legalKeySizes[i] = (_legalKeySizes[3] + _ikmSize * (i - 3));
+			for (size_t i = 4; i < m_legalKeySizes.size(); ++i)
+				m_legalKeySizes[i] = (m_legalKeySizes[3] + m_ikmSize * (i - 3));
 		}
 		else
 		{
-			_legalKeySizes.resize(4);
-			_legalRounds.resize(2);
-			_legalRounds = { 16, 20 };
+			m_legalKeySizes.resize(4);
+			m_legalRounds.resize(2);
+			m_legalRounds = { 16, 20 };
 		}
 	}
 
@@ -405,12 +405,12 @@ private:
 
 	inline uint Fe0(uint X)
 	{
-		return _sprBox[2 * (byte)X] ^ _sprBox[2 * (byte)(X >> 8) + 0x001] ^ _sprBox[2 * (byte)(X >> 16) + 0x200] ^ _sprBox[2 * (byte)(X >> 24) + 0x201];
+		return m_sprBox[2 * (byte)X] ^ m_sprBox[2 * (byte)(X >> 8) + 0x001] ^ m_sprBox[2 * (byte)(X >> 16) + 0x200] ^ m_sprBox[2 * (byte)(X >> 24) + 0x201];
 	}
 
 	inline uint Fe3(uint X)
 	{
-		return _sprBox[2 * (byte)(X >> 24)] ^ _sprBox[2 * (byte)X + 0x001] ^ _sprBox[2 * (byte)(X >> 8) + 0x200] ^ _sprBox[2 * (byte)(X >> 16) + 0x201];
+		return m_sprBox[2 * (byte)(X >> 24)] ^ m_sprBox[2 * (byte)X + 0x001] ^ m_sprBox[2 * (byte)(X >> 8) + 0x200] ^ m_sprBox[2 * (byte)(X >> 16) + 0x201];
 	}
 
 	inline uint LFSR1(uint X)

@@ -2,10 +2,10 @@
 
 void Threefish256::Clear()
 {
-	if (_expandedKey.size() > 0)
-		fill(_expandedKey.begin(), _expandedKey.end(), 0);
-	if (_expandedTweak.size() > 0)
-		fill(_expandedTweak.begin(), _expandedTweak.end(), 0);
+	if (m_expandedKey.size() > 0)
+		fill(m_expandedKey.begin(), m_expandedKey.end(), 0);
+	if (m_expandedTweak.size() > 0)
+		fill(m_expandedTweak.begin(), m_expandedTweak.end(), 0);
 }
 
 void Threefish256::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &Output)
@@ -15,14 +15,14 @@ void Threefish256::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &
 	ulong b1 = Input[1];
 	ulong b2 = Input[2];
 	ulong b3 = Input[3];
-	ulong k0 = _expandedKey[0];
-	ulong k1 = _expandedKey[1];
-	ulong k2 = _expandedKey[2];
-	ulong k3 = _expandedKey[3];
-	ulong k4 = _expandedKey[4];
-	ulong t0 = _expandedTweak[0];
-	ulong t1 = _expandedTweak[1];
-	ulong t2 = _expandedTweak[2];
+	ulong k0 = m_expandedKey[0];
+	ulong k1 = m_expandedKey[1];
+	ulong k2 = m_expandedKey[2];
+	ulong k3 = m_expandedKey[3];
+	ulong k4 = m_expandedKey[4];
+	ulong t0 = m_expandedTweak[0];
+	ulong t1 = m_expandedTweak[1];
+	ulong t2 = m_expandedTweak[2];
 
 	Mix(b0, b1, 14, k0, k1 + t0);
 	Mix(b2, b3, 16, k2 + t1, k3);
@@ -180,18 +180,18 @@ void Threefish256::SetKey(const std::vector<ulong> &Key)
 	size_t i;
 	ulong parity = KeyScheduleConst;
 
-	for (i = 0; i < _expandedKey.size() - 1; i++)
+	for (i = 0; i < m_expandedKey.size() - 1; i++)
 	{
-		_expandedKey[i] = Key[i];
+		m_expandedKey[i] = Key[i];
 		parity ^= Key[i];
 	}
 
-	_expandedKey[i] = parity;
+	m_expandedKey[i] = parity;
 }
 
 void Threefish256::SetTweak(const std::vector<ulong> &Tweak)
 {
-	_expandedTweak[0] = Tweak[0];
-	_expandedTweak[1] = Tweak[1];
-	_expandedTweak[2] = Tweak[0] ^ Tweak[1];
+	m_expandedTweak[0] = Tweak[0];
+	m_expandedTweak[1] = Tweak[1];
+	m_expandedTweak[2] = Tweak[0] ^ Tweak[1];
 }

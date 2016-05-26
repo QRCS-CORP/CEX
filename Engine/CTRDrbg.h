@@ -77,17 +77,17 @@ private:
 	static constexpr size_t MAXALLOC_MB100 = 100000000;
 	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
-	CEX::Cipher::Symmetric::Block::IBlockCipher* _blockCipher;
-	size_t _blockSize;
-	std::vector<byte> _ctrVector;
-	bool _isDestroyed;
-	bool _isEncryption;
-	bool _isInitialized;
-	size_t _keySize;
-	bool _isParallel;
-	size_t _parallelBlockSize;
-	size_t _processorCount;
-	std::vector<std::vector<byte>> _threadVectors;
+	CEX::Cipher::Symmetric::Block::IBlockCipher* m_blockCipher;
+	size_t m_blockSize;
+	std::vector<byte> m_ctrVector;
+	bool m_isDestroyed;
+	bool m_isEncryption;
+	bool m_isInitialized;
+	size_t m_keySize;
+	bool m_isParallel;
+	size_t m_parallelBlockSize;
+	size_t m_processorCount;
+	std::vector<std::vector<byte>> m_threadVectors;
 
 public:
 
@@ -101,23 +101,23 @@ public:
 	/// <summary>
 	/// Get: Generator is ready to produce data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	bool &IsParallel() { return _isParallel; }
+	bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	const std::vector<byte> IV() { return _ctrVector; }
+	const std::vector<byte> IV() { return m_ctrVector; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual size_t KeySize() { return _keySize; }
+	virtual size_t KeySize() { return m_keySize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -127,7 +127,7 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	size_t &ParallelBlockSize() { return _parallelBlockSize; }
+	size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -137,12 +137,12 @@ public:
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	const size_t ParallelMinimumSize() { return _processorCount * _blockSize; }
+	const size_t ParallelMinimumSize() { return m_processorCount * m_blockSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	const size_t ProcessorCount() { return _processorCount; }
+	const size_t ProcessorCount() { return m_processorCount; }
 
 	// *** Constructor *** //
 
@@ -156,30 +156,30 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null cipher is used</exception>
 	CTRDrbg(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, const size_t KeySize = 0)
 		:
-		_blockCipher(Cipher),
-		_blockSize(Cipher->BlockSize()),
-		_ctrVector(Cipher->BlockSize()),
-		_isDestroyed(false),
-		_isEncryption(false),
-		_isInitialized(false),
-		_isParallel(false),
-		_parallelBlockSize(PARALLEL_DEFBLOCK),
-		_processorCount(0)
+		m_blockCipher(Cipher),
+		m_blockSize(Cipher->BlockSize()),
+		m_ctrVector(Cipher->BlockSize()),
+		m_isDestroyed(false),
+		m_isEncryption(false),
+		m_isInitialized(false),
+		m_isParallel(false),
+		m_parallelBlockSize(PARALLEL_DEFBLOCK),
+		m_processorCount(0)
 	{
-		if (_blockCipher == 0)
+		if (m_blockCipher == 0)
 			throw CryptoGeneratorException("CTRDrbg:CTor", "The Cipher can not be null!");
 
 		// default the 256 bit key size
 		if (KeySize == 0)
 		{
-			_keySize = 32;
+			m_keySize = 32;
 		}
 		else
 		{
 			if (!IsValidKeySize(KeySize))
 				throw CryptoGeneratorException("CTRDrbg:CTor", "The key size must be a ciphers legal key size!");
 			else
-				_keySize = KeySize;
+				m_keySize = KeySize;
 		}
 
 		SetScope();

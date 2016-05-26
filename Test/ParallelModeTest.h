@@ -21,14 +21,14 @@ namespace Test
 		const unsigned int MAX_ALLOC = 4096;
 		const unsigned int DEF_BLOCK = 64000;
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _cipherText;
-		std::vector<byte> _decText;
-		std::vector<byte> _iv;
-		std::vector<byte> _key;
-		std::vector<byte> _plnText;
-		unsigned int _parallelBlockSize;
-		unsigned int _processorCount;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_cipherText;
+		std::vector<byte> m_decText;
+		std::vector<byte> m_iv;
+		std::vector<byte> m_key;
+		std::vector<byte> m_plnText;
+		unsigned int m_parallelBlockSize;
+		unsigned int m_processorCount;
 
     public:
 		/// <summary>
@@ -39,20 +39,20 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <remarks>
 		/// Compares Output between linear and parallel Cipher Modes
 		/// </remarks>
 		ParallelModeTest() 
 			:
-			_cipherText(MAX_ALLOC),
-			_decText(MAX_ALLOC),
-			_iv(16),
-			_key(32),
-			_parallelBlockSize(DEF_BLOCK),
-			_plnText(MAX_ALLOC),
-			_processorCount(1)
+			m_cipherText(MAX_ALLOC),
+			m_decText(MAX_ALLOC),
+			m_iv(16),
+			m_key(32),
+			m_parallelBlockSize(DEF_BLOCK),
+			m_plnText(MAX_ALLOC),
+			m_processorCount(1)
 		{
 
 		}

@@ -8,9 +8,9 @@ namespace Test
 		try
 		{
 			Initialize();
-			CompareVector(_key, _iv, _expected);
+			CompareVector(m_key, m_iv, m_expected);
 			OnProgress("Passed VMAC vector tests..");
-			CompareAccess(_key, _iv);
+			CompareAccess(m_key, m_iv);
 			OnProgress("Passed DoFinal/ComputeHash methods output comparison..");
 
 			return SUCCESS;
@@ -31,11 +31,11 @@ namespace Test
 		CEX::Mac::VMAC mac;
 
 		mac.Initialize(Key, Iv);
-		mac.BlockUpdate(_input, 0, _input.size());
+		mac.BlockUpdate(m_input, 0, m_input.size());
 		mac.DoFinal(hash1, 0);
 
 		std::vector<byte> hash2(20);
-		mac.ComputeMac(_input, hash2);
+		mac.ComputeMac(m_input, hash2);
 
 		if (hash1 != hash2)
 			throw std::string("VMACTest: hash is not equal!");
@@ -47,7 +47,7 @@ namespace Test
 		CEX::Mac::VMAC mac;
 
 		mac.Initialize(Key, Iv);
-		mac.BlockUpdate(_input, 0, _input.size());
+		mac.BlockUpdate(m_input, 0, m_input.size());
 		mac.DoFinal(hash, 0);
 
 		if (Expected != hash)
@@ -56,16 +56,16 @@ namespace Test
 
 	void VMACTest::Initialize()
 	{
-		HexConverter::Decode("9BDA16E2AD0E284774A3ACBC8835A8326C11FAAD", _expected);
-		HexConverter::Decode("4B5C2F003E67F39557A8D26F3DA2B155", _iv);
-		HexConverter::Decode("9661410AB797D8A9EB767C21172DF6C7", _key);
+		HexConverter::Decode("9BDA16E2AD0E284774A3ACBC8835A8326C11FAAD", m_expected);
+		HexConverter::Decode("4B5C2F003E67F39557A8D26F3DA2B155", m_iv);
+		HexConverter::Decode("9661410AB797D8A9EB767C21172DF6C7", m_key);
 
-		for (unsigned int i = 0; i < _input.size(); i++)
-			_input[i] = (byte)i;
+		for (unsigned int i = 0; i < m_input.size(); i++)
+			m_input[i] = (byte)i;
 	}
 
 	void VMACTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

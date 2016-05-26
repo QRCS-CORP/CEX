@@ -9,7 +9,7 @@ namespace Test
 		try
 		{
 			Initialize();
-			CompareVector(_output);
+			CompareVector(m_output);
 			OnProgress("CTRDrbg: Passed vector comparison tests..");
 
 			return SUCCESS;
@@ -48,11 +48,11 @@ namespace Test
 
 	void CTRDrbgTest::Initialize()
 	{
-		HexConverter::Decode("b621dbd634714c11d9e72953d580474b37780e36b74edbd5c4b3a506e5a41018", _output);
+		HexConverter::Decode("b621dbd634714c11d9e72953d580474b37780e36b74edbd5c4b3a506e5a41018", m_output);
 	}
 
 	void CTRDrbgTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

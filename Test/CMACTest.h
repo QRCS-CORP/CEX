@@ -17,10 +17,10 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All CMAC tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<std::vector<byte>> _expected;
-		std::vector<std::vector<byte>> _input;
-		std::vector<std::vector<byte>> _keys;
+		TestEventHandler m_progressEvent;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<byte>> m_input;
+		std::vector<std::vector<byte>> m_keys;
 
 	public:
 		/// <summary>
@@ -31,7 +31,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer CMAC vectors for equality

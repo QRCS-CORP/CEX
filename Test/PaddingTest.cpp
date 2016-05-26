@@ -71,6 +71,6 @@ namespace Test
 
 	void PaddingTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

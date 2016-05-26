@@ -75,17 +75,17 @@ class CTRPrng : public IRandom
 private:
 	static constexpr size_t BUFFER_SIZE = 4096;
 
-	std::vector<byte>  _byteBuffer;
-	size_t _bufferIndex;
-	size_t _bufferSize = 0;
-	size_t _keySize = 0;
-	bool _isDestroyed;
-	CEX::Enumeration::BlockCiphers _engineType;
-	CEX::Cipher::Symmetric::Block::IBlockCipher* _rngEngine;
-	CEX::Generator::CTRDrbg* _rngGenerator;
-	CEX::Seed::ISeed* _seedGenerator;
-	CEX::Enumeration::SeedGenerators _seedType;
-	std::vector<byte>  _stateSeed;
+	std::vector<byte> m_byteBuffer;
+	size_t m_bufferIndex;
+	size_t m_bufferSize = 0;
+	size_t m_keySize = 0;
+	bool m_isDestroyed;
+	CEX::Enumeration::BlockCiphers m_engineType;
+	CEX::Cipher::Symmetric::Block::IBlockCipher* m_rngEngine;
+	CEX::Generator::CTRDrbg* m_rngGenerator;
+	CEX::Seed::ISeed* m_seedGenerator;
+	CEX::Enumeration::SeedGenerators m_seedType;
+	std::vector<byte>  m_stateSeed;
 
 public:
 
@@ -115,20 +115,20 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
 	CTRPrng(CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 0)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_engineType(BlockEngine),
-		_isDestroyed(false),
-		_seedType(SeedEngine)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_engineType(BlockEngine),
+		m_isDestroyed(false),
+		m_seedType(SeedEngine)
 	{
 		if (BufferSize < 64)
 			throw CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!");
 
 		if (KeySize > 0)
-			_keySize = KeySize;
+			m_keySize = KeySize;
 		else
-			_keySize = GetKeySize(BlockEngine);
+			m_keySize = GetKeySize(BlockEngine);
 
 		Reset();
 	}
@@ -144,12 +144,12 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or too small</exception>
 	CTRPrng(std::vector<byte> &Seed, CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, size_t BufferSize = 4096)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_engineType(BlockEngine),
-		_isDestroyed(false),
-		_stateSeed(Seed)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_engineType(BlockEngine),
+		m_isDestroyed(false),
+		m_stateSeed(Seed)
 	{
 		if (BufferSize < 64)
 			throw CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!");
@@ -158,7 +158,7 @@ public:
 		if (GetKeySize(BlockEngine) < Seed.size())
 			throw CryptoRandomException("CTRPrng:Ctor", "The state seed is too small! must be at least the size of the cipher key/iv");
 
-		_keySize = GetKeySize(BlockEngine);
+		m_keySize = GetKeySize(BlockEngine);
 
 		Reset();
 	}

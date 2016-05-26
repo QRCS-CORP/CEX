@@ -21,9 +21,9 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All XSPRsg tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<std::vector<byte>> _expected;
-		std::vector<std::vector<uint64_t>> _input;
+		TestEventHandler m_progressEvent;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<uint64_t>> m_input;
 
 	public:
 		/// <summary>
@@ -34,14 +34,14 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer XSPRsg vectors for equality
 		/// </summary>
 		XSPRsgTest()
 			:
-			_input(4, std::vector<uint64_t>(4))
+			m_input(4, std::vector<uint64_t>(4))
 		{
 
 		}

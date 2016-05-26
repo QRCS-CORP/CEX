@@ -14,21 +14,21 @@ void Skein256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size
 	while (bytesDone < Length && InOffset < Input.size())
 	{
 		// do a transform if the input buffer is filled
-		if (_bytesFilled == STATE_BYTES)
+		if (m_bytesFilled == STATE_BYTES)
 		{
 			// moves the byte input buffer to the UInt64 cipher input
 			for (int i = 0; i < STATE_WORDS; i++)
-				_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(_inputBuffer, i * 8);
+				m_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(m_inputBuffer, i * 8);
 
 			// process the block
 			ProcessBlock(STATE_BYTES);
 			// clear first flag, which will be set by Initialize() if this is the first transform
-			_ubiParameters.SetIsFirstBlock(false);
+			m_ubiParameters.SetIsFirstBlock(false);
 			// reset buffer fill count
-			_bytesFilled = 0;
+			m_bytesFilled = 0;
 		}
 
-		_inputBuffer[_bytesFilled++] = Input[InOffset++];
+		m_inputBuffer[m_bytesFilled++] = Input[InOffset++];
 		bytesDone++;
 	}
 }
@@ -43,18 +43,18 @@ void Skein256::ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Ou
 
 void Skein256::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isDestroyed = true;
-		_bytesFilled = 0;
-		_blockCipher.Clear();
-		_ubiParameters.Clear();
+		m_isDestroyed = true;
+		m_bytesFilled = 0;
+		m_blockCipher.Clear();
+		m_ubiParameters.Clear();
 
-		CEX::Utility::IntUtils::ClearVector(_cipherInput);
-		CEX::Utility::IntUtils::ClearVector(_configString);
-		CEX::Utility::IntUtils::ClearVector(_configValue);
-		CEX::Utility::IntUtils::ClearVector(_digestState);
-		CEX::Utility::IntUtils::ClearVector(_inputBuffer);
+		CEX::Utility::IntUtils::ClearVector(m_cipherInput);
+		CEX::Utility::IntUtils::ClearVector(m_configString);
+		CEX::Utility::IntUtils::ClearVector(m_configValue);
+		CEX::Utility::IntUtils::ClearVector(m_digestState);
+		CEX::Utility::IntUtils::ClearVector(m_inputBuffer);
 	}
 }
 
@@ -64,29 +64,29 @@ size_t Skein256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 		throw CryptoDigestException("Skein256:DoFinal", "The Output buffer is too short!");
 
 	// pad left over space in input buffer with zeros
-	for (size_t i = _bytesFilled; i < _inputBuffer.size(); i++)
-		_inputBuffer[i] = 0;
+	for (size_t i = m_bytesFilled; i < m_inputBuffer.size(); i++)
+		m_inputBuffer[i] = 0;
 	// copy to cipher input buffer
 	for (size_t i = 0; i < STATE_WORDS; i++)
-		_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(_inputBuffer, i * 8);
+		m_cipherInput[i] = CEX::Utility::IntUtils::BytesToLe64(m_inputBuffer, i * 8);
 
 	// process final message block
-	_ubiParameters.SetIsFinalBlock(true);
-	ProcessBlock((uint)_bytesFilled);
+	m_ubiParameters.SetIsFinalBlock(true);
+	ProcessBlock((uint)m_bytesFilled);
 	// clear cipher input
-	std::fill(_cipherInput.begin(), _cipherInput.end(), 0);
+	std::fill(m_cipherInput.begin(), m_cipherInput.end(), 0);
 	// do output block counter mode output 
 	std::vector<byte> hash(STATE_OUTPUT, 0);
 	std::vector<ulong> oldState(STATE_WORDS);
 
 	// save old state
-	for (size_t j = 0; j < _digestState.size(); j++)
-		oldState[j] = _digestState[j];
+	for (size_t j = 0; j < m_digestState.size(); j++)
+		oldState[j] = m_digestState[j];
 
 	for (size_t i = 0; i < STATE_OUTPUT; i += STATE_BYTES)
 	{
-		_ubiParameters.StartNewBlockType((UbiType)Out);
-		_ubiParameters.SetIsFinalBlock(true);
+		m_ubiParameters.StartNewBlockType((UbiType)Out);
+		m_ubiParameters.SetIsFinalBlock(true);
 		ProcessBlock(8);
 
 		// output a chunk of the hash
@@ -94,13 +94,13 @@ size_t Skein256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 		if (outputSize > STATE_BYTES)
 			outputSize = STATE_BYTES;
 
-		PutBytes(_digestState, hash, i, outputSize);
+		PutBytes(m_digestState, hash, i, outputSize);
 		// restore old state
-		for (size_t j = 0; j < _digestState.size(); j++)
-			_digestState[j] = oldState[j];
+		for (size_t j = 0; j < m_digestState.size(); j++)
+			m_digestState[j] = oldState[j];
 
 		// Increment counter
-		_cipherInput[0]++;
+		m_cipherInput[0]++;
 	}
 
 	memcpy(&Output[OutOffset], &hash[0], hash.size());
@@ -120,16 +120,16 @@ void Skein256::GenerateConfiguration(std::vector<ulong> InitialState)
 
 	cipher.SetKey(InitialState);
 	cipher.SetTweak(tweak.GetTweak());
-	cipher.Encrypt(_configString, _configValue);
+	cipher.Encrypt(m_configString, m_configValue);
 
-	_configValue[0] ^= _configString[0];
-	_configValue[1] ^= _configString[1];
-	_configValue[2] ^= _configString[2];
+	m_configValue[0] ^= m_configString[0];
+	m_configValue[1] ^= m_configString[1];
+	m_configValue[2] ^= m_configString[2];
 }
 
 void Skein256::Initialize(SkeinInitializationType InitializationType)
 {
-	_initializationType = InitializationType;
+	m_initializationType = InitializationType;
 
 	switch (InitializationType)
 	{
@@ -142,14 +142,14 @@ void Skein256::Initialize(SkeinInitializationType InitializationType)
 		case SkeinInitializationType::ZeroedState:
 		{
 			// copy the configuration value to the state
-			for (size_t i = 0; i < _digestState.size(); i++)
-				_digestState[i] = 0;
+			for (size_t i = 0; i < m_digestState.size(); i++)
+				m_digestState[i] = 0;
 			break;
 		}
 		case SkeinInitializationType::ChainedConfig:
 		{
 			// generate a chained configuration
-			GenerateConfiguration(_digestState);
+			GenerateConfiguration(m_digestState);
 			// continue initialization
 			Initialize();
 			return;
@@ -159,7 +159,7 @@ void Skein256::Initialize(SkeinInitializationType InitializationType)
 	}
 
 	// reset bytes filled
-	_bytesFilled = 0;
+	m_bytesFilled = 0;
 }
 
 void Skein256::Reset()
@@ -172,8 +172,8 @@ void Skein256::SetMaxTreeHeight(const byte Height)
 	if (Height == 1)
 		throw CryptoDigestException("Skein256:SetMaxTreeHeight", "Tree height must be zero or greater than 1.");
 
-	_configString[2] &= ~((ulong)0xff << 16);
-	_configString[2] |= (ulong)Height << 16;
+	m_configString[2] &= ~((ulong)0xff << 16);
+	m_configString[2] |= (ulong)Height << 16;
 }
 
 void Skein256::SetSchema(const std::vector<byte> &Schema)
@@ -181,7 +181,7 @@ void Skein256::SetSchema(const std::vector<byte> &Schema)
 	if (Schema.size() != 4)
 		throw CryptoDigestException("Skein256:SetSchema", "Schema must be 4 bytes.");
 
-	ulong n = _configString[0];
+	ulong n = m_configString[0];
 
 	// clear the schema bytes
 	n &= ~(ulong)0xfffffffful;
@@ -191,19 +191,19 @@ void Skein256::SetSchema(const std::vector<byte> &Schema)
 	n |= (ulong)Schema[1] << 8;
 	n |= (ulong)Schema[0];
 
-	_configString[0] = n;
+	m_configString[0] = n;
 }
 
 void Skein256::SetTreeFanOutSize(const byte Size)
 {
-	_configString[2] &= ~((ulong)0xff << 8);
-	_configString[2] |= (ulong)Size << 8;
+	m_configString[2] &= ~((ulong)0xff << 8);
+	m_configString[2] |= (ulong)Size << 8;
 }
 
 void Skein256::SetTreeLeafSize(const byte Size)
 {
-	_configString[2] &= ~(ulong)0xff;
-	_configString[2] |= (ulong)Size;
+	m_configString[2] &= ~(ulong)0xff;
+	m_configString[2] |= (ulong)Size;
 }
 
 void Skein256::SetVersion(const uint Version)
@@ -211,8 +211,8 @@ void Skein256::SetVersion(const uint Version)
 	if (Version > 3)
 		throw CryptoDigestException("Skein256:SetVersion", "Version must be between 0 and 3, inclusive.");
 
-	_configString[0] &= ~((ulong)0x03 << 32);
-	_configString[0] |= (ulong)Version << 32;
+	m_configString[0] &= ~((ulong)0x03 << 32);
+	m_configString[0] |= (ulong)Version << 32;
 }
 
 void Skein256::Update(byte Input)
@@ -235,39 +235,39 @@ void Skein256::GenerateConfiguration()
 	tweak.SetBitsProcessed(32);
 
 	cipher.SetTweak(tweak.GetTweak());
-	cipher.Encrypt(_configString, _configValue);
+	cipher.Encrypt(m_configString, m_configValue);
 
-	_configValue[0] ^= _configString[0];
-	_configValue[1] ^= _configString[1];
-	_configValue[2] ^= _configString[2];
+	m_configValue[0] ^= m_configString[0];
+	m_configValue[1] ^= m_configString[1];
+	m_configValue[2] ^= m_configString[2];
 }
 
 void Skein256::Initialize()
 {
 	// copy the configuration value to the state
-	for (size_t i = 0; i < _digestState.size(); i++)
-		_digestState[i] = _configValue[i];
+	for (size_t i = 0; i < m_digestState.size(); i++)
+		m_digestState[i] = m_configValue[i];
 
 	// set up tweak for message block
-	_ubiParameters.StartNewBlockType((UbiType)Message);
+	m_ubiParameters.StartNewBlockType((UbiType)Message);
 	// reset bytes filled
-	_bytesFilled = 0;
+	m_bytesFilled = 0;
 }
 
 void Skein256::ProcessBlock(uint Value)
 {
 	// set the key to the current state
-	_blockCipher.SetKey(_digestState);
+	m_blockCipher.SetKey(m_digestState);
 	// update tweak
-	ulong bits = _ubiParameters.GetBitsProcessed() + Value;
-	_ubiParameters.SetBitsProcessed(bits);
-	_blockCipher.SetTweak(_ubiParameters.GetTweak());
+	ulong bits = m_ubiParameters.GetBitsProcessed() + Value;
+	m_ubiParameters.SetBitsProcessed(bits);
+	m_blockCipher.SetTweak(m_ubiParameters.GetTweak());
 	// encrypt block
-	_blockCipher.Encrypt(_cipherInput, _digestState);
+	m_blockCipher.Encrypt(m_cipherInput, m_digestState);
 
 	// feed-forward input with state
-	for (size_t i = 0; i < _cipherInput.size(); i++)
-		_digestState[i] ^= _cipherInput[i];
+	for (size_t i = 0; i < m_cipherInput.size(); i++)
+		m_digestState[i] ^= m_cipherInput[i];
 }
 
 void Skein256::PutBytes(std::vector<ulong> Input, std::vector<byte> &Output, size_t Offset, size_t ByteCount)

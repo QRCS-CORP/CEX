@@ -17,8 +17,8 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All ISCRsg tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<uint> _expected;
+		TestEventHandler m_progressEvent;
+		std::vector<uint> m_expected;
 
 	public:
 		/// <summary>
@@ -29,7 +29,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer ISCRsg vectors for equality

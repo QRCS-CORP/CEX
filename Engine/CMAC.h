@@ -76,17 +76,17 @@ private:
 	static constexpr byte CT87 = (byte)0x87;
 	static constexpr byte CT1B = (byte)0x1b;
 
-	size_t _blockSize;
-	CEX::Common::KeyParams _cipherKey;
-	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* _cipherMode;
-	bool _isDestroyed;
-	bool _isInitialized;
-	std::vector<byte>_K1; 
-	std::vector<byte>_K2;
-	size_t _macSize;
-	std::vector<byte> _msgCode;
-	std::vector<byte> _wrkBuffer;
-	size_t _wrkOffset;
+	size_t m_blockSize;
+	CEX::Common::KeyParams m_cipherKey;
+	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* m_cipherMode;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	std::vector<byte> K1; 
+	std::vector<byte> K2;
+	size_t m_macSize;
+	std::vector<byte> m_msgCode;
+	std::vector<byte> m_wrkBuffer;
+	size_t m_wrkOffset;
 
 public:
 
@@ -95,7 +95,7 @@ public:
 	/// <summary>
 	/// Get: The Macs internal blocksize in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return _blockSize; }
+	virtual const size_t BlockSize() { return m_blockSize; }
 
 	/// <summary>
 	/// Get: The macs type name
@@ -105,12 +105,12 @@ public:
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const size_t MacSize() { return _macSize; }
+	virtual const size_t MacSize() { return m_macSize; }
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: Algorithm name
@@ -126,25 +126,25 @@ public:
 	/// <exception cref="CryptoMacException">Thrown if an invalid block size is used</exception>
 	CMAC(CEX::Enumeration::BlockCiphers EngineType)
 		:
-		_blockSize(0),
-		_cipherKey(),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_macSize(0),
-		_msgCode(0),
-		_wrkBuffer(0),
-		_wrkOffset(0)
+		m_blockSize(0),
+		m_cipherKey(),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_macSize(0),
+		m_msgCode(0),
+		m_wrkBuffer(0),
+		m_wrkOffset(0)
 	{
 		CreateCipher(EngineType);
-		if (_cipherMode == 0)
+		if (m_cipherMode == 0)
 			throw CryptoMacException("CMAC:Ctor", "Could not create the cipher!");
-		if (_cipherMode->BlockSize() != 16 && _cipherMode->BlockSize() != 32)
+		if (m_cipherMode->BlockSize() != 16 && m_cipherMode->BlockSize() != 32)
 			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
 
-		_blockSize = _cipherMode->BlockSize();
-		_macSize = _cipherMode->BlockSize();
-		_msgCode.resize(_cipherMode->BlockSize());
-		_wrkBuffer.resize(_cipherMode->BlockSize());
+		m_blockSize = m_cipherMode->BlockSize();
+		m_macSize = m_cipherMode->BlockSize();
+		m_msgCode.resize(m_cipherMode->BlockSize());
+		m_wrkBuffer.resize(m_cipherMode->BlockSize());
 	}
 
 	/// <summary>
@@ -156,14 +156,14 @@ public:
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
 	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher)
 		:
-		_blockSize(Cipher->BlockSize()),
-		_cipherKey(),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_macSize(Cipher->BlockSize()),
-		_msgCode(Cipher->BlockSize()),
-		_wrkBuffer(Cipher->BlockSize()),
-		_wrkOffset(0)
+		m_blockSize(Cipher->BlockSize()),
+		m_cipherKey(),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_macSize(Cipher->BlockSize()),
+		m_msgCode(Cipher->BlockSize()),
+		m_wrkBuffer(Cipher->BlockSize()),
+		m_wrkOffset(0)
 	{
 		if (Cipher == 0)
 			throw CryptoMacException("CMAC:Ctor", "Cipher can not be null!");

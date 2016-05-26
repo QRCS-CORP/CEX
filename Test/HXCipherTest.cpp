@@ -40,7 +40,7 @@ namespace Test
 			("497bef5ccb4faee957b7946705c3dc10"),	// hkdf extended 22 rounds 
 			("7380a2ca37d034a34d0af97eb46caede")	// standard 512 key, 22 rounds
 		};
-		HexConverter::Decode(rhxEncoded, 3, _rhxExpected);
+		HexConverter::Decode(rhxEncoded, 3, m_rhxExpected);
 
 		const char* shxEncoded[3] =
 		{
@@ -48,7 +48,7 @@ namespace Test
 			("9dcd48706592211eb48d659b9df8824f"),	// hkdf extended 40 rounds
 			("9c41b8c6fba7154b95afc7c8a5449687")	// standard 512 key, 40 rounds
 		};
-		HexConverter::Decode(shxEncoded, 3, _shxExpected);
+		HexConverter::Decode(shxEncoded, 3, m_shxExpected);
 
 		const char* thxEncoded[3] =
 		{
@@ -56,19 +56,19 @@ namespace Test
 			("e0ec1b5807ed879a88a18244237e8bad"),	// hkdf extended 20 rounds
 			("32626075c43a30a56aa4cc5ddbf58179")	// standard 512 key, 20 rounds
 		};
-		HexConverter::Decode(thxEncoded, 3, _thxExpected);
+		HexConverter::Decode(thxEncoded, 3, m_thxExpected);
 
-		for (unsigned int i = 0; i < _key.size(); i++)
-			_key[i] = (byte)i;
-		for (unsigned int i = 0; i < _key2.size(); i++)
-			_key2[i] = (byte)i;
-		for (unsigned int i = 0; i < _iv.size(); i++)
-			_iv[i] = (byte)i;
+		for (unsigned int i = 0; i < m_key.size(); i++)
+			m_key[i] = (byte)i;
+		for (unsigned int i = 0; i < m_key2.size(); i++)
+			m_key2[i] = (byte)i;
+		for (unsigned int i = 0; i < m_iv.size(); i++)
+			m_iv[i] = (byte)i;
 	}
 
 	void HXCipherTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 
 	void HXCipherTest::RHXMonteCarlo()
@@ -82,7 +82,7 @@ namespace Test
 			CEX::Digest::SHA512 digest;
 			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(&digest, 14, 16);
 			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(_key, _iv);
+			CEX::Common::KeyParams k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -90,7 +90,7 @@ namespace Test
 				cipher.Transform(inpBytes, outBytes);
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
-			if (outBytes != _rhxExpected[0])
+			if (outBytes != m_rhxExpected[0])
 				throw std::string("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
@@ -110,7 +110,7 @@ namespace Test
 			CEX::Digest::SHA512 digest;
 			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(&digest, 22, 16);
 			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(_key, _iv);
+			CEX::Common::KeyParams k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -119,7 +119,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _rhxExpected[1])
+			if (outBytes != m_rhxExpected[1])
 				throw std::string("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
@@ -139,7 +139,7 @@ namespace Test
 		{
 			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(16, 22);
 			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(_key2, _iv);
+			CEX::Common::KeyParams k(m_key2, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -148,7 +148,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _rhxExpected[2])
+			if (outBytes != m_rhxExpected[2])
 				throw std::string("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
@@ -176,7 +176,7 @@ namespace Test
 			CEX::Digest::SHA512 digest;
 			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(&digest, 32);
 			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(_key, _iv);
+			CEX::Common::KeyParams k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -185,7 +185,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _shxExpected[0])
+			if (outBytes != m_shxExpected[0])
 				throw std::string("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
@@ -205,7 +205,7 @@ namespace Test
 			CEX::Digest::SHA512 digest;
 			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(&digest, 40);
 			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(_key, _iv);
+			CEX::Common::KeyParams k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -214,7 +214,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _shxExpected[1])
+			if (outBytes != m_shxExpected[1])
 				throw std::string("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
@@ -233,7 +233,7 @@ namespace Test
 		{
 			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(40);
 			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(_key2, _iv);
+			CEX::Common::KeyParams k(m_key2, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -242,7 +242,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _shxExpected[2])
+			if (outBytes != m_shxExpected[2])
 				throw std::string("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
@@ -270,7 +270,7 @@ namespace Test
 			CEX::Digest::SHA512 digest;
 			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(&digest, 16);
 			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(_key, _iv);
+			CEX::Common::KeyParams k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -279,7 +279,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _thxExpected[0])
+			if (outBytes != m_thxExpected[0])
 				throw std::string("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
@@ -299,7 +299,7 @@ namespace Test
 			CEX::Digest::SHA512 digest;
 			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(&digest, 20);
 			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(_key, _iv);
+			CEX::Common::KeyParams k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -308,7 +308,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _thxExpected[1])
+			if (outBytes != m_thxExpected[1])
 				throw std::string("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
@@ -327,7 +327,7 @@ namespace Test
 		{
 			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(20);
 			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(_key2, _iv);
+			CEX::Common::KeyParams k(m_key2, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -336,7 +336,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], 16);
 			}
 
-			if (outBytes != _thxExpected[2])
+			if (outBytes != m_thxExpected[2])
 				throw std::string("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);

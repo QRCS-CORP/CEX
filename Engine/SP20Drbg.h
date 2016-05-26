@@ -82,18 +82,18 @@ private:
 	static constexpr size_t STATE_SIZE = 16;
 	static constexpr size_t VECTOR_SIZE = 8;
 
-	std::vector<uint> _ctrVector;
-	std::vector<byte> _dstCode;
-	bool _isDestroyed;
-	bool _isInitialized;
-	bool _isParallel;
-	std::vector<size_t> _legalKeySizes;
-	std::vector<size_t> _legalRounds;
-	size_t _parallelBlockSize;
-	size_t _processorCount;
-	size_t _rndCount;
-	std::vector<std::vector<uint>> _threadVectors;
-	std::vector<uint> _wrkState;
+	std::vector<uint> m_ctrVector;
+	std::vector<byte> m_dstCode;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	bool m_isParallel;
+	std::vector<size_t> m_legalKeySizes;
+	std::vector<size_t> m_legalRounds;
+	size_t m_parallelBlockSize;
+	size_t m_processorCount;
+	size_t m_rndCount;
+	std::vector<std::vector<uint>> m_threadVectors;
+	std::vector<uint> m_wrkState;
 
 public:
 
@@ -107,17 +107,17 @@ public:
 	/// <summary>
 	/// Get: Generator is ready to produce data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
 	/// </summary>
-	bool &IsParallel() { return _isParallel; }
+	bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	const std::vector<uint> IV() { return _ctrVector; }
+	const std::vector<uint> IV() { return m_ctrVector; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
@@ -128,12 +128,12 @@ public:
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	const std::vector<size_t>&LegalKeySizes() { return _legalKeySizes; };
+	const std::vector<size_t>&LegalKeySizes() { return m_legalKeySizes; };
 
 	/// <summary>
 	/// Get: Available diffusion round assignments
 	/// </summary>
-	const std::vector<size_t> &LegalRounds() { return _legalRounds; }
+	const std::vector<size_t> &LegalRounds() { return m_legalRounds; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -143,7 +143,7 @@ public:
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	size_t &ParallelBlockSize() { return _parallelBlockSize; }
+	size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -153,12 +153,12 @@ public:
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	const size_t ParallelMinimumSize() { return _processorCount * (STATE_SIZE * 4); }
+	const size_t ParallelMinimumSize() { return m_processorCount * (STATE_SIZE * 4); }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	const size_t ProcessorCount() { return _processorCount; }
+	const size_t ProcessorCount() { return m_processorCount; }
 
 	/// <summary>
 	/// Get: Initialization vector size
@@ -174,20 +174,20 @@ public:
 	/// <param name="Rounds">The number of transformation rounds</param>
 	explicit SP20Drbg(size_t Rounds = 20)
 		:
-		_ctrVector(2, 0),
-		_dstCode(0),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_isParallel(false),
-		_legalKeySizes(2),
-		_legalRounds(12),
-		_parallelBlockSize(PARALLEL_DEFBLOCK),
-		_processorCount(0),
-		_rndCount(Rounds),
-		_wrkState(14, 0)
+		m_ctrVector(2, 0),
+		m_dstCode(0),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_isParallel(false),
+		m_legalKeySizes(2),
+		m_legalRounds(12),
+		m_parallelBlockSize(PARALLEL_DEFBLOCK),
+		m_processorCount(0),
+		m_rndCount(Rounds),
+		m_wrkState(14, 0)
 	{
-		_legalKeySizes = { 16, 32 };
-		_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
+		m_legalKeySizes = { 16, 32 };
+		m_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
 		SetScope();
 	}
 

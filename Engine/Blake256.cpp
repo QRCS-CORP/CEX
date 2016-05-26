@@ -3,7 +3,7 @@
 
 NAMESPACE_DIGEST
 
-static constexpr uint _C32[] =
+static constexpr uint m_C32[] =
 {
 	0x243F6A88U, 0x85A308D3U, 0x13198A2EU, 0x03707344U,
 	0xA4093822U, 0x299F31D0U, 0x082EFA98U, 0xEC4E6C89U,
@@ -11,7 +11,7 @@ static constexpr uint _C32[] =
 	0xC0AC29B7U, 0xC97C50DDU, 0x3F84D5B5U, 0xB5470917U
 };
 
-static constexpr uint _ftSigma[] =
+static constexpr uint m_ftSigma[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 	14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3,
@@ -34,23 +34,23 @@ void Blake256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake256:BlockUpdate", "The Input buffer is too short!");
 
-	size_t fill = 64 - _dataLen;
+	size_t fill = 64 - m_dataLen;
 
 	// compress remaining data filled with new bits
-	if (_dataLen != 0 && (Length >= fill))
+	if (m_dataLen != 0 && (Length >= fill))
 	{
-		memcpy(&_digestState[_dataLen], &Input[InOffset], fill);
-		_T += TN_512;
-		Compress32(_digestState, 0);
+		memcpy(&m_digestState[m_dataLen], &Input[InOffset], fill);
+		T += TN_512;
+		Compress32(m_digestState, 0);
 		InOffset += fill;
 		Length -= fill;
-		_dataLen = 0;
+		m_dataLen = 0;
 	}
 
 	// compress data until enough for a block
 	while (Length > 63)
 	{
-		_T += TN_512;
+		T += TN_512;
 		Compress32(Input, InOffset);
 		InOffset += 64;
 		Length -= 64;
@@ -58,12 +58,12 @@ void Blake256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size
 
 	if (Length != 0)
 	{
-		memcpy(&_digestState[_dataLen], &Input[InOffset], Length);
-		_dataLen += Length;
+		memcpy(&m_digestState[m_dataLen], &Input[InOffset], Length);
+		m_dataLen += Length;
 	}
 	else
 	{
-		_dataLen = 0;
+		m_dataLen = 0;
 	}
 }
 
@@ -76,17 +76,17 @@ void Blake256::ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Ou
 
 void Blake256::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isDestroyed = true;
-		_dataLen = 0;
-		_isNullT = false;
-		_T = 0;
+		m_isDestroyed = true;
+		m_dataLen = 0;
+		m_isNullT = false;
+		T = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_HashVal);
-		CEX::Utility::IntUtils::ClearVector(_salt32);
-		CEX::Utility::IntUtils::ClearVector(_M);
-		CEX::Utility::IntUtils::ClearVector(_V);
+		CEX::Utility::IntUtils::ClearVector(m_hashVal);
+		CEX::Utility::IntUtils::ClearVector(m_salt32);
+		CEX::Utility::IntUtils::ClearVector(M);
+		CEX::Utility::IntUtils::ClearVector(V);
 	}
 }
 
@@ -96,55 +96,55 @@ size_t Blake256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 		throw CryptoDigestException("Blake256:DoFinal", "The Output buffer is too short!");
 
 	std::vector<byte> msgLen(8);
-	ulong len = _T + ((uint64_t)_dataLen << 3);
+	ulong len = T + ((uint64_t)m_dataLen << 3);
 	CEX::Utility::IntUtils::Be32ToBytes((uint)(len >> 32) & 0xFFFFFFFFU, msgLen, 0);
 	CEX::Utility::IntUtils::Be32ToBytes((uint)(len & 0xFFFFFFFFU), msgLen, 4);
 
 	// special case of one padding byte
-	if (_dataLen == PAD_LENGTH)
+	if (m_dataLen == PAD_LENGTH)
 	{
-		_T -= 8;
+		T -= 8;
 		std::vector<byte> one(1, 0x81);
 		BlockUpdate(one, 0, 1);
 	}
 	else
 	{
-		if (_dataLen < PAD_LENGTH)
+		if (m_dataLen < PAD_LENGTH)
 		{
 			// enough space to fill the block
-			if (_dataLen == 0)
-				_isNullT = true;
+			if (m_dataLen == 0)
+				m_isNullT = true;
 
-			_T -= TN_440 - ((uint64_t)_dataLen << 3);
-			BlockUpdate(_Padding, 0, PAD_LENGTH - _dataLen);
+			T -= TN_440 - ((uint64_t)m_dataLen << 3);
+			BlockUpdate(m_padding, 0, PAD_LENGTH - m_dataLen);
 		}
 		else
 		{
 			// not enough space, need 2 compressions
-			_T -= TN_512 - ((uint64_t)_dataLen << 3);
-			BlockUpdate(_Padding, 0, 64 - _dataLen);
-			_T -= TN_440;
-			BlockUpdate(_Padding, 1, PAD_LENGTH);
-			_isNullT = true;
+			T -= TN_512 - ((uint64_t)m_dataLen << 3);
+			BlockUpdate(m_padding, 0, 64 - m_dataLen);
+			T -= TN_440;
+			BlockUpdate(m_padding, 1, PAD_LENGTH);
+			m_isNullT = true;
 		}
 
 		std::vector<byte> one(1, 0x01);
 		BlockUpdate(one, 0, 1);
-		_T -= 8;
+		T -= 8;
 	}
 
-	_T -= 64;
+	T -= 64;
 	BlockUpdate(msgLen, 0, 8);
 	std::vector<byte> digest(32, 0);
 
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[0], digest, 0);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[1], digest, 4);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[2], digest, 8);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[3], digest, 12);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[4], digest, 16);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[5], digest, 20);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[6], digest, 24);
-	CEX::Utility::IntUtils::Be32ToBytes(_HashVal[7], digest, 28);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[0], digest, 0);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[1], digest, 4);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[2], digest, 8);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[3], digest, 12);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[4], digest, 16);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[5], digest, 20);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[6], digest, 24);
+	CEX::Utility::IntUtils::Be32ToBytes(m_hashVal[7], digest, 28);
 
 	memcpy(&Output[OutOffset], &digest[0], digest.size());
 	Reset();
@@ -168,63 +168,63 @@ void Blake256::Update(byte Input)
 void Blake256::G32(uint A, uint B, uint C, uint D, uint R, uint I)
 {
 	int P = (R << 4) + I;
-	int P0 = _ftSigma[P];
-	int P1 = _ftSigma[P + 1];
+	int P0 = m_ftSigma[P];
+	int P1 = m_ftSigma[P + 1];
 
-	_V[A] += _V[B] + (_M[P0] ^ _C32[P1]);
-	_V[D] = CEX::Utility::IntUtils::RotateRight(_V[D] ^ _V[A], 16);
-	_V[C] += _V[D];
-	_V[B] = CEX::Utility::IntUtils::RotateRight(_V[B] ^ _V[C], 12);
-	_V[A] += _V[B] + (_M[P1] ^ _C32[P0]);
-	_V[D] = CEX::Utility::IntUtils::RotateRight(_V[D] ^ _V[A], 8);
-	_V[C] += _V[D];
-	_V[B] = CEX::Utility::IntUtils::RotateRight(_V[B] ^ _V[C], 7);
+	V[A] += V[B] + (M[P0] ^ m_C32[P1]);
+	V[D] = CEX::Utility::IntUtils::RotateRight(V[D] ^ V[A], 16);
+	V[C] += V[D];
+	V[B] = CEX::Utility::IntUtils::RotateRight(V[B] ^ V[C], 12);
+	V[A] += V[B] + (M[P1] ^ m_C32[P0]);
+	V[D] = CEX::Utility::IntUtils::RotateRight(V[D] ^ V[A], 8);
+	V[C] += V[D];
+	V[B] = CEX::Utility::IntUtils::RotateRight(V[B] ^ V[C], 7);
 }
 
 void Blake256::Compress32(const std::vector<byte> &Block, size_t Offset)
 {
-	_M[0] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset);
-	_M[1] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 4);
-	_M[2] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 8);
-	_M[3] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 12);
-	_M[4] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 16);
-	_M[5] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 20);
-	_M[6] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 24);
-	_M[7] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 28);
-	_M[8] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 32);
-	_M[9] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 36);
-	_M[10] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 40);
-	_M[11] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 44);
-	_M[12] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 48);
-	_M[13] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 52);
-	_M[14] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 56);
-	_M[15] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 60);
+	M[0] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset);
+	M[1] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 4);
+	M[2] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 8);
+	M[3] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 12);
+	M[4] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 16);
+	M[5] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 20);
+	M[6] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 24);
+	M[7] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 28);
+	M[8] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 32);
+	M[9] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 36);
+	M[10] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 40);
+	M[11] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 44);
+	M[12] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 48);
+	M[13] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 52);
+	M[14] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 56);
+	M[15] = CEX::Utility::IntUtils::BytesToBe32(Block, Offset + 60);
 
-	_V[0] = _HashVal[0];
-	_V[1] = _HashVal[1];
-	_V[2] = _HashVal[2];
-	_V[3] = _HashVal[3];
-	_V[4] = _HashVal[4];
-	_V[5] = _HashVal[5];
-	_V[6] = _HashVal[6];
-	_V[7] = _HashVal[7];
-	_V[8] = _salt32[0] ^ 0x243F6A88U;
-	_V[9] = _salt32[1] ^ 0x85A308D3U;
-	_V[10] = _salt32[2] ^ 0x13198A2EU;
-	_V[11] = _salt32[3] ^ 0x03707344U;
-	_V[12] = 0xA4093822U;
-	_V[13] = 0x299F31D0U;
-	_V[14] = 0x082EFA98U;
-	_V[15] = 0xEC4E6C89U;
+	V[0] = m_hashVal[0];
+	V[1] = m_hashVal[1];
+	V[2] = m_hashVal[2];
+	V[3] = m_hashVal[3];
+	V[4] = m_hashVal[4];
+	V[5] = m_hashVal[5];
+	V[6] = m_hashVal[6];
+	V[7] = m_hashVal[7];
+	V[8] = m_salt32[0] ^ 0x243F6A88U;
+	V[9] = m_salt32[1] ^ 0x85A308D3U;
+	V[10] = m_salt32[2] ^ 0x13198A2EU;
+	V[11] = m_salt32[3] ^ 0x03707344U;
+	V[12] = 0xA4093822U;
+	V[13] = 0x299F31D0U;
+	V[14] = 0x082EFA98U;
+	V[15] = 0xEC4E6C89U;
 
-	if (!_isNullT)
+	if (!m_isNullT)
 	{
-		uint uLen = (uint)(_T & 0xFFFFFFFFU);
-		_V[12] ^= uLen;
-		_V[13] ^= uLen;
-		uLen = (uint)((_T >> 32) & 0xFFFFFFFFU);
-		_V[14] ^= uLen;
-		_V[15] ^= uLen;
+		uint uLen = (uint)(T & 0xFFFFFFFFU);
+		V[12] ^= uLen;
+		V[13] ^= uLen;
+		uLen = (uint)((T >> 32) & 0xFFFFFFFFU);
+		V[14] ^= uLen;
+		V[15] ^= uLen;
 	}
 
 	uint index = 0;
@@ -235,30 +235,30 @@ void Blake256::Compress32(const std::vector<byte> &Block, size_t Offset)
 
 	} while (index != ROUNDS);
 
-	_HashVal[0] ^= _V[0];
-	_HashVal[1] ^= _V[1];
-	_HashVal[2] ^= _V[2];
-	_HashVal[3] ^= _V[3];
-	_HashVal[4] ^= _V[4];
-	_HashVal[5] ^= _V[5];
-	_HashVal[6] ^= _V[6];
-	_HashVal[7] ^= _V[7];
-	_HashVal[0] ^= _V[8];
-	_HashVal[1] ^= _V[9];
-	_HashVal[2] ^= _V[10];
-	_HashVal[3] ^= _V[11];
-	_HashVal[4] ^= _V[12];
-	_HashVal[5] ^= _V[13];
-	_HashVal[6] ^= _V[14];
-	_HashVal[7] ^= _V[15];
-	_HashVal[0] ^= _salt32[0];
-	_HashVal[1] ^= _salt32[1];
-	_HashVal[2] ^= _salt32[2];
-	_HashVal[3] ^= _salt32[3];
-	_HashVal[4] ^= _salt32[0];
-	_HashVal[5] ^= _salt32[1];
-	_HashVal[6] ^= _salt32[2];
-	_HashVal[7] ^= _salt32[3];
+	m_hashVal[0] ^= V[0];
+	m_hashVal[1] ^= V[1];
+	m_hashVal[2] ^= V[2];
+	m_hashVal[3] ^= V[3];
+	m_hashVal[4] ^= V[4];
+	m_hashVal[5] ^= V[5];
+	m_hashVal[6] ^= V[6];
+	m_hashVal[7] ^= V[7];
+	m_hashVal[0] ^= V[8];
+	m_hashVal[1] ^= V[9];
+	m_hashVal[2] ^= V[10];
+	m_hashVal[3] ^= V[11];
+	m_hashVal[4] ^= V[12];
+	m_hashVal[5] ^= V[13];
+	m_hashVal[6] ^= V[14];
+	m_hashVal[7] ^= V[15];
+	m_hashVal[0] ^= m_salt32[0];
+	m_hashVal[1] ^= m_salt32[1];
+	m_hashVal[2] ^= m_salt32[2];
+	m_hashVal[3] ^= m_salt32[3];
+	m_hashVal[4] ^= m_salt32[0];
+	m_hashVal[5] ^= m_salt32[1];
+	m_hashVal[6] ^= m_salt32[2];
+	m_hashVal[7] ^= m_salt32[3];
 }
 
 void Blake256::G32BLK(uint Index)
@@ -275,17 +275,17 @@ void Blake256::G32BLK(uint Index)
 
 void Blake256::Initialize()
 {
-	_HashVal =
+	m_hashVal =
 	{
 		0x6A09E667U, 0xBB67AE85U, 0x3C6EF372U, 0xA54FF53AU,
 		0x510E527FU, 0x9B05688CU, 0x1F83D9ABU, 0x5BE0CD19U
 	};
 
-	std::fill(_salt32.begin(), _salt32.end(), 0);
-	_T = 0;
-	_dataLen = 0;
-	_isNullT = false;
-	std::fill(_digestState.begin(), _digestState.end(), 0);
+	std::fill(m_salt32.begin(), m_salt32.end(), 0);
+	T = 0;
+	m_dataLen = 0;
+	m_isNullT = false;
+	std::fill(m_digestState.begin(), m_digestState.end(), 0);
 }
 
 NAMESPACE_DIGESTEND

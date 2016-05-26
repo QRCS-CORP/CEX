@@ -8,10 +8,10 @@ std::vector<byte> DigestStream::ComputeHash(CEX::IO::IByteStream* InStream)
 	if (InStream->Length() - InStream->Position() < 1)
 		throw CEX::Exception::CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
 
-	_inStream = InStream;
-	size_t dataLen = _inStream->Length() - _inStream->Position();
+	m_inStream = InStream;
+	size_t dataLen = m_inStream->Length() - m_inStream->Position();
 	CalculateInterval(dataLen);
-	_digestEngine->Reset();
+	m_digestEngine->Reset();
 
 	return Compute(dataLen);
 }
@@ -23,7 +23,7 @@ std::vector<byte> DigestStream::ComputeHash(const std::vector<byte> &Input, size
 
 	size_t dataLen = Length - InOffset;
 	CalculateInterval(dataLen);
-	_digestEngine->Reset();
+	m_digestEngine->Reset();
 
 	return Compute(Input, InOffset, Length);
 }
@@ -34,20 +34,20 @@ void DigestStream::CalculateInterval(size_t Length)
 {
 	size_t interval = Length / 100;
 
-	if (interval < _blockSize)
-		_progressInterval = _blockSize;
+	if (interval < m_blockSize)
+		m_progressInterval = m_blockSize;
 	else
-		_progressInterval = (interval - (interval % _blockSize));
+		m_progressInterval = (interval - (interval % m_blockSize));
 
-	if (_progressInterval == 0)
-		_progressInterval = _blockSize;
+	if (m_progressInterval == 0)
+		m_progressInterval = m_blockSize;
 }
 
 void DigestStream::CalculateProgress(size_t Length, bool Completed)
 {
-	if (Completed || Length % _progressInterval == 0)
+	if (Completed || Length % m_progressInterval == 0)
 	{
-		double progress = 100.0 * ((double)_progressInterval / Length);
+		double progress = 100.0 * ((double)m_progressInterval / Length);
 		ProgressPercent((int)progress);
 	}
 }
@@ -56,13 +56,13 @@ std::vector<byte> DigestStream::Compute(size_t Length)
 {
 	size_t bytesTotal = 0;
 	size_t bytesRead = 0;
-	std::vector<byte> buffer(_blockSize);
-	size_t maxBlocks = Length / _blockSize;
+	std::vector<byte> buffer(m_blockSize);
+	size_t maxBlocks = Length / m_blockSize;
 
 	for (size_t i = 0; i < maxBlocks; i++)
 	{
-		bytesRead = _inStream->Read(buffer, 0, _blockSize);
-		_digestEngine->BlockUpdate(buffer, 0, bytesRead);
+		bytesRead = m_inStream->Read(buffer, 0, m_blockSize);
+		m_digestEngine->BlockUpdate(buffer, 0, bytesRead);
 		bytesTotal += bytesRead;
 		CalculateProgress(bytesTotal);
 	}
@@ -71,14 +71,14 @@ std::vector<byte> DigestStream::Compute(size_t Length)
 	if (bytesTotal < Length)
 	{
 		buffer.resize(Length - bytesTotal);
-		bytesRead = _inStream->Read(buffer, 0, buffer.size());
-		_digestEngine->BlockUpdate(buffer, 0, bytesRead);
+		bytesRead = m_inStream->Read(buffer, 0, buffer.size());
+		m_digestEngine->BlockUpdate(buffer, 0, bytesRead);
 		bytesTotal += bytesRead;
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(_digestEngine->DigestSize());
-	_digestEngine->DoFinal(chkSum, 0);
+	std::vector<byte> chkSum(m_digestEngine->DigestSize());
+	m_digestEngine->DoFinal(chkSum, 0);
 	CalculateProgress(bytesTotal);
 
 	return chkSum;
@@ -86,14 +86,14 @@ std::vector<byte> DigestStream::Compute(size_t Length)
 
 std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	const size_t alnBlocks = (Length / _blockSize) * _blockSize;
+	const size_t alnBlocks = (Length / m_blockSize) * m_blockSize;
 	size_t bytesTotal = 0;
 
 	while (bytesTotal != alnBlocks)
 	{
-		_digestEngine->BlockUpdate(Input, InOffset, _blockSize);
-		InOffset += _blockSize;
-		bytesTotal += _blockSize;
+		m_digestEngine->BlockUpdate(Input, InOffset, m_blockSize);
+		InOffset += m_blockSize;
+		bytesTotal += m_blockSize;
 		CalculateProgress(bytesTotal);
 	}
 
@@ -101,13 +101,13 @@ std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t I
 	if (bytesTotal != Length)
 	{
 		size_t diff = Length - bytesTotal;
-		_digestEngine->BlockUpdate(Input, InOffset, diff);
+		m_digestEngine->BlockUpdate(Input, InOffset, diff);
 		bytesTotal += diff;
 	}
 
 	// get the hash
-	std::vector<byte> chkSum(_digestEngine->DigestSize());
-	_digestEngine->DoFinal(chkSum, 0);
+	std::vector<byte> chkSum(m_digestEngine->DigestSize());
+	m_digestEngine->DoFinal(chkSum, 0);
 	CalculateProgress(bytesTotal);
 
 	return chkSum;
@@ -115,14 +115,14 @@ std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t I
 
 void DigestStream::Destroy()
 {
-	_blockSize = 0;
-	_destroyEngine = false;
-	_progressInterval = 0;
+	m_blockSize = 0;
+	m_destroyEngine = false;
+	m_progressInterval = 0;
 
-	if (_destroyEngine)
-		delete _digestEngine;
+	if (m_destroyEngine)
+		delete m_digestEngine;
 
-	_isDestroyed = true;
+	m_isDestroyed = true;
 }
 
 NAMESPACE_PROCESSINGEND

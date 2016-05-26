@@ -1,7 +1,12 @@
 #include "BlockCipherFromName.h"
-#include "RHX.h"
 #include "SHX.h"
 #include "THX.h"
+
+#if defined(AESNI_AVAILABLE)
+#include "AHX.h"
+#elif
+#include "RHX.h"
+#endif
 
 NAMESPACE_HELPER
 
@@ -10,7 +15,13 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 	switch (BlockCipherType)
 	{
 		case CEX::Enumeration::BlockCiphers::RHX:
-			return new CEX::Cipher::Symmetric::Block::RHX();
+		{
+#if defined(AESNI_AVAILABLE)
+				return new CEX::Cipher::Symmetric::Block::AHX();
+#elif
+				return new CEX::Cipher::Symmetric::Block::RHX();
+#endif
+		}
 		case CEX::Enumeration::BlockCiphers::SHX:
 			return new CEX::Cipher::Symmetric::Block::SHX();
 		case CEX::Enumeration::BlockCiphers::THX:
@@ -25,7 +36,11 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 	switch (BlockCipherType)
 	{
 		case CEX::Enumeration::BlockCiphers::RHX:
-			return new CEX::Cipher::Symmetric::Block::RHX(BlockSize, RoundCount, KdfEngineType);
+#if defined(AESNI_AVAILABLE)
+				return new CEX::Cipher::Symmetric::Block::AHX(RoundCount, KdfEngineType);
+#elif
+				return new CEX::Cipher::Symmetric::Block::RHX(BlockSize, RoundCount, KdfEngineType);
+#endif
 		case CEX::Enumeration::BlockCiphers::SHX:
 			return new CEX::Cipher::Symmetric::Block::SHX(RoundCount, KdfEngineType);
 		case CEX::Enumeration::BlockCiphers::THX:

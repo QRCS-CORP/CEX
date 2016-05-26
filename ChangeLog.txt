@@ -22,3 +22,9 @@ Changes April 13, 2016:
 
 Changes May 20, 2016:
 * RHX k512 key schedule change (recommended)
+
+Changes May 26, 2016
+* RHX k512 key schedule change (recommended)
+* Addition of AHX an AES-NI implementation
+* Changes to several test classes
+* Formatting changes throughout

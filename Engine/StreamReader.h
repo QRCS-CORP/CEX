@@ -11,7 +11,7 @@ NAMESPACE_IO
 class StreamReader
 {
 private:
-	CEX::IO::MemoryStream _streamData;
+	CEX::IO::MemoryStream m_streamData;
 	StreamReader() {}
 
 public:
@@ -19,12 +19,12 @@ public:
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const size_t Length() { return _streamData.Length(); }
+	const size_t Length() { return m_streamData.Length(); }
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const size_t Position() { return _streamData.Position(); }
+	const size_t Position() { return m_streamData.Position(); }
 
 	/// <summary>
 	/// Initialize this class with a byte array
@@ -33,7 +33,7 @@ public:
 	/// <param name="DataStream">MemoryStream to read</param>
 	explicit StreamReader(const CEX::IO::MemoryStream &DataStream)
 		:
-		_streamData(DataStream)
+		m_streamData(DataStream)
 	{
 	}
 

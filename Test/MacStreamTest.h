@@ -25,7 +25,7 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All MacStream tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compare MacStream output to Mac instance output

@@ -40,15 +40,11 @@ using CEX::Enumeration::BlockCiphers;
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.CipherStream"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.VolumeCipher"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Structure.PackageKey"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.KeyPolicies"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.PackageKeyStates"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Prngs"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.KeyGenerator"/>
-/// <seealso cref="VTDev.Libraries.CEXEngine.Crypto.Common.KeyParams"/>
+/// <seealso cref="CEX::Processing::CipherStream"/>
+/// <seealso cref="CEX::Enumeration::Prngs"/>
+/// <seealso cref="CEX::Enumeration::Digests"/>
+/// <seealso cref="CEX::Common::KeyGenerator"/>
+/// <seealso cref="CEX::Common::KeyParams"/>
 class MacDescription
 {
 private:
@@ -87,31 +83,31 @@ public:
 	/// </summary>
 	const CEX::Enumeration::Macs MacType() const { return (CEX::Enumeration::Macs)_macType; }
 	/// <summary>
-	/// The cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.KeySizes">Key Size</see>
+	/// The cipher <see cref="CEX::Enumeration::KeySizes">Key Size</see>
 	/// </summary>
 	const uint KeySize() const { return _keySize; }
 	/// <summary>
-	/// Size of the cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.IVSizes">Initialization Vector</see>
+	/// Size of the cipher <see cref="CEX::Enumeration::IVSizes">Initialization Vector</see>
 	/// </summary>
 	const CEX::Enumeration::IVSizes IvSize() const { return (CEX::Enumeration::IVSizes)_ivSize; }
 	/// <summary>
-	/// The HMAC <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used to authenticate a message file encrypted with this key
+	/// The HMAC <see cref="CEX::Enumeration::Digests">Digest</see> engine used to authenticate a message file encrypted with this key
 	/// </summary>
 	const CEX::Enumeration::Digests HmacEngine() const { return (CEX::Enumeration::Digests)_hmacEngine; }
 	/// <summary>
-	/// The symmetric block cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockCiphers">Engine</see> type
+	/// The symmetric block cipher <see cref="CEX::Enumeration::BlockCiphers">Engine</see> type
 	/// </summary>
 	const CEX::Enumeration::BlockCiphers EngineType() const { return (CEX::Enumeration::BlockCiphers)_engineType; }
 	/// <summary>
-	/// The cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockSizes">Block Size</see>
+	/// The cipher <see cref="CEX::Enumeration::BlockSizes">Block Size</see>
 	/// </summary>
 	const CEX::Enumeration::BlockSizes BlockSize() const { return (CEX::Enumeration::BlockSizes)_blockSize; }
 	/// <summary>
-	/// The number of diffusion <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.RoundCounts">Rounds</see>
+	/// The number of diffusion <see cref="CEX::Enumeration::RoundCounts">Rounds</see>
 	/// </summary>
 	const CEX::Enumeration::RoundCounts RoundCount() const { return (CEX::Enumeration::RoundCounts)_roundCount; }
 	/// <summary>
-	/// The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers
+	/// The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers
 	/// </summary>
 	const CEX::Enumeration::Digests KdfEngine() const { return (CEX::Enumeration::Digests)_kdfEngine; }
 
@@ -137,11 +133,11 @@ public:
 	/// <param name="MacType">The type of Mac generator; Cmac, Hmac, or Vmac</param>
 	/// <param name="KeySize">The mac/cipher key size in bytes</param>
 	/// <param name="IvSize">Size of the Mac Initialization Vector</param>
-	/// <param name="HmacEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used in the Hmac</param>
-	/// <param name="EngineType">The symmetric block cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.SymmetricEngines">Engine</see> type</param>
-	/// <param name="BlockSize">The cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockSizes">Block Size</see></param>
-	/// <param name="RoundCount">The number of diffusion <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.RoundCounts">Rounds</see></param>
-	/// <param name="KdfEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
+	/// <param name="HmacEngine">The <see cref="CEX::Enumeration::Digests">Digest</see> engine used in the Hmac</param>
+	/// <param name="EngineType">The symmetric block cipher <see cref="CEX::Enumeration::SymmetricEngines">Engine</see> type</param>
+	/// <param name="BlockSize">The cipher <see cref="CEX::Enumeration::BlockSizes">Block Size</see></param>
+	/// <param name="RoundCount">The number of diffusion <see cref="CEX::Enumeration::RoundCounts">Rounds</see></param>
+	/// <param name="KdfEngine">The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	MacDescription(CEX::Enumeration::Macs MacType, uint KeySize, uint IvSize, CEX::Enumeration::Digests HmacEngine = CEX::Enumeration::Digests::SHA512, CEX::Enumeration::BlockCiphers EngineType = CEX::Enumeration::BlockCiphers::RHX,
 		CEX::Enumeration::BlockSizes BlockSize = CEX::Enumeration::BlockSizes::B128, CEX::Enumeration::RoundCounts RoundCount = CEX::Enumeration::RoundCounts::R14, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
 	{
@@ -160,7 +156,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="HmacEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used in the Hmac</param>
+	/// <param name="HmacEngine">The <see cref="CEX::Enumeration::Digests">Digest</see> engine used in the Hmac</param>
 	MacDescription(uint KeySize, CEX::Enumeration::Digests HmacEngine)
 	{
 		_macType = (uint)CEX::Enumeration::Macs::HMAC;
@@ -178,11 +174,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="EngineType">The symmetric block cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.SymmetricEngines">Engine</see> type</param>
-	/// <param name="IvSize">Size of the cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.IVSizes">Initialization Vector</see></param>
-	/// <param name="BlockSize">The cipher <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.BlockSizes">Block Size</see></param>
-	/// <param name="RoundCount">The number of diffusion <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.RoundCounts">Rounds</see></param>
-	/// <param name="KdfEngine">The <see cref="VTDev.Libraries.CEXEngine.Crypto.Enumeration.Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
+	/// <param name="EngineType">The symmetric block cipher <see cref="CEX::Enumeration::SymmetricEngines">Engine</see> type</param>
+	/// <param name="IvSize">Size of the cipher <see cref="CEX::Enumeration::IVSizes">Initialization Vector</see></param>
+	/// <param name="BlockSize">The cipher <see cref="CEX::Enumeration::BlockSizes">Block Size</see></param>
+	/// <param name="RoundCount">The number of diffusion <see cref=CEX::Enumeration::RoundCounts">Rounds</see></param>
+	/// <param name="KdfEngine">The <see cref="CEX::Enumeration::Digests">Digest</see> engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	MacDescription(uint KeySize, CEX::Enumeration::BlockCiphers EngineType, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::BlockSizes BlockSize = CEX::Enumeration::BlockSizes::B128,
 		CEX::Enumeration::RoundCounts RoundCount = CEX::Enumeration::RoundCounts::R14, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
 	{

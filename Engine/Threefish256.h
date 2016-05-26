@@ -15,8 +15,8 @@ private:
 	static constexpr uint ExpandedTweakSize = 3;
 	static constexpr ulong KeyScheduleConst = 0x1BD11BDAA9FC1A22;
 
-	std::vector<ulong>  _expandedKey;
-	std::vector<ulong>  _expandedTweak;
+	std::vector<ulong> m_expandedKey;
+	std::vector<ulong> m_expandedTweak;
 
 public:
 	/// <summary>
@@ -24,11 +24,11 @@ public:
 	/// </summary>
 	Threefish256()
 		:
-		_expandedTweak(ExpandedTweakSize, 0),
-		_expandedKey(ExpandedKeySize, 0)
+		m_expandedTweak(ExpandedTweakSize, 0),
+		m_expandedKey(ExpandedKeySize, 0)
 	{
 		// Create the expanded key array
-		_expandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
+		m_expandedKey[ExpandedKeySize - 1] = KeyScheduleConst;
 	}
 
 	/// <summary>

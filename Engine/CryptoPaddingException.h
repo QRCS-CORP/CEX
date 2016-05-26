@@ -11,19 +11,19 @@ NAMESPACE_EXCEPTION
 struct CryptoPaddingException : std::exception
 {
 private:
-	std::string _origin;
-	std::string _message;
+	std::string m_origin;
+	std::string m_message;
 
 public:
 	/// <summary>
 	/// Get/Set: The message associated with the error
 	/// </summary>
-	std::string &Message() { return _message; }
+	std::string &Message() { return m_message; }
 
 	/// <summary>
 	/// Get/Set: The origin of the exception in the format Class
 	/// </summary>
-	std::string &Origin() { return _origin; }
+	std::string &Origin() { return m_origin; }
 
 
 	/// <summary>
@@ -33,7 +33,7 @@ public:
 	/// <param name="Message">A custom message or error data</param>
 	explicit CryptoPaddingException(const std::string &Message)
 		: 
-		_message(Message)
+		m_message(Message)
 	{
 	}
 
@@ -45,8 +45,8 @@ public:
 	/// <param name="Message">A custom message or error data</param>
 	CryptoPaddingException(const std::string &Origin, const std::string &Message) 
 		: 
-		_origin(Origin), 
-		_message(Message)
+		m_origin(Origin), 
+		m_message(Message)
 	{
 	}
 };

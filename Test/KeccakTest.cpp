@@ -18,24 +18,24 @@ namespace Test
 			CEX::Digest::Keccak512* kc384 = new CEX::Digest::Keccak512(384);
 			CEX::Digest::Keccak512* kc512 = new CEX::Digest::Keccak512(512);
 
-			CompareVector(kc224, _expected224);
+			CompareVector(kc224, m_expected224);
 			OnProgress("Passed Keccak 224 bit digest vector tests..");
-			CompareVector(kc256, _expected256);
+			CompareVector(kc256, m_expected256);
 			OnProgress("Passed Keccak 256 bit digest vector tests..");
-			CompareVector(kc288, _expected288);
+			CompareVector(kc288, m_expected288);
 			OnProgress("Passed Keccak 288 bit digest vector tests..");
-			CompareVector(kc384, _expected384);
+			CompareVector(kc384, m_expected384);
 			OnProgress("KeccakTest: Passed Keccak 384 bit digest vector tests..");
-			CompareVector(kc512, _expected512);
+			CompareVector(kc512, m_expected512);
 			OnProgress("KeccakTest: Passed Keccak 512 bit digest vector tests..");
 
-			CompareHMAC(kc224, _mac224, _trunc224);
+			CompareHMAC(kc224, m_mac224, m_trunc224);
 			OnProgress("Passed Keccak 224 bit digest HMAC tests..");
-			CompareHMAC(kc256, _mac256, _trunc256);
+			CompareHMAC(kc256, m_mac256, m_trunc256);
 			OnProgress("Passed Keccak 256 bit digest HMAC tests..");
-			CompareHMAC(kc384, _mac384, _trunc384);
+			CompareHMAC(kc384, m_mac384, m_trunc384);
 			OnProgress("KeccakTest: Passed Keccak 384 bit digest HMAC tests..");
-			CompareHMAC(kc512, _mac512, _trunc512);
+			CompareHMAC(kc512, m_mac512, m_trunc512);
 			OnProgress("KeccakTest: Passed Keccak 512 bit digest HMAC tests..");
 
 			delete kc224;
@@ -60,10 +60,10 @@ namespace Test
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
-		for (unsigned int i = 0; i != _messages.size(); i++)
+		for (unsigned int i = 0; i != m_messages.size(); i++)
 		{
-			if (_messages[i].size() != 0)
-				Digest->BlockUpdate(_messages[i], 0, _messages[i].size());
+			if (m_messages[i].size() != 0)
+				Digest->BlockUpdate(m_messages[i], 0, m_messages[i].size());
 
 			Digest->DoFinal(hash, 0);
 
@@ -79,7 +79,7 @@ namespace Test
 		Digest->BlockUpdate(k64, 0, k64.size());
 		Digest->DoFinal(hash, 0);
 
-		if (Expected[_messages.size()] != hash)
+		if (Expected[m_messages.size()] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
@@ -87,7 +87,7 @@ namespace Test
 
 		Digest->DoFinal(hash, 0);
 
-		if (Expected[_messages.size()] != hash)
+		if (Expected[m_messages.size()] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
@@ -96,7 +96,7 @@ namespace Test
 		Digest->BlockUpdate(k64, 0, k64.size());
 		Digest->DoFinal(hash, 0);
 
-		if (Expected[_messages.size() + 1] != hash)
+		if (Expected[m_messages.size() + 1] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != 64; i++)
@@ -107,7 +107,7 @@ namespace Test
 
 		Digest->DoFinal(hash, 0);
 
-		if (Expected[_messages.size() + 1] != hash)
+		if (Expected[m_messages.size() + 1] != hash)
 			throw std::string("Keccak: Expected hash is not equal!");
 
 		CompareDoFinal(Digest);
@@ -116,12 +116,12 @@ namespace Test
 		for (unsigned int i = 0; i != 16384; i++)
 		{
 		for (int j = 0; j != 1024; j++)
-		Digest->BlockUpdate(_xtremeData, 0, _xtremeData.size());
+		Digest->BlockUpdate(m_xtremeData, 0, m_xtremeData.size());
 		}
 
 		Digest->DoFinal(hash, 0);
 
-		if ((Expected[_messages.size() + 2]) != hash)
+		if ((Expected[m_messages.size() + 2]) != hash)
 		throw std::string("Keccak: Expected hash is not equal!");*/
 	}
 
@@ -149,10 +149,10 @@ namespace Test
 		CEX::Mac::HMAC mac(Digest);
 		std::vector<byte> macV2(mac.MacSize(), 0);
 
-		for (unsigned int i = 0; i != _macKeys.size(); i++)
+		for (unsigned int i = 0; i != m_macKeys.size(); i++)
 		{
-			mac.Initialize(_macKeys[i]);
-			mac.BlockUpdate(_macData[i], 0, _macData[i].size());
+			mac.Initialize(m_macKeys[i]);
+			mac.BlockUpdate(m_macData[i], 0, m_macData[i].size());
 			std::vector<byte> macV(mac.MacSize());
 			mac.DoFinal(macV, 0);
 
@@ -162,8 +162,8 @@ namespace Test
 
 		// test truncated keys
 		CEX::Mac::HMAC mac2(Digest);
-		mac2.Initialize(_truncKey);
-		mac2.BlockUpdate(_truncData, 0, _truncData.size());
+		mac2.Initialize(m_truncKey);
+		mac2.BlockUpdate(m_truncData, 0, m_truncData.size());
 		mac2.DoFinal(macV2, 0);
 
 		for (unsigned int i = 0; i != TruncExpected.size(); i++)
@@ -181,7 +181,7 @@ namespace Test
 			("54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f67"),
 			("54686520717569636b2062726f776e20666f78206a756d7073206f76657220746865206c617a7920646f672e")
 		};
-		HexConverter::Decode(messagesEnc, 3, _messages);
+		HexConverter::Decode(messagesEnc, 3, m_messages);
 
 		const char* expected224Enc[6] =
 		{
@@ -192,7 +192,7 @@ namespace Test
 			("68b5fc8c87193155bba68a2485377e809ee4f81a85ef023b9e64add0"),
 			("c42e4aee858e1a8ad2976896b9d23dd187f64436ee15969afdbc68c5")
 		};
-		HexConverter::Decode(expected224Enc, 6, _expected224);
+		HexConverter::Decode(expected224Enc, 6, m_expected224);
 
 		const char* expected256Enc[6] =
 		{
@@ -203,7 +203,7 @@ namespace Test
 			("db368762253ede6d4f1db87e0b799b96e554eae005747a2ea687456ca8bcbd03"),
 			("5f313c39963dcf792b5470d4ade9f3a356a3e4021748690a958372e2b06f82a4")
 		};
-		HexConverter::Decode(expected256Enc, 6, _expected256);
+		HexConverter::Decode(expected256Enc, 6, m_expected256);
 
 		const char* expected288Enc[6] =
 		{
@@ -214,7 +214,7 @@ namespace Test
 			("a9cb5a75b5b81b7528301e72553ed6770214fa963956e790528afe420de33c074e6f4220"),
 			("eadaf5ba2ad6a2f6f338fce0e1efdad2a61bb38f6be6068b01093977acf99e97a5d5827c")
 		};
-		HexConverter::Decode(expected288Enc, 6, _expected288);
+		HexConverter::Decode(expected288Enc, 6, m_expected288);
 
 		const char* expected384Enc[6] =
 		{
@@ -225,7 +225,7 @@ namespace Test
 			("d4fe8586fd8f858dd2e4dee0bafc19b4c12b4e2a856054abc4b14927354931675cdcaf942267f204ea706c19f7beefc4"),
 			("9b7168b4494a80a86408e6b9dc4e5a1837c85dd8ff452ed410f2832959c08c8c0d040a892eb9a755776372d4a8732315")
 		};
-		HexConverter::Decode(expected384Enc, 6, _expected384);
+		HexConverter::Decode(expected384Enc, 6, m_expected384);
 
 		const char* expected512Enc[6] =
 		{
@@ -236,7 +236,7 @@ namespace Test
 			("dc44d4f4d36b07ab5fc04016cbe53548e5a7778671c58a43cb379fd00c06719b8073141fc22191ffc3db5f8b8983ae8341fa37f18c1c969664393aa5ceade64e"),
 			("3e122edaf37398231cfaca4c7c216c9d66d5b899ec1d7ac617c40c7261906a45fc01617a021e5da3bd8d4182695b5cb785a28237cbb167590e34718e56d8aab8")
 		};
-		HexConverter::Decode(expected512Enc, 6, _expected512);
+		HexConverter::Decode(expected512Enc, 6, m_expected512);
 
 		const char* macKeysEnc[7] =
 		{
@@ -251,7 +251,7 @@ namespace Test
 			("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 		};
-		HexConverter::Decode(macKeysEnc, 7, _macKeys);
+		HexConverter::Decode(macKeysEnc, 7, m_macKeys);
 
 		const char* macDataEnc[7] =
 		{
@@ -267,7 +267,7 @@ namespace Test
 				"68616e20626c6f636b2d73697a6520646174612e20546865206b6579206e6565647320746f20626520686173686564206265666f7265206265696e6720757365\n" \
 				"642062792074686520484d414320616c676f726974686d2e")
 		};
-		HexConverter::Decode(macDataEnc, 7, _macData);
+		HexConverter::Decode(macDataEnc, 7, m_macData);
 
 		const char* mac224Enc[7] =
 		{
@@ -279,7 +279,7 @@ namespace Test
 			("ba13009405a929f398b348885caa5419191bb948ada32194afc84104"),
 			("92649468be236c3c72c189909c063b13f994be05749dc91310db639e")
 		};
-		HexConverter::Decode(mac224Enc, 7, _mac224);
+		HexConverter::Decode(mac224Enc, 7, m_mac224);
 
 		const char* mac256Enc[7] =
 		{
@@ -291,7 +291,7 @@ namespace Test
 			("1fdc8cb4e27d07c10d897dec39c217792a6e64fa9c63a77ce42ad106ef284e02"),
 			("fdaa10a0299aecff9bb411cf2d7748a4022e4a26be3fb5b11b33d8c2b7ef5484")
 		};
-		HexConverter::Decode(mac256Enc, 7, _mac256);
+		HexConverter::Decode(mac256Enc, 7, m_mac256);
 
 		const char* mac384Enc[7] =
 		{
@@ -303,7 +303,7 @@ namespace Test
 			("4860ea191ac34994cf88957afe5a836ef36e4cc1a66d75bf77defb7576122d75f60660e4cf731c6effac06402787e2b9"),
 			("fe9357e3cfa538eb0373a2ce8f1e26ad6590afdaf266f1300522e8896d27e73f654d0631c8fa598d4bb82af6b744f4f5")
 		};
-		HexConverter::Decode(mac384Enc, 7, _mac384);
+		HexConverter::Decode(mac384Enc, 7, m_mac384);
 
 		const char* mac512Enc[7] =
 		{
@@ -315,19 +315,19 @@ namespace Test
 			("2c6b9748d35c4c8db0b4407dd2ed2381f133bdbd1dfaa69e30051eb6badfcca64299b88ae05fdbd3dd3dd7fe627e42e39e48b0fe8c7f1e85f2dbd52c2d753572"),
 			("6adc502f14e27812402fc81a807b28bf8a53c87bea7a1df6256bf66f5de1a4cb741407ad15ab8abc136846057f881969fbb159c321c904bfb557b77afb7778c8")
 		};
-		HexConverter::Decode(mac512Enc, 7, _mac512);
+		HexConverter::Decode(mac512Enc, 7, m_mac512);
 
-		HexConverter::Decode("0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", _truncKey);
-		HexConverter::Decode("546573742057697468205472756e636174696f6e", _truncData);
-		HexConverter::Decode("f52bbcfd654264e7133085c5e69b72c3", _trunc224);
-		HexConverter::Decode("745e7e687f8335280d54202ef13cecc6", _trunc256);
-		HexConverter::Decode("fa9aea2bc1e181e47cbb8c3df243814d", _trunc384);
-		HexConverter::Decode("04c929fead434bba190dacfa554ce3f5", _trunc512);
-		HexConverter::Decode("61626364656667686263646566676869636465666768696a6465666768696a6b65666768696a6b6c666768696a6b6c6d6768696a6b6c6d6e68696a6b6c6d6e6f", _xtremeData);
+		HexConverter::Decode("0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", m_truncKey);
+		HexConverter::Decode("546573742057697468205472756e636174696f6e", m_truncData);
+		HexConverter::Decode("f52bbcfd654264e7133085c5e69b72c3", m_trunc224);
+		HexConverter::Decode("745e7e687f8335280d54202ef13cecc6", m_trunc256);
+		HexConverter::Decode("fa9aea2bc1e181e47cbb8c3df243814d", m_trunc384);
+		HexConverter::Decode("04c929fead434bba190dacfa554ce3f5", m_trunc512);
+		HexConverter::Decode("61626364656667686263646566676869636465666768696a6465666768696a6b65666768696a6b6c666768696a6b6c6d6768696a6b6c6d6e68696a6b6c6d6e6f", m_xtremeData);
 	}
 
 	void KeccakTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

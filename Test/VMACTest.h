@@ -17,11 +17,11 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All VMAC tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _expected;
-		std::vector<byte> _input;
-		std::vector<byte> _iv;
-		std::vector<byte> _key;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_expected;
+		std::vector<byte> m_input;
+		std::vector<byte> m_iv;
+		std::vector<byte> m_key;
 
 	public:
 		/// <summary>
@@ -32,14 +32,14 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer VMAC vectors for equality
 		/// </summary>
 		VMACTest()
 			:
-			_input(256)
+			m_input(256)
 		{
 		}
 

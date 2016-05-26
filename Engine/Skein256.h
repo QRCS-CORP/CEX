@@ -81,16 +81,16 @@ private:
 	static constexpr size_t STATE_WORDS = STATE_SIZE / 64;
 	static constexpr size_t STATE_OUTPUT = (STATE_SIZE + 7) / 8;
 
-	Threefish256 _blockCipher;
-	size_t _bytesFilled;
-	std::vector<ulong> _cipherInput;
-	std::vector<ulong> _configString;
-	std::vector<ulong> _configValue;
-	std::vector<ulong> _digestState;
-	SkeinInitializationType _initializationType;
-	std::vector<byte> _inputBuffer;
-	bool _isDestroyed;
-	UbiTweak _ubiParameters;
+	Threefish256 m_blockCipher;
+	size_t m_bytesFilled;
+	std::vector<ulong> m_cipherInput;
+	std::vector<ulong> m_configString;
+	std::vector<ulong> m_configValue;
+	std::vector<ulong> m_digestState;
+	SkeinInitializationType m_initializationType;
+	std::vector<byte> m_inputBuffer;
+	bool m_isDestroyed;
+	UbiTweak m_ubiParameters;
 
 public:
 
@@ -116,7 +116,7 @@ public:
 	/// </summary>
 	std::vector<ulong> GetConfigString()
 	{
-		return _configString;
+		return m_configString;
 	}
 
 	/// <summary>
@@ -124,7 +124,7 @@ public:
 	/// </summary>
 	std::vector<ulong> GetConfigValue()
 	{
-		return _configValue;
+		return m_configValue;
 	}
 
 	/// <summary>
@@ -132,7 +132,7 @@ public:
 	/// </summary>
 	SkeinInitializationType GetInitializationType()
 	{
-		return _initializationType;
+		return m_initializationType;
 	}
 
 	/// <summary>
@@ -148,7 +148,7 @@ public:
 	/// </summary>
 	UbiTweak GetUbiParameters()
 	{
-		return _ubiParameters;
+		return m_ubiParameters;
 	}
 
 	/// <summary>
@@ -163,18 +163,18 @@ public:
 	/// </summary>
 	explicit Skein256(SkeinInitializationType InitializationType = SkeinInitializationType::Normal)
 		:
-		_blockCipher(),
-		_cipherInput(STATE_WORDS),
-		_configString(STATE_SIZE),
-		_configValue(STATE_SIZE),
-		_isDestroyed(false),
-		_digestState(STATE_WORDS),
-		_inputBuffer(STATE_BYTES),
-		_ubiParameters()
+		m_blockCipher(),
+		m_cipherInput(STATE_WORDS),
+		m_configString(STATE_SIZE),
+		m_configValue(STATE_SIZE),
+		m_isDestroyed(false),
+		m_digestState(STATE_WORDS),
+		m_inputBuffer(STATE_BYTES),
+		m_ubiParameters()
 	{
-		_initializationType = InitializationType;
+		m_initializationType = InitializationType;
 		// generate the configuration string
-		_configString[1] = (ulong)(DigestSize() * 8);
+		m_configString[1] = (ulong)(DigestSize() * 8);
 		// "SHA3"
 		std::vector<byte> schema(4, 0);
 		schema[0] = 83;

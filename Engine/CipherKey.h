@@ -35,35 +35,35 @@ private:
 	static constexpr unsigned long EXTKEY_SEEK = DESC_SIZE;
 	static constexpr unsigned long DESC_SEEK = DESC_SIZE + EXTKEY_SIZE;
 
-	std::vector<byte> _keyID;
-	std::vector<byte> _extKey;
-	CEX::Common::CipherDescription _cprDsc;
+	std::vector<byte> m_keyID;
+	std::vector<byte> m_extKey;
+	CEX::Common::CipherDescription m_cprDsc;
 
 public:
 
 	/// <summary>
 	/// The CipherDescription structure containing a complete description of the cipher instance
 	/// </summary>
-	CEX::Common::CipherDescription Description() const { return _cprDsc; }
+	CEX::Common::CipherDescription Description() const { return m_cprDsc; }
 
 	/// <summary>
 	/// The unique 16 byte ID field used to identify this key.
 	/// </summary>
-	const std::vector<byte> &KeyId() { return _keyID; }
+	const std::vector<byte> &KeyId() { return m_keyID; }
 
 	/// <summary>
 	/// An array of random bytes used to encrypt a message file extension.
 	/// </summary>
-	const std::vector<byte> &ExtensionKey() { return _extKey; }
+	const std::vector<byte> &ExtensionKey() { return m_extKey; }
 
 	/// <summary>
 	/// Default constructor
 	/// </summary>
 	CipherKey()
 		:
-		_cprDsc(),
-		_extKey(0),
-		_keyID(0)
+		m_cprDsc(),
+		m_extKey(0),
+		m_keyID(0)
 	{
 	}
 
@@ -80,14 +80,14 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if either the KeyId or ExtensionKey fields are null or invalid</exception>
 	CipherKey(CEX::Common::CipherDescription &Description, std::vector<byte> &KeyId, std::vector<byte> &ExtensionKey)
 		:
-		_cprDsc(Description),
-		_extKey(0),
-		_keyID(0)
+		m_cprDsc(Description),
+		m_extKey(0),
+		m_keyID(0)
 	{
 		if (KeyId.size() == 0)
 		{
 			CEX::Prng::CSPPrng rnd;
-			_keyID = rnd.GetBytes(KEYID_SIZE);
+			m_keyID = rnd.GetBytes(KEYID_SIZE);
 		}
 		else if (KeyId.size() != KEYID_SIZE)
 		{
@@ -95,13 +95,13 @@ public:
 		}
 		else
 		{
-			_keyID = KeyId;
+			m_keyID = KeyId;
 		}
 
 		if (ExtensionKey.size() == 0)
 		{
 			CEX::Prng::CSPPrng rnd;
-			_extKey = rnd.GetBytes(EXTKEY_SIZE);
+			m_extKey = rnd.GetBytes(EXTKEY_SIZE);
 		}
 		else if (ExtensionKey.size() != EXTKEY_SIZE)
 		{
@@ -109,7 +109,7 @@ public:
 		}
 		else
 		{
-			_extKey = ExtensionKey;
+			m_extKey = ExtensionKey;
 		}
 	}
 
@@ -120,13 +120,13 @@ public:
 	/// <param name="KeyStream">The Stream containing the CipherKey</param>
 	explicit CipherKey(CEX::IO::MemoryStream &KeyStream)
 		:
-		_extKey(0),
-		_keyID(0)
+		m_extKey(0),
+		m_keyID(0)
 	{
 		CEX::IO::StreamReader reader(KeyStream);
-		_keyID = reader.ReadBytes(KEYID_SIZE);
-		_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
+		m_keyID = reader.ReadBytes(KEYID_SIZE);
+		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
+		m_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -136,14 +136,14 @@ public:
 	/// <param name="KeyArray">The byte array containing the CipherKey</param>
 	explicit CipherKey(std::vector<byte> &KeyArray)
 		:
-		_extKey(0),
-		_keyID(0)
+		m_extKey(0),
+		m_keyID(0)
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(KeyArray);
 		CEX::IO::StreamReader reader(ms);
-		_keyID = reader.ReadBytes(KEYID_SIZE);
-		_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
+		m_keyID = reader.ReadBytes(KEYID_SIZE);
+		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
+		m_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -151,11 +151,11 @@ public:
 	/// </summary>
 	void Reset()
 	{
-		_cprDsc.Reset();
-		if (_extKey.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(_extKey);
-		if (_keyID.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(_keyID);
+		m_cprDsc.Reset();
+		if (m_extKey.size() != 0)
+			CEX::Utility::IntUtils::ClearVector(m_extKey);
+		if (m_keyID.size() != 0)
+			CEX::Utility::IntUtils::ClearVector(m_keyID);
 	}
 
 	/// <summary>
@@ -166,9 +166,9 @@ public:
 	std::vector<byte> ToBytes()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		writer.Write(_keyID);
-		writer.Write(_extKey);
-		std::vector<byte> cpr = _cprDsc.ToBytes();
+		writer.Write(m_keyID);
+		writer.Write(m_extKey);
+		std::vector<byte> cpr = m_cprDsc.ToBytes();
 		writer.Write(cpr);
 
 		return writer.GetBytes();
@@ -182,9 +182,9 @@ public:
 	CEX::IO::MemoryStream* ToStream()
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
-		writer.Write(_keyID);
-		writer.Write(_extKey);
-		std::vector<byte> cpr = _cprDsc.ToBytes();
+		writer.Write(m_keyID);
+		writer.Write(m_extKey);
+		std::vector<byte> cpr = m_cprDsc.ToBytes();
 		writer.Write(cpr);
 
 		return writer.GetStream();
@@ -282,11 +282,11 @@ public:
 	/// <returns>Hash code</returns>
 	int GetHashCode()
 	{
-		int result = _cprDsc.GetHashCode();
-		for (size_t i = 0; i < _keyID.size(); ++i)
-			result += (31 * _keyID[i]);
-		for (size_t i = 0; i < _extKey.size(); ++i)
-			result += (31 * _extKey[i]);
+		int result = m_cprDsc.GetHashCode();
+		for (size_t i = 0; i < m_keyID.size(); ++i)
+			result += (31 * m_keyID[i]);
+		for (size_t i = 0; i < m_extKey.size(); ++i)
+			result += (31 * m_extKey[i]);
 
 		return result;
 	}

@@ -19,25 +19,25 @@ void THX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void THX::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isDestroyed = true;
-		_dfnRounds = 0;
-		_ikmSize = 0;
-		_isEncryption = false;
-		_isInitialized = false;
+		m_isDestroyed = true;
+		m_dfnRounds = 0;
+		m_ikmSize = 0;
+		m_isEncryption = false;
+		m_isInitialized = false;
 
-		CEX::Utility::IntUtils::ClearVector(_expKey);
-		CEX::Utility::IntUtils::ClearVector(_sprBox);
-		CEX::Utility::IntUtils::ClearVector(_hkdfInfo);
-		CEX::Utility::IntUtils::ClearVector(_legalKeySizes);
-		CEX::Utility::IntUtils::ClearVector(_legalRounds);
+		CEX::Utility::IntUtils::ClearVector(m_expKey);
+		CEX::Utility::IntUtils::ClearVector(m_sprBox);
+		CEX::Utility::IntUtils::ClearVector(m_hkdfInfo);
+		CEX::Utility::IntUtils::ClearVector(m_legalKeySizes);
+		CEX::Utility::IntUtils::ClearVector(m_legalRounds);
 
-		if (_kdfEngine != 0)
+		if (m_kdfEngine != 0)
 		{
-			_kdfEngine->Destroy();
-			if (_destroyEngine)
-				delete _kdfEngine;
+			m_kdfEngine->Destroy();
+			if (m_destroyEngine)
+				delete m_kdfEngine;
 		}
 	}
 }
@@ -54,42 +54,42 @@ void THX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-	int dgtsze = GetIkmSize(_kdfEngineType);
+	int dgtsze = GetIkmSize(m_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 
-	if (key.size() < _legalKeySizes[0])
+	if (key.size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
-	if (key.size() > _legalKeySizes[3] && (key.size() % dgtsze) != 0)
+	if (key.size() > m_legalKeySizes[3] && (key.size() % dgtsze) != 0)
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
 
-	for (size_t i = 0; i < _legalKeySizes.size(); ++i)
+	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
 	{
-		if (key.size() == _legalKeySizes[i])
+		if (key.size() == m_legalKeySizes[i])
 			break;
-		if (i == _legalKeySizes.size() - 1)
+		if (i == m_legalKeySizes.size() - 1)
 			throw CryptoSymmetricCipherException("THX:Initialize", msg);
 	}
 
 	// get the kdf digest engine
-	if (_kdfEngineType != CEX::Enumeration::Digests::None)
+	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
 	{
-		if (key.size() < _ikmSize)
+		if (key.size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("THX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
 
-		_kdfEngine = GetDigest(_kdfEngineType);
+		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}
 
-	_isEncryption = Encryption;
+	m_isEncryption = Encryption;
 	// expand the key
 	ExpandKey(key);
 	// ready to transform data
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void THX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (_isEncryption)
+	if (m_isEncryption)
 		EncryptBlock(Input, Output);
 	else
 		DecryptBlock(Input, Output);
@@ -97,7 +97,7 @@ void THX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void THX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (_isEncryption)
+	if (m_isEncryption)
 		EncryptBlock(Input, InOffset, Output, OutOffset);
 	else
 		DecryptBlock(Input, InOffset, Output, OutOffset);
@@ -105,7 +105,7 @@ void THX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void THX::ExpandKey(const std::vector<byte> &Key)
 {
-	if (_kdfEngineType != CEX::Enumeration::Digests::None)
+	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
@@ -121,7 +121,7 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 {
 	size_t k64Cnt = 4;
 	size_t keyCtr = 0;
-	size_t keySize = _dfnRounds * 2 + 8;
+	size_t keySize = m_dfnRounds * 2 + 8;
 	size_t kbtSize = keySize * 4;
 	uint Y0, Y1, Y2, Y3;
 	std::vector<byte> rawKey(kbtSize, 0);
@@ -129,24 +129,24 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 	std::vector<uint> eKm(k64Cnt, 0);
 	std::vector<uint> oKm(k64Cnt, 0);
 	std::vector<uint> wK(keySize, 0);
-	size_t saltSize = Key.size() - _ikmSize;
+	size_t saltSize = Key.size() - m_ikmSize;
 
 	// hkdf input
-	std::vector<byte> kdfKey(_ikmSize, 0);
+	std::vector<byte> kdfKey(m_ikmSize, 0);
 	std::vector<byte> kdfSalt(0, 0);
 
 	// copy hkdf key and salt from user key
-	memcpy(&kdfKey[0], &Key[0], _ikmSize);
+	memcpy(&kdfKey[0], &Key[0], m_ikmSize);
 	if (saltSize > 0)
 	{
 		kdfSalt.resize(saltSize);
-		memcpy(&kdfSalt[0], &Key[_ikmSize], saltSize);
+		memcpy(&kdfSalt[0], &Key[m_ikmSize], saltSize);
 	}
 
 	// HKDF generator expands array
-	CEX::Mac::HMAC hmac(_kdfEngine);
+	CEX::Mac::HMAC hmac(m_kdfEngine);
 	CEX::Generator::HKDF gen(&hmac);
-	gen.Initialize(kdfSalt, kdfKey, _hkdfInfo);
+	gen.Initialize(kdfSalt, kdfKey, m_hkdfInfo);
 	gen.Generate(rawKey);
 
 	// copy bytes to working key
@@ -180,14 +180,14 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 		Y3 = (byte)Q0[Y3] ^ sbKey[11];
 
 		// sbox members as MDS matrix multiplies 
-		_sprBox[keyCtr * 2] = MDS0[(byte)Q0[(byte)Q0[Y0] ^ sbKey[4]] ^ sbKey[0]];
-		_sprBox[keyCtr * 2 + 1] = MDS1[(byte)Q0[Q1[Y1] ^ sbKey[5]] ^ sbKey[1]];
-		_sprBox[keyCtr * 2 + 0x200] = MDS2[(byte)Q1[(byte)Q0[Y2] ^ sbKey[6]] ^ sbKey[2]];
-		_sprBox[keyCtr++ * 2 + 0x201] = MDS3[(byte)Q1[(byte)Q1[Y3] ^ sbKey[7]] ^ sbKey[3]];
+		m_sprBox[keyCtr * 2] = MDS0[(byte)Q0[(byte)Q0[Y0] ^ sbKey[4]] ^ sbKey[0]];
+		m_sprBox[keyCtr * 2 + 1] = MDS1[(byte)Q0[Q1[Y1] ^ sbKey[5]] ^ sbKey[1]];
+		m_sprBox[keyCtr * 2 + 0x200] = MDS2[(byte)Q1[(byte)Q0[Y2] ^ sbKey[6]] ^ sbKey[2]];
+		m_sprBox[keyCtr++ * 2 + 0x201] = MDS3[(byte)Q1[(byte)Q1[Y3] ^ sbKey[7]] ^ sbKey[3]];
 	}
 
 	// key processed
-	_expKey = wK;
+	m_expKey = wK;
 }
 
 void THX::StandardExpand(const std::vector<byte> &Key)
@@ -200,10 +200,10 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	std::vector<uint> eKm(kmLen, 0);
 	std::vector<uint> oKm(kmLen, 0);
 	std::vector<byte> sbKey(Key.size() == 64 ? 32 : 16, 0);
-	std::vector<uint> wK(_dfnRounds * 2 + 8, 0);
+	std::vector<uint> wK(m_dfnRounds * 2 + 8, 0);
 
 	// CHANGE: 512 key gets 4 extra rounds
-	_dfnRounds = (Key.size() == 64) ? 20 : ROUNDS16;
+	m_dfnRounds = (Key.size() == 64) ? 20 : ROUNDS16;
 
 	for (size_t i = 0; i < k64Cnt; ++i)
 	{
@@ -277,14 +277,14 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 		}
 
 		// sbox members as MDS matrix multiplies 
-		_sprBox[keyCtr * 2] = MDS0[(byte)Q0[(byte)Q0[Y0] ^ sbKey[4]] ^ sbKey[0]];
-		_sprBox[keyCtr * 2 + 1] = MDS1[(byte)Q0[Q1[Y1] ^ sbKey[5]] ^ sbKey[1]];
-		_sprBox[(keyCtr * 2) + 0x200] = MDS2[(byte)Q1[(byte)Q0[Y2] ^ sbKey[6]] ^ sbKey[2]];
-		_sprBox[keyCtr++ * 2 + 0x201] = MDS3[(byte)Q1[(byte)Q1[Y3] ^ sbKey[7]] ^ sbKey[3]];
+		m_sprBox[keyCtr * 2] = MDS0[(byte)Q0[(byte)Q0[Y0] ^ sbKey[4]] ^ sbKey[0]];
+		m_sprBox[keyCtr * 2 + 1] = MDS1[(byte)Q0[Q1[Y1] ^ sbKey[5]] ^ sbKey[1]];
+		m_sprBox[(keyCtr * 2) + 0x200] = MDS2[(byte)Q1[(byte)Q0[Y2] ^ sbKey[6]] ^ sbKey[2]];
+		m_sprBox[keyCtr++ * 2 + 0x201] = MDS3[(byte)Q1[(byte)Q1[Y3] ^ sbKey[7]] ^ sbKey[3]];
 	}
 
 	// expanded key
-	_expKey = wK;
+	m_expKey = wK;
 }
 
 // *** Rounds Processing *** //
@@ -293,45 +293,45 @@ void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 {
 	const size_t LRD = 8;
 	size_t keyCtr = 4;
-	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
 	uint T0, T1;
 
-	keyCtr = _expKey.size();
+	keyCtr = m_expKey.size();
 	do
 	{
 		// round 1
 		T0 = Fe0(X2);
 		T1 = Fe3(X3);
-		X1 ^= T0 + 2 * T1 + _expKey[--keyCtr];
-		X0 = (X0 << 1 | (X0 >> 31)) ^ (T0 + T1 + _expKey[--keyCtr]);
+		X1 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
+		X0 = (X0 << 1 | (X0 >> 31)) ^ (T0 + T1 + m_expKey[--keyCtr]);
 		X1 = (X1 >> 1) | X1 << 31;
 		// round 2
 		T0 = Fe0(X0);
 		T1 = Fe3(X1);
-		X3 ^= T0 + 2 * T1 + _expKey[--keyCtr];
-		X2 = (X2 << 1 | (X2 >> 31)) ^ (T0 + T1 + _expKey[--keyCtr]);
+		X3 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
+		X2 = (X2 << 1 | (X2 >> 31)) ^ (T0 + T1 + m_expKey[--keyCtr]);
 		X3 = (X3 >> 1) | X3 << 31;
 
 	} while (keyCtr != LRD);
 
 	keyCtr = 0;
-	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ _expKey[keyCtr], Output, OutOffset);
-	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ _expKey[++keyCtr], Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ _expKey[++keyCtr], Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
 }
 
 void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = _expKey.size() - 1;
+	const size_t LRD = m_expKey.size() - 1;
 	size_t keyCtr = 0;
-	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ _expKey[keyCtr];
-	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ _expKey[++keyCtr];
-	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ _expKey[++keyCtr];
-	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ _expKey[++keyCtr];
+	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
+	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
+	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
+	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = 7;
@@ -339,23 +339,23 @@ void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	{
 		T0 = Fe0(X0);
 		T1 = Fe3(X1);
-		X2 ^= T0 + T1 + _expKey[++keyCtr];
+		X2 ^= T0 + T1 + m_expKey[++keyCtr];
 		X2 = (X2 >> 1) | X2 << 31;
-		X3 = (X3 << 1 | (X3 >> 31)) ^ (T0 + 2 * T1 + _expKey[++keyCtr]);
+		X3 = (X3 << 1 | (X3 >> 31)) ^ (T0 + 2 * T1 + m_expKey[++keyCtr]);
 
 		T0 = Fe0(X2);
 		T1 = Fe3(X3);
-		X0 ^= T0 + T1 + _expKey[++keyCtr];
+		X0 ^= T0 + T1 + m_expKey[++keyCtr];
 		X0 = (X0 >> 1) | X0 << 31;
-		X1 = (X1 << 1 | (X1 >> 31)) ^ (T0 + 2 * T1 + _expKey[++keyCtr]);
+		X1 = (X1 << 1 | (X1 >> 31)) ^ (T0 + 2 * T1 + m_expKey[++keyCtr]);
 
 	} while (keyCtr != LRD);
 
 	keyCtr = 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ _expKey[keyCtr], Output, OutOffset);
-	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ _expKey[++keyCtr], Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ _expKey[++keyCtr], Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ _expKey[++keyCtr], Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[keyCtr], Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
 }
 
 // *** Helpers *** //

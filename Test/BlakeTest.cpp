@@ -11,30 +11,30 @@ namespace Test
 			Initialize();
 
 			CEX::Digest::Blake256* dgt256 = new CEX::Digest::Blake256();
-			CompareVector(dgt256, _message[0], _expected[0]);
-			CompareVector(dgt256, _message[1], _expected[1]);
-			CompareVector(dgt256, _message[2], _expected[2]);
-			CompareVector(dgt256, _message[3], _expected[3]);
-			CompareVector(dgt256, _message[4], _expected[4]);
-			CompareVector(dgt256, _message[5], _expected[5]);
-			CompareVector(dgt256, _message[6], _expected[6]);
-			CompareVector(dgt256, _message[7], _expected[7]);
-			CompareVector(dgt256, _message[8], _expected[8]);
-			CompareVector(dgt256, _message[9], _expected[9]);
+			CompareVector(dgt256, m_message[0], m_expected[0]);
+			CompareVector(dgt256, m_message[1], m_expected[1]);
+			CompareVector(dgt256, m_message[2], m_expected[2]);
+			CompareVector(dgt256, m_message[3], m_expected[3]);
+			CompareVector(dgt256, m_message[4], m_expected[4]);
+			CompareVector(dgt256, m_message[5], m_expected[5]);
+			CompareVector(dgt256, m_message[6], m_expected[6]);
+			CompareVector(dgt256, m_message[7], m_expected[7]);
+			CompareVector(dgt256, m_message[8], m_expected[8]);
+			CompareVector(dgt256, m_message[9], m_expected[9]);
 			delete dgt256;
 			OnProgress("Passed Blake 256 vector tests..");
 
 			CEX::Digest::Blake512* dgt512 = new CEX::Digest::Blake512();
-			CompareVector(dgt512, _message[10], _expected[10]);
-			CompareVector(dgt512, _message[11], _expected[11]);
-			CompareVector(dgt512, _message[12], _expected[12]);
-			CompareVector(dgt512, _message[13], _expected[13]);
-			CompareVector(dgt512, _message[14], _expected[14]);
-			CompareVector(dgt512, _message[15], _expected[15]);
-			CompareVector(dgt512, _message[16], _expected[16]);
-			CompareVector(dgt512, _message[17], _expected[17]);
-			CompareVector(dgt512, _message[18], _expected[18]);
-			CompareVector(dgt512, _message[19], _expected[19]);
+			CompareVector(dgt512, m_message[10], m_expected[10]);
+			CompareVector(dgt512, m_message[11], m_expected[11]);
+			CompareVector(dgt512, m_message[12], m_expected[12]);
+			CompareVector(dgt512, m_message[13], m_expected[13]);
+			CompareVector(dgt512, m_message[14], m_expected[14]);
+			CompareVector(dgt512, m_message[15], m_expected[15]);
+			CompareVector(dgt512, m_message[16], m_expected[16]);
+			CompareVector(dgt512, m_message[17], m_expected[17]);
+			CompareVector(dgt512, m_message[18], m_expected[18]);
+			CompareVector(dgt512, m_message[19], m_expected[19]);
 			delete dgt512;
 			OnProgress("Passed Blake 512 vector tests..");
 
@@ -95,7 +95,7 @@ namespace Test
 			("45C48A199A992BD22291A2ADF54FF7A5379348AF571FE0E4AE51DBD57D1A7B73A13419AC55737013649F485551EB39A0E51BA8E216AC6E75ADA136B38F019BDE"),
 			("C546CC110B9175896713BEC3F7D158A4ED26081BCAF9CA0DC91EA91CAA9381EA84E9A4758BA15CC3D44F1693FF77C68173122B9293F81133D480C75BA77842B0"),
 		};
-		HexConverter::Decode(expectedEncoded, 20, _expected);
+		HexConverter::Decode(expectedEncoded, 20, m_expected);
 
 		const char* messageEncoded[20] =
 		{
@@ -120,11 +120,11 @@ namespace Test
 			("F1F45C8C41D6B06FC5DA2E6242A6F966EAB82447BC38D38FC50D1B61D29017AD0DB36E2C39C5FB2985AA495F265D01CED6EE77581A72C528FE78288940ADF8"),
 			("E52397A1D04ED8EC1CFB4D8F7A8566AA28DDF8B6F959D460D47A3A5A06B655BACE1998E4250666361F2D449264AE41AABA9341C50A00F3DE354C1468E408CAA4"),
 		};
-		HexConverter::Decode(messageEncoded, 20, _message);
+		HexConverter::Decode(messageEncoded, 20, m_message);
 	}
 
 	void BlakeTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

@@ -37,7 +37,7 @@ namespace Test
 
 		// digest instance for baseline
 		CEX::Digest::IDigest* eng = CEX::Helper::DigestFromName::GetInstance(Engine);
-		unsigned int dgtSze = eng->DigestSize();
+		size_t dgtSze = eng->DigestSize();
 		std::vector<byte> hash1(dgtSze);
 		eng->ComputeHash(data, hash1);
 		delete eng;
@@ -60,6 +60,6 @@ namespace Test
 
 	void DigestStreamTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

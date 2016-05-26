@@ -57,11 +57,11 @@ private:
 	static constexpr size_t BUFFER_SIZE = 4096;
 	static constexpr size_t MAXD16 = 16368;
 
-	bool _isDestroyed;
-	CEX::Seed::CSPRsg* _rngGenerator;
-	std::vector<byte> _byteBuffer;
-	size_t _bufferIndex;
-	size_t _bufferSize;
+	bool m_isDestroyed;
+	CEX::Seed::CSPRsg* m_rngGenerator;
+	std::vector<byte> m_byteBuffer;
+	size_t m_bufferIndex;
+	size_t m_bufferSize;
 
 public:
 
@@ -76,10 +76,10 @@ public:
 	/// <exception cref="CryptoRandomException">Thrown if buffer size is too small</exception>
 	explicit SecureRandom(size_t BufferSize = BUFFER_SIZE)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_isDestroyed(false)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_isDestroyed(false)
 	{
 		if (BufferSize < 64)
 			throw CryptoRandomException("SecureRandom:Ctor", "Buffer size must be at least 64 bytes!");

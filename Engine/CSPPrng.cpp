@@ -5,29 +5,29 @@ NAMESPACE_PRNG
 
 void CSPPrng::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		if (_rngCrypto != 0)
+		if (m_rngCrypto != 0)
 		{
-			_rngCrypto->Destroy();
-			delete _rngCrypto;
+			m_rngCrypto->Destroy();
+			delete m_rngCrypto;
 		}
 
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 
 std::vector<byte> CSPPrng::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
-	_rngCrypto->GetBytes(data);
+	m_rngCrypto->GetBytes(data);
 
 	return data;
 }
 
 void CSPPrng::GetBytes(std::vector<byte> &Output)
 {
-	_rngCrypto->GetBytes(Output);
+	m_rngCrypto->GetBytes(Output);
 }
 
 uint CSPPrng::Next()
@@ -86,13 +86,13 @@ ulong CSPPrng::NextLong(ulong Minimum, ulong Maximum)
 
 void CSPPrng::Reset()
 {
-	if (_rngCrypto != 0)
+	if (m_rngCrypto != 0)
 	{
-		_rngCrypto->Destroy();
-		delete _rngCrypto;
+		m_rngCrypto->Destroy();
+		delete m_rngCrypto;
 	}
 
-	_rngCrypto = new CEX::Seed::CSPRsg;
+	m_rngCrypto = new CEX::Seed::CSPRsg;
 }
 
 // *** Protected Methods *** //

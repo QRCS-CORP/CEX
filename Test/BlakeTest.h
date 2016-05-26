@@ -18,9 +18,9 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All Blake tests have executed succesfully.";
 
-		std::vector<std::vector<byte>> _expected;
-		std::vector<std::vector<byte>> _message;
-		TestEventHandler _progressEvent;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<byte>> m_message;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -31,7 +31,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Blake Vector KATs from the Blake SHA-3 submission package

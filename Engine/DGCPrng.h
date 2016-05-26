@@ -70,16 +70,16 @@ class DGCPrng : public IRandom
 private:
 	static constexpr size_t BUFFER_SIZE = 1024;
 
-	size_t _bufferIndex = 0;
-	size_t _bufferSize = 0;
-	std::vector<byte> _byteBuffer;
-	CEX::Digest::IDigest* _digestEngine;
-	CEX::Enumeration::Digests _digestType;
-	bool _isDestroyed;
-	CEX::Generator::DGCDrbg* _rngGenerator;
-	CEX::Seed::ISeed* _seedGenerator;
-	CEX::Enumeration::SeedGenerators _seedType;
-	std::vector<byte> _stateSeed;
+	size_t m_bufferIndex = 0;
+	size_t m_bufferSize = 0;
+	std::vector<byte> m_byteBuffer;
+	CEX::Digest::IDigest* m_digestEngine;
+	CEX::Enumeration::Digests m_digestType;
+	bool m_isDestroyed;
+	CEX::Generator::DGCDrbg* m_rngGenerator;
+	CEX::Seed::ISeed* m_seedGenerator;
+	CEX::Enumeration::SeedGenerators m_seedType;
+	std::vector<byte> m_stateSeed;
 
 public:
 
@@ -108,12 +108,12 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
 	DGCPrng(CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::Keccak512, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_digestType(DigestEngine),
-		_isDestroyed(false),
-		_seedType(SeedEngine)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_digestType(DigestEngine),
+		m_isDestroyed(false),
+		m_seedType(SeedEngine)
 	{
 		if (BufferSize < 64)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 64 bytes!");
@@ -132,11 +132,11 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
 	explicit DGCPrng(std::vector<byte> Seed, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::Keccak512, size_t BufferSize = BUFFER_SIZE)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_digestType(DigestEngine),
-		_isDestroyed(false)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_digestType(DigestEngine),
+		m_isDestroyed(false)
 	{
 		if (Seed.size() == 0)
 			throw CryptoRandomException("DGCPrng:Ctor", "Seed can not be null!");
@@ -145,7 +145,7 @@ public:
 		if (BufferSize < 128)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 128 bytes!");
 
-		_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
+		m_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
 		Reset();
 	}
 

@@ -1,5 +1,6 @@
 #include "AesAvsTest.h"
 #include "RHX.h"
+#include "AHX.h"
 
 namespace Test
 {
@@ -24,8 +25,10 @@ namespace Test
 
 				HexConverter::Decode(istr, key);
 				HexConverter::Decode(jstr, cipherText);
-
-				CompareVector(key, plainText, cipherText);
+				if (m_testNI)
+					CompareVectorNI(key, plainText, cipherText);
+				else
+					CompareVector(key, plainText, cipherText);
 			}
 			OnProgress("AesAvsTest: Passed 128 bit key vectors test..");
 
@@ -36,7 +39,10 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 48), key);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
-				CompareVector(key, plainText, cipherText);
+				if (m_testNI)
+					CompareVectorNI(key, plainText, cipherText);
+				else
+					CompareVector(key, plainText, cipherText);
 			}
 			OnProgress("AesAvsTest: Passed 192 bit key vectors test..");
 
@@ -47,7 +53,10 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 64), key);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
-				CompareVector(key, plainText, cipherText);
+				if (m_testNI)
+					CompareVectorNI(key, plainText, cipherText);
+				else
+					CompareVector(key, plainText, cipherText);
 			}
 			OnProgress("AesAvsTest: Passed 256 bit key vectors test..");
 
@@ -59,7 +68,10 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), plainText);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
-				CompareVector(key, plainText, cipherText);
+				if (m_testNI)
+					CompareVectorNI(key, plainText, cipherText);
+				else
+					CompareVector(key, plainText, cipherText);
 			}
 			OnProgress("AesAvsTest: Passed 128 bit plain-text vectors test..");
 
@@ -71,7 +83,10 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), plainText);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
-				CompareVector(key, plainText, cipherText);
+				if (m_testNI)
+					CompareVectorNI(key, plainText, cipherText);
+				else
+					CompareVector(key, plainText, cipherText);
 			}
 			OnProgress("AesAvsTest: Passed 192 bit plain-text vectors test..");
 
@@ -83,7 +98,10 @@ namespace Test
 				HexConverter::Decode(data.substr(i, 32), plainText);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
-				CompareVector(key, plainText, cipherText);
+				if (m_testNI)
+					CompareVectorNI(key, plainText, cipherText);
+				else
+					CompareVector(key, plainText, cipherText);
 			}
 			OnProgress("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed");
 
@@ -114,8 +132,23 @@ namespace Test
 		}
 	}
 
+	void AesAvsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	{
+		{
+			std::vector<byte> outBytes(Input.size(), 0);
+
+			CEX::Cipher::Symmetric::Block::AHX engine;
+			CEX::Common::KeyParams k(Key);
+			engine.Initialize(true, k);
+			engine.Transform(Input, outBytes);
+
+			if (outBytes != Output)
+				throw std::string("AESAVS: AES-NI Encrypted arrays are not equal!");
+		}
+	}
+
 	void AesAvsTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

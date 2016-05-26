@@ -33,10 +33,10 @@ void KeyFactory::Create(CEX::Common::CipherDescription &Description, CEX::Common
 	CEX::Seed::CSPRsg rnd;
 	CEX::Processing::Structure::CipherKey ck(Description, rnd.GetBytes(16), rnd.GetBytes(16));
 	std::vector<byte> hdr = ck.ToBytes();
-	_keyStream->Write(hdr, 0, hdr.size());
+	m_keyStream->Write(hdr, 0, hdr.size());
 	CEX::IO::MemoryStream* tmp = CEX::Common::KeyParams::Serialize(KeyParam);
 	std::vector<byte> key = tmp->ToArray();
-	_keyStream->Write(key, 0, key.size());
+	m_keyStream->Write(key, 0, key.size());
 	delete tmp;
 }
 
@@ -61,14 +61,14 @@ void KeyFactory::Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::Symm
 
 void KeyFactory::Extract(CEX::Processing::Structure::CipherKey &KeyHeader, CEX::Common::KeyParams &KeyParam)
 {
-	KeyHeader = CEX::Processing::Structure::CipherKey(*_keyStream);
+	KeyHeader = CEX::Processing::Structure::CipherKey(*m_keyStream);
 	const CEX::Common::CipherDescription dsc = KeyHeader.Description();
 
-	if (_keyStream->Length() < dsc.KeySize() + (uint)dsc.IvSize() + dsc.MacKeySize() + KeyHeader.GetHeaderSize())
+	if (m_keyStream->Length() < dsc.KeySize() + (uint)dsc.IvSize() + dsc.MacKeySize() + KeyHeader.GetHeaderSize())
 		throw CEX::Exception::CryptoProcessingException("KeyFactory:Extract", "The size of the key file does not align with the CipherKey sizes! Key is corrupt.");
 
-	_keyStream->Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);
-	KeyParam = *CEX::Common::KeyParams::DeSerialize(*_keyStream);
+	m_keyStream->Seek(KeyHeader.GetHeaderSize(), CEX::IO::SeekOrigin::Begin);
+	KeyParam = *CEX::Common::KeyParams::DeSerialize(*m_keyStream);
 }
 
 NAMESPACE_PRCFACTORYEND

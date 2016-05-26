@@ -13,18 +13,18 @@ namespace Test
 	struct TestException : std::exception
 	{
 	private:
-		std::string _origin;
-		std::string _message;
+		std::string m_origin;
+		std::string m_message;
 
 	public:
 		/// <summary>
 		/// The origin of the exception in the format Class:Method
 		/// </summary>
-		const std::string &Origin() const { return _origin; }
-		std::string &Origin() { return _origin; }
+		const std::string &Origin() const { return m_origin; }
+		std::string &Origin() { return m_origin; }
 
-		const std::string &Message() const { return _message; }
-		std::string &Message() { return _message; }
+		const std::string &Message() const { return m_message; }
+		std::string &Message() { return m_message; }
 
 		/// <summary>
 		/// Exception constructor
@@ -33,7 +33,7 @@ namespace Test
 		/// <param name="Message">A custom message or error data</param>
 		explicit TestException(const std::string &Message)
 			:
-			_message(Message)
+			m_message(Message)
 		{
 		}
 
@@ -45,8 +45,8 @@ namespace Test
 		/// <param name="Message">A custom message or error data</param>
 		TestException(const std::string &Origin, const std::string &Message)
 			:
-			_origin(Origin),
-			_message(Message)
+			m_origin(Origin),
+			m_message(Message)
 		{
 		}
 	};

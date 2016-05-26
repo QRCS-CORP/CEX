@@ -6,19 +6,19 @@ NAMESPACE_STREAM
 
 void ChaCha::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isDestroyed = true;
-		_isInitialized = false;
-		_processorCount = 0;
-		_isParallel = false;
-		_parallelBlockSize = 0;
-		_rndCount = 0;
+		m_isDestroyed = true;
+		m_isInitialized = false;
+		m_processorCount = 0;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
+		m_rndCount = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_ctrVector);
-		CEX::Utility::IntUtils::ClearVector(_wrkState);
-		CEX::Utility::IntUtils::ClearVector(_dstCode);
-		CEX::Utility::IntUtils::ClearVector(_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(m_ctrVector);
+		CEX::Utility::IntUtils::ClearVector(m_wrkState);
+		CEX::Utility::IntUtils::ClearVector(m_dstCode);
+		CEX::Utility::IntUtils::ClearVector(m_threadVectors);
 	}
 }
 
@@ -29,7 +29,7 @@ void ChaCha::Initialize(const CEX::Common::KeyParams &KeyParam)
 	if (KeyParam.Key().size() != 16 && KeyParam.Key().size() != 32)
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "Key must be 16 or 32 bytes!");
 
-	if (_dstCode.size() == 0)
+	if (m_dstCode.size() == 0)
 	{
 		std::string info;
 		if (KeyParam.Key().size() == 16)
@@ -37,20 +37,20 @@ void ChaCha::Initialize(const CEX::Common::KeyParams &KeyParam)
 		else
 			info = "expand 32-byte k";
 
-		_dstCode.reserve(info.size());
+		m_dstCode.reserve(info.size());
 		for (size_t i = 0; i < info.size(); ++i)
-			_dstCode.push_back(info[i]);
+			m_dstCode.push_back(info[i]);
 	}
 
 	Reset();
 	SetKey(KeyParam.Key(), KeyParam.IV());
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void ChaCha::Reset()
 {
-	_ctrVector[0] = 0;
-	_ctrVector[1] = 0;
+	m_ctrVector[0] = 0;
+	m_ctrVector[1] = 0;
 }
 
 void ChaCha::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -60,7 +60,7 @@ void ChaCha::Transform(const std::vector<byte> &Input, std::vector<byte> &Output
 
 void ChaCha::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	ProcessBlock(Input, InOffset, Output, OutOffset, _isParallel ? _parallelBlockSize : BLOCK_SIZE);
+	ProcessBlock(Input, InOffset, Output, OutOffset, m_isParallel ? m_parallelBlockSize : BLOCK_SIZE);
 }
 
 void ChaCha::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
@@ -74,38 +74,38 @@ void ChaCha::SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 {
 	if (Key.size() == 32)
 	{
-		_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 0);
-		_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 4);
-		_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 8);
-		_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 12);
-		_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(Key, 16);
-		_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 20);
-		_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 24);
-		_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 28);
-		_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
-		_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
+		m_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 0);
+		m_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 4);
+		m_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 8);
+		m_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 12);
+		m_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(Key, 16);
+		m_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 20);
+		m_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 24);
+		m_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 28);
+		m_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
+		m_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
 
 	}
 	else
 	{
-		_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 0);
-		_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 4);
-		_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 8);
-		_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 12);
-		_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
-		_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
+		m_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 0);
+		m_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 4);
+		m_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 8);
+		m_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 12);
+		m_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
+		m_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
 	}
 }
 
@@ -158,10 +158,10 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 	if (blkSize > Output.size() - OutOffset)
 		blkSize = Output.size() - OutOffset;
 
-	if (!_isParallel || blkSize < _parallelBlockSize)
+	if (!m_isParallel || blkSize < m_parallelBlockSize)
 	{
 		// generate random
-		Generate(blkSize, _ctrVector, Output, OutOffset);
+		Generate(blkSize, m_ctrVector, Output, OutOffset);
 		// output is input xor with random
 		size_t sze = blkSize - (blkSize % BLOCK_SIZE);
 
@@ -178,18 +178,18 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 	else
 	{
 		// parallel CTR processing //
-		size_t cnkSize = (blkSize / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
-		size_t rndSize = cnkSize * _processorCount;
+		size_t cnkSize = (blkSize / BLOCK_SIZE / m_processorCount) * BLOCK_SIZE;
+		size_t rndSize = cnkSize * m_processorCount;
 		size_t subSize = (cnkSize / BLOCK_SIZE);
 
 		// create jagged array of 'sub counters'
-		_threadVectors.resize(_processorCount);
+		m_threadVectors.resize(m_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
 		{
-			std::vector<uint> &Vec = _threadVectors[i];
+			std::vector<uint> &Vec = m_threadVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(_ctrVector, subSize * i, Vec);
+			this->Increase(m_ctrVector, subSize * i, Vec);
 			// create random at offset position
 			this->Generate(cnkSize, Vec, Output, (i * cnkSize));
 			// xor with input at offset
@@ -200,132 +200,132 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 		if (rndSize < blkSize)
 		{
 			size_t fnlSize = blkSize % rndSize;
-			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, rndSize);
+			Generate(fnlSize, m_threadVectors[m_processorCount - 1], Output, rndSize);
 
 			for (size_t i = 0; i < fnlSize; ++i)
 				Output[i + OutOffset + rndSize] ^= (byte)(Input[i + InOffset + rndSize]);
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
+		memcpy(&m_ctrVector[0], &m_threadVectors[m_processorCount - 1][0], m_ctrVector.size() * sizeof(uint));
 	}
 }
 
 void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter)
 {
 	size_t ctr = 0;
-	uint X0 = _wrkState[ctr];
-	uint X1 = _wrkState[++ctr];
-	uint X2 = _wrkState[++ctr];
-	uint X3 = _wrkState[++ctr];
-	uint X4 = _wrkState[++ctr];
-	uint X5 = _wrkState[++ctr];
-	uint X6 = _wrkState[++ctr];
-	uint X7 = _wrkState[++ctr];
-	uint X8 = _wrkState[++ctr];
-	uint X9 = _wrkState[++ctr];
-	uint X10 = _wrkState[++ctr];
-	uint X11 = _wrkState[++ctr];
+	uint X0 = m_wrkState[ctr];
+	uint X1 = m_wrkState[++ctr];
+	uint X2 = m_wrkState[++ctr];
+	uint X3 = m_wrkState[++ctr];
+	uint X4 = m_wrkState[++ctr];
+	uint X5 = m_wrkState[++ctr];
+	uint X6 = m_wrkState[++ctr];
+	uint X7 = m_wrkState[++ctr];
+	uint X8 = m_wrkState[++ctr];
+	uint X9 = m_wrkState[++ctr];
+	uint X10 = m_wrkState[++ctr];
+	uint X11 = m_wrkState[++ctr];
 	uint X12 = Counter[0];
 	uint X13 = Counter[1];
-	uint X14 = _wrkState[++ctr];
-	uint X15 = _wrkState[++ctr];
+	uint X14 = m_wrkState[++ctr];
+	uint X15 = m_wrkState[++ctr];
 
-	ctr = _rndCount;
+	ctr = m_rndCount;
 	while (ctr != 0)
 	{
 		X0 += X4; 
-		X12 = CEX::Utility::IntUtils::RotateLeft(X12 ^ X0, 16);
+		X12 = CEX::Utility::IntUtils::RotlFixed(X12 ^ X0, 16);
 		X8 += X12;
-		X4 = CEX::Utility::IntUtils::RotateLeft(X4 ^ X8, 12);
+		X4 = CEX::Utility::IntUtils::RotlFixed(X4 ^ X8, 12);
 		X0 += X4; 
-		X12 = CEX::Utility::IntUtils::RotateLeft(X12 ^ X0, 8);
+		X12 = CEX::Utility::IntUtils::RotlFixed(X12 ^ X0, 8);
 		X8 += X12; 
-		X4 = CEX::Utility::IntUtils::RotateLeft(X4 ^ X8, 7);
+		X4 = CEX::Utility::IntUtils::RotlFixed(X4 ^ X8, 7);
 		X1 += X5; 
-		X13 = CEX::Utility::IntUtils::RotateLeft(X13 ^ X1, 16);
+		X13 = CEX::Utility::IntUtils::RotlFixed(X13 ^ X1, 16);
 		X9 += X13; 
-		X5 = CEX::Utility::IntUtils::RotateLeft(X5 ^ X9, 12);
+		X5 = CEX::Utility::IntUtils::RotlFixed(X5 ^ X9, 12);
 		X1 += X5; 
-		X13 = CEX::Utility::IntUtils::RotateLeft(X13 ^ X1, 8);
+		X13 = CEX::Utility::IntUtils::RotlFixed(X13 ^ X1, 8);
 		X9 += X13; 
-		X5 = CEX::Utility::IntUtils::RotateLeft(X5 ^ X9, 7);
+		X5 = CEX::Utility::IntUtils::RotlFixed(X5 ^ X9, 7);
 		X2 += X6; 
-		X14 = CEX::Utility::IntUtils::RotateLeft(X14 ^ X2, 16);
+		X14 = CEX::Utility::IntUtils::RotlFixed(X14 ^ X2, 16);
 		X10 += X14; 
-		X6 = CEX::Utility::IntUtils::RotateLeft(X6 ^ X10, 12);
+		X6 = CEX::Utility::IntUtils::RotlFixed(X6 ^ X10, 12);
 		X2 += X6; 
-		X14 = CEX::Utility::IntUtils::RotateLeft(X14 ^ X2, 8);
+		X14 = CEX::Utility::IntUtils::RotlFixed(X14 ^ X2, 8);
 		X10 += X14; 
-		X6 = CEX::Utility::IntUtils::RotateLeft(X6 ^ X10, 7);
+		X6 = CEX::Utility::IntUtils::RotlFixed(X6 ^ X10, 7);
 		X3 += X7; 
-		X15 = CEX::Utility::IntUtils::RotateLeft(X15 ^ X3, 16);
+		X15 = CEX::Utility::IntUtils::RotlFixed(X15 ^ X3, 16);
 		X11 += X15; 
-		X7 = CEX::Utility::IntUtils::RotateLeft(X7 ^ X11, 12);
+		X7 = CEX::Utility::IntUtils::RotlFixed(X7 ^ X11, 12);
 		X3 += X7; 
-		X15 = CEX::Utility::IntUtils::RotateLeft(X15 ^ X3, 8);
+		X15 = CEX::Utility::IntUtils::RotlFixed(X15 ^ X3, 8);
 		X11 += X15; 
-		X7 = CEX::Utility::IntUtils::RotateLeft(X7 ^ X11, 7);
+		X7 = CEX::Utility::IntUtils::RotlFixed(X7 ^ X11, 7);
 		X0 += X5; 
-		X15 = CEX::Utility::IntUtils::RotateLeft(X15 ^ X0, 16);
+		X15 = CEX::Utility::IntUtils::RotlFixed(X15 ^ X0, 16);
 		X10 += X15; 
-		X5 = CEX::Utility::IntUtils::RotateLeft(X5 ^ X10, 12);
+		X5 = CEX::Utility::IntUtils::RotlFixed(X5 ^ X10, 12);
 		X0 += X5; 
-		X15 = CEX::Utility::IntUtils::RotateLeft(X15 ^ X0, 8);
+		X15 = CEX::Utility::IntUtils::RotlFixed(X15 ^ X0, 8);
 		X10 += X15; 
-		X5 = CEX::Utility::IntUtils::RotateLeft(X5 ^ X10, 7);
+		X5 = CEX::Utility::IntUtils::RotlFixed(X5 ^ X10, 7);
 		X1 += X6; 
-		X12 = CEX::Utility::IntUtils::RotateLeft(X12 ^ X1, 16);
+		X12 = CEX::Utility::IntUtils::RotlFixed(X12 ^ X1, 16);
 		X11 += X12; 
-		X6 = CEX::Utility::IntUtils::RotateLeft(X6 ^ X11, 12);
+		X6 = CEX::Utility::IntUtils::RotlFixed(X6 ^ X11, 12);
 		X1 += X6; 
-		X12 = CEX::Utility::IntUtils::RotateLeft(X12 ^ X1, 8);
+		X12 = CEX::Utility::IntUtils::RotlFixed(X12 ^ X1, 8);
 		X11 += X12; 
-		X6 = CEX::Utility::IntUtils::RotateLeft(X6 ^ X11, 7);
+		X6 = CEX::Utility::IntUtils::RotlFixed(X6 ^ X11, 7);
 		X2 += X7; 
-		X13 = CEX::Utility::IntUtils::RotateLeft(X13 ^ X2, 16);
+		X13 = CEX::Utility::IntUtils::RotlFixed(X13 ^ X2, 16);
 		X8 += X13; 
-		X7 = CEX::Utility::IntUtils::RotateLeft(X7 ^ X8, 12);
+		X7 = CEX::Utility::IntUtils::RotlFixed(X7 ^ X8, 12);
 		X2 += X7; 
-		X13 = CEX::Utility::IntUtils::RotateLeft(X13 ^ X2, 8);
+		X13 = CEX::Utility::IntUtils::RotlFixed(X13 ^ X2, 8);
 		X8 += X13; 
-		X7 = CEX::Utility::IntUtils::RotateLeft(X7 ^ X8, 7);
+		X7 = CEX::Utility::IntUtils::RotlFixed(X7 ^ X8, 7);
 		X3 += X4; 
-		X14 = CEX::Utility::IntUtils::RotateLeft(X14 ^ X3, 16);
+		X14 = CEX::Utility::IntUtils::RotlFixed(X14 ^ X3, 16);
 		X9 += X14; 
-		X4 = CEX::Utility::IntUtils::RotateLeft(X4 ^ X9, 12);
+		X4 = CEX::Utility::IntUtils::RotlFixed(X4 ^ X9, 12);
 		X3 += X4; 
-		X14 = CEX::Utility::IntUtils::RotateLeft(X14 ^ X3, 8);
+		X14 = CEX::Utility::IntUtils::RotlFixed(X14 ^ X3, 8);
 		X9 += X14; 
-		X4 = CEX::Utility::IntUtils::RotateLeft(X4 ^ X9, 7);
+		X4 = CEX::Utility::IntUtils::RotlFixed(X4 ^ X9, 7);
 		ctr -= 2;
 	}
 
-	CEX::Utility::IntUtils::Le32ToBytes(X0 + _wrkState[ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X1 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X2 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X3 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X4 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X5 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X6 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X7 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X8 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X9 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X10 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X11 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X0 + m_wrkState[ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X1 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X2 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X3 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X4 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X5 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X6 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X7 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X8 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X9 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X10 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X11 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
 	CEX::Utility::IntUtils::Le32ToBytes(X12 + Counter[0], Output, OutOffset); OutOffset += 4;
 	CEX::Utility::IntUtils::Le32ToBytes(X13 + Counter[1], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X14 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X15 + _wrkState[++ctr], Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X14 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X15 + m_wrkState[++ctr], Output, OutOffset);
 }
 
 void ChaCha::SetScope()
 {
-	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
-	if (_processorCount % 2 != 0)
-		_processorCount--;
-	if (_processorCount > 1)
-		_isParallel = true;
+	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	if (m_processorCount % 2 != 0)
+		m_processorCount--;
+	if (m_processorCount > 1)
+		m_isParallel = true;
 }
 
 NAMESPACE_STREAMEND

@@ -81,16 +81,16 @@ private:
 	static constexpr ulong TN_888 = 888;
 	static constexpr ulong TN_1024 = 1024;
 
-	size_t _dataLen = 0;
-	std::vector<byte> _digestState;
-	std::vector<ulong> _HashVal;
-	bool _isDestroyed;
-	bool _isNullT;
-	std::vector<ulong> _M;
-	std::vector<byte> _Padding;
-	std::vector<ulong> _salt64;
-	ulong _T;
-	std::vector<ulong> _V;
+	size_t m_dataLen = 0;
+	std::vector<byte> m_digestState;
+	std::vector<ulong> m_hashVal;
+	bool m_isDestroyed;
+	bool m_isNullT;
+	std::vector<ulong> M;
+	std::vector<byte> m_padding;
+	std::vector<ulong> m_salt64;
+	ulong T;
+	std::vector<ulong> V;
 
 public:
 
@@ -123,15 +123,15 @@ public:
 	/// </summary>
 	Blake512()
 		:
-		_digestState(128, 0),
-		_HashVal(8, 0),
-		_Padding(128, 0),
-		_salt64(4, 0),
-		_M(16, 0),
-		_V(16, 0),
-		_isDestroyed(false)
+		m_digestState(128, 0),
+		m_hashVal(8, 0),
+		m_padding(128, 0),
+		m_salt64(4, 0),
+		M(16, 0),
+		V(16, 0),
+		m_isDestroyed(false)
 	{
-		_Padding[0] = 0x80;
+		m_padding[0] = 0x80;
 		Initialize();
 	}
 
@@ -144,21 +144,21 @@ public:
 	/// <exception cref="CryptoDigestException">Thrown if the salt length is invalid</exception>
 	explicit Blake512(std::vector<ulong> Salt)
 		:
-		_HashVal(8, 0),
-		_salt64(4, 0),
-		_M(16, 0),
-		_V(16, 0),
-		_Padding(64, 0),
-		_digestState(64, 0),
-		_isDestroyed(false)
+		m_hashVal(8, 0),
+		m_salt64(4, 0),
+		M(16, 0),
+		V(16, 0),
+		m_padding(64, 0),
+		m_digestState(64, 0),
+		m_isDestroyed(false)
 	{
 		if (Salt.size() != 4)
 			throw CryptoDigestException("Blake512:Ctor", "The Salt array length must be 4!");
 
 		for (size_t i = 0; i < Salt.size(); i++)
-			_salt64[i] = Salt[i];
+			m_salt64[i] = Salt[i];
 
-		_Padding[0] = 0x80;
+		m_padding[0] = 0x80;
 		Initialize();
 	}
 

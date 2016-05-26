@@ -35,14 +35,14 @@ private:
 	static constexpr int MASK = (MSIZE - 1) << 2;
 	static constexpr uint GDNR = 0x9e3779b9; // golden ratio
 
-	int _accululator;
-	int _cycCounter;
-	bool _isDestroyed;
-	int _lstResult;
-	int _rndCount;
-	std::vector<int> _rndResult;
-	uint _rslCounter;
-	std::vector<int> _wrkBuffer;
+	int m_accululator;
+	int m_cycCounter;
+	bool m_isDestroyed;
+	int m_lstResult;
+	int m_rndCount;
+	std::vector<int> m_rndResult;
+	uint m_rslCounter;
+	std::vector<int> m_wrkBuffer;
 
 public:
 	// *** Properties *** //
@@ -64,14 +64,14 @@ public:
 	/// </summary>
 	ISCRsg()
 		:
-		_accululator(0),
-		_cycCounter(0),
-		_isDestroyed(false),
-		_lstResult(0),
-		_rndCount(0),
-		_rndResult(MSIZE),
-		_rslCounter(0),
-		_wrkBuffer(MSIZE)
+		m_accululator(0),
+		m_cycCounter(0),
+		m_isDestroyed(false),
+		m_lstResult(0),
+		m_rndCount(0),
+		m_rndResult(MSIZE),
+		m_rslCounter(0),
+		m_wrkBuffer(MSIZE)
 	{
 		size_t len = MAXSEED * sizeof(int);
 		GetSeed(len);
@@ -87,20 +87,20 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if an invalid seed size is used</exception>
 	explicit ISCRsg(const std::vector<int> &Seed)
 		:
-		_accululator(0),
-		_cycCounter(0),
-		_isDestroyed(false),
-		_lstResult(0),
-		_rndCount(0),
-		_rndResult(MSIZE),
-		_rslCounter(0),
-		_wrkBuffer(MSIZE)
+		m_accululator(0),
+		m_cycCounter(0),
+		m_isDestroyed(false),
+		m_lstResult(0),
+		m_rndCount(0),
+		m_rndResult(MSIZE),
+		m_rslCounter(0),
+		m_wrkBuffer(MSIZE)
 	{
 		if (Seed.size() < 1 || Seed.size() > 256)
 			throw CryptoRandomException("ISCRsg:CTor", "The seed array length must be between 1 and 256 int32 values!");
 
 		size_t len = Seed.size() > MAXSEED ? MAXSEED : Seed.size();
-		memcpy(&_rndResult[0], &Seed[0], len * sizeof(int));
+		memcpy(&m_rndResult[0], &Seed[0], len * sizeof(int));
 		Initialize(true);
 	}
 

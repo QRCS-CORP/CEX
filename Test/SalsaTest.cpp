@@ -11,14 +11,14 @@ namespace Test
 			Initialize();
 
 			// test vectors with 8/12/20 rounds and 128/256 keys
-			CompareVector(20, _key[0], _iv[0], _plainText, _cipherText[0]);
-			CompareVector(20, _key[1], _iv[0], _plainText, _cipherText[1]);
+			CompareVector(20, m_key[0], m_iv[0], m_plainText, m_cipherText[0]);
+			CompareVector(20, m_key[1], m_iv[0], m_plainText, m_cipherText[1]);
 			OnProgress("SalsaTest: Passed 20 round vector tests..");
-			CompareVector(12, _key[0], _iv[0], _plainText, _cipherText[2]);
-			CompareVector(8, _key[0], _iv[0], _plainText, _cipherText[3]);
+			CompareVector(12, m_key[0], m_iv[0], m_plainText, m_cipherText[2]);
+			CompareVector(8, m_key[0], m_iv[0], m_plainText, m_cipherText[3]);
 			OnProgress("SalsaTest: Passed 8 and 12 round vector tests..");
-			CompareVector(20, _key[2], _iv[1], _plainText, _cipherText[4]);
-			CompareVector(20, _key[3], _iv[2], _plainText, _cipherText[5]);
+			CompareVector(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
+			CompareVector(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
 			OnProgress("SalsaTest: Passed 256 bit key vector tests..");
 			CompareParallel();
 			OnProgress("SalsaTest: Passed parallel/linear equality tests..");
@@ -42,14 +42,14 @@ namespace Test
 		rng.GetBytes(key);
 		std::vector<byte> iv(8);
 		rng.GetBytes(iv);
-		std::vector<byte> data(256);
+		std::vector<byte> data(10240);
 		rng.GetBytes(data);
-		std::vector<byte> enc(256, 0);
-		std::vector<byte> dec(256, 0);
-		std::vector<byte> enc2(256, 0);
-		std::vector<byte> dec2(256, 0);
+		std::vector<byte> enc(10240, 0);
+		std::vector<byte> dec(10240, 0);
+		std::vector<byte> enc2(10240, 0);
+		std::vector<byte> dec2(10240, 0);
 		CEX::Common::KeyParams k(key, iv);
-
+		
 		// encrypt linear
 		CEX::Cipher::Symmetric::Stream::Salsa20 cipher(20);
 		cipher.Initialize(k);
@@ -60,7 +60,7 @@ namespace Test
 		CEX::Cipher::Symmetric::Stream::Salsa20 cipher2(20);
 		cipher2.Initialize(k);
 		cipher2.IsParallel() = true;
-		cipher2.ParallelBlockSize() = 256;
+		cipher2.ParallelBlockSize() = cipher2.ParallelMinimumSize();
 		cipher2.Transform(data, enc2);
 
 		if (enc != enc2)
@@ -74,7 +74,7 @@ namespace Test
 		// decrypt parallel
 		cipher.Initialize(k);
 		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = 256;
+		cipher.ParallelBlockSize() = cipher.ParallelMinimumSize();
 		cipher.Transform(enc2, dec2);
 
 		if (dec != data)
@@ -106,7 +106,7 @@ namespace Test
 
 	void SalsaTest::Initialize()
 	{
-		HexConverter::Decode("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", _plainText);
+		HexConverter::Decode("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", m_plainText);
 
 		const char* keyEncoded[4] =
 		{
@@ -115,7 +115,7 @@ namespace Test
 			("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D"),
 			("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12")
 		};
-		HexConverter::Decode(keyEncoded, 4, _key);
+		HexConverter::Decode(keyEncoded, 4, m_key);
 
 		const char* ivEncoded[3] =
 		{
@@ -123,7 +123,7 @@ namespace Test
 			("0D74DB42A91077DE"),
 			("167DE44BB21980E7")
 		};
-		HexConverter::Decode(ivEncoded, 3, _iv);
+		HexConverter::Decode(ivEncoded, 3, m_iv);
 
 		const char* cipherTextEncoded[6] =
 		{
@@ -134,11 +134,11 @@ namespace Test
 			("F5FAD53F79F9DF58C4AEA0D0ED9A9601F278112CA7180D565B420A48019670EAF24CE493A86263F677B46ACE1924773D2BB25571E1AA8593758FC382B1280B71"), //20r-256k
 			("3944F6DC9F85B128083879FDF190F7DEE4053A07BC09896D51D0690BD4DA4AC1062F1E47D3D0716F80A9B4D85E6D6085EE06947601C85F1A27A2F76E45A6AA87")  //20r-256k
 		};
-		HexConverter::Decode(cipherTextEncoded, 6, _cipherText);
+		HexConverter::Decode(cipherTextEncoded, 6, m_cipherText);
 	}
 
 	void SalsaTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

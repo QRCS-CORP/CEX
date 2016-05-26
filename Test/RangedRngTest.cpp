@@ -98,6 +98,6 @@ namespace Test
 
 	void RangedRngTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

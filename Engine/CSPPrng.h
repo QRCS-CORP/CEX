@@ -59,8 +59,8 @@ NAMESPACE_PRNG
 class CSPPrng : public IRandom
 {
 private:
-	bool _isDestroyed;
-	CEX::Seed::CSPRsg* _rngCrypto;
+	bool m_isDestroyed;
+	CEX::Seed::CSPRsg* m_rngCrypto;
 
 public:
 
@@ -83,7 +83,7 @@ public:
 	/// </summary>
 	CSPPrng()
 		:
-		_isDestroyed(false)
+		m_isDestroyed(false)
 	{
 		Reset();
 	}

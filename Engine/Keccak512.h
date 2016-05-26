@@ -75,12 +75,12 @@ NAMESPACE_DIGEST
 class Keccak512 : public IDigest
 {
 private:
-	size_t _blockSize;
-	std::vector<byte> _buffer;
-	size_t _bufferIndex;
-	size_t _digestSize;
-	bool _isDestroyed;
-	std::vector<ulong> _state;
+	size_t m_blockSize;
+	std::vector<byte> m_buffer;
+	size_t m_bufferIndex;
+	size_t m_digestSize;
+	bool m_isDestroyed;
+	std::vector<ulong> m_state;
 
 public:
 
@@ -89,12 +89,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual size_t BlockSize() { return _blockSize; }
+	virtual size_t BlockSize() { return m_blockSize; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual size_t DigestSize() { return _digestSize; }
+	virtual size_t DigestSize() { return m_digestSize; }
 
 	/// <summary>
 	/// Get: The digests type enumeration member
@@ -115,20 +115,20 @@ public:
 	/// <param name="DigestSize">Digest return size in bits</param>
 	explicit Keccak512(int DigestSize = 512)
 		:
-		_blockSize(0),
-		_buffer(0),
-		_bufferIndex(0),
-		_isDestroyed(false),
-		_digestSize(0),
-		_state(25, 0)
+		m_blockSize(0),
+		m_buffer(0),
+		m_bufferIndex(0),
+		m_isDestroyed(false),
+		m_digestSize(0),
+		m_state(25, 0)
 	{
 		// test for legal sizes; default at 512
 		if (DigestSize == 384)
-			_digestSize = 384 / 8;
+			m_digestSize = 384 / 8;
 		else
-			_digestSize = 512 / 8;
+			m_digestSize = 512 / 8;
 
-		_blockSize = 200 - (_digestSize * 2);
+		m_blockSize = 200 - (m_digestSize * 2);
 
 		Initialize();
 	}

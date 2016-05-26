@@ -11,25 +11,25 @@ namespace Test
 		{
 			Initialize();
 
-			CompareVector256(_keys[0], _input[0], _expected256[0]);
-			CompareVector256(_keys[1], _input[1], _expected256[1]);
-			CompareVector256(_keys[2], _input[2], _expected256[2]);
-			CompareVector256(_keys[3], _input[3], _expected256[3]);
-			CompareVector256(_keys[4], _input[4], _expected256[4]);
-			CompareVector256(_keys[5], _input[5], _expected256[5]);
-			CompareVector256(_keys[6], _input[6], _expected256[6]);
+			CompareVector256(m_keys[0], m_input[0], m_expected256[0]);
+			CompareVector256(m_keys[1], m_input[1], m_expected256[1]);
+			CompareVector256(m_keys[2], m_input[2], m_expected256[2]);
+			CompareVector256(m_keys[3], m_input[3], m_expected256[3]);
+			CompareVector256(m_keys[4], m_input[4], m_expected256[4]);
+			CompareVector256(m_keys[5], m_input[5], m_expected256[5]);
+			CompareVector256(m_keys[6], m_input[6], m_expected256[6]);
 			OnProgress("HMACTest: Passed SHA-2 256 bit known answer vector tests..");
 
-			CompareVector512(_keys[0], _input[0], _expected512[0]);
-			CompareVector512(_keys[1], _input[1], _expected512[1]);
-			CompareVector512(_keys[2], _input[2], _expected512[2]);
-			CompareVector512(_keys[3], _input[3], _expected512[3]);
-			CompareVector512(_keys[4], _input[4], _expected512[4]);
-			CompareVector512(_keys[5], _input[5], _expected512[5]);
-			CompareVector512(_keys[6], _input[6], _expected512[6]);
+			CompareVector512(m_keys[0], m_input[0], m_expected512[0]);
+			CompareVector512(m_keys[1], m_input[1], m_expected512[1]);
+			CompareVector512(m_keys[2], m_input[2], m_expected512[2]);
+			CompareVector512(m_keys[3], m_input[3], m_expected512[3]);
+			CompareVector512(m_keys[4], m_input[4], m_expected512[4]);
+			CompareVector512(m_keys[5], m_input[5], m_expected512[5]);
+			CompareVector512(m_keys[6], m_input[6], m_expected512[6]);
 			OnProgress("HMACTest: Passed SHA-2 512 bit known answer vector tests..");
 
-			CompareAccess(_keys[3]);
+			CompareAccess(m_keys[3]);
 			OnProgress("Passed DoFinal/ComputeHash methods output comparison..");
 
 			return SUCCESS;
@@ -138,7 +138,7 @@ namespace Test
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" \
 				"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 		};
-		HexConverter::Decode(keysEnc, 7, _keys);
+		HexConverter::Decode(keysEnc, 7, m_keys);
 
 		const char* plainTextEnc[7] =
 		{
@@ -152,7 +152,7 @@ namespace Test
 				"68616e20626c6f636b2d73697a6520646174612e20546865206b6579206e6565647320746f20626520686173686564206265666f7265206265696e6720757365" \
 				"642062792074686520484d414320616c676f726974686d2e")
 		};
-		HexConverter::Decode(plainTextEnc, 7, _input);
+		HexConverter::Decode(plainTextEnc, 7, m_input);
 
 		const char* expected256Enc[7] =
 		{
@@ -164,7 +164,7 @@ namespace Test
 			("60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54"),
 			("9b09ffa71b942fcb27635fbcd5b0e944bfdc63644f0713938a7f51535c3a35e2")
 		};
-		HexConverter::Decode(expected256Enc, 7, _expected256);
+		HexConverter::Decode(expected256Enc, 7, m_expected256);
 
 		const char* expected512Enc[7] =
 		{
@@ -176,11 +176,11 @@ namespace Test
 			("80b24263c7c1a3ebb71493c1dd7be8b49b46d1f41b4aeec1121b013783f8f3526b56d037e05f2598bd0fd2215d6a1e5295e64f73f63f0aec8b915a985d786598"),
 			("e37b6a775dc87dbaa4dfa9f96e5e3ffddebd71f8867289865df5a32d20cdc944b6022cac3c4982b10d5eeb55c3e4de15134676fb6de0446065c97440fa8c6a58")
 		};
-		HexConverter::Decode(expected512Enc, 7, _expected512);
+		HexConverter::Decode(expected512Enc, 7, m_expected512);
 	}
 
 	void HMACTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

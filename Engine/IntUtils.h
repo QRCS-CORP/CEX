@@ -17,15 +17,15 @@ class IntUtils
 {
 public:
 
-/// <summary>
-/// Get a byte value from a 32 bit integer
-/// </summary>
-/// 
-/// <param name="Value">The integer value</param>
-/// <param name="Shift">The number of bytes to shift</param>
-/// 
-/// <returns>Bit precision</returns>
-#define GETBYTE(Value, Shift) (uint)byte((Value)>>(8*(Shift)))
+	/// <summary>
+	/// Get a byte value from a 32 bit integer
+	/// </summary>
+	/// 
+	/// <param name="Value">The integer value</param>
+	/// <param name="Shift">The number of bytes to shift</param>
+	/// 
+	/// <returns>Bit precision</returns>
+	#define GETBYTE(Value, Shift) (uint)byte((Value)>>(8*(Shift)))
 	// these may be faster on other CPUs/compilers
 	// #define GETBYTE(Value, Shift) (uint)(((Value)>>(8*(Shift)))&255)
 	// #define GETBYTE(Value, Shift) (((byte *)&(Value))[Shift])
@@ -53,7 +53,7 @@ public:
 	{
 		Value = ((Value & 0xAA) >> 1) | ((Value & 0x55) << 1);
 		Value = ((Value & 0xCC) >> 2) | ((Value & 0x33) << 2);
-		return (byte)RotlFixed(Value, 4);
+		return static_cast<byte>(RotlFixed(Value, 4));
 	}
 
 	/// <summary>
@@ -127,7 +127,7 @@ public:
 	/// <returns>The reversed ushort</returns>
 	static inline ushort ByteReverse(ushort Value)
 	{
-		return (ushort)RotlFixed(Value, 8U);
+		return static_cast<ushort>(RotlFixed(Value, 8U));
 	}
 
 	/// <summary>
@@ -163,7 +163,7 @@ public:
 	{
 #ifdef PPC_INTRINSICS
 		// PPC: load reverse indexed instruction
-		return (uint)__lwbrx(&Value, 0);
+		return static_cast<uint>(__lwbrx(&Value, 0));
 #elif defined(FAST_ROTATE)
 		// 5 instructions with rotate instruction, 9 without
 		return (RotrFixed64(Value, 8U) & 0xff00ff00) | (RotlFixed64(Value, 8U) & 0x00ff00ff);
@@ -191,8 +191,8 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination array</param>
 	static inline void Be16ToBytes(const ushort Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
-		Output[OutOffset + 1] = (byte)Value;
-		Output[OutOffset] = (byte)(Value >> 8);
+		Output[OutOffset + 1] = static_cast<byte>(Value);
+		Output[OutOffset] = static_cast<byte>(Value >> 8);
 	}
 
 	/// <summary>
@@ -204,10 +204,10 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination array</param>
 	static inline void Be32ToBytes(const uint Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
-		Output[OutOffset + 3] = (byte)Value;
-		Output[OutOffset + 2] = (byte)(Value >> 8);
-		Output[OutOffset + 1] = (byte)(Value >> 16);
-		Output[OutOffset] = (byte)(Value >> 24);
+		Output[OutOffset + 3] = static_cast<byte>(Value);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 16);
+		Output[OutOffset] = static_cast<byte>(Value >> 24);
 	}
 
 	/// <summary>
@@ -219,14 +219,14 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination array</param>
 	static inline void Be64ToBytes(const ulong Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
-		Output[OutOffset + 7] = (byte)Value;
-		Output[OutOffset + 6] = (byte)(Value >> 8);
-		Output[OutOffset + 5] = (byte)(Value >> 16);
-		Output[OutOffset + 4] = (byte)(Value >> 24);
-		Output[OutOffset + 3] = (byte)(Value >> 32);
-		Output[OutOffset + 2] = (byte)(Value >> 40);
-		Output[OutOffset + 1] = (byte)(Value >> 48);
-		Output[OutOffset] = (byte)(Value >> 56);
+		Output[OutOffset + 7] = static_cast<byte>(Value);
+		Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 5] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 4] = static_cast<byte>(Value >> 24);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 32);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 40);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 48);
+		Output[OutOffset] = static_cast<byte>(Value >> 56);
 	}
 
 	/// <summary>
@@ -239,8 +239,8 @@ public:
 	static inline ushort BytesToBe16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ushort)Input[InOffset] << 8) |
-			((ushort)Input[InOffset + 1]);
+			(static_cast<ushort>(Input[InOffset] << 8)) |
+			(static_cast<ushort>(Input[InOffset + 1]));
 	}
 
 	/// <summary>
@@ -253,10 +253,10 @@ public:
 	static inline uint BytesToBe32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((uint)Input[InOffset] << 24) |
-			((uint)Input[InOffset + 1] << 16) |
-			((uint)Input[InOffset + 2] << 8) |
-			((uint)Input[InOffset + 3]);
+			(static_cast<uint>(Input[InOffset] << 24)) |
+			(static_cast<uint>(Input[InOffset + 1] << 16)) |
+			(static_cast<uint>(Input[InOffset + 2] << 8)) |
+			(static_cast<uint>(Input[InOffset + 3]));
 	}
 
 	/// <summary>
@@ -290,8 +290,8 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Le16ToBytes(const ushort Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
-		Output[OutOffset] = (byte)Value;
-		Output[OutOffset + 1] = (byte)(Value >> 8);
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
 	}
 
 	/// <summary>
@@ -303,10 +303,10 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Le32ToBytes(const uint Value, std::vector<byte> &Output, const size_t OutOffset)
 	{
-		Output[OutOffset] = (byte)Value;
-		Output[OutOffset + 1] = (byte)(Value >> 8);
-		Output[OutOffset + 2] = (byte)(Value >> 16);
-		Output[OutOffset + 3] = (byte)(Value >> 24);
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
 	}
 
 	/// <summary>
@@ -318,14 +318,14 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Le64ToBytes(const ulong DWord, std::vector<byte> &Output, const size_t OutOffset)
 	{
-		Output[OutOffset] = (byte)DWord;
-		Output[OutOffset + 1] = (byte)(DWord >> 8);
-		Output[OutOffset + 2] = (byte)(DWord >> 16);
-		Output[OutOffset + 3] = (byte)(DWord >> 24);
-		Output[OutOffset + 4] = (byte)(DWord >> 32);
-		Output[OutOffset + 5] = (byte)(DWord >> 40);
-		Output[OutOffset + 6] = (byte)(DWord >> 48);
-		Output[OutOffset + 7] = (byte)(DWord >> 56);
+		Output[OutOffset] = static_cast<byte>(DWord);
+		Output[OutOffset + 1] = static_cast<byte>(DWord >> 8);
+		Output[OutOffset + 2] = static_cast<byte>(DWord >> 16);
+		Output[OutOffset + 3] = static_cast<byte>(DWord >> 24);
+		Output[OutOffset + 4] = static_cast<byte>(DWord >> 32);
+		Output[OutOffset + 5] = static_cast<byte>(DWord >> 40);
+		Output[OutOffset + 6] = static_cast<byte>(DWord >> 48);
+		Output[OutOffset + 7] = static_cast<byte>(DWord >> 56);
 	}
 
 	/// <summary>
@@ -338,8 +338,8 @@ public:
 	static inline ushort BytesToLe16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ushort)Input[InOffset] |
-			((ushort)Input[InOffset + 1] << 8));
+			(static_cast<ushort>(Input[InOffset]) |
+			(static_cast<ushort>(Input[InOffset + 1] << 8)));
 	}
 
 	/// <summary>
@@ -352,10 +352,10 @@ public:
 	static inline uint BytesToLe32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((uint)Input[InOffset] |
-			((uint)Input[InOffset + 1] << 8) |
-			((uint)Input[InOffset + 2] << 16) |
-			((uint)Input[InOffset + 3] << 24));
+			(static_cast<uint>(Input[InOffset]) |
+			(static_cast<uint>(Input[InOffset + 1] << 8)) |
+			(static_cast<uint>(Input[InOffset + 2] << 16)) |
+			(static_cast<uint>(Input[InOffset + 3] << 24)));
 	}
 
 	/// <summary>
@@ -368,14 +368,14 @@ public:
 	static inline ulong BytesToLe64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ulong)Input[InOffset] |
+			((ulong)Input[InOffset]) |
 			((ulong)Input[InOffset + 1] << 8) |
 			((ulong)Input[InOffset + 2] << 16) |
 			((ulong)Input[InOffset + 3] << 24) |
 			((ulong)Input[InOffset + 4] << 32) |
 			((ulong)Input[InOffset + 5] << 40) |
 			((ulong)Input[InOffset + 6] << 48) |
-			((ulong)Input[InOffset + 7] << 56));
+			((ulong)Input[InOffset + 7] << 56);
 	}
 
 #if defined(IS_LITTLE_ENDIAN)
@@ -389,8 +389,8 @@ public:
 	static inline ushort BytesToWord16(const std::vector<byte> &Input)
 	{
 		return
-			((ushort)Input[0] |
-			((ushort)Input[1] << 8));
+			(static_cast<ushort>(Input[0]) |
+			(static_cast<ushort>(Input[1] << 8)));
 	}
 
 	/// <summary>
@@ -404,8 +404,8 @@ public:
 	static inline ushort BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ushort)Input[InOffset] |
-			((ushort)Input[InOffset + 1] << 8));
+			(static_cast<ushort>(Input[InOffset]) |
+			(static_cast<ushort>(Input[InOffset + 1] << 8)));
 	}
 
 	/// <summary>
@@ -418,10 +418,10 @@ public:
 	static inline uint BytesToWord32(const std::vector<byte> &Input)
 	{
 		return
-			((uint)Input[0] |
-			((uint)Input[1] << 8) |
-			((uint)Input[2] << 16) |
-			((uint)Input[3] << 24));
+			(static_cast<uint>(Input[0]) |
+			(static_cast<uint>(Input[1] << 8)) |
+			(static_cast<uint>(Input[2] << 16)) |
+			(static_cast<uint>(Input[3] << 24)));
 	}
 
 	/// <summary>
@@ -435,10 +435,10 @@ public:
 	static inline uint BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((uint)Input[InOffset] |
-			((uint)Input[InOffset + 1] << 8) |
-			((uint)Input[InOffset + 2] << 16) |
-			((uint)Input[InOffset + 3] << 24));
+			(static_cast<uint>(Input[InOffset]) |
+			(static_cast<uint>(Input[InOffset + 1] << 8)) |
+			(static_cast<uint>(Input[InOffset + 2] << 16)) |
+			(static_cast<uint>(Input[InOffset + 3] << 24)));
 	}
 
 	/// <summary>
@@ -451,14 +451,14 @@ public:
 	static inline ulong BytesToWord64(const std::vector<byte> &Input)
 	{
 		return
-			((ulong)Input[0] |
+			((ulong)Input[0]) |
 			((ulong)Input[1] << 8) |
 			((ulong)Input[2] << 16) |
 			((ulong)Input[3] << 24) |
 			((ulong)Input[4] << 32) |
 			((ulong)Input[5] << 40) |
 			((ulong)Input[6] << 48) |
-			((ulong)Input[7] << 56));
+			((ulong)Input[7] << 56);
 	}
 
 	/// <summary>
@@ -472,14 +472,14 @@ public:
 	static inline ulong BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ulong)Input[InOffset] |
+			((ulong)Input[InOffset]) |
 			((ulong)Input[InOffset + 1] << 8) |
 			((ulong)Input[InOffset + 2] << 16) |
 			((ulong)Input[InOffset + 3] << 24) |
 			((ulong)Input[InOffset + 4] << 32) |
 			((ulong)Input[InOffset + 5] << 40) |
 			((ulong)Input[InOffset + 6] << 48) |
-			((ulong)Input[InOffset + 7] << 56));
+			((ulong)Input[InOffset + 7] << 56);
 	}
 
 	/// <summary>
@@ -490,8 +490,8 @@ public:
 	/// <param name="Output">The destination bytes</param>
 	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output)
 	{
-		Output[0] = (byte)Value;
-		Output[1] = (byte)(Value >> 8);
+		Output[0] = static_cast<byte>(Value);
+		Output[1] = static_cast<byte>(Value >> 8);
 	}
 
 	/// <summary>
@@ -503,8 +503,8 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
 	{
-		Output[OutOffset] = (byte)Value;
-		Output[OutOffset + 1] = (byte)(Value >> 8);
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
 	}
 
 	/// <summary>
@@ -515,10 +515,10 @@ public:
 	/// <param name="Output">The destination bytes</param>
 	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output)
 	{
-		Output[0] = (byte)Value;
-		Output[1] = (byte)(Value >> 8);
-		Output[2] = (byte)(Value >> 16);
-		Output[3] = (byte)(Value >> 24);
+		Output[0] = static_cast<byte>(Value);
+		Output[1] = static_cast<byte>(Value >> 8);
+		Output[2] = static_cast<byte>(Value >> 16);
+		Output[3] = static_cast<byte>(Value >> 24);
 	}
 
 	/// <summary>
@@ -530,10 +530,10 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
 	{
-		Output[OutOffset] = (byte)Value;
-		Output[OutOffset + 1] = (byte)(Value >> 8);
-		Output[OutOffset + 2] = (byte)(Value >> 16);
-		Output[OutOffset + 3] = (byte)(Value >> 24);
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
 	}
 
 	/// <summary>
@@ -544,14 +544,14 @@ public:
 	/// <param name="Output">The destination bytes</param>
 	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output)
 	{
-		Output[0] = (byte)Value;
-		Output[1] = (byte)(Value >> 8);
-		Output[2] = (byte)(Value >> 16);
-		Output[3] = (byte)(Value >> 24);
-		Output[4] = (byte)(Value >> 32);
-		Output[5] = (byte)(Value >> 40);
-		Output[6] = (byte)(Value >> 48);
-		Output[7] = (byte)(Value >> 56);
+		Output[0] = static_cast<byte>(Value);
+		Output[1] = static_cast<byte>(Value >> 8);
+		Output[2] = static_cast<byte>(Value >> 16);
+		Output[3] = static_cast<byte>(Value >> 24);
+		Output[4] = static_cast<byte>(Value >> 32);
+		Output[5] = static_cast<byte>(Value >> 40);
+		Output[6] = static_cast<byte>(Value >> 48);
+		Output[7] = static_cast<byte>(Value >> 56);
 	}
 
 	/// <summary>
@@ -563,14 +563,14 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
 	{
-		Output[OutOffset] = (byte)Value;
-		Output[OutOffset + 1] = (byte)(Value >> 8);
-		Output[OutOffset + 2] = (byte)(Value >> 16);
-		Output[OutOffset + 3] = (byte)(Value >> 24);
-		Output[OutOffset + 4] = (byte)(Value >> 32);
-		Output[OutOffset + 5] = (byte)(Value >> 40);
-		Output[OutOffset + 6] = (byte)(Value >> 48);
-		Output[OutOffset + 7] = (byte)(Value >> 56);
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
+		Output[OutOffset + 4] = static_cast<byte>(Value >> 32);
+		Output[OutOffset + 5] = static_cast<byte>(Value >> 40);
+		Output[OutOffset + 6] = static_cast<byte>(Value >> 48);
+		Output[OutOffset + 7] = static_cast<byte>(Value >> 56);
 	}
 #else
 	/// <summary>
@@ -583,8 +583,8 @@ public:
 	static inline ushort BytesToWord16(const std::vector<byte> &Input)
 	{
 		return
-			((ushort)Input[1] |
-			((ushort)Input[0] << 8));
+			(static_cast<ushort>(Input[1]) |
+			(static_cast<ushort>(Input[0] << 8)));
 	}
 
 	/// <summary>
@@ -598,8 +598,8 @@ public:
 	static inline ushort BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ushort)Input[InOffset + 1] |
-			((ushort)Input[InOffset] << 8));
+			(static_cast<ushort>(Input[InOffset + 1]) |
+			(static_cast<ushort>(Input[InOffset] << 8)));
 	}
 
 	/// <summary>
@@ -612,10 +612,10 @@ public:
 	static inline uint BytesToWord32(const std::vector<byte> &Input)
 	{
 		return
-			((uint)Input[3] |
-			((uint)Input[2] << 8) |
-			((uint)Input[1] << 16) |
-			((uint)Input[0] << 24));
+			(static_cast<uint>(Input[3]) |
+			(static_cast<uint>(Input[2] << 8)) |
+			(static_cast<uint>(Input[1] << 16)) |
+			(static_cast<uint>(Input[0] << 24)));
 	}
 
 	/// <summary>
@@ -629,10 +629,10 @@ public:
 	static inline uint BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((uint)Input[InOffset + 3] |
-			((uint)Input[InOffset + 2] << 8) |
-			((uint)Input[InOffset + 1] << 16) |
-			((uint)Input[InOffset] << 24));
+			(static_cast<uint>(Input[InOffset + 3]) |
+			(static_cast<uint>(Input[InOffset + 2] << 8)) |
+			(static_cast<uint>(Input[InOffset + 1] << 16)) |
+			(static_cast<uint>(Input[InOffset] << 24)));
 	}
 
 	/// <summary>
@@ -645,14 +645,14 @@ public:
 	static inline ulong BytesToWord64(const std::vector<byte> &Input)
 	{
 		return
-			((ulong)Input[7] |
+			((ulong)Input[7]) |
 			((ulong)Input[6] << 8) |
 			((ulong)Input[5] << 16) |
 			((ulong)Input[4] << 24) |
 			((ulong)Input[3] << 32) |
 			((ulong)Input[2] << 40) |
 			((ulong)Input[1] << 48) |
-			((ulong)Input[0] << 56));
+			((ulong)Input[0] << 56);
 	}
 
 	/// <summary>
@@ -666,14 +666,14 @@ public:
 	static inline ulong BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
 	{
 		return
-			((ulong)Input[InOffset + 7] |
+			((ulong)Input[InOffset + 7]) |
 			((ulong)Input[InOffset + 6] << 8) |
 			((ulong)Input[InOffset + 5] << 16) |
 			((ulong)Input[InOffset + 4] << 24) |
 			((ulong)Input[InOffset + 3] << 32) |
 			((ulong)Input[InOffset + 2] << 40) |
 			((ulong)Input[InOffset + 1] << 48) |
-			((ulong)Input[InOffset] << 56));
+			((ulong)Input[InOffset] << 56);
 	}
 
 	/// <summary>
@@ -684,8 +684,8 @@ public:
 	/// <param name="Output">The destination bytes</param>
 	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output)
 	{
-		Output[1] = (byte)Value;
-		Output[0] = (byte)(Value >> 8);
+		Output[1] = static_cast<byte>(Value);
+		Output[0] = static_cast<byte>(Value >> 8);
 	}
 
 	/// <summary>
@@ -697,8 +697,8 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
 	{
-		Output[OutOffset + 1] = (byte)Value;
-		Output[OutOffset] = (byte)(Value >> 8);
+		Output[OutOffset + 1] = static_cast<byte>(Value);
+		Output[OutOffset] = static_cast<byte>(Value >> 8);
 	}
 
 	/// <summary>
@@ -709,10 +709,10 @@ public:
 	/// <param name="Output">The destination bytes</param>
 	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output)
 	{
-		Output[3] = (byte)Value;
-		Output[2] = (byte)(Value >> 8);
-		Output[1] = (byte)(Value >> 16);
-		Output[0] = (byte)(Value >> 24);
+		Output[3] = static_cast<byte>(Value);
+		Output[2] = static_cast<byte>(Value >> 8);
+		Output[1] = static_cast<byte>(Value >> 16);
+		Output[0] = static_cast<byte>(Value >> 24);
 	}
 
 	/// <summary>
@@ -724,10 +724,10 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
 	{
-		Output[OutOffset + 3] = (byte)Value;
-		Output[OutOffset + 2] = (byte)(Value >> 8);
-		Output[OutOffset + 1] = (byte)(Value >> 16);
-		Output[OutOffset] = (byte)(Value >> 24);
+		Output[OutOffset + 3] = static_cast<byte>(Value);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 16);
+		Output[OutOffset] = static_cast<byte>(Value >> 24);
 	}
 
 	/// <summary>
@@ -738,14 +738,14 @@ public:
 	/// <param name="Output">The destination bytes</param>
 	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output)
 	{
-		Output[7] = (byte)Value;
-		Output[6] = (byte)(Value >> 8);
-		Output[5] = (byte)(Value >> 16);
-		Output[4] = (byte)(Value >> 24);
-		Output[3] = (byte)(Value >> 32);
-		Output[2] = (byte)(Value >> 40);
-		Output[1] = (byte)(Value >> 48);
-		Output[0] = (byte)(Value >> 56);
+		Output[7] = static_cast<byte>(Value);
+		Output[6] = static_cast<byte>(Value >> 8);
+		Output[5] = static_cast<byte>(Value >> 16);
+		Output[4] = static_cast<byte>(Value >> 24);
+		Output[3] = static_cast<byte>(Value >> 32);
+		Output[2] = static_cast<byte>(Value >> 40);
+		Output[1] = static_cast<byte>(Value >> 48);
+		Output[0] = static_cast<byte>(Value >> 56);
 	}
 
 	/// <summary>
@@ -757,14 +757,14 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static inline void Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
 	{
-		Output[OutOffset + 7] = (byte)Value;
-		Output[OutOffset + 6] = (byte)(Value >> 8);
-		Output[OutOffset + 5] = (byte)(Value >> 16);
-		Output[OutOffset + 4] = (byte)(Value >> 24);
-		Output[OutOffset + 3] = (byte)(Value >> 32);
-		Output[OutOffset + 2] = (byte)(Value >> 40);
-		Output[OutOffset + 1] = (byte)(Value >> 48);
-		Output[OutOffset] = (byte)(Value >> 56);
+		Output[OutOffset + 7] = static_cast<byte>(Value);
+		Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 5] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 4] = static_cast<byte>(Value >> 24);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 32);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 40);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 48);
+		Output[OutOffset] = static_cast<byte>(Value >> 56);
 	}
 #endif
 
@@ -950,7 +950,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	static inline uint RotlFixed(uint Value, uint Shift)
 	{
-		return Shift ? _lrotl(Value, Shift) : Value;
+		return _lrotl(Value, Shift);
 	}
 
 	/// <summary>
@@ -963,7 +963,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	static inline uint RotrFixed(uint Value, uint Shift)
 	{
-		return Shift ? _lrotr(Value, Shift) : Value;
+		return _lrotr(Value, Shift);
 	}
 
 	/// <summary>
@@ -976,7 +976,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	static inline ulong RotlFixed64(ulong Value, uint Shift)
 	{
-		return Shift ? _rotl64(Value, Shift) : Value;
+		return _rotl64(Value, Shift);
 	}
 
 	/// <summary>
@@ -989,7 +989,7 @@ public:
 	/// <returns>The right shifted 64 bit integer</returns>
 	static inline ulong RotrFixed64(ulong Value, uint Shift)
 	{
-		return Shift ? _rotr64(Value, Shift) : Value;
+		return _rotr64(Value, Shift);
 	}
 
 #elif defined(PPC_INTRINSICS)
@@ -1055,7 +1055,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	static inline uint RotlFixed(uint Value, uint Shift)
 	{
-		return Shift ? __rlwinm(Value, Shift, 0, 31) : Value;
+		return __rlwinm(Value, Shift, 0, 31);
 	}
 
 	/// <summary>
@@ -1068,7 +1068,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	static inline uint RotrFixed(uint Value, uint Shift)
 	{
-		return Shift ? __rlwinm(Value, 32 - Shift, 0, 31) : Value;
+		return __rlwinm(Value, 32 - Shift, 0, 31);
 	}
 
 	/// <summary>

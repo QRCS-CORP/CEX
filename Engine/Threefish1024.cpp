@@ -2,10 +2,10 @@
 
 void Threefish1024::Clear()
 {
-	if (_expandedKey.size() > 0)
-		fill(_expandedKey.begin(), _expandedKey.end(), 0);
-	if (_expandedTweak.size() > 0)
-		fill(_expandedTweak.begin(), _expandedTweak.end(), 0);
+	if (m_expandedKey.size() > 0)
+		fill(m_expandedKey.begin(), m_expandedKey.end(), 0);
+	if (m_expandedTweak.size() > 0)
+		fill(m_expandedTweak.begin(), m_expandedTweak.end(), 0);
 }
 
 void Threefish1024::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> &Output)
@@ -27,26 +27,26 @@ void Threefish1024::Encrypt(const std::vector<ulong> &Input, std::vector<ulong> 
 	ulong B13 = Input[13];
 	ulong B14 = Input[14];
 	ulong B15 = Input[15];
-	ulong K0 = _expandedKey[0];
-	ulong K1 = _expandedKey[1];
-	ulong K2 = _expandedKey[2];
-	ulong K3 = _expandedKey[3];
-	ulong K4 = _expandedKey[4];
-	ulong K5 = _expandedKey[5];
-	ulong K6 = _expandedKey[6];
-	ulong K7 = _expandedKey[7];
-	ulong K8 = _expandedKey[8];
-	ulong K9 = _expandedKey[9];
-	ulong K10 = _expandedKey[10];
-	ulong K11 = _expandedKey[11];
-	ulong K12 = _expandedKey[12];
-	ulong K13 = _expandedKey[13];
-	ulong K14 = _expandedKey[14];
-	ulong K15 = _expandedKey[15];
-	ulong K16 = _expandedKey[16];
-	ulong T0 = _expandedTweak[0];
-	ulong T1 = _expandedTweak[1];
-	ulong T2 = _expandedTweak[2];
+	ulong K0 = m_expandedKey[0];
+	ulong K1 = m_expandedKey[1];
+	ulong K2 = m_expandedKey[2];
+	ulong K3 = m_expandedKey[3];
+	ulong K4 = m_expandedKey[4];
+	ulong K5 = m_expandedKey[5];
+	ulong K6 = m_expandedKey[6];
+	ulong K7 = m_expandedKey[7];
+	ulong K8 = m_expandedKey[8];
+	ulong K9 = m_expandedKey[9];
+	ulong K10 = m_expandedKey[10];
+	ulong K11 = m_expandedKey[11];
+	ulong K12 = m_expandedKey[12];
+	ulong K13 = m_expandedKey[13];
+	ulong K14 = m_expandedKey[14];
+	ulong K15 = m_expandedKey[15];
+	ulong K16 = m_expandedKey[16];
+	ulong T0 = m_expandedTweak[0];
+	ulong T1 = m_expandedTweak[1];
+	ulong T2 = m_expandedTweak[2];
 
 	Mix(B0, B1, 24, K0, K1);
 	Mix(B2, B3, 13, K2, K3);
@@ -713,18 +713,18 @@ void Threefish1024::SetKey(const std::vector<ulong> &Key)
 	size_t i;
 	ulong parity = KeyScheduleConst;
 
-	for (i = 0; i < _expandedKey.size() - 1; i++)
+	for (i = 0; i < m_expandedKey.size() - 1; i++)
 	{
-		_expandedKey[i] = Key[i];
+		m_expandedKey[i] = Key[i];
 		parity ^= Key[i];
 	}
 
-	_expandedKey[i] = parity;
+	m_expandedKey[i] = parity;
 }
 
 void Threefish1024::SetTweak(const std::vector<ulong> &Tweak)
 {
-	_expandedTweak[0] = Tweak[0];
-	_expandedTweak[1] = Tweak[1];
-	_expandedTweak[2] = Tweak[0] ^ Tweak[1];
+	m_expandedTweak[0] = Tweak[0];
+	m_expandedTweak[1] = Tweak[1];
+	m_expandedTweak[2] = Tweak[0] ^ Tweak[1];
 }

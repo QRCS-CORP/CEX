@@ -47,11 +47,11 @@ void FileStream::CopyTo(IByteStream* Destination)
 
 void FileStream::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
 		_filePosition = 0;
 		_fileStream.close();
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 

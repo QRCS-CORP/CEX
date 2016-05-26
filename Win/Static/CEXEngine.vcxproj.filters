@@ -510,6 +510,15 @@
     <ClInclude Include="..\..\Engine\MacKey.h">
       <Filter>Header Files\Processing\Structure</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Engine\AHX.h">
+      <Filter>Header Files\Cipher\Symmetric\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Int128.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Engine\Cpu.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Engine\CBC.cpp">
@@ -709,6 +718,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Engine\MacFromDescription.cpp">
       <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Engine\AHX.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

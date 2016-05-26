@@ -38,7 +38,7 @@ class CSPRsg : public ISeed
 {
 private:
 #ifdef _WIN32
-	HCRYPTPROV _hProvider = 0;
+	HCRYPTPROV m_hProvider = 0;
 #endif
 
 public:

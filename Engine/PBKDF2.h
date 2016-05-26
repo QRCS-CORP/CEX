@@ -68,15 +68,15 @@ class PBKDF2 : public IGenerator
 private:
 	static constexpr size_t PKCS_ITERATIONS = 1000;
 
-	size_t _blockSize;
-	CEX::Mac::HMAC* _digestMac;
-	size_t _hashSize;
-	bool _isDestroyed;
-	bool _isInitialized;
-	std::vector<byte> _macKey;
-	CEX::Digest::IDigest* _msgDigest;
-	size_t _prcIterations;
-	std::vector<byte> _macSalt;
+	size_t m_blockSize;
+	CEX::Mac::HMAC* m_digestMac;
+	size_t m_hashSize;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	std::vector<byte> m_macKey;
+	CEX::Digest::IDigest* m_msgDigest;
+	size_t m_prcIterations;
+	std::vector<byte> m_macSalt;
 
 public:
 
@@ -90,18 +90,18 @@ public:
 	/// <summary>
 	/// Get: Generator is ready to produce data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> IV() { return _macKey; }
+	virtual const std::vector<byte> IV() { return m_macKey; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual size_t KeySize() { return _blockSize; }
+	virtual size_t KeySize() { return m_blockSize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -120,19 +120,19 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or Iterations count is used</exception>
 	PBKDF2(CEX::Digest::IDigest* Digest, size_t Iterations = PKCS_ITERATIONS)
 		:
-		_blockSize(Digest->BlockSize()),
-		_hashSize(Digest->DigestSize()),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_macKey(0),
-		_msgDigest(Digest),
-		_prcIterations(Iterations),
-		_macSalt(0)
+		m_blockSize(Digest->BlockSize()),
+		m_hashSize(Digest->DigestSize()),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_macKey(0),
+		m_msgDigest(Digest),
+		m_prcIterations(Iterations),
+		m_macSalt(0)
 	{
-		if (_prcIterations == 0)
+		if (m_prcIterations == 0)
 			throw CryptoGeneratorException("PBKDF2:CTor", "Iterations count can not be zero!");
 
-		_digestMac = new CEX::Mac::HMAC(_msgDigest);
+		m_digestMac = new CEX::Mac::HMAC(m_msgDigest);
 	}
 
 	/// <summary>
@@ -145,19 +145,19 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or invalid Iterations count is used</exception>
 	PBKDF2(CEX::Mac::HMAC* Hmac, size_t Iterations = PKCS_ITERATIONS)
 		:
-		_blockSize(Hmac->BlockSize()),
-		_digestMac(Hmac),
-		_hashSize(Hmac->MacSize()),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_macKey(0),
-		_macSalt(0),
-		_msgDigest(0),
-		_prcIterations(Iterations)
+		m_blockSize(Hmac->BlockSize()),
+		m_digestMac(Hmac),
+		m_hashSize(Hmac->MacSize()),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_macKey(0),
+		m_macSalt(0),
+		m_msgDigest(0),
+		m_prcIterations(Iterations)
 	{
-		if (_prcIterations == 0)
+		if (m_prcIterations == 0)
 			throw CryptoGeneratorException("PBKDF2:CTor", "Iterations count can not be zero!");
-		if (!_digestMac->IsInitialized())
+		if (!m_digestMac->IsInitialized())
 			throw CryptoGeneratorException("PBKDF2:CTor", "The HMAC has not been initialized!");
 	}
 

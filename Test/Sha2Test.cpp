@@ -11,18 +11,18 @@ namespace Test
 			Initialize();
 
 			CEX::Digest::SHA256* sha256 = new CEX::Digest::SHA256();
-			CompareVector(sha256, _message[0], _expected256[0]);
-			CompareVector(sha256, _message[1], _expected256[1]);
-			CompareVector(sha256, _message[2], _expected256[2]);
-			CompareVector(sha256, _message[3], _expected256[3]);
+			CompareVector(sha256, m_message[0], m_expected256[0]);
+			CompareVector(sha256, m_message[1], m_expected256[1]);
+			CompareVector(sha256, m_message[2], m_expected256[2]);
+			CompareVector(sha256, m_message[3], m_expected256[3]);
 			delete sha256;
 			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");
 
 			CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
-			CompareVector(sha512, _message[0], _expected512[0]);
-			CompareVector(sha512, _message[1], _expected512[1]);
-			CompareVector(sha512, _message[2], _expected512[2]);
-			CompareVector(sha512, _message[3], _expected512[3]);
+			CompareVector(sha512, m_message[0], m_expected512[0]);
+			CompareVector(sha512, m_message[1], m_expected512[1]);
+			CompareVector(sha512, m_message[2], m_expected512[2]);
+			CompareVector(sha512, m_message[3], m_expected512[3]);
 			delete sha512;
 			OnProgress("Sha2Test: Passed SHA-2 512 bit digest vector tests..");
 
@@ -62,7 +62,7 @@ namespace Test
 			("6162636462636465636465666465666765666768666768696768696a68696a6b696a6b6c6a6b6c6d6b6c6d6e6c6d6e6f6d6e6f706e6f7071"),
 			("61626364656667686263646566676869636465666768696a6465666768696a6b65666768696a6b6c666768696a6b6c6d6768696a6b6c6d6e68696a6b6c6d6e6f696a6b6c6d6e6f706a6b6c6d6e6f70716b6c6d6e6f7071726c6d6e6f707172736d6e6f70717273746e6f707172737475")
 		};
-		HexConverter::Decode(messageEncoded, 4, _message);
+		HexConverter::Decode(messageEncoded, 4, m_message);
 
 		const char* exp256Encoded[4] =
 		{
@@ -71,7 +71,7 @@ namespace Test
 			("248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"),
 			("cf5b16a778af8380036ce59e7b0492370b249b11e8f07a51afac45037afee9d1")
 		};
-		HexConverter::Decode(exp256Encoded, 4, _expected256);
+		HexConverter::Decode(exp256Encoded, 4, m_expected256);
 
 		const char* exp512Encoded[4] =
 		{
@@ -80,11 +80,11 @@ namespace Test
 			("204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c33596fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445"),
 			("8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909")
 		};
-		HexConverter::Decode(exp512Encoded, 4, _expected512);
+		HexConverter::Decode(exp512Encoded, 4, m_expected512);
 	}
 
 	void SHA2Test::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

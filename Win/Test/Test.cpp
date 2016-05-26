@@ -12,6 +12,7 @@
 #include "CipherStreamTest.h"
 #include "CMACTest.h"
 #include "ConsoleUtils.h"
+#include "Cpu.h"
 #include "CTRDrbgTest.h"
 #include "DigestStreamTest.h"
 #include "HKDFTest.h"
@@ -74,7 +75,7 @@ bool CanTest(std::string Message)
 	return false;
 }
 
-void PrintHeader(std::string Data, std::string Decoration = "******")
+void PrintHeader(std::string Data, std::string Decoration = "***")
 {
 	ConsoleUtils::WriteLine(Decoration + Data + Decoration);
 }
@@ -82,10 +83,10 @@ void PrintHeader(std::string Data, std::string Decoration = "******")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.1b: CEX Library in C++     *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.1: CEX Library in C++      *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.1d                           *");
-	ConsoleUtils::WriteLine("* Date:      Apr 13, 2016                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.1e                           *");
+	ConsoleUtils::WriteLine("* Date:      May 27, 2016                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -131,20 +132,6 @@ void RunTest(Test::ITest* Test)
 	}
 }
 
-/*static bool GetNNICapability()
-{
-	unsigned int b;
-
-	__asm
-	{
-		mov		eax, 1
-		cpuid
-		mov		b, ecx
-	}
-
-	return (b & (1 << 25)) != 0;
-}*/
-
 int main()
 {
 	ConsoleUtils::SizeConsole();
@@ -152,6 +139,9 @@ int main()
 
 	try
 	{
+		PrintHeader("Warning! Assembly must be compiled as Release with correct platform (x86/x64) for accurate timings");
+		PrintHeader("", "");
+
 		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))
 		{
 			RunTest(new SpeedTest());
@@ -171,7 +161,15 @@ int main()
 		ConsoleUtils::WriteLine("");
 
 		PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
+		PrintHeader("Testing the AES-NI implementation (AHX)");
+		if (CEX::Utility::Cpu::HasAESNI())
+			RunTest(new AesAvsTest(true));
+		PrintHeader("Testing the AES software implementation (RHX)");
 		RunTest(new AesAvsTest());
+		PrintHeader("Testing the AES-NI implementation (AHX)");
+		if (CEX::Utility::Cpu::HasAESNI())
+			RunTest(new AesFipsTest(true));
+		PrintHeader("Testing the AES software implementation (RHX)");
 		RunTest(new AesFipsTest());
 		RunTest(new RijndaelTest());
 		RunTest(new SerpentTest());

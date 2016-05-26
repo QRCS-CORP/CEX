@@ -12,31 +12,31 @@ NAMESPACE_PRNG
 /// </summary>
 void DGCPrng::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_bufferIndex = 0;
-		_bufferSize = 0;
+		m_bufferIndex = 0;
+		m_bufferSize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_byteBuffer);
-		CEX::Utility::IntUtils::ClearVector(_stateSeed);
+		CEX::Utility::IntUtils::ClearVector(m_byteBuffer);
+		CEX::Utility::IntUtils::ClearVector(m_stateSeed);
 
-		if (_seedGenerator != 0)
+		if (m_seedGenerator != 0)
 		{
-			_seedGenerator->Destroy();
-			delete _seedGenerator;
+			m_seedGenerator->Destroy();
+			delete m_seedGenerator;
 		}
-		if (_digestEngine != 0)
+		if (m_digestEngine != 0)
 		{
-			_digestEngine->Destroy();
-			delete _digestEngine;
+			m_digestEngine->Destroy();
+			delete m_digestEngine;
 		}
-		if (_rngGenerator != 0)
+		if (m_rngGenerator != 0)
 		{
-			_rngGenerator->Destroy();
-			delete _rngGenerator;
+			m_rngGenerator->Destroy();
+			delete m_rngGenerator;
 		}
 
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 
@@ -64,38 +64,38 @@ void DGCPrng::GetBytes(std::vector<byte> &Output)
 	if (Output.size() == 0)
 		throw CryptoRandomException("CTRPrng:GetBytes", "Buffer size must be at least 1 byte!");
 
-	if (_byteBuffer.size() - _bufferIndex < Output.size())
+	if (m_byteBuffer.size() - m_bufferIndex < Output.size())
 	{
-		size_t bufSize = _byteBuffer.size() - _bufferIndex;
+		size_t bufSize = m_byteBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			memcpy(&Output[0], &_byteBuffer[_bufferIndex], bufSize);
+			memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], bufSize);
 
 		size_t rem = Output.size() - bufSize;
 
 		while (rem > 0)
 		{
 			// fill buffer
-			_rngGenerator->Generate(_byteBuffer);
+			m_rngGenerator->Generate(m_byteBuffer);
 
-			if (rem > _byteBuffer.size())
+			if (rem > m_byteBuffer.size())
 			{
-				memcpy(&Output[bufSize], &_byteBuffer[0], _byteBuffer.size());
-				bufSize += _byteBuffer.size();
-				rem -= _byteBuffer.size();
+				memcpy(&Output[bufSize], &m_byteBuffer[0], m_byteBuffer.size());
+				bufSize += m_byteBuffer.size();
+				rem -= m_byteBuffer.size();
 			}
 			else
 			{
-				memcpy(&Output[bufSize], &_byteBuffer[0], rem);
-				_bufferIndex = rem;
+				memcpy(&Output[bufSize], &m_byteBuffer[0], rem);
+				m_bufferIndex = rem;
 				rem = 0;
 			}
 		}
 	}
 	else
 	{
-		memcpy(&Output[0], &_byteBuffer[_bufferIndex], Output.size());
-		_bufferIndex += Output.size();
+		memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], Output.size());
+		m_bufferIndex += Output.size();
 	}
 }
 
@@ -199,40 +199,40 @@ ulong DGCPrng::NextLong(ulong Minimum, ulong Maximum)
 void DGCPrng::Reset()
 {
 
-	if (_seedGenerator != 0)
+	if (m_seedGenerator != 0)
 	{
-		_seedGenerator->Destroy();
-		delete _seedGenerator;
+		m_seedGenerator->Destroy();
+		delete m_seedGenerator;
 	}
-	if (_digestEngine != 0)
+	if (m_digestEngine != 0)
 	{
-		_digestEngine->Destroy();
-		delete _digestEngine;
+		m_digestEngine->Destroy();
+		delete m_digestEngine;
 	}
-	if (_rngGenerator != 0)
+	if (m_rngGenerator != 0)
 	{
-		_rngGenerator->Destroy();
-		delete _rngGenerator;
+		m_rngGenerator->Destroy();
+		delete m_rngGenerator;
 	}
 
-	_digestEngine = GetInstance(_digestType);
-	_rngGenerator = new CEX::Generator::DGCDrbg(_digestEngine);
+	m_digestEngine = GetInstance(m_digestType);
+	m_rngGenerator = new CEX::Generator::DGCDrbg(m_digestEngine);
 
-	if (_stateSeed.size() != 0)
+	if (m_stateSeed.size() != 0)
 	{
-		_rngGenerator->Initialize(_stateSeed);
+		m_rngGenerator->Initialize(m_stateSeed);
 	}
 	else
 	{
-		_seedGenerator = GetSeedGenerator(_seedType);
-		size_t len = (_digestEngine->BlockSize() * 2) + 8;
+		m_seedGenerator = GetSeedGenerator(m_seedType);
+		size_t len = (m_digestEngine->BlockSize() * 2) + 8;
 		std::vector<byte> seed(len);
-		_seedGenerator->GetBytes(seed);
-		_rngGenerator->Initialize(seed);   // 2 * block + counter (2*bsz+8)
+		m_seedGenerator->GetBytes(seed);
+		m_rngGenerator->Initialize(seed);   // 2 * block + counter (2*bsz+8)
 	}
 
-	_rngGenerator->Generate(_byteBuffer);
-	_bufferIndex = 0;
+	m_rngGenerator->Generate(m_byteBuffer);
+	m_bufferIndex = 0;
 }
 
 // *** Protected Methods *** //

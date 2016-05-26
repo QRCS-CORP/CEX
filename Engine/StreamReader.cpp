@@ -5,10 +5,10 @@ NAMESPACE_IO
 
 byte StreamReader::ReadByte()
 {
-	if (_streamData.Position() < _streamData.Length())
+	if (m_streamData.Position() < m_streamData.Length())
 	{
 		std::vector<byte> data(1);
-		_streamData.Read(data, 0, 1);
+		m_streamData.Read(data, 0, 1);
 		return data[0];
 	}
 
@@ -17,10 +17,10 @@ byte StreamReader::ReadByte()
 
 std::vector<byte> StreamReader::ReadBytes(size_t Length)
 {
-	if (_streamData.Position() + Length <= _streamData.Length())
+	if (m_streamData.Position() + Length <= m_streamData.Length())
 	{
 		std::vector<byte> data(Length);
-		_streamData.Read(data, 0, Length);
+		m_streamData.Read(data, 0, Length);
 		return data;
 	}
 	else
@@ -33,10 +33,10 @@ short StreamReader::ReadInt16()
 {
 	uint sze = sizeof(short);
 
-	if (_streamData.Position() + sze < _streamData.Length())
+	if (m_streamData.Position() + sze < m_streamData.Length())
 	{
 		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
+		m_streamData.Read(data, 0, sze);
 		short num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
@@ -51,10 +51,10 @@ ushort StreamReader::ReadUInt16()
 {
 	uint sze = sizeof(ushort);
 
-	if (_streamData.Position() + sze < _streamData.Length())
+	if (m_streamData.Position() + sze < m_streamData.Length())
 	{
 		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
+		m_streamData.Read(data, 0, sze);
 		ushort num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
@@ -69,10 +69,10 @@ int StreamReader::ReadInt32()
 {
 	uint sze = sizeof(int);
 
-	if (_streamData.Position() + sze < _streamData.Length())
+	if (m_streamData.Position() + sze < m_streamData.Length())
 	{
 		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
+		m_streamData.Read(data, 0, sze);
 		int num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
@@ -87,10 +87,10 @@ uint StreamReader::ReadUInt32()
 {
 	uint sze = sizeof(uint);
 
-	if (_streamData.Position() + sze < _streamData.Length())
+	if (m_streamData.Position() + sze < m_streamData.Length())
 	{
 		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
+		m_streamData.Read(data, 0, sze);
 		uint num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
@@ -105,10 +105,10 @@ long StreamReader::ReadInt64()
 {
 	uint sze = sizeof(long);
 
-	if (_streamData.Position() + sze < _streamData.Length())
+	if (m_streamData.Position() + sze < m_streamData.Length())
 	{
 		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
+		m_streamData.Read(data, 0, sze);
 		long num(0);
 		memcpy(&num, &data[0], sze);
 		return num;
@@ -123,10 +123,10 @@ ulong StreamReader::ReadUInt64()
 {
 	uint sze = sizeof(ulong);
 
-	if (_streamData.Position() + sze < _streamData.Length())
+	if (m_streamData.Position() + sze < m_streamData.Length())
 	{
 		std::vector<byte> data(sze);
-		_streamData.Read(data, 0, sze);
+		m_streamData.Read(data, 0, sze);
 		ulong num(0);
 		memcpy(&num, &data[0], sze);
 		return num;

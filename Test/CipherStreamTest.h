@@ -22,14 +22,14 @@ namespace Test
 		const unsigned int MAX_ALLOC = 4096;
 		const unsigned int DEF_BLOCK = 64000;
 
-		TestEventHandler _progressEvent;
-		std::vector<byte> _cmpText;
-		std::vector<byte> _decText;
-		std::vector<byte> _encText;
-		std::vector<byte> _iv;
-		std::vector<byte> _key;
-		std::vector<byte> _plnText;
-		unsigned int _processorCount;
+		TestEventHandler m_progressEvent;
+		std::vector<byte> m_cmpText;
+		std::vector<byte> m_decText;
+		std::vector<byte> m_encText;
+		std::vector<byte> m_iv;
+		std::vector<byte> m_key;
+		std::vector<byte> m_plnText;
+		unsigned int m_processorCount;
 
 	public:
 		/// <summary>
@@ -40,17 +40,17 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		CipherStreamTest()
 			:
-			_encText(MAX_ALLOC),
-			_cmpText(MAX_ALLOC),
-			_decText(MAX_ALLOC),
-			_iv(16),
-			_key(32),
-			_plnText(MAX_ALLOC),
-			_processorCount(1)
+			m_encText(MAX_ALLOC),
+			m_cmpText(MAX_ALLOC),
+			m_decText(MAX_ALLOC),
+			m_iv(16),
+			m_key(32),
+			m_plnText(MAX_ALLOC),
+			m_processorCount(1)
 		{
 		}
 
@@ -74,12 +74,12 @@ namespace Test
 		void StreamModesTest(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding);
 		void StreamingTest(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher);
 		// *** Helpers *** //
-		int AllocateRandom(std::vector<byte> &Data, unsigned int Size = 0, int NonAlign = 0);
-		void BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
-		void BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
-		void BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+		size_t AllocateRandom(std::vector<byte> &Data, size_t Size = 0, size_t NonAlign = 0);
+		void BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		void BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		void BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void OnProgress(char* Data);
-		void ProcessStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, unsigned int InOffset, std::vector<byte> &Output, unsigned int OutOffset);
+		void ProcessStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	};
 }
 

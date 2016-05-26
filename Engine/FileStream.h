@@ -37,7 +37,7 @@ public:
 private:
 	static constexpr uint BLOCK_SIZE = 4096;
 
-	bool _isDestroyed;
+	bool m_isDestroyed;
 	const char* _filename;
 	size_t _filePosition;
 	size_t _fileSize;
@@ -95,7 +95,7 @@ public:
 		_fileAccess(Access),
 		_fileMode(Mode),
 		_filename(0),
-		_isDestroyed(false),
+		m_isDestroyed(false),
 		_filePosition(0),
 		_fileSize(0)
 	{

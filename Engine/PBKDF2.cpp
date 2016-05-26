@@ -5,17 +5,17 @@ NAMESPACE_GENERATOR
 
 void PBKDF2::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_blockSize = 0;
-		_hashSize = 0;
-		_isInitialized = false;
-		_prcIterations = 0;
+		m_blockSize = 0;
+		m_hashSize = 0;
+		m_isInitialized = false;
+		m_prcIterations = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_macKey);
-		CEX::Utility::IntUtils::ClearVector(_macSalt);
+		CEX::Utility::IntUtils::ClearVector(m_macKey);
+		CEX::Utility::IntUtils::ClearVector(m_macSalt);
 
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 
@@ -38,54 +38,54 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size
 
 void PBKDF2::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Ikm.size() < _hashSize * 2)
+	if (Ikm.size() < m_hashSize * 2)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 
-	_macKey.resize(_hashSize);
-	memcpy(&_macKey[0], &Ikm[0], _hashSize);
-	_macSalt.resize(Ikm.size() - _hashSize);
-	memcpy(&_macSalt[0], &Ikm[_hashSize], Ikm.size() - _hashSize);
+	m_macKey.resize(m_hashSize);
+	memcpy(&m_macKey[0], &Ikm[0], m_hashSize);
+	m_macSalt.resize(Ikm.size() - m_hashSize);
+	memcpy(&m_macSalt[0], &Ikm[m_hashSize], Ikm.size() - m_hashSize);
 
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
 {
-	if (Salt.size() < _blockSize)
+	if (Salt.size() < m_blockSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
-	if (Ikm.size() < _hashSize)
+	if (Ikm.size() < m_hashSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "IKM size is too small; must be a minumum of digest block size!");
 
 	// clone iv and salt
-	_macKey.resize(Ikm.size());
-	_macSalt.resize(Salt.size());
+	m_macKey.resize(Ikm.size());
+	m_macSalt.resize(Salt.size());
 
-	if (_macKey.size() > 0)
-		memcpy(&_macKey[0], &Ikm[0], Ikm.size());
-	if (_macSalt.size() > 0)
-		memcpy(&_macSalt[0], &Salt[0], Salt.size());
+	if (m_macKey.size() > 0)
+		memcpy(&m_macKey[0], &Ikm[0], Ikm.size());
+	if (m_macSalt.size() > 0)
+		memcpy(&m_macSalt[0], &Salt[0], Salt.size());
 
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce)
 {
-	if (Salt.size() + Nonce.size() < _blockSize)
+	if (Salt.size() + Nonce.size() < m_blockSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
-	if (Ikm.size() < _hashSize)
+	if (Ikm.size() < m_hashSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "IKM with Nonce size is too small; combined must be a minumum of digest block size!");
 
-	_macKey.resize(Ikm.size());
-	_macSalt.resize(Salt.size() + Nonce.size());
+	m_macKey.resize(Ikm.size());
+	m_macSalt.resize(Salt.size() + Nonce.size());
 
-	if (_macKey.size() > 0)
-		memcpy(&_macKey[0], &Ikm[0], Ikm.size());
-	if (_macSalt.size() > 0)
-		memcpy(&_macSalt[0], &Salt[0], Salt.size());
+	if (m_macKey.size() > 0)
+		memcpy(&m_macKey[0], &Ikm[0], Ikm.size());
+	if (m_macSalt.size() > 0)
+		memcpy(&m_macSalt[0], &Salt[0], Salt.size());
 	if (Nonce.size() > 0)
-		memcpy(&_macSalt[Salt.size()], &Nonce[0], Nonce.size());
+		memcpy(&m_macSalt[Salt.size()], &Nonce[0], Nonce.size());
 
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void PBKDF2::Update(const std::vector<byte> &Salt)
@@ -100,8 +100,8 @@ void PBKDF2::Update(const std::vector<byte> &Salt)
 
 size_t PBKDF2::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-	size_t diff = Size % _hashSize;
-	size_t max = Size / _hashSize;
+	size_t diff = Size % m_hashSize;
+	size_t max = Size / m_hashSize;
 	uint ctr = 0;
 	std::vector<byte> buffer(4);
 	std::vector<byte> outBytes(Size);
@@ -109,13 +109,13 @@ size_t PBKDF2::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t S
 	for (ctr = 0; ctr < max; ++ctr)
 	{
 		IntToOctet(buffer, ctr + 1);
-		Process(buffer, outBytes, ctr * _hashSize);
+		Process(buffer, outBytes, ctr * m_hashSize);
 	}
 
 	if (diff > 0)
 	{
 		IntToOctet(buffer, ctr + 1);
-		std::vector<byte> rem(_hashSize);
+		std::vector<byte> rem(m_hashSize);
 		Process(buffer, rem, 0);
 		memcpy(&outBytes[outBytes.size() - diff], &rem[0], diff);
 	}
@@ -135,23 +135,23 @@ void PBKDF2::IntToOctet(std::vector<byte> &Output, uint Counter)
 
 void PBKDF2::Process(std::vector<byte> Input, std::vector<byte> &Output, size_t OutOffset)
 {
-	std::vector<byte> state(_hashSize);
+	std::vector<byte> state(m_hashSize);
 
-	_digestMac->Initialize(_macKey);
+	m_digestMac->Initialize(m_macKey);
 
-	if (_macSalt.size() != 0)
-		_digestMac->BlockUpdate(_macSalt, 0, _macSalt.size());
+	if (m_macSalt.size() != 0)
+		m_digestMac->BlockUpdate(m_macSalt, 0, m_macSalt.size());
 
-	_digestMac->BlockUpdate(Input, 0, Input.size());
-	_digestMac->DoFinal(state, 0);
+	m_digestMac->BlockUpdate(Input, 0, Input.size());
+	m_digestMac->DoFinal(state, 0);
 
 	memcpy(&Output[OutOffset], &state[0], state.size());
 
-	for (int count = 1; count != _prcIterations; count++)
+	for (int count = 1; count != m_prcIterations; count++)
 	{
-		_digestMac->Initialize(_macKey);
-		_digestMac->BlockUpdate(state, 0, state.size());
-		_digestMac->DoFinal(state, 0);
+		m_digestMac->Initialize(m_macKey);
+		m_digestMac->BlockUpdate(state, 0, state.size());
+		m_digestMac->DoFinal(state, 0);
 
 		for (int j = 0; j != state.size(); j++)
 			Output[OutOffset + j] ^= state[j];

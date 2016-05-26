@@ -6,21 +6,21 @@ NAMESPACE_GENERATOR
 
 void SP20Drbg::Destroy()
 {
-	if (!_isDestroyed)
+	if (!m_isDestroyed)
 	{
-		_isInitialized = false;
-		_processorCount = 0;
-		_isParallel = false;
-		_parallelBlockSize = 0;
-		_rndCount = 0;
+		m_isInitialized = false;
+		m_processorCount = 0;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
+		m_rndCount = 0;
 
-		CEX::Utility::IntUtils::ClearVector(_ctrVector);
-		CEX::Utility::IntUtils::ClearVector(_dstCode);
-		CEX::Utility::IntUtils::ClearVector(_legalRounds);
-		CEX::Utility::IntUtils::ClearVector(_threadVectors);
-		CEX::Utility::IntUtils::ClearVector(_wrkState);
+		CEX::Utility::IntUtils::ClearVector(m_ctrVector);
+		CEX::Utility::IntUtils::ClearVector(m_dstCode);
+		CEX::Utility::IntUtils::ClearVector(m_legalRounds);
+		CEX::Utility::IntUtils::ClearVector(m_threadVectors);
+		CEX::Utility::IntUtils::ClearVector(m_wrkState);
 
-		_isDestroyed = true;
+		m_isDestroyed = true;
 	}
 }
 
@@ -41,7 +41,7 @@ size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 
 void SP20Drbg::Initialize(const std::vector<byte> &Ikm)
 {
-	if (Ikm.size() != _legalKeySizes[0] + VECTOR_SIZE && Ikm.size() != _legalKeySizes[1] + VECTOR_SIZE)
+	if (Ikm.size() != m_legalKeySizes[0] + VECTOR_SIZE && Ikm.size() != m_legalKeySizes[1] + VECTOR_SIZE)
 		throw CryptoGeneratorException("SP20Drbg:Initialize", "Key material size is too small; must be exactly 24 (128 bit key) or 40 bytes (256 bit key)!");
 
 	std::string info;
@@ -50,9 +50,9 @@ void SP20Drbg::Initialize(const std::vector<byte> &Ikm)
 	else
 		info = "expand 32-byte k";
 
-	_dstCode.reserve(info.size());
+	m_dstCode.reserve(info.size());
 	for (size_t i = 0; i < info.size(); ++i)
-		_dstCode.push_back(info[i]);
+		m_dstCode.push_back(info[i]);
 
 	std::vector<byte> iv(VECTOR_SIZE);
 	memcpy(&iv[0], &Ikm[0], VECTOR_SIZE);
@@ -60,7 +60,7 @@ void SP20Drbg::Initialize(const std::vector<byte> &Ikm)
 	std::vector<byte> key(keyLen);
 	memcpy(&key[0], &Ikm[VECTOR_SIZE], keyLen);
 	SetKey(key, iv);
-	_isInitialized = true;
+	m_isInitialized = true;
 }
 
 void SP20Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
@@ -85,10 +85,10 @@ void SP20Drbg::Update(const std::vector<byte> &Salt)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("SP20Drbg:Update", "Salt is too small!");
 
-	if (Salt.size() == _legalKeySizes[0] + VECTOR_SIZE || Salt.size() == _legalKeySizes[1] + VECTOR_SIZE)
+	if (Salt.size() == m_legalKeySizes[0] + VECTOR_SIZE || Salt.size() == m_legalKeySizes[1] + VECTOR_SIZE)
 		Initialize(Salt);
 	else if (Salt.size() == VECTOR_SIZE)
-		memcpy(&_ctrVector[0], &Salt[0], _ctrVector.size());
+		memcpy(&m_ctrVector[0], &Salt[0], m_ctrVector.size());
 	else
 		throw CryptoGeneratorException("SP20Drbg:Update", "Salt must be either 40 bytes; (key and vector), or 8 bytes; (vector only) in length!");
 }
@@ -134,24 +134,24 @@ void SP20Drbg::Increment(std::vector<uint> &Counter)
 void SP20Drbg::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std::vector<uint> &Counter)
 {
 	size_t ctr = 0;
-	uint X0 = _wrkState[ctr];
-	uint X1 = _wrkState[++ctr];
-	uint X2 = _wrkState[++ctr];
-	uint X3 = _wrkState[++ctr];
-	uint X4 = _wrkState[++ctr];
-	uint X5 = _wrkState[++ctr];
-	uint X6 = _wrkState[++ctr];
-	uint X7 = _wrkState[++ctr];
+	uint X0 = m_wrkState[ctr];
+	uint X1 = m_wrkState[++ctr];
+	uint X2 = m_wrkState[++ctr];
+	uint X3 = m_wrkState[++ctr];
+	uint X4 = m_wrkState[++ctr];
+	uint X5 = m_wrkState[++ctr];
+	uint X6 = m_wrkState[++ctr];
+	uint X7 = m_wrkState[++ctr];
 	uint X8 = Counter[0];
 	uint X9 = Counter[1];
-	uint X10 = _wrkState[++ctr];
-	uint X11 = _wrkState[++ctr];
-	uint X12 = _wrkState[++ctr];
-	uint X13 = _wrkState[++ctr];
-	uint X14 = _wrkState[++ctr];
-	uint X15 = _wrkState[++ctr];
+	uint X10 = m_wrkState[++ctr];
+	uint X11 = m_wrkState[++ctr];
+	uint X12 = m_wrkState[++ctr];
+	uint X13 = m_wrkState[++ctr];
+	uint X14 = m_wrkState[++ctr];
+	uint X15 = m_wrkState[++ctr];
 
-	ctr = _rndCount;
+	ctr = m_rndCount;
 	while (ctr != 0)
 	{
 		X4 ^= CEX::Utility::IntUtils::RotateLeft(X0 + X12, 7);
@@ -189,94 +189,94 @@ void SP20Drbg::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std:
 		ctr -= 2;
 	}
 
-	CEX::Utility::IntUtils::Le32ToBytes(X0 + _wrkState[ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X1 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X2 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X3 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X4 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X5 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X6 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X7 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X0 + m_wrkState[ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X1 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X2 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X3 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X4 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X5 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X6 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X7 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
 	CEX::Utility::IntUtils::Le32ToBytes(X8 + Counter[0], Output, OutOffset); OutOffset += 4;
 	CEX::Utility::IntUtils::Le32ToBytes(X9 + Counter[1], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X10 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X11 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X12 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X13 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X14 + _wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X15 + _wrkState[++ctr], Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X10 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X11 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X12 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X13 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X14 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	CEX::Utility::IntUtils::Le32ToBytes(X15 + m_wrkState[++ctr], Output, OutOffset);
 }
 
 void SP20Drbg::SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 {
 	if (Key.size() == 32)
 	{
-		_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 0);
-		_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 4);
-		_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
-		_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
-		_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 8);
-		_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 16);
-		_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 20);
-		_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 24);
-		_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Key, 28);
-		_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 12);
+		m_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 0);
+		m_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 4);
+		m_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
+		m_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
+		m_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 8);
+		m_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 16);
+		m_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 20);
+		m_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 24);
+		m_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Key, 28);
+		m_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 12);
 	}
 	else
 	{
-		_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 0);
-		_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 4);
-		_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
-		_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
-		_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 8);
-		_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(_dstCode, 12);
+		m_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 0);
+		m_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 4);
+		m_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
+		m_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
+		m_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 8);
+		m_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 12);
 	}
 }
 
 void SP20Drbg::SetScope()
 {
-	_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
-	if (_processorCount % 2 != 0)
-		_processorCount--;
-	if (_processorCount > 1)
-		_isParallel = true;
+	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	if (m_processorCount % 2 != 0)
+		m_processorCount--;
+	if (m_processorCount > 1)
+		m_isParallel = true;
 }
 
 void SP20Drbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 {
 	size_t outSize = Output.size() - OutOffset;
 
-	if (!_isParallel || outSize < _parallelBlockSize)
+	if (!m_isParallel || outSize < m_parallelBlockSize)
 	{
 		// generate random
-		Generate(outSize, _ctrVector, Output, OutOffset);
+		Generate(outSize, m_ctrVector, Output, OutOffset);
 	}
 	else
 	{
 		// parallel CTR processing //
-		size_t cnkSize = (outSize / BLOCK_SIZE / _processorCount) * BLOCK_SIZE;
-		size_t rndSize = cnkSize * _processorCount;
+		size_t cnkSize = (outSize / BLOCK_SIZE / m_processorCount) * BLOCK_SIZE;
+		size_t rndSize = cnkSize * m_processorCount;
 		size_t subSize = (cnkSize / BLOCK_SIZE);
 		// create jagged array of 'sub counters'
-		_threadVectors.resize(_processorCount);
+		m_threadVectors.resize(m_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, _processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
+		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
 		{
-			std::vector<uint> &iv = _threadVectors[i];
+			std::vector<uint> &iv = m_threadVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(_ctrVector, subSize * i, iv);
+			this->Increase(m_ctrVector, subSize * i, iv);
 			// create random at offset position
 			this->Generate(cnkSize, iv, Output, OutOffset + (i * cnkSize));
 		});
@@ -285,11 +285,11 @@ void SP20Drbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 		if (rndSize < outSize)
 		{
 			size_t fnlSize = outSize % rndSize;
-			Generate(fnlSize, _threadVectors[_processorCount - 1], Output, OutOffset + rndSize);
+			Generate(fnlSize, m_threadVectors[m_processorCount - 1], Output, OutOffset + rndSize);
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&_ctrVector[0], &_threadVectors[_processorCount - 1][0], _ctrVector.size() * sizeof(uint));
+		memcpy(&m_ctrVector[0], &m_threadVectors[m_processorCount - 1][0], m_ctrVector.size() * sizeof(uint));
 	}
 }
 

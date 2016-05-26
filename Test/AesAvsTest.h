@@ -16,7 +16,8 @@ namespace Test
 		const std::string FAILURE = "FAILURE: ";
 		const std::string SUCCESS = "SUCCESS! AESAVS tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
+		TestEventHandler m_progressEvent;
+		bool m_testNI;
 
     public:
 		/// <summary>
@@ -27,12 +28,16 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// NIST AESAVS known answer vector tests
 		/// </summary>
-		AesAvsTest() {}
+		AesAvsTest(bool TestNI = false)
+			:
+			m_testNI(TestNI)
+		{
+		}
 
 		/// <summary>
 		/// Destructor
@@ -46,6 +51,7 @@ namespace Test
         
     private:
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
+		void CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void OnProgress(char* Data);
     };
 }

@@ -18,10 +18,10 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! Rijndael tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-        std::vector<std::vector<byte>> _cipherText;
-        std::vector<std::vector<byte>> _keys;
-        std::vector<std::vector<byte>> _plainText;
+		TestEventHandler m_progressEvent;
+        std::vector<std::vector<byte>> m_cipherText;
+        std::vector<std::vector<byte>> m_keys;
+        std::vector<std::vector<byte>> m_plainText;
 
     public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality

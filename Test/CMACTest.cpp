@@ -10,22 +10,22 @@ namespace Test
 		{
 			Initialize();
 
-			CompareVector(_keys[0], _input[0], _expected[0]);
-			CompareVector(_keys[0], _input[1], _expected[1]);
-			CompareVector(_keys[0], _input[2], _expected[2]);
-			CompareVector(_keys[0], _input[3], _expected[3]);
+			CompareVector(m_keys[0], m_input[0], m_expected[0]);
+			CompareVector(m_keys[0], m_input[1], m_expected[1]);
+			CompareVector(m_keys[0], m_input[2], m_expected[2]);
+			CompareVector(m_keys[0], m_input[3], m_expected[3]);
 			OnProgress("Passed 128 bit key vector tests..");
-			CompareVector(_keys[1], _input[0], _expected[4]);
-			CompareVector(_keys[1], _input[1], _expected[5]);
-			CompareVector(_keys[1], _input[2], _expected[6]);
-			CompareVector(_keys[1], _input[3], _expected[7]);
+			CompareVector(m_keys[1], m_input[0], m_expected[4]);
+			CompareVector(m_keys[1], m_input[1], m_expected[5]);
+			CompareVector(m_keys[1], m_input[2], m_expected[6]);
+			CompareVector(m_keys[1], m_input[3], m_expected[7]);
 			OnProgress("Passed 192 bit key vector tests..");
-			CompareVector(_keys[2], _input[0], _expected[8]);
-			CompareVector(_keys[2], _input[1], _expected[9]);
-			CompareVector(_keys[2], _input[2], _expected[10]);
-			CompareVector(_keys[2], _input[3], _expected[11]);
+			CompareVector(m_keys[2], m_input[0], m_expected[8]);
+			CompareVector(m_keys[2], m_input[1], m_expected[9]);
+			CompareVector(m_keys[2], m_input[2], m_expected[10]);
+			CompareVector(m_keys[2], m_input[3], m_expected[11]);
 			OnProgress("Passed 256 bit key vector tests..");
-			CompareAccess(_keys[2]);
+			CompareAccess(m_keys[2]);
 			OnProgress("Passed DoFinal/ComputeHash methods output comparison..");
 
 			return SUCCESS;
@@ -83,7 +83,7 @@ namespace Test
 			("8e73b0f7da0e6452c810f32b809079e562f8ead2522c6b7b"),
 			("603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4")
 		};
-		HexConverter::Decode(keysEncoded, 3, _keys);
+		HexConverter::Decode(keysEncoded, 3, m_keys);
 
 		const char* inputEncoded[4] =
 		{
@@ -92,7 +92,7 @@ namespace Test
 			("6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411"),
 			("6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411e5fbc1191a0a52eff69f2445df4f9b17ad2b417be66c3710")
 		};
-		HexConverter::Decode(inputEncoded, 4, _input);
+		HexConverter::Decode(inputEncoded, 4, m_input);
 
 		const char* expectedEncoded[12] =
 		{
@@ -109,11 +109,11 @@ namespace Test
 			("aaf3d8f1de5640c232f5b169b9c911e6"),
 			("e1992190549f6ed5696a2c056c315410")
 		};
-		HexConverter::Decode(expectedEncoded, 12, _expected);
+		HexConverter::Decode(expectedEncoded, 12, m_expected);
 	}
 
 	void CMACTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

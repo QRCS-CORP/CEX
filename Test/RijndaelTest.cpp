@@ -9,8 +9,8 @@ namespace Test
 		{
 			Initialize();
 
-			for (unsigned int i = 0; i < _plainText.size(); ++i)
-				CompareVector(_keys[i], _plainText[i], _cipherText[i]);
+			for (unsigned int i = 0; i < m_plainText.size(); ++i)
+				CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
 
 			OnProgress("RijndaelTest : Passed 128 and 256 bit block tests..");
 
@@ -66,7 +66,7 @@ namespace Test
 			("0000000000000000000000000000000000000000000000000000000000000000"),
 			("0000000000000000000000000000000000000000000000000000000000000000")
 		};
-		HexConverter::Decode(keysEncoded, 15, _keys);
+		HexConverter::Decode(keysEncoded, 15, m_keys);
 
 		const char* plainTextEncoded[15] =
 		{
@@ -86,7 +86,7 @@ namespace Test
 			("2000000000000000000000000000000000000000000000000000000000000000"),
 			("1000000000000000000000000000000000000000000000000000000000000000")
 		};
-		HexConverter::Decode(plainTextEncoded, 15, _plainText);
+		HexConverter::Decode(plainTextEncoded, 15, m_plainText);
 
 		const char* cipherTextEncoded[15] =
 		{
@@ -106,11 +106,11 @@ namespace Test
 			("87B829FB7B0C16C408151D323FCB8B56EBC0573747D46C2B47BFD533ED3273C9"),
 			("DB462EEC713D4CC89607DCA35C4FE6E8D618C8BDACD3DD1C0A1B14E6CA8C23C6")
 		};
-		HexConverter::Decode(cipherTextEncoded, 15, _cipherText);
+		HexConverter::Decode(cipherTextEncoded, 15, m_cipherText);
 	}
 
 	void RijndaelTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 }

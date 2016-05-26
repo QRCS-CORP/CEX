@@ -34,8 +34,8 @@ namespace Test
 	void ParallelModeTest::BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
 		const size_t blkSize = Cipher->BlockSize();
-		const unsigned long inpSize = (size_t)(Input.size() - InOffset);
-		const unsigned long alnSize = (size_t)(inpSize - (inpSize % blkSize));
+		const size_t inpSize = (size_t)(Input.size() - InOffset);
+		const size_t alnSize = (size_t)(inpSize - (inpSize % blkSize));
 		unsigned long count = 0;
 
 		Cipher->IsParallel() = false;
@@ -371,21 +371,21 @@ namespace Test
 
 	void ParallelModeTest::Initialize()
 	{
-		_cipherText.reserve(MAX_ALLOC);
-		_decText.reserve(MAX_ALLOC);
-		_plnText.reserve(MAX_ALLOC);
+		m_cipherText.reserve(MAX_ALLOC);
+		m_decText.reserve(MAX_ALLOC);
+		m_plnText.reserve(MAX_ALLOC);
 
 		for (size_t i = 0; i < 32; i++)
-			_key[i] = (byte)i;
+			m_key[i] = (byte)i;
 		for (int i = 15; i != 0; i--)
-			_iv[i] = (byte)i;
+			m_iv[i] = (byte)i;
 
-		_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+		m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 	}
 
 	void ParallelModeTest::ParallelCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t blkSize = _parallelBlockSize;
+		const size_t blkSize = m_parallelBlockSize;
 		const size_t inpSize = (Input.size() - InOffset);
 		const size_t alnSize = ((inpSize / blkSize) * blkSize);
 		unsigned long count = 0;
@@ -415,7 +415,7 @@ namespace Test
 
 	void ParallelModeTest::ParallelDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t blkSize = _parallelBlockSize;
+		const size_t blkSize = m_parallelBlockSize;
 		const size_t inpSize = (Input.size() - InOffset);
 		const size_t alnSize = ((inpSize / blkSize) * blkSize);
 		size_t count = 0;
@@ -441,11 +441,11 @@ namespace Test
 	void ParallelModeTest::ParallelIntegrity()
 	{
 		CEX::Prng::CSPPrng rng;
-		_iv.resize(16);
-		_key.resize(32);
-		rng.GetBytes(_iv);
-		rng.GetBytes(_key);
-		CEX::Common::KeyParams kp(_key, _iv);
+		m_iv.resize(16);
+		m_key.resize(32);
+		rng.GetBytes(m_iv);
+		rng.GetBytes(m_key);
+		CEX::Common::KeyParams kp(m_key, m_iv);
 
 		std::vector<byte> cp2Text(0);
 		cp2Text.reserve(MAX_ALLOC);
@@ -460,31 +460,31 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				size_t sze = rng.Next(MIN_ALLOC, MAX_ALLOC);
-				_cipherText.resize(sze);
+				m_cipherText.resize(sze);
 				cp2Text.resize(sze);
-				_decText.resize(sze);
-				_plnText.resize(sze);
-				rng.GetBytes(_plnText);
+				m_decText.resize(sze);
+				m_plnText.resize(sze);
+				rng.GetBytes(m_plnText);
 
 				cipher.Initialize(true, kp);
-				BlockCTR(&cipher, _plnText, 0, _cipherText, 0);
+				BlockCTR(&cipher, m_plnText, 0, m_cipherText, 0);
 
 				cipher.Initialize(true, kp);
-				ParallelCTR(&cipher, _plnText, 0, cp2Text, 0);
+				ParallelCTR(&cipher, m_plnText, 0, cp2Text, 0);
 
-				if (_cipherText != cp2Text)
+				if (m_cipherText != cp2Text)
 					throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
-				BlockCTR(&cipher, _cipherText, 0, _decText, 0);
+				BlockCTR(&cipher, m_cipherText, 0, m_decText, 0);
 
-				if (_decText != _plnText)
+				if (m_decText != m_plnText)
 					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
-				ParallelCTR(&cipher, cp2Text, 0, _decText, 0);
+				ParallelCTR(&cipher, cp2Text, 0, m_decText, 0);
 
-				if (_decText != _plnText)
+				if (m_decText != m_plnText)
 					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
 			}
 
@@ -502,19 +502,19 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				size_t sze = rng.Next(MIN_ALLOC, MAX_ALLOC);
-				_cipherText.resize(sze);
-				_decText.resize(sze);
-				_plnText.resize(sze);
-				rng.GetBytes(_plnText);
+				m_cipherText.resize(sze);
+				m_decText.resize(sze);
+				m_plnText.resize(sze);
+				rng.GetBytes(m_plnText);
 
 				// encrypt the array locally
 				cipher.Initialize(true, kp);
-				BlockEncrypt(&cipher, &pad, _plnText, 0, _cipherText, 0);
+				BlockEncrypt(&cipher, &pad, m_plnText, 0, m_cipherText, 0);
 				// decrypt
 				cipher.Initialize(false, kp);
-				ParallelDecrypt(&cipher, &pad, _cipherText, 0, _decText, 0);
+				ParallelDecrypt(&cipher, &pad, m_cipherText, 0, m_decText, 0);
 
-				if (_plnText != _decText)
+				if (m_plnText != m_decText)
 					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
 			}
 
@@ -532,19 +532,19 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				size_t sze = rng.Next(MIN_ALLOC, MAX_ALLOC);
-				_cipherText.resize(sze);
-				_decText.resize(sze);
-				_plnText.resize(sze);
-				rng.GetBytes(_plnText);
+				m_cipherText.resize(sze);
+				m_decText.resize(sze);
+				m_plnText.resize(sze);
+				rng.GetBytes(m_plnText);
 
 				// encrypt the array locally
 				cipher.Initialize(true, kp);
-				BlockEncrypt(&cipher, &pad, _plnText, 0, _cipherText, 0);
+				BlockEncrypt(&cipher, &pad, m_plnText, 0, m_cipherText, 0);
 				// decrypt
 				cipher.Initialize(false, kp);
-				ParallelDecrypt(&cipher, &pad, _cipherText, 0, _decText, 0);
+				ParallelDecrypt(&cipher, &pad, m_cipherText, 0, m_decText, 0);
 
-				if (_plnText != _decText)
+				if (m_plnText != m_decText)
 					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
 			}
 
@@ -555,7 +555,7 @@ namespace Test
 
 	void ParallelModeTest::OnProgress(char* Data)
 	{
-		_progressEvent(Data);
+		m_progressEvent(Data);
 	}
 
 	void ParallelModeTest::Transform1(CEX::Cipher::Symmetric::Block::Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output)

@@ -17,11 +17,11 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! Salsa20 tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<std::vector<byte>> _cipherText;
-		std::vector<std::vector<byte>> _iv;
-		std::vector<std::vector<byte>> _key;
-		std::vector<byte> _plainText;
+		TestEventHandler m_progressEvent;
+		std::vector<std::vector<byte>> m_cipherText;
+		std::vector<std::vector<byte>> m_iv;
+		std::vector<std::vector<byte>> m_key;
+		std::vector<byte> m_plainText;
 
     public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer Salsa20 vectors for equality

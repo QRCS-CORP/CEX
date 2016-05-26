@@ -17,11 +17,11 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! Cipher Mode tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-        std::vector<std::vector<byte>> _keys;
-        std::vector<std::vector<byte>> _vectors;
-        std::vector<std::vector<std::vector<byte>>> _input;
-        std::vector<std::vector<std::vector<byte>>> _output;
+		TestEventHandler m_progressEvent;
+        std::vector<std::vector<byte>> m_keys;
+        std::vector<std::vector<byte>> m_vectors;
+        std::vector<std::vector<std::vector<byte>>> m_input;
+        std::vector<std::vector<std::vector<byte>>> m_output;
 
     public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer Cipher Mode vectors for equality (NIST 800-38A)

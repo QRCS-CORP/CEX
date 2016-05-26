@@ -16,13 +16,13 @@ namespace Test
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! HX tests have executed succesfully.";
 
-		TestEventHandler _progressEvent;
-		std::vector<std::vector<byte>> _rhxExpected;
-		std::vector<std::vector<byte>> _shxExpected;
-		std::vector<std::vector<byte>> _thxExpected;
-		std::vector<byte> _key;
-		std::vector<byte> _key2;
-		std::vector<byte> _iv;
+		TestEventHandler m_progressEvent;
+		std::vector<std::vector<byte>> m_rhxExpected;
+		std::vector<std::vector<byte>> m_shxExpected;
+		std::vector<std::vector<byte>> m_thxExpected;
+		std::vector<byte> m_key;
+		std::vector<byte> m_key2;
+		std::vector<byte> m_iv;
 
 	public:
 		/// <summary>
@@ -33,16 +33,16 @@ namespace Test
 		/// <summary>
 		/// Progress return event callback
 		/// </summary>
-		virtual TestEventHandler &Progress() { return _progressEvent; }
+		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer HX Cipher vectors for equality
 		/// </summary>
 		HXCipherTest()
 			:
-			_key(128, 0),
-			_key2(64, 0),
-			_iv(16, 0)
+			m_key(128, 0),
+			m_key2(64, 0),
+			m_iv(16, 0)
 		{
 		}
 

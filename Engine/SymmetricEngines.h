@@ -10,6 +10,10 @@ NAMESPACE_ENUMERATION
 enum class SymmetricEngines : uint
 {
 	/// <summary>
+	/// An AES-NI implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation
+	/// </summary>
+	AHX = 1,
+	/// <summary>
 	/// An implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation
 	/// </summary>
 	RHX = 2,

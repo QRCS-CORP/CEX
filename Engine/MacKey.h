@@ -35,28 +35,28 @@ private:
 	static constexpr uint MACDSC_SEEK = 0;
 	static constexpr uint KEYUID_SEEK = MACDSC_SIZE;
 
-	std::vector<byte> _keyId;
-	CEX::Common::MacDescription _macDsc;
+	std::vector<byte> m_keyId;
+	CEX::Common::MacDescription m_macDsc;
 
 public:
 
 	/// <summary>
 	/// The MacDescription structure containing a complete description of the Mac instance
 	/// </summary>
-	CEX::Common::MacDescription Description() const { return _macDsc; }
+	CEX::Common::MacDescription Description() const { return m_macDsc; }
 
 	/// <summary>
 	/// The unique 16 byte ID field used to identify this key.
 	/// </summary>
-	const std::vector<byte> &KeyId() { return _keyId; }
+	const std::vector<byte> &KeyId() { return m_keyId; }
 
 	/// <summary>
 	/// Default constructor
 	/// </summary>
 	MacKey()
 		:
-		_macDsc(),
-		_keyId(0)
+		m_macDsc(),
+		m_keyId(0)
 	{
 	}
 
@@ -72,13 +72,13 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if either the KeyId or ExtensionKey fields are null or invalid</exception>
 	MacKey(CEX::Common::MacDescription &Description, std::vector<byte> &KeyId)
 		:
-		_macDsc(Description),
-		_keyId(0)
+		m_macDsc(Description),
+		m_keyId(0)
 	{
 		if (KeyId.size() == 0)
 		{
 			CEX::Prng::CSPPrng rnd;
-			_keyId = rnd.GetBytes(KEYUID_SIZE);
+			m_keyId = rnd.GetBytes(KEYUID_SIZE);
 		}
 		else if (KeyId.size() != KEYUID_SIZE)
 		{
@@ -86,7 +86,7 @@ public:
 		}
 		else
 		{
-			_keyId = KeyId;
+			m_keyId = KeyId;
 		}
 	}
 
@@ -97,12 +97,12 @@ public:
 	/// <param name="KeyStream">The Stream containing the MacKey</param>
 	explicit MacKey(CEX::IO::MemoryStream &KeyStream)
 		:
-		_keyId(0)
+		m_keyId(0)
 	{
 		CEX::IO::StreamReader reader(KeyStream);
 
-		_macDsc = CEX::Common::MacDescription(reader.ReadBytes(CEX::Common::MacDescription::GetHeaderSize()));
-		_keyId = reader.ReadBytes(KEYUID_SIZE);
+		m_macDsc = CEX::Common::MacDescription(reader.ReadBytes(CEX::Common::MacDescription::GetHeaderSize()));
+		m_keyId = reader.ReadBytes(KEYUID_SIZE);
 	}
 
 	/// <summary>
@@ -112,13 +112,13 @@ public:
 	/// <param name="KeyArray">The byte array containing the MacKey</param>
 	explicit MacKey(std::vector<byte> &KeyArray)
 		:
-		_keyId(0)
+		m_keyId(0)
 	{
 		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(KeyArray);
 		CEX::IO::StreamReader reader(ms);
 
-		_macDsc = CEX::Common::MacDescription(reader.ReadBytes(CEX::Common::MacDescription::GetHeaderSize()));
-		_keyId = reader.ReadBytes(KEYUID_SIZE);
+		m_macDsc = CEX::Common::MacDescription(reader.ReadBytes(CEX::Common::MacDescription::GetHeaderSize()));
+		m_keyId = reader.ReadBytes(KEYUID_SIZE);
 	}
 
 	/// <summary>
@@ -126,9 +126,9 @@ public:
 	/// </summary>
 	void Reset()
 	{
-		_macDsc.Reset();
-		if (_keyId.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(_keyId);
+		m_macDsc.Reset();
+		if (m_keyId.size() != 0)
+			CEX::Utility::IntUtils::ClearVector(m_keyId);
 	}
 
 	/// <summary>
@@ -140,8 +140,8 @@ public:
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 
-		writer.Write(_macDsc.ToBytes());
-		writer.Write(_keyId);
+		writer.Write(m_macDsc.ToBytes());
+		writer.Write(m_keyId);
 
 		return writer.GetBytes();
 	}
@@ -155,8 +155,8 @@ public:
 	{
 		CEX::IO::StreamWriter writer(GetHeaderSize());
 
-		writer.Write(_macDsc.ToBytes());
-		writer.Write(_keyId);
+		writer.Write(m_macDsc.ToBytes());
+		writer.Write(m_keyId);
 
 		return writer.GetStream();
 	}
@@ -228,9 +228,9 @@ public:
 	/// <returns>Hash code</returns>
 	int GetHashCode()
 	{
-		int result = _macDsc.GetHashCode();
-		for (size_t i = 0; i < _keyId.size(); ++i)
-			result += (31 * _keyId[i]);
+		int result = m_macDsc.GetHashCode();
+		for (size_t i = 0; i < m_keyId.size(); ++i)
+			result += (31 * m_keyId[i]);
 
 		return result;
 	}

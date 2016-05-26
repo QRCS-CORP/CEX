@@ -64,13 +64,13 @@ NAMESPACE_GENERATOR
 class KDF2Drbg : public IGenerator
 {
 private:
-	size_t _hashSize;
-	bool _isDestroyed;
-	bool _isInitialized;
-	std::vector<byte> _IV;
-	size_t _blockSize;
-	CEX::Digest::IDigest* _msgDigest;
-	std::vector<byte> _Salt;
+	size_t m_hashSize;
+	bool m_isDestroyed;
+	bool m_isInitialized;
+	std::vector<byte> m_Iv;
+	size_t m_blockSize;
+	CEX::Digest::IDigest* m_msgDigest;
+	std::vector<byte> m_salt;
 
 public:
 
@@ -84,18 +84,18 @@ public:
 	/// <summary>
 	/// Get: Generator is ready to produce data
 	/// </summary>
-	virtual const bool IsInitialized() { return _isInitialized; }
+	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
 	/// Get: The current state of the initialization Vector
 	/// </summary>
-	virtual const std::vector<byte> IV() { return _IV; }
+	virtual const std::vector<byte> IV() { return m_Iv; }
 
 	/// <summary>
 	/// <para>Minimum initialization key size in bytes; 
 	/// combined sizes of Salt, Ikm, and Nonce must be at least this size.</para>
 	/// </summary>
-	virtual size_t KeySize() { return _blockSize; }
+	virtual size_t KeySize() { return m_blockSize; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -113,13 +113,13 @@ public:
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
 	explicit KDF2Drbg(CEX::Digest::IDigest* Digest)
 		:
-		_blockSize(Digest->BlockSize()),
-		_hashSize(Digest->DigestSize()),
-		_isDestroyed(false),
-		_isInitialized(false),
-		_IV(0),
-		_msgDigest(Digest),
-		_Salt(0)
+		m_blockSize(Digest->BlockSize()),
+		m_hashSize(Digest->DigestSize()),
+		m_isDestroyed(false),
+		m_isInitialized(false),
+		m_Iv(0),
+		m_msgDigest(Digest),
+		m_salt(0)
 	{
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");

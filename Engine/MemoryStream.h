@@ -11,9 +11,9 @@ NAMESPACE_IO
 class MemoryStream : public IByteStream
 {
 private:
-	bool _isDestroyed;
-	std::vector<byte> _streamData;
-	size_t _streamPosition;
+	bool m_isDestroyed;
+	std::vector<byte> m_streamData;
+	size_t m_streamPosition;
 
 public:
 
@@ -37,17 +37,17 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const size_t Length() { return _streamData.size(); }
+	virtual const size_t Length() { return m_streamData.size(); }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const size_t Position() { return _streamPosition; }
+	virtual const size_t Position() { return m_streamPosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
 	/// </summary>
-	std::vector<byte> &ToArray() { return _streamData; }
+	std::vector<byte> &ToArray() { return m_streamData; }
 
 	// *** Constructor *** //
 
@@ -56,9 +56,9 @@ public:
 	/// </summary>
 	MemoryStream() 
 		:
-		_isDestroyed(false),
-		_streamData(0),
-		_streamPosition(0)
+		m_isDestroyed(false),
+		m_streamData(0),
+		m_streamPosition(0)
 	{
 	}
 
@@ -69,11 +69,11 @@ public:
 	/// <param name="Length">The reserved length of the stream</param>
 	explicit MemoryStream(size_t Length)
 		:
-		_isDestroyed(false),
-		_streamData(0),
-		_streamPosition(0)
+		m_isDestroyed(false),
+		m_streamData(0),
+		m_streamPosition(0)
 	{
-		_streamData.reserve(Length);
+		m_streamData.reserve(Length);
 	}
 
 	/// <summary>
@@ -83,9 +83,9 @@ public:
 	/// <param name="DataArray">The array used to initialize the stream</param>
 	explicit MemoryStream(const std::vector<byte> &DataArray)
 		:
-		_isDestroyed(false),
-		_streamData(DataArray),
-		_streamPosition(0)
+		m_isDestroyed(false),
+		m_streamData(DataArray),
+		m_streamPosition(0)
 	{
 	}
 
@@ -100,15 +100,15 @@ public:
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
 	explicit MemoryStream(std::vector<byte> &DataArray, size_t Offset, size_t Length)
 		:
-		_isDestroyed(false),
-		_streamData(0),
-		_streamPosition(0)
+		m_isDestroyed(false),
+		m_streamData(0),
+		m_streamPosition(0)
 	{
 		if (Length > DataArray.size() - Offset)
 			throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
 
-		_streamData.reserve(Length);
-		_streamData.insert(_streamData.begin(), DataArray.begin() + Offset, DataArray.begin() + Length);
+		m_streamData.reserve(Length);
+		m_streamData.insert(m_streamData.begin(), DataArray.begin() + Offset, DataArray.begin() + Length);
 	}
 
 	// *** Public Methods *** //

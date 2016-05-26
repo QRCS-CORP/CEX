@@ -64,15 +64,15 @@ private:
 	static constexpr size_t PKCS_ITERATIONS = 2;
 	static constexpr size_t BUFFER_SIZE = 1024;
 
-	size_t _bufferIndex;
-	size_t _bufferSize;
-	std::vector<byte> _byteBuffer;
-	CEX::Digest::IDigest* _digestEngine;
-	size_t _digestIterations;
-	CEX::Enumeration::Digests _digestType;
-	bool _isDestroyed;
-	CEX::Generator::PBKDF2* _rngGenerator;
-	std::vector<byte> _stateSeed;
+	size_t m_bufferIndex;
+	size_t m_bufferSize;
+	std::vector<byte> m_byteBuffer;
+	CEX::Digest::IDigest* m_digestEngine;
+	size_t m_digestIterations;
+	CEX::Enumeration::Digests m_digestType;
+	bool m_isDestroyed;
+	CEX::Generator::PBKDF2* m_rngGenerator;
+	std::vector<byte> m_stateSeed;
 
 public:
 
@@ -102,13 +102,13 @@ public:
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
 	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::SHA512, size_t BufferSize = BUFFER_SIZE)
 		:
-		_bufferIndex(0),
-		_bufferSize(BufferSize),
-		_byteBuffer(BufferSize),
-		_digestIterations(Iterations),
-		_digestType(DigestEngine),
-		_isDestroyed(false),
-		_stateSeed(Seed)
+		m_bufferIndex(0),
+		m_bufferSize(BufferSize),
+		m_byteBuffer(BufferSize),
+		m_digestIterations(Iterations),
+		m_digestType(DigestEngine),
+		m_isDestroyed(false),
+		m_stateSeed(Seed)
 	{
 		if (Iterations == 0)
 			throw CryptoRandomException("DGCPrng:Ctor", "Iterations can not be zero; at least 1 iteration is required!");
