@@ -142,7 +142,7 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// expanded key size
 	size_t keySize = (blkWords * (m_dfnRounds + 1)) / 4;
 	// kdf return array
-	size_t keyBytes = keySize * 4;
+	size_t keyBytes = keySize * 16;
 	std::vector<byte> rawKey(keyBytes, 0);
 	size_t saltSize = Key.size() - m_ikmSize;
 	// hkdf input
@@ -164,8 +164,17 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	gen.Generate(rawKey);
 	// initialize working key
 	m_expKey.resize(keySize);
+
+	// big endian format to align with test vectors
+	for (size_t i = 0; i < rawKey.size(); i += 4)
+	{
+		uint tmpbk = CEX::Utility::IntUtils::BytesToBe32(rawKey, i);
+		memcpy(&rawKey[i], &tmpbk, 4);
+	}
+
 	// copy bytes to working key
-	memcpy(&m_expKey[0], &rawKey[0], keyBytes);
+	for (size_t i = 0, j = 0; i < keySize; ++i, j += 16)
+		m_expKey[i] = _mm_loadu_si128((const __m128i*)(const void*)&rawKey[j]);
 }
 
 void AHX::StandardExpand(const std::vector<byte> &Key)

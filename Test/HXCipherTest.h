@@ -61,6 +61,7 @@ namespace Test
 	private:
 		void Initialize();
 		void OnProgress(char* Data);
+		void AHXMonteCarlo();
 		void RHXMonteCarlo();
 		void SHXMonteCarlo();
 		void THXMonteCarlo();

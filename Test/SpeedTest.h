@@ -57,9 +57,9 @@ namespace Test
 	private:
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void Initialize();
-		void ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, unsigned int KeySize, unsigned int IvSize = 16, unsigned int Loops = DEFITER);
-		void ParallelModeLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, unsigned int SampleSize, bool Parallel = false, int KeySize = 32, int IvSize = 16, unsigned int Loops = DEFITER);
-		void ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, int KeySize, int IvSize = 16, unsigned int Loops = DEFITER);
+		void ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, size_t SampleSize, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
+		void ParallelModeLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, size_t SampleSize, bool Parallel = false, size_t KeySize = 32, size_t IvSize = 16, size_t Loops = DEFITER);
+		void ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
 		void OnProgress(char* Data);
 		void AHXSpeedTest();
 		void RDXSpeedTest();

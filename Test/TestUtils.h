@@ -92,7 +92,7 @@ namespace Test
 		/// <summary>
 		/// Initializes a KeyParams structure with pseudo random data
 		/// </summary>
-		static void GetRandomKey(CEX::Common::KeyParams &keyParams, int keySize, int ivSize)
+		static void GetRandomKey(CEX::Common::KeyParams &keyParams, size_t keySize, size_t ivSize)
 		{
 			CEX::Seed::CSPRsg rng;
 			std::vector<byte> key(keySize, 0);

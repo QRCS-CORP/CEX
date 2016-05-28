@@ -199,7 +199,7 @@ public:
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	AHX(CEX::Digest::IDigest *KdfEngine, size_t Rounds = ROUNDS22, size_t BlockSize = BLOCK16)
+	AHX(CEX::Digest::IDigest *KdfEngine, size_t Rounds = ROUNDS22)
 		:
 		m_blockSize(BLOCK16),
 		m_destroyEngine(false),

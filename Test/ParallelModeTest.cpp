@@ -34,9 +34,9 @@ namespace Test
 	void ParallelModeTest::BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
 		const size_t blkSize = Cipher->BlockSize();
-		const size_t inpSize = (size_t)(Input.size() - InOffset);
-		const size_t alnSize = (size_t)(inpSize - (inpSize % blkSize));
-		unsigned long count = 0;
+		const size_t inpSize = (Input.size() - InOffset);
+		const size_t alnSize = (inpSize - (inpSize % blkSize));
+		size_t count = 0;
 
 		Cipher->IsParallel() = false;
 
@@ -45,7 +45,7 @@ namespace Test
 			Cipher->Transform(Input, InOffset, Output, OutOffset);
 			InOffset += blkSize;
 			OutOffset += blkSize;
-			count += blkSize;
+ 			count += blkSize;
 		}
 
 		// partial
@@ -95,7 +95,7 @@ namespace Test
 		const size_t blkSize = Cipher->BlockSize();
 		const size_t inpSize = (size_t)(Input.size() - InOffset);
 		const size_t alnSize = inpSize - (inpSize % blkSize);
-		unsigned long count = 0;
+		size_t count = 0;
 
 		Cipher->IsParallel() = false;
 
@@ -388,7 +388,7 @@ namespace Test
 		const size_t blkSize = m_parallelBlockSize;
 		const size_t inpSize = (Input.size() - InOffset);
 		const size_t alnSize = ((inpSize / blkSize) * blkSize);
-		unsigned long count = 0;
+		size_t count = 0;
 
 		Cipher->IsParallel() = true;
 		Cipher->ParallelBlockSize() = blkSize;

@@ -139,7 +139,7 @@ int main()
 
 	try
 	{
-		PrintHeader("Warning! Assembly must be compiled as Release with correct platform (x86/x64) for accurate timings");
+		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
 
 		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))
