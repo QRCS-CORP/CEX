@@ -45,8 +45,12 @@ namespace Test
 		{
 			("2ac5dd436cb2a1c976b25a1edaf1f650"),	// hkdf extended 14 rounds
 			("497bef5ccb4faee957b7946705c3dc10"),	// hkdf extended 22 rounds 
+<<<<<<< HEAD
 			("05e57d29a9f646d840c070ed3a17da53"),	// standard 512 key, 22 rounds
 			("46af483df6bbaf9e3a0aa8c182011752bb8bab6f2ebc4cd424407994f6ff6534")	// standard 512 key, 22 rounds, 32 byte block
+=======
+			("05e57d29a9f646d840c070ed3a17da53")	// standard 512 key, 22 rounds
+>>>>>>> origin/master
 		};
 		HexConverter::Decode(rhxEncoded, 4, m_rhxExpected);
 
