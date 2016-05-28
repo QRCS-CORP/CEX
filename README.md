@@ -7,7 +7,7 @@ AES-NI has been added (AHX) along with corresponding tests.
 AHX is reaching speeds of over 5GB per second on an i7.
 The symmetric ciphers are some of the fastest and most flexible implementations available.
 
-This is a preliminary release; not everything is tested, or final, and changes will be made for 1.1 release.
+This is a preliminary release; not everything is tested, or final, and changes will be made for 1.2 release.
 
 CEX .Net Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 
