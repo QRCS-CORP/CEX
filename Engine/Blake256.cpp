@@ -172,13 +172,13 @@ void Blake256::G32(uint A, uint B, uint C, uint D, uint R, uint I)
 	int P1 = m_ftSigma[P + 1];
 
 	V[A] += V[B] + (M[P0] ^ m_C32[P1]);
-	V[D] = CEX::Utility::IntUtils::RotateRight(V[D] ^ V[A], 16);
+	V[D] = CEX::Utility::IntUtils::RotateFixRight(V[D] ^ V[A], 16);
 	V[C] += V[D];
-	V[B] = CEX::Utility::IntUtils::RotateRight(V[B] ^ V[C], 12);
+	V[B] = CEX::Utility::IntUtils::RotateFixRight(V[B] ^ V[C], 12);
 	V[A] += V[B] + (M[P1] ^ m_C32[P0]);
-	V[D] = CEX::Utility::IntUtils::RotateRight(V[D] ^ V[A], 8);
+	V[D] = CEX::Utility::IntUtils::RotateFixRight(V[D] ^ V[A], 8);
 	V[C] += V[D];
-	V[B] = CEX::Utility::IntUtils::RotateRight(V[B] ^ V[C], 7);
+	V[B] = CEX::Utility::IntUtils::RotateFixRight(V[B] ^ V[C], 7);
 }
 
 void Blake256::Compress32(const std::vector<byte> &Block, size_t Offset)
@@ -243,6 +243,8 @@ void Blake256::Compress32(const std::vector<byte> &Block, size_t Offset)
 	m_hashVal[5] ^= V[5];
 	m_hashVal[6] ^= V[6];
 	m_hashVal[7] ^= V[7];
+	/*CEX::Utility::IntUtils::XOR8X32(V, 0, m_hashVal, 0);*/
+
 	m_hashVal[0] ^= V[8];
 	m_hashVal[1] ^= V[9];
 	m_hashVal[2] ^= V[10];
@@ -251,14 +253,19 @@ void Blake256::Compress32(const std::vector<byte> &Block, size_t Offset)
 	m_hashVal[5] ^= V[13];
 	m_hashVal[6] ^= V[14];
 	m_hashVal[7] ^= V[15];
+	/*CEX::Utility::IntUtils::XOR8X32(V, 8, m_hashVal, 0);*/
+
 	m_hashVal[0] ^= m_salt32[0];
 	m_hashVal[1] ^= m_salt32[1];
 	m_hashVal[2] ^= m_salt32[2];
 	m_hashVal[3] ^= m_salt32[3];
+	/*CEX::Utility::IntUtils::XOR4X32(m_salt32, 0, m_hashVal, 0);*/
+
 	m_hashVal[4] ^= m_salt32[0];
 	m_hashVal[5] ^= m_salt32[1];
 	m_hashVal[6] ^= m_salt32[2];
 	m_hashVal[7] ^= m_salt32[3];
+	/*CEX::Utility::IntUtils::XOR4X32(m_salt32, 0, m_hashVal, 4);*/
 }
 
 void Blake256::G32BLK(uint Index)

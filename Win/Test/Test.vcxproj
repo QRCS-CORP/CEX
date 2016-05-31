@@ -146,7 +146,8 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -228,7 +229,7 @@
     <ClInclude Include="..\..\Test\SerpentTest.h" />
     <ClInclude Include="..\..\Test\Sha2Test.h" />
     <ClInclude Include="..\..\Test\SkeinTest.h" />
-    <ClInclude Include="..\..\Test\SpeedTest.h" />
+    <ClInclude Include="..\..\Test\CipherSpeedTest.h" />
     <ClInclude Include="..\..\Test\CipherStreamTest.h" />
     <ClInclude Include="..\..\Test\TestCommon.h" />
     <ClInclude Include="..\..\Test\TestException.h" />
@@ -237,6 +238,7 @@
     <ClInclude Include="..\..\Test\TwofishTest.h" />
     <ClInclude Include="..\..\Test\VMACTest.h" />
     <ClInclude Include="..\..\Test\XSPRsgTest.h" />
+    <ClInclude Include="DigestSpeedTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
@@ -266,7 +268,7 @@
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />
     <ClCompile Include="..\..\Test\SP20DrbgTest.cpp" />
-    <ClCompile Include="..\..\Test\SpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\CipherSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\TwofishTest.cpp" />
     <ClCompile Include="..\..\Test\VMACTest.cpp" />
     <ClCompile Include="..\..\Test\XSPRsgTest.cpp" />

@@ -14,6 +14,7 @@
 #include "ConsoleUtils.h"
 #include "Cpu.h"
 #include "CTRDrbgTest.h"
+#include "DigestSpeedTest.h"
 #include "DigestStreamTest.h"
 #include "HKDFTest.h"
 #include "HMACTest.h"
@@ -34,7 +35,7 @@
 #include "Sha2Test.h"
 #include "SkeinTest.h"
 #include "SP20DrbgTest.h"
-#include "SpeedTest.h"
+#include "CipherSpeedTest.h"
 #include "TwofishTest.h"
 #include "VMACTest.h"
 #include "XSPRsgTest.h"
@@ -142,9 +143,19 @@ int main()
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
 
-		if (CanTest("Press 'Y' then Enter to run Speed Tests, any other key to cancel: "))
+		if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
 		{
-			RunTest(new SpeedTest());
+			RunTest(new CipherSpeedTest());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Speed tests were Cancelled..");
+		}
+		ConsoleUtils::WriteLine("");
+
+		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
+		{
+			RunTest(new DigestSpeedTest());
 		}
 		else
 		{

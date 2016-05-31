@@ -53,7 +53,7 @@ public:
 	{
 		Value = ((Value & 0xAA) >> 1) | ((Value & 0x55) << 1);
 		Value = ((Value & 0xCC) >> 2) | ((Value & 0x33) << 2);
-		return static_cast<byte>(RotlFixed(Value, 4));
+		return static_cast<byte>(RotateFixLeft(Value, 4));
 	}
 
 	/// <summary>
@@ -127,7 +127,7 @@ public:
 	/// <returns>The reversed ushort</returns>
 	static inline ushort ByteReverse(ushort Value)
 	{
-		return static_cast<ushort>(RotlFixed(Value, 8U));
+		return static_cast<ushort>(RotateFixLeft(Value, 8U));
 	}
 
 	/// <summary>
@@ -144,11 +144,11 @@ public:
 		return (uint)__lwbrx(&Value, 0);
 #elif defined(FAST_ROTATE)
 		// 5 instructions with rotate instruction, 9 without
-		return (RotrFixed(Value, 8U) & 0xff00ff00) | (RotlFixed(Value, 8U) & 0x00ff00ff);
+		return (RotateFixRight(Value, 8U) & 0xff00ff00) | (RotateFixLeft(Value, 8U) & 0x00ff00ff);
 #else
 		// 6 instructions with rotate instruction, 8 without
 		Value = ((Value & 0xFF00FF00) >> 8) | ((Value & 0x00FF00FF) << 8);
-		return RotlFixed(Value, 16U);
+		return RotateFixLeft(Value, 16U);
 #endif
 	}
 
@@ -166,11 +166,11 @@ public:
 		return static_cast<uint>(__lwbrx(&Value, 0));
 #elif defined(FAST_ROTATE)
 		// 5 instructions with rotate instruction, 9 without
-		return (RotrFixed64(Value, 8U) & 0xff00ff00) | (RotlFixed64(Value, 8U) & 0x00ff00ff);
+		return (RotateFixRight(Value, 8U) & 0xff00ff00) | (RotateFixLeft(Value, 8U) & 0x00ff00ff);
 #else
 		// 6 instructions with rotate instruction, 8 without
 		Value = ((Value & 0xFF00FF00) >> 8) | ((Value & 0x00FF00FF) << 8);
-		return RotlFixed(Value, 16U);
+		return RotateFixLeft(Value, 16U);
 #endif
 	}
 
@@ -909,7 +909,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft(ulong Value, uint Shift)
+	static inline ulong RotateLeft64(ulong Value, uint Shift)
 	{
 		return Shift ? _rotl64(Value, Shift) : Value;
 	}
@@ -935,59 +935,59 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight(ulong Value, uint Shift)
+	static inline ulong RotateRight64(ulong Value, uint Shift)
 	{
 		return Shift ? _rotr64(Value, Shift) : Value;
 	}
 
 	/// <summary>
-	/// Rotate shift an unsigned 32 bit integer to the left
+	/// Rotate shift an unsigned 32 bit integer to the left by a positive fixed non-zero increment
 	/// </summary>
 	/// 
 	/// <param name="Value">The initial value</param>
-	/// <param name="Y">The number of bits to shift</param>
+	/// <param name="Y">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotlFixed(uint Value, uint Shift)
+	static inline uint RotateFixLeft(uint Value, uint Shift)
 	{
 		return _lrotl(Value, Shift);
 	}
 
 	/// <summary>
-	/// Rotate shift an unsigned 32 bit integer to the right
+	/// Rotate shift an unsigned 64 bit integer to the left by a positive fixed non-zero increment
 	/// </summary>
 	/// 
 	/// <param name="Value">The initial value</param>
-	/// <param name="Shift">The number of bits to shift</param>
-	/// 
-	/// <returns>The right shifted integer</returns>
-	static inline uint RotrFixed(uint Value, uint Shift)
-	{
-		return _lrotr(Value, Shift);
-	}
-
-	/// <summary>
-	/// Rotate shift an unsigned 64 bit integer to the left
-	/// </summary>
-	/// 
-	/// <param name="Value">The initial value</param>
-	/// <param name="Shift">The number of bits to shift</param>
+	/// <param name="Shift">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotlFixed64(ulong Value, uint Shift)
+	static inline ulong RotateFixLeft64(ulong Value, uint Shift)
 	{
 		return _rotl64(Value, Shift);
 	}
 
 	/// <summary>
-	/// Rotate shift an unsigned 64 bit integer to the right
+	/// Rotate shift an unsigned 32 bit integer to the right by a positive fixed non-zero increment
 	/// </summary>
 	/// 
 	/// <param name="Value">The initial value</param>
-	/// <param name="Shift">The number of bits to shift</param>
+	/// <param name="Shift">The number of bits to shift, shift can not be zero</param>
+	/// 
+	/// <returns>The right shifted integer</returns>
+	static inline uint RotateFixRight(uint Value, uint Shift)
+	{
+		return _lrotr(Value, Shift);
+	}
+
+	/// <summary>
+	/// Rotate shift an unsigned 64 bit integer to the right by a positive fixed non-zero increment
+	/// </summary>
+	/// 
+	/// <param name="Value">The initial value</param>
+	/// <param name="Shift">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotrFixed64(ulong Value, uint Shift)
+	static inline ulong RotateFixRight64(ulong Value, uint Shift)
 	{
 		return _rotr64(Value, Shift);
 	}
@@ -1053,7 +1053,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotlFixed(uint Value, uint Shift)
+	static inline uint RotateFixLeft(uint Value, uint Shift)
 	{
 		return __rlwinm(Value, Shift, 0, 31);
 	}
@@ -1066,7 +1066,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotrFixed(uint Value, uint Shift)
+	static inline uint RotateFixRight(uint Value, uint Shift)
 	{
 		return __rlwinm(Value, 32 - Shift, 0, 31);
 	}
@@ -1079,7 +1079,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotlFixed64(ulong Value, uint Shift)
+	static inline ulong RotateFixLeft(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | ((long)((ulong)Value >> -Shift));
 	}
@@ -1092,7 +1092,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotrFixed64(ulong Value, uint Shift)
+	static inline ulong RotateFixRight(ulong Value, uint Shift)
 	{
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
@@ -1157,7 +1157,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotlFixed(uint Value, uint Shift)
+	static inline uint RotateFixLeft(uint Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
 	}
@@ -1170,7 +1170,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotrFixed(uint Value, uint Shift)
+	static inline uint RotateFixRight(uint Value, uint Shift)
 	{
 		return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
 	}
@@ -1183,7 +1183,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotlFixed64(ulong Value, uint Shift)
+	static inline ulong RotateFixLeft(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | ((long)((ulong)Value >> -Shift));
 	}
@@ -1196,7 +1196,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotrFixed64(ulong Value, uint Shift)
+	static inline ulong RotateFixRight(ulong Value, uint Shift)
 	{
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
@@ -1372,14 +1372,6 @@ public:
 	/// 
 	/// <param name="Input">The source array</param>
 	/// <param name="Output">The destination array</param>
-	static void XOR32(const byte* &Input, byte* &Output);
-
-	/// <summary>
-	/// Block XOR 4 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
 	static void XOR32(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
@@ -1405,14 +1397,6 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR64(const byte* &Input, byte* &Output);
-
-	/// <summary>
-	/// Block XOR 8 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
@@ -1431,26 +1415,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR128(const byte* &Input, byte* &Output);
-
-	/// <summary>
-	/// Block XOR 16 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	static void XOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 32 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR256(const byte* &Input, byte* &Output);
 
 	/// <summary>
 	/// Block XOR 32 bytes
@@ -1469,6 +1437,56 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 2 64bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void XOR2X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 4 64bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void XOR4X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 8 64bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void XOR8X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 4 32bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void XOR4X32(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 8 32bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void XOR8X32(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// XOR contiguous 16 byte blocks in an array.

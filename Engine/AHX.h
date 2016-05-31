@@ -37,10 +37,6 @@
 #define _CEXENGINE_AHX_H
 
 #include "IBlockCipher.h"
-#include "HKDF.h"
-#include "HMAC.h"
-#include "IntUtils.h"
-#include "DigestFromName.h"
 #include <wmmintrin.h>
 
 NAMESPACE_BLOCK

@@ -1,9 +1,9 @@
 #include "RHX.h"
 #include "Rijndael.h"
+#include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
 #include "IntUtils.h"
-#include "DigestFromName.h"
 
 NAMESPACE_BLOCK
 
@@ -749,7 +749,7 @@ CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
-		throw CryptoSymmetricCipherException("CipherStream:KdfEngine", "The digest could not be instantiated!");
+		throw CryptoSymmetricCipherException("RHX:GetDigest", "The digest could not be instantiated!");
 	}
 }
 

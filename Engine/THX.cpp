@@ -1,9 +1,9 @@
 #include "THX.h"
 #include "Twofish.h"
+#include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
 #include "IntUtils.h"
-#include "DigestFromName.h"
 
 NAMESPACE_BLOCK
 
@@ -408,7 +408,7 @@ CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
-		throw CryptoSymmetricCipherException("CipherStream:GetKeyEngine", "The digest could not be instantiated!");
+		throw CryptoSymmetricCipherException("THX:GetDigest", "The digest could not be instantiated!");
 	}
 }
 

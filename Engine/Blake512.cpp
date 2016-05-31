@@ -225,6 +225,7 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 	m_hashVal[5] ^= V[5];
 	m_hashVal[6] ^= V[6];
 	m_hashVal[7] ^= V[7];
+	/*CEX::Utility::IntUtils::XOR8X64(V, 0, m_hashVal, 0);*/
 
 	m_hashVal[0] ^= V[8];
 	m_hashVal[1] ^= V[9];
@@ -234,15 +235,19 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 	m_hashVal[5] ^= V[13];
 	m_hashVal[6] ^= V[14];
 	m_hashVal[7] ^= V[15];
+	/*CEX::Utility::IntUtils::XOR8X64(V, 8, m_hashVal, 0);*/
 
 	m_hashVal[0] ^= m_salt64[0];
 	m_hashVal[1] ^= m_salt64[1];
 	m_hashVal[2] ^= m_salt64[2];
 	m_hashVal[3] ^= m_salt64[3];
+	/*CEX::Utility::IntUtils::XOR4X64(m_salt64, 0, m_hashVal, 0);*/
+
 	m_hashVal[4] ^= m_salt64[0];
 	m_hashVal[5] ^= m_salt64[1];
 	m_hashVal[6] ^= m_salt64[2];
 	m_hashVal[7] ^= m_salt64[3];
+	/*CEX::Utility::IntUtils::XOR4X64(m_salt64, 0, m_hashVal, 4);*/
 }
 
 void Blake512::G64BLK(uint Index)
@@ -265,13 +270,13 @@ void Blake512::G64(uint A, uint B, uint C, uint D, uint R, uint I)
 
 	// initialization
 	V[A] += V[B] + (M[P0] ^ m_C64[P1]);
-	V[D] = CEX::Utility::IntUtils::RotrFixed64(V[D] ^ V[A], 32);
+	V[D] = CEX::Utility::IntUtils::RotateFixRight64(V[D] ^ V[A], 32);
 	V[C] += V[D];
-	V[B] = CEX::Utility::IntUtils::RotrFixed64(V[B] ^ V[C], 25);
+	V[B] = CEX::Utility::IntUtils::RotateFixRight64(V[B] ^ V[C], 25);
 	V[A] += V[B] + (M[P1] ^ m_C64[P0]);
-	V[D] = CEX::Utility::IntUtils::RotrFixed64(V[D] ^ V[A], 16);
+	V[D] = CEX::Utility::IntUtils::RotateFixRight64(V[D] ^ V[A], 16);
 	V[C] += V[D];
-	V[B] = CEX::Utility::IntUtils::RotrFixed64(V[B] ^ V[C], 11);
+	V[B] = CEX::Utility::IntUtils::RotateFixRight64(V[B] ^ V[C], 11);
 }
 
 void Blake512::Initialize()

@@ -1,9 +1,8 @@
 #include "AHX.h"
+#include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
 #include "IntUtils.h"
-#include "DigestFromName.h"
-#include <wmmintrin.h>
 
 NAMESPACE_BLOCK
 
@@ -194,7 +193,6 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 		m_expKey[1] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 16));
 		m_expKey[2] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 32));
 		m_expKey[3] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 48));
-
 		m_expKey[4] = _mm_aeskeygenassist_si128(m_expKey[3], 0x01);
 		ExpandRotBlock(m_expKey, 4, 4);
 		ExpandSubBlock(m_expKey, 5, 4);
@@ -230,7 +228,6 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 		m_expKey[0] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data()));
 		m_expKey[1] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 16));
 		m_expKey[2] = _mm_aeskeygenassist_si128(m_expKey[1], 0x01);
-
 		ExpandRotBlock(m_expKey, 2, 2);
 		ExpandSubBlock(m_expKey, 3, 2);
 		m_expKey[4] = _mm_aeskeygenassist_si128(m_expKey[3], 0x02);
@@ -255,8 +252,8 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 	{
 		__m128i K0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data()));
 		__m128i K1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(Key.data() + 8));
-		K1 = _mm_srli_si128(K1, 8);
 
+		K1 = _mm_srli_si128(K1, 8);
 		m_expKey[0] = K0;
 		m_expKey[1] = K1;
 		ExpandRotBlock(m_expKey, &K0, &K1, _mm_aeskeygenassist_si128(K1, 0x01), 24);
@@ -296,7 +293,8 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 
 void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset)
 {
-	__m128i key1 = *K1;
+	// 192 bit key expansion method, -requires additional processing
+	__m128i key1 = *K1; 
 	__m128i key2 = *K2;
 
 	KR = _mm_shuffle_epi32(KR, _MM_SHUFFLE(1, 1, 1, 1));
@@ -327,6 +325,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 
 void AHX::ExpandRotBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset)
 {
+	// 128, 256, 512 bit key method
 	__m128i pkb = Key[Index - Offset];
 	Key[Index] = _mm_shuffle_epi32(Key[Index], 0xff);
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
@@ -337,6 +336,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset)
 
 void AHX::ExpandSubBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset)
 {
+	// used with 256 and 512 bit keys
 	__m128i pkb = Key[Index - Offset];
 	Key[Index] = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(Key[Index - 1], 0x0), 0xaa);
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
@@ -390,7 +390,7 @@ CEX::Digest::IDigest* AHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
-		throw CryptoSymmetricCipherException("CipherStream:KdfEngine", "The digest could not be instantiated!");
+		throw CryptoSymmetricCipherException("AHX:GetDigest", "The digest could not be instantiated!");
 	}
 }
 

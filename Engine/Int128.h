@@ -8,7 +8,7 @@
 
 NAMESPACE_UTILITY
 
-// borrowed from Botans simd_sse2.h
+// not completed yet; borrowed from Botans simd_sse2.h as a reference
 class Int128
 {
 public:
