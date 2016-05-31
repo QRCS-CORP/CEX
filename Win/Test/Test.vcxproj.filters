@@ -284,7 +284,7 @@
     <ClInclude Include="..\..\Test\CipherSpeedTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
-    <ClInclude Include="DigestSpeedTest.h">
+    <ClInclude Include="..\..\Test\DigestSpeedTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
   </ItemGroup>
@@ -383,6 +383,9 @@
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\DigestSpeedTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
   </ItemGroup>
