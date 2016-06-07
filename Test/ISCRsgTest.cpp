@@ -1,5 +1,5 @@
 #include "ISCRsgTest.h"
-#include "ISCRsg.h"
+#include "../CEX/ISCRsg.h"
 
 namespace Test
 {

@@ -1,5 +1,5 @@
 #include "TwofishTest.h"
-#include "THX.h"
+#include "../CEX/THX.h"
 
 namespace Test
 {

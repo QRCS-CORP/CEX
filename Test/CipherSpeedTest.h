@@ -2,8 +2,8 @@
 #define _CEXTEST_CIPHERSPEEDTEST_H
 
 #include "ITest.h"
-#include "ICipherMode.h"
-#include "IStreamCipher.h"
+#include "../CEX/ICipherMode.h"
+#include "../CEX/IStreamCipher.h"
 
 namespace Test
 {

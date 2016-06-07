@@ -1,6 +1,6 @@
 #include "KDF2DrbgTest.h"
-#include "KDF2Drbg.h"
-#include "SHA256.h"
+#include "../CEX/KDF2Drbg.h"
+#include "../CEX/SHA256.h"
 
 namespace Test
 {

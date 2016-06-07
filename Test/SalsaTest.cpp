@@ -1,6 +1,6 @@
 #include "SalsaTest.h"
-#include "CSPRsg.h"
-#include "Salsa20.h"
+#include "../CEX/CSPRsg.h"
+#include "../CEX/Salsa20.h"
 
 namespace Test
 {

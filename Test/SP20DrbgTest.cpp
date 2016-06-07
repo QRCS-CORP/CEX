@@ -1,5 +1,5 @@
 #include "SP20DrbgTest.h"
-#include "SP20Drbg.h"
+#include "../CEX/SP20Drbg.h"
 
 namespace Test
 {

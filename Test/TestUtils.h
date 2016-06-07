@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_TestUtils_H
-#define _CEXTEST_TestUtils_H
+#ifndef _CEXTEST_TESTUTILS_H
+#define _CEXTEST_TESTUTILS_H
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -10,10 +10,10 @@
 
 #include <fstream>
 #include <iostream>
-#include "Common.h"
-#include "CSPRsg.h"
-#include "KeyParams.h"
 #include <algorithm>
+#include "../CEX/Common.h"
+#include "../CEX/CSPRsg.h"
+#include "../CEX/KeyParams.h"
 
 namespace Test
 {
@@ -24,9 +24,9 @@ namespace Test
 		/// <summary>
 		/// Copy an int vector array
 		/// </summary>
-		static void CopyVector(const std::vector<int> &srcArray, size_t srcIndex, std::vector<int> &dstArray, size_t dstIndex, size_t length)
+		static void CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length)
 		{
-			memcpy(&dstArray[dstIndex], &srcArray[srcIndex], length*sizeof(srcArray[srcIndex]));
+			memcpy(&DstArray[DstIndex], &SrcArray[SrcIndex], Length * sizeof(SrcArray[SrcIndex]));
 		}
 
 		/// <summary>
@@ -108,14 +108,14 @@ namespace Test
 		/// </summary>
 		/// 
 		/// <returns>Success</returns>
-		static bool Read(const std::string &path, std::string &contents)
+		static bool Read(const std::string &FilePath, std::string &Contents)
 		{
 			bool status = false;
-			std::ifstream ifs(path, std::ios::binary | std::ios::ate);
+			std::ifstream ifs(FilePath, std::ios::binary | std::ios::ate);
 
-			if (!ifs.is_open())
+			if (!ifs || !ifs.is_open())
 			{
-				throw std::string("file not open");
+				throw std::string("Could not open the KAT file!");
 			}
 			else
 			{
@@ -129,11 +129,11 @@ namespace Test
 					std::vector<char> bufv(bufsize, 0);
 					char *buf = &bufv[0];
 					ifs.read(buf, bufsize);
-					contents.assign(buf, bufsize);
+					Contents.assign(buf, bufsize);
 				}
 				else
 				{
-					throw std::string("file empty");
+					throw std::string("The KAT file is empty!");
 				}
 			}
 
@@ -154,9 +154,9 @@ namespace Test
 		/// <summary>
 		/// Reverses a byte array
 		/// </summary>
-		static void Reverse(std::vector<byte> &v)
+		static void Reverse(std::vector<byte> &Vector)
 		{
-			std::reverse(v.begin(), v.end());
+			std::reverse(Vector.begin(), Vector.end());
 		}
 	};
 }

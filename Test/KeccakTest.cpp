@@ -1,8 +1,8 @@
 #include "KeccakTest.h"
-#include "HMAC.h"
-#include "Keccak256.h"
-#include "Keccak512.h"
-#include "KeyParams.h"
+#include "../CEX/HMAC.h"
+#include "../CEX/Keccak256.h"
+#include "../CEX/Keccak512.h"
+#include "../CEX/KeyParams.h"
 
 namespace Test
 {

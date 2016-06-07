@@ -1,6 +1,6 @@
 #include "CMACTest.h"
-#include "CMAC.h"
-#include "RHX.h"
+#include "../CEX/CMAC.h"
+#include "../CEX/RHX.h"
 
 namespace Test
 {

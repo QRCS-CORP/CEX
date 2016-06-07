@@ -1,9 +1,9 @@
 #include "HKDFTest.h"
-#include "HKDF.h"
-#include "HMAC.h"
-#include "IDigest.h"
-#include "KeyParams.h"
-#include "SHA256.h"
+#include "../CEX/HKDF.h"
+#include "../CEX/HMAC.h"
+#include "../CEX/IDigest.h"
+#include "../CEX/KeyParams.h"
+#include "../CEX/SHA256.h"
 
 namespace Test
 {

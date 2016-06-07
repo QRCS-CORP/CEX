@@ -1,6 +1,6 @@
 #include "ChaChaTest.h"
-#include "ChaCha.h"
-#include "CSPRsg.h"
+#include "../CEX/ChaCha.h"
+#include "../CEX/CSPRsg.h"
 
 namespace Test
 {

@@ -1,11 +1,11 @@
 #include "KeyFactoryTest.h"
-#include "CipherDescription.h"
-#include "CipherKey.h"
-#include "CSPPrng.h"
-#include "KeyFactory.h"
-#include "KeyGenerator.h"
-#include "MemoryStream.h"
-#include "MessageHeader.h"
+#include "../CEX/CipherDescription.h"
+#include "../CEX/CipherKey.h"
+#include "../CEX/CSPPrng.h"
+#include "../CEX/KeyFactory.h"
+#include "../CEX/KeyGenerator.h"
+#include "../CEX/MemoryStream.h"
+#include "../CEX/MessageHeader.h"
 
 namespace Test
 {

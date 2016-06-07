@@ -2,7 +2,7 @@
 #define _CEXTEST_DIGESTSPEEDTEST_H
 
 #include "ITest.h"
-#include "Digests.h"
+#include "../CEX/Digests.h"
 
 namespace Test
 {

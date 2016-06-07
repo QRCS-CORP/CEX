@@ -2,7 +2,7 @@
 #define _CEXTEST_PBKDF2DRBGTEST_H
 
 #include "ITest.h"
-#include "IDigest.h"
+#include "../CEX/IDigest.h"
 
 namespace Test
 {

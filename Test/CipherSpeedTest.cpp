@@ -1,17 +1,17 @@
 #include "CipherSpeedTest.h"
-#include "Cpu.h"
+#include "../CEX/Cpu.h"
 #if defined (AESNI_AVAILABLE)
-#include "AHX.h"
+#include "../CEX/AHX.h"
 #endif
-#include "RHX.h"
-#include "SHX.h"
-#include "THX.h"
-#include "CTR.h"
-#include "CBC.h"
-#include "CFB.h"
-#include "OFB.h"
-#include "SHA512.h"
-#include "Salsa20.h"
+#include "../CEX/RHX.h"
+#include "../CEX/SHX.h"
+#include "../CEX/THX.h"
+#include "../CEX/CTR.h"
+#include "../CEX/CBC.h"
+#include "../CEX/CFB.h"
+#include "../CEX/OFB.h"
+#include "../CEX/SHA512.h"
+#include "../CEX/Salsa20.h"
 
 namespace Test
 {

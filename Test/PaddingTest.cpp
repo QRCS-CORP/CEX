@@ -1,8 +1,8 @@
 #include "PaddingTest.h"
-#include "ISO7816.h"
-#include "PKCS7.h"
-#include "TBC.h"
-#include "X923.h"
+#include "../CEX/ISO7816.h"
+#include "../CEX/PKCS7.h"
+#include "../CEX/TBC.h"
+#include "../CEX/X923.h"
 
 namespace Test
 {

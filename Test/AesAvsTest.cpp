@@ -1,7 +1,7 @@
 #include "AesAvsTest.h"
-#include "RHX.h"
+#include "../CEX/RHX.h"
 #if defined(AESNI_AVAILABLE)
-#include "AHX.h"
+#include "../CEX/AHX.h"
 #endif
 
 namespace Test

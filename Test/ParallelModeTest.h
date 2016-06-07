@@ -2,9 +2,9 @@
 #define _CEXTEST_PARALLELMODETEST_H
 
 #include "ITest.h"
-#include "IPadding.h"
-#include "ICipherMode.h"
-#include "ParallelUtils.h"
+#include "../CEX/IPadding.h"
+#include "../CEX/ICipherMode.h"
+#include "../CEX/ParallelUtils.h"
 
 namespace Test
 {

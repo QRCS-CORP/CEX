@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../CEX/Cpu.h"
 #include "AesAvsTest.h"
 #include "AesFipsTest.h"
 #include "BlakeTest.h"
@@ -12,7 +13,6 @@
 #include "CipherStreamTest.h"
 #include "CMACTest.h"
 #include "ConsoleUtils.h"
-#include "Cpu.h"
 #include "CTRDrbgTest.h"
 #include "DigestSpeedTest.h"
 #include "DigestStreamTest.h"
@@ -153,7 +153,8 @@ int main()
 		}
 		ConsoleUtils::WriteLine("");
 
-		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
+		// digests are currently being rewritten, so this can wait..
+		/*if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
 			RunTest(new DigestSpeedTest());
 		}
@@ -161,7 +162,7 @@ int main()
 		{
 			ConsoleUtils::WriteLine("Speed tests were Cancelled..");
 		}
-		ConsoleUtils::WriteLine("");
+		ConsoleUtils::WriteLine("");*/
 
 		if (!CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{

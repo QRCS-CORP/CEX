@@ -2,7 +2,7 @@
 #define _CEXTEST_PADDINGTEST_H
 
 #include "ITest.h"
-#include "IPadding.h"
+#include "../CEX/IPadding.h"
 
 namespace Test
 {

@@ -1,4 +1,5 @@
 #include "XSPRsgTest.h"
+#include "../CEX/XSPRsg.h"
 
 namespace Test
 {
@@ -7,7 +8,6 @@ namespace Test
 		try
 		{
 			Initialize();
-
 			CompareVector(m_input[0], m_expected[0]);
 			CompareVector(m_input[1], m_expected[1]);
 			CompareVector(m_input[2], m_expected[2]);
@@ -29,7 +29,7 @@ namespace Test
 	void XSPRsgTest::CompareVector(std::vector<uint64_t> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> rand(32);
-		XSPRsg* gen = new XSPRsg(Input);
+		CEX::Seed::XSPRsg* gen = new CEX::Seed::XSPRsg(Input);
 		gen->GetBytes(rand);
 		delete gen;
 

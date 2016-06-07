@@ -2,16 +2,16 @@
 #define _CEXTEST_MACSTREAMTEST_H
 
 #include "ITest.h"
-#include "CSPPrng.h"
-#include "IMac.h"
-#include "CMAC.h"
-#include "HMAC.h"
-#include "VMAC.h"
-#include "SHA256.h"
-#include "RHX.h"
-#include "MacStream.h"
-#include "MemoryStream.h"
-#include "IByteStream.h"
+#include "../CEX/CSPPrng.h"
+#include "../CEX/IMac.h"
+#include "../CEX/CMAC.h"
+#include "../CEX/HMAC.h"
+#include "../CEX/VMAC.h"
+#include "../CEX/SHA256.h"
+#include "../CEX/RHX.h"
+#include "../CEX/MacStream.h"
+#include "../CEX/MemoryStream.h"
+#include "../CEX/IByteStream.h"
 
 namespace Test
 {

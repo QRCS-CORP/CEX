@@ -28,3 +28,10 @@ Changes May 26, 2016
 * Addition of AHX an AES-NI implementation
 * Changes to several test classes
 * Formatting changes throughout
+
+Changes June 7, 2016
+* Folder name change from Engine to CEX
+* Changes to name space and formatting throughout
+* Initial reorganization of Skein
+* Changes to Blake (Blake2 is on the way)
+* Revised IntUtils

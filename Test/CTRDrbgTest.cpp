@@ -1,6 +1,6 @@
 #include "CTRDrbgTest.h"
-#include "CTRDrbg.h"
-#include "RHX.h"
+#include "../CEX/CTRDrbg.h"
+#include "../CEX/RHX.h"
 
 namespace Test
 {

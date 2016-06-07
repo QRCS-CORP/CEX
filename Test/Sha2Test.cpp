@@ -1,6 +1,6 @@
 #include "SHA2Test.h"
-#include "SHA256.h"
-#include "SHA512.h"
+#include "../CEX/SHA256.h"
+#include "../CEX/SHA512.h"
 
 namespace Test
 {

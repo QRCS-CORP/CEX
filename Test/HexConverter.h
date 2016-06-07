@@ -3,143 +3,138 @@
 
 #include <string.h>
 #include <vector>
-#include "Common.h"
+#include "../CEX/Common.h"
 
 namespace Test
 {
-    static std::vector<byte> m_decodingTable;
-    static std::vector<byte> m_encodingTable;
-    
-    /// <summary>
-    /// A Hexadecimal conversion helper class
-    /// </summary>
-    class HexConverter
-    {
-    public:
-        static void Decode(const std::string &Data, std::vector<byte> &temp)
-        {
-            Initialize();
-
-            unsigned int length = 0;
-			unsigned int end = (unsigned int)Data.size();
-            
-            temp.resize(end / 2,0);
-
-            while (end > 0)
-            {
-                if (!Ignore(Data[end - 1]))
-                    break;
-
-                end--;
-            }
-
-			unsigned int i = 0;
-			unsigned int ct = 0;
-
-            while (i < end)
-            {
-
-                while (i < end && Ignore(Data[i]))
-                    i++;
-
-				byte b1 = m_decodingTable[Data[i++]];
-
-                while (i < end && Ignore(Data[i]))
-                    i++;
-
-				byte b2 = m_decodingTable[Data[i++]];
-                temp[ct++] = (byte)((b1 << 4) | b2);
-                length++;
-            }
-        }
-
-        static void Decode(const std::vector<std::string> &Data, std::vector<std::vector<byte>> &result)
-        {
-            Initialize();
-            
-            result.clear();
-            
-            for (unsigned int i = 0; i < (unsigned int)Data.size(); ++i)
-			{
-                const std::string str=Data[i];
-                std::vector<byte> temp;
-                Decode(str, temp);
-                result.push_back(temp);
-            }
-        }
-        
-        static void Decode(const char *encodedStrings[], size_t encodedSize, std::vector<std::vector<byte>> &result) 
+	/// <summary>
+	/// A Hexadecimal conversion helper class
+	/// </summary>
+	class HexConverter
+	{
+	private:
+		static constexpr byte m_encBytes[16] =
 		{
-            result.reserve(encodedSize);
-            
-            for (unsigned int i = 0; i < encodedSize; ++i)
-			{
-                std::string encoded=encodedStrings[i];
-                std::vector<byte> decoded;
-                Decode(encoded, decoded);
-                result.push_back(decoded);
-            }
-        }
+			(byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7',
+			(byte)'8', (byte)'9', (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f'
+		};
 
-		static void Encode(const std::vector<byte> &Data, unsigned int Offset, unsigned int Length, std::vector<byte> &temp)
+	public:
+		static void Decode(const std::string &Input, std::vector<byte> &Output)
 		{
-			Initialize();
+			size_t end = Input.size();
+			Output.resize(end / 2, 0);
 
-			temp.resize(Length * 2, 0);
-
-			int counter = 0;
-
-			for (unsigned int i = Offset; i < (Offset + Length); i++)
+			while (end > 0)
 			{
-				int v = Data[i];
-				temp[counter++] = m_encodingTable[v >> 4];
-				temp[counter++] = m_encodingTable[v & 0xf];
+				if (!Ignore(Input[end - 1]))
+					break;
+
+				end--;
+			}
+
+			size_t i = 0;
+			size_t j = 0;
+			size_t length = 0;
+			std::vector<byte> decTable = GetDecodingTable();
+
+			while (i < end)
+			{
+				while (i < end && Ignore(Input[i]))
+					i++;
+
+				byte b1 = decTable[Input[i++]];
+
+				while (i < end && Ignore(Input[i]))
+					i++;
+
+				byte b2 = decTable[Input[i++]];
+				Output[j++] = (byte)((b1 << 4) | b2);
+				length++;
 			}
 		}
 
-		static void ToString(const std::vector<byte> &Data, std::string &result)
+		static void Decode(const std::vector<std::string> &Input, std::vector<std::vector<byte>> &Output)
 		{
-			Initialize();
+			Output.clear();
 
+			for (size_t i = 0; i < Input.size(); ++i)
+			{
+				const std::string str = Input[i];
+				std::vector<byte> temp;
+				Decode(str, temp);
+				Output.push_back(temp);
+			}
+		}
+
+		static void Decode(const char *InputArray[], size_t Length, std::vector<std::vector<byte>> &OutputArray)
+		{
+			OutputArray.reserve(Length);
+
+			for (size_t i = 0; i < Length; ++i)
+			{
+				std::string encoded = InputArray[i];
+				std::vector<byte> decoded;
+				Decode(encoded, decoded);
+				OutputArray.push_back(decoded);
+			}
+		}
+
+		static void Encode(const std::vector<byte> &Input, size_t Offset, size_t Length, std::vector<byte> &Output)
+		{
+			Output.resize(Length * 2, 0);
+			size_t counter = 0;
+			std::vector<byte> encTable = GetEncodingTable();
+
+			for (size_t i = Offset; i < (Offset + Length); i++)
+			{
+				int vct = Input[i];
+				Output[counter++] = encTable[vct >> 4];
+				Output[counter++] = encTable[vct & 0xf];
+			}
+		}
+
+		static bool Ignore(char Value)
+		{
+			return (Value == '\n' || Value == '\r' || Value == '\t' || Value == ' ');
+		}
+
+		static void ToString(const std::vector<byte> &Input, std::string &Output)
+		{
 			std::vector<byte> encoded;
-			Encode(Data, 0, (unsigned int)Data.size(), encoded);
-			result.assign((char*)&encoded[0], encoded.size());
+			Encode(Input, 0, Input.size(), encoded);
+			Output.assign((char*)&encoded[0], encoded.size());
 		}
 
-    private:
-        static bool Ignore(char C)
-        {
-            return (C == '\n' || C == '\r' || C == '\t' || C == ' ');
-        }
-
-		static void Initialize()
+	private:
+		static std::vector<byte> GetEncodingTable()
 		{
-			if (m_decodingTable.size() == 0) 
-			{
-				m_decodingTable.resize(128, 0);
+			std::vector<byte> encTable;
+			encTable.reserve(sizeof(m_encBytes));
+			for (size_t i = 0; i < sizeof(m_encBytes); ++i)
+				encTable.push_back(m_encBytes[i]);
 
-				byte encodingBytes[16] =
-				{
-					(byte)'0', (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7',
-					(byte)'8', (byte)'9', (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f'
-				};
-
-				m_encodingTable.reserve(sizeof(encodingBytes));
-				for (unsigned int i = 0; i < sizeof(encodingBytes); ++i)
-					m_encodingTable.push_back(encodingBytes[i]);
-
-				for (unsigned int i = 0; i < m_encodingTable.size(); i++)
-					m_decodingTable[m_encodingTable[i]] = (byte)i;
-
-				m_decodingTable['A'] = m_decodingTable['a'];
-				m_decodingTable['B'] = m_decodingTable['b'];
-				m_decodingTable['C'] = m_decodingTable['c'];
-				m_decodingTable['D'] = m_decodingTable['d'];
-				m_decodingTable['E'] = m_decodingTable['e'];
-				m_decodingTable['F'] = m_decodingTable['f'];
-			}
+			return encTable;
 		}
-    };
+
+		static std::vector<byte> GetDecodingTable()
+		{
+			std::vector<byte> encTable = GetEncodingTable();
+			std::vector<byte> decTable(128, 0);
+
+			for (size_t i = 0; i < encTable.size(); i++)
+				decTable[encTable[i]] = (byte)i;
+
+			decTable['A'] = decTable['a'];
+			decTable['B'] = decTable['b'];
+			decTable['C'] = decTable['c'];
+			decTable['D'] = decTable['d'];
+			decTable['E'] = decTable['e'];
+			decTable['F'] = decTable['f'];
+
+			return decTable;
+		}
+	};
 }
 
 #endif

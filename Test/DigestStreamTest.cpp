@@ -1,9 +1,9 @@
 #include "DigestStreamTest.h"
-#include "CSPPrng.h"
-#include "DigestStream.h"
-#include "DigestFromName.h"
-#include "MemoryStream.h"
-#include "IByteStream.h"
+#include "../CEX/CSPPrng.h"
+#include "../CEX/DigestStream.h"
+#include "../CEX/DigestFromName.h"
+#include "../CEX/MemoryStream.h"
+#include "../CEX/IByteStream.h"
 
 namespace Test
 {

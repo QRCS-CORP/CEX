@@ -1,5 +1,5 @@
 #include "RijndaelTest.h"
-#include "RHX.h"
+#include "../CEX/RHX.h"
 
 namespace Test
 {

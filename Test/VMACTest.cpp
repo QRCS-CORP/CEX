@@ -1,5 +1,5 @@
 #include "VMACTest.h"
-#include "VMAC.h"
+#include "../CEX/VMAC.h"
 
 namespace Test
 {

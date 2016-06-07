@@ -1,6 +1,6 @@
 #include "SerpentTest.h"
-#include "SHX.h"
-#include "IntUtils.h"
+#include "../CEX/SHX.h"
+#include "../CEX/IntUtils.h"
 
 namespace Test
 {

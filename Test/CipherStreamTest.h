@@ -2,10 +2,10 @@
 #define _CEXTEST_STREAMCIPHERTEST_H
 
 #include "ITest.h"
-#include "ICipherMode.h"
-#include "IStreamCipher.h"
-#include "IPadding.h"
-#include "CipherDescription.h"
+#include "../CEX/ICipherMode.h"
+#include "../CEX/IStreamCipher.h"
+#include "../CEX/IPadding.h"
+#include "../CEX/CipherDescription.h"
 
 namespace Test
 {

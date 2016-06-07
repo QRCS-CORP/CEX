@@ -1,10 +1,10 @@
 #include "CipherModeTest.h"
-#include "CBC.h"
-#include "CFB.h"
-#include "CTR.h"
-#include "ECB.h"
-#include "OFB.h"
-#include "RHX.h"
+#include "../CEX/CBC.h"
+#include "../CEX/CFB.h"
+#include "../CEX/CTR.h"
+#include "../CEX/ECB.h"
+#include "../CEX/OFB.h"
+#include "../CEX/RHX.h"
 
 namespace Test
 {

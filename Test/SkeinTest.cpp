@@ -1,7 +1,7 @@
 #include "SkeinTest.h"
-#include "Skein256.h"
-#include "Skein512.h"
-#include "Skein1024.h"
+#include "../CEX/Skein256.h"
+#include "../CEX/Skein512.h"
+#include "../CEX/Skein1024.h"
 
 namespace Test
 {

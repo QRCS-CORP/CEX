@@ -1,12 +1,12 @@
 #include "HXCipherTest.h"
-#include "CTR.h"
-#include "RHX.h"
-#include "SHX.h"
-#include "THX.h"
-#include "SHA512.h"
+#include "../CEX/CTR.h"
+#include "../CEX/RHX.h"
+#include "../CEX/SHX.h"
+#include "../CEX/THX.h"
+#include "../CEX/SHA512.h"
 
 #if defined(AESNI_AVAILABLE)
-#include "AHX.h"
+#include "../CEX/AHX.h"
 #endif
 
 namespace Test

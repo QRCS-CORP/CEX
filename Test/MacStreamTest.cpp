@@ -1,12 +1,12 @@
 #include "MacStreamTest.h"
-#include "CSPPrng.h"
-#include "CMAC.h"
-#include "HMAC.h"
-#include "VMAC.h"
-#include "BlockCiphers.h"
-#include "MacDescription.h"
-#include "IVSizes.h"
-#include "KeyParams.h"
+#include "../CEX/CSPPrng.h"
+#include "../CEX/CMAC.h"
+#include "../CEX/HMAC.h"
+#include "../CEX/VMAC.h"
+#include "../CEX/BlockCiphers.h"
+#include "../CEX/MacDescription.h"
+#include "../CEX/IVSizes.h"
+#include "../CEX/KeyParams.h"
 
 namespace Test
 {

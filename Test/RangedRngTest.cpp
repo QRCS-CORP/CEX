@@ -1,9 +1,9 @@
 #include "RangedRngTest.h"
-#include "CSPPrng.h"
-#include "CTRPrng.h"
-#include "DGCPrng.h"
-#include "PPBPrng.h"
-#include "SP20Prng.h"
+#include "../CEX/CSPPrng.h"
+#include "../CEX/CTRPrng.h"
+#include "../CEX/DGCPrng.h"
+#include "../CEX/PPBPrng.h"
+#include "../CEX/SP20Prng.h"
 
 namespace Test
 {

@@ -2,7 +2,7 @@
 #define _CEXTEST_RANGEDRNGTEST_H
 
 #include "ITest.h"
-#include "IRandom.h"
+#include "../CEX/IRandom.h"
 
 namespace Test
 {

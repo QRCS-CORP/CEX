@@ -1,6 +1,7 @@
 #include "DigestSpeedTest.h"
-#include "IDigest.h"
-#include "DigestFromName.h"
+#include "../CEX/IDigest.h"
+#include "../CEX/DigestFromName.h"
+#include "../CEX/IntUtils.h"
 
 namespace Test
 {

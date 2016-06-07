@@ -1,6 +1,6 @@
 #include "BlakeTest.h"
-#include "Blake256.h"
-#include "Blake512.h"
+#include "../CEX/Blake256.h"
+#include "../CEX/Blake512.h"
 
 namespace Test
 {

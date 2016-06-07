@@ -1,6 +1,8 @@
 #include "AesFipsTest.h"
-#include "RHX.h"
-#include "AHX.h"
+#include "../CEX/RHX.h"
+#if defined(AESNI_AVAILABLE)
+#include "../CEX/AHX.h"
+#endif
 
 namespace Test
 {
@@ -62,6 +64,7 @@ namespace Test
 
 	void AesFipsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
+#if defined(AESNI_AVAILABLE)
 		std::vector<byte> outBytes(Input.size(), 0);
 
 		CEX::Cipher::Symmetric::Block::AHX engine;
@@ -77,6 +80,7 @@ namespace Test
 
 		if (outBytes != Input)
 			throw std::string("AesFipsTest: AES: Decrypted arrays are not equal!");
+#endif
 	}
 
 	void AesFipsTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -110,6 +114,7 @@ namespace Test
 
 	void AesFipsTest::CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
+#if defined(AESNI_AVAILABLE)
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
 		{
@@ -135,6 +140,7 @@ namespace Test
 
 		if (outBytes != Input)
 			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+#endif
 	}
 
 	void AesFipsTest::Initialize()

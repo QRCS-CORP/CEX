@@ -1,7 +1,7 @@
 #include "PBKDF2Test.h"
-#include "SHA256.h"
-#include "SHA512.h"
-#include "PBKDF2.h"
+#include "../CEX/SHA256.h"
+#include "../CEX/SHA512.h"
+#include "../CEX/PBKDF2.h"
 
 namespace Test
 {

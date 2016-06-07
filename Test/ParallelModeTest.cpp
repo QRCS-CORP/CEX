@@ -1,10 +1,10 @@
 #include "ParallelModeTest.h"
-#include "CSPPrng.h"
-#include "RHX.h"
-#include "CTR.h"
-#include "CBC.h"
-#include "CFB.h"
-#include "ISO7816.h"
+#include "../CEX/CSPPrng.h"
+#include "../CEX/RHX.h"
+#include "../CEX/CTR.h"
+#include "../CEX/CBC.h"
+#include "../CEX/CFB.h"
+#include "../CEX/ISO7816.h"
 
 namespace Test
 {
