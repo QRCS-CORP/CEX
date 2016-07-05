@@ -409,8 +409,7 @@ void SHA256::ProcessBlock()
 
 	// reset the offset and clear the word buffer
 	m_wordOffset = 0;
-	//memset(m_wordBuffer.data(), 0, sizeof(m_wordBuffer));
-	std::fill(m_wordBuffer.begin(), m_wordBuffer.end(), 0);
+	memset(m_wordBuffer.data(), 0, m_wordBuffer.size() * sizeof(uint));
 }
 
 void SHA256::ProcessLength(ulong BitLength)

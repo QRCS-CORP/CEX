@@ -1,6 +1,8 @@
 #include "DigestFromName.h"
 #include "Blake256.h"
 #include "Blake512.h"
+#include "Blake2Bp512.h"
+#include "Blake2Sp256.h"
 #include "Keccak256.h"
 #include "Keccak512.h"
 #include "SHA256.h"
@@ -19,6 +21,14 @@ CEX::Digest::IDigest* DigestFromName::GetInstance(CEX::Enumeration::Digests Dige
 		return new CEX::Digest::Blake256();
 	case CEX::Enumeration::Digests::Blake512:
 		return new CEX::Digest::Blake512();
+	case CEX::Enumeration::Digests::Blake2B512:
+		return new CEX::Digest::Blake2Bp512();
+	case CEX::Enumeration::Digests::Blake2BP512:
+		return new CEX::Digest::Blake2Bp512(true);
+	case CEX::Enumeration::Digests::Blake2S256:
+		return new CEX::Digest::Blake2Sp256();
+	case CEX::Enumeration::Digests::Blake2SP256:
+		return new CEX::Digest::Blake2Sp256(true);
 	case CEX::Enumeration::Digests::Keccak256:
 		return new CEX::Digest::Keccak256();
 	case CEX::Enumeration::Digests::Keccak512:
@@ -42,13 +52,15 @@ int DigestFromName::GetBlockSize(CEX::Enumeration::Digests DigestType)
 {
 	switch (DigestType)
 	{
-	case CEX::Enumeration::Digests::Blake256:
 	case CEX::Enumeration::Digests::Skein256:
 		return 32;
-	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::Blake256:
+	case CEX::Enumeration::Digests::Blake2S256:
 	case CEX::Enumeration::Digests::SHA256:
 	case CEX::Enumeration::Digests::Skein512:
 		return 64;
+	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::Blake2B512:
 	case CEX::Enumeration::Digests::SHA512:
 	case CEX::Enumeration::Digests::Skein1024:
 		return 128;
@@ -56,6 +68,10 @@ int DigestFromName::GetBlockSize(CEX::Enumeration::Digests DigestType)
 		return 136;
 	case CEX::Enumeration::Digests::Keccak512:
 		return 72;
+	case CEX::Enumeration::Digests::Blake2SP256:
+	case CEX::Enumeration::Digests::Blake2BP512:
+		return 16384;
+
 	case CEX::Enumeration::Digests::None:
 		return 0;
 	default:
@@ -68,11 +84,15 @@ int DigestFromName::GetDigestSize(CEX::Enumeration::Digests DigestType)
 	switch (DigestType)
 	{
 	case CEX::Enumeration::Digests::Blake256:
+	case CEX::Enumeration::Digests::Blake2S256:
+	case CEX::Enumeration::Digests::Blake2SP256:
 	case CEX::Enumeration::Digests::Keccak256:
 	case CEX::Enumeration::Digests::SHA256:
 	case CEX::Enumeration::Digests::Skein256:
 		return 32;
 	case CEX::Enumeration::Digests::Blake512:
+	case CEX::Enumeration::Digests::Blake2B512:
+	case CEX::Enumeration::Digests::Blake2BP512:
 	case CEX::Enumeration::Digests::Keccak512:
 	case CEX::Enumeration::Digests::SHA512:
 	case CEX::Enumeration::Digests::Skein512:

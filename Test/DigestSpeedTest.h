@@ -56,6 +56,14 @@ namespace Test
 				DigestBlockLoop(Digests::Blake256, MB100);
 				OnProgress("***The Blake 512 digest***");
 				DigestBlockLoop(Digests::Blake512, MB100);
+				OnProgress("***The Blake2S 256 digest***");
+				DigestBlockLoop(Digests::Blake2S256, MB100);
+				OnProgress("***The Blake2SP 256 digest***");
+				DigestBlockLoop(Digests::Blake2SP256, MB100, 10, true);
+				OnProgress("***The Blake2B 512 digest***");
+				DigestBlockLoop(Digests::Blake2B512, MB100);
+				OnProgress("***The Blake2BP 512 digest***");
+				DigestBlockLoop(Digests::Blake2BP512, MB100, 10, true);
 				OnProgress("***The Keccak 256 digest***");
 				DigestBlockLoop(Digests::Keccak256, MB100);
 				OnProgress("***The Keccak 512 digest***");
@@ -84,7 +92,7 @@ namespace Test
 		}
 
 	private:
-		void DigestBlockLoop(CEX::Enumeration::Digests DigestType, size_t SampleSize, size_t Loops = DEFITER);
+		void DigestBlockLoop(CEX::Enumeration::Digests DigestType, size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void OnProgress(char* Data);
 	};

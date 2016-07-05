@@ -8,6 +8,7 @@
 #include "AesAvsTest.h"
 #include "AesFipsTest.h"
 #include "BlakeTest.h"
+#include "Blake2Test.h"
 #include "ChaChaTest.h"
 #include "CipherModeTest.h"
 #include "CipherStreamTest.h"
@@ -86,8 +87,8 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.1: CEX Library in C++      *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.1e                           *");
-	ConsoleUtils::WriteLine("* Date:      May 27, 2016                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.1f                           *");
+	ConsoleUtils::WriteLine("* Date:      July 4, 2016                    *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -143,6 +144,69 @@ int main()
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
 
+		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
+		{
+			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
+			PrintHeader("Testing the AES-NI implementation (AHX)");
+			if (CEX::Utility::Cpu::HasAESNI())
+				RunTest(new AesAvsTest(true));
+			PrintHeader("Testing the AES software implementation (RHX)");
+			RunTest(new AesAvsTest());
+			PrintHeader("Testing the AES-NI implementation (AHX)");
+			if (CEX::Utility::Cpu::HasAESNI())
+				RunTest(new AesFipsTest(true));
+			PrintHeader("Testing the AES software implementation (RHX)");
+			RunTest(new AesFipsTest());
+			RunTest(new RijndaelTest());
+			RunTest(new SerpentTest());
+			RunTest(new TwofishTest());
+			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
+			RunTest(new CipherModeTest());
+			PrintHeader("TESTING PARALLEL CIPHER MODES");
+			RunTest(new ParallelModeTest());
+			PrintHeader("TESTING CIPHER PADDING MODES");
+			RunTest(new PaddingTest());
+			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
+			RunTest(new ChaChaTest());
+			RunTest(new SalsaTest());
+			PrintHeader("TESTING HX EXTENDED CIPHERS");
+			RunTest(new HXCipherTest());
+			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
+			RunTest(new CipherStreamTest());
+			RunTest(new DigestStreamTest());
+			RunTest(new MacStreamTest());
+			RunTest(new KeyFactoryTest());
+			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
+			RunTest(new BlakeTest());
+			RunTest(new Blake2Test());
+			RunTest(new KeccakTest());
+			RunTest(new SHA2Test());
+			RunTest(new SkeinTest());
+			PrintHeader("TESTING MESSAGE AUTHENTICATION CODE GENERATORS");
+			RunTest(new CMACTest());
+			RunTest(new HMACTest());
+			RunTest(new VMACTest());
+			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
+			RunTest(new RangedRngTest());
+			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
+			RunTest(new CTRDrbgTest());
+			RunTest(new HKDFTest());
+			RunTest(new KDF2DrbgTest());
+			RunTest(new PBKDF2Test());
+			RunTest(new SP20DrbgTest());
+			PrintHeader("TESTING PSEUDO RANDOM SEED GENERATORS");
+			RunTest(new ISCRsgTest());
+			RunTest(new XSPRsgTest());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Diagnostic tests were Cancelled..");
+		}
+		ConsoleUtils::WriteLine("");
+
+
+		ConsoleUtils::WriteLine("");
+
 		if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
 		{
 			RunTest(new CipherSpeedTest());
@@ -163,65 +227,6 @@ int main()
 			ConsoleUtils::WriteLine("Speed tests were Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");*/
-
-		if (!CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
-		{
-			ConsoleUtils::WriteLine("Completed! Press any key to close..");
-			GetResponse();
-			return 0;
-		}
-		ConsoleUtils::WriteLine("");
-
-		PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
-		PrintHeader("Testing the AES-NI implementation (AHX)");
-		if (CEX::Utility::Cpu::HasAESNI())
-			RunTest(new AesAvsTest(true));
-		PrintHeader("Testing the AES software implementation (RHX)");
-		RunTest(new AesAvsTest());
-		PrintHeader("Testing the AES-NI implementation (AHX)");
-		if (CEX::Utility::Cpu::HasAESNI())
-			RunTest(new AesFipsTest(true));
-		PrintHeader("Testing the AES software implementation (RHX)");
-		RunTest(new AesFipsTest());
-		RunTest(new RijndaelTest());
-		RunTest(new SerpentTest());
-		RunTest(new TwofishTest());
-		PrintHeader("TESTING SYMMETRIC CIPHER MODES");
-		RunTest(new CipherModeTest());
-		PrintHeader("TESTING PARALLEL CIPHER MODES");
-		RunTest(new ParallelModeTest());
-		PrintHeader("TESTING CIPHER PADDING MODES");
-		RunTest(new PaddingTest());
-		PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
-		RunTest(new ChaChaTest());
-		RunTest(new SalsaTest());
-		PrintHeader("TESTING HX EXTENDED CIPHERS");
-		RunTest(new HXCipherTest());
-		PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
-		RunTest(new CipherStreamTest());
-		RunTest(new DigestStreamTest());
-		RunTest(new MacStreamTest());
-		RunTest(new KeyFactoryTest());
-		PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-		RunTest(new BlakeTest());
-		RunTest(new KeccakTest());
-		RunTest(new SHA2Test());
-		RunTest(new SkeinTest());
-		PrintHeader("TESTING MESSAGE AUTHENTICATION CODE GENERATORS");
-		RunTest(new CMACTest());
-		RunTest(new HMACTest());
-		RunTest(new VMACTest());
-		PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
-		RunTest(new RangedRngTest());
-		PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
-		RunTest(new CTRDrbgTest());
-		RunTest(new HKDFTest());
-		RunTest(new KDF2DrbgTest());
-		RunTest(new PBKDF2Test());
-		RunTest(new SP20DrbgTest());
-		PrintHeader("TESTING PSEUDO RANDOM SEED GENERATORS");
-		RunTest(new ISCRsgTest());
-		RunTest(new XSPRsgTest());
 
 		PrintHeader("Completed! Press any key to close..", "");
 		GetResponse();

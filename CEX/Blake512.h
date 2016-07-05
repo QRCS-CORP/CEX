@@ -58,7 +58,7 @@ NAMESPACE_DIGEST
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Block size is 64 bytes, (512 bits).</description></item>
+/// <item><description>Block size is 128 bytes, (1024 bits).</description></item>
 /// <item><description>Digest size is 64 bytes, (512 bits).</description></item>
 /// <item><description>The <see cref="ComputeHash(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods</description>/></item>
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
@@ -74,7 +74,7 @@ NAMESPACE_DIGEST
 class Blake512 : public IDigest
 {
 private:
-	static constexpr size_t BLOCK_SIZE = 64;
+	static constexpr size_t BLOCK_SIZE = 128;
 	static constexpr size_t DIGEST_SIZE = 64;
 	static constexpr size_t PAD_LENGTH = 111;
 	static constexpr size_t ROUNDS = 16;
@@ -124,10 +124,10 @@ public:
 	Blake512()
 		:
 		m_dataLen(0),
-		m_digestState(128, 0),
+		m_digestState(BLOCK_SIZE, 0),
 		m_hashVal(8, 0),
 		m_isDestroyed(false),
-		m_padding(128, 0),
+		m_padding(BLOCK_SIZE, 0),
 		m_salt64(4, 0),
 		m_M(16, 0),
 		m_T(0),
@@ -144,13 +144,13 @@ public:
 	/// <param name="Salt">The optional salt value; must be 4 unsigned longs in length</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the salt length is invalid</exception>
-	explicit Blake512(std::vector<ulong> Salt)
+	explicit Blake512(std::vector<ulong> &Salt)
 		:
 		m_dataLen(0),
-		m_digestState(128, 0),
+		m_digestState(BLOCK_SIZE, 0),
 		m_hashVal(8, 0),
 		m_isDestroyed(false),
-		m_padding(128, 0),
+		m_padding(BLOCK_SIZE, 0),
 		m_salt64(4, 0),
 		m_M(16, 0),
 		m_T(0),
@@ -225,10 +225,10 @@ public:
 	void Update(byte Input);
 
 private:
-	void Compress64(const std::vector<byte> &pbBlock, size_t Offset);
-	void G64(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I);
-	void G64BLK(uint Index);
+	void Compress(const std::vector<byte> &Block, size_t Offset);
 	void Initialize();
+	void Mix(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I);
+	void MixBlock(uint Index);
 };
 
 NAMESPACE_DIGESTEND

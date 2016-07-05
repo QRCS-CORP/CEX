@@ -5,11 +5,15 @@
 
 namespace Test
 {
-	void DigestSpeedTest::DigestBlockLoop(CEX::Enumeration::Digests DigestType, size_t SampleSize, size_t Loops)
+	void DigestSpeedTest::DigestBlockLoop(CEX::Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
 		CEX::Digest::IDigest* dgt = CEX::Helper::DigestFromName::GetInstance(DigestType);
+		size_t bufSze = dgt->BlockSize();
+		if (Parallel && DigestType == CEX::Enumeration::Digests::Blake2BP512 || DigestType == CEX::Enumeration::Digests::Blake2SP256)
+			bufSze = SampleSize / 8;
+		
 		std::vector<byte> hash(dgt->DigestSize(), 0);
-		std::vector<byte> buffer(dgt->BlockSize(), 0);
+		std::vector<byte> buffer(bufSze, 0);
 		const char* name = dgt->Name();
 		uint64_t start = TestUtils::GetTimeMs64();
 

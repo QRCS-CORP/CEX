@@ -492,7 +492,7 @@ void SHA512::ProcessBlock()
 	H7 += w7;
 
 	m_wordOffset = 0;
-	std::fill(m_wordBuffer.begin(), m_wordBuffer.end(), 0);
+	memset(m_wordBuffer.data(), 0, m_wordBuffer.size() * sizeof(ulong));
 }
 
 void SHA512::ProcessLength(ulong LowWord, ulong HiWord)

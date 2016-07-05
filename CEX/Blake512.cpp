@@ -36,26 +36,26 @@ void Blake512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake512:BlockUpdate", "The Input buffer is too short!");
 
-	size_t fill = 128 - m_dataLen;
+	size_t fill = BLOCK_SIZE - m_dataLen;
 
 	// compress remaining data filled with new bits
 	if ((m_dataLen != 0) && (Length >= fill))
 	{
 		memcpy(&m_digestState[m_dataLen], &Input[InOffset], fill);
 		m_T += TN_1024;
-		Compress64(m_digestState, 0);
+		Compress(m_digestState, 0);
 		InOffset += fill;
 		Length -= fill;
 		m_dataLen = 0;
 	}
 
 	// compress data until enough for a block
-	while (Length > 127)
+	while (Length > BLOCK_SIZE)
 	{
 		m_T += TN_1024;
-		Compress64(Input, InOffset);
-		InOffset += 128;
-		Length -= 128;
+		Compress(Input, InOffset);
+		InOffset += BLOCK_SIZE;
+		Length -= BLOCK_SIZE;
 	}
 
 	if (Length != 0)
@@ -122,7 +122,7 @@ size_t Blake512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 		{
 			// not enough space, need 2 compressions 
 			m_T -= TN_1024 - ((ulong)m_dataLen << 3);
-			BlockUpdate(m_padding, 0, 128 - m_dataLen);
+			BlockUpdate(m_padding, 0, BLOCK_SIZE - m_dataLen);
 			m_T -= TN_888;
 			BlockUpdate(m_padding, 1, PAD_LENGTH);
 			m_isNullT = true;
@@ -133,9 +133,9 @@ size_t Blake512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 		m_T -= 8;
 	}
 
-	m_T -= 128;
+	m_T -= BLOCK_SIZE;
 	BlockUpdate(msgLen, 0, 16);
-	std::vector<byte> digest(64, 0);
+	std::vector<byte> digest(DIGEST_SIZE, 0);
 
 	CEX::Utility::IntUtils::Be64ToBytes(m_hashVal[0], digest, 0);
 	CEX::Utility::IntUtils::Be64ToBytes(m_hashVal[1], digest, 8);
@@ -165,24 +165,24 @@ void Blake512::Update(byte Input)
 
 // *** Protected Methods *** //
 
-void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
+void Blake512::Compress(const std::vector<byte> &Block, size_t Offset)
 {
-	m_M[0] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset);
-	m_M[1] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 8);
-	m_M[2] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 16);
-	m_M[3] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 24);
-	m_M[4] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 32);
-	m_M[5] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 40);
-	m_M[6] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 48);
-	m_M[7] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 56);
-	m_M[8] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 64);
-	m_M[9] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 72);
-	m_M[10] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 80);
-	m_M[11] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 88);
-	m_M[12] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 96);
-	m_M[13] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 104);
-	m_M[14] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 112);
-	m_M[15] = CEX::Utility::IntUtils::BytesToBe64(pbBlock, Offset + 120);
+	m_M[0] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset);
+	m_M[1] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 8);
+	m_M[2] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 16);
+	m_M[3] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 24);
+	m_M[4] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 32);
+	m_M[5] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 40);
+	m_M[6] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 48);
+	m_M[7] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 56);
+	m_M[8] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 64);
+	m_M[9] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 72);
+	m_M[10] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 80);
+	m_M[11] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 88);
+	m_M[12] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 96);
+	m_M[13] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 104);
+	m_M[14] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 112);
+	m_M[15] = CEX::Utility::IntUtils::BytesToBe64(Block, Offset + 120);
 
 	m_V[0] = m_hashVal[0];
 	m_V[1] = m_hashVal[1];
@@ -192,14 +192,14 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 	m_V[5] = m_hashVal[5];
 	m_V[6] = m_hashVal[6];
 	m_V[7] = m_hashVal[7];
-	m_V[8] = m_salt64[0] ^ 0x243F6A8885A308D3UL;
-	m_V[9] = m_salt64[1] ^ 0x13198A2E03707344UL;
-	m_V[10] = m_salt64[2] ^ 0xA4093822299F31D0UL;
-	m_V[11] = m_salt64[3] ^ 0x082EFA98EC4E6C89UL;
-	m_V[12] = 0x452821E638D01377UL;
-	m_V[13] = 0xBE5466CF34E90C6CUL;
-	m_V[14] = 0xC0AC29B7C97C50DDUL;
-	m_V[15] = 0x3F84D5B5B5470917UL;
+	m_V[8] = m_salt64[0] ^ 0x243F6A8885A308D3ULL;
+	m_V[9] = m_salt64[1] ^ 0x13198A2E03707344ULL;
+	m_V[10] = m_salt64[2] ^ 0xA4093822299F31D0ULL;
+	m_V[11] = m_salt64[3] ^ 0x082EFA98EC4E6C89ULL;
+	m_V[12] = 0x452821E638D01377ULL;
+	m_V[13] = 0xBE5466CF34E90C6CULL;
+	m_V[14] = 0xC0AC29B7C97C50DDULL;
+	m_V[15] = 0x3F84D5B5B5470917ULL;
 
 	if (!m_isNullT)
 	{
@@ -211,12 +211,12 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 	uint index = 0;
 	do
 	{
-		G64BLK(index);
+		MixBlock(index);
 		index++;
 
 	} while (index != ROUNDS);
 
-	// finalization
+	// finalize
 	m_hashVal[0] ^= m_V[0];
 	m_hashVal[1] ^= m_V[1];
 	m_hashVal[2] ^= m_V[2];
@@ -225,7 +225,6 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 	m_hashVal[5] ^= m_V[5];
 	m_hashVal[6] ^= m_V[6];
 	m_hashVal[7] ^= m_V[7];
-	/*CEX::Utility::IntUtils::XOR8X64(m_V, 0, m_hashVal, 0);*/
 
 	m_hashVal[0] ^= m_V[8];
 	m_hashVal[1] ^= m_V[9];
@@ -235,34 +234,31 @@ void Blake512::Compress64(const std::vector<byte> &pbBlock, size_t Offset)
 	m_hashVal[5] ^= m_V[13];
 	m_hashVal[6] ^= m_V[14];
 	m_hashVal[7] ^= m_V[15];
-	/*CEX::Utility::IntUtils::XOR8X64(m_V, 8, m_hashVal, 0);*/
 
 	m_hashVal[0] ^= m_salt64[0];
 	m_hashVal[1] ^= m_salt64[1];
 	m_hashVal[2] ^= m_salt64[2];
 	m_hashVal[3] ^= m_salt64[3];
-	/*CEX::Utility::IntUtils::XOR4X64(m_salt64, 0, m_hashVal, 0);*/
 
 	m_hashVal[4] ^= m_salt64[0];
 	m_hashVal[5] ^= m_salt64[1];
 	m_hashVal[6] ^= m_salt64[2];
 	m_hashVal[7] ^= m_salt64[3];
-	/*CEX::Utility::IntUtils::XOR4X64(m_salt64, 0, m_hashVal, 4);*/
 }
 
-void Blake512::G64BLK(uint Index)
+void Blake512::MixBlock(uint Index)
 {
-	G64(0, 4, 8, 12, Index, 0);
-	G64(1, 5, 9, 13, Index, 2);
-	G64(2, 6, 10, 14, Index, 4);
-	G64(3, 7, 11, 15, Index, 6);
-	G64(3, 4, 9, 14, Index, 14);
-	G64(2, 7, 8, 13, Index, 12);
-	G64(0, 5, 10, 15, Index, 8);
-	G64(1, 6, 11, 12, Index, 10);
+	Mix(0, 4, 8, 12, Index, 0);
+	Mix(1, 5, 9, 13, Index, 2);
+	Mix(2, 6, 10, 14, Index, 4);
+	Mix(3, 7, 11, 15, Index, 6);
+	Mix(3, 4, 9, 14, Index, 14);
+	Mix(2, 7, 8, 13, Index, 12);
+	Mix(0, 5, 10, 15, Index, 8);
+	Mix(1, 6, 11, 12, Index, 10);
 }
 
-void Blake512::G64(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I)
+void Blake512::Mix(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I)
 {
 	size_t P = (R << 4) + I;
 	size_t P0 = m_ftSigma[P];

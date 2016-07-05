@@ -2,15 +2,7 @@
 #define _CEXENGINE_PARALLELUTILS_H
 
 #include "Common.h"
-
-#if defined(ANDROID) && defined(_OPENMP)
-	#include <omp.h>
-#elif defined(_WIN32)
-	#include <Windows.h>
-	#include <ppl.h>
-#else
-	#include <future>
-#endif
+#include <functional>
 
 NAMESPACE_UTILITY
 
@@ -26,7 +18,7 @@ public:
 	/// Lock a thread instance.
 	/// <para>ex. lock<std::mutex> lock(mtx);</para>
 	/// </summary> 
-	class lock 
+	class lock
 	{
 	private:
 		Lockable &mtx;
@@ -41,7 +33,7 @@ public:
 		{
 			mtx.lock();
 		}
-		~lock() 
+		~lock()
 		{
 			mtx.unlock();
 		}

@@ -6,11 +6,15 @@
 	#pragma warning(disable: 4244)
 #endif
 
+#define IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
+
 // define endianess of CPU
-#if !defined(IS_LITTLE_ENDIAN) && (defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__PPC__) || defined(__mips__) || (defined(__MWERKS__) && !defined(__INTEL__)))
-	#define IS_BIG_ENDIAN
+#if !defined(IS_LITTLE_ENDIAN)
+#	if (defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__PPC__) || defined(__mips__) || (defined(__MWERKS__) && !defined(__INTEL__)))
+#		define IS_BIG_ENDIAN
 #else
-	#define IS_LITTLE_ENDIAN
+#		define IS_LITTLE_ENDIAN
+#	endif
 #endif
 
 // get register size
@@ -211,16 +215,45 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #endif
 
 #if CEX_BOOL_AESNI_INTRINSICS_AVAILABLE
-	#define AESNI_AVAILABLE
+#	define AESNI_AVAILABLE
 #endif
 
 #if defined(INTEL_INTRINSICS) && (CEX_BOOL_SSE2_INTRINSICS_AVAILABLE || CEX_BOOL_SSE4_INTRINSICS_AVAILABLE)
-	#define INTENSICS_AVAILABLE
+#	define HAS_INTRINSICS
+#	if defined(CEX_BOOL_SSE4_INTRINSICS_AVAILABLE)
+#		define HAS_SSE4
+#		define HAS_SSE3
+#	elif CEX_BOOL_SSSE3_ASM_AVAILABLE = 1
+#		define HAS_SSE3
+#	elif defined(CEX_BOOL_SSE2_INTRINSICS_AVAILABLE)
+#		define HAS_SSE2
+#	endif
+#elif defined(__SSE4_1__) || defined(__SSE4_2__) || defined(__AVX__) || defined(__AVX2__) || defined(__XOP__)
+#	define HAS_SSE4
+#	define HAS_SSE3
+#elif defined(__SSSE3__)
+#	define HAS_SSE3
+#elif defined(_MSC_VER) 
+#	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
+#		define HAS_SSE2
+#	endif
+#	if _MSC_VER >= 1500 && _MSC_FULL_VER >= 150030729
+#		define HAS_SSE4
+#		define HAS_SSE3
+#	elif _MSC_VER > 1200 || defined(_mm_free)
+#		define HAS_SSE3
+#	endif
 #endif
 
+#if defined(HAS_SSE4) || defined(HAS_SSE3)
+#	define HAS_INTRINSICS
+#endif
+
+#define CPP_EXCEPTIONS
+
 // this flag calls rotation methods using the intrensic functions on amd and intel
-// in many cases the compiler uses intrensics by default, and forcing intresics api 
-// can actually create a slower function by adding an indirection
+// in many cases the compiler uses intrinsics by default, and forcing api 
+// can actually create a slower function
 //#define FORCE_ROTATION_INTRENSICS
 
 #endif

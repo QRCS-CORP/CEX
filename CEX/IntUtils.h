@@ -370,6 +370,38 @@ public:
 #endif
 	}
 
+	static inline void Le256ToBlock(std::vector<uint32_t> &Input, std::vector<uint8_t> &Output, size_t OutOffset)
+	{
+#if defined(IS_LITTLE_ENDIAN)
+		memcpy(&Output[OutOffset], &Input[0], Input.size() * sizeof(uint32_t));
+#else
+		Le32ToBytes(Input[0], Output, OutOffset);
+		Le32ToBytes(Input[1], Output, OutOffset + 4);
+		Le32ToBytes(Input[2], Output, OutOffset + 8);
+		Le32ToBytes(Input[3], Output, OutOffset + 12);
+		Le32ToBytes(Input[4], Output, OutOffset + 16);
+		Le32ToBytes(Input[5], Output, OutOffset + 20);
+		Le32ToBytes(Input[6], Output, OutOffset + 24);
+		Le32ToBytes(Input[7], Output, OutOffset + 28);
+#endif
+	}
+
+	static inline void Le512ToBlock(std::vector<uint64_t> &Input, std::vector<uint8_t> &Output, size_t OutOffset)
+	{
+#if defined(IS_LITTLE_ENDIAN)
+		memcpy(&Output[OutOffset], &Input[0], Input.size() * sizeof(uint64_t));
+#else
+		Le64ToBytes(Input[0], Output, OutOffset);
+		Le64ToBytes(Input[1], Output, OutOffset + 8);
+		Le64ToBytes(Input[2], Output, OutOffset + 16);
+		Le64ToBytes(Input[3], Output, OutOffset + 24);
+		Le64ToBytes(Input[4], Output, OutOffset + 32);
+		Le64ToBytes(Input[5], Output, OutOffset + 40);
+		Le64ToBytes(Input[6], Output, OutOffset + 48);
+		Le64ToBytes(Input[7], Output, OutOffset + 56);
+#endif
+	}
+
 	/// <summary>
 	/// Convert a byte array to a Little Endian 16 bit word
 	/// </summary>
@@ -840,12 +872,8 @@ public:
 			return;
 
 		for (size_t i = 0; i < Obj.size(); i++)
-		{
-			if (Obj[i].capacity() > 0)
-				memset(Obj[i].data(), 0, Obj[i].capacity() * sizeof(T));
-            
-			Obj[i].clear();
-		}
+			ClearVector(Obj[i]);
+
 		Obj.clear();
 	}
     
@@ -860,7 +888,8 @@ public:
 		if (Obj.capacity() == 0)
 			return;
 
-		memset(Obj.data(), 0, Obj.capacity() * sizeof(T));
+		static void *(*const volatile memset_v)(void *, int, size_t) = &memset;
+		memset_v(Obj.data(), 0, Obj.size() * sizeof(T));
 		Obj.clear();
 	}
 

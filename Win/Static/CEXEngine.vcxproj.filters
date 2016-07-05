@@ -510,6 +510,27 @@
     <ClInclude Include="..\..\CEX\MacFromDescription.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\MacParams.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CpuDetect.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2Params.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2Sp256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2BCompress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2Bp512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2SCompress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -712,6 +733,12 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\ParallelUtils.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake2Bp512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake2Sp256.cpp">
+      <Filter>Source Files\Digest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

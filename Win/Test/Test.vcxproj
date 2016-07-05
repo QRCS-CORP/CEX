@@ -142,18 +142,21 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -200,6 +203,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\AesFipsTest.h" />
+    <ClInclude Include="..\..\Test\Blake2Test.h" />
     <ClInclude Include="..\..\Test\BlakeTest.h" />
     <ClInclude Include="..\..\Test\ChaChaTest.h" />
     <ClInclude Include="..\..\Test\CipherModeTest.h" />
@@ -243,6 +247,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\AesFipsTest.cpp" />
+    <ClCompile Include="..\..\Test\Blake2Test.cpp" />
     <ClCompile Include="..\..\Test\BlakeTest.cpp" />
     <ClCompile Include="..\..\Test\ChaChaTest.cpp" />
     <ClCompile Include="..\..\Test\CipherModeTest.cpp" />

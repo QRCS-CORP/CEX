@@ -99,6 +99,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,17 +152,20 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <Optimization>MaxSpeed</Optimization>
+      <OpenMPSupport>false</OpenMPSupport>
+      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -176,7 +180,12 @@
     <ClInclude Include="..\..\CEX\AsymmetricEngines.h" />
     <ClInclude Include="..\..\CEX\BitConverter.h" />
     <ClInclude Include="..\..\CEX\Blake256.h" />
+    <ClInclude Include="..\..\CEX\Blake2Params.h" />
     <ClInclude Include="..\..\CEX\Blake512.h" />
+    <ClInclude Include="..\..\CEX\Blake2Bp512.h" />
+    <ClInclude Include="..\..\CEX\Blake2BCompress.h" />
+    <ClInclude Include="..\..\CEX\Blake2Sp256.h" />
+    <ClInclude Include="..\..\CEX\Blake2SCompress.h" />
     <ClInclude Include="..\..\CEX\BlockCipherFromName.h" />
     <ClInclude Include="..\..\CEX\BlockCiphers.h" />
     <ClInclude Include="..\..\CEX\BlockSizes.h" />
@@ -193,6 +202,7 @@
     <ClInclude Include="..\..\CEX\Common.h" />
     <ClInclude Include="..\..\CEX\Config.h" />
     <ClInclude Include="..\..\CEX\Cpu.h" />
+    <ClInclude Include="..\..\CEX\CpuDetect.h" />
     <ClInclude Include="..\..\CEX\CryptoCipherModeException.h" />
     <ClInclude Include="..\..\CEX\CryptoDigestException.h" />
     <ClInclude Include="..\..\CEX\CryptoException.h" />
@@ -245,6 +255,7 @@
     <ClInclude Include="..\..\CEX\KeySizes.h" />
     <ClInclude Include="..\..\CEX\MacFromDescription.h" />
     <ClInclude Include="..\..\CEX\MacKey.h" />
+    <ClInclude Include="..\..\CEX\MacParams.h" />
     <ClInclude Include="..\..\CEX\Macs.h" />
     <ClInclude Include="..\..\CEX\MemoryStream.h" />
     <ClInclude Include="..\..\CEX\MessageHeader.h" />
@@ -299,6 +310,8 @@
     <ClCompile Include="..\..\CEX\AHX.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
     <ClCompile Include="..\..\CEX\Blake512.cpp" />
+    <ClCompile Include="..\..\CEX\Blake2Bp512.cpp" />
+    <ClCompile Include="..\..\CEX\Blake2Sp256.cpp" />
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp" />
     <ClCompile Include="..\..\CEX\CBC.cpp" />
     <ClCompile Include="..\..\CEX\CFB.cpp" />

@@ -57,7 +57,7 @@ NAMESPACE_DIGEST
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Block size is 32 bytes, (256 bits).</description></item>
+/// <item><description>Block size is 64 bytes, (512 bits).</description></item>
 /// <item><description>Digest size is 32 bytes, (256 bits).</description></item>
 /// <item><description>The <see cref="ComputeHash(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods.</description>/></item>
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
@@ -73,10 +73,10 @@ NAMESPACE_DIGEST
 class Blake256 : public IDigest
 {
 private:
-	static constexpr size_t BLOCK_SIZE = 32;
-	static constexpr size_t DIGEST_SIZE = 32;
-	static constexpr size_t PAD_LENGTH = 55;
-	static constexpr size_t ROUNDS = 14;
+	static constexpr uint BLOCK_SIZE = 64;
+	static constexpr uint DIGEST_SIZE = 32;
+	static constexpr uint PAD_LENGTH = 55;
+	static constexpr uint ROUNDS = 14;
 	static constexpr ulong TN_440 = 440;
 	static constexpr ulong TN_512 = 512;
 
@@ -124,10 +124,10 @@ public:
 		:
 		m_dataLen(0),
 		m_isDestroyed(false),
-		m_digestState(64, 0),
+		m_digestState(BLOCK_SIZE, 0),
 		m_hashVal(8, 0),
 		m_M(16, 0),
-		m_padding(64, 0),
+		m_padding(BLOCK_SIZE, 0),
 		m_salt32(4, 0),
 		m_T(0),
 		m_V(16, 0)
@@ -147,10 +147,10 @@ public:
 		:
 		m_dataLen(0),
 		m_isDestroyed(false),
-		m_digestState(64, 0),
+		m_digestState(BLOCK_SIZE, 0),
 		m_hashVal(8, 0),
 		m_M(16, 0),
-		m_padding(64, 0),
+		m_padding(BLOCK_SIZE, 0),
 		m_salt32(4, 0),
 		m_T(0),
 		m_V(16, 0)
@@ -224,10 +224,10 @@ public:
 	void Update(byte Input);
 
 private:
-	void G32(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I);
-	void G32BLK(size_t Index);
-	void Compress32(const std::vector<byte> &Block, size_t Offset);
+	void Compress(const std::vector<byte> &Block, size_t Offset);
 	void Initialize();
+	void Mix(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I);
+	void MixBlock(size_t Index);
 };
 
 NAMESPACE_DIGESTEND
