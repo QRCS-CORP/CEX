@@ -1,5 +1,5 @@
-#ifndef _BLAKE2_CPUDETECT_H
-#define _BLAKE2_CPUDETECT_H
+#ifndef _CEXENGINE_CPUDETECT_H
+#define _CEXENGINE_CPUDETECT_H
 
 // based on: https://github.com/Mysticial/FeatureDetector
 #include "Common.h"

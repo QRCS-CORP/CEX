@@ -30,8 +30,8 @@
 // Written by John Underhill, January 12, 2015
 // contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_BLAKE256_H
-#define _CEXENGINE_BLAKE256_H
+#ifndef _CEXENGINE_CEXENGINE56_H
+#define _CEXENGINE_CEXENGINE56_H
 
 #include "IDigest.h"
 

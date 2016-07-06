@@ -33,8 +33,8 @@
 // Written by John Underhill, June 19, 2016
 // contact: develop@vtdev.com
 
-#ifndef _BLAKE2_BLAKES256_H
-#define _BLAKE2_BLAKES256_H
+#ifndef _CEXENGINE_BLAKE2SS256_H
+#define _CEXENGINE_BLAKE2SS256_H
 
 #include "Blake2Params.h"
 #include "Config.h"

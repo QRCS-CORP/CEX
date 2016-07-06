@@ -237,6 +237,7 @@
     <ClInclude Include="..\..\CEX\IGenerator.h" />
     <ClInclude Include="..\..\CEX\IMac.h" />
     <ClInclude Include="..\..\CEX\Int128.h" />
+    <ClInclude Include="..\..\CEX\Intrinsics.h" />
     <ClInclude Include="..\..\CEX\IntUtils.h" />
     <ClInclude Include="..\..\CEX\IPadding.h" />
     <ClInclude Include="..\..\CEX\IRandom.h" />

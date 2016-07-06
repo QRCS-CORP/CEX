@@ -1,29 +1,8 @@
-#ifndef _BLAKE2_BLAKEBCOMPRESS_H
-#define _BLAKE2_BLAKEBCOMPRESS_H
+#ifndef _CEXENGINE_BLAKE2SCOMPRESS_H
+#define _CEXENGINE_BLAKE2SCOMPRESS_H
 
+#include "Intrinsics.h"
 #include "IntUtils.h"
-
-#if defined(HAS_INTRINSICS)
-#	if defined(_MSC_VER) 
-// Microsoft C/C++-compatible compiler
-#		include <intrin.h>
-#	elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) 
-// GCC-compatible compiler, targeting x86/x86-64
-#		include <x86intrin.h>
-#	elif defined(__GNUC__) && defined(__ARM_NEON__) 
-// GCC-compatible compiler, targeting ARM with NEON
-#		include <arm_neon.h>
-#	elif defined(__GNUC__) && defined(__IWMMXT__) 
-// GCC-compatible compiler, targeting ARM with WMMX
-#		include <mmintrin.h>
-#	elif (defined(__GNUC__) || defined(__xlC__)) && (defined(__VEC__) || defined(__ALTIVEC__)) 
-// XLC or GCC-compatible compiler, targeting PowerPC with VMX/VSX
-#		include <altivec.h>
-#	elif defined(__GNUC__) && defined(__SPE__) 
-// GCC-compatible compiler, targeting PowerPC with SPE
-#		include <spe.h>
-#	endif
-#endif
 
 NAMESPACE_DIGEST
 
@@ -31,7 +10,7 @@ class Blake2SCompress
 {
 public:
 
-#if defined(HAS_INTRINSICS)
+#if defined(HAS_ADVINTRIN)
 
 #	if defined(HAS_XOP)
 #		define TOB(x) ((x)*4*0x01010101 + 0x03020100) 
@@ -42,12 +21,12 @@ public:
 #		define TOI(reg) _mm_castps_si128((reg))
 #	endif
 
-#	ifndef HAS_XOP
-#		ifndef HAS_SSE3 // Note: shouldn't this be if defined?
+#	if !defined(HAS_XOP)
+#		if !defined(HAS_SSSE3)
 #			define _mm_roti_epi32(r, c) ( \
-            (8==-(c)) ? _mm_shuffle_epi8(r,r8) \
-            : (16==-(c)) ? _mm_shuffle_epi8(r,r16) \
-            : _mm_xor_si128(_mm_srli_epi32( (r), -(c) ),_mm_slli_epi32( (r), 32-(-(c)) )) )
+                (8==-(c)) ? _mm_shuffle_epi8(r,r8) \
+              : (16==-(c)) ? _mm_shuffle_epi8(r,r16) \
+              : _mm_xor_si128(_mm_srli_epi32( (r), -(c) ),_mm_slli_epi32( (r), 32-(-(c)) )) )
 #		else
 #			define _mm_roti_epi32(r, c) _mm_xor_si128(_mm_srli_epi32( (r), -(c) ),_mm_slli_epi32( (r), 32-(-(c)) ))
 #		endif
@@ -67,7 +46,7 @@ public:
 #endif
 #endif
 
-#if defined(HAS_SSE3) && !defined(HAS_XOP)
+#if defined(HAS_SSSE3) && !defined(HAS_XOP)
 		const __m128i r8 = _mm_set_epi8(12, 15, 14, 13, 8, 11, 10, 9, 4, 7, 6, 5, 0, 3, 2, 1);
 		const __m128i r16 = _mm_set_epi8(13, 12, 15, 14, 9, 8, 11, 10, 5, 4, 7, 6, 1, 0, 3, 2);
 #endif
@@ -167,10 +146,10 @@ public:
 #elif defined(HAS_SSE4)
 		buf4 = TOI(_mm_shuffle_ps(TOF(m2), TOF(m3), _MM_SHUFFLE(3, 1, 3, 1)));
 #else
-		buf4 = _mm_set_epi32(m15, m13, m11, m9)
+		buf4 = _mm_set_epi32(m15, m13, m11, m9);
 #endif
-			// g2
-			row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
+		// g2
+		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
 		row3 = _mm_add_epi32(row3, row4);
@@ -192,9 +171,9 @@ public:
 		t2 = _mm_blend_epi16(t0, t1, 0xF0);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 1, 0, 3));
 #else
-		buf1 = _mm_set_epi32(m13, m9, m4, m14)
+		buf1 = _mm_set_epi32(m13, m9, m4, m14);
 #endif
-			row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
+		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
 		row3 = _mm_add_epi32(row3, row4);
@@ -211,9 +190,9 @@ public:
 		t2 = _mm_blend_epi16(t0, t1, 0xF0);
 		buf2 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 3, 0, 1));
 #else
-		buf2 = _mm_set_epi32(m6, m15, m8, m10)
+		buf2 = _mm_set_epi32(m6, m15, m8, m10);
 #endif
-			row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
+		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
 		row3 = _mm_add_epi32(row3, row4);
@@ -276,9 +255,9 @@ public:
 		t2 = _mm_blend_epi16(t0, t1, 0x0F);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(3, 1, 0, 2));
 #else
-		buf1 = _mm_set_epi32(m15, m5, m12, m11)
+		buf1 = _mm_set_epi32(m15, m5, m12, m11);
 #endif
-			row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
+		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
 		row3 = _mm_add_epi32(row3, row4);
@@ -2025,6 +2004,7 @@ public:
 		State.H[7] ^= v7 ^ v15;
 	}
 #endif
+
 };
 
 NAMESPACE_DIGESTEND

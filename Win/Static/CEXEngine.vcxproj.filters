@@ -531,6 +531,9 @@
     <ClInclude Include="..\..\CEX\Blake2SCompress.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\Intrinsics.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
