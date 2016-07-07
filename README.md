@@ -2,6 +2,7 @@
 The CEX Cryptographic library in C++
 
 Update v1.1f, AES-NI added (512 key and HKDF key expansion capable).
+
 Update v1.1g, all variants of Blake2 added; 2B, 2BP, 2S, and 2SP, sequential and parallel, integrated Mac and Drbg, optional intrinsics.
 
 Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
