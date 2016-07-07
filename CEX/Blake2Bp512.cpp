@@ -1,5 +1,6 @@
 #include "Blake2Bp512.h"
 #include "Blake2BCompress.h"
+#include "CpuDetect.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
@@ -402,6 +403,12 @@ void Blake2Bp512::Update(uint8_t Input)
 
 // *** Private Methods *** //
 
+void Blake2Bp512::DetectCpu()
+{
+	CEX::Common::CpuDetect detect;
+	m_hasIntrinsics = detect.HW_AVX || detect.HW_AVX2 || detect.HW_SSE2 || detect.HW_SSE3 || detect.HW_SSE41 || detect.HW_SSE42 || detect.HW_SSE4A || detect.HW_SSSE3 || detect.HW_XOP;
+}
+
 void Blake2Bp512::Increase(Blake2bState &State, uint64_t Length)
 {
 	State.T[0] += Length;
@@ -442,7 +449,10 @@ void Blake2Bp512::Initialize(Blake2Params &Params, Blake2bState &State)
 void Blake2Bp512::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, size_t Length)
 {
 	Increase(State, Length);
-	Blake2BCompress::Compress(Input, InOffset, State, m_cIV);
+	if (m_hasIntrinsics)
+		Blake2BCompress::ICompress(Input, InOffset, State, m_cIV);
+	else
+		Blake2BCompress::UCompress(Input, InOffset, State, m_cIV);
 }
 
 void Blake2Bp512::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, uint64_t Length)

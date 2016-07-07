@@ -1,0 +1,7 @@
+Version 1.1f
+Changes June 04, 2016:
+* AES-NI added (512 key and HKDF key expansion capable).
+
+Version 1.1g
+Changes July 08, 2016:
+* Blake2 added; 2B, 2BP, 2S, and 2SP, sequential and parallel, integrated Mac and Drbg, optional intrinsics.

@@ -145,6 +145,7 @@ private:
 	};
 
 	std::vector<uint32_t> m_cIV;
+	bool m_hasIntrinsics;
 	bool m_isDestroyed;
 	bool m_isParallel;
 	uint32_t m_leafSize;
@@ -222,6 +223,7 @@ public:
 	/// <param name="Parallel">If set to true the digest uses the Blake2SP parallel configuration, false processes in sequential mode.</param>
 	explicit Blake2Sp256(bool Parallel = false)
 		:
+		m_hasIntrinsics(false),
 		m_isDestroyed(false),
 		m_isParallel(Parallel),
 		m_leafSize(Parallel ? DEF_LEAFSIZE : BLOCK_SIZE),
@@ -237,6 +239,9 @@ public:
 			0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL,
 			0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL
 		};
+
+		// intrinsics support switch
+		DetectCpu();
 
 		if (m_isParallel)
 		{
@@ -272,6 +277,7 @@ public:
 	/// <param name="Params">A Blake2Params structure containing the Tree Hash configuration settings.</param>
 	explicit Blake2Sp256(Blake2Params &Params)
 		:
+		m_hasIntrinsics(false),
 		m_isDestroyed(false),
 		m_isParallel(false),
 		m_leafSize(BLOCK_SIZE),
@@ -289,6 +295,9 @@ public:
 			0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL,
 			0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL
 		};
+
+		// intrinsics support switch
+		DetectCpu();
 
 		if (m_isParallel)
 		{
@@ -399,6 +408,7 @@ public:
 	virtual void Update(uint8_t Input);
 
 private:
+	void DetectCpu();
 	void Increase(Blake2sState &State, uint32_t Length);
 	void Increment(std::vector<uint8_t> &Counter);
 	void Initialize(Blake2Params &Params, Blake2sState &State);

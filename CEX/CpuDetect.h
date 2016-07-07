@@ -5,13 +5,14 @@
 #include "Common.h"
 
 #ifdef _WIN32
-#include <intrin.h>
-#define cpuid(info, x)    __cpuidex(info, x, 0)
-#else
-#include <cpuid.h>
+#	include <intrin.h>
+#	include <stdio.h>
+#		define cpuid(info, x)  __cpuidex(info, x, 0)
+#	else
+#	include <cpuid.h>
 void cpuid(int info[4], int InfoType) {
 	__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
-}
+	}
 #endif
 
 NAMESPACE_COMMON
@@ -177,15 +178,19 @@ public:
 			HW_SSE41 = (info[2] & ((int)1 << 19)) != 0;
 			HW_SSE42 = (info[2] & ((int)1 << 20)) != 0;
 			HW_AES = (info[2] & ((int)1 << 25)) != 0;
-			HW_AVX = (info[2] & ((int)1 << 28)) != 0;
 			HW_FMA3 = (info[2] & ((int)1 << 12)) != 0;
 			HW_RDRAND = (info[2] & ((int)1 << 30)) != 0;
+			HW_AVX = (info[2] & ((int)1 << 28)) != 0;
 		}
 
 		if (nIds >= 0x00000007)
 		{
 			cpuid(info, 0x00000007);
+#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
+			HW_AVX2 = IsAVS2Supported();
+#else
 			HW_AVX2 = (info[1] & ((int)1 << 5)) != 0;
+#endif
 			HW_BMI1 = (info[1] & ((int)1 << 3)) != 0;
 			HW_BMI2 = (info[1] & ((int)1 << 8)) != 0;
 			HW_ADX = (info[1] & ((int)1 << 19)) != 0;
@@ -214,7 +219,7 @@ public:
 	}
 
 #if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-	bool AVSSupported()
+	bool IsAVSSupported()
 	{
 		bool avxSupported = false;
 		int cpuInfo[4];
@@ -227,15 +232,15 @@ public:
 		{
 			// Check if the OS will save the YMM registers
 			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);// 0xe6 avc2
-			avxSupported = (xcrFeatureMask & 0x6) || false;
+			HW_AVX = (xcrFeatureMask & 0x6) || false;
 		}
 
 		return avxSupported;
 	}
 
-	bool AVS2Supported()
+	bool IsAVS2Supported()
 	{
-		bool avxSupported = false;
+		bool avx2Supported = false;
 		int cpuInfo[4];
 		__cpuid(cpuInfo, 1);
 
@@ -246,10 +251,10 @@ public:
 		{
 			// Check if the OS will save the YMM registers
 			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-			avxSupported = (xcrFeatureMask & 0xe6) || false;
+			avx2Supported = (xcrFeatureMask & 0xe6) || false;
 		}
 
-		return avxSupported;
+		return avx2Supported;
 	}
 #endif
 };

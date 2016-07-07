@@ -1,5 +1,6 @@
 #include "Blake2Sp256.h"
 #include "Blake2SCompress.h"
+#include "CpuDetect.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
@@ -401,6 +402,12 @@ void Blake2Sp256::Update(uint8_t Input)
 
 // *** Private Methods *** //
 
+void Blake2Sp256::DetectCpu()
+{
+	CEX::Common::CpuDetect detect;
+	m_hasIntrinsics = detect.HW_AVX || detect.HW_AVX2 || detect.HW_SSE2 || detect.HW_SSE3 || detect.HW_SSE41 || detect.HW_SSE42 || detect.HW_SSE4A || detect.HW_SSSE3 || detect.HW_XOP;
+}
+
 void Blake2Sp256::Increase(Blake2sState &State, uint32_t Length)
 {
 	State.T[0] += Length;
@@ -442,7 +449,10 @@ void Blake2Sp256::Initialize(Blake2Params &Params, Blake2sState &State)
 void Blake2Sp256::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, size_t Length)
 {
 	Increase(State, (uint32_t)Length);
-	Blake2SCompress::Compress(Input, InOffset, State, m_cIV);
+	if (m_hasIntrinsics)
+		Blake2SCompress::ICompress(Input, InOffset, State, m_cIV);
+	else
+		Blake2SCompress::UCompress(Input, InOffset, State, m_cIV);
 }
 
 void Blake2Sp256::ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, uint64_t Length)

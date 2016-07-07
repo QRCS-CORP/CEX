@@ -1,7 +1,9 @@
 #ifndef _CEXENGINE_BLAKE2SCOMPRESS_H
 #define _CEXENGINE_BLAKE2SCOMPRESS_H
 
-#include "Intrinsics.h"
+#if defined(HAS_ADVINTRIN)
+#	include "Intrinsics.h"
+#endif
 #include "IntUtils.h"
 
 NAMESPACE_DIGEST
@@ -11,7 +13,6 @@ class Blake2SCompress
 public:
 
 #if defined(HAS_ADVINTRIN)
-
 #	if defined(HAS_XOP)
 #		define TOB(x) ((x)*4*0x01010101 + 0x03020100) 
 #	endif
@@ -31,32 +32,34 @@ public:
 #			define _mm_roti_epi32(r, c) _mm_xor_si128(_mm_srli_epi32( (r), -(c) ),_mm_slli_epi32( (r), 32-(-(c)) ))
 #		endif
 #	endif
+#endif
 
 	template <typename T>
-	static inline void Compress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
+	static inline void ICompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
 	{
+#if defined(HAS_ADVINTRIN)
 		__m128i row1, row2, row3, row4;
 		__m128i buf1, buf2, buf3, buf4;
 		__m128i ff0, ff1;
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 		__m128i t0, t1;
-#if !defined(HAS_XOP)
-		__m128i t2;
-#endif
-#endif
+#		if !defined(HAS_XOP)
+			__m128i t2;
+#		endif
+#    endif
 
-#if defined(HAS_SSSE3) && !defined(HAS_XOP)
+#    if defined(HAS_SSSE3) && !defined(HAS_XOP)
 		const __m128i r8 = _mm_set_epi8(12, 15, 14, 13, 8, 11, 10, 9, 4, 7, 6, 5, 0, 3, 2, 1);
 		const __m128i r16 = _mm_set_epi8(13, 12, 15, 14, 9, 8, 11, 10, 5, 4, 7, 6, 1, 0, 3, 2);
-#endif
+#    endif
 
-#if defined(HAS_SSE4)
+#    if defined(HAS_SSE4)
 		const __m128i m0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);
 		const __m128i m1 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 16]);
 		const __m128i m2 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 32]);
 		const __m128i m3 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 48]);
-#else
+#    else
 		uint8_t* block = (uint8_t*)Input.data() + InOffset;
 		const uint32_t  m0 = ((uint32_t *)block)[0];
 		const uint32_t  m1 = ((uint32_t *)block)[1];
@@ -74,7 +77,7 @@ public:
 		const uint32_t m13 = ((uint32_t *)block)[13];
 		const uint32_t m14 = ((uint32_t *)block)[14];
 		const uint32_t m15 = ((uint32_t *)block)[15];
-#endif
+#    endif
 
 		row1 = ff0 = _mm_loadu_si128((const __m128i*)&State.H[0]);
 		row2 = ff1 = _mm_loadu_si128((const __m128i*)&State.H[4]);
@@ -86,13 +89,13 @@ public:
 
 		// round 0
 		// lm 0.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		buf1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(6), TOB(4), TOB(2), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		buf1 = TOI(_mm_shuffle_ps(TOF(m0), TOF(m1), _MM_SHUFFLE(2, 0, 2, 0)));
-#else
+#    else
 		buf1 = _mm_set_epi32(m6, m4, m2, m0);
-#endif
+#    endif
 		// g1
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
@@ -102,13 +105,13 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 0.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		buf2 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(7), TOB(5), TOB(3), TOB(1)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		buf2 = TOI(_mm_shuffle_ps(TOF(m0), TOF(m1), _MM_SHUFFLE(3, 1, 3, 1)));
-#else
+#    else
 		buf2 = _mm_set_epi32(m7, m5, m3, m1);
-#endif
+#    endif
 		// g2
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
@@ -124,13 +127,13 @@ public:
 
 
 		// lm 0.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		buf3 = _mm_perm_epi8(m2, m3, _mm_set_epi32(TOB(6), TOB(4), TOB(2), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		buf3 = TOI(_mm_shuffle_ps(TOF(m2), TOF(m3), _MM_SHUFFLE(2, 0, 2, 0)));
-#else
+#    else
 		buf3 = _mm_set_epi32(m14, m12, m10, m8);
-#endif
+#    endif
 
 		// g1
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
@@ -141,13 +144,13 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 0.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		buf4 = _mm_perm_epi8(m2, m3, _mm_set_epi32(TOB(7), TOB(5), TOB(3), TOB(1)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		buf4 = TOI(_mm_shuffle_ps(TOF(m2), TOF(m3), _MM_SHUFFLE(3, 1, 3, 1)));
-#else
+#    else
 		buf4 = _mm_set_epi32(m15, m13, m11, m9);
-#endif
+#    endif
 		// g2
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
@@ -162,17 +165,17 @@ public:
 
 		// round 1
 		// lm 1.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m1, m2, _mm_set_epi32(TOB(0), TOB(5), TOB(0), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(5), TOB(2), TOB(1), TOB(6)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m1, m2, 0x0C);
 		t1 = _mm_slli_si128(m3, 4);
 		t2 = _mm_blend_epi16(t0, t1, 0xF0);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 1, 0, 3));
-#else
+#    else
 		buf1 = _mm_set_epi32(m13, m9, m4, m14);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -181,17 +184,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 1.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m1, m2, _mm_set_epi32(TOB(2), TOB(0), TOB(4), TOB(6)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(7), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_shuffle_epi32(m2, _MM_SHUFFLE(0, 0, 2, 0));
 		t1 = _mm_blend_epi16(m1, m3, 0xC0);
 		t2 = _mm_blend_epi16(t0, t1, 0xF0);
 		buf2 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 3, 0, 1));
-#else
+#    else
 		buf2 = _mm_set_epi32(m6, m15, m8, m10);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -203,17 +206,17 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 1.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(5), TOB(0), TOB(0), TOB(1)));
 		buf3 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(3), TOB(7), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_slli_si128(m1, 4);
 		t1 = _mm_blend_epi16(m2, t0, 0x30);
 		t2 = _mm_blend_epi16(m0, t1, 0xF0);
 		buf3 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 3, 0, 1));
-#else
+#    else
 		buf3 = _mm_set_epi32(m5, m11, m0, m1);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -222,17 +225,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 1.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(3), TOB(7), TOB(2), TOB(0)));
 		buf4 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(1), TOB(4)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m0, m1);
 		t1 = _mm_slli_si128(m3, 4);
 		t2 = _mm_blend_epi16(t0, t1, 0x0C);
 		buf4 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 3, 0, 1));
-#else
+#    else
 		buf4 = _mm_set_epi32(m3, m7, m2, m12);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -246,17 +249,17 @@ public:
 
 		// round 2
 		// lm 2.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m1, m2, _mm_set_epi32(TOB(0), TOB(1), TOB(0), TOB(7)));
 		buf1 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(7), TOB(2), TOB(4), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m2, m3);
 		t1 = _mm_blend_epi16(m3, m1, 0x0C);
 		t2 = _mm_blend_epi16(t0, t1, 0x0F);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(3, 1, 0, 2));
-#else
+#    else
 		buf1 = _mm_set_epi32(m15, m5, m12, m11);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -265,17 +268,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 2.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(0), TOB(2), TOB(0), TOB(4)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(5), TOB(2), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpacklo_epi32(m2, m0);
 		t1 = _mm_blend_epi16(t0, m0, 0xF0);
 		t2 = _mm_slli_si128(m3, 8);
 		buf2 = _mm_blend_epi16(t1, t2, 0xC0);
-#else
+#    else
 		buf2 = _mm_set_epi32(m13, m2, m0, m8);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -287,17 +290,17 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 2.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(7), TOB(3), TOB(0)));
 		buf3 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(5), TOB(2), TOB(1), TOB(6)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m0, m2, 0x3C);
 		t1 = _mm_srli_si128(m1, 12);
 		t2 = _mm_blend_epi16(t0, t1, 0x03);
 		buf3 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(1, 0, 3, 2));
-#else
+#    else
 		buf3 = _mm_set_epi32(m9, m7, m3, m10);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -306,17 +309,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 2.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(4), TOB(1), TOB(6), TOB(0)));
 		buf4 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(1), TOB(6)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_slli_si128(m3, 4);
 		t1 = _mm_blend_epi16(m0, m1, 0x33);
 		t2 = _mm_blend_epi16(t1, t0, 0xC0);
 		buf4 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(0, 1, 2, 3));
-#else
+#    else
 		buf4 = _mm_set_epi32(m4, m1, m6, m14);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -330,18 +333,18 @@ public:
 
 		// round 3
 		// lm 3.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(0), TOB(3), TOB(7)));
 		t0 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(7), TOB(2), TOB(1), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(5), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m0, m1);
 		t1 = _mm_unpackhi_epi32(t0, m2);
 		t2 = _mm_blend_epi16(t1, m3, 0x0C);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(3, 1, 0, 2));
-#else
+#    else
 		buf1 = _mm_set_epi32(m11, m13, m3, m7);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -350,17 +353,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 3.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(0), TOB(0), TOB(1), TOB(5)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(6), TOB(4), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_slli_si128(m2, 8);
 		t1 = _mm_blend_epi16(m3, m0, 0x0C);
 		t2 = _mm_blend_epi16(t1, t0, 0xC0);
 		buf2 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 0, 1, 3));
-#else
+#    else
 		buf2 = _mm_set_epi32(m14, m12, m1, m9);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -372,16 +375,16 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 3.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(4), TOB(5), TOB(2)));
 		buf3 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(7), TOB(2), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m0, m1, 0x0F);
 		t1 = _mm_blend_epi16(t0, m3, 0xC0);
 		buf3 = _mm_shuffle_epi32(t1, _MM_SHUFFLE(3, 0, 1, 2));
-#else
+#    else
 		buf3 = _mm_set_epi32(m15, m4, m5, m2);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -390,16 +393,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 3.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(0), TOB(0), TOB(6)));
 		buf4 = _mm_perm_epi8(t1, m2, _mm_set_epi32(TOB(4), TOB(2), TOB(6), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpacklo_epi32(m0, m2);
 		t1 = _mm_unpackhi_epi32(m1, m2);
 		buf4 = _mm_unpacklo_epi64(t1, t0);
-#else
+#    else
 		buf4 = _mm_set_epi32(m8, m0, m10, m6);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -413,17 +416,17 @@ public:
 
 		// round 4
 		// lm 4.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(2), TOB(5), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(6), TOB(2), TOB(1), TOB(5)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpacklo_epi64(m1, m2);
 		t1 = _mm_unpackhi_epi64(m0, m2);
 		t2 = _mm_blend_epi16(t0, t1, 0x33);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 0, 1, 3));
-#else
+#    else
 		buf1 = _mm_set_epi32(m10, m2, m5, m9);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -432,16 +435,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 4.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(4), TOB(7), TOB(0)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(7), TOB(2), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi64(m1, m3);
 		t1 = _mm_unpacklo_epi64(m0, m1);
 		buf2 = _mm_blend_epi16(t0, t1, 0x33);
-#else
+#    else
 		buf2 = _mm_set_epi32(m15, m4, m7, m0);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -453,17 +456,17 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 4.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(3), TOB(6), TOB(0), TOB(0)));
 		t0 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(3), TOB(2), TOB(7), TOB(0)));
 		buf3 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(1), TOB(6)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi64(m3, m1);
 		t1 = _mm_unpackhi_epi64(m2, m0);
 		buf3 = _mm_blend_epi16(t1, t0, 0x33);
-#else
+#    else
 		buf3 = _mm_set_epi32(m3, m6, m11, m14);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -472,17 +475,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 4.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(0), TOB(4), TOB(0), TOB(1)));
 		buf4 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(5), TOB(2), TOB(4), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m0, m2, 0x03);
 		t1 = _mm_slli_si128(t0, 8);
 		t2 = _mm_blend_epi16(t1, m3, 0x0F);
 		buf4 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(1, 2, 0, 3));
-#else
+#    else
 		buf4 = _mm_set_epi32(m13, m8, m12, m1);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -496,16 +499,16 @@ public:
 
 		// round 5
 		// lm 5.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(0), TOB(6), TOB(2)));
 		buf1 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(4), TOB(2), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m0, m1);
 		t1 = _mm_unpacklo_epi32(m0, m2);
 		buf1 = _mm_unpacklo_epi64(t0, t1);
-#else
+#    else
 		buf1 = _mm_set_epi32(m8, m0, m6, m2);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -514,16 +517,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 5.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(3), TOB(7), TOB(6), TOB(0)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(1), TOB(4)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_srli_si128(m2, 4);
 		t1 = _mm_blend_epi16(m0, m3, 0x03);
 		buf2 = _mm_blend_epi16(t1, t0, 0x3C);
-#else
+#    else
 		buf2 = _mm_set_epi32(m3, m11, m10, m12);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -535,17 +538,17 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 5.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(1), TOB(0), TOB(7), TOB(4)));
 		buf3 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(7), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m1, m0, 0x0C);
 		t1 = _mm_srli_si128(m3, 4);
 		t2 = _mm_blend_epi16(t0, t1, 0x30);
 		buf3 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(1, 2, 3, 0));
-#else
+#    else
 		buf3 = _mm_set_epi32(m1, m15, m7, m4);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -554,16 +557,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 5.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m1, m2, _mm_set_epi32(TOB(5), TOB(0), TOB(1), TOB(0)));
 		buf4 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(6), TOB(1), TOB(5)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpacklo_epi64(m1, m2);
 		t1 = _mm_shuffle_epi32(m3, _MM_SHUFFLE(0, 2, 0, 1));
 		buf4 = _mm_blend_epi16(t0, t1, 0x33);
-#else
+#    else
 		buf4 = _mm_set_epi32(m9, m14, m5, m13);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -577,16 +580,16 @@ public:
 
 		// round 6
 		// lm 6.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(4), TOB(0), TOB(1), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(6), TOB(1), TOB(4)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_slli_si128(m1, 12);
 		t1 = _mm_blend_epi16(m0, m3, 0x33);
 		buf1 = _mm_blend_epi16(t1, t0, 0xC0);
-#else
+#    else
 		buf1 = _mm_set_epi32(m4, m14, m1, m12);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -595,17 +598,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 6.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m1, m2, _mm_set_epi32(TOB(6), TOB(0), TOB(0), TOB(1)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(5), TOB(7), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m3, m2, 0x30);
 		t1 = _mm_srli_si128(m1, 4);
 		t2 = _mm_blend_epi16(t0, t1, 0x03);
 		buf2 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(2, 1, 3, 0));
-#else
+#    else
 		buf2 = _mm_set_epi32(m10, m13, m15, m5);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -617,16 +620,16 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 6.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(0), TOB(6), TOB(0)));
 		buf3 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(4), TOB(5), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpacklo_epi64(m0, m2);
 		t1 = _mm_srli_si128(m1, 4);
 		buf3 = _mm_shuffle_epi32(_mm_blend_epi16(t0, t1, 0x0C), _MM_SHUFFLE(2, 3, 1, 0));
-#else
+#    else
 		buf3 = _mm_set_epi32(m8, m9, m6, m0);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -635,16 +638,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 6.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(2), TOB(3), TOB(7)));
 		buf4 = _mm_perm_epi8(t1, m2, _mm_set_epi32(TOB(7), TOB(2), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m1, m2);
 		t1 = _mm_unpackhi_epi64(m0, t0);
 		buf4 = _mm_shuffle_epi32(t1, _MM_SHUFFLE(3, 0, 1, 2));
-#else
+#    else
 		buf4 = _mm_set_epi32(m11, m2, m3, m7);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -658,16 +661,16 @@ public:
 
 		// round 7
 		// lm 7.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(3), TOB(0), TOB(7), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(4), TOB(1), TOB(5)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m0, m1);
 		t1 = _mm_blend_epi16(t0, m3, 0x0F);
 		buf1 = _mm_shuffle_epi32(t1, _MM_SHUFFLE(2, 0, 3, 1));
-#else
+#    else
 		buf1 = _mm_set_epi32(m3, m12, m7, m13);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -676,17 +679,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 7.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(5), TOB(1), TOB(0), TOB(7)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(6), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m2, m3, 0x30);
 		t1 = _mm_srli_si128(m0, 4);
 		t2 = _mm_blend_epi16(t0, t1, 0x03);
 		buf2 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(1, 0, 2, 3));
-#else
+#    else
 		buf2 = _mm_set_epi32(m9, m1, m14, m11);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -698,18 +701,18 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 7.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(2), TOB(0), TOB(0), TOB(5)));
 		t0 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(3), TOB(4), TOB(1), TOB(0)));
 		buf3 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(7), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi64(m0, m3);
 		t1 = _mm_unpacklo_epi64(m1, m2);
 		t2 = _mm_blend_epi16(t0, t1, 0x3C);
 		buf3 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(0, 2, 3, 1));
-#else
+#    else
 		buf3 = _mm_set_epi32(m2, m8, m15, m5);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -718,16 +721,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 7.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(6), TOB(4), TOB(0)));
 		buf4 = _mm_perm_epi8(t1, m2, _mm_set_epi32(TOB(6), TOB(2), TOB(1), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpacklo_epi32(m0, m1);
 		t1 = _mm_unpackhi_epi32(m1, m2);
 		buf4 = _mm_unpacklo_epi64(t0, t1);
-#else
+#    else
 		buf4 = _mm_set_epi32(m10, m6, m4, m0);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -741,18 +744,18 @@ public:
 
 		// round 8
 		// lm 8.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(0), TOB(0), TOB(0), TOB(6)));
 		t0 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(3), TOB(7), TOB(1), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(6), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m1, m3);
 		t1 = _mm_unpacklo_epi64(t0, m0);
 		t2 = _mm_blend_epi16(t1, m2, 0xC0);
 		buf1 = _mm_shufflehi_epi16(t2, _MM_SHUFFLE(1, 0, 3, 2));
-#else
+#    else
 		buf1 = _mm_set_epi32(m0, m11, m14, m6);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -761,16 +764,16 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 8.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(4), TOB(3), TOB(5), TOB(0)));
 		buf2 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(1), TOB(7)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m0, m3);
 		t1 = _mm_blend_epi16(m2, t0, 0xF0);
 		buf2 = _mm_shuffle_epi32(t1, _MM_SHUFFLE(0, 2, 1, 3));
-#else
+#    else
 		buf2 = _mm_set_epi32(m8, m3, m9, m15);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -782,16 +785,16 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 8.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(6), TOB(1), TOB(0), TOB(0)));
 		buf3 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(3), TOB(2), TOB(5), TOB(4)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m2, m0, 0x0C);
 		t1 = _mm_slli_si128(t0, 4);
 		buf3 = _mm_blend_epi16(t1, m3, 0x0F);
-#else
+#    else
 		buf3 = _mm_set_epi32(m10, m1, m13, m12);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -800,14 +803,14 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 8.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		buf4 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(5), TOB(4), TOB(7), TOB(2)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m1, m0, 0x30);
 		buf4 = _mm_shuffle_epi32(t0, _MM_SHUFFLE(1, 0, 3, 2));
-#else
+#    else
 		buf4 = _mm_set_epi32(m5, m4, m7, m2);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -821,17 +824,17 @@ public:
 
 		// round 9
 		// lm 9.1
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(1), TOB(7), TOB(0), TOB(0)));
 		buf1 = _mm_perm_epi8(t0, m2, _mm_set_epi32(TOB(3), TOB(2), TOB(4), TOB(6)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m0, m2, 0x03);
 		t1 = _mm_blend_epi16(m1, m2, 0x30);
 		t2 = _mm_blend_epi16(t1, t0, 0x0F);
 		buf1 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(1, 3, 0, 2));
-#else
+#    else
 		buf1 = _mm_set_epi32(m1, m7, m8, m10);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf1), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -840,15 +843,15 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 9.2
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		buf2 = _mm_perm_epi8(m0, m1, _mm_set_epi32(TOB(5), TOB(6), TOB(4), TOB(2)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_slli_si128(m0, 4);
 		t1 = _mm_blend_epi16(m1, t0, 0xC0);
 		buf2 = _mm_shuffle_epi32(t1, _MM_SHUFFLE(1, 2, 0, 3));
-#else
+#    else
 		buf2 = _mm_set_epi32(m5, m6, m4, m2);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf2), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -860,17 +863,17 @@ public:
 		row2 = _mm_shuffle_epi32(row2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 9.3
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t0 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(0), TOB(3), TOB(5), TOB(0)));
 		buf3 = _mm_perm_epi8(t0, m3, _mm_set_epi32(TOB(5), TOB(2), TOB(1), TOB(7)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_unpackhi_epi32(m0, m3);
 		t1 = _mm_unpacklo_epi32(m2, m3);
 		t2 = _mm_unpackhi_epi64(t0, t1);
 		buf3 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(3, 0, 2, 1));
-#else
+#    else
 		buf3 = _mm_set_epi32(m13, m3, m9, m15);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf3), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -16);
@@ -879,17 +882,17 @@ public:
 		row2 = _mm_roti_epi32(row2, -12);
 
 		// lm 9.4
-#if defined(HAS_XOP)
+#    if defined(HAS_XOP)
 		t1 = _mm_perm_epi8(m0, m2, _mm_set_epi32(TOB(0), TOB(0), TOB(0), TOB(7)));
 		buf4 = _mm_perm_epi8(t1, m3, _mm_set_epi32(TOB(3), TOB(4), TOB(6), TOB(0)));
-#elif defined(HAS_SSE4)
+#    elif defined(HAS_SSE4)
 		t0 = _mm_blend_epi16(m3, m2, 0xC0);
 		t1 = _mm_unpacklo_epi32(m0, m3);
 		t2 = _mm_blend_epi16(t0, t1, 0x0F);
 		buf4 = _mm_shuffle_epi32(t2, _MM_SHUFFLE(0, 1, 2, 3));
-#else
+#    else
 		buf4 = _mm_set_epi32(m0, m12, m14, m11);
-#endif
+#    endif
 		row1 = _mm_add_epi32(_mm_add_epi32(row1, buf4), row2);
 		row4 = _mm_xor_si128(row4, row1);
 		row4 = _mm_roti_epi32(row4, -8);
@@ -903,29 +906,32 @@ public:
 
 		_mm_storeu_si128((__m128i*)&State.H[0], _mm_xor_si128(ff0, _mm_xor_si128(row1, row3)));
 		_mm_storeu_si128((__m128i*)&State.H[4], _mm_xor_si128(ff1, _mm_xor_si128(row2, row4)));
+#    else
+		UCompress(Input, InOffset, State, IV);
+#endif
 	}
-#else
+
 	template <typename T>
-	static inline void Compress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
+	static inline void UCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
 	{
 		std::vector<uint32_t> msg(16);
 
-		msg[0] = IntUtils::BytesToLe32(Input, InOffset);
-		msg[1] = IntUtils::BytesToLe32(Input, InOffset + 4);
-		msg[2] = IntUtils::BytesToLe32(Input, InOffset + 8);
-		msg[3] = IntUtils::BytesToLe32(Input, InOffset + 12);
-		msg[4] = IntUtils::BytesToLe32(Input, InOffset + 16);
-		msg[5] = IntUtils::BytesToLe32(Input, InOffset + 20);
-		msg[6] = IntUtils::BytesToLe32(Input, InOffset + 24);
-		msg[7] = IntUtils::BytesToLe32(Input, InOffset + 28);
-		msg[8] = IntUtils::BytesToLe32(Input, InOffset + 32);
-		msg[9] = IntUtils::BytesToLe32(Input, InOffset + 36);
-		msg[10] = IntUtils::BytesToLe32(Input, InOffset + 40);
-		msg[11] = IntUtils::BytesToLe32(Input, InOffset + 44);
-		msg[12] = IntUtils::BytesToLe32(Input, InOffset + 48);
-		msg[13] = IntUtils::BytesToLe32(Input, InOffset + 52);
-		msg[14] = IntUtils::BytesToLe32(Input, InOffset + 56);
-		msg[15] = IntUtils::BytesToLe32(Input, InOffset + 60);
+		msg[0] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset);
+		msg[1] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4);
+		msg[2] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8);
+		msg[3] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12);
+		msg[4] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 16);
+		msg[5] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 20);
+		msg[6] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 24);
+		msg[7] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 28);
+		msg[8] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 32);
+		msg[9] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 36);
+		msg[10] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 40);
+		msg[11] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 44);
+		msg[12] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 48);
+		msg[13] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 52);
+		msg[14] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 56);
+		msg[15] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 60);
 
 		uint32_t v0 = State.H[0];
 		uint32_t v1 = State.H[1];
@@ -2003,8 +2009,6 @@ public:
 		State.H[6] ^= v6 ^ v14;
 		State.H[7] ^= v7 ^ v15;
 	}
-#endif
-
 };
 
 NAMESPACE_DIGESTEND
