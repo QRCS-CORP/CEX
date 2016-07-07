@@ -264,8 +264,6 @@ size_t Blake2Sp256::Generate(CEX::Common::MacParams &MacKey, std::vector<uint8_t
 	size_t bufSize = DIGEST_SIZE;
 	std::vector<uint8_t> inpCtr(BLOCK_SIZE);
 
-	// start counter at 1
-	Increment(inpCtr);
 	// add the key to state
 	LoadMacKey(MacKey);
 	// process the key
