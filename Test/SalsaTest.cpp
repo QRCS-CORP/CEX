@@ -60,7 +60,7 @@ namespace Test
 		CEX::Cipher::Symmetric::Stream::Salsa20 cipher2(20);
 		cipher2.Initialize(k);
 		cipher2.IsParallel() = true;
-		cipher2.ParallelBlockSize() = cipher2.ParallelMinimumSize();
+		cipher2.ParallelBlockSize(cipher2.ParallelMinimumSize());
 		cipher2.Transform(data, enc2);
 
 		if (enc != enc2)
@@ -74,7 +74,7 @@ namespace Test
 		// decrypt parallel
 		cipher.Initialize(k);
 		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = cipher.ParallelMinimumSize();
+		cipher.ParallelBlockSize(cipher.ParallelMinimumSize());
 		cipher.Transform(enc2, dec2);
 
 		if (dec != data)

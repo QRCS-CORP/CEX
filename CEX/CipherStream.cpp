@@ -255,9 +255,9 @@ void CipherStream::CalculateBlockSize(size_t Length)
 	if (m_parallelBlockSize >= ParallelMinimumSize())
 	{
 		if (!m_isStreamCipher)
-			m_cipherEngine->ParallelBlockSize() = m_parallelBlockSize;
+			m_cipherEngine->ParallelBlockSize(m_parallelBlockSize);
 		else
-			m_streamCipher->ParallelBlockSize() = m_parallelBlockSize;
+			m_streamCipher->ParallelBlockSize(m_parallelBlockSize);
 	}
 }
 
@@ -541,7 +541,7 @@ void CipherStream::ParallelCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStr
 	std::vector<byte> outBuffer(blkSize);
 
 	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
+	m_cipherEngine->ParallelBlockSize(blkSize);
 
 	while (count != alnSize)
 	{
@@ -573,7 +573,7 @@ void CipherStream::ParallelCTR(const std::vector<byte> &Input, size_t InOffset, 
 	size_t count = 0;
 
 	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
+	m_cipherEngine->ParallelBlockSize(blkSize);
 
 	// parallel blocks
 	while (count != alnSize)
@@ -609,7 +609,7 @@ void CipherStream::ParallelDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByt
 	std::vector<byte> outBuffer(blkSize);
 
 	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
+	m_cipherEngine->ParallelBlockSize(blkSize);
 
 	while (count != alnSize)
 	{
@@ -634,7 +634,7 @@ void CipherStream::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffs
 	size_t count = 0;
 
 	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
+	m_cipherEngine->ParallelBlockSize(blkSize);
 
 	// parallel
 	while (count != alnSize)
@@ -665,7 +665,7 @@ void CipherStream::ParallelStream(CEX::IO::IByteStream* InStream, CEX::IO::IByte
 	std::vector<byte> outBuffer(blkSize);
 
 	m_streamCipher->IsParallel() = true;
-	m_streamCipher->ParallelBlockSize() = blkSize;
+	m_streamCipher->ParallelBlockSize(blkSize);
 
 	while (count != alnSize)
 	{
@@ -697,7 +697,7 @@ void CipherStream::ParallelStream(const std::vector<byte> &Input, size_t InOffse
 	size_t count = 0;
 
 	m_streamCipher->IsParallel() = true;
-	m_streamCipher->ParallelBlockSize() = blkSize;
+	m_streamCipher->ParallelBlockSize(blkSize);
 
 	// parallel blocks
 	while (count != alnSize)

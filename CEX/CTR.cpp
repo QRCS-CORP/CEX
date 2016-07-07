@@ -86,16 +86,13 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 		const size_t cnkSize = (Output.size() / m_blockSize / m_processorCount) * m_blockSize;
 		const size_t rndSize = cnkSize * m_processorCount;
 		const size_t subSize = (cnkSize / m_blockSize);
-		// create jagged array of 'sub counters'
-		m_threadVectors.resize(m_processorCount);
 
 		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, &Output, cnkSize, rndSize, subSize](size_t i)
 		{
-			std::vector<byte> &thdVec = m_threadVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(m_ctrVector, subSize * i, thdVec);
+			this->Increase(m_ctrVector, subSize * i, m_threadVectors[i]);
 			// create random at offset position
-			this->Generate(cnkSize, thdVec, Output, (i * cnkSize));
+			this->Generate(cnkSize, m_threadVectors[i], Output, (i * cnkSize));
 			// xor the block
 			CEX::Utility::IntUtils::XORBLK(Input, i * cnkSize, Output, i * cnkSize, cnkSize);
 		});
@@ -143,16 +140,13 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vec
 		const size_t cnkSize = m_parallelBlockSize / m_processorCount;
 		const size_t rndSize = cnkSize * m_processorCount;
 		const size_t subSize = (cnkSize / m_blockSize);
-		// create jagged array of 'sub counters'
-		m_threadVectors.resize(m_processorCount);
 
 		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
 		{
-			std::vector<byte> &thdVec = m_threadVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(m_ctrVector, subSize * i, thdVec);
+			this->Increase(m_ctrVector, subSize * i, m_threadVectors[i]);
 			// create random at offset position
-			this->Generate(cnkSize, thdVec, Output, (i * cnkSize));
+			this->Generate(cnkSize, m_threadVectors[i], Output, (i * cnkSize));
 			// xor with input at offset
 			CEX::Utility::IntUtils::XORBLK(Input, InOffset + (i * cnkSize), Output, OutOffset + (i * cnkSize), cnkSize);
 		});
@@ -199,8 +193,15 @@ void CTR::SetScope()
 	if (m_processorCount > 1)
 		m_isParallel = true;
 
-	// calc default parallel block size as n * 64kb
 	m_parallelBlockSize = m_processorCount * PARALLEL_DEFBLOCK;
+
+	if (m_isParallel)
+	{
+		if (m_threadVectors.size() != m_processorCount)
+			m_threadVectors.resize(m_processorCount);
+		for (size_t i = 0; i < m_processorCount; ++i)
+			m_threadVectors[i].resize(m_blockSize);
+	}
 }
 
 NAMESPACE_MODEEND

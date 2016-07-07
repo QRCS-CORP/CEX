@@ -133,13 +133,18 @@ public:
 	virtual const char* Name() { return "CBC"; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// <para>The parallel block size is calculated automatically based on the number of available processors on the system (n * 64kb).</para>
+	/// Get: Parallel block size.
 	/// </summary>
-	///
-	/// <exception cref="CryptoCipherModeException">Thrown if a parallel block size is not evenly divisible by ParallelMinimumSize, 
-	/// or block size is less than ParallelMinimumSize or more than ParallelMaximumSize values</exception>
-	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
+
+	/// <summary>
+	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// </summary>
+	virtual void ParallelBlockSize(size_t BlockSize)
+	{
+		m_parallelBlockSize = BlockSize;
+		SetScope();
+	}
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing

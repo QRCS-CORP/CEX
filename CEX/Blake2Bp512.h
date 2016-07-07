@@ -86,9 +86,10 @@ NAMESPACE_DIGEST
 	/// <list type="bullet">
 	/// <item><description>Algorithm is selected through the constructor (2B or 2BP), parallel version is selected through either the Parallel flag, or via the Blake2Params ThreadCount() configuration parameter.</description></item>
 	/// <item><description>Parallel and sequential algorithms (Blake2B or Blake2BP) produce different digest outputs, this is expected.</description></item>
-	/// <item><description>Sequential Block size is fixed at 128 bytes, (1024 bits), but smaller or larger blocks can be processed, for best performance, align message input to a multiple of the internal block size.</description></item>
+	/// <item><description>Sequential Block size 128 bytes, (1024 bits), but smaller or larger blocks can be processed, for best performance, align message input to a multiple of the internal block size.</description></item>
 	/// <item><description>Parallel Block input size to the BlockUpdate function should be aligned to a multiple of ParallelMinimumSize() for best performance.</description></item>
 	/// <item><description>Best performance for parallel mode is to use a large input block size to minimize parallel loop creation cost, block size should be in a range of 32KiB to 25MiB.</description></item>
+	/// <item><description>The number of threads used in parallel mode can be user defined through the Blake2Params->ThreadCount property to any even number of threads; note that hash output value will change with threadcount.</description></item>
 	/// <item><description>Digest output size is fixed at 64 bytes, (512 bits).</description></item>
 	/// <item><description>The <see cref="ComputeHash(uint8_t[])"/> method wraps the <see cref="BlockUpdate(uint8_t[], size_t, size_t)"/> and DoFinal methods</description>/></item>
 	/// <item><description>The <see cref="DoFinal(uint8_t[], size_t)"/> method resets the internal state.</description></item>
@@ -212,15 +213,11 @@ NAMESPACE_DIGEST
 		// *** Constructor *** //
 
 		/// <summary>
-		/// Initialize the digest
+		/// Initialize the class as either the 2B or 2BP variant.
+		/// <para>Initialize as either the parallel version Blake2BP, or sequential Blake2B variant.</para>
 		/// </summary>
-		///
-		/// <remarks>
-		/// <para>Setting the Parallel mode to true initializes the Blake2BP digest configuration (parallel), when set to false initializes the Blake2B configuration.
-		/// Note that the two different algorithms (BlakeB and BlakeBP) will return different hash codes (this is expected, use one or the other).</para>
-		/// <remarks>
-		///
-		/// <param name="Parallel">If set to true the digest uses the Blake2BP parallel configuration, false processes in sequential mode.</param>
+		/// 
+		/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2BP variant.</param>
 		explicit Blake2Bp512(bool Parallel = false)
 			:
 			m_hasIntrinsics(false),
@@ -263,18 +260,14 @@ NAMESPACE_DIGEST
 		}
 
 		/// <summary>
-		/// Initialize the digest
+		/// Initialize the class with a Blake2Params structure.
+		/// <para>The parameters structure allows for tuning of the internal configuration string,
+		/// and changing the number of threads used by the parallel mechanism (ThreadCount).
+		/// If the ThreadCount is greater than 1, parallel mode (Blake2BP) is instantiated.
+		/// The default threadcount is 4, changing from the default will produce a different output hash code.</para>
 		/// </summary>
-		///
-		/// <remarks>
-		/// <para>Setting the TreeConfig::FanOut() to greater than 1 initializes the Blake2-BP digest configuration (parallel), when set to false initializes the Blake2-B configuration.
-		/// Note that the two different algorithms (BlakeB and BlakeBP) will return different hash codes (this is expected, use one or the other).
-		/// The default sequential mode Blake2Params configuration settings are : treeParams = { (uint8_t)DIGEST_SIZE, 0, 1, 1, 0, 0, 0, 0, 0 };.
-		/// The default parallel mode Blake2Params configuration settings are : treeParams = { (uint8_t)DIGEST_SIZE, 0, 4, 2, 0, 0, 0, (uint8_t)DIGEST_SIZE, 4 };.
-		/// See the Blake2Params documentation for details on flags and configuration settings.</para>
-		/// </remarks>
 		/// 
-		/// <param name="Params">A Blake2Params structure containing the Tree Hash configuration settings.</param>
+		/// <param name="Params">The Blake2Params structure, containing the tree configuration settings.</param>
 		explicit Blake2Bp512(Blake2Params &Params)
 			:
 			m_hasIntrinsics(false),

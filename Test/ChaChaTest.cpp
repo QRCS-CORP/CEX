@@ -56,7 +56,7 @@ namespace Test
 		// decrypt parallel
 		cipher.Initialize(k);
 		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = cipher.ParallelMinimumSize();
+		cipher.ParallelBlockSize(cipher.ParallelMinimumSize());
 		cipher.Transform(enc, dec);
 
 		if (data != dec)

@@ -235,7 +235,7 @@ namespace Test
 			CEX::Cipher::Symmetric::Block::AHX* engine = new CEX::Cipher::Symmetric::Block::AHX();//r14
 			CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 			// default is 64k * cpu count, w/ ni, keep within l2 cache size, but large enough to offset parallel loop setup cost
-			cipher->ParallelBlockSize() = cipher->ProcessorCount() * 32000;
+			cipher->ParallelBlockSize(cipher->ProcessorCount() * 32000);
 			ParallelBlockLoop(cipher, MB100, 32);
 			delete cipher;
 			delete engine;

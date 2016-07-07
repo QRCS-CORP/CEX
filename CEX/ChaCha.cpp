@@ -158,7 +158,7 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 	if (blkSize > Output.size() - OutOffset)
 		blkSize = Output.size() - OutOffset;
 
-	if (!m_isParallel || blkSize < m_parallelBlockSize)
+	if (!m_isParallel || blkSize < ParallelMinimumSize())
 	{
 		// generate random
 		Generate(blkSize, m_ctrVector, Output, OutOffset);
@@ -182,16 +182,12 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 		size_t rndSize = cnkSize * m_processorCount;
 		size_t subSize = (cnkSize / BLOCK_SIZE);
 
-		// create jagged array of 'sub counters'
-		m_threadVectors.resize(m_processorCount);
-
 		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, rndSize, subSize](size_t i)
 		{
-			std::vector<uint> &Vec = m_threadVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(m_ctrVector, subSize * i, Vec);
+			this->Increase(m_ctrVector, subSize * i, m_threadVectors[i]);
 			// create random at offset position
-			this->Generate(cnkSize, Vec, Output, (i * cnkSize));
+			this->Generate(cnkSize, m_threadVectors[i], Output, (i * cnkSize));
 			// xor with input at offset
 			CEX::Utility::IntUtils::XORBLK(Input, InOffset + (i * cnkSize), Output, OutOffset + (i * cnkSize), cnkSize);
 		});
@@ -326,6 +322,14 @@ void ChaCha::SetScope()
 		m_processorCount--;
 	if (m_processorCount > 1)
 		m_isParallel = true;
+
+	if (m_isParallel)
+	{
+		if (m_threadVectors.size() != m_processorCount)
+			m_threadVectors.resize(m_processorCount);
+		for (size_t i = 0; i < m_processorCount; ++i)
+			m_threadVectors[i].resize(VECTOR_SIZE);
+	}
 }
 
 NAMESPACE_STREAMEND

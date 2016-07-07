@@ -470,6 +470,74 @@ public:
 #endif
 	}
 
+	/// <summary>
+	/// Convert a byte array to a Little Endian 32 bit word array
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The output integer array</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	/// <returns>An array of 32 bit words in Little Endian format</returns>
+	static inline void BytesToLeUL512(const std::vector<uint8_t> &Input, const size_t InOffset, std::vector<uint32_t> &Output, const size_t OutOffset)
+	{
+#if defined(IS_LITTLE_ENDIAN)
+		uint32_t value = 0;
+		memcpy(&Output[OutOffset], &Input[InOffset], 16 * sizeof(uint32_t));
+#else
+		Output[OutOffset] = BytesToLe32(Input, InOffset);
+		Output[OutOffset + 1] = BytesToLe32(Input, InOffset + 4);
+		Output[OutOffset + 2] = BytesToLe32(Input, InOffset + 8);
+		Output[OutOffset + 3] = BytesToLe32(Input, InOffset + 12);
+		Output[OutOffset + 4] = BytesToLe32(Input, InOffset + 16);
+		Output[OutOffset + 5] = BytesToLe32(Input, InOffset + 20);
+		Output[OutOffset + 6] = BytesToLe32(Input, InOffset + 24);
+		Output[OutOffset + 7] = BytesToLe32(Input, InOffset + 28);
+		Output[OutOffset + 8] = BytesToLe32(Input, InOffset + 32);
+		Output[OutOffset + 9] = BytesToLe32(Input, InOffset + 36);
+		Output[OutOffset + 10] = BytesToLe32(Input, InOffset + 40);
+		Output[OutOffset + 11] = BytesToLe32(Input, InOffset + 44);
+		Output[OutOffset + 12] = BytesToLe32(Input, InOffset + 48);
+		Output[OutOffset + 13] = BytesToLe32(Input, InOffset + 52);
+		Output[OutOffset + 14] = BytesToLe32(Input, InOffset + 56);
+		Output[OutOffset + 15] = BytesToLe32(Input, InOffset + 60);
+#endif
+	}
+
+	/// <summary>
+	/// Convert a byte array to a Little Endian 64 bit dword array
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The output integer array</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	/// <returns>An array of 64 bit dwords in Little Endian format</returns>
+	static inline void BytesToLeULL512(const std::vector<uint8_t> &Input, const size_t InOffset, std::vector<uint64_t> &Output, size_t OutOffset)
+	{
+#if defined(IS_LITTLE_ENDIAN)
+		uint32_t value = 0;
+		memcpy(&Output[OutOffset], &Input[InOffset], 16 * sizeof(uint64_t));
+#else
+		Output[OutOffset] = BytesToLe64(Input, InOffset);
+		Output[OutOffset + 1] = BytesToLe64(Input, InOffset + 8);
+		Output[OutOffset + 2] = BytesToLe64(Input, InOffset + 16);
+		Output[OutOffset + 3] = BytesToLe64(Input, InOffset + 24);
+		Output[OutOffset + 4] = BytesToLe64(Input, InOffset + 32);
+		Output[OutOffset + 5] = BytesToLe64(Input, InOffset + 40);
+		Output[OutOffset + 6] = BytesToLe64(Input, InOffset + 48);
+		Output[OutOffset + 7] = BytesToLe64(Input, InOffset + 56);
+		Output[OutOffset + 8] = BytesToLe64(Input, InOffset + 64);
+		Output[OutOffset + 9] = BytesToLe64(Input, InOffset + 72);
+		Output[OutOffset + 10] = BytesToLe64(Input, InOffset + 80);
+		Output[OutOffset + 11] = BytesToLe64(Input, InOffset + 88);
+		Output[OutOffset + 12] = BytesToLe64(Input, InOffset + 96);
+		Output[OutOffset + 13] = BytesToLe64(Input, InOffset + 104);
+		Output[OutOffset + 14] = BytesToLe64(Input, InOffset + 112);
+		Output[OutOffset + 15] = BytesToLe64(Input, InOffset + 120);
+#endif
+	}
+
 #if defined(IS_LITTLE_ENDIAN)
 	/// <summary>
 	/// Convert a byte array to a system aligned 16 bit word

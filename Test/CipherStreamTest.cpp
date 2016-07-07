@@ -162,8 +162,8 @@ namespace Test
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelBlockSize(prlBlock);
+			cipher2.ParallelBlockSize(prlBlock);
 			CEX::IO::MemoryStream mIn(m_plnText);
 			CEX::IO::MemoryStream mOut;
 			CEX::IO::MemoryStream mRes;
@@ -259,8 +259,8 @@ namespace Test
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelBlockSize(prlBlock);
+			cipher2.ParallelBlockSize(prlBlock);
 			CEX::IO::MemoryStream mIn(m_plnText);
 			CEX::IO::MemoryStream mOut;
 			CEX::IO::MemoryStream mRes;
@@ -356,8 +356,8 @@ namespace Test
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelBlockSize(prlBlock);
+			cipher2.ParallelBlockSize(prlBlock);
 			CEX::IO::MemoryStream mIn(m_plnText);
 			CEX::IO::MemoryStream mOut;
 			CEX::IO::MemoryStream mRes;
@@ -677,8 +677,8 @@ namespace Test
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelBlockSize(prlBlock);
+			cipher2.ParallelBlockSize(prlBlock);
 			CEX::IO::MemoryStream mIn(m_plnText);
 			CEX::IO::MemoryStream mOut;
 			CEX::IO::MemoryStream mRes;
@@ -781,7 +781,7 @@ namespace Test
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher->ParallelBlockSize() = prlBlock;
+			cipher->ParallelBlockSize(prlBlock);
 			cs.ParallelBlockSize() = prlBlock;
 			CEX::IO::MemoryStream mIn(m_plnText);
 			CEX::IO::MemoryStream mOut;

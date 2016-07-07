@@ -915,23 +915,7 @@ public:
 	static inline void UCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
 	{
 		std::vector<uint32_t> msg(16);
-
-		msg[0] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset);
-		msg[1] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4);
-		msg[2] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8);
-		msg[3] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12);
-		msg[4] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 16);
-		msg[5] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 20);
-		msg[6] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 24);
-		msg[7] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 28);
-		msg[8] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 32);
-		msg[9] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 36);
-		msg[10] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 40);
-		msg[11] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 44);
-		msg[12] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 48);
-		msg[13] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 52);
-		msg[14] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 56);
-		msg[15] = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 60);
+		CEX::Utility::IntUtils::BytesToLeUL512(Input, InOffset, msg, 0);
 
 		uint32_t v0 = State.H[0];
 		uint32_t v1 = State.H[1];

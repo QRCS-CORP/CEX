@@ -156,9 +156,18 @@ public:
 	virtual const char *Name() { return "Salsa20"; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get: Parallel block size.
 	/// </summary>
-	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
+
+	/// <summary>
+	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// </summary>
+	virtual void ParallelBlockSize(size_t BlockSize)
+	{
+		m_parallelBlockSize = BlockSize;
+		SetScope();
+	}
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing

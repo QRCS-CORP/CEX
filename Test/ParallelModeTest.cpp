@@ -152,7 +152,7 @@ namespace Test
 				plen = 1024;
 
 			// set parallel block size
-			cipher.ParallelBlockSize() = plen;
+			cipher.ParallelBlockSize(plen);
 
 			// encrypt //
 			// parallel 1
@@ -241,7 +241,7 @@ namespace Test
 			GetBytes(2048, data);
 
 			// encrypt
-			cipher.ParallelBlockSize() = 1024;
+			cipher.ParallelBlockSize(1024);
 
 			// t1: encrypt only in normal mode for cbc
 			cipher.Initialize(true, keyParam);
@@ -306,7 +306,7 @@ namespace Test
 			GetBytes(2048, data);
 
 			// encrypt
-			cipher.ParallelBlockSize() = 1024;
+			cipher.ParallelBlockSize(1024);
 
 			// t1: encrypt only in normal mode for cfb
 			cipher.Initialize(true, keyParam);
@@ -391,7 +391,7 @@ namespace Test
 		size_t count = 0;
 
 		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
+		Cipher->ParallelBlockSize(blkSize);
 
 		// parallel blocks
 		while (count != alnSize)
@@ -421,7 +421,7 @@ namespace Test
 		size_t count = 0;
 
 		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
+		Cipher->ParallelBlockSize(blkSize);
 
 		// parallel
 		while (count != alnSize)

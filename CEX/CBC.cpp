@@ -122,12 +122,8 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Out
 		const size_t blkSize = m_blockSize;
 		const size_t blkCount = (cnkSize / blkSize);
 
-		m_threadVectors.resize(m_processorCount);
-
 		for (size_t i = 0; i < m_processorCount; i++)
 		{
-			m_threadVectors[i].resize(m_blockSize, 0);
-
 			if (i != 0)
 				memcpy(&m_threadVectors[i][0], &Input[(i * cnkSize) - blkSize], blkSize);
 			else
@@ -136,8 +132,7 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Out
 
 		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, &Output, cnkSize, blkCount, blkSize](size_t i)
 		{
-			std::vector<byte> &thdVec = m_threadVectors[i];
-			this->ProcessDecrypt(Input, i * cnkSize, Output, i * cnkSize, thdVec, blkCount);
+			this->ProcessDecrypt(Input, i * cnkSize, Output, i * cnkSize, m_threadVectors[i], blkCount);
 		});
 
 		// copy the last vector to class variable
@@ -162,12 +157,8 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset,
 		const size_t blkSize = m_blockSize;
 		const size_t blkCount = (cnkSize / blkSize);
 
-		m_threadVectors.resize(m_processorCount);
-
 		for (size_t i = 0; i < m_processorCount; i++)
 		{
-			m_threadVectors[i].resize(blkSize, 0);
-
 			// get the vectors
 			if (i != 0)
 				memcpy(&m_threadVectors[i][0], &Input[(InOffset + (i * cnkSize)) - blkSize], blkSize);
@@ -178,8 +169,7 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset,
 
 		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](size_t i)
 		{
-			std::vector<byte> &thdVec = m_threadVectors[i];
-			this->ProcessDecrypt(Input, InOffset + i * cnkSize, Output, OutOffset + i * cnkSize, thdVec, blkCount);
+			this->ProcessDecrypt(Input, InOffset + i * cnkSize, Output, OutOffset + i * cnkSize, m_threadVectors[i], blkCount);
 		});
 		// copy the last vector to class variable
 		memcpy(&m_cbcIv[0], &m_threadVectors[m_processorCount - 1][0], m_cbcIv.size());
@@ -211,8 +201,15 @@ void CBC::SetScope()
 	if (m_processorCount > 1)
 		m_isParallel = true;
 
-	// calc default parallel block size as n * 64kb
 	m_parallelBlockSize = m_processorCount * PARALLEL_DEFBLOCK;
+
+	if (m_isParallel)
+	{
+		if (m_threadVectors.size() != m_processorCount)
+			m_threadVectors.resize(m_processorCount);
+		for (size_t i = 0; i < m_processorCount; ++i)
+			m_threadVectors[i].resize(m_blockSize);
+	}
 }
 
 NAMESPACE_MODEEND

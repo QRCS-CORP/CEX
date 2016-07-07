@@ -71,9 +71,14 @@ public:
 	virtual const char *Name() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get: Parallel block size.
 	/// </summary>
-	virtual size_t &ParallelBlockSize() = 0;
+	virtual const size_t ParallelBlockSize() = 0;
+
+	/// <summary>
+	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// </summary>
+	virtual void ParallelBlockSize(size_t BlockSize) = 0;
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
