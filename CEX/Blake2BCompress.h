@@ -1,7 +1,7 @@
 #ifndef _CEXENGINE_BLAKE2BCOMPRESS_H
 #define _CEXENGINE_BLAKE2BCOMPRESS_H
 
-#if defined(HAS_ADVINTRIN)
+#if defined(HAS_MINSSE)
 #	include "Intrinsics.h"
 #endif
 #include "IntUtils.h"
@@ -12,7 +12,7 @@ class Blake2BCompress
 {
 public:
 
-#if defined(HAS_ADVINTRIN)
+#if defined(HAS_MINSSE)
 #	if !defined(HAS_XOP)
 #		if defined(HAS_SSSE3)
 #			define _mm_roti_epi64(x, c) \
@@ -81,9 +81,9 @@ public:
 #	endif
 #endif
 	template <typename T>
-	static inline void ICompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
+	static inline void SCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
 	{
-#if defined(HAS_ADVINTRIN)
+#if defined(HAS_MINSSE)
 #    if defined(HAS_SSE4)
 		const __m128i m0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);
 		const __m128i m1 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 16]);

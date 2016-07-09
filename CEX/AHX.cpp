@@ -57,23 +57,23 @@ void AHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 
 	if (key.size() < m_legalKeySizes[0])
-		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
+		throw CryptoSymmetricCipherException("AHX:Initialize", msg);
 	if (dgtsze != 0 && key.size() > m_legalKeySizes[3] && (key.size() % dgtsze) != 0)
-		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
+		throw CryptoSymmetricCipherException("AHX:Initialize", msg);
 
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
 	{
 		if (key.size() == m_legalKeySizes[i])
 			break;
 		if (i == m_legalKeySizes.size() - 1)
-			throw CryptoSymmetricCipherException("RHX:Initialize", msg);
+			throw CryptoSymmetricCipherException("AHX:Initialize", msg);
 	}
 
 	// get the kdf digest engine
 	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
 	{
 		if (key.size() < m_ikmSize)
-			throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
+			throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
 
 		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}

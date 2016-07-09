@@ -23,6 +23,7 @@
 #	include <immintrin.h>
 #elif defined(HAS_XOP)
 #	include <intrin.h>
+#	include <xopintrin.h>
 #endif
 #if defined(HAS_SSE42)
 #	include <nmmintrin.h>

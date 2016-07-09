@@ -60,6 +60,8 @@ NAMESPACE_STREAM
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
+/// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
+/// <item><description>SIMD implementation requires compilation with SSSE3 or higher.</description></item>
 /// <item><description>Valid Key sizes are 128 and 256 (16 and 32 bytes).</description></item>
 /// <item><description>Block size is 64 bytes wide.</description></item>
 /// <item><description>Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.</description></item>
@@ -88,6 +90,7 @@ private:
 	static constexpr const char *TAU = "expand 16-byte k";
 
 	std::vector<uint> m_ctrVector;
+	bool m_hasIntrinsics;
 	bool m_isDestroyed;
 	std::vector<byte> m_dstCode;
 	bool m_isInitialized;
@@ -205,6 +208,7 @@ public:
 	explicit ChaCha(size_t Rounds = ROUNDS20)
 		:
 		m_ctrVector(2, 0),
+		m_hasIntrinsics(false),
 		m_isDestroyed(false),
 		m_isInitialized(false),
 		m_isParallel(false),
@@ -220,6 +224,7 @@ public:
 		m_legalKeySizes = { 16, 32 };
 		m_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
 
+		DetectCpu();
 		SetScope();
 	}
 
@@ -287,10 +292,12 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 private:
-	void ChaChaCore(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter);
+	void SRoundBlock(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter);
+	void URoundBlock(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
+	void DetectCpu();
 	void Generate(const size_t Size, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset);
 	uint GetProcessorCount();
-	void Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Buffer);
+	void Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);
 	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);

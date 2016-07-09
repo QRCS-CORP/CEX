@@ -1,5 +1,9 @@
 #include "ChaCha.h"
+#include "CpuDetect.h"
 #include "IntUtils.h"
+#if defined(HAS_MINSSE)
+#	include "Intrinsics.h"
+#endif
 #include "ParallelUtils.h"
 
 NAMESPACE_STREAM
@@ -20,6 +24,12 @@ void ChaCha::Destroy()
 		CEX::Utility::IntUtils::ClearVector(m_dstCode);
 		CEX::Utility::IntUtils::ClearVector(m_threadVectors);
 	}
+}
+
+void ChaCha::DetectCpu()
+{
+	CEX::Common::CpuDetect detect;
+	m_hasIntrinsics = detect.HasMinIntrinsics();
 }
 
 void ChaCha::Initialize(const CEX::Common::KeyParams &KeyParam)
@@ -111,12 +121,12 @@ void ChaCha::SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 
 // ** Processing ** //
 
-void ChaCha::Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Buffer)
+void ChaCha::Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector)
 {
-	Buffer = Counter;
+	Vector = Counter;
 
 	for (size_t i = 0; i < Size; i++)
-		Increment(Buffer);
+		Increment(Vector);
 }
 
 void ChaCha::Increment(std::vector<uint> &Counter)
@@ -132,7 +142,11 @@ void ChaCha::Generate(const size_t Size, std::vector<uint> &Counter, std::vector
 
 	while (ctr != aln)
 	{
-		ChaChaCore(Output, OutOffset + ctr, Counter);
+		if (m_hasIntrinsics)
+			SRoundBlock(Output, OutOffset + ctr, Counter);
+		else
+			URoundBlock(Output, OutOffset + ctr, Counter);
+
 		Increment(Counter);
 		ctr += BLOCK_SIZE;
 	}
@@ -140,7 +154,11 @@ void ChaCha::Generate(const size_t Size, std::vector<uint> &Counter, std::vector
 	if (ctr != Size)
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
-		ChaChaCore(outputBlock, 0, Counter);
+		if (m_hasIntrinsics)
+			SRoundBlock(outputBlock, 0, Counter);
+		else
+			URoundBlock(outputBlock, 0, Counter);
+
 		size_t fnlSize = Size % BLOCK_SIZE;
 		memcpy(&Output[OutOffset + (Size - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
@@ -207,7 +225,92 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 	}
 }
 
-void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter)
+#if defined(HAS_MINSSE)
+#	if !defined(HAS_XOP)
+#		if defined(HAS_SSSE3)
+#			define _mm_roti_epi32(r, c) (																	\
+				((c) == 8) ?																				\
+				_mm_shuffle_epi8((r), _mm_set_epi8(14, 13, 12, 15, 10, 9, 8, 11, 6, 5, 4, 7, 2, 1, 0, 3))	\
+				: ((c) == 16) ?																				\
+				_mm_shuffle_epi8((r), _mm_set_epi8(13, 12, 15, 14, 9, 8, 11, 10, 5, 4, 7, 6, 1, 0, 3, 2))	\
+				: ((c) == 24) ?																				\
+				_mm_shuffle_epi8((r), _mm_set_epi8(12, 15, 14, 13, 8, 11, 10, 9, 4, 7, 6, 5, 0, 3, 2, 1))	\
+				:																							\
+				_mm_xor_si128(_mm_slli_epi32((r), (c)), _mm_srli_epi32((r), 32-(c)))						\
+        )
+#		else
+#			define _mm_roti_epi32(r, c) _mm_xor_si128(_mm_slli_epi32((r), (c)), _mm_srli_epi32((r), 32-(c)))
+#		endif
+#	endif
+#endif
+
+void ChaCha::SRoundBlock(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter)
+{
+#if defined(HAS_MINSSE)
+	__m128i W0, W1, W2, W3;
+	__m128i X0 = W0 = _mm_loadu_si128((const __m128i*)&m_wrkState[0]);
+	__m128i X1 = W1 = _mm_loadu_si128((const __m128i*)&m_wrkState[4]);
+	__m128i X2 = W2 = _mm_loadu_si128((const __m128i*)&m_wrkState[8]);
+	__m128i T0 = _mm_loadl_epi64((const __m128i*)&Counter[0]);
+	__m128i T1 = _mm_loadl_epi64((const __m128i*)&m_wrkState[12]);
+	__m128i X3 = W3 = _mm_unpacklo_epi64(T0, T1);
+
+	size_t ctr = m_rndCount;
+	while (ctr != 0)
+	{
+		X0 = _mm_add_epi32(X0, X1);
+		T0 = _mm_xor_si128(X3, X0);
+		X3 = _mm_roti_epi32(T0, 16);
+
+		X2 = _mm_add_epi32(X2, X3);
+		T0 = _mm_xor_si128(X1, X2);
+		X1 = _mm_roti_epi32(T0, 12);
+
+		X0 = _mm_add_epi32(X0, X1);
+		T0 = _mm_xor_si128(X3, X0);
+		X3 = _mm_roti_epi32(T0, 8);
+
+		X2 = _mm_add_epi32(X2, X3);
+		T0 = _mm_xor_si128(X1, X2);
+		X1 = _mm_roti_epi32(T0, 7);
+
+		X1 = _mm_shuffle_epi32(X1, 0x39);
+		X2 = _mm_shuffle_epi32(X2, 0x4e);
+		X3 = _mm_shuffle_epi32(X3, 0x93);
+
+		X0 = _mm_add_epi32(X0, X1);
+		T0 = _mm_xor_si128(X3, X0);
+		X3 = _mm_roti_epi32(T0, 16);
+
+		X2 = _mm_add_epi32(X2, X3);
+		T0 = _mm_xor_si128(X1, X2);
+		X1 = _mm_roti_epi32(T0, 12);
+
+		X0 = _mm_add_epi32(X0, X1);
+		T0 = _mm_xor_si128(X3, X0);
+		X3 = _mm_roti_epi32(T0, 8);
+
+		X2 = _mm_add_epi32(X2, X3);
+		T0 = _mm_xor_si128(X1, X2);
+		X1 = _mm_roti_epi32(T0, 7);
+
+		X1 = _mm_shuffle_epi32(X1, 0x93);
+		X2 = _mm_shuffle_epi32(X2, 0x4e);
+		X3 = _mm_shuffle_epi32(X3, 0x39);
+
+		ctr -= 2;
+	}
+
+	_mm_storeu_si128((__m128i*)&Output[OutOffset], _mm_add_epi32(X0, W0));
+	_mm_storeu_si128((__m128i*)&Output[OutOffset + 16], _mm_add_epi32(X1, W1));
+	_mm_storeu_si128((__m128i*)&Output[OutOffset + 32], _mm_add_epi32(X2, W2));
+	_mm_storeu_si128((__m128i*)&Output[OutOffset + 48], _mm_add_epi32(X3, W3));
+#else
+	URoundBlock(Output, OutOffset, Counter);
+#endif
+}
+
+void ChaCha::URoundBlock(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter)
 {
 	size_t ctr = 0;
 	uint X0 = m_wrkState[ctr];
@@ -230,7 +333,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 	ctr = m_rndCount;
 	while (ctr != 0)
 	{
-		X0 += X4; 
+		X0 += X4;
 		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X0, 16);
 		X8 += X12;
 		X4 = CEX::Utility::IntUtils::RotateFixLeft(X4 ^ X8, 12);
@@ -238,6 +341,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X0, 8);
 		X8 += X12; 
 		X4 = CEX::Utility::IntUtils::RotateFixLeft(X4 ^ X8, 7);
+
 		X1 += X5; 
 		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X1, 16);
 		X9 += X13; 
@@ -245,7 +349,8 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X1 += X5; 
 		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X1, 8);
 		X9 += X13; 
-		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X9, 7);
+		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X9, 7);//x1:338,x13:154,x9:323,x5:399
+
 		X2 += X6; 
 		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X2, 16);
 		X10 += X14; 
@@ -254,6 +359,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X2, 8);
 		X10 += X14; 
 		X6 = CEX::Utility::IntUtils::RotateFixLeft(X6 ^ X10, 7);
+
 		X3 += X7; 
 		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X3, 16);
 		X11 += X15; 
@@ -262,6 +368,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X3, 8);
 		X11 += X15; 
 		X7 = CEX::Utility::IntUtils::RotateFixLeft(X7 ^ X11, 7);
+
 		X0 += X5; 
 		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X0, 16);
 		X10 += X15; 
@@ -270,6 +377,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X0, 8);
 		X10 += X15; 
 		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X10, 7);
+
 		X1 += X6; 
 		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X1, 16);
 		X11 += X12; 
@@ -278,6 +386,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X1, 8);
 		X11 += X12; 
 		X6 = CEX::Utility::IntUtils::RotateFixLeft(X6 ^ X11, 7);
+
 		X2 += X7; 
 		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X2, 16);
 		X8 += X13; 
@@ -286,6 +395,7 @@ void ChaCha::ChaChaCore(std::vector<byte> &Output, size_t OutOffset, std::vector
 		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X2, 8);
 		X8 += X13; 
 		X7 = CEX::Utility::IntUtils::RotateFixLeft(X7 ^ X8, 7);
+
 		X3 += X4; 
 		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X3, 16);
 		X9 += X14; 

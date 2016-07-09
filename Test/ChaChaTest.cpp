@@ -73,7 +73,7 @@ namespace Test
 		cipher.Transform(Input, 0, outBytes, 0, Input.size());
 
 		if (outBytes != Output)
-			throw std::string("ChaCha: Encrypted arrays are not equal!");
+			throw std::string("ChaCha: Encrypted arrays are not equal!"); //251,184
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, 0, outBytes, 0, Output.size());

@@ -62,6 +62,7 @@ namespace Test
 		void ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
 		void OnProgress(char* Data);
 		void AHXSpeedTest();
+		void ChaChaSpeedTest();
 		void RDXSpeedTest();
 		void RHXSpeedTest(int Rounds = 22);
 		void SalsaSpeedTest();

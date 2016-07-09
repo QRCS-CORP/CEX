@@ -26,10 +26,9 @@ void CFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	std::vector<byte> iv = KeyParam.IV();
 	size_t diff = m_cfbIv.size() - iv.size();
-
 	memcpy(&m_cfbIv[diff], &iv[0], iv.size());
 	memset(&m_cfbIv[0], 0, diff);
-
+	m_threadVectors.resize(m_processorCount);
 	m_blockCipher->Initialize(true, KeyParam);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;

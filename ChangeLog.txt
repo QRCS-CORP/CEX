@@ -5,3 +5,10 @@ Changes June 04, 2016:
 Version 1.1g
 Changes July 08, 2016:
 * Blake2 added; 2B, 2BP, 2S, and 2SP, sequential and parallel, integrated Mac and Drbg, optional intrinsics.
+
+Version 1.1g
+Changes July 09, 2016:
+* Added intrinsics to the parallelized ChaCha implementation
+* Work on CpuDetect, (all intrinsics are now runtime enabled automatically).
+* Set default SSE support to AVX /arch:AVX
+* Work begun on intrinsics symmetric mode chain

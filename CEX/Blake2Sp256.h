@@ -93,6 +93,8 @@ NAMESPACE_DIGEST
 /// <item><description>Digest output size is fixed at 32 bytes, (256 bits).</description></item>
 /// <item><description>The <see cref="ComputeHash(uint8_t[])"/> method wraps the <see cref="BlockUpdate(uint8_t[], size_t, size_t)"/> and DoFinal methods</description>/></item>
 /// <item><description>The <see cref="DoFinal(uint8_t[], size_t)"/> method resets the internal state.</description></item>
+/// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
+/// <item><description>SIMD implementation requires compilation with SSSE3 or higher.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>

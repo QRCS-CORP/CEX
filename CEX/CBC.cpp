@@ -71,6 +71,7 @@ void CBC::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	m_blockCipher->Initialize(Encryption, KeyParam);
 	m_cbcIv = KeyParam.IV();
 	m_cbcNextIv.resize(m_cbcIv.size(), 0);
+	m_threadVectors.resize(m_processorCount);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }

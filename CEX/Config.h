@@ -54,7 +54,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 
 // intrensics flags
 #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
-	#define INTEL_INTRINSICS
+	#define HAS_MINSSE
 	#define FAST_ROTATE
 #elif defined(__MWERKS__) && TARGET_CPU_PPC
 	#define PPC_INTRINSICS
@@ -283,7 +283,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #endif
 
 #if defined(HAS_SSE42) || defined(HAS_SSE41) || defined(HAS_SSSE3) || defined(HAS_SSE3)
-#	define HAS_ADVINTRIN
+#	define HAS_MINSSE
 #endif
 
 #define CPP_EXCEPTIONS

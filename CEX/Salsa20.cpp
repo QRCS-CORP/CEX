@@ -131,7 +131,7 @@ void Salsa20::Generate(const size_t Size, std::vector<uint> &Counter, std::vecto
 
 	while (ctr != aln)
 	{
-		SalsaCore(Output, OutOffset + ctr, Counter);
+		RoundBlock(Output, OutOffset + ctr, Counter);
 		Increment(Counter);
 		ctr += BLOCK_SIZE;
 	}
@@ -139,7 +139,7 @@ void Salsa20::Generate(const size_t Size, std::vector<uint> &Counter, std::vecto
 	if (ctr != Size)
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
-		SalsaCore(outputBlock, 0, Counter);
+		RoundBlock(outputBlock, 0, Counter);
 		int fnlSize = Size % BLOCK_SIZE;
 		memcpy(&Output[OutOffset + (Size - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
@@ -202,12 +202,11 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset
 		}
 
 		// copy the last counter position to class variable
-		size_t x = sizeof(m_ctrVector);
 		memcpy(&m_ctrVector[0], &m_threadVectors[m_processorCount - 1][0], m_ctrVector.size() * sizeof(uint));
 	}
 }
 
-void Salsa20::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std::vector<uint> &Counter)
+void Salsa20::RoundBlock(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter)
 {
 	size_t ctr = 0;
 	uint X0 = m_wrkState[ctr];
@@ -234,30 +233,37 @@ void Salsa20::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std::
 		X8 ^= CEX::Utility::IntUtils::RotateFixLeft(X4 + X0, 9);
 		X12 ^= CEX::Utility::IntUtils::RotateFixLeft(X8 + X4, 13);
 		X0 ^= CEX::Utility::IntUtils::RotateFixLeft(X12 + X8, 18);
+
 		X9 ^= CEX::Utility::IntUtils::RotateFixLeft(X5 + X1, 7);
 		X13 ^= CEX::Utility::IntUtils::RotateFixLeft(X9 + X5, 9);
 		X1 ^= CEX::Utility::IntUtils::RotateFixLeft(X13 + X9, 13);
 		X5 ^= CEX::Utility::IntUtils::RotateFixLeft(X1 + X13, 18);
+
 		X14 ^= CEX::Utility::IntUtils::RotateFixLeft(X10 + X6, 7);
 		X2 ^= CEX::Utility::IntUtils::RotateFixLeft(X14 + X10, 9);
 		X6 ^= CEX::Utility::IntUtils::RotateFixLeft(X2 + X14, 13);
 		X10 ^= CEX::Utility::IntUtils::RotateFixLeft(X6 + X2, 18);
+
 		X3 ^= CEX::Utility::IntUtils::RotateFixLeft(X15 + X11, 7);
 		X7 ^= CEX::Utility::IntUtils::RotateFixLeft(X3 + X15, 9);
 		X11 ^= CEX::Utility::IntUtils::RotateFixLeft(X7 + X3, 13);
 		X15 ^= CEX::Utility::IntUtils::RotateFixLeft(X11 + X7, 18);
+
 		X1 ^= CEX::Utility::IntUtils::RotateFixLeft(X0 + X3, 7);
 		X2 ^= CEX::Utility::IntUtils::RotateFixLeft(X1 + X0, 9);
 		X3 ^= CEX::Utility::IntUtils::RotateFixLeft(X2 + X1, 13);
 		X0 ^= CEX::Utility::IntUtils::RotateFixLeft(X3 + X2, 18);
+
 		X6 ^= CEX::Utility::IntUtils::RotateFixLeft(X5 + X4, 7);
 		X7 ^= CEX::Utility::IntUtils::RotateFixLeft(X6 + X5, 9);
 		X4 ^= CEX::Utility::IntUtils::RotateFixLeft(X7 + X6, 13);
 		X5 ^= CEX::Utility::IntUtils::RotateFixLeft(X4 + X7, 18);
+
 		X11 ^= CEX::Utility::IntUtils::RotateFixLeft(X10 + X9, 7);
 		X8 ^= CEX::Utility::IntUtils::RotateFixLeft(X11 + X10, 9);
 		X9 ^= CEX::Utility::IntUtils::RotateFixLeft(X8 + X11, 13);
 		X10 ^= CEX::Utility::IntUtils::RotateFixLeft(X9 + X8, 18);
+
 		X12 ^= CEX::Utility::IntUtils::RotateFixLeft(X15 + X14, 7);
 		X13 ^= CEX::Utility::IntUtils::RotateFixLeft(X12 + X15, 9);
 		X14 ^= CEX::Utility::IntUtils::RotateFixLeft(X13 + X12, 13);

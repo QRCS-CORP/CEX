@@ -1,7 +1,4 @@
 #include "IntUtils.h"
-#if defined(INTEL_INTRINSICS)
-	#include <emmintrin.h>
-#endif
 
 NAMESPACE_UTILITY
 
@@ -89,7 +86,7 @@ void IntUtils::XOR64(const std::vector<byte> &Input, size_t InOffset, std::vecto
 	Output[++OutOffset] ^= Input[++InOffset];
 }
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR128(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[0], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[0]), _mm_loadu_si128((const __m128i*)(const void*)&Output[0])));
@@ -116,7 +113,7 @@ void IntUtils::XOR128(const std::vector<byte> &Input, std::vector<byte> &Output)
 }
 #endif
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
@@ -143,7 +140,7 @@ void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vect
 }
 #endif
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR256(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[0], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[0]), _mm_loadu_si128((const __m128i*)(const void*)&Output[0])));
@@ -187,7 +184,7 @@ void IntUtils::XOR256(const std::vector<byte> &Input, std::vector<byte> &Output)
 }
 #endif
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
@@ -231,7 +228,7 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 }
 #endif
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR2X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
@@ -244,7 +241,7 @@ void IntUtils::XOR2X64(const std::vector<ulong> &Input, size_t InOffset, std::ve
 }
 #endif
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR4X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
@@ -262,7 +259,7 @@ void IntUtils::XOR4X64(const std::vector<ulong> &Input, size_t InOffset, std::ve
 
 
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR8X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
@@ -286,7 +283,7 @@ void IntUtils::XOR4X64(const std::vector<ulong> &Input, size_t InOffset, std::ve
 
 
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR4X32(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
@@ -301,7 +298,7 @@ void IntUtils::XOR4X32(const std::vector<uint> &Input, size_t InOffset, std::vec
 }
 #endif
 
-#if defined(INTEL_INTRINSICS)
+#if defined(HAS_MINSSE)
 void IntUtils::XOR8X32(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
 {
 	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_xor_si128(_mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));

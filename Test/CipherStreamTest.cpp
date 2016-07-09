@@ -220,13 +220,22 @@ namespace Test
 			mOut.Seek(0, CEX::IO::SeekOrigin::Begin);
 			mRes.Seek(0, CEX::IO::SeekOrigin::Begin);
 			cs.Initialize(false, kp);
-			cs.Write(&mOut, &mRes);
+			cs.Write(&mOut, &mRes);/**/
 
 			if (mRes.ToArray() != m_decText)
 				throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
 
 			m_cmpText.resize(m_encText.size());
-			// byte array interface
+			// byte array interface parallel
+			cs.Initialize(false, kp);
+			cs.Write(m_encText, 0, m_cmpText, 0);
+
+			if (m_cmpText != m_decText)
+				throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
+
+			m_cmpText.resize(m_encText.size());
+			// byte array interface sequential
+			cs.IsParallel() = false;
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 

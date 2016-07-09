@@ -1,7 +1,6 @@
 #ifndef _CEXENGINE_CPUDETECT_H
 #define _CEXENGINE_CPUDETECT_H
 
-// based on: https://github.com/Mysticial/FeatureDetector
 #include "Common.h"
 
 #ifdef _WIN32
@@ -23,6 +22,142 @@ NAMESPACE_COMMON
 class CpuDetect
 {
 public:
+
+	/// <summary>
+	/// Enumeration of processor feature sets
+	/// </summary>
+	enum FeatureSet : uint32_t
+	{
+		/// <summary>
+		/// Intructions are not available
+		/// </summary>
+		NONE = 0,
+		/// <summary>
+		/// MMX instructions
+		/// </summary>
+		MMX = 1,
+		/// <summary>
+		/// Cpu is x64
+		/// </summary>
+		X64 = 2,
+		/// <summary>
+		/// Advanced Bit Manipulation
+		/// </summary>
+		ABM = 4,
+		/// <summary>
+		/// Intel Digital Random Number Generator
+		/// </summary>
+		RDRAND = 8,
+		/// <summary>
+		/// Bit Manipulation Instruction Set 1
+		/// </summary>
+		BMI1 = 16,
+		/// <summary>
+		/// Bit Manipulation Instruction Set 2
+		/// </summary>
+		BMI2 = 32,
+		/// <summary>
+		/// Intel Add-Carry Instruction Extensions
+		/// </summary>
+		ADX = 64,
+		/// <summary>
+		/// Cpu supports prefetch
+		/// </summary>
+		PREFETCHWT1 = 128,
+		/// <summary>
+		/// Streaming SIMD Extensions 1.0
+		/// </summary>
+		SSE = 256,
+		/// <summary>
+		/// Streaming SIMD Extensions 2.0
+		/// </summary>
+		SSE2 = 512,
+		/// <summary>
+		/// Streaming SIMD Extensions 3.0
+		/// </summary>
+		SSE3 = 1024,
+		/// <summary>
+		/// SSE3 E3 Merom New Instructions
+		/// </summary>
+		SSSE3 = 2048,
+		/// <summary>
+		/// Streaming SIMD Extensions 4.1
+		/// </summary>
+		SSE41 = 4096,
+		/// <summary>
+		/// Streaming SIMD Extensions 4.2
+		/// </summary>
+		SSE42 = 8192,
+		/// <summary>
+		/// AMD SSE 4A instructions
+		/// </summary>
+		SSE4A = 16384,
+		/// <summary>
+		/// AES-NI instructions
+		/// </summary>
+		AES = 32768,
+		/// <summary>
+		/// SHA instructions
+		/// </summary>
+		SHA = 65536,
+		/// <summary>
+		/// Advanced Vector Extensions
+		/// </summary>
+		AVX = 131072,
+		/// <summary>
+		/// AMD eXtended Operations
+		/// </summary>
+		XOP = 262144,
+		/// <summary>
+		/// AMD FMA 3 instructions
+		/// </summary>
+		FMA3 = 524288,
+		/// <summary>
+		/// AMD FMA 4 instructions
+		/// </summary>
+		FMA4 = 1048576,
+		/// <summary>
+		/// Advanced Vector Extensions 2
+		/// </summary>
+		AVX2 = 2097152,
+		/// <summary>
+		/// AVX512 Foundation
+		/// </summary>
+		AVX512F = 4194304,
+		/// <summary>
+		/// AVX512 Conflict Detection
+		/// </summary>
+		AVX512CD = 8388608,
+		/// <summary>
+		/// AVX512 Prefetch
+		/// </summary>
+		AVX512PF = 16777216,
+		/// <summary>
+		/// AVX512 Exponential + Reciprocal
+		/// </summary>
+		AVX512ER = 33554432,
+		/// <summary>
+		/// AVX512 Vector Length Extensions
+		/// </summary>
+		AVX512VL = 67108864,
+		/// <summary>
+		/// AVX512 Byte + Word
+		/// </summary>
+		AVX512BW = 134217728,
+		/// <summary>
+		/// AVX512 Doubleword + Quadword
+		/// </summary>
+		AVX512DQ = 268435456,
+		/// <summary>
+		/// AVX512 Integer 52-bit Fused Multiply-Add
+		/// </summary>
+		AVX512IFMA = 536870912,
+		/// <summary>
+		/// AVX512 Vector Byte Manipulation Instructions
+		/// </summary>
+		AVX512VBMI = 1073741824,
+	};
+
 	/// <summary>
 	/// MMX instructions available
 	/// </summary>
@@ -218,6 +353,54 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// Returns true if any of the AVX512, AVX2, AVX1, or XOP feature sets are available
+	/// </summary>
+	bool HasAdvancedSSE()
+	{
+		return HW_AVX512F || HW_AVX2 || HW_AVX || HW_XOP;
+	}
+
+	/// <summary>
+	/// Returns true if SSE2 or greater is available
+	/// </summary>
+	bool HasMinIntrinsics()
+	{
+		return HW_AVX512F || HW_AVX2 || HW_AVX || HW_XOP || HW_SSE42 || HW_SSE41 || HW_SSE4A || HW_SSSE3 || HW_SSE3 || HW_SSE2;
+	}
+
+	/// <summary> 
+	/// Returns the best available SIMD feature set available
+	/// </summary>
+	FeatureSet HighestSSEVersion()
+	{
+		if (HW_AVX512F)
+			return FeatureSet::AVX512F;
+		else if (HW_AVX2)
+			return FeatureSet::AVX2;
+		else if (HW_AVX)
+			return FeatureSet::AVX;
+		else if (HW_XOP)
+			return FeatureSet::XOP;
+		else if (HW_SSE42)
+			return FeatureSet::SSE42;
+		else if (HW_SSE41)
+			return FeatureSet::SSE41;
+		else if (HW_SSE4A)
+			return FeatureSet::SSE4A;
+		else if (HW_SSSE3)
+			return FeatureSet::SSSE3;
+		else if (HW_SSE3)
+			return FeatureSet::SSE3;
+		else if (HW_SSE2)
+			return FeatureSet::SSE2;
+		else if (HW_SSE)
+			return FeatureSet::SSE;
+		else if (HW_MMX)
+			return FeatureSet::MMX;
+	}
+
+private:
 #if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
 	bool IsAVSSupported()
 	{

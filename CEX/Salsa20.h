@@ -288,12 +288,12 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 private:
+	void RoundBlock(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
 	void Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector);
 	void Increment(std::vector<uint> &Counter);
 	void Generate(const size_t Size, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset);
 	uint GetProcessorCount();
 	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-	void SalsaCore(std::vector<byte> &Output, const size_t OutOffset, const std::vector<uint> &Counter);
 	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);
 	void SetScope();
 };

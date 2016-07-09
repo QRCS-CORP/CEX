@@ -404,7 +404,7 @@ void Blake2Bp512::Update(uint8_t Input)
 void Blake2Bp512::DetectCpu()
 {
 	CEX::Common::CpuDetect detect;
-	m_hasIntrinsics = detect.HW_AVX || detect.HW_AVX2 || detect.HW_SSE2 || detect.HW_SSE3 || detect.HW_SSE41 || detect.HW_SSE42 || detect.HW_SSE4A || detect.HW_SSSE3 || detect.HW_XOP;
+	m_hasIntrinsics = detect.HasMinIntrinsics();
 }
 
 void Blake2Bp512::Increase(Blake2bState &State, uint64_t Length)
@@ -448,7 +448,7 @@ void Blake2Bp512::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffse
 {
 	Increase(State, Length);
 	if (m_hasIntrinsics)
-		Blake2BCompress::ICompress(Input, InOffset, State, m_cIV);
+		Blake2BCompress::SCompress(Input, InOffset, State, m_cIV);
 	else
 		Blake2BCompress::UCompress(Input, InOffset, State, m_cIV);
 }

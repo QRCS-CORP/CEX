@@ -4,8 +4,8 @@
 #include "Common.h"
 #include <sstream>
 
-#ifdef INTEL_INTRINSICS
-#include <stdlib.h>
+#if defined(HAS_MINSSE)
+#	include "Intrinsics.h"
 #endif
 
 NAMESPACE_UTILITY
@@ -1042,7 +1042,7 @@ public:
 
 	// ** Rotate ** //
 
-#if defined(INTEL_INTRINSICS) && defined(FORCE_ROTATION_INTRENSICS)
+#if defined(HAS_MINSSE) && defined(FORCE_ROTATION_INTRENSICS)
 #pragma intrinsic(_rotl, _lrotl, _rotl64, _rotr, _lrotr, _rotr64)
 
 	/// <summary>
@@ -1523,6 +1523,10 @@ public:
 	}
 
 	// ** Block XOR ** //
+
+
+
+
 
 	/// <summary>
 	/// Block XOR 4 bytes

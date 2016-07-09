@@ -11,6 +11,7 @@
 #include "../CEX/CFB.h"
 #include "../CEX/OFB.h"
 #include "../CEX/SHA512.h"
+#include "../CEX/ChaCha.h"
 #include "../CEX/Salsa20.h"
 
 namespace Test
@@ -28,6 +29,8 @@ namespace Test
 			OnProgress("***AES-NI (AHX): Monte Carlo test (K=256; R=14)***");
 			AHXSpeedTest();
 #endif
+			//for (size_t i = 0; i < 10; ++i)
+			//	ChaChaSpeedTest();
 			OnProgress("***RHX: Monte Carlo test (K=256; R=14)***");
 			RDXSpeedTest();
 			OnProgress("***RHX: Monte Carlo test (K=512; R=22)***");
@@ -41,6 +44,8 @@ namespace Test
 			OnProgress("***THX: Monte Carlo test (K=512; R=20)***");
 			THXSpeedTest();
 			OnProgress("***Salsa20: Monte Carlo test (K=256; R=20)***");
+			ChaChaSpeedTest();
+			OnProgress("***ChaCha: Monte Carlo test (K=256; R=20)***");
 			SalsaSpeedTest();
 
 			OnProgress("### CBC and CFB Parallel Decryption Speed Tests: 10 loops * 100MB ###");
@@ -241,6 +246,13 @@ namespace Test
 			delete engine;
 		//}
 #endif
+	}
+
+	void CipherSpeedTest::ChaChaSpeedTest()
+	{
+		CEX::Cipher::Symmetric::Stream::ChaCha* cipher = new CEX::Cipher::Symmetric::Stream::ChaCha();
+		ParallelStreamLoop(cipher, 32, 8);
+		delete cipher;
 	}
 
 	void CipherSpeedTest::RDXSpeedTest()

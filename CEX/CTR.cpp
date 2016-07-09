@@ -25,6 +25,7 @@ void CTR::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	m_blockCipher->Initialize(true, KeyParam);
 	m_ctrVector = KeyParam.IV();
+	m_threadVectors.resize(m_processorCount);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }

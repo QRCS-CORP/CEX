@@ -398,17 +398,18 @@ void CipherStream::BlockDecrypt(const std::vector<byte> &Input, size_t InOffset,
 		CalculateProgress(inpSize, count);
 	}
 
-	// last block
-	std::vector<byte> inpBuffer(blkSize);
-	memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
-	std::vector<byte> outBuffer(blkSize);
-	m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
-	size_t fnlSize = blkSize - m_cipherPadding->GetPaddingLength(outBuffer, 0);
-	memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
-	OutOffset += fnlSize;
-
-	if (Output.size() != OutOffset)
+	if (alnSize != inpSize)
+	{
+		// last block
+		std::vector<byte> inpBuffer(blkSize);
+		memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
+		std::vector<byte> outBuffer(blkSize);
+		m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
+		size_t fnlSize = blkSize - m_cipherPadding->GetPaddingLength(outBuffer, 0);
+		memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
+		OutOffset += fnlSize;
 		Output.resize(OutOffset);
+	}
 
 	CalculateProgress(inpSize, OutOffset);
 }

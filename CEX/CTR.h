@@ -143,8 +143,8 @@ public:
 	/// </summary>
 	virtual void ParallelBlockSize(size_t BlockSize)
 	{
-		m_parallelBlockSize = BlockSize;
 		SetScope();
+		m_parallelBlockSize = BlockSize;
 	}
 
 	/// <summary>

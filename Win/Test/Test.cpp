@@ -143,7 +143,7 @@ int main()
 	{
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
-
+		RunTest(new CipherStreamTest());
 		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");

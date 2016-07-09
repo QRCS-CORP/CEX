@@ -1,10 +1,10 @@
 #ifndef _CEXENGINE_BLAKE2SCOMPRESS_H
 #define _CEXENGINE_BLAKE2SCOMPRESS_H
 
-#if defined(HAS_ADVINTRIN)
+#include "IntUtils.h"
+#if defined(HAS_MINSSE)
 #	include "Intrinsics.h"
 #endif
-#include "IntUtils.h"
 
 NAMESPACE_DIGEST
 
@@ -12,7 +12,7 @@ class Blake2SCompress
 {
 public:
 
-#if defined(HAS_ADVINTRIN)
+#if defined(HAS_MINSSE)
 #	if defined(HAS_XOP)
 #		define TOB(x) ((x)*4*0x01010101 + 0x03020100) 
 #	endif
@@ -35,9 +35,9 @@ public:
 #endif
 
 	template <typename T>
-	static inline void ICompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
+	static inline void SCompress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
 	{
-#if defined(HAS_ADVINTRIN)
+#if defined(HAS_MINSSE)
 		__m128i row1, row2, row3, row4;
 		__m128i buf1, buf2, buf3, buf4;
 		__m128i ff0, ff1;
