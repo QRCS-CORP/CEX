@@ -398,6 +398,8 @@ public:
 			return FeatureSet::SSE;
 		else if (HW_MMX)
 			return FeatureSet::MMX;
+		else
+			return FeatureSet::NONE;
 	}
 
 private:

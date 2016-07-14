@@ -126,6 +126,7 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<uint> m_expKey;
+	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	size_t m_ikmSize;
 	bool m_isDestroyed;
@@ -135,7 +136,7 @@ private:
 	CEX::Enumeration::Digests m_kdfEngineType;
 	std::vector<size_t> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
-	std::vector<uint> m_sprBox;
+	std::vector<uint> m_sBox;
 
 public:
 
@@ -162,6 +163,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::THX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -208,6 +214,7 @@ public:
 		:
 		m_destroyEngine(false),
 		m_dfnRounds(Rounds),
+		m_hasIntrinsics(true),
 		m_hkdfInfo(0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -216,7 +223,7 @@ public:
 		m_kdfEngine(KdfEngine),
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(9, 0),
-		m_sprBox(SBOX_SIZE, 0)
+		m_sBox(SBOX_SIZE, 0)
 	{
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("THX:CTor", "Invalid null parameter! The digest instance can not be null.");
@@ -257,6 +264,7 @@ public:
 		:
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
+		m_hasIntrinsics(true),
 		m_hkdfInfo(0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -266,7 +274,7 @@ public:
 		m_kdfEngineType(KdfEngineType),
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(0, 0),
-		m_sprBox(SBOX_SIZE, 0)
+		m_sBox(SBOX_SIZE, 0)
 	{
 		// add standard key lengths
 		m_legalKeySizes[0] = 16;
@@ -392,46 +400,64 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
+	/// <summary>
+	/// Transform 4 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input UInt128 to Transform</param>
+	/// <param name="Output">UInt128 Output product of Transform</param>
+	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
 private:
+
+	template<typename T, typename U>
+	T I4Fe0(const T &X, const std::vector<U> &M)
+	{
+		return T(
+			M[2 * X.Register.m128i_u8[12]] ^ m_sBox[2 * X.Register.m128i_u8[13] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[14] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[15] + 0x201],
+			M[2 * X.Register.m128i_u8[8]] ^ m_sBox[2 * X.Register.m128i_u8[9] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[10] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[11] + 0x201],
+			M[2 * X.Register.m128i_u8[4]] ^ m_sBox[2 * X.Register.m128i_u8[5] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[6] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[7] + 0x201],
+			M[2 * X.Register.m128i_u8[0]] ^ m_sBox[2 * X.Register.m128i_u8[1] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[2] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[3] + 0x201]
+		);
+	}
+
+	template<typename T, typename U>
+	T I4Fe3(const T &X, const std::vector<U> &M)
+	{
+		return T(
+			M[2 * X.Register.m128i_u8[12] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[13] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[14] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[15]],
+			M[2 * X.Register.m128i_u8[8] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[9] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[10] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[11]],
+			M[2 * X.Register.m128i_u8[4] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[5] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[6] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[7]],
+			M[2 * X.Register.m128i_u8[0] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[1] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[2] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[3]]
+		);
+	}
+
+	template<typename T, typename U>
+	T Fe0(const T X, std::vector<U> &M)
+	{
+		return M[2 * (byte)X] ^ m_sBox[2 * (byte)(X >> 8) + 0x001] ^ m_sBox[2 * (byte)(X >> 16) + 0x200] ^ m_sBox[2 * (byte)(X >> 24) + 0x201];
+	}
+
+	template<typename T, typename U>
+	T Fe3(const T X, const std::vector<U> &M)
+	{
+		return M[2 * (byte)X + 0x001] ^ m_sBox[2 * (byte)(X >> 8) + 0x200] ^ m_sBox[2 * (byte)(X >> 16) + 0x201] ^ m_sBox[2 * (byte)(X >> 24)];
+	}
+
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
-	uint MDSEncode(uint K0, uint K1);
-	uint THX::Mix32(const uint X, const std::vector<uint> &Key, const size_t Count);
+	uint EncodeMDS(uint K0, uint K1);
+	uint Mix4(const uint X, const std::vector<uint> &Key, const size_t Count);
+	void Mix16(const uint X, const std::vector<byte> &Key, const size_t Count, std::vector<uint> &Output);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
-
-	inline uint Fe0(uint X)
-	{
-		return m_sprBox[2 * (byte)X] ^ m_sprBox[2 * (byte)(X >> 8) + 0x001] ^ m_sprBox[2 * (byte)(X >> 16) + 0x200] ^ m_sprBox[2 * (byte)(X >> 24) + 0x201];
-	}
-
-	inline uint Fe3(uint X)
-	{
-		return m_sprBox[2 * (byte)(X >> 24)] ^ m_sprBox[2 * (byte)X + 0x001] ^ m_sprBox[2 * (byte)(X >> 8) + 0x200] ^ m_sprBox[2 * (byte)(X >> 16) + 0x201];
-	}
-
-	inline uint LFSR1(uint X)
-	{
-		return (X >> 1) ^ (((X & 0x01) != 0) ? GF256_FDBK_2 : 0);
-	}
-
-	inline uint LFSR2(uint X)
-	{
-		return (X >> 2) ^ (((X & 0x02) != 0) ? GF256_FDBK_2 : 0) ^ (((X & 0x01) != 0) ? GF256_FDBK_4 : 0);
-	}
-
-	inline uint MX(uint X)
-	{
-		return X ^ LFSR2(X);
-	}
-
-	inline uint MXY(uint X)
-	{
-		return X ^ LFSR1(X) ^ LFSR2(X);
-	}
 };
 
 NAMESPACE_BLOCKEND

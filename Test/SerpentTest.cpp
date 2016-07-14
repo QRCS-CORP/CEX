@@ -1,4 +1,5 @@
 #include "SerpentTest.h"
+#include "../CEX/CTR.h"
 #include "../CEX/SHX.h"
 #include "../CEX/IntUtils.h"
 
@@ -9,6 +10,8 @@ namespace Test
 		try
 		{
 			using namespace TestFiles::Nessie;
+
+			CompareOutput();
 
 			std::vector<byte> cip(16, 0);
 			std::vector<byte> key(16, 0);
@@ -23,6 +26,9 @@ namespace Test
 			std::string mntStr;
 			std::string mnt1kStr;
 
+			std::string rcnt; 
+			std::string klen; 
+			std::string resp;
 			TestUtils::Read(serpentcipher128, cipStr);
 			TestUtils::Read(serpentkey128, keyStr);
 			TestUtils::Read(serpentplain128, plnStr);
@@ -38,21 +44,17 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(i, 32), key);
 				HexConverter::Decode(plnStr.substr(i, 32), pln);
 
-				// reversed endian order in Nessie test vectors
+				// *note* reversed endian ordered keys in Nessie test vectors
 				TestUtils::Reverse(key);
-				TestUtils::Reverse(cip);
-				TestUtils::Reverse(pln);
 
 				if (doMonte)
 				{
 					HexConverter::Decode(mntStr.substr(i, 32), mnt);
-					TestUtils::Reverse(mnt);
 					// monte carlo 100 rounds
 					CompareMonteCarlo(key, pln, mnt);
 					rcount += 100;
 					// 1000 rounds
 					HexConverter::Decode(mnt1kStr.substr(i, 32), mnt);
-					TestUtils::Reverse(mnt);
 					CompareMonteCarlo(key, pln, mnt, 1000);
 					rcount += 1000;
 				}
@@ -60,10 +62,10 @@ namespace Test
 				// vector comparison
 				CompareVector(key, pln, cip);
 			}
-
-			std::string rcnt = CEX::Utility::IntUtils::ToString(rcount);
-			std::string klen = CEX::Utility::IntUtils::ToString((int)(keyStr.size() / 32));
-			std::string resp = "Serpent128: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
+			//
+			rcnt = CEX::Utility::IntUtils::ToString(rcount);
+			klen = CEX::Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			resp = "Serpent128: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
 			OnProgress(const_cast<char*>(resp.c_str()));
 			rcount = 0;
 
@@ -81,21 +83,16 @@ namespace Test
 				HexConverter::Decode(cipStr.substr(i, 32), cip);
 				HexConverter::Decode(keyStr.substr(j, 48), key);
 				HexConverter::Decode(plnStr.substr(i, 32), pln);
-
 				TestUtils::Reverse(key);
-				TestUtils::Reverse(cip);
-				TestUtils::Reverse(pln);
 
 				if (doMonte)
 				{
 					HexConverter::Decode(mntStr.substr(i, 32), mnt);
-					TestUtils::Reverse(mnt);
 					// monte carlo 100 rounds
 					CompareMonteCarlo(key, pln, mnt);
 					rcount += 100;
 					// 1000 rounds
 					HexConverter::Decode(mnt1kStr.substr(i, 32), mnt);
-					TestUtils::Reverse(mnt);
 					CompareMonteCarlo(key, pln, mnt, 1000);
 					rcount += 1000;
 				}
@@ -125,21 +122,16 @@ namespace Test
 				HexConverter::Decode(cipStr.substr(i, 32), cip);
 				HexConverter::Decode(keyStr.substr(j, 64), key);
 				HexConverter::Decode(plnStr.substr(i, 32), pln);
-
 				TestUtils::Reverse(key);
-				TestUtils::Reverse(cip);
-				TestUtils::Reverse(pln);
 
 				if (doMonte)
 				{
 					HexConverter::Decode(mntStr.substr(i, 32), mnt);
-					TestUtils::Reverse(mnt);
 					// monte carlo 100 rounds
 					CompareMonteCarlo(key, pln, mnt);
 					rcount += 100;
 					// 1000 rounds
 					HexConverter::Decode(mnt1kStr.substr(i, 32), mnt);
-					TestUtils::Reverse(mnt);
 					CompareMonteCarlo(key, pln, mnt, 1000);
 					rcount += 1000;
 				}
@@ -168,6 +160,32 @@ namespace Test
 		{
 			throw TestException(std::string(FAILURE + " : Internal Error"));
 		}
+	}
+
+	void CompareIntrinsics()
+	{
+		/*std::vector<byte> inBytes(16, 0);
+		std::vector<byte> outBytes(16, 0);
+		std::vector<byte> key(32, 0);
+		std::vector<byte> iv(16, 0);
+
+		CEX::Cipher::Symmetric::Block::SHX* enc;
+		CEX::Cipher::Symmetric::Block::Mode::CTR cipher(enc);
+		CEX::Common::KeyParams k(key, iv);
+
+		cipher.Initialize(true, k);
+		cipher.Transform(inBytes, outBytes);
+
+		if (Output != outBytes)
+			throw std::string("Serpent Vector: Arrays are not equal!");
+
+		//TestUtils::Reverse(outBytes);
+		CEX::Cipher::Symmetric::Block::SHX dec;
+		dec.Initialize(false, k);
+		dec.DecryptBlock(outBytes, expBytes);
+
+		if (Input != expBytes)
+			throw std::string("Serpent Vector: Arrays are not equal!");*/
 	}
 
 	void SerpentTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, unsigned int Count)
@@ -213,21 +231,25 @@ namespace Test
 
 	void SerpentTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
-		std::vector<byte> outBytes(Output.size(), 0);
+		std::vector<byte> expBytes(16, 0);
+		std::vector<byte> outBytes(16, 0);
+		std::vector<byte> inBytes(16, 0);
+		memcpy(&inBytes[0], &Input[0], 16);
+
 		CEX::Cipher::Symmetric::Block::SHX enc;
 		CEX::Common::KeyParams k(Key);
 		enc.Initialize(true, k);
-		enc.EncryptBlock(Input, outBytes);
+		enc.EncryptBlock(inBytes, outBytes);
 
 		if (Output != outBytes)
 			throw std::string("Serpent Vector: Arrays are not equal!");
 
+		//TestUtils::Reverse(outBytes);
 		CEX::Cipher::Symmetric::Block::SHX dec;
-		//CEX::Common::KeyParams k2(Key);
 		dec.Initialize(false, k);
-		dec.DecryptBlock(Output, outBytes);
+		dec.DecryptBlock(outBytes, expBytes);
 
-		if (Input != outBytes)
+		if (Input != expBytes)
 			throw std::string("Serpent Vector: Arrays are not equal!");
 	}
 

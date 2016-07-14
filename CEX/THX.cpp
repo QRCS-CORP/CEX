@@ -1,9 +1,13 @@
 #include "THX.h"
 #include "Twofish.h"
+#include "CpuDetect.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
 #include "IntUtils.h"
+#if defined(HAS_MINSSE)
+#	include "UInt128.h"
+#endif
 
 NAMESPACE_BLOCK
 
@@ -28,7 +32,7 @@ void THX::Destroy()
 		m_isInitialized = false;
 
 		CEX::Utility::IntUtils::ClearVector(m_expKey);
-		CEX::Utility::IntUtils::ClearVector(m_sprBox);
+		CEX::Utility::IntUtils::ClearVector(m_sBox);
 		CEX::Utility::IntUtils::ClearVector(m_hkdfInfo);
 		CEX::Utility::IntUtils::ClearVector(m_legalKeySizes);
 		CEX::Utility::IntUtils::ClearVector(m_legalRounds);
@@ -103,6 +107,14 @@ void THX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		DecryptBlock(Input, InOffset, Output, OutOffset);
 }
 
+void THX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt64(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt64(Input, InOffset, Output, OutOffset);
+}
+
 void THX::ExpandKey(const std::vector<byte> &Key)
 {
 	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
@@ -160,33 +172,23 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 		oKm[i] = CEX::Utility::IntUtils::BytesToLe32(rawKey, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		CEX::Utility::IntUtils::Le32ToBytes(MDSEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		CEX::Utility::IntUtils::Le32ToBytes(EncodeMDS(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	keyCtr = 0;
+	std::vector<uint> sMix(4);
 
-	while (keyCtr < KEY_BITS)
+	while (keyCtr != KEY_BITS)
 	{
 		Y0 = Y1 = Y2 = Y3 = (uint)keyCtr;
-
-		Y0 = (byte)Q1[Y0] ^ sbKey[12];
-		Y1 = (byte)Q0[Y1] ^ sbKey[13];
-		Y2 = (byte)Q0[Y2] ^ sbKey[14];
-		Y3 = (byte)Q1[Y3] ^ sbKey[15];
-
-		Y0 = (byte)Q1[Y0] ^ sbKey[8];
-		Y1 = (byte)Q1[Y1] ^ sbKey[9];
-		Y2 = (byte)Q0[Y2] ^ sbKey[10];
-		Y3 = (byte)Q0[Y3] ^ sbKey[11];
-
-		// sbox members as MDS matrix multiplies 
-		m_sprBox[keyCtr * 2] = MDS0[(byte)Q0[(byte)Q0[Y0] ^ sbKey[4]] ^ sbKey[0]];
-		m_sprBox[keyCtr * 2 + 1] = MDS1[(byte)Q0[Q1[Y1] ^ sbKey[5]] ^ sbKey[1]];
-		m_sprBox[keyCtr * 2 + 0x200] = MDS2[(byte)Q1[(byte)Q0[Y2] ^ sbKey[6]] ^ sbKey[2]];
-		m_sprBox[keyCtr++ * 2 + 0x201] = MDS3[(byte)Q1[(byte)Q1[Y3] ^ sbKey[7]] ^ sbKey[3]];
+		Mix16((uint)keyCtr, sbKey, Key.size(), sMix);
+		m_sBox[keyCtr * 2] = sMix[0];
+		m_sBox[keyCtr * 2 + 1] = sMix[1];
+		m_sBox[keyCtr * 2 + 0x200] = sMix[2];
+		m_sBox[keyCtr * 2 + 0x201] = sMix[3];
+		++keyCtr;
 	}
 
-	// key processed
 	m_expKey = wK;
 }
 
@@ -213,77 +215,37 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 		oKm[i] = CEX::Utility::IntUtils::BytesToLe32(Key, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		CEX::Utility::IntUtils::Le32ToBytes(MDSEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		CEX::Utility::IntUtils::Le32ToBytes(EncodeMDS(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
-	keyCtr = 0;
+	// gen s-box members
+	keyCtr = Y0 = Y1 = Y2 = Y3 = 0;
+	std::vector<uint> sMix(4);
 
-	while (keyCtr < KEY_BITS)
+	while (keyCtr != KEY_BITS)
 	{
-		// create the expanded keys
-		if (keyCtr < (int)(wK.size() / 2))
+		// create the expanded key
+		if (keyCtr < (wK.size() / 2))
 		{
-			Q = (uint)(keyCtr * SK_STEP);
-			A = Mix32(Q, eKm, k64Cnt);
-			B = Mix32(Q + SK_BUMP, oKm, k64Cnt);
+			Q = keyCtr * SK_STEP;
+			A = Mix4(Q, eKm, k64Cnt);
+			B = Mix4(Q + SK_BUMP, oKm, k64Cnt);
 			B = B << 8 | (uint)(B >> 24);
 			A += B;
 			wK[keyCtr * 2] = A;
 			A += B;
-			wK[keyCtr * 2 + 1] = A << SK_ROTL | (long)(A >> (32 - SK_ROTL));
+			wK[keyCtr * 2 + 1] = A << SK_ROTL | (uint)(A >> (32 - SK_ROTL));
 		}
 
-		// gen s-box members
 		Y0 = Y1 = Y2 = Y3 = (uint)keyCtr;
-
-		// 512 key
-		if (Key.size() == 64)
-		{
-			Y0 = (byte)Q1[Y0] ^ sbKey[28];
-			Y1 = (byte)Q0[Y1] ^ sbKey[29];
-			Y2 = (byte)Q0[Y2] ^ sbKey[30];
-			Y3 = (byte)Q1[Y3] ^ sbKey[31];
-
-			Y0 = (byte)Q1[Y0] ^ sbKey[24];
-			Y1 = (byte)Q1[Y1] ^ sbKey[25];
-			Y2 = (byte)Q0[Y2] ^ sbKey[26];
-			Y3 = (byte)Q0[Y3] ^ sbKey[27];
-
-			Y0 = (byte)Q0[Y0] ^ sbKey[20];
-			Y1 = (byte)Q1[Y1] ^ sbKey[21];
-			Y2 = (byte)Q1[Y2] ^ sbKey[22];
-			Y3 = (byte)Q0[Y3] ^ sbKey[23];
-
-			Y0 = (byte)Q0[Y0] ^ sbKey[16];
-			Y1 = (byte)Q0[Y1] ^ sbKey[17];
-			Y2 = (byte)Q1[Y2] ^ sbKey[18];
-			Y3 = (byte)Q1[Y3] ^ sbKey[19];
-		}
-		// 256 key
-		if (Key.size() > 24)
-		{
-			Y0 = (byte)Q1[Y0] ^ sbKey[12];
-			Y1 = (byte)Q0[Y1] ^ sbKey[13];
-			Y2 = (byte)Q0[Y2] ^ sbKey[14];
-			Y3 = (byte)Q1[Y3] ^ sbKey[15];
-		}
-		// 192 key
-		if (Key.size() > 16)
-		{
-			Y0 = (byte)Q1[Y0] ^ sbKey[8];
-			Y1 = (byte)Q1[Y1] ^ sbKey[9];
-			Y2 = (byte)Q0[Y2] ^ sbKey[10];
-			Y3 = (byte)Q0[Y3] ^ sbKey[11];
-		}
-
-		// sbox members as MDS matrix multiplies 
-		m_sprBox[keyCtr * 2] = MDS0[(byte)Q0[(byte)Q0[Y0] ^ sbKey[4]] ^ sbKey[0]];
-		m_sprBox[keyCtr * 2 + 1] = MDS1[(byte)Q0[Q1[Y1] ^ sbKey[5]] ^ sbKey[1]];
-		m_sprBox[(keyCtr * 2) + 0x200] = MDS2[(byte)Q1[(byte)Q0[Y2] ^ sbKey[6]] ^ sbKey[2]];
-		m_sprBox[keyCtr++ * 2 + 0x201] = MDS3[(byte)Q1[(byte)Q1[Y3] ^ sbKey[7]] ^ sbKey[3]];
+		Mix16((uint)keyCtr, sbKey, Key.size(), sMix);
+		m_sBox[keyCtr * 2] = sMix[0];
+		m_sBox[keyCtr * 2 + 1] = sMix[1];
+		m_sBox[keyCtr * 2 + 0x200] = sMix[2];
+		m_sBox[keyCtr * 2 + 0x201] = sMix[3];
+		++keyCtr;
 	}
 
-	// expanded key
 	m_expKey = wK;
 }
 
@@ -302,26 +264,90 @@ void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	keyCtr = m_expKey.size();
 	do
 	{
-		// round 1
-		T0 = Fe0(X2);
-		T1 = Fe3(X3);
+		T0 = Fe0(X2, m_sBox);
+		T1 = Fe3(X3, m_sBox);
 		X1 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
-		X0 = (X0 << 1 | (X0 >> 31)) ^ (T0 + T1 + m_expKey[--keyCtr]);
-		X1 = (X1 >> 1) | X1 << 31;
-		// round 2
-		T0 = Fe0(X0);
-		T1 = Fe3(X1);
-		X3 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
-		X2 = (X2 << 1 | (X2 >> 31)) ^ (T0 + T1 + m_expKey[--keyCtr]);
-		X3 = (X3 >> 1) | X3 << 31;
+		X0 = (X0 << 1) | (X0 >> 31);
+		X0 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X1 = (X1 >> 1) | (X1 << 31);
 
-	} while (keyCtr != LRD);
+		T0 = Fe0(X0, m_sBox);
+		T1 = Fe3(X1, m_sBox);
+		X3 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
+		X2 = (X2 << 1) | (X2 >> 31);
+		X2 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X3 = (X3 >> 1) | (X3 << 31);
+	} 
+	while (keyCtr != LRD);
 
 	keyCtr = 0;
 	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
 	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
 	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
 	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
+}
+
+void THX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+#if defined(HAS_MINSSE)
+
+	const size_t LRD = 8;
+	size_t keyCtr = 4;
+
+	// input round
+	CEX::Common::UInt128 X2(Input, InOffset);
+	CEX::Common::UInt128 X3(Input, InOffset + 16);
+	CEX::Common::UInt128 X0(Input, InOffset + 32);
+	CEX::Common::UInt128 X1(Input, InOffset + 48);
+	CEX::Common::UInt128::Transpose(X2, X3, X0, X1);
+	CEX::Common::UInt128 T0, T1;
+	CEX::Common::UInt128 N2(2);
+
+	X2 ^= m_expKey[keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+	X0 ^= m_expKey[++keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+
+	keyCtr = m_expKey.size();
+	do
+	{
+		T0 = I4Fe0(X2, m_sBox);
+		T1 = I4Fe3(X3, m_sBox);
+		X1 ^= T0 + N2 * T1 + m_expKey[--keyCtr];
+		X0 = (X0 << 1) | (X0 >> 31);
+		X0 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X1 = (X1 >> 1) | (X1 << 31);
+
+		T0 = I4Fe0(X0, m_sBox);
+		T1 = I4Fe3(X1, m_sBox);
+		X3 ^= T0 + N2 * T1 + m_expKey[--keyCtr];
+		X2 = (X2 << 1) | (X2 >> 31);
+		X2 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X3 = (X3 >> 1) | (X3 << 31);
+	} 
+	while (keyCtr != LRD);
+
+	// last round
+	keyCtr = 0;
+	X0 ^= m_expKey[keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+	X2 ^= m_expKey[++keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+
+	CEX::Common::UInt128::Transpose(X0, X1, X2, X3);
+	X0.StoreLE(Output, OutOffset);
+	X1.StoreLE(Output, OutOffset + 16);
+	X2.StoreLE(Output, OutOffset + 32);
+	X3.StoreLE(Output, OutOffset + 48);
+
+#else
+
+	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+
+#endif
 }
 
 void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -337,67 +363,137 @@ void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	keyCtr = 7;
 	do
 	{
-		T0 = Fe0(X0);
-		T1 = Fe3(X1);
+		T0 = Fe0(X0, m_sBox);
+		T1 = Fe3(X1, m_sBox);
 		X2 ^= T0 + T1 + m_expKey[++keyCtr];
-		X2 = (X2 >> 1) | X2 << 31;
-		X3 = (X3 << 1 | (X3 >> 31)) ^ (T0 + 2 * T1 + m_expKey[++keyCtr]);
+		X2 = (X2 >> 1) | (X2 << 31);
+		X3 = (X3 << 1) | (X3 >> 31);
+		X3 ^= (T0 + 2 * T1 + m_expKey[++keyCtr]);
 
-		T0 = Fe0(X2);
-		T1 = Fe3(X3);
+		T0 = Fe0(X2, m_sBox);
+		T1 = Fe3(X3, m_sBox);
 		X0 ^= T0 + T1 + m_expKey[++keyCtr];
-		X0 = (X0 >> 1) | X0 << 31;
-		X1 = (X1 << 1 | (X1 >> 31)) ^ (T0 + 2 * T1 + m_expKey[++keyCtr]);
-
-	} while (keyCtr != LRD);
+		X0 = (X0 >> 1) | (X0 << 31);
+		X1 = (X1 << 1) | (X1 >> 31);
+		X1 ^= (T0 + 2 * T1 + m_expKey[++keyCtr]);
+	} 
+	while (keyCtr != LRD);
 
 	keyCtr = 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[keyCtr], Output, OutOffset);
-	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
+	X2 ^= m_expKey[keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+	X0 ^= m_expKey[++keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+
+	CEX::Utility::IntUtils::Le32ToBytes(X2, Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(X3, Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(X0, Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(X1, Output, OutOffset + 12);
+}
+
+void THX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+#if defined(HAS_MINSSE)
+
+	const size_t LRD = m_expKey.size() - 1;
+	size_t keyCtr = 0;
+
+	// input round
+	CEX::Common::UInt128 X0(Input, InOffset);
+	CEX::Common::UInt128 X1(Input, InOffset + 16);
+	CEX::Common::UInt128 X2(Input, InOffset + 32);
+	CEX::Common::UInt128 X3(Input, InOffset + 48);
+	CEX::Common::UInt128::Transpose(X0, X1, X2, X3);
+	CEX::Common::UInt128 T0, T1;
+	CEX::Common::UInt128 N2(2);
+
+	X0 ^= m_expKey[keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+	X2 ^= m_expKey[++keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+	
+	keyCtr = 7;
+	do
+	{
+		T0 = I4Fe0(X0, m_sBox);
+		T1 = I4Fe3(X1, m_sBox);
+		X2 ^= T0 + T1 + m_expKey[++keyCtr];
+		X2 = (X2 >> 1) | (X2 << 31);
+		X3 = (X3 << 1) | (X3 >> 31);
+		X3 ^= (T0 + N2 * T1 + m_expKey[++keyCtr]);
+
+		T0 = I4Fe0(X2, m_sBox);
+		T1 = I4Fe3(X3, m_sBox);
+		X0 ^= T0 + T1 + m_expKey[++keyCtr];
+		X0 = (X0 >> 1) | (X0 << 31);
+		X1 = ((X1 << 1) | (X1 >> 31));
+		X1 ^= (T0 + N2 * T1 + m_expKey[++keyCtr]);
+	} 
+	while (keyCtr != LRD);
+
+	// last round
+	keyCtr = 4;
+	X2 ^= m_expKey[keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+	X0 ^= m_expKey[++keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+
+	CEX::Common::UInt128::Transpose(X2, X3, X0, X1);
+	X2.StoreLE(Output, OutOffset);
+	X3.StoreLE(Output, OutOffset + 16);
+	X0.StoreLE(Output, OutOffset + 32);
+	X1.StoreLE(Output, OutOffset + 48);
+
+#else
+
+	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+
+#endif
 }
 
 // *** Helpers *** //
 
-uint THX::MDSEncode(uint K0, uint K1)
+uint THX::EncodeMDS(uint K0, uint K1)
 {
-	uint b = ((K1 >> 24) & 0xff);
-	uint g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	uint g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	uint rt = ((K1 << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
+	uint B = ((K1 >> 24) & 0xff);
+	uint G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	uint G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	uint temp = ((K1 << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
 
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
-	rt ^= K0;
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
-	b = ((rt >> 24) & 0xff);
-	g2 = ((b << 1) ^ ((b & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
-	g3 = ((b >> 1) ^ ((b & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ g2;
-	rt = ((rt << 8) ^ (g3 << 24) ^ (g2 << 16) ^ (g3 << 8) ^ b);
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	temp ^= K0;
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	B = ((temp >> 24) & 0xff);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xff;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
 
-	return rt;
+	return temp;
 }
 
 CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
@@ -417,7 +513,7 @@ int THX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
 }
 
-uint THX::Mix32(const uint X, const std::vector<uint> &Key, const size_t Count)
+uint THX::Mix4(const uint X, const std::vector<uint> &Key, const size_t Count)
 {
 	uint Y0 = (byte)X;
 	uint Y1 = (byte)(X >> 8);
@@ -465,10 +561,62 @@ uint THX::Mix32(const uint X, const std::vector<uint> &Key, const size_t Count)
 	}
 
 	// return the MDS matrix multiply
-	return MDS0[(byte)Q0[(byte)Q0[Y0] ^ (byte)Key[1]] ^ (byte)Key[0]] ^
-		MDS1[(byte)Q0[(byte)Q1[Y1] ^ (byte)(Key[1] >> 8)] ^ (byte)(Key[0] >> 8)] ^
-		MDS2[(byte)Q1[(byte)Q0[Y2] ^ (byte)(Key[1] >> 16)] ^ (byte)(Key[0] >> 16)] ^
-		MDS3[(byte)Q1[(byte)Q1[Y3] ^ (byte)(Key[1] >> 24)] ^ (byte)(Key[0] >> 24)];
+	return M0[(byte)Q0[(byte)Q0[Y0] ^ (byte)Key[1]] ^ (byte)Key[0]] ^
+		M1[(byte)Q0[(byte)Q1[Y1] ^ (byte)(Key[1] >> 8)] ^ (byte)(Key[0] >> 8)] ^
+		M2[(byte)Q1[(byte)Q0[Y2] ^ (byte)(Key[1] >> 16)] ^ (byte)(Key[0] >> 16)] ^
+		M3[(byte)Q1[(byte)Q1[Y3] ^ (byte)(Key[1] >> 24)] ^ (byte)(Key[0] >> 24)];
+}
+
+void THX::Mix16(const uint X, const std::vector<byte> &Key, const size_t Count, std::vector<uint> &Output)
+{
+	uint Y0, Y1, Y2, Y3;
+	Y0 = Y1 = Y2 = Y3 = X;
+
+	if (Count == 64)
+	{
+		Y0 = (byte)(Q1[Y0] ^ Key[28]);
+		Y1 = (byte)(Q0[Y1] ^ Key[29]);
+		Y2 = (byte)(Q0[Y2] ^ Key[30]);
+		Y3 = (byte)(Q1[Y3] ^ Key[31]);
+
+		Y0 = (byte)(Q1[Y0] ^ Key[24]);
+		Y1 = (byte)(Q1[Y1] ^ Key[25]);
+		Y2 = (byte)(Q0[Y2] ^ Key[26]);
+		Y3 = (byte)(Q0[Y3] ^ Key[27]);
+
+		Y0 = (byte)(Q0[Y0] ^ Key[20]);
+		Y1 = (byte)(Q1[Y1] ^ Key[21]);
+		Y2 = (byte)(Q1[Y2] ^ Key[22]);
+		Y3 = (byte)(Q0[Y3] ^ Key[23]);
+
+		Y0 = (byte)(Q0[Y0] ^ Key[16]);
+		Y1 = (byte)(Q0[Y1] ^ Key[17]);
+		Y2 = (byte)(Q1[Y2] ^ Key[18]);
+		Y3 = (byte)(Q1[Y3] ^ Key[19]);
+	}
+	if (Count > 24)
+	{
+		Y0 = (byte)(Q1[Y0] ^ Key[12]);
+		Y1 = (byte)(Q0[Y1] ^ Key[13]);
+		Y2 = (byte)(Q0[Y2] ^ Key[14]);
+		Y3 = (byte)(Q1[Y3] ^ Key[15]);
+	}
+	if (Count > 16)
+	{
+		Y0 = (byte)(Q1[Y0] ^ Key[8]);
+		Y1 = (byte)(Q1[Y1] ^ Key[9]);
+		Y2 = (byte)(Q0[Y2] ^ Key[10]);
+		Y3 = (byte)(Q0[Y3] ^ Key[11]);
+	}
+
+	std::vector<uint> tmp {
+		M0[Q0[Q0[Y0] ^ Key[4]] ^ Key[0]],
+		M1[Q0[Q1[Y1] ^ Key[5]] ^ Key[1]],
+		M2[Q1[Q0[Y2] ^ Key[6]] ^ Key[2]],
+		M3[Q1[Q1[Y3] ^ Key[7]] ^ Key[3]]
+	};
+
+	Output = tmp;
 }
 
 NAMESPACE_BLOCKEND

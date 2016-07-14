@@ -49,10 +49,10 @@ public:
 #		endif
 #    endif
 
-#    if defined(HAS_SSSE3) && !defined(HAS_XOP)
+//#    if defined(HAS_SSSE3) && !defined(HAS_XOP)
 		const __m128i r8 = _mm_set_epi8(12, 15, 14, 13, 8, 11, 10, 9, 4, 7, 6, 5, 0, 3, 2, 1);
 		const __m128i r16 = _mm_set_epi8(13, 12, 15, 14, 9, 8, 11, 10, 5, 4, 7, 6, 1, 0, 3, 2);
-#    endif
+//#    endif
 
 #    if defined(HAS_SSE4)
 		const __m128i m0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);

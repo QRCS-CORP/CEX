@@ -6,7 +6,9 @@
 #include <stdio.h>
 
 #ifdef _WIN32
-#include <Windows.h>
+#	include <Windows.h>
+//#else
+//#	include <cstdlib> 
 #endif
 
 class ConsoleUtils
@@ -18,7 +20,9 @@ public:
 		RECT r;
 		HWND console = GetConsoleWindow();
 		GetWindowRect(console, &r);
-		MoveWindow(console, r.left, r.top, 800, 600, TRUE);
+		MoveWindow(console, r.left, r.top, 800, 800, TRUE);
+#else
+//	system("MODE CON COLS=120 LINES=80"); // ToDo: scrollbar?
 #endif
 	}
 

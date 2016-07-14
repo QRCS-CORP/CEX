@@ -53,6 +53,7 @@ namespace Test
 		virtual std::string Run();
         
     private:
+		void CompareIntrinsics();
 		void CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, unsigned int Count = 100);
 		void CompareOutput();
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);

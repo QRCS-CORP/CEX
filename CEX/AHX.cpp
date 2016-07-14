@@ -2,6 +2,7 @@
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
+#include "UInt128.h"
 #include "IntUtils.h"
 
 NAMESPACE_BLOCK
@@ -101,6 +102,14 @@ void AHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		DecryptBlock(Input, InOffset, Output, OutOffset);
 }
 
+void AHX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt64(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt64(Input, InOffset, Output, OutOffset);
+}
+
 // *** Key Schedule *** //
 
 void AHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
@@ -173,7 +182,7 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 
 	// copy bytes to working key
 	for (size_t i = 0, j = 0; i < keySize; ++i, j += 16)
-		m_expKey[i] = _mm_loadu_si128((const __m128i*)(const void*)&rawKey[j]);
+		m_expKey[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&rawKey[j]));
 }
 
 void AHX::StandardExpand(const std::vector<byte> &Key)
@@ -323,7 +332,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 	memcpy((byte*)m_expKey.data() + Offset, &tmp, 4);
 }
 
-void AHX::ExpandRotBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset)
+void AHX::ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset)
 {
 	// 128, 256, 512 bit key method
 	__m128i pkb = Key[Index - Offset];
@@ -334,7 +343,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset)
 	Key[Index] = _mm_xor_si128(pkb, Key[Index]);
 }
 
-void AHX::ExpandSubBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset)
+void AHX::ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset)
 {
 	// used with 256 and 512 bit keys
 	__m128i pkb = Key[Index - Offset];
@@ -352,13 +361,47 @@ void AHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
-	__m128i temp = _mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]);
-	temp = _mm_xor_si128(temp, m_expKey[keyCtr]);
+	__m128i X = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
+	X = _mm_xor_si128(X, m_expKey[keyCtr]);
 
 	while (keyCtr != LRD)
-		temp = _mm_aesdec_si128(temp, m_expKey[++keyCtr]);
+		X = _mm_aesdec_si128(X, m_expKey[++keyCtr]);
 
-	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_aesdeclast_si128(temp, m_expKey[++keyCtr]));
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesdeclast_si128(X, m_expKey[++keyCtr]));
+}
+
+void AHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	const size_t LRD = m_expKey.size() - 2;
+	size_t keyCtr = 0;
+
+	CEX::Common::UInt128 X0(Input, InOffset);
+	CEX::Common::UInt128 X1(Input, InOffset + 16);
+	CEX::Common::UInt128 X2(Input, InOffset + 32);
+	CEX::Common::UInt128 X3(Input, InOffset + 48);
+
+	X0.Register = _mm_xor_si128(X0.Register, m_expKey[keyCtr]);
+	X1.Register = _mm_xor_si128(X1.Register, m_expKey[keyCtr]);
+	X2.Register = _mm_xor_si128(X2.Register, m_expKey[keyCtr]);
+	X3.Register = _mm_xor_si128(X3.Register, m_expKey[keyCtr]);
+
+	while (keyCtr != LRD)
+	{
+		X0.Register = _mm_aesdec_si128(X0.Register, m_expKey[++keyCtr]);
+		X1.Register = _mm_aesdec_si128(X1.Register, m_expKey[keyCtr]);
+		X2.Register = _mm_aesdec_si128(X2.Register, m_expKey[keyCtr]);
+		X3.Register = _mm_aesdec_si128(X3.Register, m_expKey[keyCtr]);
+	}
+
+	X0.Register = _mm_aesdeclast_si128(X0.Register, m_expKey[++keyCtr]);
+	X1.Register = _mm_aesdeclast_si128(X1.Register, m_expKey[keyCtr]);
+	X2.Register = _mm_aesdeclast_si128(X2.Register, m_expKey[keyCtr]);
+	X3.Register = _mm_aesdeclast_si128(X3.Register, m_expKey[keyCtr]);
+
+	X0.StoreLE(Output, OutOffset);
+	X1.StoreLE(Output, OutOffset + 16);
+	X2.StoreLE(Output, OutOffset + 32);
+	X3.StoreLE(Output, OutOffset + 48);
 }
 
 void AHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -366,13 +409,47 @@ void AHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
-	__m128i temp = _mm_loadu_si128((const __m128i*)(const void*)&Input[InOffset]);
-	temp = _mm_xor_si128(temp, m_expKey[keyCtr]);
+	__m128i X = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
+	X = _mm_xor_si128(X, m_expKey[keyCtr]);
 
 	while (keyCtr != LRD)
-		temp = _mm_aesenc_si128(temp, m_expKey[++keyCtr]);
+		X = _mm_aesenc_si128(X, m_expKey[++keyCtr]);
 
-	_mm_storeu_si128((__m128i*)(void*)&Output[OutOffset], _mm_aesenclast_si128(temp, m_expKey[++keyCtr]));
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesenclast_si128(X, m_expKey[++keyCtr]));
+}
+
+void AHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	const size_t LRD = m_expKey.size() - 2;
+	size_t keyCtr = 0;
+
+	CEX::Common::UInt128 X0(Input, InOffset);
+	CEX::Common::UInt128 X1(Input, InOffset + 16);
+	CEX::Common::UInt128 X2(Input, InOffset + 32);
+	CEX::Common::UInt128 X3(Input, InOffset + 48);
+
+	X0.Register = _mm_xor_si128(X0.Register, m_expKey[keyCtr]);
+	X1.Register = _mm_xor_si128(X1.Register, m_expKey[keyCtr]);
+	X2.Register = _mm_xor_si128(X2.Register, m_expKey[keyCtr]);
+	X3.Register = _mm_xor_si128(X3.Register, m_expKey[keyCtr]);
+
+	while (keyCtr != LRD)
+	{
+		X0.Register = _mm_aesenc_si128(X0.Register, m_expKey[++keyCtr]);
+		X1.Register = _mm_aesenc_si128(X1.Register, m_expKey[keyCtr]);
+		X2.Register = _mm_aesenc_si128(X2.Register, m_expKey[keyCtr]);
+		X3.Register = _mm_aesenc_si128(X3.Register, m_expKey[keyCtr]);
+	}
+
+	X0.Register = _mm_aesenclast_si128(X0.Register, m_expKey[++keyCtr]);
+	X1.Register = _mm_aesenclast_si128(X1.Register, m_expKey[keyCtr]);
+	X2.Register = _mm_aesenclast_si128(X2.Register, m_expKey[keyCtr]);
+	X3.Register = _mm_aesenclast_si128(X3.Register, m_expKey[keyCtr]);
+
+	X0.StoreLE(Output, OutOffset);
+	X1.StoreLE(Output, OutOffset + 16);
+	X2.StoreLE(Output, OutOffset + 32);
+	X3.StoreLE(Output, OutOffset + 48);
 }
 
 // *** Helpers *** //

@@ -28,6 +28,7 @@
 #include "BlockCiphers.h"
 #include "CryptoSymmetricCipherException.h"
 #include "IDigest.h"
+#include "UInt128.h"
 #include "KeyParams.h"
 
 NAMESPACE_BLOCK
@@ -63,6 +64,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() = 0;
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() = 0;
 
 	/// <summary>
 	/// Get: True is initialized for encryption, false for decryption.
@@ -162,7 +168,7 @@ public:
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform or Decrypt</param>
+	/// <param name="Input">Input bytes to Transform</param>
 	/// <param name="Output">Output product of Transform</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
@@ -177,6 +183,16 @@ public:
 	/// <param name="Output">Output product of Transform</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+
+	/// <summary>
+	/// Transform 4 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input UInt128 to Transform</param>
+	/// <param name="Output">UInt128 Output product of Transform</param>
+	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 
 NAMESPACE_BLOCKEND

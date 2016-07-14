@@ -114,6 +114,7 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<uint> m_expKey;
+	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	size_t m_ikmSize;
 	bool m_isDestroyed;
@@ -149,6 +150,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::SHX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -196,6 +202,7 @@ public:
 		m_destroyEngine(false),
 		m_isDestroyed(false),
 		m_dfnRounds(Rounds),
+		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isEncryption(false),
@@ -227,6 +234,9 @@ public:
 
 		for (size_t i = 4; i < m_legalKeySizes.size(); i++)
 			m_legalKeySizes[i] = (m_legalKeySizes[3] + m_ikmSize * (i - 3));
+
+		// intrinsics support switch
+		DetectCpu();
 	}
 
 	/// <summary>
@@ -244,6 +254,7 @@ public:
 		m_isDestroyed(false),
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
+		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isEncryption(false),
@@ -253,8 +264,6 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(0, 0)
 	{
-
-
 		// add standard key lengths
 		m_legalKeySizes[0] = 16;
 		m_legalKeySizes[1] = 24;
@@ -286,6 +295,9 @@ public:
 			m_legalRounds.resize(2);
 			m_legalRounds = { 32, 40 };
 		}
+
+		// intrinsics support switch
+		DetectCpu();
 	}
 
 	/// <summary>
@@ -379,21 +391,27 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
+	/// <summary>
+	/// Transform 4 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input UInt128 to Transform</param>
+	/// <param name="Output">UInt128 Output product of Transform</param>
+	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
 private:
+	void DetectCpu();
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
-	void InverseTransform(uint &R0, uint &R1, uint &R2, uint &R3);
-	void LinearTransform(uint &R0, uint &R1, uint &R2, uint &R3);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
-
-	inline void CopyVector(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, size_t Length)
-	{
-		memcpy(&Output[OutOffset], &Input[InOffset], Length * sizeof(Input[InOffset]));
-	}
 };
 
 NAMESPACE_BLOCKEND

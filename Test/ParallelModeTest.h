@@ -2,9 +2,9 @@
 #define _CEXTEST_PARALLELMODETEST_H
 
 #include "ITest.h"
-#include "../CEX/IPadding.h"
+#include "../CEX/IBlockCipher.h"
 #include "../CEX/ICipherMode.h"
-#include "../CEX/ParallelUtils.h"
+#include "../CEX/IPadding.h"
 
 namespace Test
 {
@@ -54,7 +54,6 @@ namespace Test
 			m_plnText(MAX_ALLOC),
 			m_processorCount(1)
 		{
-
 		}
 
 		/// <summary>
@@ -70,18 +69,19 @@ namespace Test
 		virtual std::string Run();
         
     private:
-
+		void AHXCompare();
+		void TestIntrinsics(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine);
 		void BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding,
-			const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding,
-			const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void CompareParallel();
 		void GetBytes(size_t Size, std::vector<byte> &Output);
 		void Initialize();
 		void ParallelCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void ParallelDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input,
-			size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void ParallelIntegrity();
 		void OnProgress(char* Data);
 		void Transform1(CEX::Cipher::Symmetric::Block::Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);

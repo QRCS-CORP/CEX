@@ -1,10 +1,19 @@
 #include "ParallelModeTest.h"
-#include "../CEX/CSPPrng.h"
-#include "../CEX/RHX.h"
-#include "../CEX/CTR.h"
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
+#include "../CEX/CTR.h"
+#include "../CEX/CSPPrng.h"
 #include "../CEX/ISO7816.h"
+#include "../CEX/ParallelUtils.h"
+#include "../CEX/RHX.h"
+
+#if defined(HAS_MINSSE)
+#	include "../CEX/AHX.h"
+#	include "../CEX/SHX.h"
+#	include "../CEX/THX.h"
+#endif
+
+#define STAT_INP
 
 namespace Test
 {
@@ -14,6 +23,22 @@ namespace Test
 		{
 			Initialize();
 
+#if defined(HAS_MINSSE)
+
+			AHXCompare();
+			OnProgress("ParallelModeTest: AHX Passed AES-NI/Rijndael CTR/CBC comparison tests..");
+			CEX::Cipher::Symmetric::Block::AHX* eng1 = new CEX::Cipher::Symmetric::Block::AHX();
+			TestIntrinsics(eng1);
+			OnProgress("ParallelModeTest: AHX Passed Rijndael Intrinsics Integrity tests..");
+			CEX::Cipher::Symmetric::Block::SHX* eng2 = new CEX::Cipher::Symmetric::Block::SHX();
+			TestIntrinsics(eng2);
+			OnProgress("ParallelModeTest: SHX Passed Serpent Intrinsics Integrity tests..");
+			CEX::Cipher::Symmetric::Block::THX* eng3 = new CEX::Cipher::Symmetric::Block::THX();
+			TestIntrinsics(eng3);
+			OnProgress("ParallelModeTest: THX Passed Twofish Intrinsics Integrity tests..");
+			OnProgress("");
+
+#endif
 			ParallelIntegrity();
 			OnProgress("ParallelModeTest: Passed Parallel encryption and decryption Integrity tests..");
 			CompareParallel();
@@ -29,6 +54,171 @@ namespace Test
 		{
 			throw TestException(std::string(FAILURE + " : Internal Error"));
 		}
+	}
+
+	void ParallelModeTest::AHXCompare()
+	{
+#if defined(HAS_MINSSE)
+		std::vector<byte> data;
+		std::vector<byte> dec;
+		std::vector<byte> enc1;
+		std::vector<byte> enc2;
+		std::vector<byte> key(32);
+		std::vector<byte> iv(16);
+		size_t blockSize;
+		CEX::Prng::CSPPrng rng;
+		data.reserve(MAX_ALLOC);
+		enc1.reserve(MAX_ALLOC);
+		enc2.reserve(MAX_ALLOC);
+		CEX::Cipher::Symmetric::Block::AHX* eng1 = new CEX::Cipher::Symmetric::Block::AHX();
+		CEX::Cipher::Symmetric::Block::RHX* eng2 = new CEX::Cipher::Symmetric::Block::RHX();
+		CEX::Cipher::Symmetric::Block::Mode::CTR cpr1(eng1);
+		CEX::Cipher::Symmetric::Block::Mode::CTR cpr2(eng2);
+
+		// compare rhx/ahx parallel ctr
+		for (size_t i = 0; i < 100; ++i)
+		{
+			size_t smpSze = rng.Next(MIN_ALLOC, MAX_ALLOC);
+			data.resize(smpSze);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+			rng.GetBytes(data);
+			GetBytes(32, key);
+			GetBytes(16, iv);
+
+			CEX::Common::KeyParams keyParam(key, iv);
+
+			cpr1.ParallelBlockSize(cpr1.ParallelMinimumSize() * cpr1.ProcessorCount());
+			cpr1.Initialize(true, keyParam);
+			cpr1.IsParallel() = true;
+			blockSize = cpr1.ParallelBlockSize();
+			Transform1(&cpr1, data, blockSize, enc1);
+
+			cpr2.ParallelBlockSize(cpr2.ParallelMinimumSize() * cpr2.ProcessorCount());
+			cpr2.Initialize(true, keyParam);
+			cpr2.IsParallel() = true;
+			blockSize = cpr2.ParallelBlockSize();
+			Transform1(&cpr2, data, blockSize, enc2);
+
+			if (enc1 != enc2)
+				throw std::string("Parallel CTR: Encrypted output is not equal!");
+		}
+
+		CEX::Cipher::Symmetric::Block::Mode::CBC cpr3(eng1);
+		CEX::Cipher::Symmetric::Block::Mode::CBC cpr4(eng2);
+		CEX::Cipher::Symmetric::Block::Padding::ISO7816 pad;
+
+		// compare rhx/ahx cbc
+		for (size_t i = 0; i < 100; ++i)
+		{
+			size_t smpSze = rng.Next(MIN_ALLOC, MAX_ALLOC);
+			data.resize(smpSze);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+			rng.GetBytes(data);
+			GetBytes(32, key);
+			GetBytes(16, iv);
+
+			CEX::Common::KeyParams keyParam(key, iv);
+
+			cpr3.Initialize(true, keyParam);
+			cpr3.IsParallel() = false;
+			blockSize = cpr3.BlockSize();
+			BlockEncrypt(&cpr3, &pad, data, 0, enc1, 0);
+
+			cpr4.Initialize(true, keyParam);
+			cpr4.IsParallel() = false;
+			blockSize = cpr4.BlockSize();
+			BlockEncrypt(&cpr4, &pad, data, 0, enc2, 0);
+
+			if (enc1 != enc2)
+				throw std::string("CBC: Encrypted output is not equal!");
+
+			cpr3.Initialize(false, keyParam);
+			BlockDecrypt(&cpr3, &pad, enc1, 0, dec, 0);
+
+			if (dec != data)
+				throw std::string("CBC: Decrypted output is not equal!");
+
+			cpr4.Initialize(false, keyParam);
+			BlockDecrypt(&cpr4, &pad, enc2, 0, dec, 0);
+
+			if (dec != data)
+				throw std::string("CBC: Decrypted output is not equal!");
+		}
+
+		delete eng1;
+		delete eng2;
+#endif
+	}
+
+
+	void ParallelModeTest::TestIntrinsics(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine)
+	{
+#if defined(HAS_MINSSE)
+		std::vector<byte> data;
+		std::vector<byte> dec;
+		std::vector<byte> enc1;
+		std::vector<byte> enc2;
+		std::vector<byte> key(32);
+		std::vector<byte> iv(16);
+		size_t blockSize;
+		CEX::Prng::CSPPrng rng;
+		data.reserve(MAX_ALLOC);
+		enc1.reserve(MAX_ALLOC);
+		enc2.reserve(MAX_ALLOC);
+
+#if defined STAT_INP
+		for (size_t i = 0; i < key.size(); ++i)
+			key[i] = i;
+		for (size_t i = 0; i < iv.size(); ++i)
+			iv[i] = i;
+#endif
+
+		for (size_t i = 0; i < 100; ++i)
+		{
+			size_t smpSze = rng.Next(MIN_ALLOC, MAX_ALLOC);
+			data.resize(smpSze);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+
+#if !defined STAT_INP
+			rng.GetBytes(data);
+			GetBytes(32, key);
+			GetBytes(16, iv);
+#endif
+			CEX::Common::KeyParams keyParam(key, iv);
+			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(Engine);
+			cipher.ParallelBlockSize(cipher.ParallelMinimumSize() * cipher.ProcessorCount());
+			// parallel w/ intrinsics (if available)
+			cipher.Initialize(true, keyParam);
+			cipher.IsParallel() = true;
+			blockSize = cipher.ParallelBlockSize();
+			Transform1(&cipher, data, blockSize, enc1);
+
+			// sequential
+			cipher.Initialize(true, keyParam);
+			cipher.IsParallel() = false;
+			blockSize = cipher.BlockSize();
+			Transform1(&cipher, data, blockSize, enc2);
+
+			if (enc1 != enc2)
+				throw std::string("Parallel CTR: Encrypted output is not equal!");
+
+			// decrypt
+			cipher.Initialize(false, keyParam);
+			cipher.IsParallel() = true;
+			blockSize = cipher.ParallelBlockSize();
+			Transform1(&cipher, enc1, blockSize, dec);
+
+			if (dec != data)
+				throw std::string("Parallel CTR: Decrypted output is not equal!");
+		}
+		delete Engine;
+#endif
 	}
 
 	void ParallelModeTest::BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
@@ -139,11 +329,15 @@ namespace Test
 
 		// CTR mode
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
+			CEX::Cipher::Symmetric::Block::AHX* eng = new CEX::Cipher::Symmetric::Block::AHX();
 			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
 
 			// with CTR, array can be any size
-			GetBytes(1036, data);
+			size_t smpSze = 0;
+			GetBytes(2, data);
+			memcpy(&smpSze, &data[0], 2);
+			smpSze += 800;
+			GetBytes(smpSze, data);
 
 			// how to calculate an ideal block size:
 			size_t plen = (size_t)((data.size() / cipher.ParallelMinimumSize()) * cipher.ParallelMinimumSize());
@@ -385,7 +579,7 @@ namespace Test
 
 	void ParallelModeTest::ParallelCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t blkSize = m_parallelBlockSize;
+		const size_t blkSize = Cipher->ParallelMinimumSize();
 		const size_t inpSize = (Input.size() - InOffset);
 		const size_t alnSize = ((inpSize / blkSize) * blkSize);
 		size_t count = 0;
@@ -472,7 +666,7 @@ namespace Test
 				cipher.Initialize(true, kp);
 				ParallelCTR(&cipher, m_plnText, 0, cp2Text, 0);
 
-				if (m_cipherText != cp2Text)
+				if (m_cipherText[i] != cp2Text[i])
 					throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
@@ -563,7 +757,7 @@ namespace Test
 		Output.resize(Input.size(), 0);
 
 		// best way, use the offsets
-		size_t blocks = (size_t)(Input.size() / BlockSize);
+		size_t blocks = Input.size() / BlockSize;
 
 		for (size_t i = 0; i < blocks; i++)
 			Cipher->Transform(Input, i * BlockSize, Output, i * BlockSize);
@@ -573,9 +767,9 @@ namespace Test
 			std::string name = Cipher->Name();
 			if (name == "CTR")
 			{
-				size_t sze = (size_t)(Input.size() - (blocks * BlockSize));
+				size_t sze = Input.size() - (blocks * BlockSize);
 				std::vector<byte> inpBuffer(sze);
-				size_t oft = (size_t)(Input.size() - sze);
+				size_t oft = Input.size() - sze;
 				memcpy(&inpBuffer[0], &Input[oft], sze);
 				std::vector<byte> outBuffer(sze);
 				Cipher->Transform(inpBuffer, outBuffer);
@@ -594,26 +788,18 @@ namespace Test
 		Output.resize(Input.size(), 0);
 
 		// slower, mem copy can be expensive on large data..
-		size_t blocks = (size_t)(Input.size() / BlockSize);
+		size_t blocks = Input.size() / BlockSize;
 		std::vector<byte> inBlock(BlockSize, 0);
 		std::vector<byte> outBlock(BlockSize, 0);
 
-		std::string name = Cipher->Name();
-		if (name == "CTR")
+		for (size_t i = 0; i < blocks; i++)
 		{
-			Cipher->Transform(Input, Output);
+			memcpy(&inBlock[0], &Input[i * BlockSize], BlockSize);
+			Cipher->Transform(inBlock, outBlock);
+			memcpy(&Output[i * BlockSize], &outBlock[0], BlockSize);
 		}
-		else
-		{
-			for (size_t i = 0; i < blocks; i++)
-			{
-				memcpy(&inBlock[0], &Input[i * BlockSize], BlockSize);
-				Cipher->Transform(inBlock, outBlock);
-				memcpy(&Output[i * BlockSize], &outBlock[0], BlockSize);
-			}
 
-			if (blocks * BlockSize < Input.size())
-				Cipher->Transform(Input, blocks * BlockSize, Output, blocks * BlockSize);
-		}
+		if (blocks * BlockSize < Input.size())
+			Cipher->Transform(Input, blocks * BlockSize, Output, blocks * BlockSize);
 	}
 }

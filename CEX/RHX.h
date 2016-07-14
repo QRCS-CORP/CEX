@@ -118,6 +118,7 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<uint> m_expKey;
+	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -153,6 +154,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::RHX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -202,6 +208,7 @@ public:
 		m_destroyEngine(false),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
+		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -256,6 +263,7 @@ public:
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
+		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -393,11 +401,23 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
+	/// <summary>
+	/// Transform 4 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input UInt128 to Transform</param>
+	/// <param name="Output">UInt128 Output product of Transform</param>
+	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
 private:
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	void ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex);
 	void ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset);

@@ -482,7 +482,6 @@ public:
 	static inline void BytesToLeUL512(const std::vector<uint8_t> &Input, const size_t InOffset, std::vector<uint32_t> &Output, const size_t OutOffset)
 	{
 #if defined(IS_LITTLE_ENDIAN)
-		uint32_t value = 0;
 		memcpy(&Output[OutOffset], &Input[InOffset], 16 * sizeof(uint32_t));
 #else
 		Output[OutOffset] = BytesToLe32(Input, InOffset);
@@ -516,7 +515,6 @@ public:
 	static inline void BytesToLeULL512(const std::vector<uint8_t> &Input, const size_t InOffset, std::vector<uint64_t> &Output, size_t OutOffset)
 	{
 #if defined(IS_LITTLE_ENDIAN)
-		uint32_t value = 0;
 		memcpy(&Output[OutOffset], &Input[InOffset], 16 * sizeof(uint64_t));
 #else
 		Output[OutOffset] = BytesToLe64(Input, InOffset);
@@ -945,12 +943,12 @@ public:
 		Obj.clear();
 	}
     
-	template <typename T>
 	/// <summary>
 	/// Clear an array of objects
 	/// </summary>
 	///
 	/// <param name="Obj">A byte vector array</param>
+	template <typename T>
 	static void ClearVector(std::vector<T> &Obj)
 	{
 		if (Obj.capacity() == 0)
@@ -1524,54 +1522,6 @@ public:
 
 	// ** Block XOR ** //
 
-
-
-
-
-	/// <summary>
-	/// Block XOR 4 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR32(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Block XOR 4 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 8 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR64(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Block XOR 8 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 16 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR128(const std::vector<byte> &Input, std::vector<byte> &Output);
-
 	/// <summary>
 	/// Block XOR 16 bytes
 	/// </summary>
@@ -1587,68 +1537,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source array</param>
-	/// <param name="Output">The destination array</param>
-	static void XOR256(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Block XOR 32 bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 2 64bit unsigned integers
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR2X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 4 64bit unsigned integers
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR4X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 8 64bit unsigned integers
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR8X64(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 4 32bit unsigned integers
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR4X32(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
-
-	/// <summary>
-	/// Block XOR 8 32bit unsigned integers
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">Offset within the destination array</param>
-	static void XOR8X32(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// XOR contiguous 16 byte blocks in an array.

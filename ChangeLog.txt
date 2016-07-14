@@ -12,3 +12,12 @@ Changes July 09, 2016:
 * Work on CpuDetect, (all intrinsics are now runtime enabled automatically).
 * Set default SSE support to AVX /arch:AVX
 * Work begun on intrinsics symmetric mode chain
+
+Version 1.1g
+Changes July 14, 2016:
+* Added SIMD wrappers UInt128 and UInt256
+* Added intrinsics support to Twofish and Serpent (Encrypt64 and Decrypt64)
+* Added intrinsics block process (mm128 -4 block) intrinsics to parallel CTR block cipher mode
+* Expanded intrinsic support in AES-NI (AHX) to 4 block (Encrypt64 and Decrypt64)
+* Serpent changed from outputting big endian to little endian (breaking change)
+* Added intrinsics intrgrity tests to ParallelModeTest.

@@ -219,9 +219,6 @@
     <ClInclude Include="..\..\CEX\EntropyPool.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Int128.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\KeyGenerator.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
@@ -532,6 +529,15 @@
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Intrinsics.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\TPadding.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\UInt128.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\UInt256.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>

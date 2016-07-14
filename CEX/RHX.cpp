@@ -115,6 +115,14 @@ void RHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		DecryptBlock(Input, InOffset, Output, OutOffset);
 }
 
+void RHX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt64(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt64(Input, InOffset, Output, OutOffset);
+}
+
 // *** Key Schedule *** //
 
 void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
@@ -594,6 +602,14 @@ void RHX::Decrypt32(const std::vector<byte> &Input, const size_t InOffset, std::
 	Output[OutOffset + 31] = (byte)(ISBox[(byte)Y3] ^ (byte)m_expKey[keyCtr]);
 }
 
+void RHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+}
+
 void RHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 5;
@@ -732,6 +748,14 @@ void RHX::Encrypt32(const std::vector<byte> &Input, const size_t InOffset, std::
 	Output[OutOffset + 29] = (byte)(SBox[(byte)(Y0 >> 16)] ^ (byte)(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 30] = (byte)(SBox[(byte)(Y2 >> 8)] ^ (byte)(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 31] = (byte)(SBox[(byte)Y3] ^ (byte)m_expKey[keyCtr]);
+}
+
+void RHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
 }
 
 // *** Helpers *** //

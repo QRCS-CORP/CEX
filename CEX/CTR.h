@@ -216,7 +216,9 @@ public:
 	/// <summary>
 	/// Process an array of bytes. 
 	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>. 
-	/// This method processes the entire array; used when processing small data or buffers from a larger source.
+	/// Method will process a single block from the array of either ParallelBlockSize or Blocksize depending on IsParallel property setting.
+	/// Partial blocks are permitted with both parallel and linear operation modes. 
+	/// If using this method, output and input arrays should be sized to ParallelBlockSize.
 	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
@@ -239,11 +241,11 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset);
+	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
+	static void Increase(std::vector<byte> &Counter, const size_t Size);
 	static void Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer);
 	static void Increment(std::vector<byte> &Counter);
-	void ProcessBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void SetScope();
 };
 

@@ -119,6 +119,7 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<__m128i> m_expKey;
+	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	size_t m_ikmSize;
 	bool m_isDestroyed;
@@ -153,6 +154,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::AHX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -201,6 +207,7 @@ public:
 		m_destroyEngine(false),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
+		m_hasIntrinsics(true),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -252,6 +259,7 @@ public:
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
+		m_hasIntrinsics(true),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -386,15 +394,28 @@ public:
 	/// <param name="OutOffset">Offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
+	/// <summary>
+	/// Transform 4 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input UInt128 to Transform</param>
+	/// <param name="Output">UInt128 Output product of Transform</param>
+	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
 	private:
+
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 	void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
-	void ExpandRotBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset);
-	void ExpandSubBlock(std::vector<__m128i> &Key, size_t Index, size_t Offset);
+	void ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
+	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 };

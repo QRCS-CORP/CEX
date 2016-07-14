@@ -237,7 +237,7 @@
     <ClInclude Include="..\..\CEX\ICipherMode.h" />
     <ClInclude Include="..\..\CEX\IGenerator.h" />
     <ClInclude Include="..\..\CEX\IMac.h" />
-    <ClInclude Include="..\..\CEX\Int128.h" />
+    <ClInclude Include="..\..\CEX\UInt128.h" />
     <ClInclude Include="..\..\CEX\Intrinsics.h" />
     <ClInclude Include="..\..\CEX\IntUtils.h" />
     <ClInclude Include="..\..\CEX\IPadding.h" />
@@ -302,7 +302,9 @@
     <ClInclude Include="..\..\CEX\Threefish256.h" />
     <ClInclude Include="..\..\CEX\Threefish512.h" />
     <ClInclude Include="..\..\CEX\THX.h" />
+    <ClInclude Include="..\..\CEX\TPadding.h" />
     <ClInclude Include="..\..\CEX\Twofish.h" />
+    <ClInclude Include="..\..\CEX\UInt256.h" />
     <ClInclude Include="..\..\CEX\VMAC.h" />
     <ClInclude Include="..\..\CEX\X923.h" />
     <ClInclude Include="..\..\CEX\XSPRsg.h" />

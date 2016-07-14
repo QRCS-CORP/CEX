@@ -1,9 +1,13 @@
 #include "SHX.h"
 #include "Serpent.h"
+#include "CpuDetect.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
 #include "IntUtils.h"
+#if defined(HAS_MINSSE)
+#	include "UInt128.h"
+#endif
 
 NAMESPACE_BLOCK
 
@@ -102,6 +106,14 @@ void SHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		Decrypt16(Input, InOffset, Output, OutOffset);
 }
 
+void SHX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt64(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt64(Input, InOffset, Output, OutOffset);
+}
+
 // *** Key Schedule *** //
 
 void SHX::ExpandKey(const std::vector<byte> &Key)
@@ -184,7 +196,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 			Wp[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
 
 		// copy to expanded key
-		CopyVector(Wp, 8, Wk, 0, 8);
+		memcpy(&Wk[0], &Wp[8], 8 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating primitive
 		for (size_t i = 8; i < keySize; i++)
@@ -199,7 +211,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 			Wp[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
 
 		// copy to expanded key
-		CopyVector(Wp, 16, Wk, 0, 16);
+		memcpy(&Wk[0], &Wp[16], 16 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating primitive
 		for (size_t i = 16; i < keySize; i++)
@@ -233,10 +245,15 @@ void SHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	size_t keyCtr = m_expKey.size();
 
 	// input round
-	uint R3 = m_expKey[--keyCtr] ^ CEX::Utility::IntUtils::BytesToBe32(Input, InOffset);
-	uint R2 = m_expKey[--keyCtr] ^ CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 4);
-	uint R1 = m_expKey[--keyCtr] ^ CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 8);
-	uint R0 = m_expKey[--keyCtr] ^ CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 12);
+	uint R3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12);
+	uint R2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8);
+	uint R1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4);
+	uint R0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset);
+
+	R3 ^= m_expKey[--keyCtr];
+	R2 ^= m_expKey[--keyCtr];
+	R1 ^= m_expKey[--keyCtr];
+	R0 ^= m_expKey[--keyCtr];
 
 	// process 8 round blocks
 	do
@@ -301,14 +318,121 @@ void SHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 			R0 ^= m_expKey[--keyCtr];
 			InverseTransform(R0, R1, R2, R3);
 		}
-
-	} while (keyCtr != LRD);
+	} 
+	while (keyCtr != LRD);
 
 	// last round
-	CEX::Utility::IntUtils::Be32ToBytes(R3 ^ m_expKey[--keyCtr], Output, OutOffset);
-	CEX::Utility::IntUtils::Be32ToBytes(R2 ^ m_expKey[--keyCtr], Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Be32ToBytes(R1 ^ m_expKey[--keyCtr], Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Be32ToBytes(R0 ^ m_expKey[--keyCtr], Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Le32ToBytes(R3 ^ m_expKey[--keyCtr], Output, OutOffset + 12);
+	CEX::Utility::IntUtils::Le32ToBytes(R2 ^ m_expKey[--keyCtr], Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(R1 ^ m_expKey[--keyCtr], Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(R0 ^ m_expKey[--keyCtr], Output, OutOffset);
+}
+
+void SHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+#if defined(HAS_MINSSE)
+
+	const size_t LRD = 4;
+	size_t keyCtr = m_expKey.size();
+
+	// input round
+	CEX::Common::UInt128 R0(Input, InOffset);
+	CEX::Common::UInt128 R1(Input, InOffset + 16);
+	CEX::Common::UInt128 R2(Input, InOffset + 32);
+	CEX::Common::UInt128 R3(Input, InOffset + 48);
+	CEX::Common::UInt128::Transpose(R0, R1, R2, R3);
+
+	R3 ^= m_expKey[--keyCtr];
+	R2 ^= m_expKey[--keyCtr];
+	R1 ^= m_expKey[--keyCtr];
+	R0 ^= m_expKey[--keyCtr];
+
+	// process 8 round blocks
+	do
+	{
+		Ib7(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib6(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib5(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib4(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib3(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib2(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib1(R0, R1, R2, R3);
+		R3 ^= m_expKey[--keyCtr];
+		R2 ^= m_expKey[--keyCtr];
+		R1 ^= m_expKey[--keyCtr];
+		R0 ^= m_expKey[--keyCtr];
+		InverseTransform64(R0, R1, R2, R3);
+
+		Ib0(R0, R1, R2, R3);
+
+		// skip on last block
+		if (keyCtr != LRD)
+		{
+			R3 ^= m_expKey[--keyCtr];
+			R2 ^= m_expKey[--keyCtr];
+			R1 ^= m_expKey[--keyCtr];
+			R0 ^= m_expKey[--keyCtr];
+			InverseTransform64(R0, R1, R2, R3);
+		}
+	} 
+	while (keyCtr != LRD);
+
+	// last round
+	R3 ^= m_expKey[--keyCtr];
+	R2 ^= m_expKey[--keyCtr];
+	R1 ^= m_expKey[--keyCtr];
+	R0 ^= m_expKey[--keyCtr];
+
+	CEX::Common::UInt128::Transpose(R0, R1, R2, R3);
+	R0.StoreLE(Output, OutOffset);
+	R1.StoreLE(Output, OutOffset + 16);
+	R2.StoreLE(Output, OutOffset + 32);
+	R3.StoreLE(Output, OutOffset + 48);
+
+#else
+
+	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+
+#endif
 }
 
 void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -317,10 +441,10 @@ void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	int keyCtr = -1;
 
 	// input round
-	uint R0 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 12);
-	uint R1 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 8);
-	uint R2 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset + 4);
-	uint R3 = CEX::Utility::IntUtils::BytesToBe32(Input, InOffset);
+	uint R0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset);
+	uint R1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4);
+	uint R2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8);
+	uint R3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12);
 
 	// process 8 round blocks
 	do
@@ -383,46 +507,120 @@ void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 		// skip on last block
 		if (keyCtr != LRD)
 			LinearTransform(R0, R1, R2, R3);
-
-	} while (keyCtr != LRD);
+	} 
+	while (keyCtr != LRD);
 
 	// last round
-	CEX::Utility::IntUtils::Be32ToBytes(m_expKey[++keyCtr] ^ R0, Output, OutOffset + 12);
-	CEX::Utility::IntUtils::Be32ToBytes(m_expKey[++keyCtr] ^ R1, Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Be32ToBytes(m_expKey[++keyCtr] ^ R2, Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Be32ToBytes(m_expKey[++keyCtr] ^ R3, Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(m_expKey[++keyCtr] ^ R0, Output, OutOffset);
+	CEX::Utility::IntUtils::Le32ToBytes(m_expKey[++keyCtr] ^ R1, Output, OutOffset + 4);
+	CEX::Utility::IntUtils::Le32ToBytes(m_expKey[++keyCtr] ^ R2, Output, OutOffset + 8);
+	CEX::Utility::IntUtils::Le32ToBytes(m_expKey[++keyCtr] ^ R3, Output, OutOffset + 12);
 }
 
-/// <remarks>
-/// Apply the linear transformation to the register set
-/// </remarks>
-void SHX::LinearTransform(uint &R0, uint &R1, uint &R2, uint &R3)
+void SHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	uint x0 = CEX::Utility::IntUtils::RotateLeft(R0, 13);
-	uint x2 = CEX::Utility::IntUtils::RotateLeft(R2, 3);
-	uint x1 = R1 ^ x0 ^ x2;
-	uint x3 = R3 ^ x2 ^ x0 << 3;
+#if defined(HAS_MINSSE)
 
-	R1 = CEX::Utility::IntUtils::RotateLeft(x1, 1);
-	R3 = CEX::Utility::IntUtils::RotateLeft(x3, 7);
-	R0 = CEX::Utility::IntUtils::RotateLeft(x0 ^ R1 ^ R3, 5);
-	R2 = CEX::Utility::IntUtils::RotateLeft(x2 ^ R3 ^ (R1 << 7), 22);
+	const size_t LRD = m_expKey.size() - 5;
+	int keyCtr = -1;
+
+	// input round
+	CEX::Common::UInt128 R0(Input, InOffset);
+	CEX::Common::UInt128 R1(Input, InOffset + 16);
+	CEX::Common::UInt128 R2(Input, InOffset + 32);
+	CEX::Common::UInt128 R3(Input, InOffset + 48);
+	CEX::Common::UInt128::Transpose(R0, R1, R2, R3);
+
+	// process 8 round blocks
+	do
+	{
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb0(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb1(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb2(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb3(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb4(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb5(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb6(R0, R1, R2, R3);
+		LinearTransform64(R0, R1, R2, R3);
+
+		R0 ^= m_expKey[++keyCtr];
+		R1 ^= m_expKey[++keyCtr];
+		R2 ^= m_expKey[++keyCtr];
+		R3 ^= m_expKey[++keyCtr];
+		Sb7(R0, R1, R2, R3);
+
+		// skip on last block
+		if (keyCtr != LRD)
+			LinearTransform64(R0, R1, R2, R3);
+	} 
+	while (keyCtr != LRD);
+
+	// last round
+	R0 ^= m_expKey[++keyCtr];
+	R1 ^= m_expKey[++keyCtr];
+	R2 ^= m_expKey[++keyCtr];
+	R3 ^= m_expKey[++keyCtr];
+
+	CEX::Common::UInt128::Transpose(R0, R1, R2, R3);
+	R0.StoreLE(Output, OutOffset);
+	R1.StoreLE(Output, OutOffset + 16);
+	R2.StoreLE(Output, OutOffset + 32);
+	R3.StoreLE(Output, OutOffset + 48);
+
+#else
+
+	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+
+#endif
 }
 
-/// <remarks>
-/// Apply the inverse of the linear transformation to the register set
-/// </remarks>
-void SHX::InverseTransform(uint &R0, uint &R1, uint &R2, uint &R3)
+void SHX::DetectCpu()
 {
-	uint x2 = CEX::Utility::IntUtils::RotateRight(R2, 22) ^ R3 ^ (R1 << 7);
-	uint x0 = CEX::Utility::IntUtils::RotateRight(R0, 5) ^ R1 ^ R3;
-	uint x3 = CEX::Utility::IntUtils::RotateRight(R3, 7);
-	uint x1 = CEX::Utility::IntUtils::RotateRight(R1, 1);
-
-	R3 = x3 ^ x2 ^ x0 << 3;
-	R1 = x1 ^ x0 ^ x2;
-	R2 = CEX::Utility::IntUtils::RotateRight(x2, 3);
-	R0 = CEX::Utility::IntUtils::RotateRight(x0, 13);
+	CEX::Common::CpuDetect detect;
+	m_hasIntrinsics = detect.HasMinIntrinsics();
 }
 
 CEX::Digest::IDigest* SHX::GetDigest(CEX::Enumeration::Digests DigestType)

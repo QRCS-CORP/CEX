@@ -26,229 +26,495 @@
 
 #include "Common.h"
 
+template<class T>
+void LinearTransform(T &R0, T &R1, T &R2, T &R3)
+{
+	R0 = CEX::Utility::IntUtils::RotateLeft(R0, 13);
+	R2 = CEX::Utility::IntUtils::RotateLeft(R2, 3);
+	R1 ^= R0 ^ R2;
+	R3 ^= R2 ^ (R0 << 3);
+	R1 = CEX::Utility::IntUtils::RotateLeft(R1, 1);
+	R3 = CEX::Utility::IntUtils::RotateLeft(R3, 7);
+	R0 ^= R1 ^ R3;
+	R2 ^= R3 ^ (R1 << 7);
+	R0 = CEX::Utility::IntUtils::RotateLeft(R0, 5);
+	R2 = CEX::Utility::IntUtils::RotateLeft(R2, 22);
+}
+
+template<class T>
+void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
+{
+	R0.Rotl32(13);
+	R2.Rotl32(3);
+	R1 ^= R0 ^ R2;
+	R3 ^= R2 ^ (R0 << 3);
+	R1.Rotl32(1);
+	R3.Rotl32(7);
+	R0 ^= R1 ^ R3;
+	R2 ^= R3 ^ (R1 << 7);
+	R0.Rotl32(5);
+	R2.Rotl32(22);
+}
+
+template<class T>
+void InverseTransform(T &R0, T &R1, T &R2, T &R3)
+{
+	R2 = CEX::Utility::IntUtils::RotateRight(R2, 22);
+	R0 = CEX::Utility::IntUtils::RotateRight(R0, 5);
+	R2 ^= R3 ^ (R1 << 7);
+	R0 ^= R1 ^ R3;
+	R3 = CEX::Utility::IntUtils::RotateRight(R3, 7);
+	R1 = CEX::Utility::IntUtils::RotateRight(R1, 1);
+	R3 ^= R2 ^ (R0 << 3);
+	R1 ^= R0 ^ R2;
+	R2 = CEX::Utility::IntUtils::RotateRight(R2, 3);
+	R0 = CEX::Utility::IntUtils::RotateRight(R0, 13);
+}
+
+template<class T>
+void InverseTransform64(T &R0, T &R1, T &R2, T &R3)
+{
+	R2.Rotr32(22);
+	R0.Rotr32(5);
+	R2 ^= R3 ^ (R1 << 7);
+	R0 ^= R1 ^ R3;
+	R3.Rotr32(7);
+	R1.Rotr32(1);
+	R3 ^= R2 ^ (R0 << 3);
+	R1 ^= R0 ^ R2;
+	R2.Rotr32(3);
+	R0.Rotr32(13);
+}
+
 // *** Serpent S-Boxes *** //
-
-static void Sb0(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb0(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R0 ^ R3;
-	uint t2 = R2 ^ t1;
-	uint t3 = R1 ^ t2;
-	R3 = (R0 & R3) ^ t3;
-	uint t4 = R0 ^ (R1 & t1);
-	R2 = t3 ^ (R2 | t4);
-	R0 = R3 & (t2 ^ t4);
-	R1 = (~t2) ^ R0;
-	R0 ^= (~t4);
+	R3 ^= R0;
+	T B4 = R1;
+	R1 &= R3;
+	B4 ^= R2;
+	R1 ^= R0;
+	R0 |= R3;
+	R0 ^= B4;
+	B4 ^= R3;
+	R3 ^= R2;
+	R2 |= R1;
+	R2 ^= B4;
+	B4 = ~B4;
+	B4 |= R1;
+	R1 ^= R3;
+	R1 ^= B4;
+	R3 |= R0;
+	R1 ^= R3;
+	B4 ^= R3;
+	R3 = R0; 
+	R0 = R1; 
+	R1 = B4; 
 }
 
-static void Ib0(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib0(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = ~R0;
-	uint t2 = R0 ^ R1;
-	uint t3 = R3 ^ (t1 | t2);
-	uint t4 = R2 ^ t3;
-	R2 = t2 ^ t4;
-	uint t5 = t1 ^ (R3 & t2);
-	R1 = t3 ^ (R2 & t5);
-	R3 = (R0 & t3) ^ (t4 | R1);
-	R0 = R3 ^ (t4 ^ t5);
+	R2 = ~R2;
+	T B4 = R1;
+	R1 |= R0;
+	B4 = ~B4;
+	R1 ^= R2;
+	R2 |= B4;
+	R1 ^= R3;
+	R0 ^= B4;
+	R2 ^= R0;
+	R0 &= R3;
+	B4 ^= R0;
+	R0 |= R1;
+	R0 ^= R2;
+	R3 ^= B4;
+	R2 ^= R1;
+	R3 ^= R0;
+	R3 ^= R1;
+	R2 &= R3;
+	B4 ^= R2;
+	R2 = R1;
+	R1 = B4;
 }
 
-static void Sb1(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb1(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R1 ^ (~R0);
-	uint t2 = R2 ^ (R0 | t1);
-	R2 = R3 ^ t2;
-	uint t3 = R1 ^ (R3 | t1);
-	uint t4 = t1 ^ R2;
-	R3 = t4 ^ (t2 & t3);
-	uint t5 = t2 ^ t3;
-	R1 = R3 ^ t5;
-	R0 = t2 ^ (t4 & t5);
+	R0 = ~R0;
+	R2 = ~R2;
+	T B4 = R0;
+	R0 &= R1;
+	R2 ^= R0;
+	R0 |= R3;
+	R3 ^= R2;
+	R1 ^= R0;
+	R0 ^= B4;
+	B4 |= R1;
+	R1 ^= R3;
+	R2 |= R0;
+	R2 &= B4;
+	R0 ^= R1;
+	R1 &= R2;
+	R1 ^= R0;
+	R0 &= R2;
+	B4 ^= R0;
+	R0 = R2; 
+	R2 = R3; 
+	R3 = R1; 
+	R1 = B4; 
 }
 
-static void Ib1(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib1(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R1 ^ R3;
-	uint t2 = R0 ^ (R1 & t1);
-	uint t3 = t1 ^ t2;
-	R3 = R2 ^ t3;
-	uint t4 = R1 ^ (t1 & t2);
-	R1 = t2 ^ (R3 | t4);
-	uint t5 = ~R1;
-	uint t6 = R3 ^ t4;
-	R0 = t5 ^ t6;
-	R2 = t3 ^ (t5 | t6);
+	T B4 = R1;
+	R1 ^= R3;
+	R3 &= R1;
+	B4 ^= R2;
+	R3 ^= R0;
+	R0 |= R1;
+	R2 ^= R3;
+	R0 ^= B4;
+	R0 |= R2;
+	R1 ^= R3;
+	R0 ^= R1;
+	R1 |= R3;
+	R1 ^= R0;
+	B4 = ~B4;
+	B4 ^= R1;
+	R1 |= R0;
+	R1 ^= R0;
+	R1 |= B4;
+	R3 ^= R1;
+	R1 = R0;
+	R0 = B4;
+	B4 = R2;
+	R2 = R3;
+	R3 = B4;
 }
 
-static void Sb2(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb2(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = ~R0;
-	uint t2 = R1 ^ R3;
-	uint t3 = t2 ^ (R2 & t1);
-	uint t4 = R2 ^ t1;
-	uint t5 = R1 & (R2 ^ t3);
-	uint t6 = t4 ^ t5;
-	R2 = R0 ^ ((R3 | t5) & (t3 | t4));
-	R1 = (t2 ^ t6) ^ (R2 ^ (R3 | t1));
-	R0 = t3;
-	R3 = t6;
+	T B4 = R0;
+	R0 &= R2;
+	R0 ^= R3;
+	R2 ^= R1;
+	R2 ^= R0;
+	R3 |= B4;
+	R3 ^= R1;
+	B4 ^= R2;
+	R1 = R3; 
+	R3 |= B4;
+	R3 ^= R0;
+	R0 &= R1;
+	B4 ^= R0;
+	R1 ^= R3;
+	R1 ^= B4;
+	R0 = R2; 
+	R2 = R1; 
+	R1 = R3; 
+	R3 = ~B4;
 }
 
-static void Ib2(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib2(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R1 ^ R3;
-	uint t2 = R0 ^ R2;
-	uint t3 = R2 ^ t1;
-	uint t4 = R0 | ~t1;
-	R0 = t2 ^ (R1 & t3);
-	uint t5 = t1 ^ (t2 | (R3 ^ t4));
-	uint t6 = ~t3;
-	uint t7 = R0 | t5;
-	R1 = t6 ^ t7;
-	R2 = (R3 & t6) ^ (t2 ^ t7);
-	R3 = t5;
+	R2 ^= R3;
+	R3 ^= R0;
+	T B4 = R3;
+	R3 &= R2;
+	R3 ^= R1;
+	R1 |= R2;
+	R1 ^= B4;
+	B4 &= R3;
+	R2 ^= R3;
+	B4 &= R0;
+	B4 ^= R2;
+	R2 &= R1;
+	R2 |= R0;
+	R3 = ~R3;
+	R2 ^= R3;
+	R0 ^= R3;
+	R0 &= R1;
+	R3 ^= B4;
+	R3 ^= R0;
+	R0 = R1;
+	R1 = B4;
 }
 
-static void Sb3(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb3(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R0 ^ R1;
-	uint t2 = R0 | R3;
-	uint t3 = R2 ^ R3;
-	uint t4 = (R0 & R2) | (t1 & t2);
-	R2 = t3 ^ t4;
-	uint t5 = t4 ^ (R1 ^ t2);
-	R0 = t1 ^ (t3 & t5);
-	uint t6 = R2 & R0;
-	R3 = (R1 | R3) ^ (t3 ^ t6);
-	R1 = t5 ^ t6;
+	T B4 = R0;
+	R0 |= R3;
+	R3 ^= R1;
+	R1 &= B4;
+	B4 ^= R2;
+	R2 ^= R3;
+	R3 &= R0;
+	B4 |= R1;
+	R3 ^= B4;
+	R0 ^= R1;
+	B4 &= R0;
+	R1 ^= R3;
+	B4 ^= R2;
+	R1 |= R0;
+	R1 ^= R2;
+	R0 ^= R3;
+	R2 = R1; 
+	R1 |= R3;
+	R0 ^= R1;
+	R1 = R2; 
+	R2 = R3; 
+	R3 = B4; 
 }
 
-static void Ib3(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib3(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R1 ^ R2;
-	uint t2 = R0 ^ (R1 & t1);
-	uint t3 = R3 | t2;
-	uint t4 = R3 ^ (t1 | t3);
-	R2 = (R2 ^ t2) ^ t4;
-	uint t5 = (R0 | R1) ^ t4;
-	R0 = t1 ^ t3;
-	R3 = t2 ^ (R0 & t5);
-	R1 = R3 ^ (R0 ^ t5);
+	T B4 = R2;
+	R2 ^= R1;
+	R0 ^= R2;
+	B4 &= R2;
+	B4 ^= R0;
+	R0 &= R1;
+	R1 ^= R3;
+	R3 |= B4;
+	R2 ^= R3;
+	R0 ^= R3;
+	R1 ^= B4;
+	R3 &= R2;
+	R3 ^= R1;
+	R1 ^= R0;
+	R1 |= R2;
+	R0 ^= R3;
+	R1 ^= B4;
+	R0 ^= R1;
+	B4 = R0; 
+	R0 = R2; 
+	R2 = R3; 
+	R3 = B4; 
 }
 
-static void Sb4(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb4(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R0 ^ R3;
-	uint t2 = R2 ^ (R3 & t1);
-	uint t3 = R1 | t2;
-	R3 = t1 ^ t3;
-	uint t4 = ~R1;
-	uint t5 = t2 ^ (t1 | t4);
-	uint t6 = t1 ^ t4;
-	uint t7 = (R0 & t5) ^ (t3 & t6);
-	R1 = (R0 ^ t2) ^ (t6 & t7);
-	R0 = t5;
-	R2 = t7;
+	R1 ^= R3;
+	R3 = ~R3;
+	R2 ^= R3;
+	R3 ^= R0;
+	T B4 = R1;
+	R1 &= R3;
+	R1 ^= R2;
+	B4 ^= R3;
+	R0 ^= B4;
+	R2 &= B4;
+	R2 ^= R0;
+	R0 &= R1;
+	R3 ^= R0;
+	B4 |= R1;
+	B4 ^= R0;
+	R0 |= R3;
+	R0 ^= R2;
+	R2 &= R3;
+	R0 = ~R0;
+	B4 ^= R2;
+	R2 = R0;
+	R0 = R1;
+	R1 = B4;
 }
 
-static void Ib4(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib4(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R1 ^ (R0 & (R2 | R3));
-	uint t2 = R2 ^ (R0 & t1);
-	uint t3 = R3 ^ t2;
-	uint t4 = ~R0;
-	uint t5 = t1 ^ (t2 & t3);
-	uint t6 = R3 ^ (t3 | t4);
-	R1 = t3;
-	R0 = t5 ^ t6;
-	R2 = (t1 & t6) ^ (t3 ^ t4);
-	R3 = t5;
+	T B4 = R2;
+	R2 &= R3;
+	R2 ^= R1;
+	R1 |= R3;
+	R1 &= R0;
+	B4 ^= R2;
+	B4 ^= R1;
+	R1 &= R2;
+	R0 = ~R0;
+	R3 ^= B4;
+	R1 ^= R3;
+	R3 &= R0;
+	R3 ^= R2;
+	R0 ^= R1;
+	R2 &= R0;
+	R3 ^= R0;
+	R2 ^= B4;
+	R2 |= R3;
+	R3 ^= R0;
+	R2 ^= R1;
+	R1 = R3;
+	R3 = B4;
 }
 
-static void Sb5(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb5(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = ~R0;
-	uint t2 = R0 ^ R1;
-	uint t3 = R0 ^ R3;
-	uint t4 = (R2 ^ t1) ^ (t2 | t3);
-	uint t5 = R3 & t4;
-	uint t6 = t5 ^ (t2 ^ t4);
-	uint t7 = t3 ^ (t1 | t4);
-	R2 = (t2 | t5) ^ t7;
-	R3 = (R1 ^ t5) ^ (t6 & t7);
-	R0 = t4;
-	R1 = t6;
+	R0 ^= R1;
+	R1 ^= R3;
+	R3 = ~R3;
+	T B4 = R1;
+	R1 &= R0;
+	R2 ^= R3;
+	R1 ^= R2;
+	R2 |= B4;
+	B4 ^= R3;
+	R3 &= R1;
+	R3 ^= R0;
+	B4 ^= R1;
+	B4 ^= R2;
+	R2 ^= R0;
+	R0 &= R3;
+	R2 = ~R2;
+	R0 ^= B4;
+	B4 |= R3;
+	B4 ^= R2;
+	R2 = R0;
+	R0 = R1;
+	R1 = R3;
+	R3 = B4;
 }
 
-static void Ib5(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib5(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = ~R2;
-	uint t2 = R3 ^ (R1 & t1);
-	uint t3 = R0 & t2;
-	uint t4 = t3 ^ (R1 ^ t1);
-	uint t5 = R1 | t4;
-	uint t6 = t2 ^ (R0 & t5);
-	uint t7 = R0 | R3;
-	R2 = (R1 & t7) ^ (t3 | (R0 ^ R2));
-	R0 = t7 ^ (t1 ^ t5);
-	R1 = t6;
-	R3 = t4;
+	R1 = ~R1;
+	T B4 = R3;
+	R2 ^= R1;
+	R3 |= R0;
+	R3 ^= R2;
+	R2 |= R1;
+	R2 &= R0;
+	B4 ^= R3;
+	R2 ^= B4;
+	B4 |= R0;
+	B4 ^= R1;
+	R1 &= R2;
+	R1 ^= R3;
+	B4 ^= R2;
+	R3 &= B4;
+	B4 ^= R1;
+	R3 ^= B4;
+	B4 = ~B4;
+	R3 ^= R0;
+	R0 = R1;
+	R1 = B4;
+	B4 = R3;
+	R3 = R2;
+	R2 = B4;
 }
 
-static void Sb6(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb6(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R0 ^ R3;
-	uint t2 = R1 ^ t1;
-	uint t3 = R2 ^ (~R0 | t1);
-	R1 ^= t3;
-	uint t4 = R3 ^ (t1 | R1);
-	R2 = t2 ^ (t3 & t4);
-	uint t5 = t3 ^ t4;
-	R0 = R2 ^ t5;
-	R3 = (~t3) ^ (t2 & t5);
+	R2 = ~R2;
+	T B4 = R3;
+	R3 &= R0;
+	R0 ^= B4;
+	R3 ^= R2;
+	R2 |= B4;
+	R1 ^= R3;
+	R2 ^= R0;
+	R0 |= R1;
+	R2 ^= R1;
+	B4 ^= R0;
+	R0 |= R3;
+	R0 ^= R2;
+	B4 ^= R3;
+	B4 ^= R0;
+	R3 = ~R3;
+	R2 &= B4;
+	R3 ^= R2;
+	R2 = B4;
 }
 
-static void Ib6(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib6(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = ~R0;
-	uint t2 = R0 ^ R1;
-	uint t3 = R2 ^ t2;
-	uint t4 = R3 ^ (R2 | t1);
-	uint t5 = t3 ^ t4;
-	uint t6 = t2 ^ (t3 & t4);
-	uint t7 = t4 ^ (R1 | t6);
-	uint t8 = R1 | t7;
-	R0 = t6 ^ t8;
-	R2 = (R3 & t1) ^ (t3 ^ t8);
-	R1 = t5;
-	R3 = t7;
+	R0 ^= R2;
+	T B4 = R2;
+	R2 &= R0;
+	B4 ^= R3;
+	R2 = ~R2;
+	R3 ^= R1;
+	R2 ^= R3;
+	B4 |= R0;
+	R0 ^= R2;
+	R3 ^= B4;
+	B4 ^= R1;
+	R1 &= R3;
+	R1 ^= R0;
+	R0 ^= R3;
+	R0 |= R2;
+	R3 ^= R1;
+	B4 ^= R0;
+	R0 = R1;
+	R1 = R2;
+	R2 = B4;
 }
 
-static void Sb7(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Sb7(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R1 ^ R2;
-	uint t2 = R3 ^ (R2 & t1);
-	uint t3 = R0 ^ t2;
-	R1 ^= (t3 & (R3 | t1));
-	uint t4 = t1 ^ (R0 & t3);
-	uint t5 = t3 ^ (t2 | R1);
-	R2 = t2 ^ (t4 & t5);
-	R0 = (~t5) ^ (t4 & R2);
-	R3 = t4;
+	T B4 = R1;
+	R1 |= R2;
+	R1 ^= R3;
+	B4 ^= R2;
+	R2 ^= R1;
+	R3 |= B4;
+	R3 &= R0;
+	B4 ^= R2;
+	R3 ^= R1;
+	R1 |= B4;
+	R1 ^= R0;
+	R0 |= B4;
+	R0 ^= R2;
+	R1 ^= B4;
+	R2 ^= R1;
+	R1 &= R0;
+	R1 ^= B4;
+	R2 = ~R2;
+	R2 |= R0;
+	B4 ^= R2;
+	R2 = R1;
+	R1 = R3;
+	R3 = R0;
+	R0 = B4;
 }
 
-static void Ib7(uint &R0, uint &R1, uint &R2, uint &R3)
+template<class T>
+static void Ib7(T &R0, T &R1, T &R2, T &R3)
 {
-	uint t1 = R2 | (R0 & R1);
-	uint t2 = R3 & (R0 | R1);
-	uint t3 = t1 ^ t2;
-	uint t4 = R1 ^ t2;
-	R1 = R0 ^ (t4 | (t3 ^ ~R3));
-	uint t8 = (R2 ^ t4) ^ (R3 | R1);
-	R2 = (t1 ^ R1) ^ (t8 ^ (R0 & t3));
-	R0 = t8;
-	R3 = t3;
+	T B4 = R2;
+	R2 ^= R0;
+	R0 &= R3;
+	B4 |= R3;
+	R2 = ~R2;
+	R3 ^= R1;
+	R1 |= R0;
+	R0 ^= R2;
+	R2 &= B4;
+	R3 &= B4;
+	R1 ^= R2;
+	R2 ^= R0;
+	R0 |= R2;
+	B4 ^= R1;
+	R0 ^= R3;
+	R3 ^= B4;
+	B4 |= R0;
+	R3 ^= R2;
+	B4 ^= R2;
+	R2 = R1;
+	R1 = R0;
+	R0 = R3;
+	R3 = B4;
 }
 
 #endif

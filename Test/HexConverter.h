@@ -67,16 +67,16 @@ namespace Test
 			}
 		}
 
-		static void Decode(const char *InputArray[], size_t Length, std::vector<std::vector<byte>> &OutputArray)
+		static void Decode(const char *Input[], size_t Length, std::vector<std::vector<byte>> &Output)
 		{
-			OutputArray.reserve(Length);
+			Output.reserve(Length);
 
 			for (size_t i = 0; i < Length; ++i)
 			{
-				std::string encoded = InputArray[i];
+				std::string encoded = Input[i];
 				std::vector<byte> decoded;
 				Decode(encoded, decoded);
-				OutputArray.push_back(decoded);
+				Output.push_back(decoded);
 			}
 		}
 

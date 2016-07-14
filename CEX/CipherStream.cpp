@@ -576,7 +576,6 @@ void CipherStream::ParallelCTR(const std::vector<byte> &Input, size_t InOffset, 
 	m_cipherEngine->IsParallel() = true;
 	m_cipherEngine->ParallelBlockSize(blkSize);
 
-	// parallel blocks
 	while (count != alnSize)
 	{
 		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);

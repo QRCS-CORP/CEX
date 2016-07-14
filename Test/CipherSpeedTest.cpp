@@ -24,6 +24,8 @@ namespace Test
 		{
 			Initialize();
 
+			TFXSpeedTest();
+
 			OnProgress("### Parallel CTR Mode Speed Tests: 10 loops * 100MB ###");
 #if defined (AESNI_AVAILABLE)
 			OnProgress("***AES-NI (AHX): Monte Carlo test (K=256; R=14)***");
@@ -233,7 +235,7 @@ namespace Test
 		// note: requires large data to reach best speed due to 
 		// os management of thread queues, overclock, hyperthreading etc.
 		// best results are obtained when looping test to +100GB.
-		// on an hp all-in-one i7-6700T/12GB-1600 -> h:4926, l:1690, avg: 4634 MB per second!
+		// on an hp all-in-one i7-6700T/12GB-1600 -> h:8137, l:2377, avg: 3755 MB per second!
 
 		//for (int i = 0; i < 100; ++i)
 		//{

@@ -167,11 +167,11 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset,
 				memcpy(&m_threadVectors[i][0], &m_cbcIv[0], blkSize);
 		}
 
-
 		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, cnkSize, blkCount, blkSize](size_t i)
 		{
 			this->ProcessDecrypt(Input, InOffset + i * cnkSize, Output, OutOffset + i * cnkSize, m_threadVectors[i], blkCount);
 		});
+
 		// copy the last vector to class variable
 		memcpy(&m_cbcIv[0], &m_threadVectors[m_processorCount - 1][0], m_cbcIv.size());
 	}
@@ -181,7 +181,7 @@ void CBC::ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::v
 {
 	std::vector<byte> nextIv(Iv.size(), 0);
 
-	for (size_t i = 0; i < BlockCount; i++)
+	for (size_t i = 0; i < BlockCount; ++i)
 	{
 		memcpy(&nextIv[0], &Input[InOffset], nextIv.size());
 		// decrypt input

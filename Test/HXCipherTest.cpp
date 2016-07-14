@@ -50,11 +50,12 @@ namespace Test
 		};
 		HexConverter::Decode(rhxEncoded, 4, m_rhxExpected);
 
+		// Note: kat change with serpent move from BE to LE format
 		const char* shxEncoded[3] =
 		{
-			("6f4309f375cad2e65fcfa28091ceed17"),	// hkdf extended 32 rounds
-			("9dcd48706592211eb48d659b9df8824f"),	// hkdf extended 40 rounds
-			("9c41b8c6fba7154b95afc7c8a5449687")	// standard 512 key, 40 rounds
+			("da87958d7644a9409d39bf8abb1f68a5"),	// hkdf extended 32 rounds
+			("631cfb750c1dccd2af8509af8eed9ee6"),	// hkdf extended 40 rounds
+			("71c6c606b65798621dd19fa0f5e7acb0")	// standard 512 key, 40 rounds
 		};
 		HexConverter::Decode(shxEncoded, 3, m_shxExpected);
 
