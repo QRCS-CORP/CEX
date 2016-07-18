@@ -13,7 +13,11 @@ CEX::Cipher::Symmetric::Stream::IStreamCipher* StreamCipherFromName::GetInstance
 		case CEX::Enumeration::StreamCiphers::Salsa:
 			return new CEX::Cipher::Symmetric::Stream::Salsa20(RoundCount);
 		default:
+#if defined(ENABLE_CPPEXCEPTIONS)
 			throw CEX::Exception::CryptoException("StreamCipherFromName:GetStreamEngine", "The stream cipher is not recognized!");
+#else
+			return 0;
+#endif
 	}
 }
 

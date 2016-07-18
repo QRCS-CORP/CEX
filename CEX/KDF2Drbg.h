@@ -121,8 +121,10 @@ public:
 		m_msgDigest(Digest),
 		m_salt(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
+#endif
 	}
 
 	/// <summary>

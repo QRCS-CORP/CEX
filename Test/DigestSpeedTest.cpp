@@ -14,7 +14,6 @@ namespace Test
 		
 		std::vector<byte> hash(dgt->DigestSize(), 0);
 		std::vector<byte> buffer(bufSze, 0);
-		const char* name = dgt->Name();
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)

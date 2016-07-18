@@ -101,6 +101,7 @@
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -168,6 +169,7 @@
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/-D__INTEL_COMPILER_USE_INTRINSIC_PROTOTYPES %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -235,6 +237,7 @@
     <ClInclude Include="..\..\CEX\IBlockCipher.h" />
     <ClInclude Include="..\..\CEX\IByteStream.h" />
     <ClInclude Include="..\..\CEX\ICipherMode.h" />
+    <ClInclude Include="..\..\CEX\IDigest.h" />
     <ClInclude Include="..\..\CEX\IGenerator.h" />
     <ClInclude Include="..\..\CEX\IMac.h" />
     <ClInclude Include="..\..\CEX\UInt128.h" />

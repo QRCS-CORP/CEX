@@ -155,8 +155,10 @@ public:
 		m_T(0),
 		m_V(16, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Salt.size() != 4)
 			throw CryptoDigestException("Blake256:Ctor", "The Salt array length must be 4!");
+#endif
 
 		for (size_t i = 0; i < m_salt32.size(); i++)
 			m_salt32[i] = Salt[i];

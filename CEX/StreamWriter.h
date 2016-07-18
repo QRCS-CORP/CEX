@@ -137,7 +137,7 @@ public:
 	void Write(ulong Value);
 
 
-	template <class T>
+	template <typename T>
 	/// <summary>
 	/// Write an integer array to the base stream
 	/// </summary>

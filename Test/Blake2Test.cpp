@@ -226,7 +226,7 @@ namespace Test
 	void Blake2Test::MacParamsTest()
 	{
 		std::vector<uint8_t> key(64);
-		for (size_t i = 0; i < key.size(); ++i)
+		for (uint8_t i = 0; i < key.size(); ++i)
 			key[i] = i;
 
 		CEX::Common::MacParams mkey(key, key, key);

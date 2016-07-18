@@ -26,14 +26,18 @@
 
 #include "Common.h"
 #include "BlockCiphers.h"
-#include "CryptoSymmetricCipherException.h"
 #include "IDigest.h"
 #include "UInt128.h"
 #include "KeyParams.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoSymmetricCipherException.h"
+#endif
 
 NAMESPACE_BLOCK
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoSymmetricCipherException;
+#endif
 
 /// <summary>
 /// Block Cipher Interface
@@ -64,6 +68,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() = 0;
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() = 0;
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
@@ -190,9 +199,19 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input UInt128 to Transform</param>
-	/// <param name="Output">UInt128 Output product of Transform</param>
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+
+	/// <summary>
+	/// Transform 8 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
+	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 
 NAMESPACE_BLOCKEND

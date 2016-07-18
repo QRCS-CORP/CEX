@@ -5,8 +5,10 @@ NAMESPACE_MAC
 
 void VMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoMacException("VMAC:Ctor", "The Input buffer is too short!");
+#endif
 
 	for (size_t i = 0; i < Length; ++i)
 		Update(Input[InOffset + i]);
@@ -14,8 +16,10 @@ void VMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 void VMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (!m_isInitialized)
 		throw CryptoMacException("VMAC:ComputeMac", "The Mac is not initialized!");
+#endif
 
 	if (Output.size() != MAC_SIZE)
 		Output.resize(MAC_SIZE);
@@ -47,8 +51,10 @@ void VMAC::Destroy()
 
 size_t VMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() - OutOffset < MAC_SIZE)
 		throw CryptoMacException("VMAC:DoFinal", "The Output buffer is too short!");
+#endif
 
 	size_t ctr = 1;
 	byte ptmp;
@@ -109,10 +115,12 @@ size_t VMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 
 void VMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (MacKey.size() == 0)
 		throw CryptoMacException("VMAC:Initialize", "Key can not be zero length!");
 	if (IV.size() < 1 || IV.size() > 768)
 		throw CryptoMacException("VMAC:Initialize", "VMAC requires 1 to 768 bytes of IV!");
+#endif
 
 	m_workingIV.resize(IV.size());
 	memcpy(&m_workingIV[0], &IV[0], IV.size());

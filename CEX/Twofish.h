@@ -26,6 +26,72 @@
 
 #include "Common.h"
 
+// *** Twofish Lookup Templates *** //
+
+template<typename T, typename U>
+T I8Fe0(const T &X, const std::vector<U> &M)
+{
+	return T(
+		M[2 * X.Register.m256i_u8[28]] ^ M[2 * X.Register.m256i_u8[29] + 0x001] ^ M[2 * X.Register.m256i_u8[30] + 0x200] ^ M[2 * X.Register.m256i_u8[31] + 0x201],
+		M[2 * X.Register.m256i_u8[24]] ^ M[2 * X.Register.m256i_u8[25] + 0x001] ^ M[2 * X.Register.m256i_u8[26] + 0x200] ^ M[2 * X.Register.m256i_u8[27] + 0x201],
+		M[2 * X.Register.m256i_u8[20]] ^ M[2 * X.Register.m256i_u8[21] + 0x001] ^ M[2 * X.Register.m256i_u8[22] + 0x200] ^ M[2 * X.Register.m256i_u8[23] + 0x201],
+		M[2 * X.Register.m256i_u8[16]] ^ M[2 * X.Register.m256i_u8[17] + 0x001] ^ M[2 * X.Register.m256i_u8[18] + 0x200] ^ M[2 * X.Register.m256i_u8[19] + 0x201],
+		M[2 * X.Register.m256i_u8[12]] ^ M[2 * X.Register.m256i_u8[13] + 0x001] ^ M[2 * X.Register.m256i_u8[14] + 0x200] ^ M[2 * X.Register.m256i_u8[15] + 0x201],
+		M[2 * X.Register.m256i_u8[8]] ^ M[2 * X.Register.m256i_u8[9] + 0x001] ^ M[2 * X.Register.m256i_u8[10] + 0x200] ^ M[2 * X.Register.m256i_u8[11] + 0x201],
+		M[2 * X.Register.m256i_u8[4]] ^ M[2 * X.Register.m256i_u8[5] + 0x001] ^ M[2 * X.Register.m256i_u8[6] + 0x200] ^ M[2 * X.Register.m256i_u8[7] + 0x201],
+		M[2 * X.Register.m256i_u8[0]] ^ M[2 * X.Register.m256i_u8[1] + 0x001] ^ M[2 * X.Register.m256i_u8[2] + 0x200] ^ M[2 * X.Register.m256i_u8[3] + 0x201]
+	);
+}
+
+template<typename T, typename U>
+T I8Fe3(const T &X, const std::vector<U> &M)
+{
+	return T(
+		M[2 * X.Register.m256i_u8[28] + 0x001] ^ M[2 * X.Register.m256i_u8[29] + 0x200] ^ M[2 * X.Register.m256i_u8[30] + 0x201] ^ M[2 * X.Register.m256i_u8[31]],
+		M[2 * X.Register.m256i_u8[24] + 0x001] ^ M[2 * X.Register.m256i_u8[25] + 0x200] ^ M[2 * X.Register.m256i_u8[26] + 0x201] ^ M[2 * X.Register.m256i_u8[27]],
+		M[2 * X.Register.m256i_u8[20] + 0x001] ^ M[2 * X.Register.m256i_u8[21] + 0x200] ^ M[2 * X.Register.m256i_u8[22] + 0x201] ^ M[2 * X.Register.m256i_u8[23]],
+		M[2 * X.Register.m256i_u8[16] + 0x001] ^ M[2 * X.Register.m256i_u8[17] + 0x200] ^ M[2 * X.Register.m256i_u8[18] + 0x201] ^ M[2 * X.Register.m256i_u8[19]],
+		M[2 * X.Register.m256i_u8[12] + 0x001] ^ M[2 * X.Register.m256i_u8[13] + 0x200] ^ M[2 * X.Register.m256i_u8[14] + 0x201] ^ M[2 * X.Register.m256i_u8[15]],
+		M[2 * X.Register.m256i_u8[8] + 0x001] ^ M[2 * X.Register.m256i_u8[9] + 0x200] ^ M[2 * X.Register.m256i_u8[10] + 0x201] ^ M[2 * X.Register.m256i_u8[11]],
+		M[2 * X.Register.m256i_u8[4] + 0x001] ^ M[2 * X.Register.m256i_u8[5] + 0x200] ^ M[2 * X.Register.m256i_u8[6] + 0x201] ^ M[2 * X.Register.m256i_u8[7]],
+		M[2 * X.Register.m256i_u8[0] + 0x001] ^ M[2 * X.Register.m256i_u8[1] + 0x200] ^ M[2 * X.Register.m256i_u8[2] + 0x201] ^ M[2 * X.Register.m256i_u8[3]]
+	);
+}
+
+template<typename T, typename U>
+T I4Fe0(const T &X, const std::vector<U> &M)
+{
+	return T(
+		M[2 * X.Register.m128i_u8[12]] ^ M[2 * X.Register.m128i_u8[13] + 0x001] ^ M[2 * X.Register.m128i_u8[14] + 0x200] ^ M[2 * X.Register.m128i_u8[15] + 0x201],
+		M[2 * X.Register.m128i_u8[8]] ^ M[2 * X.Register.m128i_u8[9] + 0x001] ^ M[2 * X.Register.m128i_u8[10] + 0x200] ^ M[2 * X.Register.m128i_u8[11] + 0x201],
+		M[2 * X.Register.m128i_u8[4]] ^ M[2 * X.Register.m128i_u8[5] + 0x001] ^ M[2 * X.Register.m128i_u8[6] + 0x200] ^ M[2 * X.Register.m128i_u8[7] + 0x201],
+		M[2 * X.Register.m128i_u8[0]] ^ M[2 * X.Register.m128i_u8[1] + 0x001] ^ M[2 * X.Register.m128i_u8[2] + 0x200] ^ M[2 * X.Register.m128i_u8[3] + 0x201]
+	);
+}
+
+template<typename T, typename U>
+T I4Fe3(const T &X, const std::vector<U> &M)
+{
+	return T(
+		M[2 * X.Register.m128i_u8[12] + 0x001] ^ M[2 * X.Register.m128i_u8[13] + 0x200] ^ M[2 * X.Register.m128i_u8[14] + 0x201] ^ M[2 * X.Register.m128i_u8[15]],
+		M[2 * X.Register.m128i_u8[8] + 0x001] ^ M[2 * X.Register.m128i_u8[9] + 0x200] ^ M[2 * X.Register.m128i_u8[10] + 0x201] ^ M[2 * X.Register.m128i_u8[11]],
+		M[2 * X.Register.m128i_u8[4] + 0x001] ^ M[2 * X.Register.m128i_u8[5] + 0x200] ^ M[2 * X.Register.m128i_u8[6] + 0x201] ^ M[2 * X.Register.m128i_u8[7]],
+		M[2 * X.Register.m128i_u8[0] + 0x001] ^ M[2 * X.Register.m128i_u8[1] + 0x200] ^ M[2 * X.Register.m128i_u8[2] + 0x201] ^ M[2 * X.Register.m128i_u8[3]]
+	);
+}
+
+template<typename T, typename U>
+T Fe0(const T X, std::vector<U> &M)
+{
+	return M[2 * (byte)X] ^ M[2 * (byte)(X >> 8) + 0x001] ^ M[2 * (byte)(X >> 16) + 0x200] ^ M[2 * (byte)(X >> 24) + 0x201];
+}
+
+template<typename T, typename U>
+T Fe3(const T X, const std::vector<U> &M)
+{
+	return M[2 * (byte)X + 0x001] ^ M[2 * (byte)(X >> 8) + 0x200] ^ M[2 * (byte)(X >> 16) + 0x201] ^ M[2 * (byte)(X >> 24)];
+}
+
 // *** Twofish S-Box and Lookup Tables *** //
 
 // Constant Tables

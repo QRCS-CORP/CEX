@@ -68,8 +68,9 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	int dgtsze = GetIkmSize(m_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
+
+#if defined(ENABLE_CPPEXCEPTIONS)
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
-	
 	if (key.size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
 	if (dgtsze != 0 && key.size() > m_legalKeySizes[3] && (key.size() % dgtsze) != 0)
@@ -88,10 +89,10 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	{
 		if (key.size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
-
-		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}
+#endif
 
+	m_kdfEngine = GetDigest(m_kdfEngineType);
 	m_isEncryption = Encryption;
 	// expand the key
 	ExpandKey(Encryption, key);
@@ -121,6 +122,14 @@ void RHX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std
 		Encrypt64(Input, InOffset, Output, OutOffset);
 	else
 		Decrypt64(Input, InOffset, Output, OutOffset);
+}
+
+void RHX::Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt128(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
 // *** Key Schedule *** //
@@ -610,6 +619,12 @@ void RHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
 }
 
+void RHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Decrypt64(Input, InOffset, Output, OutOffset);
+	Decrypt64(Input, InOffset + 64, Output, OutOffset + 64);
+}
+
 void RHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 5;
@@ -758,6 +773,12 @@ void RHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
 }
 
+void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Encrypt64(Input, InOffset, Output, OutOffset);
+	Encrypt64(Input, InOffset + 64, Output, OutOffset + 64);
+}
+
 // *** Helpers *** //
 
 int RHX::GetIkmSize(CEX::Enumeration::Digests DigestType)
@@ -773,7 +794,11 @@ CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CryptoSymmetricCipherException("RHX:GetDigest", "The digest could not be instantiated!");
+#else
+		return 0;
+#endif
 	}
 }
 

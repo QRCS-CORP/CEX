@@ -3,7 +3,7 @@
 
 #include "Common.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 #	include <intrin.h>
 #	include <stdio.h>
 #		define cpuid(info, x)  __cpuidex(info, x, 0)
@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// Enumeration of processor feature sets
 	/// </summary>
-	enum FeatureSet : uint32_t
+	enum FeatureSet : uint
 	{
 		/// <summary>
 		/// Intructions are not available
@@ -315,14 +315,18 @@ public:
 			HW_AES = (info[2] & ((int)1 << 25)) != 0;
 			HW_FMA3 = (info[2] & ((int)1 << 12)) != 0;
 			HW_RDRAND = (info[2] & ((int)1 << 30)) != 0;
+#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
+			HW_AVX = HasAvxSupport();
+#else
 			HW_AVX = (info[2] & ((int)1 << 28)) != 0;
+#endif
 		}
 
 		if (nIds >= 0x00000007)
 		{
 			cpuid(info, 0x00000007);
 #if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-			HW_AVX2 = IsAVS2Supported();
+			HW_AVX2 = HasAvx2Support();
 #else
 			HW_AVX2 = (info[1] & ((int)1 << 5)) != 0;
 #endif
@@ -353,8 +357,25 @@ public:
 		}
 	}
 
+
 	/// <summary>
-	/// Returns true if any of the AVX512, AVX2, AVX1, or XOP feature sets are available
+	/// Returns true if any of the AVX512, AVX2, or AVX feature sets are detected
+	/// </summary>
+	bool HasAVX()
+	{
+		return HW_AVX512F || HW_AVX2 || HW_AVX;
+	}
+
+	/// <summary>
+	/// Returns true if any of the AVX512, or AVX2 feature sets are detected
+	/// </summary>
+	bool HasAVX2()
+	{
+		return HW_AVX512F || HW_AVX2;
+	}
+
+	/// <summary>
+	/// Returns true if any of the AVX512, AVX2, AVX1, or XOP feature sets are detected
 	/// </summary>
 	bool HasAdvancedSSE()
 	{
@@ -362,11 +383,19 @@ public:
 	}
 
 	/// <summary>
-	/// Returns true if SSE2 or greater is available
+	/// Returns true if SSE2 or greater is detected
 	/// </summary>
 	bool HasMinIntrinsics()
 	{
 		return HW_AVX512F || HW_AVX2 || HW_AVX || HW_XOP || HW_SSE42 || HW_SSE41 || HW_SSE4A || HW_SSSE3 || HW_SSE3 || HW_SSE2;
+	}
+
+	/// <summary>
+	/// Returns true if the XOP feature set is detected
+	/// </summary>
+	bool HasXOP()
+	{
+		return HW_XOP;
 	}
 
 	/// <summary> 
@@ -404,9 +433,9 @@ public:
 
 private:
 #if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-	bool IsAVSSupported()
+	bool HasAvxSupport()
 	{
-		bool avxSupported = false;
+		bool support = false;
 		int cpuInfo[4];
 		__cpuid(cpuInfo, 1);
 
@@ -417,15 +446,15 @@ private:
 		{
 			// Check if the OS will save the YMM registers
 			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);// 0xe6 avc2
-			HW_AVX = (xcrFeatureMask & 0x6) || false;
+			support = (xcrFeatureMask & 0x6) || false;
 		}
 
-		return avxSupported;
+		return support;
 	}
 
-	bool IsAVS2Supported()
+	bool HasAvx2Support()
 	{
-		bool avx2Supported = false;
+		bool support = false;
 		int cpuInfo[4];
 		__cpuid(cpuInfo, 1);
 
@@ -436,10 +465,10 @@ private:
 		{
 			// Check if the OS will save the YMM registers
 			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-			avx2Supported = (xcrFeatureMask & 0xe6) || false;
+			support = (xcrFeatureMask & 0xe6) || false;
 		}
 
-		return avx2Supported;
+		return support;
 	}
 #endif
 };

@@ -96,9 +96,10 @@ public:
 		m_rslCounter(0),
 		m_wrkBuffer(MSIZE)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Seed.size() < 1 || Seed.size() > 256)
 			throw CryptoRandomException("ISCRsg:CTor", "The seed array length must be between 1 and 256 int32 values!");
-
+#endif
 		size_t len = Seed.size() > MAXSEED ? MAXSEED : Seed.size();
 		memcpy(&m_rndResult[0], &Seed[0], len * sizeof(int));
 		Initialize(true);

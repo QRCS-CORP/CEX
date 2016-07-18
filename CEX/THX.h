@@ -126,6 +126,7 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<uint> m_expKey;
+	bool m_hasAVX;
 	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	size_t m_ikmSize;
@@ -163,6 +164,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::THX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() { return m_hasAVX; }
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
@@ -214,7 +220,8 @@ public:
 		:
 		m_destroyEngine(false),
 		m_dfnRounds(Rounds),
-		m_hasIntrinsics(true),
+		m_hasIntrinsics(false),
+		m_hasAVX(false),
 		m_hkdfInfo(0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -225,10 +232,12 @@ public:
 		m_legalRounds(9, 0),
 		m_sBox(SBOX_SIZE, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("THX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
 			throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
+#endif
 
 		std::string info = "THX version 1 information string";
 		m_hkdfInfo.reserve(info.size());
@@ -248,6 +257,9 @@ public:
 
 		for (size_t i = 4; i < m_legalKeySizes.size(); i++)
 			m_legalKeySizes[i] = (m_legalKeySizes[3] + m_ikmSize * (i - 3));
+
+		// intrinsics support switch
+		DetectCpu();
 	}
 
 	/// <summary>
@@ -264,7 +276,7 @@ public:
 		:
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
-		m_hasIntrinsics(true),
+		m_hasIntrinsics(false),
 		m_hkdfInfo(0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -284,8 +296,10 @@ public:
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
 				throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
+#endif
 
 			std::string info = "THX version 1 information string";
 			m_hkdfInfo.reserve(info.size());
@@ -307,6 +321,9 @@ public:
 			m_legalRounds.resize(2);
 			m_legalRounds = { 16, 20 };
 		}
+
+		// intrinsics support switch
+		DetectCpu();
 	}
 
 	/// <summary>
@@ -406,51 +423,29 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input UInt128 to Transform</param>
-	/// <param name="Output">UInt128 Output product of Transform</param>
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
+	/// <summary>
+	/// Transform 8 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
+	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
 private:
-
-	template<typename T, typename U>
-	T I4Fe0(const T &X, const std::vector<U> &M)
-	{
-		return T(
-			M[2 * X.Register.m128i_u8[12]] ^ m_sBox[2 * X.Register.m128i_u8[13] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[14] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[15] + 0x201],
-			M[2 * X.Register.m128i_u8[8]] ^ m_sBox[2 * X.Register.m128i_u8[9] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[10] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[11] + 0x201],
-			M[2 * X.Register.m128i_u8[4]] ^ m_sBox[2 * X.Register.m128i_u8[5] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[6] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[7] + 0x201],
-			M[2 * X.Register.m128i_u8[0]] ^ m_sBox[2 * X.Register.m128i_u8[1] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[2] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[3] + 0x201]
-		);
-	}
-
-	template<typename T, typename U>
-	T I4Fe3(const T &X, const std::vector<U> &M)
-	{
-		return T(
-			M[2 * X.Register.m128i_u8[12] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[13] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[14] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[15]],
-			M[2 * X.Register.m128i_u8[8] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[9] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[10] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[11]],
-			M[2 * X.Register.m128i_u8[4] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[5] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[6] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[7]],
-			M[2 * X.Register.m128i_u8[0] + 0x001] ^ m_sBox[2 * X.Register.m128i_u8[1] + 0x200] ^ m_sBox[2 * X.Register.m128i_u8[2] + 0x201] ^ m_sBox[2 * X.Register.m128i_u8[3]]
-		);
-	}
-
-	template<typename T, typename U>
-	T Fe0(const T X, std::vector<U> &M)
-	{
-		return M[2 * (byte)X] ^ m_sBox[2 * (byte)(X >> 8) + 0x001] ^ m_sBox[2 * (byte)(X >> 16) + 0x200] ^ m_sBox[2 * (byte)(X >> 24) + 0x201];
-	}
-
-	template<typename T, typename U>
-	T Fe3(const T X, const std::vector<U> &M)
-	{
-		return M[2 * (byte)X + 0x001] ^ m_sBox[2 * (byte)(X >> 8) + 0x200] ^ m_sBox[2 * (byte)(X >> 16) + 0x201] ^ m_sBox[2 * (byte)(X >> 24)];
-	}
-
+	void DetectCpu();
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
 	uint EncodeMDS(uint K0, uint K1);

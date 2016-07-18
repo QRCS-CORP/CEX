@@ -132,18 +132,9 @@ public:
 	virtual const char* Name() { return "CFB"; }
 
 	/// <summary>
-	/// Get: Parallel block size.
+	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize)
-	{
-		SetScope();
-		m_parallelBlockSize = BlockSize;
-	}
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -183,12 +174,14 @@ public:
 		m_processorCount(1),
 		m_parallelBlockSize(PARALLEL_DEFBLOCK)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CFB:CTor", "The Cipher can not be null!");
 		if (BlockSizeBits % 8 != 0)
 			throw CryptoCipherModeException("CFB:CTor", "Invalid block size! Block must be in bits and a multiple of 8.");
 		if (BlockSizeBits / 8 > Cipher->BlockSize())
 			throw CryptoCipherModeException("CFB:CTor", "Invalid block size! Block size can not be larger than Cipher block size.");
+#endif
 
 		SetScope();
 	}

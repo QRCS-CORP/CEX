@@ -6,9 +6,10 @@ NAMESPACE_DIGEST
 
 void Keccak256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Keccak256:BlockUpdate", "The Input buffer is too short!");
-
+#endif
 	if (m_bufferIndex != 0)
 	{
 		if (Length + m_bufferIndex >= m_blockSize)
@@ -59,8 +60,10 @@ void Keccak256::Destroy()
 
 size_t Keccak256::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() - OutOffset < m_digestSize)
 		throw CryptoDigestException("Keccak256:DoFinal", "The Output buffer is too short!");
+#endif
 
 	memset(&m_buffer[m_bufferIndex], (byte)0, m_buffer.size() - m_bufferIndex);
 

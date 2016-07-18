@@ -55,8 +55,10 @@ std::vector<byte> PPBPrng::GetBytes(size_t Size)
 /// <param name="Output">Output array</param>
 void PPBPrng::GetBytes(std::vector<byte> &Output)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() == 0)
 		throw CryptoRandomException("CTRPrng:GetBytes", "Buffer size must be at least 1 byte!");
+#endif
 
 	if (m_byteBuffer.size() - m_bufferIndex < Output.size())
 	{

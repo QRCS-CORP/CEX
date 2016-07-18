@@ -178,7 +178,9 @@ public:
 			}
 			catch (...)
 			{
+#if defined(ENABLE_CPPEXCEPTIONS)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
+#endif
 			}
 
 			m_isStreamCipher = true;
@@ -192,7 +194,9 @@ public:
 			}
 			catch (...)
 			{
+#if defined(ENABLE_CPPEXCEPTIONS)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
+#endif
 			}
 
 			m_isStreamCipher = false;
@@ -222,8 +226,10 @@ public:
 		m_isInitialized(false),
 		m_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Header == 0)
 			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
+#endif
 
 		SetScope();
 
@@ -235,7 +241,9 @@ public:
 			}
 			catch (...)
 			{
+#if defined(ENABLE_CPPEXCEPTIONS)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
+#endif
 			}
 
 			m_isStreamCipher = true;
@@ -249,7 +257,9 @@ public:
 			}
 			catch (...)
 			{
+#if defined(ENABLE_CPPEXCEPTIONS)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
+#endif
 			}
 
 			m_isStreamCipher = false;
@@ -282,9 +292,10 @@ public:
 		m_isStreamCipher(false),
 		m_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (m_cipherEngine->IsInitialized())
 			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher must be initialized through the local Initialize() method!");
-
+#endif
 		SetScope();
 		ParametersCheck();
 
@@ -316,10 +327,12 @@ public:
 		m_parallelBlockProfile(BlockProfiles::SpeedProfile),
 		m_streamCipher(Cipher)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Cipher == 0)
 			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!");
 		if (Cipher->IsInitialized())
 			throw CEX::Exception::CryptoProcessingException("The cipher must be initialized through the local Initialize() method!");
+#endif
 
 		SetScope();
 		ParametersCheck();

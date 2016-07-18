@@ -255,7 +255,7 @@ size_t Blake2Bp512::Generate(CEX::Common::MacParams &MacKey, std::vector<uint8_t
 	assert(MacKey.Key().size() >= DIGEST_SIZE);
 	assert((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) <= BLOCK_SIZE);
 #endif
-#if defined(CPP_EXCEPTIONS)
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() == 0)
 		throw CEX::Exception::CryptoDigestException("Blake2Bp512:Generate", "Buffer size must be at least 1 byte!");
 	if (MacKey.Key().size() < DIGEST_SIZE)
@@ -316,7 +316,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 #if defined(_DEBUG)
 	assert(MacKey.Key().size() >= 32 || MacKey.Key().size() <= 64);
 #endif
-#if defined(CPP_EXCEPTIONS)
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (MacKey.Key().size() < 32 || MacKey.Key().size() > 64)
 		throw CEX::Exception::CryptoDigestException("Blake2Bp512", "Mac Key has invalid length!");
 #endif
@@ -326,7 +326,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 #if defined(_DEBUG)
 		assert(MacKey.Salt().size() == 16);
 #endif
-#if defined(CPP_EXCEPTIONS)
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (MacKey.Salt().size() != 16)
 			throw CEX::Exception::CryptoDigestException("Blake2Bp512", "Salt has invalid length!");
 #endif
@@ -340,7 +340,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 #if defined(_DEBUG)
 		assert(MacKey.Info().size() == 16);
 #endif
-#if defined(CPP_EXCEPTIONS)
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (MacKey.Info().size() != 16)
 			throw CEX::Exception::CryptoDigestException("Blake2Bp512", "Info has invalid length!");
 #endif

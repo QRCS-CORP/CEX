@@ -118,7 +118,6 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<uint> m_expKey;
-	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -156,9 +155,14 @@ public:
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::RHX; }
 
 	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() { return false; }
+
+	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
 	/// </summary>
-	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
+	virtual const bool HasIntrinsics() { return false; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -208,7 +212,6 @@ public:
 		m_destroyEngine(false),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
-		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -219,12 +222,14 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(15, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+#endif
 
 		std::string info = "information string RHX version 1";
 		m_hkdfInfo.reserve(info.size());
@@ -263,7 +268,6 @@ public:
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
-		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -274,8 +278,10 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(0, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
+#endif
 
 		// add standard key lengths
 		m_legalKeySizes[0] = 16;
@@ -285,8 +291,10 @@ public:
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
 				throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+#endif
 
 			std::string info = "information string RHX version 1";
 			m_hkdfInfo.reserve(info.size());
@@ -411,13 +419,25 @@ public:
 	/// <param name="Output">UInt128 Output product of Transform</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
+	/// <summary>
+	/// Transform 8 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
+	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
 private:
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt32(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	void ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex);
 	void ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset);

@@ -2,12 +2,16 @@
 #define _CEXENGINE_IRANDOM_H
 
 #include "Common.h"
-#include "CryptoRandomException.h"
 #include "Prngs.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoRandomException.h"
+#endif
 
 NAMESPACE_PRNG
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoRandomException;
+#endif
 
 /// <summary>
 /// Psuedo Random Number Generator interface

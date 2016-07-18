@@ -104,8 +104,10 @@ public:
 		m_streamData(0),
 		m_streamPosition(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Length > DataArray.size() - Offset)
 			throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
+#endif
 
 		m_streamData.reserve(Length);
 		m_streamData.insert(m_streamData.begin(), DataArray.begin() + Offset, DataArray.begin() + Length);

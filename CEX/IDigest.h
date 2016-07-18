@@ -2,12 +2,16 @@
 #define _CEXENGINE_IDIGEST_H
 
 #include "Common.h"
-#include "CryptoDigestException.h"
 #include "Digests.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoDigestException.h"
+#endif
 
 NAMESPACE_DIGEST
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoDigestException;
+#endif
 
 /// <summary>
 /// Hash Digest Interface

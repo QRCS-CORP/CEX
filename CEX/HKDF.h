@@ -121,8 +121,10 @@ public:
 		m_keySize(Digest->BlockSize()),
 		m_msgDigest(Digest)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
+#endif
 
 		 m_digestMac = new CEX::Mac::HMAC(m_msgDigest);
 	}
@@ -145,8 +147,10 @@ public:
 		m_keySize(Hmac->BlockSize()),
 		m_msgDigest(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Hmac == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Hmac can not be null!");
+#endif
 	}
 
 	/// <summary>

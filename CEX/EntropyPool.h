@@ -23,7 +23,9 @@ public:
 		:
 		_isDestroyed(false)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw std::exception("Not Implemented!");
+#endif
 	}
 
 	/// <summary>

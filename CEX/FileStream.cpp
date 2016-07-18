@@ -11,8 +11,10 @@ void FileStream::Close()
 
 void FileStream::CopyTo(IByteStream* Destination)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (_fileSize == 0)
 		throw CryptoProcessingException("FileStream:CopyTo", "The output array is too short!");
+#endif
 
 	Destination->Seek(0, CEX::IO::SeekOrigin::Begin);
 
@@ -63,8 +65,10 @@ void FileStream::Flush()
 
 size_t FileStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (_fileAccess == FileAccess::Write)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
+#endif
 
 	if (Offset + Count > _fileSize - _filePosition)
 		Count = _fileSize - _filePosition;
@@ -81,10 +85,12 @@ size_t FileStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count)
 
 byte FileStream::ReadByte()
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (_fileSize - _filePosition < 1)
 		throw CryptoProcessingException("FileStream:ReadByte", "The output array is too short!");
 	if (_fileAccess == FileAccess::Write)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
+#endif
 
 	byte data(1);
 
@@ -113,8 +119,10 @@ void FileStream::Seek(size_t Offset, SeekOrigin Origin)
 
 void FileStream::SetLength(size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:SetLength", "The file was opened as read only!");
+#endif
 
 	_fileStream.seekg(Length - 1, std::ios::beg);
 	WriteByte(0);
@@ -123,8 +131,10 @@ void FileStream::SetLength(size_t Length)
 
 void FileStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
+#endif
 
 	_fileStream.write((char*)&Buffer[Offset], Count);
 	_filePosition += Count;
@@ -133,8 +143,10 @@ void FileStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Co
 
 void FileStream::WriteByte(byte Data)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
+#endif
 
 	_fileStream.write((char*)&Data, 1);
 	_filePosition += 1;

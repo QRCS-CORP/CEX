@@ -1,4 +1,5 @@
 #include "ParallelModeTest.h"
+#include "TestUtils.h"
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
 #include "../CEX/CTR.h"
@@ -11,9 +12,13 @@
 #	include "../CEX/AHX.h"
 #	include "../CEX/SHX.h"
 #	include "../CEX/THX.h"
+#	include "../CEX/ChaCha.h"
+#	include "../CEX/Salsa20.h"
+#	include "../CEX/UInt256.h"
+#	include "../CEX/UInt128.h"
 #endif
 
-#define STAT_INP
+//#define STAT_INP // internal testing
 
 namespace Test
 {
@@ -25,18 +30,43 @@ namespace Test
 
 #if defined(HAS_MINSSE)
 
-			AHXCompare();
+			CompareAhxSimd();
 			OnProgress("ParallelModeTest: AHX Passed AES-NI/Rijndael CTR/CBC comparison tests..");
 			CEX::Cipher::Symmetric::Block::AHX* eng1 = new CEX::Cipher::Symmetric::Block::AHX();
-			TestIntrinsics(eng1);
-			OnProgress("ParallelModeTest: AHX Passed Rijndael Intrinsics Integrity tests..");
+			CompareBcrSimd(eng1);
+			OnProgress("ParallelModeTest: AHX Passed Rijndael Parallel Intrinsics Integrity tests..");
+			CompareBcrKat(eng1, m_katExpected[0]);
+			OnProgress("ParallelModeTest: AHX Passed Rijndael Monte Carlo KAT test..");
+			delete eng1;
+
 			CEX::Cipher::Symmetric::Block::SHX* eng2 = new CEX::Cipher::Symmetric::Block::SHX();
-			TestIntrinsics(eng2);
-			OnProgress("ParallelModeTest: SHX Passed Serpent Intrinsics Integrity tests..");
+			CompareBcrSimd(eng2);
+			OnProgress("ParallelModeTest: SHX Passed Serpent Parallel Intrinsics Integrity tests..");
+			CompareBcrKat(eng2, m_katExpected[1]);
+			OnProgress("ParallelModeTest: SHX Passed Serpent Monte Carlo KAT test..");
+			delete eng2;
+
 			CEX::Cipher::Symmetric::Block::THX* eng3 = new CEX::Cipher::Symmetric::Block::THX();
-			TestIntrinsics(eng3);
-			OnProgress("ParallelModeTest: THX Passed Twofish Intrinsics Integrity tests..");
+			CompareBcrSimd(eng3);
+			CompareBcrKat(eng3, m_katExpected[2]);
+			OnProgress("ParallelModeTest: THX Passed Serpent Monte Carlo KAT test..");
+			delete eng3;
+			OnProgress("ParallelModeTest: THX Passed Twofish Parallel Intrinsics Integrity tests..");
 			OnProgress("");
+
+			CEX::Cipher::Symmetric::Stream::ChaCha* stm1 = new CEX::Cipher::Symmetric::Stream::ChaCha();
+			CompareStmSimd(stm1);
+			OnProgress("ParallelModeTest: ChaCha Passed Parallel Intrinsics Integrity tests..");
+			CompareStmKat(stm1, m_katExpected[3]);
+			OnProgress("ParallelModeTest: ChaCha Passed Monte Carlo KAT test..");
+			delete stm1;
+
+			CEX::Cipher::Symmetric::Stream::Salsa20* stm2 = new CEX::Cipher::Symmetric::Stream::Salsa20();
+			CompareStmSimd(stm2);
+			OnProgress("ParallelModeTest: Salsa Passed Parallel Intrinsics Integrity tests..");
+			CompareStmKat(stm2, m_katExpected[4]);
+			OnProgress("ParallelModeTest: Salsa Passed Monte Carlo KAT test..");
+			delete stm2;
 
 #endif
 			ParallelIntegrity();
@@ -56,9 +86,10 @@ namespace Test
 		}
 	}
 
-	void ParallelModeTest::AHXCompare()
+	void ParallelModeTest::CompareAhxSimd()
 	{
 #if defined(HAS_MINSSE)
+
 		std::vector<byte> data;
 		std::vector<byte> dec;
 		std::vector<byte> enc1;
@@ -89,13 +120,13 @@ namespace Test
 
 			CEX::Common::KeyParams keyParam(key, iv);
 
-			cpr1.ParallelBlockSize(cpr1.ParallelMinimumSize() * cpr1.ProcessorCount());
+			cpr1.ParallelBlockSize() = cpr1.ParallelMinimumSize() * cpr1.ProcessorCount();
 			cpr1.Initialize(true, keyParam);
 			cpr1.IsParallel() = true;
 			blockSize = cpr1.ParallelBlockSize();
 			Transform1(&cpr1, data, blockSize, enc1);
 
-			cpr2.ParallelBlockSize(cpr2.ParallelMinimumSize() * cpr2.ProcessorCount());
+			cpr2.ParallelBlockSize() = cpr2.ParallelMinimumSize() * cpr2.ProcessorCount();
 			cpr2.Initialize(true, keyParam);
 			cpr2.IsParallel() = true;
 			blockSize = cpr2.ParallelBlockSize();
@@ -154,162 +185,61 @@ namespace Test
 #endif
 	}
 
-
-	void ParallelModeTest::TestIntrinsics(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine)
+	void ParallelModeTest::CompareBcrKat(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, std::vector<byte> Expected)
 	{
-#if defined(HAS_MINSSE)
-		std::vector<byte> data;
-		std::vector<byte> dec;
-		std::vector<byte> enc1;
-		std::vector<byte> enc2;
+		size_t blkSize = 1024;
+		std::vector<byte> data(blkSize);
+		std::vector<byte> enc(blkSize);
 		std::vector<byte> key(32);
 		std::vector<byte> iv(16);
-		size_t blockSize;
-		CEX::Prng::CSPPrng rng;
-		data.reserve(MAX_ALLOC);
-		enc1.reserve(MAX_ALLOC);
-		enc2.reserve(MAX_ALLOC);
-
-#if defined STAT_INP
-		for (size_t i = 0; i < key.size(); ++i)
+		data[0] = 128;
+		for (uint8_t i = 0; i < key.size(); ++i)
 			key[i] = i;
-		for (size_t i = 0; i < iv.size(); ++i)
+		for (uint8_t i = 0; i < iv.size(); ++i)
 			iv[i] = i;
-#endif
 
-		for (size_t i = 0; i < 100; ++i)
-		{
-			size_t smpSze = rng.Next(MIN_ALLOC, MAX_ALLOC);
-			data.resize(smpSze);
-			dec.resize(smpSze);
-			enc1.resize(smpSze);
-			enc2.resize(smpSze);
+		CEX::Common::KeyParams keyParam(key, iv);
+		CEX::Cipher::Symmetric::Block::Mode::CTR cipher(Engine);
+		cipher.ParallelBlockSize() = blkSize;
+		// parallel w/ intrinsics (if available)
+		cipher.Initialize(true, keyParam);
+		cipher.IsParallel() = true;
+		cipher.ParallelBlockSize() = blkSize;
+		Transform1(&cipher, data, data.size(), enc);
 
-#if !defined STAT_INP
-			rng.GetBytes(data);
-			GetBytes(32, key);
-			GetBytes(16, iv);
-#endif
-			CEX::Common::KeyParams keyParam(key, iv);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(Engine);
-			cipher.ParallelBlockSize(cipher.ParallelMinimumSize() * cipher.ProcessorCount());
-			// parallel w/ intrinsics (if available)
-			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = true;
-			blockSize = cipher.ParallelBlockSize();
-			Transform1(&cipher, data, blockSize, enc1);
+		while (enc.size() > 32)
+			enc = TestUtils::Reduce(enc);
 
-			// sequential
-			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
-			blockSize = cipher.BlockSize();
-			Transform1(&cipher, data, blockSize, enc2);
-
-			if (enc1 != enc2)
-				throw std::string("Parallel CTR: Encrypted output is not equal!");
-
-			// decrypt
-			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
-			blockSize = cipher.ParallelBlockSize();
-			Transform1(&cipher, enc1, blockSize, dec);
-
-			if (dec != data)
-				throw std::string("Parallel CTR: Decrypted output is not equal!");
-		}
-		delete Engine;
-#endif
+		if (enc != Expected)
+			throw std::string("ParallelModeTest: Failed Kat comparison test!");
 	}
 
-	void ParallelModeTest::BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	void ParallelModeTest::CompareStmKat(CEX::Cipher::Symmetric::Stream::IStreamCipher* Engine, std::vector<byte> Expected)
 	{
-		const size_t blkSize = Cipher->BlockSize();
-		const size_t inpSize = (Input.size() - InOffset);
-		const size_t alnSize = (inpSize - (inpSize % blkSize));
-		size_t count = 0;
+		size_t blkSize = 1024;
+		std::vector<byte> data(blkSize);
+		std::vector<byte> enc(blkSize);
+		std::vector<byte> key(32);
+		std::vector<byte> iv(8);
+		data[0] = 128;
+		for (uint8_t i = 0; i < key.size(); ++i)
+			key[i] = i;
+		for (uint8_t i = 0; i < iv.size(); ++i)
+			iv[i] = i;
+		CEX::Common::KeyParams keyParam(key, iv);
+		Engine->ParallelBlockSize() = blkSize;
 
-		Cipher->IsParallel() = false;
+		// parallel with intrinsics (if available)
+		Engine->Initialize(keyParam);
+		Engine->IsParallel() = true;
+		Engine->ParallelBlockSize() = blkSize;
+		Engine->Transform(data, enc);
 
-		while (count != alnSize)
-		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
-			InOffset += blkSize;
-			OutOffset += blkSize;
- 			count += blkSize;
-		}
+		while (enc.size() > 32)
+			enc = TestUtils::Reduce(enc);
 
-		// partial
-		if (alnSize != inpSize)
-		{
-			size_t cnkSize = inpSize - alnSize;
-			std::vector<byte> inpBuffer(blkSize);
-			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-			std::vector<byte> outBuffer(blkSize);
-			Cipher->Transform(inpBuffer, 0, outBuffer, 0);
-			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-		}
-	}
-
-	void ParallelModeTest::BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-	{
-		const size_t blkSize = Cipher->BlockSize();
-		const size_t inpSize = (size_t)(Input.size() - InOffset);
-		const size_t alnSize = (size_t)(inpSize - blkSize);
-		size_t count = 0;
-
-		Cipher->IsParallel() = false;
-
-		while (count != alnSize)
-		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
-			InOffset += blkSize;
-			OutOffset += blkSize;
-			count += blkSize;
-		}
-
-		// last block
-		std::vector<byte> inpBuffer(blkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
-		std::vector<byte> outBuffer(blkSize);
-		Cipher->Transform(inpBuffer, 0, outBuffer, 0);
-		size_t fnlSize = blkSize - (size_t)Padding->GetPaddingLength(outBuffer, 0);
-		memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
-		OutOffset += fnlSize;
-
-		if (Output.size() != OutOffset)
-			Output.resize(OutOffset);
-	}
-
-	void ParallelModeTest::BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-	{
-		const size_t blkSize = Cipher->BlockSize();
-		const size_t inpSize = (size_t)(Input.size() - InOffset);
-		const size_t alnSize = inpSize - (inpSize % blkSize);
-		size_t count = 0;
-
-		Cipher->IsParallel() = false;
-
-		while (count != alnSize)
-		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
-			InOffset += blkSize;
-			OutOffset += blkSize;
-			count += blkSize;
-		}
-
-		// partial
-		if (alnSize != inpSize)
-		{
-			size_t fnlSize = inpSize - alnSize;
-			std::vector<byte> inpBuffer(blkSize);
-			memcpy(&inpBuffer[0], &Input[InOffset], fnlSize);
-			Padding->AddPadding(inpBuffer, fnlSize);
-			std::vector<byte> outBuffer(blkSize);
-			Cipher->Transform(inpBuffer, 0, outBuffer, 0);
-			if (Output.size() != OutOffset + blkSize)
-				Output.resize(OutOffset + blkSize);
-			memcpy(&Output[OutOffset], &outBuffer[0], blkSize);
-		}
+		if (enc != Expected)
+			throw std::string("ParallelModeTest: Failed Kat comparison test!");
 	}
 
 	void ParallelModeTest::CompareParallel()
@@ -346,7 +276,7 @@ namespace Test
 				plen = 1024;
 
 			// set parallel block size
-			cipher.ParallelBlockSize(plen);
+			cipher.ParallelBlockSize() = plen;
 
 			// encrypt //
 			// parallel 1
@@ -435,7 +365,7 @@ namespace Test
 			GetBytes(2048, data);
 
 			// encrypt
-			cipher.ParallelBlockSize(1024);
+			cipher.ParallelBlockSize() = 1024;
 
 			// t1: encrypt only in normal mode for cbc
 			cipher.Initialize(true, keyParam);
@@ -500,7 +430,7 @@ namespace Test
 			GetBytes(2048, data);
 
 			// encrypt
-			cipher.ParallelBlockSize(1024);
+			cipher.ParallelBlockSize() = 1024;
 
 			// t1: encrypt only in normal mode for cfb
 			cipher.Initialize(true, keyParam);
@@ -556,6 +486,233 @@ namespace Test
 		std::cout << "ParallelModeTest: Passed Parallel CFB decryption tests..\n";
 	}
 
+	/* Helpers */
+
+	void ParallelModeTest::CompareBcrSimd(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine)
+	{
+#if defined(HAS_MINSSE)
+
+		std::vector<byte> data;
+		std::vector<byte> dec;
+		std::vector<byte> enc1;
+		std::vector<byte> enc2;
+		std::vector<byte> key(32);
+		std::vector<byte> iv(16);
+		size_t blockSize;
+		CEX::Prng::CSPPrng rng;
+		data.reserve(MAX_ALLOC);
+		enc1.reserve(MAX_ALLOC);
+		enc2.reserve(MAX_ALLOC);
+
+#if defined STAT_INP
+		for (size_t i = 0; i < key.size(); ++i)
+			key[i] = i;
+		for (size_t i = 0; i < iv.size(); ++i)
+			iv[i] = i;
+#endif
+
+		for (size_t i = 0; i < 100; ++i)
+		{
+			size_t smpSze = rng.Next(MIN_ALLOC, MAX_ALLOC);
+			data.resize(smpSze);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+
+#if !defined STAT_INP
+			rng.GetBytes(data);
+			GetBytes(32, key);
+			GetBytes(16, iv);
+#endif
+			CEX::Common::KeyParams keyParam(key, iv);
+			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(Engine);
+			cipher.ParallelBlockSize() = cipher.ParallelMinimumSize() * cipher.ProcessorCount();
+			// parallel w/ intrinsics (if available)
+			cipher.Initialize(true, keyParam);
+			cipher.IsParallel() = true;
+			blockSize = cipher.ParallelBlockSize();
+			Transform1(&cipher, data, blockSize, enc1);
+
+			// sequential
+			cipher.Initialize(true, keyParam);
+			cipher.IsParallel() = false;
+			blockSize = cipher.BlockSize();
+			Transform1(&cipher, data, blockSize, enc2);
+
+			if (enc1 != enc2)
+				throw std::string("Parallel CTR: Encrypted output is not equal!");
+
+			// decrypt
+			cipher.Initialize(false, keyParam);
+			cipher.IsParallel() = true;
+			blockSize = cipher.ParallelBlockSize();
+			Transform1(&cipher, enc1, blockSize, dec);
+
+			if (dec != data)
+				throw std::string("Parallel CTR: Decrypted output is not equal!");
+		}
+#endif
+	}
+
+	void ParallelModeTest::CompareStmSimd(CEX::Cipher::Symmetric::Stream::IStreamCipher* Engine)
+	{
+#if defined(HAS_MINSSE)
+
+		std::vector<byte> data;
+		std::vector<byte> dec;
+		std::vector<byte> enc1;
+		std::vector<byte> enc2;
+		std::vector<byte> key(32);
+		std::vector<byte> iv(8);
+		CEX::Prng::CSPPrng rng;
+		data.reserve(MAX_ALLOC);
+		enc1.reserve(MAX_ALLOC);
+		enc2.reserve(MAX_ALLOC);
+
+#if defined(STAT_INP)
+		for (size_t i = 0; i < key.size(); ++i)
+			key[i] = i;
+		for (size_t i = 0; i < iv.size(); ++i)
+			iv[i] = i;
+#endif
+
+		for (size_t i = 0; i < 100; ++i)
+		{
+#if !defined(STAT_INP)
+			size_t smpSze = rng.Next(MIN_ALLOC, MAX_ALLOC);
+			data.resize(smpSze);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+			rng.GetBytes(data);
+			GetBytes(32, key);
+			GetBytes(8, iv);
+#else
+			size_t smpSze = MIN_ALLOC * 8;
+			data.resize(smpSze);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+#endif
+			CEX::Common::KeyParams keyParam(key, iv);
+			Engine->ParallelBlockSize() = Engine->ParallelMinimumSize() * Engine->ProcessorCount();
+
+			// parallel with intrinsics (if available)
+			Engine->Initialize(keyParam);
+			Engine->IsParallel() = true;
+			Engine->Transform(data, enc1);
+
+			// sequential
+			Engine->Initialize(keyParam);
+			Engine->IsParallel() = false;
+			Engine->Transform(data, enc2);
+
+			if (enc1 != enc2)
+				throw std::string("Parallel Stream: Encrypted output is not equal!");
+
+			// decrypt
+			Engine->Initialize(keyParam);
+			Engine->IsParallel() = true;
+			Engine->Transform(enc1, dec);
+
+			if (dec != data)
+				throw std::string("Parallel Stream: Decrypted output is not equal!");
+		}
+
+#endif
+	}
+
+	void ParallelModeTest::BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	{
+		const size_t blkSize = Cipher->BlockSize();
+		const size_t inpSize = (Input.size() - InOffset);
+		const size_t alnSize = (inpSize - (inpSize % blkSize));
+		size_t count = 0;
+
+		Cipher->IsParallel() = false;
+
+		while (count != alnSize)
+		{
+			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			InOffset += blkSize;
+			OutOffset += blkSize;
+ 			count += blkSize;
+		}
+
+		// partial
+		if (alnSize != inpSize)
+		{
+			size_t cnkSize = inpSize - alnSize;
+			std::vector<byte> inpBuffer(blkSize);
+			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
+			std::vector<byte> outBuffer(blkSize);
+			Cipher->Transform(inpBuffer, 0, outBuffer, 0);
+			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
+		}
+	}
+
+	void ParallelModeTest::BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	{
+		const size_t blkSize = Cipher->BlockSize();
+		const size_t inpSize = (size_t)(Input.size() - InOffset);
+		const size_t alnSize = (size_t)(inpSize - blkSize);
+		size_t count = 0;
+
+		Cipher->IsParallel() = false;
+
+		while (count != alnSize)
+		{
+			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			InOffset += blkSize;
+			OutOffset += blkSize;
+			count += blkSize;
+		}
+
+		// last block
+		std::vector<byte> inpBuffer(blkSize);
+		memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
+		std::vector<byte> outBuffer(blkSize);
+		Cipher->Transform(inpBuffer, 0, outBuffer, 0);
+		size_t fnlSize = blkSize - (size_t)Padding->GetPaddingLength(outBuffer, 0);
+		memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
+		OutOffset += fnlSize;
+
+		//if (Output.size() != OutOffset)
+		//	Output.resize(OutOffset);
+	}
+
+	void ParallelModeTest::BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	{
+		const size_t blkSize = Cipher->BlockSize();
+		const size_t inpSize = (size_t)(Input.size() - InOffset);
+		const size_t alnSize = inpSize - (inpSize % blkSize);
+		size_t count = 0;
+
+		Cipher->IsParallel() = false;
+
+		while (count != alnSize)
+		{
+			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			InOffset += blkSize;
+			OutOffset += blkSize;
+			count += blkSize;
+		}
+
+		// partial
+		if (alnSize != inpSize)
+		{
+			size_t fnlSize = inpSize - alnSize;
+			std::vector<byte> inpBuffer(blkSize);
+			memcpy(&inpBuffer[0], &Input[InOffset], fnlSize);
+			Padding->AddPadding(inpBuffer, fnlSize);
+			std::vector<byte> outBuffer(blkSize);
+			Cipher->Transform(inpBuffer, 0, outBuffer, 0);
+			if (Output.size() != OutOffset + blkSize)
+				Output.resize(OutOffset + blkSize);
+			memcpy(&Output[OutOffset], &outBuffer[0], blkSize);
+		}
+	}
+
 	void ParallelModeTest::GetBytes(size_t Size, std::vector<byte> &Output)
 	{
 		Output.resize(Size, 0);
@@ -565,6 +722,17 @@ namespace Test
 
 	void ParallelModeTest::Initialize()
 	{
+		// vectors derived from linear loop, no intrinsics
+		const char* expected[5] =
+		{
+			("c07d97f791abc487129f47a6d29f66992d5994fbb3b8b11f3f0e8f479aa353de"), //rijndael
+			("c3d46cf0bfebf80589bb65fef3fab9fc8993f352500a9d71483d4382aab695a6"), //serpent
+			("94e6761273d83ce4f775d21eb37e88fb848b77f16791fa805a64e5750c0684b9"), //twofish
+			("0ff7d6c12d2afa7b227a3c0e31212bc98703114e7d9a9db53aef6e96d0093c0e"), //chacha
+			("27b530353e1d7c3af4a19c061e3f6ebdc4e3512df7b3805e53c30b6071cd3426")  //salsa
+		};
+		HexConverter::Decode(expected, 5, m_katExpected);
+
 		m_cipherText.reserve(MAX_ALLOC);
 		m_decText.reserve(MAX_ALLOC);
 		m_plnText.reserve(MAX_ALLOC);
@@ -585,7 +753,7 @@ namespace Test
 		size_t count = 0;
 
 		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize(blkSize);
+		Cipher->ParallelBlockSize() = blkSize;
 
 		// parallel blocks
 		while (count != alnSize)
@@ -615,7 +783,7 @@ namespace Test
 		size_t count = 0;
 
 		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize(blkSize);
+		Cipher->ParallelBlockSize() = blkSize;
 
 		// parallel
 		while (count != alnSize)
@@ -627,9 +795,7 @@ namespace Test
 		}
 
 		if (alnSize != inpSize)
-		{
 			BlockDecrypt(Cipher, Padding, Input, InOffset, Output, OutOffset);
-		}
 	}
 
 	void ParallelModeTest::ParallelIntegrity()
@@ -667,19 +833,19 @@ namespace Test
 				ParallelCTR(&cipher, m_plnText, 0, cp2Text, 0);
 
 				if (m_cipherText[i] != cp2Text[i])
-					throw std::string("CipherStreamTest: Encrypted arrays are not equal!");
+					throw std::string("ParallelModeTest: Encrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
 				BlockCTR(&cipher, m_cipherText, 0, m_decText, 0);
 
 				if (m_decText != m_plnText)
-					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
+					throw std::string("ParallelModeTest: Decrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
 				ParallelCTR(&cipher, cp2Text, 0, m_decText, 0);
 
 				if (m_decText != m_plnText)
-					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
+					throw std::string("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;
@@ -709,7 +875,7 @@ namespace Test
 				ParallelDecrypt(&cipher, &pad, m_cipherText, 0, m_decText, 0);
 
 				if (m_plnText != m_decText)
-					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
+					throw std::string("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;
@@ -739,7 +905,7 @@ namespace Test
 				ParallelDecrypt(&cipher, &pad, m_cipherText, 0, m_decText, 0);
 
 				if (m_plnText != m_decText)
-					throw std::string("CipherStreamTest: Decrypted arrays are not equal!");
+					throw std::string("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;

@@ -138,7 +138,9 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
+	//RunTest(new CipherSpeedTest());
 	//RunTest(new TwofishTest());
+	//for (size_t i = 0; i < 100; ++i)
 	//RunTest(new ParallelModeTest());
 	//RunTest(new HXCipherTest());
 

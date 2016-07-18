@@ -6,8 +6,10 @@ NAMESPACE_DIGEST
 
 void SHA512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("SHA512:BlockUpdate", "The Input buffer is too short!");
+#endif
 
 	// fill the current word
 	while ((m_bufferOffset != 0) && (Length > 0))
@@ -60,8 +62,10 @@ void SHA512::Destroy()
 
 size_t SHA512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("SHA512:DoFinal", "The Output buffer is too short!");
+#endif
 
 	Finish();
 	CEX::Utility::IntUtils::Be64ToBytes(H0, Output, OutOffset);

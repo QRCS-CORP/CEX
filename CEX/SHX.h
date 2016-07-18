@@ -114,6 +114,7 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<uint> m_expKey;
+	bool m_hasAVX;
 	bool m_hasIntrinsics;
 	std::vector<byte> m_hkdfInfo;
 	size_t m_ikmSize;
@@ -150,6 +151,11 @@ public:
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::SHX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() { return m_hasAVX; }
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
@@ -202,6 +208,7 @@ public:
 		m_destroyEngine(false),
 		m_isDestroyed(false),
 		m_dfnRounds(Rounds),
+		m_hasAVX(false),
 		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
@@ -211,10 +218,12 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(5, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("SHX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (Rounds != 32 && Rounds != 40 && Rounds != 48 && Rounds != 56 && Rounds != 64)
 			throw CryptoSymmetricCipherException("SHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64.");
+#endif
 
 		std::string info = "SHX version 1 information string";
 		m_hkdfInfo.reserve(info.size());
@@ -254,6 +263,7 @@ public:
 		m_isDestroyed(false),
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
+		m_hasAVX(false),
 		m_hasIntrinsics(false),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
@@ -272,8 +282,10 @@ public:
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (Rounds != 32 && Rounds != 40 && Rounds != 48 && Rounds != 56 && Rounds != 64)
 				throw CryptoSymmetricCipherException("SHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, and 64.");
+#endif
 
 			std::string info = "SHX version 1 information string";
 			m_hkdfInfo.reserve(info.size());
@@ -397,17 +409,29 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input UInt128 to Transform</param>
-	/// <param name="Output">UInt128 Output product of Transform</param>
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
+	/// Transform 8 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
+	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
 	void DetectCpu();
 	void ExpandKey(const std::vector<byte> &Key);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 	void SecureExpand(const std::vector<byte> &Key);

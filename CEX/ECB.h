@@ -126,17 +126,9 @@ public:
 	virtual const char* Name() { return "ECB"; }
 
 	/// <summary>
-	/// Get: Parallel block size.
+	/// Get/Set: Parallel block size; not used in ECB
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize)
-	{
-		m_parallelBlockSize = 0;
-	}
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -174,8 +166,10 @@ public:
 		m_parallelBlockSize(0),
 		m_processorCount(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!");
+#endif
 
 		SetScope();
 	}

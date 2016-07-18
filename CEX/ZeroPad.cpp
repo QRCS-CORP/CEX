@@ -4,9 +4,10 @@ NAMESPACE_PADDING
 
 size_t ZeroPad::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Offset > Input.size())
 		throw CEX::Exception::CryptoPaddingException("ZeroPad:AddPadding", "The padding offset value is longer than the array length!");
-
+#endif
 	byte code = (byte)0;
 
 	while (Offset < Input.size())

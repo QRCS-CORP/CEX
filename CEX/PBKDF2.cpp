@@ -28,8 +28,10 @@ size_t PBKDF2::Generate(std::vector<byte> &Output)
 
 size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("PBKDF2:Generate", "Output buffer too small!");
+#endif
 
 	GenerateKey(Output, OutOffset, Size);
 
@@ -38,8 +40,10 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size
 
 void PBKDF2::Initialize(const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Ikm.size() < m_hashSize * 2)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
+#endif
 
 	m_macKey.resize(m_hashSize);
 	memcpy(&m_macKey[0], &Ikm[0], m_hashSize);
@@ -51,10 +55,12 @@ void PBKDF2::Initialize(const std::vector<byte> &Ikm)
 
 void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() < m_blockSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_hashSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "IKM size is too small; must be a minumum of digest block size!");
+#endif
 
 	// clone iv and salt
 	m_macKey.resize(Ikm.size());
@@ -70,10 +76,12 @@ void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &
 
 void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() + Nonce.size() < m_blockSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_hashSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "IKM with Nonce size is too small; combined must be a minumum of digest block size!");
+#endif
 
 	m_macKey.resize(Ikm.size());
 	m_macSalt.resize(Salt.size() + Nonce.size());
@@ -90,8 +98,10 @@ void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &
 
 void PBKDF2::Update(const std::vector<byte> &Salt)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("PBKDF2:Update", "Salt is too small!");
+#endif
 
 	Initialize(Salt);
 }

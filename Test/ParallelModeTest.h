@@ -5,6 +5,7 @@
 #include "../CEX/IBlockCipher.h"
 #include "../CEX/ICipherMode.h"
 #include "../CEX/IPadding.h"
+#include "../CEX/IStreamCipher.h"
 
 namespace Test
 {
@@ -22,6 +23,7 @@ namespace Test
 		const unsigned int DEF_BLOCK = 64000;
 
 		TestEventHandler m_progressEvent;
+		std::vector<std::vector<byte>> m_katExpected;
 		std::vector<byte> m_cipherText;
 		std::vector<byte> m_decText;
 		std::vector<byte> m_iv;
@@ -69,8 +71,11 @@ namespace Test
 		virtual std::string Run();
         
     private:
-		void AHXCompare();
-		void TestIntrinsics(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine);
+		void CompareAhxSimd();
+		void CompareBcrSimd(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine);
+		void CompareStmSimd(CEX::Cipher::Symmetric::Stream::IStreamCipher* Engine);
+		void CompareBcrKat(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, std::vector<byte> Expected);
+		void CompareStmKat(CEX::Cipher::Symmetric::Stream::IStreamCipher* Engine, std::vector<byte> Expected);
 		void BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding,
 		const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);

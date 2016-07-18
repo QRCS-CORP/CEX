@@ -149,7 +149,11 @@ CEX::Digest::IDigest* KeyGenerator::GetDigestEngine(CEX::Enumeration::Digests Di
 	}
 	catch (...)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoGeneratorException("KeyGenerator:GetDigestEngine", "The digest could not be instantiated!");
+#else
+		return 0;
+#endif
 	}
 }
 
@@ -161,7 +165,11 @@ CEX::Seed::ISeed* KeyGenerator::GetSeedEngine(CEX::Enumeration::SeedGenerators S
 	}
 	catch (...)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoGeneratorException("KeyGenerator:GetSeedEngine", "The prng could not be instantiated!");
+#else
+		return 0;
+#endif
 	}
 }
 

@@ -2,12 +2,16 @@
 #define _CEXENGINE_ISEED_H
 
 #include "Common.h"
-#include "CryptoRandomException.h"
 #include "SeedGenerators.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoRandomException.h"
+#endif
 
 NAMESPACE_SEED
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoRandomException;
+#endif
 
 /// <summary>
 /// ISeed: Pseudo random seed generator interface

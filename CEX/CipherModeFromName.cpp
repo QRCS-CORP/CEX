@@ -19,7 +19,11 @@ CEX::Cipher::Symmetric::Block::Mode::ICipherMode* CipherModeFromName::GetInstanc
 		case CEX::Enumeration::CipherModes::OFB:
 			return new CEX::Cipher::Symmetric::Block::Mode::OFB(Engine);
 		default:
+#if defined(ENABLE_CPPEXCEPTIONS)
 			throw CEX::Exception::CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
+#else
+			return 0;
+#endif
 	}
 }
 

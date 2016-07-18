@@ -32,8 +32,10 @@ size_t SP20Drbg::Generate(std::vector<byte> &Output)
 
 size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("SP20Drbg:Generate", "Output buffer too small!");
+#endif
 
 	Transform(Output, OutOffset);
 	return Size;
@@ -41,8 +43,10 @@ size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 
 void SP20Drbg::Initialize(const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Ikm.size() != m_legalKeySizes[0] + VECTOR_SIZE && Ikm.size() != m_legalKeySizes[1] + VECTOR_SIZE)
 		throw CryptoGeneratorException("SP20Drbg:Initialize", "Key material size is too small; must be exactly 24 (128 bit key) or 40 bytes (256 bit key)!");
+#endif
 
 	std::string info;
 	if (Ikm.size() == 24)
@@ -82,15 +86,19 @@ void SP20Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte>
 
 void SP20Drbg::Update(const std::vector<byte> &Salt)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("SP20Drbg:Update", "Salt is too small!");
+#endif
 
 	if (Salt.size() == m_legalKeySizes[0] + VECTOR_SIZE || Salt.size() == m_legalKeySizes[1] + VECTOR_SIZE)
 		Initialize(Salt);
 	else if (Salt.size() == VECTOR_SIZE)
 		memcpy(&m_ctrVector[0], &Salt[0], m_ctrVector.size());
+#if defined(ENABLE_CPPEXCEPTIONS)
 	else
 		throw CryptoGeneratorException("SP20Drbg:Update", "Salt must be either 40 bytes; (key and vector), or 8 bytes; (vector only) in length!");
+#endif
 }
 
 // *** Protected *** //

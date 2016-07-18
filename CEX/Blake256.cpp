@@ -31,9 +31,10 @@ static constexpr uint m_ftSigma[] =
 
 void Blake256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake256:BlockUpdate", "The Input buffer is too short!");
-
+#endif
 	size_t fill = BLOCK_SIZE - m_dataLen;
 
 	// compress remaining data filled with new bits
@@ -92,8 +93,10 @@ void Blake256::Destroy()
 
 size_t Blake256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Blake256:DoFinal", "The Output buffer is too short!");
+#endif
 
 	std::vector<byte> msgLen(8);
 	ulong len = m_T + ((uint64_t)m_dataLen << 3);

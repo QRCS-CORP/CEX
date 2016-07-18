@@ -21,3 +21,11 @@ Changes July 14, 2016:
 * Expanded intrinsic support in AES-NI (AHX) to 4 block (Encrypt64 and Decrypt64)
 * Serpent changed from outputting big endian to little endian (breaking change)
 * Added intrinsics intrgrity tests to ParallelModeTest.
+
+Version 1.1h
+Changes July 18, 2016:
+* SIMD intrinsics supported added to Serpent (SHX), Twofish (THX) and extended in Rijndael (AHX)
+* Block cipher CTR mode runtime switched (cpu check) to use 128 (SSE3) and 256 (AVX) intrinsics if available
+* 128 and 256 SIMD support added to ChaCha and Salsa implementations
+* C++ exceptions support now optional via the ENABLE_CPPEXCEPTIONS flag in Config.h
+* Added various intrinsics tests to ParallelModeTest class

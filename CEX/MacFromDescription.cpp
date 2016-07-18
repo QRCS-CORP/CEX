@@ -24,7 +24,12 @@ CEX::Mac::IMac* MacFromDescription::GetInstance(CEX::Common::MacDescription &Des
 		return new CEX::Mac::VMAC();
 	}
 	default:
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoException("MacFromDescription:GetInstance", "The symmetric cipher is not recognized!");
+#else
+		return 0;
+#endif
+
 	}
 }
 

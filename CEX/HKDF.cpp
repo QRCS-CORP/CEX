@@ -25,10 +25,12 @@ size_t HKDF::Generate(std::vector<byte> &Output)
 
 size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("HKDF:Generate", "Output buffer too small!");
 	if (m_generatedBytes + Size > 255 * m_hashSize)
 		throw CryptoGeneratorException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
+#endif
 
 	if (m_generatedBytes % m_hashSize == 0)
 		ExpandNext();
@@ -59,8 +61,10 @@ size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 
 void HKDF::Initialize(const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Ikm.size() < m_keySize)
 		throw CryptoGeneratorException("DGCDrbg:Initialize", "Salt value is too small!");
+#endif
 
 	m_digestMac->Initialize(Ikm);
 	m_generatedBytes = 0;
@@ -119,9 +123,10 @@ void HKDF::Extract(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, 
 void HKDF::ExpandNext()
 {
 	size_t n = m_generatedBytes / m_hashSize + 1;
-
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (n >= 256)
 		throw CryptoGeneratorException("HKDF:ExpandNext", "HKDF cannot generate more than 255 blocks of HashLen size");
+#endif
 
 	// special case for T(0): T(0) is empty, so no update
 	if (m_generatedBytes != 0)

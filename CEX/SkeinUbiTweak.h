@@ -144,8 +144,10 @@ public:
 	/// </summary>
 	void SetTreeLevel(const byte Value)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Value > 63)
 			throw CEX::Exception::CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
+#endif
 
 		m_tweak[1] &= ~((ulong)0x3f << 48);
 		m_tweak[1] |= (ulong)Value << 48;

@@ -115,9 +115,10 @@ public:
 		m_isDestroyed(false),
 		m_seedType(SeedEngine)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (BufferSize < 64)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 64 bytes!");
-
+#endif
 		Reset();
 	}
 
@@ -138,13 +139,14 @@ public:
 		m_digestType(DigestEngine),
 		m_isDestroyed(false)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Seed.size() == 0)
 			throw CryptoRandomException("DGCPrng:Ctor", "Seed can not be null!");
 		if (GetMinimumSeedSize(DigestEngine) < Seed.size())
 			throw CryptoRandomException("DGCPrng:Ctor", "The state seed is too small! must be at least digest block size + 8 bytes");
 		if (BufferSize < 128)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 128 bytes!");
-
+#endif
 		m_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
 		Reset();
 	}

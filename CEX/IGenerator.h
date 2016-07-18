@@ -2,12 +2,16 @@
 #define _CEXENGINE_IGenerator_H
 
 #include "Common.h"
-#include "CryptoGeneratorException.h"
 #include "Generators.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoGeneratorException.h"
+#endif
 
 NAMESPACE_GENERATOR
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoGeneratorException;
+#endif
 
 /// <summary>
 /// Pseudo random Generator Interface

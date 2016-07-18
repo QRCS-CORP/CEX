@@ -11,8 +11,11 @@ byte StreamReader::ReadByte()
 		m_streamData.Read(data, 0, 1);
 		return data[0];
 	}
-
+#if defined(ENABLE_CPPEXCEPTIONS)
 	throw CEX::Exception::CryptoProcessingException("StreamReader:ReadByte", "The array does not contain enough data!");
+#else
+	return 0;
+#endif
 }
 
 std::vector<byte> StreamReader::ReadBytes(size_t Length)
@@ -25,7 +28,11 @@ std::vector<byte> StreamReader::ReadBytes(size_t Length)
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadBytes", "The array does not contain enough data!");
+#else
+		return std::vector<byte>(0);
+#endif
 	}
 }
 
@@ -43,7 +50,11 @@ short StreamReader::ReadInt16()
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt16", "The array does not contain enough data!");
+#else
+		return 0;
+#endif
 	}
 }
 
@@ -61,7 +72,11 @@ ushort StreamReader::ReadUInt16()
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt16", "The array does not contain enough data!");
+#else
+		return 0;
+#endif
 	}
 }
 
@@ -79,7 +94,11 @@ int StreamReader::ReadInt32()
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt32", "The array does not contain enough data!");
+#else
+		return 0;
+#endif
 	}
 }
 
@@ -97,7 +116,11 @@ uint StreamReader::ReadUInt32()
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt32", "The array does not contain enough data!");
+#else
+		return 0;
+#endif
 	}
 }
 
@@ -115,7 +138,11 @@ long StreamReader::ReadInt64()
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt64", "The array does not contain enough data!");
+#else
+		return 0;
+#endif
 	}
 }
 
@@ -133,7 +160,11 @@ ulong StreamReader::ReadUInt64()
 	}
 	else
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
+#else
+		return 0;
+#endif
 	}
 }
 

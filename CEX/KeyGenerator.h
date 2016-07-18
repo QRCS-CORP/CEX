@@ -97,8 +97,10 @@ public:
 		_isDestroyed(false),
 		_rngType(SeedType)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Counter.size() > 32 || (Counter.size() < 4 && Counter.size() != 0))
 			throw CEX::Exception::CryptoGeneratorException("KeyGenerator:Ctor", "The counter size must be either 0, or between 4 and 32 bytes!");
+#endif
 
 		// initialize the generators
 		Reset();

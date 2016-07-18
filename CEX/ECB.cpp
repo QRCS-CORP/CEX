@@ -39,6 +39,10 @@ void ECB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void ECB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
+	if (KeyParam.Key().size() < 16)
+		throw CryptoSymmetricCipherException("ECB:Initialize", "Requires a minimum 16 bytes of Key!");
+#endif
 	m_blockCipher->Initialize(Encryption, KeyParam);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;

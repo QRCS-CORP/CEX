@@ -24,13 +24,17 @@
 #ifndef _CEXENGINE_ICIPHERMODE_H
 #define _CEXENGINE_ICIPHERMODE_H
 
-#include "CryptoCipherModeException.h"
 #include "CipherModes.h"
 #include "IBlockCipher.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoCipherModeException.h"
+#endif
 
 NAMESPACE_MODE
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoCipherModeException;
+#endif
 
 /// <summary>
 /// Cipher Mode Interface
@@ -98,14 +102,9 @@ public:
 	virtual const char* Name() = 0;
 
 	/// <summary>
-	/// Get: Parallel block size.
+	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual const size_t ParallelBlockSize() = 0;
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize) = 0;
+	virtual size_t &ParallelBlockSize() = 0;
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing

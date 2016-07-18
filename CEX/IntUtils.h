@@ -969,7 +969,7 @@ public:
 	/// <returns>The cropped integer</returns>
 	static ulong Crop(ulong Value, uint Size);
 
-	template <class T>
+	template <typename T>
 	/// <summary>
 	/// Get a byte from an integer
 	/// </summary>
@@ -987,7 +987,7 @@ public:
 #endif
 	}
 
-	template <class T>
+	template <typename T>
 	/// <summary>
 	/// Test for power of 2
 	/// </summary>
@@ -1000,7 +1000,7 @@ public:
 		return Value > 0 && (Value & (Value - 1)) == 0;
 	}
 
-	template <class T>
+	template <typename T>
 	/// <summary>
 	/// Return the smaller of two values
 	/// </summary>
@@ -1523,6 +1523,26 @@ public:
 	// ** Block XOR ** //
 
 	/// <summary>
+	/// Block XOR 16 bytes using SSE intrinsics
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void IXOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
+	/// Block XOR 32 bytes using SSE intrinsics
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	static void IXOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
 	/// Block XOR 16 bytes
 	/// </summary>
 	/// 
@@ -1544,7 +1564,7 @@ public:
 
 	/// <summary>
 	/// XOR contiguous 16 byte blocks in an array.
-	/// <para>The array must be aligned to 16</para>
+	/// <para>The array must be aligned to 16 bytes</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The source array</param>
@@ -1552,7 +1572,8 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Size">The number of (16 byte block aligned) bytes to process</param>
-	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size);
+	/// <param name="HasIntrinsics">Run time SSE intrinsics switch</param>
+	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasIntrinsics = false);
 };
 
 NAMESPACE_UTILITYEND

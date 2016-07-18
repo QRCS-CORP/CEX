@@ -7,6 +7,9 @@
 #include "IntUtils.h"
 #if defined(HAS_MINSSE)
 #	include "UInt128.h"
+#	if defined(HAS_AVX)
+#		include "UInt256.h"
+#	endif
 #endif
 
 NAMESPACE_BLOCK
@@ -25,6 +28,8 @@ void THX::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_hasAVX = false;
+		m_hasIntrinsics = false;
 		m_isDestroyed = true;
 		m_dfnRounds = 0;
 		m_ikmSize = 0;
@@ -60,8 +65,9 @@ void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
 	int dgtsze = GetIkmSize(m_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 
+#if defined(ENABLE_CPPEXCEPTIONS)
+	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 	if (key.size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
 	if (key.size() > m_legalKeySizes[3] && (key.size() % dgtsze) != 0)
@@ -80,10 +86,10 @@ void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	{
 		if (key.size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("THX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
-
-		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}
+#endif
 
+	m_kdfEngine = GetDigest(m_kdfEngineType);
 	m_isEncryption = Encryption;
 	// expand the key
 	ExpandKey(key);
@@ -113,6 +119,14 @@ void THX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std
 		Encrypt64(Input, InOffset, Output, OutOffset);
 	else
 		Decrypt64(Input, InOffset, Output, OutOffset);
+}
+
+void THX::Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt128(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void THX::ExpandKey(const std::vector<byte> &Key)
@@ -350,6 +364,73 @@ void THX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 #endif
 }
 
+void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+#if defined(HAS_AVX)
+
+	const size_t LRD = 8;
+	size_t keyCtr = 4;
+
+	// input round
+	CEX::Common::UInt256 X2(Input, InOffset);
+	CEX::Common::UInt256 X3(Input, InOffset + 32);
+	CEX::Common::UInt256 X0(Input, InOffset + 64);
+	CEX::Common::UInt256 X1(Input, InOffset + 96);
+	CEX::Common::UInt256::Transpose(X2, X3, X0, X1);
+	CEX::Common::UInt256 T0, T1;
+	CEX::Common::UInt256 N2(2);
+
+	X2 ^= m_expKey[keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+	X0 ^= m_expKey[++keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+
+	keyCtr = m_expKey.size();
+	do
+	{
+		T0 = I8Fe0(X2, m_sBox);
+		T1 = I8Fe3(X3, m_sBox);
+		X1 ^= T0 + N2 * T1 + m_expKey[--keyCtr];
+		X0 = (X0 << 1) | (X0 >> 31);
+		X0 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X1 = (X1 >> 1) | (X1 << 31);
+
+		T0 = I8Fe0(X0, m_sBox);
+		T1 = I8Fe3(X1, m_sBox);
+		X3 ^= T0 + N2 * T1 + m_expKey[--keyCtr];
+		X2 = (X2 << 1) | (X2 >> 31);
+		X2 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X3 = (X3 >> 1) | (X3 << 31);
+	} 
+	while (keyCtr != LRD);
+
+	// last round
+	keyCtr = 0;
+	X0 ^= m_expKey[keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+	X2 ^= m_expKey[++keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+
+	CEX::Common::UInt256::Transpose(X0, X1, X2, X3);
+	X0.StoreLE(Output, OutOffset);
+	X1.StoreLE(Output, OutOffset + 32);
+	X2.StoreLE(Output, OutOffset + 64);
+	X3.StoreLE(Output, OutOffset + 96);
+
+#else
+
+	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+	Decrypt16(Input, InOffset + 64, Output, OutOffset + 64);
+	Decrypt16(Input, InOffset + 80, Output, OutOffset + 80);
+	Decrypt16(Input, InOffset + 96, Output, OutOffset + 96);
+	Decrypt16(Input, InOffset + 112, Output, OutOffset + 112);
+
+#endif
+}
+
 void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 1;
@@ -454,7 +535,81 @@ void THX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 #endif
 }
 
+void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+#if defined(HAS_AVX)
+
+	const size_t LRD = m_expKey.size() - 1;
+	size_t keyCtr = 0;
+
+	// input round
+	CEX::Common::UInt256 X0(Input, InOffset);
+	CEX::Common::UInt256 X1(Input, InOffset + 32);
+	CEX::Common::UInt256 X2(Input, InOffset + 64);
+	CEX::Common::UInt256 X3(Input, InOffset + 96);
+	CEX::Common::UInt256::Transpose(X0, X1, X2, X3);
+	CEX::Common::UInt256 T0, T1;
+	CEX::Common::UInt256 N2(2);
+
+	X0 ^= m_expKey[keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+	X2 ^= m_expKey[++keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+
+	keyCtr = 7;
+	do
+	{
+		T0 = I8Fe0(X0, m_sBox);
+		T1 = I8Fe3(X1, m_sBox);
+		X2 ^= T0 + T1 + m_expKey[++keyCtr];
+		X2 = (X2 >> 1) | (X2 << 31);
+		X3 = (X3 << 1) | (X3 >> 31);
+		X3 ^= (T0 + N2 * T1 + m_expKey[++keyCtr]);
+
+		T0 = I8Fe0(X2, m_sBox);
+		T1 = I8Fe3(X3, m_sBox);
+		X0 ^= T0 + T1 + m_expKey[++keyCtr];
+		X0 = (X0 >> 1) | (X0 << 31);
+		X1 = ((X1 << 1) | (X1 >> 31));
+		X1 ^= (T0 + N2 * T1 + m_expKey[++keyCtr]);
+	} 
+	while (keyCtr != LRD);
+
+	// last round
+	keyCtr = 4;
+	X2 ^= m_expKey[keyCtr];
+	X3 ^= m_expKey[++keyCtr];
+	X0 ^= m_expKey[++keyCtr];
+	X1 ^= m_expKey[++keyCtr];
+
+	CEX::Common::UInt256::Transpose(X2, X3, X0, X1);
+	X2.StoreLE(Output, OutOffset);
+	X3.StoreLE(Output, OutOffset + 32);
+	X0.StoreLE(Output, OutOffset + 64);
+	X1.StoreLE(Output, OutOffset + 96);
+
+#else
+
+	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+	Encrypt16(Input, InOffset + 64, Output, OutOffset + 64);
+	Encrypt16(Input, InOffset + 80, Output, OutOffset + 80);
+	Encrypt16(Input, InOffset + 96, Output, OutOffset + 96);
+	Encrypt16(Input, InOffset + 112, Output, OutOffset + 112);
+
+#endif
+}
+
 // *** Helpers *** //
+
+void THX::DetectCpu()
+{
+	CEX::Common::CpuDetect detect;
+	m_hasIntrinsics = detect.HasMinIntrinsics();
+	m_hasAVX = detect.HasAVX();
+}
 
 uint THX::EncodeMDS(uint K0, uint K1)
 {
@@ -504,7 +659,11 @@ CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CryptoSymmetricCipherException("THX:GetDigest", "The digest could not be instantiated!");
+#else
+		return 0;
+#endif
 	}
 }
 

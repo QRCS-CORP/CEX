@@ -265,8 +265,12 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define HAS_SSE4
 #endif
 
+// assumptions only for vs, requires runtime cpu checks
 #if defined(_MSC_VER) && !defined(HAS_SSE4) && !defined(HAS_SSSE3) && !defined(HAS_SSE2)
 #	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
+#		if !defined(HAS_AVX)
+#			define HAS_AVX
+#		endif
 #		define HAS_SSSE3
 #		define HAS_SSE2
 #	elif _MSC_VER >= 1500 && _MSC_FULL_VER >= 150030729
@@ -286,7 +290,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define HAS_MINSSE
 #endif
 
-#define CPP_EXCEPTIONS
+//#define ENABLE_CPPEXCEPTIONS
 
 // this flag calls rotation methods using the intrensic functions on amd and intel
 // in many cases the compiler uses intrinsics by default, and forcing api 

@@ -152,8 +152,10 @@ NAMESPACE_DIGEST
 			m_reserved3(0),
 			m_reserved4(0)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (TreeArray.size() < HDR_SIZE)
 				throw CEX::Exception::CryptoDigestException("Blake2Params:Ctor", "The TreeArray buffer is too short!");
+#endif
 
 			memcpy(&m_dgtLen, &TreeArray[0], 1);
 			memcpy(&m_keyLen, &TreeArray[1], 1);

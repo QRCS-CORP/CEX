@@ -98,8 +98,10 @@ public:
 		m_isDestroyed(false),
 		m_progressInterval(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Digest == 0)
 			throw CEX::Exception::CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!");
+#endif
 	}
 
 	/// <summary>

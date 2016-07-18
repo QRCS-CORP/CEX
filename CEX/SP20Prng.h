@@ -111,12 +111,14 @@ public:
 		m_isDestroyed(false),
 		m_seedType(SeedEngine)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (BufferSize < 64)
 			throw CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!");
 		if (KeySize != 24 && KeySize != 40)
 			throw CryptoRandomException("SP20Prng:CTor", "Seed size must be 32 or 48 bytes (key + iv)!");
 		if (Rounds < 10 || Rounds > 30 || Rounds % 2 > 0)
 			throw CryptoRandomException("SP20Prng:CTor", "Rounds must be an even number between 10 and 30!");
+#endif
 
 		Reset();
 	}
@@ -139,13 +141,14 @@ public:
 		m_keySize(Seed.size()),
 		m_isDestroyed(false)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (BufferSize < 64)
 			throw CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!");
 		if (Seed.size() != 32 && Seed.size() != 48)
 			throw CryptoRandomException("SP20Prng:CTor", "Seed size must be 32 or 48 bytes (key + iv)!");
 		if (Rounds < 10 || Rounds > 30 || Rounds % 2 > 0)
 			throw CryptoRandomException("SP20Prng:CTor", "Rounds must be an even number between 10 and 30!");
-
+#endif
 		Reset();
 	}
 

@@ -26,7 +26,7 @@
 
 #include "Common.h"
 
-template<class T>
+template<typename T>
 void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
 	R0 = CEX::Utility::IntUtils::RotateLeft(R0, 13);
@@ -41,7 +41,7 @@ void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 	R2 = CEX::Utility::IntUtils::RotateLeft(R2, 22);
 }
 
-template<class T>
+template<typename T>
 void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
 {
 	R0.Rotl32(13);
@@ -56,7 +56,7 @@ void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
 	R2.Rotl32(22);
 }
 
-template<class T>
+template<typename T>
 void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 {
 	R2 = CEX::Utility::IntUtils::RotateRight(R2, 22);
@@ -71,7 +71,7 @@ void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 	R0 = CEX::Utility::IntUtils::RotateRight(R0, 13);
 }
 
-template<class T>
+template<typename T>
 void InverseTransform64(T &R0, T &R1, T &R2, T &R3)
 {
 	R2.Rotr32(22);
@@ -87,7 +87,7 @@ void InverseTransform64(T &R0, T &R1, T &R2, T &R3)
 }
 
 // *** Serpent S-Boxes *** //
-template<class T>
+template<typename T>
 static void Sb0(T &R0, T &R1, T &R2, T &R3)
 {
 	R3 ^= R0;
@@ -113,7 +113,7 @@ static void Sb0(T &R0, T &R1, T &R2, T &R3)
 	R1 = B4; 
 }
 
-template<class T>
+template<typename T>
 static void Ib0(T &R0, T &R1, T &R2, T &R3)
 {
 	R2 = ~R2;
@@ -139,7 +139,7 @@ static void Ib0(T &R0, T &R1, T &R2, T &R3)
 	R1 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Sb1(T &R0, T &R1, T &R2, T &R3)
 {
 	R0 = ~R0;
@@ -166,7 +166,7 @@ static void Sb1(T &R0, T &R1, T &R2, T &R3)
 	R1 = B4; 
 }
 
-template<class T>
+template<typename T>
 static void Ib1(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R1;
@@ -195,7 +195,7 @@ static void Ib1(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Sb2(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R0;
@@ -219,7 +219,7 @@ static void Sb2(T &R0, T &R1, T &R2, T &R3)
 	R3 = ~B4;
 }
 
-template<class T>
+template<typename T>
 static void Ib2(T &R0, T &R1, T &R2, T &R3)
 {
 	R2 ^= R3;
@@ -245,7 +245,7 @@ static void Ib2(T &R0, T &R1, T &R2, T &R3)
 	R1 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Sb3(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R0;
@@ -272,7 +272,7 @@ static void Sb3(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4; 
 }
 
-template<class T>
+template<typename T>
 static void Ib3(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R2;
@@ -299,7 +299,7 @@ static void Ib3(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4; 
 }
 
-template<class T>
+template<typename T>
 static void Sb4(T &R0, T &R1, T &R2, T &R3)
 {
 	R1 ^= R3;
@@ -327,7 +327,7 @@ static void Sb4(T &R0, T &R1, T &R2, T &R3)
 	R1 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Ib4(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R2;
@@ -354,7 +354,7 @@ static void Ib4(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Sb5(T &R0, T &R1, T &R2, T &R3)
 {
 	R0 ^= R1;
@@ -382,7 +382,7 @@ static void Sb5(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Ib5(T &R0, T &R1, T &R2, T &R3)
 {
 	R1 = ~R1;
@@ -411,7 +411,7 @@ static void Ib5(T &R0, T &R1, T &R2, T &R3)
 	R2 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Sb6(T &R0, T &R1, T &R2, T &R3)
 {
 	R2 = ~R2;
@@ -435,7 +435,7 @@ static void Sb6(T &R0, T &R1, T &R2, T &R3)
 	R2 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Ib6(T &R0, T &R1, T &R2, T &R3)
 {
 	R0 ^= R2;
@@ -460,7 +460,7 @@ static void Ib6(T &R0, T &R1, T &R2, T &R3)
 	R2 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Sb7(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R1;
@@ -489,7 +489,7 @@ static void Sb7(T &R0, T &R1, T &R2, T &R3)
 	R0 = B4;
 }
 
-template<class T>
+template<typename T>
 static void Ib7(T &R0, T &R1, T &R2, T &R3)
 {
 	T B4 = R2;

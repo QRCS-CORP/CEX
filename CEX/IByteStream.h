@@ -3,11 +3,15 @@
 
 #include "Common.h"
 #include "SeekOrigin.h"
-#include "CryptoProcessingException.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoProcessingException.h"
+#endif
 
 NAMESPACE_IO
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoProcessingException;
+#endif
 
 /// <summary>
 /// Data stream object interface

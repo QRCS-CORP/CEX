@@ -2,14 +2,18 @@
 #define _CEXENGINE_IStreamCipher_H
 
 #include "Common.h"
-#include "CryptoSymmetricCipherException.h"
 #include "KeyParams.h"
 #include "ParallelUtils.h"
 #include "StreamCiphers.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoSymmetricCipherException.h"
+#endif
 
 NAMESPACE_STREAM
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoSymmetricCipherException;
+#endif
 
 /// <summary>
 /// Stream Cipher Interface
@@ -44,6 +48,16 @@ public:
 	virtual const CEX::Enumeration::StreamCiphers Enumeral() = 0;
 
 	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() = 0;
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() = 0;
+
+	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
@@ -71,14 +85,9 @@ public:
 	virtual const char *Name() = 0;
 
 	/// <summary>
-	/// Get: Parallel block size.
+	/// Get/Set: Parallel block size; must be set before Initialize()
 	/// </summary>
-	virtual const size_t ParallelBlockSize() = 0;
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize) = 0;
+	virtual size_t &ParallelBlockSize() = 0;
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing

@@ -23,8 +23,10 @@ size_t KDF2Drbg::Generate(std::vector<byte> &Output)
 
 size_t KDF2Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("KDF2Drbg:Generate", "Output buffer too small!");
+#endif
 
 	GenerateKey(Output, OutOffset, Size);
 	return Size;
@@ -32,9 +34,10 @@ size_t KDF2Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 
 void KDF2Drbg::Initialize(const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Ikm.size() < m_hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
-
+#endif
 	if (Ikm.size() < m_blockSize + m_hashSize)
 	{
 		m_salt.resize(Ikm.size());
@@ -55,10 +58,12 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Ikm)
 
 void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() < m_hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_blockSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "IKM size is too small; must be a minumum of digest block size!");
+#endif
 
 	// clone iv and salt
 	m_Iv.resize(m_blockSize);
@@ -74,10 +79,12 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte>
 
 void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() + Nonce.size() < m_hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_blockSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "IKM with Nonce size is too small; combined must be a minumum of digest block size!");
+#endif
 
 	// clone iv and salt
 	m_Iv.resize(m_blockSize);
@@ -95,8 +102,10 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte>
 
 void KDF2Drbg::Update(const std::vector<byte> &Salt)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("KDF2Drbg:Update", "Salt is too small!");
+#endif
 
 	Initialize(Salt);
 }

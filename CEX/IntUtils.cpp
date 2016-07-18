@@ -46,11 +46,11 @@ uint IntUtils::Parity(ulong Value)
 	return (uint)Value & 1;
 }
 
-void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+void IntUtils::IXOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 #if defined(HAS_MINSSE)
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
-#elif
+#else
 	Output[OutOffset] ^= Input[InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
@@ -68,6 +68,67 @@ void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vect
 	Output[++OutOffset] ^= Input[++InOffset];
 	Output[++OutOffset] ^= Input[++InOffset];
 #endif
+}
+
+void IntUtils::IXOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+#if defined(HAS_MINSSE)
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128((const __m128i*)(const void*)&Output[OutOffset])));
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 16]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 16])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 16]))));
+#else
+	Output[OutOffset] ^= Input[InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+#endif
+}
+
+void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	Output[OutOffset] ^= Input[InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
+	Output[++OutOffset] ^= Input[++InOffset];
 }
 
 void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
@@ -111,17 +172,20 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 #endif
 }
 
-void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size)
+void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasIntrinsics)
 {
 	const size_t BLOCK = 16;
 	size_t ctr = 0;
 
 	do
 	{
-		XOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
+		if (HasIntrinsics)
+			IXOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
+		else
+			XOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
 		ctr += BLOCK;
-
-	} while (ctr != Size);
+	} 
+	while (ctr != Size);
 }
 
 NAMESPACE_UTILITYEND

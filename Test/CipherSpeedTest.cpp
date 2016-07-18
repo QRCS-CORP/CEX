@@ -23,16 +23,13 @@ namespace Test
 		try
 		{
 			Initialize();
-
-			TFXSpeedTest();
-
 			OnProgress("### Parallel CTR Mode Speed Tests: 10 loops * 100MB ###");
+
 #if defined (AESNI_AVAILABLE)
 			OnProgress("***AES-NI (AHX): Monte Carlo test (K=256; R=14)***");
 			AHXSpeedTest();
 #endif
-			//for (size_t i = 0; i < 10; ++i)
-			//	ChaChaSpeedTest();
+
 			OnProgress("***RHX: Monte Carlo test (K=256; R=14)***");
 			RDXSpeedTest();
 			OnProgress("***RHX: Monte Carlo test (K=512; R=22)***");
@@ -46,9 +43,9 @@ namespace Test
 			OnProgress("***THX: Monte Carlo test (K=512; R=20)***");
 			THXSpeedTest();
 			OnProgress("***Salsa20: Monte Carlo test (K=256; R=20)***");
-			ChaChaSpeedTest();
-			OnProgress("***ChaCha: Monte Carlo test (K=256; R=20)***");
 			SalsaSpeedTest();
+			OnProgress("***ChaCha: Monte Carlo test (K=256; R=20)***");
+			ChaChaSpeedTest();
 
 			OnProgress("### CBC and CFB Parallel Decryption Speed Tests: 10 loops * 100MB ###");
 			CEX::Cipher::Symmetric::Block::IBlockCipher* engine =  new CEX::Cipher::Symmetric::Block::RHX();
@@ -109,8 +106,6 @@ namespace Test
 		Cipher->IsParallel() = true;
 		std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
 		std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
-		const char* name = Cipher->Engine()->Name();
-		size_t rounds = Cipher->Engine()->Rounds();
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -144,7 +139,6 @@ namespace Test
 		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
 		std::vector<byte> buffer1(16, 0);
 		std::vector<byte> buffer2(16, 0);
-		const char* name = Cipher->Engine()->Name();
 		SampleSize -= (SampleSize % 16);
 
 		if (!Parallel)
@@ -162,7 +156,6 @@ namespace Test
 		}
 
 		uint64_t start = TestUtils::GetTimeMs64();
-		size_t rounds = Cipher->Engine()->Rounds();
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
@@ -201,8 +194,6 @@ namespace Test
 		std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
 		std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
 		uint64_t start = TestUtils::GetTimeMs64();
-		const char *name = Cipher->Name();
-		uint64_t rounds = Cipher->Rounds();
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
@@ -242,7 +233,7 @@ namespace Test
 			CEX::Cipher::Symmetric::Block::AHX* engine = new CEX::Cipher::Symmetric::Block::AHX();//r14
 			CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 			// default is 64k * cpu count, w/ ni, keep within l2 cache size, but large enough to offset parallel loop setup cost
-			cipher->ParallelBlockSize(cipher->ProcessorCount() * 32000);
+			cipher->ParallelBlockSize() = cipher->ProcessorCount() * 32000;
 			ParallelBlockLoop(cipher, MB100, 32);
 			delete cipher;
 			delete engine;

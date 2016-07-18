@@ -110,13 +110,14 @@ public:
 		m_isDestroyed(false),
 		m_stateSeed(Seed)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Iterations == 0)
 			throw CryptoRandomException("DGCPrng:Ctor", "Iterations can not be zero; at least 1 iteration is required!");
 		if (GetMinimumSeedSize(DigestEngine) < Seed.size())
 			throw CryptoRandomException("DGCPrng:Ctor", "The state seed is too small! must be at least digests block size!");
 		if (BufferSize < 64)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 64 bytes!");
-
+#endif
 		Reset();
 	}
 

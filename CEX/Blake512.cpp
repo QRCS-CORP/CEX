@@ -33,8 +33,10 @@ static constexpr ulong m_ftSigma[] =
 
 void Blake512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake512:BlockUpdate", "The Input buffer is too short!");
+#endif
 
 	size_t fill = BLOCK_SIZE - m_dataLen;
 
@@ -94,8 +96,10 @@ void Blake512::Destroy()
 
 size_t Blake512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Blake512:DoFinal", "The Output buffer is too short!");
+#endif
 
 	std::vector<byte> msgLen(16);
 	CEX::Utility::IntUtils::Be64ToBytes(m_T + ((ulong)m_dataLen << 3), msgLen, 8);

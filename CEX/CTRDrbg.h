@@ -166,8 +166,10 @@ public:
 		m_parallelBlockSize(PARALLEL_DEFBLOCK),
 		m_processorCount(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (m_blockCipher == 0)
 			throw CryptoGeneratorException("CTRDrbg:CTor", "The Cipher can not be null!");
+#endif
 
 		// default the 256 bit key size
 		if (KeySize == 0)
@@ -176,10 +178,11 @@ public:
 		}
 		else
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (!IsValidKeySize(KeySize))
 				throw CryptoGeneratorException("CTRDrbg:CTor", "The key size must be a ciphers legal key size!");
-			else
-				m_keySize = KeySize;
+#endif
+			m_keySize = KeySize;
 		}
 
 		SetScope();

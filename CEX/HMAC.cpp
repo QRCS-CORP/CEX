@@ -6,8 +6,10 @@ NAMESPACE_MAC
 
 void HMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (InOffset + Length > Input.size())
 		throw CryptoMacException("HMAC:BlockUpdate", "The Input buffer is too short!");
+#endif
 
 	m_msgDigest->BlockUpdate(Input, InOffset, Length);
 }
@@ -34,8 +36,10 @@ void HMAC::Destroy()
 
 size_t HMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Output.size() - OutOffset < m_msgDigest->DigestSize())
 		throw CryptoMacException("HMAC:DoFinal", "The Output buffer is too short!");
+#endif
 
 	std::vector<byte> tmpv(m_digestSize, 0);
 

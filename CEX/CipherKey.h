@@ -91,7 +91,9 @@ public:
 		}
 		else if (KeyId.size() != KEYID_SIZE)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The KeyId must be exactly 16 bytes!");
+#endif
 		}
 		else
 		{
@@ -105,7 +107,9 @@ public:
 		}
 		else if (ExtensionKey.size() != EXTKEY_SIZE)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The random extension field must be exactly 16 bytes!");
+#endif
 		}
 		else
 		{

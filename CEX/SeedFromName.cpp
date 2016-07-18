@@ -16,7 +16,11 @@ CEX::Seed::ISeed* SeedFromName::GetInstance(CEX::Enumeration::SeedGenerators See
 	case CEX::Enumeration::SeedGenerators::XSPRsg:
 		return new CEX::Seed::XSPRsg();
 	default:
+#if defined(ENABLE_CPPEXCEPTIONS)
 		throw CEX::Exception::CryptoException("SeedFromName:GetInstance", "The specified seed generator type is unrecognized!");
+#else
+		return 0;
+#endif
 	}
 }
 

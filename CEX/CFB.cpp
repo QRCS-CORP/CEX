@@ -24,6 +24,16 @@ void CFB::Destroy()
 
 void CFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
+	if (KeyParam.IV().size() < 1)
+		throw CryptoSymmetricCipherException("CFB:Initialize", "Requires a minimum 1 byte of IV!");
+	if (KeyParam.Key().size() < 16)
+		throw CryptoSymmetricCipherException("CFB:Initialize", "Requires a minimum 16 bytes of Key!");
+	if (ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
+		throw CryptoSymmetricCipherException("CFB:Initialize", "The parallel block size is out of bounds!");
+	if (ParallelBlockSize() % ParallelMinimumSize() != 0)
+		throw CryptoSymmetricCipherException("CFB:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+#endif
 	std::vector<byte> iv = KeyParam.IV();
 	size_t diff = m_cfbIv.size() - iv.size();
 	memcpy(&m_cfbIv[diff], &iv[0], iv.size());

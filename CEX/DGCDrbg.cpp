@@ -26,8 +26,10 @@ size_t DGCDrbg::Generate(std::vector<byte> &Output)
 
 size_t DGCDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("DGCDrbg:Generate", "Output buffer too small!");
+#endif
 
 	size_t offset = 0;
 	size_t len = OutOffset + Size;
@@ -50,8 +52,10 @@ size_t DGCDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Siz
 
 void DGCDrbg::Initialize(const std::vector<byte> &Ikm)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Ikm.size() < COUNTER_SIZE)
 		throw CryptoGeneratorException("DGCDrbg:Initialize", "Salt must be at least 8 bytes!");
+#endif
 
 	const size_t ctrSize = sizeof(long);
 	std::vector<long> counter(1);
@@ -98,10 +102,10 @@ void DGCDrbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> 
 void DGCDrbg::Update(const std::vector<byte> &Salt)
 {
 	const size_t ctrSize = sizeof(long);
-
+#if defined(ENABLE_CPPEXCEPTIONS)
 	if (Salt.size() < ctrSize)
 		throw CryptoGeneratorException("DGCDrbg:Update", "Minimum key size has not been added. Size must be at least 8 bytes!");
-
+#endif
 	// update seed and counter
 	if (Salt.size() >= m_msgDigest->BlockSize() + ctrSize)
 	{

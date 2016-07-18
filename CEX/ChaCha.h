@@ -90,11 +90,12 @@ private:
 	static constexpr const char *TAU = "expand 16-byte k";
 
 	std::vector<uint> m_ctrVector;
-	bool m_hasIntrinsics;
-	bool m_isDestroyed;
 	std::vector<byte> m_dstCode;
+	bool m_hasAVX;
+	bool m_hasIntrinsics;
 	bool m_isInitialized;
 	bool m_isParallel;
+	bool m_isDestroyed;
 	std::vector<size_t> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	size_t m_parallelBlockSize;
@@ -132,6 +133,16 @@ public:
 	virtual const CEX::Enumeration::StreamCiphers Enumeral() { return CEX::Enumeration::StreamCiphers::ChaCha; }
 
 	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() { return m_hasAVX; }
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
+
+	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() { return m_isInitialized; }
@@ -152,18 +163,9 @@ public:
 	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size.
+	/// Get/Set: Parallel block size; must align (threads * n) with ParallelMinimumSize()
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize)
-	{
-		m_parallelBlockSize = BlockSize;
-		SetScope();
-	}
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -208,6 +210,7 @@ public:
 	explicit ChaCha(size_t Rounds = ROUNDS20)
 		:
 		m_ctrVector(2, 0),
+		m_hasAVX(false),
 		m_hasIntrinsics(false),
 		m_isDestroyed(false),
 		m_isInitialized(false),
@@ -216,10 +219,12 @@ public:
 		m_rndCount(Rounds),
 		m_wrkState(14, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Rounds == 0 || (Rounds & 1) != 0)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be between 8 and 30!");
+#endif
 
 		m_legalKeySizes = { 16, 32 };
 		m_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
@@ -248,9 +253,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParam">Cipher key container. 
-	/// <para>Uses the Key and IV fields of KeyParam. 
-	/// The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
-	/// IV must be 8 bytes in size.</para>
+	/// <para>Uses the Key and IV fields of KeyParam. The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
+	/// The IV must be 8 bytes in size.</para>
 	/// </param>
 	virtual void Initialize(const CEX::Common::KeyParams &KeyParam);
 
@@ -292,16 +296,17 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 private:
-	void SRoundBlock(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter);
-	void URoundBlock(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
 	void DetectCpu();
-	void Generate(const size_t Size, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset);
+	void Generate(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter, const size_t Length);
 	uint GetProcessorCount();
-	void Increase(const std::vector<uint> &Counter, const size_t Size, std::vector<uint> &Vector);
+	void Increase(const std::vector<uint> &Input, std::vector<uint> &Output, const size_t Length);
 	void Increment(std::vector<uint> &Counter);
 	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);
 	void SetScope();
+	void Transform64(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter);
+	void Transform256(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
+	void Transform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
 };
 
 NAMESPACE_STREAMEND

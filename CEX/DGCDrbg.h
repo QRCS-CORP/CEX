@@ -134,8 +134,10 @@ public:
 		m_stateCtr(1),
 		m_seedCtr(1)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Digest == 0)
 			throw CryptoGeneratorException("DGCDrbg:Ctor", "Digest can not be null!");
+#endif
 	}
 
 	/// <summary>

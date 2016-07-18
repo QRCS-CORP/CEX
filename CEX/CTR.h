@@ -134,18 +134,9 @@ public:
 	virtual const char* Name() { return "CTR"; }
 
 	/// <summary>
-	/// Get: Parallel block size.
+	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize)
-	{
-		SetScope();
-		m_parallelBlockSize = BlockSize;
-	}
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -182,8 +173,10 @@ public:
 		m_parallelBlockSize(PARALLEL_DEFBLOCK),
 		m_processorCount(1)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CTR:CTor", "The Cipher can not be null!");
+#endif
 
 		SetScope();
 	}
@@ -242,8 +235,7 @@ public:
 
 private:
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
-	static void Increase(std::vector<byte> &Counter, const size_t Size);
-	static void Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer);
+	static void Increase(const std::vector<byte> &Input, const size_t Size, std::vector<byte> &Output);
 	static void Increment(std::vector<byte> &Counter);
 	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void SetScope();

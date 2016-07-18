@@ -300,7 +300,7 @@ public:
 			assert(Params.LeafLength() > BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE == 0);
 			assert(Params.ThreadDepth() > 2 || Params.ThreadDepth() % 2 == 0);
 #endif
-#if defined(CPP_EXCEPTIONS)
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
 				throw CEX::Exception::CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
 			if (Params.ThreadDepth() < 2 || Params.ThreadDepth() % 2 != 0)

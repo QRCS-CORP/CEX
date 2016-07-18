@@ -68,6 +68,16 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void CBC::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
+#if defined(ENABLE_CPPEXCEPTIONS)
+	if (KeyParam.IV().size() < 16)
+		throw CryptoSymmetricCipherException("CBC:Initialize", "Requires a minimum 16 bytes of IV!");
+	if (KeyParam.Key().size() < 16)
+		throw CryptoSymmetricCipherException("CBC:Initialize", "Requires a minimum 16 bytes of Key!");
+	if (ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
+		throw CryptoSymmetricCipherException("CBC:Initialize", "The parallel block size is out of bounds!");
+	if (ParallelBlockSize() % ParallelMinimumSize() != 0)
+		throw CryptoSymmetricCipherException("CBC:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+#endif
 	m_blockCipher->Initialize(Encryption, KeyParam);
 	m_cbcIv = KeyParam.IV();
 	m_cbcNextIv.resize(m_cbcIv.size(), 0);
@@ -187,7 +197,7 @@ void CBC::ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::v
 		// decrypt input
 		m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
 		// xor output and iv
-		CEX::Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size());
+		CEX::Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size(), Engine()->HasIntrinsics());
 		memcpy(&Iv[0], &nextIv[0], nextIv.size());
 		InOffset += Iv.size();
 		OutOffset += Iv.size();

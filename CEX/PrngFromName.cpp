@@ -19,7 +19,11 @@ CEX::Prng::IRandom* PrngFromName::GetInstance(CEX::Enumeration::Prngs PrngType)
 		case CEX::Enumeration::Prngs::SP20Prng:
 			return new CEX::Prng::SP20Prng();
 		default:
+#if defined(ENABLE_CPPEXCEPTIONS)
 			throw CEX::Exception::CryptoException("PrngFromName:GetPrng", "The specified PRNG type is unrecognized!");
+#else
+			return 0;
+#endif
 	}
 }
 

@@ -136,10 +136,12 @@ public:
 		m_wrkOffset(0)
 	{
 		CreateCipher(EngineType);
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (m_cipherMode == 0)
 			throw CryptoMacException("CMAC:Ctor", "Could not create the cipher!");
 		if (m_cipherMode->BlockSize() != 16 && m_cipherMode->BlockSize() != 32)
 			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
+#endif
 
 		m_blockSize = m_cipherMode->BlockSize();
 		m_macSize = m_cipherMode->BlockSize();
@@ -165,11 +167,12 @@ public:
 		m_wrkBuffer(Cipher->BlockSize()),
 		m_wrkOffset(0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Cipher == 0)
 			throw CryptoMacException("CMAC:Ctor", "Cipher can not be null!");
 		if (Cipher->BlockSize() != 16 && Cipher->BlockSize() != 32)
 			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
-
+#endif
 		LoadCipher(Cipher);
 	}
 

@@ -122,9 +122,10 @@ public:
 		m_isDestroyed(false),
 		m_seedType(SeedEngine)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (BufferSize < 64)
 			throw CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!");
-
+#endif
 		if (KeySize > 0)
 			m_keySize = KeySize;
 		else
@@ -151,13 +152,14 @@ public:
 		m_isDestroyed(false),
 		m_stateSeed(Seed)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (BufferSize < 64)
 			throw CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!");
 		if (Seed.size() == 0)
 			throw CryptoRandomException("CTRPrng:Ctor", "Seed can not be null or empty!");
 		if (GetKeySize(BlockEngine) < Seed.size())
 			throw CryptoRandomException("CTRPrng:Ctor", "The state seed is too small! must be at least the size of the cipher key/iv");
-
+#endif
 		m_keySize = GetKeySize(BlockEngine);
 
 		Reset();

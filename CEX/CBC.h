@@ -133,18 +133,9 @@ public:
 	virtual const char* Name() { return "CBC"; }
 
 	/// <summary>
-	/// Get: Parallel block size.
+	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
-
-	/// <summary>
-	/// Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// </summary>
-	virtual void ParallelBlockSize(size_t BlockSize)
-	{
-		SetScope();
-		m_parallelBlockSize = BlockSize;
-	}
+	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input size with parallel processing
@@ -182,9 +173,10 @@ public:
 		m_processorCount(1),
 		m_parallelBlockSize(PARALLEL_DEFBLOCK)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CBC:CTor", "The Cipher can not be null!");
-
+#endif
 		SetScope();
 	}
 

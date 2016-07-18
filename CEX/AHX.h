@@ -156,6 +156,11 @@ public:
 	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::AHX; }
 
 	/// <summary>
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() { return false; }
+
+	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
 	/// </summary>
 	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
@@ -218,10 +223,12 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(15, 0)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
 			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+#endif
 
 		std::string info = "information string RHX version 1";
 		m_hkdfInfo.reserve(info.size());
@@ -278,8 +285,10 @@ public:
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
+#if defined(ENABLE_CPPEXCEPTIONS)
 			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
 				throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+#endif
 
 			std::string info = "information string RHX version 1";
 			m_hkdfInfo.reserve(info.size());
@@ -400,9 +409,19 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input UInt128 to Transform</param>
-	/// <param name="Output">UInt128 Output product of Transform</param>
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
+	/// Transform 8 blocks of bytes.
+	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">Input array to Transform</param>
+	/// <param name="Output">Output array product of Transform</param>
+	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	private:
 
@@ -414,8 +433,10 @@ public:
 	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	int GetIkmSize(CEX::Enumeration::Digests DigestType);
 	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
 };

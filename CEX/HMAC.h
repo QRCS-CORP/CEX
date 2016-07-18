@@ -130,9 +130,10 @@ public:
 		m_isInitialized(false)
 	{
 		CreateDigest(DigestType);
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (m_msgDigest == 0)
 			throw CryptoMacException("HMAC:Ctor", "Could not create the digest!");
-
+#endif
 		m_blockSize = m_msgDigest->BlockSize();
 		m_digestSize = m_msgDigest->DigestSize();
 		m_inputPad.resize(m_msgDigest->BlockSize());
@@ -156,8 +157,10 @@ public:
 		m_outputPad(Digest->BlockSize(), 0),
 		m_isInitialized(false)
 	{
+#if defined(ENABLE_CPPEXCEPTIONS)
 		if (Digest == 0)
 			throw CryptoMacException("HMAC:Ctor", "The digest can not be null!");
+#endif
 	}
 
 	/// <summary>

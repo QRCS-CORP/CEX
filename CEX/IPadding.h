@@ -2,12 +2,16 @@
 #define _CEXENGINE_IPADDING_H
 
 #include "Common.h"
-#include "CryptoPaddingException.h"
 #include "PaddingModes.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoPaddingException.h"
+#endif
 
 NAMESPACE_PADDING
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoPaddingException;
+#endif
 
 /// <summary>
 /// Padding Mode Interface

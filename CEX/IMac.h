@@ -2,12 +2,16 @@
 #define _CEXENGINE_IMAC_H
 
 #include "Common.h"
-#include "CryptoMacException.h"
 #include "Macs.h"
+#if defined(ENABLE_CPPEXCEPTIONS)
+#	include "CryptoMacException.h"
+#endif
 
 NAMESPACE_MAC
 
+#if defined(ENABLE_CPPEXCEPTIONS)
 using CEX::Exception::CryptoMacException;
+#endif
 
 /// <summary>
 /// Message Authentication Code (MAC) Interface
