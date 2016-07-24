@@ -215,8 +215,8 @@ public:
 	// *** Constructor *** //
 
 	/// <summary>
-	/// Initialize the class as either the 2B or 2BP variant.
-	/// <para>Initialize as either the parallel version Blake2BP, or sequential Blake2B variant.</para>
+	/// Initialize the class as either the 2B or 2BP.
+	/// <para>Initialize as either the parallel version Blake2BP, or sequential Blake2B.</para>
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2BP variant.</param>

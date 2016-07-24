@@ -2,7 +2,6 @@
 #define _CEXENGINE_UINT128_H
 
 #include "Common.h"
-//#include <emmintrin.h>
 #include "Intrinsics.h"
 
 NAMESPACE_COMMON
@@ -13,7 +12,7 @@ NAMESPACE_COMMON
 class UInt128
 {
 private:
-	UInt128(__m128i Input) 
+	UInt128(__m128i Input)
 	{
 		Register = Input;
 	}
@@ -29,7 +28,7 @@ public:
 	UInt128() {}
 
 	/// <summary>
-	/// Initialize with an 8bit unsigned integer array
+	/// Initialize with an 8bit unsigned integer array in Little Endian format
 	/// </summary>
 	///
 	/// <param name="Input">The array containing the data; must be at least 16 bytes</param>
@@ -40,7 +39,18 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize with a 32bit unsigned integer array
+	/// Initialize with a 16bit unsigned integer array in Little Endian format
+	/// </summary>
+	///
+	/// <param name="Input">The array containing the data; must be at least 8 * 16bit uints</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	UInt128(const std::vector<ushort> &Input, size_t Offset)
+	{
+		Register = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
+	}
+
+	/// <summary>
+	/// Initialize with a 32bit unsigned integer array in Little Endian format
 	/// </summary>
 	///
 	/// <param name="Input">The array containing the data; must be at least 4 * 32bit uints</param>
@@ -51,7 +61,7 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize with a 64bit unsigned integer array
+	/// Initialize with a 64bit unsigned integer array in Little Endian format
 	/// </summary>
 	///
 	/// <param name="Input">The array containing the data; must be at least 2 * 64bit uints</param>
@@ -65,10 +75,10 @@ public:
 	/// Initialize with 4 * 32bit unsigned integers
 	/// </summary>
 	///
-	/// <param name="X0">Register 0</param>
-	/// <param name="X1">Register 1</param>
-	/// <param name="X2">Register 2</param>
-	/// <param name="X3">Register 3</param>
+	/// <param name="X0">uint 0</param>
+	/// <param name="X1">uint 1</param>
+	/// <param name="X2">uint 2</param>
+	/// <param name="X3">uint 3</param>
 	UInt128(uint X0, uint X1, uint X2, uint X3)
 	{
 		Register = _mm_set_epi32(X0, X1, X2, X3);
@@ -87,15 +97,75 @@ public:
 	/* Load and Store */
 
 	/// <summary>
-	/// Store register in an integer array in Big Endian format
+	/// Load an array into a register in Big Endian format
 	/// </summary>
 	///
 	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template <typename T>
-	void StoreBE(std::vector<T> &Output, size_t Offset) const
+	void LoadBE(const std::vector<T> &Input, size_t Offset)
 	{
-		Swap().StoreLE(Output, Offset);
+		Swap().LoadLE(Input, Offset);
+	}
+
+	/// <summary>
+	/// Load with 4 * 32bit unsigned integers in Big Endian format
+	/// </summary>
+	///
+	/// <param name="X0">uint 0</param>
+	/// <param name="X1">uint 1</param>
+	/// <param name="X2">uint 2</param>
+	/// <param name="X3">uint 3</param>
+	void LoadBE(uint X0, uint X1, uint X2, uint X3)
+	{
+		Swap().LoadLE(X0, X1, X2, X3);
+	}
+
+	/// <summary>
+	/// Transposes and loads 4 * UInt128 at 32bit boundaries in Big Endian format
+	/// </summary>
+	///
+	/// <param name="Input">The data input array</param>
+	/// <param name="Offset">The starting position within the input array</param>
+	/// <param name="X0">Operand 0</param>
+	/// <param name="X1">Operand 1</param>
+	/// <param name="X0">Operand 2</param>
+	/// <param name="X1">Operand 3</param>
+	static inline void LoadBE16(const std::vector<byte> &Input, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
+	{
+		X0.LoadBE(Input, Offset);
+		X1.LoadBE(Input, Offset + 16);
+		X2.LoadBE(Input, Offset + 32);
+		X3.LoadBE(Input, Offset + 48);
+		Transpose(X0, X1, X2, X3);
+	}
+
+	/// <summary>
+	/// Loads 64 * 32bit integers to a UInt128 array in Big Endian format
+	/// </summary>
+	///
+	/// <param name="Input">The input byte array</param>
+	/// <param name="InOffset">The starting offset within the input array</param>
+	/// <param name="Output">The destination UInt128 array</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	static inline void LoadBE256(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt128> &Output, size_t OutOffset)
+	{
+		Output[OutOffset].LoadBE(Input, InOffset);
+		Output[OutOffset + 1].LoadBE(Input, InOffset + 16);
+		Output[OutOffset + 2].LoadBE(Input, InOffset + 32);
+		Output[OutOffset + 3].LoadBE(Input, InOffset + 48);
+		Output[OutOffset + 4].LoadBE(Input, InOffset + 64);
+		Output[OutOffset + 5].LoadBE(Input, InOffset + 80);
+		Output[OutOffset + 6].LoadBE(Input, InOffset + 96);
+		Output[OutOffset + 7].LoadBE(Input, InOffset + 112);
+		Output[OutOffset + 8].LoadBE(Input, InOffset + 128);
+		Output[OutOffset + 9].LoadBE(Input, InOffset + 144);
+		Output[OutOffset + 10].LoadBE(Input, InOffset + 160);
+		Output[OutOffset + 11].LoadBE(Input, InOffset + 176);
+		Output[OutOffset + 12].LoadBE(Input, InOffset + 192);
+		Output[OutOffset + 13].LoadBE(Input, InOffset + 208);
+		Output[OutOffset + 14].LoadBE(Input, InOffset + 224);
+		Output[OutOffset + 15].LoadBE(Input, InOffset + 240);
 	}
 
 	/// <summary>
@@ -111,7 +181,20 @@ public:
 	}
 
 	/// <summary>
-	/// Transposes and loads 4 * UInt128 at 32bit boundaries
+	/// Load with 4 * 32bit unsigned integers in Little Endian format
+	/// </summary>
+	///
+	/// <param name="X0">uint 0</param>
+	/// <param name="X1">uint 1</param>
+	/// <param name="X2">uint 2</param>
+	/// <param name="X3">uint 3</param>
+	void LoadLE(uint X0, uint X1, uint X2, uint X3)
+	{
+		Register = _mm_set_epi32(X0, X1, X2, X3);
+	}
+
+	/// <summary>
+	/// Transposes and loads 4 * UInt128 at 32bit boundaries in Little Endian format
 	/// </summary>
 	///
 	/// <param name="Input">The data input array</param>
@@ -122,37 +205,132 @@ public:
 	/// <param name="X1">Operand 3</param>
 	static inline void LoadLE16(const std::vector<byte> &Input, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
-		memcpy(&X0.Register.m128i_u32[0], &Input[Offset], 4);
-		memcpy(&X0.Register.m128i_u32[1], &Input[Offset + 16], 4);
-		memcpy(&X0.Register.m128i_u32[2], &Input[Offset + 32], 4);
-		memcpy(&X0.Register.m128i_u32[3], &Input[Offset + 48], 4);
-
-		memcpy(&X1.Register.m128i_u32[0], &Input[Offset + 4], 4);
-		memcpy(&X1.Register.m128i_u32[1], &Input[Offset + 20], 4);
-		memcpy(&X1.Register.m128i_u32[2], &Input[Offset + 36], 4);
-		memcpy(&X1.Register.m128i_u32[3], &Input[Offset + 52], 4);
-
-		memcpy(&X2.Register.m128i_u32[0], &Input[Offset + 8], 4);
-		memcpy(&X2.Register.m128i_u32[1], &Input[Offset + 24], 4);
-		memcpy(&X2.Register.m128i_u32[2], &Input[Offset + 40], 4);
-		memcpy(&X2.Register.m128i_u32[3], &Input[Offset + 56], 4);
-
-		memcpy(&X3.Register.m128i_u32[0], &Input[Offset + 12], 4);
-		memcpy(&X3.Register.m128i_u32[1], &Input[Offset + 28], 4);
-		memcpy(&X3.Register.m128i_u32[2], &Input[Offset + 44], 4);
-		memcpy(&X3.Register.m128i_u32[3], &Input[Offset + 60], 4);
+		X0.LoadLE(Input, Offset);
+		X1.LoadLE(Input, Offset + 16);
+		X2.LoadLE(Input, Offset + 32);
+		X3.LoadLE(Input, Offset + 48);
+		Transpose(X0, X1, X2, X3);
 	}
 
 	/// <summary>
-	/// Load an array into a register in Big Endian format
+	/// Loads 64 * 32bit integers to a UInt128 array in Little Endian format
+	/// </summary>
+	///
+	/// <param name="Input">The input byte array</param>
+	/// <param name="InOffset">The starting offset within the input array</param>
+	/// <param name="Output">The destination UInt128 array</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	static inline void LoadLE256(std::vector<byte> &Input, size_t InOffset, std::vector<UInt128> &Output, size_t OutOffset)
+	{
+		Output[OutOffset].LoadLE(Input, InOffset);
+		Output[OutOffset + 1].LoadLE(Input, InOffset + 16);
+		Output[OutOffset + 2].LoadLE(Input, InOffset + 32);
+		Output[OutOffset + 3].LoadLE(Input, InOffset + 48);
+		Output[OutOffset + 4].LoadLE(Input, InOffset + 64);
+		Output[OutOffset + 5].LoadLE(Input, InOffset + 80);
+		Output[OutOffset + 6].LoadLE(Input, InOffset + 96);
+		Output[OutOffset + 7].LoadLE(Input, InOffset + 112);
+		Output[OutOffset + 8].LoadLE(Input, InOffset + 128);
+		Output[OutOffset + 9].LoadLE(Input, InOffset + 144);
+		Output[OutOffset + 10].LoadLE(Input, InOffset + 160);
+		Output[OutOffset + 11].LoadLE(Input, InOffset + 176);
+		Output[OutOffset + 12].LoadLE(Input, InOffset + 192);
+		Output[OutOffset + 13].LoadLE(Input, InOffset + 208);
+		Output[OutOffset + 14].LoadLE(Input, InOffset + 224);
+		Output[OutOffset + 15].LoadLE(Input, InOffset + 240);
+	}
+
+	/// <summary>
+	/// Store register in an integer array in Big Endian format
 	/// </summary>
 	///
 	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template <typename T>
-	void LoadBE(const std::vector<T> &Input, size_t Offset)
+	void StoreBE(std::vector<T> &Output, size_t Offset) const
 	{
-		Swap().LoadLE(Input, Offset);
+		Swap().StoreLE(Output, Offset);
+	}
+
+	/// <summary>
+	/// Transposes and stores 16 * 32bit integers in Big Endian format
+	/// </summary>
+	///
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="Offset">The starting offset within the output array</param>
+	/// <param name="X0">Operand 0</param>
+	/// <param name="X1">Operand 1</param>
+	/// <param name="X0">Operand 2</param>
+	/// <param name="X1">Operand 3</param>
+	static inline void StoreBE16(std::vector<byte> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
+	{
+		Transpose(X0, X1, X2, X3);
+		X0.StoreBE(Output, Offset);
+		X1.StoreBE(Output, Offset + 16);
+		X2.StoreBE(Output, Offset + 32);
+		X3.StoreBE(Output, Offset + 48);
+	}
+
+	/// <summary>
+	/// Transposes and loads 64 * 32bit integers to an output array in Big Endian format
+	/// </summary>
+	///
+	/// <param name="Input">The input UInt128 array</param>
+	/// <param name="InOffset">The starting offset within the input array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	static inline void StoreBE256(std::vector<UInt128> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	{
+		__m128i T0 = _mm_unpacklo_epi32(Input[InOffset].Register, Input[InOffset + 1].Register);
+		__m128i T1 = _mm_unpacklo_epi32(Input[InOffset + 2].Register, Input[InOffset + 3].Register);
+		__m128i T2 = _mm_unpacklo_epi32(Input[InOffset + 4].Register, Input[InOffset + 5].Register);
+		__m128i T3 = _mm_unpacklo_epi32(Input[InOffset + 6].Register, Input[InOffset + 7].Register);
+		__m128i T4 = _mm_unpacklo_epi32(Input[InOffset + 8].Register, Input[InOffset + 9].Register);
+		__m128i T5 = _mm_unpacklo_epi32(Input[InOffset + 10].Register, Input[InOffset + 11].Register);
+		__m128i T6 = _mm_unpacklo_epi32(Input[InOffset + 12].Register, Input[InOffset + 13].Register);
+		__m128i T7 = _mm_unpacklo_epi32(Input[InOffset + 14].Register, Input[InOffset + 15].Register);
+		__m128i T8 = _mm_unpackhi_epi32(Input[InOffset].Register, Input[InOffset + 1].Register);
+		__m128i T9 = _mm_unpackhi_epi32(Input[InOffset + 2].Register, Input[InOffset + 3].Register);
+		__m128i T10 = _mm_unpackhi_epi32(Input[InOffset + 4].Register, Input[InOffset + 5].Register);
+		__m128i T11 = _mm_unpackhi_epi32(Input[InOffset + 6].Register, Input[InOffset + 7].Register);
+		__m128i T12 = _mm_unpackhi_epi32(Input[InOffset + 8].Register, Input[InOffset + 9].Register);
+		__m128i T13 = _mm_unpackhi_epi32(Input[InOffset + 10].Register, Input[InOffset + 11].Register);
+		__m128i T14 = _mm_unpackhi_epi32(Input[InOffset + 12].Register, Input[InOffset + 13].Register);
+		__m128i T15 = _mm_unpackhi_epi32(Input[InOffset + 14].Register, Input[InOffset + 15].Register);
+
+		Input[InOffset].Register = _mm_unpacklo_epi64(T0, T1);
+		Input[InOffset + 1].Register = _mm_unpacklo_epi64(T2, T3);
+		Input[InOffset + 2].Register = _mm_unpacklo_epi64(T4, T5);
+		Input[InOffset + 3].Register = _mm_unpacklo_epi64(T6, T7);
+		Input[InOffset + 4].Register = _mm_unpackhi_epi64(T0, T1);
+		Input[InOffset + 5].Register = _mm_unpackhi_epi64(T2, T3);
+		Input[InOffset + 6].Register = _mm_unpackhi_epi64(T4, T5);
+		Input[InOffset + 7].Register = _mm_unpackhi_epi64(T6, T7);
+		Input[InOffset + 8].Register = _mm_unpacklo_epi64(T8, T9);
+		Input[InOffset + 9].Register = _mm_unpacklo_epi64(T10, T11);
+		Input[InOffset + 10].Register = _mm_unpacklo_epi64(T12, T13);
+		Input[InOffset + 11].Register = _mm_unpacklo_epi64(T14, T15);
+		Input[InOffset + 12].Register = _mm_unpackhi_epi64(T8, T9);
+		Input[InOffset + 13].Register = _mm_unpackhi_epi64(T10, T11);
+		Input[InOffset + 14].Register = _mm_unpackhi_epi64(T12, T13);
+		Input[InOffset + 15].Register = _mm_unpackhi_epi64(T14, T15);
+
+		Input[InOffset].StoreBE(Output, OutOffset);
+		Input[InOffset + 1].StoreBE(Output, OutOffset + 16);
+		Input[InOffset + 2].StoreBE(Output, OutOffset + 32);
+		Input[InOffset + 3].StoreBE(Output, OutOffset + 48);
+		Input[InOffset + 4].StoreBE(Output, OutOffset + 64);
+		Input[InOffset + 5].StoreBE(Output, OutOffset + 80);
+		Input[InOffset + 6].StoreBE(Output, OutOffset + 96);
+		Input[InOffset + 7].StoreBE(Output, OutOffset + 112);
+		Input[InOffset + 8].StoreBE(Output, OutOffset + 128);
+		Input[InOffset + 9].StoreBE(Output, OutOffset + 144);
+		Input[InOffset + 10].StoreBE(Output, OutOffset + 160);
+		Input[InOffset + 11].StoreBE(Output, OutOffset + 176);
+		Input[InOffset + 12].StoreBE(Output, OutOffset + 192);
+		Input[InOffset + 13].StoreBE(Output, OutOffset + 208);
+		Input[InOffset + 14].StoreBE(Output, OutOffset + 224);
+		Input[InOffset + 15].StoreBE(Output, OutOffset + 240);
 	}
 
 	/// <summary>
@@ -168,7 +346,7 @@ public:
 	}
 
 	/// <summary>
-	/// Transposes and stores 16 * 32bit integers in little endian format
+	/// Transposes and stores 16 * 32bit integers in Little Endian format
 	/// </summary>
 	///
 	/// <param name="Output">The destination byte array</param>
@@ -179,109 +357,72 @@ public:
 	/// <param name="X1">Operand 3</param>
 	static inline void StoreLE16(std::vector<byte> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
-		memcpy(&Output[Offset], &X0.Register.m128i_u32[0], 4);
-		memcpy(&Output[Offset + 16], &X0.Register.m128i_u32[1], 4);
-		memcpy(&Output[Offset + 32], &X0.Register.m128i_u32[2], 4);
-		memcpy(&Output[Offset + 48], &X0.Register.m128i_u32[3], 4);
-
-		memcpy(&Output[Offset + 4], &X1.Register.m128i_u32[0], 4);
-		memcpy(&Output[Offset + 20], &X1.Register.m128i_u32[1], 4);
-		memcpy(&Output[Offset + 36], &X1.Register.m128i_u32[2], 4);
-		memcpy(&Output[Offset + 52], &X1.Register.m128i_u32[3], 4);
-
-		memcpy(&Output[Offset + 8], &X2.Register.m128i_u32[0], 4);
-		memcpy(&Output[Offset + 24], &X2.Register.m128i_u32[1], 4);
-		memcpy(&Output[Offset + 40], &X2.Register.m128i_u32[2], 4);
-		memcpy(&Output[Offset + 56], &X2.Register.m128i_u32[3], 4);
-
-		memcpy(&Output[Offset + 12], &X3.Register.m128i_u32[0], 4);
-		memcpy(&Output[Offset + 28], &X3.Register.m128i_u32[1], 4);
-		memcpy(&Output[Offset + 44], &X3.Register.m128i_u32[2], 4);
-		memcpy(&Output[Offset + 60], &X3.Register.m128i_u32[3], 4);
+		Transpose(X0, X1, X2, X3);
+		X0.StoreLE(Output, Offset);
+		X1.StoreLE(Output, Offset + 16);
+		X2.StoreLE(Output, Offset + 32);
+		X3.StoreLE(Output, Offset + 48);
 	}
 
 	/// <summary>
-	/// Transposes and copies 64 * 32bit integers to an output array
+	/// Transposes and copies 64 * 32bit integers to an output array in Little Endian format
 	/// </summary>
 	///
+	/// <param name="Input">The input UInt128 array</param>
 	/// <param name="Output">The destination byte array</param>
-	/// <param name="Offset">The starting offset within the output array</param>
-	/// <param name="X0">Operand 0</param>
-	/// <param name="X1">Operand 1</param>
-	/// <param name="X0">Operand 2</param>
-	/// <param name="X1">Operand 3</param>
-	/// <param name="X0">Operand 4</param>
-	/// <param name="X1">Operand 5</param>
-	/// <param name="X0">Operand 6</param>
-	/// <param name="X1">Operand 7</param>
-	/// <param name="X0">Operand 8</param>
-	/// <param name="X1">Operand 9</param>
-	/// <param name="X0">Operand 10</param>
-	/// <param name="X1">Operand 11</param>
-	/// <param name="X0">Operand 12</param>
-	/// <param name="X1">Operand 13</param>
-	/// <param name="X0">Operand 14</param>
-	/// <param name="X1">Operand 15</param>
-	static inline void StoreLE256(std::vector<byte> &Output, size_t Offset,
-		UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3,
-		UInt128 &X4, UInt128 &X5, UInt128 &X6, UInt128 &X7,
-		UInt128 &X8, UInt128 &X9, UInt128 &X10, UInt128 &X11,
-		UInt128 &X12, UInt128 &X13, UInt128 &X14, UInt128 &X15)
+	/// <param name="OutOffset">The starting offset within the output array</param>
+	static inline void StoreLE256(std::vector<UInt128> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		__m128i T0 = _mm_unpacklo_epi32(X0.Register, X1.Register);
-		__m128i T1 = _mm_unpacklo_epi32(X2.Register, X3.Register);
-		__m128i T2 = _mm_unpacklo_epi32(X4.Register, X5.Register);
-		__m128i T3 = _mm_unpacklo_epi32(X6.Register, X7.Register);
-		__m128i T4 = _mm_unpacklo_epi32(X8.Register, X9.Register);
-		__m128i T5 = _mm_unpacklo_epi32(X10.Register, X11.Register);
-		__m128i T6 = _mm_unpacklo_epi32(X12.Register, X13.Register);
-		__m128i T7 = _mm_unpacklo_epi32(X14.Register, X15.Register);
+		__m128i T0 = _mm_unpacklo_epi32(Input[InOffset].Register, Input[InOffset + 1].Register);
+		__m128i T1 = _mm_unpacklo_epi32(Input[InOffset + 2].Register, Input[InOffset + 3].Register);
+		__m128i T2 = _mm_unpacklo_epi32(Input[InOffset + 4].Register, Input[InOffset + 5].Register);
+		__m128i T3 = _mm_unpacklo_epi32(Input[InOffset + 6].Register, Input[InOffset + 7].Register);
+		__m128i T4 = _mm_unpacklo_epi32(Input[InOffset + 8].Register, Input[InOffset + 9].Register);
+		__m128i T5 = _mm_unpacklo_epi32(Input[InOffset + 10].Register, Input[InOffset + 11].Register);
+		__m128i T6 = _mm_unpacklo_epi32(Input[InOffset + 12].Register, Input[InOffset + 13].Register);
+		__m128i T7 = _mm_unpacklo_epi32(Input[InOffset + 14].Register, Input[InOffset + 15].Register);
+		__m128i T8 = _mm_unpackhi_epi32(Input[InOffset].Register, Input[InOffset + 1].Register);
+		__m128i T9 = _mm_unpackhi_epi32(Input[InOffset + 2].Register, Input[InOffset + 3].Register);
+		__m128i T10 = _mm_unpackhi_epi32(Input[InOffset + 4].Register, Input[InOffset + 5].Register);
+		__m128i T11 = _mm_unpackhi_epi32(Input[InOffset + 6].Register, Input[InOffset + 7].Register);
+		__m128i T12 = _mm_unpackhi_epi32(Input[InOffset + 8].Register, Input[InOffset + 9].Register);
+		__m128i T13 = _mm_unpackhi_epi32(Input[InOffset + 10].Register, Input[InOffset + 11].Register);
+		__m128i T14 = _mm_unpackhi_epi32(Input[InOffset + 12].Register, Input[InOffset + 13].Register);
+		__m128i T15 = _mm_unpackhi_epi32(Input[InOffset + 14].Register, Input[InOffset + 15].Register);
 
-		__m128i T8 = _mm_unpackhi_epi32(X0.Register, X1.Register);
-		__m128i T9 = _mm_unpackhi_epi32(X2.Register, X3.Register);
-		__m128i T10 = _mm_unpackhi_epi32(X4.Register, X5.Register);
-		__m128i T11 = _mm_unpackhi_epi32(X6.Register, X7.Register);
-		__m128i T12 = _mm_unpackhi_epi32(X8.Register, X9.Register);
-		__m128i T13 = _mm_unpackhi_epi32(X10.Register, X11.Register);
-		__m128i T14 = _mm_unpackhi_epi32(X12.Register, X13.Register);
-		__m128i T15 = _mm_unpackhi_epi32(X14.Register, X15.Register);
+		Input[InOffset].Register = _mm_unpacklo_epi64(T0, T1);
+		Input[InOffset + 1].Register = _mm_unpacklo_epi64(T2, T3);
+		Input[InOffset + 2].Register = _mm_unpacklo_epi64(T4, T5);
+		Input[InOffset + 3].Register = _mm_unpacklo_epi64(T6, T7);
+		Input[InOffset + 4].Register = _mm_unpackhi_epi64(T0, T1);
+		Input[InOffset + 5].Register = _mm_unpackhi_epi64(T2, T3);
+		Input[InOffset + 6].Register = _mm_unpackhi_epi64(T4, T5);
+		Input[InOffset + 7].Register = _mm_unpackhi_epi64(T6, T7);
+		Input[InOffset + 8].Register = _mm_unpacklo_epi64(T8, T9);
+		Input[InOffset + 9].Register = _mm_unpacklo_epi64(T10, T11);
+		Input[InOffset + 10].Register = _mm_unpacklo_epi64(T12, T13);
+		Input[InOffset + 11].Register = _mm_unpacklo_epi64(T14, T15);
+		Input[InOffset + 12].Register = _mm_unpackhi_epi64(T8, T9);
+		Input[InOffset + 13].Register = _mm_unpackhi_epi64(T10, T11);
+		Input[InOffset + 14].Register = _mm_unpackhi_epi64(T12, T13);
+		Input[InOffset + 15].Register = _mm_unpackhi_epi64(T14, T15);
 
-		X0.Register = _mm_unpacklo_epi64(T0, T1);
-		X1.Register = _mm_unpacklo_epi64(T2, T3);
-		X2.Register = _mm_unpacklo_epi64(T4, T5);
-		X3.Register = _mm_unpacklo_epi64(T6, T7);
-
-		X4.Register = _mm_unpackhi_epi64(T0, T1);
-		X5.Register = _mm_unpackhi_epi64(T2, T3);
-		X6.Register = _mm_unpackhi_epi64(T4, T5);
-		X7.Register = _mm_unpackhi_epi64(T6, T7);
-
-		X8.Register = _mm_unpacklo_epi64(T8, T9);
-		X9.Register = _mm_unpacklo_epi64(T10, T11);
-		X10.Register = _mm_unpacklo_epi64(T12, T13);
-		X11.Register = _mm_unpacklo_epi64(T14, T15);
-
-		X12.Register = _mm_unpackhi_epi64(T8, T9);
-		X13.Register = _mm_unpackhi_epi64(T10, T11);
-		X14.Register = _mm_unpackhi_epi64(T12, T13);
-		X15.Register = _mm_unpackhi_epi64(T14, T15);
-
-		memcpy(&Output[Offset], &X0, 16);
-		memcpy(&Output[Offset + 16], &X1, 16);
-		memcpy(&Output[Offset + 32], &X2, 16);
-		memcpy(&Output[Offset + 48], &X3, 16);
-		memcpy(&Output[Offset + 64], &X4, 16);
-		memcpy(&Output[Offset + 80], &X5, 16);
-		memcpy(&Output[Offset + 96], &X6, 16);
-		memcpy(&Output[Offset + 112], &X7, 16);
-		memcpy(&Output[Offset + 128], &X8, 16);
-		memcpy(&Output[Offset + 144], &X9, 16);
-		memcpy(&Output[Offset + 160], &X10, 16);
-		memcpy(&Output[Offset + 176], &X11, 16);
-		memcpy(&Output[Offset + 192], &X12, 16);
-		memcpy(&Output[Offset + 208], &X13, 16);
-		memcpy(&Output[Offset + 224], &X14, 16);
-		memcpy(&Output[Offset + 240], &X15, 16);
+		Input[InOffset].StoreLE(Output, OutOffset);
+		Input[InOffset + 1].StoreLE(Output, OutOffset + 16);
+		Input[InOffset + 2].StoreLE(Output, OutOffset + 32);
+		Input[InOffset + 3].StoreLE(Output, OutOffset + 48);
+		Input[InOffset + 4].StoreLE(Output, OutOffset + 64);
+		Input[InOffset + 5].StoreLE(Output, OutOffset + 80);
+		Input[InOffset + 6].StoreLE(Output, OutOffset + 96);
+		Input[InOffset + 7].StoreLE(Output, OutOffset + 112);
+		Input[InOffset + 8].StoreLE(Output, OutOffset + 128);
+		Input[InOffset + 9].StoreLE(Output, OutOffset + 144);
+		Input[InOffset + 10].StoreLE(Output, OutOffset + 160);
+		Input[InOffset + 11].StoreLE(Output, OutOffset + 176);
+		Input[InOffset + 12].StoreLE(Output, OutOffset + 192);
+		Input[InOffset + 13].StoreLE(Output, OutOffset + 208);
+		Input[InOffset + 14].StoreLE(Output, OutOffset + 224);
+		Input[InOffset + 15].StoreLE(Output, OutOffset + 240);
 	}
 
 	/* Methods */
@@ -291,29 +432,21 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The comparison integer</param>
+	/// 
+	/// <returns>The processed UInt128</returns>
 	UInt128 AndNot(const UInt128 &Value)
 	{
 		return UInt128(_mm_andnot_si128(Register, Value.Register));
 	}
 
 	/// <summary>
-	/// Interleaves 32bit integers at the specified distance
+	/// Returns the length of the register in bytes
 	/// </summary>
 	///
-	/// <param name="Input">The UInt128 to interleave</param>
-	/// <param name="Distance">The distance offset between sequential registers</param>
-	static inline void InterLeave32(std::vector<UInt128> &Input, size_t Distance)
+	/// <returns>The registers size</returns>
+	static inline const size_t Length()
 	{
-		std::vector<uint> X(Input.size() * 4);
-		memcpy(&X[0], &Input[0], Input.size() * 16);
-
-		for (size_t i = 0; i < Input.size(); ++i)
-		{
-			memcpy(&Input[i].Register.m128i_u32[0], &X[i], 4);
-			memcpy(&Input[i].Register.m128i_u32[1], &X[Distance + i], 4);
-			memcpy(&Input[i].Register.m128i_u32[2], &X[Distance * 2 + i], 4);
-			memcpy(&Input[i].Register.m128i_u32[3], &X[Distance * 3 + i], 4);
-		}
+		return 16;
 	}
 
 	/// <summary>
@@ -332,6 +465,8 @@ public:
 	///
 	/// <param name="Value">The integer to rotate</param>
 	/// <param name="Shift">The shift degree; maximum is 32</param>
+	/// 
+	/// <returns>The rotated UInt128</returns>
 	static inline UInt128 Rotl32(const UInt128 &Value, const int Shift)
 	{
 		return UInt128(_mm_or_si128(_mm_slli_epi32(Value.Register, static_cast<int>(Shift)), _mm_srli_epi32(Value.Register, static_cast<int>(32 - Shift))));
@@ -353,14 +488,68 @@ public:
 	///
 	/// <param name="Value">The integer to rotate</param>
 	/// <param name="Shift">The shift degree; maximum is 32</param>
+	/// 
+	/// <returns>The rotated UInt128</returns>
 	static inline UInt128 Rotr32(const UInt128 &Value, const int Shift)
 	{
 		return Rotl32(Value, 32 - Shift);
 	}
 
 	/// <summary>
+	/// Load a Uint128 in Big Endian format using 32bit uints staggered at multiples of the shift factor
+	/// </summary>
+	///
+	/// <param name="Input">The input byte array</param>
+	/// <param name="Offset">The starting offset within the input array</param>
+	/// <param name="Shift">The shift factor</param>
+	/// 
+	/// <returns>A populated UInt128</returns>
+	static inline UInt128 ShuffleLoadBE(const std::vector<byte> &Input, size_t Offset, size_t Shift)
+	{
+		return UInt128(
+			(Input[Offset] << 24) | (Input[Offset + 1] << 16) | (Input[Offset + 2] << 8) | Input[Offset + 3],
+			(Input[Offset + Shift] << 24) | (Input[Offset + 1 + Shift] << 16) | (Input[Offset + 2 + Shift] << 8) | Input[Offset + 3 + Shift],
+			(Input[Offset + Shift * 2] << 24) | (Input[Offset + 1 + Shift * 2] << 16) | (Input[Offset + 2 + Shift * 2] << 8) | Input[Offset + 3 + Shift * 2],
+			(Input[Offset + Shift * 3] << 24) | (Input[Offset + 1 + Shift * 3] << 16) | (Input[Offset + 2 + Shift * 3] << 8) | Input[Offset + 3 + Shift * 3]);
+	}
+
+	/// <summary>
+	/// Load a Uint128 in Big Endian format using a 32bit uint array staggered at multiples of the shift factor
+	/// </summary>
+	///
+	/// <param name="Input">The input uint32 array</param>
+	/// <param name="Offset">The starting offset within the input array</param>
+	/// <param name="Shift">The shift factor</param>
+	/// 
+	/// <returns>A populated UInt128</returns>
+	static inline UInt128 ShuffleLoad32(const std::vector<uint> &Input, size_t Offset, size_t Shift)
+	{
+		return UInt128(Input[Offset], Input[Offset + Shift], Input[Offset + Shift * 2], Input[Offset + Shift * 3]);
+	}
+
+	/// <summary>
+	/// Load a Uint128 in Little Endian format using uint staggered at multiples of the shift factor
+	/// </summary>
+	///
+	/// <param name="Input">The input byte array</param>
+	/// <param name="Offset">The starting offset within the input array</param>
+	/// <param name="Shift">The shift factor</param>
+	/// 
+	/// <returns>A populated UInt128</returns>
+	static inline UInt128 ShuffleLoadLE(const std::vector<byte> &Input, size_t Offset, size_t Shift)
+	{
+		return UInt128(
+			Input[Offset] | (Input[Offset + 1] << 8) | (Input[Offset + 2] << 16) | (Input[Offset + 3] << 24),
+			Input[Offset + Shift] | (Input[Offset + 1 + Shift] << 8) | (Input[Offset + 2 + Shift] << 16) | (Input[Offset + 3 + Shift] << 24),
+			Input[Offset + Shift * 2] | (Input[Offset + 1 + Shift * 2] << 8) | (Input[Offset + 2 + Shift * 2] << 16) | (Input[Offset + 3 + Shift * 2] << 24),
+			Input[Offset + Shift * 3] | (Input[Offset + 1 + Shift * 3] << 8) | (Input[Offset + 2 + Shift * 3] << 16) | (Input[Offset + 3 + Shift * 3] << 24));
+	}
+
+	/// <summary>
 	/// Performs a byte swap on 4 unsigned integers
 	/// </summary>
+	/// 
+	/// <returns>The byte swapped UInt128</returns>
 	UInt128 Swap() const
 	{
 		__m128i T = Register;
@@ -369,6 +558,67 @@ public:
 		T = _mm_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
 
 		return UInt128(_mm_or_si128(_mm_srli_epi16(T, 8), _mm_slli_epi16(T, 8)));
+	}
+
+	/// <summary>
+	/// Performs a byte swap on 4 unsigned integers
+	/// </summary>
+	/// 		
+	/// <param name="R">The UInt128 to process</param>
+	/// 
+	/// <returns>The byte swapped UInt128</returns>
+	static inline UInt128 Swap(UInt128 &R)
+	{
+		__m128i T = R.Register;
+
+		T = _mm_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
+		T = _mm_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
+
+		return UInt128(_mm_or_si128(_mm_srli_epi16(T, 8), _mm_slli_epi16(T, 8)));
+	}
+
+	/// <summary>
+	/// Copies the register uint8 array to an output array
+	/// </summary>
+	///
+	/// <param name="Input">The output byte array</param>
+	/// <param name="Offset">The starting offset within the output array</param>
+	void ToUint8(std::vector<byte> &Output, size_t OutOffset)
+	{
+		memcpy(&Output[OutOffset], &Register.m128i_u8[0], 16);
+	}
+
+	/// <summary>
+	/// Copies the register uint16 array to an output array
+	/// </summary>
+	///
+	/// <param name="Input">The output byte array</param>
+	/// <param name="Offset">The starting offset within the output array</param>
+	void ToUint16(std::vector<ushort> &Output, size_t OutOffset)
+	{
+		memcpy(&Output[OutOffset], &Register.m128i_u16[0], 16);
+	}
+
+	/// <summary>
+	/// Copies the register uint32 array to an output array
+	/// </summary>
+	///
+	/// <param name="Input">The output byte array</param>
+	/// <param name="Offset">The starting offset within the output array</param>
+	void ToUint32(std::vector<uint> &Output, size_t OutOffset)
+	{
+		memcpy(&Output[OutOffset], &Register.m128i_u32[0], 16);
+	}
+
+	/// <summary>
+	/// Copies the register uint64 array to an output array
+	/// </summary>
+	///
+	/// <param name="Input">The output byte array</param>
+	/// <param name="Offset">The starting offset within the output array</param>
+	void ToUint64(std::vector<ulong> &Output, size_t OutOffset)
+	{
+		memcpy(&Output[OutOffset], &Register.m128i_u64[0], 16);
 	}
 
 	/// <summary>
@@ -381,16 +631,14 @@ public:
 	/// <param name="X3">Operand 3</param>
 	static inline void Transpose(UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
-
-
-		__m128i T0 = _mm_unpacklo_epi32(X0.Register, X1.Register); // get [0 + 1] uints put in t0
-		__m128i T1 = _mm_unpacklo_epi32(X2.Register, X3.Register); // get [0 + 1] uints put in 0 and 1 of t1
-		__m128i T2 = _mm_unpackhi_epi32(X0.Register, X1.Register); // get [2 + 3] uints put in 2 and 3 of t2
-		__m128i T3 = _mm_unpackhi_epi32(X2.Register, X3.Register); // get [2 + 3] uints put in 2 and 3 of t3
-		X0.Register = _mm_unpacklo_epi64(T0, T1); // copy first 8 bytes of t0 and t1 to x0
-		X1.Register = _mm_unpackhi_epi64(T0, T1); // copy last 8 bytes of t0 and t1 to x1
-		X2.Register = _mm_unpacklo_epi64(T2, T3); // copy first 8 bytes of t2 and t3 to x2
-		X3.Register = _mm_unpackhi_epi64(T2, T3); // copy last 8 bytes of t2 and t3 to x3
+		__m128i T0 = _mm_unpacklo_epi32(X0.Register, X1.Register);
+		__m128i T1 = _mm_unpacklo_epi32(X2.Register, X3.Register);
+		__m128i T2 = _mm_unpackhi_epi32(X0.Register, X1.Register);
+		__m128i T3 = _mm_unpackhi_epi32(X2.Register, X3.Register);
+		X0.Register = _mm_unpacklo_epi64(T0, T1);
+		X1.Register = _mm_unpackhi_epi64(T0, T1);
+		X2.Register = _mm_unpacklo_epi64(T2, T3);
+		X3.Register = _mm_unpackhi_epi64(T2, T3);
 	}
 
 	/* Operators */

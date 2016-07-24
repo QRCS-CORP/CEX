@@ -6,7 +6,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	std::vector<ulong> data;
 	CEX::Utility::IntUtils::BytesToWord64s(Input, Offset, Size, data);
 
-	for (size_t j = 0; j < Size / 8; j++)
+	for (size_t j = 0; j < Size / 8; ++j)
 		State[j] ^= data[j];
 
 	ulong Aba, Abe, Abi, Abo, Abu;

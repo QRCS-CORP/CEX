@@ -10,6 +10,8 @@ namespace Test
 		{
 			Initialize();
 
+			CompareIntrinsics();
+
 			CEX::Digest::SHA256* sha256 = new CEX::Digest::SHA256();
 			CompareVector(sha256, m_message[0], m_expected256[0]);
 			CompareVector(sha256, m_message[1], m_expected256[1]);
@@ -36,6 +38,28 @@ namespace Test
 		{
 			throw TestException(std::string(FAILURE + " : Internal Error"));
 		}
+	}
+
+	void SHA2Test::CompareIntrinsics()
+	{
+		std::vector<byte> hash(32, 0);
+		std::vector<byte> msg(256, 0);
+		for (size_t i = 0; i < msg.size(); ++i)
+			msg[i] = i;
+
+		CEX::Digest::SHA256 dgt;
+		dgt.BlockUpdate(msg, 0, msg.size());
+
+		/*std::vector<byte> hash(32, 0);
+		std::vector<byte> msg(512, 0);
+		for (size_t i = 0; i < msg.size() / 2; ++i)
+		{
+			msg[i] = i;
+			msg[i + 256] = i;
+		}
+
+		CEX::Digest::SHA256 dgt;
+		dgt.BlockUpdate(msg, 0, msg.size());*/
 	}
 
 	void SHA2Test::CompareVector(CEX::Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)

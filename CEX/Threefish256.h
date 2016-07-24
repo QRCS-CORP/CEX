@@ -69,7 +69,7 @@ private:
 	{
 		B += K1;
 		A += B + K0;
-		B = RotateLeft64(B, R) ^ A; //TODO: use intrinsics
+		B = RotateLeft64(B, R) ^ A;
 	}
 
 	inline static ulong RotateLeft64(ulong V, uint B)

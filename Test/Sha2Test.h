@@ -54,6 +54,7 @@ namespace Test
 		virtual std::string Run();
         
     private:
+		void CompareIntrinsics();
 		void CompareVector(CEX::Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected);
 		void Initialize();
 		void OnProgress(char* Data);

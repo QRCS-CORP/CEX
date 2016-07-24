@@ -382,87 +382,89 @@ void Salsa20::Transform256(std::vector<byte> &Output, size_t OutOffset, std::vec
 #if defined(HAS_MINSSE)
 
 	size_t ctr = 0;
-	CEX::Common::UInt128 X0(m_wrkState[ctr]);
-	CEX::Common::UInt128 X1(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X2(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X3(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X4(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X5(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X6(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X7(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X8(Counter, 0);
-	CEX::Common::UInt128 X9(Counter, 16);
-	CEX::Common::UInt128 X10(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X11(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X12(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X13(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X14(m_wrkState[++ctr]);
-	CEX::Common::UInt128 X15(m_wrkState[++ctr]);
+	std::vector<CEX::Common::UInt128> X {
+		CEX::Common::UInt128(m_wrkState[ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(Counter, 0),
+		CEX::Common::UInt128(Counter, 16),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+		CEX::Common::UInt128(m_wrkState[++ctr]),
+	};
 
 	ctr = m_rndCount;
 	while (ctr != 0)
 	{
-		X4 ^= CEX::Common::UInt128::Rotl32(X0 + X12, 7);
-		X8 ^= CEX::Common::UInt128::Rotl32(X4 + X0, 9);
-		X12 ^= CEX::Common::UInt128::Rotl32(X8 + X4, 13);
-		X0 ^= CEX::Common::UInt128::Rotl32(X12 + X8, 18);
+		X[4] ^= CEX::Common::UInt128::Rotl32(X[0] + X[12], 7);
+		X[8] ^= CEX::Common::UInt128::Rotl32(X[4] + X[0], 9);
+		X[12] ^= CEX::Common::UInt128::Rotl32(X[8] + X[4], 13);
+		X[0] ^= CEX::Common::UInt128::Rotl32(X[12] + X[8], 18);
 
-		X9 ^= CEX::Common::UInt128::Rotl32(X5 + X1, 7);
-		X13 ^= CEX::Common::UInt128::Rotl32(X9 + X5, 9);
-		X1 ^= CEX::Common::UInt128::Rotl32(X13 + X9, 13);
-		X5 ^= CEX::Common::UInt128::Rotl32(X1 + X13, 18);
+		X[9] ^= CEX::Common::UInt128::Rotl32(X[5] + X[1], 7);
+		X[13] ^= CEX::Common::UInt128::Rotl32(X[9] + X[5], 9);
+		X[1] ^= CEX::Common::UInt128::Rotl32(X[13] + X[9], 13);
+		X[5] ^= CEX::Common::UInt128::Rotl32(X[1] + X[13], 18);
 
-		X14 ^= CEX::Common::UInt128::Rotl32(X10 + X6, 7);
-		X2 ^= CEX::Common::UInt128::Rotl32(X14 + X10, 9);
-		X6 ^= CEX::Common::UInt128::Rotl32(X2 + X14, 13);
-		X10 ^= CEX::Common::UInt128::Rotl32(X6 + X2, 18);
+		X[14] ^= CEX::Common::UInt128::Rotl32(X[10] + X[6], 7);
+		X[2] ^= CEX::Common::UInt128::Rotl32(X[14] + X[10], 9);
+		X[6] ^= CEX::Common::UInt128::Rotl32(X[2] + X[14], 13);
+		X[10] ^= CEX::Common::UInt128::Rotl32(X[6] + X[2], 18);
 
-		X3 ^= CEX::Common::UInt128::Rotl32(X15 + X11, 7);
-		X7 ^= CEX::Common::UInt128::Rotl32(X3 + X15, 9);
-		X11 ^= CEX::Common::UInt128::Rotl32(X7 + X3, 13);
-		X15 ^= CEX::Common::UInt128::Rotl32(X11 + X7, 18);
+		X[3] ^= CEX::Common::UInt128::Rotl32(X[15] + X[11], 7);
+		X[7] ^= CEX::Common::UInt128::Rotl32(X[3] + X[15], 9);
+		X[11] ^= CEX::Common::UInt128::Rotl32(X[7] + X[3], 13);
+		X[15] ^= CEX::Common::UInt128::Rotl32(X[11] + X[7], 18);
 
-		X1 ^= CEX::Common::UInt128::Rotl32(X0 + X3, 7);
-		X2 ^= CEX::Common::UInt128::Rotl32(X1 + X0, 9);
-		X3 ^= CEX::Common::UInt128::Rotl32(X2 + X1, 13);
-		X0 ^= CEX::Common::UInt128::Rotl32(X3 + X2, 18);
+		X[1] ^= CEX::Common::UInt128::Rotl32(X[0] + X[3], 7);
+		X[2] ^= CEX::Common::UInt128::Rotl32(X[1] + X[0], 9);
+		X[3] ^= CEX::Common::UInt128::Rotl32(X[2] + X[1], 13);
+		X[0] ^= CEX::Common::UInt128::Rotl32(X[3] + X[2], 18);
 
-		X6 ^= CEX::Common::UInt128::Rotl32(X5 + X4, 7);
-		X7 ^= CEX::Common::UInt128::Rotl32(X6 + X5, 9);
-		X4 ^= CEX::Common::UInt128::Rotl32(X7 + X6, 13);
-		X5 ^= CEX::Common::UInt128::Rotl32(X4 + X7, 18);
+		X[6] ^= CEX::Common::UInt128::Rotl32(X[5] + X[4], 7);
+		X[7] ^= CEX::Common::UInt128::Rotl32(X[6] + X[5], 9);
+		X[4] ^= CEX::Common::UInt128::Rotl32(X[7] + X[6], 13);
+		X[5] ^= CEX::Common::UInt128::Rotl32(X[4] + X[7], 18);
 
-		X11 ^= CEX::Common::UInt128::Rotl32(X10 + X9, 7);
-		X8 ^= CEX::Common::UInt128::Rotl32(X11 + X10, 9);
-		X9 ^= CEX::Common::UInt128::Rotl32(X8 + X11, 13);
-		X10 ^= CEX::Common::UInt128::Rotl32(X9 + X8, 18);
+		X[11] ^= CEX::Common::UInt128::Rotl32(X[10] + X[9], 7);
+		X[8] ^= CEX::Common::UInt128::Rotl32(X[11] + X[10], 9);
+		X[9] ^= CEX::Common::UInt128::Rotl32(X[8] + X[11], 13);
+		X[10] ^= CEX::Common::UInt128::Rotl32(X[9] + X[8], 18);
 
-		X12 ^= CEX::Common::UInt128::Rotl32(X15 + X14, 7);
-		X13 ^= CEX::Common::UInt128::Rotl32(X12 + X15, 9);
-		X14 ^= CEX::Common::UInt128::Rotl32(X13 + X12, 13);
-		X15 ^= CEX::Common::UInt128::Rotl32(X14 + X13, 18);
+		X[12] ^= CEX::Common::UInt128::Rotl32(X[15] + X[14], 7);
+		X[13] ^= CEX::Common::UInt128::Rotl32(X[12] + X[15], 9);
+		X[14] ^= CEX::Common::UInt128::Rotl32(X[13] + X[12], 13);
+		X[15] ^= CEX::Common::UInt128::Rotl32(X[14] + X[13], 18);
 		ctr -= 2;
 	}
 
 	// last round
-	X0 += m_wrkState[ctr];
-	X1 += m_wrkState[++ctr];
-	X2 += m_wrkState[++ctr];
-	X3 += m_wrkState[++ctr];
-	X4 += m_wrkState[++ctr];
-	X5 += m_wrkState[++ctr];
-	X6 += m_wrkState[++ctr];
-	X7 += m_wrkState[++ctr];
-	X8 += CEX::Common::UInt128(Counter, 0);
-	X9 += CEX::Common::UInt128(Counter, 16);
-	X10 += m_wrkState[++ctr];
-	X11 += m_wrkState[++ctr];
-	X12 += m_wrkState[++ctr];
-	X13 += m_wrkState[++ctr];
-	X14 += m_wrkState[++ctr];
-	X15 += m_wrkState[++ctr];
+	X[0] += m_wrkState[ctr];
+	X[1] += m_wrkState[++ctr];
+	X[2] += m_wrkState[++ctr];
+	X[3] += m_wrkState[++ctr];
+	X[4] += m_wrkState[++ctr];
+	X[5] += m_wrkState[++ctr];
+	X[6] += m_wrkState[++ctr];
+	X[7] += m_wrkState[++ctr];
+	X[8] += CEX::Common::UInt128(Counter, 0);
+	X[9] += CEX::Common::UInt128(Counter, 16);
+	X[10] += m_wrkState[++ctr];
+	X[11] += m_wrkState[++ctr];
+	X[12] += m_wrkState[++ctr];
+	X[13] += m_wrkState[++ctr];
+	X[14] += m_wrkState[++ctr];
+	X[15] += m_wrkState[++ctr];
 	
-	CEX::Common::UInt128::StoreLE256(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
+	CEX::Common::UInt128::StoreLE256(X, 0, Output, OutOffset);
 
 #else
 
@@ -482,87 +484,89 @@ void Salsa20::Transform512(std::vector<byte> &Output, size_t OutOffset, std::vec
 #if defined(HAS_AVX)
 
 	size_t ctr = 0;
-	CEX::Common::UInt256 X0(m_wrkState[ctr]);
-	CEX::Common::UInt256 X1(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X2(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X3(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X4(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X5(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X6(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X7(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X8(Counter, 0);
-	CEX::Common::UInt256 X9(Counter, 32);
-	CEX::Common::UInt256 X10(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X11(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X12(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X13(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X14(m_wrkState[++ctr]);
-	CEX::Common::UInt256 X15(m_wrkState[++ctr]);
+	std::vector<CEX::Common::UInt256> X{
+		CEX::Common::UInt256(m_wrkState[ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(Counter, 0),
+		CEX::Common::UInt256(Counter, 16),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+		CEX::Common::UInt256(m_wrkState[++ctr]),
+	};
 
 	ctr = m_rndCount;
 	while (ctr != 0)
 	{
-		X4 ^= CEX::Common::UInt256::Rotl32(X0 + X12, 7);
-		X8 ^= CEX::Common::UInt256::Rotl32(X4 + X0, 9);
-		X12 ^= CEX::Common::UInt256::Rotl32(X8 + X4, 13);
-		X0 ^= CEX::Common::UInt256::Rotl32(X12 + X8, 18);
+		X[4] ^= CEX::Common::UInt256::Rotl32(X[0] + X[12], 7);
+		X[8] ^= CEX::Common::UInt256::Rotl32(X[4] + X[0], 9);
+		X[12] ^= CEX::Common::UInt256::Rotl32(X[8] + X[4], 13);
+		X[0] ^= CEX::Common::UInt256::Rotl32(X[12] + X[8], 18);
 
-		X9 ^= CEX::Common::UInt256::Rotl32(X5 + X1, 7);
-		X13 ^= CEX::Common::UInt256::Rotl32(X9 + X5, 9);
-		X1 ^= CEX::Common::UInt256::Rotl32(X13 + X9, 13);
-		X5 ^= CEX::Common::UInt256::Rotl32(X1 + X13, 18);
+		X[9] ^= CEX::Common::UInt256::Rotl32(X[5] + X[1], 7);
+		X[13] ^= CEX::Common::UInt256::Rotl32(X[9] + X[5], 9);
+		X[1] ^= CEX::Common::UInt256::Rotl32(X[13] + X[9], 13);
+		X[5] ^= CEX::Common::UInt256::Rotl32(X[1] + X[13], 18);
 
-		X14 ^= CEX::Common::UInt256::Rotl32(X10 + X6, 7);
-		X2 ^= CEX::Common::UInt256::Rotl32(X14 + X10, 9);
-		X6 ^= CEX::Common::UInt256::Rotl32(X2 + X14, 13);
-		X10 ^= CEX::Common::UInt256::Rotl32(X6 + X2, 18);
+		X[14] ^= CEX::Common::UInt256::Rotl32(X[10] + X[6], 7);
+		X[2] ^= CEX::Common::UInt256::Rotl32(X[14] + X[10], 9);
+		X[6] ^= CEX::Common::UInt256::Rotl32(X[2] + X[14], 13);
+		X[10] ^= CEX::Common::UInt256::Rotl32(X[6] + X[2], 18);
 
-		X3 ^= CEX::Common::UInt256::Rotl32(X15 + X11, 7);
-		X7 ^= CEX::Common::UInt256::Rotl32(X3 + X15, 9);
-		X11 ^= CEX::Common::UInt256::Rotl32(X7 + X3, 13);
-		X15 ^= CEX::Common::UInt256::Rotl32(X11 + X7, 18);
+		X[3] ^= CEX::Common::UInt256::Rotl32(X[15] + X[11], 7);
+		X[7] ^= CEX::Common::UInt256::Rotl32(X[3] + X[15], 9);
+		X[11] ^= CEX::Common::UInt256::Rotl32(X[7] + X[3], 13);
+		X[15] ^= CEX::Common::UInt256::Rotl32(X[11] + X[7], 18);
 
-		X1 ^= CEX::Common::UInt256::Rotl32(X0 + X3, 7);
-		X2 ^= CEX::Common::UInt256::Rotl32(X1 + X0, 9);
-		X3 ^= CEX::Common::UInt256::Rotl32(X2 + X1, 13);
-		X0 ^= CEX::Common::UInt256::Rotl32(X3 + X2, 18);
+		X[1] ^= CEX::Common::UInt256::Rotl32(X[0] + X[3], 7);
+		X[2] ^= CEX::Common::UInt256::Rotl32(X[1] + X[0], 9);
+		X[3] ^= CEX::Common::UInt256::Rotl32(X[2] + X[1], 13);
+		X[0] ^= CEX::Common::UInt256::Rotl32(X[3] + X[2], 18);
 
-		X6 ^= CEX::Common::UInt256::Rotl32(X5 + X4, 7);
-		X7 ^= CEX::Common::UInt256::Rotl32(X6 + X5, 9);
-		X4 ^= CEX::Common::UInt256::Rotl32(X7 + X6, 13);
-		X5 ^= CEX::Common::UInt256::Rotl32(X4 + X7, 18);
+		X[6] ^= CEX::Common::UInt256::Rotl32(X[5] + X[4], 7);
+		X[7] ^= CEX::Common::UInt256::Rotl32(X[6] + X[5], 9);
+		X[4] ^= CEX::Common::UInt256::Rotl32(X[7] + X[6], 13);
+		X[5] ^= CEX::Common::UInt256::Rotl32(X[4] + X[7], 18);
 
-		X11 ^= CEX::Common::UInt256::Rotl32(X10 + X9, 7);
-		X8 ^= CEX::Common::UInt256::Rotl32(X11 + X10, 9);
-		X9 ^= CEX::Common::UInt256::Rotl32(X8 + X11, 13);
-		X10 ^= CEX::Common::UInt256::Rotl32(X9 + X8, 18);
+		X[11] ^= CEX::Common::UInt256::Rotl32(X[10] + X[9], 7);
+		X[8] ^= CEX::Common::UInt256::Rotl32(X[11] + X[10], 9);
+		X[9] ^= CEX::Common::UInt256::Rotl32(X[8] + X[11], 13);
+		X[10] ^= CEX::Common::UInt256::Rotl32(X[9] + X[8], 18);
 
-		X12 ^= CEX::Common::UInt256::Rotl32(X15 + X14, 7);
-		X13 ^= CEX::Common::UInt256::Rotl32(X12 + X15, 9);
-		X14 ^= CEX::Common::UInt256::Rotl32(X13 + X12, 13);
-		X15 ^= CEX::Common::UInt256::Rotl32(X14 + X13, 18);
+		X[12] ^= CEX::Common::UInt256::Rotl32(X[15] + X[14], 7);
+		X[13] ^= CEX::Common::UInt256::Rotl32(X[12] + X[15], 9);
+		X[14] ^= CEX::Common::UInt256::Rotl32(X[13] + X[12], 13);
+		X[15] ^= CEX::Common::UInt256::Rotl32(X[14] + X[13], 18);
 		ctr -= 2;
 	}
 
 	// last round
-	X0 += m_wrkState[ctr];
-	X1 += m_wrkState[++ctr];
-	X2 += m_wrkState[++ctr];
-	X3 += m_wrkState[++ctr];
-	X4 += m_wrkState[++ctr];
-	X5 += m_wrkState[++ctr];
-	X6 += m_wrkState[++ctr];
-	X7 += m_wrkState[++ctr];
-	X8 += CEX::Common::UInt256(Counter, 0);
-	X9 += CEX::Common::UInt256(Counter, 32);
-	X10 += m_wrkState[++ctr];
-	X11 += m_wrkState[++ctr];
-	X12 += m_wrkState[++ctr];
-	X13 += m_wrkState[++ctr];
-	X14 += m_wrkState[++ctr];
-	X15 += m_wrkState[++ctr];
+	X[0] += m_wrkState[ctr];
+	X[1] += m_wrkState[++ctr];
+	X[2] += m_wrkState[++ctr];
+	X[3] += m_wrkState[++ctr];
+	X[4] += m_wrkState[++ctr];
+	X[5] += m_wrkState[++ctr];
+	X[6] += m_wrkState[++ctr];
+	X[7] += m_wrkState[++ctr];
+	X[8] += CEX::Common::UInt256(Counter, 0);
+	X[9] += CEX::Common::UInt256(Counter, 16);
+	X[10] += m_wrkState[++ctr];
+	X[11] += m_wrkState[++ctr];
+	X[12] += m_wrkState[++ctr];
+	X[13] += m_wrkState[++ctr];
+	X[14] += m_wrkState[++ctr];
+	X[15] += m_wrkState[++ctr];
 
-	CEX::Common::UInt256::StoreLE512(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
+	CEX::Common::UInt256::StoreLE512(X, 0, Output, OutOffset);
 
 #else
 

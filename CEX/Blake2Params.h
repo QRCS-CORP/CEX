@@ -126,12 +126,11 @@ NAMESPACE_DIGEST
 			m_nodeOffset(0),
 			m_nodeDepth(0),
 			m_innerLen(0),
-			m_threadDepth(0),
+			m_threadDepth(8),
 			m_reserved2(0),
 			m_reserved3(0),
 			m_reserved4(0)
 		{
-			m_threadDepth = m_dgtLen > 32 ? 4 : 8;
 		}
 
 		/// <summary>
@@ -172,7 +171,7 @@ NAMESPACE_DIGEST
 		}
 
 		/// <summary>
-		/// Initialize this structure with paramerters
+		/// Initialize this structure with parameters
 		/// </summary>
 		/// 
 		/// <param name="DigestLength">Digest byte length (1 byte): an integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s</param>

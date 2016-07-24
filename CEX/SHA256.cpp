@@ -144,7 +144,7 @@ void SHA256::ProcessBlock()
 	uint w6 = H6;
 	uint w7 = H7;
 
-	// expand 16 word block into 64 word blocks
+	// expand 16 word block into 64 blocks
 	m_wordBuffer[16] = Theta1(m_wordBuffer[14]) + m_wordBuffer[9] + Theta0(m_wordBuffer[1]) + m_wordBuffer[0];
 	m_wordBuffer[17] = Theta1(m_wordBuffer[15]) + m_wordBuffer[10] + Theta0(m_wordBuffer[2]) + m_wordBuffer[1];
 	m_wordBuffer[18] = Theta1(m_wordBuffer[16]) + m_wordBuffer[11] + Theta0(m_wordBuffer[3]) + m_wordBuffer[2];
