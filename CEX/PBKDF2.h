@@ -129,7 +129,7 @@ public:
 		m_prcIterations(Iterations),
 		m_macSalt(0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (m_prcIterations == 0)
 			throw CryptoGeneratorException("PBKDF2:CTor", "Iterations count can not be zero!");
 #endif
@@ -157,7 +157,7 @@ public:
 		m_msgDigest(0),
 		m_prcIterations(Iterations)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (m_prcIterations == 0)
 			throw CryptoGeneratorException("PBKDF2:CTor", "Iterations count can not be zero!");
 		if (!m_digestMac->IsInitialized())

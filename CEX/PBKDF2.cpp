@@ -28,7 +28,7 @@ size_t PBKDF2::Generate(std::vector<byte> &Output)
 
 size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("PBKDF2:Generate", "Output buffer too small!");
 #endif
@@ -40,7 +40,7 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size
 
 void PBKDF2::Initialize(const std::vector<byte> &Ikm)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Ikm.size() < m_hashSize * 2)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 #endif
@@ -55,7 +55,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Ikm)
 
 void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() < m_blockSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_hashSize)
@@ -76,7 +76,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &
 
 void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() + Nonce.size() < m_blockSize)
 		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_hashSize)
@@ -98,7 +98,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &
 
 void PBKDF2::Update(const std::vector<byte> &Salt)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("PBKDF2:Update", "Salt is too small!");
 #endif
@@ -106,7 +106,7 @@ void PBKDF2::Update(const std::vector<byte> &Salt)
 	Initialize(Salt);
 }
 
-// *** Protected *** //
+// *** Private *** //
 
 size_t PBKDF2::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {

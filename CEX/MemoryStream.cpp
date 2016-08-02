@@ -5,7 +5,7 @@ NAMESPACE_IO
 
 void MemoryStream::Close()
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	throw CryptoProcessingException("MemoryStream:Flush", "Not implemented in MemoryStream!");
 #endif
 }
@@ -27,7 +27,7 @@ void MemoryStream::Destroy()
 
 void MemoryStream::Flush()
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	throw CryptoProcessingException("MemoryStream:Flush", "Not implemented in MemoryStream!");
 #endif
 }
@@ -48,7 +48,7 @@ size_t MemoryStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count
 
 byte MemoryStream::ReadByte()
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (m_streamData.size() - m_streamPosition < 1)
 		throw CryptoProcessingException("MemoryStream:ReadByte", "The output array is too short!");
 #endif
@@ -84,7 +84,7 @@ void MemoryStream::SetLength(size_t Length)
 
 void MemoryStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Offset + Count > Buffer.size())
 		throw CryptoProcessingException("MemoryStream:Write", "The output array is too short!");
 #endif

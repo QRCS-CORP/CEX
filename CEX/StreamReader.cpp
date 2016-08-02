@@ -11,7 +11,7 @@ byte StreamReader::ReadByte()
 		m_streamData.Read(data, 0, 1);
 		return data[0];
 	}
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	throw CEX::Exception::CryptoProcessingException("StreamReader:ReadByte", "The array does not contain enough data!");
 #else
 	return 0;
@@ -28,7 +28,7 @@ std::vector<byte> StreamReader::ReadBytes(size_t Length)
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadBytes", "The array does not contain enough data!");
 #else
 		return std::vector<byte>(0);
@@ -50,7 +50,7 @@ short StreamReader::ReadInt16()
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt16", "The array does not contain enough data!");
 #else
 		return 0;
@@ -72,7 +72,7 @@ ushort StreamReader::ReadUInt16()
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt16", "The array does not contain enough data!");
 #else
 		return 0;
@@ -94,7 +94,7 @@ int StreamReader::ReadInt32()
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt32", "The array does not contain enough data!");
 #else
 		return 0;
@@ -116,7 +116,7 @@ uint StreamReader::ReadUInt32()
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt32", "The array does not contain enough data!");
 #else
 		return 0;
@@ -138,7 +138,7 @@ long StreamReader::ReadInt64()
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt64", "The array does not contain enough data!");
 #else
 		return 0;
@@ -160,7 +160,7 @@ ulong StreamReader::ReadUInt64()
 	}
 	else
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
 #else
 		return 0;

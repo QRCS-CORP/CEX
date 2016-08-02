@@ -178,7 +178,7 @@ public:
 			}
 			catch (...)
 			{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
 #endif
 			}
@@ -194,7 +194,7 @@ public:
 			}
 			catch (...)
 			{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
 #endif
 			}
@@ -226,7 +226,7 @@ public:
 		m_isInitialized(false),
 		m_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Header == 0)
 			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
 #endif
@@ -241,7 +241,7 @@ public:
 			}
 			catch (...)
 			{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
 #endif
 			}
@@ -257,7 +257,7 @@ public:
 			}
 			catch (...)
 			{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
 #endif
 			}
@@ -292,7 +292,7 @@ public:
 		m_isStreamCipher(false),
 		m_parallelBlockProfile(BlockProfiles::SpeedProfile)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (m_cipherEngine->IsInitialized())
 			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher must be initialized through the local Initialize() method!");
 #endif
@@ -327,7 +327,7 @@ public:
 		m_parallelBlockProfile(BlockProfiles::SpeedProfile),
 		m_streamCipher(Cipher)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
 			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!");
 		if (Cipher->IsInitialized())

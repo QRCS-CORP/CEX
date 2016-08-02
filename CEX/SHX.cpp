@@ -65,7 +65,7 @@ void SHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	int dgtsze = GetIkmSize(m_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 	if (key.size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("SHX:Initialize", msg);
@@ -85,10 +85,11 @@ void SHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	{
 		if (key.size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
+
+		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}
 #endif
 
-	m_kdfEngine = GetDigest(m_kdfEngineType);
 	m_isEncryption = Encryption;
 	// expand the key
 	ExpandKey(key);
@@ -207,14 +208,14 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// 32 byte key
 		// step 2: rotate k into w(k) ints
 		for (size_t i = 8; i < 16; i++)
-			Wp[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
+			Wp[i] = CEX::Utility::IntUtils::RotL32((uint)(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
 
 		// copy to expanded key
 		memcpy(&Wk[0], &Wp[8], 8 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating primitive
 		for (size_t i = 8; i < keySize; i++)
-			Wk[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+			Wk[i] = CEX::Utility::IntUtils::RotL32((uint)(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 	}
 	else
 	{
@@ -222,14 +223,14 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// step 3: rotate k into w(k) ints, with extended polynominal
 		// Wp := (Wp-16 ^ Wp-13 ^ Wp-11 ^ Wp-10 ^ Wp-8 ^ Wp-5 ^ Wp-3 ^ Wp-1 ^ PHI ^ i) <<< 11
 		for (size_t i = 16; i < 32; i++)
-			Wp[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
+			Wp[i] = CEX::Utility::IntUtils::RotL32((uint)(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
 
 		// copy to expanded key
 		memcpy(&Wk[0], &Wp[16], 16 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating primitive
 		for (size_t i = 16; i < keySize; i++)
-			Wk[i] = CEX::Utility::IntUtils::RotateLeft((uint)(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+			Wk[i] = CEX::Utility::IntUtils::RotL32((uint)(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 	}
 
 	// step 4: create the working keys by processing with the Sbox and IP
@@ -859,7 +860,7 @@ CEX::Digest::IDigest* SHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoSymmetricCipherException("SHX:GetDigest", "The digest could not be instantiated!");
 #else
 		return 0;

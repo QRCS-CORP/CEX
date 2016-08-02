@@ -122,7 +122,7 @@ public:
 		m_isDestroyed(false),
 		m_seedType(SeedEngine)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (BufferSize < 64)
 			throw CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!");
 #endif
@@ -152,7 +152,7 @@ public:
 		m_isDestroyed(false),
 		m_stateSeed(Seed)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (BufferSize < 64)
 			throw CryptoRandomException("CTRPrng:Ctor", "Buffer size must be at least 64 bytes!");
 		if (Seed.size() == 0)

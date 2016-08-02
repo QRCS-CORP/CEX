@@ -23,7 +23,7 @@ size_t KDF2Drbg::Generate(std::vector<byte> &Output)
 
 size_t KDF2Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("KDF2Drbg:Generate", "Output buffer too small!");
 #endif
@@ -34,7 +34,7 @@ size_t KDF2Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 
 void KDF2Drbg::Initialize(const std::vector<byte> &Ikm)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Ikm.size() < m_hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 #endif
@@ -58,7 +58,7 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Ikm)
 
 void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() < m_hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_blockSize)
@@ -79,7 +79,7 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte>
 
 void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() + Nonce.size() < m_hashSize)
 		throw CryptoGeneratorException("KDF2Drbg:Initialize", "Salt size is too small; must be a minumum of digest return size!");
 	if (Ikm.size() < m_blockSize)
@@ -102,7 +102,7 @@ void KDF2Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte>
 
 void KDF2Drbg::Update(const std::vector<byte> &Salt)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("KDF2Drbg:Update", "Salt is too small!");
 #endif
@@ -110,7 +110,7 @@ void KDF2Drbg::Update(const std::vector<byte> &Salt)
 	Initialize(Salt);
 }
 
-// *** Protected *** //
+// *** Private *** //
 
 size_t KDF2Drbg::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
@@ -143,7 +143,7 @@ size_t KDF2Drbg::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t
 			memcpy(&Output[OutOffset], &hash[0], Size);
 		}
 
-		counter++;
+		++counter;
 	}
 
 	m_msgDigest->Reset();

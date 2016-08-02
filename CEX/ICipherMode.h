@@ -26,13 +26,13 @@
 
 #include "CipherModes.h"
 #include "IBlockCipher.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoCipherModeException.h"
 #endif
 
 NAMESPACE_MODE
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoCipherModeException;
 #endif
 

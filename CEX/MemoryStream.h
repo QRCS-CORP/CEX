@@ -104,7 +104,7 @@ public:
 		m_streamData(0),
 		m_streamPosition(0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Length > DataArray.size() - Offset)
 			throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
 #endif

@@ -33,7 +33,7 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 			return new CEX::Cipher::Symmetric::Block::THX();
 
 		default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			throw CEX::Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
 #else
 			return 0;
@@ -63,7 +63,7 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 		case CEX::Enumeration::BlockCiphers::THX:
 			return new CEX::Cipher::Symmetric::Block::THX(RoundCount, KdfEngineType);
 		default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			throw CEX::Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
 #else
 			return 0;

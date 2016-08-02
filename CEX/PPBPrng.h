@@ -110,7 +110,7 @@ public:
 		m_isDestroyed(false),
 		m_stateSeed(Seed)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Iterations == 0)
 			throw CryptoRandomException("DGCPrng:Ctor", "Iterations can not be zero; at least 1 iteration is required!");
 		if (GetMinimumSeedSize(DigestEngine) < Seed.size())

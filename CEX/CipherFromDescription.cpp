@@ -21,7 +21,7 @@ CEX::Cipher::Symmetric::Block::Mode::ICipherMode* CipherFromDescription::GetInst
 				(uint)Description.BlockSize(), (uint)Description.RoundCount(), Description.KdfEngine()));
 	}
 	default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoException("CipherFromDescription:GetInstance", "The symmetric cipher is not recognized!");
 #else
 		return 0;

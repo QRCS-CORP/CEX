@@ -23,7 +23,7 @@ void OFB::Destroy()
 
 void OFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (KeyParam.IV().size() < 1)
 		throw CryptoSymmetricCipherException("OFB:Initialize", "Requires a minimum 1 bytes of IV!");
 	if (KeyParam.Key().size() < 16)

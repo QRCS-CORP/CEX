@@ -4,7 +4,7 @@ NAMESPACE_PADDING
 
 size_t TBC::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Offset > Input.size())
 		throw CryptoPaddingException("TBC:AddPadding", "The padding offset value is longer than the array length!");
 #endif

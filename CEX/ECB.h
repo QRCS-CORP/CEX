@@ -166,7 +166,7 @@ public:
 		m_parallelBlockSize(0),
 		m_processorCount(0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!");
 #endif

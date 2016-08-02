@@ -115,7 +115,7 @@ public:
 		m_isDestroyed(false),
 		m_seedType(SeedEngine)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (BufferSize < 64)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 64 bytes!");
 #endif
@@ -139,7 +139,7 @@ public:
 		m_digestType(DigestEngine),
 		m_isDestroyed(false)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Seed.size() == 0)
 			throw CryptoRandomException("DGCPrng:Ctor", "Seed can not be null!");
 		if (GetMinimumSeedSize(DigestEngine) < Seed.size())

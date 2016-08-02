@@ -20,7 +20,7 @@ void CSPRsg::GetBytes(std::vector<byte> &Output)
 	if (!::CryptGenRandom(m_hProvider, dwLength, ptr))
 	{
 		::CryptReleaseContext(m_hProvider, 0);
-#	if defined(ENABLE_CPPEXCEPTIONS)
+#	if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoRandomException("CSPRsg:GetBytes", "Call to CryptGenRandom failed; random provider is not available!");
 #	endif
 	}
@@ -58,7 +58,7 @@ void CSPRsg::GetBytes(std::vector<byte> &Output)
 	}
 
 
-#	if defined(ENABLE_CPPEXCEPTIONS)
+#	if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoRandomException("CSPRsg:GetBytes", "Call to arc4random failed; random provider is not available!");
 #	endif
 
@@ -88,7 +88,7 @@ void CSPRsg::Reset()
 #ifdef _WIN32
 	if (!::CryptAcquireContextW(&m_hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
 	{
-#	if defined(ENABLE_CPPEXCEPTIONS)
+#	if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoRandomException("CSPRsg:Reset", "Call to CryptAcquireContextW failed; random provider is not available!");
 #	endif
 	}

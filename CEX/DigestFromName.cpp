@@ -44,7 +44,7 @@ CEX::Digest::IDigest* DigestFromName::GetInstance(CEX::Enumeration::Digests Dige
 	case CEX::Enumeration::Digests::Skein1024:
 		return new CEX::Digest::Skein1024();
 	default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoException("DigestFromName:GetInstance", "The digest is not recognized!");
 #else
 		return 0;
@@ -79,7 +79,7 @@ int DigestFromName::GetBlockSize(CEX::Enumeration::Digests DigestType)
 	case CEX::Enumeration::Digests::None:
 		return 0;
 	default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoException("DigestFromName:GetBlockSize", "The digest type is not supported!");
 #else
 		return 0;
@@ -110,7 +110,7 @@ int DigestFromName::GetDigestSize(CEX::Enumeration::Digests DigestType)
 	case CEX::Enumeration::Digests::None:
 		return 0;
 	default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoException("DigestFromName:GetDigestSize", "The digest type is not supported!");
 #else
 		return 0;

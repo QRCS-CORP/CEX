@@ -3,13 +3,13 @@
 
 #include "Common.h"
 #include "Macs.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoMacException.h"
 #endif
 
 NAMESPACE_MAC
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoMacException;
 #endif
 

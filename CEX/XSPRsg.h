@@ -102,7 +102,7 @@ public:
 		m_stateSeed(Seed.size()),
 		m_wrkBuffer(Seed.size())
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Seed.size() != 2 && Seed.size() != 16)
 			throw CryptoRandomException("XSPRsg:CTor", "The seed array length must be either 2 or 16 long values!");
 

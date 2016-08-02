@@ -19,7 +19,7 @@ CEX::Cipher::Symmetric::Block::Padding::IPadding* PaddingFromName::GetInstance(C
 		case CEX::Enumeration::PaddingModes::X923:
 			return new CEX::Cipher::Symmetric::Block::Padding::X923();
 		default:
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			throw CEX::Exception::CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
 #else
 			return 0;

@@ -111,7 +111,7 @@ public:
 		m_isDestroyed(false),
 		m_seedType(SeedEngine)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (BufferSize < 64)
 			throw CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!");
 		if (KeySize != 24 && KeySize != 40)
@@ -141,7 +141,7 @@ public:
 		m_keySize(Seed.size()),
 		m_isDestroyed(false)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (BufferSize < 64)
 			throw CryptoRandomException("SP20Prng:CTor", "Buffer size must be at least 64 bytes!");
 		if (Seed.size() != 32 && Seed.size() != 48)

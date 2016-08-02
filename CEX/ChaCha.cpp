@@ -41,7 +41,7 @@ void ChaCha::DetectCpu()
 
 void ChaCha::Initialize(const CEX::Common::KeyParams &KeyParam)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (KeyParam.IV().size() != 8)
 		throw CryptoSymmetricCipherException("ChaCha:Initialize", "Requires exactly 8 bytes of IV!");
 	if (KeyParam.Key().size() != 16 && KeyParam.Key().size() != 32)
@@ -319,76 +319,76 @@ void ChaCha::Transform64(std::vector<byte> &Output, size_t OutOffset, std::vecto
 	while (ctr != 0)
 	{
 		X0 += X4;
-		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X0, 16);
+		X12 = CEX::Utility::IntUtils::RotFL32(X12 ^ X0, 16);
 		X8 += X12;
-		X4 = CEX::Utility::IntUtils::RotateFixLeft(X4 ^ X8, 12);
+		X4 = CEX::Utility::IntUtils::RotFL32(X4 ^ X8, 12);
 		X0 += X4; 
-		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X0, 8);
+		X12 = CEX::Utility::IntUtils::RotFL32(X12 ^ X0, 8);
 		X8 += X12; 
-		X4 = CEX::Utility::IntUtils::RotateFixLeft(X4 ^ X8, 7);
+		X4 = CEX::Utility::IntUtils::RotFL32(X4 ^ X8, 7);
 
 		X1 += X5; 
-		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X1, 16);
+		X13 = CEX::Utility::IntUtils::RotFL32(X13 ^ X1, 16);
 		X9 += X13; 
-		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X9, 12);
+		X5 = CEX::Utility::IntUtils::RotFL32(X5 ^ X9, 12);
 		X1 += X5; 
-		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X1, 8);
+		X13 = CEX::Utility::IntUtils::RotFL32(X13 ^ X1, 8);
 		X9 += X13; 
-		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X9, 7);//x1:338,x13:154,x9:323,x5:399
+		X5 = CEX::Utility::IntUtils::RotFL32(X5 ^ X9, 7);
 
 		X2 += X6; 
-		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X2, 16);
+		X14 = CEX::Utility::IntUtils::RotFL32(X14 ^ X2, 16);
 		X10 += X14; 
-		X6 = CEX::Utility::IntUtils::RotateFixLeft(X6 ^ X10, 12);
+		X6 = CEX::Utility::IntUtils::RotFL32(X6 ^ X10, 12);
 		X2 += X6; 
-		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X2, 8);
+		X14 = CEX::Utility::IntUtils::RotFL32(X14 ^ X2, 8);
 		X10 += X14; 
-		X6 = CEX::Utility::IntUtils::RotateFixLeft(X6 ^ X10, 7);
+		X6 = CEX::Utility::IntUtils::RotFL32(X6 ^ X10, 7);
 
 		X3 += X7; 
-		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X3, 16);
+		X15 = CEX::Utility::IntUtils::RotFL32(X15 ^ X3, 16);
 		X11 += X15; 
-		X7 = CEX::Utility::IntUtils::RotateFixLeft(X7 ^ X11, 12);
+		X7 = CEX::Utility::IntUtils::RotFL32(X7 ^ X11, 12);
 		X3 += X7; 
-		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X3, 8);
+		X15 = CEX::Utility::IntUtils::RotFL32(X15 ^ X3, 8);
 		X11 += X15; 
-		X7 = CEX::Utility::IntUtils::RotateFixLeft(X7 ^ X11, 7);
+		X7 = CEX::Utility::IntUtils::RotFL32(X7 ^ X11, 7);
 
 		X0 += X5; 
-		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X0, 16);
+		X15 = CEX::Utility::IntUtils::RotFL32(X15 ^ X0, 16);
 		X10 += X15; 
-		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X10, 12);
+		X5 = CEX::Utility::IntUtils::RotFL32(X5 ^ X10, 12);
 		X0 += X5; 
-		X15 = CEX::Utility::IntUtils::RotateFixLeft(X15 ^ X0, 8);
+		X15 = CEX::Utility::IntUtils::RotFL32(X15 ^ X0, 8);
 		X10 += X15; 
-		X5 = CEX::Utility::IntUtils::RotateFixLeft(X5 ^ X10, 7);
+		X5 = CEX::Utility::IntUtils::RotFL32(X5 ^ X10, 7);
 
 		X1 += X6; 
-		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X1, 16);
+		X12 = CEX::Utility::IntUtils::RotFL32(X12 ^ X1, 16);
 		X11 += X12; 
-		X6 = CEX::Utility::IntUtils::RotateFixLeft(X6 ^ X11, 12);
+		X6 = CEX::Utility::IntUtils::RotFL32(X6 ^ X11, 12);
 		X1 += X6; 
-		X12 = CEX::Utility::IntUtils::RotateFixLeft(X12 ^ X1, 8);
+		X12 = CEX::Utility::IntUtils::RotFL32(X12 ^ X1, 8);
 		X11 += X12; 
-		X6 = CEX::Utility::IntUtils::RotateFixLeft(X6 ^ X11, 7);
+		X6 = CEX::Utility::IntUtils::RotFL32(X6 ^ X11, 7);
 
 		X2 += X7; 
-		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X2, 16);
+		X13 = CEX::Utility::IntUtils::RotFL32(X13 ^ X2, 16);
 		X8 += X13; 
-		X7 = CEX::Utility::IntUtils::RotateFixLeft(X7 ^ X8, 12);
+		X7 = CEX::Utility::IntUtils::RotFL32(X7 ^ X8, 12);
 		X2 += X7; 
-		X13 = CEX::Utility::IntUtils::RotateFixLeft(X13 ^ X2, 8);
+		X13 = CEX::Utility::IntUtils::RotFL32(X13 ^ X2, 8);
 		X8 += X13; 
-		X7 = CEX::Utility::IntUtils::RotateFixLeft(X7 ^ X8, 7);
+		X7 = CEX::Utility::IntUtils::RotFL32(X7 ^ X8, 7);
 
 		X3 += X4; 
-		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X3, 16);
+		X14 = CEX::Utility::IntUtils::RotFL32(X14 ^ X3, 16);
 		X9 += X14; 
-		X4 = CEX::Utility::IntUtils::RotateFixLeft(X4 ^ X9, 12);
+		X4 = CEX::Utility::IntUtils::RotFL32(X4 ^ X9, 12);
 		X3 += X4; 
-		X14 = CEX::Utility::IntUtils::RotateFixLeft(X14 ^ X3, 8);
+		X14 = CEX::Utility::IntUtils::RotFL32(X14 ^ X3, 8);
 		X9 += X14; 
-		X4 = CEX::Utility::IntUtils::RotateFixLeft(X4 ^ X9, 7);
+		X4 = CEX::Utility::IntUtils::RotFL32(X4 ^ X9, 7);
 		ctr -= 2;
 	}
 

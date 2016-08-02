@@ -3,13 +3,13 @@
 
 #include "Common.h"
 #include "SeedGenerators.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoRandomException.h"
 #endif
 
 NAMESPACE_SEED
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoRandomException;
 #endif
 

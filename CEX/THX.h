@@ -232,7 +232,7 @@ public:
 		m_legalRounds(9, 0),
 		m_sBox(SBOX_SIZE, 0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("THX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
@@ -296,7 +296,7 @@ public:
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
 				throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
 #endif

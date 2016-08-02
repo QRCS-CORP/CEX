@@ -144,7 +144,7 @@ public:
 	/// </summary>
 	void SetTreeLevel(const byte Value)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Value > 63)
 			throw CEX::Exception::CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
 #endif

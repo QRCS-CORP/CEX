@@ -3,13 +3,13 @@
 
 #include "Common.h"
 #include "PaddingModes.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoPaddingException.h"
 #endif
 
 NAMESPACE_PADDING
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoPaddingException;
 #endif
 

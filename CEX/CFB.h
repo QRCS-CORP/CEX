@@ -174,7 +174,7 @@ public:
 		m_processorCount(1),
 		m_parallelBlockSize(PARALLEL_DEFBLOCK)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CFB:CTor", "The Cipher can not be null!");
 		if (BlockSizeBits % 8 != 0)

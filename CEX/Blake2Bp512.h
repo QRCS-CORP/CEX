@@ -277,14 +277,14 @@ public:
 		m_isParallel(false),
 		m_leafSize(BLOCK_SIZE),
 		m_minParallel(0),
-		m_msgBuffer(Params.ThreadDepth() > 0 ? 2 * Params.ThreadDepth() * BLOCK_SIZE : BLOCK_SIZE),
+		m_msgBuffer(Params.ParallelDegree() > 0 ? 2 * Params.ParallelDegree() * BLOCK_SIZE : BLOCK_SIZE),
 		m_msgLength(0),
-		m_State(Params.ThreadDepth() > 0 ? Params.ThreadDepth() : 1),
+		m_State(Params.ParallelDegree() > 0 ? Params.ParallelDegree() : 1),
 		m_treeConfig(CHAIN_SIZE),
 		m_treeDestroy(false),
 		m_treeParams(Params)
 	{
-		m_isParallel = m_treeParams.ThreadDepth() > 1;
+		m_isParallel = m_treeParams.ParallelDegree() > 1;
 		m_cIV =
 		{
 			0x6A09E667F3BCC908UL, 0xBB67AE8584CAA73BUL, 0x3C6EF372FE94F82BUL, 0xA54FF53A5F1D36F1UL,
@@ -298,19 +298,19 @@ public:
 		{
 #if defined(_DEBUG)
 			assert(Params.LeafLength() > BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE == 0);
-			assert(Params.ThreadDepth() > 2 || Params.ThreadDepth() % 2 == 0);
+			assert(Params.ParallelDegree() > 2 || Params.ParallelDegree() % 2 == 0);
 #endif
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
 				throw CEX::Exception::CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
-			if (Params.ThreadDepth() < 2 || Params.ThreadDepth() % 2 != 0)
-				throw CEX::Exception::CryptoDigestException("BlakeBP512:Ctor", "The ThreadDepth parameter is invalid! Must be an even number greater than 1.");
+			if (Params.ParallelDegree() < 2 || Params.ParallelDegree() % 2 != 0)
+				throw CEX::Exception::CryptoDigestException("BlakeBP512:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
 #endif
 
-			m_minParallel = m_treeParams.ThreadDepth() * BLOCK_SIZE;
+			m_minParallel = m_treeParams.ParallelDegree() * BLOCK_SIZE;
 			m_leafSize = Params.LeafLength() == 0 ? DEF_LEAFSIZE : Params.LeafLength();
 			// set parallel block size as Pn * leaf size 
-			m_parallelBlockSize = Params.ThreadDepth() * m_leafSize;
+			m_parallelBlockSize = Params.ParallelDegree() * m_leafSize;
 			// initialize leafs
 			Reset();
 		}

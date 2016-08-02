@@ -86,7 +86,7 @@ public:
 		m_extKey(0),
 		m_msgMac(0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (HeaderStream.Length() < SIZE_BASEHEADER)
 			throw CEX::Exception::CryptoProcessingException("MessageHeader:CTor", "MessageHeader stream is too small!");
 #endif
@@ -195,7 +195,7 @@ public:
 	/// <returns>Encrypted file extension</returns>
 	static std::vector<byte> EncryptExtension(const std::string &Extension, const std::vector<byte> &Key)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Extension.size() > EXTKEY_SIZE)
 			throw CEX::Exception::CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the extension string is too long!");
 		if (Key.size() != EXTKEY_SIZE)

@@ -62,17 +62,17 @@ private:
 	static inline void Mix(ulong &A, ulong &B, uint R)
 	{
 		A += B;
-		B = RotateLeft64(B, R) ^ A;
+		B = RotL64(B, R) ^ A;
 	}
 
 	static inline void Mix(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
 	{
 		B += K1;
 		A += B + K0;
-		B = RotateLeft64(B, R) ^ A;
+		B = RotL64(B, R) ^ A;
 	}
 
-	static inline ulong RotateLeft64(ulong V, uint B)
+	static inline ulong RotL64(ulong V, uint B)
 	{
 		return (V << B) | (V >> (64 - B));
 	}

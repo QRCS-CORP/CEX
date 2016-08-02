@@ -6,7 +6,7 @@ NAMESPACE_DIGEST
 
 void SHA256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("SHA256:BlockUpdate", "The Input buffer is too short!");
 #endif
@@ -62,7 +62,7 @@ void SHA256::Destroy()
 
 size_t SHA256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() - OutOffset < DigestSize())
 		throw CryptoDigestException("SHA256:DoFinal", "The Output buffer is too short!");
 #endif

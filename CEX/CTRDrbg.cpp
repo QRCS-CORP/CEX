@@ -32,7 +32,7 @@ size_t CTRDrbg::Generate(std::vector<byte> &Output)
 
 size_t CTRDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("CTRDrbg:Generate", "Output buffer too small!");
 #endif
@@ -43,7 +43,7 @@ size_t CTRDrbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Siz
 
 void CTRDrbg::Initialize(const std::vector<byte> &Ikm)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Ikm.size() != m_keySize + m_blockSize)
 		throw CryptoGeneratorException("CTRDrbg:Initialize", "Salt size is too small; must be key size plus the blocksize!");
 #endif
@@ -83,7 +83,7 @@ void CTRDrbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> 
 
 void CTRDrbg::Update(const std::vector<byte> &Salt)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("CTRDrbg:Update", "Salt is too small!");
 #endif
@@ -94,7 +94,7 @@ void CTRDrbg::Update(const std::vector<byte> &Salt)
 		memcpy(&m_ctrVector[0], &Salt[0], m_ctrVector.size());
 }
 
-// *** Protected *** //
+// *** Private *** //
 
 void CTRDrbg::Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {

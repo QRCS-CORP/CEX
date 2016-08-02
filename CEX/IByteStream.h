@@ -3,13 +3,13 @@
 
 #include "Common.h"
 #include "SeekOrigin.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoProcessingException.h"
 #endif
 
 NAMESPACE_IO
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoProcessingException;
 #endif
 

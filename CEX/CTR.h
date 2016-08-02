@@ -173,7 +173,7 @@ public:
 		m_parallelBlockSize(PARALLEL_DEFBLOCK),
 		m_processorCount(1)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CTR:CTor", "The Cipher can not be null!");
 #endif

@@ -3,13 +3,13 @@
 
 #include "Common.h"
 #include "Generators.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoGeneratorException.h"
 #endif
 
 NAMESPACE_GENERATOR
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoGeneratorException;
 #endif
 

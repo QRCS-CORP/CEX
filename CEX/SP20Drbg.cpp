@@ -32,7 +32,7 @@ size_t SP20Drbg::Generate(std::vector<byte> &Output)
 
 size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((Output.size() - Size) < OutOffset)
 		throw CryptoGeneratorException("SP20Drbg:Generate", "Output buffer too small!");
 #endif
@@ -43,7 +43,7 @@ size_t SP20Drbg::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Si
 
 void SP20Drbg::Initialize(const std::vector<byte> &Ikm)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Ikm.size() != m_legalKeySizes[0] + VECTOR_SIZE && Ikm.size() != m_legalKeySizes[1] + VECTOR_SIZE)
 		throw CryptoGeneratorException("SP20Drbg:Initialize", "Key material size is too small; must be exactly 24 (128 bit key) or 40 bytes (256 bit key)!");
 #endif
@@ -86,7 +86,7 @@ void SP20Drbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte>
 
 void SP20Drbg::Update(const std::vector<byte> &Salt)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Salt.size() == 0)
 		throw CryptoGeneratorException("SP20Drbg:Update", "Salt is too small!");
 #endif
@@ -95,13 +95,13 @@ void SP20Drbg::Update(const std::vector<byte> &Salt)
 		Initialize(Salt);
 	else if (Salt.size() == VECTOR_SIZE)
 		memcpy(&m_ctrVector[0], &Salt[0], m_ctrVector.size());
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	else
 		throw CryptoGeneratorException("SP20Drbg:Update", "Salt must be either 40 bytes; (key and vector), or 8 bytes; (vector only) in length!");
 #endif
 }
 
-// *** Protected *** //
+// *** Private *** //
 
 void SP20Drbg::Generate(const size_t Length, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
@@ -162,38 +162,38 @@ void SP20Drbg::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std:
 	ctr = m_rndCount;
 	while (ctr != 0)
 	{
-		X4 ^= CEX::Utility::IntUtils::RotateLeft(X0 + X12, 7);
-		X8 ^= CEX::Utility::IntUtils::RotateLeft(X4 + X0, 9);
-		X12 ^= CEX::Utility::IntUtils::RotateLeft(X8 + X4, 13);
-		X0 ^= CEX::Utility::IntUtils::RotateLeft(X12 + X8, 18);
-		X9 ^= CEX::Utility::IntUtils::RotateLeft(X5 + X1, 7);
-		X13 ^= CEX::Utility::IntUtils::RotateLeft(X9 + X5, 9);
-		X1 ^= CEX::Utility::IntUtils::RotateLeft(X13 + X9, 13);
-		X5 ^= CEX::Utility::IntUtils::RotateLeft(X1 + X13, 18);
-		X14 ^= CEX::Utility::IntUtils::RotateLeft(X10 + X6, 7);
-		X2 ^= CEX::Utility::IntUtils::RotateLeft(X14 + X10, 9);
-		X6 ^= CEX::Utility::IntUtils::RotateLeft(X2 + X14, 13);
-		X10 ^= CEX::Utility::IntUtils::RotateLeft(X6 + X2, 18);
-		X3 ^= CEX::Utility::IntUtils::RotateLeft(X15 + X11, 7);
-		X7 ^= CEX::Utility::IntUtils::RotateLeft(X3 + X15, 9);
-		X11 ^= CEX::Utility::IntUtils::RotateLeft(X7 + X3, 13);
-		X15 ^= CEX::Utility::IntUtils::RotateLeft(X11 + X7, 18);
-		X1 ^= CEX::Utility::IntUtils::RotateLeft(X0 + X3, 7);
-		X2 ^= CEX::Utility::IntUtils::RotateLeft(X1 + X0, 9);
-		X3 ^= CEX::Utility::IntUtils::RotateLeft(X2 + X1, 13);
-		X0 ^= CEX::Utility::IntUtils::RotateLeft(X3 + X2, 18);
-		X6 ^= CEX::Utility::IntUtils::RotateLeft(X5 + X4, 7);
-		X7 ^= CEX::Utility::IntUtils::RotateLeft(X6 + X5, 9);
-		X4 ^= CEX::Utility::IntUtils::RotateLeft(X7 + X6, 13);
-		X5 ^= CEX::Utility::IntUtils::RotateLeft(X4 + X7, 18);
-		X11 ^= CEX::Utility::IntUtils::RotateLeft(X10 + X9, 7);
-		X8 ^= CEX::Utility::IntUtils::RotateLeft(X11 + X10, 9);
-		X9 ^= CEX::Utility::IntUtils::RotateLeft(X8 + X11, 13);
-		X10 ^= CEX::Utility::IntUtils::RotateLeft(X9 + X8, 18);
-		X12 ^= CEX::Utility::IntUtils::RotateLeft(X15 + X14, 7);
-		X13 ^= CEX::Utility::IntUtils::RotateLeft(X12 + X15, 9);
-		X14 ^= CEX::Utility::IntUtils::RotateLeft(X13 + X12, 13);
-		X15 ^= CEX::Utility::IntUtils::RotateLeft(X14 + X13, 18);
+		X4 ^= CEX::Utility::IntUtils::RotL32(X0 + X12, 7);
+		X8 ^= CEX::Utility::IntUtils::RotL32(X4 + X0, 9);
+		X12 ^= CEX::Utility::IntUtils::RotL32(X8 + X4, 13);
+		X0 ^= CEX::Utility::IntUtils::RotL32(X12 + X8, 18);
+		X9 ^= CEX::Utility::IntUtils::RotL32(X5 + X1, 7);
+		X13 ^= CEX::Utility::IntUtils::RotL32(X9 + X5, 9);
+		X1 ^= CEX::Utility::IntUtils::RotL32(X13 + X9, 13);
+		X5 ^= CEX::Utility::IntUtils::RotL32(X1 + X13, 18);
+		X14 ^= CEX::Utility::IntUtils::RotL32(X10 + X6, 7);
+		X2 ^= CEX::Utility::IntUtils::RotL32(X14 + X10, 9);
+		X6 ^= CEX::Utility::IntUtils::RotL32(X2 + X14, 13);
+		X10 ^= CEX::Utility::IntUtils::RotL32(X6 + X2, 18);
+		X3 ^= CEX::Utility::IntUtils::RotL32(X15 + X11, 7);
+		X7 ^= CEX::Utility::IntUtils::RotL32(X3 + X15, 9);
+		X11 ^= CEX::Utility::IntUtils::RotL32(X7 + X3, 13);
+		X15 ^= CEX::Utility::IntUtils::RotL32(X11 + X7, 18);
+		X1 ^= CEX::Utility::IntUtils::RotL32(X0 + X3, 7);
+		X2 ^= CEX::Utility::IntUtils::RotL32(X1 + X0, 9);
+		X3 ^= CEX::Utility::IntUtils::RotL32(X2 + X1, 13);
+		X0 ^= CEX::Utility::IntUtils::RotL32(X3 + X2, 18);
+		X6 ^= CEX::Utility::IntUtils::RotL32(X5 + X4, 7);
+		X7 ^= CEX::Utility::IntUtils::RotL32(X6 + X5, 9);
+		X4 ^= CEX::Utility::IntUtils::RotL32(X7 + X6, 13);
+		X5 ^= CEX::Utility::IntUtils::RotL32(X4 + X7, 18);
+		X11 ^= CEX::Utility::IntUtils::RotL32(X10 + X9, 7);
+		X8 ^= CEX::Utility::IntUtils::RotL32(X11 + X10, 9);
+		X9 ^= CEX::Utility::IntUtils::RotL32(X8 + X11, 13);
+		X10 ^= CEX::Utility::IntUtils::RotL32(X9 + X8, 18);
+		X12 ^= CEX::Utility::IntUtils::RotL32(X15 + X14, 7);
+		X13 ^= CEX::Utility::IntUtils::RotL32(X12 + X15, 9);
+		X14 ^= CEX::Utility::IntUtils::RotL32(X13 + X12, 13);
+		X15 ^= CEX::Utility::IntUtils::RotL32(X14 + X13, 18);
 		ctr -= 2;
 	}
 

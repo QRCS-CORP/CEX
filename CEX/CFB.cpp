@@ -24,7 +24,7 @@ void CFB::Destroy()
 
 void CFB::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (KeyParam.IV().size() < 1)
 		throw CryptoSymmetricCipherException("CFB:Initialize", "Requires a minimum 1 byte of IV!");
 	if (KeyParam.Key().size() < 16)

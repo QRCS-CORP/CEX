@@ -29,16 +29,16 @@
 template<typename T>
 void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R0 = CEX::Utility::IntUtils::RotateLeft(R0, 13);
-	R2 = CEX::Utility::IntUtils::RotateLeft(R2, 3);
+	R0 = CEX::Utility::IntUtils::RotL32(R0, 13);
+	R2 = CEX::Utility::IntUtils::RotL32(R2, 3);
 	R1 ^= R0 ^ R2;
 	R3 ^= R2 ^ (R0 << 3);
-	R1 = CEX::Utility::IntUtils::RotateLeft(R1, 1);
-	R3 = CEX::Utility::IntUtils::RotateLeft(R3, 7);
+	R1 = CEX::Utility::IntUtils::RotL32(R1, 1);
+	R3 = CEX::Utility::IntUtils::RotL32(R3, 7);
 	R0 ^= R1 ^ R3;
 	R2 ^= R3 ^ (R1 << 7);
-	R0 = CEX::Utility::IntUtils::RotateLeft(R0, 5);
-	R2 = CEX::Utility::IntUtils::RotateLeft(R2, 22);
+	R0 = CEX::Utility::IntUtils::RotL32(R0, 5);
+	R2 = CEX::Utility::IntUtils::RotL32(R2, 22);
 }
 
 template<typename T>
@@ -59,16 +59,16 @@ void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
 template<typename T>
 void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R2 = CEX::Utility::IntUtils::RotateRight(R2, 22);
-	R0 = CEX::Utility::IntUtils::RotateRight(R0, 5);
+	R2 = CEX::Utility::IntUtils::RotR32(R2, 22);
+	R0 = CEX::Utility::IntUtils::RotR32(R0, 5);
 	R2 ^= R3 ^ (R1 << 7);
 	R0 ^= R1 ^ R3;
-	R3 = CEX::Utility::IntUtils::RotateRight(R3, 7);
-	R1 = CEX::Utility::IntUtils::RotateRight(R1, 1);
+	R3 = CEX::Utility::IntUtils::RotR32(R3, 7);
+	R1 = CEX::Utility::IntUtils::RotR32(R1, 1);
 	R3 ^= R2 ^ (R0 << 3);
 	R1 ^= R0 ^ R2;
-	R2 = CEX::Utility::IntUtils::RotateRight(R2, 3);
-	R0 = CEX::Utility::IntUtils::RotateRight(R0, 13);
+	R2 = CEX::Utility::IntUtils::RotR32(R2, 3);
+	R0 = CEX::Utility::IntUtils::RotR32(R0, 13);
 }
 
 template<typename T>

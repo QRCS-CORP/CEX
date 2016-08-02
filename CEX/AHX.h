@@ -223,7 +223,7 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(15, 0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
@@ -285,7 +285,7 @@ public:
 
 		if (KdfEngineType != CEX::Enumeration::Digests::None)
 		{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
 				throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
 #endif

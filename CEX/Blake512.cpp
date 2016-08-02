@@ -33,7 +33,7 @@ static constexpr ulong m_ftSigma[] =
 
 void Blake512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Blake512:BlockUpdate", "The Input buffer is too short!");
 #endif
@@ -96,7 +96,7 @@ void Blake512::Destroy()
 
 size_t Blake512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Blake512:DoFinal", "The Output buffer is too short!");
 #endif
@@ -270,13 +270,13 @@ void Blake512::Mix(size_t A, size_t B, size_t C, size_t D, size_t R, size_t I)
 
 	// initialization
 	m_V[A] += m_V[B] + (m_M[P0] ^ m_C64[P1]);
-	m_V[D] = CEX::Utility::IntUtils::RotateFixRight64(m_V[D] ^ m_V[A], 32);
+	m_V[D] = CEX::Utility::IntUtils::RotFR64(m_V[D] ^ m_V[A], 32);
 	m_V[C] += m_V[D];
-	m_V[B] = CEX::Utility::IntUtils::RotateFixRight64(m_V[B] ^ m_V[C], 25);
+	m_V[B] = CEX::Utility::IntUtils::RotFR64(m_V[B] ^ m_V[C], 25);
 	m_V[A] += m_V[B] + (m_M[P1] ^ m_C64[P0]);
-	m_V[D] = CEX::Utility::IntUtils::RotateFixRight64(m_V[D] ^ m_V[A], 16);
+	m_V[D] = CEX::Utility::IntUtils::RotFR64(m_V[D] ^ m_V[A], 16);
 	m_V[C] += m_V[D];
-	m_V[B] = CEX::Utility::IntUtils::RotateFixRight64(m_V[B] ^ m_V[C], 11);
+	m_V[B] = CEX::Utility::IntUtils::RotFR64(m_V[B] ^ m_V[C], 11);
 }
 
 void Blake512::Initialize()

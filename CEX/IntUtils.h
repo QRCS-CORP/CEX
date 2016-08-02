@@ -53,7 +53,7 @@ public:
 	{
 		Value = ((Value & 0xAA) >> 1) | ((Value & 0x55) << 1);
 		Value = ((Value & 0xCC) >> 2) | ((Value & 0x33) << 2);
-		return static_cast<byte>(RotateFixLeft(Value, 4));
+		return static_cast<byte>(RotFL32(Value, 4));
 	}
 
 	/// <summary>
@@ -127,7 +127,7 @@ public:
 	/// <returns>The reversed ushort</returns>
 	static inline ushort ByteReverse(ushort Value)
 	{
-		return static_cast<ushort>(RotateFixLeft(Value, 8U));
+		return static_cast<ushort>(RotFL32(Value, 8U));
 	}
 
 	/// <summary>
@@ -144,11 +144,11 @@ public:
 		return (uint)__lwbrx(&Value, 0);
 #elif defined(FAST_ROTATE)
 		// 5 instructions with rotate instruction, 9 without
-		return (RotateFixRight(Value, 8U) & 0xff00ff00) | (RotateFixLeft(Value, 8U) & 0x00ff00ff);
+		return (RotFR32(Value, 8U) & 0xff00ff00) | (RotFL32(Value, 8U) & 0x00ff00ff);
 #else
 		// 6 instructions with rotate instruction, 8 without
 		Value = ((Value & 0xFF00FF00) >> 8) | ((Value & 0x00FF00FF) << 8);
-		return RotateFixLeft(Value, 16U);
+		return RotFL32(Value, 16U);
 #endif
 	}
 
@@ -166,11 +166,11 @@ public:
 		return static_cast<uint>(__lwbrx(&Value, 0));
 #elif defined(FAST_ROTATE)
 		// 5 instructions with rotate instruction, 9 without
-		return (RotateFixRight(Value, 8U) & 0xff00ff00) | (RotateFixLeft(Value, 8U) & 0x00ff00ff);
+		return (RotFR32(Value, 8U) & 0xff00ff00) | (RotFL32(Value, 8U) & 0x00ff00ff);
 #else
 		// 6 instructions with rotate instruction, 8 without
 		Value = ((Value & 0xFF00FF00) >> 8) | ((Value & 0x00FF00FF) << 8);
-		return RotateFixLeft(Value, 16U);
+		return RotFL32(Value, 16U);
 #endif
 	}
 
@@ -1040,7 +1040,7 @@ public:
 
 	// ** Rotate ** //
 
-#if defined(HAS_MINSSE) && defined(FORCE_ROTATION_INTRENSICS)
+#if defined(HAS_MINSSE) && defined(FASTROTATE_ENABLED)
 #pragma intrinsic(_rotl, _lrotl, _rotl64, _rotr, _lrotr, _rotr64)
 
 	/// <summary>
@@ -1051,7 +1051,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateLeft(uint Value, uint Shift)
+	static inline uint RotL32(uint Value, uint Shift)
 	{
 		return Shift ? _rotl(Value, Shift) : Value;
 	}
@@ -1064,7 +1064,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft64(ulong Value, uint Shift)
+	static inline ulong RotL64(ulong Value, uint Shift)
 	{
 		return Shift ? _rotl64(Value, Shift) : Value;
 	}
@@ -1077,7 +1077,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateRight(uint Value, uint Shift)
+	static inline uint RotR32(uint Value, uint Shift)
 	{
 		return Shift ? _rotr(Value, Shift) : Value;
 	}
@@ -1090,7 +1090,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight64(ulong Value, uint Shift)
+	static inline ulong RotR64(ulong Value, uint Shift)
 	{
 		return Shift ? _rotr64(Value, Shift) : Value;
 	}
@@ -1103,7 +1103,7 @@ public:
 	/// <param name="Y">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateFixLeft(uint Value, uint Shift)
+	static inline uint RotFL32(uint Value, uint Shift)
 	{
 		return _lrotl(Value, Shift);
 	}
@@ -1116,7 +1116,7 @@ public:
 	/// <param name="Shift">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateFixLeft64(ulong Value, uint Shift)
+	static inline ulong RotFL64(ulong Value, uint Shift)
 	{
 		return _rotl64(Value, Shift);
 	}
@@ -1129,7 +1129,7 @@ public:
 	/// <param name="Shift">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateFixRight(uint Value, uint Shift)
+	static inline uint RotFR32(uint Value, uint Shift)
 	{
 		return _lrotr(Value, Shift);
 	}
@@ -1142,12 +1142,12 @@ public:
 	/// <param name="Shift">The number of bits to shift, shift can not be zero</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotateFixRight64(ulong Value, uint Shift)
+	static inline ulong RotFR64(ulong Value, uint Shift)
 	{
 		return _rotr64(Value, Shift);
 	}
 
-#elif defined(PPC_INTRINSICS) && defined(FORCE_ROTATION_INTRENSICS)
+#elif defined(PPC_INTRINSICS) && defined(FASTROTATE_ENABLED)
 	/// <summary>
 	/// Rotate shift an unsigned 32 bit integer to the left
 	/// </summary>
@@ -1156,7 +1156,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateLeft(uint Value, uint Shift)
+	static inline uint RotL32(uint Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, Shift, 0, 31) : Value;
 	}
@@ -1169,7 +1169,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft64(ulong Value, uint Shift)
+	static inline ulong RotL64(ulong Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, Shift, 0, 63) : Value;
 	}
@@ -1182,7 +1182,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateRight(uint Value, uint Shift)
+	static inline uint RotR32(uint Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, 32 - Shift, 0, 31) : Value;
 	}
@@ -1195,7 +1195,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight64(ulong Value, uint Shift)
+	static inline ulong RotR64(ulong Value, uint Shift)
 	{
 		return Shift ? __rlwinm(Value, 64 - Shift, 0, 63) : Value;
 	}
@@ -1208,7 +1208,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateFixLeft(uint Value, uint Shift)
+	static inline uint RotFL32(uint Value, uint Shift)
 	{
 		return __rlwinm(Value, Shift, 0, 31);
 	}
@@ -1221,7 +1221,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateFixLeft64(ulong Value, uint Shift)
+	static inline ulong RotFL64(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | ((long)((ulong)Value >> -Shift));
 	}
@@ -1234,7 +1234,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateFixRight(uint Value, uint Shift)
+	static inline uint RotFR32(uint Value, uint Shift)
 	{
 		return __rlwinm(Value, 32 - Shift, 0, 31);
 	}
@@ -1247,7 +1247,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotateFixRight64(ulong Value, uint Shift)
+	static inline ulong RotFR64(ulong Value, uint Shift)
 	{
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
@@ -1261,7 +1261,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateLeft(uint Value, uint Shift)
+	static inline uint RotL32(uint Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
 	}
@@ -1274,7 +1274,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateLeft64(ulong Value, uint Shift)
+	static inline ulong RotL64(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (sizeof(ulong) * 8 - Shift));
 	}
@@ -1287,7 +1287,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateRight(uint Value, uint Shift)
+	static inline uint RotR32(uint Value, uint Shift)
 	{
 		return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
 	}
@@ -1300,7 +1300,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline ulong RotateRight64(ulong Value, uint Shift)
+	static inline ulong RotR64(ulong Value, uint Shift)
 	{
 		return (Value >> Shift) | (Value << (sizeof(ulong) * 8 - Shift));
 	}
@@ -1313,7 +1313,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline uint RotateFixLeft(uint Value, uint Shift)
+	static inline uint RotFL32(uint Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (32 - Shift));
 	}
@@ -1326,7 +1326,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The left shifted integer</returns>
-	static inline ulong RotateFixLeft64(ulong Value, uint Shift)
+	static inline ulong RotFL64(ulong Value, uint Shift)
 	{
 		return (Value << Shift) | (Value >> (64 - Shift));
 	}
@@ -1339,7 +1339,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted integer</returns>
-	static inline uint RotateFixRight(uint Value, uint Shift)
+	static inline uint RotFR32(uint Value, uint Shift)
 	{
 		return (Value >> Shift) | (Value << (32 - Shift));
 	}
@@ -1352,7 +1352,7 @@ public:
 	/// <param name="Shift">The number of bits to shift</param>
 	/// 
 	/// <returns>The right shifted 64 bit integer</returns>
-	static inline ulong RotateFixRight64(ulong Value, uint Shift)
+	static inline ulong RotFR64(ulong Value, uint Shift)
 	{
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}

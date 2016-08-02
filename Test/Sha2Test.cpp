@@ -10,15 +10,15 @@ namespace Test
 		{
 			Initialize();
 
-			CompareIntrinsics();
+			//CompareIntrinsics();
 
-			CEX::Digest::SHA256* sha256 = new CEX::Digest::SHA256();
+			/*CEX::Digest::SHA256* sha256 = new CEX::Digest::SHA256();
 			CompareVector(sha256, m_message[0], m_expected256[0]);
 			CompareVector(sha256, m_message[1], m_expected256[1]);
 			CompareVector(sha256, m_message[2], m_expected256[2]);
 			CompareVector(sha256, m_message[3], m_expected256[3]);
 			delete sha256;
-			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");
+			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");*/
 
 			CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
 			CompareVector(sha512, m_message[0], m_expected512[0]);

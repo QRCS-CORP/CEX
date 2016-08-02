@@ -68,7 +68,7 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void CBC::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (KeyParam.IV().size() < 16)
 		throw CryptoSymmetricCipherException("CBC:Initialize", "Requires a minimum 16 bytes of IV!");
 	if (KeyParam.Key().size() < 16)

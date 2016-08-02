@@ -5,13 +5,13 @@
 #include "KeyParams.h"
 #include "ParallelUtils.h"
 #include "StreamCiphers.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoSymmetricCipherException.h"
 #endif
 
 NAMESPACE_STREAM
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoSymmetricCipherException;
 #endif
 

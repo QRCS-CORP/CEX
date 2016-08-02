@@ -6,7 +6,7 @@ NAMESPACE_MAC
 
 void HMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (InOffset + Length > Input.size())
 		throw CryptoMacException("HMAC:BlockUpdate", "The Input buffer is too short!");
 #endif
@@ -36,16 +36,15 @@ void HMAC::Destroy()
 
 size_t HMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() - OutOffset < m_msgDigest->DigestSize())
 		throw CryptoMacException("HMAC:DoFinal", "The Output buffer is too short!");
 #endif
 
-	std::vector<byte> tmpv(m_digestSize, 0);
-
-	m_msgDigest->DoFinal(tmpv, 0);
+	std::vector<byte> tmpV(m_digestSize, 0);
+	m_msgDigest->DoFinal(tmpV, 0);
 	m_msgDigest->BlockUpdate(m_outputPad, 0, m_outputPad.size());
-	m_msgDigest->BlockUpdate(tmpv, 0, tmpv.size());
+	m_msgDigest->BlockUpdate(tmpV, 0, tmpV.size());
 	size_t msgLen = m_msgDigest->DoFinal(Output, OutOffset);
 	m_msgDigest->BlockUpdate(m_inputPad, 0, m_inputPad.size());
 	Reset();
@@ -55,6 +54,14 @@ size_t HMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 
 void HMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
 {
+#if defined(_DEBUG)
+	assert(MacKey.size() > 1);
+#endif
+#if defined(CPPEXCEPTIONS_ENABLED)
+	if (MacKey.size() < 1)
+		throw CryptoMacException("SHA256:LoadMacKey", "The minimum key size is 8 bytes, key length equal to digest output size is recommended!");
+#endif
+
 	m_msgDigest->Reset();
 	size_t keyLength = MacKey.size() + IV.size();
 

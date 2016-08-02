@@ -32,10 +32,10 @@ void Blake2Bp512::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset
 			ttlLen -= m_msgBuffer.size();
 
 			// empty the message buffer
-			CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset](size_t i)
+			CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
 			{
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE);
-				ProcessBlock(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.ThreadDepth() * BLOCK_SIZE), m_State[i], BLOCK_SIZE);
+				ProcessBlock(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.ParallelDegree() * BLOCK_SIZE), m_State[i], BLOCK_SIZE);
 			});
 
 			// loop in the remainder (no buffering)
@@ -47,7 +47,7 @@ void Blake2Bp512::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset
 					prcLen -= (prcLen % m_minParallel);
 
 				// process large blocks
-				CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset, prcLen](size_t i)
+				CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, prcLen](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_State[i], prcLen);
 				});
@@ -71,7 +71,7 @@ void Blake2Bp512::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset
 			m_msgLength = m_msgBuffer.size();
 
 			// process first half of buffer
-			CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ThreadDepth(), [this, &Input, InOffset](size_t i)
+			CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
 			{
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE);
 			});
@@ -147,13 +147,13 @@ size_t Blake2Bp512::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 {
 	if (m_isParallel)
 	{
-		std::vector<uint8_t> hashCodes(m_treeParams.ThreadDepth() * DIGEST_SIZE);
+		std::vector<uint8_t> hashCodes(m_treeParams.ParallelDegree() * DIGEST_SIZE);
 
 		// padding
 		if (m_msgLength < m_msgBuffer.size())
 			memset(&m_msgBuffer[m_msgLength], 0, m_msgBuffer.size() - m_msgLength);
 
-		std::vector<uint8_t> padLen(m_treeParams.ThreadDepth(), BLOCK_SIZE);
+		std::vector<uint8_t> padLen(m_treeParams.ParallelDegree(), BLOCK_SIZE);
 		uint64_t prtBlk = ULL_MAX;
 
 		// process unaligned blocks
@@ -176,14 +176,14 @@ size_t Blake2Bp512::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 		}
 
 		// process last 4 blocks
-		for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
+		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
 		{
 			// apply f0 bit reversal constant to final blocks
 			m_State[i].F[0] = ULL_MAX;
 			size_t blkSze = BLOCK_SIZE;
 
 			// f1 constant on last block
-			if (i == m_treeParams.ThreadDepth() - 1)
+			if (i == m_treeParams.ParallelDegree() - 1)
 				m_State[i].F[1] = ULL_MAX;
 
 			if (i == prtBlk)
@@ -217,7 +217,7 @@ size_t Blake2Bp512::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 		Initialize(m_treeParams, m_State[0]);
 
 		// load blocks
-		for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
+		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
 			BlockUpdate(hashCodes, i * DIGEST_SIZE, DIGEST_SIZE);
 
 		// compress all but last block
@@ -255,7 +255,7 @@ size_t Blake2Bp512::Generate(CEX::Common::MacParams &MacKey, std::vector<uint8_t
 	assert(MacKey.Key().size() >= DIGEST_SIZE);
 	assert((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) <= BLOCK_SIZE);
 #endif
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() == 0)
 		throw CEX::Exception::CryptoDigestException("Blake2Bp512:Generate", "Buffer size must be at least 1 byte!");
 	if (MacKey.Key().size() < DIGEST_SIZE)
@@ -316,7 +316,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 #if defined(_DEBUG)
 	assert(MacKey.Key().size() >= 32 || MacKey.Key().size() <= 64);
 #endif
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (MacKey.Key().size() < 32 || MacKey.Key().size() > 64)
 		throw CEX::Exception::CryptoDigestException("Blake2Bp512", "Mac Key has invalid length!");
 #endif
@@ -326,7 +326,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 #if defined(_DEBUG)
 		assert(MacKey.Salt().size() == 16);
 #endif
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (MacKey.Salt().size() != 16)
 			throw CEX::Exception::CryptoDigestException("Blake2Bp512", "Salt has invalid length!");
 #endif
@@ -340,7 +340,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 #if defined(_DEBUG)
 		assert(MacKey.Info().size() == 16);
 #endif
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (MacKey.Info().size() != 16)
 			throw CEX::Exception::CryptoDigestException("Blake2Bp512", "Info has invalid length!");
 #endif
@@ -356,7 +356,7 @@ void Blake2Bp512::LoadMacKey(CEX::Common::MacParams &MacKey)
 	if (m_isParallel)
 	{
 		// initialize the leaf nodes and add the key 
-		for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
+		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
 		{
 			memcpy(&m_msgBuffer[i * BLOCK_SIZE], &mkey[0], mkey.size());
 			m_treeParams.NodeOffset() = i;
@@ -380,7 +380,7 @@ void Blake2Bp512::Reset()
 
 	if (m_isParallel)
 	{
-		for (size_t i = 0; i < m_treeParams.ThreadDepth(); ++i)
+		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
 		{
 			m_treeParams.NodeOffset() = i;
 			Initialize(m_treeParams, m_State[i]);

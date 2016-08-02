@@ -121,7 +121,7 @@ public:
 		m_keySize(Digest->BlockSize()),
 		m_msgDigest(Digest)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Digest == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
 #endif
@@ -147,7 +147,7 @@ public:
 		m_keySize(Hmac->BlockSize()),
 		m_msgDigest(0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Hmac == 0)
 			throw CryptoGeneratorException("HKDF:CTor", "The Hmac can not be null!");
 #endif
@@ -226,7 +226,7 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
-	void ExpandNext();
+	void Expand();
 	void Extract(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, std::vector<byte> &Prk);
 };
 

@@ -23,7 +23,7 @@ public:
 		:
 		_isDestroyed(false)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw std::exception("Not Implemented!");
 #endif
 	}

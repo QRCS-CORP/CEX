@@ -44,7 +44,7 @@ void CipherStream::Destroy()
 			}
 			catch (...) 
 			{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 				throw CEX::Exception::CryptoProcessingException("CipherStream:Destroy", "The engines were not heap allocated!");
 #endif
 			}
@@ -65,7 +65,7 @@ void CipherStream::Initialize(bool Encryption, CEX::Common::KeyParams &KeyParam)
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!");
 #endif
 	}
@@ -76,7 +76,7 @@ void CipherStream::Initialize(bool Encryption, CEX::Common::KeyParams &KeyParam)
 
 void CipherStream::Write(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (!m_isInitialized)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
 	if (InStream->Length() - InStream->Position() < 1)
@@ -141,7 +141,7 @@ void CipherStream::Write(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* O
 
 void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (!m_isInitialized)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
 	if (Input.size() - InOffset < 1)
@@ -498,7 +498,7 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* CipherStream::GetBlockEngine(CEX::E
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:GetBlockEngine", "The cipher could not be instantiated!");
 #else
 		return 0;
@@ -516,7 +516,7 @@ CEX::Cipher::Symmetric::Block::Mode::ICipherMode* CipherStream::GetCipherMode(CE
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:GetCipherMode", "The cipher mode could not be instantiated!");
 #else
 		return 0;
@@ -532,7 +532,7 @@ CEX::Cipher::Symmetric::Block::Padding::IPadding* CipherStream::GetPaddingMode(C
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:GetPaddingMode", "The padding could not be instantiated!");
 #else
 		return 0;
@@ -548,7 +548,7 @@ CEX::Cipher::Symmetric::Stream::IStreamCipher* CipherStream::GetStreamEngine(CEX
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CEX::Exception::CryptoProcessingException("CipherStream:GetStreamEngine", "The cipher could not be instantiated!");
 #else
 		return 0;

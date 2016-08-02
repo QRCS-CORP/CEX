@@ -5,7 +5,7 @@ NAMESPACE_DIGEST
 
 void Skein256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Skein256:BlockUpdate", "The Input buffer is too short!");
 #endif
@@ -62,7 +62,7 @@ void Skein256::Destroy()
 
 size_t Skein256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Skein256:DoFinal", "The Output buffer is too short!");
 #endif
@@ -173,7 +173,7 @@ void Skein256::Reset()
 
 void Skein256::SetMaxTreeHeight(const byte Height)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Height == 1)
 		throw CryptoDigestException("Skein256:SetMaxTreeHeight", "Tree height must be zero or greater than 1.");
 #endif
@@ -184,7 +184,7 @@ void Skein256::SetMaxTreeHeight(const byte Height)
 
 void Skein256::SetSchema(const std::vector<byte> &Schema)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Schema.size() != 4)
 		throw CryptoDigestException("Skein256:SetSchema", "Schema must be 4 bytes.");
 #endif
@@ -216,7 +216,7 @@ void Skein256::SetTreeLeafSize(const byte Size)
 
 void Skein256::SetVersion(const uint Version)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Version > 3)
 		throw CryptoDigestException("Skein256:SetVersion", "Version must be between 0 and 3, inclusive.");
 #endif

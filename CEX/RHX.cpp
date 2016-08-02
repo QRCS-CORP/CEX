@@ -69,7 +69,7 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	int dgtsze = GetIkmSize(m_kdfEngineType);
 	const std::vector<byte> &key = KeyParam.Key();
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
 	if (key.size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
@@ -89,10 +89,11 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	{
 		if (key.size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
+
+		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}
 #endif
 
-	m_kdfEngine = GetDigest(m_kdfEngineType);
 	m_isEncryption = Encryption;
 	// expand the key
 	ExpandKey(Encryption, key);
@@ -794,7 +795,7 @@ CEX::Digest::IDigest* RHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoSymmetricCipherException("RHX:GetDigest", "The digest could not be instantiated!");
 #else
 		return 0;

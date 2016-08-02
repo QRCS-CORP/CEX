@@ -24,7 +24,7 @@ void CTR::Destroy()
 
 void CTR::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (KeyParam.IV().size() < 16)
 		throw CryptoSymmetricCipherException("CTR:Initialize", "Requires a minimum 16 bytes of IV!");
 	if (KeyParam.Key().size() < 16)

@@ -100,7 +100,7 @@ public:
 		_fileSize(0)
 	{
 		_filename = FileName.c_str();
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Access == FileAccess::Read && !FileExists(_filename))
 			throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
 #endif
@@ -114,7 +114,7 @@ public:
 		}
 		catch (...)
 		{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!");
 #endif
 		}

@@ -82,7 +82,7 @@ public:
 		}
 		else if (KeyId.size() != KEYUID_SIZE)
 		{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The MacKey must be exactly 16 bytes!");
 #endif
 		}

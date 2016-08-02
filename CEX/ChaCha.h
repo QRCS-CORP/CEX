@@ -219,7 +219,7 @@ public:
 		m_rndCount(Rounds),
 		m_wrkState(14, 0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Rounds == 0 || (Rounds & 1) != 0)
 			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)

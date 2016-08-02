@@ -29,13 +29,13 @@
 #include "IDigest.h"
 #include "UInt128.h"
 #include "KeyParams.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoSymmetricCipherException.h"
 #endif
 
 NAMESPACE_BLOCK
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoSymmetricCipherException;
 #endif
 

@@ -94,7 +94,7 @@ NAMESPACE_DIGEST
 		/// <summary>
 		/// Get/Set: The desired number of threads used to process the message (default is 4 for Blake2-BP, or 8 for Blake2-SP)
 		/// </summary>
-		uint8_t &ThreadDepth() { return m_threadDepth; }
+		uint8_t &ParallelDegree() { return m_threadDepth; }
 
 		/// <summary>
 		/// Get/Set: The second reserved byte
@@ -151,7 +151,7 @@ NAMESPACE_DIGEST
 			m_reserved3(0),
 			m_reserved4(0)
 		{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			if (TreeArray.size() < HDR_SIZE)
 				throw CEX::Exception::CryptoDigestException("Blake2Params:Ctor", "The TreeArray buffer is too short!");
 #endif
@@ -182,8 +182,8 @@ NAMESPACE_DIGEST
 		/// <param name="NodeOffset">Node offset (8 or 6 bytes): an integer in [0, 264 −1] for BLAKE2b, and in [0, 248 −1] for BLAKE2s(set to 0 for the first, leftmost, leaf, or in sequential mode)</param>
 		/// <param name="NodeDepth">Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)</param>
 		/// <param name="InnerLength">Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)</param>
-		/// <param name="ThreadDepth">The number of threads used in parallel mode, the default is 4 for Blake2bp, and 8 for Blake2sp</param>
-		Blake2Params(uint8_t DigestLength, uint8_t KeyLength, uint8_t FanOut, uint8_t MaxDepth, uint32_t LeafLength, uint64_t NodeOffset, uint8_t NodeDepth, uint8_t InnerLength, uint8_t ThreadDepth)
+		/// <param name="ParallelDegree">The number of threads used in parallel mode, the default is 4 for Blake2bp, and 8 for Blake2sp</param>
+		Blake2Params(uint8_t DigestLength, uint8_t KeyLength, uint8_t FanOut, uint8_t MaxDepth, uint32_t LeafLength, uint64_t NodeOffset, uint8_t NodeDepth, uint8_t InnerLength, uint8_t ParallelDegree)
 			:
 			m_dgtLen(DigestLength),
 			m_keyLen(KeyLength),
@@ -193,20 +193,19 @@ NAMESPACE_DIGEST
 			m_nodeOffset(NodeOffset),
 			m_nodeDepth(NodeDepth),
 			m_innerLen(InnerLength),
-			m_threadDepth(ThreadDepth),
+			m_threadDepth(ParallelDegree),
 			m_reserved2(0),
 			m_reserved3(0),
 			m_reserved4(0)
 		{
 		}
 
-
 		/// <summary>
 		/// Create a clone of this structure
 		/// </summary>
 		Blake2Params Clone()
 		{
-			Blake2Params result(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ThreadDepth());
+			Blake2Params result(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
 			return result;
 		}
 
@@ -216,7 +215,7 @@ NAMESPACE_DIGEST
 		/// </summary>
 		Blake2Params* DeepCopy()
 		{
-			return new Blake2Params(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ThreadDepth());
+			return new Blake2Params(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
 		}
 
 		/// <summary>

@@ -166,7 +166,7 @@ public:
 		m_parallelBlockSize(PARALLEL_DEFBLOCK),
 		m_processorCount(0)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (m_blockCipher == 0)
 			throw CryptoGeneratorException("CTRDrbg:CTor", "The Cipher can not be null!");
 #endif
@@ -178,7 +178,7 @@ public:
 		}
 		else
 		{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 			if (!IsValidKeySize(KeySize))
 				throw CryptoGeneratorException("CTRDrbg:CTor", "The key size must be a ciphers legal key size!");
 #endif

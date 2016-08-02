@@ -298,6 +298,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define HAS_MINSSE
 #endif
 
-//#define ENABLE_CPPEXCEPTIONS
+#define CPPEXCEPTIONS_ENABLED
+#define FASTROTATE_ENABLED
 
 #endif

@@ -6,7 +6,7 @@ NAMESPACE_PROCESSING
 
 std::vector<byte> MacStream::ComputeMac(CEX::IO::IByteStream* InStream)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (InStream->Length() - InStream->Position() < 1)
 		throw CEX::Exception::CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
 #endif
@@ -21,7 +21,7 @@ std::vector<byte> MacStream::ComputeMac(CEX::IO::IByteStream* InStream)
 
 std::vector<byte> MacStream::ComputeMac(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
 		throw CEX::Exception::CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
 #endif

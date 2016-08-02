@@ -81,7 +81,7 @@ public:
 		m_byteBuffer(BufferSize),
 		m_isDestroyed(false)
 	{
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 		if (BufferSize < 64)
 			throw CryptoRandomException("SecureRandom:Ctor", "Buffer size must be at least 64 bytes!");
 #endif

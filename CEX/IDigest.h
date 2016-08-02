@@ -3,13 +3,13 @@
 
 #include "Common.h"
 #include "Digests.h"
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoDigestException.h"
 #endif
 
 NAMESPACE_DIGEST
 
-#if defined(ENABLE_CPPEXCEPTIONS)
+#if defined(CPPEXCEPTIONS_ENABLED)
 using CEX::Exception::CryptoDigestException;
 #endif
 
