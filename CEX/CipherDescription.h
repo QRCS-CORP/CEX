@@ -95,7 +95,7 @@ public:
 	/// <summary>
 	/// The Cryptographic Engine type
 	/// </summary>
-	const CEX::Enumeration::SymmetricEngines EngineType() const { return (CEX::Enumeration::SymmetricEngines)_engineType; }
+	const SymmetricEngines EngineType() const { return (SymmetricEngines)_engineType; }
 
 	/// <summary>
 	/// Get: The cipher Key Size
@@ -110,32 +110,32 @@ public:
 	/// <summary>
 	/// Size of the cipher Initialization Vector
 	/// </summary>
-	const CEX::Enumeration::IVSizes IvSize() const { return (CEX::Enumeration::IVSizes)_ivSize; }
+	const IVSizes IvSize() const { return (IVSizes)_ivSize; }
 
 	/// <summary>
 	/// The type of Cipher Mode
 	/// </summary>
-	const CEX::Enumeration::CipherModes CipherType() const { return (CEX::Enumeration::CipherModes)_cipherType; }
+	const CipherModes CipherType() const { return (CipherModes)_cipherType; }
 
 	/// <summary>
 	/// The type of cipher Padding Mode
 	/// </summary>
-	const CEX::Enumeration::PaddingModes PaddingType() const { return (CEX::Enumeration::PaddingModes)_paddingType; }
+	const PaddingModes PaddingType() const { return (PaddingModes)_paddingType; }
 
 	/// <summary>
 	/// The cipher Block Size
 	/// </summary>
-	const CEX::Enumeration::BlockSizes BlockSize() const { return (CEX::Enumeration::BlockSizes)_blockSize; }
+	const BlockSizes BlockSize() const { return (BlockSizes)_blockSize; }
 
 	/// <summary>
 	/// The number of diffusion Rounds
 	/// </summary>
-	const CEX::Enumeration::RoundCounts RoundCount() const { return (CEX::Enumeration::RoundCounts)_roundCount; }
+	const RoundCounts RoundCount() const { return (RoundCounts)_roundCount; }
 
 	/// <summary>
 	/// The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
 	/// </summary>
-	const CEX::Enumeration::Digests KdfEngine() const { return (CEX::Enumeration::Digests)_kdfEngine; }
+	const Digests KdfEngine() const { return (Digests)_kdfEngine; }
 
 	/// <summary>
 	/// The size of the HMAC key in bytes; a zeroed parameter means authentication is not enabled with this key
@@ -145,7 +145,7 @@ public:
 	/// <summary>
 	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
 	/// </summary>
-	const CEX::Enumeration::Digests MacEngine() const { return (CEX::Enumeration::Digests)_macEngine; }
+	const Digests MacEngine() const { return (Digests)_macEngine; }
 
 	/// <summary>
 	/// Default constructor
@@ -178,8 +178,8 @@ public:
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	/// <param name="MacKeySize">The size of the HMAC key in bytes; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC Digest engine used to authenticate a message file encrypted with this key</param>
-	CipherDescription(CEX::Enumeration::SymmetricEngines EngineType, uint KeySize, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize,
-		CEX::Enumeration::RoundCounts RoundCount, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512, uint MacKeySize = 64, CEX::Enumeration::Digests MacEngine = CEX::Enumeration::Digests::SHA512)
+	CipherDescription(SymmetricEngines EngineType, uint KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, BlockSizes BlockSize,
+		RoundCounts RoundCount, Digests KdfEngine = Digests::SHA512, uint MacKeySize = 64, Digests MacEngine = Digests::SHA512)
 	{
 		this->_engineType = (uint)EngineType;
 		this->_keySize = KeySize;
@@ -234,6 +234,53 @@ public:
 		_kdfEngine = reader.ReadByte();
 		_macKeySize = reader.ReadByte();
 		_macEngine = reader.ReadByte();
+	}
+	/// <summary>
+	/// An AES-128 preset using CBC mode and PKCS7 padding
+	/// </summary>
+	static CipherDescription AES128CBC()
+	{
+		return CipherDescription(SymmetricEngines::RHX, 16, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R10);
+	}
+
+	/// <summary>
+	/// An AES-256 preset using CBC mode and PKCS7 padding
+	/// </summary>
+	static CipherDescription AES256CBC()
+	{
+		return CipherDescription(SymmetricEngines::RHX, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R14);
+	}
+
+	/// <summary>
+	/// An Rijndael-512 preset using CBC mode and PKCS7 padding
+	/// </summary>
+	static CipherDescription AES512CBC()
+	{
+		return CipherDescription(SymmetricEngines::RHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R22);
+	}
+
+	/// <summary>
+	/// An AES-128 preset using CTR mode
+	/// </summary>
+	static CipherDescription AES128CTR()
+	{
+		return CipherDescription(SymmetricEngines::RHX, 16, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R10);
+	}
+
+	/// <summary>
+	/// An AES-256 preset using CTR mode
+	/// </summary>
+	static CipherDescription AES256CTR()
+	{
+		return CipherDescription(SymmetricEngines::RHX, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R14);
+	}
+
+	/// <summary>
+	/// An Rijndael-512 preset using CTR mode
+	/// </summary>
+	static CipherDescription AES512CTR()
+	{
+		return CipherDescription(SymmetricEngines::RHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R22);
 	}
 
 	/// <summary>
