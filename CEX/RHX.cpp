@@ -85,14 +85,15 @@ void RHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 	}
 
 	// get the kdf digest engine
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
+
 	{
 		if (key.size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
-
-		m_kdfEngine = GetDigest(m_kdfEngineType);
 	}
 #endif
+
+	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
+		m_kdfEngine = GetDigest(m_kdfEngineType);
 
 	m_isEncryption = Encryption;
 	// expand the key
