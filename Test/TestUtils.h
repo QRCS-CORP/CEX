@@ -92,11 +92,11 @@ namespace Test
 		/// <summary>
 		/// Initializes a KeyParams structure with pseudo random data
 		/// </summary>
-		static void GetRandomKey(CEX::Common::KeyParams &keyParams, size_t keySize, size_t ivSize)
+		static void GetRandomKey(CEX::Common::KeyParams &keyParams, size_t KeySize, size_t IvSize)
 		{
 			CEX::Seed::CSPRsg rng;
-			std::vector<byte> key(keySize, 0);
-			std::vector<byte> iv(ivSize, 0);
+			std::vector<byte> key(KeySize, 0);
+			std::vector<byte> iv(IvSize, 0);
 			rng.GetBytes(key);
 			rng.GetBytes(iv);
 			keyParams.Key() = key;
@@ -154,9 +154,9 @@ namespace Test
 		/// <summary>
 		/// Reverses a byte array
 		/// </summary>
-		static void Reverse(std::vector<byte> &Vector)
+		static void Reverse(std::vector<byte> &Data)
 		{
-			std::reverse(Vector.begin(), Vector.end());
+			std::reverse(Data.begin(), Data.end());
 		}
 	};
 }

@@ -192,6 +192,7 @@ namespace Test
 		std::vector<byte> enc(blkSize);
 		std::vector<byte> key(32);
 		std::vector<byte> iv(16);
+
 		data[0] = 128;
 		for (uint8_t i = 0; i < key.size(); ++i)
 			key[i] = i;
@@ -216,18 +217,18 @@ namespace Test
 
 	void ParallelModeTest::CompareStmKat(CEX::Cipher::Symmetric::Stream::IStreamCipher* Engine, std::vector<byte> Expected)
 	{
-		size_t blkSize = 1024;
+		size_t blkSize = 4096;
 		std::vector<byte> data(blkSize);
 		std::vector<byte> enc(blkSize);
 		std::vector<byte> key(32);
 		std::vector<byte> iv(8);
 		data[0] = 128;
+
 		for (uint8_t i = 0; i < key.size(); ++i)
 			key[i] = i;
 		for (uint8_t i = 0; i < iv.size(); ++i)
 			iv[i] = i;
 		CEX::Common::KeyParams keyParam(key, iv);
-		Engine->ParallelBlockSize() = blkSize;
 
 		// parallel with intrinsics (if available)
 		Engine->Initialize(keyParam);
@@ -239,7 +240,7 @@ namespace Test
 			enc = TestUtils::Reduce(enc);
 
 		if (enc != Expected)
-			throw std::string("ParallelModeTest: Failed Kat comparison test!");
+			throw std::string("ParallelModeTest: Failed Stream Cipher Kat comparison test!");
 	}
 
 	void ParallelModeTest::CompareParallel()
@@ -565,6 +566,7 @@ namespace Test
 		std::vector<byte> key(32);
 		std::vector<byte> iv(8);
 		CEX::Prng::CSPPrng rng;
+
 		data.reserve(MAX_ALLOC);
 		enc1.reserve(MAX_ALLOC);
 		enc2.reserve(MAX_ALLOC);
@@ -597,15 +599,15 @@ namespace Test
 			CEX::Common::KeyParams keyParam(key, iv);
 			Engine->ParallelBlockSize() = Engine->ParallelMinimumSize() * Engine->ProcessorCount();
 
-			// parallel with intrinsics (if available)
-			Engine->Initialize(keyParam);
-			Engine->IsParallel() = true;
-			Engine->Transform(data, enc1);
-
 			// sequential
 			Engine->Initialize(keyParam);
 			Engine->IsParallel() = false;
 			Engine->Transform(data, enc2);
+
+			// parallel with intrinsics (if available)
+			Engine->Initialize(keyParam);
+			Engine->IsParallel() = true;
+			Engine->Transform(data, enc1);
 
 			if (enc1 != enc2)
 				throw std::string("Parallel Stream: Encrypted output is not equal!");
@@ -728,8 +730,8 @@ namespace Test
 			("c07d97f791abc487129f47a6d29f66992d5994fbb3b8b11f3f0e8f479aa353de"), //rijndael
 			("c3d46cf0bfebf80589bb65fef3fab9fc8993f352500a9d71483d4382aab695a6"), //serpent
 			("94e6761273d83ce4f775d21eb37e88fb848b77f16791fa805a64e5750c0684b9"), //twofish
-			("0ff7d6c12d2afa7b227a3c0e31212bc98703114e7d9a9db53aef6e96d0093c0e"), //chacha
-			("27b530353e1d7c3af4a19c061e3f6ebdc4e3512df7b3805e53c30b6071cd3426")  //salsa
+			("4036af67c0a150992cc6ff649a3204e1e0d5ed3baa822d7b284ce4f7bd0302a5"), //chacha
+			("37287bc9b4706c9450c943cf99ae3d685878f5e906546f36b53adab35f8e91cb")  //salsa
 		};
 		HexConverter::Decode(expected, 5, m_katExpected);
 

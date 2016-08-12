@@ -23,13 +23,11 @@ namespace Test
 		try
 		{
 			Initialize();
-			OnProgress("### Parallel CTR Mode Speed Tests: 10 loops * 100MB ###");
 
 #if defined (AESNI_AVAILABLE)
 			OnProgress("***AES-NI (AHX): Monte Carlo test (K=256; R=14)***");
 			AHXSpeedTest();
 #endif
-
 			OnProgress("***RHX: Monte Carlo test (K=256; R=14)***");
 			RDXSpeedTest();
 			OnProgress("***RHX: Monte Carlo test (K=512; R=22)***");
@@ -47,14 +45,32 @@ namespace Test
 			OnProgress("***ChaCha: Monte Carlo test (K=256; R=20)***");
 			ChaChaSpeedTest();
 
+#if defined (AESNI_AVAILABLE)
+			OnProgress("### CBC and CFB Parallel Decryption Speed Tests: 10 loops * 100MB ###");
+			CEX::Cipher::Symmetric::Block::IBlockCipher* engine = new CEX::Cipher::Symmetric::Block::AHX();
+			OnProgress("***AHX: CBC Decryption test (K=256; R=14)***");
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, true, 32, 16, 10);
+			OnProgress("***AHX: CFB Decryption test (K=256; R=14)***");
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, true, 32, 16, 10);
+
+			OnProgress("### AHX Sequential Mode Speed Tests: 10 loops * 100MB ###");
+			OnProgress("***AHX: CTR Encrypt test (K=256; R=14)***");
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CTR(engine), MB100, false, 32, 16, 10);
+			OnProgress("***AHX: CBC Encrypt test (K=256; R=14)***");
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, false, 32, 16, 10);
+			OnProgress("***AHX: CFB Encrypt test (K=256; R=14)***");
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, false, 32, 16, 10);
+			OnProgress("***AHX: OFB Encrypt test (K=256; R=14)***");
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::OFB(engine), MB100, false, 32, 16, 10);
+#else
 			OnProgress("### CBC and CFB Parallel Decryption Speed Tests: 10 loops * 100MB ###");
 			CEX::Cipher::Symmetric::Block::IBlockCipher* engine =  new CEX::Cipher::Symmetric::Block::RHX();
 			OnProgress("***RHX: CBC Decryption test (K=256; R=14)***");
-			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, true, 32, 16);
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CBC(engine), MB100, true, 32, 16, 10);
 			OnProgress("***RHX: CFB Decryption test (K=256; R=14)***");
-			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, true, 32, 16);
+			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, true, 32, 16, 10);
 
-			OnProgress("### RHX Standard Mode Speed Tests: 10 loops * 100MB ###");
+			OnProgress("### RHX Sequential Mode Speed Tests: 10 loops * 100MB ###");
 			OnProgress("***RHX: CTR Encrypt test (K=256; R=14)***");
 			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CTR(engine), MB100, false, 32, 16, 10);
 			OnProgress("***RHX: CBC Encrypt test (K=256; R=14)***");
@@ -63,6 +79,7 @@ namespace Test
 			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::CFB(engine), MB100, false, 32, 16, 10);
 			OnProgress("***RHX: OFB Encrypt test (K=256; R=14)***");
 			ParallelModeLoop(new CEX::Cipher::Symmetric::Block::Mode::OFB(engine), MB100, false, 32, 16, 10);
+#endif
 			delete engine;
 
 			return MESSAGE;
@@ -226,7 +243,7 @@ namespace Test
 		// note: requires large data to reach best speed due to 
 		// os management of thread queues, overclock, hyperthreading etc.
 		// best results are obtained when looping test to +100GB.
-		// on an hp all-in-one i7-6700T/12GB-1600 -> h:8137, l:2377, avg: 3755 MB per second!
+		// on an hp all-in-one i7-6700T/12GB-1600 -> k:256, r:14, l:1GB, t:0.117, avg: 8547 MB per second!
 
 		//for (int i = 0; i < 100; ++i)
 		//{

@@ -43,6 +43,20 @@ NAMESPACE_PROCESSING
 /// <para>Wraps encryption stream functions in an easy to use interface.</para>
 /// </summary> 
 /// 
+/// <example>
+/// <description>Example of encrypting a Stream using a CipherDescription preset:</description>
+/// <code>
+/// KeyParams kp(key, iv);
+/// MemoryStream mIn(plaintext);
+/// MemoryStream mOut;
+/// CipherDescription cd = CipherDescription::AES256CTR();
+///
+/// CipherStream cs(cd);
+/// cs.Initialize(true, kp);
+/// cs.Write(&mIn, &mOut);
+/// </code>
+/// </example>
+/// 
 /// <seealso cref="CEX::Common::CipherDescription"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Stream"/>
 /// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>

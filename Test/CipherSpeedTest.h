@@ -46,7 +46,6 @@ namespace Test
 			m_key256(32, 0),
 			m_key1536(192, 0)
 		{
-
 		}
 
 		/// <summary>

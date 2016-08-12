@@ -3,11 +3,10 @@
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
-#if defined(HAS_MINSSE)
+#if defined(HAS_AVX)
+#	include "UInt256.h"
+#elif defined(HAS_MINSSE)
 #	include "UInt128.h"
-#	if defined(HAS_AVX)
-#		include "UInt256.h"
-#	endif
 #endif
 
 NAMESPACE_STREAM
@@ -23,6 +22,7 @@ void Salsa20::Destroy()
 		m_processorCount = 0;
 		m_isParallel = false;
 		m_parallelBlockSize = 0;
+		m_parallelMinimumSize = 0;
 		m_rndCount = 0;
 
 		CEX::Utility::IntUtils::ClearVector(m_ctrVector);
@@ -46,9 +46,9 @@ void Salsa20::Initialize(const CEX::Common::KeyParams &KeyParam)
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "Requires exactly 8 bytes of IV!");
 	if (KeyParam.Key().size() != 16 && KeyParam.Key().size() != 32)
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "Key must be 16 or 32 bytes!");
-	if (ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
+	if (IsParallel() && ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "The parallel block size is out of bounds!");
-	if (ParallelBlockSize() % ParallelMinimumSize() != 0)
+	if (IsParallel() && ParallelBlockSize() % ParallelMinimumSize() != 0)
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 #endif
 
@@ -159,34 +159,34 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 	{
 		const size_t BLK8 = 8 * BLOCK_SIZE;
 		size_t paln = Length - (Length % BLK8);
-		std::vector<uint> ctrBlk(BLK8 / sizeof(uint));
+		std::vector<uint> ctrBlk(16);
 
 		// process 8 blocks (uses avx if available)
 		while (ctr != paln)
 		{
 			memcpy(&ctrBlk[0], &Counter[0], 4);
-			memcpy(&ctrBlk[8], &Counter[0], 4);
+			memcpy(&ctrBlk[8], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[1], &Counter[0], 4);
-			memcpy(&ctrBlk[9], &Counter[0], 4);
+			memcpy(&ctrBlk[9], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[2], &Counter[0], 4);
-			memcpy(&ctrBlk[10], &Counter[0], 4);
+			memcpy(&ctrBlk[10], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[3], &Counter[0], 4);
-			memcpy(&ctrBlk[11], &Counter[0], 4);
+			memcpy(&ctrBlk[11], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[4], &Counter[0], 4);
-			memcpy(&ctrBlk[12], &Counter[0], 4);
+			memcpy(&ctrBlk[12], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[5], &Counter[0], 4);
-			memcpy(&ctrBlk[13], &Counter[0], 4);
+			memcpy(&ctrBlk[13], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[6], &Counter[0], 4);
-			memcpy(&ctrBlk[14], &Counter[0], 4);
+			memcpy(&ctrBlk[14], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[7], &Counter[0], 4);
-			memcpy(&ctrBlk[15], &Counter[0], 4);
+			memcpy(&ctrBlk[15], &Counter[1], 4);
 			Increment(Counter);
 			Transform512(Output, OutOffset + ctr, ctrBlk);
 			ctr += BLK8;
@@ -195,22 +195,22 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 	else if (HasIntrinsics() && Length >= BLK4)
 	{
 		size_t paln = Length - (Length % BLK4);
-		std::vector<uint> ctrBlk(BLK4 / sizeof(uint));
+		std::vector<uint> ctrBlk(8);
 
 		// process 4 blocks (uses sse intrinsics if available)
 		while (ctr != paln)
 		{
 			memcpy(&ctrBlk[0], &Counter[0], 4);
-			memcpy(&ctrBlk[4], &Counter[0], 4);
+			memcpy(&ctrBlk[4], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[1], &Counter[0], 4);
-			memcpy(&ctrBlk[5], &Counter[0], 4);
+			memcpy(&ctrBlk[5], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[2], &Counter[0], 4);
-			memcpy(&ctrBlk[6], &Counter[0], 4);
+			memcpy(&ctrBlk[6], &Counter[1], 4);
 			Increment(Counter);
 			memcpy(&ctrBlk[3], &Counter[0], 4);
-			memcpy(&ctrBlk[7], &Counter[0], 4);
+			memcpy(&ctrBlk[7], &Counter[1], 4);
 			Increment(Counter);
 			Transform256(Output, OutOffset + ctr, ctrBlk);
 			ctr += BLK4;
@@ -245,7 +245,7 @@ void Salsa20::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset
 	if (blkSize > Output.size() - OutOffset)
 		blkSize = Output.size() - OutOffset;
 
-	if (!m_isParallel || blkSize < ParallelMinimumSize())
+	if (!m_isParallel || blkSize < m_parallelMinimumSize)
 	{
 		// generate random
 		Generate(Output, OutOffset, m_ctrVector, blkSize);
@@ -379,7 +379,7 @@ void Salsa20::Transform64(std::vector<byte> &Output, size_t OutOffset, std::vect
 
 void Salsa20::Transform256(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter)
 {
-#if defined(HAS_MINSSE)
+#if defined(HAS_MINSSE) && !defined(HAS_AVX)
 
 	size_t ctr = 0;
 	std::vector<CEX::Common::UInt128> X {
@@ -392,7 +392,7 @@ void Salsa20::Transform256(std::vector<byte> &Output, size_t OutOffset, std::vec
 		CEX::Common::UInt128(m_wrkState[++ctr]),
 		CEX::Common::UInt128(m_wrkState[++ctr]),
 		CEX::Common::UInt128(Counter, 0),
-		CEX::Common::UInt128(Counter, 16),
+		CEX::Common::UInt128(Counter, 4),
 		CEX::Common::UInt128(m_wrkState[++ctr]),
 		CEX::Common::UInt128(m_wrkState[++ctr]),
 		CEX::Common::UInt128(m_wrkState[++ctr]),
@@ -456,7 +456,7 @@ void Salsa20::Transform256(std::vector<byte> &Output, size_t OutOffset, std::vec
 	X[6] += m_wrkState[++ctr];
 	X[7] += m_wrkState[++ctr];
 	X[8] += CEX::Common::UInt128(Counter, 0);
-	X[9] += CEX::Common::UInt128(Counter, 16);
+	X[9] += CEX::Common::UInt128(Counter, 4);
 	X[10] += m_wrkState[++ctr];
 	X[11] += m_wrkState[++ctr];
 	X[12] += m_wrkState[++ctr];
@@ -468,13 +468,19 @@ void Salsa20::Transform256(std::vector<byte> &Output, size_t OutOffset, std::vec
 
 #else
 
-	Transform64(Output, OutOffset, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 64, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 128, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 192, Counter);
+	std::vector<uint> tmpCtr(2);
+	tmpCtr[0] = Counter[0];
+	tmpCtr[1] = Counter[4];
+	Transform64(Output, OutOffset, tmpCtr);
+	tmpCtr[0] = Counter[1];
+	tmpCtr[1] = Counter[5];
+	Transform64(Output, OutOffset + 64, tmpCtr);
+	tmpCtr[0] = Counter[2];
+	tmpCtr[1] = Counter[6];
+	Transform64(Output, OutOffset + 128, tmpCtr);
+	tmpCtr[0] = Counter[3];
+	tmpCtr[1] = Counter[7];
+	Transform64(Output, OutOffset + 192, tmpCtr);
 
 #endif
 }
@@ -494,7 +500,7 @@ void Salsa20::Transform512(std::vector<byte> &Output, size_t OutOffset, std::vec
 		CEX::Common::UInt256(m_wrkState[++ctr]),
 		CEX::Common::UInt256(m_wrkState[++ctr]),
 		CEX::Common::UInt256(Counter, 0),
-		CEX::Common::UInt256(Counter, 16),
+		CEX::Common::UInt256(Counter, 8),
 		CEX::Common::UInt256(m_wrkState[++ctr]),
 		CEX::Common::UInt256(m_wrkState[++ctr]),
 		CEX::Common::UInt256(m_wrkState[++ctr]),
@@ -558,7 +564,7 @@ void Salsa20::Transform512(std::vector<byte> &Output, size_t OutOffset, std::vec
 	X[6] += m_wrkState[++ctr];
 	X[7] += m_wrkState[++ctr];
 	X[8] += CEX::Common::UInt256(Counter, 0);
-	X[9] += CEX::Common::UInt256(Counter, 16);
+	X[9] += CEX::Common::UInt256(Counter, 8);
 	X[10] += m_wrkState[++ctr];
 	X[11] += m_wrkState[++ctr];
 	X[12] += m_wrkState[++ctr];
@@ -570,21 +576,31 @@ void Salsa20::Transform512(std::vector<byte> &Output, size_t OutOffset, std::vec
 
 #else
 
-	Transform64(Output, OutOffset, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 64, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 128, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 192, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 256, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 320, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 384, Counter);
-	Increment(Counter);
-	Transform64(Output, OutOffset + 448, Counter);
+	std::vector<uint> tmpCtr(2);
+	tmpCtr[0] = Counter[0];
+	tmpCtr[1] = Counter[8];
+	Transform64(Output, OutOffset, tmpCtr);
+	tmpCtr[0] = Counter[1];
+	tmpCtr[1] = Counter[9];
+	Transform64(Output, OutOffset + 64, tmpCtr);
+	tmpCtr[0] = Counter[2];
+	tmpCtr[1] = Counter[10];
+	Transform64(Output, OutOffset + 128, tmpCtr);
+	tmpCtr[0] = Counter[3];
+	tmpCtr[1] = Counter[11];
+	Transform64(Output, OutOffset + 192, tmpCtr);
+	tmpCtr[0] = Counter[4];
+	tmpCtr[1] = Counter[12];
+	Transform64(Output, OutOffset + 256, tmpCtr);
+	tmpCtr[0] = Counter[5];
+	tmpCtr[1] = Counter[13];
+	Transform64(Output, OutOffset + 320, tmpCtr);
+	tmpCtr[0] = Counter[6];
+	tmpCtr[1] = Counter[14];
+	Transform64(Output, OutOffset + 384, tmpCtr);
+	tmpCtr[0] = Counter[7];
+	tmpCtr[1] = Counter[15];
+	Transform64(Output, OutOffset + 448, tmpCtr);
 
 #endif
 }
@@ -599,6 +615,15 @@ void Salsa20::SetScope()
 
 	if (m_isParallel)
 	{
+		m_parallelMinimumSize = m_processorCount * BLOCK_SIZE;
+
+		if (m_hasAVX)
+			m_parallelMinimumSize *= 8;
+		else if (m_hasIntrinsics)
+			m_parallelMinimumSize *= 4;
+
+		m_parallelBlockSize = m_parallelMinimumSize * 10;
+
 		if (m_threadVectors.size() != m_processorCount)
 			m_threadVectors.resize(m_processorCount);
 		for (size_t i = 0; i < m_processorCount; ++i)

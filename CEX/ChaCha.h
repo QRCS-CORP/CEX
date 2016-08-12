@@ -99,6 +99,7 @@ private:
 	std::vector<size_t> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	size_t m_parallelBlockSize;
+	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 	size_t m_rndCount;
 	std::vector<std::vector<uint>> m_threadVectors;
@@ -176,7 +177,7 @@ public:
 	/// Get: The smallest parallel block size. 
 	/// <para>Parallel blocks must be a multiple of this size.</para>
 	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return m_processorCount * (STATE_SIZE * 4); }
+	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
 	/// <remarks>
 	/// Get: Processor count
@@ -215,7 +216,8 @@ public:
 		m_isDestroyed(false),
 		m_isInitialized(false),
 		m_isParallel(false),
-		m_parallelBlockSize(PARALLEL_DEFBLOCK),
+		m_parallelBlockSize(0),
+		m_parallelMinimumSize(0),
 		m_rndCount(Rounds),
 		m_wrkState(14, 0)
 	{

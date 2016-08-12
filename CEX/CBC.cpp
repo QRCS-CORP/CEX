@@ -189,9 +189,62 @@ void CBC::ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset,
 
 void CBC::ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount)
 {
-	std::vector<byte> nextIv(Iv.size(), 0);
+	std::vector<byte> nextIv(Iv.size());
+	size_t blkCtr = BlockCount;
 
-	for (size_t i = 0; i < BlockCount; ++i)
+	/*if (Engine()->HasAVX() && blkCtr > 8)
+	{
+		size_t itrCount = blkCtr / 8;
+		const size_t AVXBLK = 8 * Iv.size();
+		std::vector<byte> blkIv(AVXBLK);
+		std::vector<byte> tmpIv(AVXBLK);
+
+		// process the iv block
+		memcpy(&tmpIv[0], &Iv[0], Iv.size());
+		memcpy(&tmpIv[Iv.size()], &Input[InOffset], AVXBLK - Iv.size());
+		m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
+		CEX::Utility::IntUtils::XORBLK(tmpIv, 0, Output, OutOffset, AVXBLK, Engine()->HasIntrinsics());
+		memcpy(&tmpIv[0], &blkIv[0], blkIv.size());
+		InOffset += AVXBLK - Iv.size();
+		OutOffset += AVXBLK;
+		itrCount--;
+
+		for (size_t i = 0; i < itrCount; ++i)
+		{
+			memcpy(&blkIv[0], &Input[InOffset + i * AVXBLK], blkIv.size());
+			m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
+			CEX::Utility::IntUtils::XORBLK(tmpIv, 0, Output, OutOffset, AVXBLK, Engine()->HasIntrinsics());
+			memcpy(&tmpIv[0], &blkIv[0], blkIv.size());
+			InOffset += AVXBLK;
+			OutOffset += AVXBLK;
+		}
+
+		blkCtr -= itrCount * 8;
+		if (blkCtr == 0)
+			memcpy(&Iv[0], &blkIv[blkIv.size() - Iv.size()], Iv.size());
+	}
+	else if (Engine()->HasIntrinsics() && blkCtr >= 4)
+	{
+		size_t itrCount = blkCtr / 4;
+		const size_t SSEBLK = 4 * Iv.size();
+		std::vector<byte> blkIv(SSEBLK);
+
+		for (size_t i = 0; i < itrCount; ++i)
+		{
+			memcpy(&blkIv[0], &Input[InOffset + i * SSEBLK], blkIv.size());
+			m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
+			CEX::Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, SSEBLK, Engine()->HasIntrinsics());
+			memcpy(&Iv[0], &blkIv[0], blkIv.size());
+			InOffset += SSEBLK;
+			OutOffset += SSEBLK;
+		}
+
+		blkCtr -= itrCount * 4;
+		if (blkCtr == 0)
+			memcpy(&Iv[0], &blkIv[blkIv.size() - Iv.size()], Iv.size());
+	}*/
+
+	for (size_t i = 0; i < blkCtr; ++i)
 	{
 		memcpy(&nextIv[0], &Input[InOffset], nextIv.size());
 		// decrypt input

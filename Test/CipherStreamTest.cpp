@@ -466,6 +466,7 @@ namespace Test
 		CEX::IO::MemoryStream mIn(m_plnText);
 		CEX::IO::MemoryStream mOut;
 		CEX::IO::MemoryStream mRes;
+		CEX::Common::CipherDescription cd = CEX::Common::CipherDescription::AES256CTR();
 
 		CEX::Processing::CipherStream cs(Description);
 		cs.Initialize(true, kp);
@@ -784,7 +785,7 @@ namespace Test
 		// ctr test
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			size_t sze = AllocateRandom(m_plnText);
+			size_t sze = AllocateRandom(m_plnText, cipher->ParallelMinimumSize());
 			size_t prlBlock = sze - (sze % (cipher->BlockSize() * m_processorCount));
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
@@ -927,6 +928,7 @@ namespace Test
 		CEX::IO::MemoryStream mRes;
 
 		CEX::Processing::CipherStream cs(Cipher);
+		cs.IsParallel() = false;
 		cs.Initialize(true, kp);
 		cs.Write(&mIn, &mOut);
 
