@@ -36,7 +36,7 @@
 NAMESPACE_BLOCK
 
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoSymmetricCipherException;
+	using CEX::Exception::CryptoSymmetricCipherException;
 #endif
 
 /// <summary>

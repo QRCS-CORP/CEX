@@ -10,7 +10,11 @@ void CSPPrng::Destroy()
 		if (m_rngCrypto != 0)
 		{
 			m_rngCrypto->Destroy();
-			delete m_rngCrypto;
+			try
+			{
+				delete m_rngCrypto;
+			}
+			catch (...) {}
 		}
 
 		m_isDestroyed = true;

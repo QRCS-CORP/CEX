@@ -161,7 +161,7 @@ public:
 	virtual const bool HasAVX() { return false; }
 
 	/// <summary>
-	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// Get: Returns True if the cipher supports SSE2 SIMD intrinsics
 	/// </summary>
 	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
 

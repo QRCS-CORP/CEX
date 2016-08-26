@@ -28,8 +28,9 @@
 
 // *** Twofish Lookup Templates *** //
 
-// Note: look into - extern __m128i _mm_i64gather_epi64(int const * base, __m128i vindex, const int scale);
+// ToDo: look into gather/load - extern __m128i _mm_i64gather_epi64(int const * base, __m128i vindex, const int scale);
 // http://www.physics.ntua.gr/~konstant/HetCluster/intel12.1/compiler_c/main_cls/intref_cls/common/intref_avx2_mm256_i64gather_epi64.htm
+// If not feasable/efficient, consider calculating sbox member on the fly..
 
 template<typename T, typename U>
 T I8Fe0(const T &X, const std::vector<U> &M)

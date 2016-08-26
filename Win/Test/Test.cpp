@@ -138,7 +138,7 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-
+	//RunTest(new ParallelModeTest());
 	try
 	{
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");

@@ -251,15 +251,15 @@ void ChaCha::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset,
 		// generate random
 		Generate(Output, OutOffset, m_ctrVector, blkSize);
 		// output is input xor random
-		size_t sze = blkSize - (blkSize % BLOCK_SIZE);
+		size_t alnSze = blkSize - (blkSize % BLOCK_SIZE);
 
-		if (sze != 0)
-			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
+		if (alnSze != 0)
+			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, alnSze);
 
 		// get the remaining bytes
-		if (sze != blkSize)
+		if (alnSze != blkSize)
 		{
-			for (size_t i = sze; i < blkSize; ++i)
+			for (size_t i = alnSze; i < blkSize; ++i)
 				Output[i + OutOffset] ^= Input[i + InOffset];
 		}
 	}

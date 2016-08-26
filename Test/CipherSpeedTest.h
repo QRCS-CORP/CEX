@@ -62,13 +62,10 @@ namespace Test
 		void OnProgress(char* Data);
 		void AHXSpeedTest();
 		void ChaChaSpeedTest();
-		void RDXSpeedTest();
-		void RHXSpeedTest(int Rounds = 22);
+		void RHXSpeedTest(size_t KeySize = 32);
 		void SalsaSpeedTest();
-		void SHXSpeedTest(int Rounds = 40);
-		void SPXSpeedTest();
-		void THXSpeedTest(int Rounds = 20);
-		void TFXSpeedTest();
+		void SHXSpeedTest(size_t KeySize = 32);
+		void THXSpeedTest(size_t KeySize = 32);
 	};
 }
 

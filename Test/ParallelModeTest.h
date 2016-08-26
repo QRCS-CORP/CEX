@@ -21,6 +21,12 @@ namespace Test
 		const unsigned int MIN_ALLOC = 512;
 		const unsigned int MAX_ALLOC = 4096;
 		const unsigned int DEF_BLOCK = 64000;
+#if defined(_DEBUG)
+		const unsigned int TEST_LOOPS = 10;
+#else
+		const unsigned int TEST_LOOPS = 100;
+#endif
+
 
 		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_katExpected;
@@ -71,6 +77,7 @@ namespace Test
 		virtual std::string Run();
         
     private:
+		void CompareCbcDecrypt(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine1, CEX::Cipher::Symmetric::Block::IBlockCipher* Engine2);
 		void CompareAhxSimd();
 		void CompareBcrSimd(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine);
 		void CompareStmSimd(CEX::Cipher::Symmetric::Stream::IStreamCipher* Engine);

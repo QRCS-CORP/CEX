@@ -43,8 +43,8 @@ NAMESPACE_MODE
 /// OFB cipher(new RDX());
 /// // initialize for encryption
 /// cipher.Initialize(true, KeyParams(Key, IV));
-/// // encrypt a block
-/// cipher.Transform(Input, Output);
+/// // encrypt one block
+/// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
@@ -75,6 +75,7 @@ private:
 	std::vector<byte> m_ofbIv;
 	size_t m_parallelBlockSize;
 	size_t m_processorCount;
+	OFB() {}
 
 public:
 
@@ -151,7 +152,7 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	///
-	/// <param name="Cipher">Underlying encryption algorithm</param>
+	/// <param name="Cipher">Uninitialized cipher engine instance; can not be null</param>
 	/// <param name="BlockSizeBits">Block size in bits; minimum is 8, or 1 byte. Maximum is Cipher block size in bits</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
@@ -176,6 +177,8 @@ public:
 		if (BlockSizeBits / 8 > Cipher->BlockSize())
 			throw CryptoCipherModeException("OFB:CTor", "Invalid block size! Block size can not be larger than Cipher block size.");
 #endif
+
+		ProcessingScope();
 	}
 
 	/// <summary>
@@ -224,7 +227,12 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessingScope();
 };
 
 NAMESPACE_MODEEND

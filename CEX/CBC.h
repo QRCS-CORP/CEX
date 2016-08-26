@@ -43,8 +43,8 @@ NAMESPACE_MODE
 /// CBC cipher(new RDX());
 /// // initialize for encryption
 /// cipher.Initialize(true, KeyParams(Key, IV));
-/// // encrypt a block
-/// cipher.Transform(Input, Output);
+/// // encrypt one block
+/// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
@@ -68,20 +68,24 @@ NAMESPACE_MODE
 class CBC : public ICipherMode
 {
 private:
-	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
 	std::vector<byte> m_cbcIv;
-	std::vector<byte> m_cbcNextIv;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	bool m_isParallel;
 	size_t m_parallelBlockSize;
+	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 	std::vector<std::vector<byte>> m_threadVectors;
+	bool m_wideBlock64;
+	bool m_wideBlock128;
+
+	CBC() {}
 
 public:
 
@@ -145,7 +149,7 @@ public:
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return m_processorCount * m_blockSize; }
+	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
 	/// <remarks>
 	/// Get: Processor count
@@ -159,7 +163,7 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	///
-	/// <param name="Cipher">Underlying encryption cipher</param>
+	/// <param name="Cipher">Uninitialized cipher engine instance; can not be null</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher is used</exception>
 	explicit CBC(IBlockCipher* Cipher)
@@ -171,13 +175,15 @@ public:
 		m_isInitialized(false),
 		m_isParallel(false),
 		m_processorCount(1),
-		m_parallelBlockSize(PARALLEL_DEFBLOCK)
+		m_parallelBlockSize(0),
+		m_parallelMinimumSize(0)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
 			throw CryptoCipherModeException("CBC:CTor", "The Cipher can not be null!");
 #endif
-		SetScope();
+
+		ProcessingScope();
 	}
 
 	/// <summary>
@@ -265,10 +271,13 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
-	void SetScope();
+	void Decrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
+	void Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessingScope();
 };
 
 NAMESPACE_MODEEND

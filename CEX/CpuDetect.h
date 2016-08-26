@@ -399,7 +399,7 @@ public:
 	}
 
 	/// <summary> 
-	/// Returns the best available SIMD feature set available
+	/// Returns the best available SIMD feature set
 	/// </summary>
 	FeatureSet HighestSSEVersion()
 	{
@@ -445,7 +445,7 @@ private:
 		if (osUsesXSAVE_XRSTORE && cpuAVXSuport)
 		{
 			// Check if the OS will save the YMM registers
-			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);// 0xe6 avc2
+			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
 			support = (xcrFeatureMask & 0x6) || false;
 		}
 

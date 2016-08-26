@@ -43,8 +43,8 @@ NAMESPACE_MODE
 /// CFB cipher(new RDX());
 /// // initialize for encryption
 /// cipher.Initialize(true, KeyParams(Key, IV));
-/// // encrypt a block
-/// cipher.Transform(Input, Output);
+/// // encrypt one block
+/// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
@@ -74,14 +74,15 @@ private:
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
 	std::vector<byte> m_cfbIv;
-	std::vector<byte> m_cfbBuffer;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	bool m_isParallel;
 	size_t m_parallelBlockSize;
+	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 	std::vector<std::vector<byte>> m_threadVectors;
+	CFB() {}
 
 public:
 	// *** Properties *** //
@@ -144,7 +145,7 @@ public:
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return m_processorCount * m_blockSize; }
+	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
 	/// <remarks>
 	/// Get: Processor count
@@ -157,7 +158,7 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	///
-	/// <param name="Cipher">Underlying encryption algorithm</param>
+	/// <param name="Cipher">Uninitialized cipher engine instance; can not be null</param>
 	/// <param name="BlockSizeBits">Block size in bits; minimum is 8, or 1 byte. Maximum is Cipher block size in bits</param>
 	///
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
@@ -165,14 +166,14 @@ public:
 		:
 		m_blockCipher(Cipher),
 		m_blockSize(BlockSizeBits / 8),
-		m_cfbBuffer(Cipher->BlockSize()),
 		m_cfbIv(Cipher->BlockSize()),
 		m_isDestroyed(false),
 		m_isEncryption(false),
 		m_isInitialized(false),
 		m_isParallel(false),
 		m_processorCount(1),
-		m_parallelBlockSize(PARALLEL_DEFBLOCK)
+		m_parallelBlockSize(0),
+		m_parallelMinimumSize(0)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
@@ -183,7 +184,7 @@ public:
 			throw CryptoCipherModeException("CFB:CTor", "Invalid block size! Block size can not be larger than Cipher block size.");
 #endif
 
-		SetScope();
+		ProcessingScope();
 	}
 
 	/// <summary>
@@ -232,15 +233,6 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
-	/// Decrypt a single block of bytes.
-	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
-	/// </summary>
-	///
-	/// <param name="Input">Encrypted bytes</param>
-	/// <param name="Output">Decrypted bytes</param>
-	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
 	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
 	/// </summary>
@@ -250,15 +242,6 @@ public:
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Offset in the Output array</param>
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Encrypt a block of bytes.
-	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.</para>
-	/// </summary>
-	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
-	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
@@ -272,10 +255,13 @@ public:
 	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void ParallelDecrypt(const std::vector<byte> &Input, std::vector<byte> &Output);
-	void ParallelDecrypt(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void ProcessDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
-	void SetScope();
+	void Decrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
+	void Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessingScope();
 };
 
 NAMESPACE_MODEEND

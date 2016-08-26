@@ -147,6 +147,11 @@ void THX::ExpandKey(const std::vector<byte> &Key)
 
 void THX::SecureExpand(const std::vector<byte> &Key)
 {
+	// ToDo: look into some changes
+	// 1) Pull the sbox key directly from the kdf and remove(?) sbox premix stage
+	// 2) Store sbox key and calculate sbox member on the fly when sse/avx enabled(?) test performance
+	// 3) If (2) is a significant gain, sbox becomes fallback when intrinsics are not available
+
 	size_t k64Cnt = 4;
 	size_t keyCtr = 0;
 	size_t keySize = m_dfnRounds * 2 + 8;
@@ -243,7 +248,7 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 		// create the expanded key
 		if (keyCtr < (wK.size() / 2))
 		{
-			Q = keyCtr * SK_STEP;
+			Q = (uint)(keyCtr * SK_STEP);
 			A = Mix4(Q, eKm, k64Cnt);
 			B = Mix4(Q + SK_BUMP, oKm, k64Cnt);
 			B = B << 8 | (uint)(B >> 24);

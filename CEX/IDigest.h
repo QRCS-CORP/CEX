@@ -10,7 +10,7 @@
 NAMESPACE_DIGEST
 
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoDigestException;
+	using CEX::Exception::CryptoDigestException;
 #endif
 
 /// <summary>

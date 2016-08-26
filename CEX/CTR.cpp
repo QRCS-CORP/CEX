@@ -1,5 +1,4 @@
 #include "CTR.h"
-#include "UInt128.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
@@ -24,16 +23,33 @@ void CTR::Destroy()
 
 void CTR::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
+#if defined(_DEBUG)
+	if (KeyParam.IV().size() == 64)
+		assert(m_blockCipher->HasIntrinsics());
+	if (KeyParam.IV().size() == 128)
+		assert(m_blockCipher->HasAVX());
+	if (IsParallel())
+	{
+		assert(ParallelBlockSize() >= ParallelMinimumSize() || ParallelBlockSize() <= ParallelMaximumSize());
+		assert(ParallelBlockSize() % ParallelMinimumSize() == 0);
+	}
+	assert(KeyParam.IV().size() > 15);
+	assert(KeyParam.Key().size() > 15);
+#elif defined(CPPEXCEPTIONS_ENABLED)
+	if (KeyParam.IV().size() == 64 && !m_blockCipher->HasIntrinsics())
+		throw CryptoSymmetricCipherException("CTR:Initialize", "SSE 128bit intrinsics are not available on this system!");
+	if (KeyParam.IV().size() == 128 && !m_blockCipher->HasAVX())
+		throw CryptoSymmetricCipherException("CTR:Initialize", "AVX 256bit intrinsics are not available on this system!");
 	if (KeyParam.IV().size() < 16)
 		throw CryptoSymmetricCipherException("CTR:Initialize", "Requires a minimum 16 bytes of IV!");
 	if (KeyParam.Key().size() < 16)
 		throw CryptoSymmetricCipherException("CTR:Initialize", "Requires a minimum 16 bytes of Key!");
-	if (ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
+	if (IsParallel() && ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
 		throw CryptoSymmetricCipherException("CTR:Initialize", "The parallel block size is out of bounds!");
-	if (ParallelBlockSize() % ParallelMinimumSize() != 0)
+	if (IsParallel() && ParallelBlockSize() % ParallelMinimumSize() != 0)
 		throw CryptoSymmetricCipherException("CTR:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 #endif
+
 	m_blockCipher->Initialize(true, KeyParam);
 	m_ctrVector = KeyParam.IV();
 	m_threadVectors.resize(m_processorCount);
@@ -43,12 +59,48 @@ void CTR::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 
 void CTR::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	ProcessBlock(Input, 0, Output, 0, m_isParallel ? m_parallelBlockSize : m_blockSize);
+	EncryptSegment(Input, 0, Output, 0, m_isParallel ? m_parallelBlockSize : m_blockSize);
 }
 
 void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	ProcessBlock(Input, InOffset, Output, OutOffset, m_isParallel ? m_parallelBlockSize : m_blockSize);
+	EncryptSegment(Input, InOffset, Output, OutOffset, m_isParallel ? m_parallelBlockSize : m_blockSize);
+}
+
+void CTR::Decrypt64(const std::vector<byte>& Input, std::vector<byte>& Output)
+{
+#if defined(_DEBUG)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#elif defined(CPPEXCEPTIONS_ENABLED)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#endif
+}
+
+void CTR::Decrypt128(const std::vector<byte>& Input, const size_t InOffset, std::vector<byte>& Output, const size_t OutOffset)
+{
+#if defined(_DEBUG)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#elif defined(CPPEXCEPTIONS_ENABLED)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#endif
+}
+
+void CTR::Encrypt64(const std::vector<byte>& Input, std::vector<byte>& Output)
+{
+#if defined(_DEBUG)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#elif defined(CPPEXCEPTIONS_ENABLED)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#endif
+}
+
+void CTR::Encrypt128(const std::vector<byte>& Input, const size_t InOffset, std::vector<byte>& Output, const size_t OutOffset)
+{
+#if defined(_DEBUG)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#elif defined(CPPEXCEPTIONS_ENABLED)
+	throw CryptoSymmetricCipherException("Transform", "Not implemented yet!");
+#endif
 }
 
 void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
@@ -63,7 +115,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		size_t paln = Length - (Length % BLK8);
 		std::vector<byte> ctrBlk(BLK8);
 
-		// process 8 blocks (uses avx if available)
+		// stagger counters and process 8 blocks with avx
 		while (ctr != paln)
 		{
 			memcpy(&ctrBlk[0], &Counter[0], Counter.size());
@@ -91,7 +143,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		size_t paln = Length - (Length % BLK4);
 		std::vector<byte> ctrBlk(BLK4);
 
-		// process 4 blocks (uses sse intrinsics if available)
+		// 4 blocks with sse
 		while (ctr != paln)
 		{
 			memcpy(&ctrBlk[0], &Counter[0], Counter.size());
@@ -124,7 +176,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	}
 }
 
-void CTR::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+void CTR::EncryptSegment(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	const size_t outSize = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
 
@@ -133,17 +185,16 @@ void CTR::ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	{
 		// generate random
 		Generate(Output, OutOffset, outSize, m_ctrVector);
-
 		// process block aligned
-		size_t sze = outSize - (outSize % m_blockCipher->BlockSize());
+		size_t alnSze = outSize - (outSize % m_blockCipher->BlockSize());
 
-		if (sze != 0)
-			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, sze);
+		if (alnSze != 0)
+			CEX::Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, alnSze, Engine()->HasIntrinsics());
 
 		// get the remaining bytes
-		if (sze != outSize)
+		if (alnSze != outSize)
 		{
-			for (size_t i = sze; i < outSize; ++i)
+			for (size_t i = alnSze; i < outSize; ++i)
 				Output[i + OutOffset] ^= Input[i + InOffset];
 		}
 	}
@@ -205,7 +256,7 @@ void CTR::Increase(const std::vector<byte> &Input, const size_t Length, std::vec
 	}
 }
 
-void CTR::SetScope()
+void CTR::ProcessingScope()
 {
 	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
 	if (m_processorCount % 2 != 0)
@@ -213,10 +264,17 @@ void CTR::SetScope()
 	if (m_processorCount > 1)
 		m_isParallel = true;
 
-	m_parallelBlockSize = m_processorCount * PARALLEL_DEFBLOCK;
-
 	if (m_isParallel)
 	{
+		m_parallelMinimumSize = m_processorCount * m_blockCipher->BlockSize();
+
+		if (m_blockCipher->HasAVX())
+			m_parallelMinimumSize *= 8;
+		else if (m_blockCipher->HasIntrinsics())
+			m_parallelMinimumSize *= 4;
+
+		m_parallelBlockSize = PARALLEL_DEFBLOCK - (PARALLEL_DEFBLOCK % m_parallelMinimumSize);
+
 		if (m_threadVectors.size() != m_processorCount)
 			m_threadVectors.resize(m_processorCount);
 		for (size_t i = 0; i < m_processorCount; ++i)

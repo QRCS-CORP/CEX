@@ -43,8 +43,8 @@ NAMESPACE_MODE
 /// ECB cipher(new RDX());
 /// // initialize for encryption
 /// cipher.Initialize(true, KeyParams(Key));
-/// // encrypt a block
-/// cipher.Transform(Input, Output);
+/// // encrypt one block
+/// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
@@ -75,6 +75,7 @@ private:
 	bool m_isParallel;
 	size_t m_parallelBlockSize;
 	size_t m_processorCount;
+	ECB() {}
 
 public:
 
@@ -151,7 +152,7 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	///
-	/// <param name="Cipher">Underlying encryption algorithm</param>
+	/// <param name="Cipher">Uninitialized cipher engine instance; can not be null</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher or valid block size is used</exception>
 	explicit ECB(IBlockCipher* Cipher)
@@ -171,7 +172,7 @@ public:
 			throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!");
 #endif
 
-		SetScope();
+		ProcessingScope();
 	}
 
 	/// <summary>
@@ -259,7 +260,11 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	void SetScope();
+	void Decrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ProcessingScope();
 };
 
 NAMESPACE_MODEEND

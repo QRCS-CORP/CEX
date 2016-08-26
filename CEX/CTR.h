@@ -43,8 +43,8 @@ NAMESPACE_MODE
 /// CTR cipher(new RDX());
 /// // initialize for encryption
 /// cipher.Initialize(true, KeyParams(Key, IV));
-/// // encrypt a block
-/// cipher.Transform(Input, Output);
+/// // encrypt one block
+/// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
@@ -81,8 +81,10 @@ private:
 	bool m_isInitialized;
 	bool m_isParallel;
 	size_t m_parallelBlockSize;
+	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 	std::vector<std::vector<byte>> m_threadVectors;
+	CTR() {}
 
 public:
 
@@ -159,7 +161,7 @@ public:
 	/// Initialize the Cipher
 	/// </summary>
 	///
-	/// <param name="Cipher">Underlying encryption algorithm</param>
+	/// <param name="Cipher">Uninitialized cipher engine instance; can not be null</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Cipher is used</exception>
 	explicit CTR(IBlockCipher* Cipher)
@@ -178,7 +180,7 @@ public:
 			throw CryptoCipherModeException("CTR:CTor", "The Cipher can not be null!");
 #endif
 
-		SetScope();
+		ProcessingScope();
 	}
 
 	/// <summary>
@@ -234,11 +236,15 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
+	void Decrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void EncryptSegment(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
 	static void Increase(const std::vector<byte> &Input, const size_t Size, std::vector<byte> &Output);
 	static void Increment(std::vector<byte> &Counter);
-	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-	void SetScope();
+	void ProcessingScope();
 };
 
 NAMESPACE_MODEEND

@@ -96,9 +96,81 @@ void CTRDrbg::Update(const std::vector<byte> &Salt)
 
 // *** Private *** //
 
-void CTRDrbg::Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset)
+void CTRDrbg::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
 {
-	size_t aln = Length - (Length % m_blockSize);
+	size_t ctr = 0;
+	const size_t BALN = Length - (Length % m_blockSize);
+	const size_t BLK4 = 4 * m_blockSize;
+
+	if (m_blockCipher->HasAVX() && Length >= 2 * BLK4)
+	{
+		const size_t BLK8 = 8 * m_blockSize;
+		size_t paln = Length - (Length % BLK8);
+		std::vector<byte> ctrBlk(BLK8);
+
+		// stagger counters and process 8 blocks with avx
+		while (ctr != paln)
+		{
+			memcpy(&ctrBlk[0], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[16], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[32], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[48], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[64], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[80], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[96], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[112], &Counter[0], Counter.size());
+			Increment(Counter);
+			m_blockCipher->Transform128(ctrBlk, 0, Output, OutOffset + ctr);
+			ctr += BLK8;
+		}
+	}
+	else if (m_blockCipher->HasIntrinsics() && Length >= BLK4)
+	{
+		size_t paln = Length - (Length % BLK4);
+		std::vector<byte> ctrBlk(BLK4);
+
+		// 4 blocks with sse
+		while (ctr != paln)
+		{
+			memcpy(&ctrBlk[0], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[16], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[32], &Counter[0], Counter.size());
+			Increment(Counter);
+			memcpy(&ctrBlk[48], &Counter[0], Counter.size());
+			Increment(Counter);
+			m_blockCipher->Transform64(ctrBlk, 0, Output, OutOffset + ctr);
+			ctr += BLK4;
+		}
+	}
+
+	while (ctr != BALN)
+	{
+		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + ctr);
+		Increment(Counter);
+		ctr += m_blockSize;
+	}
+
+	if (ctr != Length)
+	{
+		std::vector<byte> outputBlock(m_blockSize, 0);
+		m_blockCipher->EncryptBlock(Counter, outputBlock);
+		size_t fnlSize = Length % m_blockSize;
+		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
+		Increment(Counter);
+	}
+
+	// ToDo: check this!
+
+	/*size_t aln = Length - (Length % m_blockSize);
 	size_t ctr = 0;
 
 	while (ctr != aln)
@@ -115,7 +187,7 @@ void CTRDrbg::Generate(const size_t Length, std::vector<byte> &Counter, std::vec
 		size_t fnlSize = Length % m_blockSize;
 		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
-	}
+	}*/
 }
 
 void CTRDrbg::Increment(std::vector<byte> &Counter)
@@ -176,7 +248,7 @@ void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 	if (!m_isParallel || outSize < m_parallelBlockSize)
 	{
 		// generate random
-		Generate(outSize, m_ctrVector, Output, OutOffset);
+		Generate(Output, OutOffset, outSize, m_ctrVector);
 	}
 	else
 	{
@@ -193,14 +265,14 @@ void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 			// offset counter by chunk size / block size
 			this->Increase(m_ctrVector, subSize * i, iv);
 			// create random at offset position
-			this->Generate(cnkSize, iv, Output, OutOffset + (i * cnkSize));
+			this->Generate(Output, OutOffset + (i * cnkSize), cnkSize, iv);
 		});
 
 		// last block processing
 		if (rndSize < outSize)
 		{
 			size_t fnlSize = outSize % rndSize;
-			Generate(fnlSize, m_threadVectors[m_processorCount - 1], Output, OutOffset + rndSize);
+			Generate(Output, OutOffset + rndSize, fnlSize, m_threadVectors[m_processorCount - 1]);
 		}
 
 		// copy the last counter position to class variable

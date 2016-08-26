@@ -261,7 +261,7 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
-	void Generate(const size_t Length, std::vector<byte> &Counter, std::vector<byte> &Output, const size_t OutOffset);
+	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
 	void Increment(std::vector<byte> &Counter);
 	void Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer);
 	bool IsValidKeySize(const size_t KeySize = 0);
