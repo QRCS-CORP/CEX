@@ -206,11 +206,11 @@ void CFB::Detect()
 
 void CFB::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t SEGSZE = m_parallelBlockSize / m_processorCount;
+	const size_t SEGSZE = m_parallelBlockSize / m_parallelMaxDegree;
 	const size_t BLKCNT = (SEGSZE / m_blockSize);
 	std::vector<byte> tmpIv(m_blockSize);
 
-	ParallelUtils::ParallelFor(0, m_processorCount, [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
+	ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
 	{
 		std::vector<byte> thdIv(m_blockSize);
 
@@ -221,7 +221,7 @@ void CFB::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset,
 
 		this->DecryptSegment(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, thdIv, BLKCNT);
 
-		if (i == m_processorCount - 1)
+		if (i == m_parallelMaxDegree - 1)
 			memcpy(&tmpIv[0], &thdIv[0], m_blockSize);
 	});
 
