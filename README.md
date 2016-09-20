@@ -26,7 +26,7 @@ AES-NI added (512 key and HKDF key expansion capable).
 
 
 ##Links
-#####.NET version Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
+#####CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 #####API Help: http://www.vtdev.com/CEX-Plus/Help/index.html
 #####Homepage: http://www.vtdev.com/cexhome.html
 
