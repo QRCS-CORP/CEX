@@ -15,7 +15,7 @@ Added little endian counter mode ICM, updated and rewrote all block cipher modes
 Added Wide Block Vectorization (WBV) to CBC and ECB modes, (see header files for description). 
 CBC decrypt parallelized and pipelined, CFB decrypt parallelized.
 Updates to Salsa and ChaCha, updates to documentation, and some reorganization of code base.
-Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, all regularly clock over 9GB per second on my modest HP desktop). This release is stable; (aside from bug fixes or enhancements, existing cipher modes should be constant).
+Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, all regularly clock over 9GB per second on my modest HP desktop). The block/stream cipher portion of this release is stable; (aside from bug fixes or enhancements, existing cipher modes should be constant, but new modes will soon be added).
 
 ###v1.1h:
 Rijndael, Serpent and Twofish implementations now working with 128 and 256 bit intrinsics in multi-threaded CTR mode.
