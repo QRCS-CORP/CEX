@@ -34,6 +34,8 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Cipher::Symmetric::Block::IBlockCipher;
+
 /// <summary>
 /// CTRDrbg: An implementation of a Encryption Counter based Deterministic Random Byte Generator
 /// </summary> 
@@ -77,26 +79,30 @@ private:
 	static constexpr size_t MAXALLOC_MB100 = 100000000;
 	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
-	CEX::Cipher::Symmetric::Block::IBlockCipher* m_blockCipher;
+	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
 	std::vector<byte> m_ctrVector;
+	bool m_hasAVX;
+	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	size_t m_keySize;
 	bool m_isParallel;
 	size_t m_parallelBlockSize;
+	size_t m_parallelMinimumSize;
+	size_t m_parallelMaxDegree;
 	size_t m_processorCount;
-	std::vector<std::vector<byte>> m_threadVectors;
+	std::vector<std::vector<byte>> m_thdVectors;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::CTRDrbg; }
+	virtual const Generators Enumeral() { return Generators::CTRDrbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -137,14 +143,14 @@ public:
 	/// <summary>
 	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
 	/// </summary>
-	const size_t ParallelMinimumSize() { return m_processorCount * m_blockSize; }
+	const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
 	const size_t ProcessorCount() { return m_processorCount; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Creates a HKDF Bytes Generator using the given HMAC function
@@ -154,20 +160,24 @@ public:
 	/// <param name="KeySize">The internal ciphers key size; calculated automatically if this value is zero</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null cipher is used</exception>
-	CTRDrbg(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher, const size_t KeySize = 0)
+	CTRDrbg(IBlockCipher* Cipher, const size_t KeySize = 0)
 		:
 		m_blockCipher(Cipher),
 		m_blockSize(Cipher->BlockSize()),
 		m_ctrVector(Cipher->BlockSize()),
+		m_hasAVX(false),
+		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isEncryption(false),
 		m_isInitialized(false),
 		m_isParallel(false),
 		m_parallelBlockSize(PARALLEL_DEFBLOCK),
+		m_parallelMinimumSize(0),
+		m_parallelMaxDegree(0),
 		m_processorCount(0)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		if (m_blockCipher == 0)
+		if (Cipher == 0)
 			throw CryptoGeneratorException("CTRDrbg:CTor", "The Cipher can not be null!");
 #endif
 
@@ -185,7 +195,7 @@ public:
 			m_keySize = KeySize;
 		}
 
-		SetScope();
+		Scope();
 	}
 
 	/// <summary>
@@ -196,7 +206,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -252,6 +262,17 @@ public:
 	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce);
 
 	/// <summary>
+	/// Set the maximum number of threads allocated when using multi-threaded processing.
+	/// <para>When set to zero, thread count is set automatically. If set to 1, runs in sequential mode. 
+	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	void ParallelMaxDegree(size_t Degree);
+
+	/// <summary>
 	/// Update the Salt material
 	/// </summary>
 	/// 
@@ -261,11 +282,12 @@ public:
 	virtual void Update(const std::vector<byte> &Salt);
 
 private:
+	void Detect();
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
 	void Increment(std::vector<byte> &Counter);
 	void Increase(const std::vector<byte> &Counter, const size_t Size, std::vector<byte> &Buffer);
 	bool IsValidKeySize(const size_t KeySize = 0);
-	void SetScope();
+	void Scope();
 	void Transform(std::vector<byte> &Output, size_t OutOffset);
 };
 

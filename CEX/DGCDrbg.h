@@ -35,6 +35,8 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Digest::IDigest;
+
 /// <summary>
 /// DGTDRBG: An implementation of a Digest Counter based Deterministic Random Byte Generator
 /// </summary> 
@@ -84,19 +86,19 @@ private:
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	size_t m_keySize;
-	CEX::Digest::IDigest* m_msgDigest;
+	IDigest* m_msgDigest;
 	std::mutex m_mtxLock;
 	long m_seedCtr;
 	long m_stateCtr;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::DGCDrbg; }
+	virtual const Generators Enumeral() { return Generators::DGCDrbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -114,7 +116,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "DGCDrbg"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class
@@ -123,7 +125,7 @@ public:
 	/// <param name="Digest">Hash function</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit DGCDrbg(CEX::Digest::IDigest* Digest)
+	explicit DGCDrbg(IDigest* Digest)
 		:
 		m_dgtSeed(Digest->DigestSize()),
 		m_dgtState(Digest->DigestSize()),
@@ -148,7 +150,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -192,7 +194,6 @@ public:
 	/// 
 	/// <param name="Salt">The Salt value</param>
 	/// <param name="Ikm">The Key value</param>
-	/// <param name="Nonce">The Nonce value</param>
 	virtual void Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm);
 
 	/// <summary>

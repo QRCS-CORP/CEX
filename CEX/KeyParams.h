@@ -9,7 +9,7 @@
 NAMESPACE_COMMON
 
 /// <summary>
-/// KeyParams: A Symmetric Cipher Key and Vector Container class.
+/// KeyParams: A Symmetric Cipher Key, Vector, and IKM Container class
 /// </summary>
 class KeyParams
 {

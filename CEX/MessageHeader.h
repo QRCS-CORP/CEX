@@ -4,12 +4,18 @@
 #include "Common.h"
 #include <algorithm>
 #include "CryptoProcessingException.h"
-#include "CSPPrng.h"
 #include "IntUtils.h"
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
 NAMESPACE_PRCSTRUCT
+
+using CEX::Exception::CryptoProcessingException;
+using CEX::Utility::IntUtils;
+using CEX::IO::MemoryStream;
+using CEX::IO::SeekOrigin;
+using CEX::IO::StreamReader;
+using CEX::IO::StreamWriter;
 
 /// <summary>
 /// An encrypted message file header structure. 
@@ -80,7 +86,7 @@ public:
 	/// <param name="MacLength">Length in bytes of the Message Authentication Code; must align to MacLength property in <see cref="VTDev.Libraries.CEXEngine.Crypto.Processing.Structure.PackageKey"/></param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if the DataStream is too small</exception>
-	MessageHeader(CEX::IO::MemoryStream &HeaderStream, uint MacLength = 0)
+	MessageHeader(MemoryStream &HeaderStream, uint MacLength = 0)
 		:
 		m_keyID(0),
 		m_extKey(0),
@@ -88,9 +94,9 @@ public:
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (HeaderStream.Length() < SIZE_BASEHEADER)
-			throw CEX::Exception::CryptoProcessingException("MessageHeader:CTor", "MessageHeader stream is too small!");
+			throw CryptoProcessingException("MessageHeader:CTor", "MessageHeader stream is too small!");
 #endif
-		CEX::IO::StreamReader reader(HeaderStream);
+		StreamReader reader(HeaderStream);
 		m_keyID = reader.ReadBytes(KEYID_SIZE);
 		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		if (MacLength > 0)
@@ -104,8 +110,8 @@ public:
 	/// <param name="HeaderArray">The byte array containing the MessageHeader</param>
 	explicit MessageHeader(std::vector<byte> &HeaderArray)
 	{
-		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(HeaderArray);
-		CEX::IO::StreamReader reader(ms);
+		MemoryStream ms = MemoryStream(HeaderArray);
+		StreamReader reader(ms);
 		m_keyID = reader.ReadBytes(KEYID_SIZE);
 		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
 		size_t len = (reader.Length() - reader.Position());
@@ -119,11 +125,11 @@ public:
 	void Reset()
 	{
 		if (m_keyID.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(m_keyID);
+			IntUtils::ClearVector(m_keyID);
 		if (m_extKey.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(m_extKey);
+			IntUtils::ClearVector(m_extKey);
 		if (m_msgMac.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(m_msgMac);
+			IntUtils::ClearVector(m_msgMac);
 	}
 
 	/// <summary>
@@ -133,7 +139,7 @@ public:
 	/// <returns>The byte array containing the MessageHeader</returns>
 	std::vector<byte> ToBytes()
 	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
+		StreamWriter writer(GetHeaderSize());
 		writer.Write(m_keyID);
 		writer.Write(m_extKey);
 		if (m_msgMac.size() > 0)
@@ -147,9 +153,9 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The MemoryStream containing the MessageHeader</returns>
-	CEX::IO::MemoryStream* ToStream()
+	MemoryStream* ToStream()
 	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
+		StreamWriter writer(GetHeaderSize());
 		writer.Write(m_keyID);
 		writer.Write(m_extKey);
 		if (m_msgMac.size() > 0)
@@ -197,9 +203,9 @@ public:
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (Extension.size() > EXTKEY_SIZE)
-			throw CEX::Exception::CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the extension string is too long!");
+			throw CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the extension string is too long!");
 		if (Key.size() != EXTKEY_SIZE)
-			throw CEX::Exception::CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the key is the wrong size!");
+			throw CryptoProcessingException("MessageHeader:GetEncryptedExtension", "the key is the wrong size!");
 #endif
 
 		std::vector<byte> data(EXTKEY_SIZE);
@@ -219,10 +225,10 @@ public:
 	/// <param name="MessageStream">Stream containing a message header</param>
 	/// 
 	/// <returns>The 16 byte extension key field</returns>
-	static std::vector<byte> GetExtensionKey(CEX::IO::MemoryStream &MessageStream)
+	static std::vector<byte> GetExtensionKey(MemoryStream &MessageStream)
 	{
-		MessageStream.Seek(SEEKTO_EXT, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(MessageStream).ReadBytes(EXTKEY_SIZE);
+		MessageStream.Seek(SEEKTO_EXT, SeekOrigin::Begin);
+		return StreamReader(MessageStream).ReadBytes(EXTKEY_SIZE);
 	}
 
 	/// <summary>
@@ -232,10 +238,10 @@ public:
 	/// <param name="MessageStream">Stream containing a message header</param>
 	/// 
 	/// <returns>The unique 16 byte ID of the key used to encrypt this message</returns>
-	static std::vector<byte> GetKeyId(CEX::IO::MemoryStream &MessageStream)
+	static std::vector<byte> GetKeyId(MemoryStream &MessageStream)
 	{
-		MessageStream.Seek(SEEKTO_ID, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(MessageStream).ReadBytes(KEYID_SIZE);
+		MessageStream.Seek(SEEKTO_ID, SeekOrigin::Begin);
+		return StreamReader(MessageStream).ReadBytes(KEYID_SIZE);
 	}
 
 	/// <summary>
@@ -246,10 +252,10 @@ public:
 	/// <param name="MacKeySize">Size of the Message Authentication Code key</param>
 	/// 
 	/// <returns>64 byte Hash value</returns>
-	static std::vector<byte> GetMessageMac(CEX::IO::MemoryStream &MessageStream, int MacKeySize)
+	static std::vector<byte> GetMessageMac(MemoryStream &MessageStream, int MacKeySize)
 	{
-		MessageStream.Seek(SEEKTO_HASH, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(MessageStream).ReadBytes(MacKeySize);
+		MessageStream.Seek(SEEKTO_HASH, SeekOrigin::Begin);
+		return StreamReader(MessageStream).ReadBytes(MacKeySize);
 	}
 
 	/// <summary>
@@ -259,7 +265,7 @@ public:
 	/// <param name="MessageStream">Stream containing a message header</param>
 	/// 
 	/// <returns>Valid</returns>
-	static bool HasHeader(CEX::IO::MemoryStream &MessageStream)
+	static bool HasHeader(MemoryStream &MessageStream)
 	{
 		// not a guarantee of valid header
 		return MessageStream.Length() >= GetHeaderSize();
@@ -271,9 +277,9 @@ public:
 	/// 
 	/// <param name="MessageStream">The message stream</param>
 	/// <param name="Extension">The message file extension</param>
-	static void SetExtensionKey(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &Extension)
+	static void SetExtensionKey(MemoryStream &MessageStream, std::vector<byte> &Extension)
 	{
-		MessageStream.Seek(SEEKTO_EXT, CEX::IO::SeekOrigin::Begin);
+		MessageStream.Seek(SEEKTO_EXT, SeekOrigin::Begin);
 		MessageStream.Write(Extension, 0, EXTKEY_SIZE);
 	}
 
@@ -283,9 +289,9 @@ public:
 	/// 
 	/// <param name="MessageStream">The message stream</param>
 	/// <param name="KeyID">The unique 16 byte ID of the key used to encrypt this message</param>
-	static void SetKeyId(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &KeyID)
+	static void SetKeyId(MemoryStream &MessageStream, std::vector<byte> &KeyID)
 	{
-		MessageStream.Seek(SEEKTO_ID, CEX::IO::SeekOrigin::Begin);
+		MessageStream.Seek(SEEKTO_ID, SeekOrigin::Begin);
 		MessageStream.Write(KeyID, 0, KEYID_SIZE);
 	}
 
@@ -295,9 +301,9 @@ public:
 	/// 
 	/// <param name="MessageStream">The message stream</param>
 	/// <param name="Mac">The Message Authentication Code</param>
-	static void SetMessageMac(CEX::IO::MemoryStream &MessageStream, std::vector<byte> &Mac)
+	static void SetMessageMac(MemoryStream &MessageStream, std::vector<byte> &Mac)
 	{
-		MessageStream.Seek(SEEKTO_HASH, CEX::IO::SeekOrigin::Begin);
+		MessageStream.Seek(SEEKTO_HASH, SeekOrigin::Begin);
 		MessageStream.Write(Mac, 0, Mac.size());
 	}
 

@@ -1,12 +1,17 @@
-#include "Common.h"
 #include "CipherStream.h"
 #include "BlockCipherFromName.h"
 #include "CipherModeFromName.h"
-#include "StreamCipherFromName.h"
 #include "PaddingFromName.h"
 #include "ParallelUtils.h"
+#include "StreamCipherFromName.h"
 
 NAMESPACE_PROCESSING
+
+using CEX::Helper::BlockCipherFromName;
+using CEX::Helper::CipherModeFromName;
+using CEX::Helper::PaddingFromName;
+using CEX::Utility::ParallelUtils;
+using CEX::Helper::StreamCipherFromName;
 
 void CipherStream::Destroy()
 {
@@ -45,7 +50,7 @@ void CipherStream::Destroy()
 			catch (...) 
 			{
 #if defined(CPPEXCEPTIONS_ENABLED)
-				throw CEX::Exception::CryptoProcessingException("CipherStream:Destroy", "The engines were not heap allocated!");
+				throw CryptoProcessingException("CipherStream:Destroy", "The engines were not heap allocated!");
 #endif
 			}
 		}
@@ -54,7 +59,7 @@ void CipherStream::Destroy()
 	}
 }
 
-void CipherStream::Initialize(bool Encryption, CEX::Common::KeyParams &KeyParam)
+void CipherStream::Initialize(bool Encryption, KeyParams &KeyParam)
 {
 	try
 	{
@@ -66,7 +71,7 @@ void CipherStream::Initialize(bool Encryption, CEX::Common::KeyParams &KeyParam)
 	catch (...)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!");
+		throw CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!");
 #endif
 	}
 
@@ -74,13 +79,13 @@ void CipherStream::Initialize(bool Encryption, CEX::Common::KeyParams &KeyParam)
 	m_isInitialized = true;
 }
 
-void CipherStream::Write(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
 	if (!m_isInitialized)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
+		throw CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
 	if (InStream->Length() - InStream->Position() < 1)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The Input stream is too short!");
+		throw CryptoProcessingException("CipherStream:Write", "The Input stream is too short!");
 #endif
 
 	// parallel min check and calc block size
@@ -143,11 +148,11 @@ void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::v
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
 	if (!m_isInitialized)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
+		throw CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
 	if (Input.size() - InOffset < 1)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The Input array is too short!");
+		throw CryptoProcessingException("CipherStream:Write", "The Input array is too short!");
 	if (Input.size() - InOffset > Output.size() - OutOffset)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:Write", "The Output array is too short!");
+		throw CryptoProcessingException("CipherStream:Write", "The Output array is too short!");
 #endif
 
 	// parallel min check and calc block size
@@ -194,7 +199,7 @@ void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::v
 	}
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 void CipherStream::CalculateBlockSize(size_t Length)
 {
@@ -207,9 +212,7 @@ void CipherStream::CalculateBlockSize(size_t Length)
 
 	// parallel min check
 	if (Length < ParallelMinimumSize())
-	{
 		m_parallelBlockSize = cipherBlock;
-	}
 
 	if (m_parallelBlockProfile == BlockProfiles::ProgressProfile)
 	{
@@ -267,6 +270,15 @@ void CipherStream::CalculateBlockSize(size_t Length)
 		else
 			m_streamCipher->ParallelBlockSize() = m_parallelBlockSize;
 	}
+
+	// align
+	if (m_isParallel)
+	{
+		if (!m_isStreamCipher)
+			m_parallelBlockSize -= (m_parallelBlockSize % m_cipherEngine->ParallelMinimumSize());
+		else
+			m_parallelBlockSize -= (m_parallelBlockSize % m_streamCipher->ParallelMinimumSize());
+	}
 }
 
 void CipherStream::CalculateProgress(size_t Length, size_t Processed)
@@ -292,7 +304,7 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 	}
 }
 
-void CipherStream::BlockCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::BlockCTR(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_cipherEngine->BlockSize();
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -356,7 +368,7 @@ void CipherStream::BlockCTR(const std::vector<byte> &Input, size_t InOffset, std
 	CalculateProgress(inpSize, count);
 }
 
-void CipherStream::BlockDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::BlockDecrypt(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_cipherEngine->BlockSize();
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -422,7 +434,7 @@ void CipherStream::BlockDecrypt(const std::vector<byte> &Input, size_t InOffset,
 	CalculateProgress(inpSize, OutOffset);
 }
 
-void CipherStream::BlockEncrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::BlockEncrypt(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_cipherEngine->BlockSize();
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -490,73 +502,73 @@ void CipherStream::BlockEncrypt(const std::vector<byte> &Input, size_t InOffset,
 	CalculateProgress(inpSize, count);
 }
 
-CEX::Cipher::Symmetric::Block::IBlockCipher* CipherStream::GetBlockEngine(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine)
+IBlockCipher* CipherStream::GetBlockEngine(BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine)
 {
 	try
 	{
-		return CEX::Helper::BlockCipherFromName::GetInstance(EngineType, BlockSize, RoundCount, KdfEngine);
+		return BlockCipherFromName::GetInstance(EngineType, BlockSize, RoundCount, KdfEngine);
 	}
 	catch (...)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:GetBlockEngine", "The cipher could not be instantiated!");
+		throw CryptoProcessingException("CipherStream:GetBlockEngine", "The cipher could not be instantiated!");
 #else
 		return 0;
 #endif
 	}
 }
 
-CEX::Cipher::Symmetric::Block::Mode::ICipherMode* CipherStream::GetCipherMode(CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine)
+ICipherMode* CipherStream::GetCipherMode(CipherModes CipherType, BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine)
 {
-	CEX::Cipher::Symmetric::Block::IBlockCipher* engine = GetBlockEngine(EngineType, BlockSize, RoundCount, KdfEngine);
+	IBlockCipher* engine = GetBlockEngine(EngineType, BlockSize, RoundCount, KdfEngine);
 
 	try
 	{
-		return CEX::Helper::CipherModeFromName::GetInstance(CipherType, engine);
+		return CipherModeFromName::GetInstance(CipherType, engine);
 	}
 	catch (...)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:GetCipherMode", "The cipher mode could not be instantiated!");
+		throw CryptoProcessingException("CipherStream:GetCipherMode", "The cipher mode could not be instantiated!");
 #else
 		return 0;
 #endif
 	}
 }
 
-CEX::Cipher::Symmetric::Block::Padding::IPadding* CipherStream::GetPaddingMode(CEX::Enumeration::PaddingModes PaddingType)
+IPadding* CipherStream::GetPaddingMode(PaddingModes PaddingType)
 {
 	try
 	{
-		return CEX::Helper::PaddingFromName::GetInstance(PaddingType);
+		return PaddingFromName::GetInstance(PaddingType);
 	}
 	catch (...)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:GetPaddingMode", "The padding could not be instantiated!");
+		throw CryptoProcessingException("CipherStream:GetPaddingMode", "The padding could not be instantiated!");
 #else
 		return 0;
 #endif
 	}
 }
 
-CEX::Cipher::Symmetric::Stream::IStreamCipher* CipherStream::GetStreamEngine(CEX::Enumeration::StreamCiphers EngineType, int RoundCount)
+IStreamCipher* CipherStream::GetStreamEngine(StreamCiphers EngineType, int RoundCount)
 {
 	try
 	{
-		return CEX::Helper::StreamCipherFromName::GetInstance(EngineType, RoundCount);
+		return StreamCipherFromName::GetInstance(EngineType, RoundCount);
 	}
 	catch (...)
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("CipherStream:GetStreamEngine", "The cipher could not be instantiated!");
+		throw CryptoProcessingException("CipherStream:GetStreamEngine", "The cipher could not be instantiated!");
 #else
 		return 0;
 #endif
 	}
 }
 
-void CipherStream::ParallelCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::ParallelCTR(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_parallelBlockSize;
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -623,7 +635,7 @@ void CipherStream::ParallelCTR(const std::vector<byte> &Input, size_t InOffset, 
 	CalculateProgress(inpSize, count);
 }
 
-void CipherStream::ParallelDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::ParallelDecrypt(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_parallelBlockSize;
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -679,7 +691,7 @@ void CipherStream::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffs
 	CalculateProgress(inpSize, count);
 }
 
-void CipherStream::ParallelStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::ParallelStream(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_parallelBlockSize;
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -747,7 +759,7 @@ void CipherStream::ParallelStream(const std::vector<byte> &Input, size_t InOffse
 	CalculateProgress(inpSize, count);
 }
 
-void CipherStream::ProcessStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream)
+void CipherStream::ProcessStream(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t blkSize = m_streamCipher->BlockSize();
 	const size_t inpSize = (InStream->Length() - InStream->Position());
@@ -830,9 +842,9 @@ void CipherStream::ParametersCheck()
 	else
 	{
 		m_blockSize = m_cipherEngine->BlockSize();
-		m_isCounterMode = m_cipherEngine->Enumeral() == CEX::Enumeration::CipherModes::CTR;
+		m_isCounterMode = m_cipherEngine->Enumeral() == CipherModes::CTR;
 
-		if (m_cipherEngine->Enumeral() == CEX::Enumeration::CipherModes::CBC || m_cipherEngine->Enumeral() == CEX::Enumeration::CipherModes::CFB || m_isCounterMode)
+		if (m_cipherEngine->Enumeral() == CipherModes::CBC || m_cipherEngine->Enumeral() == CipherModes::CFB || m_isCounterMode)
 		{
 			m_isParallel = m_cipherEngine->IsParallel() && !(!m_isCounterMode && m_cipherEngine->IsEncryption());
 			m_parallelBlockSize = m_cipherEngine->ParallelBlockSize();
@@ -847,7 +859,7 @@ void CipherStream::ParametersCheck()
 
 void CipherStream::SetScope()
 {
-	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	m_processorCount = ParallelUtils::ProcessorCount();
 	if (m_processorCount % 2 != 0)
 		m_processorCount--;
 	if (m_processorCount > 1)

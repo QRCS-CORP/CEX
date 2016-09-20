@@ -123,14 +123,17 @@ private:
 	bool m_isEncryption;
 	bool m_isInitialized;
 	size_t m_ikmSize;
-	CEX::Enumeration::Digests m_kdfEngineType;
-	CEX::Digest::IDigest* m_kdfEngine;
+	Digests m_kdfEngineType;
+	IDigest* m_kdfEngine;
 	std::vector<size_t> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 
+	RHX(const RHX&) = delete;
+	RHX& operator=(const RHX&) = delete;
+
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes.
@@ -152,17 +155,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::RHX; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports AVX intrinsics
-	/// </summary>
-	virtual const bool HasAVX() { return false; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports SIMD intrinsics
-	/// </summary>
-	virtual const bool HasIntrinsics() { return false; }
+	virtual const BlockCiphers Enumeral() { return BlockCiphers::RHX; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -195,7 +188,7 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() { return m_dfnRounds; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class with a Digest instance (HKDF mode)
@@ -206,7 +199,7 @@ public:
 	/// <param name="BlockSize">Cipher input Block Size. Default is 16 bytes.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(CEX::Digest::IDigest *KdfEngine, size_t Rounds = ROUNDS22, size_t BlockSize = BLOCK16)
+	RHX(IDigest *KdfEngine, size_t Rounds = ROUNDS22, size_t BlockSize = BLOCK16)
 		:
 		m_blockSize(BlockSize),
 		m_destroyEngine(false),
@@ -218,10 +211,14 @@ public:
 		m_isEncryption(false),
 		m_isInitialized(false),
 		m_kdfEngine(KdfEngine),
-		m_kdfEngineType(CEX::Enumeration::Digests::SHA512),
+		m_kdfEngineType(Digests::SHA512),
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(15, 0)
 	{
+#if defined(DEBUGASSERT_ENABLED)
+		assert(KdfEngine != 0);
+		assert(Rounds >= MIN_ROUNDS || Rounds <= MAX_ROUNDS || Rounds % 2 == 0);
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid null parameter! The digest instance can not be null.");
@@ -258,11 +255,11 @@ public:
 	/// <param name="BlockSize">Cipher input <see cref="BlockSize"/>. The <see cref="LegalBlockSizes"/> property contains available sizes. Default is 16 bytes.</param>
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. 
 	/// Default is based on the key size; defining rounds requires HKDF extended mode.</param>
-	/// <param name="KdfEngineType">The Key Schedule HKDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> 
+	/// <param name="KdfEngineType">The Key Schedule HKDF digest engine; can be any one of the supported Digest types
 	/// implementations. The default engine is None, which invokes the standard key schedule mechanism.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	RHX(size_t BlockSize = BLOCK16, size_t Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::None)
+	RHX(size_t BlockSize = BLOCK16, size_t Rounds = ROUNDS22, Digests KdfEngineType = Digests::None)
 		:
 		m_blockSize(BlockSize),
 		m_destroyEngine(true),
@@ -278,6 +275,9 @@ public:
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(0, 0)
 	{
+#if defined(DEBUGASSERT_ENABLED)
+		assert(Rounds >= MIN_ROUNDS || Rounds <= MAX_ROUNDS || Rounds % 2 == 0);
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
 			throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
@@ -289,7 +289,7 @@ public:
 		m_legalKeySizes[2] = 32;
 		m_legalKeySizes[3] = 64;
 
-		if (KdfEngineType != CEX::Enumeration::Digests::None)
+		if (KdfEngineType != Digests::None)
 		{
 #if defined(CPPEXCEPTIONS_ENABLED)
 			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
@@ -326,7 +326,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
@@ -385,7 +385,7 @@ public:
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -403,10 +403,10 @@ public:
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
@@ -415,8 +415,10 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input UInt128 to Transform</param>
-	/// <param name="Output">UInt128 Output product of Transform</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">Output product of Transform</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
@@ -425,8 +427,10 @@ public:
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input array to Transform</param>
-	/// <param name="Output">Output array product of Transform</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">Output product of Transform</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
@@ -441,8 +445,8 @@ private:
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	void ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex);
 	void ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset);
-	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
-	int GetIkmSize(CEX::Enumeration::Digests DigestType);
+	IDigest* GetDigest(Digests DigestType);
+	uint GetIkmSize(Digests DigestType);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 	uint SubByte(uint Rot);

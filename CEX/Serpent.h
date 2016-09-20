@@ -86,7 +86,7 @@ void InverseTransform64(T &R0, T &R1, T &R2, T &R3)
 	R0.Rotr32(13);
 }
 
-// *** Serpent S-Boxes *** //
+//~~~Serpent S-Boxes~~~//
 template<typename T>
 static void Sb0(T &R0, T &R1, T &R2, T &R3)
 {

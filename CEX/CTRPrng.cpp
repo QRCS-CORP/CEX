@@ -5,6 +5,8 @@
 
 NAMESPACE_PRNG
 
+using CEX::Utility::IntUtils;
+
 /// <summary>
 /// Release all resources associated with the object
 /// </summary>
@@ -12,14 +14,14 @@ void CTRPrng::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		m_engineType = CEX::Enumeration::BlockCiphers::RHX;
-		m_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
+		m_engineType = BlockCiphers::RHX;
+		m_seedType = SeedGenerators::CSPRsg;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
 		m_keySize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_stateSeed);
-		CEX::Utility::IntUtils::ClearVector(m_byteBuffer);
+		IntUtils::ClearVector(m_stateSeed);
+		IntUtils::ClearVector(m_byteBuffer);
 
 		if (m_seedGenerator != 0)
 		{
@@ -109,7 +111,7 @@ void CTRPrng::GetBytes(std::vector<byte> &Output)
 /// <returns>Random UInt32</returns>
 uint CTRPrng::Next()
 {
-	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
+	return IntUtils::ToInt32(GetBytes(4));
 }
 
 /// <summary>
@@ -156,7 +158,7 @@ uint CTRPrng::Next(uint Minimum, uint Maximum)
 /// <returns>Random UInt64</returns>
 ulong CTRPrng::NextLong()
 {
-	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
+	return IntUtils::ToInt64(GetBytes(8));
 }
 
 /// <summary>
@@ -279,25 +281,25 @@ std::vector<byte> CTRPrng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-CEX::Cipher::Symmetric::Block::IBlockCipher* CTRPrng::GetCipher(CEX::Enumeration::BlockCiphers RngEngine)
+IBlockCipher* CTRPrng::GetCipher(BlockCiphers RngEngine)
 {
 	return CEX::Helper::BlockCipherFromName::GetInstance(RngEngine);
 }
 
-uint CTRPrng::GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine)
+uint CTRPrng::GetKeySize(BlockCiphers CipherEngine)
 {
 	switch (CipherEngine)
 	{
-	case CEX::Enumeration::BlockCiphers::RHX:
-	case CEX::Enumeration::BlockCiphers::SHX:
-	case CEX::Enumeration::BlockCiphers::THX:
+	case BlockCiphers::RHX:
+	case BlockCiphers::SHX:
+	case BlockCiphers::THX:
 		return 32;
 	default:
 		return 32;
 	}
 }
 
-CEX::Seed::ISeed* CTRPrng::GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine)
+ISeed* CTRPrng::GetSeedGenerator(SeedGenerators SeedEngine)
 {
 	switch (SeedEngine)
 	{

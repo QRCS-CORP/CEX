@@ -206,7 +206,6 @@
     <ClInclude Include="..\..\CEX\CMAC.h" />
     <ClInclude Include="..\..\CEX\Common.h" />
     <ClInclude Include="..\..\CEX\Config.h" />
-    <ClInclude Include="..\..\CEX\Cpu.h" />
     <ClInclude Include="..\..\CEX\CpuDetect.h" />
     <ClInclude Include="..\..\CEX\CryptoCipherModeException.h" />
     <ClInclude Include="..\..\CEX\CryptoDigestException.h" />
@@ -238,9 +237,12 @@
     <ClInclude Include="..\..\CEX\IBlockCipher.h" />
     <ClInclude Include="..\..\CEX\IByteStream.h" />
     <ClInclude Include="..\..\CEX\ICipherMode.h" />
+    <ClInclude Include="..\..\CEX\ICM.h" />
     <ClInclude Include="..\..\CEX\IDigest.h" />
     <ClInclude Include="..\..\CEX\IGenerator.h" />
     <ClInclude Include="..\..\CEX\IMac.h" />
+    <ClInclude Include="..\..\CEX\MacDescription.h" />
+    <ClInclude Include="..\..\CEX\MacStream.h" />
     <ClInclude Include="..\..\CEX\UInt128.h" />
     <ClInclude Include="..\..\CEX\Intrinsics.h" />
     <ClInclude Include="..\..\CEX\IntUtils.h" />
@@ -306,7 +308,6 @@
     <ClInclude Include="..\..\CEX\Threefish256.h" />
     <ClInclude Include="..\..\CEX\Threefish512.h" />
     <ClInclude Include="..\..\CEX\THX.h" />
-    <ClInclude Include="..\..\CEX\TPadding.h" />
     <ClInclude Include="..\..\CEX\Twofish.h" />
     <ClInclude Include="..\..\CEX\UInt256.h" />
     <ClInclude Include="..\..\CEX\VMAC.h" />
@@ -329,6 +330,7 @@
     <ClCompile Include="..\..\CEX\CipherModeFromName.cpp" />
     <ClCompile Include="..\..\CEX\CipherStream.cpp" />
     <ClCompile Include="..\..\CEX\CMAC.cpp" />
+    <ClCompile Include="..\..\CEX\CpuDetect.cpp" />
     <ClCompile Include="..\..\CEX\CSPPrng.cpp" />
     <ClCompile Include="..\..\CEX\CSPRsg.cpp" />
     <ClCompile Include="..\..\CEX\CTR.cpp" />
@@ -342,6 +344,7 @@
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
     <ClCompile Include="..\..\CEX\HKDF.cpp" />
     <ClCompile Include="..\..\CEX\HMAC.cpp" />
+    <ClCompile Include="..\..\CEX\ICM.cpp" />
     <ClCompile Include="..\..\CEX\IntUtils.cpp" />
     <ClCompile Include="..\..\CEX\ISCRsg.cpp" />
     <ClCompile Include="..\..\CEX\ISO7816.cpp" />

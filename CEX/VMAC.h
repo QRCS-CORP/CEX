@@ -87,7 +87,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
@@ -97,7 +97,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Macs Enumeral() { return CEX::Enumeration::Macs::VMAC; }
+	virtual const Macs Enumeral() { return Macs::VMAC; }
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
@@ -114,7 +114,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "VMAC"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the VMAC class
@@ -146,7 +146,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the buffer

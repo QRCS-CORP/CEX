@@ -49,6 +49,8 @@
 #define NAMESPACE_MACEND } } 
 //#define NAMESPACE_NETWORK namespace CEX { namespace Network {
 //#define NAMESPACE_NETWORKEND } } 
+#define NAMESPACE_NUMERIC namespace CEX { namespace Numeric {
+#define NAMESPACE_NUMERICEND } } 
 #define NAMESPACE_PRNG namespace CEX { namespace Prng {
 #define NAMESPACE_PRNGEND } } 
 #define NAMESPACE_PROCESSING namespace CEX { namespace Processing {
@@ -61,4 +63,5 @@
 #define NAMESPACE_SEEDEND } } 
 #define NAMESPACE_UTILITY namespace CEX { namespace Utility {
 #define NAMESPACE_UTILITYEND } } 
+
 #endif

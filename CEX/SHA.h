@@ -26,7 +26,7 @@
 
 #include "Common.h"
 
-// *** SHA Lookup Tables *** //
+//~~~SHA Lookup Tables~~~//
 
 constexpr uint K32[] =
 {

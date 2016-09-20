@@ -39,6 +39,9 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Mac::HMAC;
+using CEX::Digest::IDigest;
+
 /// <summary>
 /// HKDF: An implementation of an Hash based Key Derivation Function
 /// </summary> 
@@ -69,22 +72,22 @@ class HKDF : public IGenerator
 private:
 	std::vector<byte> m_currentT;
 	std::vector<byte> m_digestInfo;
-	CEX::Mac::HMAC *m_digestMac;
+	HMAC* m_digestMac;
 	size_t m_generatedBytes;
 	size_t m_hashSize;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	size_t m_keySize;
-	CEX::Digest::IDigest* m_msgDigest;
+	IDigest* m_msgDigest;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::HKDF; }
+	virtual const Generators Enumeral() { return Generators::HKDF; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -102,7 +105,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "HKDF"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize an HKDF Bytes Generator with a message digest
@@ -111,7 +114,7 @@ public:
 	/// <param name="Digest">The initialized message digest to be used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit HKDF(CEX::Digest::IDigest* Digest)
+	explicit HKDF(IDigest* Digest)
 		:
 		m_isDestroyed(false),
 		m_currentT(Digest->DigestSize(), 0),
@@ -126,7 +129,7 @@ public:
 			throw CryptoGeneratorException("HKDF:CTor", "The Digest can not be null!");
 #endif
 
-		 m_digestMac = new CEX::Mac::HMAC(m_msgDigest);
+		 m_digestMac = new HMAC(m_msgDigest);
 	}
 
 	/// <summary>
@@ -136,7 +139,7 @@ public:
 	/// <param name="Hmac">The initialized HMAC to be used</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null HMAC is used</exception>
-	explicit HKDF(CEX::Mac::HMAC* Hmac)
+	explicit HKDF(HMAC* Hmac)
 		:
 		m_currentT(Hmac->MacSize(), 0),
 		m_digestMac(Hmac),
@@ -161,7 +164,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

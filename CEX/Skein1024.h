@@ -95,7 +95,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
@@ -110,7 +110,7 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual CEX::Enumeration::Digests Enumeral() { return CEX::Enumeration::Digests::Skein1024; }
+	virtual Digests Enumeral() { return Digests::Skein1024; }
 
 	/// <summary>
 	/// Get: Digest name
@@ -157,7 +157,7 @@ public:
 		return m_ubiParameters;
 	}
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the digest
@@ -197,7 +197,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the buffer

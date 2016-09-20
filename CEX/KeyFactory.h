@@ -9,6 +9,19 @@
 
 NAMESPACE_PRCFACTORY
 
+using CEX::Enumeration::BlockSizes;
+using CEX::Common::CipherDescription;
+using CEX::Processing::Structure::CipherKey;
+using CEX::Enumeration::CipherModes;
+using CEX::Enumeration::Digests;
+using CEX::Enumeration::IVSizes;
+using CEX::Common::KeyParams;
+using CEX::IO::MemoryStream;
+using CEX::Enumeration::PaddingModes;
+using CEX::Enumeration::RoundCounts;
+using CEX::Enumeration::SeedGenerators;
+using CEX::Enumeration::SymmetricEngines;
+
 /// <summary>
 /// KeyFactory: Used to create or extract a CipherKey file.
 /// 
@@ -65,7 +78,7 @@ class KeyFactory
 {
 private:
 	bool m_isDestroyed;
-	CEX::IO::MemoryStream* m_keyStream;
+	MemoryStream* m_keyStream;
 
 	KeyFactory() {}
 
@@ -76,7 +89,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The fully qualified path to the key file to be read or created</param>
-	explicit KeyFactory(CEX::IO::MemoryStream* KeyStream)
+	explicit KeyFactory(MemoryStream* KeyStream)
 		:
 		m_isDestroyed(false),
 		m_keyStream(KeyStream)
@@ -101,7 +114,7 @@ public:
 	/// <param name="HashEngine">The Digest Engine used in the stage II phase of key generation.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a KeyParams member is null, but specified in the Header</exception>
-	void Create(CEX::Common::CipherDescription &Description, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, CEX::Enumeration::Digests HashEngine = CEX::Enumeration::Digests::SHA512);
+	void Create(CipherDescription &Description, SeedGenerators SeedEngine = SeedGenerators::CSPRsg, Digests HashEngine = Digests::SHA512);
 
 	/// <summary>
 	/// Create a single use key file using a KeyParams containing the key material, and a CipherDescription containing the cipher implementation details
@@ -111,7 +124,7 @@ public:
 	/// <param name="KeyParam">An initialized and populated key material container</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a KeyParams member is null, but specified in the Header or a Header parameter does not match a KeyParams value</exception>
-	void Create(CEX::Common::CipherDescription &Description, CEX::Common::KeyParams &KeyParam);
+	void Create(CipherDescription &Description, KeyParams &KeyParam);
 
 	/// <summary>
 	/// Create a single use Key file using a manual description of the cipher parameters.
@@ -128,9 +141,8 @@ public:
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX ciphers</param>
 	/// <param name="MacKeySize">The size of the HMAC key in bytes; a zeroed parameter means authentication is not enabled with this key</param>
 	/// <param name="MacEngine">The HMAC Digest engine used to authenticate a message file encrypted with this key</param>
-	void Create(CEX::Common::KeyParams &KeyParam, CEX::Enumeration::SymmetricEngines EngineType, int KeySize, CEX::Enumeration::IVSizes IvSize, 
-		CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::PaddingModes PaddingType, CEX::Enumeration::BlockSizes BlockSize, 
-		CEX::Enumeration::RoundCounts Rounds, CEX::Enumeration::Digests KdfEngine, int MacKeySize, CEX::Enumeration::Digests MacEngine);
+	void Create(KeyParams &KeyParam, SymmetricEngines EngineType, int KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, 
+		BlockSizes BlockSize, RoundCounts Rounds, Digests KdfEngine, int MacKeySize, Digests MacEngine);
 
 	/// <summary>
 	/// Extract a KeyParams and CipherKey
@@ -140,7 +152,7 @@ public:
 	/// <param name="KeyParam">The KeyParams container that receives the key material from the file</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the key file could not be found or a Header parameter does not match the keystream length</exception>
-	void Extract(CEX::Processing::Structure::CipherKey &KeyHeader, CEX::Common::KeyParams &KeyParam);
+	void Extract(CipherKey &KeyHeader, KeyParams &KeyParam);
 };
 
 NAMESPACE_PRCFACTORYEND

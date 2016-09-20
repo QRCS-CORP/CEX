@@ -37,6 +37,13 @@
 
 NAMESPACE_PROCESSING
 
+using CEX::Exception::CryptoProcessingException;
+using CEX::Event::Event;
+using CEX::Common::KeyParams;
+using CEX::IO::IByteStream;
+using CEX::Mac::IMac;
+using CEX::Common::MacDescription;
+
 /// <summary>
 /// MAC stream helper class.
 /// <para>Wraps Message Authentication Code (MAC) stream functions in an easy to use interface.</para>
@@ -74,9 +81,9 @@ private:
 
 	size_t m_blockSize;
 	bool m_destroyEngine;
-	CEX::IO::IByteStream* m_inStream;
+	IByteStream* m_inStream;
 	bool m_isDestroyed = false;
-	CEX::Mac::IMac* m_macEngine;
+	IMac* m_macEngine;
 	size_t m_progressInterval;
 
 	MacStream() { }
@@ -86,7 +93,7 @@ public:
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
-	CEX::Event::Event<int> ProgressPercent;
+	Event<int> ProgressPercent;
 
 	/// <summary>
 	/// Initialize the class with an 
@@ -96,7 +103,7 @@ public:
 	/// <param name="MacKey">A KeyParams containing the Mac key and Iv; note the Ikm parameter in KeyParams is not used</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if an uninitialized Mac is used</exception>
-	explicit MacStream(CEX::Common::MacDescription &Description, CEX::Common::KeyParams &MacKey)
+	explicit MacStream(MacDescription &Description, KeyParams &MacKey)
 		:
 		m_blockSize(0),
 		m_destroyEngine(false),
@@ -106,7 +113,7 @@ public:
 	{
 		CreateMac(Description);
 		if (m_macEngine == 0)
-			throw CEX::Exception::CryptoProcessingException("MacStream:CTor", "The Mac could not be created!");
+			throw CryptoProcessingException("MacStream:CTor", "The Mac could not be created!");
 
 		m_macEngine->Initialize(MacKey.Key(), MacKey.IV());
 		m_blockSize = m_macEngine->BlockSize();
@@ -119,7 +126,7 @@ public:
 	/// <param name="Mac">The initialized <see cref="CEX::Mac::IMac"/> instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
-	explicit MacStream(CEX::Mac::IMac* Mac)
+	explicit MacStream(IMac* Mac)
 		:
 		m_blockSize(Mac->BlockSize()),
 		m_destroyEngine(false),
@@ -129,9 +136,9 @@ public:
 		m_progressInterval(0)
 	{
 		if (Mac == 0)
-			throw CEX::Exception::CryptoProcessingException("MacStream:CTor", "The Mac can not be null!");
+			throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!");
 		if (!Mac->IsInitialized())
-			throw CEX::Exception::CryptoProcessingException("MacStream:CTor", "The Mac is not initialized!");
+			throw CryptoProcessingException("MacStream:CTor", "The Mac is not initialized!");
 	}
 
 	/// <summary>
@@ -149,7 +156,7 @@ public:
 	/// <returns>The Mac Code</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> ComputeMac(CEX::IO::IByteStream* InStream);
+	std::vector<byte> ComputeMac(IByteStream* InStream);
 
 	/// <summary>
 	/// Process a length within the Input stream using an Offset
@@ -168,7 +175,7 @@ private:
 	void CalculateProgress(size_t Length, bool Completed = false);
 	std::vector<byte> Compute(size_t Length);
 	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
-	void CreateMac(CEX::Common::MacDescription &Description);
+	void CreateMac(MacDescription &Description);
 	void Destroy();
 };
 

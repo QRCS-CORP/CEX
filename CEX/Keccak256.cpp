@@ -4,6 +4,8 @@
 
 NAMESPACE_DIGEST
 
+using CEX::Utility::IntUtils;
+
 void Keccak256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -53,8 +55,8 @@ void Keccak256::Destroy()
 		m_digestSize = 0;
 		m_blockSize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_buffer);
-		CEX::Utility::IntUtils::ClearVector(m_state);
+		IntUtils::ClearVector(m_buffer);
+		IntUtils::ClearVector(m_state);
 	}
 }
 
@@ -79,7 +81,7 @@ size_t Keccak256::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 	m_state[17] = ~m_state[17];
 
 	std::vector<byte> longBytes;
-	CEX::Utility::IntUtils::Word64sToBytes(m_state, longBytes);
+	IntUtils::Word64sToBytes(m_state, longBytes);
 	memcpy(&Output[OutOffset], &longBytes[0], m_digestSize);
 	Initialize();
 
@@ -97,7 +99,7 @@ void Keccak256::Update(byte Input)
 	BlockUpdate(one, 0, 1);
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 void Keccak256::Initialize()
 {

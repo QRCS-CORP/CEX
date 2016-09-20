@@ -18,7 +18,7 @@ NAMESPACE_PADDING
 class PKCS7 : public IPadding
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -30,19 +30,19 @@ public:
 	/// </summary>
 	virtual ~PKCS7() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::PKCS7; }
+	virtual const PaddingModes Enumeral() { return PaddingModes::PKCS7; }
 
 	/// <summary>
 	/// Get: Padding name
 	/// </summary>
 	virtual const char *Name() { return "PKCS7"; }
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Add padding to input array

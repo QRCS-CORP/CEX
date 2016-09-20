@@ -14,26 +14,26 @@ class BlockCipherFromName
 {
 public:
 	/// <summary>
-	/// Get a block cipher instance with default initialization parameters
+	/// Get a symmetric block cipher instance
 	/// </summary>
 	/// 
 	/// <param name="BlockCipherType">The block cipher enumeration name</param>
 	/// 
-	/// <returns>An initialized block cipher</returns>
+	/// <returns>A symmetric block cipher instance</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
 	static CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers BlockCipherType);
 
 	/// <summary>
-	/// Get a block cipher instance with specified initialization parameters
+	/// Get a symmetric block cipher instance with initialization parameters
 	/// </summary>
 	/// 
-	/// <param name="BlockCipherType">The block cipher enumeration name</param>
-	/// <param name="BlockSize">The cipher block size</param>
-	/// <param name="RoundCount">The number of cipher rounds</param>
-	/// <param name="KdfEngineType">The ciphers key expansion engine (HX ciphers)</param>
+	/// <param name="BlockCipherType">The symmetric block ciphers enumeration type name</param>
+	/// <param name="BlockSize">The symmetric ciphers internal block size; 16 bytes with Twofish and Serpent, or 16/32 for Rijndael</param>
+	/// <param name="RoundCount">The symmetric ciphers diffusion rounds count; requires KdfEngineType set to a supported digest type</param>
+	/// <param name="KdfEngineType">The symmetric ciphers HKDF key expansion digest engine type; set to None for standard key schedule, select a digest for secure key expansion mode</param>
 	/// 
-	/// <returns>An initialized block cipher</returns>
+	/// <returns>A symmetric block cipher instance</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
 	static CEX::Cipher::Symmetric::Block::IBlockCipher* GetInstance(CEX::Enumeration::BlockCiphers BlockCipherType, uint BlockSize, uint RoundCount, CEX::Enumeration::Digests KdfEngineType);

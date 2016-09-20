@@ -35,6 +35,9 @@
 
 NAMESPACE_MAC
 
+using CEX::Enumeration::Digests;
+using CEX::Digest::IDigest;
+
 /// <summary>
 /// An implementation of a Hash based Message Authentication Code
 /// </summary>
@@ -82,12 +85,12 @@ private:
 	size_t m_digestSize;
 	bool m_isInitialized;
 	std::vector<byte> m_inputPad;
-	CEX::Digest::IDigest* m_msgDigest;
+	IDigest* m_msgDigest;
 	std::vector<byte> m_outputPad;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
@@ -97,7 +100,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Macs Enumeral() { return CEX::Enumeration::Macs::HMAC; }
+	virtual const Macs Enumeral() { return Macs::HMAC; }
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
@@ -114,13 +117,13 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "HMAC"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 	/// <summary>
 	/// Initialize this class using the digest enumeration name
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The message digest enumeration name</param>
-	explicit HMAC(CEX::Enumeration::Digests DigestType)
+	explicit HMAC(Digests DigestType)
 		:
 		m_blockSize(0),
 		m_digestSize(0),
@@ -147,7 +150,7 @@ public:
 	/// <param name="Digest">Message Digest instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if a null digest is used</exception>
-	explicit HMAC(CEX::Digest::IDigest *Digest)
+	explicit HMAC(IDigest* Digest)
 		:
 		m_blockSize(Digest->BlockSize()),
 		m_digestSize(Digest->DigestSize()),
@@ -171,7 +174,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the digest
@@ -227,7 +230,7 @@ public:
 	virtual void Update(byte Input);
 
 private:
-	void CreateDigest(CEX::Enumeration::Digests DigestType);
+	void CreateDigest(Digests DigestType);
 
 	inline void XorPad(std::vector<byte> &A, byte N)
 	{

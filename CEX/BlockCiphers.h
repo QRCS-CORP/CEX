@@ -20,11 +20,11 @@ enum class BlockCiphers : uint
 	/// <summary>
 	/// The Serpent Block Cipher Extended with an HKDF Key Schedule
 	/// </summary>
-	SHX = 8,
+	SHX = 4,
 	/// <summary>
 	/// A Twofish Block Cipher Extended with an HKDF Key Schedule
 	/// </summary>
-	THX = 32
+	THX = 8
 };
 
 NAMESPACE_ENUMERATIONEND

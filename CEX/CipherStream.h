@@ -31,12 +31,30 @@
 #include "CryptoProcessingException.h"
 #include "CipherDescription.h"
 #include "Event.h"
+#include "IBlockCipher.h"
 #include "IByteStream.h"
 #include "ICipherMode.h"
 #include "IPadding.h"
 #include "IStreamCipher.h"
+#include "SymmetricEngines.h"
 
 NAMESPACE_PROCESSING
+
+using CEX::Enumeration::BlockCiphers;
+using CEX::Exception::CryptoProcessingException;
+using CEX::Common::CipherDescription;
+using CEX::Enumeration::CipherModes;
+using CEX::Enumeration::Digests;
+using CEX::Event::Event;
+using CEX::Cipher::Symmetric::Block::IBlockCipher;
+using CEX::IO::IByteStream;
+using CEX::Cipher::Symmetric::Block::Mode::ICipherMode;
+using CEX::Cipher::Symmetric::Block::Padding::IPadding;
+using CEX::Cipher::Symmetric::Stream::IStreamCipher;
+using CEX::Common::KeyParams;
+using CEX::Enumeration::PaddingModes;
+using CEX::Enumeration::StreamCiphers;
+using CEX::Enumeration::SymmetricEngines;
 
 /// <summary>
 /// CipherStream: used to wrap a streams cryptographic transformation.
@@ -99,10 +117,10 @@ private:
 	static constexpr size_t MAXALLOC_MB100 = 100000000;
 	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
 
-	CEX::Cipher::Symmetric::Block::IBlockCipher* m_blockCipher;
+	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
-	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* m_cipherEngine;
-	CEX::Cipher::Symmetric::Block::Padding::IPadding* m_cipherPadding;
+	ICipherMode* m_cipherEngine;
+	IPadding* m_cipherPadding;
 	bool m_destroyEngine;
 	bool m_isBufferedIO;
 	bool m_isCounterMode;
@@ -114,7 +132,7 @@ private:
 	size_t m_parallelBlockSize;
 	size_t m_processorCount;
 	BlockProfiles m_parallelBlockProfile;
-	CEX::Cipher::Symmetric::Stream::IStreamCipher* m_streamCipher;
+	IStreamCipher* m_streamCipher;
 
 	CipherStream() {}
 
@@ -122,9 +140,9 @@ public:
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
-	CEX::Event::Event<int> ProgressPercent;
+	Event<int> ProgressPercent;
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get/Set: Automatic processor parallelization
@@ -156,7 +174,7 @@ public:
 	/// </remarks>
 	const size_t ProcessorCount() { return m_processorCount; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class with a CipherDescription Structure; containing the cipher implementation details, and a KeyParams class containing the Key material.
@@ -172,7 +190,7 @@ public:
 	/// <param name="KdfEngine">The HX ciphers key schedule engine</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid CipherDescription or KeyParams is used</exception>
-	CipherStream(CEX::Enumeration::SymmetricEngines EngineType, int RoundCount = 22, CEX::Enumeration::CipherModes CipherType = CEX::Enumeration::CipherModes::CTR, CEX::Enumeration::PaddingModes PaddingType = CEX::Enumeration::PaddingModes::PKCS7, int BlockSize = 16, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
+	CipherStream(SymmetricEngines EngineType, int RoundCount = 22, CipherModes CipherType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::PKCS7, int BlockSize = 16, Digests KdfEngine = Digests::SHA512)
 		:
 		m_blockCipher(0),
 		m_destroyEngine(true),
@@ -184,16 +202,16 @@ public:
 	{
 		SetScope();
 
-		if (EngineType == CEX::Enumeration::SymmetricEngines::ChaCha || EngineType == CEX::Enumeration::SymmetricEngines::Salsa)
+		if (EngineType == SymmetricEngines::ChaCha || EngineType == SymmetricEngines::Salsa)
 		{
 			try
 			{
-				m_streamCipher = GetStreamEngine((CEX::Enumeration::StreamCiphers)EngineType, RoundCount);
+				m_streamCipher = GetStreamEngine((StreamCiphers)EngineType, RoundCount);
 			}
 			catch (...)
 			{
 #if defined(CPPEXCEPTIONS_ENABLED)
-				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
+				throw CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
 #endif
 			}
 
@@ -204,12 +222,12 @@ public:
 		{
 			try
 			{
-				m_cipherEngine = GetCipherMode(CipherType, (CEX::Enumeration::BlockCiphers)EngineType, BlockSize, RoundCount, KdfEngine);
+				m_cipherEngine = GetCipherMode(CipherType, (BlockCiphers)EngineType, BlockSize, RoundCount, KdfEngine);
 			}
 			catch (...)
 			{
 #if defined(CPPEXCEPTIONS_ENABLED)
-				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
+				throw CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check method parameters!");
 #endif
 			}
 
@@ -230,7 +248,7 @@ public:
 	/// <param name="Header">A CipherDescription containing the cipher description</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if an invalid CipherDescription is used</exception>
-	explicit CipherStream(CEX::Common::CipherDescription* Header)
+	explicit CipherStream(CipherDescription* Header)
 		:
 		m_blockCipher(0),
 		m_destroyEngine(true),
@@ -242,21 +260,21 @@ public:
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (Header == 0)
-			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
+			throw CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
 #endif
 
 		SetScope();
 
-		if (Header->EngineType() == CEX::Enumeration::SymmetricEngines::ChaCha || Header->EngineType() == CEX::Enumeration::SymmetricEngines::Salsa)
+		if (Header->EngineType() == SymmetricEngines::ChaCha || Header->EngineType() == SymmetricEngines::Salsa)
 		{
 			try
 			{
-				m_streamCipher = GetStreamEngine((CEX::Enumeration::StreamCiphers)Header->EngineType(), (int)Header->RoundCount());
+				m_streamCipher = GetStreamEngine((StreamCiphers)Header->EngineType(), (int)Header->RoundCount());
 			}
 			catch (...)
 			{
 #if defined(CPPEXCEPTIONS_ENABLED)
-				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
+				throw CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
 #endif
 			}
 
@@ -267,12 +285,12 @@ public:
 		{
 			try
 			{
-				m_cipherEngine = GetCipherMode(Header->CipherType(), (CEX::Enumeration::BlockCiphers)Header->EngineType(), (int)Header->BlockSize(), (int)Header->RoundCount(), Header->KdfEngine());
+				m_cipherEngine = GetCipherMode(Header->CipherType(), (BlockCiphers)Header->EngineType(), (int)Header->BlockSize(), (int)Header->RoundCount(), Header->KdfEngine());
 			}
 			catch (...)
 			{
 #if defined(CPPEXCEPTIONS_ENABLED)
-				throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
+				throw CryptoProcessingException("CipherStream:CTor", "The cipher could not be initialize, check description parameters!");
 #endif
 			}
 
@@ -294,7 +312,7 @@ public:
 	/// <param name="Padding">The Block Cipher Padding instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Cipher is used</exception>
-	CipherStream(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding = 0)
+	CipherStream(ICipherMode* Cipher, IPadding* Padding = 0)
 		:
 		m_blockCipher(0),
 		m_cipherEngine(Cipher),
@@ -308,7 +326,7 @@ public:
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (m_cipherEngine->IsInitialized())
-			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The cipher must be initialized through the local Initialize() method!");
+			throw CryptoProcessingException("CipherStream:CTor", "The cipher must be initialized through the local Initialize() method!");
 #endif
 		SetScope();
 		ParametersCheck();
@@ -316,8 +334,8 @@ public:
 		// default padding
 		if (Padding != 0)
 			m_cipherPadding = Padding;
-		else if (m_cipherEngine->Enumeral() != CEX::Enumeration::CipherModes::CTR)
-			m_cipherPadding = GetPaddingMode(CEX::Enumeration::PaddingModes::X923);
+		else if (m_cipherEngine->Enumeral() != CipherModes::CTR)
+			m_cipherPadding = GetPaddingMode(PaddingModes::X923);
 	}
 
 	/// <summary>
@@ -328,7 +346,7 @@ public:
 	/// <param name="Cipher">The uninitialized Stream Cipher instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Stream Cipher is used</exception>
-	explicit CipherStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher)
+	explicit CipherStream(IStreamCipher* Cipher)
 		:
 		m_blockCipher(0),
 		m_cipherPadding(0),
@@ -343,9 +361,9 @@ public:
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
-			throw CEX::Exception::CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!");
+			throw CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!");
 		if (Cipher->IsInitialized())
-			throw CEX::Exception::CryptoProcessingException("The cipher must be initialized through the local Initialize() method!");
+			throw CryptoProcessingException("The cipher must be initialized through the local Initialize() method!");
 #endif
 
 		SetScope();
@@ -360,7 +378,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -373,7 +391,7 @@ public:
 	/// 
 	/// <param name="Encryption">The cipher is used for encryption</param>
 	/// <param name="KeyParam">The KeyParams containing the cipher key and initialization vector</param>
-	void Initialize(bool Encryption, CEX::Common::KeyParams &KeyParam);
+	void Initialize(bool Encryption, KeyParams &KeyParam);
 
 	/// <summary>
 	/// Process using streams.
@@ -384,7 +402,7 @@ public:
 	/// <param name="OutStream">The Output Stream</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Write is called before Initialize(), or the Input stream is empty</exception>
-	void Write(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void Write(IByteStream* InStream, IByteStream* OutStream);
 
 	/// <summary>
 	/// Process using byte arrays.
@@ -401,25 +419,25 @@ public:
 
 private:
 
-	void BlockCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void BlockCTR(IByteStream* InStream, IByteStream* OutStream);
 	void BlockCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void BlockDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void BlockDecrypt(IByteStream* InStream, IByteStream* OutStream);
 	void BlockDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void BlockEncrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void BlockEncrypt(IByteStream* InStream, IByteStream* OutStream);
 	void BlockEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void CalculateBlockSize(size_t Length);
 	void CalculateProgress(size_t Length, size_t Processed);
-	CEX::Cipher::Symmetric::Block::IBlockCipher* GetBlockEngine(CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine);
-	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* GetCipherMode(CEX::Enumeration::CipherModes CipherType, CEX::Enumeration::BlockCiphers EngineType, int BlockSize, int RoundCount, CEX::Enumeration::Digests KdfEngine);
-	CEX::Cipher::Symmetric::Block::Padding::IPadding* GetPaddingMode(CEX::Enumeration::PaddingModes PaddingType);
-	CEX::Cipher::Symmetric::Stream::IStreamCipher* GetStreamEngine(CEX::Enumeration::StreamCiphers EngineType, int RoundCount);
-	void ParallelCTR(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	IBlockCipher* GetBlockEngine(BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine);
+	ICipherMode* GetCipherMode(CipherModes CipherType, BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine);
+	IPadding* GetPaddingMode(PaddingModes PaddingType);
+	IStreamCipher* GetStreamEngine(StreamCiphers EngineType, int RoundCount);
+	void ParallelCTR(IByteStream* InStream, IByteStream* OutStream);
 	void ParallelCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void ParallelDecrypt(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void ParallelDecrypt(IByteStream* InStream, IByteStream* OutStream);
 	void ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void ParallelStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void ParallelStream(IByteStream* InStream, IByteStream* OutStream);
 	void ParallelStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void ProcessStream(CEX::IO::IByteStream* InStream, CEX::IO::IByteStream* OutStream);
+	void ProcessStream(IByteStream* InStream, IByteStream* OutStream);
 	void ProcessStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	bool IsParallelMin(size_t Length);
 	void ParametersCheck();

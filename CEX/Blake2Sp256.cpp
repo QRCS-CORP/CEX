@@ -6,7 +6,10 @@
 
 NAMESPACE_DIGEST
 
-// *** Public Methods *** //
+using CEX::Utility::IntUtils;
+using CEX::Utility::ParallelUtils;
+
+//~~~Public Methods~~~//
 
 void Blake2Sp256::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length)
 {
@@ -32,7 +35,7 @@ void Blake2Sp256::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset
 			ttlLen -= m_msgBuffer.size();
 
 			// empty the message buffer
-			CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
+			ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
 			{
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE);
 				ProcessBlock(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.ParallelDegree() * BLOCK_SIZE), m_State[i], BLOCK_SIZE);
@@ -47,7 +50,7 @@ void Blake2Sp256::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset
 					prcLen -= (prcLen % m_minParallel);
 
 				// process large blocks
-				CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, prcLen](size_t i)
+				ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, prcLen](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_State[i], prcLen);
 				});
@@ -71,7 +74,7 @@ void Blake2Sp256::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset
 			m_msgLength = m_msgBuffer.size();
 
 			// process first half of buffer
-			CEX::Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
+			ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
 			{
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], BLOCK_SIZE);
 			});
@@ -125,9 +128,9 @@ void Blake2Sp256::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		CEX::Utility::IntUtils::ClearVector(m_cIV);
-		CEX::Utility::IntUtils::ClearVector(m_msgBuffer);
-		CEX::Utility::IntUtils::ClearVector(m_treeConfig);
+		IntUtils::ClearVector(m_cIV);
+		IntUtils::ClearVector(m_msgBuffer);
+		IntUtils::ClearVector(m_treeConfig);
 
 		for (size_t i = 0; i < m_State.size(); ++i)
 			m_State[i].Reset();
@@ -205,7 +208,7 @@ size_t Blake2Sp256::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 			ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_State[i], blkSze);
 			m_msgLength -= BLOCK_SIZE;
 
-			CEX::Utility::IntUtils::Le256ToBlock(m_State[i].H, hashCodes, i * DIGEST_SIZE);
+			IntUtils::Le256ToBlock(m_State[i].H, hashCodes, i * DIGEST_SIZE);
 		}
 
 		// set up the root node
@@ -229,7 +232,7 @@ size_t Blake2Sp256::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 		// last compression
 		ProcessBlock(m_msgBuffer, m_msgLength - BLOCK_SIZE, m_State[0], BLOCK_SIZE);
 		// output the code
-		CEX::Utility::IntUtils::Le256ToBlock(m_State[0].H, Output, 0);
+		IntUtils::Le256ToBlock(m_State[0].H, Output, 0);
 	}
 	else
 	{
@@ -239,7 +242,7 @@ size_t Blake2Sp256::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 
 		m_State[0].F[0] = UL_MAX;
 		ProcessBlock(m_msgBuffer, 0, m_State[0], m_msgLength);
-		CEX::Utility::IntUtils::Le256ToBlock(m_State[0].H, Output, 0);
+		IntUtils::Le256ToBlock(m_State[0].H, Output, 0);
 	}
 
 	Reset();
@@ -249,7 +252,7 @@ size_t Blake2Sp256::DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset
 
 size_t Blake2Sp256::Generate(CEX::Common::MacParams &MacKey, std::vector<uint8_t> &Output)
 {
-#if defined(_DEBUG)
+#if defined(DEBUGASSERT_ENABLED)
 	assert(Output.size() != 0);
 	assert(MacKey.Key().size() >= DIGEST_SIZE);
 	assert((MacKey.Key().size() + MacKey.Salt().size() + MacKey.Info().size()) <= BLOCK_SIZE);
@@ -312,7 +315,7 @@ size_t Blake2Sp256::Generate(CEX::Common::MacParams &MacKey, std::vector<uint8_t
 
 void Blake2Sp256::LoadMacKey(CEX::Common::MacParams &MacKey)
 {
-#if defined(_DEBUG)
+#if defined(DEBUGASSERT_ENABLED)
 	assert(MacKey.Key().size() >= 16 || MacKey.Key().size() <= 32);
 #endif
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -322,7 +325,7 @@ void Blake2Sp256::LoadMacKey(CEX::Common::MacParams &MacKey)
 
 	if (MacKey.Salt().size() != 0)
 	{
-#if defined(_DEBUG)
+#if defined(DEBUGASSERT_ENABLED)
 		assert(MacKey.Salt().size() == 8);
 #endif
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -330,13 +333,13 @@ void Blake2Sp256::LoadMacKey(CEX::Common::MacParams &MacKey)
 			throw CEX::Exception::CryptoDigestException("Blake2Sp256", "Salt has invalid length!");
 #endif
 
-		m_treeConfig[4] = CEX::Utility::IntUtils::BytesToLe32(MacKey.Salt(), 0);
-		m_treeConfig[5] = CEX::Utility::IntUtils::BytesToLe32(MacKey.Salt(), 4);
+		m_treeConfig[4] = IntUtils::BytesToLe32(MacKey.Salt(), 0);
+		m_treeConfig[5] = IntUtils::BytesToLe32(MacKey.Salt(), 4);
 	}
 
 	if (MacKey.Info().size() != 0)
 	{
-#if defined(_DEBUG)
+#if defined(DEBUGASSERT_ENABLED)
 		assert(MacKey.Info().size() == 8);
 #endif
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -344,8 +347,8 @@ void Blake2Sp256::LoadMacKey(CEX::Common::MacParams &MacKey)
 			throw CEX::Exception::CryptoDigestException("Blake2Sp256", "Info has invalid length!");
 #endif
 
-		m_treeConfig[6] = CEX::Utility::IntUtils::BytesToLe32(MacKey.Info(), 0);
-		m_treeConfig[7] = CEX::Utility::IntUtils::BytesToLe32(MacKey.Info(), 4);
+		m_treeConfig[6] = IntUtils::BytesToLe32(MacKey.Info(), 0);
+		m_treeConfig[7] = IntUtils::BytesToLe32(MacKey.Info(), 4);
 	}
 
 	std::vector<uint8_t> mkey(BLOCK_SIZE, 0);
@@ -398,12 +401,12 @@ void Blake2Sp256::Update(uint8_t Input)
 	BlockUpdate(inp, 0, 1);
 }
 
-// *** Private Methods *** //
+//~~~Private Methods~~~//
 
-void Blake2Sp256::DetectCpu()
+void Blake2Sp256::Detect()
 {
 	CEX::Common::CpuDetect detect;
-	m_hasIntrinsics = detect.HasMinIntrinsics();
+	m_hasSSE = detect.HasMinIntrinsics();
 }
 
 void Blake2Sp256::Increase(Blake2sState &State, uint32_t Length)
@@ -416,7 +419,7 @@ void Blake2Sp256::Increase(Blake2sState &State, uint32_t Length)
 void Blake2Sp256::Increment(std::vector<uint8_t> &Counter)
 {
 	// increment the message counter
-	CEX::Utility::IntUtils::Le32ToBytes(CEX::Utility::IntUtils::BytesToLe32(Counter, 0) + 1, Counter, 0);
+	IntUtils::Le32ToBytes(IntUtils::BytesToLe32(Counter, 0) + 1, Counter, 0);
 }
 
 void Blake2Sp256::Initialize(Blake2Params &Params, Blake2sState &State)
@@ -447,7 +450,7 @@ void Blake2Sp256::Initialize(Blake2Params &Params, Blake2sState &State)
 void Blake2Sp256::ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, size_t Length)
 {
 	Increase(State, (uint32_t)Length);
-	if (m_hasIntrinsics)
+	if (m_hasSSE)
 		Blake2SCompress::SCompress(Input, InOffset, State, m_cIV);
 	else
 		Blake2SCompress::UCompress(Input, InOffset, State, m_cIV);

@@ -19,7 +19,7 @@ using CEX::Exception::CryptoProcessingException;
 class IByteStream
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	virtual ~IByteStream() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The stream can be read
@@ -58,7 +58,7 @@ public:
 	/// </summary>
 	virtual const size_t Position() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Close and flush the stream

@@ -148,7 +148,7 @@ private:
 	};
 
 	std::vector<uint64_t> m_cIV;
-	bool m_hasIntrinsics;
+	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isParallel;
 	uint32_t m_leafSize;
@@ -163,7 +163,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
@@ -178,12 +178,12 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual CEX::Enumeration::Digests Enumeral() 
+	virtual Digests Enumeral() 
 	{ 
 		if (m_isParallel)
-			return CEX::Enumeration::Digests::Blake2BP512;
+			return Digests::Blake2BP512;
 		else
-			return CEX::Enumeration::Digests::Blake2B512;
+			return Digests::Blake2B512;
 	}
 
 	/// <summary>
@@ -212,7 +212,7 @@ public:
 	/// </summary>
 	const size_t ParallelMinimumSize() { return m_minParallel; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class as either the 2B or 2BP.
@@ -222,7 +222,7 @@ public:
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2BP variant.</param>
 	explicit Blake2Bp512(bool Parallel = false)
 		:
-		m_hasIntrinsics(false),
+		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isParallel(Parallel),
 		m_leafSize(Parallel ? DEF_LEAFSIZE : BLOCK_SIZE),
@@ -240,7 +240,7 @@ public:
 		};
 
 		// intrinsics support switch
-		DetectCpu();
+		Detect();
 
 		if (m_isParallel)
 		{
@@ -272,7 +272,7 @@ public:
 	/// <param name="Params">The Blake2Params structure, containing the tree configuration settings.</param>
 	explicit Blake2Bp512(Blake2Params &Params)
 		:
-		m_hasIntrinsics(false),
+		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isParallel(false),
 		m_leafSize(BLOCK_SIZE),
@@ -292,19 +292,19 @@ public:
 		};
 
 		// intrinsics support switch
-		DetectCpu();
+		Detect();
 
 		if (m_isParallel)
 		{
-#if defined(_DEBUG)
+#if defined(DEBUGASSERT_ENABLED)
 			assert(Params.LeafLength() > BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE == 0);
 			assert(Params.ParallelDegree() > 2 || Params.ParallelDegree() % 2 == 0);
 #endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 			if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
-				throw CEX::Exception::CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
+				throw CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
 			if (Params.ParallelDegree() < 2 || Params.ParallelDegree() % 2 != 0)
-				throw CEX::Exception::CryptoDigestException("BlakeBP512:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
+				throw CryptoDigestException("BlakeBP512:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
 #endif
 
 			m_minParallel = m_treeParams.ParallelDegree() * BLOCK_SIZE;
@@ -330,7 +330,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the message buffer
@@ -379,7 +379,7 @@ public:
 	/// <param name="Output">The psuedo random output</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
-	size_t Generate(CEX::Common::MacParams &MacKey, std::vector<uint8_t> &Output);
+	size_t Generate(MacParams &MacKey, std::vector<uint8_t> &Output);
 
 	/// <summary>
 	/// Initialize the digest as a MAC code generator
@@ -389,7 +389,7 @@ public:
 	/// <para>The input Key must be a maximum size of 64 bytes, and a minimum size of 32 bytes. 
 	/// If either the Salt or Info parameters are used, their size must be 16 bytes.
 	/// The maximum combined size of Key, Salt, and Info, must be 128 bytes or less.</para></param>
-	virtual void LoadMacKey(CEX::Common::MacParams &MacKey);
+	virtual void LoadMacKey(MacParams &MacKey);
 
 	/// <summary>
 	/// Reset the internal state to sequential defaults
@@ -404,7 +404,7 @@ public:
 	virtual void Update(uint8_t Input);
 
 private:
-	void DetectCpu();
+	void Detect();
 	void Increase(Blake2bState &State, uint64_t Length);
 	void Increment(std::vector<uint8_t> &Counter);
 	void Initialize(Blake2Params &Params, Blake2bState &State);

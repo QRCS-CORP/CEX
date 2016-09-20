@@ -42,7 +42,7 @@ private:
 #endif
 
 public:
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The seed generators type name
@@ -54,7 +54,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "CSPRsg"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -72,7 +72,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

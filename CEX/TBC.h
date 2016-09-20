@@ -15,7 +15,7 @@ private:
 	const byte MKCODE = (byte)0xff;
 
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -27,19 +27,19 @@ public:
 	/// </summary>
 	virtual ~TBC() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::TBC; }
+	virtual const PaddingModes Enumeral() { return PaddingModes::TBC; }
 
 	/// <summary>
 	/// Get: Padding name
 	/// </summary>
 	virtual const char *Name() { return "TBC"; }
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Add padding to input array

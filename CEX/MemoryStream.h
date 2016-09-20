@@ -17,7 +17,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The stream can be read
@@ -49,7 +49,7 @@ public:
 	/// </summary>
 	std::vector<byte> &ToArray() { return m_streamData; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -113,7 +113,7 @@ public:
 		m_streamData.insert(m_streamData.begin(), DataArray.begin() + Offset, DataArray.begin() + Length);
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Finalize objects
@@ -122,7 +122,7 @@ public:
 	{
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Close and flush the stream

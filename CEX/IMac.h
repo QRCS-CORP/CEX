@@ -9,8 +9,9 @@
 
 NAMESPACE_MAC
 
+using CEX::Enumeration::Macs;
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoMacException;
+	using CEX::Exception::CryptoMacException;
 #endif
 
 /// <summary>
@@ -19,7 +20,7 @@ using CEX::Exception::CryptoMacException;
 class IMac
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -31,12 +32,12 @@ public:
 	/// </summary>
 	virtual ~IMac() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Macs Enumeral() = 0;
+	virtual const Macs Enumeral() = 0;
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
@@ -58,7 +59,7 @@ public:
 	/// </summary>
 	virtual const char *Name() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the digest

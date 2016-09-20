@@ -3,6 +3,8 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Utility::IntUtils;
+
 void KDF2Drbg::Destroy()
 {
 	if (!m_isDestroyed)
@@ -10,8 +12,8 @@ void KDF2Drbg::Destroy()
 		m_blockSize = 0;
 		m_hashSize = 0;
 		m_isInitialized = false;
-		CEX::Utility::IntUtils::ClearVector(m_Iv);
-		CEX::Utility::IntUtils::ClearVector(m_salt);
+		IntUtils::ClearVector(m_Iv);
+		IntUtils::ClearVector(m_salt);
 	}
 }
 
@@ -110,7 +112,7 @@ void KDF2Drbg::Update(const std::vector<byte> &Salt)
 	Initialize(Salt);
 }
 
-// *** Private *** //
+//~~~Private~~~//
 
 size_t KDF2Drbg::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {

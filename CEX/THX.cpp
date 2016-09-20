@@ -1,18 +1,18 @@
 #include "THX.h"
 #include "Twofish.h"
-#include "CpuDetect.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "HMAC.h"
 #include "IntUtils.h"
-#if defined(HAS_MINSSE)
+#if defined(HAS_AVX)
+#	include "UInt256.h"
+#elif defined(HAS_MINSSE)
 #	include "UInt128.h"
-#	if defined(HAS_AVX)
-#		include "UInt256.h"
-#	endif
 #endif
 
 NAMESPACE_BLOCK
+
+using CEX::Utility::IntUtils;
 
 void THX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -28,19 +28,17 @@ void THX::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		m_hasAVX = false;
-		m_hasIntrinsics = false;
 		m_isDestroyed = true;
 		m_dfnRounds = 0;
 		m_ikmSize = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
 
-		CEX::Utility::IntUtils::ClearVector(m_expKey);
-		CEX::Utility::IntUtils::ClearVector(m_sBox);
-		CEX::Utility::IntUtils::ClearVector(m_hkdfInfo);
-		CEX::Utility::IntUtils::ClearVector(m_legalKeySizes);
-		CEX::Utility::IntUtils::ClearVector(m_legalRounds);
+		IntUtils::ClearVector(m_expKey);
+		IntUtils::ClearVector(m_sBox);
+		IntUtils::ClearVector(m_hkdfInfo);
+		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_legalRounds);
 
 		if (m_kdfEngine != 0)
 		{
@@ -63,28 +61,31 @@ void THX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 {
-	int dgtsze = GetIkmSize(m_kdfEngineType);
-	const std::vector<byte> &key = KeyParam.Key();
+	uint dgtsze = GetIkmSize(m_kdfEngineType);
 
+#if defined(DEBUGASSERT_ENABLED)
+	assert(KeyParam.Key().size() >= m_legalKeySizes[0] && KeyParam.Key().size() <= m_legalKeySizes[m_legalKeySizes.size() - 1]);
+	if (dgtsze != 0)
+		assert(KeyParam.Key().size() % dgtsze == 0);
+	assert(KeyParam.Key().size() >= m_ikmSize);
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
-	if (key.size() < m_legalKeySizes[0])
+	if (KeyParam.Key().size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
-	if (key.size() > m_legalKeySizes[3] && (key.size() % dgtsze) != 0)
+	if (KeyParam.Key().size() > m_legalKeySizes[3] && (KeyParam.Key().size() % dgtsze) != 0)
 		throw CryptoSymmetricCipherException("THX:Initialize", msg);
 
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
 	{
-		if (key.size() == m_legalKeySizes[i])
+		if (KeyParam.Key().size() == m_legalKeySizes[i])
 			break;
 		if (i == m_legalKeySizes.size() - 1)
 			throw CryptoSymmetricCipherException("THX:Initialize", msg);
 	}
-
-	// get the kdf digest engine
 	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
 	{
-		if (key.size() < m_ikmSize)
+		if (KeyParam.Key().size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("THX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
 	}
 #endif
@@ -94,7 +95,7 @@ void THX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
 
 	m_isEncryption = Encryption;
 	// expand the key
-	ExpandKey(key);
+	ExpandKey(KeyParam.Key());
 	// ready to transform data
 	m_isInitialized = true;
 }
@@ -188,12 +189,12 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 	for (uint i = 0; i < k64Cnt; i++)
 	{
 		// round key material
-		eKm[i] = CEX::Utility::IntUtils::BytesToLe32(rawKey, keyCtr);
+		eKm[i] = IntUtils::BytesToLe32(rawKey, keyCtr);
 		keyCtr += 4;
-		oKm[i] = CEX::Utility::IntUtils::BytesToLe32(rawKey, keyCtr);
+		oKm[i] = IntUtils::BytesToLe32(rawKey, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		CEX::Utility::IntUtils::Le32ToBytes(EncodeMDS(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		IntUtils::Le32ToBytes(EncodeMDS(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	keyCtr = 0;
@@ -231,12 +232,12 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	for (size_t i = 0; i < k64Cnt; ++i)
 	{
 		// round key material
-		eKm[i] = CEX::Utility::IntUtils::BytesToLe32(Key, keyCtr);
+		eKm[i] = IntUtils::BytesToLe32(Key, keyCtr);
 		keyCtr += 4;
-		oKm[i] = CEX::Utility::IntUtils::BytesToLe32(Key, keyCtr);
+		oKm[i] = IntUtils::BytesToLe32(Key, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		CEX::Utility::IntUtils::Le32ToBytes(EncodeMDS(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		IntUtils::Le32ToBytes(EncodeMDS(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	// gen s-box members
@@ -270,16 +271,16 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	m_expKey = wK;
 }
 
-// *** Rounds Processing *** //
+//~~~Rounds Processing~~~//
 
 void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = 8;
 	size_t keyCtr = 4;
-	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X2 = IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
+	uint X3 = IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
+	uint X0 = IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
+	uint X1 = IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = m_expKey.size();
@@ -302,27 +303,27 @@ void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	while (keyCtr != LRD);
 
 	keyCtr = 0;
-	CEX::Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
-	CEX::Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
+	IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
+	IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
+	IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
+	IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
 }
 
 void THX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(HAS_MINSSE)
+#if defined(HAS_MINSSE) && !defined(HAS_AVX)
 
 	const size_t LRD = 8;
 	size_t keyCtr = 4;
 
 	// input round
-	CEX::Common::UInt128 X2(Input, InOffset);
-	CEX::Common::UInt128 X3(Input, InOffset + 16);
-	CEX::Common::UInt128 X0(Input, InOffset + 32);
-	CEX::Common::UInt128 X1(Input, InOffset + 48);
-	CEX::Common::UInt128::Transpose(X2, X3, X0, X1);
-	CEX::Common::UInt128 T0, T1;
-	CEX::Common::UInt128 N2(2);
+	CEX::Numeric::UInt128 X2(Input, InOffset);
+	CEX::Numeric::UInt128 X3(Input, InOffset + 16);
+	CEX::Numeric::UInt128 X0(Input, InOffset + 32);
+	CEX::Numeric::UInt128 X1(Input, InOffset + 48);
+	CEX::Numeric::UInt128::Transpose(X2, X3, X0, X1);
+	CEX::Numeric::UInt128 T0, T1;
+	CEX::Numeric::UInt128 N2(2);
 
 	X2 ^= m_expKey[keyCtr];
 	X3 ^= m_expKey[++keyCtr];
@@ -355,7 +356,7 @@ void THX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	X2 ^= m_expKey[++keyCtr];
 	X3 ^= m_expKey[++keyCtr];
 
-	CEX::Common::UInt128::Transpose(X0, X1, X2, X3);
+	CEX::Numeric::UInt128::Transpose(X0, X1, X2, X3);
 	X0.StoreLE(Output, OutOffset);
 	X1.StoreLE(Output, OutOffset + 16);
 	X2.StoreLE(Output, OutOffset + 32);
@@ -379,13 +380,13 @@ void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	size_t keyCtr = 4;
 
 	// input round
-	CEX::Common::UInt256 X2(Input, InOffset);
-	CEX::Common::UInt256 X3(Input, InOffset + 32);
-	CEX::Common::UInt256 X0(Input, InOffset + 64);
-	CEX::Common::UInt256 X1(Input, InOffset + 96);
-	CEX::Common::UInt256::Transpose(X2, X3, X0, X1);
-	CEX::Common::UInt256 T0, T1;
-	CEX::Common::UInt256 N2(2);
+	CEX::Numeric::UInt256 X2(Input, InOffset);
+	CEX::Numeric::UInt256 X3(Input, InOffset + 32);
+	CEX::Numeric::UInt256 X0(Input, InOffset + 64);
+	CEX::Numeric::UInt256 X1(Input, InOffset + 96);
+	CEX::Numeric::UInt256::Transpose(X2, X3, X0, X1);
+	CEX::Numeric::UInt256 T0, T1;
+	CEX::Numeric::UInt256 N2(2);
 
 	X2 ^= m_expKey[keyCtr];
 	X3 ^= m_expKey[++keyCtr];
@@ -418,7 +419,7 @@ void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	X2 ^= m_expKey[++keyCtr];
 	X3 ^= m_expKey[++keyCtr];
 
-	CEX::Common::UInt256::Transpose(X0, X1, X2, X3);
+	CEX::Numeric::UInt256::Transpose(X0, X1, X2, X3);
 	X0.StoreLE(Output, OutOffset);
 	X1.StoreLE(Output, OutOffset + 32);
 	X2.StoreLE(Output, OutOffset + 64);
@@ -442,10 +443,10 @@ void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 {
 	const size_t LRD = m_expKey.size() - 1;
 	size_t keyCtr = 0;
-	uint X0 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X1 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X2 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X3 = CEX::Utility::IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X0 = IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
+	uint X1 = IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
+	uint X2 = IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
+	uint X3 = IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = 7;
@@ -473,27 +474,27 @@ void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	X0 ^= m_expKey[++keyCtr];
 	X1 ^= m_expKey[++keyCtr];
 
-	CEX::Utility::IntUtils::Le32ToBytes(X2, Output, OutOffset);
-	CEX::Utility::IntUtils::Le32ToBytes(X3, Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Le32ToBytes(X0, Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Le32ToBytes(X1, Output, OutOffset + 12);
+	IntUtils::Le32ToBytes(X2, Output, OutOffset);
+	IntUtils::Le32ToBytes(X3, Output, OutOffset + 4);
+	IntUtils::Le32ToBytes(X0, Output, OutOffset + 8);
+	IntUtils::Le32ToBytes(X1, Output, OutOffset + 12);
 }
 
 void THX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(HAS_MINSSE)
+#if defined(HAS_MINSSE) && !defined(HAS_AVX)
 
 	const size_t LRD = m_expKey.size() - 1;
 	size_t keyCtr = 0;
 
 	// input round
-	CEX::Common::UInt128 X0(Input, InOffset);
-	CEX::Common::UInt128 X1(Input, InOffset + 16);
-	CEX::Common::UInt128 X2(Input, InOffset + 32);
-	CEX::Common::UInt128 X3(Input, InOffset + 48);
-	CEX::Common::UInt128::Transpose(X0, X1, X2, X3);
-	CEX::Common::UInt128 T0, T1;
-	CEX::Common::UInt128 N2(2);
+	CEX::Numeric::UInt128 X0(Input, InOffset);
+	CEX::Numeric::UInt128 X1(Input, InOffset + 16);
+	CEX::Numeric::UInt128 X2(Input, InOffset + 32);
+	CEX::Numeric::UInt128 X3(Input, InOffset + 48);
+	CEX::Numeric::UInt128::Transpose(X0, X1, X2, X3);
+	CEX::Numeric::UInt128 T0, T1;
+	CEX::Numeric::UInt128 N2(2);
 
 	X0 ^= m_expKey[keyCtr];
 	X1 ^= m_expKey[++keyCtr];
@@ -526,7 +527,7 @@ void THX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	X0 ^= m_expKey[++keyCtr];
 	X1 ^= m_expKey[++keyCtr];
 
-	CEX::Common::UInt128::Transpose(X2, X3, X0, X1);
+	CEX::Numeric::UInt128::Transpose(X2, X3, X0, X1);
 	X2.StoreLE(Output, OutOffset);
 	X3.StoreLE(Output, OutOffset + 16);
 	X0.StoreLE(Output, OutOffset + 32);
@@ -550,13 +551,13 @@ void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	size_t keyCtr = 0;
 
 	// input round
-	CEX::Common::UInt256 X0(Input, InOffset);
-	CEX::Common::UInt256 X1(Input, InOffset + 32);
-	CEX::Common::UInt256 X2(Input, InOffset + 64);
-	CEX::Common::UInt256 X3(Input, InOffset + 96);
-	CEX::Common::UInt256::Transpose(X0, X1, X2, X3);
-	CEX::Common::UInt256 T0, T1;
-	CEX::Common::UInt256 N2(2);
+	CEX::Numeric::UInt256 X0(Input, InOffset);
+	CEX::Numeric::UInt256 X1(Input, InOffset + 32);
+	CEX::Numeric::UInt256 X2(Input, InOffset + 64);
+	CEX::Numeric::UInt256 X3(Input, InOffset + 96);
+	CEX::Numeric::UInt256::Transpose(X0, X1, X2, X3);
+	CEX::Numeric::UInt256 T0, T1;
+	CEX::Numeric::UInt256 N2(2);
 
 	X0 ^= m_expKey[keyCtr];
 	X1 ^= m_expKey[++keyCtr];
@@ -589,7 +590,7 @@ void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	X0 ^= m_expKey[++keyCtr];
 	X1 ^= m_expKey[++keyCtr];
 
-	CEX::Common::UInt256::Transpose(X2, X3, X0, X1);
+	CEX::Numeric::UInt256::Transpose(X2, X3, X0, X1);
 	X2.StoreLE(Output, OutOffset);
 	X3.StoreLE(Output, OutOffset + 32);
 	X0.StoreLE(Output, OutOffset + 64);
@@ -609,14 +610,7 @@ void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 #endif
 }
 
-// *** Helpers *** //
-
-void THX::DetectCpu()
-{
-	CEX::Common::CpuDetect detect;
-	m_hasIntrinsics = detect.HasMinIntrinsics();
-	m_hasAVX = detect.HasAVX();
-}
+//~~~Helpers~~~//
 
 uint THX::EncodeMDS(uint K0, uint K1)
 {
@@ -666,6 +660,9 @@ CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
+#if defined(DEBUGASSERT_ENABLED)
+		assert("THX:GetDigest The digest could not be instantiated!");
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoSymmetricCipherException("THX:GetDigest", "The digest could not be instantiated!");
 #else
@@ -674,7 +671,7 @@ CEX::Digest::IDigest* THX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 }
 
-int THX::GetIkmSize(CEX::Enumeration::Digests DigestType)
+uint THX::GetIkmSize(CEX::Enumeration::Digests DigestType)
 {
 	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
 }

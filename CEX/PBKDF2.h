@@ -25,10 +25,13 @@
 #define _CEXENGINE_PBKDF2_H
 
 #include "IGenerator.h"
-#include "IDigest.h"
 #include "HMAC.h"
+#include "IDigest.h"
 
 NAMESPACE_GENERATOR
+
+using CEX::Mac::HMAC;
+using CEX::Digest::IDigest;
 
 /// <summary>
 /// PBKDF2 V2: An implementation of an Hash based Key Derivation Function
@@ -69,23 +72,23 @@ private:
 	static constexpr size_t PKCS_ITERATIONS = 1000;
 
 	size_t m_blockSize;
-	CEX::Mac::HMAC* m_digestMac;
+	HMAC* m_digestMac;
 	size_t m_hashSize;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<byte> m_macKey;
-	CEX::Digest::IDigest* m_msgDigest;
+	IDigest* m_msgDigest;
 	size_t m_prcIterations;
 	std::vector<byte> m_macSalt;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::PBKDF2; }
+	virtual const Generators Enumeral() { return Generators::PBKDF2; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -108,7 +111,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "PBKDF2"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Creates a PBKDF2 Bytes Generator based on the given hash function
@@ -118,7 +121,7 @@ public:
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or Iterations count is used</exception>
-	PBKDF2(CEX::Digest::IDigest* Digest, size_t Iterations = PKCS_ITERATIONS)
+	PBKDF2(IDigest* Digest, size_t Iterations = PKCS_ITERATIONS)
 		:
 		m_blockSize(Digest->BlockSize()),
 		m_hashSize(Digest->DigestSize()),
@@ -145,7 +148,7 @@ public:
 	/// <param name="Iterations">The number of cycles used to produce output</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoGeneratorException">Thrown if a null Digest or invalid Iterations count is used</exception>
-	PBKDF2(CEX::Mac::HMAC* Hmac, size_t Iterations = PKCS_ITERATIONS)
+	PBKDF2(HMAC* Hmac, size_t Iterations = PKCS_ITERATIONS)
 		:
 		m_blockSize(Hmac->BlockSize()),
 		m_digestMac(Hmac),
@@ -173,7 +176,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

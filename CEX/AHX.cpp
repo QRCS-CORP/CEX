@@ -3,10 +3,11 @@
 #include "HKDF.h"
 #include "HMAC.h"
 #include "UInt128.h"
-#include "UInt256.h"
 #include "IntUtils.h"
 
 NAMESPACE_BLOCK
+
+using CEX::Utility::IntUtils;
 
 void AHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -28,10 +29,10 @@ void AHX::Destroy()
 		m_isEncryption = false;
 		m_isInitialized = false;
 
-		CEX::Utility::IntUtils::ClearVector(m_expKey);
-		CEX::Utility::IntUtils::ClearVector(m_hkdfInfo);
-		CEX::Utility::IntUtils::ClearVector(m_legalKeySizes);
-		CEX::Utility::IntUtils::ClearVector(m_legalRounds);
+		IntUtils::ClearVector(m_expKey);
+		IntUtils::ClearVector(m_hkdfInfo);
+		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_legalRounds);
 
 		if (m_kdfEngine != 0)
 		{
@@ -52,40 +53,43 @@ void AHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
 
-void AHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
+void AHX::Initialize(bool Encryption, const KeyParams &KeyParam)
 {
-	int dgtsze = GetIkmSize(m_kdfEngineType);
-	const std::vector<byte> &key = KeyParam.Key();
+	uint dgtsze = GetIkmSize(m_kdfEngineType);
 
+#if defined(DEBUGASSERT_ENABLED)
+	assert(KeyParam.Key().size() >= m_legalKeySizes[0] && KeyParam.Key().size() <= m_legalKeySizes[m_legalKeySizes.size() - 1]);
+	if (dgtsze != 0)
+		assert(KeyParam.Key().size() % dgtsze == 0);
+	assert(KeyParam.Key().size() >= m_ikmSize);
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
-	if (key.size() < m_legalKeySizes[0])
+	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash functions output size.";
+	if (KeyParam.Key().size() < m_legalKeySizes[0])
 		throw CryptoSymmetricCipherException("AHX:Initialize", msg);
-	if (dgtsze != 0 && key.size() > m_legalKeySizes[3] && (key.size() % dgtsze) != 0)
+	if (dgtsze != 0 && KeyParam.Key().size() > m_legalKeySizes[3] && (KeyParam.Key().size() % dgtsze) != 0)
 		throw CryptoSymmetricCipherException("AHX:Initialize", msg);
 
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
 	{
-		if (key.size() == m_legalKeySizes[i])
+		if (KeyParam.Key().size() == m_legalKeySizes[i])
 			break;
 		if (i == m_legalKeySizes.size() - 1)
 			throw CryptoSymmetricCipherException("AHX:Initialize", msg);
 	}
-
-	// get the kdf digest engine
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
+	if (m_kdfEngineType != Digests::None)
 	{
-		if (key.size() < m_ikmSize)
+		if (KeyParam.Key().size() < m_ikmSize)
 			throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
 	}
 #endif
 
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
+	if (m_kdfEngineType != Digests::None)
 		m_kdfEngine = GetDigest(m_kdfEngineType);
 
 	m_isEncryption = Encryption;
 	// expand the key
-	ExpandKey(Encryption, key);
+	ExpandKey(Encryption, KeyParam.Key());
 	// ready to transform data
 	m_isInitialized = true;
 }
@@ -122,11 +126,11 @@ void AHX::Transform128(const std::vector<byte> &Input, const size_t InOffset, st
 		Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
-// *** Key Schedule *** //
+//~~~Key Schedule~~~//
 
 void AHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 {
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
+	if (m_kdfEngineType != Digests::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
@@ -188,7 +192,7 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// big endian format to align with test vectors
 	for (size_t i = 0; i < rawKey.size(); i += 4)
 	{
-		uint tmpbk = CEX::Utility::IntUtils::BytesToBe32(rawKey, i);
+		uint tmpbk = IntUtils::BytesToBe32(rawKey, i);
 		memcpy(&rawKey[i], &tmpbk, 4);
 	}
 
@@ -366,7 +370,7 @@ void AHX::ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const si
 	Key[Index] = _mm_xor_si128(pkb, Key[Index]);
 }
 
-// *** Rounds Processing *** //
+//~~~Rounds Processing~~~//
 
 void AHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
@@ -387,10 +391,10 @@ void AHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
-	CEX::Common::UInt128 X0(Input, InOffset);
-	CEX::Common::UInt128 X1(Input, InOffset + 16);
-	CEX::Common::UInt128 X2(Input, InOffset + 32);
-	CEX::Common::UInt128 X3(Input, InOffset + 48);
+	CEX::Numeric::UInt128 X0(Input, InOffset);
+	CEX::Numeric::UInt128 X1(Input, InOffset + 16);
+	CEX::Numeric::UInt128 X2(Input, InOffset + 32);
+	CEX::Numeric::UInt128 X3(Input, InOffset + 48);
 
 	X0.Register = _mm_xor_si128(X0.Register, m_expKey[keyCtr]);
 	X1.Register = _mm_xor_si128(X1.Register, m_expKey[keyCtr]);
@@ -418,6 +422,7 @@ void AHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void AHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
+	// no aes-ni 256 api.. yet
 	Decrypt64(Input, InOffset, Output, OutOffset);
 	Decrypt64(Input, InOffset + 64, Output, OutOffset + 64);
 }
@@ -441,10 +446,10 @@ void AHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
-	CEX::Common::UInt128 X0(Input, InOffset);
-	CEX::Common::UInt128 X1(Input, InOffset + 16);
-	CEX::Common::UInt128 X2(Input, InOffset + 32);
-	CEX::Common::UInt128 X3(Input, InOffset + 48);
+	CEX::Numeric::UInt128 X0(Input, InOffset);
+	CEX::Numeric::UInt128 X1(Input, InOffset + 16);
+	CEX::Numeric::UInt128 X2(Input, InOffset + 32);
+	CEX::Numeric::UInt128 X3(Input, InOffset + 48);
 
 	X0.Register = _mm_xor_si128(X0.Register, m_expKey[keyCtr]);
 	X1.Register = _mm_xor_si128(X1.Register, m_expKey[keyCtr]);
@@ -476,14 +481,14 @@ void AHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	Encrypt64(Input, InOffset + 64, Output, OutOffset + 64);
 }
 
-// *** Helpers *** //
+//~~~Helpers~~~//
 
-int AHX::GetIkmSize(CEX::Enumeration::Digests DigestType)
+uint AHX::GetIkmSize(Digests DigestType)
 {
 	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
 }
 
-CEX::Digest::IDigest* AHX::GetDigest(CEX::Enumeration::Digests DigestType)
+IDigest* AHX::GetDigest(Digests DigestType)
 {
 	try
 	{
@@ -491,6 +496,9 @@ CEX::Digest::IDigest* AHX::GetDigest(CEX::Enumeration::Digests DigestType)
 	}
 	catch (...)
 	{
+#if defined(DEBUGASSERT_ENABLED)
+		assert("AHX:GetDigest The digest could not be instantiated!");
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 		throw CryptoSymmetricCipherException("AHX:GetDigest", "The digest could not be instantiated!");
 #else

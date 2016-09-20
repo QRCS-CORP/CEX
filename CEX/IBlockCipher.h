@@ -27,7 +27,6 @@
 #include "Common.h"
 #include "BlockCiphers.h"
 #include "IDigest.h"
-#include "UInt128.h"
 #include "KeyParams.h"
 #if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoSymmetricCipherException.h"
@@ -35,6 +34,10 @@
 
 NAMESPACE_BLOCK
 
+using CEX::Enumeration::BlockCiphers;
+using CEX::Enumeration::Digests;
+using CEX::Digest::IDigest;
+using CEX::Common::KeyParams;
 #if defined(CPPEXCEPTIONS_ENABLED)
 	using CEX::Exception::CryptoSymmetricCipherException;
 #endif
@@ -45,7 +48,7 @@ NAMESPACE_BLOCK
 class IBlockCipher
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -57,7 +60,7 @@ public:
 	/// </summary>
 	virtual ~IBlockCipher() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes
@@ -67,17 +70,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const CEX::Enumeration::BlockCiphers Enumeral() = 0;
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports AVX intrinsics
-	/// </summary>
-	virtual const bool HasAVX() = 0;
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports SIMD intrinsics
-	/// </summary>
-	virtual const bool HasIntrinsics() = 0;
+	virtual const BlockCiphers Enumeral() = 0;
 
 	/// <summary>
 	/// Get: True is initialized for encryption, false for decryption.
@@ -110,7 +103,7 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
@@ -169,7 +162,7 @@ public:
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam) = 0;
+	virtual void Initialize(bool Encryption, const KeyParams &KeyParam) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -199,8 +192,10 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input array to Transform</param>
-	/// <param name="Output">Output array product of Transform</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">Output product of Transform</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
@@ -209,8 +204,10 @@ public:
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input array to Transform</param>
-	/// <param name="Output">Output array product of Transform</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">Output product of Transform</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 

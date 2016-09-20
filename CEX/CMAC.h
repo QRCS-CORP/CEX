@@ -35,6 +35,11 @@
 
 NAMESPACE_MAC
 
+using CEX::Enumeration::BlockCiphers;
+using CEX::Cipher::Symmetric::Block::IBlockCipher;
+using CEX::Cipher::Symmetric::Block::Mode::ICipherMode;
+using CEX::Common::KeyParams;
+
 /// <summary>
 /// An implementation of a Cipher based Message Authentication Code
 /// </summary>
@@ -77,8 +82,8 @@ private:
 	static constexpr byte CT1B = (byte)0x1b;
 
 	size_t m_blockSize;
-	CEX::Common::KeyParams m_cipherKey;
-	CEX::Cipher::Symmetric::Block::Mode::ICipherMode* m_cipherMode;
+	KeyParams m_cipherKey;
+	ICipherMode* m_cipherMode;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<byte> K1; 
@@ -90,7 +95,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Macs internal blocksize in bytes
@@ -100,7 +105,7 @@ public:
 	/// <summary>
 	/// Get: The macs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Macs Enumeral() { return CEX::Enumeration::Macs::CMAC; }
+	virtual const Macs Enumeral() { return Macs::CMAC; }
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
@@ -117,14 +122,14 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "CMAC"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
 	/// <param name="EngineType">The block cipher enumeration name</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block size is used</exception>
-	CMAC(CEX::Enumeration::BlockCiphers EngineType)
+	CMAC(BlockCiphers EngineType)
 		:
 		m_blockSize(0),
 		m_cipherKey(),
@@ -156,7 +161,7 @@ public:
 	/// <param name="Cipher">Instance of the block cipher</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
-	CMAC(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher)
+	CMAC(IBlockCipher* Cipher)
 		:
 		m_blockSize(Cipher->BlockSize()),
 		m_cipherKey(),
@@ -184,7 +189,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the buffer
@@ -251,7 +256,7 @@ public:
 private:
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
 	void CreateCipher(CEX::Enumeration::BlockCiphers Cipher);
-	void LoadCipher(CEX::Cipher::Symmetric::Block::IBlockCipher* Cipher);
+	void LoadCipher(IBlockCipher* Cipher);
 };
 
 NAMESPACE_MACEND

@@ -1,14 +1,24 @@
 #include "CTRDrbg.h"
+#include "CpuDetect.h"
 #include "IntUtils.h"
+#include "KeyParams.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_GENERATOR
+
+using CEX::Common::CpuDetect;
+using CEX::Utility::IntUtils;
+using CEX::Common::KeyParams;
+using CEX::Utility::ParallelUtils;
 
 void CTRDrbg::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_blockSize = 0;
+		m_hasAVX = false;
+		m_hasSSE = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_processorCount = 0;
@@ -16,10 +26,8 @@ void CTRDrbg::Destroy()
 		m_keySize = 0;
 		m_parallelBlockSize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_ctrVector);
-		CEX::Utility::IntUtils::ClearVector(m_threadVectors);
-
-		m_isDestroyed = true;
+		IntUtils::ClearVector(m_ctrVector);
+		IntUtils::ClearVector(m_thdVectors);
 	}
 }
 
@@ -53,7 +61,7 @@ void CTRDrbg::Initialize(const std::vector<byte> &Ikm)
 	std::vector<byte> key(keyLen);
 	memcpy(&key[0], &Ikm[m_blockSize], keyLen);
 
-	m_blockCipher->Initialize(true, CEX::Common::KeyParams(key));
+	m_blockCipher->Initialize(true, KeyParams(key));
 	m_isInitialized = true;
 }
 
@@ -81,6 +89,11 @@ void CTRDrbg::Initialize(const std::vector<byte> &Salt, const std::vector<byte> 
 	Initialize(key);
 }
 
+void CTRDrbg::ParallelMaxDegree(size_t Degree)
+{
+	//ToDo
+}
+
 void CTRDrbg::Update(const std::vector<byte> &Salt)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -94,7 +107,27 @@ void CTRDrbg::Update(const std::vector<byte> &Salt)
 		memcpy(&m_ctrVector[0], &Salt[0], m_ctrVector.size());
 }
 
-// *** Private *** //
+//~~~Private~~~//
+
+void CTRDrbg::Detect()
+{
+	try
+	{
+		CpuDetect detect;
+		m_hasSSE = detect.HasMinIntrinsics();
+		m_hasAVX = detect.HasAVX();
+		m_parallelBlockSize = detect.L1CacheSize * 1000;
+	}
+	catch (...)
+	{
+#if defined(DEBUGASSERT_ENABLED)
+		assert("CpuDetect not compatable!");
+#endif
+#if defined(CPPEXCEPTIONS_ENABLED)
+		throw CryptoGeneratorException("CTRDrbg:Detect", "CpuDetect not compatable!");
+#endif
+	}
+}
 
 void CTRDrbg::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
 {
@@ -102,7 +135,7 @@ void CTRDrbg::Generate(std::vector<byte> &Output, const size_t OutOffset, const 
 	const size_t BALN = Length - (Length % m_blockSize);
 	const size_t BLK4 = 4 * m_blockSize;
 
-	if (m_blockCipher->HasAVX() && Length >= 2 * BLK4)
+	if (m_hasAVX && Length >= 2 * BLK4)
 	{
 		const size_t BLK8 = 8 * m_blockSize;
 		size_t paln = Length - (Length % BLK8);
@@ -131,7 +164,7 @@ void CTRDrbg::Generate(std::vector<byte> &Output, const size_t OutOffset, const 
 			ctr += BLK8;
 		}
 	}
-	else if (m_blockCipher->HasIntrinsics() && Length >= BLK4)
+	else if (m_hasSSE && Length >= BLK4)
 	{
 		size_t paln = Length - (Length % BLK4);
 		std::vector<byte> ctrBlk(BLK4);
@@ -167,27 +200,6 @@ void CTRDrbg::Generate(std::vector<byte> &Output, const size_t OutOffset, const 
 		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
 		Increment(Counter);
 	}
-
-	// ToDo: check this!
-
-	/*size_t aln = Length - (Length % m_blockSize);
-	size_t ctr = 0;
-
-	while (ctr != aln)
-	{
-		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + ctr);
-		Increment(Counter);
-		ctr += m_blockSize;
-	}
-
-	if (ctr != Length)
-	{
-		std::vector<byte> outputBlock(m_blockSize, 0);
-		m_blockCipher->EncryptBlock(Counter, outputBlock);
-		size_t fnlSize = Length % m_blockSize;
-		memcpy(&Output[OutOffset + (Length - fnlSize)], &outputBlock[0], fnlSize);
-		Increment(Counter);
-	}*/
 }
 
 void CTRDrbg::Increment(std::vector<byte> &Counter)
@@ -231,14 +243,47 @@ bool CTRDrbg::IsValidKeySize(const size_t KeySize)
 	return true;
 }
 
-void CTRDrbg::SetScope()
+void CTRDrbg::Scope()
 {
-	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	Detect();
 
-	if (m_processorCount % 2 != 0)
-		m_processorCount--;
-	if (m_processorCount > 1)
-		m_isParallel = true;
+	m_processorCount = ParallelUtils::ProcessorCount();
+
+	if (m_parallelMaxDegree == 1)
+	{
+		m_isParallel = false;
+	}
+	else
+	{
+		if (m_processorCount % 2 != 0)
+			m_processorCount--;
+		if (m_processorCount > 1)
+			m_isParallel = true;
+	}
+
+	if (m_parallelMaxDegree == 0)
+		m_parallelMaxDegree = m_processorCount;
+
+	if (m_isParallel)
+	{
+		m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
+
+		if (m_hasAVX)
+			m_parallelMinimumSize *= 8;
+		else if (m_hasSSE)
+			m_parallelMinimumSize *= 4;
+
+		// 16 kb minimum
+		if (m_parallelBlockSize == 0 || m_parallelBlockSize < PARALLEL_DEFBLOCK / 4)
+			m_parallelBlockSize = PARALLEL_DEFBLOCK - (PARALLEL_DEFBLOCK % m_parallelMinimumSize);
+		else
+			m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
+
+		if (m_thdVectors.size() != m_parallelMaxDegree)
+			m_thdVectors.resize(m_parallelMaxDegree);
+		for (size_t i = 0; i < m_parallelMaxDegree; ++i)
+			m_thdVectors[i].resize(m_blockSize);
+	}
 }
 
 void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
@@ -253,30 +298,30 @@ void CTRDrbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 	else
 	{
 		// parallel CTR processing //
-		size_t cnkSize = (outSize / m_blockSize / m_processorCount) * m_blockSize;
-		size_t rndSize = cnkSize * m_processorCount;
-		size_t subSize = (cnkSize / m_blockSize);
+		const size_t CNKSZE = (outSize / m_blockSize / m_processorCount) * m_blockSize;
+		const size_t RNDSZE = CNKSZE * m_processorCount;
+		const size_t SUBSZE = (CNKSZE / m_blockSize);
 		// create jagged array of 'sub counters'
-		m_threadVectors.resize(m_processorCount);
+		m_thdVectors.resize(m_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
+		ParallelUtils::ParallelFor(0, m_processorCount, [this, &Output, CNKSZE, RNDSZE, SUBSZE, OutOffset](size_t i)
 		{
-			std::vector<byte> &iv = m_threadVectors[i];
+			std::vector<byte> &iv = m_thdVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(m_ctrVector, subSize * i, iv);
+			this->Increase(m_ctrVector, SUBSZE * i, iv);
 			// create random at offset position
-			this->Generate(Output, OutOffset + (i * cnkSize), cnkSize, iv);
+			this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, iv);
 		});
 
 		// last block processing
-		if (rndSize < outSize)
+		if (RNDSZE < outSize)
 		{
-			size_t fnlSize = outSize % rndSize;
-			Generate(Output, OutOffset + rndSize, fnlSize, m_threadVectors[m_processorCount - 1]);
+			size_t fnlSize = outSize % RNDSZE;
+			Generate(Output, OutOffset + RNDSZE, fnlSize, m_thdVectors[m_processorCount - 1]);
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&m_ctrVector[0], &m_threadVectors[m_processorCount - 1][0], m_ctrVector.size());
+		memcpy(&m_ctrVector[0], &m_thdVectors[m_processorCount - 1][0], m_ctrVector.size());
 	}
 }
 

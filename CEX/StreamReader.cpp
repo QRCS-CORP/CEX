@@ -3,6 +3,8 @@
 
 NAMESPACE_IO
 
+using CEX::Exception::CryptoProcessingException;
+
 byte StreamReader::ReadByte()
 {
 	if (m_streamData.Position() < m_streamData.Length())
@@ -12,7 +14,7 @@ byte StreamReader::ReadByte()
 		return data[0];
 	}
 #if defined(CPPEXCEPTIONS_ENABLED)
-	throw CEX::Exception::CryptoProcessingException("StreamReader:ReadByte", "The array does not contain enough data!");
+	throw CryptoProcessingException("StreamReader:ReadByte", "The array does not contain enough data!");
 #else
 	return 0;
 #endif
@@ -29,7 +31,7 @@ std::vector<byte> StreamReader::ReadBytes(size_t Length)
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadBytes", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadBytes", "The array does not contain enough data!");
 #else
 		return std::vector<byte>(0);
 #endif
@@ -51,7 +53,7 @@ short StreamReader::ReadInt16()
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt16", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadInt16", "The array does not contain enough data!");
 #else
 		return 0;
 #endif
@@ -73,7 +75,7 @@ ushort StreamReader::ReadUInt16()
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt16", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadUInt16", "The array does not contain enough data!");
 #else
 		return 0;
 #endif
@@ -95,7 +97,7 @@ int StreamReader::ReadInt32()
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt32", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadInt32", "The array does not contain enough data!");
 #else
 		return 0;
 #endif
@@ -117,7 +119,7 @@ uint StreamReader::ReadUInt32()
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt32", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadUInt32", "The array does not contain enough data!");
 #else
 		return 0;
 #endif
@@ -139,7 +141,7 @@ long StreamReader::ReadInt64()
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadInt64", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadInt64", "The array does not contain enough data!");
 #else
 		return 0;
 #endif
@@ -161,7 +163,7 @@ ulong StreamReader::ReadUInt64()
 	else
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
+		throw CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
 #else
 		return 0;
 #endif

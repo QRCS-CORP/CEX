@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../CEX/Cpu.h"
+#include "../CEX/CpuDetect.h"
 #include "AesAvsTest.h"
 #include "AesFipsTest.h"
 #include "BlakeTest.h"
@@ -56,6 +56,19 @@ using namespace Test;
 // DTM-KEX				-?
 // TLS					-?
 
+bool HasAESNI()
+{
+	try
+	{
+		CEX::Common::CpuDetect detect;
+		return detect.HasAES();
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
 std::string GetResponse()
 {
 	std::string resp;
@@ -87,8 +100,8 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.1: CEX Library in C++      *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.1f                           *");
-	ConsoleUtils::WriteLine("* Date:      July 4, 2016                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.1l                           *");
+	ConsoleUtils::WriteLine("* Date:      September 18, 2016              *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -136,25 +149,31 @@ void RunTest(Test::ITest* Test)
 
 int main()
 {
+	bool hasNI = HasAESNI();
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	//RunTest(new ParallelModeTest());
+
 	try
 	{
+#if defined (_DEBUG)
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
-
+#endif
 		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
-			PrintHeader("Testing the AES-NI implementation (AHX)");
-			if (CEX::Utility::Cpu::HasAESNI())
+			if (hasNI)
+			{
+				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesAvsTest(true));
+			}
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesAvsTest());
-			PrintHeader("Testing the AES-NI implementation (AHX)");
-			if (CEX::Utility::Cpu::HasAESNI())
+			if (hasNI)
+			{
+				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesFipsTest(true));
+			}
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesFipsTest());
 			RunTest(new RijndaelTest());
@@ -217,7 +236,7 @@ int main()
 		}
 		ConsoleUtils::WriteLine("");
 
-		// digests are currently being rewritten, so this can wait..
+		// digests are being rewritten, so this can wait..
 		/*if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
 			RunTest(new DigestSpeedTest());

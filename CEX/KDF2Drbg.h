@@ -29,6 +29,8 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Digest::IDigest;
+
 /// <summary>
 /// KDF2Drbg: An implementation of an Hash based Key Derivation Function
 /// </summary> 
@@ -69,17 +71,17 @@ private:
 	bool m_isInitialized;
 	std::vector<byte> m_Iv;
 	size_t m_blockSize;
-	CEX::Digest::IDigest* m_msgDigest;
+	IDigest* m_msgDigest;
 	std::vector<byte> m_salt;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::KDF2Drbg; }
+	virtual const Generators Enumeral() { return Generators::KDF2Drbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -102,7 +104,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "KDF2Drbg"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Creates a KDF2 Bytes Generator based on the given hash function
@@ -135,7 +137,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

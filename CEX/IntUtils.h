@@ -183,6 +183,15 @@ public:
 	// ** Big Endian ** //
 
 	/// <summary>
+	/// Run time check for Little Endian byte order
+	/// </summary>
+	static inline bool IsBigEndian()
+	{
+		int num = 1;
+		return (*(uint8_t *)&num != 1);
+	}
+
+	/// <summary>
 	/// Convert a Big Endian 16 bit word to bytes
 	/// </summary>
 	/// 
@@ -310,6 +319,15 @@ public:
 	}
 
 	// ** Little Endian ** //
+
+	/// <summary>
+	/// Run time check for Little Endian byte order
+	/// </summary>
+	static inline bool IsLittleEndian()
+	{
+		int num = 1;
+		return (*(uint8_t *)&num == 1);
+	}
 
 	/// <summary>
 	/// Convert a Little Endian 16 bit word to bytes
@@ -1572,8 +1590,8 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Size">The number of (16 byte block aligned) bytes to process</param>
-	/// <param name="HasIntrinsics">Run time SSE intrinsics switch</param>
-	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasIntrinsics = false);
+	/// <param name="HasSSE">Run time SSE intrinsics switch</param>
+	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasSSE = false);
 };
 
 NAMESPACE_UTILITYEND

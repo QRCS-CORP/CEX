@@ -4,11 +4,11 @@
 
 NAMESPACE_PRNG
 
-// *** Public Methods *** //
+using CEX::Seed::CSPRsg;
+using CEX::Utility::IntUtils;
 
-/// <summary>
-/// Release all resources associated with the object
-/// </summary>
+//~~~Public Methods~~~//
+
 void SP20Prng::Destroy()
 {
 	if (!m_isDestroyed)
@@ -18,8 +18,8 @@ void SP20Prng::Destroy()
 		m_dfnRounds = 0;
 		m_keySize = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_byteBuffer);
-		CEX::Utility::IntUtils::ClearVector(m_stateSeed);
+		IntUtils::ClearVector(m_byteBuffer);
+		IntUtils::ClearVector(m_stateSeed);
 
 		if (m_seedGenerator != 0)
 		{
@@ -35,13 +35,6 @@ void SP20Prng::Destroy()
 	}
 }
 
-/// <summary>
-/// Return an array filled with pseudo random bytes
-/// </summary>
-/// 
-/// <param name="Size">Size of requested byte array</param>
-/// 
-/// <returns>Random byte array</returns>
 std::vector<byte> SP20Prng::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
@@ -49,11 +42,6 @@ std::vector<byte> SP20Prng::GetBytes(size_t Size)
 	return data;
 }
 
-/// <summary>
-/// Fill an array with pseudo random bytes
-/// </summary>
-///
-/// <param name="Output">Output array</param>
 void SP20Prng::GetBytes(std::vector<byte> &Output)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -96,23 +84,11 @@ void SP20Prng::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt32</returns>
 uint SP20Prng::Next()
 {
-	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
+	return IntUtils::ToInt32(GetBytes(4));
 }
 
-/// <summary>
-/// Get an pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint SP20Prng::Next(uint Maximum)
 {
 	std::vector<byte> rand;
@@ -128,14 +104,6 @@ uint SP20Prng::Next(uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint SP20Prng::Next(uint Minimum, uint Maximum)
 {
 	uint num = 0;
@@ -143,23 +111,11 @@ uint SP20Prng::Next(uint Minimum, uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt64</returns>
 ulong SP20Prng::NextLong()
 {
-	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
+	return IntUtils::ToInt64(GetBytes(8));
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong SP20Prng::NextLong(ulong Maximum)
 {
 	std::vector<byte> rand;
@@ -175,14 +131,6 @@ ulong SP20Prng::NextLong(ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong SP20Prng::NextLong(ulong Minimum, ulong Maximum)
 {
 	ulong num = 0;
@@ -190,9 +138,6 @@ ulong SP20Prng::NextLong(ulong Minimum, ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Reset the generator instance
-/// </summary>
 void SP20Prng::Reset()
 {
 	if (m_rngGenerator != 0)
@@ -207,7 +152,7 @@ void SP20Prng::Reset()
 	}
 
 	m_seedGenerator = GetSeedGenerator(m_seedType);
-	m_rngGenerator = new CEX::Generator::SP20Drbg(m_dfnRounds);
+	m_rngGenerator = new SP20Drbg(m_dfnRounds);
 
 	if (m_seedGenerator != 0)
 	{
@@ -224,7 +169,7 @@ void SP20Prng::Reset()
 	m_bufferIndex = 0;
 }
 
-// *** Private *** //
+//~~~Private~~~//
 
 std::vector<byte> SP20Prng::GetBits(std::vector<byte> Data, ulong Maximum)
 {
@@ -268,14 +213,14 @@ std::vector<byte> SP20Prng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-CEX::Seed::ISeed* SP20Prng::GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine)
+ISeed* SP20Prng::GetSeedGenerator(SeedGenerators SeedEngine)
 {
-	switch (SeedEngine)
+	switch (SeedEngine) //ToDo: SeedFromName
 	{
 		/*case CEX::Enumeration::SeedGenerators::XSPRsg:
 		return new CEX::Seed::XSPRsg();*/ //ToDo?
 	default:
-		return new CEX::Seed::CSPRsg();
+		return new CSPRsg();
 	}
 }
 

@@ -9,8 +9,9 @@
 
 NAMESPACE_PADDING
 
+using CEX::Enumeration::PaddingModes;
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoPaddingException;
+	using CEX::Exception::CryptoPaddingException;
 #endif
 
 /// <summary>
@@ -19,7 +20,7 @@ using CEX::Exception::CryptoPaddingException;
 class IPadding
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -31,19 +32,19 @@ public:
 	/// </summary>
 	virtual ~IPadding() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const CEX::Enumeration::PaddingModes Enumeral() = 0;
+	virtual const PaddingModes Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Padding name
 	/// </summary>
 	virtual const char *Name() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Add padding to input array

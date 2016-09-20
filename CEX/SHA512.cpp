@@ -4,6 +4,8 @@
 
 NAMESPACE_DIGEST
 
+using CEX::Utility::IntUtils;
+
 void SHA512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -55,8 +57,8 @@ void SHA512::Destroy()
 		H0 = 0, H1 = 0, H2 = 0, H3 = 0, H4 = 0, H5 = 0, H6 = 0, H7 = 0;
 		m_wordOffset = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_prcBuffer);
-		CEX::Utility::IntUtils::ClearVector(m_wordBuffer);
+		IntUtils::ClearVector(m_prcBuffer);
+		IntUtils::ClearVector(m_wordBuffer);
 	}
 }
 
@@ -68,14 +70,14 @@ size_t SHA512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 #endif
 
 	Finish();
-	CEX::Utility::IntUtils::Be64ToBytes(H0, Output, OutOffset);
-	CEX::Utility::IntUtils::Be64ToBytes(H1, Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Be64ToBytes(H2, Output, OutOffset + 16);
-	CEX::Utility::IntUtils::Be64ToBytes(H3, Output, OutOffset + 24);
-	CEX::Utility::IntUtils::Be64ToBytes(H4, Output, OutOffset + 32);
-	CEX::Utility::IntUtils::Be64ToBytes(H5, Output, OutOffset + 40);
-	CEX::Utility::IntUtils::Be64ToBytes(H6, Output, OutOffset + 48);
-	CEX::Utility::IntUtils::Be64ToBytes(H7, Output, OutOffset + 56);
+	IntUtils::Be64ToBytes(H0, Output, OutOffset);
+	IntUtils::Be64ToBytes(H1, Output, OutOffset + 8);
+	IntUtils::Be64ToBytes(H2, Output, OutOffset + 16);
+	IntUtils::Be64ToBytes(H3, Output, OutOffset + 24);
+	IntUtils::Be64ToBytes(H4, Output, OutOffset + 32);
+	IntUtils::Be64ToBytes(H5, Output, OutOffset + 40);
+	IntUtils::Be64ToBytes(H6, Output, OutOffset + 48);
+	IntUtils::Be64ToBytes(H7, Output, OutOffset + 56);
 
 	Reset();
 
@@ -107,7 +109,7 @@ void SHA512::Update(byte Input)
 	m_btCounter1++;
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 void SHA512::AdjustByteCounts()
 {
@@ -510,7 +512,7 @@ void SHA512::ProcessLength(ulong LowWord, ulong HiWord)
 
 void SHA512::ProcessWord(const std::vector<byte> &Input, size_t InOffset)
 {
-	m_wordBuffer[m_wordOffset] = CEX::Utility::IntUtils::BytesToBe64(Input, InOffset);
+	m_wordBuffer[m_wordOffset] = IntUtils::BytesToBe64(Input, InOffset);
 
 	if (++m_wordOffset == 16)
 		ProcessBlock();

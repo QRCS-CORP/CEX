@@ -1,9 +1,12 @@
 #include "PPBPrng.h"
 #include "IntUtils.h"
+#include "DigestFromName.h"
 
 NAMESPACE_PRNG
 
-// *** Public Methods *** //
+using CEX::Utility::IntUtils;
+
+//~~~Public Methods~~~//
 
 /// <summary>
 /// Release all resources associated with the object
@@ -16,8 +19,8 @@ void PPBPrng::Destroy()
 		m_bufferSize = 0;
 		m_digestIterations = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_byteBuffer);
-		CEX::Utility::IntUtils::ClearVector(m_stateSeed);
+		IntUtils::ClearVector(m_byteBuffer);
+		IntUtils::ClearVector(m_stateSeed);
 
 		if (m_rngGenerator != 0)
 		{
@@ -102,7 +105,7 @@ void PPBPrng::GetBytes(std::vector<byte> &Output)
 /// <returns>Random UInt32</returns>
 uint PPBPrng::Next()
 {
-	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
+	return IntUtils::ToInt32(GetBytes(4));
 }
 
 /// <summary>
@@ -149,7 +152,7 @@ uint PPBPrng::Next(uint Minimum, uint Maximum)
 /// <returns>Random UInt64</returns>
 ulong PPBPrng::NextLong()
 {
-	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
+	return IntUtils::ToInt64(GetBytes(8));
 }
 
 /// <summary>
@@ -206,13 +209,13 @@ void PPBPrng::Reset()
 	}
 
 	m_digestEngine = GetInstance(m_digestType);
-	m_rngGenerator = new CEX::Generator::PBKDF2(m_digestEngine, m_digestIterations);
+	m_rngGenerator = new PBKDF2(m_digestEngine, m_digestIterations);
 	m_rngGenerator->Initialize(m_stateSeed);
 	m_rngGenerator->Generate(m_byteBuffer);
 	m_bufferIndex = 0;
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 std::vector<byte> PPBPrng::GetBits(std::vector<byte> Data, ulong Maximum)
 {
@@ -256,32 +259,32 @@ std::vector<byte> PPBPrng::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-CEX::Digest::IDigest* PPBPrng::GetInstance(CEX::Enumeration::Digests RngEngine)
+IDigest* PPBPrng::GetInstance(Digests RngEngine)
 {
 	return CEX::Helper::DigestFromName::GetInstance(RngEngine);
 }
 
-uint PPBPrng::GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine)
+uint PPBPrng::GetMinimumSeedSize(Digests RngEngine)
 {
 	switch (RngEngine)
 	{
-		case CEX::Enumeration::Digests::Blake256:
+		case Digests::Blake256:
 			return 32;
-		case CEX::Enumeration::Digests::Blake512:
+		case Digests::Blake512:
 			return 64;
-		case CEX::Enumeration::Digests::Keccak256:
+		case Digests::Keccak256:
 			return 136;
-		case CEX::Enumeration::Digests::Keccak512:
+		case Digests::Keccak512:
 			return 72;
-		case CEX::Enumeration::Digests::SHA256:
+		case Digests::SHA256:
 			return 64;
-		case CEX::Enumeration::Digests::SHA512:
+		case Digests::SHA512:
 			return 128;
-		case CEX::Enumeration::Digests::Skein1024:
+		case Digests::Skein1024:
 			return 128;
-		case CEX::Enumeration::Digests::Skein256:
+		case Digests::Skein256:
 			return 32;
-		case CEX::Enumeration::Digests::Skein512:
+		case Digests::Skein512:
 			return 64;
 		default:
 			return 128;

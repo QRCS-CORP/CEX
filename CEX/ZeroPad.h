@@ -11,7 +11,7 @@ NAMESPACE_PADDING
 class ZeroPad : public IPadding
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -23,19 +23,19 @@ public:
 	/// </summary>
 	virtual ~ZeroPad() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::None; }
+	virtual const PaddingModes Enumeral() { return PaddingModes::None; }
 
 	/// <summary>
 	/// Get: Padding name
 	/// </summary>
 	virtual const char *Name() { return "ZeroPad"; }
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Add padding to input array

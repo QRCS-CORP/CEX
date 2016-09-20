@@ -3,6 +3,8 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Utility::IntUtils;
+
 void PBKDF2::Destroy()
 {
 	if (!m_isDestroyed)
@@ -12,8 +14,8 @@ void PBKDF2::Destroy()
 		m_isInitialized = false;
 		m_prcIterations = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_macKey);
-		CEX::Utility::IntUtils::ClearVector(m_macSalt);
+		IntUtils::ClearVector(m_macKey);
+		IntUtils::ClearVector(m_macSalt);
 
 		m_isDestroyed = true;
 	}
@@ -106,7 +108,7 @@ void PBKDF2::Update(const std::vector<byte> &Salt)
 	Initialize(Salt);
 }
 
-// *** Private *** //
+//~~~Private~~~//
 
 size_t PBKDF2::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 {

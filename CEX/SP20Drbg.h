@@ -92,17 +92,17 @@ private:
 	size_t m_parallelBlockSize;
 	size_t m_processorCount;
 	size_t m_rndCount;
-	std::vector<std::vector<uint>> m_threadVectors;
+	std::vector<std::vector<uint>> m_thdVectors;
 	std::vector<uint> m_wrkState;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
 	/// </summary>
-	virtual const CEX::Enumeration::Generators Enumeral() { return CEX::Enumeration::Generators::SP20Drbg; }
+	virtual const Generators Enumeral() { return Generators::SP20Drbg; }
 
 	/// <summary>
 	/// Get: Generator is ready to produce data
@@ -165,7 +165,7 @@ public:
 	/// </summary>
 	const size_t VectorSize() { return VECTOR_SIZE; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the SP20 generator
@@ -199,7 +199,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

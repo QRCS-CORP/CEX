@@ -9,8 +9,9 @@
 
 NAMESPACE_PRNG
 
+using CEX::Enumeration::Prngs;
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoRandomException;
+	using CEX::Exception::CryptoRandomException;
 #endif
 
 /// <summary>
@@ -19,7 +20,7 @@ using CEX::Exception::CryptoRandomException;
 class IRandom
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -31,19 +32,19 @@ public:
 	/// </summary>
 	virtual ~IRandom() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Prngs Enumeral() = 0;
+	virtual const Prngs Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Algorithm name
 	/// </summary>
 	virtual const char *Name() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

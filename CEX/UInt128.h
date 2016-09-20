@@ -4,7 +4,7 @@
 #include "Common.h"
 #include "Intrinsics.h"
 
-NAMESPACE_COMMON
+NAMESPACE_NUMERIC
 
 /// <summary>
 /// An SSE 128 intrinsics wrapper
@@ -23,7 +23,7 @@ public:
 	/// </summary>
 	__m128i Register;
 
-	/* Constructor */
+	//~~~ Constructor~~~//
 
 	UInt128() {}
 
@@ -94,7 +94,7 @@ public:
 		Register = _mm_set1_epi32(X);
 	}
 
-	/* Load and Store */
+	//~~~ Load and Store~~~//
 
 	/// <summary>
 	/// Load an array into a register in Big Endian format
@@ -129,8 +129,8 @@ public:
 	/// <param name="Offset">The starting position within the input array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
-	/// <param name="X0">Operand 2</param>
-	/// <param name="X1">Operand 3</param>
+	/// <param name="X2">Operand 2</param>
+	/// <param name="X3">Operand 3</param>
 	static inline void LoadBE16(const std::vector<byte> &Input, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		X0.LoadBE(Input, Offset);
@@ -201,8 +201,8 @@ public:
 	/// <param name="Offset">The starting position within the input array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
-	/// <param name="X0">Operand 2</param>
-	/// <param name="X1">Operand 3</param>
+	/// <param name="X2">Operand 2</param>
+	/// <param name="X3">Operand 3</param>
 	static inline void LoadLE16(const std::vector<byte> &Input, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		X0.LoadLE(Input, Offset);
@@ -244,7 +244,7 @@ public:
 	/// Store register in an integer array in Big Endian format
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
+	/// <param name="Output">The array containing the data; must be at least 128 bits in length</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template <typename T>
 	void StoreBE(std::vector<T> &Output, size_t Offset) const
@@ -260,8 +260,8 @@ public:
 	/// <param name="Offset">The starting offset within the output array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
-	/// <param name="X0">Operand 2</param>
-	/// <param name="X1">Operand 3</param>
+	/// <param name="X2">Operand 2</param>
+	/// <param name="X3">Operand 3</param>
 	static inline void StoreBE16(std::vector<byte> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		Transpose(X0, X1, X2, X3);
@@ -337,7 +337,7 @@ public:
 	/// Store register in an integer array in Little Endian format
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
+	/// <param name="Output">The array containing the data; must be at least 128 bits in length</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template <typename T>
 	void StoreLE(std::vector<T> &Output, size_t Offset) const
@@ -353,8 +353,8 @@ public:
 	/// <param name="Offset">The starting offset within the output array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
-	/// <param name="X0">Operand 2</param>
-	/// <param name="X1">Operand 3</param>
+	/// <param name="X2">Operand 2</param>
+	/// <param name="X3">Operand 3</param>
 	static inline void StoreLE16(std::vector<byte> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		Transpose(X0, X1, X2, X3);
@@ -369,8 +369,9 @@ public:
 	/// </summary>
 	///
 	/// <param name="Input">The input UInt128 array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="Output">The destination byte array</param>
-	/// <param name="OutOffset">The starting offset within the output array</param>
+	/// <param name="OutOffset">The starting offset within the Output array</param>
 	static inline void StoreLE256(std::vector<UInt128> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
 		__m128i T0 = _mm_unpacklo_epi32(Input[InOffset].Register, Input[InOffset + 1].Register);
@@ -425,7 +426,7 @@ public:
 		Input[InOffset + 15].StoreLE(Output, OutOffset + 240);
 	}
 
-	/* Methods */
+	//~~~ Methods~~~//
 
 	/// <summary>
 	/// Computes the bitwise AND of the 128-bit value in *this* and the bitwise NOT of the 128-bit value in Value
@@ -564,12 +565,12 @@ public:
 	/// Performs a byte swap on 4 unsigned integers
 	/// </summary>
 	/// 		
-	/// <param name="R">The UInt128 to process</param>
+	/// <param name="X">The UInt128 to process</param>
 	/// 
 	/// <returns>The byte swapped UInt128</returns>
-	static inline UInt128 Swap(UInt128 &R)
+	static inline UInt128 Swap(UInt128 &X)
 	{
-		__m128i T = R.Register;
+		__m128i T = X.Register;
 
 		T = _mm_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
 		T = _mm_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
@@ -581,44 +582,44 @@ public:
 	/// Copies the register uint8 array to an output array
 	/// </summary>
 	///
-	/// <param name="Input">The output byte array</param>
+	/// <param name="Output">The output byte array</param>
 	/// <param name="Offset">The starting offset within the output array</param>
-	void ToUint8(std::vector<byte> &Output, size_t OutOffset)
+	void ToUint8(std::vector<byte> &Output, size_t Offset)
 	{
-		memcpy(&Output[OutOffset], &Register.m128i_u8[0], 16);
+		memcpy(&Output[Offset], &Register.m128i_u8[0], 16);
 	}
 
 	/// <summary>
 	/// Copies the register uint16 array to an output array
 	/// </summary>
 	///
-	/// <param name="Input">The output byte array</param>
+	/// <param name="Output">The output byte array</param>
 	/// <param name="Offset">The starting offset within the output array</param>
-	void ToUint16(std::vector<ushort> &Output, size_t OutOffset)
+	void ToUint16(std::vector<ushort> &Output, size_t Offset)
 	{
-		memcpy(&Output[OutOffset], &Register.m128i_u16[0], 16);
+		memcpy(&Output[Offset], &Register.m128i_u16[0], 16);
 	}
 
 	/// <summary>
 	/// Copies the register uint32 array to an output array
 	/// </summary>
 	///
-	/// <param name="Input">The output byte array</param>
+	/// <param name="Output">The output byte array</param>
 	/// <param name="Offset">The starting offset within the output array</param>
-	void ToUint32(std::vector<uint> &Output, size_t OutOffset)
+	void ToUint32(std::vector<uint> &Output, size_t Offset)
 	{
-		memcpy(&Output[OutOffset], &Register.m128i_u32[0], 16);
+		memcpy(&Output[Offset], &Register.m128i_u32[0], 16);
 	}
 
 	/// <summary>
 	/// Copies the register uint64 array to an output array
 	/// </summary>
 	///
-	/// <param name="Input">The output byte array</param>
+	/// <param name="Output">The output byte array</param>
 	/// <param name="Offset">The starting offset within the output array</param>
-	void ToUint64(std::vector<ulong> &Output, size_t OutOffset)
+	void ToUint64(std::vector<ulong> &Output, size_t Offset)
 	{
-		memcpy(&Output[OutOffset], &Register.m128i_u64[0], 16);
+		memcpy(&Output[Offset], &Register.m128i_u64[0], 16);
 	}
 
 	/// <summary>
@@ -641,28 +642,53 @@ public:
 		X3.Register = _mm_unpackhi_epi64(T2, T3);
 	}
 
-	/* Operators */
+	//~~~ Operators~~~//
 
+	/// <summary>
+	/// Add a value to this integer
+	/// </summary>
+	///
+	/// <param name="Value">The value to add</param>
 	void operator += (const UInt128 &Value)
 	{
 		Register = _mm_add_epi32(Register, Value.Register);
 	}
 
+	/// <summary>
+	/// Add two integers
+	/// </summary>
+	///
+	/// <param name="Value">The value to add</param>
 	UInt128 operator + (const UInt128 &Value) const
 	{
 		return UInt128(_mm_add_epi32(Register, Value.Register));
 	}
 
+	/// <summary>
+	/// Subtract a value from this integer
+	/// </summary>
+	///
+	/// <param name="Value">The value to subtract</param>
 	void operator -= (const UInt128 &Value)
 	{
 		Register = _mm_sub_epi32(Register, Value.Register);
 	}
 
+	/// <summary>
+	/// Subtract two integers
+	/// </summary>
+	///
+	/// <param name="Value">The value to subtract</param>
 	UInt128 operator - (const UInt128 &Value) const
 	{
 		return UInt128(_mm_sub_epi32(Register, Value.Register));
 	}
 
+	/// <summary>
+	/// Multiply a value with this integer
+	/// </summary>
+	///
+	/// <param name="Value">The value to multiply</param>
 	void operator *= (const UInt128 &Value)
 	{
 #if defined(__SSE4_1__)
@@ -674,6 +700,11 @@ public:
 #endif
 	}
 
+	/// <summary>
+	/// Multiply two integers
+	/// </summary>
+	///
+	/// <param name="Value">The value to multiply</param>
 	UInt128 operator * (const UInt128 &Value) const
 	{
 #if defined(__SSE4_1__)
@@ -685,16 +716,28 @@ public:
 #endif
 	}
 
+	/// <summary>
+	/// Divide this integer by a value
+	/// </summary>
+	///
+	/// <param name="Value">The divisor value</param>
 	void operator /= (const UInt128 &Value)
 	{
+		// ToDo: finish this (rounded floating point ops)
 		Register.m128i_u32[0] /= Value.Register.m128i_u32[0];
 		Register.m128i_u32[1] /= Value.Register.m128i_u32[1];
 		Register.m128i_u32[2] /= Value.Register.m128i_u32[2];
 		Register.m128i_u32[3] /= Value.Register.m128i_u32[3];
 	}
 
+	/// <summary>
+	/// Divide two integers
+	/// </summary>
+	///
+	/// <param name="Value">The divisor value</param>
 	UInt128 operator / (const UInt128 &Value) const
 	{
+		// ToDo: finish this
 		return UInt128(
 			Register.m128i_u32[0] / Value.Register.m128i_u32[0],
 			Register.m128i_u32[1] / Value.Register.m128i_u32[1],
@@ -702,16 +745,28 @@ public:
 			Register.m128i_u32[3] / Value.Register.m128i_u32[3]);
 	}
 
+	/// <summary>
+	/// Get the remainder from a division operation
+	/// </summary>
+	///
+	/// <param name="Value">The divisor value</param>
 	void operator %= (const UInt128 &Value)
 	{
+		// ToDo: finish this
 		Register.m128i_u32[0] %= Value.Register.m128i_u32[0];
 		Register.m128i_u32[1] %= Value.Register.m128i_u32[1];
 		Register.m128i_u32[2] %= Value.Register.m128i_u32[2];
 		Register.m128i_u32[3] %= Value.Register.m128i_u32[3];
 	}
 
+	/// <summary>
+	/// Get the remainder from a division operation between two integers
+	/// </summary>
+	///
+	/// <param name="Value">The divisor value</param>
 	UInt128 operator % (const UInt128 &Value) const
 	{
+		// ToDo: finish this
 		return UInt128(
 			Register.m128i_u32[0] % Value.Register.m128i_u32[0],
 			Register.m128i_u32[1] % Value.Register.m128i_u32[1],
@@ -719,61 +774,114 @@ public:
 			Register.m128i_u32[3] % Value.Register.m128i_u32[3]);
 	}
 
+	/// <summary>
+	/// Xor this integer by a value
+	/// </summary>
+	///
+	/// <param name="Value">The value to Xor</param>
 	void operator ^= (const UInt128 &Value)
 	{
 		Register = _mm_xor_si128(Register, Value.Register);
 	}
 
+	/// <summary>
+	/// Xor two integers
+	/// </summary>
+	///
+	/// <param name="Value">The value to Xor</param>
 	UInt128 operator ^ (const UInt128 &Value) const
 	{
 		return UInt128(_mm_xor_si128(Register, Value.Register));
 	}
 
+	/// <summary>
+	/// OR this integer
+	/// </summary>
+	///
+	/// <param name="Value">The value to OR</param>
 	void operator |= (const UInt128 &Value)
 	{
 		Register = _mm_or_si128(Register, Value.Register);
 	}
 
+	/// <summary>
+	/// OR two integers
+	/// </summary>
+	///
+	/// <param name="Value">The value to OR</param>
 	UInt128 operator | (const UInt128 &Value)
 	{
 		return UInt128(_mm_or_si128(Register, Value.Register));
 	}
 
+	/// <summary>
+	/// AND this integer
+	/// </summary>
+	///
+	/// <param name="Value">The value to AND</param>
 	void operator &= (const UInt128 &Value)
 	{
 		Register = _mm_and_si128(Register, Value.Register);
 	}
 
+	/// <summary>
+	/// AND two integers
+	/// </summary>
+	///
+	/// <param name="Value">The value to AND</param>
 	UInt128 operator & (const UInt128 &Value)
 	{
 		return UInt128(_mm_and_si128(Register, Value.Register));
 	}
 
+	/// <summary>
+	/// Left shift this integer
+	/// </summary>
+	///
+	/// <param name="Shift">The shift position</param>
 	void operator <<= (const int Shift)
 	{
 		Register = _mm_slli_epi32(Register, Shift);
 	}
 
+	/// <summary>
+	/// Left shift two integers
+	/// </summary>
+	///
+	/// <param name="Shift">The shift position</param>
 	UInt128 operator << (const int Shift) const
 	{
 		return UInt128(_mm_slli_epi32(Register, static_cast<int>(Shift)));
 	}
 
+	/// <summary>
+	/// Right shift this integer
+	/// </summary>
+	///
+	/// <param name="Shift">The shift position</param>
 	void operator >>= (const int Shift)
 	{
 		Register = _mm_srli_epi32(Register, Shift);
 	}
 
+	/// <summary>
+	/// Right shift two integers
+	/// </summary>
+	///
+	/// <param name="Shift">The shift position</param>
 	UInt128 operator >> (const int Shift) const
 	{
 		return UInt128(_mm_srli_epi32(Register, static_cast<int>(Shift)));
 	}
 
+	/// <summary>
+	/// Bitwise NOT this integer
+	/// </summary>
 	UInt128 operator ~ () const
 	{
 		return UInt128(_mm_xor_si128(Register, _mm_set1_epi32(0xFFFFFFFF)));
 	}
 };
 
-NAMESPACE_COMMONEND
+NAMESPACE_NUMERICEND
 #endif

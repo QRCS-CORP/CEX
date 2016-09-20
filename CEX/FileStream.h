@@ -49,7 +49,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The stream can be read
@@ -81,7 +81,7 @@ public:
 	/// </summary>
 	std::fstream &Stream() { return _fileStream; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -120,7 +120,7 @@ public:
 		}
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Finalize objects
@@ -130,7 +130,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Close and flush the stream

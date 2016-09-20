@@ -3,12 +3,15 @@
 
 #include "Common.h"
 #include "Digests.h"
+#include "MacParams.h"
 #if defined(CPPEXCEPTIONS_ENABLED)
 #	include "CryptoDigestException.h"
 #endif
 
 NAMESPACE_DIGEST
 
+using CEX::Enumeration::Digests;
+using CEX::Common::MacParams;
 #if defined(CPPEXCEPTIONS_ENABLED)
 	using CEX::Exception::CryptoDigestException;
 #endif
@@ -19,7 +22,7 @@ NAMESPACE_DIGEST
 class IDigest
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -31,7 +34,7 @@ public:
 	/// </summary>
 	virtual ~IDigest() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Digests internal block size in bytes
@@ -46,14 +49,14 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual CEX::Enumeration::Digests Enumeral() = 0;
+	virtual Digests Enumeral() = 0;
 
 	/// <summary>
 	/// Get: The Digest name
 	/// </summary>
 	virtual const char *Name() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the buffer

@@ -54,7 +54,7 @@ size_t HMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 
 void HMAC::Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV)
 {
-#if defined(_DEBUG)
+#if defined(DEBUGASSERT_ENABLED)
 	assert(MacKey.size() > 1);
 #endif
 #if defined(CPPEXCEPTIONS_ENABLED)

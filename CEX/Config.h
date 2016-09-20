@@ -8,6 +8,10 @@
 
 #define IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
 
+#define GETBITMASK(index, size) (((1 << (size)) - 1) << (index))
+#define READBITSFROM(data, index, size) (((data) & GETBITMASK((index), (size))) >> (index))
+#define WRITEBITSTO(data, index, size, value) ((data) = ((data) & (~GETBITMASK((index), (size)))) | ((value) << (index)))
+
 // define endianess of CPU
 #if !defined(IS_LITTLE_ENDIAN)
 #	if (defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__PPC__) || defined(__mips__) || (defined(__MWERKS__) && !defined(__INTEL__)))
@@ -299,6 +303,9 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #endif
 
 #define CPPEXCEPTIONS_ENABLED
+#if defined(_DEBUG)
+#	define DEBUGASSERT_ENABLED
+#endif
 #define FASTROTATE_ENABLED
 
 #endif

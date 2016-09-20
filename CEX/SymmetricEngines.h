@@ -20,19 +20,19 @@ enum class SymmetricEngines : uint
 	/// <summary>
 	/// The Serpent Block Cipher Extended with an HKDF Key Schedule
 	/// </summary>
-	SHX = 8,
+	SHX = 4,
 	/// <summary>
 	/// A Twofish Block Cipher Extended with an HKDF Key Schedule
 	/// </summary>
-	THX = 32,
+	THX = 8,
 	/// <summary>
 	/// An implementation of the ChaCha Stream Cipher
 	/// </summary>
-	ChaCha = 64,
+	ChaCha = 16,
 	/// <summary>
 	/// A Salsa20 Stream Cipher
 	/// </summary>
-	Salsa = 128
+	Salsa = 32
 };
 
 NAMESPACE_ENUMERATIONEND

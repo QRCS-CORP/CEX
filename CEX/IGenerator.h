@@ -9,8 +9,9 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Enumeration::Generators;
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoGeneratorException;
+	using CEX::Exception::CryptoGeneratorException;
 #endif
 
 /// <summary>
@@ -19,7 +20,7 @@ using CEX::Exception::CryptoGeneratorException;
 class IGenerator
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -32,7 +33,7 @@ public:
 	virtual ~IGenerator() {}
 
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The generators type name
@@ -55,7 +56,7 @@ public:
 	/// </summary>
 	virtual const char *Name() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

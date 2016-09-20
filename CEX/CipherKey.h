@@ -11,6 +11,15 @@
 
 NAMESPACE_PRCSTRUCT
 
+using CEX::Common::CipherDescription;
+using CEX::Prng::CSPPrng;
+using CEX::Exception::CryptoProcessingException;
+using CEX::Utility::IntUtils;
+using CEX::IO::MemoryStream;
+using CEX::IO::SeekOrigin;
+using CEX::IO::StreamReader;
+using CEX::IO::StreamWriter;
+
 /// <summary>
 /// The CipherKey structure.
 /// <para>Used in conjunction with the CipherStream class. 
@@ -37,14 +46,14 @@ private:
 
 	std::vector<byte> m_keyID;
 	std::vector<byte> m_extKey;
-	CEX::Common::CipherDescription m_cprDsc;
+	CipherDescription m_cprDsc;
 
 public:
 
 	/// <summary>
 	/// The CipherDescription structure containing a complete description of the cipher instance
 	/// </summary>
-	CEX::Common::CipherDescription Description() const { return m_cprDsc; }
+	CipherDescription Description() const { return m_cprDsc; }
 
 	/// <summary>
 	/// The unique 16 byte ID field used to identify this key.
@@ -78,7 +87,7 @@ public:
 	/// <param name="ExtensionKey">An array of random bytes used to encrypt a message file extension. A null value auto generates this field</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if either the KeyId or ExtensionKey fields are null or invalid</exception>
-	CipherKey(CEX::Common::CipherDescription &Description, std::vector<byte> &KeyId, std::vector<byte> &ExtensionKey)
+	CipherKey(CipherDescription &Description, std::vector<byte> &KeyId, std::vector<byte> &ExtensionKey)
 		:
 		m_cprDsc(Description),
 		m_extKey(0),
@@ -86,13 +95,13 @@ public:
 	{
 		if (KeyId.size() == 0)
 		{
-			CEX::Prng::CSPPrng rnd;
+			CSPPrng rnd;
 			m_keyID = rnd.GetBytes(KEYID_SIZE);
 		}
 		else if (KeyId.size() != KEYID_SIZE)
 		{
 #if defined(CPPEXCEPTIONS_ENABLED)
-			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The KeyId must be exactly 16 bytes!");
+			throw new CryptoProcessingException("CipherKey:CTor", "The KeyId must be exactly 16 bytes!");
 #endif
 		}
 		else
@@ -102,13 +111,13 @@ public:
 
 		if (ExtensionKey.size() == 0)
 		{
-			CEX::Prng::CSPPrng rnd;
+			CSPPrng rnd;
 			m_extKey = rnd.GetBytes(EXTKEY_SIZE);
 		}
 		else if (ExtensionKey.size() != EXTKEY_SIZE)
 		{
 #if defined(CPPEXCEPTIONS_ENABLED)
-			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The random extension field must be exactly 16 bytes!");
+			throw new CryptoProcessingException("CipherKey:CTor", "The random extension field must be exactly 16 bytes!");
 #endif
 		}
 		else
@@ -122,15 +131,15 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The Stream containing the CipherKey</param>
-	explicit CipherKey(CEX::IO::MemoryStream &KeyStream)
+	explicit CipherKey(MemoryStream &KeyStream)
 		:
 		m_extKey(0),
 		m_keyID(0)
 	{
-		CEX::IO::StreamReader reader(KeyStream);
+		StreamReader reader(KeyStream);
 		m_keyID = reader.ReadBytes(KEYID_SIZE);
 		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		m_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
+		m_cprDsc = CipherDescription(reader.ReadBytes(CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -143,11 +152,11 @@ public:
 		m_extKey(0),
 		m_keyID(0)
 	{
-		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(KeyArray);
-		CEX::IO::StreamReader reader(ms);
+		MemoryStream ms = MemoryStream(KeyArray);
+		StreamReader reader(ms);
 		m_keyID = reader.ReadBytes(KEYID_SIZE);
 		m_extKey = reader.ReadBytes(EXTKEY_SIZE);
-		m_cprDsc = CEX::Common::CipherDescription(reader.ReadBytes(CEX::Common::CipherDescription::GetHeaderSize()));
+		m_cprDsc = CipherDescription(reader.ReadBytes(CipherDescription::GetHeaderSize()));
 	}
 
 	/// <summary>
@@ -157,9 +166,9 @@ public:
 	{
 		m_cprDsc.Reset();
 		if (m_extKey.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(m_extKey);
+			IntUtils::ClearVector(m_extKey);
 		if (m_keyID.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(m_keyID);
+			IntUtils::ClearVector(m_keyID);
 	}
 
 	/// <summary>
@@ -169,7 +178,7 @@ public:
 	/// <returns>The byte array containing the CipherKey</returns>
 	std::vector<byte> ToBytes()
 	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
+		StreamWriter writer(GetHeaderSize());
 		writer.Write(m_keyID);
 		writer.Write(m_extKey);
 		std::vector<byte> cpr = m_cprDsc.ToBytes();
@@ -183,9 +192,9 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The MemoryStream containing the CipherKey</returns>
-	CEX::IO::MemoryStream* ToStream()
+	MemoryStream* ToStream()
 	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
+		StreamWriter writer(GetHeaderSize());
 		writer.Write(m_keyID);
 		writer.Write(m_extKey);
 		std::vector<byte> cpr = m_cprDsc.ToBytes();
@@ -211,10 +220,10 @@ public:
 	/// <param name="KeyStream">The stream containing a key package</param>
 	/// 
 	/// <returns>CipherDescription structure</returns>
-	static CEX::Common::CipherDescription* GetCipherDescription(CEX::IO::MemoryStream &KeyStream)
+	static CipherDescription* GetCipherDescription(MemoryStream &KeyStream)
 	{
-		KeyStream.Seek(DESC_SEEK, CEX::IO::SeekOrigin::Begin);
-		return new CEX::Common::CipherDescription(KeyStream);
+		KeyStream.Seek(DESC_SEEK, SeekOrigin::Begin);
+		return new CipherDescription(KeyStream);
 	}
 
 	/// <summary>
@@ -224,10 +233,10 @@ public:
 	/// <param name="KeyStream">The stream containing the cipher key</param>
 	/// 
 	/// <returns>The file extension key</returns>
-	static std::vector<byte> GetExtensionKey(CEX::IO::MemoryStream &KeyStream)
+	static std::vector<byte> GetExtensionKey(MemoryStream &KeyStream)
 	{
-		KeyStream.Seek(EXTKEY_SEEK, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(KeyStream).ReadBytes(EXTKEY_SIZE);
+		KeyStream.Seek(EXTKEY_SEEK, SeekOrigin::Begin);
+		return StreamReader(KeyStream).ReadBytes(EXTKEY_SIZE);
 	}
 
 	/// <summary>
@@ -237,10 +246,10 @@ public:
 	/// <param name="KeyStream">The stream containing a cipher key</param>
 	/// 
 	/// <returns>The file extension key</returns>
-	static std::vector<byte> GetKeyId(CEX::IO::MemoryStream &KeyStream)
+	static std::vector<byte> GetKeyId(MemoryStream &KeyStream)
 	{
-		KeyStream.Seek(KEYID_SEEK, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(KeyStream).ReadBytes(KEYID_SIZE);
+		KeyStream.Seek(KEYID_SEEK, SeekOrigin::Begin);
+		return StreamReader(KeyStream).ReadBytes(KEYID_SIZE);
 	}
 
 	/// <summary>
@@ -249,9 +258,9 @@ public:
 	/// 
 	/// <param name="KeyStream">The stream containing a key package</param>
 	/// <param name="Description">The CipherDescription structure</param>
-	static void SetCipherDescription(CEX::IO::MemoryStream &KeyStream, CEX::Common::CipherDescription &Description)
+	static void SetCipherDescription(MemoryStream &KeyStream, CipherDescription &Description)
 	{
-		KeyStream.Seek(DESC_SEEK, CEX::IO::SeekOrigin::Begin);
+		KeyStream.Seek(DESC_SEEK, SeekOrigin::Begin);
 		KeyStream.Write(Description.ToBytes(), 0, DESC_SIZE);
 	}
 
@@ -261,9 +270,9 @@ public:
 	/// 
 	/// <param name="KeyStream">The stream containing a cipher key</param>
 	/// <param name="ExtensionKey">Array of 16 bytes containing the ExtensionKey</param>
-	static void SetExtensionKey(CEX::IO::MemoryStream &KeyStream, std::vector<byte> &ExtensionKey)
+	static void SetExtensionKey(MemoryStream &KeyStream, std::vector<byte> &ExtensionKey)
 	{
-		KeyStream.Seek(EXTKEY_SEEK, CEX::IO::SeekOrigin::Begin);
+		KeyStream.Seek(EXTKEY_SEEK, SeekOrigin::Begin);
 		KeyStream.Write(ExtensionKey, 0, EXTKEY_SIZE);
 	}
 
@@ -273,9 +282,9 @@ public:
 	/// 
 	/// <param name="KeyStream">The stream containing a cipher key</param>
 	/// <param name="KeyId">Array of 16 bytes containing the key id</param>
-	static void SetKeyId(CEX::IO::MemoryStream &KeyStream, std::vector<byte> &KeyId)
+	static void SetKeyId(MemoryStream &KeyStream, std::vector<byte> &KeyId)
 	{
-		KeyStream.Seek(KEYID_SEEK, CEX::IO::SeekOrigin::Begin);
+		KeyStream.Seek(KEYID_SEEK, SeekOrigin::Begin);
 		KeyStream.Write(KeyId, 0, KEYID_SIZE);
 	}
 

@@ -84,7 +84,7 @@ private:
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
@@ -99,14 +99,14 @@ public:
 	/// <summary>
 	/// Get: The digests type enumeration member
 	/// </summary>
-	virtual CEX::Enumeration::Digests Enumeral() { return CEX::Enumeration::Digests::Keccak512; }
+	virtual Digests Enumeral() { return Digests::Keccak512; }
 
 	/// <summary>
 	/// Get: Digest name
 	/// </summary>
 	virtual const char *Name() { return "Keccak512"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the digest
@@ -141,7 +141,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Update the buffer

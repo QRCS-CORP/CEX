@@ -1,14 +1,15 @@
 #include "BlockCipherFromName.h"
+#include "CpuDetect.h"
 #include "RHX.h"
 #include "SHX.h"
 #include "THX.h"
-
 #if defined(AESNI_AVAILABLE)
 #	include "AHX.h"
-#	include "CpuDetect.h"
 #endif
 
 NAMESPACE_HELPER
+
+using CEX::Common::CpuDetect;
 
 CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CEX::Enumeration::BlockCiphers BlockCipherType)
 {
@@ -18,8 +19,8 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 		case CEX::Enumeration::BlockCiphers::RHX:
 		{
 #if defined(AESNI_AVAILABLE)
-			CEX::Common::CpuDetect detect;
-			if (detect.AES)
+			CpuDetect detect;
+			if (detect.HasAES())
 				return new CEX::Cipher::Symmetric::Block::AHX();
 			else
 				return new CEX::Cipher::Symmetric::Block::RHX();
@@ -49,8 +50,8 @@ CEX::Cipher::Symmetric::Block::IBlockCipher* BlockCipherFromName::GetInstance(CE
 		case CEX::Enumeration::BlockCiphers::RHX:
 		{
 #if defined(AESNI_AVAILABLE)
-			CEX::Common::CpuDetect detect;
-			if (detect.AES)
+			CpuDetect detect;
+			if (detect.HasAES())
 				return new CEX::Cipher::Symmetric::Block::AHX(RoundCount, KdfEngineType);
 			else
 				return new CEX::Cipher::Symmetric::Block::RHX(BlockSize, RoundCount, KdfEngineType);

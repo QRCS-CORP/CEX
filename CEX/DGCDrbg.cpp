@@ -4,12 +4,15 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Utility::IntUtils;
+using CEX::Utility::ParallelUtils;
+
 void DGCDrbg::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		CEX::Utility::IntUtils::ClearVector(m_dgtSeed);
-		CEX::Utility::IntUtils::ClearVector(m_dgtState);
+		IntUtils::ClearVector(m_dgtSeed);
+		IntUtils::ClearVector(m_dgtState);
 
 		m_isInitialized = true;
 		m_keySize = 0;
@@ -128,7 +131,7 @@ void DGCDrbg::Update(const std::vector<byte> &Salt)
 	}
 }
 
-// *** Private *** //
+//~~~Private~~~//
 
 void DGCDrbg::CycleSeed()
 {
@@ -148,7 +151,7 @@ void DGCDrbg::IncrementCounter(long Counter)
 
 void DGCDrbg::GenerateState()
 {
-	CEX::Utility::ParallelUtils::lock<std::mutex> lock(m_mtxLock);
+	ParallelUtils::lock<std::mutex> lock(m_mtxLock);
 	IncrementCounter(m_stateCtr++);
 	m_msgDigest->BlockUpdate(m_dgtState, 0, m_dgtState.size());
 	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
@@ -160,7 +163,7 @@ void DGCDrbg::GenerateState()
 
 void DGCDrbg::UpdateCounter(long Counter)
 {
-	CEX::Utility::ParallelUtils::lock<std::mutex> lock(m_mtxLock);
+	ParallelUtils::lock<std::mutex> lock(m_mtxLock);
 	IncrementCounter(Counter);
 	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
 	m_msgDigest->DoFinal(m_dgtSeed, 0);
@@ -168,7 +171,7 @@ void DGCDrbg::UpdateCounter(long Counter)
 
 void DGCDrbg::UpdateSeed(std::vector<byte> Seed)
 {
-	CEX::Utility::ParallelUtils::lock<std::mutex> lock(m_mtxLock);
+	ParallelUtils::lock<std::mutex> lock(m_mtxLock);
 	m_msgDigest->BlockUpdate(Seed, 0, Seed.size());
 	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
 	m_msgDigest->DoFinal(m_dgtSeed, 0);

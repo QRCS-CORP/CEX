@@ -3,6 +3,8 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Utility::IntUtils;
+
 void HKDF::Destroy()
 {
 	if (!m_isDestroyed)
@@ -13,8 +15,8 @@ void HKDF::Destroy()
 		m_keySize = 0;
 		m_generatedBytes = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_currentT);
-		CEX::Utility::IntUtils::ClearVector(m_digestInfo);
+		IntUtils::ClearVector(m_currentT);
+		IntUtils::ClearVector(m_digestInfo);
 	}
 }
 
@@ -39,7 +41,7 @@ size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 	size_t toGenerate = Size;
 	size_t posInT = m_generatedBytes % m_hashSize;
 	size_t leftInT = m_hashSize - m_generatedBytes % m_hashSize;
-	size_t toCopy = CEX::Utility::IntUtils::Min(leftInT, toGenerate);
+	size_t toCopy = IntUtils::Min(leftInT, toGenerate);
 
 	memcpy(&Output[OutOffset], &m_currentT[posInT], toCopy);
 	m_generatedBytes += toCopy;
@@ -49,7 +51,7 @@ size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
 	while (toGenerate != 0)
 	{
 		Expand();
-		toCopy = CEX::Utility::IntUtils::Min(m_hashSize, toGenerate);
+		toCopy = IntUtils::Min(m_hashSize, toGenerate);
 		memcpy(&Output[OutOffset], &m_currentT[0], toCopy);
 		m_generatedBytes += toCopy;
 		toGenerate -= toCopy;
@@ -98,7 +100,7 @@ void HKDF::Update(const std::vector<byte> &Salt)
 	Initialize(Salt);
 }
 
-// *** Private *** //
+//~~~Private~~~//
 
 void HKDF::Extract(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, std::vector<byte> &Prk)
 {

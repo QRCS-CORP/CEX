@@ -11,7 +11,7 @@ NAMESPACE_PADDING
 class X923 : public IPadding
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -23,19 +23,19 @@ public:
 	/// </summary>
 	virtual ~X923() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::X923; }
+	virtual const PaddingModes Enumeral() { return PaddingModes::X923; }
 
 	/// <summary>
 	/// Get: Padding name
 	/// </summary>
 	virtual const char *Name() { return "X923"; }
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Add padding to input array

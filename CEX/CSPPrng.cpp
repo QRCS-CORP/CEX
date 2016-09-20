@@ -3,6 +3,8 @@
 
 NAMESPACE_PRNG
 
+using CEX::Utility::IntUtils;
+
 void CSPPrng::Destroy()
 {
 	if (!m_isDestroyed)
@@ -36,7 +38,7 @@ void CSPPrng::GetBytes(std::vector<byte> &Output)
 
 uint CSPPrng::Next()
 {
-	return CEX::Utility::IntUtils::ToInt32(GetBytes(4));
+	return IntUtils::ToInt32(GetBytes(4));
 }
 
 uint CSPPrng::Next(uint Maximum)
@@ -63,7 +65,7 @@ uint CSPPrng::Next(uint Minimum, uint Maximum)
 
 ulong CSPPrng::NextLong()
 {
-	return CEX::Utility::IntUtils::ToInt64(GetBytes(8));
+	return IntUtils::ToInt64(GetBytes(8));
 }
 
 ulong CSPPrng::NextLong(ulong Maximum)
@@ -99,7 +101,7 @@ void CSPPrng::Reset()
 	m_rngCrypto = new CEX::Seed::CSPRsg;
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 std::vector<byte> CSPPrng::GetByteRange(ulong Maximum)
 {

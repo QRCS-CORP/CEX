@@ -5,7 +5,9 @@
 
 NAMESPACE_PRNG
 
-// *** Public Methods *** //
+using CEX::IO::BitConverter;
+
+//~~~Public Methods~~~//
 
 /// <summary>
 /// Release all resources associated with the object
@@ -28,7 +30,7 @@ void SecureRandom::Destroy()
 	}
 }
 
-// *** Byte *** //
+//~~~Byte~~~//
 
 /// <summary>
 /// Return an array filled with pseudo random bytes
@@ -91,7 +93,7 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-// *** Char *** //
+//~~~Char~~~//
 
 /// <summary>
 /// Get a random char
@@ -101,7 +103,7 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 char SecureRandom::NextChar()
 {
 	int sze = sizeof(char);
-	return CEX::IO::BitConverter::ToChar(GetBytes(sze), 0);
+	return BitConverter::ToChar(GetBytes(sze), 0);
 }
 
 /// <summary>
@@ -112,10 +114,10 @@ char SecureRandom::NextChar()
 unsigned char SecureRandom::NextUChar()
 {
 	int sze = sizeof(unsigned char);
-	return CEX::IO::BitConverter::ToUChar(GetBytes(sze), 0);
+	return BitConverter::ToUChar(GetBytes(sze), 0);
 }
 
-// *** Double *** //
+//~~~Double~~~//
 
 /// <summary>
 /// Get a random double
@@ -125,10 +127,10 @@ unsigned char SecureRandom::NextUChar()
 double SecureRandom::NextDouble()
 {
 	int sze = sizeof(double);
-	return CEX::IO::BitConverter::ToDouble(GetBytes(sze), 0);
+	return BitConverter::ToDouble(GetBytes(sze), 0);
 }
 
-// *** Int16 *** //
+//~~~Int16~~~//
 
 /// <summary>
 /// Get a random non-negative short integer
@@ -137,7 +139,7 @@ double SecureRandom::NextDouble()
 /// <returns>Random Int16</returns>
 short SecureRandom::NextInt16()
 {
-	return CEX::IO::BitConverter::ToInt16(GetBytes(2), 0);
+	return BitConverter::ToInt16(GetBytes(2), 0);
 }
 
 /// <summary>
@@ -177,7 +179,7 @@ short SecureRandom::NextInt16(short Minimum, short Maximum)
 }
 
 
-// *** UInt16 *** //
+//~~~UInt16~~~//
 
 /// <summary>
 /// Get a random unsigned short integer
@@ -186,7 +188,7 @@ short SecureRandom::NextInt16(short Minimum, short Maximum)
 /// <returns>Random UInt16</returns>
 unsigned short SecureRandom::NextUInt16()
 {
-	return CEX::IO::BitConverter::ToUInt16(GetBytes(2), 0);
+	return BitConverter::ToUInt16(GetBytes(2), 0);
 }
 
 /// <summary>
@@ -226,7 +228,7 @@ unsigned short SecureRandom::NextUInt16(unsigned short Minimum, unsigned short M
 	return num;
 }
 
-// *** Int32 *** //
+//~~~Int32~~~//
 
 /// <summary>
 /// Get a random non-negative 32bit integer
@@ -235,7 +237,7 @@ unsigned short SecureRandom::NextUInt16(unsigned short Minimum, unsigned short M
 /// <returns>Random Int32</returns>
 int SecureRandom::Next()
 {
-	return CEX::IO::BitConverter::ToInt32(GetBytes(4), 0);
+	return BitConverter::ToInt32(GetBytes(4), 0);
 }
 
 /// <summary>
@@ -245,7 +247,7 @@ int SecureRandom::Next()
 /// <returns>Random Int32</returns>
 int SecureRandom::NextInt32()
 {
-	return CEX::IO::BitConverter::ToInt32(GetBytes(4), 0);
+	return BitConverter::ToInt32(GetBytes(4), 0);
 }
 
 /// <summary>
@@ -285,7 +287,7 @@ int SecureRandom::NextInt32(int Minimum, int Maximum)
 	return num;
 }
 
-// *** UInt32 *** //
+//~~~UInt32~~~//
 
 /// <summary>
 /// Get a random unsigned 32bit integer
@@ -294,7 +296,7 @@ int SecureRandom::NextInt32(int Minimum, int Maximum)
 /// <returns>Random UInt32</returns>
 uint SecureRandom::NextUInt32()
 {
-	return CEX::IO::BitConverter::ToUInt32(GetBytes(4), 0);
+	return BitConverter::ToUInt32(GetBytes(4), 0);
 }
 
 /// <summary>
@@ -334,7 +336,7 @@ uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
 	return num;
 }
 
-// *** Int64 *** //
+//~~~Int64~~~//
 
 /// <summary>
 /// Get a random long integer
@@ -343,7 +345,7 @@ uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
 /// <returns>Random Int64</returns>
 long SecureRandom::NextLong()
 {
-	return CEX::IO::BitConverter::ToInt64(GetBytes(8), 0);
+	return BitConverter::ToInt64(GetBytes(8), 0);
 }
 
 /// <summary>
@@ -353,7 +355,7 @@ long SecureRandom::NextLong()
 /// <returns>Random Int64</returns>
 long SecureRandom::NextInt64()
 {
-	return CEX::IO::BitConverter::ToInt64(GetBytes(8), 0);
+	return BitConverter::ToInt64(GetBytes(8), 0);
 }
 
 /// <summary>
@@ -393,7 +395,7 @@ long SecureRandom::NextInt64(long Minimum, long Maximum)
 	return num;
 }
 
-// *** UInt64 *** //
+//~~~UInt64~~~//
 
 /// <summary>
 /// Get a random ulong integer
@@ -402,7 +404,7 @@ long SecureRandom::NextInt64(long Minimum, long Maximum)
 /// <returns>Random UInt64</returns>
 ulong SecureRandom::NextUInt64()
 {
-	return CEX::IO::BitConverter::ToUInt64(GetBytes(8), 0);
+	return BitConverter::ToUInt64(GetBytes(8), 0);
 }
 
 /// <summary>
@@ -457,7 +459,7 @@ void SecureRandom::Reset()
 	m_bufferIndex = 0;
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
 {

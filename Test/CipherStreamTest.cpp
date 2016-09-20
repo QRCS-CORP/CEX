@@ -157,7 +157,7 @@ namespace Test
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			size_t sze = AllocateRandom(m_plnText, 0, cipher.BlockSize());
-			size_t prlBlock = sze - (sze % (cipher.BlockSize() * m_processorCount));
+			size_t prlBlock = sze - (sze % cipher.ParallelMinimumSize());
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 			m_encText.resize(sze);
@@ -263,7 +263,7 @@ namespace Test
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			size_t sze = AllocateRandom(m_plnText, 0, cipher.BlockSize());
-			size_t prlBlock = sze - (sze % (cipher.BlockSize() * m_processorCount));
+			size_t prlBlock = sze - (sze % cipher.ParallelMinimumSize());
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 			m_encText.resize(sze);
@@ -360,7 +360,7 @@ namespace Test
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			size_t sze = AllocateRandom(m_plnText);
-			size_t prlBlock = sze - (sze % (cipher.BlockSize() * m_processorCount));
+			size_t prlBlock = sze - (sze % cipher.ParallelMinimumSize());
 			m_encText.resize(sze);
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
@@ -533,7 +533,7 @@ namespace Test
 
 		CEX::Cipher::Symmetric::Block::RHX* engine = new CEX::Cipher::Symmetric::Block::RHX();
 
-		// 1 byte w/ byte arrays
+		// 1 byte with byte arrays
 		{
 			CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 			CEX::Processing::CipherStream cs(cipher);
@@ -549,7 +549,7 @@ namespace Test
 
 			delete cipher;
 		}
-		// 1 byte w/ stream
+		// 1 byte with stream
 		{
 			CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 			CEX::Processing::CipherStream cs(cipher);
@@ -570,7 +570,7 @@ namespace Test
 			delete cipher;
 		}
 
-		// partial block w/ byte arrays
+		// partial block with byte arrays
 		{
 			CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 			CEX::Processing::CipherStream cs(cipher);
@@ -589,7 +589,7 @@ namespace Test
 
 			delete cipher;
 		}
-		// partial block w/ stream
+		// partial block with stream
 		{
 			CEX::Cipher::Symmetric::Block::Mode::CTR* cipher = new CEX::Cipher::Symmetric::Block::Mode::CTR(engine);
 			CEX::Processing::CipherStream cs(cipher);
@@ -613,7 +613,7 @@ namespace Test
 			delete cipher;
 		}
 
-		// random block sizes w/ byte arrays
+		// random block sizes with byte arrays
 		{
 			for (unsigned int i = 0; i < 100; i++)
 			{
@@ -636,7 +636,7 @@ namespace Test
 				delete cipher;
 			}
 		}
-		// random block sizes w/ stream
+		// random block sizes with stream
 		{
 			for (unsigned int i = 0; i < 100; i++)
 			{

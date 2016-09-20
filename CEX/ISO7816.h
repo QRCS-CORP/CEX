@@ -22,7 +22,7 @@ private:
 	const byte MKCODE = (byte)0x80;
 
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -34,19 +34,19 @@ public:
 	/// </summary>
 	virtual ~ISO7816() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const CEX::Enumeration::PaddingModes Enumeral() { return CEX::Enumeration::PaddingModes::ISO7816; }
+	virtual const PaddingModes Enumeral() { return PaddingModes::ISO7816; }
 
 	/// <summary>
 	/// Get: Padding name
 	/// </summary>
 	virtual const char *Name() { return "ISO7816"; }
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Add padding to input array

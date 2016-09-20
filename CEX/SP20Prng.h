@@ -26,9 +26,14 @@
 
 #include "IRandom.h"
 #include "ISeed.h"
+#include "SeedGenerators.h"
 #include "SP20Drbg.h"
 
 NAMESPACE_PRNG
+
+using CEX::Seed::ISeed;
+using CEX::Enumeration::SeedGenerators;
+using CEX::Generator::SP20Drbg;
 
 /// <summary>
 /// SP20Prng: An implementation of a Encryption Counter based Deterministic Random Number Generator
@@ -70,26 +75,26 @@ private:
 	size_t m_dfnRounds;
 	size_t m_keySize = 0;
 	bool m_isDestroyed;
-	CEX::Generator::SP20Drbg* m_rngGenerator;
-	CEX::Seed::ISeed* m_seedGenerator;
-	CEX::Enumeration::SeedGenerators m_seedType;
+	SP20Drbg* m_rngGenerator;
+	ISeed* m_seedGenerator;
+	SeedGenerators m_seedType;
 	std::vector<byte>  m_stateSeed;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::SP20Prng; }
+	virtual const Prngs Enumeral() { return Prngs::SP20Prng; }
 
 	/// <summary>
 	/// Get: Algorithm name
 	/// </summary>
 	virtual const char *Name() { return "SP20Prng"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class
@@ -101,7 +106,7 @@ public:
 	/// <param name="Rounds">The number of diffusion rounds to use when generating the key stream</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer or key size invalid, or rounds count is out of range (rounds 10-30, min. buffer 64 bytes)</exception>
-	SP20Prng(CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 40, size_t Rounds = 20)
+	SP20Prng(SeedGenerators SeedEngine = SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 40, size_t Rounds = 20)
 		:
 		m_bufferIndex(0),
 		m_bufferSize(BufferSize),
@@ -161,7 +166,7 @@ public:
 	}
 
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -244,7 +249,7 @@ public:
 private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
+	ISeed* GetSeedGenerator(SeedGenerators SeedEngine);
 };
 
 NAMESPACE_PRNGEND

@@ -25,11 +25,15 @@
 #define _CEXENGINE_PBPRNG_H
 
 #include "IRandom.h"
-#include "DigestFromName.h"
-#include "IntUtils.h"
+#include "Digests.h"
+#include "IDigest.h"
 #include "PBKDF2.h"
 
 NAMESPACE_PRNG
+
+using CEX::Enumeration::Digests;
+using CEX::Digest::IDigest;
+using CEX::Generator::PBKDF2;
 
 /// <summary>
 /// PBPRng: An implementation of a passphrase based PKCS#5 random number generator
@@ -67,28 +71,28 @@ private:
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
 	std::vector<byte> m_byteBuffer;
-	CEX::Digest::IDigest* m_digestEngine;
+	IDigest* m_digestEngine;
 	size_t m_digestIterations;
-	CEX::Enumeration::Digests m_digestType;
+	Digests m_digestType;
 	bool m_isDestroyed;
-	CEX::Generator::PBKDF2* m_rngGenerator;
+	PBKDF2* m_rngGenerator;
 	std::vector<byte> m_stateSeed;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::PPBPrng; }
+	virtual const Prngs Enumeral() { return Prngs::PPBPrng; }
 
 	/// <summary>
 	/// Get: Algorithm name
 	/// </summary>
 	virtual const char *Name() { return "PPBPrng"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -100,7 +104,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
-	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::SHA512, size_t BufferSize = BUFFER_SIZE)
+	PPBPrng(std::vector<byte> &Seed, int Iterations = PKCS_ITERATIONS, Digests DigestEngine = Digests::SHA512, size_t BufferSize = BUFFER_SIZE)
 		:
 		m_bufferIndex(0),
 		m_bufferSize(BufferSize),
@@ -129,7 +133,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -212,8 +216,8 @@ public:
 private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests RngEngine);
-	uint GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine);
+	IDigest* GetInstance(Digests RngEngine);
+	uint GetMinimumSeedSize(Digests RngEngine);
 };
 
 NAMESPACE_PRNGEND

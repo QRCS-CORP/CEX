@@ -12,11 +12,11 @@ enum class StreamCiphers : uint
 	/// <summary>
 	/// An implementation of the ChaCha Stream Cipher
 	/// </summary>
-	ChaCha = 64,
+	ChaCha = 16,
 	/// <summary>
 	/// A Salsa20 Stream Cipher
 	/// </summary>
-	Salsa = 128
+	Salsa = 32
 };
 
 NAMESPACE_ENUMERATIONEND

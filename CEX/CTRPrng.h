@@ -30,12 +30,19 @@
 #define _CEXENGINE_CTRPRNG_H
 
 #include "IRandom.h"
+#include "BlockCiphers.h"
 #include "CTRDrbg.h"
 #include "IBlockCipher.h"
-#include "IRandom.h"
 #include "ISeed.h"
+#include "SeedGenerators.h"
 
 NAMESPACE_PRNG
+
+using CEX::Enumeration::BlockCiphers;
+using CEX::Generator::CTRDrbg;
+using CEX::Cipher::Symmetric::Block::IBlockCipher;
+using CEX::Seed::ISeed;
+using CEX::Enumeration::SeedGenerators;
 
 /// <summary>
 /// CTRPrng: An implementation of a Encryption Counter based Deterministic Random Number Generator
@@ -80,28 +87,28 @@ private:
 	size_t m_bufferSize = 0;
 	size_t m_keySize = 0;
 	bool m_isDestroyed;
-	CEX::Enumeration::BlockCiphers m_engineType;
-	CEX::Cipher::Symmetric::Block::IBlockCipher* m_rngEngine;
-	CEX::Generator::CTRDrbg* m_rngGenerator;
-	CEX::Seed::ISeed* m_seedGenerator;
-	CEX::Enumeration::SeedGenerators m_seedType;
+	BlockCiphers m_engineType;
+	IBlockCipher* m_rngEngine;
+	CTRDrbg* m_rngGenerator;
+	ISeed* m_seedGenerator;
+	SeedGenerators m_seedType;
 	std::vector<byte>  m_stateSeed;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::CTRPrng; }
+	virtual const Prngs Enumeral() { return Prngs::CTRPrng; }
 
 	/// <summary>
 	/// Get: Digest name
 	/// </summary>
 	virtual const char *Name() { return "CTRPrng"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -113,7 +120,7 @@ public:
 	/// <param name="KeySize">The key size (in bytes) of the symmetric cipher; a <c>0</c> value will auto size the key</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	CTRPrng(CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 0)
+	CTRPrng(BlockCiphers BlockEngine = BlockCiphers::RHX, SeedGenerators SeedEngine = SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE, size_t KeySize = 0)
 		:
 		m_bufferIndex(0),
 		m_bufferSize(BufferSize),
@@ -143,7 +150,7 @@ public:
 	/// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or too small</exception>
-	CTRPrng(std::vector<byte> &Seed, CEX::Enumeration::BlockCiphers BlockEngine = CEX::Enumeration::BlockCiphers::RHX, size_t BufferSize = 4096)
+	CTRPrng(std::vector<byte> &Seed, BlockCiphers BlockEngine = BlockCiphers::RHX, size_t BufferSize = 4096)
 		:
 		m_bufferIndex(0),
 		m_bufferSize(BufferSize),
@@ -173,7 +180,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -256,9 +263,9 @@ public:
 private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Cipher::Symmetric::Block::IBlockCipher* GetCipher(CEX::Enumeration::BlockCiphers RngEngine);
-	uint GetKeySize(CEX::Enumeration::BlockCiphers CipherEngine);
-	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
+	IBlockCipher* GetCipher(BlockCiphers RngEngine);
+	uint GetKeySize(BlockCiphers CipherEngine);
+	ISeed* GetSeedGenerator(SeedGenerators SeedEngine);
 };
 
 NAMESPACE_PRNGEND

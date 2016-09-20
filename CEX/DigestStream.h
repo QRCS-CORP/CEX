@@ -35,6 +35,13 @@
 
 NAMESPACE_PROCESSING
 
+using CEX::Exception::CryptoProcessingException;
+using CEX::Helper::DigestFromName;
+using CEX::Enumeration::Digests;
+using CEX::Event::Event;
+using CEX::IO::IByteStream;
+using CEX::Digest::IDigest;
+
 /// <summary>
 /// Digest stream helper class.
 /// <para>Wraps Message Digest stream functions in an easy to use interface.</para>
@@ -66,9 +73,9 @@ private:
 	static constexpr size_t BUFFER_SIZE = 64 * 1024;
 
 	size_t m_blockSize;
-	CEX::Digest::IDigest* m_digestEngine;
+	IDigest* m_digestEngine;
 	bool m_destroyEngine;
-	CEX::IO::IByteStream* m_inStream;
+	IByteStream* m_inStream;
 	bool m_isDestroyed = false;
 	size_t m_progressInterval;
 
@@ -79,7 +86,7 @@ public:
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
-	CEX::Event::Event<int> ProgressPercent;
+	Event<int> ProgressPercent;
 
 	/// <summary>
 	/// Initialize the class with a digest instance
@@ -89,7 +96,7 @@ public:
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
-	explicit DigestStream(CEX::Digest::IDigest* Digest)
+	explicit DigestStream(IDigest* Digest)
 		:
 		m_blockSize(Digest->BlockSize()),
 		m_destroyEngine(false),
@@ -100,7 +107,7 @@ public:
 	{
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (Digest == 0)
-			throw CEX::Exception::CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!");
+			throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!");
 #endif
 	}
 
@@ -109,14 +116,14 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Digest">The digest enumeration member</param>
-	explicit DigestStream(CEX::Enumeration::Digests Digest)
+	explicit DigestStream(Digests Digest)
 		:
 		m_destroyEngine(true),
 		m_inStream(0),
 		m_isDestroyed(false),
 		m_progressInterval(0)
 	{
-		m_digestEngine = CEX::Helper::DigestFromName::GetInstance(Digest);
+		m_digestEngine = DigestFromName::GetInstance(Digest);
 		m_blockSize = m_digestEngine->BlockSize();
 	}
 
@@ -135,7 +142,7 @@ public:
 	/// <returns>The Message Digest</returns>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> ComputeHash(CEX::IO::IByteStream* InStream);
+	std::vector<byte> ComputeHash(IByteStream* InStream);
 
 	/// <summary>
 	/// Process a length within the Input stream using an Offset

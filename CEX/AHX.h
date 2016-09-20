@@ -119,20 +119,24 @@ private:
 	bool m_destroyEngine;
 	size_t m_dfnRounds;
 	std::vector<__m128i> m_expKey;
-	bool m_hasIntrinsics;
+	bool m_hasAVX;
+	bool m_hasSSE;
 	std::vector<byte> m_hkdfInfo;
 	size_t m_ikmSize;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	CEX::Digest::IDigest* m_kdfEngine;
-	CEX::Enumeration::Digests m_kdfEngineType;
+	IDigest* m_kdfEngine;
+	Digests m_kdfEngineType;
 	std::vector<size_t> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 
+	AHX(const AHX&) = delete;
+	AHX& operator=(const AHX&) = delete;
+
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes.
@@ -153,17 +157,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const CEX::Enumeration::BlockCiphers Enumeral() { return CEX::Enumeration::BlockCiphers::AHX; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports AVX intrinsics
-	/// </summary>
-	virtual const bool HasAVX() { return false; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports SSE2 SIMD intrinsics
-	/// </summary>
-	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
+	virtual const BlockCiphers Enumeral() { return BlockCiphers::AHX; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
@@ -196,7 +190,7 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() { return m_dfnRounds; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class with a Digest instance (HKDF mode)
@@ -206,23 +200,28 @@ public:
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
 	///
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	AHX(CEX::Digest::IDigest *KdfEngine, size_t Rounds = ROUNDS22)
+	AHX(IDigest *KdfEngine, size_t Rounds = ROUNDS22)
 		:
 		m_blockSize(BLOCK16),
 		m_destroyEngine(false),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
-		m_hasIntrinsics(true),
+		m_hasAVX(false),
+		m_hasSSE(true),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
 		m_isEncryption(false),
 		m_isInitialized(false),
 		m_kdfEngine(KdfEngine),
-		m_kdfEngineType(CEX::Enumeration::Digests::SHA512),
+		m_kdfEngineType(Digests::SHA512),
 		m_legalKeySizes(LEGAL_KEYS, 0),
 		m_legalRounds(15, 0)
 	{
+#if defined(DEBUGASSERT_ENABLED)
+		assert(KdfEngine != 0);
+		assert(Rounds >= MIN_ROUNDS && Rounds <= MAX_ROUNDS && Rounds % 2 == 0);
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid null parameter! The digest instance can not be null.");
@@ -239,7 +238,6 @@ public:
 		m_kdfEngineType = KdfEngine->Enumeral();
 		// set the hmac key size
 		m_ikmSize = m_kdfEngine->DigestSize();
-
 		// add standard key lengths
 		m_legalKeySizes[0] = 16;
 		m_legalKeySizes[1] = 24;
@@ -256,17 +254,17 @@ public:
 	/// 
 	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. 
 	/// Default is based on the key size; defining rounds requires HKDF extended mode.</param>
-	/// <param name="KdfEngineType">The Key Schedule HKDF digest engine; can be any one of the <see cref="CEX::Enumeration::Digests">Digest</see> 
+	/// <param name="KdfEngineType">The Key Schedule HKDF digest engine; can be any one of the Digest
 	/// implementations. The default engine is None, which invokes the standard key schedule mechanism.</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	AHX(size_t Rounds = ROUNDS22, CEX::Enumeration::Digests KdfEngineType = CEX::Enumeration::Digests::None)
+	AHX(size_t Rounds = ROUNDS22, Digests KdfEngineType = Digests::None)
 		:
 		m_blockSize(BLOCK16),
 		m_destroyEngine(true),
 		m_dfnRounds(Rounds),
 		m_expKey(0),
-		m_hasIntrinsics(true),
+		m_hasSSE(true),
 		m_hkdfInfo(0, 0),
 		m_ikmSize(0),
 		m_isDestroyed(false),
@@ -283,8 +281,11 @@ public:
 		m_legalKeySizes[2] = 32;
 		m_legalKeySizes[3] = 64;
 
-		if (KdfEngineType != CEX::Enumeration::Digests::None)
+		if (KdfEngineType != Digests::None)
 		{
+#if defined(DEBUGASSERT_ENABLED)
+			assert(Rounds >= MIN_ROUNDS && Rounds <= MAX_ROUNDS && Rounds % 2 == 0);
+#endif
 #if defined(CPPEXCEPTIONS_ENABLED)
 			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
 				throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
@@ -320,7 +321,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
@@ -379,7 +380,7 @@ public:
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -397,10 +398,10 @@ public:
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
@@ -409,8 +410,10 @@ public:
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input array to Transform</param>
-	/// <param name="Output">Output array product of Transform</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">Output product of Transform</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
@@ -419,8 +422,10 @@ public:
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input array to Transform</param>
-	/// <param name="Output">Output array product of Transform</param>
+	/// <param name="Input">Input message to Transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">Output product of Transform</param>
+	/// <param name="OutOffset">Starting offset in the Output array</param>
 	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	private:
@@ -437,8 +442,8 @@ public:
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	int GetIkmSize(CEX::Enumeration::Digests DigestType);
-	CEX::Digest::IDigest* GetDigest(CEX::Enumeration::Digests DigestType);
+	uint GetIkmSize(Digests DigestType);
+	IDigest* GetDigest(Digests DigestType);
 };
 
 NAMESPACE_BLOCKEND

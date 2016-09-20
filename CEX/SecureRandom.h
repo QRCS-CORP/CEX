@@ -37,7 +37,10 @@
 
 NAMESPACE_PRNG
 
-using CEX::Exception::CryptoRandomException;
+using CEX::Seed::CSPRsg;
+#if defined(CPPEXCEPTIONS_ENABLED)
+	using CEX::Exception::CryptoRandomException;
+#endif
 
 /// <summary>
 /// An implementation of a Cryptographically Secure Pseudo Random Number Generator: SecureRandom. 
@@ -58,14 +61,14 @@ private:
 	static constexpr size_t MAXD16 = 16368;
 
 	bool m_isDestroyed;
-	CEX::Seed::CSPRsg* m_rngGenerator;
+	CSPRsg* m_rngGenerator;
 	std::vector<byte> m_byteBuffer;
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
 
 public:
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class

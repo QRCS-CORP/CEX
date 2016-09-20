@@ -24,6 +24,8 @@
 #ifndef _CEXENGINE_ICIPHERMODE_H
 #define _CEXENGINE_ICIPHERMODE_H
 
+#include "Common.h"
+#include "BlockCiphers.h"
 #include "CipherModes.h"
 #include "IBlockCipher.h"
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -32,96 +34,117 @@
 
 NAMESPACE_MODE
 
+using CEX::Enumeration::BlockCiphers;
+using CEX::Enumeration::CipherModes; 
+using CEX::Cipher::Symmetric::Block::IBlockCipher;
+using CEX::Common::KeyParams;
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoCipherModeException;
+	using CEX::Exception::CryptoCipherModeException;
 #endif
 
 /// <summary>
-/// Cipher Mode Interface
+/// Cipher mode virtual interface class.
+/// <para>Provides virtual interfaces for standard symmetric block cipher modes.</para>
 /// </summary>
 class ICipherMode
 {
+	ICipherMode(const ICipherMode&) = delete;
+	ICipherMode& operator=(const ICipherMode&) = delete;
+
 public:
-	// *** Constructor *** //
+
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// Initialize the ICipherMode virtual interface class
 	/// </summary>
-	ICipherMode() {}
+	explicit ICipherMode() {}
 
 	/// <summary>
-	/// Destructor
+	/// Finalize objects
 	/// </summary>
 	virtual ~ICipherMode() {}
 
-	// *** Properties *** //
+
+	//~~~Properties~~~//
 
 	/// <summary>
-	/// Get: Unit block size of internal cipher
+	/// Get: Block size of internal cipher in bytes
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get: Underlying Cipher
+	/// Get: The underlying Block Cipher instance
 	/// </summary>
 	virtual IBlockCipher* Engine() = 0;
 
 	/// <summary>
-	/// Get: The cipher modes type name
+	/// Get: The Cipher Modes enumeration type name
 	/// </summary>
-	virtual const CEX::Enumeration::CipherModes Enumeral() = 0;
+	virtual const CipherModes Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Initialized for encryption, false for decryption
+	/// Get: Returns True if the cipher supports AVX intrinsics
+	/// </summary>
+	virtual const bool HasAVX() = 0;
+
+	/// <summary>
+	/// Get: Returns True if the cipher supports SIMD intrinsics
+	/// </summary>
+	virtual const bool HasSSE() = 0;
+
+	/// <summary>
+	/// Get: True if initialized for encryption, False for decryption
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
 	/// <summary>
-	/// Get: Cipher is ready to transform data
+	/// Get: The Block Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: Automatic processor parallelization
+	/// Get: Enable automatic processor parallelization
 	/// </summary>
 	virtual bool &IsParallel() = 0;
 
 	/// <summary>
-	/// Get: The current state of the initialization Vector
+	/// Get: The current state of the Initialization Vector
 	/// </summary>
 	virtual const std::vector<byte> &IV() = 0;
 
 	/// <summary>
-	/// Get: List of available legal key sizes
+	/// Get: Array of valid encryption key byte lengths
 	/// </summary>
 	virtual const std::vector<size_t> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Get: Cipher name
+	/// Get: The Cipher Mode name
 	/// </summary>
 	virtual const char* Name() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>
 	/// </summary>
 	virtual size_t &ParallelBlockSize() = 0;
 
 	/// <summary>
-	/// Get: Maximum input size with parallel processing
+	/// Get: Maximum input block byte length when using multi-threaded processing
 	/// </summary>
 	virtual const size_t ParallelMaximumSize() = 0;
 
 	/// <summary>
-	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
+	/// Get: The smallest valid input block byte length, when using multi-threaded processing; parallel blocks must be a multiple of this size
 	/// </summary>
 	virtual const size_t ParallelMinimumSize() = 0;
 
 	/// <remarks>
-	/// Get: Processor count
+	/// Get: Available system processor core count
 	/// </remarks>
 	virtual const size_t ProcessorCount() = 0;
 
-	// *** Public Methods *** //
+
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -129,33 +152,33 @@ public:
 	virtual void Destroy() = 0;
 
 	/// <summary>
-	/// Initialize the Cipher
+	/// Initialize the Cipher instance
 	/// </summary>
 	///
 	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
 	/// <param name="KeyParam">The KeyParams containing key and vector</param>
-	virtual void Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam) = 0;
+	virtual void Initialize(bool Encryption, const KeyParams &KeyParam) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes. 
-	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>.
+	/// <para>Transforms one block of bytes beginning at a zero index.
 	/// Initialize() must be called before this method can be used.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.  
-	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>.
+	/// <para>Transforms one block of bytes using the designated offsets.
 	/// Initialize() must be called before this method can be used.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 

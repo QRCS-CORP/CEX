@@ -35,6 +35,8 @@
 
 NAMESPACE_PRNG
 
+using CEX::Seed::CSPRsg;
+
 /// <summary>
 /// An implementation of a Cryptographically Secure PRNG using the the operating system random provider
 /// </summary>
@@ -60,23 +62,23 @@ class CSPPrng : public IRandom
 {
 private:
 	bool m_isDestroyed;
-	CEX::Seed::CSPRsg* m_rngCrypto;
+	CSPRsg* m_rngCrypto;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::CSPPrng; }
+	virtual const Prngs Enumeral() { return Prngs::CSPPrng; }
 
 	/// <summary>
 	/// Get: Digest name
 	/// </summary>
 	virtual const char *Name() { return "CSPPrng"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class
@@ -96,7 +98,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

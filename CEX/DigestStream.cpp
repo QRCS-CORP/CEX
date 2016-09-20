@@ -3,11 +3,11 @@
 
 NAMESPACE_PROCESSING
 
-std::vector<byte> DigestStream::ComputeHash(CEX::IO::IByteStream* InStream)
+std::vector<byte> DigestStream::ComputeHash(IByteStream* InStream)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
 	if (InStream->Length() - InStream->Position() < 1)
-		throw CEX::Exception::CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
+		throw CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
 #endif
 
 	m_inStream = InStream;
@@ -22,7 +22,7 @@ std::vector<byte> DigestStream::ComputeHash(const std::vector<byte> &Input, size
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
-		throw CEX::Exception::CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
+		throw CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
 #endif
 
 	size_t dataLen = Length - InOffset;

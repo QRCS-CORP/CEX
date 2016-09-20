@@ -30,7 +30,7 @@ void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void
 #if defined(_OPENMP)
 #pragma omp parallel num_threads(To)
 	{
-		size_t i = omp_get_thread_num();
+		size_t i = (size_t)omp_get_thread_num();
 		F(i);
 	}
 #elif defined(_WIN32)

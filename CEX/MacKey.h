@@ -2,14 +2,23 @@
 #define _CEXENGINE_MACKEY_H
 
 #include "Common.h"
-#include "MacDescription.h"
 #include "CryptoProcessingException.h"
 #include "CSPPrng.h"
 #include "IntUtils.h"
+#include "MacDescription.h"
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
 NAMESPACE_PRCSTRUCT
+
+using CEX::Exception::CryptoProcessingException;
+using CEX::Prng::CSPPrng;
+using CEX::Utility::IntUtils;
+using CEX::Common::MacDescription;
+using CEX::IO::MemoryStream;
+using CEX::IO::SeekOrigin;
+using CEX::IO::StreamReader;
+using CEX::IO::StreamWriter;
 
 /// <summary>
 /// The MacKey structure.
@@ -36,14 +45,14 @@ private:
 	static constexpr uint KEYUID_SEEK = MACDSC_SIZE;
 
 	std::vector<byte> m_keyId;
-	CEX::Common::MacDescription m_macDsc;
+	MacDescription m_macDsc;
 
 public:
 
 	/// <summary>
 	/// The MacDescription structure containing a complete description of the Mac instance
 	/// </summary>
-	CEX::Common::MacDescription Description() const { return m_macDsc; }
+	MacDescription Description() const { return m_macDsc; }
 
 	/// <summary>
 	/// The unique 16 byte ID field used to identify this key.
@@ -70,20 +79,20 @@ public:
 	/// <param name="KeyId">The unique 16 byte ID field used to identify this key. A null value auto generates this field</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if either the KeyId or ExtensionKey fields are null or invalid</exception>
-	MacKey(CEX::Common::MacDescription &Description, std::vector<byte> &KeyId)
+	MacKey(MacDescription &Description, std::vector<byte> &KeyId)
 		:
 		m_macDsc(Description),
 		m_keyId(0)
 	{
 		if (KeyId.size() == 0)
 		{
-			CEX::Prng::CSPPrng rnd;
+			CSPPrng rnd;
 			m_keyId = rnd.GetBytes(KEYUID_SIZE);
 		}
 		else if (KeyId.size() != KEYUID_SIZE)
 		{
 #if defined(CPPEXCEPTIONS_ENABLED)
-			throw new CEX::Exception::CryptoProcessingException("CipherKey:CTor", "The MacKey must be exactly 16 bytes!");
+			throw new CryptoProcessingException("CipherKey:CTor", "The MacKey must be exactly 16 bytes!");
 #endif
 		}
 		else
@@ -97,13 +106,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The Stream containing the MacKey</param>
-	explicit MacKey(CEX::IO::MemoryStream &KeyStream)
+	explicit MacKey(MemoryStream &KeyStream)
 		:
 		m_keyId(0)
 	{
-		CEX::IO::StreamReader reader(KeyStream);
+		StreamReader reader(KeyStream);
 
-		m_macDsc = CEX::Common::MacDescription(reader.ReadBytes(CEX::Common::MacDescription::GetHeaderSize()));
+		m_macDsc = MacDescription(reader.ReadBytes(MacDescription::GetHeaderSize()));
 		m_keyId = reader.ReadBytes(KEYUID_SIZE);
 	}
 
@@ -116,10 +125,10 @@ public:
 		:
 		m_keyId(0)
 	{
-		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(KeyArray);
-		CEX::IO::StreamReader reader(ms);
+		MemoryStream ms = MemoryStream(KeyArray);
+		StreamReader reader(ms);
 
-		m_macDsc = CEX::Common::MacDescription(reader.ReadBytes(CEX::Common::MacDescription::GetHeaderSize()));
+		m_macDsc = MacDescription(reader.ReadBytes(MacDescription::GetHeaderSize()));
 		m_keyId = reader.ReadBytes(KEYUID_SIZE);
 	}
 
@@ -130,7 +139,7 @@ public:
 	{
 		m_macDsc.Reset();
 		if (m_keyId.size() != 0)
-			CEX::Utility::IntUtils::ClearVector(m_keyId);
+			IntUtils::ClearVector(m_keyId);
 	}
 
 	/// <summary>
@@ -140,7 +149,7 @@ public:
 	/// <returns>The byte array containing the MacKey</returns>
 	std::vector<byte> ToBytes()
 	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
+		StreamWriter writer(GetHeaderSize());
 
 		writer.Write(m_macDsc.ToBytes());
 		writer.Write(m_keyId);
@@ -153,9 +162,9 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The MemoryStream containing the MacKey</returns>
-	CEX::IO::MemoryStream* ToStream()
+	MemoryStream* ToStream()
 	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
+		StreamWriter writer(GetHeaderSize());
 
 		writer.Write(m_macDsc.ToBytes());
 		writer.Write(m_keyId);
@@ -180,10 +189,10 @@ public:
 	/// <param name="KeyStream">The stream containing a key package</param>
 	/// 
 	/// <returns>MacDescription structure</returns>
-	static CEX::Common::MacDescription* GetCipherDescription(CEX::IO::MemoryStream &KeyStream)
+	static MacDescription* GetCipherDescription(MemoryStream &KeyStream)
 	{
-		KeyStream.Seek(MACDSC_SEEK, CEX::IO::SeekOrigin::Begin);
-		return new CEX::Common::MacDescription(KeyStream);
+		KeyStream.Seek(MACDSC_SEEK, SeekOrigin::Begin);
+		return new MacDescription(KeyStream);
 	}
 
 	/// <summary>
@@ -193,10 +202,10 @@ public:
 	/// <param name="KeyStream">The stream containing a Mac key</param>
 	/// 
 	/// <returns>The file extension key</returns>
-	static std::vector<byte> GetKeyId(CEX::IO::MemoryStream &KeyStream)
+	static std::vector<byte> GetKeyId(MemoryStream &KeyStream)
 	{
-		KeyStream.Seek(KEYUID_SEEK, CEX::IO::SeekOrigin::Begin);
-		return CEX::IO::StreamReader(KeyStream).ReadBytes(KEYUID_SIZE);
+		KeyStream.Seek(KEYUID_SEEK, SeekOrigin::Begin);
+		return StreamReader(KeyStream).ReadBytes(KEYUID_SIZE);
 	}
 
 	/// <summary>
@@ -205,9 +214,9 @@ public:
 	/// 
 	/// <param name="KeyStream">The stream containing a key package</param>
 	/// <param name="Description">The MacDescription structure</param>
-	static void SetCipherDescription(CEX::IO::MemoryStream &KeyStream, CEX::Common::MacDescription &Description)
+	static void SetCipherDescription(MemoryStream &KeyStream, MacDescription &Description)
 	{
-		KeyStream.Seek(MACDSC_SEEK, CEX::IO::SeekOrigin::Begin);
+		KeyStream.Seek(MACDSC_SEEK, SeekOrigin::Begin);
 		KeyStream.Write(Description.ToBytes(), 0, MACDSC_SIZE);
 	}
 
@@ -217,9 +226,9 @@ public:
 	/// 
 	/// <param name="KeyStream">The stream containing a Mac key</param>
 	/// <param name="KeyId">Array of 16 bytes containing the key id</param>
-	static void SetKeyId(CEX::IO::MemoryStream &KeyStream, std::vector<byte> &KeyId)
+	static void SetKeyId(MemoryStream &KeyStream, std::vector<byte> &KeyId)
 	{
-		KeyStream.Seek(KEYUID_SEEK, CEX::IO::SeekOrigin::Begin);
+		KeyStream.Seek(KEYUID_SEEK, SeekOrigin::Begin);
 		KeyStream.Write(KeyId, 0, KEYUID_SIZE);
 	}
 

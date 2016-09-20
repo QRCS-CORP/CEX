@@ -172,14 +172,14 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 #endif
 }
 
-void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasIntrinsics)
+void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasSSE)
 {
 	const size_t BLOCK = 16;
 	size_t ctr = 0;
 
 	do
 	{
-		if (HasIntrinsics)
+		if (HasSSE)
 			IXOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
 		else
 			XOR128(Input, InOffset + ctr, Output, OutOffset + ctr);

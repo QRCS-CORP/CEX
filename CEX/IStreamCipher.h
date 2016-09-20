@@ -11,8 +11,10 @@
 
 NAMESPACE_STREAM
 
+using CEX::Common::KeyParams;
+using CEX::Enumeration::StreamCiphers;
 #if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoSymmetricCipherException;
+	using CEX::Exception::CryptoSymmetricCipherException;
 #endif
 
 /// <summary>
@@ -22,7 +24,7 @@ class IStreamCipher
 {
 
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -45,7 +47,7 @@ public:
 	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
-	virtual const CEX::Enumeration::StreamCiphers Enumeral() = 0;
+	virtual const StreamCiphers Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
@@ -55,7 +57,7 @@ public:
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
 	/// </summary>
-	virtual const bool HasIntrinsics() = 0;
+	virtual const bool HasSSE() = 0;
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
@@ -99,6 +101,11 @@ public:
 	/// </summary>
 	virtual const size_t ParallelMinimumSize() = 0;
 
+	/// <summary>
+	/// Get: The maximum number of threads allocated when using multi-threaded processing
+	/// </summary>
+	virtual const size_t ParallelThreadsMax() = 0;
+
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
@@ -114,7 +121,7 @@ public:
 	/// </summary>
 	virtual const size_t VectorSize() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -126,7 +133,18 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParam">Cipher key container. The LegalKeySizes property contains valid sizes</param>
-	virtual void Initialize(const CEX::Common::KeyParams &KeyParam) = 0;
+	virtual void Initialize(const KeyParams &KeyParam) = 0;
+
+	/// <summary>
+	/// Set the maximum number of threads allocated when using multi-threaded processing.
+	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
+	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes

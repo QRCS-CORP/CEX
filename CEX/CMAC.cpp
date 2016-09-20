@@ -6,6 +6,8 @@
 
 NAMESPACE_MAC
 
+using CEX::Utility::IntUtils;
+
 void CMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -63,10 +65,10 @@ void CMAC::Destroy()
 	{
 		m_blockSize = 0;
 		m_isInitialized = false;
-		CEX::Utility::IntUtils::ClearVector(K1);
-		CEX::Utility::IntUtils::ClearVector(K2);
-		CEX::Utility::IntUtils::ClearVector(m_msgCode);
-		CEX::Utility::IntUtils::ClearVector(m_wrkBuffer);
+		IntUtils::ClearVector(K1);
+		IntUtils::ClearVector(K2);
+		IntUtils::ClearVector(m_msgCode);
+		IntUtils::ClearVector(m_wrkBuffer);
 		m_macSize = 0;
 		m_wrkOffset = 0;
 		m_isDestroyed = true;
@@ -84,11 +86,11 @@ size_t CMAC::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 	{
 		CEX::Cipher::Symmetric::Block::Padding::ISO7816 pad;
 		pad.AddPadding(m_wrkBuffer, m_wrkOffset);
-		CEX::Utility::IntUtils::XORBLK(K2, 0, m_wrkBuffer, 0, m_macSize);
+		IntUtils::XORBLK(K2, 0, m_wrkBuffer, 0, m_macSize);
 	}
 	else
 	{
-		CEX::Utility::IntUtils::XORBLK(K1, 0, m_wrkBuffer, 0, m_macSize);
+		IntUtils::XORBLK(K1, 0, m_wrkBuffer, 0, m_macSize);
 	}
 
 	m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);

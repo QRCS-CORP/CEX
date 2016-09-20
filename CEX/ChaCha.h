@@ -77,37 +77,40 @@ NAMESPACE_STREAM
 class ChaCha : public IStreamCipher
 {
 private:
-	static constexpr size_t ROUNDS20 = 20;
-	static constexpr size_t MAX_ROUNDS = 30;
-	static constexpr size_t MIN_ROUNDS = 8;
-	static constexpr size_t STATE_SIZE = 16;
-	static constexpr size_t VECTOR_SIZE = 8;
 	static constexpr size_t BLOCK_SIZE = 64;
-	static constexpr size_t PARALLEL_CHUNK = 1024;
+	static constexpr size_t MAX_ROUNDS = 30;
 	static constexpr size_t MAXALLOC_MB100 = 100000000;
+	static constexpr size_t MIN_ROUNDS = 8;
+	static constexpr size_t PARALLEL_CHUNK = 1024;
 	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
+	static constexpr size_t ROUNDS20 = 20;
 	static constexpr const char *SIGMA = "expand 32-byte k";
+	static constexpr size_t STATE_SIZE = 16;
 	static constexpr const char *TAU = "expand 16-byte k";
+	static constexpr size_t VECTOR_SIZE = 8;
 
 	std::vector<uint> m_ctrVector;
 	std::vector<byte> m_dstCode;
 	bool m_hasAVX;
-	bool m_hasIntrinsics;
+	bool m_hasSSE;
 	bool m_isInitialized;
 	bool m_isParallel;
 	bool m_isDestroyed;
 	std::vector<size_t> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	size_t m_parallelBlockSize;
+	size_t m_parallelMaxDegree;
 	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 	size_t m_rndCount;
-	std::vector<std::vector<uint>> m_threadVectors;
 	std::vector<uint> m_wrkState;
+
+	ChaCha(const ChaCha&) = delete;
+	ChaCha& operator=(const ChaCha&) = delete;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes.
@@ -131,7 +134,7 @@ public:
 	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
-	virtual const CEX::Enumeration::StreamCiphers Enumeral() { return CEX::Enumeration::StreamCiphers::ChaCha; }
+	virtual const StreamCiphers Enumeral() { return StreamCiphers::ChaCha; }
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
@@ -141,7 +144,7 @@ public:
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
 	/// </summary>
-	virtual const bool HasIntrinsics() { return m_hasIntrinsics; }
+	virtual const bool HasSSE() { return m_hasSSE; }
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
@@ -179,10 +182,15 @@ public:
 	/// </summary>
 	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
+	/// <summary>
+	/// Get: The maximum number of threads allocated when using multi-threaded processing
+	/// </summary>
+	virtual const size_t ParallelThreadsMax() { return m_parallelMaxDegree; }
+
 	/// <remarks>
 	/// Get: Processor count
 	/// </remarks>
-	virtual const size_t ProcessorCount() { return GetProcessorCount(); }
+	virtual const size_t ProcessorCount() { return m_processorCount; }
 
 	/// <summary>
 	/// Get: Cipher name
@@ -199,7 +207,7 @@ public:
 	/// </summary>
 	virtual const size_t VectorSize() { return VECTOR_SIZE; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class
@@ -212,11 +220,12 @@ public:
 		:
 		m_ctrVector(2, 0),
 		m_hasAVX(false),
-		m_hasIntrinsics(false),
+		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isInitialized(false),
 		m_isParallel(false),
 		m_parallelBlockSize(0),
+		m_parallelMaxDegree(0),
 		m_parallelMinimumSize(0),
 		m_rndCount(Rounds),
 		m_wrkState(14, 0)
@@ -231,8 +240,8 @@ public:
 		m_legalKeySizes = { 16, 32 };
 		m_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
 
-		DetectCpu();
-		SetScope();
+		Detect();
+		Scope();
 	}
 
 	/// <summary>
@@ -243,7 +252,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Destroy of this class
@@ -258,7 +267,18 @@ public:
 	/// <para>Uses the Key and IV fields of KeyParam. The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
 	/// The IV must be 8 bytes in size.</para>
 	/// </param>
-	virtual void Initialize(const CEX::Common::KeyParams &KeyParam);
+	virtual void Initialize(const KeyParams &KeyParam);
+
+	/// <summary>
+	/// Set the maximum number of threads allocated when using multi-threaded processing.
+	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
+	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	virtual void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
 	/// Reset the primary internal counter
@@ -298,14 +318,13 @@ public:
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 private:
-	void DetectCpu();
+	void Detect();
+	void Expand(const std::vector<byte> &Key, const std::vector<byte> &Iv);
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter, const size_t Length);
-	uint GetProcessorCount();
 	void Increase(const std::vector<uint> &Input, std::vector<uint> &Output, const size_t Length);
 	void Increment(std::vector<uint> &Counter);
-	void ProcessBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-	void SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv);
-	void SetScope();
+	void Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+	void Scope();
 	void Transform64(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter);
 	void Transform256(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
 	void Transform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);

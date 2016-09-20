@@ -46,7 +46,7 @@ private:
 	std::vector<ulong> JMP1024;
 
 public:
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The seed generators type name
@@ -58,7 +58,7 @@ public:
 	/// </summary>
 	virtual const char *Name() { return "XSPRsg"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize this class using the default random provider to generate 16 ulongs and invoke the 1024 bit function
@@ -137,7 +137,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

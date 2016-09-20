@@ -4,11 +4,13 @@
 
 NAMESPACE_PROCESSING
 
-std::vector<byte> MacStream::ComputeMac(CEX::IO::IByteStream* InStream)
+using CEX::Helper::MacFromDescription;
+
+std::vector<byte> MacStream::ComputeMac(IByteStream* InStream)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
 	if (InStream->Length() - InStream->Position() < 1)
-		throw CEX::Exception::CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
+		throw CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
 #endif
 
 	m_inStream = InStream;
@@ -23,7 +25,7 @@ std::vector<byte> MacStream::ComputeMac(const std::vector<byte> &Input, size_t I
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
-		throw CEX::Exception::CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
+		throw CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
 #endif
 
 	size_t dataLen = Length - InOffset;
@@ -33,7 +35,7 @@ std::vector<byte> MacStream::ComputeMac(const std::vector<byte> &Input, size_t I
 	return Compute(Input, InOffset, Length);
 }
 
-/*** Protected Methods ***/
+/*** Private Methods ***/
 
 void MacStream::CalculateInterval(size_t Length)
 {
@@ -130,9 +132,9 @@ void MacStream::Destroy()
 	m_isDestroyed = true;
 }
 
-void MacStream::CreateMac(CEX::Common::MacDescription &Description)
+void MacStream::CreateMac(MacDescription &Description)
 {
-	m_macEngine = CEX::Helper::MacFromDescription::GetInstance(Description);
+	m_macEngine = MacFromDescription::GetInstance(Description);
 }
 
 NAMESPACE_PROCESSINGEND

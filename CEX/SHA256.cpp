@@ -4,6 +4,8 @@
 
 NAMESPACE_DIGEST
 
+using CEX::Utility::IntUtils;
+
 void SHA256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 #if defined(CPPEXCEPTIONS_ENABLED)
@@ -55,8 +57,8 @@ void SHA256::Destroy()
 		H0 = 0, H1 = 0, H2 = 0, H3 = 0, H4 = 0, H5 = 0, H6 = 0, H7 = 0;
 		m_wordOffset = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_prcBuffer);
-		CEX::Utility::IntUtils::ClearVector(m_wordBuffer);
+		IntUtils::ClearVector(m_prcBuffer);
+		IntUtils::ClearVector(m_wordBuffer);
 	}
 }
 
@@ -68,14 +70,14 @@ size_t SHA256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 #endif
 
 	Finish();
-	CEX::Utility::IntUtils::Be32ToBytes(H0, Output, OutOffset);
-	CEX::Utility::IntUtils::Be32ToBytes(H1, Output, OutOffset + 4);
-	CEX::Utility::IntUtils::Be32ToBytes(H2, Output, OutOffset + 8);
-	CEX::Utility::IntUtils::Be32ToBytes(H3, Output, OutOffset + 12);
-	CEX::Utility::IntUtils::Be32ToBytes(H4, Output, OutOffset + 16);
-	CEX::Utility::IntUtils::Be32ToBytes(H5, Output, OutOffset + 20);
-	CEX::Utility::IntUtils::Be32ToBytes(H6, Output, OutOffset + 24);
-	CEX::Utility::IntUtils::Be32ToBytes(H7, Output, OutOffset + 28);
+	IntUtils::Be32ToBytes(H0, Output, OutOffset);
+	IntUtils::Be32ToBytes(H1, Output, OutOffset + 4);
+	IntUtils::Be32ToBytes(H2, Output, OutOffset + 8);
+	IntUtils::Be32ToBytes(H3, Output, OutOffset + 12);
+	IntUtils::Be32ToBytes(H4, Output, OutOffset + 16);
+	IntUtils::Be32ToBytes(H5, Output, OutOffset + 20);
+	IntUtils::Be32ToBytes(H6, Output, OutOffset + 24);
+	IntUtils::Be32ToBytes(H7, Output, OutOffset + 28);
 
 	Reset();
 
@@ -104,7 +106,7 @@ void SHA256::Update(byte Input)
 	m_byteCount++;
 }
 
-// *** Protected Methods *** //
+//~~~Protected Methods~~~//
 
 void SHA256::Finish()
 {
@@ -427,7 +429,7 @@ void SHA256::ProcessLength(ulong BitLength)
 
 void SHA256::ProcessWord(const std::vector<byte> &Input, size_t Offset)
 {
-	m_wordBuffer[m_wordOffset] = CEX::Utility::IntUtils::BytesToBe32(Input, Offset);
+	m_wordBuffer[m_wordOffset] = IntUtils::BytesToBe32(Input, Offset);
 
 	if (++m_wordOffset == 16)
 		ProcessBlock();

@@ -211,7 +211,7 @@ NAMESPACE_DIGEST
 
 		/// <summary>
 		/// Create a deep copy of this structure.
-		/// <para>Caller must delete this object.</pare>
+		/// <para>Caller must delete this object.</para>
 		/// </summary>
 		Blake2Params* DeepCopy()
 		{

@@ -22,13 +22,17 @@ enum class CipherModes : uint
 	/// </summary>
 	CFB = 2,
 	/// <summary>
-	/// SIC Counter Mode
+	/// Big Endian Segmented Integer Counter Mode
 	/// </summary>
 	CTR = 4,
 	/// <summary>
+	/// Little Endian Integer Counter Mode
+	/// </summary>
+	ICM = 8,
+	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>
-	OFB = 8
+	OFB = 16
 };
 
 NAMESPACE_ENUMERATIONEND

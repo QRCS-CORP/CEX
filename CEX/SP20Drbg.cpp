@@ -4,6 +4,9 @@
 
 NAMESPACE_GENERATOR
 
+using CEX::Utility::IntUtils;
+using CEX::Utility::ParallelUtils;
+
 void SP20Drbg::Destroy()
 {
 	if (!m_isDestroyed)
@@ -14,11 +17,11 @@ void SP20Drbg::Destroy()
 		m_parallelBlockSize = 0;
 		m_rndCount = 0;
 
-		CEX::Utility::IntUtils::ClearVector(m_ctrVector);
-		CEX::Utility::IntUtils::ClearVector(m_dstCode);
-		CEX::Utility::IntUtils::ClearVector(m_legalRounds);
-		CEX::Utility::IntUtils::ClearVector(m_threadVectors);
-		CEX::Utility::IntUtils::ClearVector(m_wrkState);
+		IntUtils::ClearVector(m_ctrVector);
+		IntUtils::ClearVector(m_dstCode);
+		IntUtils::ClearVector(m_legalRounds);
+		IntUtils::ClearVector(m_thdVectors);
+		IntUtils::ClearVector(m_wrkState);
 
 		m_isDestroyed = true;
 	}
@@ -101,7 +104,7 @@ void SP20Drbg::Update(const std::vector<byte> &Salt)
 #endif
 }
 
-// *** Private *** //
+//~~~Private~~~//
 
 void SP20Drbg::Generate(const size_t Length, std::vector<uint> &Counter, std::vector<byte> &Output, const size_t OutOffset)
 {
@@ -162,100 +165,100 @@ void SP20Drbg::SalsaCore(std::vector<byte> &Output, size_t OutOffset, const std:
 	ctr = m_rndCount;
 	while (ctr != 0)
 	{
-		X4 ^= CEX::Utility::IntUtils::RotL32(X0 + X12, 7);
-		X8 ^= CEX::Utility::IntUtils::RotL32(X4 + X0, 9);
-		X12 ^= CEX::Utility::IntUtils::RotL32(X8 + X4, 13);
-		X0 ^= CEX::Utility::IntUtils::RotL32(X12 + X8, 18);
-		X9 ^= CEX::Utility::IntUtils::RotL32(X5 + X1, 7);
-		X13 ^= CEX::Utility::IntUtils::RotL32(X9 + X5, 9);
-		X1 ^= CEX::Utility::IntUtils::RotL32(X13 + X9, 13);
-		X5 ^= CEX::Utility::IntUtils::RotL32(X1 + X13, 18);
-		X14 ^= CEX::Utility::IntUtils::RotL32(X10 + X6, 7);
-		X2 ^= CEX::Utility::IntUtils::RotL32(X14 + X10, 9);
-		X6 ^= CEX::Utility::IntUtils::RotL32(X2 + X14, 13);
-		X10 ^= CEX::Utility::IntUtils::RotL32(X6 + X2, 18);
-		X3 ^= CEX::Utility::IntUtils::RotL32(X15 + X11, 7);
-		X7 ^= CEX::Utility::IntUtils::RotL32(X3 + X15, 9);
-		X11 ^= CEX::Utility::IntUtils::RotL32(X7 + X3, 13);
-		X15 ^= CEX::Utility::IntUtils::RotL32(X11 + X7, 18);
-		X1 ^= CEX::Utility::IntUtils::RotL32(X0 + X3, 7);
-		X2 ^= CEX::Utility::IntUtils::RotL32(X1 + X0, 9);
-		X3 ^= CEX::Utility::IntUtils::RotL32(X2 + X1, 13);
-		X0 ^= CEX::Utility::IntUtils::RotL32(X3 + X2, 18);
-		X6 ^= CEX::Utility::IntUtils::RotL32(X5 + X4, 7);
-		X7 ^= CEX::Utility::IntUtils::RotL32(X6 + X5, 9);
-		X4 ^= CEX::Utility::IntUtils::RotL32(X7 + X6, 13);
-		X5 ^= CEX::Utility::IntUtils::RotL32(X4 + X7, 18);
-		X11 ^= CEX::Utility::IntUtils::RotL32(X10 + X9, 7);
-		X8 ^= CEX::Utility::IntUtils::RotL32(X11 + X10, 9);
-		X9 ^= CEX::Utility::IntUtils::RotL32(X8 + X11, 13);
-		X10 ^= CEX::Utility::IntUtils::RotL32(X9 + X8, 18);
-		X12 ^= CEX::Utility::IntUtils::RotL32(X15 + X14, 7);
-		X13 ^= CEX::Utility::IntUtils::RotL32(X12 + X15, 9);
-		X14 ^= CEX::Utility::IntUtils::RotL32(X13 + X12, 13);
-		X15 ^= CEX::Utility::IntUtils::RotL32(X14 + X13, 18);
+		X4 ^= IntUtils::RotL32(X0 + X12, 7);
+		X8 ^= IntUtils::RotL32(X4 + X0, 9);
+		X12 ^= IntUtils::RotL32(X8 + X4, 13);
+		X0 ^= IntUtils::RotL32(X12 + X8, 18);
+		X9 ^= IntUtils::RotL32(X5 + X1, 7);
+		X13 ^= IntUtils::RotL32(X9 + X5, 9);
+		X1 ^= IntUtils::RotL32(X13 + X9, 13);
+		X5 ^= IntUtils::RotL32(X1 + X13, 18);
+		X14 ^= IntUtils::RotL32(X10 + X6, 7);
+		X2 ^= IntUtils::RotL32(X14 + X10, 9);
+		X6 ^= IntUtils::RotL32(X2 + X14, 13);
+		X10 ^= IntUtils::RotL32(X6 + X2, 18);
+		X3 ^= IntUtils::RotL32(X15 + X11, 7);
+		X7 ^= IntUtils::RotL32(X3 + X15, 9);
+		X11 ^= IntUtils::RotL32(X7 + X3, 13);
+		X15 ^= IntUtils::RotL32(X11 + X7, 18);
+		X1 ^= IntUtils::RotL32(X0 + X3, 7);
+		X2 ^= IntUtils::RotL32(X1 + X0, 9);
+		X3 ^= IntUtils::RotL32(X2 + X1, 13);
+		X0 ^= IntUtils::RotL32(X3 + X2, 18);
+		X6 ^= IntUtils::RotL32(X5 + X4, 7);
+		X7 ^= IntUtils::RotL32(X6 + X5, 9);
+		X4 ^= IntUtils::RotL32(X7 + X6, 13);
+		X5 ^= IntUtils::RotL32(X4 + X7, 18);
+		X11 ^= IntUtils::RotL32(X10 + X9, 7);
+		X8 ^= IntUtils::RotL32(X11 + X10, 9);
+		X9 ^= IntUtils::RotL32(X8 + X11, 13);
+		X10 ^= IntUtils::RotL32(X9 + X8, 18);
+		X12 ^= IntUtils::RotL32(X15 + X14, 7);
+		X13 ^= IntUtils::RotL32(X12 + X15, 9);
+		X14 ^= IntUtils::RotL32(X13 + X12, 13);
+		X15 ^= IntUtils::RotL32(X14 + X13, 18);
 		ctr -= 2;
 	}
 
-	CEX::Utility::IntUtils::Le32ToBytes(X0 + m_wrkState[ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X1 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X2 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X3 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X4 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X5 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X6 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X7 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X8 + Counter[0], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X9 + Counter[1], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X10 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X11 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X12 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X13 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X14 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
-	CEX::Utility::IntUtils::Le32ToBytes(X15 + m_wrkState[++ctr], Output, OutOffset);
+	IntUtils::Le32ToBytes(X0 + m_wrkState[ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X1 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X2 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X3 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X4 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X5 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X6 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X7 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X8 + Counter[0], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X9 + Counter[1], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X10 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X11 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X12 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X13 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X14 + m_wrkState[++ctr], Output, OutOffset); OutOffset += 4;
+	IntUtils::Le32ToBytes(X15 + m_wrkState[++ctr], Output, OutOffset);
 }
 
 void SP20Drbg::SetKey(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 {
 	if (Key.size() == 32)
 	{
-		m_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 0);
-		m_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		m_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		m_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		m_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		m_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 4);
-		m_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
-		m_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
-		m_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 8);
-		m_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 16);
-		m_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 20);
-		m_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 24);
-		m_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Key, 28);
-		m_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 12);
+		m_wrkState[0] = IntUtils::BytesToLe32(m_dstCode, 0);
+		m_wrkState[1] = IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[2] = IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[3] = IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[4] = IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[5] = IntUtils::BytesToLe32(m_dstCode, 4);
+		m_wrkState[6] = IntUtils::BytesToLe32(Iv, 0);
+		m_wrkState[7] = IntUtils::BytesToLe32(Iv, 4);
+		m_wrkState[8] = IntUtils::BytesToLe32(m_dstCode, 8);
+		m_wrkState[9] = IntUtils::BytesToLe32(Key, 16);
+		m_wrkState[10] = IntUtils::BytesToLe32(Key, 20);
+		m_wrkState[11] = IntUtils::BytesToLe32(Key, 24);
+		m_wrkState[12] = IntUtils::BytesToLe32(Key, 28);
+		m_wrkState[13] = IntUtils::BytesToLe32(m_dstCode, 12);
 	}
 	else
 	{
-		m_wrkState[0] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 0);
-		m_wrkState[1] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		m_wrkState[2] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		m_wrkState[3] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		m_wrkState[4] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		m_wrkState[5] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 4);
-		m_wrkState[6] = CEX::Utility::IntUtils::BytesToLe32(Iv, 0);
-		m_wrkState[7] = CEX::Utility::IntUtils::BytesToLe32(Iv, 4);
-		m_wrkState[8] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 8);
-		m_wrkState[9] = CEX::Utility::IntUtils::BytesToLe32(Key, 0);
-		m_wrkState[10] = CEX::Utility::IntUtils::BytesToLe32(Key, 4);
-		m_wrkState[11] = CEX::Utility::IntUtils::BytesToLe32(Key, 8);
-		m_wrkState[12] = CEX::Utility::IntUtils::BytesToLe32(Key, 12);
-		m_wrkState[13] = CEX::Utility::IntUtils::BytesToLe32(m_dstCode, 12);
+		m_wrkState[0] = IntUtils::BytesToLe32(m_dstCode, 0);
+		m_wrkState[1] = IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[2] = IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[3] = IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[4] = IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[5] = IntUtils::BytesToLe32(m_dstCode, 4);
+		m_wrkState[6] = IntUtils::BytesToLe32(Iv, 0);
+		m_wrkState[7] = IntUtils::BytesToLe32(Iv, 4);
+		m_wrkState[8] = IntUtils::BytesToLe32(m_dstCode, 8);
+		m_wrkState[9] = IntUtils::BytesToLe32(Key, 0);
+		m_wrkState[10] = IntUtils::BytesToLe32(Key, 4);
+		m_wrkState[11] = IntUtils::BytesToLe32(Key, 8);
+		m_wrkState[12] = IntUtils::BytesToLe32(Key, 12);
+		m_wrkState[13] = IntUtils::BytesToLe32(m_dstCode, 12);
 	}
 }
 
 void SP20Drbg::SetScope()
 {
-	m_processorCount = CEX::Utility::ParallelUtils::ProcessorCount();
+	m_processorCount = ParallelUtils::ProcessorCount();
 	if (m_processorCount % 2 != 0)
 		m_processorCount--;
 	if (m_processorCount > 1)
@@ -274,30 +277,30 @@ void SP20Drbg::Transform(std::vector<byte> &Output, size_t OutOffset)
 	else
 	{
 		// parallel CTR processing //
-		size_t cnkSize = (outSize / BLOCK_SIZE / m_processorCount) * BLOCK_SIZE;
-		size_t rndSize = cnkSize * m_processorCount;
-		size_t subSize = (cnkSize / BLOCK_SIZE);
+		const size_t CNKSZE = (outSize / BLOCK_SIZE / m_processorCount) * BLOCK_SIZE;
+		const size_t RNDSZE = CNKSZE * m_processorCount;
+		const size_t SUBSZE = (CNKSZE / BLOCK_SIZE);
 		// create jagged array of 'sub counters'
-		m_threadVectors.resize(m_processorCount);
+		m_thdVectors.resize(m_processorCount);
 
-		CEX::Utility::ParallelUtils::ParallelFor(0, m_processorCount, [this, &Output, cnkSize, rndSize, subSize, OutOffset](size_t i)
+		ParallelUtils::ParallelFor(0, m_processorCount, [this, &Output, CNKSZE, RNDSZE, SUBSZE, OutOffset](size_t i)
 		{
-			std::vector<uint> &iv = m_threadVectors[i];
+			std::vector<uint> &iv = m_thdVectors[i];
 			// offset counter by chunk size / block size
-			this->Increase(m_ctrVector, subSize * i, iv);
+			this->Increase(m_ctrVector, SUBSZE * i, iv);
 			// create random at offset position
-			this->Generate(cnkSize, iv, Output, OutOffset + (i * cnkSize));
+			this->Generate(CNKSZE, iv, Output, OutOffset + (i * CNKSZE));
 		});
 
 		// last block processing
-		if (rndSize < outSize)
+		if (RNDSZE < outSize)
 		{
-			size_t fnlSize = outSize % rndSize;
-			Generate(fnlSize, m_threadVectors[m_processorCount - 1], Output, OutOffset + rndSize);
+			size_t fnlSize = outSize % RNDSZE;
+			Generate(fnlSize, m_thdVectors[m_processorCount - 1], Output, OutOffset + RNDSZE);
 		}
 
 		// copy the last counter position to class variable
-		memcpy(&m_ctrVector[0], &m_threadVectors[m_processorCount - 1][0], m_ctrVector.size() * sizeof(uint));
+		memcpy(&m_ctrVector[0], &m_thdVectors[m_processorCount - 1][0], m_ctrVector.size() * sizeof(uint));
 	}
 }
 

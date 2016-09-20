@@ -26,7 +26,7 @@
 
 #include "Common.h"
 
-// *** Rijndael S-Box and Lookup Tables *** //
+//~~~Rijndael S-Box and Lookup Tables~~~//
 
 constexpr uint Rcon[] = {
     0x00000000, 0x01000000, 0x02000000, 0x04000000, 0x08000000, 0x10000000, 0x20000000, 0x40000000,

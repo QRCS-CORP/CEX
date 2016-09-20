@@ -19,7 +19,7 @@ using CEX::Exception::CryptoRandomException;
 class ISeed
 {
 public:
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// CTor: Initialize this class
@@ -31,7 +31,7 @@ public:
 	/// </summary>
 	virtual ~ISeed() {}
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The seed generators type name
@@ -43,7 +43,7 @@ public:
 	/// </summary>
 	virtual const char *Name() = 0;
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

@@ -2,15 +2,16 @@
 #define _CEXENGINE_CPUDETECT_H
 
 #include "Common.h"
+#include <algorithm>
 
 #if defined(_WIN32)
 #	include <intrin.h>
 #	include <stdio.h>
-#		define cpuid(info, x)  __cpuidex(info, x, 0)
-#	else
+#	define cpuid(info, x)  __cpuidex(info, x, 0)
+#else
 #	include <cpuid.h>
-void cpuid(int info[4], int InfoType) {
-	__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
+	void cpuid(int info[4], int InfoType) {
+		__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
 	}
 #endif
 
@@ -23,10 +24,21 @@ class CpuDetect
 {
 public:
 
+	//~~~ Public Enums~~~//
+	/// <summary>
+	/// Enumeration of cpu vendors
+	/// </summary>
+	enum class CpuVendors : uint
+	{
+		UNKNOWN = 0,
+		AMD = 1,
+		INTEL = 2
+	};
+
 	/// <summary>
 	/// Enumeration of processor feature sets
 	/// </summary>
-	enum FeatureSet : uint
+	enum class FeatureSets : uint
 	{
 		/// <summary>
 		/// Intructions are not available
@@ -156,7 +168,52 @@ public:
 		/// AVX512 Vector Byte Manipulation Instructions
 		/// </summary>
 		AVX512VBMI = 1073741824,
+		/// <summary>
+		/// Hardware supports hyper-threading
+		/// </summary>
+		HYPERTHREAD = 2147483648
 	};
+
+	/// <summary>
+	/// Maps to the L2Associative cache associativity setting
+	/// </summary>
+	enum class CacheAssociations
+	{
+		Disabled = 0,
+		DirectMapped = 1,
+		TwoWay = 2,
+		FourWay = 4,
+		EightWay = 6,
+		SixteenWay = 8,
+		FullyAssociative = 16
+	};
+
+	//~~~ Properties~~~//
+
+	/// <summary>
+	/// Returns the L1 cache size per processer in Kilobytes
+	/// </summary>
+	size_t L1CacheSize;
+
+	/// <summary>
+	/// Returns the total L1 cache size for all processers in Kilobytes
+	/// </summary>
+	size_t L1CacheTotal;
+
+	/// <summary>
+	/// Returns the L2 cache size per processer in Kilobytes
+	/// </summary>
+	size_t L2CacheSize;
+
+	/// <summary>
+	/// Returns the L2 cache associativity
+	/// </summary>
+	CacheAssociations L2Associative;
+
+	/// <summary>
+	/// The CPU's vendor string
+	/// </summary>
+	std::string CpuVendor;
 
 	/// <summary>
 	/// MMX instructions available
@@ -200,6 +257,10 @@ public:
 	/// Streaming SIMD Extensions 2.0 available
 	/// </summary>
 	bool HW_SSE2;
+	/// <summary>
+	/// Hardware supports hyper-threading
+	/// </summary>
+	bool HW_HYPER;
 	/// <summary>
 	/// Streaming SIMD Extensions 3.0 available
 	/// </summary>
@@ -288,75 +349,64 @@ public:
 	/// AVX512 Vector Byte Manipulation Instructions
 	/// </summary>
 	bool HW_AVX512VBMI;
+	/// <summary>
+	/// The total number of physical cores per processor
+	/// </summary>
+	size_t HW_PHYSICALCORES;
+	/// <summary>
+	/// The total number of virtual cores per processor (including hyperthreading)
+	/// </summary>
+	size_t HW_VIRTUALCORES;
+	/// <summary>
+	/// The maximum number of logical processors per core
+	/// </summary>
+	size_t HW_LOGICALPERCORE;
+	/// <summary>
+	/// N-core and CAP_HT is falsely set
+	/// </summary>
+	bool HW_AMD_CMP_LEGACY;
+	/// <summary>
+	/// MultiProcessing capable; reserved on AMD64
+	/// </summary>
+	bool HW_AMD_MP;
+	/// <summary>
+	/// AMD MMX extensions enabled
+	/// </summary>
+	bool HW_AMD_MMX_EXT;
+	/// <summary>
+	/// AMD 3DNOW PRO extensions enabled
+	/// </summary>
+	bool HW_AMD_3DNOW_PRO;
+	/// <summary>
+	/// AMD 3DNOW extensions enabled
+	/// </summary>
+	bool HW_AMD_3DNOW;
+
+	//~~~ Constructor~~~//
 
 	/// <summary>
 	/// Initialization Detects Cpu features
 	/// </summary>
 	CpuDetect()
 	{
-		int info[4];
-		cpuid(info, 0);
-		int nIds = info[0];
-
-		cpuid(info, 0x80000000);
-		unsigned nExIds = info[0];
-
-		//  Detect Features
-		if (nIds >= 0x00000001)
-		{
-			cpuid(info, 0x00000001);
-			HW_MMX = (info[3] & ((int)1 << 23)) != 0;
-			HW_SSE = (info[3] & ((int)1 << 25)) != 0;
-			HW_SSE2 = (info[3] & ((int)1 << 26)) != 0;
-			HW_SSE3 = (info[2] & ((int)1 << 0)) != 0;
-			HW_SSSE3 = (info[2] & ((int)1 << 9)) != 0;
-			HW_SSE41 = (info[2] & ((int)1 << 19)) != 0;
-			HW_SSE42 = (info[2] & ((int)1 << 20)) != 0;
-			HW_AES = (info[2] & ((int)1 << 25)) != 0;
-			HW_FMA3 = (info[2] & ((int)1 << 12)) != 0;
-			HW_RDRAND = (info[2] & ((int)1 << 30)) != 0;
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-			HW_AVX = HasAvxSupport();
-#else
-			HW_AVX = (info[2] & ((int)1 << 28)) != 0;
-#endif
-		}
-
-		if (nIds >= 0x00000007)
-		{
-			cpuid(info, 0x00000007);
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-			HW_AVX2 = HasAvx2Support();
-#else
-			HW_AVX2 = (info[1] & ((int)1 << 5)) != 0;
-#endif
-			HW_BMI1 = (info[1] & ((int)1 << 3)) != 0;
-			HW_BMI2 = (info[1] & ((int)1 << 8)) != 0;
-			HW_ADX = (info[1] & ((int)1 << 19)) != 0;
-			HW_SHA = (info[1] & ((int)1 << 29)) != 0;
-			HW_PREFETCHWT1 = (info[2] & ((int)1 << 0)) != 0;
-			HW_AVX512F = (info[1] & ((int)1 << 16)) != 0;
-			HW_AVX512CD = (info[1] & ((int)1 << 28)) != 0;
-			HW_AVX512PF = (info[1] & ((int)1 << 26)) != 0;
-			HW_AVX512ER = (info[1] & ((int)1 << 27)) != 0;
-			HW_AVX512VL = (info[1] & ((int)1 << 31)) != 0;
-			HW_AVX512BW = (info[1] & ((int)1 << 30)) != 0;
-			HW_AVX512DQ = (info[1] & ((int)1 << 17)) != 0;
-			HW_AVX512IFMA = (info[1] & ((int)1 << 21)) != 0;
-			HW_AVX512VBMI = (info[2] & ((int)1 << 1)) != 0;
-		}
-
-		if (nExIds >= 0x80000001)
-		{
-			cpuid(info, 0x80000001);
-			HW_x64 = (info[3] & ((int)1 << 29)) != 0;
-			HW_ABM = (info[2] & ((int)1 << 5)) != 0;
-			HW_SSE4A = (info[2] & ((int)1 << 6)) != 0;
-			HW_FMA4 = (info[2] & ((int)1 << 16)) != 0;
-			HW_XOP = (info[2] & ((int)1 << 11)) != 0;
-		}
+		Initialize();
+		Detect();
 	}
 
+	//~~~ Public Methods~~~//
+
+	/// <summary>
+	/// Detect the Cpu feature set
+	/// </summary>
+	void Detect();
+
+	/// <summary>
+	/// Returns true if any of the AVX512, AVX2, or AVX feature sets are detected
+	/// </summary>
+	bool HasAES()
+	{
+		return HW_AVX512F || HW_AVX2 || HW_AVX;
+	}
 
 	/// <summary>
 	/// Returns true if any of the AVX512, AVX2, or AVX feature sets are detected
@@ -401,76 +451,62 @@ public:
 	/// <summary> 
 	/// Returns the best available SIMD feature set
 	/// </summary>
-	FeatureSet HighestSSEVersion()
+	FeatureSets HighestSSEVersion()
 	{
 		if (HW_AVX512F)
-			return FeatureSet::AVX512F;
+			return FeatureSets::AVX512F;
 		else if (HW_AVX2)
-			return FeatureSet::AVX2;
+			return FeatureSets::AVX2;
 		else if (HW_AVX)
-			return FeatureSet::AVX;
+			return FeatureSets::AVX;
 		else if (HW_XOP)
-			return FeatureSet::XOP;
+			return FeatureSets::XOP;
 		else if (HW_SSE42)
-			return FeatureSet::SSE42;
+			return FeatureSets::SSE42;
 		else if (HW_SSE41)
-			return FeatureSet::SSE41;
+			return FeatureSets::SSE41;
 		else if (HW_SSE4A)
-			return FeatureSet::SSE4A;
+			return FeatureSets::SSE4A;
 		else if (HW_SSSE3)
-			return FeatureSet::SSSE3;
+			return FeatureSets::SSSE3;
 		else if (HW_SSE3)
-			return FeatureSet::SSE3;
+			return FeatureSets::SSE3;
 		else if (HW_SSE2)
-			return FeatureSet::SSE2;
+			return FeatureSets::SSE2;
 		else if (HW_SSE)
-			return FeatureSet::SSE;
+			return FeatureSets::SSE;
 		else if (HW_MMX)
-			return FeatureSet::MMX;
+			return FeatureSets::MMX;
 		else
-			return FeatureSet::NONE;
+			return FeatureSets::NONE;
+	}
+
+	/// <summary>
+	/// Returns the cpu vendors enumeration value
+	/// </summary>
+	CpuVendors Vendor()
+	{
+		if (CpuVendor.size() > 0)
+		{
+			std::string data = CpuVendor;
+			std::transform(data.begin(), data.end(), data.begin(), ::tolower);
+			if (CpuVendor.find_first_of("intel") > 0)
+				return CpuVendors::INTEL;
+			else if (CpuVendor.find_first_of("amd") > 0)
+				return CpuVendors::AMD;
+		}
+		return CpuVendors::UNKNOWN;
 	}
 
 private:
+
 #if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-	bool HasAvxSupport()
-	{
-		bool support = false;
-		int cpuInfo[4];
-		__cpuid(cpuInfo, 1);
-
-		bool osUsesXSAVE_XRSTORE = cpuInfo[2] & (1 << 27) || false;
-		bool cpuAVXSuport = cpuInfo[2] & (1 << 28) || false;
-
-		if (osUsesXSAVE_XRSTORE && cpuAVXSuport)
-		{
-			// Check if the OS will save the YMM registers
-			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-			support = (xcrFeatureMask & 0x6) || false;
-		}
-
-		return support;
-	}
-
-	bool HasAvx2Support()
-	{
-		bool support = false;
-		int cpuInfo[4];
-		__cpuid(cpuInfo, 1);
-
-		bool osUsesXSAVE_XRSTORE = cpuInfo[2] & (1 << 27) || false;
-		bool cpuAVXSuport = cpuInfo[2] & (1 << 28) || false;
-
-		if (osUsesXSAVE_XRSTORE && cpuAVXSuport)
-		{
-			// Check if the OS will save the YMM registers
-			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-			support = (xcrFeatureMask & 0xe6) || false;
-		}
-
-		return support;
-	}
+	bool HasAvxSupport();
+	bool HasAvx2Support();
 #endif
+	void Initialize();
+	size_t MaxCoresPerPackage();
+	size_t MaxLogicalPerCore();
 };
 
 NAMESPACE_COMMONEND

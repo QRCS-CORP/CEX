@@ -26,11 +26,11 @@
 
 #include "Common.h"
 
-// *** Twofish Lookup Templates *** //
-
 // ToDo: look into gather/load - extern __m128i _mm_i64gather_epi64(int const * base, __m128i vindex, const int scale);
 // http://www.physics.ntua.gr/~konstant/HetCluster/intel12.1/compiler_c/main_cls/intref_cls/common/intref_avx2_mm256_i64gather_epi64.htm
 // If not feasable/efficient, consider calculating sbox member on the fly..
+
+//~~~Twofish Lookup Templates~~~//
 
 template<typename T, typename U>
 T I8Fe0(const T &X, const std::vector<U> &M)
@@ -96,9 +96,8 @@ T Fe3(const T X, const std::vector<U> &M)
 	return M[2 * (byte)X + 0x001] ^ M[2 * (byte)(X >> 8) + 0x200] ^ M[2 * (byte)(X >> 16) + 0x201] ^ M[2 * (byte)(X >> 24)];
 }
 
-// *** Twofish S-Box and Lookup Tables *** //
+//~~~Twofish S-Box and Lookup Tables~~~//
 
-// Constant Tables
 static constexpr byte Q0[] =
 {
 	0xA9, 0x67, 0xB3, 0xE8, 0x04, 0xFD, 0xA3, 0x76, 0x9A, 0x92, 0x80, 0x78, 0xE4, 0xDD, 0xD1, 0x38,

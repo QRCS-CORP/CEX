@@ -26,10 +26,18 @@
 
 #include "IRandom.h"
 #include "DGCDrbg.h"
+#include "Digests.h"
 #include "IDigest.h"
 #include "ISeed.h"
+#include "SeedGenerators.h"
 
 NAMESPACE_PRNG
+
+using CEX::Generator::DGCDrbg;
+using CEX::Enumeration::Digests;
+using CEX::Digest::IDigest;
+using CEX::Seed::ISeed;
+using CEX::Enumeration::SeedGenerators;
 
 /// <summary>
 /// DGCPrng: An implementation of a Digest Counter based Random Number Generator
@@ -73,29 +81,29 @@ private:
 	size_t m_bufferIndex = 0;
 	size_t m_bufferSize = 0;
 	std::vector<byte> m_byteBuffer;
-	CEX::Digest::IDigest* m_digestEngine;
-	CEX::Enumeration::Digests m_digestType;
+	IDigest* m_digestEngine;
+	Digests m_digestType;
 	bool m_isDestroyed;
-	CEX::Generator::DGCDrbg* m_rngGenerator;
-	CEX::Seed::ISeed* m_seedGenerator;
-	CEX::Enumeration::SeedGenerators m_seedType;
+	DGCDrbg* m_rngGenerator;
+	ISeed* m_seedGenerator;
+	SeedGenerators m_seedType;
 	std::vector<byte> m_stateSeed;
 
 public:
 
-	// *** Properties *** //
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The prngs type name
 	/// </summary>
-	virtual const CEX::Enumeration::Prngs Enumeral() { return CEX::Enumeration::Prngs::DGCPrng; }
+	virtual const Prngs Enumeral() { return Prngs::DGCPrng; }
 
 	/// <summary>
 	/// Get: Algorithm name
 	/// </summary>
 	virtual const char *Name() { return "DGCPrng"; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class
@@ -106,7 +114,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	DGCPrng(CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::Keccak512, CEX::Enumeration::SeedGenerators SeedEngine = CEX::Enumeration::SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE)
+	DGCPrng(Digests DigestEngine = Digests::Keccak512, SeedGenerators SeedEngine = SeedGenerators::CSPRsg, size_t BufferSize = BUFFER_SIZE)
 		:
 		m_bufferIndex(0),
 		m_bufferSize(BufferSize),
@@ -131,7 +139,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="CEX::Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
-	explicit DGCPrng(std::vector<byte> Seed, CEX::Enumeration::Digests DigestEngine = CEX::Enumeration::Digests::Keccak512, size_t BufferSize = BUFFER_SIZE)
+	explicit DGCPrng(std::vector<byte> Seed, Digests DigestEngine = Digests::Keccak512, size_t BufferSize = BUFFER_SIZE)
 		:
 		m_bufferIndex(0),
 		m_bufferSize(BufferSize),
@@ -147,7 +155,7 @@ public:
 		if (BufferSize < 128)
 			throw CryptoRandomException("DGCPrng:Ctor", "BufferSize must be at least 128 bytes!");
 #endif
-		m_seedType = CEX::Enumeration::SeedGenerators::CSPRsg;
+		m_seedType = SeedGenerators::CSPRsg;
 		Reset();
 	}
 
@@ -159,7 +167,7 @@ public:
 		Destroy();
 	}
 
-	// *** Public Methods *** //
+	//~~~Public Methods~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -242,9 +250,9 @@ public:
 private:
 	std::vector<byte> GetBits(std::vector<byte> Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	CEX::Digest::IDigest* GetInstance(CEX::Enumeration::Digests RngEngine);
-	uint GetMinimumSeedSize(CEX::Enumeration::Digests RngEngine);
-	CEX::Seed::ISeed* GetSeedGenerator(CEX::Enumeration::SeedGenerators SeedEngine);
+	IDigest* GetInstance(Digests RngEngine);
+	uint GetMinimumSeedSize(Digests RngEngine);
+	ISeed* GetSeedGenerator(SeedGenerators SeedEngine);
 };
 
 NAMESPACE_PRNGEND
