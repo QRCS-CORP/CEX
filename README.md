@@ -19,7 +19,6 @@ Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, al
 ###v1.1h:
 Rijndael, Serpent and Twofish implementations now working with 128 and 256 bit intrinsics in multi-threaded CTR mode.
 Salsa and Chacha implemented with multi-threading and 128/256 bit intrinsics
-
 Update v1.1g, all variants of Blake2 added; 2B, 2BP, 2S, and 2SP, sequential and parallel, integrated Mac and Drbg, optional intrinsics.
 
 ###v1.1f: 
