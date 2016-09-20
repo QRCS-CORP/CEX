@@ -4,7 +4,7 @@ The CEX Cryptographic library in C++
 ##Intro
 First off, consider that this is a workspace for a personal project, it is constantly changing, and not officially published, or particularly stable.
 
-The library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs RNGs etc. This should be completed in early 2017. The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. When I feel the first half off the library is complete, (well, stable anyways..), I'll write an article about it, and post the link here.
+The library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs RNGs etc. This should be completed in early 2017. The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. When I feel the first half of the library is complete, (well, stable anyways..), I'll write an article about it, and post the link here.
 
 All that aside, this has come a long way since the initial translation of the C# library posted here last spring; there are many additions and improvements including some very fast, very powerful cipher implementations. There are some new ideas, and new technologies, as I intend to push the envelope a little, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
 
