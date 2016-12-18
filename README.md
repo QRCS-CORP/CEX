@@ -14,23 +14,25 @@ All that aside, this has come a long way since the initial translation of the C#
 
 ###Version 0.13: December 18, 2016
 Massive update!
-Added pipelined and parallelized SHA-2 implementations. 
-Kdfs and Drbgs seperated and rewritten. 
-Drbgs completely rewritten (added forward prediction resistance), and added an HMAC based Drbg (HMG).
-XORShift+, ISAAC and VMPC MAC implementations removed, (primitives may not be secure enough or tested enough for this library).
-MACs rewritten. 
-Addition of a symmetric key interface with ISymmetricKey replacing old KeyParams format and unifying access across function types (Drbg, Mac, cipher and Kdf all use the same interface).
-Addition of a secure key and secure memory implementations.
-Three new entropy providers added: Intel RdRand/RdSeed (RDP), Cpu Jitter (CJP), and a system state entropy collector (ECP).
+* Added pipelined and parallelized SHA-2 implementations. 
+* Kdfs and Drbgs seperated and rewritten. 
+* Drbgs completely rewritten (added forward prediction resistance), and added an HMAC based Drbg (HMG).
+* XORShift+, ISAAC and VMPC MAC implementations removed, (primitives may not be secure enough or tested enough for this library).
+* MACs rewritten. 
+* Addition of a symmetric key interface with ISymmetricKey replacing old KeyParams format and unifying access across function types (Drbg, Mac, cipher and Kdf all use the same interface).
+* Addition of a secure key and secure memory implementations.
+* Three new entropy providers added: Intel RdRand/RdSeed (RDP), Cpu Jitter (CJP), and a system state entropy collector (ECP).
+
 Some things shifted around in the namespace, and a lot of small optimizations throughout.
 Documentation expanded and rewritten, now each class (brevity permitting), contains a mathematical description of the main function, a usage example, a technical overview, external links, and implementation details.
 Published the libraries html help documentation and updated the links.
 
 ###Version 0.12: September 21, 2016
-Added little endian counter mode ICM, updated and rewrote all block cipher modes.
-Added Wide Block Vectorization (WBV) to CBC and ECB modes, (see header files for description). 
-ECB and CBC-Decrypt parallelized and pipelined, CFB-Decrypt parallelized.
-Updates to Salsa and ChaCha, updates to documentation, and some reorganization of code base.
+* Added little endian counter mode ICM, updated and rewrote all block cipher modes.
+* Added Wide Block Vectorization (WBV) to CBC and ECB modes, (see header files for description). 
+* ECB and CBC-Decrypt parallelized and pipelined, CFB-Decrypt parallelized.
+* Updates to Salsa and ChaCha, updates to documentation, and some reorganization of code base.
+
 Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, all regularly clock over 9GB per second on my 'modest' HP desktop). The block/stream cipher portion of this release is stable; (aside from bug fixes or enhancements, existing cipher modes should be constant, but new modes will soon be added).
 
 ###Version 0.11: August 12, 2016
