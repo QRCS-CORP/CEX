@@ -54,9 +54,9 @@ using namespace Test;
 // CipherStream rewrite	-done
 // KeyGenerator rewrite	-dome
 
-//
+// 
 // Release 0.14
-// GCM/OFB/OCB			-?
+// GCM/CWC/OCB				-?
 // GMAC/OMAC			-?
 // Scrypt(maybe)		-?
 // Code review			-?
