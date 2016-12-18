@@ -19,11 +19,11 @@ Versioning changed to 0.x format, (project is not to be considered a major relea
 * Added pipelined and parallelized SHA-2 implementations. 
 * Kdfs and Drbgs seperated and rewritten. 
 * Drbgs completely rewritten (added forward prediction resistance), and added an HMAC based Drbg (HMG).
-* XORShift+, ISAAC and VMPC MAC implementations removed, (primitives may not be secure enough or tested enough for this library).
-* MACs rewritten. 
+* MACs rewritten, VMAC removed. 
 * Addition of a symmetric key interface with ISymmetricKey replacing old KeyParams format and unifying access across function types (Drbg, Mac, cipher and Kdf all use the same interface).
 * Addition of a secure key and secure memory implementations.
 * Three new entropy providers added: Intel RdRand/RdSeed (RDP), Cpu Jitter (CJP), and a system state entropy collector (ECP).
+* XORShift+, ISAAC and VMPC MAC implementations removed, (primitives may not be secure enough or tested enough for this library).
 
 Some things shifted around in the namespace, and a lot of small optimizations throughout.
 Documentation expanded and rewritten, now each class (brevity permitting), contains a mathematical description of the main function, a usage example, a technical overview, external links, and implementation details.
