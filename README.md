@@ -13,7 +13,9 @@ All that aside, this has come a long way since the initial translation of the C#
 ##Updates
 
 ###Version 0.13: December 18, 2016
-Massive update!
+Massive update! License changed from MIT to GPLv3, (it had to happen sooner or lator). 
+Versioning changed to 0.x format, (project is not to be considered a major release until the symmetric cryptography is complete after 0.14).
+
 * Added pipelined and parallelized SHA-2 implementations. 
 * Kdfs and Drbgs seperated and rewritten. 
 * Drbgs completely rewritten (added forward prediction resistance), and added an HMAC based Drbg (HMG).
