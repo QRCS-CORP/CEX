@@ -1,9 +1,11 @@
 #include "ChaChaTest.h"
-#include "../CEX/ChaCha.h"
-#include "../CEX/CSPRsg.h"
+#include "../CEX/ChaCha20.h"
+#include "../CEX/CSP.h"
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Stream;
+
 	std::string ChaChaTest::Run()
 	{
 		try
@@ -25,9 +27,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -37,7 +39,7 @@ namespace Test
 
 	void ChaChaTest::CompareParallel()
 	{
-		CEX::Seed::CSPRsg rng;
+		Provider::CSP rng;
 		std::vector<byte> key(32);
 		rng.GetBytes(key);
 		std::vector<byte> iv(8);
@@ -46,8 +48,8 @@ namespace Test
 		rng.GetBytes(data);
 		std::vector<byte> enc(10240, 0);
 		std::vector<byte> dec(10240, 0);
-		CEX::Common::KeyParams k(key, iv);
-		CEX::Cipher::Symmetric::Stream::ChaCha cipher(20);
+		Key::Symmetric::SymmetricKey k(key, iv);
+		ChaCha20 cipher(20);
 
 		// encrypt linear
 		cipher.Initialize(k);
@@ -60,26 +62,26 @@ namespace Test
 		cipher.Transform(enc, dec);
 
 		if (data != dec)
-			throw std::string("ChaCha: Decrypted arrays are not equal!");
+			throw std::exception("ChaCha20: Decrypted arrays are not equal!");
 	}
 
 	void ChaChaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		CEX::Common::KeyParams k(Key, Vector);
-		CEX::Cipher::Symmetric::Stream::ChaCha cipher(Rounds);
+		Key::Symmetric::SymmetricKey k(Key, Vector);
+		ChaCha20 cipher(Rounds);
 
 		cipher.Initialize(k);
 		cipher.Transform(Input, 0, outBytes, 0, Input.size());
 
 		if (outBytes != Output)
-			throw std::string("ChaCha: Encrypted arrays are not equal!"); //251,184
+			throw std::exception("ChaCha20: Encrypted arrays are not equal!"); //251,184
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, 0, outBytes, 0, Output.size());
 
 		if (outBytes != Input)
-			throw std::string("ChaCha: Decrypted arrays are not equal!");
+			throw std::exception("ChaCha20: Decrypted arrays are not equal!");
 	}
 
 	void ChaChaTest::Initialize()

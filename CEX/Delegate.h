@@ -1,9 +1,9 @@
-#ifndef _CEXENGINE_DELEGATE_H
-#define _CEXENGINE_DELEGATE_H
+#ifndef _CEX_DELEGATE_H
+#define _CEX_DELEGATE_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
-NAMESPACE_EVENT
+NAMESPACE_ROUTING
 
 /// <summary>
 /// The Delegate Listener interface definition
@@ -36,5 +36,5 @@ public:
 	virtual void operator()(T param) = 0;
 };
 
-NAMESPACE_EVENTEND
+NAMESPACE_ROUTINGEND
 #endif

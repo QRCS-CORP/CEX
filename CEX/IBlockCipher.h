@@ -1,49 +1,42 @@
-﻿// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEXENGINE_IBLOCKCIPHER_H
-#define _CEXENGINE_IBLOCKCIPHER_H
+#ifndef _CEX_IBLOCKCIPHER_H
+#define _CEX_IBLOCKCIPHER_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "BlockCiphers.h"
+#include "CryptoSymmetricCipherException.h"
 #include "IDigest.h"
-#include "KeyParams.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoSymmetricCipherException.h"
-#endif
+#include "ISymmetricKey.h"
+#include "SymmetricKeySize.h"
 
 NAMESPACE_BLOCK
 
-using CEX::Enumeration::BlockCiphers;
-using CEX::Enumeration::Digests;
-using CEX::Digest::IDigest;
-using CEX::Common::KeyParams;
-#if defined(CPPEXCEPTIONS_ENABLED)
-	using CEX::Exception::CryptoSymmetricCipherException;
-#endif
+using Enumeration::BlockCiphers;
+using Exception::CryptoSymmetricCipherException;
+using Enumeration::Digests;
+using Digest::IDigest;
+using Key::Symmetric::ISymmetricKey;
+using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
-/// Block Cipher Interface
+/// The Block Cipher Interface class
 /// </summary> 
 class IBlockCipher
 {
@@ -51,7 +44,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	IBlockCipher() {}
 
@@ -68,13 +61,29 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
+	/// Get/Set: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
+	/// <para>Changing this code will create a unique distribution of the cipher.
+	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.
+	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
+	/// </summary>
+	virtual std::vector<byte> &DistributionCode() = 0;
+
+	/// <summary>
+	/// Get: The maximum size of the distribution code in bytes.
+	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
+	/// If used as a nonce the distribution code should be secret, and equal in size to this value</para>
+	/// </summary>
+	virtual const size_t DistributionCodeMax() = 0;
+
+	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
 	virtual const BlockCiphers Enumeral() = 0;
 
 	/// <summary>
 	/// Get: True is initialized for encryption, false for decryption.
-	/// <para>Value set in <see cref="Initialize(bool, KeyParams)"/>.</para>
+	/// <para>Value set in <see cref="Initialize(bool, SymmetricKey)"/>.</para>
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
@@ -84,22 +93,27 @@ public:
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
+	/// Get: The extended ciphers HKDF digest type
+	/// </summary>
+	virtual const Digests KdfEngine() = 0;
+
+	/// <summary>
 	/// Get: List of available legal key sizes
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() = 0;
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Get: Available diffusion round assignments
+	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() = 0;
+	virtual const std::vector<size_t> LegalRounds() = 0;
 
 	/// <summary>
-	/// Get: Cipher name
+	/// Get: The block ciphers class name
 	/// </summary>
-	virtual const char* Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: The number of diffusion rounds processed by the transform
+	/// Get: The number of transformation rounds processed by the transform
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
@@ -107,7 +121,7 @@ public:
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
@@ -117,14 +131,14 @@ public:
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
-	/// <param name="InOffset">Offset in the Input array</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">Decrypted bytes</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
@@ -134,80 +148,80 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
-	/// Initialize the Cipher
+	/// Initialize the cipher
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam) = 0;
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input message to Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Starting offset in the Output array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input message to Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Starting offset in the Output array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
 	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 

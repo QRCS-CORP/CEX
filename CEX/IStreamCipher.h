@@ -1,21 +1,19 @@
-﻿#ifndef _CEXENGINE_IStreamCipher_H
-#define _CEXENGINE_IStreamCipher_H
+﻿#ifndef _CEX_IStreamCipher_H
+#define _CEX_IStreamCipher_H
 
-#include "Common.h"
-#include "KeyParams.h"
+#include "CexDomain.h"
+#include "CryptoSymmetricCipherException.h"
+#include "ISymmetricKey.h"
 #include "ParallelUtils.h"
 #include "StreamCiphers.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoSymmetricCipherException.h"
-#endif
+#include "SymmetricKeySize.h"
 
 NAMESPACE_STREAM
 
-using CEX::Common::KeyParams;
-using CEX::Enumeration::StreamCiphers;
-#if defined(CPPEXCEPTIONS_ENABLED)
-	using CEX::Exception::CryptoSymmetricCipherException;
-#endif
+using Exception::CryptoSymmetricCipherException;
+using Key::Symmetric::ISymmetricKey;
+using Enumeration::StreamCiphers;
+using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
 /// Stream Cipher Interface
@@ -27,7 +25,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	IStreamCipher() {}
 
@@ -36,6 +34,7 @@ public:
 	/// </summary>
 	virtual ~IStreamCipher() {}
 
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes.
@@ -45,6 +44,15 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
+	/// Get/Set: The salt value in the initialization parameters (Tau-Sigma).
+	/// <para>This value can also be set with the Info parameter of an ISymmetricKey member, or use the default.
+	/// Changing this code will create a unique distribution of the cipher.
+	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
+	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
+	/// </summary>
+	virtual std::vector<byte> &DistributionCode() = 0;
+
+	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
 	virtual const StreamCiphers Enumeral() = 0;
@@ -52,7 +60,7 @@ public:
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
 	/// </summary>
-	virtual const bool HasAVX() = 0;
+	virtual const bool HasAVX2() = 0;
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
@@ -70,21 +78,26 @@ public:
 	virtual bool &IsParallel() = 0;
 
 	/// <summary>
+	/// Get: Initialization vector size
+	/// </summary>
+	virtual const size_t IvSize() = 0;
+
+	/// <summary>
 	/// Get: Unit block size of internal cipher in bytes.
 	/// <para>Block size must be 16 or 32 bytes wide. 
 	/// Value set in class constructor.</para>
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() = 0;
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Get: Available diffusion round assignments
+	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() = 0;
+	virtual const std::vector<size_t> LegalRounds() = 0;
 
 	/// <summary>
-	/// Get: Cipher name
+	/// Get: The stream ciphers class name
 	/// </summary>
-	virtual const char *Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Get/Set: Parallel block size; must be set before Initialize()
@@ -104,7 +117,7 @@ public:
 	/// <summary>
 	/// Get: The maximum number of threads allocated when using multi-threaded processing
 	/// </summary>
-	virtual const size_t ParallelThreadsMax() = 0;
+	virtual size_t &ParallelThreadsMax() = 0;
 
 	/// <remarks>
 	/// Get: Processor count
@@ -116,11 +129,6 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
-	/// <summary>
-	/// Get: Initialization vector size
-	/// </summary>
-	virtual const size_t VectorSize() = 0;
-
 	//~~~Public Methods~~~//
 
 	/// <summary>
@@ -129,11 +137,11 @@ public:
 	virtual void Destroy() = 0;
 
 	/// <summary>
-	/// Initialize the Cipher
+	/// Initialize the cipher
 	/// </summary>
 	/// 
 	/// <param name="KeyParam">Cipher key container. The LegalKeySizes property contains valid sizes</param>
-	virtual void Initialize(const KeyParams &KeyParam) = 0;
+	virtual void Initialize(ISymmetricKey &KeyParam) = 0;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -143,37 +151,37 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes, plain text for encryption, cipher text for decryption</param>
-	/// <param name="Output">Output bytes, array of at least equal size of input that receives processed bytes</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset parameters.
-	/// <para><see cref="Initialize(KeyParams)"/> must be called before this method can be used.</para>
+	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
-	/// <para><see cref="Initialize(KeyParams)"/> must be called before this method can be used.</para>
+	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">Length of data to process</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
 };

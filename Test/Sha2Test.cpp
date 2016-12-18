@@ -12,15 +12,15 @@ namespace Test
 
 			//CompareIntrinsics();
 
-			/*CEX::Digest::SHA256* sha256 = new CEX::Digest::SHA256();
+			Digest::SHA256* sha256 = new Digest::SHA256();
 			CompareVector(sha256, m_message[0], m_expected256[0]);
 			CompareVector(sha256, m_message[1], m_expected256[1]);
 			CompareVector(sha256, m_message[2], m_expected256[2]);
 			CompareVector(sha256, m_message[3], m_expected256[3]);
 			delete sha256;
-			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");*/
+			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");
 
-			CEX::Digest::SHA512* sha512 = new CEX::Digest::SHA512();
+			Digest::SHA512* sha512 = new Digest::SHA512();
 			CompareVector(sha512, m_message[0], m_expected512[0]);
 			CompareVector(sha512, m_message[1], m_expected512[1]);
 			CompareVector(sha512, m_message[2], m_expected512[2]);
@@ -30,9 +30,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -40,29 +40,7 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::CompareIntrinsics()
-	{
-		std::vector<byte> hash(32, 0);
-		std::vector<byte> msg(256, 0);
-		for (size_t i = 0; i < msg.size(); ++i)
-			msg[i] = i;
-
-		CEX::Digest::SHA256 dgt;
-		dgt.BlockUpdate(msg, 0, msg.size());
-
-		/*std::vector<byte> hash(32, 0);
-		std::vector<byte> msg(512, 0);
-		for (size_t i = 0; i < msg.size() / 2; ++i)
-		{
-			msg[i] = i;
-			msg[i + 256] = i;
-		}
-
-		CEX::Digest::SHA256 dgt;
-		dgt.BlockUpdate(msg, 0, msg.size());*/
-	}
-
-	void SHA2Test::CompareVector(CEX::Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)
+	void SHA2Test::CompareVector(Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
@@ -70,11 +48,11 @@ namespace Test
 		Digest->DoFinal(hash, 0);
 
 		if (Expected != hash)
-			throw std::string("SHA2: Expected hash is not equal!");
+			throw std::exception("SHA2: Expected hash is not equal!");
 
 		Digest->ComputeHash(Input, hash);
 		if (Expected != hash)
-			throw std::string("SHA2: Expected hash is not equal!");
+			throw std::exception("SHA2: Expected hash is not equal!");
 	}
 
 	void SHA2Test::Initialize()

@@ -1,25 +1,21 @@
-﻿// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
 // 
 // Implementation Details:
 // An implementation of a Output FeedBack Mode (OFB).
@@ -27,50 +23,47 @@
 // Updated September 16, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_OFB_H
-#define _CEXENGINE_OFB_H
+#ifndef _CEX_OFB_H
+#define _CEX_OFB_H
 
 #include "ICipherMode.h"
 
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements a Output FeedBack Mode: OFB
+/// Implements a Output FeedBack Mode (OFB)
 /// </summary>
 /// 
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// OFB cipher(new AHX());
+/// OFB cipher(BlockCiphers::AHX);
 /// // initialize for encryption
-/// cipher.Initialize(true, KeyParams(Key, IV));
+/// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one block
 /// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 ///
-/// <seealso cref="CEX::Enumeration::BlockCiphers"/><BR>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
-/// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>Output Feedback Mode (OFB) is a similar construction to the CFB mode, and allows encryption of various block sizes.<BR>
-/// It differs in that the output of the encryption block function, (rather than the ciphertext), serves as the feedback register.<BR>
-/// The cipher is initialized by copying the initialization vector to an internal register, prepended by zeroes.<BR>
-/// During a transformation, this register is encrypted by the underlying cipher into a buffer, the buffer is then XOR'd with the input message block to produce the ciphertext.<BR>
+/// <para>Output Feedback Mode (OFB) is a similar construction to the CFB mode, and allows encryption of various block sizes.<br>
+/// It differs in that the output of the encryption block function, (rather than the ciphertext), serves as the feedback register.<br>
+/// The cipher is initialized by copying the initialization vector to an internal register, prepended by zeroes.<br>
+/// During a transformation, this register is encrypted by the underlying cipher into a buffer, the buffer is then XOR'd with the input message block to produce the ciphertext.<br>
 /// The vector block is then rotated so that the latter half of the vector is shifted to the start of the array, and the buffer is moved to the end of the array.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR> 
-/// C=ciphertext, P=plaintext, K=key, E=encrypt, ^=XOR<BR><BR>
-/// <EM>Encryption</EM><BR>
-/// I1 ← IV. For 1 ≤ j ≤ u, given plaintext block Pj:<BR>
-/// (a) Oj ← EK(Ij). -Compute the block cipher output.<BR>
-/// (b) Tj ← the r leftmost bits of Oj. -Assume the leftmost is identified as bit 1.<BR>
-/// (c) Cj ← Pj ^ Tj. -Transmit the r-bit ciphertext block Cj.<BR>
-/// (d) Ij+1 ← 2r · Ij + Tj mod 2n. -Update the block cipher input for the next block.<BR>
-/// <EM>Decryption</EM><BR>
-/// I1 ← IV . For 1 ≤ j ≤ u, upon receiving Cj:<BR>
+/// <para><EM>Legend:</EM><br> 
+/// C=ciphertext, P=plaintext, K=key, E=encrypt, ^=XOR<br>
+/// <EM>Encryption</EM><br>
+/// I1 ← IV. For 1 ≤ j ≤ u, given plaintext block Pj:<br>
+/// (a) Oj ← EK(Ij). -Compute the block cipher output.<br>
+/// (b) Tj ← the r leftmost bits of Oj. -Assume the leftmost is identified as bit 1.<br>
+/// (c) Cj ← Pj ^ Tj. -Transmit the r-bit ciphertext block Cj.<br>
+/// (d) Ij+1 ← 2r · Ij + Tj mod 2n. -Update the block cipher input for the next block.<br>
+/// <EM>Decryption</EM><br>
+/// I1 ← IV . For 1 ≤ j ≤ u, upon receiving Cj:<br>
 /// Pj ← Cj ^ Tj, where Tj, Oj, and Ij are computed as an encryption cycle; K(C).</para>
 ///
 /// <description><B>Implementation Notes:</B></description>
@@ -80,7 +73,7 @@ NAMESPACE_MODE
 /// <item><description>A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
 /// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
 /// <item><description>The DecryptBlock and EncryptBlock functions can only be accessed through the class instance.</description></item>
-/// <item><description>The transformation methods can not be called until the the Initialize(bool, KeyParams) function has been called.</description></item>
+/// <item><description>The transformation methods can not be called until the Initialize(bool, SymmetricKey) function has been called.</description></item>
 /// <item><description>Due to block chain depenencies in OFB mode, neither the encryption or decryption functions can be processed in parallel.</description></item>
 /// </list>
 /// 
@@ -94,10 +87,12 @@ NAMESPACE_MODE
 class OFB : public ICipherMode
 {
 private:
+
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
+	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
-	bool m_hasAVX;
+	bool m_hasAVX2;
 	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -108,11 +103,11 @@ private:
 	size_t m_parallelBlockSize;
 	size_t m_processorCount;
 
-	OFB() = delete;
+public:
+
 	OFB(const OFB&) = delete;
 	OFB& operator=(const OFB&) = delete;
-
-public:
+	OFB& operator=(OFB&&) = delete;
 
 	//~~~Properties~~~//
 
@@ -122,22 +117,27 @@ public:
 	virtual const size_t BlockSize() { return m_blockSize; }
 
 	/// <summary>
+	/// Get: The block ciphers formal type name
+	/// </summary>
+	virtual BlockCiphers CipherType() { return m_cipherType; }
+
+	/// <summary>
 	/// Get: The underlying Block Cipher instance
 	/// </summary>
 	virtual IBlockCipher* Engine() { return m_blockCipher; }
 
 	/// <summary>
-	/// Get: The Cipher Modes enumeration type name
+	/// Get: The cipher modes type name
 	/// </summary>
 	virtual const CipherModes Enumeral() { return CipherModes::OFB; }
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
 	/// </summary>
-	virtual const bool HasAVX() { return m_hasAVX; }
+	virtual const bool HasAVX2() { return m_hasAVX2; }
 
 	/// <summary>
-	/// Get: Returns True if the cipher supports SSE2 SIMD intrinsics
+	/// Get: Returns True if the cipher supports SSE SIMD intrinsics
 	/// </summary>
 	virtual const bool HasSSE() { return m_hasSSE; }
 
@@ -157,19 +157,14 @@ public:
 	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
-	/// Get: The current state of the Initialization Vector
-	/// </summary>
-	virtual const std::vector<byte> &IV() { return m_ofbVector; }
-
-	/// <summary>
 	/// Get: Array of valid encryption key byte lengths
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return m_blockCipher->LegalKeySizes(); }
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_blockCipher->LegalKeySizes(); }
 
 	/// <summary>
-	/// Get: The Cipher Mode name
+	/// Get: The cipher modes class name
 	/// </summary>
-	virtual const char *Name() { return "OFB"; }
+	virtual const std::string Name() { return "OFB"; }
 
 	/// <summary>
 	/// Get: Parallel block size (Not used in this mode)
@@ -200,12 +195,14 @@ public:
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null block cipher type is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used, or the specified register size is invalid</exception>
 	explicit OFB(BlockCiphers CipherType, size_t RegisterSize = 16)
 		:
+		m_blockCipher(0),
 		m_blockSize(RegisterSize),
+		m_cipherType(CipherType),
 		m_destroyEngine(true),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isEncryption(false),
@@ -216,21 +213,15 @@ public:
 		m_parallelBlockSize(0),
 		m_processorCount(0)
 	{
-		m_blockCipher = GetCipher(CipherType);
-		m_ofbBuffer.resize(m_blockCipher->BlockSize());
-		m_ofbVector.resize(m_blockCipher->BlockSize());
-
-#if defined(DEBUGASSERT_ENABLED)
-		assert((uint)CipherType == 0);
-		assert(RegisterSize > 0);
-		assert(RegisterSize <= m_blockCipher->BlockSize());
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if ((uint)CipherType == 0)
+		if (CipherType == BlockCiphers::None)
 			throw CryptoCipherModeException("OFB:CTor", "The Cipher type can not be zero!");
-#endif
+		if (RegisterSize == 0)
+			throw CryptoCipherModeException("OFB:CTor", "The RegisterSize can not be zero!");
 
-		Scope();
+		LoadState();
+
+		if (RegisterSize > m_blockCipher->BlockSize())
+			throw CryptoCipherModeException("OFB:CTor", "The RegisterSize can not be more than the ciphers block size!");
 	}
 
 	/// <summary>
@@ -240,13 +231,14 @@ public:
 	/// <param name="Cipher">Uninitialized block cipher instance; can not be null</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size; default value is 16 bytes.</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null block cipher is used, or the specified block size is invalid</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null block cipher is used, or the specified register size is invalid</exception>
 	explicit OFB(IBlockCipher* Cipher, size_t RegisterSize = 16)
 		:
 		m_blockCipher(Cipher),
 		m_blockSize(RegisterSize),
+		m_cipherType(Cipher->Enumeral()),
 		m_destroyEngine(false),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isEncryption(false),
@@ -257,21 +249,14 @@ public:
 		m_parallelBlockSize(0),
 		m_processorCount(0)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert(Cipher != 0);
-		assert(RegisterSize > 0);
-		assert(RegisterSize <= Cipher->BlockSize());
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (Cipher == 0)
+		if (m_blockCipher == 0)
 			throw CryptoCipherModeException("OFB:CTor", "The Cipher can not be null!");
-		if (RegisterSize < 1)
+		if (m_blockSize < 1)
 			throw CryptoCipherModeException("OFB:CTor", "Invalid block size! Block must be in bits and a multiple of 8.");
-		if (RegisterSize > Cipher->BlockSize())
+		if (m_blockSize > m_blockCipher->BlockSize())
 			throw CryptoCipherModeException("OFB:CTor", "Invalid block size! Block size can not be larger than Cipher block size.");
-#endif
 
-		Scope();
+		LoadState();
 	}
 
 	/// <summary>
@@ -287,11 +272,13 @@ public:
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>
 	virtual void Destroy();
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
-	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.
+	/// <para>Initialize(bool, SymmetricKey) must be called before this method can be used.
 	/// Encrypts one block of bytes beginning at a zero index.</para>
 	/// </summary>
 	/// 
@@ -301,7 +288,7 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
-	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.
+	/// <para>Initialize(bool, SymmetricKey) must be called before this method can be used.
 	/// Encrypts one block of bytes at the designated offsets.</para>
 	/// </summary>
 	/// 
@@ -316,35 +303,36 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
-	/// <param name="KeyParam">KeyParams containing the encryption Key and Initialization Vector</param>
+	/// <param name="KeyParam">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
-	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or IV is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes. 
-	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.
+	/// <para>Initialize(bool, SymmetricKey) must be called before this method can be used.
 	/// Encrypts one block of bytes beginning at a zero index.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters. 
-	/// <para>Initialize(bool, KeyParams) must be called before this method can be used.
+	/// <para>Initialize(bool, SymmetricKey) must be called before this method can be used.
 	/// Encrypts one block of bytes at the designated offsets.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	IBlockCipher* GetCipher(BlockCiphers CipherType);
+	IBlockCipher* LoadCipher(BlockCiphers CipherType);
+	void LoadState();
 	void Scope();
 };
 

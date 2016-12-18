@@ -1,10 +1,12 @@
 #include "Keccak.h"
 #include "IntUtils.h"
 
+NAMESPACE_DIGEST
+
 void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::vector<ulong> &State, size_t Size)
 {
 	std::vector<ulong> data;
-	CEX::Utility::IntUtils::BytesToWord64s(Input, Offset, Size, data);
+	Utility::IntUtils::BytesToWord64s(Input, Offset, Size, data);
 
 	for (size_t j = 0; j < Size / 8; ++j)
 		State[j] ^= data[j];
@@ -58,6 +60,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
 	Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
 	Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -164,6 +167,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -270,6 +274,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -376,6 +381,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -482,6 +488,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -588,6 +595,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -694,6 +702,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -800,6 +809,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -906,6 +916,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1012,6 +1023,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1118,6 +1130,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1224,6 +1237,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1330,6 +1344,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1436,6 +1451,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1542,6 +1558,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1648,6 +1665,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1754,6 +1772,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1860,6 +1879,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -1966,6 +1986,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -2072,6 +2093,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -2178,6 +2200,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -2284,6 +2307,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -2390,6 +2414,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Aso;
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -2496,6 +2521,7 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	Co ^= Eso;
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
+
 	Da = Cu ^ (Ce << 1) ^ (Ce >> (64 - 1));
 	De = Ca ^ (Ci << 1) ^ (Ci >> (64 - 1));
 	Di = Ce ^ (Co << 1) ^ (Co >> (64 - 1));
@@ -2605,3 +2631,4 @@ void Keccak::TransformBlock(const std::vector<byte> &Input, size_t Offset, std::
 	State[24] = Asu;
 }
 
+NAMESPACE_DIGESTEND

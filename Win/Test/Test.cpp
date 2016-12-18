@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -7,61 +8,84 @@
 #include "../CEX/CpuDetect.h"
 #include "AesAvsTest.h"
 #include "AesFipsTest.h"
-#include "BlakeTest.h"
 #include "Blake2Test.h"
 #include "ChaChaTest.h"
 #include "CipherModeTest.h"
+#include "CipherSpeedTest.h"
 #include "CipherStreamTest.h"
 #include "CMACTest.h"
 #include "ConsoleUtils.h"
-#include "CTRDrbgTest.h"
+#include "CMGTest.h"
+#include "DCGTest.h"
 #include "DigestSpeedTest.h"
 #include "DigestStreamTest.h"
+#include "KDF2Test.h"
+#include "KeccakTest.h"
 #include "HKDFTest.h"
 #include "HMACTest.h"
+#include "HMGTest.h"
 #include "HXCipherTest.h"
 #include "ITest.h"
-#include "KDF2DrbgTest.h"
-#include "ISCRsgTest.h"
-#include "KeccakTest.h"
-#include "KeyFactoryTest.h"
 #include "MacStreamTest.h"
 #include "PaddingTest.h"
 #include "ParallelModeTest.h"
 #include "PBKDF2Test.h"
 #include "RangedRngTest.h"
+#include "RandomOutputTest.h"
 #include "RijndaelTest.h"
 #include "SalsaTest.h"
+#include "SecureStreamTest.h"
 #include "SerpentTest.h"
 #include "Sha2Test.h"
 #include "SkeinTest.h"
-#include "SP20DrbgTest.h"
-#include "CipherSpeedTest.h"
+#include "SymmetricKeyGeneratorTest.h"
+#include "SymmetricKeyTest.h"
 #include "TwofishTest.h"
-#include "VMACTest.h"
-#include "XSPRsgTest.h"
 
 using namespace Test;
 
-// *** CEX 1.0 TODO ***
-// EntropyPool			-?
-// VolumeCipher			-?
-// KeyFactory 			-?
-// PackageFactory		-?
+// *** CEX 1.0 RoadMap ***
 //
-// *** CEX 2.0 TODO ***
+// Release 0.13
+// HX kdf change		-done
+// DCG/CMG/HMG Drbg		-done
+// RDP/ECP/CJP provider -done
+// Secure Key/mem		-done
+// CipherStream rewrite	-done
+// KeyGenerator rewrite	-dome
+
+//
+// Release 0.14
+// GCM/OFB/OCB			-?
+// GMAC/OMAC			-?
+// Scrypt(maybe)		-?
+// Code review			-?
+
+// Release 1.0
+// Keccak/Skein Tree	-?
+// Grøstl(maybe)		-?
+// DLL API				-?
+// Code review			-?
+
+// 1.0 Notes:
+// SHA2/Blake remove generator
+// SHA2/Blake tree hashing mode-3 (add mixing-step/reduce-state tree-mode?)
+// SHA2/Blake parallel block size calculation from detectcpu
+
+// *** 1.1 RoadMap ***
+//
 // RingLWE				-?
-// NTRU					-?
+// McEliece				-?
 // Networking			-?
-// DTM-KEX				-?
 // TLS					-?
+// DTM-KEX				-?
 
 bool HasAESNI()
 {
 	try
 	{
-		CEX::Common::CpuDetect detect;
-		return detect.HasAES();
+		Common::CpuDetect detect;
+		return detect.AESNI();
 	}
 	catch (...)
 	{
@@ -98,10 +122,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.1: CEX Library in C++      *");
+	ConsoleUtils::WriteLine("* CEX++ Version 0.13.0.1: CEX Library in C++ *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.1l                           *");
-	ConsoleUtils::WriteLine("* Date:      September 18, 2016              *");
+	ConsoleUtils::WriteLine("* Release:   v0.13 (M)                       *");
+	ConsoleUtils::WriteLine("* License:   GPLv3							  *");
+	ConsoleUtils::WriteLine("* Date:      December 18, 2016               *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -179,6 +204,8 @@ int main()
 			RunTest(new RijndaelTest());
 			RunTest(new SerpentTest());
 			RunTest(new TwofishTest());
+			PrintHeader("TESTING HX EXTENDED CIPHERS");
+			RunTest(new HXCipherTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
 			RunTest(new CipherModeTest());
 			PrintHeader("TESTING PARALLEL CIPHER MODES");
@@ -188,15 +215,11 @@ int main()
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
 			RunTest(new ChaChaTest());
 			RunTest(new SalsaTest());
-			PrintHeader("TESTING HX EXTENDED CIPHERS");
-			RunTest(new HXCipherTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
 			RunTest(new CipherStreamTest());
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
-			RunTest(new KeyFactoryTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			RunTest(new BlakeTest());
 			RunTest(new Blake2Test());
 			RunTest(new KeccakTest());
 			RunTest(new SHA2Test());
@@ -204,18 +227,20 @@ int main()
 			PrintHeader("TESTING MESSAGE AUTHENTICATION CODE GENERATORS");
 			RunTest(new CMACTest());
 			RunTest(new HMACTest());
-			RunTest(new VMACTest());
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
 			RunTest(new RangedRngTest());
-			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
-			RunTest(new CTRDrbgTest());
+			PrintHeader("TESTING KEY DERIVATION FUNCTIONS");
 			RunTest(new HKDFTest());
-			RunTest(new KDF2DrbgTest());
+			RunTest(new KDF2Test());
 			RunTest(new PBKDF2Test());
-			RunTest(new SP20DrbgTest());
-			PrintHeader("TESTING PSEUDO RANDOM SEED GENERATORS");
-			RunTest(new ISCRsgTest());
-			RunTest(new XSPRsgTest());
+			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
+			RunTest(new CMGTest());
+			RunTest(new DCGTest());
+			RunTest(new HMGTest());
+			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
+			RunTest(new SymmetricKeyGeneratorTest());
+			RunTest(new SecureStreamTest());
+			RunTest(new SymmetricKeyTest());
 		}
 		else
 		{

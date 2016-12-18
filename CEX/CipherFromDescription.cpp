@@ -5,27 +5,30 @@
 
 NAMESPACE_HELPER
 
-using CEX::Common::CipherDescription;
-using CEX::Enumeration::SymmetricEngines;
+using Enumeration::SymmetricEngines;
 
-CEX::Cipher::Symmetric::Block::Mode::ICipherMode* CipherFromDescription::GetInstance(CEX::Common::CipherDescription &Description)
+ICipherMode* CipherFromDescription::GetInstance(CipherDescription &Description)
 {
-	switch (Description.EngineType())
+	try
 	{
-	case SymmetricEngines::RHX:
-	case SymmetricEngines::SHX:
-	case SymmetricEngines::THX:
-	{
-		return CEX::Helper::CipherModeFromName::GetInstance(Description.CipherType(),
-			CEX::Helper::BlockCipherFromName::GetInstance((CEX::Enumeration::BlockCiphers)Description.EngineType(),
-				(uint)Description.BlockSize(), (uint)Description.RoundCount(), Description.KdfEngine()));
+		switch (Description.EngineType())
+		{
+		case SymmetricEngines::AHX:
+		case SymmetricEngines::RHX:
+		case SymmetricEngines::SHX:
+		case SymmetricEngines::THX:
+		{
+			return Helper::CipherModeFromName::GetInstance(Description.CipherType(),
+				Helper::BlockCipherFromName::GetInstance((Enumeration::BlockCiphers)Description.EngineType(),
+					(uint)Description.BlockSize(), (uint)Description.RoundCount(), Description.KdfEngine()));
+		}
+		default:
+			throw Exception::CryptoException("CipherFromDescription:GetInstance", "The symmetric cipher is not recognized!");
+		}
 	}
-	default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoException("CipherFromDescription:GetInstance", "The symmetric cipher is not recognized!");
-#else
-		return 0;
-#endif
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("CipherFromDescription:GetInstance", "The symmetric cipher type is unavailable!", std::string(ex.what()));
 	}
 }
 

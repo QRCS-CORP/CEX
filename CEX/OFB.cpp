@@ -1,15 +1,9 @@
 #include "OFB.h"
+#include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
-#include "CpuDetect.h"
-#include "IntUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_MODE
-
-using CEX::Helper::BlockCipherFromName;
-using CEX::Common::CpuDetect;
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
 
 //~~~Public Methods~~~//
 
@@ -18,34 +12,32 @@ void OFB::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_cipherType = BlockCiphers::None;
+		m_hasAVX2 = false;
+		m_hasSSE = false;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
+		m_processorCount = 0;
 
 		try
 		{
 			if (m_destroyEngine)
 			{
+				m_destroyEngine = false;
+
 				if (m_blockCipher != 0)
 					delete m_blockCipher;
 			}
-			m_hasAVX = false;
-			m_hasSSE = false;
-			m_destroyEngine = false;
-			m_blockSize = 0;
-			m_isEncryption = false;
-			m_isInitialized = false;
-			m_processorCount = 0;
-			m_isParallel = false;
-			m_parallelBlockSize = 0;
-			IntUtils::ClearVector(m_ofbVector);
-			IntUtils::ClearVector(m_ofbBuffer);
+
+			Utility::ArrayUtils::ClearVector(m_ofbVector);
+			Utility::ArrayUtils::ClearVector(m_ofbBuffer);
 		}
-		catch (...) 
+		catch(std::exception& ex) 
 		{
-#if defined(DEBUGASSERT_ENABLED)
-			assert("OFB::Destroy: Could not clear all variables!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CryptoCipherModeException("OFB::Destroy", "Could not clear all variables!");
-#endif
+			throw CryptoCipherModeException("OFB:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
@@ -70,28 +62,16 @@ void OFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	memcpy(&m_ofbVector[m_ofbVector.size() - m_blockSize], &m_ofbBuffer[0], m_blockSize);
 }
 
-void OFB::Initialize(bool Encryption, const KeyParams &KeyParam)
+void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	if (KeyParam.IV().size() == 64)
-		assert(HasSSE());
-	if (KeyParam.IV().size() == 128)
-		assert(HasAVX());
-	assert(KeyParam.IV().size() > 0);
-	assert(KeyParam.Key().size() > 15);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (KeyParam.IV().size() == 64 && !HasSSE())
-		throw CryptoSymmetricCipherException("OFB:Initialize", "SSE 128bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() == 128 && !HasAVX())
-		throw CryptoSymmetricCipherException("OFB:Initialize", "AVX 256bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() < 1)
-		throw CryptoSymmetricCipherException("OFB:Initialize", "Requires a minimum 1 bytes of IV!");
-	if (KeyParam.Key().size() < 16)
-		throw CryptoSymmetricCipherException("OFB:Initialize", "Requires a minimum 16 bytes of Key!");
-#endif
+	if (KeyParam.Nonce().size() < 1)
+		throw CryptoSymmetricCipherException("OFB:Initialize", "Requires a minimum 1 bytes of Nonce!");
+	if (KeyParam.Nonce().size() > m_blockSize)
+		throw CryptoSymmetricCipherException("OFB:Initialize", "Nonce can not be larger than the cipher block size!");
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParam.Key().size()))
+		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() members in length.");
 
-	std::vector<byte> iv = KeyParam.IV();
+	std::vector<byte> iv = KeyParam.Nonce();
 	m_blockCipher->Initialize(true, KeyParam);
 
 	if (iv.size() < m_ofbVector.size())
@@ -123,25 +103,33 @@ void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 //~~~Private Methods~~~//
 
-IBlockCipher* OFB::GetCipher(BlockCiphers CipherType)
+IBlockCipher* OFB::LoadCipher(BlockCiphers CipherType)
 {
 	try
 	{
-		return BlockCipherFromName::GetInstance(CipherType);
+		return Helper::BlockCipherFromName::GetInstance(CipherType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoSymmetricCipherException("OFB:GetCipher", "The block cipher could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoSymmetricCipherException("OFB:LoadCipher", "The block cipher could not be instantiated!", std::string(ex.what()));
 	}
+}
+
+void OFB::LoadState()
+{
+	if (m_blockCipher == 0)
+	{
+		m_blockCipher = LoadCipher(m_cipherType);
+		m_ofbBuffer.resize(m_blockCipher->BlockSize());
+		m_ofbVector.resize(m_blockCipher->BlockSize());
+	}
+
+	Scope();
 }
 
 void OFB::Scope()
 {
-	m_processorCount = ParallelUtils::ProcessorCount();
+	m_processorCount = Utility::ParallelUtils::ProcessorCount();
 }
 
 NAMESPACE_MODEEND

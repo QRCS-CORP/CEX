@@ -6,24 +6,27 @@
 
 NAMESPACE_HELPER
 
-CEX::Cipher::Symmetric::Block::Padding::IPadding* PaddingFromName::GetInstance(CEX::Enumeration::PaddingModes PaddingType)
+IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 {
-	switch (PaddingType)
+	try
 	{
-		case CEX::Enumeration::PaddingModes::ISO7816:
-			return new CEX::Cipher::Symmetric::Block::Padding::ISO7816();
-		case CEX::Enumeration::PaddingModes::PKCS7:
-			return new CEX::Cipher::Symmetric::Block::Padding::PKCS7();
-		case CEX::Enumeration::PaddingModes::TBC:
-			return new CEX::Cipher::Symmetric::Block::Padding::TBC();
-		case CEX::Enumeration::PaddingModes::X923:
-			return new CEX::Cipher::Symmetric::Block::Padding::X923();
+		switch (PaddingType)
+		{
+		case PaddingModes::ISO7816:
+			return new Cipher::Symmetric::Block::Padding::ISO7816();
+		case PaddingModes::PKCS7:
+			return new Cipher::Symmetric::Block::Padding::PKCS7();
+		case PaddingModes::TBC:
+			return new Cipher::Symmetric::Block::Padding::TBC();
+		case PaddingModes::X923:
+			return new Cipher::Symmetric::Block::Padding::X923();
 		default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CEX::Exception::CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
-#else
-			return 0;
-#endif
+			throw Exception::CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
+		}
+	}
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("PaddingFromName:GetInstance", "The padding mode is unavailable!", std::string(ex.what()));
 	}
 }
 

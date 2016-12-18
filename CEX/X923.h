@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_X923_H
-#define _CEXENGINE_X923_H
+#ifndef _CEX_X923_H
+#define _CEX_X923_H
 
 #include "IPadding.h"
 
@@ -10,11 +10,17 @@ NAMESPACE_PADDING
 /// </summary>
 class X923 : public IPadding
 {
+private:
+
+	X923(const X923&) = delete;
+	X923& operator=(const X923&) = delete;
+	X923& operator=(X923&&) = delete;
+
 public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize this class
+	/// Instantiate this class
 	/// </summary>
 	X923() {}
 
@@ -31,9 +37,9 @@ public:
 	virtual const PaddingModes Enumeral() { return PaddingModes::X923; }
 
 	/// <summary>
-	/// Get: Padding name
+	/// Get: The padding modes class name
 	/// </summary>
-	virtual const char *Name() { return "X923"; }
+	virtual const std::string Name() { return "X923"; }
 
 	//~~~Public Methods~~~//
 
@@ -46,7 +52,7 @@ public:
 	///
 	/// <returns>Length of padding</returns>
 	///
-	/// <exception cref="CEX::Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
+	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
 	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
 
 	/// <summary>

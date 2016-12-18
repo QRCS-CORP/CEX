@@ -3,6 +3,8 @@
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string TwofishTest::Run()
 	{
 		using namespace TestFiles::Counterpane;
@@ -103,9 +105,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -117,35 +119,35 @@ namespace Test
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
-		CEX::Cipher::Symmetric::Block::THX engine;
+		THX engine;
 
-		CEX::Common::KeyParams k(Key);
+		Key::Symmetric::SymmetricKey k(Key);
 		engine.Initialize(Encrypt, k);
 
 		for (unsigned int i = 0; i < Count; i++)
 			engine.Transform(outBytes, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("Twofish MonteCarlo: Arrays are not equal!");
+			throw std::exception("Twofish MonteCarlo: Arrays are not equal!");
 	}
 
 	void TwofishTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		CEX::Cipher::Symmetric::Block::THX tfx;
-		CEX::Common::KeyParams k(Key);
+		THX tfx;
+		Key::Symmetric::SymmetricKey k(Key);
 
 		tfx.Initialize(true, k);
 		tfx.EncryptBlock(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("Twofish Vector: Encrypted arrays are not equal!");
+			throw std::exception("Twofish Vector: Encrypted arrays are not equal!");
 
 		tfx.Initialize(false, k);
 		tfx.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::string("Twofish Vector: Decrypted arrays are not equal!");
+			throw std::exception("Twofish Vector: Decrypted arrays are not equal!");
 	}
 
 	void TwofishTest::Initialize()

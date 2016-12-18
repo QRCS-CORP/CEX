@@ -45,25 +45,25 @@ namespace Test
 		/// </summary>
 		virtual std::string Run()
 		{
-			using namespace CEX::Enumeration;
+			using namespace Enumeration;
 
 			try
 			{
-				using CEX::Enumeration::Digests;
+				using Enumeration::Digests;
 
 				OnProgress("### Message Digest Speed Tests: 10 loops * 100MB ###");
 				OnProgress("***The Blake 256 digest***");
-				DigestBlockLoop(Digests::Blake256, MB100);
+				DigestBlockLoop(Digests::BlakeS256, MB100);
 				OnProgress("***The Blake 512 digest***");
-				DigestBlockLoop(Digests::Blake512, MB100);
+				DigestBlockLoop(Digests::BlakeB512, MB100);
 				OnProgress("***The Blake2S 256 digest***");
-				DigestBlockLoop(Digests::Blake2S256, MB100);
+				DigestBlockLoop(Digests::BlakeS256, MB100);
 				OnProgress("***The Blake2SP 256 digest***");
-				DigestBlockLoop(Digests::Blake2SP256, MB100, 10, true);
+				DigestBlockLoop(Digests::BlakeSP256, MB100, 10, true);
 				OnProgress("***The Blake2B 512 digest***");
-				DigestBlockLoop(Digests::Blake2B512, MB100);
+				DigestBlockLoop(Digests::BlakeB512, MB100);
 				OnProgress("***The Blake2BP 512 digest***");
-				DigestBlockLoop(Digests::Blake2BP512, MB100, 10, true);
+				DigestBlockLoop(Digests::BlakeBP512, MB100, 10, true);
 				OnProgress("***The Keccak 256 digest***");
 				DigestBlockLoop(Digests::Keccak256, MB100);
 				OnProgress("***The Keccak 512 digest***");
@@ -81,9 +81,9 @@ namespace Test
 
 				return MESSAGE;
 			}
-			catch (std::string &ex)
+			catch (std::exception const &ex)
 			{
-				return FAILURE + " : " + ex;
+				return FAILURE + " : " + ex.what();
 			}
 			catch (...)
 			{
@@ -92,7 +92,7 @@ namespace Test
 		}
 
 	private:
-		void DigestBlockLoop(CEX::Enumeration::Digests DigestType, size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
+		void DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops = DEFITER, bool Parallel = false);
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
 		void OnProgress(char* Data);
 	};

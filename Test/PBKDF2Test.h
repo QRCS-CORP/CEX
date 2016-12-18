@@ -8,16 +8,17 @@ namespace Test
 {
 	/// <summary>
 	/// Tests the PBKDF2 implementation using vector comparisons.
-	/// <para>Vectors generated via verified version in .Net CEX.</para>
+	/// <para>Using the official Kats from RFC 6070: https://tools.ietf.org/html/rfc6070 .</para>
 	/// </summary>
 	class PBKDF2Test : public ITest
 	{
 	private:
 		const std::string DESCRIPTION = "PBKDF2 SHA-2 test vectors.";
 		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All HKDF tests have executed succesfully.";
+		const std::string SUCCESS = "SUCCESS! All PBKDF2 tests have executed succesfully.";
 
 		TestEventHandler m_progressEvent;
+		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_output;
 		std::vector<std::vector<byte>> m_salt;
 
@@ -36,6 +37,10 @@ namespace Test
 		/// Compares known answer PBKDF2 Drbg vectors for equality
 		/// </summary>
 		PBKDF2Test()
+			:
+			m_key(2),
+			m_output(0),
+			m_salt(2)
 		{
 		}
 
@@ -52,9 +57,10 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareVector(CEX::Digest::IDigest* Engine, std::vector<byte> &Output);
+		void CompareVector(size_t Size, size_t Iterations, std::vector<byte> &Salt, std::vector<byte> &Key, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(char* Data);
+		void TestInit();
 	};
 }
 

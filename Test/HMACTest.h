@@ -39,7 +39,6 @@ namespace Test
 		/// </summary>
 		HMACTest()
         {
-
         }
 
 		/// <summary>

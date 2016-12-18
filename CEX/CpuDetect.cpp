@@ -1,214 +1,219 @@
 #include "CpuDetect.h"
+#include <algorithm>
+
+#if defined(CEX_OS_WINDOWS)
+#	include <intrin.h>
+#	include <stdio.h>
+#	define cpuid(info, x)  __cpuidex(info, x, 0)
+#else
+#	include <cpuid.h>
+	void cpuid(int info[4], int InfoType) {
+	__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
+}
+#endif
 
 NAMESPACE_COMMON
 
-//~~~ Public Methods~~~//
+//~~~ Private Methods~~~//
+
+#if defined(MSCAVX)
+	bool CpuDetect::AvxSupported()
+	{
+		int cpuInfo[4];
+
+		__cpuid(cpuInfo, 1);
+
+		// check if os saves the ymm registers
+		if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
+			return (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0x6) != 0;
+
+		return false;
+	}
+
+	bool CpuDetect::Avx2Supported()
+	{
+		int cpuInfo[4];
+
+		__cpuid(cpuInfo, 1);
+
+		if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
+			return (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0xe6) != 0;
+
+		return false;
+	}
+#endif
 
 void CpuDetect::Detect()
 {
-	int info[4];
-	cpuid(info, 0);
-	int nIds = info[0];
+	int cpuInfo[4];
+	cpuid(cpuInfo, 0);
+	int nIds = cpuInfo[0];
 
 	// cpu vendor name
 	char vendId[0x20];
 	memset(vendId, 0, sizeof(vendId));
-	*((int*)vendId) = info[1];
-	*((int*)(vendId + 4)) = info[3];
-	*((int*)(vendId + 8)) = info[2];
-	CpuVendor = std::string(vendId);
+	*((int*)vendId) = cpuInfo[1];
+	*((int*)(vendId + 4)) = cpuInfo[3];
+	*((int*)(vendId + 8)) = cpuInfo[2];
+	m_cpuVendor = std::string(vendId);
 
-	cpuid(info, 0x80000000);
-	unsigned nExIds = info[0];
+	cpuid(cpuInfo, 0x80000000);
+	unsigned nExIds = cpuInfo[0];
 
 	//  detect Features
 	if (nIds >= 0x00000001)
 	{
-		cpuid(info, 0x00000001);
-		HW_MMX = (info[3] & ((int)1 << 23)) != 0;
-		HW_SSE = (info[3] & ((int)1 << 25)) != 0;
-		HW_SSE2 = (info[3] & ((int)1 << 26)) != 0;
-		HW_HYPER = (info[3] & ((int)1 << 28)) != 0;
-		HW_SSE3 = (info[2] & ((int)1 << 0)) != 0;
-		HW_SSSE3 = (info[2] & ((int)1 << 9)) != 0;
-		HW_SSE41 = (info[2] & ((int)1 << 19)) != 0;
-		HW_SSE42 = (info[2] & ((int)1 << 20)) != 0;
-		HW_AES = (info[2] & ((int)1 << 25)) != 0;
-		HW_FMA3 = (info[2] & ((int)1 << 12)) != 0;
-		HW_RDRAND = (info[2] & ((int)1 << 30)) != 0;
+		cpuid(cpuInfo, 0x00000001);
 
+		m_amdMp = READBITSFROM(cpuInfo[0], 19, 1) != 0;
+		m_amdMmxExt = READBITSFROM(cpuInfo[0], 22, 1) != 0;
+		m_amd3dNowPro = READBITSFROM(cpuInfo[0], 30, 1) != 0;
+		m_amd3dNow = READBITSFROM(cpuInfo[0], 31, 1) != 0;
 
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-		HW_AVX = HasAvxSupport();
+		m_amdCmpLegacy = (cpuInfo[1], 1, 1) != 0;
+
+		m_sse3 = READBITSFROM(cpuInfo[2], 0, 1) != 0;
+		m_ssse3 = READBITSFROM(cpuInfo[2], 9, 1) != 0;
+		m_fma3 = READBITSFROM(cpuInfo[2], 12, 1) != 0;
+		m_sse41 = READBITSFROM(cpuInfo[2], 19, 1) != 0;
+		m_sse42 = READBITSFROM(cpuInfo[2], 20, 1) != 0;
+		m_aesni = READBITSFROM(cpuInfo[2], 25, 1) != 0;
+
+#if defined(MSCAVX)
+		m_avx = AvxSupported();
 #else
-		HW_AVX = (info[2] & ((int)1 << 28)) != 0;
+		m_avx = READBITSFROM(cpuInfo[2], 28, 1) != 0;
 #endif
+		m_rdRand = READBITSFROM(cpuInfo[2], 30, 1) != 0;
 
-		HW_AMD_CMP_LEGACY = (info[1] & ((int)1 << 1)) != 0;
-		HW_AMD_MP = (info[0] & ((int)1 << 19)) != 0;
-		HW_AMD_MMX_EXT = (info[0] & ((int)1 << 22)) != 0;
-		HW_AMD_3DNOW_PRO = (info[0] & ((int)1 << 30)) != 0;
-		HW_AMD_3DNOW = (info[0] & ((int)1 << 31)) != 0;
+		m_mmx = READBITSFROM(cpuInfo[3], 23, 1) != 0;
+		m_sse1 = READBITSFROM(cpuInfo[3], 25, 1) != 0;
+		m_sse2 = READBITSFROM(cpuInfo[3], 26, 1) != 0;
+		m_rdtscp = READBITSFROM(cpuInfo[3], 27, 1) != 0;
+		m_hyperThread = READBITSFROM(cpuInfo[3], 28, 1) != 0;
 	}
 
 	// extended features
 	if (nIds >= 0x00000007)
 	{
-		cpuid(info, 0x00000007);
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-		HW_AVX2 = HasAvx2Support();
+		cpuid(cpuInfo, 0x00000007);
+
+		m_sgx = READBITSFROM(cpuInfo[1], 2, 1) != 0;
+		m_bmt1 = READBITSFROM(cpuInfo[1], 3, 1) != 0;
+		m_hle = READBITSFROM(cpuInfo[1], 4, 1) != 0;
+#if defined(MSCAVX)
+		m_avx2 = Avx2Supported();
 #else
-		HW_AVX2 = (info[1] & ((int)1 << 5)) != 0;
+		m_avx2 = (cpuInfo[1], 5, 1) != 0;
 #endif
-		HW_BMI1 = (info[1] & ((int)1 << 3)) != 0;
-		HW_BMI2 = (info[1] & ((int)1 << 8)) != 0;
-		HW_ADX = (info[1] & ((int)1 << 19)) != 0;
-		HW_SHA = (info[1] & ((int)1 << 29)) != 0;
-		HW_PREFETCHWT1 = (info[2] & ((int)1 << 0)) != 0;
-		HW_AVX512F = (info[1] & ((int)1 << 16)) != 0;
-		HW_AVX512CD = (info[1] & ((int)1 << 28)) != 0;
-		HW_AVX512PF = (info[1] & ((int)1 << 26)) != 0;
-		HW_AVX512ER = (info[1] & ((int)1 << 27)) != 0;
-		HW_AVX512VL = (info[1] & ((int)1 << 31)) != 0;
-		HW_AVX512BW = (info[1] & ((int)1 << 30)) != 0;
-		HW_AVX512DQ = (info[1] & ((int)1 << 17)) != 0;
-		HW_AVX512IFMA = (info[1] & ((int)1 << 21)) != 0;
-		HW_AVX512VBMI = (info[2] & ((int)1 << 1)) != 0;
+		m_smep = READBITSFROM(cpuInfo[1], 7, 1) != 0;
+		m_bmt2 = READBITSFROM(cpuInfo[1], 8, 1) != 0;
+		m_rtm = READBITSFROM(cpuInfo[1], 11, 1) != 0;
+		m_pqm = READBITSFROM(cpuInfo[1], 12, 1) != 0;
+		m_mpx = READBITSFROM(cpuInfo[1], 14, 1) != 0;
+		m_pqe = READBITSFROM(cpuInfo[1], 15, 1) != 0;
+		m_avx512f = READBITSFROM(cpuInfo[1], 16, 1) != 0;
+		m_avx512dq = READBITSFROM(cpuInfo[1], 17, 1) != 0;
+		m_rdSeed = READBITSFROM(cpuInfo[1], 18, 1) != 0;
+		m_ads = READBITSFROM(cpuInfo[1], 19, 1) != 0;
+		m_smap = READBITSFROM(cpuInfo[1], 20, 1) != 0;
+		m_avx512ifma = READBITSFROM(cpuInfo[1], 21, 1) != 0;
+		m_avx512pf = READBITSFROM(cpuInfo[1], 26, 1) != 0;
+		m_avx512er = READBITSFROM(cpuInfo[1], 27, 1) != 0;
+		m_avx512cd = READBITSFROM(cpuInfo[1], 28, 1) != 0;
+		m_sha = READBITSFROM(cpuInfo[1], 29, 1) != 0;
+		m_avx512bw = READBITSFROM(cpuInfo[1], 30, 1) != 0;
+		m_avx512vl = READBITSFROM(cpuInfo[1], 31, 1) != 0;
+
+		m_prefetch = READBITSFROM(cpuInfo[2], 0, 1) != 0;
+		m_avx512vbmi = READBITSFROM(cpuInfo[2], 1, 1) != 0;
+		m_pku = READBITSFROM(cpuInfo[2], 3, 1) != 0;
+		m_pkuos = READBITSFROM(cpuInfo[2], 4, 1) != 0;
+
+		m_avx5124vnniw = READBITSFROM(cpuInfo[3], 2, 1) != 0;
+		m_avx5124fmaps = READBITSFROM(cpuInfo[3], 3, 1) != 0;
 	}
 
 	if (nExIds >= 0x80000001)
 	{
-		cpuid(info, 0x80000001);
-		HW_x64 = (info[3] & ((int)1 << 29)) != 0;
-		HW_ABM = (info[2] & ((int)1 << 5)) != 0;
-		HW_SSE4A = (info[2] & ((int)1 << 6)) != 0;
-		HW_FMA4 = (info[2] & ((int)1 << 16)) != 0;
-		HW_XOP = (info[2] & ((int)1 << 11)) != 0;
+		cpuid(cpuInfo, 0x80000001);
+
+		m_abm = READBITSFROM(cpuInfo[2], 5, 1) != 0;
+		m_sse4a = READBITSFROM(cpuInfo[2], 6, 1) != 0;
+		m_xop = READBITSFROM(cpuInfo[2], 11, 1) != 0;
+		m_fma4 = READBITSFROM(cpuInfo[2], 16, 1) != 0;
+		m_x64  = READBITSFROM(cpuInfo[3], 29, 1) != 0;
 	}
 
 	// topology
-	HW_VIRTUALCORES = MaxCoresPerPackage();
-	HW_PHYSICALCORES = HW_HYPER == true && HW_VIRTUALCORES > 1 ? HW_VIRTUALCORES / 2 : HW_VIRTUALCORES;
-	HW_LOGICALPERCORE = MaxLogicalPerCore();
-
+	m_virtCores = MaxCoresPerPackage();
+	m_physCores = m_hyperThread == true && m_virtCores > 1 ? m_virtCores / 2 : m_virtCores;
+	m_logicalPerCore = MaxLogicalPerCore();
+	GetFrequency();
+	GetSerialNumber();
+	
+	// TODO: AMD
 	// cache info
 	if ((nExIds & 0xFF) > 5)
 	{
-		cpuid(info, 0x80000006);
-		L1CacheSize = READBITSFROM(info[2], 0, 8);
-		L1CacheTotal = HW_PHYSICALCORES * L1CacheSize;
-		L2CacheSize = READBITSFROM(info[2], 16, 16);
-		L2Associative = (CacheAssociations)READBITSFROM(info[2], 12, 4);
+		cpuid(cpuInfo, 0x80000006);
+
+		m_l1CacheSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 8));
+		m_l1CacheLineSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 11)); // ?
+		m_l2Associative = static_cast<CacheAssociations>(READBITSFROM(cpuInfo[2], 12, 4));
+		m_l2CacheSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 16, 16));
+	}
+
+	// TODO:
+	//http://www.cyberciti.biz/faq/linux-cpuid-command-read-cpuid-instruction-on-linux-for-cpu/
+	/*L3 cache information(0x80000006 / edx) :
+	line size(bytes) = 0x0 (0)
+	lines per tag = 0x0 (0)
+	associativity = L2 off(0)
+	size(in 512Kb units) = 0x0 (0)*/
+}
+
+void CpuDetect::GetFrequency()
+{
+	int cpuInfo[4];
+	cpuid(cpuInfo, 0);
+
+	if (cpuInfo[0] >= 0x16)
+	{
+		cpuid(cpuInfo, 0x16);
+		m_frequencyBase = cpuInfo[0];
+		m_frequencyMax = cpuInfo[1];
+		m_busSpeed = cpuInfo[2];
 	}
 }
 
-
-//~~~ Private Methods~~~//
-
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-	bool CpuDetect::HasAvxSupport()
-	{
-		bool support = false;
-		int cpuInfo[4];
-		__cpuid(cpuInfo, 1);
-
-		bool osUsesXSave = cpuInfo[2] & (1 << 27) || false;
-		bool cpuAVXSuport = cpuInfo[2] & (1 << 28) || false;
-
-		if (osUsesXSave && cpuAVXSuport)
-		{
-			// Check if the OS will save the YMM registers
-			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-			support = (xcrFeatureMask & 0x6) || false;
-		}
-
-		return support;
-	}
-
-	bool CpuDetect::HasAvx2Support()
-	{
-		bool support = false;
-		int cpuInfo[4];
-		__cpuid(cpuInfo, 1);
-
-		bool osUsesXSAVE_XRSTORE = cpuInfo[2] & (1 << 27) || false;
-		bool cpuAVXSuport = cpuInfo[2] & (1 << 28) || false;
-
-		if (osUsesXSAVE_XRSTORE && cpuAVXSuport)
-		{
-			// Check if the OS will save the YMM registers
-			unsigned long long xcrFeatureMask = _xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-			support = (xcrFeatureMask & 0xe6) || false;
-		}
-
-		return support;
-	}
-#endif
-
-void CpuDetect::Initialize()
+void CpuDetect::GetSerialNumber()
 {
-	L1CacheSize = 0;
-	L1CacheTotal = 0;
-	L2CacheSize = 0;
-	CpuVendor = "";
-	L2Associative = CacheAssociations::Disabled;
+	int cpuInfo[4];
+	cpuid(cpuInfo, 0x00000003);
 
-	HW_MMX = false;
-	HW_x64 = false;
-	HW_ABM = false;
-	HW_RDRAND = false;
-	HW_BMI1 = false;
-	HW_BMI2 = false;
-	HW_ADX = false;
-	HW_PREFETCHWT1 = false;
-	HW_SSE = false;
-	HW_SSE2 = false;
-	HW_HYPER = false;
-	HW_SSE3 = false;
-	HW_SSSE3 = false;
-	HW_SSE41 = false;
-	HW_SSE42 = false;
-	HW_SSE4A = false;
-	HW_AES = false;
-	HW_SHA = false;
-	HW_AVX = false;
-	HW_XOP = false;
-	HW_FMA3 = false;
-	HW_FMA4 = false;
-	HW_AVX2 = false;
-	HW_AVX512F = false;
-	HW_AVX512CD = false;
-	HW_AVX512PF = false;
-	HW_AVX512ER = false;
-	HW_AVX512VL = false;
-	HW_AVX512BW = false;
-	HW_AVX512DQ = false;
-	HW_AVX512IFMA = false;
-	HW_AVX512VBMI = false;
-	HW_AMD_CMP_LEGACY = false;
-	HW_AMD_MP = false;
-	HW_AMD_MMX_EXT = false;
-	HW_AMD_3DNOW_PRO = false;
-	HW_AMD_3DNOW = false;
-	HW_VIRTUALCORES = 0;
-	HW_PHYSICALCORES = 0;
-	HW_LOGICALPERCORE = 0;
+	char prcId[8];
+	memset(prcId, 0, sizeof(prcId));
+	*((int*)(prcId)) = cpuInfo[3];
+	*((int*)(prcId + 4)) = cpuInfo[2];
+
+	m_serialNumber = std::string(prcId);
 }
 
 size_t CpuDetect::MaxCoresPerPackage()
 {
 	size_t maxCores = 1;
+	int cpuInfo[4];
 
-	int info[4];
 	switch (Vendor())
 	{
 	case CpuVendors::INTEL:
-		cpuid(info, 4);
-		maxCores = READBITSFROM(info[0], 26, 8) + 1;
+		cpuid(cpuInfo, 4);
+		maxCores = static_cast<size_t>(READBITSFROM(cpuInfo[0], 26, 8) + 1);
 		break;
 	case CpuVendors::AMD:
-		cpuid(info, 0x80000008);
-		maxCores = READBITSFROM(info[0], 0, 8) + 1;
+		cpuid(cpuInfo, 0x80000008);
+		maxCores = static_cast<size_t>(READBITSFROM(cpuInfo[0], 0, 8) + 1);
 		break;
 	default:
 		break;
@@ -219,20 +224,35 @@ size_t CpuDetect::MaxCoresPerPackage()
 
 size_t CpuDetect::MaxLogicalPerCore()
 {
-	if (!HW_HYPER)
+	if (!m_hyperThread)
 		return 1;
-	if (Vendor() == CpuVendors::AMD && HW_AMD_CMP_LEGACY)
+	if (Vendor() == CpuVendors::AMD && m_amdCmpLegacy)
 		return 1;
 
-	int info[4];
-	cpuid(info, 1);
-	size_t logical = READBITSFROM(info[0], 16, 8);
+	int cpuInfo[4];
+	cpuid(cpuInfo, 1);
+
+	size_t logical = static_cast<size_t>(READBITSFROM(cpuInfo[0], 16, 8));
 	size_t cores = MaxCoresPerPackage();
 
 	if (logical % cores == 0)
 		return logical / cores;
 
 	return 1;
+}
+
+const CpuDetect::CpuVendors CpuDetect::Vendor()
+{
+	if (m_cpuVendor.size() > 0)
+	{
+		std::string data = m_cpuVendor;
+		std::transform(data.begin(), data.end(), data.begin(), ::tolower);
+		if (m_cpuVendor.find_first_of("intel") > 0)
+			return CpuVendors::INTEL;
+		else if (m_cpuVendor.find_first_of("amd") > 0)
+			return CpuVendors::AMD;
+	}
+	return CpuVendors::UNKNOWN;
 }
 
 NAMESPACE_COMMONEND

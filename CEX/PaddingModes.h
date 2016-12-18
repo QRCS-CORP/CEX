@@ -1,16 +1,16 @@
-#ifndef _CEXENGINE_PADDINGMODES_H
-#define _CEXENGINE_PADDINGMODES_H
+#ifndef _CEX_PADDINGMODES_H
+#define _CEX_PADDINGMODES_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// Block Cipher Padding Modes
+/// Block cipher padding mode enmumeration names
 /// </summary>
-enum class PaddingModes : uint
+enum class PaddingModes : uint8_t
 {
 	/// <summary>
-	/// Specify None if the input should not require padding (block aligned)
+	/// No padding mode is specified
 	/// </summary>
 	None = 0,
 	/// <summary>

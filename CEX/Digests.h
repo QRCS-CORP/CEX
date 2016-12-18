@@ -1,42 +1,34 @@
-#ifndef _CEXENGINE_DIGESTS_H
-#define _CEXENGINE_DIGESTS_H
+#ifndef _CEX_DIGESTS_H
+#define _CEX_DIGESTS_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// Message Digests
+/// Cryptographic hash functions enmumeration names
 /// </summary>
-enum class Digests : uint
+enum class Digests : uint8_t
 {
 	/// <summary>
-	/// No digest selected
+	/// No hash digest is specified
 	/// </summary>
 	None = 0,
 	/// <summary>
 	/// The Blake2B digest with a 512 bit return size
 	/// </summary>
-	Blake2B512 = 1,
+	BlakeB512 = 1,
 	/// <summary>
 	/// The parallelized Blake2BP digest with a 512 bit return size
 	/// </summary>
-	Blake2BP512 = 2,
+	BlakeBP512 = 2,
 	/// <summary>
 	/// The Blake2S digest with a 256 bit return size
 	/// </summary>
-	Blake2S256 = 3,
+	BlakeS256 = 3,
 	/// <summary>
 	/// The parallelized Blake2SP digest with a 256 bit return size
 	/// </summary>
-	Blake2SP256 = 4,
-	/// <summary>
-	/// The Blake digest with a 256 bit return size
-	/// </summary>
-	Blake256 = 5,
-	/// <summary>
-	/// The Blake digest with a 512 bit return size
-	/// </summary>
-	Blake512 = 6,
+	BlakeSP256 = 4,
 	/// <summary>
 	/// The SHA-3 digest based on Keccak with a 256 bit return size
 	/// </summary>

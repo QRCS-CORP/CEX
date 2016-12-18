@@ -1,18 +1,14 @@
-#ifndef _CEXENGINE_IPADDING_H
-#define _CEXENGINE_IPADDING_H
+#ifndef _CEX_IPADDING_H
+#define _CEX_IPADDING_H
 
-#include "Common.h"
+#include "CexDomain.h"
+#include "CryptoPaddingException.h"
 #include "PaddingModes.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoPaddingException.h"
-#endif
 
 NAMESPACE_PADDING
 
-using CEX::Enumeration::PaddingModes;
-#if defined(CPPEXCEPTIONS_ENABLED)
-	using CEX::Exception::CryptoPaddingException;
-#endif
+using Enumeration::PaddingModes;
+using Exception::CryptoPaddingException;
 
 /// <summary>
 /// Padding Mode Interface
@@ -23,7 +19,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	IPadding() {}
 
@@ -40,9 +36,9 @@ public:
 	virtual const PaddingModes Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Padding name
+	/// Get: The padding modes class name
 	/// </summary>
-	virtual const char *Name() = 0;
+	virtual const std::string Name() = 0;
 
 	//~~~Public Methods~~~//
 

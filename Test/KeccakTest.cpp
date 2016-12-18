@@ -2,7 +2,7 @@
 #include "../CEX/HMAC.h"
 #include "../CEX/Keccak256.h"
 #include "../CEX/Keccak512.h"
-#include "../CEX/KeyParams.h"
+#include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
@@ -12,11 +12,11 @@ namespace Test
 		{
 			Initialize();
 
-			CEX::Digest::Keccak256* kc224 = new CEX::Digest::Keccak256(224);
-			CEX::Digest::Keccak256* kc256 = new CEX::Digest::Keccak256(256);
-			CEX::Digest::Keccak256* kc288 = new CEX::Digest::Keccak256(288);
-			CEX::Digest::Keccak512* kc384 = new CEX::Digest::Keccak512(384);
-			CEX::Digest::Keccak512* kc512 = new CEX::Digest::Keccak512(512);
+			Digest::Keccak256* kc224 = new Digest::Keccak256(224);
+			Digest::Keccak256* kc256 = new Digest::Keccak256(256);
+			Digest::Keccak256* kc288 = new Digest::Keccak256(288);
+			Digest::Keccak512* kc384 = new Digest::Keccak512(384);
+			Digest::Keccak512* kc512 = new Digest::Keccak512(512);
 
 			CompareVector(kc224, m_expected224);
 			OnProgress("Passed Keccak 224 bit digest vector tests..");
@@ -46,9 +46,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -56,7 +56,7 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::CompareVector(CEX::Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected)
+	void KeccakTest::CompareVector(Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
@@ -68,7 +68,7 @@ namespace Test
 			Digest->DoFinal(hash, 0);
 
 			if (Expected[i] != hash)
-				throw std::string("Keccak: Expected hash is not equal!");
+				throw std::exception("Keccak: Expected hash is not equal!");
 		}
 
 		std::vector<byte> k64(1024 * 64, 0);
@@ -80,7 +80,7 @@ namespace Test
 		Digest->DoFinal(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
-			throw std::string("Keccak: Expected hash is not equal!");
+			throw std::exception("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
 			Digest->Update((byte)'a');
@@ -88,7 +88,7 @@ namespace Test
 		Digest->DoFinal(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
-			throw std::string("Keccak: Expected hash is not equal!");
+			throw std::exception("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)('a' + (i % 26));
@@ -97,7 +97,7 @@ namespace Test
 		Digest->DoFinal(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
-			throw std::string("Keccak: Expected hash is not equal!");
+			throw std::exception("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != 64; i++)
 		{
@@ -108,7 +108,7 @@ namespace Test
 		Digest->DoFinal(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
-			throw std::string("Keccak: Expected hash is not equal!");
+			throw std::exception("Keccak: Expected hash is not equal!");
 
 		CompareDoFinal(Digest);
 
@@ -122,10 +122,10 @@ namespace Test
 		Digest->DoFinal(hash, 0);
 
 		if ((Expected[m_messages.size() + 2]) != hash)
-		throw std::string("Keccak: Expected hash is not equal!");*/
+		throw std::exception("Keccak: Expected hash is not equal!");*/
 	}
 
-	void KeccakTest::CompareDoFinal(CEX::Digest::IDigest* Digest)
+	void KeccakTest::CompareDoFinal(Digest::IDigest* Digest)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
@@ -140,13 +140,13 @@ namespace Test
 			Digest->DoFinal(outBytes, i);
 
 			if (expected != outBytes)
-				throw std::string("Keccak DoFinal: Expected hash is not equal!");
+				throw std::exception("Keccak DoFinal: Expected hash is not equal!");
 		}
 	}
 
-	void KeccakTest::CompareHMAC(CEX::Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected)
+	void KeccakTest::CompareHMAC(Digest::IDigest* Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected)
 	{
-		CEX::Mac::HMAC mac(Digest);
+		Mac::HMAC mac(Digest);
 		std::vector<byte> macV2(mac.MacSize(), 0);
 
 		for (unsigned int i = 0; i != m_macKeys.size(); i++)
@@ -157,11 +157,11 @@ namespace Test
 			mac.DoFinal(macV, 0);
 
 			if (Expected[i] != macV)
-				throw std::string("Keccak HMAC: Expected hash is not equal!");
+				throw std::exception("Keccak HMAC: Expected hash is not equal!");
 		}
 
 		// test truncated keys
-		CEX::Mac::HMAC mac2(Digest);
+		Mac::HMAC mac2(Digest);
 		mac2.Initialize(m_truncKey);
 		mac2.BlockUpdate(m_truncData, 0, m_truncData.size());
 		mac2.DoFinal(macV2, 0);
@@ -169,7 +169,7 @@ namespace Test
 		for (unsigned int i = 0; i != TruncExpected.size(); i++)
 		{
 			if (macV2[i] != TruncExpected[i])
-				throw std::string("Keccak HMAC: Expected hash is not equal!");
+				throw std::exception("Keccak HMAC: Expected hash is not equal!");
 		}
 	}
 

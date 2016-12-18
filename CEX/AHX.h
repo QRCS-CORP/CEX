@@ -1,25 +1,21 @@
-// The MIT License (MIT)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
 // 
 // Principal Algorithms:
 // Cipher implementation based on the Rijndael block cipher designed by Joan Daemen and Vincent Rijmen:
@@ -31,10 +27,11 @@
 // using HKDF with a selectable Message Digest for expanded key generation.
 // AES-NI HKDF Extended (AHX)
 // Written by John Underhill, May 21, 2016
-// contact: develop@vtdev.com
+// Updated October 20, 2016
+// Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_AHX_H
-#define _CEXENGINE_AHX_H
+#ifndef _CEX_AHX_H
+#define _CEX_AHX_H
 
 #include "IBlockCipher.h"
 #include <wmmintrin.h>
@@ -42,55 +39,62 @@
 NAMESPACE_BLOCK
 
 /// <summary>
-/// AHX: A Rijndael Cipher extended with an (optional) HKDF powered Key Schedule.
-/// <para>AHX is an AES-NI implementation that uses a standard configuration on key sizes up to 64 bytes (512 bits). 
-/// An optional HKDF Expand bytes generator can be used to expand the user supplied key into a working key integer array
-/// for increased rounds and additional security.</para>
+/// A Rijndael Cipher extended with an (optional) HKDF powered Key Schedule
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example of encrypting a block:</description>
 /// <code>
-/// CTR cipher(new AHX());
+/// CTR cipher(Enumeration::BlockCiphers::AHX);
 /// // initialize for encryption
-/// cipher.Initialize(true, KeyParams(Key, IV));
+/// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt a block
-/// cipher.Transform(Input, Output);
+/// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
-/// 
-/// <seealso cref="CEX::Enumeration::BlockCiphers"/>
-/// <seealso cref="CEX::Enumeration::Digests"/>
-/// <seealso cref="CEX::Digest::IDigest"/>
 /// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <para>The key schedule in AHX is the defining difference between this and a standard version of Rijndael.
-/// The standard Rijndael Key Schedule (128-256 bits), has been extended to accomodate a 512 bit key size.
-/// AHX can (optionally) use an HMAC based Key Derivation Function (HKDF) to expand the cipher key to create the internal round key integer array. 
-/// This provides better security, and allows for a user assignable number of transformation rounds.
-/// When using the HKDF extended mode, the number of diffusion rounds can be set by the user (through the class constructor). 
+/// The standard Rijndael Key Schedule (128-256 bits), has been extended to accomodate a 512 bit key size.<br>
+/// AHX can (optionally) use an HMAC based Key Derivation Function (HKDF) to expand the cipher key to create the internal round key integer array.
+/// This provides better security, and allows for a user assignable number of transformation rounds.<br>
+/// When using the HKDF extended mode, the number of transformation rounds can be set by the user (through the class constructor).
 /// AHX can run between 10 and 38 rounds.</para>
+///
+/// <description>Changes to AHX Version 1.2:</description>
+/// <para>Version 1.2 of the cipher has changes to the HKDF powered key schedule, which may make it incompatable with previous versions of the cipher.<br>
+/// Previous versions split the key into salt and key arrays, and processed these arrays with the HKDF Extract step, which compresses the key material into a pseudo random key used to initialize the HMAC.<br>
+/// The previous versions also added the Info parameter through the HKDF Initialize(key, salt, info) function.<br>
+/// The Info parameter is now set through a property added to the HKDF implementation, so using the Initialize function to load the Info string is no longer required.<br>
+/// This allows for loading the key into HKDF with the Initialize(key) function, which bypasses the extract step, but can still use the Info parameter to provide additional entropy.<br>
+/// The key is used by HKDF to initialize the HMAC. The HMAC key can use up to the hash functions internal block size before a compression cycle is called, reducing the key size to the hash functions output size.<br>
+/// The best size for maximum security is to set the HMAC key to the hash functions block size, this initializes the HMAC with a full block of keying material.<br>
+/// HKDF cycles it's internal state, a one byte counter, and the Info parameter through the HMAC to generate the expanded key.<br>
+/// For best security, it is desirable to have the HMAC process input equal to the hash functions block size, i.e. no zero byte padding is processed by the compression function.<br>
+/// The Info parameter can now be used as an additional source of keying material, if sized to the DistributionCodeMax() property, blocks of state+counter+info are equal to the hash functions block size,
+/// this is the best possible security configuration.</para>
+///
+/// <para>When using SHA-2 256, a minimum key size for AHX is 32 bytes, larger lengths of input key can be used so long as it aligns; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.<br>
+/// The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.<br>
+/// Valid key sizes can be determined at runtime using the LegalKeySizes() property, based on the digest selected.
+/// When using the extended mode, the legal key sizes are determined based on the selected digests hash output size, 
+/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes).<br>
+/// The number of transformation rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze.<br>
+/// AHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256.<br>
+/// Valid rounds assignments can be found in the LegalRounds() property.</para>
 /// 
 /// <list type="bullet">
-/// <item><description>When using the standard cipher, the key length the rounds calculation is done automatically: 10, 12, 14, and 22, for key sizes 126, 192, 256, and 512 bits.</description></item>
-/// <item><description>HKDF Digest engine is definable through the AHX(uint, Digests) Constructor parameter: KDFEngine.</description></item>
-/// <item><description>Key Schedule is powered by a Hash based Key Derivation Function using a user definable Digest.</description></item>
-/// <item><description>Minimum key size is the Digests hash return size, and extendable in blocks of (N * Hash Size) bytes.</description></item>
-/// <item><description>Valid block sizes are 16 bytes wide.</description></item>
-/// <item><description>The rounds can only be assigned if using the HKDF extended mode. Valid Rounds are 10 to 38, default is 22.</description></item>
+/// <item><description>An input key of up to 64 bytes in length will use a standard key schedule for internal key expansion; greater than 64 bytes implements the HKDF key schedule.</description></item>
+/// <item><description>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.</description></item>
+/// <item><description>The HKDF Digest engine is definable through the <see cref="AHX(uint, Digests)">Constructor</see> type enumeration parameter: KdfEngine.</description></item>
+/// <item><description>Minimum HKDF key size is the Digests Hash output size, recommended is 2* the minimum, or increments of (n * hash-size) in bytes.</description></item>
+/// <item><description>The recommended size for maximum security is 2* the digests block size; this calls HKDF Extract using full blocks of key and salt.</description></item>
+/// <item><description>Valid key sizes can be determined at run time using the <see cref="LegalKeySizes"/> property.</description></item>
+/// <item><description>The internal block size is 16 bytes wide.</description></item>
+/// <item><description>Diffusion rounds assignments are 10 to 38, the default is 22 (128-256 bit key), a 512 bit key is automatically assigned 22 rounds.</description></item>
+/// <item><description>Valid rounds assignments can be found in the <see cref="LegalRounds"/> property.</description></item>
 /// </list>
-/// 
-/// <para>When using SHA-2 256, a minimum key size for AHX is 32 bytes, further blocks of can be added to the key so long as they align; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.</para> 
-/// 
-/// <para>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake, Keccak, SHA-2 or Skein.
-/// Correct key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property, based on the digest selected.
-/// When using the extended mode, the legal key sizes are determined based on the selected digests hash output size, 
-/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes).</para>
-/// 
-/// <para>The number of diffusion rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. 
-/// AHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256. 
-/// Valid rounds assignments can be found in the <see cref="LegalRounds"/> static property.</para>
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
@@ -108,33 +112,36 @@ NAMESPACE_BLOCK
 class AHX : public IBlockCipher
 {
 private:
-	static constexpr size_t BLOCK16 = 16;
-	static constexpr size_t BLOCK32 = 32;
-	static constexpr size_t LEGAL_KEYS = 10;
-	static constexpr size_t MAX_ROUNDS = 38;
-	static constexpr size_t MIN_ROUNDS = 10;
-	static constexpr size_t ROUNDS22 = 22;
+
+	const size_t BLOCK16 = 16;
+	const size_t BLOCK32 = 32;
+	const size_t LEGAL_KEYS = 10;
+	const size_t MAX_ROUNDS = 38;
+	const size_t MIN_ROUNDS = 10;
+	const size_t AES256_ROUNDS = 14;
 
 	size_t m_blockSize;
 	bool m_destroyEngine;
-	size_t m_dfnRounds;
 	std::vector<__m128i> m_expKey;
-	bool m_hasAVX;
+	bool m_hasAVX2;
 	bool m_hasSSE;
-	std::vector<byte> m_hkdfInfo;
-	size_t m_ikmSize;
+	IDigest* m_kdfEngine;
+	Digests m_kdfEngineType;
+	std::vector<byte> m_kdfInfo;
+	size_t m_kdfInfoMax;
+	size_t m_kdfKeySize;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	IDigest* m_kdfEngine;
-	Digests m_kdfEngineType;
-	std::vector<size_t> m_legalKeySizes;
+	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
+	size_t m_rndCount;
+
+public:
 
 	AHX(const AHX&) = delete;
 	AHX& operator=(const AHX&) = delete;
-
-public:
+	AHX& operator=(AHX&&) = delete;
 
 	//~~~Properties~~~//
 
@@ -145,14 +152,20 @@ public:
 	virtual const size_t BlockSize() { return m_blockSize; }
 
 	/// <summary>
-	/// Get/Set: Sets the Info value in the HKDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(bool, KeyParams)"/> is called.
-	/// Changing this code will create a unique distribution of the cipher.
-	/// Code can be either a zero byte array, or a multiple of the HKDF digest engines return size.</para>
+	/// Get/Set: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
+	/// <para>Changing this code will create a unique distribution of the cipher.
+	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.
+	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
-	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if an invalid distribution code is used</exception>
-	const std::vector<byte> &DistributionCode() { return m_hkdfInfo; }
+	virtual std::vector<byte> &DistributionCode() { return m_kdfInfo; }
+
+	/// <summary>
+	/// Get: The maximum size of the distribution code in bytes.
+	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
+	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
+	/// </summary>
+	virtual const size_t DistributionCodeMax() { return m_kdfInfoMax; }
 
 	/// <summary>
 	/// Get: The block ciphers type name
@@ -161,7 +174,7 @@ public:
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
-	/// <para>Value set in <see cref="Initialize(bool, KeyParams)"/>.</para>
+	/// <para>Value set in <see cref="Initialize(bool, SymmetricKey)"/>.</para>
 	/// </summary>
 	virtual const bool IsEncryption() { return m_isEncryption; }
 
@@ -171,146 +184,103 @@ public:
 	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
-	/// Get: Available Encryption Key Sizes in bytes
+	/// Get: The extended ciphers HKDF digest type
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return m_legalKeySizes; }
+	virtual const Digests KdfEngine() { return m_kdfEngineType; }
 
 	/// <summary>
-	/// Get: Available diffusion round assignments
+	/// Get: The supported key, nonce, and info sizes for the selected cipher configuration
 	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() { return m_legalRounds; }
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; }
 
 	/// <summary>
-	/// Get: Cipher name
+	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const char* Name() { return "AHX"; }
+	virtual const std::vector<size_t> LegalRounds() { return m_legalRounds; }
 
 	/// <summary>
-	/// Get: The number of diffusion rounds processed by the transform
+	/// Get: The block ciphers class name
 	/// </summary>
-	virtual const size_t Rounds() { return m_dfnRounds; }
+	virtual const std::string Name() { return "AHX"; }
+
+	/// <summary>
+	/// Get: The number of transformation rounds processed by the transform
+	/// </summary>
+	virtual const size_t Rounds() { return m_rndCount; }
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize the class with a Digest instance (HKDF mode)
+	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
 	/// </summary>
-	///
-	/// <param name="KdfEngine">The Key Schedule KDF digest engine instance; can be any one of the Digest implementations.</param>
-	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
-	///
-	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	AHX(IDigest *KdfEngine, size_t Rounds = ROUNDS22)
+	/// 
+	/// <param name="KdfEngineType">The Key Schedule HKDF digest engine; can be any one of the Digest
+	/// implementations. The default engine is None, which invokes the standard key schedule mechanism.</param>
+	/// <param name="Rounds">Number of transformation rounds. The <see cref="LegalRounds"/> property contains available sizes. 
+	/// Default is automatically calculated based on the key size; defining rounds requires HKDF extended mode.</param>
+	/// 
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
+	AHX(Digests KdfEngineType = Digests::None, size_t Rounds = 14)
 		:
 		m_blockSize(BLOCK16),
-		m_destroyEngine(false),
-		m_dfnRounds(Rounds),
+		m_destroyEngine(true),
 		m_expKey(0),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(true),
-		m_hkdfInfo(0, 0),
-		m_ikmSize(0),
+		m_kdfEngine(0),
+		m_kdfEngineType(KdfEngineType),
+		m_kdfInfo(0, 0),
+		m_kdfInfoMax(0),
+		m_kdfKeySize(0),
 		m_isDestroyed(false),
 		m_isEncryption(false),
 		m_isInitialized(false),
-		m_kdfEngine(KdfEngine),
-		m_kdfEngineType(Digests::SHA512),
-		m_legalKeySizes(LEGAL_KEYS, 0),
-		m_legalRounds(15, 0)
+		m_legalKeySizes(0),
+		m_legalRounds(0),
+		m_rndCount(Rounds)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert(KdfEngine != 0);
-		assert(Rounds >= MIN_ROUNDS && Rounds <= MAX_ROUNDS && Rounds % 2 == 0);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
+		if (KdfEngineType != Digests::None)
+		{
+			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
+				throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+		}
+
+		LoadState(KdfEngineType);
+	}
+
+	/// <summary>
+	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
+	/// </summary>
+	///
+	/// <param name="KdfEngine">The Key Schedule KDF digest engine instance; can be any one of the Digest implementations.</param>
+	/// <param name="Rounds">Number of transformation rounds. The <see cref="LegalRounds"/> property contains available sizes.  Default is 22 rounds.</param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
+	AHX(IDigest *KdfEngine, size_t Rounds = 14)
+		:
+		m_blockSize(BLOCK16),
+		m_destroyEngine(false),
+		m_expKey(0),
+		m_hasAVX2(false),
+		m_hasSSE(true),
+		m_kdfEngine(KdfEngine),
+		m_kdfEngineType(KdfEngine->Enumeral()),
+		m_kdfInfo(0, 0),
+		m_kdfInfoMax(0),
+		m_kdfKeySize(0),
+		m_isDestroyed(false),
+		m_isEncryption(false),
+		m_isInitialized(false),
+		m_legalKeySizes(0),
+		m_legalRounds(0),
+		m_rndCount(Rounds)
+	{
 		if (KdfEngine == 0)
 			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid null parameter! The digest instance can not be null.");
 		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
 			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
-#endif
 
-		std::string info = "information string RHX version 1";
-		m_hkdfInfo.reserve(info.size());
-		for (size_t i = 0; i < info.size(); ++i)
-			m_hkdfInfo.push_back(info[i]);
-
-		m_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
-		m_kdfEngineType = KdfEngine->Enumeral();
-		// set the hmac key size
-		m_ikmSize = m_kdfEngine->DigestSize();
-		// add standard key lengths
-		m_legalKeySizes[0] = 16;
-		m_legalKeySizes[1] = 24;
-		m_legalKeySizes[2] = 32;
-		m_legalKeySizes[3] = 64;
-
-		for (size_t i = 4; i < m_legalKeySizes.size(); ++i)
-			m_legalKeySizes[i] = (m_legalKeySizes[3] + m_ikmSize * (i - 3));
-	}
-
-	/// <summary>
-	/// Initialize the class
-	/// </summary>
-	/// 
-	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. 
-	/// Default is based on the key size; defining rounds requires HKDF extended mode.</param>
-	/// <param name="KdfEngineType">The Key Schedule HKDF digest engine; can be any one of the Digest
-	/// implementations. The default engine is None, which invokes the standard key schedule mechanism.</param>
-	/// 
-	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	AHX(size_t Rounds = ROUNDS22, Digests KdfEngineType = Digests::None)
-		:
-		m_blockSize(BLOCK16),
-		m_destroyEngine(true),
-		m_dfnRounds(Rounds),
-		m_expKey(0),
-		m_hasSSE(true),
-		m_hkdfInfo(0, 0),
-		m_ikmSize(0),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_kdfEngine(0),
-		m_kdfEngineType(KdfEngineType),
-		m_legalKeySizes(LEGAL_KEYS, 0),
-		m_legalRounds(0, 0)
-	{
-		// add standard key lengths
-		m_legalKeySizes[0] = 16;
-		m_legalKeySizes[1] = 24;
-		m_legalKeySizes[2] = 32;
-		m_legalKeySizes[3] = 64;
-
-		if (KdfEngineType != Digests::None)
-		{
-#if defined(DEBUGASSERT_ENABLED)
-			assert(Rounds >= MIN_ROUNDS && Rounds <= MAX_ROUNDS && Rounds % 2 == 0);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-			if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 != 0)
-				throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
-#endif
-
-			std::string info = "information string RHX version 1";
-			m_hkdfInfo.reserve(info.size());
-			for (size_t i = 0; i < info.size(); ++i)
-				m_hkdfInfo.push_back(info[i]);
-
-			m_legalRounds.resize(15);
-			m_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
-			// set the hmac key size
-			m_ikmSize = GetIkmSize(KdfEngineType);
-
-			// hkdf extended key sizes
-			for (size_t i = 4; i < m_legalKeySizes.size(); ++i)
-				m_legalKeySizes[i] = (m_legalKeySizes[3] + m_ikmSize * (i - 3));
-		}
-		else
-		{
-			m_legalKeySizes.resize(4);
-			m_legalRounds.resize(4);
-			m_legalRounds = { 10, 12, 14, 22 };
-		}
+		LoadState(KdfEngine->Enumeral());
 	}
 
 	/// <summary>
@@ -325,7 +295,7 @@ public:
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
@@ -335,14 +305,14 @@ public:
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
 	/// <param name="Input">Encrypted bytes</param>
-	/// <param name="InOffset">Offset in the Input array</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">Decrypted bytes</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
@@ -352,80 +322,80 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
-	/// Initialize the Cipher.
+	/// Initialize the cipher
 	/// </summary>
 	///
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam);
 
 	/// <summary>
 	/// Transform a block of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input bytes to Transform or Decrypt</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array of bytes to transform or Decrypt</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
-	/// <param name="Input">Input message to Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Starting offset in the Output array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input message to Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Starting offset in the Output array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
 	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
-	/// <para><see cref="Initialize(bool, KeyParams)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input message to Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Starting offset in the Output array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
 	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	private:
@@ -442,8 +412,8 @@ public:
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	uint GetIkmSize(Digests DigestType);
-	IDigest* GetDigest(Digests DigestType);
+	void LoadState(Digests KdfEngineType);
+	IDigest* LoadDigest(Digests DigestType);
 };
 
 NAMESPACE_BLOCKEND

@@ -1,30 +1,43 @@
-#ifndef _CEXENGINE_ASYMMETRICENGINES_H
-#define _CEXENGINE_ASYMMETRICENGINES_H
+#ifndef _CEX_ASYMMETRICENGINES_H
+#define _CEX_ASYMMETRICENGINES_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
-/// Asymmetric Encryption Ciphers
+/// Asymmetric cipher enmumeration names
 /// </summary>
-enum class AsymmetricEngines : uint
+enum class AsymmetricEngines : uint8_t
 {
+	/// <summary>
+	/// No asymmetric cipher is specified
+	/// </summary>
+	None = 0,
+	/// <summary>
+	/// A Generalized Merkle Signature Scheme implementation
+	/// </summary>
+	GMSS = 1,
+	/// <summary>
+	/// A McEliece cipher implementation
+	/// </summary>
+	McEliece = 2,
 	/// <summary>
 	/// An NTRU cipher implementation
 	/// </summary>
-	NTRU = 1,
+	NTRU = 4,
 	/// <summary>
-	/// An Ring-LWE cipher implementation
+	/// A Rainbow signature scheme implementation
 	/// </summary>
-	RingLWE = 2,
+	Rainbow = 8,
 	/// <summary>
-	/// A Rainbow signing implementation
+	/// A Ring-LWE cipher implementation
 	/// </summary>
-	Rainbow = 4,
+	RingLWE = 16,
 	/// <summary>
-	/// A Super Isogeny Diffie Hellman implementation
+	/// A Supersingular Isogeny Diffie Hellman implementation
 	/// </summary>
-	SIDH = 8
+	SIDH = 32
 };
 
 NAMESPACE_ENUMERATIONEND

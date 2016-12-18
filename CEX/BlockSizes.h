@@ -1,15 +1,19 @@
-#ifndef _CEXENGINE_BLOCKSIZES_H
-#define _CEXENGINE_BLOCKSIZES_H
+#ifndef _CEX_BLOCKSIZES_H
+#define _CEX_BLOCKSIZES_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// <para>Block cipher sizes in bits. Can be cast as Block byte size integers, 
-/// i.e. (int sz = BlockSizes.B512) is equal to 64.</para>
+/// Common symmetric block cipher state bit sizes.
+/// <para>Can be cast as Block byte size integers, i.e. (int sz = BlockSizes.B512) is equal to 64.</para>
 /// </summary>
-enum class BlockSizes : uint
+enum class BlockSizes : uint8_t
 {
+	/// <summary>
+	/// No block size is specified
+	/// </summary>
+	None = 0,
 	/// <summary>
 	/// 128 bit block size
 	/// </summary>

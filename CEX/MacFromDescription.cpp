@@ -1,35 +1,28 @@
 #include "MacFromDescription.h"
 #include "CMAC.h"
 #include "HMAC.h"
-#include "VMAC.h"
 #include "Macs.h"
 #include "CryptoException.h"
 
 NAMESPACE_HELPER
 
-CEX::Mac::IMac* MacFromDescription::GetInstance(CEX::Common::MacDescription &Description)
+IMac* MacFromDescription::GetInstance(MacDescription &Description)
 {
-	switch (Description.MacType())
+	try
 	{
-	case CEX::Enumeration::Macs::CMAC:
-	{
-		return new CEX::Mac::CMAC(Description.EngineType());
+		switch (Description.MacType())
+		{
+		case Enumeration::Macs::CMAC:
+			return new Mac::CMAC(Description.EngineType());
+		case Enumeration::Macs::HMAC:
+			return new Mac::HMAC(Description.HmacEngine());
+		default:
+			throw Exception::CryptoException("MacFromDescription:GetInstance", "The mac type is not recognized!");
+		}
 	}
-	case CEX::Enumeration::Macs::HMAC:
+	catch (const std::exception &ex)
 	{
-		return new CEX::Mac::HMAC(Description.HmacEngine());
-	}
-	case CEX::Enumeration::Macs::VMAC:
-	{
-		return new CEX::Mac::VMAC();
-	}
-	default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoException("MacFromDescription:GetInstance", "The symmetric cipher is not recognized!");
-#else
-		return 0;
-#endif
-
+		throw Exception::CryptoException("MacFromDescription:GetInstance", "The mac is unavailable!", std::string(ex.what()));
 	}
 }
 

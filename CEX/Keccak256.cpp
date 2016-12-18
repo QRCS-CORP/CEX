@@ -1,17 +1,17 @@
 #include "Keccak256.h"
 #include "Keccak.h"
+#include "ArrayUtils.h"
 #include "IntUtils.h"
 
 NAMESPACE_DIGEST
 
-using CEX::Utility::IntUtils;
+using Utility::IntUtils;
 
 void Keccak256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((InOffset + Length) > Input.size())
 		throw CryptoDigestException("Keccak256:BlockUpdate", "The Input buffer is too short!");
-#endif
+
 	if (m_bufferIndex != 0)
 	{
 		if (Length + m_bufferIndex >= m_blockSize)
@@ -55,17 +55,22 @@ void Keccak256::Destroy()
 		m_digestSize = 0;
 		m_blockSize = 0;
 
-		IntUtils::ClearVector(m_buffer);
-		IntUtils::ClearVector(m_state);
+		try
+		{
+			Utility::ArrayUtils::ClearVector(m_buffer);
+			Utility::ArrayUtils::ClearVector(m_state);
+		}
+		catch (std::exception& ex)
+		{
+			throw CryptoDigestException("Keccak256:Destroy", "Could not clear all variables!", std::string(ex.what()));
+		}
 	}
 }
 
 size_t Keccak256::DoFinal(std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() - OutOffset < m_digestSize)
 		throw CryptoDigestException("Keccak256:DoFinal", "The Output buffer is too short!");
-#endif
 
 	memset(&m_buffer[m_bufferIndex], (byte)0, m_buffer.size() - m_bufferIndex);
 

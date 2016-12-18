@@ -8,6 +8,8 @@
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string CipherModeTest::Run()
 	{
 		try
@@ -42,9 +44,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -64,9 +66,9 @@ namespace Test
 			index = 10;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::CBC mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::CBC mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -74,16 +76,16 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::string("CBC Mode: Encrypted arrays are not equal!");
+					throw std::exception("CBC Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
 
 		index++;
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::CBC mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::CBC mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(false, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -91,7 +93,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::string("CBC Mode: Decrypted arrays are not equal!");
+					throw std::exception("CBC Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -109,9 +111,9 @@ namespace Test
 			index = 16;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::CFB mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::CFB mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -119,7 +121,7 @@ namespace Test
 				mode.Transform(Input[index][i], 0, outBytes, 0);
 
 				if (outBytes != Output[index][i])
-					throw std::string("CFB Mode: Encrypted arrays are not equal!");
+					throw std::exception("CFB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -127,9 +129,9 @@ namespace Test
 		index++;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::CFB mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::CFB mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(false, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -137,7 +139,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::string("CFB Mode: Decrypted arrays are not equal!");
+					throw std::exception("CFB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -155,9 +157,9 @@ namespace Test
 			index = 28;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::CTR mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::CTR mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -165,16 +167,16 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::string("CTR Mode: Encrypted arrays are not equal!");
+					throw std::exception("CTR Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
 
 		index++;
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::CTR mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::CTR mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(false, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -182,7 +184,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::string("CTR Mode: Decrypted arrays are not equal!");
+					throw std::exception("CTR Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -199,9 +201,9 @@ namespace Test
 			index = 4;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::ECB mode(eng);
-			CEX::Common::KeyParams k(Key);
+			RHX* eng = new RHX();
+			Mode::ECB mode(eng);
+			Key::Symmetric::SymmetricKey k(Key);
 			mode.Initialize(true, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -209,7 +211,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::string("ECB Mode: Encrypted arrays are not equal!");
+					throw std::exception("ECB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -217,9 +219,9 @@ namespace Test
 		index++;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::ECB mode(eng);
-			CEX::Common::KeyParams k(Key);
+			RHX* eng = new RHX();
+			Mode::ECB mode(eng);
+			Key::Symmetric::SymmetricKey k(Key);
 			mode.Initialize(false, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -227,7 +229,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::string("ECB Mode: Decrypted arrays are not equal!");
+					throw std::exception("ECB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -245,9 +247,9 @@ namespace Test
 			index = 22;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::OFB mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::OFB mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -255,7 +257,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::string("OFB Mode: Encrypted arrays are not equal!");
+					throw std::exception("OFB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -263,9 +265,9 @@ namespace Test
 		index++;
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
-			CEX::Cipher::Symmetric::Block::Mode::OFB mode(eng);
-			CEX::Common::KeyParams k(Key, iv);
+			RHX* eng = new RHX();
+			Mode::OFB mode(eng);
+			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
 			for (unsigned int i = 0; i < 4; i++)
@@ -273,7 +275,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::string("OFB Mode: Decrypted arrays are not equal!");
+					throw std::exception("OFB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}

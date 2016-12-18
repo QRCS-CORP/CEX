@@ -3,7 +3,7 @@
 
 #include <string.h>
 #include <vector>
-#include "../CEX/Common.h"
+#include "../CEX/CexDomain.h"
 
 namespace Test
 {

@@ -1,15 +1,11 @@
 #include "ICM.h"
+#include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_MODE
-
-using CEX::Helper::BlockCipherFromName;
-using CEX::Common::CpuDetect;
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
 
 //~~~Public Methods~~~//
 
@@ -18,36 +14,33 @@ void ICM::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_cipherType = BlockCiphers::None;
+		m_hasAVX2 = false;
+		m_hasSSE = false;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
+		m_parallelMaxDegree = 0;
+		m_parallelMinimumSize = 0;
+		m_processorCount = 0;
 
 		try
 		{
 			if (m_destroyEngine)
 			{
+				m_destroyEngine = false;
+
 				if (m_blockCipher != 0)
 					delete m_blockCipher;
 			}
 
-			m_blockSize = 0;
-			m_hasAVX = false;
-			m_hasSSE = false;
-			m_destroyEngine = false;
-			m_isEncryption = false;
-			m_isInitialized = false;
-			m_processorCount = 0;
-			m_isParallel = false;
-			m_parallelBlockSize = 0;
-			m_parallelMaxDegree = 0;
-			m_parallelMinimumSize = 0;
-			IntUtils::ClearVector(m_ctrVector);
+			Utility::ArrayUtils::ClearVector(m_ctrVector);
 		}
-		catch (...) 
+		catch(std::exception& ex) 
 		{
-#if defined(DEBUGASSERT_ENABLED)
-			assert("ICM::Destroy: Could not clear all variables!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CryptoCipherModeException("ICM::Destroy", "Could not clear all variables!");
-#endif
+			throw CryptoCipherModeException("ICM:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
@@ -59,65 +52,39 @@ void ICM::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 
 void ICM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	m_blockCipher->EncryptBlock(Convert64(m_ctrVector), 0, Output, OutOffset);
+	m_blockCipher->EncryptBlock(Convert(m_ctrVector), 0, Output, OutOffset);
 	Increment(m_ctrVector);
 
 	for (size_t i = 0; i < BLOCK_SIZE; ++i)
 		Output[i + OutOffset] ^= Input[i + InOffset];
 }
 
-void ICM::Initialize(bool Encryption, const KeyParams &KeyParam)
+void ICM::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	if (KeyParam.IV().size() == 64)
-		assert(HasSSE());
-	if (KeyParam.IV().size() == 128)
-		assert(HasAVX());
-	if (IsParallel())
-	{
-		assert(ParallelBlockSize() >= ParallelMinimumSize() || ParallelBlockSize() <= ParallelMaximumSize());
-		assert(ParallelBlockSize() % ParallelMinimumSize() == 0);
-	}
-	assert(KeyParam.IV().size() > 15);
-	assert(KeyParam.Key().size() > 15);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (KeyParam.IV().size() == 64 && !HasSSE())
-		throw CryptoSymmetricCipherException("ICM:Initialize", "SSE 128bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() == 128 && !HasAVX())
-		throw CryptoSymmetricCipherException("ICM:Initialize", "AVX 256bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() < 16)
-		throw CryptoSymmetricCipherException("ICM:Initialize", "Requires a minimum 16 bytes of IV!");
-	if (KeyParam.Key().size() < 16)
-		throw CryptoSymmetricCipherException("ICM:Initialize", "Requires a minimum 16 bytes of Key!");
+	// recheck params
+	Scope();
+
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParam.Key().size(), KeyParam.Nonce().size()))
+		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid key or nonce size! Key and nonce must be one of the LegalKeySizes() members in length.");
 	if (IsParallel() && ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
 		throw CryptoSymmetricCipherException("ICM:Initialize", "The parallel block size is out of bounds!");
 	if (IsParallel() && ParallelBlockSize() % ParallelMinimumSize() != 0)
 		throw CryptoSymmetricCipherException("ICM:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
-#endif
 
 	m_blockCipher->Initialize(true, KeyParam);
-	m_ctrPublic = KeyParam.IV();
-	memcpy(&m_ctrVector[0], &KeyParam.IV()[0], BLOCK_SIZE);
+	memcpy(&m_ctrVector[0], &KeyParam.Nonce()[0], BLOCK_SIZE);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }
 
 void ICM::ParallelMaxDegree(size_t Degree)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	assert(Degree != 0);
-	assert(Degree % 2 == 0);
-	assert(Degree <= m_processorCount);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Degree == 0)
-		throw CryptoCipherModeException("ICM::ParallelMaxDegree", "Parallel degree can not be zero!");
+		throw CryptoCipherModeException("ICM:ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
-		throw CryptoCipherModeException("ICM::ParallelMaxDegree", "Parallel degree must be an even number!");
+		throw CryptoCipherModeException("ICM:ParallelMaxDegree", "Parallel degree must be an even number!");
 	if (Degree > m_processorCount)
-		throw CryptoCipherModeException("ICM::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
-#endif
+		throw CryptoCipherModeException("ICM:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
 	m_parallelMaxDegree = Degree;
 	Scope();
@@ -148,38 +115,47 @@ void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 //~~~Private Methods~~~//
 
-std::vector<byte> ICM::Convert64(const std::vector<ulong> &Input)
+// TODO: why is this so slow?
+std::vector<byte> ICM::Convert(const std::vector<ulong> &Input)
 {
-	std::vector<byte> ret(BLOCK_SIZE);
+	std::vector<byte> ctr(BLOCK_SIZE);
 #if defined(IS_LITTLE_ENDIAN)
-	memcpy(&ret[0], &Input[0], BLOCK_SIZE);
+	memcpy(&ctr[0], &Input[0], BLOCK_SIZE);
 #else
-	IntUtils::Le64ToBytes(Input[0], ret, 0);
-	IntUtils::Le64ToBytes(Input[1], ret, 8);
+	Utility::IntUtils::Le64ToBytes(Input[0], ctr, 0);
+	Utility::IntUtils::Le64ToBytes(Input[1], ctr, 8);
 #endif
-	return ret;
+	return ctr;
 }
 
 void ICM::Detect()
 {
 	try
 	{
-		CpuDetect detect;
-		m_hasSSE = detect.HasMinIntrinsics();
-		m_hasAVX = detect.HasAVX();
-		m_parallelBlockSize = detect.L1CacheTotal * 1000; //m_parallelBlockSize /= 2;
+		Common::CpuDetect detect;
+		m_processorCount = detect.VirtualCores();
+		if (m_processorCount > 1 && m_processorCount % 2 != 0)
+			m_processorCount--;
+
+		m_parallelBlockSize = detect.L1DataCacheTotal();
+		if (m_parallelBlockSize == 0 || m_processorCount == 0)
+			throw std::exception();
+
+		m_hasSSE = detect.SSE();
+		m_hasAVX2 = detect.AVX2();
 	}
 	catch (...)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert("CpuDetect not compatable!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoCipherModeException("ICM:Detect", "CpuDetect not compatable!");
-#endif
+		m_processorCount = Utility::ParallelUtils::ProcessorCount();
+
+		if (m_processorCount == 0)
+			m_processorCount = 1;
+		if (m_processorCount > 1 && m_processorCount % 2 != 0)
+			m_processorCount--;
+
 		m_hasSSE = false;
-		m_hasAVX = false;
-		m_parallelBlockSize = PARALLEL_DEFBLOCK;
+		m_hasAVX2 = false;
+		m_parallelBlockSize = m_processorCount * PRC_DATACACHE;
 	}
 }
 
@@ -189,7 +165,7 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	const size_t SSEBLK = 4 * m_blockSize;
 	const size_t AVXBLK = 8 * m_blockSize;
 
-	if (m_hasAVX && Length >= AVXBLK)
+	if (m_hasAVX2 && Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		std::vector<byte> ctrBlk(AVXBLK);
@@ -241,76 +217,81 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	const size_t BLKALN = Length - (Length % m_blockSize);
 	while (blkCtr != BLKALN)
 	{
-		m_blockCipher->EncryptBlock(Convert64(Counter), 0, Output, OutOffset + blkCtr);
+		m_blockCipher->EncryptBlock(Convert(Counter), 0, Output, OutOffset + blkCtr);
 		Increment(Counter);
 		blkCtr += m_blockSize;
 	}
 
 	if (blkCtr != Length)
 	{
-		std::vector<byte> outputBlock(m_blockSize, 0);
-		m_blockCipher->EncryptBlock(Convert64(Counter), outputBlock);
+		std::vector<byte> tmp(BLOCK_SIZE);
+		m_blockCipher->EncryptBlock(Convert(Counter), 0, tmp, 0);
 		const size_t FNLSZE = Length % m_blockSize;
-		memcpy(&Output[OutOffset + (Length - FNLSZE)], &outputBlock[0], FNLSZE);
+		memcpy(&Output[OutOffset + (Length - FNLSZE)], &tmp[0], FNLSZE);
 		Increment(Counter);
 	}
 }
 
-IBlockCipher* ICM::GetCipher(BlockCiphers CipherType)
+void ICM::Increase(const std::vector<ulong> &Input, std::vector<ulong> &Output, const ulong Value)
+{
+	memcpy(&Output[0], &Input[0], BLOCK_SIZE);
+	Output[0] += Value;
+	if (Output[0] < Input[0])
+		++Output[1];
+}
+
+void ICM::Increment(std::vector<ulong> &Counter)
+{
+	if (++Counter[0] == 0)
+		++Counter[1];
+}
+
+IBlockCipher* ICM::LoadCipher(BlockCiphers CipherType)
 {
 	try
 	{
-		return BlockCipherFromName::GetInstance(CipherType);
+		return Helper::BlockCipherFromName::GetInstance(CipherType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoSymmetricCipherException("ICM:GetCipher", "The block cipher could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoSymmetricCipherException("ICM:LoadCipher", "The block cipher could not be instantiated!", std::string(ex.what()));
 	}
+}
+
+void ICM::LoadState()
+{
+	if (m_blockCipher == 0)
+	{
+		m_blockCipher = LoadCipher(m_cipherType);
+		m_blockSize = m_blockCipher->BlockSize();
+	}
+
+	Detect();
+	Scope();
 }
 
 void ICM::Scope()
 {
-	Detect();
-	m_processorCount = ParallelUtils::ProcessorCount();
-
 	if (m_parallelMaxDegree == 1)
-	{
-		// maxdegree value of 1 turns parallel off
 		m_isParallel = false;
-	}
-	else
-	{
-		// even number of cpu's required
-		if (m_processorCount % 2 != 0)
-			m_processorCount--;
-		if (m_processorCount > 1)
-			m_isParallel = true;
-	}
+	else if (!m_isInitialized)
+		m_isParallel = (m_processorCount > 1);
 
-	// value 0 zero uses max virtual cpu's
 	if (m_parallelMaxDegree == 0)
 		m_parallelMaxDegree = m_processorCount;
 
-	if (m_isParallel)
-	{
-		m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
+	m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
 
-		// widen for SIMD
-		if (m_hasAVX)
-			m_parallelMinimumSize *= 8;
-		else if (m_hasSSE)
-			m_parallelMinimumSize *= 4;
+	if (m_hasAVX2)
+		m_parallelMinimumSize *= 8;
+	else if (m_hasSSE)
+		m_parallelMinimumSize *= 4;
 
-		// 16 kb minimum block for performance, adjust if necessary to target cache size (portables)
-		if (m_parallelBlockSize == 0 || m_parallelBlockSize < PARALLEL_DEFBLOCK / 4)
-			m_parallelBlockSize = PARALLEL_DEFBLOCK - (PARALLEL_DEFBLOCK % m_parallelMinimumSize);
-		else
-			m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
-	}
+	// 16 kb minimum
+	if (m_parallelBlockSize == 0 || m_parallelBlockSize < PRC_DATACACHE)
+		m_parallelBlockSize = (m_parallelMaxDegree * PRC_DATACACHE) - ((m_parallelMaxDegree * PRC_DATACACHE) % m_parallelMinimumSize);
+	else
+		m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
 }
 
 void ICM::TransformParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
@@ -320,7 +301,7 @@ void ICM::TransformParallel(const std::vector<byte> &Input, const size_t InOffse
 	const size_t CTRLEN = (CNKSZE / m_blockSize);
 	std::vector<ulong> tmpCtr(m_ctrVector.size());
 
-	ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
+	Utility::ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
 	{
 		// thread level counter
 		std::vector<ulong> thdCtr(2, 0);
@@ -329,7 +310,7 @@ void ICM::TransformParallel(const std::vector<byte> &Input, const size_t InOffse
 		// generate random at output array offset
 		this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 		// xor with input at offsets
-		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, HasSSE());
+		Utility::IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, HasSSE());
 		// store last counter
 		if (i == m_parallelMaxDegree - 1)
 			memcpy(&tmpCtr[0], &thdCtr[0], BLOCK_SIZE);
@@ -342,7 +323,7 @@ void ICM::TransformParallel(const std::vector<byte> &Input, const size_t InOffse
 	const size_t ALNSZE = CNKSZE * m_parallelMaxDegree;
 	if (ALNSZE < OUTSZE)
 	{
-		size_t fnlSize = Output.size() % ALNSZE;
+		size_t fnlSize = (Output.size() - OutOffset) % ALNSZE;
 		Generate(Output, ALNSZE, fnlSize, m_ctrVector);
 
 		for (size_t i = ALNSZE; i < OUTSZE; i++)
@@ -358,7 +339,7 @@ void ICM::TransformSequential(const std::vector<byte> &Input, const size_t InOff
 	size_t ALNSZE = Length - (Length % m_blockCipher->BlockSize());
 
 	if (ALNSZE != 0)
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, HasSSE());
+		Utility::IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, HasSSE());
 
 	// get the remaining bytes
 	if (ALNSZE != Length)

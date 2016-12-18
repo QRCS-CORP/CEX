@@ -33,7 +33,7 @@ namespace Test
 		/// <summary>
 		/// NIST AESAVS known answer vector tests
 		/// </summary>
-		AesAvsTest(bool TestNI = false)
+		explicit AesAvsTest(bool TestNI = false)
 			:
 			m_testNI(TestNI)
 		{

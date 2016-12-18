@@ -1,14 +1,18 @@
-#ifndef _CEXENGINE_STREAMCIPHERFROMNAME_H
-#define _CEXENGINE_STREAMCIPHERFROMNAME_H
+#ifndef _CEX_STREAMCIPHERFROMNAME_H
+#define _CEX_STREAMCIPHERFROMNAME_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "CryptoException.h"
 #include "IStreamCipher.h"
 
 NAMESPACE_HELPER
 
+using Cipher::Symmetric::Stream::IStreamCipher;
+using Enumeration::StreamCiphers;
+
 /// <summary>
-/// StreamCipherFromName: Get a Stream Cipher instance from it's enumeration name.
+/// Get a Stream Cipher instance from it's enumeration name.
+/// <para>The stream ciphers Initialize function must be called before it can be used.<para>
 /// </summary>
 class StreamCipherFromName
 {
@@ -20,10 +24,10 @@ public:
 	/// <param name="StreamCipherType">The stream cipher enumeration name</param>
 	/// <param name="RoundCount">The number of cipher rounds</param>
 	/// 
-	/// <returns>An initialized stream cipher</returns>
+	/// <returns>An uninitialized stream cipher</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static CEX::Cipher::Symmetric::Stream::IStreamCipher* GetInstance(CEX::Enumeration::StreamCiphers StreamCipherType, uint RoundCount);
+	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static IStreamCipher* GetInstance(StreamCiphers StreamCipherType, uint RoundCount);
 };
 
 NAMESPACE_HELPEREND

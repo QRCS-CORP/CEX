@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_UBITYPE_H
-#define _CEXENGINE_UBITYPE_H
+#ifndef _CEX_UBITYPE_H
+#define _CEX_UBITYPE_H
 
 /// <summary>
 /// Specifies the Skein Ubi type

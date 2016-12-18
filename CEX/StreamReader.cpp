@@ -3,7 +3,7 @@
 
 NAMESPACE_IO
 
-using CEX::Exception::CryptoProcessingException;
+using Exception::CryptoProcessingException;
 
 byte StreamReader::ReadByte()
 {
@@ -13,11 +13,8 @@ byte StreamReader::ReadByte()
 		m_streamData.Read(data, 0, 1);
 		return data[0];
 	}
-#if defined(CPPEXCEPTIONS_ENABLED)
+
 	throw CryptoProcessingException("StreamReader:ReadByte", "The array does not contain enough data!");
-#else
-	return 0;
-#endif
 }
 
 std::vector<byte> StreamReader::ReadBytes(size_t Length)
@@ -28,14 +25,8 @@ std::vector<byte> StreamReader::ReadBytes(size_t Length)
 		m_streamData.Read(data, 0, Length);
 		return data;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadBytes", "The array does not contain enough data!");
-#else
-		return std::vector<byte>(0);
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadBytes", "The array does not contain enough data!");
 }
 
 short StreamReader::ReadInt16()
@@ -50,14 +41,8 @@ short StreamReader::ReadInt16()
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadInt16", "The array does not contain enough data!");
-#else
-		return 0;
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadInt16", "The array does not contain enough data!");
 }
 
 ushort StreamReader::ReadUInt16()
@@ -72,14 +57,8 @@ ushort StreamReader::ReadUInt16()
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadUInt16", "The array does not contain enough data!");
-#else
-		return 0;
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadUInt16", "The array does not contain enough data!");
 }
 
 int StreamReader::ReadInt32()
@@ -94,14 +73,8 @@ int StreamReader::ReadInt32()
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadInt32", "The array does not contain enough data!");
-#else
-		return 0;
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadInt32", "The array does not contain enough data!");
 }
 
 uint StreamReader::ReadUInt32()
@@ -116,14 +89,8 @@ uint StreamReader::ReadUInt32()
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadUInt32", "The array does not contain enough data!");
-#else
-		return 0;
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadUInt32", "The array does not contain enough data!");
 }
 
 long StreamReader::ReadInt64()
@@ -138,14 +105,8 @@ long StreamReader::ReadInt64()
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadInt64", "The array does not contain enough data!");
-#else
-		return 0;
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadInt64", "The array does not contain enough data!");
 }
 
 ulong StreamReader::ReadUInt64()
@@ -160,14 +121,8 @@ ulong StreamReader::ReadUInt64()
 		memcpy(&num, &data[0], sze);
 		return num;
 	}
-	else
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
-#else
-		return 0;
-#endif
-	}
+
+	throw CryptoProcessingException("StreamReader:ReadUInt64", "The array does not contain enough data!");
 }
 
 NAMESPACE_IOEND

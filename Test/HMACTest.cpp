@@ -34,9 +34,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -47,8 +47,8 @@ namespace Test
 	void HMACTest::CompareAccess(std::vector<byte> &Key)
 	{
 		std::vector<byte> hash1(32);
-		CEX::Digest::SHA256* eng = new CEX::Digest::SHA256();
-		CEX::Mac::HMAC mac(eng);
+		Digest::SHA256* eng = new Digest::SHA256();
+		Mac::HMAC mac(eng);
 		mac.Initialize(Key);
 
 		std::vector<byte> input(256);
@@ -64,14 +64,14 @@ namespace Test
 		delete eng;
 
 		if (hash1 != hash2)
-			throw std::string("CMAC is not equal!");
+			throw std::exception("CMAC is not equal!");
 	}
 
 	void HMACTest::CompareVector256(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(32, 0);
-		CEX::Digest::SHA256* eng = new CEX::Digest::SHA256();
-		CEX::Mac::HMAC mac(eng);
+		Digest::SHA256* eng = new Digest::SHA256();
+		Mac::HMAC mac(eng);
 
 		mac.Initialize(Key);
 		mac.ComputeMac(Input, hash);
@@ -86,20 +86,20 @@ namespace Test
 			memcpy(&tmph[0], &hash[0], Expected.size());
 
 			if (Expected != tmph)
-				throw std::string("HMACTest: return code is not equal!");
+				throw std::exception("HMACTest: return code is not equal!");
 		}
 		else
 		{
 			if (Expected != hash)
-				throw std::string("HMACTest: return code is not equal!");
+				throw std::exception("HMACTest: return code is not equal!");
 		}
 	}
 
 	void HMACTest::CompareVector512(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(32, 0);
-		CEX::Digest::SHA512* eng = new CEX::Digest::SHA512();
-		CEX::Mac::HMAC mac(eng);
+		Digest::SHA512* eng = new Digest::SHA512();
+		Mac::HMAC mac(eng);
 
 		mac.Initialize(Key);
 		mac.ComputeMac(Input, hash);
@@ -113,12 +113,12 @@ namespace Test
 			memcpy(&tmph[0], &hash[0], Expected.size());
 
 			if (Expected != tmph)
-				throw std::string("HMACTest: return code is not equal!");
+				throw std::exception("HMACTest: return code is not equal!");
 		}
 		else
 		{
 			if (Expected != hash)
-				throw std::string("HMACTest: return code is not equal!");
+				throw std::exception("HMACTest: return code is not equal!");
 		}
 	}
 

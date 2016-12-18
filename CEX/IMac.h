@@ -1,18 +1,18 @@
-#ifndef _CEXENGINE_IMAC_H
-#define _CEXENGINE_IMAC_H
+#ifndef _CEX_IMAC_H
+#define _CEX_IMAC_H
 
-#include "Common.h"
+#include "CexDomain.h"
+#include "CryptoMacException.h"
+#include "ISymmetricKey.h"
 #include "Macs.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoMacException.h"
-#endif
+#include "SymmetricKeySize.h"
 
 NAMESPACE_MAC
 
-using CEX::Enumeration::Macs;
-#if defined(CPPEXCEPTIONS_ENABLED)
-	using CEX::Exception::CryptoMacException;
-#endif
+using Exception::CryptoMacException;
+using Key::Symmetric::ISymmetricKey;
+using Enumeration::Macs;
+using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
 /// Message Authentication Code (MAC) Interface
@@ -23,7 +23,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	IMac() {}
 
@@ -35,7 +35,7 @@ public:
 	//~~~Properties~~~//
 
 	/// <summary>
-	/// Get: The macs type name
+	/// Get: The Mac generators type name
 	/// </summary>
 	virtual const Macs Enumeral() = 0;
 
@@ -55,9 +55,14 @@ public:
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: Algorithm name
+	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
-	virtual const char *Name() = 0;
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+
+	/// <summary>
+	/// Get: Mac generators class name
+	/// </summary>
+	virtual const std::string Name() = 0;
 
 	//~~~Public Methods~~~//
 
@@ -94,12 +99,36 @@ public:
 	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
+	/// Initialize the MAC generator with a SymmetricKey key container.
+	/// <para>Uses a key and optional salt and info arrays to initialize the MAC.</para>
+	/// </summary>
+	/// 
+	/// <param name="MacParam">A SymmetricKey key container class</param>
+	virtual void Initialize(ISymmetricKey &MacParam) = 0;
+
+	/// <summary>
+	/// Initialize the MAC with a key
+	/// </summary>
+	///
+	/// <param name="Key">The MAC generators primary key</param>
+	virtual void Initialize(const std::vector<byte> &Key) = 0;
+
+	/// <summary>
+	/// Initialize the MAC with a key and salt arrays
+	/// </summary>
+	///
+	/// <param name="Key">The MAC generators primary key</param>
+	/// <param name="Salt">The salt or initialization vector</param>
+	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) = 0;
+
+	/// <summary>
 	/// Initialize the MAC generator.
 	/// </summary>
 	///
-	/// <param name="MacKey">The HMAC Key</param>
-	/// <param name="IV">The optional IV</param>
-	virtual void Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV) = 0;
+	/// <param name="Key">The MAC generators primary key</param>
+	/// <param name="Salt">The salt or initialization vector</param>
+	/// <param name="Info">The info parameter used as an addional source of entropy</param>
+	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) = 0;
 
 	/// <summary>
 	/// Reset and initialize the underlying digest

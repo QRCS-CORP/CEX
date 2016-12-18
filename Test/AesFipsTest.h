@@ -39,7 +39,7 @@ namespace Test
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality (FIPS 197)
 		/// </summary>
-		AesFipsTest(bool TestNI = false)
+		explicit AesFipsTest(bool TestNI = false)
 			:
 			m_testNI(TestNI)
         {

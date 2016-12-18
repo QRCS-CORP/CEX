@@ -2,10 +2,10 @@
 #include <fstream>
 #include <string.h>
 #include "HexConverter.h"
-#include "../CEX/CSPRsg.h"
-#include "../CEX/Blake2Sp256.h"
-#include "../CEX/Blake2Bp512.h"
-#include "../CEX/MacParams.h"
+#include "../CEX/CSP.h"
+#include "../CEX/BlakeS256.h"
+#include "../CEX/BlakeB512.h"
+#include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
@@ -16,7 +16,7 @@ namespace Test
 			TreeParamsTest();
 			OnProgress("Passed Blake2Params parameter serialization test..");
 			MacParamsTest();
-			OnProgress("Passed MacParams cloning test..");
+			OnProgress("Passed SymmetricKey cloning test..");
 			Blake2STest();
 			OnProgress("Passed Blake2-S 256 vector tests..");
 			Blake2SPTest();
@@ -28,9 +28,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -71,13 +71,13 @@ namespace Test
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					CEX::Common::MacParams mkey(key);
-					CEX::Digest::Blake2Bp512 blake2b(false);
+					Key::Symmetric::SymmetricKey mkey(key);
+					Digest::BlakeB512 blake2b(false);
 					blake2b.LoadMacKey(mkey);
 					blake2b.ComputeHash(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2BTest: KAT test has failed!");
+						throw std::exception("Blake2BTest: KAT test has failed!");
 				}
 			}
 		}
@@ -118,13 +118,13 @@ namespace Test
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					CEX::Digest::Blake2Bp512 blake2(true);
-					CEX::Common::MacParams mkey(key);
+					Digest::BlakeB512 blake2(true);
+					Key::Symmetric::SymmetricKey mkey(key);
 					blake2.LoadMacKey(mkey);
 					blake2.ComputeHash(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2BPTest: KAT test has failed!");
+						throw std::exception("Blake2BPTest: KAT test has failed!");
 				}
 			}
 		}
@@ -164,13 +164,13 @@ namespace Test
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					CEX::Common::MacParams mkey(key);
-					CEX::Digest::Blake2Sp256 blake2s(false);
+					Key::Symmetric::SymmetricKey mkey(key);
+					Digest::BlakeS256 blake2s(false);
 					blake2s.LoadMacKey(mkey);
 					blake2s.ComputeHash(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2STest: KAT test has failed!");
+						throw std::exception("Blake2STest: KAT test has failed!");
 				}
 			}
 		}
@@ -210,13 +210,13 @@ namespace Test
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					CEX::Common::MacParams mkey(key);
-					CEX::Digest::Blake2Sp256 blake2sp(true);
+					Key::Symmetric::SymmetricKey mkey(key);
+					Digest::BlakeS256 blake2sp(true);
 					blake2sp.LoadMacKey(mkey);
 					blake2sp.ComputeHash(input, hash);
 
 					if (hash != expect)
-						throw std::string("Blake2SPTest: KAT test has failed!");
+						throw std::exception("Blake2SPTest: KAT test has failed!");
 				}
 			}
 		}
@@ -229,22 +229,21 @@ namespace Test
 		for (uint8_t i = 0; i < key.size(); ++i)
 			key[i] = i;
 
-		CEX::Common::MacParams mkey(key, key, key);
-		CEX::Common::MacParams* mkey2 = mkey.DeepCopy();
-		CEX::Common::MacParams mkey3 = mkey.Clone();
+		Key::Symmetric::SymmetricKey mkey(key, key, key);
+		Key::Symmetric::ISymmetricKey* mkey2 = mkey.Clone();
 
-		if (!mkey.Equals(*mkey2) || !mkey.Equals(mkey3))
-			throw std::string("Blake2STest: Mac parameters test failed!");
+		if (!mkey.Equals(*mkey2))
+			throw std::exception("Blake2STest: Mac parameters test failed!");
 	}
 
 	void Blake2Test::TreeParamsTest()
 	{
-		CEX::Digest::Blake2Params tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
+		Digest::Blake2Params tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
 		std::vector<uint8_t> tres = tree1.ToBytes();
-		CEX::Digest::Blake2Params tree2(tres);
+		Digest::Blake2Params tree2(tres);
 
 		if (!tree1.Equals(tree2))
-			throw std::string("Blake2STest: Tree parameters test failed!");
+			throw std::exception("Blake2STest: Tree parameters test failed!");
 	}
 
 	void Blake2Test::OnProgress(char* Data)

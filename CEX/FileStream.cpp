@@ -1,49 +1,60 @@
 #include "FileStream.h"
-#include "IntUtils.h"
+
+#if defined(CEX_OS_WINDOWS)
+#	include <io.h>  
+#	include <fcntl.h>  
+#elif defined(CEX_OS_POSIX)
+#	include <unistd.h>
+#	include <sys/types.h>
+#endif
 
 NAMESPACE_IO
 
 void FileStream::Close()
 {
-	if (_fileStream)
-		_fileStream.close();
+	if (m_fileStream && m_fileStream.is_open())
+	{
+		if (m_fileWritten != 0)
+			m_fileStream.flush();
+		m_fileStream.close();
+		m_fileSize = 0;
+		m_filePosition = 0;
+	}
 }
 
 void FileStream::CopyTo(IByteStream* Destination)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (_fileSize == 0)
+	if (m_fileSize == 0)
 		throw CryptoProcessingException("FileStream:CopyTo", "The output array is too short!");
-#endif
 
-	Destination->Seek(0, CEX::IO::SeekOrigin::Begin);
+	Destination->Seek(0, IO::SeekOrigin::Begin);
 
-	if (_fileSize > BLOCK_SIZE)
+	if (m_fileSize > CHUNK_SIZE)
 	{
-		size_t aln = _fileSize - (_fileSize % BLOCK_SIZE);
-		std::vector<byte> buffer(BLOCK_SIZE);
-		_fileStream.seekg(0, std::ios::beg);
+		size_t aln = m_fileSize - (m_fileSize % CHUNK_SIZE);
+		std::vector<byte> buffer(CHUNK_SIZE);
+		m_fileStream.seekg(0, std::ios::beg);
 
 		uint ctr = 0;
 		do
 		{
-			_fileStream.read((char*)&buffer, BLOCK_SIZE);
-			Destination->Write(buffer, ctr, BLOCK_SIZE);
-			ctr += BLOCK_SIZE;
+			m_fileStream.read((char*)&buffer, CHUNK_SIZE);
+			Destination->Write(buffer, ctr, CHUNK_SIZE);
+			ctr += CHUNK_SIZE;
 
 		} while (ctr != aln);
 
-		if (aln != _fileSize)
+		if (aln != m_fileSize)
 		{
-			_fileStream.read((char*)&buffer, _fileSize - aln);
-			Destination->Write(buffer, aln, _fileSize - aln);
+			m_fileStream.read((char*)&buffer, m_fileSize - aln);
+			Destination->Write(buffer, aln, m_fileSize - aln);
 		}
 	}
 	else
 	{
-		std::vector<byte> buffer(_fileSize);
-		_fileStream.seekg(0, std::ios::beg);
-		Destination->Write(buffer, 0, _fileSize);
+		std::vector<byte> buffer(m_fileSize);
+		m_fileStream.seekg(0, std::ios::beg);
+		Destination->Write(buffer, 0, m_fileSize);
 	}
 }
 
@@ -51,129 +62,142 @@ void FileStream::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		_filePosition = 0;
-		_fileStream.close();
+		m_filePosition = 0;
+		Close();
 		m_isDestroyed = true;
 	}
 }
 
-void FileStream::Flush()
+bool FileStream::FileExists(const std::string &FileName)
 {
-	if (_fileStream)
-		_fileStream.flush();
+	std::ifstream infile(FileName.c_str());
+	return infile.good();
 }
 
-size_t FileStream::Read(std::vector<byte> &Buffer, size_t Offset, size_t Count)
+uint64_t FileStream::FileSize(const std::string &FileName)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (_fileAccess == FileAccess::Write)
+	if (!FileExists(FileName))
+		return 0;
+
+	std::ifstream in(FileName.c_str(), std::ifstream::ate | std::ifstream::binary);
+	return static_cast<uint64_t>(in.tellg());
+}
+
+void FileStream::Flush()
+{
+	if (m_fileStream && m_fileWritten != 0)
+		m_fileStream.flush();
+}
+
+size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
+{
+	if (m_fileAccess == FileAccess::Write)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
-#endif
 
-	if (Offset + Count > _fileSize - _filePosition)
-		Count = _fileSize - _filePosition;
+	if (Offset + Length > m_fileSize - m_filePosition)
+		Length = m_fileSize - m_filePosition;
 
-	if (Count > 0)
+	if (Length > 0)
 	{
 		// read the data:
-		_fileStream.read((char*)&Buffer[Offset], Count);
-		_filePosition += Count;
+		m_fileStream.read((char*)&Output[Offset], Length);
+		m_filePosition += Length;
 	}
 
-	return Count;
+	return Length;
 }
 
 byte FileStream::ReadByte()
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (_fileSize - _filePosition < 1)
+	if (m_fileSize - m_filePosition < 1)
 		throw CryptoProcessingException("FileStream:ReadByte", "The output array is too short!");
-	if (_fileAccess == FileAccess::Write)
+	if (m_fileAccess == FileAccess::Write)
 		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
-#endif
 
 	byte data(1);
 
-	_fileStream.read((char*)&data, 1);
-	_filePosition += 1;
+	m_fileStream.read((char*)&data, 1);
+	m_filePosition += 1;
 	return data;
 }
 
 void FileStream::Reset()
 {
-	_fileStream.seekg(0, std::ios::beg);
-	_filePosition = 0;
+	m_fileStream.seekg(0, std::ios::beg);
+	m_filePosition = 0;
 }
 
-void FileStream::Seek(size_t Offset, SeekOrigin Origin)
+void FileStream::Seek(uint64_t Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
-		_fileStream.seekg(Offset, std::ios::beg);
+		m_fileStream.seekg(Offset, std::ios::beg);
 	else if (Origin == SeekOrigin::End)
-		_fileStream.seekg(Offset, std::ios::end);
+		m_fileStream.seekg(Offset, std::ios::end);
 	else
-		_fileStream.seekg(Offset, std::ios::cur);
+		m_fileStream.seekg(Offset, std::ios::cur);
 
-	_filePosition = (uint)_fileStream.tellg();
+	m_filePosition = static_cast<uint64_t>(m_fileStream.tellg());
 }
 
-void FileStream::SetLength(size_t Length)
+void FileStream::SetLength(uint64_t Length)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (_fileAccess == FileAccess::Read)
+	if (m_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:SetLength", "The file was opened as read only!");
-#endif
 
-	_fileStream.seekg(Length - 1, std::ios::beg);
-	WriteByte(0);
-	_fileStream.seekg(0, std::ios::beg);
-}
-
-void FileStream::Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count)
-{
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (_fileAccess == FileAccess::Read)
-		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
-#endif
-
-	_fileStream.write((char*)&Buffer[Offset], Count);
-	_filePosition += Count;
-	_fileSize += Count;
-}
-
-void FileStream::WriteByte(byte Data)
-{
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (_fileAccess == FileAccess::Read)
-		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
-#endif
-
-	_fileStream.write((char*)&Data, 1);
-	_filePosition += 1;
-	_fileSize += 1;
-}
-
-bool FileStream::FileExists(const char* FileName)
-{
-	try
+	if (Length < m_fileSize)
 	{
-		std::ifstream infile(FileName);
-		bool valid = infile.good();
-		infile.close();
-		return valid;
+#if defined(CEX_OS_WINDOWS)
+
+		int handle;
+		if (_sopen_s(&handle, m_fileName.c_str(), _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE) == 0)
+			_chsize(handle, Length);
+
+#elif defined(CEX_OS_POSIX)
+
+		truncate(m_fileName.c_str(), Length);
+
+#endif
 	}
-	catch (...)
+	else if (Length > m_fileSize)
 	{
-		return false;
+		m_fileStream.seekg(Length - 1, std::ios::beg);
+		m_fileStream.write("", 1);
+		m_fileStream.seekg(0, std::ios::beg);
 	}
 }
 
-std::ifstream::pos_type FileStream::FileSize(const char* FileName)
+void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	std::ifstream in(FileName, std::ifstream::ate | std::ifstream::binary);
-	size_t size = (size_t)in.tellg();
-	in.close();
-	return size;
+	if (m_fileAccess == FileAccess::Read)
+		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
+
+	m_fileStream.write((char*)&Input[Offset], Length);
+	m_filePosition += Length;
+	m_fileSize += Length;
+	m_fileWritten += Length;
+
+	if (m_fileWritten >= CHUNK_SIZE)
+	{
+		m_fileStream.flush();
+		m_fileWritten = 0;
+	}
+}
+
+void FileStream::WriteByte(byte Value)
+{
+	if (m_fileAccess == FileAccess::Read)
+		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
+
+	m_fileStream.write((char*)&Value, 1);
+	m_filePosition++;
+	m_fileSize++;
+	m_fileWritten++;
+
+	if (m_fileWritten >= CHUNK_SIZE)
+	{
+		m_fileStream.flush();
+		m_fileWritten = 0;
+	}
 }
 
 NAMESPACE_IOEND

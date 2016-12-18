@@ -11,12 +11,14 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include "../CEX/Common.h"
-#include "../CEX/CSPRsg.h"
-#include "../CEX/KeyParams.h"
+#include "../CEX/CexDomain.h"
+#include "../CEX/CSP.h"
+#include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	using namespace CEX;
+
 	class TestUtils
 	{
 	public:
@@ -102,17 +104,17 @@ namespace Test
 		}
 
 		/// <summary>
-		/// Initializes a KeyParams structure with pseudo random data
+		/// Initializes a SymmetricKey structure with pseudo random data
 		/// </summary>
-		static void GetRandomKey(CEX::Common::KeyParams &keyParams, size_t KeySize, size_t IvSize)
+		static Key::Symmetric::SymmetricKey GetRandomKey(size_t KeySize, size_t IvSize)
 		{
-			CEX::Seed::CSPRsg rng;
+			Provider::CSP rng;
 			std::vector<byte> key(KeySize, 0);
 			std::vector<byte> iv(IvSize, 0);
 			rng.GetBytes(key);
 			rng.GetBytes(iv);
-			keyParams.Key() = key;
-			keyParams.IV() = iv;
+
+			return Key::Symmetric::SymmetricKey(key, iv);
 		}
 
 		/// <summary>
@@ -120,7 +122,7 @@ namespace Test
 		/// </summary>
 		static void GetRandom(std::vector<byte> &Data)
 		{
-			CEX::Seed::CSPRsg rng;
+			Provider::CSP rng;
 			rng.GetBytes(Data);
 		}
 
@@ -136,7 +138,7 @@ namespace Test
 
 			if (!ifs || !ifs.is_open())
 			{
-				throw std::string("Could not open the KAT file!");
+				throw std::exception("Could not open the KAT file!");
 			}
 			else
 			{
@@ -154,7 +156,7 @@ namespace Test
 				}
 				else
 				{
-					throw std::string("The KAT file is empty!");
+					throw std::exception("The KAT file is empty!");
 				}
 			}
 

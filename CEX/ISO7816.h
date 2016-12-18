@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_ISO7816_H
-#define _CEXENGINE_ISO7816_H
+#ifndef _CEX_ISO7816_H
+#define _CEX_ISO7816_H
 
 #include "IPadding.h"
 
@@ -18,6 +18,11 @@ NAMESPACE_PADDING
 class ISO7816 : public IPadding
 {
 private:
+
+	ISO7816(const ISO7816&) = delete;
+	ISO7816& operator=(const ISO7816&) = delete;
+	ISO7816& operator=(ISO7816&&) = delete;
+
 	const byte ZBCODE = (byte)0x00;
 	const byte MKCODE = (byte)0x80;
 
@@ -25,7 +30,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	ISO7816() {}
 
@@ -42,9 +47,9 @@ public:
 	virtual const PaddingModes Enumeral() { return PaddingModes::ISO7816; }
 
 	/// <summary>
-	/// Get: Padding name
+	/// Get: The padding modes class name
 	/// </summary>
-	virtual const char *Name() { return "ISO7816"; }
+	virtual const std::string Name() { return "ISO7816"; }
 
 	//~~~Public Methods~~~//
 
@@ -57,7 +62,7 @@ public:
 	///
 	/// <returns>Length of padding</returns>
 	///
-	/// <exception cref="CEX::Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
+	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
 	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
 
 	/// <summary>

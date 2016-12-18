@@ -1,14 +1,18 @@
-#ifndef _CEXENGINE_MACS_H
-#define _CEXENGINE_MACS_H
+#ifndef _CEX_MACS_H
+#define _CEX_MACS_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// Message Authentication Code Generators
+/// Message Authentication Code generator enmumeration names
 /// </summary>
-enum class Macs : uint
+enum class Macs : uint8_t
 {
+	/// <summary>
+	/// No kdf is specified
+	/// </summary>
+	None = 0,
 	/// <summary>
 	/// A Cipher based Message Authentication Code wrapper (CMAC)
 	/// </summary>
@@ -16,11 +20,7 @@ enum class Macs : uint
 	/// <summary>
 	/// A Hash based Message Authentication Code wrapper (HMAC)
 	/// </summary>
-	HMAC = 2,
-	/// <summary>
-	/// A Variably Modified Permutation Composition based Message Authentication Code (VMPC-MAC)
-	/// </summary>
-	VMAC = 4
+	HMAC = 2
 };
 
 NAMESPACE_ENUMERATIONEND

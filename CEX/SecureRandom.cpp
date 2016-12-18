@@ -1,44 +1,37 @@
 #include "SecureRandom.h"
-#include "CSPPrng.h"
+#include "ArrayUtils.h"
 #include "BitConverter.h"
-#include "IntUtils.h"
+#include "ProviderFromName.h"
 
 NAMESPACE_PRNG
 
-using CEX::IO::BitConverter;
+using IO::BitConverter;
 
 //~~~Public Methods~~~//
 
-/// <summary>
-/// Release all resources associated with the object
-/// </summary>
 void SecureRandom::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
+		m_seedType = Providers::None;
 
-		CEX::Utility::IntUtils::ClearVector(m_byteBuffer);
-
-		if (m_rngGenerator != 0)
+		try
 		{
-			m_rngGenerator->Destroy();
-			delete m_rngGenerator;
+			Utility::ArrayUtils::ClearVector(m_byteBuffer);
+
+			if (m_rngGenerator != 0)
+				delete m_rngGenerator;
 		}
-		m_isDestroyed = true;
+		catch(std::exception& ex)
+		{
+			throw CryptoRandomException("SecureRandom:Destroy", "Not all objects were destroyed!", std::string(ex.what()));
+		}
 	}
 }
 
-//~~~Byte~~~//
-
-/// <summary>
-/// Return an array filled with pseudo random bytes
-/// </summary>
-/// 
-/// <param name="Size">Size of requested byte array</param>
-/// 
-/// <returns>Random byte array</returns>
 std::vector<byte> SecureRandom::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
@@ -46,17 +39,10 @@ std::vector<byte> SecureRandom::GetBytes(size_t Size)
 	return data;
 }
 
-/// <summary>
-/// Fill an array with pseudo random bytes
-/// </summary>
-///
-/// <param name="Output">Output array</param>
 void SecureRandom::GetBytes(std::vector<byte> &Output)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() == 0)
-		throw CryptoRandomException("CTRPrng:GetBytes", "Buffer size must be at least 1 byte!");
-#endif
+		throw CryptoRandomException("SecureRandom:GetBytes", "Buffer size must be at least 1 byte!");
 
 	if (m_byteBuffer.size() - m_bufferIndex < Output.size())
 	{
@@ -93,61 +79,29 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-//~~~Char~~~//
-
-/// <summary>
-/// Get a random char
-/// </summary>
-/// 
-/// <returns>Random char</returns>
 char SecureRandom::NextChar()
 {
 	int sze = sizeof(char);
 	return BitConverter::ToChar(GetBytes(sze), 0);
 }
 
-/// <summary>
-/// Get a random unsigned char
-/// </summary>
-/// 
-/// <returns>Random unsigned char</returns>
 unsigned char SecureRandom::NextUChar()
 {
 	int sze = sizeof(unsigned char);
 	return BitConverter::ToUChar(GetBytes(sze), 0);
 }
 
-//~~~Double~~~//
-
-/// <summary>
-/// Get a random double
-/// </summary>
-/// 
-/// <returns>Random double</returns>
 double SecureRandom::NextDouble()
 {
 	int sze = sizeof(double);
 	return BitConverter::ToDouble(GetBytes(sze), 0);
 }
 
-//~~~Int16~~~//
-
-/// <summary>
-/// Get a random non-negative short integer
-/// </summary>
-/// 
-/// <returns>Random Int16</returns>
 short SecureRandom::NextInt16()
 {
 	return BitConverter::ToInt16(GetBytes(2), 0);
 }
 
-/// <summary>
-/// Get a random non-negative short integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// <returns>Random Int16</returns>
 short SecureRandom::NextInt16(short Maximum)
 {
 	std::vector<byte> rand;
@@ -163,14 +117,6 @@ short SecureRandom::NextInt16(short Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a random non-negative short integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random Int16</returns>
 short SecureRandom::NextInt16(short Minimum, short Maximum)
 {
 	short num = 0;
@@ -178,30 +124,15 @@ short SecureRandom::NextInt16(short Minimum, short Maximum)
 	return num;
 }
 
-
-//~~~UInt16~~~//
-
-/// <summary>
-/// Get a random unsigned short integer
-/// </summary>
-/// 
-/// <returns>Random UInt16</returns>
-unsigned short SecureRandom::NextUInt16()
+ushort SecureRandom::NextUInt16()
 {
 	return BitConverter::ToUInt16(GetBytes(2), 0);
 }
 
-/// <summary>
-/// Get a random unsigned short integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt16</returns>
-unsigned short SecureRandom::NextUInt16(unsigned short Maximum)
+ushort SecureRandom::NextUInt16(ushort Maximum)
 {
 	std::vector<byte> rand;
-	unsigned short num(0);
+	ushort num(0);
 
 	do
 	{
@@ -213,50 +144,23 @@ unsigned short SecureRandom::NextUInt16(unsigned short Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a random unsigned short integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt16</returns>
-unsigned short SecureRandom::NextUInt16(unsigned short Minimum, unsigned short Maximum)
+ushort SecureRandom::NextUInt16(ushort Minimum, ushort Maximum)
 {
-	unsigned short num = 0;
+	ushort num = 0;
 	while ((num = NextUInt16(Maximum)) < Minimum) {}
 	return num;
 }
 
-//~~~Int32~~~//
-
-/// <summary>
-/// Get a random non-negative 32bit integer
-/// </summary>
-/// 
-/// <returns>Random Int32</returns>
 int SecureRandom::Next()
 {
 	return BitConverter::ToInt32(GetBytes(4), 0);
 }
 
-/// <summary>
-/// Get a random non-negative 32bit integer
-/// </summary>
-/// 
-/// <returns>Random Int32</returns>
 int SecureRandom::NextInt32()
 {
 	return BitConverter::ToInt32(GetBytes(4), 0);
 }
 
-/// <summary>
-/// Get a random non-negative 32bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random Int32</returns>
 int SecureRandom::NextInt32(int Maximum)
 {
 	std::vector<byte> rand;
@@ -272,14 +176,6 @@ int SecureRandom::NextInt32(int Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a random non-negative 32bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random Int32</returns>
 int SecureRandom::NextInt32(int Minimum, int Maximum)
 {
 	int num = 0;
@@ -287,25 +183,11 @@ int SecureRandom::NextInt32(int Minimum, int Maximum)
 	return num;
 }
 
-//~~~UInt32~~~//
-
-/// <summary>
-/// Get a random unsigned 32bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt32</returns>
 uint SecureRandom::NextUInt32()
 {
 	return BitConverter::ToUInt32(GetBytes(4), 0);
 }
 
-/// <summary>
-/// Get a random unsigned integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint SecureRandom::NextUInt32(uint Maximum)
 {
 	std::vector<byte> rand;
@@ -321,14 +203,6 @@ uint SecureRandom::NextUInt32(uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a random unsigned integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
 {
 	uint num = 0;
@@ -336,35 +210,16 @@ uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
 	return num;
 }
 
-//~~~Int64~~~//
-
-/// <summary>
-/// Get a random long integer
-/// </summary>
-/// 
-/// <returns>Random Int64</returns>
 long SecureRandom::NextLong()
 {
 	return BitConverter::ToInt64(GetBytes(8), 0);
 }
 
-/// <summary>
-/// Get a random long integer
-/// </summary>
-/// 
-/// <returns>Random Int64</returns>
 long SecureRandom::NextInt64()
 {
 	return BitConverter::ToInt64(GetBytes(8), 0);
 }
 
-/// <summary>
-/// Get a random long integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random Int64</returns>
 long SecureRandom::NextInt64(long Maximum)
 {
 	std::vector<byte> rand;
@@ -380,14 +235,6 @@ long SecureRandom::NextInt64(long Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a random long integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random Int64</returns>
 long SecureRandom::NextInt64(long Minimum, long Maximum)
 {
 	long num = 0;
@@ -395,25 +242,11 @@ long SecureRandom::NextInt64(long Minimum, long Maximum)
 	return num;
 }
 
-//~~~UInt64~~~//
-
-/// <summary>
-/// Get a random ulong integer
-/// </summary>
-/// 
-/// <returns>Random UInt64</returns>
 ulong SecureRandom::NextUInt64()
 {
 	return BitConverter::ToUInt64(GetBytes(8), 0);
 }
 
-/// <summary>
-/// Get a random ulong integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong SecureRandom::NextUInt64(ulong Maximum)
 {
 	std::vector<byte> rand;
@@ -429,14 +262,6 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a random ulong integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong SecureRandom::NextUInt64(ulong Minimum, ulong Maximum)
 {
 	ulong num = 0;
@@ -444,22 +269,25 @@ ulong SecureRandom::NextUInt64(ulong Minimum, ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Reset the generator instance
-/// </summary>
 void SecureRandom::Reset()
 {
 	if (m_rngGenerator != 0)
-	{
-		m_rngGenerator->Destroy();
 		delete m_rngGenerator;
+
+	try
+	{
+		m_rngGenerator = Helper::ProviderFromName::GetInstance(m_seedType);
 	}
-	m_rngGenerator = new CEX::Seed::CSPRsg;
+	catch(std::exception& ex)
+	{
+		throw CryptoRandomException("SecureRandom:Reset", "Random seed generator could not be acquired!", std::string(ex.what()));
+	}
+
 	m_rngGenerator->GetBytes(m_byteBuffer);
 	m_bufferIndex = 0;
 }
 
-//~~~Protected Methods~~~//
+//~~~Private Methods~~~//
 
 std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
 {
@@ -485,7 +313,7 @@ std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
 	return GetBits(data, Maximum);
 }
 
-std::vector<byte> SecureRandom::GetBits(std::vector<byte> Data, ulong Maximum)
+std::vector<byte> SecureRandom::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
 	ulong val = 0;
 	memcpy(&val, &Data[0], Data.size());

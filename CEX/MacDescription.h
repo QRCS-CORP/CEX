@@ -1,7 +1,7 @@
-#ifndef _CEXENGINE_MACDESCRIPTION_H
-#define _CEXENGINE_MACDESCRIPTION_H
+#ifndef _CEX_MACDESCRIPTION_H
+#define _CEX_MACDESCRIPTION_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "BlockCiphers.h"
 #include "BlockSizes.h"
 #include "CipherModes.h"
@@ -13,119 +13,110 @@
 #include "PaddingModes.h"
 #include "RoundCounts.h"
 #include "StreamReader.h"
-#include "StreamWriter.h"
 
-NAMESPACE_COMMON
+NAMESPACE_PROCESSING
 
-using CEX::Enumeration::BlockCiphers; // ToDo: need this?
-using CEX::Enumeration::BlockSizes;
-using CEX::Enumeration::CipherModes;
-using CEX::Enumeration::Digests;
-using CEX::Enumeration::IVSizes;
-using CEX::Enumeration::KeySizes;
-using CEX::Enumeration::Macs;
-using CEX::Enumeration::PaddingModes;
-using CEX::Enumeration::RoundCounts;
+using Enumeration::BlockCiphers;
+using Enumeration::BlockSizes;
+using Enumeration::CipherModes;
+using Enumeration::Digests;
+using Enumeration::IVSizes;
+using Enumeration::KeySizes;
+using Enumeration::Macs;
+using Enumeration::PaddingModes;
+using Enumeration::RoundCounts;
+using IO::MemoryStream;
 
 /// <summary>
 /// The MacDescription structure.
-/// <para>Used in conjunction with the <see cref="VTDev.Libraries.CEXEngine.Crypto.Processing.MacStream"/> class.
+/// <para>Used in conjunction with the MacStream class.
 /// Contains all the necessary settings required to recreate a Mac instance.</para>
 /// </summary>
 /// 
 /// <example>
-/// <description>Example of populating a <c>MacDescription</c> for an Hmac:</description>
+/// <description>Populating a MacDescription for an Hmac:</description>
 /// <code>
-///    MacDescription msc(
+///    MacDescription md(
 ///        Digests.SHA512,	// hmac engine
 ///        128);			// key size in bytes
 /// </code>
 /// </example>
-/// 
-/// <seealso cref="CEX::Processing::CipherStream"/>
-/// <seealso cref="CEX::Enumeration::Digests"/>
-/// <seealso cref="CEX::Common::KeyGenerator"/>
-/// <seealso cref="CEX::Common::KeyParams"/>
-/// <seealso cref="CEX::Enumeration::Prngs"/>
 class MacDescription
 {
 private:
-	static constexpr uint MACTPE_SIZE = 1;
-	static constexpr uint KEYSZE_SIZE = 2;
-	static constexpr uint IVSIZE_SIZE = 1;
-	static constexpr uint MACENG_SIZE = 1;
-	static constexpr uint MACKEY_SIZE = 1;
-	static constexpr uint ENGTPE_SIZE = 1;
-	static constexpr uint BLKSZE_SIZE = 1;
-	static constexpr uint RNDCNT_SIZE = 1;
-	static constexpr uint KDFENG_SIZE = 1;
-	static constexpr uint MACHDR_SIZE = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + MACENG_SIZE + MACKEY_SIZE + ENGTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE + KDFENG_SIZE;
-	static constexpr uint MACTPE_SEEK = 0;
-	static constexpr uint KEYSZE_SEEK = MACTPE_SIZE;
-	static constexpr uint IVSIZE_SEEK = MACTPE_SIZE + KEYSZE_SIZE;
-	static constexpr uint MACENG_SEEK = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE;
-	static constexpr uint MACKEY_SEEK = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + MACENG_SIZE;
-	static constexpr uint ENGTPE_SEEK = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + MACENG_SIZE + MACKEY_SIZE;
-	static constexpr uint BLKSZE_SEEK = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + MACENG_SIZE + MACKEY_SIZE + ENGTPE_SIZE;
-	static constexpr uint RNDCNT_SEEK = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + MACENG_SIZE + MACKEY_SIZE + ENGTPE_SIZE + BLKSZE_SIZE;
-	static constexpr uint KDFENG_SEEK = MACTPE_SIZE + KEYSZE_SIZE + IVSIZE_SIZE + MACENG_SIZE + MACKEY_SIZE + ENGTPE_SIZE + BLKSZE_SIZE + RNDCNT_SIZE;
 
-	uint _macType;
-	uint _keySize;
-	uint _ivSize;
-	uint _hmacEngine;
-	uint _engineType;
-	uint _blockSize;
-	uint _roundCount;
-	uint _kdfEngine;
+	static const uint32_t MACHDR_SIZE = 9;
+
+	uint8_t m_macType;
+	uint16_t m_keySize;
+	uint8_t m_ivSize;
+	uint8_t m_hmacEngine;
+	uint8_t m_engineType;
+	uint8_t m_blockSize;
+	uint8_t m_roundCount;
+	uint8_t m_kdfEngine;
 
 public:
+
+	MacDescription& operator=(const MacDescription&) = delete;
+
+	//~~~Properties~~~//
+
 	/// <summary>
 	/// The type of Mac engine to use; CMac, Hmac, or Vmac.
 	/// </summary>
-	const CEX::Enumeration::Macs MacType() const { return (CEX::Enumeration::Macs)_macType; }
+	const Macs MacType() const { return static_cast<Macs>(m_macType); }
+
 	/// <summary>
 	/// The cipher Key Size
 	/// </summary>
-	const uint KeySize() const { return _keySize; }
+	const uint16_t KeySize() const { return m_keySize; }
+
 	/// <summary>
 	/// Size of the cipher Initialization Vector
 	/// </summary>
-	const CEX::Enumeration::IVSizes IvSize() const { return (CEX::Enumeration::IVSizes)_ivSize; }
+	const IVSizes IvSize() const { return static_cast<IVSizes>(m_ivSize); }
+
 	/// <summary>
 	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
 	/// </summary>
-	const CEX::Enumeration::Digests HmacEngine() const { return (CEX::Enumeration::Digests)_hmacEngine; }
+	const Digests HmacEngine() const { return static_cast<Digests>(m_hmacEngine); }
+
 	/// <summary>
 	/// The symmetric block cipher Engine type
 	/// </summary>
-	const CEX::Enumeration::BlockCiphers EngineType() const { return (CEX::Enumeration::BlockCiphers)_engineType; }
+	const BlockCiphers EngineType() const { return static_cast<BlockCiphers>(m_engineType); }
+
 	/// <summary>
 	/// The cipher internal Block Size
 	/// </summary>
-	const CEX::Enumeration::BlockSizes BlockSize() const { return (CEX::Enumeration::BlockSizes)_blockSize; }
+	const BlockSizes BlockSize() const { return static_cast<BlockSizes>(m_blockSize); }
+
 	/// <summary>
-	/// The number of cipher diffusion Rounds
+	/// The number of cipher transformation Rounds
 	/// </summary>
-	const CEX::Enumeration::RoundCounts RoundCount() const { return (CEX::Enumeration::RoundCounts)_roundCount; }
+	const RoundCounts RoundCount() const { return static_cast<RoundCounts>(m_roundCount); }
+
+	//~~~Constructor~~~//
+
 	/// <summary>
 	/// The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
 	/// </summary>
-	const CEX::Enumeration::Digests KdfEngine() const { return (CEX::Enumeration::Digests)_kdfEngine; }
+	const Digests KdfEngine() const { return static_cast<Digests>(m_kdfEngine); }
 
 	/// <summary>
 	/// Default constructor
 	/// </summary>
-	MacDescription()
+	explicit MacDescription()
 		:
-		_macType(0),
-		_keySize(0),
-		_ivSize(0),
-		_hmacEngine(0),
-		_engineType(0),
-		_blockSize(0),
-		_roundCount(0),
-		_kdfEngine(0)
+		m_macType(0),
+		m_keySize(0),
+		m_ivSize(0),
+		m_hmacEngine(0),
+		m_engineType(0),
+		m_blockSize(0),
+		m_roundCount(0),
+		m_kdfEngine(0)
 	{}
 
 	/// <summary>
@@ -138,19 +129,19 @@ public:
 	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
 	/// <param name="EngineType">The symmetric block cipher Engine type</param>
 	/// <param name="BlockSize">The cipher Block Size</param>
-	/// <param name="RoundCount">The number of diffusion Rounds</param>
+	/// <param name="RoundCount">The number of transformation Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	MacDescription(CEX::Enumeration::Macs MacType, uint KeySize, uint IvSize, CEX::Enumeration::Digests HmacEngine = CEX::Enumeration::Digests::SHA512, CEX::Enumeration::BlockCiphers EngineType = CEX::Enumeration::BlockCiphers::RHX,
-		CEX::Enumeration::BlockSizes BlockSize = CEX::Enumeration::BlockSizes::B128, CEX::Enumeration::RoundCounts RoundCount = CEX::Enumeration::RoundCounts::R14, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
+	explicit MacDescription(Macs MacType, uint16_t KeySize, uint8_t IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
+		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512)
 	{
-		_macType = (uint)MacType;
-		_keySize = KeySize;
-		_ivSize = IvSize;
-		_hmacEngine = (uint)HmacEngine;
-		_engineType = (uint)EngineType;
-		_blockSize = (uint)BlockSize;
-		_roundCount = (uint)RoundCount;
-		_kdfEngine = (uint)KdfEngine;
+		m_macType = static_cast<uint8_t>(MacType);
+		m_keySize = KeySize;
+		m_ivSize = IvSize;
+		m_hmacEngine = static_cast<uint8_t>(HmacEngine);
+		m_engineType = static_cast<uint8_t>(EngineType);
+		m_blockSize = static_cast<uint8_t>(BlockSize);
+		m_roundCount = static_cast<uint8_t>(RoundCount);
+		m_kdfEngine = static_cast<uint8_t>(KdfEngine);
 	}
 
 	/// <summary>
@@ -159,16 +150,16 @@ public:
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
 	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
-	MacDescription(uint KeySize, CEX::Enumeration::Digests HmacEngine)
+	explicit MacDescription(uint KeySize, Digests HmacEngine)
 	{
-		_macType = (uint)CEX::Enumeration::Macs::HMAC;
-		_keySize = KeySize;
-		_hmacEngine = (uint)HmacEngine;
-		_ivSize = 0;
-		_engineType = 0;
-		_blockSize = 0;
-		_roundCount = 0;
-		_kdfEngine = 0;
+		m_macType = static_cast<uint8_t>(Macs::HMAC);
+		m_keySize = KeySize;
+		m_hmacEngine = static_cast<uint8_t>(HmacEngine);
+		m_ivSize = 0;
+		m_engineType = 0;
+		m_blockSize = 0;
+		m_roundCount = 0;
+		m_kdfEngine = 0;
 	}
 
 	/// <summary>
@@ -179,37 +170,19 @@ public:
 	/// <param name="EngineType">The symmetric block cipher Engine type</param>
 	/// <param name="IvSize">Size of the cipher Initialization Vector</param>
 	/// <param name="BlockSize">The cipher Block Size</param>
-	/// <param name="RoundCount">The number of diffusion Rounds</param>
+	/// <param name="RoundCount">The number of transformation Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	MacDescription(uint KeySize, CEX::Enumeration::BlockCiphers EngineType, CEX::Enumeration::IVSizes IvSize, CEX::Enumeration::BlockSizes BlockSize = CEX::Enumeration::BlockSizes::B128,
-		CEX::Enumeration::RoundCounts RoundCount = CEX::Enumeration::RoundCounts::R14, CEX::Enumeration::Digests KdfEngine = CEX::Enumeration::Digests::SHA512)
+	explicit MacDescription(uint16_t KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
+		RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512)
 	{
-		_macType = (uint)CEX::Enumeration::Macs::CMAC;
-		_keySize = KeySize;
-		_ivSize = (uint)IvSize;
-		_hmacEngine = 0;
-		_engineType = (uint)EngineType;
-		_blockSize = (uint)BlockSize;
-		_roundCount = (uint)RoundCount;
-		_kdfEngine = (uint)KdfEngine;
-	}
-
-	/// <summary>
-	/// Initialize the structure with parameters for an VMAC generator
-	/// </summary>
-	/// 
-	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="VectorSize">Size of the VMAC initialization vector in bytes</param>
-	MacDescription(uint KeySize, uint VectorSize)
-	{
-		_macType = (uint)CEX::Enumeration::Macs::VMAC;
-		_keySize = KeySize;
-		_ivSize = VectorSize;
-		_hmacEngine = 0;
-		_engineType = 0;
-		_blockSize = 0;
-		_roundCount = 0;
-		_kdfEngine = 0;
+		m_macType = static_cast<uint8_t>(Macs::CMAC);
+		m_keySize = KeySize;
+		m_ivSize = static_cast<uint8_t>(IvSize);
+		m_hmacEngine = 0;
+		m_engineType = static_cast<uint8_t>(EngineType);
+		m_blockSize = static_cast<uint8_t>(BlockSize);
+		m_roundCount = static_cast<uint8_t>(RoundCount);
+		m_kdfEngine = static_cast<uint8_t>(KdfEngine);
 	}
 
 	/// <summary>
@@ -217,18 +190,18 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the MacDescription</param>
-	MacDescription(const CEX::IO::MemoryStream &DescriptionStream)
+	explicit MacDescription(const MemoryStream &DescriptionStream)
 	{
-		CEX::IO::StreamReader reader(DescriptionStream);
+		IO::StreamReader reader(DescriptionStream);
 
-		_macType = reader.ReadByte();
-		_keySize = reader.ReadInt16();
-		_ivSize = reader.ReadByte();
-		_hmacEngine = reader.ReadByte();
-		_engineType = reader.ReadByte();
-		_blockSize = reader.ReadByte();
-		_roundCount = reader.ReadByte();
-		_kdfEngine = reader.ReadByte();
+		m_macType = reader.ReadByte();
+		m_keySize = reader.ReadInt16();
+		m_ivSize = reader.ReadByte();
+		m_hmacEngine = reader.ReadByte();
+		m_engineType = reader.ReadByte();
+		m_blockSize = reader.ReadByte();
+		m_roundCount = reader.ReadByte();
+		m_kdfEngine = reader.ReadByte();
 	}
 
 	/// <summary>
@@ -236,106 +209,70 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DescriptionArray">The byte array containing the MacDescription</param>
-	MacDescription(const std::vector<byte> &DescriptionArray)
+	explicit MacDescription(const std::vector<byte> &DescriptionArray)
 	{
-		CEX::IO::MemoryStream ms = CEX::IO::MemoryStream(DescriptionArray);
-		CEX::IO::StreamReader reader(ms);
+		MemoryStream ms = MemoryStream(DescriptionArray);
+		IO::StreamReader reader(ms);
 
-		_macType = reader.ReadByte();
-		_keySize = reader.ReadInt16();
-		_ivSize = reader.ReadByte();
-		_hmacEngine = reader.ReadByte();
-		_engineType = reader.ReadByte();
-		_blockSize = reader.ReadByte();
-		_roundCount = reader.ReadByte();
-		_kdfEngine = reader.ReadByte();
+		m_macType = reader.ReadByte();
+		m_keySize = reader.ReadInt16();
+		m_ivSize = reader.ReadByte();
+		m_hmacEngine = reader.ReadByte();
+		m_engineType = reader.ReadByte();
+		m_blockSize = reader.ReadByte();
+		m_roundCount = reader.ReadByte();
+		m_kdfEngine = reader.ReadByte();
 	}
 
+	//~~~Public Functions~~~//
+
 	/// <summary>
-	/// Get the header Size in bytes
+	/// An HMAC SHA-256 preset
+	/// </summary>
+	static MacDescription HMACSHA256();
+
+	/// <summary>
+	/// An HMAC SHA-512 preset
+	/// </summary>
+	static MacDescription HMACSHA512();
+
+	/// <summary>
+	/// An CMAC AES-256 preset
+	/// </summary>
+	static MacDescription CMACAES256();
+
+	/// <summary>
+	/// Get the header size in bytes
 	/// </summary>
 	/// 
 	/// <returns>Header size</returns>
-	static int GetHeaderSize()
-	{
-		return MACHDR_SIZE;
-	}
+	static int GetHeaderSize();
 
 	/// <summary>
 	/// Reset all struct members
 	/// </summary>
-	void Reset()
-	{
-		_macType = 0;
-		_keySize = 0;
-		_ivSize = 0;
-		_hmacEngine = 0;
-		_engineType = 0;
-		_blockSize = 0;
-		_roundCount = 0;
-		_kdfEngine = 0;
-	}
+	void Reset();
 
 	/// <summary>
 	/// Convert the MacDescription structure as a byte array
 	/// </summary>
 	/// 
 	/// <returns>The byte array containing the MacDescription</returns>
-	std::vector<byte> ToBytes()
-	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
-
-		writer.Write((byte)_macType);
-		writer.Write((short)_keySize);
-		writer.Write((byte)_ivSize);
-		writer.Write((byte)_hmacEngine);
-		writer.Write((byte)_engineType);
-		writer.Write((byte)_blockSize);
-		writer.Write((byte)_roundCount);
-		writer.Write((byte)_kdfEngine);
-
-		return writer.GetBytes();
-	}
+	std::vector<byte> ToBytes();
 
 	/// <summary>
 	/// Convert the MacDescription structure to a MemoryStream
 	/// </summary>
 	/// 
 	/// <returns>The MemoryStream containing the MacDescription</returns>
-	CEX::IO::MemoryStream* ToStream()
-	{
-		CEX::IO::StreamWriter writer(GetHeaderSize());
-
-		writer.Write((byte)_macType);
-		writer.Write((short)_keySize);
-		writer.Write((byte)_ivSize);
-		writer.Write((byte)_hmacEngine);
-		writer.Write((byte)_engineType);
-		writer.Write((byte)_blockSize);
-		writer.Write((byte)_roundCount);
-		writer.Write((byte)_kdfEngine);
-
-		return writer.GetStream();
-	}
+	MemoryStream* ToStream();
 
 	/// <summary>
 	/// Get the hash code for this object
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	int GetHashCode()
-	{
-		int hash = 31 * _macType;
-		hash += 31 * _keySize;
-		hash += 31 * _ivSize;
-		hash += 31 * _hmacEngine;
-		hash += 31 * _engineType;
-		hash += 31 * _blockSize;
-		hash += 31 * _roundCount;
-		hash += 31 * _kdfEngine;
-
-		return hash;
-	}
+	int GetHashCode();
 
 	/// <summary>
 	/// Compare this object instance with another
@@ -344,15 +281,8 @@ public:
 	/// <param name="Obj">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(MacDescription &Obj)
-	{
-		if (this->GetHashCode() != Obj.GetHashCode())
-			return false;
-
-		return true;
-	}
-
+	bool Equals(MacDescription &Obj);
 };
 
-NAMESPACE_COMMONEND
+NAMESPACE_PROCESSINGEND
 #endif

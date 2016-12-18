@@ -1,15 +1,19 @@
-#ifndef _CEXENGINE_KEYSIZES_H
-#define _CEXENGINE_KEYSIZES_H
+#ifndef _CEX_KEYSIZES_H
+#define _CEX_KEYSIZES_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// <para>Key Sizes in bits. Can be cast as Key byte size integers, 
-/// i.e. (uint sz = KeySizes.K256) is equal to 32.</para>
+/// Common key bit sizes.
+/// <para> Can be cast as Key byte size integers, i.e. (uint sz = KeySizes.K256) is equal to 32.</para>
 /// </summary>
-enum class KeySizes : uint
+enum class KeySizes : uint16_t
 {
+	/// <summary>
+	/// No key size is specified
+	/// </summary>
+	None = 0,
 	/// <summary>
 	/// 128 bit Key
 	/// </summary>

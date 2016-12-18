@@ -1,9 +1,11 @@
 #include "SalsaTest.h"
-#include "../CEX/CSPRsg.h"
+#include "../CEX/CSP.h"
 #include "../CEX/Salsa20.h"
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Stream;
+
 	std::string SalsaTest::Run()
 	{
 		try
@@ -25,9 +27,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -37,7 +39,7 @@ namespace Test
 
 	void SalsaTest::CompareParallel()
 	{
-		CEX::Seed::CSPRsg rng;
+		Provider::CSP rng;
 		std::vector<byte> key(32);
 		rng.GetBytes(key);
 		std::vector<byte> iv(8);
@@ -48,23 +50,23 @@ namespace Test
 		std::vector<byte> dec(10240, 0);
 		std::vector<byte> enc2(10240, 0);
 		std::vector<byte> dec2(10240, 0);
-		CEX::Common::KeyParams k(key, iv);
+		Key::Symmetric::SymmetricKey k(key, iv);
 		
 		// encrypt linear
-		CEX::Cipher::Symmetric::Stream::Salsa20 cipher(20);
+		Salsa20 cipher(20);
 		cipher.Initialize(k);
 		cipher.IsParallel() = false;
 		cipher.Transform(data, enc);
 
 		// encrypt parallel
-		CEX::Cipher::Symmetric::Stream::Salsa20 cipher2(20);
+		Salsa20 cipher2(20);
 		cipher2.Initialize(k);
 		cipher2.IsParallel() = true;
 		cipher2.ParallelBlockSize() = cipher2.ParallelMinimumSize();
 		cipher2.Transform(data, enc2);
 
 		if (enc != enc2)
-			throw std::string("Salsa20: Encrypted arrays are not equal!");
+			throw std::exception("Salsa20: Encrypted arrays are not equal!");
 
 		// decrypt linear
 		cipher2.Initialize(k);
@@ -78,30 +80,30 @@ namespace Test
 		cipher.Transform(enc2, dec2);
 
 		if (dec != data)
-			throw std::string("Salsa20: Decrypted arrays are not equal!");
+			throw std::exception("Salsa20: Decrypted arrays are not equal!");
 		if (dec != dec2)
-			throw std::string("Salsa20: Decrypted arrays are not equal!");
+			throw std::exception("Salsa20: Decrypted arrays are not equal!");
 	}
 
 	void SalsaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		CEX::Common::KeyParams k(Key, Vector);
-		CEX::Cipher::Symmetric::Stream::Salsa20 cipher(Rounds);
+		Key::Symmetric::SymmetricKey k(Key, Vector);
+		Salsa20 cipher(Rounds);
 		cipher.Initialize(k);
 		cipher.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("Salsa20: Encrypted arrays are not equal!");
+			throw std::exception("Salsa20: Encrypted arrays are not equal!");
 
 		if (!Test::TestUtils::IsEqual(outBytes, Output))
-			throw std::string("Salsa20: Encrypted arrays are not equal!");
+			throw std::exception("Salsa20: Encrypted arrays are not equal!");
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, outBytes);
 
 		if (!Test::TestUtils::IsEqual(outBytes, Input))
-			throw std::string("Salsa20: Decrypted arrays are not equal!");
+			throw std::exception("Salsa20: Decrypted arrays are not equal!");
 	}
 
 	void SalsaTest::Initialize()

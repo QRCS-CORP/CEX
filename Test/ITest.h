@@ -6,6 +6,8 @@
 
 namespace Test
 {
+	using namespace CEX;
+
 	/// <summary>
 	/// Test Interface
 	/// </summary>

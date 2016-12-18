@@ -11,14 +11,14 @@
 #include "../CEX/OFB.h"
 #include "../CEX/ICM.h"
 #include "../CEX/SHA512.h"
-#include "../CEX/ChaCha.h"
+#include "../CEX/ChaCha20.h"
 #include "../CEX/Salsa20.h"
-
+#include "../CEX/IntUtils.h"
 
 namespace Test
 {
-	using namespace CEX::Cipher::Symmetric::Block;
-	using namespace CEX::Cipher::Symmetric::Stream;
+	using namespace Cipher::Symmetric::Block;
+	using namespace Cipher::Symmetric::Stream;
 
 	std::string CipherSpeedTest::Run()
 	{
@@ -87,20 +87,20 @@ namespace Test
 
 
 			OnProgress("### STREAM CIPHER TESTS ###");
-			OnProgress("### Tests speeds of Salsa and ChaCha stream ciphers");
+			OnProgress("### Tests speeds of Salsa and ChaCha20 stream ciphers");
 			OnProgress("### Uses default of 20 rounds, 256 bit key");
 			OnProgress("");
 
 			OnProgress("***Salsa20: Monte Carlo test (K=256; R=20)***");
 			SalsaSpeedTest();
-			OnProgress("***ChaCha: Monte Carlo test (K=256; R=20)***");
+			OnProgress("***ChaCha20: Monte Carlo test (K=256; R=20)***");
 			ChaChaSpeedTest();
 
 			return MESSAGE;
 		}
-		catch (std::string &ex)
+		catch (std::exception const &ex)
 		{
-			return FAILURE + " : " + ex;
+			return FAILURE + " : " + ex.what();
 		}
 		catch (...)
 		{
@@ -187,7 +187,7 @@ namespace Test
 
 	void CipherSpeedTest::ChaChaSpeedTest()
 	{
-		ChaCha* cipher = new ChaCha();
+		ChaCha20* cipher = new ChaCha20();
 		ParallelStreamLoop(cipher, 32, 8, 10);
 		delete cipher;
 	}
@@ -213,9 +213,9 @@ namespace Test
 	{
 		try
 		{
-			CEX::Common::CpuDetect detect;
-			m_hasAESNI = detect.HasAES();
-			m_hasSSE = detect.HasMinIntrinsics();
+			Common::CpuDetect detect;
+			m_hasAESNI = detect.AESNI();
+			m_hasSSE = detect.SSE();
 		}
 		catch (...)
 		{
@@ -231,13 +231,13 @@ namespace Test
 
 	void CipherSpeedTest::ParallelBlockLoop(Mode::ICipherMode* Cipher, bool Encrypt, bool Parallel, size_t SampleSize, size_t KeySize, size_t IvSize, size_t Loops)
 	{
-		CEX::Common::KeyParams keyParams;
+		;
 		size_t blkSze = Parallel ? Cipher->ParallelBlockSize() : Cipher->BlockSize();
 		std::vector<byte> buffer1(blkSze, 0);
 		std::vector<byte> buffer2(blkSze, 0);
 
-		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
-		Cipher->Initialize(Encrypt, keyParams);
+		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
+		Cipher->Initialize(Encrypt, keyParam);
 		Cipher->IsParallel() = Parallel;
 		uint64_t start = TestUtils::GetTimeMs64();
 
@@ -251,16 +251,16 @@ namespace Test
 				Cipher->Transform(buffer1, 0, buffer2, 0);
 				counter += buffer1.size();
 			}
-			std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			OnProgress(const_cast<char*>(calc.c_str()));
 		}
 
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
 		uint64_t len = Loops * SampleSize;
 		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string glen = CEX::Utility::IntUtils::ToString(len / GB1);
-		std::string mbps = CEX::Utility::IntUtils::ToString((rate / MB1));
-		std::string secs = CEX::Utility::IntUtils::ToString((double)dur / 1000.0);
+		std::string glen = Utility::IntUtils::ToString(len / GB1);
+		std::string mbps = Utility::IntUtils::ToString((rate / MB1));
+		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 		OnProgress(const_cast<char*>(resp.c_str()));
 		OnProgress("");
@@ -268,9 +268,8 @@ namespace Test
 
 	void CipherSpeedTest::ParallelStreamLoop(IStreamCipher* Cipher, size_t KeySize, size_t IvSize, size_t Loops)
 	{
-		CEX::Common::KeyParams keyParams;
-		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
-		Cipher->Initialize(keyParams);
+		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
+		Cipher->Initialize(keyParam);
 		Cipher->IsParallel() = true;
 		std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
 		std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
@@ -286,16 +285,15 @@ namespace Test
 				Cipher->Transform(buffer1, 0, buffer2, 0);
 				counter += buffer1.size();
 			}
-			std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			OnProgress(const_cast<char*>(calc.c_str()));
 		}
 
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
 		uint64_t len = Loops * DATA_SIZE;
 		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string mbps = CEX::Utility::IntUtils::ToString((rate / MB1));
-		std::string klen = CEX::Utility::IntUtils::ToString(KeySize * 8);
-		std::string secs = CEX::Utility::IntUtils::ToString((double)dur / 1000.0);
+		std::string mbps = Utility::IntUtils::ToString((rate / MB1));
+		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 		OnProgress(const_cast<char*>(resp.c_str()));
 		OnProgress("");
@@ -307,17 +305,16 @@ namespace Test
 		std::vector<byte> buffer2(IvSize, 0);
 		SampleSize -= (SampleSize % IvSize);
 		Mode::CBC cipher(Engine);
-		CEX::Common::KeyParams keyParams;
-		TestUtils::GetRandomKey(keyParams, KeySize, IvSize);
+		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
 
 		if (!Parallel)
 		{
-			cipher.Initialize(true, keyParams);
+			cipher.Initialize(true, keyParam);
 			cipher.IsParallel() = false;
 		}
 		else
 		{
-			cipher.Initialize(false, keyParams);
+			cipher.Initialize(false, keyParam);
 			cipher.IsParallel() = true;
 			buffer1.resize(cipher.ParallelBlockSize());
 			buffer2.resize(cipher.ParallelBlockSize());
@@ -337,7 +334,7 @@ namespace Test
 					cipher.Transform128(buffer1, 0, buffer2, 0);
 					counter += buffer1.size();
 				}
-				std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 				OnProgress(const_cast<char*>(calc.c_str()));
 			}
 		}
@@ -353,7 +350,7 @@ namespace Test
 					cipher.Transform64(buffer1, 0, buffer2, 0);
 					counter += buffer1.size();
 				}
-				std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 				OnProgress(const_cast<char*>(calc.c_str()));
 			}
 		}
@@ -361,9 +358,8 @@ namespace Test
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
 		uint64_t len = Loops * SampleSize;
 		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string mbps = CEX::Utility::IntUtils::ToString(rate / MB1);
-		std::string klen = CEX::Utility::IntUtils::ToString(KeySize * 8);
-		std::string secs = CEX::Utility::IntUtils::ToString((double)dur / 1000.0);
+		std::string mbps = Utility::IntUtils::ToString(rate / MB1);
+		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 		OnProgress(const_cast<char*>(resp.c_str()));
 		OnProgress("");
@@ -400,7 +396,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -420,7 +416,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -435,7 +431,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -456,7 +452,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -471,7 +467,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 	}
 

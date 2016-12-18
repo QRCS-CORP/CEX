@@ -5,6 +5,8 @@
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string SerpentTest::Run()
 	{
 		try
@@ -63,8 +65,8 @@ namespace Test
 				CompareVector(key, pln, cip);
 			}
 			//
-			rcnt = CEX::Utility::IntUtils::ToString(rcount);
-			klen = CEX::Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			rcnt = Utility::IntUtils::ToString(rcount);
+			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent128: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
 			OnProgress(const_cast<char*>(resp.c_str()));
 			rcount = 0;
@@ -101,8 +103,8 @@ namespace Test
 				CompareVector(key, pln, cip);
 			}
 
-			rcnt = CEX::Utility::IntUtils::ToString(rcount);
-			klen = CEX::Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			rcnt = Utility::IntUtils::ToString(rcount);
+			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent192: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
 			OnProgress(const_cast<char*>(resp.c_str()));
 
@@ -140,8 +142,8 @@ namespace Test
 				CompareVector(key, pln, cip);
 			}
 
-			rcnt = CEX::Utility::IntUtils::ToString(rcount);
-			klen = CEX::Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			rcnt = Utility::IntUtils::ToString(rcount);
+			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent256: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
 			OnProgress(const_cast<char*>(resp.c_str()));
 			rcount = 0;
@@ -152,9 +154,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -162,38 +164,12 @@ namespace Test
 		}
 	}
 
-	void CompareIntrinsics()
-	{
-		/*std::vector<byte> inBytes(16, 0);
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> key(32, 0);
-		std::vector<byte> iv(16, 0);
-
-		CEX::Cipher::Symmetric::Block::SHX* enc;
-		CEX::Cipher::Symmetric::Block::Mode::CTR cipher(enc);
-		CEX::Common::KeyParams k(key, iv);
-
-		cipher.Initialize(true, k);
-		cipher.Transform(inBytes, outBytes);
-
-		if (Output != outBytes)
-			throw std::string("Serpent Vector: Arrays are not equal!");
-
-		//TestUtils::Reverse(outBytes);
-		CEX::Cipher::Symmetric::Block::SHX dec;
-		dec.Initialize(false, k);
-		dec.DecryptBlock(outBytes, expBytes);
-
-		if (Input != expBytes)
-			throw std::string("Serpent Vector: Arrays are not equal!");*/
-	}
-
 	void SerpentTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, unsigned int Count)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
-		CEX::Cipher::Symmetric::Block::SHX eng;
-		CEX::Common::KeyParams k(Key);
+		SHX eng;
+		Key::Symmetric::SymmetricKey k(Key);
 
 		eng.Initialize(true, k);
 
@@ -201,7 +177,7 @@ namespace Test
 			eng.Transform(outBytes, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("Serpent MonteCarlo: Arrays are not equal!");
+			throw std::exception("Serpent MonteCarlo: Arrays are not equal!");
 	}
 
 	void SerpentTest::CompareOutput()
@@ -216,8 +192,8 @@ namespace Test
 		for (unsigned int i = 0; i < 64; i++)
 			key[i] = (byte)i;
 
-		CEX::Cipher::Symmetric::Block::SHX eng;
-		CEX::Common::KeyParams k(key);
+		SHX eng;
+		Key::Symmetric::SymmetricKey k(key);
 
 		eng.Initialize(true, k);
 		eng.EncryptBlock(inBytes, outBytes);
@@ -226,7 +202,7 @@ namespace Test
 		eng.DecryptBlock(outBytes, decBytes);
 
 		if (inBytes != decBytes)
-			throw std::string("Serpent: Decrypted arrays are not equal!");
+			throw std::exception("Serpent: Decrypted arrays are not equal!");
 	}
 
 	void SerpentTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -236,21 +212,21 @@ namespace Test
 		std::vector<byte> inBytes(16, 0);
 		memcpy(&inBytes[0], &Input[0], 16);
 
-		CEX::Cipher::Symmetric::Block::SHX enc;
-		CEX::Common::KeyParams k(Key);
+		SHX enc;
+		Key::Symmetric::SymmetricKey k(Key);
 		enc.Initialize(true, k);
 		enc.EncryptBlock(inBytes, outBytes);
 
 		if (Output != outBytes)
-			throw std::string("Serpent Vector: Arrays are not equal!");
+			throw std::exception("Serpent Vector: Arrays are not equal!");
 
 		//TestUtils::Reverse(outBytes);
-		CEX::Cipher::Symmetric::Block::SHX dec;
+		SHX dec;
 		dec.Initialize(false, k);
 		dec.DecryptBlock(outBytes, expBytes);
 
 		if (Input != expBytes)
-			throw std::string("Serpent Vector: Arrays are not equal!");
+			throw std::exception("Serpent Vector: Arrays are not equal!");
 	}
 
 	void SerpentTest::OnProgress(char* Data)

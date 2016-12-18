@@ -6,7 +6,7 @@
 namespace Test
 {
     /// <summary>
-	/// Tests the HKDF Drbg implementation using vector comparisons.
+	/// Tests the HKDF implementation using vector comparisons.
     /// <para>Uses vectors from: RFC 5869: HMAC-based Extract-and-Expand Key Derivation Function (HKDF) 
 	/// <see href="http://tools.ietf.org/html/rfc5869"/></para>
     /// </summary>
@@ -18,7 +18,7 @@ namespace Test
 		const std::string SUCCESS = "SUCCESS! All HKDF tests have executed succesfully.";
 
 		TestEventHandler m_progressEvent;
-        std::vector<std::vector<byte>> m_ikm;
+        std::vector<std::vector<byte>> m_key;
         std::vector<std::vector<byte>> m_info;
         std::vector<std::vector<byte>> m_output;
         std::vector<std::vector<byte>> m_salt;
@@ -55,9 +55,10 @@ namespace Test
 		virtual std::string Run();
 
     private:
-		void CompareVector(int Size, std::vector<byte> &Salt, std::vector<byte> &Key, std::vector<byte> &Info, std::vector<byte> &Output);
+		void CompareVector(int Size, std::vector<byte> &Salt, std::vector<byte> &Key, std::vector<byte> &Info, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(char* Data);
+		void TestInit();
     };
 }
 

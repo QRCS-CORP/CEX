@@ -1,44 +1,41 @@
-// The MIT License (MIT)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEXENGINE_SERPENT_H
-#define _CEXENGINE_SERPENT_H
+#ifndef _CEX_SERPENT_H
+#define _CEX_SERPENT_H
 
-#include "Common.h"
+#include "CexDomain.h"
+
+NAMESPACE_BLOCK
 
 template<typename T>
 void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R0 = CEX::Utility::IntUtils::RotL32(R0, 13);
-	R2 = CEX::Utility::IntUtils::RotL32(R2, 3);
+	R0 = Utility::IntUtils::RotL32(R0, 13);
+	R2 = Utility::IntUtils::RotL32(R2, 3);
 	R1 ^= R0 ^ R2;
 	R3 ^= R2 ^ (R0 << 3);
-	R1 = CEX::Utility::IntUtils::RotL32(R1, 1);
-	R3 = CEX::Utility::IntUtils::RotL32(R3, 7);
+	R1 = Utility::IntUtils::RotL32(R1, 1);
+	R3 = Utility::IntUtils::RotL32(R3, 7);
 	R0 ^= R1 ^ R3;
 	R2 ^= R3 ^ (R1 << 7);
-	R0 = CEX::Utility::IntUtils::RotL32(R0, 5);
-	R2 = CEX::Utility::IntUtils::RotL32(R2, 22);
+	R0 = Utility::IntUtils::RotL32(R0, 5);
+	R2 = Utility::IntUtils::RotL32(R2, 22);
 }
 
 template<typename T>
@@ -59,16 +56,16 @@ void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
 template<typename T>
 void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 {
-	R2 = CEX::Utility::IntUtils::RotR32(R2, 22);
-	R0 = CEX::Utility::IntUtils::RotR32(R0, 5);
+	R2 = Utility::IntUtils::RotR32(R2, 22);
+	R0 = Utility::IntUtils::RotR32(R0, 5);
 	R2 ^= R3 ^ (R1 << 7);
 	R0 ^= R1 ^ R3;
-	R3 = CEX::Utility::IntUtils::RotR32(R3, 7);
-	R1 = CEX::Utility::IntUtils::RotR32(R1, 1);
+	R3 = Utility::IntUtils::RotR32(R3, 7);
+	R1 = Utility::IntUtils::RotR32(R1, 1);
 	R3 ^= R2 ^ (R0 << 3);
 	R1 ^= R0 ^ R2;
-	R2 = CEX::Utility::IntUtils::RotR32(R2, 3);
-	R0 = CEX::Utility::IntUtils::RotR32(R0, 13);
+	R2 = Utility::IntUtils::RotR32(R2, 3);
+	R0 = Utility::IntUtils::RotR32(R0, 13);
 }
 
 template<typename T>
@@ -517,4 +514,5 @@ static void Ib7(T &R0, T &R1, T &R2, T &R3)
 	R3 = B4;
 }
 
+NAMESPACE_BLOCKEND
 #endif

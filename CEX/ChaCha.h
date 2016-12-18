@@ -1,335 +1,373 @@
-// The MIT License (MIT)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-// 
-// Principal Algorithms:
-// Portions of this cipher based on the ChaCha stream cipher designed by Daniel J. Bernstein:
-// ChaCha20 <a href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</a>.
-// 
-// Implementation Details:
-// ChaCha20+
-// An implementation based on the ChaCha stream cipher,
-// using an extended key size, and higher variable rounds assignment.
-// Valid Key sizes are 128 and 256 (16 and 32 bytes).
-// Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.
-// Written by John Underhill, October 21, 2014
-// contact: develop@vtdev.com
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEXENGINE_CHACHA_H
-#define _CEXENGINE_CHACHA_H
+#ifndef _CEX_CHACHA_H
+#define _CEX_CHACHA_H
 
-#include "IStreamCipher.h"
+#include "CexDomain.h"
+#include "IntUtils.h"
+#include "UInt128.h"
+#include "UInt256.h"
 
 NAMESPACE_STREAM
 
-/// <summary>
-/// ChaCha+: A parallelized ChaCha stream cipher implementation
-/// </summary>
-/// 
-/// <example>
-/// <description>Encrypt an array with ChaCha:</description>
-/// <code>
-/// KeyParams kp(Key, Iv);
-/// ChaCha cipher(20);
-/// // linear encrypt
-/// cipher.Initialize(kp);
-/// cipher.IsParallel() = false;
-/// cipher.Transform(Input, Output);
-/// </code>
-/// </example>
-/// 
-/// <remarks>
-/// <description>Implementation Notes:</description>
-/// <list type="bullet">
-/// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
-/// <item><description>SIMD implementation requires compilation with SSSE3 or higher.</description></item>
-/// <item><description>Valid Key sizes are 128 and 256 (16 and 32 bytes).</description></item>
-/// <item><description>Block size is 64 bytes wide.</description></item>
-/// <item><description>Valid rounds are 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28 and 30.</description></item>
-/// </list>
-/// 
-/// <description>Guiding Publications:</description>
-/// <list type="number">
-/// <item><description>ChaCha20 <a href="http://cr.yp.to/chacha/chacha-20080128.pdf">Specification</a>.</description></item>
-/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/design.pdf">Design</a>.</description></item>
-/// <item><description>Salsa20 <a href="http://cr.yp.to/snuffle/security.pdf">Security</a>.</description></item>
-/// </list>
-/// </remarks>
-class ChaCha : public IStreamCipher
+using Utility::IntUtils;
+using Numeric::UInt128;
+using Numeric::UInt256;
+
+class ChaCha
 {
-private:
-	static constexpr size_t BLOCK_SIZE = 64;
-	static constexpr size_t MAX_ROUNDS = 30;
-	static constexpr size_t MAXALLOC_MB100 = 100000000;
-	static constexpr size_t MIN_ROUNDS = 8;
-	static constexpr size_t PARALLEL_CHUNK = 1024;
-	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
-	static constexpr size_t ROUNDS20 = 20;
-	static constexpr const char *SIGMA = "expand 32-byte k";
-	static constexpr size_t STATE_SIZE = 16;
-	static constexpr const char *TAU = "expand 16-byte k";
-	static constexpr size_t VECTOR_SIZE = 8;
-
-	std::vector<uint> m_ctrVector;
-	std::vector<byte> m_dstCode;
-	bool m_hasAVX;
-	bool m_hasSSE;
-	bool m_isInitialized;
-	bool m_isParallel;
-	bool m_isDestroyed;
-	std::vector<size_t> m_legalKeySizes;
-	std::vector<size_t> m_legalRounds;
-	size_t m_parallelBlockSize;
-	size_t m_parallelMaxDegree;
-	size_t m_parallelMinimumSize;
-	size_t m_processorCount;
-	size_t m_rndCount;
-	std::vector<uint> m_wrkState;
-
-	ChaCha(const ChaCha&) = delete;
-	ChaCha& operator=(const ChaCha&) = delete;
-
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes.
-	/// <para>Block size is 64 bytes wide.</para>
-	/// </summary>
-	virtual const size_t BlockSize() { return BLOCK_SIZE; }
-
-	/// <summary>
-	/// Get the current counter value
-	/// </summary>
-	virtual ulong Counter() { return ((ulong)m_ctrVector[1] << 32) | (m_ctrVector[0] & 0xffffffffL); }
-
-	/// <summary>
-	/// Get/Set: Sets the Nonce value in the initialization parameters (Tau-Sigma).
-	/// <para>Must be set before <see cref="Initialize(KeyParams)"/> is called.
-	/// Changing this code will create a unique distribution of the cipher.
-	/// Code must be 16 bytes in length and sufficiently asymmetric (no more than 2 repeating characters, at a distance of 2 intervals).</para>
-	/// </summary>
-	virtual std::vector<byte> &DistributionCode() { return m_dstCode; }
-
-	/// <summary>
-	/// Get: The stream ciphers type name
-	/// </summary>
-	virtual const StreamCiphers Enumeral() { return StreamCiphers::ChaCha; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports AVX intrinsics
-	/// </summary>
-	virtual const bool HasAVX() { return m_hasAVX; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports SIMD intrinsics
-	/// </summary>
-	virtual const bool HasSSE() { return m_hasSSE; }
-
-	/// <summary>
-	/// Get: Cipher is ready to transform data
-	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
-
-	/// <summary>
-	/// Get: Available Encryption Key Sizes in bytes
-	/// </summary>
-	virtual const std::vector<size_t>&LegalKeySizes() { return m_legalKeySizes; }
-
-	/// <summary>
-	/// Get: Available diffusion round assignments
-	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() { return m_legalRounds; }
-
-	/// <summary>
-	/// Get/Set: Automatic processor parallelization
-	/// </summary>
-	virtual bool &IsParallel() { return m_isParallel; }
-
-	/// <summary>
-	/// Get/Set: Parallel block size; must align (threads * n) with ParallelMinimumSize()
-	/// </summary>
-	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
-
-	/// <summary>
-	/// Get: Maximum input size with parallel processing
-	/// </summary>
-	virtual const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
-
-	/// <summary>
-	/// Get: The smallest parallel block size. 
-	/// <para>Parallel blocks must be a multiple of this size.</para>
-	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
-
-	/// <summary>
-	/// Get: The maximum number of threads allocated when using multi-threaded processing
-	/// </summary>
-	virtual const size_t ParallelThreadsMax() { return m_parallelMaxDegree; }
-
-	/// <remarks>
-	/// Get: Processor count
-	/// </remarks>
-	virtual const size_t ProcessorCount() { return m_processorCount; }
-
-	/// <summary>
-	/// Get: Cipher name
-	/// </summary>
-	virtual const char *Name() { return "ChaCha"; }
-
-	/// <summary>
-	/// Get: Number of rounds
-	/// </summary>
-	virtual const size_t Rounds() { return m_rndCount; }
-
-	/// <summary>
-	/// Get: Initialization vector size
-	/// </summary>
-	virtual const size_t VectorSize() { return VECTOR_SIZE; }
-
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// Initialize the class
-	/// </summary>
-	///
-	/// <param name="Rounds">Number of diffusion rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 20 rounds.</param>
-	///
-	/// <exception cref="CEX::Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	explicit ChaCha(size_t Rounds = ROUNDS20)
-		:
-		m_ctrVector(2, 0),
-		m_hasAVX(false),
-		m_hasSSE(false),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_isParallel(false),
-		m_parallelBlockSize(0),
-		m_parallelMaxDegree(0),
-		m_parallelMinimumSize(0),
-		m_rndCount(Rounds),
-		m_wrkState(14, 0)
+	static void Transform64(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (Rounds == 0 || (Rounds & 1) != 0)
-			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
-		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
-			throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be between 8 and 30!");
-#endif
+		size_t ctr = 0;
+		uint X0 = State[ctr];
+		uint X1 = State[++ctr];
+		uint X2 = State[++ctr];
+		uint X3 = State[++ctr];
+		uint X4 = State[++ctr];
+		uint X5 = State[++ctr];
+		uint X6 = State[++ctr];
+		uint X7 = State[++ctr];
+		uint X8 = State[++ctr];
+		uint X9 = State[++ctr];
+		uint X10 = State[++ctr];
+		uint X11 = State[++ctr];
+		uint X12 = Counter[0];
+		uint X13 = Counter[1];
+		uint X14 = State[++ctr];
+		uint X15 = State[++ctr];
 
-		m_legalKeySizes = { 16, 32 };
-		m_legalRounds = { 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30 };
+		ctr = Rounds;
+		while (ctr != 0)
+		{
+			X0 += X4;
+			X12 = IntUtils::RotFL32(X12 ^ X0, 16);
+			X8 += X12;
+			X4 = IntUtils::RotFL32(X4 ^ X8, 12);
+			X0 += X4;
+			X12 = IntUtils::RotFL32(X12 ^ X0, 8);
+			X8 += X12;
+			X4 = IntUtils::RotFL32(X4 ^ X8, 7);
+			X1 += X5;
+			X13 = IntUtils::RotFL32(X13 ^ X1, 16);
+			X9 += X13;
+			X5 = IntUtils::RotFL32(X5 ^ X9, 12);
+			X1 += X5;
+			X13 = IntUtils::RotFL32(X13 ^ X1, 8);
+			X9 += X13;
+			X5 = IntUtils::RotFL32(X5 ^ X9, 7);
+			X2 += X6;
+			X14 = IntUtils::RotFL32(X14 ^ X2, 16);
+			X10 += X14;
+			X6 = IntUtils::RotFL32(X6 ^ X10, 12);
+			X2 += X6;
+			X14 = IntUtils::RotFL32(X14 ^ X2, 8);
+			X10 += X14;
+			X6 = IntUtils::RotFL32(X6 ^ X10, 7);
+			X3 += X7;
+			X15 = IntUtils::RotFL32(X15 ^ X3, 16);
+			X11 += X15;
+			X7 = IntUtils::RotFL32(X7 ^ X11, 12);
+			X3 += X7;
+			X15 = IntUtils::RotFL32(X15 ^ X3, 8);
+			X11 += X15;
+			X7 = IntUtils::RotFL32(X7 ^ X11, 7);
+			X0 += X5;
+			X15 = IntUtils::RotFL32(X15 ^ X0, 16);
+			X10 += X15;
+			X5 = IntUtils::RotFL32(X5 ^ X10, 12);
+			X0 += X5;
+			X15 = IntUtils::RotFL32(X15 ^ X0, 8);
+			X10 += X15;
+			X5 = IntUtils::RotFL32(X5 ^ X10, 7);
+			X1 += X6;
+			X12 = IntUtils::RotFL32(X12 ^ X1, 16);
+			X11 += X12;
+			X6 = IntUtils::RotFL32(X6 ^ X11, 12);
+			X1 += X6;
+			X12 = IntUtils::RotFL32(X12 ^ X1, 8);
+			X11 += X12;
+			X6 = IntUtils::RotFL32(X6 ^ X11, 7);
+			X2 += X7;
+			X13 = IntUtils::RotFL32(X13 ^ X2, 16);
+			X8 += X13;
+			X7 = IntUtils::RotFL32(X7 ^ X8, 12);
+			X2 += X7;
+			X13 = IntUtils::RotFL32(X13 ^ X2, 8);
+			X8 += X13;
+			X7 = IntUtils::RotFL32(X7 ^ X8, 7);
+			X3 += X4;
+			X14 = IntUtils::RotFL32(X14 ^ X3, 16);
+			X9 += X14;
+			X4 = IntUtils::RotFL32(X4 ^ X9, 12);
+			X3 += X4;
+			X14 = IntUtils::RotFL32(X14 ^ X3, 8);
+			X9 += X14;
+			X4 = IntUtils::RotFL32(X4 ^ X9, 7);
+			ctr -= 2;
+		}
 
-		Detect();
-		Scope();
+		IntUtils::Le32ToBytes(X0 + State[ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X1 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X2 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X3 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X4 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X5 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X6 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X7 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X8 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X9 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X10 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X11 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X12 + Counter[0], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X13 + Counter[1], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X14 + State[++ctr], Output, OutOffset); OutOffset += 4;
+		IntUtils::Le32ToBytes(X15 + State[++ctr], Output, OutOffset);
 	}
 
-	/// <summary>
-	/// Finalize objects
-	/// </summary>
-	virtual ~ChaCha()
+	static void Transform256(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
-		Destroy();
+		size_t ctr = 0;
+		std::vector<UInt128> X{
+			UInt128(State[ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+			UInt128(Counter, 0),
+			UInt128(Counter, 4),
+			UInt128(State[++ctr]),
+			UInt128(State[++ctr]),
+		};
+
+		ctr = Rounds;
+		while (ctr != 0)
+		{
+			X[0] += X[4];
+			X[12] = UInt128::Rotl32(X[12] ^ X[0], 16);
+			X[8] += X[12];
+			X[4] = UInt128::Rotl32(X[4] ^ X[8], 12);
+			X[0] += X[4];
+			X[12] = UInt128::Rotl32(X[12] ^ X[0], 8);
+			X[8] += X[12];
+			X[4] = UInt128::Rotl32(X[4] ^ X[8], 7);
+			X[1] += X[5];
+			X[13] = UInt128::Rotl32(X[13] ^ X[1], 16);
+			X[9] += X[13];
+			X[5] = UInt128::Rotl32(X[5] ^ X[9], 12);
+			X[1] += X[5];
+			X[13] = UInt128::Rotl32(X[13] ^ X[1], 8);
+			X[9] += X[13];
+			X[5] = UInt128::Rotl32(X[5] ^ X[9], 7);
+			X[2] += X[6];
+			X[14] = UInt128::Rotl32(X[14] ^ X[2], 16);
+			X[10] += X[14];
+			X[6] = UInt128::Rotl32(X[6] ^ X[10], 12);
+			X[2] += X[6];
+			X[14] = UInt128::Rotl32(X[14] ^ X[2], 8);
+			X[10] += X[14];
+			X[6] = UInt128::Rotl32(X[6] ^ X[10], 7);
+			X[3] += X[7];
+			X[15] = UInt128::Rotl32(X[15] ^ X[3], 16);
+			X[11] += X[15];
+			X[7] = UInt128::Rotl32(X[7] ^ X[11], 12);
+			X[3] += X[7];
+			X[15] = UInt128::Rotl32(X[15] ^ X[3], 8);
+			X[11] += X[15];
+			X[7] = UInt128::Rotl32(X[7] ^ X[11], 7);
+			X[0] += X[5];
+			X[15] = UInt128::Rotl32(X[15] ^ X[0], 16);
+			X[10] += X[15];
+			X[5] = UInt128::Rotl32(X[5] ^ X[10], 12);
+			X[0] += X[5];
+			X[15] = UInt128::Rotl32(X[15] ^ X[0], 8);
+			X[10] += X[15];
+			X[5] = UInt128::Rotl32(X[5] ^ X[10], 7);
+			X[1] += X[6];
+			X[12] = UInt128::Rotl32(X[12] ^ X[1], 16);
+			X[11] += X[12];
+			X[6] = UInt128::Rotl32(X[6] ^ X[11], 12);
+			X[1] += X[6];
+			X[12] = UInt128::Rotl32(X[12] ^ X[1], 8);
+			X[11] += X[12];
+			X[6] = UInt128::Rotl32(X[6] ^ X[11], 7);
+			X[2] += X[7];
+			X[13] = UInt128::Rotl32(X[13] ^ X[2], 16);
+			X[8] += X[13];
+			X[7] = UInt128::Rotl32(X[7] ^ X[8], 12);
+			X[2] += X[7];
+			X[13] = UInt128::Rotl32(X[13] ^ X[2], 8);
+			X[8] += X[13];
+			X[7] = UInt128::Rotl32(X[7] ^ X[8], 7);
+			X[3] += X[4];
+			X[14] = UInt128::Rotl32(X[14] ^ X[3], 16);
+			X[9] += X[14];
+			X[4] = UInt128::Rotl32(X[4] ^ X[9], 12);
+			X[3] += X[4];
+			X[14] = UInt128::Rotl32(X[14] ^ X[3], 8);
+			X[9] += X[14];
+			X[4] = UInt128::Rotl32(X[4] ^ X[9], 7);
+			ctr -= 2;
+		}
+
+		// last round
+		X[0] += UInt128(State[ctr]);
+		X[1] += UInt128(State[++ctr]);
+		X[2] += UInt128(State[++ctr]);
+		X[3] += UInt128(State[++ctr]);
+		X[4] += UInt128(State[++ctr]);
+		X[5] += UInt128(State[++ctr]);
+		X[6] += UInt128(State[++ctr]);
+		X[7] += UInt128(State[++ctr]);
+		X[8] += UInt128(State[++ctr]);
+		X[9] += UInt128(State[++ctr]);
+		X[10] += UInt128(State[++ctr]);
+		X[11] += UInt128(State[++ctr]);
+		X[12] += UInt128(Counter, 0);
+		X[13] += UInt128(Counter, 4);
+		X[14] += UInt128(State[++ctr]);
+		X[15] += UInt128(State[++ctr]);
+
+		UInt128::StoreLE256(X, 0, Output, OutOffset);
 	}
 
-	//~~~Public Methods~~~//
+	static void Transform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
+	{
+		size_t ctr = 0;
+		std::vector<UInt256> X{
+			UInt256(State[ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+			UInt256(Counter, 0),
+			UInt256(Counter, 8),
+			UInt256(State[++ctr]),
+			UInt256(State[++ctr]),
+		};
 
-	/// <summary>
-	/// Destroy of this class
-	/// </summary>
-	virtual void Destroy();
+		ctr = Rounds;
+		while (ctr != 0)
+		{
+			X[0] += X[4];
+			X[12] = UInt256::Rotl32(X[12] ^ X[0], 16);
+			X[8] += X[12];
+			X[4] = UInt256::Rotl32(X[4] ^ X[8], 12);
+			X[0] += X[4];
+			X[12] = UInt256::Rotl32(X[12] ^ X[0], 8);
+			X[8] += X[12];
+			X[4] = UInt256::Rotl32(X[4] ^ X[8], 7);
+			X[1] += X[5];
+			X[13] = UInt256::Rotl32(X[13] ^ X[1], 16);
+			X[9] += X[13];
+			X[5] = UInt256::Rotl32(X[5] ^ X[9], 12);
+			X[1] += X[5];
+			X[13] = UInt256::Rotl32(X[13] ^ X[1], 8);
+			X[9] += X[13];
+			X[5] = UInt256::Rotl32(X[5] ^ X[9], 7);
+			X[2] += X[6];
+			X[14] = UInt256::Rotl32(X[14] ^ X[2], 16);
+			X[10] += X[14];
+			X[6] = UInt256::Rotl32(X[6] ^ X[10], 12);
+			X[2] += X[6];
+			X[14] = UInt256::Rotl32(X[14] ^ X[2], 8);
+			X[10] += X[14];
+			X[6] = UInt256::Rotl32(X[6] ^ X[10], 7);
+			X[3] += X[7];
+			X[15] = UInt256::Rotl32(X[15] ^ X[3], 16);
+			X[11] += X[15];
+			X[7] = UInt256::Rotl32(X[7] ^ X[11], 12);
+			X[3] += X[7];
+			X[15] = UInt256::Rotl32(X[15] ^ X[3], 8);
+			X[11] += X[15];
+			X[7] = UInt256::Rotl32(X[7] ^ X[11], 7);
+			X[0] += X[5];
+			X[15] = UInt256::Rotl32(X[15] ^ X[0], 16);
+			X[10] += X[15];
+			X[5] = UInt256::Rotl32(X[5] ^ X[10], 12);
+			X[0] += X[5];
+			X[15] = UInt256::Rotl32(X[15] ^ X[0], 8);
+			X[10] += X[15];
+			X[5] = UInt256::Rotl32(X[5] ^ X[10], 7);
+			X[1] += X[6];
+			X[12] = UInt256::Rotl32(X[12] ^ X[1], 16);
+			X[11] += X[12];
+			X[6] = UInt256::Rotl32(X[6] ^ X[11], 12);
+			X[1] += X[6];
+			X[12] = UInt256::Rotl32(X[12] ^ X[1], 8);
+			X[11] += X[12];
+			X[6] = UInt256::Rotl32(X[6] ^ X[11], 7);
+			X[2] += X[7];
+			X[13] = UInt256::Rotl32(X[13] ^ X[2], 16);
+			X[8] += X[13];
+			X[7] = UInt256::Rotl32(X[7] ^ X[8], 12);
+			X[2] += X[7];
+			X[13] = UInt256::Rotl32(X[13] ^ X[2], 8);
+			X[8] += X[13];
+			X[7] = UInt256::Rotl32(X[7] ^ X[8], 7);
+			X[3] += X[4];
+			X[14] = UInt256::Rotl32(X[14] ^ X[3], 16);
+			X[9] += X[14];
+			X[4] = UInt256::Rotl32(X[4] ^ X[9], 12);
+			X[3] += X[4];
+			X[14] = UInt256::Rotl32(X[14] ^ X[3], 8);
+			X[9] += X[14];
+			X[4] = UInt256::Rotl32(X[4] ^ X[9], 7);
+			ctr -= 2;
+		}
 
-	/// <summary>
-	/// Initialize the Cipher
-	/// </summary>
-	/// 
-	/// <param name="KeyParam">Cipher key container. 
-	/// <para>Uses the Key and IV fields of KeyParam. The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
-	/// The IV must be 8 bytes in size.</para>
-	/// </param>
-	virtual void Initialize(const KeyParams &KeyParam);
+		// last round
+		X[0] += UInt256(State[ctr]);
+		X[1] += UInt256(State[++ctr]);
+		X[2] += UInt256(State[++ctr]);
+		X[3] += UInt256(State[++ctr]);
+		X[4] += UInt256(State[++ctr]);
+		X[5] += UInt256(State[++ctr]);
+		X[6] += UInt256(State[++ctr]);
+		X[7] += UInt256(State[++ctr]);
+		X[8] += UInt256(State[++ctr]);
+		X[9] += UInt256(State[++ctr]);
+		X[10] += UInt256(State[++ctr]);
+		X[11] += UInt256(State[++ctr]);
+		X[12] += UInt256(Counter, 0);
+		X[13] += UInt256(Counter, 8);
+		X[14] += UInt256(State[++ctr]);
+		X[15] += UInt256(State[++ctr]);
 
-	/// <summary>
-	/// Set the maximum number of threads allocated when using multi-threaded processing.
-	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
-	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
-	/// </summary>
-	///
-	/// <param name="Degree">The desired number of threads</param>
-	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
-	virtual void ParallelMaxDegree(size_t Degree);
-
-	/// <summary>
-	/// Reset the primary internal counter
-	/// </summary>
-	virtual void Reset();
-
-	/// <summary>
-	/// Encrypt/Decrypt an array of bytes.
-	/// <para><see cref="Initialize(KeyParams)"/> must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">Input bytes, plain text for encryption, cipher text for decryption</param>
-	/// <param name="Output">Output bytes, array of at least equal size of input that receives processed bytes</param>
-	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Encrypt/Decrypt an array of bytes with offset parameters.
-	/// <para><see cref="Initialize(KeyParams)"/> must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
-	/// <para><see cref="Initialize(KeyParams)"/> must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Output product of Transform</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
-	/// <param name="Length">Number of bytes to process</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-
-private:
-	void Detect();
-	void Expand(const std::vector<byte> &Key, const std::vector<byte> &Iv);
-	void Generate(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter, const size_t Length);
-	void Increase(const std::vector<uint> &Input, std::vector<uint> &Output, const size_t Length);
-	void Increment(std::vector<uint> &Counter);
-	void Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
-	void Scope();
-	void Transform64(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter);
-	void Transform256(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
-	void Transform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter);
+		UInt256::StoreLE512(X, 0, Output, OutOffset);
+	}
 };
 
 NAMESPACE_STREAMEND
 #endif
-

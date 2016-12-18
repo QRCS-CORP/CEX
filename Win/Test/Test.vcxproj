@@ -162,6 +162,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="..\..\Test\Diehard Results\100mb\cjp100.txt" />
+    <Text Include="..\..\Test\Diehard Results\100mb\cmg100.txt" />
+    <Text Include="..\..\Test\Diehard Results\100mb\csp100.txt" />
+    <Text Include="..\..\Test\Diehard Results\100mb\dcg100.txt" />
+    <Text Include="..\..\Test\Diehard Results\100mb\ecp100.txt" />
+    <Text Include="..\..\Test\Diehard Results\100mb\hmg100.txt" />
+    <Text Include="..\..\Test\Diehard Results\100mb\rdp100.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\cjp10.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\cmg10.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\csp10.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\dcg10.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\ecp10.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\hmg10.txt" />
+    <Text Include="..\..\Test\Diehard Results\10mb\rdp10.txt" />
+    <Text Include="..\..\Test\NistStsResults.txt" />
     <Text Include="..\Vectors\AESAVS\keyvect128.txt">
       <DeploymentContent>false</DeploymentContent>
     </Text>
@@ -206,27 +221,29 @@
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\AesFipsTest.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
-    <ClInclude Include="..\..\Test\BlakeTest.h" />
     <ClInclude Include="..\..\Test\ChaChaTest.h" />
     <ClInclude Include="..\..\Test\CipherModeTest.h" />
     <ClInclude Include="..\..\Test\CMACTest.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
-    <ClInclude Include="..\..\Test\CTRDrbgTest.h" />
+    <ClInclude Include="..\..\Test\CMGTest.h" />
+    <ClInclude Include="..\..\Test\DCGTest.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\HMACTest.h" />
-    <ClInclude Include="..\..\Test\ISCRsgTest.h" />
-    <ClInclude Include="..\..\Test\KeyFactoryTest.h" />
+    <ClInclude Include="..\..\Test\HMGTest.h" />
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
-    <ClInclude Include="..\..\Test\SP20DrbgTest.h" />
+    <ClInclude Include="..\..\Test\RandomOutputTest.h" />
+    <ClInclude Include="..\..\Test\SecureStreamTest.h" />
+    <ClInclude Include="..\..\Test\SymmetricKeyGeneratorTest.h" />
+    <ClInclude Include="..\..\Test\SymmetricKeyTest.h" />
     <ClInclude Include="..\..\Test\TestEventHandler.h" />
     <ClInclude Include="..\..\Test\TestEvent.h" />
     <ClInclude Include="..\..\Test\HexConverter.h" />
     <ClInclude Include="..\..\Test\HXCipherTest.h" />
     <ClInclude Include="..\..\Test\ITest.h" />
-    <ClInclude Include="..\..\Test\KDF2DrbgTest.h" />
+    <ClInclude Include="..\..\Test\KDF2Test.h" />
     <ClInclude Include="..\..\Test\KeccakTest.h" />
     <ClInclude Include="..\..\Test\ParallelModeTest.h" />
     <ClInclude Include="..\..\Test\PBKDF2Test.h" />
@@ -243,43 +260,41 @@
     <ClInclude Include="..\..\Test\TestFiles.h" />
     <ClInclude Include="..\..\Test\TestUtils.h" />
     <ClInclude Include="..\..\Test\TwofishTest.h" />
-    <ClInclude Include="..\..\Test\VMACTest.h" />
-    <ClInclude Include="..\..\Test\XSPRsgTest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\AesFipsTest.cpp" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
-    <ClCompile Include="..\..\Test\BlakeTest.cpp" />
     <ClCompile Include="..\..\Test\ChaChaTest.cpp" />
     <ClCompile Include="..\..\Test\CipherModeTest.cpp" />
     <ClCompile Include="..\..\Test\CipherStreamTest.cpp" />
     <ClCompile Include="..\..\Test\CMACTest.cpp" />
-    <ClCompile Include="..\..\Test\CTRDrbgTest.cpp" />
+    <ClCompile Include="..\..\Test\CMGTest.cpp" />
+    <ClCompile Include="..\..\Test\DCGTest.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp" />
     <ClCompile Include="..\..\Test\HKDFTest.cpp" />
     <ClCompile Include="..\..\Test\HMACTest.cpp" />
+    <ClCompile Include="..\..\Test\HMGTest.cpp" />
     <ClCompile Include="..\..\Test\HXCipherTest.cpp" />
-    <ClCompile Include="..\..\Test\ISCRsgTest.cpp" />
-    <ClCompile Include="..\..\Test\KDF2DrbgTest.cpp" />
+    <ClCompile Include="..\..\Test\KDF2Test.cpp" />
     <ClCompile Include="..\..\Test\KeccakTest.cpp" />
-    <ClCompile Include="..\..\Test\KeyFactoryTest.cpp" />
     <ClCompile Include="..\..\Test\MacStreamTest.cpp" />
     <ClCompile Include="..\..\Test\PaddingTest.cpp" />
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
+    <ClCompile Include="..\..\Test\RandomOutputTest.cpp" />
     <ClCompile Include="..\..\Test\RangedRngTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\SalsaTest.cpp" />
+    <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />
     <ClCompile Include="..\..\Test\SerpentTest.cpp" />
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />
-    <ClCompile Include="..\..\Test\SP20DrbgTest.cpp" />
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\SymmetricKeyGeneratorTest.cpp" />
+    <ClCompile Include="..\..\Test\SymmetricKeyTest.cpp" />
     <ClCompile Include="..\..\Test\TwofishTest.cpp" />
-    <ClCompile Include="..\..\Test\VMACTest.cpp" />
-    <ClCompile Include="..\..\Test\XSPRsgTest.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,15 +1,9 @@
 #include "ECB.h"
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_MODE
-
-using CEX::Helper::BlockCipherFromName;
-using CEX::Common::CpuDetect;
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
 
 //~~~Public Methods~~~//
 
@@ -48,36 +42,32 @@ void ECB::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_cipherType = BlockCiphers::None;
+		m_hasAVX2 = false;
+		m_hasSSE = false;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
+		m_parallelMaxDegree = 0;
+		m_parallelMinimumSize = 0;
+		m_processorCount = 0;
+		m_wideBlock = false;
 
 		try
 		{
 			if (m_destroyEngine)
 			{
+				m_destroyEngine = false;
+
 				if (m_blockCipher != 0)
 					delete m_blockCipher;
 			}
-			m_blockSize = 0;
-			m_destroyEngine = false;
-			m_hasAVX = false;
-			m_hasSSE = false;
-			m_destroyEngine = false;
-			m_blockSize = 0;
-			m_isEncryption = false;
-			m_isInitialized = false;
-			m_isParallel = false;
-			m_parallelBlockSize = 0;
-			m_parallelMinimumSize = 0;
-			m_processorCount = 0;
-			m_wideBlock = false;
 		}
-		catch (...) 
+		catch(std::exception& ex) 
 		{
-#if defined(DEBUGASSERT_ENABLED)
-			assert("ECB::Destroy: Could not clear all variables!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CryptoCipherModeException("ECB::Destroy", "Could not clear all variables!");
-#endif
+			throw CryptoCipherModeException("ECB:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
@@ -112,28 +102,18 @@ void ECB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
 }
 
-void ECB::Initialize(bool Encryption, const KeyParams &KeyParam)
+void ECB::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	if (KeyParam.IV().size() == 64)
-		assert(HasSSE());
-	if (KeyParam.IV().size() == 128)
-		assert(HasAVX());
-	assert(KeyParam.Key().size() > 15);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (KeyParam.IV().size() == 64 && !HasSSE())
-		throw CryptoSymmetricCipherException("ECB:Initialize", "SSE 128bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() == 128 && !HasAVX())
-		throw CryptoSymmetricCipherException("ECB:Initialize", "AVX 256bit intrinsics are not available on this system!");
-	if (KeyParam.Key().size() < 16)
-		throw CryptoSymmetricCipherException("ECB:Initialize", "Requires a minimum 16 bytes of Key!");
-#endif
+	// recheck params
+	Scope();
+
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParam.Key().size()))
+		throw CryptoSymmetricCipherException("ECB:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 
 	// iv is used only to trigger WBV
-	if (KeyParam.IV().size() == 64 || KeyParam.IV().size() == 128)
+	if (KeyParam.Nonce().size() == 64 || KeyParam.Nonce().size() == 128)
 	{
-		m_blockSize = KeyParam.IV().size();
+		m_blockSize = KeyParam.Nonce().size();
 		m_wideBlock = true;
 	}
 
@@ -144,19 +124,12 @@ void ECB::Initialize(bool Encryption, const KeyParams &KeyParam)
 
 void ECB::ParallelMaxDegree(size_t Degree)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	assert(Degree != 0);
-	assert(Degree % 2 == 0);
-	assert(Degree <= m_processorCount);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Degree == 0)
 		throw CryptoCipherModeException("ECB:ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
 		throw CryptoCipherModeException("ECB:ParallelMaxDegree", "Parallel degree must be an even number!");
 	if (Degree > m_processorCount)
 		throw CryptoCipherModeException("ECB:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
-#endif
 
 	m_parallelMaxDegree = Degree;
 	Scope();
@@ -164,7 +137,7 @@ void ECB::ParallelMaxDegree(size_t Degree)
 
 void ECB::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	m_blockCipher->Transform(Input, 0, Output, 0);
+	Transform(Input, 0, Output, 0);
 }
 
 void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -249,50 +222,31 @@ void ECB::Detect()
 {
 	try
 	{
-		CpuDetect detect;
-		m_hasSSE = detect.HasMinIntrinsics();
-		m_hasAVX = detect.HasAVX();
-		m_parallelBlockSize = detect.L1CacheSize * 1000;
+		Common::CpuDetect detect;
+		m_processorCount = detect.VirtualCores();
+		if (m_processorCount > 1 && m_processorCount % 2 != 0)
+			m_processorCount--;
+
+		m_parallelBlockSize = detect.L1DataCacheTotal();
+		if (m_parallelBlockSize == 0 || m_processorCount == 0)
+			throw std::exception();
+
+		m_hasSSE = detect.SSE();
+		m_hasAVX2 = detect.AVX2();
 	}
 	catch (...)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert("CpuDetect not compatable!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoCipherModeException("ECB:Detect", "CpuDetect not compatable!");
-#endif
+		m_processorCount = Utility::ParallelUtils::ProcessorCount();
+
+		if (m_processorCount == 0)
+			m_processorCount = 1;
+		if (m_processorCount > 1 && m_processorCount % 2 != 0)
+			m_processorCount--;
+
 		m_hasSSE = false;
-		m_hasAVX = false;
-		m_parallelBlockSize = PARALLEL_DEFBLOCK;
+		m_hasAVX2 = false;
+		m_parallelBlockSize = m_processorCount * PRC_DATACACHE;
 	}
-}
-
-IBlockCipher* ECB::GetCipher(BlockCiphers CipherType)
-{
-	try
-	{
-		return BlockCipherFromName::GetInstance(CipherType);
-	}
-	catch (...)
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoSymmetricCipherException("ECB:GetCipher", "The block cipher could not be instantiated!");
-#else
-		return 0;
-#endif
-	}
-}
-
-void ECB::TransformParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	const size_t SEGSZE = m_parallelBlockSize / m_parallelMaxDegree;
-	const size_t BLKCNT = (SEGSZE / m_blockSize);
-
-	ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, SEGSZE, BLKCNT](size_t i)
-	{
-		this->Generate(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, BLKCNT);
-	});
 }
 
 void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, const size_t BlockCount)
@@ -327,7 +281,7 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 	}
 	else
 	{
-		if (m_hasAVX && blkCtr > 7)
+		if (m_hasAVX2 && blkCtr > 7)
 		{
 			// 256bit avx
 			const size_t AVXBLK = 128;
@@ -361,7 +315,7 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 
 		while (blkCtr != 0)
 		{
-			m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
+			m_blockCipher->Transform(Input, InOffset, Output, OutOffset);
 			InOffset += m_blockSize;
 			OutOffset += m_blockSize;
 			--blkCtr;
@@ -369,41 +323,63 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 	}
 }
 
+IBlockCipher* ECB::LoadCipher(BlockCiphers CipherType)
+{
+	try
+	{
+		return Helper::BlockCipherFromName::GetInstance(CipherType);
+	}
+	catch(std::exception& ex)
+	{
+		throw CryptoSymmetricCipherException("ECB:LoadCipher", "The block cipher could not be instantiated!", std::string(ex.what()));
+	}
+}
+
+void ECB::LoadState()
+{
+	if (m_blockCipher == 0)
+	{
+		m_blockCipher = LoadCipher(m_cipherType);
+		m_blockSize = m_blockCipher->BlockSize();
+	}
+
+	Detect();
+	Scope();
+}
+
 void ECB::Scope()
 {
-	Detect();
-	m_processorCount = ParallelUtils::ProcessorCount();
-
 	if (m_parallelMaxDegree == 1)
-	{
 		m_isParallel = false;
-	}
-	else
-	{
-		if (m_processorCount % 2 != 0)
-			m_processorCount--;
-		if (m_processorCount > 1)
-			m_isParallel = true;
-	}
+	else if (!m_isInitialized)
+		m_isParallel = (m_processorCount > 1);
 
 	if (m_parallelMaxDegree == 0)
 		m_parallelMaxDegree = m_processorCount;
 
-	if (m_isParallel)
+	m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
+
+	if (m_hasAVX2)
+		m_parallelMinimumSize *= 8;
+	else if (m_hasSSE)
+		m_parallelMinimumSize *= 4;
+
+	// 16 kb minimum
+	if (m_parallelBlockSize == 0 || m_parallelBlockSize < PRC_DATACACHE)
+		m_parallelBlockSize = (m_parallelMaxDegree * PRC_DATACACHE) - ((m_parallelMaxDegree * PRC_DATACACHE) % m_parallelMinimumSize);
+	else
+		m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
+}
+
+void ECB::TransformParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	const size_t SEGSZE = m_parallelBlockSize / m_parallelMaxDegree;
+	const size_t BLKCNT = (SEGSZE / m_blockSize);
+
+	Utility::ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, SEGSZE, BLKCNT](size_t i)
 	{
-		m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
-
-		if (m_hasAVX)
-			m_parallelMinimumSize *= 8;
-		else if (m_hasSSE)
-			m_parallelMinimumSize *= 4;
-
-		// 16 kb minimum
-		if (m_parallelBlockSize == 0 || m_parallelBlockSize < PARALLEL_DEFBLOCK / 4)
-			m_parallelBlockSize = PARALLEL_DEFBLOCK - (PARALLEL_DEFBLOCK % m_parallelMinimumSize);
-		else
-			m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
-	}
+		this->Generate(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, BLKCNT);
+	});
 }
 
 NAMESPACE_MODEEND

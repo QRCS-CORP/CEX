@@ -3,6 +3,8 @@
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string RijndaelTest::Run()
 	{
 		try
@@ -16,9 +18,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -30,20 +32,20 @@ namespace Test
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		std::vector<byte> outBytes2(Input.size(), 0);
-		CEX::Cipher::Symmetric::Block::RHX engine((unsigned int)Input.size());
-		CEX::Common::KeyParams k(Key);
+		RHX engine(Digests::None, 14, Input.size());
+		Key::Symmetric::SymmetricKey k(Key);
 
 		engine.Initialize(true, k);
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("RijndaelTest: Encrypted arrays are not equal!");
+			throw std::exception("RijndaelTest: Encrypted arrays are not equal!");
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::string("RijndaelTest: Decrypted arrays are not equal!");
+			throw std::exception("RijndaelTest: Decrypted arrays are not equal!");
 	}
 
 	void RijndaelTest::Initialize()

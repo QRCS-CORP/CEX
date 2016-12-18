@@ -1,46 +1,39 @@
-﻿// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEXENGINE_ICIPHERMODE_H
-#define _CEXENGINE_ICIPHERMODE_H
+#ifndef _CEX_ICIPHERMODE_H
+#define _CEX_ICIPHERMODE_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "BlockCiphers.h"
 #include "CipherModes.h"
 #include "IBlockCipher.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoCipherModeException.h"
-#endif
+#include "CryptoCipherModeException.h"
+#include "SymmetricKeySize.h"
 
 NAMESPACE_MODE
 
-using CEX::Enumeration::BlockCiphers;
-using CEX::Enumeration::CipherModes; 
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
-using CEX::Common::KeyParams;
-#if defined(CPPEXCEPTIONS_ENABLED)
-	using CEX::Exception::CryptoCipherModeException;
-#endif
+using Enumeration::BlockCiphers;
+using Enumeration::CipherModes; 
+using Exception::CryptoCipherModeException;
+using Block::IBlockCipher;
+using Key::Symmetric::ISymmetricKey;
+using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
 /// Cipher mode virtual interface class.
@@ -74,6 +67,11 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
+	/// Get: The block ciphers formal type name
+	/// </summary>
+	virtual BlockCiphers CipherType() = 0;
+
+	/// <summary>
 	/// Get: The underlying Block Cipher instance
 	/// </summary>
 	virtual IBlockCipher* Engine() = 0;
@@ -86,7 +84,7 @@ public:
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
 	/// </summary>
-	virtual const bool HasAVX() = 0;
+	virtual const bool HasAVX2() = 0;
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports SIMD intrinsics
@@ -109,19 +107,14 @@ public:
 	virtual bool &IsParallel() = 0;
 
 	/// <summary>
-	/// Get: The current state of the Initialization Vector
-	/// </summary>
-	virtual const std::vector<byte> &IV() = 0;
-
-	/// <summary>
 	/// Get: Array of valid encryption key byte lengths
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() = 0;
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Get: The Cipher Mode name
+	/// Get: The cipher mode name
 	/// </summary>
-	virtual const char* Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>
@@ -156,8 +149,8 @@ public:
 	/// </summary>
 	///
 	/// <param name="Encryption">True if cipher is used for encryption, false to decrypt</param>
-	/// <param name="KeyParam">The KeyParams containing key and vector</param>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam) = 0;
+	/// <param name="KeyParam">The SymmetricKey containing key and vector</param>
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes. 

@@ -1,49 +1,45 @@
-﻿// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-// 
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
+//
 // Implementation Details:
 // An implementation of an integer Counter Mode (ICM).
 // Written by John Underhill, September 24, 2014
 // Updated September 16, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_ICM_H
-#define _CEXENGINE_ICM_H
+#ifndef _CEX_ICM_H
+#define _CEX_ICM_H
 
 #include "ICipherMode.h"
 
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements a Little Endian Integer Counter Mode: ICM
+/// Implements a Little Endian Integer Counter Mode (ICM)
 /// </summary> 
 /// 
 /// <example>
 /// <description>Encrypting a single block of bytes:</description>
 /// <code>
-/// ICM cipher(new AHX());
+/// ICM cipher(BlockCiphers::AHX);
 /// // initialize for encryption
-/// cipher.Initialize(true, KeyParams(Key, IV));
+/// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one block
 /// cipher.EncryptBlock(Input, 0, Output, 0);
 /// </code>
@@ -56,37 +52,33 @@ NAMESPACE_MODE
 /// // enable parallel and define parallel input block size
 /// cipher.IsParallel() = true;
 /// // calculated automatically based on cache size, but overridable
-/// cipher.ParallelBlockSize() = ProcessorCount() * 32000;
+/// cipher.ParallelBlockSize() = cipher.ProcessorCount() * 32000;
 /// // initialize for encryption
-/// cipher.Initialize(true, KeyParams(Key, IV));
+/// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one parallel sized block
 /// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="CEX::Enumeration::BlockCiphers"/><BR>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
-/// 
-/// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The ICM Counter mode generates a key-stream by encrypting successive values of an incrementing Little Endian ordered 64bit integer counter array.<BR>
-/// The key-stream is then XOR'd with the input message block creating a type of stream cipher.<BR>
-/// The ICM counter mode differs from a standard CTR mode by using a little endian byte ordered counter, allowing the use of 64 bit integers in the counter array.<BR>
-/// The trend in processors is moving towards little endian format, and with devices that use this bit ordering, ICM can be significantly faster then the standard big endian CTR implementation.<BR>
-/// In parallel mode, the ICM modes counter is increased by a number factored from the number of input blocks, allowing for a multi-threaded operation.<BR>
-/// The implementation is further parallelized by constructing a larger 'staggered' counter array, and processing large blocks using 128 or 256 SIMD instructions.</para>
+/// <para>The ICM Counter mode generates a key-stream by encrypting successive values of an incrementing Little Endian ordered 64bit integer counter array.<br>
+/// The key-stream is then XOR'd with the input message block creating a type of stream cipher.<br>
+/// The ICM counter mode differs from the standard CTR mode by using a little endian byte ordered counter, allowing the use of 64 bit integers in the counter array on an LE based architecture (e.g AMD, Intel).<br>
+/// The trend in processors is moving towards little endian format, and with devices that use this bit ordering, ICM can be significantly faster then the standard big endian CTR implementation.<br>
+/// In parallel mode, the ICM modes counter is increased by a number factored from the number of message blocks (ParallelBlockSize), allowing for counter pre-calculation and multi-threaded processing.<br>
+/// The implementation is further parallelized by constructing a 'staggered' counter array, and processing large sub-blocks using 128 or 256 SIMD instructions through the ciphers Transform-64/128 SIMD methods.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR> 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>^<B/>=XOR<BR><BR>
-/// <EM>Encryption</EM><BR>
-/// C0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj) ^ Pj, C+1.<BR>
+/// <para><EM>Legend:</EM><br> 
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>^</B>=XOR<br>
+/// <EM>Encryption</EM><br>
+/// C0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj) ^ Pj, C+1.</para><br>
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The transformation function of the ICM mode is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded.
-/// Output from the parallelized functions aligns with the output from a standard sequential ICM implementation.<BR>
-/// This is acheived by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads.<BR> 
+/// Output from the parallelized functions aligns with the output from a standard sequential ICM implementation.<br>
+/// This is acheived by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads.<br> 
 /// The key stream generated by encrypting the counter array(s), is used as a source of random, and XOR'd with the message input to produce the cipher text.</para>
 ///
 /// <description>Implementation Notes:</description>
@@ -96,11 +88,11 @@ NAMESPACE_MODE
 /// <item><description>A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
 /// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
 /// <item><description>The EncryptBlock function can only be accessed through the class instance.</description></item>
-/// <item><description>The transformation methods can not be called until the the Initialize(bool, KeyParams) function has been called.</description></item>
+/// <item><description>The transformation methods can not be called until the Initialize(bool, SymmetricKey) function has been called.</description></item>
 /// <item><description>Parallel processing is enabled by setting IsParallel() to true, and passing an input block of ParallelBlockSize() to the transform.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
-/// <item><description>ParallelBlockSize() is calculated automatically based on processor(s) cache size but can be user defined, but must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = (data.size() / cipher.ParallelMinimumSize()) * 40</c></description></item>
+/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
+/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = data.size() - (data.size() % cipher.ParallelMinimumSize());</c></description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -112,31 +104,32 @@ NAMESPACE_MODE
 class ICM : public ICipherMode
 {
 private:
-	static constexpr size_t BLOCK_SIZE = 16;
-	static constexpr size_t MAXALLOC_MB100 = 100000000;
-	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
+
+	const size_t BLOCK_SIZE = 16;
+	const size_t MAX_PRLALLOC = 100000000;
+	const size_t PRC_DATACACHE = 32000;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
+	BlockCiphers m_cipherType;
 	std::vector<ulong> m_ctrVector;
-	std::vector<byte> m_ctrPublic;
 	bool m_destroyEngine;
-	bool m_hasAVX;
+	bool m_hasAVX2;
 	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	bool m_isParallel;
 	size_t m_parallelBlockSize;
-	size_t m_parallelMinimumSize;
 	size_t m_parallelMaxDegree;
+	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 
-	ICM() = delete;
+public:
+
 	ICM(const ICM&) = delete;
 	ICM& operator=(const ICM&) = delete;
-
-public:
+	ICM& operator=(ICM&&) = delete;
 
 	//~~~Properties~~~//
 
@@ -144,6 +137,11 @@ public:
 	/// Get: Block size of internal cipher in bytes
 	/// </summary>
 	virtual const size_t BlockSize() { return m_blockSize; }
+
+	/// <summary>
+	/// Get: The block ciphers formal type name
+	/// </summary>
+	virtual BlockCiphers CipherType() { return m_cipherType; }
 
 	/// <summary>
 	/// Get: The underlying Block Cipher instance
@@ -158,10 +156,10 @@ public:
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
 	/// </summary>
-	virtual const bool HasAVX() { return m_hasAVX; }
+	virtual const bool HasAVX2() { return m_hasAVX2; }
 
 	/// <summary>
-	/// Get: Returns True if the cipher supports SSE2 SIMD intrinsics
+	/// Get: Returns True if the cipher supports SSE SIMD intrinsics
 	/// </summary>
 	virtual const bool HasSSE() { return m_hasSSE; }
 
@@ -181,33 +179,25 @@ public:
 	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
-	/// Get: The current state of the Initialization Vector
-	/// </summary>
-	virtual const std::vector<byte> &IV() 
-	{ 
-		memcpy(&m_ctrPublic[0], &m_ctrVector[0], BLOCK_SIZE);
-		return m_ctrPublic;
-	}
-
-	/// <summary>
 	/// Get: Array of valid encryption key byte lengths
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return m_blockCipher->LegalKeySizes(); }
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_blockCipher->LegalKeySizes(); }
 
 	/// <summary>
-	/// Get: The Cipher Mode name
+	/// Get: The cipher mode name
 	/// </summary>
-	virtual const char* Name() { return "ICM"; }
+	virtual const std::string Name() { return "ICM"; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>
+	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, SymmetricKey)"/> function is called.</para>
 	/// </summary>
 	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input block byte length when using multi-threaded processing
 	/// </summary>
-	virtual const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
+	virtual const size_t ParallelMaximumSize() { return MAX_PRLALLOC; }
 
 	/// <summary>
 	/// Get: The smallest valid input block byte length, when using multi-threaded processing; parallel blocks must be a multiple of this size
@@ -215,9 +205,10 @@ public:
 	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
 	/// <summary>
-	/// Get: The maximum number of threads allocated when using multi-threaded processing
+	/// Get/Set: The maximum number of threads allocated when using multi-threaded processing.
+	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	const size_t ParallelThreadsMax() { return m_parallelMaxDegree; }
+	size_t &ParallelThreadsMax() { return m_parallelMaxDegree; }
 
 	/// <summary>
 	/// Get: Available system processor core count
@@ -232,13 +223,15 @@ public:
 	///
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null block cipher type is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
 	explicit ICM(BlockCiphers CipherType)
 		:
-		m_ctrPublic(16, 0),
-		m_ctrVector(2, 0),
+		m_blockCipher(0),
+		m_blockSize(0),
+		m_cipherType(CipherType),
+		m_ctrVector(2),
 		m_destroyEngine(true),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isEncryption(false),
@@ -247,19 +240,12 @@ public:
 		m_parallelBlockSize(0),
 		m_parallelMaxDegree(0),
 		m_parallelMinimumSize(0),
-		m_processorCount(1)
+		m_processorCount(0)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert((uint)CipherType != 0);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if ((uint)CipherType == 0)
+		if (m_cipherType == BlockCiphers::None)
 			throw CryptoCipherModeException("ICM:CTor", "The Cipher type can not be zero!");
-#endif
 
-		m_blockCipher = GetCipher(CipherType);
-		m_blockSize = m_blockCipher->BlockSize();
-		Scope();
+		LoadState();
 	}
 
 	/// <summary>
@@ -268,37 +254,31 @@ public:
 	///
 	/// <param name="Cipher">The uninitialized block cipher instance; can not be null</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null block cipher is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null block cipher is used</exception>
 	explicit ICM(IBlockCipher* Cipher)
 		:
 		m_blockCipher(Cipher),
 		m_blockSize(Cipher->BlockSize()),
-		m_ctrPublic(16, 0),
-		m_ctrVector(2, 0),
+		m_cipherType(Cipher->Enumeral()),
+		m_ctrVector(2),
 		m_destroyEngine(false),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isEncryption(false),
 		m_isInitialized(false),
 		m_isParallel(false),
-		m_parallelBlockSize(PARALLEL_DEFBLOCK),
+		m_parallelBlockSize(0),
 		m_parallelMaxDegree(0),
 		m_parallelMinimumSize(0),
-		m_processorCount(1)
+		m_processorCount(0)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert(Cipher != 0);
-		assert(Cipher->BlockSize() == 16);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (Cipher == 0)
+		if (m_blockCipher == 0)
 			throw CryptoCipherModeException("ICM:CTor", "The Cipher can not be null!");
-		if (Cipher->BlockSize() != 16)
+		if (m_blockCipher->BlockSize() != 16)
 			throw CryptoCipherModeException("ICM:CTor", "This mode only supports a 16 byte block size!");
-#endif
 
-		Scope();
+		LoadState();
 	}
 
 	/// <summary>
@@ -314,7 +294,7 @@ public:
 	/// <summary>
 	/// Encrypt a single block of bytes. 
 	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
@@ -324,7 +304,7 @@ public:
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
 	/// <para>Encrypts one block of bytes at the designated offsets.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
@@ -343,10 +323,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
-	/// <param name="KeyParam">KeyParams containing the encryption Key and Initialization Vector</param>
+	/// <param name="KeyParam">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
-	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or IV is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam);
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -356,20 +336,20 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
-	/// Process an array of bytes. 
+	/// Transform one block of bytes. 
 	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>. 
 	/// Method will process a single block from the array of either ParallelBlockSize or Blocksize depending on IsParallel property setting.
 	/// Partial blocks are permitted with both parallel and linear operation modes. 
 	/// If using this method, output and input arrays should be sized to ParallelBlockSize.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="Output">Output product of Transform</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="Output">The output array of transformed bytes</param>
 	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
@@ -377,34 +357,23 @@ public:
 	/// <para>Parallel capable function if Output array length is at least equal to <see cref="ParallelMinimumSize"/>. 
 	/// Method will process a single block from the array of either ParallelBlockSize or Blocksize depending on IsParallel property setting.
 	/// Partial blocks are permitted with both parallel and linear operation modes.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input bytes to Transform</param>
-	/// <param name="InOffset">Offset in the Input array</param>
-	/// <param name="Output">Transformed bytes</param>
-	/// <param name="OutOffset">Offset in the Output array</param>
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 private:
-	inline static void Increase(const std::vector<ulong> &Input, std::vector<ulong> &Output, const ulong Value)
-	{
-		memcpy(&Output[0], &Input[0], BLOCK_SIZE);
-		Output[0] += Value;
-		if (Output[0] < Input[0])
-			++Output[1];
-	}
-
-	inline static void Increment(std::vector<ulong> &Counter)
-	{
-		if (++Counter[0] == 0)
-			++Counter[1];
-	}
-
-	std::vector<byte> Convert64(const std::vector<ulong> &Input);
+	std::vector<byte> Convert(const std::vector<ulong> &Input);
 	void Detect();
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<ulong> &Counter);
-	IBlockCipher* GetCipher(BlockCiphers CipherType);
+	void Increase(const std::vector<ulong> &Input, std::vector<ulong> &Output, const ulong Value);
+	void Increment(std::vector<ulong> &Counter);
+	IBlockCipher* LoadCipher(BlockCiphers CipherType);
+	void LoadState();
 	void Scope();
 	void TransformParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void TransformSequential(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);

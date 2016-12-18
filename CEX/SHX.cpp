@@ -1,18 +1,18 @@
 #include "SHX.h"
 #include "Serpent.h"
+#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
-#include "HMAC.h"
 #include "IntUtils.h"
-#if defined(HAS_AVX)
-#	include "UInt256.h"
-#elif defined(HAS_MINSSE)
-#	include "UInt128.h"
-#endif
+#include "UInt128.h"
+#include "UInt256.h"
 
 NAMESPACE_BLOCK
 
-using CEX::Utility::IntUtils;
+using Helper::DigestFromName;
+using Utility::IntUtils;
+using Numeric::UInt128;
+using Numeric::UInt256;
 
 void SHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -29,21 +29,29 @@ void SHX::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_dfnRounds = 0;
-		m_ikmSize = 0;
+		m_kdfEngineType = Digests::None;
+		m_kdfInfoMax = 0;
+		m_kdfKeySize = 0;
+		m_isDestroyed = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
+		m_rndCount = 0;
 
-		IntUtils::ClearVector(m_expKey);
-		IntUtils::ClearVector(m_hkdfInfo);
-		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearVector(m_legalRounds);
-
-		if (m_kdfEngine != 0)
+		try
 		{
-			m_kdfEngine->Destroy();
-			if (m_destroyEngine)
+			Utility::ArrayUtils::ClearVector(m_expKey);
+			Utility::ArrayUtils::ClearVector(m_kdfInfo);
+			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
+			Utility::ArrayUtils::ClearVector(m_legalRounds);
+
+			if (m_kdfEngine != 0 && m_destroyEngine)
 				delete m_kdfEngine;
+
+			m_destroyEngine = false;
+		}
+		catch (std::exception& ex)
+		{
+			throw CryptoSymmetricCipherException("SHX:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
@@ -58,39 +66,18 @@ void SHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
 
-void SHX::Initialize(bool Encryption, const CEX::Common::KeyParams &KeyParam)
+void SHX::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
-	uint dgtsze = GetIkmSize(m_kdfEngineType);
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParam.Key().size()))
+		throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	if (m_kdfEngineType != Enumeration::Digests::None && KeyParam.Info().size() > m_kdfInfoMax)
+		throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 
-#if defined(DEBUGASSERT_ENABLED)
-	assert(KeyParam.Key().size() >= m_legalKeySizes[0] && KeyParam.Key().size() <= m_legalKeySizes[m_legalKeySizes.size() - 1]);
-	if (dgtsze != 0)
-		assert(KeyParam.Key().size() % dgtsze == 0);
-	assert(KeyParam.Key().size() >= m_ikmSize);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
-	if (KeyParam.Key().size() < m_legalKeySizes[0])
-		throw CryptoSymmetricCipherException("SHX:Initialize", msg);
-	if (KeyParam.Key().size() > m_legalKeySizes[3] && (KeyParam.Key().size() % dgtsze) != 0)
-		throw CryptoSymmetricCipherException("SHX:Initialize", msg);
+	if (m_kdfEngineType != Enumeration::Digests::None)
+		m_kdfEngine = LoadDigest(m_kdfEngineType);
 
-	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
-	{
-		if (KeyParam.Key().size() == m_legalKeySizes[i])
-			break;
-		if (i == m_legalKeySizes.size() - 1)
-			throw CryptoSymmetricCipherException("SHX:Initialize", msg);
-	}
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
-	{
-		if (KeyParam.Key().size() < m_ikmSize)
-			throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
-	}
-#endif
-
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
-		m_kdfEngine = GetDigest(m_kdfEngineType);
+	if (KeyParam.Info().size() > 0)
+		m_kdfInfo = KeyParam.Info();
 
 	m_isEncryption = Encryption;
 	// expand the key
@@ -135,7 +122,7 @@ void SHX::Transform128(const std::vector<byte> &Input, const size_t InOffset, st
 
 void SHX::ExpandKey(const std::vector<byte> &Key)
 {
-	if (m_kdfEngineType != CEX::Enumeration::Digests::None)
+	if (m_kdfEngineType != Enumeration::Digests::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
@@ -150,36 +137,39 @@ void SHX::ExpandKey(const std::vector<byte> &Key)
 void SHX::SecureExpand(const std::vector<byte> &Key)
 {
 	// expanded key size
-	size_t keySize = 4 * (m_dfnRounds + 1);
-	// hkdf return array
+	size_t keySize = 4 * (m_rndCount + 1);
 	size_t keyBytes = keySize * 4;
-	std::vector<byte> rawKey(keyBytes, 0);
-	size_t saltSize = Key.size() - m_ikmSize;
 
-	// hkdf input
-	std::vector<byte> kdfKey(m_ikmSize, 0);
-	std::vector<byte> kdfSalt(0, 0);
+	Kdf::HKDF gen(m_kdfEngine);
 
-	// copy hkdf key and salt from user key
-	memcpy(&kdfKey[0], &Key[0], m_ikmSize);
-	if (saltSize > 0)
+	// change 1.2: use extract only on an oversized key
+	if (Key.size() > m_kdfEngine->BlockSize())
 	{
-		kdfSalt.resize(saltSize);
-		memcpy(&kdfSalt[0], &Key[m_ikmSize], saltSize);
+		// seperate salt and key
+		m_kdfKeySize = m_kdfEngine->BlockSize();
+		std::vector<byte> kdfKey(m_kdfKeySize, 0);
+		memcpy(&kdfKey[0], &Key[0], m_kdfKeySize);
+		size_t saltSize = Key.size() - m_kdfKeySize;
+		std::vector<byte> kdfSalt(saltSize, 0);
+		memcpy(&kdfSalt[0], &Key[m_kdfKeySize], saltSize);
+		// info can be null
+		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
+	}
+	else
+	{
+		if (m_kdfInfo.size() != 0)
+			gen.Info() = m_kdfInfo;
+
+		gen.Initialize(Key);
 	}
 
-	// HKDF generator expands array using an SHA512 HMAC
-	CEX::Mac::HMAC hmac(m_kdfEngine);
-	CEX::Generator::HKDF gen(&hmac);
-	gen.Initialize(kdfSalt, kdfKey, m_hkdfInfo);
+	std::vector<byte> rawKey(keyBytes, 0);
+	// expand the round keys
 	gen.Generate(rawKey);
-
 	// initialize working key
-	std::vector<uint> wK(keySize, 0);
+	m_expKey.resize(keySize, 0);
 	// copy bytes to working key
-	memcpy(&wK[0], &rawKey[0], keyBytes);
-	// set the expanded key
-	m_expKey = wK;
+	memcpy(&m_expKey[0], &rawKey[0], keyBytes);
 }
 
 void SHX::StandardExpand(const std::vector<byte> &Key)
@@ -191,8 +181,8 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 	size_t offset = 0;
 
 	// CHANGE: 512 key gets 8 extra rounds
-	m_dfnRounds = (Key.size() == 64) ? 40 : ROUNDS32;
-	size_t keySize = 4 * (m_dfnRounds + 1);
+	m_rndCount = (Key.size() == 64) ? 40 : ROUNDS32;
+	size_t keySize = 4 * (m_rndCount + 1);
 
 	// step 1: reverse copy key to temp array
 	for (offset = Key.size(); offset > 0; offset -= 4)
@@ -347,73 +337,71 @@ void SHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void SHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(HAS_MINSSE) && !defined(HAS_AVX)
-
 	const size_t LRD = 4;
 	size_t keyCtr = m_expKey.size();
 
 	// input round
-	CEX::Numeric::UInt128 R0(Input, InOffset);
-	CEX::Numeric::UInt128 R1(Input, InOffset + 16);
-	CEX::Numeric::UInt128 R2(Input, InOffset + 32);
-	CEX::Numeric::UInt128 R3(Input, InOffset + 48);
-	CEX::Numeric::UInt128::Transpose(R0, R1, R2, R3);
+	UInt128 R0(Input, InOffset);
+	UInt128 R1(Input, InOffset + 16);
+	UInt128 R2(Input, InOffset + 32);
+	UInt128 R3(Input, InOffset + 48);
+	UInt128::Transpose(R0, R1, R2, R3);
 
-	R3 ^= m_expKey[--keyCtr];
-	R2 ^= m_expKey[--keyCtr];
-	R1 ^= m_expKey[--keyCtr];
-	R0 ^= m_expKey[--keyCtr];
+	R3 ^= UInt128(m_expKey[--keyCtr]);
+	R2 ^= UInt128(m_expKey[--keyCtr]);
+	R1 ^= UInt128(m_expKey[--keyCtr]);
+	R0 ^= UInt128(m_expKey[--keyCtr]);
 
 	// process 8 round blocks
 	do
 	{
 		Ib7(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib6(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib5(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib4(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib3(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib2(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib1(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt128(m_expKey[--keyCtr]);
+		R2 ^= UInt128(m_expKey[--keyCtr]);
+		R1 ^= UInt128(m_expKey[--keyCtr]);
+		R0 ^= UInt128(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib0(R0, R1, R2, R3);
@@ -421,106 +409,95 @@ void SHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 		// skip on last block
 		if (keyCtr != LRD)
 		{
-			R3 ^= m_expKey[--keyCtr];
-			R2 ^= m_expKey[--keyCtr];
-			R1 ^= m_expKey[--keyCtr];
-			R0 ^= m_expKey[--keyCtr];
+			R3 ^= UInt128(m_expKey[--keyCtr]);
+			R2 ^= UInt128(m_expKey[--keyCtr]);
+			R1 ^= UInt128(m_expKey[--keyCtr]);
+			R0 ^= UInt128(m_expKey[--keyCtr]);
 			InverseTransform64(R0, R1, R2, R3);
 		}
 	} 
 	while (keyCtr != LRD);
 
 	// last round
-	R3 ^= m_expKey[--keyCtr];
-	R2 ^= m_expKey[--keyCtr];
-	R1 ^= m_expKey[--keyCtr];
-	R0 ^= m_expKey[--keyCtr];
+	R3 ^= UInt128(m_expKey[--keyCtr]);
+	R2 ^= UInt128(m_expKey[--keyCtr]);
+	R1 ^= UInt128(m_expKey[--keyCtr]);
+	R0 ^= UInt128(m_expKey[--keyCtr]);
 
-	CEX::Numeric::UInt128::Transpose(R0, R1, R2, R3);
+	UInt128::Transpose(R0, R1, R2, R3);
 	R0.StoreLE(Output, OutOffset);
 	R1.StoreLE(Output, OutOffset + 16);
 	R2.StoreLE(Output, OutOffset + 32);
 	R3.StoreLE(Output, OutOffset + 48);
-
-#else
-
-	Decrypt16(Input, InOffset, Output, OutOffset);
-	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-
-#endif
 }
 
 void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(HAS_AVX)
-
 	const size_t LRD = 4;
 	size_t keyCtr = m_expKey.size();
 
 	// input round
-	CEX::Numeric::UInt256 R0(Input, InOffset);
-	CEX::Numeric::UInt256 R1(Input, InOffset + 32);
-	CEX::Numeric::UInt256 R2(Input, InOffset + 64);
-	CEX::Numeric::UInt256 R3(Input, InOffset + 96);
-	CEX::Numeric::UInt256::Transpose(R0, R1, R2, R3);
+	UInt256 R0(Input, InOffset);
+	UInt256 R1(Input, InOffset + 32);
+	UInt256 R2(Input, InOffset + 64);
+	UInt256 R3(Input, InOffset + 96);
+	UInt256::Transpose(R0, R1, R2, R3);
 
-	R3 ^= m_expKey[--keyCtr];
-	R2 ^= m_expKey[--keyCtr];
-	R1 ^= m_expKey[--keyCtr];
-	R0 ^= m_expKey[--keyCtr];
+	R3 ^= UInt256(m_expKey[--keyCtr]);
+	R2 ^= UInt256(m_expKey[--keyCtr]);
+	R1 ^= UInt256(m_expKey[--keyCtr]);
+	R0 ^= UInt256(m_expKey[--keyCtr]);
 
 	// process 8 round blocks
 	do
 	{
 		Ib7(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib6(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib5(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib4(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib3(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib2(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib1(R0, R1, R2, R3);
-		R3 ^= m_expKey[--keyCtr];
-		R2 ^= m_expKey[--keyCtr];
-		R1 ^= m_expKey[--keyCtr];
-		R0 ^= m_expKey[--keyCtr];
+		R3 ^= UInt256(m_expKey[--keyCtr]);
+		R2 ^= UInt256(m_expKey[--keyCtr]);
+		R1 ^= UInt256(m_expKey[--keyCtr]);
+		R0 ^= UInt256(m_expKey[--keyCtr]);
 		InverseTransform64(R0, R1, R2, R3);
 
 		Ib0(R0, R1, R2, R3);
@@ -528,38 +505,25 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 		// skip on last block
 		if (keyCtr != LRD)
 		{
-			R3 ^= m_expKey[--keyCtr];
-			R2 ^= m_expKey[--keyCtr];
-			R1 ^= m_expKey[--keyCtr];
-			R0 ^= m_expKey[--keyCtr];
+			R3 ^= UInt256(m_expKey[--keyCtr]);
+			R2 ^= UInt256(m_expKey[--keyCtr]);
+			R1 ^= UInt256(m_expKey[--keyCtr]);
+			R0 ^= UInt256(m_expKey[--keyCtr]);
 			InverseTransform64(R0, R1, R2, R3);
 		}
 	} while (keyCtr != LRD);
 
 	// last round
-	R3 ^= m_expKey[--keyCtr];
-	R2 ^= m_expKey[--keyCtr];
-	R1 ^= m_expKey[--keyCtr];
-	R0 ^= m_expKey[--keyCtr];
+	R3 ^= UInt256(m_expKey[--keyCtr]);
+	R2 ^= UInt256(m_expKey[--keyCtr]);
+	R1 ^= UInt256(m_expKey[--keyCtr]);
+	R0 ^= UInt256(m_expKey[--keyCtr]);
 
-	CEX::Numeric::UInt256::Transpose(R0, R1, R2, R3);
+	UInt256::Transpose(R0, R1, R2, R3);
 	R0.StoreLE(Output, OutOffset);
 	R1.StoreLE(Output, OutOffset + 32);
 	R2.StoreLE(Output, OutOffset + 64);
 	R3.StoreLE(Output, OutOffset + 96);
-
-#else
-
-	Decrypt16(Input, InOffset, Output, OutOffset);
-	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-	Decrypt16(Input, InOffset + 64, Output, OutOffset + 64);
-	Decrypt16(Input, InOffset + 80, Output, OutOffset + 80);
-	Decrypt16(Input, InOffset + 96, Output, OutOffset + 96);
-	Decrypt16(Input, InOffset + 112, Output, OutOffset + 112);
-
-#endif
 }
 
 void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -646,74 +610,72 @@ void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void SHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(HAS_MINSSE) && !defined(HAS_AVX)
-
 	const size_t LRD = m_expKey.size() - 5;
 	int keyCtr = -1;
 
 	// input round
-	CEX::Numeric::UInt128 R0(Input, InOffset);
-	CEX::Numeric::UInt128 R1(Input, InOffset + 16);
-	CEX::Numeric::UInt128 R2(Input, InOffset + 32);
-	CEX::Numeric::UInt128 R3(Input, InOffset + 48);
-	CEX::Numeric::UInt128::Transpose(R0, R1, R2, R3);
+	UInt128 R0(Input, InOffset);
+	UInt128 R1(Input, InOffset + 16);
+	UInt128 R2(Input, InOffset + 32);
+	UInt128 R3(Input, InOffset + 48);
+	UInt128::Transpose(R0, R1, R2, R3);
 
 	// process 8 round blocks
 	do
 	{
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb0(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb1(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb2(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb3(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb4(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb5(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb6(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt128(m_expKey[++keyCtr]);
+		R1 ^= UInt128(m_expKey[++keyCtr]);
+		R2 ^= UInt128(m_expKey[++keyCtr]);
+		R3 ^= UInt128(m_expKey[++keyCtr]);
 		Sb7(R0, R1, R2, R3);
 
 		// skip on last block
@@ -723,97 +685,86 @@ void SHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	while (keyCtr != LRD);
 
 	// last round
-	R0 ^= m_expKey[++keyCtr];
-	R1 ^= m_expKey[++keyCtr];
-	R2 ^= m_expKey[++keyCtr];
-	R3 ^= m_expKey[++keyCtr];
+	R0 ^= UInt128(m_expKey[++keyCtr]);
+	R1 ^= UInt128(m_expKey[++keyCtr]);
+	R2 ^= UInt128(m_expKey[++keyCtr]);
+	R3 ^= UInt128(m_expKey[++keyCtr]);
 
-	CEX::Numeric::UInt128::Transpose(R0, R1, R2, R3);
+	UInt128::Transpose(R0, R1, R2, R3);
 	R0.StoreLE(Output, OutOffset);
 	R1.StoreLE(Output, OutOffset + 16);
 	R2.StoreLE(Output, OutOffset + 32);
 	R3.StoreLE(Output, OutOffset + 48);
-
-#else
-
-	Encrypt16(Input, InOffset, Output, OutOffset);
-	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-
-#endif
 }
 
 void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(HAS_AVX)
-
 	const size_t LRD = m_expKey.size() - 5;
 	int keyCtr = -1;
 
 	// input round
-	CEX::Numeric::UInt256 R0(Input, InOffset);
-	CEX::Numeric::UInt256 R1(Input, InOffset + 32);
-	CEX::Numeric::UInt256 R2(Input, InOffset + 64);
-	CEX::Numeric::UInt256 R3(Input, InOffset + 96);
-	CEX::Numeric::UInt256::Transpose(R0, R1, R2, R3);
+	UInt256 R0(Input, InOffset);
+	UInt256 R1(Input, InOffset + 32);
+	UInt256 R2(Input, InOffset + 64);
+	UInt256 R3(Input, InOffset + 96);
+	UInt256::Transpose(R0, R1, R2, R3);
 
 	// process 8 round blocks
 	do
 	{
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb0(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb1(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb2(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb3(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb4(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb5(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb6(R0, R1, R2, R3);
 		LinearTransform64(R0, R1, R2, R3);
 
-		R0 ^= m_expKey[++keyCtr];
-		R1 ^= m_expKey[++keyCtr];
-		R2 ^= m_expKey[++keyCtr];
-		R3 ^= m_expKey[++keyCtr];
+		R0 ^= UInt256(m_expKey[++keyCtr]);
+		R1 ^= UInt256(m_expKey[++keyCtr]);
+		R2 ^= UInt256(m_expKey[++keyCtr]);
+		R3 ^= UInt256(m_expKey[++keyCtr]);
 		Sb7(R0, R1, R2, R3);
 
 		// skip on last block
@@ -822,53 +773,67 @@ void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	} while (keyCtr != LRD);
 
 	// last round
-	R0 ^= m_expKey[++keyCtr];
-	R1 ^= m_expKey[++keyCtr];
-	R2 ^= m_expKey[++keyCtr];
-	R3 ^= m_expKey[++keyCtr];
+	R0 ^= UInt256(m_expKey[++keyCtr]);
+	R1 ^= UInt256(m_expKey[++keyCtr]);
+	R2 ^= UInt256(m_expKey[++keyCtr]);
+	R3 ^= UInt256(m_expKey[++keyCtr]);
 
-	CEX::Numeric::UInt256::Transpose(R0, R1, R2, R3);
+	UInt256::Transpose(R0, R1, R2, R3);
 	R0.StoreLE(Output, OutOffset);
 	R1.StoreLE(Output, OutOffset + 32);
 	R2.StoreLE(Output, OutOffset + 64);
 	R3.StoreLE(Output, OutOffset + 96);
-
-#else
-
-	Encrypt16(Input, InOffset, Output, OutOffset);
-	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-	Encrypt16(Input, InOffset + 64, Output, OutOffset + 64);
-	Encrypt16(Input, InOffset + 80, Output, OutOffset + 80);
-	Encrypt16(Input, InOffset + 96, Output, OutOffset + 96);
-	Encrypt16(Input, InOffset + 112, Output, OutOffset + 112);
-
-#endif
 }
 
-CEX::Digest::IDigest* SHX::GetDigest(CEX::Enumeration::Digests DigestType)
+Digest::IDigest* SHX::LoadDigest(Enumeration::Digests DigestType)
 {
 	try
 	{
-		return CEX::Helper::DigestFromName::GetInstance(DigestType);
+		return DigestFromName::GetInstance(DigestType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert("SHX:GetDigest The digest could not be instantiated!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoSymmetricCipherException("SHX:GetDigest", "The digest could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoSymmetricCipherException("SHX:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
 	}
 }
 
-uint SHX::GetIkmSize(CEX::Enumeration::Digests DigestType)
+void SHX::LoadState(Digests ExtractorType)
 {
-	return CEX::Helper::DigestFromName::GetDigestSize(DigestType);
+	std::string info = "SHX version 1 information string";
+	m_kdfInfo.reserve(info.size());
+	for (size_t i = 0; i < info.size(); ++i)
+		m_kdfInfo.push_back(info[i]);
+
+	m_kdfEngineType = ExtractorType;
+
+	if (ExtractorType == Digests::None)
+	{
+		m_legalRounds.resize(2);
+		m_legalRounds = { 32, 40 };
+
+		m_legalKeySizes.resize(4);
+		m_legalKeySizes[0] = SymmetricKeySize(16, 16, 0);
+		m_legalKeySizes[1] = SymmetricKeySize(24, 16, 0);
+		m_legalKeySizes[2] = SymmetricKeySize(32, 16, 0);
+		m_legalKeySizes[3] = SymmetricKeySize(64, 16, 0);
+	}
+	else
+	{
+		m_legalRounds.resize(5);
+		m_legalRounds = { 32, 40, 48, 56, 64 };
+
+		// change: default at ideal size, a full block to key HMAC
+		m_kdfKeySize = DigestFromName::GetBlockSize(m_kdfEngineType);
+		// calculate max saturation of entropy when distribution code is used as key extension; subtract hash finalizer code + 1 byte HKDF counter
+		m_kdfInfoMax = m_kdfKeySize - (DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
+		m_legalKeySizes.resize(3);
+		// min allowable HMAC key
+		m_legalKeySizes[0] = SymmetricKeySize(DigestFromName::GetDigestSize(m_kdfEngineType), BLOCK_SIZE, m_kdfInfoMax);
+		// best size, no ipad/opad zero-byte mix in HMAC
+		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, BLOCK_SIZE, m_kdfInfoMax);
+		// triggers HKDF Extract
+		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, BLOCK_SIZE, m_kdfInfoMax);
+	}
 }
 
 NAMESPACE_BLOCKEND

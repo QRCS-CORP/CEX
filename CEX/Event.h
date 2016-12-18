@@ -1,13 +1,11 @@
-#ifndef _CEXENGINE_EVENT_H
-#define _CEXENGINE_EVENT_H
+#ifndef _CEX_EVENT_H
+#define _CEX_EVENT_H
 
-#include "Common.h"
-#include <vector>
-#include <algorithm>
+#include "CexDomain.h"
 #include "Delegate.h"
+#include <algorithm>
 
-NAMESPACE_EVENT
-
+NAMESPACE_ROUTING
 
 /// <summary>
 /// An Event interface pattern
@@ -36,16 +34,16 @@ NAMESPACE_EVENT
 /// 
 /// void ProgressTest()
 /// {
-/// 	CipherStream cs(CEX::Enumeration::SymmetricEngines::RDX,
+/// 	CipherStream cs(Enumeration::SymmetricEngines::RDX,
 /// 		22,
-/// 		CEX::Enumeration::CipherModes::CBC,
-/// 		CEX::Enumeration::PaddingModes::PKCS7);
+/// 		Enumeration::CipherModes::CBC,
+/// 		Enumeration::PaddingModes::PKCS7);
 /// 
 /// 	SampleEvent evt;
 /// 	cs.ProgressPercent += &evt.Completed;
 /// 	std:vector&lt;byte&gt; key(32);
 /// 	std:vector&lt;byte&gt; iv(16);
-/// 	cs.Initialize(true, CEX::Common::KeyParams(key, iv));
+/// 	cs.Initialize(true, Key::Symmetric::SymmetricKey(key, iv));
 /// 	std:vector&lt;byte&gt; data(32000);
 /// 	std:vector&lt;byte&gt; vret(32000);
 /// 	cs.Write(data, 0, vret, 0);
@@ -99,5 +97,5 @@ public:
 	}
 };
 
-NAMESPACE_EVENTEND
+NAMESPACE_ROUTINGEND
 #endif

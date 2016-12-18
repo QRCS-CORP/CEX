@@ -37,9 +37,6 @@
     <Filter Include="Header Files\Digest">
       <UniqueIdentifier>{1672c46d-d51c-48dd-88af-6e81b33808f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Generator">
-      <UniqueIdentifier>{4ca95536-18f1-432b-8a06-699033dcadba}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Mac">
       <UniqueIdentifier>{c040e8f6-f991-4abc-985d-69f7ece4cfa4}</UniqueIdentifier>
     </Filter>
@@ -76,9 +73,6 @@
     <Filter Include="Source Files\Digest">
       <UniqueIdentifier>{080f52a4-81f5-4f7a-b1ad-6ba942789bf8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Generator">
-      <UniqueIdentifier>{5e4f2c67-9347-414a-9258-1abff310dbcf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Mac">
       <UniqueIdentifier>{d6dc62eb-fec3-4420-9309-5be05315faa6}</UniqueIdentifier>
     </Filter>
@@ -87,12 +81,6 @@
     </Filter>
     <Filter Include="Source Files\Prng">
       <UniqueIdentifier>{c15bfdc9-684d-4444-8795-91df89388aed}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Seed">
-      <UniqueIdentifier>{45737c37-8c1e-4cb6-b871-0f9b4f5b214b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Seed">
-      <UniqueIdentifier>{1303b164-5c34-4fba-9cdb-b4ed4a34455c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Enumeration">
       <UniqueIdentifier>{46bf6934-1945-432e-a27e-0d21bab62341}</UniqueIdentifier>
@@ -103,17 +91,11 @@
     <Filter Include="Source Files\Processing">
       <UniqueIdentifier>{8a83d7a9-f3ad-4e1a-ab2c-c138da7686b8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\IO">
-      <UniqueIdentifier>{8690bc59-6dca-42a8-ae72-a9541167bf4f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Cipher\Symmetric\Block\Support">
       <UniqueIdentifier>{41e3c3fe-04c9-4529-9c73-6016401dc8ac}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Digest\Support">
       <UniqueIdentifier>{f5d3b4d1-ad76-4a4b-a072-529a67190b29}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Event">
-      <UniqueIdentifier>{8d6837de-6f36-4c90-8084-1d3da1a21501}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Helper">
       <UniqueIdentifier>{2a549b89-8eae-416f-91b9-b9723f44ea84}</UniqueIdentifier>
@@ -130,23 +112,65 @@
     <Filter Include="Source Files\IO">
       <UniqueIdentifier>{9dc772a6-6635-4dd3-99db-e47c092c0bb5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Processing\Factory">
-      <UniqueIdentifier>{66280d1f-c332-411d-9323-dc07e81ff4d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Processing\Structure">
-      <UniqueIdentifier>{4459698f-6898-4440-a4c2-97bf7d480e83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Processing\Factory">
-      <UniqueIdentifier>{8909b3c3-c9e0-4e2f-952e-90568ce5b33f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Numeric">
       <UniqueIdentifier>{4e101cf7-7d89-42f0-a10a-ab718d33e5b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Stream\Support">
+      <UniqueIdentifier>{6b9cc0a7-dfc2-4f16-bead-ab3aa858c6b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Kdf">
+      <UniqueIdentifier>{9d07bdbc-f826-4f77-ab44-131bc2db7088}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Kdf">
+      <UniqueIdentifier>{5b41f706-49d0-4896-97e5-7a304edb53c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Drbg">
+      <UniqueIdentifier>{4ca95536-18f1-432b-8a06-699033dcadba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drbg">
+      <UniqueIdentifier>{5e4f2c67-9347-414a-9258-1abff310dbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Routing">
+      <UniqueIdentifier>{8d6837de-6f36-4c90-8084-1d3da1a21501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{8690bc59-6dca-42a8-ae72-a9541167bf4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Provider">
+      <UniqueIdentifier>{45737c37-8c1e-4cb6-b871-0f9b4f5b214b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Provider">
+      <UniqueIdentifier>{1303b164-5c34-4fba-9cdb-b4ed4a34455c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key">
+      <UniqueIdentifier>{05fcad4c-a55e-46f0-8c07-d021bf297f11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key\Symmetric">
+      <UniqueIdentifier>{190b2d46-2367-4b73-bad7-12286129ea0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key\Asymmetric">
+      <UniqueIdentifier>{6956376a-f97a-4d3d-81e4-edcdb3f3aaf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key">
+      <UniqueIdentifier>{aa45e525-578e-44fb-8f62-e9f217f8d1c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Symmetric">
+      <UniqueIdentifier>{9fde4c28-49c7-450e-bbd3-e395005f45b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Asymmetric">
+      <UniqueIdentifier>{3195fdfc-bada-408a-8159-73e175e8f971}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric">
+      <UniqueIdentifier>{67cc3e24-0bc4-4a34-a724-142719323cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Numeric">
+      <UniqueIdentifier>{28facc4a-d472-4e43-99ca-18f9def6ef9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric">
+      <UniqueIdentifier>{3f88a5c6-6632-4cba-80ee-513206c1094a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Engine\Documentation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\CBC.h">
       <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
     </ClInclude>
@@ -201,32 +225,11 @@
     <ClInclude Include="..\..\CEX\THX.h">
       <Filter>Header Files\Cipher\Symmetric\Block</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\ChaCha.h">
-      <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\IStreamCipher.h">
       <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Salsa20.h">
       <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CipherDescription.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Common.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Config.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\EntropyPool.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\KeyGenerator.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\KeyParams.h">
-      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Keccak.h">
       <Filter>Header Files\Digest\Support</Filter>
@@ -249,22 +252,10 @@
     <ClInclude Include="..\..\CEX\Threefish1024.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Keccak256.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Keccak512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA512.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Skein256.h">
@@ -291,9 +282,6 @@
     <ClInclude Include="..\..\CEX\Digests.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Generators.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\KeySizes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -306,14 +294,11 @@
     <ClInclude Include="..\..\CEX\Prngs.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SeedGenerators.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Delegate.h">
-      <Filter>Header Files\Event</Filter>
+      <Filter>Header Files\Routing</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Event.h">
-      <Filter>Header Files\Event</Filter>
+      <Filter>Header Files\Routing</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoCipherModeException.h">
       <Filter>Header Files\Exception</Filter>
@@ -345,13 +330,7 @@
     <ClInclude Include="..\..\CEX\TBC.h">
       <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\IVSizes.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\KdfGenerators.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\RoundCounts.h">
@@ -363,27 +342,6 @@
     <ClInclude Include="..\..\CEX\SymmetricEngines.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\CTRDrbg.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\DGCDrbg.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\HKDF.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\IGenerator.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\KDF2Drbg.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PBKDF2.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SP20Drbg.h">
-      <Filter>Header Files\Generator</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\BlockCipherFromName.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
@@ -394,12 +352,6 @@
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\PaddingFromName.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PrngFromName.h">
-      <Filter>Header Files\Helper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SeedFromName.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\StreamCipherFromName.h">
@@ -435,56 +387,14 @@
     <ClInclude Include="..\..\CEX\IMac.h">
       <Filter>Header Files\Mac</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\VMAC.h">
-      <Filter>Header Files\Mac</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CSPPrng.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CTRPrng.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\DGCPrng.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\IRandom.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PPBPrng.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SecureRandom.h">
       <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SP20Prng.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\KeyFactory.h">
-      <Filter>Header Files\Processing\Factory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CipherKey.h">
-      <Filter>Header Files\Processing\Structure</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MacKey.h">
-      <Filter>Header Files\Processing\Structure</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MessageHeader.h">
-      <Filter>Header Files\Processing\Structure</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CipherStream.h">
       <Filter>Header Files\Processing</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\DigestStream.h">
       <Filter>Header Files\Processing</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\CSPRsg.h">
-      <Filter>Header Files\Seed</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\ISCRsg.h">
-      <Filter>Header Files\Seed</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\ISeed.h">
-      <Filter>Header Files\Seed</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ArrayUtils.h">
       <Filter>Header Files\Utility</Filter>
@@ -495,9 +405,6 @@
     <ClInclude Include="..\..\CEX\ParallelUtils.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\XSPRsg.h">
-      <Filter>Header Files\Seed</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\X923.h">
       <Filter>Header Files\Cipher\Symmetric\Block\Padding</Filter>
     </ClInclude>
@@ -507,25 +414,10 @@
     <ClInclude Include="..\..\CEX\MacFromDescription.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\MacParams.h">
-      <Filter>Header Files\Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\CpuDetect.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Blake2Params.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2Sp256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2BCompress.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2Bp512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2SCompress.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Intrinsics.h">
@@ -533,9 +425,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\IDigest.h">
       <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MacDescription.h">
-      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\UInt128.h">
       <Filter>Header Files\Numeric</Filter>
@@ -548,6 +437,159 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\ICM.h">
       <Filter>Header Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Salsa.h">
+      <Filter>Header Files\Cipher\Symmetric\Stream\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ChaCha20.h">
+      <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ChaCha.h">
+      <Filter>Header Files\Cipher\Symmetric\Stream\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Documentation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA2Params.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA256Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA512Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ULong256.h">
+      <Filter>Header Files\Numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2B.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2S.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\BlakeS256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\BlakeB512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PBKDF2.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\HKDF.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KDF2.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CryptoKdfException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IKdf.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Kdfs.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IDrbg.h">
+      <Filter>Header Files\Drbg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Drbgs.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CMG.h">
+      <Filter>Header Files\Drbg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DCG.h">
+      <Filter>Header Files\Drbg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Providers.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IProvider.h">
+      <Filter>Header Files\Provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ProviderFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KdfFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CSP.h">
+      <Filter>Header Files\Provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\HMG.h">
+      <Filter>Header Files\Drbg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RDP.h">
+      <Filter>Header Files\Provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SysUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ECP.h">
+      <Filter>Header Files\Provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PrngFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IPrng.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CMR.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DCR.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PBR.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CexDomain.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CJP.h">
+      <Filter>Header Files\Provider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CexConfig.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ISymmetricKey.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SymmetricKey.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SymmetricKeySize.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SymmetricSecureKey.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\StreamModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CipherDescription.h">
+      <Filter>Header Files\Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MacDescription.h">
+      <Filter>Header Files\Processing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SymmetricKeyGenerator.h">
+      <Filter>Header Files\Key\Symmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SecureStream.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DrbgFromName.h">
+      <Filter>Header Files\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -593,14 +635,8 @@
     <ClCompile Include="..\..\CEX\THX.cpp">
       <Filter>Source Files\Cipher\Symmetric\Block</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\ChaCha.cpp">
-      <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Salsa20.cpp">
       <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\KeyGenerator.cpp">
-      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
@@ -614,22 +650,10 @@
     <ClCompile Include="..\..\CEX\Threefish1024.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Blake256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Blake512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak256.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA512.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Skein256.cpp">
@@ -640,24 +664,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Skein1024.cpp">
       <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\CTRDrbg.cpp">
-      <Filter>Source Files\Generator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\DGCDrbg.cpp">
-      <Filter>Source Files\Generator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\HKDF.cpp">
-      <Filter>Source Files\Generator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\KDF2Drbg.cpp">
-      <Filter>Source Files\Generator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\PBKDF2.cpp">
-      <Filter>Source Files\Generator</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SP20Drbg.cpp">
-      <Filter>Source Files\Generator</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp">
       <Filter>Source Files\Helper</Filter>
@@ -675,12 +681,6 @@
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\PaddingFromName.cpp">
-      <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\PrngFromName.cpp">
-      <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SeedFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\StreamCipherFromName.cpp">
@@ -704,29 +704,8 @@
     <ClCompile Include="..\..\CEX\HMAC.cpp">
       <Filter>Source Files\Mac</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\VMAC.cpp">
-      <Filter>Source Files\Mac</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\CSPPrng.cpp">
-      <Filter>Source Files\Prng</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\CTRPrng.cpp">
-      <Filter>Source Files\Prng</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\DGCPrng.cpp">
-      <Filter>Source Files\Prng</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\PPBPrng.cpp">
-      <Filter>Source Files\Prng</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SecureRandom.cpp">
       <Filter>Source Files\Prng</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SP20Prng.cpp">
-      <Filter>Source Files\Prng</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\KeyFactory.cpp">
-      <Filter>Source Files\Processing\Factory</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CipherStream.cpp">
       <Filter>Source Files\Processing</Filter>
@@ -737,32 +716,119 @@
     <ClCompile Include="..\..\CEX\MacStream.cpp">
       <Filter>Source Files\Processing</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\CSPRsg.cpp">
-      <Filter>Source Files\Seed</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\ISCRsg.cpp">
-      <Filter>Source Files\Seed</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\XSPRsg.cpp">
-      <Filter>Source Files\Seed</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\IntUtils.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ParallelUtils.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Blake2Bp512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Blake2Sp256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\ICM.cpp">
       <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CpuDetect.cpp">
       <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ChaCha20.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\BlakeS256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\BlakeB512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\HKDF.cpp">
+      <Filter>Source Files\Kdf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PBKDF2.cpp">
+      <Filter>Source Files\Kdf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KDF2.cpp">
+      <Filter>Source Files\Kdf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CMG.cpp">
+      <Filter>Source Files\Drbg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DCG.cpp">
+      <Filter>Source Files\Drbg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ProviderFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KdfFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CSP.cpp">
+      <Filter>Source Files\Provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\HMG.cpp">
+      <Filter>Source Files\Drbg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RDP.cpp">
+      <Filter>Source Files\Provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PrngFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CMR.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DCR.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PBR.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECP.cpp">
+      <Filter>Source Files\Provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SysUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CJP.cpp">
+      <Filter>Source Files\Provider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SymmetricKey.cpp">
+      <Filter>Source Files\Key\Symmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\BitConverter.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\UInt128.cpp">
+      <Filter>Source Files\Numeric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\UInt256.cpp">
+      <Filter>Source Files\Numeric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ULong256.cpp">
+      <Filter>Source Files\Numeric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ArrayUtils.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SymmetricSecureKey.cpp">
+      <Filter>Source Files\Key\Symmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CipherDescription.cpp">
+      <Filter>Source Files\Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MacDescription.cpp">
+      <Filter>Source Files\Processing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SymmetricKeyGenerator.cpp">
+      <Filter>Source Files\Key\Symmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SecureStream.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DrbgFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,173 +1,248 @@
 #include "PBKDF2.h"
+#include "ArrayUtils.h"
+#include "DigestFromName.h"
 #include "IntUtils.h"
 
-NAMESPACE_GENERATOR
+NAMESPACE_KDF
 
-using CEX::Utility::IntUtils;
+//~~~Public Methods~~~//
 
 void PBKDF2::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		m_blockSize = 0;
-		m_hashSize = 0;
-		m_isInitialized = false;
-		m_prcIterations = 0;
-
-		IntUtils::ClearVector(m_macKey);
-		IntUtils::ClearVector(m_macSalt);
-
 		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_kdfCounter = 0;
+		m_kdfDigestType = Digests::None;
+		m_isInitialized = false;
+		m_kdfIterations = 0;
+		m_macSize = 0;
+
+		try
+		{
+			if (m_destroyEngine)
+			{
+				m_destroyEngine = false;
+
+				if (m_kdfDigest != 0)
+					delete m_kdfDigest;
+				if (m_kdfMac != 0)
+					delete m_kdfMac;
+			}
+
+			Utility::ArrayUtils::ClearVector(m_kdfKey);
+			Utility::ArrayUtils::ClearVector(m_kdfSalt);
+			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
+		}
+		catch(std::exception& ex)
+		{
+			throw CryptoKdfException("PBKDF2:Destroy", "The class state was not disposed!", std::string(ex.what()));
+		}
 	}
 }
 
 size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
-	GenerateKey(Output, 0, Output.size());
+	if (!m_isInitialized)
+		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
+	if (Output.size() == 0)
+		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
+	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
+		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 
-	return Output.size();
+	return Expand(Output, 0, Output.size());
 }
 
-size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Size)
+size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if ((Output.size() - Size) < OutOffset)
-		throw CryptoGeneratorException("PBKDF2:Generate", "Output buffer too small!");
-#endif
+	if (!m_isInitialized)
+		throw CryptoKdfException("PBKDF2:Generate", "The generator must be initialized before use!");
+	if ((Output.size() - Length) < OutOffset)
+		throw CryptoKdfException("PBKDF2:Generate", "Output buffer too small!");
+	if (m_kdfCounter + (Length / m_macSize) > 255)
+		throw CryptoKdfException("PBKDF2:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 
-	GenerateKey(Output, OutOffset, Size);
-
-	return Size;
+	return Expand(Output, OutOffset, Length);
 }
 
-void PBKDF2::Initialize(const std::vector<byte> &Ikm)
+void PBKDF2::Initialize(ISymmetricKey &GenParam)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (Ikm.size() < m_hashSize * 2)
-		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
-#endif
+	if (GenParam.Key().size() < MIN_PASSLEN)
+		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
 
-	m_macKey.resize(m_hashSize);
-	memcpy(&m_macKey[0], &Ikm[0], m_hashSize);
-	m_macSalt.resize(Ikm.size() - m_hashSize);
-	memcpy(&m_macSalt[0], &Ikm[m_hashSize], Ikm.size() - m_hashSize);
-
-	m_isInitialized = true;
-}
-
-void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm)
-{
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (Salt.size() < m_blockSize)
-		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
-	if (Ikm.size() < m_hashSize)
-		throw CryptoGeneratorException("PBKDF2:Initialize", "IKM size is too small; must be a minumum of digest block size!");
-#endif
-
-	// clone iv and salt
-	m_macKey.resize(Ikm.size());
-	m_macSalt.resize(Salt.size());
-
-	if (m_macKey.size() > 0)
-		memcpy(&m_macKey[0], &Ikm[0], Ikm.size());
-	if (m_macSalt.size() > 0)
-		memcpy(&m_macSalt[0], &Salt[0], Salt.size());
-
-	m_isInitialized = true;
-}
-
-void PBKDF2::Initialize(const std::vector<byte> &Salt, const std::vector<byte> &Ikm, const std::vector<byte> &Nonce)
-{
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (Salt.size() + Nonce.size() < m_blockSize)
-		throw CryptoGeneratorException("PBKDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
-	if (Ikm.size() < m_hashSize)
-		throw CryptoGeneratorException("PBKDF2:Initialize", "IKM with Nonce size is too small; combined must be a minumum of digest block size!");
-#endif
-
-	m_macKey.resize(Ikm.size());
-	m_macSalt.resize(Salt.size() + Nonce.size());
-
-	if (m_macKey.size() > 0)
-		memcpy(&m_macKey[0], &Ikm[0], Ikm.size());
-	if (m_macSalt.size() > 0)
-		memcpy(&m_macSalt[0], &Salt[0], Salt.size());
-	if (Nonce.size() > 0)
-		memcpy(&m_macSalt[Salt.size()], &Nonce[0], Nonce.size());
-
-	m_isInitialized = true;
-}
-
-void PBKDF2::Update(const std::vector<byte> &Salt)
-{
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (Salt.size() == 0)
-		throw CryptoGeneratorException("PBKDF2:Update", "Salt is too small!");
-#endif
-
-	Initialize(Salt);
-}
-
-//~~~Private~~~//
-
-size_t PBKDF2::GenerateKey(std::vector<byte> &Output, size_t OutOffset, size_t Size)
-{
-	size_t diff = Size % m_hashSize;
-	size_t max = Size / m_hashSize;
-	uint ctr = 0;
-	std::vector<byte> buffer(4);
-	std::vector<byte> outBytes(Size);
-
-	for (ctr = 0; ctr < max; ++ctr)
+	if (GenParam.Nonce().size() != 0)
 	{
-		IntToOctet(buffer, ctr + 1);
-		Process(buffer, outBytes, ctr * m_hashSize);
+		if (GenParam.Info().size() != 0)
+			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+		else
+			Initialize(GenParam.Key(), GenParam.Nonce());
 	}
-
-	if (diff > 0)
+	else
 	{
-		IntToOctet(buffer, ctr + 1);
-		std::vector<byte> rem(m_hashSize);
-		Process(buffer, rem, 0);
-		memcpy(&outBytes[outBytes.size() - diff], &rem[0], diff);
+		Initialize(GenParam.Key());
 	}
-
-	memcpy(&Output[OutOffset], &outBytes[0], outBytes.size());
-
-	return Size;
 }
 
-void PBKDF2::IntToOctet(std::vector<byte> &Output, uint Counter)
+void PBKDF2::Initialize(const std::vector<byte> &Key)
 {
-	Output[0] = (byte)((uint)Counter >> 24);
-	Output[1] = (byte)((uint)Counter >> 16);
-	Output[2] = (byte)((uint)Counter >> 8);
-	Output[3] = (byte)Counter;
+	if (Key.size() < MIN_PASSLEN)
+		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+
+	if (m_isInitialized)
+		Reset();
+
+	m_kdfKey.resize(Key.size());
+	memcpy(&m_kdfKey[0], &Key[0], m_kdfKey.size());
+	m_isInitialized = true;
 }
 
-void PBKDF2::Process(std::vector<byte> Input, std::vector<byte> &Output, size_t OutOffset)
+void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
 {
-	std::vector<byte> state(m_hashSize);
+	if (Key.size() < MIN_PASSLEN)
+		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small, must be a minumum of 4 bytes!");
+	if (Salt.size() < MIN_SALTLEN)
+		throw CryptoKdfException("PBKDF2:Initialize", "Salt size is too small, must be a minumum of 4 bytes!");
 
-	m_digestMac->Initialize(m_macKey);
+	if (m_isInitialized)
+		Reset();
 
-	if (m_macSalt.size() != 0)
-		m_digestMac->BlockUpdate(m_macSalt, 0, m_macSalt.size());
+	m_kdfKey.resize(Key.size());
+	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	m_kdfSalt.resize(Salt.size());
+	memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
 
-	m_digestMac->BlockUpdate(Input, 0, Input.size());
-	m_digestMac->DoFinal(state, 0);
+	m_isInitialized = true;
+}
 
+void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
+{
+	if (Key.size() < MIN_PASSLEN)
+		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small, must be a minumum of 4 bytes!");
+	if (Salt.size() + Info.size() < MIN_SALTLEN)
+		throw CryptoKdfException("PBKDF2:Initialize", "Salt with info size is too small, combined must be a minumum of 4 bytes!");
+
+	if (m_isInitialized)
+		Reset();
+
+	m_kdfKey.resize(Key.size());
+	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	m_kdfSalt.resize(Salt.size() + Info.size());
+
+	if (Salt.size() > 0)
+		memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+	if (Info.size() > 0)
+		memcpy(&m_kdfSalt[Salt.size()], &Info[0], Info.size());
+
+	m_isInitialized = true;
+}
+
+void PBKDF2::Reset()
+{
+	m_kdfMac->Reset();
+	m_kdfCounter = 1;
+	m_kdfKey.clear();
+	m_kdfSalt.clear();
+	m_isInitialized = false;
+}
+
+void PBKDF2::Update(const std::vector<byte> &Seed)
+{
+	if (Seed.size() < MIN_PASSLEN)
+		throw CryptoKdfException("PBKDF2:Update", "Seed can not be less than 4 bytes in length!");
+
+	if (Seed.size() > m_kdfSalt.size())
+		m_kdfSalt.resize(Seed.size());
+
+	memcpy(&m_kdfSalt[0], &Seed[0], Seed.size());
+}
+
+//~~~Private Methods~~~//
+
+size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+{
+	if (m_kdfCounter + (Length / m_macSize) > 255)
+		throw CryptoKdfException("PBKDF2:Expand", "Maximum length value is 255 * the digest return size!");
+
+	size_t prcLen = Length;
+
+	do
+	{
+		size_t prcRmd = Utility::IntUtils::Min(m_macSize, prcLen);
+
+		if (prcRmd >= m_macSize)
+		{
+			Process(Output, OutOffset);
+		}
+		else
+		{
+			std::vector<byte> tmp(m_macSize);
+			Process(tmp, 0);
+			memcpy(&Output[OutOffset], &tmp[0], prcRmd);
+		}
+
+		prcLen -= prcRmd;
+		OutOffset += prcRmd;
+		++m_kdfCounter;
+	} 
+	while (prcLen != 0);
+
+	return Length;
+}
+
+void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
+{
+	m_kdfMac->Initialize(m_kdfKey);
+
+	if (m_kdfSalt.size() != 0)
+		m_kdfMac->BlockUpdate(m_kdfSalt, 0, m_kdfSalt.size());
+
+	std::vector<byte> counter(4, 0);
+	Utility::IntUtils::Be32ToBytes(m_kdfCounter, counter, 0);
+	m_kdfMac->BlockUpdate(counter, 0, counter.size());
+
+	std::vector<byte> state(m_macSize);
+	m_kdfMac->DoFinal(state, 0);
 	memcpy(&Output[OutOffset], &state[0], state.size());
 
-	for (int count = 1; count != m_prcIterations; count++)
+	for (int i = 1; i != m_kdfIterations; ++i)
 	{
-		m_digestMac->Initialize(m_macKey);
-		m_digestMac->BlockUpdate(state, 0, state.size());
-		m_digestMac->DoFinal(state, 0);
+		m_kdfMac->Initialize(m_kdfKey);
+		m_kdfMac->BlockUpdate(state, 0, state.size());
+		m_kdfMac->DoFinal(state, 0);
 
-		for (int j = 0; j != state.size(); j++)
+		for (size_t j = 0; j != state.size(); ++j)
 			Output[OutOffset + j] ^= state[j];
 	}
 }
 
-NAMESPACE_GENERATOREND
+IDigest* PBKDF2::LoadDigest(Digests DigestType)
+{
+	try
+	{
+		return Helper::DigestFromName::GetInstance(DigestType);
+	}
+	catch(std::exception& ex)
+	{
+		throw CryptoKdfException("PBKDF2:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
+	}
+}
+
+void PBKDF2::LoadState()
+{
+	m_blockSize = m_kdfMac->BlockSize();
+	m_macSize = m_kdfMac->MacSize();
+	m_kdfDigestType = m_kdfMac->DigestType();
+
+	// best salt size; hash finalizer code and counter length adjusted
+	size_t saltLen = m_kdfMac->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 4);
+	m_legalKeySizes.resize(3);
+	// minimum security is the digest output size
+	m_legalKeySizes[0] = SymmetricKeySize(m_macSize, 0, 0);
+	// recommended size, adjusted salt size to hash full blocks
+	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, saltLen, 0);
+	// max recommended; add a block of key to info (appended to salt)
+	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, saltLen, m_blockSize);
+}
+
+NAMESPACE_KDFEND

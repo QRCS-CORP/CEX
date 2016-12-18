@@ -1,7 +1,25 @@
-#ifndef _CEXENGINE_THREEFISH256_H
-#define _CEXENGINE_THREEFISH256_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2016 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#include "Common.h"
+#ifndef _CEX_THREEFISH256_H
+#define _CEX_THREEFISH256_H
+
+#include "CexDomain.h"
 
 /// <summary>
 /// Part of Skein256: the Threefish cipher using a 256bit key size.
@@ -9,11 +27,11 @@
 class Threefish256
 {
 private:
-	static constexpr uint CipherSize = 256;
-	static constexpr uint CipherQwords = CipherSize / 64;
-	static constexpr uint ExpandedKeySize = CipherQwords + 1;
-	static constexpr uint ExpandedTweakSize = 3;
-	static constexpr ulong KeyScheduleConst = 0x1BD11BDAA9FC1A22;
+	const uint CipherSize = 256;
+	const uint CipherQwords = CipherSize / 64;
+	const uint ExpandedKeySize = CipherQwords + 1;
+	const uint ExpandedTweakSize = 3;
+	const ulong KeyScheduleConst = 0x1BD11BDAA9FC1A22;
 
 	std::vector<ulong> m_expandedKey;
 	std::vector<ulong> m_expandedTweak;

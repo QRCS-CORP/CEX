@@ -1,17 +1,15 @@
-#ifndef _CEXENGINE_ISTREAM_H
-#define _CEXENGINE_ISTREAM_H
+#ifndef _CEX_ISTREAM_H
+#define _CEX_ISTREAM_H
 
-#include "Common.h"
+#include "CexDomain.h"
+#include "CryptoProcessingException.h"
 #include "SeekOrigin.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoProcessingException.h"
-#endif
+#include "StreamModes.h"
 
 NAMESPACE_IO
 
-#if defined(CPPEXCEPTIONS_ENABLED)
-using CEX::Exception::CryptoProcessingException;
-#endif
+using Exception::CryptoProcessingException;
+using Enumeration::StreamModes;
 
 /// <summary>
 /// Data stream object interface
@@ -22,7 +20,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	IByteStream() {}
 
@@ -49,14 +47,19 @@ public:
 	virtual const bool CanWrite() = 0;
 
 	/// <summary>
+	/// Get: The stream container type
+	/// </summary>
+	virtual const StreamModes Enumeral() = 0;
+
+	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const size_t Length() = 0;
+	virtual const uint64_t Length() = 0;
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const size_t Position() = 0;
+	virtual const uint64_t Position() = 0;
 
 	//~~~Public Methods~~~//
 
@@ -78,20 +81,15 @@ public:
 	virtual void Destroy() = 0;
 
 	/// <summary>
-	/// Write the stream to disk
-	/// </summary>
-	virtual void Flush() = 0;
-
-	/// <summary>
-	/// Reads a portion of the stream into the buffer
+	/// Copies a portion of the stream into an output buffer
 	/// </summary>
 	///
-	/// <param name="Buffer">The output buffer receiving the bytes</param>
-	/// <param name="Offset">Offset within the output buffer at which to begin</param>
+	/// <param name="Output">The output array receiving the bytes</param>
+	/// <param name="Offset">Offset within the output array at which to begin</param>
 	/// <param name="Count">The number of bytes to read</param>
 	///
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Read(std::vector<byte> &Buffer, size_t Offset, size_t Count) = 0;
+	/// <returns>The number of bytes read</returns>
+	virtual size_t Read(std::vector<byte> &Output, size_t Offset, size_t Count) = 0;
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -111,34 +109,32 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(size_t Offset, SeekOrigin Origin) = 0;
+	virtual void Seek(uint64_t Offset, SeekOrigin Origin) = 0;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(size_t Length) = 0;
+	virtual void SetLength(uint64_t Length) = 0;
 
 	/// <summary>
-	/// Writes a buffer into the stream
+	/// Writes an input buffer to the stream
 	/// </summary>
 	///
-	/// <param name="Buffer">The buffer to write to the stream</param>
-	/// <param name="Offset">Offset within the output buffer at which to begin</param>
-	/// <param name="Count">The number of bytes to write</param>
+	/// <param name="Input">The input array to write to the stream</param>
+	/// <param name="Offset">Offset within the input array at which to begin</param>
+	/// <param name="Length">The number of bytes to write</param>
 	///
 	/// <returns>The number of bytes written</returns>
-	///
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
-	virtual void Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count) = 0;
+	virtual void Write(const std::vector<byte> &Input, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Write a single byte from the stream
 	/// </summary>
 	///
-	/// <returns>The byte value</returns>
-	virtual void WriteByte(byte Data) = 0;
+	/// <param name="Value">The byte value to write</param>
+	virtual void WriteByte(byte Value) = 0;
 };
 
 NAMESPACE_IOEND

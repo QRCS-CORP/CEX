@@ -1,33 +1,29 @@
-// The MIT License (MIT)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
 // 
 // Written by John Underhill, January 21, 2015
-// contact: develop@vtdev.com
+// Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_DIGESTSTREAM_H
-#define _CEXENGINE_DIGESTSTREAM_H
+#ifndef _CEX_DIGESTSTREAM_H
+#define _CEX_DIGESTSTREAM_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "CryptoProcessingException.h"
 #include "DigestFromName.h"
 #include "Event.h"
@@ -35,12 +31,12 @@
 
 NAMESPACE_PROCESSING
 
-using CEX::Exception::CryptoProcessingException;
-using CEX::Helper::DigestFromName;
-using CEX::Enumeration::Digests;
-using CEX::Event::Event;
-using CEX::IO::IByteStream;
-using CEX::Digest::IDigest;
+using Exception::CryptoProcessingException;
+using Helper::DigestFromName;
+using Enumeration::Digests;
+using Routing::Event;
+using IO::IByteStream;
+using Digest::IDigest;
 
 /// <summary>
 /// Digest stream helper class.
@@ -58,8 +54,6 @@ using CEX::Digest::IDigest;
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="CEX::Enumeration::Digests"/>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -70,8 +64,7 @@ using CEX::Digest::IDigest;
 class DigestStream
 {
 private:
-	static constexpr size_t BUFFER_SIZE = 64 * 1024;
-
+	const size_t BUFFER_SIZE = 64 * 1024;
 	size_t m_blockSize;
 	IDigest* m_digestEngine;
 	bool m_destroyEngine;
@@ -79,9 +72,12 @@ private:
 	bool m_isDestroyed = false;
 	size_t m_progressInterval;
 
-	DigestStream() { }
-
 public:
+
+	DigestStream() = delete;
+	DigestStream(const DigestStream&) = delete;
+	DigestStream& operator=(const DigestStream&) = delete;
+	DigestStream& operator=(DigestStream&&) = delete;
 
 	/// <summary>
 	/// The Progress Percent event
@@ -95,7 +91,7 @@ public:
 	/// 
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
 	explicit DigestStream(IDigest* Digest)
 		:
 		m_blockSize(Digest->BlockSize()),
@@ -105,10 +101,8 @@ public:
 		m_isDestroyed(false),
 		m_progressInterval(0)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Digest == 0)
 			throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!");
-#endif
 	}
 
 	/// <summary>
@@ -141,7 +135,7 @@ public:
 	/// 
 	/// <returns>The Message Digest</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeHash(IByteStream* InStream);
 
 	/// <summary>
@@ -153,7 +147,7 @@ public:
 	/// <param name="InOffset">The Input array starting offset</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeHash(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:

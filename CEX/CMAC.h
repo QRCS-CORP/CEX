@@ -1,69 +1,87 @@
-// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
 // 
 // Implementation Details:
 // An implementation of a Cipher based Message Authentication Code (CMAC).
 // Written by John Underhill, January 10, 2014
-// contact: develop@vtdev.com
+// Updated October 3, 2016
+// Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_CMAC_H
-#define _CEXENGINE_CMAC_H
+#ifndef _CEX_CMAC_H
+#define _CEX_CMAC_H
 
 #include "IMac.h"
-#include "ICipherMode.h"
 #include "BlockCiphers.h"
+#include "ICipherMode.h"
 
 NAMESPACE_MAC
 
-using CEX::Enumeration::BlockCiphers;
-using CEX::Cipher::Symmetric::Block::IBlockCipher;
-using CEX::Cipher::Symmetric::Block::Mode::ICipherMode;
-using CEX::Common::KeyParams;
+using Enumeration::BlockCiphers;
+using Cipher::Symmetric::Block::IBlockCipher;
+using Cipher::Symmetric::Block::Mode::ICipherMode;
 
 /// <summary>
-/// An implementation of a Cipher based Message Authentication Code
+/// An implementation of a Cipher based Message Authentication Code generator
 /// </summary>
 /// 
 /// <example>
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
-/// CEX::Cipher::Symmetric::Block::RDX* eng;
-/// CEX::Mac::CMAC cmac1(eng);
-/// hmac1.Initialize(key, [IV]);
-/// hmac1.ComputeMac(Input, Output);
-/// delete cpr;
+/// CMAC mac(Enumeration::BlockCiphers::AHX);
+/// mac.Initialize(Key, Nonce);
+/// mac.ComputeMac(Input, Output);
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="CEX::Cipher::Symmetric::Block"/>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
-/// 
 /// <remarks>
+/// <description><B>Overview:</B></description>
+/// <para>Cipher-based Message Authentication Code (CMAC), sometimes known as OMAC, is a block cipher-based message authentication code algorithm.<br>
+/// It can use any of the block ciphers in this library to provide assurance of message authenticity and the integrity of binary data.</para>
+/// 
+/// <description><B>Description:</B></description>
+/// <para><EM>Legend:</EM><br> 
+/// <B>CIPH</B>=encryption-function, <B>K</B>=key, <B>b</B>=block-size, <B>M</B>=message, <B>K1,K2</B>=subkeys, <B>^</B>=XOR, <B>ls</B>=left-shift</para>
+/// <para><EM>Subkey Generation</EM><br>
+/// 1) Let L = CIPHK(0b).<br>
+/// 2)	 If MSB1(L) = 0, then K1 = L ls 1;<br>
+/// Else K1 = (L ls 1) ^ Rb<br>
+/// 3)	 If MSB1(K1) = 0, then K2 = K1 ls 1;<br>
+/// Else K2 = (K1 ls 1) ^ Rb.</para>
+///
+/// <para><EM>MAC Function</EM><br>
+/// 1) Apply the subkey generation process to K to produce K1 and K2.<br>
+/// 2) If Mlen = 0, let n = 1; else, let n = ⎡Mlen / b⎤.<br>
+/// 3) Let M1, M2, ..., Mn - 1, Mn*, denote the unique sequence of bit strings such that M = M1 || M2 || ... || Mn - 1 || Mn*, where M1, M2, ..., Mn - 1 are complete blocks.<br>
+/// 4) If Mn* is a complete block, let Mn = K1 ^ Mn*; else, let Mn = K2 ^ (Mn* || 10j), where j = nb - Mlen - 1.<br>
+/// 5) Let C0 = 0b.<br>
+/// 6) For i = 1 to n, let Ci = CIPHK(Ci - 1 ^ Mi).<br>
+/// 7) Let T = MSBTlen(Cn).<br>
+/// 8) Return T.</para>
+///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>MAC return size must be a divisible of 8.</description></item>
-/// <item><description>MAC return size can be no longer than the Cipher Block size.</description></item>
-/// <item><description>Valid Cipher block sizes are 8 and 16 byte wide.</description></item>
+/// <item><description>Never reuse a ciphers key and iv for the MAC function, this is insecure and strongly discouraged.</description></item>
+/// <item><description>MAC return size is the underlying ciphers block-size; e.g. for AES, 16 bytes.</description></item>
+/// <item><description>With the Initialize(Key) method, the key must be at least the ciphers block-size plus the minimum key size in length.</description></item>
+/// <item><description>The Initialize(Key, Salt), and Initialize(Key, Salt, Info) methods, use the Key parameter as the cipher key, and the Salt as the initialization vector.</description></item>
+/// <item><description>The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule.</description></item>
+/// <item><description>After a finalizer call (DoFinal or ComputeMac), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -71,23 +89,23 @@ using CEX::Common::KeyParams;
 /// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38B/SP_800-38B.pdf">SP800-38B</a>: The CMAC Mode for Authentication.</description></item>
 /// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4493">4493</a>: The AES-CMAC Algorithm.</description></item>
-/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4494">4494</a>: The AES-CMAC-96 Algorithm and Its Use with IPsec.</description></item>
-/// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4615">4493</a>: The AES-CMAC-PRF-128 Algorithm for the Internet Key Exchange Protocol (IKE).</description></item>
 /// </list>
 /// </remarks>
 class CMAC : public IMac
 {
 private:
-	static constexpr byte CT87 = (byte)0x87;
-	static constexpr byte CT1B = (byte)0x1b;
 
-	size_t m_blockSize;
-	KeyParams m_cipherKey;
+	const byte CT87 = (byte)0x87;
+	const byte CT1B = (byte)0x1b;
+
 	ICipherMode* m_cipherMode;
+	BlockCiphers m_cipherType;
+	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::vector<byte> K1; 
-	std::vector<byte> K2;
+	std::vector<byte> m_K1; 
+	std::vector<byte> m_K2;
+	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_macSize;
 	std::vector<byte> m_msgCode;
 	std::vector<byte> m_wrkBuffer;
@@ -95,15 +113,20 @@ private:
 
 public:
 
+	CMAC() = delete;
+	CMAC(const CMAC&) = delete;
+	CMAC& operator=(const CMAC&) = delete;
+	CMAC& operator=(CMAC&&) = delete;
+
 	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The Macs internal blocksize in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return m_blockSize; }
+	virtual const size_t BlockSize() { return m_cipherMode->BlockSize(); }
 
 	/// <summary>
-	/// Get: The macs type name
+	/// Get: Mac generators type name
 	/// </summary>
 	virtual const Macs Enumeral() { return Macs::CMAC; }
 
@@ -118,40 +141,39 @@ public:
 	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
-	/// Get: Algorithm name
+	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
-	virtual const char *Name() { return "CMAC"; }
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; };
+
+	/// <summary>
+	/// Get: Mac generators class name
+	/// </summary>
+	virtual const std::string Name() { return "CMAC"; }
 
 	//~~~Constructor~~~//
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
-	/// <param name="EngineType">The block cipher enumeration name</param>
+	/// <param name="CipherType">The block cipher enumeration name</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block size is used</exception>
-	CMAC(BlockCiphers EngineType)
+	explicit CMAC(BlockCiphers CipherType)
 		:
-		m_blockSize(0),
-		m_cipherKey(),
+		m_cipherType(CipherType),
+		m_destroyEngine(true),
 		m_isDestroyed(false),
 		m_isInitialized(false),
+		m_legalKeySizes(0),
 		m_macSize(0),
 		m_msgCode(0),
 		m_wrkBuffer(0),
 		m_wrkOffset(0)
 	{
-		CreateCipher(EngineType);
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (m_cipherMode == 0)
-			throw CryptoMacException("CMAC:Ctor", "Could not create the cipher!");
-		if (m_cipherMode->BlockSize() != 16 && m_cipherMode->BlockSize() != 32)
-			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
-#endif
+		if (CipherType == BlockCiphers::None)
+			throw CryptoMacException("CMAC:Ctor", "The cipher type name is invalid!");
 
-		m_blockSize = m_cipherMode->BlockSize();
-		m_macSize = m_cipherMode->BlockSize();
-		m_msgCode.resize(m_cipherMode->BlockSize());
-		m_wrkBuffer.resize(m_cipherMode->BlockSize());
+		m_cipherMode = LoadCipher(CipherType);
+		LoadState();
 	}
 
 	/// <summary>
@@ -160,25 +182,24 @@ public:
 	///
 	/// <param name="Cipher">Instance of the block cipher</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
-	CMAC(IBlockCipher* Cipher)
+	/// <exception cref="Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
+	explicit CMAC(IBlockCipher* Cipher)
 		:
-		m_blockSize(Cipher->BlockSize()),
-		m_cipherKey(),
+		m_cipherType(Cipher->Enumeral()),
+		m_destroyEngine(false),
 		m_isDestroyed(false),
 		m_isInitialized(false),
-		m_macSize(Cipher->BlockSize()),
-		m_msgCode(Cipher->BlockSize()),
-		m_wrkBuffer(Cipher->BlockSize()),
+		m_legalKeySizes(0),
+		m_macSize(0),
+		m_msgCode(0),
+		m_wrkBuffer(0),
 		m_wrkOffset(0)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
 		if (Cipher == 0)
 			throw CryptoMacException("CMAC:Ctor", "Cipher can not be null!");
-		if (Cipher->BlockSize() != 16 && Cipher->BlockSize() != 32)
-			throw CryptoMacException("CMAC:Ctor", "Block size must be 128 or 256 bits!");
-#endif
-		LoadCipher(Cipher);
+
+		m_cipherMode = LoadCipher(Cipher);
+		LoadState();
 	}
 
 	/// <summary>
@@ -192,22 +213,28 @@ public:
 	//~~~Public Methods~~~//
 
 	/// <summary>
-	/// Update the buffer
+	/// Update the Mac with a block of bytes
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">Offset within Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if an invalid Input size is chosen</exception>
+	/// <param name="Input">The Mac input data array</param>
+	/// <param name="InOffset">Starting position with the Input array</param>
+	/// <param name="Length">Length of data to process</param>
 	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 	/// <summary>
-	/// Get the Mac hash value
+	/// Get: The block cipher engine type
+	/// </summary>
+	const BlockCiphers CipherType() { return m_cipherType; }
+
+	/// <summary>
+	/// Process an input array and return the Mac code in the output array.
+	/// <para>After calling this function the Macs state is reset and must be re-initialized with a new key.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="Output">The output message code</param>
+	/// <param name="Input">The input data byte array</param>
+	/// <param name="Output">The output Mac code array</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
 	virtual void ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
@@ -216,11 +243,12 @@ public:
 	virtual void Destroy();
 
 	/// <summary>
-	/// Process the last block of data
+	/// Process the data and return a Mac code
+	/// <para>After calling this function the Macs state is reset and must be re-initialized with a new key.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The hash value return</param>
-	/// <param name="OutOffset">The offset in the data</param>
+	/// <param name="Output">The output Mac code array</param>
+	/// <param name="OutOffset">The offset in the output array</param>
 	/// 
 	/// <returns>The number of bytes processed</returns>
 	/// 
@@ -228,21 +256,44 @@ public:
 	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset);
 
 	/// <summary>
-	/// Initialize the Cipher MAC generator.
-	/// <para>Uses a Key and optional IV field to initialize the cipher.</para>
+	/// Initialize the MAC generator with a SymmetricKey key container.
+	/// <para>Uses a key, salt, and optional info arrays to initialize the MAC.
+	/// The Salt parameter is used as the underlying cipher modes initialization vector, and must be at least block-size in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="MacKey">A byte array containing the cipher Key. 
-	/// <para>Key size must be one of the <c>LegalKeySizes</c> of the underlying cipher.</para>
-	/// </param>
-	/// <param name="IV">A byte array containing the CBC mode Initialization Vector.
-	/// <para>IV size must be the ciphers blocksize.</para></param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if an invalid Key size is chosen</exception>
-	virtual void Initialize(const std::vector<byte> &MacKey, const std::vector<byte> &IV);
+	/// <param name="MacParam">A SymmetricKey key container class</param>
+	virtual void Initialize(ISymmetricKey &MacParam);
 
 	/// <summary>
-	/// Reset the internal state
+	/// Initialize the MAC with a key.
+	/// <para>The key must be at least the minimum legal key size, plus the ciphers block-size in length.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The MAC generators primary key</param>
+	virtual void Initialize(const std::vector<byte> &Key);
+
+	/// <summary>
+	/// Initialize the MAC with key and salt arrays.
+	/// <para>The key must be at least the minimum legal key size, and the salt must be the ciphers block-size in length.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The MAC generators primary key</param>
+	/// <param name="Salt">The salt or initialization vector</param>
+	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt);
+
+	/// <summary>
+	/// Initialize the MAC generator with key, salt, and info arrays.
+	/// <para>The key must be a legal key size, and the salt must be the ciphers block-size in length.
+	/// The info parameter is only used on HX extended mode ciphers.</para>
+	/// </summary>
+	///
+	/// <param name="Key">The MAC generators primary key</param>
+	/// <param name="Salt">The salt used as the cipher modes initialization vector</param>
+	/// <param name="Info">The info parameter appended to the key as a source of additional entropy</param>
+	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info);
+
+	/// <summary>
+	/// Reset to the default state; Mac must be re-initialized after this call
 	/// </summary>
 	virtual void Reset();
 
@@ -255,8 +306,10 @@ public:
 
 private:
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
-	void CreateCipher(CEX::Enumeration::BlockCiphers Cipher);
-	void LoadCipher(IBlockCipher* Cipher);
+	ICipherMode* LoadCipher(Enumeration::BlockCiphers CipherType);
+	ICipherMode* LoadCipher(IBlockCipher* Cipher);
+	void LoadState();
+
 };
 
 NAMESPACE_MACEND

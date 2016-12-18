@@ -1,7 +1,7 @@
-#ifndef _CEXENGINE_SEEKORIGIN_H
-#define _CEXENGINE_SEEKORIGIN_H
+#ifndef _CEX_SEEKORIGIN_H
+#define _CEX_SEEKORIGIN_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_IO
 /// <summary>

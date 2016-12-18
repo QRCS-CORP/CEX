@@ -1,11 +1,11 @@
 #include "AesFipsTest.h"
+#include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
-#if defined(AESNI_AVAILABLE)
-#	include "../CEX/AHX.h"
-#endif
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string AesFipsTest::Run()
 	{
 		try
@@ -34,9 +34,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -47,49 +47,48 @@ namespace Test
 	void AesFipsTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		CEX::Cipher::Symmetric::Block::RHX engine(16);
-		CEX::Common::KeyParams k(Key);
+		RHX engine;
+		Key::Symmetric::SymmetricKey k(Key);
 		engine.Initialize(true, k);
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("AesFipsTest: AES: Encrypted arrays are not equal!");
+			throw std::exception("AesFipsTest: AES: Encrypted arrays are not equal!");
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::string("AesFipsTest: AES: Decrypted arrays are not equal!");
+			throw std::exception("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
-#if defined(AESNI_AVAILABLE)
 		std::vector<byte> outBytes(Input.size(), 0);
+		AHX engine;
+		Key::Symmetric::SymmetricKey k(Key);
 
-		CEX::Cipher::Symmetric::Block::AHX engine;
-		CEX::Common::KeyParams k(Key);
 		engine.Initialize(true, k);
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("AesFipsTest: AES: Encrypted arrays are not equal!");
+			throw std::exception("AesFipsTest: AES: Encrypted arrays are not equal!");
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::string("AesFipsTest: AES: Decrypted arrays are not equal!");
-#endif
+			throw std::exception("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
+
 		{
-			CEX::Cipher::Symmetric::Block::RHX engine(16);
-			CEX::Common::KeyParams k(Key);
+			RHX engine;
+			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 10000; i++)
@@ -97,11 +96,11 @@ namespace Test
 		}
 
 		if (outBytes != Output)
-			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 
 		{
-			CEX::Cipher::Symmetric::Block::RHX engine(16);
-			CEX::Common::KeyParams k(Key);
+			RHX engine;
+			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(false, k);
 
 			for (unsigned int i = 0; i != 10000; i++)
@@ -109,17 +108,16 @@ namespace Test
 		}
 
 		if (outBytes != Input)
-			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
-#if defined(AESNI_AVAILABLE)
 		std::vector<byte> outBytes(Input.size(), 0);
 		memcpy(&outBytes[0], &Input[0], outBytes.size());
 		{
-			CEX::Cipher::Symmetric::Block::AHX engine;
-			CEX::Common::KeyParams k(Key);
+			AHX engine;
+			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 10000; i++)
@@ -127,11 +125,11 @@ namespace Test
 		}
 
 		if (outBytes != Output)
-			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 
 		{
-			CEX::Cipher::Symmetric::Block::AHX engine;
-			CEX::Common::KeyParams k(Key);
+			AHX engine;
+			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(false, k);
 
 			for (unsigned int i = 0; i != 10000; i++)
@@ -139,8 +137,7 @@ namespace Test
 		}
 
 		if (outBytes != Input)
-			throw std::string("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
-#endif
+			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 	}
 
 	void AesFipsTest::Initialize()

@@ -1,15 +1,19 @@
-#ifndef _CEXENGINE_IVSIZES_H
-#define _CEXENGINE_IVSIZES_H
+#ifndef _CEX_IVSIZES_H
+#define _CEX_IVSIZES_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// <para>IV Sizes in bits. Can be cast as IV byte size integers, 
-/// i.e. (int sz = IVSizes.V128) is equal to 16.</para>
+/// Common Initialization Vector bit sizes.
+/// <para> Can be cast as IV byte size integers, i.e. (int sz = IVSizes.V128) is equal to 16.</para>
 /// </summary>
-enum class IVSizes : uint
+enum class IVSizes : uint8_t
 {
+	/// <summary>
+	/// No iv size is specified
+	/// </summary>
+	None = 0,
 	/// <summary>
 	/// 64 bit IV
 	/// </summary>

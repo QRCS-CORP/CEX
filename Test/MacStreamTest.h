@@ -2,16 +2,7 @@
 #define _CEXTEST_MACSTREAMTEST_H
 
 #include "ITest.h"
-#include "../CEX/CSPPrng.h"
 #include "../CEX/IMac.h"
-#include "../CEX/CMAC.h"
-#include "../CEX/HMAC.h"
-#include "../CEX/VMAC.h"
-#include "../CEX/SHA256.h"
-#include "../CEX/RHX.h"
-#include "../CEX/MacStream.h"
-#include "../CEX/MemoryStream.h"
-#include "../CEX/IByteStream.h"
 
 namespace Test
 {
@@ -58,11 +49,10 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareOutput(CEX::Mac::IMac* Engine);
+		void CompareOutput(Mac::IMac* Engine1, Mac::IMac* Engine2);
 		void CmacDescriptionTest();
 		void HmacDescriptionTest();
 		void OnProgress(char* Data);
-		void VmacDescriptionTest();
 	};
 }
 

@@ -60,26 +60,26 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		// *** Tests *** //
 		void CbcModeTest();
 		void CfbModeTest();
 		void CtrModeTest();
-		void DescriptionTest(CEX::Common::CipherDescription* Description);
+		void DescriptionTest(Processing::CipherDescription* Description);
+		void FileStreamTest();
 		void Initialize();
 		void MemoryStreamTest();
 		void ParametersTest();
 		void OfbModeTest();
 		void SerializeStructTest();
 		void StreamTest();
-		void StreamModesTest(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding);
-		void StreamingTest(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher);
-		// *** Helpers *** //
+		void StreamModesTest(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding);
+		void StreamingTest(Cipher::Symmetric::Stream::IStreamCipher* Cipher);
+
 		size_t AllocateRandom(std::vector<byte> &Data, size_t Size = 0, size_t NonAlign = 0);
-		void BlockCTR(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-		void BlockDecrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-		void BlockEncrypt(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		void BlockCTR(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		void BlockDecrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		void BlockEncrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void OnProgress(char* Data);
-		void ProcessStream(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		void ProcessStream(Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	};
 }
 

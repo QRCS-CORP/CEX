@@ -5,11 +5,11 @@
 
 namespace Test
 {
-	void DigestSpeedTest::DigestBlockLoop(CEX::Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
+	void DigestSpeedTest::DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
-		CEX::Digest::IDigest* dgt = CEX::Helper::DigestFromName::GetInstance(DigestType);
+		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType);
 		size_t bufSze = dgt->BlockSize();
-		if (Parallel && DigestType == CEX::Enumeration::Digests::Blake2BP512 || DigestType == CEX::Enumeration::Digests::Blake2SP256)
+		if (Parallel && DigestType == Enumeration::Digests::BlakeBP512 || DigestType == Enumeration::Digests::BlakeSP256)
 			bufSze = SampleSize / 8;
 		
 		std::vector<byte> hash(dgt->DigestSize(), 0);
@@ -26,7 +26,7 @@ namespace Test
 				dgt->BlockUpdate(buffer, 0, buffer.size());
 				counter += buffer.size();
 			}
-			std::string calc = CEX::Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			OnProgress(const_cast<char*>(calc.c_str()));
 		}
 		dgt->DoFinal(hash, 0);
@@ -35,9 +35,9 @@ namespace Test
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
 		uint64_t len = Loops * SampleSize;
 		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string glen = CEX::Utility::IntUtils::ToString(len / GB1);
-		std::string mbps = CEX::Utility::IntUtils::ToString((rate / MB1));
-		std::string secs = CEX::Utility::IntUtils::ToString((double)dur / 1000.0);
+		std::string glen = Utility::IntUtils::ToString(len / GB1);
+		std::string mbps = Utility::IntUtils::ToString((rate / MB1));
+		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 
 		OnProgress(const_cast<char*>(resp.c_str()));

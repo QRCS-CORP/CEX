@@ -1,14 +1,19 @@
-#ifndef _CEXENGINE_BLOCKCIPHERFROMDESCRIPTION_H
-#define _CEXENGINE_BLOCKCIPHERFROMDESCRIPTION_H
+#ifndef _CEX_CIPHERFROMDESCRIPTION_H
+#define _CEX_CIPHERFROMDESCRIPTION_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "CipherDescription.h"
 #include "ICipherMode.h"
 
 NAMESPACE_HELPER
 
+using Processing::CipherDescription;
+using Cipher::Symmetric::Block::Mode::ICipherMode;
+using Enumeration::SymmetricEngines;
+
 /// <summary>
-/// Get a symmetric cipher instance from it's description
+/// Get a symmetric cipher instance from it's description.
+/// <para>The Cipher modes Initialize function must be called before it can be used.<para>
 /// </summary>
 class CipherFromDescription
 {
@@ -19,10 +24,10 @@ public:
 	/// 
 	/// <param name="Description">The structure describing the symmetric cipher</param>
 	/// 
-	/// <returns>An uninitialized symmetric cipher wrapped in a mode</returns>
+	/// <returns>An uninitialized symmetric cipher mode</returns>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if the cipher type is not supported</exception>
-	static CEX::Cipher::Symmetric::Block::Mode::ICipherMode* GetInstance(CEX::Common::CipherDescription &Description);
+	static ICipherMode* GetInstance(CipherDescription &Description);
 };
 
 NAMESPACE_HELPEREND

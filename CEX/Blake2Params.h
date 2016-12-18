@@ -1,31 +1,26 @@
-﻿// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEXENGINE_BLAKE2PARAMS_H
-#define _CEXENGINE_BLAKE2PARAMS_H
+#ifndef _CEX_BLAKE2PARAMS_H
+#define _CEX_BLAKE2PARAMS_H
 
+#include "CexDomain.h"
 #include "CryptoDigestException.h"
-#include "Common.h"
 
 NAMESPACE_DIGEST
 
@@ -35,7 +30,7 @@ NAMESPACE_DIGEST
 	struct Blake2Params
 	{
 	private:
-		static constexpr size_t HDR_SIZE = 36;
+		static const size_t HDR_SIZE = 36;
 
 		uint8_t m_dgtLen;
 		uint8_t m_keyLen;
@@ -116,7 +111,7 @@ NAMESPACE_DIGEST
 		/// Initialize the default structure.
 		/// <para>Default settings are linear mode (Blake2-B).</para>
 		/// </summary>
-		Blake2Params()
+		explicit Blake2Params()
 			:
 			m_dgtLen(64),
 			m_keyLen(0),
@@ -136,7 +131,7 @@ NAMESPACE_DIGEST
 		/// <summary>
 		/// Initialize the MessageHeader structure using a serialized byte array
 		/// </summary>
-		Blake2Params(std::vector<uint8_t> TreeArray)
+		explicit Blake2Params(std::vector<uint8_t> TreeArray)
 			:
 			m_dgtLen(0),
 			m_keyLen(0),
@@ -151,10 +146,8 @@ NAMESPACE_DIGEST
 			m_reserved3(0),
 			m_reserved4(0)
 		{
-#if defined(CPPEXCEPTIONS_ENABLED)
 			if (TreeArray.size() < HDR_SIZE)
-				throw CEX::Exception::CryptoDigestException("Blake2Params:Ctor", "The TreeArray buffer is too short!");
-#endif
+				throw Exception::CryptoDigestException("Blake2Params:Ctor", "The TreeArray buffer is too short!");
 
 			memcpy(&m_dgtLen, &TreeArray[0], 1);
 			memcpy(&m_keyLen, &TreeArray[1], 1);
@@ -183,7 +176,7 @@ NAMESPACE_DIGEST
 		/// <param name="NodeDepth">Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)</param>
 		/// <param name="InnerLength">Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)</param>
 		/// <param name="ParallelDegree">The number of threads used in parallel mode, the default is 4 for Blake2bp, and 8 for Blake2sp</param>
-		Blake2Params(uint8_t DigestLength, uint8_t KeyLength, uint8_t FanOut, uint8_t MaxDepth, uint32_t LeafLength, uint64_t NodeOffset, uint8_t NodeDepth, uint8_t InnerLength, uint8_t ParallelDegree)
+		explicit Blake2Params(uint8_t DigestLength, uint8_t KeyLength, uint8_t FanOut, uint8_t MaxDepth, uint32_t LeafLength, uint64_t NodeOffset, uint8_t NodeDepth, uint8_t InnerLength, uint8_t ParallelDegree)
 			:
 			m_dgtLen(DigestLength),
 			m_keyLen(KeyLength),
@@ -213,6 +206,8 @@ NAMESPACE_DIGEST
 		/// Create a deep copy of this structure.
 		/// <para>Caller must delete this object.</para>
 		/// </summary>
+		/// 
+		/// <returns>A pointer to a Blake2Params instance</returns>
 		Blake2Params* DeepCopy()
 		{
 			return new Blake2Params(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
@@ -258,7 +253,7 @@ NAMESPACE_DIGEST
 		}
 
 		/// <summary>
-		/// Get the header Size in bytes
+		/// Get the header size in bytes
 		/// </summary>
 		/// 
 		/// <returns>Header size</returns>

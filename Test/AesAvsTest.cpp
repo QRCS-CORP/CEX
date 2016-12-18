@@ -1,11 +1,11 @@
 #include "AesAvsTest.h"
-#include "../CEX/RHX.h"
-#if defined(AESNI_AVAILABLE)
 #include "../CEX/AHX.h"
-#endif
+#include "../CEX/RHX.h"
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string AesAvsTest::Run()
 	{
 		using namespace TestFiles::AESAVS;
@@ -109,9 +109,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -123,28 +123,26 @@ namespace Test
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 
-		CEX::Cipher::Symmetric::Block::RHX engine;
-		CEX::Common::KeyParams k(Key);
+		RHX engine;
+		Key::Symmetric::SymmetricKey k(Key);
 		engine.Initialize(true, k);
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("AESAVS: Encrypted arrays are not equal!");
+			throw std::exception("AESAVS: Encrypted arrays are not equal!");
 	}
 
 	void AesAvsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
-#if defined(AESNI_AVAILABLE)
 		std::vector<byte> outBytes(Input.size(), 0);
 
-		CEX::Cipher::Symmetric::Block::AHX engine;
-		CEX::Common::KeyParams k(Key);
+		AHX engine;
+		Key::Symmetric::SymmetricKey k(Key);
 		engine.Initialize(true, k);
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::string("AESAVS: AES-NI Encrypted arrays are not equal!");
-#endif
+			throw std::exception("AESAVS: AES-NI Encrypted arrays are not equal!");
 	}
 
 	void AesAvsTest::OnProgress(char* Data)

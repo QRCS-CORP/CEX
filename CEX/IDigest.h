@@ -1,20 +1,16 @@
-#ifndef _CEXENGINE_IDIGEST_H
-#define _CEXENGINE_IDIGEST_H
+#ifndef _CEX_IDIGEST_H
+#define _CEX_IDIGEST_H
 
-#include "Common.h"
+#include "CexDomain.h"
+#include "CryptoDigestException.h"
 #include "Digests.h"
-#include "MacParams.h"
-#if defined(CPPEXCEPTIONS_ENABLED)
-#	include "CryptoDigestException.h"
-#endif
+#include "ISymmetricKey.h"
 
 NAMESPACE_DIGEST
 
-using CEX::Enumeration::Digests;
-using CEX::Common::MacParams;
-#if defined(CPPEXCEPTIONS_ENABLED)
-	using CEX::Exception::CryptoDigestException;
-#endif
+using Exception::CryptoDigestException;
+using Enumeration::Digests;
+using Key::Symmetric::ISymmetricKey;
 
 /// <summary>
 /// Hash Digest Interface
@@ -25,7 +21,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	IDigest() {}
 
@@ -47,14 +43,14 @@ public:
 	virtual size_t DigestSize() = 0;
 
 	/// <summary>
-	/// Get: The digests type enumeration member
+	/// Get: The digests type name
 	/// </summary>
 	virtual Digests Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The Digest name
+	/// Get: The digests class name
 	/// </summary>
-	virtual const char *Name() = 0;
+	virtual const std::string Name() = 0;
 
 	//~~~Public Methods~~~//
 

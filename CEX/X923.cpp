@@ -1,21 +1,20 @@
 #include "X923.h"
-#include "CSPRsg.h"
+#include "CSP.h"
 
 NAMESPACE_PADDING
 
 size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Offset > Input.size())
 		throw CryptoPaddingException("X923:AddPadding", "The padding offset value is longer than the array length!");
-#endif
+
 	size_t len = (Input.size() - Offset) - 1;
 	byte code = (byte)(Input.size() - Offset);
 
 	if (len > 0)
 	{
 		std::vector<byte> data(len);
-		CEX::Seed::CSPRsg rnd;
+		Provider::CSP rnd;
 		rnd.GetBytes(data);
 		memcpy(&Input[Offset], &data[0], len);
 	}

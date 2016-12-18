@@ -1,14 +1,17 @@
-#ifndef _CEXENGINE_PRNGFROMNAME_H
-#define _CEXENGINE_PRNGFROMNAME_H
+#ifndef _CEX_PRNGFROMNAME_H
+#define _CEX_PRNGFROMNAME_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "CryptoException.h"
-#include "IRandom.h"
+#include "IPrng.h"
 
 NAMESPACE_HELPER
 
+using Prng::IPrng;
+using Enumeration::Prngs;
+
 /// <summary>
-/// PrngFromName: Get a Prng instance from it's enumeration name.
+/// Get a Prng instance from it's enumeration name.
 /// </summary>
 class PrngFromName
 {
@@ -21,8 +24,8 @@ public:
 	/// 
 	/// <returns>An initialized Prng</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static CEX::Prng::IRandom* GetInstance(CEX::Enumeration::Prngs PrngType);
+	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
+	static IPrng* GetInstance(Prngs PrngType);
 };
 
 NAMESPACE_HELPEREND

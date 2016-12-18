@@ -1,18 +1,9 @@
-#ifndef _CEXENGINE_CPUDETECT_H
-#define _CEXENGINE_CPUDETECT_H
+#ifndef _CEX_CPUDETECT_H
+#define _CEX_CPUDETECT_H
 
-#include "Common.h"
-#include <algorithm>
-
-#if defined(_WIN32)
-#	include <intrin.h>
-#	include <stdio.h>
-#	define cpuid(info, x)  __cpuidex(info, x, 0)
-#else
-#	include <cpuid.h>
-	void cpuid(int info[4], int InfoType) {
-		__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
-	}
+#include "CexDomain.h"
+#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
+#	define MSCAVX
 #endif
 
 NAMESPACE_COMMON
@@ -24,11 +15,10 @@ class CpuDetect
 {
 public:
 
-	//~~~ Public Enums~~~//
 	/// <summary>
 	/// Enumeration of cpu vendors
 	/// </summary>
-	enum class CpuVendors : uint
+	enum class CpuVendors : int
 	{
 		UNKNOWN = 0,
 		AMD = 1,
@@ -36,146 +26,7 @@ public:
 	};
 
 	/// <summary>
-	/// Enumeration of processor feature sets
-	/// </summary>
-	enum class FeatureSets : uint
-	{
-		/// <summary>
-		/// Intructions are not available
-		/// </summary>
-		NONE = 0,
-		/// <summary>
-		/// MMX instructions
-		/// </summary>
-		MMX = 1,
-		/// <summary>
-		/// Cpu is x64
-		/// </summary>
-		X64 = 2,
-		/// <summary>
-		/// Advanced Bit Manipulation
-		/// </summary>
-		ABM = 4,
-		/// <summary>
-		/// Intel Digital Random Number Generator
-		/// </summary>
-		RDRAND = 8,
-		/// <summary>
-		/// Bit Manipulation Instruction Set 1
-		/// </summary>
-		BMI1 = 16,
-		/// <summary>
-		/// Bit Manipulation Instruction Set 2
-		/// </summary>
-		BMI2 = 32,
-		/// <summary>
-		/// Intel Add-Carry Instruction Extensions
-		/// </summary>
-		ADX = 64,
-		/// <summary>
-		/// Cpu supports prefetch
-		/// </summary>
-		PREFETCHWT1 = 128,
-		/// <summary>
-		/// Streaming SIMD Extensions 1.0
-		/// </summary>
-		SSE = 256,
-		/// <summary>
-		/// Streaming SIMD Extensions 2.0
-		/// </summary>
-		SSE2 = 512,
-		/// <summary>
-		/// Streaming SIMD Extensions 3.0
-		/// </summary>
-		SSE3 = 1024,
-		/// <summary>
-		/// SSE3 E3 Merom New Instructions
-		/// </summary>
-		SSSE3 = 2048,
-		/// <summary>
-		/// Streaming SIMD Extensions 4.1
-		/// </summary>
-		SSE41 = 4096,
-		/// <summary>
-		/// Streaming SIMD Extensions 4.2
-		/// </summary>
-		SSE42 = 8192,
-		/// <summary>
-		/// AMD SSE 4A instructions
-		/// </summary>
-		SSE4A = 16384,
-		/// <summary>
-		/// AES-NI instructions
-		/// </summary>
-		AES = 32768,
-		/// <summary>
-		/// SHA instructions
-		/// </summary>
-		SHA = 65536,
-		/// <summary>
-		/// Advanced Vector Extensions
-		/// </summary>
-		AVX = 131072,
-		/// <summary>
-		/// AMD eXtended Operations
-		/// </summary>
-		XOP = 262144,
-		/// <summary>
-		/// AMD FMA 3 instructions
-		/// </summary>
-		FMA3 = 524288,
-		/// <summary>
-		/// AMD FMA 4 instructions
-		/// </summary>
-		FMA4 = 1048576,
-		/// <summary>
-		/// Advanced Vector Extensions 2
-		/// </summary>
-		AVX2 = 2097152,
-		/// <summary>
-		/// AVX512 Foundation
-		/// </summary>
-		AVX512F = 4194304,
-		/// <summary>
-		/// AVX512 Conflict Detection
-		/// </summary>
-		AVX512CD = 8388608,
-		/// <summary>
-		/// AVX512 Prefetch
-		/// </summary>
-		AVX512PF = 16777216,
-		/// <summary>
-		/// AVX512 Exponential + Reciprocal
-		/// </summary>
-		AVX512ER = 33554432,
-		/// <summary>
-		/// AVX512 Vector Length Extensions
-		/// </summary>
-		AVX512VL = 67108864,
-		/// <summary>
-		/// AVX512 Byte + Word
-		/// </summary>
-		AVX512BW = 134217728,
-		/// <summary>
-		/// AVX512 Doubleword + Quadword
-		/// </summary>
-		AVX512DQ = 268435456,
-		/// <summary>
-		/// AVX512 Integer 52-bit Fused Multiply-Add
-		/// </summary>
-		AVX512IFMA = 536870912,
-		/// <summary>
-		/// AVX512 Vector Byte Manipulation Instructions
-		/// </summary>
-		AVX512VBMI = 1073741824,
-		/// <summary>
-		/// Hardware supports hyper-threading
-		/// </summary>
-		HYPERTHREAD = 2147483648
-	};
-
-	/// <summary>
-	/// Maps to the L2Associative cache associativity setting
+	/// The L2 cache associativity setting
 	/// </summary>
 	enum class CacheAssociations
 	{
@@ -188,199 +39,460 @@ public:
 		FullyAssociative = 16
 	};
 
+private:
+
+	const size_t KB1 = 1024;
+	const size_t KB32 = 32 * 1024;
+	const size_t KB128 = 128 * 1024;
+	const size_t KB256 = 256 * 1024;
+
+	bool m_abm;
+	bool m_ads;
+	bool m_aesni;
+	bool m_amd3dNow;
+	bool m_amd3dNowPro;
+	bool m_amdCmpLegacy;
+	bool m_amdMmxExt;
+	bool m_amdMp;
+	bool m_avx;
+	bool m_avx2;
+	bool m_avx5124fmaps;
+	bool m_avx512bw;
+	bool m_avx512cd;
+	bool m_avx512dq;
+	bool m_avx512er;
+	bool m_avx512f;
+	bool m_avx512ifma;
+	bool m_avx512pf;
+	bool m_avx5124vnniw;
+	bool m_avx512vbmi;
+	bool m_avx512vl;
+	bool m_bmt1;
+	bool m_bmt2;
+	uint32_t m_busSpeed;
+	std::string m_cpuVendor;
+	bool m_fma3;
+	bool m_fma4;
+	uint32_t m_frequencyBase;
+	uint32_t m_frequencyMax;
+	bool m_hle;
+	bool m_hyperThread;
+	size_t m_l1CacheSize;
+	size_t m_l1CacheLineSize;
+	CacheAssociations m_l2Associative;
+	size_t m_l2CacheSize;
+	size_t m_logicalPerCore;
+	bool m_mmx;
+	bool m_mpx;
+	size_t m_physCores;
+	bool m_pku;
+	bool m_pkuos;
+	bool m_pqe;
+	bool m_pqm;
+	bool m_prefetch;
+	bool m_rdRand;
+	bool m_rdSeed;
+	bool m_rtm;
+	bool m_rdtscp;
+	std::string m_serialNumber;
+	bool m_sgx;
+	bool m_sha;
+	bool m_smap;
+	bool m_smep;
+	bool m_sse1;
+	bool m_sse2;
+	bool m_sse3;
+	bool m_ssse3;
+	bool m_sse4a;
+	bool m_sse41;
+	bool m_sse42;
+	size_t m_virtCores;
+	bool m_x64;
+	bool m_xop;
+
+public:
+
 	//~~~ Properties~~~//
 
 	/// <summary>
-	/// Returns the L1 cache size per processer in Kilobytes
+	/// Advanced Bit Manipulation
 	/// </summary>
-	size_t L1CacheSize;
+	const bool ABM() { return m_abm; }
 
 	/// <summary>
-	/// Returns the total L1 cache size for all processers in Kilobytes
+	/// Intel Add-Carry Instruction Extensions
 	/// </summary>
-	size_t L1CacheTotal;
+	const bool ADS() { return m_ads; }
 
 	/// <summary>
-	/// Returns the L2 cache size per processer in Kilobytes
+	/// Returns true if the AES-NI feature set is detected
 	/// </summary>
-	size_t L2CacheSize;
+	const bool AESNI() { return m_aesni; }
+
+	/// <summary>
+	/// AMD 3DNOW extensions enabled
+	/// </summary>
+	const bool AMD3DNOW() { return m_amd3dNow; }
+
+	/// <summary>
+	/// AMD 3DNOW PRO extensions enabled
+	/// </summary>
+	const bool AMD3DNOWPRO() { return m_amd3dNowPro; }
+
+	/// <summary>
+	/// N-core and CAP_HT is falsely set
+	/// </summary>
+	const bool AMDCMPLEGACY() { return m_amdCmpLegacy; }
+
+	/// <summary>
+	/// AMD MMX extensions enabled
+	/// </summary>
+	const bool AMDMMXEXT() { return m_amdMmxExt; }
+
+	/// <summary>
+	/// MultiProcessing capable; reserved on AMD64
+	/// </summary>
+	const bool AMDMP() { return m_amdMp; }
+
+	/// <summary>
+	/// Returns true if the Advanced Vector Extensions feature set is detected
+	/// </summary>
+	const bool AVX() { return m_avx; }
+
+	/// <summary>
+	/// Returns true if the Advanced Vector Extensions 2 feature set is detected
+	/// </summary>
+	const bool AVX2() { return m_avx2; }
+
+	/// <summary>
+	/// AVX512 Byte + Word detected
+	/// </summary>
+	const bool AVX512BW() { return m_avx512bw; }
+
+	/// <summary>
+	/// AVX512 Conflict Detection
+	/// </summary>
+	const bool AVX512CD() { return m_avx512cd; }
+
+	/// <summary>
+	/// AVX512 Doubleword + Quadword detected
+	/// </summary>
+	const bool AVX512DQ() { return m_avx512dq; }
+
+	/// <summary>
+	/// AVX512 Exponential + Reciprocal detected
+	/// </summary>
+	const bool AVX512ER() { return m_avx512er; }
+
+	/// <summary>
+	/// AVX512 Foundation detected
+	/// </summary>
+	const bool AVX512F() { return m_avx512f; }
+
+	/// <summary>
+	/// AVX512 Integer 52-bit Fused Multiply-Add detected
+	/// </summary>
+	const bool AVX512IFMA() { return m_avx512ifma; }
+
+	/// <summary>
+	/// Multiply Accumulation Single precision
+	/// </summary>
+	const bool AVX512IFMAPS() { return m_avx5124fmaps; }
+
+	/// <summary>
+	/// AVX512 Neural Network Instructions
+	/// </summary>
+	const bool AVX512NNI() { return m_avx5124vnniw; }
+
+	/// <summary>
+	/// AVX512 Prefetch detected
+	/// </summary>
+	const bool AVX512PF() { return m_avx512pf; }
+
+	/// <summary>
+	/// AVX512 Vector Byte Manipulation Instructions detected
+	/// </summary>
+	const bool AVX512VBMI() { return m_avx512vbmi; }
+
+	/// <summary>
+	/// AVX512 Vector Length Extensions detected
+	/// </summary>
+	const bool AVX512VL() { return m_avx512vl; }
+
+	/// <summary>
+	/// Bit Manipulation Instruction Set 1
+	/// </summary>
+	const bool BMT1() { return m_bmt1; }
+
+	/// <summary>
+	/// Bit Manipulation Instruction Set 2
+	/// </summary>
+	const bool BMT2() { return m_bmt2; }
+
+	/// <summary>
+	/// The processor bus speed (newer Intel only)
+	/// </summary>
+	const size_t BusSpeed()
+	{
+		return m_busSpeed;
+	}
+
+	/// <summary>
+	/// AMD FMA 3 instructions available
+	/// </summary>
+	const bool FMA3() { return m_fma3; }
+
+	/// <summary>
+	/// AMD FMA 4 instructions available
+	/// </summary>
+	const bool FMA4() { return m_fma4; }
+
+	/// <summary>
+	/// The processor base frequency (newer Intel only)
+	/// </summary>
+	const size_t FrequencyBase()
+	{
+		return m_frequencyBase;
+	}
+
+	/// <summary>
+	/// The processor maximum frequency (newer Intel only)
+	/// </summary>
+	const size_t FrequencyMax()
+	{
+		return m_frequencyMax;
+	}
+
+	/// <summary>
+	/// TSE Hardware Lock Elision
+	/// </summary>
+	const bool HLE() { return m_hle; }
+
+	/// <summary>
+	/// Hardware supports hyper-threading
+	/// </summary>
+	const bool HyperThread() { return m_hyperThread; }
+
+	/// <summary>
+	/// Cpu is x64
+	/// </summary>
+	const bool Is64() { return m_x64; }
+
+	/// <summary>
+	/// The total L1 data/instruction cache size in bytes for each physical processor core, defaults to 32kib
+	/// </summary>
+	const size_t L1CacheSize() 
+	{ 
+		if (m_l1CacheSize == 0 || m_physCores == 0)
+			return KB32;
+		else
+			return m_l1CacheSize * KB1; 
+	}
+
+	/// <summary>
+	/// The total L1 data/instruction cache line size in bytes for each physical processor core, defaults to 64 bytes
+	/// </summary>
+	const size_t L1CacheLineSize()
+	{
+		if (m_l1CacheLineSize == 0)
+			return 64;
+		else
+			return m_l1CacheLineSize;
+	}
+
+	/// <summary>
+	/// The total L1 data/instruction cache size in bytes for all processor cores, defaults to 256kib
+	/// </summary>
+	const size_t L1CacheTotal() 
+	{ 
+		if (m_l1CacheSize == 0 || m_physCores == 0)
+			return KB256;
+		else
+			return m_l1CacheSize * m_physCores * KB1; 
+	}
+
+	/// <summary>
+	/// The total L1 data cache size in bytes for all processor cores, defaults to 256kib
+	/// </summary>
+	const size_t L1DataCacheTotal()
+	{
+		if (m_l1CacheSize == 0 || m_physCores == 0)
+			return KB256;
+		else
+			return (m_l1CacheSize / 2) * m_physCores * KB1;
+	}
+
+	/// <summary>
+	/// The total L2 cache size in bytes for each physical processor core, defaults to 128kib
+	/// </summary>
+	const size_t L2CacheSize() 
+	{ 
+		if (m_l2CacheSize == 0 || m_physCores == 0)
+			return KB128;
+		else
+			return m_l2CacheSize * KB1; 
+	}
+
+	/// <summary>
+	/// The total L2 cache size in bytes for all processor cores, defaults to 256kib
+	/// </summary>
+	const size_t L2CacheTotal() 
+	{ 
+		if (m_l2CacheSize == 0 || m_physCores == 0)
+			return KB256;
+		else
+			return m_l2CacheSize * m_physCores * KB1; 
+	}
 
 	/// <summary>
 	/// Returns the L2 cache associativity
 	/// </summary>
-	CacheAssociations L2Associative;
+	const CacheAssociations L2Associative() { return m_l2Associative; }
 
 	/// <summary>
-	/// The CPU's vendor string
+	/// The maximum number of logical processors per core
 	/// </summary>
-	std::string CpuVendor;
+	const size_t LogicalPerCore() { return m_logicalPerCore; }
 
 	/// <summary>
 	/// MMX instructions available
 	/// </summary>
-	bool HW_MMX;
+	const bool MMX() { return m_mmx; }
+
 	/// <summary>
-	/// Cpu is x64
+	/// Intel Memory Protection Extensions
 	/// </summary>
-	bool HW_x64;
+	const bool MPX() { return m_mpx; }
+
 	/// <summary>
-	/// Advanced Bit Manipulation
+	/// The total number of physical processor cores
 	/// </summary>
-	bool HW_ABM;
+	const size_t PhysicalCores() { return m_physCores; }
+
 	/// <summary>
-	/// Intel Digital Random Number Generator
+	/// Memory Protection Keys for User-mode pages
 	/// </summary>
-	bool HW_RDRAND;
+	const bool PKU() { return m_pku; }
+
 	/// <summary>
-	/// Bit Manipulation Instruction Set 1
+	/// PKU enabled by OS
 	/// </summary>
-	bool HW_BMI1;
+	const bool PKUOS() { return m_pkuos; }
+
 	/// <summary>
-	/// Bit Manipulation Instruction Set 2
+	/// Platform Quality of Service Enforcement
 	/// </summary>
-	bool HW_BMI2;
+	const bool PQE() { return m_pqe; }
+
 	/// <summary>
-	/// Intel Add-Carry Instruction Extensions
+	/// Platform Quality of Service Monitoring
 	/// </summary>
-	bool HW_ADX;
+	const bool PQM() { return m_pqm; }
+
 	/// <summary>
 	/// Cpu supports prefetch
 	/// </summary>
-	bool HW_PREFETCHWT1;
+	const bool PREFETCH() { return m_prefetch; }
 
-	//  SIMD: 128-bit
 	/// <summary>
-	/// Streaming SIMD Extensions 1.0 available
+	/// Intel Digital Random Number Generator
 	/// </summary>
-	bool HW_SSE;
+	const bool RDRAND() { return m_rdRand; }
+
 	/// <summary>
-	/// Streaming SIMD Extensions 2.0 available
+	/// Intel Digital Random Seed Generator
 	/// </summary>
-	bool HW_SSE2;
+	const bool RDSEED() { return m_rdSeed; }//
+
 	/// <summary>
-	/// Hardware supports hyper-threading
+	/// RDTSCP time-stamp instruction
 	/// </summary>
-	bool HW_HYPER;
+	const bool RDTSCP() { return m_rdtscp; }
+
 	/// <summary>
-	/// Streaming SIMD Extensions 3.0 available
+	/// TSE Restricted Transactional Memory
 	/// </summary>
-	bool HW_SSE3;
+	const bool RTM() { return m_rtm; }
+
 	/// <summary>
-	/// SSE3 E3 Merom New Instructions available
+	/// The processor serial number (not supported on some processors)
 	/// </summary>
-	bool HW_SSSE3;
-	/// <summary>
-	/// Streaming SIMD Extensions 4.1 available
-	/// </summary>
-	bool HW_SSE41;
-	/// <summary>
-	/// Streaming SIMD Extensions 4.2 available
-	/// </summary>
-	bool HW_SSE42;
-	/// <summary>
-	/// AMD SSE 4A instructions available
-	/// </summary>
-	bool HW_SSE4A;
-	/// <summary>
-	/// AES-NI instructions available
-	/// </summary>
-	bool HW_AES;
+	const std::string SerialNumber() { return m_serialNumber; }
+
 	/// <summary>
 	/// SHA instructions available
 	/// </summary>
-	bool HW_SHA;
+	const bool SHA() { return m_sha; }
 
-	//  SIMD: 256-bit
 	/// <summary>
-	/// Advanced Vector Extensions available
+	/// Software Guard Extensions
 	/// </summary>
-	bool HW_AVX;
-	/// <summary>
-	/// AMD eXtended Operations available
-	/// </summary>
-	bool HW_XOP;
-	/// <summary>
-	/// AMD FMA 3 instructions available
-	/// </summary>
-	bool HW_FMA3;
-	/// <summary>
-	/// AMD FMA 4 instructions available
-	/// </summary>
-	bool HW_FMA4;
-	/// <summary>
-	/// Advanced Vector Extensions 2 available
-	/// </summary>
-	bool HW_AVX2;
+	const bool SGX() { return m_sgx; }
 
-	//  SIMD: 512-bit
 	/// <summary>
-	/// AVX512 Foundation
+	/// Supervisor Mode Access Prevention
 	/// </summary>
-	bool HW_AVX512F;
+	const bool SMAP() { return m_smap; }
+
 	/// <summary>
-	/// AVX512 Conflict Detection
+	/// Supervisor-Mode Execution Prevention
 	/// </summary>
-	bool HW_AVX512CD;
+	const bool SMEP() { return m_smep; }
+
 	/// <summary>
-	/// AVX512 Prefetch
+	/// Returns true if SSE2 or greater is detected
 	/// </summary>
-	bool HW_AVX512PF;
+	const bool SSE() { return m_avx512f || m_avx2 || m_avx || m_xop || m_sse42 || m_sse41 || m_sse4a || m_ssse3 || m_sse3 || m_sse2; }
+
 	/// <summary>
-	/// AVX512 Exponential + Reciprocal
+	/// Streaming SIMD Extensions 1.0 available
 	/// </summary>
-	bool HW_AVX512ER;
+	const bool SSE1() { return m_sse1; }
+
 	/// <summary>
-	/// AVX512 Vector Length Extensions
+	/// Streaming SIMD Extensions 2.0 available
 	/// </summary>
-	bool HW_AVX512VL;
+	const bool SSE2() { return m_sse2; }
+
 	/// <summary>
-	/// AVX512 Byte + Word
+	/// Streaming SIMD Extensions 3.0 available
 	/// </summary>
-	bool HW_AVX512BW;
+	const bool SSE3() { return m_sse3; }
+
 	/// <summary>
-	/// AVX512 Doubleword + Quadword
+	/// SSE3 E3 Merom New Instructions available
 	/// </summary>
-	bool HW_AVX512DQ;
+	const bool SSSE3() { return m_ssse3; }
+
 	/// <summary>
-	/// AVX512 Integer 52-bit Fused Multiply-Add
+	/// AMD SSE 4A instructions available
 	/// </summary>
-	bool HW_AVX512IFMA;
+	const bool SSE4A() { return m_sse4a; }
+
 	/// <summary>
-	/// AVX512 Vector Byte Manipulation Instructions
+	/// Streaming SIMD Extensions 4.1 available
 	/// </summary>
-	bool HW_AVX512VBMI;
+	const bool SSE41() { return m_sse41; }
+
 	/// <summary>
-	/// The total number of physical cores per processor
+	/// Streaming SIMD Extensions 4.2 available
 	/// </summary>
-	size_t HW_PHYSICALCORES;
+	const bool SSE42() { return m_sse42; }
+
 	/// <summary>
-	/// The total number of virtual cores per processor (including hyperthreading)
+	/// Returns the cpu vendors enumeration value
 	/// </summary>
-	size_t HW_VIRTUALCORES;
+	const CpuVendors Vendor();
+
 	/// <summary>
-	/// The maximum number of logical processors per core
+	/// The total number of threads available using hyperthreading
 	/// </summary>
-	size_t HW_LOGICALPERCORE;
+	const size_t VirtualCores() { return m_virtCores; }
+
 	/// <summary>
-	/// N-core and CAP_HT is falsely set
+	/// Returns true if the AMD eXtended Operations feature set is detected
 	/// </summary>
-	bool HW_AMD_CMP_LEGACY;
-	/// <summary>
-	/// MultiProcessing capable; reserved on AMD64
-	/// </summary>
-	bool HW_AMD_MP;
-	/// <summary>
-	/// AMD MMX extensions enabled
-	/// </summary>
-	bool HW_AMD_MMX_EXT;
-	/// <summary>
-	/// AMD 3DNOW PRO extensions enabled
-	/// </summary>
-	bool HW_AMD_3DNOW_PRO;
-	/// <summary>
-	/// AMD 3DNOW extensions enabled
-	/// </summary>
-	bool HW_AMD_3DNOW;
+	const bool XOP() { return m_xop; }
 
 	//~~~ Constructor~~~//
 
@@ -388,123 +500,83 @@ public:
 	/// Initialization Detects Cpu features
 	/// </summary>
 	CpuDetect()
+		:
+		m_abm(false),
+		m_ads(false),
+		m_aesni(false),
+		m_amd3dNow(false),
+		m_amd3dNowPro(false),
+		m_amdCmpLegacy(false),
+		m_amdMmxExt(false),
+		m_amdMp(false),
+		m_avx(false),
+		m_avx2(false),
+		m_avx5124fmaps(false),
+		m_avx512bw(false),
+		m_avx512cd(false),
+		m_avx512dq(false),
+		m_avx512er(false),
+		m_avx512f(false),
+		m_avx512ifma(false),
+		m_avx512pf(false),
+		m_avx5124vnniw(false),
+		m_avx512vbmi(false),
+		m_avx512vl(false),
+		m_bmt1(false),
+		m_bmt2(false),
+		m_busSpeed(0),
+		m_cpuVendor(""),
+		m_fma3(false),
+		m_fma4(false),
+		m_frequencyBase(0), 
+		m_frequencyMax(0),
+		m_hle(false),
+		m_hyperThread(false),
+		m_l1CacheSize(0),
+		m_l1CacheLineSize(0),
+		m_l2Associative(CacheAssociations::Disabled),
+		m_l2CacheSize(0),
+		m_logicalPerCore(0),
+		m_mmx(false),
+		m_mpx(false),
+		m_physCores(0),
+		m_pku(false), 
+		m_pkuos(false),
+		m_pqe(false),
+		m_pqm(false),
+		m_prefetch(false),
+		m_rdRand(false),
+		m_rdSeed(false),
+		m_rdtscp(false),
+		m_rtm(false),
+		m_serialNumber(""),
+		m_sgx(false),
+		m_sha(false),
+		m_smap(false),
+		m_smep(false),
+		m_sse1(false),
+		m_sse2(false),
+		m_sse3(false),
+		m_sse41(false),
+		m_sse42(false),
+		m_sse4a(false),
+		m_ssse3(false),
+		m_virtCores(0),
+		m_x64(false),
+		m_xop(false)
 	{
-		Initialize();
 		Detect();
-	}
-
-	//~~~ Public Methods~~~//
-
-	/// <summary>
-	/// Detect the Cpu feature set
-	/// </summary>
-	void Detect();
-
-	/// <summary>
-	/// Returns true if any of the AVX512, AVX2, or AVX feature sets are detected
-	/// </summary>
-	bool HasAES()
-	{
-		return HW_AVX512F || HW_AVX2 || HW_AVX;
-	}
-
-	/// <summary>
-	/// Returns true if any of the AVX512, AVX2, or AVX feature sets are detected
-	/// </summary>
-	bool HasAVX()
-	{
-		return HW_AVX512F || HW_AVX2 || HW_AVX;
-	}
-
-	/// <summary>
-	/// Returns true if any of the AVX512, or AVX2 feature sets are detected
-	/// </summary>
-	bool HasAVX2()
-	{
-		return HW_AVX512F || HW_AVX2;
-	}
-
-	/// <summary>
-	/// Returns true if any of the AVX512, AVX2, AVX1, or XOP feature sets are detected
-	/// </summary>
-	bool HasAdvancedSSE()
-	{
-		return HW_AVX512F || HW_AVX2 || HW_AVX || HW_XOP;
-	}
-
-	/// <summary>
-	/// Returns true if SSE2 or greater is detected
-	/// </summary>
-	bool HasMinIntrinsics()
-	{
-		return HW_AVX512F || HW_AVX2 || HW_AVX || HW_XOP || HW_SSE42 || HW_SSE41 || HW_SSE4A || HW_SSSE3 || HW_SSE3 || HW_SSE2;
-	}
-
-	/// <summary>
-	/// Returns true if the XOP feature set is detected
-	/// </summary>
-	bool HasXOP()
-	{
-		return HW_XOP;
-	}
-
-	/// <summary> 
-	/// Returns the best available SIMD feature set
-	/// </summary>
-	FeatureSets HighestSSEVersion()
-	{
-		if (HW_AVX512F)
-			return FeatureSets::AVX512F;
-		else if (HW_AVX2)
-			return FeatureSets::AVX2;
-		else if (HW_AVX)
-			return FeatureSets::AVX;
-		else if (HW_XOP)
-			return FeatureSets::XOP;
-		else if (HW_SSE42)
-			return FeatureSets::SSE42;
-		else if (HW_SSE41)
-			return FeatureSets::SSE41;
-		else if (HW_SSE4A)
-			return FeatureSets::SSE4A;
-		else if (HW_SSSE3)
-			return FeatureSets::SSSE3;
-		else if (HW_SSE3)
-			return FeatureSets::SSE3;
-		else if (HW_SSE2)
-			return FeatureSets::SSE2;
-		else if (HW_SSE)
-			return FeatureSets::SSE;
-		else if (HW_MMX)
-			return FeatureSets::MMX;
-		else
-			return FeatureSets::NONE;
-	}
-
-	/// <summary>
-	/// Returns the cpu vendors enumeration value
-	/// </summary>
-	CpuVendors Vendor()
-	{
-		if (CpuVendor.size() > 0)
-		{
-			std::string data = CpuVendor;
-			std::transform(data.begin(), data.end(), data.begin(), ::tolower);
-			if (CpuVendor.find_first_of("intel") > 0)
-				return CpuVendors::INTEL;
-			else if (CpuVendor.find_first_of("amd") > 0)
-				return CpuVendors::AMD;
-		}
-		return CpuVendors::UNKNOWN;
 	}
 
 private:
 
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-	bool HasAvxSupport();
-	bool HasAvx2Support();
+#if defined(MSCAVX)
+	bool AvxSupported();
+	bool Avx2Supported();
 #endif
-	void Initialize();
+	void Detect();
+	void GetFrequency();
+	void GetSerialNumber();
 	size_t MaxCoresPerPackage();
 	size_t MaxLogicalPerCore();
 };

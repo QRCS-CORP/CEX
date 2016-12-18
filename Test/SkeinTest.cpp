@@ -11,21 +11,21 @@ namespace Test
 		{
 			Initialize();
 
-			CEX::Digest::Skein256* sk256 = new CEX::Digest::Skein256();
+			Digest::Skein256* sk256 = new Digest::Skein256();
 			CompareVector(sk256, m_message256[0], m_expected256[0]);
 			CompareVector(sk256, m_message256[1], m_expected256[1]);
 			CompareVector(sk256, m_message256[2], m_expected256[2]);
 			OnProgress("Passed Skein 256 bit digest vector tests..");
 			delete sk256;
 
-			CEX::Digest::Skein512* sk512 = new CEX::Digest::Skein512();
+			Digest::Skein512* sk512 = new Digest::Skein512();
 			CompareVector(sk512, m_message512[0], m_expected512[0]);
 			CompareVector(sk512, m_message512[1], m_expected512[1]);
 			CompareVector(sk512, m_message512[2], m_expected512[2]);
 			delete sk512;
 			OnProgress("Passed Skein 512 bit digest vector tests..");
 
-			CEX::Digest::Skein1024* sk1024 = new CEX::Digest::Skein1024();
+			Digest::Skein1024* sk1024 = new Digest::Skein1024();
 			CompareVector(sk1024, m_message1024[0], m_expected1024[0]);
 			CompareVector(sk1024, m_message1024[1], m_expected1024[1]);
 			CompareVector(sk1024, m_message1024[2], m_expected1024[2]);
@@ -34,9 +34,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -44,7 +44,7 @@ namespace Test
 		}
 	}
 
-	void SkeinTest::CompareVector(CEX::Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)
+	void SkeinTest::CompareVector(Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
@@ -54,11 +54,11 @@ namespace Test
 		Digest->Reset();
 
 		if (Expected != hash)
-			throw std::string("SKein Vector: Expected hash is not equal!");
+			throw std::exception("SKein Vector: Expected hash is not equal!");
 
 		Digest->ComputeHash(Input, hash);
 		if (Expected != hash)
-			throw std::string("SKein Vector: Expected hash is not equal!");
+			throw std::exception("SKein Vector: Expected hash is not equal!");
 	}
 
 	void SkeinTest::Initialize()

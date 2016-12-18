@@ -1,18 +1,22 @@
-#ifndef _CEXENGINE_FILESTREAM_H
-#define _CEXENGINE_FILESTREAM_H
+#ifndef _CEX_FILESTREAM_H
+#define _CEX_FILESTREAM_H
 
 #include "IByteStream.h"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 NAMESPACE_IO
 
 /// <summary>
-/// Write data values to a file
+/// A file streaming container.
+/// <para>Manipulate a file through a streaming interface.</para>
 /// </summary>
 class FileStream : public IByteStream
 {
 public:
+
+	//~~~Enums~~~//
+
 	/// <summary>
 	/// File access type flags
 	/// </summary>
@@ -26,7 +30,7 @@ public:
 	/// <summary>
 	/// File operation mode flags
 	/// </summary>
-	enum class FileMode : int
+	enum class FileModes : int
 	{
 		Append = std::ios::app,
 		AtEnd = std::ios::ate,
@@ -35,26 +39,32 @@ public:
 	};
 
 private:
-	static constexpr uint BLOCK_SIZE = 4096;
 
+	const uint32_t CHUNK_SIZE = 4096;
 	bool m_isDestroyed;
-	const char* _filename;
-	size_t _filePosition;
-	size_t _fileSize;
-	std::fstream _fileStream;
-	FileAccess _fileAccess;
-	FileMode _fileMode;
-
-	FileStream() {}
+	std::string m_fileName;
+	uint64_t m_filePosition;
+	uint64_t m_fileSize;
+	uint32_t m_fileWritten;
+	std::fstream m_fileStream;
+	FileAccess m_fileAccess;
+	FileModes m_fileMode;
 
 public:
+
+	FileStream() = delete;
 
 	//~~~Properties~~~//
 
 	/// <summary>
+	/// Get: The file read and write file access flags
+	/// </summary>
+	const FileAccess Access() { return m_fileAccess; }
+
+	/// <summary>
 	/// Get: The stream can be read
 	/// </summary>
-	virtual const bool CanRead() { return _fileAccess != FileAccess::Write; }
+	virtual const bool CanRead() { return m_fileAccess != FileAccess::Write; }
 
 	/// <summary>
 	/// Get: The stream is seekable
@@ -64,59 +74,70 @@ public:
 	/// <summary>
 	/// Get: The stream can be written to
 	/// </summary>
-	virtual const bool CanWrite() { return _fileAccess != FileAccess::Read; }
+	virtual const bool CanWrite() { return m_fileAccess != FileAccess::Read; }
+
+	/// <summary>
+	/// Get: The stream container type
+	/// </summary>
+	virtual const StreamModes Enumeral() { return StreamModes::FileStream; }
+
+	/// <summary>
+	/// Get: The file open mode flags
+	/// </summary>
+	const FileModes FileMode() { return m_fileMode; }
+
+	/// <summary>
+	/// Get: The file name and path
+	/// </summary>
+	std::string FileName() { return m_fileName; }
 
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const size_t Length() { return _fileSize; }
+	virtual const uint64_t Length() { return m_fileSize; }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const size_t Position() { return _filePosition; }
+	virtual const uint64_t Position() { return m_filePosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
 	/// </summary>
-	std::fstream &Stream() { return _fileStream; }
+	std::fstream &Stream() { return m_fileStream; }
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize this class
+	/// Instantiate this class with a file name and options
 	/// </summary>
 	///
-	/// <param name="FileName">The full path to the file</param>
+	/// <param name="FileName">The full path and name of the file</param>
 	/// <param name="Access">The level of access requested</param>
 	/// <param name="Mode">The file processing mode</param>
-	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileMode Mode = FileMode::Binary)
+	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileModes Mode = FileModes::Binary)
 		:
-		_fileAccess(Access),
-		_fileMode(Mode),
-		_filename(0),
+		m_fileAccess(Access),
+		m_fileMode(Mode),
+		m_fileName(FileName),
 		m_isDestroyed(false),
-		_filePosition(0),
-		_fileSize(0)
+		m_filePosition(0),
+		m_fileSize(0),
+		m_fileWritten(0)
 	{
-		_filename = FileName.c_str();
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (Access == FileAccess::Read && !FileExists(_filename))
+		if (Access == FileAccess::Read && !FileExists(m_fileName))
 			throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
-#endif
 
-		_fileSize = (size_t)FileSize(_filename);
+		m_fileSize = FileSize(m_fileName);
 
 		try
 		{
-			_fileStream.open(_filename, (int)Access | (int)Mode);
-			_fileStream.unsetf(std::ios::skipws);
+			m_fileStream.open(m_fileName, (int)Access | (int)Mode);
+			m_fileStream.unsetf(std::ios::skipws);
 		}
-		catch (...)
+		catch(std::exception& ex)
 		{
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!");
-#endif
+			throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!", std::string(ex.what()));
 		}
 	}
 
@@ -150,28 +171,46 @@ public:
 	virtual void Destroy();
 
 	/// <summary>
-	/// Write the stream to disk
+	/// Check if a file exists
 	/// </summary>
-	virtual void Flush();
+	///
+	/// <param name="FileName">The full path and file name</param>
+	///
+	/// <returns>Returns true if the file exists</returns>
+	static bool FileExists(const std::string &FileName);
 
 	/// <summary>
-	/// Reads a portion of the stream into the buffer
+	/// Get the file size in bytes
 	/// </summary>
 	///
-	/// <param name="Buffer">The output buffer receiving the bytes</param>
-	/// <param name="Offset">Offset within the output buffer at which to begin</param>
-	/// <param name="Count">The number of bytes to read</param>
+	/// <param name="FileName">The full path and file name</param>
 	///
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Read(std::vector<byte> &Buffer, size_t Offset, size_t Count);
+	/// <returns>Returns the file size</returns>
+	static uint64_t FileSize(const std::string &FileName);
+
+	/// <summary>
+	/// Write the stream to disk
+	/// </summary>
+	void Flush();
+
+	/// <summary>
+	/// Copies a portion of the stream into an output buffer
+	/// </summary>
+	///
+	/// <param name="Output">The output array receiving the bytes</param>
+	/// <param name="Offset">Offset within the output array at which to begin</param>
+	/// <param name="Length">The number of bytes to read</param>
+	///
+	/// <returns>The number of bytes read</returns>
+	virtual size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Read a single byte from the stream
 	/// </summary>
 	///
-	/// <returns>The byte value</returns>
+	/// <returns>The read byte value</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the stream is too short or the file is write only</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the stream is too short or the file is write only</exception>
 	virtual byte ReadByte();
 
 	/// <summary>
@@ -185,7 +224,7 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(size_t Offset, SeekOrigin Origin);
+	virtual void Seek(uint64_t Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
@@ -193,35 +232,30 @@ public:
 	/// 
 	/// <param name="Length">The desired length</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void SetLength(size_t Length);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
+	virtual void SetLength(uint64_t Length);
 
 	/// <summary>
-	/// Writes a buffer into the stream
+	/// Writes an input buffer to the stream
 	/// </summary>
 	///
-	/// <param name="Buffer">The output buffer to write to the stream</param>
-	/// <param name="Offset">Offset within the output buffer at which to begin</param>
-	/// <param name="Count">The number of bytes to write</param>
+	/// <param name="Input">The input array to write to the stream</param>
+	/// <param name="Offset">Offset within the input array at which to begin</param>
+	/// <param name="Length">The number of bytes to write</param>
 	///
-	/// <returns>The number of bytes processed</returns>
+	/// <returns>The number of bytes written</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
+	virtual void Write(const std::vector<byte> &Input, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Write a single byte from the stream
 	/// </summary>
 	///
-	/// <returns>The byte value</returns>
+	/// <param name="Value">The byte value to write</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void WriteByte(byte Data);
-
-private:
-	bool FileExists(const char* FileName);
-
-	std::ifstream::pos_type FileSize(const char* FileName);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
+	virtual void WriteByte(byte Value);
 };
 
 NAMESPACE_IOEND

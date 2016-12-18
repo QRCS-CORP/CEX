@@ -53,23 +53,23 @@ namespace Test
 
 	private:
 		void AHXSpeedTest();
-		void CBCSpeedTest(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void CFBSpeedTest(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void CTRSpeedTest(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void CBCSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void CFBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void CTRSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void ChaChaSpeedTest();
 		void CounterSpeedTest();
 		uint64_t GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize);
-		void ICMSpeedTest(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void ICMSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void Initialize();
-		void OFBSpeedTest(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void ParallelBlockLoop(CEX::Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, bool Encrypt, bool Parallel, size_t SampleSize, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
-		void ParallelStreamLoop(CEX::Cipher::Symmetric::Stream::IStreamCipher* Cipher, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
+		void OFBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
+		void ParallelBlockLoop(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, bool Encrypt, bool Parallel, size_t SampleSize, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
+		void ParallelStreamLoop(Cipher::Symmetric::Stream::IStreamCipher* Cipher, size_t KeySize, size_t IvSize = 16, size_t Loops = DEFITER);
 		void OnProgress(char* Data);
 		void RHXSpeedTest(size_t KeySize = 32);
 		void SalsaSpeedTest();
 		void SHXSpeedTest(size_t KeySize = 32);
 		void THXSpeedTest(size_t KeySize = 32);
-		void WideModeLoop(CEX::Cipher::Symmetric::Block::IBlockCipher* Engine, size_t SampleSize, bool Parallel = false, size_t KeySize = 32, size_t IvSize = 128, size_t Loops = DEFITER);
+		void WideModeLoop(Cipher::Symmetric::Block::IBlockCipher* Engine, size_t SampleSize, bool Parallel = false, size_t KeySize = 32, size_t IvSize = 128, size_t Loops = DEFITER);
 	};
 }
 

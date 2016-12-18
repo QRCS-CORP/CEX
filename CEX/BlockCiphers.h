@@ -1,30 +1,46 @@
-#ifndef _CEXENGINE_BLOCKCIPHERS_H
-#define _CEXENGINE_BLOCKCIPHERS_H
+#ifndef _CEX_BLOCKCIPHERS_H
+#define _CEX_BLOCKCIPHERS_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// Block Ciphers
+/// Symmetric block cipher enmumeration names
 /// </summary>
-enum class BlockCiphers : uint
+enum class BlockCiphers : uint8_t
 {
 	/// <summary>
-	/// An AES-NI implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation
+	/// No block cipher is specified
+	/// </summary>
+	None = 0,
+	/// <summary>
+	/// An AES-NI implementation based on the Rijndael Block Cipher extended with an HKDF key schedule
 	/// </summary>
 	AHX = 1,
 	/// <summary>
-	/// An implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation
+	/// An implementation based on the Rijndael Block Cipher
 	/// </summary>
-	RHX = 2,
+	Rijndael = 2,
 	/// <summary>
-	/// The Serpent Block Cipher Extended with an HKDF Key Schedule
+	/// An implementation based on the Rijndael Block Cipher extended with an HKDF key schedule
 	/// </summary>
-	SHX = 4,
+	RHX = 4,
 	/// <summary>
-	/// A Twofish Block Cipher Extended with an HKDF Key Schedule
+	/// An implementation based on the Serpent Block Cipher
 	/// </summary>
-	THX = 8
+	Serpent = 8,
+	/// <summary>
+	/// An implementation based on the Serpent Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	SHX = 16,
+	/// <summary>
+	/// An implementation based on the Twofish Block Cipher
+	/// </summary>
+	Twofish = 32,
+	/// <summary>
+	/// An implementation based on the Twofish Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	THX = 64,
 };
 
 NAMESPACE_ENUMERATIONEND

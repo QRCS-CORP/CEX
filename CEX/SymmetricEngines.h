@@ -1,36 +1,40 @@
-#ifndef _CEXENGINE_SYMMETRICENGINES_H
-#define _CEXENGINE_SYMMETRICENGINES_H
+#ifndef _CEX_SYMMETRICENGINES_H
+#define _CEX_SYMMETRICENGINES_H
 
-#include "Common.h"
+#include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
 /// <summary>
-/// Symmetric Encryption Ciphers
+/// Symmetric encryption ciphers enumeration names
 /// </summary>
-enum class SymmetricEngines : uint
+enum class SymmetricEngines : uint8_t
 {
 	/// <summary>
-	/// An AES-NI implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation
+	/// No symmetric cipher is specified
+	/// </summary>
+	None = 0,
+	/// <summary>
+	/// An AES-NI block cipher implementation with optional HKDF key expansion
 	/// </summary>
 	AHX = 1,
 	/// <summary>
-	/// An implementation based on the Rijndael Block Cipher, using HKDF with a SHA512 HMAC for expanded key generation
+	/// An implementation based on the Rijndael block cipher with optional HKDF key expansion
 	/// </summary>
 	RHX = 2,
 	/// <summary>
-	/// The Serpent Block Cipher Extended with an HKDF Key Schedule
+	/// The Serpent block cipher with optional HKDF key expansion
 	/// </summary>
 	SHX = 4,
 	/// <summary>
-	/// A Twofish Block Cipher Extended with an HKDF Key Schedule
+	/// A Twofish Block Cipher with optional HKDF key expansion
 	/// </summary>
 	THX = 8,
 	/// <summary>
-	/// An implementation of the ChaCha Stream Cipher
+	/// An implementation of the ChaCha stream cipher
 	/// </summary>
-	ChaCha = 16,
+	ChaCha20 = 16,
 	/// <summary>
-	/// A Salsa20 Stream Cipher
+	/// An implementation of the Salsa stream cipher
 	/// </summary>
 	Salsa = 32
 };

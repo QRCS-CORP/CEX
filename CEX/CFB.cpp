@@ -1,15 +1,10 @@
 #include "CFB.h"
+#include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_MODE
-
-using CEX::Helper::BlockCipherFromName;
-using CEX::Common::CpuDetect;
-using CEX::Utility::IntUtils;
-using CEX::Utility::ParallelUtils;
 
 void CFB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -37,35 +32,33 @@ void CFB::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_cipherType = BlockCiphers::None;
+		m_hasAVX2 = false;
+		m_hasSSE = false;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isParallel = false;
+		m_parallelBlockSize = 0;
+		m_parallelMaxDegree = 0;
+		m_parallelMinimumSize = 0;
+		m_processorCount = 0;
 
 		try
 		{
 			if (m_destroyEngine)
 			{
+				m_destroyEngine = false;
+
 				if (m_blockCipher != 0)
 					delete m_blockCipher;
 			}
 
-			m_blockSize = 0;
-			m_hasAVX = false;
-			m_hasSSE = false;
-			m_isEncryption = false;
-			m_isInitialized = false;
-			m_isParallel = false;
-			m_parallelBlockSize = 0;
-			m_parallelMaxDegree = 0;
-			m_parallelMinimumSize = 0;
-			m_processorCount = 0;
-			IntUtils::ClearVector(m_cfbVector);
+			Utility::ArrayUtils::ClearVector(m_cfbVector);
 		}
-		catch (...) 
+		catch(std::exception& ex) 
 		{
-#if defined(DEBUGASSERT_ENABLED)
-			assert("CFB::Destroy: Could not clear all variables!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CryptoCipherModeException("CFB::Destroy", "Could not clear all variables!");
-#endif
+			throw CryptoCipherModeException("CFB:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
@@ -92,33 +85,21 @@ void CFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	memcpy(&m_cfbVector[m_cfbVector.size() - m_blockSize], &Output[OutOffset], m_blockSize);
 }
 
-void CFB::Initialize(bool Encryption, const KeyParams &KeyParam)
+void CFB::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	if (IsParallel())
-	{
-		assert(ParallelBlockSize() >= ParallelMinimumSize() || ParallelBlockSize() <= ParallelMaximumSize());
-		assert(ParallelBlockSize() % ParallelMinimumSize() == 0);
-	}
-	assert(KeyParam.IV().size() > 0);
-	assert(KeyParam.Key().size() > 15);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-	if (KeyParam.IV().size() == 64 && !HasSSE())
-		throw CryptoSymmetricCipherException("CFB:Initialize", "SSE 128bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() == 128 && !HasAVX())
-		throw CryptoSymmetricCipherException("CFB:Initialize", "AVX 256bit intrinsics are not available on this system!");
-	if (KeyParam.IV().size() < 1)
-		throw CryptoSymmetricCipherException("CFB:Initialize", "Requires a minimum 1 byte of IV!");
-	if (KeyParam.Key().size() < 16)
-		throw CryptoSymmetricCipherException("CFB:Initialize", "Requires a minimum 16 bytes of Key!");
+	// recheck params
+	Scope();
+
+	if (KeyParam.Nonce().size() < 1)
+		throw CryptoSymmetricCipherException("CFB:Initialize", "Requires a minimum 1 byte of Nonce!");
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParam.Key().size()))
+		throw CryptoSymmetricCipherException("CBC:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 	if (IsParallel() && ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
 		throw CryptoSymmetricCipherException("CFB:Initialize", "The parallel block size is out of bounds!");
 	if (IsParallel() && ParallelBlockSize() % ParallelMinimumSize() != 0)
 		throw CryptoSymmetricCipherException("CFB:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
-#endif
 
-	std::vector<byte> iv = KeyParam.IV();
+	std::vector<byte> iv = KeyParam.Nonce();
 	size_t diff = m_cfbVector.size() - iv.size();
 	memcpy(&m_cfbVector[diff], &iv[0], iv.size());
 	memset(&m_cfbVector[0], 0, diff);
@@ -129,19 +110,12 @@ void CFB::Initialize(bool Encryption, const KeyParams &KeyParam)
 
 void CFB::ParallelMaxDegree(size_t Degree)
 {
-#if defined(DEBUGASSERT_ENABLED)
-	assert(Degree != 0);
-	assert(Degree % 2 == 0);
-	assert(Degree <= m_processorCount);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Degree == 0)
 		throw CryptoCipherModeException("CFB:ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
 		throw CryptoCipherModeException("CFB:ParallelMaxDegree", "Parallel degree must be an even number!");
 	if (Degree > m_processorCount)
 		throw CryptoCipherModeException("CFB:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
-#endif
 
 	m_parallelMaxDegree = Degree;
 	Scope();
@@ -185,22 +159,30 @@ void CFB::Detect()
 {
 	try
 	{
-		CpuDetect detect;
-		m_hasSSE = detect.HasMinIntrinsics();
-		m_hasAVX = detect.HasAVX();
-		m_parallelBlockSize = detect.L1CacheSize * 1000;
+		Common::CpuDetect detect;
+		m_processorCount = detect.VirtualCores();
+		if (m_processorCount > 1 && m_processorCount % 2 != 0)
+			m_processorCount--;
+
+		m_parallelBlockSize = detect.L1DataCacheTotal();
+		if (m_parallelBlockSize == 0 || m_processorCount == 0)
+			throw std::exception();
+
+		m_hasSSE = detect.SSE();
+		m_hasAVX2 = detect.AVX2();
 	}
 	catch (...)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert("CpuDetect not compatable!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoCipherModeException("CFB:Detect", "CpuDetect not compatable!");
-#endif
+		m_processorCount = Utility::ParallelUtils::ProcessorCount();
+
+		if (m_processorCount == 0)
+			m_processorCount = 1;
+		if (m_processorCount > 1 && m_processorCount % 2 != 0)
+			m_processorCount--;
+
 		m_hasSSE = false;
-		m_hasAVX = false;
-		m_parallelBlockSize = PARALLEL_DEFBLOCK;
+		m_hasAVX2 = false;
+		m_parallelBlockSize = m_processorCount * PRC_DATACACHE;
 	}
 }
 
@@ -210,7 +192,7 @@ void CFB::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset,
 	const size_t BLKCNT = (SEGSZE / m_blockSize);
 	std::vector<byte> tmpIv(m_blockSize);
 
-	ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
+	Utility::ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
 	{
 		std::vector<byte> thdIv(m_blockSize);
 
@@ -250,57 +232,47 @@ void CFB::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 	}
 }
 
-IBlockCipher* CFB::GetCipher(BlockCiphers CipherType)
+IBlockCipher* CFB::LoadCipher(BlockCiphers CipherType)
 {
 	try
 	{
-		return BlockCipherFromName::GetInstance(CipherType);
+		return Helper::BlockCipherFromName::GetInstance(CipherType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoSymmetricCipherException("CTR:GetCipher", "The block cipher could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoSymmetricCipherException("CFB:LoadCipher", "The block cipher could not be instantiated!", std::string(ex.what()));
 	}
+}
+
+void CFB::LoadState()
+{
+	if (m_blockCipher == 0)
+	{
+		m_blockCipher = LoadCipher(m_cipherType);
+		m_cfbVector.resize(m_blockCipher->BlockSize());
+	}
+
+	Detect();
+	Scope();
 }
 
 void CFB::Scope()
 {
-	Detect();
-	m_processorCount = ParallelUtils::ProcessorCount();
-
 	if (m_parallelMaxDegree == 1)
-	{
 		m_isParallel = false;
-	}
-	else
-	{
-		if (m_processorCount % 2 != 0)
-			m_processorCount--;
-		if (m_processorCount > 1)
-			m_isParallel = true;
-	}
+	else if (!m_isInitialized)
+		m_isParallel = (m_processorCount > 1);
 
 	if (m_parallelMaxDegree == 0)
 		m_parallelMaxDegree = m_processorCount;
 
-	if (m_isParallel)
-	{
-		m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
+	m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
 
-		if (m_hasAVX)
-			m_parallelMinimumSize *= 8;
-		else if (m_hasSSE)
-			m_parallelMinimumSize *= 4;
-
-		// 16 kb minimum
-		if (m_parallelBlockSize == 0 || m_parallelBlockSize < PARALLEL_DEFBLOCK / 4)
-			m_parallelBlockSize = PARALLEL_DEFBLOCK - (PARALLEL_DEFBLOCK % m_parallelMinimumSize);
-		else
-			m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
-	}
+	// 16 kb minimum
+	if (m_parallelBlockSize == 0 || m_parallelBlockSize < PRC_DATACACHE)
+		m_parallelBlockSize = (m_parallelMaxDegree * PRC_DATACACHE) - ((m_parallelMaxDegree * PRC_DATACACHE) % m_parallelMinimumSize);
+	else
+		m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
 }
 
 NAMESPACE_MODEEND

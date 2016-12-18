@@ -1,14 +1,14 @@
 #include "RHX.h"
 #include "Rijndael.h"
+#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
-#include "HMAC.h"
 #include "IntUtils.h"
 
 NAMESPACE_BLOCK
 
-using CEX::Helper::DigestFromName;
-using CEX::Utility::IntUtils;
+using Helper::DigestFromName;
+using Utility::IntUtils;
 
 void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -32,21 +32,29 @@ void RHX::Destroy()
 	{
 		m_isDestroyed = true;
 		m_blockSize = 0;
-		m_dfnRounds = 0;
-		m_ikmSize = 0;
+		m_isDestroyed = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
+		m_kdfEngineType = Digests::None;
+		m_kdfInfoMax = 0;
+		m_kdfKeySize = 0;
+		m_rndCount = 0;
 
-		IntUtils::ClearVector(m_expKey);
-		IntUtils::ClearVector(m_hkdfInfo);
-		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearVector(m_legalRounds);
-
-		if (m_kdfEngine != 0)
+		try
 		{
-			m_kdfEngine->Destroy();
-			if (m_destroyEngine)
+			Utility::ArrayUtils::ClearVector(m_expKey);
+			Utility::ArrayUtils::ClearVector(m_kdfInfo);
+			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
+			Utility::ArrayUtils::ClearVector(m_legalRounds);
+
+			if (m_kdfEngine != 0 && m_destroyEngine)
 				delete m_kdfEngine;
+
+			m_destroyEngine = false;
+		}
+		catch (std::exception& ex)
+		{
+			throw CryptoSymmetricCipherException("RHX:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
@@ -67,39 +75,18 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 		Encrypt32(Input, InOffset, Output, OutOffset);
 }
 
-void RHX::Initialize(bool Encryption, const KeyParams &KeyParam)
+void RHX::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
-	uint dgtsze = GetIkmSize(m_kdfEngineType);
-
-#if defined(DEBUGASSERT_ENABLED)
-	assert(KeyParam.Key().size() >= m_legalKeySizes[0] && KeyParam.Key().size() <= m_legalKeySizes[m_legalKeySizes.size() - 1]);
-	if (dgtsze != 0)
-		assert(KeyParam.Key().size() % dgtsze == 0);
-	assert(KeyParam.Key().size() >= m_ikmSize);
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-	std::string msg = "Invalid key size! Key must be either 16, 24, 32, 64 bytes or, a multiple of the hkdf hash output size.";
-	if (KeyParam.Key().size() < m_legalKeySizes[0])
-		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
-	if (dgtsze != 0 && KeyParam.Key().size() > m_legalKeySizes[3] && (KeyParam.Key().size() % dgtsze) != 0)
-		throw CryptoSymmetricCipherException("RHX:Initialize", msg);
-
-	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
-	{
-		if (KeyParam.Key().size() == m_legalKeySizes[i])
-			break;
-		if (i == m_legalKeySizes.size() - 1)
-			throw CryptoSymmetricCipherException("RHX:Initialize", msg);
-	}
-	if (m_kdfEngineType != Digests::None)
-	{
-		if (KeyParam.Key().size() < m_ikmSize)
-			throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key! HKDF extended mode requires key be at least hash output size.");
-	}
-#endif
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParam.Key().size()))
+		throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	if (m_kdfEngineType != Enumeration::Digests::None && KeyParam.Info().size() > m_kdfInfoMax)
+		throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 
 	if (m_kdfEngineType != Digests::None)
-		m_kdfEngine = GetDigest(m_kdfEngineType);
+		m_kdfEngine = LoadDigest(m_kdfEngineType);
+
+	if (KeyParam.Info().size() > 0)
+		m_kdfInfo = KeyParam.Info();
 
 	m_isEncryption = Encryption;
 	// expand the key
@@ -186,29 +173,35 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 	// block and key in 32 bit words
 	size_t blkWords = m_blockSize / 4;
 	// expanded key size
-	size_t keySize = blkWords * (m_dfnRounds + 1);
-	// kdf return array
+	size_t keySize = (blkWords * (m_rndCount + 1));
 	size_t keyBytes = keySize * 4;
-	std::vector<byte> rawKey(keyBytes, 0);
-	size_t saltSize = Key.size() - m_ikmSize;
 
-	// hkdf input
-	std::vector<byte> kdfKey(m_ikmSize, 0);
-	std::vector<byte> kdfSalt(0, 0);
-	// copy hkdf key and salt from user key
-	memcpy(&kdfKey[0], &Key[0], m_ikmSize);
-	if (saltSize > 0)
+	Kdf::HKDF gen(m_kdfEngine);
+
+	// change 1.2: use extract only on an oversized key
+	if (Key.size() > m_kdfEngine->BlockSize())
 	{
-		kdfSalt.resize(saltSize);
-		memcpy(&kdfSalt[0], &Key[m_ikmSize], saltSize);
+		// seperate salt and key
+		m_kdfKeySize = m_kdfEngine->BlockSize();
+		std::vector<byte> kdfKey(m_kdfKeySize, 0);
+		memcpy(&kdfKey[0], &Key[0], m_kdfKeySize);
+		size_t saltSize = Key.size() - m_kdfKeySize;
+		std::vector<byte> kdfSalt(saltSize, 0);
+		memcpy(&kdfSalt[0], &Key[m_kdfKeySize], saltSize);
+		// info can be null
+		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
+	}
+	else
+	{
+		if (m_kdfInfo.size() != 0)
+			gen.Info() = m_kdfInfo;
+
+		gen.Initialize(Key);
 	}
 
-	// HKDF generator expands array 
-	CEX::Mac::HMAC hmac(m_kdfEngine);
-	CEX::Generator::HKDF gen(&hmac);
-	gen.Initialize(kdfSalt, kdfKey, m_hkdfInfo);
+	std::vector<byte> rawKey(keyBytes, 0);
+	// expand the round keys
 	gen.Generate(rawKey);
-
 	// initialize working key
 	m_expKey.resize(keySize, 0);
 	// copy bytes to working key
@@ -222,9 +215,9 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	// key in 32 bit words
 	size_t keyWords = Key.size() / 4;
 	// rounds calculation, 512 gets 22 rounds
-	m_dfnRounds = (blkWords == 8 && keyWords != 16) ? 14 : keyWords + 6;
+	m_rndCount = (blkWords == 8 && keyWords != 16) ? 14 : keyWords + 6;
 	// setup expanded key
-	m_expKey.resize(blkWords * (m_dfnRounds + 1), 0);
+	m_expKey.resize(blkWords * (m_rndCount + 1), 0);
 
 	if (keyWords == 16)
 	{
@@ -805,27 +798,54 @@ void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 //~~~Helpers~~~//
 
-uint RHX::GetIkmSize(Digests DigestType)
-{
-	return DigestFromName::GetDigestSize(DigestType);
-}
-
-IDigest* RHX::GetDigest(Digests DigestType)
+IDigest* RHX::LoadDigest(Digests DigestType)
 {
 	try
 	{
 		return DigestFromName::GetInstance(DigestType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert("RHX:GetDigest The digest could not be instantiated!");
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoSymmetricCipherException("RHX:GetDigest", "The digest could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoSymmetricCipherException("RHX:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
+	}
+}
+
+void RHX::LoadState(Digests ExtractorType)
+{
+	std::string info = "information string RHX version 1";
+	m_kdfInfo.reserve(info.size());
+	for (size_t i = 0; i < info.size(); ++i)
+		m_kdfInfo.push_back(info[i]);
+
+	m_kdfEngineType = ExtractorType;
+
+	if (m_kdfEngineType == Digests::None)
+	{
+		m_legalRounds.resize(4);
+		m_legalRounds = { 10, 12, 14, 22 };
+
+		m_legalKeySizes.resize(4);
+		m_legalKeySizes[0] = SymmetricKeySize(16, m_blockSize, 0);
+		m_legalKeySizes[1] = SymmetricKeySize(24, m_blockSize, 0);
+		m_legalKeySizes[2] = SymmetricKeySize(32, m_blockSize, 0);
+		m_legalKeySizes[3] = SymmetricKeySize(64, m_blockSize, 0);
+	}
+	else
+	{
+		m_legalRounds.resize(15);
+		m_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
+
+		// change: default at ideal size, a full block to key HMAC
+		m_kdfKeySize = DigestFromName::GetBlockSize(m_kdfEngineType);
+		// calculate max saturation of entropy when distribution code is used as key extension; subtract hash finalizer code + 1 byte HKDF counter
+		m_kdfInfoMax = m_kdfKeySize - (DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
+		m_legalKeySizes.resize(3);
+		// min allowable HMAC key
+		m_legalKeySizes[0] = SymmetricKeySize(DigestFromName::GetDigestSize(m_kdfEngineType), m_blockSize, m_kdfInfoMax);
+		// best size, no ipad/opad zero-byte mix in HMAC
+		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, m_blockSize, m_kdfInfoMax);
+		// triggers HKDF Extract
+		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, m_blockSize, m_kdfInfoMax);
 	}
 }
 

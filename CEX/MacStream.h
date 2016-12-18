@@ -1,48 +1,44 @@
-// The MIT License (MIT)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
 // 
 // Written by John Underhill, January 21, 2015
-// contact: develop@vtdev.com
+// Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_MACSTREAM_H
-#define _CEXENGINE_MACSTREAM_H
+#ifndef _CEX_MACSTREAM_H
+#define _CEX_MACSTREAM_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "CryptoProcessingException.h"
 #include "Event.h"
 #include "IByteStream.h"
 #include "IMac.h"
 #include "MacDescription.h"
-#include "KeyParams.h"
+#include "ISymmetricKey.h"
 
 NAMESPACE_PROCESSING
 
-using CEX::Exception::CryptoProcessingException;
-using CEX::Event::Event;
-using CEX::Common::KeyParams;
-using CEX::IO::IByteStream;
-using CEX::Mac::IMac;
-using CEX::Common::MacDescription;
+using Exception::CryptoProcessingException;
+using Routing::Event;
+using Key::Symmetric::ISymmetricKey;
+using IO::IByteStream;
+using Mac::IMac;
+using Processing::MacDescription;
 
 /// <summary>
 /// MAC stream helper class.
@@ -64,8 +60,6 @@ using CEX::Common::MacDescription;
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="CEX::Enumeration::Macs"/>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -77,7 +71,7 @@ using CEX::Common::MacDescription;
 class MacStream
 {
 private:
-	static constexpr size_t BUFFER_SIZE = 64 * 1024;
+	const size_t BUFFER_SIZE = 64 * 1024;
 
 	size_t m_blockSize;
 	bool m_destroyEngine;
@@ -86,9 +80,12 @@ private:
 	IMac* m_macEngine;
 	size_t m_progressInterval;
 
-	MacStream() { }
-
 public:
+
+	MacStream() = delete;
+	MacStream(const MacStream&) = delete;
+	MacStream& operator=(const MacStream&) = delete;
+	MacStream& operator=(MacStream&&) = delete;
 
 	/// <summary>
 	/// The Progress Percent event
@@ -100,10 +97,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
-	/// <param name="MacKey">A KeyParams containing the Mac key and Iv; note the Ikm parameter in KeyParams is not used</param>
+	/// <param name="MacKey">A SymmetricKey containing the Mac key and salt; note the info parameter in SymmetricKey is not used</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if an uninitialized Mac is used</exception>
-	explicit MacStream(MacDescription &Description, KeyParams &MacKey)
+	explicit MacStream(MacDescription &Description, ISymmetricKey &MacKey)
 		:
 		m_blockSize(0),
 		m_destroyEngine(false),
@@ -115,7 +112,7 @@ public:
 		if (m_macEngine == 0)
 			throw CryptoProcessingException("MacStream:CTor", "The Mac could not be created!");
 
-		m_macEngine->Initialize(MacKey.Key(), MacKey.IV());
+		m_macEngine->Initialize(MacKey);
 		m_blockSize = m_macEngine->BlockSize();
 	}
 
@@ -123,9 +120,9 @@ public:
 	/// Initialize the class with an initialized Mac instance
 	/// </summary>
 	/// 
-	/// <param name="Mac">The initialized <see cref="CEX::Mac::IMac"/> instance</param>
+	/// <param name="Mac">The initialized <see cref="Mac::IMac"/> instance</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
 	explicit MacStream(IMac* Mac)
 		:
 		m_blockSize(Mac->BlockSize()),
@@ -155,7 +152,7 @@ public:
 	/// 
 	/// <returns>The Mac Code</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeMac(IByteStream* InStream);
 
 	/// <summary>
@@ -167,7 +164,7 @@ public:
 	/// <param name="InOffset">The Input array starting offset</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
 	std::vector<byte> ComputeMac(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:

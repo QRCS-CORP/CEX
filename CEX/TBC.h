@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_TBC_H
-#define _CEXENGINE_TBC_H
+#ifndef _CEX_TBC_H
+#define _CEX_TBC_H
 
 #include "IPadding.h"
 
@@ -11,6 +11,11 @@ NAMESPACE_PADDING
 class TBC : public IPadding
 {
 private:
+
+	TBC(const TBC&) = delete;
+	TBC& operator=(const TBC&) = delete;
+	TBC& operator=(TBC&&) = delete;
+
 	const byte ZBCODE = (byte)0x00;
 	const byte MKCODE = (byte)0xff;
 
@@ -18,7 +23,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	TBC() {}
 
@@ -35,9 +40,9 @@ public:
 	virtual const PaddingModes Enumeral() { return PaddingModes::TBC; }
 
 	/// <summary>
-	/// Get: Padding name
+	/// Get: The padding modes class name
 	/// </summary>
-	virtual const char *Name() { return "TBC"; }
+	virtual const std::string Name() { return "TBC"; }
 
 	//~~~Public Methods~~~//
 
@@ -50,7 +55,7 @@ public:
 	///
 	/// <returns>Length of padding</returns>
 	///
-	/// <exception cref="CEX::Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
+	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
 	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
 
 	/// <summary>

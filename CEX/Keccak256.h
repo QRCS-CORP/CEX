@@ -1,25 +1,21 @@
-// The MIT License (MIT)
+// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
+//
 // 
 // Principal Algorithms:
 // An implementation of the SHA-3 digest based on Keccak, designed by Guido Bertoni, Joan Daemen, Michaël Peeters, and Gilles Van Assche. 
@@ -28,18 +24,17 @@
 // Implementation Details:
 // An implementation of the SHA-3 digest with a 256 bit return size. 
 // Written by John Underhill, September 19, 2014
-// contact: develop@vtdev.com
+// Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_KECCAK256_H
-#define _CEXENGINE_KECCAK256_H
+#ifndef _CEX_KECCAK256_H
+#define _CEX_KECCAK256_H
 
 #include "IDigest.h"
-#include "IntUtils.h"
 
 NAMESPACE_DIGEST
 
 /// <summary>
-/// Keccak256: An implementation of the SHA-3 Keccak digest
+/// An implementation of the SHA-3 Keccak digest
 /// </summary>
 ///
 /// <example>
@@ -52,9 +47,6 @@ NAMESPACE_DIGEST
 /// </code>
 /// </example>
 ///
-/// <seealso cref="CEX::Digest::IDigest"/>
-/// <seealso cref="CEX::Enumeration::Digests"/>
-/// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -74,6 +66,7 @@ NAMESPACE_DIGEST
 class Keccak256 : public IDigest
 {
 private:
+
 	size_t m_blockSize;
 	std::vector<byte> m_buffer;
 	size_t m_bufferIndex;
@@ -82,6 +75,10 @@ private:
 	std::vector<ulong> m_state;
 
 public:
+
+	Keccak256(const Keccak256&) = delete;
+	Keccak256& operator=(const Keccak256&) = delete;
+	Keccak256& operator=(Keccak256&&) = delete;
 
 	//~~~Properties~~~//
 
@@ -96,14 +93,14 @@ public:
 	virtual size_t DigestSize() { return m_digestSize; }
 
 	/// <summary>
-	/// Get: The digests type enumeration member
+	/// Get: The digests type name
 	/// </summary>
 	virtual Digests Enumeral() { return Digests::Keccak256; }
 
 	/// <summary>
-	/// Get: Digest name
+	/// Get: The digests class name
 	/// </summary>
-	virtual const char *Name() { return "Keccak256"; }
+	virtual const std::string Name() { return "Keccak256"; }
 
 	//~~~Constructor~~~//
 

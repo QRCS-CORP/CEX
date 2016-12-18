@@ -6,6 +6,8 @@
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	/// <summary>
 	/// Tests each Padding mode for valid output
 	/// </summary>
@@ -49,7 +51,7 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareOutput(CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding);
+		void CompareOutput(Padding::IPadding* Padding);
 		void OnProgress(char* Data);
 	};
 }

@@ -1,19 +1,20 @@
-#ifndef _CEXENGINE_MEMORYSTREAM_H
-#define _CEXENGINE_MEMORYSTREAM_H
+#ifndef _CEX_MEMORYSTREAM_H
+#define _CEX_MEMORYSTREAM_H
 
 #include "IByteStream.h"
 
 NAMESPACE_IO
 
 /// <summary>
-/// Write data to a byte array
+/// A memory stream container.
+/// <para>Manipulate a byte array through a streaming interface.</para>
 /// </summary>
 class MemoryStream : public IByteStream
 {
 private:
 	bool m_isDestroyed;
 	std::vector<byte> m_streamData;
-	size_t m_streamPosition;
+	uint64_t m_streamPosition;
 
 public:
 
@@ -35,24 +36,29 @@ public:
 	virtual const bool CanWrite() { return true; }
 
 	/// <summary>
+	/// Get: The stream container type
+	/// </summary>
+	virtual const StreamModes Enumeral() { return StreamModes::MemoryStream; }
+
+	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const size_t Length() { return m_streamData.size(); }
+	virtual const uint64_t Length() { return static_cast<uint64_t>(m_streamData.size()); }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const size_t Position() { return m_streamPosition; }
+	virtual const uint64_t Position() { return m_streamPosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
 	/// </summary>
-	std::vector<byte> &ToArray() { return m_streamData; }
+	std::vector<byte> ToArray() { return m_streamData; }
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize this class
+	/// Initialize and empty stream
 	/// </summary>
 	MemoryStream() 
 		:
@@ -63,7 +69,7 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize this class; setting the streams length
+	/// Initialize this class and set the streams length
 	/// </summary>
 	///
 	/// <param name="Length">The reserved length of the stream</param>
@@ -77,40 +83,38 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize this class; setting a byte array as the streams content
+	/// Initialize this class with a byte array
 	/// </summary>
 	///
-	/// <param name="DataArray">The array used to initialize the stream</param>
-	explicit MemoryStream(const std::vector<byte> &DataArray)
+	/// <param name="Data">The array used to initialize the stream</param>
+	explicit MemoryStream(const std::vector<byte> &Data)
 		:
 		m_isDestroyed(false),
-		m_streamData(DataArray),
+		m_streamData(Data),
 		m_streamPosition(0)
 	{
 	}
 
 	/// <summary>
-	/// Initialize this class (Copy constructor); copy a portion of a byte array to the streams content
+	/// Initialize this class with a byte array with offset and length parameters
 	/// </summary>
 	/// 
-	/// <param name="DataArray">The array used to initialize the stream</param>
+	/// <param name="Data">The array used to initialize the stream</param>
 	/// <param name="Offset">The offset in the Data array at which to begin copying</param>
 	/// <param name="Length">The number of bytes to copy</param>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
-	explicit MemoryStream(std::vector<byte> &DataArray, size_t Offset, size_t Length)
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
+	explicit MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t Length)
 		:
 		m_isDestroyed(false),
 		m_streamData(0),
 		m_streamPosition(0)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (Length > DataArray.size() - Offset)
+		if (Length > Data.size() - Offset)
 			throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
-#endif
 
-		m_streamData.reserve(Length);
-		m_streamData.insert(m_streamData.begin(), DataArray.begin() + Offset, DataArray.begin() + Length);
+		m_streamData.resize(Length);
+		memcpy(&m_streamData[0], &Data[Offset], Length);
 	}
 
 	//~~~Public Methods~~~//
@@ -120,15 +124,14 @@ public:
 	/// </summary>
 	virtual ~MemoryStream()
 	{
+		Destroy();
 	}
 
 	//~~~Public Methods~~~//
 
 	/// <summary>
-	/// Close and flush the stream
+	/// Close and flush the stream (not used in MemoryStream)
 	/// </summary>
-	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Not implemented exception</exception>
 	virtual void Close();
 
 	/// <summary>
@@ -144,22 +147,15 @@ public:
 	virtual void Destroy();
 
 	/// <summary>
-	/// Write the stream to disk
-	/// </summary>
-	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Not implemented exception</exception>
-	virtual void Flush();
-
-	/// <summary>
-	/// Reads a portion of the stream into the buffer
+	/// Copies a portion of the stream into an output buffer
 	/// </summary>
 	///
-	/// <param name="Buffer">The output buffer receiving the bytes</param>
-	/// <param name="Offset">Offset within the output buffer at which to begin</param>
-	/// <param name="Count">The number of bytes to read</param>
+	/// <param name="Output">The output array receiving the bytes</param>
+	/// <param name="Offset">Offset within the output array at which to begin</param>
+	/// <param name="Length">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual size_t Read(std::vector<byte> &Buffer, size_t Offset, size_t Count);
+	virtual size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -167,7 +163,7 @@ public:
 	///
 	/// <returns>The byte value</returns>
 	/// 
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if the output array is too short</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the stream is too short</exception>
 	virtual byte ReadByte();
 
 	/// <summary>
@@ -181,34 +177,34 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(size_t Offset, SeekOrigin Origin);
+	virtual void Seek(uint64_t Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(size_t Length);
+	virtual void SetLength(uint64_t Length);
 
 	/// <summary>
-	/// Writes a buffer into the stream
+	/// Writes an input buffer to the stream
 	/// </summary>
 	///
-	/// <param name="Buffer">The output buffer to write to the stream</param>
-	/// <param name="Offset">Offset within the output buffer at which to begin</param>
-	/// <param name="Count">The number of bytes to write</param>
+	/// <param name="Input">The input array to write to the stream</param>
+	/// <param name="Offset">Offset within the input array at which to begin</param>
+	/// <param name="Length">The number of bytes to write</param>
 	///
-	/// <returns>The number of bytes processed</returns>
+	/// <returns>The number of bytes written</returns>
 	///
-	/// <exception cref="CEX::Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
-	virtual void Write(const std::vector<byte> &Buffer, size_t Offset, size_t Count);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
+	virtual void Write(const std::vector<byte> &Input, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Write a single byte from the stream
 	/// </summary>
 	///
-	/// <returns>The byte value</returns>
-	virtual void WriteByte(byte Data);
+	/// <param name="Value">The byte value to write</param>
+	virtual void WriteByte(byte Value);
 };
 
 NAMESPACE_IOEND

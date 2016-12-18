@@ -7,11 +7,7 @@
 
 NAMESPACE_PROCESSING
 
-using CEX::Helper::BlockCipherFromName;
-using CEX::Helper::CipherModeFromName;
-using CEX::Helper::PaddingFromName;
-using CEX::Utility::ParallelUtils;
-using CEX::Helper::StreamCipherFromName;
+//~~~Public Methods~~~//
 
 void CipherStream::Destroy()
 {
@@ -24,18 +20,9 @@ void CipherStream::Destroy()
 		m_isParallel = false;
 		m_isStreamCipher = false;
 		m_parallelBlockSize = 0;
-		m_processorCount = 0;
-		BlockProfiles m_parallelBlockProfile = BlockProfiles::ProgressProfile;
 
 		if (m_destroyEngine)
 		{
-			if (m_cipherEngine != 0)
-				m_cipherEngine->Destroy();
-			if (m_blockCipher != 0)
-				m_blockCipher->Destroy();
-			if (m_streamCipher != 0)
-				m_streamCipher->Destroy();
-
 			try
 			{
 				if (m_blockCipher != 0)
@@ -47,11 +34,9 @@ void CipherStream::Destroy()
 				if (m_cipherPadding != 0)
 					delete m_cipherPadding;
 			}
-			catch (...) 
+			catch(std::exception& ex) 
 			{
-#if defined(CPPEXCEPTIONS_ENABLED)
-				throw CryptoProcessingException("CipherStream:Destroy", "The engines were not heap allocated!");
-#endif
+				throw CryptoProcessingException("CipherStream:Destroy", "The engines were not heap allocated!", std::string(ex.what()));
 			}
 		}
 
@@ -59,7 +44,7 @@ void CipherStream::Destroy()
 	}
 }
 
-void CipherStream::Initialize(bool Encryption, KeyParams &KeyParam)
+void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParam)
 {
 	try
 	{
@@ -68,11 +53,9 @@ void CipherStream::Initialize(bool Encryption, KeyParams &KeyParam)
 		else
 			m_streamCipher->Initialize(KeyParam);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!");
-#endif
+		throw CryptoProcessingException("CipherStream:Initialize", "The key could not be loaded, check the key and iv sizes!", std::string(ex.what()));
 	}
 
 	m_isEncryption = Encryption;
@@ -81,204 +64,316 @@ void CipherStream::Initialize(bool Encryption, KeyParams &KeyParam)
 
 void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (!m_isInitialized)
 		throw CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
 	if (InStream->Length() - InStream->Position() < 1)
 		throw CryptoProcessingException("CipherStream:Write", "The Input stream is too short!");
-#endif
+	if (!InStream->CanRead())
+		throw CryptoProcessingException("CipherStream:Write", "The Input stream is set to write only!");
+	if (!OutStream->CanRead() || !OutStream->CanWrite())
+		throw CryptoProcessingException("CipherStream:Write", "The Output stream is to read only! Must be read and write capable.");
 
-	// parallel min check and calc block size
-	size_t dlen = InStream->Length() - InStream->Position();
-	CalculateBlockSize(dlen);
-
-	if (m_isEncryption && dlen % m_blockSize != 0)
-	{
-		size_t alen = (dlen - (dlen % m_blockSize)) + m_blockSize;
-		OutStream->SetLength(alen);
-	}
-	else
-	{
-		OutStream->SetLength(dlen);
-	}
+	ParametersCheck();
 
 	if (!m_isStreamCipher)
-	{
-		if (m_isParallel && IsParallelMin(dlen))
-		{
-			if (m_isCounterMode)
-			{
-				ParallelCTR(InStream, OutStream);
-			}
-			else
-			{
-				if (m_isEncryption)
-					BlockEncrypt(InStream, OutStream);
-				else
-					ParallelDecrypt(InStream, OutStream);
-			}
-		}
-		else
-		{
-			if (m_isCounterMode)
-			{
-				BlockCTR(InStream, OutStream);
-			}
-			else
-			{
-				if (m_isEncryption)
-					BlockEncrypt(InStream, OutStream);
-				else
-					BlockDecrypt(InStream, OutStream);
-			}
-		}
-	}
+		BlockTransform(InStream, OutStream);
 	else
-	{
-		if (m_isParallel && IsParallelMin(dlen))
-			ParallelStream(InStream, OutStream);
-		else
-			ProcessStream(InStream, OutStream);
-	}
+		StreamTransform(InStream, OutStream);
 
-	OutStream->SetLength(OutStream->Position());
+	if (OutStream->Position() != OutStream->Length())
+		OutStream->SetLength(OutStream->Position());
 }
 
 void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (!m_isInitialized)
 		throw CryptoProcessingException("CipherStream:Write", "The cipher has not been initialized; call the Initialize() function first!");
 	if (Input.size() - InOffset < 1)
 		throw CryptoProcessingException("CipherStream:Write", "The Input array is too short!");
 	if (Input.size() - InOffset > Output.size() - OutOffset)
 		throw CryptoProcessingException("CipherStream:Write", "The Output array is too short!");
-#endif
 
-	// parallel min check and calc block size
-	size_t dlen = Input.size() - InOffset;
-	CalculateBlockSize(dlen);
+	ParametersCheck();
 
 	if (!m_isStreamCipher)
-	{
-		if (m_isParallel && IsParallelMin(dlen))
-		{
-			if (m_isCounterMode)
-			{
-				ParallelCTR(Input, InOffset, Output, OutOffset);
-			}
-			else
-			{
-				if (m_isEncryption)
-					BlockEncrypt(Input, InOffset, Output, OutOffset);
-				else
-					ParallelDecrypt(Input, InOffset, Output, OutOffset);
-			}
-		}
-		else
-		{
-			if (m_isCounterMode)
-			{
-				BlockCTR(Input, InOffset, Output, OutOffset);
-			}
-			else
-			{
-				if (m_isEncryption)
-					BlockEncrypt(Input, InOffset, Output, OutOffset);
-				else
-					BlockDecrypt(Input, InOffset, Output, OutOffset);
-			}
-		}
-	}
+		BlockTransform(Input, InOffset, Output, OutOffset);
 	else
-	{
-		if (m_isParallel && IsParallelMin(dlen))
-			ParallelStream(Input, InOffset, Output, OutOffset);
-		else
-			ProcessStream(Input, InOffset, Output, OutOffset);
-	}
+		StreamTransform(Input, InOffset, Output, OutOffset);
 }
 
-//~~~Protected Methods~~~//
+//~~~Private Methods~~~//
 
-void CipherStream::CalculateBlockSize(size_t Length)
+void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	size_t cipherBlock = 0;
+	const size_t INPSZE = Input.size() - InOffset;
+	size_t alnSze = 0;
+	size_t blkSze = 0;
+	size_t count = 0;
 
-	if (m_isStreamCipher)
-		cipherBlock = m_streamCipher->BlockSize();
-	else
-		cipherBlock = m_cipherEngine->BlockSize();
-
-	// parallel min check
-	if (Length < ParallelMinimumSize())
-		m_parallelBlockSize = cipherBlock;
-
-	if (m_parallelBlockProfile == BlockProfiles::ProgressProfile)
+	if (m_isParallel && INPSZE >= m_cipherEngine->ParallelBlockSize())
 	{
-		// get largest 10 base block 
-		size_t dsr = 10;
-		while (Length / dsr > ParallelMaximumSize())
-			dsr *= 2;
+		blkSze = m_parallelBlockSize;
+		alnSze = (INPSZE / m_parallelBlockSize) * m_parallelBlockSize;
 
-		m_parallelBlockSize = Length / dsr;
-	}
-	else if (m_parallelBlockProfile == BlockProfiles::SpeedProfile)
-	{
-		if (Length < PARALLEL_DEFBLOCK)
+		while (count != alnSze)
 		{
-			// small block
-			m_parallelBlockSize = Length;
+			m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
+			InOffset += blkSze;
+			OutOffset += blkSze;
+			count += blkSze;
+			CalculateProgress(INPSZE, count);
 		}
-		else
-		{
-			// get largest 64kb base block
-			size_t dsr = Length - (Length % PARALLEL_DEFBLOCK);
 
-			if (Length > ParallelMaximumSize())
-			{
-				while (dsr > ParallelMaximumSize())
-					dsr /= 2;
-
-				m_parallelBlockSize = (int)dsr;
-			}
-			else
-			{
-				m_parallelBlockSize = (int)dsr;
-			}
-		}
-	}
-
-	if (m_isParallel && !m_isCounterMode && !m_isEncryption && !m_isStreamCipher)
-	{
-		if (m_parallelBlockSize % ParallelMinimumSize() > 0)
-			m_parallelBlockSize -= (m_parallelBlockSize % ParallelMinimumSize());
-		else
-			m_parallelBlockSize -= ParallelMinimumSize();
+		m_cipherEngine->IsParallel() = false;
 	}
 	else
 	{
-		if (m_parallelBlockSize % ParallelMinimumSize() != 0)
-			m_parallelBlockSize -= (m_parallelBlockSize % ParallelMinimumSize());
+		m_cipherEngine->IsParallel() = false;
 	}
 
-	// set the ciphers block size
-	if (m_parallelBlockSize >= ParallelMinimumSize())
+	blkSze = m_blockSize;
+	alnSze = (!m_isCounterMode && !m_isEncryption) ? (INPSZE < blkSze) ? 0 : INPSZE - blkSze : ((INPSZE / blkSze) * blkSze);
+
+	while (count != alnSze)
 	{
-		if (!m_isStreamCipher)
-			m_cipherEngine->ParallelBlockSize() = m_parallelBlockSize;
-		else
-			m_streamCipher->ParallelBlockSize() = m_parallelBlockSize;
+		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
+		InOffset += blkSze;
+		OutOffset += blkSze;
+		count += blkSze;
+		CalculateProgress(INPSZE, count);
 	}
 
-	// align
-	if (m_isParallel)
+	// partial
+	if (alnSze != INPSZE)
 	{
-		if (!m_isStreamCipher)
-			m_parallelBlockSize -= (m_parallelBlockSize % m_cipherEngine->ParallelMinimumSize());
+		if (m_isCounterMode)
+		{
+			size_t fnlSze = INPSZE - alnSze;
+			std::vector<byte> inpBuffer(blkSze);
+			memcpy(&inpBuffer[0], &Input[InOffset], fnlSze);
+			std::vector<byte> outBuffer(blkSze);
+
+			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
+			memcpy(&Output[OutOffset], &outBuffer[0], fnlSze);
+			count += fnlSze;
+		}
+		else if (m_isEncryption)
+		{
+			size_t fnlSze = INPSZE - alnSze;
+			std::vector<byte> inpBuffer(blkSze);
+			memcpy(&inpBuffer[0], &Input[InOffset], fnlSze);
+			m_cipherPadding->AddPadding(inpBuffer, fnlSze);
+			count += blkSze;
+			if (Output.size() != count)
+				Output.resize(count);
+
+			m_cipherEngine->Transform(inpBuffer, 0, Output, OutOffset);
+		}
 		else
-			m_parallelBlockSize -= (m_parallelBlockSize % m_streamCipher->ParallelMinimumSize());
+		{
+			std::vector<byte> outBuffer(blkSze);
+			m_cipherEngine->Transform(Input, InOffset, outBuffer, 0);
+			size_t fnlSze = blkSze - m_cipherPadding->GetPaddingLength(outBuffer, 0);
+			memcpy(&Output[OutOffset], &outBuffer[0], fnlSze);
+			count += fnlSze;
+			if (Output.size() != count)
+				Output.resize(count);
+		}
 	}
+
+	CalculateProgress(INPSZE, count);
+}
+
+void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
+{
+	const size_t INPSZE = InStream->Length() - InStream->Position();
+	size_t alnSze = 0;
+	size_t blkSze = 0;
+	size_t count = 0;
+	std::vector<byte> inpBuffer(0);
+	std::vector<byte> outBuffer(0);
+
+	if (m_isParallel && INPSZE >= m_cipherEngine->ParallelBlockSize())
+	{
+		blkSze = m_parallelBlockSize;
+		alnSze = (INPSZE / m_parallelBlockSize) * m_parallelBlockSize;
+		inpBuffer.resize(blkSze);
+		outBuffer.resize(blkSze);
+
+		while (count != alnSze)
+		{
+			InStream->Read(inpBuffer, 0, blkSze);
+			m_cipherEngine->Transform(inpBuffer, outBuffer);
+			OutStream->Write(outBuffer, 0, blkSze);
+			count += blkSze;
+			CalculateProgress(INPSZE, OutStream->Position());
+		}
+
+		m_cipherEngine->IsParallel() = false;
+	}
+	else
+	{
+		m_cipherEngine->IsParallel() = false;
+	}
+
+	blkSze = m_blockSize;
+	alnSze = (!m_isCounterMode && !m_isEncryption) ? (INPSZE < blkSze) ? 0 : INPSZE - blkSze : ((INPSZE / blkSze) * blkSze);
+	inpBuffer.resize(blkSze);
+	outBuffer.resize(blkSze);
+
+	while (count != alnSze)
+	{
+		InStream->Read(inpBuffer, 0, blkSze);
+		m_cipherEngine->Transform(inpBuffer, outBuffer);
+		OutStream->Write(outBuffer, 0, blkSze);
+		count += blkSze;
+		CalculateProgress(INPSZE, OutStream->Position());
+	}
+
+	// partial
+	if (alnSze != INPSZE)
+	{
+		if (m_isCounterMode)
+		{
+			size_t fnlSze = INPSZE - alnSze;
+			memset(&outBuffer[0], 0, outBuffer.size());
+			memset(&inpBuffer[0], 0, inpBuffer.size());
+			InStream->Read(inpBuffer, 0, fnlSze);
+			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
+			OutStream->Write(outBuffer, 0, fnlSze);
+		}
+		else if (m_isEncryption)
+		{
+			size_t fnlSze = INPSZE - alnSze;
+			InStream->Read(inpBuffer, 0, fnlSze);
+			m_cipherPadding->AddPadding(inpBuffer, fnlSze);
+			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
+			OutStream->Write(outBuffer, 0, blkSze);
+		}
+		else
+		{
+			InStream->Read(inpBuffer, 0, blkSze);
+			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
+			size_t fnlSze = blkSze - m_cipherPadding->GetPaddingLength(outBuffer, 0);
+			OutStream->Write(outBuffer, 0, fnlSze);
+		}
+	}
+
+	CalculateProgress(INPSZE, OutStream->Position());
+}
+
+void CipherStream::StreamTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+{
+	const size_t INPSZE = Input.size() - InOffset;
+	size_t alnSze = 0;
+	size_t blkSze = 0;
+	size_t count = 0;
+
+	if (m_isParallel && INPSZE >= m_streamCipher->ParallelBlockSize())
+	{
+		blkSze = m_parallelBlockSize;
+		alnSze = (INPSZE / m_parallelBlockSize) * m_parallelBlockSize;
+
+		while (count != alnSze)
+		{
+			m_streamCipher->Transform(Input, InOffset, Output, OutOffset);
+			InOffset += blkSze;
+			OutOffset += blkSze;
+			count += blkSze;
+			CalculateProgress(INPSZE, count);
+		}
+
+		m_streamCipher->IsParallel() = false;
+	}
+	else
+	{
+		m_streamCipher->IsParallel() = false;
+	}
+
+	blkSze = m_blockSize;
+	alnSze = (INPSZE / blkSze) * blkSze;
+
+	while (count != alnSze)
+	{
+		m_streamCipher->Transform(Input, InOffset, Output, OutOffset);
+		InOffset += blkSze;
+		OutOffset += blkSze;
+		count += blkSze;
+		CalculateProgress(INPSZE, count);
+	}
+
+	// partial
+	if (alnSze != INPSZE)
+	{
+		size_t cnkSize = INPSZE - alnSze;
+		std::vector<byte> inpBuffer(cnkSize);
+		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
+		std::vector<byte> outBuffer(cnkSize);
+		m_streamCipher->Transform(inpBuffer, outBuffer);
+		memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
+		count += cnkSize;
+	}
+
+	CalculateProgress(INPSZE, count);
+}
+
+void CipherStream::StreamTransform(IByteStream* InStream, IByteStream* OutStream)
+{
+	const size_t INPSZE = InStream->Length() - InStream->Position();
+	size_t alnSze = 0;
+	size_t blkSze = 0;
+	size_t count = 0;
+	std::vector<byte> inpBuffer(0);
+	std::vector<byte> outBuffer(0);
+
+	if (m_isParallel && INPSZE >= m_streamCipher->ParallelBlockSize())
+	{
+		blkSze = m_parallelBlockSize;
+		alnSze = (INPSZE / m_parallelBlockSize) * m_parallelBlockSize;
+		inpBuffer.resize(blkSze);
+		outBuffer.resize(blkSze);
+
+		while (count != alnSze)
+		{
+			InStream->Read(inpBuffer, 0, blkSze);
+			m_streamCipher->Transform(inpBuffer, outBuffer);
+			OutStream->Write(outBuffer, 0, blkSze);
+			count += blkSze;
+			CalculateProgress(INPSZE, OutStream->Position());
+		}
+
+		m_streamCipher->IsParallel() = false;
+	}
+	else
+	{
+		m_streamCipher->IsParallel() = false;
+	}
+
+	blkSze = m_blockSize;
+	alnSze = (INPSZE / blkSze) * blkSze;
+	inpBuffer.resize(blkSze);
+	outBuffer.resize(blkSze);
+
+	while (count != alnSze)
+	{
+		InStream->Read(inpBuffer, 0, blkSze);
+		m_streamCipher->Transform(inpBuffer, outBuffer);
+		OutStream->Write(outBuffer, 0, blkSze);
+		count += blkSze;
+		CalculateProgress(INPSZE, OutStream->Position());
+	}
+
+	if (alnSze != INPSZE)
+	{
+		size_t cnkSize = INPSZE - alnSze;
+		inpBuffer.resize(cnkSize);
+		InStream->Read(inpBuffer, 0, cnkSize);
+		outBuffer.resize(cnkSize);
+		m_streamCipher->Transform(inpBuffer, outBuffer);
+		OutStream->Write(outBuffer, 0, cnkSize);
+	}
+
+	CalculateProgress(INPSZE, OutStream->Position());
 }
 
 void CipherStream::CalculateProgress(size_t Length, size_t Processed)
@@ -304,235 +399,15 @@ void CipherStream::CalculateProgress(size_t Length, size_t Processed)
 	}
 }
 
-void CipherStream::BlockCTR(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_cipherEngine->BlockSize();
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_cipherEngine->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t fnlSize = inpSize - alnSize;
-		InStream->Read(inpBuffer, 0, fnlSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, fnlSize);
-	}
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::BlockCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_cipherEngine->BlockSize();
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-
-	m_cipherEngine->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	// partial
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		std::vector<byte> inpBuffer(blkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-		std::vector<byte> outBuffer(blkSize);
-		m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
-		memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-		count += cnkSize;
-	}
-
-	CalculateProgress(inpSize, count);
-}
-
-void CipherStream::BlockDecrypt(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_cipherEngine->BlockSize();
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize < blkSize) ? 0 : inpSize - blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_cipherEngine->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		InStream->Read(inpBuffer, 0, cnkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		size_t fnlSize = blkSize - m_cipherPadding->GetPaddingLength(outBuffer, 0);
-		OutStream->Write(outBuffer, 0, fnlSize);
-	}
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::BlockDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_cipherEngine->BlockSize();
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize < blkSize) ? 0 : inpSize - blkSize;
-	size_t count = 0;
-
-	m_cipherEngine->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	if (alnSize != inpSize)
-	{
-		// last block
-		std::vector<byte> inpBuffer(blkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], blkSize);
-		std::vector<byte> outBuffer(blkSize);
-		m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
-		size_t fnlSize = blkSize - m_cipherPadding->GetPaddingLength(outBuffer, 0);
-		memcpy(&Output[OutOffset], &outBuffer[0], fnlSize);
-		OutOffset += fnlSize;
-		Output.resize(OutOffset);
-	}
-
-	CalculateProgress(inpSize, OutOffset);
-}
-
-void CipherStream::BlockEncrypt(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_cipherEngine->BlockSize();
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_cipherEngine->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t fnlSize = inpSize - alnSize;
-		InStream->Read(inpBuffer, 0, fnlSize);
-		m_cipherPadding->AddPadding(inpBuffer, fnlSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-	}
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::BlockEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_cipherEngine->BlockSize();
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-
-	m_cipherEngine->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	// partial
-	if (alnSize != inpSize)
-	{
-		size_t fnlSize = inpSize - alnSize;
-		std::vector<byte> inpBuffer(blkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], fnlSize);
-		m_cipherPadding->AddPadding(inpBuffer, fnlSize);
-		std::vector<byte> outBuffer(blkSize);
-		m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0);
-		if (Output.size() != OutOffset + blkSize)
-			Output.resize(OutOffset + blkSize);
-		memcpy(&Output[OutOffset], &outBuffer[0], blkSize);
-		count += blkSize;
-	}
-
-	CalculateProgress(inpSize, count);
-}
-
-IBlockCipher* CipherStream::GetBlockEngine(BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine)
+ICipherMode* CipherStream::GetCipherMode(CipherModes ModeType, BlockCiphers CipherType, int BlockSize, int RoundCount, Digests KdfEngine)
 {
 	try
 	{
-		return BlockCipherFromName::GetInstance(EngineType, BlockSize, RoundCount, KdfEngine);
+		return Helper::CipherModeFromName::GetInstance(ModeType, CipherType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("CipherStream:GetBlockEngine", "The cipher could not be instantiated!");
-#else
-		return 0;
-#endif
-	}
-}
-
-ICipherMode* CipherStream::GetCipherMode(CipherModes CipherType, BlockCiphers EngineType, int BlockSize, int RoundCount, Digests KdfEngine)
-{
-	IBlockCipher* engine = GetBlockEngine(EngineType, BlockSize, RoundCount, KdfEngine);
-
-	try
-	{
-		return CipherModeFromName::GetInstance(CipherType, engine);
-	}
-	catch (...)
-	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("CipherStream:GetCipherMode", "The cipher mode could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoProcessingException("CipherStream:GetCipherMode", "The cipher mode could not be instantiated!", std::string(ex.what()));
 	}
 }
 
@@ -540,297 +415,57 @@ IPadding* CipherStream::GetPaddingMode(PaddingModes PaddingType)
 {
 	try
 	{
-		return PaddingFromName::GetInstance(PaddingType);
+		return Helper::PaddingFromName::GetInstance(PaddingType);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("CipherStream:GetPaddingMode", "The padding could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoProcessingException("CipherStream:GetPaddingMode", "The padding could not be instantiated!", std::string(ex.what()));
 	}
 }
 
-IStreamCipher* CipherStream::GetStreamEngine(StreamCiphers EngineType, int RoundCount)
+IStreamCipher* CipherStream::GetStreamCipher(StreamCiphers CipherType, int RoundCount)
 {
 	try
 	{
-		return StreamCipherFromName::GetInstance(EngineType, RoundCount);
+		return Helper::StreamCipherFromName::GetInstance(CipherType, RoundCount);
 	}
-	catch (...)
+	catch(std::exception& ex)
 	{
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CryptoProcessingException("CipherStream:GetStreamEngine", "The cipher could not be instantiated!");
-#else
-		return 0;
-#endif
+		throw CryptoProcessingException("CipherStream:GetStreamEngine", "The cipher could not be instantiated!", std::string(ex.what()));
 	}
-}
-
-void CipherStream::ParallelCTR(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_parallelBlockSize;
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		inpBuffer.resize(cnkSize);
-		InStream->Read(inpBuffer, 0, cnkSize);
-		outBuffer.resize(cnkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, cnkSize);
-	}
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::ParallelCTR(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_parallelBlockSize;
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-
-	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
-
-	while (count != alnSize)
-	{
-		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		std::vector<byte> inpBuffer(cnkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-		std::vector<byte> outBuffer(cnkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-		count += cnkSize;
-	}
-
-	CalculateProgress(inpSize, count);
-}
-
-void CipherStream::ParallelDecrypt(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_parallelBlockSize;
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_cipherEngine->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-		BlockDecrypt(InStream, OutStream);
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_parallelBlockSize;
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-
-	m_cipherEngine->IsParallel() = true;
-	m_cipherEngine->ParallelBlockSize() = blkSize;
-
-	// parallel
-	while (count != alnSize)
-	{
-		m_cipherEngine->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	if (alnSize != inpSize)
-	{
-		BlockDecrypt(Input, InOffset, Output, OutOffset);
-		count += (inpSize - alnSize);
-	}
-
-	CalculateProgress(inpSize, count);
-}
-
-void CipherStream::ParallelStream(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_parallelBlockSize;
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_streamCipher->IsParallel() = true;
-	m_streamCipher->ParallelBlockSize() = blkSize;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_streamCipher->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		inpBuffer.resize(cnkSize);
-		InStream->Read(inpBuffer, 0, cnkSize);
-		outBuffer.resize(cnkSize);
-		m_streamCipher->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, cnkSize);
-	}
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::ParallelStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_parallelBlockSize;
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-
-	m_streamCipher->IsParallel() = true;
-	m_streamCipher->ParallelBlockSize() = blkSize;
-
-	// parallel blocks
-	while (count != alnSize)
-	{
-		m_streamCipher->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		std::vector<byte> inpBuffer(cnkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-		std::vector<byte> outBuffer(cnkSize);
-		m_streamCipher->Transform(inpBuffer, outBuffer);
-		memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-		count += cnkSize;
-	}
-
-	CalculateProgress(inpSize, count);
-}
-
-void CipherStream::ProcessStream(IByteStream* InStream, IByteStream* OutStream)
-{
-	const size_t blkSize = m_streamCipher->BlockSize();
-	const size_t inpSize = (InStream->Length() - InStream->Position());
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-	std::vector<byte> inpBuffer(blkSize);
-	std::vector<byte> outBuffer(blkSize);
-
-	m_streamCipher->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		InStream->Read(inpBuffer, 0, blkSize);
-		m_streamCipher->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, blkSize);
-		count += blkSize;
-		CalculateProgress(inpSize, OutStream->Position());
-	}
-
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		inpBuffer.resize(cnkSize);
-		InStream->Read(inpBuffer, 0, cnkSize);
-		outBuffer.resize(cnkSize);
-		m_streamCipher->Transform(inpBuffer, outBuffer);
-		OutStream->Write(outBuffer, 0, cnkSize);
-	}
-
-	CalculateProgress(inpSize, OutStream->Position());
-}
-
-void CipherStream::ProcessStream(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
-{
-	const size_t blkSize = m_streamCipher->BlockSize();
-	const size_t inpSize = (Input.size() - InOffset);
-	const size_t alnSize = (inpSize / blkSize) * blkSize;
-	size_t count = 0;
-
-	m_streamCipher->IsParallel() = false;
-
-	while (count != alnSize)
-	{
-		m_streamCipher->Transform(Input, InOffset, Output, OutOffset);
-		InOffset += blkSize;
-		OutOffset += blkSize;
-		count += blkSize;
-		CalculateProgress(inpSize, count);
-	}
-
-	// partial
-	if (alnSize != inpSize)
-	{
-		size_t cnkSize = inpSize - alnSize;
-		std::vector<byte> inpBuffer(cnkSize);
-		memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
-		std::vector<byte> outBuffer(cnkSize);
-		m_streamCipher->Transform(inpBuffer, outBuffer);
-		memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
-		count += cnkSize;
-	}
-
-	CalculateProgress(inpSize, count);
-}
-
-bool CipherStream::IsParallelMin(size_t Length)
-{
-	return (Length >= ParallelMinimumSize());
 }
 
 void CipherStream::ParametersCheck()
+{
+	if (m_isStreamCipher)
+	{
+		if (m_parallelBlockSize != 0)
+		{
+			if (m_parallelBlockSize < m_streamCipher->ParallelMinimumSize())
+				m_parallelBlockSize = m_streamCipher->ParallelMinimumSize();
+			else if (m_parallelBlockSize != m_streamCipher->ParallelBlockSize())
+				m_parallelBlockSize -= (m_parallelBlockSize % m_streamCipher->ParallelMinimumSize());
+		}
+
+		m_streamCipher->IsParallel() = m_isParallel && m_streamCipher->ProcessorCount() > 1;
+		m_streamCipher->ParallelBlockSize() = m_parallelBlockSize;
+	}
+	else
+	{
+		if (m_parallelBlockSize != 0)
+		{
+			if (m_parallelBlockSize < m_cipherEngine->ParallelMinimumSize())
+				m_parallelBlockSize = m_cipherEngine->ParallelMinimumSize();
+			else if (m_parallelBlockSize != m_cipherEngine->ParallelBlockSize())
+				m_parallelBlockSize -= (m_parallelBlockSize % m_cipherEngine->ParallelMinimumSize());
+		}
+
+		m_cipherEngine->IsParallel() = m_isParallel && m_cipherEngine->ProcessorCount() > 1;
+		m_cipherEngine->ParallelBlockSize() = m_parallelBlockSize;
+	}
+}
+
+void CipherStream::Scope()
 {
 	if (m_isStreamCipher)
 	{
@@ -838,32 +473,23 @@ void CipherStream::ParametersCheck()
 		m_isCounterMode = false;
 		m_isParallel = m_streamCipher->IsParallel();
 		m_parallelBlockSize = m_streamCipher->ParallelBlockSize();
+		m_parallelMinimumSize = m_streamCipher->ParallelMinimumSize();
+
+		for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
+			m_legalKeySizes.push_back(SymmetricKeySize(m_streamCipher->LegalKeySizes()[i].KeySize(), m_streamCipher->IvSize(), 0));
 	}
 	else
 	{
 		m_blockSize = m_cipherEngine->BlockSize();
-		m_isCounterMode = m_cipherEngine->Enumeral() == CipherModes::CTR;
+		m_isCounterMode = (m_cipherEngine->Enumeral() == CipherModes::CTR || m_cipherEngine->Enumeral() == CipherModes::ICM);
+		m_isParallel = m_cipherEngine->IsParallel();
+		m_parallelBlockSize = m_cipherEngine->ParallelBlockSize();
+		m_parallelMinimumSize = m_cipherEngine->ParallelMinimumSize();
 
-		if (m_cipherEngine->Enumeral() == CipherModes::CBC || m_cipherEngine->Enumeral() == CipherModes::CFB || m_isCounterMode)
-		{
-			m_isParallel = m_cipherEngine->IsParallel() && !(!m_isCounterMode && m_cipherEngine->IsEncryption());
-			m_parallelBlockSize = m_cipherEngine->ParallelBlockSize();
-		}
-		else
-		{
-			m_isParallel = false;
-			m_parallelBlockSize = m_blockSize;
-		}
+		size_t dstMax = m_cipherEngine->Engine()->KdfEngine() != Digests::None ? m_cipherEngine->Engine()->DistributionCodeMax() : 0;
+		for (size_t i = 0; i < m_cipherEngine->LegalKeySizes().size(); ++i)
+			m_legalKeySizes.push_back(SymmetricKeySize(m_cipherEngine->LegalKeySizes()[i].KeySize(), m_cipherEngine->BlockSize(), dstMax));
 	}
-}
-
-void CipherStream::SetScope()
-{
-	m_processorCount = ParallelUtils::ProcessorCount();
-	if (m_processorCount % 2 != 0)
-		m_processorCount--;
-	if (m_processorCount > 1)
-		m_isParallel = true;
 }
 
 NAMESPACE_PROCESSINGEND

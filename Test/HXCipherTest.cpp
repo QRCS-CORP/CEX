@@ -1,25 +1,24 @@
 #include "HXCipherTest.h"
 #include "../CEX/CTR.h"
+#include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
 #include "../CEX/THX.h"
 #include "../CEX/SHA512.h"
 
-#if defined(AESNI_AVAILABLE)
-#include "../CEX/AHX.h"
-#endif
-
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block;
+
 	std::string HXCipherTest::Run()
 	{
 		try
 		{
 			Initialize();
-#if defined(AESNI_AVAILABLE)
+#if defined(CEX_AESNI_AVAILABLE)
 			AHXMonteCarlo();
-			OnProgress("AHX: Passed AES-NI Monte Carlo tests..");
 #endif
+			OnProgress("AHX: Passed AES-NI Monte Carlo tests..");
 			RHXMonteCarlo();
 			OnProgress("RHX: Passed RHX Monte Carlo tests..");
 			SHXMonteCarlo();
@@ -29,9 +28,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -43,27 +42,27 @@ namespace Test
 	{
 		const char* rhxEncoded[4] =
 		{
-			("2ac5dd436cb2a1c976b25a1edaf1f650"),	// hkdf extended 14 rounds
-			("497bef5ccb4faee957b7946705c3dc10"),	// hkdf extended 22 rounds 
-			("05e57d29a9f646d840c070ed3a17da53"),	// standard 512 key, 22 rounds
-			("46af483df6bbaf9e3a0aa8c182011752bb8bab6f2ebc4cd424407994f6ff6534")	// standard 512 key, 22 rounds, 32 byte block
+			("a36e01f66404b6af9ed09ea6e4faaff2"),	// hkdf extended 14 rounds  old: 2ac5dd436cb2a1c976b25a1edaf1f650
+			("43b4418a1d0b32aeff34df0c189556c4"),	// hkdf extended 22 rounds  old: 497bef5ccb4faee957b7946705c3dc10
+			("05e57d29a9f646d840c070ed3a17da53"),	// standard 512 key, 22 rounds  old: same
+			("46af483df6bbaf9e3a0aa8c182011752bb8bab6f2ebc4cd424407994f6ff6534")	// standard 512 key, 22 rounds, 32 byte block  old: same
 		};
 		HexConverter::Decode(rhxEncoded, 4, m_rhxExpected);
 
 		// Note: kat change with serpent move from BE to LE format
 		const char* shxEncoded[3] =
 		{
-			("da87958d7644a9409d39bf8abb1f68a5"),	// hkdf extended 32 rounds
-			("631cfb750c1dccd2af8509af8eed9ee6"),	// hkdf extended 40 rounds
-			("71c6c606b65798621dd19fa0f5e7acb0")	// standard 512 key, 40 rounds
+			("b47cc603a10d3c41d93bb98352611635"),	// hkdf extended 32 rounds  old: da87958d7644a9409d39bf8abb1f68a5
+			("eb0942fc83099a30835b479bde4bcf31"),	// hkdf extended 40 rounds  old: 631cfb750c1dccd2af8509af8eed9ee6
+			("71c6c606b65798621dd19fa0f5e7acb0")	// standard 512 key, 40 rounds  old: same
 		};
 		HexConverter::Decode(shxEncoded, 3, m_shxExpected);
 
 		const char* thxEncoded[3] =
 		{
-			("0b97de0f11367d25ad45d3293072e2bb"),	// hkdf extended 16 rounds
-			("e0ec1b5807ed879a88a18244237e8bad"),	// hkdf extended 20 rounds
-			("32626075c43a30a56aa4cc5ddbf58179")	// standard 512 key, 20 rounds
+			("b8ee1fec4b6caf2607a84b52934fd3d3"),	// hkdf extended 16 rounds  old: 0b97de0f11367d25ad45d3293072e2bb
+			("1870b32752892a6857f798751a8cc5fd"),	// hkdf extended 20 rounds  old: e0ec1b5807ed879a88a18244237e8bad
+			("32626075c43a30a56aa4cc5ddbf58179")	// standard 512 key, 20 rounds  old: same
 		};
 		HexConverter::Decode(thxEncoded, 3, m_thxExpected);
 
@@ -82,26 +81,28 @@ namespace Test
 
 	void HXCipherTest::AHXMonteCarlo()
 	{
-#if defined(AESNI_AVAILABLE)
 		std::vector<byte> inpBytes(16, 0);
 		std::vector<byte> outBytes(16, 0);
 		std::vector<byte> decBytes(16, 0);
 
 		// AHX, 14 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::AHX* eng = new CEX::Cipher::Symmetric::Block::AHX(&digest, 14);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			AHX* eng = new AHX(&digest, 14);
+			//std::vector<byte> info(eng->DistributionCodeMax(), 0);
+			//eng->DistributionCode() = info;
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);
+				cipher.Transform(inpBytes, outBytes);//"fafaabd082a96d88f674c29eabac380c"
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
+
 			if (outBytes != m_rhxExpected[0])
-				throw std::string("AHX: Failed encryption test!");
+				throw std::exception("AHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -113,14 +114,14 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("AHX: Failed decryption test!");
+				throw std::exception("AHX: Failed decryption test!");
 		}
 		// AHX, 22 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::AHX* eng = new CEX::Cipher::Symmetric::Block::AHX(&digest, 22);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			AHX* eng = new AHX(&digest, 22);
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -130,7 +131,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[1])
-				throw std::string("AHX: Failed encryption test!");
+				throw std::exception("AHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -142,14 +143,14 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("AHX: Failed decryption test!");
+				throw std::exception("AHX: Failed decryption test!");
 		}
 
 		// AHX, 22 rounds, standard key schedule
 		{
-			CEX::Cipher::Symmetric::Block::AHX* eng = new CEX::Cipher::Symmetric::Block::AHX(22);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key2, m_iv);
+			AHX* eng = new AHX();
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -159,7 +160,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[2])
-				throw std::string("AHX: Failed encryption test!");
+				throw std::exception("AHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -171,9 +172,8 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("AHX: Failed decryption test!");
+				throw std::exception("AHX: Failed decryption test!");
 		}
-#endif
 	}
 
 	void HXCipherTest::RHXMonteCarlo()
@@ -184,10 +184,10 @@ namespace Test
 
 		// RHX, 14 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(&digest, 14, 16);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			RHX* eng = new RHX(&digest, 14, 16);
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -196,7 +196,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 			if (outBytes != m_rhxExpected[0])
-				throw std::string("RHX: Failed encryption test!");
+				throw std::exception("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -208,14 +208,14 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("RHX: Failed decryption test!");
+				throw std::exception("RHX: Failed decryption test!");
 		}
 		// RHX, 22 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(&digest, 22, 16);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			RHX* eng = new RHX(&digest, 22, 16);
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -225,7 +225,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[1])
-				throw std::string("RHX: Failed encryption test!");
+				throw std::exception("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -237,14 +237,14 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("RHX: Failed decryption test!");
+				throw std::exception("RHX: Failed decryption test!");
 		}
 
 		// RHX, 22 rounds, standard key schedule
 		{
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(16, 22);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key2, m_iv);
+			RHX* eng = new RHX();
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -254,7 +254,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[2])
-				throw std::string("RHX: Failed encryption test!");
+				throw std::exception("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -266,7 +266,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("RHX: Failed decryption test!");
+				throw std::exception("RHX: Failed decryption test!");
 		}
 
 		// RHX, 22 rounds, 32 byte block, standard key schedule
@@ -279,9 +279,9 @@ namespace Test
 			for (unsigned int i = 0; i < iv.size(); i++)
 				iv[i] = (byte)i;
 
-			CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX(32, 22);
-			CEX::Cipher::Symmetric::Block::Mode::CTR cipher(eng);
-			CEX::Common::KeyParams k(m_key2, iv);
+			RHX* eng = new RHX(Digests::None, 22, 32);
+			Mode::CTR cipher(eng);
+			Key::Symmetric::SymmetricKey k(m_key2, iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -291,7 +291,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[3])
-				throw std::string("RHX: Failed encryption test!");
+				throw std::exception("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -303,7 +303,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("RHX: Failed decryption test!");
+				throw std::exception("RHX: Failed decryption test!");
 		}
 	}
 
@@ -315,10 +315,10 @@ namespace Test
 
 		// SHX, 32 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(&digest, 32);
-			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			SHX* eng = new SHX(&digest, 32);
+			Mode::CTR engine(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -328,7 +328,7 @@ namespace Test
 			}
 
 			if (outBytes != m_shxExpected[0])
-				throw std::string("SHX: Failed encryption test!");
+				throw std::exception("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -340,14 +340,14 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("SHX: Failed decryption test!");
+				throw std::exception("SHX: Failed decryption test!");
 		}
 		// SHX, 40 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(&digest, 40);
-			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			SHX* eng = new SHX(&digest, 40);
+			Mode::CTR engine(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -357,7 +357,7 @@ namespace Test
 			}
 
 			if (outBytes != m_shxExpected[1])
-				throw std::string("SHX: Failed encryption test!");
+				throw std::exception("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -369,13 +369,13 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("SHX: Failed decryption test!");
+				throw std::exception("SHX: Failed decryption test!");
 		}
 		// SHX, 40 rounds, standard key schedule
 		{
-			CEX::Cipher::Symmetric::Block::SHX* eng = new CEX::Cipher::Symmetric::Block::SHX(40);
-			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(m_key2, m_iv);
+			SHX* eng = new SHX();
+			Mode::CTR engine(eng);
+			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -385,7 +385,7 @@ namespace Test
 			}
 
 			if (outBytes != m_shxExpected[2])
-				throw std::string("SHX: Failed encryption test!");
+				throw std::exception("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -397,7 +397,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("SHX: Failed decryption test!");
+				throw std::exception("SHX: Failed decryption test!");
 		}
 	}
 
@@ -409,10 +409,10 @@ namespace Test
 
 		// THX, 16 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(&digest, 16);
-			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			THX* eng = new THX(&digest, 16);
+			Mode::CTR engine(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -422,7 +422,7 @@ namespace Test
 			}
 
 			if (outBytes != m_thxExpected[0])
-				throw std::string("THX: Failed encryption test!");
+				throw std::exception("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -434,14 +434,14 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("THX: Failed decryption test!");
+				throw std::exception("THX: Failed decryption test!");
 		}
 		// THX, 20 rounds
 		{
-			CEX::Digest::SHA512 digest;
-			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(&digest, 20);
-			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(m_key, m_iv);
+			Digest::SHA512 digest;
+			THX* eng = new THX(&digest, 20);
+			Mode::CTR engine(eng);
+			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -451,7 +451,7 @@ namespace Test
 			}
 
 			if (outBytes != m_thxExpected[1])
-				throw std::string("THX: Failed encryption test!");
+				throw std::exception("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -463,13 +463,13 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("THX: Failed decryption test!");
+				throw std::exception("THX: Failed decryption test!");
 		}
 		// THX, 20 rounds, standard key schedule
 		{
-			CEX::Cipher::Symmetric::Block::THX* eng = new CEX::Cipher::Symmetric::Block::THX(20);
-			CEX::Cipher::Symmetric::Block::Mode::CTR engine(eng);
-			CEX::Common::KeyParams k(m_key2, m_iv);
+			THX* eng = new THX(Digests::None, 20);
+			Mode::CTR engine(eng);
+			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			engine.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
@@ -479,7 +479,7 @@ namespace Test
 			}
 
 			if (outBytes != m_thxExpected[2])
-				throw std::string("THX: Failed encryption test!");
+				throw std::exception("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -491,7 +491,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::string("THX: Failed decryption test!");
+				throw std::exception("THX: Failed decryption test!");
 		}
 	}
 }

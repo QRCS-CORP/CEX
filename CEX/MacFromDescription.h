@@ -1,14 +1,18 @@
-#ifndef _CEXENGINE_BLOCKCIPHERFROMDESCRIPTION_H
-#define _CEXENGINE_BLOCKCIPHERFROMDESCRIPTION_H
+#ifndef _CEX_MACFROMDESCRIPTION_H
+#define _CEX_MACFROMDESCRIPTION_H
 
-#include "Common.h"
+#include "CexDomain.h"
 #include "MacDescription.h"
 #include "IMac.h"
 
 NAMESPACE_HELPER
 
+using Mac::IMac;
+using Processing::MacDescription;
+
 /// <summary>
-/// Get a Mac generator instance from it's description
+/// Get a Mac generator instance from it's description.
+/// <para>The MACs Initialize function must be called before it can be used.<para>
 /// </summary>
 class MacFromDescription
 {
@@ -19,10 +23,10 @@ public:
 	/// 
 	/// <param name="Description">The structure describing the Mac generator</param>
 	/// 
-	/// <returns>An initialized Mac generator</returns>
+	/// <returns>An uninitialized Mac generator</returns>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if the Mac type is not supported</exception>
-	static Mac::IMac* GetInstance(Common::MacDescription &Description);
+	static IMac* GetInstance(MacDescription &Description);
 };
 
 NAMESPACE_HELPEREND

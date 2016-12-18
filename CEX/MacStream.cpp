@@ -1,41 +1,34 @@
-#include "Common.h"
 #include "MacStream.h"
 #include "MacFromDescription.h"
 
 NAMESPACE_PROCESSING
 
-using CEX::Helper::MacFromDescription;
+//~~~Public Methods~~~//
 
 std::vector<byte> MacStream::ComputeMac(IByteStream* InStream)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (InStream->Length() - InStream->Position() < 1)
 		throw CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
-#endif
 
 	m_inStream = InStream;
 	size_t dataLen = m_inStream->Length() - m_inStream->Position();
 	CalculateInterval(dataLen);
-	m_macEngine->Reset();
 
 	return Compute(dataLen);
 }
 
 std::vector<byte> MacStream::ComputeMac(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
 		throw CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
-#endif
 
 	size_t dataLen = Length - InOffset;
 	CalculateInterval(dataLen);
-	m_macEngine->Reset();
 
 	return Compute(Input, InOffset, Length);
 }
 
-/*** Private Methods ***/
+//~~~Private Methods~~~//
 
 void MacStream::CalculateInterval(size_t Length)
 {
@@ -122,19 +115,21 @@ std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOf
 
 void MacStream::Destroy()
 {
+	m_isDestroyed = true;
 	m_blockSize = 0;
-	m_destroyEngine = false;
 	m_progressInterval = 0;
 
 	if (m_destroyEngine)
+	{
 		delete m_macEngine;
+		m_destroyEngine = false;
+	}
 
-	m_isDestroyed = true;
 }
 
 void MacStream::CreateMac(MacDescription &Description)
 {
-	m_macEngine = MacFromDescription::GetInstance(Description);
+	m_macEngine = Helper::MacFromDescription::GetInstance(Description);
 }
 
 NAMESPACE_PROCESSINGEND

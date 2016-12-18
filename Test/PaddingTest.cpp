@@ -10,20 +10,20 @@ namespace Test
 	{
 		try
 		{
-			CompareOutput(new CEX::Cipher::Symmetric::Block::Padding::ISO7816());
+			CompareOutput(new Padding::ISO7816());
 			OnProgress("PaddingTest: Passed ISO7816 comparison tests..");
-			CompareOutput(new CEX::Cipher::Symmetric::Block::Padding::PKCS7());
+			CompareOutput(new Padding::PKCS7());
 			OnProgress("PaddingTest: Passed PKCS7 comparison tests..");
-			CompareOutput(new CEX::Cipher::Symmetric::Block::Padding::TBC());
+			CompareOutput(new Padding::TBC());
 			OnProgress("PaddingTest: Passed TBC comparison tests..");
-			CompareOutput(new CEX::Cipher::Symmetric::Block::Padding::X923());
+			CompareOutput(new Padding::X923());
 			OnProgress("PaddingTest: Passed X923 comparison tests..");
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -31,9 +31,9 @@ namespace Test
 		}
 	}
 
-	void PaddingTest::CompareOutput(CEX::Cipher::Symmetric::Block::Padding::IPadding* Padding)
+	void PaddingTest::CompareOutput(Padding::IPadding* Padding)
 	{
-		CEX::Seed::CSPRsg rng;
+		Provider::CSP rng;
 		std::vector<byte> fill(16);
 		rng.GetBytes(fill);
 		const unsigned int BLOCK = 16;
@@ -50,9 +50,9 @@ namespace Test
 			// verify length
 			unsigned int len = (unsigned int)Padding->GetPaddingLength(data);
 			if (len == 0 && i != 0)
-				throw std::string("PaddingTest: Failed the padding value return check!");
+				throw std::exception("PaddingTest: Failed the padding value return check!");
 			else if (i != 0 && len != BLOCK - i)
-				throw std::string("PaddingTest: Failed the padding value return check!");
+				throw std::exception("PaddingTest: Failed the padding value return check!");
 
 			// test offset method
 			if (i > 0 && i < 15)
@@ -60,9 +60,9 @@ namespace Test
 				len = (unsigned int)Padding->GetPaddingLength(data, i);
 
 				if (len == 0 && i != 0)
-					throw std::string("PaddingTest: Failed the padding value return check!");
+					throw std::exception("PaddingTest: Failed the padding value return check!");
 				else if (i != 0 && len != BLOCK - i)
-					throw std::string("PaddingTest: Failed the offset padding value return check!");
+					throw std::exception("PaddingTest: Failed the offset padding value return check!");
 			}
 		}
 

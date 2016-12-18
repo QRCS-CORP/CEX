@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_STREAMWRITER_H
-#define _CEXENGINE_STREAMWRITER_H
+#ifndef _CEX_STREAMWRITER_H
+#define _CEX_STREAMWRITER_H
 
 #include "MemoryStream.h"
 
@@ -27,7 +27,7 @@ public:
 	const size_t Position() const { return m_streamPosition; }
 
 	/// <summary>
-	/// Initialize this class
+	/// Instantiate this class
 	/// </summary>
 	///
 	/// <param name="Length">The length of the underlying stream</param>
@@ -39,11 +39,11 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize this class with a byte array
+	/// Instantiate this class with a byte array
 	/// </summary>
 	///
 	/// <param name="DataArray">The byte array to write data to</param>
-	explicit StreamWriter(std::vector<byte> &DataArray)
+	explicit StreamWriter(const std::vector<byte> &DataArray)
 		:
 		m_streamData(DataArray),
 		m_streamPosition(0)
@@ -51,7 +51,7 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize this class with a MemoryStream
+	/// Instantiate this class with a MemoryStream
 	/// </summary>
 	///
 	/// <param name="DataStream">The MemoryStream to write data to</param>
@@ -92,58 +92,57 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(byte Value);
+	void Write(const byte Value);
 
 	/// <summary>
 	/// Write a 16bit integer to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(short Value);
+	void Write(const short Value);
 
 	/// <summary>
 	/// Write a 16bit unsigned integer to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(ushort Value);
+	void Write(const ushort Value);
 
 	/// <summary>
 	/// Write a 32bit integer to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(int Value);
+	void Write(const int Value);
 
 	/// <summary>
 	/// Write a 32bit unsigned integer to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(uint Value);
+	void Write(const uint Value);
 
 	/// <summary>
 	/// Write a 64bit integer to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(long Value);
+	void Write(const long Value);
 
 	/// <summary>
 	/// Write a 64bit unsigned integer to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(ulong Value);
+	void Write(const ulong Value);
 
-
-	template <typename T>
 	/// <summary>
 	/// Write an integer array to the base stream
 	/// </summary>
 	/// 
 	/// <param name="Value">The integer value</param>
-	void Write(std::vector<T> &Value)
+	template <typename T>
+	void Write(const std::vector<T> &Value)
 	{
 		size_t sze = sizeof(T) * Value.size();
 		if (m_streamPosition + sze > m_streamData.size())

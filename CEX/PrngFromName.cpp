@@ -1,29 +1,26 @@
 #include "PrngFromName.h"
-#include "CSPPrng.h"
-#include "CTRPrng.h"
-#include "SP20Prng.h"
-#include "DGCPrng.h"
+#include "CMR.h"
+#include "DCR.h"
 
 NAMESPACE_HELPER
 
-CEX::Prng::IRandom* PrngFromName::GetInstance(CEX::Enumeration::Prngs PrngType)
+IPrng* PrngFromName::GetInstance(Prngs PrngType)
 {
-	switch (PrngType)
+	try
 	{
-		case CEX::Enumeration::Prngs::CSPPrng:
-			return new CEX::Prng::CSPPrng();
-		case CEX::Enumeration::Prngs::CTRPrng:
-			return new CEX::Prng::CTRPrng();
-		case CEX::Enumeration::Prngs::DGCPrng:
-			return new CEX::Prng::DGCPrng();
-		case CEX::Enumeration::Prngs::SP20Prng:
-			return new CEX::Prng::SP20Prng();
-		default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-			throw CEX::Exception::CryptoException("PrngFromName:GetPrng", "The specified PRNG type is unrecognized!");
-#else
-			return 0;
-#endif
+		switch (PrngType)
+		{
+			case Prngs::CMR:
+				return new Prng::CMR();
+			case Prngs::DCR:
+				return new Prng::DCR();
+			default:
+				throw Exception::CryptoException("PrngFromName:GetPrng", "The specified prng type is unrecognized!");
+		}
+	}
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("PrngFromName:GetInstance", "The prng is unavailable!", std::string(ex.what()));
 	}
 }
 

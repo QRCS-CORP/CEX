@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_PKCS7_H
-#define _CEXENGINE_PKCS7_H
+#ifndef _CEX_PKCS7_H
+#define _CEX_PKCS7_H
 
 #include "IPadding.h"
 
@@ -17,11 +17,17 @@ NAMESPACE_PADDING
 /// </remarks>
 class PKCS7 : public IPadding
 {
+private:
+
+	PKCS7(const PKCS7&) = delete;
+	PKCS7& operator=(const PKCS7&) = delete;
+	PKCS7& operator=(PKCS7&&) = delete;
+
 public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	PKCS7() {}
 
@@ -38,9 +44,9 @@ public:
 	virtual const PaddingModes Enumeral() { return PaddingModes::PKCS7; }
 
 	/// <summary>
-	/// Get: Padding name
+	/// Get: The padding modes class name
 	/// </summary>
-	virtual const char *Name() { return "PKCS7"; }
+	virtual const std::string Name() { return "PKCS7"; }
 
 	//~~~Public Methods~~~//
 
@@ -53,7 +59,7 @@ public:
 	///
 	/// <returns>Length of padding</returns>
 	///
-	/// <exception cref="CEX::Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
+	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
 	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
 
 	/// <summary>

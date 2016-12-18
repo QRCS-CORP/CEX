@@ -49,7 +49,7 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareOutput(CEX::Enumeration::Digests Engine);
+		void CompareOutput(Enumeration::Digests Engine);
 		void OnProgress(char* Data);
 	};
 }

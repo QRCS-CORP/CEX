@@ -49,9 +49,6 @@
     <Filter Include="Header Files\Test\PrngTest">
       <UniqueIdentifier>{d6ff0042-a489-45e3-9749-732aa03d51d2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Test\SeedTest">
-      <UniqueIdentifier>{67030bb3-f94e-427c-ba05-2e53605c75cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Test">
       <UniqueIdentifier>{f99e4b43-43b7-4ed2-b9a3-9a33df4df93a}</UniqueIdentifier>
     </Filter>
@@ -76,8 +73,26 @@
     <Filter Include="Source Files\Test\ProcessorTest">
       <UniqueIdentifier>{aa3431cb-f6fd-4a5c-959c-77ec1aa133d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Test\SeedTest">
+    <Filter Include="Source Files\Test\KdfTest">
+      <UniqueIdentifier>{b0116f79-f2f7-4195-a598-fc121e115982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\KdfTest">
+      <UniqueIdentifier>{004c5a77-341b-4681-8aa6-1dc37ecda2c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\ProviderTest">
+      <UniqueIdentifier>{67030bb3-f94e-427c-ba05-2e53605c75cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\ProviderTest">
       <UniqueIdentifier>{88de1aa6-d081-44ec-80bc-ce3b6da30a34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\ProviderTest\DiehardResults">
+      <UniqueIdentifier>{1a162da5-6443-45df-8b40-c6cb4a1db94f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\ProviderTest\DiehardResults\10MB">
+      <UniqueIdentifier>{9f7fd282-bb04-4140-90bd-9bba9138d54a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\ProviderTest\DiehardResults\100MB">
+      <UniqueIdentifier>{3b74ae82-ab25-4665-a517-7d790ec73df6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +177,51 @@
     <Text Include="..\Vectors\Nessie\serpentplain256.txt">
       <Filter>Header Files\Test\Vectors\Nessie</Filter>
     </Text>
+    <Text Include="..\..\Test\NistStsResults.txt">
+      <Filter>Header Files\Test\ProviderTest</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\cjp10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\cmg10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\csp10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\dcg10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\ecp10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\hmg10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\10mb\rdp10.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\10MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\cjp100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\cmg100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\csp100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\dcg100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\ecp100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\hmg100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
+    <Text Include="..\..\Test\Diehard Results\100mb\rdp100.txt">
+      <Filter>Header Files\Test\ProviderTest\DiehardResults\100MB</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\AesAvsTest.h">
@@ -191,9 +251,6 @@
     <ClInclude Include="..\..\Test\SerpentTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\BlakeTest.h">
-      <Filter>Header Files\Test\DigestTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\KeccakTest.h">
       <Filter>Header Files\Test\DigestTest</Filter>
     </ClInclude>
@@ -202,9 +259,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\SkeinTest.h">
       <Filter>Header Files\Test\DigestTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\KDF2DrbgTest.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TwofishTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
@@ -220,12 +274,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\TestUtils.h">
       <Filter>Header Files\Test\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\PBKDF2Test.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\CTRDrbgTest.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\ITest.h">
       <Filter>Header Files\Test\Common</Filter>
@@ -251,12 +299,6 @@
     <ClInclude Include="..\..\Test\HMACTest.h">
       <Filter>Header Files\Test\MacTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\HKDFTest.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\VMACTest.h">
-      <Filter>Header Files\Test\MacTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\CipherStreamTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
@@ -266,20 +308,8 @@
     <ClInclude Include="..\..\Test\DigestStreamTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\ISCRsgTest.h">
-      <Filter>Header Files\Test\SeedTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\XSPRsgTest.h">
-      <Filter>Header Files\Test\SeedTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\TestException.h">
       <Filter>Header Files\Test\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\KeyFactoryTest.h">
-      <Filter>Header Files\Test\ProcessorTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\SP20DrbgTest.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\CipherSpeedTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
@@ -289,6 +319,36 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\Blake2Test.h">
       <Filter>Header Files\Test\DigestTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HKDFTest.h">
+      <Filter>Header Files\Test\KdfTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\PBKDF2Test.h">
+      <Filter>Header Files\Test\KdfTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\KDF2Test.h">
+      <Filter>Header Files\Test\KdfTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\DCGTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CMGTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HMGTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RandomOutputTest.h">
+      <Filter>Header Files\Test\ProviderTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SecureStreamTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SymmetricKeyGeneratorTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SymmetricKeyTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -325,9 +385,6 @@
     <ClCompile Include="..\..\Test\HMACTest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\VMACTest.cpp">
-      <Filter>Source Files\Test\MacTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\RangedRngTest.cpp">
       <Filter>Source Files\Test\PrngTest</Filter>
     </ClCompile>
@@ -337,29 +394,11 @@
     <ClCompile Include="..\..\Test\MacStreamTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\BlakeTest.cpp">
-      <Filter>Source Files\Test\DigestTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\CTRDrbgTest.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\HKDFTest.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\KDF2DrbgTest.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\KeccakTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\KeyFactoryTest.cpp">
-      <Filter>Source Files\Test\ProcessorTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\PBKDF2Test.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\SalsaTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
@@ -373,15 +412,6 @@
     <ClCompile Include="..\..\Test\SkeinTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\ISCRsgTest.cpp">
-      <Filter>Source Files\Test\SeedTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\XSPRsgTest.cpp">
-      <Filter>Source Files\Test\SeedTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\SP20DrbgTest.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\TwofishTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
@@ -393,6 +423,36 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\Blake2Test.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\PBKDF2Test.cpp">
+      <Filter>Source Files\Test\KdfTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\HKDFTest.cpp">
+      <Filter>Source Files\Test\KdfTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\KDF2Test.cpp">
+      <Filter>Source Files\Test\KdfTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\DCGTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CMGTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\HMGTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RandomOutputTest.cpp">
+      <Filter>Source Files\Test\ProviderTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SymmetricKeyGeneratorTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SymmetricKeyTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SecureStreamTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

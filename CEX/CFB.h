@@ -1,41 +1,37 @@
-﻿// The MIT License (MIT)
+﻿// The GPL version 3 License (GPLv3)
 // 
 // Copyright (c) 2016 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 // 
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// You should have received a copy of the GNU General Public License
+// along with this program.If not, see <http://www.gnu.org/licenses/>.
 // 
+//
 // Implementation Details:
 // An implementation of a Cipher FeedBack Mode (CFB).
 // Written by John Underhill, September 24, 2014
 // Updated September 16, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEXENGINE_CFB_H
-#define _CEXENGINE_CFB_H
+#ifndef _CEX_CFB_H
+#define _CEX_CFB_H
 
 #include "ICipherMode.h"
 
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements a Cipher FeedBack Mode: CFB
+/// Implements a Cipher FeedBack Mode (CFB)
 /// </summary>
 /// 
 /// <example>
@@ -43,7 +39,7 @@ NAMESPACE_MODE
 /// <code>
 /// CFB cipher(new AHX());
 /// // initialize for encryption
-/// cipher.Initialize(true, KeyParams(Key, IV));
+/// cipher.Initialize(true, SymmetricKey(Key, Nonce));
 /// // encrypt one block
 /// cipher.Transform(Input, 0, Output, 0);
 /// </code>
@@ -52,46 +48,43 @@ NAMESPACE_MODE
 /// <example>
 /// <description>Decrypting using multi-threading:</description>
 /// <code>
-/// CFB cipher(new AHX());
+/// CFB cipher(BlockCiphers::AHX);
 /// // enable parallel and set the parallel input block size
 /// cipher.IsParallel() = true;
 /// // calculated automatically based on cache size, but overridable
 /// cipher.ParallelBlockSize() = cipher.ProcessorCount() * 32000;
 /// // initialize for decryption
-/// cipher.Initialize(false, KeyParams(Key, IV));
+/// cipher.Initialize(false, SymmetricKey(Key, Nonce));
 /// // decrypt one parallel sized block
 /// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
 /// 
-/// <seealso cref="CEX::Enumeration::BlockCiphers"/><BR>
-/// <seealso cref="CEX::Cipher::Symmetric::Block::Mode::ICipherMode"/>
-/// 
 /// <remarks>
 /// <description><B>Overview:</B></description>//encrypt the register, xor the ciphertext with the plaintext by block-size bytes   left shift the register  copy cipher text to the register
-/// <para>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output.<BR>
-/// Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks.<BR>
-/// On the first block the IV (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes.<BR>
-/// The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector.<BR>
-/// The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern.<BR>
+/// <para>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output.<br>
+/// Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks.<br>
+/// On the first block the Nonce (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes.<br>
+/// The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector.<br>
+/// The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern.<br>
 /// The decryption function follows the reverse pattern; the block is decrypted with the symmetric cipher, and then XOR'd with the ciphertext from the previous block to produce the plain-text.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR> 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>E<SUP>-1</SUP></B>=decrypt, <B>^<B/>=XOR<BR><BR>
-/// <EM>Encryption</EM><BR>
-/// I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u:<BR>
-/// (a) Oj ← EK(Ij). (Compute the block cipher output)<BR>
-/// (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1)<BR>
-/// (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj)<BR>
-/// (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register)<BR>
-/// <EM>Decryption</EM><BR>
+/// <para><EM>Legend:</EM><br> 
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>E<SUP>-1</SUP></B>=decrypt, <B>^</B>=XOR<br>
+/// <EM>Encryption</EM><br>
+/// I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u:<br>
+/// (a) Oj ← EK(Ij). (Compute the block cipher output)<br>
+/// (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1)<br>
+/// (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj)<br>
+/// (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register)<br>
+/// <EM>Decryption</EM><br>
 /// Pj ← Cj ^ tj. where tj, Oj and Ij</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The encryption function of the CFB mode is limited by its dependency chain; that is, each block relies on information from the previous block, and so can not be multi-threaded.
-/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores.<BR>
-/// This is acheived by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.<BR> 
+/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores.<br>
+/// This is acheived by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.<br> 
 /// The CFB parallel decryption mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread
 /// uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</para>
 ///
@@ -101,12 +94,12 @@ NAMESPACE_MODE
 /// <item><description>A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
 /// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
 /// <item><description>The DecryptBlock and EncryptBlock functions can only be accessed through the class instance.</description></item>
-/// <item><description>The transformation methods can not be called until the the Initialize(bool, KeyParams) function has been called.</description></item>
+/// <item><description>The transformation methods can not be called until the Initialize(bool, SymmetricKey) function has been called.</description></item>
 /// <item><description>In CFB mode, only the decryption function can be processed in parallel.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>Parallel processing is enabled on decryption by setting IsParallel() to true, and passing an input block of ParallelBlockSize() to the transform.</description></item>
-/// <item><description>ParallelBlockSize() is calculated automatically based on processor cache size but can be user defined, but must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = (data.size() / cipher.ParallelMinimumSize()) * 40</c></description></item>
+/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
+/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = data.size() - (data.size() % cipher.ParallelMinimumSize());</c></description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -118,14 +111,16 @@ NAMESPACE_MODE
 class CFB : public ICipherMode
 {
 private:
-	static constexpr size_t MAXALLOC_MB100 = 100000000;
-	static constexpr size_t PARALLEL_DEFBLOCK = 64000;
+
+	const size_t MAX_PRLALLOC = 100000000;
+	const size_t PRC_DATACACHE = 32000;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
 	std::vector<byte> m_cfbVector;
+	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
-	bool m_hasAVX;
+	bool m_hasAVX2;
 	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -136,17 +131,23 @@ private:
 	size_t m_parallelMinimumSize;
 	size_t m_processorCount;
 
-	CFB() = delete;
+public:
+
 	CFB(const CFB&) = delete;
 	CFB& operator=(const CFB&) = delete;
+	CFB& operator=(CFB&&) = delete;
 
-public:
 	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Block size of internal cipher in bytes
 	/// </summary>
 	virtual const size_t BlockSize() { return m_blockSize; }
+
+	/// <summary>
+	/// Get: The block ciphers formal type name
+	/// </summary>
+	virtual BlockCiphers CipherType() { return m_cipherType; }
 
 	/// <summary>
 	/// Get: The underlying Block Cipher instance
@@ -161,10 +162,10 @@ public:
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics
 	/// </summary>
-	virtual const bool HasAVX() { return m_hasAVX; }
+	virtual const bool HasAVX2() { return m_hasAVX2; }
 
 	/// <summary>
-	/// Get: Returns True if the cipher supports SSE2 SIMD intrinsics
+	/// Get: Returns True if the cipher supports SSE SIMD intrinsics
 	/// </summary>
 	virtual const bool HasSSE() { return m_hasSSE; }
 
@@ -184,34 +185,36 @@ public:
 	virtual bool &IsParallel() { return m_isParallel; }
 
 	/// <summary>
-	/// Get: The current state of the Initialization Vector
-	/// </summary>
-	virtual const std::vector<byte> &IV() { return m_cfbVector; }
-
-	/// <summary>
 	/// Get: Array of valid encryption key byte lengths
 	/// </summary>
-	virtual const std::vector<size_t> &LegalKeySizes() { return m_blockCipher->LegalKeySizes(); }
+	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_blockCipher->LegalKeySizes(); }
 
 	/// <summary>
-	/// Get: The Cipher Mode name
+	/// Get: The cipher mode name
 	/// </summary>
-	virtual const char* Name() { return "CFB"; }
+	virtual const std::string Name() { return "CFB"; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>
+	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, SymmetricKey)"/> function is called.</para>
 	/// </summary>
 	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
 
 	/// <summary>
 	/// Get: Maximum input block byte length when using multi-threaded processing
 	/// </summary>
-	virtual const size_t ParallelMaximumSize() { return MAXALLOC_MB100; }
+	virtual const size_t ParallelMaximumSize() { return MAX_PRLALLOC; }
 
 	/// <summary>
 	/// Get: The smallest valid input block byte length, when using multi-threaded processing; parallel blocks must be a multiple of this size
 	/// </summary>
 	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
+
+	/// <summary>
+	/// Get/Set: The maximum number of threads allocated when using multi-threaded processing.
+	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, SymmetricKey)"/> function is called.</para>
+	/// </summary>
+	size_t &ParallelThreadsMax() { return m_parallelMaxDegree; }
 
 	/// <summary>
 	/// Get: Available system processor core count
@@ -227,14 +230,17 @@ public:
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null block cipher type is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
 	explicit CFB(BlockCiphers CipherType, size_t RegisterSize = 16)
 		:
+		m_blockCipher(0),
 		m_blockSize(RegisterSize),
+		m_cfbVector(0),
+		m_cipherType(CipherType),
 		m_destroyEngine(true),
 		m_isDestroyed(false),
 		m_isEncryption(false),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(false),
 		m_isInitialized(false),
 		m_isParallel(false),
@@ -243,21 +249,15 @@ public:
 		m_parallelMaxDegree(0),
 		m_processorCount(0)
 	{
-		m_blockCipher = GetCipher(CipherType);
-		m_cfbVector.resize(m_blockCipher->BlockSize());
-
-#if defined(DEBUGASSERT_ENABLED)
-		assert((uint)CipherType != 0);
-		assert(RegisterSize > 0);
-		assert(RegisterSize <= m_blockCipher->BlockSize());
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if ((uint)CipherType == 0)
+		if (m_cipherType == BlockCiphers::None)
 			throw CryptoCipherModeException("CFB:CTor", "The Cipher type can not be zero!");
-#endif
+		if (m_blockSize == 0)
+			throw CryptoCipherModeException("CFB:CTor", "The register size can not be zero!");
 
+		LoadState();
 
-		Scope();
+		if (m_blockSize > m_blockCipher->BlockSize())
+			throw CryptoCipherModeException("CFB:CTor", "The register size is invalid!");
 	}
 
 	/// <summary>
@@ -267,14 +267,15 @@ public:
 	/// <param name="Cipher">An uninitialized block cipher instance; can not be null</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size; default value is 16 bytes</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if a null Block Cipher is used, or the specified block size is invalid</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null Block Cipher is used, or the specified block size is invalid</exception>
 	explicit CFB(IBlockCipher* Cipher, size_t RegisterSize = 16)
 		:
 		m_blockCipher(Cipher),
 		m_blockSize(RegisterSize),
 		m_cfbVector(Cipher->BlockSize()),
+		m_cipherType(Cipher->Enumeral()),
 		m_destroyEngine(false),
-		m_hasAVX(false),
+		m_hasAVX2(false),
 		m_hasSSE(false),
 		m_isDestroyed(false),
 		m_isEncryption(false),
@@ -283,23 +284,16 @@ public:
 		m_parallelBlockSize(0),
 		m_parallelMaxDegree(0),
 		m_parallelMinimumSize(0),
-		m_processorCount(1)
+		m_processorCount(0)
 	{
-#if defined(DEBUGASSERT_ENABLED)
-		assert(Cipher != 0);
-		assert(RegisterSize > 0);
-		assert(RegisterSize <= Cipher->BlockSize());
-#endif
-#if defined(CPPEXCEPTIONS_ENABLED)
-		if (Cipher == 0)
+		if (m_blockCipher == 0)
 			throw CryptoCipherModeException("CFB:CTor", "The Cipher can not be null!");
-		if (RegisterSize < 1)
-			throw CryptoCipherModeException("CFB:CTor", "Invalid block size! Block must be at least 1 byte.");
-		if (RegisterSize > Cipher->BlockSize())
-			throw CryptoCipherModeException("CFB:CTor", "Invalid block size! Block size can not be larger than Block Ciphers internal block size.");
-#endif
+		if (m_blockSize < 1)
+			throw CryptoCipherModeException("CFB:CTor", "The register size can not be zero!");
+		if (m_blockSize > m_blockCipher->BlockSize())
+			throw CryptoCipherModeException("CFB:CTor", "The register size is invalid! Register size can not be larger than Block Ciphers internal block size.");
 
-		Scope();
+		LoadState();
 	}
 
 	/// <summary>
@@ -315,7 +309,7 @@ public:
 	/// <summary>
 	/// Decrypt a single block of bytes.
 	/// <para>Decrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
@@ -325,7 +319,7 @@ public:
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
 	/// <para>Decrypts one block of bytes using the designated offsets.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
@@ -337,12 +331,14 @@ public:
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>
 	virtual void Destroy();
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
 	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
@@ -352,7 +348,7 @@ public:
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
 	/// <para>Encrypts one block of bytes at the designated offsets.
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
@@ -366,10 +362,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
-	/// <param name="KeyParam">KeyParams containing the encryption Key and Initialization Vector</param>
+	/// <param name="KeyParam">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
-	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or IV is used</exception>
-	virtual void Initialize(bool Encryption, const KeyParams &KeyParam);
+	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam);
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -379,7 +375,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="CEX::Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
@@ -387,7 +383,7 @@ public:
 	/// <para>Transforms one block of bytes beginning at a zero index.
 	/// Encryption or Decryption is performed based on the Encryption flag set in the Initialize() function.
 	/// Multi-threading capable function in Decryption mode; set IsParallel() to true to enable, and process blocks of ParallelBlockSize().
-	/// Initialize(bool, KeyParams) must be called before this function can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this function can be used.</para>
 	/// </summary>
 	///
 	/// <param name="Input">The input array to transform</param>
@@ -398,7 +394,7 @@ public:
 	/// Transform a block of bytes using offset parameters.
 	/// <para>Transforms one block of bytes using the designated offsets.
 	/// Multi-threading capable function in Decryption mode; set IsParallel() to true to enable, and process blocks of ParallelBlockSize().
-	/// Initialize(bool, KeyParams) must be called before this method can be used.</para>
+	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	///
 	/// <param name="Input">The input array to transform</param>
@@ -411,7 +407,8 @@ private:
 	void DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
 	void Detect();
-	IBlockCipher* GetCipher(BlockCiphers CipherType);
+	IBlockCipher* LoadCipher(BlockCiphers CipherType);
+	void LoadState();
 	void Scope();
 };
 

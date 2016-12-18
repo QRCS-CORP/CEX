@@ -1,16 +1,15 @@
 #include "Skein1024.h"
+#include "ArrayUtils.h"
 #include "IntUtils.h"
 
 NAMESPACE_DIGEST
 
-using CEX::Utility::IntUtils;
+using Utility::IntUtils;
 
 void Skein1024::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if ((size_t)(InOffset + Length) > Input.size())
 		throw CryptoDigestException("Skein1024:BlockUpdate", "The Input buffer is too short!");
-#endif
 
 	size_t bytesDone = 0;
 
@@ -54,20 +53,26 @@ void Skein1024::Destroy()
 		m_blockCipher.Clear();
 		m_ubiParameters.Clear();
 
-		IntUtils::ClearVector(m_cipherInput);
-		IntUtils::ClearVector(m_configString);
-		IntUtils::ClearVector(m_configValue);
-		IntUtils::ClearVector(m_digestState);
-		IntUtils::ClearVector(m_inputBuffer);
+		try
+		{
+			Utility::ArrayUtils::ClearVector(m_cipherInput);
+			Utility::ArrayUtils::ClearVector(m_configString);
+			Utility::ArrayUtils::ClearVector(m_configValue);
+			Utility::ArrayUtils::ClearVector(m_digestState);
+			Utility::ArrayUtils::ClearVector(m_inputBuffer);
+		}
+		catch (std::exception& ex)
+		{
+			throw CryptoDigestException("Skein1024:Destroy", "Could not clear all variables!", std::string(ex.what()));
+		}
 	}
 }
 
 size_t Skein1024::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Output.size() - OutOffset < DIGEST_SIZE)
 		throw CryptoDigestException("Skein1024:DoFinal", "The Output buffer is too short!");
-#endif
+
 	// pad left over space in input buffer with zeros
 	for (size_t i = m_bytesFilled; i < m_inputBuffer.size(); i++)
 		m_inputBuffer[i] = 0;
@@ -174,10 +179,8 @@ void Skein1024::Reset()
 
 void Skein1024::SetMaxTreeHeight(const byte Height)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Height == 1)
 		throw CryptoDigestException("Skein1024:SetMaxTreeHeight", "Tree height must be zero or greater than 1.");
-#endif
 
 	m_configString[2] &= ~((ulong)0xff << 16);
 	m_configString[2] |= (ulong)Height << 16;
@@ -185,10 +188,8 @@ void Skein1024::SetMaxTreeHeight(const byte Height)
 
 void Skein1024::SetSchema(const std::vector<byte> &Schema)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Schema.size() != 4)
 		throw CryptoDigestException("Skein1024:SetSchema", "Schema must be 4 bytes.");
-#endif
 
 	ulong n = m_configString[0];
 
@@ -217,10 +218,8 @@ void Skein1024::SetTreeLeafSize(const byte Size)
 
 void Skein1024::SetVersion(const uint Version)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Version > 3)
 		throw CryptoDigestException("Skein1024:SetVersion", "Version must be between 0 and 3, inclusive.");
-#endif
 
 	m_configString[0] &= ~((ulong)0x03 << 32);
 	m_configString[0] |= (ulong)Version << 32;

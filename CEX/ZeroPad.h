@@ -1,5 +1,5 @@
-﻿#ifndef _CEXENGINE_ZEROPAD_H
-#define _CEXENGINE_ZEROPAD_H
+﻿#ifndef _CEX_ZEROPAD_H
+#define _CEX_ZEROPAD_H
 
 #include "IPadding.h"
 
@@ -10,11 +10,17 @@ NAMESPACE_PADDING
 /// </summary>
 class ZeroPad : public IPadding
 {
+private:
+
+	ZeroPad(const ZeroPad&) = delete;
+	ZeroPad& operator=(const ZeroPad&) = delete;
+	ZeroPad& operator=(ZeroPad&&) = delete;
+
 public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Initialize this class
+	/// CTor: Instantiate this class
 	/// </summary>
 	ZeroPad() {}
 
@@ -31,9 +37,9 @@ public:
 	virtual const PaddingModes Enumeral() { return PaddingModes::None; }
 
 	/// <summary>
-	/// Get: Padding name
+	/// Get: The padding modes class name
 	/// </summary>
-	virtual const char *Name() { return "ZeroPad"; }
+	virtual const std::string Name() { return "ZeroPad"; }
 
 	//~~~Public Methods~~~//
 
@@ -46,7 +52,7 @@ public:
 	///
 	/// <returns>Length of padding</returns>
 	///
-	/// <exception cref="CEX::Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
+	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
 	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
 
 	/// <summary>

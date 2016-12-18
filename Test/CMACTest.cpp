@@ -30,9 +30,9 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::string const& ex)
+		catch (std::exception const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex));
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
 		catch (...)
 		{
@@ -42,9 +42,9 @@ namespace Test
 
 	void CMACTest::CompareAccess(std::vector<byte> &Key)
 	{
-		CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
+		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
 		std::vector<byte> iv(eng->BlockSize());
-		CEX::Mac::CMAC mac(eng);
+		Mac::CMAC mac(eng);
 
 		mac.Initialize(Key, iv);
 		std::vector<byte> input(64);
@@ -52,19 +52,21 @@ namespace Test
 		std::vector<byte> hash1(16);
 		mac.DoFinal(hash1, 0);
 		std::vector<byte> hash2(16);
+		// must reinitialize after a finalizer call
+		mac.Initialize(Key, iv);
 		mac.ComputeMac(input, hash2);
 		delete eng;
 
 		if (hash1 != hash2)
-			throw std::string("CMAC is not equal!");
+			throw std::exception("CMAC is not equal!");
 	}
 
 	void CMACTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(16);
-		CEX::Cipher::Symmetric::Block::RHX* eng = new CEX::Cipher::Symmetric::Block::RHX();
+		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
 		std::vector<byte> iv(eng->BlockSize());
-		CEX::Mac::CMAC mac(eng);
+		Mac::CMAC mac(eng);
 
 		mac.Initialize(Key, iv);
 		mac.BlockUpdate(Input, 0, Input.size());
@@ -72,7 +74,7 @@ namespace Test
 		delete eng;
 
 		if (Expected != hash)
-			throw std::string("CMAC is not equal!");
+			throw std::exception("CMAC is not equal!");
 	}
 
 	void CMACTest::Initialize()

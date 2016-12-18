@@ -1,5 +1,5 @@
-#ifndef _CEXENGINE_SKEINSTATETYPE_H
-#define _CEXENGINE_SKEINSTATETYPE_H
+#ifndef _CEX_SKEINSTATETYPE_H
+#define _CEX_SKEINSTATETYPE_H
 
 /// <summary>
 /// Specifies the Skein initialization type

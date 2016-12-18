@@ -2,7 +2,6 @@
 #define _CEXTEST_RANGEDRNGTEST_H
 
 #include "ITest.h"
-#include "../CEX/IRandom.h"
 
 namespace Test
 {
@@ -45,7 +44,7 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void EvaluateRange(CEX::Prng::IRandom* Rng);
+		void EvaluateRange();
 		void OnProgress(char* Data);
 	};
 }

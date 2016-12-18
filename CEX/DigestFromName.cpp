@@ -1,8 +1,6 @@
 #include "DigestFromName.h"
-#include "Blake256.h"
-#include "Blake512.h"
-#include "Blake2Bp512.h"
-#include "Blake2Sp256.h"
+#include "BlakeB512.h"
+#include "BlakeS256.h"
 #include "Keccak256.h"
 #include "Keccak512.h"
 #include "SHA256.h"
@@ -13,109 +11,142 @@
 
 NAMESPACE_HELPER
 
-CEX::Digest::IDigest* DigestFromName::GetInstance(CEX::Enumeration::Digests DigestType)
+IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 {
-	switch (DigestType)
+	try
 	{
-	case CEX::Enumeration::Digests::Blake256:
-		return new CEX::Digest::Blake256();
-	case CEX::Enumeration::Digests::Blake512:
-		return new CEX::Digest::Blake512();
-	case CEX::Enumeration::Digests::Blake2B512:
-		return new CEX::Digest::Blake2Bp512();
-	case CEX::Enumeration::Digests::Blake2BP512:
-		return new CEX::Digest::Blake2Bp512(true);
-	case CEX::Enumeration::Digests::Blake2S256:
-		return new CEX::Digest::Blake2Sp256();
-	case CEX::Enumeration::Digests::Blake2SP256:
-		return new CEX::Digest::Blake2Sp256(true);
-	case CEX::Enumeration::Digests::Keccak256:
-		return new CEX::Digest::Keccak256();
-	case CEX::Enumeration::Digests::Keccak512:
-		return new CEX::Digest::Keccak512();
-	case CEX::Enumeration::Digests::SHA256:
-		return new CEX::Digest::SHA256();
-	case CEX::Enumeration::Digests::SHA512:
-		return new CEX::Digest::SHA512();
-	case CEX::Enumeration::Digests::Skein256:
-		return new CEX::Digest::Skein256();
-	case CEX::Enumeration::Digests::Skein512:
-		return new CEX::Digest::Skein512();
-	case CEX::Enumeration::Digests::Skein1024:
-		return new CEX::Digest::Skein1024();
-	default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoException("DigestFromName:GetInstance", "The digest is not recognized!");
-#else
-		return 0;
-#endif
+		switch (DigestType)
+		{
+		case Digests::BlakeB512:
+			return new Digest::BlakeB512(Parallel);
+		case Digests::BlakeBP512:
+			return new Digest::BlakeB512(true);
+		case Digests::BlakeS256:
+			return new Digest::BlakeS256(Parallel);
+		case Digests::BlakeSP256:
+			return new Digest::BlakeS256(true);
+		case Digests::Keccak256:
+			return new Digest::Keccak256();
+		case Digests::Keccak512:
+			return new Digest::Keccak512();
+		case Digests::SHA256:
+			return new Digest::SHA256(Parallel);
+		case Digests::SHA512:
+			return new Digest::SHA512(Parallel);
+		case Digests::Skein256:
+			return new Digest::Skein256();
+		case Digests::Skein512:
+			return new Digest::Skein512();
+		case Digests::Skein1024:
+			return new Digest::Skein1024();
+		default:
+			throw Exception::CryptoException("DigestFromName:GetInstance", "The digest is not recognized!");
+		}
+	}
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("DigestFromName:GetInstance", "The digest is unavailable!", std::string(ex.what()));
 	}
 }
 
-int DigestFromName::GetBlockSize(CEX::Enumeration::Digests DigestType)
+size_t DigestFromName::GetBlockSize(Digests DigestType)
 {
-	switch (DigestType)
+	try
 	{
-	case CEX::Enumeration::Digests::Skein256:
-		return 32;
-	case CEX::Enumeration::Digests::Blake256:
-	case CEX::Enumeration::Digests::Blake2S256:
-	case CEX::Enumeration::Digests::SHA256:
-	case CEX::Enumeration::Digests::Skein512:
-		return 64;
-	case CEX::Enumeration::Digests::Blake512:
-	case CEX::Enumeration::Digests::Blake2B512:
-	case CEX::Enumeration::Digests::SHA512:
-	case CEX::Enumeration::Digests::Skein1024:
-		return 128;
-	case CEX::Enumeration::Digests::Keccak256:
-		return 136;
-	case CEX::Enumeration::Digests::Keccak512:
-		return 72;
-	case CEX::Enumeration::Digests::Blake2SP256:
-	case CEX::Enumeration::Digests::Blake2BP512:
-		return 16384;
+		switch (DigestType)
+		{
+		case Digests::Skein256:
+			return 32;
+		case Digests::BlakeS256:
+		case Digests::SHA256:
+		case Digests::Skein512:
+			return 64;
+		case Digests::BlakeB512:
+		case Digests::SHA512:
+		case Digests::Skein1024:
+			return 128;
+		case Digests::Keccak256:
+			return 136;
+		case Digests::Keccak512:
+			return 72;
+		case Digests::BlakeSP256:
+		case Digests::BlakeBP512:
+			return 16384;
 
-	case CEX::Enumeration::Digests::None:
-		return 0;
-	default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoException("DigestFromName:GetBlockSize", "The digest type is not supported!");
-#else
-		return 0;
-#endif
+		case Digests::None:
+			return 0;
+		default:
+			throw Exception::CryptoException("DigestFromName:GetBlockSize", "The digest type is not supported!");
+		}
+	}
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("DigestFromName:GetBlockSize", "The digest is unavailable!", std::string(ex.what()));
 	}
 }
 
-int DigestFromName::GetDigestSize(CEX::Enumeration::Digests DigestType)
+size_t DigestFromName::GetDigestSize(Digests DigestType)
 {
-	switch (DigestType)
+	try
 	{
-	case CEX::Enumeration::Digests::Blake256:
-	case CEX::Enumeration::Digests::Blake2S256:
-	case CEX::Enumeration::Digests::Blake2SP256:
-	case CEX::Enumeration::Digests::Keccak256:
-	case CEX::Enumeration::Digests::SHA256:
-	case CEX::Enumeration::Digests::Skein256:
-		return 32;
-	case CEX::Enumeration::Digests::Blake512:
-	case CEX::Enumeration::Digests::Blake2B512:
-	case CEX::Enumeration::Digests::Blake2BP512:
-	case CEX::Enumeration::Digests::Keccak512:
-	case CEX::Enumeration::Digests::SHA512:
-	case CEX::Enumeration::Digests::Skein512:
-		return 64;
-	case CEX::Enumeration::Digests::Skein1024:
-		return 128;
-	case CEX::Enumeration::Digests::None:
-		return 0;
-	default:
-#if defined(CPPEXCEPTIONS_ENABLED)
-		throw CEX::Exception::CryptoException("DigestFromName:GetDigestSize", "The digest type is not supported!");
-#else
-		return 0;
-#endif
+		switch (DigestType)
+		{
+		case Digests::BlakeS256:
+		case Digests::BlakeSP256:
+		case Digests::Keccak256:
+		case Digests::SHA256:
+		case Digests::Skein256:
+			return 32;
+		case Digests::BlakeB512:
+		case Digests::BlakeBP512:
+		case Digests::Keccak512:
+		case Digests::SHA512:
+		case Digests::Skein512:
+			return 64;
+		case Digests::Skein1024:
+			return 128;
+		case Digests::None:
+			return 0;
+		default:
+			throw Exception::CryptoException("DigestFromName:GetDigestSize", "The digest type is not supported!");
+		}
+	}
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("DigestFromName:GetDigestSize", "The digest is unavailable!", std::string(ex.what()));
+	}
+}
 
+size_t DigestFromName::GetPaddingSize(Digests DigestType)
+{
+	try
+	{
+		switch (DigestType)
+		{
+		case Digests::BlakeS256:
+		case Digests::BlakeSP256:
+		case Digests::BlakeB512:
+		case Digests::BlakeBP512:
+		case Digests::Skein256:
+		case Digests::Skein512:
+		case Digests::Skein1024:
+			return 0;
+		case Digests::Keccak256:
+		case Digests::Keccak512:
+			return 1;
+		case Digests::SHA256:
+			return 9;
+		case Digests::SHA512:
+			return 17;
+		case Digests::None:
+			return 0;
+		default:
+			throw Exception::CryptoException("DigestFromName:GetPaddingSize", "The digest type is not supported!");
+		}
+	}
+	catch (const std::exception &ex)
+	{
+		throw Exception::CryptoException("DigestFromName:GetPaddingSize", "The digest is unavailable!", std::string(ex.what()));
 	}
 }
 

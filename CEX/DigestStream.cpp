@@ -1,14 +1,13 @@
-#include "Common.h"
 #include "DigestStream.h"
 
 NAMESPACE_PROCESSING
 
+//~~~Public Methods~~~//
+
 std::vector<byte> DigestStream::ComputeHash(IByteStream* InStream)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (InStream->Length() - InStream->Position() < 1)
 		throw CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
-#endif
 
 	m_inStream = InStream;
 	size_t dataLen = m_inStream->Length() - m_inStream->Position();
@@ -20,10 +19,8 @@ std::vector<byte> DigestStream::ComputeHash(IByteStream* InStream)
 
 std::vector<byte> DigestStream::ComputeHash(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-#if defined(CPPEXCEPTIONS_ENABLED)
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
 		throw CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
-#endif
 
 	size_t dataLen = Length - InOffset;
 	CalculateInterval(dataLen);
@@ -32,7 +29,7 @@ std::vector<byte> DigestStream::ComputeHash(const std::vector<byte> &Input, size
 	return Compute(Input, InOffset, Length);
 }
 
-/*** Protected Methods ***/
+//~~~Private Methods~~~//
 
 void DigestStream::CalculateInterval(size_t Length)
 {
@@ -119,14 +116,15 @@ std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t I
 
 void DigestStream::Destroy()
 {
+	m_isDestroyed = true;
 	m_blockSize = 0;
-	m_destroyEngine = false;
 	m_progressInterval = 0;
 
 	if (m_destroyEngine)
+	{
 		delete m_digestEngine;
-
-	m_isDestroyed = true;
+		m_destroyEngine = false;
+	}
 }
 
 NAMESPACE_PROCESSINGEND
