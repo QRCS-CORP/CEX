@@ -27,7 +27,6 @@ Versioning changed to 0.x format, (project is not to be considered a major relea
 
 Some things shifted around in the namespace, and a lot of small optimizations throughout.
 Documentation expanded and rewritten, now each class (brevity permitting), contains a mathematical description of the main function, a usage example, a technical overview, external links, and implementation details.
-Published the libraries html help documentation and updated the links.
 
 ###Version 0.12: September 21, 2016
 * Added little endian counter mode ICM, updated and rewrote all block cipher modes.
