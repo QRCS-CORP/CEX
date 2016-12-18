@@ -18,7 +18,7 @@ This help package contains details on the cryptographic primitives used in the l
 The current version is <B>0.13.0.1</B> (M version), which are the major, minor, patch, and release codes.<br>
 \brief
 Scheduled for release <B>0.14.0.1</B> (version N):<br>
-GCM/CWC/OCB	symmetric cipher modes<br>
+GCM/OCB	symmetric cipher modes<br>
 GMAC and OMAC Mac functions<br>
 Scrypt password-based key derivation function
 

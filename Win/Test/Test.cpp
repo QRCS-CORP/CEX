@@ -56,7 +56,7 @@ using namespace Test;
 
 // 
 // Release 0.14
-// GCM/CWC/OCB				-?
+// GCM/OCB				-?
 // GMAC/OMAC			-?
 // Scrypt(maybe)		-?
 // Code review			-?
