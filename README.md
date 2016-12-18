@@ -69,6 +69,9 @@ Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, al
 * Updates to format and code
 * First review
 
+##License
+This project is licensed under the GPL version 3 (GPLv3):
+https://www.gnu.org/licenses/gpl-3.0.en.html
 
 ##Links
 #####CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
