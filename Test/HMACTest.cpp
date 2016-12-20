@@ -30,7 +30,7 @@ namespace Test
 			OnProgress("HMACTest: Passed SHA-2 512 bit known answer vector tests..");
 
 			CompareAccess(m_keys[3]);
-			OnProgress("Passed DoFinal/ComputeHash methods output comparison..");
+			OnProgress("Passed DoFinal/Compute methods output comparison..");
 
 			return SUCCESS;
 		}
@@ -55,7 +55,7 @@ namespace Test
 		for (unsigned int i = 0; i < input.size(); ++i)
 			input[i] = (byte)i;
 
-		mac.ComputeMac(input, hash1);
+		mac.Compute(input, hash1);
 
 		std::vector<byte> hash2(32);
 		mac.BlockUpdate(input, 0, 128);
@@ -74,7 +74,7 @@ namespace Test
 		Mac::HMAC mac(eng);
 
 		mac.Initialize(Key);
-		mac.ComputeMac(Input, hash);
+		mac.Compute(Input, hash);
 
 		delete eng;
 
@@ -102,7 +102,7 @@ namespace Test
 		Mac::HMAC mac(eng);
 
 		mac.Initialize(Key);
-		mac.ComputeMac(Input, hash);
+		mac.Compute(Input, hash);
 
 		delete eng;
 

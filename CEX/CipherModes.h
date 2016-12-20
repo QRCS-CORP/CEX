@@ -24,23 +24,31 @@ enum class CipherModes : uint8_t
 	/// <summary>
 	/// Cipher FeedBack Mode
 	/// </summary>
-	CFB = 4,
+	CFB = 3,
 	/// <summary>
 	/// Big Endian Segmented Integer Counter Mode
 	/// </summary>
-	CTR = 8,
+	CTR = 4,
 	/// <summary>
-	/// Galois Counter Mode
+	/// Encrypt and Authenticate AEAD Mode
 	/// </summary>
-	GCM = 16,
+	EAX = 5,
+	/// <summary>
+	/// Galois Counter AEAD Mode
+	/// </summary>
+	GCM = 6,
 	/// <summary>
 	/// Little Endian Integer Counter Mode
 	/// </summary>
-	ICM = 32,
+	ICM = 7,
+	/// <summary>
+	/// Ouffset Codebook AEAD Mode
+	/// </summary>
+	OCB = 8,
 	/// <summary>
 	/// Output FeedBack Mode
 	/// </summary>
-	OFB = 64
+	OFB = 9
 };
 
 NAMESPACE_ENUMERATIONEND

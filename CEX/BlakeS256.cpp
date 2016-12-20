@@ -116,7 +116,7 @@ void BlakeS256::BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset, 
 	}
 }
 
-void BlakeS256::ComputeHash(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
+void BlakeS256::Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output)
 {
 	BlockUpdate(Input, 0, Input.size());
 	DoFinal(Output, 0);

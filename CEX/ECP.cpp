@@ -142,7 +142,7 @@ std::vector<byte> ECP::Compress(std::vector<byte> &State)
 {
 	Digest::Keccak512 dgt;
 	std::vector<byte> outKey(dgt.DigestSize());
-	dgt.ComputeHash(State, outKey);
+	dgt.Compute(State, outKey);
 
 	return outKey;
 }
