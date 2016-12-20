@@ -41,19 +41,19 @@ private:
 public:
 
 	/// <summary>
-	/// Get: The info byte array length
+	/// Get/Set: The info byte array length
 	/// </summary>
-	const size_t InfoSize() { return m_infoSize; }
+	size_t &InfoSize() { return m_infoSize; }
 
 	/// <summary>
-	/// Get: The key byte array length
+	/// Get/Set: The key byte array length
 	/// </summary>
-	const size_t KeySize() { return m_keySize; }
+	size_t &KeySize() { return m_keySize; }
 
 	/// <summary>
-	/// Get: The nonce byte array length
+	/// Get/Set: The nonce byte array length
 	/// </summary>
-	const size_t NonceSize() { return m_nonceSize; }
+	size_t &NonceSize() { return m_nonceSize; }
 
 
 	/// <summary>
