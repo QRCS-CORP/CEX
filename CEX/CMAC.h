@@ -20,7 +20,7 @@
 // Implementation Details:
 // An implementation of a Cipher based Message Authentication Code (CMAC).
 // Written by John Underhill, January 10, 2014
-// Updated December 20, 2016
+// Updated October 3, 2016
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_CMAC_H
@@ -44,8 +44,8 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <description>Example generating a MAC code from an Input array</description>
 /// <code>
 /// CMAC mac(Enumeration::BlockCiphers::AHX);
-/// mac.Initialize(Key);
-/// mac.Compute(Input, Output);
+/// mac.Initialize(Key, Nonce);
+/// mac.ComputeMac(Input, Output);
 /// </code>
 /// </example>
 /// 
@@ -76,12 +76,12 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Never reuse a ciphers key for the CMAC function, this is insecure and strongly discouraged.</description></item>
-/// <item><description>MAC return size is the underlying ciphers block-size; e.g. for AES, 16 bytes, and can be truncated by the caller.</description></item>
+/// <item><description>Never reuse a ciphers key and iv for the MAC function, this is insecure and strongly discouraged.</description></item>
+/// <item><description>MAC return size is the underlying ciphers block-size; e.g. for AES, 16 bytes.</description></item>
 /// <item><description>With the Initialize(Key) method, the key must be at least the ciphers block-size plus the minimum key size in length.</description></item>
 /// <item><description>The Initialize(Key, Salt), and Initialize(Key, Salt, Info) methods, use the Key parameter as the cipher key, and the Salt as the initialization vector.</description></item>
 /// <item><description>The Initialize(Key, Salt, Info) method assigns the Info array to an HX extended ciphers DistributionCode property; used by the secure key schedule.</description></item>
-/// <item><description>After a finalizer call (DoFinal or Compute), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
+/// <item><description>After a finalizer call (DoFinal or ComputeMac), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -177,7 +177,7 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize this class with a block cipher instance
+	/// Initialize the class
 	/// </summary>
 	///
 	/// <param name="Cipher">Instance of the block cipher</param>
@@ -235,7 +235,7 @@ public:
 	/// <param name="Output">The output Mac code array</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	virtual void ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -258,7 +258,7 @@ public:
 	/// <summary>
 	/// Initialize the MAC generator with a SymmetricKey key container.
 	/// <para>Uses a key, salt, and optional info arrays to initialize the MAC.
-	/// The Salt parameter is appended to the key, total key size must equal a LegalKeySize.</para>
+	/// The Salt parameter is used as the underlying cipher modes initialization vector, and must be at least block-size in length.</para>
 	/// </summary>
 	/// 
 	/// <param name="MacParam">A SymmetricKey key container class</param>
@@ -274,7 +274,7 @@ public:
 
 	/// <summary>
 	/// Initialize the MAC with key and salt arrays.
-	/// <para>The Salt parameter is appended to the key, total key size must equal a LegalKeySize.</para>
+	/// <para>The key must be at least the minimum legal key size, and the salt must be the ciphers block-size in length.</para>
 	/// </summary>
 	///
 	/// <param name="Key">The MAC generators primary key</param>
@@ -283,7 +283,7 @@ public:
 
 	/// <summary>
 	/// Initialize the MAC generator with key, salt, and info arrays.
-	/// <para>The Salt parameter is appended to the key, total key size must equal a LegalKeySize.
+	/// <para>The key must be a legal key size, and the salt must be the ciphers block-size in length.
 	/// The info parameter is only used on HX extended mode ciphers.</para>
 	/// </summary>
 	///

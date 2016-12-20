@@ -88,7 +88,7 @@ void SHA512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t
 	}
 }
 
-void SHA512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void SHA512::ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (Input.size() < m_minParallel)
 		m_isParallel = false;

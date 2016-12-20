@@ -43,7 +43,7 @@ NAMESPACE_DIGEST
 /// Keccak512 digest;
 /// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
-/// digest.Compute(Input, hash);
+/// digest.ComputeHash(Input, hash);
 /// </code>
 /// </example>
 ///
@@ -53,7 +53,7 @@ NAMESPACE_DIGEST
 /// <item><description>Hash sizes are 48 and 64 bytes (384 and 512 bits).</description></item>
 /// <item><description>Block sizes are 104, and 72 bytes (832, 576 bits).</description></item>
 /// <item><description>Use the <see cref="BlockSize"/> property to determine block sizes at runtime.</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods.</description>/></item>
+/// <item><description>The <see cref="ComputeHash(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods.</description>/></item>
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
 /// </list>
 ///
@@ -157,7 +157,7 @@ public:
 	/// 
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The hash output value array</param>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	virtual void ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object

@@ -26,7 +26,7 @@ namespace Test
 			CompareVector(m_keys[2], m_input[3], m_expected[11]);
 			OnProgress("Passed 256 bit key vector tests..");
 			CompareAccess(m_keys[2]);
-			OnProgress("Passed DoFinal/Compute methods output comparison..");
+			OnProgress("Passed DoFinal/ComputeHash methods output comparison..");
 
 			return SUCCESS;
 		}
@@ -43,17 +43,18 @@ namespace Test
 	void CMACTest::CompareAccess(std::vector<byte> &Key)
 	{
 		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
+		std::vector<byte> iv(eng->BlockSize());
 		Mac::CMAC mac(eng);
 
-		mac.Initialize(Key);
+		mac.Initialize(Key, iv);
 		std::vector<byte> input(64);
 		mac.BlockUpdate(input, 0, input.size());
 		std::vector<byte> hash1(16);
 		mac.DoFinal(hash1, 0);
 		std::vector<byte> hash2(16);
 		// must reinitialize after a finalizer call
-		mac.Initialize(Key);
-		mac.Compute(input, hash2);
+		mac.Initialize(Key, iv);
+		mac.ComputeMac(input, hash2);
 		delete eng;
 
 		if (hash1 != hash2)
@@ -64,12 +65,12 @@ namespace Test
 	{
 		std::vector<byte> hash(16);
 		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-
+		std::vector<byte> iv(eng->BlockSize());
 		Mac::CMAC mac(eng);
-		mac.Initialize(Key);
+
+		mac.Initialize(Key, iv);
 		mac.BlockUpdate(Input, 0, Input.size());
 		mac.DoFinal(hash, 0);
-
 		delete eng;
 
 		if (Expected != hash)

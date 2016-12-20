@@ -39,7 +39,7 @@ namespace Test
 			HMGGenerateFile(FILEPATH + "hmg_10mb.txt", FILESIZE);
 			OnProgress("Hash based Mac Generator completed..");
 
-			OnProgress("Passed DoFinal/Compute methods output comparison..");
+			OnProgress("Passed DoFinal/ComputeHash methods output comparison..");
 
 			return SUCCESS;
 		}

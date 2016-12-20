@@ -50,7 +50,7 @@ namespace Test
 		if (Expected != hash)
 			throw std::exception("SHA2: Expected hash is not equal!");
 
-		Digest->Compute(Input, hash);
+		Digest->ComputeHash(Input, hash);
 		if (Expected != hash)
 			throw std::exception("SHA2: Expected hash is not equal!");
 	}

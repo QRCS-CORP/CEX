@@ -53,7 +53,7 @@ using Processing::MacDescription;
 /// hmac->Initialize(Key, Iv);
 /// MacStream ds(mac);
 /// IByteStream* ms = new MemoryStream(Input);
-/// Code = ds.Compute(ms);
+/// Code = ds.ComputeMac(ms);
 /// delete eng;
 /// delete mac;
 /// delete ms;
@@ -65,7 +65,7 @@ using Processing::MacDescription;
 /// <list type="bullet">
 /// <item><description>Uses any of the implemented Macs using the IMac interface.</description></item>
 /// <item><description>Mac must be fully initialized before passed to the constructor.</description></item>
-/// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either Compute() calls.</description></item>
+/// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either ComputeMac() calls.</description></item>
 /// </list>
 /// </remarks>
 class MacStream
@@ -152,8 +152,8 @@ public:
 	/// 
 	/// <returns>The Mac Code</returns>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> Compute(IByteStream* InStream);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	std::vector<byte> ComputeMac(IByteStream* InStream);
 
 	/// <summary>
 	/// Process a length within the Input stream using an Offset
@@ -164,14 +164,14 @@ public:
 	/// <param name="InOffset">The Input array starting offset</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	std::vector<byte> ComputeMac(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
 	void CalculateInterval(size_t Length);
 	void CalculateProgress(size_t Length, bool Completed = false);
-	std::vector<byte> Process(size_t Length);
-	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	std::vector<byte> Compute(size_t Length);
+	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void CreateMac(MacDescription &Description);
 	void Destroy();
 };

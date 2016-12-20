@@ -105,7 +105,7 @@ std::vector<byte> SymmetricSecureKey::GetSystemKey()
 
 	Digest::SHA512 dgt;
 	std::vector<byte> hash(dgt.DigestSize());
-	dgt.Compute(state, hash);
+	dgt.ComputeHash(state, hash);
 
 	return hash;
 }

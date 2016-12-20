@@ -4,29 +4,29 @@ NAMESPACE_PROCESSING
 
 //~~~Public Methods~~~//
 
-std::vector<byte> DigestStream::Compute(IByteStream* InStream)
+std::vector<byte> DigestStream::ComputeHash(IByteStream* InStream)
 {
 	if (InStream->Length() - InStream->Position() < 1)
-		throw CryptoProcessingException("DigestStream:Compute", "The Input stream is too short!");
+		throw CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
 
 	m_inStream = InStream;
 	size_t dataLen = m_inStream->Length() - m_inStream->Position();
 	CalculateInterval(dataLen);
 	m_digestEngine->Reset();
 
-	return Process(dataLen);
+	return Compute(dataLen);
 }
 
-std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<byte> DigestStream::ComputeHash(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
-		throw CryptoProcessingException("DigestStream:Compute", "The Input stream is too short!");
+		throw CryptoProcessingException("DigestStream:ComputeHash", "The Input stream is too short!");
 
 	size_t dataLen = Length - InOffset;
 	CalculateInterval(dataLen);
 	m_digestEngine->Reset();
 
-	return Process(Input, InOffset, Length);
+	return Compute(Input, InOffset, Length);
 }
 
 //~~~Private Methods~~~//
@@ -53,7 +53,7 @@ void DigestStream::CalculateProgress(size_t Length, bool Completed)
 	}
 }
 
-std::vector<byte> DigestStream::Process(size_t Length)
+std::vector<byte> DigestStream::Compute(size_t Length)
 {
 	size_t bytesTotal = 0;
 	size_t bytesRead = 0;
@@ -85,7 +85,7 @@ std::vector<byte> DigestStream::Process(size_t Length)
 	return chkSum;
 }
 
-std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	const size_t alnBlocks = (Length / m_blockSize) * m_blockSize;
 	size_t bytesTotal = 0;

@@ -45,10 +45,10 @@ void CMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t L
 	}
 }
 
-void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void CMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
-		throw CryptoMacException("CMAC:Compute", "The Mac is not initialized!");
+		throw CryptoMacException("CMAC:ComputeMac", "The Mac is not initialized!");
 
 	if (Output.size() != m_macSize)
 		Output.resize(m_macSize);
@@ -132,20 +132,31 @@ void CMAC::Initialize(ISymmetricKey &MacParam)
 
 void CMAC::Initialize(const std::vector<byte> &Key)
 {
-	if (!SymmetricKeySize::Contains(m_cipherMode->LegalKeySizes(), Key.size(), 0, 0))
-		throw CryptoMacException("CMAC:Initialize", "Key size is too small; must be minimum key size!");
+	if (!SymmetricKeySize::Contains(m_cipherMode->LegalKeySizes(), Key.size() - m_cipherMode->BlockSize(), m_cipherMode->BlockSize(), 0))
+		throw CryptoMacException("CMAC:Initialize", "Key size is too small; must be cipher block size + minimum key size!");
+
+	std::vector<byte> tmpKey(Key.size() - m_cipherMode->BlockSize());
+	std::vector<byte> tmpIv(m_cipherMode->BlockSize());
+
+	memcpy(&tmpKey[0], &Key[0], tmpKey.size());
+	memcpy(&tmpIv[0], &Key[tmpKey.size()], tmpIv.size());
+
+	Initialize(tmpKey, tmpIv);
+}
+
+void CMAC::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
+{
+	if (!SymmetricKeySize::Contains(m_cipherMode->LegalKeySizes(), Key.size(), Salt.size(), 0))
+		throw CryptoMacException("CMAC:Initialize", "Key size is invalid; must be a legal key size!");
 
 	if (m_isInitialized)
 		Reset();
 
-	std::vector<byte> tmpIv(m_cipherMode->BlockSize());
-	Key::Symmetric::SymmetricKey kp(Key, tmpIv);
-
+	Key::Symmetric::SymmetricKey kp(Key, Salt);
 	m_cipherMode->Initialize(true, kp);
 
 	std::vector<byte> lu(m_cipherMode->BlockSize());
 	std::vector<byte> tmpz(m_cipherMode->BlockSize());
-
 	m_cipherMode->Transform(tmpz, 0, lu, 0);
 	m_K1 = GenerateSubkey(lu);
 	m_K2 = GenerateSubkey(m_K1);
@@ -154,18 +165,11 @@ void CMAC::Initialize(const std::vector<byte> &Key)
 	m_isInitialized = true;
 }
 
-void CMAC::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
-{
-	// append salt to key
-	std::vector<byte> tmpKey(Key.size() + Salt.size());
-	memcpy(&tmpKey[0], &Key[0], Key.size());
-	memcpy(&tmpKey[Key.size()], &Salt[0], Salt.size());
-
-	Initialize(tmpKey);
-}
-
 void CMAC::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
 {
+	if (!SymmetricKeySize::Contains(m_cipherMode->LegalKeySizes(), Key.size(), Salt.size(), 0))
+		throw CryptoMacException("CMAC:Initialize", "Key or salt size is too small; must be cipher block size + minimum key size!");
+
 	// info is only processed on hx extended ciphers
 	if (Info.size() != 0 && 
 		m_cipherType != BlockCiphers::Rijndael &&
@@ -185,12 +189,7 @@ void CMAC::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 		}
 	}
 
-	// append salt to key
-	std::vector<byte> tmpKey(Key.size() + Salt.size());
-	memcpy(&tmpKey[0], &Key[0], Key.size());
-	memcpy(&tmpKey[Key.size()], &Salt[0], Salt.size());
-
-	Initialize(tmpKey);
+	Initialize(Key, Salt);
 }
 
 void CMAC::Reset()
@@ -227,7 +226,7 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 	tmpKey[Input.size() - 1] = (byte)(Input[Input.size() - 1] << 1);
 
 	if (fbit == 1)
-		tmpKey[Input.size() - 1] ^= (Input.size() == m_cipherMode->BlockSize()) ? CT87 : CT1B;
+		tmpKey[Input.size() - 1] ^= Input.size() == m_cipherMode->BlockSize() ? CT87 : CT1B;
 
 	return tmpKey;
 }
@@ -261,11 +260,7 @@ void CMAC::LoadState()
 	m_macSize = m_cipherMode->BlockSize();
 	m_msgCode.resize(m_macSize);
 	m_wrkBuffer.resize(m_macSize);
-
-	m_legalKeySizes.resize(m_cipherMode->LegalKeySizes().size());
-	// cbc iv is always zeroed with cmac
-	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
-		m_legalKeySizes[i] = SymmetricKeySize(m_cipherMode->LegalKeySizes()[i].KeySize(), 0, m_cipherMode->LegalKeySizes()[i].InfoSize());
+	m_legalKeySizes = m_cipherMode->LegalKeySizes();
 }
 
 NAMESPACE_MACEND
