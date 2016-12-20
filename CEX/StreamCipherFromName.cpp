@@ -12,7 +12,7 @@ IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType,
 		{
 		case StreamCiphers::ChaCha20:
 			return new Cipher::Symmetric::Stream::ChaCha20(RoundCount);
-		case StreamCiphers::Salsa:
+		case StreamCiphers::Salsa20:
 			return new Cipher::Symmetric::Stream::Salsa20(RoundCount);
 		default:
 			throw Exception::CryptoException("StreamCipherFromName:GetStreamEngine", "The stream cipher is not recognized!");

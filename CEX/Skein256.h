@@ -38,12 +38,12 @@ NAMESPACE_DIGEST
 /// </summary>
 /// 
 /// <example>
-/// <description>Example using the ComputeHash method:</description>
+/// <description>Example using the Compute method:</description>
 /// <code>
 /// Skein256 digest;
 /// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
-/// digest.ComputeHash(Input, hash);
+/// digest.Compute(Input, hash);
 /// </code>
 /// </example>
 /// 
@@ -52,7 +52,7 @@ NAMESPACE_DIGEST
 /// <list type="bullet">
 /// <item><description>Block size is 32 bytes, (256 bits).</description></item>
 /// <item><description>Digest size is 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="ComputeHash(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods, and resets the internal state.</description>/></item>
+/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods, and resets the internal state.</description>/></item>
 /// <item><description>The <see cref="DoFinal(byte[], int)"/> method does NOT reset the internal state; call <see cref="Reset()"/> to reinitialize.</description></item>
 /// </list>
 /// 
@@ -213,7 +213,7 @@ public:
 	/// 
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The hash output value array</param>
-	virtual void ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output);
+	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object

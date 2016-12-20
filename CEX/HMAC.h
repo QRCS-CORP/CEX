@@ -44,7 +44,7 @@ using Digest::IDigest;
 /// <code>
 /// Mac::HMAC mac(Enumeration::Digests::SHA256);
 /// mac.Initialize(Key);
-/// mac.ComputeMac(Input, Output);
+/// mac.Compute(Input, Output);
 /// </code>
 /// </example>
 /// 
@@ -66,9 +66,9 @@ using Digest::IDigest;
 /// <item><description>Block size is the underlying hash functions internal block size in bytes.</description></item>
 /// <item><description>Digest size is the hash functions output code size in bytes.</description></item>
 /// <item><description>The key size should be equal or greater than the digests output size, and less or equal to the block-size.</description></item>
-/// <item><description>The ComputeMac(Input, Output) method wraps the BlockUpdate(Input, Offset, Length) and DoFinal(Output, Offset) methods and should only be used on small to medium sized data.</description>/></item>
+/// <item><description>The Compute(Input, Output) method wraps the BlockUpdate(Input, Offset, Length) and DoFinal(Output, Offset) methods and should only be used on small to medium sized data.</description>/></item>
 /// <item><description>The BlockUpdate(Input, Offset, Length) processes any length of message data, and is used in conjunction with the DoFinal(Output, Offset) method, which returns the final MAC code.</description>/></item>
-/// <item><description>After a finalizer call (DoFinal or ComputeMac), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
+/// <item><description>After a finalizer call (DoFinal or Compute), the Mac functions state is reset and must be re-initialized with a new key.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -216,7 +216,7 @@ public:
 	/// <param name="Output">The output Mac code array</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual void ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output);
+	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object

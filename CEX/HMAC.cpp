@@ -14,7 +14,7 @@ void HMAC::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t L
 	m_msgDigest->BlockUpdate(Input, InOffset, Length);
 }
 
-void HMAC::ComputeMac(const std::vector<byte> &Input, std::vector<byte> &Output)
+void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (Output.size() != m_msgDigest->DigestSize())
 		Output.resize(m_msgDigest->DigestSize());

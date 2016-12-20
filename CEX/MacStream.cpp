@@ -5,27 +5,27 @@ NAMESPACE_PROCESSING
 
 //~~~Public Methods~~~//
 
-std::vector<byte> MacStream::ComputeMac(IByteStream* InStream)
+std::vector<byte> MacStream::Compute(IByteStream* InStream)
 {
 	if (InStream->Length() - InStream->Position() < 1)
-		throw CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
+		throw CryptoProcessingException("MacStream:Compute", "The Input stream is too short!");
 
 	m_inStream = InStream;
 	size_t dataLen = m_inStream->Length() - m_inStream->Position();
 	CalculateInterval(dataLen);
 
-	return Compute(dataLen);
+	return Process(dataLen);
 }
 
-std::vector<byte> MacStream::ComputeMac(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	if (Length - InOffset < 1 || Length - InOffset > Input.size())
-		throw CryptoProcessingException("MacStream:ComputeHash", "The Input stream is too short!");
+		throw CryptoProcessingException("MacStream:Compute", "The Input stream is too short!");
 
 	size_t dataLen = Length - InOffset;
 	CalculateInterval(dataLen);
 
-	return Compute(Input, InOffset, Length);
+	return Process(Input, InOffset, Length);
 }
 
 //~~~Private Methods~~~//
@@ -52,7 +52,7 @@ void MacStream::CalculateProgress(size_t Length, bool Completed)
 	}
 }
 
-std::vector<byte> MacStream::Compute(size_t Length)
+std::vector<byte> MacStream::Process(size_t Length)
 {
 	size_t bytesTotal = 0;
 	size_t bytesRead = 0;
@@ -84,7 +84,7 @@ std::vector<byte> MacStream::Compute(size_t Length)
 	return chkSum;
 }
 
-std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
 	const size_t alnBlocks = (Length / m_blockSize) * m_blockSize;
 	size_t bytesTotal = 0;
@@ -124,7 +124,6 @@ void MacStream::Destroy()
 		delete m_macEngine;
 		m_destroyEngine = false;
 	}
-
 }
 
 void MacStream::CreateMac(MacDescription &Description)

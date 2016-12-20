@@ -42,13 +42,13 @@ NAMESPACE_DIGEST
 /// </summary> 
 /// 
 /// <example>
-/// <description>Example using the ComputeHash method:</description>
-/// <para>Use the ComputeHash method for small to medium data sizes</para>
+/// <description>Example using the Compute method:</description>
+/// <para>Use the Compute method for small to medium data sizes</para>
 /// <code>
 /// BlakeS256 dgt;
 /// std:vector&lt;uint8_t&gt; hash(dgt.DigestSize(), 0);
 /// // compute a hash
-/// dgt.ComputeHash(input, hash);
+/// dgt.Compute(input, hash);
 /// </code>
 /// </example>
 ///
@@ -84,7 +84,7 @@ NAMESPACE_DIGEST
 /// <item><description>Best performance for parallel mode is to use a large input block size to minimize parallel loop creation cost, block size should be in a range of 32KiB to 25MiB.</description></item>
 /// <item><description>The number of threads used in parallel mode can be user defined through the Blake2Params->ThreadCount property to any even number of threads; note that hash value will change with threadcount.</description></item>
 /// <item><description>Digest output size is fixed at 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="ComputeHash(uint8_t[])"/> method wraps the <see cref="BlockUpdate(uint8_t[], size_t, size_t)"/> and DoFinal methods</description>/></item>
+/// <item><description>The <see cref="Compute(uint8_t[])"/> method wraps the <see cref="BlockUpdate(uint8_t[], size_t, size_t)"/> and DoFinal methods</description>/></item>
 /// <item><description>The <see cref="DoFinal(uint8_t[], size_t)"/> method resets the internal state.</description></item>
 /// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
 /// <item><description>SIMD implementation requires compilation with SSSE3 or higher.</description></item>
@@ -338,7 +338,7 @@ public:
 	/// 
 	/// <param name="Input">The message input data</param>
 	/// <param name="Output">The hash value output array</param>
-	virtual void ComputeHash(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output);
+	virtual void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object

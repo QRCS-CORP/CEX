@@ -42,12 +42,12 @@ using Key::Symmetric::ISymmetricKey;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Using the ComputeHash method:</description>
+/// <description>Using the Compute method:</description>
 /// <code>
 /// SHA256 dgt;
 /// std:vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
 /// // compute a hash
-/// dgt.ComputeHash(Input, hash);
+/// dgt.Compute(Input, hash);
 /// </code>
 ///
 /// <description>Implement an HMAC:</description>
@@ -57,7 +57,7 @@ using Key::Symmetric::ISymmetricKey;
 /// // initialize HMAC by loading the key
 /// dgt.LoadMacKey(SymmetricKey(user-key));
 /// // compute mac
-/// dgt.ComputeHash(Input, mac);
+/// dgt.Compute(Input, mac);
 /// </code>
 ///
 /// <description>HKDF Generator:</description>
@@ -95,7 +95,7 @@ using Key::Symmetric::ISymmetricKey;
 /// <list type="bullet">
 /// <item><description>State block size is 64 bytes, (512 bits), in parallel mode the ParallelBlockSize() is used (P * B * 8).</description></item>
 /// <item><description>Digest output size is 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="ComputeHash(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], size_t, size_t)"/> and DoFinal methods; (suitable for small data).</description>/></item>
+/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], size_t, size_t)"/> and DoFinal methods; (suitable for small data).</description>/></item>
 /// <item><description>The <see cref="Update(byte)"/> and <see cref="BlockUpdate(byte[], size_t, size_t)"/> methods process message input.</description></item>
 /// <item><description>The <see cref="DoFinal(byte[], size_t)"/> method returns the hash or MAC code and resets the internal state.</description></item>
 /// <item><description>The Generate function produces pseudo-random bytes using an internal implementation of the HKDF Expand bytes generator.</description></item>
@@ -330,7 +330,7 @@ public:
 	/// 
 	/// <param name="Input">The input message array</param>
 	/// <param name="Output">The hash output code array</param>
-	virtual void ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output);
+	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object
