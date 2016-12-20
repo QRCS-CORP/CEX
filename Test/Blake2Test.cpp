@@ -74,7 +74,7 @@ namespace Test
 					Key::Symmetric::SymmetricKey mkey(key);
 					Digest::BlakeB512 blake2b(false);
 					blake2b.LoadMacKey(mkey);
-					blake2b.Compute(input, hash);
+					blake2b.ComputeHash(input, hash);
 
 					if (hash != expect)
 						throw std::exception("Blake2BTest: KAT test has failed!");
@@ -121,7 +121,7 @@ namespace Test
 					Digest::BlakeB512 blake2(true);
 					Key::Symmetric::SymmetricKey mkey(key);
 					blake2.LoadMacKey(mkey);
-					blake2.Compute(input, hash);
+					blake2.ComputeHash(input, hash);
 
 					if (hash != expect)
 						throw std::exception("Blake2BPTest: KAT test has failed!");
@@ -167,7 +167,7 @@ namespace Test
 					Key::Symmetric::SymmetricKey mkey(key);
 					Digest::BlakeS256 blake2s(false);
 					blake2s.LoadMacKey(mkey);
-					blake2s.Compute(input, hash);
+					blake2s.ComputeHash(input, hash);
 
 					if (hash != expect)
 						throw std::exception("Blake2STest: KAT test has failed!");
@@ -213,7 +213,7 @@ namespace Test
 					Key::Symmetric::SymmetricKey mkey(key);
 					Digest::BlakeS256 blake2sp(true);
 					blake2sp.LoadMacKey(mkey);
-					blake2sp.Compute(input, hash);
+					blake2sp.ComputeHash(input, hash);
 
 					if (hash != expect)
 						throw std::exception("Blake2SPTest: KAT test has failed!");

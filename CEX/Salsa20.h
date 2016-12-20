@@ -150,7 +150,7 @@ public:
 	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
-	virtual const StreamCiphers Enumeral() { return StreamCiphers::Salsa20; }
+	virtual const StreamCiphers Enumeral() { return StreamCiphers::Salsa; }
 
 	/// <summary>
 	/// Get: Returns True if the cipher supports AVX intrinsics

@@ -138,7 +138,7 @@ std::vector<byte> SymmetricKeyGenerator::GetBlock()
 	Mac::HMAC mac(m_dgtType);
 	mac.Initialize(key);
 	std::vector<byte> output(mac.MacSize());
-	mac.Compute(seed, output);
+	mac.ComputeMac(seed, output);
 
 	return output;
 }

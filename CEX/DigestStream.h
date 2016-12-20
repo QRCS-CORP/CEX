@@ -49,7 +49,7 @@ using Digest::IDigest;
 /// SHA512* eng = new SHA512();
 /// StreamDigest dstrm(eng);
 /// // get the hash code
-/// hash = dstrm.Compute(Input);
+/// hash = dstrm.ComputeHash(Input);
 /// delete eng;
 /// </code>
 /// </example>
@@ -58,7 +58,7 @@ using Digest::IDigest;
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Uses any of the implemented Digests using either the IDigest interface, or a Digests enumeration member.</description></item>
-/// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either of the Compute() calls.</description></item>
+/// <item><description>Implementation has a Progress counter that returns total sum of bytes processed per either of the ComputeHash() calls.</description></item>
 /// </list>
 /// </remarks>
 class DigestStream
@@ -135,8 +135,8 @@ public:
 	/// 
 	/// <returns>The Message Digest</returns>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> Compute(IByteStream* InStream);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	std::vector<byte> ComputeHash(IByteStream* InStream);
 
 	/// <summary>
 	/// Process a length within the Input stream using an Offset
@@ -147,14 +147,14 @@ public:
 	/// <param name="InOffset">The Input array starting offset</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
-	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if ComputeHash is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	std::vector<byte> ComputeHash(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
 	void CalculateInterval(size_t Length);
 	void CalculateProgress(size_t Length, bool Completed = false);
-	std::vector<byte> Process(size_t Length);
-	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	std::vector<byte> Compute(size_t Length);
+	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Destroy();
 };
 

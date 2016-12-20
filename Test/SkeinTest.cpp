@@ -56,7 +56,7 @@ namespace Test
 		if (Expected != hash)
 			throw std::exception("SKein Vector: Expected hash is not equal!");
 
-		Digest->Compute(Input, hash);
+		Digest->ComputeHash(Input, hash);
 		if (Expected != hash)
 			throw std::exception("SKein Vector: Expected hash is not equal!");
 	}

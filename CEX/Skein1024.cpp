@@ -36,7 +36,7 @@ void Skein1024::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, siz
 	}
 }
 
-void Skein1024::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
+void Skein1024::ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Output.resize(DIGEST_SIZE);
 	BlockUpdate(Input, 0, Input.size());
