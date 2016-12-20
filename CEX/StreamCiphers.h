@@ -20,7 +20,7 @@ enum class StreamCiphers : uint8_t
 	/// <summary>
 	/// A Salsa20 Stream Cipher
 	/// </summary>
-	Salsa = 32
+	Salsa20 = 32
 };
 
 NAMESPACE_ENUMERATIONEND

@@ -259,7 +259,7 @@ public:
 		m_parallelMinimumSize(0),
 		m_streamCipher(0)
 	{
-		if (CipherType != StreamCiphers::ChaCha20 && CipherType != StreamCiphers::Salsa)
+		if (CipherType != StreamCiphers::ChaCha20 && CipherType != StreamCiphers::Salsa20)
 			throw CryptoProcessingException("CipherStream:CTor", "The stream cipher is not recognized!");
 		if (RoundCount < 10 || RoundCount > 30 || RoundCount % 2 != 0)
 			throw CryptoProcessingException("CipherStream:CTor", "Invalid rounds count; must be an even number between 10 and 30!");

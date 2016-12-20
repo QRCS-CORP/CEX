@@ -39,7 +39,7 @@ void Keccak512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, siz
 	}
 }
 
-void Keccak512::ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output)
+void Keccak512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Output.resize(m_digestSize);
 	BlockUpdate(Input, 0, Input.size());

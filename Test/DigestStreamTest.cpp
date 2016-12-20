@@ -39,20 +39,20 @@ namespace Test
 		Digest::IDigest* eng = Helper::DigestFromName::GetInstance(Engine);
 		size_t dgtSze = eng->DigestSize();
 		std::vector<byte> hash1(dgtSze);
-		eng->ComputeHash(data, hash1);
+		eng->Compute(data, hash1);
 		delete eng;
 
 		// test stream method
 		std::vector<byte> hash2(dgtSze);
 		Processing::DigestStream ds(Engine);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
-		hash2 = ds.ComputeHash(ms);
+		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
 			throw std::exception("DigestStreamTest: Expected hash is not equal!");
 
 		// test byte access method
-		hash2 = ds.ComputeHash(data, 0, data.size());
+		hash2 = ds.Compute(data, 0, data.size());
 
 		if (hash1 != hash2)
 			throw std::exception("DigestStreamTest: Expected hash is not equal!");

@@ -69,7 +69,7 @@ public:
 	/// 
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The hash output value array</param>
-	virtual void ComputeHash(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Release all resources associated with the object
