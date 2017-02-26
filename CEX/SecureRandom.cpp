@@ -7,7 +7,28 @@ NAMESPACE_PRNG
 
 using IO::BitConverter;
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+SecureRandom::SecureRandom(Providers ProviderType, size_t BufferSize)
+	:
+	m_bufferIndex(0),
+	m_bufferSize(BufferSize),
+	m_byteBuffer(BufferSize),
+	m_isDestroyed(false),
+	m_pvdType(ProviderType)
+{
+	if (BufferSize < 64)
+		throw CryptoRandomException("SecureRandom:Ctor", "Buffer size must be at least 64 bytes!");
+
+	Reset();
+}
+
+SecureRandom::~SecureRandom()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void SecureRandom::Destroy()
 {
@@ -16,7 +37,7 @@ void SecureRandom::Destroy()
 		m_isDestroyed = true;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
-		m_seedType = Providers::None;
+		m_pvdType = Providers::None;
 
 		try
 		{
@@ -274,20 +295,12 @@ void SecureRandom::Reset()
 	if (m_rngGenerator != 0)
 		delete m_rngGenerator;
 
-	try
-	{
-		m_rngGenerator = Helper::ProviderFromName::GetInstance(m_seedType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoRandomException("SecureRandom:Reset", "Random seed generator could not be acquired!", std::string(ex.what()));
-	}
-
+	m_rngGenerator = Helper::ProviderFromName::GetInstance(m_pvdType);
 	m_rngGenerator->GetBytes(m_byteBuffer);
 	m_bufferIndex = 0;
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
 {

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -55,7 +55,6 @@ using Enumeration::PaddingModes;
 using Enumeration::StreamCiphers;
 using Enumeration::SymmetricEngines;
 
-
 /// <summary>
 /// Used to wrap a streaming transformation.
 /// <para>Wraps encryption stream functions in an easy to use interface.</para>
@@ -65,13 +64,16 @@ using Enumeration::SymmetricEngines;
 /// <description>Encrypting a memory stream using a CipherDescription preset:</description>
 /// <code>
 /// SymmetricKey kp(key, iv);
-/// MemoryStream mIn(plaintext);
-/// MemoryStream mOut;
+/// MemoryStream* mIn = new MemoryStream(plaintext);
+/// MemoryStream* mOut = new MemoryStream(plaintext.size());
 /// CipherDescription cd = CipherDescription::AES256CTR();
 ///
 /// CipherStream cs(cd);
 /// cs.Initialize(true, kp);
-/// cs.Write(&mIn, &mOut);
+/// cs.Write(mIn, mOut);
+///
+/// delete mIn;
+/// delete mOut;
 /// </code>
 /// </example>
 /// 
@@ -79,8 +81,8 @@ using Enumeration::SymmetricEngines;
 /// <description>Encrypting a file in-place:</description>
 /// <code>
 /// // initialize file stream; input must be set with Read and output must be ReadWrite access
-/// FileStream fIn("C:\\Tests\\test.txt", FileStream::FileAccess::Read);
-/// FileStream fOut("C:\\Tests\\test.txt", FileStream::FileAccess::ReadWrite);
+/// FileStream* fIn = new FileStream("C://Tests//test.txt", FileStream::FileAccess::Read);
+/// FileStream* fOut = new FileStream("C://Tests//test.txt", FileStream::FileAccess::ReadWrite);
 /// Key::Symmetric::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CBC
@@ -88,9 +90,12 @@ using Enumeration::SymmetricEngines;
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
-/// cs.Write(&fIn, &fOut);
+/// cs.Write(fIn, fOut);
+///
 /// fIn.Close();
 /// fOut.Close();
+/// delete fIn;
+/// delete fOut;
 /// </code>
 /// </example>
 ///
@@ -98,8 +103,8 @@ using Enumeration::SymmetricEngines;
 /// <description>Encrypting to a new file:</description>
 /// <code>
 /// // initialize file streams; input must be set with Read and output must be ReadWrite access
-/// FileStream fIn("C:\\Tests\\test.txt", FileStream::FileAccess::Read);
-/// FileStream fOut("C:\\Tests\\testenc.txt", FileStream::FileAccess::ReadWrite);
+/// FileStream* fIn = new FileStream("C://Tests//test.txt", FileStream::FileAccess::Read);
+/// FileStream* fOut = new FileStream("C://Tests//testenc.txt", FileStream::FileAccess::ReadWrite);
 /// Key::Symmetric::SymmetricKey kp(key, iv);
 ///
 /// // instantiate the cipher with AES-CTR
@@ -107,20 +112,23 @@ using Enumeration::SymmetricEngines;
 /// // initialize the cipher for encryption
 /// cs.Initialize(true, kp);
 /// // write to file
-/// cs.Write(&fIn, &fOut);
+/// cs.Write(fIn, fOut);
+///
 /// fIn.Close();
 /// fOut.Close();
+/// delete fIn;
+/// delete fOut;
 /// </code>
 /// </example>
 ///
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>The CipherStream class is an easy to use wrapper that initializes and operates a symmetric cipher, automating many complex tasks down to just a couple of methods, 
-/// in an extensible ease of use pattern.<br>
-/// Either a block cipher and mode, or a stream cipher can be initialized through the classes constructor, using either the cipher (and options) enumeration members, or a cipher instance.<br>
-/// The CipherStream class uses the IByteStream interface, and can encrypt either a byte array using MemoryStream, or a file with FileStream.<br>
-/// This class supports parallel processing; if the cipher configuration supports parallelism (CTR/ICM, and CBC/CFB Decrypt), the IsParallel property will be set to true.<br>
-/// The IsParallel property can be overrided and set to false, disabling parallel processing.<br>
+/// in an extensible ease of use pattern.<BR></BR>
+/// Either a block cipher and mode, or a stream cipher can be initialized through the classes constructor, using either the cipher (and options) enumeration members, or a cipher instance.<BR></BR>
+/// The CipherStream class uses the IByteStream interface, and can encrypt either a byte array using MemoryStream, or a file with FileStream.<BR></BR>
+/// This class supports parallel processing; if the cipher configuration supports parallelism (CTR/ICM, and CBC/CFB Decrypt), the IsParallel property will be set to true.<BR></BR>
+/// The IsParallel property can be overridden and set to false, disabling parallel processing.<BR></BR>
 /// If using the byte array Write method, the output array should be at least ParallelBlockSize in length to enable parallel processing.</para>
 ///
 /// <description><B>Implementation Notes:</B></description>
@@ -129,10 +137,11 @@ using Enumeration::SymmetricEngines;
 /// <item><description>Implementation has a Progress counter that returns total sum of bytes processed during a Write call.</description></item>
 /// <item><description>The Write methods can not be called until the Initialize(bool, ISymmetricKey) function has been called.</description></item>
 /// <item><description>The Initialize function takes a boolean (Encrypt/Decrypt) flag and an ISymmetricKey, which can be either a SymmetricKey or SymmetricSecureKey container class.</description></item>
-/// <item><description>Parallel processing is enabled by setting IsParallel() to true, and passing an output block of at least ParallelBlockSize to the Write function.</description></item>
+/// <item><description>If the system supports Parallel processing, IsParallel() is set to true; passing an output block of at least ParallelBlockSize to the Write function.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = data.size() - (data.size() % cipher.ParallelMinimumSize());</c></description></item>
+/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
+/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
 /// </list>
 /// </remarks>
 class CipherStream
@@ -214,27 +223,7 @@ public:
 	/// <param name="PaddingType">The padding mode enumeration name</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if an invalid CipherDescription or SymmetricKey is used</exception>
-	explicit CipherStream(BlockCiphers CipherType = BlockCiphers::RHX, Digests KdfEngine = Digests::SHA256, int RoundCount = 22, CipherModes ModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None)
-		:
-		m_blockCipher(0),
-		m_destroyEngine(true),
-		m_isBufferedIO(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_isStreamCipher(false),
-		m_legalKeySizes(0),
-		m_parallelBlockSize(0),
-		m_parallelMinimumSize(0),
-		m_streamCipher(0)
-	{
-		m_cipherEngine = GetCipherMode(ModeType, CipherType, 16, RoundCount, KdfEngine);
-		Scope();
-
-		if (!m_isCounterMode)
-			m_cipherPadding = GetPaddingMode(PaddingType);
-
-	}
+	explicit CipherStream(BlockCiphers CipherType = BlockCiphers::RHX, Digests KdfEngine = Digests::SHA256, int RoundCount = 22, CipherModes ModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
 
 	/// <summary>
 	/// Initialize this class with stream cipher enumeration parameters.
@@ -245,28 +234,7 @@ public:
 	/// <param name="RoundCount">The number of transformation rounds; the default for Salsa and ChaCha is 20 rounds</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if an invalid cipher type or rounds count is used</exception>
-	explicit CipherStream(StreamCiphers CipherType, size_t RoundCount = 20)
-		:
-		m_blockCipher(0),
-		m_destroyEngine(true),
-		m_isBufferedIO(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_isStreamCipher(true),
-		m_legalKeySizes(0),
-		m_parallelBlockSize(0),
-		m_parallelMinimumSize(0),
-		m_streamCipher(0)
-	{
-		if (CipherType != StreamCiphers::ChaCha20 && CipherType != StreamCiphers::Salsa20)
-			throw CryptoProcessingException("CipherStream:CTor", "The stream cipher is not recognized!");
-		if (RoundCount < 10 || RoundCount > 30 || RoundCount % 2 != 0)
-			throw CryptoProcessingException("CipherStream:CTor", "Invalid rounds count; must be an even number between 10 and 30!");
-
-		m_streamCipher = GetStreamCipher(CipherType, RoundCount);
-		Scope();
-	}
+	explicit CipherStream(StreamCiphers CipherType, size_t RoundCount = 20);
 
 	/// <summary>
 	/// Initialize the class with a CipherDescription Structure; containing the cipher implementation details.
@@ -276,38 +244,7 @@ public:
 	/// <param name="Header">A CipherDescription structure</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if an invalid CipherDescription is used</exception>
-	explicit CipherStream(CipherDescription* Header)
-		:
-		m_blockCipher(0),
-		m_destroyEngine(true),
-		m_isBufferedIO(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_legalKeySizes(0),
-		m_parallelBlockSize(0),
-		m_parallelMinimumSize(0),
-		m_streamCipher(0)
-	{
-		if (Header == 0)
-			throw CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
-
-		if (Header->EngineType() == SymmetricEngines::ChaCha20 || Header->EngineType() == SymmetricEngines::Salsa)
-		{
-			m_isStreamCipher = true;
-			m_streamCipher = GetStreamCipher((StreamCiphers)Header->EngineType(), (int)Header->RoundCount());
-		}
-		else
-		{
-			m_isStreamCipher = false;
-			m_cipherEngine = GetCipherMode(Header->CipherType(), (BlockCiphers)Header->EngineType(), (int)Header->BlockSize(), (int)Header->RoundCount(), Header->KdfEngine());
-
-			if (!m_isCounterMode && Header->PaddingType() != PaddingModes::None)
-				m_cipherPadding = GetPaddingMode(Header->PaddingType());
-		}
-
-		Scope();
-	}
+	explicit CipherStream(CipherDescription* Header);
 
 	/// <summary>
 	/// Initialize the class with a block cipher mode and (optional) padding instances.
@@ -319,29 +256,7 @@ public:
 	/// <param name="Padding">The block cipher padding instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null cipher mode is used</exception>
-	explicit CipherStream(ICipherMode* Cipher, IPadding* Padding = 0)
-		:
-		m_blockCipher(0),
-		m_cipherEngine(Cipher),
-		m_cipherPadding(Padding),
-		m_destroyEngine(false),
-		m_isBufferedIO(false),
-		m_isDestroyed(false),
-		m_isEncryption(Cipher->IsEncryption()),
-		m_isInitialized(false),
-		m_isStreamCipher(false),
-		m_legalKeySizes(0),
-		m_parallelBlockSize(0),
-		m_parallelMinimumSize(0),
-		m_streamCipher(0)
-	{
-		if (m_cipherEngine->IsInitialized())
-			throw CryptoProcessingException("CipherStream:CTor", "The cipher must be initialized through the local Initialize() method!");
-		if (m_cipherPadding == 0 && m_cipherEngine->Enumeral() != CipherModes::CTR)
-			m_cipherPadding = GetPaddingMode(PaddingModes::X923);
-
-		Scope();
-	}
+	explicit CipherStream(ICipherMode* Cipher, IPadding* Padding = 0);
 
 	/// <summary>
 	/// Initialize the class with a stream cipher instance.
@@ -351,36 +266,14 @@ public:
 	/// <param name="Cipher">The stream cipher instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null stream cipher is used</exception>
-	explicit CipherStream(IStreamCipher* Cipher)
-		:
-		m_blockCipher(0),
-		m_cipherPadding(0),
-		m_destroyEngine(false),
-		m_isBufferedIO(false),
-		m_isDestroyed(false),
-		m_isEncryption(),
-		m_isInitialized(false),
-		m_isStreamCipher(true),
-		m_parallelBlockSize(0),
-		m_streamCipher(Cipher)
-	{
-		if (Cipher == 0)
-			throw CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!");
-		if (Cipher->IsInitialized())
-			throw CryptoProcessingException("The cipher must be initialized through the local Initialize() method!");
-
-		Scope();
-	}
+	explicit CipherStream(IStreamCipher* Cipher);
 
 	/// <summary>
 	/// Destroy this class
 	/// </summary>
-	~CipherStream() 
-	{
-		Destroy();
-	}
+	~CipherStream();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -393,8 +286,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">The cipher is initialized for encryption</param>
-	/// <param name="KeyParam">The ISymmetricKey containing the cipher key and initialization vector</param>
-	void Initialize(bool Encryption, ISymmetricKey &KeyParam);
+	/// <param name="KeyParams">The ISymmetricKey containing the cipher key and initialization vector</param>
+	void Initialize(bool Encryption, ISymmetricKey &KeyParams);
 
 	/// <summary>
 	/// Process using file or memory streams.
@@ -421,12 +314,13 @@ public:
 	void Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 
 private:
+
 	void BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void BlockTransform(IByteStream* InStream, IByteStream* OutStream);
 	void CalculateProgress(size_t Length, size_t Processed);
 	ICipherMode* GetCipherMode(CipherModes ModeType, BlockCiphers CipherType, int BlockSize, int RoundCount, Digests KdfEngine);
 	IPadding* GetPaddingMode(PaddingModes PaddingType);
-	IStreamCipher* GetStreamCipher(StreamCiphers CipherType, int RoundCount);
+	IStreamCipher* GetStreamCipher(StreamCiphers CipherType, size_t RoundCount);
 	void ParametersCheck();
 	void StreamTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void StreamTransform(IByteStream* InStream, IByteStream* OutStream);

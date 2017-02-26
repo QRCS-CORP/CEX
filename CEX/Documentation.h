@@ -9,28 +9,28 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 0.13.0.1.
+Welcome to the CEX++ Cryptographic Library, version 0.14.0.1.
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>0.13.0.1</B> (M version), which are the major, minor, patch, and release codes.<br>
+The current version is <B>0.14.0.1</B> (M version), which are the major, minor, patch, and release codes.<BR></BR>
 \brief
-Scheduled for release <B>0.14.0.1</B> (version N):<br>
-GCM/OCB	symmetric cipher modes<br>
-GMAC and OMAC Mac functions<br>
-Scrypt password-based key derivation function
+Scheduled for release <B>1.0.0.1</B> (version M):<BR></BR>
+Keccak/Skein Tree Hashing and Digests review<BR></BR>
+Secure Vector implementation<BR></BR>
+SCRYPT<BR></BR>
 
 \author    John Underhill
-\version   0.13.0.1
-\date      December 18, 2016
+\version   0.14.0.1
+\date      February 22, 2017
 \copyright GPL version 3 license (GPLv3)
 
 \section intro_link Links
-The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html <br>
-CEX++ on Github: https://github.com/Steppenwolfe65/CEX <br>
-CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET <br>
+The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html <BR></BR>
+CEX++ on Github: https://github.com/Steppenwolfe65/CEX <BR></BR>
+CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET <BR></BR>
 The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 */
 // end doxygen main //
@@ -88,9 +88,13 @@ NAMESPACE_ROOT
 				class CBC {};
 				class CFB {};
 				class CTR {};
+				class EAX {};
 				class ECB {};
+				class GCM {};
+				class IAeadMode {};
 				class ICipherMode {};
 				class ICM {};
+				class OCB {};
 				class OFB {};
 			NAMESPACE_MODEEND
 			/*! @} */
@@ -119,6 +123,7 @@ NAMESPACE_ROOT
 		*  @brief Symmetric Stream Cipher Namespace
 		*/
 		NAMESPACE_STREAM
+			class IStreamCipher {};
 			class ChaCha20 {};
 			class Salsa20 {};
 		NAMESPACE_STREAMEND
@@ -136,8 +141,7 @@ NAMESPACE_ROOT
 	NAMESPACE_COMMON
 		class CipherDescription {};
 		class CpuDetect {};
-		class SymmetricKeyGenerator {};
-		class SymmetricKey {};
+		class ParallelOptions {};
 	NAMESPACE_COMMONEND
 	/*! @} */
 
@@ -293,9 +297,9 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_MAC
 		class CMAC {};
+		class GMAC {};
 		class HMAC {};
 		class IMac {};
-		class MacDescription {};
 	NAMESPACE_MACEND
 	/*! @} */
 
@@ -348,6 +352,7 @@ NAMESPACE_ROOT
 	*  @brief Entropy source collectors and concentrators
 	*/
 	NAMESPACE_PROVIDER
+		class CJP {};
 		class CSP {};
 		class ECP {};
 		class IProvider {};
@@ -375,6 +380,7 @@ NAMESPACE_ROOT
 		class ArrayUtils {};
 		class IntUtils {};
 		class ParallelUtils {};
+		class SysUtils {};
 	NAMESPACE_UTILITYEND
 	/*! @} */
 

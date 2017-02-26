@@ -3,12 +3,68 @@
 #include "DigestFromName.h"
 #include "IntUtils.h"
 #include "ProviderFromName.h"
+#include "SymmetricKey.h"
 
 NAMESPACE_DRBG
 
 using Utility::IntUtils;
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+HMG::HMG(Digests DigestType, Providers ProviderType)
+	:
+	m_hmacEngine(DigestType),
+	m_destroyEngine(true),
+	m_digestType(DigestType),
+	m_distributionCode(0),
+	m_distributionCodeMax(0),
+	m_hmacKey(m_hmacEngine.BlockSize()),
+	m_hmacState(m_hmacEngine.MacSize(), 0x01),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_providerSource(Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_providerType(ProviderType),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
+	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
+	m_seedCtr(SEEDCTR_SIZE),
+	m_stateCtr(STATECTR_SIZE)
+{
+	Scope();
+}
+
+HMG::HMG(IDigest* Digest, IProvider* Provider)
+	:
+	m_hmacEngine(Digest != 0 ? Digest : throw CryptoGeneratorException("HMG:Ctor", "Digest can not be null!")),
+	m_destroyEngine(false),
+	m_digestType(Digest->Enumeral()),
+	m_distributionCode(0),
+	m_distributionCodeMax(0),
+	m_hmacKey(m_hmacEngine.BlockSize()),
+	m_hmacState(m_hmacEngine.MacSize(), 0x01),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_providerSource(Provider != 0 ? Provider : throw CryptoGeneratorException("HMG:Ctor", "Provider can not be null!")),
+	m_providerType(Provider->Enumeral()),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
+	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
+	m_seedCtr(SEEDCTR_SIZE),
+	m_stateCtr(STATECTR_SIZE)
+{
+	Scope();
+}
+
+HMG::~HMG()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void HMG::Destroy()
 {
@@ -105,13 +161,14 @@ void HMG::Initialize(const std::vector<byte> &Seed)
 
 	// pre-initialize the HMAC
 	m_hmacKey = Seed;
-	m_hmacEngine.Initialize(m_hmacKey);
+	Key::Symmetric::SymmetricKey kp(m_hmacKey);
+	m_hmacEngine.Initialize(kp);
 	// add entropy and re-mix before first output call
 	Derive(m_hmacKey);
 
 	size_t secLen = Seed.size();
 	if (secLen < m_hmacEngine.MacSize())
-		m_secStrength = secLen * 8;
+		m_secStrength = (secLen * 8) / 2;
 
 	m_isInitialized = true;
 }
@@ -160,7 +217,7 @@ void HMG::Update(const std::vector<byte> &Seed)
 	Derive(Seed);
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 void HMG::Derive(const std::vector<byte> &Seed)
 {
@@ -174,7 +231,7 @@ void HMG::Derive(const std::vector<byte> &Seed)
 	// preserve some initial entropy
 	if (m_isInitialized)
 	{
-		m_hmacEngine.BlockUpdate(m_hmacKey, 0, m_hmacKey.size());
+		m_hmacEngine.Update(m_hmacKey, 0, m_hmacKey.size());
 		blkOffset += m_hmacKey.size();
 	}
 
@@ -184,13 +241,13 @@ void HMG::Derive(const std::vector<byte> &Seed)
 		// 1) increment seed counter by key-bytes copied
 		Increase(m_seedCtr, keyRmd);
 		// 2) process the seed counter
-		m_hmacEngine.BlockUpdate(m_seedCtr, 0, m_seedCtr.size());
+		m_hmacEngine.Update(m_seedCtr, 0, m_seedCtr.size());
 		// 3) process the seed
-		m_hmacEngine.BlockUpdate(Seed, 0, Seed.size());
+		m_hmacEngine.Update(Seed, 0, Seed.size());
 		// 4) pad with new entropy
 		RandomPad(blkOffset);
 		// 5) compress and add to HMAC key
-		m_hmacEngine.DoFinal(macCode, 0);
+		m_hmacEngine.Finalize(macCode, 0);
 		memcpy(&tmpKey[keyOffset], &macCode[0], keyRmd);
 
 		keyLen -= keyRmd;
@@ -201,7 +258,8 @@ void HMG::Derive(const std::vector<byte> &Seed)
 	// store the new key
 	m_hmacKey = tmpKey;
 	// 6) rekey the HMAC
-	m_hmacEngine.Initialize(m_hmacKey);
+	Key::Symmetric::SymmetricKey kp(m_hmacKey);
+	m_hmacEngine.Initialize(kp);
 	// 7) generate the states initial entropy
 	m_providerSource->GetBytes(m_hmacState);
 }
@@ -216,14 +274,14 @@ void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 		// 1) increase state counter by output-bytes generated
 		Increase(m_stateCtr, rmdLen);
 		// 2) process the state counter
-		m_hmacEngine.BlockUpdate(m_stateCtr, 0, m_stateCtr.size());
+		m_hmacEngine.Update(m_stateCtr, 0, m_stateCtr.size());
 		// 3) process the current state
-		m_hmacEngine.BlockUpdate(m_hmacState, 0, m_hmacState.size());
+		m_hmacEngine.Update(m_hmacState, 0, m_hmacState.size());
 		// 4) optional personalization string
 		if (m_distributionCode.size() != 0)
-			m_hmacEngine.BlockUpdate(m_distributionCode, 0, m_distributionCode.size());
+			m_hmacEngine.Update(m_distributionCode, 0, m_distributionCode.size());
 		// 5) output the state
-		m_hmacEngine.DoFinal(m_hmacState, 0);
+		m_hmacEngine.Finalize(m_hmacState, 0);
 		memcpy(&Output[OutOffset], &m_hmacState[0], rmdLen);
 
 		prcLen -= rmdLen;
@@ -249,27 +307,8 @@ void HMG::Increase(std::vector<byte> &Counter, const size_t Value)
 	}
 }
 
-IProvider* HMG::LoadProvider(Providers ProviderType)
+void HMG::Scope()
 {
-	try
-	{
-		return Helper::ProviderFromName::GetInstance(ProviderType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoGeneratorException("HMG:LoadProvider", "The entropy provider could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-void HMG::LoadState()
-{
-	if (m_providerSource == 0 && m_providerType != Providers::None)
-		m_providerSource = LoadProvider(m_providerType);
-
-	m_hmacKey.resize(m_hmacEngine.BlockSize());
-	m_hmacState.resize(m_hmacEngine.MacSize(), 0x01);
-	m_reseedThreshold = m_hmacEngine.MacSize() * 1000;
-	m_secStrength = m_hmacEngine.MacSize() * 8;
 	m_distributionCodeMax = m_hmacEngine.BlockSize() + (m_hmacEngine.BlockSize() - (m_stateCtr.size() + m_hmacState.size() + Helper::DigestFromName::GetPaddingSize(m_digestType)));
 
 	m_legalKeySizes.resize(3);
@@ -294,7 +333,7 @@ void HMG::RandomPad(size_t BlockOffset)
 	std::vector<byte> tmpV(padLen);
 	m_providerSource->GetBytes(tmpV);
 	// digest processes full blocks by padding with entropy from provider
-	m_hmacEngine.BlockUpdate(tmpV, 0, tmpV.size());
+	m_hmacEngine.Update(tmpV, 0, tmpV.size());
 }
 
 NAMESPACE_DRBGEND

@@ -10,6 +10,9 @@
 #include "../CEX/ECB.h"
 #include "../CEX/OFB.h"
 #include "../CEX/ICM.h"
+#include "../CEX/EAX.h"
+#include "../CEX/GCM.h"
+#include "../CEX/OCB.h"
 #include "../CEX/SHA512.h"
 #include "../CEX/ChaCha20.h"
 #include "../CEX/Salsa20.h"
@@ -19,6 +22,7 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 	using namespace Cipher::Symmetric::Stream;
+	using Utility::IntUtils;
 
 	std::string CipherSpeedTest::Run()
 	{
@@ -55,12 +59,16 @@ namespace Test
 			OnProgress("### Uses the standard rounds and a 256 bit key");
 			OnProgress("");
 
+			/*AHX* eng1 = new AHX();
+			for (size_t i = 0; i < 10; ++i)
+				GCMSpeedTest(eng1, true, true);*/
+
 			IBlockCipher* engine;
 			if (m_hasAESNI)
 				engine = new AHX();
 			else
 				engine = new RHX();
-			
+
 			OnProgress("***AES-CBC Sequential Encryption***");
 			CBCSpeedTest(engine, true, false);
 			OnProgress("***AES-CBC Parallel Decryption***");
@@ -83,8 +91,28 @@ namespace Test
 
 			OnProgress("***AES-OFB Sequential Encryption***");
 			OFBSpeedTest(engine, true, false);
-			delete engine;
 
+			OnProgress("### AEAD Authenticated Cipher Modes ###");
+			OnProgress("### Tests speeds of EAX, GCM, and OCB authenticated modes");
+			OnProgress("### Uses the standard rounds and a 256 bit key");
+			OnProgress("");
+
+			OnProgress("***AES-EAX Sequential Encryption***");
+			EAXSpeedTest(engine, true, false);
+			OnProgress("***AES-EAX Parallel Encryption***");
+			EAXSpeedTest(engine, true, true);
+
+			OnProgress("***AES-GCM Sequential Encryption***");
+			GCMSpeedTest(engine, true, false);
+			OnProgress("***AES-GCM Parallel Encryption***");
+			GCMSpeedTest(engine, true, true);
+
+			OnProgress("***AES-OCB Sequential Encryption***");
+			OCBSpeedTest(engine, true, false);
+			OnProgress("***AES-OCB Parallel Encryption***");
+			OCBSpeedTest(engine, true, true);
+
+			delete engine;
 
 			OnProgress("### STREAM CIPHER TESTS ###");
 			OnProgress("### Tests speeds of Salsa and ChaCha20 stream ciphers");
@@ -114,7 +142,7 @@ namespace Test
 	{
 		AHX* engine = new AHX();
 		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, 32, 16, 20);
+		ParallelBlockLoop(cipher, true, true, MB100, 32, 16, 20, m_progressEvent);
 		delete cipher;
 		delete engine;
 	}
@@ -123,7 +151,7 @@ namespace Test
 	{
 		RHX* engine = new RHX();
 		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20);
+		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
 		delete cipher;
 		delete engine;
 	}
@@ -132,7 +160,7 @@ namespace Test
 	{
 		SHX* engine = new SHX();
 		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20);
+		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
 		delete cipher;
 		delete engine;
 	}
@@ -141,7 +169,7 @@ namespace Test
 	{
 		THX* engine = new THX();
 		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20);
+		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
 		delete cipher;
 		delete engine;
 	}
@@ -151,35 +179,58 @@ namespace Test
 	void CipherSpeedTest::CBCSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
 	{
 		Mode::CBC* cipher = new Mode::CBC(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::CFBSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
 	{
 		Mode::CFB* cipher = new Mode::CFB(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::CTRSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
 	{
 		Mode::CTR* cipher = new Mode::CTR(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::ICMSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
 	{
 		Mode::ICM* cipher = new Mode::ICM(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::OFBSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
 	{
 		Mode::OFB* cipher = new Mode::OFB(Engine);
-		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+		delete cipher;
+	}
+
+	//*** IEAD Mode Tests ***//
+
+	void CipherSpeedTest::EAXSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	{
+		Mode::EAX* cipher = new Mode::EAX(Engine);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 16, 10, m_progressEvent);
+		delete cipher;
+	}
+
+	void CipherSpeedTest::GCMSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	{
+		Mode::GCM* cipher = new Mode::GCM(Engine);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 12, 10, m_progressEvent);
+		delete cipher;
+	}
+
+	void CipherSpeedTest::OCBSpeedTest(IBlockCipher* Engine, bool Encrypt, bool Parallel)
+	{
+		Mode::OCB* cipher = new Mode::OCB(Engine);
+		ParallelBlockLoop(cipher, Encrypt, Parallel, MB100, 32, 12, 10, m_progressEvent);
 		delete cipher;
 	}
 
@@ -188,14 +239,14 @@ namespace Test
 	void CipherSpeedTest::ChaChaSpeedTest()
 	{
 		ChaCha20* cipher = new ChaCha20();
-		ParallelStreamLoop(cipher, 32, 8, 10);
+		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
 		delete cipher;
 	}
 
 	void CipherSpeedTest::SalsaSpeedTest()
 	{
 		Salsa20* cipher = new Salsa20();
-		ParallelStreamLoop(cipher, 32, 8, 10);
+		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
 		delete cipher;
 	}
 
@@ -229,78 +280,9 @@ namespace Test
 		m_progressEvent(Data);
 	}
 
-	void CipherSpeedTest::ParallelBlockLoop(Mode::ICipherMode* Cipher, bool Encrypt, bool Parallel, size_t SampleSize, size_t KeySize, size_t IvSize, size_t Loops)
-	{
-		;
-		size_t blkSze = Parallel ? Cipher->ParallelBlockSize() : Cipher->BlockSize();
-		std::vector<byte> buffer1(blkSze, 0);
-		std::vector<byte> buffer2(blkSze, 0);
-
-		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-		Cipher->Initialize(Encrypt, keyParam);
-		Cipher->IsParallel() = Parallel;
-		uint64_t start = TestUtils::GetTimeMs64();
-
-		for (size_t i = 0; i < Loops; ++i)
-		{
-			size_t counter = 0;
-			uint64_t lstart = TestUtils::GetTimeMs64();
-
-			while (counter < SampleSize)
-			{
-				Cipher->Transform(buffer1, 0, buffer2, 0);
-				counter += buffer1.size();
-			}
-			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-			OnProgress(const_cast<char*>(calc.c_str()));
-		}
-
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-		uint64_t len = Loops * SampleSize;
-		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string glen = Utility::IntUtils::ToString(len / GB1);
-		std::string mbps = Utility::IntUtils::ToString((rate / MB1));
-		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
-		std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
-		OnProgress(const_cast<char*>(resp.c_str()));
-		OnProgress("");
-	}
-
-	void CipherSpeedTest::ParallelStreamLoop(IStreamCipher* Cipher, size_t KeySize, size_t IvSize, size_t Loops)
-	{
-		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-		Cipher->Initialize(keyParam);
-		Cipher->IsParallel() = true;
-		std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
-		std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
-		uint64_t start = TestUtils::GetTimeMs64();
-
-		for (size_t i = 0; i < Loops; ++i)
-		{
-			size_t counter = 0;
-			uint64_t lstart = TestUtils::GetTimeMs64();
-
-			while (counter < DATA_SIZE)
-			{
-				Cipher->Transform(buffer1, 0, buffer2, 0);
-				counter += buffer1.size();
-			}
-			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-			OnProgress(const_cast<char*>(calc.c_str()));
-		}
-
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-		uint64_t len = Loops * DATA_SIZE;
-		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string mbps = Utility::IntUtils::ToString((rate / MB1));
-		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
-		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
-		OnProgress(const_cast<char*>(resp.c_str()));
-		OnProgress("");
-	}
-
 	void CipherSpeedTest::WideModeLoop(IBlockCipher* Engine, size_t SampleSize, bool Parallel, size_t KeySize, size_t IvSize, size_t Loops)
 	{
+		// not fully implemented, for future use..
 		std::vector<byte> buffer1(IvSize, 0);
 		std::vector<byte> buffer2(IvSize, 0);
 		SampleSize -= (SampleSize % IvSize);
@@ -310,12 +292,12 @@ namespace Test
 		if (!Parallel)
 		{
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 		}
 		else
 		{
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			buffer1.resize(cipher.ParallelBlockSize());
 			buffer2.resize(cipher.ParallelBlockSize());
 		}
@@ -334,7 +316,7 @@ namespace Test
 					cipher.Transform128(buffer1, 0, buffer2, 0);
 					counter += buffer1.size();
 				}
-				std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 				OnProgress(const_cast<char*>(calc.c_str()));
 			}
 		}
@@ -350,7 +332,7 @@ namespace Test
 					cipher.Transform64(buffer1, 0, buffer2, 0);
 					counter += buffer1.size();
 				}
-				std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 				OnProgress(const_cast<char*>(calc.c_str()));
 			}
 		}
@@ -358,14 +340,12 @@ namespace Test
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
 		uint64_t len = Loops * SampleSize;
 		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string mbps = Utility::IntUtils::ToString(rate / MB1);
-		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
+		std::string mbps = IntUtils::ToString(rate / MB1);
+		std::string secs = IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 		OnProgress(const_cast<char*>(resp.c_str()));
 		OnProgress("");
 	}
-
-
 
 	// Note: internal test, ignore
 	void CipherSpeedTest::CounterSpeedTest()
@@ -396,7 +376,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -416,7 +396,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -431,7 +411,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -452,7 +432,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 
 
@@ -467,7 +447,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(const_cast<char*>(calc.c_str()));
 	}
 

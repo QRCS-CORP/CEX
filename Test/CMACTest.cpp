@@ -1,9 +1,12 @@
 #include "CMACTest.h"
 #include "../CEX/CMAC.h"
 #include "../CEX/RHX.h"
+#include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	using Key::Symmetric::SymmetricKey;
+
 	std::string CMACTest::Run()
 	{
 		try
@@ -26,7 +29,7 @@ namespace Test
 			CompareVector(m_keys[2], m_input[3], m_expected[11]);
 			OnProgress("Passed 256 bit key vector tests..");
 			CompareAccess(m_keys[2]);
-			OnProgress("Passed DoFinal/Compute methods output comparison..");
+			OnProgress("Passed Finalize/Compute methods output comparison..");
 
 			return SUCCESS;
 		}
@@ -44,15 +47,16 @@ namespace Test
 	{
 		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
 		Mac::CMAC mac(eng);
+		SymmetricKey kp(Key);
 
-		mac.Initialize(Key);
+		mac.Initialize(kp);
 		std::vector<byte> input(64);
-		mac.BlockUpdate(input, 0, input.size());
+		mac.Update(input, 0, input.size());
 		std::vector<byte> hash1(16);
-		mac.DoFinal(hash1, 0);
+		mac.Finalize(hash1, 0);
 		std::vector<byte> hash2(16);
 		// must reinitialize after a finalizer call
-		mac.Initialize(Key);
+		mac.Initialize(kp);
 		mac.Compute(input, hash2);
 		delete eng;
 
@@ -64,11 +68,12 @@ namespace Test
 	{
 		std::vector<byte> hash(16);
 		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
+		SymmetricKey kp(Key);
 
 		Mac::CMAC mac(eng);
-		mac.Initialize(Key);
-		mac.BlockUpdate(Input, 0, Input.size());
-		mac.DoFinal(hash, 0);
+		mac.Initialize(kp);
+		mac.Update(Input, 0, Input.size());
+		mac.Finalize(hash, 0);
 
 		delete eng;
 

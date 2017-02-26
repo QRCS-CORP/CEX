@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -31,7 +31,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// Implements a Cipher FeedBack Mode (CFB)
+/// An implementation of a Cipher FeedBack Mode
 /// </summary>
 /// 
 /// <example>
@@ -62,29 +62,29 @@ NAMESPACE_MODE
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>//encrypt the register, xor the ciphertext with the plaintext by block-size bytes   left shift the register  copy cipher text to the register
-/// <para>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output.<br>
-/// Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks.<br>
-/// On the first block the Nonce (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes.<br>
-/// The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector.<br>
-/// The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern.<br>
+/// <para>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output.<BR></BR>
+/// Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks.<BR></BR>
+/// On the first block the Nonce (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes.<BR></BR>
+/// The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector.<BR></BR>
+/// The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern.<BR></BR>
 /// The decryption function follows the reverse pattern; the block is decrypted with the symmetric cipher, and then XOR'd with the ciphertext from the previous block to produce the plain-text.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><br> 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>E<SUP>-1</SUP></B>=decrypt, <B>^</B>=XOR<br>
-/// <EM>Encryption</EM><br>
-/// I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u:<br>
-/// (a) Oj ← EK(Ij). (Compute the block cipher output)<br>
-/// (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1)<br>
-/// (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj)<br>
-/// (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register)<br>
-/// <EM>Decryption</EM><br>
+/// <para><EM>Legend:</EM><BR></BR> 
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>^</B>=XOR<BR></BR>
+/// <EM>Encryption</EM><BR></BR>
+/// I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u:<BR></BR>
+/// (a) Oj ← EK(Ij). (Compute the block cipher output)<BR></BR>
+/// (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1)<BR></BR>
+/// (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj)<BR></BR>
+/// (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register)<BR></BR>
+/// <EM>Decryption</EM><BR></BR>
 /// Pj ← Cj ^ tj. where tj, Oj and Ij</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The encryption function of the CFB mode is limited by its dependency chain; that is, each block relies on information from the previous block, and so can not be multi-threaded.
-/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores.<br>
-/// This is acheived by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.<br> 
+/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores.<BR></BR>
+/// This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.<BR></BR> 
 /// The CFB parallel decryption mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread
 /// uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</para>
 ///
@@ -94,7 +94,7 @@ NAMESPACE_MODE
 /// <item><description>A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
 /// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
 /// <item><description>The DecryptBlock and EncryptBlock functions can only be accessed through the class instance.</description></item>
-/// <item><description>The transformation methods can not be called until the Initialize(bool, SymmetricKey) function has been called.</description></item>
+/// <item><description>The transformation methods can not be called until the Initialize(bool, ISymmetricKey) function has been called.</description></item>
 /// <item><description>In CFB mode, only the decryption function can be processed in parallel.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>Parallel processing is enabled on decryption by setting IsParallel() to true, and passing an input block of ParallelBlockSize() to the transform.</description></item>
@@ -112,24 +112,18 @@ class CFB : public ICipherMode
 {
 private:
 
-	const size_t MAX_PRLALLOC = 100000000;
-	const size_t PRC_DATACACHE = 32000;
+	static const size_t BLOCK_SIZE = 16;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
 	std::vector<byte> m_cfbVector;
 	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
-	bool m_hasAVX2;
-	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	bool m_isParallel;
-	size_t m_parallelBlockSize;
-	size_t m_parallelMaxDegree;
-	size_t m_parallelMinimumSize;
-	size_t m_processorCount;
+	bool m_isLoaded;
+	ParallelOptions m_parallelProfile;
 
 public:
 
@@ -160,16 +154,6 @@ public:
 	virtual const CipherModes Enumeral() { return CipherModes::CFB; }
 
 	/// <summary>
-	/// Get: Returns True if the cipher supports AVX intrinsics
-	/// </summary>
-	virtual const bool HasAVX2() { return m_hasAVX2; }
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports SSE SIMD intrinsics
-	/// </summary>
-	virtual const bool HasSSE() { return m_hasSSE; }
-
-	/// <summary>
 	/// Get: True if initialized for encryption, False for decryption
 	/// </summary>
 	virtual const bool IsEncryption() { return m_isEncryption; }
@@ -180,12 +164,14 @@ public:
 	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
-	/// Get/Set: Enable automatic processor parallelization
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input/output data arrays passed to the transform must be this size in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual bool &IsParallel() { return m_isParallel; }
+	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 
 	/// <summary>
-	/// Get: Array of valid encryption key byte lengths
+	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_blockCipher->LegalKeySizes(); }
 
@@ -195,31 +181,18 @@ public:
 	virtual const std::string Name() { return "CFB"; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.
-	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, SymmetricKey)"/> function is called.</para>
+	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
 
 	/// <summary>
-	/// Get: Maximum input block byte length when using multi-threaded processing
+	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	virtual const size_t ParallelMaximumSize() { return MAX_PRLALLOC; }
-
-	/// <summary>
-	/// Get: The smallest valid input block byte length, when using multi-threaded processing; parallel blocks must be a multiple of this size
-	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
-
-	/// <summary>
-	/// Get/Set: The maximum number of threads allocated when using multi-threaded processing.
-	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, SymmetricKey)"/> function is called.</para>
-	/// </summary>
-	size_t &ParallelThreadsMax() { return m_parallelMaxDegree; }
-
-	/// <summary>
-	/// Get: Available system processor core count
-	/// </summary>
-	virtual const size_t ProcessorCount() { return m_processorCount; }
+	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
 
 	//~~~Constructor~~~//
 
@@ -231,34 +204,7 @@ public:
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
-	explicit CFB(BlockCiphers CipherType, size_t RegisterSize = 16)
-		:
-		m_blockCipher(0),
-		m_blockSize(RegisterSize),
-		m_cfbVector(0),
-		m_cipherType(CipherType),
-		m_destroyEngine(true),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_hasAVX2(false),
-		m_hasSSE(false),
-		m_isInitialized(false),
-		m_isParallel(false),
-		m_parallelBlockSize(0),
-		m_parallelMinimumSize(0),
-		m_parallelMaxDegree(0),
-		m_processorCount(0)
-	{
-		if (m_cipherType == BlockCiphers::None)
-			throw CryptoCipherModeException("CFB:CTor", "The Cipher type can not be zero!");
-		if (m_blockSize == 0)
-			throw CryptoCipherModeException("CFB:CTor", "The register size can not be zero!");
-
-		LoadState();
-
-		if (m_blockSize > m_blockCipher->BlockSize())
-			throw CryptoCipherModeException("CFB:CTor", "The register size is invalid!");
-	}
+	explicit CFB(BlockCiphers CipherType, size_t RegisterSize = 16);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance
@@ -268,48 +214,19 @@ public:
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size; default value is 16 bytes</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if a null Block Cipher is used, or the specified block size is invalid</exception>
-	explicit CFB(IBlockCipher* Cipher, size_t RegisterSize = 16)
-		:
-		m_blockCipher(Cipher),
-		m_blockSize(RegisterSize),
-		m_cfbVector(Cipher->BlockSize()),
-		m_cipherType(Cipher->Enumeral()),
-		m_destroyEngine(false),
-		m_hasAVX2(false),
-		m_hasSSE(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_isParallel(false),
-		m_parallelBlockSize(0),
-		m_parallelMaxDegree(0),
-		m_parallelMinimumSize(0),
-		m_processorCount(0)
-	{
-		if (m_blockCipher == 0)
-			throw CryptoCipherModeException("CFB:CTor", "The Cipher can not be null!");
-		if (m_blockSize < 1)
-			throw CryptoCipherModeException("CFB:CTor", "The register size can not be zero!");
-		if (m_blockSize > m_blockCipher->BlockSize())
-			throw CryptoCipherModeException("CFB:CTor", "The register size is invalid! Register size can not be larger than Block Ciphers internal block size.");
-
-		LoadState();
-	}
+	explicit CFB(IBlockCipher* Cipher, size_t RegisterSize = 16);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~CFB()
-	{
-		Destroy();
-	}
+	virtual ~CFB();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
 	/// <para>Decrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
@@ -319,7 +236,7 @@ public:
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
 	/// <para>Decrypts one block of bytes using the designated offsets.
-	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
@@ -338,7 +255,7 @@ public:
 	/// <summary>
 	/// Encrypt a single block of bytes. 
 	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
@@ -348,7 +265,7 @@ public:
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
 	/// <para>Encrypts one block of bytes at the designated offsets.
-	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
@@ -362,10 +279,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">True if cipher is used for encryption, False to decrypt</param>
-	/// <param name="KeyParam">SymmetricKey containing the encryption Key and Initialization Vector</param>
+	/// <param name="KeyParams">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam);
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams);
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -379,36 +296,61 @@ public:
 	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
-	/// Transform a block of bytes.
-	/// <para>Transforms one block of bytes beginning at a zero index.
-	/// Encryption or Decryption is performed based on the Encryption flag set in the Initialize() function.
-	/// Multi-threading capable function in Decryption mode; set IsParallel() to true to enable, and process blocks of ParallelBlockSize().
-	/// Initialize(bool, SymmetricKey) must be called before this function can be used.</para>
+	/// Transform an entire block of bytes. 
+	/// <para>Encrypts one block of bytes beginning at a zero index.
+	/// This method is used in a buffering strategy, where buffers of size BlockSize() for sequential processing, 
+	/// or ParallelBlockSize() for parallel processing, are processed and copied to a larger array by the caller.
+	/// Parallel processing is limited to the Decryption function only, the Encryption function will process ParallelBlockSize() blocks in sequential mode.
+	/// Buffers should be of the same size, either BlockSize() or ParallelBlockSize().
+	/// If the Input and Output array sizes differ, the smallest array size will be processed.
+	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
-	///
-	/// <param name="Input">The input array to transform</param>
+	/// 
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
+	/// 
+	/// <returns>The number of bytes processed</returns>
+	virtual size_t Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
-	/// Transform a block of bytes using offset parameters.
-	/// <para>Transforms one block of bytes using the designated offsets.
-	/// Multi-threading capable function in Decryption mode; set IsParallel() to true to enable, and process blocks of ParallelBlockSize().
-	/// Initialize(bool, SymmetricKey) must be called before this method can be used.</para>
+	/// Transform a block of bytes with offset parameters.
+	/// <para>Transforms one block of bytes at the designated offsets.
+	/// This method is used when looping through two large arrays utilizing offsets incremented by the caller.
+	/// One block is processed of either ParallelBlockSize() for parallel processing, or BlockSize() for sequential mode.
+	/// Parallel processing is limited to the Decryption function only, the Encryption function will process ParallelBlockSize() blocks in sequential mode.
+	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
-	///
-	/// <param name="Input">The input array to transform</param>
+	/// 
+	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	/// 
+	/// <returns>The number of bytes processed</returns>
+	virtual size_t Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+
+	/// <summary>
+	/// Transform a length of bytes with offset parameters. 
+	/// <para>This method processes a specified length of bytes, utilizing offsets incremented by the caller.
+	/// If IsParallel() is set to true, and the length is at least ParallelBlockSize(), the transform is run in parallel processing mode.
+	/// Parallel processing is limited to the Decryption function only, the Encryption function will process ParallelBlockSize() blocks in sequential mode.
+	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Length">The number of bytes to transform</param>
+	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 private:
+
 	void DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
-	void Detect();
-	IBlockCipher* LoadCipher(BlockCiphers CipherType);
-	void LoadState();
 	void Scope();
 };
 

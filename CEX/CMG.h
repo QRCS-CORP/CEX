@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -31,6 +31,7 @@
 #include "Digests.h"
 #include "IBlockCipher.h"
 #include "IDigest.h"
+#include "ParallelOptions.h"
 
 NAMESPACE_DRBG
 
@@ -38,6 +39,8 @@ using Enumeration::BlockCiphers;
 using Enumeration::Digests;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Digest::IDigest;
+
+using Common::ParallelOptions;
 
 /// <summary>
 /// An implementation of a block cipher Counter Mode Generator (CMG)
@@ -56,39 +59,39 @@ using Digest::IDigest;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The Counter mode generates a key-stream by encrypting successive values of an incrementing Big Endian ordered 128bit counter array (nonce).<br>
-/// In parallel mode, the generators counter is increased by a number factored from the number of input blocks, allowing for a multi-threaded operation.<br>
+/// <para>The Counter mode generates a key-stream by encrypting successive values of an incrementing Big Endian ordered 128bit counter array (nonce).<BR></BR>
+/// In parallel mode, the generators counter is increased by a number factored from the number of input blocks, allowing for a multi-threaded operation.<BR></BR>
 /// The implementation is further parallelized by constructing a larger 'staggered' counter array, and processing large blocks using 128 or 256 SIMD instructions.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><br> 
-/// <B>C</B>=pseudo-random, <B>K</B>=seed, <B>E</B>=encrypt<br>
-/// <EM>Generate</EM><br>
-/// R0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj), C+1.</para><br>
+/// <para><EM>Legend:</EM><BR></BR> 
+/// <B>C</B>=pseudo-random, <B>K</B>=seed, <B>E</B>=encrypt<BR></BR>
+/// <EM>Generate</EM><BR></BR>
+/// R0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj), C+1.</para><BR></BR>
 ///
 /// <description><B>Initialization and Update:</B></description>
 /// <para>The Initialize functions have three different parameter options: the Seed which is the primary key, 
-/// the Nonce used to initialize the internal counter, and the Info which is used in the Generate function.<br>
-/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<br>
-/// The supported seed-sizes are calculated based on the block ciphers functions internal block size, and can vary depending on which cipher is used to instantiate the generator.<br>
-/// The 16 byte (NonceSize) Nonce value is another secret value, used to initialize the counter to a non-zero random value.<br>
-/// The Info parameter maps to the DistributionCode() property of an extended HX cipher, but is ignored when a standard cipher implementation is used.<br>
-/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property<br> 
-/// The Update function uses the seed value to re-key the cipher via the internal key derivation function.<br>
+/// the Nonce used to initialize the internal counter, and the Info which is used in the Generate function.<BR></BR>
+/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<BR></BR>
+/// The supported seed-sizes are calculated based on the block ciphers functions internal block size, and can vary depending on which cipher is used to instantiate the generator.<BR></BR>
+/// The 16 byte (NonceSize) Nonce value is another secret value, used to initialize the counter to a non-zero random value.<BR></BR>
+/// The Info parameter maps to the DistributionCode() property of an extended HX cipher, but is ignored when a standard cipher implementation is used.<BR></BR>
+/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property<BR></BR> 
+/// The Update function uses the seed value to re-key the cipher via the internal key derivation function.<BR></BR>
 /// The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The transformation function in a CTR generator is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded.<br>
-/// Output from the parallelized functions aligns with the output from a standard sequential CTR implementation processing an all zeroes input array.<br>
-/// Parallelism is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads.<br> 
+/// <para>The transformation function in a CTR generator is not limited by a dependency chain; this mode can be both SIMD pipelined and multi-threaded.<BR></BR>
+/// Output from the parallelized functions aligns with the output from a standard sequential CTR implementation processing an all zeroes input array.<BR></BR>
+/// Parallelism is achieved by pre-calculating the counters positional offset over multiple 'chunks' of key-stream, which are then generated independently across threads.<BR></BR> 
 /// The key stream generated by encrypting the counter array(s), is output as the source of pseudo-random.</para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
-/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<br>
+/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<BR></BR>
 /// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through a KDF2 generator along with the current state, 
-/// the output is used to reseed the generator.<br>
-/// The interval at which this reseeding occurs is 1mb by default, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, the seed is regenerated.<br> 
-/// Predictive resistance is strongly recommended when producing large amounts of psuedo-random (10kb or greater).</para>
+/// the output is used to reseed the generator.<BR></BR>
+/// The interval at which this reseeding occurs is 1mb by default, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, the seed is regenerated.<BR></BR> 
+/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -101,10 +104,11 @@ using Digest::IDigest;
 /// <item><description>There are three LegalKeySizes, minimum, recommended, and maximum, with CMG, the middle value is the recommended seed length for best security; i.e. LegalKeySizes()[1].</description></item>
 /// <item><description>The Generate() methods can not be used until an Initialize() function has been called, and the generator is seeded.</description></item>
 /// <item><description>In a block cipher counter based generator, the encryption function can be both pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
-/// <item><description>Parallel processing is enabled by setting IsParallel() to true, and passing an output block of ParallelBlockSize() to the Generate function.</description></item>
+/// <item><description>If the system supports Parallel processing, IsParallel() is set to true; passing an output block of ParallelBlockSize() to the Generate function.</description></item>
 /// <item><description>The ParallelThreadsMax() property is the thread count in the parallel loop (pre-configured automatically); this must be either 1 (IsParallel=false), or an even number no greater than the number of processer cores on the system.</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = data.size() - (data.size() % cipher.ParallelMinimumSize());</c></description></item>
+/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
+/// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % .ParallelMinimumSize);</c></description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -119,8 +123,8 @@ class CMG : public IDrbg
 {
 private:
 
-	const size_t COUNTER_SIZE = 16;
-	const size_t DEF_CYCTHRESH = 1024 * 1000; // 1mb
+	static const size_t COUNTER_SIZE = 16;
+	static const size_t DEF_CYCTHRESH = 1024 * 1000;
 	const uint64_t MAX_OUTPUT = 35184372088832;
 	const size_t MAX_PRLALLOC = 100000000;
 	const size_t MAX_REQUEST = 65536;
@@ -134,21 +138,15 @@ private:
 	bool m_destroyEngine;
 	std::vector<byte> m_distributionCode;
 	size_t m_distributionCodeMax;
-	bool m_hasAVX2;
-	bool m_hasSSE;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	bool m_isParallel;
 	IDigest* m_kdfEngine;
 	Digests m_kdfEngineType;
 	std::vector<byte> m_kdfInfo;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_parallelBlockSize;
-	size_t m_parallelMaxDegree;
-	size_t m_parallelMinimumSize;
+	ParallelOptions m_parallelProfile;
 	bool m_prdResistant;
-	size_t m_processorCount;
 	IProvider* m_providerSource;
 	Providers m_providerType;
 	size_t m_reseedCounter;
@@ -167,7 +165,7 @@ public:
 
 	/// <summary>
 	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(bool, SymmetricKey)"/> is called.
+	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
 	/// Changing this code will create a unique distribution of the generator.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
 	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
@@ -192,9 +190,10 @@ public:
 	virtual const bool IsInitialized() { return m_isInitialized; }
 
 	/// <summary>
-	/// Get/Set: Automatic processor parallelization
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available on the system.</para>
 	/// </summary>
-	bool &IsParallel() { return m_isParallel; }
+	const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
@@ -227,29 +226,18 @@ public:
 	virtual const size_t NonceSize() { return COUNTER_SIZE; }
 
 	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+	const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
 
 	/// <summary>
-	/// Get: Maximum input size with parallel processing
+	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	const size_t ParallelMaximumSize() { return MAX_PRLALLOC; }
-
-	/// <summary>
-	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
-	/// </summary>
-	const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
-
-	/// <summary>
-	/// Get: The maximum number of threads allocated when using multi-threaded processing
-	/// </summary>
-	const size_t ParallelThreadsMax() { return m_parallelMaxDegree; }
-
-	/// <remarks>
-	/// Get: Processor count
-	/// </remarks>
-	const size_t ProcessorCount() { return m_processorCount; }
+	ParallelOptions &ParallelProfile() { return m_parallelProfile; }
 
 	/// <summary>
 	/// Get/Set: Generating this amount or greater, triggers seed regeneration
@@ -264,7 +252,7 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate the class using a block cipher type name, an optional entropy source type, and optional 
+	/// Instantiate the class using a block cipher type-name, an optional entropy source type, and optional kdf hash-engine
 	/// </summary>
 	///
 	/// <param name="CipherType">The block cipher type to instantiate as the primary generator.
@@ -275,43 +263,7 @@ public:
 	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit CMG(BlockCiphers CipherType = BlockCiphers::AHX, Digests KdfEngineType = Digests::SHA512, Providers ProviderType = Providers::CSP)
-		:
-		m_blockCipher(0),
-		m_blockSize(0),
-		m_cipherType(CipherType),
-		m_ctrVector(0),
-		m_destroyEngine(true),
-		m_distributionCode(0),
-		m_distributionCodeMax(0),
-		m_hasAVX2(false),
-		m_hasSSE(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_isParallel(false),
-		m_kdfEngine(0),
-		m_kdfEngineType(KdfEngineType),
-		m_kdfInfo(0),
-		m_legalKeySizes(0),
-		m_parallelBlockSize(0),
-		m_parallelMaxDegree(0),
-		m_parallelMinimumSize(0),
-		m_prdResistant(false),
-		m_processorCount(0),
-		m_providerSource(0),
-		m_providerType(ProviderType),
-		m_reseedCounter(0),
-		m_reseedRequests(0),
-		m_reseedThreshold(0),
-		m_secStrength(0),
-		m_seedSize(0)
-	{
-		if (m_cipherType == BlockCiphers::None)
-			throw CryptoGeneratorException("CMG:CTor", "The cipher type can not be none!");
-
-		LoadState();
-	}
+	explicit CMG(BlockCiphers CipherType = BlockCiphers::AHX, Digests KdfEngineType = Digests::SHA512, Providers ProviderType = Providers::CSP);
 
 	/// <summary>
 	/// Instantiate the class using a block cipher instance and an optional entropy source
@@ -324,55 +276,14 @@ public:
 	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
-	explicit CMG(IBlockCipher* Cipher, IDigest* KdfEngine = 0, IProvider* Provider = 0)
-		:
-		m_blockCipher(Cipher),
-		m_blockSize(Cipher->BlockSize()),
-		m_cipherType(Cipher->Enumeral()),
-		m_ctrVector(Cipher->BlockSize()),
-		m_destroyEngine(false),
-		m_distributionCode(0),
-		m_distributionCodeMax(0),
-		m_hasAVX2(false),
-		m_hasSSE(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_isParallel(false),
-		m_kdfEngine(KdfEngine),
-		m_kdfEngineType(KdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
-		m_kdfInfo(0),
-		m_legalKeySizes(0),
-		m_parallelBlockSize(0),
-		m_parallelMaxDegree(0),
-		m_parallelMinimumSize(0),
-		m_prdResistant(false),
-		m_processorCount(0),
-		m_providerSource(Provider),
-		m_providerType(Provider != 0 ? Provider->Enumeral() : Providers::None),
-		m_reseedCounter(0),
-		m_reseedRequests(0),
-		m_reseedThreshold(0),
-		m_secStrength(0),
-		m_seedSize(0)
-	{
-		if (m_blockCipher == 0)
-			throw CryptoGeneratorException("CMG:CTor", "The Cipher can not be null!");
-		if (m_blockCipher->BlockSize() != COUNTER_SIZE)
-			throw CryptoGeneratorException("CMG:CTor", "The Cipher block size must be 16 bytes!");
-
-		LoadState();
-	}
+	explicit CMG(IBlockCipher* Cipher, IDigest* KdfEngine = 0, IProvider* Provider = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~CMG()
-	{
-		Destroy();
-	}
+	virtual ~CMG();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -469,16 +380,9 @@ public:
 	virtual void Update(const std::vector<byte> &Seed);
 
 private:
+
 	void Derive(std::vector<byte> &Seed);
-	void Detect();
 	void Generate(std::vector<byte> &Output, size_t OutOffset);
-	void Increment(std::vector<byte> &Counter);
-	void Increase(const std::vector<byte> &Input, std::vector<byte> &Output, const size_t Value);
-	IBlockCipher* LoadCipher(BlockCiphers CipherType, Digests KdfEngineType);
-	IDigest* LoadDigest(Digests DigestType);
-	IProvider* LoadProvider(Providers ProviderType);
-	void LoadState();
-	void Scope();
 	void Transform(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter);
 };
 

@@ -60,40 +60,21 @@ public:
 	/// <summary>
 	/// Initialize and empty stream
 	/// </summary>
-	MemoryStream() 
-		:
-		m_isDestroyed(false),
-		m_streamData(0),
-		m_streamPosition(0)
-	{
-	}
+	MemoryStream();
 
 	/// <summary>
 	/// Initialize this class and set the streams length
 	/// </summary>
 	///
 	/// <param name="Length">The reserved length of the stream</param>
-	explicit MemoryStream(size_t Length)
-		:
-		m_isDestroyed(false),
-		m_streamData(0),
-		m_streamPosition(0)
-	{
-		m_streamData.reserve(Length);
-	}
+	explicit MemoryStream(size_t Length);
 
 	/// <summary>
 	/// Initialize this class with a byte array
 	/// </summary>
 	///
 	/// <param name="Data">The array used to initialize the stream</param>
-	explicit MemoryStream(const std::vector<byte> &Data)
-		:
-		m_isDestroyed(false),
-		m_streamData(Data),
-		m_streamPosition(0)
-	{
-	}
+	explicit MemoryStream(const std::vector<byte> &Data);
 
 	/// <summary>
 	/// Initialize this class with a byte array with offset and length parameters
@@ -104,30 +85,14 @@ public:
 	/// <param name="Length">The number of bytes to copy</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
-	explicit MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t Length)
-		:
-		m_isDestroyed(false),
-		m_streamData(0),
-		m_streamPosition(0)
-	{
-		if (Length > Data.size() - Offset)
-			throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
-
-		m_streamData.resize(Length);
-		memcpy(&m_streamData[0], &Data[Offset], Length);
-	}
-
-	//~~~Public Methods~~~//
+	explicit MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~MemoryStream()
-	{
-		Destroy();
-	}
+	virtual ~MemoryStream();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Close and flush the stream (not used in MemoryStream)

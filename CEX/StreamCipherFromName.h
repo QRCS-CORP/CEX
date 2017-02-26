@@ -27,7 +27,7 @@ public:
 	/// <returns>An uninitialized stream cipher</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IStreamCipher* GetInstance(StreamCiphers StreamCipherType, uint RoundCount);
+	static IStreamCipher* GetInstance(StreamCiphers StreamCipherType, size_t RoundCount);
 };
 
 NAMESPACE_HELPEREND

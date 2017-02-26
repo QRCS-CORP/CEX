@@ -7,7 +7,22 @@
 
 NAMESPACE_PROVIDER
 
-//** Public Methods **//
+//~~~Constructor~~~//
+
+RDP::RDP(RdEngines RdEngine)
+	:
+	m_engineType(RdEngine),
+	m_isAvailable(false)
+{
+	Reset();
+}
+
+RDP::~RDP()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void RDP::Destroy()
 {

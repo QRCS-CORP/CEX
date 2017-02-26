@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -53,8 +53,8 @@ NAMESPACE_DIGEST
 /// <item><description>Hash sizes are 48 and 64 bytes (384 and 512 bits).</description></item>
 /// <item><description>Block sizes are 104, and 72 bytes (832, 576 bits).</description></item>
 /// <item><description>Use the <see cref="BlockSize"/> property to determine block sizes at runtime.</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods.</description>/></item>
-/// <item><description>The <see cref="DoFinal(byte[], int)"/> method resets the internal state.</description></item>
+/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], int, int)"/> and Finalize methods.</description>/></item>
+/// <item><description>The <see cref="Finalize(byte[], int)"/> method resets the internal state.</description></item>
 /// </list>
 ///
 /// <description>Guiding Publications:</description>
@@ -110,46 +110,14 @@ public:
 	/// </summary>
 	///
 	/// <param name="DigestSize">Digest return size in bits</param>
-	explicit Keccak512(int DigestSize = 512)
-		:
-		m_blockSize(0),
-		m_buffer(0),
-		m_bufferIndex(0),
-		m_isDestroyed(false),
-		m_digestSize(0),
-		m_state(25, 0)
-	{
-		// test for legal sizes; default at 512
-		if (DigestSize == 384)
-			m_digestSize = 384 / 8;
-		else
-			m_digestSize = 512 / 8;
-
-		m_blockSize = 200 - (m_digestSize * 2);
-
-		Initialize();
-	}
+	explicit Keccak512(int DigestSize = 512);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~Keccak512()
-	{
-		Destroy();
-	}
+	virtual ~Keccak512();
 
-	//~~~Public Methods~~~//
-
-	/// <summary>
-	/// Update the buffer
-	/// </summary>
-	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
-	///
-	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Get the Hash value
@@ -174,7 +142,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
+	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Reset the internal state
@@ -187,6 +155,17 @@ public:
 	///
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input);
+
+	/// <summary>
+	/// Update the buffer
+	/// </summary>
+	/// 
+	/// <param name="Input">Input data</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="Length">Amount of data to process in bytes</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
+	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
 	void Initialize();

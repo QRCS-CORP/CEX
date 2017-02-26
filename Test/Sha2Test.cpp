@@ -44,8 +44,8 @@ namespace Test
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
-		Digest->BlockUpdate(Input, 0, Input.size());
-		Digest->DoFinal(hash, 0);
+		Digest->Update(Input, 0, Input.size());
+		Digest->Finalize(hash, 0);
 
 		if (Expected != hash)
 			throw std::exception("SHA2: Expected hash is not equal!");

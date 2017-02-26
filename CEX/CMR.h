@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -28,13 +28,11 @@
 #include "IPrng.h"
 #include "BlockCiphers.h"
 #include "CMG.h"
-#include "IProvider.h"
 #include "Providers.h"
 
 NAMESPACE_PRNG
 
 using Enumeration::BlockCiphers;
-using Provider::IProvider;
 using Enumeration::Providers;
 
 /// <summary>
@@ -108,20 +106,7 @@ public:
 	/// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	CMR(BlockCiphers CipherType = BlockCiphers::RHX, Providers ProviderType = Providers::CSP, size_t BufferSize = 4096)
-		:
-		m_bufferIndex(0),
-		m_bufferSize(BufferSize),
-		m_byteBuffer(BufferSize),
-		m_engineType(CipherType),
-		m_isDestroyed(false),
-		m_pvdType(ProviderType)
-	{
-		if (BufferSize < BUFFER_MIN)
-			throw CryptoRandomException("CMR:Ctor", "Buffer size must be at least 64 bytes!");
-
-		Reset();
-	}
+	CMR(BlockCiphers CipherType = BlockCiphers::RHX, Providers ProviderType = Providers::CSP, size_t BufferSize = 4096);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -132,32 +117,14 @@ public:
 	/// <param name="BufferSize">The size of the cache of random bytes (must be more than 1024 to enable parallel processing)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or too small</exception>
-	CMR(std::vector<byte> &Seed, BlockCiphers CipherType = BlockCiphers::RHX, size_t BufferSize = 4096)
-		:
-		m_bufferIndex(0),
-		m_bufferSize(BufferSize),
-		m_byteBuffer(BufferSize),
-		m_engineType(CipherType),
-		m_isDestroyed(false),
-		m_stateSeed(Seed)
-	{
-		if (BufferSize < BUFFER_MIN)
-			throw CryptoRandomException("CMR:Ctor", "Buffer size must be at least 64 bytes!");
-		if (Seed.size() == 0)
-			throw CryptoRandomException("CMR:Ctor", "Seed can not be null or empty!");
-
-		Reset();
-	}
+	CMR(std::vector<byte> &Seed, BlockCiphers CipherType = BlockCiphers::RHX, size_t BufferSize = 4096);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~CMR()
-	{
-		Destroy();
-	}
+	virtual ~CMR();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -178,7 +145,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	virtual void GetBytes(std::vector<byte> &Data);
+	virtual void GetBytes(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -240,7 +207,6 @@ public:
 private:
 	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	IProvider* LoadProvider(Providers ProviderType);
 };
 
 NAMESPACE_PRNGEND

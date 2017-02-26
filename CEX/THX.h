@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -55,34 +55,34 @@ NAMESPACE_BLOCK
 /// <remarks>
 /// <description>Description:</description>
 /// <para>THX is a Twofish implementation that can use a standard configuration on key sizes up to 32 bytes (256 bits), 
-/// an extended key size of 64 bytes (512 bits), or unlimited key sizes greater than 64 bytes.<br>
-/// On <see cref="LegalKeySizes"/> larger than 64 bytes, an HKDF random bytes generator is used to expand the <c>working key</c> integer array.<br>
+/// an extended key size of 64 bytes (512 bits), or unlimited key sizes greater than 64 bytes.<BR></BR>
+/// On <see cref="LegalKeySizes"/> larger than 64 bytes, an HKDF random bytes generator is used to expand the <c>working key</c> integer array.<BR></BR>
 /// In HKDF extended mode, the number of <c>transformation rounds</c> can be user assigned (through the constructor) to between 16 and 32 rounds.
-/// Increasing the number of transformation rounds processed within the ciphers rounds function creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze.<br>
+/// Increasing the number of transformation rounds processed within the ciphers rounds function creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze.<BR></BR>
 /// THX is capable of processing up to 32 rounds, that is twice the number of rounds used in a standard implementation of Twofish. 
 /// When using e.g. SHA-2 256, a minimum key size for is 32 bytes, further blocks of can be added to the key so long as they align; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.
 /// </para>
 ///
 /// <description>Changes to THX Version 1.2:</description>
-/// <para>Version 1.2 of the cipher has changes to the HKDF powered key schedule, which may make it incompatable with previous versions of the cipher.<br>
-/// Previous versions split the key into salt and key arrays, and processed these arrays with the HKDF Extract step, which compresses the key material into a pseudo random key used to initialize the HMAC.<br>
-/// The previous versions also added the Info parameter through the HKDF Initialize(key, salt, info) function.<br>
-/// The Info parameter is now set through a property added to the HKDF implementation, so using the Initialize function to load the Info string is no longer required.<br>
-/// This allows for loading the key into HKDF with the Initialize(key) function, which bypasses the extract step, but can still use the Info parameter to provide additional entropy.<br>
-/// The key is used by HKDF to initialize the HMAC. The HMAC key can use up to the hash functions internal block size before a compression cycle is called, reducing the key size to the hash functions output size.<br>
-/// The best size for maximum security is to set the HMAC key to the hash functions block size, this initializes the HMAC with a full block of keying material.<br>
-/// HKDF cycles it's internal state, a one byte counter, and the Info parameter through the HMAC to generate the expanded key.<br>
-/// For best security, it is desirable to have the HMAC process input equal to the hash functions block size, i.e. no zero byte padding is processed by the compression function.<br>
+/// <para>Version 1.2 of the cipher has changes to the HKDF powered key schedule, which may make it incompatable with previous versions of the cipher.<BR></BR>
+/// Previous versions split the key into salt and key arrays, and processed these arrays with the HKDF Extract step, which compresses the key material into a pseudo random key used to initialize the HMAC.<BR></BR>
+/// The previous versions also added the Info parameter through the HKDF Initialize(key, salt, info) function.<BR></BR>
+/// The Info parameter is now set through a property added to the HKDF implementation, so using the Initialize function to load the Info string is no longer required.<BR></BR>
+/// This allows for loading the key into HKDF with the Initialize(key) function, which bypasses the extract step, but can still use the Info parameter to provide additional entropy.<BR></BR>
+/// The key is used by HKDF to initialize the HMAC. The HMAC key can use up to the hash functions internal block size before a compression cycle is called, reducing the key size to the hash functions output size.<BR></BR>
+/// The best size for maximum security is to set the HMAC key to the hash functions block size, this initializes the HMAC with a full block of keying material.<BR></BR>
+/// HKDF cycles it's internal state, a one byte counter, and the Info parameter through the HMAC to generate the expanded key.<BR></BR>
+/// For best security, it is desirable to have the HMAC process input equal to the hash functions block size, i.e. no zero byte padding is processed by the compression function.<BR></BR>
 /// The Info parameter can now be used as an additional source of keying material, if sized to the DistributionCodeMax() property, blocks of state+counter+info are equal to the hash functions block size,
 /// this is the best possible security configuration.</para>
 ///
-/// <para>When using SHA-2 256, a minimum key size for THX is 32 bytes, larger lengths of input key can be used so long as it aligns; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.<br>
-/// The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.<br>
+/// <para>When using SHA-2 256, a minimum key size for THX is 32 bytes, larger lengths of input key can be used so long as it aligns; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.<BR></BR>
+/// The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.<BR></BR>
 /// Valid key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property, based on the digest selected.
 /// When using the extended mode, the legal key sizes are determined based on the selected digests hash output size, 
-/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes).<br>
-/// The number of transformation rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze.<br>
-/// THX is capable of processing up to thirty-two rounds, that is sixteen rounds more than sixteen rounds used in a standard implementation of Twofish.<br>
+/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes).<BR></BR>
+/// The number of transformation rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze.<BR></BR>
+/// THX is capable of processing up to thirty-two rounds, that is sixteen rounds more than sixteen rounds used in a standard implementation of Twofish.<BR></BR>
 /// Valid rounds assignments can be found in the <see cref="LegalRounds"/> property.</para>
 /// 
 /// <description>Implementation Notes:</description>
@@ -114,16 +114,19 @@ class THX : public IBlockCipher
 {
 private:
 
+	static const std::string DEF_INFO;
 	const size_t BLOCK_SIZE = 16;
 	const uint DEFAULT_SUBKEYS = 40;
-	const uint GF256_FDBK = 0x169; // primitive polynomial for GF(256)
+	const uint GF256_FDBK = 0x169;
 	const uint GF256_FDBK_2 = GF256_FDBK / 2;
 	const uint GF256_FDBK_4 = GF256_FDBK / 4;
 	const uint KEY_BITS = 256;
 	const size_t LEGAL_KEYS = 10;
 	const uint DEF_ROUNDS16 = 16;
 	const uint DEF_ROUNDS20 = 20;
-	const uint RS_GF_FDBK = 0x14D; // field generator
+	// size of state buffer and sbox subtracted parallel size calculations
+	const size_t STATE_PRECACHED = 2048 + 4096;
+	const uint RS_GF_FDBK = 0x14D;
 	const uint SK_BUMP = 0x01010101;
 	const uint SK_ROTL = 9;
 	const uint SK_STEP = 0x02020202;
@@ -178,11 +181,11 @@ public:
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const BlockCiphers Enumeral() { return BlockCiphers::THX; }
+	virtual const BlockCiphers Enumeral() { return m_kdfEngineType == Digests::None ? BlockCiphers::Twofish : BlockCiphers::THX; }
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
-	/// <para>Value set in <see cref="Initialize(bool, SymmetricKey)"/>.</para>
+	/// <para>Value set in <see cref="Initialize(bool, ISymmetricKey)"/>.</para>
 	/// </summary>
 	virtual const bool IsEncryption() { return m_isEncryption; }
 
@@ -216,6 +219,13 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() { return m_rndCount; }
 
+	/// <summary>
+	/// Get: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
+	/// <para>This value is subtracted from the parallel block-size calculations, to reduce the occurence of L1 cache eviction of hot tables and class variables. 
+	/// This is a timing and performance optimization, see the ParallelOptions class for more details.</para>
+	/// </summary>
+	virtual const size_t StateCacheSize() { return STATE_PRECACHED; }
+
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -228,30 +238,7 @@ public:
 	/// Default is 16 rounds, defining rounds requires HKDF extended mode.</param>
 	/// 
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	THX(Digests KdfEngineType = Digests::None, uint Rounds = 16)
-		:
-		m_destroyEngine(true),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_kdfEngine(0),
-		m_kdfEngineType(KdfEngineType),
-		m_kdfInfo(0),
-		m_kdfInfoMax(0),
-		m_kdfKeySize(0),
-		m_legalKeySizes(0),
-		m_legalRounds(0),
-		m_rndCount(Rounds),
-		m_sBox(SBOX_SIZE, 0)
-	{
-		if (KdfEngineType != Digests::None)
-		{
-			if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
-				throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
-		}
-
-		LoadState(KdfEngineType);
-	}
+	THX(Digests KdfEngineType = Digests::None, uint Rounds = 16);
 
 	/// <summary>
 	/// Instantiate the class with a Digest instance (HKDF extended mode), and with optional transformation rounds count
@@ -261,43 +248,18 @@ public:
 	/// <param name="Rounds">Number of transformation rounds; the <see cref="LegalRounds"/> property contains available sizes, default is 20 rounds.</param>
 	/// 
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	THX(IDigest *KdfEngine, size_t Rounds = 20)
-		:
-		m_destroyEngine(false),
-		m_isDestroyed(false),
-		m_isEncryption(false),
-		m_isInitialized(false),
-		m_kdfEngine(KdfEngine),
-		m_kdfEngineType(KdfEngine->Enumeral()),
-		m_kdfInfo(0),
-		m_kdfInfoMax(0),
-		m_kdfKeySize(0),
-		m_legalKeySizes(0),
-		m_legalRounds(0),
-		m_rndCount(Rounds),
-		m_sBox(SBOX_SIZE, 0)
-	{
-		if (KdfEngine == 0)
-			throw CryptoSymmetricCipherException("THX:CTor", "Invalid null parameter! The digest instance can not be null.");
-		if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
-			throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
-
-		LoadState(KdfEngine->Enumeral());
-	}
+	THX(IDigest *KdfEngine, size_t Rounds = 20);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~THX()
-	{
-		Destroy();
-	}
+	virtual ~THX();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -307,7 +269,7 @@ public:
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -324,7 +286,7 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -334,7 +296,7 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -349,14 +311,14 @@ public:
 	/// </summary>
 	///
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
+	/// <param name="KeyParams">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam);
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams);
 
 	/// <summary>
 	/// Transform a block of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -366,7 +328,7 @@ public:
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -378,7 +340,7 @@ public:
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -390,7 +352,7 @@ public:
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -408,7 +370,6 @@ private:
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(const std::vector<byte> &Key);
-	IDigest* LoadDigest(Digests DigestType);
 	void LoadState(Digests KdfEngineType);
 	uint MdsEncode(uint K0, uint K1);
 	uint Mix4(const uint X, const std::vector<uint> &Key, const size_t Count);

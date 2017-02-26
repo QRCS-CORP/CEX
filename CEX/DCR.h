@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -22,13 +22,11 @@
 #include "IPrng.h"
 #include "DCG.h"
 #include "Digests.h"
-#include "IProvider.h"
 #include "Providers.h"
 
 NAMESPACE_PRNG
 
 using Enumeration::Digests;
-using Provider::IProvider;
 using Enumeration::Providers;
 
 /// <summary>
@@ -74,8 +72,7 @@ private:
 	Digests m_digestType;
 	bool m_isDestroyed;
 	Drbg::DCG* m_rngGenerator;
-	IProvider* m_seedGenerator;
-	Providers m_seedType;
+	Providers m_pvdType;
 	std::vector<byte> m_stateSeed;
 
 public:
@@ -103,20 +100,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	DCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::CSP, size_t BufferSize = 1024)
-		:
-		m_bufferIndex(0),
-		m_bufferSize(BufferSize),
-		m_byteBuffer(BufferSize),
-		m_digestType(DigestEngine),
-		m_isDestroyed(false),
-		m_seedType(SeedEngine)
-	{
-		if (BufferSize < BUFFER_MIN)
-			throw CryptoRandomException("DCR:Ctor", "BufferSize must be at least 64 bytes!");
-
-		Reset();
-	}
+	DCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::CSP, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -127,34 +111,14 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
-	explicit DCR(std::vector<byte> Seed, Digests DigestEngine = Digests::Keccak512, size_t BufferSize = 1024)
-		:
-		m_bufferIndex(0),
-		m_bufferSize(BufferSize),
-		m_byteBuffer(BufferSize),
-		m_digestType(DigestEngine),
-		m_isDestroyed(false)
-	{
-		if (Seed.size() == 0)
-			throw CryptoRandomException("DCR:Ctor", "Seed can not be null!");
-		if (GetMinimumSeedSize(DigestEngine) < Seed.size())
-			throw CryptoRandomException("DCR:Ctor", "The state seed is too small! must be at least digest block size + 8 bytes");
-		if (BufferSize < BUFFER_MIN)
-			throw CryptoRandomException("DCR:Ctor", "BufferSize must be at least 128 bytes!");
-
-		m_seedType = Providers::CSP;
-		Reset();
-	}
+	explicit DCR(std::vector<byte> Seed, Digests DigestEngine = Digests::Keccak512, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~DCR()
-	{
-		Destroy();
-	}
+	virtual ~DCR();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -175,7 +139,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	virtual void GetBytes(std::vector<byte> &Data);
+	virtual void GetBytes(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -238,7 +202,6 @@ private:
 	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	uint GetMinimumSeedSize(Digests RngEngine);
-	IProvider* GetProvider(Providers SeedEngine);
 };
 
 NAMESPACE_PRNGEND

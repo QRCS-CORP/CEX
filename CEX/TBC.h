@@ -44,7 +44,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() { return "TBC"; }
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Add padding to input array

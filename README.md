@@ -12,6 +12,12 @@ All that aside, this has come a long way since the initial translation of the C#
 
 ##Updates
 
+###Version 0.14: February 26, 2017
+* Added pipelind and parallelized EAX, GCM, and OCB authenticated cipher modes
+* Global integration of the ParallelOptions class for auto-calculating and independant SIMD and multi-threading controls
+* Addition of the GMAC message authentication generator
+* Implementation of cache management and constant-time timing attack counter-measures
+
 ###Version 0.13: December 18, 2016
 Massive update! License changed from MIT to GPLv3, (it had to happen sooner or later). 
 Versioning changed to 0.x format, (project is not to be considered a major release until the symmetric cryptography is complete after 0.14).
@@ -74,6 +80,7 @@ This project is licensed under the GPL version 3 (GPLv3):
 https://www.gnu.org/licenses/gpl-3.0.en.html
 
 ##Links
+#####Introduction to CEX++ 0.14: http://www.vtdev.com/CEX-Plus/CEX_0.14.pdf
 #####CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 #####API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html 
 #####Homepage: http://www.vtdev.com/cexhome.html

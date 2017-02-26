@@ -39,7 +39,7 @@ namespace Test
 			HMGGenerateFile(FILEPATH + "hmg_10mb.txt", FILESIZE);
 			OnProgress("Hash based Mac Generator completed..");
 
-			OnProgress("Passed DoFinal/Compute methods output comparison..");
+			OnProgress("Passed Finalize/Compute methods output comparison..");
 
 			return SUCCESS;
 		}
@@ -71,7 +71,7 @@ namespace Test
 		pvd->GetBytes(seed);
 		pvd->GetBytes(nonce);
 		pvd->GetBytes(info);
-		ctd.IsParallel() = true;
+		ctd.ParallelProfile().IsParallel() = true;
 		ctd.Initialize(seed, nonce, info);
 
 		size_t prcLen = FileSize;

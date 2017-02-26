@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -52,8 +52,8 @@ NAMESPACE_DIGEST
 /// <list type="bullet">
 /// <item><description>Block size is 32 bytes, (256 bits).</description></item>
 /// <item><description>Digest size is 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], int, int)"/> and DoFinal methods, and resets the internal state.</description>/></item>
-/// <item><description>The <see cref="DoFinal(byte[], int)"/> method does NOT reset the internal state; call <see cref="Reset()"/> to reinitialize.</description></item>
+/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], int, int)"/> and Finalize methods, and resets the internal state.</description>/></item>
+/// <item><description>The <see cref="Finalize(byte[], int)"/> method does NOT reset the internal state; call <see cref="Reset()"/> to reinitialize.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -159,53 +159,14 @@ public:
 	/// <summary>
 	/// Initialize the digest
 	/// </summary>
-	explicit Skein256(SkeinStateType InitializationType = SkeinStateType::Normal)
-		:
-		m_blockCipher(),
-		m_bytesFilled(0),
-		m_cipherInput(STATE_WORDS),
-		m_configString(STATE_SIZE),
-		m_configValue(STATE_SIZE),
-		m_digestState(STATE_WORDS),
-		m_initializationType(InitializationType),
-		m_isDestroyed(false),
-		m_inputBuffer(STATE_BYTES),
-		m_ubiParameters()
-	{
-		// generate the configuration string
-		m_configString[1] = (ulong)(DigestSize() * 8);
-		// "SHA3"
-		std::vector<byte> schema(4, 0);
-		schema[0] = 83;
-		schema[1] = 72;
-		schema[2] = 65;
-		schema[3] = 51;
-		SetSchema(schema);
-		SetVersion(1);
-		GenerateConfiguration();
-		Initialize(InitializationType);
-	}
+	explicit Skein256(SkeinStateType InitializationType = SkeinStateType::Normal);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~Skein256()
-	{
-		Destroy();
-	}
+	virtual ~Skein256();
 
-	//~~~Public Methods~~~//
-
-	/// <summary>
-	/// Update the buffer
-	/// </summary>
-	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
-	///
-	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Get the Hash value
@@ -230,7 +191,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
+	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Generate a configuration using a state key
@@ -300,6 +261,17 @@ public:
 	/// 
 	/// <param name="Input">Input byte</param>
 	void Update(byte Input);
+
+	/// <summary>
+	/// Update the buffer
+	/// </summary>
+	/// 
+	/// <param name="Input">Input data</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="Length">Amount of data to process in bytes</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
+	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
 	void GenerateConfiguration();

@@ -10,6 +10,41 @@
 
 NAMESPACE_IO
 
+//~~~Constructor~~~//
+
+FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes Mode)
+	:
+	m_fileAccess(Access),
+	m_fileMode(Mode),
+	m_fileName(FileName),
+	m_isDestroyed(false),
+	m_filePosition(0),
+	m_fileSize(0),
+	m_fileWritten(0)
+{
+	if (Access == FileAccess::Read && !FileExists(m_fileName))
+		throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
+
+	m_fileSize = FileSize(m_fileName);
+
+	try
+	{
+		m_fileStream.open(m_fileName, (int)Access | (int)Mode);
+		m_fileStream.unsetf(std::ios::skipws);
+	}
+	catch (std::exception& ex)
+	{
+		throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!", std::string(ex.what()));
+	}
+}
+
+FileStream::~FileStream()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void FileStream::Close()
 {
 	if (m_fileStream && m_fileStream.is_open())

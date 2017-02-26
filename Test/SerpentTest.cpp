@@ -31,11 +31,11 @@ namespace Test
 			std::string rcnt; 
 			std::string klen; 
 			std::string resp;
-			TestUtils::Read(serpentcipher128, cipStr);
-			TestUtils::Read(serpentkey128, keyStr);
-			TestUtils::Read(serpentplain128, plnStr);
-			TestUtils::Read(serpentmonte100_128, mntStr);
-			TestUtils::Read(serpentmonte1000_128, mnt1kStr);
+			TestUtils::Read(SERPENTCTEXT128, cipStr);
+			TestUtils::Read(SERPENTKEY128, keyStr);
+			TestUtils::Read(SERPENTPTEXT128, plnStr);
+			TestUtils::Read(SERPENTM100X128, mntStr);
+			TestUtils::Read(SERPENTM1000X128, mnt1kStr);
 
 			for (unsigned int i = 0; i < keyStr.size(); i += 32)
 			{
@@ -72,11 +72,11 @@ namespace Test
 			rcount = 0;
 
 			// 192 bit keys
-			TestUtils::Read(serpentcipher192, cipStr);
-			TestUtils::Read(serpentkey192, keyStr);
-			TestUtils::Read(serpentplain192, plnStr);
-			TestUtils::Read(serpentmonte100_192, mntStr);
-			TestUtils::Read(serpentmonte1000_192, mnt1kStr);
+			TestUtils::Read(SERPENTCTEXT192, cipStr);
+			TestUtils::Read(SERPENTKEY192, keyStr);
+			TestUtils::Read(SERPENTPTEXT192, plnStr);
+			TestUtils::Read(SERPENTM100X192, mntStr);
+			TestUtils::Read(SERPENTM1000X192, mnt1kStr);
 
 			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
 			{
@@ -111,11 +111,11 @@ namespace Test
 			rcount = 0;
 
 			// 256 bit keys
-			TestUtils::Read(serpentcipher256, cipStr);
-			TestUtils::Read(serpentkey256, keyStr);
-			TestUtils::Read(serpentplain256, plnStr);
-			TestUtils::Read(serpentmonte100_256, mntStr);
-			TestUtils::Read(serpentmonte1000_256, mnt1kStr);
+			TestUtils::Read(SERPENTCTEXT256, cipStr);
+			TestUtils::Read(SERPENTKEY256, keyStr);
+			TestUtils::Read(SERPENTPTEXT256, plnStr);
+			TestUtils::Read(SERPENTM100X256, mntStr);
+			TestUtils::Read(SERPENTM1000X256, mnt1kStr);
 
 			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
 			{

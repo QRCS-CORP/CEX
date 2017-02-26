@@ -55,14 +55,14 @@ namespace Test
 		// encrypt linear
 		Salsa20 cipher(20);
 		cipher.Initialize(k);
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 		cipher.Transform(data, enc);
 
 		// encrypt parallel
 		Salsa20 cipher2(20);
 		cipher2.Initialize(k);
-		cipher2.IsParallel() = true;
-		cipher2.ParallelBlockSize() = cipher2.ParallelMinimumSize();
+		cipher2.ParallelProfile().IsParallel() = true;
+		cipher2.ParallelProfile().ParallelBlockSize() = cipher2.ParallelProfile().ParallelMinimumSize();
 		cipher2.Transform(data, enc2);
 
 		if (enc != enc2)
@@ -70,13 +70,13 @@ namespace Test
 
 		// decrypt linear
 		cipher2.Initialize(k);
-		cipher2.IsParallel() = false;
+		cipher2.ParallelProfile().IsParallel() = false;
 		cipher2.Transform(enc, dec);
 
 		// decrypt parallel
 		cipher.Initialize(k);
-		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = cipher.ParallelMinimumSize();
+		cipher.ParallelProfile().IsParallel() = true;
+		cipher.ParallelProfile().ParallelBlockSize() = cipher.ParallelProfile().ParallelMinimumSize();
 		cipher.Transform(enc2, dec2);
 
 		if (dec != data)

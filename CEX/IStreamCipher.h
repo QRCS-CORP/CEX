@@ -3,7 +3,9 @@
 
 #include "CexDomain.h"
 #include "CryptoSymmetricCipherException.h"
+#include "IntUtils.h"
 #include "ISymmetricKey.h"
+#include "ParallelOptions.h"
 #include "ParallelUtils.h"
 #include "StreamCiphers.h"
 #include "SymmetricKeySize.h"
@@ -11,17 +13,19 @@
 NAMESPACE_STREAM
 
 using Exception::CryptoSymmetricCipherException;
+using Utility::IntUtils;
 using Key::Symmetric::ISymmetricKey;
+using Common::ParallelOptions;
 using Enumeration::StreamCiphers;
 using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
-/// Stream Cipher Interface
+/// Stream Cipher virtual interface class
 /// </summary>
 class IStreamCipher
 {
-
 public:
+
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -58,34 +62,19 @@ public:
 	virtual const StreamCiphers Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Returns True if the cipher supports AVX intrinsics
-	/// </summary>
-	virtual const bool HasAVX2() = 0;
-
-	/// <summary>
-	/// Get: Returns True if the cipher supports SIMD intrinsics
-	/// </summary>
-	virtual const bool HasSSE() = 0;
-
-	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get/Set: Automatic processor parallelization
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input/output data arrays passed to the transform must be this size in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual bool &IsParallel() = 0;
+	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Get: Initialization vector size
-	/// </summary>
-	virtual const size_t IvSize() = 0;
-
-	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes.
-	/// <para>Block size must be 16 or 32 bytes wide. 
-	/// Value set in class constructor.</para>
+	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
@@ -100,36 +89,25 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel block size; must be set before Initialize()
+	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual size_t &ParallelBlockSize() = 0;
+	virtual const size_t ParallelBlockSize() = 0;
 
 	/// <summary>
-	/// Get: Maximum input size with parallel processing
+	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	virtual const size_t ParallelMaximumSize() = 0;
-
-	/// <summary>
-	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
-	/// </summary>
-	virtual const size_t ParallelMinimumSize() = 0;
-
-	/// <summary>
-	/// Get: The maximum number of threads allocated when using multi-threaded processing
-	/// </summary>
-	virtual size_t &ParallelThreadsMax() = 0;
-
-	/// <remarks>
-	/// Get: Processor count
-	/// </remarks>
-	virtual const size_t ProcessorCount() = 0;
+	virtual ParallelOptions &ParallelProfile() = 0;
 
 	/// <summary>
 	/// Get: Number of rounds
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -140,8 +118,8 @@ public:
 	/// Initialize the cipher
 	/// </summary>
 	/// 
-	/// <param name="KeyParam">Cipher key container. The LegalKeySizes property contains valid sizes</param>
-	virtual void Initialize(ISymmetricKey &KeyParam) = 0;
+	/// <param name="KeyParams">Cipher key container. The LegalKeySizes property contains valid sizes</param>
+	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.

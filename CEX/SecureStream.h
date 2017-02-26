@@ -52,34 +52,12 @@ public:
 	/// </summary>
 	virtual const uint64_t Position() { return m_streamPosition; }
 
-	/// <summary>
-	/// Get: The underlying stream
-	/// </summary>
-	std::vector<byte> ToArray() 
-	{ 
-		if (m_streamData.size() == 0)
-			return std::vector<byte>(0);
-
-		Transform();
-		std::vector<byte> tmp = m_streamData;
-		Transform();
-
-		return tmp; 
-	}
-
 	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize and empty stream
 	/// </summary>
-	SecureStream()
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_streamData(0),
-		m_streamPosition(0)
-	{
-	}
+	SecureStream();
 
 	/// <summary>
 	/// Initialize this class and set the streams length
@@ -87,21 +65,7 @@ public:
 	///
 	/// <param name="Length">The reserved length of the stream</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SecureStream(size_t Length, uint64_t KeySalt = 0)
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_streamData(0),
-		m_streamPosition(0)
-	{
-		if (KeySalt != 0)
-		{
-			m_keySalt.resize(sizeof(uint64_t));
-			memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
-		}
-
-		m_streamData.reserve(Length);
-	}
+	explicit SecureStream(size_t Length, uint64_t KeySalt = 0);
 
 	/// <summary>
 	/// Initialize this class with a byte array
@@ -109,21 +73,7 @@ public:
 	///
 	/// <param name="Data">The array used to initialize the stream</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SecureStream(const std::vector<byte> &Data, uint64_t KeySalt = 0)
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_streamData(Data),
-		m_streamPosition(0)
-	{
-		if (KeySalt != 0)
-		{
-			m_keySalt.resize(sizeof(uint64_t));
-			memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
-		}
-
-		Transform();
-	}
+	explicit SecureStream(const std::vector<byte> &Data, uint64_t KeySalt = 0);
 
 	/// <summary>
 	/// Initialize this class with a byte array with offset and length parameters
@@ -135,39 +85,14 @@ public:
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
-	explicit SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, uint64_t KeySalt = 0)
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_streamData(0),
-		m_streamPosition(0)
-	{
-		if (Length > Data.size() - Offset)
-			throw CryptoProcessingException("SecureStream:CTor", "Length is longer than the array size!");
-
-		m_streamData.resize(Length);
-		memcpy(&m_streamData[0], &Data[Offset], Length);
-
-		if (KeySalt != 0)
-		{
-			m_keySalt.resize(sizeof(uint64_t));
-			memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
-		}
-
-		Transform();
-	}
-
-	//~~~Public Methods~~~//
+	explicit SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, uint64_t KeySalt = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SecureStream()
-	{
-		Destroy();
-	}
+	virtual ~SecureStream();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Close and flush the stream (not used in SecureStream)
@@ -225,6 +150,11 @@ public:
 	/// 
 	/// <param name="Length">The desired length</param>
 	virtual void SetLength(uint64_t Length);
+
+	/// <summary>
+	/// Return the underlying byte stream
+	/// </summary>
+	std::vector<byte> ToArray();
 
 	/// <summary>
 	/// Writes an input buffer to the stream

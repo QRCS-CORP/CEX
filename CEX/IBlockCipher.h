@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -41,6 +41,10 @@ using Key::Symmetric::SymmetricKeySize;
 class IBlockCipher
 {
 public:
+
+	IBlockCipher(const IBlockCipher&) = delete;
+	IBlockCipher& operator=(const IBlockCipher&) = delete;
+
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -83,7 +87,7 @@ public:
 
 	/// <summary>
 	/// Get: True is initialized for encryption, false for decryption.
-	/// <para>Value set in <see cref="Initialize(bool, SymmetricKey)"/>.</para>
+	/// <para>Value set in <see cref="Initialize(bool, ISymmetricKey)"/>.</para>
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
@@ -117,11 +121,17 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
-	//~~~Public Methods~~~//
+	/// <summary>
+	/// Get: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
+	/// <para>Used in parallel block calculation to reduce L1 cache eviction occurence. see ParallelOptions</para>
+	/// </summary>
+	virtual const size_t StateCacheSize() = 0;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	///
@@ -131,7 +141,7 @@ public:
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>false</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -148,7 +158,7 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -158,7 +168,7 @@ public:
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -173,14 +183,14 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParam">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
+	/// <param name="KeyParams">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
 	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParam) = 0;
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
 	/// Transform a block of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -190,7 +200,7 @@ public:
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output arrays with Offsets must be at least <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -202,7 +212,7 @@ public:
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 4 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 
@@ -214,7 +224,7 @@ public:
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
-	/// <para><see cref="Initialize(bool, SymmetricKey)"/> must be called before this method can be used.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
 	/// Input and Output array lengths must be at least 8 * <see cref="BlockSize"/> in length.</para>
 	/// </summary>
 	/// 

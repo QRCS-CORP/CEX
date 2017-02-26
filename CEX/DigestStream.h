@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -64,9 +64,9 @@ using Digest::IDigest;
 class DigestStream
 {
 private:
+	IDigest* m_digestEngine;
 	const size_t BUFFER_SIZE = 64 * 1024;
 	size_t m_blockSize;
-	IDigest* m_digestEngine;
 	bool m_destroyEngine;
 	IByteStream* m_inStream;
 	bool m_isDestroyed = false;
@@ -84,6 +84,15 @@ public:
 	/// </summary>
 	Event<int> ProgressPercent;
 
+	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Initialize the class with a digest enumeration
+	/// </summary>
+	/// 
+	/// <param name="Digest">The digest enumeration member</param>
+	explicit DigestStream(Digests Digest);
+
 	/// <summary>
 	/// Initialize the class with a digest instance
 	/// <para>Digest must be fully initialized before calling this method.</para>
@@ -92,42 +101,14 @@ public:
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
-	explicit DigestStream(IDigest* Digest)
-		:
-		m_blockSize(Digest->BlockSize()),
-		m_destroyEngine(false),
-		m_digestEngine(Digest),
-		m_inStream(0),
-		m_isDestroyed(false),
-		m_progressInterval(0)
-	{
-		if (Digest == 0)
-			throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!");
-	}
-
-	/// <summary>
-	/// Initialize the class with a digest enumeration
-	/// </summary>
-	/// 
-	/// <param name="Digest">The digest enumeration member</param>
-	explicit DigestStream(Digests Digest)
-		:
-		m_destroyEngine(true),
-		m_inStream(0),
-		m_isDestroyed(false),
-		m_progressInterval(0)
-	{
-		m_digestEngine = DigestFromName::GetInstance(Digest);
-		m_blockSize = m_digestEngine->BlockSize();
-	}
+	explicit DigestStream(IDigest* Digest);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	~DigestStream()
-	{
-		Destroy();
-	}
+	~DigestStream();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Process the entire length of the Input Stream
@@ -151,6 +132,7 @@ public:
 	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
+
 	void CalculateInterval(size_t Length);
 	void CalculateProgress(size_t Length, bool Completed = false);
 	std::vector<byte> Process(size_t Length);

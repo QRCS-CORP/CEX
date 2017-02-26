@@ -59,30 +59,23 @@ private:
 
 public:
 
+	//~~~Constructor~~~//
+
 	/// <summary>
 	/// Instantiate this class.
-	/// <para></para>
+	/// <para>Select provider and digest type generator options, or take the defaults</para>
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The hash function used to power an hmac used to condition output keying material</param>
 	/// <param name="ProviderType">The entropy provider that supplies the seed material for the key compression cycle</param>
-	SymmetricKeyGenerator(Digests DigestType = Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP)
-		:
-		m_dgtType(DigestType),
-		m_isDestroyed(false),
-		m_pvdType(ProviderType)
-	{
-		// initialize the provider
-		Reset();
-	}
+	SymmetricKeyGenerator(Digests DigestType = Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP);
 
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	~SymmetricKeyGenerator()
-	{
-		Destroy();
-	}
+	~SymmetricKeyGenerator();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -131,8 +124,7 @@ public:
 private:
 
 	std::vector<byte> Generate(size_t KeySize);
-	std::vector<byte> GetBlock();
-	Provider::IProvider* GetProvider(Enumeration::Providers ProviderType);
+	std::vector<byte> GenerateBlock();
 };
 
 NAMESPACE_KEYSYMMETRICEND

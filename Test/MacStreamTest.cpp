@@ -14,6 +14,8 @@
 
 namespace Test
 {
+	using Key::Symmetric::SymmetricKey;
+
 	std::string MacStreamTest::Run()
 	{
 		using namespace Mac;
@@ -29,10 +31,11 @@ namespace Test
 
 			Digest::SHA256* sha = new Digest::SHA256();
 			HMAC* hmac1 = new HMAC(sha);
-			hmac1->Initialize(key, iv);
+			SymmetricKey kp1(key, iv);
+			hmac1->Initialize(kp1);
 			// test enum initialization
 			HMAC* hmac2 = new HMAC(Enumeration::Digests::SHA256);
-			hmac2->Initialize(key, iv);
+			hmac2->Initialize(kp1);
 			CompareOutput(hmac1, hmac2);
 			OnProgress("Passed MacStream HMAC comparison tests..");
 			delete hmac1;
@@ -42,9 +45,10 @@ namespace Test
 			key.resize(32);
 			Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
 			CMAC* cmac1 = new CMAC(eng);
-			cmac1->Initialize(key);
-			CMAC* cmac2 = new CMAC(Enumeration::BlockCiphers::RHX);
-			cmac2->Initialize(key);
+			SymmetricKey kp2(key);
+			cmac1->Initialize(kp2);
+			CMAC* cmac2 = new CMAC(Enumeration::BlockCiphers::Rijndael);
+			cmac2->Initialize(kp2);
 			CompareOutput(cmac1, cmac2);
 			OnProgress("Passed MacStream CMAC comparison tests..");
 			delete cmac1;
@@ -101,10 +105,11 @@ namespace Test
 		std::vector<byte> data = rng.GetBytes(rng.NextInt32(100, 400));
 		std::vector<byte> key = rng.GetBytes(32);
 		Mac::CMAC mac(Enumeration::BlockCiphers::Rijndael);
-		mac.Initialize(key);
+		SymmetricKey kp(key);
+		mac.Initialize(kp);
 		std::vector<byte> c1(mac.MacSize());
 		mac.Compute(data, c1);
-		Key::Symmetric::SymmetricKey mp(key);
+		Key::Symmetric::SymmetricKey mp(kp);
 
 		Processing::MacDescription mds(32, Enumeration::BlockCiphers::Rijndael, Enumeration::IVSizes::V128);
 		Processing::MacStream mst(mds, mp);
@@ -122,11 +127,12 @@ namespace Test
 		std::vector<byte> data = rng.GetBytes(rng.NextInt32(100, 400));
 		std::vector<byte> key = rng.GetBytes(64);
 		Mac::HMAC mac(Enumeration::Digests::SHA256);
-		mac.Initialize(key);
+		SymmetricKey kp(key);
+		mac.Initialize(kp);
 		std::vector<byte> c1(mac.MacSize());
 		mac.Compute(data, c1);
-		Key::Symmetric::SymmetricKey mp(key);
 
+		Key::Symmetric::SymmetricKey mp(key);
 		Processing::MacDescription mds(64, Enumeration::Digests::SHA256);
 		Processing::MacStream mst(mds, mp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);

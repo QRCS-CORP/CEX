@@ -19,10 +19,10 @@ namespace Test
 			// vector tests //
 			// 128 bit keys
 			std::string cipStr;
-			TestUtils::Read(twofishcipher128, cipStr);
+			TestUtils::Read(TWOFISHCTEXT128, cipStr);
 
 			std::string keyStr;
-			TestUtils::Read(twofishkey128, keyStr);
+			TestUtils::Read(TWOFISHKEY128, keyStr);
 
 			for (unsigned int i = 0; i < keyStr.size(); i += 32)
 			{
@@ -35,8 +35,8 @@ namespace Test
 			OnProgress("TwofishTest: Passed Twofish 128 bit key vector tests..");
 
 			// 192 bit keys
-			TestUtils::Read(twofishcipher192, cipStr);
-			TestUtils::Read(twofishkey192, keyStr);
+			TestUtils::Read(TWOFISHCTEXT192, cipStr);
+			TestUtils::Read(TWOFISHKEY192, keyStr);
 
 			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
 			{
@@ -49,8 +49,8 @@ namespace Test
 			OnProgress("TwofishTest: Passed Twofish 192 bit key vector tests..");
 
 			// 256 bit keys
-			TestUtils::Read(twofishcipher256, cipStr);
-			TestUtils::Read(twofishkey256, keyStr);
+			TestUtils::Read(TWOFISHCTEXT256, cipStr);
+			TestUtils::Read(TWOFISHKEY256, keyStr);
 
 			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
 			{

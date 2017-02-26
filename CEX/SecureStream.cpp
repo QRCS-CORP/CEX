@@ -7,7 +7,77 @@
 
 NAMESPACE_IO
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+SecureStream::SecureStream()
+	:
+	m_isDestroyed(false),
+	m_keySalt(0),
+	m_streamData(0),
+	m_streamPosition(0)
+{
+}
+
+SecureStream::SecureStream(size_t Length, uint64_t KeySalt)
+	:
+	m_isDestroyed(false),
+	m_keySalt(0),
+	m_streamData(0),
+	m_streamPosition(0)
+{
+	if (KeySalt != 0)
+	{
+		m_keySalt.resize(sizeof(uint64_t));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+	}
+
+	m_streamData.reserve(Length);
+}
+
+SecureStream::SecureStream(const std::vector<byte> &Data, uint64_t KeySalt)
+	:
+	m_isDestroyed(false),
+	m_keySalt(0),
+	m_streamData(Data),
+	m_streamPosition(0)
+{
+	if (KeySalt != 0)
+	{
+		m_keySalt.resize(sizeof(uint64_t));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+	}
+
+	Transform();
+}
+
+SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, uint64_t KeySalt)
+	:
+	m_isDestroyed(false),
+	m_keySalt(0),
+	m_streamData(0),
+	m_streamPosition(0)
+{
+	if (Length > Data.size() - Offset)
+		throw CryptoProcessingException("SecureStream:CTor", "Length is longer than the array size!");
+
+	m_streamData.resize(Length);
+	memcpy(&m_streamData[0], &Data[Offset], Length);
+
+	if (KeySalt != 0)
+	{
+		m_keySalt.resize(sizeof(uint64_t));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+	}
+
+	Transform();
+}
+
+SecureStream::~SecureStream()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void SecureStream::Close()
 {
@@ -84,6 +154,18 @@ void SecureStream::SetLength(uint64_t Length)
 	m_streamData.reserve(Length);
 }
 
+std::vector<byte> SecureStream::ToArray()
+{
+	if (m_streamData.size() == 0)
+		return std::vector<byte>(0);
+
+	Transform();
+	std::vector<byte> tmp = m_streamData;
+	Transform();
+
+	return tmp;
+}
+
 void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
 	if (Offset + Length > Input.size())
@@ -112,7 +194,7 @@ void SecureStream::WriteByte(byte Value)
 	m_streamPosition += 1;
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 std::vector<byte> SecureStream::GetSystemKey()
 {

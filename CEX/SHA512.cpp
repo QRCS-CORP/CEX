@@ -10,83 +10,89 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-//~~~Public Methods~~~//
 
-void SHA512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+//~~~Constructor~~~//
+
+SHA512::SHA512(bool Parallel)
+	:
+	m_hasAvx(false),
+	m_iPad(0),
+	m_isDestroyed(false),
+	m_isHmac(false),
+	m_isInitialized(false),
+	m_isParallel(Parallel),
+	m_leafSize(BLOCK_SIZE),
+	m_minParallel(MIN_PRLBLOCK),
+	m_msgBuffer(Parallel ? MIN_PRLBLOCK : BLOCK_SIZE, 0),
+	m_msgLength(0),
+	m_oPad(0),
+	m_parallelBlockSize(PRL_BRANCHSIZE * PRL_DEGREE),
+	m_State(Parallel ? PRL_DEGREE * ITL_LANESIZE : 1),
+	m_treeDestroy(true)
 {
-	if (Input.size() - InOffset < Length)
-		throw CryptoDigestException("SHA512:BlockUpdate", "The Input buffer is too short!");
-	if (Length == 0)
-		return;
-
 	if (m_isParallel)
 	{
-		size_t stateOffset = m_State.size() / m_treeParams.ParallelDegree();
 
-		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
-		{
-			// fill buffer
-			size_t rmd = m_msgBuffer.size() - m_msgLength;
-			if (rmd != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
-
-			// empty the message buffer
-			Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, stateOffset](size_t i)
-			{
-				ProcessBlock(m_msgBuffer, i * ITL_BLKSIZE, m_State, i * stateOffset);
-			});
-
-			m_msgLength = 0;
-			Length -= rmd;
-			InOffset += rmd;
-		}
-
-		if (Length >= m_minParallel)
-		{
-			// calculate working set size
-			size_t prcLen = Length - (Length % m_minParallel);
-
-			// process large blocks
-			//for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
-			Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, prcLen, stateOffset](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * ITL_BLKSIZE), m_State, i * stateOffset, prcLen);
-			});
-
-			Length -= prcLen;
-			InOffset += prcLen;
-		}
+		DetectCpu();
+		// defaults to tree depth(1), parallel degree(4), and subtree(8) branch size
+		m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 1, (uint8_t)BLOCK_SIZE, (uint8_t)PRL_DEGREE, (uint8_t)ITL_LANESIZE };
 	}
 	else
 	{
-		if (m_msgLength != 0 && m_msgLength + Length >= BLOCK_SIZE)
-		{
-			size_t rmd = BLOCK_SIZE - m_msgLength;
-			if (rmd != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
-
-			ProcessBlock(m_msgBuffer, 0, m_State, 0);
-			m_msgLength = 0;
-			InOffset += rmd;
-			Length -= rmd;
-		}
-
-		// loop until last block
-		while (Length > BLOCK_SIZE)
-		{
-			ProcessBlock(Input, InOffset, m_State, 0);
-			InOffset += BLOCK_SIZE;
-			Length -= BLOCK_SIZE;
-		}
+		// fixed values for sequential mode
+		m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 0, (uint8_t)BLOCK_SIZE, 0, 0 };
 	}
 
-	// store unaligned bytes
-	if (Length != 0)
-	{
-		memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], Length);
-		m_msgLength += Length;
-	}
+	Initialize(m_State);
 }
+
+SHA512::SHA512(SHA2Params &Params)
+	:
+	m_iPad(0),
+	m_isDestroyed(false),
+	m_isHmac(false),
+	m_isInitialized(false),
+	m_isParallel(false),
+	m_leafSize(BLOCK_SIZE),
+	m_minParallel(Params.ParallelDegree() * ITL_LANESIZE * BLOCK_SIZE),
+	m_msgBuffer(Params.ParallelDegree() > 0 ? Params.ParallelDegree() * ITL_LANESIZE * BLOCK_SIZE : BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelBlockSize(0),
+	m_oPad(0),
+	m_State(Params.ParallelDegree() > 0 ? Params.ParallelDegree() * ITL_LANESIZE : 1),
+	m_treeDestroy(false),
+	m_treeParams(Params)
+{
+	m_isParallel = Params.ParallelDegree() > 1;
+
+	if (m_isParallel)
+	{
+		if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
+			throw CryptoDigestException("SHA512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
+		if (Params.ParallelDegree() < 2 || Params.ParallelDegree() % 2 != 0)
+			throw CryptoDigestException("SHA512:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
+		if (Params.TreeDepth() > 2)
+			throw CryptoDigestException("SHA512:Ctor", "The maximum tree depth is 2; valid range is 0, 1, and 2.");
+		if (Params.SubTreeLength() % 2 != 0 || Params.SubTreeLength() < 2 || Params.SubTreeLength() > m_minParallel / BLOCK_SIZE)
+			throw CryptoDigestException("SHA512:Ctor", "SubTreeLength must be divisible by two, and no more than minimum parallel divide by block size.");
+
+		DetectCpu();
+		m_treeParams = { (uint8_t)DIGEST_SIZE, 0, (uint8_t)(Params.TreeDepth() == 2 ? 2 : 1), (uint8_t)BLOCK_SIZE, Params.ParallelDegree(), Params.SubTreeLength() };
+	}
+	else
+	{
+		m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 0, (uint8_t)BLOCK_SIZE, 0, 0 };
+	}
+
+	Initialize(m_State);
+}
+
+SHA512::~SHA512()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void SHA512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -94,8 +100,8 @@ void SHA512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 		m_isParallel = false;
 
 	Output.resize(DIGEST_SIZE);
-	BlockUpdate(Input, 0, Input.size());
-	DoFinal(Output, 0);
+	Update(Input, 0, Input.size());
+	Finalize(Output, 0);
 }
 
 void SHA512::Destroy()
@@ -133,10 +139,10 @@ void SHA512::Destroy()
 	}
 }
 
-size_t SHA512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
+size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DigestSize())
-		throw CryptoDigestException("SHA512:DoFinal", "The Output buffer is too short!");
+		throw CryptoDigestException("SHA512:Finalize", "The Output buffer is too short!");
 
 	// rtm: too small for parallel
 	if (!m_isHmac && m_isParallel && m_State[0].T[0] == 0)
@@ -144,7 +150,7 @@ size_t SHA512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
 		m_isParallel = false;
 		size_t len = m_msgLength;
 		m_msgLength = 0;
-		BlockUpdate(m_msgBuffer, 0, len);
+		Update(m_msgBuffer, 0, len);
 	}
 
 	if (m_isParallel && !m_isHmac)
@@ -302,7 +308,7 @@ void SHA512::LoadMacKey(ISymmetricKey &MacKey)
 
 	if (klen > BLOCK_SIZE)
 	{
-		BlockUpdate(key, 0, key.size());
+		Update(key, 0, key.size());
 		key.resize(DIGEST_SIZE);
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_State, 0);
 		StateToBytes(key, 0, m_State, 0);
@@ -328,10 +334,86 @@ void SHA512::Reset()
 void SHA512::Update(byte Input)
 {
 	std::vector<uint8_t> inp(1, Input);
-	BlockUpdate(inp, 0, 1);
+	Update(inp, 0, 1);
 }
 
-//~~~Private Methods~~~//
+void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+{
+	if (Input.size() - InOffset < Length)
+		throw CryptoDigestException("SHA512:Update", "The Input buffer is too short!");
+	if (Length == 0)
+		return;
+
+	if (m_isParallel)
+	{
+		size_t stateOffset = m_State.size() / m_treeParams.ParallelDegree();
+
+		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
+		{
+			// fill buffer
+			size_t rmd = m_msgBuffer.size() - m_msgLength;
+			if (rmd != 0)
+				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
+
+			// empty the message buffer
+			Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, stateOffset](size_t i)
+			{
+				ProcessBlock(m_msgBuffer, i * ITL_BLKSIZE, m_State, i * stateOffset);
+			});
+
+			m_msgLength = 0;
+			Length -= rmd;
+			InOffset += rmd;
+		}
+
+		if (Length >= m_minParallel)
+		{
+			// calculate working set size
+			size_t prcLen = Length - (Length % m_minParallel);
+
+			// process large blocks
+			//for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
+			Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, prcLen, stateOffset](size_t i)
+			{
+				ProcessLeaf(Input, InOffset + (i * ITL_BLKSIZE), m_State, i * stateOffset, prcLen);
+			});
+
+			Length -= prcLen;
+			InOffset += prcLen;
+		}
+	}
+	else
+	{
+		if (m_msgLength != 0 && m_msgLength + Length >= BLOCK_SIZE)
+		{
+			size_t rmd = BLOCK_SIZE - m_msgLength;
+			if (rmd != 0)
+				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
+
+			ProcessBlock(m_msgBuffer, 0, m_State, 0);
+			m_msgLength = 0;
+			InOffset += rmd;
+			Length -= rmd;
+		}
+
+		// loop until last block
+		while (Length > BLOCK_SIZE)
+		{
+			ProcessBlock(Input, InOffset, m_State, 0);
+			InOffset += BLOCK_SIZE;
+			Length -= BLOCK_SIZE;
+		}
+	}
+
+	// store unaligned bytes
+	if (Length != 0)
+	{
+		memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], Length);
+		m_msgLength += Length;
+	}
+}
+
+//~~~Private Functions~~~//
 
 void SHA512::DetectCpu()
 {
@@ -356,8 +438,8 @@ void SHA512::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt
 		LoadMacKey(Key::Symmetric::SymmetricKey(Salt));
 	}
 
-	BlockUpdate(Key, 0, Key.size());
-	DoFinal(Output, 0);
+	Update(Key, 0, Key.size());
+	Finalize(Output, 0);
 	ResetMac();
 }
 
@@ -366,12 +448,12 @@ void SHA512::Expand(const std::vector<byte> &Input, size_t Count, std::vector<by
 	const size_t N = Count / DIGEST_SIZE + 1;
 
 	if (Count != 0)
-		BlockUpdate(Output, 0, DIGEST_SIZE);
+		Update(Output, 0, DIGEST_SIZE);
 	if (Input.size() > 0)
-		BlockUpdate(Input, 0, Input.size());
+		Update(Input, 0, Input.size());
 
 	Update((byte)N);
-	DoFinal(Output, 0);
+	Finalize(Output, 0);
 	ResetMac();
 }
 

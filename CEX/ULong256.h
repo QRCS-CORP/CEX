@@ -152,7 +152,7 @@ NAMESPACE_NUMERIC
 			_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), Register);
 		}
 
-		//~~~Public Methods~~~//
+		//~~~Public Functions~~~//
 
 		/// <summary>
 		/// Computes the bitwise AND of the 256-bit value in *this* and the bitwise NOT of the 256-bit value in Value

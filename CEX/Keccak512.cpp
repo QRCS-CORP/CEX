@@ -7,43 +7,40 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-void Keccak512::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+//~~~Constructor~~~//
+
+Keccak512::Keccak512(int DigestSize)
+	:
+	m_blockSize(0),
+	m_buffer(0),
+	m_bufferIndex(0),
+	m_isDestroyed(false),
+	m_digestSize(0),
+	m_state(25, 0)
 {
-	if ((InOffset + Length) > Input.size())
-		throw CryptoDigestException("Keccak512:BlockUpdate", "The Input buffer is too short!");
+	// test for legal sizes; default at 512
+	if (DigestSize == 384)
+		m_digestSize = 384 / 8;
+	else
+		m_digestSize = 512 / 8;
 
-	if (m_bufferIndex != 0)
-	{
-		if (Length + m_bufferIndex >= m_blockSize)
-		{
-			size_t chunkSize = m_blockSize - m_bufferIndex;
-			memcpy(&m_buffer[m_bufferIndex], &Input[InOffset], chunkSize);
-			Keccak::TransformBlock(m_buffer, 0, m_state, m_blockSize);
-			Length -= chunkSize;
-			InOffset += chunkSize;
-			m_bufferIndex = 0;
-		}
-	}
+	m_blockSize = 200 - (m_digestSize * 2);
 
-	while (Length >= m_buffer.size())
-	{
-		Keccak::TransformBlock(Input, InOffset, m_state, m_blockSize);
-		InOffset += m_buffer.size();
-		Length -= m_buffer.size();
-	}
-
-	if (Length != 0)
-	{
-		memcpy(&m_buffer[m_bufferIndex], &Input[InOffset], Length);
-		m_bufferIndex += Length;
-	}
+	Initialize();
 }
+
+Keccak512::~Keccak512()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void Keccak512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Output.resize(m_digestSize);
-	BlockUpdate(Input, 0, Input.size());
-	DoFinal(Output, 0);
+	Update(Input, 0, Input.size());
+	Finalize(Output, 0);
 }
 
 void Keccak512::Destroy()
@@ -67,10 +64,10 @@ void Keccak512::Destroy()
 	}
 }
 
-size_t Keccak512::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
+size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < m_digestSize)
-		throw CryptoDigestException("Keccak512:DoFinal", "The Output buffer is too short!");
+		throw CryptoDigestException("Keccak512:Finalize", "The Output buffer is too short!");
 
 	memset(&m_buffer[m_bufferIndex], (byte)0, m_buffer.size() - m_bufferIndex);
 
@@ -101,10 +98,42 @@ void Keccak512::Reset()
 void Keccak512::Update(byte Input)
 {
 	std::vector<byte> one(1, Input);
-	BlockUpdate(one, 0, 1);
+	Update(one, 0, 1);
 }
 
-//~~~Protected Methods~~~//
+void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+{
+	if ((InOffset + Length) > Input.size())
+		throw CryptoDigestException("Keccak512:Update", "The Input buffer is too short!");
+
+	if (m_bufferIndex != 0)
+	{
+		if (Length + m_bufferIndex >= m_blockSize)
+		{
+			size_t chunkSize = m_blockSize - m_bufferIndex;
+			memcpy(&m_buffer[m_bufferIndex], &Input[InOffset], chunkSize);
+			Keccak::TransformBlock(m_buffer, 0, m_state, m_blockSize);
+			Length -= chunkSize;
+			InOffset += chunkSize;
+			m_bufferIndex = 0;
+		}
+	}
+
+	while (Length >= m_buffer.size())
+	{
+		Keccak::TransformBlock(Input, InOffset, m_state, m_blockSize);
+		InOffset += m_buffer.size();
+		Length -= m_buffer.size();
+	}
+
+	if (Length != 0)
+	{
+		memcpy(&m_buffer[m_bufferIndex], &Input[InOffset], Length);
+		m_bufferIndex += Length;
+	}
+}
+
+//~~~Private Functions~~~//
 
 void Keccak512::Initialize()
 {

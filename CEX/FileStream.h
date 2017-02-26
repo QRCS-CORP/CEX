@@ -115,43 +115,14 @@ public:
 	/// <param name="FileName">The full path and name of the file</param>
 	/// <param name="Access">The level of access requested</param>
 	/// <param name="Mode">The file processing mode</param>
-	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileModes Mode = FileModes::Binary)
-		:
-		m_fileAccess(Access),
-		m_fileMode(Mode),
-		m_fileName(FileName),
-		m_isDestroyed(false),
-		m_filePosition(0),
-		m_fileSize(0),
-		m_fileWritten(0)
-	{
-		if (Access == FileAccess::Read && !FileExists(m_fileName))
-			throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
-
-		m_fileSize = FileSize(m_fileName);
-
-		try
-		{
-			m_fileStream.open(m_fileName, (int)Access | (int)Mode);
-			m_fileStream.unsetf(std::ios::skipws);
-		}
-		catch(std::exception& ex)
-		{
-			throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!", std::string(ex.what()));
-		}
-	}
-
-	//~~~Public Methods~~~//
+	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileModes Mode = FileModes::Binary);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~FileStream()
-	{
-		Destroy();
-	}
+	virtual ~FileStream();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Close and flush the stream

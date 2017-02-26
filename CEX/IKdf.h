@@ -60,7 +60,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() = 0;
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -119,16 +119,16 @@ public:
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) = 0;
 
 	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
-	/// </summary>
-	virtual void Reset() = 0;
-
-	/// <summary>
 	/// Update the generators keying material
 	/// </summary>
 	///
 	/// <param name="Seed">The new seed value array</param>
-	virtual void Update(const std::vector<byte> &Seed) = 0;
+	virtual void ReSeed(const std::vector<byte> &Seed) = 0;
+
+	/// <summary>
+	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// </summary>
+	virtual void Reset() = 0;
 };
 
 NAMESPACE_KDFEND

@@ -2,10 +2,72 @@
 #include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "SymmetricKey.h"
 
 NAMESPACE_KDF
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+PBKDF2::PBKDF2(Digests DigestType, size_t Iterations)
+	:
+	m_macGenerator(new HMAC(DigestType)),
+	m_blockSize(m_macGenerator->BlockSize()),
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfCounter(1),
+	m_kdfDigestType(DigestType),
+	m_kdfIterations(Iterations != 0 ? Iterations : throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0),
+	m_macSize(m_macGenerator->MacSize())
+{
+	LoadState();
+}
+
+PBKDF2::PBKDF2(IDigest* Digest, size_t Iterations)
+	:
+	m_macGenerator(Digest != 0 ? new HMAC(Digest) : throw CryptoKdfException("PBKDF2:CTor", "Digest instance can not be null!")),
+	m_blockSize(m_macGenerator->BlockSize()),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfCounter(1),
+	m_kdfDigestType(Digest->Enumeral()),
+	m_kdfIterations(Iterations != 0 ? Iterations : throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0),
+	m_macSize(m_macGenerator->MacSize())
+{
+	LoadState();
+}
+
+PBKDF2::PBKDF2(HMAC* Mac, size_t Iterations)
+	:
+	m_macGenerator(Mac != 0 ? Mac : throw CryptoKdfException("PBKDF2:CTor", "HMAC instance can not be null!")),
+	m_blockSize(m_macGenerator->BlockSize()),
+	m_kdfCounter(1),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfDigestType(m_macGenerator->DigestType()),
+	m_kdfIterations(Iterations != 0 ? Iterations : throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0),
+	m_macSize(m_macGenerator->MacSize())
+{
+	LoadState();
+}
+
+PBKDF2::~PBKDF2()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void PBKDF2::Destroy()
 {
@@ -25,10 +87,8 @@ void PBKDF2::Destroy()
 			{
 				m_destroyEngine = false;
 
-				if (m_kdfDigest != 0)
-					delete m_kdfDigest;
-				if (m_kdfMac != 0)
-					delete m_kdfMac;
+				if (m_macGenerator != 0)
+					delete m_macGenerator;
 			}
 
 			Utility::ArrayUtils::ClearVector(m_kdfKey);
@@ -137,19 +197,10 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 	m_isInitialized = true;
 }
 
-void PBKDF2::Reset()
-{
-	m_kdfMac->Reset();
-	m_kdfCounter = 1;
-	m_kdfKey.clear();
-	m_kdfSalt.clear();
-	m_isInitialized = false;
-}
-
-void PBKDF2::Update(const std::vector<byte> &Seed)
+void PBKDF2::ReSeed(const std::vector<byte> &Seed)
 {
 	if (Seed.size() < MIN_PASSLEN)
-		throw CryptoKdfException("PBKDF2:Update", "Seed can not be less than 4 bytes in length!");
+		throw CryptoKdfException("PBKDF2:ReSeed", "Seed can not be less than 4 bytes in length!");
 
 	if (Seed.size() > m_kdfSalt.size())
 		m_kdfSalt.resize(Seed.size());
@@ -157,7 +208,16 @@ void PBKDF2::Update(const std::vector<byte> &Seed)
 	memcpy(&m_kdfSalt[0], &Seed[0], Seed.size());
 }
 
-//~~~Private Methods~~~//
+void PBKDF2::Reset()
+{
+	m_macGenerator->Reset();
+	m_kdfCounter = 1;
+	m_kdfKey.clear();
+	m_kdfSalt.clear();
+	m_isInitialized = false;
+}
+
+//~~~Private Functions~~~//
 
 size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
@@ -192,50 +252,35 @@ size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 
 void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
 {
-	m_kdfMac->Initialize(m_kdfKey);
+	Key::Symmetric::SymmetricKey kp(m_kdfKey);
+	m_macGenerator->Initialize(kp);
 
 	if (m_kdfSalt.size() != 0)
-		m_kdfMac->BlockUpdate(m_kdfSalt, 0, m_kdfSalt.size());
+		m_macGenerator->Update(m_kdfSalt, 0, m_kdfSalt.size());
 
 	std::vector<byte> counter(4, 0);
 	Utility::IntUtils::Be32ToBytes(m_kdfCounter, counter, 0);
-	m_kdfMac->BlockUpdate(counter, 0, counter.size());
+	m_macGenerator->Update(counter, 0, counter.size());
 
 	std::vector<byte> state(m_macSize);
-	m_kdfMac->DoFinal(state, 0);
+	m_macGenerator->Finalize(state, 0);
 	memcpy(&Output[OutOffset], &state[0], state.size());
 
 	for (int i = 1; i != m_kdfIterations; ++i)
 	{
-		m_kdfMac->Initialize(m_kdfKey);
-		m_kdfMac->BlockUpdate(state, 0, state.size());
-		m_kdfMac->DoFinal(state, 0);
+		m_macGenerator->Initialize(kp);
+		m_macGenerator->Update(state, 0, state.size());
+		m_macGenerator->Finalize(state, 0);
 
 		for (size_t j = 0; j != state.size(); ++j)
 			Output[OutOffset + j] ^= state[j];
 	}
 }
 
-IDigest* PBKDF2::LoadDigest(Digests DigestType)
-{
-	try
-	{
-		return Helper::DigestFromName::GetInstance(DigestType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoKdfException("PBKDF2:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
-	}
-}
-
 void PBKDF2::LoadState()
 {
-	m_blockSize = m_kdfMac->BlockSize();
-	m_macSize = m_kdfMac->MacSize();
-	m_kdfDigestType = m_kdfMac->DigestType();
-
 	// best salt size; hash finalizer code and counter length adjusted
-	size_t saltLen = m_kdfMac->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 4);
+	size_t saltLen = m_macGenerator->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 4);
 	m_legalKeySizes.resize(3);
 	// minimum security is the digest output size
 	m_legalKeySizes[0] = SymmetricKeySize(m_macSize, 0, 0);

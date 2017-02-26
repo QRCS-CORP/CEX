@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "../CEX/CpuDetect.h"
+#include "AEADTest.h"
 #include "AesAvsTest.h"
 #include "AesFipsTest.h"
 #include "Blake2Test.h"
@@ -19,6 +20,7 @@
 #include "DCGTest.h"
 #include "DigestSpeedTest.h"
 #include "DigestStreamTest.h"
+#include "GMACTest.h"
 #include "KDF2Test.h"
 #include "KeccakTest.h"
 #include "HKDFTest.h"
@@ -56,21 +58,20 @@ using namespace Test;
 
 // 
 // Release 0.14
-// GCM/OCB				-?
-// GMAC/OMAC			-?
-// Scrypt(maybe)		-?
-// Code review			-?
+// EAX/GCM/OCB			-done
+// GMAC					-done
+// Code review			-done
 
 // Release 1.0
 // Keccak/Skein Tree	-?
-// Grøstl(maybe)		-?
+// Scrypt(maybe)		-?
 // DLL API				-?
 // Code review			-?
 
 // 1.0 Notes:
 // SHA2/Blake remove generator
 // SHA2/Blake tree hashing mode-3 (add mixing-step/reduce-state tree-mode?)
-// SHA2/Blake parallel block size calculation from detectcpu
+// Digests use paralleloptions
 
 // *** 1.1 RoadMap ***
 //
@@ -125,7 +126,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("* CEX++ Version 0.13.0.1: CEX Library in C++ *");
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v0.13 (M)                       *");
-	ConsoleUtils::WriteLine("* License:   GPLv3							  *");
+	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
 	ConsoleUtils::WriteLine("* Date:      December 18, 2016               *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
@@ -178,6 +179,9 @@ int main()
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 
+	//RunTest(new SymmetricKeyGeneratorTest());
+	//RunTest(new CipherSpeedTest());
+
 	try
 	{
 #if defined (_DEBUG)
@@ -208,6 +212,8 @@ int main()
 			RunTest(new HXCipherTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
 			RunTest(new CipherModeTest());
+			PrintHeader("TESTING SYMMETRIC CIPHER AEAD MODES");
+			RunTest(new AEADTest());
 			PrintHeader("TESTING PARALLEL CIPHER MODES");
 			RunTest(new ParallelModeTest());
 			PrintHeader("TESTING CIPHER PADDING MODES");

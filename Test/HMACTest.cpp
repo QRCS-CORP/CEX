@@ -2,9 +2,12 @@
 #include "../CEX/HMAC.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SHA512.h"
+#include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	using Key::Symmetric::SymmetricKey;
+
 	std::string HMACTest::Run()
 	{
 		try
@@ -30,7 +33,7 @@ namespace Test
 			OnProgress("HMACTest: Passed SHA-2 512 bit known answer vector tests..");
 
 			CompareAccess(m_keys[3]);
-			OnProgress("Passed DoFinal/Compute methods output comparison..");
+			OnProgress("Passed Finalize/Compute methods output comparison..");
 
 			return SUCCESS;
 		}
@@ -49,7 +52,9 @@ namespace Test
 		std::vector<byte> hash1(32);
 		Digest::SHA256* eng = new Digest::SHA256();
 		Mac::HMAC mac(eng);
-		mac.Initialize(Key);
+		SymmetricKey kp(Key);
+
+		mac.Initialize(kp);
 
 		std::vector<byte> input(256);
 		for (unsigned int i = 0; i < input.size(); ++i)
@@ -58,9 +63,9 @@ namespace Test
 		mac.Compute(input, hash1);
 
 		std::vector<byte> hash2(32);
-		mac.BlockUpdate(input, 0, 128);
-		mac.BlockUpdate(input, 128, 128);
-		mac.DoFinal(hash2, 0);
+		mac.Update(input, 0, 128);
+		mac.Update(input, 128, 128);
+		mac.Finalize(hash2, 0);
 		delete eng;
 
 		if (hash1 != hash2)
@@ -72,8 +77,9 @@ namespace Test
 		std::vector<byte> hash(32, 0);
 		Digest::SHA256* eng = new Digest::SHA256();
 		Mac::HMAC mac(eng);
+		SymmetricKey kp(Key);
 
-		mac.Initialize(Key);
+		mac.Initialize(kp);
 		mac.Compute(Input, hash);
 
 		delete eng;
@@ -100,8 +106,9 @@ namespace Test
 		std::vector<byte> hash(32, 0);
 		Digest::SHA512* eng = new Digest::SHA512();
 		Mac::HMAC mac(eng);
+		SymmetricKey kp(Key);
 
-		mac.Initialize(Key);
+		mac.Initialize(kp);
 		mac.Compute(Input, hash);
 
 		delete eng;

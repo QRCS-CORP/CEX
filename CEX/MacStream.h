@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -73,11 +73,11 @@ class MacStream
 private:
 	const size_t BUFFER_SIZE = 64 * 1024;
 
+	IMac* m_macEngine;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	IByteStream* m_inStream;
 	bool m_isDestroyed = false;
-	IMac* m_macEngine;
 	size_t m_progressInterval;
 
 public:
@@ -92,29 +92,17 @@ public:
 	/// </summary>
 	Event<int> ProgressPercent;
 
+	//~~~Constructor~~~//
+
 	/// <summary>
-	/// Initialize the class with an 
+	/// Initialize the class with a MacDescription and key
 	/// </summary>
 	/// 
 	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
 	/// <param name="MacKey">A SymmetricKey containing the Mac key and salt; note the info parameter in SymmetricKey is not used</param>
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if an uninitialized Mac is used</exception>
-	explicit MacStream(MacDescription &Description, ISymmetricKey &MacKey)
-		:
-		m_blockSize(0),
-		m_destroyEngine(false),
-		m_inStream(0),
-		m_isDestroyed(false),
-		m_progressInterval(0)
-	{
-		CreateMac(Description);
-		if (m_macEngine == 0)
-			throw CryptoProcessingException("MacStream:CTor", "The Mac could not be created!");
-
-		m_macEngine->Initialize(MacKey);
-		m_blockSize = m_macEngine->BlockSize();
-	}
+	explicit MacStream(MacDescription &Description, ISymmetricKey &MacKey);
 
 	/// <summary>
 	/// Initialize the class with an initialized Mac instance
@@ -123,28 +111,14 @@ public:
 	/// <param name="Mac">The initialized <see cref="Mac::IMac"/> instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
-	explicit MacStream(IMac* Mac)
-		:
-		m_blockSize(Mac->BlockSize()),
-		m_destroyEngine(false),
-		m_inStream(0),
-		m_isDestroyed(false),
-		m_macEngine(Mac),
-		m_progressInterval(0)
-	{
-		if (Mac == 0)
-			throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!");
-		if (!Mac->IsInitialized())
-			throw CryptoProcessingException("MacStream:CTor", "The Mac is not initialized!");
-	}
+	explicit MacStream(IMac* Mac);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	~MacStream()
-	{
-		Destroy();
-	}
+	~MacStream();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Process the entire length of the Input Stream
@@ -168,11 +142,11 @@ public:
 	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
+
 	void CalculateInterval(size_t Length);
 	void CalculateProgress(size_t Length, bool Completed = false);
 	std::vector<byte> Process(size_t Length);
 	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
-	void CreateMac(MacDescription &Description);
 	void Destroy();
 };
 

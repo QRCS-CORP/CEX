@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -33,7 +33,8 @@ NAMESPACE_PROVIDER
 /// <summary>
 /// The CPU Jitter entropy Provider (CJP).
 /// <para>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time.
-/// Because the CPU and cache memory are continuously being accessed by various operating system and application processes, small timing differences can be observed and measured using a high resolution timestamp.
+/// Because the CPU and cache memory are continuously being accessed by various operating system and application processes, 
+/// small timing differences can be observed and measured using a high-resolution timestamp.
 /// Delays caused by events like external thread execution, branching, cache misses, and memory movement through the processor cache levels are measured, 
 /// and these small differences are collected and concentrated to produce the providers output.
 /// The CJP provider should not be used as the sole source of entropy for secret keys, but should be combined with other sources and concentrated to produce a key.</para>
@@ -79,11 +80,11 @@ private:
 	bool m_isAvailable;
 	uint64_t m_lastDelta;
 	uint64_t m_lastDelta2;
-	uint32_t m_memAccessLoops;
-	uint32_t m_memBlocks;
-	uint32_t m_memBlockSize;
-	uint32_t m_memPosition;
-	uint32_t m_memTotalSize;
+	size_t m_memAccessLoops;
+	size_t m_memBlocks;
+	size_t m_memBlockSize;
+	size_t m_memPosition;
+	size_t m_memTotalSize;
 	byte* m_memState;
 	uint32_t m_overSampleRate;
 	uint64_t m_prevTime;
@@ -148,47 +149,14 @@ public:
 	/// <summary>
 	/// Instantiate this class
 	/// </summary>
-	CJP()
-		:
-		m_enableAccess(true),
-		m_enableDebias(true),
-		m_isAvailable(false),
-		m_lastDelta(0),
-		m_lastDelta2(0),
-		m_memAccessLoops(MEMORY_ACCESSLOOPS),
-		m_memBlocks(MEMORY_BLOCKS),
-		m_memBlockSize(MEMORY_BLOCKSIZE),
-		m_memPosition(0),
-		m_memTotalSize(MEMORY_SIZE),
-		m_memState(0),
-		m_overSampleRate(OVRSMP_RATE_MIN),
-		m_prevTime(0),
-		m_rndState(0),
-		m_secureCache(true),
-		m_stirPool(true),
-		m_stuckTest(1)
-	{
-		if (CEX_SUPPORTED_COMPILER != 1)
-			throw CryptoRandomException("CJP:Ctor", "This RNG is not supported by your compiler!");
-
-		m_isAvailable = TimerCheck();
-
-		if (m_isAvailable)
-		{
-			Detect();
-			Prime();
-		}
-	}
+	CJP();
 
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~CJP()
-	{
-		Destroy();
-	}
+	virtual ~CJP();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

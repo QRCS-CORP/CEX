@@ -7,6 +7,25 @@
 
 NAMESPACE_KEYSYMMETRIC
 
+//~~~Constructor~~~//
+
+SymmetricKeyGenerator::SymmetricKeyGenerator(Digests DigestType, Providers ProviderType)
+	:
+	m_dgtType(DigestType),
+	m_isDestroyed(false),
+	m_pvdType(ProviderType)
+{
+	// initialize the provider
+	Reset();
+}
+
+SymmetricKeyGenerator::~SymmetricKeyGenerator()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void SymmetricKeyGenerator::Destroy()
 {
 	if (!m_isDestroyed)
@@ -83,7 +102,7 @@ void SymmetricKeyGenerator::Reset()
 
 	try
 	{
-		m_pvdEngine = GetProvider(m_pvdType);
+		m_pvdEngine = Helper::ProviderFromName::GetInstance(m_pvdType);
 	}
 	catch (...) 
 	{ 
@@ -93,9 +112,11 @@ void SymmetricKeyGenerator::Reset()
 	if (m_pvdEngine == 0 || !m_pvdEngine->IsAvailable())
 	{
 		delete m_pvdEngine;
-		m_pvdEngine = GetProvider(Providers::CSP);
+		m_pvdEngine = Helper::ProviderFromName::GetInstance(Providers::CSP);
 	}
 }
+
+//~~~Private Functions~~~//
 
 std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 {
@@ -108,7 +129,7 @@ std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 
 	do
 	{
-		std::vector<byte> rnd = GetBlock();
+		std::vector<byte> rnd = GenerateBlock();
 		size_t alnLen = Utility::IntUtils::Min(keyLen, rnd.size());
 		memcpy(&key[blkOff], &rnd[0], alnLen);
 		keyLen -= alnLen;
@@ -119,7 +140,7 @@ std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 	return key;
 }
 
-std::vector<byte> SymmetricKeyGenerator::GetBlock()
+std::vector<byte> SymmetricKeyGenerator::GenerateBlock()
 {
 	// seed size is 2x mac input block size less finalizer padding
 	const size_t BLKSZE = Helper::DigestFromName::GetBlockSize(m_dgtType);
@@ -136,23 +157,12 @@ std::vector<byte> SymmetricKeyGenerator::GetBlock()
 
 	// condition random bytes with an hmac
 	Mac::HMAC mac(m_dgtType);
-	mac.Initialize(key);
+	SymmetricKey kp(key);
+	mac.Initialize(kp);
 	std::vector<byte> output(mac.MacSize());
 	mac.Compute(seed, output);
 
 	return output;
-}
-
-Provider::IProvider* SymmetricKeyGenerator::GetProvider(Enumeration::Providers ProviderType)
-{
-	try
-	{
-		return Helper::ProviderFromName::GetInstance(ProviderType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoGeneratorException("SymmetricKeyGenerator:GetSeedEngine", "The prng could not be instantiated!", std::string(ex.what()));
-	}
 }
 
 NAMESPACE_KEYSYMMETRICEND

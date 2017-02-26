@@ -4,7 +4,7 @@
 
 NAMESPACE_HELPER
 
-IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType, uint RoundCount)
+IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType, size_t RoundCount)
 {
 	try
 	{

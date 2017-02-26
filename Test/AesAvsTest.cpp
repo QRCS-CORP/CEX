@@ -18,7 +18,7 @@ namespace Test
 		try
 		{
 			std::string data;
-			Test::TestUtils::Read(keyvect128, data);
+			Test::TestUtils::Read(AESAVSKEY128, data);
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -34,7 +34,7 @@ namespace Test
 			}
 			OnProgress("AesAvsTest: Passed 128 bit key vectors test..");
 
-			Test::TestUtils::Read(keyvect192, data);
+			Test::TestUtils::Read(AESAVSKEY192, data);
 
 			for (unsigned int i = 0, j = 48; i < data.size(); i += 80, j += 80)
 			{
@@ -48,7 +48,7 @@ namespace Test
 			}
 			OnProgress("AesAvsTest: Passed 192 bit key vectors test..");
 
-			Test::TestUtils::Read(keyvect256, data);
+			Test::TestUtils::Read(AESAVSKEY256, data);
 
 			for (unsigned int i = 0, j = 64; i < data.size(); i += 96, j += 96)
 			{
@@ -63,7 +63,7 @@ namespace Test
 			OnProgress("AesAvsTest: Passed 256 bit key vectors test..");
 
 			HexConverter::Decode("00000000000000000000000000000000", key);
-			Test::TestUtils::Read(plainvect128, data);
+			Test::TestUtils::Read(AESAVSPTEXT128, data);
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -78,7 +78,7 @@ namespace Test
 			OnProgress("AesAvsTest: Passed 128 bit plain-text vectors test..");
 
 			HexConverter::Decode("000000000000000000000000000000000000000000000000", key);
-			Test::TestUtils::Read(plainvect192, data);
+			Test::TestUtils::Read(AESAVSPTEXT192, data);
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -93,7 +93,7 @@ namespace Test
 			OnProgress("AesAvsTest: Passed 192 bit plain-text vectors test..");
 
 			HexConverter::Decode("0000000000000000000000000000000000000000000000000000000000000000", key);
-			Test::TestUtils::Read(plainvect256, data);
+			Test::TestUtils::Read(AESAVSPTEXT256, data);
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{

@@ -1,13 +1,51 @@
 #include "CBC.h"
 #include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
-#include "CpuDetect.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_MODE
 
-//~~~ Public Methods~~~//
+using Utility::IntUtils;
+
+//~~~Constructor~~~//
+
+CBC::CBC(BlockCiphers CipherType)
+	:
+	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType)),
+	m_blockSize(m_blockCipher->BlockSize()),
+	m_cbcVector(m_blockSize),
+	m_cipherType(CipherType),
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_parallelProfile(m_blockSize, true, m_blockCipher->StateCacheSize(), true)
+{
+}
+
+CBC::CBC(IBlockCipher* Cipher)
+	:
+	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoCipherModeException("CBC:CTor", "The Cipher can not be null!")),
+	m_blockSize(m_blockCipher->BlockSize()),
+	m_cbcVector(m_blockSize),
+	m_cipherType(Cipher->Enumeral()),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_parallelProfile(m_blockSize, true, m_blockCipher->StateCacheSize(), true)
+{
+}
+
+CBC::~CBC()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void CBC::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
@@ -16,10 +54,13 @@ void CBC::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 
 void CBC::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockSize, "The data arrays are smaller than the the block-size!");
+
 	std::vector<byte> nxtIv(m_blockSize);
 	memcpy(&nxtIv[0], &Input[InOffset], m_blockSize);
 	m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
-	Utility::IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size());
+	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.HasSimd128());
 	memcpy(&m_cbcVector[0], &nxtIv[0], m_cbcVector.size());
 }
 
@@ -30,13 +71,10 @@ void CBC::Decrypt64(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CBC::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_blockSize != 64)
-		throw CryptoSymmetricCipherException("CBC:Transform64", "The cipher has not been initialized with a 64 byte vector!");
-
 	std::vector<byte> nxtIv(m_blockSize);
 	memcpy(&nxtIv[0], &Input[InOffset], m_blockSize);
 	m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
-	Utility::IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size());
+	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.HasSimd128());
 	memcpy(&m_cbcVector[0], &nxtIv[0], m_cbcVector.size());
 }
 
@@ -47,13 +85,10 @@ void CBC::Decrypt128(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CBC::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_blockSize != 128)
-		throw CryptoSymmetricCipherException("CBC:Transform128", "The cipher has not been initialized with a 128 byte vector!");
-
 	std::vector<byte> nxtIv(m_blockSize);
 	memcpy(&nxtIv[0], &Input[InOffset], m_blockSize);
 	m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
-	Utility::IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size());
+	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.HasSimd128());
 	memcpy(&m_cbcVector[0], &nxtIv[0], m_cbcVector.size());
 }
 
@@ -64,16 +99,10 @@ void CBC::Destroy()
 		m_isDestroyed = true;
 		m_blockSize = 0;
 		m_cipherType = BlockCiphers::None;
-		m_hasAVX2 = false;
-		m_hasSSE = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_isParallel = false;
-		m_parallelBlockSize = 0;
-		m_parallelMaxDegree = 0;
-		m_parallelMinimumSize = 0;
-		m_processorCount = 0;
-		m_wideBlock = false;
+		m_isLoaded = false;
+		m_parallelProfile.Reset();
 
 		try
 		{
@@ -101,7 +130,10 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 
 void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Utility::IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size());
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockSize, "The data arrays are smaller than the the block-size!");
+
+	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.HasSimd128());
 	m_blockCipher->EncryptBlock(m_cbcVector, 0, Output, OutOffset);
 	memcpy(&m_cbcVector[0], &Output[OutOffset], m_blockSize);
 }
@@ -113,10 +145,7 @@ void CBC::Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CBC::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_blockSize != 64)
-		throw CryptoSymmetricCipherException("CBC:Transform64", "The cipher has not been initialized with a 64 byte vector!");
-
-	Utility::IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size());
+	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.HasSimd128());
 	m_blockCipher->Transform64(m_cbcVector, 0, Output, OutOffset);
 	memcpy(&m_cbcVector[0], &Output[OutOffset], m_blockSize);
 }
@@ -128,38 +157,33 @@ void CBC::Encrypt128(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CBC::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_blockSize != 128)
-		throw CryptoSymmetricCipherException("CBC:Transform128", "The cipher has not been initialized with a 128 byte vector!");
-
-	Utility::IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size());
+	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.HasSimd128());
 	m_blockCipher->Transform128(m_cbcVector, 0, Output, OutOffset);
 	memcpy(&m_cbcVector[0], &Output[OutOffset], m_blockSize);
 }
 
-void CBC::Initialize(bool Encryption, ISymmetricKey &KeyParam)
+void CBC::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	// recheck params
-	Scope();
-
-	if (KeyParam.Nonce().size() == 64 && !HasSSE())
+	if (KeyParams.Nonce().size() == 64 && !m_parallelProfile.HasSimd128())
 		throw CryptoSymmetricCipherException("CBC:Initialize", "SSE 128bit intrinsics are not available on this system!");
-	if (KeyParam.Nonce().size() == 128 && !HasAVX2())
+	if (KeyParams.Nonce().size() == 128 && !m_parallelProfile.HasSimd256())
 		throw CryptoSymmetricCipherException("CBC:Initialize", "AVX2 256bit intrinsics are not available on this system!");
-	if (KeyParam.Nonce().size() < 16)
+	if (KeyParams.Nonce().size() < 16)
 		throw CryptoSymmetricCipherException("CBC:Initialize", "Requires a minimum 16 bytes of Nonce!");
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParam.Key().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 		throw CryptoSymmetricCipherException("CBC:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
-	if (IsParallel() && ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
+	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
 		throw CryptoSymmetricCipherException("CBC:Initialize", "The parallel block size is out of bounds!");
-	if (IsParallel() && ParallelBlockSize() % ParallelMinimumSize() != 0)
+	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		throw CryptoSymmetricCipherException("CBC:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 
-	m_blockCipher->Initialize(Encryption, KeyParam);
-	m_cbcVector = KeyParam.Nonce();
+	Scope();
+	m_blockCipher->Initialize(Encryption, KeyParams);
+	m_cbcVector = KeyParams.Nonce();
 	m_isEncryption = Encryption;
-	m_wideBlock = m_cbcVector.size() == 64 || m_cbcVector.size() == 128;
+	m_parallelProfile.WideBlock() = m_cbcVector.size() == 64 || m_cbcVector.size() == 128;
 
-	if (m_wideBlock)
+	if (m_parallelProfile.WideBlock())
 		m_blockSize = m_cbcVector.size();
 
 	m_isInitialized = true;
@@ -171,43 +195,69 @@ void CBC::ParallelMaxDegree(size_t Degree)
 		throw CryptoCipherModeException("CBC:ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
 		throw CryptoCipherModeException("CBC:ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_processorCount)
+	if (Degree > m_parallelProfile.ProcessorCount())
 		throw CryptoCipherModeException("CBC:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
-	m_parallelMaxDegree = Degree;
-	Scope();
+	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CBC::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
+size_t CBC::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Transform(Input, 0, Output, 0);
+	const size_t PRCSZE = IntUtils::Min(Output.size(), Input.size());
+	Transform(Input, 0, Output, 0, PRCSZE);
+	return PRCSZE;
 }
 
-void CBC::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+size_t CBC::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_isEncryption)
+	if (m_parallelProfile.IsParallel() && (IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_parallelProfile.ParallelBlockSize()))
 	{
-		EncryptBlock(Input, InOffset, Output, OutOffset);
+		Transform(Input, InOffset, Output, OutOffset, m_parallelProfile.ParallelBlockSize());
+		return m_parallelProfile.ParallelBlockSize();
 	}
 	else
 	{
-		if (m_isParallel)
-		{
-			if ((Output.size() - OutOffset) >= m_parallelBlockSize)
-			{
-				DecryptParallel(Input, InOffset, Output, OutOffset);
-			}
-			else
-			{
-				size_t blocks = (Output.size() - OutOffset) / m_blockSize;
+		if (m_isEncryption)
+			EncryptBlock(Input, InOffset, Output, OutOffset);
+		else
+			DecryptBlock(Input, InOffset, Output, OutOffset);
 
-				for (size_t i = 0; i < blocks; i++)
-					DecryptBlock(Input, (i * m_blockSize) + InOffset, Output, (i * m_blockSize) + OutOffset);
-			}
+		return BLOCK_SIZE;
+	}
+}
+
+void CBC::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+{
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
+
+	size_t blkCtr = Length / m_blockSize;
+
+	if (m_isEncryption)
+	{
+		for (size_t i = 0; i < blkCtr; ++i)
+			EncryptBlock(Input, (i * m_blockSize) + InOffset, Output, (i * m_blockSize) + OutOffset);
+	}
+	else
+	{
+		if (m_parallelProfile.IsParallel() && Length >= m_parallelProfile.ParallelBlockSize())
+		{
+			const size_t PRBCNT = Length / m_parallelProfile.ParallelBlockSize();
+
+			for (size_t i = 0; i < PRBCNT; ++i)
+				DecryptParallel(Input, (i * m_parallelProfile.ParallelBlockSize()) + InOffset, Output, (i * m_parallelProfile.ParallelBlockSize()) + OutOffset);
+
+			const size_t PRCBLK = (m_parallelProfile.ParallelBlockSize() / m_blockSize) * PRBCNT;
+			blkCtr -= PRCBLK;
+
+			for (size_t i = 0; i < blkCtr; ++i)
+				DecryptBlock(Input, ((i + PRCBLK) * m_blockSize) + InOffset, Output, ((i + PRCBLK) * m_blockSize) + OutOffset);
 		}
 		else
 		{
-			DecryptBlock(Input, InOffset, Output, OutOffset);
+			for (size_t i = 0; i < blkCtr; ++i)
+				DecryptBlock(Input, (i * m_blockSize) + InOffset, Output, (i * m_blockSize) + OutOffset);
 		}
 	}
 }
@@ -225,9 +275,9 @@ void CBC::Transform64(const std::vector<byte> &Input, const size_t InOffset, std
 	}
 	else
 	{
-		if (m_isParallel)
+		if (m_parallelProfile.IsParallel())
 		{
-			if ((Output.size() - OutOffset) >= m_parallelBlockSize)
+			if ((Output.size() - OutOffset) >= m_parallelProfile.ParallelBlockSize())
 			{
 				DecryptParallel(Input, InOffset, Output, OutOffset);
 			}
@@ -260,9 +310,9 @@ void CBC::Transform128(const std::vector<byte> &Input, const size_t InOffset, st
 	}
 	else
 	{
-		if (m_isParallel)
+		if (m_parallelProfile.IsParallel())
 		{
-			if ((Output.size() - OutOffset) >= m_parallelBlockSize)
+			if ((Output.size() - OutOffset) >= m_parallelProfile.ParallelBlockSize())
 			{
 				DecryptParallel(Input, InOffset, Output, OutOffset);
 			}
@@ -281,15 +331,15 @@ void CBC::Transform128(const std::vector<byte> &Input, const size_t InOffset, st
 	}
 }
 
-//~~~ Private Methods~~~//
+//~~~Private Functions~~~//
 
 void CBC::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t SEGSZE = m_parallelBlockSize / m_parallelMaxDegree;
+	const size_t SEGSZE = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 	const size_t BLKCNT = (SEGSZE / m_blockSize);
 	std::vector<byte> tmpIv(m_blockSize);
 
-	Utility::ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
+	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
 	{
 		std::vector<byte> thdIv(m_blockSize);
 
@@ -300,7 +350,7 @@ void CBC::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset,
 
 		this->DecryptSegment(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, thdIv, BLKCNT);
 
-		if (i == m_parallelMaxDegree - 1)
+		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			memcpy(&tmpIv[0], &thdIv[0], m_blockSize);
 	});
 
@@ -311,7 +361,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 {
 	size_t blkCtr = BlockCount;
 
-	if (m_wideBlock)
+	if (m_parallelProfile.WideBlock())
 	{
 		const size_t SMDBLK = Iv.size();
 		std::vector<byte> blkNxt(SMDBLK);
@@ -324,7 +374,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&blkNxt[0], &Input[InOffset], SMDBLK);
 				m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
-				Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, HasSSE());
+				IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, m_parallelProfile.HasSimd128());
 				memcpy(&Iv[0], &blkNxt[0], SMDBLK);
 				InOffset += SMDBLK;
 				OutOffset += SMDBLK;
@@ -338,7 +388,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&blkNxt[0], &Input[InOffset], SMDBLK);
 				m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
-				Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, HasSSE());
+				IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, m_parallelProfile.HasSimd128());
 				memcpy(&Iv[0], &blkNxt[0], SMDBLK);
 				InOffset += SMDBLK;
 				OutOffset += SMDBLK;
@@ -348,7 +398,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 	}
 	else
 	{
-		if (HasAVX2() && blkCtr > 7)
+		if (m_parallelProfile.HasSimd256() && blkCtr > 7)
 		{
 			// 256bit avx
 			const size_t AVXBLK = 128;
@@ -368,7 +418,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 				// transform 8 blocks
 				m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
 				// xor the set
-				Utility::IntUtils::XORBLK(blkIv, 0, Output, OutOffset, AVXBLK, HasSSE());
+				IntUtils::XORBLK(blkIv, 0, Output, OutOffset, AVXBLK, m_parallelProfile.HasSimd128());
 				// swap iv
 				memcpy(&blkIv[0], &blkNxt[0], AVXBLK);
 				InOffset += AVXBLK;
@@ -379,7 +429,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 			memcpy(&Iv[0], &blkNxt[0], Iv.size());
 		}
-		else if (HasSSE() && blkCtr > 3)
+		else if (m_parallelProfile.HasSimd128() && blkCtr > 3)
 		{
 			// 128bit sse3
 			const size_t SSEBLK = 64;
@@ -394,7 +444,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&blkNxt[0], &Input[InOffset + BLKOFT], SSEBLK);
 				m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
-				Utility::IntUtils::XORBLK(blkIv, 0, Output, OutOffset, SSEBLK, true);
+				IntUtils::XORBLK(blkIv, 0, Output, OutOffset, SSEBLK, m_parallelProfile.HasSimd128());
 				memcpy(&blkIv[0], &blkNxt[0], SSEBLK);
 				InOffset += SSEBLK;
 				OutOffset += SSEBLK;
@@ -414,7 +464,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&nxtIv[0], &Input[InOffset], nxtIv.size());
 				m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
-				Utility::IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size(), HasSSE());
+				IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size(), m_parallelProfile.HasSimd128());
 				memcpy(&Iv[0], &nxtIv[0], nxtIv.size());
 				InOffset += m_blockSize;
 				OutOffset += m_blockSize;
@@ -424,84 +474,10 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 	}
 }
 
-void CBC::Detect()
-{
-	try
-	{
-		Common::CpuDetect detect;
-		m_processorCount = detect.VirtualCores();
-		if (m_processorCount > 1 && m_processorCount % 2 != 0)
-			m_processorCount--;
-
-		m_parallelBlockSize = detect.L1DataCacheTotal();
-		if (m_parallelBlockSize == 0 || m_processorCount == 0)
-			throw std::exception();
-
-		m_hasSSE = detect.SSE();
-		m_hasAVX2 = detect.AVX2();
-	}
-	catch (...)
-	{
-		m_processorCount = Utility::ParallelUtils::ProcessorCount();
-
-		if (m_processorCount == 0)
-			m_processorCount = 1;
-		if (m_processorCount > 1 && m_processorCount % 2 != 0)
-			m_processorCount--;
-
-		m_hasSSE = false;
-		m_hasAVX2 = false;
-		m_parallelBlockSize = m_processorCount * PRC_DATACACHE;
-	}
-}
-
-IBlockCipher* CBC::LoadCipher(BlockCiphers CipherType)
-{
-	try
-	{
-		return Helper::BlockCipherFromName::GetInstance(CipherType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoSymmetricCipherException("CBC:LoadCipher", "The block cipher could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-void CBC::LoadState()
-{
-	if (m_blockCipher == 0)
-	{
-		m_blockCipher = LoadCipher(m_cipherType);
-		m_blockSize = m_blockCipher->BlockSize();
-		m_cbcVector.resize(m_blockSize);
-	}
-
-	Detect();
-	Scope();
-}
-
 void CBC::Scope()
 {
-	if (m_parallelMaxDegree == 1)
-		m_isParallel = false;
-	else if (!m_isInitialized)
-		m_isParallel = (m_processorCount > 1);
-
-	if (m_parallelMaxDegree == 0)
-		m_parallelMaxDegree = m_processorCount;
-
-	m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
-
-	if (m_hasAVX2)
-		m_parallelMinimumSize *= 8;
-	else if (m_hasSSE)
-		m_parallelMinimumSize *= 4;
-
-	// 16 kb minimum
-	if (m_parallelBlockSize == 0 || m_parallelBlockSize < PRC_DATACACHE)
-		m_parallelBlockSize = (m_parallelMaxDegree * PRC_DATACACHE) - ((m_parallelMaxDegree * PRC_DATACACHE) % m_parallelMinimumSize);
-	else
-		m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
+	if (!m_parallelProfile.IsDefault())
+		m_parallelProfile.Calculate();
 }
 
 NAMESPACE_MODEEND

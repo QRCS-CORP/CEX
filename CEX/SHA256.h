@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -95,11 +95,11 @@ using Key::Symmetric::ISymmetricKey;
 /// <list type="bullet">
 /// <item><description>State block size is 64 bytes, (512 bits), in parallel mode the ParallelBlockSize() is used (P * B * 8).</description></item>
 /// <item><description>Digest output size is 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="BlockUpdate(byte[], size_t, size_t)"/> and DoFinal methods; (suitable for small data).</description>/></item>
-/// <item><description>The <see cref="Update(byte)"/> and <see cref="BlockUpdate(byte[], size_t, size_t)"/> methods process message input.</description></item>
-/// <item><description>The <see cref="DoFinal(byte[], size_t)"/> method returns the hash or MAC code and resets the internal state.</description></item>
+/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], size_t, size_t)"/> and Finalize methods; (suitable for small data).</description>/></item>
+/// <item><description>The <see cref="Update(byte)"/> and <see cref="Update(byte[], size_t, size_t)"/> methods process message input.</description></item>
+/// <item><description>The <see cref="Finalize(byte[], size_t)"/> method returns the hash or MAC code and resets the internal state.</description></item>
 /// <item><description>The Generate function produces pseudo-random bytes using an internal implementation of the HKDF Expand bytes generator.</description></item>
-/// <item><description>The LoadMacKey function initializes an HMAC implementation; used with the update and DoFinal methods for creating a MAC code.</description></item>
+/// <item><description>The LoadMacKey function initializes an HMAC implementation; used with the update and Finalize methods for creating a MAC code.</description></item>
 /// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
 /// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
 /// <item><description>Default tree hashing mode is depth 1 sequential; intermediate hashes are finalized as contiguous input.</description></item>
@@ -211,7 +211,7 @@ public:
 	/// </summary>
 	const size_t ParallelMinimumSize() { return m_minParallel; }
 
-	// *** Constructor *** //
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class with either the Parallel or Sequential hashing engine.
@@ -219,38 +219,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded SHA-2 variant.</param>
-	explicit SHA256(bool Parallel = false)
-		:
-		m_hasAvx(false),
-		m_iPad(0),
-		m_isDestroyed(false),
-		m_isHmac(false),
-		m_isInitialized(false),
-		m_isParallel(Parallel),
-		m_leafSize(BLOCK_SIZE),
-		m_minParallel(MIN_PRLBLOCK),
-		m_msgBuffer(Parallel ? MIN_PRLBLOCK : BLOCK_SIZE, 0),
-		m_msgLength(0),
-		m_oPad(0),
-		m_parallelBlockSize(PRL_BRANCHSIZE * PRL_DEGREE),
-		m_State(Parallel ? PRL_DEGREE * ITL_LANESIZE : 1),
-		m_treeDestroy(true)
-	{
-		if (m_isParallel)
-		{
-			// intrinsics support switch
-			DetectCpu();
-			// defaults to tree depth(1), parallel degree(4), and subtree(8) branch size
-			m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 1, (uint8_t)BLOCK_SIZE, (uint8_t)PRL_DEGREE, (uint8_t)ITL_LANESIZE };
-		}
-		else
-		{
-			// fixed values for sequential
-			m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 0, (uint8_t)BLOCK_SIZE, 0, 0 };
-		}
-
-		Initialize(m_State);
-	}
+	explicit SHA256(bool Parallel = false);
 
 	/// <summary>
 	/// Initialize the class with an SHA2Params structure.
@@ -263,66 +232,14 @@ public:
 	/// <param name="Params">The Blake2Params structure, containing the tree configuration settings.</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the SHA2Params structure contains invalid values</exception>
-	explicit SHA256(SHA2Params &Params)
-		:
-		m_iPad(0),
-		m_isDestroyed(false),
-		m_isHmac(false),
-		m_isInitialized(false),
-		m_isParallel(false),
-		m_leafSize(BLOCK_SIZE),
-		m_minParallel(Params.ParallelDegree() * ITL_LANESIZE * BLOCK_SIZE),
-		m_msgBuffer(Params.ParallelDegree() > 0 ? Params.ParallelDegree() * ITL_LANESIZE * BLOCK_SIZE : BLOCK_SIZE),
-		m_msgLength(0),
-		m_oPad(0),
-		m_parallelBlockSize(0),
-		m_State(Params.ParallelDegree() > 0 ? Params.ParallelDegree() * ITL_LANESIZE : 1),
-		m_treeDestroy(false),
-		m_treeParams(Params)
-	{
-		m_isParallel = m_treeParams.ParallelDegree() > 1;
-
-		if (m_isParallel)
-		{
-			if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
-				throw CryptoDigestException("SHA256:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
-			if (Params.ParallelDegree() < 2 || Params.ParallelDegree() % 2 != 0)
-				throw CryptoDigestException("SHA256:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
-			if (Params.TreeDepth() > 2)
-				throw CryptoDigestException("SHA256:Ctor", "The tree depth valid range is 0, 1, and 2.");
-			if (Params.SubTreeLength() % 2 != 0 || Params.SubTreeLength() < 2 || Params.SubTreeLength() > m_minParallel / BLOCK_SIZE)
-				throw CryptoDigestException("SHA256:Ctor", "SubTreeLength must be divisible by two, and no more than minimum parallel divide by block size.");
-
-			DetectCpu();
-			// override and store
-			m_treeParams = { (uint8_t)DIGEST_SIZE, 0, (uint8_t)(Params.TreeDepth() == 2 ? 2 : 1), (uint8_t)BLOCK_SIZE, Params.ParallelDegree(), Params.SubTreeLength() };
-		}
-		else
-		{
-			m_treeParams = { (uint8_t)DIGEST_SIZE, 0, 0, (uint8_t)BLOCK_SIZE, 0, 0 };
-		}
-
-		Initialize(m_State);
-	}
+	explicit SHA256(SHA2Params &Params);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SHA256()
-	{
-		Destroy();
-	}
+	virtual ~SHA256();
 
-	//~~~Public Methods~~~//
-
-	/// <summary>
-	/// Update the buffer with a block of bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">The number of message bytes to process</param>
-	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Get the hash code for a message input array
@@ -347,7 +264,7 @@ public:
 	/// <returns>The byte size of the hash code</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output array is too short</exception>
-	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset);
+	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Generate pseudo random bytes using the digest as with an HKDF Expand bytes generator
@@ -381,6 +298,15 @@ public:
 	/// 
 	/// <param name="Input">Input message byte</param>
 	virtual void Update(byte Input);
+
+	/// <summary>
+	/// Update the buffer with a block of bytes
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="Length">The number of message bytes to process</param>
+	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
 	void DetectCpu();

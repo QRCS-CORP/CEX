@@ -53,12 +53,12 @@ namespace Test
 
 		// encrypt linear
 		cipher.Initialize(k);
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 		cipher.Transform(data, enc);
 		// decrypt parallel
 		cipher.Initialize(k);
-		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = cipher.ParallelMinimumSize();
+		cipher.ParallelProfile().IsParallel() = true;
+		cipher.ParallelProfile().ParallelBlockSize() = cipher.ParallelProfile().ParallelMinimumSize();
 		cipher.Transform(enc, dec);
 
 		if (data != dec)

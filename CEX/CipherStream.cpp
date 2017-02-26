@@ -7,7 +7,137 @@
 
 NAMESPACE_PROCESSING
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+CipherStream::CipherStream(BlockCiphers CipherType, Digests KdfEngine, int RoundCount, CipherModes ModeType, PaddingModes PaddingType)
+	:
+	m_blockCipher(0),
+	m_destroyEngine(true),
+	m_isBufferedIO(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isStreamCipher(false),
+	m_legalKeySizes(0),
+	m_parallelBlockSize(0),
+	m_parallelMinimumSize(0),
+	m_streamCipher(0)
+{
+	m_cipherEngine = GetCipherMode(ModeType, CipherType, 16, RoundCount, KdfEngine);
+	Scope();
+
+	if (!m_isCounterMode)
+		m_cipherPadding = GetPaddingMode(PaddingType);
+
+}
+
+CipherStream::CipherStream(StreamCiphers CipherType, size_t RoundCount)
+	:
+	m_blockCipher(0),
+	m_destroyEngine(true),
+	m_isBufferedIO(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isStreamCipher(true),
+	m_legalKeySizes(0),
+	m_parallelBlockSize(0),
+	m_parallelMinimumSize(0),
+	m_streamCipher(0)
+{
+	if (CipherType != StreamCiphers::ChaCha20 && CipherType != StreamCiphers::Salsa20)
+		throw CryptoProcessingException("CipherStream:CTor", "The stream cipher is not recognized!");
+	if (RoundCount < 10 || RoundCount > 30 || RoundCount % 2 != 0)
+		throw CryptoProcessingException("CipherStream:CTor", "Invalid rounds count; must be an even number between 10 and 30!");
+
+	m_streamCipher = GetStreamCipher(CipherType, RoundCount);
+	Scope();
+}
+
+CipherStream::CipherStream(CipherDescription* Header)
+	:
+	m_blockCipher(0),
+	m_destroyEngine(true),
+	m_isBufferedIO(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_parallelBlockSize(0),
+	m_parallelMinimumSize(0),
+	m_streamCipher(0)
+{
+	if (Header == 0)
+		throw CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
+
+	if (Header->EngineType() == SymmetricEngines::ChaCha20 || Header->EngineType() == SymmetricEngines::Salsa)
+	{
+		m_isStreamCipher = true;
+		m_streamCipher = GetStreamCipher((StreamCiphers)Header->EngineType(), (int)Header->RoundCount());
+	}
+	else
+	{
+		m_isStreamCipher = false;
+		m_cipherEngine = GetCipherMode(Header->CipherType(), (BlockCiphers)Header->EngineType(), (int)Header->BlockSize(), (int)Header->RoundCount(), Header->KdfEngine());
+
+		if (!m_isCounterMode && Header->PaddingType() != PaddingModes::None)
+			m_cipherPadding = GetPaddingMode(Header->PaddingType());
+	}
+
+	Scope();
+}
+
+CipherStream::CipherStream(ICipherMode* Cipher, IPadding* Padding)
+	:
+	m_blockCipher(0),
+	m_cipherEngine(Cipher),
+	m_cipherPadding(Padding),
+	m_destroyEngine(false),
+	m_isBufferedIO(false),
+	m_isDestroyed(false),
+	m_isEncryption(Cipher->IsEncryption()),
+	m_isInitialized(false),
+	m_isStreamCipher(false),
+	m_legalKeySizes(0),
+	m_parallelBlockSize(0),
+	m_parallelMinimumSize(0),
+	m_streamCipher(0)
+{
+	if (m_cipherEngine->IsInitialized())
+		throw CryptoProcessingException("CipherStream:CTor", "The cipher must be initialized through the local Initialize() method!");
+	if (m_cipherPadding == 0 && m_cipherEngine->Enumeral() != CipherModes::CTR)
+		m_cipherPadding = GetPaddingMode(PaddingModes::X923);
+
+	Scope();
+}
+
+CipherStream::CipherStream(IStreamCipher* Cipher)
+	:
+	m_blockCipher(0),
+	m_cipherPadding(0),
+	m_destroyEngine(false),
+	m_isBufferedIO(false),
+	m_isDestroyed(false),
+	m_isEncryption(),
+	m_isInitialized(false),
+	m_isStreamCipher(true),
+	m_parallelBlockSize(0),
+	m_streamCipher(Cipher)
+{
+	if (Cipher == 0)
+		throw CryptoProcessingException("CipherStream:CTor", "The Cipher can not be null!");
+	if (Cipher->IsInitialized())
+		throw CryptoProcessingException("The cipher must be initialized through the local Initialize() method!");
+
+	Scope();
+}
+
+CipherStream::~CipherStream()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void CipherStream::Destroy()
 {
@@ -44,14 +174,14 @@ void CipherStream::Destroy()
 	}
 }
 
-void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParam)
+void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	try
 	{
 		if (!m_isStreamCipher)
-			m_cipherEngine->Initialize(Encryption, KeyParam);
+			m_cipherEngine->Initialize(Encryption, KeyParams);
 		else
-			m_streamCipher->Initialize(KeyParam);
+			m_streamCipher->Initialize(KeyParams);
 	}
 	catch(std::exception& ex)
 	{
@@ -101,7 +231,7 @@ void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::v
 		StreamTransform(Input, InOffset, Output, OutOffset);
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
@@ -124,11 +254,11 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 			CalculateProgress(INPSZE, count);
 		}
 
-		m_cipherEngine->IsParallel() = false;
+		m_cipherEngine->ParallelProfile().IsParallel() = false;
 	}
 	else
 	{
-		m_cipherEngine->IsParallel() = false;
+		m_cipherEngine->ParallelProfile().IsParallel() = false;
 	}
 
 	blkSze = m_blockSize;
@@ -209,11 +339,11 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 			CalculateProgress(INPSZE, OutStream->Position());
 		}
 
-		m_cipherEngine->IsParallel() = false;
+		m_cipherEngine->ParallelProfile().IsParallel() = false;
 	}
 	else
 	{
-		m_cipherEngine->IsParallel() = false;
+		m_cipherEngine->ParallelProfile().IsParallel() = false;
 	}
 
 	blkSze = m_blockSize;
@@ -283,11 +413,11 @@ void CipherStream::StreamTransform(const std::vector<byte> &Input, size_t InOffs
 			CalculateProgress(INPSZE, count);
 		}
 
-		m_streamCipher->IsParallel() = false;
+		m_streamCipher->ParallelProfile().IsParallel() = false;
 	}
 	else
 	{
-		m_streamCipher->IsParallel() = false;
+		m_streamCipher->ParallelProfile().IsParallel() = false;
 	}
 
 	blkSze = m_blockSize;
@@ -342,11 +472,11 @@ void CipherStream::StreamTransform(IByteStream* InStream, IByteStream* OutStream
 			CalculateProgress(INPSZE, OutStream->Position());
 		}
 
-		m_streamCipher->IsParallel() = false;
+		m_streamCipher->ParallelProfile().IsParallel() = false;
 	}
 	else
 	{
-		m_streamCipher->IsParallel() = false;
+		m_streamCipher->ParallelProfile().IsParallel() = false;
 	}
 
 	blkSze = m_blockSize;
@@ -423,7 +553,7 @@ IPadding* CipherStream::GetPaddingMode(PaddingModes PaddingType)
 	}
 }
 
-IStreamCipher* CipherStream::GetStreamCipher(StreamCiphers CipherType, int RoundCount)
+IStreamCipher* CipherStream::GetStreamCipher(StreamCiphers CipherType, size_t RoundCount)
 {
 	try
 	{
@@ -441,27 +571,27 @@ void CipherStream::ParametersCheck()
 	{
 		if (m_parallelBlockSize != 0)
 		{
-			if (m_parallelBlockSize < m_streamCipher->ParallelMinimumSize())
-				m_parallelBlockSize = m_streamCipher->ParallelMinimumSize();
+			if (m_parallelBlockSize < m_streamCipher->ParallelProfile().ParallelMinimumSize())
+				m_parallelBlockSize = m_streamCipher->ParallelProfile().ParallelMinimumSize();
 			else if (m_parallelBlockSize != m_streamCipher->ParallelBlockSize())
-				m_parallelBlockSize -= (m_parallelBlockSize % m_streamCipher->ParallelMinimumSize());
+				m_parallelBlockSize -= (m_parallelBlockSize % m_streamCipher->ParallelProfile().ParallelMinimumSize());
 		}
 
-		m_streamCipher->IsParallel() = m_isParallel && m_streamCipher->ProcessorCount() > 1;
-		m_streamCipher->ParallelBlockSize() = m_parallelBlockSize;
+		m_streamCipher->ParallelProfile().IsParallel() = m_isParallel && m_streamCipher->ParallelProfile().ProcessorCount() > 1;
+		m_streamCipher->ParallelProfile().ParallelBlockSize() = m_parallelBlockSize;
 	}
 	else
 	{
 		if (m_parallelBlockSize != 0)
 		{
-			if (m_parallelBlockSize < m_cipherEngine->ParallelMinimumSize())
-				m_parallelBlockSize = m_cipherEngine->ParallelMinimumSize();
+			if (m_parallelBlockSize < m_cipherEngine->ParallelProfile().ParallelMinimumSize())
+				m_parallelBlockSize = m_cipherEngine->ParallelProfile().ParallelMinimumSize();
 			else if (m_parallelBlockSize != m_cipherEngine->ParallelBlockSize())
-				m_parallelBlockSize -= (m_parallelBlockSize % m_cipherEngine->ParallelMinimumSize());
+				m_parallelBlockSize -= (m_parallelBlockSize % m_cipherEngine->ParallelProfile().ParallelMinimumSize());
 		}
 
-		m_cipherEngine->IsParallel() = m_isParallel && m_cipherEngine->ProcessorCount() > 1;
-		m_cipherEngine->ParallelBlockSize() = m_parallelBlockSize;
+		m_cipherEngine->ParallelProfile().IsParallel() = m_isParallel && m_cipherEngine->ParallelProfile().ProcessorCount() > 1;
+		m_cipherEngine->ParallelProfile().ParallelBlockSize() = m_parallelBlockSize;
 	}
 }
 
@@ -473,10 +603,10 @@ void CipherStream::Scope()
 		m_isCounterMode = false;
 		m_isParallel = m_streamCipher->IsParallel();
 		m_parallelBlockSize = m_streamCipher->ParallelBlockSize();
-		m_parallelMinimumSize = m_streamCipher->ParallelMinimumSize();
+		m_parallelMinimumSize = m_streamCipher->ParallelProfile().ParallelMinimumSize();
 
 		for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
-			m_legalKeySizes.push_back(SymmetricKeySize(m_streamCipher->LegalKeySizes()[i].KeySize(), m_streamCipher->IvSize(), 0));
+			m_legalKeySizes.push_back(SymmetricKeySize(m_streamCipher->LegalKeySizes()[i].KeySize(), m_streamCipher->LegalKeySizes()[i].NonceSize(), 0));
 	}
 	else
 	{
@@ -484,7 +614,7 @@ void CipherStream::Scope()
 		m_isCounterMode = (m_cipherEngine->Enumeral() == CipherModes::CTR || m_cipherEngine->Enumeral() == CipherModes::ICM);
 		m_isParallel = m_cipherEngine->IsParallel();
 		m_parallelBlockSize = m_cipherEngine->ParallelBlockSize();
-		m_parallelMinimumSize = m_cipherEngine->ParallelMinimumSize();
+		m_parallelMinimumSize = m_cipherEngine->ParallelProfile().ParallelMinimumSize();
 
 		size_t dstMax = m_cipherEngine->Engine()->KdfEngine() != Digests::None ? m_cipherEngine->Engine()->DistributionCodeMax() : 0;
 		for (size_t i = 0; i < m_cipherEngine->LegalKeySizes().size(); ++i)

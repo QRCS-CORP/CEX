@@ -63,24 +63,14 @@ public:
 	/// <summary>
 	/// Instantiate this class
 	/// </summary>
-	CSP()
-		:
-		m_isAvailable(false)
-	{
-#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
-		m_isAvailable = true;
-#endif
-	}
+	CSP();
 
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~CSP()
-	{
-		Destroy();
-	}
+	virtual ~CSP();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

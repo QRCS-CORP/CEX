@@ -1,7 +1,6 @@
 #include "CMG.h"
 #include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
-#include "CpuDetect.h"
 #include "DigestFromName.h"
 #include "KDF2.h"
 #include "ISymmetricKey.h"
@@ -11,7 +10,76 @@
 
 NAMESPACE_DRBG
 
-//~~~Public Methods~~~//
+using Utility::ArrayUtils;
+
+//~~~Constructor~~~//
+
+CMG::CMG(BlockCiphers CipherType, Digests KdfEngineType, Providers ProviderType)
+	:
+	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType, KdfEngineType)),
+	m_blockSize(m_blockCipher->BlockSize()),
+	m_cipherType(CipherType),
+	m_ctrVector(COUNTER_SIZE),
+	m_destroyEngine(true),
+	m_distributionCode(0),
+	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_parallelProfile(m_blockSize, true, m_blockCipher->StateCacheSize(), false),
+	m_kdfEngine(KdfEngineType != Digests::None ? Helper::DigestFromName::GetInstance(KdfEngineType) : 0),
+	m_kdfEngineType(KdfEngineType),
+	m_kdfInfo(0),
+	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
+	m_prdResistant(ProviderType != Providers::None),
+	m_providerSource(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(ProviderType) : 0),
+	m_providerType(ProviderType),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(DEF_CYCTHRESH),
+	m_secStrength(0),
+	m_seedSize(0)
+{
+	if (m_blockSize != COUNTER_SIZE)
+		throw CryptoGeneratorException("CMG:CTor", "The Cipher block size must be 16 bytes!");
+}
+
+CMG::CMG(IBlockCipher* Cipher, IDigest* KdfEngine, IProvider* Provider)
+	:
+	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoGeneratorException("CMG:CTor", "The Cipher can not be null!")),
+	m_blockSize(m_blockCipher->BlockSize()),
+	m_cipherType(m_blockCipher->Enumeral()),
+	m_ctrVector(COUNTER_SIZE),
+	m_destroyEngine(false),
+	m_distributionCode(0),
+	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_kdfEngine(KdfEngine),
+	m_kdfEngineType(m_kdfEngine != 0 ? m_kdfEngine->Enumeral() : Digests::None),
+	m_kdfInfo(0),
+	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
+	m_parallelProfile(m_blockSize, true, m_blockCipher->StateCacheSize(), false),
+	m_prdResistant(Provider != 0),
+	m_providerSource(Provider),
+	m_providerType(m_providerSource != 0 ? m_providerSource->Enumeral() : Providers::None),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(DEF_CYCTHRESH),
+	m_secStrength(0),
+	m_seedSize(0)
+{
+	if (m_blockSize != COUNTER_SIZE)
+		throw CryptoGeneratorException("CMG:CTor", "The Cipher block size must be 16 bytes!");
+}
+
+CMG::~CMG()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void CMG::Destroy()
 {
@@ -20,17 +88,11 @@ void CMG::Destroy()
 		m_isDestroyed = true;
 		m_blockSize = 0;
 		m_cipherType = BlockCiphers::None;
-		m_hasAVX2 = false;
-		m_hasSSE = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_isParallel = false;
 		m_kdfEngineType = Digests::None;
+		m_parallelProfile.Reset();
 		m_prdResistant = false;
-		m_processorCount = 0;
-		m_parallelBlockSize = 0;
-		m_parallelMaxDegree = 0;
-		m_parallelMinimumSize = 0;
 		m_providerType = Providers::None;
 		m_reseedCounter = 0;
 		m_reseedRequests = 0;
@@ -76,7 +138,7 @@ size_t CMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		throw CryptoGeneratorException("CMG:Generate", "Output buffer too small!");
 	if (m_reseedRequests > MAX_RESEED)
 		throw CryptoGeneratorException("DCG:Generate", "The maximum reseed requests have been exceeded!");
-	if (Length > m_parallelBlockSize)
+	if (Length > ParallelBlockSize())
 		throw CryptoGeneratorException("DCG:Generate", "The maximum request size is has been exceeded!");
 
 	Generate(Output, OutOffset);
@@ -117,9 +179,6 @@ void CMG::Initialize(ISymmetricKey &GenParam)
 
 void CMG::Initialize(const std::vector<byte> &Seed)
 {
-	// check for param changes
-	Scope();
-
 	if (!m_isInitialized)
 	{
 		if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size() - m_blockSize, m_blockSize))
@@ -133,7 +192,8 @@ void CMG::Initialize(const std::vector<byte> &Seed)
 
 	// initialize the block cipher
 	size_t keyLen = Seed.size() - m_blockSize;
-	m_secStrength = keyLen * 8;
+	// security upper bound is 256, could actually be more depending on cipher configuration
+	m_secStrength = (keyLen > 32) ? 256 : keyLen * 8;
 	std::vector<byte> key(keyLen);
 	memcpy(&key[0], &Seed[m_blockSize], keyLen);
 	m_blockCipher->Initialize(true, Key::Symmetric::SymmetricKey(key));
@@ -194,11 +254,10 @@ void CMG::ParallelMaxDegree(size_t Degree)
 		throw CryptoGeneratorException("CMG::ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
 		throw CryptoGeneratorException("CMG::ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_processorCount)
+	if (Degree > m_parallelProfile.ProcessorCount())
 		throw CryptoGeneratorException("CMG::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
-	m_parallelMaxDegree = Degree;
-	Scope();
+	m_parallelProfile.SetMaxDegree(Degree);
 }
 
 void CMG::Update(const std::vector<byte> &Seed)
@@ -209,7 +268,7 @@ void CMG::Update(const std::vector<byte> &Seed)
 	Initialize(Seed);
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 void CMG::Derive(std::vector<byte> &Seed)
 {
@@ -227,42 +286,11 @@ void CMG::Derive(std::vector<byte> &Seed)
 	Initialize(tmpK);
 }
 
-void CMG::Detect()
-{
-	try
-	{
-		Common::CpuDetect detect;
-		m_processorCount = detect.VirtualCores();
-		if (m_processorCount > 1 && m_processorCount % 2 != 0)
-			m_processorCount--;
-
-		m_parallelBlockSize = detect.L1DataCacheTotal();
-		if (m_parallelBlockSize == 0 || m_processorCount == 0)
-			throw std::exception();
-
-		m_hasSSE = detect.SSE();
-		m_hasAVX2 = detect.AVX2();
-	}
-	catch(...)
-	{
-		m_processorCount = Utility::ParallelUtils::ProcessorCount();
-
-		if (m_processorCount == 0)
-			m_processorCount = 1;
-		if (m_processorCount > 1 && m_processorCount % 2 != 0)
-			m_processorCount--;
-
-		m_hasSSE = false;
-		m_hasAVX2 = false;
-		m_parallelBlockSize = m_processorCount * PRC_DATACACHE;
-	}
-}
-
 void CMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 {
 	size_t outSize = Output.size() - OutOffset;
 
-	if (!m_isParallel || outSize < m_parallelBlockSize)
+	if (!IsParallel() || outSize < ParallelBlockSize())
 	{
 		// not parallel or too small; generate p-rand block
 		Transform(Output, OutOffset, outSize, m_ctrVector);
@@ -270,27 +298,27 @@ void CMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 	else
 	{
 		const size_t OUTSZE = outSize;
-		const size_t CNKSZE = m_parallelBlockSize / m_parallelMaxDegree;
+		const size_t CNKSZE = ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 		const size_t CTRLEN = (CNKSZE / m_blockSize);
 		std::vector<byte> tmpCtr(m_ctrVector.size());
 
-		Utility::ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
+		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
 		{
 			// thread level counter
 			std::vector<byte> thdCtr(m_ctrVector.size());
 			// offset counter by chunk size / block size  
-			this->Increase(m_ctrVector, thdCtr, CTRLEN * i);
+			ArrayUtils::IncreaseBE8(m_ctrVector, thdCtr, CTRLEN * i);
 			// generate random at output offset
 			this->Transform(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 			// store last counter
-			if (i == m_parallelMaxDegree - 1)
+			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 				memcpy(&tmpCtr[0], &thdCtr[0], tmpCtr.size());
 		});
 
 		// copy last counter to class variable
 		memcpy(&m_ctrVector[0], &tmpCtr[0], m_ctrVector.size());
 		// last block processing
-		const size_t ALNSZE = CNKSZE * m_parallelMaxDegree;
+		const size_t ALNSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
 
 		if (ALNSZE < OUTSZE)
 		{
@@ -300,119 +328,13 @@ void CMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 	}
 }
 
-void CMG::Increase(const std::vector<byte> &Input, std::vector<byte> &Output, const size_t Value)
-{
-	const size_t CTRSZE = Output.size() - 1;
-	std::vector<byte> ctrInc(sizeof(Value));
-	memcpy(&ctrInc[0], &Value, ctrInc.size());
-	memcpy(&Output[0], &Input[0], Input.size());
-	byte carry = 0;
-
-	for (size_t i = CTRSZE; i > 0; --i)
-	{
-		byte odst = Output[i];
-		byte osrc = CTRSZE - i < ctrInc.size() ? ctrInc[CTRSZE - i] : (byte)0;
-		byte ndst = (byte)(odst + osrc + carry);
-		carry = ndst < odst ? 1 : 0;
-		Output[i] = ndst;
-	}
-}
-
-void CMG::Increment(std::vector<byte> &Counter)
-{
-	size_t i = Counter.size();
-	while (--i >= 0 && ++Counter[i] == 0) {}
-}
-
-IBlockCipher* CMG::LoadCipher(BlockCiphers CipherType, Digests KdfEngineType)
-{
-	try
-	{
-		Digests dgt = KdfEngineType;
-		if (CipherType == BlockCiphers::Rijndael || CipherType == BlockCiphers::Serpent || CipherType == BlockCiphers::Twofish)
-			dgt = Digests::None;
-
-		return Helper::BlockCipherFromName::GetInstance(CipherType, dgt);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoGeneratorException("CMG:LoadCipher", "The block cipher could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-IDigest* CMG::LoadDigest(Digests DigestType)
-{
-	try
-	{
-		return Helper::DigestFromName::GetInstance(DigestType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoGeneratorException("CMG:LoadDigest", "The message digest could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-IProvider* CMG::LoadProvider(Providers ProviderType)
-{
-	try
-	{
-		return Helper::ProviderFromName::GetInstance(ProviderType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoGeneratorException("CMG:LoadProvider", "The entropy provider could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-void CMG::LoadState()
-{
-	if (m_blockCipher == 0)
-		m_blockCipher = LoadCipher(m_cipherType, m_kdfEngineType);
-	if (m_kdfEngineType != Digests::None && m_kdfEngine == 0)
-		m_kdfEngine = LoadDigest(m_kdfEngineType);
-	if (m_providerType != Providers::None && m_providerSource == 0)
-		m_providerSource = LoadProvider(m_providerType);
-
-	m_blockSize = m_blockCipher->BlockSize();
-	m_ctrVector.resize(m_blockSize);
-	m_prdResistant = m_providerType != Providers::None;
-	m_reseedThreshold = DEF_CYCTHRESH;
-	m_distributionCodeMax = m_blockCipher->DistributionCodeMax();
-	m_legalKeySizes = m_blockCipher->LegalKeySizes();
-
-	Detect();
-	Scope();
-}
-
-void CMG::Scope()
-{
-	if (m_parallelMaxDegree == 1 || m_processorCount == 1)
-		m_isParallel = false;
-
-	if (m_parallelMaxDegree == 0)
-		m_parallelMaxDegree = m_processorCount;
-
-	m_parallelMinimumSize = m_parallelMaxDegree * m_blockCipher->BlockSize();
-
-	if (m_hasAVX2)
-		m_parallelMinimumSize *= 8;
-	else if (m_hasSSE)
-		m_parallelMinimumSize *= 4;
-
-	// 16 kb minimum
-	if (m_parallelBlockSize == 0 || m_parallelBlockSize < PRC_DATACACHE)
-		m_parallelBlockSize = (m_parallelMaxDegree * PRC_DATACACHE) - ((m_parallelMaxDegree * PRC_DATACACHE) % m_parallelMinimumSize);
-	else
-		m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
-}
-
 void CMG::Transform(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
 {
 	size_t blkCtr = 0;
 	const size_t SSEBLK = 4 * m_blockSize;
 	const size_t AVXBLK = 8 * m_blockSize;
 
-	if (m_hasAVX2 && Length >= AVXBLK)
+	if (m_parallelProfile.HasSimd256() && Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		std::vector<byte> ctrBlk(AVXBLK);
@@ -421,26 +343,26 @@ void CMG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		while (blkCtr != PBKALN)
 		{
 			memcpy(&ctrBlk[0], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[16], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[32], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[48], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[64], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[80], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[96], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[112], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			m_blockCipher->Transform128(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVXBLK;
 		}
 	}
-	else if (m_hasSSE && Length >= SSEBLK)
+	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
 	{
 		const size_t PBKALN = Length - (Length % SSEBLK);
 		std::vector<byte> ctrBlk(SSEBLK);
@@ -449,13 +371,13 @@ void CMG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		while (blkCtr != PBKALN)
 		{
 			memcpy(&ctrBlk[0], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[16], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[32], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			memcpy(&ctrBlk[48], &Counter[0], Counter.size());
-			Increment(Counter);
+			ArrayUtils::IncrementBE8(Counter);
 			m_blockCipher->Transform64(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += SSEBLK;
 		}
@@ -466,7 +388,7 @@ void CMG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 	while (blkCtr != BLKALN)
 	{
 		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + blkCtr);
-		Increment(Counter);
+		ArrayUtils::IncrementBE8(Counter);
 		blkCtr += m_blockSize;
 	}
 
@@ -477,7 +399,7 @@ void CMG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		m_blockCipher->EncryptBlock(Counter, outputBlock);
 		const size_t FNLSZE = Length % m_blockSize;
 		memcpy(&Output[OutOffset + (Length - FNLSZE)], &outputBlock[0], FNLSZE);
-		Increment(Counter);
+		ArrayUtils::IncrementBE8(Counter);
 	}
 }
 

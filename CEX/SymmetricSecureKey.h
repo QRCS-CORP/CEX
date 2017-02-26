@@ -68,14 +68,7 @@ public:
 	/// <summary>
 	/// Instantiate an empty container
 	/// </summary>
-	SymmetricSecureKey()
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_keySizes(0, 0, 0),
-		m_keyState(0)
-	{
-	}
+	SymmetricSecureKey();
 
 	/// <summary>
 	/// Instantiate this class with an encryption key.
@@ -84,27 +77,7 @@ public:
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, uint64_t KeySalt = 0)
-		:
-		m_isDestroyed(false),
-		m_keySizes(Key.size(), 0, 0),
-		m_keySalt(0),
-		m_keyState(0)
-	{
-		if (Key.size() == 0)
-			throw CryptoProcessingException("SymmetricSecureKey:Ctor", "The key can not be zero sized!");
-
-		m_keyState.resize(m_keySizes.KeySize());
-		memcpy(&m_keyState[0], &Key[0], m_keySizes.KeySize());
-
-		if (KeySalt != 0)
-		{
-			m_keySalt.resize(sizeof(uint64_t));
-			memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
-		}
-
-		Transform();
-	}
+	explicit SymmetricSecureKey(const std::vector<byte> &Key, uint64_t KeySalt = 0);
 
 	/// <summary>
 	/// Instantiate this class with an encryption key, and nonce parameters.
@@ -114,28 +87,7 @@ public:
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, uint64_t KeySalt = 0)
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_keySizes(Key.size(), Nonce.size(), 0),
-		m_keyState(0)
-	{
-		if (Key.size() == 0 || Nonce.size() == 0)
-			throw CryptoProcessingException("SymmetricSecureKey:Ctor", "The key and nonce can not be zero sized!");
-
-		m_keyState.resize(m_keySizes.KeySize() + m_keySizes.NonceSize());
-		memcpy(&m_keyState[0], &Key[0], m_keySizes.KeySize());
-		memcpy(&m_keyState[m_keySizes.KeySize()], &Nonce[0], m_keySizes.NonceSize());
-
-		if (KeySalt != 0)
-		{
-			m_keySalt.resize(sizeof(uint64_t));
-			memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
-		}
-
-		Transform();
-	}
+	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, uint64_t KeySalt = 0);
 
 	/// <summary>
 	/// Instantiate this class with an encryption key, nonce, and info parameters.
@@ -146,37 +98,12 @@ public:
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, uint64_t KeySalt = 0)
-		:
-		m_isDestroyed(false),
-		m_keySalt(0),
-		m_keySizes(Key.size(), Nonce.size(), Info.size()),
-		m_keyState(0)
-	{
-		if (Key.size() == 0 || Nonce.size() == 0 || Info.size() == 0)
-			throw CryptoProcessingException("SymmetricSecureKey:Ctor", "The key, nonce, and info can not be zero sized!");
-
-		m_keyState.resize(m_keySizes.KeySize() + m_keySizes.NonceSize() + m_keySizes.InfoSize());
-		memcpy(&m_keyState[0], &Key[0], m_keySizes.KeySize());
-		memcpy(&m_keyState[m_keySizes.KeySize()], &Nonce[0], m_keySizes.NonceSize());
-		memcpy(&m_keyState[m_keySizes.KeySize() + m_keySizes.NonceSize()], &Info[0], m_keySizes.InfoSize());
-
-		if (KeySalt != 0)
-		{
-			m_keySalt.resize(sizeof(uint64_t));
-			memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
-		}
-
-		Transform();
-	}
+	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, uint64_t KeySalt = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SymmetricSecureKey()
-	{
-		Destroy();
-	}
+	virtual ~SymmetricSecureKey();
 
 	//~~~Public Functions~~~//
 

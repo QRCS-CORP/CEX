@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -52,19 +52,19 @@ using Digest::IDigest;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>KDF2 uses a hash digest as a pseudo random function to produce pseudo-random output in a process known as key stretching.<br>
-/// Using the same input key, and optional salt and information strings, produces the exact same output.<br>
+/// <para>KDF2 uses a hash digest as a pseudo random function to produce pseudo-random output in a process known as key stretching.<BR></BR>
+/// Using the same input key, and optional salt and information strings, produces the exact same output.<BR></BR>
 /// It is recommended that a salt value is added along with the key, this mitigates some attacks against the function.</para>
 /// 
-/// <description><B>Description:</B></description><br>
-/// <EM>Legend:</EM><br>
-/// <B>Z</B>=key, <B>T</B>=output-key, <B>hlen</B>=digest-length, <B>kLen</B>=output-length<br>
-/// <para><EM>Generate:</EM><br>
-/// 1) Set d = ceiling(kLen/hLen).<br>
-/// 2) Set T = "".<br>
-/// 3) for Counter = 1 to d-1 do:<br>
-///		 C = IntegerToString(Counter, 4).<br>
-///		 T = T || Hash(Z || C || [OtherInfo]).<br>
+/// <description><B>Description:</B></description><BR></BR>
+/// <EM>Legend:</EM><BR></BR>
+/// <B>Z</B>=key, <B>T</B>=output-key, <B>hlen</B>=digest-length, <B>kLen</B>=output-length<BR></BR>
+/// <para><EM>Generate:</EM><BR></BR>
+/// 1) Set d = ceiling(kLen/hLen).<BR></BR>
+/// 2) Set T = "".<BR></BR>
+/// 3) for Counter = 1 to d-1 do:<BR></BR>
+///		 C = IntegerToString(Counter, 4).<BR></BR>
+///		 T = T || Hash(Z || C || [OtherInfo]).<BR></BR>
 /// 4) Output the first kLen bytes of T as K.</para> 
 ///
 /// <description><B>Implementation Notes:</B></description>
@@ -89,6 +89,7 @@ private:
 
 	const size_t MIN_SALTLEN = 4;
 
+	IDigest* m_msgDigest;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	size_t m_hashSize;
@@ -98,7 +99,6 @@ private:
 	Digests m_kdfDigestType;
 	std::vector<byte> m_kdfKey;
 	std::vector<byte> m_kdfSalt;
-	IDigest* m_kdfDigest;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 
 public:
@@ -139,68 +139,29 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Creates a KDF2 generator using a message digest type name
+	/// Instantiates a KDF2 generator using a message digest type name
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The hash functions type name enumeral</param>
+	/// <param name="DigestType">The hash functions type-name enumeral</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name or iterations count is used</exception>
-	explicit KDF2(Digests DigestType)
-		:
-		m_blockSize(0),
-		m_destroyEngine(true),
-		m_hashSize(0),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(1),
-		m_kdfDigestType(Digests::None),
-		m_kdfKey(0),
-		m_kdfSalt(0),
-		m_legalKeySizes(0)
-	{
-		if (DigestType == Digests::None)
-			throw CryptoKdfException("KDF2:CTor", "Digest type can not be none!");
-
-		m_kdfDigest = LoadDigest(DigestType);
-		LoadState();
-	}
+	explicit KDF2(Digests DigestType);
 
 	/// <summary>
-	/// Creates a KDF2 generator using a message digest instance
+	/// Instantiates a KDF2 generator using a message digest instance
 	/// </summary>
 	/// 
 	/// <param name="Digest">The initialized message digest instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if a null digest is used</exception>
-	explicit KDF2(Digest::IDigest* Digest)
-		:
-		m_blockSize(0),
-		m_destroyEngine(false),
-		m_hashSize(0),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(1),
-		m_kdfDigestType(Digests::None),
-		m_kdfKey(0),
-		m_kdfSalt(0),
-		m_kdfDigest(Digest),
-		m_legalKeySizes(0)
-	{
-		if (Digest == 0)
-			throw CryptoKdfException("HKDF:CTor", "The Digest can not be null!");
-
-		LoadState();
-	}
+	explicit KDF2(Digest::IDigest* Digest);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~KDF2()
-	{
-		Destroy();
-	}
+	virtual ~KDF2();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -263,22 +224,21 @@ public:
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info);
 
 	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
-	/// </summary>
-	virtual void Reset();
-
-	/// <summary>
 	/// Update the generators keying material
 	/// </summary>
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
-	virtual void Update(const std::vector<byte> &Seed);
+	virtual void ReSeed(const std::vector<byte> &Seed);
+
+	/// <summary>
+	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// </summary>
+	virtual void Reset();
 
 private:
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	IDigest* LoadDigest(Digests DigestType);
 	void LoadState();
 };
 

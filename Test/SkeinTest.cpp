@@ -48,9 +48,9 @@ namespace Test
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
-		Digest->BlockUpdate(Input, 0, Input.size());
-		Digest->DoFinal(hash, 0);
-		// must call reset with skein if using DoFinal method!
+		Digest->Update(Input, 0, Input.size());
+		Digest->Finalize(hash, 0);
+		// must call reset with skein if using Finalize method!
 		Digest->Reset();
 
 		if (Expected != hash)

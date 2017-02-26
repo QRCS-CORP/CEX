@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -53,7 +53,7 @@ NAMESPACE_DIGEST
 /// </example>
 ///
 /// <example>
-/// <description>Use the BlockUpdate method for large data sizes:</description>
+/// <description>Use the Update method for large data sizes:</description>
 /// <code>
 /// BlakeB512 dgt;
 /// std:vector&lt;uint8_t&gt; hash(dgt.DigestSize(), 0);
@@ -62,15 +62,15 @@ NAMESPACE_DIGEST
 /// // update blocks
 /// while (len > dgt.DigestSize())
 /// {
-///		dgt.BlockUpdate(input, offset, len);
+///		dgt.Update(input, offset, len);
 ///		offset += dgt.DigestSize();
 ///		len -= dgt.DigestSize();
 /// }
 ///
 /// if (len > 0)
-///		dgt.BlockUpdate(input, offset, len);
+///		dgt.Update(input, offset, len);
 ///
-/// dgt.DoFinal(hash, 0);
+/// dgt.Finalize(hash, 0);
 /// </code>
 /// </example>
 /// 
@@ -80,12 +80,12 @@ NAMESPACE_DIGEST
 /// <item><description>Algorithm is selected through the constructor (2B or 2BP), parallel version is selected through either the Parallel flag, or via the Blake2Params ThreadCount() configuration parameter.</description></item>
 /// <item><description>Parallel and sequential algorithms (Blake2B or Blake2BP) produce different digest outputs, this is expected.</description></item>
 /// <item><description>Sequential Block size 128 bytes, (1024 bits), but smaller or larger blocks can be processed, for best performance, align message input to a multiple of the internal block size.</description></item>
-/// <item><description>Parallel Block input size to the BlockUpdate function should be aligned to a multiple of ParallelMinimumSize() for best performance.</description></item>
+/// <item><description>Parallel Block input size to the Update function should be aligned to a multiple of ParallelMinimumSize() for best performance.</description></item>
 /// <item><description>Best performance for parallel mode is to use a large input block size to minimize parallel loop creation cost, block size should be in a range of 32KiB to 25MiB.</description></item>
 /// <item><description>The number of threads used in parallel mode can be user defined through the Blake2Params->ThreadCount property to any even number of threads; note that hash output value will change with threadcount.</description></item>
 /// <item><description>Digest output size is fixed at 64 bytes, (512 bits).</description></item>
-/// <item><description>The <see cref="Compute(uint8_t[])"/> method wraps the <see cref="BlockUpdate(uint8_t[], size_t, size_t)"/> and DoFinal methods</description>/></item>
-/// <item><description>The <see cref="DoFinal(uint8_t[], size_t)"/> method resets the internal state.</description></item>
+/// <item><description>The <see cref="Compute(uint8_t[])"/> method wraps the <see cref="Update(uint8_t[], size_t, size_t)"/> and Finalize methods</description>/></item>
+/// <item><description>The <see cref="Finalize(uint8_t[], size_t)"/> method resets the internal state.</description></item>
 /// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
 /// <item><description>SIMD implementation requires compilation with SSSE3 or higher.</description></item>
 /// </list>
@@ -142,7 +142,7 @@ private:
 	};
 
 	std::vector<uint64_t> m_cIV;
-	bool m_hasSSE;
+	bool m_hasSimd128;
 	bool m_isDestroyed;
 	bool m_isParallel;
 	uint32_t m_leafSize;
@@ -218,41 +218,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2BP variant.</param>
-	explicit BlakeB512(bool Parallel = false)
-		:
-		m_cIV({ 0x6A09E667F3BCC908UL, 0xBB67AE8584CAA73BUL, 0x3C6EF372FE94F82BUL, 0xA54FF53A5F1D36F1UL, 0x510E527FADE682D1UL, 0x9B05688C2B3E6C1FUL, 0x1F83D9ABFB41BD6BUL, 0x5BE0CD19137E2179UL }),
-		m_hasSSE(false),
-		m_isDestroyed(false),
-		m_isParallel(Parallel),
-		m_leafSize(Parallel ? DEF_LEAFSIZE : BLOCK_SIZE),
-		m_minParallel(0),
-		m_msgBuffer(Parallel ? 2 * PARALLEL_DEG * BLOCK_SIZE : BLOCK_SIZE),
-		m_msgLength(0),
-		m_State(Parallel ? PARALLEL_DEG : 1),
-		m_treeConfig(8),
-		m_treeDestroy(true)
-	{
-		// intrinsics support switch
-		Detect();
-
-		if (m_isParallel)
-		{
-			// sets defaults of depth 2, fanout 4, 4 threads
-			m_treeParams = Blake2Params((uint8_t)DIGEST_SIZE, 0, 4, 2, 0, 0, 0, (uint8_t)DIGEST_SIZE, 4);
-			// minimum block size
-			m_minParallel = PARALLEL_DEG * BLOCK_SIZE;
-			// default parallel input block expected is Pn * 16384 bytes
-			m_parallelBlockSize = m_leafSize * PARALLEL_DEG;
-			// initialize the leaf nodes
-			Reset();
-		}
-		else
-		{
-			// default depth 1, fanout 1, leaf length unlimited
-			m_treeParams = Blake2Params((uint8_t)DIGEST_SIZE, 0, 1, 1, 0, 0, 0, 0, 0);
-			Initialize(m_treeParams, m_State[0]);
-		}
-	}
+	explicit BlakeB512(bool Parallel = false);
 
 	/// <summary>
 	/// Initialize the class with a Blake2Params structure.
@@ -263,75 +229,14 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Params">The Blake2Params structure, containing the tree configuration settings.</param>
-	explicit BlakeB512(Blake2Params &Params)
-		:
-		m_hasSSE(false),
-		m_isDestroyed(false),
-		m_isParallel(false),
-		m_leafSize(BLOCK_SIZE),
-		m_minParallel(0),
-		m_msgBuffer(Params.ParallelDegree() > 0 ? 2 * Params.ParallelDegree() * BLOCK_SIZE : BLOCK_SIZE),
-		m_msgLength(0),
-		m_State(Params.ParallelDegree() > 0 ? Params.ParallelDegree() : 1),
-		m_treeConfig(CHAIN_SIZE),
-		m_treeDestroy(false),
-		m_treeParams(Params)
-	{
-		m_isParallel = m_treeParams.ParallelDegree() > 1;
-		m_cIV =
-		{
-			0x6A09E667F3BCC908UL, 0xBB67AE8584CAA73BUL, 0x3C6EF372FE94F82BUL, 0xA54FF53A5F1D36F1UL,
-			0x510E527FADE682D1UL, 0x9B05688C2B3E6C1FUL, 0x1F83D9ABFB41BD6BUL, 0x5BE0CD19137E2179UL
-		};
-
-		// intrinsics support switch
-		Detect();
-
-		if (m_isParallel)
-		{
-			if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
-				throw CryptoDigestException("BlakeBP512:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
-			if (Params.ParallelDegree() < 2 || Params.ParallelDegree() % 2 != 0)
-				throw CryptoDigestException("BlakeBP512:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
-
-			m_minParallel = m_treeParams.ParallelDegree() * BLOCK_SIZE;
-			m_leafSize = Params.LeafLength() == 0 ? DEF_LEAFSIZE : Params.LeafLength();
-			// set parallel block size as Pn * leaf size 
-			m_parallelBlockSize = Params.ParallelDegree() * m_leafSize;
-			// initialize leafs
-			Reset();
-		}
-		else
-		{
-			// fixed at defaults for sequential; depth 1, fanout 1, leaf length unlimited
-			m_treeParams = Blake2Params((uint8_t)DIGEST_SIZE, 0, 1, 1, 0, 0, 0, 0, 0);
-			Initialize(m_treeParams, m_State[0]);
-		}
-	}
+	explicit BlakeB512(Blake2Params &Params);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~BlakeB512()
-	{
-		Destroy();
-	}
+	virtual ~BlakeB512();
 
-	//~~~Public Methods~~~//
-
-	/// <summary>
-	/// Update the message buffer
-	/// </summary>
-	///
-	/// <remarks>
-	/// <para>For best performance in parallel mode, use block sizes that are evenly divisible by ParallelMinimumSize() to reduce caching.
-	/// Block size for parallel mode should be in a range of minimum 32KiB to 25MiB, larger block sizes reduce the impact of parallel loop creation.</para>
-	/// </remarks>
-	/// 
-	/// <param name="Input">The Input message data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">The amount of data to process in bytes</param>
-	virtual void BlockUpdate(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length);
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Process the message data and return the Hash value
@@ -356,14 +261,14 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual size_t DoFinal(std::vector<uint8_t> &Output, const size_t OutOffset);
+	virtual size_t Finalize(std::vector<uint8_t> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the digest as a counter based DRBG
 	/// </summary>
 	/// 
 	/// <param name="MacKey">The input key parameters; the input Key must be a minimum of 64 bytes, maximum of combined Key, Salt, and Info, must be 128 bytes or less</param>
-	/// <param name="Output">The psuedo random output</param>
+	/// <param name="Output">The pseudo random output</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
 	size_t Generate(ISymmetricKey &MacKey, std::vector<uint8_t> &Output);
@@ -390,10 +295,22 @@ public:
 	/// <param name="Input">Input message byte</param>
 	virtual void Update(uint8_t Input);
 
+	/// <summary>
+	/// Update the message buffer
+	/// </summary>
+	///
+	/// <remarks>
+	/// <para>For best performance in parallel mode, use block sizes that are evenly divisible by ParallelMinimumSize() to reduce caching.
+	/// Block size for parallel mode should be in a range of minimum 32KiB to 25MiB, larger block sizes reduce the impact of parallel loop creation.</para>
+	/// </remarks>
+	/// 
+	/// <param name="Input">The Input message data</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="Length">The amount of data to process in bytes</param>
+	virtual void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length);
+
 private:
 	void Detect();
-	void Increase(Blake2bState &State, uint64_t Length);
-	void Increment(std::vector<uint8_t> &Counter);
 	void Initialize(Blake2Params &Params, Blake2bState &State);
 	void ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, size_t Length);
 	void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2bState &State, uint64_t Length);

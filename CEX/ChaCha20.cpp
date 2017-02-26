@@ -1,71 +1,86 @@
 #include "ChaCha20.h"
 #include "ChaCha.h"
 #include "ArrayUtils.h"
-#include "CpuDetect.h"
-#include "IntUtils.h"
-#include "ParallelUtils.h"
 
 NAMESPACE_STREAM
 
-using Utility::IntUtils;
+using Utility::ArrayUtils;
+
+const std::string ChaCha20::SIGMA_INFO = "expand 32-byte k";
+const std::string ChaCha20::TAU_INFO = "expand 16-byte k";
+
+//~~~Constructor~~~//
+
+ChaCha20::ChaCha20(size_t Rounds)
+	:
+	m_ctrVector(2, 0),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true),
+	m_rndCount(Rounds),
+	m_wrkState(14, 0)
+{
+	if (Rounds == 0 || (Rounds & 1) != 0)
+		throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
+	if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
+		throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be between 8 and 30!");
+
+	Scope();
+}
+
+ChaCha20::~ChaCha20()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void ChaCha20::Destroy()
 {
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_hasAVX2 = false;
-		m_hasSSE = false;
 		m_isInitialized = false;
-		m_processorCount = 0;
-		m_isParallel = false;
-		m_parallelBlockSize = 0;
-		m_parallelMaxDegree = 0;
-		m_parallelMinimumSize = 0;
+		m_parallelProfile.Reset();
 		m_rndCount = 0;
-		Utility::ArrayUtils::ClearVector(m_ctrVector);
-		Utility::ArrayUtils::ClearVector(m_wrkState);
-		Utility::ArrayUtils::ClearVector(m_dstCode);
-		Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-		Utility::ArrayUtils::ClearVector(m_legalRounds);
+		ArrayUtils::ClearVector(m_ctrVector);
+		ArrayUtils::ClearVector(m_wrkState);
+		ArrayUtils::ClearVector(m_dstCode);
+		ArrayUtils::ClearVector(m_legalKeySizes);
+		ArrayUtils::ClearVector(m_legalRounds);
 	}
 }
 
-void ChaCha20::Initialize(ISymmetricKey &KeyParam)
+void ChaCha20::Initialize(ISymmetricKey &KeyParams)
 {
 	// recheck params
 	Scope();
 
-	if (KeyParam.Nonce().size() != 8)
+	if (KeyParams.Nonce().size() != 8)
 		throw CryptoSymmetricCipherException("ChaCha20:Initialize", "Requires exactly 8 bytes of Nonce!");
-	if (KeyParam.Key().size() != 16 && KeyParam.Key().size() != 32)
+	if (KeyParams.Key().size() != 16 && KeyParams.Key().size() != 32)
 		throw CryptoSymmetricCipherException("ChaCha20:Initialize", "Key must be 16 or 32 bytes!");
-	if (IsParallel() && ParallelBlockSize() < ParallelMinimumSize() || ParallelBlockSize() > ParallelMaximumSize())
+	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
 		throw CryptoSymmetricCipherException("ChaCha20:Initialize", "The parallel block size is out of bounds!");
-	if (IsParallel() && ParallelBlockSize() % ParallelMinimumSize() != 0)
+	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
 		throw CryptoSymmetricCipherException("ChaCha20:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
 
-
-	if (KeyParam.Info().size() != 0)
+	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		m_dstCode = KeyParam.Info();
+		m_dstCode = KeyParams.Info();
 	}
 	else
 	{
-		std::string info;
-		if (KeyParam.Key().size() == 16)
-			info = "expand 16-byte k";
+		if (KeyParams.Key().size() == 32)
+			m_dstCode.assign(SIGMA_INFO.begin(), SIGMA_INFO.end());
 		else
-			info = "expand 32-byte k";
-
-		m_dstCode.reserve(info.size());
-		for (size_t i = 0; i < info.size(); ++i)
-			m_dstCode.push_back(info[i]);
+			m_dstCode.assign(TAU_INFO.begin(), TAU_INFO.end());
 	}
 
 	Reset();
-	Expand(KeyParam.Key(), KeyParam.Nonce());
+	Expand(KeyParams.Key(), KeyParams.Nonce());
 	m_isInitialized = true;
 }
 
@@ -75,11 +90,10 @@ void ChaCha20::ParallelMaxDegree(size_t Degree)
 		throw CryptoSymmetricCipherException("ChaCha20::ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
 		throw CryptoSymmetricCipherException("ChaCha20::ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_processorCount)
+	if (Degree > m_parallelProfile.ProcessorCount())
 		throw CryptoSymmetricCipherException("ChaCha20::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
-	m_parallelMaxDegree = Degree;
-	Scope();
+	m_parallelProfile.SetMaxDegree(Degree);
 }
 
 void ChaCha20::Reset()
@@ -95,7 +109,7 @@ void ChaCha20::Transform(const std::vector<byte> &Input, std::vector<byte> &Outp
 
 void ChaCha20::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Process(Input, InOffset, Output, OutOffset, m_isParallel ? m_parallelBlockSize : BLOCK_SIZE);
+	Process(Input, InOffset, Output, OutOffset, m_parallelProfile.IsParallel() ? m_parallelProfile.ParallelBlockSize() : BLOCK_SIZE);
 }
 
 void ChaCha20::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
@@ -103,39 +117,7 @@ void ChaCha20::Transform(const std::vector<byte> &Input, const size_t InOffset, 
 	Process(Input, InOffset, Output, OutOffset, Length);
 }
 
-//~~~Private Methods~~~//
-
-void ChaCha20::Detect()
-{
-	try
-	{
-		Common::CpuDetect detect;
-		m_processorCount = detect.VirtualCores();
-
-		if (m_processorCount == 0)
-			throw std::exception();
-		if (m_processorCount > 1 && m_processorCount % 2 != 0)
-			m_processorCount--;
-
-		m_hasSSE = detect.SSE();
-		m_hasAVX2 = detect.AVX2();
-		m_parallelBlockSize = detect.L1DataCacheTotal();
-
-	}
-	catch (...)
-	{
-		m_processorCount = Utility::ParallelUtils::ProcessorCount();
-
-		if (m_processorCount == 0)
-			m_processorCount = 1;
-		if (m_processorCount > 1 && m_processorCount % 2 != 0)
-			m_processorCount--;
-
-		m_hasSSE = false;
-		m_hasAVX2 = false;
-		m_parallelBlockSize = m_processorCount * PRC_DATACACHE;
-	}
-}
+//~~~Private Functions~~~//
 
 void ChaCha20::Expand(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 {
@@ -176,27 +158,13 @@ void ChaCha20::Expand(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 	}
 }
 
-void ChaCha20::Increase(const std::vector<uint> &Input, std::vector<uint> &Output, const size_t Length)
-{
-	Output = Input;
-
-	for (size_t i = 0; i < Length; i++)
-		Increment(Output);
-}
-
-void ChaCha20::Increment(std::vector<uint> &Counter)
-{
-	if (++Counter[0] == 0)
-		++Counter[1];
-}
-
 void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter, const size_t Length)
 {
 	size_t ctr = 0;
 	const size_t SSEBLK = 4 * BLOCK_SIZE;
 	const size_t AVXBLK = 8 * BLOCK_SIZE;
 
-	if (m_hasAVX2 && Length >= AVXBLK)
+	if (m_parallelProfile.HasSimd256() && Length >= AVXBLK)
 	{
 		size_t paln = Length - (Length % AVXBLK);
 		std::vector<uint> ctrBlk(16);
@@ -206,33 +174,33 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 		{
 			memcpy(&ctrBlk[0], &Counter[0], 4);
 			memcpy(&ctrBlk[8], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[1], &Counter[0], 4);
 			memcpy(&ctrBlk[9], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[2], &Counter[0], 4);
 			memcpy(&ctrBlk[10], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[3], &Counter[0], 4);
 			memcpy(&ctrBlk[11], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[4], &Counter[0], 4);
 			memcpy(&ctrBlk[12], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[5], &Counter[0], 4);
 			memcpy(&ctrBlk[13], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[6], &Counter[0], 4);
 			memcpy(&ctrBlk[14], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[7], &Counter[0], 4);
 			memcpy(&ctrBlk[15], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			ChaCha::Transform512(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVXBLK;
 		}
 	}
-	else if (m_hasSSE && Length >= SSEBLK)
+	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
 	{
 		size_t paln = Length - (Length % SSEBLK);
 		std::vector<uint> ctrBlk(8);
@@ -242,16 +210,16 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 		{
 			memcpy(&ctrBlk[0], &Counter[0], 4);
 			memcpy(&ctrBlk[4], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[1], &Counter[0], 4);
 			memcpy(&ctrBlk[5], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[2], &Counter[0], 4);
 			memcpy(&ctrBlk[6], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			memcpy(&ctrBlk[3], &Counter[0], 4);
 			memcpy(&ctrBlk[7], &Counter[1], 4);
-			Increment(Counter);
+			ArrayUtils::IncrementLE32(Counter);
 			ChaCha::Transform256(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += SSEBLK;
 		}
@@ -261,7 +229,7 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 	while (ctr != ALNSZE)
 	{
 		ChaCha::Transform64(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
-		Increment(Counter);
+		ArrayUtils::IncrementLE32(Counter);
 		ctr += BLOCK_SIZE;
 	}
 
@@ -271,7 +239,7 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 		ChaCha::Transform64(outputBlock, 0, Counter, m_wrkState, m_rndCount);
 		const size_t FNLSZE = Length % BLOCK_SIZE;
 		memcpy(&Output[OutOffset + (Length - FNLSZE)], &outputBlock[0], FNLSZE);
-		Increment(Counter);
+		ArrayUtils::IncrementLE32(Counter);
 	}
 }
 
@@ -279,7 +247,7 @@ void ChaCha20::Process(const std::vector<byte> &Input, const size_t InOffset, st
 {
 	const size_t PRCSZE = (Length >= Input.size() - InOffset) && Length >= Output.size() - OutOffset ? IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) : Length;
 
-	if (!m_isParallel || PRCSZE < m_parallelMinimumSize)
+	if (!m_parallelProfile.IsParallel() || PRCSZE < m_parallelProfile.ParallelMinimumSize())
 	{
 		// generate random
 		Generate(Output, OutOffset, m_ctrVector, PRCSZE);
@@ -299,23 +267,23 @@ void ChaCha20::Process(const std::vector<byte> &Input, const size_t InOffset, st
 	else
 	{
 		// parallel CTR processing //
-		const size_t CNKSZE = (PRCSZE / BLOCK_SIZE / m_parallelMaxDegree) * BLOCK_SIZE;
-		const size_t RNDSZE = CNKSZE * m_parallelMaxDegree;
+		const size_t CNKSZE = (PRCSZE / BLOCK_SIZE / m_parallelProfile.ParallelMaxDegree()) * BLOCK_SIZE;
+		const size_t RNDSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
 		const size_t CTRLEN = (CNKSZE / BLOCK_SIZE);
 		std::vector<uint> tmpCtr(m_ctrVector.size());
 
-		Utility::ParallelUtils::ParallelFor(0, m_parallelMaxDegree, [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
+		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
 		{
 			// thread level counter
 			std::vector<uint> thdCtr(m_ctrVector.size());
 			// offset counter by chunk size / block size
-			this->Increase(m_ctrVector, thdCtr, CTRLEN * i);
+			ArrayUtils::IncreaseLE32(m_ctrVector, thdCtr, CTRLEN * i);
 			// create random at offset position
 			this->Generate(Output, (i * CNKSZE), thdCtr, CNKSZE);
 			// xor with input at offset
-			IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, HasSSE());
+			IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, m_parallelProfile.HasSimd128());
 			// store last counter
-			if (i == m_parallelMaxDegree - 1)
+			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 				memcpy(&tmpCtr[0], &thdCtr[0], CTR_SIZE);
 		});
 
@@ -336,33 +304,6 @@ void ChaCha20::Process(const std::vector<byte> &Input, const size_t InOffset, st
 
 void ChaCha20::Scope()
 {
-	Detect();
-
-	m_processorCount = Utility::ParallelUtils::ProcessorCount();
-	if (m_processorCount % 2 != 0)
-		m_processorCount--;
-
-	if (m_parallelMaxDegree == 1)
-		m_isParallel = false;
-	else if (!m_isInitialized)
-		m_isParallel = (m_processorCount > 1);
-
-	if (m_parallelMaxDegree == 0)
-		m_parallelMaxDegree = m_processorCount;
-
-	m_parallelMinimumSize = m_parallelMaxDegree * BLOCK_SIZE;
-
-	if (m_hasAVX2)
-		m_parallelMinimumSize *= 8;
-	else if (m_hasSSE)
-		m_parallelMinimumSize *= 4;
-
-	// 16 kb minimum
-	if (m_parallelBlockSize == 0 || m_parallelBlockSize < PRC_DATACACHE / 2)
-		m_parallelBlockSize = (m_processorCount * PRC_DATACACHE) - ((m_processorCount * PRC_DATACACHE) % m_parallelMinimumSize);
-	else
-		m_parallelBlockSize = m_parallelBlockSize - (m_parallelBlockSize % m_parallelMinimumSize);
-
 	m_legalKeySizes.resize(2);
 	m_legalKeySizes[0] = SymmetricKeySize(16, 8, 0);
 	m_legalKeySizes[1] = SymmetricKeySize(32, 8, 0);

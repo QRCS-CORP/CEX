@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -58,7 +58,7 @@ private:
 	std::vector<byte> m_byteBuffer;
 	bool m_isDestroyed;
 	IProvider* m_rngGenerator;
-	Providers m_seedType;
+	Providers m_pvdType;
 
 	SecureRandom(const SecureRandom&) = delete;
 	SecureRandom& operator=(const SecureRandom&) = delete;
@@ -76,28 +76,14 @@ public:
 	/// <param name="BufferSize">Size of the internal buffer; must be at least 64 bytes</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if buffer size is too small</exception>
-	explicit SecureRandom(Providers ProviderType = Providers::CSP, size_t BufferSize = 4096)
-		:
-		m_bufferIndex(0),
-		m_bufferSize(BufferSize),
-		m_byteBuffer(BufferSize),
-		m_isDestroyed(false),
-		m_seedType(ProviderType)
-	{
-		if (BufferSize < 64)
-			throw CryptoRandomException("SecureRandom:Ctor", "Buffer size must be at least 64 bytes!");
-
-		Reset();
-	}
+	explicit SecureRandom(Providers ProviderType = Providers::CSP, size_t BufferSize = 4096);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SecureRandom()
-	{
-		Destroy();
-	}
+	virtual ~SecureRandom();
 
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

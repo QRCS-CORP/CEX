@@ -14,7 +14,7 @@ enum class BlockCiphers : uint8_t
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An AES-NI implementation based on the Rijndael Block Cipher extended with an HKDF key schedule
+	/// An AES-NI implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF key schedule
 	/// </summary>
 	AHX = 1,
 	/// <summary>
@@ -40,7 +40,7 @@ enum class BlockCiphers : uint8_t
 	/// <summary>
 	/// An implementation based on the Twofish Block Cipher extended with an HKDF key schedule
 	/// </summary>
-	THX = 64,
+	THX = 64
 };
 
 NAMESPACE_ENUMERATIONEND

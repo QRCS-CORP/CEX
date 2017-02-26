@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -28,14 +28,15 @@
 
 #include "IKdf.h"
 #include "Digests.h"
-#include "HMAC.h"
 #include "IDigest.h"
+#include "HMAC.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
-using Mac::HMAC;
 using Digest::IDigest;
+using Mac::HMAC;
+
 
 /// <summary>
 /// An implementation of the Passphrase Based Key Derivation Version 2 (PBKDF2)
@@ -55,21 +56,21 @@ using Digest::IDigest;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>PBKDF2 uses an HMAC as a pseudo random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching.<br>
-/// By increasing the number of iterations in which the function is applied, the amount of time required to derive the key becomes more computationally expensive.<br>
+/// <para>PBKDF2 uses an HMAC as a pseudo random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching.<BR></BR>
+/// By increasing the number of iterations in which the function is applied, the amount of time required to derive the key becomes more computationally expensive.<BR></BR>
 /// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
 /// 
-/// <description><B>Description:</B></description><br>
-/// <EM>Legend:</EM><br>
-/// <B>DK</B>=derived-key, <B>c</B>=iterations, <B>hlen</B>=digest-length, <B>dkLen</B>=output-length<br>
-/// <para><EM>Generate:</EM><br>
+/// <description><B>Description:</B></description><BR></BR>
+/// <EM>Legend:</EM><BR></BR>
+/// <B>DK</B>=derived-key, <B>c</B>=iterations, <B>hlen</B>=digest-length, <B>dkLen</B>=output-length<BR></BR>
+/// <para><EM>Generate:</EM><BR></BR>
 /// The function takes as parameters the passphrase, salt, the iterations count, and the output length.
-/// DK = PBKDF2(Password, Salt, c, dkLen).<br>
-/// DK = T1 || T2 || ... || Td klen/hlen<br>
-/// The function F is the XOR of (c) iterations of chained PRFs<br>
-/// The first iteration uses the password as the PRF key and salt concatenated with an incrementing counter (i).<br>
-/// Ti = F(Password, Salt, c, i)<br>
-/// Subsequent iterations use the passphrase as the key and the output of the previous computation as the salt.<br>
+/// DK = PBKDF2(Password, Salt, c, dkLen).<BR></BR>
+/// DK = T1 || T2 || ... || Td klen/hlen<BR></BR>
+/// The function F is the XOR of (c) iterations of chained PRFs<BR></BR>
+/// The first iteration uses the password as the PRF key and salt concatenated with an incrementing counter (i).<BR></BR>
+/// Ti = F(Password, Salt, c, i)<BR></BR>
+/// Subsequent iterations use the passphrase as the key and the output of the previous computation as the salt.<BR></BR>
 /// U2 = PRF(Password, U1), U3 = PRF(Password, U2) ... Uc = PRF(Password, Uc-1).</para> 
 ///
 /// <description><B>Implementation Notes:</B></description>
@@ -98,16 +99,15 @@ private:
 	const size_t MIN_PASSLEN = 4;
 	const size_t MIN_SALTLEN = 4;
 
+	HMAC* m_macGenerator;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	uint m_kdfCounter;
-	IDigest* m_kdfDigest;
 	Digests m_kdfDigestType;
 	size_t m_kdfIterations;
 	std::vector<byte> m_kdfKey;
-	HMAC* m_kdfMac;
 	std::vector<byte> m_kdfSalt;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_macSize;
@@ -150,111 +150,41 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Creates a PBKDF2 generator using a message digest type name
+	/// Instantiates a PBKDF2 generator using a message digest type name
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The hash functions type name enumeral</param>
 	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name or iterations count is used</exception>
-	PBKDF2(Digests DigestType, size_t Iterations = 5000)
-		:
-		m_blockSize(0),
-		m_destroyEngine(true),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(1),
-		m_kdfDigest(0),
-		m_kdfDigestType(Digests::None),
-		m_kdfIterations(Iterations),
-		m_kdfKey(0),
-		m_kdfSalt(0),
-		m_legalKeySizes(0),
-		m_macSize(0)
-	{
-		if (DigestType == Digests::None)
-			throw CryptoKdfException("PBKDF2:CTor", "Digest type can not be none!");
-		if (m_kdfIterations == 0)
-			throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!");
-
-		m_kdfDigest = LoadDigest(DigestType);
-		m_kdfMac = new HMAC(m_kdfDigest);
-		LoadState();
-	}
+	PBKDF2(Digests DigestType, size_t Iterations = 5000);
 
 	/// <summary>
-	/// Creates a PBKDF2 generator using a message digest instance
+	/// Instantiates a PBKDF2 generator using a message digest instance
 	/// </summary>
 	/// 
 	/// <param name="Digest">The initialized message digest instance</param>
 	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if a null digest or iterations count is used</exception>
-	PBKDF2(IDigest* Digest, size_t Iterations = 5000)
-		:
-		m_blockSize(0),
-		m_destroyEngine(false),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(1),
-		m_kdfDigest(Digest),
-		m_kdfDigestType(Digests::None),
-		m_kdfIterations(Iterations),
-		m_kdfKey(0),
-		m_kdfSalt(0),
-		m_legalKeySizes(0),
-		m_macSize(0)
-	{
-		if (Digest == 0)
-			throw CryptoKdfException("PBKDF2:CTor", "Digest instance can not be null!");
-		if (m_kdfIterations == 0)
-			throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!");
-
-		m_kdfMac = new HMAC(m_kdfDigest);
-		LoadState();
-	}
+	PBKDF2(IDigest* Digest, size_t Iterations = 5000);
 
 	/// <summary>
-	/// Creates a PBKDF2 generator using an initialized HMAC instance
+	/// Instantiates a PBKDF2 generator using an initialized HMAC instance
 	/// </summary>
 	/// 
 	/// <param name="Mac">The initialized HMAC instance</param>
 	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if a null HMAC, or an invalid iterations count is used</exception>
-	PBKDF2(HMAC* Mac, size_t Iterations = 5000)
-		:
-		m_blockSize(0),
-		m_kdfCounter(1),
-		m_destroyEngine(false),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfDigest(0),
-		m_kdfDigestType(Digests::None),
-		m_kdfIterations(Iterations),
-		m_kdfKey(0),
-		m_kdfMac(Mac),
-		m_kdfSalt(0),
-		m_legalKeySizes(0),
-		m_macSize(0)
-	{
-		if (Mac == 0)
-			throw CryptoKdfException("PBKDF2:CTor", "HMAC instance can not be null!");
-		if (m_kdfIterations == 0)
-			throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!");
-
-		LoadState();
-	}
+	PBKDF2(HMAC* Mac, size_t Iterations = 5000);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~PBKDF2()
-	{
-		Destroy();
-	}
+	virtual ~PBKDF2();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -318,11 +248,6 @@ public:
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info);
 
 	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
-	/// </summary>
-	virtual void Reset();
-
-	/// <summary>
 	/// Update the generators salt array.
 	/// <para>The salt length <para>
 	/// </summary>
@@ -330,11 +255,15 @@ public:
 	/// <param name="Seed">The new seed value array</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
-	virtual void Update(const std::vector<byte> &Seed);
+	virtual void ReSeed(const std::vector<byte> &Seed);
+
+	/// <summary>
+	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// </summary>
+	virtual void Reset();
 
 private:
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
-	IDigest* LoadDigest(Digests DigestType);
 	void LoadState();
 	void Process(std::vector<byte> &Output, size_t OutOffset);
 };

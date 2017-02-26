@@ -18,9 +18,9 @@ namespace Test
 		const std::string DESCRIPTION = "CipherStream Processer Tests.";
 		const std::string FAILURE = "FAILURE: ";
 		const std::string SUCCESS = "SUCCESS! CipherStream tests have executed succesfully.";
-		const unsigned int MIN_ALLOC = 4096;
-		const unsigned int MAX_ALLOC = 8192;
-		const unsigned int DEF_BLOCK = 64000;
+		const int32_t MIN_ALLOC = 4096;
+		const int32_t MAX_ALLOC = 8192;
+		const int32_t DEF_BLOCK = 64000;
 
 		TestEventHandler m_progressEvent;
 		std::vector<byte> m_cmpText;
@@ -29,7 +29,7 @@ namespace Test
 		std::vector<byte> m_iv;
 		std::vector<byte> m_key;
 		std::vector<byte> m_plnText;
-		unsigned int m_processorCount;
+		size_t m_processorCount;
 
 	public:
 		/// <summary>

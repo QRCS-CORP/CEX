@@ -95,7 +95,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,7 +110,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +127,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,8 +146,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>
-      </AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -218,6 +217,7 @@
     <Text Include="..\Vectors\Nessie\serpentplain256.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Test\AEADTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\AesFipsTest.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
@@ -228,6 +228,7 @@
     <ClInclude Include="..\..\Test\CMGTest.h" />
     <ClInclude Include="..\..\Test\DCGTest.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
+    <ClInclude Include="..\..\Test\GMACTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\HMACTest.h" />
     <ClInclude Include="..\..\Test\HMGTest.h" />
@@ -262,6 +263,7 @@
     <ClInclude Include="..\..\Test\TwofishTest.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Test\AEADTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\AesFipsTest.cpp" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
@@ -273,6 +275,7 @@
     <ClCompile Include="..\..\Test\DCGTest.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp" />
+    <ClCompile Include="..\..\Test\GMACTest.cpp" />
     <ClCompile Include="..\..\Test\HKDFTest.cpp" />
     <ClCompile Include="..\..\Test\HMACTest.cpp" />
     <ClCompile Include="..\..\Test\HMGTest.cpp" />

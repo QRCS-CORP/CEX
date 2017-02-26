@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -53,78 +53,77 @@ using Enumeration::Providers;
 /// 
 /// <remarks>
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><br> 
+/// <para><EM>Legend:</EM><BR></BR> 
 /// <B>Hm</B>=hmac_function, <B>P</B>=entropy_provider, <B>R</B>=generator_state, <B>K</B>=input_key, <B>Dk</B>=derived_key, <B>Dc</B>=distribution_code, <B>Sc</B>=state_counter, <B>Kc</B>=seed_counter, <B>Df</B>=derivation_function</para>
 /// <para>
 /// <description><B>Derive:</B></description>
-/// <br>
-/// <para>
-/// Hm(K). the HMAC is first pre-initialized with the input key in the Initialize function.<br>
-/// Increment the seed counter by the bytes required for the iteration, and mac the state counter, the input key, and a length of pseudo-random bytes from the provider.<br>
-/// 1) For 1 ≤ j ≤ t, Kc = (Kc + kLen), Dk = Dk || Hm(Kc || K || P).<br>
-/// 2) Hm(Dk). -re-initialize the HMAC with the derived key.<br>
+/// <BR></BR>
+/// Hm(K). the HMAC is first pre-initialized with the input key in the Initialize function.<BR></BR>
+/// Increment the seed counter by the bytes required for the iteration, and mac the state counter, the input key, and a length of pseudo-random bytes from the provider.<BR></BR>
+/// 1) For 1 ≤ j ≤ t, Kc = (Kc + kLen), Dk = Dk || Hm(Kc || K || P).<BR></BR>
+/// 2) Hm(Dk). -re-initialize the HMAC with the derived key.<BR></BR>
 /// 3) R = P(statelen). -generate the initial state using the entropy provider.
 /// </para>
 ///
-/// <para><EM>Initialize</EM><br>
+/// <para><EM>Initialize</EM><BR></BR>
 /// The Initialize function can take up to 3 inputs; the generator Seed which is the primary key, a Nonce value of 8 bytes used to initialize the state counter,
-/// and the distribution code used in the Generate function.<br>
-/// <br>
-/// 1) Hm(K). -pre-key the HMAC.<br>
-/// 2) if (Nonce) Sc = Nonce. -set the state counter to a non-zero secret value (optional, but recommended).<br>
-/// 3) if (Info) Dc = Info. -set the distribution code (optional, but recommended).<br>
-/// 4) Dk = Df(Sc || K || P) -extract the primary seed.<br>
-/// 5) Hm(Dk). -re-initialize the HMAC with the derived key.<br>
+/// and the distribution code used in the Generate function.<BR></BR>
+/// <BR></BR>
+/// 1) Hm(K). -pre-key the HMAC.<BR></BR>
+/// 2) if (Nonce) Sc = Nonce. -set the state counter to a non-zero secret value (optional, but recommended).<BR></BR>
+/// 3) if (Info) Dc = Info. -set the distribution code (optional, but recommended).<BR></BR>
+/// 4) Dk = Df(Sc || K || P) -extract the primary seed.<BR></BR>
+/// 5) Hm(Dk). -re-initialize the HMAC with the derived key.<BR></BR>
 /// </para>
 ///
-/// <para><EM>Generate</EM><br>
-/// Increment the state counter by the bytes requested in each iteration and generate the state bytes to the generator ouput<br>
-///	1) For 1 ≤ j ≤ t, Sc = (Sc + kLen), output = output || Hm(Sc || R || Dc).<br>
-/// Loop until requested output size has been generated and written to the output array.<br>
-/// If the reseed threshold has been exceeded, re-key the HMAC.<br>
-/// 2) if (Sc > reseed_threshold) <br>
-///		K = Hm(Sc || R || Dc). -generate (internal) state for derivation key.<br>
+/// <para><EM>Generate</EM><BR></BR>
+/// Increment the state counter by the bytes requested in each iteration and generate the state bytes to the generator ouput<BR></BR>
+///	1) For 1 ≤ j ≤ t, Sc = (Sc + kLen), output = output || Hm(Sc || R || Dc).<BR></BR>
+/// Loop until requested output size has been generated and written to the output array.<BR></BR>
+/// If the reseed threshold has been exceeded, re-key the HMAC.<BR></BR>
+/// 2) if (Sc > reseed_threshold) <BR></BR>
+///		K = Hm(Sc || R || Dc). -generate (internal) state for derivation key.<BR></BR>
 ///		Dk = Df(K). -extract and re-key the HMAC, and generate a new initial state with the provider.
 /// </para>
 ///
 /// <description><B>Overview:</B></description>
-/// <para>The HMAC based generator uses a hash function in a keyed HMAC to generate pseudo-random output.<br>
+/// <para>The HMAC based generator uses a hash function in a keyed HMAC to generate pseudo-random output.<BR></BR>
 /// The HMAC is first initialized with the input seed values, then used in an internal key strengthening/derivation function to extract a key equal to the underlying hash functions internal block size,
-/// this is the most secure configuration when using a random HMAC key.<br>
+/// this is the most secure configuration when using a random HMAC key.<BR></BR>
 /// The key derivation function takes as input a seed counter, (which is incremented by the number of bytes generated in each expansion cycle), the initial seed key, 
-/// and uses an entropy provider to pad the input blocks to the HMAC, so that the hash function processes a full block of state in the hash finalizer function.<br>
+/// and uses an entropy provider to pad the input blocks to the HMAC, so that the hash function processes a full block of state in the hash finalizer function.<BR></BR>
 /// In a Merkle–Damgård construction (SHA2), the finalizer appends a code to the end of the last block, (and if the block is full, it processes a block of zero-byte padding with the code), 
-/// this is compensated for by subtracting the codes length from the random padding request length when required.<br>
+/// this is compensated for by subtracting the codes length from the random padding request length when required.<BR></BR>
 /// The generator function uses the re-keyed HMAC to process a state counter, (optionally initialized as a random value array, and incremented on each cycle iteration by the required number of bytes copied from a block), 
-/// an initial random state array generated by the random provider, and the optional DistributionCode array, (set either through the property or the Info parameter of the Initialize function).<br>
+/// an initial random state array generated by the random provider, and the optional DistributionCode array, (set either through the property or the Info parameter of the Initialize function).<BR></BR>
 /// The DistributionCode can be applied as a secondary, static source of entropy used by the generate function, making it similar to an HKDF construction, (HMG uses an 8 byte counter instead of 1 byte used by HKDF). 
-/// The DistributionCodeMax property is the ideal size for the code, (it also compensates for any hash finalizer code length), this ensures only full blocks are processed by the hash function finalizer.<br>
+/// The DistributionCodeMax property is the ideal size for the code, (it also compensates for any hash finalizer code length), this ensures only full blocks are processed by the hash function finalizer.<BR></BR>
 /// The generator copies the HMAC finalized output to the internal state, and the functions output array. 
-/// The pseudo-random state array is processed as seed material in the next iteration of the generation cycle, in a continuous transformation process.<br>
-/// The state counter can be initialized by the Nonce parameter of the Initialize function to an 8 byte secret and random value, (this is strongly recommended).<br>
+/// The pseudo-random state array is processed as seed material in the next iteration of the generation cycle, in a continuous transformation process.<BR></BR>
+/// The state counter can be initialized by the Nonce parameter of the Initialize function to an 8 byte secret and random value, (this is strongly recommended).<BR></BR>
 /// The reseed-requests counter is incremented by the number of bytes processed by a generation call, if this value exceeds the ReseedThreshold value (10 * the MAC output size by default),
-/// the generator transforms the state to an internal array, (not added to output), and uses that state, along with the reseed counter and entropy provider, to buid a new HMAC key.<br>
+/// the generator transforms the state to an internal array, (not added to output), and uses that state, along with the reseed counter and entropy provider, to buid a new HMAC key.<BR></BR>
 /// The HMAC is then re-keyed, the reseed-requests counter is reset, and a new initial state is generated by the entropy provider for the next generation cycle.
 /// </para>
 /// 
 /// <description><B>Initialization and Update:</B></description>
 /// <para>The Initialize functions have three different parameter options: the Seed which is the primary key, 
-/// the Nonce used to initialize the internal state-counter, and the Info which is used in the Generate function.<br>
-/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<br>
-/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator.<br>
-/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value.<br>
-/// The Info parameter maps to the DistributionCode() property, and is used as message state when generating the pseudo-random output.<br>
-/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property<br> 
-/// The Update function uses the seed value to re-key the HMAC via the internal key derivation function.<br>
+/// the Nonce used to initialize the internal state-counter, and the Info which is used in the Generate function.<BR></BR>
+/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<BR></BR>
+/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator.<BR></BR>
+/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value.<BR></BR>
+/// The Info parameter maps to the DistributionCode() property, and is used as message state when generating the pseudo-random output.<BR></BR>
+/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property<BR></BR> 
+/// The Update function uses the seed value to re-key the HMAC via the internal key derivation function.<BR></BR>
 /// The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
-/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<br>
+/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<BR></BR>
 /// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through the derivation function along with the current state, 
-/// the output hash is used to reseed the generator.<br>
+/// the output hash is used to reseed the generator.<BR></BR>
 /// The default interval at which this reseeding occurs is 1000 times the digest output size in bytes, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, 
-/// the seed is regenerated.<br> 
-/// Predictive resistance is strongly recommended when producing large amounts of psuedo-random (10kb or greater).</para>
+/// the seed is regenerated.<BR></BR> 
+/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -162,11 +161,11 @@ private:
 	static const size_t SEEDCTR_SIZE = 4;
 	static const size_t STATECTR_SIZE = 8;
 
+	Mac::HMAC m_hmacEngine;
 	bool m_destroyEngine;
 	Digests m_digestType;
 	std::vector<byte> m_distributionCode;
 	size_t m_distributionCodeMax;
-	Mac::HMAC m_hmacEngine;
 	std::vector<byte> m_hmacKey;
 	std::vector<byte> m_hmacState;
 	bool m_isDestroyed;
@@ -191,7 +190,7 @@ public:
 
 	/// <summary>
 	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(bool, SymmetricKey)"/> is called.
+	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
 	/// Changing this code will create a unique distribution of the generator.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
 	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
@@ -266,34 +265,7 @@ public:
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized digest type name is used</exception>
-	explicit HMG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::CSP)
-		:
-		m_destroyEngine(true),
-		m_digestType(DigestType),
-		m_distributionCode(0),
-		m_distributionCodeMax(0),
-		m_hmacEngine(DigestType),
-		m_hmacKey(0),
-		m_hmacState(0),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_legalKeySizes(0),
-		m_providerSource(0),
-		m_providerType(ProviderType),
-		m_reseedCounter(0),
-		m_reseedRequests(0),
-		m_reseedThreshold(0),
-		m_secStrength(0),
-		m_seedCtr(SEEDCTR_SIZE),
-		m_stateCtr(STATECTR_SIZE)
-	{
-		if (DigestType == Digests::None)
-			throw CryptoGeneratorException("HMG:CTor", "The digest type type can not be none!");
-		if (ProviderType == Providers::None)
-			throw CryptoGeneratorException("HMG:CTor", "The provider type type can not be none!");
-
-		LoadState();
-	}
+	explicit HMG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::CSP);
 
 	/// <summary>
 	/// Instantiate the class using a digest instance, and an optional entropy source 
@@ -303,44 +275,14 @@ public:
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit HMG(IDigest* Digest, IProvider* Provider = 0)
-		:
-		m_destroyEngine(false),
-		m_digestType(Digest->Enumeral()),
-		m_distributionCode(0),
-		m_distributionCodeMax(0),
-		m_hmacEngine(Digest),
-		m_hmacKey(0),
-		m_hmacState(0),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_legalKeySizes(0),
-		m_providerSource(Provider),
-		m_providerType(Provider == 0 ? Providers::None : Provider->Enumeral()),
-		m_reseedCounter(0),
-		m_reseedRequests(0),
-		m_reseedThreshold(0),
-		m_secStrength(0),
-		m_seedCtr(SEEDCTR_SIZE),
-		m_stateCtr(STATECTR_SIZE)
-	{
-		if (Digest == 0)
-			throw CryptoGeneratorException("HMG:Ctor", "Digest can not be null!");
-		if (Provider == 0)
-			throw CryptoGeneratorException("HMG:Ctor", "Provider can not be null!");
-
-		LoadState();
-	}
+	explicit HMG(IDigest* Digest, IProvider* Provider = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~HMG()
-	{
-		Destroy();
-	}
+	virtual ~HMG();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -426,9 +368,8 @@ private:
 	void Derive(const std::vector<byte> &Seed);
 	void Generate(std::vector<byte> &Output, size_t OutOffset);
 	void Increase(std::vector<byte> &Counter, const size_t Value);
-	IProvider* LoadProvider(Providers ProviderType);
-	void LoadState();
 	void RandomPad(size_t BlockOffset);
+	void Scope();
 };
 
 NAMESPACE_DRBGEND

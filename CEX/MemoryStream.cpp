@@ -3,6 +3,53 @@
 
 NAMESPACE_IO
 
+//~~~Constructor~~~//
+
+MemoryStream::MemoryStream()
+	:
+	m_isDestroyed(false),
+	m_streamData(0),
+	m_streamPosition(0)
+{
+}
+
+MemoryStream::MemoryStream(size_t Length)
+	:
+	m_isDestroyed(false),
+	m_streamData(0),
+	m_streamPosition(0)
+{
+	m_streamData.reserve(Length);
+}
+
+MemoryStream::MemoryStream(const std::vector<byte> &Data)
+	:
+	m_isDestroyed(false),
+	m_streamData(Data),
+	m_streamPosition(0)
+{
+}
+
+MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t Length)
+	:
+	m_isDestroyed(false),
+	m_streamData(0),
+	m_streamPosition(0)
+{
+	if (Length > Data.size() - Offset)
+		throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
+
+	m_streamData.resize(Length);
+	memcpy(&m_streamData[0], &Data[Offset], Length);
+}
+
+MemoryStream::~MemoryStream()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void MemoryStream::Close()
 {
 	m_streamData.clear();

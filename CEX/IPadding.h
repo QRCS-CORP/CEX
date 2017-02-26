@@ -40,7 +40,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() = 0;
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Add padding to input array

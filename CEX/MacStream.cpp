@@ -3,7 +3,39 @@
 
 NAMESPACE_PROCESSING
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+MacStream::MacStream(MacDescription &Description, ISymmetricKey &MacKey)
+	:
+	m_macEngine(Helper::MacFromDescription::GetInstance(Description)),
+	m_blockSize(m_macEngine->BlockSize()),
+	m_destroyEngine(false),
+	m_inStream(0),
+	m_isDestroyed(false),
+	m_progressInterval(0)
+{
+	m_macEngine->Initialize(MacKey);
+}
+
+MacStream::MacStream(IMac* Mac)
+	:
+	m_macEngine(Mac != 0 ? Mac : throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!")),
+	m_blockSize(m_macEngine->BlockSize()),
+	m_destroyEngine(false),
+	m_inStream(0),
+	m_isDestroyed(false),
+	m_progressInterval(0)
+{
+	if (!m_macEngine->IsInitialized())
+		throw CryptoProcessingException("MacStream:CTor", "The Mac is not initialized!");
+}
+
+MacStream::~MacStream()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 std::vector<byte> MacStream::Compute(IByteStream* InStream)
 {
@@ -28,7 +60,7 @@ std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOf
 	return Process(Input, InOffset, Length);
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 void MacStream::CalculateInterval(size_t Length)
 {
@@ -62,7 +94,7 @@ std::vector<byte> MacStream::Process(size_t Length)
 	for (size_t i = 0; i < maxBlocks; i++)
 	{
 		bytesRead = m_inStream->Read(buffer, 0, m_blockSize);
-		m_macEngine->BlockUpdate(buffer, 0, bytesRead);
+		m_macEngine->Update(buffer, 0, bytesRead);
 		bytesTotal += bytesRead;
 		CalculateProgress(bytesTotal);
 	}
@@ -72,13 +104,13 @@ std::vector<byte> MacStream::Process(size_t Length)
 	{
 		buffer.resize(Length - bytesTotal);
 		bytesRead = m_inStream->Read(buffer, 0, buffer.size());
-		m_macEngine->BlockUpdate(buffer, 0, bytesRead);
+		m_macEngine->Update(buffer, 0, bytesRead);
 		bytesTotal += bytesRead;
 	}
 
 	// get the hash
 	std::vector<byte> chkSum(m_macEngine->MacSize());
-	m_macEngine->DoFinal(chkSum, 0);
+	m_macEngine->Finalize(chkSum, 0);
 	CalculateProgress(bytesTotal);
 
 	return chkSum;
@@ -91,7 +123,7 @@ std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOf
 
 	while (bytesTotal != alnBlocks)
 	{
-		m_macEngine->BlockUpdate(Input, InOffset, m_blockSize);
+		m_macEngine->Update(Input, InOffset, m_blockSize);
 		InOffset += m_blockSize;
 		bytesTotal += m_blockSize;
 		CalculateProgress(bytesTotal);
@@ -101,13 +133,13 @@ std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOf
 	if (bytesTotal != Length)
 	{
 		size_t diff = Length - bytesTotal;
-		m_macEngine->BlockUpdate(Input, InOffset, diff);
+		m_macEngine->Update(Input, InOffset, diff);
 		bytesTotal += diff;
 	}
 
 	// get the hash
 	std::vector<byte> chkSum(m_macEngine->MacSize());
-	m_macEngine->DoFinal(chkSum, 0);
+	m_macEngine->Finalize(chkSum, 0);
 	CalculateProgress(bytesTotal);
 
 	return chkSum;
@@ -124,11 +156,6 @@ void MacStream::Destroy()
 		delete m_macEngine;
 		m_destroyEngine = false;
 	}
-}
-
-void MacStream::CreateMac(MacDescription &Description)
-{
-	m_macEngine = Helper::MacFromDescription::GetInstance(Description);
 }
 
 NAMESPACE_PROCESSINGEND

@@ -4,7 +4,6 @@
 #include "CipherModeFromName.h"
 #include "CpuDetect.h"
 #include "CSP.h"
-#include "ICipherMode.h"
 #include "Keccak512.h"
 #include "SymmetricKey.h"
 #include "SysUtils.h"
@@ -13,9 +12,26 @@ NAMESPACE_PROVIDER
 
 using Utility::ArrayUtils;
 using Utility::SysUtils;
-using Cipher::Symmetric::Block::Mode::ICipherMode;
 
-ICipherMode* m_cipherMode;
+//~~~Constructor~~~//
+
+ECP::ECP()
+	:
+	m_isAvailable(false)
+{
+#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
+	m_isAvailable = true;
+#endif
+
+	Reset();
+}
+
+ECP::~ECP()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void ECP::Destroy()
 {
@@ -59,18 +75,6 @@ uint32_t ECP::Next()
 
 void ECP::Reset()
 {
-	if (m_cipherMode != 0 && m_cipherMode->IsInitialized())
-		m_cipherMode->Destroy();
-
-	// 22 rounds of rijndael using hkdf-sha256 key schedule
-	Cipher::Symmetric::Block::IBlockCipher* cipher = Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, 16, 22, Enumeration::Digests::SHA256);
-
-	// get the iv and hkdf info from system provider
-	std::vector<byte> info(cipher->DistributionCodeMax());
-	std::vector<byte> iv(16);
-	CSP pvd;
-	pvd.GetBytes(info);
-	pvd.GetBytes(iv);
 	std::vector<byte> key;
 
 	try
@@ -84,11 +88,19 @@ void ECP::Reset()
 	}
 
 	// initialize the cipher
-	cipher->DistributionCode() = info;
-	m_cipherMode = Helper::CipherModeFromName::GetInstance(Enumeration::CipherModes::CTR, cipher);
-	Key::Symmetric::SymmetricKey kp(key, iv);
+	m_cipherMode = Helper::CipherModeFromName::GetInstance(Enumeration::CipherModes::CTR, Enumeration::BlockCiphers::AHX);
+
+	// get the iv and hkdf info from system provider
+	std::vector<byte> info(m_cipherMode->LegalKeySizes()[0].InfoSize());
+	std::vector<byte> iv(16);
+	CSP pvd;
+	pvd.GetBytes(info);
+	pvd.GetBytes(iv);
+	Key::Symmetric::SymmetricKey kp(key, iv, info);
 	m_cipherMode->Initialize(true, kp);
 }
+
+//~~~Private Functions~~~//
 
 std::vector<byte> ECP::Collect()
 {

@@ -6,6 +6,7 @@
 #include "../CEX/ChaCha20.h"
 #include "../CEX/CpuDetect.h"
 #include "../CEX/CTR.h"
+#include "../CEX/ECB.h"
 #include "../CEX/ICM.h"
 #include "../CEX/ParallelUtils.h"
 #include "../CEX/RHX.h"
@@ -26,6 +27,31 @@ namespace Test
 
 			if (m_hasSSE)
 			{
+				CTR* cpr1 = new CTR(BlockCiphers::Rijndael);
+				AccessCheck(cpr1);
+				delete cpr1;
+				OnProgress("ParallelModeTest: Passed CTR parallel/sequential access api tests..");
+
+				ICM* cpr2 = new ICM(BlockCiphers::Rijndael);
+				AccessCheck(cpr2);
+				delete cpr2;
+				OnProgress("ParallelModeTest: Passed ICM parallel/sequential access api tests..");
+
+				CBC* cpr3 = new CBC(BlockCiphers::Rijndael);
+				AccessCheck(cpr3);
+				delete cpr3;
+				OnProgress("ParallelModeTest: Passed CBC parallel/sequential access api tests..");
+
+				CFB* cpr4 = new CFB(BlockCiphers::Rijndael);
+				AccessCheck(cpr4);
+				delete cpr4;
+				OnProgress("ParallelModeTest: Passed CFB parallel/sequential access api tests..");
+
+				ECB* cpr5 = new ECB(BlockCiphers::Rijndael);
+				AccessCheck(cpr5);
+				delete cpr5;
+				OnProgress("ParallelModeTest: Passed CFB parallel/sequential access api tests..");
+
 				if (m_hasAESNI)
 				{
 					CompareAhxSimd();
@@ -99,6 +125,150 @@ namespace Test
 		}
 	}
 
+	void ParallelModeTest::AccessCheck(ICipherMode* Cipher)
+	{
+		std::vector<byte> data;
+		std::vector<byte> datBuf(16);
+		std::vector<byte> dec;
+		std::vector<byte> decBuf(16);
+		std::vector<byte> enc1;
+		std::vector<byte> enc2;
+		std::vector<byte> encBuf(16);
+		std::vector<byte> key(32);
+		std::vector<byte> iv(16);
+		Prng::SecureRandom rng;
+
+		data.reserve(MAX_ALLOC);
+		dec.reserve(MAX_ALLOC);
+		enc1.reserve(MAX_ALLOC);
+		enc2.reserve(MAX_ALLOC);
+
+		GetBytes(32, key);
+		GetBytes(16, iv);
+		Key::Symmetric::SymmetricKey keyParam(key, iv);
+
+
+		const size_t blkSze = Cipher->BlockSize();
+
+		for (size_t i = 0; i < 10; ++i)
+		{
+			size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
+
+			data.resize(smpSze);
+			rng.GetBytes(data);
+			dec.resize(smpSze);
+			enc1.resize(smpSze);
+			enc2.resize(smpSze);
+			size_t blkCnt = smpSze / blkSze;
+			Cipher->ParallelProfile().IsParallel() = false;
+			std::string name = Cipher->Name();
+
+			// sequential access //
+
+			// with offsets: transform(in, off, out, off)
+			Cipher->Initialize(true, keyParam);
+			// encrypt
+			for (size_t j = 0; j < blkCnt; ++j)
+				Cipher->Transform(data, j * blkSze, enc1, j * blkSze);
+
+			Cipher->Initialize(false, keyParam);
+			// decrypt
+			for (size_t j = 0; j < blkCnt; ++j)
+				Cipher->Transform(enc1, j * blkSze, dec, j * blkSze);
+
+			if (dec != data)
+				throw std::exception("Decrypted output is not equal!");
+
+
+			// buffered: transform(in, out)
+			Cipher->Initialize(true, keyParam);
+			for (size_t j = 0; j < blkCnt; ++j)
+			{
+				memcpy(&datBuf[0], &data[j * blkSze], blkSze);
+				Cipher->Transform(datBuf, encBuf);
+				memcpy(&enc2[j * blkSze], &encBuf[0], blkSze);
+			}
+
+			if (enc1 != enc2)
+				throw std::exception("Encrypted output is not equal!");
+
+			Cipher->Initialize(false, keyParam);
+			memset(&dec[0], 0, dec.size());
+			// decrypt
+			for (size_t j = 0; j < blkCnt; ++j)
+			{
+				memcpy(&encBuf[0], &enc2[j * blkSze], blkSze);
+				Cipher->Transform(encBuf, decBuf);
+				memcpy(&dec[j * blkSze], &decBuf[0], blkSze);
+			}
+
+			if (dec != data)
+				throw std::exception("Decrypted output is not equal!");
+
+
+			// with size param: transform(in, off, out, off, size)
+			memset(&enc2[0], 0, enc2.size());
+			Cipher->Initialize(true, keyParam);
+			Cipher->Transform(data, 0, enc2, 0, data.size());
+
+			if (enc1 != enc2)
+				throw std::exception("Encrypted output is not equal!");
+
+			memset(&dec[0], 0, dec.size());
+			Cipher->Initialize(false, keyParam);
+			Cipher->Transform(enc2, 0, dec, 0, data.size());
+
+			if (dec != data)
+				throw std::exception("Decrypted output is not equal!");
+
+
+			// parallel access //
+
+			Cipher->ParallelProfile().IsParallel() = true;
+			Cipher->ParallelProfile().ParallelBlockSize() = smpSze;
+			bool prlEncrypt = Cipher->Enumeral() == CipherModes::CTR || Cipher->Enumeral() == CipherModes::ECB || Cipher->Enumeral() == CipherModes::ICM;
+
+			if (prlEncrypt)
+			{
+				// with offsets: transform(in, off, out, off)
+				memset(&enc2[0], 0, enc2.size());
+				Cipher->Initialize(true, keyParam);
+				// encrypt
+				Cipher->Transform(data, 0, enc2, 0);
+
+				if (enc1 != enc2)
+					throw std::exception("Encrypted output is not equal!");
+			}
+
+			memset(&dec[0], 0, dec.size());
+			Cipher->Initialize(false, keyParam);
+			// decrypt
+			Cipher->Transform(enc2, 0, dec, 0);
+
+			if (dec != data)
+				throw std::exception("Decrypted output is not equal!");
+
+			if (prlEncrypt)
+			{
+				// with size param: transform(in, off, out, off, size)
+				memset(&enc2[0], 0, enc2.size());
+				Cipher->Initialize(true, keyParam);
+				Cipher->Transform(data, 0, enc2, 0, data.size());
+
+				if (enc1 != enc2)
+					throw std::exception("Encrypted output is not equal!");
+			}
+
+			memset(&dec[0], 0, dec.size());
+			Cipher->Initialize(false, keyParam);
+			Cipher->Transform(enc2, 0, dec, 0, enc2.size());
+
+			if (dec != data)
+				throw std::exception("Decrypted output is not equal!");
+		}
+	}
+
 	void ParallelModeTest::CompareAhxSimd()
 	{
 		std::vector<byte> data;
@@ -130,15 +300,15 @@ namespace Test
 			GetBytes(16, iv);
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
 
-			cpr1.ParallelBlockSize() = cpr1.ParallelMinimumSize() * cpr1.ProcessorCount();
+			cpr1.ParallelProfile().ParallelBlockSize() = cpr1.ParallelProfile().ParallelMinimumSize() * cpr1.ParallelProfile().ProcessorCount();
 			cpr1.Initialize(true, keyParam);
-			cpr1.IsParallel() = true;
+			cpr1.ParallelProfile().IsParallel() = true;
 			size_t blockSize = cpr1.ParallelBlockSize();
 			Transform1(&cpr1, data, blockSize, enc1);
 
-			cpr2.ParallelBlockSize() = cpr2.ParallelMinimumSize() * cpr2.ProcessorCount();
+			cpr2.ParallelProfile().ParallelBlockSize() = cpr2.ParallelProfile().ParallelMinimumSize() * cpr2.ParallelProfile().ProcessorCount();
 			cpr2.Initialize(true, keyParam);
-			cpr2.IsParallel() = true;
+			cpr2.ParallelProfile().IsParallel() = true;
 			blockSize = cpr2.ParallelBlockSize();
 			Transform1(&cpr2, data, blockSize, enc2);
 
@@ -164,11 +334,11 @@ namespace Test
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
 
 			cpr3.Initialize(true, keyParam);
-			cpr3.IsParallel() = false;
+			cpr3.ParallelProfile().IsParallel() = false;
 			BlockEncrypt(&cpr3, data, 0, enc1, 0);
 
 			cpr4.Initialize(true, keyParam);
-			cpr4.IsParallel() = false;
+			cpr4.ParallelProfile().IsParallel() = false;
 			BlockEncrypt(&cpr4, data, 0, enc2, 0);
 
 			if (enc1 != enc2)
@@ -207,11 +377,11 @@ namespace Test
 
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 		Mode::CTR cipher(Engine);
-		cipher.ParallelBlockSize() = blkSize;
+		cipher.ParallelProfile().ParallelBlockSize() = blkSize;
 		// parallel w/ intrinsics (if available)
 		cipher.Initialize(true, keyParam);
-		cipher.IsParallel() = true;
-		cipher.ParallelBlockSize() = blkSize;
+		cipher.ParallelProfile().IsParallel() = true;
+		cipher.ParallelProfile().ParallelBlockSize() = blkSize;
 		Transform1(&cipher, data, data.size(), enc);
 
 		while (enc.size() > 32)
@@ -256,16 +426,16 @@ namespace Test
 #endif
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
 			Mode::CTR cipher(Engine);
-			cipher.ParallelBlockSize() = cipher.ParallelMinimumSize() * cipher.ProcessorCount();
+			cipher.ParallelProfile().ParallelBlockSize() = cipher.ParallelProfile().ParallelMinimumSize() * cipher.ParallelProfile().ProcessorCount();
 			// parallel w/ intrinsics (if available)
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			size_t blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, data, blockSize, enc1);
 
 			// sequential
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform1(&cipher, data, blockSize, enc2);
 
@@ -274,7 +444,7 @@ namespace Test
 
 			// decrypt
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, enc1, blockSize, dec);
 
@@ -318,7 +488,7 @@ namespace Test
 		// compare to sequential decryption output
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelMinimumSize(), (uint)cipher1.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelProfile().ParallelMinimumSize(), (uint)cipher1.ParallelBlockSize());
 			smpSze -= (smpSze % cipher1.BlockSize());
 			//smpSze = 38176;
 			data.resize(smpSze);
@@ -328,13 +498,13 @@ namespace Test
 
 			// standard mode
 			cipher1.Initialize(false, keyParam);
-			cipher1.IsParallel() = false;
+			cipher1.ParallelProfile().IsParallel() = false;
 			Transform1(&cipher1, data, cipher1.BlockSize(), dec1);
 
 			// parallel + intrinsics
-			cipher2.ParallelBlockSize() = cipher2.ParallelMinimumSize();
+			cipher2.ParallelProfile().ParallelBlockSize() = cipher2.ParallelProfile().ParallelMinimumSize();
 			cipher2.Initialize(false, keyParam);
-			cipher2.IsParallel() = true;
+			cipher2.ParallelProfile().IsParallel() = true;
 			Transform1(&cipher2, data, cipher2.ParallelBlockSize(), dec2);
 
 			if (dec1 != dec2)
@@ -344,8 +514,8 @@ namespace Test
 		// decryption output integrity
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelMinimumSize(), (uint)cipher1.ParallelBlockSize());
-			smpSze -= (smpSze % cipher1.ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelProfile().ParallelMinimumSize(), (uint)cipher1.ParallelBlockSize());
+			smpSze -= (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			data.resize(smpSze);
 			dec1.resize(smpSze);
 			dec2.resize(smpSze);
@@ -353,13 +523,13 @@ namespace Test
 
 			// standard mode encrypt
 			cipher1.Initialize(true, keyParam);
-			cipher1.IsParallel() = false;
+			cipher1.ParallelProfile().IsParallel() = false;
 			Transform1(&cipher1, data, cipher1.BlockSize(), dec1);
 
 			// parallel decrypt
-			cipher2.ParallelBlockSize() = smpSze;
+			cipher2.ParallelProfile().ParallelBlockSize() = smpSze;
 			cipher2.Initialize(false, keyParam);
-			cipher2.IsParallel() = true;
+			cipher2.ParallelProfile().IsParallel() = true;
 			Transform1(&cipher2, dec1, smpSze, dec2);
 
 			if (data != dec2)
@@ -403,11 +573,11 @@ namespace Test
 		Mode::CBC cipher(Engine);
 
 		// test sequential 128 wide block
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
 			smpSze -= (smpSze % BLK128);
 			data.resize(smpSze);
 			enc.resize(smpSze);
@@ -436,7 +606,7 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
 			smpSze -= (smpSze % BLK128);
 			data.resize(smpSze);
 			enc.resize(smpSze);
@@ -450,9 +620,9 @@ namespace Test
 				cipher.Transform128(data, j * BLK128, enc, j * BLK128);
 
 			// decrypt
-			const size_t PRLMIN = cipher.ParallelMinimumSize();
-			cipher.ParallelBlockSize() = PRLMIN;
-			cipher.IsParallel() = true;
+			const size_t PRLMIN = cipher.ParallelProfile().ParallelMinimumSize();
+			cipher.ParallelProfile().ParallelBlockSize() = PRLMIN;
+			cipher.ParallelProfile().IsParallel() = true;
 			cipher.Initialize(false, keyParam2);
 			size_t offset = 0;
 
@@ -473,11 +643,11 @@ namespace Test
 		// test sequential 64 wide block
 		rng.GetBytes(iv64);
 		Key::Symmetric::SymmetricKey keyParam3(key, iv128);
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
 			smpSze -= (smpSze % BLK64);
 			data.resize(smpSze);
 			enc.resize(smpSze);
@@ -503,11 +673,11 @@ namespace Test
 		// test 64 wide with parallel decrypt
 		rng.GetBytes(iv64);
 		Key::Symmetric::SymmetricKey keyParam4(key, iv128);
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
 			smpSze -= (smpSze % BLK64);
 			data.resize(smpSze);
 			enc.resize(smpSze);
@@ -521,9 +691,9 @@ namespace Test
 				cipher.Transform64(data, j * BLK64, enc, j * BLK64);
 
 			// decrypt
-			const size_t PRLMIN = cipher.ParallelMinimumSize();
-			cipher.ParallelBlockSize() = PRLMIN;
-			cipher.IsParallel() = true;
+			const size_t PRLMIN = cipher.ParallelProfile().ParallelMinimumSize();
+			cipher.ParallelProfile().ParallelBlockSize() = PRLMIN;
+			cipher.ParallelProfile().IsParallel() = true;
 			cipher.Initialize(false, keyParam4);
 
 			size_t offset = 0;
@@ -640,7 +810,7 @@ namespace Test
 		{
 			RHX* eng = new RHX();
 			Mode::CBC cipher(eng);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
@@ -670,7 +840,7 @@ namespace Test
 		{
 			RHX* eng = new RHX();
 			Mode::CFB cipher(eng);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
@@ -711,6 +881,8 @@ namespace Test
 
 		GetBytes(32, key);
 		GetBytes(16, iv);
+		GetBytes(2048, data);
+
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 
 		// CTR
@@ -721,13 +893,13 @@ namespace Test
 			// encrypt //
 			// parallel 1
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, data, blockSize, enc1);
 
 			// parallel 2
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform2(&cipher, data, blockSize, enc2);
 
@@ -736,18 +908,18 @@ namespace Test
 
 			// linear 1
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform1(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
 				throw std::exception("Parallel CTR: Encrypted output is not equal!");
 
-			// linear 2
+			// linear 3
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
-			Transform2(&cipher, data, blockSize, enc2);
+			Transform3(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
 				throw std::exception("Parallel CTR: Encrypted output is not equal!");
@@ -756,31 +928,31 @@ namespace Test
 
 			// parallel 1
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, enc1, blockSize, dec1);
 
 			// parallel 2
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw std::exception("Parallel CTR: Decrypted output is not equal!");
 
-			// linear 1
+			// linear 3
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
-			Transform1(&cipher, enc1, blockSize, dec2);
+			Transform3(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw std::exception("Parallel CTR: Decrypted output is not equal!");
 
 			// linear 2
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform2(&cipher, enc2, blockSize, dec2);
 
@@ -805,31 +977,31 @@ namespace Test
 			// encrypt //
 			// parallel 1
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, data, blockSize, enc1);
 
 			// parallel 2
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
 				throw std::exception("Parallel ICM: Encrypted output is not equal!");
 
-			// linear 1
+			// linear 3
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
-			Transform1(&cipher, data, blockSize, enc2);
+			Transform3(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
 				throw std::exception("Parallel ICM: Encrypted output is not equal!");
 
 			// linear 2
 			cipher.Initialize(true, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform2(&cipher, data, blockSize, enc2);
 
@@ -839,31 +1011,31 @@ namespace Test
 			// decrypt //
 			// parallel 1
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, enc1, blockSize, dec1);
 
 			// parallel 2
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw std::exception("Parallel ICM: Decrypted output is not equal!");
 
-			// linear 1
+			// linear 3
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
-			Transform1(&cipher, enc1, blockSize, dec2);
+			Transform3(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw std::exception("Parallel ICM: Decrypted output is not equal!");
 
 			// linear 2
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform2(&cipher, enc2, blockSize, dec2);
 
@@ -885,11 +1057,9 @@ namespace Test
 			RHX* eng = new RHX();
 			Mode::CBC cipher(eng);
 
-			// must be divisible by block size, add padding if required
-			GetBytes(2048, data);
-
 			// encrypt
-			cipher.ParallelBlockSize() = 1024;
+			cipher.ParallelProfile().ParallelBlockSize() = 1024;
+			cipher.ParallelProfile().IsParallel() = false;
 
 			// t1: encrypt only in normal mode for cbc
 			cipher.Initialize(true, keyParam);
@@ -908,28 +1078,28 @@ namespace Test
 
 			// t1 parallel
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform1(&cipher, enc1, blockSize, dec1);
 
-			// t1 linear
+			// t2 linear
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
-			Transform1(&cipher, enc2, blockSize, dec2);
+			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw std::exception("Parallel CBC: Decrypted output is not equal!");
 
-			// t2 parallel
+			// t1 parallel
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
-			Transform2(&cipher, enc2, blockSize, dec1);
+			Transform1(&cipher, enc2, blockSize, dec1);
 
 			// t2 linear
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform2(&cipher, enc1, blockSize, dec2);
 
@@ -951,11 +1121,9 @@ namespace Test
 			RHX* eng = new RHX();
 			Mode::CFB cipher(eng);
 
-			// must be divisible by block size, add padding if required
-			GetBytes(2048, data);
-
 			// encrypt
-			cipher.ParallelBlockSize() = 1024;
+			cipher.ParallelProfile().ParallelBlockSize() = 1024;
+			cipher.ParallelProfile().IsParallel() = false;
 
 			// t1: encrypt only in normal mode for cfb
 			cipher.Initialize(true, keyParam);
@@ -971,15 +1139,15 @@ namespace Test
 
 			// decrypt //
 
-			// t1 parallel
+			// t3 parallel
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
-			Transform1(&cipher, enc1, blockSize, dec1);
+			Transform3(&cipher, enc1, blockSize, dec1);
 
 			// t1 linear
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
 			Transform1(&cipher, enc2, blockSize, dec2);
 
@@ -988,15 +1156,15 @@ namespace Test
 
 			// t2 parallel
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = true;
+			cipher.ParallelProfile().IsParallel() = true;
 			blockSize = cipher.ParallelBlockSize();
 			Transform2(&cipher, enc2, blockSize, dec1);
 
-			// t2 linear
+			// t3 linear
 			cipher.Initialize(false, keyParam);
-			cipher.IsParallel() = false;
+			cipher.ParallelProfile().IsParallel() = false;
 			blockSize = cipher.BlockSize();
-			Transform2(&cipher, enc1, blockSize, dec2);
+			Transform3(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw std::exception("Parallel CFB: Decrypted output is not equal!");
@@ -1029,8 +1197,8 @@ namespace Test
 
 		// parallel with intrinsics (if available)
 		Engine->Initialize(keyParam);
-		Engine->IsParallel() = true;
-		Engine->ParallelBlockSize() = blkSize;
+		Engine->ParallelProfile().IsParallel() = true;
+		Engine->ParallelProfile().ParallelBlockSize() = blkSize;
 		Engine->Transform(data, enc);
 
 		while (enc.size() > 32)
@@ -1080,16 +1248,16 @@ namespace Test
 			enc2.resize(smpSze);
 #endif
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
-			Engine->ParallelBlockSize() = Engine->ParallelMinimumSize() * Engine->ProcessorCount();
+			Engine->ParallelProfile().ParallelBlockSize() = Engine->ParallelProfile().ParallelMinimumSize() * Engine->ParallelProfile().ProcessorCount();
 
 			// sequential
 			Engine->Initialize(keyParam);
-			Engine->IsParallel() = false;
+			Engine->ParallelProfile().IsParallel() = false;
 			Engine->Transform(data, enc2);
 
 			// parallel with intrinsics (if available)
 			Engine->Initialize(keyParam);
-			Engine->IsParallel() = true;
+			Engine->ParallelProfile().IsParallel() = true;
 			Engine->Transform(data, enc1);
 
 			if (enc1 != enc2)
@@ -1097,7 +1265,7 @@ namespace Test
 
 			// decrypt
 			Engine->Initialize(keyParam);
-			Engine->IsParallel() = true;
+			Engine->ParallelProfile().IsParallel() = true;
 			Engine->Transform(enc1, dec);
 
 			if (dec != data)
@@ -1114,7 +1282,7 @@ namespace Test
 		const size_t alnSize = (inpSize - (inpSize % blkSize));
 		size_t count = 0;
 
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != alnSize)
 		{
@@ -1141,7 +1309,7 @@ namespace Test
 		const size_t blkSize = Cipher->BlockSize();
 		const size_t inpSize = Input.size() - InOffset;
 		size_t count = 0;
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != inpSize)
 		{
@@ -1157,7 +1325,7 @@ namespace Test
 		const size_t blkSize = Cipher->BlockSize();
 		const size_t inpSize = Input.size() - InOffset;
 		size_t count = 0;
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != inpSize)
 		{
@@ -1209,13 +1377,13 @@ namespace Test
 
 	void ParallelModeTest::ParallelCTR(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t blkSize = Cipher->ParallelMinimumSize();
+		const size_t blkSize = Cipher->ParallelProfile().ParallelMinimumSize();
 		const size_t inpSize = (Input.size() - InOffset);
 		const size_t alnSize = ((inpSize / blkSize) * blkSize);
 		size_t count = 0;
 
-		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
+		Cipher->ParallelProfile().IsParallel() = true;
+		Cipher->ParallelProfile().ParallelBlockSize() = blkSize;
 
 		// parallel blocks
 		while (count != alnSize)
@@ -1239,13 +1407,13 @@ namespace Test
 
 	void ParallelModeTest::ParallelDecrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t blkSize = Cipher->ParallelMinimumSize();
+		const size_t blkSize = Cipher->ParallelProfile().ParallelMinimumSize();
 		const size_t inpSize = (Input.size() - InOffset);
 		const size_t alnSize = ((inpSize / blkSize) * blkSize);
 		size_t count = 0;
 
-		Cipher->IsParallel() = true;
-		Cipher->ParallelBlockSize() = blkSize;
+		Cipher->ParallelProfile().IsParallel() = true;
+		Cipher->ParallelProfile().ParallelBlockSize() = blkSize;
 
 		// parallel
 		while (count != alnSize)
@@ -1284,7 +1452,8 @@ namespace Test
 			}
 			else
 			{
-				Cipher->Transform(Input, blocks * BlockSize, Output, blocks * BlockSize);
+				size_t prcLen = blocks * BlockSize;
+				Cipher->Transform(Input, prcLen, Output, prcLen, Input.size() - prcLen);
 			}
 		}
 	}
@@ -1306,6 +1475,14 @@ namespace Test
 		}
 
 		if (blocks * BlockSize < Input.size())
-			Cipher->Transform(Input, blocks * BlockSize, Output, blocks * BlockSize);
+		{
+			size_t prcLen = blocks * BlockSize;
+			Cipher->Transform(Input, prcLen, Output, prcLen, Input.size() - prcLen);
+		}
+	}
+
+	void ParallelModeTest::Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output)
+	{
+		Cipher->Transform(Input, 0, Output, 0, Input.size());
 	}
 }

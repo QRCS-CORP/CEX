@@ -2,7 +2,37 @@
 
 NAMESPACE_PROCESSING
 
-//~~~Public Methods~~~//
+
+//~~~Constructor~~~//
+
+DigestStream::DigestStream(Digests Digest)
+	:
+	m_digestEngine(DigestFromName::GetInstance(Digest)),
+	m_blockSize(m_digestEngine->BlockSize()),
+	m_destroyEngine(true),
+	m_inStream(0),
+	m_isDestroyed(false),
+	m_progressInterval(0)
+{
+}
+
+DigestStream::DigestStream(IDigest* Digest)
+	:
+	m_digestEngine(Digest != 0 ? Digest : throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!")),
+	m_blockSize(m_digestEngine->BlockSize()),
+	m_destroyEngine(false),
+	m_inStream(0),
+	m_isDestroyed(false),
+	m_progressInterval(0)
+{
+}
+
+DigestStream::~DigestStream()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 {
@@ -29,7 +59,7 @@ std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t I
 	return Process(Input, InOffset, Length);
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 void DigestStream::CalculateInterval(size_t Length)
 {
@@ -63,7 +93,7 @@ std::vector<byte> DigestStream::Process(size_t Length)
 	for (size_t i = 0; i < maxBlocks; i++)
 	{
 		bytesRead = m_inStream->Read(buffer, 0, m_blockSize);
-		m_digestEngine->BlockUpdate(buffer, 0, bytesRead);
+		m_digestEngine->Update(buffer, 0, bytesRead);
 		bytesTotal += bytesRead;
 		CalculateProgress(bytesTotal);
 	}
@@ -73,13 +103,13 @@ std::vector<byte> DigestStream::Process(size_t Length)
 	{
 		buffer.resize(Length - bytesTotal);
 		bytesRead = m_inStream->Read(buffer, 0, buffer.size());
-		m_digestEngine->BlockUpdate(buffer, 0, bytesRead);
+		m_digestEngine->Update(buffer, 0, bytesRead);
 		bytesTotal += bytesRead;
 	}
 
 	// get the hash
 	std::vector<byte> chkSum(m_digestEngine->DigestSize());
-	m_digestEngine->DoFinal(chkSum, 0);
+	m_digestEngine->Finalize(chkSum, 0);
 	CalculateProgress(bytesTotal);
 
 	return chkSum;
@@ -92,7 +122,7 @@ std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t I
 
 	while (bytesTotal != alnBlocks)
 	{
-		m_digestEngine->BlockUpdate(Input, InOffset, m_blockSize);
+		m_digestEngine->Update(Input, InOffset, m_blockSize);
 		InOffset += m_blockSize;
 		bytesTotal += m_blockSize;
 		CalculateProgress(bytesTotal);
@@ -102,13 +132,13 @@ std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t I
 	if (bytesTotal != Length)
 	{
 		size_t diff = Length - bytesTotal;
-		m_digestEngine->BlockUpdate(Input, InOffset, diff);
+		m_digestEngine->Update(Input, InOffset, diff);
 		bytesTotal += diff;
 	}
 
 	// get the hash
 	std::vector<byte> chkSum(m_digestEngine->DigestSize());
-	m_digestEngine->DoFinal(chkSum, 0);
+	m_digestEngine->Finalize(chkSum, 0);
 	CalculateProgress(bytesTotal);
 
 	return chkSum;

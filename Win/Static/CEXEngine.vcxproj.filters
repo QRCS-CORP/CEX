@@ -169,6 +169,15 @@
     <Filter Include="Source Files\Cipher\Asymmetric">
       <UniqueIdentifier>{3f88a5c6-6632-4cba-80ee-513206c1094a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cipher\Symmetric\Block\AEAD">
+      <UniqueIdentifier>{e9ffc6a4-9eb0-4d04-bfae-ee0a18bffd08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Symmetric\Block\AEAD">
+      <UniqueIdentifier>{08a07751-15c5-44d2-a4c0-5c9a5b51d0fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Mac\Support">
+      <UniqueIdentifier>{f94d7d61-7ebf-4677-99d1-a30d379cc032}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -591,6 +600,27 @@
     <ClInclude Include="..\..\CEX\DrbgFromName.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\EAX.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAeadMode.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\OCB.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ParallelOptions.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\GCM.h">
+      <Filter>Header Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\GMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\GHASH.h">
+      <Filter>Header Files\Mac\Support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -600,9 +630,6 @@
       <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\CTR.cpp">
-      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\ECB.cpp">
       <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\OFB.cpp">
@@ -829,6 +856,24 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp">
       <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ECB.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\Mode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\EAX.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\ParallelOptions.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\OCB.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\GCM.cpp">
+      <Filter>Source Files\Cipher\Symmetric\Block\AEAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\GMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

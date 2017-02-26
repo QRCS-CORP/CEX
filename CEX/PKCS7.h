@@ -48,7 +48,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() { return "PKCS7"; }
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Add padding to input array

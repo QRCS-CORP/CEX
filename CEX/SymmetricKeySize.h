@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -179,9 +179,9 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	int GetHashCode()
+	size_t GetHashCode()
 	{
-		int result = 31 * m_keySize;
+		size_t result = 31 * m_keySize;
 		result += 31 * m_nonceSize;
 		result += 31 * m_infoSize;
 
@@ -193,7 +193,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Header size</returns>
-	static int GetHeaderSize()
+	static size_t GetHeaderSize()
 	{
 		return HDR_SIZE;
 	}

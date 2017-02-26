@@ -20,12 +20,12 @@ NAMESPACE_PROVIDER
 /// 
 /// <remarks>
 /// <para>The RdRand DRNG uses thermal noise to generate random bits that are buffered into a shift register, then fed into a CBC-MAC to condition the bytes.
-/// The output from the CBC-MAC is obtained using the RDSEED api.<br>
-/// To accomodate large sampling, the system has a built in CTR_DRBG, (as specified in SP800-90), which is continuously reseeded with the output from RDSEED.
-/// The output from the CTR Drbg is obtained using the RDRAND api.<br>
+/// The output from the CBC-MAC is obtained using the RDSEED api.<BR></BR>
+/// To accommodate large sampling, the system has a built in CTR_DRBG, (as specified in SP800-90), which is continuously reseeded with the output from RDSEED.
+/// The output from the CTR Drbg is obtained using the RDRAND api.<BR></BR>
 /// There is some controversy surrounding the security of this mechanism, though the design appears to be sound, and has been reviewed by external auditors, 
-/// it is still a propietary closed system.<br>
-/// The entropy source itself must therefore be considered to be a 'black box', a source that can not be verified directly, and so must be considered to be of low entropy value.<br>
+/// it is still a proprietary closed system.<BR></BR>
+/// The entropy source itself must therefore be considered to be a 'black box', a source that can not be verified directly, and so must be considered to be of low entropy value.<BR></BR>
 /// For this reason, the DRNG should not be used as the sole source of entropy when creating secret keys, but should be used in concert with other sources of entropy.</para>
 /// 
 /// <description>Guiding Publications::</description>
@@ -101,23 +101,14 @@ public:
 	/// </summary>
 	///
 	/// <param name="RdEngine">The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</param>
-	RDP(RdEngines RdEngine = RdEngines::RdRand)
-		:
-		m_engineType(RdEngine),
-		m_isAvailable(false)
-	{
-		Reset();
-	}
+	RDP(RdEngines RdEngine = RdEngines::RdRand);
 
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~RDP()
-	{
-		Destroy();
-	}
+	virtual ~RDP();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

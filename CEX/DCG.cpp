@@ -6,11 +6,64 @@
 
 NAMESPACE_DRBG
 
-
 using Utility::IntUtils;
 
+//~~~Constructor~~~//
 
-//~~~Public Methods~~~//
+DCG::DCG(Digests DigestType, Providers ProviderType)
+	:
+	m_msgDigest(Helper::DigestFromName::GetInstance(DigestType)),
+	m_destroyEngine(true),
+	m_digestType(DigestType),
+	m_distributionCodeMax(m_msgDigest->BlockSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_prdResistant(ProviderType != Providers::None),
+	m_priSeed(m_msgDigest->DigestSize()),
+	m_priState(m_msgDigest->DigestSize()),
+	m_providerSource(ProviderType == Providers::None ? 0 : Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_providerType(ProviderType),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_msgDigest->DigestSize() * 1000),
+	m_secStrength(((m_msgDigest->DigestSize() * 8) / 2)),
+	m_seedCtr(COUNTER_SIZE),
+	m_stateCtr(COUNTER_SIZE)
+{
+	Scope();
+}
+
+DCG::DCG(IDigest* Digest, IProvider* Provider)
+	:
+	m_msgDigest(Digest != 0 ? Digest : throw CryptoGeneratorException("DCG:Ctor", "Digest can not be null!")),
+	m_destroyEngine(false),
+	m_digestType(m_msgDigest->Enumeral()),
+	m_distributionCodeMax(m_msgDigest->BlockSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_prdResistant(Provider != 0),
+	m_priSeed(m_msgDigest->DigestSize()),
+	m_priState(m_msgDigest->DigestSize()),
+	m_providerSource(Provider),
+	m_providerType(m_providerSource != 0 ? m_providerSource->Enumeral() : Providers::None),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_msgDigest->DigestSize() * 1000),
+	m_secStrength((m_msgDigest->DigestSize() * 8) / 2),
+	m_seedCtr(COUNTER_SIZE),
+	m_stateCtr(COUNTER_SIZE)
+{
+	Scope();
+}
+
+DCG::~DCG()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void DCG::Destroy()
 {
@@ -30,8 +83,8 @@ void DCG::Destroy()
 
 		try
 		{
-			Utility::ArrayUtils::ClearVector(m_dgtSeed);
-			Utility::ArrayUtils::ClearVector(m_dgtState);
+			Utility::ArrayUtils::ClearVector(m_priSeed);
+			Utility::ArrayUtils::ClearVector(m_priState);
 			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
 			Utility::ArrayUtils::ClearVector(m_seedCtr);
 			Utility::ArrayUtils::ClearVector(m_stateCtr);
@@ -74,13 +127,13 @@ size_t DCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	do
 	{
 		Increment(m_stateCtr);
-		m_msgDigest->BlockUpdate(m_stateCtr, 0, m_stateCtr.size());
-		m_msgDigest->BlockUpdate(m_dgtState, 0, m_dgtState.size());
-		m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
-		m_msgDigest->DoFinal(m_dgtState, 0);
+		m_msgDigest->Update(m_stateCtr, 0, m_stateCtr.size());
+		m_msgDigest->Update(m_priState, 0, m_priState.size());
+		m_msgDigest->Update(m_priSeed, 0, m_priSeed.size());
+		m_msgDigest->Finalize(m_priState, 0);
 
-		size_t rmdLen = IntUtils::Min(m_dgtState.size(), prcLen);
-		memcpy(&Output[OutOffset], &m_dgtState[0], rmdLen);
+		size_t rmdLen = IntUtils::Min(m_priState.size(), prcLen);
+		memcpy(&Output[OutOffset], &m_priState[0], rmdLen);
 		prcLen -= rmdLen;
 		OutOffset += rmdLen;
 		m_reseedCounter += rmdLen;
@@ -120,8 +173,8 @@ void DCG::Initialize(const std::vector<byte> &Seed)
 
 	Update(Seed);
 
-	if (Seed.size() < m_msgDigest->DigestSize())
-		m_secStrength = Seed.size() * 8;
+	if (Seed.size() < (m_msgDigest->DigestSize() / 2))
+		m_secStrength = (Seed.size() * 8) / 2;
 
 	m_isInitialized = true;
 }
@@ -141,7 +194,7 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 	size_t secLen = Seed.size() + (Nonce.size() - m_stateCtr.size());
 	if (secLen < m_msgDigest->DigestSize())
-		m_secStrength = secLen * 8;
+		m_secStrength = (secLen * 8) / 2;
 
 	m_isInitialized = true;
 }
@@ -169,29 +222,29 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 void DCG::Update(const std::vector<byte> &Seed)
 {
-	m_msgDigest->BlockUpdate(Seed, 0, Seed.size());
-	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
+	m_msgDigest->Update(Seed, 0, Seed.size());
+	m_msgDigest->Update(m_priSeed, 0, m_priSeed.size());
 
 	// added for prediction resistance, pads with new entropy
 	if (m_prdResistant)
-		Extract(Seed.size() + m_dgtSeed.size());
+		Extract(Seed.size() + m_priSeed.size());
 
-	m_msgDigest->DoFinal(m_dgtSeed, 0);
+	m_msgDigest->Finalize(m_priSeed, 0);
 }
 
-//~~~Private Methods~~~//
+//~~~Private Functions~~~//
 
 void DCG::Derive()
 {
-	m_msgDigest->BlockUpdate(m_dgtSeed, 0, m_dgtSeed.size());
+	m_msgDigest->Update(m_priSeed, 0, m_priSeed.size());
 	Increment(m_seedCtr);
-	m_msgDigest->BlockUpdate(m_seedCtr, 0, m_seedCtr.size());
+	m_msgDigest->Update(m_seedCtr, 0, m_seedCtr.size());
 
 	// added for prediction resistance
 	if (m_prdResistant)
-		Extract(m_dgtSeed.size() + m_seedCtr.size());
+		Extract(m_priSeed.size() + m_seedCtr.size());
 
-	m_msgDigest->DoFinal(m_dgtSeed, 0);
+	m_msgDigest->Finalize(m_priSeed, 0);
 }
 
 void DCG::Extract(size_t BlockOffset)
@@ -208,7 +261,7 @@ void DCG::Extract(size_t BlockOffset)
 	std::vector<byte> ent(entLen);
 	m_providerSource->GetBytes(ent);
 	// digest processes full blocks by padding with entropy from provider
-	m_msgDigest->BlockUpdate(ent, 0, ent.size());
+	m_msgDigest->Update(ent, 0, ent.size());
 }
 
 void DCG::Increment(std::vector<byte> &Counter)
@@ -220,45 +273,8 @@ void DCG::Increment(std::vector<byte> &Counter)
 	}
 }
 
-IDigest* DCG::LoadDigest(Digests DigestType)
+void DCG::Scope()
 {
-	try
-	{
-		return Helper::DigestFromName::GetInstance(DigestType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoGeneratorException("DCG:LoadDigest", "The message digest could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-IProvider* DCG::LoadProvider(Providers ProviderType)
-{
-	try
-	{
-		return Helper::ProviderFromName::GetInstance(ProviderType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoGeneratorException("DCG:LoadProvider", "The entropy provider could not be instantiated!", std::string(ex.what()));
-	}
-}
-
-void DCG::LoadState()
-{
-	if (m_msgDigest == 0)
-		m_msgDigest = LoadDigest(m_digestType);
-
-	if (m_providerSource == 0 && m_providerType != Providers::None)
-		m_providerSource = LoadProvider(m_providerType);
-
-	m_prdResistant = m_providerType != Providers::None;
-	m_dgtSeed.resize(m_msgDigest->DigestSize());
-	m_dgtState.resize(m_msgDigest->DigestSize());
-	m_secStrength = m_msgDigest->DigestSize() * 8;
-	m_reseedThreshold = m_msgDigest->DigestSize() * 1000;
-	m_distributionCodeMax = m_msgDigest->BlockSize();
-
 	m_legalKeySizes.resize(3);
 	// minimum seed size
 	m_legalKeySizes[0] = SymmetricKeySize(m_msgDigest->BlockSize() - Helper::DigestFromName::GetPaddingSize(m_digestType), 0, 0);

@@ -48,34 +48,14 @@ public:
 	/// <summary>
 	/// Instantiate an empty container
 	/// </summary>
-	SymmetricKey()
-		:
-
-		m_info(0),
-		m_isDestroyed(false),
-		m_key(0),
-		m_keySizes(0, 0, 0),
-		m_nonce(0)
-	{
-	}
+	SymmetricKey();
 
 	/// <summary>
 	/// Instantiate this class with an encryption key
 	/// </summary>
 	///
 	/// <param name="Key">The primary encryption key</param>
-	explicit SymmetricKey(const std::vector<byte> &Key)
-		:
-		m_info(0),
-		m_isDestroyed(false),
-		m_key(Key),
-		m_keySizes(Key.size(), 0, 0),
-		m_nonce(0)
-
-	{
-		if (Key.size() == 0)
-			throw CryptoProcessingException("SymmetricKey:Ctor", "The key can not be zero sized!");
-	}
+	explicit SymmetricKey(const std::vector<byte> &Key);
 
 	/// <summary>
 	/// Instantiate this class with an encryption key, and nonce parameters
@@ -83,18 +63,7 @@ public:
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
-	explicit SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce)
-		:
-		m_info(0),
-		m_isDestroyed(false),
-		m_key(Key),
-		m_keySizes(Key.size(), Nonce.size(), 0),
-		m_nonce(Nonce)
-
-	{
-		if (Key.size() == 0 || Nonce.size() == 0)
-			throw CryptoProcessingException("SymmetricKey:Ctor", "The key and nonce can not be zero sized!");
-	}
+	explicit SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce);
 
 	/// <summary>
 	/// Instantiate this class with an encryption key, nonce, and info parameters
@@ -103,25 +72,12 @@ public:
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
-	explicit SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
-		:
-		m_info(Info),
-		m_isDestroyed(false),
-		m_key(Key),
-		m_keySizes(Key.size(), Nonce.size(), Info.size()),
-		m_nonce(Nonce)
-	{
-		if (Key.size() == 0 || Nonce.size() == 0 || Info.size() == 0)
-			throw CryptoProcessingException("SymmetricKey:Ctor", "The key, nonce, and info can not be zero sized!");
-	}
+	explicit SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SymmetricKey()
-	{
-		Destroy();
-	}
+	virtual ~SymmetricKey();
 
 	//~~~Public Functions~~~//
 

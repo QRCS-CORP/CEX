@@ -6,6 +6,8 @@
 
 namespace Test
 {
+	using Key::Symmetric::SymmetricKey;
+
 	std::string KeccakTest::Run()
 	{
 		try
@@ -63,9 +65,9 @@ namespace Test
 		for (unsigned int i = 0; i != m_messages.size(); i++)
 		{
 			if (m_messages[i].size() != 0)
-				Digest->BlockUpdate(m_messages[i], 0, m_messages[i].size());
+				Digest->Update(m_messages[i], 0, m_messages[i].size());
 
-			Digest->DoFinal(hash, 0);
+			Digest->Finalize(hash, 0);
 
 			if (Expected[i] != hash)
 				throw std::exception("Keccak: Expected hash is not equal!");
@@ -76,8 +78,8 @@ namespace Test
 		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)'a';
 
-		Digest->BlockUpdate(k64, 0, k64.size());
-		Digest->DoFinal(hash, 0);
+		Digest->Update(k64, 0, k64.size());
+		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
 			throw std::exception("Keccak: Expected hash is not equal!");
@@ -85,7 +87,7 @@ namespace Test
 		for (unsigned int i = 0; i != k64.size(); i++)
 			Digest->Update((byte)'a');
 
-		Digest->DoFinal(hash, 0);
+		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
 			throw std::exception("Keccak: Expected hash is not equal!");
@@ -93,8 +95,8 @@ namespace Test
 		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)('a' + (i % 26));
 
-		Digest->BlockUpdate(k64, 0, k64.size());
-		Digest->DoFinal(hash, 0);
+		Digest->Update(k64, 0, k64.size());
+		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
 			throw std::exception("Keccak: Expected hash is not equal!");
@@ -102,10 +104,10 @@ namespace Test
 		for (unsigned int i = 0; i != 64; i++)
 		{
 			Digest->Update(k64[i * 1024]);
-			Digest->BlockUpdate(k64, i * 1024 + 1, 1023);
+			Digest->Update(k64, i * 1024 + 1, 1023);
 		}
 
-		Digest->DoFinal(hash, 0);
+		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
 			throw std::exception("Keccak: Expected hash is not equal!");
@@ -116,10 +118,10 @@ namespace Test
 		for (unsigned int i = 0; i != 16384; i++)
 		{
 		for (int j = 0; j != 1024; j++)
-		Digest->BlockUpdate(m_xtremeData, 0, m_xtremeData.size());
+		Digest->Update(m_xtremeData, 0, m_xtremeData.size());
 		}
 
-		Digest->DoFinal(hash, 0);
+		Digest->Finalize(hash, 0);
 
 		if ((Expected[m_messages.size() + 2]) != hash)
 		throw std::exception("Keccak: Expected hash is not equal!");*/
@@ -129,7 +131,7 @@ namespace Test
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
-		Digest->DoFinal(hash, 0);
+		Digest->Finalize(hash, 0);
 
 		for (unsigned int i = 0; i <= Digest->DigestSize(); ++i)
 		{
@@ -137,10 +139,10 @@ namespace Test
 			memcpy(&expected[i], &hash[0], hash.size());
 			std::vector<byte> outBytes(2 * Digest->DigestSize(), 0);
 
-			Digest->DoFinal(outBytes, i);
+			Digest->Finalize(outBytes, i);
 
 			if (expected != outBytes)
-				throw std::exception("Keccak DoFinal: Expected hash is not equal!");
+				throw std::exception("Keccak Finalize: Expected hash is not equal!");
 		}
 	}
 
@@ -151,10 +153,11 @@ namespace Test
 
 		for (unsigned int i = 0; i != m_macKeys.size(); i++)
 		{
-			mac.Initialize(m_macKeys[i]);
-			mac.BlockUpdate(m_macData[i], 0, m_macData[i].size());
+			SymmetricKey kp(m_macKeys[i]);
+			mac.Initialize(kp);
+			mac.Update(m_macData[i], 0, m_macData[i].size());
 			std::vector<byte> macV(mac.MacSize());
-			mac.DoFinal(macV, 0);
+			mac.Finalize(macV, 0);
 
 			if (Expected[i] != macV)
 				throw std::exception("Keccak HMAC: Expected hash is not equal!");
@@ -162,9 +165,10 @@ namespace Test
 
 		// test truncated keys
 		Mac::HMAC mac2(Digest);
-		mac2.Initialize(m_truncKey);
-		mac2.BlockUpdate(m_truncData, 0, m_truncData.size());
-		mac2.DoFinal(macV2, 0);
+		SymmetricKey kp(m_truncKey);
+		mac2.Initialize(kp);
+		mac2.Update(m_truncData, 0, m_truncData.size());
+		mac2.Finalize(macV2, 0);
 
 		for (unsigned int i = 0; i != TruncExpected.size(); i++)
 		{

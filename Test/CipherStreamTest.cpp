@@ -152,7 +152,7 @@ namespace Test
 		std::vector<byte> data(1025, 3);
 
 		// initialize the cipher and key container
-		Processing::CipherStream cs(Enumeration::BlockCiphers::RHX, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ISO7816);
+		Processing::CipherStream cs(Enumeration::BlockCiphers::Rijndael, Enumeration::Digests::None, 14, Enumeration::CipherModes::CBC, Enumeration::PaddingModes::ISO7816);
 		Key::Symmetric::SymmetricKey kp(key, iv);
 
 		// encrypt the file in-place
@@ -198,19 +198,19 @@ namespace Test
 		Cipher::Symmetric::Block::Mode::CBC cipher(eng);
 		Cipher::Symmetric::Block::Mode::CBC cipher2(eng);
 		Cipher::Symmetric::Block::Padding::ISO7816* padding = new Cipher::Symmetric::Block::Padding::ISO7816();
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 		Processing::CipherStream cs(&cipher2, padding);
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			size_t sze = AllocateRandom(m_plnText, 0, cipher.BlockSize());
-			size_t prlBlock = sze - (sze % cipher.ParallelMinimumSize());
+			size_t prlBlock = sze - (sze % cipher.ParallelProfile().ParallelMinimumSize());
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
 			IO::MemoryStream mIn(m_plnText);
 			IO::MemoryStream mOut;
 			IO::MemoryStream mRes;
@@ -305,19 +305,19 @@ namespace Test
 		Cipher::Symmetric::Block::Mode::CFB cipher(eng);
 		Cipher::Symmetric::Block::Mode::CFB cipher2(eng);
 		Cipher::Symmetric::Block::Padding::ISO7816* padding = new Cipher::Symmetric::Block::Padding::ISO7816();
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 		Processing::CipherStream cs(&cipher2, padding);
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			size_t sze = AllocateRandom(m_plnText, 0, cipher.BlockSize());
-			size_t prlBlock = sze - (sze % cipher.ParallelMinimumSize());
+			size_t prlBlock = sze - (sze % cipher.ParallelProfile().ParallelMinimumSize());
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
 			IO::MemoryStream mIn(m_plnText);
 			IO::MemoryStream mOut;
 			IO::MemoryStream mRes;
@@ -403,19 +403,19 @@ namespace Test
 		Cipher::Symmetric::Block::Mode::CTR cipher(eng);
 		Cipher::Symmetric::Block::Mode::CTR cipher2(eng);
 		Processing::CipherStream cs(&cipher2);
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 
 		// ctr test
 		for (unsigned int i = 0; i < 10; i++)
 		{
 			size_t sze = AllocateRandom(m_plnText);
-			size_t prlBlock = sze - (sze % cipher.ParallelMinimumSize());
+			size_t prlBlock = sze - (sze % cipher.ParallelProfile().ParallelMinimumSize());
 			m_encText.resize(sze);
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
 			IO::MemoryStream mIn(m_plnText);
 			IO::MemoryStream mOut;
 			IO::MemoryStream mRes;
@@ -729,7 +729,7 @@ namespace Test
 		Cipher::Symmetric::Block::Mode::OFB cipher(engine);
 		Cipher::Symmetric::Block::Mode::OFB cipher2(engine);
 		Cipher::Symmetric::Block::Padding::ISO7816* padding = new Cipher::Symmetric::Block::Padding::ISO7816();
-		cipher.IsParallel() = false;
+		cipher.ParallelProfile().IsParallel() = false;
 		Processing::CipherStream cs(&cipher2, padding);
 
 		for (size_t i = 0; i < 10; i++)
@@ -740,8 +740,8 @@ namespace Test
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher.ParallelBlockSize() = prlBlock;
-			cipher2.ParallelBlockSize() = prlBlock;
+			cipher.ParallelProfile().ParallelBlockSize() = prlBlock;
+			cipher2.ParallelProfile().ParallelBlockSize() = prlBlock;
 			IO::MemoryStream mIn(m_plnText);
 			IO::MemoryStream mOut;
 			IO::MemoryStream mRes;
@@ -778,7 +778,7 @@ namespace Test
 				throw std::exception("CipherStreamTest: Decrypted arrays are not equal!");
 
 			// decrypt linear mode
-			cipher2.IsParallel() = false;
+			cipher2.ParallelProfile().IsParallel() = false;
 			mOut.Seek(0, IO::SeekOrigin::Begin);
 			cs.Initialize(false, kp);
 			cs.Write(&mOut, &mRes);
@@ -831,18 +831,18 @@ namespace Test
 		Cipher::Symmetric::Stream::Salsa20* cipher = new Cipher::Symmetric::Stream::Salsa20();
 		Cipher::Symmetric::Stream::Salsa20* cipher2 = new Cipher::Symmetric::Stream::Salsa20();
 		Processing::CipherStream cs(cipher2);
-		cipher->IsParallel() = false;
+		cipher->ParallelProfile().IsParallel() = false;
 
 		// ctr test
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			size_t sze = AllocateRandom(m_plnText, cipher->ParallelMinimumSize());
+			size_t sze = AllocateRandom(m_plnText, cipher->ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = sze - (sze % (cipher->BlockSize() * m_processorCount));
 			m_cmpText.resize(sze);
 			m_decText.resize(sze);
 			m_encText.resize(sze);
 
-			cipher->ParallelBlockSize() = prlBlock;
+			cipher->ParallelProfile().ParallelBlockSize() = prlBlock;
 			IO::MemoryStream mIn(m_plnText);
 			IO::MemoryStream mOut;
 			IO::MemoryStream mRes;
@@ -1028,7 +1028,7 @@ namespace Test
 		const size_t alnSize = inpSize - (size_t)(inpSize % blkSize);
 		size_t count = 0;
 
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != alnSize)
 		{
@@ -1057,7 +1057,7 @@ namespace Test
 		const size_t alnSize = inpSize - blkSize;
 		size_t count = 0;
 
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != alnSize)
 		{
@@ -1087,7 +1087,7 @@ namespace Test
 		const size_t alnSize = inpSize - (inpSize % blkSize);
 		size_t count = 0;
 
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != alnSize)
 		{
@@ -1124,7 +1124,7 @@ namespace Test
 		const size_t alnSize = (unsigned int)(inpSize / blkSize) * blkSize;
 		size_t count = 0;
 
-		Cipher->IsParallel() = false;
+		Cipher->ParallelProfile().IsParallel() = false;
 
 		while (count != alnSize)
 		{

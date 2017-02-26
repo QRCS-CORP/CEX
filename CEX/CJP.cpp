@@ -5,6 +5,47 @@
 
 NAMESPACE_PROVIDER
 
+//~~~Constructor~~~//
+
+CJP::CJP()
+	:
+	m_enableAccess(true),
+	m_enableDebias(true),
+	m_isAvailable(false),
+	m_lastDelta(0),
+	m_lastDelta2(0),
+	m_memAccessLoops(MEMORY_ACCESSLOOPS),
+	m_memBlocks(MEMORY_BLOCKS),
+	m_memBlockSize(MEMORY_BLOCKSIZE),
+	m_memPosition(0),
+	m_memTotalSize(MEMORY_SIZE),
+	m_memState(0),
+	m_overSampleRate(OVRSMP_RATE_MIN),
+	m_prevTime(0),
+	m_rndState(0),
+	m_secureCache(true),
+	m_stirPool(true),
+	m_stuckTest(1)
+{
+	if (CEX_SUPPORTED_COMPILER != 1)
+		throw CryptoRandomException("CJP:Ctor", "This RNG is not supported by your compiler!");
+
+	m_isAvailable = TimerCheck();
+
+	if (m_isAvailable)
+	{
+		Detect();
+		Prime();
+	}
+}
+
+CJP::~CJP()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void CJP::Destroy()
 {
 	try
@@ -84,6 +125,8 @@ void CJP::Reset()
 	Prime();
 }
 
+//~~~Private Functions~~~//
+
 CEX_OPTIMIZE_IGNORE
 void CJP::AccessMemory()
 {
@@ -138,8 +181,8 @@ void CJP::Detect()
 
 		if (detect.L1CacheTotal() != 0)
 		{
-			m_memBlockSize = static_cast<uint32_t>(detect.L1CacheLineSize());
-			m_memBlocks = static_cast<uint32_t>((detect.L1CacheTotal() / detect.VirtualCores()) / m_memBlockSize);
+			m_memBlockSize = detect.L1CacheLineSize();
+			m_memBlocks = (detect.L1CacheTotal() / detect.VirtualCores() / m_memBlockSize);
 			m_memTotalSize = m_memBlocks * m_memBlockSize;
 			m_memAccessLoops = (m_memTotalSize / m_memBlockSize) * 2;
 		}

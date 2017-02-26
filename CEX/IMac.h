@@ -64,16 +64,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() = 0;
 
-	//~~~Public Methods~~~//
-
-	/// <summary>
-	/// Update the digest
-	/// </summary>
-	///
-	/// <param name="Input">Hash input data</param>
-	/// <param name="InOffset">Starting position with the Input array</param>
-	/// <param name="Length">Length of data to process</param>
-	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Get the MAC value
@@ -96,51 +87,36 @@ public:
 	/// <param name="OutOffset">Offset within Output array</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual size_t DoFinal(std::vector<byte> &Output, size_t OutOffset) = 0;
+	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Initialize the MAC generator with a SymmetricKey key container.
 	/// <para>Uses a key and optional salt and info arrays to initialize the MAC.</para>
 	/// </summary>
 	/// 
-	/// <param name="MacParam">A SymmetricKey key container class</param>
-	virtual void Initialize(ISymmetricKey &MacParam) = 0;
+	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
-	/// Initialize the MAC with a key
-	/// </summary>
-	///
-	/// <param name="Key">The MAC generators primary key</param>
-	virtual void Initialize(const std::vector<byte> &Key) = 0;
-
-	/// <summary>
-	/// Initialize the MAC with a key and salt arrays
-	/// </summary>
-	///
-	/// <param name="Key">The MAC generators primary key</param>
-	/// <param name="Salt">The salt or initialization vector</param>
-	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) = 0;
-
-	/// <summary>
-	/// Initialize the MAC generator.
-	/// </summary>
-	///
-	/// <param name="Key">The MAC generators primary key</param>
-	/// <param name="Salt">The salt or initialization vector</param>
-	/// <param name="Info">The info parameter used as an addional source of entropy</param>
-	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) = 0;
-
-	/// <summary>
-	/// Reset and initialize the underlying digest
+	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
 	/// </summary>
 	virtual void Reset() = 0;
 
 	/// <summary>
-	/// Update the digest with 1 byte
+	/// Update the Mac with a single byte
 	/// </summary>
 	/// 
-	/// <param name="Input">Input byte</param>
+	/// <param name="Input">Input byte to process</param>
 	virtual void Update(byte Input) = 0;
+
+	/// <summary>
+	/// Update the Mac with a block of bytes
+	/// </summary>
+	/// 
+	/// <param name="Input">The input data array to process</param>
+	/// <param name="InOffset">Starting position with the input array</param>
+	/// <param name="Length">The length of data to process in bytes</param>
+	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
 };
 
 NAMESPACE_MACEND

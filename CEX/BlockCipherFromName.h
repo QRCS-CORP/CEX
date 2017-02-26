@@ -19,19 +19,21 @@ class BlockCipherFromName
 public:
 	/// <summary>
 	/// Get a symmetric block cipher instance.
-	/// <para>If an extended (HX) block cipher type is selected, the default HKDF hash engine is SHA2-512.</para>
+	/// <para>If an extended (AHX/RHX, SHX, or THX) block cipher type is selected, the default key-schedule hash engine is SHA2-256.
+	/// Selecting a root cipher type (Rijndael, Serpent, or Twofish), will return a standard cipher configuration.</para>
 	/// </summary>
 	/// 
 	/// <param name="BlockCipherType">The block cipher enumeration name</param>
-	/// <param name="KdfEngineType">The [optional] (HX) extended ciphers HKDF digest engine; the default is None</param>
+	/// <param name="KdfEngineType">The [optional] (HX) extended ciphers HKDF hash engine; the default is SHA256.</param>
 	/// 
 	/// <returns>A symmetric block cipher instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests KdfEngineType = Digests::None);
+	static IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests KdfEngineType = Digests::SHA256);
 
 	/// <summary>
-	/// Get a symmetric block cipher instance with initialization parameters
+	/// Get a symmetric block cipher instance with initialization parameters.
+	/// <para>Selecting a root cipher type (Rijndael, Serpent, or Twofish), will return a standard cipher configuration.</para>
 	/// </summary>
 	/// 
 	/// <param name="BlockCipherType">The symmetric block ciphers enumeration type name</param>

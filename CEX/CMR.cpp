@@ -5,9 +5,47 @@
 
 NAMESPACE_PRNG
 
-/// <summary>
-/// Release all resources associated with the object
-/// </summary>
+//~~~Constructor~~~//
+
+CMR::CMR(BlockCiphers CipherType, Providers ProviderType, size_t BufferSize)
+	:
+	m_bufferIndex(0),
+	m_bufferSize(BufferSize),
+	m_byteBuffer(BufferSize),
+	m_engineType(CipherType),
+	m_isDestroyed(false),
+	m_pvdType(ProviderType)
+{
+	if (BufferSize < BUFFER_MIN)
+		throw CryptoRandomException("CMR:Ctor", "Buffer size must be at least 64 bytes!");
+
+	Reset();
+}
+
+CMR::CMR(std::vector<byte> &Seed, BlockCiphers CipherType, size_t BufferSize)
+	:
+	m_bufferIndex(0),
+	m_bufferSize(BufferSize),
+	m_byteBuffer(BufferSize),
+	m_engineType(CipherType),
+	m_isDestroyed(false),
+	m_stateSeed(Seed)
+{
+	if (BufferSize < BUFFER_MIN)
+		throw CryptoRandomException("CMR:Ctor", "Buffer size must be at least 64 bytes!");
+	if (Seed.size() == 0)
+		throw CryptoRandomException("CMR:Ctor", "Seed can not be null or empty!");
+
+	Reset();
+}
+
+CMR::~CMR()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void CMR::Destroy()
 {
 	if (!m_isDestroyed)
@@ -27,13 +65,6 @@ void CMR::Destroy()
 	}
 }
 
-/// <summary>
-/// Return an array filled with pseudo random bytes
-/// </summary>
-/// 
-/// <param name="Size">Size of requested byte array</param>
-/// 
-/// <returns>Random byte array</returns>
 std::vector<byte> CMR::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
@@ -41,11 +72,6 @@ std::vector<byte> CMR::GetBytes(size_t Size)
 	return data;
 }
 
-/// <summary>
-/// Fill an array with pseudo random bytes
-/// </summary>
-///
-/// <param name="Output">Output array</param>
 void CMR::GetBytes(std::vector<byte> &Output)
 {
 	if (Output.size() == 0)
@@ -86,23 +112,11 @@ void CMR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt32</returns>
 uint CMR::Next()
 {
 	return Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
-/// <summary>
-/// Get an pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint CMR::Next(uint Maximum)
 {
 	std::vector<byte> rand;
@@ -118,14 +132,6 @@ uint CMR::Next(uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint CMR::Next(uint Minimum, uint Maximum)
 {
 	uint num = 0;
@@ -133,23 +139,11 @@ uint CMR::Next(uint Minimum, uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt64</returns>
 ulong CMR::NextLong()
 {
 	return Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong CMR::NextLong(ulong Maximum)
 {
 	std::vector<byte> rand;
@@ -165,14 +159,6 @@ ulong CMR::NextLong(ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong CMR::NextLong(ulong Minimum, ulong Maximum)
 {
 	ulong num = 0;
@@ -180,9 +166,6 @@ ulong CMR::NextLong(ulong Minimum, ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Reset the generator instance
-/// </summary>
 void CMR::Reset()
 {
 	if (m_rngGenerator != 0)
@@ -197,8 +180,9 @@ void CMR::Reset()
 	else
 	{
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
-		IProvider* seedGen = LoadProvider(m_pvdType);
+		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType);
 		seedGen->GetBytes(seed);
+		delete seedGen;
 		m_rngGenerator->Initialize(seed);
 	}
 
@@ -246,18 +230,6 @@ std::vector<byte> CMR::GetByteRange(ulong Maximum)
 		data = GetBytes(8);
 
 	return GetBits(data, Maximum);
-}
-
-IProvider* CMR::LoadProvider(Providers ProviderType)
-{
-	try
-	{
-		return Helper::ProviderFromName::GetInstance(ProviderType);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoRandomException("CMR:LoadProvider", "The entropy provider could not be instantiated!", std::string(ex.what()));
-	}
 }
 
 NAMESPACE_PRNGEND

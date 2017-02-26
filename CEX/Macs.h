@@ -20,7 +20,11 @@ enum class Macs : uint8_t
 	/// <summary>
 	/// A Hash based Message Authentication Code wrapper (HMAC)
 	/// </summary>
-	HMAC = 2
+	HMAC = 2,
+	/// <summary>
+	/// A Cipher based Message Authentication Code wrapper (GMAC)
+	/// </summary>
+	GMAC = 4
 };
 
 NAMESPACE_ENUMERATIONEND

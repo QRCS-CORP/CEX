@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -50,68 +50,68 @@ using Enumeration::Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The DCG (Digest Counter Generator) uses a hash function run in a counter mode similar to a block cipher CTR mode.<br>
-/// The design is an update to a standard hash-based counter mechanism described in NIST documentation, and implemented in the BouncyCastle DigestRandomCounter class.<br>
+/// <para>The DCG (Digest Counter Generator) uses a hash function run in a counter mode similar to a block cipher CTR mode.<BR></BR>
+/// The design is an update to a standard hash-based counter mechanism described in NIST documentation, and implemented in the BouncyCastle DigestRandomCounter class.<BR></BR>
 /// As described in the thesis; Security Analysis for Pseudo-Random Numbers Generators by Sylvain Ruhault, because the original mechanism lacked a source of random used to update the seed with fresh entropy,
-/// the mechanism will eventually fail due to internal state decomposition, and so should not be considered a resiliant drbg design.<br>
-/// This implementation however does provide an (optional) entropy source provider option, and so can be implemented with both Predictive and Backtracking reisitance per recommendations Section 8.8 of SP80090A revision 1.<br>
-/// The way in which the entropy provider distributes seed material is also an important design change. <br>
-/// In the original algorithm, the Generate function processes the digest seed, the state, and the state-counter to produce the new state.<br>
+/// the mechanism will eventually fail due to internal state decomposition, and so should not be considered a resiliant drbg design.<BR></BR>
+/// This implementation however does provide an (optional) entropy source provider option, and so can be implemented with both Predictive and Backtracking reisitance per recommendations Section 8.8 of SP80090A revision 1.<BR></BR>
+/// The way in which the entropy provider distributes seed material is also an important design change. <BR></BR>
+/// In the original algorithm, the Generate function processes the digest seed, the state, and the state-counter to produce the new state.<BR></BR>
 /// In a Merkle–Damgård construction (SHA2), the finalizer appends a code to the end of the last block, (and if the block is full, it processes a block of zero-byte padding with the code), 
-/// this is compensated for by subtracting the codes length from the random padding request length when required.<br>
-/// With, for example, SHA2-512 which uses a 128 byte block size, the number of bytes processed with this configuration would be 64+64+8, leaving 120 bytes of zero-padding processed by the digests finalize function.<br>
-/// With the entropy source engaged, these empty bytes are filled with fresh entropy, ensuring that only full blocks are compressed, which in turn, should yield a more secure output.<br>
+/// this is compensated for by subtracting the codes length from the random padding request length when required.<BR></BR>
+/// With, for example, SHA2-512 which uses a 128 byte block size, the number of bytes processed with this configuration would be 64+64+8, leaving 120 bytes of zero-padding processed by the digests finalize function.<BR></BR>
+/// With the entropy source engaged, these empty bytes are filled with fresh entropy, ensuring that only full blocks are compressed, which in turn, should yield a more secure output.<BR></BR>
 /// Another important change is in the use of the Nonce field, (either input through one of the Initialize functions directly, or as a parameter of the RngPrams key container), this field now sets the starting 
-/// count in the primary state counter.<br>
-/// The left-most 8 bytes of the Nonce are copied to the state counter, and the entire Nonce is then passed to the update function to be processed as seed material.<br>
+/// count in the primary state counter.<BR></BR>
+/// The left-most 8 bytes of the Nonce are copied to the state counter, and the entire Nonce is then passed to the update function to be processed as seed material.<BR></BR>
 /// The Update() function works in a similar way to the Generate() function, in that the entropy provider is used to pad the input blocks to the hash function with fresh entropy.</para>
 ///
 /// <description><B>Initialization and Update:</B></description>
 /// <para>The Initialize functions have three different parameter options: the Seed which is the primary key, 
-/// the Nonce used to initialize the internal state-counter, and the Info which is an additional source of entropy.<br>
-/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<br>
-/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator.<br>
-/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value.<br>
-/// The Update function uses the seed value to re-key the generator via the internal key derivation function.<br>
+/// the Nonce used to initialize the internal state-counter, and the Info which is an additional source of entropy.<BR></BR>
+/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<BR></BR>
+/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator.<BR></BR>
+/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value.<BR></BR>
+/// The Update function uses the seed value to re-key the generator via the internal key derivation function.<BR></BR>
 /// The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</para>
 ///
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><br> 
+/// <para><EM>Legend:</EM><BR></BR> 
 /// <B>H<SUB>K</SUB></B>=hash_function, <B>P</B>=entropy_provider, <B>S1</B>=seed_material, <B>S2</B>=state, <B>S3</B>=seed_counter, <B>S4</B>=state_counter</para>
 /// 
-/// <para><EM>Update</EM><br>
-/// The Update function takes as input the current internal state(S1, S2, S3, S4) and an optional entropy input P; it outputs a new internal state where only S1 is updated.<br>
-/// Require: S = (S1, S2, S3, S4), I<br>
-/// Ensure: S<br>
-/// 1) S1 = H<SUB>K</SUB>(S1 || I)<br>
-/// 2) if (P) then<br>
-///      return S<SUP>0</SUP> = (S1, S2, S3, S4), P<br>
-///    else<br>
+/// <para><EM>Update</EM><BR></BR>
+/// The Update function takes as input the current internal state(S1, S2, S3, S4) and an optional entropy input P; it outputs a new internal state where only S1 is updated.<BR></BR>
+/// Require: S = (S1, S2, S3, S4), I<BR></BR>
+/// Ensure: S<BR></BR>
+/// 1) S1 = H<SUB>K</SUB>(S1 || I)<BR></BR>
+/// 2) if (P) then<BR></BR>
+///      return S<SUP>0</SUP> = (S1, S2, S3, S4), P<BR></BR>
+///    else<BR></BR>
 ///      return S<SUP>0</SUP> = (S1, S2, S3, S4)
 /// </para>
 ///
-/// <para><EM>Generate</EM><br>
-/// Require: S = (S1, S2, S3, S4)<br>
-/// Ensure: S<br>
-/// 1) S4 = S4 + 1<br>
-/// 2) if (P) then <br>
-///      S2 = H<SUB>K</SUB>(S4 || S2 || S1 || P)<br>
-///    else <br>
-///      S2 = H<SUB>K</SUB>(S4 || S2 || S1)<br>
-/// 3) if S3 mod 10 = 0 then<br>
-/// 4) S3 = S3 + 1<br>
-/// 5) S1 = H<SUB>K</SUB>(S1 || S3)<br>
-/// 6) end if<br>
+/// <para><EM>Generate</EM><BR></BR>
+/// Require: S = (S1, S2, S3, S4)<BR></BR>
+/// Ensure: S<BR></BR>
+/// 1) S4 = S4 + 1<BR></BR>
+/// 2) if (P) then <BR></BR>
+///      S2 = H<SUB>K</SUB>(S4 || S2 || S1 || P)<BR></BR>
+///    else <BR></BR>
+///      S2 = H<SUB>K</SUB>(S4 || S2 || S1)<BR></BR>
+/// 3) if S3 mod 10 = 0 then<BR></BR>
+/// 4) S3 = S3 + 1<BR></BR>
+/// 5) S1 = H<SUB>K</SUB>(S1 || S3)<BR></BR>
+/// 6) end if<BR></BR>
 /// 7) return S<SUP>0</SUP> = (S1, S2, S3, S4)
 /// </para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
-/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<br>
+/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<BR></BR>
 /// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through the hash function along with the current state, 
-/// the output hash is used to reseed the generator.<br>
+/// the output hash is used to reseed the generator.<BR></BR>
 /// The default interval at which this reseeding occurs is 1000 times the digest output size in bytes, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, 
-/// the seed is regenerated.<br> 
-/// Predictive resistance is strongly recommended when producing large amounts of psuedo-random (10kb or greater).</para>
+/// the seed is regenerated.<BR></BR> 
+/// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
@@ -146,17 +146,17 @@ private:
 	const size_t MAX_RESEED = 536870912;
 	const size_t MINSEED_SIZE = 8;
 
+	IDigest* m_msgDigest;
 	bool m_destroyEngine;
 	Digests m_digestType;
-	std::vector<byte> m_dgtSeed;
-	std::vector<byte> m_dgtState;
 	std::vector<byte> m_distributionCode;
 	size_t m_distributionCodeMax;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	IDigest* m_msgDigest;
 	bool m_prdResistant;
+	std::vector<byte> m_priSeed;
+	std::vector<byte> m_priState;
 	IProvider* m_providerSource;
 	Providers m_providerType;
 	size_t m_reseedCounter;
@@ -176,7 +176,7 @@ public:
 
 	/// <summary>
 	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(bool, SymmetricKey)"/> is called.
+	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
 	/// Changing this code will create a unique distribution of the generator.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
 	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
@@ -251,27 +251,7 @@ public:
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized digest type name is used</exception>
-	explicit DCG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::CSP)
-		:
-		m_destroyEngine(true),
-		m_digestType(DigestType),
-		m_dgtSeed(0),
-		m_dgtState(0),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_legalKeySizes(0),
-		m_providerType(ProviderType),
-		m_reseedCounter(0),
-		m_reseedRequests(0),
-		m_reseedThreshold(0),
-		m_stateCtr(COUNTER_SIZE),
-		m_seedCtr(COUNTER_SIZE)
-	{
-		if (DigestType == Digests::None)
-			throw CryptoGeneratorException("DCG:CTor", "The digest type type can not be none!");
-
-		LoadState();
-	}
+	explicit DCG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::CSP);
 
 	/// <summary>
 	/// Instantiate the class using a digest instance, and an optional entropy source 
@@ -281,39 +261,14 @@ public:
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit DCG(IDigest* Digest, IProvider* Provider = 0)
-		:
-		m_destroyEngine(false),
-		m_digestType(Digest->Enumeral()),
-		m_dgtSeed(0),
-		m_dgtState(0),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_legalKeySizes(0),
-		m_msgDigest(Digest),
-		m_providerSource(Provider),
-		m_providerType(Provider == 0 ? Providers::None : Provider->Enumeral()),
-		m_reseedCounter(0),
-		m_reseedRequests(0),
-		m_reseedThreshold(0),
-		m_stateCtr(COUNTER_SIZE),
-		m_seedCtr(COUNTER_SIZE)
-	{
-		if (Digest == 0)
-			throw CryptoGeneratorException("DCG:Ctor", "Digest can not be null!");
-
-		LoadState();
-	}
+	explicit DCG(IDigest* Digest, IProvider* Provider = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~DCG()
-	{
-		Destroy();
-	}
+	virtual ~DCG();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -386,9 +341,7 @@ private:
 	void Derive();
 	void Extract(size_t BlockOffset);
 	void Increment(std::vector<byte> &Counter);
-	IDigest* LoadDigest(Digests DigestType);
-	IProvider* LoadProvider(Providers ProviderType);
-	void LoadState();
+	void Scope();
 };
 
 NAMESPACE_DRBGEND

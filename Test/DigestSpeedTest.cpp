@@ -23,13 +23,13 @@ namespace Test
 
 			while (counter < SampleSize)
 			{
-				dgt->BlockUpdate(buffer, 0, buffer.size());
+				dgt->Update(buffer, 0, buffer.size());
 				counter += buffer.size();
 			}
 			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			OnProgress(const_cast<char*>(calc.c_str()));
 		}
-		dgt->DoFinal(hash, 0);
+		dgt->Finalize(hash, 0);
 		delete dgt;
 
 		uint64_t dur = TestUtils::GetTimeMs64() - start;

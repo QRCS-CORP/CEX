@@ -5,7 +5,48 @@
 
 NAMESPACE_KDF
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
+
+KDF2::KDF2(Digests DigestType)
+	:
+	m_msgDigest(Helper::DigestFromName::GetInstance(DigestType)),
+	m_blockSize(m_msgDigest->BlockSize()),
+	m_destroyEngine(true),
+	m_hashSize(m_msgDigest->DigestSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfCounter(1),
+	m_kdfDigestType(DigestType),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0)
+{
+	LoadState();
+}
+
+KDF2::KDF2(Digest::IDigest* Digest)
+	:
+	m_msgDigest(Digest != 0 ? Digest : throw CryptoKdfException("KDF2:CTor", "The Digest can not be null!")),
+	m_blockSize(m_msgDigest->BlockSize()),
+	m_destroyEngine(false),
+	m_hashSize(m_msgDigest->DigestSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfCounter(1),
+	m_kdfDigestType(m_msgDigest->Enumeral()),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0)
+{
+	LoadState();
+}
+
+KDF2::~KDF2()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void KDF2::Destroy()
 {
@@ -24,8 +65,8 @@ void KDF2::Destroy()
 			{
 				m_destroyEngine = false;
 
-				if (m_kdfDigest != 0)
-					delete m_kdfDigest;
+				if (m_msgDigest != 0)
+					delete m_msgDigest;
 			}
 
 			Utility::ArrayUtils::ClearVector(m_kdfKey);
@@ -42,11 +83,11 @@ void KDF2::Destroy()
 size_t KDF2::Generate(std::vector<byte> &Output)
 {
 	if (!m_isInitialized)
-		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
+		throw CryptoKdfException("KDF2:Generate", "The generator must be initialized before use!");
 	if (Output.size() == 0)
-		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
+		throw CryptoKdfException("KDF2:Generate", "Output buffer too small!");
 	if (m_kdfCounter + (Output.size() / m_hashSize) > 255)
-		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
+		throw CryptoKdfException("KDF2:Generate", "KDF2 may only be used for 255 * HashLen bytes of output");
 
 	return Expand(Output, 0, Output.size());
 }
@@ -58,7 +99,7 @@ size_t KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	if ((Output.size() - Length) < OutOffset)
 		throw CryptoKdfException("KDF2:Generate", "Output buffer too small!");
 	if (m_kdfCounter + (Length / m_hashSize) > 255)
-		throw CryptoKdfException("KDF2:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
+		throw CryptoKdfException("KDF2:Generate", "KDF2 may only be used for 255 * HashLen bytes of output");
 
 	return Expand(Output, OutOffset, Length);
 }
@@ -151,16 +192,7 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 	m_isInitialized = true;
 }
 
-void KDF2::Reset()
-{
-	m_kdfDigest->Reset();
-	m_kdfCounter = 1;
-	m_kdfKey.clear();
-	m_kdfSalt.clear();
-	m_isInitialized = false;
-}
-
-void KDF2::Update(const std::vector<byte> &Seed)
+void KDF2::ReSeed(const std::vector<byte> &Seed)
 {
 	if (Seed.size() < m_hashSize)
 		throw CryptoKdfException("KDF2:Update", "Seed is too small!");
@@ -168,7 +200,16 @@ void KDF2::Update(const std::vector<byte> &Seed)
 	Initialize(Seed);
 }
 
-//~~~Private Methods~~~//
+void KDF2::Reset()
+{
+	m_msgDigest->Reset();
+	m_kdfCounter = 1;
+	m_kdfKey.clear();
+	m_kdfSalt.clear();
+	m_isInitialized = false;
+}
+
+//~~~Private Functions~~~//
 
 size_t KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
@@ -180,17 +221,17 @@ size_t KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 	do
 	{
-		m_kdfDigest->BlockUpdate(m_kdfKey, 0, m_kdfKey.size());
+		m_msgDigest->Update(m_kdfKey, 0, m_kdfKey.size());
 
-		m_kdfDigest->Update(static_cast<byte>(m_kdfCounter >> 24));
-		m_kdfDigest->Update(static_cast<byte>(m_kdfCounter >> 16));
-		m_kdfDigest->Update(static_cast<byte>(m_kdfCounter >> 8));
-		m_kdfDigest->Update(static_cast<byte>(m_kdfCounter));
+		m_msgDigest->Update(static_cast<byte>(m_kdfCounter >> 24));
+		m_msgDigest->Update(static_cast<byte>(m_kdfCounter >> 16));
+		m_msgDigest->Update(static_cast<byte>(m_kdfCounter >> 8));
+		m_msgDigest->Update(static_cast<byte>(m_kdfCounter));
 
 		if (m_kdfSalt.size() != 0)
-			m_kdfDigest->BlockUpdate(m_kdfSalt, 0, m_kdfSalt.size());
+			m_msgDigest->Update(m_kdfSalt, 0, m_kdfSalt.size());
 
-		m_kdfDigest->DoFinal(hash, 0);
+		m_msgDigest->Finalize(hash, 0);
 		++m_kdfCounter;
 
 		size_t prcRmd = Utility::IntUtils::Min(m_hashSize, prcLen);
@@ -203,33 +244,17 @@ size_t KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	return Length;
 }
 
-IDigest* KDF2::LoadDigest(Digests DigestType)
-{
-	try
-	{
-		return Helper::DigestFromName::GetInstance(DigestType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoKdfException("KDF2:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
-	}
-}
-
 void KDF2::LoadState()
 {
-	m_blockSize = m_kdfDigest->BlockSize();
-	m_hashSize = m_kdfDigest->DigestSize();
-	m_kdfDigestType = m_kdfDigest->Enumeral();
-
 	// best salt size; hash finalizer code and counter length adjusted
-	size_t sltLen = m_blockSize - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 4);
+	size_t saltLen = m_blockSize - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + sizeof(uint));
 	m_legalKeySizes.resize(3);
 	// minimum security is the digest output size
 	m_legalKeySizes[0] = SymmetricKeySize(m_hashSize, 0, 0);
 	// recommended size, adjusted salt size to hash full blocks
-	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, sltLen, 0);
+	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, saltLen, 0);
 	// max recommended; add a block of key to info (appended to salt)
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, sltLen, m_blockSize);
+	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, saltLen, m_blockSize);
 }
 
 NAMESPACE_KDFEND

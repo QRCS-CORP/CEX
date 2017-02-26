@@ -70,6 +70,7 @@ private:
 	bool m_bmt1;
 	bool m_bmt2;
 	uint32_t m_busSpeed;
+	bool m_cmul;
 	std::string m_cpuVendor;
 	bool m_fma3;
 	bool m_fma4;
@@ -230,12 +231,17 @@ public:
 	const bool BMT2() { return m_bmt2; }
 
 	/// <summary>
-	/// The processor bus speed (newer Intel only)
+	/// The processor bus speed (newer Intel only) 
 	/// </summary>
 	const size_t BusSpeed()
 	{
 		return m_busSpeed;
 	}
+
+	/// <summary>
+	/// Intel CMUL available
+	/// </summary>
+	const bool CMUL() { return m_cmul; }
 
 	/// <summary>
 	/// AMD FMA 3 instructions available
@@ -460,7 +466,7 @@ public:
 	const bool SSE3() { return m_sse3; }
 
 	/// <summary>
-	/// SSE3 E3 Merom New Instructions available
+	/// Supplemental SSE3 Merom New Instructions available
 	/// </summary>
 	const bool SSSE3() { return m_ssse3; }
 
@@ -499,74 +505,7 @@ public:
 	/// <summary>
 	/// Initialization Detects Cpu features
 	/// </summary>
-	CpuDetect()
-		:
-		m_abm(false),
-		m_ads(false),
-		m_aesni(false),
-		m_amd3dNow(false),
-		m_amd3dNowPro(false),
-		m_amdCmpLegacy(false),
-		m_amdMmxExt(false),
-		m_amdMp(false),
-		m_avx(false),
-		m_avx2(false),
-		m_avx5124fmaps(false),
-		m_avx512bw(false),
-		m_avx512cd(false),
-		m_avx512dq(false),
-		m_avx512er(false),
-		m_avx512f(false),
-		m_avx512ifma(false),
-		m_avx512pf(false),
-		m_avx5124vnniw(false),
-		m_avx512vbmi(false),
-		m_avx512vl(false),
-		m_bmt1(false),
-		m_bmt2(false),
-		m_busSpeed(0),
-		m_cpuVendor(""),
-		m_fma3(false),
-		m_fma4(false),
-		m_frequencyBase(0), 
-		m_frequencyMax(0),
-		m_hle(false),
-		m_hyperThread(false),
-		m_l1CacheSize(0),
-		m_l1CacheLineSize(0),
-		m_l2Associative(CacheAssociations::Disabled),
-		m_l2CacheSize(0),
-		m_logicalPerCore(0),
-		m_mmx(false),
-		m_mpx(false),
-		m_physCores(0),
-		m_pku(false), 
-		m_pkuos(false),
-		m_pqe(false),
-		m_pqm(false),
-		m_prefetch(false),
-		m_rdRand(false),
-		m_rdSeed(false),
-		m_rdtscp(false),
-		m_rtm(false),
-		m_serialNumber(""),
-		m_sgx(false),
-		m_sha(false),
-		m_smap(false),
-		m_smep(false),
-		m_sse1(false),
-		m_sse2(false),
-		m_sse3(false),
-		m_sse41(false),
-		m_sse42(false),
-		m_sse4a(false),
-		m_ssse3(false),
-		m_virtCores(0),
-		m_x64(false),
-		m_xop(false)
-	{
-		Detect();
-	}
+	CpuDetect();
 
 private:
 

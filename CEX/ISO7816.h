@@ -51,7 +51,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() { return "ISO7816"; }
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Add padding to input array

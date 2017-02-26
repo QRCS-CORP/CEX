@@ -7,11 +7,35 @@ NAMESPACE_PRNG
 
 using Utility::IntUtils;
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
 
-/// <summary>
-/// Release all resources associated with the object
-/// </summary>
+PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestEngine, size_t BufferSize)
+	:
+	m_bufferIndex(0),
+	m_bufferSize(BufferSize),
+	m_byteBuffer(BufferSize),
+	m_digestIterations(Iterations),
+	m_digestType(DigestEngine),
+	m_isDestroyed(false),
+	m_stateSeed(Seed)
+{
+	if (Iterations == 0)
+		throw CryptoRandomException("PBR:Ctor", "Iterations can not be zero; at least 1 iteration is required!");
+	if (GetMinimumSeedSize(DigestEngine) < Seed.size())
+		throw CryptoRandomException("PBR:Ctor", "The state seed is too small! must be at least digests block size!");
+	if (BufferSize < 64)
+		throw CryptoRandomException("PBR:Ctor", "BufferSize must be at least 64 bytes!");
+
+	Reset();
+}
+
+PBR::~PBR()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void PBR::Destroy()
 {
 	if (!m_isDestroyed)
@@ -25,20 +49,11 @@ void PBR::Destroy()
 
 		if (m_rngGenerator != 0)
 			delete m_rngGenerator;
-		if (m_digestEngine != 0)
-			delete m_digestEngine;
 
 		m_isDestroyed = true;
 	}
 }
 
-/// <summary>
-/// Return an array filled with pseudo random bytes
-/// </summary>
-/// 
-/// <param name="Size">Size of requested byte array</param>
-/// 
-/// <returns>Random byte array</returns>
 std::vector<byte> PBR::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
@@ -46,11 +61,6 @@ std::vector<byte> PBR::GetBytes(size_t Size)
 	return data;
 }
 
-/// <summary>
-/// Fill an array with pseudo random bytes
-/// </summary>
-///
-/// <param name="Output">Output array</param>
 void PBR::GetBytes(std::vector<byte> &Output)
 {
 	if (Output.size() == 0)
@@ -91,23 +101,11 @@ void PBR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt32</returns>
 uint PBR::Next()
 {
 	return Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
-/// <summary>
-/// Get an pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint PBR::Next(uint Maximum)
 {
 	std::vector<byte> rand;
@@ -123,14 +121,6 @@ uint PBR::Next(uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint PBR::Next(uint Minimum, uint Maximum)
 {
 	uint num = 0;
@@ -138,23 +128,11 @@ uint PBR::Next(uint Minimum, uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt64</returns>
 ulong PBR::NextLong()
 {
 	return Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong PBR::NextLong(ulong Maximum)
 {
 	std::vector<byte> rand;
@@ -170,14 +148,6 @@ ulong PBR::NextLong(ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong PBR::NextLong(ulong Minimum, ulong Maximum)
 {
 	ulong num = 0;
@@ -185,24 +155,18 @@ ulong PBR::NextLong(ulong Minimum, ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Reset the generator instance
-/// </summary>
 void PBR::Reset()
 {
-	if (m_digestEngine != 0)
-		delete m_digestEngine;
 	if (m_rngGenerator != 0)
 		delete m_rngGenerator;
 
-	m_digestEngine = GetInstance(m_digestType);
-	m_rngGenerator = new Kdf::PBKDF2(m_digestEngine, m_digestIterations);
+	m_rngGenerator = new Kdf::PBKDF2(m_digestType, m_digestIterations);
 	m_rngGenerator->Initialize(m_stateSeed);
 	m_rngGenerator->Generate(m_byteBuffer);
 	m_bufferIndex = 0;
 }
 
-//~~~Protected Methods~~~//
+//~~~Private Functions~~~//
 
 std::vector<byte> PBR::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
@@ -244,11 +208,6 @@ std::vector<byte> PBR::GetByteRange(ulong Maximum)
 		data = GetBytes(8);
 
 	return GetBits(data, Maximum);
-}
-
-IDigest* PBR::GetInstance(Digests RngEngine)
-{
-	return Helper::DigestFromName::GetInstance(RngEngine);
 }
 
 uint PBR::GetMinimumSeedSize(Digests RngEngine)

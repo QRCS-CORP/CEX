@@ -10,6 +10,64 @@ NAMESPACE_BLOCK
 using Helper::DigestFromName;
 using Utility::IntUtils;
 
+const std::string AHX::DEF_INFO = "information string RHX version 1";
+
+//~~~Constructor~~~//
+
+AHX::AHX(Digests KdfEngineType, size_t Rounds)
+	:
+	m_blockSize(BLOCK_SIZE),
+	m_destroyEngine(true),
+	m_expKey(0),
+	m_kdfEngine(KdfEngineType == Digests::None ? 0 : DigestFromName::GetInstance(KdfEngineType)),
+	m_kdfEngineType(KdfEngineType),
+	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(Rounds)
+{
+	if (KdfEngineType != Digests::None)
+	{
+		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
+			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+	}
+
+	LoadState(m_kdfEngineType);
+}
+
+AHX::AHX(IDigest *KdfEngine, size_t Rounds)
+	:
+	m_blockSize(BLOCK_SIZE),
+	m_destroyEngine(false),
+	m_expKey(0),
+	m_kdfEngine(KdfEngine),
+	m_kdfEngineType(m_kdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
+	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(Rounds)
+{
+	if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
+		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+
+	LoadState(m_kdfEngineType);
+}
+
+AHX::~AHX()
+{
+	Destroy();
+}
+
 void AHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Decrypt16(Input, 0, Output, 0);
@@ -26,8 +84,6 @@ void AHX::Destroy()
 	{
 		m_isDestroyed = true;
 		m_blockSize = 0;
-		m_hasAVX2 = false;
-		m_hasSSE = false;
 		m_kdfEngineType = Digests::None;
 		m_kdfInfoMax = 0;
 		m_kdfKeySize = 0;
@@ -64,22 +120,19 @@ void AHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
 
-void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParam)
+void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParam.Key().size()))
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
-	if (m_kdfEngineType != Enumeration::Digests::None && KeyParam.Info().size() > m_kdfInfoMax)
+	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 
-	if (m_kdfEngineType != Digests::None)
-		m_kdfEngine = LoadDigest(m_kdfEngineType);
-
-	if (KeyParam.Info().size() > 0)
-		m_kdfInfo = KeyParam.Info();
+	if (KeyParams.Info().size() > 0)
+		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
 	// expand the key
-	ExpandKey(Encryption, KeyParam.Key());
+	ExpandKey(Encryption, KeyParams.Key());
 	// ready to transform data
 	m_isInitialized = true;
 }
@@ -481,32 +534,13 @@ void AHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 //~~~Helpers~~~//
 
-IDigest* AHX::LoadDigest(Digests DigestType)
-{
-	try
-	{
-		return DigestFromName::GetInstance(DigestType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoSymmetricCipherException("AHX:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
-	}
-}
-
 void AHX::LoadState(Digests KdfEngineType)
 {
-	std::string info = "information string RHX version 1";
-	m_kdfInfo.reserve(info.size());
-	for (size_t i = 0; i < info.size(); ++i)
-		m_kdfInfo.push_back(info[i]);
-
-	m_kdfEngineType = KdfEngineType;
-
 	if (m_kdfEngineType == Digests::None)
 	{
 		m_legalRounds.resize(4);
 		m_legalRounds = { 10, 12, 14, 22 };
-		m_legalKeySizes.resize(4);;
+		m_legalKeySizes.resize(4);
 		m_legalKeySizes[0] = SymmetricKeySize(16, 16, 0);
 		m_legalKeySizes[1] = SymmetricKeySize(24, 16, 0);
 		m_legalKeySizes[2] = SymmetricKeySize(32, 16, 0);
@@ -524,7 +558,7 @@ void AHX::LoadState(Digests KdfEngineType)
 		m_legalKeySizes.resize(3);
 		// min allowable HMAC key
 		m_legalKeySizes[0] = SymmetricKeySize(DigestFromName::GetDigestSize(m_kdfEngineType), m_blockSize, m_kdfInfoMax);
-		// best size, no ipad/opad zero-byte mix in HMAC
+		// best size, no ipad/opad zero byte post-compressed mix in HMAC
 		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, m_blockSize, m_kdfInfoMax);
 		// triggers HKDF Extract
 		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, m_blockSize, m_kdfInfoMax);

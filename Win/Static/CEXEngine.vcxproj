@@ -233,9 +233,13 @@
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
     <ClInclude Include="..\..\CEX\Drbgs.h" />
+    <ClInclude Include="..\..\CEX\GCM.h" />
+    <ClInclude Include="..\..\CEX\GHASH.h" />
+    <ClInclude Include="..\..\CEX\GMAC.h" />
     <ClInclude Include="..\..\CEX\HKDF.h" />
     <ClInclude Include="..\..\CEX\HMAC.h" />
     <ClInclude Include="..\..\CEX\HMG.h" />
+    <ClInclude Include="..\..\CEX\IAeadMode.h" />
     <ClInclude Include="..\..\CEX\IBlockCipher.h" />
     <ClInclude Include="..\..\CEX\IByteStream.h" />
     <ClInclude Include="..\..\CEX\ICipherMode.h" />
@@ -247,6 +251,9 @@
     <ClInclude Include="..\..\CEX\IPrng.h" />
     <ClInclude Include="..\..\CEX\ISymmetricKey.h" />
     <ClInclude Include="..\..\CEX\KdfFromName.h" />
+    <ClInclude Include="..\..\CEX\EAX.h" />
+    <ClInclude Include="..\..\CEX\OCB.h" />
+    <ClInclude Include="..\..\CEX\ParallelOptions.h" />
     <ClInclude Include="..\..\CEX\SecureStream.h" />
     <ClInclude Include="..\..\CEX\StreamModes.h" />
     <ClInclude Include="..\..\CEX\SymmetricKeySize.h" />
@@ -347,9 +354,12 @@
     <ClCompile Include="..\..\CEX\DigestFromName.cpp" />
     <ClCompile Include="..\..\CEX\DigestStream.cpp" />
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp" />
+    <ClCompile Include="..\..\CEX\EAX.cpp" />
     <ClCompile Include="..\..\CEX\ECB.cpp" />
     <ClCompile Include="..\..\CEX\ECP.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
+    <ClCompile Include="..\..\CEX\GCM.cpp" />
+    <ClCompile Include="..\..\CEX\GMAC.cpp" />
     <ClCompile Include="..\..\CEX\HKDF.cpp" />
     <ClCompile Include="..\..\CEX\HMAC.cpp" />
     <ClCompile Include="..\..\CEX\HMG.cpp" />
@@ -361,6 +371,8 @@
     <ClCompile Include="..\..\CEX\Keccak.cpp" />
     <ClCompile Include="..\..\CEX\Keccak256.cpp" />
     <ClCompile Include="..\..\CEX\Keccak512.cpp" />
+    <ClCompile Include="..\..\CEX\OCB.cpp" />
+    <ClCompile Include="..\..\CEX\ParallelOptions.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricKeyGenerator.cpp" />
     <ClCompile Include="..\..\CEX\MacDescription.cpp" />

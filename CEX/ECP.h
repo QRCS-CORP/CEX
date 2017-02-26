@@ -2,8 +2,11 @@
 #define _CEX_ECP_H
 
 #include "IProvider.h"
+#include "ICipherMode.h"
 
 NAMESPACE_PROVIDER
+
+using Cipher::Symmetric::Block::Mode::ICipherMode;
 
 /// <summary>
 /// An implementation of a system Entropy Collector Provider.
@@ -20,11 +23,11 @@ NAMESPACE_PROVIDER
 /// </example>
 /// 
 /// <remarks>
-/// <para>The Entropy Collection Provider is a two stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a block cipher CTR generator.<br> 
-/// The first stage collects numerous caches of low entropy states; high-resolution timers, process and thread ids, the system random provider, and statistics for various hardware devices and system operations.<br>
+/// <para>The Entropy Collection Provider is a two stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a block cipher CTR generator.<BR></BR> 
+/// The first stage collects numerous caches of low entropy states; high-resolution timers, process and thread ids, the system random provider, and statistics for various hardware devices and system operations.<BR></BR>
 /// These sources of entropy are compressed using Keccak to create a 512 bit cipher key. 
-/// The key initializes an (HX extended) instance of Rijndael using 22 rounds and an HKDF(SHA256) key schedule.<br>
-/// The 16 byte counter and the HKDF distribution code (personalization string) are then created with the system entropy provider and the cipher initialized.<br>
+/// The key initializes an (HX extended) instance of Rijndael using 22 rounds and an HKDF(SHA256) key schedule.<BR></BR>
+/// The 16 byte counter and the HKDF distribution code (personalization string) are then created with the system entropy provider and the cipher initialized.<BR></BR>
 /// Output from the ECP provider is the product of encrypting the incrementing counter.
 /// </para>
 /// 
@@ -42,6 +45,7 @@ class ECP : public IProvider
 private:
 
 	const size_t DEF_STATECAP = 1024;
+	ICipherMode* m_cipherMode;
 	bool m_isAvailable;
 
 public:
@@ -72,26 +76,14 @@ public:
 	/// <summary>
 	/// Instantiate this class
 	/// </summary>
-	ECP()
-		:
-		m_isAvailable(false)
-	{
-#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
-		m_isAvailable = true;
-#endif
-
-		Reset();
-	}
+	ECP();
 
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~ECP()
-	{
-		Destroy();
-	}
+	virtual ~ECP();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

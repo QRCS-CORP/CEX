@@ -6,41 +6,47 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-void Skein256::BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+//~~~Constructor~~~//
+
+Skein256::Skein256(SkeinStateType InitializationType)
+	:
+	m_blockCipher(),
+	m_bytesFilled(0),
+	m_cipherInput(STATE_WORDS),
+	m_configString(STATE_SIZE),
+	m_configValue(STATE_SIZE),
+	m_digestState(STATE_WORDS),
+	m_initializationType(InitializationType),
+	m_isDestroyed(false),
+	m_inputBuffer(STATE_BYTES),
+	m_ubiParameters()
 {
-	if ((InOffset + Length) > Input.size())
-		throw CryptoDigestException("Skein256:BlockUpdate", "The Input buffer is too short!");
-
-	size_t bytesDone = 0;
-
-	// fill input buffer
-	while (bytesDone < Length && InOffset < Input.size())
-	{
-		// do a transform if the input buffer is filled
-		if (m_bytesFilled == STATE_BYTES)
-		{
-			// moves the byte input buffer to the UInt64 cipher input
-			for (int i = 0; i < STATE_WORDS; i++)
-				m_cipherInput[i] = IntUtils::BytesToLe64(m_inputBuffer, i * 8);
-
-			// process the block
-			ProcessBlock(STATE_BYTES);
-			// clear first flag, which will be set by Initialize() if this is the first transform
-			m_ubiParameters.SetIsFirstBlock(false);
-			// reset buffer fill count
-			m_bytesFilled = 0;
-		}
-
-		m_inputBuffer[m_bytesFilled++] = Input[InOffset++];
-		bytesDone++;
-	}
+	// generate the configuration string
+	m_configString[1] = (ulong)(DigestSize() * 8);
+	// "SHA3"
+	std::vector<byte> schema(4, 0);
+	schema[0] = 83;
+	schema[1] = 72;
+	schema[2] = 65;
+	schema[3] = 51;
+	SetSchema(schema);
+	SetVersion(1);
+	GenerateConfiguration();
+	Initialize(InitializationType);
 }
+
+Skein256::~Skein256()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void Skein256::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Output.resize(DIGEST_SIZE);
-	BlockUpdate(Input, 0, Input.size());
-	DoFinal(Output, 0);
+	Update(Input, 0, Input.size());
+	Finalize(Output, 0);
 	Reset();
 }
 
@@ -68,10 +74,10 @@ void Skein256::Destroy()
 	}
 }
 
-size_t Skein256::DoFinal(std::vector<byte> &Output, const size_t OutOffset)
+size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (Output.size() - OutOffset < DIGEST_SIZE)
-		throw CryptoDigestException("Skein256:DoFinal", "The Output buffer is too short!");
+		throw CryptoDigestException("Skein256:Finalize", "The Output buffer is too short!");
 
 	// pad left over space in input buffer with zeros
 	for (size_t i = m_bytesFilled; i < m_inputBuffer.size(); i++)
@@ -228,10 +234,40 @@ void Skein256::SetVersion(const uint Version)
 void Skein256::Update(byte Input)
 {
 	std::vector<byte> one(1, Input);
-	BlockUpdate(one, 0, 1);
+	Update(one, 0, 1);
 }
 
-//~~~Protected Methods~~~//
+void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+{
+	if ((InOffset + Length) > Input.size())
+		throw CryptoDigestException("Skein256:Update", "The Input buffer is too short!");
+
+	size_t bytesDone = 0;
+
+	// fill input buffer
+	while (bytesDone < Length && InOffset < Input.size())
+	{
+		// do a transform if the input buffer is filled
+		if (m_bytesFilled == STATE_BYTES)
+		{
+			// moves the byte input buffer to the UInt64 cipher input
+			for (int i = 0; i < STATE_WORDS; i++)
+				m_cipherInput[i] = IntUtils::BytesToLe64(m_inputBuffer, i * 8);
+
+			// process the block
+			ProcessBlock(STATE_BYTES);
+			// clear first flag, which will be set by Initialize() if this is the first transform
+			m_ubiParameters.SetIsFirstBlock(false);
+			// reset buffer fill count
+			m_bytesFilled = 0;
+		}
+
+		m_inputBuffer[m_bytesFilled++] = Input[InOffset++];
+		bytesDone++;
+	}
+}
+
+//~~~Private Functions~~~//
 
 void Skein256::GenerateConfiguration()
 {

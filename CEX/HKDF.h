@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -32,14 +32,14 @@
 
 #include "IKdf.h"
 #include "Digests.h"
-#include "HMAC.h"
 #include "IDigest.h"
+#include "HMAC.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
-using Mac::HMAC;
 using Digest::IDigest;
+using Mac::HMAC;
 
 /// <summary>
 /// An implementation of an Hash based Key Derivation Function (HKDF)
@@ -59,33 +59,33 @@ using Digest::IDigest;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>HKDF uses an HMAC as a pseudo random function to produce pseudo-random output in a process known as key stretching.<br>
-/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo random key.<br>
-/// The Extract step is called if the the KDF is initialized with the salt or info parameters, this compresses the input material to a key used by the HMAC.<br>
-/// The Info parameter may also be set via the Info() property, this can be used to bypass the extract step, while adding additional input to the HMAC compression cycle.<br>
+/// <para>HKDF uses an HMAC as a pseudo random function to produce pseudo-random output in a process known as key stretching.<BR></BR>
+/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo random key.<BR></BR>
+/// The Extract step is called if the the KDF is initialized with the salt or info parameters, this compresses the input material to a key used by the HMAC.<BR></BR>
+/// The Info parameter may also be set via the Info() property, this can be used to bypass the extract step, while adding additional input to the HMAC compression cycle.<BR></BR>
 /// For best possible security, the Extract step should be skipped, the KDF is initialized with a key equal in size to the hash functions internal block-size, 
-/// and the Info parameter is used as a secondary source of pseudo-random key input.<br>
-/// If used in this configuration, the Info parameter should be sized to the hash block-size, less one byte of counter, and any padding added by the hash functions finalizer.<br>
+/// and the Info parameter is used as a secondary source of pseudo-random key input.<BR></BR>
+/// If used in this configuration, the Info parameter should be sized to the hash block-size, less one byte of counter, and any padding added by the hash functions finalizer.<BR></BR>
 /// Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle, and the underlying hash function processes only full blocks of input.</para>
 /// 
-/// <description><B>Description:</B></description><br>
-/// <EM>Legend:</EM><br>
-/// <B>PRK</B>=pseudorandom key, <B>info</B>=info-string, <B>OKM</B>=output-key, <B>L</B>=output-length<br>
-/// <para><EM>Extract:</EM><br>
+/// <description><B>Description:</B></description><BR></BR>
+/// <EM>Legend:</EM><BR></BR>
+/// <B>PRK</B>=pseudorandom key, <B>info</B>=info-string, <B>OKM</B>=output-key, <B>L</B>=output-length<BR></BR>
+/// <para><EM>Extract:</EM><BR></BR>
 /// PRK = HMAC-Hash(salt, Info)</para>
 ///
-/// <para><EM>Expand:</EM><br>
-/// The output OKM is calculated as follows:<br>
-/// N = ceil(L/HashLen)<br>
-/// T = T(1) | T(2) | T(3) | ... | T(N)<br>
-///	OKM = first L octets of T<br>
-///	where:<br>
-///	T(0) = empty string (zero length)<br>
-///	T(1) = HMAC-Hash(PRK, T(0) | info | 0x01)<br>
-///	T(2) = HMAC-Hash(PRK, T(1) | info | 0x02)<br>
-///	T(3) = HMAC-Hash(PRK, T(2) | info | 0x03)<br>
-///	T(N) = HMAC-Hash(PRK, T(N) | info | N)<br>
-///	...<br>
+/// <para><EM>Expand:</EM><BR></BR>
+/// The output OKM is calculated as follows:<BR></BR>
+/// N = ceil(L/HashLen)<BR></BR>
+/// T = T(1) | T(2) | T(3) | ... | T(N)<BR></BR>
+///	OKM = first L octets of T<BR></BR>
+///	where:<BR></BR>
+///	T(0) = empty string (zero length)<BR></BR>
+///	T(1) = HMAC-Hash(PRK, T(0) | info | 0x01)<BR></BR>
+///	T(2) = HMAC-Hash(PRK, T(1) | info | 0x02)<BR></BR>
+///	T(3) = HMAC-Hash(PRK, T(2) | info | 0x03)<BR></BR>
+///	T(N) = HMAC-Hash(PRK, T(N) | info | N)<BR></BR>
+///	...<BR></BR>
 ///	The constant concatenated to the end of each T(n) is a single octet counter.</para>
 ///
 /// <description><B>Implementation Notes:</B></description>
@@ -113,15 +113,14 @@ private:
 	const size_t MIN_KEYLEN = 16;
 	const size_t MIN_SALTLEN = 4;
 
+	HMAC* m_macGenerator;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	byte m_kdfCounter;
-	IDigest* m_kdfDigest;
 	Digests m_kdfDigestType;
 	std::vector<byte> m_kdfInfo;
-	HMAC* m_kdfMac;
 	std::vector<byte> m_kdfState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_macSize;
@@ -171,95 +170,38 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Creates an HKDF generator using a message digest type name
+	/// Instantiates an HKDF generator using a message digest type name
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The hash functions type name enumeral</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name is used</exception>
-	explicit HKDF(Digests DigestType)
-		:
-		m_blockSize(0),
-		m_destroyEngine(true),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(0),
-		m_kdfDigestType(Digests::None),
-		m_kdfState(0),
-		m_legalKeySizes(0),
-		m_macSize(0)
-	{
-		if (DigestType == Digests::None)
-			throw CryptoKdfException("PBKDF2:CTor", "Digest type can not be none!");
-
-		m_kdfDigest = LoadDigest(DigestType);
-		m_kdfMac = new HMAC(m_kdfDigest);
-		LoadState();
-	}
+	explicit HKDF(Digests DigestType);
 
 	/// <summary>
-	/// Creates an HKDF generator using a message digest instance
+	/// Instantiates an HKDF generator using a message digest instance
 	/// </summary>
 	/// 
 	/// <param name="Digest">The initialized message digest instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if a null digest is used</exception>
-	explicit HKDF(IDigest* Digest)
-		:
-		m_blockSize(0),
-		m_destroyEngine(false),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(0),
-		m_kdfDigest(Digest),
-		m_kdfDigestType(Digests::None),
-		m_kdfState(0),
-		m_legalKeySizes(0),
-		m_macSize(0)
-	{
-		if (Digest == 0)
-			throw CryptoKdfException("HKDF:CTor", "The Digest can not be null!");
-
-		 m_kdfMac = new HMAC(m_kdfDigest);
-		 LoadState();
-	}
+	explicit HKDF(IDigest* Digest);
 
 	/// <summary>
-	/// Creates an HKDF generator using an HMAC instance
+	/// Instantiates an HKDF generator using an HMAC instance
 	/// </summary>
 	/// 
 	/// <param name="Mac">The initialized HMAC instance</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if a null HMAC is used</exception>
-	explicit HKDF(HMAC* Mac)
-		:
-		m_blockSize(0),
-		m_destroyEngine(false),
-		m_isDestroyed(false),
-		m_isInitialized(false),
-		m_kdfCounter(0),
-		m_kdfDigest(0),
-		m_kdfDigestType(Digests::None),
-		m_kdfMac(Mac),
-		m_kdfState(0),
-		m_legalKeySizes(0),
-		m_macSize(0)
-	{
-		if (Mac == 0)
-			throw CryptoKdfException("HKDF:CTor", "The Hmac can not be null!");
-
-		LoadState();
-	}
+	explicit HKDF(HMAC* Mac);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~HKDF()
-	{
-		Destroy();
-	}
+	virtual ~HKDF();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -324,23 +266,22 @@ public:
 	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info);
 
 	/// <summary>
-	/// Reset the internal state; Kdf must be re-initialized before it can be used again
-	/// </summary>
-	virtual void Reset();
-
-	/// <summary>
 	/// Update the generators keying material
 	/// </summary>
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
-	virtual void Update(const std::vector<byte> &Seed);
+	virtual void ReSeed(const std::vector<byte> &Seed);
+
+	/// <summary>
+	/// Reset the internal state; Kdf must be re-initialized before it can be used again
+	/// </summary>
+	virtual void Reset();
 
 private:
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
-	IDigest* LoadDigest(Digests DigestType);
 	void LoadState();
 };
 

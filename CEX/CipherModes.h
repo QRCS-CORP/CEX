@@ -42,7 +42,7 @@ enum class CipherModes : uint8_t
 	/// </summary>
 	ICM = 7,
 	/// <summary>
-	/// Ouffset Codebook AEAD Mode
+	/// Offset CodeBook AEAD Mode
 	/// </summary>
 	OCB = 8,
 	/// <summary>

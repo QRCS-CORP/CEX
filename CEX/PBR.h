@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2016 vtdev.com
+// Copyright (c) 2017 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -21,13 +21,11 @@
 
 #include "IPrng.h"
 #include "Digests.h"
-#include "IDigest.h"
 #include "PBKDF2.h"
 
 NAMESPACE_PRNG
 
 using Enumeration::Digests;
-using Digest::IDigest;
 
 /// <summary>
 /// An implementation of a Passphrase Based Pseudo Random Number Generator
@@ -68,7 +66,6 @@ private:
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
 	std::vector<byte> m_byteBuffer;
-	IDigest* m_digestEngine;
 	size_t m_digestIterations;
 	Digests m_digestType;
 	bool m_isDestroyed;
@@ -101,35 +98,14 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
-	PBR(std::vector<byte> &Seed, int Iterations = 5000, Digests DigestEngine = Digests::SHA512, size_t BufferSize = 1024)
-		:
-		m_bufferIndex(0),
-		m_bufferSize(BufferSize),
-		m_byteBuffer(BufferSize),
-		m_digestIterations(Iterations),
-		m_digestType(DigestEngine),
-		m_isDestroyed(false),
-		m_stateSeed(Seed)
-	{
-		if (Iterations == 0)
-			throw CryptoRandomException("PBR:Ctor", "Iterations can not be zero; at least 1 iteration is required!");
-		if (GetMinimumSeedSize(DigestEngine) < Seed.size())
-			throw CryptoRandomException("PBR:Ctor", "The state seed is too small! must be at least digests block size!");
-		if (BufferSize < 64)
-			throw CryptoRandomException("PBR:Ctor", "BufferSize must be at least 64 bytes!");
-
-		Reset();
-	}
+	PBR(std::vector<byte> &Seed, int Iterations = 5000, Digests DigestEngine = Digests::SHA512, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~PBR()
-	{
-		Destroy();
-	}
+	virtual ~PBR();
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -150,7 +126,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	virtual void GetBytes(std::vector<byte> &Data);
+	virtual void GetBytes(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -212,7 +188,6 @@ public:
 private:
 	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
-	IDigest* GetInstance(Digests RngEngine);
 	uint GetMinimumSeedSize(Digests RngEngine);
 };
 

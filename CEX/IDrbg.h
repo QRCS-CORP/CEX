@@ -88,7 +88,7 @@ public:
 	/// </summary>
 	virtual const size_t SecurityStrength() = 0;
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object

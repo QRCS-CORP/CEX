@@ -41,7 +41,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() { return "ZeroPad"; }
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Add padding to input array

@@ -18,6 +18,10 @@ using Key::Symmetric::ISymmetricKey;
 class IDigest
 {
 public:
+
+	IDigest(const IDigest&) = delete;
+	IDigest& operator=(const IDigest&) = delete;
+
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -52,16 +56,7 @@ public:
 	/// </summary>
 	virtual const std::string Name() = 0;
 
-	//~~~Public Methods~~~//
-
-	/// <summary>
-	/// Update the buffer
-	/// </summary>
-	/// 
-	/// <param name="Input">Input data</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
-	/// <param name="Length">Amount of data to process in bytes</param>
-	virtual void BlockUpdate(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Get the Hash value
@@ -84,7 +79,7 @@ public:
 	/// <param name="OutOffset">The starting offset within the Output array</param>
 	/// 
 	/// <returns>Size of Hash value</returns>
-	virtual size_t DoFinal(std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Reset the internal state
@@ -97,6 +92,15 @@ public:
 	/// 
 	/// <param name="Input">Input byte</param>
 	virtual void Update(byte Input) = 0;
+
+	/// <summary>
+	/// Update the buffer
+	/// </summary>
+	/// 
+	/// <param name="Input">Input data</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="Length">Amount of data to process in bytes</param>
+	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) = 0;
 };
 
 NAMESPACE_DIGESTEND

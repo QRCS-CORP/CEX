@@ -740,6 +740,20 @@ uint IntUtils::Parity(ulong Value)
 
 #endif
 
+std::vector<uint8_t> IntUtils::StripLeadingZeros(const std::vector<uint8_t> &Input, size_t Length)
+{
+	size_t leading = 0;
+	uint8_t zeros = 0xFF;
+
+	for (size_t i = 0; i != Length; ++i)
+	{
+		zeros &= IsZero<uint8_t>(Input[i]);
+		leading += Select<uint8_t>(zeros, 1, 0);
+	}
+
+	return std::vector<byte>(Input[leading], Input[Length]);
+}
+
 std::vector<byte> IntUtils::ToBit16(ushort Value)
 {
 	std::vector<byte> data(2);
@@ -931,20 +945,31 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 #endif
 }
 
-void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasSSE)
+void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length, bool HasSimd128)
 {
 	const size_t BLOCK = 16;
 	size_t ctr = 0;
 
 	do
 	{
-		if (HasSSE)
+		if (HasSimd128)
 			IXOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
 		else
 			XOR128(Input, InOffset + ctr, Output, OutOffset + ctr);
 		ctr += BLOCK;
 	} 
-	while (ctr != Size);
+	while (ctr != Length);
+}
+
+void IntUtils::XORPRT(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
+{
+	size_t ctr = 0;
+
+	while (ctr != Length)
+	{
+		Output[OutOffset + ctr] ^= Input[InOffset + ctr];
+		++ctr;
+	} 
 }
 
 NAMESPACE_UTILITYEND

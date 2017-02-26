@@ -6,6 +6,7 @@
 // common headers
 #include <cstring>
 #include <exception>
+#include <iostream>
 #include <stdint.h>
 #include <stdio.h>
 #include <string>
@@ -423,6 +424,26 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #else
 #	define CEX_OPTIMIZE_RESUME 0
 #endif
+
+#if !defined(_DEBUG)
+#	define CEX_NODEBUG
+#endif
+
+#if !defined(CEX_NODEBUG)
+#   define CEXASSERT(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+        } \
+    } while (false)
+#else
+#   define CEXASSERT(condition, message) do { } while (false)
+#endif
+
+// prefetch base offset in parallel block calculation
+#define CEX_PREFETCH_BASE size_t = 2048
 
 // EOF
 #endif

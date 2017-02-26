@@ -10,6 +10,7 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 	using namespace Cipher::Symmetric::Stream;
+	using namespace Cipher::Symmetric::Block::Mode;
 
     /// <remarks>
     /// Kat, integrity, and output comparisons, targeting multi-threaded and SIMD cipher mode operations
@@ -88,6 +89,8 @@ namespace Test
 		void CompareStmKat(IStreamCipher* Engine, std::vector<byte> Expected);
 		// Looping integrity test, compares Salsa/Chacha multi-threaded/SIMD with sequentially generated output
 		void CompareStmSimd(IStreamCipher* Engine);
+		// test each cipher modes access methods, e.g. sequential and parallel Transform() api
+		void AccessCheck(ICipherMode* Cipher);
 
 		void BlockCTR(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockDecrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
@@ -97,8 +100,12 @@ namespace Test
 		void OnProgress(char* Data);
 		void ParallelCTR(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void ParallelDecrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
+		// buffered blocks: t(in, out)
 		void Transform1(Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
+		// loop through: t(in, inoff, out, outoff)
 		void Transform2(Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
+		// whole array: t(in, inoff, out, outoff, len)
+		void Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
     };
 }
 

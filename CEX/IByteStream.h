@@ -17,6 +17,7 @@ using Enumeration::StreamModes;
 class IByteStream
 {
 public:
+
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -61,7 +62,7 @@ public:
 	/// </summary>
 	virtual const uint64_t Position() = 0;
 
-	//~~~Public Methods~~~//
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Close and flush the stream

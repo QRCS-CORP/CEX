@@ -10,6 +10,67 @@ NAMESPACE_BLOCK
 using Helper::DigestFromName;
 using Utility::IntUtils;
 
+const std::string RHX::DEF_INFO = "information string RHX version 1";
+
+//~~~Constructor~~~//
+
+RHX::RHX(Digests KdfEngineType, size_t Rounds, size_t BlockSize)
+	:
+	m_blockSize(BlockSize),
+	m_destroyEngine(true),
+	m_expKey(0),
+	m_kdfEngine(KdfEngineType == Digests::None ? 0 : DigestFromName::GetInstance(KdfEngineType)),
+	m_kdfEngineType(KdfEngineType),
+	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(Rounds)
+{
+	if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
+		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
+	if (m_kdfEngine != 0 && Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
+		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+
+	LoadState(KdfEngineType);
+}
+
+RHX::RHX(IDigest *KdfEngine, size_t Rounds, size_t BlockSize)
+	:
+	m_blockSize(BlockSize),
+	m_destroyEngine(false),
+	m_expKey(0),
+	m_kdfEngine(KdfEngine),
+	m_kdfEngineType(m_kdfEngine != 0 ? m_kdfEngine->Enumeral() : Digests::None),
+	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(Rounds)
+{
+	if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
+		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
+	if (m_kdfEngine != 0 && Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
+		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
+
+	LoadState(KdfEngine->Enumeral());
+}
+
+RHX::~RHX()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (m_blockSize == BLOCK16)
@@ -75,22 +136,24 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 		Encrypt32(Input, InOffset, Output, OutOffset);
 }
 
-void RHX::Initialize(bool Encryption, ISymmetricKey &KeyParam)
+void RHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParam.Key().size()))
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
 		throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
-	if (m_kdfEngineType != Enumeration::Digests::None && KeyParam.Info().size() > m_kdfInfoMax)
+	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
 		throw CryptoSymmetricCipherException("RHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 
-	if (m_kdfEngineType != Digests::None)
-		m_kdfEngine = LoadDigest(m_kdfEngineType);
-
-	if (KeyParam.Info().size() > 0)
-		m_kdfInfo = KeyParam.Info();
+	if (KeyParams.Info().size() > 0)
+		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
 	// expand the key
-	ExpandKey(Encryption, KeyParam.Key());
+	ExpandKey(Encryption, KeyParams.Key());
+
+#if defined(CEX_PREFETCH_TABLES)
+	Prefetch();
+#endif
+
 	// ready to transform data
 	m_isInitialized = true;
 }
@@ -796,29 +859,10 @@ void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	Encrypt64(Input, InOffset + 64, Output, OutOffset + 64);
 }
 
-//~~~Helpers~~~//
-
-IDigest* RHX::LoadDigest(Digests DigestType)
-{
-	try
-	{
-		return DigestFromName::GetInstance(DigestType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoSymmetricCipherException("RHX:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
-	}
-}
+//~~~Private Functions~~~//
 
 void RHX::LoadState(Digests ExtractorType)
 {
-	std::string info = "information string RHX version 1";
-	m_kdfInfo.reserve(info.size());
-	for (size_t i = 0; i < info.size(); ++i)
-		m_kdfInfo.push_back(info[i]);
-
-	m_kdfEngineType = ExtractorType;
-
 	if (m_kdfEngineType == Digests::None)
 	{
 		m_legalRounds.resize(4);
@@ -848,6 +892,37 @@ void RHX::LoadState(Digests ExtractorType)
 		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, m_blockSize, m_kdfInfoMax);
 	}
 }
+
+CEX_OPTIMIZE_IGNORE
+void RHX::Prefetch()
+{
+	// timing defence: pre-load tables into cache
+	volatile uint dummy;
+
+	if (m_isEncryption)
+	{
+		for (size_t i = 0; i < 256; ++i)
+		{
+			dummy ^= SBox[i];
+			dummy ^= T0[i];
+			dummy ^= T1[i];
+			dummy ^= T2[i];
+			dummy ^= T3[i];
+		}
+	}
+	else
+	{
+		for (size_t i = 0; i < 256; ++i)
+		{
+			dummy ^= ISBox[i];
+			dummy ^= IT0[i];
+			dummy ^= IT1[i];
+			dummy ^= IT2[i];
+			dummy ^= IT3[i];
+		}
+	}
+}
+CEX_OPTIMIZE_RESUME
 
 uint RHX::SubByte(uint Rot)
 {

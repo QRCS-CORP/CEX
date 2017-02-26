@@ -99,7 +99,7 @@ public:
 	/// <param name="B">The modulus</param>
 	/// 
 	/// <returns>The new value</returns>
-	template <class T1, class T2>
+	template <typename T1, typename T2>
 	static T2 ModPowerOf2(T1 A, T2 B)
 	{
 		assert(IsPowerOf2(B));
@@ -114,7 +114,7 @@ public:
 	/// 
 	/// <returns>The string representation</returns>
 	template<typename T>
-	static std::string ToString(const T& Value)
+	static std::string ToString(const T &Value)
 	{
 		std::ostringstream oss;
 		oss << Value;
@@ -170,7 +170,7 @@ public:
 	static ulong BitReverse(ulong Value);
 #endif
 
-	//~~~Misc Byte~~~//
+	//~~~Miscellaneous Byte~~~//
 
 	/// <summary>
 	/// Get the byte precision
@@ -220,6 +220,23 @@ public:
 	/// Run time check for Little Endian byte order
 	/// </summary>
 	static bool IsBigEndian();
+
+	/// <summary>
+	/// Convert bytes to a Big Endian N bit word
+	/// </summary>
+	/// 
+	/// <param name="Input">The input bytes</param>
+	/// <param name="Offset">Offset within the input block</param>
+	/// <returns>A T size word in Big Endian format</returns>
+	template<typename T>
+	inline static T LoadBE(const std::vector<byte> &Input, size_t Offset)
+	{
+		Offset *= sizeof(T);
+		T out = 0;
+		for (size_t i = 0; i != sizeof(T); ++i)
+			out = (out << 8) | Input[Offset + i];
+		return out;
+	}
 
 	/// <summary>
 	/// Convert a Big Endian 16 bit word to bytes
@@ -281,6 +298,23 @@ public:
 	/// Run time check for Little Endian byte order
 	/// </summary>
 	static bool IsLittleEndian();
+
+	/// <summary>
+	/// Convert bytes to a Little Endian N bit word
+	/// </summary>
+	/// 
+	/// <param name="Input">The input bytes</param>
+	/// <param name="Offset">Offset within the input block</param>
+	/// <returns>A T size word in Little Endian format</returns>
+	template<typename T>
+	inline T LoadLE(const std::vector<byte> &Input, size_t Offset)
+	{
+		Offset *= sizeof(T);
+		T out = 0;
+		for (size_t i = 0; i != sizeof(T); ++i)
+			out = (out << 8) | Input[Offset + (sizeof(T) - 1 - i)];
+		return out;
+	}
 
 	/// <summary>
 	/// Convert a Little Endian 16 bit word to bytes
@@ -486,6 +520,8 @@ public:
 	/// <param name="OutOffset">OutOffset within the destination block</param>
 	static void Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset);
 
+	//~~~Miscellaneous and Constant Time~~~//
+
 	/// <summary>
 	/// Crop a 64 bit integer value
 	/// </summary>
@@ -497,6 +533,27 @@ public:
 	static ulong Crop(ulong Value, uint Size);
 
 	/// <summary>
+	/// Expand an integer mask in constant time
+	/// </summary>
+	/// 
+	/// <param name="X">The N bit word</param>
+	/// 
+	/// <returns>A N bit expanded word</returns>
+	template<typename T>
+	static T ExpandMask(T X)
+	{
+		T r = X;
+		// fold r down to a single bit
+		for (size_t i = 1; i != sizeof(T) * 8; i *= 2)
+			r |= r >> i;
+
+		r &= 1;
+		r = ~(r - 1);
+
+		return r;
+	}
+
+	/// <summary>
 	/// Get the parity bit from a 64 bit integer
 	/// </summary>
 	/// 
@@ -504,6 +561,168 @@ public:
 	/// 
 	/// <returns>The parity value</returns>
 	static uint Parity(ulong Value);
+
+	/// <summary>
+	/// Combine the bits from two integers filtered by a mask value
+	/// </summary>
+	/// 
+	/// <param name="Mask">The mask value</param>
+	/// <param name="A">The first value</param>
+	/// <param name="B">The second value</param>
+	/// 
+	/// <returns>A combined N bit integer</returns>
+	template<typename T>
+	static T Select(T Mask, T A, T B)
+	{
+		return (A & Mask) | (B & ~Mask);
+	}
+
+	/// <summary>
+	/// Select an integer based on a mask
+	/// </summary>
+	/// 
+	/// <param name="Pred">The mask value</param>
+	/// <param name="Value">The value</param>
+	/// 
+	/// <returns>A masked N bit integer</returns>
+	template<typename P, typename V>
+	static V ValueOrZero(P Pred, V Value)
+	{
+		return Select<V>(ExpandMask<V>(Pred), Value, static_cast<V>(0));
+	}
+
+	/// <summary>
+	/// Constant time zero value check
+	/// </summary>
+	/// 
+	/// <param name="X">The value to test</param>
+	/// 
+	/// <returns>A positive integer if non-zero</returns>
+	template<typename T>
+	static T IsZero(T X)
+	{
+		return ~ExpandMask<T>(X);
+	}
+
+	/// <summary>
+	/// Constant time comparison of two integers for equality
+	/// </summary>
+	/// 
+	/// <param name="X">The first value to test</param>
+	/// <param name="Y">The second value to test</param>
+	/// 
+	/// <returns>A positive integer if equal</returns>
+	template<typename T>
+	static T IsEqual(T X, T Y)
+	{
+		return IsZero<T>(X ^ Y);
+	}
+
+	/// <summary>
+	/// Constant time test if X < Y
+	/// </summary>
+	/// 
+	/// <param name="X">The first value to test</param>
+	/// <param name="Y">The second value to test</param>
+	/// 
+	/// <returns>A positive integer if less</returns>
+	template<typename T>
+	static T IsLess(T X, T Y)
+	{
+		return ExpandMask<T>(X < Y);
+	}
+
+	/// <summary>
+	/// Constant time test if X <= Y
+	/// </summary>
+	/// 
+	/// <param name="X">The first value to test</param>
+	/// <param name="Y">The second value to test</param>
+	/// 
+	/// <returns>A positive integer if less</returns>
+	template<typename T>
+	static T IsLte(T X, T Y)
+	{
+		return ExpandMask<T>(X <= Y);
+	}
+
+	/// <summary>
+	/// Constant time conditional bit copy
+	/// </summary>
+	/// 
+	/// <param name="Value">The destination value</param>
+	/// <param name="From0">The first value to copy</param>
+	/// <param name="From1">The second value to copy</param>
+	/// <param name="Length">The number of bits to copy</param>
+	template<typename T>
+	static void ConditionalCopy(T Value, T* To, const T* From0, const T* From1, size_t Length)
+	{
+		const T MASK = ExpandMask<T>(Value);
+
+		for (size_t i = 0; i != Length; ++i)
+			To[i] = Select<T>(MASK, From0[i], From1[i]);
+	}
+
+	/// <summary>
+	/// Constant time conditional zeroize memory
+	/// </summary>
+	/// 
+	/// <param name="Condition">The condition</param>
+	/// <param name="From0">The first value to copy</param>
+	/// <param name="From1">The second value to copy</param>
+	/// <param name="Length">The number of bits to copy</param>
+	template<typename T>
+	static void ConditionalZeroMem(T Condition, T* Array, size_t Length)
+	{
+		const T MASK = ExpandMask<T>(Condition);
+		const T ZERO(0);
+
+		for (size_t i = 0; i != Length; ++i)
+			Array[i] = Select<T>(MASK, ZERO, Array[i]);
+	}
+
+	/// <summary>
+	/// Constant time last bit expansion
+	/// </summary>
+	/// 
+	/// <param name="A">The value to expand</param>
+	/// 
+	/// <returns>A expanded N bit integer</returns>
+	template<typename T>
+	static T ExpandTopBit(T A)
+	{
+		return ExpandMask<T>(A >> (sizeof(T) * 8 - 1));
+	}
+
+	/// <summary>
+	/// Constant time return the larger value of the two integers
+	/// </summary>
+	/// 
+	/// <param name="A">The first value to compare</param>
+	/// <param name="B">The second value to compare</param>
+	/// 
+	/// <returns>The larger value</returns>
+	template<typename T>
+	static T CMax(T A, T B)
+	{
+		return Select<T>(ExpandTopBit<T>(A), A, B);
+	}
+
+	/// <summary>
+	/// Constant time return the lesser value of the two integers
+	/// </summary>
+	/// 
+	/// <param name="A">The first value to compare</param>
+	/// <param name="B">The second value to compare</param>
+	/// 
+	/// <returns>The lesser value</returns>
+	template<typename T>
+	static T CMin(T A, T B)
+	{
+		return Select<T>(ExpandTopBit<T>(B), B, A);
+	}
+
+	static std::vector<uint8_t> StripLeadingZeros(const std::vector<uint8_t> &Input, size_t Length);
 
 	//~~~Rotate~~~//
 
@@ -742,9 +961,22 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="Size">The number of (16 byte block aligned) bytes to process</param>
-	/// <param name="HasSSE">Run time SSE intrinsics switch</param>
-	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Size, bool HasSSE = false);
+	/// <param name="Length">The number of (16 byte block aligned) bytes to process</param>
+	/// <param name="HasSimd128">Run time SSE intrinsics switch</param>
+	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length, bool HasSimd128 = false);
+
+
+	/// <summary>
+	/// XOR a partial block.
+	/// <para>The length should be less than 16 bytes, otherwise use the parallel methods and process the last block with this (sequential) function.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	/// <param name="Length">The number of (16 byte block aligned) bytes to process</param>
+	static void XORPRT(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 };
 
 NAMESPACE_UTILITYEND

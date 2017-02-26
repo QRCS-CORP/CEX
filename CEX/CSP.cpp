@@ -22,7 +22,23 @@
 
 NAMESPACE_PROVIDER
 
-//** Public Methods **//
+//~~~Constructor~~~//
+
+CSP::CSP()
+	:
+	m_isAvailable(false)
+{
+#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
+	m_isAvailable = true;
+#endif
+}
+
+CSP::~CSP()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
 
 void CSP::Destroy()
 {

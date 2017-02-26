@@ -5,11 +5,49 @@
 
 NAMESPACE_PRNG
 
-//~~~Public Methods~~~//
+//~~~Constructor~~~//
 
-/// <summary>
-/// Release all resources associated with the object
-/// </summary>
+DCR::DCR(Digests DigestEngine, Providers SeedEngine, size_t BufferSize)
+	:
+	m_bufferIndex(0),
+	m_bufferSize(BufferSize),
+	m_byteBuffer(BufferSize),
+	m_digestType(DigestEngine),
+	m_isDestroyed(false),
+	m_pvdType(SeedEngine)
+{
+	if (BufferSize < BUFFER_MIN)
+		throw CryptoRandomException("DCR:Ctor", "BufferSize must be at least 64 bytes!");
+
+	Reset();
+}
+
+DCR::DCR(std::vector<byte> Seed, Digests DigestEngine, size_t BufferSize)
+	:
+	m_bufferIndex(0),
+	m_bufferSize(BufferSize),
+	m_byteBuffer(BufferSize),
+	m_digestType(DigestEngine),
+	m_isDestroyed(false)
+{
+	if (Seed.size() == 0)
+		throw CryptoRandomException("DCR:Ctor", "Seed can not be null!");
+	if (GetMinimumSeedSize(DigestEngine) < Seed.size())
+		throw CryptoRandomException("DCR:Ctor", "The state seed is too small! must be at least digest block size + 8 bytes");
+	if (BufferSize < BUFFER_MIN)
+		throw CryptoRandomException("DCR:Ctor", "BufferSize must be at least 128 bytes!");
+
+	m_pvdType = Providers::CSP;
+	Reset();
+}
+
+DCR::~DCR()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void DCR::Destroy()
 {
 	if (!m_isDestroyed)
@@ -20,8 +58,6 @@ void DCR::Destroy()
 		Utility::ArrayUtils::ClearVector(m_byteBuffer);
 		Utility::ArrayUtils::ClearVector(m_stateSeed);
 
-		if (m_seedGenerator != 0)
-			delete m_seedGenerator;
 		if (m_rngGenerator != 0)
 			delete m_rngGenerator;
 
@@ -29,13 +65,6 @@ void DCR::Destroy()
 	}
 }
 
-/// <summary>
-/// Return an array filled with pseudo random bytes
-/// </summary>
-/// 
-/// <param name="Size">Size of requested byte array</param>
-/// 
-/// <returns>Random byte array</returns>
 std::vector<byte> DCR::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
@@ -43,11 +72,6 @@ std::vector<byte> DCR::GetBytes(size_t Size)
 	return data;
 }
 
-/// <summary>
-/// Fill an array with pseudo random bytes
-/// </summary>
-///
-/// <param name="Output">Output array</param>
 void DCR::GetBytes(std::vector<byte> &Output)
 {
 	if (Output.size() == 0)
@@ -88,23 +112,11 @@ void DCR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt32</returns>
 uint DCR::Next()
 {
 	return Utility::IntUtils::ToInt32(GetBytes(4));
 }
 
-/// <summary>
-/// Get an pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint DCR::Next(uint Maximum)
 {
 	std::vector<byte> rand;
@@ -120,14 +132,6 @@ uint DCR::Next(uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 32bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt32</returns>
 uint DCR::Next(uint Minimum, uint Maximum)
 {
 	uint num = 0;
@@ -135,23 +139,11 @@ uint DCR::Next(uint Minimum, uint Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <returns>Random UInt64</returns>
 ulong DCR::NextLong()
 {
 	return Utility::IntUtils::ToInt64(GetBytes(8));
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong DCR::NextLong(ulong Maximum)
 {
 	std::vector<byte> rand;
@@ -167,14 +159,6 @@ ulong DCR::NextLong(ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Get a ranged pseudo random unsigned 64bit integer
-/// </summary>
-/// 
-/// <param name="Minimum">Minimum value</param>
-/// <param name="Maximum">Maximum value</param>
-/// 
-/// <returns>Random UInt64</returns>
 ulong DCR::NextLong(ulong Minimum, ulong Maximum)
 {
 	ulong num = 0;
@@ -182,14 +166,8 @@ ulong DCR::NextLong(ulong Minimum, ulong Maximum)
 	return num;
 }
 
-/// <summary>
-/// Reset the generator instance
-/// </summary>
 void DCR::Reset()
 {
-
-	if (m_seedGenerator != 0)
-		delete m_seedGenerator;
 	if (m_rngGenerator != 0)
 		delete m_rngGenerator;
 
@@ -201,9 +179,10 @@ void DCR::Reset()
 	}
 	else
 	{
-		m_seedGenerator = GetProvider(m_seedType);
+		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType);
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
-		m_seedGenerator->GetBytes(seed);
+		seedGen->GetBytes(seed);
+		delete seedGen;
 		m_rngGenerator->Initialize(seed);
 	}
 
@@ -211,7 +190,7 @@ void DCR::Reset()
 	m_bufferIndex = 0;
 }
 
-//~~~Protected Methods~~~//
+//~~~Private Functions~~~//
 
 std::vector<byte> DCR::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
@@ -281,18 +260,6 @@ uint DCR::GetMinimumSeedSize(Digests RngEngine)
 			return ctrLen + 64;
 		default:
 			return ctrLen + 128;
-	}
-}
-
-IProvider* DCR::GetProvider(Providers SeedEngine)
-{
-	try
-	{
-		return Helper::ProviderFromName::GetInstance(SeedEngine);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoRandomException("DCR:GetSeedGenerator", "Seed generator could not be instantiated!", std::string(ex.what()));
 	}
 }
 

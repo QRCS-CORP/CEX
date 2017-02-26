@@ -98,18 +98,27 @@ namespace Test
 		if (outBytes != m_output[1])
 			throw std::exception("HKDF: Initialization test failed!");
 
-		// hmac instance
-		Mac::HMAC hmac(Enumeration::Digests::SHA256);
-		Kdf::HKDF gen2(&hmac);
+		// digest instance
+		Digest::SHA256* dgt = new Digest::SHA256();
+		Kdf::HKDF gen2(dgt);
 		gen2.Initialize(m_key[1], m_salt[1], m_info[1]);
 		gen2.Generate(outBytes, 0, outBytes.size());
+		delete dgt;
+		if (outBytes != m_output[1])
+			throw std::exception("HKDF: Initialization test failed!");
+
+		// hmac instance
+		Mac::HMAC hmac(Enumeration::Digests::SHA256);
+		Kdf::HKDF gen3(&hmac);
+		gen3.Initialize(m_key[1], m_salt[1], m_info[1]);
+		gen3.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[1])
 			throw std::exception("HKDF: Initialization test failed!");
 
 		// test reset
-		gen2.Reset();
-		gen2.Initialize(m_key[1], m_salt[1], m_info[1]);
-		gen2.Generate(outBytes, 0, outBytes.size());
+		gen1.Reset();
+		gen1.Initialize(m_key[1], m_salt[1], m_info[1]);
+		gen1.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[1])
 			throw std::exception("HKDF: Initialization test failed!");
 

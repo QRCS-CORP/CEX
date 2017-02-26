@@ -14,6 +14,61 @@ using Utility::IntUtils;
 using Numeric::UInt128;
 using Numeric::UInt256;
 
+const std::string THX::DEF_INFO = "THX version 1 information string";
+
+//~~~Constructor~~~//
+
+THX::THX(Digests KdfEngineType, uint Rounds)
+	:
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_kdfEngine(KdfEngineType == Digests::None ? 0 : DigestFromName::GetInstance(KdfEngineType)),
+	m_kdfEngineType(KdfEngineType),
+	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(Rounds),
+	m_sBox(SBOX_SIZE, 0)
+{
+	if (KdfEngineType != Digests::None && Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
+			throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
+
+	LoadState(KdfEngineType);
+}
+
+THX::THX(IDigest *KdfEngine, size_t Rounds)
+	:
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_kdfEngine(KdfEngine),
+	m_kdfEngineType(m_kdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
+	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(Rounds),
+	m_sBox(SBOX_SIZE, 0)
+{
+	if (Rounds != 16 && Rounds != 18 && Rounds != 20 && Rounds != 22 && Rounds != 24 && Rounds != 26 && Rounds != 28 && Rounds != 30 && Rounds != 32)
+		throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds size! Sizes supported are 16, 18, 20, 22, 24, 26, 28, 30 and 32.");
+
+	LoadState(KdfEngine->Enumeral());
+}
+
+THX::~THX()
+{
+	Destroy();
+}
+
+//~~~Public Functions~~~//
+
 void THX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Decrypt16(Input, 0, Output, 0);
@@ -67,22 +122,20 @@ void THX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt16(Input, InOffset, Output, OutOffset);
 }
 
-void THX::Initialize(bool Encryption, ISymmetricKey &KeyParam)
+void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParam.Key().size()))
+	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
 		throw CryptoSymmetricCipherException("THX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
-	if (m_kdfEngineType != Enumeration::Digests::None && KeyParam.Info().size() > m_kdfInfoMax)
+	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
 		throw CryptoSymmetricCipherException("THX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 
-	if (m_kdfEngineType != Enumeration::Digests::None)
-		m_kdfEngine = LoadDigest(m_kdfEngineType);
-
-	if (KeyParam.Info().size() > 0)
-		m_kdfInfo = KeyParam.Info();
+	if (KeyParams.Info().size() > 0)
+		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
 	// expand the key
-	ExpandKey(KeyParam.Key());
+	ExpandKey(KeyParams.Key());
+
 	// ready to transform data
 	m_isInitialized = true;
 }
@@ -554,27 +607,8 @@ void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 //~~~Helpers~~~//
 
-Digest::IDigest* THX::LoadDigest(Enumeration::Digests DigestType)
-{
-	try
-	{
-		return DigestFromName::GetInstance(DigestType);
-	}
-	catch(std::exception& ex)
-	{
-		throw CryptoSymmetricCipherException("THX:LoadDigest", "The digest could not be instantiated!", std::string(ex.what()));
-	}
-}
-
 void THX::LoadState(Digests ExtractorType)
 {
-	std::string info = "THX version 1 information string";
-	m_kdfInfo.reserve(info.size());
-	for (size_t i = 0; i < info.size(); ++i)
-		m_kdfInfo.push_back(info[i]);
-
-	m_kdfEngineType = ExtractorType;
-
 	if (ExtractorType == Digests::None)
 	{
 		m_legalRounds.resize(2);

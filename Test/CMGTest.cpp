@@ -44,7 +44,7 @@ namespace Test
 		try
 		{
 			// test enumeration instantiation
-			Drbg::CMG ctd(BlockCiphers::RHX, Digests::SHA256);
+			Drbg::CMG ctd(BlockCiphers::Rijndael, Digests::SHA256);
 			// test seed + nonce + info init
 			ctd.Initialize(key, nonce, info);
 			ctd.Generate(output);
@@ -61,7 +61,7 @@ namespace Test
 
 			// test parallel
 			output.resize(ctd.ParallelBlockSize());
-			ctd.IsParallel() = true;
+			ctd.ParallelProfile().IsParallel() = true;
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
