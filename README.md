@@ -13,7 +13,7 @@ All that aside, this has come a long way since the initial translation of the C#
 ##Updates
 
 ###Version 0.14: February 26, 2017
-* Added pipelind and parallelized EAX, GCM, and OCB authenticated cipher modes
+* Added pipelined and parallelized EAX, GCM, and OCB authenticated cipher modes
 * Global integration of the ParallelOptions class for auto-calculating and independant SIMD and multi-threading controls
 * Addition of the GMAC message authentication generator
 * Implementation of cache management and constant-time timing attack counter-measures
