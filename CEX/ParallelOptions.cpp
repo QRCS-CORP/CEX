@@ -88,9 +88,12 @@ void ParallelOptions::Calculate()
 	// first init is auto
 	if (m_autoInit)
 	{
+		m_parallelBlockSize = (m_l1DataCacheTotal - m_l1DataCacheReserved);
 		// split channels in/out by halving available cache
 		if (m_splitChannel)
-			m_parallelBlockSize = (m_l1DataCacheTotal - m_l1DataCacheReserved) / 2;
+			m_parallelBlockSize /= 2;
+
+
 		// default to capability
 		m_isParallel = (m_processorCount > 1);
 		// on init only
