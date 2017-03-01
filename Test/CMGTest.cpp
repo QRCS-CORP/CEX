@@ -39,12 +39,13 @@ namespace Test
 		std::vector<byte> info(96, 0x01);
 		std::vector<byte> key(32, 0x02);
 		std::vector<byte> nonce(16, 0x03);
-		std::vector<byte> output(SAMPLE_SIZE);
+		std::vector<byte> output(0);
 
 		try
 		{
 			// test enumeration instantiation
 			Drbg::CMG ctd(BlockCiphers::Rijndael, Digests::SHA256);
+			output.resize(ctd.ParallelBlockSize());
 			// test seed + nonce + info init
 			ctd.Initialize(key, nonce, info);
 			ctd.Generate(output);
@@ -60,7 +61,6 @@ namespace Test
 				throw std::exception("CMGTest: Failed duplication test!");
 
 			// test parallel
-			output.resize(ctd.ParallelBlockSize());
 			ctd.ParallelProfile().IsParallel() = true;
 			ctd.Generate(output);
 
@@ -87,6 +87,7 @@ namespace Test
 			Digest::SHA256* dgt = new Digest::SHA256;
 			RHX* cpr = new RHX;
 			Drbg::CMG ctd2(cpr, dgt);
+			output.resize(ctd2.ParallelBlockSize());
 			ctd2.Initialize(key);
 			ctd2.Generate(output);
 			delete cpr;
