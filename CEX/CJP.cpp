@@ -107,15 +107,15 @@ std::vector<byte> CJP::GetBytes(size_t Length)
 	return data;
 }
 
-uint32_t CJP::Next()
+uint CJP::Next()
 {
 	if (!m_isAvailable)
 		throw CryptoRandomException("CJP:Next", "High resolution timer not available or too coarse for RNG!");
 
-	std::vector<byte> data(sizeof(uint32_t));
+	std::vector<byte> data(sizeof(uint));
 	Generate(data, 0, data.size());
-	uint32_t rnd = 0;
-	memcpy(&rnd, &data[0], sizeof(uint32_t));
+	uint rnd = 0;
+	memcpy(&rnd, &data[0], sizeof(uint));
 
 	return rnd;
 }
@@ -140,8 +140,8 @@ void CJP::AccessMemory()
 	// L3 and real memory accesses have even a wider range of wait states. However, to reliably access either L3 or memory, the ec->m_memState memory must be quite large which is usually not desirable.
 
 	byte* tmpState = 0;
-	const uint32_t WRPSZE = m_memBlockSize * m_memBlocks;
-	const size_t ACLCNT = (size_t)(m_memAccessLoops + ShuffleLoop(ACC_LOOP_BIT_MAX, ACC_LOOP_BIT_MIN));
+	const uint WRPSZE = m_memBlockSize * m_memBlocks;
+	const size_t ACLCNT = (m_memAccessLoops + ShuffleLoop(ACC_LOOP_BIT_MAX, ACC_LOOP_BIT_MIN));
 
 	for (size_t i = 0; i < ACLCNT; ++i)
 	{
@@ -155,16 +155,15 @@ void CJP::AccessMemory()
 }
 CEX_OPTIMIZE_RESUME
 
-uint64_t CJP::DebiasBit()
+// Von Neuman unbias function as explained in RFC 4086 section 4.2.
+// As shown in the documentation of that RNG, the bits from MeasureJitter are considered independent which 
+// implies that the Von Neuman unbias operation is applicable.
+ulong CJP::DebiasBit()
 {
-	// Von Neuman unbias function as explained in RFC 4086 section 4.2.
-	// as shown in the documentation of that RNG, the bits from MeasureJitter are considered independent which 
-	// implies that the Von Neuman unbias operation is applicable.
-
 	do
 	{
-		uint64_t a = MeasureJitter();
-		uint64_t b = MeasureJitter();
+		ulong a = MeasureJitter();
+		ulong b = MeasureJitter();
 
 		if (a == b)
 			continue;
@@ -181,8 +180,8 @@ void CJP::Detect()
 
 		if (detect.L1CacheTotal() != 0)
 		{
-			m_memBlockSize = detect.L1CacheLineSize();
-			m_memBlocks = (detect.L1CacheTotal() / detect.VirtualCores() / m_memBlockSize);
+			m_memBlockSize = static_cast<uint>(detect.L1CacheLineSize());
+			m_memBlocks = (static_cast<uint>(detect.L1CacheTotal()) / static_cast<uint>(detect.VirtualCores()) / m_memBlockSize);
 			m_memTotalSize = m_memBlocks * m_memBlockSize;
 			m_memAccessLoops = (m_memTotalSize / m_memBlockSize) * 2;
 		}
@@ -196,21 +195,22 @@ void CJP::Detect()
 	}
 }
 
+// CPU jitter noise source; this is the noise source based on the CPU execution time jitter.
+// This function not only acts as folding operation, but this function's execution is used to measure the CPU execution time jitter. 
 CEX_OPTIMIZE_IGNORE
-void CJP::FoldTime(uint64_t TimeStamp, uint64_t &Folded)
+void CJP::FoldTime(ulong TimeStamp, ulong &Folded)
 {
-	// CPU jitter noise source; this is the noise source based on the CPU execution time jitter
-	// this function not only acts as folding operation, but this function's execution is used to measure the CPU execution time jitter. 
+
 
 	const size_t FLDCNT = ShuffleLoop(FOLD_LOOP_BIT_MAX, FOLD_LOOP_BIT_MIN);
-	uint64_t fldTmp = 0;
+	ulong fldTmp = 0;
 
 	for (size_t j = 0; j < FLDCNT; ++j)
 	{
 		fldTmp = 0;
 		for (size_t i = 1; (DATA_SIZE_BITS) >= i; ++i)
 		{
-			uint64_t tmp = TimeStamp << (DATA_SIZE_BITS - i);
+			ulong tmp = TimeStamp << (DATA_SIZE_BITS - i);
 			tmp = tmp >> (DATA_SIZE_BITS - 1);
 			fldTmp ^= tmp;
 		}
@@ -222,7 +222,7 @@ CEX_OPTIMIZE_RESUME
 
 size_t CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	const size_t RNDSZE = sizeof(uint64_t);
+	const size_t RNDSZE = sizeof(ulong);
 
 	do
 	{
@@ -251,11 +251,11 @@ void CJP::Generate64()
 	// priming of the m_prevTime value
 	MeasureJitter();
 
-	uint32_t smpCtr = 0;
+	uint smpCtr = 0;
 
 	while (true)
 	{
-		uint64_t jitter = 0;
+		ulong jitter = 0;
 
 		if (m_enableDebias)
 			jitter = DebiasBit();
@@ -287,24 +287,23 @@ void CJP::Generate64()
 		StirPool();
 }
 
-uint64_t CJP::GetTimeStamp()
+ulong CJP::GetTimeStamp()
 {
 	return Utility::SysUtils::TimeStamp();
 }
 
-uint64_t CJP::MeasureJitter()
+// The heart of the entropy generation process; calculate time deltas and use the CPU jitter in the time deltas.
+// The jitter is folded into one bit; this function is the "random bit generator" as it produces one random bit per invocation.
+ulong CJP::MeasureJitter()
 {
-	// the heart of the entropy generation process; calculate time deltas and use the CPU jitter in the time deltas.
-	// the jitter is folded into one bit; this function is the "random bit generator" as it produces one random bit per invocation
-
-	uint64_t delta = 0;
-	uint64_t folded = 0;
+	ulong delta = 0;
+	ulong folded = 0;
 
 	// Invoke one noise source before time measurement to add variations
 	if (m_enableAccess)
 		AccessMemory();
 	// Get time stamp and calculate time delta to previous invocation to measure the timing variations
-	uint64_t time = GetTimeStamp();
+	ulong time = GetTimeStamp();
 	delta = time - m_prevTime;
 	m_prevTime = time;
 	// Now call the next noise sources which also folds the data
@@ -342,15 +341,15 @@ void CJP::Prime()
 	Generate64();
 }
 
-uint32_t CJP::ShuffleLoop(uint32_t LowBits, uint32_t MinShift)
+size_t CJP::ShuffleLoop(uint LowBits, uint MinShift)
 {
 	// update of the loop count used for the next round of an entropy collection
 
-	const uint32_t SHFMSK = (1 << LowBits) - 1;
-	uint64_t shuffle = 0;
+	const uint SHFMSK = (1 << LowBits) - 1;
+	ulong shuffle = 0;
 
 	// store the timestamp
-	uint64_t time = GetTimeStamp();
+	ulong time = GetTimeStamp();
 	// mix the current state of the random number into the shuffle calculation to balance that shuffle a bit more
 	time ^= m_rndState;
 
@@ -362,24 +361,23 @@ uint32_t CJP::ShuffleLoop(uint32_t LowBits, uint32_t MinShift)
 	}
 
 	// add a lower boundary value to ensure we have a minimum RNG loop count
-	return (uint32_t)(shuffle + (1 << MinShift));
+	return static_cast<size_t>(shuffle + (1 << MinShift));
 }
 
+// Shuffle the pool by mixing some value with a bijective function (XOR) into the pool.
+// This function generates a mixer value that depends on the bits set and the
+// location of the set bits in the random number generated by the entropy source.
+// Therefore, based on the generated random number, this mixer value can have 2**64 different values.
+// That mixer value is initialized with the first two SHA-1 constants.
+// After obtaining the mixer value, it is XORed into the random number.
+// The mixer value is not assumed to contain any entropy,
+// but due to the XOR operation, it can also not destroy any entropy present in the entropy pool.
 void CJP::StirPool()
 {
-	// shuffle the pool by mixing some value with a bijective function (XOR) into the pool
-	// this function generates a mixer value that depends on the bits set and the
-	// location of the set bits in the random number generated by the entropy source.
-	// therefore, based on the generated random number, this mixer value can have 2**64 different values.
-	// that mixer value is initialized with the first two SHA-1 constants.
-	// after obtaining the mixer value, it is XORed into the random number.
-	// the mixer value is not assumed to contain any entropy.
-	// but due to the XOR operation, it can also not destroy any entropy present in the entropy pool.
-
 	union c
 	{
-		uint64_t u64;
-		uint32_t u32[2];
+		ulong u64;
+		uint u32[2];
 	};
 
 	// This constant is derived from the first two 32 bit initialization vectors of SHA-1 as defined in FIPS 180-4 section 5.3.1
@@ -407,15 +405,14 @@ void CJP::StirPool()
 	m_rndState ^= mixer.u64;
 }
 
-void CJP::StuckCheck(uint64_t CurrentDelta)
+// Checks the 1st derivation of the jitter measurement (time delta), 
+// 2nd derivation of the jitter measurement (delta of time deltas),
+// and the 3rd derivation of the jitter measurement (delta of delta of time deltas).
+// A 0 jitter measurement not stuck test (good bit), 1 jitter measurement stuck test (reject bit).
+void CJP::StuckCheck(ulong CurrentDelta)
 {
-	// checks the 1st derivation of the jitter measurement (time delta), 
-	// 2nd derivation of the jitter measurement (delta of time deltas),
-	// and the 3rd derivation of the jitter measurement (delta of delta of time deltas).
-	// 0 jitter measurement not stuck test (good bit), 1 jitter measurement stuck test (reject bit).
-
-	const uint64_t DELTA2 = m_lastDelta - CurrentDelta;
-	const uint64_t DELTA3 = DELTA2 - m_lastDelta2;
+	const ulong DELTA2 = m_lastDelta - CurrentDelta;
+	const ulong DELTA3 = DELTA2 - m_lastDelta2;
 
 	m_lastDelta = CurrentDelta;
 	m_lastDelta2 = DELTA2;
@@ -426,20 +423,20 @@ void CJP::StuckCheck(uint64_t CurrentDelta)
 
 bool CJP::TimerCheck()
 {
-	uint64_t sumDelta = 0;
-	uint64_t oldDelta = 0;
+	ulong sumDelta = 0;
+	ulong oldDelta = 0;
 	size_t backCtr = 0;
 	size_t varCtr = 0;
 	size_t modCtr = 0;
 
 	for (size_t i = 0; (LOOP_TEST_COUNT + CLEARCACHE) > i; i++)
 	{
-		uint64_t delta = 0;
-		uint64_t folded = 0;
+		ulong delta = 0;
+		ulong folded = 0;
 
-		uint64_t time = Utility::SysUtils::TimeStamp();
+		ulong time = Utility::SysUtils::TimeStamp();
 		FoldTime(time, folded);
-		uint64_t time2 = Utility::SysUtils::TimeStamp();
+		ulong time2 = Utility::SysUtils::TimeStamp();
 
 		// test whether timer works
 		if (time == 0 || time2 == 0)

@@ -47,15 +47,15 @@ class CipherDescription
 {
 private:
 
-	static const uint32_t HDR_SIZE = 9;
-	uint8_t m_engineType;
-	uint16_t m_keySize;
-	uint8_t m_ivSize;
-	uint8_t m_cipherType;
-	uint8_t m_paddingType;
-	uint8_t m_blockSize;
-	uint8_t m_roundCount;
-	uint8_t m_kdfEngine;
+	static const uint HDR_SIZE = 9;
+	byte m_engineType;
+	short m_keySize;
+	byte m_ivSize;
+	byte m_cipherType;
+	byte m_paddingType;
+	byte m_blockSize;
+	byte m_roundCount;
+	byte m_kdfEngine;
 
 public:
 
@@ -71,12 +71,12 @@ public:
 	/// <summary>
 	/// Get: The cipher Key Size
 	/// </summary>
-	const uint16_t KeySize() const { return m_keySize; }
+	const short KeySize() const { return m_keySize; }
 
 	/// <summary>
 	/// Set: The cipher Key Size
 	/// </summary>
-	uint16_t &KeySize() { return m_keySize; }
+	short &KeySize() { return m_keySize; }
 
 	/// <summary>
 	/// Size of the cipher Initialization Vector
@@ -137,17 +137,17 @@ public:
 	/// <param name="BlockSize">The cipher block size</param>
 	/// <param name="RoundCount">The number of transformation rounds</param>
 	/// <param name="KdfEngine">The digest engine used to power the key schedule key derivation Function in HX extended ciphers</param>
-	CipherDescription(SymmetricEngines EngineType, uint16_t KeySize, IVSizes IvSize, CipherModes CipherType, 
+	CipherDescription(SymmetricEngines EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType, 
 		PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine = Digests::SHA512)
 	{
-		m_engineType = static_cast<uint8_t>(EngineType);
+		m_engineType = static_cast<byte>(EngineType);
 		m_keySize = KeySize;
-		m_ivSize = static_cast<uint8_t>(IvSize);
-		m_cipherType = static_cast<uint8_t>(CipherType);
-		m_paddingType = static_cast<uint8_t>(PaddingType);
-		m_blockSize = static_cast<uint8_t>(BlockSize);
-		m_roundCount = static_cast<uint8_t>(RoundCount);
-		m_kdfEngine = static_cast<uint8_t>(KdfEngine);
+		m_ivSize = static_cast<byte>(IvSize);
+		m_cipherType = static_cast<byte>(CipherType);
+		m_paddingType = static_cast<byte>(PaddingType);
+		m_blockSize = static_cast<byte>(BlockSize);
+		m_roundCount = static_cast<byte>(RoundCount);
+		m_kdfEngine = static_cast<byte>(KdfEngine);
 	}
 
 	/// <summary>

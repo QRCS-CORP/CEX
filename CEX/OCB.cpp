@@ -92,11 +92,11 @@ void OCB::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	memcpy(&Output[OutOffset], &Input[InOffset], BLOCK_SIZE);
 	std::vector<byte> hash(BLOCK_SIZE);
 	GetLSub(Ntz(++m_mainBlockCount), hash);
-	IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
-	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
-	IntUtils::XORBLK(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+	IntUtils::XORBLK(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 }
 
 void OCB::Destroy()
@@ -155,13 +155,13 @@ void OCB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	memcpy(&Output[OutOffset], &Input[InOffset], BLOCK_SIZE);
-	IntUtils::XORBLK(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	std::vector<byte> hash(BLOCK_SIZE);
 	GetLSub(Ntz(++m_mainBlockCount), hash);
-	IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
-	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 }
 
 void OCB::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length)
@@ -237,10 +237,10 @@ void OCB::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 		GetLSub(Ntz(++blkCnt), offset);
 		std::vector<byte> tmp(BLOCK_SIZE);
 		memcpy(&tmp[0], &Input[blkOff], BLOCK_SIZE);
-		IntUtils::XORBLK(offset, 0, offsetHash, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
-		IntUtils::XORBLK(offsetHash, 0, tmp, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(offset, 0, offsetHash, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+		IntUtils::XORBLK(offsetHash, 0, tmp, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 		m_hashCipher->Transform(tmp, 0, tmp, 0);
-		IntUtils::XORBLK(tmp, 0, m_aadData, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(tmp, 0, m_aadData, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 		blkOff += BLOCK_SIZE;
 		blkLen -= BLOCK_SIZE;
 	}
@@ -250,10 +250,10 @@ void OCB::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 		std::vector<byte> tmp(BLOCK_SIZE);
 		memcpy(&tmp[0], &Input[blkOff], blkLen);
 		ExtendBlock(tmp, blkLen);
-		IntUtils::XORBLK(m_listAsterisk, 0, offsetHash, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
-		IntUtils::XORBLK(offsetHash, 0, tmp, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(m_listAsterisk, 0, offsetHash, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+		IntUtils::XORBLK(offsetHash, 0, tmp, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 		m_hashCipher->Transform(tmp, 0, tmp, 0);
-		IntUtils::XORBLK(tmp, 0, m_aadData, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(tmp, 0, m_aadData, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	}
 
 	m_aadLoaded = true;
@@ -337,10 +337,10 @@ bool OCB::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 
 void OCB::CalculateMac()
 {
-	IntUtils::XORBLK(m_mainOffset, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
-	IntUtils::XORBLK(m_listDollar, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_mainOffset, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+	IntUtils::XORBLK(m_listDollar, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	m_hashCipher->Transform(m_checkSum, 0, m_checkSum, 0);
-	IntUtils::XORBLK(m_aadData, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_aadData, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	memcpy(&m_msgTag[0], &m_checkSum[0], m_macSize);
 	Reset();
 
@@ -422,9 +422,9 @@ void OCB::GetLSub(size_t N, std::vector<byte> &LSub)
 	memcpy(&LSub[0], &m_hashList[N][0], BLOCK_SIZE);
 }
 
-uint32_t OCB::Ntz(uint64_t X)
+uint OCB::Ntz(ulong X)
 {
-	uint32_t zCnt = 0;
+	uint zCnt = 0;
 
 	while (!(X & 1)) 
 	{
@@ -445,28 +445,28 @@ void OCB::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		const size_t SUBBLK = PBKALN / AVXBLK;
 
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 		for (size_t i = 0; i < SUBBLK; ++i)
 			m_blockCipher->Transform128(Output, OutOffset + (i * AVXBLK), Output, OutOffset + (i * AVXBLK));
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 	}
 	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
 	{
 		const size_t PBKALN = Length - (Length % SSEBLK);
 		const size_t SUBBLK = PBKALN / AVXBLK;
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 		for (size_t i = 0; i < SUBBLK; ++i)
 			m_blockCipher->Transform128(Output, OutOffset + (i * SSEBLK), Output, OutOffset + (i * SSEBLK));
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 	}
 	else
 	{
 		const size_t PBKALN = Length - (Length % BLOCK_SIZE);
 		const size_t SUBBLK = PBKALN / BLOCK_SIZE;
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 		for (size_t i = 0; i < SUBBLK; ++i)
 			m_blockCipher->Transform(Output, OutOffset + (i * BLOCK_SIZE), Output, OutOffset + (i * BLOCK_SIZE));
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 	}
 }
 
@@ -487,7 +487,7 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	for (size_t i = 0; i < BLKCNT; ++i)
 	{
 		GetLSub(Ntz(++m_mainBlockCount), hash);
-		IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 		memcpy(&offsetChain[(i * BLOCK_SIZE)], &m_mainOffset[0], BLOCK_SIZE);
 	}
 
@@ -512,9 +512,9 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	{
 		while (Length >= BLOCK_SIZE)
 		{
-			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 			m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 
 			Length -= BLOCK_SIZE;
 			OutOffset += BLOCK_SIZE;
@@ -527,7 +527,7 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 
 	// update the checksum
 	for (size_t i = 0; i < BLKCNT; ++i)
-		IntUtils::XORBLK(Output, OUTOFF + (i * BLOCK_SIZE), m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Output, OUTOFF + (i * BLOCK_SIZE), m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 }
 
 void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -540,7 +540,7 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 
 	// pre-fold the checksum
 	for (size_t i = 0; i < BLKCNT; ++i)
-		IntUtils::XORBLK(Output, OutOffset + (i * BLOCK_SIZE), m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Output, OutOffset + (i * BLOCK_SIZE), m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 
 	// create the offset chain
 	std::vector<byte> offsetChain(ALNLEN);
@@ -550,7 +550,7 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	for (size_t i = 0; i < BLKCNT; ++i)
 	{
 		GetLSub(Ntz(++m_mainBlockCount), hash);
-		IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(hash, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 		memcpy(&offsetChain[(i * BLOCK_SIZE)], &m_mainOffset[0], BLOCK_SIZE);
 	}
 
@@ -575,9 +575,9 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	{
 		while (Length >= BLOCK_SIZE)
 		{
-			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 			m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+			IntUtils::XORBLK(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 
 			Length -= BLOCK_SIZE;
 			OutOffset += BLOCK_SIZE;
@@ -597,16 +597,16 @@ void OCB::ProcessPartial(const std::vector<byte> &Input, const size_t InOffset, 
 		ExtendBlock(Output, OutOffset + Length);
 
 		IntUtils::XORPRT(Output, OutOffset, m_checkSum, 0, Length + 1);
-		IntUtils::XORBLK(m_listAsterisk, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(m_listAsterisk, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 
 		std::vector<byte> pad(BLOCK_SIZE);
 		m_hashCipher->Transform(m_mainOffset, 0, pad, 0);
-		IntUtils::XORBLK(pad, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(pad, 0, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	}
 	else
 	{
 		memcpy(&Output[OutOffset], &Input[InOffset], Length);
-		IntUtils::XORBLK(m_listAsterisk, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(m_listAsterisk, 0, m_mainOffset, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 
 		std::vector<byte> pad(BLOCK_SIZE);
 		m_hashCipher->Transform(m_mainOffset, 0, pad, 0);
@@ -615,7 +615,7 @@ void OCB::ProcessPartial(const std::vector<byte> &Input, const size_t InOffset, 
 		std::vector<byte> tmp(BLOCK_SIZE);
 		memcpy(&tmp[0], &Output[OutOffset], Length);
 		ExtendBlock(tmp, Length);
-		IntUtils::XORBLK(tmp, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(tmp, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	}
 }
 

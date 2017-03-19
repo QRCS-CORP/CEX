@@ -9,17 +9,18 @@ using Exception::CryptoProcessingException;
 
 //~~~Constructor~~~//
 
-ParallelOptions::ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel)
+ParallelOptions::ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree)
 	:
 	m_autoInit(true),
 	m_blockSize(BlockSize),
+	m_hasSHA2(false),
 	m_hasSimd128(false),
 	m_hasSimd256(false),
 	m_isParallel(false),
 	m_l1DataCacheReserved(ReservedCache),
 	m_l1DataCacheTotal(0),
 	m_parallelBlockSize(0),
-	m_parallelMaxDegree(0),
+	m_parallelMaxDegree(ParallelMaxDegree),
 	m_parallelMinimumSize(0),
 	m_physicalCores(0),
 	m_processorCount(0),
@@ -41,6 +42,7 @@ ParallelOptions::ParallelOptions(size_t BlockSize, bool Parallel, size_t Paralle
 	:
 	m_autoInit(false),
 	m_blockSize(BlockSize),
+	m_hasSHA2(false),
 	m_hasSimd128(false),
 	m_hasSimd256(false),
 	m_isParallel(Parallel),
@@ -160,12 +162,13 @@ void ParallelOptions::Detect()
 {
 	Common::CpuDetect detect;
 
+	m_hasSHA2 = detect.SHA();
 	m_hasSimd128 = detect.SSE();
 	m_hasSimd256 = detect.AVX2();
 	m_physicalCores = detect.PhysicalCores();
 	m_simdDetected = (m_hasSimd256) ? SimdProfiles::Simd256 : (m_hasSimd128) ? SimdProfiles::Simd128 : SimdProfiles::None;
 	m_virtualCores = detect.VirtualCores();
-	m_processorCount = (m_virtualCores > m_physicalCores) ? m_virtualCores: m_physicalCores;
+	m_processorCount = (m_virtualCores > m_physicalCores) ? m_virtualCores : m_physicalCores;
 
 	// TODO: fail-safe until CpuDetect is fully vetted
 	if (m_processorCount == 0 || m_processorCount > 32)
@@ -183,6 +186,7 @@ void ParallelOptions::Reset()
 {
 	m_autoInit = false;
 	m_blockSize = 0;
+	m_hasSHA2 = false;
 	m_hasSimd128 = false;
 	m_hasSimd256 = false;
 	m_l1DataCacheReserved = 0;

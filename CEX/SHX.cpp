@@ -231,7 +231,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 	size_t offset = 0;
 
 	// CHANGE: 512 key gets 8 extra rounds
-	m_rndCount = (Key.size() == 64) ? 40 : ROUNDS32;
+	m_rndCount = (Key.size() == 64) ? 40 : 32;
 	size_t keySize = 4 * (m_rndCount + 1);
 
 	// step 1: reverse copy key to temp array
@@ -255,7 +255,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// copy to expanded key
 		memcpy(&Wk[0], &Wp[8], 8 * sizeof(uint));
 
-		// step 3: calculate remainder of rounds with rotating primitive
+		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 8; i < keySize; i++)
 			Wk[i] = IntUtils::RotL32((uint)(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 	}
@@ -270,7 +270,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// copy to expanded key
 		memcpy(&Wk[0], &Wp[16], 16 * sizeof(uint));
 
-		// step 3: calculate remainder of rounds with rotating primitive
+		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 16; i < keySize; i++)
 			Wk[i] = IntUtils::RotL32((uint)(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
 	}

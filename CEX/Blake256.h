@@ -22,7 +22,7 @@
 // Blake2 whitepaper <a href="https://blake2.net/blake2.pdf">BLAKE2: simpler, smaller, fast as MD5</a>.
 // 
 // Implementation Details:
-// An implementation of the Blake2S and Blake2SP digests with a 256 bit digest output size.
+// An implementation of the Blake256Compress and Blake2SP digests with a 256 bit digest output size.
 // Based on the Blake2 Github projects by Samuel Neves and Christian Winnerlein.
 // Blake2: https://github.com/BLAKE2/BLAKE2
 //
@@ -32,21 +32,24 @@
 #ifndef _CEX_BLAKE2SP256_H
 #define _CEX_BLAKE2SP256_H
 
-#include "Blake2Params.h"
+#include "BlakeParams.h"
 #include "IDigest.h"
+#include "ISymmetricKey.h"
 
 NAMESPACE_DIGEST
 
+using Key::Symmetric::ISymmetricKey;
+
 /// <summary>
-/// An implementation of the Blake2S and Blake2SP digests with a 256 bit digest output size
+/// An implementation of the Blake256Compress and Blake2SP digests with a 256 bit digest output size
 /// </summary> 
 /// 
 /// <example>
 /// <description>Example using the Compute method:</description>
 /// <para>Use the Compute method for small to medium data sizes</para>
 /// <code>
-/// BlakeS256 dgt;
-/// std:vector&lt;uint8_t&gt; hash(dgt.DigestSize(), 0);
+/// Blake256 dgt;
+/// std:vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
 /// // compute a hash
 /// dgt.Compute(input, hash);
 /// </code>
@@ -55,8 +58,8 @@ NAMESPACE_DIGEST
 /// <example>
 /// <description>Use the Update method for large data sizes:</description>
 /// <code>
-/// BlakeS256 dgt;
-/// std:vector&lt;uint8_t&gt; hash(dgt.DigestSize(), 0);
+/// Blake256 dgt;
+/// std:vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
 /// int64_t len = (int64_t)input.size();
 ///
 /// // update blocks
@@ -77,17 +80,17 @@ NAMESPACE_DIGEST
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Algorithm is selected through the constructor (2S or 2SP), parallel version is selected through either the Parallel flag, or via the Blake2Params ThreadCount() configuration parameter.</description></item>
-/// <item><description>Parallel and sequential algorithms (Blake2S or Blake2SP) produce different digest outputs, this is expected.</description></item>
+/// <item><description>Algorithm is selected through the constructor (2S or 2SP), parallel version is selected through either the Parallel flag, or via the BlakeParams ThreadCount() configuration parameter.</description></item>
+/// <item><description>Parallel and sequential algorithms (Blake256Compress or Blake2SP) produce different digest outputs, this is expected.</description></item>
 /// <item><description>Sequential Block size is 64 bytes, (512 bits), but smaller or larger blocks can be processed, for best performance, align message input to a multiple of the internal block size.</description></item>
 /// <item><description>Parallel Block input size to the Update function should be aligned to a multiple of ParallelMinimumSize() for best performance.</description></item>
 /// <item><description>Best performance for parallel mode is to use a large input block size to minimize parallel loop creation cost, block size should be in a range of 32KiB to 25MiB.</description></item>
-/// <item><description>The number of threads used in parallel mode can be user defined through the Blake2Params->ThreadCount property to any even number of threads; note that hash value will change with threadcount.</description></item>
+/// <item><description>The number of threads used in parallel mode can be user defined through the BlakeParams->ThreadCount property to any even number of threads; note that hash value will change with threadcount.</description></item>
 /// <item><description>Digest output size is fixed at 32 bytes, (256 bits).</description></item>
-/// <item><description>The <see cref="Compute(uint8_t[])"/> method wraps the <see cref="Update(uint8_t[], size_t, size_t)"/> and Finalize methods</description>/></item>
-/// <item><description>The <see cref="Finalize(uint8_t[], size_t)"/> method resets the internal state.</description></item>
+/// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], size_t, size_t)"/> and Finalize methods</description>/></item>
+/// <item><description>The <see cref="Finalize(byte[], size_t)"/> method resets the internal state.</description></item>
 /// <item><description>Optional intrinsics are runtime enabled automatically based on cpu support.</description></item>
-/// <item><description>SIMD implementation requires compilation with SSSE3 or higher.</description></item>
+/// <item><description>SIMD implementation requires compilation with SSE3 or higher.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -100,27 +103,29 @@ NAMESPACE_DIGEST
 /// <item><description>SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c</a>.</description></item>
 /// </list>
 /// </remarks>
-class BlakeS256 : public IDigest
+class Blake256 : public IDigest
 {
 private:
 
-	static const uint32_t BLOCK_SIZE = 64;
-	static const uint32_t CHAIN_SIZE = 8;
-	static const uint32_t COUNTER_SIZE = 2;
-	static const uint32_t PARALLEL_DEG = 8;
-	const uint32_t DEF_LEAFSIZE = 16384;
+	static const size_t BLOCK_SIZE = 64;
+	static const uint CHAIN_SIZE = 8;
+	static const uint COUNTER_SIZE = 2;
+	static const uint DEF_PRLDEGREE = 8;
+	const uint DEF_LEAFSIZE = 16384;
 	const size_t DIGEST_SIZE = 32;
-	const uint32_t FLAG_SIZE = 2;
-	const uint32_t MAX_PRLBLOCK = 5120000;
-	const uint32_t MIN_PRLBLOCK = 256;
+	const uint FLAG_SIZE = 2;
+	const uint MAX_PRLBLOCK = 5120000;
+	const uint MIN_PRLBLOCK = 256;
 	const size_t ROUND_COUNT = 10;
-	const uint32_t UL_MAX = 4294967295;
+	// size of reserved state buffer subtracted from parallel size calculations
+	const size_t STATE_PRECACHED = 2048;
+	const uint UL_MAX = 4294967295;
 
 	struct Blake2sState
 	{
-		std::vector<uint32_t> H;
-		std::vector<uint32_t> T;
-		std::vector<uint32_t> F;
+		std::vector<uint> H;
+		std::vector<uint> T;
+		std::vector<uint> F;
 
 		Blake2sState()
 			:
@@ -133,33 +138,30 @@ private:
 		void Reset()
 		{
 			if (F.size() > 0)
-				memset(&F[0], 0, F.size() * sizeof(uint32_t));
+				memset(&F[0], 0, F.size() * sizeof(uint));
 			if (H.size() > 0)
-				memset(&H[0], 0, H.size() * sizeof(uint32_t));
+				memset(&H[0], 0, H.size() * sizeof(uint));
 			if (T.size() > 0)
-				memset(&T[0], 0, T.size() * sizeof(uint32_t));
+				memset(&T[0], 0, T.size() * sizeof(uint));
 		}
 	};
 
-	std::vector<uint32_t> m_cIV;
-	bool m_hasSimd128;
+	std::vector<uint> m_cIV;
+	std::vector<Blake2sState> m_dgtState;
 	bool m_isDestroyed;
-	bool m_isParallel;
-	uint32_t m_leafSize;
-	std::vector<uint8_t> m_msgBuffer;
+	uint m_leafSize;
+	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
-	size_t m_parallelBlockSize;
-	std::vector<Blake2sState> m_State;
-	std::vector<uint32_t> m_treeConfig;
+	std::vector<uint> m_treeConfig;
 	bool m_treeDestroy;
-	Blake2Params m_treeParams;
-	size_t m_minParallel;
+	BlakeParams m_treeParams;
+	ParallelOptions m_parallelProfile;
 
 public:
 
-	BlakeS256(const BlakeS256&) = delete;
-	BlakeS256& operator=(const BlakeS256&) = delete;
-	BlakeS256& operator=(BlakeS256&&) = delete;
+	Blake256(const Blake256&) = delete;
+	Blake256& operator=(const Blake256&) = delete;
+	Blake256& operator=(Blake256&&) = delete;
 
 	//~~~Properties~~~//
 
@@ -178,63 +180,64 @@ public:
 	/// </summary>
 	virtual Digests Enumeral() 
 	{ 
-		if (m_isParallel)
-			return Digests::BlakeSP256;
-		else
-			return Digests::BlakeS256;
+		return Digests::Blake256;
 	}
+
+	/// <summary>
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input data array passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 
 	/// <summary>
 	/// Get: The digests class name
 	/// </summary>
 	virtual const std::string Name()
 	{
-		if (m_isParallel)
-			return "BlakeSP256";
-		else
-			return "BlakeS256";
+		return "Blake256";
 	}
 
 	/// <summary>
-	/// Get: Parallel block size; set either automatically, or through the constructors Blake2Params ThreadCount() parameter. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelBlockSize; }
+	const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
 
 	/// <summary>
-	/// Get: Maximum input size with parallel processing
+	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state, or initialize the digest using a SkeinParams with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	virtual const size_t ParallelMaximumSize() { return MAX_PRLBLOCK; }
-
-	/// <summary>
-	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
-	/// </summary>
-	virtual const size_t ParallelMinimumSize() { return m_minParallel; }
+	ParallelOptions &ParallelProfile() { return m_parallelProfile; }
 
 	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Initialize the class as either the 2S or 2SP.
-	/// <para>Initialize as either the parallel version Blake2SP, or sequential Blake2S.</para>
+	/// <para>Initialize as either the parallel version Blake2SP, or sequential Blake256Compress.</para>
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2SP variant.</param>
-	explicit BlakeS256(bool Parallel = false);
+	explicit Blake256(bool Parallel = false);
 
 	/// <summary>
-	/// Initialize the class with a Blake2Params structure.
+	/// Initialize the class with a BlakeParams structure.
 	/// <para>The parameters structure allows for tuning of the internal configuration string,
 	/// and changing the number of threads used by the parallel mechanism (ThreadCount).
 	/// If the ThreadCount is greater than 1, parallel mode (Blake2SP) is instantiated.
 	/// The default thread count is 8, changing from the default will produce a different output hash code.</para>
 	/// </summary>
 	/// 
-	/// <param name="Params">The Blake2Params structure, containing the tree configuration settings.</param>
-	explicit BlakeS256(Blake2Params &Params);
+	/// <param name="Params">The BlakeParams structure, containing the tree configuration settings.</param>
+	explicit Blake256(BlakeParams &Params);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~BlakeS256();
+	virtual ~Blake256();
 
 	//~~~Public Functions~~~//
 
@@ -244,7 +247,7 @@ public:
 	/// 
 	/// <param name="Input">The message input data</param>
 	/// <param name="Output">The hash value output array</param>
-	virtual void Compute(const std::vector<uint8_t> &Input, std::vector<uint8_t> &Output);
+	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -261,17 +264,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual size_t Finalize(std::vector<uint8_t> &Output, const size_t OutOffset);
-
-	/// <summary>
-	/// Run the digest as an HKDF bytes generator
-	/// </summary>
-	/// 
-	/// <param name="MacKey">The input key parameters; the input Key should be at least as large as the hash output size</param>
-	/// <param name="Output">The array to fill with pseudo random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
-	virtual size_t Generate(ISymmetricKey &MacKey, std::vector<uint8_t> &Output);
+	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Initialize the digest as a MAC code generator
@@ -281,7 +274,18 @@ public:
 	/// <para>The input Key must be a maximum size of 32 bytes, and a minimum size of 16 bytes. 
 	/// If either the Salt or Info parameters are used, their size must be 8 bytes.
 	/// The maximum combined size of Key, Salt, and Info, must be 64 bytes or less.</para></param>
-	virtual void LoadMacKey(ISymmetricKey &MacKey);
+	virtual void Initialize(ISymmetricKey &MacKey);
+
+	/// <summary>
+	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
+	/// <para>Thread count must be an even number, and not exceed the number of processor cores.
+	/// Changing this value from the default (8 threads), will change the output hash value.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	virtual void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
 	/// Reset the internal state to sequential defaults
@@ -293,7 +297,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">Input message byte</param>
-	virtual void Update(uint8_t Input);
+	virtual void Update(byte Input);
 
 	/// <summary>
 	/// Update the message buffer
@@ -307,13 +311,13 @@ public:
 	/// <param name="Input">The Input message data</param>
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="Length">The amount of data to process in bytes</param>
-	virtual void Update(const std::vector<uint8_t> &Input, size_t InOffset, size_t Length);
+	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
-	void Detect();
-	void Initialize(Blake2Params &Params, Blake2sState &State);
-	void ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, size_t Length);
-	void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, Blake2sState &State, uint64_t Length);
+
+	void Compress(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length);
+	void LoadState(Blake2sState &State);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

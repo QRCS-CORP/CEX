@@ -18,7 +18,7 @@ SecureStream::SecureStream()
 {
 }
 
-SecureStream::SecureStream(size_t Length, uint64_t KeySalt)
+SecureStream::SecureStream(size_t Length, ulong KeySalt)
 	:
 	m_isDestroyed(false),
 	m_keySalt(0),
@@ -27,14 +27,14 @@ SecureStream::SecureStream(size_t Length, uint64_t KeySalt)
 {
 	if (KeySalt != 0)
 	{
-		m_keySalt.resize(sizeof(uint64_t));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+		m_keySalt.resize(sizeof(ulong));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
 	}
 
 	m_streamData.reserve(Length);
 }
 
-SecureStream::SecureStream(const std::vector<byte> &Data, uint64_t KeySalt)
+SecureStream::SecureStream(const std::vector<byte> &Data, ulong KeySalt)
 	:
 	m_isDestroyed(false),
 	m_keySalt(0),
@@ -43,14 +43,14 @@ SecureStream::SecureStream(const std::vector<byte> &Data, uint64_t KeySalt)
 {
 	if (KeySalt != 0)
 	{
-		m_keySalt.resize(sizeof(uint64_t));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+		m_keySalt.resize(sizeof(ulong));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
 	}
 
 	Transform();
 }
 
-SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, uint64_t KeySalt)
+SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, ulong KeySalt)
 	:
 	m_isDestroyed(false),
 	m_keySalt(0),
@@ -65,8 +65,8 @@ SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length
 
 	if (KeySalt != 0)
 	{
-		m_keySalt.resize(sizeof(uint64_t));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+		m_keySalt.resize(sizeof(ulong));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
 	}
 
 	Transform();
@@ -139,7 +139,7 @@ void SecureStream::Reset()
 	m_streamPosition = 0;
 }
 
-void SecureStream::Seek(uint64_t Offset, SeekOrigin Origin)
+void SecureStream::Seek(ulong Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 		m_streamPosition = Offset;
@@ -149,7 +149,7 @@ void SecureStream::Seek(uint64_t Offset, SeekOrigin Origin)
 		m_streamPosition += Offset;
 }
 
-void SecureStream::SetLength(uint64_t Length)
+void SecureStream::SetLength(ulong Length)
 {
 	m_streamData.reserve(Length);
 }

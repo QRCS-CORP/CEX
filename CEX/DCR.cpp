@@ -240,9 +240,9 @@ uint DCR::GetMinimumSeedSize(Digests RngEngine)
 
 	switch (RngEngine)
 	{
-	case Digests::BlakeS256:
+	case Digests::Blake256:
 			return ctrLen + 32;
-		case Digests::BlakeB512:
+		case Digests::Blake512:
 			return ctrLen + 64;
 		case Digests::Keccak256:
 			return ctrLen + 136;

@@ -4,6 +4,7 @@
 #include "CpuDetect.h"
 #include "IntUtils.h"
 #include "Intrinsics.h"
+#include "SimdProfiles.h"
 
 NAMESPACE_MAC
 
@@ -24,6 +25,11 @@ private:
 	size_t m_msgOffset;
 
 public:
+
+	/// <summary>
+	/// 128bit SIMD instructions are available on this system
+	/// </summary>
+	bool HasSimd128() { return m_hasCMul; }
 
 	/// <summary>
 	/// Instantiate this class; this is an internal class used by GMAC and GCM mode
@@ -59,7 +65,7 @@ public:
 		std::vector<byte> fnlBlock(BLOCK_SIZE);
 		IntUtils::Be64ToBytes(8 * AdSize, fnlBlock, 0);
 		IntUtils::Be64ToBytes(8 * TextSize, fnlBlock, 8);
-		IntUtils::XORBLK(fnlBlock, 0, Output, 0, BLOCK_SIZE, m_hasCMul);
+		IntUtils::XORBLK(fnlBlock, 0, Output, 0, BLOCK_SIZE, m_hasCMul ? Enumeration::SimdProfiles::Simd128 : Enumeration::SimdProfiles::None);
 		GcmMultiply(Output);
 	}
 
@@ -80,7 +86,7 @@ public:
 
 	void ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output)
 	{
-		IntUtils::XORBLK(Input, InOffset, Output, 0, BLOCK_SIZE, m_hasCMul);
+		IntUtils::XORBLK(Input, InOffset, Output, 0, BLOCK_SIZE, m_hasCMul ? Enumeration::SimdProfiles::Simd128 : Enumeration::SimdProfiles::None);
 		GcmMultiply(Output);
 	}
 

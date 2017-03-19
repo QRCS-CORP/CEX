@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Symmetric encryption ciphers enumeration names
 /// </summary>
-enum class SymmetricEngines : uint8_t
+enum class SymmetricEngines : byte
 {
 	/// <summary>
 	/// No symmetric cipher is specified

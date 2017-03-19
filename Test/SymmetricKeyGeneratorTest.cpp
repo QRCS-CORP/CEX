@@ -60,7 +60,7 @@ namespace Test
 		if (!IsValidKey(symKey1))
 			throw std::exception("CheckInit: Key generation has failed!");
 
-		SymmetricKeyGenerator keyGen2(Digests::BlakeB512, Providers::CSP);
+		SymmetricKeyGenerator keyGen2(Digests::Blake512, Providers::CSP);
 		SymmetricKey symKey2 = keyGen2.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey2))
 			throw std::exception("CheckInit: Key generation has failed!");

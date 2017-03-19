@@ -1,5 +1,5 @@
-#ifndef _CEX_KEYPARAMS_H
-#define _CEX_KEYPARAMS_H
+#ifndef _CEX_SYMMETRICKEY_H
+#define _CEX_SYMMETRICKEY_H
 
 #include "ISymmetricKey.h"
 

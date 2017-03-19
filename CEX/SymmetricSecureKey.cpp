@@ -21,7 +21,7 @@ SymmetricSecureKey::SymmetricSecureKey()
 {
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, uint64_t KeySalt)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySalt)
 	:
 	m_isDestroyed(false),
 	m_keySizes(Key.size(), 0, 0),
@@ -36,14 +36,14 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, uint64_t Ke
 
 	if (KeySalt != 0)
 	{
-		m_keySalt.resize(sizeof(uint64_t));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+		m_keySalt.resize(sizeof(ulong));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
 	}
 
 	Transform();
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, uint64_t KeySalt)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, ulong KeySalt)
 	:
 	m_isDestroyed(false),
 	m_keySalt(0),
@@ -59,14 +59,14 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 
 	if (KeySalt != 0)
 	{
-		m_keySalt.resize(sizeof(uint64_t));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+		m_keySalt.resize(sizeof(ulong));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
 	}
 
 	Transform();
 }
 
-SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, uint64_t KeySalt)
+SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, ulong KeySalt)
 	:
 	m_isDestroyed(false),
 	m_keySalt(0),
@@ -83,8 +83,8 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 
 	if (KeySalt != 0)
 	{
-		m_keySalt.resize(sizeof(uint64_t));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(uint64_t));
+		m_keySalt.resize(sizeof(ulong));
+		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
 	}
 
 	Transform();

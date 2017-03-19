@@ -27,91 +27,91 @@ NAMESPACE_DIGEST
 	/// <summary>
 	/// The Blake2 parameters structure
 	/// </summary> 
-	struct Blake2Params
+	struct BlakeParams
 	{
 	private:
 		static const size_t HDR_SIZE = 36;
 
-		uint8_t m_dgtLen;
-		uint8_t m_keyLen;
-		uint8_t m_fanOut;
-		uint8_t m_maxDepth;
-		uint32_t m_leafLength;
-		uint64_t m_nodeOffset;
-		uint8_t m_nodeDepth;
-		uint8_t m_innerLen;
-		uint8_t m_threadDepth;
-		uint8_t m_reserved2;
-		uint64_t m_reserved3;
-		uint64_t m_reserved4;
+		byte m_dgtLen;
+		byte m_keyLen;
+		byte m_fanOut;
+		byte m_maxDepth;
+		uint m_leafLength;
+		ulong m_nodeOffset;
+		byte m_nodeDepth;
+		byte m_innerLen;
+		byte m_threadDepth;
+		byte m_reserved2;
+		ulong m_reserved3;
+		ulong m_reserved4;
 
 	public:
 		/// <summary>
 		/// Get/Set: Digest byte length (1 byte): an integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s
 		/// </summary>
-		uint8_t &DigestLength() { return m_dgtLen; }
+		byte &DigestLength() { return m_dgtLen; }
 
 		/// <summary>
 		/// Get/Set: Key byte length (1 byte): an integer in [0, 64] for BLAKE2b, in [0, 32] for BLAKE2s (set to 0 if no key is used)
 		/// </summary>
-		uint8_t &KeyLength() { return m_keyLen; }
+		byte &KeyLength() { return m_keyLen; }
 
 		/// <summary>
 		/// Get/Set: Fanout (1 byte): an integer in [0, 255] (set to 0 if unlimited, and to 1 only in sequential mode)
 		/// </summary>
-		uint8_t &FanOut() { return m_fanOut; }
+		byte &FanOut() { return m_fanOut; }
 
 		/// <summary>
 		/// Get/Set: Maximal depth (1 byte): an integer in [1, 255] (set to 255 if unlimited, and to 1 only in sequential mode)
 		/// </summary>
-		uint8_t &MaxDepth() { return m_maxDepth; }
+		byte &MaxDepth() { return m_maxDepth; }
 
 		/// <summary>
 		/// Get/Set: Leaf maximal byte length (4 bytes): an integer in [0, 232 − 1], that is, up to 4 GiB (set to 0 if unlimited, or in sequential mode)
 		/// </summary>
-		uint32_t &LeafLength() { return m_leafLength; }
+		uint &LeafLength() { return m_leafLength; }
 
 		/// <summary>
 		/// Get/Set: Node offset (8 or 6 bytes): an integer in [0, 264 −1] for BLAKE2b, and in [0, 248 −1] for BLAKE2s(set to 0 for the first, leftmost, leaf, or in sequential mode)
 		/// </summary>
-		uint64_t &NodeOffset() { return m_nodeOffset; }
+		ulong &NodeOffset() { return m_nodeOffset; }
 
 		/// <summary>
 		/// Get/Set: Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)
 		/// </summary>
-		uint8_t &NodeDepth() { return m_nodeDepth; }
+		byte &NodeDepth() { return m_nodeDepth; }
 
 		/// <summary>
 		/// Get/Set: Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)
 		/// </summary>
-		uint8_t &InnerLength() { return m_innerLen; }
+		byte &InnerLength() { return m_innerLen; }
 
 		/// <summary>
 		/// Get/Set: The desired number of threads used to process the message (default is 4 for Blake2-BP, or 8 for Blake2-SP)
 		/// </summary>
-		uint8_t &ParallelDegree() { return m_threadDepth; }
+		byte &ParallelDegree() { return m_threadDepth; }
 
 		/// <summary>
 		/// Get/Set: The second reserved byte
 		/// </summary>
-		uint8_t &Reserved2() { return m_reserved2; }
+		byte &Reserved2() { return m_reserved2; }
 
 		/// <summary>
 		/// Get/Set: The third reserved ulong
 		/// </summary>
-		uint64_t &Reserved3() { return m_reserved3; }
+		ulong &Reserved3() { return m_reserved3; }
 
 		/// <summary>
 		/// Get/Set: The fourth reserved ulong
 		/// </summary>
-		uint64_t &Reserved4() { return m_reserved4; }
+		ulong &Reserved4() { return m_reserved4; }
 
 
 		/// <summary>
 		/// Initialize the default structure.
 		/// <para>Default settings are linear mode (Blake2-B).</para>
 		/// </summary>
-		explicit Blake2Params()
+		explicit BlakeParams()
 			:
 			m_dgtLen(64),
 			m_keyLen(0),
@@ -131,7 +131,7 @@ NAMESPACE_DIGEST
 		/// <summary>
 		/// Initialize the MessageHeader structure using a serialized byte array
 		/// </summary>
-		explicit Blake2Params(std::vector<uint8_t> TreeArray)
+		explicit BlakeParams(std::vector<byte> TreeArray)
 			:
 			m_dgtLen(0),
 			m_keyLen(0),
@@ -147,7 +147,7 @@ NAMESPACE_DIGEST
 			m_reserved4(0)
 		{
 			if (TreeArray.size() < HDR_SIZE)
-				throw Exception::CryptoDigestException("Blake2Params:Ctor", "The TreeArray buffer is too short!");
+				throw Exception::CryptoDigestException("BlakeParams:Ctor", "The TreeArray buffer is too short!");
 
 			memcpy(&m_dgtLen, &TreeArray[0], 1);
 			memcpy(&m_keyLen, &TreeArray[1], 1);
@@ -176,7 +176,7 @@ NAMESPACE_DIGEST
 		/// <param name="NodeDepth">Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)</param>
 		/// <param name="InnerLength">Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)</param>
 		/// <param name="ParallelDegree">The number of threads used in parallel mode, the default is 4 for Blake2bp, and 8 for Blake2sp</param>
-		explicit Blake2Params(uint8_t DigestLength, uint8_t KeyLength, uint8_t FanOut, uint8_t MaxDepth, uint32_t LeafLength, uint64_t NodeOffset, uint8_t NodeDepth, uint8_t InnerLength, uint8_t ParallelDegree)
+		explicit BlakeParams(byte DigestLength, byte KeyLength, byte FanOut, byte MaxDepth, uint LeafLength, ulong NodeOffset, byte NodeDepth, byte InnerLength, byte ParallelDegree)
 			:
 			m_dgtLen(DigestLength),
 			m_keyLen(KeyLength),
@@ -196,9 +196,9 @@ NAMESPACE_DIGEST
 		/// <summary>
 		/// Create a clone of this structure
 		/// </summary>
-		Blake2Params Clone()
+		BlakeParams Clone()
 		{
-			Blake2Params result(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
+			BlakeParams result(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
 			return result;
 		}
 
@@ -207,10 +207,10 @@ NAMESPACE_DIGEST
 		/// <para>Caller must delete this object.</para>
 		/// </summary>
 		/// 
-		/// <returns>A pointer to a Blake2Params instance</returns>
-		Blake2Params* DeepCopy()
+		/// <returns>A pointer to a BlakeParams instance</returns>
+		BlakeParams* DeepCopy()
 		{
-			return new Blake2Params(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
+			return new BlakeParams(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
 		}
 
 		/// <summary>
@@ -220,7 +220,7 @@ NAMESPACE_DIGEST
 		/// <param name="Obj">Object to compare</param>
 		/// 
 		/// <returns>True if equal, otherwise false</returns>
-		bool Equals(Blake2Params &Obj)
+		bool Equals(BlakeParams &Obj)
 		{
 			if (this->GetHashCode() != Obj.GetHashCode())
 				return false;
@@ -282,13 +282,13 @@ NAMESPACE_DIGEST
 		}
 
 		/// <summary>
-		/// Convert the Blake2Params structure serialized to a byte array
+		/// Convert the BlakeParams structure serialized to a byte array
 		/// </summary>
 		/// 
-		/// <returns>The byte array containing the Blake2Params</returns>
-		std::vector<uint8_t> ToBytes()
+		/// <returns>The byte array containing the BlakeParams</returns>
+		std::vector<byte> ToBytes()
 		{
-			std::vector<uint8_t> trs(HDR_SIZE, 0);
+			std::vector<byte> trs(HDR_SIZE, 0);
 
 			memcpy(&trs[0], &m_dgtLen, 1);
 			memcpy(&trs[1], &m_keyLen, 1);

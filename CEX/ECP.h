@@ -16,7 +16,7 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <example>
 /// <description>Example of getting a seed value:</description>
 /// <code>
-/// std:vector&lt;uint8_t&gt; output(32);
+/// std:vector&lt;byte&gt; output(32);
 /// ECP gen;
 /// gen.GetBytes(output);
 /// </code>
@@ -118,7 +118,7 @@ public:
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
-	virtual uint32_t Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Reset the internal state

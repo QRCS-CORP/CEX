@@ -141,7 +141,7 @@ class DCG : public IDrbg
 private:
 
 	static const size_t COUNTER_SIZE = sizeof(ulong);
-	const uint64_t MAX_OUTPUT = 35184372088832;
+	const ulong MAX_OUTPUT = 35184372088832;
 	const size_t MAX_REQUEST = 65536;
 	const size_t MAX_RESEED = 536870912;
 	const size_t MINSEED_SIZE = 8;
@@ -208,7 +208,7 @@ public:
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
-	virtual const uint64_t MaxOutputSize() { return MAX_OUTPUT; }
+	virtual const ulong MaxOutputSize() { return MAX_OUTPUT; }
 
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated in a single request

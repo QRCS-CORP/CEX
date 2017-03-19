@@ -91,7 +91,7 @@ void CTR::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 	m_blockCipher->EncryptBlock(m_ctrVector, 0, Output, OutOffset);
 	ArrayUtils::IncrementBE8(m_ctrVector);
-	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, m_blockSize, m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, m_blockSize, m_parallelProfile.SimdProfile());
 }
 
 void CTR::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -271,7 +271,7 @@ void CTR::TransformParallel(const std::vector<byte> &Input, const size_t InOffse
 		// generate random at output offset
 		this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 		// xor with input at offsets
-		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, m_parallelProfile.SimdProfile());
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			memcpy(&tmpCtr[0], &thdCtr[0], tmpCtr.size());
@@ -300,7 +300,7 @@ void CTR::TransformSequential(const std::vector<byte> &Input, const size_t InOff
 	size_t ALNSZE = Length - (Length % m_blockSize);
 
 	if (ALNSZE != 0)
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, m_parallelProfile.HasSimd128());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, m_parallelProfile.SimdProfile());
 
 	// get the remaining bytes
 	if (ALNSZE != Length)

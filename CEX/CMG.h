@@ -125,7 +125,7 @@ private:
 
 	static const size_t COUNTER_SIZE = 16;
 	static const size_t DEF_CYCTHRESH = 1024 * 1000;
-	const uint64_t MAX_OUTPUT = 35184372088832;
+	const ulong MAX_OUTPUT = 35184372088832;
 	const size_t MAX_PRLALLOC = 100000000;
 	const size_t MAX_REQUEST = 65536;
 	const size_t MAX_RESEED = 536870912;
@@ -203,7 +203,7 @@ public:
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
-	virtual const uint64_t MaxOutputSize() { return MAX_OUTPUT; }
+	virtual const ulong MaxOutputSize() { return MAX_OUTPUT; }
 
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated in a single request

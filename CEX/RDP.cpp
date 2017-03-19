@@ -66,13 +66,13 @@ std::vector<byte> RDP::GetBytes(size_t Length)
 	return data;
 }
 
-uint32_t RDP::Next()
+uint RDP::Next()
 {
 	if (!m_isAvailable)
 		throw CryptoRandomException("RDP:Engine", "Random provider is not available!");
 
 	const size_t RTRCNT = (m_engineType == RdEngines::RdRand) ? RDRRETRY : RDSRETRY;
-	uint32_t rnd = 0;
+	uint rnd = 0;
 
 	for (size_t i = 0; i != RTRCNT + 1; ++i)
 	{

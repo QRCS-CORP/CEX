@@ -289,7 +289,7 @@ public:
 	static inline void IncreaseBE8(const std::vector<byte> &Input, std::vector<byte> &Output, const size_t Length)
 	{
 		const size_t CTRSZE = Output.size() - 1;
-		uint32_t ctrLen = static_cast<uint>(Length);
+		uint ctrLen = static_cast<uint>(Length);
 		std::vector<byte> ctrInc(sizeof(ctrLen));
 		memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
 		memcpy(&Output[0], &Input[0], Input.size());
@@ -348,7 +348,7 @@ public:
 
 		for (size_t i = 0; i != CEIL; ++i)
 		{
-			uint32_t pos = rnd.NextUInt32(0, CEIL);
+			uint pos = rnd.NextUInt32(0, CEIL);
 			if (i != pos)
 				std::swap(Output[i], Output[pos]);
 		}

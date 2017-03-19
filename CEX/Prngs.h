@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Pseudo Random Generators enmumeration names
 /// </summary>
-enum class Prngs : uint8_t
+enum class Prngs : byte
 {
 	/// <summary>
 	/// No prng is specified

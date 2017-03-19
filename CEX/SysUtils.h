@@ -65,35 +65,35 @@ public:
 	/// <param name="Drive">The drive to poll</param>
 	///
 	/// <returns>A vector of 64bit uint sizes</returns>
-	static std::vector<uint64_t> DriveSpace(const std::string &Drive);
+	static std::vector<ulong> DriveSpace(const std::string &Drive);
 
 	/// <summary>
 	/// Return the total physical memory size in bytes
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t MemoryPhysicalTotal();
+	static ulong MemoryPhysicalTotal();
 
 	/// <summary>
 	/// Return the used physical memory size in bytes
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t MemoryPhysicalUsed();
+	static ulong MemoryPhysicalUsed();
 
 	/// <summary>
 	/// Return the used virtual memory size in bytes
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t MemoryVirtualTotal();
+	static ulong MemoryVirtualTotal();
 
 	/// <summary>
 	/// Return the used virtual memory size in bytes
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t MemoryVirtualUsed();
+	static ulong MemoryVirtualUsed();
 
 	/// <summary>
 	/// Return the operating system name string
@@ -107,7 +107,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The 32bit process id</returns>
-	static uint32_t ProcessId();
+	static uint ProcessId();
 
 	/// <summary>
 	/// Return the logged-in user name
@@ -121,21 +121,21 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t TimeCurrentNS();
+	static ulong TimeCurrentNS();
 
 	/// <summary>
 	/// Return the system tick count
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t TimeStamp();
+	static ulong TimeStamp();
 
 	/// <summary>
 	/// Return the time in milliseconds since the system was booted
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static uint64_t TimeSinceBoot();
+	static ulong TimeSinceBoot();
 
 	/// <summary>
 	/// Return the CEX library version string
@@ -158,7 +158,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The 32bit uint id</returns>
-	static uint32_t CurrentThreadId();
+	static uint CurrentThreadId();
 
 	/// <summary>
 	/// Return the current caret position
@@ -260,7 +260,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A vector of process information</returns>
-	static std::vector<uint32_t> ProcessEntries();
+	static std::vector<uint> ProcessEntries();
 
 	/// <summary>
 	/// Return an rusage struct with system usage information

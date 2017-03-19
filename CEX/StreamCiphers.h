@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Stream cipher enumeration names
 /// </summary>
-enum class StreamCiphers : uint8_t
+enum class StreamCiphers : byte
 {
 	/// <summary>
 	/// No stream cipher is specified

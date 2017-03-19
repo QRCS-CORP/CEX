@@ -19,9 +19,7 @@
 #ifndef _CEX_BLAKE2BCOMPRESS_H
 #define _CEX_BLAKE2BCOMPRESS_H
 
-#if defined(CEX_HAS_MINSSE)
-#	include "Intrinsics.h"
-#endif
+#include "Intrinsics.h"
 #include "IntUtils.h"
 
 NAMESPACE_DIGEST
@@ -29,7 +27,7 @@ NAMESPACE_DIGEST
 /**
 * \internal
 */
-class Blake2B
+class Blake512Compress
 {
 public:
 
@@ -102,9 +100,8 @@ public:
 #	endif
 #endif
 	template <typename T>
-	static inline void CompressW(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
+	static void Compress128W(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
-#if defined(CEX_HAS_MINSSE)
 #    if defined(CEX_HAS_SSE4)
 		const __m128i M0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);
 		const __m128i M1 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 16]);
@@ -115,23 +112,23 @@ public:
 		const __m128i M6 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 96]);
 		const __m128i M7 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 112]);
 #	else
-		uint8_t* msg = (uint8_t*)Input.data() + InOffset;
-		const uint64_t M0 = ((uint64_t*)msg)[0];
-		const uint64_t M1 = ((uint64_t*)msg)[1];
-		const uint64_t M2 = ((uint64_t*)msg)[2];
-		const uint64_t M3 = ((uint64_t*)msg)[3];
-		const uint64_t M4 = ((uint64_t*)msg)[4];
-		const uint64_t M5 = ((uint64_t*)msg)[5];
-		const uint64_t M6 = ((uint64_t*)msg)[6];
-		const uint64_t M7 = ((uint64_t*)msg)[7];
-		const uint64_t M8 = ((uint64_t*)msg)[8];
-		const uint64_t M9 = ((uint64_t*)msg)[9];
-		const uint64_t M10 = ((uint64_t*)msg)[10];
-		const uint64_t M11 = ((uint64_t*)msg)[11];
-		const uint64_t M12 = ((uint64_t*)msg)[12];
-		const uint64_t M13 = ((uint64_t*)msg)[13];
-		const uint64_t M14 = ((uint64_t*)msg)[14];
-		const uint64_t M15 = ((uint64_t*)msg)[15];
+		byte* msg = (byte*)Input.data() + InOffset;
+		const ulong M0 = ((ulong*)msg)[0];
+		const ulong M1 = ((ulong*)msg)[1];
+		const ulong M2 = ((ulong*)msg)[2];
+		const ulong M3 = ((ulong*)msg)[3];
+		const ulong M4 = ((ulong*)msg)[4];
+		const ulong M5 = ((ulong*)msg)[5];
+		const ulong M6 = ((ulong*)msg)[6];
+		const ulong M7 = ((ulong*)msg)[7];
+		const ulong M8 = ((ulong*)msg)[8];
+		const ulong M9 = ((ulong*)msg)[9];
+		const ulong M10 = ((ulong*)msg)[10];
+		const ulong M11 = ((ulong*)msg)[11];
+		const ulong M12 = ((ulong*)msg)[12];
+		const ulong M13 = ((ulong*)msg)[13];
+		const ulong M14 = ((ulong*)msg)[14];
+		const ulong M15 = ((ulong*)msg)[15];
 #    endif
 
 #    if defined(CEX_HAS_SSSE3) && !defined(CEX_HAS_XOP)
@@ -1184,35 +1181,30 @@ public:
 		RH2 = _mm_xor_si128(RH4, RH2);
 		_mm_storeu_si128((__m128i*)&State.H[4], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[4]), RL2));
 		_mm_storeu_si128((__m128i*)&State.H[6], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[6]), RH2));
-#else
-
-		Compress(Input, InOffset, State, IV);
-
-#endif
 	}
 
 	template <typename T>
-	static inline void Compress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint64_t> &IV)
+	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
-		std::vector<uint64_t> M(16);
+		std::vector<ulong> M(16);
 		Utility::IntUtils::BytesToLeULL512(Input, InOffset, M, 0);
 
-		uint64_t R0 = State.H[0];
-		uint64_t R1 = State.H[1];
-		uint64_t R2 = State.H[2];
-		uint64_t R3 = State.H[3];
-		uint64_t R4 = State.H[4];
-		uint64_t R5 = State.H[5];
-		uint64_t R6 = State.H[6];
-		uint64_t R7 = State.H[7];
-		uint64_t R8 = IV[0];
-		uint64_t R9 = IV[1];
-		uint64_t R10 = IV[2];
-		uint64_t R11 = IV[3];
-		uint64_t R12 = IV[4] ^ State.T[0];
-		uint64_t R13 = IV[5] ^ State.T[1];
-		uint64_t R14 = IV[6] ^ State.F[0];
-		uint64_t R15 = IV[7] ^ State.F[1];
+		ulong R0 = State.H[0];
+		ulong R1 = State.H[1];
+		ulong R2 = State.H[2];
+		ulong R3 = State.H[3];
+		ulong R4 = State.H[4];
+		ulong R5 = State.H[5];
+		ulong R6 = State.H[6];
+		ulong R7 = State.H[7];
+		ulong R8 = IV[0];
+		ulong R9 = IV[1];
+		ulong R10 = IV[2];
+		ulong R11 = IV[3];
+		ulong R12 = IV[4] ^ State.T[0];
+		ulong R13 = IV[5] ^ State.T[1];
+		ulong R14 = IV[6] ^ State.F[0];
+		ulong R15 = IV[7] ^ State.F[1];
 
 		// round 0
 		R0 += R4 + M[0];

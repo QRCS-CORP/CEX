@@ -4,11 +4,12 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Common symmetric block cipher state bit sizes.
 /// <para>Can be cast as Block byte size integers, i.e. (int sz = BlockSizes.B512) is equal to 64.</para>
 /// </summary>
-enum class BlockSizes : uint8_t
+enum class BlockSizes : byte
 {
 	/// <summary>
 	/// No block size is specified

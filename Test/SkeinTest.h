@@ -6,6 +6,8 @@
 
 namespace Test
 {
+	using namespace Digest;
+
 	/// <summary>
 	/// Tests the Skein digest implementation using vector comparisons.
 	/// <para>Tests the 256, 512, and 1024 bit versions of Skein against known test vectors from the skein 1.3 document, appendix C:
@@ -57,7 +59,8 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareVector(Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected);
+		void CompareParallel(IDigest* Dgt1, IDigest* Dgt2);
+		void CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(char* Data);
 	};

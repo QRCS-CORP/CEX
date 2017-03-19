@@ -41,16 +41,16 @@ void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 template<typename T>
 void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
 {
-	R0.Rotl32(13);
-	R2.Rotl32(3);
+	R0.RotL32(13);
+	R2.RotL32(3);
 	R1 ^= R0 ^ R2;
 	R3 ^= R2 ^ (R0 << 3);
-	R1.Rotl32(1);
-	R3.Rotl32(7);
+	R1.RotL32(1);
+	R3.RotL32(7);
 	R0 ^= R1 ^ R3;
 	R2 ^= R3 ^ (R1 << 7);
-	R0.Rotl32(5);
-	R2.Rotl32(22);
+	R0.RotL32(5);
+	R2.RotL32(22);
 }
 
 template<typename T>
@@ -71,16 +71,16 @@ void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 template<typename T>
 void InverseTransform64(T &R0, T &R1, T &R2, T &R3)
 {
-	R2.Rotr32(22);
-	R0.Rotr32(5);
+	R2.RotR32(22);
+	R0.RotR32(5);
 	R2 ^= R3 ^ (R1 << 7);
 	R0 ^= R1 ^ R3;
-	R3.Rotr32(7);
-	R1.Rotr32(1);
+	R3.RotR32(7);
+	R1.RotR32(1);
 	R3 ^= R2 ^ (R0 << 3);
 	R1 ^= R0 ^ R2;
-	R2.Rotr32(3);
-	R0.Rotr32(13);
+	R2.RotR32(3);
+	R0.RotR32(13);
 }
 
 //~~~Serpent S-Boxes~~~//

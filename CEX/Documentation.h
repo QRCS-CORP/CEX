@@ -9,22 +9,22 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 0.14.0.1.
+Welcome to the CEX++ Cryptographic Library, version 0.14.0.2 (M2).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>0.14.0.1</B> (M version), which are the major, minor, patch, and release codes.<BR></BR>
+The current version is <B>0.14.0.2</B> (M version), which are the major, minor, patch, and release codes.<BR></BR>
 \brief
 Scheduled for release <B>1.0.0.1</B> (version M):<BR></BR>
-Keccak/Skein Tree Hashing and Digests review<BR></BR>
+Keccak Tree Hashing and Digests review<BR></BR>
 Secure Vector implementation<BR></BR>
 SCRYPT<BR></BR>
 
 \author    John Underhill
-\version   0.14.0.1
-\date      February 22, 2017
+\version   0.14.0.2
+\date      March 16, 2017
 \copyright GPL version 3 license (GPLv3)
 
 \section intro_link Links
@@ -151,16 +151,21 @@ NAMESPACE_ROOT
 	*  @{
 	*/
 	NAMESPACE_DIGEST
-		class BlakeB512 {};
-		class BlakeS256 {};
+		class Blake512 {};
+		class Blake256 {};
+		class Blake2Params {};
 		class IDigest {};
 		class Keccak256 {};
 		class Keccak512 {};
 		class SHA256 {};
 		class SHA512 {};
+		class SHA2Params {};
 		class Skein256 {};
 		class Skein512 {};
 		class Skein1024 {};
+		class SkeinParams {};
+		class SkeinUbiTweak {};
+		enum class SkeinUbiType {};
 	NAMESPACE_DIGESTEND
 	/*! @} */
 
@@ -197,6 +202,7 @@ NAMESPACE_ROOT
 		enum class Prngs {};
 		enum class RoundCounts {};
 		enum class Providers {};
+		enum class SimdProfiles {};
 		enum class StreamCiphers {};
 		enum class SymmetricEngines {};
 	NAMESPACE_ENUMERATIONEND

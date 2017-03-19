@@ -3,8 +3,8 @@
 #include <string.h>
 #include "HexConverter.h"
 #include "../CEX/CSP.h"
-#include "../CEX/BlakeS256.h"
-#include "../CEX/BlakeB512.h"
+#include "../CEX/Blake256.h"
+#include "../CEX/Blake512.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
@@ -72,8 +72,8 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Key::Symmetric::SymmetricKey mkey(key);
-					Digest::BlakeB512 blake2b(false);
-					blake2b.LoadMacKey(mkey);
+					Digest::Blake512 blake2b(false);
+					blake2b.Initialize(mkey);
 					blake2b.Compute(input, hash);
 
 					if (hash != expect)
@@ -118,9 +118,9 @@ namespace Test
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Digest::BlakeB512 blake2(true);
+					Digest::Blake512 blake2(true);
 					Key::Symmetric::SymmetricKey mkey(key);
-					blake2.LoadMacKey(mkey);
+					blake2.Initialize(mkey);
 					blake2.Compute(input, hash);
 
 					if (hash != expect)
@@ -165,8 +165,8 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Key::Symmetric::SymmetricKey mkey(key);
-					Digest::BlakeS256 blake2s(false);
-					blake2s.LoadMacKey(mkey);
+					Digest::Blake256 blake2s(false);
+					blake2s.Initialize(mkey);
 					blake2s.Compute(input, hash);
 
 					if (hash != expect)
@@ -211,8 +211,8 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Key::Symmetric::SymmetricKey mkey(key);
-					Digest::BlakeS256 blake2sp(true);
-					blake2sp.LoadMacKey(mkey);
+					Digest::Blake256 blake2sp(true);
+					blake2sp.Initialize(mkey);
 					blake2sp.Compute(input, hash);
 
 					if (hash != expect)
@@ -238,9 +238,9 @@ namespace Test
 
 	void Blake2Test::TreeParamsTest()
 	{
-		Digest::Blake2Params tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
+		Digest::BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
 		std::vector<uint8_t> tres = tree1.ToBytes();
-		Digest::Blake2Params tree2(tres);
+		Digest::BlakeParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
 			throw std::exception("Blake2STest: Tree parameters test failed!");

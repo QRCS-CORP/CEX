@@ -150,7 +150,7 @@ public:
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input/output data arrays passed to the transform must be this size in bytes to trigger parallelization.</para>
+	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 

@@ -69,13 +69,13 @@ private:
 	bool m_avx512vl;
 	bool m_bmt1;
 	bool m_bmt2;
-	uint32_t m_busSpeed;
+	uint m_busSpeed;
 	bool m_cmul;
 	std::string m_cpuVendor;
 	bool m_fma3;
 	bool m_fma4;
-	uint32_t m_frequencyBase;
-	uint32_t m_frequencyMax;
+	uint m_frequencyBase;
+	uint m_frequencyMax;
 	bool m_hle;
 	bool m_hyperThread;
 	size_t m_l1CacheSize;

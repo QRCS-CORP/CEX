@@ -109,7 +109,7 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		throw CryptoMacException("GMAC:Finalize", "The Output buffer is too short!");
 
 	m_gmacHash->FinalizeBlock(m_msgCode, m_msgCounter, 0);
-	IntUtils::XORBLK(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
+	IntUtils::XORBLK(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE, m_gmacHash->HasSimd128() ? Enumeration::SimdProfiles::Simd128 : Enumeration::SimdProfiles::None);
 	memcpy(&Output[OutOffset], &m_msgCode[0], BLOCK_SIZE);
 	Reset();
 

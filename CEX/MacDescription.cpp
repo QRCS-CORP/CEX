@@ -39,14 +39,14 @@ std::vector<byte> MacDescription::ToBytes()
 {
 	IO::StreamWriter writer(GetHeaderSize());
 
-	writer.Write(static_cast<uint8_t>(m_macType));
-	writer.Write(static_cast<uint16_t>(m_keySize));
-	writer.Write(static_cast<uint8_t>(m_ivSize));
-	writer.Write(static_cast<uint8_t>(m_hmacEngine));
-	writer.Write(static_cast<uint8_t>(m_engineType));
-	writer.Write(static_cast<uint8_t>(m_blockSize));
-	writer.Write(static_cast<uint8_t>(m_roundCount));
-	writer.Write(static_cast<uint8_t>(m_kdfEngine));
+	writer.Write(static_cast<byte>(m_macType));
+	writer.Write(static_cast<short>(m_keySize));
+	writer.Write(static_cast<byte>(m_ivSize));
+	writer.Write(static_cast<byte>(m_hmacEngine));
+	writer.Write(static_cast<byte>(m_engineType));
+	writer.Write(static_cast<byte>(m_blockSize));
+	writer.Write(static_cast<byte>(m_roundCount));
+	writer.Write(static_cast<byte>(m_kdfEngine));
 
 	return writer.GetBytes();
 }
@@ -55,14 +55,14 @@ IO::MemoryStream* MacDescription::ToStream()
 {
 	IO::StreamWriter writer(GetHeaderSize());
 
-	writer.Write(static_cast<uint8_t>(m_macType));
-	writer.Write(static_cast<uint16_t>(m_keySize));
-	writer.Write(static_cast<uint8_t>(m_ivSize));
-	writer.Write(static_cast<uint8_t>(m_hmacEngine));
-	writer.Write(static_cast<uint8_t>(m_engineType));
-	writer.Write(static_cast<uint8_t>(m_blockSize));
-	writer.Write(static_cast<uint8_t>(m_roundCount));
-	writer.Write(static_cast<uint8_t>(m_kdfEngine));
+	writer.Write(static_cast<byte>(m_macType));
+	writer.Write(static_cast<short>(m_keySize));
+	writer.Write(static_cast<byte>(m_ivSize));
+	writer.Write(static_cast<byte>(m_hmacEngine));
+	writer.Write(static_cast<byte>(m_engineType));
+	writer.Write(static_cast<byte>(m_blockSize));
+	writer.Write(static_cast<byte>(m_roundCount));
+	writer.Write(static_cast<byte>(m_kdfEngine));
 
 	return writer.GetStream();
 }

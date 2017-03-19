@@ -391,7 +391,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 	*K2 = key2;
 
 	Offset += 16;
-	uint32_t tmp = _mm_cvtsi128_si32(key2);
+	uint tmp = _mm_cvtsi128_si32(key2);
 
 	memcpy((byte*)m_expKey.data() + Offset, &tmp, 4);
 	Offset += 4;

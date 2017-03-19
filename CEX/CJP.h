@@ -43,7 +43,7 @@ NAMESPACE_PROVIDER
 /// <example>
 /// <description>Example of getting a seed value:</description>
 /// <code>
-/// std:vector&lt;uint8_t&gt; output(32);
+/// std:vector&lt;byte&gt; output(32);
 /// CJP gen;
 /// gen.GetBytes(output);
 /// </code>
@@ -61,37 +61,37 @@ NAMESPACE_PROVIDER
 class CJP : public IProvider
 {
 private:
-	const size_t ACC_LOOP_BIT_MAX = 7;
-	const size_t ACC_LOOP_BIT_MIN = 0;
-	const size_t CLEARCACHE = 100;
-	const size_t DATA_SIZE_BITS = ((sizeof(uint64_t)) * 8);
-	const size_t FOLD_LOOP_BIT_MAX = 4;
-	const size_t FOLD_LOOP_BIT_MIN = 0;
-	const size_t LOOP_TEST_COUNT = 300;
-	const size_t MEMORY_ACCESSLOOPS = 256;
-	const size_t MEMORY_BLOCKS = 512;
-	const size_t MEMORY_BLOCKSIZE = 32;
-	const size_t MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
-	const size_t OVRSMP_RATE_MAX = 128;
-	const size_t OVRSMP_RATE_MIN = 1;
+	const uint ACC_LOOP_BIT_MAX = 7;
+	const uint ACC_LOOP_BIT_MIN = 0;
+	const uint CLEARCACHE = 100;
+	const uint DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
+	const uint FOLD_LOOP_BIT_MAX = 4;
+	const uint FOLD_LOOP_BIT_MIN = 0;
+	const uint LOOP_TEST_COUNT = 300;
+	const uint MEMORY_ACCESSLOOPS = 256;
+	const uint MEMORY_BLOCKS = 512;
+	const uint MEMORY_BLOCKSIZE = 32;
+	const uint MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
+	const uint OVRSMP_RATE_MAX = 128;
+	const uint OVRSMP_RATE_MIN = 1;
 
 	bool m_enableAccess;
 	bool m_enableDebias;
 	bool m_isAvailable;
-	uint64_t m_lastDelta;
-	uint64_t m_lastDelta2;
-	size_t m_memAccessLoops;
-	size_t m_memBlocks;
-	size_t m_memBlockSize;
-	size_t m_memPosition;
-	size_t m_memTotalSize;
+	ulong m_lastDelta;
+	ulong m_lastDelta2;
+	uint m_memAccessLoops;
+	uint m_memBlocks;
+	uint m_memBlockSize;
+	uint m_memPosition;
+	uint m_memTotalSize;
 	byte* m_memState;
-	uint32_t m_overSampleRate;
-	uint64_t m_prevTime;
-	uint64_t m_rndState;
+	uint m_overSampleRate;
+	ulong m_prevTime;
+	ulong m_rndState;
 	bool m_secureCache;
 	bool m_stirPool;
-	uint32_t m_stuckTest;
+	uint m_stuckTest;
 
 public:
 
@@ -135,7 +135,7 @@ public:
 	/// <para>Accepted values are between 1 and 128; the default is 1.
 	/// Increasing this value will increase generation times significantly.</para>
 	/// </summary>
-	uint32_t &OverSampleRate() { return m_overSampleRate; }
+	uint &OverSampleRate() { return m_overSampleRate; }
 
 	/// <summary>
 	/// Get/Set: Populate the random cache with an unused value after each generation cycle
@@ -191,7 +191,7 @@ public:
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
-	virtual uint32_t Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Reset the internal state
@@ -201,17 +201,17 @@ public:
 private:
 
 	void AccessMemory();
-	uint64_t DebiasBit();
+	ulong DebiasBit();
 	void Detect();
-	void FoldTime(uint64_t TimeStamp, uint64_t &Folded);
+	void FoldTime(ulong TimeStamp, ulong &Folded);
 	size_t Generate(std::vector<byte> &Output, size_t Offset, size_t Length);
 	void Generate64();
-	uint64_t GetTimeStamp();
-	uint64_t MeasureJitter();
+	ulong GetTimeStamp();
+	ulong MeasureJitter();
 	void Prime();
-	uint32_t ShuffleLoop(uint32_t LowBits, uint32_t MinShift);
+	size_t ShuffleLoop(uint LowBits, uint MinShift);
 	void StirPool();
-	void StuckCheck(uint64_t CurrentDelta);
+	void StuckCheck(ulong CurrentDelta);
 	bool TimerCheck();
 };
 

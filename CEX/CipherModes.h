@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Symmetric cipher mode enmumeration names
 /// </summary>
-enum class CipherModes : uint8_t
+enum class CipherModes : byte
 {
 	/// <summary>
 	/// No cipher mode is specified

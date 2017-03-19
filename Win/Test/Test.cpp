@@ -57,29 +57,31 @@ using namespace Test;
 // KeyGenerator rewrite	-dome
 
 // 
-// Release 0.14
+// Release 0.14.2.1
 // EAX/GCM/OCB			-done
 // GMAC					-done
 // Code review			-done
 
 // Release 1.0
-// Keccak/Skein Tree	-?
+// Skein Tree			-done
+// Rewrite SHA2			-done
+// Rewrite Blake2		-done
+// Keccak Tree			-?
+// srvector				-?
 // Scrypt(maybe)		-?
-// DLL API				-?
 // Code review			-?
 
-// 1.0 Notes:
-// SHA2/Blake remove generator
-// SHA2/Blake tree hashing mode-3 (add mixing-step/reduce-state tree-mode?)
-// Digests use paralleloptions
 
 // *** 1.1 RoadMap ***
 //
 // RingLWE				-?
 // McEliece				-?
+// GMSS					-?
+// RSA-Sig				-?
 // Networking			-?
 // TLS					-?
-// DTM-KEX				-?
+// STM-KEX				-?
+// DLL API				-?
 
 bool HasAESNI()
 {
@@ -123,11 +125,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 0.13.0.1: CEX Library in C++ *");
+	ConsoleUtils::WriteLine("* CEX++ Version 0.14.0.2: CEX Library in C++ *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v0.13 (M)                       *");
+	ConsoleUtils::WriteLine("* Release:   v0.14.0.2 (M2)                  *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      December 18, 2016               *");
+	ConsoleUtils::WriteLine("* Date:      March 16, 2017                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -178,9 +180,6 @@ int main()
 	bool hasNI = HasAESNI();
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-
-	//RunTest(new SymmetricKeyGeneratorTest());
-	//RunTest(new CipherSpeedTest());
 
 	try
 	{

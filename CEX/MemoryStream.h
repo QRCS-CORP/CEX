@@ -14,7 +14,7 @@ class MemoryStream : public IByteStream
 private:
 	bool m_isDestroyed;
 	std::vector<byte> m_streamData;
-	uint64_t m_streamPosition;
+	ulong m_streamPosition;
 
 public:
 
@@ -43,12 +43,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const uint64_t Length() { return static_cast<uint64_t>(m_streamData.size()); }
+	virtual const ulong Length() { return static_cast<ulong>(m_streamData.size()); }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const uint64_t Position() { return m_streamPosition; }
+	virtual const ulong Position() { return m_streamPosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
@@ -142,14 +142,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(uint64_t Offset, SeekOrigin Origin);
+	virtual void Seek(ulong Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(uint64_t Length);
+	virtual void SetLength(ulong Length);
 
 	/// <summary>
 	/// Writes an input buffer to the stream

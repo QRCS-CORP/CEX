@@ -366,6 +366,9 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 // assumptions only in visual studio (still!), requires runtime cpu checks to be sure
 #if defined(CEX_OS_WINDOWS) && !defined(CEX_HAS_SSE4) && !defined(CEX_HAS_SSSE3) && !defined(CEX_HAS_SSE2)
 #	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
+#		if !defined(CEX_HAS_SSE4)
+#			define CEX_HAS_SSE4
+#		endif
 #		if !defined(CEX_HAS_AVX)
 #			define CEX_HAS_AVX
 #		endif

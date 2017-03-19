@@ -2,8 +2,12 @@
 #define _CEX_PARALLELOPTIONS_H
 
 #include "CexDomain.h"
+#include "SimdProfiles.h"
 
 NAMESPACE_COMMON
+
+
+using Enumeration::SimdProfiles;
 
 /// <summary>
 /// The ParallelOptions class.
@@ -15,19 +19,14 @@ NAMESPACE_COMMON
 /// <code>
 ///    ParallelOptions prl(
 ///        16,          // a base block size of 16 bytes
-///        false);		// parallel not using simd block multiplier
+///        false,		// parallel not using simd block multiplier
+///		   1024,		// subtract pre-cached elements
+///		   true);		// dual channel algorithm (in/out)
 /// </code>
 /// </example>
 class ParallelOptions
 {
 public:
-
-	enum class SimdProfiles : uint8_t
-	{
-		None = 0,
-		Simd128 = 1,
-		Simd256 = 2
-	};
 
 private:
 
@@ -39,13 +38,14 @@ private:
 	};
 
 	// 16kb min
-	const size_t DEF_DATACACHE = 16000;
+	const size_t DEF_DATACACHE = 16384;
 	// 32mb, not enforced
-	const size_t MAX_PRLALLOC = DEF_DATACACHE * 2000; 
+	const size_t MAX_PRLALLOC = DEF_DATACACHE * 2000;
 
 	bool m_autoInit;
 	size_t m_blockSize;
 	AutoParallelParams m_defaultParams;
+	bool m_hasSHA2;
 	bool m_hasSimd128;
 	bool m_hasSimd256;
 	bool m_isParallel;
@@ -64,8 +64,6 @@ private:
 
 public:
 
-	//ParallelOptions() = delete;
-
 	//~~~Properties~~~//
 
 	/// <summary>
@@ -73,7 +71,7 @@ public:
 	/// </summary>
 	const bool IsDefault()
 	{
-		return (m_defaultParams.IsParallel == m_isParallel && 
+		return (m_defaultParams.IsParallel == m_isParallel &&
 			m_defaultParams.MaxDegree == m_parallelMaxDegree &&
 			m_defaultParams.ParallelBlockSize == m_parallelBlockSize);
 	}
@@ -82,6 +80,11 @@ public:
 	/// Get: Block size of the algorithm in bytes
 	/// </summary>
 	const size_t BlockSize() { return m_blockSize; }
+
+	/// <summary>
+	/// Get: Returns True if the system supports SHA2 intrinsics
+	/// </summary>
+	const bool HasSHA2() { return m_hasSHA2; }
 
 	/// <summary>
 	/// Get: Returns True if the system supports 128bit SSE3 SIMD intrinsics
@@ -127,11 +130,10 @@ public:
 	const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
 
 	/// <summary>
-	/// Get/Set: The maximum number of threads allocated when using multi-threaded processing.
-	/// <para>Changes to this value must be made before the <see cref="Initialize(bool, ISymmetricKey)"/> function is called.
-	/// Changing the degree will auto-calculate new ParallelBlockSize and ParallelMinimumSize values.</para>
+	/// Get: The maximum number of threads allocated when using multi-threaded processing.
+	/// <para>Changes to this value must be made through the SetMaxDegree(size_t) function.</para>
 	/// </summary>
-	size_t &ParallelMaxDegree() { return m_parallelMaxDegree; }
+	const size_t ParallelMaxDegree() { return m_parallelMaxDegree; }
 
 	/// <summary>
 	/// Get: The number of processor cores available on the system
@@ -142,6 +144,11 @@ public:
 	/// Get: The maximum number of processor cores available on the system
 	/// </summary>
 	const size_t ProcessorCount() { return m_virtualCores != 0 ? m_virtualCores : m_physicalCores; }
+
+	/// <summary>
+	/// Get: The maximum supported SIMD instruction set
+	/// </summary>
+	const SimdProfiles SimdProfile() { return m_simdDetected; }
 
 	/// <summary>
 	/// Get: The number of virtual (hyper-threading) processor cores available on the system
@@ -167,7 +174,8 @@ public:
 	/// <para>Setting this value to the sum size (or greater) of the classes state variables, can reduce the frequency of L1 cache eviction of that state, 
 	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.<para></param>
 	/// <param name="SplitChannel">The calling algorithm uses two channels of equal size Input and Output when processing data</param>
-	explicit ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel);
+	/// <param name="ParallelMaxDegree">The maximum number of processor cores used by the algorithm during parallel processing; if set to zero, uses total number of processor cores</param>
+	explicit ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree = 0);
 
 	/// <summary>
 	/// Instantiate this class, setting each value manually.
@@ -244,6 +252,7 @@ public:
 	void Detect();
 	void StoreDefaults();
 };
+
 
 NAMESPACE_COMMONEND
 #endif

@@ -16,6 +16,7 @@ Keccak512::Keccak512(int DigestSize)
 	m_bufferIndex(0),
 	m_isDestroyed(false),
 	m_digestSize(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_state(25, 0)
 {
 	// test for legal sizes; default at 512

@@ -80,7 +80,7 @@ public:
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
-	virtual uint32_t Next() = 0;
+	virtual uint Next() = 0;
 
 	/// <summary>
 	/// Reset the internal state

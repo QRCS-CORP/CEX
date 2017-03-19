@@ -2,6 +2,7 @@
 #include "../CEX/Skein256.h"
 #include "../CEX/Skein512.h"
 #include "../CEX/Skein1024.h"
+#include "../CEX/SecureRandom.h"
 
 namespace Test
 {
@@ -11,26 +12,50 @@ namespace Test
 		{
 			Initialize();
 
-			Digest::Skein256* sk256 = new Digest::Skein256();
+			Skein256* sk256 = new Skein256();
 			CompareVector(sk256, m_message256[0], m_expected256[0]);
 			CompareVector(sk256, m_message256[1], m_expected256[1]);
 			CompareVector(sk256, m_message256[2], m_expected256[2]);
 			OnProgress("Passed Skein 256 bit digest vector tests..");
 			delete sk256;
 
-			Digest::Skein512* sk512 = new Digest::Skein512();
+			Skein512* sk512 = new Skein512();
 			CompareVector(sk512, m_message512[0], m_expected512[0]);
 			CompareVector(sk512, m_message512[1], m_expected512[1]);
 			CompareVector(sk512, m_message512[2], m_expected512[2]);
 			delete sk512;
 			OnProgress("Passed Skein 512 bit digest vector tests..");
 
-			Digest::Skein1024* sk1024 = new Digest::Skein1024();
+			Skein1024* sk1024 = new Skein1024();
 			CompareVector(sk1024, m_message1024[0], m_expected1024[0]);
 			CompareVector(sk1024, m_message1024[1], m_expected1024[1]);
 			CompareVector(sk1024, m_message1024[2], m_expected1024[2]);
 			delete sk1024;
 			OnProgress("Passed Skein 1024 bit digest vector tests..");
+
+			Skein256* sks2 = new Skein256(true);
+			SkeinParams sp1(32, 32, 8);
+			Skein256* sks3 = new Skein256(sp1);
+			CompareParallel(sks2, sks3);
+			delete sks2;
+			delete sks3;
+			OnProgress("Passed Skein 256 parallelization tests..");
+
+			Skein512* skm2 = new Skein512(true);
+			SkeinParams sp2(64, 64, 8);
+			Skein512* skm3 = new Skein512(sp2);
+			CompareParallel(skm2, skm3);
+			delete skm2;
+			delete skm3;
+			OnProgress("Passed Skein 512 parallelization tests..");
+
+			Skein1024* skl2 = new Skein1024(true);
+			SkeinParams sp3(128, 128, 8);
+			Skein1024* skl3 = new Skein1024(sp3);
+			CompareParallel(skl2, skl3);
+			delete skl2;
+			delete skl3;
+			OnProgress("Passed Skein 1024 parallelization tests..");
 
 			return SUCCESS;
 		}
@@ -44,7 +69,50 @@ namespace Test
 		}
 	}
 
-	void SkeinTest::CompareVector(Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)
+	void SkeinTest::CompareParallel(IDigest* Dgt1, IDigest* Dgt2)
+	{
+		std::vector<byte> hash1(Dgt1->DigestSize(), 0);
+		std::vector<byte> hash2(Dgt1->DigestSize(), 0);
+		const size_t PRLBLK = Dgt1->ParallelBlockSize();
+		const size_t PRLMIN = Dgt1->ParallelProfile().ParallelMinimumSize();
+		CEX::Prng::SecureRandom rnd;
+		Dgt1->ParallelProfile().ParallelBlockSize() = PRLBLK;
+		Dgt2->ParallelProfile().ParallelBlockSize() = PRLMIN;
+
+		for (size_t i = 0; i < 100; ++i)
+		{
+			uint32_t prlSze = rnd.NextUInt32(PRLMIN * 2, PRLMIN * 8);
+			prlSze -= (prlSze % PRLMIN);
+			// set to parallel, but block will be too small.. processed with alternate
+			std::vector<byte> input(prlSze);
+			rnd.GetBytes(input);
+
+			Dgt1->Update(input, 0, input.size());
+			Dgt1->Finalize(hash1, 0);
+			Dgt1->Reset();
+
+			// this will run in parallel
+			Dgt2->Update(input, 0, input.size());
+			Dgt2->Finalize(hash2, 0);
+			Dgt2->Reset();
+
+			if (hash1 != hash2)
+				throw std::exception("SKein Vector: Expected hash is not equal!");
+
+			// test partial block-size and compute method
+			input.resize(input.size() + rnd.NextUInt32(1, 200), (byte)199);
+			Dgt1->Compute(input, hash1);
+
+			Dgt2->Update(input, 0, input.size());
+			Dgt2->Finalize(hash2, 0);
+			Dgt2->Reset();
+
+			if (hash1 != hash2)
+				throw std::exception("SKein Vector: Expected hash is not equal!");
+		}
+	}
+
+	void SkeinTest::CompareVector(IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 

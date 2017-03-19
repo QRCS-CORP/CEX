@@ -19,14 +19,12 @@
 #ifndef _CEX_BLAKE2SCOMPRESS_H
 #define _CEX_BLAKE2SCOMPRESS_H
 
+#include "Intrinsics.h"
 #include "IntUtils.h"
-#if defined(CEX_HAS_MINSSE)
-#	include "Intrinsics.h"
-#endif
 
 NAMESPACE_DIGEST
 
-class Blake2S
+class Blake256Compress
 {
 public:
 
@@ -53,9 +51,8 @@ public:
 #endif
 
 	template <typename T>
-	static inline void CompressW(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
+	static void Compress64W(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<uint> &IV)
 	{
-#if defined(CEX_HAS_MINSSE)
 		__m128i R1, R2, R3, R4;
 		__m128i B1, B2, B3, B4;
 		__m128i FF0, FF1;
@@ -78,29 +75,29 @@ public:
 		const __m128i M2 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 32]);
 		const __m128i M3 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 48]);
 #    else
-		uint8_t* msg = (uint8_t*)Input.data() + InOffset;
-		const uint32_t  M0 = ((uint32_t *)msg)[0];
-		const uint32_t  M1 = ((uint32_t *)msg)[1];
-		const uint32_t  M2 = ((uint32_t *)msg)[2];
-		const uint32_t  M3 = ((uint32_t *)msg)[3];
-		const uint32_t  M4 = ((uint32_t *)msg)[4];
-		const uint32_t  M5 = ((uint32_t *)msg)[5];
-		const uint32_t  M6 = ((uint32_t *)msg)[6];
-		const uint32_t  M7 = ((uint32_t *)msg)[7];
-		const uint32_t  M8 = ((uint32_t *)msg)[8];
-		const uint32_t  M9 = ((uint32_t *)msg)[9];
-		const uint32_t M10 = ((uint32_t *)msg)[10];
-		const uint32_t M11 = ((uint32_t *)msg)[11];
-		const uint32_t M12 = ((uint32_t *)msg)[12];
-		const uint32_t M13 = ((uint32_t *)msg)[13];
-		const uint32_t M14 = ((uint32_t *)msg)[14];
-		const uint32_t M15 = ((uint32_t *)msg)[15];
+		byte* msg = (byte*)Input.data() + InOffset;
+		const uint  M0 = ((uint*)msg)[0];
+		const uint  M1 = ((uint*)msg)[1];
+		const uint  M2 = ((uint*)msg)[2];
+		const uint  M3 = ((uint*)msg)[3];
+		const uint  M4 = ((uint*)msg)[4];
+		const uint  M5 = ((uint*)msg)[5];
+		const uint  M6 = ((uint*)msg)[6];
+		const uint  M7 = ((uint*)msg)[7];
+		const uint  M8 = ((uint*)msg)[8];
+		const uint  M9 = ((uint*)msg)[9];
+		const uint M10 = ((uint*)msg)[10];
+		const uint M11 = ((uint*)msg)[11];
+		const uint M12 = ((uint*)msg)[12];
+		const uint M13 = ((uint*)msg)[13];
+		const uint M14 = ((uint*)msg)[14];
+		const uint M15 = ((uint*)msg)[15];
 #    endif
 
 		R1 = FF0 = _mm_loadu_si128((const __m128i*)&State.H[0]);
 		R2 = FF1 = _mm_loadu_si128((const __m128i*)&State.H[4]);
 		R3 = _mm_loadu_si128((const __m128i*)&IV[0]);
-		std::vector<uint8_t> taf(16);
+		std::vector<byte> taf(16);
 		memcpy(&taf[0], &State.T[0], 8);
 		memcpy(&taf[8], &State.F[0], 8);
 		R4 = _mm_xor_si128(_mm_loadu_si128((const __m128i*)&IV[4]), _mm_loadu_si128((const __m128i*)&taf[0]));
@@ -921,38 +918,32 @@ public:
 		R3 = _mm_shuffle_epi32(R3, _MM_SHUFFLE(1, 0, 3, 2));
 		R2 = _mm_shuffle_epi32(R2, _MM_SHUFFLE(2, 1, 0, 3));
 
-
 		_mm_storeu_si128((__m128i*)&State.H[0], _mm_xor_si128(FF0, _mm_xor_si128(R1, R3)));
 		_mm_storeu_si128((__m128i*)&State.H[4], _mm_xor_si128(FF1, _mm_xor_si128(R2, R4)));
-#else
-
-		Compress(Input, InOffset, State, IV);
-
-#endif
 	}
 
 	template <typename T>
-	static inline void Compress(const std::vector<uint8_t> &Input, size_t InOffset, T &State, const std::vector<uint32_t> &IV)
+	static void Compress64(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<uint> &IV)
 	{
-		std::vector<uint32_t> M(16);
+		std::vector<uint> M(16);
 		Utility::IntUtils::BytesToLeUL512(Input, InOffset, M, 0);
 
-		uint32_t R0 = State.H[0];
-		uint32_t R1 = State.H[1];
-		uint32_t R2 = State.H[2];
-		uint32_t R3 = State.H[3];
-		uint32_t R4 = State.H[4];
-		uint32_t R5 = State.H[5];
-		uint32_t R6 = State.H[6];
-		uint32_t R7 = State.H[7];
-		uint32_t R8 = IV[0];
-		uint32_t R9 = IV[1];
-		uint32_t R10 = IV[2];
-		uint32_t R11 = IV[3];
-		uint32_t R12 = IV[4] ^ State.T[0];
-		uint32_t R13 = IV[5] ^ State.T[1];
-		uint32_t R14 = IV[6] ^ State.F[0];
-		uint32_t R15 = IV[7] ^ State.F[1];
+		uint R0 = State.H[0];
+		uint R1 = State.H[1];
+		uint R2 = State.H[2];
+		uint R3 = State.H[3];
+		uint R4 = State.H[4];
+		uint R5 = State.H[5];
+		uint R6 = State.H[6];
+		uint R7 = State.H[7];
+		uint R8 = IV[0];
+		uint R9 = IV[1];
+		uint R10 = IV[2];
+		uint R11 = IV[3];
+		uint R12 = IV[4] ^ State.T[0];
+		uint R13 = IV[5] ^ State.T[1];
+		uint R14 = IV[6] ^ State.F[0];
+		uint R15 = IV[7] ^ State.F[1];
 
 		// round 0
 		R0 += R4 + M[0];

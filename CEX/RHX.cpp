@@ -31,7 +31,7 @@ RHX::RHX(Digests KdfEngineType, size_t Rounds, size_t BlockSize)
 	m_legalRounds(0),
 	m_rndCount(Rounds)
 {
-	if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
+	if (BlockSize != 16 && BlockSize != 32)
 		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
 	if (m_kdfEngine != 0 && Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
 		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
@@ -56,7 +56,7 @@ RHX::RHX(IDigest *KdfEngine, size_t Rounds, size_t BlockSize)
 	m_legalRounds(0),
 	m_rndCount(Rounds)
 {
-	if (BlockSize != BLOCK16 && BlockSize != BLOCK32)
+	if (BlockSize != 16 && BlockSize != 32)
 		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid block size! Supported block sizes are 16 and 32 bytes.");
 	if (m_kdfEngine != 0 && Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
 		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
@@ -73,7 +73,7 @@ RHX::~RHX()
 
 void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (m_blockSize == BLOCK16)
+	if (m_blockSize == 16)
 		Decrypt16(Input, 0, Output, 0);
 	else
 		Decrypt32(Input, 0, Output, 0);
@@ -81,7 +81,7 @@ void RHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 
 void RHX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_blockSize == BLOCK16)
+	if (m_blockSize == 16)
 		Decrypt16(Input, InOffset, Output, OutOffset);
 	else
 		Decrypt32(Input, InOffset, Output, OutOffset);
@@ -122,7 +122,7 @@ void RHX::Destroy()
 
 void RHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (m_blockSize == BLOCK16)
+	if (m_blockSize == 16)
 		Encrypt16(Input, 0, Output, 0);
 	else
 		Encrypt32(Input, 0, Output, 0);
@@ -130,7 +130,7 @@ void RHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 
 void RHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	if (m_blockSize == BLOCK16)
+	if (m_blockSize == 16)
 		Encrypt16(Input, InOffset, Output, OutOffset);
 	else
 		Encrypt32(Input, InOffset, Output, OutOffset);

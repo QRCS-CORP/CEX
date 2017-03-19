@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Key Derivation Functions enumeration names
 /// </summary>
-enum class Kdfs : uint8_t
+enum class Kdfs : byte
 {
 	/// <summary>
 	/// No kdf is specified

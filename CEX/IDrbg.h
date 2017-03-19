@@ -56,7 +56,7 @@ public:
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
-	virtual const uint64_t MaxOutputSize() = 0;
+	virtual const ulong MaxOutputSize() = 0;
 
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated in a single request

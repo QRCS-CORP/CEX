@@ -142,7 +142,7 @@ private:
 	bool m_isDestroyed;
 	bool m_isFinalized;
 	bool m_isInitialized;
-	uint64_t m_mainBlockCount;
+	ulong m_mainBlockCount;
 	bool m_isEncryption;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<byte> m_listAsterisk;
@@ -206,7 +206,7 @@ public:
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input/output data arrays passed to the transform must be this size in bytes to trigger parallelization.</para>
+	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 
@@ -453,7 +453,7 @@ private:
 	void ExtendBlock(std::vector<byte> &Output, size_t Position);
 	void GenerateOffsets(const std::vector<byte> &Nonce);
 	void GetLSub(size_t N, std::vector<byte> &LSub);
-	uint32_t Ntz(uint64_t X);
+	uint Ntz(ulong X);
 	void ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void ProcessPartial(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, size_t Length);

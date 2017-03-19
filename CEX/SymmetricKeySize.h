@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_LEGALKEYSIZE_H
-#define _CEX_LEGALKEYSIZE_H
+#ifndef _CEX_SYMMETRICKEYSIZE_H
+#define _CEX_SYMMETRICKEYSIZE_H
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"
@@ -72,7 +72,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyArray">Key byte array containing a serialized SymmetricKeySize structure</param>
-	explicit SymmetricKeySize(std::vector<uint8_t> KeyArray)
+	explicit SymmetricKeySize(std::vector<byte> KeyArray)
 		:
 		m_infoSize(0),
 		m_keySize(0),
@@ -213,9 +213,9 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The byte array containing the SymmetricKeySize</returns>
-	std::vector<uint8_t> ToBytes()
+	std::vector<byte> ToBytes()
 	{
-		std::vector<uint8_t> trs(HDR_SIZE, 0);
+		std::vector<byte> trs(HDR_SIZE, 0);
 
 		memcpy(&trs[0], &m_infoSize, sizeof(size_t));
 		memcpy(&trs[4], &m_keySize, sizeof(size_t));

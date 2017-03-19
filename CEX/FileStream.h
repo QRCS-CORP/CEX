@@ -40,12 +40,12 @@ public:
 
 private:
 
-	const uint32_t CHUNK_SIZE = 4096;
+	const uint CHUNK_SIZE = 4096;
 	bool m_isDestroyed;
 	std::string m_fileName;
-	uint64_t m_filePosition;
-	uint64_t m_fileSize;
-	uint32_t m_fileWritten;
+	ulong m_filePosition;
+	ulong m_fileSize;
+	ulong m_fileWritten;
 	std::fstream m_fileStream;
 	FileAccess m_fileAccess;
 	FileModes m_fileMode;
@@ -94,12 +94,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const uint64_t Length() { return m_fileSize; }
+	virtual const ulong Length() { return m_fileSize; }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const uint64_t Position() { return m_filePosition; }
+	virtual const ulong Position() { return m_filePosition; }
 
 	/// <summary>
 	/// Get: The underlying stream
@@ -157,7 +157,7 @@ public:
 	/// <param name="FileName">The full path and file name</param>
 	///
 	/// <returns>Returns the file size</returns>
-	static uint64_t FileSize(const std::string &FileName);
+	static ulong FileSize(const std::string &FileName);
 
 	/// <summary>
 	/// Write the stream to disk
@@ -195,7 +195,7 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(uint64_t Offset, SeekOrigin Origin);
+	virtual void Seek(ulong Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
@@ -204,7 +204,7 @@ public:
 	/// <param name="Length">The desired length</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void SetLength(uint64_t Length);
+	virtual void SetLength(ulong Length);
 
 	/// <summary>
 	/// Writes an input buffer to the stream

@@ -120,12 +120,9 @@ private:
 
 	static const std::string DEF_INFO;
 	const size_t BLOCK_SIZE = 16;
-	const size_t LEGAL_KEYS = 10;
 	const size_t MAX_ROUNDS = 64;
 	const size_t MIN_ROUNDS = 32;
 	const uint PHI = 0x9E3779B9;
-	const size_t ROUNDS32 = 32;
-	const size_t ROUNDS40 = 40;
 	// size of state buffer subtracted parallel size calculations
 	const size_t STATE_PRECACHED = 2048;
 

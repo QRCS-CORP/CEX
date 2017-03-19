@@ -4,11 +4,12 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Common Initialization Vector bit sizes.
 /// <para> Can be cast as IV byte size integers, i.e. (int sz = IVSizes.V128) is equal to 16.</para>
 /// </summary>
-enum class IVSizes : uint8_t
+enum class IVSizes : byte
 {
 	/// <summary>
 	/// No iv size is specified

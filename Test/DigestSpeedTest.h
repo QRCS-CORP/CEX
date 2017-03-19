@@ -53,17 +53,17 @@ namespace Test
 
 				OnProgress("### Message Digest Speed Tests: 10 loops * 100MB ###");
 				OnProgress("***The Blake 256 digest***");
-				DigestBlockLoop(Digests::BlakeS256, MB100);
+				DigestBlockLoop(Digests::Blake256, MB100);
 				OnProgress("***The Blake 512 digest***");
-				DigestBlockLoop(Digests::BlakeB512, MB100);
+				DigestBlockLoop(Digests::Blake512, MB100);
 				OnProgress("***The Blake2S 256 digest***");
-				DigestBlockLoop(Digests::BlakeS256, MB100);
+				DigestBlockLoop(Digests::Blake256, MB100);
 				OnProgress("***The Blake2SP 256 digest***");
-				DigestBlockLoop(Digests::BlakeSP256, MB100, 10, true);
+				DigestBlockLoop(Digests::Blake256, MB100, 10, true);
 				OnProgress("***The Blake2B 512 digest***");
-				DigestBlockLoop(Digests::BlakeB512, MB100);
+				DigestBlockLoop(Digests::Blake512, MB100);
 				OnProgress("***The Blake2BP 512 digest***");
-				DigestBlockLoop(Digests::BlakeBP512, MB100, 10, true);
+				DigestBlockLoop(Digests::Blake512, MB100, 10, true);
 				OnProgress("***The Keccak 256 digest***");
 				DigestBlockLoop(Digests::Keccak256, MB100);
 				OnProgress("***The Keccak 512 digest***");

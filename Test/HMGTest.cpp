@@ -109,7 +109,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::BlakeB512, CEX::Enumeration::Providers::CSP);
+			Drbg::HMG ctd(Enumeration::Digests::Blake512, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -126,7 +126,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::BlakeS256, CEX::Enumeration::Providers::CSP);
+			Drbg::HMG ctd(Enumeration::Digests::Blake256, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);

@@ -116,7 +116,6 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string DEF_INFO;
 	const size_t AES256_ROUNDS = 14;
-	const size_t LEGAL_KEYS = 10;
 	const size_t MAX_ROUNDS = 38;
 	const size_t MIN_ROUNDS = 10;
 	// size of state buffer subtracted parallel size calculations

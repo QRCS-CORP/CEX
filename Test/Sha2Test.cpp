@@ -10,8 +10,6 @@ namespace Test
 		{
 			Initialize();
 
-			//CompareIntrinsics();
-
 			Digest::SHA256* sha256 = new Digest::SHA256();
 			CompareVector(sha256, m_message[0], m_expected256[0]);
 			CompareVector(sha256, m_message[1], m_expected256[1]);
@@ -40,7 +38,7 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::CompareVector(Digest::IDigest *Digest, std::vector<byte> Input, std::vector<byte> Expected)
+	void SHA2Test::CompareVector(Digest::IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 

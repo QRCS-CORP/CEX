@@ -45,16 +45,16 @@ class MacDescription
 {
 private:
 
-	static const uint32_t MACHDR_SIZE = 9;
+	static const uint MACHDR_SIZE = 9;
 
-	uint8_t m_macType;
-	uint16_t m_keySize;
-	uint8_t m_ivSize;
-	uint8_t m_hmacEngine;
-	uint8_t m_engineType;
-	uint8_t m_blockSize;
-	uint8_t m_roundCount;
-	uint8_t m_kdfEngine;
+	byte m_macType;
+	short m_keySize;
+	byte m_ivSize;
+	byte m_hmacEngine;
+	byte m_engineType;
+	byte m_blockSize;
+	byte m_roundCount;
+	byte m_kdfEngine;
 
 public:
 
@@ -70,7 +70,7 @@ public:
 	/// <summary>
 	/// The cipher Key Size
 	/// </summary>
-	const uint16_t KeySize() const { return m_keySize; }
+	const short KeySize() const { return m_keySize; }
 
 	/// <summary>
 	/// Size of the cipher Initialization Vector
@@ -131,17 +131,17 @@ public:
 	/// <param name="BlockSize">The cipher Block Size</param>
 	/// <param name="RoundCount">The number of transformation Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	explicit MacDescription(Macs MacType, uint16_t KeySize, uint8_t IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
+	explicit MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
 		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512)
 	{
-		m_macType = static_cast<uint8_t>(MacType);
+		m_macType = static_cast<byte>(MacType);
 		m_keySize = KeySize;
 		m_ivSize = IvSize;
-		m_hmacEngine = static_cast<uint8_t>(HmacEngine);
-		m_engineType = static_cast<uint8_t>(EngineType);
-		m_blockSize = static_cast<uint8_t>(BlockSize);
-		m_roundCount = static_cast<uint8_t>(RoundCount);
-		m_kdfEngine = static_cast<uint8_t>(KdfEngine);
+		m_hmacEngine = static_cast<byte>(HmacEngine);
+		m_engineType = static_cast<byte>(EngineType);
+		m_blockSize = static_cast<byte>(BlockSize);
+		m_roundCount = static_cast<byte>(RoundCount);
+		m_kdfEngine = static_cast<byte>(KdfEngine);
 	}
 
 	/// <summary>
@@ -152,9 +152,9 @@ public:
 	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
 	explicit MacDescription(uint KeySize, Digests HmacEngine)
 	{
-		m_macType = static_cast<uint8_t>(Macs::HMAC);
+		m_macType = static_cast<byte>(Macs::HMAC);
 		m_keySize = KeySize;
-		m_hmacEngine = static_cast<uint8_t>(HmacEngine);
+		m_hmacEngine = static_cast<byte>(HmacEngine);
 		m_ivSize = 0;
 		m_engineType = 0;
 		m_blockSize = 0;
@@ -172,17 +172,17 @@ public:
 	/// <param name="BlockSize">The cipher Block Size</param>
 	/// <param name="RoundCount">The number of transformation Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	explicit MacDescription(uint16_t KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
+	explicit MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
 		RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512)
 	{
-		m_macType = static_cast<uint8_t>(Macs::CMAC);
+		m_macType = static_cast<byte>(Macs::CMAC);
 		m_keySize = KeySize;
-		m_ivSize = static_cast<uint8_t>(IvSize);
+		m_ivSize = static_cast<byte>(IvSize);
 		m_hmacEngine = 0;
-		m_engineType = static_cast<uint8_t>(EngineType);
-		m_blockSize = static_cast<uint8_t>(BlockSize);
-		m_roundCount = static_cast<uint8_t>(RoundCount);
-		m_kdfEngine = static_cast<uint8_t>(KdfEngine);
+		m_engineType = static_cast<byte>(EngineType);
+		m_blockSize = static_cast<byte>(BlockSize);
+		m_roundCount = static_cast<byte>(RoundCount);
+		m_kdfEngine = static_cast<byte>(KdfEngine);
 	}
 
 	/// <summary>

@@ -92,7 +92,7 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	m_msgDigest->Update(tmpV, 0, tmpV.size());
 
 	size_t msgLen = m_msgDigest->Finalize(Output, OutOffset);
-	m_msgDigest->Reset();
+	m_msgDigest->Reset(); // TODO: still necessary?
 	m_msgDigest->Update(m_inputPad, 0, m_inputPad.size());
 
 	return msgLen;

@@ -4,59 +4,52 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Cryptographic hash functions enmumeration names
 /// </summary>
-enum class Digests : uint8_t
+enum class Digests : byte
 {
 	/// <summary>
 	/// No hash digest is specified
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The Blake2B digest with a 512 bit return size
+	/// The Blake256Compress digest with a 256 bit return size
 	/// </summary>
-	BlakeB512 = 1,
+	Blake256 = 1,
 	/// <summary>
-	/// The parallelized Blake2BP digest with a 512 bit return size
+	/// The Blake512Compress digest with a 512 bit return size
 	/// </summary>
-	BlakeBP512 = 2,
-	/// <summary>
-	/// The Blake2S digest with a 256 bit return size
-	/// </summary>
-	BlakeS256 = 3,
-	/// <summary>
-	/// The parallelized Blake2SP digest with a 256 bit return size
-	/// </summary>
-	BlakeSP256 = 4,
+	Blake512 = 2,
 	/// <summary>
 	/// The SHA-3 digest based on Keccak with a 256 bit return size
 	/// </summary>
-	Keccak256 = 7,
+	Keccak256 = 3,
 	/// <summary>
 	/// The SHA-3 digest based on Keccak with a 512 bit return size
 	/// </summary>
-	Keccak512 = 8,
+	Keccak512 = 4,
 	/// <summary>
 	///The SHA-2 digest with a 256 bit return size
 	/// </summary>
-	SHA256 = 9,
+	SHA256 = 5,
 	/// <summary>
 	/// The SHA-2 digest with a 512 bit return size
 	/// </summary>
-	SHA512 = 10,
+	SHA512 = 6,
 	/// <summary>
 	/// The Skein digest with a 256 bit return size
 	/// </summary>
-	Skein256 = 11,
+	Skein256 = 7,
 	/// <summary>
 	/// The Skein digest with a 512 bit return size
 	/// </summary>
-	Skein512 = 12,
+	Skein512 = 8,
 	/// <summary>
 	/// The Skein digest with a 1024 bit return size
 	/// </summary>
-	Skein1024 = 13
+	Skein1024 = 9
 };
 
 NAMESPACE_ENUMERATIONEND

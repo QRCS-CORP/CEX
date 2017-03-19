@@ -9,7 +9,7 @@ namespace Test
 	{
 		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType);
 		size_t bufSze = dgt->BlockSize();
-		if (Parallel && DigestType == Enumeration::Digests::BlakeBP512 || DigestType == Enumeration::Digests::BlakeSP256)
+		if (Parallel)
 			bufSze = SampleSize / 8;
 		
 		std::vector<byte> hash(dgt->DigestSize(), 0);

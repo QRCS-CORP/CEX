@@ -16,7 +16,7 @@ private:
 	bool m_isDestroyed;
 	std::vector<byte> m_keySalt;
 	std::vector<byte> m_streamData;
-	uint64_t m_streamPosition;
+	ulong m_streamPosition;
 
 public:
 
@@ -45,12 +45,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const uint64_t Length() { return static_cast<uint64_t>(m_streamData.size()); }
+	virtual const ulong Length() { return static_cast<ulong>(m_streamData.size()); }
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const uint64_t Position() { return m_streamPosition; }
+	virtual const ulong Position() { return m_streamPosition; }
 
 	//~~~Constructor~~~//
 
@@ -65,7 +65,7 @@ public:
 	///
 	/// <param name="Length">The reserved length of the stream</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SecureStream(size_t Length, uint64_t KeySalt = 0);
+	explicit SecureStream(size_t Length, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Initialize this class with a byte array
@@ -73,7 +73,7 @@ public:
 	///
 	/// <param name="Data">The array used to initialize the stream</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SecureStream(const std::vector<byte> &Data, uint64_t KeySalt = 0);
+	explicit SecureStream(const std::vector<byte> &Data, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Initialize this class with a byte array with offset and length parameters
@@ -85,7 +85,7 @@ public:
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
-	explicit SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, uint64_t KeySalt = 0);
+	explicit SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Finalize objects
@@ -142,14 +142,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(uint64_t Offset, SeekOrigin Origin);
+	virtual void Seek(ulong Offset, SeekOrigin Origin);
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(uint64_t Length);
+	virtual void SetLength(ulong Length);
 
 	/// <summary>
 	/// Return the underlying byte stream

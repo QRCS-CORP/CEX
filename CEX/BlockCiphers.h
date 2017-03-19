@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Symmetric block cipher enmumeration names
 /// </summary>
-enum class BlockCiphers : uint8_t
+enum class BlockCiphers : byte
 {
 	/// <summary>
 	/// No block cipher is specified

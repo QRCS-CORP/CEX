@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// Asymmetric cipher enmumeration names
 /// </summary>
-enum class AsymmetricEngines : uint8_t
+enum class AsymmetricEngines : byte
 {
 	/// <summary>
 	/// No asymmetric cipher is specified

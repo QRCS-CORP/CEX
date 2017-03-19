@@ -30,80 +30,46 @@
 #define _CEX_SHA256_H
 
 #include "IDigest.h"
-#include "SHA2Params.h"
 
 NAMESPACE_DIGEST
 
-using Key::Symmetric::ISymmetricKey;
-
 /// <summary>
-/// An implementation of the SHA-2 digest with a 256 bit digest return size.
-/// <para>Implements a sequential or parallelized hash function, HMAC, or HKDF bytes generator.</para>
+/// An implementation of the SHA-2 digest with a 256 bit digest return size
 /// </summary> 
 /// 
 /// <example>
 /// <description>Using the Compute method:</description>
 /// <code>
 /// SHA256 dgt;
-/// std:vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
+/// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
-/// dgt.Compute(Input, hash);
-/// </code>
-///
-/// <description>Implement an HMAC:</description>
-/// <code>
-/// SHA256 dgt;
-/// std:vector&lt;byte&gt; mac(dgt.DigestSize(), 0);
-/// // initialize HMAC by loading the key
-/// dgt.LoadMacKey(SymmetricKey(user-key));
-/// // compute mac
-/// dgt.Compute(Input, mac);
-/// </code>
-///
-/// <description>HKDF Generator:</description>
-/// <code>
-/// SHA256 dgt;
-/// std:vector&lt;byte&gt; output(100);
-/// // fill output with p-rand
-/// dgt.Generate(SymmetricKey(user-key), output);
+/// dgt.Update(Input, 0, Input.size());
+/// dgt.Finalize(hash, 0);
+/// dgt.Reset();
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description>Tree Hashing Description:</description>
-/// <para>Tree hashing mode is instantiated when the parallel mechanism is engaged through one of the constructors.
-/// The parallel mode uses multi-threading parallel processing, in conjunction with (if supported) SIMD multi-block concurrent processing.
-/// The hash digest creates a series of lanes using the formula ParallelDegree * ni, where ni is the maximum number of blocks that can be 
-/// processed simultaneously using SIMD instructions. With SHA-2 256, the AVX 256i instructions can process 8 blocks in parallel, 
-/// with the 512 bit version of the digest, ni is equal to 4. 
-/// All parallel processing (with or without SSE3/AVX capabilities) produces an identical hash code. 
-/// Works with or without processor intrinsics; SIMD processing is enabled through run-time cpu capabilities check.</para>
-///
-/// <para>The message input is offset across lanes, with each of the (32 for SHA256, 16 for SHA512) lanes consuming the offset message data in equal amounts, staggered in a j-slice arrangement.
-/// The state from these intermediate hashes is used as input for the final hash calculation, in this way message processing can be distributed between any even number of processors.
-/// The default ParallelDegree setting is 4, (this is the number of threads created to process state), but this number can be any even number, 
-/// and should be set to the number of processor cores on the target system. 
-/// Note that changing the parallel degree, will change the output hash value.</para>
-///
-/// <para>There are two tree hashing modes, the default tree has a depth of 1, where all hash states are processed as contiguous input into the root hash finalizer, H(l1,l2,l3..ln).
-/// The other tree mode is instantiated by setting the SHA2Params TreeDepth value to 2, this seperates the state into branches consisting of SubTreeLength number of nodes on each branch.
-/// Each nodes state is used as message input for an intermediate branch hash, the branch finalizer also processes the serialized SHA2Params structure, 
-/// which contains a NodeOffset counter that is equal to the linear position of the node within the tree arrangement; H(b1= H(l1,l2..ln), b2= H(ln+1,ln+2..ln+n), ..bn).
-/// After each branch is finalized, the branch states are then used as input for the root hash calculation.</para>
+/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter.<BR></BR> 
+/// The default number of threads is 8, this can be changed using the ParallelMaxDegree(size_t) function, but not directly through the ParallelProfile accessor,
+/// (state sizes must be recalculated when the thread count changes).
+/// Changing the thread count from the default, will produce a different hash output.<BR></BR>
+/// The thread count must be an even number less or equal to the number of processing cores.<BR></BR>
+/// For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length.<BR></BR>
+/// The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments.<BR></BR>
+/// The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state.<BR></BR>
+/// The hash finalizer processes each leaf state as contiguous message input for the root hash; i.e. R = H(S0 || S1 || S2 || ...Sn).</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>State block size is 64 bytes, (512 bits), in parallel mode the ParallelBlockSize() is used (P * B * 8).</description></item>
+/// <item><description>State block size is 64 bytes, (512 bits), in parallel mode the ParallelBlockSize() is used to trigger multi-threaded processing.</description></item>
 /// <item><description>Digest output size is 32 bytes, (256 bits).</description></item>
 /// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], size_t, size_t)"/> and Finalize methods; (suitable for small data).</description>/></item>
 /// <item><description>The <see cref="Update(byte)"/> and <see cref="Update(byte[], size_t, size_t)"/> methods process message input.</description></item>
 /// <item><description>The <see cref="Finalize(byte[], size_t)"/> method returns the hash or MAC code and resets the internal state.</description></item>
-/// <item><description>The Generate function produces pseudo-random bytes using an internal implementation of the HKDF Expand bytes generator.</description></item>
-/// <item><description>The LoadMacKey function initializes an HMAC implementation; used with the update and Finalize methods for creating a MAC code.</description></item>
 /// <item><description>Setting Parallel to true in the constructor instantiates the multi-threaded variant.</description></item>
 /// <item><description>Multi-threaded and sequential versions produce a different output hash for a message, this is expected.</description></item>
-/// <item><description>Default tree hashing mode is depth 1 sequential; intermediate hashes are finalized as contiguous input.</description></item>
-/// <item><description>Setting the SHA2Params TreeDepth property to 2, finalizes branches of SubTreeLength nodes as message input for the root hash.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
@@ -125,12 +91,9 @@ private:
 
 	static const size_t BLOCK_SIZE = 64;
 	static const size_t DIGEST_SIZE = 32;
-	static const size_t ITL_LANESIZE = 8;
-	static const size_t ITL_BLKSIZE = BLOCK_SIZE * ITL_LANESIZE;
-	static const uint PRL_BRANCHSIZE = 1024 * 1000 * 10;
-	static const uint PRL_DEGREE = 4;
-	static const uint MAX_PRLBLOCK = 1024 * 1000 * PRL_DEGREE * 100;
-	static const uint MIN_PRLBLOCK = ITL_BLKSIZE * PRL_DEGREE;
+	static const uint DEF_PRLDEGREE = 8;
+	// size of reserved state buffer subtracted from parallel size calculations
+	const size_t STATE_PRECACHED = 2048;
 
 	struct SHA256State
 	{
@@ -152,21 +115,12 @@ private:
 		}
 	};
 
-	bool m_hasAvx;
-	std::vector<byte> m_iPad;
 	bool m_isDestroyed;
-	bool m_isHmac;
 	bool m_isInitialized;
-	bool m_isParallel;
-	uint32_t m_leafSize;
-	size_t m_minParallel;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength = 0;
-	std::vector<byte> m_oPad;
-	size_t m_parallelBlockSize;
-	std::vector<SHA256State> m_State;
-	bool m_treeDestroy;
-	SHA2Params m_treeParams;
+	ParallelOptions m_parallelProfile;
+	std::vector<SHA256State> m_dgtState;
 
 public:
 
@@ -192,24 +146,31 @@ public:
 	virtual Digests Enumeral() { return Digests::SHA256; }
 
 	/// <summary>
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input data array passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+
+	/// <summary>
 	/// Get: The digests class name
 	/// </summary>
 	virtual const std::string Name() { return "SHA256"; }
 
 	/// <summary>
-	/// Get: Parallel block size; set either automatically, or through the constructors Blake2Params ThreadCount() parameter. Must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	const size_t ParallelBlockSize() { return m_parallelBlockSize; }
+	const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
 
 	/// <summary>
-	/// Get: Maximum input size with parallel processing
+	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state, or initialize the digest using a SkeinParams with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	const size_t ParallelMaximumSize() { return MAX_PRLBLOCK; }
-
-	/// <summary>
-	/// Get: The smallest parallel block size. Parallel blocks must be a multiple of this size.
-	/// </summary>
-	const size_t ParallelMinimumSize() { return m_minParallel; }
+	ParallelOptions &ParallelProfile() { return m_parallelProfile; }
 
 	//~~~Constructor~~~//
 
@@ -220,19 +181,6 @@ public:
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded SHA-2 variant.</param>
 	explicit SHA256(bool Parallel = false);
-
-	/// <summary>
-	/// Initialize the class with an SHA2Params structure.
-	/// <para>The parameters structure allows for tuning of the internal configuration string,
-	/// and changing the number of threads used by the parallel mechanism (ParallelDegree).
-	/// If the parallel degree is greater than 1, multi-threading hash engine is instantiated.
-	/// The default thread count is 4, changing this value will produce a different output hash code.</para>
-	/// </summary>
-	/// 
-	/// <param name="Params">The Blake2Params structure, containing the tree configuration settings.</param>
-	///
-	/// <exception cref="CryptoDigestException">Thrown if the SHA2Params structure contains invalid values</exception>
-	explicit SHA256(SHA2Params &Params);
 
 	/// <summary>
 	/// Finalize objects
@@ -267,25 +215,15 @@ public:
 	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
-	/// Generate pseudo random bytes using the digest as with an HKDF Expand bytes generator
+	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
+	/// <para>Thread count must be an even number, and not exceed the number of processor cores.
+	/// Changing this value from the default (8 threads), will change the output hash value.</para>
 	/// </summary>
-	/// 
-	/// <param name="MacKey">The input key parameters; the input Key should be at least as large as the hash output size</param>
-	/// <param name="Output">The array to fill with pseudo random bytes</param>
-	/// 
-	/// <returns>The number of bytes generated</returns>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the maximum number of output bytes is exceeded</exception>
-	size_t Generate(ISymmetricKey &MacKey, std::vector<uint8_t> &Output);
-
-	/// <summary>
-	/// Initialize the digest as a MAC code generator
-	/// </summary>
-	/// 
-	/// <param name="MacKey">The input key parameters; key size should be at least as large as the hash output size</para></param>
+	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="CryptoDigestException">Thrown if the Key size is less than the required minimum</exception>
-	void LoadMacKey(ISymmetricKey &MacKey);
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	virtual void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
 	/// Reset the internal state
@@ -309,17 +247,12 @@ public:
 	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
-	void DetectCpu();
-	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
-	void Expand(const std::vector<byte> &Input, size_t Count, std::vector<byte> &Output);
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<SHA256State> &State, size_t StateOffset);
-	void Initialize(std::vector<SHA256State> &State);
-	void LoadState(std::vector<SHA256State> &State, size_t StateOffset);
-	void MacFinal(std::vector<byte> &Input, const size_t Length, std::vector<SHA256State> &State, size_t StateOffset);
-	void ProcessBlock(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<SHA256State> &State, size_t StateOffset);
-	void ProcessLeaf(const std::vector<uint8_t> &Input, size_t InOffset, std::vector<SHA256State> &State, size_t StateOffset, uint64_t Length);
-	void ResetMac();
-	void StateToBytes(std::vector<byte> &Output, const size_t OutOffset, std::vector<SHA256State> &State, size_t StateOffset);
+
+	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
+	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA256State &State);
+	void Initialize();
+	void LoadState(SHA256State &State);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA256State &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

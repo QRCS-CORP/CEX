@@ -198,24 +198,24 @@ const size_t UInt256::Length()
 	return 32;
 }
 
-void UInt256::Rotl32(const int Shift)
+void UInt256::RotL32(const int Shift)
 {
 	Register = _mm256_or_si256(_mm256_slli_epi32(Register, static_cast<int>(Shift)), _mm256_srli_epi32(Register, static_cast<int>(32 - Shift)));
 }
 
-UInt256 UInt256::Rotl32(const UInt256 &Value, const int Shift)
+UInt256 UInt256::RotL32(const UInt256 &Value, const int Shift)
 {
 	return UInt256(_mm256_or_si256(_mm256_slli_epi32(Value.Register, static_cast<int>(Shift)), _mm256_srli_epi32(Value.Register, static_cast<int>(32 - Shift))));
 }
 
-void UInt256::Rotr32(const int Shift)
+void UInt256::RotR32(const int Shift)
 {
-	Rotl32(32 - Shift);
+	RotL32(32 - Shift);
 }
 
-UInt256 UInt256::Rotr32(const UInt256 &Value, const int Shift)
+UInt256 UInt256::RotR32(const UInt256 &Value, const int Shift)
 {
-	return Rotl32(Value, 32 - Shift);
+	return RotL32(Value, 32 - Shift);
 }
 
 UInt256 UInt256::ShuffleLoadBE(const std::vector<byte> &Input, size_t Offset, size_t Shift)

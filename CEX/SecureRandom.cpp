@@ -292,9 +292,6 @@ ulong SecureRandom::NextUInt64(ulong Minimum, ulong Maximum)
 
 void SecureRandom::Reset()
 {
-	if (m_rngGenerator != 0)
-		delete m_rngGenerator;
-
 	m_rngGenerator = Helper::ProviderFromName::GetInstance(m_pvdType);
 	m_rngGenerator->GetBytes(m_byteBuffer);
 	m_bufferIndex = 0;

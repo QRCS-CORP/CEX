@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Message Authentication Code generator enmumeration names
 /// </summary>
-enum class Macs : uint8_t
+enum class Macs : byte
 {
 	/// <summary>
 	/// No kdf is specified

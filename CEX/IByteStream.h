@@ -55,12 +55,12 @@ public:
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const uint64_t Length() = 0;
+	virtual const ulong Length() = 0;
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const uint64_t Position() = 0;
+	virtual const ulong Position() = 0;
 
 	//~~~Public Functions~~~//
 
@@ -110,14 +110,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(uint64_t Offset, SeekOrigin Origin) = 0;
+	virtual void Seek(ulong Offset, SeekOrigin Origin) = 0;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(uint64_t Length) = 0;
+	virtual void SetLength(ulong Length) = 0;
 
 	/// <summary>
 	/// Writes an input buffer to the stream

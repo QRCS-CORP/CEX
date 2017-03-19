@@ -16,6 +16,7 @@ Keccak256::Keccak256(int DigestSize)
 	m_buffer(0),
 	m_bufferIndex(0),
 	m_digestSize(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
 	m_state(25, 0)
 {
 	// test for legal sizes; default at 256

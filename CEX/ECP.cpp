@@ -63,12 +63,12 @@ std::vector<byte> ECP::GetBytes(size_t Length)
 	return data;
 }
 
-uint32_t ECP::Next()
+uint ECP::Next()
 {
-	uint32_t rndNum;
-	std::vector<byte> rnd(sizeof(uint32_t));
+	uint rndNum;
+	std::vector<byte> rnd(sizeof(uint));
 	GetBytes(rnd);
-	memcpy(&rndNum, &rnd[0], sizeof(uint32_t));
+	memcpy(&rndNum, &rnd[0], sizeof(uint));
 
 	return rndNum;
 }
@@ -108,7 +108,7 @@ std::vector<byte> ECP::Collect()
 
 	std::vector<byte> sysState(0);
 	std::vector<byte> rndBuffer(KBLK);
-	uint64_t ts = SysUtils::TimeStamp();
+	ulong ts = SysUtils::TimeStamp();
 
 	CSP pvd;
 	pvd.GetBytes(rndBuffer);

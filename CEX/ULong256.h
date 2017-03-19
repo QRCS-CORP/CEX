@@ -175,7 +175,7 @@ NAMESPACE_NUMERIC
 		/// </summary>
 		///
 		/// <param name="Shift">The shift degree; maximum is 64</param>
-		void Rotl64(const int Shift);
+		void RotL64(const int Shift);
 
 		/// <summary>
 		/// Computes the 64 bit left rotation of four unsigned integers
@@ -185,14 +185,14 @@ NAMESPACE_NUMERIC
 		/// <param name="Shift">The shift degree; maximum is 64</param>
 		/// 
 		/// <returns>The rotated ULong256</returns>
-		static ULong256 Rotl64(const ULong256 &Value, const int Shift);
+		static ULong256 RotL64(const ULong256 &Value, const int Shift);
 
 		/// <summary>
 		/// Computes the 64 bit right rotation of four unsigned integers
 		/// </summary>
 		///
 		/// <param name="Shift">The shift degree; maximum is 64</param>
-		void Rotr64(const int Shift);
+		void RotR64(const int Shift);
 
 		/// <summary>
 		/// Computes the 64 bit right rotation of four unsigned integers
@@ -202,7 +202,7 @@ NAMESPACE_NUMERIC
 		/// <param name="Shift">The shift degree; maximum is 64</param>
 		/// 
 		/// <returns>The rotated ULong256</returns>
-		static ULong256 Rotr64(const ULong256 &Value, const int Shift);
+		static ULong256 RotR64(const ULong256 &Value, const int Shift);
 
 		/// <summary>
 		/// Load a Uint256 in Big Endian format using uint staggered at multiples of the shift factor
@@ -347,7 +347,7 @@ NAMESPACE_NUMERIC
 		/// <param name="Value">The divisor value</param>
 		inline void operator /= (const ULong256 &Value)
 		{
-			//ToDo: finish
+			// ToDo: fix this
 			Register.m256i_u64[0] /= Value.Register.m256i_u64[0];
 			Register.m256i_u64[1] /= Value.Register.m256i_u64[1];
 			Register.m256i_u64[2] /= Value.Register.m256i_u64[2];
@@ -362,7 +362,7 @@ NAMESPACE_NUMERIC
 		/// <param name="Value">The divisor value</param>
 		inline ULong256 operator / (const ULong256 &Value) const
 		{
-			//ToDo: finish
+			// ToDo: fix this
 			return ULong256(
 				Register.m256i_u64[0] / Value.Register.m256i_u64[0],
 				Register.m256i_u64[1] / Value.Register.m256i_u64[1],
@@ -378,7 +378,7 @@ NAMESPACE_NUMERIC
 		/// <param name="Value">The divisor value</param>
 		inline void operator %= (const ULong256 &Value)
 		{
-			//ToDo: finish
+			// ToDo: fix this
 			Register.m256i_u64[0] %= Value.Register.m256i_u64[0];
 			Register.m256i_u64[1] %= Value.Register.m256i_u64[1];
 			Register.m256i_u64[2] %= Value.Register.m256i_u64[2];
@@ -392,7 +392,7 @@ NAMESPACE_NUMERIC
 		/// <param name="Value">The divisor value</param>
 		inline ULong256 operator % (const ULong256 &Value) const
 		{
-			//ToDo: finish
+			// ToDo: fix this
 			return ULong256(
 				Register.m256i_u64[0] % Value.Register.m256i_u64[0],
 				Register.m256i_u64[1] % Value.Register.m256i_u64[1],

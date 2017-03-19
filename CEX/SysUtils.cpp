@@ -29,34 +29,34 @@ std::vector<char> SysUtils::ComputerName()
 #endif
 }
 
-std::vector<uint64_t> SysUtils::DriveSpace(const std::string &Drive)
+std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 {
 #if defined(CEX_OS_WINDOWS)
 	ULARGE_INTEGER freeBytes;
 	ULARGE_INTEGER totalBytes;
 	ULARGE_INTEGER availBytes;
-	std::vector<uint64_t> retSizes(0);
+	std::vector<ulong> retSizes(0);
 	std::wstring ws;
 
 	ws.assign(Drive.begin(), Drive.end());
 
 	if (GetDiskFreeSpaceEx(ws.c_str(), &freeBytes, &totalBytes, &availBytes))
 	{
-		retSizes.push_back((uint64_t)freeBytes.QuadPart);
-		retSizes.push_back((uint64_t)totalBytes.QuadPart);
-		retSizes.push_back((uint64_t)availBytes.QuadPart);
+		retSizes.push_back((ulong)freeBytes.QuadPart);
+		retSizes.push_back((ulong)totalBytes.QuadPart);
+		retSizes.push_back((ulong)availBytes.QuadPart);
 	}
 
 	return retSizes;
 
 #elif defined(CEX_OS_POSIX)
 
-	std::vector<uint64_t> retSizes(0);
+	std::vector<ulong> retSizes(0);
 	struct statvfs fsinfo;
 	statvfs("/", &fsinfo);
 
-	retSizes.push_back((uint64_t)fsinfo.f_frsize * fsinfo.f_blocks);
-	retSizes.push_back((uint64_t)fsinfo.f_bsize * fsinfo.f_bfree);
+	retSizes.push_back((ulong)fsinfo.f_frsize * fsinfo.f_blocks);
+	retSizes.push_back((ulong)fsinfo.f_bsize * fsinfo.f_bfree);
 
 	return retSizes;
 
@@ -65,7 +65,7 @@ std::vector<uint64_t> SysUtils::DriveSpace(const std::string &Drive)
 #endif
 }
 
-uint64_t SysUtils::MemoryPhysicalTotal()
+ulong SysUtils::MemoryPhysicalTotal()
 {
 #if defined(CEX_OS_WINDOWS)
 
@@ -74,7 +74,7 @@ uint64_t SysUtils::MemoryPhysicalTotal()
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
 
-	return static_cast<uint64_t>(memInfo.ullTotalPhys);
+	return static_cast<ulong>(memInfo.ullTotalPhys);
 
 #elif defined(CEX_OS_POSIX)
 
@@ -83,14 +83,14 @@ uint64_t SysUtils::MemoryPhysicalTotal()
 	long long totalPhysMem = memInfo.totalram;
 	totalPhysMem *= memInfo.mem_unit;
 
-	return static_cast<uint64_t>(totalPhysMem);
+	return static_cast<ulong>(totalPhysMem);
 
 #else
 	return 0;
 #endif
 }
 
-uint64_t SysUtils::MemoryPhysicalUsed()
+ulong SysUtils::MemoryPhysicalUsed()
 {
 #if defined(CEX_OS_WINDOWS)
 
@@ -98,7 +98,7 @@ uint64_t SysUtils::MemoryPhysicalUsed()
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
 
-	return static_cast<uint64_t>(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
+	return static_cast<ulong>(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
 
 #elif defined(CEX_OS_POSIX)
 
@@ -107,14 +107,14 @@ uint64_t SysUtils::MemoryPhysicalUsed()
 	long long physMemUsed = memInfo.totalram - memInfo.freeram;
 	physMemUsed *= memInfo.mem_unit;
 
-	return static_cast<uint64_t>(physMemUsed);
+	return static_cast<ulong>(physMemUsed);
 
 #else
 	return 0;
 #endif
 }
 
-uint64_t SysUtils::MemoryVirtualTotal()
+ulong SysUtils::MemoryVirtualTotal()
 {
 #if defined(CEX_OS_WINDOWS)
 
@@ -122,7 +122,7 @@ uint64_t SysUtils::MemoryVirtualTotal()
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
 
-	return static_cast<uint64_t>(memInfo.ullTotalPageFile);
+	return static_cast<ulong>(memInfo.ullTotalPageFile);
 
 #elif defined(CEX_OS_POSIX)
 
@@ -132,14 +132,14 @@ uint64_t SysUtils::MemoryVirtualTotal()
 	totalVirtualMem += memInfo.totalswap;
 	totalVirtualMem *= memInfo.mem_unit;
 
-	return static_cast<uint64_t>(totalVirtualMem);
+	return static_cast<ulong>(totalVirtualMem);
 
 #else
 	return 0;
 #endif
 }
 
-uint64_t SysUtils::MemoryVirtualUsed()
+ulong SysUtils::MemoryVirtualUsed()
 {
 #if defined(CEX_OS_WINDOWS)
 
@@ -147,7 +147,7 @@ uint64_t SysUtils::MemoryVirtualUsed()
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
 
-	return static_cast<uint64_t>(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
+	return static_cast<ulong>(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
 
 #elif defined(CEX_OS_POSIX)
 
@@ -157,7 +157,7 @@ uint64_t SysUtils::MemoryVirtualUsed()
 	virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
 	virtualMemUsed *= memInfo.mem_unit;
 
-	return static_cast<uint64_t>(virtualMemUsed);
+	return static_cast<ulong>(virtualMemUsed);
 #else
 	return 0;
 #endif
@@ -182,12 +182,12 @@ std::string SysUtils::OsName()
 #endif
 }
 
-uint32_t SysUtils::ProcessId()
+uint SysUtils::ProcessId()
 {
 #if defined(CEX_OS_WINDOWS)
-	return static_cast<uint32_t>(GetCurrentProcessId());
+	return static_cast<uint>(GetCurrentProcessId());
 #else
-	return static_cast<uint32_t>(::getpid());
+	return static_cast<uint>(::getpid());
 #endif
 }
 
@@ -218,22 +218,22 @@ std::vector<char> SysUtils::UserName()
 #endif
 }
 
-uint64_t SysUtils::TimeCurrentNS()
+ulong SysUtils::TimeCurrentNS()
 {
-	return static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+	return static_cast<ulong>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 }
 
-uint64_t SysUtils::TimeStamp()
+ulong SysUtils::TimeStamp()
 {
 	// extracts from: http://nadeausoftware.com/articles/2012/04/c_c_tip_how_measure_elapsed_real_time_benchmarking
 
 #if defined(CEX_OS_WINDOWS)
 
-	return static_cast<uint64_t>(__rdtsc());
+	return static_cast<ulong>(__rdtsc());
 
 #elif (defined(CEX_OS_HPUX) || defined(CEX_OS_SUNUX)) && (defined(__SVR4) || defined(__svr4__))
 	// HP-UX, Solaris
-	return static_cast<uint64_t>(gethrtime());
+	return static_cast<ulong>(gethrtime());
 
 #elif defined(CEX_OS_APPLE)
 	// OSX
@@ -245,7 +245,7 @@ uint64_t SysUtils::TimeStamp()
 		timeConvert = timeBase.numer / timeBase.denom;
 	}
 
-	return static_cast<uint64_t>(mach_absolute_time() * timeConvert);
+	return static_cast<ulong>(mach_absolute_time() * timeConvert);
 
 #elif defined(CEX_OS_POSIX)
 	// POSIX
@@ -272,25 +272,25 @@ uint64_t SysUtils::TimeStamp()
 		const clockid_t id = (clockid_t)-1;
 #		endif
 		if (id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
-			return static_cast<uint64_t>(ts.tv_sec + ts.tv_nsec);
+			return static_cast<ulong>(ts.tv_sec + ts.tv_nsec);
 	}
 #endif
 	// AIX, BSD, Cygwin, HP-UX, Linux, OSX, POSIX, Solaris
 	struct timeval tm;
 	gettimeofday(&tm, NULL);
 
-	return static_cast<uint64_t>(tm.tv_sec + tm.tv_usec);
+	return static_cast<ulong>(tm.tv_sec + tm.tv_usec);
 
 #else
 	std::chrono::high_resolution_clock::time_point epoch;
 	auto now = std::chrono::high_resolution_clock::now();
 	auto elapsed = now - epoch;
 
-	return static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+	return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 #endif
 }
 
-uint64_t SysUtils::TimeSinceBoot()
+ulong SysUtils::TimeSinceBoot()
 {
 	// http://stackoverflow.com/questions/30095439/how-do-i-get-system-up-time-in-milliseconds-in-c
 #if defined(CEX_OS_WINDOWS)
@@ -302,7 +302,7 @@ uint64_t SysUtils::TimeSinceBoot()
 	std::chrono::milliseconds uptime(0u);
 	struct timespec ts;
 	if (clock_gettime(CLOCK_UPTIME_PRECISE, &ts) == 0)
-		uptime = std::chrono::milliseconds(static_cast<uint64_t>(ts.tv_sec) * 1000ULL + static_cast<uint64_t>(ts.tv_nsec) / 1000000ULL);
+		uptime = std::chrono::milliseconds(static_cast<ulong>(ts.tv_sec) * 1000ULL + static_cast<ulong>(ts.tv_nsec) / 1000000ULL);
 
 	return uptime;
 
@@ -359,7 +359,7 @@ std::string SysUtils::Version()
 		return serInf;
 	}
 
-	uint32_t SysUtils::CurrentThreadId()
+	uint SysUtils::CurrentThreadId()
 	{
 		return GetCurrentThreadId();
 	}
@@ -677,15 +677,15 @@ std::string SysUtils::Version()
 
 #elif defined(CEX_OS_POSIX)
 
-	std::vector<uint32_t> SysUtils::ProcessEntries()
+	std::vector<uint> SysUtils::ProcessEntries()
 	{
-		std::vector<uint32_t> retValues(0);
+		std::vector<uint> retValues(0);
 
-		retValues.push_back(static_cast<uint32_t>(::getpid()));
-		retValues.push_back(static_cast<uint32_t>(::getppid()));
-		retValues.push_back(static_cast<uint32_t>(::getuid()));
-		retValues.push_back(static_cast<uint32_t>(::getgid()));
-		retValues.push_back(static_cast<uint32_t>(::getpgrp()));
+		retValues.push_back(static_cast<uint>(::getpid()));
+		retValues.push_back(static_cast<uint>(::getppid()));
+		retValues.push_back(static_cast<uint>(::getuid()));
+		retValues.push_back(static_cast<uint>(::getgid()));
+		retValues.push_back(static_cast<uint>(::getpgrp()));
 
 		return retValues;
 	}
@@ -700,7 +700,7 @@ std::string SysUtils::Version()
 
 	std::string SysUtils::UserId()
 	{
-		return std::string(static_cast<uint32_t>(::getuid()));
+		return std::string(static_cast<uint>(::getuid()));
 	}
 
 // TODO: fill all of these out and merge..

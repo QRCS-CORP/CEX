@@ -275,7 +275,7 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	std::vector<uint> wK(m_rndCount * 2 + 8, 0);
 
 	// CHANGE: 512 key gets 4 extra rounds
-	m_rndCount = (Key.size() == 64) ? 20 : DEF_ROUNDS16;
+	m_rndCount = (Key.size() == 64) ? 20 : DEF_ROUNDS;
 
 	for (size_t i = 0; i < k64Cnt; ++i)
 	{

@@ -290,7 +290,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	void Rotl32(const int Shift);
+	void RotL32(const int Shift);
 
 	/// <summary>
 	/// Computes the 32 bit left rotation of four unsigned integers
@@ -300,14 +300,14 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt256</returns>
-	static UInt256 Rotl32(const UInt256 &Value, const int Shift);
+	static UInt256 RotL32(const UInt256 &Value, const int Shift);
 
 	/// <summary>
 	/// Computes the 32 bit right rotation of four unsigned integers
 	/// </summary>
 	///
 	/// <param name="Shift">The shift degree; maximum is 32</param>
-	void Rotr32(const int Shift);
+	void RotR32(const int Shift);
 
 	/// <summary>
 	/// Computes the 32 bit right rotation of four unsigned integers
@@ -317,7 +317,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt256</returns>
-	static UInt256 Rotr32(const UInt256 &Value, const int Shift);
+	static UInt256 RotR32(const UInt256 &Value, const int Shift);
 
 	/// <summary>
 	/// Load a Uint256 in Big Endian format using uint staggered at multiples of the shift factor

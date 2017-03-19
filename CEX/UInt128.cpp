@@ -206,24 +206,24 @@ const size_t UInt128::Length()
 	return 16;
 }
 
-void UInt128::Rotl32(const int Shift)
+void UInt128::RotL32(const int Shift)
 {
 	Register = _mm_or_si128(_mm_slli_epi32(Register, static_cast<int>(Shift)), _mm_srli_epi32(Register, static_cast<int>(32 - Shift)));
 }
 
-UInt128 UInt128::Rotl32(const UInt128 &Value, const int Shift)
+UInt128 UInt128::RotL32(const UInt128 &Value, const int Shift)
 {
 	return UInt128(_mm_or_si128(_mm_slli_epi32(Value.Register, static_cast<int>(Shift)), _mm_srli_epi32(Value.Register, static_cast<int>(32 - Shift))));
 }
 
-void UInt128::Rotr32(const int Shift)
+void UInt128::RotR32(const int Shift)
 {
-	Rotl32(32 - Shift);
+	RotL32(32 - Shift);
 }
 
-UInt128 UInt128::Rotr32(const UInt128 &Value, const int Shift)
+UInt128 UInt128::RotR32(const UInt128 &Value, const int Shift)
 {
-	return Rotl32(Value, 32 - Shift);
+	return RotL32(Value, 32 - Shift);
 }
 
 UInt128 UInt128::ShuffleLoadBE(const std::vector<byte> &Input, size_t Offset, size_t Shift)

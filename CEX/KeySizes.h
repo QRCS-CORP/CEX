@@ -4,11 +4,12 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Common key bit sizes.
 /// <para> Can be cast as Key byte size integers, i.e. (uint sz = KeySizes.K256) is equal to 32.</para>
 /// </summary>
-enum class KeySizes : uint16_t
+enum class KeySizes : short
 {
 	/// <summary>
 	/// No key size is specified

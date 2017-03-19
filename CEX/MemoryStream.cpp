@@ -104,7 +104,7 @@ void MemoryStream::Reset()
 	m_streamPosition = 0;
 }
 
-void MemoryStream::Seek(uint64_t Offset, SeekOrigin Origin)
+void MemoryStream::Seek(ulong Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 		m_streamPosition = Offset;
@@ -114,7 +114,7 @@ void MemoryStream::Seek(uint64_t Offset, SeekOrigin Origin)
 		m_streamPosition += Offset;
 }
 
-void MemoryStream::SetLength(uint64_t Length)
+void MemoryStream::SetLength(ulong Length)
 {
 	m_streamData.reserve(Length);
 }

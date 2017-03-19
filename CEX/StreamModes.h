@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Streaming file and memory container types
 /// </summary>
-enum class StreamModes : uint8_t
+enum class StreamModes : byte
 {
 	/// <summary>
 	/// No stream mode is specified

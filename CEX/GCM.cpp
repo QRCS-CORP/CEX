@@ -296,7 +296,7 @@ bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 void GCM::CalculateMac()
 {
 	m_gcmHash->FinalizeBlock(m_checkSum, m_aadSize, m_msgSize);
-	IntUtils::XORBLK(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
+	IntUtils::XORBLK(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE, m_parallelProfile.SimdProfile());
 	memcpy(&m_msgTag[0], &m_checkSum[0], BLOCK_SIZE);
 	Reset();
 

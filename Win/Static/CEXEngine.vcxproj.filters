@@ -243,37 +243,10 @@
     <ClInclude Include="..\..\CEX\Keccak.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SkeinStateType.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SkeinUbiTweak.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SkeinUbiType.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish256.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish512.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish1024.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Keccak256.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Keccak512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Skein256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Skein512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Skein1024.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\AsymmetricEngines.h">
@@ -426,9 +399,6 @@
     <ClInclude Include="..\..\CEX\CpuDetect.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2Params.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Intrinsics.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
@@ -459,35 +429,8 @@
     <ClInclude Include="..\..\CEX\Documentation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA2Params.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA256Compress.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA512Compress.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\ULong256.h">
       <Filter>Header Files\Numeric</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2B.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2S.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\BlakeS256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\BlakeB512.h">
-      <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\PBKDF2.h">
       <Filter>Header Files\Kdf</Filter>
@@ -621,6 +564,60 @@
     <ClInclude Include="..\..\CEX\GHASH.h">
       <Filter>Header Files\Mac\Support</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\SimdProfiles.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Threefish256.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Threefish512.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Threefish1024.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SkeinParams.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SkeinUbiTweak.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Skein256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Skein512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Skein1024.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA256Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA512Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake256Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake512Compress.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\BlakeParams.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -668,28 +665,10 @@
     <ClCompile Include="..\..\CEX\Keccak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish256.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish512.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Threefish1024.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak256.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Skein256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Skein512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Skein1024.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp">
@@ -757,18 +736,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\ChaCha20.cpp">
       <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA512.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\BlakeS256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\BlakeB512.cpp">
-      <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\HKDF.cpp">
       <Filter>Source Files\Kdf</Filter>
@@ -874,6 +841,27 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\GMAC.cpp">
       <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Skein256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Skein512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Skein1024.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake512.cpp">
+      <Filter>Source Files\Digest</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

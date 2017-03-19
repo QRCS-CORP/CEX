@@ -4,10 +4,11 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Block cipher padding mode enmumeration names
 /// </summary>
-enum class PaddingModes : uint8_t
+enum class PaddingModes : byte
 {
 	/// <summary>
 	/// No padding mode is specified

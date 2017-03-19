@@ -4,11 +4,12 @@
 #include "CexDomain.h"
 
 NAMESPACE_ENUMERATION
+
 /// <summary>
 /// Rounds Count enumeration names.
 /// <para>Can be cast as round count integers, e.g. (int ct = RoundCounts.R12) is equal to 12.</para>
 /// </summary>
-enum class RoundCounts : uint8_t
+enum class RoundCounts : byte
 {
 	/// <summary>
 	/// No round count is specified

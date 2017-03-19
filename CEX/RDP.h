@@ -12,7 +12,7 @@ NAMESPACE_PROVIDER
 /// <example>
 /// <description>Example of getting a seed value:</description>
 /// <code>
-/// std:vector&lt;uint8_t&gt; output(32);
+/// std:vector&lt;byte&gt; output(32);
 /// RDP gen;
 /// gen.GetBytes(output);
 /// </code>
@@ -45,7 +45,7 @@ public:
 	/// <summary>
 	/// The Intel DRNG providers engine configuration type
 	/// </summary>
-	enum RdEngines : uint8_t
+	enum RdEngines : byte
 	{
 		/// <summary>
 		/// The random number provider
@@ -143,7 +143,7 @@ public:
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
-	virtual uint32_t Next();
+	virtual uint Next();
 
 	/// <summary>
 	/// Reset the internal state

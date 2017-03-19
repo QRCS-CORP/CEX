@@ -60,7 +60,7 @@ void CBC::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	std::vector<byte> nxtIv(m_blockSize);
 	memcpy(&nxtIv[0], &Input[InOffset], m_blockSize);
 	m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
-	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.SimdProfile());
 	memcpy(&m_cbcVector[0], &nxtIv[0], m_cbcVector.size());
 }
 
@@ -74,7 +74,7 @@ void CBC::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	std::vector<byte> nxtIv(m_blockSize);
 	memcpy(&nxtIv[0], &Input[InOffset], m_blockSize);
 	m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
-	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.SimdProfile());
 	memcpy(&m_cbcVector[0], &nxtIv[0], m_cbcVector.size());
 }
 
@@ -88,7 +88,7 @@ void CBC::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	std::vector<byte> nxtIv(m_blockSize);
 	memcpy(&nxtIv[0], &Input[InOffset], m_blockSize);
 	m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
-	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(m_cbcVector, 0, Output, OutOffset, m_cbcVector.size(), m_parallelProfile.SimdProfile());
 	memcpy(&m_cbcVector[0], &nxtIv[0], m_cbcVector.size());
 }
 
@@ -133,7 +133,7 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
 	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockSize, "The data arrays are smaller than the the block-size!");
 
-	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.SimdProfile());
 	m_blockCipher->EncryptBlock(m_cbcVector, 0, Output, OutOffset);
 	memcpy(&m_cbcVector[0], &Output[OutOffset], m_blockSize);
 }
@@ -145,7 +145,7 @@ void CBC::Encrypt64(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CBC::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.SimdProfile());
 	m_blockCipher->Transform64(m_cbcVector, 0, Output, OutOffset);
 	memcpy(&m_cbcVector[0], &Output[OutOffset], m_blockSize);
 }
@@ -157,7 +157,7 @@ void CBC::Encrypt128(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 void CBC::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.HasSimd128());
+	IntUtils::XORBLK(Input, InOffset, m_cbcVector, 0, m_cbcVector.size(), m_parallelProfile.SimdProfile());
 	m_blockCipher->Transform128(m_cbcVector, 0, Output, OutOffset);
 	memcpy(&m_cbcVector[0], &Output[OutOffset], m_blockSize);
 }
@@ -374,7 +374,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&blkNxt[0], &Input[InOffset], SMDBLK);
 				m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
-				IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, m_parallelProfile.HasSimd128());
+				IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, m_parallelProfile.SimdProfile());
 				memcpy(&Iv[0], &blkNxt[0], SMDBLK);
 				InOffset += SMDBLK;
 				OutOffset += SMDBLK;
@@ -388,7 +388,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&blkNxt[0], &Input[InOffset], SMDBLK);
 				m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
-				IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, m_parallelProfile.HasSimd128());
+				IntUtils::XORBLK(Iv, 0, Output, OutOffset, SMDBLK, m_parallelProfile.SimdProfile());
 				memcpy(&Iv[0], &blkNxt[0], SMDBLK);
 				InOffset += SMDBLK;
 				OutOffset += SMDBLK;
@@ -418,7 +418,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 				// transform 8 blocks
 				m_blockCipher->Transform128(Input, InOffset, Output, OutOffset);
 				// xor the set
-				IntUtils::XORBLK(blkIv, 0, Output, OutOffset, AVXBLK, m_parallelProfile.HasSimd128());
+				IntUtils::XORBLK(blkIv, 0, Output, OutOffset, AVXBLK, m_parallelProfile.SimdProfile());
 				// swap iv
 				memcpy(&blkIv[0], &blkNxt[0], AVXBLK);
 				InOffset += AVXBLK;
@@ -444,7 +444,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&blkNxt[0], &Input[InOffset + BLKOFT], SSEBLK);
 				m_blockCipher->Transform64(Input, InOffset, Output, OutOffset);
-				IntUtils::XORBLK(blkIv, 0, Output, OutOffset, SSEBLK, m_parallelProfile.HasSimd128());
+				IntUtils::XORBLK(blkIv, 0, Output, OutOffset, SSEBLK, m_parallelProfile.SimdProfile());
 				memcpy(&blkIv[0], &blkNxt[0], SSEBLK);
 				InOffset += SSEBLK;
 				OutOffset += SSEBLK;
@@ -464,7 +464,7 @@ void CBC::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 			{
 				memcpy(&nxtIv[0], &Input[InOffset], nxtIv.size());
 				m_blockCipher->DecryptBlock(Input, InOffset, Output, OutOffset);
-				IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size(), m_parallelProfile.HasSimd128());
+				IntUtils::XORBLK(Iv, 0, Output, OutOffset, Iv.size(), m_parallelProfile.SimdProfile());
 				memcpy(&Iv[0], &nxtIv[0], nxtIv.size());
 				InOffset += m_blockSize;
 				OutOffset += m_blockSize;

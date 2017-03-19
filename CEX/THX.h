@@ -116,21 +116,18 @@ private:
 
 	static const std::string DEF_INFO;
 	const size_t BLOCK_SIZE = 16;
-	const uint DEFAULT_SUBKEYS = 40;
+	const uint DEF_ROUNDS = 16;
 	const uint GF256_FDBK = 0x169;
 	const uint GF256_FDBK_2 = GF256_FDBK / 2;
 	const uint GF256_FDBK_4 = GF256_FDBK / 4;
 	const uint KEY_BITS = 256;
-	const size_t LEGAL_KEYS = 10;
-	const uint DEF_ROUNDS16 = 16;
-	const uint DEF_ROUNDS20 = 20;
-	// size of state buffer and sbox subtracted parallel size calculations
-	const size_t STATE_PRECACHED = 2048 + 4096;
 	const uint RS_GF_FDBK = 0x14D;
 	const uint SK_BUMP = 0x01010101;
 	const uint SK_ROTL = 9;
 	const uint SK_STEP = 0x02020202;
 	const size_t SBOX_SIZE = 1024;
+	// size of state buffer and sbox subtracted parallel size calculations
+	const size_t STATE_PRECACHED = 2048 + 4096;
 
 	bool m_destroyEngine;
 	std::vector<uint> m_expKey;

@@ -109,13 +109,13 @@ bool FileStream::FileExists(const std::string &FileName)
 	return infile.good();
 }
 
-uint64_t FileStream::FileSize(const std::string &FileName)
+ulong FileStream::FileSize(const std::string &FileName)
 {
 	if (!FileExists(FileName))
 		return 0;
 
 	std::ifstream in(FileName.c_str(), std::ifstream::ate | std::ifstream::binary);
-	return static_cast<uint64_t>(in.tellg());
+	return static_cast<ulong>(in.tellg());
 }
 
 void FileStream::Flush()
@@ -162,7 +162,7 @@ void FileStream::Reset()
 	m_filePosition = 0;
 }
 
-void FileStream::Seek(uint64_t Offset, SeekOrigin Origin)
+void FileStream::Seek(ulong Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
 		m_fileStream.seekg(Offset, std::ios::beg);
@@ -171,10 +171,10 @@ void FileStream::Seek(uint64_t Offset, SeekOrigin Origin)
 	else
 		m_fileStream.seekg(Offset, std::ios::cur);
 
-	m_filePosition = static_cast<uint64_t>(m_fileStream.tellg());
+	m_filePosition = static_cast<ulong>(m_fileStream.tellg());
 }
 
-void FileStream::SetLength(uint64_t Length)
+void FileStream::SetLength(ulong Length)
 {
 	if (m_fileAccess == FileAccess::Read)
 		throw CryptoProcessingException("FileStream:SetLength", "The file was opened as read only!");

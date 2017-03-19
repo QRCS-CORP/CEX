@@ -1,5 +1,5 @@
-#ifndef _CEX_SECUREKEY_H
-#define _CEX_SECUREKEY_H
+#ifndef _CEX_SYMMETRICSECUREKEY_H
+#define _CEX_SYMMETRICSECUREKEY_H
 
 #include "ISymmetricKey.h"
 
@@ -77,7 +77,7 @@ public:
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, uint64_t KeySalt = 0);
+	explicit SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Instantiate this class with an encryption key, and nonce parameters.
@@ -87,7 +87,7 @@ public:
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, uint64_t KeySalt = 0);
+	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Instantiate this class with an encryption key, nonce, and info parameters.
@@ -98,7 +98,7 @@ public:
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, uint64_t KeySalt = 0);
+	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Finalize objects
