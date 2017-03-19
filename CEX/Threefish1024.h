@@ -24,9 +24,9 @@
 
 NAMESPACE_DIGEST
 
-/// <summary>
-/// A Threefish cipher using a 1024bit key size.
-/// </summary> 
+/**
+* \internal
+*/
 class Threefish1024
 {
 private:

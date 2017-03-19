@@ -24,6 +24,9 @@
 
 NAMESPACE_DIGEST
 
+/**
+* \internal
+*/
 class Blake256Compress
 {
 public:

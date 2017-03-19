@@ -23,9 +23,10 @@
 
 NAMESPACE_DIGEST
 
-/// <summary>
-/// Keccak methods and constants
-/// </summary> 
+
+/**
+* \internal
+*/
 class Keccak
 {
 private:

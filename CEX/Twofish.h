@@ -21,6 +21,8 @@
 
 #include "CexDomain.h"
 
+NAMESPACE_BLOCK
+
 // ToDo: look into gather/load - extern __m128i _mm_i32gather_epi32(int const * base, __m128i vindex, const int scale);
 // http://www.physics.ntua.gr/~konstant/HetCluster/intel12.1/compiler_c/main_cls/intref_cls/common/intref_avx2_mm256_i64gather_epi64.htm
 // https://software.intel.com/en-us/node/523960
@@ -278,4 +280,5 @@ static uint M3[] =
 	0x9A196F9A, 0xE01A9DE0, 0x8F94368F, 0xE6C742E6, 0xECC94AEC, 0xFDD25EFD, 0xAB7FC1AB, 0xD8A8E0D8
 };
 
+NAMESPACE_BLOCKEND
 #endif

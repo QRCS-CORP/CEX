@@ -30,6 +30,9 @@ using Utility::IntUtils;
 using Numeric::UInt128;
 using Numeric::UInt256;
 
+/**
+* \internal
+*/
 class Salsa
 {
 public:

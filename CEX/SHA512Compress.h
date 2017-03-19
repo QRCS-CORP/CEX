@@ -23,9 +23,9 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-/// <summary>
-/// The SHA512 compression class
-/// </summary> 
+/**
+* \internal
+*/
 class SHA512Compress
 {
 private:

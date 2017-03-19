@@ -21,6 +21,8 @@
 
 #include "CexDomain.h"
 
+NAMESPACE_BLOCK
+
 //~~~Rijndael S-Box and Lookup Tables~~~//
 
 constexpr uint Rcon[] = {
@@ -348,5 +350,6 @@ constexpr uint IT3[] = {
 	0xa8017139, 0x0cb3de08, 0xb4e49cd8, 0x56c19064, 0xcb84617b, 0x32b670d5, 0x6c5c7448, 0xb85742d0,
 };
 
+NAMESPACE_BLOCKEND
 #endif
 
