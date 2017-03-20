@@ -24,9 +24,9 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-/**
-* \internal
-*/
+/// <summary>
+/// The SHA256 compression class
+/// </summary> 
 class SHA256Compress
 {
 private:

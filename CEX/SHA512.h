@@ -24,6 +24,7 @@
 // Implementation Details:
 // An implementation of the SHA-2 digest with a 512 bit return size. 
 // Written by John Underhill, July 31, 2016
+// Updated March 20, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_SHA512_H
@@ -127,8 +128,8 @@ private:
 		}
 	};
 
+	std::vector<byte> m_dstCode;
 	bool m_isDestroyed;
-	bool m_isInitialized;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
@@ -151,6 +152,21 @@ public:
 	/// Get: Size of returned digest in bytes
 	/// </summary>
 	virtual size_t DigestSize() { return DIGEST_SIZE; }
+
+	/// <summary>
+	/// Get/Set: Reads or Sets the Info (personalization string) value in the initialization parameters.
+	/// <para>Changing this code will create a unique distribution of the digest.
+	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
+	/// </summary>
+	std::vector<byte> &DistributionCode() { return m_dstCode; }
+
+	/// <summary>
+	/// Get: The maximum size of the distribution code in bytes.
+	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
+	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
+	/// </summary>
+	const size_t DistributionCodeMax() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type name
@@ -262,7 +278,6 @@ private:
 
 	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
-	void Initialize();
 	void LoadState(SHA512State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length);
 };

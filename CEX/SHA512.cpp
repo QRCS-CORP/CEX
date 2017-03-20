@@ -1,6 +1,5 @@
 #include "SHA512.h"
 #include "ArrayUtils.h"
-#include "CpuDetect.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 #include "SHA512Compress.h"
@@ -14,8 +13,8 @@ using Utility::ParallelUtils;
 
 SHA512::SHA512(bool Parallel)
 	:
+	m_dstCode(0),
 	m_isDestroyed(false),
-	m_isInitialized(false),
 	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
@@ -24,7 +23,7 @@ SHA512::SHA512(bool Parallel)
 	if (m_parallelProfile.IsParallel())
 		m_parallelProfile.IsParallel() = Parallel;
 
-	Initialize();
+	Reset();
 }
 
 SHA512::~SHA512()
@@ -46,7 +45,6 @@ void SHA512::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_isInitialized = false;
 		m_msgLength = 0;
 
 		try
@@ -54,8 +52,8 @@ void SHA512::Destroy()
 			for (size_t i = 0; i < m_dgtState.size(); ++i)
 				m_dgtState[i].Reset();
 
-			Utility::ArrayUtils::ClearVector(m_msgBuffer);
 			Utility::ArrayUtils::ClearVector(m_dgtState);
+			Utility::ArrayUtils::ClearVector(m_msgBuffer);
 		}
 		catch (std::exception& ex)
 		{
@@ -99,8 +97,21 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			m_msgLength += DIGEST_SIZE;
 		}
 
+		// compress full blocks
+		size_t blkOff = 0;
+		if (m_msgLength > BLOCK_SIZE)
+		{
+			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
+
+			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
+				Compress(m_msgBuffer, i * BLOCK_SIZE, rootState);
+
+			m_msgLength -= BLKRMD;
+			blkOff = BLKRMD;
+		}
+
 		// finalize and store
-		HashFinal(m_msgBuffer, 0, m_msgLength, rootState);
+		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
 		IntUtils::BeULL512ToBlock(rootState.H, Output, OutOffset);
 	}
 	else
@@ -138,7 +149,11 @@ void SHA512::Reset()
 	m_msgLength = 0;
 	memset(&m_msgBuffer[0], 0, m_msgBuffer.size());
 
-	Initialize();
+	for (size_t i = 0; i < m_dgtState.size(); ++i)
+		LoadState(m_dgtState[i]);
+
+	if (m_dstCode.size() != 0)
+		Compress(m_dstCode, 0, m_dgtState[0]);
 }
 
 void SHA512::Update(byte Input)
@@ -267,14 +282,6 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	IntUtils::Be64ToBytes(State.T[1], Input, InOffset + 112);
 	IntUtils::Be64ToBytes(bitLen, Input, InOffset + 120);
 	SHA512Compress::Compress128(Input, InOffset, State);
-}
-
-void SHA512::Initialize()
-{
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
-		LoadState(m_dgtState[i]);
-
-	m_isInitialized = true;
 }
 
 void SHA512::LoadState(SHA512State &State)

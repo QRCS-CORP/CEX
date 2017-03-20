@@ -1,13 +1,11 @@
 #include "SHA256.h"
 #include "ArrayUtils.h"
-#include "CpuDetect.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 #include "SHA256Compress.h"
 
 NAMESPACE_DIGEST
 
-using Common::CpuDetect;
 using Utility::IntUtils;
 using Utility::ParallelUtils;
 
@@ -15,8 +13,8 @@ using Utility::ParallelUtils;
 
 SHA256::SHA256(bool Parallel)
 	:
+	m_dstCode(0),
 	m_isDestroyed(false),
-	m_isInitialized(false),
 	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
@@ -25,7 +23,7 @@ SHA256::SHA256(bool Parallel)
 	if (m_parallelProfile.IsParallel())
 		m_parallelProfile.IsParallel() = Parallel;
 
-	Initialize();
+	Reset();
 }
 
 SHA256::~SHA256()
@@ -47,7 +45,6 @@ void SHA256::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_isInitialized = false;
 		m_msgLength = 0;
 
 		try
@@ -100,8 +97,21 @@ size_t SHA256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			m_msgLength += DIGEST_SIZE;
 		}
 
+		// compress full blocks
+		size_t blkOff = 0;
+		if (m_msgLength > BLOCK_SIZE)
+		{
+			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
+
+			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
+				Compress(m_msgBuffer, i * BLOCK_SIZE, rootState);
+
+			m_msgLength -= BLKRMD;
+			blkOff = BLKRMD;
+		}
+
 		// finalize and store
-		HashFinal(m_msgBuffer, 0, m_msgLength, rootState);
+		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
 		IntUtils::BeUL256ToBlock(rootState.H, Output, OutOffset);
 	}
 	else
@@ -139,7 +149,11 @@ void SHA256::Reset()
 	m_msgLength = 0;
 	memset(&m_msgBuffer[0], 0, m_msgBuffer.size());
 
-	Initialize();
+	for (size_t i = 0; i < m_dgtState.size(); ++i)
+		LoadState(m_dgtState[i]);
+
+	if (m_dstCode.size() != 0)
+		Compress(m_dstCode, 0, m_dgtState[0]);
 }
 
 void SHA256::Update(byte Input)
@@ -264,14 +278,6 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	IntUtils::Be32ToBytes((uint)((ulong)bitLen >> 32), Input, InOffset + 56);
 	IntUtils::Be32ToBytes((uint)((ulong)bitLen), Input, InOffset + 60);
 	SHA256Compress::Compress64(Input, InOffset, State);
-}
-
-void SHA256::Initialize()
-{
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
-		LoadState(m_dgtState[i]);
-
-	m_isInitialized = true;
 }
 
 void SHA256::LoadState(SHA256State &State)
