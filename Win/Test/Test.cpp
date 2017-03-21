@@ -66,7 +66,7 @@ using namespace Test;
 // Skein Tree			-done
 // Rewrite SHA2			-done
 // Rewrite Blake2		-done
-// Keccak Tree			-?
+// Keccak Tree			-done
 // srvector				-?
 // Scrypt(maybe)		-?
 // Code review			-?
@@ -125,11 +125,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 0.14.0.2: CEX Library in C++ *");
+	ConsoleUtils::WriteLine("* CEX++ Version 0.14.0.3: CEX Library in C++ *");
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v0.14.0.2 (M2)                  *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      March 16, 2017                  *");
+	ConsoleUtils::WriteLine("* Date:      March 21, 2017                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");

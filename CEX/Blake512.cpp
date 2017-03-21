@@ -354,7 +354,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				Compress(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.ParallelDegree() * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
 			});
 
-			// loop in the remainder (no buffering)
+			// loop in the remainder (reduce buffering)
 			if (Length > PRLMIN)
 			{
 				// calculate working set size

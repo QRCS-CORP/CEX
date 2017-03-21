@@ -5,7 +5,7 @@ NAMESPACE_IO
 void StreamWriter::Destroy()
 {
 	if (m_streamData.capacity() > 0)
-		memset(m_streamData.data(), 0, m_streamData.capacity() * sizeof(byte));
+		memset(m_streamData.data(), 0, m_streamData.capacity());
 	m_streamData.clear();
 
 	m_streamPosition = 0;

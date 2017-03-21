@@ -31,6 +31,7 @@
 #define _CEX_SHA512_H
 
 #include "IDigest.h"
+#include "SHA2Params.h"
 
 NAMESPACE_DIGEST
 
@@ -121,19 +122,25 @@ private:
 
 		void Reset()
 		{
-			if (H.size() > 0)
-				memset(&H[0], 0, H.size() * sizeof(ulong));
-			if (T.size() > 0)
-				memset(&T[0], 0, T.size() * sizeof(ulong));
+			T[0] = 0;
+			T[1] = 0;
+			H[0] = 0x6a09e667f3bcc908;
+			H[1] = 0xbb67ae8584caa73b;
+			H[2] = 0x3c6ef372fe94f82b;
+			H[3] = 0xa54ff53a5f1d36f1;
+			H[4] = 0x510e527fade682d1;
+			H[5] = 0x9b05688c2b3e6c1f;
+			H[6] = 0x1f83d9abfb41bd6b;
+			H[7] = 0x5be0cd19137e2179;
 		}
 	};
 
-	std::vector<byte> m_dstCode;
+	SHA2Params m_treeParams;
+	std::vector<SHA512State> m_dgtState;
 	bool m_isDestroyed;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	std::vector<SHA512State> m_dgtState;
 
 public:
 
@@ -152,21 +159,6 @@ public:
 	/// Get: Size of returned digest in bytes
 	/// </summary>
 	virtual size_t DigestSize() { return DIGEST_SIZE; }
-
-	/// <summary>
-	/// Get/Set: Reads or Sets the Info (personalization string) value in the initialization parameters.
-	/// <para>Changing this code will create a unique distribution of the digest.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
-	/// </summary>
-	std::vector<byte> &DistributionCode() { return m_dstCode; }
-
-	/// <summary>
-	/// Get: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
-	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
-	/// </summary>
-	const size_t DistributionCodeMax() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type name
@@ -209,6 +201,19 @@ public:
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded SHA-2 variant.</param>
 	explicit SHA512(bool Parallel = false);
+
+	/// <summary>
+	/// Initialize the class with an SHA2Params structure.
+	/// <para>The parameters structure allows for tuning of the internal configuration string,
+	/// and changing the number of threads used by the parallel mechanism (FanOut).
+	/// If the parallel degree is greater than 1, multi-threading hash engine is instantiated.
+	/// The default thread count is 8, changing this value will produce a different output hash code.</para>
+	/// </summary>
+	/// 
+	/// <param name="Params">The SHA2Params structure, containing the tree configuration settings.</param>
+	///
+	/// <exception cref="CryptoDigestException">Thrown if the SHA2Params structure contains invalid values</exception>
+	explicit SHA512(SHA2Params &Params);
 
 	/// <summary>
 	/// Finalize objects
@@ -278,7 +283,6 @@ private:
 
 	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
-	void LoadState(SHA512State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length);
 };
 

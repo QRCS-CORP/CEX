@@ -30,6 +30,7 @@
 #define _CEX_KECCAK256_H
 
 #include "IDigest.h"
+#include "KeccakParams.h"
 
 NAMESPACE_DIGEST
 
@@ -67,18 +68,53 @@ class Keccak256 : public IDigest
 {
 private:
 
-	static const size_t BLOCK_SIZE = 144;
+	struct Keccak256State
+	{
+		const ulong MAX_ULL = 0xFFFFFFFFFFFFFFFF;
+		std::vector<ulong> H;
+		ulong T;
+
+		Keccak256State()
+			:
+			H(25, 0),
+			T(0)
+		{
+		}
+
+		void Increase(size_t Length)
+		{
+			T += Length;
+		}
+
+		void Reset()
+		{
+			if (H.size() > 0)
+				memset(&H[0], 0, H.size() * sizeof(ulong));
+
+			H[1] = MAX_ULL;
+			H[2] = MAX_ULL;
+			H[8] = MAX_ULL;
+			H[12] = MAX_ULL;
+			H[17] = MAX_ULL;
+			H[20] = MAX_ULL;
+			T = 0;
+		}
+	};
+
+	static const size_t BLOCK_SIZE = 136;
+	static const size_t DIGEST_SIZE = 32;
+
 	// size of reserved state buffer subtracted from parallel size calculations
 	const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_SIZE = 25;
 	static const size_t DEF_PRLDEGREE = 8;
 
-	size_t m_blockSize;
-	std::vector<byte> m_buffer;
-	size_t m_bufferIndex;
-	size_t m_digestSize;
+	KeccakParams m_treeParams;
+	std::vector<Keccak256State> m_dgtState;
 	bool m_isDestroyed;
+	std::vector<byte> m_msgBuffer;
+	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	std::vector<ulong> m_state;
 
 public:
 
@@ -91,12 +127,12 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual size_t BlockSize() { return m_blockSize; }
+	virtual size_t BlockSize() { return BLOCK_SIZE; }
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual size_t DigestSize() { return m_digestSize; }
+	virtual size_t DigestSize() { return DIGEST_SIZE; }
 
 	/// <summary>
 	/// Get: The digests type name
@@ -133,11 +169,25 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize the digest
+	/// Initialize the class with either the Parallel or Sequential hashing engine.
+	/// <para>Initialize as parallel instantiates tree hashing, if false uses the standard SHA-3 256bit hashing instance.</para>
 	/// </summary>
+	/// 
+	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded SHA-3 variant.</param>
+	explicit Keccak256(bool Parallel = false);
+
+	/// <summary>
+	/// Initialize the class with an KeccakParams structure.
+	/// <para>The parameters structure allows for tuning of the internal configuration string,
+	/// and changing the number of threads used by the parallel mechanism (FanOut).
+	/// If the parallel degree is greater than 1, multi-threading hash engine is instantiated.
+	/// The default thread count is 8, changing this value will produce a different output hash code.</para>
+	/// </summary>
+	/// 
+	/// <param name="Params">The KeccakParams structure, containing the tree configuration settings.</param>
 	///
-	/// <param name="DigestSize">Digest return size in bits</param>
-	explicit Keccak256(int DigestSize = 256);
+	/// <exception cref="CryptoDigestException">Thrown if the KeccakParams structure contains invalid values</exception>
+	explicit Keccak256(KeccakParams &Params);
 
 	/// <summary>
 	/// Finalize objects
@@ -172,6 +222,17 @@ public:
 	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
+	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
+	/// <para>Thread count must be an even number, and not exceed the number of processor cores.
+	/// Changing this value from the default (8 threads), will change the output hash value.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	virtual void ParallelMaxDegree(size_t Degree);
+
+	/// <summary>
 	/// Reset the internal state
 	/// </summary>
 	virtual void Reset();
@@ -195,7 +256,10 @@ public:
 	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
-	void Initialize();
+
+	void Compress(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State);
+	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak256State &State);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

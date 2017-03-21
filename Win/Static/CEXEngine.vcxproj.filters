@@ -243,12 +243,6 @@
     <ClInclude Include="..\..\CEX\Keccak.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Keccak256.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Keccak512.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\AsymmetricEngines.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -618,6 +612,18 @@
     <ClInclude Include="..\..\CEX\Blake512.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA2Params.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KeccakParams.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Keccak512.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Keccak256.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -661,15 +667,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Salsa20.cpp">
       <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak256.cpp">
-      <Filter>Source Files\Digest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak512.cpp">
-      <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp">
       <Filter>Source Files\Helper</Filter>
@@ -861,6 +858,15 @@
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Blake512.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Keccak.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Keccak256.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Keccak512.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
   </ItemGroup>

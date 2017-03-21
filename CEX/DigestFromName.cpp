@@ -116,13 +116,12 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 		{
 		case Digests::Blake256:
 		case Digests::Blake512:
+		case Digests::Keccak256:
+		case Digests::Keccak512:
 		case Digests::Skein256:
 		case Digests::Skein512:
 		case Digests::Skein1024:
 			return 0;
-		case Digests::Keccak256:
-		case Digests::Keccak512:
-			return 1;
 		case Digests::SHA256:
 			return 9;
 		case Digests::SHA512:

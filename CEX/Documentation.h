@@ -9,13 +9,13 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 0.14.0.2 (M2).
+Welcome to the CEX++ Cryptographic Library, version 0.14.0.3 (M2).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>0.14.0.2</B> (M version), which are the major, minor, patch, and release codes.<BR></BR>
+The current version is <B>0.14.0.3</B> (M version), which are the major, minor, patch, and release codes.<BR></BR>
 \brief
 Scheduled for release <B>1.0.0.1</B> (version M):<BR></BR>
 Keccak Tree Hashing and Digests review<BR></BR>
@@ -23,8 +23,8 @@ Secure Vector implementation<BR></BR>
 SCRYPT<BR></BR>
 
 \author    John Underhill
-\version   0.14.0.2
-\date      March 16, 2017
+\version   0.14.0.3
+\date      March 21, 2017
 \copyright GPL version 3 license (GPLv3)
 
 \section intro_link Links

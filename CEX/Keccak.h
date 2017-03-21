@@ -30,6 +30,7 @@ NAMESPACE_DIGEST
 class Keccak
 {
 private:
+
 	static const ulong C0 = 0x0000000000000001;
 	static const ulong C1 = 0x0000000000008082;
 	static const ulong C2 = 0x800000000000808a;
@@ -56,15 +57,8 @@ private:
 	static const ulong C23 = 0x8000000080008008;
 
 public:
-	/// <summary>
-	/// Process a block of bytes
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array</param>
-	/// <param name="Offset">The offset index</param>
-	/// <param name="State">The state array</param>
-	/// <param name="Size">The size of the transform</param>
-	static void TransformBlock(const std::vector<byte> &Input, size_t Offset, std::vector<ulong> &State, size_t Size);
+
+	static void Compress(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State);
 };
 
 NAMESPACE_DIGESTEND

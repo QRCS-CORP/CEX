@@ -45,7 +45,7 @@ Skein256::Skein256(SkeinParams &Params)
 		m_dgtState.resize(m_treeParams.FanOut());
 		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
 	}
-	else if (m_parallelProfile.IsParallel() = true)
+	else if (m_parallelProfile.IsParallel())
 	{
 		m_parallelProfile.IsParallel() = false;
 	}
@@ -172,8 +172,6 @@ void Skein256::ParallelMaxDegree(size_t Degree)
 		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree can not exceed 254!");
 	if (Degree % 2 != 0)
 		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	m_dgtState.clear();
@@ -244,6 +242,19 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 			Length -= PRMLEN;
 			InOffset += PRMLEN;
+		}
+
+		if (Length >= BLOCK_SIZE)
+		{
+			// stagger blocks
+			size_t blkCtr = 0;
+			while (Length >= BLOCK_SIZE)
+			{
+				ProcessBlock(Input, InOffset, m_dgtState, blkCtr);
+				InOffset += BLOCK_SIZE;
+				Length -= BLOCK_SIZE;
+				blkCtr = (blkCtr != m_dgtState.size() - 1) ? blkCtr + 1 : 0;
+			}
 		}
 	}
 	else

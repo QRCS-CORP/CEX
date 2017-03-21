@@ -13,7 +13,7 @@ using Utility::ParallelUtils;
 
 SHA512::SHA512(bool Parallel)
 	:
-	m_dstCode(0),
+	m_treeParams(DIGEST_SIZE, static_cast<uint>(BLOCK_SIZE), DEF_PRLDEGREE),
 	m_isDestroyed(false),
 	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
@@ -22,6 +22,28 @@ SHA512::SHA512(bool Parallel)
 {
 	if (m_parallelProfile.IsParallel())
 		m_parallelProfile.IsParallel() = Parallel;
+
+	Reset();
+}
+
+SHA512::SHA512(SHA2Params &Params)
+	:
+	m_treeParams(Params),
+	m_dgtState(1),
+	m_isDestroyed(false),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut())
+{
+	if (m_treeParams.FanOut() > 1)
+	{
+		m_dgtState.resize(m_treeParams.FanOut());
+		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
+	}
+	else if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = false;
+	}
 
 	Reset();
 }
@@ -88,7 +110,7 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// initialize root state
 		SHA512State rootState;
-		LoadState(rootState);
+		rootState.Reset();
 
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -150,10 +172,15 @@ void SHA512::Reset()
 	memset(&m_msgBuffer[0], 0, m_msgBuffer.size());
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
-		LoadState(m_dgtState[i]);
+	{
+		m_dgtState[i].Reset();
 
-	if (m_dstCode.size() != 0)
-		Compress(m_dstCode, 0, m_dgtState[0]);
+		if (m_parallelProfile.IsParallel())
+		{
+			m_treeParams.NodeOffset() = i;
+			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
+		}
+	}
 }
 
 void SHA512::Update(byte Input)
@@ -282,20 +309,6 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	IntUtils::Be64ToBytes(State.T[1], Input, InOffset + 112);
 	IntUtils::Be64ToBytes(bitLen, Input, InOffset + 120);
 	SHA512Compress::Compress128(Input, InOffset, State);
-}
-
-void SHA512::LoadState(SHA512State &State)
-{
-	State.T[0] = 0;
-	State.T[1] = 0;
-	State.H[0] = 0x6a09e667f3bcc908;
-	State.H[1] = 0xbb67ae8584caa73b;
-	State.H[2] = 0x3c6ef372fe94f82b;
-	State.H[3] = 0xa54ff53a5f1d36f1;
-	State.H[4] = 0x510e527fade682d1;
-	State.H[5] = 0x9b05688c2b3e6c1f;
-	State.H[6] = 0x1f83d9abfb41bd6b;
-	State.H[7] = 0x5be0cd19137e2179;
 }
 
 void SHA512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length)

@@ -45,7 +45,7 @@ Skein1024::Skein1024(SkeinParams &Params)
 		m_dgtState.resize(m_treeParams.FanOut());
 		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
 	}
-	else if (m_parallelProfile.IsParallel() = true)
+	else if (m_parallelProfile.IsParallel())
 	{
 		m_parallelProfile.IsParallel() = false;
 	}
@@ -172,8 +172,6 @@ void Skein1024::ParallelMaxDegree(size_t Degree)
 		throw CryptoDigestException("Skein1024:ParallelMaxDegree", "Parallel degree can not exceed 254!");
 	if (Degree % 2 != 0)
 		throw CryptoDigestException("Skein1024:ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoDigestException("Skein1024:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	m_dgtState.clear();

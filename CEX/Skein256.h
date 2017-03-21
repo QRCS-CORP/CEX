@@ -155,6 +155,13 @@ public:
 	//~~~Properties~~~//
 
 	/// <summary>
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input data array passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+
+	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
 	virtual size_t BlockSize() { return BLOCK_SIZE; }
@@ -168,13 +175,6 @@ public:
 	/// Get: The digests type name
 	/// </summary>
 	virtual Digests Enumeral() { return Digests::Skein256; }
-
-	/// <summary>
-	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input data array passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
-	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 
 	/// <summary>
 	/// Get: The digests class name

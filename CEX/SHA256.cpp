@@ -13,7 +13,7 @@ using Utility::ParallelUtils;
 
 SHA256::SHA256(bool Parallel)
 	:
-	m_dstCode(0),
+	m_treeParams(DIGEST_SIZE, static_cast<uint>(BLOCK_SIZE), DEF_PRLDEGREE),
 	m_isDestroyed(false),
 	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
@@ -22,6 +22,28 @@ SHA256::SHA256(bool Parallel)
 {
 	if (m_parallelProfile.IsParallel())
 		m_parallelProfile.IsParallel() = Parallel;
+
+	Reset();
+}
+
+SHA256::SHA256(SHA2Params &Params)
+	:
+	m_treeParams(Params),
+	m_dgtState(1),
+	m_isDestroyed(false),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut())
+{
+	if (m_treeParams.FanOut() > 1)
+	{
+		m_dgtState.resize(m_treeParams.FanOut());
+		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
+	}
+	else if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = false;
+	}
 
 	Reset();
 }
@@ -88,7 +110,7 @@ size_t SHA256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// initialize root state
 		SHA256State rootState;
-		LoadState(rootState);
+		rootState.Reset();
 
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -150,10 +172,15 @@ void SHA256::Reset()
 	memset(&m_msgBuffer[0], 0, m_msgBuffer.size());
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
-		LoadState(m_dgtState[i]);
+	{
+		m_dgtState[i].Reset();
 
-	if (m_dstCode.size() != 0)
-		Compress(m_dstCode, 0, m_dgtState[0]);
+		if (m_parallelProfile.IsParallel())
+		{
+			m_treeParams.NodeOffset() = i;
+			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
+		}
+	}
 }
 
 void SHA256::Update(byte Input)
@@ -278,19 +305,6 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	IntUtils::Be32ToBytes((uint)((ulong)bitLen >> 32), Input, InOffset + 56);
 	IntUtils::Be32ToBytes((uint)((ulong)bitLen), Input, InOffset + 60);
 	SHA256Compress::Compress64(Input, InOffset, State);
-}
-
-void SHA256::LoadState(SHA256State &State)
-{
-	State.T = 0;
-	State.H[0] = 0x6a09e667;
-	State.H[1] = 0xbb67ae85;
-	State.H[2] = 0x3c6ef372;
-	State.H[3] = 0xa54ff53a;
-	State.H[4] = 0x510e527f;
-	State.H[5] = 0x9b05688c;
-	State.H[6] = 0x1f83d9ab;
-	State.H[7] = 0x5be0cd19;
 }
 
 void SHA256::Compress(const std::vector<byte> &Input, size_t InOffset, SHA256State &State)

@@ -131,7 +131,7 @@ NAMESPACE_DIGEST
 		/// <summary>
 		/// Initialize the MessageHeader structure using a serialized byte array
 		/// </summary>
-		explicit BlakeParams(std::vector<byte> TreeArray)
+		explicit BlakeParams(const std::vector<byte> &TreeArray)
 			:
 			m_dgtLen(0),
 			m_keyLen(0),
@@ -198,7 +198,7 @@ NAMESPACE_DIGEST
 		/// </summary>
 		BlakeParams Clone()
 		{
-			BlakeParams result(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
+			BlakeParams result(ToBytes());
 			return result;
 		}
 
@@ -210,7 +210,7 @@ NAMESPACE_DIGEST
 		/// <returns>A pointer to a BlakeParams instance</returns>
 		BlakeParams* DeepCopy()
 		{
-			return new BlakeParams(DigestLength(), KeyLength(), FanOut(), MaxDepth(), LeafLength(), NodeOffset(), NodeDepth(), InnerLength(), ParallelDegree());
+			return new BlakeParams(ToBytes());
 		}
 
 		/// <summary>
