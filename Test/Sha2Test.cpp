@@ -4,13 +4,18 @@
 
 namespace Test
 {
+	using namespace Digest;
+
 	std::string SHA2Test::Run()
 	{
 		try
 		{
 			Initialize();
 
-			Digest::SHA256* sha256 = new Digest::SHA256();
+			TreeParamsTest();
+			OnProgress("Passed SHA2Params parameter serialization test..");
+
+			SHA256* sha256 = new SHA256();
 			CompareVector(sha256, m_message[0], m_expected256[0]);
 			CompareVector(sha256, m_message[1], m_expected256[1]);
 			CompareVector(sha256, m_message[2], m_expected256[2]);
@@ -18,7 +23,7 @@ namespace Test
 			delete sha256;
 			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");
 
-			Digest::SHA512* sha512 = new Digest::SHA512();
+			SHA512* sha512 = new SHA512();
 			CompareVector(sha512, m_message[0], m_expected512[0]);
 			CompareVector(sha512, m_message[1], m_expected512[1]);
 			CompareVector(sha512, m_message[2], m_expected512[2]);
@@ -38,7 +43,7 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::CompareVector(Digest::IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SHA2Test::CompareVector(IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
@@ -86,5 +91,26 @@ namespace Test
 	void SHA2Test::OnProgress(char* Data)
 	{
 		m_progressEvent(Data);
+	}
+
+	void SHA2Test::TreeParamsTest()
+	{
+		std::vector<byte> code1(8, 7);
+
+		SHA2Params tree1(32, 32, 8);
+		tree1.DistributionCode() = code1;
+		std::vector<uint8_t> tres = tree1.ToBytes();
+		SHA2Params tree2(tres);
+
+		if (!tree1.Equals(tree2))
+			throw std::string("SHA2Test: Tree parameters test failed!");
+
+		std::vector<byte> code2(20, 7);
+		SHA2Params tree3(0, 64, 1, 128, 8, 1, code2);
+		tres = tree3.ToBytes();
+		SHA2Params tree4(tres);
+
+		if (!tree3.Equals(tree4))
+			throw std::string("SHA2Test: Tree parameters test failed!");
 	}
 }

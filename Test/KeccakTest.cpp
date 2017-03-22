@@ -6,9 +6,8 @@
 
 namespace Test
 {
+	using namespace Digest;
 	using CEX::Key::Symmetric::SymmetricKey;
-	using CEX::Digest::Keccak256;
-	using CEX::Digest::Keccak512;
 	using CEX::Mac::HMAC;
 
 	std::string KeccakTest::Run()
@@ -16,6 +15,9 @@ namespace Test
 		try
 		{
 			Initialize();
+
+			TreeParamsTest();
+			OnProgress("Passed KeccakParams parameter serialization test..");
 
 			Keccak256* kc256 = new Keccak256;
 			Keccak512* kc512 = new Keccak512;
@@ -261,5 +263,26 @@ namespace Test
 	void KeccakTest::OnProgress(char* Data)
 	{
 		m_progressEvent(Data);
+	}
+
+	void KeccakTest::TreeParamsTest()
+	{
+		std::vector<byte> code1(8, 7);
+
+		KeccakParams tree1(32, 32, 8);
+		tree1.DistributionCode() = code1;
+		std::vector<uint8_t> tres = tree1.ToBytes();
+		KeccakParams tree2(tres);
+
+		if (!tree1.Equals(tree2))
+			throw std::string("KeccakTest: Tree parameters test failed!");
+
+		std::vector<byte> code2(20, 7);
+		KeccakParams tree3(0, 64, 1, 128, 8, 1, code2);
+		tres = tree3.ToBytes();
+		KeccakParams tree4(tres);
+
+		if (!tree3.Equals(tree4))
+			throw std::string("KeccakTest: Tree parameters test failed!");
 	}
 }

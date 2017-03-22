@@ -12,6 +12,9 @@ namespace Test
 		{
 			Initialize();
 
+			TreeParamsTest();
+			OnProgress("Passed SkeinParams parameter serialization test..");
+
 			Skein256* sk256 = new Skein256();
 			CompareVector(sk256, m_message256[0], m_expected256[0]);
 			CompareVector(sk256, m_message256[1], m_expected256[1]);
@@ -178,6 +181,27 @@ namespace Test
 			("842A53C99C12B0CF80CF69491BE5E2F7515DE8733B6EA9422DFD676665B5FA42FFB3A9C48C217777950848CECDB48F640F81FB92BEF6F88F7A85C1F7CD1446C9161C0AFE8F25AE444F40D3680081C35AA43F640FD5FA3C3C030BCC06ABAC01D098BCC984EBD8322712921E00B1BA07D6D01F26907050255EF2C8E24F716C52A5")
 		};
 		HexConverter::Decode(expected1024Encoded, 3, m_expected1024);
+	}
+
+	void SkeinTest::TreeParamsTest()
+	{
+		std::vector<byte> code1(8, 7);
+
+		SkeinParams tree1(32, 32, 8);
+		tree1.DistributionCode() = code1;
+		std::vector<uint8_t> tres = tree1.ToBytes();
+		SkeinParams tree2(tres);
+
+		if (!tree1.Equals(tree2))
+			throw std::string("SkeinTest: Tree parameters test failed!");
+
+		std::vector<byte> code2(20, 7);
+		SkeinParams tree3(std::vector<byte> { 1, 2, 3, 4 }, 64, 1, 64, 8, 0, code2);
+		tres = tree3.ToBytes();
+		SkeinParams tree4(tres);
+
+		if (!tree3.Equals(tree4))
+			throw std::string("SkeinTest: Tree parameters test failed!");
 	}
 
 	void SkeinTest::OnProgress(char* Data)

@@ -9,6 +9,10 @@
 
 namespace Test
 {
+	using Digest::BlakeParams;
+	using Digest::Blake256;
+	using Digest::Blake512;
+
 	std::string Blake2Test::Run()
 	{
 		try
@@ -72,7 +76,7 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Key::Symmetric::SymmetricKey mkey(key);
-					Digest::Blake512 blake2b(false);
+					Blake512 blake2b(false);
 					blake2b.Initialize(mkey);
 					blake2b.Compute(input, hash);
 
@@ -118,7 +122,9 @@ namespace Test
 					if (line.length() - sze > 0)
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
-					Digest::Blake512 blake2(true);
+					// Note: the official default is 4 threads, my default on all digests is 8 threads
+					BlakeParams params(64, 2, 4, 0, 64);
+					Blake512 blake2(params);
 					Key::Symmetric::SymmetricKey mkey(key);
 					blake2.Initialize(mkey);
 					blake2.Compute(input, hash);
@@ -165,7 +171,7 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Key::Symmetric::SymmetricKey mkey(key);
-					Digest::Blake256 blake2s(false);
+					Blake256 blake2s(false);
 					blake2s.Initialize(mkey);
 					blake2s.Compute(input, hash);
 
@@ -211,7 +217,7 @@ namespace Test
 						HexConverter::Decode(line.substr(sze, line.length() - sze), expect);
 
 					Key::Symmetric::SymmetricKey mkey(key);
-					Digest::Blake256 blake2sp(true);
+					Blake256 blake2sp(true);
 					blake2sp.Initialize(mkey);
 					blake2sp.Compute(input, hash);
 
@@ -238,12 +244,22 @@ namespace Test
 
 	void Blake2Test::TreeParamsTest()
 	{
-		Digest::BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, 0);
+		std::vector<byte> code1(40, 7);
+
+		BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, code1);
 		std::vector<uint8_t> tres = tree1.ToBytes();
-		Digest::BlakeParams tree2(tres);
+		BlakeParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
-			throw std::exception("Blake2STest: Tree parameters test failed!");
+			throw std::string("Blake2STest: Tree parameters test failed!");
+
+		std::vector<byte> code2(12, 3);
+		BlakeParams tree3(32, 32, 2, 1, 32000, 32, 1, 32, code1);
+		tres = tree3.ToBytes();
+		BlakeParams tree4(tres);
+
+		if (!tree3.Equals(tree4))
+			throw std::string("Blake2STest: Tree parameters test failed!");
 	}
 
 	void Blake2Test::OnProgress(char* Data)

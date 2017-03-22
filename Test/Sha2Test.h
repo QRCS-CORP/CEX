@@ -57,6 +57,7 @@ namespace Test
 		void CompareVector(Digest::IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(char* Data);
+		void TreeParamsTest();
     };
 }
 

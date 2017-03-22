@@ -28,7 +28,7 @@ public:
 	/// <param name="Shift">The number of bytes to shift</param>
 	/// 
 	/// <returns>Bit precision</returns>
-#define GETBYTE(Value, Shift) (uint)byte((Value)>>(8*(Shift)))
+	#define GETBYTE(Value, Shift) (uint)byte((Value)>>(8*(Shift)))
 	// these may be faster on other CPUs/compilers
 	// #define GETBYTE(Value, Shift) (uint)(((Value)>>(8*(Shift)))&255)
 	// #define GETBYTE(Value, Shift) (((byte *)&(Value))[Shift])
@@ -993,6 +993,17 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, SimdProfiles SimdProfile);
+
+	/// <summary>
+	/// Block XOR 8 * 32bit unsigned integers
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">Offset within the destination array</param>
+	/// <param name="SimdProfile">System supported SIMD instructions</param>
+	static void XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile);
 
 	/// <summary>
 	/// Block XOR 4 * 64bit unsigned integers

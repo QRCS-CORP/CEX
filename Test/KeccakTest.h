@@ -76,6 +76,7 @@ namespace Test
 		void CompareHMAC(IDigest* Digest, std::vector<std::vector<byte>> &Expected, std::vector<byte> &TruncExpected);
 		void Initialize();
 		void OnProgress(char* Data);
+		void TreeParamsTest();
 	};
 }
 

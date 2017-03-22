@@ -113,12 +113,7 @@ public:
 	/// </summary>
 	const size_t DistributionCodeMax() 
 	{ 
-		if (m_outputSize == 32)
-			return 8;
-		else if (m_outputSize == 64)
-			return 40;
-		else
-			return 104;
+		return (m_outputSize - HDR_SIZE);
 	}
 
 	/// <summary>
@@ -144,7 +139,7 @@ public:
 	/// </summary>
 	/// <param name="OutputSize">Digest output byte length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; this must be the digests block size</param>
-	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
+	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (limit of one state per processor core is recommended)</param>
 	SkeinParams(ulong OutputSize, byte LeafSize = 0, byte Fanout = 0)
 		:
 		m_treeSchema{ 83, 72, 65, 51 }, 
@@ -179,18 +174,17 @@ public:
 	{
 		CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
 
-		m_dstCode.resize(DistributionCodeMax());
-
 		memcpy(&m_treeSchema[0], &TreeArray[0], 4);
-		memcpy(&m_treeVersion, &TreeArray[4], 2);
-		memcpy(&m_reserved1, &TreeArray[6], 2);
-		memcpy(&m_outputSize, &TreeArray[8], 8);
+		m_treeVersion = IntUtils::BytesToLe16(TreeArray, 4);
+		m_reserved1 = IntUtils::BytesToLe16(TreeArray, 6);
+		m_outputSize = IntUtils::BytesToLe64(TreeArray, 8);
 		memcpy(&m_leafSize, &TreeArray[16], 1);
 		memcpy(&m_treeDepth, &TreeArray[17], 1);
 		memcpy(&m_treeFanout, &TreeArray[18], 1);
 		memcpy(&m_reserved2, &TreeArray[19], 1);
-		memcpy(&m_reserved3, &TreeArray[20], 4);
-		memcpy(&m_dstCode, &TreeArray[24], m_dstCode.size());
+		m_reserved3 = IntUtils::BytesToLe32(TreeArray, 20);
+		m_dstCode.resize(DistributionCodeMax());
+		memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 	}
 
 	/// <summary>
@@ -203,8 +197,8 @@ public:
 	/// <param name="LeafSize">The outer leaf length in bytes; this should be the digest block size in bytes</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
 	/// <param name="TreeDepth">The depth of the parallel tree; this value is always zero in this implementation</param>
-	/// <param name="Info">Optional personalization string</param>
-	explicit SkeinParams(const std::vector<byte> &Schema, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &Info)
+	/// <param name="DistributionCode">The optional personalization string; must be no longer than DistributionCodeMax in size</param>
+	explicit SkeinParams(const std::vector<byte> &Schema, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &DistributionCode)
 		:
 		m_treeSchema(Schema), 
 		m_treeVersion(Version),
@@ -215,7 +209,7 @@ public:
 		m_treeFanout(Fanout),
 		m_reserved2(0),
 		m_reserved3(0),
-		m_dstCode(Info)
+		m_dstCode(DistributionCode)
 	{
 		m_dstCode.resize(DistributionCodeMax());
 
@@ -354,14 +348,14 @@ public:
 		std::vector<byte> trs(GetHeaderSize(), 0);
 
 		memcpy(&trs[0], &m_treeSchema[0], 4);
-		memcpy(&trs[4], &m_treeVersion, 2);
-		memcpy(&trs[6], &m_reserved1, 2);
-		memcpy(&trs[8], &m_outputSize, 8);
+		IntUtils::Le16ToBytes(m_treeVersion, trs, 4);
+		IntUtils::Le16ToBytes(m_reserved1, trs, 6);
+		IntUtils::Le64ToBytes(m_outputSize, trs, 8);
 		memcpy(&trs[16], &m_leafSize, 1);
 		memcpy(&trs[17], &m_treeDepth, 1);
 		memcpy(&trs[18], &m_treeFanout, 1);
 		memcpy(&trs[19], &m_reserved2, 1);
-		memcpy(&trs[20], &m_reserved3, 4);
+		IntUtils::Le32ToBytes(m_reserved3, trs, 20);
 		memcpy(&trs[24], &m_dstCode[0], m_dstCode.size());
 
 		return trs;

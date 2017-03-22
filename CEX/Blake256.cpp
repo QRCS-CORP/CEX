@@ -32,14 +32,14 @@ Blake256::Blake256(bool Parallel)
 	if (m_parallelProfile.IsParallel())
 	{
 		// sets defaults of depth 2, fanout 8, 8 threads
-		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 0, DEF_PRLDEGREE, 2, 0, 0, 0, static_cast<byte>(DIGEST_SIZE), DEF_PRLDEGREE);
+		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 2, DEF_PRLDEGREE, 0, static_cast<byte>(DIGEST_SIZE));
 		// initialize the leaf nodes 
 		Reset();
 	}
 	else
 	{
 		// default depth 1, fanout 1, leaf length unlimited
-		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 0, 1, 1, 0, 0, 0, 0, 0);
+		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE));
 		LoadState(m_dgtState[0]);
 	}
 }
@@ -47,33 +47,33 @@ Blake256::Blake256(bool Parallel)
 Blake256::Blake256(BlakeParams &Params)
 	:
 	m_cIV(SCIV),
-	m_dgtState(Params.ParallelDegree() > 0 ? Params.ParallelDegree() : 1),
+	m_dgtState(Params.FanOut() > 0 ? Params.FanOut() : 1),
 	m_isDestroyed(false),
 	m_leafSize(BLOCK_SIZE),
-	m_msgBuffer(Params.ParallelDegree() > 0 ? 2 * Params.ParallelDegree() * BLOCK_SIZE : BLOCK_SIZE),
+	m_msgBuffer(Params.FanOut() > 0 ? 2 * Params.FanOut() * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, Params.ParallelDegree()),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, Params.FanOut()),
 	m_treeConfig(CHAIN_SIZE),
 	m_treeDestroy(false),
 	m_treeParams(Params)
 {
 	if (m_parallelProfile.IsParallel())
-		m_parallelProfile.IsParallel() = m_treeParams.ParallelDegree() > 1;
+		m_parallelProfile.IsParallel() = m_treeParams.FanOut() > 1;
 
 	if (m_parallelProfile.IsParallel())
 	{
 		if (Params.LeafLength() != 0 && (Params.LeafLength() < BLOCK_SIZE || Params.LeafLength() % BLOCK_SIZE != 0))
 			throw CryptoDigestException("BlakeSP256:Ctor", "The LeafLength parameter is invalid! Must be evenly divisible by digest block size.");
-		if (Params.ParallelDegree() < 2 || Params.ParallelDegree() % 2 != 0)
-			throw CryptoDigestException("BlakeSP256:Ctor", "The ParallelDegree parameter is invalid! Must be an even number greater than 1.");
+		if (Params.FanOut() < 2 || Params.FanOut() % 2 != 0)
+			throw CryptoDigestException("BlakeSP256:Ctor", "The FanOut parameter is invalid! Must be an even number greater than 1.");
 
-		m_leafSize = Params.LeafLength() == 0 ? DEF_LEAFSIZE : Params.LeafLength();
+		m_leafSize = (Params.LeafLength() == 0) ? DEF_LEAFSIZE : Params.LeafLength();
 		Reset();
 	}
 	else
 	{
 		// fixed at defaults for sequential; depth 1, fanout 1, leaf length unlimited
-		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 0, 1, 1, 0, 0, 0, 0, 0);
+		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 0, 1, 1, 0, 0, 0, 0, Params.DistributionCode());
 		LoadState(m_dgtState[0]);
 	}
 }
@@ -123,7 +123,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_parallelProfile.IsParallel())
 	{
-		std::vector<byte> hashCodes(m_treeParams.ParallelDegree() * DIGEST_SIZE);
+		std::vector<byte> hashCodes(m_treeParams.FanOut() * DIGEST_SIZE);
 
 		// padding
 		if (m_msgLength < m_msgBuffer.size())
@@ -150,14 +150,14 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		}
 
 		// process last 8 blocks
-		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
+		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			// apply f0 bit reversal constant to final blocks
 			m_dgtState[i].F[0] = UL_MAX;
 			size_t blkLen = BLOCK_SIZE;
 
 			// f1 constant on last block
-			if (i == m_treeParams.ParallelDegree() - 1)
+			if (i == m_treeParams.FanOut() - 1)
 				m_dgtState[i].F[1] = UL_MAX;
 
 			if (i == prtBlk)
@@ -191,7 +191,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		LoadState(m_dgtState[0]);
 
 		// load blocks
-		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
+		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 			Update(hashCodes, i * DIGEST_SIZE, DIGEST_SIZE);
 
 		// compress all but last block
@@ -252,7 +252,7 @@ void Blake256::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 	if (m_parallelProfile.IsParallel())
 	{
 		// initialize the leaf nodes and add the key 
-		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
+		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			memcpy(&m_msgBuffer[i * BLOCK_SIZE], &mkey[0], mkey.size());
 			m_treeParams.NodeOffset() = i;
@@ -286,12 +286,14 @@ void Blake256::ParallelMaxDegree(size_t Degree)
 
 	if (Degree > 1 && m_parallelProfile.ProcessorCount() > 1)
 	{
-		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 0, static_cast<byte>(Degree), 2, 0, 0, 0, static_cast<byte>(DIGEST_SIZE), static_cast<byte>(Degree));
+		m_treeParams.FanOut() = static_cast<byte>(Degree);
+		m_treeParams.MaxDepth() = 2;
+		m_treeParams.InnerLength() = static_cast<byte>(DIGEST_SIZE);
 		m_parallelProfile.IsParallel() = true;
 	}
 	else
 	{
-		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE), 0, 1, 1, 0, 0, 0, 0, 0);
+		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE));
 		m_parallelProfile.IsParallel() = false;
 	}
 
@@ -305,7 +307,7 @@ void Blake256::Reset()
 
 	if (m_parallelProfile.IsParallel())
 	{
-		for (size_t i = 0; i < m_treeParams.ParallelDegree(); ++i)
+		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			m_treeParams.NodeOffset() = i;
 			LoadState(m_dgtState[i]);
@@ -348,10 +350,10 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			ttlLen -= m_msgBuffer.size();
 
 			// empty the entire message buffer
-			Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
+			Utility::ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 			{
 				Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
-				Compress(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.ParallelDegree() * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
+				Compress(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.FanOut() * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
 			});
 
 			// loop in the remainder (no buffering)
@@ -363,7 +365,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 					prcLen -= (prcLen % m_parallelProfile.ParallelMinimumSize());
 
 				// process large blocks
-				Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset, prcLen](size_t i)
+				Utility::ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset, prcLen](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], prcLen);
 				});
@@ -387,7 +389,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			m_msgLength = m_msgBuffer.size();
 
 			// process first half of buffer
-			Utility::ParallelUtils::ParallelFor(0, m_treeParams.ParallelDegree(), [this, &Input, InOffset](size_t i)
+			Utility::ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 			{
 				Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
 			});
@@ -447,23 +449,8 @@ void Blake256::LoadState(Blake2sState &State)
 	memset(&State.F[0], 0, FLAG_SIZE * sizeof(uint));
 	memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(uint));
 
-	m_treeConfig[0] = m_treeParams.DigestLength();
-	m_treeConfig[0] |= m_treeParams.KeyLength() << 8;
-	m_treeConfig[0] |= m_treeParams.FanOut() << 16;
-	m_treeConfig[0] |= m_treeParams.MaxDepth() << 24;
-	m_treeConfig[1] = m_treeParams.LeafLength();
-	m_treeConfig[2] = (uint)m_treeParams.NodeOffset();
-	m_treeConfig[3] |= m_treeParams.NodeDepth() << 16;
-	m_treeConfig[3] |= m_treeParams.InnerLength() << 24;
-
-	State.H[0] ^= m_treeConfig[0];
-	State.H[1] ^= m_treeConfig[1];
-	State.H[2] ^= m_treeConfig[2];
-	State.H[3] ^= m_treeConfig[3];
-	State.H[4] ^= m_treeConfig[4];
-	State.H[5] ^= m_treeConfig[5];
-	State.H[6] ^= m_treeConfig[6];
-	State.H[7] ^= m_treeConfig[7];
+	m_treeParams.GetConfig(m_treeConfig);
+	IntUtils::XORUL256(m_treeConfig, 0, State.H, 0, m_parallelProfile.SimdProfile());
 }
 
 void Blake256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length)

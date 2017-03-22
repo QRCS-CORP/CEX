@@ -1,8 +1,9 @@
 #include "IntUtils.h"
-#include "Intrinsics.h"
+#if defined(CEX_HAS_MINSSE)
+#	include "Intrinsics.h"
+#endif
 
 NAMESPACE_UTILITY
-
 
 uint IntUtils::BitPrecision(ulong Value)
 {
@@ -467,227 +468,227 @@ void IntUtils::BytesToLeULL1024(const std::vector<byte> &Input, const size_t InO
 
 #if defined(IS_LITTLE_ENDIAN)
 
-ushort IntUtils::BytesToWord16(const std::vector<byte> &Input)
-{
-	return
-		(static_cast<ushort>(Input[0]) |
-		(static_cast<ushort>(Input[1] << 8)));
-}
+	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input)
+	{
+		return
+			(static_cast<ushort>(Input[0]) |
+			(static_cast<ushort>(Input[1] << 8)));
+	}
 
-ushort IntUtils::BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
-{
-	return
-		(static_cast<ushort>(Input[InOffset]) |
-		(static_cast<ushort>(Input[InOffset + 1] << 8)));
-}
+	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
+	{
+		return
+			(static_cast<ushort>(Input[InOffset]) |
+			(static_cast<ushort>(Input[InOffset + 1] << 8)));
+	}
 
-uint IntUtils::BytesToWord32(const std::vector<byte> &Input)
-{
-	return
-		(static_cast<uint>(Input[0]) |
-		(static_cast<uint>(Input[1] << 8)) |
+	uint IntUtils::BytesToWord32(const std::vector<byte> &Input)
+	{
+		return
+			(static_cast<uint>(Input[0]) |
+			(static_cast<uint>(Input[1] << 8)) |
 			(static_cast<uint>(Input[2] << 16)) |
 			(static_cast<uint>(Input[3] << 24)));
-}
+	}
 
-uint IntUtils::BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
-{
-	return
-		(static_cast<uint>(Input[InOffset]) |
-		(static_cast<uint>(Input[InOffset + 1] << 8)) |
+	uint IntUtils::BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
+	{
+		return
+			(static_cast<uint>(Input[InOffset]) |
+			(static_cast<uint>(Input[InOffset + 1] << 8)) |
 			(static_cast<uint>(Input[InOffset + 2] << 16)) |
 			(static_cast<uint>(Input[InOffset + 3] << 24)));
-}
+	}
 
-ulong IntUtils::BytesToWord64(const std::vector<byte> &Input)
-{
-	return
-		((ulong)Input[0]) |
-		((ulong)Input[1] << 8) |
-		((ulong)Input[2] << 16) |
-		((ulong)Input[3] << 24) |
-		((ulong)Input[4] << 32) |
-		((ulong)Input[5] << 40) |
-		((ulong)Input[6] << 48) |
-		((ulong)Input[7] << 56);
-}
+	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input)
+	{
+		return
+			((ulong)Input[0]) |
+			((ulong)Input[1] << 8) |
+			((ulong)Input[2] << 16) |
+			((ulong)Input[3] << 24) |
+			((ulong)Input[4] << 32) |
+			((ulong)Input[5] << 40) |
+			((ulong)Input[6] << 48) |
+			((ulong)Input[7] << 56);
+	}
 
-ulong IntUtils::BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
-{
-	return
-		((ulong)Input[InOffset]) |
-		((ulong)Input[InOffset + 1] << 8) |
-		((ulong)Input[InOffset + 2] << 16) |
-		((ulong)Input[InOffset + 3] << 24) |
-		((ulong)Input[InOffset + 4] << 32) |
-		((ulong)Input[InOffset + 5] << 40) |
-		((ulong)Input[InOffset + 6] << 48) |
-		((ulong)Input[InOffset + 7] << 56);
-}
+	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
+	{
+		return
+			((ulong)Input[InOffset]) |
+			((ulong)Input[InOffset + 1] << 8) |
+			((ulong)Input[InOffset + 2] << 16) |
+			((ulong)Input[InOffset + 3] << 24) |
+			((ulong)Input[InOffset + 4] << 32) |
+			((ulong)Input[InOffset + 5] << 40) |
+			((ulong)Input[InOffset + 6] << 48) |
+			((ulong)Input[InOffset + 7] << 56);
+	}
 
-void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output)
-{
-	Output[0] = static_cast<byte>(Value);
-	Output[1] = static_cast<byte>(Value >> 8);
-}
+	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output)
+	{
+		Output[0] = static_cast<byte>(Value);
+		Output[1] = static_cast<byte>(Value >> 8);
+	}
 
-void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
-{
-	Output[OutOffset] = static_cast<byte>(Value);
-	Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-}
+	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
+	{
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
+	}
 
-void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output)
-{
-	Output[0] = static_cast<byte>(Value);
-	Output[1] = static_cast<byte>(Value >> 8);
-	Output[2] = static_cast<byte>(Value >> 16);
-	Output[3] = static_cast<byte>(Value >> 24);
-}
+	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output)
+	{
+		Output[0] = static_cast<byte>(Value);
+		Output[1] = static_cast<byte>(Value >> 8);
+		Output[2] = static_cast<byte>(Value >> 16);
+		Output[3] = static_cast<byte>(Value >> 24);
+	}
 
-void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
-{
-	Output[OutOffset] = static_cast<byte>(Value);
-	Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-	Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
-	Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
-}
+	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
+	{
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
+	}
 
-void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output)
-{
-	Output[0] = static_cast<byte>(Value);
-	Output[1] = static_cast<byte>(Value >> 8);
-	Output[2] = static_cast<byte>(Value >> 16);
-	Output[3] = static_cast<byte>(Value >> 24);
-	Output[4] = static_cast<byte>(Value >> 32);
-	Output[5] = static_cast<byte>(Value >> 40);
-	Output[6] = static_cast<byte>(Value >> 48);
-	Output[7] = static_cast<byte>(Value >> 56);
-}
+	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output)
+	{
+		Output[0] = static_cast<byte>(Value);
+		Output[1] = static_cast<byte>(Value >> 8);
+		Output[2] = static_cast<byte>(Value >> 16);
+		Output[3] = static_cast<byte>(Value >> 24);
+		Output[4] = static_cast<byte>(Value >> 32);
+		Output[5] = static_cast<byte>(Value >> 40);
+		Output[6] = static_cast<byte>(Value >> 48);
+		Output[7] = static_cast<byte>(Value >> 56);
+	}
 
-void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
-{
-	Output[OutOffset] = static_cast<byte>(Value);
-	Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-	Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
-	Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
-	Output[OutOffset + 4] = static_cast<byte>(Value >> 32);
-	Output[OutOffset + 5] = static_cast<byte>(Value >> 40);
-	Output[OutOffset + 6] = static_cast<byte>(Value >> 48);
-	Output[OutOffset + 7] = static_cast<byte>(Value >> 56);
-}
+	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
+	{
+		Output[OutOffset] = static_cast<byte>(Value);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
+		Output[OutOffset + 4] = static_cast<byte>(Value >> 32);
+		Output[OutOffset + 5] = static_cast<byte>(Value >> 40);
+		Output[OutOffset + 6] = static_cast<byte>(Value >> 48);
+		Output[OutOffset + 7] = static_cast<byte>(Value >> 56);
+	}
 
 #else
 
-ushort IntUtils::BytesToWord16(const std::vector<byte> &Input)
-{
-	return
-		(static_cast<ushort>(Input[1]) |
-		(static_cast<ushort>(Input[0] << 8)));
-}
+	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input)
+	{
+		return
+			(static_cast<ushort>(Input[1]) |
+			(static_cast<ushort>(Input[0] << 8)));
+	}
 
-ushort IntUtils::BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
-{
-	return
-		(static_cast<ushort>(Input[InOffset + 1]) |
-		(static_cast<ushort>(Input[InOffset] << 8)));
-}
+	ushort IntUtils::BytesToWord16(const std::vector<byte> &Input, const size_t InOffset)
+	{
+		return
+			(static_cast<ushort>(Input[InOffset + 1]) |
+			(static_cast<ushort>(Input[InOffset] << 8)));
+	}
 
-uint IntUtils::BytesToWord32(const std::vector<byte> &Input)
-{
-	return
-		(static_cast<uint>(Input[3]) |
-		(static_cast<uint>(Input[2] << 8)) |
+	uint IntUtils::BytesToWord32(const std::vector<byte> &Input)
+	{
+		return
+			(static_cast<uint>(Input[3]) |
+			(static_cast<uint>(Input[2] << 8)) |
 			(static_cast<uint>(Input[1] << 16)) |
 			(static_cast<uint>(Input[0] << 24)));
-}
+	}
 
-uint IntUtils::BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
-{
-	return
-		(static_cast<uint>(Input[InOffset + 3]) |
-		(static_cast<uint>(Input[InOffset + 2] << 8)) |
+	uint IntUtils::BytesToWord32(const std::vector<byte> &Input, const size_t InOffset)
+	{
+		return
+			(static_cast<uint>(Input[InOffset + 3]) |
+			(static_cast<uint>(Input[InOffset + 2] << 8)) |
 			(static_cast<uint>(Input[InOffset + 1] << 16)) |
 			(static_cast<uint>(Input[InOffset] << 24)));
-}
+	}
 
-ulong IntUtils::BytesToWord64(const std::vector<byte> &Input)
-{
-	return
-		((ulong)Input[7]) |
-		((ulong)Input[6] << 8) |
-		((ulong)Input[5] << 16) |
-		((ulong)Input[4] << 24) |
-		((ulong)Input[3] << 32) |
-		((ulong)Input[2] << 40) |
-		((ulong)Input[1] << 48) |
-		((ulong)Input[0] << 56);
-}
+	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input)
+	{
+		return
+			((ulong)Input[7]) |
+			((ulong)Input[6] << 8) |
+			((ulong)Input[5] << 16) |
+			((ulong)Input[4] << 24) |
+			((ulong)Input[3] << 32) |
+			((ulong)Input[2] << 40) |
+			((ulong)Input[1] << 48) |
+			((ulong)Input[0] << 56);
+	}
 
-ulong IntUtils::BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
-{
-	return
-		((ulong)Input[InOffset + 7]) |
-		((ulong)Input[InOffset + 6] << 8) |
-		((ulong)Input[InOffset + 5] << 16) |
-		((ulong)Input[InOffset + 4] << 24) |
-		((ulong)Input[InOffset + 3] << 32) |
-		((ulong)Input[InOffset + 2] << 40) |
-		((ulong)Input[InOffset + 1] << 48) |
-		((ulong)Input[InOffset] << 56);
-}
+	ulong IntUtils::BytesToWord64(const std::vector<byte> &Input, const size_t InOffset)
+	{
+		return
+			((ulong)Input[InOffset + 7]) |
+			((ulong)Input[InOffset + 6] << 8) |
+			((ulong)Input[InOffset + 5] << 16) |
+			((ulong)Input[InOffset + 4] << 24) |
+			((ulong)Input[InOffset + 3] << 32) |
+			((ulong)Input[InOffset + 2] << 40) |
+			((ulong)Input[InOffset + 1] << 48) |
+			((ulong)Input[InOffset] << 56);
+	}
 
-void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output)
-{
-	Output[1] = static_cast<byte>(Value);
-	Output[0] = static_cast<byte>(Value >> 8);
-}
+	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output)
+	{
+		Output[1] = static_cast<byte>(Value);
+		Output[0] = static_cast<byte>(Value >> 8);
+	}
 
-void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
-{
-	Output[OutOffset + 1] = static_cast<byte>(Value);
-	Output[OutOffset] = static_cast<byte>(Value >> 8);
-}
+	void IntUtils::Word16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
+	{
+		Output[OutOffset + 1] = static_cast<byte>(Value);
+		Output[OutOffset] = static_cast<byte>(Value >> 8);
+	}
 
-void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output)
-{
-	Output[3] = static_cast<byte>(Value);
-	Output[2] = static_cast<byte>(Value >> 8);
-	Output[1] = static_cast<byte>(Value >> 16);
-	Output[0] = static_cast<byte>(Value >> 24);
-}
+	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output)
+	{
+		Output[3] = static_cast<byte>(Value);
+		Output[2] = static_cast<byte>(Value >> 8);
+		Output[1] = static_cast<byte>(Value >> 16);
+		Output[0] = static_cast<byte>(Value >> 24);
+	}
 
-void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
-{
-	Output[OutOffset + 3] = static_cast<byte>(Value);
-	Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
-	Output[OutOffset + 1] = static_cast<byte>(Value >> 16);
-	Output[OutOffset] = static_cast<byte>(Value >> 24);
-}
+	void IntUtils::Word32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
+	{
+		Output[OutOffset + 3] = static_cast<byte>(Value);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 16);
+		Output[OutOffset] = static_cast<byte>(Value >> 24);
+	}
 
-void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output)
-{
-	Output[7] = static_cast<byte>(Value);
-	Output[6] = static_cast<byte>(Value >> 8);
-	Output[5] = static_cast<byte>(Value >> 16);
-	Output[4] = static_cast<byte>(Value >> 24);
-	Output[3] = static_cast<byte>(Value >> 32);
-	Output[2] = static_cast<byte>(Value >> 40);
-	Output[1] = static_cast<byte>(Value >> 48);
-	Output[0] = static_cast<byte>(Value >> 56);
-}
+	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output)
+	{
+		Output[7] = static_cast<byte>(Value);
+		Output[6] = static_cast<byte>(Value >> 8);
+		Output[5] = static_cast<byte>(Value >> 16);
+		Output[4] = static_cast<byte>(Value >> 24);
+		Output[3] = static_cast<byte>(Value >> 32);
+		Output[2] = static_cast<byte>(Value >> 40);
+		Output[1] = static_cast<byte>(Value >> 48);
+		Output[0] = static_cast<byte>(Value >> 56);
+	}
 
-void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
-{
-	Output[OutOffset + 7] = static_cast<byte>(Value);
-	Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
-	Output[OutOffset + 5] = static_cast<byte>(Value >> 16);
-	Output[OutOffset + 4] = static_cast<byte>(Value >> 24);
-	Output[OutOffset + 3] = static_cast<byte>(Value >> 32);
-	Output[OutOffset + 2] = static_cast<byte>(Value >> 40);
-	Output[OutOffset + 1] = static_cast<byte>(Value >> 48);
-	Output[OutOffset] = static_cast<byte>(Value >> 56);
-}
+	void IntUtils::Word64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
+	{
+		Output[OutOffset + 7] = static_cast<byte>(Value);
+		Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
+		Output[OutOffset + 5] = static_cast<byte>(Value >> 16);
+		Output[OutOffset + 4] = static_cast<byte>(Value >> 24);
+		Output[OutOffset + 3] = static_cast<byte>(Value >> 32);
+		Output[OutOffset + 2] = static_cast<byte>(Value >> 40);
+		Output[OutOffset + 1] = static_cast<byte>(Value >> 48);
+		Output[OutOffset] = static_cast<byte>(Value >> 56);
+	}
 
 #endif
 
@@ -709,129 +710,129 @@ uint IntUtils::Parity(ulong Value)
 #if defined(CEX_HAS_MINSSE) && defined(CEX_FASTROTATE_ENABLED)
 #	pragma intrinsic(_rotl, _lrotl, _rotl64, _rotr, _lrotr, _rotr64)
 
-uint IntUtils::RotL32(uint Value, uint Shift)
-{
-	return Shift ? _rotl(Value, Shift) : Value;
-}
+	uint IntUtils::RotL32(uint Value, uint Shift)
+	{
+		return Shift ? _rotl(Value, Shift) : Value;
+	}
 
-ulong IntUtils::RotL64(ulong Value, uint Shift)
-{
-	return Shift ? _rotl64(Value, Shift) : Value;
-}
+	ulong IntUtils::RotL64(ulong Value, uint Shift)
+	{
+		return Shift ? _rotl64(Value, Shift) : Value;
+	}
 
-uint IntUtils::RotR32(uint Value, uint Shift)
-{
-	return Shift ? _rotr(Value, Shift) : Value;
-}
+	uint IntUtils::RotR32(uint Value, uint Shift)
+	{
+		return Shift ? _rotr(Value, Shift) : Value;
+	}
 
-ulong IntUtils::RotR64(ulong Value, uint Shift)
-{
-	return Shift ? _rotr64(Value, Shift) : Value;
-}
+	ulong IntUtils::RotR64(ulong Value, uint Shift)
+	{
+		return Shift ? _rotr64(Value, Shift) : Value;
+	}
 
-uint IntUtils::RotFL32(uint Value, uint Shift)
-{
-	return _lrotl(Value, Shift);
-}
+	uint IntUtils::RotFL32(uint Value, uint Shift)
+	{
+		return _lrotl(Value, Shift);
+	}
 
-ulong IntUtils::RotFL64(ulong Value, uint Shift)
-{
-	return _rotl64(Value, Shift);
-}
+	ulong IntUtils::RotFL64(ulong Value, uint Shift)
+	{
+		return _rotl64(Value, Shift);
+	}
 
-uint IntUtils::RotFR32(uint Value, uint Shift)
-{
-	return _lrotr(Value, Shift);
-}
+	uint IntUtils::RotFR32(uint Value, uint Shift)
+	{
+		return _lrotr(Value, Shift);
+	}
 
-ulong IntUtils::RotFR64(ulong Value, uint Shift)
-{
-	return _rotr64(Value, Shift);
-}
+	ulong IntUtils::RotFR64(ulong Value, uint Shift)
+	{
+		return _rotr64(Value, Shift);
+	}
 
 #elif defined(CEX_PPC_INTRINSICS) && defined(CEX_FASTROTATE_ENABLED)
 
-uint IntUtils::RotL32(uint Value, uint Shift)
-{
-	return Shift ? __rlwinm(Value, Shift, 0, 31) : Value;
-}
+	uint IntUtils::RotL32(uint Value, uint Shift)
+	{
+		return Shift ? __rlwinm(Value, Shift, 0, 31) : Value;
+	}
 
-ulong IntUtils::RotL64(ulong Value, uint Shift)
-{
-	return Shift ? __rlwinm(Value, Shift, 0, 63) : Value;
-}
+	ulong IntUtils::RotL64(ulong Value, uint Shift)
+	{
+		return Shift ? __rlwinm(Value, Shift, 0, 63) : Value;
+	}
 
-uint IntUtils::RotR32(uint Value, uint Shift)
-{
-	return Shift ? __rlwinm(Value, 32 - Shift, 0, 31) : Value;
-}
+	uint IntUtils::RotR32(uint Value, uint Shift)
+	{
+		return Shift ? __rlwinm(Value, 32 - Shift, 0, 31) : Value;
+	}
 
-ulong IntUtils::RotR64(ulong Value, uint Shift)
-{
-	return Shift ? __rlwinm(Value, 64 - Shift, 0, 63) : Value;
-}
+	ulong IntUtils::RotR64(ulong Value, uint Shift)
+	{
+		return Shift ? __rlwinm(Value, 64 - Shift, 0, 63) : Value;
+	}
 
-uint IntUtils::RotFL32(uint Value, uint Shift)
-{
-	return __rlwinm(Value, Shift, 0, 31);
-}
+	uint IntUtils::RotFL32(uint Value, uint Shift)
+	{
+		return __rlwinm(Value, Shift, 0, 31);
+	}
 
-ulong IntUtils::RotFL64(ulong Value, uint Shift)
-{
-	return (Value << Shift) | ((long)((ulong)Value >> -Shift));
-}
+	ulong IntUtils::RotFL64(ulong Value, uint Shift)
+	{
+		return (Value << Shift) | ((long)((ulong)Value >> -Shift));
+	}
 
-uint IntUtils::RotFR32(uint Value, uint Shift)
-{
-	return __rlwinm(Value, 32 - Shift, 0, 31);
-}
+	uint IntUtils::RotFR32(uint Value, uint Shift)
+	{
+		return __rlwinm(Value, 32 - Shift, 0, 31);
+	}
 
-ulong IntUtils::RotFR64(ulong Value, uint Shift)
-{
-	return ((Value >> Shift) | (Value << (64 - Shift)));
-}
+	ulong IntUtils::RotFR64(ulong Value, uint Shift)
+	{
+		return ((Value >> Shift) | (Value << (64 - Shift)));
+	}
 
 #else
 
-uint IntUtils::RotL32(uint Value, uint Shift)
-{
-	return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
-}
+	uint IntUtils::RotL32(uint Value, uint Shift)
+	{
+		return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
+	}
 
-ulong IntUtils::RotL64(ulong Value, uint Shift)
-{
-	return (Value << Shift) | (Value >> (sizeof(ulong) * 8 - Shift));
-}
+	ulong IntUtils::RotL64(ulong Value, uint Shift)
+	{
+		return (Value << Shift) | (Value >> (sizeof(ulong) * 8 - Shift));
+	}
 
-uint IntUtils::RotR32(uint Value, uint Shift)
-{
-	return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
-}
+	uint IntUtils::RotR32(uint Value, uint Shift)
+	{
+		return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
+	}
 
-ulong IntUtils::RotR64(ulong Value, uint Shift)
-{
-	return (Value >> Shift) | (Value << (sizeof(ulong) * 8 - Shift));
-}
+	ulong IntUtils::RotR64(ulong Value, uint Shift)
+	{
+		return (Value >> Shift) | (Value << (sizeof(ulong) * 8 - Shift));
+	}
 
-uint IntUtils::RotFL32(uint Value, uint Shift)
-{
-	return (Value << Shift) | (Value >> (32 - Shift));
-}
+	uint IntUtils::RotFL32(uint Value, uint Shift)
+	{
+		return (Value << Shift) | (Value >> (32 - Shift));
+	}
 
-ulong IntUtils::RotFL64(ulong Value, uint Shift)
-{
-	return (Value << Shift) | (Value >> (64 - Shift));
-}
+	ulong IntUtils::RotFL64(ulong Value, uint Shift)
+	{
+		return (Value << Shift) | (Value >> (64 - Shift));
+	}
 
-uint IntUtils::RotFR32(uint Value, uint Shift)
-{
-	return (Value >> Shift) | (Value << (32 - Shift));
-}
+	uint IntUtils::RotFR32(uint Value, uint Shift)
+	{
+		return (Value >> Shift) | (Value << (32 - Shift));
+	}
 
-ulong IntUtils::RotFR64(ulong Value, uint Shift)
-{
-	return ((Value >> Shift) | (Value << (64 - Shift)));
-}
+	ulong IntUtils::RotFR64(ulong Value, uint Shift)
+	{
+		return ((Value >> Shift) | (Value << (64 - Shift)));
+	}
 
 #endif
 
@@ -989,6 +990,30 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 	}
 }
 
+void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+{
+	if (SimdProfile == SimdProfiles::Simd256)
+	{
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
+	}
+	else if (SimdProfile == SimdProfiles::Simd128)
+	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
+	}
+	else
+	{
+		Output[OutOffset] ^= Input[InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+	}
+}
+
 void IntUtils::XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
 {
 	if (SimdProfile == SimdProfiles::Simd256)
@@ -1107,9 +1132,7 @@ void IntUtils::XORPRT(const std::vector<byte> &Input, const size_t InOffset, std
 	{
 		Output[OutOffset + ctr] ^= Input[InOffset + ctr];
 		++ctr;
-	}
+	} 
 }
-
-
 
 NAMESPACE_UTILITYEND
