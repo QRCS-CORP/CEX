@@ -179,7 +179,7 @@ void Keccak256::Reset()
 
 		if (m_parallelProfile.IsParallel())
 		{
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<uint>(i);
 			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
 		}
 	}
@@ -275,36 +275,6 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], Length);
 		m_msgLength += Length;
 	}
-
-
-	/*if ((InOffset + Length) > Input.size())
-		throw CryptoDigestException("Keccak256:Update", "The Input buffer is too short!");
-
-	if (m_msgLength != 0)
-	{
-		if (Length + m_msgLength >= BLOCK_SIZE)
-		{
-			size_t chunkSize = BLOCK_SIZE - m_msgLength;
-			memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], chunkSize);
-			Keccak::TransformBlock(m_msgBuffer, 0, m_dgtState[0].H, BLOCK_SIZE);
-			Length -= chunkSize;
-			InOffset += chunkSize;
-			m_msgLength = 0;
-		}
-	}
-
-	while (Length >= m_msgBuffer.size())
-	{
-		Keccak::TransformBlock(Input, InOffset, m_dgtState[0].H, BLOCK_SIZE);
-		InOffset += m_msgBuffer.size();
-		Length -= m_msgBuffer.size();
-	}
-
-	if (Length != 0)
-	{
-		memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], Length);
-		m_msgLength += Length;
-	}*/
 }
 
 //~~~Private Functions~~~//

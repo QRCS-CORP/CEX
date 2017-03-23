@@ -66,13 +66,13 @@ private:
 	const size_t BUFFER_SIZE = 1024;
 	const size_t BUFFER_MIN = 64;
 
-	size_t m_bufferIndex = 0;
-	size_t m_bufferSize = 0;
-	std::vector<byte> m_byteBuffer;
+	size_t m_bufferIndex;
+	size_t m_bufferSize;
 	Digests m_digestType;
 	bool m_isDestroyed;
 	Drbg::DCG* m_rngGenerator;
 	Providers m_pvdType;
+	std::vector<byte> m_rngBuffer;
 	std::vector<byte> m_stateSeed;
 
 public:

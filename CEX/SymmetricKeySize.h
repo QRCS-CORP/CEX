@@ -33,27 +33,27 @@ struct SymmetricKeySize
 {
 private:
 
-	static const size_t HDR_SIZE = sizeof(size_t) * 3;
-	size_t m_infoSize;
-	size_t m_keySize;
-	size_t m_nonceSize;
+	static const size_t HDR_SIZE = sizeof(uint) * 3;
+	uint m_infoSize;
+	uint m_keySize;
+	uint m_nonceSize;
 
 public:
 
 	/// <summary>
 	/// Get/Set: The info byte array length
 	/// </summary>
-	size_t &InfoSize() { return m_infoSize; }
+	uint &InfoSize() { return m_infoSize; }
 
 	/// <summary>
 	/// Get/Set: The key byte array length
 	/// </summary>
-	size_t &KeySize() { return m_keySize; }
+	uint &KeySize() { return m_keySize; }
 
 	/// <summary>
 	/// Get/Set: The nonce byte array length
 	/// </summary>
-	size_t &NonceSize() { return m_nonceSize; }
+	uint &NonceSize() { return m_nonceSize; }
 
 
 	/// <summary>
@@ -81,9 +81,9 @@ public:
 		if (KeyArray.size() < HDR_SIZE)
 			throw CryptoProcessingException("SymmetricKeySize:Ctor", "The KeyArray buffer is too small!");
 
-		memcpy(&m_infoSize, &KeyArray[0], sizeof(size_t));
-		memcpy(&m_keySize, &KeyArray[sizeof(size_t)], sizeof(size_t));
-		memcpy(&m_nonceSize, &KeyArray[sizeof(size_t) * 2], sizeof(size_t));
+		memcpy(&m_infoSize, &KeyArray[0], sizeof(uint));
+		memcpy(&m_keySize, &KeyArray[sizeof(uint)], sizeof(uint));
+		memcpy(&m_nonceSize, &KeyArray[sizeof(uint) * 2], sizeof(uint));
 	}
 
 	/// <summary>
@@ -95,9 +95,9 @@ public:
 	/// <param name="InfoSize">The info byte array length</param>
 	explicit SymmetricKeySize(size_t KeySize, size_t NonceSize, size_t InfoSize)
 		:
-		m_infoSize(InfoSize),
-		m_keySize(KeySize),
-		m_nonceSize(NonceSize)
+		m_infoSize(static_cast<uint>(InfoSize)),
+		m_keySize(static_cast<uint>(KeySize)),
+		m_nonceSize(static_cast<uint>(NonceSize))
 	{
 	}
 
@@ -179,9 +179,9 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	size_t GetHashCode()
+	uint GetHashCode()
 	{
-		size_t result = 31 * m_keySize;
+		uint result = 31 * m_keySize;
 		result += 31 * m_nonceSize;
 		result += 31 * m_infoSize;
 
@@ -217,9 +217,9 @@ public:
 	{
 		std::vector<byte> trs(HDR_SIZE, 0);
 
-		memcpy(&trs[0], &m_infoSize, sizeof(size_t));
-		memcpy(&trs[4], &m_keySize, sizeof(size_t));
-		memcpy(&trs[8], &m_nonceSize, sizeof(size_t));
+		memcpy(&trs[0], &m_infoSize, sizeof(uint));
+		memcpy(&trs[4], &m_keySize, sizeof(uint));
+		memcpy(&trs[8], &m_nonceSize, sizeof(uint));
 
 		return trs;
 	}

@@ -55,8 +55,8 @@ public:
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input/output data arrays passed to the transform must be this size in bytes to trigger parallelization.</para>
+	/// <para>Indicates whether parallel processing is available on this system.
+	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() = 0;
 
@@ -66,15 +66,15 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
 
 	/// <summary>
 	/// Get/Set: Parallel and SIMD capability flags and sizes 
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
 	virtual ParallelOptions &ParallelProfile() = 0;
@@ -103,6 +103,15 @@ public:
 	/// 
 	/// <returns>Size of Hash value</returns>
 	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) = 0;
+
+	/// <summary>
+	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
+	/// <para>Thread count must be an even number, and not exceed the number of processor cores.
+	/// Changing this value from the default (8 threads), will change the output hash value.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
 	/// Reset the internal state

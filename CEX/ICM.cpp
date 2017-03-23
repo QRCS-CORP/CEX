@@ -91,7 +91,7 @@ void ICM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockSize, "The data arrays are smaller than the the block-size!");
 
 	std::vector<byte> tmpCtr(BLOCK_SIZE);
-	Convert(m_ctrVector, tmpCtr);
+	Convert(m_ctrVector, tmpCtr, 0);
 	m_blockCipher->EncryptBlock(tmpCtr, 0, Output, OutOffset);
 	ArrayUtils::IncrementLE64(m_ctrVector);
 	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
@@ -179,13 +179,13 @@ void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 //~~~Private Functions~~~//
 
-void ICM::Convert(const std::vector<ulong> &Input, std::vector<byte> &Output)
+void ICM::Convert(const std::vector<ulong> &Input, std::vector<byte> &Output, size_t OutOffset)
 {
 #if defined(IS_LITTLE_ENDIAN)
-	memcpy(&Output[0], &Input[0], BLOCK_SIZE);
+	memcpy(&Output[OutOffset], &Input[0], BLOCK_SIZE);
 #else
-	IntUtils::Le64ToBytes(Input[0], Output, 0);
-	IntUtils::Le64ToBytes(Input[1], Output, 8);
+	IntUtils::Le64ToBytes(Input[0], Output, OutOffset);
+	IntUtils::Le64ToBytes(Input[1], Output, OutOffset + 8);
 #endif
 }
 
@@ -203,21 +203,21 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		// stagger counters and process 8 blocks with avx
 		while (blkCtr != PBKALN)
 		{
-			memcpy(&ctrBlk[0], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 0);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[16], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 16);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[32], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 32);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[48], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 48);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[64], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 64);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[80], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 80);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[96], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 96);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[112], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 112);
 			ArrayUtils::IncrementLE64(Counter);
 			m_blockCipher->Transform128(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVXBLK;
@@ -231,13 +231,13 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		// 4 blocks with sse
 		while (blkCtr != PBKALN)
 		{
-			memcpy(&ctrBlk[0], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 0);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[16], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 16);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[32], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 32);
 			ArrayUtils::IncrementLE64(Counter);
-			memcpy(&ctrBlk[48], &Counter[0], BLOCK_SIZE);
+			Convert(Counter, ctrBlk, 48);
 			ArrayUtils::IncrementLE64(Counter);
 			m_blockCipher->Transform64(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += SSEBLK;
@@ -249,7 +249,7 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 
 	while (blkCtr != BLKALN)
 	{
-		Convert(Counter, tmpCtr);
+		Convert(Counter, tmpCtr, 0);
 		m_blockCipher->EncryptBlock(tmpCtr, 0, Output, OutOffset + blkCtr);
 		ArrayUtils::IncrementLE64(Counter);
 		blkCtr += m_blockSize;
@@ -258,7 +258,7 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	if (blkCtr != Length)
 	{
 		std::vector<byte> tmp(BLOCK_SIZE);
-		Convert(Counter, tmpCtr);
+		Convert(Counter, tmpCtr, 0);
 		m_blockCipher->EncryptBlock(tmpCtr, 0, tmp, 0);
 		const size_t FNLSZE = Length % m_blockSize;
 		memcpy(&Output[OutOffset + (Length - FNLSZE)], &tmp[0], FNLSZE);

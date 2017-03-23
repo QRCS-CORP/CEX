@@ -52,32 +52,51 @@ namespace Test
 				using Enumeration::Digests;
 
 				OnProgress("### Message Digest Speed Tests: 10 loops * 100MB ###");
-				OnProgress("***The Blake 256 digest***");
+
+				OnProgress("***The sequential Blake 256 digest***");
 				DigestBlockLoop(Digests::Blake256, MB100);
-				OnProgress("***The Blake 512 digest***");
-				DigestBlockLoop(Digests::Blake512, MB100);
-				OnProgress("***The Blake2S 256 digest***");
-				DigestBlockLoop(Digests::Blake256, MB100);
-				OnProgress("***The Blake2SP 256 digest***");
+				OnProgress("***The sequential parallel Blake 256 digest***");
 				DigestBlockLoop(Digests::Blake256, MB100, 10, true);
-				OnProgress("***The Blake2B 512 digest***");
+
+				OnProgress("***The sequential Blake 512 digest***");
 				DigestBlockLoop(Digests::Blake512, MB100);
-				OnProgress("***The Blake2BP 512 digest***");
+				OnProgress("***The parallel Blake 512 digest***");
 				DigestBlockLoop(Digests::Blake512, MB100, 10, true);
-				OnProgress("***The Keccak 256 digest***");
+
+				OnProgress("***The sequential Keccak 256 digest***");
 				DigestBlockLoop(Digests::Keccak256, MB100);
-				OnProgress("***The Keccak 512 digest***");
+				OnProgress("***The parallel Keccak 256 digest***");
+				DigestBlockLoop(Digests::Keccak256, MB100, 10, true);
+
+				OnProgress("***The sequential Keccak 512 digest***");
 				DigestBlockLoop(Digests::Keccak512, MB100);
-				OnProgress("***The SHA2 256 digest***");
+				OnProgress("***The parallel Keccak 512 digest***");
+				DigestBlockLoop(Digests::Keccak512, MB100, 10, true);
+
+				OnProgress("***The sequential SHA2 256 digest***");
 				DigestBlockLoop(Digests::SHA256, MB100);
-				OnProgress("***The SHA2 512 digest***");
+				OnProgress("***The parallel SHA2 256 digest***");
+				DigestBlockLoop(Digests::SHA256, MB100, 10, true);
+
+				OnProgress("***The sequential SHA2 512 digest***");
 				DigestBlockLoop(Digests::SHA512, MB100);
-				OnProgress("***The Skein 256 digest***");
+				OnProgress("***The parallel SHA2 512 digest***");
+				DigestBlockLoop(Digests::SHA512, MB100, 10, true);
+
+				OnProgress("***The sequential Skein 256 digest***");
 				DigestBlockLoop(Digests::Skein256, MB100);
-				OnProgress("***The Skein 512 digest***");
+				OnProgress("***The parallel Skein 256 digest***");
+				DigestBlockLoop(Digests::Skein256, MB100, 10, true);
+
+				OnProgress("***The sequential Skein 512 digest***");
 				DigestBlockLoop(Digests::Skein512, MB100);
-				OnProgress("***The Skein 1024 digest***");
+				OnProgress("***The parallel Skein 512 digest***");
+				DigestBlockLoop(Digests::Skein512, MB100, 10, true);
+
+				OnProgress("***The sequential Skein 1024 digest***");
 				DigestBlockLoop(Digests::Skein1024, MB100);
+				OnProgress("***The parallel Skein 1024 digest***");
+				DigestBlockLoop(Digests::Skein1024, MB100, 10, true);
 
 				return MESSAGE;
 			}

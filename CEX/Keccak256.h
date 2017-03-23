@@ -141,8 +141,8 @@ public:
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input data array passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// <para>Indicates whether parallel processing is available on this system.
+	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
 
@@ -152,19 +152,19 @@ public:
 	virtual const std::string Name() { return "Keccak256"; }
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
 
 	/// <summary>
 	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
 	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
-	/// and reinitialize the state, or initialize the digest using a SkeinParams with the FanOut property set to the desired number of threads.</para>
+	/// and reinitialize the state, or initialize the digest using a KeccakParams with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
 
 	//~~~Constructor~~~//
 
@@ -229,7 +229,7 @@ public:
 	///
 	/// <param name="Degree">The desired number of threads</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
 	virtual void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>

@@ -2,7 +2,6 @@
 
 NAMESPACE_PROCESSING
 
-
 //~~~Constructor~~~//
 
 DigestStream::DigestStream(Digests Digest)

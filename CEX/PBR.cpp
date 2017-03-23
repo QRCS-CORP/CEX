@@ -13,10 +13,10 @@ PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestEngine, size_t B
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize),
-	m_byteBuffer(BufferSize),
 	m_digestIterations(Iterations),
 	m_digestType(DigestEngine),
 	m_isDestroyed(false),
+	m_rngBuffer(BufferSize),
 	m_stateSeed(Seed)
 {
 	if (Iterations == 0)
@@ -44,7 +44,7 @@ void PBR::Destroy()
 		m_bufferSize = 0;
 		m_digestIterations = 0;
 
-		Utility::ArrayUtils::ClearVector(m_byteBuffer);
+		Utility::ArrayUtils::ClearVector(m_rngBuffer);
 		Utility::ArrayUtils::ClearVector(m_stateSeed);
 
 		if (m_rngGenerator != 0)
@@ -66,29 +66,29 @@ void PBR::GetBytes(std::vector<byte> &Output)
 	if (Output.size() == 0)
 		throw CryptoRandomException("PBR:GetBytes", "Buffer size must be at least 1 byte!");
 
-	if (m_byteBuffer.size() - m_bufferIndex < Output.size())
+	if (m_rngBuffer.size() - m_bufferIndex < Output.size())
 	{
-		size_t bufSize = m_byteBuffer.size() - m_bufferIndex;
+		size_t bufSize = m_rngBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], bufSize);
+			memcpy(&Output[0], &m_rngBuffer[m_bufferIndex], bufSize);
 
 		size_t rem = Output.size() - bufSize;
 
 		while (rem != 0)
 		{
 			// fill buffer
-			m_rngGenerator->Generate(m_byteBuffer);
+			m_rngGenerator->Generate(m_rngBuffer);
 
-			if (rem > m_byteBuffer.size())
+			if (rem > m_rngBuffer.size())
 			{
-				memcpy(&Output[bufSize], &m_byteBuffer[0], m_byteBuffer.size());
-				bufSize += m_byteBuffer.size();
-				rem -= m_byteBuffer.size();
+				memcpy(&Output[bufSize], &m_rngBuffer[0], m_rngBuffer.size());
+				bufSize += m_rngBuffer.size();
+				rem -= m_rngBuffer.size();
 			}
 			else
 			{
-				memcpy(&Output[bufSize], &m_byteBuffer[0], rem);
+				memcpy(&Output[bufSize], &m_rngBuffer[0], rem);
 				m_bufferIndex = rem;
 				rem = 0;
 			}
@@ -96,7 +96,7 @@ void PBR::GetBytes(std::vector<byte> &Output)
 	}
 	else
 	{
-		memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], Output.size());
+		memcpy(&Output[0], &m_rngBuffer[m_bufferIndex], Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -162,7 +162,7 @@ void PBR::Reset()
 
 	m_rngGenerator = new Kdf::PBKDF2(m_digestType, m_digestIterations);
 	m_rngGenerator->Initialize(m_stateSeed);
-	m_rngGenerator->Generate(m_byteBuffer);
+	m_rngGenerator->Generate(m_rngBuffer);
 	m_bufferIndex = 0;
 }
 

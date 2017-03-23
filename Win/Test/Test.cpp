@@ -267,7 +267,7 @@ int main()
 		ConsoleUtils::WriteLine("");
 
 		// digests are being rewritten, so this can wait..
-		/*if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
+		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
 			RunTest(new DigestSpeedTest());
 		}
@@ -275,7 +275,7 @@ int main()
 		{
 			ConsoleUtils::WriteLine("Speed tests were Cancelled..");
 		}
-		ConsoleUtils::WriteLine("");*/
+		ConsoleUtils::WriteLine("");/**/
 
 		PrintHeader("Completed! Press any key to close..", "");
 		GetResponse();

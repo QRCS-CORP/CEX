@@ -233,7 +233,8 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 	// initialize working key
 	m_expKey.resize(keySize, 0);
 	// copy bytes to working key
-	memcpy(&wK[0], &rawKey[0], keyBytes);
+	for (size_t i = 0; i < wK.size(); ++i)
+		wK[i] = IntUtils::BytesToLe32(rawKey, i * sizeof(uint));
 
 	// sbox encoding steps
 	for (uint i = 0; i < k64Cnt; i++)

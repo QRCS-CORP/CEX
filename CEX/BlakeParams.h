@@ -241,14 +241,14 @@ public:
 		if (sizeof(T) == sizeof(ulong))
 		{
 			Config[0] = m_outputSize;
-			Config[0] |= m_keyLen << 8;
-			Config[0] |= m_fanOut << 16;
-			Config[0] |= m_maxDepth << 24;
-			Config[0] |= m_leafSize << 32;
+			Config[0] |= ((ulong)m_keyLen << 8);
+			Config[0] |= ((ulong)m_fanOut << 16);
+			Config[0] |= ((ulong)m_maxDepth << 24);
+			Config[0] |= ((ulong)m_leafSize << 32);
 			Config[1] = m_nodeOffset;
 			Config[2] = m_nodeDepth;
-			Config[2] |= m_innerLen << 8;
-			Config[2] |= m_reserved << 16;
+			Config[2] |= ((ulong)m_innerLen << 8);
+			Config[2] |= ((ulong)m_reserved << 16);
 
 			for (size_t i = 3; i < Config.size(); ++i)
 				Config[i] = IntUtils::BytesToLe64(m_dstCode, (i - 3) * sizeof(ulong));
@@ -256,13 +256,13 @@ public:
 		else
 		{
 			Config[0] = m_outputSize;
-			Config[0] |= m_keyLen << 8;
-			Config[0] |= m_fanOut << 16;
-			Config[0] |= m_maxDepth << 24;
+			Config[0] |= ((uint)m_keyLen << 8);
+			Config[0] |= ((uint)m_fanOut << 16);
+			Config[0] |= ((uint)m_maxDepth << 24);
 			Config[1] = m_leafSize;
 			Config[2] = m_nodeOffset;
-			Config[3] |= m_nodeDepth << 16;
-			Config[3] |= m_innerLen << 24;
+			Config[3] |= ((uint)m_nodeDepth << 16);
+			Config[3] |= ((uint)m_innerLen << 24);
 			Config[4] = m_reserved;
 
 			for (size_t i = 5; i < Config.size(); ++i)

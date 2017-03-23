@@ -22,9 +22,9 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 		case Digests::Blake256:
 			return new Digest::Blake256(Parallel);
 		case Digests::Keccak256:
-			return new Digest::Keccak256();
+			return new Digest::Keccak256(Parallel);
 		case Digests::Keccak512:
-			return new Digest::Keccak512();
+			return new Digest::Keccak512(Parallel);
 		case Digests::SHA256:
 			return new Digest::SHA256(Parallel);
 		case Digests::SHA512:

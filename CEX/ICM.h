@@ -314,7 +314,7 @@ public:
 
 private:
 
-	void Convert(const std::vector<ulong> &Input, std::vector<byte> &Output);
+	void Convert(const std::vector<ulong> &Input, std::vector<byte> &Output, size_t OutOffset);
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<ulong> &Counter);
 	void Scope();
 	void TransformParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);

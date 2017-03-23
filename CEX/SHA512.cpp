@@ -177,7 +177,7 @@ void SHA512::Reset()
 
 		if (m_parallelProfile.IsParallel())
 		{
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<uint>(i);
 			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
 		}
 	}

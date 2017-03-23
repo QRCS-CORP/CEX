@@ -1,6 +1,7 @@
 #include "SymmetricSecureKey.h"
 #include "ArrayUtils.h"
 #include "CTR.h"
+#include "IntUtils.h"
 #include "SHA512.h"
 #include "StreamWriter.h"
 #include "StreamReader.h"
@@ -8,7 +9,6 @@
 #include "SysUtils.h"
 
 NAMESPACE_KEYSYMMETRIC
-
 
 //~~~Constructors~~~//
 
@@ -37,7 +37,7 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySa
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
+		Utility::IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
 	}
 
 	Transform();
@@ -60,7 +60,7 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
+		Utility::IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
 	}
 
 	Transform();
@@ -84,7 +84,7 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		memcpy(&m_keySalt[0], &KeySalt, sizeof(ulong));
+		Utility::IntUtils::Le64ToBytes(KeySalt, m_keySalt, 0);
 	}
 
 	Transform();

@@ -7,10 +7,10 @@ namespace Test
 {
 	void DigestSpeedTest::DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
-		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType);
+		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType, Parallel);
 		size_t bufSze = dgt->BlockSize();
 		if (Parallel)
-			bufSze = SampleSize / 8;
+			bufSze = dgt->ParallelBlockSize();
 		
 		std::vector<byte> hash(dgt->DigestSize(), 0);
 		std::vector<byte> buffer(bufSze, 0);

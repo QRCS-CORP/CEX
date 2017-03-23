@@ -84,7 +84,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint32_t prlSze = rnd.NextUInt32(PRLMIN * 2, PRLMIN * 8);
+			size_t prlSze = (size_t)rnd.NextUInt32((uint)(PRLMIN * 2), (uint)(PRLMIN * 8));
 			prlSze -= (prlSze % PRLMIN);
 			// set to parallel, but block will be too small.. processed with alternate
 			std::vector<byte> input(prlSze);

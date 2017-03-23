@@ -34,6 +34,7 @@ NAMESPACE_MAC
 
 using Enumeration::Digests;
 using Digest::IDigest;
+using Common::ParallelOptions;
 
 /// <summary>
 /// An implementation of a Hash based Message Authentication Code generator
@@ -65,7 +66,9 @@ using Digest::IDigest;
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Block size is the underlying hash functions internal block size in bytes.</description></item>
+/// <item><description>This implementation can utilize a parallelized digest instance for multi-threaded Mac calculations.</description></item>
+/// <item><description>If the Parallel parameter of the constructor is set to true, or a parallelized digest instance is loaded, passing an input block of ParallelBlockSize bytes will be processed in parallel.</description></item>
+/// <item><description>Sequential mode block size is the underlying hash functions internal block size in bytes.</description></item>
 /// <item><description>Digest size is the hash functions output code size in bytes.</description></item>
 /// <item><description>The key size should be equal or greater than the digests output size, and less or equal to the block-size.</description></item>
 /// <item><description>The Compute(Input, Output) method wraps the Update(Input, Offset, Length) and Finalize(Output, Offset) methods and should only be used on small to medium sized data.</description>/></item>
@@ -137,9 +140,31 @@ public:
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; };
 
 	/// <summary>
+	/// Get: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available on this system.
+	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	const bool IsParallel() { return m_msgDigest->IsParallel(); }
+
+	/// <summary>
 	/// Get: Mac generators class name
 	/// </summary>
 	virtual const std::string Name() { return "HMAC"; }
+
+	/// <summary>
+	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.<para>
+	/// </summary>
+	const size_t ParallelBlockSize() { return m_msgDigest->ParallelBlockSize(); }
+
+	/// <summary>
+	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state, or initialize the digest manually using a digest Params structure with the FanOut property set to the desired number of threads.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile() { return m_msgDigest->ParallelProfile(); }
 
 	//~~~Constructor~~~//
 
@@ -148,7 +173,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The message digest enumeration name</param>
-	explicit HMAC(Digests DigestType);
+	/// <param name="Parallel">Initialize the parallelized form of the message digest</param>
+	explicit HMAC(Digests DigestType, bool Parallel = false);
 
 	/// <summary>
 	/// Initialize the class
@@ -203,6 +229,17 @@ public:
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
 	virtual void Initialize(ISymmetricKey &KeyParams);
+
+	/// <summary>
+	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
+	/// <para>Thread count must be an even number, and not exceed the number of processor cores.
+	/// Changing this value from the default (8 threads), will change the output hash value.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
+	void ParallelMaxDegree(size_t Degree);
 
 	/// <summary>
 	/// Reset to the default state; Mac must be re-initialized after this call

@@ -378,12 +378,11 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 	key1 = _mm_xor_si128(key1, _mm_slli_si128(key1, 4));
 	key1 = _mm_xor_si128(key1, _mm_slli_si128(key1, 4));
 	key1 = _mm_xor_si128(key1, KR);
-
 	*K1 = key1;
 
-	memcpy(((byte*)m_expKey.data() + Offset), &key1, 16);
+	memcpy(((byte*)Key.data() + Offset), &key1, 16);
 
-	if (Offset == 192 && Key.size() == 13)
+	if (Offset == 192 && Key.size() == 13) // TODO: timing?
 		return;
 
 	key2 = _mm_xor_si128(key2, _mm_slli_si128(key2, 4));
@@ -391,12 +390,12 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 	*K2 = key2;
 
 	Offset += 16;
-	uint tmp = _mm_cvtsi128_si32(key2);
-
-	memcpy((byte*)m_expKey.data() + Offset, &tmp, 4);
+	std::vector<byte> tmpB(4);
+	IntUtils::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
+	memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 	Offset += 4;
-	tmp = _mm_cvtsi128_si32(_mm_srli_si128(key2, 4));
-	memcpy((byte*)m_expKey.data() + Offset, &tmp, 4);
+	IntUtils::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
+	memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 }
 
 void AHX::ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset)

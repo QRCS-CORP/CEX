@@ -6,9 +6,9 @@ NAMESPACE_MAC
 
 //~~~Constructor~~~//
 
-HMAC::HMAC(Digests DigestType)
+HMAC::HMAC(Digests DigestType, bool Parallel)
 	:
-	m_msgDigest(Helper::DigestFromName::GetInstance(DigestType)),
+	m_msgDigest(Helper::DigestFromName::GetInstance(DigestType, Parallel)),
 	m_destroyEngine(true),
 	m_inputPad(m_msgDigest->BlockSize()),
 	m_isDestroyed(false),
@@ -131,6 +131,18 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 	m_msgDigest->Update(m_inputPad, 0, m_inputPad.size());
 
 	m_isInitialized = true;
+}
+
+void HMAC::ParallelMaxDegree(size_t Degree)
+{
+	try
+	{
+		m_msgDigest->ParallelMaxDegree(Degree);
+	}
+	catch (...)
+	{
+		throw CryptoMacException("HMAC:ParallelMaxDegree", "The Degree value must be a non-zero even number less than the number of processor cores!");
+	}
 }
 
 void HMAC::Reset()

@@ -72,13 +72,13 @@ private:
 	const size_t BUFFER_DEF = 4096;
 	const size_t BUFFER_MIN = 64;
 
-	std::vector<byte> m_byteBuffer;
 	size_t m_bufferIndex;
 	size_t m_bufferSize = 0;
 	bool m_isDestroyed;
 	BlockCiphers m_engineType;
 	Drbg::CMG* m_rngGenerator;
 	Providers m_pvdType;
+	std::vector<byte> m_rngBuffer;
 	std::vector<byte>  m_stateSeed;
 
 public:

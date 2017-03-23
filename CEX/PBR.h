@@ -65,10 +65,10 @@ private:
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
-	std::vector<byte> m_byteBuffer;
 	size_t m_digestIterations;
 	Digests m_digestType;
 	bool m_isDestroyed;
+	std::vector<byte> m_rngBuffer;
 	Kdf::PBKDF2* m_rngGenerator;
 	std::vector<byte> m_stateSeed;
 

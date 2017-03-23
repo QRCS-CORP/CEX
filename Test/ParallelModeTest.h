@@ -32,7 +32,7 @@ namespace Test
 
 		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_katExpected;
-		unsigned int m_processorCount;
+		size_t m_processorCount;
 		bool m_hasAESNI;
 		bool m_hasSSE;
 

@@ -267,8 +267,10 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 	gen.Generate(rawKey);
 	// initialize working key
 	m_expKey.resize(keySize, 0);
+
 	// copy bytes to working key
-	memcpy(&m_expKey[0], &rawKey[0], keyBytes);
+	for (size_t i = 0; i < m_expKey.size(); ++i)
+		m_expKey[i] = IntUtils::BytesToLe32(rawKey, i * sizeof(uint));
 }
 
 void RHX::StandardExpand(const std::vector<byte> &Key)

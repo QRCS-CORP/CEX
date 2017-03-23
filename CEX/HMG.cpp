@@ -239,7 +239,7 @@ void HMG::Derive(const std::vector<byte> &Seed)
 	{
 		size_t keyRmd = IntUtils::Min(macCode.size(), keyLen);
 		// 1) increment seed counter by key-bytes copied
-		Increase(m_seedCtr, keyRmd);
+		Increase(m_seedCtr, static_cast<uint>(keyRmd));
 		// 2) process the seed counter
 		m_hmacEngine.Update(m_seedCtr, 0, m_seedCtr.size());
 		// 3) process the seed
@@ -272,7 +272,7 @@ void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 	{
 		size_t rmdLen = IntUtils::Min(m_hmacState.size(), prcLen);
 		// 1) increase state counter by output-bytes generated
-		Increase(m_stateCtr, rmdLen);
+		Increase(m_stateCtr, static_cast<uint>(rmdLen));
 		// 2) process the state counter
 		m_hmacEngine.Update(m_stateCtr, 0, m_stateCtr.size());
 		// 3) process the current state
@@ -290,11 +290,11 @@ void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 	while (prcLen != 0);
 }
 
-void HMG::Increase(std::vector<byte> &Counter, const size_t Value)
+void HMG::Increase(std::vector<byte> &Counter, const uint Length)
 {
 	const size_t CTRSZE = Counter.size() - 1;
-	std::vector<byte> ctrInc(sizeof(Value));
-	memcpy(&ctrInc[0], &Value, ctrInc.size());
+	std::vector<byte> ctrInc(sizeof(uint));
+	IntUtils::Le32ToBytes(Length, ctrInc, 0);
 	byte carry = 0;
 
 	for (size_t i = CTRSZE; i > 0; --i)

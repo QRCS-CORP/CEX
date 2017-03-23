@@ -260,7 +260,7 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			memcpy(&m_msgBuffer[i * BLOCK_SIZE], &mkey[0], mkey.size());
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i]);
 		}
 		m_msgLength = m_parallelProfile.ParallelMinimumSize();
@@ -308,7 +308,7 @@ void Blake512::Reset()
 	{
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
-			m_treeParams.NodeOffset() = i;
+			m_treeParams.NodeOffset() = static_cast<byte>(i);
 			LoadState(m_dgtState[i]);
 		}
 		m_treeParams.NodeOffset() = 0;
@@ -448,7 +448,7 @@ void Blake512::LoadState(Blake2bState &State)
 	memset(&State.F[0], 0, FLAG_SIZE * sizeof(ulong));
 	memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(ulong));
 
-	m_treeParams.GetConfig(m_treeConfig);
+	m_treeParams.GetConfig<ulong>(m_treeConfig);
 	IntUtils::XORULL512(m_treeConfig, 0, State.H, 0, m_parallelProfile.SimdProfile());
 }
 
