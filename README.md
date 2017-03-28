@@ -21,9 +21,9 @@ The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, 
 
 * The asymmetric cipher framework
 
-### Release 1.1.0.1 
-** RingLWE
-*** RLWE-SIG
+### Release 1.1.0.1
+* RingLWE
+* RLWE-SIG
 * McEliece
 * GMSS
 * RSA-Sig
