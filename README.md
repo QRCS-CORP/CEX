@@ -11,6 +11,8 @@ This library is being built in two stages; the symmetric cryptography, which con
 That work is still evolving however, as improvments and additions to the symmetric cryptography will continue throughout the libraries lifetime.
 The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and the next release will have the first asymmetric cipher (RingLWE) and asymmetric framework.
 
+The Win folder contains a visual studio test project, which tests each cipher and protocol with it's official test vectors, and has a set of digest and symmetric cipher speed tests.
+
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
 ## Roadmap
