@@ -16,33 +16,33 @@ The second half will be the addition of asymmetric cryptography, with a strong f
 The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, patch, and release codes.
  
 ### Release 1.0.0.2 (version A2):
-The RingLWE asymmetric cipher
-The RLWE-SIG asymmetric signature scheme
+* The RingLWE asymmetric cipher
+* The RLWE-SIG asymmetric signature scheme
 
-The asymmetric cipher framework
+* The asymmetric cipher framework
 
 ### Release 1.1.0.1 
 
-RingLWE 
+* RingLWE 
 
-RLWE-SIG 
+* RLWE-SIG 
 
-McEliece 
-GMSS 
+* McEliece 
+* GMSS 
 
-RSA-Sig
+* RSA-Sig
 
 ### Release 1.2.0.1
 
-Cross platform Networking
+* Cross platform Networking
 
-TLS
+* TLS
 
-STM-KEX
+* STM-KEX
 
-Android/iOS/Linux Compatability
+* Android/iOS/Linux Compatability
 
-DLL API
+* DLL API
 
 ## Updates
 
