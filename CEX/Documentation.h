@@ -9,28 +9,43 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 0.14.0.3 (M2).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.1 (A1).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>0.14.0.3</B> (M version), which are the major, minor, patch, and release codes.<BR></BR>
+The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, patch, and release codes. \n
 \brief
-Scheduled for release <B>1.0.0.1</B> (version M):<BR></BR>
-Keccak Tree Hashing and Digests review<BR></BR>
-Secure Vector implementation<BR></BR>
-SCRYPT<BR></BR>
+
+<B>Release 1.0.0.2 (version A2):</B> \n
+The RingLWE asymmetric cipher \n
+The RLWE-SIG asymmetric signature scheme \n
+The asymmetric cipher framework \n  \n
+
+<B>Release 1.1.0.1</B> \n
+RingLWE \n
+RLWE-SIG \n
+McEliece \n
+GMSS \n
+RSA-Sig \n \n
+
+<B>Release 1.2.0.1</B> \n
+Networking \n
+TLS \n
+STM-KEX \n
+Android/iOS/Linux Compatability \n
+DLL API \n
 
 \author    John Underhill
-\version   0.14.0.3
-\date      March 21, 2017
+\version   1.0.0.1
+\date      March 30, 2017
 \copyright GPL version 3 license (GPLv3)
 
 \section intro_link Links
-The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html <BR></BR>
-CEX++ on Github: https://github.com/Steppenwolfe65/CEX <BR></BR>
-CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET <BR></BR>
+The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html  \n
+CEX++ on Github: https://github.com/Steppenwolfe65/CEX  \n
+CEX .NET on Github: https://github.com/Steppenwolfe65/CEX-NET  \n
 The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 */
 // end doxygen main //
@@ -157,6 +172,7 @@ NAMESPACE_ROOT
 		class IDigest {};
 		class Keccak256 {};
 		class Keccak512 {};
+		class KeccakParams {};
 		class SHA256 {};
 		class SHA512 {};
 		class SHA2Params {};
@@ -271,6 +287,7 @@ NAMESPACE_ROOT
 		class IKdf {};
 		class KDF2 {};
 		class PBKDF2 {};
+		class SCRYPT {};
 	NAMESPACE_KDFEND
 	/*! @} */
 

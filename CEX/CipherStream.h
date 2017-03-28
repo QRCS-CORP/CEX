@@ -124,11 +124,11 @@ using Enumeration::SymmetricEngines;
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>The CipherStream class is an easy to use wrapper that initializes and operates a symmetric cipher, automating many complex tasks down to just a couple of methods, 
-/// in an extensible ease of use pattern.<BR></BR>
-/// Either a block cipher and mode, or a stream cipher can be initialized through the classes constructor, using either the cipher (and options) enumeration members, or a cipher instance.<BR></BR>
-/// The CipherStream class uses the IByteStream interface, and can encrypt either a byte array using MemoryStream, or a file with FileStream.<BR></BR>
-/// This class supports parallel processing; if the cipher configuration supports parallelism (CTR/ICM, and CBC/CFB Decrypt), the IsParallel property will be set to true.<BR></BR>
-/// The IsParallel property can be overridden and set to false, disabling parallel processing.<BR></BR>
+/// in an extensible ease of use pattern. \n
+/// Either a block cipher and mode, or a stream cipher can be initialized through the classes constructor, using either the cipher (and options) enumeration members, or a cipher instance. \n
+/// The CipherStream class uses the IByteStream interface, and can encrypt either a byte array using MemoryStream, or a file with FileStream. \n
+/// This class supports parallel processing; if the cipher configuration supports parallelism (CTR/ICM, and CBC/CFB Decrypt), the IsParallel property will be set to true. \n
+/// The IsParallel property can be overridden and set to false, disabling parallel processing. \n
 /// If using the byte array Write method, the output array should be at least ParallelBlockSize in length to enable parallel processing.</para>
 ///
 /// <description><B>Implementation Notes:</B></description>

@@ -47,23 +47,23 @@ NAMESPACE_MODE
 ///
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>Output Feedback Mode (OFB) is a similar construction to the CFB mode, and allows encryption of various block sizes.<BR></BR>
-/// It differs in that the output of the encryption block function, (rather than the ciphertext), serves as the feedback register.<BR></BR>
-/// The cipher is initialized by copying the initialization vector to an internal register, prepended by zeroes.<BR></BR>
-/// During a transformation, this register is encrypted by the underlying cipher into a buffer, the buffer is then XOR'd with the input message block to produce the ciphertext.<BR></BR>
+/// <para>Output Feedback Mode (OFB) is a similar construction to the CFB mode, and allows encryption of various block sizes. \n
+/// It differs in that the output of the encryption block function, (rather than the ciphertext), serves as the feedback register. \n
+/// The cipher is initialized by copying the initialization vector to an internal register, prepended by zeroes. \n
+/// During a transformation, this register is encrypted by the underlying cipher into a buffer, the buffer is then XOR'd with the input message block to produce the ciphertext. \n
 /// The vector block is then rotated so that the latter half of the vector is shifted to the start of the array, and the buffer is moved to the end of the array.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
-/// C=ciphertext, P=plaintext, K=key, E=encrypt, ^=XOR<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// I1 ← IV. For 1 ≤ j ≤ u, given plaintext block Pj:<BR></BR>
-/// (a) Oj ← EK(Ij). -Compute the block cipher output.<BR></BR>
-/// (b) Tj ← the r leftmost bits of Oj. -Assume the leftmost is identified as bit 1.<BR></BR>
-/// (c) Cj ← Pj ^ Tj. -Transmit the r-bit ciphertext block Cj.<BR></BR>
-/// (d) Ij+1 ← 2r · Ij + Tj mod 2n. -Update the block cipher input for the next block.<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
-/// I1 ← IV . For 1 ≤ j ≤ u, upon receiving Cj:<BR></BR>
+/// <para><EM>Legend:</EM> \n 
+/// C=ciphertext, P=plaintext, K=key, E=encrypt, ^=XOR \n
+/// <EM>Encryption</EM> \n
+/// I1 ← IV. For 1 ≤ j ≤ u, given plaintext block Pj: \n
+/// (a) Oj ← EK(Ij). -Compute the block cipher output. \n
+/// (b) Tj ← the r leftmost bits of Oj. -Assume the leftmost is identified as bit 1. \n
+/// (c) Cj ← Pj ^ Tj. -Transmit the r-bit ciphertext block Cj. \n
+/// (d) Ij+1 ← 2r · Ij + Tj mod 2n. -Update the block cipher input for the next block. \n
+/// <EM>Decryption</EM> \n
+/// I1 ← IV . For 1 ≤ j ≤ u, upon receiving Cj: \n
 /// Pj ← Cj ^ Tj, where Tj, Oj, and Ij are computed as an encryption cycle; K(C).</para>
 ///
 /// <description><B>Implementation Notes:</B></description>

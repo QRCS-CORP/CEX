@@ -62,32 +62,32 @@ NAMESPACE_MODE
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The Cipher Block Chaining cipher mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output.<BR></BR>
+/// <para>The Cipher Block Chaining cipher mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output. \n
 /// The mechanism used in CBC mode can be described as XOR chaining of message input blocks; the first block is XOR'd with the initialization vector, then encrypted with the underlying symmetric cipher.
-/// The second block is XOR'd with the first encrypted block, then encrypted, and all subsequent blocks follow this pattern.<BR></BR>
+/// The second block is XOR'd with the first encrypted block, then encrypted, and all subsequent blocks follow this pattern. \n
 /// The decryption function follows the reverse pattern; the block is decrypted with the symmetric cipher, and then XOR'd with the ciphertext from the previous block to produce the plain-text.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>^</B>=XOR<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// C0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj−1 ^ Pj).<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
+/// <para><EM>Legend:</EM> \n 
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>^</B>=XOR \n
+/// <EM>Encryption</EM> \n
+/// C0 ← IV. For 1 ≤ j ≤ t, Cj ← EK(Cj−1 ^ Pj). \n
+/// <EM>Decryption</EM> \n
 /// C0 ← IV. For 1 ≤ j ≤ t, Pj ← Cj−1 ^ E<SUP>−1</SUP>K(Cj).</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The encryption function of the CBC mode is limited by its dependency chain; that is, each block relies on information from the previous block, and so can not be multi-threaded.
-/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores.<BR></BR>
-/// This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.<BR></BR> 
+/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores. \n
+/// This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads. \n 
 /// The CBC parallel decryption mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread
 /// uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</para>
 ///
 /// <description><B>CBC-WBV:</B></description>
-/// <para>Wide Block Vectorization is an extension of the standard CBC mode. Instead of processing a single 16 byte block of input, WBV processes 4 or 8 blocks concurrently using SIMD instructions.<BR></BR>
-/// The underlying block cipher contains the functions Transform64() and Transform128(), which use parallel instructions (SSE3 or AVX dedending on runtime availability), to process multiple input blocks simultaneously.<BR></BR>
-/// This has two adavantages; the first being that if the longer initialization vector is secure (64 or 128 bytes), there is a corresponding increase in security. The second advantage is performance.<BR></BR>
+/// <para>Wide Block Vectorization is an extension of the standard CBC mode. Instead of processing a single 16 byte block of input, WBV processes 4 or 8 blocks concurrently using SIMD instructions. \n
+/// The underlying block cipher contains the functions Transform64() and Transform128(), which use parallel instructions (SSE3 or AVX dedending on runtime availability), to process multiple input blocks simultaneously. \n
+/// This has two adavantages; the first being that if the longer initialization vector is secure (64 or 128 bytes), there is a corresponding increase in security. The second advantage is performance. \n
 /// Even if a mode is limited by dependency chaining, like the encryption function of the CBC mode, it can still be parallelized using this method, processing input several times faster than the standard 
-/// sequential mode configuration.<BR></BR>
+/// sequential mode configuration. \n
 /// Just as with the standard block size, the decryption function is multi-threaded, maximizing the potential throughput of this extended mode.</para>
 ///
 /// <description><B>Implementation Notes:</B></description>

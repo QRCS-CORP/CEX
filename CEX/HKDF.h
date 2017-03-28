@@ -59,33 +59,33 @@ using Mac::HMAC;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>HKDF uses an HMAC as a pseudo random function to produce pseudo-random output in a process known as key stretching.<BR></BR>
-/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo random key.<BR></BR>
-/// The Extract step is called if the the KDF is initialized with the salt or info parameters, this compresses the input material to a key used by the HMAC.<BR></BR>
-/// The Info parameter may also be set via the Info() property, this can be used to bypass the extract step, while adding additional input to the HMAC compression cycle.<BR></BR>
+/// <para>HKDF uses an HMAC as a pseudo random function to produce pseudo-random output in a process known as key stretching. \n
+/// HKDF has two primary functions; Expand, which expands an input key into a larger key, and Extract, which pre-compresses key and optional salt and info parameters into a pseudo random key. \n
+/// The Extract step is called if the the KDF is initialized with the salt or info parameters, this compresses the input material to a key used by the HMAC. \n
+/// The Info parameter may also be set via the Info() property, this can be used to bypass the extract step, while adding additional input to the HMAC compression cycle. \n
 /// For best possible security, the Extract step should be skipped, the KDF is initialized with a key equal in size to the hash functions internal block-size, 
-/// and the Info parameter is used as a secondary source of pseudo-random key input.<BR></BR>
-/// If used in this configuration, the Info parameter should be sized to the hash block-size, less one byte of counter, and any padding added by the hash functions finalizer.<BR></BR>
+/// and the Info parameter is used as a secondary source of pseudo-random key input. \n
+/// If used in this configuration, the Info parameter should be sized to the hash block-size, less one byte of counter, and any padding added by the hash functions finalizer. \n
 /// Using this formula the HMAC is given the maximum amount of entropy on each expansion cycle, and the underlying hash function processes only full blocks of input.</para>
 /// 
-/// <description><B>Description:</B></description><BR></BR>
-/// <EM>Legend:</EM><BR></BR>
-/// <B>PRK</B>=pseudorandom key, <B>info</B>=info-string, <B>OKM</B>=output-key, <B>L</B>=output-length<BR></BR>
-/// <para><EM>Extract:</EM><BR></BR>
+/// <description><B>Description:</B></description> \n
+/// <EM>Legend:</EM> \n
+/// <B>PRK</B>=pseudorandom key, <B>info</B>=info-string, <B>OKM</B>=output-key, <B>L</B>=output-length \n
+/// <para><EM>Extract:</EM> \n
 /// PRK = HMAC-Hash(salt, Info)</para>
 ///
-/// <para><EM>Expand:</EM><BR></BR>
-/// The output OKM is calculated as follows:<BR></BR>
-/// N = ceil(L/HashLen)<BR></BR>
-/// T = T(1) | T(2) | T(3) | ... | T(N)<BR></BR>
-///	OKM = first L octets of T<BR></BR>
-///	where:<BR></BR>
-///	T(0) = empty string (zero length)<BR></BR>
-///	T(1) = HMAC-Hash(PRK, T(0) | info | 0x01)<BR></BR>
-///	T(2) = HMAC-Hash(PRK, T(1) | info | 0x02)<BR></BR>
-///	T(3) = HMAC-Hash(PRK, T(2) | info | 0x03)<BR></BR>
-///	T(N) = HMAC-Hash(PRK, T(N) | info | N)<BR></BR>
-///	...<BR></BR>
+/// <para><EM>Expand:</EM> \n
+/// The output OKM is calculated as follows: \n
+/// N = ceil(L/HashLen) \n
+/// T = T(1) | T(2) | T(3) | ... | T(N) \n
+///	OKM = first L octets of T \n
+///	where: \n
+///	T(0) = empty string (zero length) \n
+///	T(1) = HMAC-Hash(PRK, T(0) | info | 0x01) \n
+///	T(2) = HMAC-Hash(PRK, T(1) | info | 0x02) \n
+///	T(3) = HMAC-Hash(PRK, T(2) | info | 0x03) \n
+///	T(N) = HMAC-Hash(PRK, T(N) | info | N) \n
+///	... \n
 ///	The constant concatenated to the end of each T(n) is a single octet counter.</para>
 ///
 /// <description><B>Implementation Notes:</B></description>

@@ -263,7 +263,7 @@ public:
 
 	/// <summary>
 	/// Create a deep copy of this structure.
-	/// <para>Caller must delete this object.</pare>
+	/// <para>Caller must delete this object.</para>
 	/// </summary>
 	/// 
 	/// <returns>A pointer to a copy of this SkeinParams structure</returns>

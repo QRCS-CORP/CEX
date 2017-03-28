@@ -108,8 +108,6 @@ size_t PBKDF2::Generate(std::vector<byte> &Output)
 		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
 	if (Output.size() == 0)
 		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
-	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
-		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 
 	return Expand(Output, 0, Output.size());
 }
@@ -120,8 +118,6 @@ size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 		throw CryptoKdfException("PBKDF2:Generate", "The generator must be initialized before use!");
 	if ((Output.size() - Length) < OutOffset)
 		throw CryptoKdfException("PBKDF2:Generate", "Output buffer too small!");
-	if (m_kdfCounter + (Length / m_macSize) > 255)
-		throw CryptoKdfException("PBKDF2:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 
 	return Expand(Output, OutOffset, Length);
 }
@@ -221,9 +217,6 @@ void PBKDF2::Reset()
 
 size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (m_kdfCounter + (Length / m_macSize) > 255)
-		throw CryptoKdfException("PBKDF2:Expand", "Maximum length value is 255 * the digest return size!");
-
 	size_t prcLen = Length;
 
 	do

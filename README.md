@@ -3,14 +3,56 @@ The CEX Cryptographic library in C++
 
 ## Intro
 ### Welcome
-Firstly, in it's current form, consider this as just a workspace for a personal project; it is constantly changing, and not officially published, or particularly stable.
-This is also currently limited to being a Windows library only; some writing has been done anticipating future compatability with Linux, Android, and iOS, though it is not currently tested.
+CEX is being written from the ground-up as a powerful and accessable post-quantum secure cryptographic library; a flexible security model, performance-oriented, designed for ease of use, automation of complex tasks, and the ability to upwardly adjust the security of the contained encryption protocols.
+Through the use of simplified controls, the strict enforcement of key sizes and security minimums, and the automation of complex error-prone tasks, the application of cryptography can be greatly simplified. Whether it is encrypting a local file, or establishing a secure communications channel, the application developer requires a set of simple but flexible controls to guarantee a correct implementation.
 
-The library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs etc. This should be completed in early 2017. The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. When I feel the first half of the library is complete, (well, stable anyways..), I'll write an article about it, and post the link here.
+There are some new ideas, and new technologies, as I intend to push the envelope a little, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
 
-All that aside, this has come a long way since the initial translation of the C# library posted here last spring; there are many additions and improvements including some very fast, very powerful symmetric cipher implementations. There are some new ideas, and new technologies, as I intend to push the envelope a little, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
+This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
+That work is still evolving however, as improvments and additions to the symmetric cryptography will continue throughout the libraries lifetime.
+The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and the next release will have the first asymmetric cipher (RingLWE) and asymmetric framework.
+
+## Roadmap
+The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, patch, and release codes.
+ 
+### Release 1.0.0.2 (version A2):
+The RingLWE asymmetric cipher
+The RLWE-SIG asymmetric signature scheme
+
+The asymmetric cipher framework
+
+### Release 1.1.0.1 
+
+RingLWE 
+
+RLWE-SIG 
+
+McEliece 
+GMSS 
+
+RSA-Sig
+
+### Release 1.2.0.1
+
+Cross platform Networking
+
+TLS
+
+STM-KEX
+
+Android/iOS/Linux Compatability
+
+DLL API
 
 ## Updates
+
+### Version 1.0: March 28, 2017
+The first official release of the library, (ciphers and protocols are now tested, documented, and ready for deployment).
+* Completed Code and Help review cycles.
+* Added multi-threaded Tree Hashing to all Skein and Keccak digest implementations.
+* Added SIMD parallelization to Skein512.
+* Rewrote SHA-2 paralellized tree hashing and added support for the SHA-NI SIMD to SHA-256.
+* Added a multi-threaded and SIMD parallelized implementation of the SCRYPT key derivation function.
 
 ### Version 0.14: February 26, 2017
 * Added pipelined and parallelized EAX, GCM, and OCB authenticated cipher modes
@@ -83,7 +125,6 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
 ##### Introduction to CEX++ 0.14: http://www.vtdev.com/CEX-Plus/CEX_0.14.pdf
 ##### CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 ##### API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html 
-##### Homepage: http://www.vtdev.com/cexhome.html
 
 ## Disclaimer
 This project contains strong cryptography, before downloading the source files, 

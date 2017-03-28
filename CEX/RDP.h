@@ -20,12 +20,12 @@ NAMESPACE_PROVIDER
 /// 
 /// <remarks>
 /// <para>The RdRand DRNG uses thermal noise to generate random bits that are buffered into a shift register, then fed into a CBC-MAC to condition the bytes.
-/// The output from the CBC-MAC is obtained using the RDSEED api.<BR></BR>
+/// The output from the CBC-MAC is obtained using the RDSEED api. \n
 /// To accommodate large sampling, the system has a built in CTR_DRBG, (as specified in SP800-90), which is continuously reseeded with the output from RDSEED.
-/// The output from the CTR Drbg is obtained using the RDRAND api.<BR></BR>
+/// The output from the CTR Drbg is obtained using the RDRAND api. \n
 /// There is some controversy surrounding the security of this mechanism, though the design appears to be sound, and has been reviewed by external auditors, 
-/// it is still a proprietary closed system.<BR></BR>
-/// The entropy source itself must therefore be considered to be a 'black box', a source that can not be verified directly, and so must be considered to be of low entropy value.<BR></BR>
+/// it is still a proprietary closed system. \n
+/// The entropy source itself must therefore be considered to be a 'black box', a source that can not be verified directly, and so must be considered to be of low entropy value. \n
 /// For this reason, the DRNG should not be used as the sole source of entropy when creating secret keys, but should be used in concert with other sources of entropy.</para>
 /// 
 /// <description>Guiding Publications::</description>

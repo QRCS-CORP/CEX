@@ -53,18 +53,18 @@ NAMESPACE_DIGEST
 /// 
 /// <remarks>
 /// <description>Tree Hashing Description:</description>
-/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors.<BR></BR> 
-/// The default settings are applied when using the Skein256(bool) constructor, or a manually defined configuration when using the Skein256(SkeinParams) constructor.<BR></BR>
+/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through one of the two constructors. \n 
+/// The default settings are applied when using the Skein256(bool) constructor, or a manually defined configuration when using the Skein256(SkeinParams) constructor. \n
 /// The SkeinParams structure contains property accessors that are initialized by the boolean constructor at their defaults; 
-/// Schema(83,72,65,51) OuputSize(64), Version(1), FanOut(Parallel ? 8 : 0), and LeafSize(32).<BR></BR>
+/// Schema(83,72,65,51) OuputSize(64), Version(1), FanOut(Parallel ? 8 : 0), and LeafSize(32). \n
 /// The SkeinParams structure when passed to the constructor, can be used to change the FanOut property (which corresponds to the number of threads used in parallel mode), 
-/// which must be an even number less or equal to the number of processing cores.<BR></BR>
-/// For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length.<BR></BR>
-/// The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments.<BR></BR>
-/// The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state.<BR></BR>
-/// The hash finalizer processes each leaf state as contiguous message input for the root hash; i.e. R = H(S0 || S1 || S2 || ...Sn).<BR></BR> 
-/// The FanOut accessor in a SkeinParams structure is the sum number of leaves in the sequential hash chain, the default is 8, which uses eight states/threads.<BR></BR> 
-/// Changing any of the SkeinParams values from their defaults, will produce a different hash output.<BR></BR>
+/// which must be an even number less or equal to the number of processing cores. \n
+/// For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length. \n
+/// The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments. \n
+/// The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state. \n
+/// The hash finalizer processes each leaf state as contiguous message input for the root hash; i.e. R = H(S0 || S1 || S2 || ...Sn). \n 
+/// The FanOut accessor in a SkeinParams structure is the sum number of leaves in the sequential hash chain, the default is 8, which uses eight states/threads. \n 
+/// Changing any of the SkeinParams values from their defaults, will produce a different hash output. \n
 /// The SkeinParams structure also contains an optional DistributionCode() property, which is a personalization string applied when generating the initial state (the default is zero).
 /// The personalization string can be used to create a unique distribution, in either sequential or parallel operating modes.
 /// The DistributionCodeMax() accessor provides the upper limit to the personalization strings byte-length, this size is different for each variant; (256=8, 512=40, 1024=104).</para>

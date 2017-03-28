@@ -50,67 +50,67 @@ using Enumeration::Digests;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The DCG (Digest Counter Generator) uses a hash function run in a counter mode similar to a block cipher CTR mode.<BR></BR>
-/// The design is an update to a standard hash-based counter mechanism described in NIST documentation, and implemented in the BouncyCastle DigestRandomCounter class.<BR></BR>
+/// <para>The DCG (Digest Counter Generator) uses a hash function run in a counter mode similar to a block cipher CTR mode. \n
+/// The design is an update to a standard hash-based counter mechanism described in NIST documentation, and implemented in the BouncyCastle DigestRandomCounter class. \n
 /// As described in the thesis; Security Analysis for Pseudo-Random Numbers Generators by Sylvain Ruhault, because the original mechanism lacked a source of random used to update the seed with fresh entropy,
-/// the mechanism will eventually fail due to internal state decomposition, and so should not be considered a resiliant drbg design.<BR></BR>
-/// This implementation however does provide an (optional) entropy source provider option, and so can be implemented with both Predictive and Backtracking reisitance per recommendations Section 8.8 of SP80090A revision 1.<BR></BR>
-/// The way in which the entropy provider distributes seed material is also an important design change. <BR></BR>
-/// In the original algorithm, the Generate function processes the digest seed, the state, and the state-counter to produce the new state.<BR></BR>
+/// the mechanism will eventually fail due to internal state decomposition, and so should not be considered a resiliant drbg design. \n
+/// This implementation however does provide an (optional) entropy source provider option, and so can be implemented with both Predictive and Backtracking reisitance per recommendations Section 8.8 of SP80090A revision 1. \n
+/// The way in which the entropy provider distributes seed material is also an important design change.  \n
+/// In the original algorithm, the Generate function processes the digest seed, the state, and the state-counter to produce the new state. \n
 /// In a Merkle–Damgård construction (SHA2), the finalizer appends a code to the end of the last block, (and if the block is full, it processes a block of zero-byte padding with the code), 
-/// this is compensated for by subtracting the codes length from the random padding request length when required.<BR></BR>
-/// With, for example, SHA2-512 which uses a 128 byte block size, the number of bytes processed with this configuration would be 64+64+8, leaving 120 bytes of zero-padding processed by the digests finalize function.<BR></BR>
-/// With the entropy source engaged, these empty bytes are filled with fresh entropy, ensuring that only full blocks are compressed, which in turn, should yield a more secure output.<BR></BR>
+/// this is compensated for by subtracting the codes length from the random padding request length when required. \n
+/// With, for example, SHA2-512 which uses a 128 byte block size, the number of bytes processed with this configuration would be 64+64+8, leaving 120 bytes of zero-padding processed by the digests finalize function. \n
+/// With the entropy source engaged, these empty bytes are filled with fresh entropy, ensuring that only full blocks are compressed, which in turn, should yield a more secure output. \n
 /// Another important change is in the use of the Nonce field, (either input through one of the Initialize functions directly, or as a parameter of the RngPrams key container), this field now sets the starting 
-/// count in the primary state counter.<BR></BR>
-/// The left-most 8 bytes of the Nonce are copied to the state counter, and the entire Nonce is then passed to the update function to be processed as seed material.<BR></BR>
+/// count in the primary state counter. \n
+/// The left-most 8 bytes of the Nonce are copied to the state counter, and the entire Nonce is then passed to the update function to be processed as seed material. \n
 /// The Update() function works in a similar way to the Generate() function, in that the entropy provider is used to pad the input blocks to the hash function with fresh entropy.</para>
 ///
 /// <description><B>Initialization and Update:</B></description>
 /// <para>The Initialize functions have three different parameter options: the Seed which is the primary key, 
-/// the Nonce used to initialize the internal state-counter, and the Info which is an additional source of entropy.<BR></BR>
-/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<BR></BR>
-/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator.<BR></BR>
-/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value.<BR></BR>
-/// The Update function uses the seed value to re-key the generator via the internal key derivation function.<BR></BR>
+/// the Nonce used to initialize the internal state-counter, and the Info which is an additional source of entropy. \n
+/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value. \n
+/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator. \n
+/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value. \n
+/// The Update function uses the seed value to re-key the generator via the internal key derivation function. \n
 /// The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</para>
 ///
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
+/// <para><EM>Legend:</EM> \n 
 /// <B>H<SUB>K</SUB></B>=hash_function, <B>P</B>=entropy_provider, <B>S1</B>=seed_material, <B>S2</B>=state, <B>S3</B>=seed_counter, <B>S4</B>=state_counter</para>
 /// 
-/// <para><EM>Update</EM><BR></BR>
-/// The Update function takes as input the current internal state(S1, S2, S3, S4) and an optional entropy input P; it outputs a new internal state where only S1 is updated.<BR></BR>
-/// Require: S = (S1, S2, S3, S4), I<BR></BR>
-/// Ensure: S<BR></BR>
-/// 1) S1 = H<SUB>K</SUB>(S1 || I)<BR></BR>
-/// 2) if (P) then<BR></BR>
-///      return S<SUP>0</SUP> = (S1, S2, S3, S4), P<BR></BR>
-///    else<BR></BR>
+/// <para><EM>Update</EM> \n
+/// The Update function takes as input the current internal state(S1, S2, S3, S4) and an optional entropy input P; it outputs a new internal state where only S1 is updated. \n
+/// Require: S = (S1, S2, S3, S4), I \n
+/// Ensure: S \n
+/// 1) S1 = H<SUB>K</SUB>(S1 || I) \n
+/// 2) if (P) then \n
+///      return S<SUP>0</SUP> = (S1, S2, S3, S4), P \n
+///    else \n
 ///      return S<SUP>0</SUP> = (S1, S2, S3, S4)
 /// </para>
 ///
-/// <para><EM>Generate</EM><BR></BR>
-/// Require: S = (S1, S2, S3, S4)<BR></BR>
-/// Ensure: S<BR></BR>
-/// 1) S4 = S4 + 1<BR></BR>
-/// 2) if (P) then <BR></BR>
-///      S2 = H<SUB>K</SUB>(S4 || S2 || S1 || P)<BR></BR>
-///    else <BR></BR>
-///      S2 = H<SUB>K</SUB>(S4 || S2 || S1)<BR></BR>
-/// 3) if S3 mod 10 = 0 then<BR></BR>
-/// 4) S3 = S3 + 1<BR></BR>
-/// 5) S1 = H<SUB>K</SUB>(S1 || S3)<BR></BR>
-/// 6) end if<BR></BR>
+/// <para><EM>Generate</EM> \n
+/// Require: S = (S1, S2, S3, S4) \n
+/// Ensure: S \n
+/// 1) S4 = S4 + 1 \n
+/// 2) if (P) then  \n
+///      S2 = H<SUB>K</SUB>(S4 || S2 || S1 || P) \n
+///    else  \n
+///      S2 = H<SUB>K</SUB>(S4 || S2 || S1) \n
+/// 3) if S3 mod 10 = 0 then \n
+/// 4) S3 = S3 + 1 \n
+/// 5) S1 = H<SUB>K</SUB>(S1 || S3) \n
+/// 6) end if \n
 /// 7) return S<SUP>0</SUP> = (S1, S2, S3, S4)
 /// </para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
-/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<BR></BR>
+/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator. \n
 /// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through the hash function along with the current state, 
-/// the output hash is used to reseed the generator.<BR></BR>
+/// the output hash is used to reseed the generator. \n
 /// The default interval at which this reseeding occurs is 1000 times the digest output size in bytes, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, 
-/// the seed is regenerated.<BR></BR> 
+/// the seed is regenerated. \n 
 /// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
 ///
 /// <description>Implementation Notes:</description>

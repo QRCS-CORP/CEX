@@ -36,6 +36,7 @@
 #include "RandomOutputTest.h"
 #include "RijndaelTest.h"
 #include "SalsaTest.h"
+#include "SCRYPTTest.h"
 #include "SecureStreamTest.h"
 #include "SerpentTest.h"
 #include "Sha2Test.h"
@@ -56,25 +57,26 @@ using namespace Test;
 // CipherStream rewrite	-done
 // KeyGenerator rewrite	-dome
 
-// 
 // Release 0.14.2.1
 // EAX/GCM/OCB			-done
 // GMAC					-done
 // Code review			-done
 
-// Release 1.0
+// *** 1st Official Version: March 30, 2017 ***
+//
+// Release 1.0.0.1
 // Skein Tree			-done
 // Rewrite SHA2			-done
 // Rewrite Blake2		-done
 // Keccak Tree			-done
-// srvector				-?
-// Scrypt(maybe)		-?
-// Code review			-?
+// Scrypt(maybe)		-done
+// Code review			-done
+// Help review			-done
 
-
-// *** 1.1 RoadMap ***
+// *** 1.1.0.0 RoadMap ***
 //
 // RingLWE				-?
+// RLWE-SIG				-?
 // McEliece				-?
 // GMSS					-?
 // RSA-Sig				-?
@@ -125,11 +127,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 0.14.0.3: CEX Library in C++ *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.1: CEX Library in C++  *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v0.14.0.2 (M2)                  *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.1 (A1)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      March 21, 2017                  *");
+	ConsoleUtils::WriteLine("* Date:      March 30, 2017                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -179,7 +181,7 @@ int main()
 {
 	bool hasNI = HasAESNI();
 	ConsoleUtils::SizeConsole();
-	PrintTitle();
+	PrintTitle(); 
 
 	try
 	{
@@ -238,6 +240,7 @@ int main()
 			RunTest(new HKDFTest());
 			RunTest(new KDF2Test());
 			RunTest(new PBKDF2Test());
+			RunTest(new SCRYPTTest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new CMGTest());
 			RunTest(new DCGTest());
@@ -262,20 +265,19 @@ int main()
 		}
 		else
 		{
-			ConsoleUtils::WriteLine("Speed tests were Cancelled..");
+			ConsoleUtils::WriteLine("Cipher Speed tests were Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
 
-		// digests are being rewritten, so this can wait..
 		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
 		{
 			RunTest(new DigestSpeedTest());
 		}
 		else
 		{
-			ConsoleUtils::WriteLine("Speed tests were Cancelled..");
+			ConsoleUtils::WriteLine("Digest Speed tests were Cancelled..");
 		}
-		ConsoleUtils::WriteLine("");/**/
+		ConsoleUtils::WriteLine("");
 
 		PrintHeader("Completed! Press any key to close..", "");
 		GetResponse();

@@ -356,6 +356,9 @@
     <ClInclude Include="..\..\Test\GMACTest.h">
       <Filter>Header Files\Test\MacTest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\SCRYPTTest.h">
+      <Filter>Header Files\Test\KdfTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -465,6 +468,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\GMACTest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SCRYPTTest.cpp">
+      <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -20,9 +20,9 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\ulong256.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\x923.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\zeropad.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\keccak512.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\ocb.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\paralleloptions.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\scrypt.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\securestream.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\sha256.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\sha512.obj
@@ -40,7 +40,6 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\pbkdf2.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\pbr.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\pkcs7.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\dcr.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\digestfromname.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\digeststream.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\drbgfromname.obj
@@ -60,7 +59,7 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\kdffromname.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\keccak.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\keccak256.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\arrayutils.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\keccak512.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\bitconverter.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\blake256.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\blake512.obj
@@ -80,7 +79,9 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\stati
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\ctr.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\cmg.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\dcg.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\dcr.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\ahx.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\arrayutils.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\cex.lib
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\cex.pdb
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\static\debug\cex.tlog\cl.command.1.tlog

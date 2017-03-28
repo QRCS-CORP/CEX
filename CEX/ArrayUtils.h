@@ -200,6 +200,25 @@ public:
 	}
 
 	/// <summary>
+	/// Copy integers between arrays
+	/// </summary>
+	/// 
+	/// <param name="Input">The source array</param>
+	/// <param name="InOffset">The input array starting offset</param>
+	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">The destination array starting offset</param>
+	/// <param name="Elements">The number of array elements to copy</param>
+	template <typename T>
+	static void Copy(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Elements)
+	{
+		if (Output.size() - OutOffset < Elements)
+			Output.resize(OutOffset + Elements);
+
+		for (size_t i = 0; i < Elements; ++i)
+			Output[OutOffset + i] = Input[InOffset + i];
+	}
+
+	/// <summary>
 	/// Return true if the char array contains the value
 	/// </summary>
 	/// 

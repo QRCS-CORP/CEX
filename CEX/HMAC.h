@@ -53,16 +53,16 @@ using Common::ParallelOptions;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>A keyed Hash Message Authentication Code (HMAC) uses a cryptographic hash function with a secret key to verify data integrity and authenticate a message.<BR></BR>
+/// <para>A keyed Hash Message Authentication Code (HMAC) uses a cryptographic hash function with a secret key to verify data integrity and authenticate a message. \n
 /// Any cryptographic hash function may be used in the calculation of an HMAC, including any of the hash functions implemented in this library. 
 /// The cryptographic strength of the HMAC depends upon the strength of the underlying hash function, the size of its hash output, and on the size and quality of the key.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
-/// <B>H</B>=hash-function, <B>K</B>=key, <B>K'</B>=derived-key, <B>m</B>=message, <B>^</B>=XOR, <B>||</B>=concatonate<BR></BR>
-/// <EM>Generate</EM><BR></BR>
-/// Where opad is the outer padding (0x5c...5c), and ipad is the inner padding (0x36...36), and K' is a secret key, derived from key K.<BR></BR>
-/// HMAC(K,m) = H((K' ^ opad) || H(K' ^ ipad) || m))</para><BR></BR>
+/// <para><EM>Legend:</EM> \n 
+/// <B>H</B>=hash-function, <B>K</B>=key, <B>K'</B>=derived-key, <B>m</B>=message, <B>^</B>=XOR, <B>||</B>=concatonate \n
+/// <EM>Generate</EM> \n
+/// Where opad is the outer padding (0x5c...5c), and ipad is the inner padding (0x36...36), and K' is a secret key, derived from key K. \n
+/// HMAC(K,m) = H((K' ^ opad) || H(K' ^ ipad) || m))</para> \n
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">

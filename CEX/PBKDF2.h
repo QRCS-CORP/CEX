@@ -56,21 +56,21 @@ using Mac::HMAC;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>PBKDF2 uses an HMAC as a pseudo random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching.<BR></BR>
-/// By increasing the number of iterations in which the function is applied, the amount of time required to derive the key becomes more computationally expensive.<BR></BR>
+/// <para>PBKDF2 uses an HMAC as a pseudo random function to process a passphrase repeatedly, producing pseudo-random output in a process known as key stretching. \n
+/// By increasing the number of iterations in which the function is applied, the amount of time required to derive the key becomes more computationally expensive. \n
 /// A salt value can be added to the passphrase, this strongly mitigates rainbow-table based attacks on the passphrase.</para>
 /// 
-/// <description><B>Description:</B></description><BR></BR>
-/// <EM>Legend:</EM><BR></BR>
-/// <B>DK</B>=derived-key, <B>c</B>=iterations, <B>hlen</B>=digest-length, <B>dkLen</B>=output-length<BR></BR>
-/// <para><EM>Generate:</EM><BR></BR>
+/// <description><B>Description:</B></description> \n
+/// <EM>Legend:</EM> \n
+/// <B>DK</B>=derived-key, <B>c</B>=iterations, <B>hlen</B>=digest-length, <B>dkLen</B>=output-length \n
+/// <para><EM>Generate:</EM> \n
 /// The function takes as parameters the passphrase, salt, the iterations count, and the output length.
-/// DK = PBKDF2(Password, Salt, c, dkLen).<BR></BR>
-/// DK = T1 || T2 || ... || Td klen/hlen<BR></BR>
-/// The function F is the XOR of (c) iterations of chained PRFs<BR></BR>
-/// The first iteration uses the password as the PRF key and salt concatenated with an incrementing counter (i).<BR></BR>
-/// Ti = F(Password, Salt, c, i)<BR></BR>
-/// Subsequent iterations use the passphrase as the key and the output of the previous computation as the salt.<BR></BR>
+/// DK = PBKDF2(Password, Salt, c, dkLen). \n
+/// DK = T1 || T2 || ... || Td klen/hlen \n
+/// The function F is the XOR of (c) iterations of chained PRFs \n
+/// The first iteration uses the password as the PRF key and salt concatenated with an incrementing counter (i). \n
+/// Ti = F(Password, Salt, c, i) \n
+/// Subsequent iterations use the passphrase as the key and the output of the previous computation as the salt. \n
 /// U2 = PRF(Password, U1), U3 = PRF(Password, U2) ... Uc = PRF(Password, Uc-1).</para> 
 ///
 /// <description><B>Implementation Notes:</B></description>
@@ -263,6 +263,7 @@ public:
 	virtual void Reset();
 
 private:
+
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void LoadState();
 	void Process(std::vector<byte> &Output, size_t OutOffset);

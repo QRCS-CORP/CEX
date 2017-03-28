@@ -73,28 +73,28 @@ NAMESPACE_MODE
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>
-/// The OCB Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode.<BR></BR>
-/// OCB is an online mode, meaning it can stream data of any size, without needing to know the data size in advance.<BR></BR>
-/// It also has provable security, dependant on the block cipher used by the mode.<BR></BR>
-/// OCB first XORs the plain-text into a checksum, which is used in the finalizer to create the MAC tag.<BR></BR>
-/// A nonce is generated and XOR'd with the encrypted plain-text to create the cipher-text.<BR></BR>
-/// Decryption performs these steps in reverse, creating a nonce and the cipher-text bytes through the decryption function, then adding the plain-text to a checksum.<BR></BR>
-/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.<BR></BR>
+/// The OCB Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. \n
+/// OCB is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
+/// It also has provable security, dependant on the block cipher used by the mode. \n
+/// OCB first XORs the plain-text into a checksum, which is used in the finalizer to create the MAC tag. \n
+/// A nonce is generated and XOR'd with the encrypted plain-text to create the cipher-text. \n
+/// Decryption performs these steps in reverse, creating a nonce and the cipher-text bytes through the decryption function, then adding the plain-text to a checksum. \n
+/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process. \n
 /// The Finalize(Output, Offset, Length) function writes the MAC code to an output stream in either encryption or decryption operation modes.
 /// </para>
 ///
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR>
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// for i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T.<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
+/// <para><EM>Legend:</EM> \n
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code \n
+/// <EM>Encryption</EM> \n
+/// for i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T. \n
+/// <EM>Decryption</EM> \n
 /// for i ...n (T = Mk(Ci), Pi = D(Ci)). PT = P||T.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The encryption and decryption functions of OCB mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads.<BR></BR>
+/// <para>The encryption and decryption functions of OCB mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
 /// The OCB parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
-/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.<BR></BR>
+/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. \n
 /// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
 /// Sequential processing is used when the system dows not support SIMD or has only one core, or a standard an input blockis less than the parallel block size.</para>
 ///

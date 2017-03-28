@@ -62,29 +62,29 @@ NAMESPACE_MODE
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>//encrypt the register, xor the ciphertext with the plaintext by block-size bytes   left shift the register  copy cipher text to the register
-/// <para>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output.<BR></BR>
-/// Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks.<BR></BR>
-/// On the first block the Nonce (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes.<BR></BR>
-/// The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector.<BR></BR>
-/// The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern.<BR></BR>
+/// <para>The Cipher FeedBack mode wraps a symmetric block cipher, enabling the processing of multiple contiguous input blocks to produce a unique cipher-text output. \n
+/// Similar to CBC encryption, the chaining mechanism requires that a ciphertext block depends on preceding plaintext blocks. \n
+/// On the first block the Nonce (register) is first encrypted, then XOR'd with the plaintext, using the specified BlockSize number of bytes. \n
+/// The block is left-shifted by block-size bytes, and the ciphertext is used to fill the end of the vector. \n
+/// The second block is encrypted and XOR'd with the first encrypted block using the same register shift, and all subsequent blocks follow this pattern. \n
 /// The decryption function follows the reverse pattern; the block is decrypted with the symmetric cipher, and then XOR'd with the ciphertext from the previous block to produce the plain-text.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>^</B>=XOR<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u:<BR></BR>
-/// (a) Oj ← EK(Ij). (Compute the block cipher output)<BR></BR>
-/// (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1)<BR></BR>
-/// (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj)<BR></BR>
-/// (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register)<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
+/// <para><EM>Legend:</EM> \n 
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>^</B>=XOR \n
+/// <EM>Encryption</EM> \n
+/// I1 ← IV . (Ij is the input value in a shift register) For 1 ≤ j ≤ u: \n
+/// (a) Oj ← EK(Ij). (Compute the block cipher output) \n
+/// (b) tj ← the r leftmost bits of Oj. (Assume the leftmost is identified as bit 1) \n
+/// (c) Cj ← Pj ^ tj. (Transmit the r-bit ciphertext block cj) \n
+/// (d) Ij+1 ← 2r · Ij + Cj mod 2n. (Shift Cj into right end of shift register) \n
+/// <EM>Decryption</EM> \n
 /// Pj ← Cj ^ tj. where tj, Oj and Ij</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
 /// <para>The encryption function of the CFB mode is limited by its dependency chain; that is, each block relies on information from the previous block, and so can not be multi-threaded.
-/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores.<BR></BR>
-/// This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads.<BR></BR> 
+/// The decryption function however, is not limited by this dependency chain and can be parallelized via the use of simultaneous processing by multiple processor cores. \n
+/// This is achieved by storing the starting vector, (the encrypted bytes), from offsets within the ciphertext stream, and then processing multiple blocks of cipher-text independently across threads. \n 
 /// The CFB parallel decryption mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread
 /// uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</para>
 ///

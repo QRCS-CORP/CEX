@@ -53,14 +53,14 @@ NAMESPACE_DIGEST
 /// 
 /// <remarks>
 /// <description>Tree Hashing Description:</description>
-/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter.<BR></BR> 
+/// <para>The tree hashing mode is instantiated when the parallel mechanism is engaged through the constructors Parallel parameter. \n 
 /// The default number of threads is 8, this can be changed using the ParallelMaxDegree(size_t) function, but not directly through the ParallelProfile accessor,
 /// (state sizes must be recalculated when the thread count changes).
-/// Changing the thread count from the default, will produce a different hash output.<BR></BR>
-/// The thread count must be an even number less or equal to the number of processing cores.<BR></BR>
-/// For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length.<BR></BR>
-/// The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments.<BR></BR>
-/// The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state.<BR></BR>
+/// Changing the thread count from the default, will produce a different hash output. \n
+/// The thread count must be an even number less or equal to the number of processing cores. \n
+/// For best performance in tree hashing mode, the message input block-size (Length parameter of an Update call), should be ParallelBlockSize in length. \n
+/// The ideal parallel block-size is calculated automatically based on the hardware profile and algorithm requirments. \n
+/// The parallel mode uses multi-threaded parallel processing, with each thread maintaining a single unique state. \n
 /// The hash finalizer processes each leaf state as contiguous message input for the root hash; i.e. R = H(S0 || S1 || S2 || ...Sn).</para>
 ///
 /// <description>Implementation Notes:</description>

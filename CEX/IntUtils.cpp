@@ -237,6 +237,32 @@ bool IntUtils::IsLittleEndian()
 	return (*(byte *)&num == 1);
 }
 
+void IntUtils::BlockToLe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output)
+{
+#if defined(IS_LITTLE_ENDIAN)
+	memcpy(&Output[0], &Input[InOffset], Output.size() * sizeof(uint));
+#else
+	for (size_t i = 0; i < Output.size(); ++i)
+	{
+		Output[i] = IntUtils::BytesToLe32(Input, InOffset);
+		InOffset += 4;
+	}
+#endif
+}
+
+void IntUtils::Le32ToBlock(std::vector<uint> &Input, std::vector<byte> &Output, size_t OutOffset)
+{
+#if defined(IS_LITTLE_ENDIAN)
+	memcpy(&Output[OutOffset], &Input[0], Output.size());
+#else
+	for (size_t i = 0; i < Input.size(); ++i)
+	{
+		IntUtils::Le32ToBytes(Input[i], Output, OutOffset);
+		OutOffset += 4;
+	}
+#endif
+}
+
 void IntUtils::Le16ToBytes(const ushort Value, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if defined(IS_LITTLE_ENDIAN)
@@ -750,6 +776,21 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 	}
 }
 
+void IntUtils::XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+{
+	if (SimdProfile != SimdProfiles::None)
+	{
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+	}
+	else
+	{
+		Output[OutOffset] ^= Input[InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+		Output[++OutOffset] ^= Input[++InOffset];
+	}
+}
+
 void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
 {
 	if (SimdProfile == SimdProfiles::Simd256)
@@ -893,6 +934,39 @@ void IntUtils::XORPRT(const std::vector<byte> &Input, const size_t InOffset, std
 		Output[OutOffset + ctr] ^= Input[InOffset + ctr];
 		++ctr;
 	} 
+}
+
+void IntUtils::XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile)
+{
+	const size_t BLOCK4 = 4;
+	const size_t BLOCK8 = 8;
+	size_t blkCtr = 0;
+
+	do
+	{
+		if ((Length - blkCtr) < BLOCK8)
+		{
+			XORUL128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			blkCtr += BLOCK4;
+		}
+		else
+		{
+			XORUL256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			blkCtr += BLOCK8;
+		}
+	} 
+	while (blkCtr != Length);
+}
+
+void IntUtils::XORULPRT(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length)
+{
+	size_t ctr = 0;
+
+	while (ctr != Length)
+	{
+		Output[OutOffset + ctr] ^= Input[InOffset + ctr];
+		++ctr;
+	}
 }
 
 NAMESPACE_UTILITYEND

@@ -52,21 +52,21 @@ using Cipher::Symmetric::Block::IBlockCipher;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>Cipher-based Message Authentication Code (GMAC), is a block-cipher based message authentication code algorithm.<BR></BR>
+/// <para>Cipher-based Message Authentication Code (GMAC), is a block-cipher based message authentication code algorithm. \n
 /// It can use any of the block ciphers in this library to provide assurance of message authenticity and the integrity of binary data.
-/// GMAC used in conjunction with a secure cipher mode (CTR) is the basis of the Galois/Counter Mode (GCM).<BR></BR>
+/// GMAC used in conjunction with a secure cipher mode (CTR) is the basis of the Galois/Counter Mode (GCM). \n
 /// When GCM is used as a stand-alone MAC code generator, it is suitable for use in an Encrypt-then-MAC generic composition configuration, 
 /// or as an inexpensive tag generator, but should not be used solely as a PRF for pseudo-random generation.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
+/// <para><EM>Legend:</EM> \n 
 /// <B>H</B>=hash-key, <B>A</B>=plain-text, <B>C</B>=cipher-text, <B>m</B>=message-length, <B>n</B>=ciphertext-length, <B>||</B>=OR, <B>^</B>=XOR</para>
-/// <para><EM>MAC Function</EM><BR></BR>
-/// 1) for i = 1...m-1, (Xi-1 ^ Ai) * H.<BR></BR>
-/// 2) for i = m (Xi-1 ^ (Am || 0<sup>128-v</sup>)) * H.<BR></BR>
-/// 3) for i = m+1...m-1, (Xi-1 ^ Ci-m) * H.<BR></BR>
-/// 4) for i = m + n (Xm+n-1 ^ (Cn || 0<sup>128-u</sup>)) * H.<BR></BR>
-/// 5) for i = m + n + 1 (Xm+n ^ (len(A)||len(C))) * H.<BR></BR></para>
+/// <para><EM>MAC Function</EM> \n
+/// 1) for i = 1...m-1, (Xi-1 ^ Ai) * H. \n
+/// 2) for i = m (Xi-1 ^ (Am || 0<sup>128-v</sup>)) * H. \n
+/// 3) for i = m+1...m-1, (Xi-1 ^ Ci-m) * H. \n
+/// 4) for i = m + n (Xm+n-1 ^ (Cn || 0<sup>128-u</sup>)) * H. \n
+/// 5) for i = m + n + 1 (Xm+n ^ (len(A)||len(C))) * H. \n</para>
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">

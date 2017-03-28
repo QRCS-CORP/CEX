@@ -52,19 +52,19 @@ using Digest::IDigest;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>KDF2 uses a hash digest as a pseudo random function to produce pseudo-random output in a process known as key stretching.<BR></BR>
-/// Using the same input key, and optional salt and information strings, produces the exact same output.<BR></BR>
+/// <para>KDF2 uses a hash digest as a pseudo random function to produce pseudo-random output in a process known as key stretching. \n
+/// Using the same input key, and optional salt and information strings, produces the exact same output. \n
 /// It is recommended that a salt value is added along with the key, this mitigates some attacks against the function.</para>
 /// 
-/// <description><B>Description:</B></description><BR></BR>
-/// <EM>Legend:</EM><BR></BR>
-/// <B>Z</B>=key, <B>T</B>=output-key, <B>hlen</B>=digest-length, <B>kLen</B>=output-length<BR></BR>
-/// <para><EM>Generate:</EM><BR></BR>
-/// 1) Set d = ceiling(kLen/hLen).<BR></BR>
-/// 2) Set T = "".<BR></BR>
-/// 3) for Counter = 1 to d-1 do:<BR></BR>
-///		 C = IntegerToString(Counter, 4).<BR></BR>
-///		 T = T || Hash(Z || C || [OtherInfo]).<BR></BR>
+/// <description><B>Description:</B></description> \n
+/// <EM>Legend:</EM> \n
+/// <B>Z</B>=key, <B>T</B>=output-key, <B>hlen</B>=digest-length, <B>kLen</B>=output-length \n
+/// <para><EM>Generate:</EM> \n
+/// 1) Set d = ceiling(kLen/hLen). \n
+/// 2) Set T = "". \n
+/// 3) for Counter = 1 to d-1 do: \n
+///		 C = IntegerToString(Counter, 4). \n
+///		 T = T || Hash(Z || C || [OtherInfo]). \n
 /// 4) Output the first kLen bytes of T as K.</para> 
 ///
 /// <description><B>Implementation Notes:</B></description>

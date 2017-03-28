@@ -118,11 +118,13 @@
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <OpenMPSupport>true</OpenMPSupport>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -260,6 +262,7 @@
     <ClInclude Include="..\..\CEX\KeccakParams.h" />
     <ClInclude Include="..\..\CEX\OCB.h" />
     <ClInclude Include="..\..\CEX\ParallelOptions.h" />
+    <ClInclude Include="..\..\CEX\SCRYPT.h" />
     <ClInclude Include="..\..\CEX\SecureStream.h" />
     <ClInclude Include="..\..\CEX\SHA256.h" />
     <ClInclude Include="..\..\CEX\SHA256Compress.h" />
@@ -377,6 +380,7 @@
     <ClCompile Include="..\..\CEX\Keccak512.cpp" />
     <ClCompile Include="..\..\CEX\OCB.cpp" />
     <ClCompile Include="..\..\CEX\ParallelOptions.cpp" />
+    <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
     <ClCompile Include="..\..\CEX\SHA256.cpp" />
     <ClCompile Include="..\..\CEX\SHA512.cpp" />

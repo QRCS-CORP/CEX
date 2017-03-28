@@ -64,28 +64,28 @@ NAMESPACE_MODE
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>The Electronic Code Book cipher processes message input directly through the underlying block cipher. 
-/// No Initialization Vector is used, and the output from each block does not effect the output of any other block.<BR></BR>
+/// No Initialization Vector is used, and the output from each block does not effect the output of any other block. \n
 /// For this reason, ECB is not considered a secure cipher mode, and should never be used in the transformation of real data, but only for debugging and performance testing.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// For 1 ≤ j ≤ t, Cj ← EK(Pj).<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
+/// <para><EM>Legend:</EM> \n 
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>K</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt \n
+/// <EM>Encryption</EM> \n
+/// For 1 ≤ j ≤ t, Cj ← EK(Pj). \n
+/// <EM>Decryption</EM> \n
 /// For 1 ≤ j ≤ t, Pj ← E<SUP>−1</SUP>K(Cj).</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The encryption and decryption functions of the ECB mode be multi-threaded. This is achieved by processing multiple blocks of cipher-text independently across threads.<BR></BR> 
+/// <para>The encryption and decryption functions of the ECB mode be multi-threaded. This is achieved by processing multiple blocks of cipher-text independently across threads. \n 
 /// The ECB parallel mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread
 /// uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</para>
 ///
 /// <description><B>ECB-WBV:</B></description>
-/// <para>Wide Block Vectorization is an extension of the standard ECB mode. Instead of processing a single 16 byte block of input, WBV processes 4 or 8 blocks concurrently using SIMD instructions.<BR></BR>
-/// The underlying block cipher contains the functions Transform64() and Transform128(), which use parallel instructions (SSE3 or AVX dedending on runtime availability), to process multiple input blocks simultaneously.<BR></BR>
-/// This has two adavantages; the first being that if the longer initialization vector is secure (64 or 128 bytes), there is a corresponding increase in security. The second advantage is performance.<BR></BR>
+/// <para>Wide Block Vectorization is an extension of the standard ECB mode. Instead of processing a single 16 byte block of input, WBV processes 4 or 8 blocks concurrently using SIMD instructions. \n
+/// The underlying block cipher contains the functions Transform64() and Transform128(), which use parallel instructions (SSE3 or AVX dedending on runtime availability), to process multiple input blocks simultaneously. \n
+/// This has two adavantages; the first being that if the longer initialization vector is secure (64 or 128 bytes), there is a corresponding increase in security. The second advantage is performance. \n
 /// Even if a mode is limited by dependency chaining, like the encryption function of the CBC mode, it can still be parallelized using this method, processing input several times faster than the standard 
-/// sequential mode configuration.<BR></BR>
+/// sequential mode configuration. \n
 /// Just as with the standard block size, the decryption function is multi-threaded, maximizing the potential throughput of this extended mode.</para>
 ///
 /// <description>Implementation Notes:</description>

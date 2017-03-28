@@ -44,36 +44,36 @@ NAMESPACE_MODE
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>
-/// The GCM Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode.<BR></BR>
-/// GCM is an online mode, meaning it can stream data of any size, without needing to know the data size in advance.<BR></BR>
-/// GCM uses a Galois Multiply function then combines the ciphertext with an authentication code to produce an authentication tag.<BR></BR>
-/// A nonce is generated and XOR'd with the encrypted plain-text to create the cipher-text.<BR></BR>
-/// Decryption performs these steps in reverse, creating a nonce and the cipher-text bytes through the decryption function, then adding the plain-text to a checksum.<BR></BR>
-/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.<BR></BR>
+/// The GCM Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. \n
+/// GCM is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
+/// GCM uses a Galois Multiply function then combines the ciphertext with an authentication code to produce an authentication tag. \n
+/// A nonce is generated and XOR'd with the encrypted plain-text to create the cipher-text. \n
+/// Decryption performs these steps in reverse, creating a nonce and the cipher-text bytes through the decryption function, then adding the plain-text to a checksum. \n
+/// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process. \n
 /// The Finalize(Output, Offset, Length) function writes the MAC code to an output stream in either encryption or decryption operation modes.
 /// </para>
 ///
 /// <description><B>Description:</B></description>
-/// <para><EM>Mac Legend:</EM><BR></BR> 
+/// <para><EM>Mac Legend:</EM> \n 
 /// <B>H</B>=hash-key, <B>A</B>=plain-text, <B>C</B>=cipher-text, <B>m</B>=message-length, <B>n</B>=ciphertext-length, <B>||</B>=OR, <B>^</B>=XOR</para>
-/// <para><EM>MAC Function</EM><BR></BR>
-/// 1) for i = 1...m-1, (Xi-1 ^ Ai) * H.<BR></BR>
-/// 2) for i = m (Xi-1 ^ (Am || 0<sup>128-v</sup>)) * H.<BR></BR>
-/// 3) for i = m+1...m-1, (Xi-1 ^ Ci-m) * H.<BR></BR>
-/// 4) for i = m + n (Xm+n-1 ^ (Cn || 0<sup>128-u</sup>)) * H.<BR></BR>
-/// 5) for i = m + n + 1 (Xm+n ^ (len(A)||len(C))) * H.<BR></BR></para>
+/// <para><EM>MAC Function</EM> \n
+/// 1) for i = 1...m-1, (Xi-1 ^ Ai) * H. \n
+/// 2) for i = m (Xi-1 ^ (Am || 0<sup>128-v</sup>)) * H. \n
+/// 3) for i = m+1...m-1, (Xi-1 ^ Ci-m) * H. \n
+/// 4) for i = m + n (Xm+n-1 ^ (Cn || 0<sup>128-u</sup>)) * H. \n
+/// 5) for i = m + n + 1 (Xm+n ^ (len(A)||len(C))) * H. \n</para>
 ///
-/// <para><EM>Cipher Legend:</EM><BR></BR>
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// for i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T.<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
+/// <para><EM>Cipher Legend:</EM> \n
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code \n
+/// <EM>Encryption</EM> \n
+/// for i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T. \n
+/// <EM>Decryption</EM> \n
 /// for i ...n (T = Mk(Ci), Pi = D(Ci)). PT = P||T.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The encryption and decryption functions of GCM mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads.<BR></BR>
+/// <para>The encryption and decryption functions of GCM mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
 /// The GCM parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
-/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.<BR></BR>
+/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. \n
 /// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
 /// Sequential processing is used when the system dows not support SIMD or has only one core, or a standard an input blockis less than the parallel block size.</para>
 ///

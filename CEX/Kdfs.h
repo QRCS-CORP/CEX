@@ -25,7 +25,11 @@ enum class Kdfs : byte
 	/// <summary>
 	/// An implementation of a Passphrase Based KDF: PBKDF2
 	/// </summary>
-	PBKDF2 = 4
+	PBKDF2 = 4,
+	/// <summary>
+	/// An implementation of the SCRYPT KDF
+	/// </summary>
+	SCRYPT = 8
 };
 
 NAMESPACE_ENUMERATIONEND

@@ -53,76 +53,76 @@ using Enumeration::Providers;
 /// 
 /// <remarks>
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
+/// <para><EM>Legend:</EM> \n 
 /// <B>Hm</B>=hmac_function, <B>P</B>=entropy_provider, <B>R</B>=generator_state, <B>K</B>=input_key, <B>Dk</B>=derived_key, <B>Dc</B>=distribution_code, <B>Sc</B>=state_counter, <B>Kc</B>=seed_counter, <B>Df</B>=derivation_function</para>
 /// <para>
 /// <description><B>Derive:</B></description>
-/// <BR></BR>
-/// Hm(K). the HMAC is first pre-initialized with the input key in the Initialize function.<BR></BR>
-/// Increment the seed counter by the bytes required for the iteration, and mac the state counter, the input key, and a length of pseudo-random bytes from the provider.<BR></BR>
-/// 1) For 1 ≤ j ≤ t, Kc = (Kc + kLen), Dk = Dk || Hm(Kc || K || P).<BR></BR>
-/// 2) Hm(Dk). -re-initialize the HMAC with the derived key.<BR></BR>
+///  \n
+/// Hm(K). the HMAC is first pre-initialized with the input key in the Initialize function. \n
+/// Increment the seed counter by the bytes required for the iteration, and mac the state counter, the input key, and a length of pseudo-random bytes from the provider. \n
+/// 1) For 1 ≤ j ≤ t, Kc = (Kc + kLen), Dk = Dk || Hm(Kc || K || P). \n
+/// 2) Hm(Dk). -re-initialize the HMAC with the derived key. \n
 /// 3) R = P(statelen). -generate the initial state using the entropy provider.
 /// </para>
 ///
-/// <para><EM>Initialize</EM><BR></BR>
+/// <para><EM>Initialize</EM> \n
 /// The Initialize function can take up to 3 inputs; the generator Seed which is the primary key, a Nonce value of 8 bytes used to initialize the state counter,
-/// and the distribution code used in the Generate function.<BR></BR>
-/// <BR></BR>
-/// 1) Hm(K). -pre-key the HMAC.<BR></BR>
-/// 2) if (Nonce) Sc = Nonce. -set the state counter to a non-zero secret value (optional, but recommended).<BR></BR>
-/// 3) if (Info) Dc = Info. -set the distribution code (optional, but recommended).<BR></BR>
-/// 4) Dk = Df(Sc || K || P) -extract the primary seed.<BR></BR>
-/// 5) Hm(Dk). -re-initialize the HMAC with the derived key.<BR></BR>
+/// and the distribution code used in the Generate function. \n
+///  \n
+/// 1) Hm(K). -pre-key the HMAC. \n
+/// 2) if (Nonce) Sc = Nonce. -set the state counter to a non-zero secret value (optional, but recommended). \n
+/// 3) if (Info) Dc = Info. -set the distribution code (optional, but recommended). \n
+/// 4) Dk = Df(Sc || K || P) -extract the primary seed. \n
+/// 5) Hm(Dk). -re-initialize the HMAC with the derived key. \n
 /// </para>
 ///
-/// <para><EM>Generate</EM><BR></BR>
-/// Increment the state counter by the bytes requested in each iteration and generate the state bytes to the generator ouput<BR></BR>
-///	1) For 1 ≤ j ≤ t, Sc = (Sc + kLen), output = output || Hm(Sc || R || Dc).<BR></BR>
-/// Loop until requested output size has been generated and written to the output array.<BR></BR>
-/// If the reseed threshold has been exceeded, re-key the HMAC.<BR></BR>
-/// 2) if (Sc > reseed_threshold) <BR></BR>
-///		K = Hm(Sc || R || Dc). -generate (internal) state for derivation key.<BR></BR>
+/// <para><EM>Generate</EM> \n
+/// Increment the state counter by the bytes requested in each iteration and generate the state bytes to the generator ouput \n
+///	1) For 1 ≤ j ≤ t, Sc = (Sc + kLen), output = output || Hm(Sc || R || Dc). \n
+/// Loop until requested output size has been generated and written to the output array. \n
+/// If the reseed threshold has been exceeded, re-key the HMAC. \n
+/// 2) if (Sc > reseed_threshold)  \n
+///		K = Hm(Sc || R || Dc). -generate (internal) state for derivation key. \n
 ///		Dk = Df(K). -extract and re-key the HMAC, and generate a new initial state with the provider.
 /// </para>
 ///
 /// <description><B>Overview:</B></description>
-/// <para>The HMAC based generator uses a hash function in a keyed HMAC to generate pseudo-random output.<BR></BR>
+/// <para>The HMAC based generator uses a hash function in a keyed HMAC to generate pseudo-random output. \n
 /// The HMAC is first initialized with the input seed values, then used in an internal key strengthening/derivation function to extract a key equal to the underlying hash functions internal block size,
-/// this is the most secure configuration when using a random HMAC key.<BR></BR>
+/// this is the most secure configuration when using a random HMAC key. \n
 /// The key derivation function takes as input a seed counter, (which is incremented by the number of bytes generated in each expansion cycle), the initial seed key, 
-/// and uses an entropy provider to pad the input blocks to the HMAC, so that the hash function processes a full block of state in the hash finalizer function.<BR></BR>
+/// and uses an entropy provider to pad the input blocks to the HMAC, so that the hash function processes a full block of state in the hash finalizer function. \n
 /// In a Merkle–Damgård construction (SHA2), the finalizer appends a code to the end of the last block, (and if the block is full, it processes a block of zero-byte padding with the code), 
-/// this is compensated for by subtracting the codes length from the random padding request length when required.<BR></BR>
+/// this is compensated for by subtracting the codes length from the random padding request length when required. \n
 /// The generator function uses the re-keyed HMAC to process a state counter, (optionally initialized as a random value array, and incremented on each cycle iteration by the required number of bytes copied from a block), 
-/// an initial random state array generated by the random provider, and the optional DistributionCode array, (set either through the property or the Info parameter of the Initialize function).<BR></BR>
+/// an initial random state array generated by the random provider, and the optional DistributionCode array, (set either through the property or the Info parameter of the Initialize function). \n
 /// The DistributionCode can be applied as a secondary, static source of entropy used by the generate function, making it similar to an HKDF construction, (HMG uses an 8 byte counter instead of 1 byte used by HKDF). 
-/// The DistributionCodeMax property is the ideal size for the code, (it also compensates for any hash finalizer code length), this ensures only full blocks are processed by the hash function finalizer.<BR></BR>
+/// The DistributionCodeMax property is the ideal size for the code, (it also compensates for any hash finalizer code length), this ensures only full blocks are processed by the hash function finalizer. \n
 /// The generator copies the HMAC finalized output to the internal state, and the functions output array. 
-/// The pseudo-random state array is processed as seed material in the next iteration of the generation cycle, in a continuous transformation process.<BR></BR>
-/// The state counter can be initialized by the Nonce parameter of the Initialize function to an 8 byte secret and random value, (this is strongly recommended).<BR></BR>
+/// The pseudo-random state array is processed as seed material in the next iteration of the generation cycle, in a continuous transformation process. \n
+/// The state counter can be initialized by the Nonce parameter of the Initialize function to an 8 byte secret and random value, (this is strongly recommended). \n
 /// The reseed-requests counter is incremented by the number of bytes processed by a generation call, if this value exceeds the ReseedThreshold value (10 * the MAC output size by default),
-/// the generator transforms the state to an internal array, (not added to output), and uses that state, along with the reseed counter and entropy provider, to buid a new HMAC key.<BR></BR>
+/// the generator transforms the state to an internal array, (not added to output), and uses that state, along with the reseed counter and entropy provider, to buid a new HMAC key. \n
 /// The HMAC is then re-keyed, the reseed-requests counter is reset, and a new initial state is generated by the entropy provider for the next generation cycle.
 /// </para>
 /// 
 /// <description><B>Initialization and Update:</B></description>
 /// <para>The Initialize functions have three different parameter options: the Seed which is the primary key, 
-/// the Nonce used to initialize the internal state-counter, and the Info which is used in the Generate function.<BR></BR>
-/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value.<BR></BR>
-/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator.<BR></BR>
-/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value.<BR></BR>
-/// The Info parameter maps to the DistributionCode() property, and is used as message state when generating the pseudo-random output.<BR></BR>
-/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property<BR></BR> 
-/// The Update function uses the seed value to re-key the HMAC via the internal key derivation function.<BR></BR>
+/// the Nonce used to initialize the internal state-counter, and the Info which is used in the Generate function. \n
+/// The Seed value must be one of the LegalKeySizes() in length, and must be a secret and random value. \n
+/// The supported seed-sizes are calculated based on the hash functions internal block size, and can vary depending on which message digest is used to instantiate the generator. \n
+/// The eight byte (NonceSize) Nonce value is another secret value, used to initialize the internal state counter to a non-zero random value. \n
+/// The Info parameter maps to the DistributionCode() property, and is used as message state when generating the pseudo-random output. \n
+/// The DistributionCode is recommended, and for best security, should be secret, random, and equal in length to the DistributionCodeMax() property \n 
+/// The Update function uses the seed value to re-key the HMAC via the internal key derivation function. \n
 /// The update functions Seed parameter, must be a random seed value equal in length to the seed used to initialize the generator.</para>
 ///
 /// <description><B>Predictive Resistance:</B></description>
-/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator.<BR></BR>
+/// <para>Predictive and backtracking resistance prevent an attacker who has gained knowledge of generator state at some time from predicting future or previous outputs from the generator. \n
 /// The optional resistance mechanism uses an entropy provider to add seed material to the generator, this new seed material is passed through the derivation function along with the current state, 
-/// the output hash is used to reseed the generator.<BR></BR>
+/// the output hash is used to reseed the generator. \n
 /// The default interval at which this reseeding occurs is 1000 times the digest output size in bytes, but can be set using the ReseedThreshold() property; once this number of bytes or greater has been generated, 
-/// the seed is regenerated.<BR></BR> 
+/// the seed is regenerated. \n 
 /// Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</para>
 ///
 /// <description>Implementation Notes:</description>

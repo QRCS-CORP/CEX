@@ -236,6 +236,7 @@
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
     <ClInclude Include="..\..\Test\RandomOutputTest.h" />
+    <ClInclude Include="..\..\Test\SCRYPTTest.h" />
     <ClInclude Include="..\..\Test\SecureStreamTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyGeneratorTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyTest.h" />
@@ -290,6 +291,7 @@
     <ClCompile Include="..\..\Test\RangedRngTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\SalsaTest.cpp" />
+    <ClCompile Include="..\..\Test\SCRYPTTest.cpp" />
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />
     <ClCompile Include="..\..\Test\SerpentTest.cpp" />
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />

@@ -53,27 +53,27 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>Cipher-based Message Authentication Code (CMAC), sometimes known as OMAC, is a block cipher-based message authentication code algorithm.<BR></BR>
+/// <para>Cipher-based Message Authentication Code (CMAC), sometimes known as OMAC, is a block cipher-based message authentication code algorithm. \n
 /// It can use any of the block ciphers in this library to provide assurance of message authenticity and the integrity of binary data.</para>
 /// 
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR> 
+/// <para><EM>Legend:</EM> \n 
 /// <B>CIPH</B>=encryption-function, <B>K</B>=key, <B>b</B>=block-size, <B>M</B>=message, <B>K1,K2</B>=subkeys, <B>^</B>=XOR, <B>ls</B>=left-shift</para>
-/// <para><EM>Subkey Generation</EM><BR></BR>
-/// 1) Let L = CIPHK(0b).<BR></BR>
-/// 2)	 If MSB1(L) = 0, then K1 = L ls 1;<BR></BR>
-/// Else K1 = (L ls 1) ^ Rb<BR></BR>
-/// 3)	 If MSB1(K1) = 0, then K2 = K1 ls 1;<BR></BR>
+/// <para><EM>Subkey Generation</EM> \n
+/// 1) Let L = CIPHK(0b). \n
+/// 2)	 If MSB1(L) = 0, then K1 = L ls 1; \n
+/// Else K1 = (L ls 1) ^ Rb \n
+/// 3)	 If MSB1(K1) = 0, then K2 = K1 ls 1; \n
 /// Else K2 = (K1 ls 1) ^ Rb.</para>
 ///
-/// <para><EM>MAC Function</EM><BR></BR>
-/// 1) Apply the subkey generation process to K to produce K1 and K2.<BR></BR>
-/// 2) If Mlen = 0, let n = 1; else, let n = ⎡Mlen / b⎤.<BR></BR>
-/// 3) Let M1, M2, ..., Mn - 1, Mn*, denote the unique sequence of bit strings such that M = M1 || M2 || ... || Mn - 1 || Mn*, where M1, M2, ..., Mn - 1 are complete blocks.<BR></BR>
-/// 4) If Mn* is a complete block, let Mn = K1 ^ Mn*; else, let Mn = K2 ^ (Mn* || 10j), where j = nb - Mlen - 1.<BR></BR>
-/// 5) Let C0 = 0b.<BR></BR>
-/// 6) For i = 1 to n, let Ci = CIPHK(Ci - 1 ^ Mi).<BR></BR>
-/// 7) Let T = MSBTlen(Cn).<BR></BR>
+/// <para><EM>MAC Function</EM> \n
+/// 1) Apply the subkey generation process to K to produce K1 and K2. \n
+/// 2) If Mlen = 0, let n = 1; else, let n = ⎡Mlen / b⎤. \n
+/// 3) Let M1, M2, ..., Mn - 1, Mn*, denote the unique sequence of bit strings such that M = M1 || M2 || ... || Mn - 1 || Mn*, where M1, M2, ..., Mn - 1 are complete blocks. \n
+/// 4) If Mn* is a complete block, let Mn = K1 ^ Mn*; else, let Mn = K2 ^ (Mn* || 10j), where j = nb - Mlen - 1. \n
+/// 5) Let C0 = 0b. \n
+/// 6) For i = 1 to n, let Ci = CIPHK(Ci - 1 ^ Mi). \n
+/// 7) Let T = MSBTlen(Cn). \n
 /// 8) Return T.</para>
 ///
 /// <description>Implementation Notes:</description>

@@ -624,6 +624,9 @@
     <ClInclude Include="..\..\CEX\Keccak256.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\SCRYPT.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -868,6 +871,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak512.cpp">
       <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SCRYPT.cpp">
+      <Filter>Source Files\Kdf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

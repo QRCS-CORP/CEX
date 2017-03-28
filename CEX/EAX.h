@@ -68,26 +68,26 @@ NAMESPACE_MODE
 /// <remarks>
 /// <description><B>Overview:</B></description>
 /// <para>
-/// The EAX Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode.<BR></BR>
-/// EAX is an online mode, meaning it can stream data of any size, without needing to know the data size in advance.<BR></BR>
-/// It also has provable security, dependant on the block cipher used by the mode.<BR></BR>
-/// EAX first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a CBC-based MAC function used for data authentication.<BR></BR>
-/// When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call.<BR></BR>
-/// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text.<BR></BR>
+/// The EAX Cipher Mode is an Authenticate Encrypt and Additional Data (AEAD) authenticated mode. \n
+/// EAX is an online mode, meaning it can stream data of any size, without needing to know the data size in advance. \n
+/// It also has provable security, dependant on the block cipher used by the mode. \n
+/// EAX first encrypts the plaintext using a counter mode (CTR), then processes that cipher-text using a CBC-based MAC function used for data authentication. \n
+/// When encryption is completed, the MAC code is generated and appended to the output stream using the Finalize(Output, Offset) call. \n
+/// Decryption performs these steps in reverse, processing the cipher-text bytes through the MAC function, then decrypting the data to plain-text. \n
 /// The Verify(Input, Offset) function can be used to compare the MAC code embedded in the cipher-text with the code generated during the decryption process.</para>
 ///
 /// <description><B>Description:</B></description>
-/// <para><EM>Legend:</EM><BR></BR>
-/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code<BR></BR>
-/// <EM>Encryption</EM><BR></BR>
-/// For i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T.<BR></BR>
-/// <EM>Decryption</EM><BR></BR>
+/// <para><EM>Legend:</EM> \n
+/// <B>C</B>=ciphertext, <B>P</B>=plaintext, <B>k</B>=key, <B>E</B>=encrypt, <B>D</B>=decrypt, <B>Mk</B>=keyed mac, <B>T</B>=mac code \n
+/// <EM>Encryption</EM> \n
+/// For i ...n (Ci = Ek(Pi), T = Mk(Ci)). CT = C||T. \n
+/// <EM>Decryption</EM> \n
 /// For i ...n (T = Mk(Ci), Pi = D(Ci)). PT = P||T.</para>
 ///
 /// <description><B>Multi-Threading:</B></description>
-/// <para>The encryption and decryption functions of the EAX mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads.<BR></BR>
+/// <para>The encryption and decryption functions of the EAX mode can be multi-threaded. This is achieved by processing multiple blocks of message input independently across threads. \n
 /// The EAX parallel mode also leverages SIMD instructions to 'double parallelize' those segments. An input block assigned to a thread
-/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.<BR></BR>
+/// uses SIMD instructions to decrypt/encrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions. \n
 /// Input blocks equal to, or divisble by the ParallelBlockSize() are processed in parallel on supported systems.
 /// The cipher transform is parallelizable, however the authentication pass, (CMAC), is processed sequentially.</para>
 ///

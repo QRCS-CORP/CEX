@@ -56,32 +56,32 @@ NAMESPACE_BLOCK
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <para>The key schedule in AHX is the defining difference between this and a standard version of Rijndael.
-/// The standard Rijndael Key Schedule (128-256 bits), has been extended to accommodate a 512 bit key size.<BR></BR>
+/// The standard Rijndael Key Schedule (128-256 bits), has been extended to accommodate a 512 bit key size. \n
 /// AHX can (optionally) use an HMAC based Key Derivation Function (HKDF) to expand the cipher key to create the internal round key integer array.
-/// This provides better security, and allows for a user assignable number of transformation rounds.<BR></BR>
+/// This provides better security, and allows for a user assignable number of transformation rounds. \n
 /// When using the HKDF extended mode, the number of transformation rounds can be set by the user (through the class constructor).
 /// AHX can run between 10 and 38 rounds.</para>
 ///
 /// <description>Changes to AHX Version 1.2:</description>
-/// <para>Version 1.2 of the cipher has changes to the HKDF powered key schedule, which may make it incompatable with previous versions of the cipher.<BR></BR>
-/// Previous versions split the key into salt and key arrays, and processed these arrays with the HKDF Extract step, which compresses the key material into a pseudo random key used to initialize the HMAC.<BR></BR>
-/// The previous versions also added the Info parameter through the HKDF Initialize(key, salt, info) function.<BR></BR>
-/// The Info parameter is now set through a property added to the HKDF implementation, so using the Initialize function to load the Info string is no longer required.<BR></BR>
-/// This allows for loading the key into HKDF with the Initialize(key) function, which bypasses the extract step, but can still use the Info parameter to provide additional entropy.<BR></BR>
-/// The key is used by HKDF to initialize the HMAC. The HMAC key can use up to the hash functions internal block size before a compression cycle is called, reducing the key size to the hash functions output size.<BR></BR>
-/// The best size for maximum security is to set the HMAC key to the hash functions block size, this initializes the HMAC with a full block of keying material.<BR></BR>
-/// HKDF cycles it's internal state, a one byte counter, and the Info parameter through the HMAC to generate the expanded key.<BR></BR>
-/// For best security, it is desirable to have the HMAC process input equal to the hash functions block size, i.e. no zero byte padding is processed by the compression function.<BR></BR>
+/// <para>Version 1.2 of the cipher has changes to the HKDF powered key schedule, which may make it incompatable with previous versions of the cipher. \n
+/// Previous versions split the key into salt and key arrays, and processed these arrays with the HKDF Extract step, which compresses the key material into a pseudo random key used to initialize the HMAC. \n
+/// The previous versions also added the Info parameter through the HKDF Initialize(key, salt, info) function. \n
+/// The Info parameter is now set through a property added to the HKDF implementation, so using the Initialize function to load the Info string is no longer required. \n
+/// This allows for loading the key into HKDF with the Initialize(key) function, which bypasses the extract step, but can still use the Info parameter to provide additional entropy. \n
+/// The key is used by HKDF to initialize the HMAC. The HMAC key can use up to the hash functions internal block size before a compression cycle is called, reducing the key size to the hash functions output size. \n
+/// The best size for maximum security is to set the HMAC key to the hash functions block size, this initializes the HMAC with a full block of keying material. \n
+/// HKDF cycles it's internal state, a one byte counter, and the Info parameter through the HMAC to generate the expanded key. \n
+/// For best security, it is desirable to have the HMAC process input equal to the hash functions block size, i.e. no zero byte padding is processed by the compression function. \n
 /// The Info parameter can now be used as an additional source of keying material, if sized to the DistributionCodeMax() property, blocks of state+counter+info are equal to the hash functions block size,
 /// this is the best possible security configuration.</para>
 ///
-/// <para>When using SHA-2 256, a minimum key size for AHX is 32 bytes, larger lengths of input key can be used so long as it aligns; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum.<BR></BR>
-/// The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.<BR></BR>
+/// <para>When using SHA-2 256, a minimum key size for AHX is 32 bytes, larger lengths of input key can be used so long as it aligns; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum. \n
+/// The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein. \n
 /// Valid key sizes can be determined at runtime using the LegalKeySizes() property, based on the digest selected.
 /// When using the extended mode, the legal key sizes are determined based on the selected digests hash output size, 
-/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes).<BR></BR>
-/// The number of transformation rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze.<BR></BR>
-/// AHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256.<BR></BR>
+/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes). \n
+/// The number of transformation rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. \n
+/// AHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256. \n
 /// Valid rounds assignments can be found in the LegalRounds() property.</para>
 /// 
 /// <list type="bullet">
@@ -357,16 +357,16 @@ public:
 
 private:
 
-	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
-	void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
-	void ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
-	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
+	void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
+	void ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
+	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void LoadState(Digests KdfEngineType);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
