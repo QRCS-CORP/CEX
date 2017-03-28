@@ -4,13 +4,14 @@ The CEX Cryptographic library in C++
 ## Intro
 ### Welcome
 CEX is being written from the ground-up as a powerful and accessable post-quantum secure cryptographic library; a flexible security model, performance-oriented, designed for ease of use, automation of complex tasks, and the ability to upwardly adjust the security of the contained encryption protocols.
-Through the use of simplified controls, the strict enforcement of key sizes and security minimums, and the automation of complex error-prone tasks, the application of cryptography can be greatly simplified. Whether it is encrypting a local file, or establishing a secure communications channel, the application developer requires a set of simple but flexible controls to guarantee a correct implementation.
 
 There are some new ideas, and new technologies, as I intend to push the envelope a little, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
 
 This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
 That work is still evolving however, as improvments and additions to the symmetric cryptography will continue throughout the libraries lifetime.
 The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and the next release will have the first asymmetric cipher (RingLWE) and asymmetric framework.
+
+For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
 ## Roadmap
 The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, patch, and release codes.
