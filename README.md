@@ -30,7 +30,6 @@ The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, 
 * RSA-Sig
 
 ### Release 1.2.0.1
-
 * Cross platform Networking
 
 * TLS
