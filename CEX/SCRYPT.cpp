@@ -271,7 +271,6 @@ void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<by
 {
 	PBKDF2 kdf(m_kdfDigest, 1);
 	kdf.Initialize(Key::Symmetric::SymmetricKey(Key, Salt));
-	std::vector<byte> tmp(Length);
 	kdf.Generate(Output, OutOffset, Length);
 }
 
@@ -359,7 +358,7 @@ void SCRYPT::SalsaCoreW(std::vector<uint> &State)
 	X1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[4]));
 	X2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[8]));
 	X3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[12]));
-	std::vector<__m128i> B{ X0, X1, X2, X3};
+	std::vector<__m128i> B { X0, X1, X2, X3};
 
 	for (size_t i = 0; i < 8; i += 2)
 	{

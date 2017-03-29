@@ -65,11 +65,9 @@ Versioning changed to 0.x format, (project is not to be considered a major relea
 * Added pipelined and parallelized SHA-2 implementations. 
 * Kdfs and Drbgs seperated and rewritten. 
 * Drbgs completely rewritten (added forward prediction resistance), and added an HMAC based Drbg (HMG).
-* MACs rewritten, VMAC removed. 
 * Addition of a symmetric key interface with ISymmetricKey replacing old KeyParams format and unifying access across function types (Drbg, Mac, cipher and Kdf all use the same interface).
 * Addition of a secure key and secure memory implementations.
 * Three new entropy providers added: Intel RdRand/RdSeed (RDP), Cpu Jitter (CJP), and a system state entropy collector (ECP).
-* XORShift+, ISAAC and VMPC MAC implementations removed, (primitives may not be secure enough or tested enough for this library).
 
 Some things shifted around in the namespace, and a lot of small optimizations throughout.
 Documentation expanded and rewritten, now each class (brevity permitting), contains a mathematical description of the main function, a usage example, a technical overview, external links, and implementation details.
@@ -90,7 +88,7 @@ Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, al
 ### Version 0.10: July 18, 2016
 * Added SIMD wrappers UInt128 and UInt256
 * Added intrinsics support to Twofish and Serpent (Encrypt64 and Decrypt64)
-* Added intrinsics block process (mm128 -4 block) intrinsics to parallel CTR block cipher mode
+* Added 128/256bit intrinsics to multi-threaded CTR block-cipher mode
 * Expanded intrinsic support in AES-NI (AHX) to 4 block (Encrypt64 and Decrypt64)
 * Serpent changed from outputting big endian to little endian (breaking change)
 * Added intrinsics integrity tests to ParallelModeTest.
