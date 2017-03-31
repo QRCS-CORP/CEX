@@ -178,7 +178,7 @@ public:
 	/// <summary>
 	/// Get: The digests type name
 	/// </summary>
-	virtual Digests Enumeral() 
+	virtual const Digests Enumeral() 
 	{ 
 		return Digests::Blake512;
 	}

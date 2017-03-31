@@ -13,11 +13,11 @@ namespace Test
 		{
 			Initialize();
 
-			CompareVector(m_key[0], m_salt[0], m_output[0], 1024, 8, 16, 64);
-			CompareVector(m_key[1], m_salt[1], m_output[1], 16384, 8, 1, 64);
+			CompareVector(m_key[0], m_salt[0], m_output[0], 1024, 16, 64);
+			CompareVector(m_key[1], m_salt[1], m_output[1], 16384, 1, 64);
 			// long test
 #if !defined(_DEBUG)
-			CompareVector(m_key[1], m_salt[1], m_output[2], 1048576, 8, 1, 64);
+			CompareVector(m_key[1], m_salt[1], m_output[2], 1048576, 1, 64);
 #endif
 			return SUCCESS;
 		}
@@ -31,12 +31,12 @@ namespace Test
 		}
 	}
 
-	void SCRYPTTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t MemoryCost, size_t Parallelization, size_t OutputSize)
+	void SCRYPTTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t Parallelization, size_t OutputSize)
 	{
 		std::vector<byte> outBytes(OutputSize);
 
 		// enum access
-		Kdf::SCRYPT gen1(Enumeration::Digests::SHA256, CpuCost, MemoryCost, Parallelization);
+		Kdf::SCRYPT gen1(Enumeration::Digests::SHA256, CpuCost, Parallelization);
 		gen1.Initialize(Key, Salt);
 		gen1.Generate(outBytes, 0, OutputSize);
 

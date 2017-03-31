@@ -392,8 +392,8 @@ uint IntUtils::BytesToLe32(const std::vector<byte> &Input, const size_t InOffset
 	return
 		(static_cast<uint>(Input[InOffset]) |
 		(static_cast<uint>(Input[InOffset + 1] << 8)) |
-			(static_cast<uint>(Input[InOffset + 2] << 16)) |
-			(static_cast<uint>(Input[InOffset + 3] << 24)));
+		(static_cast<uint>(Input[InOffset + 2] << 16)) |
+		(static_cast<uint>(Input[InOffset + 3] << 24)));
 #endif
 }
 

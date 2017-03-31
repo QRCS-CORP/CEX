@@ -57,7 +57,7 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t MemoryCost, size_t Parallelization, size_t OutputSize);
+		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t Parallelization, size_t OutputSize);
 		void Initialize();
 		void OnProgress(char* Data);
 	};

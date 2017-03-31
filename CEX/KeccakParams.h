@@ -37,7 +37,7 @@ using Utility::IntUtils;
 struct KeccakParams
 {
 private:
-	static constexpr size_t HDR_SIZE = 24;
+	static const size_t HDR_SIZE = 24;
 
 	// offset | size | type
 	// 0		4		Node relational offset

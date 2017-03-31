@@ -1,6 +1,5 @@
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\vc140.pdb
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\vc140.idb
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hxciphertest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\kdf2test.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\keccaktest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\macstreamtest.obj
@@ -11,6 +10,7 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\rangedrngtest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\rijndaeltest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\salsatest.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\scrypttest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\securestreamtest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\serpenttest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\sha2test.obj
@@ -36,7 +36,7 @@ c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hkdftest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hmactest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hmgtest.obj
-c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\scrypttest.obj
+c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\test\debug\hxciphertest.obj
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\test.ilk
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\test.exe
 c:\users\john\documents\visual studio 2015\projects\cryptography\cex++\win\debug\test.pdb

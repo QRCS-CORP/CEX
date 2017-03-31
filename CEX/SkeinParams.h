@@ -37,7 +37,7 @@ using Utility::IntUtils;
 struct SkeinParams
 {
 private:
-	static constexpr size_t HDR_SIZE = 24;
+	static const size_t HDR_SIZE = 24;
 
 	// skein 1.3, table 7:
 	// offset | size | type

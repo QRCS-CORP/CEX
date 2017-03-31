@@ -139,7 +139,7 @@ public:
 	/// <summary>
 	/// Get: The digests type name
 	/// </summary>
-	virtual Digests Enumeral() { return Digests::Keccak512; }
+	virtual const Digests Enumeral() { return Digests::Keccak512; }
 
 	/// <summary>
 	/// Get: Processor parallelization availability.

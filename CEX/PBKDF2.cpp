@@ -272,15 +272,15 @@ void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
 
 void PBKDF2::LoadState()
 {
-	// best salt size; hash finalizer code and counter length adjusted
-	size_t saltLen = m_macGenerator->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 4);
 	m_legalKeySizes.resize(3);
-	// minimum security is the digest output size
-	m_legalKeySizes[0] = SymmetricKeySize(m_macSize, 0, 0);
-	// recommended size, adjusted salt size to hash full blocks
-	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, saltLen, 0);
-	// max recommended; add a block of key to info (appended to salt)
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, saltLen, m_blockSize);
+	// this is the recommended size: 
+	// ideally, salt should be passphrase len - (4 bytes of counter + digest finalizer code)
+	// you want to fill one complete block, and avoid hmac compression on > block-size
+	m_legalKeySizes[0] = SymmetricKeySize(0, m_macGenerator->MacSize(), 0);
+	// 2nd recommended size
+	m_legalKeySizes[1] = SymmetricKeySize(0, m_macGenerator->MacSize(), 0);
+	// max recommended
+	m_legalKeySizes[2] = SymmetricKeySize(0, m_macGenerator->MacSize() * 2, 0);
 }
 
 NAMESPACE_KDFEND

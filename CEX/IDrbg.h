@@ -41,7 +41,7 @@ public:
 	/// <summary>
 	/// Get: The Drbg generators type name
 	/// </summary>
-	virtual const Enumeration::Drbgs Enumeral() = 0;
+	virtual const Drbgs Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Generator is ready to produce random

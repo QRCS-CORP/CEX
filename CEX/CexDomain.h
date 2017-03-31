@@ -8,14 +8,28 @@
 
 #define NAMESPACE_CIPHER namespace CEX { namespace Cipher {
 #define NAMESPACE_CIPHEREND } }
-//#define NAMESPACE_ASYMMETRIC namespace CEX { namespace Cipher { namespace Asymmetric {
-//#define NAMESPACE_ASYMMETRICEND } } }
-//#define NAMESPACE_ASYENCRYPT namespace CEX { namespace Cipher { namespace Asymmetric { namespace Encrypt {
-//#define NAMESPACE_ASYENCRYPTEND } } } }
-//#define NAMESPACE_ASYKEX namespace CEX { namespace Cipher { namespace Asymmetric { namespace KEX {
-//#define NAMESPACE_ASYKEXEND } } } }
-//#define NAMESPACE_ASYSIGN namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign {
-//#define NAMESPACE_ASYSIGNEND } } } }
+
+#define NAMESPACE_ASYMMETRIC namespace CEX { namespace Cipher { namespace Asymmetric {
+#define NAMESPACE_ASYMMETRICEND } } }
+#define NAMESPACE_ASYMMETRICENCRYPT namespace CEX { namespace Cipher { namespace Asymmetric { namespace Encrypt {
+#define NAMESPACE_ASYMMETRICENCRYPTEND } } } }
+#define NAMESPACE_MCELIECE namespace CEX { namespace Cipher { namespace Asymmetric { namespace Encrypt { namespace McEliece {
+#define NAMESPACE_MCELIECEEND } } } } }
+#define NAMESPACE_RINGLWE namespace CEX { namespace Cipher { namespace Asymmetric { namespace Encrypt { namespace RingLWE {
+#define NAMESPACE_RINGLWEEND } } } } }
+#define NAMESPACE_ASYMMETRICKEX namespace CEX { namespace Cipher { namespace Asymmetric { namespace KEX {
+#define NAMESPACE_ASYMMETRICKEXEND } } } }
+#define NAMESPACE_STM namespace CEX { namespace Cipher { namespace Asymmetric { namespace KEX { namespace STM {
+#define NAMESPACE_STMEND } } } } }
+#define NAMESPACE_TLS namespace CEX { namespace Cipher { namespace Asymmetric { namespace KEX { namespace TLS {
+#define NAMESPACE_TLSEND } } } } }
+#define NAMESPACE_ASYMMETRICSIGN namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign {
+#define NAMESPACE_ASYMMETRICSIGNEND } } } }
+#define NAMESPACE_GMSS namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace GMSS {
+#define NAMESPACE_GMSSEND } } } } }
+#define NAMESPACE_RLWESIG namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace RingLWESIG {
+#define NAMESPACE_RLWESIGEND } } } } }
+
 #define NAMESPACE_SYMMETRIC namespace CEX { namespace Cipher { namespace Symmetric {
 #define NAMESPACE_SYMMETRICEND } } }
 #define NAMESPACE_BLOCK namespace CEX { namespace Cipher { namespace Symmetric { namespace Block {
@@ -48,13 +62,13 @@
 #define NAMESPACE_KEYEND } } 
 #define NAMESPACE_KEYSYMMETRIC namespace CEX { namespace Key { namespace Symmetric {
 #define NAMESPACE_KEYSYMMETRICEND } } }
-//#define NAMESPACE_KEYASYMMETRIC namespace CEX { namespace Key { namespace Asymmetric {
-//#define NAMESPACE_KEYASYMMETRICEND } } }
+#define NAMESPACE_KEYASYMMETRIC namespace CEX { namespace Key { namespace Asymmetric {
+#define NAMESPACE_KEYASYMMETRICEND } } }
 
 #define NAMESPACE_MAC namespace CEX { namespace Mac {
 #define NAMESPACE_MACEND } } 
-//#define NAMESPACE_NETWORK namespace CEX { namespace Network {
-//#define NAMESPACE_NETWORKEND } } 
+#define NAMESPACE_NETWORK namespace CEX { namespace Network {
+#define NAMESPACE_NETWORKEND } } 
 #define NAMESPACE_NUMERIC namespace CEX { namespace Numeric {
 #define NAMESPACE_NUMERICEND } } 
 #define NAMESPACE_PRNG namespace CEX { namespace Prng {

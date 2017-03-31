@@ -92,25 +92,23 @@ private:
 	struct ScryptParameters
 	{
 		size_t CpuCost;
-		size_t MemoryCost;
 		size_t Parallelization;
 
-		explicit ScryptParameters(size_t CpuCost, size_t MemoryCost, size_t Parallelization)
+		explicit ScryptParameters(size_t CpuCost, size_t Parallelization)
 			:
 			CpuCost(CpuCost),
-			MemoryCost(MemoryCost),
 			Parallelization(Parallelization)
 		{}
 
 		void Reset()
 		{
 			CpuCost = 0;
-			MemoryCost = 0;
 			Parallelization = 0;
 		}
 	};
 
-	const size_t MIN_PASSLEN = 4;
+	const size_t MEM_COST = 8;
+	const size_t MIN_PASSLEN = 6;
 	const size_t MIN_SALTLEN = 4;
 
 	IDigest* m_kdfDigest;
@@ -181,14 +179,14 @@ public:
 	/// 
 	/// <param name="DigestType">The hash functions type-name enumeral</param>
 	/// <param name="CpuCost">The CPU cost parameter; increasing this value affects the cpu and memory cost.
-	/// <para>This value must equal to or divisible by 1024. A minimum size of (default) 16384 is recommended.</para></param>
-	/// <param name="MemoryCost">The Memory cost parameter.
-	/// <para>Increasing this value will cause the generator to use more memory as a multiple of this factor. A minimum of 8 is recommended.</para></param>
-	/// <param name="Parallelization">The Parallelization parameter. 
-	/// <para>Change this value to multiply the cpu cost by this factor, the default value is 1.</para></param>
+	/// <para>This value must be evenly divisible by 1024, with the minimum legal size of 1024. 
+	/// The minimum recommended size is 16384.</para></param>
+	/// <param name="Parallelization">The Parallelization parameter; indicates the number of threads used by the generator. 
+	/// <para>Change this value to multiply the cpu cost by this factor, the default value is 1.
+	/// Setting this value to 0 will automatically use the number of system processor cores.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name or parameters are used</exception>
-	explicit SCRYPT(Digests DigestType, size_t CpuCost = 16384, size_t MemoryCost = 8, size_t Parallelization = 1);
+	explicit SCRYPT(Digests DigestType, size_t CpuCost = 16384, size_t Parallelization = 1);
 
 	/// <summary>
 	/// Instantiates an SCRYPT generator using a message digest instance
@@ -196,15 +194,14 @@ public:
 	/// 
 	/// <param name="Digest">The initialized message digest instance</param>
 	/// <param name="CpuCost">The CPU cost parameter; increasing this value affects the cpu and memory cost.
-	/// <para>This value must equal to or divisible by 1024. A minimum size of (default) 16384 is recommended.</para></param>
-	/// <param name="MemoryCost">The Memory cost parameter.
-	/// <para>Increasing this value will cause the generator to use more memory as a multiple of this factor. A minimum of 8 is recommended.</para></param>
-	/// <param name="Parallelization">The Parallelization parameter. 
-	/// <para>Change this value to multiply the cpu cost by this factor, the default value is 1.</para></param>
-	/// <param name="Parallelization">The Parallelization parameter</param>
+	/// <para>This value must be evenly divisible by 1024, with the minimum legal size of 1024. 
+	/// The minimum recommended size is 16384.</para></param>
+	/// <param name="Parallelization">The Parallelization parameter; indicates the number of threads used by the generator.  
+	/// <para>Change this value to multiply the cpu cost by this factor, the default value is 1.
+	/// Setting this value to 0 will automatically use the number of system processor cores.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if a null digest or invalid parameters are used</exception>
-	explicit SCRYPT(IDigest* Digest, size_t CpuCost = 16384, size_t MemoryCost = 8, size_t Parallelization = 1);
+	explicit SCRYPT(IDigest* Digest, size_t CpuCost = 16384, size_t Parallelization = 1);
 
 	/// <summary>
 	/// Finalize objects
@@ -289,13 +286,13 @@ public:
 
 private:
 
-	void BlockMix(std::vector<uint> &State, std::vector<uint> &Y, size_t R);
+	void BlockMix(std::vector<uint> &State, std::vector<uint> &Y);
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length);
 	void SalsaCore(std::vector<uint> &Output);
 	void SalsaCoreW(std::vector<uint> &Output);
 	void Scope();
-	void SMix(std::vector<uint> &State, size_t StateOffset, size_t N, size_t R);
+	void SMix(std::vector<uint> &State, size_t StateOffset, size_t N);
 };
 
 NAMESPACE_KDFEND

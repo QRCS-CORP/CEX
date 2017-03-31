@@ -178,6 +178,72 @@
     <Filter Include="Header Files\Mac\Support">
       <UniqueIdentifier>{f94d7d61-7ebf-4677-99d1-a30d379cc032}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Common">
+      <UniqueIdentifier>{f0b40e55-10fb-466b-bd8d-fc32b428360a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Encrypt">
+      <UniqueIdentifier>{39640886-cd1f-4352-97bd-da3f850b94ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\KEX">
+      <UniqueIdentifier>{e8f34ed9-02ab-4b46-90d8-ed9955ff823e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign">
+      <UniqueIdentifier>{d00d4d78-1dd5-4f8d-b85a-bd38bb12538d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Encrypt\McEliece">
+      <UniqueIdentifier>{b59e605c-4096-4d7e-acd1-d39c119230ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Encrypt\RingLWE">
+      <UniqueIdentifier>{046e42d0-5c8a-40d8-929c-fec0297d71eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\KEX\TLS">
+      <UniqueIdentifier>{d7f12952-6a87-4982-96ad-eac3fb35ac05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\KEX\STM">
+      <UniqueIdentifier>{b0b8ec79-a9b1-4e59-a0eb-c3b734ef3b22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Common">
+      <UniqueIdentifier>{e8493dac-ed34-4de8-932a-70d91843d2f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Encrypt">
+      <UniqueIdentifier>{60af2114-8bce-4b8b-82cb-13a3c8e36f1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\RingLWE">
+      <UniqueIdentifier>{a80898f3-6afc-4a1c-bfd4-4f19a584e69f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\McEliece">
+      <UniqueIdentifier>{d98aa6ce-c534-49cd-a0bc-b66dd7a4b7b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign\RLWESIG">
+      <UniqueIdentifier>{ef3863fe-b139-419d-ad5b-52fc4e249eca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign\GMSS">
+      <UniqueIdentifier>{e1dc5f4f-d16a-4a86-ac41-a86ddb31a63e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\KEX">
+      <UniqueIdentifier>{e4161a52-a540-4c1b-b504-3ec85defbaca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\KEX\STM">
+      <UniqueIdentifier>{da24df47-e9fd-4fb2-877b-ff06d9d63501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\KEX\TLS">
+      <UniqueIdentifier>{d3fddbff-e594-4495-bb1a-4dd89036f68c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign">
+      <UniqueIdentifier>{f32014fa-8dd3-4458-b9f1-324e4fcb7cae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign\GMSS">
+      <UniqueIdentifier>{aefc1462-8149-4297-845f-2f1ddbdf5381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign\RLWESIG">
+      <UniqueIdentifier>{3f4d3371-6c42-44ef-aafd-c8f3e56f4a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Network">
+      <UniqueIdentifier>{f4b0f131-58dc-4026-8dbf-9665f6ab0a1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Network">
+      <UniqueIdentifier>{dcec47a5-5d97-4e50-890e-752cda63f7d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -626,6 +692,21 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\SCRYPT.h">
       <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CryptoAsymmetricException.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsymmetricKey.h">
+      <Filter>Header Files\Key\Asymmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsymmetricKeyPair.h">
+      <Filter>Header Files\Key\Asymmetric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsymmetricCipher.h">
+      <Filter>Header Files\Cipher\Asymmetric\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAsymmetricSign.h">
+      <Filter>Header Files\Cipher\Asymmetric\Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

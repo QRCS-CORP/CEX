@@ -192,7 +192,7 @@ void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	// copy nonce to state counter
 	memcpy(&m_stateCtr[0], &Nonce[0], IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 
-	// info can be a salt secret or domain limiter; added to derivation function input
+	// info can be a secret salt or domain identifier; added to derivation function input
 	// for best security, info should be secret, random, and DistributionCodeMax size
 	if (Info.size() <= m_distributionCodeMax)
 	{

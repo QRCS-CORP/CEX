@@ -16,40 +16,32 @@ using Enumeration::SimdProfiles;
 
 //~~~Constructor~~~//
 
-SCRYPT::SCRYPT(Digests DigestType, size_t CpuCost, size_t MemoryCost, size_t Parallelization)
+SCRYPT::SCRYPT(Digests DigestType, size_t CpuCost, size_t Parallelization)
 	:
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_kdfDigest(Helper::DigestFromName::GetInstance(DigestType)),
 	m_kdfDigestType(DigestType),
 	m_parallelProfile(64, true, 2048, true),
-	m_scryptParameters(CpuCost, MemoryCost, Parallelization)
+	m_scryptParameters(CpuCost, Parallelization)
 {
 	if (CpuCost < 1024 || CpuCost % 1024 != 0)
-		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be an even number equal to or divisible by 1024!");
-	if (MemoryCost < 8 || MemoryCost % 2 != 0)
-		throw CryptoKdfException("SCRYPT:Ctor", "The memory cost must be an even number equal to or greater than 8!");
-	if (Parallelization < 1 || Parallelization > 64)
-		throw CryptoKdfException("SCRYPT:Ctor", "The parallelization must be non-zero number less than to 65!");
+		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be greater than 1024 divisible by 1024!");
 
 	Scope();
 }
 
-SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t MemoryCost, size_t Parallelization)
+SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
 	:
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_kdfDigest(Digest),
 	m_kdfDigestType(m_kdfDigest->Enumeral()),
 	m_parallelProfile(64, true, 2048, true),
-	m_scryptParameters(CpuCost, MemoryCost, Parallelization)
+	m_scryptParameters(CpuCost, Parallelization)
 {
-	if (CpuCost < 1024 || CpuCost % 2 != 0)
-		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be an even number equal to or greater than 1024!");
-	if (MemoryCost < 8 || MemoryCost % 2 != 0)
-		throw CryptoKdfException("SCRYPT:Ctor", "The memory cost must be an even number equal to or greater than 8!");
-	if (Parallelization < 1 || Parallelization > 64)
-		throw CryptoKdfException("SCRYPT:Ctor", "The parallelization must be non-zero number less than to 65!");
+	if (CpuCost < 1024 || CpuCost % 1024 != 0)
+		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be greater than 1024 divisible by 1024!");
 
 	Scope();
 }
@@ -140,6 +132,7 @@ void SCRYPT::Initialize(const std::vector<byte> &Key)
 
 	m_kdfKey.resize(Key.size());
 	memcpy(&m_kdfKey[0], &Key[0], m_kdfKey.size());
+
 	m_isInitialized = true;
 }
 
@@ -203,26 +196,26 @@ void SCRYPT::Reset()
 
 //~~~Private Functions~~~//
 
-void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y, size_t R)
+void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
 {
 	std::vector<uint> X(16);
 	ArrayUtils::Copy(State, State.size() - 16, X, 0, 16);
 
-	for (size_t i = 0; i < 2 * R; i += 2)
+	for (size_t i = 0; i < 2 * MEM_COST; i += 2)
 	{
 		IntUtils::XORULBLK(State, i * 16, X, 0, X.size(), m_parallelProfile.SimdProfile());
-		//if (m_parallelProfile.SimdProfile() != SimdProfiles::None) // TODO: not working yet..
-		//	SalsaCoreW(X);
-		//else
+		if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
+			SalsaCoreW(X);
+		else
 			SalsaCore(X);
 		ArrayUtils::Copy(X, 0, Y, i * 8, 16);
 
 		IntUtils::XORULBLK(State, i * 16 + 16, X, 0, X.size(), m_parallelProfile.SimdProfile());
-		//if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
-		//	SalsaCoreW(X);
-		//else
+		if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
+			SalsaCoreW(X);
+		else
 			SalsaCore(X);
-		ArrayUtils::Copy(X, 0, Y, i * 8 + R * 16, 16);
+		ArrayUtils::Copy(X, 0, Y, i * 8 + MEM_COST * 16, 16);
 	}
 
 	ArrayUtils::Copy(Y, 0, State, 0, Y.size());
@@ -230,7 +223,7 @@ void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y, size_t R)
 
 size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	const size_t MFLEN = m_scryptParameters.MemoryCost * 128;
+	const size_t MFLEN = MEM_COST * 128;
 	const size_t KEYSZE = m_scryptParameters.Parallelization * MFLEN;
 	const size_t SKSZE = KEYSZE >> 2;
 
@@ -242,14 +235,25 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	size_t ttlOff = 0;
 	std::vector<uint> stateK(SKSZE);
 
-	IntUtils::BlockToLe32(tmpK, 0, stateK);
+	if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
+	{
+		for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
+		{
+			for (size_t i = 0; i < 16; i++)
+				stateK[k * 16 + i] = IntUtils::BytesToLe32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
+		}
+	}
+	else
+	{
+		IntUtils::BlockToLe32(tmpK, 0, stateK);
+	}
 
 	if (!m_parallelProfile.IsParallel() && PRLBLK >= MFLWRD)
 	{
 		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &stateK, PRLBLK, MFLWRD](size_t i)
 		{
 			for(size_t j = 0; j < PRLBLK; j += MFLWRD)
-				SMix(stateK, (i * PRLBLK) + j, m_scryptParameters.CpuCost, m_scryptParameters.MemoryCost);
+				SMix(stateK, (i * PRLBLK) + j, m_scryptParameters.CpuCost);
 		});
 
 		ttlOff = PRLBLK * m_parallelProfile.ParallelMaxDegree();
@@ -258,10 +262,22 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	if (ttlOff != SKSZE)
 	{
 		for (size_t i = ttlOff; i < SKSZE; i += MFLWRD)
-			SMix(stateK, i, m_scryptParameters.CpuCost, m_scryptParameters.MemoryCost);
+			SMix(stateK, i, m_scryptParameters.CpuCost);
 	}
 
-	IntUtils::Le32ToBlock(stateK, tmpK, 0);
+	if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
+	{
+		for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
+		{
+			for (size_t i = 0; i < 16; i++)
+				IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
+		}
+	}
+	else
+	{
+		IntUtils::Le32ToBlock(stateK, tmpK, 0);
+	}
+
 	Extract(Output, OutOffset, m_kdfKey, tmpK, Length);
 
 	return Length;
@@ -351,7 +367,7 @@ void SCRYPT::SalsaCore(std::vector<uint> &State)
 
 void SCRYPT::SalsaCoreW(std::vector<uint> &State)
 {
-	__m128i X0, X1, X2, X3; // TODO: can't use, not aligning to sequential
+	__m128i X0, X1, X2, X3;
 	__m128i T;
 
 	X0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[0]));
@@ -405,70 +421,35 @@ void SCRYPT::SalsaCoreW(std::vector<uint> &State)
 
 void SCRYPT::Scope()
 {
-	// best salt size; hash finalizer code and counter length adjusted
-	size_t saltLen = m_kdfDigest->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 4);
+	// enable/disable multi-threading
+	m_parallelProfile.IsParallel() = (m_scryptParameters.Parallelization != 1);
+
+	// set the parallel factor or adjust thread count
+	if (m_scryptParameters.Parallelization == 0)
+	{
+		// auto-set
+		m_scryptParameters.Parallelization = m_parallelProfile.ParallelMaxDegree();
+	}
+	else if (m_scryptParameters.Parallelization > 1 && m_scryptParameters.Parallelization < m_parallelProfile.ParallelMaxDegree())
+	{
+		// custom degree
+		m_parallelProfile.SetMaxDegree(m_scryptParameters.Parallelization);
+	}
+
 	m_legalKeySizes.resize(3);
-	// minimum security is the digest output size
-	m_legalKeySizes[0] = SymmetricKeySize(m_kdfDigest->DigestSize(), 0, 0);
-	// recommended size, adjusted salt size to hash full blocks
-	m_legalKeySizes[1] = SymmetricKeySize(m_kdfDigest->BlockSize(), saltLen, 0);
-	// max, recommended; key is 2x digest block size
-	m_legalKeySizes[2] = SymmetricKeySize(m_kdfDigest->BlockSize() * 2, saltLen, 0);
+	// this is the recommended size: 
+	// ideally, salt should be passphrase len - (4 bytes of pbkdf counter + digest finalizer code)
+	// you want to fill one complete block, and avoid hmac compression on > block-size
+	m_legalKeySizes[0] = SymmetricKeySize(0, m_kdfDigest->DigestSize(), 0);
+	// 2nd recommended size
+	m_legalKeySizes[1] = SymmetricKeySize(0, m_kdfDigest->BlockSize(), 0);
+	// max recommended
+	m_legalKeySizes[2] = SymmetricKeySize(0, m_kdfDigest->BlockSize() * 2, 0);
 }
 
-/*void crypto_scrypt_smix(uint8_t* B, size_t r, uint64_t N, void* _V, void* XY)
+void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 {
-	uint32_t * X = XY;
-	uint32_t * Y = (void *)((uint8_t *)(XY)+128 * r);
-	uint32_t * Z = (void *)((uint8_t *)(XY)+256 * r);
-	uint32_t * V = _V;
-	uint64_t i;
-	uint64_t j;
-	size_t k;
-
-	// 1: X <-- B 
-	for (k = 0; k < 32 * r; k++)
-		X[k] = le32dec(&B[4 * k]);
-
-	// 2: for i = 0 to N - 1 do 
-	for (i = 0; i < N; i += 2) {
-		// 3: V_i <-- X 
-		blkcpy(&V[i * (32 * r)], X, 128 * r);
-
-		// 4: X <-- H(X) 
-		blockmix_salsa8(X, Y, Z, r);
-
-		// 3: V_i <-- X 
-		blkcpy(&V[(i + 1) * (32 * r)], Y, 128 * r);
-
-		// 4: X <-- H(X) 
-		blockmix_salsa8(Y, X, Z, r);
-	}
-
-	// 6: for i = 0 to N - 1 do 
-	for (i = 0; i < N; i += 2) {
-		// 7: j <-- Integerify(X) mod N 
-		j = integerify(X, r) & (N - 1);
-
-		// 8: X <-- H(X \xor V_j) 
-		blkxor(X, &V[j * (32 * r)], 128 * r);
-		blockmix_salsa8(X, Y, Z, r);
-
-		// 7: j <-- Integerify(X) mod N 
-		j = integerify(Y, r) & (N - 1);
-
-		// 8: X <-- H(X \xor V_j) 
-		blkxor(Y, &V[j * (32 * r)], 128 * r);
-		blockmix_salsa8(Y, X, Z, r);
-	}
-
-	// 10: B' <-- X 
-	for (k = 0; k < 32 * r; k++)
-		le32enc(&B[4 * k], X[k]);
-}*/
-void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N, size_t R)
-{
-	size_t bCount = R * 32;
+	size_t bCount = MEM_COST * 32;
 	std::vector<uint> X(bCount);
 	std::vector<uint> Y(bCount);
 	std::vector<std::vector<uint>> V(N);
@@ -478,7 +459,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N, size_t
 	for (size_t i = 0; i < N; ++i)
 	{
 		V[i] = X;
-		BlockMix(X, Y, R);
+		BlockMix(X, Y);
 	}
 
 	const uint NMASK = (uint)N - 1;
@@ -486,7 +467,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N, size_t
 	{
 		uint j = X[bCount - 16] & NMASK;
 		IntUtils::XORULBLK(V[j], 0, X, 0, X.size(), m_parallelProfile.SimdProfile());
-		BlockMix(X, Y, R);
+		BlockMix(X, Y);
 	}
 
 	ArrayUtils::Copy(X, 0, State, StateOffset, bCount);

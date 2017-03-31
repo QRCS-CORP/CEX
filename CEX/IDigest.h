@@ -51,7 +51,7 @@ public:
 	/// <summary>
 	/// Get: The digests type name
 	/// </summary>
-	virtual Digests Enumeral() = 0;
+	virtual const Digests Enumeral() = 0;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
