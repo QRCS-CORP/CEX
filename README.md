@@ -47,6 +47,7 @@ The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, 
 ### Version 1.0: March 28, 2017
 The first official release of the library, (ciphers and protocols are now tested, documented, and ready for deployment).
 * Completed Code and Help review cycles.
+* Added parallelized HMAC implementation
 * Added multi-threaded Tree Hashing to all Skein and Keccak digest implementations.
 * Added SIMD parallelization to Skein512.
 * Rewrote SHA-2 paralellized tree hashing and added support for the SHA-NI SIMD to SHA-256.
@@ -81,13 +82,14 @@ Documentation expanded and rewritten, now each class (brevity permitting), conta
 Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, all regularly clock over 9GB per second on my 'modest' HP desktop). The block/stream cipher portion of this release is stable; (aside from bug fixes or enhancements, existing cipher modes should be constant, but new modes will soon be added).
 
 ### Version 0.11: August 12, 2016
+* Added AVX2 versions of Serpent and Twofish (Transform128, Encrypt128, and Decrypt128 functions)
 * Fixed bug in SIMD counter staggered offsets in Salsa and ChaCha implementations
 * Fixed bug in symmetric cipher Initialize() where disabling exceptions caused digest initialization to throw
 * Parallel mode and CipherStream tests extended and adjusted
 
 ### Version 0.10: July 18, 2016
 * Added SIMD wrappers UInt128 and UInt256
-* Added intrinsics support to Twofish and Serpent (Encrypt64 and Decrypt64)
+* Added intrinsics support to Twofish and Serpent (Transform64, Encrypt64 and Decrypt64 functions)
 * Added 128/256bit intrinsics to multi-threaded CTR block-cipher mode
 * Expanded intrinsic support in AES-NI (AHX) to 4 block (Encrypt64 and Decrypt64)
 * Serpent changed from outputting big endian to little endian (breaking change)
@@ -95,7 +97,6 @@ Speeds are now absolutely insane; (ECB/ICM/CBC-Decrypt modes using AESNI-256, al
 * SIMD intrinsics supported added to Serpent (SHX), Twofish (THX) and extended in Rijndael (AHX)
 * Block cipher CTR mode runtime switched (cpu check) to use 128 (SSE3) and 256 (AVX) intrinsics if available
 * 128 and 256 SIMD support added to ChaCha and Salsa implementations
-* C++ exceptions support now optional via the ENABLE_CPPEXCEPTIONS flag in Config.h
 * Added various intrinsics tests to ParallelModeTest class
 
 ### Version 0.09: July 08, 2016

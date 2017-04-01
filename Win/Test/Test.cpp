@@ -182,7 +182,6 @@ int main()
 	bool hasNI = HasAESNI();
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
-	RunTest(new SCRYPTTest());
 
 	try
 	{
