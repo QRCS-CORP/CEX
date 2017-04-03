@@ -91,11 +91,13 @@ static const int CEX_VERSION_RELEASE = 1;
 #if defined(CEX_COMPILER_MSC)
 #	if defined(_M_X64) || defined(_M_AMD64)
 #		define CEX_ARCH_X64
+#		define CEX_ARCH_X86_X64
 #		if defined(_M_AMD64)
 #			define CEX_ARCH_AMD64
 #		endif
 #	elif defined(_M_IX86) || defined(_X86_)
 #		define CEX_ARCH_IX86
+#		define CEX_ARCH_X86_X64
 #	elif defined(_M_ARM)
 #		define CEX_ARCH_ARM
 #		if defined(_M_ARM_ARMV7VE)
@@ -111,11 +113,13 @@ static const int CEX_VERSION_RELEASE = 1;
 #elif defined(CEX_COMPILER_GCC)
 #	if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
 #		define CEX_ARCH_X64
+#		define CEX_ARCH_X86_X64
 #		if defined(_M_AMD64)
 #			define CEX_ARCH_AMD64
 #		endif
 #	elif defined(i386) || defined(__i386) || defined(__i386__)
 #		define CEX_ARCH_IX86
+#		define CEX_ARCH_X86_X64
 #	elif defined(__arm__)
 #		define CEX_ARCH_ARM
 #		if defined(__aarch64__)
