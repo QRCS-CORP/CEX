@@ -2,17 +2,33 @@
 #include <algorithm>
 #include <thread>
 
-#if defined(CEX_OS_WINDOWS)
-#	include <intrin.h>
-#	include <stdio.h>
-#	define cpuid(info, x)  __cpuidex(info, x, 0)
-#else
-#	include <cpuid.h>
-	void cpuid(int info[4], int InfoType) {
-	__cpuid_count(InfoType, 0, info[0], info[1], info[2], info[3]);
-}
+#if defined(CEX_ARCH_X86_X64)
+#	if defined(CEX_COMPILER_MSC)
+#		include <intrin.h>
+#		define X86_CPUID(type, out) do { __cpuid((int*)out, type); } while(0)
+#		define X86_CPUID_SUBLEVEL(type, level, out) do { __cpuidex((int*)out, type, level); } while(0)
+#	elif defined(CEX_COMPILER_INTEL)
+#		include <ia32intrin.h>
+#		define X86_CPUID(type, out) do { __cpuid(out, type); } while(0)
+#		define X86_CPUID_SUBLEVEL(type, level, out) do { __cpuidex((int*)out, type, level); } while(0)
+#	elif defined(CEX_ARCH_X64) && defined(CEX_USE_GCC_INLINE_ASM)
+#		define X86_CPUID(type, out)                                                    \
+			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3]) \
+				: "0" (type))
+#		define X86_CPUID_SUBLEVEL(type, level, out)                                    \
+			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3]) \
+				: "0" (type), "2" (level))
+#	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
+#		include <cpuid.h>
+#		define X86_CPUID(type, out) do { __get_cpuid(type, out, out+1, out+2, out+3); } while(0)
+#		define X86_CPUID_SUBLEVEL(type, level, out) \
+			do { __cpuid_count(type, level, out[0], out[1], out[2], out[3]); } while(0)
+#	else
+#		warning "No way of calling cpuid for this compiler"
+#		define X86_CPUID(type, out) do { clear_mem(out, 4); } while(0)
+#		define X86_CPUID_SUBLEVEL(type, level, out) do { clear_mem(out, 4); } while(0)
+#	endif
 #endif
-
 NAMESPACE_COMMON
 
 //~~~ Constructor~~~//
@@ -91,9 +107,9 @@ CpuDetect::CpuDetect()
 #if defined(MSCAVX)
 	bool CpuDetect::AvxSupported()
 	{
-		int cpuInfo[4];
+		uint cpuInfo[4];
 
-		__cpuid(cpuInfo, 1);
+		X86_CPUID(1, cpuInfo);
 
 		// check if os saves the ymm registers
 		if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
@@ -104,9 +120,9 @@ CpuDetect::CpuDetect()
 
 	bool CpuDetect::Avx2Supported()
 	{
-		int cpuInfo[4];
+		uint cpuInfo[4];
 
-		__cpuid(cpuInfo, 1);
+		X86_CPUID(1, cpuInfo);
 
 		if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
 			return (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0xe6) != 0;
@@ -117,9 +133,9 @@ CpuDetect::CpuDetect()
 
 void CpuDetect::Detect()
 {
-	int cpuInfo[4];
-	cpuid(cpuInfo, 0);
-	int nIds = cpuInfo[0];
+	uint cpuInfo[4];
+	X86_CPUID(0, cpuInfo);
+	uint nIds = cpuInfo[0];
 
 	// cpu vendor name
 	char vendId[0x20];
@@ -129,13 +145,13 @@ void CpuDetect::Detect()
 	*((int*)(vendId + 8)) = cpuInfo[2];
 	m_cpuVendor = std::string(vendId);
 
-	cpuid(cpuInfo, 0x80000000);
+	X86_CPUID(0x80000000, cpuInfo);
 	unsigned nExIds = cpuInfo[0];
 
 	//  detect Features
 	if (nIds >= 0x00000001)
 	{
-		cpuid(cpuInfo, 0x00000001);
+		X86_CPUID(0x00000001, cpuInfo);
 
 		m_amdMp = READBITSFROM(cpuInfo[0], 19, 1) != 0;
 		m_amdMmxExt = READBITSFROM(cpuInfo[0], 22, 1) != 0;
@@ -169,7 +185,7 @@ void CpuDetect::Detect()
 	// extended features
 	if (nIds >= 0x00000007)
 	{
-		cpuid(cpuInfo, 0x00000007);
+		X86_CPUID(0x00000007, cpuInfo);
 
 		m_sgx = READBITSFROM(cpuInfo[1], 2, 1) != 0;
 		m_bmt1 = READBITSFROM(cpuInfo[1], 3, 1) != 0;
@@ -209,7 +225,7 @@ void CpuDetect::Detect()
 
 	if (nExIds >= 0x80000001)
 	{
-		cpuid(cpuInfo, 0x80000001);
+		X86_CPUID(0x80000001, cpuInfo);
 
 		m_abm = READBITSFROM(cpuInfo[2], 5, 1) != 0;
 		m_sse4a = READBITSFROM(cpuInfo[2], 6, 1) != 0;
@@ -229,7 +245,7 @@ void CpuDetect::Detect()
 	// cache info
 	if ((nExIds & 0xFF) > 5)
 	{
-		cpuid(cpuInfo, 0x80000006);
+		X86_CPUID(0x80000006, cpuInfo);
 
 		m_l1CacheSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 8));
 		m_l1CacheLineSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 11)); // ?
@@ -248,12 +264,12 @@ void CpuDetect::Detect()
 
 void CpuDetect::GetFrequency()
 {
-	int cpuInfo[4];
-	cpuid(cpuInfo, 0);
+	uint cpuInfo[4];
+	X86_CPUID(0, cpuInfo);
 
 	if (cpuInfo[0] >= 0x16)
 	{
-		cpuid(cpuInfo, 0x16);
+		X86_CPUID(0x16, cpuInfo);
 		m_frequencyBase = cpuInfo[0];
 		m_frequencyMax = cpuInfo[1];
 		m_busSpeed = cpuInfo[2];
@@ -262,8 +278,8 @@ void CpuDetect::GetFrequency()
 
 void CpuDetect::GetSerialNumber()
 {
-	int cpuInfo[4];
-	cpuid(cpuInfo, 0x00000003);
+	uint cpuInfo[4];
+	X86_CPUID(0x00000003, cpuInfo);
 
 	char prcId[8];
 	memset(prcId, 0, sizeof(prcId));
@@ -276,16 +292,18 @@ void CpuDetect::GetSerialNumber()
 size_t CpuDetect::MaxCoresPerPackage()
 {
 	size_t maxCores = 1;
-	int cpuInfo[4];
+	uint cpuInfo[4];
 
 	switch (Vendor())
 	{
 	case CpuVendors::INTEL:
-		cpuid(cpuInfo, 4);
+		X86_CPUID(4, cpuInfo);
 		maxCores = static_cast<size_t>(READBITSFROM(cpuInfo[0], 26, 8) + 1);
 		break;
 	case CpuVendors::AMD:
-		maxCores = std::thread::hardware_concurrency();
+		X86_CPUID(0x80000008, cpuInfo);
+		maxCores = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 8) + 1);
+		//maxCores = std::thread::hardware_concurrency();
 		break;
 	default:
 		break;
@@ -301,8 +319,8 @@ size_t CpuDetect::MaxLogicalPerCore()
 	if (Vendor() == CpuVendors::AMD && m_amdCmpLegacy)
 		return 1;
 
-	int cpuInfo[4];
-	cpuid(cpuInfo, 1);
+	uint cpuInfo[4];
+	X86_CPUID(1, cpuInfo);
 
 	size_t logical = static_cast<size_t>(READBITSFROM(cpuInfo[0], 16, 8));
 	size_t cores = MaxCoresPerPackage();
