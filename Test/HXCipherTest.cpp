@@ -1,4 +1,5 @@
 #include "HXCipherTest.h"
+#include "../CEX/CpuDetect.h"
 #include "../CEX/CTR.h"
 #include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
@@ -15,10 +16,13 @@ namespace Test
 		try
 		{
 			Initialize();
-#if defined(CEX_AESNI_AVAILABLE)
-			AHXMonteCarlo();
-#endif
-			OnProgress("AHX: Passed AES-NI Monte Carlo tests..");
+
+			Common::CpuDetect detect;
+			if (detect.AESNI())
+			{
+				AHXMonteCarlo();
+				OnProgress("AHX: Passed AES-NI Monte Carlo tests..");
+			}
 			RHXMonteCarlo();
 			OnProgress("RHX: Passed RHX Monte Carlo tests..");
 			SHXMonteCarlo();

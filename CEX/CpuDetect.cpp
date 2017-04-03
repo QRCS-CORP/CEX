@@ -1,5 +1,6 @@
 #include "CpuDetect.h"
 #include <algorithm>
+#include <thread>
 
 #if defined(CEX_OS_WINDOWS)
 #	include <intrin.h>
@@ -284,8 +285,7 @@ size_t CpuDetect::MaxCoresPerPackage()
 		maxCores = static_cast<size_t>(READBITSFROM(cpuInfo[0], 26, 8) + 1);
 		break;
 	case CpuVendors::AMD:
-		cpuid(cpuInfo, 0x80000008);
-		maxCores = static_cast<size_t>(READBITSFROM(cpuInfo[0], 0, 8) + 1);
+		maxCores = std::thread::hardware_concurrency();
 		break;
 	default:
 		break;
@@ -319,9 +319,9 @@ const CpuDetect::CpuVendors CpuDetect::Vendor()
 	{
 		std::string data = m_cpuVendor;
 		std::transform(data.begin(), data.end(), data.begin(), ::tolower);
-		if (m_cpuVendor.find_first_of("intel") > 0)
+		if (data.find("intel", 0) != std::string::npos)
 			return CpuVendors::INTEL;
-		else if (m_cpuVendor.find_first_of("amd") > 0)
+		else if (data.find("amd", 0) != std::string::npos)
 			return CpuVendors::AMD;
 	}
 	return CpuVendors::UNKNOWN;

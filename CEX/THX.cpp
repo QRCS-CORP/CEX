@@ -305,7 +305,7 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 			A += B;
 			wK[keyCtr * 2] = A;
 			A += B;
-			wK[keyCtr * 2 + 1] = A << SK_ROTL | (uint)(A >> (32 - SK_ROTL));
+			wK[(keyCtr * 2) + 1] = (uint)(A << SK_ROTL) | (uint)(A >> (32 - SK_ROTL));
 		}
 
 		Mix16((uint)keyCtr, sbKey, Key.size(), sMix);

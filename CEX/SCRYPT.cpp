@@ -1,6 +1,7 @@
 #include "SCRYPT.h"
 #include "ArrayUtils.h"
 #include "DigestFromName.h"
+#include "Intrinsics.h"
 #include "IntUtils.h"
 #include "PBKDF2.h"
 #include "ParallelUtils.h"
