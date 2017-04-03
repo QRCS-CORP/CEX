@@ -41,7 +41,7 @@ namespace Test
 		gen1.Generate(outBytes, 0, OutputSize);
 
 		if (outBytes != Expected)
-			throw std::exception("SCRYPT: Initialization test failed!");
+			throw TestException("SCRYPT: Initialization test failed!");
 	}
 
 	void SCRYPTTest::Initialize()

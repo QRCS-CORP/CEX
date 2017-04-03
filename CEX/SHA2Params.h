@@ -37,6 +37,7 @@ using Utility::IntUtils;
 struct SHA2Params
 {
 private:
+
 	static const size_t HDR_SIZE = 24;
 
 	// offset | size | type

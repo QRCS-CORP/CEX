@@ -70,13 +70,13 @@ private:
 
 	struct Keccak256State
 	{
-		const ulong MAX_ULL = 0xFFFFFFFFFFFFFFFF;
+		static const ulong MAX_ULL = 0xFFFFFFFFFFFFFFFF;
 		std::vector<ulong> H;
 		ulong T;
 
 		Keccak256State()
 			:
-			H(25, 0),
+			H(25),
 			T(0)
 		{
 		}
@@ -105,7 +105,7 @@ private:
 	static const size_t DIGEST_SIZE = 32;
 
 	// size of reserved state buffer subtracted from parallel size calculations
-	const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_SIZE = 25;
 	static const size_t DEF_PRLDEGREE = 8;
 

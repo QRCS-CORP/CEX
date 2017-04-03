@@ -110,8 +110,8 @@ class HKDF : public IKdf
 {
 private:
 
-	const size_t MIN_KEYLEN = 16;
-	const size_t MIN_SALTLEN = 4;
+	static const size_t MIN_KEYLEN = 16;
+	static const size_t MIN_SALTLEN = 4;
 
 	HMAC* m_macGenerator;
 	size_t m_blockSize;

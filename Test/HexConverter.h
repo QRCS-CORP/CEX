@@ -1,7 +1,7 @@
 #ifndef _CEXTEST_HEXCONVERTER_H
 #define _CEXTEST_HEXCONVERTER_H
 
-#include <string.h>
+#include <string>
 #include <vector>
 #include "../CEX/CexDomain.h"
 

@@ -42,7 +42,7 @@ namespace Test
 			ctd.Generate(output);
 
 		if (output != Expected)
-			throw std::exception("DCGTest: Failed comparison test!");
+			throw TestException("DCGTest: Failed comparison test!");
 	}
 
 	void DCGTest::CheckInit()
@@ -69,11 +69,11 @@ namespace Test
 			delete pvd;
 
 			if (CheckRuns(output))
-				throw std::exception("DCGTest: Failed duplication test!");
+				throw TestException("DCGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("DCGTest: Failed primitive instantiation test!");
+			throw TestException("DCGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -84,7 +84,7 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("DCGTest: Failed duplication test!");
+				throw TestException("DCGTest: Failed duplication test!");
 
 			// second legal key size + nonce
 			size_t seedLen = ctd.LegalKeySizes()[1].KeySize() - 8;
@@ -94,7 +94,7 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("DCGTest: Failed duplication test!");
+				throw TestException("DCGTest: Failed duplication test!");
 
 			// third legal key size + nonce + info
 			seedLen = (ctd.LegalKeySizes()[2].KeySize() / 2) - 8;
@@ -104,12 +104,12 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("DCGTest: Failed duplication test!");
+				throw TestException("DCGTest: Failed duplication test!");
 
 		}
 		catch (...)
 		{
-			throw std::exception("DCGTest: Failed enumeration instantiation test!");
+			throw TestException("DCGTest: Failed enumeration instantiation test!");
 		}
 	}
 

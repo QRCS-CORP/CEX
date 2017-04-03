@@ -10,7 +10,7 @@ NAMESPACE_DIGEST
 using Utility::IntUtils;
 using Utility::ArrayUtils;
 
-const static std::vector<uint> SCIV = { 0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL };
+static const std::vector<uint> SCIV = { 0x6A09E667UL, 0xBB67AE85UL, 0x3C6EF372UL, 0xA54FF53AUL, 0x510E527FUL, 0x9B05688CUL, 0x1F83D9ABUL, 0x5BE0CD19UL };
 
 //~~~Constructor~~~//
 

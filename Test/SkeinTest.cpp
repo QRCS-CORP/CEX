@@ -100,7 +100,7 @@ namespace Test
 			Dgt2->Reset();
 
 			if (hash1 != hash2)
-				throw std::exception("SKein Vector: Expected hash is not equal!");
+				throw TestException("SKein Vector: Expected hash is not equal!");
 
 			// test partial block-size and compute method
 			input.resize(input.size() + rnd.NextUInt32(1, 200), (byte)199);
@@ -111,7 +111,7 @@ namespace Test
 			Dgt2->Reset();
 
 			if (hash1 != hash2)
-				throw std::exception("SKein Vector: Expected hash is not equal!");
+				throw TestException("SKein Vector: Expected hash is not equal!");
 		}
 	}
 
@@ -125,11 +125,11 @@ namespace Test
 		Digest->Reset();
 
 		if (Expected != hash)
-			throw std::exception("SKein Vector: Expected hash is not equal!");
+			throw TestException("SKein Vector: Expected hash is not equal!");
 
 		Digest->Compute(Input, hash);
 		if (Expected != hash)
-			throw std::exception("SKein Vector: Expected hash is not equal!");
+			throw TestException("SKein Vector: Expected hash is not equal!");
 	}
 
 	void SkeinTest::Initialize()

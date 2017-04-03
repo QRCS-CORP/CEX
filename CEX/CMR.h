@@ -68,9 +68,9 @@ using Enumeration::Providers;
 class CMR : public IPrng
 {
 private:
-	const size_t BLOCK_SIZE = 16;
-	const size_t BUFFER_DEF = 4096;
-	const size_t BUFFER_MIN = 64;
+	static const size_t BLOCK_SIZE = 16;
+	static const size_t BUFFER_DEF = 4096;
+	static const size_t BUFFER_MIN = 64;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize = 0;

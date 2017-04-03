@@ -48,6 +48,7 @@ class CipherDescription
 private:
 
 	static const uint HDR_SIZE = 9;
+
 	byte m_engineType;
 	short m_keySize;
 	byte m_ivSize;

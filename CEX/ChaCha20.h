@@ -96,10 +96,10 @@ class ChaCha20 : public IStreamCipher
 {
 private:
 
-	const size_t BLOCK_SIZE = 64;
-	const size_t CTR_SIZE = 8;
-	const size_t MAX_ROUNDS = 30;
-	const size_t MIN_ROUNDS = 8;
+	static const size_t BLOCK_SIZE = 64;
+	static const size_t CTR_SIZE = 8;
+	static const size_t MAX_ROUNDS = 30;
+	static const size_t MIN_ROUNDS = 8;
 	static const size_t STATE_PRECACHED = 2048;
 	static const std::string SIGMA_INFO;
 	static const std::string TAU_INFO;

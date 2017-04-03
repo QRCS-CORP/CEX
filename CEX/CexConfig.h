@@ -7,15 +7,15 @@
 #include <cstring>
 #include <exception>
 #include <iostream>
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdio>
 #include <string>
 #include <vector>
 
 // library version info
-static const int CEX_VERSION_MAJOR = 0;
-static const int CEX_VERSION_MINOR = 13; // m series
-static const int CEX_VERSION_PATCH = 0;
+static const int CEX_VERSION_MAJOR = 1; // A1 series
+static const int CEX_VERSION_MINOR = 0;
+static const int CEX_VERSION_PATCH = 1;
 static const int CEX_VERSION_RELEASE = 1;
 
 // compiler types; not all will be supported (targets are msv, mingw, gcc, intel, and clang)
@@ -85,6 +85,52 @@ static const int CEX_VERSION_RELEASE = 1;
 #endif
 #if defined(__posix) || defined(_POSIX_VERSION)
 #	define CEX_OS_POSIX
+#endif
+
+// cpu type (only intel/amd/arm are targeted for support)
+#if defined(CEX_COMPILER_MSC)
+#	if defined(_M_X64) || defined(_M_AMD64)
+#		define CEX_ARCH_X64
+#		if defined(_M_AMD64)
+#			define CEX_ARCH_AMD64
+#		endif
+#	elif defined(_M_IX86) || defined(_X86_)
+#		define CEX_ARCH_IX86
+#	elif defined(_M_ARM)
+#		define CEX_ARCH_ARM
+#		if defined(_M_ARM_ARMV7VE)
+#			define CEX_ARCH_ARMV7VE
+#		elif defined(_M_ARM_FP)
+#			define CEX_ARCH_ARMFP
+#		elif defined(_M_ARM64)
+#			define CEX_ARCH_ARM64
+#		endif
+#	elif defined(_M_IA64)
+#		define CEX_ARCH_IA64
+#	endif
+#elif defined(CEX_COMPILER_GCC)
+#	if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
+#		define CEX_ARCH_X64
+#		if defined(_M_AMD64)
+#			define CEX_ARCH_AMD64
+#		endif
+#	elif defined(i386) || defined(__i386) || defined(__i386__)
+#		define CEX_ARCH_IX86
+#	elif defined(__arm__)
+#		define CEX_ARCH_ARM
+#		if defined(__aarch64__)
+#			define CEX_ARCH_ARM64
+#		endif
+#	elif defined(__ia64) || defined(__ia64__) || defined(__itanium__)
+#		define CEX_ARCH_IA64
+#	elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(__64BIT__) || defined(_LP64) || defined(__LP64__)
+#		define CEX_ARCH_PPC
+#	elif defined(__sparc) || defined(__sparc__)
+#		define CEX_ARCH_SPARC
+#		if defined(__sparc64__)
+#			define CEX_ARCH_SPARC64
+#		endif
+#	endif
 #endif
 
 // supported os targets

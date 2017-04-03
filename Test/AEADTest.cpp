@@ -122,14 +122,14 @@ namespace Test
 
 		// this output should be different because of decremented nonce
 		if (encData1 == encData2)
-			throw std::exception("AEADTest: Output does not match!");
+			throw TestException("AEADTest: Output does not match!");
 
 		// get the code after incrementing nonce
 		Cipher->Transform(decData, 0, encData2, 0, decData.size());
 		Cipher->Finalize(encData2, decData.size(), 16);
 
 		if (encData1 != encData2)
-			throw std::exception("AEADTest: Output does not match!");
+			throw TestException("AEADTest: Output does not match!");
 	}
 
 	void AEADTest::CompareVector(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
@@ -147,7 +147,7 @@ namespace Test
 		Cipher->Finalize(encData, PlainText.size(), 16);
 
 		if (CipherText != encData)
-			throw std::exception("AEADTest: Encrypted output is not equal!");
+			throw TestException("AEADTest: Encrypted output is not equal!");
 
 		// decryption
 		Cipher->Initialize(false, kp);
@@ -164,17 +164,17 @@ namespace Test
 
 		// Finalizer can be skipped if Verify called
 		if (!Cipher->Verify(encData, dataLen, 16))
-			throw std::exception("AEADTest: Tags do not match!");
+			throw TestException("AEADTest: Tags do not match!");
 
 		std::vector<byte> decData(dataLen);
 		if (dataLen != 0)
 			memcpy(&decData[0], &tmpData[0], dataLen);
 
 		if (PlainText != decData)
-			throw std::exception("AEADTest: Decrypted output is not equal!");
+			throw TestException("AEADTest: Decrypted output is not equal!");
 
 		if (MacCode != macCode || MacCode != Cipher->Tag())
-			throw std::exception("AEADTest: Tags do not match!");
+			throw TestException("AEADTest: Tags do not match!");
 	}
 
 	void AEADTest::ParallelTest(IAeadMode* Cipher)
@@ -220,7 +220,7 @@ namespace Test
 			Cipher->Finalize(encData2, dataLen, Cipher->MaxTagSize());
 
 			if (encData1 != encData2)
-				throw std::exception("AEADTest: Encrypted output is not equal!");
+				throw TestException("AEADTest: Encrypted output is not equal!");
 
 			// parallel decryption mode
 			decData1.resize(dataLen);
@@ -239,11 +239,11 @@ namespace Test
 			Cipher->Finalize(encData2, dataLen, Cipher->MaxTagSize());
 
 			if (decData1 != decData2)
-				throw std::exception("AEADTest: Decrypted output is not equal!");
+				throw TestException("AEADTest: Decrypted output is not equal!");
 			if (decData1 != data)
-				throw std::exception("AEADTest: Decrypted output is not equal!");
+				throw TestException("AEADTest: Decrypted output is not equal!");
 			if (!Cipher->Verify(encData1, dataLen, Cipher->MaxTagSize()))
-				throw std::exception("AEADTest: Tags do not match!");
+				throw TestException("AEADTest: Tags do not match!");
 		}
 	}
 
@@ -283,7 +283,7 @@ namespace Test
 			Cipher->Transform(encData, 0, decData, 0, encData.size() - Cipher->MaxTagSize());
 
 			if (!Cipher->Verify(encData, dataLen, Cipher->MaxTagSize()))
-				throw std::exception("AEADTest: Tags do not match!!");
+				throw TestException("AEADTest: Tags do not match!!");
 		}
 	}
 

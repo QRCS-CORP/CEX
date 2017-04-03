@@ -54,11 +54,11 @@ namespace Test
 			delete pvd;
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -74,7 +74,7 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 
 			// second legal key size
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x03);
@@ -83,7 +83,7 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 
 			// third legal key size + nonce + info
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x03);
@@ -91,12 +91,12 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed enumeration instantiation test!");
+			throw TestException("HMGTest: Failed enumeration instantiation test!");
 		}
 	}
 
@@ -117,11 +117,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -134,11 +134,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -151,11 +151,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -168,11 +168,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -185,11 +185,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -202,11 +202,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -219,11 +219,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -236,11 +236,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 
 		try
@@ -253,11 +253,11 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("HMGTest: Failed duplication test!");
+				throw TestException("HMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("HMGTest: Failed primitive instantiation test!");
+			throw TestException("HMGTest: Failed primitive instantiation test!");
 		}
 	}
 

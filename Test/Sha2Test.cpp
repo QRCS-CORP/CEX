@@ -51,11 +51,11 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected != hash)
-			throw std::exception("SHA2: Expected hash is not equal!");
+			throw TestException("SHA2: Expected hash is not equal!");
 
 		Digest->Compute(Input, hash);
 		if (Expected != hash)
-			throw std::exception("SHA2: Expected hash is not equal!");
+			throw TestException("SHA2: Expected hash is not equal!");
 	}
 
 	void SHA2Test::Initialize()

@@ -43,7 +43,7 @@ namespace Test
 		gen1.Generate(outBytes, 0, Size);
 
 		if (outBytes != Expected)
-			throw std::exception("PBKDF2: Values are not equal!");
+			throw TestException("PBKDF2: Values are not equal!");
 
 		// test the auto constructor
 		Kdf::PBKDF2 gen2(Enumeration::Digests::SHA256, Iterations);
@@ -53,7 +53,7 @@ namespace Test
 		delete eng256;
 
 		if (outBytes != Expected)
-			throw std::exception("PBKDF2: Values are not equal!");
+			throw TestException("PBKDF2: Values are not equal!");
 	}
 
 	void PBKDF2Test::Initialize()
@@ -104,7 +104,7 @@ namespace Test
 		gen1.Initialize(m_key[1], m_salt[1]);
 		gen1.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[3])
-			throw std::exception("PBKDF2: Initialization test failed!");
+			throw TestException("PBKDF2: Initialization test failed!");
 
 		// hmac instance
 		Mac::HMAC hmac(Enumeration::Digests::SHA256);
@@ -112,14 +112,14 @@ namespace Test
 		gen2.Initialize(m_key[1], m_salt[1]);
 		gen2.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[3])
-			throw std::exception("PBKDF2: Initialization test failed!");
+			throw TestException("PBKDF2: Initialization test failed!");
 
 		// test reset
 		gen2.Reset();
 		gen2.Initialize(m_key[1], m_salt[1]);
 		gen2.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[3])
-			throw std::exception("PBKDF2: Initialization test failed!");
+			throw TestException("PBKDF2: Initialization test failed!");
 
 	}
 }

@@ -30,6 +30,7 @@ NAMESPACE_DIGEST
 class Threefish256
 {
 private:
+
 	static const size_t BLOCK_SIZE = 32;
 
 	static ulong GetParity(const std::vector<ulong> &Key)

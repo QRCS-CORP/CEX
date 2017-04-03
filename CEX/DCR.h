@@ -63,8 +63,8 @@ using Enumeration::Providers;
 class DCR : public IPrng
 {
 private:
-	const size_t BUFFER_SIZE = 1024;
-	const size_t BUFFER_MIN = 64;
+	static const size_t BUFFER_SIZE = 1024;
+	static const size_t BUFFER_MIN = 64;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;

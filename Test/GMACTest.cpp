@@ -43,7 +43,7 @@ namespace Test
 		code.resize(MacCode.size());
 
 		if (MacCode != code)
-			throw std::exception("GMAC: Tags do not match!");
+			throw TestException("GMAC: Tags do not match!");
 	}
 
 	void GMACTest::Initialize()

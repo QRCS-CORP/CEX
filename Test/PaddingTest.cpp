@@ -50,9 +50,9 @@ namespace Test
 			// verify length
 			unsigned int len = (unsigned int)Padding->GetPaddingLength(data);
 			if (len == 0 && i != 0)
-				throw std::exception("PaddingTest: Failed the padding value return check!");
+				throw TestException("PaddingTest: Failed the padding value return check!");
 			else if (i != 0 && len != BLOCK - i)
-				throw std::exception("PaddingTest: Failed the padding value return check!");
+				throw TestException("PaddingTest: Failed the padding value return check!");
 
 			// test offset method
 			if (i > 0 && i < 15)
@@ -60,9 +60,9 @@ namespace Test
 				len = (unsigned int)Padding->GetPaddingLength(data, i);
 
 				if (len == 0 && i != 0)
-					throw std::exception("PaddingTest: Failed the padding value return check!");
+					throw TestException("PaddingTest: Failed the padding value return check!");
 				else if (i != 0 && len != BLOCK - i)
-					throw std::exception("PaddingTest: Failed the offset padding value return check!");
+					throw TestException("PaddingTest: Failed the offset padding value return check!");
 			}
 		}
 

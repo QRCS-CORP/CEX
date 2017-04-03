@@ -1,7 +1,7 @@
 #ifndef _CEXENGINE_TESTEXCEPTION_H
 #define _CEXENGINE_TESTEXCEPTION_H
 
-#include <string.h>
+#include <string>
 #include <iostream>
 #include <exception>
 
@@ -33,6 +33,7 @@ namespace Test
 		/// <param name="Message">A custom message or error data</param>
 		explicit TestException(const std::string &Message)
 			:
+			m_origin(""),
 			m_message(Message)
 		{
 		}

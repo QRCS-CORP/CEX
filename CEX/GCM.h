@@ -102,8 +102,8 @@ class GCM : public IAeadMode
 private:
 
 	static const size_t BLOCK_SIZE = 16;
-	const size_t MAX_PRLALLOC = 100000000;
-	const size_t TAG_MINLEN = 12;
+	static const size_t MAX_PRLALLOC = 100000000;
+	static const size_t TAG_MINLEN = 12;
 
 	std::vector<byte> m_aadData;
 	bool m_aadLoaded;

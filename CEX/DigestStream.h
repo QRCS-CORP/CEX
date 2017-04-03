@@ -64,6 +64,7 @@ using Digest::IDigest;
 class DigestStream
 {
 private:
+
 	IDigest* m_digestEngine;
 	const size_t BUFFER_SIZE = 64 * 1024;
 	size_t m_blockSize;

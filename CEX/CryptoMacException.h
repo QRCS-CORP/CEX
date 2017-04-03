@@ -11,9 +11,9 @@ NAMESPACE_EXCEPTION
 struct CryptoMacException : std::exception
 {
 private:
-	std::string m_origin;
-	std::string m_message;
 	std::string m_details;
+	std::string m_message;
+	std::string m_origin;
 
 public:
 
@@ -40,7 +40,9 @@ public:
 	/// <param name="Message">A custom message or error data</param>
 	explicit CryptoMacException(const std::string &Message)
 		:
-		m_message(Message)
+		m_details(""),
+		m_message(Message),
+		m_origin("")
 	{
 	}
 
@@ -52,6 +54,7 @@ public:
 	/// <param name="Message">A custom message or error data</param>
 	explicit CryptoMacException(const std::string &Origin, const std::string &Message)
 		:
+		m_details(""),
 		m_message(Message),
 		m_origin(Origin)
 	{

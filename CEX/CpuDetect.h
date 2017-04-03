@@ -2,6 +2,7 @@
 #define _CEX_CPUDETECT_H
 
 #include "CexDomain.h"
+
 #if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
 #	define MSCAVX
 #endif

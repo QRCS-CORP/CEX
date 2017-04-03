@@ -100,7 +100,7 @@ private:
 	static const size_t MIN_PRLBLOCK = BLOCK_SIZE * DEF_PRLDEGREE;
 	static const size_t STATE_SIZE = 4;
 	// size of reserved state buffer subtracted from parallel size calculations
-	const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_PRECACHED = 2048;
 
 	struct Skein256State
 	{
@@ -114,11 +114,11 @@ private:
 		Skein256State()
 			:
 			// state
-			S(4, 0),
+			S(4),
 			// tweak
-			T(2, 0),
+			T(2),
 			// config
-			V(4, 0)
+			V(4)
 		{
 		}
 

@@ -119,12 +119,12 @@ class SHX : public IBlockCipher
 private:
 
 	static const std::string DEF_INFO;
-	const size_t BLOCK_SIZE = 16;
-	const size_t MAX_ROUNDS = 64;
-	const size_t MIN_ROUNDS = 32;
-	const uint PHI = 0x9E3779B9;
+	static const size_t BLOCK_SIZE = 16;
+	static const size_t MAX_ROUNDS = 64;
+	static const size_t MIN_ROUNDS = 32;
+	static const uint PHI = 0x9E3779B9;
 	// size of state buffer subtracted parallel size calculations
-	const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_PRECACHED = 2048;
 
 	bool m_destroyEngine;
 	std::vector<uint> m_expKey;

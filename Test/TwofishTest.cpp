@@ -128,7 +128,7 @@ namespace Test
 			engine.Transform(outBytes, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("Twofish MonteCarlo: Arrays are not equal!");
+			throw TestException("Twofish MonteCarlo: Arrays are not equal!");
 	}
 
 	void TwofishTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -141,13 +141,13 @@ namespace Test
 		tfx.EncryptBlock(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("Twofish Vector: Encrypted arrays are not equal!");
+			throw TestException("Twofish Vector: Encrypted arrays are not equal!");
 
 		tfx.Initialize(false, k);
 		tfx.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::exception("Twofish Vector: Decrypted arrays are not equal!");
+			throw TestException("Twofish Vector: Decrypted arrays are not equal!");
 	}
 
 	void TwofishTest::Initialize()

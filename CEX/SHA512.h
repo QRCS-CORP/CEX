@@ -95,7 +95,7 @@ private:
 	static const size_t DIGEST_SIZE = 64;
 	static const ulong DEF_PRLDEGREE = 8;
 	// size of reserved state buffer subtracted from parallel size calculations
-	const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_PRECACHED = 2048;
 
 	struct SHA512State
 	{

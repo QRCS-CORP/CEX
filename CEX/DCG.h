@@ -141,10 +141,10 @@ class DCG : public IDrbg
 private:
 
 	static const size_t COUNTER_SIZE = sizeof(ulong);
-	const ulong MAX_OUTPUT = 35184372088832;
-	const size_t MAX_REQUEST = 65536;
-	const size_t MAX_RESEED = 536870912;
-	const size_t MINSEED_SIZE = 8;
+	static const ulong MAX_OUTPUT = 35184372088832;
+	static const size_t MAX_REQUEST = 65536;
+	static const size_t MAX_RESEED = 536870912;
+	static const size_t MINSEED_SIZE = 8;
 
 	IDigest* m_msgDigest;
 	bool m_destroyEngine;

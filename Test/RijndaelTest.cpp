@@ -39,13 +39,13 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("RijndaelTest: Encrypted arrays are not equal!");
+			throw TestException("RijndaelTest: Encrypted arrays are not equal!");
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::exception("RijndaelTest: Decrypted arrays are not equal!");
+			throw TestException("RijndaelTest: Decrypted arrays are not equal!");
 	}
 
 	void RijndaelTest::Initialize()

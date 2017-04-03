@@ -59,7 +59,7 @@ namespace Test
 			Digest->Finalize(hash, 0);
 
 			if (Expected[i] != hash)
-				throw std::exception("Keccak: Expected hash is not equal!");
+				throw TestException("Keccak: Expected hash is not equal!");
 		}
 
 		std::vector<byte> k64(1024 * 64, 0);
@@ -71,7 +71,7 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
-			throw std::exception("Keccak: Expected hash is not equal!");
+			throw TestException("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
 			Digest->Update((byte)'a');
@@ -79,7 +79,7 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
-			throw std::exception("Keccak: Expected hash is not equal!");
+			throw TestException("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != k64.size(); i++)
 			k64[i] = (byte)('a' + (i % 26));
@@ -88,7 +88,7 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
-			throw std::exception("Keccak: Expected hash is not equal!");
+			throw TestException("Keccak: Expected hash is not equal!");
 
 		for (unsigned int i = 0; i != 64; i++)
 		{
@@ -99,7 +99,7 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
-			throw std::exception("Keccak: Expected hash is not equal!");
+			throw TestException("Keccak: Expected hash is not equal!");
 
 		CompareDoFinal(Digest);
 
@@ -113,7 +113,7 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if ((Expected[m_messages.size() + 2]) != hash)
-		throw std::exception("Keccak: Expected hash is not equal!");*/
+		throw TestException("Keccak: Expected hash is not equal!");*/
 	}
 
 	void KeccakTest::CompareDoFinal(IDigest* Digest)
@@ -131,7 +131,7 @@ namespace Test
 			Digest->Finalize(outBytes, i);
 
 			if (expected != outBytes)
-				throw std::exception("Keccak Finalize: Expected hash is not equal!");
+				throw TestException("Keccak Finalize: Expected hash is not equal!");
 		}
 	}
 
@@ -149,7 +149,7 @@ namespace Test
 			mac.Finalize(macV, 0);
 
 			if (Expected[i] != macV)
-				throw std::exception("Keccak HMAC: Expected hash is not equal!");
+				throw TestException("Keccak HMAC: Expected hash is not equal!");
 		}
 
 		// test truncated keys
@@ -162,7 +162,7 @@ namespace Test
 		for (unsigned int i = 0; i != TruncExpected.size(); i++)
 		{
 			if (macV2[i] != TruncExpected[i])
-				throw std::exception("Keccak HMAC: Expected hash is not equal!");
+				throw TestException("Keccak HMAC: Expected hash is not equal!");
 		}
 	}
 

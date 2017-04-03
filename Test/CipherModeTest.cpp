@@ -76,7 +76,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::exception("CBC Mode: Encrypted arrays are not equal!");
+					throw TestException("CBC Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -93,7 +93,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::exception("CBC Mode: Decrypted arrays are not equal!");
+					throw TestException("CBC Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -121,7 +121,7 @@ namespace Test
 				mode.Transform(Input[index][i], 0, outBytes, 0);
 
 				if (outBytes != Output[index][i])
-					throw std::exception("CFB Mode: Encrypted arrays are not equal!");
+					throw TestException("CFB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -139,7 +139,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::exception("CFB Mode: Decrypted arrays are not equal!");
+					throw TestException("CFB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -167,7 +167,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::exception("CTR Mode: Encrypted arrays are not equal!");
+					throw TestException("CTR Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -184,7 +184,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::exception("CTR Mode: Decrypted arrays are not equal!");
+					throw TestException("CTR Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -211,7 +211,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::exception("ECB Mode: Encrypted arrays are not equal!");
+					throw TestException("ECB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -229,7 +229,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::exception("ECB Mode: Decrypted arrays are not equal!");
+					throw TestException("ECB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -257,7 +257,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != Output[index][i])
-					throw std::exception("OFB Mode: Encrypted arrays are not equal!");
+					throw TestException("OFB Mode: Encrypted arrays are not equal!");
 			}
 			delete eng;
 		}
@@ -275,7 +275,7 @@ namespace Test
 				mode.Transform(Input[index][i], outBytes);
 
 				if (outBytes != m_output[index][i])
-					throw std::exception("OFB Mode: Decrypted arrays are not equal!");
+					throw TestException("OFB Mode: Decrypted arrays are not equal!");
 			}
 			delete eng;
 		}

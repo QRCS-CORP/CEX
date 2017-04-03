@@ -45,7 +45,7 @@ namespace Test
 		gen.Generate(outBytes, 0, Size);
 
 		if (outBytes != Expected)
-			throw std::exception("HKDF: Values are not equal!");
+			throw TestException("HKDF: Values are not equal!");
 	}
 
 	void HKDFTest::Initialize()
@@ -96,7 +96,7 @@ namespace Test
 		gen1.Initialize(m_key[1], m_salt[1], m_info[1]);
 		gen1.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[1])
-			throw std::exception("HKDF: Initialization test failed!");
+			throw TestException("HKDF: Initialization test failed!");
 
 		// digest instance
 		Digest::SHA256* dgt = new Digest::SHA256();
@@ -105,7 +105,7 @@ namespace Test
 		gen2.Generate(outBytes, 0, outBytes.size());
 		delete dgt;
 		if (outBytes != m_output[1])
-			throw std::exception("HKDF: Initialization test failed!");
+			throw TestException("HKDF: Initialization test failed!");
 
 		// hmac instance
 		Mac::HMAC hmac(Enumeration::Digests::SHA256);
@@ -113,14 +113,14 @@ namespace Test
 		gen3.Initialize(m_key[1], m_salt[1], m_info[1]);
 		gen3.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[1])
-			throw std::exception("HKDF: Initialization test failed!");
+			throw TestException("HKDF: Initialization test failed!");
 
 		// test reset
 		gen1.Reset();
 		gen1.Initialize(m_key[1], m_salt[1], m_info[1]);
 		gen1.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[1])
-			throw std::exception("HKDF: Initialization test failed!");
+			throw TestException("HKDF: Initialization test failed!");
 
 	}
 }

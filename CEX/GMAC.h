@@ -88,7 +88,7 @@ class GMAC : public IMac
 {
 private:
 	static const size_t BLOCK_SIZE = 16;
-	const size_t TAG_MINLEN = 8;
+	static const size_t TAG_MINLEN = 8;
 
 	IBlockCipher* m_blockCipher;
 	BlockCiphers m_cipherType;

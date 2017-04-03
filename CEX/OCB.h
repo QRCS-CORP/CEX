@@ -124,10 +124,10 @@ class OCB : public IAeadMode
 private:
 	static const size_t BLOCK_SIZE = 16;
 	static const size_t PREFETCH_HASH = 16 * 32;
-	const size_t MAX_NONCESIZE = 15;
-	const size_t MAX_TAGSIZE = 16;
-	const size_t MIN_NONCESIZE = 12;
-	const size_t MIN_TAGSIZE = 12;
+	static const size_t MAX_NONCESIZE = 15;
+	static const size_t MAX_TAGSIZE = 16;
+	static const size_t MIN_NONCESIZE = 12;
+	static const size_t MIN_TAGSIZE = 12;
 
 	std::vector<byte> m_aadData;
 	bool m_aadLoaded;

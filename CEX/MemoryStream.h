@@ -12,6 +12,7 @@ NAMESPACE_IO
 class MemoryStream : public IByteStream
 {
 private:
+
 	bool m_isDestroyed;
 	std::vector<byte> m_streamData;
 	ulong m_streamPosition;

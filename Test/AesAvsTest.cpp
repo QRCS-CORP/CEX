@@ -129,7 +129,7 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("AESAVS: Encrypted arrays are not equal!");
+			throw TestException("AESAVS: Encrypted arrays are not equal!");
 	}
 
 	void AesAvsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -142,7 +142,7 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("AESAVS: AES-NI Encrypted arrays are not equal!");
+			throw TestException("AESAVS: AES-NI Encrypted arrays are not equal!");
 	}
 
 	void AesAvsTest::OnProgress(char* Data)

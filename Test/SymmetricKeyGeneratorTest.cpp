@@ -34,20 +34,20 @@ namespace Test
 
 		SymmetricKey symKey = keyGen.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey))
-			throw std::exception("CheckAccess: The key is invalid!");
+			throw TestException("CheckAccess: The key is invalid!");
 
 		SymmetricSecureKey secKey = keyGen.GetSecureKey(keySize);
 		if (!IsValidKey(secKey))
-			throw std::exception("CheckAccess: The key is invalid!");
+			throw TestException("CheckAccess: The key is invalid!");
 
 		std::vector<byte> data(128);
 		keyGen.GetBytes(data);
 		if (!IsGoodRun(data))
-			throw std::exception("CheckAccess: The key is invalid!");
+			throw TestException("CheckAccess: The key is invalid!");
 
 		data = keyGen.GetBytes(data.size());
 		if (!IsGoodRun(data))
-			throw std::exception("CheckAccess: The key is invalid!");
+			throw TestException("CheckAccess: The key is invalid!");
 	}
 
 	void SymmetricKeyGeneratorTest::CheckInit()
@@ -58,22 +58,22 @@ namespace Test
 		SymmetricKeyGenerator keyGen1(Digests::SHA256, Providers::CJP);
 		SymmetricKey symKey1 = keyGen1.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey1))
-			throw std::exception("CheckInit: Key generation has failed!");
+			throw TestException("CheckInit: Key generation has failed!");
 
 		SymmetricKeyGenerator keyGen2(Digests::Blake512, Providers::CSP);
 		SymmetricKey symKey2 = keyGen2.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey2))
-			throw std::exception("CheckInit: Key generation has failed!");
+			throw TestException("CheckInit: Key generation has failed!");
 
 		SymmetricKeyGenerator keyGen3(Digests::Keccak256, Providers::ECP);
 		SymmetricKey symKey3 = keyGen3.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey3))
-			throw std::exception("CheckInit: Key generation has failed!");
+			throw TestException("CheckInit: Key generation has failed!");
 
 		SymmetricKeyGenerator keyGen4(Digests::Skein512, Providers::RDP);
 		SymmetricKey symKey4 = keyGen4.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey4))
-			throw std::exception("CheckInit: Key generation has failed!");
+			throw TestException("CheckInit: Key generation has failed!");
 	}
 
 	bool SymmetricKeyGeneratorTest::IsGoodRun(const std::vector<byte> &Input)

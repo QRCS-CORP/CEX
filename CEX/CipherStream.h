@@ -149,7 +149,8 @@ class CipherStream
 public:
 
 private:
-	const size_t MAX_PRLALLOC = 100000000;
+
+	static const size_t MAX_PRLALLOC = 100000000;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;

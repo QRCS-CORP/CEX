@@ -97,8 +97,8 @@ class CMAC : public IMac
 {
 private:
 
-	const byte CT87 = (byte)0x87;
-	const byte CT1B = (byte)0x1b;
+	static const byte CT87 = (byte)0x87;
+	static const byte CT1B = (byte)0x1b;
 
 	ICipherMode* m_cipherMode;
 	std::vector<byte> m_cipherKey;

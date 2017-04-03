@@ -39,7 +39,6 @@ using Enumeration::BlockCiphers;
 using Enumeration::Digests;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Digest::IDigest;
-
 using Common::ParallelOptions;
 
 /// <summary>
@@ -125,11 +124,11 @@ private:
 
 	static const size_t COUNTER_SIZE = 16;
 	static const size_t DEF_CYCTHRESH = 1024 * 1000;
-	const ulong MAX_OUTPUT = 35184372088832;
-	const size_t MAX_PRLALLOC = 100000000;
-	const size_t MAX_REQUEST = 65536;
-	const size_t MAX_RESEED = 536870912;
-	const size_t PRC_DATACACHE = 1024 * 16;
+	static const ulong MAX_OUTPUT = 35184372088832;
+	static const size_t MAX_PRLALLOC = 100000000;
+	static const size_t MAX_REQUEST = 65536;
+	static const size_t MAX_RESEED = 536870912;
+	static const size_t PRC_DATACACHE = 1024 * 16;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;

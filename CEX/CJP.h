@@ -61,19 +61,19 @@ NAMESPACE_PROVIDER
 class CJP : public IProvider
 {
 private:
-	const uint ACC_LOOP_BIT_MAX = 7;
-	const uint ACC_LOOP_BIT_MIN = 0;
-	const uint CLEARCACHE = 100;
-	const uint DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
-	const uint FOLD_LOOP_BIT_MAX = 4;
-	const uint FOLD_LOOP_BIT_MIN = 0;
-	const uint LOOP_TEST_COUNT = 300;
-	const uint MEMORY_ACCESSLOOPS = 256;
-	const uint MEMORY_BLOCKS = 512;
-	const uint MEMORY_BLOCKSIZE = 32;
-	const uint MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
-	const uint OVRSMP_RATE_MAX = 128;
-	const uint OVRSMP_RATE_MIN = 1;
+	static const uint ACC_LOOP_BIT_MAX = 7;
+	static const uint ACC_LOOP_BIT_MIN = 0;
+	static const uint CLEARCACHE = 100;
+	static const uint DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
+	static const uint FOLD_LOOP_BIT_MAX = 4;
+	static const uint FOLD_LOOP_BIT_MIN = 0;
+	static const uint LOOP_TEST_COUNT = 300;
+	static const uint MEMORY_ACCESSLOOPS = 256;
+	static const uint MEMORY_BLOCKS = 512;
+	static const uint MEMORY_BLOCKSIZE = 32;
+	static const uint MEMORY_SIZE = (MEMORY_BLOCKS * MEMORY_BLOCKSIZE);
+	static const uint OVRSMP_RATE_MAX = 128;
+	static const uint OVRSMP_RATE_MIN = 1;
 
 	bool m_enableAccess;
 	bool m_enableDebias;

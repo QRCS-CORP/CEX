@@ -62,7 +62,7 @@ namespace Test
 		cipher.Transform(enc, dec);
 
 		if (data != dec)
-			throw std::exception("ChaCha20: Decrypted arrays are not equal!");
+			throw TestException("ChaCha20: Decrypted arrays are not equal!");
 	}
 
 	void ChaChaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -75,13 +75,13 @@ namespace Test
 		cipher.Transform(Input, 0, outBytes, 0, Input.size());
 
 		if (outBytes != Output)
-			throw std::exception("ChaCha20: Encrypted arrays are not equal!"); //251,184
+			throw TestException("ChaCha20: Encrypted arrays are not equal!"); //251,184
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, 0, outBytes, 0, Output.size());
 
 		if (outBytes != Input)
-			throw std::exception("ChaCha20: Decrypted arrays are not equal!");
+			throw TestException("ChaCha20: Decrypted arrays are not equal!");
 	}
 
 	void ChaChaTest::Initialize()

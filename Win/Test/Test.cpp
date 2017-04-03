@@ -2,8 +2,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <string>
 
 #include "../../CEX/CpuDetect.h"
 #include "../../Test/AEADTest.h"
@@ -84,6 +84,32 @@ using namespace Test;
 // TLS					-?
 // STM-KEX				-?
 // DLL API				-?
+
+void CpuCheck()
+{
+	Common::CpuDetect detect;
+	ConsoleUtils::WriteLine("L1 cache size: " + std::to_string(detect.L1CacheSize()));
+	ConsoleUtils::WriteLine("Total L1 cache size: " + std::to_string(detect.L1CacheTotal()));
+	ConsoleUtils::WriteLine("L1 cache line size: " + std::to_string(detect.L1CacheLineSize()));
+	ConsoleUtils::WriteLine("L2 cache size: " + std::to_string(detect.L2CacheSize()));
+	ConsoleUtils::WriteLine("Physical cores: " + std::to_string(detect.PhysicalCores()));
+	ConsoleUtils::WriteLine("Virtual cores: " + std::to_string(detect.VirtualCores()));
+	ConsoleUtils::WriteLine("HyperThreading: " + std::to_string(detect.HyperThread()));
+	ConsoleUtils::WriteLine("AES-NI: " + std::to_string(detect.AESNI()));
+	ConsoleUtils::WriteLine("AVX: " + std::to_string(detect.AVX()));
+	ConsoleUtils::WriteLine("AVX2: " + std::to_string(detect.AVX2()));
+	ConsoleUtils::WriteLine("CMUL: " + std::to_string(detect.CMUL()));
+	ConsoleUtils::WriteLine("RDRAND: " + std::to_string(detect.RDRAND()));
+	ConsoleUtils::WriteLine("RDTSCP: " + std::to_string(detect.RDTSCP()));
+	ConsoleUtils::WriteLine("SHA: " + std::to_string(detect.SHA()));
+	ConsoleUtils::WriteLine("SSE2: " + std::to_string(detect.SSE2()));
+	ConsoleUtils::WriteLine("SSE3: " + std::to_string(detect.SSE3()));
+	ConsoleUtils::WriteLine("SSSE3: " + std::to_string(detect.SSSE3()));
+	ConsoleUtils::WriteLine("SSE41: " + std::to_string(detect.SSE41()));
+	ConsoleUtils::WriteLine("SSE42: " + std::to_string(detect.SSE42()));
+	ConsoleUtils::WriteLine("XOP: " + std::to_string(detect.XOP()));
+	ConsoleUtils::WriteLine("");
+}
 
 bool HasAESNI()
 {
@@ -182,6 +208,7 @@ int main()
 	bool hasNI = HasAESNI();
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
+	//CpuCheck();
 
 	try
 	{

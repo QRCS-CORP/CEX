@@ -1,7 +1,5 @@
 #include "IntUtils.h"
-#if defined(CEX_HAS_MINSSE)
-#	include "Intrinsics.h"
-#endif
+#include "Intrinsics.h"
 
 NAMESPACE_UTILITY
 
@@ -103,6 +101,21 @@ ulong IntUtils::ByteReverse(ulong Value)
 	// 6 instructions with rotate instruction, 8 without
 	Value = ((Value & 0xFF00FF00) >> 8) | ((Value & 0x00FF00FF) << 8);
 	return RotFL32(Value, 16U);
+#endif
+}
+
+// ** Big Endian ** //
+
+void IntUtils::BlockToBe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output)
+{
+#if defined(IS_BIG_ENDIAN)
+	memcpy(&Output[0], &Input[InOffset], Output.size() * sizeof(uint));
+#else
+	for (size_t i = 0; i < Output.size(); ++i)
+	{
+		Output[i] = IntUtils::BytesToBe32(Input, InOffset);
+		InOffset += 4;
+	}
 #endif
 }
 

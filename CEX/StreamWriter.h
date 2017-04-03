@@ -11,6 +11,7 @@ NAMESPACE_IO
 class StreamWriter
 {
 private:
+
 	size_t m_streamPosition;
 	std::vector<byte> m_streamData;
 

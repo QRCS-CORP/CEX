@@ -1,6 +1,6 @@
 #include "Blake2Test.h"
 #include <fstream>
-#include <string.h>
+#include <string>
 #include "HexConverter.h"
 #include "../CEX/CSP.h"
 #include "../CEX/Blake256.h"
@@ -81,7 +81,7 @@ namespace Test
 					blake2b.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::exception("Blake2BTest: KAT test has failed!");
+						throw TestException("Blake2BTest: KAT test has failed!");
 				}
 			}
 		}
@@ -130,7 +130,7 @@ namespace Test
 					blake2.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::exception("Blake2BPTest: KAT test has failed!");
+						throw TestException("Blake2BPTest: KAT test has failed!");
 				}
 			}
 		}
@@ -176,7 +176,7 @@ namespace Test
 					blake2s.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::exception("Blake2STest: KAT test has failed!");
+						throw TestException("Blake2STest: KAT test has failed!");
 				}
 			}
 		}
@@ -222,7 +222,7 @@ namespace Test
 					blake2sp.Compute(input, hash);
 
 					if (hash != expect)
-						throw std::exception("Blake2SPTest: KAT test has failed!");
+						throw TestException("Blake2SPTest: KAT test has failed!");
 				}
 			}
 		}
@@ -239,7 +239,7 @@ namespace Test
 		Key::Symmetric::ISymmetricKey* mkey2 = mkey.Clone();
 
 		if (!mkey.Equals(*mkey2))
-			throw std::exception("Blake2STest: Mac parameters test failed!");
+			throw TestException("Blake2STest: Mac parameters test failed!");
 	}
 
 	void Blake2Test::TreeParamsTest()

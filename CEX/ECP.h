@@ -44,7 +44,8 @@ class ECP : public IProvider
 {
 private:
 
-	const size_t DEF_STATECAP = 1024;
+	static const size_t DEF_STATECAP = 1024;
+
 	ICipherMode* m_cipherMode;
 	bool m_isAvailable;
 

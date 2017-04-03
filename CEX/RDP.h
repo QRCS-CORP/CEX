@@ -60,13 +60,13 @@ public:
 private:
 
 	// how many times to read from the RDRAND/RDSEED RNGs; each read generates 32 bits of output
-	const size_t RNGPOLLS = 32;
+	static const size_t RNGPOLLS = 32;
 	// RDRAND is guaranteed to generate a random number within 10 retries on a working CPU
-	const size_t RDRRETRY = 10;
+	static const size_t RDRRETRY = 10;
 	// RdSeed is not guaranteed to generate a random number within a specific number of retries
-	const size_t RDSRETRY = 20;
-	const size_t RDSEEDMAX = 64 * 1000 * 1000;
-	const size_t RDSUCCESS = 1;
+	static const size_t RDSRETRY = 20;
+	static const size_t RDSEEDMAX = 64 * 1000 * 1000;
+	static const size_t RDSUCCESS = 1;
 
 	bool m_isAvailable;
 	RdEngines m_engineType;

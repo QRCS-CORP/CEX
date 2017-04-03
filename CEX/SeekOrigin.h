@@ -4,6 +4,7 @@
 #include "CexDomain.h"
 
 NAMESPACE_IO
+
 /// <summary>
 /// Seek origin position flags
 /// </summary>
@@ -22,7 +23,7 @@ enum class SeekOrigin : uint
 	/// </summary>
 	End = 4
 };
-NAMESPACE_IOEND
 
+NAMESPACE_IOEND
 #endif
 

@@ -112,6 +112,7 @@ public:
 	/// <returns>An unsigned 64 bit integer value</returns>
 	static ulong ToUInt64(const std::vector<byte> &Input, const size_t InOffset);
 };
+
 NAMESPACE_IOEND
 #endif
 

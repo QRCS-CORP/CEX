@@ -14,6 +14,7 @@
 #include "../CEX/CexDomain.h"
 #include "../CEX/CSP.h"
 #include "../CEX/SymmetricKey.h"
+#include "TestException.h"
 
 namespace Test
 {
@@ -138,7 +139,7 @@ namespace Test
 
 			if (!ifs || !ifs.is_open())
 			{
-				throw std::exception("Could not open the KAT file!");
+				throw TestException("Could not open the KAT file!");
 			}
 			else
 			{
@@ -156,7 +157,7 @@ namespace Test
 				}
 				else
 				{
-					throw std::exception("The KAT file is empty!");
+					throw TestException("The KAT file is empty!");
 				}
 			}
 

@@ -88,8 +88,8 @@ class HMAC : public IMac
 {
 private:
 
-	const byte IPAD = 0x36;
-	const byte OPAD = 0x5C;
+	static const byte IPAD = 0x36;
+	static const byte OPAD = 0x5C;
 
 	IDigest* m_msgDigest;
 	bool m_destroyEngine;

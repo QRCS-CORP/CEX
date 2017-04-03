@@ -23,8 +23,8 @@ private:
 	ISO7816& operator=(const ISO7816&) = delete;
 	ISO7816& operator=(ISO7816&&) = delete;
 
-	const byte ZBCODE = (byte)0x00;
-	const byte MKCODE = (byte)0x80;
+	static const byte ZBCODE = (byte)0x00;
+	static const byte MKCODE = (byte)0x80;
 
 public:
 	//~~~Constructor~~~//

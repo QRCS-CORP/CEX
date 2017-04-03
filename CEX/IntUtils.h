@@ -125,7 +125,7 @@ public:
 		return oss.str();
 	}
 
-	// ** Misc Bits ** //
+	//~~~Misc Bits~~~//
 
 	/// <summary>
 	/// Get the bit precision value
@@ -224,6 +224,16 @@ public:
 	/// Run time check for Little Endian byte order
 	/// </summary>
 	static bool IsBigEndian();
+
+	/// <summary>
+	/// Convert a Big Endian N * 8bit word array to a uint32 array.
+	/// <para>The entire input array is copied to 32bit uints, input must be 32bit aligned.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination array</param>
+	static void BlockToBe32(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output);
 
 	/// <summary>
 	/// Convert bytes to a Big Endian N bit word

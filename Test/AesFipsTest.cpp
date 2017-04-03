@@ -53,13 +53,13 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("AesFipsTest: AES: Encrypted arrays are not equal!");
+			throw TestException("AesFipsTest: AES: Encrypted arrays are not equal!");
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::exception("AesFipsTest: AES: Decrypted arrays are not equal!");
+			throw TestException("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -72,13 +72,13 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("AesFipsTest: AES: Encrypted arrays are not equal!");
+			throw TestException("AesFipsTest: AES: Encrypted arrays are not equal!");
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
-			throw std::exception("AesFipsTest: AES: Decrypted arrays are not equal!");
+			throw TestException("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -96,7 +96,7 @@ namespace Test
 		}
 
 		if (outBytes != Output)
-			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 
 		{
 			RHX engine;
@@ -108,7 +108,7 @@ namespace Test
 		}
 
 		if (outBytes != Input)
-			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 	}
 
 	void AesFipsTest::CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -125,7 +125,7 @@ namespace Test
 		}
 
 		if (outBytes != Output)
-			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 
 		{
 			AHX engine;
@@ -137,7 +137,7 @@ namespace Test
 		}
 
 		if (outBytes != Input)
-			throw std::exception("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 	}
 
 	void AesFipsTest::Initialize()

@@ -177,7 +177,7 @@ namespace Test
 			eng.Transform(outBytes, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("Serpent MonteCarlo: Arrays are not equal!");
+			throw TestException("Serpent MonteCarlo: Arrays are not equal!");
 	}
 
 	void SerpentTest::CompareOutput()
@@ -202,7 +202,7 @@ namespace Test
 		eng.DecryptBlock(outBytes, decBytes);
 
 		if (inBytes != decBytes)
-			throw std::exception("Serpent: Decrypted arrays are not equal!");
+			throw TestException("Serpent: Decrypted arrays are not equal!");
 	}
 
 	void SerpentTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -218,7 +218,7 @@ namespace Test
 		enc.EncryptBlock(inBytes, outBytes);
 
 		if (Output != outBytes)
-			throw std::exception("Serpent Vector: Arrays are not equal!");
+			throw TestException("Serpent Vector: Arrays are not equal!");
 
 		//TestUtils::Reverse(outBytes);
 		SHX dec;
@@ -226,7 +226,7 @@ namespace Test
 		dec.DecryptBlock(outBytes, expBytes);
 
 		if (Input != expBytes)
-			throw std::exception("Serpent Vector: Arrays are not equal!");
+			throw TestException("Serpent Vector: Arrays are not equal!");
 	}
 
 	void SerpentTest::OnProgress(char* Data)

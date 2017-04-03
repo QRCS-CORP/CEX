@@ -34,6 +34,7 @@ struct SymmetricKeySize
 private:
 
 	static const size_t HDR_SIZE = sizeof(uint) * 3;
+
 	uint m_infoSize;
 	uint m_keySize;
 	uint m_nonceSize;

@@ -49,13 +49,13 @@ namespace Test
 		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
-			throw std::exception("DigestStreamTest: Expected hash is not equal!");
+			throw TestException("DigestStreamTest: Expected hash is not equal!");
 
 		// test byte access method
 		hash2 = ds.Compute(data, 0, data.size());
 
 		if (hash1 != hash2)
-			throw std::exception("DigestStreamTest: Expected hash is not equal!");
+			throw TestException("DigestStreamTest: Expected hash is not equal!");
 	}
 
 	void DigestStreamTest::OnProgress(char* Data)

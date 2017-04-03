@@ -113,12 +113,12 @@ class RHX : public IBlockCipher
 private:
 
 	static const std::string DEF_INFO;
-	const size_t AES256_ROUNDS = 14;
-	const size_t AES512_ROUNDS = 22;
-	const size_t MAX_ROUNDS = 38;
-	const size_t MIN_ROUNDS = 10;
+	static const size_t AES256_ROUNDS = 14;
+	static const size_t AES512_ROUNDS = 22;
+	static const size_t MAX_ROUNDS = 38;
+	static const size_t MIN_ROUNDS = 10;
 	// size of state buffer and lookup tables subtracted parallel size calculations
-	const size_t STATE_PRECACHED = 5120;
+	static const size_t STATE_PRECACHED = 5120;
 
 	size_t m_blockSize;
 	bool m_destroyEngine;

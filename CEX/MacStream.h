@@ -71,7 +71,8 @@ using Processing::MacDescription;
 class MacStream
 {
 private:
-	const size_t BUFFER_SIZE = 64 * 1024;
+
+	static const size_t BUFFER_SIZE = 64 * 1024;
 
 	IMac* m_macEngine;
 	size_t m_blockSize;

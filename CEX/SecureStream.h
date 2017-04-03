@@ -13,6 +13,7 @@ NAMESPACE_IO
 class SecureStream : public IByteStream
 {
 private:
+
 	bool m_isDestroyed;
 	std::vector<byte> m_keySalt;
 	std::vector<byte> m_streamData;

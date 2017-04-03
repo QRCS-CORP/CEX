@@ -115,11 +115,11 @@ private:
 
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string DEF_INFO;
-	const size_t AES256_ROUNDS = 14;
-	const size_t MAX_ROUNDS = 38;
-	const size_t MIN_ROUNDS = 10;
+	static const size_t AES256_ROUNDS = 14;
+	static const size_t MAX_ROUNDS = 38;
+	static const size_t MIN_ROUNDS = 10;
 	// size of state buffer subtracted parallel size calculations
-	const size_t STATE_PRECACHED = 2048;
+	static const size_t STATE_PRECACHED = 2048;
 
 	size_t m_blockSize;
 	bool m_destroyEngine;

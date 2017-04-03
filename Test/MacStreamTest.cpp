@@ -94,7 +94,7 @@ namespace Test
 		code2 = ds.Compute(ms);
 
 		if (code1 != code2)
-			throw std::exception("MacStreamTest: Expected hash is not equal!");
+			throw TestException("MacStreamTest: Expected hash is not equal!");
 
 		delete ms;
 	}
@@ -118,7 +118,7 @@ namespace Test
 		delete ms;
 
 		if (c1 != c2)
-			throw std::exception("MacStreamTest: CMAC code arrays are not equal!");
+			throw TestException("MacStreamTest: CMAC code arrays are not equal!");
 	}
 
 	void MacStreamTest::HmacDescriptionTest()
@@ -140,7 +140,7 @@ namespace Test
 		delete ms;
 
 		if (c1 != c2)
-			throw std::exception("MacStreamTest: HMAC code arrays are not equal!");
+			throw TestException("MacStreamTest: HMAC code arrays are not equal!");
 	}
 
 	void MacStreamTest::OnProgress(char* Data)

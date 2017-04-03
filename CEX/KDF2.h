@@ -87,7 +87,7 @@ class KDF2 : public IKdf
 {
 private:
 
-	const size_t MIN_SALTLEN = 4;
+	static const size_t MIN_SALTLEN = 4;
 
 	IDigest* m_msgDigest;
 	size_t m_blockSize;

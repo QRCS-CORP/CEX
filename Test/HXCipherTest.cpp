@@ -106,7 +106,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[0])
-				throw std::exception("AHX: Failed encryption test!");
+				throw TestException("AHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -118,7 +118,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("AHX: Failed decryption test!");
+				throw TestException("AHX: Failed decryption test!");
 		}
 		// AHX, 22 rounds
 		{
@@ -135,7 +135,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[1])
-				throw std::exception("AHX: Failed encryption test!");
+				throw TestException("AHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -147,7 +147,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("AHX: Failed decryption test!");
+				throw TestException("AHX: Failed decryption test!");
 		}
 
 		// AHX, 22 rounds, standard key schedule
@@ -164,7 +164,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[2])
-				throw std::exception("AHX: Failed encryption test!");
+				throw TestException("AHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -176,7 +176,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("AHX: Failed decryption test!");
+				throw TestException("AHX: Failed decryption test!");
 		}
 	}
 
@@ -200,7 +200,7 @@ namespace Test
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 			if (outBytes != m_rhxExpected[0])
-				throw std::exception("RHX: Failed encryption test!");
+				throw TestException("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -212,7 +212,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("RHX: Failed decryption test!");
+				throw TestException("RHX: Failed decryption test!");
 		}
 		// RHX, 22 rounds
 		{
@@ -229,7 +229,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[1])
-				throw std::exception("RHX: Failed encryption test!");
+				throw TestException("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -241,7 +241,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("RHX: Failed decryption test!");
+				throw TestException("RHX: Failed decryption test!");
 		}
 
 		// RHX, 22 rounds, standard key schedule
@@ -258,7 +258,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[2])
-				throw std::exception("RHX: Failed encryption test!");
+				throw TestException("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -270,7 +270,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("RHX: Failed decryption test!");
+				throw TestException("RHX: Failed decryption test!");
 		}
 
 		// RHX, 22 rounds, 32 byte block, standard key schedule
@@ -295,7 +295,7 @@ namespace Test
 			}
 
 			if (outBytes != m_rhxExpected[3])
-				throw std::exception("RHX: Failed encryption test!");
+				throw TestException("RHX: Failed encryption test!");
 
 			cipher.Initialize(false, k);
 
@@ -307,7 +307,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("RHX: Failed decryption test!");
+				throw TestException("RHX: Failed decryption test!");
 		}
 	}
 
@@ -332,7 +332,7 @@ namespace Test
 			}
 
 			if (outBytes != m_shxExpected[0])
-				throw std::exception("SHX: Failed encryption test!");
+				throw TestException("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -344,7 +344,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("SHX: Failed decryption test!");
+				throw TestException("SHX: Failed decryption test!");
 		}
 		// SHX, 40 rounds
 		{
@@ -361,7 +361,7 @@ namespace Test
 			}
 
 			if (outBytes != m_shxExpected[1])
-				throw std::exception("SHX: Failed encryption test!");
+				throw TestException("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -373,7 +373,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("SHX: Failed decryption test!");
+				throw TestException("SHX: Failed decryption test!");
 		}
 		// SHX, 40 rounds, standard key schedule
 		{
@@ -389,7 +389,7 @@ namespace Test
 			}
 
 			if (outBytes != m_shxExpected[2])
-				throw std::exception("SHX: Failed encryption test!");
+				throw TestException("SHX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -401,7 +401,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("SHX: Failed decryption test!");
+				throw TestException("SHX: Failed decryption test!");
 		}
 	}
 
@@ -426,7 +426,7 @@ namespace Test
 			}
 
 			if (outBytes != m_thxExpected[0])
-				throw std::exception("THX: Failed encryption test!");
+				throw TestException("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -438,7 +438,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("THX: Failed decryption test!");
+				throw TestException("THX: Failed decryption test!");
 		}
 		// THX, 20 rounds
 		{
@@ -455,7 +455,7 @@ namespace Test
 			}
 
 			if (outBytes != m_thxExpected[1])
-				throw std::exception("THX: Failed encryption test!");
+				throw TestException("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -467,7 +467,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("THX: Failed decryption test!");
+				throw TestException("THX: Failed decryption test!");
 		}
 		// THX, 20 rounds, standard key schedule
 		{
@@ -483,7 +483,7 @@ namespace Test
 			}
 
 			if (outBytes != m_thxExpected[2])
-				throw std::exception("THX: Failed encryption test!");
+				throw TestException("THX: Failed encryption test!");
 
 			engine.Initialize(false, k);
 
@@ -495,7 +495,7 @@ namespace Test
 			delete eng;
 
 			if (outBytes != decBytes)
-				throw std::exception("THX: Failed decryption test!");
+				throw TestException("THX: Failed decryption test!");
 		}
 	}
 }

@@ -66,7 +66,7 @@ namespace Test
 		cipher2.Transform(data, enc2);
 
 		if (enc != enc2)
-			throw std::exception("Salsa20: Encrypted arrays are not equal!");
+			throw TestException("Salsa20: Encrypted arrays are not equal!");
 
 		// decrypt linear
 		cipher2.Initialize(k);
@@ -80,9 +80,9 @@ namespace Test
 		cipher.Transform(enc2, dec2);
 
 		if (dec != data)
-			throw std::exception("Salsa20: Decrypted arrays are not equal!");
+			throw TestException("Salsa20: Decrypted arrays are not equal!");
 		if (dec != dec2)
-			throw std::exception("Salsa20: Decrypted arrays are not equal!");
+			throw TestException("Salsa20: Decrypted arrays are not equal!");
 	}
 
 	void SalsaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -94,16 +94,16 @@ namespace Test
 		cipher.Transform(Input, outBytes);
 
 		if (outBytes != Output)
-			throw std::exception("Salsa20: Encrypted arrays are not equal!");
+			throw TestException("Salsa20: Encrypted arrays are not equal!");
 
 		if (!Test::TestUtils::IsEqual(outBytes, Output))
-			throw std::exception("Salsa20: Encrypted arrays are not equal!");
+			throw TestException("Salsa20: Encrypted arrays are not equal!");
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, outBytes);
 
 		if (!Test::TestUtils::IsEqual(outBytes, Input))
-			throw std::exception("Salsa20: Decrypted arrays are not equal!");
+			throw TestException("Salsa20: Decrypted arrays are not equal!");
 	}
 
 	void SalsaTest::Initialize()

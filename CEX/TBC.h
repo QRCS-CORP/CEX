@@ -16,8 +16,8 @@ private:
 	TBC& operator=(const TBC&) = delete;
 	TBC& operator=(TBC&&) = delete;
 
-	const byte ZBCODE = (byte)0x00;
-	const byte MKCODE = (byte)0xff;
+	static const byte ZBCODE = (byte)0x00;
+	static const byte MKCODE = (byte)0xff;
 
 public:
 	//~~~Constructor~~~//

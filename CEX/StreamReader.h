@@ -11,6 +11,7 @@ NAMESPACE_IO
 class StreamReader
 {
 private:
+
 	MemoryStream m_streamData;
 	StreamReader() {}
 

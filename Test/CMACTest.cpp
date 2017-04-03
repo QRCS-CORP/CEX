@@ -61,7 +61,7 @@ namespace Test
 		delete eng;
 
 		if (hash1 != hash2)
-			throw std::exception("CMAC is not equal!");
+			throw TestException("CMAC is not equal!");
 	}
 
 	void CMACTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
@@ -78,7 +78,7 @@ namespace Test
 		delete eng;
 
 		if (Expected != hash)
-			throw std::exception("CMAC is not equal!");
+			throw TestException("CMAC is not equal!");
 	}
 
 	void CMACTest::Initialize()

@@ -40,7 +40,8 @@ public:
 
 private:
 
-	const uint CHUNK_SIZE = 4096;
+	static const uint CHUNK_SIZE = 4096;
+
 	bool m_isDestroyed;
 	std::string m_fileName;
 	ulong m_filePosition;

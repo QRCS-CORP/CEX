@@ -5,6 +5,7 @@
 #include "IntUtils.h"
 #include "Intrinsics.h"
 #include "SimdProfiles.h"
+#include <wmmintrin.h>
 
 NAMESPACE_MAC
 

@@ -178,7 +178,7 @@ namespace Test
 				Cipher->Transform(enc1, j * blkSze, dec, j * blkSze);
 
 			if (dec != data)
-				throw std::exception("Decrypted output is not equal!");
+				throw TestException("Decrypted output is not equal!");
 
 
 			// buffered: transform(in, out)
@@ -191,7 +191,7 @@ namespace Test
 			}
 
 			if (enc1 != enc2)
-				throw std::exception("Encrypted output is not equal!");
+				throw TestException("Encrypted output is not equal!");
 
 			Cipher->Initialize(false, keyParam);
 			memset(&dec[0], 0, dec.size());
@@ -204,7 +204,7 @@ namespace Test
 			}
 
 			if (dec != data)
-				throw std::exception("Decrypted output is not equal!");
+				throw TestException("Decrypted output is not equal!");
 
 
 			// with size param: transform(in, off, out, off, size)
@@ -213,14 +213,14 @@ namespace Test
 			Cipher->Transform(data, 0, enc2, 0, data.size());
 
 			if (enc1 != enc2)
-				throw std::exception("Encrypted output is not equal!");
+				throw TestException("Encrypted output is not equal!");
 
 			memset(&dec[0], 0, dec.size());
 			Cipher->Initialize(false, keyParam);
 			Cipher->Transform(enc2, 0, dec, 0, data.size());
 
 			if (dec != data)
-				throw std::exception("Decrypted output is not equal!");
+				throw TestException("Decrypted output is not equal!");
 
 
 			// parallel access //
@@ -238,7 +238,7 @@ namespace Test
 				Cipher->Transform(data, 0, enc2, 0);
 
 				if (enc1 != enc2)
-					throw std::exception("Encrypted output is not equal!");
+					throw TestException("Encrypted output is not equal!");
 			}
 
 			memset(&dec[0], 0, dec.size());
@@ -247,7 +247,7 @@ namespace Test
 			Cipher->Transform(enc2, 0, dec, 0);
 
 			if (dec != data)
-				throw std::exception("Decrypted output is not equal!");
+				throw TestException("Decrypted output is not equal!");
 
 			if (prlEncrypt)
 			{
@@ -257,7 +257,7 @@ namespace Test
 				Cipher->Transform(data, 0, enc2, 0, data.size());
 
 				if (enc1 != enc2)
-					throw std::exception("Encrypted output is not equal!");
+					throw TestException("Encrypted output is not equal!");
 			}
 
 			memset(&dec[0], 0, dec.size());
@@ -265,7 +265,7 @@ namespace Test
 			Cipher->Transform(enc2, 0, dec, 0, enc2.size());
 
 			if (dec != data)
-				throw std::exception("Decrypted output is not equal!");
+				throw TestException("Decrypted output is not equal!");
 		}
 	}
 
@@ -313,7 +313,7 @@ namespace Test
 			Transform1(&cpr2, data, blockSize, enc2);
 
 			if (enc1 != enc2)
-				throw std::exception("Parallel CTR: Encrypted output is not equal!");
+				throw TestException("Parallel CTR: Encrypted output is not equal!");
 		}
 
 		Mode::CBC cpr3(eng1);
@@ -342,19 +342,19 @@ namespace Test
 			BlockEncrypt(&cpr4, data, 0, enc2, 0);
 
 			if (enc1 != enc2)
-				throw std::exception("CBC: Encrypted output is not equal!");
+				throw TestException("CBC: Encrypted output is not equal!");
 
 			cpr3.Initialize(false, keyParam);
 			BlockDecrypt(&cpr3, enc1, 0, dec, 0);
 
 			if (dec != data)
-				throw std::exception("CBC: Decrypted output is not equal!");
+				throw TestException("CBC: Decrypted output is not equal!");
 
 			cpr4.Initialize(false, keyParam);
 			BlockDecrypt(&cpr4, enc2, 0, dec, 0);
 
 			if (dec != data)
-				throw std::exception("CBC: Decrypted output is not equal!");
+				throw TestException("CBC: Decrypted output is not equal!");
 		}
 
 		delete eng1;
@@ -388,7 +388,7 @@ namespace Test
 			enc = TestUtils::Reduce(enc);
 
 		if (enc != Expected)
-			throw std::exception("ParallelModeTest: Failed Kat comparison test!");
+			throw TestException("ParallelModeTest: Failed Kat comparison test!");
 	}
 
 	void ParallelModeTest::CompareBcrSimd(IBlockCipher* Engine)
@@ -440,7 +440,7 @@ namespace Test
 			Transform1(&cipher, data, blockSize, enc2);
 
 			if (enc1 != enc2)
-				throw std::exception("Parallel CTR: Encrypted output is not equal!");
+				throw TestException("Parallel CTR: Encrypted output is not equal!");
 
 			// decrypt
 			cipher.Initialize(false, keyParam);
@@ -449,7 +449,7 @@ namespace Test
 			Transform1(&cipher, enc1, blockSize, dec);
 
 			if (dec != data)
-				throw std::exception("Parallel CTR: Decrypted output is not equal!");
+				throw TestException("Parallel CTR: Decrypted output is not equal!");
 		}
 	}
 
@@ -508,7 +508,7 @@ namespace Test
 			Transform1(&cipher2, data, cipher2.ParallelBlockSize(), dec2);
 
 			if (dec1 != dec2)
-				throw std::exception("ParallelModeTest: Failed CBC decryption test!");
+				throw TestException("ParallelModeTest: Failed CBC decryption test!");
 		}
 
 		// decryption output integrity
@@ -533,7 +533,7 @@ namespace Test
 			Transform1(&cipher2, dec1, smpSze, dec2);
 
 			if (data != dec2)
-				throw std::exception("ParallelModeTest: Failed CBC decryption test!");
+				throw TestException("ParallelModeTest: Failed CBC decryption test!");
 		}
 	}
 
@@ -596,7 +596,7 @@ namespace Test
 				cipher.Transform128(enc, j * BLK128, dec, j * BLK128);
 
 			if (data != dec)
-				throw std::exception("ParallelModeTest: Failed CBC-WBV integrity test!");
+				throw TestException("ParallelModeTest: Failed CBC-WBV integrity test!");
 		}
 
 
@@ -636,7 +636,7 @@ namespace Test
 			}
 
 			if (data != dec)
-				throw std::exception("ParallelModeTest: Failed CBC-WBV parallel decryption test!");
+				throw TestException("ParallelModeTest: Failed CBC-WBV parallel decryption test!");
 		}
 
 
@@ -666,7 +666,7 @@ namespace Test
 				cipher.Transform64(enc, j * BLK64, dec, j * BLK64);
 
 			if (data != dec)
-				throw std::exception("ParallelModeTest: Failed CBC-WBV integrity test!");
+				throw TestException("ParallelModeTest: Failed CBC-WBV integrity test!");
 		}
 
 
@@ -707,7 +707,7 @@ namespace Test
 			}
 
 			if (data != dec)
-				throw std::exception("ParallelModeTest: Failed CBC-WBV parallel decryption test!");
+				throw TestException("ParallelModeTest: Failed CBC-WBV parallel decryption test!");
 		}
 	}
 
@@ -748,19 +748,19 @@ namespace Test
 				ParallelCTR(&cipher, data, 0, enc2, 0);
 
 				if (enc1[i] != enc2[i])
-					throw std::exception("ParallelModeTest: Encrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Encrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
 				BlockCTR(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
-					throw std::exception("ParallelModeTest: Decrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
 				ParallelCTR(&cipher, enc2, 0, dec1, 0);
 
 				if (dec1 != data)
-					throw std::exception("ParallelModeTest: Decrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;
@@ -787,19 +787,19 @@ namespace Test
 				ParallelCTR(&cipher, data, 0, enc2, 0);
 
 				if (enc1[i] != enc2[i])
-					throw std::exception("ParallelModeTest: Encrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Encrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
 				BlockCTR(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
-					throw std::exception("ParallelModeTest: Decrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
 
 				cipher.Initialize(false, kp);
 				ParallelCTR(&cipher, enc2, 0, dec1, 0);
 
 				if (dec1 != data)
-					throw std::exception("ParallelModeTest: Decrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;
@@ -829,7 +829,7 @@ namespace Test
 				ParallelDecrypt(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
-					throw std::exception("ParallelModeTest: Decrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;
@@ -859,7 +859,7 @@ namespace Test
 				ParallelDecrypt(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
-					throw std::exception("ParallelModeTest: Decrypted arrays are not equal!");
+					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
 			}
 
 			delete eng;
@@ -904,7 +904,7 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel CTR: Encrypted output is not equal!");
+				throw TestException("Parallel CTR: Encrypted output is not equal!");
 
 			// linear 1
 			cipher.Initialize(true, keyParam);
@@ -913,7 +913,7 @@ namespace Test
 			Transform1(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel CTR: Encrypted output is not equal!");
+				throw TestException("Parallel CTR: Encrypted output is not equal!");
 
 			// linear 3
 			cipher.Initialize(true, keyParam);
@@ -922,7 +922,7 @@ namespace Test
 			Transform3(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel CTR: Encrypted output is not equal!");
+				throw TestException("Parallel CTR: Encrypted output is not equal!");
 
 			// decrypt //
 
@@ -939,7 +939,7 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CTR: Decrypted output is not equal!");
+				throw TestException("Parallel CTR: Decrypted output is not equal!");
 
 			// linear 3
 			cipher.Initialize(false, keyParam);
@@ -948,7 +948,7 @@ namespace Test
 			Transform3(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CTR: Decrypted output is not equal!");
+				throw TestException("Parallel CTR: Decrypted output is not equal!");
 
 			// linear 2
 			cipher.Initialize(false, keyParam);
@@ -957,15 +957,15 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CTR: Decrypted output is not equal!");
+				throw TestException("Parallel CTR: Decrypted output is not equal!");
 
 			delete eng;
 		}
 
 		if (data != dec1)
-			throw std::exception("Parallel CTR: Decrypted output is not equal!");
+			throw TestException("Parallel CTR: Decrypted output is not equal!");
 		if (data != dec2)
-			throw std::exception("Parallel CTR: Decrypted output is not equal!");
+			throw TestException("Parallel CTR: Decrypted output is not equal!");
 
 		OnProgress("ParallelModeTest: Passed Parallel CTR encryption and decryption tests");
 
@@ -988,7 +988,7 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel ICM: Encrypted output is not equal!");
+				throw TestException("Parallel ICM: Encrypted output is not equal!");
 
 			// linear 3
 			cipher.Initialize(true, keyParam);
@@ -997,7 +997,7 @@ namespace Test
 			Transform3(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel ICM: Encrypted output is not equal!");
+				throw TestException("Parallel ICM: Encrypted output is not equal!");
 
 			// linear 2
 			cipher.Initialize(true, keyParam);
@@ -1006,7 +1006,7 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel ICM: Encrypted output is not equal!");
+				throw TestException("Parallel ICM: Encrypted output is not equal!");
 
 			// decrypt //
 			// parallel 1
@@ -1022,7 +1022,7 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel ICM: Decrypted output is not equal!");
+				throw TestException("Parallel ICM: Decrypted output is not equal!");
 
 			// linear 3
 			cipher.Initialize(false, keyParam);
@@ -1031,7 +1031,7 @@ namespace Test
 			Transform3(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel ICM: Decrypted output is not equal!");
+				throw TestException("Parallel ICM: Decrypted output is not equal!");
 
 			// linear 2
 			cipher.Initialize(false, keyParam);
@@ -1040,15 +1040,15 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel ICM: Decrypted output is not equal!");
+				throw TestException("Parallel ICM: Decrypted output is not equal!");
 
 			delete eng;
 		}
 
 		if (data != dec1)
-			throw std::exception("Parallel ICM: Decrypted output is not equal!");
+			throw TestException("Parallel ICM: Decrypted output is not equal!");
 		if (data != dec2)
-			throw std::exception("Parallel ICM: Decrypted output is not equal!");
+			throw TestException("Parallel ICM: Decrypted output is not equal!");
 
 		OnProgress("ParallelModeTest: Passed Parallel ICM encryption and decryption tests");
 
@@ -1072,7 +1072,7 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel CBC: Decrypted output is not equal!");
+				throw TestException("Parallel CBC: Decrypted output is not equal!");
 
 			// decrypt //
 
@@ -1089,7 +1089,7 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CBC: Decrypted output is not equal!");
+				throw TestException("Parallel CBC: Decrypted output is not equal!");
 
 			// t1 parallel
 			cipher.Initialize(false, keyParam);
@@ -1104,15 +1104,15 @@ namespace Test
 			Transform2(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CBC: Decrypted output is not equal!");
+				throw TestException("Parallel CBC: Decrypted output is not equal!");
 
 			delete eng;
 		}
 
 		if (dec1 != data)
-			throw std::exception("Parallel CBC: Decrypted output is not equal!");
+			throw TestException("Parallel CBC: Decrypted output is not equal!");
 		if (dec2 != data)
-			throw std::exception("Parallel CBC: Decrypted output is not equal!");
+			throw TestException("Parallel CBC: Decrypted output is not equal!");
 
 		OnProgress("ParallelModeTest: Passed Parallel CBC decryption tests");
 
@@ -1135,7 +1135,7 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
-				throw std::exception("Parallel CFB: Decrypted output is not equal!");
+				throw TestException("Parallel CFB: Decrypted output is not equal!");
 
 			// decrypt //
 
@@ -1152,7 +1152,7 @@ namespace Test
 			Transform1(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CFB: Decrypted output is not equal!");
+				throw TestException("Parallel CFB: Decrypted output is not equal!");
 
 			// t2 parallel
 			cipher.Initialize(false, keyParam);
@@ -1167,15 +1167,15 @@ namespace Test
 			Transform3(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
-				throw std::exception("Parallel CFB: Decrypted output is not equal!");
+				throw TestException("Parallel CFB: Decrypted output is not equal!");
 
 			delete eng;
 		}
 
 		if (data != dec1)
-			throw std::exception("Parallel CFB: Decrypted output is not equal!");
+			throw TestException("Parallel CFB: Decrypted output is not equal!");
 		if (data != dec2)
-			throw std::exception("Parallel CFB: Decrypted output is not equal!");
+			throw TestException("Parallel CFB: Decrypted output is not equal!");
 
 		OnProgress("ParallelModeTest: Passed Parallel CFB decryption tests");
 	}
@@ -1205,7 +1205,7 @@ namespace Test
 			enc = TestUtils::Reduce(enc);
 
 		if (enc != Expected)
-			throw std::exception("ParallelModeTest: Failed Stream Cipher Kat comparison test!");
+			throw TestException("ParallelModeTest: Failed Stream Cipher Kat comparison test!");
 	}
 
 	void ParallelModeTest::CompareStmSimd(IStreamCipher* Engine)
@@ -1261,7 +1261,7 @@ namespace Test
 			Engine->Transform(data, enc1);
 
 			if (enc1 != enc2)
-				throw std::exception("Parallel Stream: Encrypted output is not equal!");
+				throw TestException("Parallel Stream: Encrypted output is not equal!");
 
 			// decrypt
 			Engine->Initialize(keyParam);
@@ -1269,7 +1269,7 @@ namespace Test
 			Engine->Transform(enc1, dec);
 
 			if (dec != data)
-				throw std::exception("Parallel Stream: Decrypted output is not equal!");
+				throw TestException("Parallel Stream: Decrypted output is not equal!");
 		}
 	}
 

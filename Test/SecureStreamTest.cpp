@@ -21,13 +21,13 @@ namespace Test
 			// add array via constructor
 			SecureStream secStm1(data);
 			if (secStm1.ToArray() != data)
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 
 			// test write method
 			SecureStream secStm2;
 			secStm2.Write(data, 0, data.size());
 			if (secStm2.ToArray() != data)
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 
 			// test read/write
 			size_t tmpSze = cnt - 1;
@@ -37,19 +37,19 @@ namespace Test
 			std::vector<byte> tmp2(tmpSze);
 			memcpy(&tmp2[0], &data[0], tmpSze);
 			if (tmp1 != tmp2)
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 
 			// read byte from start
 			secStm2.Seek(1, SeekOrigin::Begin);
 			byte x = secStm2.ReadByte();
 			if (x != data[1])
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 
 			// read byte from end
 			secStm2.Seek(1, SeekOrigin::End);
 			byte x1 = secStm2.ReadByte();
 			if (x1 != data[cnt - 1])
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 
 			// prepend byte
 			secStm2.Seek(0, SeekOrigin::Begin);
@@ -57,7 +57,7 @@ namespace Test
 			secStm2.Seek(0, SeekOrigin::Begin);
 			byte x2 = secStm2.ReadByte();
 			if (x1 != x2)
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 
 			// append byte
 			secStm2.Seek(0, SeekOrigin::Begin);
@@ -65,7 +65,7 @@ namespace Test
 			secStm2.Seek(0, SeekOrigin::Begin);
 			x2 = secStm2.ReadByte();
 			if (x2 != 33)
-				throw std::exception("CheckAccess: The stream is invalid!");
+				throw TestException("CheckAccess: The stream is invalid!");
 		}
 	}
 
@@ -78,7 +78,7 @@ namespace Test
 		MemoryStream memStm;
 		secStm1.CopyTo(&memStm);
 		if (memStm.ToArray() != secStm1.ToArray() || memStm.ToArray() != data)
-			throw std::exception("CompareSerial: The serialized key is invalid!");
+			throw TestException("CompareSerial: The serialized key is invalid!");
 	}
 
 	void SecureStreamTest::OnProgress(char* Data)

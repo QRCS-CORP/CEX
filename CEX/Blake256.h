@@ -111,15 +111,15 @@ private:
 	static const uint CHAIN_SIZE = 8;
 	static const uint COUNTER_SIZE = 2;
 	static const uint DEF_PRLDEGREE = 8;
-	const uint DEF_LEAFSIZE = 16384;
-	const size_t DIGEST_SIZE = 32;
-	const uint FLAG_SIZE = 2;
-	const uint MAX_PRLBLOCK = 5120000;
-	const uint MIN_PRLBLOCK = 256;
-	const size_t ROUND_COUNT = 10;
+	static const uint DEF_LEAFSIZE = 16384;
+	static const size_t DIGEST_SIZE = 32;
+	static const uint FLAG_SIZE = 2;
+	static const uint MAX_PRLBLOCK = 5120000;
+	static const uint MIN_PRLBLOCK = 256;
+	static const size_t ROUND_COUNT = 10;
 	// size of reserved state buffer subtracted from parallel size calculations
-	const size_t STATE_PRECACHED = 2048;
-	const uint UL_MAX = 4294967295;
+	static const size_t STATE_PRECACHED = 2048;
+	static const uint UL_MAX = 4294967295;
 
 	struct Blake2sState
 	{
@@ -129,9 +129,9 @@ private:
 
 		Blake2sState()
 			:
-			F(2, 0),
-			H(8, 0),
-			T(2, 0)
+			F(2),
+			H(8),
+			T(2)
 		{
 		}
 

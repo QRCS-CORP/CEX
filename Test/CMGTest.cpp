@@ -51,21 +51,21 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("CMGTest: Failed duplication test!");
+				throw TestException("CMGTest: Failed duplication test!");
 
 			// test seed + nonce init
 			ctd.Initialize(key, nonce);
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("CMGTest: Failed duplication test!");
+				throw TestException("CMGTest: Failed duplication test!");
 
 			// test parallel
 			ctd.ParallelProfile().IsParallel() = true;
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("CMGTest: Failed parallel duplication test!");
+				throw TestException("CMGTest: Failed parallel duplication test!");
 
 			// test seed init
 			key.resize(48, 0x02);
@@ -73,12 +73,12 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
-				throw std::exception("CMGTest: Failed duplication test!");
+				throw TestException("CMGTest: Failed duplication test!");
 
 		}
 		catch (...)
 		{
-			throw std::exception("CMGTest: Failed enumeration instantiation test!");
+			throw TestException("CMGTest: Failed enumeration instantiation test!");
 		}
 
 		try
@@ -94,11 +94,11 @@ namespace Test
 			delete dgt;
 
 			if (CheckRuns(output))
-				throw std::exception("CMGTest: Failed duplication test!");
+				throw TestException("CMGTest: Failed duplication test!");
 		}
 		catch (...)
 		{
-			throw std::exception("CMGTest: Failed primitive instantiation test!");
+			throw TestException("CMGTest: Failed primitive instantiation test!");
 		}
 	}
 
@@ -127,7 +127,7 @@ namespace Test
 		delete eng;
 
 		if (output1 != output2)
-			throw std::exception("CMG: Failed output comparison test!");
+			throw TestException("CMG: Failed output comparison test!");
 	}
 
 	bool CMGTest::CheckRuns(const std::vector<byte> &Input)

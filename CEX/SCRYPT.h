@@ -107,9 +107,9 @@ private:
 		}
 	};
 
-	const size_t MEM_COST = 8;
-	const size_t MIN_PASSLEN = 6;
-	const size_t MIN_SALTLEN = 4;
+	static const size_t MEM_COST = 8;
+	static const size_t MIN_PASSLEN = 6;
+	static const size_t MIN_SALTLEN = 4;
 
 	IDigest* m_kdfDigest;
 	bool m_destroyEngine;
