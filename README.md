@@ -14,7 +14,7 @@ The second half will be the addition of asymmetric cryptography, with a strong f
 Though efforts have been made towards future compatability with other platforms, this is currently a Windows only library. 
 It has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems.
 
-Only a limited number of CPUs have been tested so far; Intel i5 and i7, and for the moment, this is all that is supported, (though testing on a wider range of hardware profiles is currently underway). 
+Only a limited number of CPUs have been tested so far; Intel i5 and i7, and for the moment, this is all that is supported, (testing on a wider range of hardware profiles is currently underway). 
 
 The SIMD support is also limited to a minimum of AVX2, (AVX/SSE3 fallbacks are in place in a number of ciphers and protocols, and are currently being reviewed, so this will be a temporary limitation). 
 
