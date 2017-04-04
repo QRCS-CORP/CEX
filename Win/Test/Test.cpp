@@ -204,7 +204,7 @@ int main()
 
 	Common::CpuDetect detect;
 	bool hasAESNI = detect.AESNI();
-	// older intels (<= i3) having some strange issues, until their fixed (soon) we skip tests..
+	// older intels (<= i3) having some strange issues, until they are fixed (soon) we skip tests..
 	// we'll use avx2 availability to filter to only a subset of tests working on these older cpu's
 	bool hasAVX2 = detect.AVX2();
 

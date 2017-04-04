@@ -101,6 +101,8 @@ void CpuDetect::Initialize()
 	X86_CPUID(1, cpuInfo);
 
 	m_hyperThread = READBITSFROM(cpuInfo[3], 28, 1) != 0;
+	m_virtCores = std::thread::hardware_concurrency();
+	m_physCores = m_hyperThread == true && m_virtCores > 1 ? m_virtCores / 2 : m_virtCores;
 	m_x86CpuFlags[0] = (static_cast<ulong>(cpuInfo[3]) << 32) | cpuInfo[2]; // f1 ecx, edx
 
 	if (m_cpuVendor == CpuVendors::INTEL)
@@ -126,6 +128,14 @@ void CpuDetect::Initialize()
 
 		GetTopology();
 	}
+
+	// fallbacks
+	if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
+		m_l1CacheSize = m_virtCores * 128;
+	if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
+		m_l1CacheLineSize = 64;
+	if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
+		m_l2CacheSize = m_virtCores * 256;
 }
 
 bool CpuDetect::GetFlag(CpuidFlags Flag)
@@ -185,8 +195,6 @@ size_t CpuDetect::GetMaxLogicalPerCore()
 
 void CpuDetect::GetTopology()
 {
-	m_virtCores = std::thread::hardware_concurrency();
-	m_physCores = m_hyperThread == true && m_virtCores > 1 ? m_virtCores / 2 : m_virtCores;
 	GetFrequency();
 	GetSerialNumber();
 
@@ -197,14 +205,6 @@ void CpuDetect::GetTopology()
 	m_l1CacheLineSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 11));
 	m_l2Associative = static_cast<CacheAssociations>(READBITSFROM(cpuInfo[2], 12, 4));
 	m_l2CacheSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 16, 16));
-
-	// fallbacks
-	if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
-		m_l1CacheSize = m_physCores * 16;
-	if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
-		m_l1CacheLineSize = 64;
-	if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
-		m_l2CacheSize = m_physCores * 32;
 }
 
 const CpuDetect::CpuVendors CpuDetect::GetVendor(std::string &Name)
