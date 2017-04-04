@@ -259,7 +259,9 @@ int main()
 			RunTest(new ChaChaTest());
 			RunTest(new SalsaTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
-			RunTest(new CipherStreamTest());
+			// not on i3..
+			if (hasAVX2)
+				RunTest(new CipherStreamTest());
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
