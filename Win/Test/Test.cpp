@@ -203,15 +203,25 @@ int main()
 #endif
 
 	Common::CpuDetect detect;
-	bool hasAESNI = detect.AESNI();
-	// older intels (<= i3) having some strange issues, until they are fixed (soon) we skip tests..
-	// we'll use avx2 availability to filter to only a subset of tests working on these older cpu's
-	bool hasAVX2 = detect.AVX2();
 
-	if (!hasAVX2)
+	RunTest(new Blake2Test());
+
+	if (detect.AESNI())
+		PrintHeader("AES-NI intrinsics support has been detected on this system.");
+	else
+		PrintHeader("AES-NI intrinsics support has not been detected on this system.");
+	PrintHeader("", "");
+
+	if (!detect.AVX2())
 	{
-		PrintHeader("Warning! This library currently requires a minimum of AVX2 to support intrinsics!");
-		PrintHeader("Cipher and Digest speed tests and some parallel tests will be disabled!");
+		PrintHeader("Warning! AVX2 was not detected! This library is currently set for AVX2 intrinsics support.");
+		if (detect.AVX())
+			PrintHeader("AVX intrinsics support available, set enable enhanced instruction set to arch:AVX");
+		else if (detect.SSE2())
+			PrintHeader("SSE2 intrinsics support available, set enable enhanced instruction set to arch:SSE2");
+		else
+			PrintHeader("The minimum SIMD intrinsics support was not detected, intrinsics has been disabled!");
+
 		PrintHeader("", "");
 	}
 
@@ -224,14 +234,14 @@ int main()
 		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
-			if (hasAESNI)
+			if (detect.AESNI())
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesAvsTest(true));
 			}
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesAvsTest());
-			if (hasAESNI)
+			if (detect.AESNI())
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesFipsTest(true));
@@ -247,26 +257,20 @@ int main()
 			RunTest(new CipherModeTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER AEAD MODES");
 			RunTest(new AEADTest());
-			// not on i3..
-			if (hasAVX2)
-			{
-				PrintHeader("TESTING PARALLEL CIPHER MODES");
-				RunTest(new ParallelModeTest());
-			}
+			PrintHeader("TESTING PARALLEL CIPHER MODES");
+			RunTest(new ParallelModeTest());
 			PrintHeader("TESTING CIPHER PADDING MODES");
 			RunTest(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
 			RunTest(new ChaChaTest());
 			RunTest(new SalsaTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
-			// not on i3..
-			if (hasAVX2)
-				RunTest(new CipherStreamTest());
+			RunTest(new CipherStreamTest());
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			// sp and bp works fine on an i7, fails on i3? I'm workin on it..
-			if (hasAVX2)
+			// works on i7, not i3?
+			if (detect.AVX2())
 				RunTest(new Blake2Test());
 			RunTest(new KeccakTest());
 			RunTest(new SHA2Test());
@@ -286,9 +290,7 @@ int main()
 			RunTest(new DCGTest());
 			RunTest(new HMGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
-			// not on i3..
-			if (hasAVX2)
-				RunTest(new SymmetricKeyGeneratorTest());
+			RunTest(new SymmetricKeyGeneratorTest());
 			RunTest(new SecureStreamTest());
 			RunTest(new SymmetricKeyTest());
 		}
@@ -299,27 +301,23 @@ int main()
 		ConsoleUtils::WriteLine("");
 		ConsoleUtils::WriteLine("");
 
-		// blows up on an i3 w/ SSE?
-		if (hasAVX2)
+		if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
 		{
-			if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
-			{
-				RunTest(new CipherSpeedTest());
-			}
-			else
-			{
-				ConsoleUtils::WriteLine("Cipher Speed tests were Cancelled..");
-			}
-			ConsoleUtils::WriteLine("");
+			RunTest(new CipherSpeedTest());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Cipher Speed tests were Cancelled..");
+		}
+		ConsoleUtils::WriteLine("");
 
-			if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
-			{
-				RunTest(new DigestSpeedTest());
-			}
-			else
-			{
-				ConsoleUtils::WriteLine("Digest Speed tests were Cancelled..");
-			}
+		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
+		{
+			RunTest(new DigestSpeedTest());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Digest Speed tests were Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
 

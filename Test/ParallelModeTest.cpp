@@ -887,7 +887,12 @@ namespace Test
 
 		// CTR
 		{
-			AHX* eng = new AHX();
+			IBlockCipher* eng;
+			if (m_hasAESNI)
+				eng = new AHX();
+			else
+				eng = new RHX();
+
 			Mode::CTR cipher(eng);
 
 			// encrypt //
@@ -971,7 +976,12 @@ namespace Test
 
 		// ICM
 		{
-			AHX* eng = new AHX();
+			IBlockCipher* eng;
+			if (m_hasAESNI)
+				eng = new AHX();
+			else
+				eng = new RHX();
+
 			Mode::ICM cipher(eng);
 
 			// encrypt //

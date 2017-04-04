@@ -1,8 +1,10 @@
 #include "SymmetricKeyGeneratorTest.h"
 #include "../CEX/SymmetricKeyGenerator.h"
+#include "../CEX/CpuDetect.h"
 
 namespace Test
 {
+	using Common::CpuDetect;
 	using namespace Key::Symmetric;
 
 	std::string SymmetricKeyGeneratorTest::Run()
@@ -54,11 +56,15 @@ namespace Test
 	{
 		// test each access interface for valid output
 		SymmetricKeySize keySize(32, 16, 64);
-
-		SymmetricKeyGenerator keyGen1(Digests::SHA256, Providers::CJP);
-		SymmetricKey symKey1 = keyGen1.GetSymmetricKey(keySize);
-		if (!IsValidKey(symKey1))
-			throw TestException("CheckInit: Key generation has failed!");
+		CpuDetect detect;
+		// check for rdtscp
+		if (detect.RDTSCP())
+		{
+			SymmetricKeyGenerator keyGen1(Digests::SHA256, Providers::CJP);
+			SymmetricKey symKey1 = keyGen1.GetSymmetricKey(keySize);
+			if (!IsValidKey(symKey1))
+				throw TestException("CheckInit: Key generation has failed!");
+		}
 
 		SymmetricKeyGenerator keyGen2(Digests::Blake512, Providers::CSP);
 		SymmetricKey symKey2 = keyGen2.GetSymmetricKey(keySize);

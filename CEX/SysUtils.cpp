@@ -39,12 +39,16 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 	std::wstring ws;
 
 	ws.assign(Drive.begin(), Drive.end());
+	UINT drvType = GetDriveType(ws.c_str());
 
-	if (GetDiskFreeSpaceEx(ws.c_str(), &freeBytes, &totalBytes, &availBytes))
+	if (drvType == 3 || drvType == 6)
 	{
-		retSizes.push_back((ulong)freeBytes.QuadPart);
-		retSizes.push_back((ulong)totalBytes.QuadPart);
-		retSizes.push_back((ulong)availBytes.QuadPart);
+		if (GetDiskFreeSpaceEx(ws.c_str(), &freeBytes, &totalBytes, &availBytes))
+		{
+			retSizes.push_back((ulong)freeBytes.QuadPart);
+			retSizes.push_back((ulong)totalBytes.QuadPart);
+			retSizes.push_back((ulong)availBytes.QuadPart);
+		}
 	}
 
 	return retSizes;
