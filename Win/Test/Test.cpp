@@ -142,7 +142,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.1: CEX Library in C++  *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.1 (A1)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.1.1 (A1)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
 	ConsoleUtils::WriteLine("* Date:      April 2, 2017                   *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
@@ -204,6 +204,8 @@ int main()
 
 	Common::CpuDetect detect;
 	bool hasAESNI = detect.AESNI();
+	// older intels (<= i3) having some strange issues, until their fixed (soon) we skip tests..
+	// we'll use avx2 availability to filter to only a subset of tests working on these older cpu's
 	bool hasAVX2 = detect.AVX2();
 
 	if (!hasAVX2)
@@ -245,6 +247,7 @@ int main()
 			RunTest(new CipherModeTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER AEAD MODES");
 			RunTest(new AEADTest());
+			// not on i3..
 			if (hasAVX2)
 			{
 				PrintHeader("TESTING PARALLEL CIPHER MODES");
@@ -260,7 +263,7 @@ int main()
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			// works fine on an i7, fails on i3? I'm workin on it..
+			// sp and bp works fine on an i7, fails on i3? I'm workin on it..
 			if (hasAVX2)
 				RunTest(new Blake2Test());
 			RunTest(new KeccakTest());
@@ -281,7 +284,9 @@ int main()
 			RunTest(new DCGTest());
 			RunTest(new HMGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
-			RunTest(new SymmetricKeyGeneratorTest());
+			// not on i3..
+			if (hasAVX2)
+				RunTest(new SymmetricKeyGeneratorTest());
 			RunTest(new SecureStreamTest());
 			RunTest(new SymmetricKeyTest());
 		}
@@ -292,7 +297,7 @@ int main()
 		ConsoleUtils::WriteLine("");
 		ConsoleUtils::WriteLine("");
 
-		// blows up on an i3 w/ AVX?
+		// blows up on an i3 w/ SSE?
 		if (hasAVX2)
 		{
 			if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
