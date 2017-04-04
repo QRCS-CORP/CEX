@@ -96,6 +96,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,6 +112,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +130,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

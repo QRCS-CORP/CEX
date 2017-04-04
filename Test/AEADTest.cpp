@@ -191,7 +191,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint32_t dataLen = 1190;// rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10));
+			uint32_t dataLen = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10));
 			// important! if manually sizing parallel block, make it evenly divisible by parallel minimum size
 			Cipher->ParallelProfile().ParallelBlockSize() = dataLen - (dataLen % Cipher->ParallelProfile().ParallelMinimumSize());
 

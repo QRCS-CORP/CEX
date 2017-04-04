@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// Default constructor; does not initialize the register
 	/// </summary>
-	explicit UInt256() {}
+	UInt256() {}
 
 	/// <summary>
 	/// Initialize with an 8bit unsigned integer array
@@ -448,13 +448,9 @@ public:
 	/// <param name="Value">The value to multiply</param>
 	inline void operator *= (const UInt256 &Value)
 	{
-#if defined(__SSE4_1__)
-		Register = _mm256_mullo_epi32(Register, Value.Register);
-#else 
 		__m256i tmp1 = _mm256_mul_epu32(Register, Value.Register);
 		__m256i tmp2 = _mm256_mul_epu32(_mm256_srli_si256(Register, 4), _mm256_srli_si256(Value.Register, 4));
 		Register = _mm256_unpacklo_epi32(_mm256_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm256_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
-#endif
 	}
 
 	/// <summary>
@@ -464,13 +460,9 @@ public:
 	/// <param name="Value">The value to multiply</param>
 	inline UInt256 operator * (const UInt256 &Value) const
 	{
-#if defined(__SSE4_1__)
-		return UInt256(_mm_mullo_epi32(Register, Value.Register));
-#else 
 		__m256i tmp1 = _mm256_mul_epu32(Register, Value.Register);
 		__m256i tmp2 = _mm256_mul_epu32(_mm256_srli_si256(Register, 4), _mm256_srli_si256(Value.Register, 4));
 		return UInt256(_mm256_unpacklo_epi32(_mm256_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm256_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0))));
-#endif
 	}
 
 	/// <summary>

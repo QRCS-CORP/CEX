@@ -111,19 +111,6 @@ void CpuCheck()
 	ConsoleUtils::WriteLine("");
 }
 
-bool HasAESNI()
-{
-	try
-	{
-		Common::CpuDetect detect;
-		return detect.AESNI();
-	}
-	catch (...)
-	{
-		return false;
-	}
-}
-
 std::string GetResponse()
 {
 	std::string resp;
@@ -205,10 +192,26 @@ void RunTest(Test::ITest* Test)
 
 int main()
 {
-	bool hasNI = HasAESNI();
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
-	//CpuCheck();
+
+#if !defined(_OPENMP)
+	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
+	PrintHeader("An error has occurred! Press any key to close..", "");
+	GetResponse();
+	return 0;
+#endif
+
+	Common::CpuDetect detect;
+	bool hasAESNI = detect.AESNI();
+	bool hasAVX2 = detect.AVX2();
+
+	if (!hasAVX2)
+	{
+		PrintHeader("Warning! This library currently requires a minimum of AVX2 to support intrinsics!");
+		PrintHeader("Cipher and Digest speed tests and some parallel tests will be disabled!");
+		PrintHeader("", "");
+	}
 
 	try
 	{
@@ -219,14 +222,14 @@ int main()
 		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
-			if (hasNI)
+			if (hasAESNI)
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesAvsTest(true));
 			}
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesAvsTest());
-			if (hasNI)
+			if (hasAESNI)
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesFipsTest(true));
@@ -242,8 +245,11 @@ int main()
 			RunTest(new CipherModeTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER AEAD MODES");
 			RunTest(new AEADTest());
-			PrintHeader("TESTING PARALLEL CIPHER MODES");
-			RunTest(new ParallelModeTest());
+			if (hasAVX2)
+			{
+				PrintHeader("TESTING PARALLEL CIPHER MODES");
+				RunTest(new ParallelModeTest());
+			}
 			PrintHeader("TESTING CIPHER PADDING MODES");
 			RunTest(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
@@ -254,7 +260,9 @@ int main()
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			RunTest(new Blake2Test());
+			// works fine on an i7, fails on i3? I'm workin on it..
+			if (hasAVX2)
+				RunTest(new Blake2Test());
 			RunTest(new KeccakTest());
 			RunTest(new SHA2Test());
 			RunTest(new SkeinTest());
@@ -282,27 +290,29 @@ int main()
 			ConsoleUtils::WriteLine("Diagnostic tests were Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
-
-
 		ConsoleUtils::WriteLine("");
 
-		if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
+		// blows up on an i3 w/ AVX?
+		if (hasAVX2)
 		{
-			RunTest(new CipherSpeedTest());
-		}
-		else
-		{
-			ConsoleUtils::WriteLine("Cipher Speed tests were Cancelled..");
-		}
-		ConsoleUtils::WriteLine("");
+			if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
+			{
+				RunTest(new CipherSpeedTest());
+			}
+			else
+			{
+				ConsoleUtils::WriteLine("Cipher Speed tests were Cancelled..");
+			}
+			ConsoleUtils::WriteLine("");
 
-		if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
-		{
-			RunTest(new DigestSpeedTest());
-		}
-		else
-		{
-			ConsoleUtils::WriteLine("Digest Speed tests were Cancelled..");
+			if (CanTest("Press 'Y' then Enter to run Message Digest Speed Tests, any other key to cancel: "))
+			{
+				RunTest(new DigestSpeedTest());
+			}
+			else
+			{
+				ConsoleUtils::WriteLine("Digest Speed tests were Cancelled..");
+			}
 		}
 		ConsoleUtils::WriteLine("");
 

@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// Default constructor; does not initialize the register
 	/// </summary>
-	explicit UInt128() {}
+	UInt128() {}
 
 	/// <summary>
 	/// Initialize with an 8bit unsigned integer array in Little Endian format

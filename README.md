@@ -11,6 +11,15 @@ This library is being built in two stages; the symmetric cryptography, which con
 That work is still evolving however, as improvments and additions to the symmetric cryptography will continue throughout the libraries lifetime.
 The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and the next release will have the first asymmetric cipher (RingLWE) and asymmetric framework.
 
+Though efforts have been made towards future compatability with other platforms, this is currently a Windows only library. 
+It has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, future efforts will be made to integrate Intel/Clang and GCC compilers once testing begins on other operating systems.
+
+Only a limited number of CPUs have been tested so far; Intel i5 and i7, and for the moment, this is all that is supported, (though testing on a wider range of platforms and hardware profiles is currently underway). 
+
+The SIMD support is also limited to a minimum of AVX2, (though AVX/SSE3 fallbacks are in place in a number of ciphers and protocols). 
+
+This is still an early stage in the development of this library, so stay tuned, be patient..
+
 The Win folder contains a visual studio test project, which tests each cipher and protocol with it's official test vectors, and has a set of digest and symmetric cipher speed tests.
 
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.

@@ -3,10 +3,6 @@
 
 #include "CexDomain.h"
 
-#if defined(_MSC_VER) && _MSC_FULL_VER >= 160040219
-#	define MSCAVX
-#endif
-
 NAMESPACE_COMMON
 
 /// <summary>
@@ -42,75 +38,63 @@ public:
 
 private:
 
-	const size_t KB1 = 1024;
-	const size_t KB32 = 32 * 1024;
-	const size_t KB128 = 128 * 1024;
-	const size_t KB256 = 256 * 1024;
+	enum CpuidFlags : ulong
+	{
+		// EAX=1
+		CPUID_SSE3 = 0, // ecx 0
+		CPUID_CMUL = 1, // ecx 1
+		CPUID_SSSE3 = 9, // ecx 9
+		CPUID_SSE41 = 19, // ecx 19
+		CPUID_SSE42 = 20, // ecx 20
+		CPUID_AESNI = 25, // ecx 25
+		CPUID_AVX = 28, // ecx 28
+		CPUID_RDRAND = 30,  // ecx 30
+		CPUID_SSE2 = 32 + 26, // edx 26
+		CPUID_HYPERTHREAD = 32 + 28, // edx 28
+		// EAX=7
+		CPUID_SGX = 64 + 2, // ebx 2
+		CPUID_AVX2 = 64 + 5, // ebx 5
+		CPUID_BMI2 = 64 + 8, // ebx 8
+		CPUID_RTM = 64 + 11, // ebx 11
+		CPUID_PQM = 64 + 12, // ebx 12
+		CPUID_MPX = 64 + 14, // ebx 14
+		CPUID_PQE = 64 + 15, // ebx 15
+		CPUID_AVX512F = 64 + 16, // ebx 16
+		CPUID_RDSEED = 64 + 18, // ebx 18
+		CPUID_ADX = 64 + 19, // ebx 18
+		CPUID_SMAP = 64 + 20, // ebx 20
+		CPUID_SHA = 64 + 29, // ebx 29
+		CPUID_PREFETCH = 64 + 32, // ebx 32
+		// EAX=80000001h
+		CPUID_ABM = 128 + 5, // ecx 5
+		CPUID_SSE4A = 128 + 6, // ecx 6
+		CPUID_XOP = 128 + 11, // ecx 11
+		CPUID_FMA4 = 128 + 16, // ecx 16
+		CPUID_X64 = 128 + 29, // ecx 29
+		CPUID_RDTSCP = 192 + 27, // edx 29
+	};
 
-	bool m_abm;
-	bool m_ads;
-	bool m_aesni;
-	bool m_amd3dNow;
-	bool m_amd3dNowPro;
-	bool m_amdCmpLegacy;
-	bool m_amdMmxExt;
-	bool m_amdMp;
-	bool m_avx;
-	bool m_avx2;
-	bool m_avx5124fmaps;
-	bool m_avx512bw;
-	bool m_avx512cd;
-	bool m_avx512dq;
-	bool m_avx512er;
-	bool m_avx512f;
-	bool m_avx512ifma;
-	bool m_avx512pf;
-	bool m_avx5124vnniw;
-	bool m_avx512vbmi;
-	bool m_avx512vl;
-	bool m_bmt1;
-	bool m_bmt2;
+	static const size_t KB1 = 1024;
+	static const size_t KB32 = 32 * 1024;
+	static const size_t KB128 = 128 * 1024;
+	static const size_t KB256 = 256 * 1024;
+
 	uint m_busSpeed;
-	bool m_cmul;
-	std::string m_cpuVendor;
-	bool m_fma3;
-	bool m_fma4;
+	size_t m_cacheLineSize;
+	CpuVendors m_cpuVendor;
+	std::string m_cpuVendorString;
 	uint m_frequencyBase;
 	uint m_frequencyMax;
-	bool m_hle;
 	bool m_hyperThread;
 	size_t m_l1CacheSize;
 	size_t m_l1CacheLineSize;
 	CacheAssociations m_l2Associative;
 	size_t m_l2CacheSize;
 	size_t m_logicalPerCore;
-	bool m_mmx;
-	bool m_mpx;
 	size_t m_physCores;
-	bool m_pku;
-	bool m_pkuos;
-	bool m_pqe;
-	bool m_pqm;
-	bool m_prefetch;
-	bool m_rdRand;
-	bool m_rdSeed;
-	bool m_rtm;
-	bool m_rdtscp;
 	std::string m_serialNumber;
-	bool m_sgx;
-	bool m_sha;
-	bool m_smap;
-	bool m_smep;
-	bool m_sse1;
-	bool m_sse2;
-	bool m_sse3;
-	bool m_ssse3;
-	bool m_sse4a;
-	bool m_sse41;
-	bool m_sse42;
 	size_t m_virtCores;
-	bool m_x64;
-	bool m_xop;
+	ulong m_x86CpuFlags[4];
 
 public:
 
@@ -119,117 +103,37 @@ public:
 	/// <summary>
 	/// Advanced Bit Manipulation
 	/// </summary>
-	const bool ABM() { return m_abm; }
+	const bool ABM() { return GetFlag(CpuidFlags::CPUID_ABM); }
 
 	/// <summary>
 	/// Intel Add-Carry Instruction Extensions
 	/// </summary>
-	const bool ADS() { return m_ads; }
+	const bool ADS() { return GetFlag(CpuidFlags::CPUID_ADX); }
 
 	/// <summary>
 	/// Returns true if the AES-NI feature set is detected
 	/// </summary>
-	const bool AESNI() { return m_aesni; }
-
-	/// <summary>
-	/// AMD 3DNOW extensions enabled
-	/// </summary>
-	const bool AMD3DNOW() { return m_amd3dNow; }
-
-	/// <summary>
-	/// AMD 3DNOW PRO extensions enabled
-	/// </summary>
-	const bool AMD3DNOWPRO() { return m_amd3dNowPro; }
-
-	/// <summary>
-	/// N-core and CAP_HT is falsely set
-	/// </summary>
-	const bool AMDCMPLEGACY() { return m_amdCmpLegacy; }
-
-	/// <summary>
-	/// AMD MMX extensions enabled
-	/// </summary>
-	const bool AMDMMXEXT() { return m_amdMmxExt; }
-
-	/// <summary>
-	/// MultiProcessing capable; reserved on AMD64
-	/// </summary>
-	const bool AMDMP() { return m_amdMp; }
+	const bool AESNI() { return GetFlag(CpuidFlags::CPUID_AESNI); }
 
 	/// <summary>
 	/// Returns true if the Advanced Vector Extensions feature set is detected
 	/// </summary>
-	const bool AVX() { return m_avx; }
+	const bool AVX() { return GetFlag(CpuidFlags::CPUID_AVX); }
 
 	/// <summary>
 	/// Returns true if the Advanced Vector Extensions 2 feature set is detected
 	/// </summary>
-	const bool AVX2() { return m_avx2; }
-
-	/// <summary>
-	/// AVX512 Byte + Word detected
-	/// </summary>
-	const bool AVX512BW() { return m_avx512bw; }
-
-	/// <summary>
-	/// AVX512 Conflict Detection
-	/// </summary>
-	const bool AVX512CD() { return m_avx512cd; }
-
-	/// <summary>
-	/// AVX512 Doubleword + Quadword detected
-	/// </summary>
-	const bool AVX512DQ() { return m_avx512dq; }
-
-	/// <summary>
-	/// AVX512 Exponential + Reciprocal detected
-	/// </summary>
-	const bool AVX512ER() { return m_avx512er; }
+	const bool AVX2() { return GetFlag(CpuidFlags::CPUID_AVX2); }
 
 	/// <summary>
 	/// AVX512 Foundation detected
 	/// </summary>
-	const bool AVX512F() { return m_avx512f; }
-
-	/// <summary>
-	/// AVX512 Integer 52-bit Fused Multiply-Add detected
-	/// </summary>
-	const bool AVX512IFMA() { return m_avx512ifma; }
-
-	/// <summary>
-	/// Multiply Accumulation Single precision
-	/// </summary>
-	const bool AVX512IFMAPS() { return m_avx5124fmaps; }
-
-	/// <summary>
-	/// AVX512 Neural Network Instructions
-	/// </summary>
-	const bool AVX512NNI() { return m_avx5124vnniw; }
-
-	/// <summary>
-	/// AVX512 Prefetch detected
-	/// </summary>
-	const bool AVX512PF() { return m_avx512pf; }
-
-	/// <summary>
-	/// AVX512 Vector Byte Manipulation Instructions detected
-	/// </summary>
-	const bool AVX512VBMI() { return m_avx512vbmi; }
-
-	/// <summary>
-	/// AVX512 Vector Length Extensions detected
-	/// </summary>
-	const bool AVX512VL() { return m_avx512vl; }
-
-	/// <summary>
-	/// Bit Manipulation Instruction Set 1
-	/// </summary>
-	const bool BMT1() { return m_bmt1; }
+	const bool AVX512F() { return GetFlag(CpuidFlags::CPUID_AVX512F); }
 
 	/// <summary>
 	/// Bit Manipulation Instruction Set 2
 	/// </summary>
-	const bool BMT2() { return m_bmt2; }
+	const bool BMT2() { return GetFlag(CpuidFlags::CPUID_BMI2); }
 
 	/// <summary>
 	/// The processor bus speed (newer Intel only) 
@@ -242,17 +146,12 @@ public:
 	/// <summary>
 	/// Intel CMUL available
 	/// </summary>
-	const bool CMUL() { return m_cmul; }
-
-	/// <summary>
-	/// AMD FMA 3 instructions available
-	/// </summary>
-	const bool FMA3() { return m_fma3; }
+	const bool CMUL() { return GetFlag(CpuidFlags::CPUID_CMUL); }
 
 	/// <summary>
 	/// AMD FMA 4 instructions available
 	/// </summary>
-	const bool FMA4() { return m_fma4; }
+	const bool FMA4() { return GetFlag(CpuidFlags::CPUID_FMA4); }
 
 	/// <summary>
 	/// The processor base frequency (newer Intel only)
@@ -271,19 +170,14 @@ public:
 	}
 
 	/// <summary>
-	/// TSE Hardware Lock Elision
-	/// </summary>
-	const bool HLE() { return m_hle; }
-
-	/// <summary>
 	/// Hardware supports hyper-threading
 	/// </summary>
-	const bool HyperThread() { return m_hyperThread; }
+	const bool HyperThread() { return GetFlag(CpuidFlags::CPUID_HYPERTHREAD); }
 
 	/// <summary>
 	/// Cpu is x64
 	/// </summary>
-	const bool Is64() { return m_x64; }
+	const bool Is64() { return GetFlag(CpuidFlags::CPUID_X64); }
 
 	/// <summary>
 	/// The total L1 data/instruction cache size in bytes for each physical processor core, defaults to 32kib
@@ -362,14 +256,9 @@ public:
 	const size_t LogicalPerCore() { return m_logicalPerCore; }
 
 	/// <summary>
-	/// MMX instructions available
-	/// </summary>
-	const bool MMX() { return m_mmx; }
-
-	/// <summary>
 	/// Intel Memory Protection Extensions
 	/// </summary>
-	const bool MPX() { return m_mpx; }
+	const bool MPX() { return GetFlag(CpuidFlags::CPUID_MPX); }
 
 	/// <summary>
 	/// The total number of physical processor cores
@@ -377,49 +266,39 @@ public:
 	const size_t PhysicalCores() { return m_physCores; }
 
 	/// <summary>
-	/// Memory Protection Keys for User-mode pages
-	/// </summary>
-	const bool PKU() { return m_pku; }
-
-	/// <summary>
-	/// PKU enabled by OS
-	/// </summary>
-	const bool PKUOS() { return m_pkuos; }
-
-	/// <summary>
 	/// Platform Quality of Service Enforcement
 	/// </summary>
-	const bool PQE() { return m_pqe; }
+	const bool PQE() { return GetFlag(CpuidFlags::CPUID_PQE); }
 
 	/// <summary>
 	/// Platform Quality of Service Monitoring
 	/// </summary>
-	const bool PQM() { return m_pqm; }
+	const bool PQM() { return GetFlag(CpuidFlags::CPUID_PQM); }
 
 	/// <summary>
 	/// Cpu supports prefetch
 	/// </summary>
-	const bool PREFETCH() { return m_prefetch; }
+	const bool PREFETCH() { return GetFlag(CpuidFlags::CPUID_PREFETCH); }
 
 	/// <summary>
 	/// Intel Digital Random Number Generator
 	/// </summary>
-	const bool RDRAND() { return m_rdRand; }
+	const bool RDRAND() { return GetFlag(CpuidFlags::CPUID_RDRAND); }
 
 	/// <summary>
 	/// Intel Digital Random Seed Generator
 	/// </summary>
-	const bool RDSEED() { return m_rdSeed; }//
+	const bool RDSEED() { return GetFlag(CpuidFlags::CPUID_RDSEED); }
 
 	/// <summary>
 	/// RDTSCP time-stamp instruction
 	/// </summary>
-	const bool RDTSCP() { return m_rdtscp; }
+	const bool RDTSCP() { return GetFlag(CpuidFlags::CPUID_RDTSCP); }
 
 	/// <summary>
 	/// TSE Restricted Transactional Memory
 	/// </summary>
-	const bool RTM() { return m_rtm; }
+	const bool RTM() { return GetFlag(CpuidFlags::CPUID_RTM); }
 
 	/// <summary>
 	/// The processor serial number (not supported on some processors)
@@ -429,67 +308,52 @@ public:
 	/// <summary>
 	/// SHA instructions available
 	/// </summary>
-	const bool SHA() { return m_sha; }
-
-	/// <summary>
-	/// Software Guard Extensions
-	/// </summary>
-	const bool SGX() { return m_sgx; }
+	const bool SHA() { return GetFlag(CpuidFlags::CPUID_SHA); }
 
 	/// <summary>
 	/// Supervisor Mode Access Prevention
 	/// </summary>
-	const bool SMAP() { return m_smap; }
-
-	/// <summary>
-	/// Supervisor-Mode Execution Prevention
-	/// </summary>
-	const bool SMEP() { return m_smep; }
+	const bool SMAP() { return GetFlag(CpuidFlags::CPUID_SMAP); }
 
 	/// <summary>
 	/// Returns true if SSE2 or greater is detected
 	/// </summary>
-	const bool SSE() { return m_avx512f || m_avx2 || m_avx || m_xop || m_sse42 || m_sse41 || m_sse4a || m_ssse3 || m_sse3 || m_sse2; }
-
-	/// <summary>
-	/// Streaming SIMD Extensions 1.0 available
-	/// </summary>
-	const bool SSE1() { return m_sse1; }
+	const bool SSE() { return GetFlag(CpuidFlags::CPUID_SSE2); }
 
 	/// <summary>
 	/// Streaming SIMD Extensions 2.0 available
 	/// </summary>
-	const bool SSE2() { return m_sse2; }
+	const bool SSE2() { return GetFlag(CpuidFlags::CPUID_SSE2); }
 
 	/// <summary>
 	/// Streaming SIMD Extensions 3.0 available
 	/// </summary>
-	const bool SSE3() { return m_sse3; }
+	const bool SSE3() { return GetFlag(CpuidFlags::CPUID_SSE3); }
 
 	/// <summary>
 	/// Supplemental SSE3 Merom New Instructions available
 	/// </summary>
-	const bool SSSE3() { return m_ssse3; }
+	const bool SSSE3() { return GetFlag(CpuidFlags::CPUID_SSSE3); }
 
 	/// <summary>
 	/// AMD SSE 4A instructions available
 	/// </summary>
-	const bool SSE4A() { return m_sse4a; }
+	const bool SSE4A() { return GetFlag(CpuidFlags::CPUID_SSE4A); }
 
 	/// <summary>
 	/// Streaming SIMD Extensions 4.1 available
 	/// </summary>
-	const bool SSE41() { return m_sse41; }
+	const bool SSE41() { return GetFlag(CpuidFlags::CPUID_SSE41); }
 
 	/// <summary>
 	/// Streaming SIMD Extensions 4.2 available
 	/// </summary>
-	const bool SSE42() { return m_sse42; }
+	const bool SSE42() { return GetFlag(CpuidFlags::CPUID_SSE42); }
 
 	/// <summary>
 	/// Returns the cpu vendors enumeration value
 	/// </summary>
-	const CpuVendors Vendor();
+	CpuVendors Vendor() { return m_cpuVendor; };
 
 	/// <summary>
 	/// The total number of threads available using hyperthreading
@@ -499,7 +363,7 @@ public:
 	/// <summary>
 	/// Returns true if the AMD eXtended Operations feature set is detected
 	/// </summary>
-	const bool XOP() { return m_xop; }
+	const bool XOP() { return GetFlag(CpuidFlags::CPUID_XOP); }
 
 	//~~~ Constructor~~~//
 
@@ -510,15 +374,37 @@ public:
 
 private:
 
-#if defined(MSCAVX)
-	bool AvxSupported();
-	bool Avx2Supported();
-#endif
-	void Detect();
+	byte GetByte(size_t Index, uint Input);
+
+	template<typename T> 
+	inline byte get_byte(size_t byte_num, T input)
+	{
+		return static_cast<byte>(input >> (((~byte_num)&(sizeof(T) - 1)) << 3));
+	}
+
+	template<typename T> 
+	inline bool CompareMem(const T* p1, const T* p2, size_t n)
+	{
+		volatile T difference = 0;
+
+		for (size_t i = 0; i != n; ++i)
+			difference |= (p1[i] ^ p2[i]);
+
+		return difference == 0;
+	}
+
+
+	bool AvxEnabled();
+	bool Avx2Enabled();
+	bool GetFlag(CpuidFlags Flag);
 	void GetFrequency();
+	size_t GetMaxCoresPerPackage();
+	size_t GetMaxLogicalPerCore();
 	void GetSerialNumber();
-	size_t MaxCoresPerPackage();
-	size_t MaxLogicalPerCore();
+	void GetTopology();
+	void Initialize();
+	const CpuVendors GetVendor(std::string &Name);
+	std::string GetVendorString(uint CpuInfo[4]);
 };
 
 NAMESPACE_COMMONEND

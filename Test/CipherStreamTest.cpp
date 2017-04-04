@@ -30,7 +30,8 @@ namespace Test
 		{
 			Initialize();
 
-			FileStreamTest();
+			// local test
+			//FileStreamTest();
 
 			CbcModeTest();
 			OnProgress("Passed CBC Mode tests..");

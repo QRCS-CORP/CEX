@@ -357,7 +357,10 @@ void OCB::CalculateMac()
 void OCB::DoubleBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	uint carry = ArrayUtils::ShiftLeft(Input, Output);
-	Output[MAX_NONCESIZE] ^= (byte)(0x87 >> ((1 - carry) << 3));
+	uint x = (1 - carry) << 3;
+	byte n = (x == 0) ? 0x87 : (byte)((ulong)0x87 >> x);
+
+	Output[MAX_NONCESIZE] ^= n;
 }
 
 void OCB::ExtendBlock(std::vector<byte> &Output, size_t Position)
@@ -400,8 +403,9 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 	{
 		for (size_t i = 0; i < BLOCK_SIZE; ++i)
 		{
-			uint b1 = m_mainStretch[btmLen];
-			uint b2 = m_mainStretch[++btmLen];
+			ulong b1 = m_mainStretch[btmLen];
+			ulong b2 = m_mainStretch[++btmLen];
+
 			m_mainOffset0[i] = (byte)((b1 << BTMSZE) | (b2 >> (8 - BTMSZE)));
 		}
 	}
