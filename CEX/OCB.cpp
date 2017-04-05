@@ -457,10 +457,10 @@ void OCB::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
 	{
 		const size_t PBKALN = Length - (Length % SSEBLK);
-		const size_t SUBBLK = PBKALN / AVXBLK;
+		const size_t SUBBLK = PBKALN / SSEBLK;
 		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 		for (size_t i = 0; i < SUBBLK; ++i)
-			m_blockCipher->Transform128(Output, OutOffset + (i * SSEBLK), Output, OutOffset + (i * SSEBLK));
+			m_blockCipher->Transform64(Output, OutOffset + (i * SSEBLK), Output, OutOffset + (i * SSEBLK));
 		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, PBKALN, m_parallelProfile.SimdProfile());
 	}
 	else

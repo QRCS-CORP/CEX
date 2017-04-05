@@ -46,9 +46,8 @@ namespace Test
 			StressTest(cipher2);
 			OnProgress("AEADTest: Passed OCB stress tests..");/**/
 
-			// TODO: failing on i3
-			//ParallelTest(cipher2);
-			//OnProgress("AEADTest: Passed OCB parallel tests..");
+			ParallelTest(cipher2);
+			OnProgress("AEADTest: Passed OCB parallel tests..");
 
 			IncrementalCheck(cipher2);
 			OnProgress("AEADTest: Passed OCB auto incrementing tests..");

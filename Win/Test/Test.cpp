@@ -204,7 +204,7 @@ int main()
 
 	Common::CpuDetect detect;
 
-	RunTest(new Blake2Test());
+	RunTest(new AEADTest());
 
 	if (detect.AESNI())
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
@@ -269,9 +269,7 @@ int main()
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			// works on i7, not i3?
-			if (detect.AVX2())
-				RunTest(new Blake2Test());
+			RunTest(new Blake2Test());
 			RunTest(new KeccakTest());
 			RunTest(new SHA2Test());
 			RunTest(new SkeinTest());

@@ -12,16 +12,16 @@
 #		define X86_CPUID(type, out) do { __cpuid(out, type); } while(0)
 #		define X86_CPUID_SUBLEVEL(type, level, out) do { __cpuidex((int*)out, type, level); } while(0)
 #	elif defined(CEX_ARCH_X64) && defined(CEX_USE_GCC_INLINE_ASM)
-#		define X86_CPUID(type, out)                                                    \
-			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3]) \
+#		define X86_CPUID(type, out)															\
+			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3])	\
 				: "0" (type))
-#		define X86_CPUID_SUBLEVEL(type, level, out)                                    \
-			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3]) \
+#		define X86_CPUID_SUBLEVEL(type, level, out)											\
+			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3])	\
 				: "0" (type), "2" (level))
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 #		include <cpuid.h>
 #		define X86_CPUID(type, out) do { __get_cpuid(type, out, out+1, out+2, out+3); } while(0)
-#		define X86_CPUID_SUBLEVEL(type, level, out) \
+#		define X86_CPUID_SUBLEVEL(type, level, out)											\
 			do { __cpuid_count(type, level, out[0], out[1], out[2], out[3]); } while(0)
 #	else
 #		warning "No way of calling cpuid for this compiler"
@@ -101,6 +101,11 @@ void CpuDetect::Initialize()
 	X86_CPUID(1, cpuInfo);
 
 	m_hyperThread = READBITSFROM(cpuInfo[3], 28, 1) != 0;
+	// safest way
+	m_virtCores = std::thread::hardware_concurrency();
+	// yes, ht might be disabled in bios, but who does that?
+	m_physCores = m_hyperThread == true && m_virtCores > 1 ? m_virtCores / 2 : m_virtCores;
+
 	m_x86CpuFlags[0] = (static_cast<ulong>(cpuInfo[3]) << 32) | cpuInfo[2]; // f1 ecx, edx
 
 	if (m_cpuVendor == CpuVendors::INTEL)
@@ -125,6 +130,14 @@ void CpuDetect::Initialize()
 		m_x86CpuFlags[2] = (static_cast<ulong>(cpuInfo[3]) << 32) | cpuInfo[2]; // f8..1 ecx, edx
 
 		GetTopology();
+
+		// fallbacks
+		if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
+			m_l1CacheSize = m_physCores * 128;
+		if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
+			m_l1CacheLineSize = 64;
+		if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
+			m_l2CacheSize = m_physCores * 256;
 	}
 }
 
@@ -197,14 +210,6 @@ void CpuDetect::GetTopology()
 	m_l1CacheLineSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 0, 11));
 	m_l2Associative = static_cast<CacheAssociations>(READBITSFROM(cpuInfo[2], 12, 4));
 	m_l2CacheSize = static_cast<size_t>(READBITSFROM(cpuInfo[2], 16, 16));
-
-	// fallbacks
-	if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
-		m_l1CacheSize = m_physCores * 16;
-	if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
-		m_l1CacheLineSize = 64;
-	if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
-		m_l2CacheSize = m_physCores * 32;
 }
 
 const CpuDetect::CpuVendors CpuDetect::GetVendor(std::string &Name)

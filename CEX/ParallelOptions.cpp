@@ -1,7 +1,6 @@
 #include "ParallelOptions.h"
 #include "CpuDetect.h"
 #include "CryptoProcessingException.h"
-#include "ParallelUtils.h" //TODO: temporary
 
 NAMESPACE_COMMON
 
@@ -149,11 +148,15 @@ void ParallelOptions::SetSimdProfile(SimdProfiles Profile)
 	else if (Profile == SimdProfiles::Simd256 && m_simdDetected == SimdProfiles::Simd256)
 	{
 		m_hasSimd256 = true;
+		m_simdDetected = SimdProfiles::Simd256;
 	}
 	else
 	{
 		if (m_simdDetected == SimdProfiles::Simd128 || m_simdDetected == SimdProfiles::Simd256)
+		{
 			m_hasSimd128 = true;
+			m_simdDetected = SimdProfiles::Simd128;
+		}
 	}
 
 	Calculate();
@@ -173,9 +176,6 @@ void ParallelOptions::Detect()
 	m_virtualCores = detect.VirtualCores();
 	m_processorCount = (m_virtualCores > m_physicalCores) ? m_virtualCores : m_physicalCores;
 
-	// TODO: fail-safe until CpuDetect is fully vetted
-	if (m_processorCount == 0 || m_processorCount > 32)
-		m_processorCount = Utility::ParallelUtils::ProcessorCount();
 	if (m_processorCount > 1 && m_processorCount % 2 != 0)
 		m_processorCount--;
 	if (m_parallelMaxDegree > m_processorCount || m_parallelMaxDegree == 0 || m_processorCount > 1 && m_processorCount % 2 != 0)
