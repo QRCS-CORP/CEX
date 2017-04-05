@@ -204,7 +204,7 @@ int main()
 
 	Common::CpuDetect detect;
 
-	RunTest(new AEADTest());
+	//RunTest(new AEADTest());
 
 	if (detect.AESNI())
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
