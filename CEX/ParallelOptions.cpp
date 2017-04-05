@@ -19,6 +19,7 @@ ParallelOptions::ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t Res
 	m_isParallel(false),
 	m_l1DataCacheReserved(ReservedCache),
 	m_l1DataCacheTotal(0),
+	m_overrideMaxDegree(false),
 	m_parallelBlockSize(0),
 	m_parallelMaxDegree(ParallelMaxDegree),
 	m_parallelMinimumSize(0),
@@ -48,6 +49,7 @@ ParallelOptions::ParallelOptions(size_t BlockSize, bool Parallel, size_t Paralle
 	m_isParallel(Parallel),
 	m_l1DataCacheReserved(ReservedCache),
 	m_l1DataCacheTotal(0),
+	m_overrideMaxDegree(false),
 	m_parallelBlockSize(ParallelBlockSize),
 	m_parallelMaxDegree(MaxDegree),
 	m_parallelMinimumSize(0),
@@ -75,7 +77,7 @@ ParallelOptions::~ParallelOptions()
 
 void ParallelOptions::Calculate()
 {
-	if (m_parallelMaxDegree > m_processorCount || m_parallelMaxDegree == 0)
+	if (m_parallelMaxDegree > m_processorCount && !m_overrideMaxDegree || m_parallelMaxDegree == 0)
 		m_parallelMaxDegree = m_processorCount;
 
 	m_parallelMinimumSize = m_parallelMaxDegree * m_blockSize;
@@ -130,8 +132,9 @@ void ParallelOptions::Calculate(bool Parallel, size_t ParallelBlockSize, size_t 
 void ParallelOptions::SetMaxDegree(size_t MaxDegree)
 {
 	if (MaxDegree == 0)
-		throw CryptoProcessingException("ParallelOptions:Ctor", "The BlockSize must be a positive even number!");
+		throw CryptoProcessingException("ParallelOptions:Ctor", "The MaxDegree must be a positive even number!");
 
+	m_overrideMaxDegree = true;
 	m_parallelMaxDegree = MaxDegree;
 	Calculate();
 }

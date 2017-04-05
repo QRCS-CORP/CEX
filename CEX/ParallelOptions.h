@@ -51,6 +51,7 @@ private:
 	bool m_isParallel;
 	size_t m_l1DataCacheReserved;
 	size_t m_l1DataCacheTotal;
+	bool m_overrideMaxDegree;
 	size_t m_parallelBlockSize;
 	size_t m_parallelMaxDegree;
 	size_t m_parallelMinimumSize;
