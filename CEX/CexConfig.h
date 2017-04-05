@@ -369,6 +369,9 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #if defined(__SSE2__)
 #	define CEX_HAS_SSE2
 #endif
+#if defined(__SSE3__)
+#	define CEX_HAS_SSE3
+#endif
 #if defined(__SSSE3__)
 #	define CEX_HAS_SSSE3
 #endif
@@ -381,6 +384,9 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #if defined(__AVX__)
 #	define CEX_HAS_AVX
 #endif
+#if defined(__AVX2__)
+#	define CEX_HAS_AVX2
+#endif
 #if defined(__XOP__)
 #	define CEX_HAS_XOP
 #endif
@@ -390,55 +396,38 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #		define CEX_HAS_AVX
 #	endif
 #endif
-#if defined(CEX_HAS_XOP)
-#	if !defined(CEX_HAS_AVX)
-#		define CEX_HAS_AVX
-#	endif
-#endif
 #if defined(CEX_HAS_AVX)
-#	if !defined(CEX_HAS_SSE41)
-#		define CEX_HAS_SSE41
+#	if !defined(CEX_HAS_SSE4)
+#		define CEX_HAS_SSE4
 #	endif
 #endif
-#if defined(CEX_HAS_SSE41)
-#	if !defined(CEX_HAS_SSSE3)
-#		define CEX_HAS_SSSE3
-#	endif
-#endif
-#if defined(CEX_HAS_SSSE3)
-#	define CEX_HAS_SSE2
-#endif
-
 #if defined(CEX_HAS_SSE41) || defined(CEX_HAS_SSE42)
 #	define CEX_HAS_SSE4
 #endif
+#if defined(CEX_HAS_SSE4)
+#	if !defined(CEX_HAS_SSE3)
+#		define CEX_HAS_SSE3
+#	endif
+#endif
+#if defined(CEX_HAS_SSE3)
+#	if !defined(CEX_HAS_SSE2)
+#		define CEX_HAS_SSE2
+#	endif
+#endif
 
-// assumptions only in visual studio (still!), requires runtime cpu checks to be sure
 #if defined(CEX_OS_WINDOWS) && !defined(CEX_HAS_SSE4) && !defined(CEX_HAS_SSSE3) && !defined(CEX_HAS_SSE2)
 #	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
-#		if !defined(CEX_HAS_SSE4)
-#			define CEX_HAS_SSE4
-#		endif
-#		if !defined(CEX_HAS_AVX)
-#			define CEX_HAS_AVX
-#		endif
-#		if !defined(CEX_HAS_SSSE3)
-#			define CEX_HAS_SSSE3
+#		if !defined(CEX_HAS_SSE3)
+#			define CEX_HAS_SSE3
 #		endif
 #		if !defined(CEX_HAS_SSE2)
 #			define CEX_HAS_SSE2
 #		endif
 #	elif _MSC_VER >= 1500 && _MSC_FULL_VER >= 150030729
-#		if !defined(CEX_HAS_SSSE3)
-#			define CEX_HAS_SSSE3
-#		endif
 #		if !defined(CEX_HAS_SSE2)
 #			define CEX_HAS_SSE2
 #		endif
 #	elif _MSC_VER > 1200 || defined(_mm_free)
-#		if !defined(CEX_HAS_SSSE3)
-#			define CEX_HAS_SSSE3
-#		endif
 #		if !defined(CEX_HAS_SSE2)
 #			define CEX_HAS_SSE2
 #		endif
