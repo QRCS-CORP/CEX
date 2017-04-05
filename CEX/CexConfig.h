@@ -427,6 +427,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #		if !defined(CEX_HAS_SSE2)
 #			define CEX_HAS_SSE2
 #		endif
+#	endif
 #endif
 
 #if defined(CEX_HAS_SSE2)

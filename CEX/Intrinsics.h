@@ -17,7 +17,7 @@
 #	include <spe.h>			// GCC-compatible compiler, targeting PowerPC with SPE
 #endif
 
-#if defined(CEX_HAS_AVX2)
+/*#if defined(CEX_HAS_AVX2)
 #	include <zmmintrin.h>
 #elif defined(CEX_HAS_AVX)
 #	include <immintrin.h>
@@ -39,6 +39,6 @@
 #	include <emmintrin.h>
 #elif defined(HAS_SSE)
 #	include <xmmintrin.h>
-#endif
+#endif*/
 
 #endif

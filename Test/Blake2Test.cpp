@@ -124,10 +124,12 @@ namespace Test
 
 					// Note: the official default is 4 threads, my default on all digests is 8 threads
 					BlakeParams params(64, 2, 4, 0, 64);
-					Blake512 blake2(params);
+					Blake512 blake2bp(params);
 					Key::Symmetric::SymmetricKey mkey(key);
-					blake2.Initialize(mkey);
-					blake2.Compute(input, hash);
+					// hard code for test
+					blake2bp.ParallelProfile().SetMaxDegree(4);
+					blake2bp.Initialize(mkey);
+					blake2bp.Compute(input, hash);
 
 					if (hash != expect)
 						throw TestException("Blake2BPTest: KAT test has failed!");
@@ -218,6 +220,8 @@ namespace Test
 
 					Key::Symmetric::SymmetricKey mkey(key);
 					Blake256 blake2sp(true);
+					// hard code for test
+					blake2sp.ParallelProfile().SetMaxDegree(8);
 					blake2sp.Initialize(mkey);
 					blake2sp.Compute(input, hash);
 
