@@ -227,9 +227,8 @@ public:
 
 		size_t inpLen = Input.size() - InOffset;
 		const size_t SHFT = 8;
-		T retNum = 0;
+		T retNum = static_cast<T>(Input[InOffset]);
 
-		retNum = static_cast<T>(Input[InOffset]);
 		for (size_t i = 1; i < inpLen; ++i)
 			retNum |= static_cast<T>(Input[InOffset + i] << i * SHFT);
 

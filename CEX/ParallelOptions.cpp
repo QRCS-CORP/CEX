@@ -169,7 +169,7 @@ void ParallelOptions::Detect()
 	Common::CpuDetect detect;
 
 	m_hasSHA2 = detect.SHA();
-	m_hasSimd128 = detect.SSE2();
+	m_hasSimd128 = detect.AVX();
 	m_hasSimd256 = detect.AVX2();
 	m_physicalCores = detect.PhysicalCores();
 	m_simdDetected = (m_hasSimd256) ? SimdProfiles::Simd256 : (m_hasSimd128) ? SimdProfiles::Simd128 : SimdProfiles::None;
