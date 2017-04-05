@@ -5,6 +5,8 @@
 
 NAMESPACE_PRNG
 
+using Utility::IntUtils;
+
 //~~~Constructor~~~//
 
 DCR::DCR(Digests DigestEngine, Providers SeedEngine, size_t BufferSize)
@@ -125,7 +127,7 @@ uint DCR::Next(uint Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<uint>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -152,7 +154,7 @@ ulong DCR::NextLong(ulong Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<ulong>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -194,8 +196,7 @@ void DCR::Reset()
 
 std::vector<byte> DCR::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
-	ulong val = 0;
-	memcpy(&val, &Data[0], Data.size());
+	ulong val = IntUtils::BytesToLe<ulong>(Data, 0);
 	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
@@ -204,9 +205,7 @@ std::vector<byte> DCR::GetBits(std::vector<byte> &Data, ulong Maximum)
 		bits--;
 	}
 
-	std::vector<byte> ret(Data.size());
-	memcpy(&ret[0], &val, Data.size());
-
+	std::vector<byte> ret = IntUtils::LeToBytes<ulong>(val, Data.size());
 	return ret;
 }
 

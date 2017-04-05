@@ -1,9 +1,8 @@
 #ifndef _CEXTEST_CONSOLEUTILS_H
 #define _CEXTEST_CONSOLEUTILS_H
 
-#include <fstream>
 #include <iostream>
-#include <stdio.h>
+#include <string>
 
 #if defined(_WIN32)
 #	include <Windows.h>
@@ -30,7 +29,7 @@ public:
 
 	static void WriteLine(std::string Data)
 	{
-		std::cout << Data.c_str() << std::endl;
+		std::cout << Data << std::endl;
 	}
 };
 

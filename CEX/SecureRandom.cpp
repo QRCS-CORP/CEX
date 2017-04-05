@@ -1,11 +1,13 @@
 #include "SecureRandom.h"
 #include "ArrayUtils.h"
 #include "BitConverter.h"
+#include "IntUtils.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_PRNG
 
 using IO::BitConverter;
+using Utility::IntUtils;
 
 //~~~Constructor~~~//
 
@@ -131,7 +133,7 @@ short SecureRandom::NextInt16(short Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<short>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -158,7 +160,7 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<ushort>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -190,7 +192,7 @@ int SecureRandom::NextInt32(int Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<int>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -217,7 +219,7 @@ uint SecureRandom::NextUInt32(uint Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<uint>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -249,7 +251,7 @@ long SecureRandom::NextInt64(long Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<long>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -276,7 +278,7 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		memcpy(&num, &rand[0], rand.size());
+		num = IntUtils::BytesToLe<ulong>(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -325,8 +327,7 @@ std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
 
 std::vector<byte> SecureRandom::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
-	ulong val = 0;
-	memcpy(&val, &Data[0], Data.size());
+	ulong val = IntUtils::BytesToLe<ulong>(Data, 0);
 	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
@@ -335,9 +336,7 @@ std::vector<byte> SecureRandom::GetBits(std::vector<byte> &Data, ulong Maximum)
 		bits--;
 	}
 
-	std::vector<byte> ret(Data.size());
-	memcpy(&ret[0], &val, Data.size());
-
+	std::vector<byte> ret = IntUtils::LeToBytes<ulong>(val, Data.size());
 	return ret;
 }
 

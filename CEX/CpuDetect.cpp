@@ -130,15 +130,15 @@ void CpuDetect::Initialize()
 		m_x86CpuFlags[2] = (static_cast<ulong>(cpuInfo[3]) << 32) | cpuInfo[2]; // f8..1 ecx, edx
 
 		GetTopology();
-
-		// fallbacks
-		if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
-			m_l1CacheSize = m_physCores * 128;
-		if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
-			m_l1CacheLineSize = 64;
-		if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
-			m_l2CacheSize = m_physCores * 256;
 	}
+
+	// fallbacks
+	if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
+		m_l1CacheSize = m_physCores * 128;
+	if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
+		m_l1CacheLineSize = 64;
+	if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
+		m_l2CacheSize = m_physCores * 256;
 }
 
 bool CpuDetect::GetFlag(CpuidFlags Flag)

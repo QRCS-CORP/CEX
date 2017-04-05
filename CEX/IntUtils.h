@@ -212,6 +212,55 @@ public:
 	/// <returns>The reversed ulong</returns>
 	static ulong ByteReverse(ulong Value);
 
+	/// <summary>
+	/// Convert a byte array to an T size integer
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// 
+	/// <returns>The return integer</returns>
+	template<typename T>
+	static T BytesToLe(const std::vector<byte> &Input, size_t InOffset)
+	{
+		CEXASSERT(Input.size() - InOffset > 0, "Array too small!");
+
+		size_t inpLen = Input.size() - InOffset;
+		const size_t SHFT = 8;
+		T retNum = 0;
+
+		retNum = static_cast<T>(Input[InOffset]);
+		for (size_t i = 1; i < inpLen; ++i)
+			retNum |= static_cast<T>(Input[InOffset + i] << i * SHFT);
+
+		return retNum;
+	}
+
+	/// <summary>
+	/// Convert a T size integer to a byte array
+	/// </summary>
+	/// 
+	/// <param name="Input">The source byte array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Length">The number of bytes to copy</param>
+	/// 
+	/// <returns>The return byte array</returns>
+	template<typename T>
+	static std::vector<byte> LeToBytes(T Value, size_t Length)
+	{
+		CEXASSERT(Length > 0, "Array too small!");
+
+		std::vector<byte> retArr(Length);
+		const size_t SHFT = 8;
+
+		retArr[0] = static_cast<byte>(Value);
+
+		for (size_t i = 1; i < Length; ++i)
+			retArr[i] = static_cast<byte>(Value >> i * SHFT);
+
+		return retArr;
+	}
+
 	// Different computer architectures store data using different byte orders. "Big-endian"
 	// means the most significant byte is on the left end of a word. "Little-endian" means the 
 	// most significant byte is on the right end of a word. i.e.: 
