@@ -204,8 +204,6 @@ int main()
 
 	Common::CpuDetect detect;
 
-	//RunTest(new AEADTest());
-
 	if (detect.AESNI())
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
 	else
@@ -217,10 +215,8 @@ int main()
 		PrintHeader("Warning! AVX2 was not detected! This library is currently set for AVX2 intrinsics support.");
 		if (detect.AVX())
 			PrintHeader("AVX intrinsics support available, set enable enhanced instruction set to arch:AVX");
-		else if (detect.SSE2())
-			PrintHeader("SSE2 intrinsics support available, set enable enhanced instruction set to arch:SSE2");
 		else
-			PrintHeader("The minimum SIMD intrinsics support was not detected, intrinsics has been disabled!");
+			PrintHeader("The minimum SIMD intrinsics support (AVX) was not detected, intrinsics has been disabled!");
 
 		PrintHeader("", "");
 	}
