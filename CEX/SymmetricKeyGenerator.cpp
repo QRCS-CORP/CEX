@@ -96,10 +96,6 @@ std::vector<byte> SymmetricKeyGenerator::GetBytes(size_t Size)
 
 void SymmetricKeyGenerator::Reset()
 {
-	// reset provider engine
-	if (m_pvdEngine != 0)
-		delete m_pvdEngine;
-
 	try
 	{
 		m_pvdEngine = Helper::ProviderFromName::GetInstance(m_pvdType);
@@ -110,10 +106,7 @@ void SymmetricKeyGenerator::Reset()
 
 	// if provider is unavailable, default to system crypto provider
 	if (m_pvdEngine == 0 || !m_pvdEngine->IsAvailable())
-	{
-		delete m_pvdEngine;
 		m_pvdEngine = Helper::ProviderFromName::GetInstance(Providers::CSP);
-	}
 }
 
 //~~~Private Functions~~~//
