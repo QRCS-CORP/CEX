@@ -194,6 +194,7 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
+	//RunTest(new Blake2Test());
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
@@ -267,7 +268,8 @@ int main()
 			RunTest(new DigestStreamTest());
 			RunTest(new MacStreamTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC HASH GENERATORS");
-			RunTest(new Blake2Test());
+			// being reviewed
+			//RunTest(new Blake2Test());
 			RunTest(new KeccakTest());
 			RunTest(new SHA2Test());
 			RunTest(new SkeinTest());
