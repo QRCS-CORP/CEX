@@ -230,18 +230,15 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	size_t ttlOff = 0;
 	std::vector<uint> stateK(SKSZE);
 
-	if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
+#if defined(__AVX__)
+	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
 	{
-		for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
-		{
-			for (size_t i = 0; i < 16; i++)
-				stateK[k * 16 + i] = IntUtils::BytesToLe32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
-		}
+		for (size_t i = 0; i < 16; i++)
+			stateK[k * 16 + i] = IntUtils::BytesToLe32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
 	}
-	else
-	{
-		IntUtils::BlockToLe32(tmpK, 0, stateK);
-	}
+#else
+	IntUtils::BlockToLe32(tmpK, 0, stateK);
+#endif
 
 	if (!m_parallelProfile.IsParallel() && PRLBLK >= MFLWRD)
 	{
@@ -260,18 +257,15 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 			SMix(stateK, i, m_scryptParameters.CpuCost);
 	}
 
-	if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
+#if defined(__AVX__)
+	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
 	{
-		for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
-		{
-			for (size_t i = 0; i < 16; i++)
-				IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
-		}
+		for (size_t i = 0; i < 16; i++)
+			IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
 	}
-	else
-	{
-		IntUtils::Le32ToBlock(stateK, tmpK, 0);
-	}
+#else
+	IntUtils::Le32ToBlock(stateK, tmpK, 0);
+#endif
 
 	Extract(Output, OutOffset, m_kdfKey, tmpK, Length);
 
