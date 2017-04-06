@@ -13,6 +13,7 @@ SymmetricKeyGenerator::SymmetricKeyGenerator(Digests DigestType, Providers Provi
 	:
 	m_dgtType(DigestType),
 	m_isDestroyed(false),
+	m_pvdEngine(0),
 	m_pvdType(ProviderType)
 {
 	// initialize the provider
@@ -96,6 +97,9 @@ std::vector<byte> SymmetricKeyGenerator::GetBytes(size_t Size)
 
 void SymmetricKeyGenerator::Reset()
 {
+	if (m_pvdEngine != 0)
+		delete m_pvdEngine;
+
 	try
 	{
 		m_pvdEngine = Helper::ProviderFromName::GetInstance(m_pvdType);

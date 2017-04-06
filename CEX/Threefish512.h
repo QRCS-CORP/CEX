@@ -56,6 +56,7 @@ private:
 		B = Utility::IntUtils::RotL64(B, R) ^ A;
 	}
 
+#if defined(__AVX2__)
 	static inline void Interleave64(__m256i &X0, __m256i &X1)
 	{
 		const __m256i T0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
@@ -65,7 +66,7 @@ private:
 		X1 = _mm256_unpackhi_epi64(T0, T1);
 	}
 
-#if defined(__AVX__)
+
 	#define TF512ROUND(X0, X1, SHL)														\
 	   do {                                                                             \
 		  const __m256i SHR = _mm256_sub_epi64(_mm256_set1_epi64x(64), SHL);            \
@@ -105,7 +106,7 @@ private:
 
 public:
 
-#if defined(__AVX__)
+#if defined(__AVX2__)
 	template <typename T>
 	static void Transfrom64(std::vector<ulong> &Input, size_t InOffset, T &Output)
 	{

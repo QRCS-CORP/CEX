@@ -12,6 +12,7 @@ NAMESPACE_PROCESSING
 CipherStream::CipherStream(BlockCiphers CipherType, Digests KdfEngine, int RoundCount, CipherModes ModeType, PaddingModes PaddingType)
 	:
 	m_blockCipher(0),
+	m_cipherPadding(0),
 	m_destroyEngine(true),
 	m_isBufferedIO(false),
 	m_isDestroyed(false),
@@ -34,6 +35,7 @@ CipherStream::CipherStream(BlockCiphers CipherType, Digests KdfEngine, int Round
 CipherStream::CipherStream(StreamCiphers CipherType, size_t RoundCount)
 	:
 	m_blockCipher(0),
+	m_cipherPadding(0),
 	m_destroyEngine(true),
 	m_isBufferedIO(false),
 	m_isDestroyed(false),
@@ -57,6 +59,7 @@ CipherStream::CipherStream(StreamCiphers CipherType, size_t RoundCount)
 CipherStream::CipherStream(CipherDescription* Header)
 	:
 	m_blockCipher(0),
+	m_cipherPadding(0),
 	m_destroyEngine(true),
 	m_isBufferedIO(false),
 	m_isDestroyed(false),
