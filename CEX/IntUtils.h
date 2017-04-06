@@ -3,13 +3,10 @@
 
 #include "CexDomain.h"
 #include "CexDomain.h"
-#include "SimdProfiles.h"
 #include <algorithm>
 #include <sstream>
 
 NAMESPACE_UTILITY
-
-using Enumeration::SimdProfiles;
 
 /// <summary>
 /// An integer utility functions class
@@ -932,8 +929,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, SimdProfiles SimdProfile);
+	static void XOR128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 32 bytes
@@ -943,8 +939,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, SimdProfiles SimdProfile);
+	static void XOR256(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 4 * 32bit unsigned integers
@@ -954,8 +949,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 8 * 32bit unsigned integers
@@ -965,8 +959,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 4 * 64bit unsigned integers
@@ -976,8 +969,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 8 * 64bit unsigned integers
@@ -987,8 +979,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// Block XOR 16 * 64bit unsigned integers
@@ -998,8 +989,7 @@ public:
 	/// <param name="InOffset">Offset within the source array</param>
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile);
+	static void XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset);
 
 	/// <summary>
 	/// XOR contiguous 16 byte blocks in an array.
@@ -1011,8 +1001,7 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Length">The number of (16 byte block aligned) bytes to process</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile);
+	static void XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 
 	/// <summary>
 	/// XOR a partial byte block.
@@ -1036,8 +1025,7 @@ public:
 	/// <param name="Output">The destination array</param>
 	/// <param name="OutOffset">Offset within the destination array</param>
 	/// <param name="Length">The number of (8 uint block aligned) uint32s to process</param>
-	/// <param name="SimdProfile">System supported SIMD instructions</param>
-	static void XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile);
+	static void XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length);
 
 	/// <summary>
 	/// XOR a partial uint32 block.

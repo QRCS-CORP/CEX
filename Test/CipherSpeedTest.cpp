@@ -1,6 +1,8 @@
 #include "CipherSpeedTest.h"
 #include "../CEX/CpuDetect.h"
-#include "../CEX/AHX.h"
+#if defined(__AVX__)
+#	include "../CEX/AHX.h"
+#endif
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
 #include "../CEX/THX.h"
@@ -36,12 +38,14 @@ namespace Test
 			OnProgress("### Each cipher test Encrypts 2GB of data; 100MB chunks * 20 iterations");
 			OnProgress("");
 
+#if defined(__AVX__)
 			if (m_hasAESNI)
 			{
 				OnProgress("***AHX/ECB (AES-NI): Monte Carlo test (K=256; R=14)***");
 				AHXSpeedTest();
 			}
 			else
+#endif
 			{
 				OnProgress("***RHX/ECB: (Rijndael) Monte Carlo test (K=256; R=14)***");
 				RHXSpeedTest();
@@ -64,9 +68,11 @@ namespace Test
 				GCMSpeedTest(eng1, true, true);*/
 
 			IBlockCipher* engine;
+#if defined(__AVX__)
 			if (m_hasAESNI)
 				engine = new AHX();
 			else
+#endif
 				engine = new RHX();
 
 			OnProgress("***AES-CBC Sequential Encryption***");
@@ -138,6 +144,7 @@ namespace Test
 
 	//*** Block Cipher Tests ***//
 
+#if defined(__AVX__)
 	void CipherSpeedTest::AHXSpeedTest()
 	{
 		AHX* engine = new AHX();
@@ -146,6 +153,7 @@ namespace Test
 		delete cipher;
 		delete engine;
 	}
+#endif
 
 	void CipherSpeedTest::RHXSpeedTest(size_t KeySize)
 	{

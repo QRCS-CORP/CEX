@@ -230,6 +230,7 @@ int main()
 		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
+
 			if (detect.AESNI())
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
@@ -242,6 +243,7 @@ int main()
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesFipsTest(true));
 			}
+
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesFipsTest());
 			RunTest(new RijndaelTest());

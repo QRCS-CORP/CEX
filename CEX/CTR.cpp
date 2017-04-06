@@ -91,7 +91,7 @@ void CTR::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 	m_blockCipher->EncryptBlock(m_ctrVector, 0, Output, OutOffset);
 	ArrayUtils::IncrementBE8(m_ctrVector);
-	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, m_blockSize, m_parallelProfile.SimdProfile());
+	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, m_blockSize);
 }
 
 void CTR::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -182,7 +182,8 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	const size_t SSEBLK = 4 * m_blockSize;
 	const size_t AVXBLK = 8 * m_blockSize;
 
-	if (m_parallelProfile.HasSimd256() && Length >= AVXBLK)
+#if defined(__AVX2__)
+	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		std::vector<byte> ctrBlk(AVXBLK);
@@ -210,7 +211,8 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 			blkCtr += AVXBLK;
 		}
 	}
-	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
+#elif defined(__AVX__)
+	if (Length >= SSEBLK)
 	{
 		const size_t PBKALN = Length - (Length % SSEBLK);
 		std::vector<byte> ctrBlk(SSEBLK);
@@ -230,6 +232,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 			blkCtr += SSEBLK;
 		}
 	}
+#endif
 
 	const size_t BLKALN = Length - (Length % m_blockSize);
 	while (blkCtr != BLKALN)
@@ -271,7 +274,7 @@ void CTR::TransformParallel(const std::vector<byte> &Input, const size_t InOffse
 		// generate random at output offset
 		this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 		// xor with input at offsets
-		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, m_parallelProfile.SimdProfile());
+		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			memcpy(&tmpCtr[0], &thdCtr[0], tmpCtr.size());
@@ -300,7 +303,7 @@ void CTR::TransformSequential(const std::vector<byte> &Input, const size_t InOff
 	size_t ALNSZE = Length - (Length % m_blockSize);
 
 	if (ALNSZE != 0)
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, m_parallelProfile.SimdProfile());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE);
 
 	// get the remaining bytes
 	if (ALNSZE != Length)

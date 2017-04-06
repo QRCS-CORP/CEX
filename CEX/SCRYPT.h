@@ -166,8 +166,7 @@ public:
 
 	/// <summary>
 	/// Get/Set: Parallel and SIMD capability flags and sizes 
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// SIMD parallelization can be overriden using the SetSimdProfile(SimdProfiles) accessor, highest available value is chosen automatically.</para>
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.</para>
 	/// </summary>
 	ParallelOptions &ParallelProfile() { return m_parallelProfile; }
 
@@ -290,7 +289,6 @@ private:
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length);
 	void SalsaCore(std::vector<uint> &Output);
-	void SalsaCoreW(std::vector<uint> &Output);
 	void Scope();
 	void SMix(std::vector<uint> &State, size_t StateOffset, size_t N);
 };

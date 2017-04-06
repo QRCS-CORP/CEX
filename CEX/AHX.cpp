@@ -7,6 +7,8 @@
 
 NAMESPACE_BLOCK
 
+#if defined(__AVX__)
+
 using Helper::DigestFromName;
 using Utility::IntUtils;
 
@@ -563,5 +565,7 @@ void AHX::LoadState(Digests KdfEngineType)
 		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, m_blockSize, m_kdfInfoMax);
 	}
 }
+
+#endif
 
 NAMESPACE_BLOCKEND

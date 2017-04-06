@@ -11,6 +11,8 @@ NAMESPACE_NUMERIC
 /// </summary>
 class ULong256
 {
+#if defined(__AVX2__)
+
 public:
 
 	/// <summary>
@@ -508,6 +510,7 @@ public:
 	{
 		return ULong256(_mm256_xor_si256(Register, _mm256_set1_epi32(0xFFFFFFFF)));
 	}
+#endif
 };
 
 NAMESPACE_NUMERICEND

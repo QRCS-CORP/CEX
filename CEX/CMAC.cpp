@@ -109,11 +109,11 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	{
 		Cipher::Symmetric::Block::Padding::ISO7816 pad;
 		pad.AddPadding(m_wrkBuffer, m_wrkOffset);
-		Utility::IntUtils::XORBLK(m_K2, 0, m_wrkBuffer, 0, m_macSize, m_cipherMode->ParallelProfile().SimdProfile());
+		Utility::IntUtils::XORBLK(m_K2, 0, m_wrkBuffer, 0, m_macSize);
 	}
 	else
 	{
-		Utility::IntUtils::XORBLK(m_K1, 0, m_wrkBuffer, 0, m_macSize, m_cipherMode->ParallelProfile().SimdProfile());
+		Utility::IntUtils::XORBLK(m_K1, 0, m_wrkBuffer, 0, m_macSize);
 	}
 
 	m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);

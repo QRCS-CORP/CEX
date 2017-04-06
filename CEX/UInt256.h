@@ -6,11 +6,14 @@
 
 NAMESPACE_NUMERIC
 
+
 /// <summary>
 /// An AVX 256 intrinsics wrapper
 /// </summary>
 class UInt256
 {
+#if defined(__AVX2__)
+
 private:
 	explicit UInt256(__m256i Input)
 	{
@@ -671,6 +674,7 @@ private:
 		Xl = _mm256_permute2x128_si256(X0, X1, _MM_SHUFFLE(0, 2, 0, 0));
 		Xh = _mm256_permute2x128_si256(X0, X1, _MM_SHUFFLE(0, 3, 0, 1));
 	}
+#endif
 };
 
 NAMESPACE_NUMERICEND

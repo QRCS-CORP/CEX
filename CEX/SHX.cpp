@@ -389,6 +389,8 @@ void SHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void SHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(__AVX__)
+
 	const size_t LRD = 4;
 	size_t keyCtr = m_expKey.size();
 
@@ -481,10 +483,21 @@ void SHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	R1.StoreLE(Output, OutOffset + 16);
 	R2.StoreLE(Output, OutOffset + 32);
 	R3.StoreLE(Output, OutOffset + 48);
+
+#else
+
+	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+
+#endif
 }
 
 void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(__AVX2__)
+
 	const size_t LRD = 4;
 	size_t keyCtr = m_expKey.size();
 
@@ -576,6 +589,19 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	R1.StoreLE(Output, OutOffset + 32);
 	R2.StoreLE(Output, OutOffset + 64);
 	R3.StoreLE(Output, OutOffset + 96);
+
+#else
+
+	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+	Decrypt16(Input, InOffset + 64, Output, OutOffset + 64);
+	Decrypt16(Input, InOffset + 80, Output, OutOffset + 80);
+	Decrypt16(Input, InOffset + 96, Output, OutOffset + 96);
+	Decrypt16(Input, InOffset + 112, Output, OutOffset + 112);
+
+#endif
 }
 
 void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -662,6 +688,8 @@ void SHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void SHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(__AVX__)
+
 	const size_t LRD = m_expKey.size() - 5;
 	int keyCtr = -1;
 
@@ -747,10 +775,21 @@ void SHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	R1.StoreLE(Output, OutOffset + 16);
 	R2.StoreLE(Output, OutOffset + 32);
 	R3.StoreLE(Output, OutOffset + 48);
+
+#else
+
+	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+
+#endif
 }
 
 void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
+#if defined(__AVX2__)
+
 	const size_t LRD = m_expKey.size() - 5;
 	int keyCtr = -1;
 
@@ -835,6 +874,19 @@ void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	R1.StoreLE(Output, OutOffset + 32);
 	R2.StoreLE(Output, OutOffset + 64);
 	R3.StoreLE(Output, OutOffset + 96);
+
+#else
+
+	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
+	Encrypt16(Input, InOffset + 64, Output, OutOffset + 64);
+	Encrypt16(Input, InOffset + 80, Output, OutOffset + 80);
+	Encrypt16(Input, InOffset + 96, Output, OutOffset + 96);
+	Encrypt16(Input, InOffset + 112, Output, OutOffset + 112);
+
+#endif
 }
 
 //~~~Helper Functions~~~//

@@ -319,7 +319,7 @@ void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	Threefish256::Transfrom32(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
-	IntUtils::XORULL256(block, 0, State[StateOffset].S, 0, m_parallelProfile.SimdProfile());
+	IntUtils::XORULL256(block, 0, State[StateOffset].S, 0);
 
 	// clear first flag
 	if (!m_isInitialized && StateOffset == 0)
@@ -360,7 +360,7 @@ void Skein256::Initialize()
 			// store the new state in V for reset
 			memcpy(&m_dgtState[i].V[0], &m_dgtState[i].S[0], m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
-			IntUtils::XORULL256(config, 0, m_dgtState[i].V, 0, m_parallelProfile.SimdProfile());
+			IntUtils::XORULL256(config, 0, m_dgtState[i].V, 0);
 		}
 	}
 
@@ -377,7 +377,7 @@ void Skein256::LoadState(Skein256State &State, std::vector<ulong> &Config)
 	// store the initial state for reset
 	memcpy(&State.V[0], &State.S[0], State.V.size() * sizeof(ulong));
 	// add the config string
-	IntUtils::XORULL256(Config, 0, State.V, 0, m_parallelProfile.SimdProfile());
+	IntUtils::XORULL256(Config, 0, State.V, 0);
 }
 
 NAMESPACE_DIGESTEND

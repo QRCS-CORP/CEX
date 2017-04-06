@@ -714,14 +714,11 @@ ulong IntUtils::ToInt64(std::vector<byte> Input, size_t InOffset)
 	return BytesToLe64(Input, InOffset);
 }
 
-void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	if (SimdProfile != SimdProfiles::None)
-	{
-		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
-	}
-	else
-	{
+#if defined(__AVX__)
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -738,22 +735,17 @@ void IntUtils::XOR128(const std::vector<byte> &Input, size_t InOffset, std::vect
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 16]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 16])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 16]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -786,37 +778,29 @@ void IntUtils::XOR256(const std::vector<byte> &Input, size_t InOffset, std::vect
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORUL128(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
 {
-	if (SimdProfile != SimdProfiles::None)
-	{
+#if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -825,45 +809,35 @@ void IntUtils::XORUL256(const std::vector<uint> &Input, size_t InOffset, std::ve
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORULL256(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 2])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 4]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 4])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 4]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 2])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 6]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 6])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 6]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -872,20 +846,17 @@ void IntUtils::XORULL512(const std::vector<ulong> &Input, size_t InOffset, std::
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset, SimdProfiles SimdProfile)
+void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
 {
-	if (SimdProfile == SimdProfiles::Simd256)
-	{
+#if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 4]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 4])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 4]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 8]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 8])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 8]))));
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset + 12]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset + 12])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset + 12]))));
-	}
-	else if (SimdProfile == SimdProfiles::Simd128)
-	{
+#elif defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 2])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 2]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 4])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 4]))));
@@ -894,9 +865,7 @@ void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std:
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 10]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 10])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 10]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 12]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 12])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 12]))));
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 14]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 14])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset + 14]))));
-	}
-	else
-	{
+#else
 		Output[OutOffset] ^= Input[InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
@@ -913,10 +882,10 @@ void IntUtils::XORULL1024(const std::vector<ulong> &Input, size_t InOffset, std:
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
 		Output[++OutOffset] ^= Input[++InOffset];
-	}
+#endif
 }
 
-void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile)
+void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	const size_t BLOCK16 = 16;
 	const size_t BLOCK32 = 32;
@@ -926,12 +895,12 @@ void IntUtils::XORBLK(const std::vector<byte> &Input, const size_t InOffset, std
 	{
 		if ((Length - blkCtr) < BLOCK32)
 		{
-			XOR128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			XOR128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
 			blkCtr += BLOCK16;
 		}
 		else
 		{
-			XOR256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			XOR256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
 			blkCtr += BLOCK32;
 		}
 
@@ -949,7 +918,7 @@ void IntUtils::XORPRT(const std::vector<byte> &Input, const size_t InOffset, std
 	} 
 }
 
-void IntUtils::XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length, SimdProfiles SimdProfile)
+void IntUtils::XORULBLK(const std::vector<uint> &Input, const size_t InOffset, std::vector<uint> &Output, const size_t OutOffset, const size_t Length)
 {
 	const size_t BLOCK4 = 4;
 	const size_t BLOCK8 = 8;
@@ -959,12 +928,12 @@ void IntUtils::XORULBLK(const std::vector<uint> &Input, const size_t InOffset, s
 	{
 		if ((Length - blkCtr) < BLOCK8)
 		{
-			XORUL128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			XORUL128(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
 			blkCtr += BLOCK4;
 		}
 		else
 		{
-			XORUL256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr, SimdProfile);
+			XORUL256(Input, InOffset + blkCtr, Output, OutOffset + blkCtr);
 			blkCtr += BLOCK8;
 		}
 	} 

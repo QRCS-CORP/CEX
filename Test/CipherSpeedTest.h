@@ -125,8 +125,9 @@ namespace Test
 			Handler("");
 		}
 
-
+#if defined(__AVX__)
 		void AHXSpeedTest();
+#endif
 		void CBCSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CFBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CTRSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);

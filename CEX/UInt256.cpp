@@ -2,6 +2,8 @@
 
 NAMESPACE_NUMERIC
 
+#if defined(__AVX2__)
+
 void UInt256::LoadBE(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7)
 {
 	Swap().LoadLE(X0, X1, X2, X3, X4, X5, X6, X7);
@@ -296,5 +298,5 @@ void UInt256::Transpose(UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
 	X3.Register = _mm256_unpackhi_epi64(T2, T3);
 }
 
-
+#endif
 NAMESPACE_NUMERICEND

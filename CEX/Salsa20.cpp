@@ -163,7 +163,8 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 	const size_t SSEBLK = 4 * BLOCK_SIZE;
 	const size_t AVXBLK = 8 * BLOCK_SIZE;
 
-	if (m_parallelProfile.HasSimd256() && Length >= AVXBLK)
+#if defined(__AVX2__)
+	if (Length >= AVXBLK)
 	{
 		size_t paln = Length - (Length % AVXBLK);
 		std::vector<uint> ctrBlk(16);
@@ -199,7 +200,8 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 			ctr += AVXBLK;
 		}
 	}
-	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
+#elif defined(__AVX__)
+	if (Length >= SSEBLK)
 	{
 		size_t paln = Length - (Length % SSEBLK);
 		std::vector<uint> ctrBlk(8);
@@ -223,6 +225,7 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 			ctr += SSEBLK;
 		}
 	}
+#endif
 
 	const size_t ALNSZE = Length - (Length % BLOCK_SIZE);
 	while (ctr != ALNSZE)
@@ -254,7 +257,7 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 		const size_t ALNSZE = PRCSZE - (PRCSZE % BLOCK_SIZE);
 
 		if (ALNSZE != 0)
-			IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, m_parallelProfile.SimdProfile());
+			IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE);
 
 		// get the remaining bytes
 		if (ALNSZE != PRCSZE)
@@ -280,7 +283,7 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 			// create random at offset position
 			this->Generate(Output, (i * CNKSZE), thdCtr, CNKSZE);
 			// xor with input at offset
-			IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, m_parallelProfile.SimdProfile());
+			IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 				memcpy(&tmpCtr[0], &thdCtr[0], CTR_SIZE);

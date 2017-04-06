@@ -1,6 +1,8 @@
 #include "BlockCipherFromName.h"
 #include "CpuDetect.h"
-#include "AHX.h"
+#if defined(__AVX__)
+#	include "AHX.h"
+#endif
 #include "RHX.h"
 #include "SHX.h"
 #include "THX.h"
@@ -17,16 +19,20 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Dig
 		{
 		case BlockCiphers::AHX:
 		{
+#if defined(__AVX__)
 			if (detect.AESNI())
 				return new Cipher::Symmetric::Block::AHX(KdfEngineType, 22);
 			else
+#endif
 				return new Cipher::Symmetric::Block::RHX(KdfEngineType, 22);
 		}
 		case BlockCiphers::Rijndael:
 		{
+#if defined(__AVX__)
 			if (detect.AESNI())
 				return new Cipher::Symmetric::Block::AHX();
 			else
+#endif
 				return new Cipher::Symmetric::Block::RHX();
 		}
 		case BlockCiphers::RHX:
@@ -60,16 +66,20 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, uin
 		{
 			case BlockCiphers::AHX:
 			{
+#if defined(__AVX__)
 				if (detect.AESNI())
 					return new Cipher::Symmetric::Block::AHX(KdfEngineType, RoundCount);
 				else
+#endif
 					return new Cipher::Symmetric::Block::RHX(KdfEngineType, BlockSize, RoundCount);
 			}
 			case BlockCiphers::Rijndael:
 			{
+#if defined(__AVX__)
 				if (detect.AESNI())
 					return new Cipher::Symmetric::Block::AHX();
 				else
+#endif
 					return new Cipher::Symmetric::Block::RHX();
 			}
 			case BlockCiphers::RHX:

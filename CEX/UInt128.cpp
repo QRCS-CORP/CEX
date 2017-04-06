@@ -2,6 +2,8 @@
 
 NAMESPACE_NUMERIC
 
+#if defined(__AVX__)
+
 void UInt128::LoadBE(uint X0, uint X1, uint X2, uint X3)
 {
 	Swap().LoadLE(X0, X1, X2, X3);
@@ -301,4 +303,5 @@ void UInt128::Transpose(UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	X3.Register = _mm_unpackhi_epi64(T2, T3);
 }
 
+#endif
 NAMESPACE_NUMERICEND

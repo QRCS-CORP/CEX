@@ -65,46 +65,49 @@ private:
 		X1 = _mm256_unpackhi_epi64(T0, T1);
 	}
 
-#define TF512ROUND(X0, X1, SHL)														\
-   do {                                                                             \
-      const __m256i SHR = _mm256_sub_epi64(_mm256_set1_epi64x(64), SHL);            \
-      X0 = _mm256_add_epi64(X0, X1);                                                \
-      X1 = _mm256_or_si256(_mm256_sllv_epi64(X1, SHL), _mm256_srlv_epi64(X1, SHR)); \
-      X1 = _mm256_xor_si256(X1, X0);                                                \
-      X0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(0, 3, 2, 1));                   \
-      X1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(1, 2, 3, 0));                   \
-   } while(0)
+#if defined(__AVX__)
+	#define TF512ROUND(X0, X1, SHL)														\
+	   do {                                                                             \
+		  const __m256i SHR = _mm256_sub_epi64(_mm256_set1_epi64x(64), SHL);            \
+		  X0 = _mm256_add_epi64(X0, X1);                                                \
+		  X1 = _mm256_or_si256(_mm256_sllv_epi64(X1, SHL), _mm256_srlv_epi64(X1, SHR)); \
+		  X1 = _mm256_xor_si256(X1, X0);                                                \
+		  X0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(0, 3, 2, 1));                   \
+		  X1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(1, 2, 3, 0));                   \
+	   } while(0)
 
-#define TF512INJECTKEY(X0, X1, R0, K0, K1, I0, I1)									\
-   do {																				\
-      const __m256i T0 = _mm256_permute4x64_epi64(T, _MM_SHUFFLE(I0, 0, 0, 0));		\
-      const __m256i T1 = _mm256_permute4x64_epi64(T, _MM_SHUFFLE(0, I1, 0, 0));		\
-      X0 = _mm256_add_epi64(X0, K0);												\
-      X1 = _mm256_add_epi64(X1, K1);												\
-      X1 = _mm256_add_epi64(X1, R0);												\
-      X0 = _mm256_add_epi64(X0, T0);												\
-      X1 = _mm256_add_epi64(X1, T1);												\
-      R0 = _mm256_add_epi64(R0, RFN);												\
-   } while(0)
+	#define TF512INJECTKEY(X0, X1, R0, K0, K1, I0, I1)									\
+	   do {																				\
+		  const __m256i T0 = _mm256_permute4x64_epi64(T, _MM_SHUFFLE(I0, 0, 0, 0));		\
+		  const __m256i T1 = _mm256_permute4x64_epi64(T, _MM_SHUFFLE(0, I1, 0, 0));		\
+		  X0 = _mm256_add_epi64(X0, K0);												\
+		  X1 = _mm256_add_epi64(X1, K1);												\
+		  X1 = _mm256_add_epi64(X1, R0);												\
+		  X0 = _mm256_add_epi64(X0, T0);												\
+		  X1 = _mm256_add_epi64(X1, T1);												\
+		  R0 = _mm256_add_epi64(R0, RFN);												\
+	   } while(0)
 
-#define TF512ENC8ROUNDS(X0, X1, R0, K1, K2, K3, T0, T1, T2)			\
-   do {																\
-      TF512ROUND(X0, X1, R1);										\
-      TF512ROUND(X0, X1, R2);										\
-      TF512ROUND(X0, X1, R3);										\
-      TF512ROUND(X0, X1, R4);										\
-      TF512INJECTKEY(X0, X1, R0, K1, K2, T0, T1);					\
-      TF512ROUND(X0, X1, R5);										\
-      TF512ROUND(X0, X1, R6);										\
-      TF512ROUND(X0, X1, R7);										\
-      TF512ROUND(X0, X1, R8);										\
-      TF512INJECTKEY(X0, X1, R0, K2, K3, T2, T0);					\
-   } while(0)
+	#define TF512ENC8ROUNDS(X0, X1, R0, K1, K2, K3, T0, T1, T2)			\
+	   do {																\
+		  TF512ROUND(X0, X1, R1);										\
+		  TF512ROUND(X0, X1, R2);										\
+		  TF512ROUND(X0, X1, R3);										\
+		  TF512ROUND(X0, X1, R4);										\
+		  TF512INJECTKEY(X0, X1, R0, K1, K2, T0, T1);					\
+		  TF512ROUND(X0, X1, R5);										\
+		  TF512ROUND(X0, X1, R6);										\
+		  TF512ROUND(X0, X1, R7);										\
+		  TF512ROUND(X0, X1, R8);										\
+		  TF512INJECTKEY(X0, X1, R0, K2, K3, T2, T0);					\
+	   } while(0)
+#endif
 
 public:
 
+#if defined(__AVX__)
 	template <typename T>
-	static void Transfrom64W(std::vector<ulong> &Input, size_t InOffset, T &Output)
+	static void Transfrom64(std::vector<ulong> &Input, size_t InOffset, T &Output)
 	{
 		__m256i R0 = _mm256_set_epi64x(0, 0, 0, 0);
 		const __m256i R1 = _mm256_set_epi64x(37, 19, 36, 46);
@@ -149,6 +152,8 @@ public:
 		_mm256_storeu_si256(regOutput++, X0);
 		_mm256_storeu_si256(regOutput, X1);
 	}
+
+#else
 
 	template <typename T>
 	static void Transfrom64(std::vector<ulong> &Input, size_t InOffset, T &Output)
@@ -474,6 +479,7 @@ public:
 		Output.S[6] = B6 + K6 + T1;
 		Output.S[7] = B7 + K7 + 18;
 	}
+#endif
 };
 
 NAMESPACE_DIGESTEND

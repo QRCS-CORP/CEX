@@ -94,7 +94,7 @@ void ICM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Convert(m_ctrVector, tmpCtr, 0);
 	m_blockCipher->EncryptBlock(tmpCtr, 0, Output, OutOffset);
 	ArrayUtils::IncrementLE64(m_ctrVector);
-	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, BLOCK_SIZE, m_parallelProfile.SimdProfile());
+	IntUtils::XORBLK(Input, InOffset, Output, OutOffset, BLOCK_SIZE);
 }
 
 void ICM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -195,7 +195,8 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 	const size_t SSEBLK = 4 * m_blockSize;
 	const size_t AVXBLK = 8 * m_blockSize;
 
-	if (m_parallelProfile.HasSimd256() && Length >= AVXBLK)
+#if defined(__AVX2__)
+	if (Length >= AVXBLK)
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		std::vector<byte> ctrBlk(AVXBLK);
@@ -223,7 +224,8 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 			blkCtr += AVXBLK;
 		}
 	}
-	else if (m_parallelProfile.HasSimd128() && Length >= SSEBLK)
+#elif defined(__AVX__)
+	if (Length >= SSEBLK)
 	{
 		const size_t PBKALN = Length - (Length % SSEBLK);
 		std::vector<byte> ctrBlk(SSEBLK);
@@ -243,6 +245,7 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 			blkCtr += SSEBLK;
 		}
 	}
+#endif
 
 	const size_t BLKALN = Length - (Length % m_blockSize);
 	std::vector<byte> tmpCtr(BLOCK_SIZE);
@@ -282,7 +285,7 @@ void ICM::TransformParallel(const std::vector<byte> &Input, const size_t InOffse
 		// generate random at output array offset
 		this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 		// xor with input at offsets
-		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE, m_parallelProfile.SimdProfile());
+		IntUtils::XORBLK(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			memcpy(&tmpCtr[0], &thdCtr[0], BLOCK_SIZE);
@@ -311,7 +314,7 @@ void ICM::TransformSequential(const std::vector<byte> &Input, const size_t InOff
 	size_t ALNSZE = Length - (Length % m_blockCipher->BlockSize());
 
 	if (ALNSZE != 0)
-		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE, m_parallelProfile.SimdProfile());
+		IntUtils::XORBLK(Input, InOffset, Output, OutOffset, ALNSZE);
 
 	// get the remaining bytes
 	if (ALNSZE != Length)

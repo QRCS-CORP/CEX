@@ -61,7 +61,9 @@ namespace Test
 	private:
 		void Initialize();
 		void OnProgress(char* Data);
+#if defined(__AVX__)
 		void AHXMonteCarlo();
+#endif
 		void RHXMonteCarlo();
 		void SHXMonteCarlo();
 		void THXMonteCarlo();

@@ -18,11 +18,13 @@ namespace Test
 			Initialize();
 
 			Common::CpuDetect detect;
+#if defined(__AVX__)
 			if (detect.AESNI())
 			{
 				AHXMonteCarlo();
 				OnProgress("AHX: Passed AES-NI Monte Carlo tests..");
 			}
+#endif
 			RHXMonteCarlo();
 			OnProgress("RHX: Passed RHX Monte Carlo tests..");
 			SHXMonteCarlo();
@@ -83,6 +85,7 @@ namespace Test
 		m_progressEvent(Data);
 	}
 
+#if defined(__AVX__)
 	void HXCipherTest::AHXMonteCarlo()
 	{
 		std::vector<byte> inpBytes(16, 0);
@@ -179,6 +182,7 @@ namespace Test
 				throw TestException("AHX: Failed decryption test!");
 		}
 	}
+#endif
 
 	void HXCipherTest::RHXMonteCarlo()
 	{

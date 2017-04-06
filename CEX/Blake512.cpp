@@ -435,11 +435,7 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 void Blake512::Compress(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length)
 {
 	ArrayUtils::IncreaseLE64(State.T, State.T, Length);
-
-	if (m_parallelProfile.HasSimd128())
-		Blake512Compress::Compress128W(Input, InOffset, State, m_cIV);
-	else
-		Blake512Compress::Compress128(Input, InOffset, State, m_cIV);
+	Blake512Compress::Compress128(Input, InOffset, State, m_cIV);
 }
 
 void Blake512::LoadState(Blake2bState &State)
@@ -449,7 +445,7 @@ void Blake512::LoadState(Blake2bState &State)
 	memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(ulong));
 
 	m_treeParams.GetConfig<ulong>(m_treeConfig);
-	IntUtils::XORULL512(m_treeConfig, 0, State.H, 0, m_parallelProfile.SimdProfile());
+	IntUtils::XORULL512(m_treeConfig, 0, State.H, 0);
 }
 
 void Blake512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, ulong Length)

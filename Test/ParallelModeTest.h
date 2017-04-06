@@ -71,8 +71,11 @@ namespace Test
 		virtual std::string Run();
         
     private:
+
+#if defined(__AVX__)
 		// Looping integrity test verifies the SIMD extensions in CTR and CBC modes using AHX
 		void CompareAhxSimd();
+#endif
 		// Looping reduction Kat, compares parallel CTR with vectors generated in sequential mode
 		void CompareBcrKat(IBlockCipher* Engine, std::vector<byte> Expected);
 		// Looping integrity test, compares CTR multi-threaded/SIMD with sequentially generated output

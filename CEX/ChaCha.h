@@ -147,6 +147,8 @@ public:
 
 	static void Transform256(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
+#if defined(__AVX__)
+
 		size_t ctr = 0;
 		std::vector<UInt128> X{
 			UInt128(State[ctr]),
@@ -256,10 +258,14 @@ public:
 		X[15] += UInt128(State[++ctr]);
 
 		UInt128::StoreLE256(X, 0, Output, OutOffset);
+
+#endif
 	}
 
 	static void Transform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
+#if defined(__AVX2__)
+
 		size_t ctr = 0;
 		std::vector<UInt256> X{
 			UInt256(State[ctr]),
@@ -369,6 +375,8 @@ public:
 		X[15] += UInt256(State[++ctr]);
 
 		UInt256::StoreLE512(X, 0, Output, OutOffset);
+
+#endif
 	}
 };
 

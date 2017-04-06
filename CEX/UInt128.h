@@ -11,6 +11,8 @@ NAMESPACE_NUMERIC
 /// </summary>
 class UInt128
 {
+#if defined(__AVX__)
+
 private:
 	explicit UInt128(__m128i Input)
 	{
@@ -637,6 +639,7 @@ public:
 	{
 		return UInt128(_mm_xor_si128(Register, _mm_set1_epi32(0xFFFFFFFF)));
 	}
+#endif
 };
 
 NAMESPACE_NUMERICEND

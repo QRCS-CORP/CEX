@@ -29,80 +29,53 @@ NAMESPACE_DIGEST
 */
 class Blake512Compress
 {
+private:
+
+#if defined(__AVX__)
+#	define _mm_roti_epi64(x, c) \
+		(-(c) == 32) ? _mm_shuffle_epi32((x), _MM_SHUFFLE(2,3,0,1))  \
+		: (-(c) == 24) ? _mm_shuffle_epi8((x), R24) \
+		: (-(c) == 16) ? _mm_shuffle_epi8((x), R16) \
+		: (-(c) == 63) ? _mm_xor_si128(_mm_srli_epi64((x), -(c)), _mm_add_epi64((x), (x)))  \
+		: _mm_xor_si128(_mm_srli_epi64((x), -(c)), _mm_slli_epi64((x), 64-(-(c))))
+
+#	define DIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
+		T0 = _mm_alignr_epi8(RH2, RL2, 8); \
+		T1 = _mm_alignr_epi8(RL2, RH2, 8); \
+		RL2 = T0; \
+		RH2 = T1; \
+		\
+		T0 = RL3; \
+		RL3 = RH3; \
+		RH3 = T0;    \
+		\
+		T0 = _mm_alignr_epi8(RH4, RL4, 8); \
+		T1 = _mm_alignr_epi8(RL4, RH4, 8); \
+		RL4 = T1; \
+		RH4 = T0;
+
+#	define UNDIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
+		T0 = _mm_alignr_epi8(RL2, RH2, 8); \
+		T1 = _mm_alignr_epi8(RH2, RL2, 8); \
+		RL2 = T0; \
+		RH2 = T1; \
+		\
+		T0 = RL3; \
+		RL3 = RH3; \
+		RH3 = T0; \
+		\
+		T0 = _mm_alignr_epi8(RL4, RH4, 8); \
+		T1 = _mm_alignr_epi8(RH4, RL4, 8); \
+		RL4 = T1; \
+		RH4 = T0;
+#endif
+
 public:
 
-#if defined(CEX_HAS_MINSSE)
-#	if !defined(CEX_HAS_XOP)
-#		if defined(CEX_HAS_SSSE3)
-#			define _mm_roti_epi64(x, c) \
-					(-(c) == 32) ? _mm_shuffle_epi32((x), _MM_SHUFFLE(2,3,0,1))  \
-					: (-(c) == 24) ? _mm_shuffle_epi8((x), R24) \
-					: (-(c) == 16) ? _mm_shuffle_epi8((x), R16) \
-					: (-(c) == 63) ? _mm_xor_si128(_mm_srli_epi64((x), -(c)), _mm_add_epi64((x), (x)))  \
-					: _mm_xor_si128(_mm_srli_epi64((x), -(c)), _mm_slli_epi64((x), 64-(-(c))))
-#		else
-#			define _mm_roti_epi64(r, c) _mm_xor_si128(_mm_srli_epi64( (r), -(c) ),_mm_slli_epi64( (r), 64-(-(c)) ))
-#		endif
-#	endif
-
-#	if defined(CEX_HAS_SSSE3)
-#		define DIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
-			  T0 = _mm_alignr_epi8(RH2, RL2, 8); \
-			  T1 = _mm_alignr_epi8(RL2, RH2, 8); \
-			  RL2 = T0; \
-			  RH2 = T1; \
-			  \
-			  T0 = RL3; \
-			  RL3 = RH3; \
-			  RH3 = T0;    \
-			  \
-			  T0 = _mm_alignr_epi8(RH4, RL4, 8); \
-			  T1 = _mm_alignr_epi8(RL4, RH4, 8); \
-			  RL4 = T1; \
-			  RH4 = T0;
-
-#		define UNDIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
-			  T0 = _mm_alignr_epi8(RL2, RH2, 8); \
-			  T1 = _mm_alignr_epi8(RH2, RL2, 8); \
-			  RL2 = T0; \
-			  RH2 = T1; \
-			  \
-			  T0 = RL3; \
-			  RL3 = RH3; \
-			  RH3 = T0; \
-			  \
-			  T0 = _mm_alignr_epi8(RL4, RH4, 8); \
-			  T1 = _mm_alignr_epi8(RH4, RL4, 8); \
-			  RL4 = T1; \
-			  RH4 = T0;
-#	else
-#		define DIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
-			  T0 = RL4;\
-			  T1 = RL2;\
-			  RL4 = RL3;\
-			  RL3 = RH3;\
-			  RH3 = RL4;\
-			  RL4 = _mm_unpackhi_epi64(RH4, _mm_unpacklo_epi64(T0, T0)); \
-			  RH4 = _mm_unpackhi_epi64(T0, _mm_unpacklo_epi64(RH4, RH4)); \
-			  RL2 = _mm_unpackhi_epi64(RL2, _mm_unpacklo_epi64(RH2, RH2)); \
-			  RH2 = _mm_unpackhi_epi64(RH2, _mm_unpacklo_epi64(T1, T1))
-
-#		define UNDIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
-			  T0 = RL3;\
-			  RL3 = RH3;\
-			  RH3 = T0;\
-			  T0 = RL2;\
-			  T1 = RL4;\
-			  RL2 = _mm_unpackhi_epi64(RH2, _mm_unpacklo_epi64(RL2, RL2)); \
-			  RH2 = _mm_unpackhi_epi64(T0, _mm_unpacklo_epi64(RH2, RH2)); \
-			  RL4 = _mm_unpackhi_epi64(RL4, _mm_unpacklo_epi64(RH4, RH4)); \
-			  RH4 = _mm_unpackhi_epi64(RH4, _mm_unpacklo_epi64(T1, T1))
-#	endif
-#endif
+#if defined(__AVX__)
 	template <typename T>
-	static void Compress128W(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
+	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
-#    if defined(CEX_HAS_SSE4)
 		const __m128i M0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);
 		const __m128i M1 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 16]);
 		const __m128i M2 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 32]);
@@ -111,30 +84,9 @@ public:
 		const __m128i M5 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 80]);
 		const __m128i M6 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 96]);
 		const __m128i M7 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 112]);
-#	else
-		byte* msg = (byte*)Input.data() + InOffset;
-		const ulong M0 = ((ulong*)msg)[0];
-		const ulong M1 = ((ulong*)msg)[1];
-		const ulong M2 = ((ulong*)msg)[2];
-		const ulong M3 = ((ulong*)msg)[3];
-		const ulong M4 = ((ulong*)msg)[4];
-		const ulong M5 = ((ulong*)msg)[5];
-		const ulong M6 = ((ulong*)msg)[6];
-		const ulong M7 = ((ulong*)msg)[7];
-		const ulong M8 = ((ulong*)msg)[8];
-		const ulong M9 = ((ulong*)msg)[9];
-		const ulong M10 = ((ulong*)msg)[10];
-		const ulong M11 = ((ulong*)msg)[11];
-		const ulong M12 = ((ulong*)msg)[12];
-		const ulong M13 = ((ulong*)msg)[13];
-		const ulong M14 = ((ulong*)msg)[14];
-		const ulong M15 = ((ulong*)msg)[15];
-#    endif
-
-#    if defined(CEX_HAS_SSSE3) && !defined(CEX_HAS_XOP)
 		const __m128i R16 = _mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9);
 		const __m128i R24 = _mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10);
-#    endif
+
 		__m128i RL1 = _mm_loadu_si128((const __m128i*)&State.H[0]);
 		__m128i RH1 = _mm_loadu_si128((const __m128i*)&State.H[2]);
 		__m128i RL2 = _mm_loadu_si128((const __m128i*)&State.H[4]);
@@ -147,13 +99,8 @@ public:
 
 		// round 0
 		// lm 0.1
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M0, M1);
 		B1 = _mm_unpacklo_epi64(M2, M3);
-#    else
-		B0 = _mm_set_epi64x(M2, M0);
-		B1 = _mm_set_epi64x(M6, M4);
-#    endif
 		// g1
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
@@ -169,13 +116,8 @@ public:
 		RH2 = _mm_roti_epi64(RH2, -24);
 
 		// lm 0.2
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M0, M1);
 		B1 = _mm_unpackhi_epi64(M2, M3);
-#    else
-		B0 = _mm_set_epi64x(M3, M1);
-		B1 = _mm_set_epi64x(M7, M5);
-#    endif
 		// g2
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
@@ -193,13 +135,8 @@ public:
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// lm 0.3
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M4, M5);
 		B1 = _mm_unpacklo_epi64(M6, M7);
-#    else
-		B0 = _mm_set_epi64x(M10, M8);
-		B1 = _mm_set_epi64x(M14, M12);
-#    endif
 		// g1
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
@@ -215,13 +152,8 @@ public:
 		RH2 = _mm_roti_epi64(RH2, -24);
 
 		// lm 0.4
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M4, M5);
 		B1 = _mm_unpackhi_epi64(M6, M7);
-#    else
-		B0 = _mm_set_epi64x(M11, M9);
-		B1 = _mm_set_epi64x(M15, M13);
-#    endif
 		// g2
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
@@ -239,13 +171,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 2
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M7, M2);
 		B1 = _mm_unpackhi_epi64(M4, M6);
-#    else
-		B0 = _mm_set_epi64x(M4, M14);
-		B1 = _mm_set_epi64x(M13, M9);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -259,13 +186,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M5, M4);
 		B1 = _mm_alignr_epi8(M3, M7, 8);
-#    else
-		B0 = _mm_set_epi64x(M8, M10);
-		B1 = _mm_set_epi64x(M6, M15);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -281,13 +203,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_shuffle_epi32(M0, _MM_SHUFFLE(1, 0, 3, 2));
 		B1 = _mm_unpackhi_epi64(M5, M2);
-#    else
-		B0 = _mm_set_epi64x(M0, M1);
-		B1 = _mm_set_epi64x(M5, M11);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -301,13 +218,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M6, M1);
 		B1 = _mm_unpackhi_epi64(M3, M1);
-#    else
-		B0 = _mm_set_epi64x(M2, M12);
-		B1 = _mm_set_epi64x(M3, M7);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -324,13 +236,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 3
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_alignr_epi8(M6, M5, 8);
 		B1 = _mm_unpackhi_epi64(M2, M7);
-#    else
-		B0 = _mm_set_epi64x(M12, M11);
-		B1 = _mm_set_epi64x(M15, M5);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -344,13 +251,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M4, M0);
 		B1 = _mm_blend_epi16(M1, M6, 0xF0);
-#    else
-		B0 = _mm_set_epi64x(M0, M8);
-		B1 = _mm_set_epi64x(M13, M2);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -366,13 +268,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#    if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M5, M1, 0xF0);
 		B1 = _mm_unpackhi_epi64(M3, M4);
-#    else
-		B0 = _mm_set_epi64x(M3, M10);
-		B1 = _mm_set_epi64x(M9, M7);
-#    endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -386,13 +283,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M7, M3);
 		B1 = _mm_alignr_epi8(M2, M0, 8);
-#	else
-		B0 = _mm_set_epi64x(M6, M14);
-		B1 = _mm_set_epi64x(M4, M1);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -409,13 +301,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 4
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M3, M1);
 		B1 = _mm_unpackhi_epi64(M6, M5);
-#	else
-		B0 = _mm_set_epi64x(M3, M7);
-		B1 = _mm_set_epi64x(M11, M13);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -429,13 +316,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M4, M0);
 		B1 = _mm_unpacklo_epi64(M6, M7);
-#	else
-		B0 = _mm_set_epi64x(M1, M9);
-		B1 = _mm_set_epi64x(M14, M12);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -451,13 +333,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M1, M2, 0xF0);
 		B1 = _mm_blend_epi16(M2, M7, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M5, M2);
-		B1 = _mm_set_epi64x(M15, M4);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -471,13 +348,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M3, M5);
 		B1 = _mm_unpacklo_epi64(M0, M4);
-#	else
-		B0 = _mm_set_epi64x(M10, M6);
-		B1 = _mm_set_epi64x(M8, M0);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -494,13 +366,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 5
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M4, M2);
 		B1 = _mm_unpacklo_epi64(M1, M5);
-#	else
-		B0 = _mm_set_epi64x(M5, M9);
-		B1 = _mm_set_epi64x(M10, M2);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -514,13 +381,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M0, M3, 0xF0);
 		B1 = _mm_blend_epi16(M2, M7, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M7, M0);
-		B1 = _mm_set_epi64x(M15, M4);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -536,13 +398,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M7, M5, 0xF0);
 		B1 = _mm_blend_epi16(M3, M1, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M11, M14);
-		B1 = _mm_set_epi64x(M3, M6);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -556,13 +413,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_alignr_epi8(M6, M0, 8);
 		B1 = _mm_blend_epi16(M4, M6, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M12, M1);
-		B1 = _mm_set_epi64x(M13, M8);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -579,13 +431,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 6
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M1, M3);
 		B1 = _mm_unpacklo_epi64(M0, M4);
-#	else
-		B0 = _mm_set_epi64x(M6, M2);
-		B1 = _mm_set_epi64x(M8, M0);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -599,13 +446,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M6, M5);
 		B1 = _mm_unpackhi_epi64(M5, M1);
-#	else
-		B0 = _mm_set_epi64x(M10, M12);
-		B1 = _mm_set_epi64x(M3, M11);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -621,13 +463,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M2, M3, 0xF0);
 		B1 = _mm_unpackhi_epi64(M7, M0);
-#	else
-		B0 = _mm_set_epi64x(M7, M4);
-		B1 = _mm_set_epi64x(M1, M15);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -641,13 +478,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M6, M2);
 		B1 = _mm_blend_epi16(M7, M4, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M5, M13);
-		B1 = _mm_set_epi64x(M9, M14);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -664,13 +496,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 7
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M6, M0, 0xF0);
 		B1 = _mm_unpacklo_epi64(M7, M2);
-#	else
-		B0 = _mm_set_epi64x(M1, M12);
-		B1 = _mm_set_epi64x(M4, M14);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -684,13 +511,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M2, M7);
 		B1 = _mm_alignr_epi8(M5, M6, 8);
-#	else
-		B0 = _mm_set_epi64x(M15, M5);
-		B1 = _mm_set_epi64x(M10, M13);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -706,13 +528,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M0, M3);
 		B1 = _mm_shuffle_epi32(M4, _MM_SHUFFLE(1, 0, 3, 2));
-#	else
-		B0 = _mm_set_epi64x(M6, M0);
-		B1 = _mm_set_epi64x(M8, M9);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -726,13 +543,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M3, M1);
 		B1 = _mm_blend_epi16(M1, M5, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M3, M7);
-		B1 = _mm_set_epi64x(M11, M2);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -749,13 +561,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 8
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M6, M3);
 		B1 = _mm_blend_epi16(M6, M1, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M7, M13);
-		B1 = _mm_set_epi64x(M3, M12);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -769,13 +576,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_alignr_epi8(M7, M5, 8);
 		B1 = _mm_unpackhi_epi64(M0, M4);
-#	else
-		B0 = _mm_set_epi64x(M14, M11);
-		B1 = _mm_set_epi64x(M9, M1);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -791,13 +593,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M2, M7);
 		B1 = _mm_unpacklo_epi64(M4, M1);
-#	else
-		B0 = _mm_set_epi64x(M15, M5);
-		B1 = _mm_set_epi64x(M2, M8);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -811,13 +608,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M0, M2);
 		B1 = _mm_unpacklo_epi64(M3, M5);
-#	else
-		B0 = _mm_set_epi64x(M4, M0);
-		B1 = _mm_set_epi64x(M10, M6);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -834,13 +626,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 9
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M3, M7);
 		B1 = _mm_alignr_epi8(M0, M5, 8);
-#	else
-		B0 = _mm_set_epi64x(M14, M6);
-		B1 = _mm_set_epi64x(M0, M11);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -854,13 +641,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M7, M4);
 		B1 = _mm_alignr_epi8(M4, M1, 8);
-#	else
-		B0 = _mm_set_epi64x(M9, M15);
-		B1 = _mm_set_epi64x(M8, M3);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -876,13 +658,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = M6;
 		B1 = _mm_alignr_epi8(M5, M0, 8);
-#	else
-		B0 = _mm_set_epi64x(M13, M12);
-		B1 = _mm_set_epi64x(M10, M1);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -896,13 +673,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_blend_epi16(M1, M3, 0xF0);
 		B1 = M2;
-#	else
-		B0 = _mm_set_epi64x(M7, M2);
-		B1 = _mm_set_epi64x(M5, M4);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -919,13 +691,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 10
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M5, M4);
 		B1 = _mm_unpackhi_epi64(M3, M0);
-#	else
-		B0 = _mm_set_epi64x(M8, M10);
-		B1 = _mm_set_epi64x(M1, M7);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -939,13 +706,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M1, M2);
 		B1 = _mm_blend_epi16(M3, M2, 0xF0);
-#	else
-		B0 = _mm_set_epi64x(M4, M2);
-		B1 = _mm_set_epi64x(M5, M6);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -961,13 +723,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M7, M4);
 		B1 = _mm_unpackhi_epi64(M1, M6);
-#	else
-		B0 = _mm_set_epi64x(M9, M15);
-		B1 = _mm_set_epi64x(M13, M3);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -981,13 +738,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_alignr_epi8(M7, M5, 8);
 		B1 = _mm_unpacklo_epi64(M6, M0);
-#	else
-		B0 = _mm_set_epi64x(M14, M11);
-		B1 = _mm_set_epi64x(M0, M12);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1004,13 +756,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 11
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M0, M1);
 		B1 = _mm_unpacklo_epi64(M2, M3);
-#	else
-		B0 = _mm_set_epi64x(M2, M0);
-		B1 = _mm_set_epi64x(M6, M4);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1024,13 +771,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M0, M1);
 		B1 = _mm_unpackhi_epi64(M2, M3);
-#	else
-		B0 = _mm_set_epi64x(M3, M1);
-		B1 = _mm_set_epi64x(M7, M5);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1046,13 +788,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M4, M5);
 		B1 = _mm_unpacklo_epi64(M6, M7);
-#	else
-		B0 = _mm_set_epi64x(M10, M8);
-		B1 = _mm_set_epi64x(M14, M12);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1066,13 +803,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpackhi_epi64(M4, M5);
 		B1 = _mm_unpackhi_epi64(M6, M7);
-#	else
-		B0 = _mm_set_epi64x(M11, M9);
-		B1 = _mm_set_epi64x(M15, M13);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1089,13 +821,8 @@ public:
 		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 12
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M7, M2);
 		B1 = _mm_unpackhi_epi64(M4, M6);
-#	else
-		B0 = _mm_set_epi64x(M4, M14);
-		B1 = _mm_set_epi64x(M13, M9);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1109,13 +836,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M5, M4);
 		B1 = _mm_alignr_epi8(M3, M7, 8);
-#	else
-		B0 = _mm_set_epi64x(M8, M10);
-		B1 = _mm_set_epi64x(M6, M15);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1131,13 +853,8 @@ public:
 
 		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_shuffle_epi32(M0, _MM_SHUFFLE(1, 0, 3, 2));
 		B1 = _mm_unpackhi_epi64(M5, M2);
-#	else
-		B0 = _mm_set_epi64x(M0, M1);
-		B1 = _mm_set_epi64x(M5, M11);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1151,13 +868,8 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -24);
 		RH2 = _mm_roti_epi64(RH2, -24);
 
-#	if defined(CEX_HAS_SSE4)
 		B0 = _mm_unpacklo_epi64(M6, M1);
 		B1 = _mm_unpackhi_epi64(M3, M1);
-#	else
-		B0 = _mm_set_epi64x(M2, M12);
-		B1 = _mm_set_epi64x(M3, M7);
-#	endif
 		RL1 = _mm_add_epi64(_mm_add_epi64(RL1, B0), RL2);
 		RH1 = _mm_add_epi64(_mm_add_epi64(RH1, B1), RH2);
 		RL4 = _mm_xor_si128(RL4, RL1);
@@ -1182,6 +894,8 @@ public:
 		_mm_storeu_si128((__m128i*)&State.H[4], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[4]), RL2));
 		_mm_storeu_si128((__m128i*)&State.H[6], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[6]), RH2));
 	}
+
+#else
 
 	template <typename T>
 	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
@@ -2474,8 +2188,9 @@ public:
 		State.H[5] ^= R5 ^ R13;
 		State.H[6] ^= R6 ^ R14;
 		State.H[7] ^= R7 ^ R15;
-}
-	};
+	}
+#endif
+};
 
 NAMESPACE_DIGESTEND
 #endif

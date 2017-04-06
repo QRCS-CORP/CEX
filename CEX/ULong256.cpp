@@ -2,6 +2,8 @@
 
 NAMESPACE_NUMERIC
 
+#if defined(__AVX2__)
+
 void ULong256::LoadBE(ulong X0, ulong X1, ulong X2, ulong X3)
 {
 	Swap().LoadLE(X0, X1, X2, X3);
@@ -158,4 +160,5 @@ void ULong256::ToUint64(std::vector<ulong> &Output, size_t Offset)
 	memcpy(&Output[Offset], &Register.m256i_u64[0], 32);
 }
 
+#endif
 NAMESPACE_NUMERICEND

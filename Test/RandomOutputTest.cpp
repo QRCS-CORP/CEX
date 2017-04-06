@@ -1,5 +1,9 @@
 #include "RandomOutputTest.h"
-#include "../CEX/AHX.h"
+#if defined(__AVX__)
+#	include "../CEX/AHX.h"
+#else
+#	include "../CEX/RHX.h"
+#endif
 #include "../CEX/CJP.h"
 #include "../CEX/CMG.h"
 #include "../CEX/CSP.h"
@@ -58,7 +62,11 @@ namespace Test
 		using namespace Cipher::Symmetric::Block;
 
 		Digest::SHA512* dgt1 = new Digest::SHA512();
+#if defined(__AVX__)
 		AHX* cpr = new AHX(dgt1, 22);
+#else
+		RHX* cpr = new RHX(dgt1, 22);
+#endif
 		Digest::SHA512* dgt2 = new Digest::SHA512();
 		Provider::CSP* pvd = new Provider::CSP();
 		Drbg::CMG ctd(cpr, dgt2, pvd);

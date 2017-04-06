@@ -1,6 +1,8 @@
 #include "ParallelModeTest.h"
 #include "TestUtils.h"
-#include "../CEX/AHX.h"
+#if defined(__AVX__)
+#	include "../CEX/AHX.h"
+#endif
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
 #include "../CEX/ChaCha20.h"
@@ -52,6 +54,7 @@ namespace Test
 				delete cpr5;
 				OnProgress("ParallelModeTest: Passed CFB parallel/sequential access api tests..");
 
+#if defined(__AVX__)
 				if (m_hasAESNI)
 				{
 					CompareAhxSimd();
@@ -69,6 +72,7 @@ namespace Test
 					delete eng1b;
 					OnProgress("ParallelModeTest: AHX Passed Parallel CBC Decrypt SIMD-128 Integrity tests..");
 				}
+#endif
 
 				SHX* eng2 = new SHX();
 				CompareBcrSimd(eng2);
@@ -269,6 +273,7 @@ namespace Test
 		}
 	}
 
+#if defined(__AVX__)
 	void ParallelModeTest::CompareAhxSimd()
 	{
 		std::vector<byte> data;
@@ -360,6 +365,7 @@ namespace Test
 		delete eng1;
 		delete eng2;
 	}
+#endif
 
 	void ParallelModeTest::CompareBcrKat(IBlockCipher* Engine, std::vector<byte> Expected)
 	{
@@ -888,9 +894,11 @@ namespace Test
 		// CTR
 		{
 			IBlockCipher* eng;
+#if defined(__AVX__)
 			if (m_hasAESNI)
 				eng = new AHX();
 			else
+#endif
 				eng = new RHX();
 
 			Mode::CTR cipher(eng);
@@ -977,9 +985,11 @@ namespace Test
 		// ICM
 		{
 			IBlockCipher* eng;
+#if defined(__AVX__)
 			if (m_hasAESNI)
 				eng = new AHX();
 			else
+#endif
 				eng = new RHX();
 
 			Mode::ICM cipher(eng);

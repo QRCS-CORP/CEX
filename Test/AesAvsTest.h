@@ -51,7 +51,9 @@ namespace Test
         
     private:
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
+#if defined(__AVX__)
 		void CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
+#endif
 		void OnProgress(char* Data);
     };
 }

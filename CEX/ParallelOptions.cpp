@@ -138,30 +138,6 @@ void ParallelOptions::SetMaxDegree(size_t MaxDegree)
 	Calculate();
 }
 
-void ParallelOptions::SetSimdProfile(SimdProfiles Profile)
-{
-	if (Profile == SimdProfiles::None)
-	{
-		m_hasSimd128 = false;
-		m_hasSimd256 = false;
-	}
-	else if (Profile == SimdProfiles::Simd256 && m_simdDetected == SimdProfiles::Simd256)
-	{
-		m_hasSimd256 = true;
-		m_simdDetected = SimdProfiles::Simd256;
-	}
-	else
-	{
-		if (m_simdDetected == SimdProfiles::Simd128 || m_simdDetected == SimdProfiles::Simd256)
-		{
-			m_hasSimd128 = true;
-			m_simdDetected = SimdProfiles::Simd128;
-		}
-	}
-
-	Calculate();
-}
-
 //~~~Private Functions~~~//
 
 void ParallelOptions::Detect()

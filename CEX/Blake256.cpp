@@ -436,11 +436,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 void Blake256::Compress(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length)
 {
 	ArrayUtils::IncreaseLE32(State.T, State.T, Length);
-
-	if (m_parallelProfile.HasSimd128())
-		Blake256Compress::Compress64W(Input, InOffset, State, m_cIV);
-	else
-		Blake256Compress::Compress64(Input, InOffset, State, m_cIV);
+	Blake256Compress::Compress64(Input, InOffset, State, m_cIV);
 }
 
 void Blake256::LoadState(Blake2sState &State)
@@ -450,7 +446,7 @@ void Blake256::LoadState(Blake2sState &State)
 	memcpy(&State.H[0], &m_cIV[0], CHAIN_SIZE * sizeof(uint));
 
 	m_treeParams.GetConfig<uint>(m_treeConfig);
-	IntUtils::XORUL256(m_treeConfig, 0, State.H, 0, m_parallelProfile.SimdProfile());
+	IntUtils::XORUL256(m_treeConfig, 0, State.H, 0);
 }
 
 void Blake256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length)

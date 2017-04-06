@@ -66,7 +66,7 @@ public:
 		std::vector<byte> fnlBlock(BLOCK_SIZE);
 		IntUtils::Be64ToBytes(8 * AdSize, fnlBlock, 0);
 		IntUtils::Be64ToBytes(8 * TextSize, fnlBlock, 8);
-		IntUtils::XORBLK(fnlBlock, 0, Output, 0, BLOCK_SIZE, m_hasCMul ? Enumeration::SimdProfiles::Simd128 : Enumeration::SimdProfiles::None);
+		IntUtils::XORBLK(fnlBlock, 0, Output, 0, BLOCK_SIZE);
 		GcmMultiply(Output);
 	}
 
@@ -87,7 +87,7 @@ public:
 
 	void ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output)
 	{
-		IntUtils::XORBLK(Input, InOffset, Output, 0, BLOCK_SIZE, m_hasCMul ? Enumeration::SimdProfiles::Simd128 : Enumeration::SimdProfiles::None);
+		IntUtils::XORBLK(Input, InOffset, Output, 0, BLOCK_SIZE);
 		GcmMultiply(Output);
 	}
 
@@ -200,6 +200,8 @@ private:
 
 	void PMultiply(const std::vector<ulong> &H, std::vector<byte> &X)
 	{
+#if defined(__AVX2__)
+
 		const __m128i MASK = _mm_set_epi8(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
 		__m128i A = _mm_loadu_si128(reinterpret_cast<const __m128i*>(X.data()));
 		__m128i B = _mm_loadu_si128(reinterpret_cast<const __m128i*>(H.data()));
@@ -246,6 +248,10 @@ private:
 		T3 = _mm_shuffle_epi8(T3, MASK);
 
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(X.data()), T3);
+
+#else
+		LMultiply(H, X);
+#endif
 	}
 };
 

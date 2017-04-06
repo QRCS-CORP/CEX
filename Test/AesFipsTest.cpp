@@ -1,5 +1,7 @@
 #include "AesFipsTest.h"
-#include "../CEX/AHX.h"
+#if defined(__AVX__)
+#	include "../CEX/AHX.h"
+#endif
 #include "../CEX/RHX.h"
 
 namespace Test
@@ -14,9 +16,11 @@ namespace Test
 
 			for (unsigned int i = 0; i < 12; i++)
 			{
+#if defined(__AVX__)
 				if (m_testNI)
 					CompareVectorNI(m_keys[i], m_plainText[i], m_cipherText[i]);
 				else
+#endif
 					CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
 			}
 
@@ -24,9 +28,11 @@ namespace Test
 
 			for (unsigned int i = 12; i < m_plainText.size(); i++)
 			{
+#if defined(__AVX__)
 				if (m_testNI)
 					CompareMonteCarloNI(m_keys[i], m_plainText[i], m_cipherText[i]);
 				else
+#endif
 					CompareMonteCarlo(m_keys[i], m_plainText[i], m_cipherText[i]);
 			}
 
@@ -62,6 +68,7 @@ namespace Test
 			throw TestException("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
 
+#if defined(__AVX__)
 	void AesFipsTest::CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
@@ -80,6 +87,7 @@ namespace Test
 		if (outBytes != Input)
 			throw TestException("AesFipsTest: AES: Decrypted arrays are not equal!");
 	}
+#endif
 
 	void AesFipsTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
@@ -111,6 +119,7 @@ namespace Test
 			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 	}
 
+#if defined(__AVX__)
 	void AesFipsTest::CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
@@ -139,6 +148,7 @@ namespace Test
 		if (outBytes != Input)
 			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
 	}
+#endif
 
 	void AesFipsTest::Initialize()
 	{

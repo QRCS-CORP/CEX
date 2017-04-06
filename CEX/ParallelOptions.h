@@ -6,7 +6,6 @@
 
 NAMESPACE_COMMON
 
-
 using Enumeration::SimdProfiles;
 
 /// <summary>
@@ -224,18 +223,6 @@ public:
 	/// Reset the internal state
 	/// </summary>
 	void Reset();
-
-	/// <summary>
-	/// Force the SIMD processing profile to a user-defined configuration.
-	/// <para>The type of SIMD pipelining can be forced to either 256bit (AVX2 256), 128bit (SSE3), or None.
-	/// If the calling algorithm uses a variable SIMD profile, (both 128 and 256 byte options are supported), 
-	/// and both options are system ready, the option can be forced down to SSE3, or None, disabling SIMD pipelining.
-	/// The default SIMD profile is the highest supported on the system i.e AVX2->SSE3->None, 
-	/// (though the algorithm may not support that configuration, in which case the algorithm will default to the best configuration, or None is used if overridden).</para>
-	/// </summary>
-	/// 
-	/// <param name="Profile">Select the desired pipelining profile</param>
-	void SetSimdProfile(SimdProfiles Profile);
 
 	/// <summary>
 	/// Define parallel-block and parallel-minimum sizes based on the max number of cores assigned.

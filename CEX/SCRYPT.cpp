@@ -204,18 +204,12 @@ void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
 
 	for (size_t i = 0; i < 2 * MEM_COST; i += 2)
 	{
-		IntUtils::XORULBLK(State, i * 16, X, 0, X.size(), m_parallelProfile.SimdProfile());
-		if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
-			SalsaCoreW(X);
-		else
-			SalsaCore(X);
+		IntUtils::XORULBLK(State, i * 16, X, 0, X.size());
+		SalsaCore(X);
 		ArrayUtils::Copy(X, 0, Y, i * 8, 16);
 
-		IntUtils::XORULBLK(State, i * 16 + 16, X, 0, X.size(), m_parallelProfile.SimdProfile());
-		if (m_parallelProfile.SimdProfile() != SimdProfiles::None)
-			SalsaCoreW(X);
-		else
-			SalsaCore(X);
+		IntUtils::XORULBLK(State, i * 16 + 16, X, 0, X.size());
+		SalsaCore(X);
 		ArrayUtils::Copy(X, 0, Y, i * 8 + MEM_COST * 16, 16);
 	}
 
@@ -290,6 +284,63 @@ void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<by
 	kdf.Initialize(Key::Symmetric::SymmetricKey(Key, Salt));
 	kdf.Generate(Output, OutOffset, Length);
 }
+
+#if defined(__AVX__)
+void SCRYPT::SalsaCore(std::vector<uint> &State)
+{
+	__m128i X0, X1, X2, X3;
+	__m128i T;
+
+	X0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[0]));
+	X1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[4]));
+	X2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[8]));
+	X3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[12]));
+	std::vector<__m128i> B { X0, X1, X2, X3};
+
+	for (size_t i = 0; i < 8; i += 2)
+	{
+		T = _mm_add_epi32(X0, X3);
+		X1 = _mm_xor_si128(X1, _mm_slli_epi32(T, 7));
+		X1 = _mm_xor_si128(X1, _mm_srli_epi32(T, 25));
+		T = _mm_add_epi32(X1, X0);
+		X2 = _mm_xor_si128(X2, _mm_slli_epi32(T, 9));
+		X2 = _mm_xor_si128(X2, _mm_srli_epi32(T, 23));
+		T = _mm_add_epi32(X2, X1);
+		X3 = _mm_xor_si128(X3, _mm_slli_epi32(T, 13));
+		X3 = _mm_xor_si128(X3, _mm_srli_epi32(T, 19));
+		T = _mm_add_epi32(X3, X2);
+		X0 = _mm_xor_si128(X0, _mm_slli_epi32(T, 18));
+		X0 = _mm_xor_si128(X0, _mm_srli_epi32(T, 14));
+
+		X1 = _mm_shuffle_epi32(X1, 0x93);
+		X2 = _mm_shuffle_epi32(X2, 0x4E);
+		X3 = _mm_shuffle_epi32(X3, 0x39);
+
+		T = _mm_add_epi32(X0, X1);
+		X3 = _mm_xor_si128(X3, _mm_slli_epi32(T, 7));
+		X3 = _mm_xor_si128(X3, _mm_srli_epi32(T, 25));
+		T = _mm_add_epi32(X3, X0);
+		X2 = _mm_xor_si128(X2, _mm_slli_epi32(T, 9));
+		X2 = _mm_xor_si128(X2, _mm_srli_epi32(T, 23));
+		T = _mm_add_epi32(X2, X3);
+		X1 = _mm_xor_si128(X1, _mm_slli_epi32(T, 13));
+		X1 = _mm_xor_si128(X1, _mm_srli_epi32(T, 19));
+		T = _mm_add_epi32(X1, X2);
+		X0 = _mm_xor_si128(X0, _mm_slli_epi32(T, 18));
+		X0 = _mm_xor_si128(X0, _mm_srli_epi32(T, 14));
+
+		X1 = _mm_shuffle_epi32(X1, 0x39);
+		X2 = _mm_shuffle_epi32(X2, 0x4E);
+		X3 = _mm_shuffle_epi32(X3, 0x93);
+	}
+
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[0]), _mm_add_epi32(B[0], X0));
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[4]), _mm_add_epi32(B[1], X1));
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[8]), _mm_add_epi32(B[2], X2));
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[12]), _mm_add_epi32(B[3], X3));
+}
+
+#else
 
 void SCRYPT::SalsaCore(std::vector<uint> &State)
 {
@@ -366,59 +417,7 @@ void SCRYPT::SalsaCore(std::vector<uint> &State)
 	State[15] += X15;
 }
 
-void SCRYPT::SalsaCoreW(std::vector<uint> &State)
-{
-	__m128i X0, X1, X2, X3;
-	__m128i T;
-
-	X0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[0]));
-	X1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[4]));
-	X2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[8]));
-	X3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[12]));
-	std::vector<__m128i> B { X0, X1, X2, X3};
-
-	for (size_t i = 0; i < 8; i += 2)
-	{
-		T = _mm_add_epi32(X0, X3);
-		X1 = _mm_xor_si128(X1, _mm_slli_epi32(T, 7));
-		X1 = _mm_xor_si128(X1, _mm_srli_epi32(T, 25));
-		T = _mm_add_epi32(X1, X0);
-		X2 = _mm_xor_si128(X2, _mm_slli_epi32(T, 9));
-		X2 = _mm_xor_si128(X2, _mm_srli_epi32(T, 23));
-		T = _mm_add_epi32(X2, X1);
-		X3 = _mm_xor_si128(X3, _mm_slli_epi32(T, 13));
-		X3 = _mm_xor_si128(X3, _mm_srli_epi32(T, 19));
-		T = _mm_add_epi32(X3, X2);
-		X0 = _mm_xor_si128(X0, _mm_slli_epi32(T, 18));
-		X0 = _mm_xor_si128(X0, _mm_srli_epi32(T, 14));
-
-		X1 = _mm_shuffle_epi32(X1, 0x93);
-		X2 = _mm_shuffle_epi32(X2, 0x4E);
-		X3 = _mm_shuffle_epi32(X3, 0x39);
-
-		T = _mm_add_epi32(X0, X1);
-		X3 = _mm_xor_si128(X3, _mm_slli_epi32(T, 7));
-		X3 = _mm_xor_si128(X3, _mm_srli_epi32(T, 25));
-		T = _mm_add_epi32(X3, X0);
-		X2 = _mm_xor_si128(X2, _mm_slli_epi32(T, 9));
-		X2 = _mm_xor_si128(X2, _mm_srli_epi32(T, 23));
-		T = _mm_add_epi32(X2, X3);
-		X1 = _mm_xor_si128(X1, _mm_slli_epi32(T, 13));
-		X1 = _mm_xor_si128(X1, _mm_srli_epi32(T, 19));
-		T = _mm_add_epi32(X1, X2);
-		X0 = _mm_xor_si128(X0, _mm_slli_epi32(T, 18));
-		X0 = _mm_xor_si128(X0, _mm_srli_epi32(T, 14));
-
-		X1 = _mm_shuffle_epi32(X1, 0x39);
-		X2 = _mm_shuffle_epi32(X2, 0x4E);
-		X3 = _mm_shuffle_epi32(X3, 0x93);
-	}
-
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[0]), _mm_add_epi32(B[0], X0));
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[4]), _mm_add_epi32(B[1], X1));
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[8]), _mm_add_epi32(B[2], X2));
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[12]), _mm_add_epi32(B[3], X3));
-}
+#endif
 
 void SCRYPT::Scope()
 {
@@ -467,7 +466,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 	for (size_t i = 0; i < N; ++i)
 	{
 		uint j = X[bCount - 16] & NMASK;
-		IntUtils::XORULBLK(V[j], 0, X, 0, X.size(), m_parallelProfile.SimdProfile());
+		IntUtils::XORULBLK(V[j], 0, X, 0, X.size());
 		BlockMix(X, Y);
 	}
 

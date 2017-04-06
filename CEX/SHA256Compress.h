@@ -76,6 +76,7 @@ public:
 	template <typename T>
 	static inline void Compress64W(const std::vector<byte> &Input, size_t InOffset, T &Output)
 	{
+#if defined(__AVX__)
 		__m128i S0, S1, T0, T1;
 		__m128i MSG, TMP, MASK;
 		__m128i M0, M1, M2, M3;
@@ -256,6 +257,9 @@ public:
 		// Save state
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output.H[0]), S0);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output.H[4]), S1);
+#else
+		Compress64(Input, InOffset, Output);
+#endif
 	}
 
 	template <typename T>

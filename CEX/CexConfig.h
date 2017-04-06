@@ -391,12 +391,12 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define CEX_HAS_XOP
 #endif
 
-#if defined(CEX_HAS_AVX2)
-#if !defined(CEX_HAS_AVX)
-#		define CEX_HAS_AVX
+#if defined(__AVX2__)
+#if !defined(__AVX__)
+#		define __AVX__
 #	endif
 #endif
-#if defined(CEX_HAS_AVX)
+#if defined(__AVX__)
 #	if !defined(CEX_HAS_SSE4)
 #		define CEX_HAS_SSE4
 #	endif
@@ -428,10 +428,6 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #			define CEX_HAS_SSE2
 #		endif
 #	endif
-#endif
-
-#if defined(CEX_HAS_SSE2)
-#	define CEX_HAS_MINSSE
 #endif
 
 // enables fast rotation intrinsics
