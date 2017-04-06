@@ -16,18 +16,6 @@
     <Filter Include="Header Files\Test">
       <UniqueIdentifier>{d0936e02-c165-4804-8b49-46dca2939f65}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Test\Vectors">
-      <UniqueIdentifier>{96674cd0-aede-4dc9-892f-639c14c22916}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Test\Vectors\AESAVS">
-      <UniqueIdentifier>{7dd2852b-6b61-472c-816a-4a7e07f239e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Test\Vectors\Counterpane">
-      <UniqueIdentifier>{4d120511-a44b-4a22-8f4f-bfd93702297a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Test\Vectors\Nessie">
-      <UniqueIdentifier>{1549ee52-678a-4d5b-84c1-9d4a1d757052}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Test\CipherTest">
       <UniqueIdentifier>{416bef18-73dc-485c-9835-77f9975413d4}</UniqueIdentifier>
     </Filter>
@@ -96,87 +84,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Vectors\AESAVS\keyvect128.txt">
-      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\keyvect192.txt">
-      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\keyvect256.txt">
-      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\plainvect128.txt">
-      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\plainvect192.txt">
-      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\plainvect256.txt">
-      <Filter>Header Files\Test\Vectors\AESAVS</Filter>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishcipher128.txt">
-      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishcipher192.txt">
-      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishcipher256.txt">
-      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishkey128.txt">
-      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishkey192.txt">
-      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishkey256.txt">
-      <Filter>Header Files\Test\Vectors\Counterpane</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentcipher128.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentcipher192.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentcipher256.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentkey128.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentkey192.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentkey256.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentmonte100-128.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentmonte100-192.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentmonte100-256.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentmonte1000-128.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentmonte1000-192.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentmonte1000-256.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentplain128.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentplain192.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
-    <Text Include="..\Vectors\Nessie\serpentplain256.txt">
-      <Filter>Header Files\Test\Vectors\Nessie</Filter>
-    </Text>
     <Text Include="..\..\Test\NistStsResults.txt">
       <Filter>Header Files\Test\ProviderTest</Filter>
     </Text>
@@ -359,6 +266,9 @@
     <ClInclude Include="..\..\Test\SCRYPTTest.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -472,5 +382,10 @@
     <ClCompile Include="..\..\Test\SCRYPTTest.cpp">
       <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Test.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

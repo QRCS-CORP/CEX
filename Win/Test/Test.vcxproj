@@ -73,19 +73,23 @@
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(SourcePath)</SourcePath>
     <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\Vectors;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>$(SourcePath)</SourcePath>
     <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\Vectors;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\Vectors;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test;C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Engine;$(IncludePath)</IncludePath>
+    <ReferencePath>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\Vectors;$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -130,10 +134,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,13 +156,14 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -183,45 +189,6 @@
     <Text Include="..\..\Test\Diehard Results\10mb\hmg10.txt" />
     <Text Include="..\..\Test\Diehard Results\10mb\rdp10.txt" />
     <Text Include="..\..\Test\NistStsResults.txt" />
-    <Text Include="..\Vectors\AESAVS\keyvect128.txt">
-      <DeploymentContent>false</DeploymentContent>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\keyvect192.txt">
-      <DeploymentContent>false</DeploymentContent>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\keyvect256.txt">
-      <DeploymentContent>false</DeploymentContent>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\plainvect128.txt">
-      <DeploymentContent>false</DeploymentContent>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\plainvect192.txt">
-      <DeploymentContent>false</DeploymentContent>
-    </Text>
-    <Text Include="..\Vectors\AESAVS\plainvect256.txt">
-      <DeploymentContent>false</DeploymentContent>
-    </Text>
-    <Text Include="..\Vectors\Counterpane\twofishcipher128.txt" />
-    <Text Include="..\Vectors\Counterpane\twofishcipher192.txt" />
-    <Text Include="..\Vectors\Counterpane\twofishcipher256.txt" />
-    <Text Include="..\Vectors\Counterpane\twofishkey128.txt" />
-    <Text Include="..\Vectors\Counterpane\twofishkey192.txt" />
-    <Text Include="..\Vectors\Counterpane\twofishkey256.txt" />
-    <Text Include="..\Vectors\Nessie\serpentcipher128.txt" />
-    <Text Include="..\Vectors\Nessie\serpentcipher192.txt" />
-    <Text Include="..\Vectors\Nessie\serpentcipher256.txt" />
-    <Text Include="..\Vectors\Nessie\serpentkey128.txt" />
-    <Text Include="..\Vectors\Nessie\serpentkey192.txt" />
-    <Text Include="..\Vectors\Nessie\serpentkey256.txt" />
-    <Text Include="..\Vectors\Nessie\serpentmonte100-128.txt" />
-    <Text Include="..\Vectors\Nessie\serpentmonte100-192.txt" />
-    <Text Include="..\Vectors\Nessie\serpentmonte100-256.txt" />
-    <Text Include="..\Vectors\Nessie\serpentmonte1000-128.txt" />
-    <Text Include="..\Vectors\Nessie\serpentmonte1000-192.txt" />
-    <Text Include="..\Vectors\Nessie\serpentmonte1000-256.txt" />
-    <Text Include="..\Vectors\Nessie\serpentplain128.txt" />
-    <Text Include="..\Vectors\Nessie\serpentplain192.txt" />
-    <Text Include="..\Vectors\Nessie\serpentplain256.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Test\AEADTest.h" />
@@ -269,6 +236,7 @@
     <ClInclude Include="..\..\Test\TestFiles.h" />
     <ClInclude Include="..\..\Test\TestUtils.h" />
     <ClInclude Include="..\..\Test\TwofishTest.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AEADTest.cpp" />
@@ -313,6 +281,9 @@
     <ProjectReference Include="..\Static\CEXEngine.vcxproj">
       <Project>{ff7ab9cb-bf7b-4e0e-a3ef-f4141810b24a}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Test.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
