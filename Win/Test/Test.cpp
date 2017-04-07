@@ -85,6 +85,7 @@ using namespace Test;
 // TLS					-?
 // STM-KEX				-?
 // DLL API				-?
+// AVX512 integration	-?
 
 void CpuCheck()
 {
@@ -216,7 +217,7 @@ int main()
 	if (data.size() == 0)
 	{
 		PrintHeader("Warning! Could not find the cipher test vector KAT files!");
-		PrintHeader("The Win\Test\Vectors folder must be in the executables path.", "");
+		PrintHeader("The Win/Test/Vectors folder must be in the executables path.", "");
 		PrintHeader("An error has occurred! Press any key to close..", "");
 		GetResponse();
 		return 0;
