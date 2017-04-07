@@ -12,17 +12,17 @@ namespace Test
 	class HXCipherTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "HX Cipher Known Answer Monte Carlo Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! HX tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
+		std::vector<byte> m_iv;
+		std::vector<byte> m_key;
+		std::vector<byte> m_key2;
 		std::vector<std::vector<byte>> m_rhxExpected;
 		std::vector<std::vector<byte>> m_shxExpected;
 		std::vector<std::vector<byte>> m_thxExpected;
-		std::vector<byte> m_key;
-		std::vector<byte> m_key2;
-		std::vector<byte> m_iv;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -38,20 +38,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer HX Cipher vectors for equality
 		/// </summary>
-		HXCipherTest()
-			:
-			m_key(128, 0),
-			m_key2(64, 0),
-			m_iv(16, 0)
-		{
-		}
+		HXCipherTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~HXCipherTest()
-		{
-		}
+		~HXCipherTest();
 
 		/// <summary>
 		/// Start the tests

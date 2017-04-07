@@ -4,6 +4,22 @@
 
 namespace Test
 {
+	const std::string KDF2Test::DESCRIPTION = "KDF2 Drbg SHA-2 test vectors.";
+	const std::string KDF2Test::FAILURE = "FAILURE! ";
+	const std::string KDF2Test::SUCCESS = "SUCCESS! All KDF2 Drbg tests have executed succesfully.";
+
+	KDF2Test::KDF2Test()
+		:
+		m_key(0),
+		m_output(0),
+		m_progressEvent()
+	{
+	}
+
+	KDF2Test::~KDF2Test()
+	{
+	}
+
 	std::string KDF2Test::Run()
 	{
 		try
@@ -23,7 +39,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

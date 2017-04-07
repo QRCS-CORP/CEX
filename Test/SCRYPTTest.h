@@ -13,13 +13,13 @@ namespace Test
 	class SCRYPTTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "SCRYPT SHA-2 test vectors.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All SCRYPT tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_output;
+		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_salt;
 
 	public:
@@ -36,20 +36,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer SCRYPT Drbg vectors for equality
 		/// </summary>
-		SCRYPTTest()
-			:
-			m_key(2),
-			m_output(0),
-			m_salt(2)
-		{
-		}
+		SCRYPTTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~SCRYPTTest()
-		{
-		}
+		~SCRYPTTest();
 
 		/// <summary>
 		/// Start the tests

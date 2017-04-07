@@ -13,15 +13,15 @@ namespace Test
     class HMACTest : public ITest
     {
     private:
-		const std::string DESCRIPTION = "RFC 4321 Test Vectors for HMAC SHA224, SHA256, SHA384, and SHA512.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All HMAC tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
         std::vector<std::vector<byte>> m_expected256;
 		std::vector<std::vector<byte>> m_expected512;
         std::vector<std::vector<byte>> m_keys;
         std::vector<std::vector<byte>> m_input;
+		TestEventHandler m_progressEvent;
 
     public:
 		/// <summary>
@@ -37,16 +37,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer SHA-2 HMAC vectors for equality
 		/// </summary>
-		HMACTest()
-        {
-        }
+		HMACTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~HMACTest()
-		{
-		}
+		~HMACTest();
 
 		/// <summary>
 		/// Start the tests

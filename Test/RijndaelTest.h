@@ -14,14 +14,14 @@ namespace Test
     class RijndaelTest : public ITest
     {
 	private:
-		const std::string DESCRIPTION = "Rijndael Known Answer Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! Rijndael tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
         std::vector<std::vector<byte>> m_cipherText;
         std::vector<std::vector<byte>> m_keys;
         std::vector<std::vector<byte>> m_plainText;
+		TestEventHandler m_progressEvent;
 
     public:
 		/// <summary>
@@ -37,16 +37,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality
 		/// </summary>
-		RijndaelTest()
-        {
-        }
+		RijndaelTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~RijndaelTest()
-		{
-		}
+		~RijndaelTest();
 
 		/// <summary>
 		/// Start the tests

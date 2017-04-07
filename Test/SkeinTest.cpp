@@ -6,6 +6,31 @@
 
 namespace Test
 {
+	using Digest::Skein256;
+	using Digest::Skein512;
+	using Digest::Skein1024;
+	using Digest::SkeinParams;
+
+	const std::string SkeinTest::DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of Skein.";
+	const std::string SkeinTest::FAILURE = "FAILURE! ";
+	const std::string SkeinTest::SUCCESS = "SUCCESS! All Skein tests have executed succesfully.";
+
+	SkeinTest::SkeinTest()
+		:
+		m_expected256(0),
+		m_expected512(0),
+		m_expected1024(0),
+		m_message256(0),
+		m_message512(0),
+		m_message1024(0),
+		m_progressEvent()
+	{
+	}
+
+	SkeinTest::~SkeinTest()
+	{
+	}
+
 	std::string SkeinTest::Run()
 	{
 		try
@@ -68,7 +93,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

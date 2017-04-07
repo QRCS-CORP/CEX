@@ -14,20 +14,22 @@ namespace Test
 	class CipherSpeedTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Cipher Speed Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
-		static constexpr uint64_t KB1 = 1000;
-		static constexpr uint64_t MB1 = KB1 * 1000;
-		static constexpr uint64_t MB10 = MB1 * 10;
-		static constexpr uint64_t MB100 = MB1 * 100;
-		static constexpr uint64_t GB1 = MB1 * 1000;
-		static constexpr uint64_t DATA_SIZE = MB100;
-		static constexpr uint64_t DEFITER = 10;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string MESSAGE;
+		static const uint64_t KB1 = 1000;
+		static const uint64_t MB1 = KB1 * 1000;
+		static const uint64_t MB10 = MB1 * 10;
+		static const uint64_t MB100 = MB1 * 100;
+		static const uint64_t GB1 = MB1 * 1000;
+		static const uint64_t DATA_SIZE = MB100;
+		static const uint64_t DEF_ITERATIONS = 10;
+		static const uint64_t DEF_IVSIZE = 16;
+		static const uint64_t DEF_KEYSIZE = 32;
 
-		TestEventHandler m_progressEvent;
 		bool m_hasAESNI;
 		bool m_hasSSE;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -40,12 +42,15 @@ namespace Test
 		/// </summary>
 		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
-		CipherSpeedTest()
-			:
-			m_hasAESNI(false),
-			m_hasSSE(false)
-		{
-		}
+		/// <summary>
+		/// Initialize this class
+		/// </summary>
+		CipherSpeedTest();
+
+		/// <summary>
+		/// Destructor
+		/// </summary>
+		~CipherSpeedTest();
 
 		/// <summary>
 		/// Start the tests
@@ -145,7 +150,7 @@ namespace Test
 		void SalsaSpeedTest();
 		void SHXSpeedTest(size_t KeySize = 32);
 		void THXSpeedTest(size_t KeySize = 32);
-		void WideModeLoop(Cipher::Symmetric::Block::IBlockCipher* Engine, size_t SampleSize, bool Parallel = false, size_t KeySize = 32, size_t IvSize = 128, size_t Loops = DEFITER);
+		void WideModeLoop(Cipher::Symmetric::Block::IBlockCipher* Engine, size_t SampleSize, bool Parallel = false, size_t KeySize = 32, size_t IvSize = 128, size_t Loops = DEF_ITERATIONS);
 	};
 }
 

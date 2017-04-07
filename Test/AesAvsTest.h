@@ -12,9 +12,9 @@ namespace Test
     class AesAvsTest : public ITest
     {
 	private:
-		const std::string DESCRIPTION = "NIST Advanced Encryption Standard Algorithm Validation Suite (AESAVS) tests.";
-		const std::string FAILURE = "FAILURE: ";
-		const std::string SUCCESS = "SUCCESS! AESAVS tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 		bool m_testNI;
@@ -33,16 +33,12 @@ namespace Test
 		/// <summary>
 		/// NIST AESAVS known answer vector tests
 		/// </summary>
-		explicit AesAvsTest(bool TestNI = false)
-			:
-			m_testNI(TestNI)
-		{
-		}
+		explicit AesAvsTest(bool TestNI = false);
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~AesAvsTest() {}
+		~AesAvsTest();
 
 		/// <summary>
 		/// Start the tests

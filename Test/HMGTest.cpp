@@ -1,12 +1,26 @@
 #include "HMGTest.h"
 #include "../CEX/CSP.h"
 #include "../CEX/HMG.h"
-#include "../CEX/SymmetricKey.h"
-#include "../CEX/SHA256.h"
 #include "../CEX/IntUtils.h"
+#include "../CEX/SHA256.h"
+#include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	const std::string HMGTest::DESCRIPTION = "HMG implementations vector comparison tests.";
+	const std::string HMGTest::FAILURE = "FAILURE! ";
+	const std::string HMGTest::SUCCESS = "SUCCESS! All HMG tests have executed succesfully.";
+
+	HMGTest::HMGTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	HMGTest::~HMGTest()
+	{
+	}
+
 	std::string HMGTest::Run()
 	{
 		try
@@ -24,7 +38,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

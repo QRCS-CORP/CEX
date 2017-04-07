@@ -13,12 +13,12 @@ namespace Test
     class TwofishTest : public ITest
     {
     private:
-		const std::string DESCRIPTION = "Official Twofish Known Answer Tests (over 60,000 rounds).";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Twofish tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
         std::vector<byte> m_plainText;
+		TestEventHandler m_progressEvent;
         
     public:
 		/// <summary>
@@ -34,16 +34,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer TwoFish vectors for equality
 		/// </summary>
-		TwofishTest()
-        {
-        }
+		TwofishTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~TwofishTest()
-		{
-		}
+		~TwofishTest();
 
 		/// <summary>
 		/// Start the tests

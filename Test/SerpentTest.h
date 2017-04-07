@@ -16,9 +16,9 @@ namespace Test
     class SerpentTest : public ITest
     {
 	private:
-		const std::string DESCRIPTION = "Serpent Nessie tests, with 100 and 1000 round Monte Carlo runs.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Serpent tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -36,16 +36,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer Serpent vectors for equality (NESSIE)
 		/// </summary>
-		SerpentTest()
-		{
-		}
+		SerpentTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~SerpentTest()
-		{
-		}
+		~SerpentTest();
 
 		/// <summary>
 		/// Start the tests

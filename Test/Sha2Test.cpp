@@ -6,6 +6,23 @@ namespace Test
 {
 	using namespace Digest;
 
+	const std::string SHA2Test::DESCRIPTION = "Tests SHA-2 256/512 with NIST KAT vectors.";
+	const std::string SHA2Test::FAILURE = "FAILURE! ";
+	const std::string SHA2Test::SUCCESS = "SUCCESS! All SHA-2 tests have executed succesfully.";
+
+	SHA2Test::SHA2Test()
+		:
+		m_expected256(0),
+		m_expected512(0),
+		m_message(0),
+		m_progressEvent()
+	{
+	}
+
+	SHA2Test::~SHA2Test()
+	{
+	}
+
 	std::string SHA2Test::Run()
 	{
 		try
@@ -39,7 +56,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

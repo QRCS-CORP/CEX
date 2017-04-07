@@ -3,6 +3,20 @@
 
 namespace Test
 {
+	const std::string RangedRngTest::DESCRIPTION = "Tests Prngs for valid minimum and maximum range responses.";
+	const std::string RangedRngTest::FAILURE = "FAILURE! ";
+	const std::string RangedRngTest::SUCCESS = "SUCCESS! All Prng range tests have executed succesfully.";
+
+	RangedRngTest::RangedRngTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	RangedRngTest::~RangedRngTest()
+	{
+	}
+
 	std::string RangedRngTest::Run()
 	{
 		try

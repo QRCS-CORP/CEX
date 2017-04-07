@@ -487,6 +487,15 @@
     <ClCompile Include="..\..\Test\SCRYPTTest.cpp">
       <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Test\HexConverter.cpp">
+      <Filter>Source Files\Test\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ConsoleUtils.cpp">
+      <Filter>Source Files\Test\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\TestUtils.cpp">
+      <Filter>Source Files\Test\Common</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Test.rc">

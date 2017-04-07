@@ -1,17 +1,36 @@
 #include "Blake2Test.h"
-#include <fstream>
-#include <string>
 #include "HexConverter.h"
 #include "../CEX/CSP.h"
 #include "../CEX/Blake256.h"
 #include "../CEX/Blake512.h"
 #include "../CEX/SymmetricKey.h"
+#include <fstream>
+#include <string>
 
 namespace Test
 {
 	using Digest::BlakeParams;
 	using Digest::Blake256;
 	using Digest::Blake512;
+
+	const std::string Blake2Test::DESCRIPTION = "Blake Vector KATs; tests Blake2 256/512 digests.";
+	const std::string Blake2Test::FAILURE = "FAILURE! ";
+	const std::string Blake2Test::SUCCESS = "SUCCESS! All Blake tests have executed succesfully.";
+	const std::string Blake2Test::DMK_INP = "in:	";
+	const std::string Blake2Test::DMK_KEY = "key:	";
+	const std::string Blake2Test::DMK_HSH = "hash:	";
+
+	Blake2Test::Blake2Test()
+		:
+		m_expected(0),
+		m_message(0),
+		m_progressEvent()
+	{
+	}
+
+	Blake2Test::~Blake2Test()
+	{
+	}
 
 	std::string Blake2Test::Run()
 	{
@@ -38,7 +57,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 
@@ -46,7 +65,7 @@ namespace Test
 	{
 		std::ifstream stream("Vectors/Blake2/blake2b-kat.txt");
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2b-kat.txt");
 
 		std::string line;
 
@@ -92,7 +111,7 @@ namespace Test
 	{
 		std::ifstream stream("Vectors/Blake2/blake2bp-kat.txt");
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2bp-kat.txt");
 
 		std::string line;
 
@@ -143,7 +162,7 @@ namespace Test
 	{
 		std::ifstream stream("Vectors/Blake2/blake2s-kat.txt");
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2s-kat.txt");
 
 		std::string line;
 
@@ -189,7 +208,7 @@ namespace Test
 	{
 		std::ifstream stream("Vectors/Blake2/blake2sp-kat.txt");
 		if (!stream)
-			std::cerr << "Could not open file" << std::endl;
+			throw TestException("Could not open file: Vectors/Blake2/blake2sp-kat.txt");
 
 		std::string line;
 

@@ -13,14 +13,14 @@ namespace Test
     class HKDFTest : public ITest
     {
     private:
-		const std::string DESCRIPTION = "HKDF RFC 5869 SHA-2 test vectors.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All HKDF tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
         std::vector<std::vector<byte>> m_key;
         std::vector<std::vector<byte>> m_info;
         std::vector<std::vector<byte>> m_output;
+		TestEventHandler m_progressEvent;
         std::vector<std::vector<byte>> m_salt;
         
     public:
@@ -37,17 +37,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer HKDF Drbg vectors for equality
 		/// </summary>
-		HKDFTest()
-        {
-        }
-
+		HKDFTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~HKDFTest()
-		{
-		}
+		~HKDFTest();
 
 		/// <summary>
 		/// Start the tests

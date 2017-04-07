@@ -12,10 +12,10 @@ namespace Test
 	class DCGTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "DCG implementations vector comparison tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All DCG tests have executed succesfully.";
-		const size_t SAMPLE_SIZE = 1024;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
+		static const size_t SAMPLE_SIZE = 1024;
 
 		std::vector<std::vector<byte>> m_expected256;
 		std::vector<std::vector<byte>> m_seed256;
@@ -35,16 +35,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
 		/// </summary>
-		DCGTest()
-		{
-		}
+		DCGTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~DCGTest()
-		{
-		}
+		~DCGTest();
 
 		/// <summary>
 		/// Start the tests

@@ -8,6 +8,20 @@ namespace Test
 	using namespace Key::Symmetric;
 	using namespace IO;
 
+	const std::string SymmetricKeyTest::DESCRIPTION = "SymmetricKey test; checks constructors, access, and serialization.";
+	const std::string SymmetricKeyTest::FAILURE = "FAILURE! ";
+	const std::string SymmetricKeyTest::SUCCESS = "SUCCESS! All SymmetricKey tests have executed succesfully.";
+
+	SymmetricKeyTest::SymmetricKeyTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	SymmetricKeyTest::~SymmetricKeyTest()
+	{
+	}
+
 	void SymmetricKeyTest::CheckAccess()
 	{
 		Provider::CSP rnd;

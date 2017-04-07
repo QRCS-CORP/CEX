@@ -340,10 +340,12 @@
     <ClCompile Include="..\..\Test\CipherStreamTest.cpp" />
     <ClCompile Include="..\..\Test\CMACTest.cpp" />
     <ClCompile Include="..\..\Test\CMGTest.cpp" />
+    <ClCompile Include="..\..\Test\ConsoleUtils.cpp" />
     <ClCompile Include="..\..\Test\DCGTest.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp" />
     <ClCompile Include="..\..\Test\GMACTest.cpp" />
+    <ClCompile Include="..\..\Test\HexConverter.cpp" />
     <ClCompile Include="..\..\Test\HKDFTest.cpp" />
     <ClCompile Include="..\..\Test\HMACTest.cpp" />
     <ClCompile Include="..\..\Test\HMGTest.cpp" />
@@ -366,6 +368,7 @@
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyGeneratorTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyTest.cpp" />
+    <ClCompile Include="..\..\Test\TestUtils.cpp" />
     <ClCompile Include="..\..\Test\TwofishTest.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>

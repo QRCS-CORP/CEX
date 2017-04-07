@@ -12,15 +12,17 @@ That work is still evolving however, as improvments and additions to the symmetr
 The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and the next release will have the first asymmetric cipher (RingLWE) and asymmetric framework.
 
 Though efforts have been made towards future compatability with other platforms, this is currently a Windows-only library. 
-It has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
+This has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, using MSVC toolkits and the Intel compiler add-in toolkit, future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
 
-Only a limited number of CPUs have been tested so far; Intel i3, i5, and i7, and for the moment, this is all that is supported, (testing on a wider range of hardware profiles is currently underway). 
+Only a limited number of CPUs have been tested so far; an AMD K9, and Intel i3, i5, and i7 processors; for the moment, newer Intel and AMD cpu's are all that is supported, (testing on a wider range of hardware profiles is ongoing, if you would like to help, contact me: john at vtdev.com). 
 
-The SIMD support is set to AVX2 by default, (AVX fallbacks are in place in a number of ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX). Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics implementations.
+The SIMD support is set to AVX2 by default, (AVX implementations are also in place on a number of ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). 
+Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics implementations.
 
 This is still an early stage in the development of this library, so stay tuned, be patient..
 
 The Win folder contains a visual studio test project, which tests each cipher and protocol with it's official test vectors, and has a set of digest and symmetric cipher speed tests.
+If running the executable, the Win\Test\Vectors folder containing the cipher KAT files must be in the executables path.
 
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 

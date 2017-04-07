@@ -14,26 +14,26 @@ namespace Test
 	class AEADTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Authenticate Encrypt and Associated Data (AEAD) Cipher Mode Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! AEAD tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		const size_t NONCE_LEN = 8;
-		const size_t MAC_LEN = 8;
-		const size_t AUTHEN_LEN = 20;
-		const size_t MIN_ALLOC = 1024;
-		const size_t MAX_ALLOC = 4096;
-		const size_t EAX_TESTSIZE = 10;
-		const size_t OCB_TESTSIZE = 16;
-		const size_t GCM_TESTSIZE = 18;
+		static const size_t NONCE_LEN = 8;
+		static const size_t MAC_LEN = 8;
+		static const size_t AUTHEN_LEN = 20;
+		static const size_t MIN_ALLOC = 1024;
+		static const size_t MAX_ALLOC = 4096;
+		static const size_t EAX_TESTSIZE = 10;
+		static const size_t OCB_TESTSIZE = 16;
+		static const size_t GCM_TESTSIZE = 18;
 
-		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_associatedText;
 		std::vector<std::vector<byte>> m_cipherText;
 		std::vector<std::vector<byte>> m_expectedCode;
 		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_nonce;
 		std::vector<std::vector<byte>> m_plainText;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -49,23 +49,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer AEAD vectors for equality
 		/// </summary>
-		AEADTest()
-			:
-			m_associatedText(0),
-			m_cipherText(0),
-			m_expectedCode(0),
-			m_key(0),
-			m_nonce(0),
-			m_plainText(0)
-		{
-		}
+		AEADTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~AEADTest()
-		{
-		}
+		~AEADTest();
 
 		/// <summary>
 		/// Start the tests

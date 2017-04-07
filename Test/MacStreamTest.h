@@ -12,9 +12,9 @@ namespace Test
 	class MacStreamTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "MacStream output test; compares output from an SHA-2 512 HMAC and MacStream.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All MacStream tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -32,16 +32,12 @@ namespace Test
 		/// <summary>
 		/// Compare MacStream output to Mac instance output
 		/// </summary>
-		MacStreamTest()
-		{
-		}
+		MacStreamTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~MacStreamTest()
-		{
-		}
+		~MacStreamTest();
 
 		/// <summary>
 		/// Start the tests

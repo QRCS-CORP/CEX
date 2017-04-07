@@ -12,9 +12,9 @@ namespace Test
 	class KDF2Test : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "KDF2 Drbg SHA-2 test vectors.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All KDF2 Drbg tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		std::vector<byte> m_key;
 		std::vector<byte> m_output;
@@ -34,19 +34,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer KDF2 Drbg vectors for equality
 		/// </summary>
-		KDF2Test()
-			:
-			m_key(0),
-			m_output(0)
-		{
-		}
+		KDF2Test();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~KDF2Test()
-		{
-		}
+		~KDF2Test();
 
 		/// <summary>
 		/// Start the tests

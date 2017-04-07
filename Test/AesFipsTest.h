@@ -15,14 +15,14 @@ namespace Test
     class AesFipsTest : public ITest
     {
 	private:
-		const std::string DESCRIPTION = "NIST AES specification FIPS 197 Known Answer Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! AES tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
+        std::vector<std::vector<byte>> m_cipherText;
         std::vector<std::vector<byte>> m_keys;
         std::vector<std::vector<byte>> m_plainText;
-        std::vector<std::vector<byte>> m_cipherText;
+		TestEventHandler m_progressEvent;
 		bool m_testNI;
 
     public:
@@ -39,18 +39,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality (FIPS 197)
 		/// </summary>
-		explicit AesFipsTest(bool TestNI = false)
-			:
-			m_testNI(TestNI)
-        {
-        }
+		explicit AesFipsTest(bool TestNI = false);
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~AesFipsTest()
-		{
-		}
+		~AesFipsTest();
 
 		/// <summary>
 		/// Start the tests

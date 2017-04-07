@@ -13,15 +13,15 @@ namespace Test
 	class ChaChaTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "ChaCha20 Known Answer Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! ChaCha20 tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
-		std::vector<byte> m_plainText;
-		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_iv;
 		std::vector<std::vector<byte>> m_cipherText;
+		std::vector<std::vector<byte>> m_iv;
+		std::vector<std::vector<byte>> m_key;
+		std::vector<byte> m_plainText;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -37,16 +37,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer ChaCha20 vectors for equality
 		/// </summary>
-		ChaChaTest()
-		{
-		}
+		ChaChaTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~ChaChaTest()
-		{
-		}
+		~ChaChaTest();
 
 		/// <summary>
 		/// Start the tests

@@ -11,6 +11,26 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string HXCipherTest::DESCRIPTION = "HX Cipher Known Answer Monte Carlo Tests.";
+	const std::string HXCipherTest::FAILURE = "FAILURE! ";
+	const std::string HXCipherTest::SUCCESS = "SUCCESS! HX tests have executed succesfully.";
+
+	HXCipherTest::HXCipherTest()
+		:
+		m_iv(16),
+		m_key(128),
+		m_key2(64),
+		m_progressEvent(),
+		m_rhxExpected(0),
+		m_shxExpected(0),
+		m_thxExpected(0)
+	{
+	}
+
+	HXCipherTest::~HXCipherTest()
+	{
+	}
+
 	std::string HXCipherTest::Run()
 	{
 		try
@@ -40,7 +60,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

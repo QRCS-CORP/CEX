@@ -7,6 +7,7 @@
 #include "../CEX/CFB.h"
 #include "../CEX/ChaCha20.h"
 #include "../CEX/CpuDetect.h"
+#include "../CEX/CSP.h"
 #include "../CEX/CTR.h"
 #include "../CEX/ECB.h"
 #include "../CEX/ICM.h"
@@ -21,6 +22,24 @@
 
 namespace Test
 {
+	const std::string ParallelModeTest::DESCRIPTION = "Compares output from parallel and linear modes for equality.";
+	const std::string ParallelModeTest::FAILURE = "FAILURE! ";
+	const std::string ParallelModeTest::SUCCESS = "SUCCESS! Parallel tests have executed succesfully.";
+
+	ParallelModeTest::ParallelModeTest()
+		:
+		m_hasAESNI(false),
+		m_hasSSE(false),
+		m_katExpected(0),
+		m_processorCount(1),
+		m_progressEvent()
+	{
+	}
+
+	ParallelModeTest::~ParallelModeTest()
+	{
+	}
+
 	std::string ParallelModeTest::Run()
 	{
 		try
@@ -79,8 +98,9 @@ namespace Test
 				OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Parallel Intrinsics Integrity tests.."));
 				CompareBcrKat(eng2, m_katExpected[1]);
 				OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Monte Carlo KAT test.."));
+				//  TODO: WBVC not fully implemented
 				//CompareCbcWide(eng2);
-				//OnProgress(std::string("ParallelModeTest: SHX Passed CBC-WBV Wide Block Vector integrity and parallel tests..")); //  TODO: why does this fail?
+				//OnProgress(std::string("ParallelModeTest: SHX Passed CBC-WBV Wide Block Vector integrity and parallel tests..")); 
 
 				SHX* eng2b = new SHX();
 				CompareCbcDecrypt(eng2, eng2b);
@@ -125,7 +145,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 
@@ -1353,7 +1373,7 @@ namespace Test
 	void ParallelModeTest::GetBytes(size_t Size, std::vector<byte> &Output)
 	{
 		Output.resize(Size, 0);
-		Provider::CSP rng;
+		CEX::Provider::CSP rng;
 		rng.GetBytes(Output);
 	}
 

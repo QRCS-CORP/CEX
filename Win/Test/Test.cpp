@@ -4,7 +4,8 @@
 #include <iostream>
 #include <cstdio>
 #include <string>
-
+#include "../../Test/TestFiles.h"
+#include "../../Test/TestUtils.h"
 #include "../../CEX/CpuDetect.h"
 #include "../../Test/AEADTest.h"
 #include "../../Test/AesAvsTest.h"
@@ -201,6 +202,25 @@ int main()
 	GetResponse();
 	return 0;
 #endif
+
+	std::string data("");
+	try
+	{
+		TestUtils::Read(TestFiles::AESAVS::AESAVSKEY128, data);
+	}
+	catch (...) 
+	{
+		data = "";
+	}
+
+	if (data.size() == 0)
+	{
+		PrintHeader("Warning! Could not find the cipher test vector KAT files!");
+		PrintHeader("The Win\Test\Vectors folder must be in the executables path.", "");
+		PrintHeader("An error has occurred! Press any key to close..", "");
+		GetResponse();
+		return 0;
+	}
 
 	Common::CpuDetect detect;
 

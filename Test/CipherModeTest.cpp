@@ -10,6 +10,24 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string CipherModeTest::DESCRIPTION = "NIST SP800-38A KATs testing CBC, CFB, CTR, ECB, and OFB modes.";
+	const std::string CipherModeTest::FAILURE = "FAILURE! ";
+	const std::string CipherModeTest::SUCCESS = "SUCCESS! Cipher Mode tests have executed succesfully.";
+
+	CipherModeTest::CipherModeTest()
+		:
+		m_input(0),
+		m_keys(0),
+		m_output(0),
+		m_progressEvent(),
+		m_vectors(0)
+	{
+	}
+
+	CipherModeTest::~CipherModeTest()
+	{
+	}
+
 	std::string CipherModeTest::Run()
 	{
 		try
@@ -50,7 +68,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

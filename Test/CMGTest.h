@@ -12,10 +12,10 @@ namespace Test
 	class CMGTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "CMG implementations vector comparison tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All CMG tests have executed succesfully.";
-		const size_t SAMPLE_SIZE = 1024;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
+		static const size_t SAMPLE_SIZE = 1024;
 
 		TestEventHandler m_progressEvent;
 
@@ -33,16 +33,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
 		/// </summary>
-		CMGTest()
-		{
-		}
+		CMGTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~CMGTest()
-		{
-		}
+		~CMGTest();
 
 		/// <summary>
 		/// Start the tests

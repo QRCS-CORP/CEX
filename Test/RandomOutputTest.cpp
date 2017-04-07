@@ -18,6 +18,20 @@
 
 namespace Test
 {
+	const std::string RandomOutputTest::DESCRIPTION = "Copies generator output to a file for external testing.";
+	const std::string RandomOutputTest::FAILURE = "FAILURE! ";
+	const std::string RandomOutputTest::SUCCESS = "SUCCESS! All Random Output tests have executed succesfully.";
+
+	RandomOutputTest::RandomOutputTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	RandomOutputTest::~RandomOutputTest()
+	{
+	}
+
 	std::string RandomOutputTest::Run()
 	{
 		const std::string FILEPATH = "C:/Users/John/Documents/Tests/";
@@ -53,7 +67,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

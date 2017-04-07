@@ -13,13 +13,13 @@ namespace Test
 	class PBKDF2Test : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "PBKDF2 SHA-2 test vectors.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All PBKDF2 tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_output;
+		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_salt;
 
 	public:
@@ -36,20 +36,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer PBKDF2 Drbg vectors for equality
 		/// </summary>
-		PBKDF2Test()
-			:
-			m_key(2),
-			m_output(0),
-			m_salt(2)
-		{
-		}
+		PBKDF2Test();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~PBKDF2Test()
-		{
-		}
+		~PBKDF2Test();
 
 		/// <summary>
 		/// Start the tests

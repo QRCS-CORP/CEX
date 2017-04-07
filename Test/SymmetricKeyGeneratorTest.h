@@ -12,9 +12,9 @@ namespace Test
 	class SymmetricKeyGeneratorTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "SymmetricKeyGenerator test; verifies initialization and access methods.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All SymmetricKeyGenerator tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -32,16 +32,12 @@ namespace Test
 		/// <summary>
 		/// Initialize this class
 		/// </summary>
-		SymmetricKeyGeneratorTest()
-		{
-		}
+		SymmetricKeyGeneratorTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~SymmetricKeyGeneratorTest()
-		{
-		}
+		~SymmetricKeyGeneratorTest();
 
 		/// <summary>
 		/// Start the tests

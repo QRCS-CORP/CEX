@@ -7,6 +7,24 @@
 
 namespace Test
 {
+	const std::string HKDFTest::DESCRIPTION = "HKDF RFC 5869 SHA-2 test vectors.";
+	const std::string HKDFTest::FAILURE = "FAILURE! ";
+	const std::string HKDFTest::SUCCESS = "SUCCESS! All HKDF tests have executed succesfully.";
+
+	HKDFTest::HKDFTest()
+		: 
+		m_key(0),
+		m_info(0),
+		m_output(0),
+		m_progressEvent(),
+		m_salt(0)
+	{
+	}
+
+	HKDFTest::~HKDFTest()
+	{
+	}
+
 	std::string HKDFTest::Run()
 	{
 		try
@@ -30,7 +48,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

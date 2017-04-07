@@ -13,15 +13,15 @@ namespace Test
     class CipherModeTest : public ITest
     {
     private:
-		const std::string DESCRIPTION = "NIST SP800-38A KATs testing CBC, CFB, CTR, ECB, and OFB modes.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! Cipher Mode tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
-        std::vector<std::vector<byte>> m_keys;
-        std::vector<std::vector<byte>> m_vectors;
         std::vector<std::vector<std::vector<byte>>> m_input;
+        std::vector<std::vector<byte>> m_keys;
         std::vector<std::vector<std::vector<byte>>> m_output;
+		TestEventHandler m_progressEvent;
+        std::vector<std::vector<byte>> m_vectors;
 
     public:
 		/// <summary>
@@ -37,16 +37,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer Cipher Mode vectors for equality (NIST 800-38A)
 		/// </summary>
-		CipherModeTest()
-        {
-        }
+		CipherModeTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~CipherModeTest()
-		{
-		}
+		~CipherModeTest();
 
 		/// <summary>
 		/// Start the tests

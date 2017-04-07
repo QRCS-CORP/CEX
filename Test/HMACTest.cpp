@@ -8,6 +8,24 @@ namespace Test
 {
 	using Key::Symmetric::SymmetricKey;
 
+	const std::string HMACTest::DESCRIPTION = "RFC 4321 Test Vectors for HMAC SHA224, SHA256, SHA384, and SHA512.";
+	const std::string HMACTest::FAILURE = "FAILURE! ";
+	const std::string HMACTest::SUCCESS = "SUCCESS! All HMAC tests have executed succesfully.";
+
+	HMACTest::HMACTest()
+		:
+		m_expected256(0),
+		m_expected512(0),
+		m_keys(0),
+		m_input(0),
+		m_progressEvent()
+	{
+	}
+
+	HMACTest::~HMACTest()
+	{
+	}
+
 	std::string HMACTest::Run()
 	{
 		try
@@ -43,7 +61,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

@@ -10,6 +10,32 @@ namespace Test
 	using CEX::Key::Symmetric::SymmetricKey;
 	using CEX::Mac::HMAC;
 
+	const std::string KeccakTest::DESCRIPTION = "Keccak Vector KATs; tests SHA-3 224/256/384/512 and HMACs.";
+	const std::string KeccakTest::FAILURE = "FAILURE! ";
+	const std::string KeccakTest::SUCCESS = "SUCCESS! All Keccak tests have executed succesfully.";
+
+	KeccakTest::KeccakTest()
+		:
+		m_messages(0),
+		m_expected256(0),
+		m_expected512(0),
+		m_macKeys(0),
+		m_macData(0),
+		m_mac256(0),
+		m_mac512(0),
+		m_progressEvent(),
+		m_truncKey(0),
+		m_truncData(0),
+		m_trunc256(0),
+		m_trunc512(0),
+		m_xtremeData(0)
+	{
+	}
+
+	KeccakTest::~KeccakTest()
+	{
+	}
+
 	std::string KeccakTest::Run()
 	{
 		try
@@ -43,7 +69,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

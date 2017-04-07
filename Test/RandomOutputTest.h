@@ -11,9 +11,9 @@ namespace Test
 	class RandomOutputTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Copies generator output to a file for external testing.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Random Output tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -31,16 +31,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CMAC vectors for equality
 		/// </summary>
-		RandomOutputTest()
-		{
-		}
+		RandomOutputTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~RandomOutputTest()
-		{
-		}
+		~RandomOutputTest();
 
 		/// <summary>
 		/// Start the tests

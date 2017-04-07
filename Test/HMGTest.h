@@ -12,10 +12,10 @@ namespace Test
 	class HMGTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "HMG implementations vector comparison tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All HMG tests have executed succesfully.";
-		const size_t SAMPLE_SIZE = 1024;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
+		static const size_t SAMPLE_SIZE = 1024;
 
 		TestEventHandler m_progressEvent;
 
@@ -33,16 +33,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
 		/// </summary>
-		HMGTest()
-		{
-		}
+		HMGTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~HMGTest()
-		{
-		}
+		~HMGTest();
 
 		/// <summary>
 		/// Start the tests

@@ -7,6 +7,23 @@ namespace Test
 {
 	using Key::Symmetric::SymmetricKey;
 
+	const std::string CMACTest::DESCRIPTION = "CMAC Known Answer Test Vectors for 128/192/256 bit Keys.";
+	const std::string CMACTest::FAILURE = "FAILURE! ";
+	const std::string CMACTest::SUCCESS = "SUCCESS! All CMAC tests have executed succesfully.";
+
+	CMACTest::CMACTest()
+		:
+		m_expected(0),
+		m_input(0),
+		m_keys(0),
+		m_progressEvent()
+	{
+	}
+
+	CMACTest::~CMACTest()
+	{
+	}
+
 	std::string CMACTest::Run()
 	{
 		try
@@ -39,7 +56,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

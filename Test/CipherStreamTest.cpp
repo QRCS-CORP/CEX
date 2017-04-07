@@ -20,6 +20,27 @@
 
 namespace Test
 {
+	const std::string CipherStreamTest::DESCRIPTION = "CipherStream Processer Tests.";
+	const std::string CipherStreamTest::FAILURE = "FAILURE: ";
+	const std::string CipherStreamTest::SUCCESS = "SUCCESS! CipherStream tests have executed succesfully.";
+
+	CipherStreamTest::CipherStreamTest()
+		:
+		m_cmpText(MAX_ALLOC),
+		m_decText(MAX_ALLOC),
+		m_encText(MAX_ALLOC),
+		m_iv(16),
+		m_key(32),
+		m_plnText(MAX_ALLOC),
+		m_processorCount(1),
+		m_progressEvent()
+	{
+	}
+
+	CipherStreamTest::~CipherStreamTest()
+	{
+	}
+
 	std::string CipherStreamTest::Run()
 	{
 		using namespace Cipher::Symmetric::Block::Mode;
@@ -137,7 +158,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

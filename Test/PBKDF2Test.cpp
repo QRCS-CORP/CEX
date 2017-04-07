@@ -7,6 +7,23 @@
 
 namespace Test
 {
+	const std::string PBKDF2Test::DESCRIPTION = "PBKDF2 SHA-2 test vectors.";
+	const std::string PBKDF2Test::FAILURE = "FAILURE! ";
+	const std::string PBKDF2Test::SUCCESS = "SUCCESS! All PBKDF2 tests have executed succesfully.";
+
+	PBKDF2Test::PBKDF2Test()
+		:
+		m_key(2),
+		m_output(0),
+		m_progressEvent(),
+		m_salt(2)
+	{
+	}
+
+	PBKDF2Test::~PBKDF2Test()
+	{
+	}
+
 	std::string PBKDF2Test::Run()
 	{
 		try
@@ -29,7 +46,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

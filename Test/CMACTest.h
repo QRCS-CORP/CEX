@@ -13,14 +13,14 @@ namespace Test
 	class CMACTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "CMAC Known Answer Test Vectors for 128/192/256 bit Keys.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All CMAC tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_expected;
 		std::vector<std::vector<byte>> m_input;
 		std::vector<std::vector<byte>> m_keys;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -36,16 +36,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CMAC vectors for equality
 		/// </summary>
-		CMACTest()
-		{
-		}
+		CMACTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~CMACTest()
-		{
-		}
+		~CMACTest();
 
 		/// <summary>
 		/// Start the tests

@@ -11,6 +11,20 @@
 
 namespace Test
 {
+	const std::string CMGTest::DESCRIPTION = "CMG implementations vector comparison tests.";
+	const std::string CMGTest::FAILURE = "FAILURE! ";
+	const std::string CMGTest::SUCCESS = "SUCCESS! All CMG tests have executed succesfully.";
+
+	CMGTest::CMGTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	CMGTest::~CMGTest()
+	{
+	}
+
 	std::string CMGTest::Run()
 	{
 		try
@@ -28,7 +42,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

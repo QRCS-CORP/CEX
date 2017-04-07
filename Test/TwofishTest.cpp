@@ -5,6 +5,21 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string TwofishTest::DESCRIPTION = "Official Twofish Known Answer Tests (over 60,000 rounds).";
+	const std::string TwofishTest::FAILURE = "FAILURE! ";
+	const std::string TwofishTest::SUCCESS = "SUCCESS! All Twofish tests have executed succesfully.";
+
+	TwofishTest::TwofishTest()
+		:
+		m_plainText(0),
+		m_progressEvent()
+	{
+	}
+
+	TwofishTest::~TwofishTest()
+	{
+	}
+
 	std::string TwofishTest::Run()
 	{
 		using namespace TestFiles::Counterpane;
@@ -111,7 +126,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

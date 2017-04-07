@@ -18,23 +18,23 @@ namespace Test
     class ParallelModeTest : public ITest
     {
 	private:
-		const std::string DESCRIPTION = "Compares output from parallel and linear modes for equality.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! Parallel tests have executed succesfully.";
-		const unsigned int MIN_ALLOC = 1024;
-		const unsigned int MAX_ALLOC = 4096;
-		const unsigned int DEF_BLOCK = 64000;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
+		static const unsigned int MIN_ALLOC = 1024;
+		static const unsigned int MAX_ALLOC = 4096;
+		static const unsigned int DEF_BLOCK = 64000;
 #if defined(_DEBUG)
-		const unsigned int TEST_LOOPS = 10;
+		static const unsigned int TEST_LOOPS = 10;
 #else
-		const unsigned int TEST_LOOPS = 100;
+		static const unsigned int TEST_LOOPS = 100;
 #endif
 
-		TestEventHandler m_progressEvent;
 		bool m_hasAESNI;
 		bool m_hasSSE;
 		std::vector<std::vector<byte>> m_katExpected;
 		size_t m_processorCount;
+		TestEventHandler m_progressEvent;
 
     public:
 		/// <summary>
@@ -50,20 +50,12 @@ namespace Test
 		/// <remarks>
 		/// Compares Output between linear and parallel Cipher Modes
 		/// </remarks>
-		ParallelModeTest() 
-			:
-			m_hasAESNI(false),
-			m_hasSSE(false),
-			m_processorCount(1)
-		{
-		}
+		ParallelModeTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~ParallelModeTest()
-		{
-		}
+		~ParallelModeTest();
 
 		/// <summary>
 		/// Start the tests

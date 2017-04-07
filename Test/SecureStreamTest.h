@@ -14,9 +14,9 @@ namespace Test
 	class SecureStreamTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "SecureStream test; compares serialization, reads and writes";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All SecureStream tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -34,16 +34,12 @@ namespace Test
 		/// <summary>
 		/// Initialize this class
 		/// </summary>
-		SecureStreamTest()
-		{
-		}
+		SecureStreamTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~SecureStreamTest()
-		{
-		}
+		~SecureStreamTest();
 
 		/// <summary>
 		/// Start the tests
@@ -65,7 +61,7 @@ namespace Test
 			}
 			catch (...)
 			{
-				throw TestException(std::string(FAILURE + " : Internal Error"));
+				throw TestException(std::string(FAILURE + " : Unknown Error"));
 			}
 		}
 

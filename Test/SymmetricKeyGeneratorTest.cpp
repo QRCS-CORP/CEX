@@ -7,6 +7,20 @@ namespace Test
 	using Common::CpuDetect;
 	using namespace Key::Symmetric;
 
+	const std::string SymmetricKeyGeneratorTest::DESCRIPTION = "SymmetricKeyGenerator test; verifies initialization and access methods.";
+	const std::string SymmetricKeyGeneratorTest::FAILURE = "FAILURE! ";
+	const std::string SymmetricKeyGeneratorTest::SUCCESS = "SUCCESS! All SymmetricKeyGenerator tests have executed succesfully.";
+
+	SymmetricKeyGeneratorTest::SymmetricKeyGeneratorTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	SymmetricKeyGeneratorTest::~SymmetricKeyGeneratorTest()
+	{
+	}
+
 	std::string SymmetricKeyGeneratorTest::Run()
 	{
 		try
@@ -24,7 +38,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

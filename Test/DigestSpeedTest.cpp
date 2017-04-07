@@ -5,6 +5,20 @@
 
 namespace Test
 {
+	const std::string DigestSpeedTest::DESCRIPTION = "Digest Speed Tests.";
+	const std::string DigestSpeedTest::FAILURE = "FAILURE! ";
+	const std::string DigestSpeedTest::MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
+
+	DigestSpeedTest::DigestSpeedTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	DigestSpeedTest::~DigestSpeedTest()
+	{
+	}
+
 	void DigestSpeedTest::DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
 		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType, Parallel);

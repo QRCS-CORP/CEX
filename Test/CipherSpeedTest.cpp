@@ -1,5 +1,6 @@
 #include "CipherSpeedTest.h"
 #include "../CEX/CpuDetect.h"
+#include "../CEX/IntUtils.h"
 #if defined(__AVX__)
 #	include "../CEX/AHX.h"
 #endif
@@ -15,16 +16,31 @@
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
 #include "../CEX/OCB.h"
-#include "../CEX/SHA512.h"
 #include "../CEX/ChaCha20.h"
 #include "../CEX/Salsa20.h"
-#include "../CEX/IntUtils.h"
+#include "../CEX/SHA512.h"
 
 namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 	using namespace Cipher::Symmetric::Stream;
 	using Utility::IntUtils;
+
+	const std::string CipherSpeedTest::DESCRIPTION = "Cipher Speed Tests.";
+	const std::string CipherSpeedTest::FAILURE = "FAILURE! ";
+	const std::string CipherSpeedTest::MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
+
+	CipherSpeedTest::CipherSpeedTest()
+		:
+		m_hasAESNI(false),
+		m_hasSSE(false),
+		m_progressEvent()
+	{
+	}
+
+	CipherSpeedTest::~CipherSpeedTest()
+	{
+	}
 
 	std::string CipherSpeedTest::Run()
 	{
@@ -62,10 +78,6 @@ namespace Test
 			OnProgress(std::string("### Tests speeds of AES cipher mode implementations"));
 			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
 			OnProgress(std::string(""));
-
-			/*AHX* eng1 = new AHX();
-			for (size_t i = 0; i < 10; ++i)
-				GCMSpeedTest(eng1, true, true);*/
 
 			IBlockCipher* engine;
 #if defined(__AVX__)
@@ -121,7 +133,7 @@ namespace Test
 			delete engine;
 
 			OnProgress(std::string("### STREAM CIPHER TESTS ###"));
-			OnProgress(std::string("### Tests speeds of Salsa and ChaCha20 stream ciphers"));
+			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
 			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
 			OnProgress(std::string(""));
 
@@ -138,7 +150,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			return FAILURE + " : Internal Error";
+			return FAILURE + " : Unknown Error";
 		}
 	}
 
@@ -288,72 +300,6 @@ namespace Test
 		m_progressEvent(Data);
 	}
 
-	void CipherSpeedTest::WideModeLoop(IBlockCipher* Engine, size_t SampleSize, bool Parallel, size_t KeySize, size_t IvSize, size_t Loops)
-	{
-		// not fully implemented, for future use..
-		std::vector<byte> buffer1(IvSize, 0);
-		std::vector<byte> buffer2(IvSize, 0);
-		SampleSize -= (SampleSize % IvSize);
-		Mode::CBC cipher(Engine);
-		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-
-		if (!Parallel)
-		{
-			cipher.Initialize(true, keyParam);
-			cipher.ParallelProfile().IsParallel() = false;
-		}
-		else
-		{
-			cipher.Initialize(false, keyParam);
-			cipher.ParallelProfile().IsParallel() = true;
-			buffer1.resize(cipher.ParallelBlockSize());
-			buffer2.resize(cipher.ParallelBlockSize());
-		}
-
-		uint64_t start = TestUtils::GetTimeMs64();
-
-		if (IvSize == 128)
-		{
-			for (size_t i = 0; i < Loops; ++i)
-			{
-				size_t counter = 0;
-				uint64_t lstart = TestUtils::GetTimeMs64();
-
-				while (counter < SampleSize)
-				{
-					cipher.Transform128(buffer1, 0, buffer2, 0);
-					counter += buffer1.size();
-				}
-				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				OnProgress(calc);
-			}
-		}
-		else
-		{
-			for (size_t i = 0; i < Loops; ++i)
-			{
-				size_t counter = 0;
-				uint64_t lstart = TestUtils::GetTimeMs64();
-
-				while (counter < SampleSize)
-				{
-					cipher.Transform64(buffer1, 0, buffer2, 0);
-					counter += buffer1.size();
-				}
-				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				OnProgress(calc);
-			}
-		}
-
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-		uint64_t len = Loops * SampleSize;
-		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string mbps = IntUtils::ToString(rate / MB1);
-		std::string secs = IntUtils::ToString((double)dur / 1000.0);
-		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
-		OnProgress(resp);
-		OnProgress(std::string(""));
-	}
 
 	// Note: internal test, ignore
 	void CipherSpeedTest::CounterSpeedTest()
@@ -459,4 +405,71 @@ namespace Test
 		OnProgress(calc);
 	}
 
+	// Note: internal test, ignore
+	void CipherSpeedTest::WideModeLoop(IBlockCipher* Engine, size_t SampleSize, bool Parallel, size_t KeySize, size_t IvSize, size_t Loops)
+	{
+		// not fully implemented, for future use..
+		std::vector<byte> buffer1(IvSize, 0);
+		std::vector<byte> buffer2(IvSize, 0);
+		SampleSize -= (SampleSize % IvSize);
+		Mode::CBC cipher(Engine);
+		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
+
+		if (!Parallel)
+		{
+			cipher.Initialize(true, keyParam);
+			cipher.ParallelProfile().IsParallel() = false;
+		}
+		else
+		{
+			cipher.Initialize(false, keyParam);
+			cipher.ParallelProfile().IsParallel() = true;
+			buffer1.resize(cipher.ParallelBlockSize());
+			buffer2.resize(cipher.ParallelBlockSize());
+		}
+
+		uint64_t start = TestUtils::GetTimeMs64();
+
+		if (IvSize == 128)
+		{
+			for (size_t i = 0; i < Loops; ++i)
+			{
+				size_t counter = 0;
+				uint64_t lstart = TestUtils::GetTimeMs64();
+
+				while (counter < SampleSize)
+				{
+					cipher.Transform128(buffer1, 0, buffer2, 0);
+					counter += buffer1.size();
+				}
+				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				OnProgress(calc);
+			}
+		}
+		else
+		{
+			for (size_t i = 0; i < Loops; ++i)
+			{
+				size_t counter = 0;
+				uint64_t lstart = TestUtils::GetTimeMs64();
+
+				while (counter < SampleSize)
+				{
+					cipher.Transform64(buffer1, 0, buffer2, 0);
+					counter += buffer1.size();
+				}
+				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				OnProgress(calc);
+			}
+		}
+
+		uint64_t dur = TestUtils::GetTimeMs64() - start;
+		uint64_t len = Loops * SampleSize;
+		uint64_t rate = GetBytesPerSecond(dur, len);
+		std::string mbps = IntUtils::ToString(rate / MB1);
+		std::string secs = IntUtils::ToString((double)dur / 1000.0);
+		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
+		OnProgress(resp);
+		OnProgress(std::string(""));
+	}
 }

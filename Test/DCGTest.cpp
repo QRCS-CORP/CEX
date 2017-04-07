@@ -7,6 +7,22 @@
 
 namespace Test
 {
+	const std::string DCGTest::DESCRIPTION = "DCG implementations vector comparison tests.";
+	const std::string DCGTest::FAILURE = "FAILURE! ";
+	const std::string DCGTest::SUCCESS = "SUCCESS! All DCG tests have executed succesfully.";
+
+	DCGTest::DCGTest()
+		:
+		m_expected256(0),
+		m_seed256(0),
+		m_progressEvent()
+	{
+	}
+
+	DCGTest::~DCGTest()
+	{
+	}
+
 	std::string DCGTest::Run()
 	{
 		try
@@ -14,7 +30,7 @@ namespace Test
 			CheckInit();
 			OnProgress(std::string("DCG: Passed initialization tests.."));
 
-			// old tests do not meet minimum seed size requirements
+			// Note: old tests do not meet minimum seed size requirements
 			//Initialize();
 			//CompareOutput(m_seed256[0], m_expected256[0]);
 			//CompareOutput(m_seed256[1], m_expected256[1]);
@@ -28,7 +44,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

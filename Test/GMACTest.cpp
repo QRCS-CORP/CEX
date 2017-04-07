@@ -7,6 +7,24 @@ namespace Test
 	using Cipher::Symmetric::Block::RHX;
 	using Cipher::Symmetric::Block::IBlockCipher;
 
+	const std::string GMACTest::DESCRIPTION = "GMAC MAC Generator Tests.";
+	const std::string GMACTest::FAILURE = "FAILURE! ";
+	const std::string GMACTest::SUCCESS = "SUCCESS! GMAC tests have executed succesfully.";
+
+	GMACTest::GMACTest()
+		:
+		m_expectedCode(0),
+		m_key(0),
+		m_nonce(0),
+		m_plainText(0),
+		m_progressEvent()
+	{
+	}
+
+	GMACTest::~GMACTest()
+	{
+	}
+
 	std::string GMACTest::Run()
 	{
 		try
@@ -28,7 +46,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

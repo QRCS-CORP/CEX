@@ -2,10 +2,10 @@
 #define _CEXTEST_STREAMCIPHERTEST_H
 
 #include "ITest.h"
-#include "../CEX/ICipherMode.h"
-#include "../CEX/IStreamCipher.h"
-#include "../CEX/IPadding.h"
 #include "../CEX/CipherDescription.h"
+#include "../CEX/ICipherMode.h"
+#include "../CEX/IPadding.h"
+#include "../CEX/IStreamCipher.h"
 
 namespace Test
 {
@@ -15,14 +15,13 @@ namespace Test
 	class CipherStreamTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "CipherStream Processer Tests.";
-		const std::string FAILURE = "FAILURE: ";
-		const std::string SUCCESS = "SUCCESS! CipherStream tests have executed succesfully.";
-		const int32_t MIN_ALLOC = 4096;
-		const int32_t MAX_ALLOC = 8192;
-		const int32_t DEF_BLOCK = 64000;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
+		static const int32_t MIN_ALLOC = 4096;
+		static const int32_t MAX_ALLOC = 8192;
+		static const int32_t DEF_BLOCK = 64000;
 
-		TestEventHandler m_progressEvent;
 		std::vector<byte> m_cmpText;
 		std::vector<byte> m_decText;
 		std::vector<byte> m_encText;
@@ -30,6 +29,7 @@ namespace Test
 		std::vector<byte> m_key;
 		std::vector<byte> m_plnText;
 		size_t m_processorCount;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -42,17 +42,15 @@ namespace Test
 		/// </summary>
 		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
-		CipherStreamTest()
-			:
-			m_cmpText(MAX_ALLOC),
-			m_decText(MAX_ALLOC),
-			m_encText(MAX_ALLOC),
-			m_iv(16),
-			m_key(32),
-			m_plnText(MAX_ALLOC),
-			m_processorCount(1)
-		{
-		}
+		/// <summary>
+		/// Initialize this class
+		/// </summary>
+		CipherStreamTest();
+
+		/// <summary>
+		/// Destructor
+		/// </summary>
+		~CipherStreamTest();
 
 		/// <summary>
 		/// Start the tests

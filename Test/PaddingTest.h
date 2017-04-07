@@ -14,9 +14,9 @@ namespace Test
 	class PaddingTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Cipher Padding output Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! Cipher Padding tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -34,16 +34,12 @@ namespace Test
 		/// <summary>
 		/// Compares padding modes for valid output
 		/// </summary>
-		PaddingTest()
-		{
-		}
+		PaddingTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~PaddingTest()
-		{
-		}
+		~PaddingTest();
 
 		/// <summary>
 		/// Start the tests

@@ -16,6 +16,20 @@ namespace Test
 {
 	using Key::Symmetric::SymmetricKey;
 
+	const std::string MacStreamTest::DESCRIPTION = "MacStream output test; compares output from an SHA-2 512 HMAC and MacStream.";
+	const std::string MacStreamTest::FAILURE = "FAILURE! ";
+	const std::string MacStreamTest::SUCCESS = "SUCCESS! All MacStream tests have executed succesfully.";
+
+	MacStreamTest::MacStreamTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	MacStreamTest::~MacStreamTest()
+	{
+	}
+
 	std::string MacStreamTest::Run()
 	{
 		using namespace Mac;
@@ -69,7 +83,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

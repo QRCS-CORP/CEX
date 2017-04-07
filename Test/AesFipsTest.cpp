@@ -8,6 +8,24 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string AesFipsTest::DESCRIPTION = "NIST AES specification FIPS 197 Known Answer Tests.";
+	const std::string AesFipsTest::FAILURE = "FAILURE! ";
+	const std::string AesFipsTest::SUCCESS = "SUCCESS! AES tests have executed succesfully.";
+
+	AesFipsTest::AesFipsTest(bool TestNI)
+		:
+		m_cipherText(0),
+		m_keys(0),
+		m_plainText(0),
+		m_progressEvent(),
+		m_testNI(false)
+	{
+	}
+
+	AesFipsTest::~AesFipsTest()
+	{
+	}
+
 	std::string AesFipsTest::Run()
 	{
 		try
@@ -46,7 +64,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

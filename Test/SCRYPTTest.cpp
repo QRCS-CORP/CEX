@@ -7,6 +7,23 @@
 
 namespace Test
 {
+	const std::string SCRYPTTest::DESCRIPTION = "SCRYPT SHA-2 test vectors.";
+	const std::string SCRYPTTest::FAILURE = "FAILURE! ";
+	const std::string SCRYPTTest::SUCCESS = "SUCCESS! All SCRYPT tests have executed succesfully.";
+
+	SCRYPTTest::SCRYPTTest()
+		:
+		m_key(2),
+		m_output(0),
+		m_progressEvent(),
+		m_salt(2)
+	{
+	}
+
+	SCRYPTTest::~SCRYPTTest()
+	{
+	}
+
 	std::string SCRYPTTest::Run()
 	{
 		try
@@ -29,7 +46,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

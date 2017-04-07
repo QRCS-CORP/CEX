@@ -12,16 +12,16 @@ namespace Test
 	class DigestSpeedTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Digest Speed Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string MESSAGE = "COMPLETE! Speed tests have executed succesfully.";
-		static constexpr uint64_t KB1 = 1000;
-		static constexpr uint64_t MB1 = KB1 * 1000;
-		static constexpr uint64_t MB10 = MB1 * 10;
-		static constexpr uint64_t MB100 = MB1 * 100;
-		static constexpr uint64_t GB1 = MB1 * 1000;
-		static constexpr uint64_t DATA_SIZE = MB100;
-		static constexpr uint64_t DEFITER = 10;
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string MESSAGE;
+		static const uint64_t KB1 = 1000;
+		static const uint64_t MB1 = KB1 * 1000;
+		static const uint64_t MB10 = MB1 * 10;
+		static const uint64_t MB100 = MB1 * 100;
+		static const uint64_t GB1 = MB1 * 1000;
+		static const uint64_t DATA_SIZE = MB100;
+		static const uint64_t DEFITER = 10;
 
 		TestEventHandler m_progressEvent;
 
@@ -36,9 +36,15 @@ namespace Test
 		/// </summary>
 		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
-		DigestSpeedTest()
-		{
-		}
+		/// <summary>
+		/// Initailize this class
+		/// </summary>
+		DigestSpeedTest();
+
+		/// <summary>
+		/// Destructor
+		/// </summary>
+		~DigestSpeedTest();
 
 		/// <summary>
 		/// Start the tests
@@ -106,7 +112,7 @@ namespace Test
 			}
 			catch (...)
 			{
-				return FAILURE + " : Internal Error";
+				return FAILURE + " : Unknown Error";
 			}
 		}
 

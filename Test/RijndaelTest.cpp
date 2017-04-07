@@ -5,6 +5,23 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string RijndaelTest::DESCRIPTION = "Rijndael Known Answer Tests.";
+	const std::string RijndaelTest::FAILURE = "FAILURE! ";
+	const std::string RijndaelTest::SUCCESS = "SUCCESS! Rijndael tests have executed succesfully.";
+
+	RijndaelTest::RijndaelTest()
+		:
+		m_cipherText(0),
+		m_keys(0),
+		m_plainText(0),
+		m_progressEvent()
+	{
+	}
+
+	RijndaelTest::~RijndaelTest()
+	{
+	}
+
 	std::string RijndaelTest::Run()
 	{
 		try
@@ -24,7 +41,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

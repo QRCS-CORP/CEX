@@ -8,6 +8,19 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string AesAvsTest::DESCRIPTION = "NIST Advanced Encryption Standard Algorithm Validation Suite (AESAVS) tests.";
+	const std::string AesAvsTest::FAILURE = "FAILURE: ";
+	const std::string AesAvsTest::SUCCESS = "SUCCESS! AESAVS tests have executed succesfully.";
+
+	AesAvsTest::AesAvsTest(bool TestNI)
+		:
+		m_progressEvent(),
+		m_testNI(TestNI)
+	{
+	}
+
+	AesAvsTest::~AesAvsTest() {}
+
 	std::string AesAvsTest::Run()
 	{
 		using namespace TestFiles::AESAVS;
@@ -19,8 +32,10 @@ namespace Test
 
 		try
 		{
-			std::string data;
-			Test::TestUtils::Read(AESAVSKEY128, data);
+			std::string data = "";
+			TestUtils::Read(AESAVSKEY128, data);
+			if (data.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -38,7 +53,10 @@ namespace Test
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit key vectors test.."));
 
-			Test::TestUtils::Read(AESAVSKEY192, data);
+			data = "";
+			TestUtils::Read(AESAVSKEY192, data);
+			if (data.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 48; i < data.size(); i += 80, j += 80)
 			{
@@ -54,7 +72,10 @@ namespace Test
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit key vectors test.."));
 
-			Test::TestUtils::Read(AESAVSKEY256, data);
+			data = "";
+			TestUtils::Read(AESAVSKEY256, data);
+			if (data.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 64; i < data.size(); i += 96, j += 96)
 			{
@@ -71,7 +92,10 @@ namespace Test
 			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
 
 			HexConverter::Decode("00000000000000000000000000000000", key);
-			Test::TestUtils::Read(AESAVSPTEXT128, data);
+			data = "";
+			TestUtils::Read(AESAVSPTEXT128, data);
+			if (data.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -88,7 +112,10 @@ namespace Test
 			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
 
 			HexConverter::Decode("000000000000000000000000000000000000000000000000", key);
-			Test::TestUtils::Read(AESAVSPTEXT192, data);
+			data = "";
+			TestUtils::Read(AESAVSPTEXT192, data);
+			if (data.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -105,7 +132,10 @@ namespace Test
 			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
 
 			HexConverter::Decode("0000000000000000000000000000000000000000000000000000000000000000", key);
-			Test::TestUtils::Read(AESAVSPTEXT256, data);
+			data = "";
+			TestUtils::Read(AESAVSPTEXT256, data);
+			if (data.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
@@ -129,7 +159,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

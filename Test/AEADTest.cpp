@@ -14,6 +14,26 @@ namespace Test
 	using Cipher::Symmetric::Block::RHX;
 	using Cipher::Symmetric::Block::IBlockCipher;
 
+	const std::string AEADTest::DESCRIPTION = "Authenticate Encrypt and Associated Data (AEAD) Cipher Mode Tests.";
+	const std::string AEADTest::FAILURE = "FAILURE! ";
+	const std::string AEADTest::SUCCESS = "SUCCESS! AEAD tests have executed succesfully.";
+
+	AEADTest::AEADTest()
+		:
+		m_associatedText(0),
+		m_cipherText(0),
+		m_expectedCode(0),
+		m_key(0),
+		m_nonce(0),
+		m_plainText(0),
+		m_progressEvent()
+	{
+	}
+
+	AEADTest::~AEADTest()
+	{
+	}
+
 	std::string AEADTest::Run()
 	{
 		try
@@ -78,8 +98,53 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
+	}
+
+	void AEADTest::CompareVector(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
+		std::vector<byte> &CipherText, std::vector<byte> &MacCode)
+	{
+		Key::Symmetric::SymmetricKey kp(Key, Nonce);
+		Cipher->Initialize(true, kp);
+
+		if (AssociatedText.size() != 0)
+			Cipher->SetAssociatedData(AssociatedText, 0, AssociatedText.size());
+
+		// test encryption
+		std::vector<byte> encData(CipherText.size());
+		Cipher->Transform(PlainText, 0, encData, 0, PlainText.size());
+		Cipher->Finalize(encData, PlainText.size(), 16);
+
+		if (CipherText != encData)
+			throw TestException("AEADTest: Encrypted output is not equal!");
+
+		// decryption
+		Cipher->Initialize(false, kp);
+
+		if (AssociatedText.size() != 0)
+			Cipher->SetAssociatedData(AssociatedText, 0, AssociatedText.size());
+
+		std::vector<byte> tmpData(CipherText.size());
+		const size_t dataLen = (encData.size() >= 16) ? encData.size() - Cipher->BlockSize() : 0;
+		Cipher->Transform(encData, 0, tmpData, 0, dataLen);
+
+		std::vector<byte> macCode(16);
+		Cipher->Finalize(macCode, 0, 16);
+
+		// Finalizer can be skipped if Verify called
+		if (!Cipher->Verify(encData, dataLen, 16))
+			throw TestException("AEADTest: Tags do not match!");
+
+		std::vector<byte> decData(dataLen);
+		if (dataLen != 0)
+			memcpy(&decData[0], &tmpData[0], dataLen);
+
+		if (PlainText != decData)
+			throw TestException("AEADTest: Decrypted output is not equal!");
+
+		if (MacCode != macCode || MacCode != Cipher->Tag())
+			throw TestException("AEADTest: Tags do not match!");
 	}
 
 	void AEADTest::IncrementalCheck(IAeadMode* Cipher)
@@ -130,51 +195,6 @@ namespace Test
 
 		if (encData1 != encData2)
 			throw TestException("AEADTest: Output does not match!");
-	}
-
-	void AEADTest::CompareVector(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
-		std::vector<byte> &CipherText, std::vector<byte> &MacCode)
-	{
-		Key::Symmetric::SymmetricKey kp(Key, Nonce);
-		Cipher->Initialize(true, kp);
-
-		if (AssociatedText.size() != 0)
-			Cipher->SetAssociatedData(AssociatedText, 0, AssociatedText.size());
-
-		// test encryption
-		std::vector<byte> encData(CipherText.size());
-		Cipher->Transform(PlainText, 0, encData, 0, PlainText.size());
-		Cipher->Finalize(encData, PlainText.size(), 16);
-
-		if (CipherText != encData)
-			throw TestException("AEADTest: Encrypted output is not equal!");
-
-		// decryption
-		Cipher->Initialize(false, kp);
-
-		if (AssociatedText.size() != 0)
-			Cipher->SetAssociatedData(AssociatedText, 0, AssociatedText.size());
-
-		std::vector<byte> tmpData(CipherText.size());
-		const size_t dataLen = (encData.size() >= 16) ? encData.size() - Cipher->BlockSize() : 0;
-		Cipher->Transform(encData, 0, tmpData, 0, dataLen);
-
-		std::vector<byte> macCode(16);
-		Cipher->Finalize(macCode, 0, 16);
-
-		// Finalizer can be skipped if Verify called
-		if (!Cipher->Verify(encData, dataLen, 16))
-			throw TestException("AEADTest: Tags do not match!");
-
-		std::vector<byte> decData(dataLen);
-		if (dataLen != 0)
-			memcpy(&decData[0], &tmpData[0], dataLen);
-
-		if (PlainText != decData)
-			throw TestException("AEADTest: Decrypted output is not equal!");
-
-		if (MacCode != macCode || MacCode != Cipher->Tag())
-			throw TestException("AEADTest: Tags do not match!");
 	}
 
 	void AEADTest::ParallelTest(IAeadMode* Cipher)

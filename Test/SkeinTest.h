@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	using namespace Digest;
+	using Digest::IDigest;
 
 	/// <summary>
 	/// Tests the Skein digest implementation using vector comparisons.
@@ -16,9 +16,9 @@ namespace Test
 	class SkeinTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Tests the 256, 512, and 1024 bit versions of Skein.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Skein tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		std::vector<std::vector<byte>> m_expected256;
 		std::vector<std::vector<byte>> m_expected512;
@@ -42,16 +42,12 @@ namespace Test
 		/// <summary>
 		/// Known answer tests for the 256, 512, and 1024 bit versions of Skein
 		/// </summary>
-		SkeinTest()
-		{
-		}
+		SkeinTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~SkeinTest()
-		{
-		}
+		~SkeinTest();
 
 		/// <summary>
 		/// Start the tests

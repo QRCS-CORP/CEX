@@ -7,6 +7,20 @@ namespace Test
 {
 	using namespace CEX::IO;
 
+	const std::string SecureStreamTest::DESCRIPTION = "SecureStream test; compares serialization, reads and writes";
+	const std::string SecureStreamTest::FAILURE = "FAILURE! ";
+	const std::string SecureStreamTest::SUCCESS = "SUCCESS! All SecureStream tests have executed succesfully.";
+
+	SecureStreamTest::SecureStreamTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	SecureStreamTest::~SecureStreamTest()
+	{
+	}
+
 	void SecureStreamTest::CheckAccess()
 	{
 		Prng::SecureRandom rnd;

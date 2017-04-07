@@ -6,6 +6,24 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Stream;
 
+	const std::string ChaChaTest::DESCRIPTION = "ChaCha20 Known Answer Tests.";
+	const std::string ChaChaTest::FAILURE = "FAILURE! ";
+	const std::string ChaChaTest::SUCCESS = "SUCCESS! ChaCha20 tests have executed succesfully.";
+
+	ChaChaTest::ChaChaTest()
+		:
+		m_cipherText(0),
+		m_iv(0),
+		m_key(0),
+		m_plainText(0),
+		m_progressEvent()
+	{
+	}
+
+	ChaChaTest::~ChaChaTest()
+	{
+	}
+
 	std::string ChaChaTest::Run()
 	{
 		try
@@ -22,9 +40,8 @@ namespace Test
 			CompareVector(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
 			CompareVector(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
 			OnProgress(std::string("ChaChaTest: Passed 256 bit key vector tests.."));
-			// TODO: failing on i3
-			//CompareParallel();
-			//OnProgress(std::string("ChaChaTest: Passed parallel/linear equality tests.."));
+			CompareParallel();
+			OnProgress(std::string("ChaChaTest: Passed parallel/linear equality tests.."));
 
 			return SUCCESS;
 		}
@@ -34,7 +51,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

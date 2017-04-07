@@ -9,20 +9,21 @@ namespace Test
 	using Mac::IMac;
 
 	/// <summary>
-	/// 
+	/// Test the GMAC implementation with vectores from:
+	/// NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38B/SP_800-38B.pdf">SP800-38B</a>: The GMAC Mode for Authentication.
 	/// </summary>
 	class GMACTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "GMAC MAC Generator Tests.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! GMAC tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
-		TestEventHandler m_progressEvent;
 		std::vector<std::vector<byte>> m_expectedCode;
 		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_nonce;
 		std::vector<std::vector<byte>> m_plainText;
+		TestEventHandler m_progressEvent;
 
 	public:
 		/// <summary>
@@ -36,23 +37,14 @@ namespace Test
 		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
-		/// 
+		/// Initialize the GMAC tests
 		/// </summary>
-		GMACTest()
-			:
-			m_expectedCode(0),
-			m_key(0),
-			m_nonce(0),
-			m_plainText(0)
-		{
-		}
+		GMACTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~GMACTest()
-		{
-		}
+		~GMACTest();
 
 		/// <summary>
 		/// Start the tests

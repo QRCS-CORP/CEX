@@ -11,9 +11,9 @@ namespace Test
 	class RangedRngTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Tests Prngs for valid minimum and maximum range responses.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Prng range tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
 
@@ -31,12 +31,12 @@ namespace Test
 		/// <summary>
 		/// PRNG operational range tests
 		/// </summary>
-		RangedRngTest() {}
+		RangedRngTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		virtual ~RangedRngTest() {}
+		~RangedRngTest();
 
 		/// <summary>
 		/// Start the tests

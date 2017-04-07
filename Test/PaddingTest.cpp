@@ -1,4 +1,5 @@
 #include "PaddingTest.h"
+#include "../CEX/CSP.h"
 #include "../CEX/ISO7816.h"
 #include "../CEX/PKCS7.h"
 #include "../CEX/TBC.h"
@@ -6,6 +7,20 @@
 
 namespace Test
 {
+	const std::string PaddingTest::DESCRIPTION = "Cipher Padding output Tests.";
+	const std::string PaddingTest::FAILURE = "FAILURE! ";
+	const std::string PaddingTest::SUCCESS = "SUCCESS! Cipher Padding tests have executed succesfully.";
+
+	PaddingTest::PaddingTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	PaddingTest::~PaddingTest()
+	{
+	}
+
 	std::string PaddingTest::Run()
 	{
 		try
@@ -27,13 +42,13 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 
 	void PaddingTest::CompareOutput(Padding::IPadding* Padding)
 	{
-		Provider::CSP rng;
+		CEX::Provider::CSP rng;
 		std::vector<byte> fill(16);
 		rng.GetBytes(fill);
 		const unsigned int BLOCK = 16;

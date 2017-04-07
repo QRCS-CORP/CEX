@@ -7,6 +7,20 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Block;
 
+	const std::string SerpentTest::DESCRIPTION = "Serpent Nessie tests, with 100 and 1000 round Monte Carlo runs.";
+	const std::string SerpentTest::FAILURE = "FAILURE! ";
+	const std::string SerpentTest::SUCCESS = "SUCCESS! All Serpent tests have executed succesfully.";
+
+	SerpentTest::SerpentTest()
+		:
+		m_progressEvent()
+	{
+	}
+
+	SerpentTest::~SerpentTest()
+	{
+	}
+
 	std::string SerpentTest::Run()
 	{
 		try
@@ -22,20 +36,32 @@ namespace Test
 			int rcount = 0;
 
 			// 128 bit keys
-			std::string cipStr;
-			std::string keyStr;
-			std::string plnStr;
-			std::string mntStr;
-			std::string mnt1kStr;
+			std::string cipStr = "";
+			std::string keyStr = "";
+			std::string plnStr = "";
+			std::string mntStr = "";
+			std::string mnt1kStr = "";
 
 			std::string rcnt; 
 			std::string klen; 
 			std::string resp;
+
 			TestUtils::Read(SERPENTCTEXT128, cipStr);
+			if (cipStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTKEY128, keyStr);
+			if (keyStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTPTEXT128, plnStr);
+			if (plnStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTM100X128, mntStr);
+			if (mntStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTM1000X128, mnt1kStr);
+			if (mnt1kStr.size() == 0)
+				throw TestException("Could not find the test file!");
+
 
 			for (unsigned int i = 0; i < keyStr.size(); i += 32)
 			{
@@ -71,12 +97,28 @@ namespace Test
 			OnProgress(resp);
 			rcount = 0;
 
+			cipStr = "";
+			keyStr = "";
+			plnStr = "";
+			mntStr = "";
+			mnt1kStr = "";
+
 			// 192 bit keys
 			TestUtils::Read(SERPENTCTEXT192, cipStr);
+			if (cipStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTKEY192, keyStr);
+			if (keyStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTPTEXT192, plnStr);
+			if (plnStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTM100X192, mntStr);
+			if (mntStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTM1000X192, mnt1kStr);
+			if (mnt1kStr.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
 			{
@@ -109,12 +151,28 @@ namespace Test
 			OnProgress(resp);
 			rcount = 0;
 
+			cipStr = "";
+			keyStr = "";
+			plnStr = "";
+			mntStr = "";
+			mnt1kStr = "";
+
 			// 256 bit keys
 			TestUtils::Read(SERPENTCTEXT256, cipStr);
+			if (cipStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTKEY256, keyStr);
+			if (keyStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTPTEXT256, plnStr);
+			if (plnStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTM100X256, mntStr);
+			if (mntStr.size() == 0)
+				throw TestException("Could not find the test file!");
 			TestUtils::Read(SERPENTM1000X256, mnt1kStr);
+			if (mnt1kStr.size() == 0)
+				throw TestException("Could not find the test file!");
 
 			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
 			{
@@ -159,7 +217,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

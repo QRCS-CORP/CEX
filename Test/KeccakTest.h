@@ -22,9 +22,9 @@ namespace Test
 	class KeccakTest : public ITest
 	{
 	private:
-		const std::string DESCRIPTION = "Keccak Vector KATs; tests SHA-3 224/256/384/512 and HMACs.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All Keccak tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		std::vector<std::vector<byte>> m_messages;
 		std::vector<std::vector<byte>> m_expected256;
@@ -54,16 +54,12 @@ namespace Test
 		/// <summary>
 		/// A range of Vector KATs; tests SHA-3 256/512 and HMACs
 		/// </summary>
-		KeccakTest()
-		{
-		}
+		KeccakTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~KeccakTest()
-		{
-		}
+		~KeccakTest();
 
 		/// <summary>
 		/// Start the tests

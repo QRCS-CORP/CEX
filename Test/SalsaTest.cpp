@@ -6,6 +6,24 @@ namespace Test
 {
 	using namespace Cipher::Symmetric::Stream;
 
+	const std::string SalsaTest::DESCRIPTION = "Salsa20 Known Answer Tests.";
+	const std::string SalsaTest::FAILURE = "FAILURE! ";
+	const std::string SalsaTest::SUCCESS = "SUCCESS! Salsa20 tests have executed succesfully.";
+
+	SalsaTest::SalsaTest()
+		:
+		m_cipherText(0),
+		m_iv(0),
+		m_key(0),
+		m_plainText(0),
+		m_progressEvent()
+	{
+	}
+
+	SalsaTest::~SalsaTest()
+	{
+	}
+
 	std::string SalsaTest::Run()
 	{
 		try
@@ -34,7 +52,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Internal Error"));
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
 		}
 	}
 

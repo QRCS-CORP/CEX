@@ -14,9 +14,9 @@ namespace Test
     class SHA2Test : public ITest
     {
     private:
-		const std::string DESCRIPTION = "Tests SHA-2 256/512 with NIST KAT vectors.";
-		const std::string FAILURE = "FAILURE! ";
-		const std::string SUCCESS = "SUCCESS! All SHA-2 tests have executed succesfully.";
+		static const std::string DESCRIPTION;
+		static const std::string FAILURE;
+		static const std::string SUCCESS;
 
 		std::vector<std::vector<byte>> m_expected256;
 		std::vector<std::vector<byte>> m_expected512;
@@ -37,16 +37,12 @@ namespace Test
 		/// <summary>
 		/// Known answer tests using the NIST SHA-2 KAT vectors
 		/// </summary>
-		SHA2Test()
-        {
-        }
+		SHA2Test();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~SHA2Test()
-		{
-		}
+		~SHA2Test();
 
 		/// <summary>
 		/// Start the tests
