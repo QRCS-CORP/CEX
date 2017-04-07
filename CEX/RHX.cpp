@@ -516,11 +516,13 @@ void RHX::ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffs
 {
 	size_t sub = KeyIndex - KeyOffset;
 
-	Key[KeyIndex] = Key[sub] ^ SubByte((Key[KeyIndex - 1] << 8) | ((Key[KeyIndex - 1] >> 24) & 0xFF)) ^ Rcon[RconIndex];
-	// note: you can insert noise before each mix to further equalize timing, i.e: uint tmp = SubByte(Key[KeyIndex - 1]);
-	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
-	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
-	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	Key[KeyIndex] = Key[sub] ^ SubByte((uint)(Key[KeyIndex - 1] << 8) | (uint)(Key[KeyIndex - 1] >> 24) & 0xFF) ^ Rcon[RconIndex];
+	++KeyIndex;
+	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++KeyIndex;
+	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++KeyIndex;
+	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
 }
 
 void RHX::ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset)
@@ -528,9 +530,12 @@ void RHX::ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffs
 	size_t sub = KeyIndex - KeyOffset;
 
 	Key[KeyIndex] = SubByte(Key[KeyIndex - 1]) ^ Key[sub];
-	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
-	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
-	Key[++KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++KeyIndex;
+	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++KeyIndex;
+	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++KeyIndex;
+	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
 }
 
 //~~~Rounds Processing~~~//
