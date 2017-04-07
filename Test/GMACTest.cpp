@@ -18,6 +18,7 @@ namespace Test
 
 			for (size_t i = 0; i < m_key.size(); ++i)
 				GMACCompare(m_key[i], m_nonce[i], m_plainText[i], m_expectedCode[i]);
+			OnProgress(std::string("GMACTest: Passed GMAC known answer vector tests.."));
 
 			return SUCCESS;
 		}
@@ -113,7 +114,7 @@ namespace Test
 		HexConverter::Decode(codeEncoded, 11, m_expectedCode);
 	}
 
-	void GMACTest::OnProgress(char* Data)
+	void GMACTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

@@ -14,13 +14,13 @@ namespace Test
 			Initialize();
 
 			TestInit();
-			OnProgress("HKDFTest: Passed initialization tests..");
+			OnProgress(std::string("HKDFTest: Passed initialization tests.."));
 			CompareVector(42, m_key[0], m_salt[0], m_info[0], m_output[0]);
 			CompareVector(82, m_key[1], m_salt[1], m_info[1], m_output[1]);
-			OnProgress("HKDFTest: Passed SHA256 bit vectors tests..");
+			OnProgress(std::string("HKDFTest: Passed SHA256 bit vectors tests.."));
 			std::vector<byte> tmp(0);
 			CompareVector(42, m_key[2], tmp, tmp, m_output[2]);
-			OnProgress("HKDFTest: Passed parameters tests..");
+			OnProgress(std::string("HKDFTest: Passed parameters tests.."));
 
 			return SUCCESS;
 		}
@@ -82,7 +82,7 @@ namespace Test
 		HexConverter::Decode(outputEncoded, 3, m_output);
 	}
 
-	void HKDFTest::OnProgress(char* Data)
+	void HKDFTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

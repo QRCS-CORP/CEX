@@ -24,8 +24,6 @@
 
 NAMESPACE_MODE
 
-using Block::Mode::ICipherMode;
-
 /// <summary>
 /// An AEAD Cipher Mode virtual interface class.
 /// <para>Provides virtual interfaces for symmetric block cipher AEAD modes.</para>

@@ -52,7 +52,7 @@ namespace Test
 		void CompareOutput(Mac::IMac* Engine1, Mac::IMac* Engine2);
 		void CmacDescriptionTest();
 		void HmacDescriptionTest();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

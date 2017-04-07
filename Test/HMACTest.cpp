@@ -21,7 +21,7 @@ namespace Test
 			CompareVector256(m_keys[4], m_input[4], m_expected256[4]);
 			CompareVector256(m_keys[5], m_input[5], m_expected256[5]);
 			CompareVector256(m_keys[6], m_input[6], m_expected256[6]);
-			OnProgress("HMACTest: Passed SHA-2 256 bit known answer vector tests..");
+			OnProgress(std::string("HMACTest: Passed SHA-2 256 bit known answer vector tests.."));
 
 			CompareVector512(m_keys[0], m_input[0], m_expected512[0]);
 			CompareVector512(m_keys[1], m_input[1], m_expected512[1]);
@@ -30,10 +30,10 @@ namespace Test
 			CompareVector512(m_keys[4], m_input[4], m_expected512[4]);
 			CompareVector512(m_keys[5], m_input[5], m_expected512[5]);
 			CompareVector512(m_keys[6], m_input[6], m_expected512[6]);
-			OnProgress("HMACTest: Passed SHA-2 512 bit known answer vector tests..");
+			OnProgress(std::string("HMACTest: Passed SHA-2 512 bit known answer vector tests.."));
 
 			CompareAccess(m_keys[3]);
-			OnProgress("Passed Finalize/Compute methods output comparison..");
+			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
 
 			return SUCCESS;
 		}
@@ -186,7 +186,7 @@ namespace Test
 		HexConverter::Decode(expected512Enc, 7, m_expected512);
 	}
 
-	void HMACTest::OnProgress(char* Data)
+	void HMACTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

@@ -18,17 +18,17 @@ namespace Test
 		try
 		{
 			TreeParamsTest();
-			OnProgress("Passed Blake2Params parameter serialization test..");
+			OnProgress(std::string("Passed Blake2Params parameter serialization test.."));
 			MacParamsTest();
-			OnProgress("Passed SymmetricKey cloning test..");
+			OnProgress(std::string("Passed SymmetricKey cloning test.."));
 			Blake2STest();
-			OnProgress("Passed Blake2-S 256 vector tests..");
+			OnProgress(std::string("Passed Blake2-S 256 vector tests.."));
 			Blake2SPTest();
-			OnProgress("Passed Blake2-SP 256 vector tests..");
+			OnProgress(std::string("Passed Blake2-SP 256 vector tests.."));
 			Blake2BTest();
-			OnProgress("Passed Blake2-B 512 vector tests..");
+			OnProgress(std::string("Passed Blake2-B 512 vector tests.."));
 			Blake2BPTest();
-			OnProgress("Passed Blake2-BP 512 vector tests..");    
+			OnProgress(std::string("Passed Blake2-BP 512 vector tests.."));    
 
 			return SUCCESS;
 		}
@@ -266,7 +266,7 @@ namespace Test
 			throw std::string("Blake2STest: Tree parameters test failed!");
 	}
 
-	void Blake2Test::OnProgress(char* Data)
+	void Blake2Test::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

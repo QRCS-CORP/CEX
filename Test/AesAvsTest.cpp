@@ -36,7 +36,7 @@ namespace Test
 #endif
 					CompareVector(key, plainText, cipherText);
 			}
-			OnProgress("AesAvsTest: Passed 128 bit key vectors test..");
+			OnProgress(std::string("AesAvsTest: Passed 128 bit key vectors test.."));
 
 			Test::TestUtils::Read(AESAVSKEY192, data);
 
@@ -52,7 +52,7 @@ namespace Test
 #endif
 					CompareVector(key, plainText, cipherText);
 			}
-			OnProgress("AesAvsTest: Passed 192 bit key vectors test..");
+			OnProgress(std::string("AesAvsTest: Passed 192 bit key vectors test.."));
 
 			Test::TestUtils::Read(AESAVSKEY256, data);
 
@@ -68,7 +68,7 @@ namespace Test
 #endif
 					CompareVector(key, plainText, cipherText);
 			}
-			OnProgress("AesAvsTest: Passed 256 bit key vectors test..");
+			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
 
 			HexConverter::Decode("00000000000000000000000000000000", key);
 			Test::TestUtils::Read(AESAVSPTEXT128, data);
@@ -85,7 +85,7 @@ namespace Test
 #endif
 					CompareVector(key, plainText, cipherText);
 			}
-			OnProgress("AesAvsTest: Passed 128 bit plain-text vectors test..");
+			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
 
 			HexConverter::Decode("000000000000000000000000000000000000000000000000", key);
 			Test::TestUtils::Read(AESAVSPTEXT192, data);
@@ -102,7 +102,7 @@ namespace Test
 #endif
 					CompareVector(key, plainText, cipherText);
 			}
-			OnProgress("AesAvsTest: Passed 192 bit plain-text vectors test..");
+			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
 
 			HexConverter::Decode("0000000000000000000000000000000000000000000000000000000000000000", key);
 			Test::TestUtils::Read(AESAVSPTEXT256, data);
@@ -119,7 +119,7 @@ namespace Test
 #endif
 					CompareVector(key, plainText, cipherText);
 			}
-			OnProgress("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed");
+			OnProgress(std::string("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed"));
 
 			return SUCCESS;
 		}
@@ -161,7 +161,7 @@ namespace Test
 	}
 #endif
 
-	void AesAvsTest::OnProgress(char* Data)
+	void AesAvsTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

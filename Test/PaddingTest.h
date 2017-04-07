@@ -52,7 +52,7 @@ namespace Test
 
 	private:
 		void CompareOutput(Padding::IPadding* Padding);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

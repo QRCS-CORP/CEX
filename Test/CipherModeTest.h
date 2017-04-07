@@ -60,7 +60,7 @@ namespace Test
 		void CompareECB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output);
 		void CompareOFB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
     };
 }
 

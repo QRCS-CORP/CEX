@@ -102,7 +102,7 @@ namespace Test
 			throw TestException("CompareSerial: The secure key serialization has failed!");
 	}
 
-	void SymmetricKeyTest::OnProgress(char* Data)
+	void SymmetricKeyTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

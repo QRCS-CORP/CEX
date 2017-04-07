@@ -19,6 +19,8 @@ namespace Test
 #if !defined(_DEBUG)
 			CompareVector(m_key[1], m_salt[1], m_output[2], 1048576, 1, 64);
 #endif
+			OnProgress(std::string("SCRYPTTest: Passed SHA256 KAT vector tests.."));
+
 			return SUCCESS;
 		}
 		catch (std::exception const &ex)
@@ -77,7 +79,7 @@ namespace Test
 			m_salt[1].push_back(s2[i]);
 	}
 
-	void SCRYPTTest::OnProgress(char* Data)
+	void SCRYPTTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

@@ -14,12 +14,12 @@ namespace Test
 			Initialize();
 
 			TestInit();
-			OnProgress("PBKDF2Test: Passed initialization tests..");
+			OnProgress(std::string("PBKDF2Test: Passed initialization tests.."));
 			CompareVector(32, 1, m_key[0],m_salt[0],  m_output[0]);
 			CompareVector(32, 2, m_key[0], m_salt[0], m_output[1]);
 			CompareVector(32, 4096, m_key[0], m_salt[0], m_output[2]);
 			CompareVector(40, 4096, m_key[1], m_salt[1], m_output[3]);
-			OnProgress("PBKDF2Test: Passed SHA256 KAT vector tests..");
+			OnProgress(std::string("PBKDF2Test: Passed SHA256 KAT vector tests.."));
 
 			return SUCCESS;
 		}
@@ -90,7 +90,7 @@ namespace Test
 			m_key[1].push_back(p2[i]);
 	}
 
-	void PBKDF2Test::OnProgress(char* Data)
+	void PBKDF2Test::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

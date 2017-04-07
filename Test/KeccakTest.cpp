@@ -17,20 +17,20 @@ namespace Test
 			Initialize();
 
 			TreeParamsTest();
-			OnProgress("Passed KeccakParams parameter serialization test..");
+			OnProgress(std::string("Passed KeccakParams parameter serialization test.."));
 
 			Keccak256* kc256 = new Keccak256;
 			Keccak512* kc512 = new Keccak512;
 
 			CompareVector(kc256, m_expected256);
-			OnProgress("Passed Keccak 256 bit digest vector tests..");
+			OnProgress(std::string("Passed Keccak 256 bit digest vector tests.."));
 			CompareVector(kc512, m_expected512);
-			OnProgress("KeccakTest: Passed Keccak 512 bit digest vector tests..");
+			OnProgress(std::string("KeccakTest: Passed Keccak 512 bit digest vector tests.."));
 
 			CompareHMAC(kc256, m_mac256, m_trunc256);
-			OnProgress("Passed Keccak 256 bit digest HMAC tests..");
+			OnProgress(std::string("Passed Keccak 256 bit digest HMAC tests.."));
 			CompareHMAC(kc512, m_mac512, m_trunc512);
-			OnProgress("KeccakTest: Passed Keccak 512 bit digest HMAC tests..");
+			OnProgress(std::string("KeccakTest: Passed Keccak 512 bit digest HMAC tests.."));
 
 			delete kc256;
 			delete kc512;
@@ -260,7 +260,7 @@ namespace Test
 		HexConverter::Decode("61626364656667686263646566676869636465666768696a6465666768696a6b65666768696a6b6c666768696a6b6c6d6768696a6b6c6d6e68696a6b6c6d6e6f", m_xtremeData);
 	}
 
-	void KeccakTest::OnProgress(char* Data)
+	void KeccakTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

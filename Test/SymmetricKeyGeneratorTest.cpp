@@ -12,9 +12,9 @@ namespace Test
 		try
 		{
 			CheckInit();
-			OnProgress("SymmetricKeyGenerator: Passed initialization tests..");
+			OnProgress(std::string("SymmetricKeyGenerator: Passed initialization tests.."));
 			CheckAccess();
-			OnProgress("SymmetricKeyGenerator: Passed output comparison tests..");
+			OnProgress(std::string("SymmetricKeyGenerator: Passed output comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -116,7 +116,7 @@ namespace Test
 		return true;
 	}
 
-	void SymmetricKeyGeneratorTest::OnProgress(char* Data)
+	void SymmetricKeyGeneratorTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

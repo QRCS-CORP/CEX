@@ -14,7 +14,7 @@ namespace Test
 			for (unsigned int i = 0; i < m_plainText.size(); ++i)
 				CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
 
-			OnProgress("RijndaelTest : Passed 128 and 256 bit block tests..");
+			OnProgress(std::string("RijndaelTest : Passed 128 and 256 bit block tests.."));
 
 			return SUCCESS;
 		}
@@ -111,7 +111,7 @@ namespace Test
 		HexConverter::Decode(cipherTextEncoded, 15, m_cipherText);
 	}
 
-	void RijndaelTest::OnProgress(char* Data)
+	void RijndaelTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

@@ -60,7 +60,7 @@ namespace Test
 
 	private:
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 #if defined(__AVX__)
 		void AHXMonteCarlo();
 #endif

@@ -44,9 +44,9 @@ namespace Test
 
 		CipherStreamTest()
 			:
-			m_encText(MAX_ALLOC),
 			m_cmpText(MAX_ALLOC),
 			m_decText(MAX_ALLOC),
+			m_encText(MAX_ALLOC),
 			m_iv(16),
 			m_key(32),
 			m_plnText(MAX_ALLOC),
@@ -78,7 +78,7 @@ namespace Test
 		void BlockCTR(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockDecrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockEncrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 		void ProcessStream(Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	};
 }

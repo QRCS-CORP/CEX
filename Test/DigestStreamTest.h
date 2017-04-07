@@ -50,7 +50,7 @@ namespace Test
 
 	private:
 		void CompareOutput(Enumeration::Digests Engine);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

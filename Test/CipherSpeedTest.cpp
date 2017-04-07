@@ -32,36 +32,36 @@ namespace Test
 		{
 			Initialize();
 
-			OnProgress("### BLOCK CIPHER TESTS ###");
-			OnProgress("### Tests Rijndael, Serpent and Twofish ciphers");
-			OnProgress("### Uses pipelined and parallelized Electronic CodeBook Mode (ECB)");
-			OnProgress("### Each cipher test Encrypts 2GB of data; 100MB chunks * 20 iterations");
-			OnProgress("");
+			OnProgress(std::string("### BLOCK CIPHER TESTS ###"));
+			OnProgress(std::string("### Tests Rijndael, Serpent and Twofish ciphers"));
+			OnProgress(std::string("### Uses pipelined and parallelized Electronic CodeBook Mode (ECB)"));
+			OnProgress(std::string("### Each cipher test Encrypts 2GB of data; 100MB chunks * 20 iterations"));
+			OnProgress(std::string(""));
 
 #if defined(__AVX__)
 			if (m_hasAESNI)
 			{
-				OnProgress("***AHX/ECB (AES-NI): Monte Carlo test (K=256; R=14)***");
+				OnProgress(std::string("***AHX/ECB (AES-NI): Monte Carlo test (K=256; R=14)***"));
 				AHXSpeedTest();
 			}
 			else
 #endif
 			{
-				OnProgress("***RHX/ECB: (Rijndael) Monte Carlo test (K=256; R=14)***");
+				OnProgress(std::string("***RHX/ECB: (Rijndael) Monte Carlo test (K=256; R=14)***"));
 				RHXSpeedTest();
 			}
 
-			OnProgress("***SHX/ECB: (Serpent) Monte Carlo test (K=256; R=32)***");
+			OnProgress(std::string("***SHX/ECB: (Serpent) Monte Carlo test (K=256; R=32)***"));
 			SHXSpeedTest();
 
-			OnProgress("***THX/ECB: (Twofish) Monte Carlo test (K=256; R=16)***");
+			OnProgress(std::string("***THX/ECB: (Twofish) Monte Carlo test (K=256; R=16)***"));
 			THXSpeedTest();
 
 
-			OnProgress("### CIPHER MODE TESTS ###");
-			OnProgress("### Tests speeds of AES cipher mode implementations");
-			OnProgress("### Uses the standard rounds and a 256 bit key");
-			OnProgress("");
+			OnProgress(std::string("### CIPHER MODE TESTS ###"));
+			OnProgress(std::string("### Tests speeds of AES cipher mode implementations"));
+			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
+			OnProgress(std::string(""));
 
 			/*AHX* eng1 = new AHX();
 			for (size_t i = 0; i < 10; ++i)
@@ -75,59 +75,59 @@ namespace Test
 #endif
 				engine = new RHX();
 
-			OnProgress("***AES-CBC Sequential Encryption***");
+			OnProgress(std::string("***AES-CBC Sequential Encryption***"));
 			CBCSpeedTest(engine, true, false);
-			OnProgress("***AES-CBC Parallel Decryption***");
+			OnProgress(std::string("***AES-CBC Parallel Decryption***"));
 			CBCSpeedTest(engine, false, true);
 
-			OnProgress("***AES-CFB Sequential Encryption***");
+			OnProgress(std::string("***AES-CFB Sequential Encryption***"));
 			CFBSpeedTest(engine, true, false);
-			OnProgress("***AES-CFB Parallel Decryption***");
+			OnProgress(std::string("***AES-CFB Parallel Decryption***"));
 			CFBSpeedTest(engine, false, true);
 
-			OnProgress("***AES-CTR Sequential Encryption***");
+			OnProgress(std::string("***AES-CTR Sequential Encryption***"));
 			CTRSpeedTest(engine, true, false);
-			OnProgress("***AES-CTR Parallel Encryption***");
+			OnProgress(std::string("***AES-CTR Parallel Encryption***"));
 			CTRSpeedTest(engine, true, true);
 
-			OnProgress("***AES-ICM Sequential Encryption***");
+			OnProgress(std::string("***AES-ICM Sequential Encryption***"));
 			ICMSpeedTest(engine, true, false);
-			OnProgress("***AES-ICM Parallel Encryption***");
+			OnProgress(std::string("***AES-ICM Parallel Encryption***"));
 			ICMSpeedTest(engine, true, true);
 
-			OnProgress("***AES-OFB Sequential Encryption***");
+			OnProgress(std::string("***AES-OFB Sequential Encryption***"));
 			OFBSpeedTest(engine, true, false);
 
-			OnProgress("### AEAD Authenticated Cipher Modes ###");
-			OnProgress("### Tests speeds of EAX, GCM, and OCB authenticated modes");
-			OnProgress("### Uses the standard rounds and a 256 bit key");
-			OnProgress("");
+			OnProgress(std::string("### AEAD Authenticated Cipher Modes ###"));
+			OnProgress(std::string("### Tests speeds of EAX, GCM, and OCB authenticated modes"));
+			OnProgress(std::string("### Uses the standard rounds and a 256 bit key"));
+			OnProgress(std::string(""));
 
-			OnProgress("***AES-EAX Sequential Encryption***");
+			OnProgress(std::string("***AES-EAX Sequential Encryption***"));
 			EAXSpeedTest(engine, true, false);
-			OnProgress("***AES-EAX Parallel Encryption***");
+			OnProgress(std::string("***AES-EAX Parallel Encryption***"));
 			EAXSpeedTest(engine, true, true);
 
-			OnProgress("***AES-GCM Sequential Encryption***");
+			OnProgress(std::string("***AES-GCM Sequential Encryption***"));
 			GCMSpeedTest(engine, true, false);
-			OnProgress("***AES-GCM Parallel Encryption***");
+			OnProgress(std::string("***AES-GCM Parallel Encryption***"));
 			GCMSpeedTest(engine, true, true);
 
-			OnProgress("***AES-OCB Sequential Encryption***");
+			OnProgress(std::string("***AES-OCB Sequential Encryption***"));
 			OCBSpeedTest(engine, true, false);
-			OnProgress("***AES-OCB Parallel Encryption***");
+			OnProgress(std::string("***AES-OCB Parallel Encryption***"));
 			OCBSpeedTest(engine, true, true);
 
 			delete engine;
 
-			OnProgress("### STREAM CIPHER TESTS ###");
-			OnProgress("### Tests speeds of Salsa and ChaCha20 stream ciphers");
-			OnProgress("### Uses default of 20 rounds, 256 bit key");
-			OnProgress("");
+			OnProgress(std::string("### STREAM CIPHER TESTS ###"));
+			OnProgress(std::string("### Tests speeds of Salsa and ChaCha20 stream ciphers"));
+			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
+			OnProgress(std::string(""));
 
-			OnProgress("***Salsa20: Monte Carlo test (K=256; R=20)***");
+			OnProgress(std::string("***Salsa20: Monte Carlo test (K=256; R=20)***"));
 			SalsaSpeedTest();
-			OnProgress("***ChaCha20: Monte Carlo test (K=256; R=20)***");
+			OnProgress(std::string("***ChaCha20: Monte Carlo test (K=256; R=20)***"));
 			ChaChaSpeedTest();
 
 			return MESSAGE;
@@ -283,7 +283,7 @@ namespace Test
 		}
 	}
 
-	void CipherSpeedTest::OnProgress(char* Data)
+	void CipherSpeedTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -325,7 +325,7 @@ namespace Test
 					counter += buffer1.size();
 				}
 				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				OnProgress(const_cast<char*>(calc.c_str()));
+				OnProgress(calc);
 			}
 		}
 		else
@@ -341,7 +341,7 @@ namespace Test
 					counter += buffer1.size();
 				}
 				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				OnProgress(const_cast<char*>(calc.c_str()));
+				OnProgress(calc);
 			}
 		}
 
@@ -351,8 +351,8 @@ namespace Test
 		std::string mbps = IntUtils::ToString(rate / MB1);
 		std::string secs = IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
-		OnProgress(const_cast<char*>(resp.c_str()));
-		OnProgress("");
+		OnProgress(resp);
+		OnProgress(std::string(""));
 	}
 
 	// Note: internal test, ignore
@@ -380,12 +380,12 @@ namespace Test
 		do
 		{
 			i = ctr1.size();
-			while (--i >= 0 && ++ctr1[i] == 0) {}
+			while (--i > 0 && ++ctr1[i] == 0) {}
 
 		} while (--itr != 0);
 
 		std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
-		OnProgress(const_cast<char*>(calc.c_str()));
+		OnProgress(calc);
 
 
 		// counter 2
@@ -405,7 +405,7 @@ namespace Test
 		} while (--itr != 0);
 
 		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
-		OnProgress(const_cast<char*>(calc.c_str()));
+		OnProgress(calc);
 
 
 		// counter 3
@@ -420,7 +420,7 @@ namespace Test
 		} while (--itr != 0);
 
 		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
-		OnProgress(const_cast<char*>(calc.c_str()));
+		OnProgress(calc);
 
 
 		// counter 4
@@ -441,7 +441,7 @@ namespace Test
 		} while (--itr != 0);
 
 		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
-		OnProgress(const_cast<char*>(calc.c_str()));
+		OnProgress(calc);
 
 
 		// counter 5
@@ -450,13 +450,13 @@ namespace Test
 
 		do
 		{
-			for (size_t j = ctr5.size() - 1, carry = 1; j >= 0 && carry; j--)
+			for (size_t j = ctr5.size() - 1, carry = 1; j > 0 && carry; j--)
 				carry = !++ctr5[j];
 
 		} while (--itr != 0);
 
 		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
-		OnProgress(const_cast<char*>(calc.c_str()));
+		OnProgress(calc);
 	}
 
 }

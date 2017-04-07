@@ -11,9 +11,9 @@ namespace Test
 			Initialize();
 
 			TestInit();
-			OnProgress("KDF2Test: Passed initialization tests..");
+			OnProgress(std::string("KDF2Test: Passed initialization tests.."));
 			CompareVector(m_key, m_output);
-			OnProgress("KDF2Test: Passed 256 bit vectors test..");
+			OnProgress(std::string("KDF2Test: Passed 256 bit vectors test.."));
 
 			return SUCCESS;
 		}
@@ -46,7 +46,7 @@ namespace Test
 		HexConverter::Decode("10a2403db42a8743cb989de86e668d168cbe6046e23ff26f741e87949a3bba1311ac179f819a3d18412e9eb45668f2923c087c1299005f8d5fd42ca257bc93e8fee0c5a0d2a8aa70185401fbbd99379ec76c663e9a29d0b70f3fe261a59cdc24875a60b4aacb1319fa11c3365a8b79a44669f26fba933d012db213d7e3b16349", m_output);
 	}
 
-	void KDF2Test::OnProgress(char* Data)
+	void KDF2Test::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

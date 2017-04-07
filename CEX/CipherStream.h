@@ -40,7 +40,6 @@ NAMESPACE_PROCESSING
 
 using Enumeration::BlockCiphers;
 using Exception::CryptoProcessingException;
-using Processing::CipherDescription;
 using Enumeration::CipherModes;
 using Enumeration::Digests;
 using Routing::Event;

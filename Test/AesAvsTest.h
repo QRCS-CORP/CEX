@@ -54,7 +54,7 @@ namespace Test
 #if defined(__AVX__)
 		void CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 #endif
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
     };
 }
 

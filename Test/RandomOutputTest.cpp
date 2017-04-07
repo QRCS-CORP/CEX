@@ -27,23 +27,23 @@ namespace Test
 		{
 			// providers
 			//CJPGenerateFile(FILEPATH + "cjp_10mb.txt", FILESIZE); // can take an hour or more!
-			//OnProgress("CPU Jitter Provider completed..");
+			//OnProgress(std::string("CPU Jitter Provider completed.."));
 			CSPGenerateFile(FILEPATH + "csp_10mb.txt", FILESIZE);
-			OnProgress("System Crypto Service Provider completed..");
+			OnProgress(std::string("System Crypto Service Provider completed.."));
 			ECPGenerateFile(FILEPATH + "ecp_10mb.txt", FILESIZE);
-			OnProgress("Entropy Collection Provider completed..");
+			OnProgress(std::string("Entropy Collection Provider completed.."));
 			RDPGenerateFile(FILEPATH + "rdp_10mb.txt", FILESIZE);
-			OnProgress("RDSeed Provider completed..");
+			OnProgress(std::string("RDSeed Provider completed.."));
 
 			// drbg's
 			CMGGenerateFile(FILEPATH + "cmg_10mb.txt", FILESIZE);
-			OnProgress("Counter Mode Generator completed..");
+			OnProgress(std::string("Counter Mode Generator completed.."));
 			DCGGenerateFile(FILEPATH + "dcg_10mb.txt", FILESIZE);
-			OnProgress("Digest Counter Generator completed..");
+			OnProgress(std::string("Digest Counter Generator completed.."));
 			HMGGenerateFile(FILEPATH + "hmg_10mb.txt", FILESIZE);
-			OnProgress("Hash based Mac Generator completed..");
+			OnProgress(std::string("Hash based Mac Generator completed.."));
 
-			OnProgress("Passed Finalize/Compute methods output comparison..");
+			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
 
 			return SUCCESS;
 		}
@@ -258,7 +258,7 @@ namespace Test
 		delete pvd;
 	}
 
-	void RandomOutputTest::OnProgress(char* Data)
+	void RandomOutputTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

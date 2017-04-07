@@ -11,13 +11,13 @@ namespace Test
 		try
 		{
 			CompareOutput(new Padding::ISO7816());
-			OnProgress("PaddingTest: Passed ISO7816 comparison tests..");
+			OnProgress(std::string("PaddingTest: Passed ISO7816 comparison tests.."));
 			CompareOutput(new Padding::PKCS7());
-			OnProgress("PaddingTest: Passed PKCS7 comparison tests..");
+			OnProgress(std::string("PaddingTest: Passed PKCS7 comparison tests.."));
 			CompareOutput(new Padding::TBC());
-			OnProgress("PaddingTest: Passed TBC comparison tests..");
+			OnProgress(std::string("PaddingTest: Passed TBC comparison tests.."));
 			CompareOutput(new Padding::X923());
-			OnProgress("PaddingTest: Passed X923 comparison tests..");
+			OnProgress(std::string("PaddingTest: Passed X923 comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -69,7 +69,7 @@ namespace Test
 		delete Padding;
 	}
 
-	void PaddingTest::OnProgress(char* Data)
+	void PaddingTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

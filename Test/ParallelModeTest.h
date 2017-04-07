@@ -31,10 +31,10 @@ namespace Test
 #endif
 
 		TestEventHandler m_progressEvent;
-		std::vector<std::vector<byte>> m_katExpected;
-		size_t m_processorCount;
 		bool m_hasAESNI;
 		bool m_hasSSE;
+		std::vector<std::vector<byte>> m_katExpected;
+		size_t m_processorCount;
 
     public:
 		/// <summary>
@@ -100,7 +100,7 @@ namespace Test
 		void BlockEncrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void GetBytes(size_t Size, std::vector<byte> &Output);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 		void ParallelCTR(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void ParallelDecrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		// buffered blocks: t(in, out)
@@ -108,7 +108,7 @@ namespace Test
 		// loop through: t(in, inoff, out, outoff)
 		void Transform2(Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
 		// whole array: t(in, inoff, out, outoff, len)
-		void Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
+		void Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output);
     };
 }
 

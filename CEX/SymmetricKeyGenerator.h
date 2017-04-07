@@ -15,9 +15,6 @@ NAMESPACE_KEYSYMMETRIC
 using Exception::CryptoGeneratorException;
 using Enumeration::Digests;
 using Enumeration::Providers;
-using Symmetric::SymmetricKey;
-using Symmetric::SymmetricKeySize;
-using Symmetric::SymmetricSecureKey;
 
 /// <summary>
 /// A helper class for generating cryptographically strong keying material.

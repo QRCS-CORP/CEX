@@ -16,9 +16,9 @@ namespace Test
 		try
 		{
 			CheckInit();
-			OnProgress("CMG: Passed initialization tests..");
+			OnProgress(std::string("CMG: Passed initialization tests.."));
 			CompareOutput();
-			OnProgress("CMG: Passed output comparison tests..");
+			OnProgress(std::string("CMG: Passed output comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -143,7 +143,7 @@ namespace Test
 		return false;
 	}
 
-	void CMGTest::OnProgress(char* Data)
+	void CMGTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

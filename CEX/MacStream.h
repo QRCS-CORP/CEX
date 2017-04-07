@@ -38,7 +38,6 @@ using Routing::Event;
 using Key::Symmetric::ISymmetricKey;
 using IO::IByteStream;
 using Mac::IMac;
-using Processing::MacDescription;
 
 /// <summary>
 /// MAC stream helper class.

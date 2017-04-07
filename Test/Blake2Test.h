@@ -62,7 +62,7 @@ namespace Test
 		void Blake2SPTest();
 		void MacParamsTest();
 		void TreeParamsTest();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 #endif

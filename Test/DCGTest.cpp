@@ -12,13 +12,13 @@ namespace Test
 		try
 		{
 			CheckInit();
-			OnProgress("DCG: Passed initialization tests..");
+			OnProgress(std::string("DCG: Passed initialization tests.."));
 
 			// old tests do not meet minimum seed size requirements
 			//Initialize();
 			//CompareOutput(m_seed256[0], m_expected256[0]);
 			//CompareOutput(m_seed256[1], m_expected256[1]);
-			//OnProgress("DCG: Passed output comparison tests..");
+			//OnProgress(std::string("DCG: Passed output comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -145,7 +145,7 @@ namespace Test
 		HexConverter::Decode(exp256Encoded, 2, m_expected256);
 	}
 
-	void DCGTest::OnProgress(char* Data)
+	void DCGTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

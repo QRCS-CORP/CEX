@@ -8,6 +8,7 @@ namespace Test
 		try
 		{
 			EvaluateRange();
+			OnProgress(std::string("GMACTest: Passed Rng range validation tests.."));
 
 			return SUCCESS;
 		}
@@ -33,7 +34,7 @@ namespace Test
 				j++;
 			// improbable but not impossible, could indicate a problem though..
 			if (j > delta)
-				OnProgress("Warning! Exceeded max. expected zeroes in set..");
+				OnProgress(std::string("Warning! Exceeded max. expected zeroes in set.."));
 		}
 
 		bt.clear();
@@ -44,7 +45,7 @@ namespace Test
 			if (bt[i] == 0)
 				j++;
 			if (j > 16)
-				OnProgress("Warning! Exceeded max. expected zeroes in set..");
+				OnProgress(std::string("Warning! Exceeded max. expected zeroes in set.."));
 		}
 
 		unsigned int xi = 0;
@@ -82,7 +83,7 @@ namespace Test
 		}
 	}
 
-	void RangedRngTest::OnProgress(char* Data)
+	void RangedRngTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

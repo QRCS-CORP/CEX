@@ -62,7 +62,7 @@ namespace Test
 	private:
 		void GMACCompare(std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &PlainText, std::vector<byte> &MacCode);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

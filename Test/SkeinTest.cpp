@@ -13,13 +13,13 @@ namespace Test
 			Initialize();
 
 			TreeParamsTest();
-			OnProgress("Passed SkeinParams parameter serialization test..");
+			OnProgress(std::string("Passed SkeinParams parameter serialization test.."));
 
 			Skein256* sk256 = new Skein256();
 			CompareVector(sk256, m_message256[0], m_expected256[0]);
 			CompareVector(sk256, m_message256[1], m_expected256[1]);
 			CompareVector(sk256, m_message256[2], m_expected256[2]);
-			OnProgress("Passed Skein 256 bit digest vector tests..");
+			OnProgress(std::string("Passed Skein 256 bit digest vector tests.."));
 			delete sk256;
 
 			Skein512* sk512 = new Skein512();
@@ -27,14 +27,14 @@ namespace Test
 			CompareVector(sk512, m_message512[1], m_expected512[1]);
 			CompareVector(sk512, m_message512[2], m_expected512[2]);
 			delete sk512;
-			OnProgress("Passed Skein 512 bit digest vector tests..");
+			OnProgress(std::string("Passed Skein 512 bit digest vector tests.."));
 
 			Skein1024* sk1024 = new Skein1024();
 			CompareVector(sk1024, m_message1024[0], m_expected1024[0]);
 			CompareVector(sk1024, m_message1024[1], m_expected1024[1]);
 			CompareVector(sk1024, m_message1024[2], m_expected1024[2]);
 			delete sk1024;
-			OnProgress("Passed Skein 1024 bit digest vector tests..");
+			OnProgress(std::string("Passed Skein 1024 bit digest vector tests.."));
 
 			Skein256* sks2 = new Skein256(true);
 			SkeinParams sp1(32, 32, 8);
@@ -42,7 +42,7 @@ namespace Test
 			CompareParallel(sks2, sks3);
 			delete sks2;
 			delete sks3;
-			OnProgress("Passed Skein 256 parallelization tests..");
+			OnProgress(std::string("Passed Skein 256 parallelization tests.."));
 
 			Skein512* skm2 = new Skein512(true);
 			SkeinParams sp2(64, 64, 8);
@@ -50,7 +50,7 @@ namespace Test
 			CompareParallel(skm2, skm3);
 			delete skm2;
 			delete skm3;
-			OnProgress("Passed Skein 512 parallelization tests..");
+			OnProgress(std::string("Passed Skein 512 parallelization tests.."));
 
 			Skein1024* skl2 = new Skein1024(true);
 			SkeinParams sp3(128, 128, 8);
@@ -58,7 +58,7 @@ namespace Test
 			CompareParallel(skl2, skl3);
 			delete skl2;
 			delete skl3;
-			OnProgress("Passed Skein 1024 parallelization tests..");
+			OnProgress(std::string("Passed Skein 1024 parallelization tests.."));
 
 			return SUCCESS;
 		}
@@ -204,7 +204,7 @@ namespace Test
 			throw std::string("SkeinTest: Tree parameters test failed!");
 	}
 
-	void SkeinTest::OnProgress(char* Data)
+	void SkeinTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

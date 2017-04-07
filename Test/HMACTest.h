@@ -58,7 +58,7 @@ namespace Test
 		void CompareVector256(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void CompareVector512(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

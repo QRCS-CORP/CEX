@@ -36,17 +36,17 @@ private:
 
 	static const size_t HDR_BASE = 12;
 
-	byte m_outputSize;
-	byte m_keyLen;
-	byte m_fanOut;
-	byte m_innerLen;
-	uint m_leafSize;
-	byte m_nodeOffset;
-	byte m_maxDepth;
-	byte m_nodeDepth;
-	byte m_reserved;
 	// 256=12, 512=40
 	std::vector<byte> m_dstCode;
+	byte m_fanOut;
+	byte m_innerLen;
+	byte m_keyLen;
+	uint m_leafSize;
+	byte m_maxDepth;
+	byte m_nodeDepth;
+	byte m_nodeOffset;
+	byte m_outputSize;
+	byte m_reserved;
 
 public:
 
@@ -125,16 +125,16 @@ public:
 	/// <param name="InnerLength">Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)</param>
 	explicit BlakeParams(byte OutputSize, byte TreeDepth = 1, byte Fanout = 1, byte LeafSize = 0, byte InnerLength = 0)
 		:
-		m_outputSize(OutputSize),
-		m_keyLen(0),
+		m_dstCode(0),
 		m_fanOut(Fanout),
-		m_maxDepth(TreeDepth),
-		m_leafSize(LeafSize),
-		m_nodeOffset(0),
-		m_nodeDepth(0),
 		m_innerLen(InnerLength),
-		m_reserved(0),
-		m_dstCode(0)
+		m_keyLen(0),
+		m_leafSize(LeafSize),
+		m_maxDepth(TreeDepth),
+		m_nodeDepth(0),
+		m_nodeOffset(0),
+		m_outputSize(OutputSize),
+		m_reserved(0)
 	{
 		m_dstCode.resize(DistributionCodeMax());
 	}
@@ -144,16 +144,16 @@ public:
 	/// </summary>
 	explicit BlakeParams(const std::vector<byte> &TreeArray)
 		:
-		m_outputSize(0),
-		m_keyLen(0),
+		m_dstCode(0),
 		m_fanOut(0),
-		m_maxDepth(0),
-		m_leafSize(0),
-		m_nodeOffset(0),
-		m_nodeDepth(0),
 		m_innerLen(0),
-		m_reserved(0),
-		m_dstCode(0)
+		m_keyLen(0),
+		m_leafSize(0),
+		m_maxDepth(0),
+		m_nodeDepth(0),
+		m_nodeOffset(0),
+		m_outputSize(0),
+		m_reserved(0)
 	{
 		if (TreeArray.size() != 32 && TreeArray.size() != 64)
 			throw Exception::CryptoDigestException("BlakeParams:Ctor", "The TreeArray buffer is too short!");
@@ -186,16 +186,16 @@ public:
 	/// <param name="DistributionCode">The optional personalization string; must be no longer than DistributionCodeMax in size</param>
 	explicit BlakeParams(byte OutputSize, byte KeyLength, byte FanOut, byte MaxDepth, uint LeafLength, byte NodeOffset, byte NodeDepth, byte InnerLength, std::vector<byte> &DistributionCode)
 		:
-		m_outputSize(OutputSize),
-		m_keyLen(KeyLength),
+		m_dstCode(DistributionCode),
 		m_fanOut(FanOut),
-		m_maxDepth(MaxDepth),
-		m_leafSize(LeafLength),
-		m_nodeOffset(NodeOffset),
-		m_nodeDepth(NodeDepth),
 		m_innerLen(InnerLength),
-		m_reserved(0),
-		m_dstCode(DistributionCode)
+		m_keyLen(KeyLength),
+		m_leafSize(LeafLength),
+		m_maxDepth(MaxDepth),
+		m_nodeDepth(NodeDepth),
+		m_nodeOffset(NodeOffset),
+		m_outputSize(OutputSize),
+		m_reserved(0)
 	{
 		m_dstCode.resize(DistributionCodeMax());
 	}

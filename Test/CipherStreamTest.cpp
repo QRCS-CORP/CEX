@@ -34,58 +34,58 @@ namespace Test
 			//FileStreamTest();
 
 			CbcModeTest();
-			OnProgress("Passed CBC Mode tests..");
+			OnProgress(std::string("Passed CBC Mode tests.."));
 			CfbModeTest();
-			OnProgress("Passed CFB Mode tests..");
+			OnProgress(std::string("Passed CFB Mode tests.."));
 			CtrModeTest();
-			OnProgress("Passed CTR Mode tests..");
+			OnProgress(std::string("Passed CTR Mode tests.."));
 			OfbModeTest();
-			OnProgress("Passed OFB Mode tests..");
+			OnProgress(std::string("Passed OFB Mode tests.."));
 			StreamTest();
-			OnProgress("Passed Stream Cipher tests");
+			OnProgress(std::string("Passed Stream Cipher tests"));
 
 			MemoryStreamTest();
-			OnProgress("Passed MemoryStream self test.. ");
-			OnProgress("");
+			OnProgress(std::string("Passed MemoryStream self test.. "));
+			OnProgress(std::string(""));
 
 			SerializeStructTest();
-			OnProgress("Passed CipherDescription serialization test..");
-			OnProgress("");
+			OnProgress(std::string("Passed CipherDescription serialization test.."));
+			OnProgress(std::string(""));
 
-			OnProgress("***Testing Cipher Parameters***.. ");
+			OnProgress(std::string("***Testing Cipher Parameters***.. "));
 			ParametersTest();
-			OnProgress("Passed Cipher Parameters tests..");
+			OnProgress(std::string("Passed Cipher Parameters tests.."));
 
 			Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-			OnProgress("***Testing Padding Modes***..");
+			OnProgress(std::string("***Testing Padding Modes***.."));
 			StreamModesTest(new CBC(eng), new X923());
-			OnProgress("Passed CBC/X923 CipherStream test..");
+			OnProgress(std::string("Passed CBC/X923 CipherStream test.."));
 			StreamModesTest(new CBC(eng), new PKCS7());
-			OnProgress("Passed CBC/PKCS7 CipherStream test..");
+			OnProgress(std::string("Passed CBC/PKCS7 CipherStream test.."));
 			StreamModesTest(new CBC(eng), new TBC());
-			OnProgress("Passed CBC/TBC CipherStream test..");
+			OnProgress(std::string("Passed CBC/TBC CipherStream test.."));
 			StreamModesTest(new CBC(eng), new ISO7816());
-			OnProgress("Passed CBC/ISO7816 CipherStream test..");
-			OnProgress("");
+			OnProgress(std::string("Passed CBC/ISO7816 CipherStream test.."));
+			OnProgress(std::string(""));
 
-			OnProgress("***Testing Cipher Modes***..");
+			OnProgress(std::string("***Testing Cipher Modes***.."));
 			StreamModesTest(new CTR(eng), new ISO7816());
-			OnProgress("Passed CTR CipherStream test..");
+			OnProgress(std::string("Passed CTR CipherStream test.."));
 			StreamModesTest(new CFB(eng), new ISO7816());
-			OnProgress("Passed CFB CipherStream test..");
+			OnProgress(std::string("Passed CFB CipherStream test.."));
 			StreamModesTest(new OFB(eng), new ISO7816());
-			OnProgress("Passed OFB CipherStream test..");
-			OnProgress("");
+			OnProgress(std::string("Passed OFB CipherStream test.."));
+			OnProgress(std::string(""));
 			delete eng;/**/
 
-			OnProgress("***Testing Stream Ciphers***..");
+			OnProgress(std::string("***Testing Stream Ciphers***.."));
 			StreamingTest(new Cipher::Symmetric::Stream::ChaCha20());
-			OnProgress("Passed ChaCha20 CipherStream test..");
+			OnProgress(std::string("Passed ChaCha20 CipherStream test.."));
 			StreamingTest(new Cipher::Symmetric::Stream::Salsa20());
-			OnProgress("Passed Salsa20 CipherStream test..");
-			OnProgress("");
+			OnProgress(std::string("Passed Salsa20 CipherStream test.."));
+			OnProgress(std::string(""));
 
-			OnProgress("***Testing Cipher Description Initialization***..");
+			OnProgress(std::string("***Testing Cipher Description Initialization***.."));
 			Processing::CipherDescription cd(
 				SymmetricEngines::RHX,		// cipher engine
 				32,							// key size in bytes
@@ -97,18 +97,18 @@ namespace Test
 				Digests::None);				// optional HMAC engine
 
 			DescriptionTest(&cd);
-			OnProgress("Passed CipherDescription stream test..");
-			OnProgress("");
+			OnProgress(std::string("Passed CipherDescription stream test.."));
+			OnProgress(std::string(""));
 
-			OnProgress("***Testing Block Ciphers***.. ");
+			OnProgress(std::string("***Testing Block Ciphers***.. "));
 			Cipher::Symmetric::Block::THX* tfx = new Cipher::Symmetric::Block::THX();
 			StreamModesTest(new CBC(tfx), new ISO7816());
 			delete tfx;
-			OnProgress("Passed THX CipherStream test..");
+			OnProgress(std::string("Passed THX CipherStream test.."));
 			Cipher::Symmetric::Block::SHX* spx = new Cipher::Symmetric::Block::SHX();
 			StreamModesTest(new CBC(spx), new ISO7816());
 			delete spx;
-			OnProgress("Passed SHX CipherStream test..");
+			OnProgress(std::string("Passed SHX CipherStream test.."));
 
 			m_key.resize(192);
 			for (unsigned int i = 0; i < 192; i++)
@@ -118,16 +118,16 @@ namespace Test
 			Cipher::Symmetric::Block::RHX* rhx = new Cipher::Symmetric::Block::RHX();
 			StreamModesTest(new CBC(rhx), new ISO7816());
 			delete rhx;
-			OnProgress("Passed RHX extended CipherStream test..");
+			OnProgress(std::string("Passed RHX extended CipherStream test.."));
 			Cipher::Symmetric::Block::SHX* shx = new Cipher::Symmetric::Block::SHX();
 			StreamModesTest(new CBC(shx), new ISO7816());
 			delete shx;
-			OnProgress("Passed SHX extended CipherStream test..");
+			OnProgress(std::string("Passed SHX extended CipherStream test.."));
 			Cipher::Symmetric::Block::THX* thx = new Cipher::Symmetric::Block::THX();
 			StreamModesTest(new CBC(thx), new ISO7816());
 			delete thx;
-			OnProgress("Passed THX extended CipherStream test..");
-			OnProgress("");
+			OnProgress(std::string("Passed THX extended CipherStream test.."));
+			OnProgress(std::string(""));
 
 			return SUCCESS;
 		}
@@ -1113,7 +1113,7 @@ namespace Test
 		}
 	}
 
-	void CipherStreamTest::OnProgress(char* Data)
+	void CipherStreamTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

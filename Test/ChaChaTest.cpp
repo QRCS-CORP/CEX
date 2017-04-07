@@ -15,16 +15,16 @@ namespace Test
 			// test vectors with 8/12/20 rounds and 128/256 keys
 			CompareVector(20, m_key[0], m_iv[0], m_plainText, m_cipherText[0]);
 			CompareVector(20, m_key[1], m_iv[0], m_plainText, m_cipherText[1]);
-			OnProgress("ChaChaTest: Passed 20 round vector tests..");
+			OnProgress(std::string("ChaChaTest: Passed 20 round vector tests.."));
 			CompareVector(12, m_key[0], m_iv[0], m_plainText, m_cipherText[2]);
 			CompareVector(8, m_key[0], m_iv[0], m_plainText, m_cipherText[3]);
-			OnProgress("ChaChaTest: Passed 8 and 12 round vector tests..");
+			OnProgress(std::string("ChaChaTest: Passed 8 and 12 round vector tests.."));
 			CompareVector(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
 			CompareVector(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
-			OnProgress("ChaChaTest: Passed 256 bit key vector tests..");
+			OnProgress(std::string("ChaChaTest: Passed 256 bit key vector tests.."));
 			// TODO: failing on i3
 			//CompareParallel();
-			//OnProgress("ChaChaTest: Passed parallel/linear equality tests..");
+			//OnProgress(std::string("ChaChaTest: Passed parallel/linear equality tests.."));
 
 			return SUCCESS;
 		}
@@ -118,7 +118,7 @@ namespace Test
 		HexConverter::Decode(cipherTextEncoded, 6, m_cipherText);
 	}
 
-	void ChaChaTest::OnProgress(char* Data)
+	void ChaChaTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

@@ -81,7 +81,7 @@ namespace Test
 			throw TestException("CompareSerial: The serialized key is invalid!");
 	}
 
-	void SecureStreamTest::OnProgress(char* Data)
+	void SecureStreamTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

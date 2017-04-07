@@ -22,15 +22,15 @@ namespace Test
 			if (detect.AESNI())
 			{
 				AHXMonteCarlo();
-				OnProgress("AHX: Passed AES-NI Monte Carlo tests..");
+				OnProgress(std::string("AHX: Passed AES-NI Monte Carlo tests.."));
 			}
 #endif
 			RHXMonteCarlo();
-			OnProgress("RHX: Passed RHX Monte Carlo tests..");
+			OnProgress(std::string("RHX: Passed RHX Monte Carlo tests.."));
 			SHXMonteCarlo();
-			OnProgress("SHX: Passed SHX Monte Carlo tests..");
+			OnProgress(std::string("SHX: Passed SHX Monte Carlo tests.."));
 			THXMonteCarlo();
-			OnProgress("THX: Passed THX Monte Carlo tests..");
+			OnProgress(std::string("THX: Passed THX Monte Carlo tests.."));
 
 			return SUCCESS;
 		}
@@ -80,7 +80,7 @@ namespace Test
 			m_iv[i] = (byte)i;
 	}
 
-	void HXCipherTest::OnProgress(char* Data)
+	void HXCipherTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

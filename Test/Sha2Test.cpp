@@ -13,7 +13,7 @@ namespace Test
 			Initialize();
 
 			TreeParamsTest();
-			OnProgress("Passed SHA2Params parameter serialization test..");
+			OnProgress(std::string("Passed SHA2Params parameter serialization test.."));
 
 			SHA256* sha256 = new SHA256();
 			CompareVector(sha256, m_message[0], m_expected256[0]);
@@ -21,7 +21,7 @@ namespace Test
 			CompareVector(sha256, m_message[2], m_expected256[2]);
 			CompareVector(sha256, m_message[3], m_expected256[3]);
 			delete sha256;
-			OnProgress("Sha2Test: Passed SHA-2 256 bit digest vector tests..");
+			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));
 
 			SHA512* sha512 = new SHA512();
 			CompareVector(sha512, m_message[0], m_expected512[0]);
@@ -29,7 +29,7 @@ namespace Test
 			CompareVector(sha512, m_message[2], m_expected512[2]);
 			CompareVector(sha512, m_message[3], m_expected512[3]);
 			delete sha512;
-			OnProgress("Sha2Test: Passed SHA-2 512 bit digest vector tests..");
+			OnProgress(std::string("Sha2Test: Passed SHA-2 512 bit digest vector tests.."));
 
 			return SUCCESS;
 		}
@@ -88,7 +88,7 @@ namespace Test
 		HexConverter::Decode(exp512Encoded, 4, m_expected512);
 	}
 
-	void SHA2Test::OnProgress(char* Data)
+	void SHA2Test::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

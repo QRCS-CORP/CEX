@@ -53,7 +53,7 @@ namespace Test
 		void CheckInit();
 		void CheckMac();
 		bool CheckRuns(const std::vector<byte> &Input);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

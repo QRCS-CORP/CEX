@@ -12,9 +12,9 @@ namespace Test
 		try
 		{
 			CheckMac();
-			OnProgress("HMG: Passed mac engine tests..");
+			OnProgress(std::string("HMG: Passed mac engine tests.."));
 			CheckInit();
-			OnProgress("HMG: Passed initialization tests..");
+			OnProgress(std::string("HMG: Passed initialization tests.."));
 
 			return SUCCESS;
 		}
@@ -274,7 +274,7 @@ namespace Test
 		return false;
 	}
 
-	void HMGTest::OnProgress(char* Data)
+	void HMGTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

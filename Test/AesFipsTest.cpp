@@ -24,7 +24,7 @@ namespace Test
 					CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
 			}
 
-			OnProgress("AesFipsTest: Passed FIPS 197 Monte Carlo tests..");
+			OnProgress(std::string("AesFipsTest: Passed FIPS 197 Monte Carlo tests.."));
 
 			for (unsigned int i = 12; i < m_plainText.size(); i++)
 			{
@@ -36,7 +36,7 @@ namespace Test
 					CompareMonteCarlo(m_keys[i], m_plainText[i], m_cipherText[i]);
 			}
 
-			OnProgress("AesFipsTest: Passed Extended Monte Carlo tests..");
+			OnProgress(std::string("AesFipsTest: Passed Extended Monte Carlo tests.."));
 
 			return SUCCESS;
 		}
@@ -242,7 +242,7 @@ namespace Test
 		HexConverter::Decode(cipherTextEncoded, 24, m_cipherText);
 	}
 
-	void AesFipsTest::OnProgress(char* Data)
+	void AesFipsTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

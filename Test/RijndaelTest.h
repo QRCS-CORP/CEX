@@ -56,7 +56,7 @@ namespace Test
     private:
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
     };
 }
 

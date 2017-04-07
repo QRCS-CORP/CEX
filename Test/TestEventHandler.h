@@ -3,15 +3,16 @@
 
 #include "TestEvent.h"
 #include "ConsoleUtils.h"
+#include <string>
 
 namespace Test
 {
 	class TestEventHandler : public TestEvent<TestEventHandler>
 	{
 	public:
-		void operator()(const char* Data)
+		void operator()(const std::string Data)
 		{
-			ConsoleUtils::WriteLine(std::string(Data));
+			ConsoleUtils::WriteLine(Data);
 		}
 	};
 }

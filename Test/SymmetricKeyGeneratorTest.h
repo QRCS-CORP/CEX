@@ -53,7 +53,7 @@ namespace Test
 		void CheckInit();
 		bool IsGoodRun(const std::vector<byte> &Input);
 		bool IsValidKey(Key::Symmetric::ISymmetricKey &KeyParam);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

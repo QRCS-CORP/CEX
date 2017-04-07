@@ -53,11 +53,11 @@ namespace Test
 			try
 			{
 				CheckInit();
-				OnProgress("SymmetricKeyTest: Passed initialization tests..");
+				OnProgress(std::string("SymmetricKeyTest: Passed initialization tests.."));
 				CheckAccess();
-				OnProgress("SymmetricKeyTest: Passed output comparison tests..");
+				OnProgress(std::string("SymmetricKeyTest: Passed output comparison tests.."));
 				CompareSerial();
-				OnProgress("SymmetricKeyTest: Passed key serialization tests..");
+				OnProgress(std::string("SymmetricKeyTest: Passed key serialization tests.."));
 
 				return SUCCESS;
 			}
@@ -76,7 +76,7 @@ namespace Test
 		void CheckAccess();
 		void CheckInit();
 		void CompareSerial();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

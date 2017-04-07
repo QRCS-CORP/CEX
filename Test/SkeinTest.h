@@ -62,7 +62,7 @@ namespace Test
 		void CompareParallel(IDigest* Dgt1, IDigest* Dgt2);
 		void CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 		void TreeParamsTest();
 	};
 }

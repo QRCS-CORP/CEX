@@ -53,7 +53,7 @@ namespace Test
 		void CheckInit();
 		bool CheckRuns(const std::vector<byte> &Input);
 		void CompareOutput();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

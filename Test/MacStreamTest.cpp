@@ -37,7 +37,7 @@ namespace Test
 			HMAC* hmac2 = new HMAC(Enumeration::Digests::SHA256);
 			hmac2->Initialize(kp1);
 			CompareOutput(hmac1, hmac2);
-			OnProgress("Passed MacStream HMAC comparison tests..");
+			OnProgress(std::string("Passed MacStream HMAC comparison tests.."));
 			delete hmac1;
 			delete hmac2;
 			delete sha;
@@ -50,16 +50,16 @@ namespace Test
 			CMAC* cmac2 = new CMAC(Enumeration::BlockCiphers::Rijndael);
 			cmac2->Initialize(kp2);
 			CompareOutput(cmac1, cmac2);
-			OnProgress("Passed MacStream CMAC comparison tests..");
+			OnProgress(std::string("Passed MacStream CMAC comparison tests.."));
 			delete cmac1;
 			delete cmac2;
 			delete eng;
-			OnProgress("Passed CMAC enum initialization test..");
+			OnProgress(std::string("Passed CMAC enum initialization test.."));
 
 			CmacDescriptionTest();
-			OnProgress("Passed CMAC description initialization test..");
+			OnProgress(std::string("Passed CMAC description initialization test.."));
 			HmacDescriptionTest();
-			OnProgress("Passed HMAC description initialization test..");
+			OnProgress(std::string("Passed HMAC description initialization test.."));
 
 			return SUCCESS;
 		}
@@ -143,7 +143,7 @@ namespace Test
 			throw TestException("MacStreamTest: HMAC code arrays are not equal!");
 	}
 
-	void MacStreamTest::OnProgress(char* Data)
+	void MacStreamTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

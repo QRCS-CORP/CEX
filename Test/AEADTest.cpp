@@ -24,16 +24,16 @@ namespace Test
 
 			for (size_t i = 0; i < EAX_TESTSIZE; ++i)
 				CompareVector(cipher1, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
-			OnProgress("AEADTest: Passed EAX known answer comparison tests..");
+			OnProgress(std::string("AEADTest: Passed EAX known answer comparison tests.."));
 
 			StressTest(cipher1);
-			OnProgress("AEADTest: Passed EAX stress tests..");
+			OnProgress(std::string("AEADTest: Passed EAX stress tests.."));
 
 			ParallelTest(cipher1);
-			OnProgress("AEADTest: Passed EAX parallel tests..");
+			OnProgress(std::string("AEADTest: Passed EAX parallel tests.."));
 
 			IncrementalCheck(cipher1);
-			OnProgress("AEADTest: Passed EAX auto incrementing tests..");
+			OnProgress(std::string("AEADTest: Passed EAX auto incrementing tests.."));
 
 			delete cipher1;
 
@@ -41,16 +41,16 @@ namespace Test
 
 			for (size_t i = EAX_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE; ++i)
 				CompareVector(cipher2, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
-			OnProgress("AEADTest: Passed OCB known answer comparison tests..");
+			OnProgress(std::string("AEADTest: Passed OCB known answer comparison tests.."));
 
 			StressTest(cipher2);
-			OnProgress("AEADTest: Passed OCB stress tests..");/**/
+			OnProgress(std::string("AEADTest: Passed OCB stress tests.."));
 
 			ParallelTest(cipher2);
-			OnProgress("AEADTest: Passed OCB parallel tests..");
+			OnProgress(std::string("AEADTest: Passed OCB parallel tests.."));
 
 			IncrementalCheck(cipher2);
-			OnProgress("AEADTest: Passed OCB auto incrementing tests..");
+			OnProgress(std::string("AEADTest: Passed OCB auto incrementing tests.."));
 
 			delete cipher2;
 
@@ -60,13 +60,13 @@ namespace Test
 				CompareVector(cipher3, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 
 			StressTest(cipher3);
-			OnProgress("AEADTest: Passed GCM stress tests..");
+			OnProgress(std::string("AEADTest: Passed GCM stress tests.."));
 
 			ParallelTest(cipher3);
-			OnProgress("AEADTest: Passed GCM parallel tests..");
+			OnProgress(std::string("AEADTest: Passed GCM parallel tests.."));
 
 			IncrementalCheck(cipher3);
-			OnProgress("AEADTest: Passed GCM auto incrementing tests..");
+			OnProgress(std::string("AEADTest: Passed GCM auto incrementing tests.."));
 
 			delete cipher3;
 
@@ -602,7 +602,7 @@ namespace Test
 		HexConverter::Decode(codeEncoded, 44, m_expectedCode);
 	}
 
-	void AEADTest::OnProgress(char* Data)
+	void AEADTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

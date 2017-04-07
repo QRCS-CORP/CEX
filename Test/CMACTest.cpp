@@ -17,19 +17,19 @@ namespace Test
 			CompareVector(m_keys[0], m_input[1], m_expected[1]);
 			CompareVector(m_keys[0], m_input[2], m_expected[2]);
 			CompareVector(m_keys[0], m_input[3], m_expected[3]);
-			OnProgress("Passed 128 bit key vector tests..");
+			OnProgress(std::string("Passed 128 bit key vector tests.."));
 			CompareVector(m_keys[1], m_input[0], m_expected[4]);
 			CompareVector(m_keys[1], m_input[1], m_expected[5]);
 			CompareVector(m_keys[1], m_input[2], m_expected[6]);
 			CompareVector(m_keys[1], m_input[3], m_expected[7]);
-			OnProgress("Passed 192 bit key vector tests..");
+			OnProgress(std::string("Passed 192 bit key vector tests.."));
 			CompareVector(m_keys[2], m_input[0], m_expected[8]);
 			CompareVector(m_keys[2], m_input[1], m_expected[9]);
 			CompareVector(m_keys[2], m_input[2], m_expected[10]);
 			CompareVector(m_keys[2], m_input[3], m_expected[11]);
-			OnProgress("Passed 256 bit key vector tests..");
+			OnProgress(std::string("Passed 256 bit key vector tests.."));
 			CompareAccess(m_keys[2]);
-			OnProgress("Passed Finalize/Compute methods output comparison..");
+			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
 
 			return SUCCESS;
 		}
@@ -118,7 +118,7 @@ namespace Test
 		HexConverter::Decode(expectedEncoded, 12, m_expected);
 	}
 
-	void CMACTest::OnProgress(char* Data)
+	void CMACTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

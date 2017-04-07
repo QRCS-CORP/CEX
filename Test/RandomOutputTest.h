@@ -55,7 +55,7 @@ namespace Test
 		void CSPGenerateFile(std::string FilePath, size_t FileSize);
 		void ECPGenerateFile(std::string FilePath, size_t FileSize);
 		void RDPGenerateFile(std::string FilePath, size_t FileSize);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

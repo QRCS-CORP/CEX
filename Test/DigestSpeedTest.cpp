@@ -27,7 +27,7 @@ namespace Test
 				counter += buffer.size();
 			}
 			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-			OnProgress(const_cast<char*>(calc.c_str()));
+			OnProgress(calc);
 		}
 		dgt->Finalize(hash, 0);
 		delete dgt;
@@ -40,8 +40,8 @@ namespace Test
 		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 
-		OnProgress(const_cast<char*>(resp.c_str()));
-		OnProgress("");
+		OnProgress(resp);
+		OnProgress(std::string(""));
 	}
 
 	uint64_t DigestSpeedTest::GetBytesPerSecond(uint64_t DurationTicks, uint64_t DataSize)
@@ -52,7 +52,7 @@ namespace Test
 		return (uint64_t)(sze / sec);
 	}
 
-	void DigestSpeedTest::OnProgress(char* Data)
+	void DigestSpeedTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

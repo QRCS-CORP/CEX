@@ -45,7 +45,7 @@ namespace Test
 
 	private:
 		void EvaluateRange();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 	};
 }
 

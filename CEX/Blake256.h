@@ -123,9 +123,9 @@ private:
 
 	struct Blake2sState
 	{
+		std::vector<uint> F;
 		std::vector<uint> H;
 		std::vector<uint> T;
-		std::vector<uint> F;
 
 		Blake2sState()
 			:

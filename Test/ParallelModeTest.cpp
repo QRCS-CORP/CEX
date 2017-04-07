@@ -32,90 +32,90 @@ namespace Test
 				CTR* cpr1 = new CTR(BlockCiphers::Rijndael);
 				AccessCheck(cpr1);
 				delete cpr1;
-				OnProgress("ParallelModeTest: Passed CTR parallel/sequential access api tests..");
+				OnProgress(std::string("ParallelModeTest: Passed CTR parallel/sequential access api tests.."));
 
 				ICM* cpr2 = new ICM(BlockCiphers::Rijndael);
 				AccessCheck(cpr2);
 				delete cpr2;
-				OnProgress("ParallelModeTest: Passed ICM parallel/sequential access api tests..");
+				OnProgress(std::string("ParallelModeTest: Passed ICM parallel/sequential access api tests.."));
 
 				CBC* cpr3 = new CBC(BlockCiphers::Rijndael);
 				AccessCheck(cpr3);
 				delete cpr3;
-				OnProgress("ParallelModeTest: Passed CBC parallel/sequential access api tests..");
+				OnProgress(std::string("ParallelModeTest: Passed CBC parallel/sequential access api tests.."));
 
 				CFB* cpr4 = new CFB(BlockCiphers::Rijndael);
 				AccessCheck(cpr4);
 				delete cpr4;
-				OnProgress("ParallelModeTest: Passed CFB parallel/sequential access api tests..");
+				OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
 
 				ECB* cpr5 = new ECB(BlockCiphers::Rijndael);
 				AccessCheck(cpr5);
 				delete cpr5;
-				OnProgress("ParallelModeTest: Passed CFB parallel/sequential access api tests..");
+				OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
 
 #if defined(__AVX__)
 				if (m_hasAESNI)
 				{
 					CompareAhxSimd();
-					OnProgress("ParallelModeTest: AHX Passed AES-NI/Rijndael CTR/CBC comparison tests..");
+					OnProgress(std::string("ParallelModeTest: AHX Passed AES-NI/Rijndael CTR/CBC comparison tests.."));
 
 					AHX* eng1 = new AHX();
 					CompareBcrSimd(eng1);
-					OnProgress("ParallelModeTest: AHX Passed Rijndael Parallel Intrinsics Integrity tests..");
+					OnProgress(std::string("ParallelModeTest: AHX Passed Rijndael Parallel Intrinsics Integrity tests.."));
 					CompareBcrKat(eng1, m_katExpected[0]);
-					OnProgress("ParallelModeTest: AHX Passed Rijndael Monte Carlo KAT test..");
+					OnProgress(std::string("ParallelModeTest: AHX Passed Rijndael Monte Carlo KAT test.."));
 
 					AHX* eng1b = new AHX();
 					CompareCbcDecrypt(eng1, eng1b);
 					delete eng1;
 					delete eng1b;
-					OnProgress("ParallelModeTest: AHX Passed Parallel CBC Decrypt SIMD-128 Integrity tests..");
+					OnProgress(std::string("ParallelModeTest: AHX Passed Parallel CBC Decrypt SIMD-128 Integrity tests.."));
 				}
 #endif
 
 				SHX* eng2 = new SHX();
 				CompareBcrSimd(eng2);
-				OnProgress("ParallelModeTest: SHX Passed Serpent Parallel Intrinsics Integrity tests..");
+				OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Parallel Intrinsics Integrity tests.."));
 				CompareBcrKat(eng2, m_katExpected[1]);
-				OnProgress("ParallelModeTest: SHX Passed Serpent Monte Carlo KAT test..");
+				OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Monte Carlo KAT test.."));
 				//CompareCbcWide(eng2);
-				//OnProgress("ParallelModeTest: SHX Passed CBC-WBV Wide Block Vector integrity and parallel tests.."); //  TODO: why does this fail?
+				//OnProgress(std::string("ParallelModeTest: SHX Passed CBC-WBV Wide Block Vector integrity and parallel tests..")); //  TODO: why does this fail?
 
 				SHX* eng2b = new SHX();
 				CompareCbcDecrypt(eng2, eng2b);
-				OnProgress("ParallelModeTest: SHX Passed Parallel CBC Decrypt SIMD-256 Integrity tests..");
+				OnProgress(std::string("ParallelModeTest: SHX Passed Parallel CBC Decrypt SIMD-256 Integrity tests.."));
 				delete eng2;
 				delete eng2b;
 
 				THX* eng3 = new THX();
 				CompareBcrSimd(eng3);
-				OnProgress("ParallelModeTest: THX Passed Serpent Monte Carlo KAT test..");
+				OnProgress(std::string("ParallelModeTest: THX Passed Serpent Monte Carlo KAT test.."));
 				CompareBcrKat(eng3, m_katExpected[2]);
 				delete eng3;
-				OnProgress("ParallelModeTest: THX Passed Twofish Parallel Intrinsics Integrity tests..");
+				OnProgress(std::string("ParallelModeTest: THX Passed Twofish Parallel Intrinsics Integrity tests.."));
 
 				ChaCha20* stm1 = new ChaCha20();
 				CompareStmSimd(stm1);
-				OnProgress("ParallelModeTest: ChaCha20 Passed Parallel Intrinsics Integrity tests..");
+				OnProgress(std::string("ParallelModeTest: ChaCha20 Passed Parallel Intrinsics Integrity tests.."));
 				CompareStmKat(stm1, m_katExpected[3]);
-				OnProgress("ParallelModeTest: ChaCha20 Passed Monte Carlo KAT test..");
+				OnProgress(std::string("ParallelModeTest: ChaCha20 Passed Monte Carlo KAT test.."));
 				delete stm1;
 
 				Salsa20* stm2 = new Salsa20();
 				CompareStmSimd(stm2);
-				OnProgress("ParallelModeTest: Salsa Passed Parallel Intrinsics Integrity tests..");
+				OnProgress(std::string("ParallelModeTest: Salsa Passed Parallel Intrinsics Integrity tests.."));
 				CompareStmKat(stm2, m_katExpected[4]);
-				OnProgress("ParallelModeTest: Salsa Passed Monte Carlo KAT test..");
+				OnProgress(std::string("ParallelModeTest: Salsa Passed Monte Carlo KAT test.."));
 				delete stm2;
 
-				OnProgress("");
+				OnProgress(std::string(""));
 			}
 
 			CompareParallelLoop();
-			OnProgress("ParallelModeTest: Passed CBC/CFB/CTR/ICM Parallel encryption and decryption looping Integrity tests..");
+			OnProgress(std::string("ParallelModeTest: Passed CBC/CFB/CTR/ICM Parallel encryption and decryption looping Integrity tests.."));
 			CompareParallelOutput();
-			OnProgress("ParallelModeTest: Passed CBC/CFB/CTR/ICM Parallel output encryption and decryption tests..");
+			OnProgress(std::string("ParallelModeTest: Passed CBC/CFB/CTR/ICM Parallel output encryption and decryption tests.."));
 
 			return SUCCESS;
 		}
@@ -732,7 +732,7 @@ namespace Test
 		Key::Symmetric::SymmetricKey kp(key, iv);
 
 		// CTR
-		OnProgress("***Testing Block Cipher Modes***..");
+		OnProgress(std::string("***Testing Block Cipher Modes***.."));
 
 		{
 			RHX* eng = new RHX();
@@ -771,7 +771,7 @@ namespace Test
 
 			delete eng;
 		}
-		OnProgress("Passed CTR Mode tests..");
+		OnProgress(std::string("Passed CTR Mode tests.."));
 
 		{
 			RHX* eng = new RHX();
@@ -810,7 +810,7 @@ namespace Test
 
 			delete eng;
 		}
-		OnProgress("Passed ICM Mode tests..");
+		OnProgress(std::string("Passed ICM Mode tests.."));
 
 		// CBC
 		{
@@ -840,7 +840,7 @@ namespace Test
 
 			delete eng;
 		}
-		OnProgress("Passed CBC Mode tests..");
+		OnProgress(std::string("Passed CBC Mode tests.."));
 
 		// CFB
 		{
@@ -870,7 +870,7 @@ namespace Test
 
 			delete eng;
 		}
-		OnProgress("Passed CFB Mode tests..");
+		OnProgress(std::string("Passed CFB Mode tests.."));
 	}
 
 	void ParallelModeTest::CompareParallelOutput()
@@ -931,8 +931,7 @@ namespace Test
 			// linear 3
 			cipher.Initialize(true, keyParam);
 			cipher.ParallelProfile().IsParallel() = false;
-			blockSize = cipher.BlockSize();
-			Transform3(&cipher, data, blockSize, enc2);
+			Transform3(&cipher, data, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
 				throw TestException("Parallel CTR: Encrypted output is not equal!");
@@ -957,8 +956,7 @@ namespace Test
 			// linear 3
 			cipher.Initialize(false, keyParam);
 			cipher.ParallelProfile().IsParallel() = false;
-			blockSize = cipher.BlockSize();
-			Transform3(&cipher, enc1, blockSize, dec2);
+			Transform3(&cipher, enc1, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw TestException("Parallel CTR: Decrypted output is not equal!");
@@ -980,7 +978,7 @@ namespace Test
 		if (data != dec2)
 			throw TestException("Parallel CTR: Decrypted output is not equal!");
 
-		OnProgress("ParallelModeTest: Passed Parallel CTR encryption and decryption tests");
+		OnProgress(std::string("ParallelModeTest: Passed Parallel CTR encryption and decryption tests"));
 
 		// ICM
 		{
@@ -1013,8 +1011,7 @@ namespace Test
 			// linear 3
 			cipher.Initialize(true, keyParam);
 			cipher.ParallelProfile().IsParallel() = false;
-			blockSize = cipher.BlockSize();
-			Transform3(&cipher, data, blockSize, enc2);
+			Transform3(&cipher, data, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
 				throw TestException("Parallel ICM: Encrypted output is not equal!");
@@ -1047,8 +1044,7 @@ namespace Test
 			// linear 3
 			cipher.Initialize(false, keyParam);
 			cipher.ParallelProfile().IsParallel() = false;
-			blockSize = cipher.BlockSize();
-			Transform3(&cipher, enc1, blockSize, dec2);
+			Transform3(&cipher, enc1, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw TestException("Parallel ICM: Decrypted output is not equal!");
@@ -1070,7 +1066,7 @@ namespace Test
 		if (data != dec2)
 			throw TestException("Parallel ICM: Decrypted output is not equal!");
 
-		OnProgress("ParallelModeTest: Passed Parallel ICM encryption and decryption tests");
+		OnProgress(std::string("ParallelModeTest: Passed Parallel ICM encryption and decryption tests"));
 
 		// CBC
 		{
@@ -1134,7 +1130,7 @@ namespace Test
 		if (dec2 != data)
 			throw TestException("Parallel CBC: Decrypted output is not equal!");
 
-		OnProgress("ParallelModeTest: Passed Parallel CBC decryption tests");
+		OnProgress(std::string("ParallelModeTest: Passed Parallel CBC decryption tests"));
 
 		// CFB
 		{
@@ -1162,8 +1158,7 @@ namespace Test
 			// t3 parallel
 			cipher.Initialize(false, keyParam);
 			cipher.ParallelProfile().IsParallel() = true;
-			blockSize = cipher.ParallelBlockSize();
-			Transform3(&cipher, enc1, blockSize, dec1);
+			Transform3(&cipher, enc1, dec1);
 
 			// t1 linear
 			cipher.Initialize(false, keyParam);
@@ -1183,8 +1178,7 @@ namespace Test
 			// t3 linear
 			cipher.Initialize(false, keyParam);
 			cipher.ParallelProfile().IsParallel() = false;
-			blockSize = cipher.BlockSize();
-			Transform3(&cipher, enc1, blockSize, dec2);
+			Transform3(&cipher, enc1, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
 				throw TestException("Parallel CFB: Decrypted output is not equal!");
@@ -1197,7 +1191,7 @@ namespace Test
 		if (data != dec2)
 			throw TestException("Parallel CFB: Decrypted output is not equal!");
 
-		OnProgress("ParallelModeTest: Passed Parallel CFB decryption tests");
+		OnProgress(std::string("ParallelModeTest: Passed Parallel CFB decryption tests"));
 	}
 
 	void ParallelModeTest::CompareStmKat(IStreamCipher* Engine, std::vector<byte> Expected)
@@ -1390,7 +1384,7 @@ namespace Test
 		}
 	}
 
-	void ParallelModeTest::OnProgress(char* Data)
+	void ParallelModeTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}
@@ -1501,7 +1495,7 @@ namespace Test
 		}
 	}
 
-	void ParallelModeTest::Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output)
+	void ParallelModeTest::Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		Cipher->Transform(Input, 0, Output, 0, Input.size());
 	}

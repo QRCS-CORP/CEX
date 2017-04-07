@@ -12,10 +12,10 @@ namespace Test
 		try
 		{
 			CompareOutput(Enumeration::Digests::SHA256);
-			OnProgress("Passed DigestStream SHA256 comparison tests..");
+			OnProgress(std::string("Passed DigestStream SHA256 comparison tests.."));
 
 			CompareOutput(Enumeration::Digests::SHA512);
-			OnProgress("Passed DigestStream SHA512 comparison tests..");
+			OnProgress(std::string("Passed DigestStream SHA512 comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -58,7 +58,7 @@ namespace Test
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
 	}
 
-	void DigestStreamTest::OnProgress(char* Data)
+	void DigestStreamTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

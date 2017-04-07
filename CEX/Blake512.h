@@ -123,9 +123,9 @@ private:
 
 	struct Blake2bState
 	{
+		std::vector<ulong> F;
 		std::vector<ulong> H;
 		std::vector<ulong> T;
-		std::vector<ulong> F;
 
 		Blake2bState()
 			:

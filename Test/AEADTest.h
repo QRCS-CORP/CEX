@@ -77,7 +77,7 @@ namespace Test
 		void CompareVector(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText, std::vector<byte> &CipherText, std::vector<byte> &MacCode);
 		void IncrementalCheck(IAeadMode* Cipher);
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 		void ParallelTest(IAeadMode* Cipher);
 		void StressTest(IAeadMode* Cipher);
 	};

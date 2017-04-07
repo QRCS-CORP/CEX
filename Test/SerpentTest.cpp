@@ -67,8 +67,8 @@ namespace Test
 			//
 			rcnt = Utility::IntUtils::ToString(rcount);
 			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
-			resp = "Serpent128: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
-			OnProgress(const_cast<char*>(resp.c_str()));
+			resp = "Serpent128: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
+			OnProgress(resp);
 			rcount = 0;
 
 			// 192 bit keys
@@ -105,9 +105,8 @@ namespace Test
 
 			rcnt = Utility::IntUtils::ToString(rcount);
 			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
-			resp = "Serpent192: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
-			OnProgress(const_cast<char*>(resp.c_str()));
-
+			resp = "Serpent192: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
+			OnProgress(resp);
 			rcount = 0;
 
 			// 256 bit keys
@@ -144,13 +143,13 @@ namespace Test
 
 			rcnt = Utility::IntUtils::ToString(rcount);
 			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
-			resp = "Serpent256: Passed Monte Carlo " + rcnt + (std::string)" rounds and " + klen + (std::string)" vectors..";
-			OnProgress(const_cast<char*>(resp.c_str()));
+			resp = "Serpent256: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
+			OnProgress(resp);
 			rcount = 0;
 
 			// 512 bit key encrypt/decrypt self-test
 			CompareOutput();
-			OnProgress("SerpentTest: Passed 512 bit key self test..");
+			OnProgress(std::string("SerpentTest: Passed 512 bit key self test.."));
 
 			return SUCCESS;
 		}
@@ -229,7 +228,7 @@ namespace Test
 			throw TestException("Serpent Vector: Arrays are not equal!");
 	}
 
-	void SerpentTest::OnProgress(char* Data)
+	void SerpentTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

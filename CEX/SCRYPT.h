@@ -94,10 +94,10 @@ private:
 		size_t CpuCost;
 		size_t Parallelization;
 
-		explicit ScryptParameters(size_t CpuCost, size_t Parallelization)
+		explicit ScryptParameters(size_t Cost, size_t Parallel)
 			:
-			CpuCost(CpuCost),
-			Parallelization(Parallelization)
+			CpuCost(Cost),
+			Parallelization(Parallel)
 		{}
 
 		void Reset()

@@ -20,27 +20,27 @@ namespace Test
 			CompareCBC(m_keys[0], m_input, m_output);
 			CompareCBC(m_keys[1], m_input, m_output);
 			CompareCBC(m_keys[2], m_input, m_output);
-			OnProgress("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests..");
+			OnProgress(std::string("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests.."));
 
 			CompareCFB(m_keys[0], m_input, m_output);
 			CompareCFB(m_keys[1], m_input, m_output);
 			CompareCFB(m_keys[2], m_input, m_output);
-			OnProgress("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests..");
+			OnProgress(std::string("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests.."));
 
 			CompareCTR(m_keys[0], m_input, m_output);
 			CompareCTR(m_keys[1], m_input, m_output);
 			CompareCTR(m_keys[2], m_input, m_output);
-			OnProgress("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests..");
+			OnProgress(std::string("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests.."));
 
 			CompareECB(m_keys[0], m_input, m_output);
 			CompareECB(m_keys[1], m_input, m_output);
 			CompareECB(m_keys[2], m_input, m_output);
-			OnProgress("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests..");
+			OnProgress(std::string("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests.."));
 
 			CompareOFB(m_keys[0], m_input, m_output);
 			CompareOFB(m_keys[1], m_input, m_output);
 			CompareOFB(m_keys[2], m_input, m_output);
-			OnProgress("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests..");
+			OnProgress(std::string("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests.."));
 
 			return SUCCESS;
 		}
@@ -689,7 +689,7 @@ namespace Test
 			HexConverter::Decode(outputEncoded[i], 4, m_output[i]);
 	}
 
-	void CipherModeTest::OnProgress(char* Data)
+	void CipherModeTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

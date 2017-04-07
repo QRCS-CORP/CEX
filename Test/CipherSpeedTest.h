@@ -77,7 +77,7 @@ namespace Test
 					counter += buffer1.size();
 				}
 				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				Handler(const_cast<char*>(calc.c_str()));
+				Handler(calc);
 			}
 
 			uint64_t dur = TestUtils::GetTimeMs64() - start;
@@ -87,8 +87,8 @@ namespace Test
 			std::string mbps = IntUtils::ToString((rate / MB1));
 			std::string secs = IntUtils::ToString((double)dur / 1000.0);
 			std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
-			Handler(const_cast<char*>(resp.c_str()));
-			Handler("");
+			Handler(resp);
+			Handler(std::string(""));
 		}
 
 		template<typename T>
@@ -140,7 +140,7 @@ namespace Test
 		void Initialize();
 		void OCBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void OFBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
 		void RHXSpeedTest(size_t KeySize = 32);
 		void SalsaSpeedTest();
 		void SHXSpeedTest(size_t KeySize = 32);

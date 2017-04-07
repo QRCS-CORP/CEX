@@ -28,7 +28,6 @@ NAMESPACE_KEYSYMMETRIC
 
 using Exception::CryptoProcessingException;
 using IO::MemoryStream;
-using Symmetric::SymmetricKeySize;
 
 /// <summary>
 /// Symmetric Key virtual interface class.

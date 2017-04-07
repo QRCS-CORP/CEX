@@ -65,7 +65,7 @@ namespace Test
 		void CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 #endif
 		void Initialize();
-		void OnProgress(char* Data);
+		void OnProgress(std::string Data);
     };
 }
 
