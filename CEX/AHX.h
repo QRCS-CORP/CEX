@@ -33,10 +33,10 @@
 #ifndef _CEX_AHX_H
 #define _CEX_AHX_H
 
-#include "IBlockCipher.h"
 #if defined(__AVX__)
-#	include <wmmintrin.h>
-#endif
+#include "IBlockCipher.h"
+#include <wmmintrin.h>
+
 
 NAMESPACE_BLOCK
 
@@ -377,4 +377,5 @@ private:
 };
 
 NAMESPACE_BLOCKEND
+#endif
 #endif

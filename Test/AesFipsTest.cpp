@@ -18,7 +18,7 @@ namespace Test
 		m_keys(0),
 		m_plainText(0),
 		m_progressEvent(),
-		m_testNI(false)
+		m_testNI(TestNI)
 	{
 	}
 

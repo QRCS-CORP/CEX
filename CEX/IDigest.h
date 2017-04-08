@@ -4,14 +4,12 @@
 #include "CexDomain.h"
 #include "CryptoDigestException.h"
 #include "Digests.h"
-#include "ISymmetricKey.h"
 #include "ParallelOptions.h"
 
 NAMESPACE_DIGEST
 
 using Exception::CryptoDigestException;
 using Enumeration::Digests;
-using Key::Symmetric::ISymmetricKey;
 using Common::ParallelOptions;
 
 /// <summary>

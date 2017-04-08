@@ -387,16 +387,13 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #if defined(__AVX2__)
 #	define CEX_HAS_AVX2
 #endif
-#if defined(__XOP__)
-#	define CEX_HAS_XOP
-#endif
 
-#if defined(__AVX2__)
-#if !defined(__AVX__)
-#		define __AVX__
+#if defined(CEX_HAS_AVX2)
+#if !defined(CEX_HAS_AVX)
+#		define CEX_HAS_AVX
 #	endif
 #endif
-#if defined(__AVX__)
+#if defined(CEX_HAS_AVX)
 #	if !defined(CEX_HAS_SSE4)
 #		define CEX_HAS_SSE4
 #	endif
@@ -421,7 +418,9 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #		define CEX_HAS_SSE2
 #	endif
 #endif
-
+#if defined(__XOP__)
+#	define CEX_HAS_XOP
+#endif
 #if defined(CEX_OS_WINDOWS)
 #	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
 #		if !defined(CEX_HAS_SSE2)

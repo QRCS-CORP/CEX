@@ -42,8 +42,8 @@ namespace Test
 	{
 #if defined(_WIN32)
 		// Windows
-		__int64 ctr1 = 0, freq = 0;
-
+		int64_t ctr1 = 0;
+		int64_t freq = 0;
 		if (QueryPerformanceCounter((LARGE_INTEGER *)&ctr1) != 0)
 		{
 			QueryPerformanceFrequency((LARGE_INTEGER *)&freq);

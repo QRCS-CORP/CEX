@@ -232,9 +232,34 @@ ulong SysUtils::TimeStamp()
 	// extracts from: http://nadeausoftware.com/articles/2012/04/c_c_tip_how_measure_elapsed_real_time_benchmarking
 
 #if defined(CEX_OS_WINDOWS)
+#	if defined(__AVX__) || defined(__AVX2__)
+		return static_cast<ulong>(__rdtsc());
+#	else
+		int64_t ctr1 = 0;
+		int64_t freq = 0;
+		if (QueryPerformanceCounter((LARGE_INTEGER *)&ctr1) != 0)
+		{
+			QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
+			// return microseconds to milliseconds
+			return (uint64_t)(ctr1 * 1000.0 / freq);
+		}
+		else
+		{
+			FILETIME ft;
+			LARGE_INTEGER li;
 
-	return static_cast<ulong>(__rdtsc());
+			// Get the amount of 100 nano seconds intervals elapsed since January 1, 1601 (UTC) and copy it to a LARGE_INTEGER structure
+			GetSystemTimeAsFileTime(&ft);
+			li.LowPart = ft.dwLowDateTime;
+			li.HighPart = ft.dwHighDateTime;
 
+			uint64_t ret = li.QuadPart;
+			ret -= 116444736000000000LL; // Convert from file time to UNIX epoch time.
+			ret /= 10000; // From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals
+
+			return ret;
+		}
+#	endif
 #elif (defined(CEX_OS_HPUX) || defined(CEX_OS_SUNUX)) && (defined(__SVR4) || defined(__svr4__))
 	// HP-UX, Solaris
 	return static_cast<ulong>(gethrtime());

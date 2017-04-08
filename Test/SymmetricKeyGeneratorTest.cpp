@@ -71,6 +71,8 @@ namespace Test
 		// test each access interface for valid output
 		SymmetricKeySize keySize(32, 16, 64);
 		CpuDetect detect;
+
+#if defined(__AVX__) || defined(__AVX2__)
 		// check for rdtscp
 		if (detect.RDTSCP())
 		{
@@ -79,7 +81,7 @@ namespace Test
 			if (!IsValidKey(symKey1))
 				throw TestException("CheckInit: Key generation has failed!");
 		}
-
+#endif 
 		SymmetricKeyGenerator keyGen2(Digests::Blake512, Providers::CSP);
 		SymmetricKey symKey2 = keyGen2.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey2))
@@ -90,10 +92,12 @@ namespace Test
 		if (!IsValidKey(symKey3))
 			throw TestException("CheckInit: Key generation has failed!");
 
+#if defined(__AVX__) || defined(__AVX2__)
 		SymmetricKeyGenerator keyGen4(Digests::Skein512, Providers::RDP);
 		SymmetricKey symKey4 = keyGen4.GetSymmetricKey(keySize);
 		if (!IsValidKey(symKey4))
 			throw TestException("CheckInit: Key generation has failed!");
+#endif
 	}
 
 	bool SymmetricKeyGeneratorTest::IsGoodRun(const std::vector<byte> &Input)
