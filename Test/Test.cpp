@@ -1,50 +1,50 @@
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
-#include <cstdio>
 #include <string>
-#include "../../Test/TestFiles.h"
-#include "../../Test/TestUtils.h"
-#include "../../CEX/CpuDetect.h"
-#include "../../Test/AEADTest.h"
-#include "../../Test/AesAvsTest.h"
-#include "../../Test/AesFipsTest.h"
-#include "../../Test/Blake2Test.h"
-#include "../../Test/ChaChaTest.h"
-#include "../../Test/CipherModeTest.h"
-#include "../../Test/CipherSpeedTest.h"
-#include "../../Test/CipherStreamTest.h"
-#include "../../Test/CMACTest.h"
-#include "../../Test/ConsoleUtils.h"
-#include "../../Test/CMGTest.h"
-#include "../../Test/DCGTest.h"
-#include "../../Test/DigestSpeedTest.h"
-#include "../../Test/DigestStreamTest.h"
-#include "../../Test/GMACTest.h"
-#include "../../Test/KDF2Test.h"
-#include "../../Test/KeccakTest.h"
-#include "../../Test/HKDFTest.h"
-#include "../../Test/HMACTest.h"
-#include "../../Test/HMGTest.h"
-#include "../../Test/HXCipherTest.h"
-#include "../../Test/ITest.h"
-#include "../../Test/MacStreamTest.h"
-#include "../../Test/PaddingTest.h"
-#include "../../Test/ParallelModeTest.h"
-#include "../../Test/PBKDF2Test.h"
-#include "../../Test/RangedRngTest.h"
-#include "../../Test/RandomOutputTest.h"
-#include "../../Test/RijndaelTest.h"
-#include "../../Test/SalsaTest.h"
-#include "../../Test/SCRYPTTest.h"
-#include "../../Test/SecureStreamTest.h"
-#include "../../Test/SerpentTest.h"
-#include "../../Test/Sha2Test.h"
-#include "../../Test/SkeinTest.h"
-#include "../../Test/SymmetricKeyGeneratorTest.h"
-#include "../../Test/SymmetricKeyTest.h"
-#include "../../Test/TwofishTest.h"
+#include "../CEX/CpuDetect.h"
+#include "../Test/TestFiles.h"
+#include "../Test/TestUtils.h"
+#include "../Test/AEADTest.h"
+#include "../Test/AesAvsTest.h"
+#include "../Test/AesFipsTest.h"
+#include "../Test/Blake2Test.h"
+#include "../Test/ChaChaTest.h"
+#include "../Test/CipherModeTest.h"
+#include "../Test/CipherSpeedTest.h"
+#include "../Test/CipherStreamTest.h"
+#include "../Test/CMACTest.h"
+#include "../Test/ConsoleUtils.h"
+#include "../Test/CMGTest.h"
+#include "../Test/DCGTest.h"
+#include "../Test/DigestSpeedTest.h"
+#include "../Test/DigestStreamTest.h"
+#include "../Test/GMACTest.h"
+#include "../Test/KDF2Test.h"
+#include "../Test/KeccakTest.h"
+#include "../Test/HKDFTest.h"
+#include "../Test/HMACTest.h"
+#include "../Test/HMGTest.h"
+#include "../Test/HXCipherTest.h"
+#include "../Test/ITest.h"
+#include "../Test/MacStreamTest.h"
+#include "../Test/PaddingTest.h"
+#include "../Test/ParallelModeTest.h"
+#include "../Test/PBKDF2Test.h"
+#include "../Test/RangedRngTest.h"
+#include "../Test/RandomOutputTest.h"
+#include "../Test/RijndaelTest.h"
+#include "../Test/SalsaTest.h"
+#include "../Test/SCRYPTTest.h"
+#include "../Test/SecureStreamTest.h"
+#include "../Test/SerpentTest.h"
+#include "../Test/Sha2Test.h"
+#include "../Test/SkeinTest.h"
+#include "../Test/SymmetricKeyGeneratorTest.h"
+#include "../Test/SymmetricKeyTest.h"
+#include "../Test/TwofishTest.h"
 
 using namespace Test;
 
@@ -73,6 +73,17 @@ using namespace Test;
 // Scrypt(maybe)		-done
 // Code review			-done
 // Help review			-done
+
+// Release 1.0.1.1, April 08, 2017
+// Fixed a bug in CpuDetect (misreporting SIMD capabilities of some cpu's)
+// Added preprocessor definitions for intrinsics throughout both projects
+// Cleaned up the test project
+// Changes to code required by Intel tool-chain
+// Tested on Intel i3, i5, i7, and an AMD K9
+// Tested on debug and release versions of ARM/x86/x64
+// Tested on MSVC 2015 and 2017 ide
+// Now supports arch:AVX2 (recommended), arch:AVX (minimum), or no intrinsics support, arch:IA32
+// Many misc. internal todo's and rewrites completed
 
 // *** 1.1.0.0 RoadMap ***
 //
@@ -231,16 +242,29 @@ int main()
 		PrintHeader("AES-NI intrinsics support has not been detected on this system.");
 	PrintHeader("", "");
 
-	if (!detect.AVX2())
+	if (detect.AVX2())
 	{
-		PrintHeader("Warning! AVX2 was not detected! This library is currently set for AVX2 intrinsics support.");
-		if (detect.AVX())
-			PrintHeader("AVX intrinsics support available, set enable enhanced instruction set to arch:AVX");
-		else
-			PrintHeader("The minimum SIMD intrinsics support (AVX) was not detected, intrinsics has been disabled!");
-
-		PrintHeader("", "");
+#if !defined(__AVX2__)
+		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");
+#else
+		PrintHeader("AVX2 intrinsics support has been enabled.");
+#endif
 	}
+	else if (detect.AVX())
+	{
+#if defined(__AVX2__)
+		PrintHeader("AVX2 is not supported on this system! AVX intrinsics support is available, set enable enhanced instruction set to arch:AVX");
+#elif !defined(__AVX__)
+		PrintHeader("AVX intrinsics support has been detected, set enhanced instruction set to arch:AVX for best performance.");
+#else
+		PrintHeader("AVX intrinsics support has been enabled.");
+#endif
+	}
+	else
+	{
+		PrintHeader("The minimum SIMD intrinsics support (AVX) was not detected, intrinsics have been disabled!");
+	}
+	PrintHeader("", "");
 
 	try
 	{

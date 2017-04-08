@@ -340,13 +340,13 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		if (ttlLen > PRLMIN)
 		{
 			// fill buffer
-			size_t rmd = m_msgBuffer.size() - m_msgLength;
-			if (rmd != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
+			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+			if (RMDLEN != 0)
+				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], RMDLEN);
 
 			m_msgLength = 0;
-			Length -= rmd;
-			InOffset += rmd;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
 			ttlLen -= m_msgBuffer.size();
 
 			// empty the entire message buffer
@@ -380,12 +380,12 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		if (ttlLen > m_msgBuffer.size())
 		{
 			// fill buffer
-			size_t rmd = m_msgBuffer.size() - m_msgLength;
-			if (rmd != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
+			size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+			if (RMDLEN != 0)
+				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], RMDLEN);
 
-			Length -= rmd;
-			InOffset += rmd;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
 			m_msgLength = m_msgBuffer.size();
 
 			// process first half of buffer
@@ -396,22 +396,22 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 			// left rotate the buffer
 			m_msgLength -= m_parallelProfile.ParallelMinimumSize();
-			rmd = m_msgBuffer.size() / 2;
-			memcpy(&m_msgBuffer[0], &m_msgBuffer[rmd], rmd);
+			const size_t FNLLEN = m_msgBuffer.size() / 2;
+			memcpy(&m_msgBuffer[0], &m_msgBuffer[FNLLEN], FNLLEN);
 		}
 	}
 	else
 	{
 		if (m_msgLength + Length > BLOCK_SIZE)
 		{
-			size_t rmd = BLOCK_SIZE - m_msgLength;
-			if (rmd != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], rmd);
+			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+			if (RMDLEN != 0)
+				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], RMDLEN);
 
 			Compress(m_msgBuffer, 0, m_dgtState[0], BLOCK_SIZE);
 			m_msgLength = 0;
-			InOffset += rmd;
-			Length -= rmd;
+			InOffset += RMDLEN;
+			Length -= RMDLEN;
 		}
 
 		// loop until last block

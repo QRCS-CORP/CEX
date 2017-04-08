@@ -12,6 +12,7 @@ namespace Test
 	using Digest::BlakeParams;
 	using Digest::Blake256;
 	using Digest::Blake512;
+	using namespace TestFiles::Blake2Kat;
 
 	const std::string Blake2Test::DESCRIPTION = "Blake Vector KATs; tests Blake2 256/512 digests.";
 	const std::string Blake2Test::FAILURE = "FAILURE! ";
@@ -63,9 +64,9 @@ namespace Test
 
 	void Blake2Test::Blake2BTest()
 	{
-		std::ifstream stream("Vectors/Blake2/blake2b-kat.txt");
+		std::ifstream stream(BLAKE2BKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2b-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2BKAT);
 
 		std::string line;
 
@@ -109,9 +110,9 @@ namespace Test
 
 	void Blake2Test::Blake2BPTest()
 	{
-		std::ifstream stream("Vectors/Blake2/blake2bp-kat.txt");
+		std::ifstream stream(BLAKE2BPKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2bp-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2BPKAT);
 
 		std::string line;
 
@@ -160,9 +161,9 @@ namespace Test
 
 	void Blake2Test::Blake2STest()
 	{
-		std::ifstream stream("Vectors/Blake2/blake2s-kat.txt");
+		std::ifstream stream(BLAKE2SKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2s-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2SKAT);
 
 		std::string line;
 
@@ -206,9 +207,9 @@ namespace Test
 
 	void Blake2Test::Blake2SPTest()
 	{
-		std::ifstream stream("Vectors/Blake2/blake2sp-kat.txt");
+		std::ifstream stream(BLAKE2SPKAT);
 		if (!stream)
-			throw TestException("Could not open file: Vectors/Blake2/blake2sp-kat.txt");
+			throw TestException("Could not open file: " + BLAKE2SPKAT);
 
 		std::string line;
 

@@ -376,9 +376,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
@@ -495,6 +492,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\TestUtils.cpp">
       <Filter>Source Files\Test\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\Test.cpp">
+      <Filter>Source Files\Test</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

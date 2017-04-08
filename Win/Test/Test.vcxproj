@@ -368,9 +368,9 @@
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyGeneratorTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyTest.cpp" />
+    <ClCompile Include="..\..\Test\Test.cpp" />
     <ClCompile Include="..\..\Test\TestUtils.cpp" />
     <ClCompile Include="..\..\Test\TwofishTest.cpp" />
-    <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Static\CEXEngine.vcxproj">

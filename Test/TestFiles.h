@@ -17,6 +17,14 @@ namespace Test
 			const std::string AESAVSPTEXT256 = "Vectors/AESAVS/plainvect256.txt";
 		}
 
+		namespace Blake2Kat
+		{
+			const std::string BLAKE2SKAT = "Vectors/Blake2/blake2s-kat.txt";
+			const std::string BLAKE2SPKAT = "Vectors/Blake2/blake2sp-kat.txt";
+			const std::string BLAKE2BKAT = "Vectors/Blake2/blake2b-kat.txt";
+			const std::string BLAKE2BPKAT = "Vectors/Blake2/blake2bp-kat.txt";
+		}
+
 		namespace Counterpane
 		{
 			const std::string TWOFISHCTEXT128 = "Vectors/Counterpane/twofishcipher128.txt";
