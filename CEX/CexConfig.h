@@ -18,7 +18,7 @@ static const int CEX_VERSION_MINOR = 0;
 static const int CEX_VERSION_PATCH = 1;
 static const int CEX_VERSION_RELEASE = 1;
 
-// compiler types; not all will be supported (targets are msv, mingw, gcc, intel, and clang)
+// compiler types; not all will be supported (targets are msvc, mingw, gcc, intel, and clang)
 #if defined(_MSC_VER)
 #	define CEX_COMPILER_MSC
 #elif defined(__MINGW32__)
@@ -52,7 +52,7 @@ static const int CEX_VERSION_RELEASE = 1;
 	static const int CEX_SUPPORTED_COMPILER = 0;
 #endif
 
-// preprocessor os selection (not all OS's will be supported; target is win and posix)
+// preprocessor os selection (not all OS's will be supported; targets are win/android/linux/ios)
 #if defined(_WIN64) || defined(_WIN32)
 #	define CEX_OS_WINDOWS
 #	if defined(_WIN64)

@@ -497,9 +497,4 @@
       <Filter>Source Files\Test\Common</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Test.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
 </Project>

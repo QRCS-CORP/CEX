@@ -377,9 +377,6 @@
       <Project>{ff7ab9cb-bf7b-4e0e-a3ef-f4141810b24a}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Test.rc" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
