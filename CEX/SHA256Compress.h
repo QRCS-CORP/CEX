@@ -17,8 +17,8 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #include "CexDomain.h"
-#include "IntUtils.h"
 #include "Intrinsics.h"
+#include "IntUtils.h"
 
 NAMESPACE_DIGEST
 

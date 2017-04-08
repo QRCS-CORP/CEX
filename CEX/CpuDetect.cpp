@@ -134,11 +134,11 @@ void CpuDetect::Initialize()
 
 	// fallbacks
 	if (m_l1CacheSize == 0 || m_l1CacheSize % 8 != 0)
-		m_l1CacheSize = m_physCores * 128;
+		m_l1CacheSize = 64;
 	if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
 		m_l1CacheLineSize = 64;
 	if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
-		m_l2CacheSize = m_physCores * 256;
+		m_l2CacheSize = 256;
 }
 
 bool CpuDetect::GetFlag(CpuidFlags Flag)

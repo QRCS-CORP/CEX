@@ -22,8 +22,8 @@
 #include "CexDomain.h"
 #include "BlockCiphers.h"
 #include "CipherModes.h"
-#include "IBlockCipher.h"
 #include "CryptoCipherModeException.h"
+#include "IBlockCipher.h"
 #include "ParallelOptions.h"
 #include "SymmetricKeySize.h"
 
