@@ -366,11 +366,9 @@ private:
 	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
-#if defined(__AVX__)
 	void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
 	void ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
-#endif
 	void LoadState(Digests KdfEngineType);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
