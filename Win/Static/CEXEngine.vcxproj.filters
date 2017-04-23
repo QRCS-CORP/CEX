@@ -244,6 +244,12 @@
     <Filter Include="Source Files\Network">
       <UniqueIdentifier>{dcec47a5-5d97-4e50-890e-752cda63f7d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Exception">
+      <UniqueIdentifier>{5e87f908-b4c9-4f80-8d99-c3e7e05a2677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Mac\Support">
+      <UniqueIdentifier>{a001195e-8358-4c7a-9eb1-96e8ea9044bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -708,6 +714,12 @@
     <ClInclude Include="..\..\CEX\IAsymmetricSign.h">
       <Filter>Header Files\Cipher\Asymmetric\Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\MemUtils.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\UInt512.h">
+      <Filter>Header Files\Numeric</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -803,9 +815,6 @@
     <ClCompile Include="..\..\CEX\MacStream.cpp">
       <Filter>Source Files\Processing</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\IntUtils.cpp">
-      <Filter>Source Files\Utility</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\ParallelUtils.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
@@ -874,15 +883,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\BitConverter.cpp">
       <Filter>Source Files\IO</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\UInt128.cpp">
-      <Filter>Source Files\Numeric</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\UInt256.cpp">
-      <Filter>Source Files\Numeric</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\ULong256.cpp">
-      <Filter>Source Files\Numeric</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ArrayUtils.cpp">
       <Filter>Source Files\Utility</Filter>
@@ -955,6 +955,45 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\SCRYPT.cpp">
       <Filter>Source Files\Kdf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SymmetricKeySize.cpp">
+      <Filter>Source Files\Key\Symmetric</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoAsymmetricException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoCipherModeException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoDigestException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoGeneratorException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoKdfException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoMacException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoPaddingException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoProcessingException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoRandomException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoSymmetricCipherException.cpp">
+      <Filter>Source Files\Exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\GHASH.cpp">
+      <Filter>Source Files\Mac\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

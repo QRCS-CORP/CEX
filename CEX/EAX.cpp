@@ -1,14 +1,98 @@
 #include "EAX.h"
-#include "ArrayUtils.h"
 #include "CMAC.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ParallelUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MODE
 
-using Utility::ArrayUtils;
-using Utility::IntUtils;
+const std::string EAX::CLASS_NAME("EAX");
+
+//~~~Properties~~~//
+
+bool &EAX::AutoIncrement() 
+{
+	return m_autoIncrement; 
+}
+
+const size_t EAX::BlockSize()
+{ 
+	return m_blockSize; 
+}
+
+const BlockCiphers EAX::CipherType() 
+{ 
+	return m_cipherType;
+}
+
+IBlockCipher* EAX::Engine() 
+{ 
+	return m_cipherMode.Engine();
+}
+
+const CipherModes EAX::Enumeral()
+{
+	return CipherModes::EAX; 
+}
+
+const bool EAX::IsEncryption()
+{ 
+	return m_isEncryption; 
+}
+
+const bool EAX::IsInitialized() 
+{ 
+	return m_isInitialized; 
+}
+
+const bool EAX::IsParallel() 
+{
+	return m_parallelProfile.IsParallel();
+}
+
+const std::vector<SymmetricKeySize> &EAX::LegalKeySizes()
+{
+	return m_legalKeySizes;
+}
+
+const size_t EAX::MaxTagSize() 
+{ 
+	return m_macSize;
+}
+
+const size_t EAX::MinTagSize()
+{
+	return MIN_TAGSIZE; 
+}
+
+const std::string &EAX::Name()
+{ 
+	return CLASS_NAME; 
+}
+
+const size_t EAX::ParallelBlockSize()
+{ 
+	return m_parallelProfile.ParallelBlockSize(); 
+}
+
+ParallelOptions &EAX::ParallelProfile()
+{
+	return m_cipherMode.ParallelProfile(); 
+}
+
+bool &EAX::PreserveAD()
+{ 
+	return m_aadPreserve; 
+}
+
+const std::vector<byte> EAX::Tag()
+{
+	if (!m_isFinalized)
+		throw CryptoCipherModeException("EAX:Tag", "The cipher mode has not been finalized!");
+
+	return m_msgTag;
+}
 
 //~~~Constructor~~~//
 
@@ -75,15 +159,12 @@ EAX::~EAX()
 
 void EAX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	DecryptBlock(Input, 0, Output, 0);
+	Decrypt128(Input, 0, Output, 0);
 }
 
 void EAX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-
-	m_macGenerator.Update(Input, InOffset, m_blockSize);
-	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void EAX::Destroy()
@@ -101,11 +182,11 @@ void EAX::Destroy()
 
 	try
 	{
-		ArrayUtils::ClearVector(m_aadData);
-		ArrayUtils::ClearVector(m_cipherKey);
-		ArrayUtils::ClearVector(m_eaxNonce);
-		ArrayUtils::ClearVector(m_eaxVector);
-		ArrayUtils::ClearVector(m_msgTag);
+		Utility::IntUtils::ClearVector(m_aadData);
+		Utility::IntUtils::ClearVector(m_cipherKey);
+		Utility::IntUtils::ClearVector(m_eaxNonce);
+		Utility::IntUtils::ClearVector(m_eaxVector);
+		Utility::IntUtils::ClearVector(m_msgTag);
 
 		if (m_destroyEngine)
 		{
@@ -125,27 +206,23 @@ void EAX::Destroy()
 
 void EAX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	EncryptBlock(Input, 0, Output, 0);
+	Encrypt128(Input, 0, Output, 0);
 }
 
 void EAX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
-	m_macGenerator.Update(Input, InOffset, m_blockSize);
+	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void EAX::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length)
 {
 	if (!m_isInitialized)
 		throw CryptoCipherModeException("EAX:Finalize", "The cipher mode has not been initialized!");
-	if (Length < TAG_MINLEN || Length > m_macSize)
+	if (Length < MIN_TAGSIZE || Length > m_macSize)
 		throw CryptoCipherModeException("EAX:Finalize", "The length must be minimum of 12 and maximum of MAC code size!");
 
 	CalculateMac();
-	memcpy(&Output[Offset], &m_msgTag[0], Length);
+	Utility::MemUtils::Copy<byte>(m_msgTag, 0, Output, Offset, Length);
 }
 
 void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -191,11 +268,23 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	if (m_isFinalized)
 	{
-		memset(&m_msgTag[0], (byte)0, m_msgTag.size());
+		Utility::MemUtils::Clear<byte>(m_msgTag, 0, m_msgTag.size());
 		m_isFinalized = false;
 	}
 
 	m_isInitialized = true;
+}
+
+void EAX::ParallelMaxDegree(size_t Degree)
+{
+	if (Degree == 0)
+		throw CryptoCipherModeException("EAX:ParallelMaxDegree", "Parallel degree can not be zero!");
+	if (Degree % 2 != 0)
+		throw CryptoCipherModeException("EAX:ParallelMaxDegree", "Parallel degree must be an even number!");
+	if (Degree > m_parallelProfile.ProcessorCount())
+		throw CryptoCipherModeException("EAX:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+
+	m_parallelProfile.SetMaxDegree(Degree);
 }
 
 void EAX::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
@@ -212,35 +301,10 @@ void EAX::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 	m_aadLoaded = true;
 }
 
-size_t EAX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	const size_t PRCSZE = IntUtils::Min(Output.size(), Input.size());
-	Transform(Input, 0, Output, 0, PRCSZE);
-	return PRCSZE;
-}
-
-size_t EAX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	if (m_parallelProfile.IsParallel() && (IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_parallelProfile.ParallelBlockSize()))
-	{
-		Transform(Input, InOffset, Output, OutOffset, m_parallelProfile.ParallelBlockSize());
-		return m_parallelProfile.ParallelBlockSize();
-	}
-	else
-	{
-		if (m_isEncryption)
-			EncryptBlock(Input, InOffset, Output, OutOffset);
-		else
-			DecryptBlock(Input, InOffset, Output, OutOffset);
-
-		return BLOCK_SIZE;
-	}
-}
-
 void EAX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
 
 	if (m_isEncryption)
 	{
@@ -260,13 +324,13 @@ bool EAX::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 		throw CryptoCipherModeException("EAX:Verify", "The cipher mode has not been initialized for decryption!");
 	if (!m_isInitialized && !m_isFinalized)
 		throw CryptoCipherModeException("EAX:Verify", "The cipher mode has not been initialized!");
-	if (Length < TAG_MINLEN || Length > m_macSize)
+	if (Length < MIN_TAGSIZE || Length > m_macSize)
 		throw CryptoCipherModeException("EAX:Verify", "The length must be minimum of 12 and maximum of MAC code size!");
 
 	if (!m_isFinalized)
 		CalculateMac();
 
-	return ArrayUtils::Compare(m_msgTag, 0, Input, Offset, Length);
+	return Utility::IntUtils::Compare<byte>(m_msgTag, 0, Input, Offset, Length);
 }
 
 //~~~Private Functions~~~//
@@ -282,7 +346,7 @@ void EAX::CalculateMac()
 
 	if (m_autoIncrement)
 	{
-		ArrayUtils::IncrementBE8(m_eaxNonce);
+		Utility::IntUtils::BeIncrement8(m_eaxNonce);
 		std::vector<byte> zero(0);
 		Initialize(m_isEncryption, Key::Symmetric::SymmetricKey(zero, m_eaxNonce));
 
@@ -293,17 +357,34 @@ void EAX::CalculateMac()
 	m_isFinalized = true;
 }
 
+void EAX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+
+	m_macGenerator.Update(Input, InOffset, m_blockSize);
+	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
+}
+
+void EAX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+
+	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
+	m_macGenerator.Update(Input, InOffset, m_blockSize);
+}
+
 void EAX::Reset()
 {
 	if (!m_aadPreserve)
 	{
 		m_aadLoaded = false;
-		memset(&m_aadData[0], (byte)0, m_aadData.size());
+		Utility::MemUtils::Clear<byte>(m_aadData, 0, m_aadData.size());
 	}
 
 	m_isInitialized = false;
 	m_macGenerator.Reset();
-	memset(&m_eaxVector[0], (byte)0, m_eaxVector.size());
+	Utility::MemUtils::Clear<byte>(m_eaxVector, 0, m_eaxVector.size());
 }
 
 void EAX::Scope()

@@ -66,14 +66,13 @@ namespace Test
 
 	void HXCipherTest::Initialize()
 	{
-		const char* rhxEncoded[4] =
+		const char* rhxEncoded[3] =
 		{
 			("a36e01f66404b6af9ed09ea6e4faaff2"),	// hkdf extended 14 rounds  old: 2ac5dd436cb2a1c976b25a1edaf1f650
 			("43b4418a1d0b32aeff34df0c189556c4"),	// hkdf extended 22 rounds  old: 497bef5ccb4faee957b7946705c3dc10
-			("05e57d29a9f646d840c070ed3a17da53"),	// standard 512 key, 22 rounds  old: same
-			("46af483df6bbaf9e3a0aa8c182011752bb8bab6f2ebc4cd424407994f6ff6534")	// standard 512 key, 22 rounds, 32 byte block  old: same
+			("05e57d29a9f646d840c070ed3a17da53")	// standard 512 key, 22 rounds  old: same
 		};
-		HexConverter::Decode(rhxEncoded, 4, m_rhxExpected);
+		HexConverter::Decode(rhxEncoded, 3, m_rhxExpected);
 
 		// Note: kat change with serpent move from BE to LE format
 		const char* shxEncoded[3] =
@@ -124,7 +123,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);//"fafaabd082a96d88f674c29eabac380c"
+				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -135,7 +134,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(outBytes, inpBytes);
+				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -153,7 +152,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);
+				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -164,7 +163,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(outBytes, inpBytes);
+				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -182,7 +181,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);
+				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -193,7 +192,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(outBytes, inpBytes);
+				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -213,14 +212,14 @@ namespace Test
 		// RHX, 14 rounds
 		{
 			Digest::SHA512 digest;
-			RHX* eng = new RHX(&digest, 14, 16);
+			RHX* eng = new RHX(&digest, 14);
 			Mode::CTR cipher(eng);
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);
+				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 			if (outBytes != m_rhxExpected[0])
@@ -230,7 +229,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(outBytes, inpBytes);
+				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -241,14 +240,14 @@ namespace Test
 		// RHX, 22 rounds
 		{
 			Digest::SHA512 digest;
-			RHX* eng = new RHX(&digest, 22, 16);
+			RHX* eng = new RHX(&digest, 22);
 			Mode::CTR cipher(eng);
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);
+				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -259,7 +258,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(outBytes, inpBytes);
+				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -277,7 +276,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(inpBytes, outBytes);
+				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -288,44 +287,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				cipher.Transform(outBytes, inpBytes);
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-				throw TestException("RHX: Failed decryption test!");
-		}
-
-		// RHX, 22 rounds, 32 byte block, standard key schedule
-		{
-			inpBytes.resize(32);
-			outBytes.resize(32);
-			decBytes.resize(32);
-			std::vector<byte> iv(32);
-
-			for (unsigned int i = 0; i < iv.size(); i++)
-				iv[i] = (byte)i;
-
-			RHX* eng = new RHX(Digests::None, 22, 32);
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key2, iv);
-			cipher.Initialize(true, k);
-
-			for (unsigned int i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, outBytes);
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_rhxExpected[3])
-				throw TestException("RHX: Failed encryption test!");
-
-			cipher.Initialize(false, k);
-
-			for (unsigned int i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, inpBytes);
+				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -351,7 +313,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(inpBytes, outBytes);
+				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -362,7 +324,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(outBytes, inpBytes);
+				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -380,7 +342,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(inpBytes, outBytes);
+				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -391,7 +353,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(outBytes, inpBytes);
+				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -399,7 +361,7 @@ namespace Test
 			if (outBytes != decBytes)
 				throw TestException("SHX: Failed decryption test!");
 		}
-		// SHX, 40 rounds, standard key schedule
+		// SHX, 32 rounds, standard key schedule
 		{
 			SHX* eng = new SHX();
 			Mode::CTR engine(eng);
@@ -408,7 +370,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(inpBytes, outBytes);
+				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -419,7 +381,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(outBytes, inpBytes);
+				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -445,7 +407,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(inpBytes, outBytes);
+				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -456,7 +418,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(outBytes, inpBytes);
+				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -474,7 +436,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(inpBytes, outBytes);
+				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -485,7 +447,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(outBytes, inpBytes);
+				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
@@ -502,7 +464,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(inpBytes, outBytes);
+				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
 				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
@@ -513,7 +475,7 @@ namespace Test
 
 			for (unsigned int i = 0; i != 100; i++)
 			{
-				engine.Transform(outBytes, inpBytes);
+				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
 				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;

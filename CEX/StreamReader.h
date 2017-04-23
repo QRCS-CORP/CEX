@@ -2,6 +2,7 @@
 #define _CEX_STREAMREADER_H
 
 #include "MemoryStream.h"
+#include "MemUtils.h"
 
 NAMESPACE_IO
 
@@ -13,37 +14,41 @@ class StreamReader
 private:
 
 	MemoryStream m_streamData;
-	StreamReader() {}
 
 public:
+
+	StreamReader() = delete;
+	StreamReader(const StreamReader&) = delete;
+	StreamReader& operator=(const StreamReader&) = delete;
+	StreamReader& operator=(StreamReader&&) = delete;
+
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const size_t Length() { return m_streamData.Length(); }
+	const size_t Length();
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const size_t Position() { return m_streamData.Position(); }
+	const size_t Position();
+
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Instantiate this class with a byte array
 	/// </summary>
 	///
 	/// <param name="DataStream">MemoryStream to read</param>
-	explicit StreamReader(const MemoryStream &DataStream)
-		:
-		m_streamData(DataStream)
-	{
-	}
+	explicit StreamReader(const MemoryStream &DataStream);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	~StreamReader()
-	{
-	}
+	~StreamReader();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Read a single byte from the stream
@@ -57,51 +62,22 @@ public:
 	/// </summary>
 	///
 	/// <param name="Length">The number of bytes to read</param>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
 	std::vector<byte> ReadBytes(size_t Length);
 
 	/// <summary>
-	/// Reads a 16 bit integer from the stream
+	/// Reads a T integer from the stream
 	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	short ReadInt16();
+	template <typename T>
+	T ReadInt()
+	{
+		const size_t VALSZE = sizeof(T);
+		CEXASSERT(m_streamData.Position() + VALSZE <= m_streamData.Length(), "Stream length exceeded");
+		T val = 0;
+		Utility::MemUtils::Copy<byte, T>(m_streamData.ToArray(), m_streamData.Position(), val, VALSZE);
+		m_streamData.Seek(m_streamData.Position() + VALSZE, SeekOrigin::Begin);
 
-	/// <summary>
-	/// Reads an unsigned 16 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	ushort ReadUInt16();
-
-	/// <summary>
-	/// Reads a 32 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	int ReadInt32();
-
-	/// <summary>
-	/// Reads an unsigned 32 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	uint ReadUInt32();
-
-	/// <summary>
-	/// Reads a 64 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	long ReadInt64();
-
-	/// <summary>
-	/// Reads an unsigned 64 bit integer from the stream
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if source array is too small</exception>
-	ulong ReadUInt64();
+		return val;
+	}
 };
 
 NAMESPACE_IOEND

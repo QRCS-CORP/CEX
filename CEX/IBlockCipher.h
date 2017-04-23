@@ -102,19 +102,19 @@ public:
 	virtual const Digests KdfEngine() = 0;
 
 	/// <summary>
-	/// Get: List of available legal key sizes
+	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const std::vector<size_t> LegalRounds() = 0;
+	virtual const std::vector<size_t> &LegalRounds() = 0;
 
 	/// <summary>
 	/// Get: The block ciphers class name
 	/// </summary>
-	virtual const std::string Name() = 0;
+	virtual const std::string &Name() = 0;
 
 	/// <summary>
 	/// Get: The number of transformation rounds processed by the transform
@@ -220,7 +220,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual void Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
@@ -232,7 +232,19 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual void Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+
+	/// <summary>
+	/// Transform 16 blocks of bytes.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 16 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
+	virtual void Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 };
 
 NAMESPACE_BLOCKEND

@@ -44,7 +44,6 @@ using Enumeration::Providers;
 class SymmetricKeyGenerator
 {
 private:
-
 	SymmetricKeyGenerator(const SymmetricKeyGenerator&) = delete;
 	SymmetricKeyGenerator& operator=(const SymmetricKeyGenerator&) = delete;
 	SymmetricKeyGenerator& operator=(SymmetricKeyGenerator&&) = delete;
@@ -65,7 +64,7 @@ public:
 	/// 
 	/// <param name="DigestType">The hash function used to power an hmac used to condition output keying material</param>
 	/// <param name="ProviderType">The entropy provider that supplies the seed material for the key compression cycle</param>
-	SymmetricKeyGenerator(Digests DigestType = Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP);
+	explicit SymmetricKeyGenerator(Digests DigestType = Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP);
 
 	/// <summary>
 	/// Destructor

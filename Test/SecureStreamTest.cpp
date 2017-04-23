@@ -21,6 +21,27 @@ namespace Test
 	{
 	}
 
+	std::string SecureStreamTest::Run()
+	{
+		try
+		{
+			CompareSerial();
+			OnProgress(std::string("SymmetricKeyGenerator: Passed serialization tests.."));
+			CheckAccess();
+			OnProgress(std::string("SymmetricKeyGenerator: Passed read/write comparison tests.."));
+
+			return SUCCESS;
+		}
+		catch (std::exception const &ex)
+		{
+			throw TestException(std::string(FAILURE + " : " + ex.what()));
+		}
+		catch (...)
+		{
+			throw TestException(std::string(FAILURE + " : Unknown Error"));
+		}
+	}
+
 	void SecureStreamTest::CheckAccess()
 	{
 		Prng::SecureRandom rnd;

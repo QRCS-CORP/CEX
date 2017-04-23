@@ -27,6 +27,8 @@
 // Blake2: https://github.com/BLAKE2/BLAKE2
 //
 // Written by John Underhill, June 19, 2016
+// Updated March 1, 2017
+// Updated April 18, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_BLAKE2SP256_H
@@ -109,6 +111,7 @@ private:
 
 	static const size_t BLOCK_SIZE = 64;
 	static const uint CHAIN_SIZE = 8;
+	static const std::string CLASS_NAME;
 	static const uint COUNTER_SIZE = 2;
 	static const uint DEF_PRLDEGREE = 8;
 	static const uint DEF_LEAFSIZE = 16384;
@@ -138,11 +141,20 @@ private:
 		void Reset()
 		{
 			if (F.size() > 0)
-				memset(&F[0], 0, F.size() * sizeof(uint));
+			{
+				for (size_t i = 0; i < F.size(); ++i)
+					F[i] = 0;
+			}
 			if (H.size() > 0)
-				memset(&H[0], 0, H.size() * sizeof(uint));
+			{
+				for (size_t i = 0; i < H.size(); ++i)
+					H[i] = 0;
+			}
 			if (T.size() > 0)
-				memset(&T[0], 0, T.size() * sizeof(uint));
+			{
+				for (size_t i = 0; i < T.size(); ++i)
+					T[i] = 0;
+			}
 		}
 	};
 
@@ -152,10 +164,10 @@ private:
 	uint m_leafSize;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
+	ParallelOptions m_parallelProfile;
 	std::vector<uint> m_treeConfig;
 	bool m_treeDestroy;
 	BlakeParams m_treeParams;
-	ParallelOptions m_parallelProfile;
 
 public:
 
@@ -168,41 +180,35 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual size_t BlockSize() { return BLOCK_SIZE; }
+	size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual size_t DigestSize() { return DIGEST_SIZE; }
+	size_t DigestSize() override;
 
 	/// <summary>
 	/// Get: The digests type name
 	/// </summary>
-	virtual const Digests Enumeral() 
-	{ 
-		return Digests::Blake256;
-	}
+	const Digests Enumeral() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel() override;
 
 	/// <summary>
 	/// Get: The digests class name
 	/// </summary>
-	virtual const std::string Name()
-	{
-		return "Blake256";
-	}
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize() override;
 
 	/// <summary>
 	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
@@ -211,7 +217,7 @@ public:
 	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
 	/// and reinitialize the state, or initialize the digest using a BlakeParams with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Constructor~~~//
 
@@ -237,7 +243,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~Blake256();
+	 ~Blake256() override;
 
 	//~~~Public Functions~~~//
 
@@ -247,12 +253,12 @@ public:
 	/// 
 	/// <param name="Input">The message input data</param>
 	/// <param name="Output">The hash value output array</param>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Perform final processing and return the hash value
@@ -264,7 +270,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
+	size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the digest as a MAC code generator
@@ -274,7 +280,7 @@ public:
 	/// <para>The input Key must be a maximum size of 32 bytes, and a minimum size of 16 bytes. 
 	/// If either the Salt or Info parameters are used, their size must be 8 bytes.
 	/// The maximum combined size of Key, Salt, and Info, must be 64 bytes or less.</para></param>
-	virtual void Initialize(ISymmetricKey &MacKey);
+	void Initialize(ISymmetricKey &MacKey);
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -285,19 +291,19 @@ public:
 	/// <param name="Degree">The desired number of threads</param>
 	///
 	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
-	virtual void ParallelMaxDegree(size_t Degree);
+	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
 	/// Reset the internal state to sequential defaults
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Update the message digest with a single byte
 	/// </summary>
 	/// 
 	/// <param name="Input">Input message byte</param>
-	virtual void Update(byte Input);
+	void Update(byte Input) override;
 
 	/// <summary>
 	/// Update the message buffer
@@ -311,7 +317,7 @@ public:
 	/// <param name="Input">The Input message data</param>
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="Length">The amount of data to process in bytes</param>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 

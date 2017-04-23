@@ -21,6 +21,7 @@
 // An implementation of a Cipher FeedBack Mode (CFB).
 // Written by John Underhill, September 24, 2014
 // Updated September 16, 2016
+// Updated April 18, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_CFB_H
@@ -93,7 +94,6 @@ NAMESPACE_MODE
 /// <item><description>A cipher mode constructor can either be initialized with a block cipher instance, or using the block ciphers enumeration name.</description></item>
 /// <item><description>A block cipher instance created using the enumeration constructor, is automatically deleted when the class is destroyed.</description></item>
 /// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
-/// <item><description>The DecryptBlock and EncryptBlock functions can only be accessed through the class instance.</description></item>
 /// <item><description>The transformation methods can not be called until the Initialize(bool, ISymmetricKey) function has been called.</description></item>
 /// <item><description>In CFB mode, only the decryption function can be processed in parallel.</description></item>
 /// <item><description>The ParallelThreadsMax() property is used as the thread count in the parallel loop; this must be an even number no greater than the number of processer cores on the system.</description></item>
@@ -108,11 +108,12 @@ NAMESPACE_MODE
 /// <item><description>Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/chap7.pdf">Chapter 7: Block Ciphers</a>.</description></item>
 /// </list>
 /// </remarks>
-class CFB : public ICipherMode
+class CFB final : public ICipherMode
 {
 private:
 
 	static const size_t BLOCK_SIZE = 16;
+	static const std::string CLASS_NAME;
 
 	IBlockCipher* m_blockCipher;
 	size_t m_blockSize;
@@ -136,63 +137,60 @@ public:
 	/// <summary>
 	/// Get: Block size of internal cipher in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return m_blockSize; }
+	const size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: The block ciphers formal type name
 	/// </summary>
-	virtual BlockCiphers CipherType() { return m_cipherType; }
+	const BlockCiphers CipherType() override;
 
 	/// <summary>
 	/// Get: The underlying Block Cipher instance
 	/// </summary>
-	virtual IBlockCipher* Engine() { return m_blockCipher; }
+	IBlockCipher* Engine() override;
 
 	/// <summary>
-	/// Get: The Cipher Modes enumeration type name
+	/// Get: The cipher modes type name
 	/// </summary>
-	virtual const CipherModes Enumeral() { return CipherModes::CFB; }
+	const CipherModes Enumeral() override;
 
 	/// <summary>
 	/// Get: True if initialized for encryption, False for decryption
 	/// </summary>
-	virtual const bool IsEncryption() { return m_isEncryption; }
+	const bool IsEncryption() override;
 
 	/// <summary>
 	/// Get: The Block Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel() override;
 
 	/// <summary>
 	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_blockCipher->LegalKeySizes(); }
+	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Get: The cipher mode name
+	/// Get: The cipher modes class name
 	/// </summary>
-	virtual const std::string Name() { return "CFB"; }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize() override;
 
 	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes 
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
-	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
+	/// Get/Set: Parallel and SIMD capability flags and sizes (Not supported in this mode)
 	/// </summary>
-	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Constructor~~~//
 
@@ -219,9 +217,10 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~CFB();
+	~CFB() override;
 
 	//~~~Public Functions~~~//
+
 
 	/// <summary>
 	/// Decrypt a single block of bytes.
@@ -231,26 +230,26 @@ public:
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
 	/// <param name="Output">The output array of decrypted bytes</param>
-	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
-	/// <para>Decrypts one block of bytes using the designated offsets.
+	/// <para>Decrypts one block of bytes at the designated offsets.
 	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="InOffset">Starting offset within the Input array</param>
 	/// <param name="Output">The output array of decrypted bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	/// <param name="OutOffset">Starting offset within the Output array</param>
+	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -260,7 +259,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
 	/// <param name="Output">The output array of encrypted bytes</param>
-	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
@@ -272,7 +271,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of encrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance
@@ -282,7 +281,7 @@ public:
 	/// <param name="KeyParams">SymmetricKey containing the encryption Key and Initialization Vector</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null Key or Nonce is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams);
+	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -293,43 +292,7 @@ public:
 	/// <param name="Degree">The desired number of threads</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
-	void ParallelMaxDegree(size_t Degree);
-
-	/// <summary>
-	/// Transform an entire block of bytes. 
-	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// This method is used in a buffering strategy, where buffers of size BlockSize() for sequential processing, 
-	/// or ParallelBlockSize() for parallel processing, are processed and copied to a larger array by the caller.
-	/// Parallel processing is limited to the Decryption function only, the Encryption function will process ParallelBlockSize() blocks in sequential mode.
-	/// Buffers should be of the same size, either BlockSize() or ParallelBlockSize().
-	/// If the Input and Output array sizes differ, the smallest array size will be processed.
-	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Transform a block of bytes with offset parameters.
-	/// <para>Transforms one block of bytes at the designated offsets.
-	/// This method is used when looping through two large arrays utilizing offsets incremented by the caller.
-	/// One block is processed of either ParallelBlockSize() for parallel processing, or BlockSize() for sequential mode.
-	/// Parallel processing is limited to the Decryption function only, the Encryption function will process ParallelBlockSize() blocks in sequential mode.
-	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
 	/// Transform a length of bytes with offset parameters. 
@@ -345,12 +308,15 @@ public:
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 private:
 
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount);
+	void Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
 	void Scope();
 };
 

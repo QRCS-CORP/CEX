@@ -1,85 +1,76 @@
 #include "BitConverter.h"
+#include "MemUtils.h"
 
 NAMESPACE_IO
 
 char BitConverter::ToChar(const std::vector<byte> &Input, const size_t InOffset)
 {
-	char d = 0;
-	size_t sze = sizeof(char);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	char val = 0;
+	Utility::MemUtils::Copy<byte, char>(Input, InOffset, val, sizeof(char));
+	return val;
 }
 
 unsigned char BitConverter::ToUChar(const std::vector<byte> &Input, const size_t InOffset)
 {
-	unsigned char d = 0;
-	size_t sze = sizeof(unsigned char);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	unsigned char val = 0;
+	Utility::MemUtils::Copy<byte, unsigned char>(Input, InOffset, val, sizeof(unsigned char));
+	return val;
 }
 
 double BitConverter::ToDouble(const std::vector<byte> &Input, const size_t InOffset)
 {
-	double d = 0;
-	size_t sze = sizeof(double);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	double val = 0;
+	Utility::MemUtils::Copy<byte, double>(Input, InOffset, val, sizeof(double));
+	return val;
 }
 
 float BitConverter::ToFloat(const std::vector<byte> &Input, const size_t InOffset)
 {
-	float d = 0;
-	size_t sze = sizeof(float);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	float val = 0;
+	Utility::MemUtils::Copy<byte, float>(Input, InOffset, val, sizeof(float));
+	return val;
 }
 
 short BitConverter::ToInt16(const std::vector<byte> &Input, const size_t InOffset)
 {
-	short d = 0;
-	size_t sze = sizeof(short);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	short val = 0;
+	Utility::MemUtils::Copy<byte, short>(Input, InOffset, val, sizeof(short));
+	return val;
 }
 
 ushort BitConverter::ToUInt16(const std::vector<byte> &Input, const size_t InOffset)
 {
-	unsigned short d = 0;
-	size_t sze = sizeof(unsigned short);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	ushort val = 0;
+	Utility::MemUtils::Copy<byte, ushort>(Input, InOffset, val, sizeof(ushort));
+	return val;
 }
 
 int BitConverter::ToInt32(const std::vector<byte> &Input, const size_t InOffset)
 {
-	int d = 0;
-	size_t sze = sizeof(int);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	int val = 0;
+	Utility::MemUtils::Copy<byte, int>(Input, InOffset, val, sizeof(int));
+	return val;
 }
 
-uint BitConverter::ToUInt32(const std::vector<byte> &Input, const uint InOffset)
+uint BitConverter::ToUInt32(const std::vector<byte> &Input, const size_t InOffset)
 {
-	uint d = 0;
-	size_t sze = sizeof(uint);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	uint val = 0;
+	Utility::MemUtils::Copy<byte, uint>(Input, InOffset, val, sizeof(uint));
+	return val;
 }
 
 long BitConverter::ToInt64(const std::vector<byte> &Input, const size_t InOffset)
 {
-	long d = 0;
-	size_t sze = sizeof(long);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	long val = 0;
+	Utility::MemUtils::Copy<byte, long>(Input, InOffset, val, sizeof(long));
+	return val;
 }
 
 ulong BitConverter::ToUInt64(const std::vector<byte> &Input, const size_t InOffset)
 {
-	ulong d = 0;
-	size_t sze = sizeof(ulong);
-	memcpy(&d, &Input[InOffset], sze);
-	return d;
+	ulong val = 0;
+	Utility::MemUtils::Copy<byte, ulong>(Input, InOffset, val, sizeof(ulong));
+	return val;
 }
 
 NAMESPACE_IOEND

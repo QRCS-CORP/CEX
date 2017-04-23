@@ -20,17 +20,17 @@ public:
 	/// <summary>
 	/// Get/Set: The inner exception string
 	/// </summary>
-	std::string &Details() { return m_details; }
+	std::string &Details();
 
 	/// <summary>
 	/// Get/Set: The message associated with the error
 	/// </summary>
-	std::string &Message() { return m_message; }
+	std::string &Message();
 
 	/// <summary>
 	/// Get/Set: The origin of the exception in the format Class
 	/// </summary>
-	std::string &Origin() { return m_origin; }
+	std::string &Origin();
 
 
 	/// <summary>
@@ -38,13 +38,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Message">A custom message or error data</param>
-	explicit CryptoRandomException(const std::string &Message)
-		:
-		m_details(""),
-		m_message(Message),
-		m_origin("")
-	{
-	}
+	explicit CryptoRandomException(const std::string &Message);
 
 	/// <summary>
 	/// Instantiate this class with an origin and message
@@ -52,13 +46,7 @@ public:
 	///
 	/// <param name="Origin">The origin of the exception</param>
 	/// <param name="Message">A custom message or error data</param>
-	explicit CryptoRandomException(const std::string &Origin, const std::string &Message)
-		:
-		m_details(""),
-		m_message(Message),
-		m_origin(Origin)
-	{
-	}
+	explicit CryptoRandomException(const std::string &Origin, const std::string &Message);
 
 	/// <summary>
 	/// Instantiate this class with an origin, message and inner exception
@@ -67,13 +55,7 @@ public:
 	/// <param name="Origin">The origin of the exception</param>
 	/// <param name="Message">A custom message or error data</param>
 	/// <param name="Detail">The inner exception string</param>
-	explicit CryptoRandomException(const std::string &Origin, const std::string &Message, const std::string &Detail)
-		:
-		m_details(Detail),
-		m_message(Message),
-		m_origin(Origin)
-	{
-	}
+	explicit CryptoRandomException(const std::string &Origin, const std::string &Message, const std::string &Detail);
 };
 
 NAMESPACE_EXCEPTIONEND

@@ -34,6 +34,243 @@
 
 NAMESPACE_COMMON
 
+//~~~ Properties~~~//
+
+const bool CpuDetect::ABM() 
+{
+	return GetFlag(CpuidFlags::CPUID_ABM); 
+}
+
+const bool CpuDetect::ADS()
+{
+	return GetFlag(CpuidFlags::CPUID_ADX);
+}
+
+const bool CpuDetect::AESNI()
+{ 
+	return GetFlag(CpuidFlags::CPUID_AESNI);
+}
+
+const bool CpuDetect::AVX() 
+{
+	return GetFlag(CpuidFlags::CPUID_AVX); 
+}
+
+const bool CpuDetect::AVX2() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_AVX2); 
+}
+
+const bool CpuDetect::AVX512F()
+{
+	return GetFlag(CpuidFlags::CPUID_AVX512F); 
+}
+
+const bool CpuDetect::BMT2()
+{
+	return GetFlag(CpuidFlags::CPUID_BMI2); 
+}
+
+const size_t CpuDetect::BusSpeed()
+{
+	return m_busSpeed;
+}
+
+const bool CpuDetect::CMUL() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_CMUL);
+}
+
+const bool CpuDetect::FMA4() { return GetFlag(CpuidFlags::CPUID_FMA4); }
+
+const size_t CpuDetect::FrequencyBase()
+{
+	return m_frequencyBase;
+}
+
+const size_t CpuDetect::FrequencyMax()
+{
+	return m_frequencyMax;
+}
+
+const bool CpuDetect::HyperThread() 
+{
+	return GetFlag(CpuidFlags::CPUID_HYPERTHREAD); 
+}
+
+const bool CpuDetect::IsX64() 
+{
+	return GetFlag(CpuidFlags::CPUID_X64);
+}
+
+const size_t CpuDetect::L1CacheSize()
+{
+	if (m_l1CacheSize == 0 || m_physCores == 0)
+		return KB32;
+	else
+		return m_l1CacheSize * KB1;
+}
+
+const size_t CpuDetect::L1CacheLineSize()
+{
+	if (m_l1CacheLineSize == 0)
+		return 64;
+	else
+		return m_l1CacheLineSize;
+}
+
+const size_t CpuDetect::L1CacheTotal()
+{
+	if (m_l1CacheSize == 0 || m_physCores == 0)
+		return KB256;
+	else
+		return m_l1CacheSize * m_physCores * KB1;
+}
+
+const size_t CpuDetect::L1DataCacheTotal()
+{
+	if (m_l1CacheSize == 0 || m_physCores == 0)
+		return KB256;
+	else
+		return (m_l1CacheSize / 2) * m_physCores * KB1;
+}
+
+const size_t CpuDetect::L2CacheSize()
+{
+	if (m_l2CacheSize == 0 || m_physCores == 0)
+		return KB128;
+	else
+		return m_l2CacheSize * KB1;
+}
+
+const size_t CpuDetect::L2CacheTotal()
+{
+	if (m_l2CacheSize == 0 || m_physCores == 0)
+		return KB256;
+	else
+		return m_l2CacheSize * m_physCores * KB1;
+}
+
+const CpuDetect::CacheAssociations CpuDetect::L2Associative()
+{ 
+	return m_l2Associative; 
+}
+
+const size_t CpuDetect::LogicalPerCore() 
+{ 
+	return m_logicalPerCore;
+}
+
+const bool CpuDetect::MPX() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_MPX); 
+}
+
+const size_t CpuDetect::PhysicalCores()
+{ 
+	return m_physCores;
+}
+
+const bool CpuDetect::PQE() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_PQE);
+}
+
+const bool CpuDetect::PQM()
+{ 
+	return GetFlag(CpuidFlags::CPUID_PQM);
+}
+
+const bool CpuDetect::PREFETCH() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_PREFETCH);
+}
+
+const bool CpuDetect::RDRAND()
+{
+	return GetFlag(CpuidFlags::CPUID_RDRAND);
+}
+
+const bool CpuDetect::RDSEED() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_RDSEED); 
+}
+
+const bool CpuDetect::RDTSCP() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_RDTSCP);
+}
+
+const bool CpuDetect::RTM() 
+{
+	return GetFlag(CpuidFlags::CPUID_RTM); 
+}
+
+const std::string &CpuDetect::SerialNumber() 
+{
+	return m_serialNumber;
+}
+
+const bool CpuDetect::SHA() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_SHA);
+}
+
+const bool CpuDetect::SMAP() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_SMAP); 
+}
+
+const bool CpuDetect::SSE()
+{ 
+	return GetFlag(CpuidFlags::CPUID_SSE2); 
+}
+
+const bool CpuDetect::SSE2() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_SSE2); 
+}
+
+const bool CpuDetect::SSE3()
+{
+	return GetFlag(CpuidFlags::CPUID_SSE3);
+}
+
+const bool CpuDetect::SSSE3()
+{ 
+	return GetFlag(CpuidFlags::CPUID_SSSE3);
+}
+
+const bool CpuDetect::SSE4A()
+{
+	return GetFlag(CpuidFlags::CPUID_SSE4A);
+}
+
+const bool CpuDetect::SSE41() 
+{
+	return GetFlag(CpuidFlags::CPUID_SSE41);
+}
+
+const bool CpuDetect::SSE42()
+{ 
+	return GetFlag(CpuidFlags::CPUID_SSE42); 
+}
+
+CpuDetect::CpuVendors CpuDetect::Vendor()
+{ 
+	return m_cpuVendor; 
+}
+
+const size_t CpuDetect::VirtualCores()
+{ 
+	return m_virtCores; 
+}
+
+const bool CpuDetect::XOP() 
+{ 
+	return GetFlag(CpuidFlags::CPUID_XOP);
+}
+
 //~~~ Constructor~~~//
 
 CpuDetect::CpuDetect()

@@ -25,7 +25,9 @@
 // An implementation of the SHA-2 digest with a 256 bit return size. 
 // Written by John Underhill, July 31, 2016
 // Updated March 20, 2017
+// Updated April 18, 2017
 // Contact: develop@vtdev.com
+
 
 #ifndef _CEX_SHA256_H
 #define _CEX_SHA256_H
@@ -92,6 +94,7 @@ class SHA256 : public IDigest
 private:
 
 	static const size_t BLOCK_SIZE = 64;
+	static const std::string CLASS_NAME;
 	static const size_t DIGEST_SIZE = 32;
 	static const uint DEF_PRLDEGREE = 8;
 	// size of reserved state buffer subtracted from parallel size calculations
@@ -141,35 +144,35 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual size_t BlockSize() { return BLOCK_SIZE; }
+	size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual size_t DigestSize() { return DIGEST_SIZE; }
+	size_t DigestSize() override;
 
 	/// <summary>
 	/// Get: The digests type name
 	/// </summary>
-	virtual const Digests Enumeral() { return Digests::SHA256; }
+	const Digests Enumeral() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel() override;
 
 	/// <summary>
 	/// Get: The digests class name
 	/// </summary>
-	virtual const std::string Name() { return "SHA256"; }
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize() override;
 
 	/// <summary>
 	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
@@ -178,7 +181,7 @@ public:
 	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
 	/// and reinitialize the state, or initialize the digest using a SHA2Params with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Constructor~~~//
 
@@ -206,7 +209,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SHA256();
+	~SHA256() override;
 
 	//~~~Public Functions~~~//
 
@@ -216,12 +219,12 @@ public:
 	/// 
 	/// <param name="Input">The input message array</param>
 	/// <param name="Output">The hash output code array</param>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Finalize processing and get the hash code
@@ -233,7 +236,7 @@ public:
 	/// <returns>The byte size of the hash code</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output array is too short</exception>
-	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
+	size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -244,19 +247,19 @@ public:
 	/// <param name="Degree">The desired number of threads</param>
 	///
 	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
-	virtual void ParallelMaxDegree(size_t Degree);
+	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Update the hash with a single byte
 	/// </summary>
 	/// 
 	/// <param name="Input">Input message byte</param>
-	virtual void Update(byte Input);
+	void Update(byte Input) override;
 
 	/// <summary>
 	/// Update the buffer with a block of bytes
@@ -265,7 +268,7 @@ public:
 	/// <param name="Input">The input message array</param>
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="Length">The number of message bytes to process</param>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 

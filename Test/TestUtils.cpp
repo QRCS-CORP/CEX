@@ -8,7 +8,6 @@
 #	include <sys/types.h>
 #	include <sys/time.h>
 #endif
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 

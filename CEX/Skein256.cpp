@@ -1,12 +1,48 @@
 #include "Skein256.h"
-#include "ArrayUtils.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::ParallelUtils;
+const std::string Skein256::CLASS_NAME("Skein256");
+
+//~~~Properties~~~//
+
+size_t Skein256::BlockSize() 
+{ 
+	return BLOCK_SIZE; 
+}
+
+size_t Skein256::DigestSize()
+{ 
+	return DIGEST_SIZE; 
+}
+
+const Digests Skein256::Enumeral() 
+{ 
+	return Digests::Skein256; 
+}
+
+const bool Skein256::IsParallel() 
+{ 
+	return m_parallelProfile.IsParallel(); 
+}
+
+const std::string Skein256::Name() 
+{ 
+	return CLASS_NAME; 
+}
+
+const size_t Skein256::ParallelBlockSize() 
+{ 
+	return m_parallelProfile.ParallelBlockSize(); 
+}
+
+ParallelOptions &Skein256::ParallelProfile()
+{ 
+	return m_parallelProfile; 
+}
 
 //~~~Constructor~~~//
 
@@ -82,8 +118,8 @@ void Skein256::Destroy()
 
 		try
 		{
-			Utility::ArrayUtils::ClearVector(m_dgtState);
-			Utility::ArrayUtils::ClearVector(m_msgBuffer);
+			Utility::IntUtils::ClearVector(m_dgtState);
+			Utility::IntUtils::ClearVector(m_msgBuffer);
 		}
 		catch (std::exception& ex)
 		{
@@ -100,7 +136,7 @@ size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
-			memset(&m_msgBuffer[m_msgLength], (byte)0, m_msgBuffer.size() - m_msgLength);
+			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 
 		// process buffer
 		if (m_msgLength != 0)
@@ -126,23 +162,23 @@ size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntUtils::LeULL256ToBlock(m_dgtState[i].S, m_msgBuffer, i * BLOCK_SIZE);
+			Utility::IntUtils::LeULL256ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
 			m_msgLength += BLOCK_SIZE;
 		}
 
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, rootState, 0);
-		IntUtils::LeULL256ToBlock(rootState[0].S, Output, OutOffset);
+		Utility::IntUtils::LeULL256ToBlock(rootState[0].S, 0, Output, OutOffset);
 	}
 	else
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
-			memset(&m_msgBuffer[m_msgLength], (byte)0, m_msgBuffer.size() - m_msgLength);
+			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState, 0);
-		IntUtils::LeULL256ToBlock(m_dgtState[0].S, Output, OutOffset);
+		Utility::IntUtils::LeULL256ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -201,19 +237,19 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 		{
 			// fill buffer
-			const size_t BUFRMD = m_msgBuffer.size() - m_msgLength;
-			if (BUFRMD != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], BUFRMD);
+			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+			if (RMDLEN != 0)
+				Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 
 			// empty the message buffer
-			ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 			{
 				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
 			});
 
 			m_msgLength = 0;
-			Length -= BUFRMD;
-			InOffset += BUFRMD;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
 		}
 
 		if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -222,7 +258,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 			// process large blocks
-			ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 			{
 				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
 			});
@@ -263,7 +299,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		{
 			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 			if (RMDLEN != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], RMDLEN);
+				Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 
 			ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
 			m_msgLength = 0;
@@ -283,7 +319,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 	// store unaligned bytes
 	if (Length != 0)
 	{
-		memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], Length);
+		Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 		m_msgLength += Length;
 	}
 }
@@ -315,11 +351,11 @@ void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	State[StateOffset].Increase(Length);
 	// encrypt block
 	std::vector<ulong> block(4, 0);
-	IntUtils::BytesToLeULL256(Input, InOffset, block, 0);
+	Utility::IntUtils::LeBytesToULL256(Input, InOffset, block, 0);
 	Threefish256::Transfrom32(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
-	IntUtils::XORULL256(block, 0, State[StateOffset].S, 0);
+	Utility::MemUtils::XOR256<ulong>(block, 0, State[StateOffset].S, 0);
 
 	// clear first flag
 	if (!m_isInitialized && StateOffset == 0)
@@ -358,9 +394,9 @@ void Skein256::Initialize()
 			// compress previous state
 			Threefish256::Transfrom32(m_dgtState[i - 1].V, 0, m_dgtState[i]);
 			// store the new state in V for reset
-			memcpy(&m_dgtState[i].V[0], &m_dgtState[i].S[0], m_dgtState[i].V.size() * sizeof(ulong));
+			Utility::MemUtils::Copy<ulong>(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
-			IntUtils::XORULL256(config, 0, m_dgtState[i].V, 0);
+			Utility::MemUtils::XOR256<ulong>(config, 0, m_dgtState[i].V, 0);
 		}
 	}
 
@@ -375,9 +411,9 @@ void Skein256::LoadState(Skein256State &State, std::vector<ulong> &Config)
 	State.Increase(32);
 	Threefish256::Transfrom32(Config, 0, State);
 	// store the initial state for reset
-	memcpy(&State.V[0], &State.S[0], State.V.size() * sizeof(ulong));
+	Utility::MemUtils::Copy<ulong>(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string
-	IntUtils::XORULL256(Config, 0, State.V, 0);
+	Utility::MemUtils::XOR256<ulong>(Config, 0, State.V, 0);
 }
 
 NAMESPACE_DIGESTEND

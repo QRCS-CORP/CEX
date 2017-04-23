@@ -76,17 +76,17 @@ public:
 	/// <summary>
 	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const std::vector<size_t> LegalRounds() = 0;
+	virtual const std::vector<size_t> &LegalRounds() = 0;
 
 	/// <summary>
 	/// Get: The stream ciphers class name
 	/// </summary>
-	virtual const std::string Name() = 0;
+	virtual const std::string &Name() = 0;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
@@ -133,23 +133,22 @@ public:
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
-	/// Encrypt/Decrypt an array of bytes
+	/// Encrypt/Decrypt one block of bytes
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+	virtual void TransformBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Encrypt/Decrypt an array of bytes with offset parameters.
-	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
+	/// Encrypt/Decrypt one block of bytes
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+	virtual void TransformBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.

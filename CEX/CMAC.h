@@ -97,6 +97,8 @@ class CMAC : public IMac
 {
 private:
 
+	static const size_t BLOCK_SIZE = 16;
+	static const std::string CLASS_NAME;
 	static const byte CT87 = (byte)0x87;
 	static const byte CT1B = (byte)0x1b;
 
@@ -126,37 +128,37 @@ public:
 	/// <summary>
 	/// Get: The Macs internal blocksize in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return m_cipherMode->BlockSize(); }
+	const size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: The block cipher engine type
 	/// </summary>
-	const BlockCiphers CipherType() { return m_cipherType; }
+	const BlockCiphers CipherType();
 
 	/// <summary>
 	/// Get: Mac generators type name
 	/// </summary>
-	virtual const Macs Enumeral() { return Macs::CMAC; }
+	const Macs Enumeral() override;
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const size_t MacSize() { return m_macSize; }
+	const size_t MacSize() override;
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; };
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
 	/// Get: Mac generators class name
 	/// </summary>
-	virtual const std::string Name() { return "CMAC"; }
+	const std::string &Name() override;
 
 	//~~~Constructor~~~//
 
@@ -180,7 +182,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~CMAC();
+	~CMAC() override;
 
 	//~~~Public Functions~~~//
 
@@ -193,12 +195,12 @@ public:
 	/// <param name="Output">The output Mac code array</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Process the data and return a Mac code
@@ -211,7 +213,7 @@ public:
 	/// <returns>The number of bytes processed</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset);
+	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the MAC generator with a symmetric key container.
@@ -221,19 +223,19 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
-	virtual void Initialize(ISymmetricKey &KeyParams);
+	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
 	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Update the Mac with a single byte
 	/// </summary>
 	/// 
 	/// <param name="Input">Input byte to process</param>
-	virtual void Update(byte Input);
+	void Update(byte Input) override;
 
 	/// <summary>
 	/// Update the Mac with a block of bytes
@@ -242,9 +244,10 @@ public:
 	/// <param name="Input">The input data array to process</param>
 	/// <param name="InOffset">Starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
+
 	std::vector<byte> GenerateSubkey(std::vector<byte> &Input);
 	void Scope();
 };

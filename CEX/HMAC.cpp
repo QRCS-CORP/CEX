@@ -1,8 +1,62 @@
 #include "HMAC.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
+#include "IntUtils.h"
 
 NAMESPACE_MAC
+
+const std::string HMAC::CLASS_NAME("HMAC");
+
+//~~~Properties~~~//
+
+const size_t HMAC::BlockSize()
+{ 
+	return m_msgDigest->BlockSize();
+}
+
+const Digests HMAC::DigestType()
+{ 
+	return m_msgDigestType; 
+}
+
+const Macs HMAC::Enumeral()
+{
+	return Macs::HMAC; 
+}
+
+const size_t HMAC::MacSize() 
+{
+	return m_msgDigest->DigestSize(); 
+}
+
+const bool HMAC::IsInitialized() 
+{ 
+	return m_isInitialized; 
+}
+
+std::vector<SymmetricKeySize> HMAC::LegalKeySizes() const 
+{ 
+	return m_legalKeySizes;
+}
+
+const bool HMAC::IsParallel()
+{
+	return m_msgDigest->IsParallel(); 
+}
+
+const std::string &HMAC::Name()
+{ 
+	return CLASS_NAME;
+}
+
+const size_t HMAC::ParallelBlockSize() 
+{
+	return m_msgDigest->ParallelBlockSize();
+}
+
+ParallelOptions &HMAC::ParallelProfile() 
+{ 
+	return m_msgDigest->ParallelProfile(); 
+}
 
 //~~~Constructor~~~//
 
@@ -68,9 +122,9 @@ void HMAC::Destroy()
 					delete m_msgDigest;
 			}
 
-			Utility::ArrayUtils::ClearVector(m_inputPad);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_outputPad);
+			Utility::IntUtils::ClearVector(m_inputPad);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_outputPad);
 		}
 		catch (std::exception& ex)
 		{
@@ -119,13 +173,13 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		memcpy(&m_inputPad[0], &KeyParams.Key()[0], keyLen);
+		Utility::MemUtils::Copy<byte>(KeyParams.Key(), 0, m_inputPad, 0, keyLen);
 	}
 
 	if (m_msgDigest->BlockSize() - keyLen > 0)
-		memset(&m_inputPad[keyLen], 0, m_msgDigest->BlockSize() - keyLen);
+		Utility::MemUtils::Clear<byte>(m_inputPad, keyLen, m_msgDigest->BlockSize() - keyLen);
 
-	memcpy(&m_outputPad[0], &m_inputPad[0], m_msgDigest->BlockSize());
+	Utility::MemUtils::Copy<byte>(m_inputPad, 0, m_outputPad, 0, m_inputPad.size());
 	XorPad(m_inputPad, IPAD);
 	XorPad(m_outputPad, OPAD);
 	m_msgDigest->Update(m_inputPad, 0, m_inputPad.size());

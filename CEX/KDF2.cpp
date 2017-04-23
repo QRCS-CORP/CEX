@@ -1,9 +1,38 @@
 #include "KDF2.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 
 NAMESPACE_KDF
+
+const std::string KDF2::CLASS_NAME("KDF2");
+
+//~~~Properties~~~//
+
+const Kdfs KDF2::Enumeral()
+{ 
+	return Kdfs::KDF2; 
+}
+
+const bool KDF2::IsInitialized() 
+{ 
+	return m_isInitialized; 
+}
+
+size_t KDF2::MinKeySize() 
+{ 
+	return m_blockSize;
+}
+
+std::vector<SymmetricKeySize> KDF2::LegalKeySizes() const 
+{
+	return m_legalKeySizes; 
+}
+
+const std::string &KDF2::Name() 
+{ 
+	return CLASS_NAME;
+}
 
 //~~~Constructor~~~//
 
@@ -69,9 +98,9 @@ void KDF2::Destroy()
 					delete m_msgDigest;
 			}
 
-			Utility::ArrayUtils::ClearVector(m_kdfKey);
-			Utility::ArrayUtils::ClearVector(m_kdfSalt);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_kdfKey);
+			Utility::IntUtils::ClearVector(m_kdfSalt);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
 		}
 		catch(std::exception& ex)
 		{
@@ -82,10 +111,9 @@ void KDF2::Destroy()
 
 size_t KDF2::Generate(std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("KDF2:Generate", "The generator must be initialized before use!");
-	if (Output.size() == 0)
-		throw CryptoKdfException("KDF2:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
+
 	if (m_kdfCounter + (Output.size() / m_hashSize) > 255)
 		throw CryptoKdfException("KDF2:Generate", "KDF2 may only be used for 255 * HashLen bytes of output");
 
@@ -94,10 +122,9 @@ size_t KDF2::Generate(std::vector<byte> &Output)
 
 size_t KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("KDF2:Generate", "The generator must be initialized before use!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoKdfException("KDF2:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
+
 	if (m_kdfCounter + (Length / m_hashSize) > 255)
 		throw CryptoKdfException("KDF2:Generate", "KDF2 may only be used for 255 * HashLen bytes of output");
 
@@ -132,14 +159,14 @@ void KDF2::Initialize(const std::vector<byte> &Key)
 	{
 		// pad the key to one block
 		m_kdfKey.resize(m_blockSize);
-		memcpy(&m_kdfKey[0], &Key[0], Key.size());
+		Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, Key.size());
 	}
 	else
 	{
 		m_kdfKey.resize(m_blockSize);
-		memcpy(&m_kdfKey[0], &Key[0], m_blockSize);
+		Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_blockSize);
 		m_kdfSalt.resize(Key.size() - m_blockSize);
-		memcpy(&m_kdfSalt[0], &Key[m_blockSize], m_kdfSalt.size());
+		Utility::MemUtils::Copy<byte>(Key, m_blockSize, m_kdfSalt, 0, m_kdfSalt.size());
 	}
 
 	m_isInitialized = true;
@@ -156,12 +183,12 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, Key.size());
 
 	if (Salt.size() > 0)
 	{
 		m_kdfSalt.resize(Salt.size());
-		memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
 	}
 
 	m_isInitialized = true;
@@ -178,15 +205,15 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, Key.size());
 
 	if (Salt.size() > 0)
 	{
 		m_kdfSalt.resize(Salt.size() + Info.size());
-		memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
 		// add info as extension of salt
 		if (Info.size() > 0)
-			memcpy(&m_kdfSalt[Salt.size()], &Info[0], Info.size());
+			Utility::MemUtils::Copy<byte>(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 	}
 
 	m_isInitialized = true;
@@ -235,7 +262,7 @@ size_t KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		++m_kdfCounter;
 
 		size_t prcRmd = Utility::IntUtils::Min(m_hashSize, prcLen);
-		memcpy(&Output[OutOffset], &hash[0], prcRmd);
+		Utility::MemUtils::Copy<byte>(hash, 0, Output, OutOffset, prcRmd);
 		prcLen -= prcRmd;
 		OutOffset += prcRmd;
 	}

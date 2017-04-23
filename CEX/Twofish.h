@@ -23,75 +23,225 @@
 
 NAMESPACE_BLOCK
 
-// ToDo: look into gather/load - extern __m128i _mm_i32gather_epi32(int const * base, __m128i vindex, const int scale);
-// http://www.physics.ntua.gr/~konstant/HetCluster/intel12.1/compiler_c/main_cls/intref_cls/common/intref_avx2_mm256_i64gather_epi64.htm
-// https://software.intel.com/en-us/node/523960
-// If not feasable/efficient, consider calculating sbox member on the fly..
+template<typename T>
+void DecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
+{
+#if defined(__AVX__)
+
+	const size_t FNLRND = 8;
+	const size_t INPOFF = T::size();
+	size_t keyCtr = 4;
+
+	// input round
+	T X2(Input, InOffset);
+	T X3(Input, InOffset + INPOFF);
+	T X0(Input, InOffset + (INPOFF * 2));
+	T X1(Input, InOffset + (INPOFF * 3));
+	T::Transpose(X2, X3, X0, X1);
+	T T0, T1;
+	T N2(2);
+
+	X2 ^= T(Key[keyCtr]);
+	X3 ^= T(Key[++keyCtr]);
+	X0 ^= T(Key[++keyCtr]);
+	X1 ^= T(Key[++keyCtr]);
+
+	keyCtr = Key.size();
+	do
+	{
+		T0 = Fe0W(X2, Sbox);
+		T1 = Fe3W(X3, Sbox);
+		X1 ^= T0 + N2 * T1 + T(Key[--keyCtr]);
+		X0 = (X0 << 1) | (X0 >> 31);
+		X0 ^= (T0 + T1 + T(Key[--keyCtr]));
+		X1 = (X1 >> 1) | (X1 << 31);
+
+		T0 = Fe0W(X0, Sbox);
+		T1 = Fe3W(X1, Sbox);
+		X3 ^= T0 + N2 * T1 + T(Key[--keyCtr]);
+		X2 = (X2 << 1) | (X2 >> 31);
+		X2 ^= (T0 + T1 + T(Key[--keyCtr]));
+		X3 = (X3 >> 1) | (X3 << 31);
+	} 
+	while (keyCtr != FNLRND);
+
+	// last round
+	keyCtr = 0;
+	X0 ^= T(Key[keyCtr]);
+	X1 ^= T(Key[++keyCtr]);
+	X2 ^= T(Key[++keyCtr]);
+	X3 ^= T(Key[++keyCtr]);
+
+	T::Transpose(X0, X1, X2, X3);
+	X0.Store(Output, OutOffset);
+	X1.Store(Output, OutOffset + INPOFF);
+	X2.Store(Output, OutOffset + (INPOFF * 2));
+	X3.Store(Output, OutOffset + (INPOFF * 3));
+
+#endif
+}
+
+template<typename T>
+void THX::EncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
+{
+#if defined(__AVX__)
+
+	const size_t FNLRND = Key.size() - 1;
+	const size_t INPOFF = T::size();
+	size_t keyCtr = 0;
+
+	// input round
+	T X0(Input, InOffset);
+	T X1(Input, InOffset + INPOFF);
+	T X2(Input, InOffset + (INPOFF * 2));
+	T X3(Input, InOffset + (INPOFF * 3));
+	T::Transpose(X0, X1, X2, X3);
+	T T0, T1;
+	T N2(2);
+
+	X0 ^= T(Key[keyCtr]);
+	X1 ^= T(Key[++keyCtr]);
+	X2 ^= T(Key[++keyCtr]);
+	X3 ^= T(Key[++keyCtr]);
+
+	keyCtr = 7;
+	do
+	{
+		T0 = Fe0W(X0, Sbox);
+		T1 = Fe3W(X1, Sbox);
+		X2 ^= T0 + T1 + T(Key[++keyCtr]);
+		X2 = (X2 >> 1) | (X2 << 31);
+		X3 = (X3 << 1) | (X3 >> 31);
+		X3 ^= (T0 + N2 * T1 + T(Key[++keyCtr]));
+
+		T0 = Fe0W(X2, Sbox);
+		T1 = Fe3W(X3, Sbox);
+		X0 ^= T0 + T1 + T(Key[++keyCtr]);
+		X0 = (X0 >> 1) | (X0 << 31);
+		X1 = ((X1 << 1) | (X1 >> 31));
+		X1 ^= (T0 + N2 * T1 + T(Key[++keyCtr]));
+	} 
+	while (keyCtr != FNLRND);
+
+	// last round
+	keyCtr = 4;
+	X2 ^= T(Key[keyCtr]);
+	X3 ^= T(Key[++keyCtr]);
+	X0 ^= T(Key[++keyCtr]);
+	X1 ^= T(Key[++keyCtr]);
+
+	T::Transpose(X2, X3, X0, X1);
+	X2.Store(Output, OutOffset);
+	X3.Store(Output, OutOffset + INPOFF);
+	X0.Store(Output, OutOffset + (INPOFF * 2));
+	X1.Store(Output, OutOffset + (INPOFF * 3));
+
+#endif
+}
 
 //~~~Twofish Lookup Templates~~~//
 
+// only on msc
+#if defined(CEX_COMPILER_MSC)
+	template<typename T, typename U>
+	T Fe0W(const T &X, const std::vector<U> &Sbox)
+	{
+	#if defined(__AVX512__)
+		return T(
+			Sbox[2 * X.zmm.m512i_u8[60]] ^ Sbox[2 * X.zmm.m512i_u8[61] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[62] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[63] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[56]] ^ Sbox[2 * X.zmm.m512i_u8[57] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[58] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[59] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[52]] ^ Sbox[2 * X.zmm.m512i_u8[53] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[54] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[55] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[48]] ^ Sbox[2 * X.zmm.m512i_u8[49] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[50] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[51] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[44]] ^ Sbox[2 * X.zmm.m512i_u8[45] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[46] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[47] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[40]] ^ Sbox[2 * X.zmm.m512i_u8[41] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[42] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[43] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[36]] ^ Sbox[2 * X.zmm.m512i_u8[37] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[38] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[39] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[32]] ^ Sbox[2 * X.zmm.m512i_u8[33] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[34] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[35] + 0x201]
+			Sbox[2 * X.zmm.m512i_u8[28]] ^ Sbox[2 * X.zmm.m512i_u8[29] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[30] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[31] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[24]] ^ Sbox[2 * X.zmm.m512i_u8[25] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[26] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[27] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[20]] ^ Sbox[2 * X.zmm.m512i_u8[21] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[22] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[23] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[16]] ^ Sbox[2 * X.zmm.m512i_u8[17] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[18] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[19] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[12]] ^ Sbox[2 * X.zmm.m512i_u8[13] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[14] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[15] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[8]] ^ Sbox[2 * X.zmm.m512i_u8[9] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[10] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[11] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[4]] ^ Sbox[2 * X.zmm.m512i_u8[5] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[6] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[7] + 0x201],
+			Sbox[2 * X.zmm.m512i_u8[0]] ^ Sbox[2 * X.zmm.m512i_u8[1] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[2] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[3] + 0x201]
+		);
+	#elif !defined(__AVX512__) && defined(__AVX2__)
+		return T(
+			Sbox[2 * X.ymm.m256i_u8[28]] ^ Sbox[2 * X.ymm.m256i_u8[29] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[30] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[31] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[24]] ^ Sbox[2 * X.ymm.m256i_u8[25] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[26] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[27] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[20]] ^ Sbox[2 * X.ymm.m256i_u8[21] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[22] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[23] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[16]] ^ Sbox[2 * X.ymm.m256i_u8[17] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[18] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[19] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[12]] ^ Sbox[2 * X.ymm.m256i_u8[13] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[14] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[15] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[8]] ^ Sbox[2 * X.ymm.m256i_u8[9] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[10] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[11] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[4]] ^ Sbox[2 * X.ymm.m256i_u8[5] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[6] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[7] + 0x201],
+			Sbox[2 * X.ymm.m256i_u8[0]] ^ Sbox[2 * X.ymm.m256i_u8[1] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[2] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[3] + 0x201]
+		);
+	#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
+		return T(
+			Sbox[2 * X.xmm.m128i_u8[12]] ^ Sbox[2 * X.xmm.m128i_u8[13] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[14] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[15] + 0x201],
+			Sbox[2 * X.xmm.m128i_u8[8]] ^ Sbox[2 * X.xmm.m128i_u8[9] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[10] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[11] + 0x201],
+			Sbox[2 * X.xmm.m128i_u8[4]] ^ Sbox[2 * X.xmm.m128i_u8[5] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[6] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[7] + 0x201],
+			Sbox[2 * X.xmm.m128i_u8[0]] ^ Sbox[2 * X.xmm.m128i_u8[1] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[2] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[3] + 0x201]
+		);
+	#endif
+	}
+#endif
+
+#if defined(CEX_COMPILER_MSC)
+	template<typename T, typename U>
+	T Fe3W(const T &X, const std::vector<U> &Sbox)
+	{
+	#if defined(__AVX512__)
+		return T(
+			Sbox[2 * X.zmm.m512i_u8[60] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[61] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[62] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[63]],
+			Sbox[2 * X.zmm.m512i_u8[56] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[57] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[58] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[59]],
+			Sbox[2 * X.zmm.m512i_u8[52] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[53] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[54] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[55]],
+			Sbox[2 * X.zmm.m512i_u8[48] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[49] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[50] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[51]],
+			Sbox[2 * X.zmm.m512i_u8[44] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[45] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[46] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[47]],
+			Sbox[2 * X.zmm.m512i_u8[40] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[41] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[42] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[43]],
+			Sbox[2 * X.zmm.m512i_u8[36] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[37] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[38] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[39]],
+			Sbox[2 * X.zmm.m512i_u8[32] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[33] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[34] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[35]]
+			Sbox[2 * X.zmm.m512i_u8[28] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[29] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[30] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[31]],
+			Sbox[2 * X.zmm.m512i_u8[24] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[25] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[26] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[27]],
+			Sbox[2 * X.zmm.m512i_u8[20] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[21] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[22] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[23]],
+			Sbox[2 * X.zmm.m512i_u8[16] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[17] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[18] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[19]],
+			Sbox[2 * X.zmm.m512i_u8[12] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[13] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[14] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[15]],
+			Sbox[2 * X.zmm.m512i_u8[8] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[9] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[10] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[11]],
+			Sbox[2 * X.zmm.m512i_u8[4] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[5] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[6] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[7]],
+			Sbox[2 * X.zmm.m512i_u8[0] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[1] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[2] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[3]]
+		);
+	#elif !defined(__AVX512__) && defined(__AVX2__)
+		return T(
+			Sbox[2 * X.ymm.m256i_u8[28] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[29] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[30] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[31]],
+			Sbox[2 * X.ymm.m256i_u8[24] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[25] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[26] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[27]],
+			Sbox[2 * X.ymm.m256i_u8[20] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[21] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[22] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[23]],
+			Sbox[2 * X.ymm.m256i_u8[16] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[17] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[18] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[19]],
+			Sbox[2 * X.ymm.m256i_u8[12] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[13] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[14] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[15]],
+			Sbox[2 * X.ymm.m256i_u8[8] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[9] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[10] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[11]],
+			Sbox[2 * X.ymm.m256i_u8[4] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[5] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[6] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[7]],
+			Sbox[2 * X.ymm.m256i_u8[0] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[1] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[2] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[3]]
+		);
+	#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
+		return T(
+			Sbox[2 * X.xmm.m128i_u8[12] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[13] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[14] + 0x201] ^ Sbox[2 * X.xmm.m128i_u8[15]],
+			Sbox[2 * X.xmm.m128i_u8[8] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[9] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[10] + 0x201] ^ Sbox[2 * X.xmm.m128i_u8[11]],
+			Sbox[2 * X.xmm.m128i_u8[4] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[5] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[6] + 0x201] ^ Sbox[2 * X.xmm.m128i_u8[7]],
+			Sbox[2 * X.xmm.m128i_u8[0] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[1] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[2] + 0x201] ^ Sbox[2 * X.xmm.m128i_u8[3]]
+		);
+	#endif
+	}
+#endif
+
 template<typename T, typename U>
-T I8Fe0(const T &X, const std::vector<U> &M)
+T Fe0(const T X, std::vector<U> &Sbox)
 {
-	return T(
-		M[2 * X.Register.m256i_u8[28]] ^ M[2 * X.Register.m256i_u8[29] + 0x001] ^ M[2 * X.Register.m256i_u8[30] + 0x200] ^ M[2 * X.Register.m256i_u8[31] + 0x201],
-		M[2 * X.Register.m256i_u8[24]] ^ M[2 * X.Register.m256i_u8[25] + 0x001] ^ M[2 * X.Register.m256i_u8[26] + 0x200] ^ M[2 * X.Register.m256i_u8[27] + 0x201],
-		M[2 * X.Register.m256i_u8[20]] ^ M[2 * X.Register.m256i_u8[21] + 0x001] ^ M[2 * X.Register.m256i_u8[22] + 0x200] ^ M[2 * X.Register.m256i_u8[23] + 0x201],
-		M[2 * X.Register.m256i_u8[16]] ^ M[2 * X.Register.m256i_u8[17] + 0x001] ^ M[2 * X.Register.m256i_u8[18] + 0x200] ^ M[2 * X.Register.m256i_u8[19] + 0x201],
-		M[2 * X.Register.m256i_u8[12]] ^ M[2 * X.Register.m256i_u8[13] + 0x001] ^ M[2 * X.Register.m256i_u8[14] + 0x200] ^ M[2 * X.Register.m256i_u8[15] + 0x201],
-		M[2 * X.Register.m256i_u8[8]] ^ M[2 * X.Register.m256i_u8[9] + 0x001] ^ M[2 * X.Register.m256i_u8[10] + 0x200] ^ M[2 * X.Register.m256i_u8[11] + 0x201],
-		M[2 * X.Register.m256i_u8[4]] ^ M[2 * X.Register.m256i_u8[5] + 0x001] ^ M[2 * X.Register.m256i_u8[6] + 0x200] ^ M[2 * X.Register.m256i_u8[7] + 0x201],
-		M[2 * X.Register.m256i_u8[0]] ^ M[2 * X.Register.m256i_u8[1] + 0x001] ^ M[2 * X.Register.m256i_u8[2] + 0x200] ^ M[2 * X.Register.m256i_u8[3] + 0x201]
-	);
+	return Sbox[2 * (byte)X] ^ Sbox[2 * (byte)(X >> 8) + 0x001] ^ Sbox[2 * (byte)(X >> 16) + 0x200] ^ Sbox[2 * (byte)(X >> 24) + 0x201];
 }
 
 template<typename T, typename U>
-T I8Fe3(const T &X, const std::vector<U> &M)
+T Fe3(const T X, const std::vector<U> &Sbox)
 {
-	return T(
-		M[2 * X.Register.m256i_u8[28] + 0x001] ^ M[2 * X.Register.m256i_u8[29] + 0x200] ^ M[2 * X.Register.m256i_u8[30] + 0x201] ^ M[2 * X.Register.m256i_u8[31]],
-		M[2 * X.Register.m256i_u8[24] + 0x001] ^ M[2 * X.Register.m256i_u8[25] + 0x200] ^ M[2 * X.Register.m256i_u8[26] + 0x201] ^ M[2 * X.Register.m256i_u8[27]],
-		M[2 * X.Register.m256i_u8[20] + 0x001] ^ M[2 * X.Register.m256i_u8[21] + 0x200] ^ M[2 * X.Register.m256i_u8[22] + 0x201] ^ M[2 * X.Register.m256i_u8[23]],
-		M[2 * X.Register.m256i_u8[16] + 0x001] ^ M[2 * X.Register.m256i_u8[17] + 0x200] ^ M[2 * X.Register.m256i_u8[18] + 0x201] ^ M[2 * X.Register.m256i_u8[19]],
-		M[2 * X.Register.m256i_u8[12] + 0x001] ^ M[2 * X.Register.m256i_u8[13] + 0x200] ^ M[2 * X.Register.m256i_u8[14] + 0x201] ^ M[2 * X.Register.m256i_u8[15]],
-		M[2 * X.Register.m256i_u8[8] + 0x001] ^ M[2 * X.Register.m256i_u8[9] + 0x200] ^ M[2 * X.Register.m256i_u8[10] + 0x201] ^ M[2 * X.Register.m256i_u8[11]],
-		M[2 * X.Register.m256i_u8[4] + 0x001] ^ M[2 * X.Register.m256i_u8[5] + 0x200] ^ M[2 * X.Register.m256i_u8[6] + 0x201] ^ M[2 * X.Register.m256i_u8[7]],
-		M[2 * X.Register.m256i_u8[0] + 0x001] ^ M[2 * X.Register.m256i_u8[1] + 0x200] ^ M[2 * X.Register.m256i_u8[2] + 0x201] ^ M[2 * X.Register.m256i_u8[3]]
-	);
-}
-
-template<typename T, typename U>
-T I4Fe0(const T &X, const std::vector<U> &M)
-{
-	return T(
-		M[2 * X.Register.m128i_u8[12]] ^ M[2 * X.Register.m128i_u8[13] + 0x001] ^ M[2 * X.Register.m128i_u8[14] + 0x200] ^ M[2 * X.Register.m128i_u8[15] + 0x201],
-		M[2 * X.Register.m128i_u8[8]] ^ M[2 * X.Register.m128i_u8[9] + 0x001] ^ M[2 * X.Register.m128i_u8[10] + 0x200] ^ M[2 * X.Register.m128i_u8[11] + 0x201],
-		M[2 * X.Register.m128i_u8[4]] ^ M[2 * X.Register.m128i_u8[5] + 0x001] ^ M[2 * X.Register.m128i_u8[6] + 0x200] ^ M[2 * X.Register.m128i_u8[7] + 0x201],
-		M[2 * X.Register.m128i_u8[0]] ^ M[2 * X.Register.m128i_u8[1] + 0x001] ^ M[2 * X.Register.m128i_u8[2] + 0x200] ^ M[2 * X.Register.m128i_u8[3] + 0x201]
-	);
-}
-
-template<typename T, typename U>
-T I4Fe3(const T &X, const std::vector<U> &M)
-{
-	return T(
-		M[2 * X.Register.m128i_u8[12] + 0x001] ^ M[2 * X.Register.m128i_u8[13] + 0x200] ^ M[2 * X.Register.m128i_u8[14] + 0x201] ^ M[2 * X.Register.m128i_u8[15]],
-		M[2 * X.Register.m128i_u8[8] + 0x001] ^ M[2 * X.Register.m128i_u8[9] + 0x200] ^ M[2 * X.Register.m128i_u8[10] + 0x201] ^ M[2 * X.Register.m128i_u8[11]],
-		M[2 * X.Register.m128i_u8[4] + 0x001] ^ M[2 * X.Register.m128i_u8[5] + 0x200] ^ M[2 * X.Register.m128i_u8[6] + 0x201] ^ M[2 * X.Register.m128i_u8[7]],
-		M[2 * X.Register.m128i_u8[0] + 0x001] ^ M[2 * X.Register.m128i_u8[1] + 0x200] ^ M[2 * X.Register.m128i_u8[2] + 0x201] ^ M[2 * X.Register.m128i_u8[3]]
-	);
-}
-
-template<typename T, typename U>
-T Fe0(const T X, std::vector<U> &M)
-{
-	return M[2 * (byte)X] ^ M[2 * (byte)(X >> 8) + 0x001] ^ M[2 * (byte)(X >> 16) + 0x200] ^ M[2 * (byte)(X >> 24) + 0x201];
-}
-
-template<typename T, typename U>
-T Fe3(const T X, const std::vector<U> &M)
-{
-	return M[2 * (byte)X + 0x001] ^ M[2 * (byte)(X >> 8) + 0x200] ^ M[2 * (byte)(X >> 16) + 0x201] ^ M[2 * (byte)(X >> 24)];
+	return Sbox[2 * (byte)X + 0x001] ^ Sbox[2 * (byte)(X >> 8) + 0x200] ^ Sbox[2 * (byte)(X >> 16) + 0x201] ^ Sbox[2 * (byte)(X >> 24)];
 }
 
 //~~~Twofish S-Box and Lookup Tables~~~//

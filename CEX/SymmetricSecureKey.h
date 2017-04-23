@@ -32,36 +32,27 @@ private:
 
 public:
 
-	//~~~Public Properties~~~//
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: Return a copy of the personalization string; can used as an optional source of entropy
 	/// </summary>
-	virtual const std::vector<byte> Info()
-	{ 
-		return Extract(m_keySizes.KeySize() + m_keySizes.NonceSize(), m_keySizes.InfoSize());
-	}
+	const std::vector<byte> Info() override;
 
 	/// <summary>
 	/// Get: Return a copy of the primary key
 	/// </summary>
-	virtual const std::vector<byte> Key()
-	{ 
-		return Extract(0, m_keySizes.KeySize());
-	}
+	const std::vector<byte> Key() override;
 
 	/// <summary>
 	/// Get: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
 	/// </summary>
-	virtual const SymmetricKeySize KeySizes() { return m_keySizes; }
+	const SymmetricKeySize KeySizes() override;
 
 	/// <summary>
 	/// Get: Return a copy of the nonce
 	/// </summary>
-	virtual const std::vector<byte> Nonce()
-	{ 
-		return Extract(m_keySizes.KeySize(), m_keySizes.NonceSize());
-	}
+	const std::vector<byte> Nonce() override;
 
 	//~~~Constructors~~~//
 
@@ -103,7 +94,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SymmetricSecureKey();
+	~SymmetricSecureKey() override;
 
 	//~~~Public Functions~~~//
 
@@ -124,7 +115,7 @@ public:
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Compare this SymmetricSecureKey instance with another
@@ -133,7 +124,7 @@ public:
 	/// <param name="Obj">Key to compare</param>
 	/// 
 	/// <returns>Returns true if equal</returns>
-	virtual bool Equals(ISymmetricKey &Obj);
+	bool Equals(ISymmetricKey &Obj) override;
 
 	/// <summary>
 	/// Decrypt a SymmetricSecureKey and serialize it as a SymmetricKey stream

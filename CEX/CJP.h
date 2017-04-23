@@ -63,6 +63,7 @@ class CJP : public IProvider
 private:
 	static const uint ACC_LOOP_BIT_MAX = 7;
 	static const uint ACC_LOOP_BIT_MIN = 0;
+	static const std::string CLASS_NAME;
 	static const uint CLEARCACHE = 100;
 	static const uint DATA_SIZE_BITS = ((sizeof(ulong)) * 8);
 	static const uint FOLD_LOOP_BIT_MAX = 4;
@@ -77,6 +78,7 @@ private:
 
 	bool m_enableAccess;
 	bool m_enableDebias;
+	bool m_hasTsc;
 	bool m_isAvailable;
 	ulong m_lastDelta;
 	ulong m_lastDelta2;
@@ -105,44 +107,44 @@ public:
 	/// Get/Set: Enable the memory access noise source.
 	/// <para>Memory access delays are injected into the random generation mechanism; enabled by default.<para>
 	/// </summary>
-	bool &EnableAccess() { return m_enableAccess; }
+	bool &EnableAccess();
 
 	/// <summary>
 	/// Get/Set: Enable the Von Neumann debiasing extractor.
 	/// <para>The default and recommended value is true, which enables the bit debiasing extractor.</para>
 	/// </summary>
-	bool &EnableDebias() { return m_enableDebias; }
+	bool &EnableDebias();
 
 	/// <summary>
 	/// Get: The providers type name
 	/// </summary>
-	virtual const Enumeration::Providers Enumeral() { return Enumeration::Providers::CJP; }
+	const Providers Enumeral() override;
 
 	/// <summary>
 	/// Get: The entropy provider is available on this system.
 	/// <para>This value should be tested after class instantiation and before a request for data is made. 
 	/// If the timer resolution is too small, or the provider is otherwise unavailable, requesting data will throw an exception.</para>
 	/// </summary>
-	virtual const bool IsAvailable() { return m_isAvailable; }
+	const bool IsAvailable() override;
 
 	/// <summary>
 	/// Get: provider class name
 	/// </summary>
-	virtual const std::string Name() { return "CJP"; }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get/Set: The number of overlapping passes through the jitter entropy collector.
 	/// <para>Accepted values are between 1 and 128; the default is 1.
 	/// Increasing this value will increase generation times significantly.</para>
 	/// </summary>
-	uint &OverSampleRate() { return m_overSampleRate; }
+	uint &OverSampleRate();
 
 	/// <summary>
 	/// Get/Set: Populate the random cache with an unused value after each generation cycle
 	/// <para>Ensures memory resident state between generation calls is always an unused value.
 	/// This value is true by default and a recommended option.</para>
 	/// </summary>
-	bool &SecureCache() { return m_secureCache; }
+	bool &SecureCache();
 
 	//~~~Constructor~~~//
 
@@ -154,21 +156,21 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~CJP();
+	~CJP() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Fill a buffer with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
-	virtual void GetBytes(std::vector<byte> &Output);
+	void GetBytes(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes
@@ -177,7 +179,7 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
-	virtual void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length);
+	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Return an array with pseudo-random bytes
@@ -186,17 +188,17 @@ public:
 	/// <param name="Length">The size of the expected array returned</param>
 	/// 
 	/// <returns>An array of pseudo-random of bytes</returns>
-	virtual std::vector<byte> GetBytes(size_t Length);
+	std::vector<byte> GetBytes(size_t Length) override;
 
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
-	virtual uint Next();
+	uint Next() override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 private:
 

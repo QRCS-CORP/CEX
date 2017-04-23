@@ -28,6 +28,7 @@
 // TwoFish HKDF Extended (THX)
 // Written by John Underhill, December 11, 2014
 // Updated October 20, 2016
+// Updated April 16, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_THX_H
@@ -110,12 +111,13 @@ NAMESPACE_BLOCK
 /// <item><description>SHA3 <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">The Skein digest</a>.</description></item>
 /// </list>
 /// </remarks>
-class THX : public IBlockCipher
+class THX final : public IBlockCipher
 {
 private:
 
-	static const std::string DEF_INFO;
 	static const size_t BLOCK_SIZE = 16;
+	static const std::string CLASS_NAME;
+	static const std::string DEF_DSTINFO;
 	static const uint DEF_ROUNDS = 16;
 	static const uint GF256_FDBK = 0x169;
 	static const uint GF256_FDBK_2 = GF256_FDBK / 2;
@@ -157,7 +159,7 @@ public:
 	/// <para>Block size must be 16 or 32 bytes wide.
 	/// Value set in class constructor.</para>
 	/// </summary>
-	virtual const size_t BlockSize() { return BLOCK_SIZE; }
+	const size_t BlockSize() override;
 
 	/// <summary>
 	/// Get/Set: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
@@ -166,62 +168,62 @@ public:
 	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.
 	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
-	virtual std::vector<byte> &DistributionCode() { return m_kdfInfo; }
+	std::vector<byte> &DistributionCode() override;
 
 	/// <summary>
 	/// Get: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
 	/// </summary>
-	virtual const size_t DistributionCodeMax() { return m_kdfInfoMax; }
+	const size_t DistributionCodeMax() override;
 
 	/// <summary>
 	/// Get: The block ciphers type name
 	/// </summary>
-	virtual const BlockCiphers Enumeral() { return m_kdfEngineType == Digests::None ? BlockCiphers::Twofish : BlockCiphers::THX; }
+	const BlockCiphers Enumeral() override;
 
 	/// <summary>
 	/// Get: Initialized for encryption, false for decryption.
 	/// <para>Value set in <see cref="Initialize(bool, ISymmetricKey)"/>.</para>
 	/// </summary>
-	virtual const bool IsEncryption() { return m_isEncryption; }
+	const bool IsEncryption() override;
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: The extended ciphers HKDF digest type
 	/// </summary>
-	virtual const Digests KdfEngine() { return m_kdfEngineType; }
+	const Digests KdfEngine() override;
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; }
+	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
 	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const std::vector<size_t> LegalRounds() { return m_legalRounds; }
+	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
 	/// Get: The block ciphers class name
 	/// </summary>
-	virtual const std::string Name() { return "THX"; }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: The number of transformation rounds processed by the transform
 	/// </summary>
-	virtual const size_t Rounds() { return m_rndCount; }
+	const size_t Rounds() override;
 
 	/// <summary>
 	/// Get: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
-	/// <para>This value is subtracted from the parallel block-size calculations, to reduce the occurence of L1 cache eviction of hot tables and class variables. 
+	/// <para>Used in the parallel block size calculations, to reduce the occurence of L1 cache eviction of hot tables and class variables. 
 	/// This is a timing and performance optimization, see the ParallelOptions class for more details.</para>
 	/// </summary>
-	virtual const size_t StateCacheSize() { return STATE_PRECACHED; }
+	const size_t StateCacheSize() override;
 
 	//~~~Constructor~~~//
 
@@ -235,7 +237,7 @@ public:
 	/// Default is 16 rounds, defining rounds requires HKDF extended mode.</param>
 	/// 
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	THX(Digests KdfEngineType = Digests::None, uint Rounds = 16);
+	explicit THX(Digests KdfEngineType = Digests::None, uint Rounds = 16);
 
 	/// <summary>
 	/// Instantiate the class with a Digest instance (HKDF extended mode), and with optional transformation rounds count
@@ -245,12 +247,12 @@ public:
 	/// <param name="Rounds">Number of transformation rounds; the <see cref="LegalRounds"/> property contains available sizes, default is 20 rounds.</param>
 	/// 
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	THX(IDigest *KdfEngine, size_t Rounds = 20);
+	explicit THX(IDigest *KdfEngine, size_t Rounds = 20);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~THX();
+	~THX() override;
 
 	//~~~Public Functions~~~//
 
@@ -262,7 +264,7 @@ public:
 	/// 
 	/// <param name="Input">Encrypted bytes</param>
 	/// <param name="Output">Decrypted bytes</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -274,12 +276,12 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Clear the buffers and reset
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a block of bytes.
@@ -289,7 +291,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes with offset parameters.
@@ -301,7 +303,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -311,7 +313,7 @@ public:
 	/// <param name="KeyParams">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams);
+	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>
 	/// Transform a block of bytes.
@@ -321,7 +323,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of bytes to transform or Decrypt</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Transform(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Transform a block of bytes with offset parameters.
@@ -333,7 +335,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Transform 4 blocks of bytes.
@@ -345,7 +347,7 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Transform 8 blocks of bytes.
@@ -357,20 +359,35 @@ public:
 	/// <param name="InOffset">Starting offset in the Input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset in the output array</param>
-	virtual void Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
+
+	/// <summary>
+	/// Transform 16 blocks of bytes.
+	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called before this method can be used.
+	/// Input and Output array lengths must be at least 16 * <see cref="BlockSize"/> in length.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of bytes to transform</param>
+	/// <param name="InOffset">Starting offset in the Input array</param>
+	/// <param name="Output">The output array of transformed bytes</param>
+	/// <param name="OutOffset">Starting offset in the output array</param>
+	virtual void Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 private:
-	void Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
-	void Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(const std::vector<byte> &Key);
 	void LoadState(Digests KdfEngineType);
 	uint MdsEncode(uint K0, uint K1);
 	uint Mix4(const uint X, const std::vector<uint> &Key, const size_t Count);
 	void Mix16(const uint X, const std::vector<byte> &Key, const size_t Count, std::vector<uint> &Output);
+	void Prefetch();
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 };

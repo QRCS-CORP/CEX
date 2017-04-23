@@ -22,6 +22,25 @@
 
 NAMESPACE_PROVIDER
 
+const std::string CSP::CLASS_NAME("CSP");
+
+//~~~Properties~~~//
+
+const Enumeration::Providers CSP::Enumeral()
+{
+	return Enumeration::Providers::CSP; 
+}
+
+const bool CSP::IsAvailable()
+{ 
+	return m_isAvailable; 
+}
+
+const std::string &CSP::Name() 
+{ 
+	return CLASS_NAME;
+}
+
 //~~~Constructor~~~//
 
 CSP::CSP()
@@ -83,7 +102,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 		{
 			size_t prcRmd = Utility::IntUtils::Min(sizeof(uint), prcLen);
 			uint rndNum = arc4random();
-			memcpy(&Output[prcOffset], &rndNum, prcRmd);
+			Utility::MemUtils::Copy<uint, byte>(rndNum, Output, prcOffset, prcRmd);
 			prcOffset += prcRmd;
 			prcLen -= prcRmd;
 		} 
@@ -136,9 +155,9 @@ void CSP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 	if (Offset + Length > Output.size())
 		throw CryptoRandomException("CSP:GetBytes", "The array is too small to fulfill this request!");
 
-	std::vector<byte> rnd(Length);
-	GetBytes(rnd);
-	memcpy(&Output[Offset], &rnd[0], rnd.size());
+	std::vector<byte> rndData(Length);
+	GetBytes(rndData);
+	Utility::MemUtils::Copy<byte>(rndData, 0, Output, Offset, rndData.size());
 }
 
 std::vector<byte> CSP::GetBytes(size_t Length)
@@ -152,10 +171,9 @@ std::vector<byte> CSP::GetBytes(size_t Length)
 uint CSP::Next()
 {
 	uint rndNum = 0;
-	size_t len = sizeof(rndNum);
-	std::vector<byte> rnd(len);
-	GetBytes(rnd);
-	memcpy(&rndNum, &rnd[0], len);
+	std::vector<byte> rndData(sizeof(uint));
+	GetBytes(rndData);
+	Utility::MemUtils::Copy<byte, uint>(rndData, 0, rndNum, sizeof(uint));
 
 	return rndNum;
 }

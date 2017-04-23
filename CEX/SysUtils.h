@@ -3,6 +3,7 @@
 
 #include "CexDomain.h"
 #include "ArrayUtils.h"
+#include "CpuDetect.h"
 #include <chrono>
 
 #if defined(CEX_OS_WINDOWS)
@@ -49,6 +50,10 @@ NAMESPACE_UTILITY
 /// </summary>
 class SysUtils
 {
+private:
+
+	static bool TMR_RDTSC;
+
 public:
 
 	/// <summary>
@@ -66,6 +71,20 @@ public:
 	///
 	/// <returns>A vector of 64bit uint sizes</returns>
 	static std::vector<ulong> DriveSpace(const std::string &Drive);
+
+	/// <summary>
+	/// Return the RDTSC frequency
+	/// </summary>
+	/// 
+	/// <returns>The 64bit frequency size</returns>
+	static ulong GetRdtscFrequency();
+
+	/// <summary>
+	/// Return availability of RDTSCP timer
+	/// </summary>
+	/// 
+	/// <returns>True if available</returns>
+	static bool HasRdtsc();
 
 	/// <summary>
 	/// Return the total physical memory size in bytes
@@ -128,7 +147,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>The 64bit uint size</returns>
-	static ulong TimeStamp();
+	static ulong TimeStamp(bool HasRdtsc = false);
 
 	/// <summary>
 	/// Return the time in milliseconds since the system was booted

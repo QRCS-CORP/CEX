@@ -2,6 +2,22 @@
 
 NAMESPACE_PADDING
 
+const std::string ZeroPad::CLASS_NAME("ZeroPad");
+
+ZeroPad::ZeroPad() {}
+
+ZeroPad::~ZeroPad() {}
+
+const PaddingModes ZeroPad::Enumeral() 
+{ 
+	return PaddingModes::None; 
+}
+
+const std::string &ZeroPad::Name() 
+{ 
+	return CLASS_NAME; 
+}
+
 size_t ZeroPad::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())

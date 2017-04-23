@@ -613,7 +613,7 @@ public:
 	static void Compress64(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<uint> &IV)
 	{
 		std::vector<uint> M(16);
-		Utility::IntUtils::BytesToLeUL512(Input, InOffset, M, 0);
+		Utility::IntUtils::LeBytesToUL512(Input, InOffset, M, 0);
 
 		uint R0 = State.H[0];
 		uint R1 = State.H[1];

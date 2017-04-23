@@ -18,6 +18,7 @@
 //
 // 
 // Written by John Underhill, January 21, 2015
+// Updated April 21, 2016
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_DIGESTSTREAM_H
@@ -28,6 +29,7 @@
 #include "DigestFromName.h"
 #include "Event.h"
 #include "IByteStream.h"
+#include "ParallelOptions.h"
 
 NAMESPACE_PROCESSING
 
@@ -37,6 +39,7 @@ using Enumeration::Digests;
 using Routing::Event;
 using IO::IByteStream;
 using Digest::IDigest;
+using Common::ParallelOptions;
 
 /// <summary>
 /// Digest stream helper class.
@@ -44,12 +47,12 @@ using Digest::IDigest;
 /// </summary> 
 /// 
 /// <example>
-/// <description>Example of hashing a Stream:</description>
+/// <description>Example of hashing a stream:</description>
 /// <code>
 /// SHA512* eng = new SHA512();
-/// StreamDigest dstrm(eng);
+/// StreamDigest sdgt(eng);
 /// // get the hash code
-/// hash = dstrm.Compute(Input);
+/// hash = sdgt.Compute(Input);
 /// delete eng;
 /// </code>
 /// </example>
@@ -66,11 +69,9 @@ class DigestStream
 private:
 
 	IDigest* m_digestEngine;
-	const size_t BUFFER_SIZE = 64 * 1024;
-	size_t m_blockSize;
 	bool m_destroyEngine;
-	IByteStream* m_inStream;
 	bool m_isDestroyed = false;
+	bool m_isParallel;
 	size_t m_progressInterval;
 
 public:
@@ -85,6 +86,29 @@ public:
 	/// </summary>
 	Event<int> ProgressPercent;
 
+	//~~~Properties~~~//
+
+	/// <summary>
+	/// Get/Set: Automatic processor parallelization capable.
+	/// <para>This value is true if the host supports parallelization.
+	/// If the system and digest configuration both support parallelization, it can be disabled by setting this value to false.</para>
+	/// </summary>
+	bool IsParallel();
+
+	/// <summary>
+	/// Get/Set: Parallel block size. Must be a multiple of ParallelProfile().ParallelMinimumSize()
+	/// </summary>
+	size_t ParallelBlockSize();
+
+	/// <summary>
+	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile();
+
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -92,7 +116,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Digest">The digest enumeration member</param>
-	explicit DigestStream(Digests Digest);
+	/// <param name="Parallel">Instantiates the multi-threaded implementation of the digest</param>
+	explicit DigestStream(Digests Digest, bool Parallel = false);
 
 	/// <summary>
 	/// Initialize the class with a digest instance
@@ -112,31 +137,30 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Process the entire length of the Input Stream
+	/// Process the entire length of the source stream
 	/// </summary>
+	///
+	/// <param name="Input">The source stream to process</param>
 	/// 
-	/// <returns>The Message Digest</returns>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <returns>The message hash output code</returns>
 	std::vector<byte> Compute(IByteStream* InStream);
 
 	/// <summary>
-	/// Process a length within the Input stream using an Offset
+	/// Process a length of bytes within the source array
 	/// </summary>
 	/// 
-	/// <returns>The Message Digest</returns>
-	/// <param name="Input">The Input array to process</param>
-	/// <param name="InOffset">The Input array starting offset</param>
+	/// <param name="Input">The source array to process</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <returns>The message hash output code</returns>
 	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 
 private:
 
 	void CalculateInterval(size_t Length);
-	void CalculateProgress(size_t Length, bool Completed = false);
-	std::vector<byte> Process(size_t Length);
+	void CalculateProgress(size_t Length, size_t Processed);
+	std::vector<byte> Process(IByteStream* InStream, size_t Length);
 	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Destroy();
 };

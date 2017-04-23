@@ -29,7 +29,7 @@ namespace Test
 	ParallelModeTest::ParallelModeTest()
 		:
 		m_hasAESNI(false),
-		m_hasSSE(false),
+		m_hasAVX(false),
 		m_katExpected(0),
 		m_processorCount(1),
 		m_progressEvent()
@@ -46,91 +46,85 @@ namespace Test
 		{
 			Initialize();
 
-			if (m_hasSSE)
-			{
-				CTR* cpr1 = new CTR(BlockCiphers::Rijndael);
-				AccessCheck(cpr1);
-				delete cpr1;
-				OnProgress(std::string("ParallelModeTest: Passed CTR parallel/sequential access api tests.."));
+			CTR* cpr1 = new CTR(BlockCiphers::Rijndael);
+			AccessCheck(cpr1);
+			delete cpr1;
+			OnProgress(std::string("ParallelModeTest: Passed CTR parallel/sequential access api tests.."));
 
-				ICM* cpr2 = new ICM(BlockCiphers::Rijndael);
-				AccessCheck(cpr2);
-				delete cpr2;
-				OnProgress(std::string("ParallelModeTest: Passed ICM parallel/sequential access api tests.."));
+			ICM* cpr2 = new ICM(BlockCiphers::Rijndael);
+			AccessCheck(cpr2);
+			delete cpr2;
+			OnProgress(std::string("ParallelModeTest: Passed ICM parallel/sequential access api tests.."));
 
-				CBC* cpr3 = new CBC(BlockCiphers::Rijndael);
-				AccessCheck(cpr3);
-				delete cpr3;
-				OnProgress(std::string("ParallelModeTest: Passed CBC parallel/sequential access api tests.."));
+			CBC* cpr3 = new CBC(BlockCiphers::Rijndael);
+			AccessCheck(cpr3);
+			delete cpr3;
+			OnProgress(std::string("ParallelModeTest: Passed CBC parallel/sequential access api tests.."));
 
-				CFB* cpr4 = new CFB(BlockCiphers::Rijndael);
-				AccessCheck(cpr4);
-				delete cpr4;
-				OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
+			CFB* cpr4 = new CFB(BlockCiphers::Rijndael);
+			AccessCheck(cpr4);
+			delete cpr4;
+			OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
 
-				ECB* cpr5 = new ECB(BlockCiphers::Rijndael);
-				AccessCheck(cpr5);
-				delete cpr5;
-				OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
+			ECB* cpr5 = new ECB(BlockCiphers::Rijndael);
+			AccessCheck(cpr5);
+			delete cpr5;
+			OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
 
 #if defined(__AVX__)
-				if (m_hasAESNI)
-				{
-					CompareAhxSimd();
-					OnProgress(std::string("ParallelModeTest: AHX Passed AES-NI/Rijndael CTR/CBC comparison tests.."));
+			if (m_hasAESNI)
+			{
+				CompareAhxSimd();
+				OnProgress(std::string("ParallelModeTest: AHX Passed AES-NI/Rijndael CTR/CBC comparison tests.."));
 
-					AHX* eng1 = new AHX();
-					CompareBcrSimd(eng1);
-					OnProgress(std::string("ParallelModeTest: AHX Passed Rijndael Parallel Intrinsics Integrity tests.."));
-					CompareBcrKat(eng1, m_katExpected[0]);
-					OnProgress(std::string("ParallelModeTest: AHX Passed Rijndael Monte Carlo KAT test.."));
+				AHX* eng1 = new AHX();
+				CompareBcrSimd(eng1);
+				OnProgress(std::string("ParallelModeTest: AHX Passed Rijndael Parallel Intrinsics Integrity tests.."));
+				CompareBcrKat(eng1, m_katExpected[0]);
+				OnProgress(std::string("ParallelModeTest: AHX Passed Rijndael Monte Carlo KAT test.."));
 
-					AHX* eng1b = new AHX();
-					CompareCbcDecrypt(eng1, eng1b);
-					delete eng1;
-					delete eng1b;
-					OnProgress(std::string("ParallelModeTest: AHX Passed Parallel CBC Decrypt SIMD-128 Integrity tests.."));
-				}
+				AHX* eng1b = new AHX();
+				CompareCbcDecrypt(eng1, eng1b);
+				delete eng1;
+				delete eng1b;
+				OnProgress(std::string("ParallelModeTest: AHX Passed Parallel CBC Decrypt SIMD-128 Integrity tests.."));
+			}
 #endif
 
-				SHX* eng2 = new SHX();
-				CompareBcrSimd(eng2);
-				OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Parallel Intrinsics Integrity tests.."));
-				CompareBcrKat(eng2, m_katExpected[1]);
-				OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Monte Carlo KAT test.."));
-				//  TODO: WBVC not fully implemented
-				//CompareCbcWide(eng2);
-				//OnProgress(std::string("ParallelModeTest: SHX Passed CBC-WBV Wide Block Vector integrity and parallel tests..")); 
+			SHX* eng2 = new SHX();
+			CompareBcrSimd(eng2);
+			OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Parallel Intrinsics Integrity tests.."));
+			CompareBcrKat(eng2, m_katExpected[1]);
+			OnProgress(std::string("ParallelModeTest: SHX Passed Serpent Monte Carlo KAT test.."));
 
-				SHX* eng2b = new SHX();
-				CompareCbcDecrypt(eng2, eng2b);
-				OnProgress(std::string("ParallelModeTest: SHX Passed Parallel CBC Decrypt SIMD-256 Integrity tests.."));
-				delete eng2;
-				delete eng2b;
+			SHX* eng2b = new SHX();
+			CompareCbcDecrypt(eng2, eng2b);
+			OnProgress(std::string("ParallelModeTest: SHX Passed Parallel CBC Decrypt SIMD-256 Integrity tests.."));
+			delete eng2;
+			delete eng2b;
 
-				THX* eng3 = new THX();
-				CompareBcrSimd(eng3);
-				OnProgress(std::string("ParallelModeTest: THX Passed Serpent Monte Carlo KAT test.."));
-				CompareBcrKat(eng3, m_katExpected[2]);
-				delete eng3;
-				OnProgress(std::string("ParallelModeTest: THX Passed Twofish Parallel Intrinsics Integrity tests.."));
+			THX* eng3 = new THX();
+			CompareBcrSimd(eng3);
+			OnProgress(std::string("ParallelModeTest: THX Passed Twofish Monte Carlo KAT test.."));
+			CompareBcrKat(eng3, m_katExpected[2]);
+			delete eng3;
+			OnProgress(std::string("ParallelModeTest: THX Passed Twofish Parallel Intrinsics Integrity tests.."));
 
-				ChaCha20* stm1 = new ChaCha20();
-				CompareStmSimd(stm1);
-				OnProgress(std::string("ParallelModeTest: ChaCha20 Passed Parallel Intrinsics Integrity tests.."));
-				CompareStmKat(stm1, m_katExpected[3]);
-				OnProgress(std::string("ParallelModeTest: ChaCha20 Passed Monte Carlo KAT test.."));
-				delete stm1;
+			ChaCha20* stm1 = new ChaCha20();
+			CompareStmSimd(stm1);
+			OnProgress(std::string("ParallelModeTest: ChaCha20 Passed Parallel Intrinsics Integrity tests.."));
+			CompareStmKat(stm1, m_katExpected[3]);
+			OnProgress(std::string("ParallelModeTest: ChaCha20 Passed Monte Carlo KAT test.."));
+			delete stm1;
 
-				Salsa20* stm2 = new Salsa20();
-				CompareStmSimd(stm2);
-				OnProgress(std::string("ParallelModeTest: Salsa Passed Parallel Intrinsics Integrity tests.."));
-				CompareStmKat(stm2, m_katExpected[4]);
-				OnProgress(std::string("ParallelModeTest: Salsa Passed Monte Carlo KAT test.."));
-				delete stm2;
+			Salsa20* stm2 = new Salsa20();
+			CompareStmSimd(stm2);
+			OnProgress(std::string("ParallelModeTest: Salsa Passed Parallel Intrinsics Integrity tests.."));
+			CompareStmKat(stm2, m_katExpected[4]);
+			OnProgress(std::string("ParallelModeTest: Salsa Passed Monte Carlo KAT test.."));
+			delete stm2;
 
-				OnProgress(std::string(""));
-			}
+			OnProgress(std::string(""));
 
 			CompareParallelLoop();
 			OnProgress(std::string("ParallelModeTest: Passed CBC/CFB/CTR/ICM Parallel encryption and decryption looping Integrity tests.."));
@@ -170,13 +164,11 @@ namespace Test
 		GetBytes(32, key);
 		GetBytes(16, iv);
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
-
-
 		const size_t blkSze = Cipher->BlockSize();
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+			size_t smpSze = rng.NextInt32(Cipher->ParallelProfile().ParallelMinimumSize(), Cipher->ParallelProfile().ParallelMinimumSize() * 4);
 			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(smpSze);
@@ -190,27 +182,26 @@ namespace Test
 
 			// sequential access //
 
-			// with offsets: transform(in, off, out, off)
+			// with offsets: transform(in, off, out, off, len)
 			Cipher->Initialize(true, keyParam);
 			// encrypt
 			for (size_t j = 0; j < blkCnt; ++j)
-				Cipher->Transform(data, j * blkSze, enc1, j * blkSze);
+				Cipher->Transform(data, j * blkSze, enc1, j * blkSze, blkSze);
 
 			Cipher->Initialize(false, keyParam);
 			// decrypt
 			for (size_t j = 0; j < blkCnt; ++j)
-				Cipher->Transform(enc1, j * blkSze, dec, j * blkSze);
+				Cipher->Transform(enc1, j * blkSze, dec, j * blkSze, blkSze);
 
 			if (dec != data)
 				throw TestException("Decrypted output is not equal!");
 
 
-			// buffered: transform(in, out)
 			Cipher->Initialize(true, keyParam);
 			for (size_t j = 0; j < blkCnt; ++j)
 			{
 				memcpy(&datBuf[0], &data[j * blkSze], blkSze);
-				Cipher->Transform(datBuf, encBuf);
+				Cipher->Transform(datBuf, 0, encBuf, 0, blkSze);
 				memcpy(&enc2[j * blkSze], &encBuf[0], blkSze);
 			}
 
@@ -223,7 +214,7 @@ namespace Test
 			for (size_t j = 0; j < blkCnt; ++j)
 			{
 				memcpy(&encBuf[0], &enc2[j * blkSze], blkSze);
-				Cipher->Transform(encBuf, decBuf);
+				Cipher->Transform(encBuf, 0, decBuf, 0, blkSze);
 				memcpy(&dec[j * blkSze], &decBuf[0], blkSze);
 			}
 
@@ -259,7 +250,7 @@ namespace Test
 				memset(&enc2[0], 0, enc2.size());
 				Cipher->Initialize(true, keyParam);
 				// encrypt
-				Cipher->Transform(data, 0, enc2, 0);
+				Cipher->Transform(data, 0, enc2, 0, enc2.size());
 
 				if (enc1 != enc2)
 					throw TestException("Encrypted output is not equal!");
@@ -268,7 +259,7 @@ namespace Test
 			memset(&dec[0], 0, dec.size());
 			Cipher->Initialize(false, keyParam);
 			// decrypt
-			Cipher->Transform(enc2, 0, dec, 0);
+			Cipher->Transform(enc2, 0, dec, 0, enc2.size());
 
 			if (dec != data)
 				throw TestException("Decrypted output is not equal!");
@@ -560,180 +551,6 @@ namespace Test
 
 			if (data != dec2)
 				throw TestException("ParallelModeTest: Failed CBC decryption test!");
-		}
-	}
-
-	void ParallelModeTest::CompareCbcWide(IBlockCipher* Engine)
-	{
-		const size_t BLK64 = 64;
-		const size_t BLK128 = 128;
-
-		std::vector<byte> data;
-		std::vector<byte> enc;
-		std::vector<byte> dec;
-		std::vector<byte> key(32);
-		std::vector<byte> iv64(BLK64);
-		std::vector<byte> iv128(BLK128);
-		Prng::SecureRandom rng;
-
-#if defined(STAT_INP)
-		size_t blkSize = 4096;
-		data.resize(blkSize);
-		enc.resize(blkSize);
-		dec.resize(blkSize);
-		data[0] = 128;
-		for (uint8_t i = 0; i < key.size(); ++i)
-			key[i] = i;
-		for (uint8_t i = 0; i < iv128.size(); ++i)
-			iv128[i] = i;
-		Key::Symmetric::SymmetricKey keyParam(key, iv128);
-#else
-		data.reserve(MAX_ALLOC);
-		enc.reserve(MAX_ALLOC);
-		dec.reserve(MAX_ALLOC);
-		rng.GetBytes(key);
-		rng.GetBytes(iv128);
-		Key::Symmetric::SymmetricKey keyParam(key, iv128);
-#endif
-
-		Mode::CBC cipher(Engine);
-
-		// test sequential 128 wide block
-		cipher.ParallelProfile().IsParallel() = false;
-
-		for (size_t i = 0; i < TEST_LOOPS; ++i)
-		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
-			smpSze -= (smpSze % BLK128);
-			data.resize(smpSze);
-			enc.resize(smpSze);
-			dec.resize(smpSze);
-			rng.GetBytes(data);
-			const size_t BLKCNT = smpSze / BLK128;
-
-			// encrypt
-			cipher.Initialize(true, keyParam);
-			for (size_t j = 0; j < BLKCNT; ++j)
-				cipher.Transform128(data, j * BLK128, enc, j * BLK128);
-
-			// decrypt
-			cipher.Initialize(false, keyParam);
-			for (size_t j = 0; j < BLKCNT; ++j)
-				cipher.Transform128(enc, j * BLK128, dec, j * BLK128);
-
-			if (data != dec)
-				throw TestException("ParallelModeTest: Failed CBC-WBV integrity test!");
-		}
-
-
-		// test 128 wide with parallel decrypt
-		rng.GetBytes(iv128);
-		Key::Symmetric::SymmetricKey keyParam2(key, iv128);
-
-		for (size_t i = 0; i < TEST_LOOPS; ++i)
-		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
-			smpSze -= (smpSze % BLK128);
-			data.resize(smpSze);
-			enc.resize(smpSze);
-			dec.resize(smpSze);
-			rng.GetBytes(data);
-			const size_t BLKCNT = smpSze / BLK128;
-
-			// encrypt
-			cipher.Initialize(true, keyParam2);
-			for (size_t j = 0; j < BLKCNT; ++j)
-				cipher.Transform128(data, j * BLK128, enc, j * BLK128);
-
-			// decrypt
-			const size_t PRLMIN = cipher.ParallelProfile().ParallelMinimumSize();
-			cipher.ParallelProfile().ParallelBlockSize() = PRLMIN;
-			cipher.ParallelProfile().IsParallel() = true;
-			cipher.Initialize(false, keyParam2);
-			size_t offset = 0;
-
-			while (offset != smpSze)
-			{
-				cipher.Transform128(enc, offset, dec, offset);
-				if (smpSze - offset >= PRLMIN)
-					offset += PRLMIN;
-				else
-					offset = smpSze;
-			}
-
-			if (data != dec)
-				throw TestException("ParallelModeTest: Failed CBC-WBV parallel decryption test!");
-		}
-
-
-		// test sequential 64 wide block
-		rng.GetBytes(iv64);
-		Key::Symmetric::SymmetricKey keyParam3(key, iv128);
-		cipher.ParallelProfile().IsParallel() = false;
-
-		for (size_t i = 0; i < TEST_LOOPS; ++i)
-		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
-			smpSze -= (smpSze % BLK64);
-			data.resize(smpSze);
-			enc.resize(smpSze);
-			dec.resize(smpSze);
-			rng.GetBytes(data);
-			const size_t BLKCNT = smpSze / BLK64;
-
-			// encrypt
-			cipher.Initialize(true, keyParam3);
-			for (size_t j = 0; j < BLKCNT; ++j)
-				cipher.Transform64(data, j * BLK64, enc, j * BLK64);
-
-			// decrypt
-			cipher.Initialize(false, keyParam3);
-			for (size_t j = 0; j < BLKCNT; ++j)
-				cipher.Transform64(enc, j * BLK64, dec, j * BLK64);
-
-			if (data != dec)
-				throw TestException("ParallelModeTest: Failed CBC-WBV integrity test!");
-		}
-
-
-		// test 64 wide with parallel decrypt
-		rng.GetBytes(iv64);
-		Key::Symmetric::SymmetricKey keyParam4(key, iv128);
-		cipher.ParallelProfile().IsParallel() = false;
-
-		for (size_t i = 0; i < TEST_LOOPS; ++i)
-		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher.ParallelProfile().ParallelMinimumSize(), (uint)cipher.ParallelBlockSize());
-			smpSze -= (smpSze % BLK64);
-			data.resize(smpSze);
-			enc.resize(smpSze);
-			dec.resize(smpSze);
-			rng.GetBytes(data);
-			const size_t BLKCNT = smpSze / BLK64;
-
-			// encrypt
-			cipher.Initialize(true, keyParam4);
-			for (size_t j = 0; j < BLKCNT; ++j)
-				cipher.Transform64(data, j * BLK64, enc, j * BLK64);
-
-			// decrypt
-			const size_t PRLMIN = cipher.ParallelProfile().ParallelMinimumSize();
-			cipher.ParallelProfile().ParallelBlockSize() = PRLMIN;
-			cipher.ParallelProfile().IsParallel() = true;
-			cipher.Initialize(false, keyParam4);
-
-			size_t offset = 0;
-			while (offset != smpSze)
-			{
-				cipher.Transform64(enc, offset, dec, offset);
-				if (smpSze - offset >= PRLMIN)
-					offset += PRLMIN;
-				else
-					offset = smpSze;
-			}
-
-			if (data != dec)
-				throw TestException("ParallelModeTest: Failed CBC-WBV parallel decryption test!");
 		}
 	}
 
@@ -1233,7 +1050,7 @@ namespace Test
 		Engine->Initialize(keyParam);
 		Engine->ParallelProfile().IsParallel() = true;
 		Engine->ParallelProfile().ParallelBlockSize() = blkSize;
-		Engine->Transform(data, enc);
+		Engine->Transform(data, 0, enc, 0, data.size());
 
 		while (enc.size() > 32)
 			enc = TestUtils::Reduce(enc);
@@ -1287,12 +1104,12 @@ namespace Test
 			// sequential
 			Engine->Initialize(keyParam);
 			Engine->ParallelProfile().IsParallel() = false;
-			Engine->Transform(data, enc2);
+			Engine->Transform(data, 0, enc2, 0, data.size());
 
 			// parallel with intrinsics (if available)
 			Engine->Initialize(keyParam);
 			Engine->ParallelProfile().IsParallel() = true;
-			Engine->Transform(data, enc1);
+			Engine->Transform(data, 0, enc1, 0, data.size());
 
 			if (enc1 != enc2)
 				throw TestException("Parallel Stream: Encrypted output is not equal!");
@@ -1300,7 +1117,7 @@ namespace Test
 			// decrypt
 			Engine->Initialize(keyParam);
 			Engine->ParallelProfile().IsParallel() = true;
-			Engine->Transform(enc1, dec);
+			Engine->Transform(enc1, 0, dec, 0, enc1.size());
 
 			if (dec != data)
 				throw TestException("Parallel Stream: Decrypted output is not equal!");
@@ -1320,7 +1137,7 @@ namespace Test
 
 		while (count != alnSize)
 		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			Cipher->Transform(Input, InOffset, Output, OutOffset, blkSize);
 			InOffset += blkSize;
 			OutOffset += blkSize;
  			count += blkSize;
@@ -1333,7 +1150,7 @@ namespace Test
 			std::vector<byte> inpBuffer(blkSize);
 			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 			std::vector<byte> outBuffer(blkSize);
-			Cipher->Transform(inpBuffer, 0, outBuffer, 0);
+			Cipher->Transform(inpBuffer, 0, outBuffer, 0, cnkSize);
 			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
 		}
 	}
@@ -1347,7 +1164,7 @@ namespace Test
 
 		while (count != inpSize)
 		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			Cipher->Transform(Input, InOffset, Output, OutOffset, blkSize);
 			InOffset += blkSize;
 			OutOffset += blkSize;
 			count += blkSize;
@@ -1363,7 +1180,7 @@ namespace Test
 
 		while (count != inpSize)
 		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			Cipher->Transform(Input, InOffset, Output, OutOffset, blkSize);
 			InOffset += blkSize;
 			OutOffset += blkSize;
 			count += blkSize;
@@ -1395,12 +1212,12 @@ namespace Test
 		{
 			Common::CpuDetect detect;
 			m_hasAESNI = detect.AESNI();
-			m_hasSSE = detect.SSE();
+			m_hasAVX = detect.AVX();
 		}
 		catch (...)
 		{
 			m_hasAESNI = false;
-			m_hasSSE = false;
+			m_hasAVX = false;
 		}
 	}
 
@@ -1422,7 +1239,7 @@ namespace Test
 		// parallel blocks
 		while (count != alnSize)
 		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			Cipher->Transform(Input, InOffset, Output, OutOffset, blkSize);
 			InOffset += blkSize;
 			OutOffset += blkSize;
 			count += blkSize;
@@ -1434,7 +1251,7 @@ namespace Test
 			std::vector<byte> inpBuffer(cnkSize);
 			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 			std::vector<byte> outBuffer(cnkSize);
-			Cipher->Transform(inpBuffer, outBuffer);
+			Cipher->Transform(inpBuffer, 0, outBuffer, 0, cnkSize);
 			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
 		}
 	}
@@ -1452,7 +1269,7 @@ namespace Test
 		// parallel
 		while (count != alnSize)
 		{
-			Cipher->Transform(Input, InOffset, Output, OutOffset);
+			Cipher->Transform(Input, InOffset, Output, OutOffset, blkSize);
 			InOffset += blkSize;
 			OutOffset += blkSize;
 			count += blkSize;
@@ -1470,7 +1287,7 @@ namespace Test
 		size_t blocks = Input.size() / BlockSize;
 
 		for (size_t i = 0; i < blocks; ++i)
-			Cipher->Transform(Input, i * BlockSize, Output, i * BlockSize);
+			Cipher->Transform(Input, i * BlockSize, Output, i * BlockSize, BlockSize);
 
 		if (blocks * BlockSize < Input.size())
 		{
@@ -1481,7 +1298,7 @@ namespace Test
 				size_t oft = Input.size() - sze;
 				memcpy(&inpBuffer[0], &Input[oft], sze);
 				std::vector<byte> outBuffer(sze);
-				Cipher->Transform(inpBuffer, outBuffer);
+				Cipher->Transform(inpBuffer, 0, outBuffer, 0, sze);
 				memcpy(&Output[oft], &outBuffer[0], sze);
 			}
 			else
@@ -1504,7 +1321,7 @@ namespace Test
 		for (size_t i = 0; i < blocks; i++)
 		{
 			memcpy(&inBlock[0], &Input[i * BlockSize], BlockSize);
-			Cipher->Transform(inBlock, outBlock);
+			Cipher->Transform(inBlock, 0, outBlock, 0, BlockSize);
 			memcpy(&Output[i * BlockSize], &outBlock[0], BlockSize);
 		}
 

@@ -30,6 +30,7 @@
 #include "../Test/HXCipherTest.h"
 #include "../Test/ITest.h"
 #include "../Test/MacStreamTest.h"
+#include "../Test/MemUtilsTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
@@ -41,6 +42,8 @@
 #include "../Test/SecureStreamTest.h"
 #include "../Test/SerpentTest.h"
 #include "../Test/Sha2Test.h"
+#include "../Test/SimdSpeedTest.h"
+#include "../Test/SimdWrapperTest.h"
 #include "../Test/SkeinTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
@@ -70,9 +73,20 @@ using namespace Test;
 // Rewrite SHA2			-done
 // Rewrite Blake2		-done
 // Keccak Tree			-done
-// Scrypt(maybe)		-done
+// Scrypt				-done
 // Code review			-done
 // Help review			-done
+
+// Release 1.0.0.2, April 23, 2017
+// Added and integrated a vectorized MemUtils class
+// Added experimental AVX512 support
+// Added UInt512 class
+// Added MemUtils and SIMD tests
+// Templated Chacha and Salsa
+// Rewrites of Twofish and Serpent
+// Headers are now documentation only (no inline accessors)
+// Added override hint to virtual functions in headers
+// Many small format changes and a couple of bug fixes
 
 // Release 1.0.1.1, April 08, 2017
 // Fixed a bug in CpuDetect (misreporting SIMD capabilities of some cpu's)
@@ -87,7 +101,7 @@ using namespace Test;
 
 // *** 1.1.0.0 RoadMap ***
 //
-// RingLWE				-?
+// RingLWE				-started
 // RLWE-SIG				-?
 // McEliece				-?
 // GMSS					-?
@@ -96,7 +110,7 @@ using namespace Test;
 // TLS					-?
 // STM-KEX				-?
 // DLL API				-?
-// AVX512 integration	-?
+// AVX512 integration	-started
 
 void CpuCheck()
 {
@@ -153,11 +167,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.1: CEX Library in C++  *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.1.1: CEX Library in C++  *");
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.1.1 (A1)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      April 2, 2017                   *");
+	ConsoleUtils::WriteLine("* Date:      April 11, 2017                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -206,7 +220,7 @@ void RunTest(Test::ITest* Test)
 int main()
 {
 	ConsoleUtils::SizeConsole();
-	PrintTitle(); 
+	PrintTitle();
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
@@ -334,6 +348,9 @@ int main()
 			RunTest(new SymmetricKeyGeneratorTest());
 			RunTest(new SecureStreamTest());
 			RunTest(new SymmetricKeyTest());
+			PrintHeader("TESTING VECTORIZED MEMORY FUNCTIONS");
+			RunTest(new MemUtilsTest());
+			RunTest(new SimdWrapperTest());
 		}
 		else
 		{
@@ -341,6 +358,18 @@ int main()
 		}
 		ConsoleUtils::WriteLine("");
 		ConsoleUtils::WriteLine("");
+
+#if defined(__AVX__)
+		if (CanTest("Press 'Y' then Enter to run SIMD Memory operations Speed Tests, any other key to cancel: "))
+		{
+			RunTest(new SimdSpeedTest());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("SIMD Memory Speed tests were Cancelled..");
+		}
+		ConsoleUtils::WriteLine("");
+#endif
 
 		if (CanTest("Press 'Y' then Enter to run Symmetric Cipher Speed Tests, any other key to cancel: "))
 		{

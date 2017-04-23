@@ -1,13 +1,45 @@
 #include "HKDF.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
 #include "Macs.h"
+#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
 
-using Key::Symmetric::SymmetricKey;
+const std::string HKDF::CLASS_NAME("HKDF");
+
+//~~~Properties~~~//
+
+const Kdfs HKDF::Enumeral() 
+{ 
+	return Kdfs::HKDF; 
+}
+
+std::vector<byte> &HKDF::Info() 
+{ 
+	return m_kdfInfo; 
+}
+
+const bool HKDF::IsInitialized() 
+{ 
+	return m_isInitialized; 
+}
+
+std::vector<SymmetricKeySize> HKDF::LegalKeySizes() const 
+{ 
+	return m_legalKeySizes; 
+};
+
+size_t HKDF::MinKeySize() 
+{
+	return m_macSize; 
+}
+
+const std::string &HKDF::Name()
+{
+	return CLASS_NAME;
+}
 
 //~~~Constructor~~~//
 
@@ -87,9 +119,9 @@ void HKDF::Destroy()
 					delete m_macGenerator;
 			}
 
-			Utility::ArrayUtils::ClearVector(m_kdfInfo);
-			Utility::ArrayUtils::ClearVector(m_kdfState);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_kdfInfo);
+			Utility::IntUtils::ClearVector(m_kdfState);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
 		}
 		catch(std::exception& ex)
 		{
@@ -100,10 +132,9 @@ void HKDF::Destroy()
 
 size_t HKDF::Generate(std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
-	if (Output.size() == 0)
-		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
+
 	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
 		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 
@@ -112,10 +143,9 @@ size_t HKDF::Generate(std::vector<byte> &Output)
 
 size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
+
 	if (m_kdfCounter + (Length / m_macSize) > 255)
 		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 
@@ -145,7 +175,7 @@ void HKDF::Initialize(const std::vector<byte> &Key)
 	if (m_isInitialized)
 		Reset();
 
-	SymmetricKey kp(Key);
+	Key::Symmetric::SymmetricKey kp(Key);
 	m_macGenerator->Initialize(kp);
 	m_isInitialized = true;
 }
@@ -162,7 +192,7 @@ void HKDF::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 
 	std::vector<byte> prk;
 	Extract(Key, Salt, prk);
-	SymmetricKey kp(prk);
+	Key::Symmetric::SymmetricKey kp(prk);
 	m_macGenerator->Initialize(kp);
 	m_isInitialized = true;
 }
@@ -179,7 +209,7 @@ void HKDF::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 
 	std::vector<byte> prk(m_macSize);
 	Extract(Key, Salt, prk);
-	SymmetricKey kp(prk);
+	Key::Symmetric::SymmetricKey kp(prk);
 	m_macGenerator->Initialize(kp);
 	m_kdfInfo = Info;
 	m_isInitialized = true;
@@ -215,10 +245,10 @@ size_t HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		m_macGenerator->Update(++m_kdfCounter);
 		m_macGenerator->Finalize(m_kdfState, 0);
 
-		const size_t RMD = Utility::IntUtils::Min(m_macSize, Length - prcLen);
-		memcpy(&Output[OutOffset], &m_kdfState[0], RMD);
-		prcLen += RMD;
-		OutOffset += RMD;
+		const size_t RMDSZE = Utility::IntUtils::Min(m_macSize, Length - prcLen);
+		Utility::MemUtils::Copy<byte>(m_kdfState, 0, Output, OutOffset, RMDSZE);
+		prcLen += RMDSZE;
+		OutOffset += RMDSZE;
 	}
 
 	return Length;
@@ -226,17 +256,17 @@ size_t HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output)
 {
-	SymmetricKey kp(Key);
+	Key::Symmetric::SymmetricKey kp(Key);
 	m_macGenerator->Initialize(kp);
 
 	if (Salt.size() != 0)
 	{
-		SymmetricKey kps(Salt);
+		Key::Symmetric::SymmetricKey kps(Salt);
 		m_macGenerator->Initialize(kps);
 	}
 	else
 	{
-		SymmetricKey kps(std::vector<byte>(m_macSize, 0));
+		Key::Symmetric::SymmetricKey kps(std::vector<byte>(m_macSize, 0));
 		m_macGenerator->Initialize(kps);
 	}
 

@@ -31,32 +31,32 @@ class SHA512Compress
 private:
 	static const size_t BLOCK_SIZE = 128;
 
-	static inline ulong BigSigma0(ulong W)
+	inline static ulong BigSigma0(ulong W)
 	{
 		return ((W << 36) | (W >> 28)) ^ ((W << 30) | (W >> 34)) ^ ((W << 25) | (W >> 39));
 	}
 
-	static inline ulong BigSigma1(ulong W)
+	inline static ulong BigSigma1(ulong W)
 	{
 		return ((W << 50) | (W >> 14)) ^ ((W << 46) | (W >> 18)) ^ ((W << 23) | (W >> 41));
 	}
 
-	static inline ulong Ch(ulong B, ulong C, ulong D)
+	inline static ulong Ch(ulong B, ulong C, ulong D)
 	{
 		return (B & C) ^ (~B & D);
 	}
 
-	static inline ulong Maj(ulong B, ulong C, ulong D)
+	inline static ulong Maj(ulong B, ulong C, ulong D)
 	{
 		return (B & C) ^ (B & D) ^ (C & D);
 	}
 
-	static inline ulong Sigma0(ulong W)
+	inline static ulong Sigma0(ulong W)
 	{
 		return ((W << 63) | (W >> 1)) ^ ((W << 56) | (W >> 8)) ^ (W >> 7);
 	}
 
-	static inline ulong Sigma1(ulong W)
+	inline static ulong Sigma1(ulong W)
 	{
 		return ((W << 45) | (W >> 19)) ^ ((W << 3) | (W >> 61)) ^ (W >> 6);
 	}
@@ -72,7 +72,7 @@ private:
 public:
 
 	template <typename T>
-	static inline void Compress128(const std::vector<byte> &Input, size_t InOffset, T &Output)
+	inline static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &Output)
 	{
 		ulong A = Output.H[0];
 		ulong B = Output.H[1];
@@ -84,37 +84,37 @@ public:
 		ulong H = Output.H[7];
 		ulong W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
 
-		W0 = IntUtils::BytesToBe64(Input, InOffset);
+		W0 = IntUtils::BeBytesTo64(Input, InOffset);
 		SHA512ROUND(A, B, C, D, E, F, G, H, W0, 0x428a2f98d728ae22);
-		W1 = IntUtils::BytesToBe64(Input, InOffset + 8);
+		W1 = IntUtils::BeBytesTo64(Input, InOffset + 8);
 		SHA512ROUND(H, A, B, C, D, E, F, G, W1, 0x7137449123ef65cd);
-		W2 = IntUtils::BytesToBe64(Input, InOffset + 16);
+		W2 = IntUtils::BeBytesTo64(Input, InOffset + 16);
 		SHA512ROUND(G, H, A, B, C, D, E, F, W2, 0xb5c0fbcfec4d3b2f);
-		W3 = IntUtils::BytesToBe64(Input, InOffset + 24);
+		W3 = IntUtils::BeBytesTo64(Input, InOffset + 24);
 		SHA512ROUND(F, G, H, A, B, C, D, E, W3, 0xe9b5dba58189dbbc);
-		W4 = IntUtils::BytesToBe64(Input, InOffset + 32);
+		W4 = IntUtils::BeBytesTo64(Input, InOffset + 32);
 		SHA512ROUND(E, F, G, H, A, B, C, D, W4, 0x3956c25bf348b538);
-		W5 = IntUtils::BytesToBe64(Input, InOffset + 40);
+		W5 = IntUtils::BeBytesTo64(Input, InOffset + 40);
 		SHA512ROUND(D, E, F, G, H, A, B, C, W5, 0x59f111f1b605d019);
-		W6 = IntUtils::BytesToBe64(Input, InOffset + 48);
+		W6 = IntUtils::BeBytesTo64(Input, InOffset + 48);
 		SHA512ROUND(C, D, E, F, G, H, A, B, W6, 0x923f82a4af194f9b);
-		W7 = IntUtils::BytesToBe64(Input, InOffset + 56);
+		W7 = IntUtils::BeBytesTo64(Input, InOffset + 56);
 		SHA512ROUND(B, C, D, E, F, G, H, A, W7, 0xab1c5ed5da6d8118);
-		W8 = IntUtils::BytesToBe64(Input, InOffset + 64);
+		W8 = IntUtils::BeBytesTo64(Input, InOffset + 64);
 		SHA512ROUND(A, B, C, D, E, F, G, H, W8, 0xd807aa98a3030242);
-		W9 = IntUtils::BytesToBe64(Input, InOffset + 72);
+		W9 = IntUtils::BeBytesTo64(Input, InOffset + 72);
 		SHA512ROUND(H, A, B, C, D, E, F, G, W9, 0x12835b0145706fbe);
-		W10 = IntUtils::BytesToBe64(Input, InOffset + 80);
+		W10 = IntUtils::BeBytesTo64(Input, InOffset + 80);
 		SHA512ROUND(G, H, A, B, C, D, E, F, W10, 0x243185be4ee4b28c);
-		W11 = IntUtils::BytesToBe64(Input, InOffset + 88);
+		W11 = IntUtils::BeBytesTo64(Input, InOffset + 88);
 		SHA512ROUND(F, G, H, A, B, C, D, E, W11, 0x550c7dc3d5ffb4e2);
-		W12 = IntUtils::BytesToBe64(Input, InOffset + 96);
+		W12 = IntUtils::BeBytesTo64(Input, InOffset + 96);
 		SHA512ROUND(E, F, G, H, A, B, C, D, W12, 0x72be5d74f27b896f);
-		W13 = IntUtils::BytesToBe64(Input, InOffset + 104);
+		W13 = IntUtils::BeBytesTo64(Input, InOffset + 104);
 		SHA512ROUND(D, E, F, G, H, A, B, C, W13, 0x80deb1fe3b1696b1);
-		W14 = IntUtils::BytesToBe64(Input, InOffset + 112);
+		W14 = IntUtils::BeBytesTo64(Input, InOffset + 112);
 		SHA512ROUND(C, D, E, F, G, H, A, B, W14, 0x9bdc06a725c71235);
-		W15 = IntUtils::BytesToBe64(Input, InOffset + 120);
+		W15 = IntUtils::BeBytesTo64(Input, InOffset + 120);
 		SHA512ROUND(B, C, D, E, F, G, H, A, W15, 0xc19bf174cf692694);
 
 		W0 += Sigma1(W14) + W9 + Sigma0(W1);

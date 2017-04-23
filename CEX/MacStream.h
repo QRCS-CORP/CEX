@@ -18,6 +18,7 @@
 //
 // 
 // Written by John Underhill, January 21, 2015
+// Updated April 21, 2016
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_MACSTREAM_H
@@ -28,8 +29,9 @@
 #include "Event.h"
 #include "IByteStream.h"
 #include "IMac.h"
-#include "MacDescription.h"
 #include "ISymmetricKey.h"
+#include "MacDescription.h"
+#include "SymmetricKeySize.h"
 
 NAMESPACE_PROCESSING
 
@@ -38,6 +40,7 @@ using Routing::Event;
 using Key::Symmetric::ISymmetricKey;
 using IO::IByteStream;
 using Mac::IMac;
+using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
 /// MAC stream helper class.
@@ -71,13 +74,10 @@ class MacStream
 {
 private:
 
-	static const size_t BUFFER_SIZE = 64 * 1024;
-
 	IMac* m_macEngine;
-	size_t m_blockSize;
 	bool m_destroyEngine;
-	IByteStream* m_inStream;
-	bool m_isDestroyed = false;
+	bool m_isDestroyed;
+	bool m_isInitialized;
 	size_t m_progressInterval;
 
 public:
@@ -92,25 +92,27 @@ public:
 	/// </summary>
 	Event<int> ProgressPercent;
 
+	//~~~Properties~~~//
+
+	/// <summary>
+	/// Get: The supported key sizes for the selected mac configuration
+	/// </summary>
+	const std::vector<SymmetricKeySize> LegalKeySizes();
+
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize the class with a MacDescription and key
+	/// Initialize the class with a MacDescription
 	/// </summary>
 	/// 
 	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
-	/// <param name="MacKey">A SymmetricKey containing the Mac key and salt; note the info parameter in SymmetricKey is not used</param>
-	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if an uninitialized Mac is used</exception>
-	explicit MacStream(MacDescription &Description, ISymmetricKey &MacKey);
+	explicit MacStream(MacDescription &Description);
 
 	/// <summary>
-	/// Initialize the class with an initialized Mac instance
+	/// Initialize the class with a Mac instance
 	/// </summary>
 	/// 
-	/// <param name="Mac">The initialized <see cref="Mac::IMac"/> instance</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null or uninitialized Mac is used</exception>
+	/// <param name="Mac">The <see cref="Mac::IMac"/> instance</param>
 	explicit MacStream(IMac* Mac);
 
 	/// <summary>
@@ -121,33 +123,41 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Process the entire length of the Input Stream
+	/// Process the entire length of the source stream
 	/// </summary>
+	///
+	/// <param name="Input">The source stream to process</param>
 	/// 
-	/// <returns>The Mac Code</returns>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <returns>The Mac output code</returns>
 	std::vector<byte> Compute(IByteStream* InStream);
 
 	/// <summary>
-	/// Process a length within the Input stream using an Offset
+	/// Process a length of bytes within the source array
 	/// </summary>
 	/// 
-	/// <returns>The Mac Code</returns>
-	/// <param name="Input">The Input array to process</param>
-	/// <param name="InOffset">The Input array starting offset</param>
+	/// <param name="Input">The source array to process</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Compute is called before Initialize(), or if Size + Offset is longer than Input stream</exception>
+	/// <returns>The Mac output code</returns>
 	std::vector<byte> Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+
+	/// <summary>
+	/// Initialize the MAC generator with a SymmetricKey key container.
+	/// <para>Uses a key array to initialize the MAC.
+	/// The key size should be one of the LegalKeySizes.</para>
+	/// </summary>
+	/// 
+	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	void Initialize(ISymmetricKey &KeyParams);
 
 private:
 
 	void CalculateInterval(size_t Length);
-	void CalculateProgress(size_t Length, bool Completed = false);
-	std::vector<byte> Process(size_t Length);
-	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void CalculateProgress(size_t Length, size_t Processed);
 	void Destroy();
+	std::vector<byte> Process(IByteStream* InStream, size_t Length);
+	std::vector<byte> Process(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 };
 
 NAMESPACE_PROCESSINGEND

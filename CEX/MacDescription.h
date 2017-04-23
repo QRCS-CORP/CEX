@@ -12,7 +12,6 @@
 #include "MemoryStream.h"
 #include "PaddingModes.h"
 #include "RoundCounts.h"
-#include "StreamReader.h"
 
 NAMESPACE_PROCESSING
 
@@ -63,61 +62,51 @@ public:
 	//~~~Properties~~~//
 
 	/// <summary>
-	/// The type of Mac engine to use; CMac, Hmac, or Vmac.
+	/// The cipher internal Block Size
 	/// </summary>
-	const Macs MacType() const { return static_cast<Macs>(m_macType); }
-
-	/// <summary>
-	/// The cipher Key Size
-	/// </summary>
-	const short KeySize() const { return m_keySize; }
-
-	/// <summary>
-	/// Size of the cipher Initialization Vector
-	/// </summary>
-	const IVSizes IvSize() const { return static_cast<IVSizes>(m_ivSize); }
-
-	/// <summary>
-	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
-	/// </summary>
-	const Digests HmacEngine() const { return static_cast<Digests>(m_hmacEngine); }
+	const BlockSizes BlockSize();
 
 	/// <summary>
 	/// The symmetric block cipher Engine type
 	/// </summary>
-	const BlockCiphers EngineType() const { return static_cast<BlockCiphers>(m_engineType); }
+	const BlockCiphers EngineType();
 
 	/// <summary>
-	/// The cipher internal Block Size
+	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
 	/// </summary>
-	const BlockSizes BlockSize() const { return static_cast<BlockSizes>(m_blockSize); }
+	const Digests HmacEngine();
 
 	/// <summary>
-	/// The number of cipher transformation Rounds
+	/// Size of the cipher Initialization Vector
 	/// </summary>
-	const RoundCounts RoundCount() const { return static_cast<RoundCounts>(m_roundCount); }
-
-	//~~~Constructor~~~//
+	const IVSizes IvSize();
 
 	/// <summary>
 	/// The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
 	/// </summary>
-	const Digests KdfEngine() const { return static_cast<Digests>(m_kdfEngine); }
+	const Digests KdfEngine();
+
+	/// <summary>
+	/// The cipher Key Size
+	/// </summary>
+	const short KeySize();
+
+	/// <summary>
+	/// The type of Mac engine to use; CMac, Hmac, or Vmac.
+	/// </summary>
+	const Macs MacType();
+
+	/// <summary>
+	/// The number of cipher transformation Rounds
+	/// </summary>
+	const RoundCounts RoundCount();
+
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Default constructor
 	/// </summary>
-	explicit MacDescription()
-		:
-		m_macType(0),
-		m_keySize(0),
-		m_ivSize(0),
-		m_hmacEngine(0),
-		m_engineType(0),
-		m_blockSize(0),
-		m_roundCount(0),
-		m_kdfEngine(0)
-	{}
+	explicit MacDescription();
 
 	/// <summary>
 	/// Initialize the structure with parameters for any supported type of Mac generator
@@ -132,17 +121,7 @@ public:
 	/// <param name="RoundCount">The number of transformation Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	explicit MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
-		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512)
-	{
-		m_macType = static_cast<byte>(MacType);
-		m_keySize = KeySize;
-		m_ivSize = IvSize;
-		m_hmacEngine = static_cast<byte>(HmacEngine);
-		m_engineType = static_cast<byte>(EngineType);
-		m_blockSize = static_cast<byte>(BlockSize);
-		m_roundCount = static_cast<byte>(RoundCount);
-		m_kdfEngine = static_cast<byte>(KdfEngine);
-	}
+		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512);
 
 	/// <summary>
 	/// Initialize the structure with parameters for an HMAC generator
@@ -150,17 +129,7 @@ public:
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
 	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
-	explicit MacDescription(uint KeySize, Digests HmacEngine)
-	{
-		m_macType = static_cast<byte>(Macs::HMAC);
-		m_keySize = KeySize;
-		m_hmacEngine = static_cast<byte>(HmacEngine);
-		m_ivSize = 0;
-		m_engineType = 0;
-		m_blockSize = 0;
-		m_roundCount = 0;
-		m_kdfEngine = 0;
-	}
+	explicit MacDescription(uint KeySize, Digests HmacEngine);
 
 	/// <summary>
 	/// Initialize the structure with parameters for an CMAC generator
@@ -173,58 +142,23 @@ public:
 	/// <param name="RoundCount">The number of transformation Rounds</param>
 	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
 	explicit MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
-		RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512)
-	{
-		m_macType = static_cast<byte>(Macs::CMAC);
-		m_keySize = KeySize;
-		m_ivSize = static_cast<byte>(IvSize);
-		m_hmacEngine = 0;
-		m_engineType = static_cast<byte>(EngineType);
-		m_blockSize = static_cast<byte>(BlockSize);
-		m_roundCount = static_cast<byte>(RoundCount);
-		m_kdfEngine = static_cast<byte>(KdfEngine);
-	}
+		RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512);
 
 	/// <summary>
 	/// Initialize the MacDescription structure using a Stream
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the MacDescription</param>
-	explicit MacDescription(const MemoryStream &DescriptionStream)
-	{
-		IO::StreamReader reader(DescriptionStream);
-
-		m_macType = reader.ReadByte();
-		m_keySize = reader.ReadInt16();
-		m_ivSize = reader.ReadByte();
-		m_hmacEngine = reader.ReadByte();
-		m_engineType = reader.ReadByte();
-		m_blockSize = reader.ReadByte();
-		m_roundCount = reader.ReadByte();
-		m_kdfEngine = reader.ReadByte();
-	}
+	explicit MacDescription(const MemoryStream &DescriptionStream);
 
 	/// <summary>
 	/// Initialize the MacDescription structure using a byte array
 	/// </summary>
 	/// 
 	/// <param name="DescriptionArray">The byte array containing the MacDescription</param>
-	explicit MacDescription(const std::vector<byte> &DescriptionArray)
-	{
-		MemoryStream ms = MemoryStream(DescriptionArray);
-		IO::StreamReader reader(ms);
+	explicit MacDescription(const std::vector<byte> &DescriptionArray);
 
-		m_macType = reader.ReadByte();
-		m_keySize = reader.ReadInt16();
-		m_ivSize = reader.ReadByte();
-		m_hmacEngine = reader.ReadByte();
-		m_engineType = reader.ReadByte();
-		m_blockSize = reader.ReadByte();
-		m_roundCount = reader.ReadByte();
-		m_kdfEngine = reader.ReadByte();
-	}
-
-	//~~~Public Functions~~~//
+	//~~~Presets~~~//
 
 	/// <summary>
 	/// An HMAC SHA-256 preset
@@ -240,6 +174,24 @@ public:
 	/// An CMAC AES-256 preset
 	/// </summary>
 	static MacDescription CMACAES256();
+
+	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Compare this object instance with another
+	/// </summary>
+	/// 
+	/// <param name="Obj">Object to compare</param>
+	/// 
+	/// <returns>True if equal, otherwise false</returns>
+	bool Equals(MacDescription &Obj);
+
+	/// <summary>
+	/// Get the hash code for this object
+	/// </summary>
+	/// 
+	/// <returns>Hash code</returns>
+	int GetHashCode();
 
 	/// <summary>
 	/// Get the header size in bytes
@@ -266,22 +218,6 @@ public:
 	/// 
 	/// <returns>The MemoryStream containing the MacDescription</returns>
 	MemoryStream* ToStream();
-
-	/// <summary>
-	/// Get the hash code for this object
-	/// </summary>
-	/// 
-	/// <returns>Hash code</returns>
-	int GetHashCode();
-
-	/// <summary>
-	/// Compare this object instance with another
-	/// </summary>
-	/// 
-	/// <param name="Obj">Object to compare</param>
-	/// 
-	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(MacDescription &Obj);
 };
 
 NAMESPACE_PROCESSINGEND

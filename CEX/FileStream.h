@@ -41,6 +41,7 @@ public:
 private:
 
 	static const uint CHUNK_SIZE = 4096;
+	static const std::string CLASS_NAME;
 
 	bool m_isDestroyed;
 	std::string m_fileName;
@@ -60,52 +61,57 @@ public:
 	/// <summary>
 	/// Get: The file read and write file access flags
 	/// </summary>
-	const FileAccess Access() { return m_fileAccess; }
+	const FileAccess Access();
 
 	/// <summary>
 	/// Get: The stream can be read
 	/// </summary>
-	virtual const bool CanRead() { return m_fileAccess != FileAccess::Write; }
+	const bool CanRead() override;
 
 	/// <summary>
 	/// Get: The stream is seekable
 	/// </summary>
-	virtual const bool CanSeek() { return true; }
+	const bool CanSeek() override;
 
 	/// <summary>
 	/// Get: The stream can be written to
 	/// </summary>
-	virtual const bool CanWrite() { return m_fileAccess != FileAccess::Read; }
+	const bool CanWrite() override;
 
 	/// <summary>
 	/// Get: The stream container type
 	/// </summary>
-	virtual const StreamModes Enumeral() { return StreamModes::FileStream; }
+	const StreamModes Enumeral() override;
 
 	/// <summary>
 	/// Get: The file open mode flags
 	/// </summary>
-	const FileModes FileMode() { return m_fileMode; }
+	const FileModes FileMode();
 
 	/// <summary>
 	/// Get: The file name and path
 	/// </summary>
-	std::string FileName() { return m_fileName; }
+	std::string FileName();
 
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const ulong Length() { return m_fileSize; }
+	const ulong Length() override;
+
+	/// <summary>
+	/// Get: The streams class name
+	/// </summary>
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const ulong Position() { return m_filePosition; }
+	const ulong Position() override;
 
 	/// <summary>
 	/// Get: The underlying stream
 	/// </summary>
-	std::fstream &Stream() { return m_fileStream; }
+	std::fstream &Stream();
 
 	//~~~Constructor~~~//
 
@@ -116,31 +122,33 @@ public:
 	/// <param name="FileName">The full path and name of the file</param>
 	/// <param name="Access">The level of access requested</param>
 	/// <param name="Mode">The file processing mode</param>
+	///
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file could not be opened</exception>
 	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileModes Mode = FileModes::Binary);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~FileStream();
+	~FileStream() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Close and flush the stream
 	/// </summary>
-	virtual void Close();
+	void Close() override;
 
 	/// <summary>
 	/// Copy this stream to another stream
 	/// </summary>
 	///
 	/// <param name="Destination">The destination stream</param>
-	virtual void CopyTo(IByteStream* Destination);
+	void CopyTo(IByteStream* Destination) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Check if a file exists
@@ -174,21 +182,19 @@ public:
 	/// <param name="Length">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes read</returns>
-	virtual size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length);
+	size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Read a single byte from the stream
 	/// </summary>
 	///
 	/// <returns>The read byte value</returns>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the stream is too short or the file is write only</exception>
-	virtual byte ReadByte();
+	byte ReadByte() override;
 
 	/// <summary>
 	/// Reset and initialize the underlying stream to zero
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Seek to a position within the stream
@@ -196,16 +202,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(ulong Offset, SeekOrigin Origin);
+	void Seek(ulong Offset, SeekOrigin Origin) override;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void SetLength(ulong Length);
+	void SetLength(ulong Length) override;
 
 	/// <summary>
 	/// Writes an input buffer to the stream
@@ -216,18 +220,14 @@ public:
 	/// <param name="Length">The number of bytes to write</param>
 	///
 	/// <returns>The number of bytes written</returns>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void Write(const std::vector<byte> &Input, size_t Offset, size_t Length);
+	void Write(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Write a single byte from the stream
 	/// </summary>
 	///
 	/// <param name="Value">The byte value to write</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the file is read only</exception>
-	virtual void WriteByte(byte Value);
+	void WriteByte(byte Value) override;
 };
 
 NAMESPACE_IOEND

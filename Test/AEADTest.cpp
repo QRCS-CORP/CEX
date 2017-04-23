@@ -205,7 +205,8 @@ namespace Test
 		std::vector<byte> encData1;
 		std::vector<byte> encData2;
 		std::vector<byte> key(32);
-		std::vector<byte> nonce(Cipher->LegalKeySizes()[0].NonceSize());
+		std::vector<Key::Symmetric::SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
+		std::vector<byte> nonce(keySizes[0].NonceSize());
 		std::vector<byte> assoc(16);
 		Prng::SecureRandom rng;
 
@@ -269,11 +270,12 @@ namespace Test
 
 	void AEADTest::StressTest(IAeadMode* Cipher)
 	{
+		Key::Symmetric::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
 		std::vector<byte> data;
 		std::vector<byte> decData;
 		std::vector<byte> encData;
 		std::vector<byte> key(32);
-		std::vector<byte> nonce(Cipher->LegalKeySizes()[0].NonceSize());
+		std::vector<byte> nonce(keySize.NonceSize());
 		std::vector<byte> assoc(16);
 
 		Prng::SecureRandom rng;

@@ -75,14 +75,14 @@ namespace Test
 		Salsa20 cipher(20);
 		cipher.Initialize(k);
 		cipher.ParallelProfile().IsParallel() = false;
-		cipher.Transform(data, enc);
+		cipher.Transform(data, 0, enc, 0, data.size());
 
 		// encrypt parallel
 		Salsa20 cipher2(20);
 		cipher2.Initialize(k);
 		cipher2.ParallelProfile().IsParallel() = true;
 		cipher2.ParallelProfile().ParallelBlockSize() = cipher2.ParallelProfile().ParallelMinimumSize();
-		cipher2.Transform(data, enc2);
+		cipher2.Transform(data, 0, enc2, 0, data.size());
 
 		if (enc != enc2)
 			throw TestException("Salsa20: Encrypted arrays are not equal!");
@@ -90,13 +90,13 @@ namespace Test
 		// decrypt linear
 		cipher2.Initialize(k);
 		cipher2.ParallelProfile().IsParallel() = false;
-		cipher2.Transform(enc, dec);
+		cipher2.Transform(enc, 0, dec, 0, enc.size());
 
 		// decrypt parallel
 		cipher.Initialize(k);
 		cipher.ParallelProfile().IsParallel() = true;
 		cipher.ParallelProfile().ParallelBlockSize() = cipher.ParallelProfile().ParallelMinimumSize();
-		cipher.Transform(enc2, dec2);
+		cipher.Transform(enc2, 0, dec2, 0, enc2.size());
 
 		if (dec != data)
 			throw TestException("Salsa20: Decrypted arrays are not equal!");
@@ -110,7 +110,7 @@ namespace Test
 		Key::Symmetric::SymmetricKey k(Key, Vector);
 		Salsa20 cipher(Rounds);
 		cipher.Initialize(k);
-		cipher.Transform(Input, outBytes);
+		cipher.Transform(Input, 0, outBytes, 0, Input.size());
 
 		if (outBytes != Output)
 			throw TestException("Salsa20: Encrypted arrays are not equal!");
@@ -119,7 +119,7 @@ namespace Test
 			throw TestException("Salsa20: Encrypted arrays are not equal!");
 
 		cipher.Initialize(k);
-		cipher.Transform(Output, outBytes);
+		cipher.Transform(Output, 0, outBytes, 0, Output.size());
 
 		if (!Test::TestUtils::IsEqual(outBytes, Input))
 			throw TestException("Salsa20: Decrypted arrays are not equal!");

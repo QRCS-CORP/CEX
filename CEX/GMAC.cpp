@@ -1,12 +1,49 @@
 #include "GMAC.h"
-#include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MAC
 
-using Utility::IntUtils;
+const std::string GMAC::CLASS_NAME("GMAC");
+
+//~~~Properties~~~//
+
+const size_t GMAC::BlockSize() 
+{
+	return m_blockCipher->BlockSize(); 
+}
+
+const BlockCiphers GMAC::CipherType()
+{ 
+	return m_cipherType; 
+}
+
+const Macs GMAC::Enumeral()
+{
+	return Macs::GMAC;
+}
+
+const size_t GMAC::MacSize() 
+{ 
+	return BLOCK_SIZE; 
+}
+
+const bool GMAC::IsInitialized()
+{ 
+	return m_isInitialized; 
+}
+
+std::vector<SymmetricKeySize> GMAC::LegalKeySizes() const 
+{
+	return m_legalKeySizes; 
+};
+
+const std::string &GMAC::Name()
+{ 
+	return CLASS_NAME; 
+}
 
 GMAC::GMAC(BlockCiphers CipherType)
 	:
@@ -87,11 +124,11 @@ void GMAC::Destroy()
 					delete m_blockCipher;
 			}
 
-			Utility::ArrayUtils::ClearVector(m_gmacNonce);
-			Utility::ArrayUtils::ClearVector(m_gmacKey);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_msgBuffer);
-			Utility::ArrayUtils::ClearVector(m_msgCode);
+			Utility::IntUtils::ClearVector(m_gmacNonce);
+			Utility::IntUtils::ClearVector(m_gmacKey);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_msgBuffer);
+			Utility::IntUtils::ClearVector(m_msgCode);
 
 		}
 		catch (std::exception& ex)
@@ -109,8 +146,8 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		throw CryptoMacException("GMAC:Finalize", "The Output buffer is too short!");
 
 	m_gmacHash->FinalizeBlock(m_msgCode, m_msgCounter, 0);
-	IntUtils::XORBLK(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
-	memcpy(&Output[OutOffset], &m_msgCode[0], BLOCK_SIZE);
+	Utility::MemUtils::XorBlock<byte>(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
+	Utility::MemUtils::Copy<byte>(m_msgCode, 0, Output, OutOffset, BLOCK_SIZE);
 	Reset();
 
 	return BLOCK_SIZE;
@@ -136,8 +173,8 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 
 		m_gmacKey =
 		{
-			IntUtils::BytesToBe64(tmpH, 0),
-			IntUtils::BytesToBe64(tmpH, 8)
+			Utility::IntUtils::BeBytesTo64(tmpH, 0),
+			Utility::IntUtils::BeBytesTo64(tmpH, 8)
 		};
 
 		m_gmacHash = new GHASH(m_gmacKey);
@@ -165,9 +202,9 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 
 void GMAC::Reset()
 {
-	memset(&m_gmacNonce[0], (byte)0, m_gmacNonce.size());
-	memset(&m_msgCode[0], (byte)0, m_msgCode.size());
-	memset(&m_msgBuffer[0], (byte)0, m_msgBuffer.size());
+	Utility::MemUtils::Clear<byte>(m_gmacNonce, 0, m_gmacNonce.size());
+	Utility::MemUtils::Clear<byte>(m_msgCode, 0, m_msgCode.size());
+	Utility::MemUtils::Clear<byte>(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgCounter = 0;
 	m_msgOffset = 0;
 }
@@ -193,9 +230,10 @@ void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 void GMAC::Scope()
 {
 	m_legalKeySizes.resize(m_blockCipher->LegalKeySizes().size());
+	std::vector<SymmetricKeySize> keySizes = m_blockCipher->LegalKeySizes();
 	// recommended iv is 12 bytes with gmac
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
-		m_legalKeySizes[i] = SymmetricKeySize(m_blockCipher->LegalKeySizes()[i].KeySize(), 12, m_blockCipher->LegalKeySizes()[i].InfoSize());
+		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), 12, keySizes[i].InfoSize());
 }
 
 NAMESPACE_MACEND

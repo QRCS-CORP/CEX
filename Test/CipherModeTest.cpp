@@ -91,7 +91,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
 					throw TestException("CBC Mode: Encrypted arrays are not equal!");
@@ -108,7 +108,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
 					throw TestException("CBC Mode: Decrypted arrays are not equal!");
@@ -136,7 +136,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], 0, outBytes, 0);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
 					throw TestException("CFB Mode: Encrypted arrays are not equal!");
@@ -154,7 +154,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
 					throw TestException("CFB Mode: Decrypted arrays are not equal!");
@@ -182,7 +182,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
 					throw TestException("CTR Mode: Encrypted arrays are not equal!");
@@ -199,7 +199,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
 					throw TestException("CTR Mode: Decrypted arrays are not equal!");
@@ -226,7 +226,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
 					throw TestException("ECB Mode: Encrypted arrays are not equal!");
@@ -244,7 +244,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
 					throw TestException("ECB Mode: Decrypted arrays are not equal!");
@@ -272,7 +272,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
 					throw TestException("OFB Mode: Encrypted arrays are not equal!");
@@ -290,7 +290,7 @@ namespace Test
 
 			for (unsigned int i = 0; i < 4; i++)
 			{
-				mode.Transform(Input[index][i], outBytes);
+				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
 					throw TestException("OFB Mode: Decrypted arrays are not equal!");

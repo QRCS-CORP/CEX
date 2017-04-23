@@ -153,13 +153,13 @@ public:
 	{
 		CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
 
-		m_nodeOffset = IntUtils::BytesToLe32(TreeArray, 0);
-		m_treeVersion = IntUtils::BytesToLe16(TreeArray, 4);
-		m_outputSize = IntUtils::BytesToLe64(TreeArray, 6);
-		m_leafSize = IntUtils::BytesToLe32(TreeArray, 14);
+		m_nodeOffset = IntUtils::LeBytesTo32(TreeArray, 0);
+		m_treeVersion = IntUtils::LeBytesTo16(TreeArray, 4);
+		m_outputSize = IntUtils::LeBytesTo64(TreeArray, 6);
+		m_leafSize = IntUtils::LeBytesTo32(TreeArray, 14);
 		memcpy(&m_treeDepth, &TreeArray[18], 1);
 		memcpy(&m_treeFanout, &TreeArray[19], 1);
-		m_reserved = IntUtils::BytesToLe32(TreeArray, 20);
+		m_reserved = IntUtils::LeBytesTo32(TreeArray, 20);
 		m_dstCode.resize(DistributionCodeMax());
 		memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 	}

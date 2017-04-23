@@ -44,9 +44,11 @@ class ECP : public IProvider
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t DEF_STATECAP = 1024;
 
 	ICipherMode* m_cipherMode;
+	bool m_hasTsc;
 	bool m_isAvailable;
 
 public:
@@ -60,17 +62,17 @@ public:
 	/// <summary>
 	/// Get: The providers type name
 	/// </summary>
-	virtual const Enumeration::Providers Enumeral() { return Enumeration::Providers::ECP; }
+	const Providers Enumeral() override;
 
 	/// <summary>
 	/// Get: The entropy provider is available on this system
 	/// </summary>
-	virtual const bool IsAvailable() { return m_isAvailable; }
+	const bool IsAvailable() override;
 
 	/// <summary>
 	/// Get: The provider class name
 	/// </summary>
-	virtual const std::string Name() { return "ECP"; }
+	const std::string &Name() override;
 
 	//~~~Constructor~~~//
 
@@ -82,21 +84,21 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~ECP();
+	~ECP() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Fill a buffer with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
-	virtual void GetBytes(std::vector<byte> &Output);
+	void GetBytes(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes
@@ -105,7 +107,7 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
-	virtual void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length);
+	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Return an array with pseudo-random bytes
@@ -114,17 +116,17 @@ public:
 	/// <param name="Length">The size of the expected array returned</param>
 	/// 
 	/// <returns>An array of pseudo-random of bytes</returns>
-	virtual std::vector<byte> GetBytes(size_t Length);
+	std::vector<byte> GetBytes(size_t Length) override;
 
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
-	virtual uint Next();
+	uint Next() override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 private:
 

@@ -28,7 +28,7 @@ namespace Test
 		static const uint64_t DEF_KEYSIZE = 32;
 
 		bool m_hasAESNI;
-		bool m_hasSSE;
+		bool m_hasAVX;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -81,16 +81,16 @@ namespace Test
 					Cipher->Transform(buffer1, 0, buffer2, 0, buffer1.size());
 					counter += buffer1.size();
 				}
-				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 				Handler(calc);
 			}
 
 			uint64_t dur = TestUtils::GetTimeMs64() - start;
 			uint64_t len = Loops * SampleSize;
 			uint64_t rate = GetBytesPerSecond(dur, len);
-			std::string glen = IntUtils::ToString(len / GB1);
-			std::string mbps = IntUtils::ToString((rate / MB1));
-			std::string secs = IntUtils::ToString((double)dur / 1000.0);
+			std::string glen = TestUtils::ToString(len / GB1);
+			std::string mbps = TestUtils::ToString((rate / MB1));
+			std::string secs = TestUtils::ToString((double)dur / 1000.0);
 			std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 			Handler(resp);
 			Handler(std::string(""));
@@ -113,18 +113,18 @@ namespace Test
 
 				while (counter < DATA_SIZE)
 				{
-					Cipher->Transform(buffer1, 0, buffer2, 0);
+					Cipher->Transform(buffer1, 0, buffer2, 0, buffer1.size());
 					counter += buffer1.size();
 				}
-				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+				std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 				Handler(const_cast<char*>(calc.c_str()));
 			}
 
 			uint64_t dur = TestUtils::GetTimeMs64() - start;
 			uint64_t len = Loops * DATA_SIZE;
 			uint64_t rate = GetBytesPerSecond(dur, len);
-			std::string mbps = IntUtils::ToString((rate / MB1));
-			std::string secs = IntUtils::ToString((double)dur / 1000.0);
+			std::string mbps = TestUtils::ToString((rate / MB1));
+			std::string secs = TestUtils::ToString((double)dur / 1000.0);
 			std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 			Handler(const_cast<char*>(resp.c_str()));
 			Handler("");
@@ -150,7 +150,6 @@ namespace Test
 		void SalsaSpeedTest();
 		void SHXSpeedTest(size_t KeySize = 32);
 		void THXSpeedTest(size_t KeySize = 32);
-		void WideModeLoop(Cipher::Symmetric::Block::IBlockCipher* Engine, size_t SampleSize, bool Parallel = false, size_t KeySize = 32, size_t IvSize = 128, size_t Loops = DEF_ITERATIONS);
 	};
 }
 

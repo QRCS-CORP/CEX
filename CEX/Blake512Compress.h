@@ -901,7 +901,7 @@ public:
 	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
 		std::vector<ulong> M(16);
-		Utility::IntUtils::BytesToLeULL1024(Input, InOffset, M, 0);
+		Utility::IntUtils::LeBytesToULL1024(Input, InOffset, M, 0);
 
 		ulong R0 = State.H[0];
 		ulong R1 = State.H[1];

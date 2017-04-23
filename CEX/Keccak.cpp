@@ -9,7 +9,7 @@ void Keccak::Compress(const std::vector<byte> &Input, size_t InOffset, size_t Le
 {
 	const size_t BLKLEN = Length / sizeof(ulong);
 	for (size_t i = 0; i < BLKLEN; ++i)
-		State[i] ^= IntUtils::BytesToLe64(Input, InOffset + (i * sizeof(ulong)));
+		State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
 
 	ulong Aba, Abe, Abi, Abo, Abu;
 	ulong Aga, Age, Agi, Ago, Agu;

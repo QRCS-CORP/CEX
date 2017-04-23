@@ -31,7 +31,7 @@ namespace Test
 #endif
 
 		bool m_hasAESNI;
-		bool m_hasSSE;
+		bool m_hasAVX;
 		std::vector<std::vector<byte>> m_katExpected;
 		size_t m_processorCount;
 		TestEventHandler m_progressEvent;
@@ -74,8 +74,6 @@ namespace Test
 		void CompareBcrSimd(IBlockCipher* Engine);
 		// Looping integrity tests, compares CBC Decrypt multi-threaded/SIMD with sequentially generated output
 		void CompareCbcDecrypt(IBlockCipher* Engine1, IBlockCipher* Engine2);
-		// Looping integrity test, compares CBC Wide Block Vectors encryption/decryption output
-		void CompareCbcWide(IBlockCipher* Engine);
 		// Looping CBC/CFB/CTR integrity tests, compares sequential to parallel output
 		void CompareParallelLoop();
 		// Compares CBC/CFB/CTR output check, compares output across each block access method 

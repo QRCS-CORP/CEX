@@ -102,6 +102,7 @@
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,6 +120,7 @@
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +129,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
@@ -138,7 +140,7 @@
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,7 +165,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -300,11 +302,14 @@
     <ClInclude Include="..\..\Test\HMACTest.h" />
     <ClInclude Include="..\..\Test\HMGTest.h" />
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
+    <ClInclude Include="..\..\Test\MemUtilsTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
     <ClInclude Include="..\..\Test\RandomOutputTest.h" />
     <ClInclude Include="..\..\Test\SCRYPTTest.h" />
     <ClInclude Include="..\..\Test\SecureStreamTest.h" />
+    <ClInclude Include="..\..\Test\SimdSpeedTest.h" />
+    <ClInclude Include="..\..\Test\SimdWrapperTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyGeneratorTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyTest.h" />
     <ClInclude Include="..\..\Test\TestEventHandler.h" />
@@ -353,6 +358,7 @@
     <ClCompile Include="..\..\Test\KDF2Test.cpp" />
     <ClCompile Include="..\..\Test\KeccakTest.cpp" />
     <ClCompile Include="..\..\Test\MacStreamTest.cpp" />
+    <ClCompile Include="..\..\Test\MemUtilsTest.cpp" />
     <ClCompile Include="..\..\Test\PaddingTest.cpp" />
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
@@ -364,6 +370,8 @@
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />
     <ClCompile Include="..\..\Test\SerpentTest.cpp" />
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />
+    <ClCompile Include="..\..\Test\SimdSpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\SimdWrapperTest.cpp" />
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyGeneratorTest.cpp" />

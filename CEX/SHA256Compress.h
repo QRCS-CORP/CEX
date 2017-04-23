@@ -32,32 +32,32 @@ class SHA256Compress
 private:
 	static const size_t BLOCK_SIZE = 64;
 
-	static inline uint BigSigma0(uint W)
+	inline static uint BigSigma0(uint W)
 	{
 		return ((W >> 2) | (W << 30)) ^ ((W >> 13) | (W << 19)) ^ ((W >> 22) | (W << 10));
 	}
 
-	static inline uint BigSigma1(uint W)
+	inline static uint BigSigma1(uint W)
 	{
 		return ((W >> 6) | (W << 26)) ^ ((W >> 11) | (W << 21)) ^ ((W >> 25) | (W << 7));
 	}
 
-	static inline uint Ch(uint B, uint C, uint D)
+	inline static uint Ch(uint B, uint C, uint D)
 	{
 		return (B & C) ^ (~B & D);
 	}
 
-	static inline uint Maj(uint B, uint C, uint D)
+	inline static uint Maj(uint B, uint C, uint D)
 	{
 		return (B & C) ^ (B & D) ^ (C & D);
 	}
 
-	static inline uint Sigma0(uint W)
+	inline static uint Sigma0(uint W)
 	{
 		return ((W >> 7) | (W << 25)) ^ ((W >> 18) | (W << 14)) ^ (W >> 3);
 	}
 
-	static inline uint Sigma1(uint W)
+	inline static uint Sigma1(uint W)
 	{
 		return ((W >> 17) | (W << 15)) ^ ((W >> 19) | (W << 13)) ^ (W >> 10);
 	}
@@ -74,7 +74,7 @@ private:
 public:
 
 	template <typename T>
-	static inline void Compress64W(const std::vector<byte> &Input, size_t InOffset, T &Output)
+	inline static void Compress64W(const std::vector<byte> &Input, size_t InOffset, T &Output)
 	{
 #if defined(__AVX__)
 		__m128i S0, S1, T0, T1;
@@ -263,7 +263,7 @@ public:
 	}
 
 	template <typename T>
-	static inline void Compress64(const std::vector<byte> &Input, size_t InOffset, T &Output)
+	inline static void Compress64(const std::vector<byte> &Input, size_t InOffset, T &Output)
 	{
 		uint A = Output.H[0];
 		uint B = Output.H[1];
@@ -275,37 +275,37 @@ public:
 		uint H = Output.H[7];
 		uint W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
 
-		W0 = IntUtils::BytesToBe32(Input, InOffset);
+		W0 = IntUtils::BeBytesTo32(Input, InOffset);
 		SHA256ROUND(A, B, C, D, E, F, G, H, W0, 0x428a2f98);
-		W1 = IntUtils::BytesToBe32(Input, InOffset + 4);
+		W1 = IntUtils::BeBytesTo32(Input, InOffset + 4);
 		SHA256ROUND(H, A, B, C, D, E, F, G, W1, 0x71374491);
-		W2 = IntUtils::BytesToBe32(Input, InOffset + 8);
+		W2 = IntUtils::BeBytesTo32(Input, InOffset + 8);
 		SHA256ROUND(G, H, A, B, C, D, E, F, W2, 0xb5c0fbcf);
-		W3 = IntUtils::BytesToBe32(Input, InOffset + 12);
+		W3 = IntUtils::BeBytesTo32(Input, InOffset + 12);
 		SHA256ROUND(F, G, H, A, B, C, D, E, W3, 0xe9b5dba5);
-		W4 = IntUtils::BytesToBe32(Input, InOffset + 16);
+		W4 = IntUtils::BeBytesTo32(Input, InOffset + 16);
 		SHA256ROUND(E, F, G, H, A, B, C, D, W4, 0x3956c25b);
-		W5 = IntUtils::BytesToBe32(Input, InOffset + 20);
+		W5 = IntUtils::BeBytesTo32(Input, InOffset + 20);
 		SHA256ROUND(D, E, F, G, H, A, B, C, W5, 0x59f111f1);
-		W6 = IntUtils::BytesToBe32(Input, InOffset + 24);
+		W6 = IntUtils::BeBytesTo32(Input, InOffset + 24);
 		SHA256ROUND(C, D, E, F, G, H, A, B, W6, 0x923f82a4);
-		W7 = IntUtils::BytesToBe32(Input, InOffset + 28);
+		W7 = IntUtils::BeBytesTo32(Input, InOffset + 28);
 		SHA256ROUND(B, C, D, E, F, G, H, A, W7, 0xab1c5ed5);
-		W8 = IntUtils::BytesToBe32(Input, InOffset + 32);
+		W8 = IntUtils::BeBytesTo32(Input, InOffset + 32);
 		SHA256ROUND(A, B, C, D, E, F, G, H, W8, 0xd807aa98);
-		W9 = IntUtils::BytesToBe32(Input, InOffset + 36);
+		W9 = IntUtils::BeBytesTo32(Input, InOffset + 36);
 		SHA256ROUND(H, A, B, C, D, E, F, G, W9, 0x12835b01);
-		W10 = IntUtils::BytesToBe32(Input, InOffset + 40);
+		W10 = IntUtils::BeBytesTo32(Input, InOffset + 40);
 		SHA256ROUND(G, H, A, B, C, D, E, F, W10, 0x243185be);
-		W11 = IntUtils::BytesToBe32(Input, InOffset + 44);
+		W11 = IntUtils::BeBytesTo32(Input, InOffset + 44);
 		SHA256ROUND(F, G, H, A, B, C, D, E, W11, 0x550c7dc3);
-		W12 = IntUtils::BytesToBe32(Input, InOffset + 48);
+		W12 = IntUtils::BeBytesTo32(Input, InOffset + 48);
 		SHA256ROUND(E, F, G, H, A, B, C, D, W12, 0x72be5d74);
-		W13 = IntUtils::BytesToBe32(Input, InOffset + 52);
+		W13 = IntUtils::BeBytesTo32(Input, InOffset + 52);
 		SHA256ROUND(D, E, F, G, H, A, B, C, W13, 0x80deb1fe);
-		W14 = IntUtils::BytesToBe32(Input, InOffset + 56);
+		W14 = IntUtils::BeBytesTo32(Input, InOffset + 56);
 		SHA256ROUND(C, D, E, F, G, H, A, B, W14, 0x9bdc06a7);
-		W15 = IntUtils::BytesToBe32(Input, InOffset + 60);
+		W15 = IntUtils::BeBytesTo32(Input, InOffset + 60);
 		SHA256ROUND(B, C, D, E, F, G, H, A, W15, 0xc19bf174);
 
 		W0 += Sigma1(W14) + W9 + Sigma0(W1);

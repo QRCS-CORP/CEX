@@ -13,6 +13,7 @@ NAMESPACE_IO
 class SecureStream : public IByteStream
 {
 private:
+	static const std::string CLASS_NAME;
 
 	bool m_isDestroyed;
 	std::vector<byte> m_keySalt;
@@ -26,32 +27,37 @@ public:
 	/// <summary>
 	/// Get: The stream can be read
 	/// </summary>
-	virtual const bool CanRead() { return true; }
+	const bool CanRead() override;
 
 	/// <summary>
 	/// Get: The stream is seekable
 	/// </summary>
-	virtual const bool CanSeek() { return true; }
+	const bool CanSeek() override;
 
 	/// <summary>
 	/// Get: The stream can be written to
 	/// </summary>
-	virtual const bool CanWrite() { return true; }
+	const bool CanWrite() override;
 
 	/// <summary>
 	/// Get: The stream container type
 	/// </summary>
-	virtual const StreamModes Enumeral() { return StreamModes::SecureStream; }
+	const StreamModes Enumeral() override;
 
 	/// <summary>
 	/// Get: The stream length
 	/// </summary>
-	virtual const ulong Length() { return static_cast<ulong>(m_streamData.size()); }
+	const ulong Length() override;
+
+	/// <summary>
+	/// Get: The streams class name
+	/// </summary>
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
-	virtual const ulong Position() { return m_streamPosition; }
+	const ulong Position() override;
 
 	//~~~Constructor~~~//
 
@@ -84,33 +90,31 @@ public:
 	/// <param name="Offset">The offset in the Data array at which to begin copying</param>
 	/// <param name="Length">The number of bytes to copy</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the offset or length values are invalid</exception>
 	explicit SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, ulong KeySalt = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SecureStream();
+	~SecureStream() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Close and flush the stream (not used in SecureStream)
 	/// </summary>
-	virtual void Close();
+	void Close() override;
 
 	/// <summary>
 	/// Copy this stream to another stream
 	/// </summary>
 	///
 	/// <param name="Destination">The destination stream</param>
-	virtual void CopyTo(IByteStream* Destination);
+	void CopyTo(IByteStream* Destination) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Copies a portion of the stream into an output buffer
@@ -121,21 +125,19 @@ public:
 	/// <param name="Length">The number of bytes to read</param>
 	///
 	/// <returns>The number of bytes processed</returns>
-	virtual size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length);
+	size_t Read(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Read a single byte from the stream
 	/// </summary>
 	///
 	/// <returns>The byte value</returns>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if the stream is too short</exception>
-	virtual byte ReadByte();
+	byte ReadByte() override;
 
 	/// <summary>
 	/// Reset and initialize the underlying stream to zero
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Seek to a position within the stream
@@ -143,14 +145,14 @@ public:
 	/// 
 	/// <param name="Offset">The offset position</param>
 	/// <param name="Origin">The starting point</param>
-	virtual void Seek(ulong Offset, SeekOrigin Origin);
+	void Seek(ulong Offset, SeekOrigin Origin) override;
 
 	/// <summary>
 	/// Set the length of the stream
 	/// </summary>
 	/// 
 	/// <param name="Length">The desired length</param>
-	virtual void SetLength(ulong Length);
+	void SetLength(ulong Length) override;
 
 	/// <summary>
 	/// Return the underlying byte stream
@@ -166,18 +168,17 @@ public:
 	/// <param name="Length">The number of bytes to write</param>
 	///
 	/// <returns>The number of bytes written</returns>
-	///
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if Output array is too small</exception>
-	virtual void Write(const std::vector<byte> &Input, size_t Offset, size_t Length);
+	void Write(const std::vector<byte> &Input, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Write a single byte from the stream
 	/// </summary>
 	///
 	/// <param name="Value">The byte value to write</param>
-	virtual void WriteByte(byte Value);
+	void WriteByte(byte Value) override;
 
 private:
+
 	std::vector<byte> GetSystemKey();
 	void Transform();
 };

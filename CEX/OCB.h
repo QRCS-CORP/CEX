@@ -26,6 +26,7 @@
 // Implementation Details:
 // An implementation of an Offset CodeBook authenticated mode (OCB).
 // Written by John Underhill, February 3, 2017
+// Updated April 18, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_OCB_H
@@ -119,10 +120,11 @@ NAMESPACE_MODE
 /// <item><description>RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorithms for Authenticated Encryption</a>.</description></item>
 /// </list>
 /// </remarks>
-class OCB : public IAeadMode
+class OCB final : public IAeadMode
 {
 private:
 	static const size_t BLOCK_SIZE = 16;
+	static const std::string CLASS_NAME;
 	static const size_t PREFETCH_HASH = 16 * 32;
 	static const size_t MAX_NONCESIZE = 15;
 	static const size_t MAX_TAGSIZE = 16;
@@ -147,7 +149,6 @@ private:
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<byte> m_listAsterisk;
 	std::vector<byte> m_listDollar;
-	size_t m_macSize;
 	std::vector<byte> m_mainOffset;
 	std::vector<byte> m_mainOffset0;
 	std::vector<byte> m_mainStretch;
@@ -171,95 +172,92 @@ public:
 	/// incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. 
 	/// If set to false, requires a re-key after each finalizer cycle.<para>
 	/// </summary>
-	virtual bool &AutoIncrement() { return m_autoIncrement; }
+	bool &AutoIncrement() override;
 
 	/// <summary>
 	/// Get: Block size of internal cipher in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return BLOCK_SIZE; }
+	const size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: The block ciphers formal type name
 	/// </summary>
-	virtual BlockCiphers CipherType() { return m_cipherType; }
+	const BlockCiphers CipherType() override;
 
 	/// <summary>
 	/// Get: The underlying Block Cipher instance
 	/// </summary>
-	virtual IBlockCipher* Engine() { return m_blockCipher; }
+	IBlockCipher* Engine() override;
 
 	/// <summary>
 	/// Get: The Cipher Modes enumeration type name
 	/// </summary>
-	virtual const CipherModes Enumeral() { return CipherModes::OCB; }
+	const CipherModes Enumeral() override;
 
 	/// <summary>
 	/// Get: True if initialized for encryption, False for decryption
 	/// </summary>
-	virtual const bool IsEncryption() { return m_isEncryption; }
+	const bool IsEncryption() override;
 
 	/// <summary>
 	/// Get: The Block Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel() override;
 
 	/// <summary>
 	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; }
+	const  std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
 	/// Get: The maximum legal tag length in bytes
 	/// </summary>
-	virtual const size_t MaxTagSize() { return MAX_TAGSIZE; }
+	const size_t MaxTagSize() override;
 
 	/// <summary>
 	/// Get: The minimum legal tag length in bytes
 	/// </summary>
-	virtual const size_t MinTagSize() { return MIN_TAGSIZE; }
+	const size_t MinTagSize() override;
 
 	/// <summary>
 	/// Get: The cipher mode name
 	/// </summary>
-	virtual const std::string Name() { return "OCB"; }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize() override;
 
 	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes (Not supported in this mode)
+	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile() override;
 
 	/// <summary>
 	/// Get/Set: Persist a one-time associated data for the entire session.
 	/// <para>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments.
 	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.<para>
 	/// </summary>
-	virtual bool &PreserveAD() { return m_aadPreserve; }
+	bool &PreserveAD() override;
 
 	/// <summary>
 	/// Get: Returns the full finalized MAC code value array
 	/// </summary>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
-	virtual const std::vector<byte> Tag()
-	{
-		if (!m_isFinalized)
-			throw CryptoCipherModeException("OCB:Tag", "The cipher mode has not been finalized!");
-
-		return m_msgTag;
-	}
+	const std::vector<byte> Tag() override;
 
 	//~~~Constructor~~~//
 
@@ -284,7 +282,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~OCB();
+	~OCB() override;
 
 	//~~~Public Functions~~~//
 
@@ -296,7 +294,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of encrypted bytes</param>
 	/// <param name="Output">The output array of decrypted bytes</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Decrypt a block of bytes with offset parameters.
@@ -308,14 +306,14 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -325,7 +323,7 @@ public:
 	/// 
 	/// <param name="Input">The input array of plain text bytes</param>
 	/// <param name="Output">The output array of encrypted bytes</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Encrypt a block of bytes using offset parameters. 
@@ -337,7 +335,7 @@ public:
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of encrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Calculate the MAC code (Tag) and copy it to the Output array.   
@@ -352,7 +350,7 @@ public:
 	/// <para>Must be no greater then the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
-	virtual void Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length);
+	void Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance.
@@ -364,7 +362,18 @@ public:
 	/// <param name="KeyParams">SymmetricKey containing the encryption Key and Nonce</param>
 	/// 
 	/// <exception cref="CryptoCipherModeException">Thrown if a null or invalid Key/Nonce is used</exception>
-	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams);
+	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
+
+	/// <summary>
+	/// Set the maximum number of threads allocated when using multi-threaded processing.
+	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
+	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
 	/// Add additional data to the authentication generator.  
@@ -377,41 +386,7 @@ public:
 	/// <param name="Length">The number of bytes to process</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state has been processed</exception>
-	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length);
-
-	/// <summary>
-	/// Transform an entire block of bytes. 
-	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// This method is used in a buffering strategy, where buffers of size BlockSize() for sequential processing, 
-	/// or ParallelBlockSize() for parallel processing, are processed and copied to a larger array by the caller.
-	/// Buffers should be of the same size, either BlockSize() or ParallelBlockSize().
-	/// If the Input and Output array sizes differ, the smallest array size will be processed.
-	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
-
-	/// <summary>
-	/// Transform a block of bytes with offset parameters.
-	/// <para>Transforms one block of bytes at the designated offsets.
-	/// This method is used when looping through two large arrays utilizing offsets incremented by the caller.
-	/// One block is processed of either ParallelBlockSize() for parallel processing, or BlockSize() for sequential mode.
-	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 	/// <summary>
 	/// Transform a length of bytes with offset parameters. 
@@ -426,7 +401,7 @@ public:
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">The number of bytes to transform</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 	/// <summary>
 	/// Generate the internal MAC code and compare it with the tag contained in the Input array.   
@@ -444,12 +419,14 @@ public:
 	/// <returns>Returns false if the MAC code does not match</returns>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized for decryption</exception>
-	virtual bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length);
+	bool Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
 
 private:
 
 	void CalculateMac();
+	void Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void DoubleBlock(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExtendBlock(std::vector<byte> &Output, size_t Position);
 	void GenerateOffsets(const std::vector<byte> &Nonce);
 	void GetLSub(size_t N, std::vector<byte> &LSub);

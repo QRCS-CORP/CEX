@@ -374,6 +374,15 @@
     <ClInclude Include="..\..\Test\SCRYPTTest.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\MemUtilsTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SimdSpeedTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\SimdWrapperTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -495,6 +504,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\Test.cpp">
       <Filter>Source Files\Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\MemUtilsTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SimdSpeedTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\SimdWrapperTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@ NAMESPACE_PADDING
 /// <summary>
 /// The Zero Padding Scheme (Not Recommended).
 /// </summary>
-class ZeroPad : public IPadding
+class ZeroPad final : public IPadding
 {
 private:
 
@@ -16,30 +16,33 @@ private:
 	ZeroPad& operator=(const ZeroPad&) = delete;
 	ZeroPad& operator=(ZeroPad&&) = delete;
 
+	static const std::string CLASS_NAME;
+
 public:
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// CTor: Instantiate this class
-	/// </summary>
-	ZeroPad() {}
-
-	/// <summary>
-	/// Destructor
-	/// </summary>
-	virtual ~ZeroPad() {}
 
 	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const PaddingModes Enumeral() { return PaddingModes::None; }
+	const PaddingModes Enumeral() override;
 
 	/// <summary>
 	/// Get: The padding modes class name
 	/// </summary>
-	virtual const std::string Name() { return "ZeroPad"; }
+	const std::string &Name() override;
+
+	//~~~Constructor~~~//
+
+	/// <summary>
+	/// CTor: Instantiate this class
+	/// </summary>
+	ZeroPad();
+
+	/// <summary>
+	/// Destructor
+	/// </summary>
+	~ZeroPad() override;
 
 	//~~~Public Functions~~~//
 
@@ -53,7 +56,7 @@ public:
 	/// <returns>Length of padding</returns>
 	///
 	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
-	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
+	size_t AddPadding(std::vector<byte> &Input, size_t Offset) override;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -62,7 +65,7 @@ public:
 	/// <param name="Input">Padded array of bytes</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual size_t GetPaddingLength(const std::vector<byte> &Input);
+	size_t GetPaddingLength(const std::vector<byte> &Input) override;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -72,7 +75,7 @@ public:
 	/// <param name="Offset">Offset into array</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset);
+	size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset) override;
 };
 
 NAMESPACE_PADDINGEND

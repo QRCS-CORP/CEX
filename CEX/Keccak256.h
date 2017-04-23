@@ -24,6 +24,7 @@
 // Implementation Details:
 // An implementation of the SHA-3 digest with a 256 bit return size. 
 // Written by John Underhill, September 19, 2014
+// Updated April 18, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_KECCAK256_H
@@ -89,7 +90,10 @@ private:
 		void Reset()
 		{
 			if (H.size() > 0)
-				memset(&H[0], 0, H.size() * sizeof(ulong));
+			{
+				for (size_t i = 0; i < H.size(); ++i)
+					H[i] = 0;
+			}
 
 			H[1] = MAX_ULL;
 			H[2] = MAX_ULL;
@@ -102,8 +106,8 @@ private:
 	};
 
 	static const size_t BLOCK_SIZE = 136;
+	static const std::string CLASS_NAME;
 	static const size_t DIGEST_SIZE = 32;
-
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_SIZE = 25;
@@ -127,35 +131,35 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual size_t BlockSize() { return BLOCK_SIZE; }
+	size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: Size of returned digest in bytes
 	/// </summary>
-	virtual size_t DigestSize() { return DIGEST_SIZE; }
+	size_t DigestSize() override;
 
 	/// <summary>
 	/// Get: The digests type name
 	/// </summary>
-	virtual const Digests Enumeral() { return Digests::Keccak256; }
+	const Digests Enumeral() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel() override;
 
 	/// <summary>
 	/// Get: The digests class name
 	/// </summary>
-	virtual const std::string Name() { return "Keccak256"; }
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize() override;
 
 	/// <summary>
 	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
@@ -164,7 +168,7 @@ public:
 	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
 	/// and reinitialize the state, or initialize the digest using a KeccakParams with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Constructor~~~//
 
@@ -192,7 +196,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~Keccak256();
+	~Keccak256() override;
 
 	//~~~Public Functions~~~//
 
@@ -202,12 +206,12 @@ public:
 	/// 
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The hash output value array</param>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Do final processing and get the hash value
@@ -219,7 +223,7 @@ public:
 	/// <returns>Size of Hash value</returns>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the output buffer is too short</exception>
-	virtual size_t Finalize(std::vector<byte> &Output, const size_t OutOffset);
+	size_t Finalize(std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -230,19 +234,19 @@ public:
 	/// <param name="Degree">The desired number of threads</param>
 	///
 	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
-	virtual void ParallelMaxDegree(size_t Degree);
+	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Update the digest with a single byte
 	/// </summary>
 	///
 	/// <param name="Input">Input byte</param>
-	virtual void Update(byte Input);
+	void Update(byte Input) override;
 
 	/// <summary>
 	/// Update the buffer
@@ -253,7 +257,7 @@ public:
 	/// <param name="Length">Amount of data to process in bytes</param>
 	///
 	/// <exception cref="CryptoDigestException">Thrown if the input buffer is too short</exception>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
 

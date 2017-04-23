@@ -43,21 +43,21 @@ private:
 		return parity;
 	}
 
-	static inline void Inject(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
+	inline static void Inject(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
 	{
 		B += K1;
 		A += B + K0;
 		B = Utility::IntUtils::RotL64(B, R) ^ A;
 	}
 
-	static inline void Mix(ulong &A, ulong &B, uint R)
+	inline static void Mix(ulong &A, ulong &B, uint R)
 	{
 		A += B;
 		B = Utility::IntUtils::RotL64(B, R) ^ A;
 	}
 
 #if defined(__AVX2__)
-	static inline void Interleave64(__m256i &X0, __m256i &X1)
+	inline static void Interleave64(__m256i &X0, __m256i &X1)
 	{
 		const __m256i T0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
 		const __m256i T1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(3, 1, 2, 0));
@@ -65,7 +65,6 @@ private:
 		X0 = _mm256_unpacklo_epi64(T0, T1);
 		X1 = _mm256_unpackhi_epi64(T0, T1);
 	}
-
 
 	#define TF512ROUND(X0, X1, SHL)														\
 	   do {                                                                             \
@@ -135,7 +134,7 @@ public:
 
 		__m256i* regOutput = reinterpret_cast<__m256i*>(Output.S.data());
 		__m256i X0 = _mm256_set_epi64x(Input[InOffset + 6], Input[InOffset + 4], Input[InOffset + 2], Input[InOffset]);
-		__m256i X1 = _mm256_set_epi64x(Input[InOffset+ 7], Input[InOffset + 5], Input[InOffset + 3], Input[InOffset + 1]);
+		__m256i X1 = _mm256_set_epi64x(Input[InOffset + 7], Input[InOffset + 5], Input[InOffset + 3], Input[InOffset + 1]);
 
 		TF512INJECTKEY(X0, X1, R0, K0, K1, 2, 3);
 		TF512ENC8ROUNDS(X0, X1, R0, K1, K2, K3, 1, 2, 3);

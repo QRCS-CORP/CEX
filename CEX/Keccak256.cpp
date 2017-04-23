@@ -1,13 +1,49 @@
 #include "Keccak256.h"
 #include "Keccak.h"
-#include "ArrayUtils.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-using Utility::ParallelUtils;
+const std::string Keccak256::CLASS_NAME("Keccak512");
+
+//~~~Properties~~~//
+
+size_t Keccak256::BlockSize() 
+{ 
+	return BLOCK_SIZE; 
+}
+
+size_t Keccak256::DigestSize() 
+{ 
+	return DIGEST_SIZE; 
+}
+
+const Digests Keccak256::Enumeral() 
+{ 
+	return Digests::Keccak256; 
+}
+
+const bool Keccak256::IsParallel() 
+{
+	return m_parallelProfile.IsParallel(); 
+}
+
+const std::string Keccak256::Name()
+{ 
+	return CLASS_NAME;
+}
+
+const size_t Keccak256::ParallelBlockSize() 
+{ 
+	return m_parallelProfile.ParallelBlockSize(); 
+}
+
+ParallelOptions &Keccak256::ParallelProfile() 
+{ 
+	return m_parallelProfile;
+}
 
 //~~~Constructor~~~//
 
@@ -74,8 +110,8 @@ void Keccak256::Destroy()
 			for (size_t i = 0; i < m_dgtState.size(); ++i)
 				m_dgtState[i].Reset();
 
-			Utility::ArrayUtils::ClearVector(m_dgtState);
-			Utility::ArrayUtils::ClearVector(m_msgBuffer);
+			Utility::IntUtils::ClearVector(m_dgtState);
+			Utility::IntUtils::ClearVector(m_msgBuffer);
 		}
 		catch (std::exception& ex)
 		{
@@ -92,7 +128,7 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
-			memset(&m_msgBuffer[m_msgLength], (byte)0, m_msgBuffer.size() - m_msgLength);
+			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 
 		// process buffer
 		if (m_msgLength != 0)
@@ -114,7 +150,7 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			IntUtils::LeULL256ToBlock(m_dgtState[i].H, m_msgBuffer, i * BLOCK_SIZE);
+			Utility::IntUtils::LeULL256ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * BLOCK_SIZE);
 			m_msgLength += DIGEST_SIZE;
 		}
 
@@ -133,15 +169,15 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 		// finalize and store
 		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
-		IntUtils::LeULL256ToBlock(rootState.H, Output, OutOffset);
+		Utility::IntUtils::LeULL256ToBlock(rootState.H, 0, Output, OutOffset);
 	}
 	else
 	{
 		if (m_msgLength != m_msgBuffer.size())
-			memset(&m_msgBuffer[m_msgLength], (byte)0, m_msgBuffer.size() - m_msgLength);
+			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
-		IntUtils::LeULL256ToBlock(m_dgtState[0].H, Output, OutOffset);
+		Utility::IntUtils::LeULL256ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -159,18 +195,12 @@ void Keccak256::ParallelMaxDegree(size_t Degree)
 		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree must be an even number!");
 
 	m_parallelProfile.SetMaxDegree(Degree);
-	//m_dgtState.clear();
-	//m_dgtState.resize(Degree);
-	//m_msgBuffer.clear();
-	//m_msgBuffer.resize(Degree * BLOCK_SIZE);
-	//m_treeParams = { DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), static_cast<byte>(Degree) };
-
 	Reset();
 }
 
 void Keccak256::Reset()
 {
-	memset(&m_msgBuffer[0], (byte)0, m_msgBuffer.size());
+	Utility::MemUtils::Clear<byte>(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -203,19 +233,19 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 		{
 			// fill buffer
-			const size_t BUFRMD = m_msgBuffer.size() - m_msgLength;
-			if (BUFRMD != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], BUFRMD);
+			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+			if (RMDLEN != 0)
+				Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 
 			// empty the message buffer
-			ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 			{
 				Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
 			});
 
 			m_msgLength = 0;
-			Length -= BUFRMD;
-			InOffset += BUFRMD;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
 		}
 
 		if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -224,7 +254,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 			// process large blocks
-			ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 			{
 				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
 			});
@@ -252,7 +282,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		{
 			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 			if (RMDLEN != 0)
-				memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], RMDLEN);
+				Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 
 			Compress(m_msgBuffer, 0, m_dgtState[0]);
 			m_msgLength = 0;
@@ -272,7 +302,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 	// store unaligned bytes
 	if (Length != 0)
 	{
-		memcpy(&m_msgBuffer[m_msgLength], &Input[InOffset], Length);
+		Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 		m_msgLength += Length;
 	}
 }

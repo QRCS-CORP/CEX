@@ -19,28 +19,4 @@
 #	endif
 #endif
 
-/*#if defined(__AVX2__)
-#	include <zmmintrin.h>
-#elif defined(__AVX__)
-#	include <immintrin.h>
-#elif defined(CEX_HAS_XOP)
-#	include <intrin.h>
-#	include <xopintrin.h>
-#endif
-#if defined(CEX_HAS_SSE42)
-#	include <nmmintrin.h>
-#elif defined(CEX_HAS_SSE41)
-#	include <smmintrin.h>
-#elif defined(CEX_HAS_SSE4)
-#	include <ammintrin.h>
-#elif defined(CEX_HAS_SSSE3)
-#	include <tmmintrin.h>
-#elif defined(CEX_HAS_SSE3)
-#	include <pmmintrin.h>
-#elif !defined(CEX_HAS_SSE2)
-#	include <emmintrin.h>
-#elif defined(HAS_SSE)
-#	include <xmmintrin.h>
-#endif*/
-
 #endif

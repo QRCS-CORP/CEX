@@ -162,7 +162,7 @@ public:
 		memcpy(&m_keyLen, &TreeArray[1], 1);
 		memcpy(&m_fanOut, &TreeArray[2], 1);
 		memcpy(&m_maxDepth, &TreeArray[3], 1);
-		m_leafSize = IntUtils::BytesToLe32(TreeArray, 4);
+		m_leafSize = IntUtils::LeBytesTo32(TreeArray, 4);
 		memcpy(&m_nodeOffset, &TreeArray[8], 1);
 		memcpy(&m_nodeDepth, &TreeArray[9], 1);
 		memcpy(&m_innerLen, &TreeArray[10], 1);
@@ -251,7 +251,7 @@ public:
 			Config[2] |= ((ulong)m_reserved << 16);
 
 			for (size_t i = 3; i < Config.size(); ++i)
-				Config[i] = IntUtils::BytesToLe64(m_dstCode, (i - 3) * sizeof(ulong));
+				Config[i] = IntUtils::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
 		}
 		else
 		{
@@ -266,7 +266,7 @@ public:
 			Config[4] = m_reserved;
 
 			for (size_t i = 5; i < Config.size(); ++i)
-				Config[i] = IntUtils::BytesToLe32(m_dstCode, (i - 5) * sizeof(uint));
+				Config[i] = IntUtils::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
 		}
 	}
 

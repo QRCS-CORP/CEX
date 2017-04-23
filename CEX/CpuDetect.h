@@ -103,267 +103,222 @@ public:
 	/// <summary>
 	/// Advanced Bit Manipulation
 	/// </summary>
-	const bool ABM() { return GetFlag(CpuidFlags::CPUID_ABM); }
+	const bool ABM();
 
 	/// <summary>
 	/// Intel Add-Carry Instruction Extensions
 	/// </summary>
-	const bool ADS() { return GetFlag(CpuidFlags::CPUID_ADX); }
+	const bool ADS();
 
 	/// <summary>
 	/// Returns true if the AES-NI feature set is detected
 	/// </summary>
-	const bool AESNI() { return GetFlag(CpuidFlags::CPUID_AESNI); }
+	const bool AESNI();
 
 	/// <summary>
 	/// Returns true if the Advanced Vector Extensions feature set is detected
 	/// </summary>
-	const bool AVX() { return GetFlag(CpuidFlags::CPUID_AVX); }
+	const bool AVX();
 
 	/// <summary>
 	/// Returns true if the Advanced Vector Extensions 2 feature set is detected
 	/// </summary>
-	const bool AVX2() { return GetFlag(CpuidFlags::CPUID_AVX2); }
+	const bool AVX2();
 
 	/// <summary>
 	/// AVX512 Foundation detected
 	/// </summary>
-	const bool AVX512F() { return GetFlag(CpuidFlags::CPUID_AVX512F); }
+	const bool AVX512F();
 
 	/// <summary>
 	/// Bit Manipulation Instruction Set 2
 	/// </summary>
-	const bool BMT2() { return GetFlag(CpuidFlags::CPUID_BMI2); }
+	const bool BMT2();
 
 	/// <summary>
 	/// The processor bus speed (newer Intel only) 
 	/// </summary>
-	const size_t BusSpeed()
-	{
-		return m_busSpeed;
-	}
+	const size_t BusSpeed();
 
 	/// <summary>
 	/// Intel CMUL available
 	/// </summary>
-	const bool CMUL() { return GetFlag(CpuidFlags::CPUID_CMUL); }
+	const bool CMUL();
 
 	/// <summary>
 	/// AMD FMA 4 instructions available
 	/// </summary>
-	const bool FMA4() { return GetFlag(CpuidFlags::CPUID_FMA4); }
+	const bool FMA4();
 
 	/// <summary>
 	/// The processor base frequency (newer Intel only)
 	/// </summary>
-	const size_t FrequencyBase()
-	{
-		return m_frequencyBase;
-	}
+	const size_t FrequencyBase();
 
 	/// <summary>
 	/// The processor maximum frequency (newer Intel only)
 	/// </summary>
-	const size_t FrequencyMax()
-	{
-		return m_frequencyMax;
-	}
+	const size_t FrequencyMax();
 
 	/// <summary>
 	/// Hardware supports hyper-threading
 	/// </summary>
-	const bool HyperThread() { return GetFlag(CpuidFlags::CPUID_HYPERTHREAD); }
+	const bool HyperThread();
 
 	/// <summary>
 	/// Cpu is x64
 	/// </summary>
-	const bool Is64() { return GetFlag(CpuidFlags::CPUID_X64); }
+	const bool IsX64();
 
 	/// <summary>
 	/// The total L1 data/instruction cache size in bytes for each physical processor core, defaults to 32kib
 	/// </summary>
-	const size_t L1CacheSize() 
-	{ 
-		if (m_l1CacheSize == 0 || m_physCores == 0)
-			return KB32;
-		else
-			return m_l1CacheSize * KB1; 
-	}
+	const size_t L1CacheSize();
 
 	/// <summary>
 	/// The total L1 data/instruction cache line size in bytes for each physical processor core, defaults to 64 bytes
 	/// </summary>
-	const size_t L1CacheLineSize()
-	{
-		if (m_l1CacheLineSize == 0)
-			return 64;
-		else
-			return m_l1CacheLineSize;
-	}
+	const size_t L1CacheLineSize();
 
 	/// <summary>
 	/// The total L1 data/instruction cache size in bytes for all processor cores, defaults to 256kib
 	/// </summary>
-	const size_t L1CacheTotal() 
-	{ 
-		if (m_l1CacheSize == 0 || m_physCores == 0)
-			return KB256;
-		else
-			return m_l1CacheSize * m_physCores * KB1; 
-	}
+	const size_t L1CacheTotal();
 
 	/// <summary>
 	/// The total L1 data cache size in bytes for all processor cores, defaults to 256kib
 	/// </summary>
-	const size_t L1DataCacheTotal()
-	{
-		if (m_l1CacheSize == 0 || m_physCores == 0)
-			return KB256;
-		else
-			return (m_l1CacheSize / 2) * m_physCores * KB1;
-	}
+	const size_t L1DataCacheTotal();
 
 	/// <summary>
 	/// The total L2 cache size in bytes for each physical processor core, defaults to 128kib
 	/// </summary>
-	const size_t L2CacheSize() 
-	{ 
-		if (m_l2CacheSize == 0 || m_physCores == 0)
-			return KB128;
-		else
-			return m_l2CacheSize * KB1; 
-	}
+	const size_t L2CacheSize();
 
 	/// <summary>
 	/// The total L2 cache size in bytes for all processor cores, defaults to 256kib
 	/// </summary>
-	const size_t L2CacheTotal() 
-	{ 
-		if (m_l2CacheSize == 0 || m_physCores == 0)
-			return KB256;
-		else
-			return m_l2CacheSize * m_physCores * KB1; 
-	}
+	const size_t L2CacheTotal();
 
 	/// <summary>
 	/// Returns the L2 cache associativity
 	/// </summary>
-	const CacheAssociations L2Associative() { return m_l2Associative; }
+	const CacheAssociations L2Associative();
 
 	/// <summary>
 	/// The maximum number of logical processors per core
 	/// </summary>
-	const size_t LogicalPerCore() { return m_logicalPerCore; }
+	const size_t LogicalPerCore();
 
 	/// <summary>
 	/// Intel Memory Protection Extensions
 	/// </summary>
-	const bool MPX() { return GetFlag(CpuidFlags::CPUID_MPX); }
+	const bool MPX();
 
 	/// <summary>
 	/// The total number of physical processor cores
 	/// </summary>
-	const size_t PhysicalCores() { return m_physCores; }
+	const size_t PhysicalCores();
 
 	/// <summary>
 	/// Platform Quality of Service Enforcement
 	/// </summary>
-	const bool PQE() { return GetFlag(CpuidFlags::CPUID_PQE); }
+	const bool PQE();
 
 	/// <summary>
 	/// Platform Quality of Service Monitoring
 	/// </summary>
-	const bool PQM() { return GetFlag(CpuidFlags::CPUID_PQM); }
+	const bool PQM();
 
 	/// <summary>
 	/// Cpu supports prefetch
 	/// </summary>
-	const bool PREFETCH() { return GetFlag(CpuidFlags::CPUID_PREFETCH); }
+	const bool PREFETCH();
 
 	/// <summary>
 	/// Intel Digital Random Number Generator
 	/// </summary>
-	const bool RDRAND() { return GetFlag(CpuidFlags::CPUID_RDRAND); }
+	const bool RDRAND();
 
 	/// <summary>
 	/// Intel Digital Random Seed Generator
 	/// </summary>
-	const bool RDSEED() { return GetFlag(CpuidFlags::CPUID_RDSEED); }
+	const bool RDSEED();
 
 	/// <summary>
 	/// RDTSCP time-stamp instruction
 	/// </summary>
-	const bool RDTSCP() { return GetFlag(CpuidFlags::CPUID_RDTSCP); }
+	const bool RDTSCP();
 
 	/// <summary>
 	/// TSE Restricted Transactional Memory
 	/// </summary>
-	const bool RTM() { return GetFlag(CpuidFlags::CPUID_RTM); }
+	const bool RTM();
 
 	/// <summary>
 	/// The processor serial number (not supported on some processors)
 	/// </summary>
-	const std::string SerialNumber() { return m_serialNumber; }
+	const std::string &SerialNumber();
 
 	/// <summary>
 	/// SHA instructions available
 	/// </summary>
-	const bool SHA() { return GetFlag(CpuidFlags::CPUID_SHA); }
+	const bool SHA();
 
 	/// <summary>
 	/// Supervisor Mode Access Prevention
 	/// </summary>
-	const bool SMAP() { return GetFlag(CpuidFlags::CPUID_SMAP); }
+	const bool SMAP();
 
 	/// <summary>
 	/// Returns true if SSE2 or greater is detected
 	/// </summary>
-	const bool SSE() { return GetFlag(CpuidFlags::CPUID_SSE2); }
+	const bool SSE();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 2.0 available
 	/// </summary>
-	const bool SSE2() { return GetFlag(CpuidFlags::CPUID_SSE2); }
+	const bool SSE2();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 3.0 available
 	/// </summary>
-	const bool SSE3() { return GetFlag(CpuidFlags::CPUID_SSE3); }
+	const bool SSE3();
 
 	/// <summary>
 	/// Supplemental SSE3 Merom New Instructions available
 	/// </summary>
-	const bool SSSE3() { return GetFlag(CpuidFlags::CPUID_SSSE3); }
+	const bool SSSE3();
 
 	/// <summary>
 	/// AMD SSE 4A instructions available
 	/// </summary>
-	const bool SSE4A() { return GetFlag(CpuidFlags::CPUID_SSE4A); }
+	const bool SSE4A();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 4.1 available
 	/// </summary>
-	const bool SSE41() { return GetFlag(CpuidFlags::CPUID_SSE41); }
+	const bool SSE41();
 
 	/// <summary>
 	/// Streaming SIMD Extensions 4.2 available
 	/// </summary>
-	const bool SSE42() { return GetFlag(CpuidFlags::CPUID_SSE42); }
+	const bool SSE42();
 
 	/// <summary>
 	/// Returns the cpu vendors enumeration value
 	/// </summary>
-	CpuVendors Vendor() { return m_cpuVendor; };
+	CpuVendors Vendor();
 
 	/// <summary>
 	/// The total number of threads available using hyperthreading
 	/// </summary>
-	const size_t VirtualCores() { return m_virtCores; }
+	const size_t VirtualCores();
 
 	/// <summary>
 	/// Returns true if the AMD eXtended Operations feature set is detected
 	/// </summary>
-	const bool XOP() { return GetFlag(CpuidFlags::CPUID_XOP); }
+	const bool XOP();
 
 	//~~~ Constructor~~~//
 
@@ -373,26 +328,6 @@ public:
 	CpuDetect();
 
 private:
-
-	byte GetByte(size_t Index, uint Input);
-
-	template<typename T> 
-	inline byte get_byte(size_t byte_num, T input)
-	{
-		return static_cast<byte>(input >> (((~byte_num)&(sizeof(T) - 1)) << 3));
-	}
-
-	template<typename T> 
-	inline bool CompareMem(const T* p1, const T* p2, size_t n)
-	{
-		volatile T difference = 0;
-
-		for (size_t i = 0; i != n; ++i)
-			difference |= (p1[i] ^ p2[i]);
-
-		return difference == 0;
-	}
-
 
 	bool AvxEnabled();
 	bool Avx2Enabled();

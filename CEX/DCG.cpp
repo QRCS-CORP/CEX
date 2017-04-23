@@ -1,12 +1,74 @@
 #include "DCG.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_DRBG
 
-using Utility::IntUtils;
+const std::string DCG::CLASS_NAME("DCG");
+
+//~~~Properties~~~//
+
+std::vector<byte> &DCG::DistributionCode()
+{ 
+	return m_distributionCode;
+}
+
+const size_t DCG::DistributionCodeMax()
+{ 
+	return m_distributionCodeMax;
+}
+
+const Drbgs DCG::Enumeral() 
+{
+	return Drbgs::DCG; 
+}
+
+const bool DCG::IsInitialized()
+{ 
+	return m_isInitialized; 
+}
+
+std::vector<SymmetricKeySize> DCG::LegalKeySizes() const 
+{ 
+	return m_legalKeySizes; 
+};
+
+const ulong DCG::MaxOutputSize() 
+{ 
+	return MAX_OUTPUT;
+}
+
+const size_t DCG::MaxRequestSize()
+{ 
+	return MAX_REQUEST;
+}
+
+const size_t DCG::MaxReseedCount()
+{ 
+	return MAX_RESEED; 
+}
+
+const std::string &DCG::Name() 
+{ 
+	return CLASS_NAME;
+}
+
+const size_t DCG::NonceSize()
+{ 
+	return COUNTER_SIZE; 
+}
+
+size_t &DCG::ReseedThreshold() 
+{
+	return m_reseedThreshold;
+}
+
+const size_t DCG::SecurityStrength() 
+{
+	return m_secStrength;
+}
 
 //~~~Constructor~~~//
 
@@ -83,11 +145,11 @@ void DCG::Destroy()
 
 		try
 		{
-			Utility::ArrayUtils::ClearVector(m_priSeed);
-			Utility::ArrayUtils::ClearVector(m_priState);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_seedCtr);
-			Utility::ArrayUtils::ClearVector(m_stateCtr);
+			Utility::IntUtils::ClearVector(m_priSeed);
+			Utility::IntUtils::ClearVector(m_priState);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_seedCtr);
+			Utility::IntUtils::ClearVector(m_stateCtr);
 
 			if (m_destroyEngine)
 			{
@@ -126,14 +188,14 @@ size_t DCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 	do
 	{
-		Increment(m_stateCtr);
+		LeIncrement(m_stateCtr);
 		m_msgDigest->Update(m_stateCtr, 0, m_stateCtr.size());
 		m_msgDigest->Update(m_priState, 0, m_priState.size());
 		m_msgDigest->Update(m_priSeed, 0, m_priSeed.size());
 		m_msgDigest->Finalize(m_priState, 0);
 
-		size_t rmdLen = IntUtils::Min(m_priState.size(), prcLen);
-		memcpy(&Output[OutOffset], &m_priState[0], rmdLen);
+		size_t rmdLen = Utility::IntUtils::Min(m_priState.size(), prcLen);
+		Utility::MemUtils::Copy<byte>(m_priState, 0, Output, OutOffset, rmdLen);
 		prcLen -= rmdLen;
 		OutOffset += rmdLen;
 		m_reseedCounter += rmdLen;
@@ -187,8 +249,7 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("DCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// added: nonce becomes the initial state counter value
-	memcpy(&m_stateCtr[0], &Nonce[0], IntUtils::Min(Nonce.size(), m_stateCtr.size()));
-
+	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	// update the seed
 	Update(Seed);
 
@@ -207,8 +268,7 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("DCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// copy nonce to state counter
-	memcpy(&m_stateCtr[0], &Nonce[0], IntUtils::Min(Nonce.size(), m_stateCtr.size()));
-
+	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	// update the seed and info
 	Update(Seed);
 	Update(Info);
@@ -237,7 +297,7 @@ void DCG::Update(const std::vector<byte> &Seed)
 void DCG::Derive()
 {
 	m_msgDigest->Update(m_priSeed, 0, m_priSeed.size());
-	Increment(m_seedCtr);
+	LeIncrement(m_seedCtr);
 	m_msgDigest->Update(m_seedCtr, 0, m_seedCtr.size());
 
 	// added for prediction resistance
@@ -264,7 +324,7 @@ void DCG::Extract(size_t BlockOffset)
 	m_msgDigest->Update(ent, 0, ent.size());
 }
 
-void DCG::Increment(std::vector<byte> &Counter)
+void DCG::LeIncrement(std::vector<byte> &Counter)
 {
 	for (size_t i = 0; i < Counter.size(); ++i)
 	{

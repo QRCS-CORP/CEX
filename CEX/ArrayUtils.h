@@ -23,11 +23,11 @@ public:
 	/// <param name="Output">The destination byte array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename T, typename U>
-	static size_t Append(T Value, std::vector<U> &Output)
+	template <typename V, typename A>
+	static size_t Append(V Value, std::vector<A> &Output)
 	{
-		const size_t TSIZE = sizeof(T);
-		const size_t USIZE = sizeof(U);
+		const size_t TSIZE = sizeof(V);
+		const size_t USIZE = sizeof(A);
 
 		if (TSIZE > USIZE)
 		{
@@ -81,141 +81,19 @@ public:
 	/// <param name="Output">The destination byte array</param>
 	/// 
 	/// <returns>The number of bytes added</returns>
-	template <typename T, typename U>
-	static size_t Append(const std::vector<T> &Input, std::vector<U> &Output)
+	template <typename A, typename B>
+	static size_t Append(const std::vector<A> &Input, std::vector<B> &Output)
 	{
 		if (Input.size() == 0)
 			return 0;
 
-		const size_t TSIZE = sizeof(T) * Input.size();
-		const size_t USIZE = sizeof(U) * Output.size();
+		const size_t TSIZE = sizeof(A) * Input.size();
+		const size_t USIZE = sizeof(B) * Output.size();
 
 		Output.resize(TSIZE + USIZE);
 		memcpy(&Output[USIZE], &Input[0], TSIZE);
 
 		return TSIZE;
-	}
-
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
-	/// <summary>
-	/// Clear nested arrays of objects
-	/// </summary>
-	///
-	/// <param name="Obj">A byte vector array</param>
-	template <typename T>
-	static void ClearArray(std::vector<std::vector<T>> &Obj)
-	{
-		if (Obj.size() == 0)
-			return;
-
-		for (size_t i = 0; i < Obj.size(); i++)
-			ClearVector(Obj[i]);
-
-		Obj.clear();
-	}
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
-
-	/// <summary>
-	/// Clear an array of objects
-	/// </summary>
-	///
-	/// <param name="Obj">A byte vector array</param>
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
-	template <typename T>
-	static void ClearVector(std::vector<T> &Obj)
-	{
-		if (Obj.capacity() == 0)
-			return;
-
-		if (Obj.size() != 0)
-		{
-			static void *(*const volatile memset_v)(void *, int, size_t) = &memset;
-			memset_v(Obj.data(), 0, Obj.size() * sizeof(T));
-		}
-
-		Obj.clear();
-	}
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
-
-	/// <summary>
-	/// Constant time comparison of two arrays
-	/// </summary>
-	/// 
-	/// <param name="A">The first array to compare</param>
-	/// <param name="B">The second array to compare</param>
-	/// 
-	/// <returns>True if arrays are equivalant</returns>
-	template <typename T>
-	static bool Compare(const std::vector<T> &A, const std::vector<T> &B)
-	{
-		if (A, size() != B.size())
-			return false;
-
-		return Compare<T>(A, 0, B, 0, A.size());
-	}
-
-	/// <summary>
-	/// Constant time comparison of two arrays segments with a length parameter
-	/// </summary>
-	/// 
-	/// <param name="A">The first array to compare</param>
-	/// <param name="B">The first array to compare</param>
-	/// <param name="Length">The number of elements to compare</param>
-	/// 
-	/// <returns>True if arrays are equivalant</returns>
-	template <typename T>
-	static bool Compare(const std::vector<T> &A, const std::vector<T> &B, size_t Length)
-	{
-		return Compare<T>(A, 0, B, 0, Length);
-	}
-
-	/// <summary>
-	/// Constant time comparison of two arrays segments with offset and length parameters
-	/// </summary>
-	/// 
-	/// <param name="A">The first array to compare</param>
-	/// <param name="AOffset">The starting offset within the 'A' array</param>
-	/// <param name="B">The second array to compare</param>
-	/// <param name="BOffset">The starting offset within the 'B' array</param>
-	/// <param name="Length">The number of elements to compare</param>
-	/// 
-	/// <returns>True if arrays are equivalant</returns>
-	template <typename T>
-	static bool Compare(const std::vector<T> &A, size_t AOffset, const std::vector<T> &B, size_t BOffset, size_t Length)
-	{
-		size_t delta = 0;
-
-		for (size_t i = 0; i < Length; ++i)
-			delta |= (A[AOffset + i] ^ B[BOffset + i]);
-
-		return (delta == 0);
-	}
-
-	/// <summary>
-	/// Copy integers between arrays
-	/// </summary>
-	/// 
-	/// <param name="Input">The source array</param>
-	/// <param name="InOffset">The input array starting offset</param>
-	/// <param name="Output">The destination array</param>
-	/// <param name="OutOffset">The destination array starting offset</param>
-	/// <param name="Elements">The number of array elements to copy</param>
-	template <typename T>
-	static void Copy(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Elements)
-	{
-		if (Output.size() - OutOffset < Elements)
-			Output.resize(OutOffset + Elements);
-
-		for (size_t i = 0; i < Elements; ++i)
-			Output[OutOffset + i] = Input[InOffset + i];
 	}
 
 	/// <summary>
@@ -243,124 +121,12 @@ public:
 	}
 
 	/// <summary>
-	/// Treats the array as a large Big Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The vector array of values</param>
-	template <typename T>
-	static void Increment(std::vector<T> &Counter)
-	{
-		size_t i = Counter.size();
-		while (--i >= 0 && ++Counter[i] == 0) {}
-	}
-
-	/// <summary>
-	/// Treats a byte array as a large Big Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The vector array of values</param>
-	static inline void IncrementBE8(std::vector<byte> &Counter)
-	{
-		size_t i = Counter.size();
-		while (--i >= 0 && ++Counter[i] == 0) {}
-	}
-
-	/// <summary>
-	/// Treats a byte array as a large Little Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The vector array of values</param>
-	static inline void ArrayUtils::IncrementLE8(std::vector<byte> &Counter)
-	{
-		int i = -1;
-		while (++i < static_cast<int>(Counter.size()) && ++Counter[i] == 0) {}
-	}
-
-	/// <summary>
-	/// Treats a 2x 64bit integer array as a large Little Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The counter array to increment</param>
-	static inline void IncrementLE32(std::vector<uint> &Counter)
-	{
-		if (++Counter[0] == 0)
-			++Counter[1];
-	}
-
-	/// <summary>
-	/// Treats a 2x 64bit integer array as a large Little Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The counter array to increment</param>
-	static inline void IncrementLE64(std::vector<ulong> &Counter)
-	{
-		if (++Counter[0] == 0)
-			++Counter[1];
-	}
-
-	/// <summary>
-	/// Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by a defined length
-	/// </summary>
-	/// 
-	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output array</param>
-	/// <param name="Length">The number to increase by</param>
-	static inline void IncreaseBE8(const std::vector<byte> &Input, std::vector<byte> &Output, const size_t Length)
-	{
-		const size_t CTRSZE = Output.size() - 1;
-		uint ctrLen = static_cast<uint>(Length);
-		std::vector<byte> ctrInc(sizeof(ctrLen));
-		memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
-		memcpy(&Output[0], &Input[0], Input.size());
-		byte carry = 0;
-
-		for (size_t i = CTRSZE; i > 0; --i)
-		{
-			byte odst = Output[i];
-			byte osrc = CTRSZE - i < ctrInc.size() ? ctrInc[CTRSZE - i] : (byte)0;
-			byte ndst = (byte)(odst + osrc + carry);
-			carry = ndst < odst ? 1 : 0;
-			Output[i] = ndst;
-		}
-	}
-
-	/// <summary>
-	/// Treats a 2x 32bit integer array as a large Little Endian integer, incrementing the total value by a defined length
-	/// </summary>
-	/// 
-	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output array</param>
-	/// <param name="Length">The number to increase by</param>
-	static inline void IncreaseLE32(const std::vector<uint> &Input, std::vector<uint> &Output, const size_t Length)
-	{
-		memcpy(&Output[0], &Input[0], Input.size() * sizeof(uint));
-		Output[0] += static_cast<uint>(Length);
-		if (Output[0] < Input[0])
-			++Output[1];
-	}
-
-	/// <summary>
-	/// Treats a 2x 64bit integer array as a large Little Endian integer, incrementing the total value by a defined length
-	/// </summary>
-	/// 
-	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output array</param>
-	/// <param name="Length">The number to increase by</param>
-	static inline void IncreaseLE64(const std::vector<ulong> &Input, std::vector<ulong> &Output, const size_t Length)
-	{
-		memcpy(&Output[0], &Input[0], Input.size() * sizeof(ulong));
-		Output[0] += static_cast<uint>(Length);
-		if (Output[0] < Input[0])
-			++Output[1];
-	}
-
-	/// <summary>
 	/// Shuffle array values to randomly chosen positions
 	/// </summary>
 	/// 
 	/// <param name="Output">The integer array to shuffle</param>
 	template <typename T>
-	static inline void RandomShuffle(std::vector<T> &Output)
+	static void RandomShuffle(std::vector<T> &Output)
 	{
 		Prng::SecureRandom rnd;
 		const size_t CEIL = Output.size() - 1;
@@ -382,7 +148,7 @@ public:
 	/// 
 	/// <returns>The number of integers in the new array</returns>
 	template <typename T>
-	static inline size_t Remove(T Value, std::vector<T> &Output)
+	static size_t Remove(T Value, std::vector<T> &Output)
 	{
 		std::vector<T> tmp;
 		for (size_t i = 0; i < Output.size(); ++i)
@@ -394,31 +160,6 @@ public:
 		Output = tmp;
 
 		return tmp.size();
-	}
-
-	/// <summary>
-	/// Left shift an array of integers (OCB mode)
-	/// </summary>
-	/// 
-	/// <param name="Input">The value array to shift</param>
-	/// <param name="Output">The output integer array</param>
-	/// 
-	/// <returns>The bit count</returns>
-	static inline uint ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output)
-	{
-		size_t ctr = Input.size();
-		uint bit = 0;
-
-		do
-		{
-			--ctr;
-			uint b = Input[ctr];
-			Output[ctr] = (byte)((b << 1) | bit);
-			bit = (b >> 7) & 1;
-		} 
-		while (ctr > 0);
-
-		return bit;
 	}
 
 	/// <summary>

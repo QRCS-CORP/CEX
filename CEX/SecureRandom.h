@@ -50,6 +50,7 @@ using Exception::CryptoRandomException;
 class SecureRandom
 {
 private:
+
 	static const size_t BUFFER_SIZE = 4096;
 	static const size_t MAXD16 = 16368;
 
@@ -81,7 +82,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SecureRandom();
+	~SecureRandom();
 
 	//~~~Public Functions~~~//
 
@@ -321,6 +322,7 @@ public:
 	void Reset();
 
 private:
+
 	std::vector<byte> GetByteRange(ulong Maximum);
 	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
 };

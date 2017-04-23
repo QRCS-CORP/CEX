@@ -45,7 +45,8 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void CompareOutput(Mac::IMac* Engine1, Mac::IMac* Engine2);
+		void CompareCmac();
+		void CompareHmac();
 		void CmacDescriptionTest();
 		void HmacDescriptionTest();
 		void OnProgress(std::string Data);

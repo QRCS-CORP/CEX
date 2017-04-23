@@ -1,22 +1,39 @@
 #include "X923.h"
 #include "CSP.h"
+#include "MemUtils.h"
 
 NAMESPACE_PADDING
+
+const std::string X923::CLASS_NAME("X923");
+
+X923::X923() {}
+
+X923::~X923() {}
+
+const PaddingModes X923::Enumeral() 
+{ 
+	return PaddingModes::X923; 
+}
+
+const std::string &X923::Name()
+{
+	return CLASS_NAME; 
+}
 
 size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
 		throw CryptoPaddingException("X923:AddPadding", "The padding offset value is longer than the array length!");
 
-	size_t len = (Input.size() - Offset) - 1;
+	size_t inpLen = (Input.size() - Offset) - 1;
 	byte code = (byte)(Input.size() - Offset);
 
-	if (len > 0)
+	if (inpLen > 0)
 	{
-		std::vector<byte> data(len);
+		std::vector<byte> data(inpLen);
 		Provider::CSP rnd;
 		rnd.GetBytes(data);
-		memcpy(&Input[Offset], &data[0], len);
+		Utility::MemUtils::Copy<byte>(data, 0, Input, Offset, inpLen);
 	}
 
 	Input[Input.size() - 1] = code;

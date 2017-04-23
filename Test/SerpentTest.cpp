@@ -91,8 +91,8 @@ namespace Test
 				CompareVector(key, pln, cip);
 			}
 			//
-			rcnt = Utility::IntUtils::ToString(rcount);
-			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			rcnt = TestUtils::ToString(rcount);
+			klen = TestUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent128: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
 			OnProgress(resp);
 			rcount = 0;
@@ -145,8 +145,8 @@ namespace Test
 				CompareVector(key, pln, cip);
 			}
 
-			rcnt = Utility::IntUtils::ToString(rcount);
-			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			rcnt = TestUtils::ToString(rcount);
+			klen = TestUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent192: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
 			OnProgress(resp);
 			rcount = 0;
@@ -199,8 +199,8 @@ namespace Test
 				CompareVector(key, pln, cip);
 			}
 
-			rcnt = Utility::IntUtils::ToString(rcount);
-			klen = Utility::IntUtils::ToString((int)(keyStr.size() / 32));
+			rcnt = TestUtils::ToString(rcount);
+			klen = TestUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent256: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
 			OnProgress(resp);
 			rcount = 0;

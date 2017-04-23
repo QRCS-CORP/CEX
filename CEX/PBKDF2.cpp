@@ -1,10 +1,39 @@
 #include "PBKDF2.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
+
+const std::string PBKDF2::CLASS_NAME("PBKDF2");
+
+//~~~Properties~~~//
+
+const Kdfs PBKDF2::Enumeral() 
+{
+	return Kdfs::PBKDF2;
+}
+
+const bool PBKDF2::IsInitialized() 
+{ 
+	return m_isInitialized; 
+}
+
+std::vector<SymmetricKeySize> PBKDF2::LegalKeySizes() const
+{ 
+	return m_legalKeySizes; 
+};
+
+size_t PBKDF2::MinKeySize() 
+{ 
+	return m_macSize; 
+}
+
+const std::string &PBKDF2::Name()
+{ 
+	return CLASS_NAME; 
+}
 
 //~~~Constructor~~~//
 
@@ -91,9 +120,9 @@ void PBKDF2::Destroy()
 					delete m_macGenerator;
 			}
 
-			Utility::ArrayUtils::ClearVector(m_kdfKey);
-			Utility::ArrayUtils::ClearVector(m_kdfSalt);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_kdfKey);
+			Utility::IntUtils::ClearVector(m_kdfSalt);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
 		}
 		catch(std::exception& ex)
 		{
@@ -104,20 +133,16 @@ void PBKDF2::Destroy()
 
 size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
-	if (Output.size() == 0)
-		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
 
 	return Expand(Output, 0, Output.size());
 }
 
 size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("PBKDF2:Generate", "The generator must be initialized before use!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoKdfException("PBKDF2:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
 
 	return Expand(Output, OutOffset, Length);
 }
@@ -149,7 +174,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Key)
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], m_kdfKey.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_isInitialized = true;
 }
 
@@ -164,9 +189,9 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size());
-	memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+	Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
 
 	m_isInitialized = true;
 }
@@ -182,13 +207,13 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size() + Info.size());
 
 	if (Salt.size() > 0)
-		memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
 	if (Info.size() > 0)
-		memcpy(&m_kdfSalt[Salt.size()], &Info[0], Info.size());
+		Utility::MemUtils::Copy<byte>(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 
 	m_isInitialized = true;
 }
@@ -201,7 +226,7 @@ void PBKDF2::ReSeed(const std::vector<byte> &Seed)
 	if (Seed.size() > m_kdfSalt.size())
 		m_kdfSalt.resize(Seed.size());
 
-	memcpy(&m_kdfSalt[0], &Seed[0], Seed.size());
+	Utility::MemUtils::Copy<byte>(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
 
 void PBKDF2::Reset()
@@ -231,7 +256,7 @@ size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 		{
 			std::vector<byte> tmp(m_macSize);
 			Process(tmp, 0);
-			memcpy(&Output[OutOffset], &tmp[0], prcRmd);
+			Utility::MemUtils::Copy<byte>(tmp, 0, Output, OutOffset, prcRmd);
 		}
 
 		prcLen -= prcRmd;
@@ -257,7 +282,7 @@ void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
 
 	std::vector<byte> state(m_macSize);
 	m_macGenerator->Finalize(state, 0);
-	memcpy(&Output[OutOffset], &state[0], state.size());
+	Utility::MemUtils::Copy<byte>(state, 0, Output, OutOffset, state.size());
 
 	for (int i = 1; i != m_kdfIterations; ++i)
 	{

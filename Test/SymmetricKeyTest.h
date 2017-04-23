@@ -44,28 +44,7 @@ namespace Test
 		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run()
-		{
-			try
-			{
-				CheckInit();
-				OnProgress(std::string("SymmetricKeyTest: Passed initialization tests.."));
-				CheckAccess();
-				OnProgress(std::string("SymmetricKeyTest: Passed output comparison tests.."));
-				CompareSerial();
-				OnProgress(std::string("SymmetricKeyTest: Passed key serialization tests.."));
-
-				return SUCCESS;
-			}
-			catch (std::exception const &ex)
-			{
-				throw TestException(std::string(FAILURE + " : " + ex.what()));
-			}
-			catch (...)
-			{
-				throw TestException(std::string(FAILURE + " : Unknown Error"));
-			}
-		}
+		virtual std::string Run();
 
 	private:
 

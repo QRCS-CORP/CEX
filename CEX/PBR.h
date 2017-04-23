@@ -63,6 +63,8 @@ class PBR : public IPrng
 {
 private:
 
+	static const std::string CLASS_NAME;
+
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
 	size_t m_digestIterations;
@@ -79,12 +81,12 @@ public:
 	/// <summary>
 	/// Get: The random generators type name
 	/// </summary>
-	virtual const Prngs Enumeral() { return Prngs::PBR; }
+	const Prngs Enumeral() override;
 
 	/// <summary>
 	/// Get: The random generators class name
 	/// </summary>
-	virtual const std::string Name() { return "PBR"; }
+	const std::string &Name() override;
 
 	//~~~Constructor~~~//
 
@@ -103,14 +105,14 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~PBR();
+	~PBR() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Return an array filled with pseudo random bytes
@@ -119,21 +121,21 @@ public:
 	/// <param name="Size">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	virtual std::vector<byte> GetBytes(size_t Size);
+	std::vector<byte> GetBytes(size_t Size) override;
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	virtual void GetBytes(std::vector<byte> &Output);
+	void GetBytes(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual uint Next();
+	uint Next() override;
 
 	/// <summary>
 	/// Get an pseudo random unsigned 32bit integer
@@ -142,7 +144,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual uint Next(uint Maximum);
+	uint Next(uint Maximum) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -152,14 +154,14 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	virtual uint Next(uint Minimum, uint Maximum);
+	uint Next(uint Minimum, uint Maximum) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	virtual ulong NextLong();
+	ulong NextLong() override;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
@@ -168,7 +170,7 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	virtual ulong NextLong(ulong Maximum);
+	ulong NextLong(ulong Maximum) override;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
@@ -178,14 +180,15 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	virtual ulong NextLong(ulong Minimum, ulong Maximum);
+	ulong NextLong(ulong Minimum, ulong Maximum) override;
 
 	/// <summary>
 	/// Reset the generator instance
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 private:
+
 	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
 	std::vector<byte> GetByteRange(ulong Maximum);
 	uint GetMinimumSeedSize(Digests RngEngine);

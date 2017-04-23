@@ -70,7 +70,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers formal type name
 	/// </summary>
-	virtual BlockCiphers CipherType() = 0;
+	virtual const BlockCiphers CipherType() = 0;
 
 	/// <summary>
 	/// Get: The underlying Block Cipher instance
@@ -102,12 +102,12 @@ public:
 	/// <summary>
 	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
 	/// Get: The cipher mode name
 	/// </summary>
-	virtual const std::string Name() = 0;
+	virtual const std::string &Name() = 0;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
@@ -126,6 +126,50 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
+	/// Decrypt a single block of bytes.
+	/// <para>Decrypts one block of bytes beginning at a zero index.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of encrypted bytes</param>
+	/// <param name="Output">The output array of decrypted bytes</param>
+	virtual void DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+
+	/// <summary>
+	/// Decrypt a block of bytes with offset parameters.
+	/// <para>Decrypts one block of bytes using the designated offsets.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of encrypted bytes</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of decrypted bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
+	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+
+	/// <summary>
+	/// Encrypt a single block of bytes. 
+	/// <para>Encrypts one block of bytes beginning at a zero index.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of plain text bytes</param>
+	/// <param name="Output">The output array of encrypted bytes</param>
+	virtual void EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
+
+	/// <summary>
+	/// Encrypt a block of bytes using offset parameters. 
+	/// <para>Encrypts one block of bytes using the designated offsets.
+	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of plain text bytes</param>
+	/// <param name="InOffset">Starting offset within the input array</param>
+	/// <param name="Output">The output array of encrypted bytes</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
+	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+
+	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
 	virtual void Destroy() = 0;
@@ -139,38 +183,15 @@ public:
 	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
-	/// Transform an entire block of bytes. 
-	/// <para>Encrypts one block of bytes beginning at a zero index.
-	/// This method is used in a buffering strategy, where buffers of size BlockSize() for sequential processing, 
-	/// or ParallelBlockSize() for parallel processing, are processed and copied to a larger array by the caller.
-	/// Buffers should be of the same size, either BlockSize(), or ParallelBlockSize() if parallel processing is available.
-	/// If the Input and Output array sizes differ, the smallest array size will be processed.
-	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
+	/// Set the maximum number of threads allocated when using multi-threaded processing.
+	/// <para>When set to zero, thread count is set automatically. If set to 1, sets IsParallel() to false and runs in sequential mode. 
+	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
 	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Transform(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
-
-	/// <summary>
-	/// Transform a block of bytes with offset parameters.
-	/// <para>Transforms one block of bytes at the designated offsets.
-	/// This method is used when looping through two large arrays utilizing offsets incremented by the caller.
-	/// One block is processed of either ParallelBlockSize() if parallel processing is available, or BlockSize() for sequential mode.
-	/// To disable parallel processing, set the ParallelOptions().IsParallel() property to false.
-	/// Initialize(bool, ISymmetricKey) must be called before this method can be used.</para>
-	/// </summary>
-	/// 
-	/// <param name="Input">The input array of bytes to transform</param>
-	/// <param name="InOffset">Starting offset within the input array</param>
-	/// <param name="Output">The output array of transformed bytes</param>
-	/// <param name="OutOffset">Starting offset within the output array</param>
-	/// 
-	/// <returns>The number of bytes processed</returns>
-	virtual size_t Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
+	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
 	/// Transform a length of bytes with offset parameters. 

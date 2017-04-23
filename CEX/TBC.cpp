@@ -2,6 +2,22 @@
 
 NAMESPACE_PADDING
 
+const std::string TBC::CLASS_NAME("TBC");
+
+TBC::TBC() {}
+
+TBC::~TBC() {}
+
+const PaddingModes TBC::Enumeral() 
+{ 
+	return PaddingModes::TBC;
+}
+
+const std::string &TBC::Name() 
+{ 
+	return CLASS_NAME; 
+}
+
 size_t TBC::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())

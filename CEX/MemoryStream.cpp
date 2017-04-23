@@ -1,7 +1,52 @@
 #include "MemoryStream.h"
-#include "ArrayUtils.h"
+#include "IntUtils.h"
+#include "MemUtils.h"
 
 NAMESPACE_IO
+
+const std::string MemoryStream::CLASS_NAME("MemoryStream");
+
+//~~~Properties~~~//
+
+const bool MemoryStream::CanRead()
+{
+	return true;
+}
+
+const bool MemoryStream::CanSeek()
+{ 
+	return true;
+}
+
+const bool MemoryStream::CanWrite() 
+{
+	return true; 
+}
+
+const StreamModes MemoryStream::Enumeral()
+{ 
+	return StreamModes::MemoryStream;
+}
+
+const std::string &MemoryStream::Name()
+{
+	return CLASS_NAME;
+}
+
+const ulong MemoryStream::Length()
+{
+	return static_cast<ulong>(m_streamData.size()); 
+}
+
+const ulong MemoryStream::Position() 
+{ 
+	return m_streamPosition;
+}
+
+std::vector<byte> &MemoryStream::ToArray() 
+{ 
+	return m_streamData;
+}
 
 //~~~Constructor~~~//
 
@@ -36,11 +81,9 @@ MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t 
 	m_streamData(0),
 	m_streamPosition(0)
 {
-	if (Length > Data.size() - Offset)
-		throw CryptoProcessingException("MemoryStream:CTor", "Length is longer than the array size!");
-
+	CEXASSERT(Length <= Data.size() - Offset, "Length exceeds input capacity");
 	m_streamData.resize(Length);
-	memcpy(&m_streamData[0], &Data[Offset], Length);
+	Utility::MemUtils::Copy<byte>(Data, Offset, m_streamData, 0, Length);
 }
 
 MemoryStream::~MemoryStream()
@@ -66,7 +109,7 @@ void MemoryStream::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_streamPosition = 0;
-		Utility::ArrayUtils::ClearVector(m_streamData);
+		Utility::IntUtils::ClearVector(m_streamData);
 		m_isDestroyed = true;
 	}
 }
@@ -78,7 +121,7 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 	if (Length > 0)
 	{
-		memcpy(&Output[Offset], &m_streamData[m_streamPosition], Length);
+		Utility::MemUtils::Copy<byte>(m_streamData, m_streamPosition, Output, Offset, Length);
 		m_streamPosition += Length;
 	}
 
@@ -87,11 +130,9 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 byte MemoryStream::ReadByte()
 {
-	if (m_streamData.size() - m_streamPosition < 1)
-		throw CryptoProcessingException("MemoryStream:ReadByte", "The output array is too short!");
-
-	byte data(1);
-	memcpy(&data, &m_streamData[m_streamPosition], 1);
+	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
+	byte data = 0;
+	Utility::MemUtils::Copy<byte, byte>(m_streamData, m_streamPosition, data, 1);
 	m_streamPosition += 1;
 
 	return data;
@@ -99,7 +140,7 @@ byte MemoryStream::ReadByte()
 
 void MemoryStream::Reset()
 {
-	m_streamData.clear();
+	Utility::MemUtils::Clear<byte>(m_streamData, 0, m_streamData.size());
 	m_streamData.resize(0);
 	m_streamPosition = 0;
 }
@@ -121,8 +162,7 @@ void MemoryStream::SetLength(ulong Length)
 
 void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (Offset + Length > Input.size())
-		throw CryptoProcessingException("MemoryStream:Write", "The input array is too short!");
+	CEXASSERT(Offset + Length <= Input.size(), "Input stream length exceeded");
 
 	size_t len = m_streamPosition + Length;
 	if (m_streamData.capacity() - m_streamPosition < Length)
@@ -130,7 +170,7 @@ void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 	if (m_streamData.size() < len)
 		m_streamData.resize(len);
 
-	memcpy(&m_streamData[m_streamPosition], &Input[Offset], Length);
+	Utility::MemUtils::Copy<byte>(Input, Offset, m_streamData, m_streamPosition, Length);
 	m_streamPosition += Length;
 }
 
@@ -139,7 +179,7 @@ void MemoryStream::WriteByte(byte Value)
 	if (m_streamData.size() - m_streamPosition < 1)
 		m_streamData.resize(m_streamData.size() + 1);
 
-	memcpy(&m_streamData[m_streamPosition], &Value, 1);
+	Utility::MemUtils::Copy<byte, byte>(Value, m_streamData, m_streamPosition, 1);
 	m_streamPosition += 1;
 }
 

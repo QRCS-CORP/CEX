@@ -1,12 +1,68 @@
 #include "OFB.h"
-#include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 
 NAMESPACE_MODE
 
-using Utility::ArrayUtils;
-using Utility::IntUtils;
+const std::string OFB::CLASS_NAME("OFB");
+
+//~~~Properties~~~//
+
+const size_t OFB::BlockSize() 
+{ 
+	return m_blockSize; 
+}
+
+const BlockCiphers OFB::CipherType()
+{ 
+	return m_cipherType; 
+}
+
+IBlockCipher* OFB::Engine()
+{ 
+	return m_blockCipher; 
+}
+
+const CipherModes OFB::Enumeral()
+{ 
+	return CipherModes::OFB; 
+}
+
+const bool OFB::IsEncryption()
+{ 
+	return m_isEncryption; 
+}
+
+const bool OFB::IsInitialized() 
+{ 
+	return m_isInitialized; 
+}
+
+const bool OFB::IsParallel() 
+{ 
+	return m_parallelProfile.IsParallel(); 
+}
+
+const std::vector<SymmetricKeySize> &OFB::LegalKeySizes() 
+{ 
+	return m_blockCipher->LegalKeySizes();
+}
+
+const std::string &OFB::Name() 
+{ 
+	return CLASS_NAME; 
+}
+
+const size_t OFB::ParallelBlockSize() 
+{ 
+	return m_parallelProfile.ParallelBlockSize(); 
+}
+
+ParallelOptions &OFB::ParallelProfile() 
+{ 
+	return m_parallelProfile; 
+}
 
 //~~~Constructor~~~//
 
@@ -55,6 +111,16 @@ OFB::~OFB()
 
 //~~~Public Functions~~~//
 
+void OFB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+{
+	Encrypt128(Input, 0, Output, 0);
+}
+
+void OFB::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Encrypt128(Input, InOffset, Output, OutOffset);
+}
+
 void OFB::Destroy()
 {
 	if (!m_isDestroyed)
@@ -77,8 +143,8 @@ void OFB::Destroy()
 					delete m_blockCipher;
 			}
 
-			ArrayUtils::ClearVector(m_ofbVector);
-			ArrayUtils::ClearVector(m_ofbBuffer);
+			Utility::IntUtils::ClearVector(m_ofbVector);
+			Utility::IntUtils::ClearVector(m_ofbBuffer);
 		}
 		catch(std::exception& ex) 
 		{
@@ -89,25 +155,12 @@ void OFB::Destroy()
 
 void OFB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	EncryptBlock(Input, 0, Output, 0);
+	Encrypt128(Input, 0, Output, 0);
 }
 
 void OFB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
-
-	m_blockCipher->Transform(m_ofbVector, 0, m_ofbBuffer, 0);
-
-	// xor the iv with the plaintext producing the cipher text and the next Input block
-	for (size_t i = 0; i < m_blockSize; i++)
-		Output[OutOffset + i] = (byte)(m_ofbBuffer[i] ^ Input[InOffset + i]);
-
-	// change over the Input block
-	if (m_ofbVector.size() - m_blockSize > 0)
-		memcpy(&m_ofbVector[0], &m_ofbVector[m_blockSize], m_ofbVector.size() - m_blockSize);
-	// shift output into right end of shift register per Fips PUB81
-	memcpy(&m_ofbVector[m_ofbVector.size() - m_blockSize], &m_ofbBuffer[0], m_blockSize);
+	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -125,37 +178,24 @@ void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	if (tmpIv.size() < m_ofbVector.size())
 	{
 		// prepend the supplied tmpIv with zeros per FIPS PUB81
-		memcpy(&m_ofbVector[m_ofbVector.size() - tmpIv.size()], &tmpIv[0], tmpIv.size());
+		Utility::MemUtils::Copy<byte>(tmpIv, 0, m_ofbVector, m_ofbVector.size() - tmpIv.size(), tmpIv.size());
 
 		for (size_t i = 0; i < m_ofbVector.size() - tmpIv.size(); i++)
 			m_ofbVector[i] = 0;
 	}
 	else
 	{
-		memcpy(&m_ofbVector[0], &tmpIv[0], m_ofbVector.size());
+		Utility::MemUtils::Copy<byte>(tmpIv, 0, m_ofbVector, 0, m_ofbVector.size());
 	}
 
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
 }
 
-size_t OFB::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	const size_t PRCSZE = Utility::IntUtils::Min(Output.size(), Input.size());
-	Transform(Input, 0, Output, 0, PRCSZE);
-	return PRCSZE;
-}
-
-size_t OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	EncryptBlock(Input, InOffset, Output, OutOffset);
-	return m_blockCipher->BlockSize();
-}
-
 void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 	CEXASSERT(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
 
 	const size_t BLKSZE = m_blockCipher->BlockSize();
@@ -164,8 +204,28 @@ void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		throw CryptoCipherModeException("OFB:Transform", "Invalid length, must be evenly divisible by the ciphers block size!");
 
 	const size_t BLKCNT = Length / BLKSZE;
+
 	for (size_t i = 0; i < BLKCNT; ++i)
 		EncryptBlock(Input, (i * BLKSZE) + InOffset, Output, (i * BLKSZE) + OutOffset);
+}
+
+void OFB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+
+	m_blockCipher->Transform(m_ofbVector, 0, m_ofbBuffer, 0);
+
+	// xor the iv with the plaintext producing the cipher text and the next Input block
+	for (size_t i = 0; i < m_blockSize; i++)
+		Output[OutOffset + i] = (byte)(m_ofbBuffer[i] ^ Input[InOffset + i]);
+
+	// change over the Input block
+	if (m_ofbVector.size() - m_blockSize > 0)
+		Utility::MemUtils::Copy<byte>(m_ofbVector, m_blockSize, m_ofbVector, 0, m_ofbVector.size() - m_blockSize);
+
+	// shift output into right end of shift register per Fips PUB81
+	Utility::MemUtils::Copy<byte>(m_ofbBuffer, 0, m_ofbVector, m_ofbVector.size() - m_blockSize, m_blockSize);
 }
 
 NAMESPACE_MODEEND

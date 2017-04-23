@@ -21,7 +21,9 @@
 // An implementation of a Counter based Deterministic Random Byte Generator (CMG)
 // Written by John Underhill, November 21, 2015
 // Updated October 23, 2016
+// Updated April 18, 2017
 // Contact: develop@vtdev.com
+
 
 #ifndef _CEX_CMG_H
 #define _CEX_CMG_H
@@ -122,6 +124,8 @@ class CMG : public IDrbg
 {
 private:
 
+	static const size_t BLOCK_SIZE = 16;
+	static const std::string CLASS_NAME;
 	static const size_t COUNTER_SIZE = 16;
 	static const size_t DEF_CYCTHRESH = 1024 * 1000;
 	static const ulong MAX_OUTPUT = 35184372088832;
@@ -131,7 +135,6 @@ private:
 	static const size_t PRC_DATACACHE = 1024 * 16;
 
 	IBlockCipher* m_blockCipher;
-	size_t m_blockSize;
 	BlockCiphers m_cipherType;
 	std::vector<byte> m_ctrVector;
 	bool m_destroyEngine;
@@ -169,66 +172,66 @@ public:
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
 	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
 	/// </summary>
-	virtual std::vector<byte> &DistributionCode() { return m_distributionCode; }
+	std::vector<byte> &DistributionCode() override;
 
 	/// <summary>
 	/// Get: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in an HX ciphers HKDF key expansion function.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
 	/// </summary>
-	virtual const size_t DistributionCodeMax() { return m_distributionCodeMax; }
+	const size_t DistributionCodeMax() override;
 
 	/// <summary>
 	/// Get: The Drbg generators type name
 	/// </summary>
-	virtual const Drbgs Enumeral() { return Drbgs::CMG; }
+	const Drbgs Enumeral() override;
 
 	/// <summary>
 	/// Get: Generator is ready to produce random
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on the system.</para>
 	/// </summary>
-	const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel();
 
 	/// <summary>
 	/// Get: Available Encryption Key Sizes in bytes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; };
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
-	virtual const ulong MaxOutputSize() { return MAX_OUTPUT; }
+	const ulong MaxOutputSize() override;
 
 	/// <summary>
 	/// Get: The maximum number of bytes that can be generated in a single request
 	/// </summary>
-	virtual const size_t MaxRequestSize() { return MAX_REQUEST; }
+	const size_t MaxRequestSize() override;
 
 	/// <summary>
 	/// Get: The maximum number of times the generator can be reseeded
 	/// </summary>
-	virtual const size_t MaxReseedCount() { return MAX_RESEED; }
+	const size_t MaxReseedCount() override;
 
 	/// <summary>
 	/// Get: The Drbg generators class name
 	/// </summary>
-	virtual const std::string Name() { return "CMG"; }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: The size of the nonce counter value in bytes
 	/// </summary>
-	virtual const size_t NonceSize() { return COUNTER_SIZE; }
+	const size_t NonceSize() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize();
 
 	/// <summary>
 	/// Get/Set: Parallel and SIMD capability flags and sizes 
@@ -236,17 +239,17 @@ public:
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile();
 
 	/// <summary>
 	/// Get/Set: Generating this amount or greater, triggers seed regeneration
 	/// </summary>
-	virtual size_t &ReseedThreshold() { return m_reseedThreshold; }
+	size_t &ReseedThreshold() override;
 
 	/// <summary>
 	/// Get: The security strength in bits
 	/// </summary>
-	virtual const size_t SecurityStrength() { return m_secStrength; }
+	const size_t SecurityStrength() override;
 
 	//~~~Constructor~~~//
 
@@ -280,14 +283,14 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~CMG();
+	~CMG() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -298,7 +301,7 @@ public:
 	/// <returns>The number of bytes generated</returns>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the output array is too small</exception>
-	virtual size_t Generate(std::vector<byte> &Output);
+	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Generate pseudo random bytes using offset and length parameters
@@ -311,7 +314,7 @@ public:
 	/// <returns>The number of bytes generated</returns>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the output array is too small</exception>
-	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey structure containing the key, and optional nonce, and info string.
@@ -320,7 +323,7 @@ public:
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
-	virtual void Initialize(ISymmetricKey &GenParam);
+	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
 	/// Initialize the generator with a key.
@@ -329,7 +332,7 @@ public:
 	/// <param name="Seed">The primary key array used to seed the generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
-	virtual void Initialize(const std::vector<byte> &Seed);
+	void Initialize(const std::vector<byte> &Seed) override;
 
 	/// <summary>
 	/// Initialize the generator with key and nonce arrays.
@@ -340,7 +343,7 @@ public:
 	/// <param name="Nonce">The nonce value containing an additional source of entropy</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
-	virtual void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce);
+	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
 
 	/// <summary>
 	/// Initialize the generator with a key, a nonce array, and an information string.
@@ -355,7 +358,7 @@ public:
 	/// <param name="Info">The information string or nonce used to create a unique distribution or as a third source of entropy</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
-	virtual void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
+	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info) override;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -376,7 +379,7 @@ public:
 	/// <param name="Seed">The secret seed array</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is too small</exception>
-	virtual void Update(const std::vector<byte> &Seed);
+	void Update(const std::vector<byte> &Seed) override;
 
 private:
 

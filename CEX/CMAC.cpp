@@ -1,19 +1,56 @@
 #include "CMAC.h"
-#include "ArrayUtils.h"
 #include "CBC.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ISO7816.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MAC
 
-using Cipher::Symmetric::Block::Mode::CBC;
+const std::string CMAC::CLASS_NAME("CMAC");
+
+//~~~Properties~~~//
+
+const size_t CMAC::BlockSize()
+{ 
+	return m_cipherMode->BlockSize();
+}
+
+const BlockCiphers CMAC::CipherType()
+{ 
+	return m_cipherType; 
+}
+
+const Macs CMAC::Enumeral() 
+{ 
+	return Macs::CMAC; 
+}
+
+const size_t CMAC::MacSize() 
+{
+	return m_macSize;
+}
+
+const bool CMAC::IsInitialized() 
+{ 
+	return m_isInitialized;
+}
+
+std::vector<SymmetricKeySize> CMAC::LegalKeySizes() const 
+{ 
+	return m_legalKeySizes; 
+};
+
+const std::string &CMAC::Name() 
+{ 
+	return CLASS_NAME; 
+}
 
 //~~~Constructor~~~//
 
 CMAC::CMAC(BlockCiphers CipherType)
 	:
-	m_cipherMode(new CBC(CipherType)),
+	m_cipherMode(new Cipher::Symmetric::Block::Mode::CBC(CipherType)),
 	m_cipherKey(0),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),
@@ -30,7 +67,7 @@ CMAC::CMAC(BlockCiphers CipherType)
 
 CMAC::CMAC(IBlockCipher* Cipher)
 	:
-	m_cipherMode(new CBC(Cipher)),
+	m_cipherMode(new Cipher::Symmetric::Block::Mode::CBC(Cipher)),
 	m_cipherKey(0),
 	m_cipherType(Cipher->Enumeral()),
 	m_destroyEngine(false),
@@ -84,12 +121,12 @@ void CMAC::Destroy()
 					delete m_cipherMode;
 			}
 
-			Utility::ArrayUtils::ClearVector(m_cipherKey);
-			Utility::ArrayUtils::ClearVector(m_K1);
-			Utility::ArrayUtils::ClearVector(m_K2);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_msgCode);
-			Utility::ArrayUtils::ClearVector(m_wrkBuffer);
+			Utility::IntUtils::ClearVector(m_cipherKey);
+			Utility::IntUtils::ClearVector(m_K1);
+			Utility::IntUtils::ClearVector(m_K2);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_msgCode);
+			Utility::IntUtils::ClearVector(m_wrkBuffer);
 		}
 		catch (std::exception& ex)
 		{
@@ -109,15 +146,15 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	{
 		Cipher::Symmetric::Block::Padding::ISO7816 pad;
 		pad.AddPadding(m_wrkBuffer, m_wrkOffset);
-		Utility::IntUtils::XORBLK(m_K2, 0, m_wrkBuffer, 0, m_macSize);
+		Utility::MemUtils::XorBlock<byte>(m_K2, 0, m_wrkBuffer, 0, m_macSize);
 	}
 	else
 	{
-		Utility::IntUtils::XORBLK(m_K1, 0, m_wrkBuffer, 0, m_macSize);
+		Utility::MemUtils::XorBlock<byte>(m_K1, 0, m_wrkBuffer, 0, m_macSize);
 	}
 
-	m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
-	memcpy(&Output[OutOffset], &m_msgCode[0], m_macSize);
+	m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
+	Utility::MemUtils::Copy<byte>(m_msgCode, 0, Output, OutOffset, m_macSize);
 	Reset();
 
 	return m_macSize;
@@ -149,14 +186,14 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 		{
 			// info is too large; size to optimal max, ignore remainder
 			std::vector<byte> tmpInfo(m_cipherMode->Engine()->DistributionCodeMax());
-			memcpy(&tmpInfo[0], &KeyParams.Info()[0], tmpInfo.size());
+			Utility::MemUtils::Copy<byte>(KeyParams.Info(), 0, tmpInfo, 0, tmpInfo.size());
 			m_cipherMode->Engine()->DistributionCode() = tmpInfo;
 		}
 	}
 
 	std::vector<byte> lu(m_cipherMode->BlockSize());
 	std::vector<byte> tmpz(m_cipherMode->BlockSize());
-	m_cipherMode->Transform(tmpz, 0, lu, 0);
+	m_cipherMode->EncryptBlock(tmpz, 0, lu, 0);
 	m_K1 = GenerateSubkey(lu);
 	m_K2 = GenerateSubkey(m_K1);
 	m_cipherMode->Initialize(true, kp);
@@ -167,9 +204,9 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 void CMAC::Reset()
 {
 	// reinitialize the cbc iv
-	memset(&static_cast<CBC*>(m_cipherMode)->Nonce()[0], (byte)0, static_cast<CBC*>(m_cipherMode)->Nonce().size());
-	memset(&m_msgCode[0], 0, m_msgCode.size());
-	memset(&m_wrkBuffer[0], 0, m_wrkBuffer.size());
+	Utility::MemUtils::Clear<byte>(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode)->Nonce(), 0, BLOCK_SIZE);
+	Utility::MemUtils::Clear<byte>(m_msgCode, 0, m_msgCode.size());
+	Utility::MemUtils::Clear<byte>(m_wrkBuffer, 0, m_wrkBuffer.size());
 	m_wrkOffset = 0;
 }
 
@@ -177,7 +214,7 @@ void CMAC::Update(byte Input)
 {
 	if (m_wrkOffset == m_wrkBuffer.size())
 	{
-		m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+		m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
 		m_wrkOffset = 0;
 	}
 
@@ -195,22 +232,22 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 	if (m_wrkOffset == m_cipherMode->BlockSize())
 	{
-		m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+		m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
 		m_wrkOffset = 0;
 	}
 
 	size_t diff = m_cipherMode->BlockSize() - m_wrkOffset;
 	if (Length > diff)
 	{
-		memcpy(&m_wrkBuffer[m_wrkOffset], &Input[InOffset], diff);
-		m_cipherMode->Transform(m_wrkBuffer, 0, m_msgCode, 0);
+		Utility::MemUtils::Copy<byte>(Input, InOffset, m_wrkBuffer, m_wrkOffset, diff);
+		m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
 		m_wrkOffset = 0;
 		Length -= diff;
 		InOffset += diff;
 
 		while (Length > m_cipherMode->BlockSize())
 		{
-			m_cipherMode->Transform(Input, InOffset, m_msgCode, 0);
+			m_cipherMode->EncryptBlock(Input, InOffset, m_msgCode, 0);
 			Length -= m_cipherMode->BlockSize();
 			InOffset += m_cipherMode->BlockSize();
 		}
@@ -218,7 +255,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 	if (Length > 0)
 	{
-		memcpy(&m_wrkBuffer[m_wrkOffset], &Input[InOffset], Length);
+		Utility::MemUtils::Copy<byte>(Input, InOffset, m_wrkBuffer, m_wrkOffset, Length);
 		m_wrkOffset += Length;
 	}
 }
@@ -244,9 +281,10 @@ std::vector<byte> CMAC::GenerateSubkey(std::vector<byte> &Input)
 void CMAC::Scope()
 {
 	m_legalKeySizes.resize(m_cipherMode->LegalKeySizes().size());
+	std::vector<SymmetricKeySize> keySizes = m_cipherMode->LegalKeySizes();
 	// cbc iv is always zero-size with cmac
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
-		m_legalKeySizes[i] = SymmetricKeySize(m_cipherMode->LegalKeySizes()[i].KeySize(), 0, m_cipherMode->LegalKeySizes()[i].InfoSize());
+		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), 0, keySizes[i].InfoSize());
 }
 
 NAMESPACE_MACEND

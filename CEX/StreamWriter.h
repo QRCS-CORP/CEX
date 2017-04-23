@@ -2,6 +2,7 @@
 #define _CEX_STREAMWRITER_H
 
 #include "MemoryStream.h"
+#include "MemUtils.h"
 
 NAMESPACE_IO
 
@@ -17,59 +18,45 @@ private:
 
 public:
 
+	//~~~Properties~~~//
+
 	/// <summary>
 	/// The length of the data
 	/// </summary>
-	const size_t Length() const { return m_streamData.size(); }
+	const size_t Length();
 
 	/// <summary>
 	/// The current position within the data
 	/// </summary>
-	const size_t Position() const { return m_streamPosition; }
+	const size_t Position();
+
+	//~~~Constructor~~~//
 
 	/// <summary>
 	/// Instantiate this class
 	/// </summary>
 	///
 	/// <param name="Length">The length of the underlying stream</param>
-	explicit StreamWriter(size_t Length)
-		:
-		m_streamData(Length),
-		m_streamPosition(0)
-	{
-	}
+	explicit StreamWriter(size_t Length);
 
 	/// <summary>
 	/// Instantiate this class with a byte array
 	/// </summary>
 	///
 	/// <param name="DataArray">The byte array to write data to</param>
-	explicit StreamWriter(const std::vector<byte> &DataArray)
-		:
-		m_streamData(DataArray),
-		m_streamPosition(0)
-	{
-	}
+	explicit StreamWriter(const std::vector<byte> &DataArray);
 
 	/// <summary>
 	/// Instantiate this class with a MemoryStream
 	/// </summary>
 	///
 	/// <param name="DataStream">The MemoryStream to write data to</param>
-	explicit StreamWriter(MemoryStream &DataStream)
-		:
-		m_streamData(DataStream.ToArray()),
-		m_streamPosition(0)
-	{
-	}
+	explicit StreamWriter(MemoryStream &DataStream);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	~StreamWriter()
-	{
-		Destroy();
-	}
+	~StreamWriter();
 
 	/// <summary>
 	/// Release all resources associated with the object
@@ -89,68 +76,53 @@ public:
 	MemoryStream* GetStream();
 
 	/// <summary>
-	/// Write an 8bit integer to the base stream
+	/// Write an array of T to the base stream
 	/// </summary>
 	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const byte Value);
-
-	/// <summary>
-	/// Write a 16bit integer to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const short Value);
-
-	/// <summary>
-	/// Write a 16bit unsigned integer to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const ushort Value);
-
-	/// <summary>
-	/// Write a 32bit integer to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const int Value);
-
-	/// <summary>
-	/// Write a 32bit unsigned integer to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const uint Value);
-
-	/// <summary>
-	/// Write a 64bit integer to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const long Value);
-
-	/// <summary>
-	/// Write a 64bit unsigned integer to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
-	void Write(const ulong Value);
-
-	/// <summary>
-	/// Write an integer array to the base stream
-	/// </summary>
-	/// 
-	/// <param name="Value">The integer value</param>
+	/// <param name="Input">The T integer source array</param>
 	template <typename T>
-	void Write(const std::vector<T> &Value)
+	void Write(const std::vector<T> &Input)
 	{
-		size_t sze = sizeof(T) * Value.size();
-		if (m_streamPosition + sze > m_streamData.size())
-			m_streamData.resize(m_streamPosition + sze);
+		const size_t INPSZE = Input.size() * sizeof(T);
+		if (m_streamPosition + INPSZE > m_streamData.size())
+			m_streamData.resize(m_streamPosition + INPSZE);
 
-		memcpy(&m_streamData[m_streamPosition], &Value[0], sze);
-		m_streamPosition += sze;
+		Utility::MemUtils::Copy<T, byte>(Input, 0, m_streamData, m_streamPosition, INPSZE);
+		m_streamPosition += INPSZE;
+	}
+
+	/// <summary>
+	/// Write elements from an array of T to the base stream
+	/// </summary>
+	/// 
+	/// <param name="Input">The T integer source array</param>
+	/// <param name="InOffset">The starting offset in the T integer array</param>
+	/// <param name="Length">The number of T integers to write to the array</param>
+	template <typename T>
+	void Write(const std::vector<T> &Input, size_t InOffset, size_t Elements)
+	{
+		const size_t INPSZE = sizeof(T) * Elements;
+		if (m_streamPosition + INPSZE > m_streamData.size())
+			m_streamData.resize(m_streamPosition + INPSZE);
+
+		Utility::MemUtils::Copy<T, byte>(Input, InOffset, m_streamData, m_streamPosition, INPSZE);
+		m_streamPosition += INPSZE;
+	}
+
+	/// <summary>
+	/// Write a T sized integer to the base stream
+	/// </summary>
+	/// 
+	/// <param name="Value">The T integer value</param>
+	template <typename T>
+	void Write(T Value)
+	{
+		const size_t VALSZE = sizeof(T);
+		if (m_streamPosition + VALSZE > m_streamData.size())
+			m_streamData.resize(m_streamPosition + VALSZE);
+
+		Utility::MemUtils::Copy<T, byte>(Value, m_streamData, m_streamPosition, VALSZE);
+		m_streamPosition += VALSZE;
 	}
 };
 

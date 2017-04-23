@@ -71,7 +71,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, uin
 					return new Cipher::Symmetric::Block::AHX(KdfEngineType, RoundCount);
 				else
 #endif
-					return new Cipher::Symmetric::Block::RHX(KdfEngineType, BlockSize, RoundCount);
+					return new Cipher::Symmetric::Block::RHX(KdfEngineType, RoundCount);
 			}
 			case BlockCiphers::Rijndael:
 			{
@@ -83,7 +83,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, uin
 					return new Cipher::Symmetric::Block::RHX();
 			}
 			case BlockCiphers::RHX:
-				return new Cipher::Symmetric::Block::RHX(KdfEngineType, RoundCount, 16);
+				return new Cipher::Symmetric::Block::RHX(KdfEngineType, RoundCount);
 			case BlockCiphers::Serpent:
 				return new Cipher::Symmetric::Block::SHX();
 			case BlockCiphers::SHX:

@@ -37,6 +37,21 @@ public:
 	virtual ~IDrbg() {}
 
 	//~~~Properties~~~//
+	/// <summary>
+	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
+	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
+	/// Changing this code will create a unique distribution of the generator.
+	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
+	/// </summary>
+	virtual std::vector<byte> &DistributionCode() = 0;
+
+	/// <summary>
+	/// Get: The maximum size of the distribution code in bytes.
+	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
+	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
+	/// </summary>
+	virtual const size_t DistributionCodeMax() = 0;
 
 	/// <summary>
 	/// Get: The Drbg generators type name
@@ -71,7 +86,7 @@ public:
 	/// <summary>
 	/// The Drbg generators class name
 	/// </summary>
-	virtual const std::string Name() = 0;
+	virtual const std::string &Name() = 0;
 
 	/// <summary>
 	/// Get: The size of the nonce counter value in bytes

@@ -1,18 +1,80 @@
 #include "AHX.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "IntUtils.h"
-#include "UInt128.h"
+#include "MemUtils.h"
+#if defined(__AVX__)
+#	include "UInt128.h"
+#endif
 
 NAMESPACE_BLOCK
 
 #if defined(__AVX__)
 
-using Helper::DigestFromName;
-using Utility::IntUtils;
+const std::string AHX::CLASS_NAME("AHX");
+const std::string AHX::DEF_DSTINFO("information string RHX version 1");
 
-const std::string AHX::DEF_INFO = "information string RHX version 1";
+//~~~Properties~~~//
+
+const size_t AHX::BlockSize()
+{
+	return BLOCK_SIZE;
+}
+
+std::vector<byte> &AHX::DistributionCode()
+{
+	return m_kdfInfo;
+}
+
+const size_t AHX::DistributionCodeMax()
+{
+	return m_kdfInfoMax;
+}
+
+const BlockCiphers AHX::Enumeral()
+{
+	return (m_kdfEngineType == Digests::None) ? BlockCiphers::Rijndael : BlockCiphers::AHX;
+}
+
+const bool AHX::IsEncryption()
+{
+	return m_isEncryption;
+}
+
+const bool AHX::IsInitialized()
+{
+	return m_isInitialized;
+}
+
+const Digests AHX::KdfEngine()
+{
+	return m_kdfEngineType;
+}
+
+const std::vector<SymmetricKeySize> &AHX::LegalKeySizes()
+{
+	return m_legalKeySizes;
+}
+
+const std::vector<size_t> &AHX::LegalRounds()
+{
+	return m_legalRounds;
+}
+
+const std::string &AHX::Name()
+{
+	return CLASS_NAME;
+}
+
+const size_t AHX::Rounds()
+{
+	return m_rndCount;
+}
+
+const size_t AHX::StateCacheSize()
+{
+	return STATE_PRECACHED;
+}
 
 //~~~Constructor~~~//
 
@@ -21,9 +83,9 @@ AHX::AHX(Digests KdfEngineType, size_t Rounds)
 	m_blockSize(BLOCK_SIZE),
 	m_destroyEngine(true),
 	m_expKey(0),
-	m_kdfEngine(KdfEngineType == Digests::None ? 0 : DigestFromName::GetInstance(KdfEngineType)),
+	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
 	m_kdfEngineType(KdfEngineType),
-	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_kdfInfoMax(0),
 	m_kdfKeySize(0),
 	m_isDestroyed(false),
@@ -49,7 +111,7 @@ AHX::AHX(IDigest *KdfEngine, size_t Rounds)
 	m_expKey(0),
 	m_kdfEngine(KdfEngine),
 	m_kdfEngineType(m_kdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
-	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_kdfInfoMax(0),
 	m_kdfKeySize(0),
 	m_isDestroyed(false),
@@ -70,14 +132,16 @@ AHX::~AHX()
 	Destroy();
 }
 
+//~~~Public Functions~~~//
+
 void AHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Decrypt16(Input, 0, Output, 0);
+	Decrypt128(Input, 0, Output, 0);
 }
 
 void AHX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void AHX::Destroy()
@@ -95,10 +159,10 @@ void AHX::Destroy()
 
 		try 
 		{
-			Utility::ArrayUtils::ClearVector(m_expKey);
-			Utility::ArrayUtils::ClearVector(m_kdfInfo);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_legalRounds);
+			Utility::IntUtils::ClearVector(m_expKey);
+			Utility::IntUtils::ClearVector(m_kdfInfo);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_legalRounds);
 
 			if (m_kdfEngine != 0 && m_destroyEngine)
 				delete m_kdfEngine;
@@ -114,12 +178,12 @@ void AHX::Destroy()
 
 void AHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Encrypt16(Input, 0, Output, 0);
+	Encrypt128(Input, 0, Output, 0);
 }
 
 void AHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Encrypt16(Input, InOffset, Output, OutOffset);
+	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -142,33 +206,41 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 void AHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (m_isEncryption)
-		EncryptBlock(Input, Output);
+		Encrypt128(Input, 0, Output, 0);
 	else
-		DecryptBlock(Input, Output);
+		Decrypt128(Input, 0, Output, 0);
 }
 
 void AHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
-		EncryptBlock(Input, InOffset, Output, OutOffset);
-	else
-		DecryptBlock(Input, InOffset, Output, OutOffset);
-}
-
-void AHX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	if (m_isEncryption)
-		Encrypt64(Input, InOffset, Output, OutOffset);
-	else
-		Decrypt64(Input, InOffset, Output, OutOffset);
-}
-
-void AHX::Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	if (m_isEncryption)
 		Encrypt128(Input, InOffset, Output, OutOffset);
 	else
 		Decrypt128(Input, InOffset, Output, OutOffset);
+}
+
+void AHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt512(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt512(Input, InOffset, Output, OutOffset);
+}
+
+void AHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt1024(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt1024(Input, InOffset, Output, OutOffset);
+}
+
+void AHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt2048(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt2048(Input, InOffset, Output, OutOffset);
 }
 
 //~~~Key Schedule~~~//
@@ -220,10 +292,10 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 		// seperate salt and key
 		m_kdfKeySize = m_kdfEngine->BlockSize();
 		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		memcpy(&kdfKey[0], &Key[0], m_kdfKeySize);
+		Utility::MemUtils::Copy<byte>(Key, 0, kdfKey, 0, m_kdfKeySize);
 		size_t saltSize = Key.size() - m_kdfKeySize;
 		std::vector<byte> kdfSalt(saltSize, 0);
-		memcpy(&kdfSalt[0], &Key[m_kdfKeySize], saltSize);
+		Utility::MemUtils::Copy<byte>(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
 		// info can be null
 		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
 	}
@@ -245,8 +317,8 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// big endian format to align with test vectors
 	for (size_t i = 0; i < rawKey.size(); i += 4)
 	{
-		uint tmpbk = IntUtils::BytesToBe32(rawKey, i);
-		memcpy(&rawKey[i], &tmpbk, 4);
+		uint tmpbk = Utility::IntUtils::BeBytesTo32(rawKey, i);
+		Utility::IntUtils::Le32ToBytes(tmpbk, rawKey, i);
 	}
 
 	// copy bytes to working key
@@ -382,7 +454,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 	key1 = _mm_xor_si128(key1, KR);
 	*K1 = key1;
 
-	memcpy(((byte*)Key.data() + Offset), &key1, 16);
+	std::memcpy(((byte*)Key.data() + Offset), &key1, 16);
 
 	if (Offset == 192 && Key.size() == 13) // TODO: timing?
 		return;
@@ -393,11 +465,11 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 
 	Offset += 16;
 	std::vector<byte> tmpB(4);
-	IntUtils::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
-	memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
+	Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
+	std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 	Offset += 4;
-	IntUtils::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
-	memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
+	Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
+	std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 }
 
 void AHX::ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset)
@@ -424,7 +496,7 @@ void AHX::ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const si
 
 //~~~Rounds Processing~~~//
 
-void AHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void AHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
@@ -438,7 +510,7 @@ void AHX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesdeclast_si128(X, m_expKey[++keyCtr]));
 }
 
-void AHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void AHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
@@ -448,38 +520,44 @@ void AHX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	Numeric::UInt128 X2(Input, InOffset + 32);
 	Numeric::UInt128 X3(Input, InOffset + 48);
 
-	X0.Register = _mm_xor_si128(X0.Register, m_expKey[keyCtr]);
-	X1.Register = _mm_xor_si128(X1.Register, m_expKey[keyCtr]);
-	X2.Register = _mm_xor_si128(X2.Register, m_expKey[keyCtr]);
-	X3.Register = _mm_xor_si128(X3.Register, m_expKey[keyCtr]);
+	X0.xmm = _mm_xor_si128(X0.xmm, m_expKey[keyCtr]);
+	X1.xmm = _mm_xor_si128(X1.xmm, m_expKey[keyCtr]);
+	X2.xmm = _mm_xor_si128(X2.xmm, m_expKey[keyCtr]);
+	X3.xmm = _mm_xor_si128(X3.xmm, m_expKey[keyCtr]);
 
 	while (keyCtr != LRD)
 	{
-		X0.Register = _mm_aesdec_si128(X0.Register, m_expKey[++keyCtr]);
-		X1.Register = _mm_aesdec_si128(X1.Register, m_expKey[keyCtr]);
-		X2.Register = _mm_aesdec_si128(X2.Register, m_expKey[keyCtr]);
-		X3.Register = _mm_aesdec_si128(X3.Register, m_expKey[keyCtr]);
+		X0.xmm = _mm_aesdec_si128(X0.xmm, m_expKey[++keyCtr]);
+		X1.xmm = _mm_aesdec_si128(X1.xmm, m_expKey[keyCtr]);
+		X2.xmm = _mm_aesdec_si128(X2.xmm, m_expKey[keyCtr]);
+		X3.xmm = _mm_aesdec_si128(X3.xmm, m_expKey[keyCtr]);
 	}
 
-	X0.Register = _mm_aesdeclast_si128(X0.Register, m_expKey[++keyCtr]);
-	X1.Register = _mm_aesdeclast_si128(X1.Register, m_expKey[keyCtr]);
-	X2.Register = _mm_aesdeclast_si128(X2.Register, m_expKey[keyCtr]);
-	X3.Register = _mm_aesdeclast_si128(X3.Register, m_expKey[keyCtr]);
+	X0.xmm = _mm_aesdeclast_si128(X0.xmm, m_expKey[++keyCtr]);
+	X1.xmm = _mm_aesdeclast_si128(X1.xmm, m_expKey[keyCtr]);
+	X2.xmm = _mm_aesdeclast_si128(X2.xmm, m_expKey[keyCtr]);
+	X3.xmm = _mm_aesdeclast_si128(X3.xmm, m_expKey[keyCtr]);
 
-	X0.StoreLE(Output, OutOffset);
-	X1.StoreLE(Output, OutOffset + 16);
-	X2.StoreLE(Output, OutOffset + 32);
-	X3.StoreLE(Output, OutOffset + 48);
+	X0.Store(Output, OutOffset);
+	X1.Store(Output, OutOffset + 16);
+	X2.Store(Output, OutOffset + 32);
+	X3.Store(Output, OutOffset + 48);
 }
 
-void AHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void AHX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	// no aes-ni 256 api.. yet
-	Decrypt64(Input, InOffset, Output, OutOffset);
-	Decrypt64(Input, InOffset + 64, Output, OutOffset + 64);
+	Decrypt512(Input, InOffset, Output, OutOffset);
+	Decrypt512(Input, InOffset + 64, Output, OutOffset + 64);
 }
 
-void AHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void AHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Decrypt1024(Input, InOffset, Output, OutOffset);
+	Decrypt1024(Input, InOffset + 128, Output, OutOffset + 128);
+}
+
+void AHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
@@ -493,7 +571,7 @@ void AHX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesenclast_si128(X, m_expKey[++keyCtr]));
 }
 
-void AHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void AHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t LRD = m_expKey.size() - 2;
 	size_t keyCtr = 0;
@@ -503,34 +581,40 @@ void AHX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::
 	Numeric::UInt128 X2(Input, InOffset + 32);
 	Numeric::UInt128 X3(Input, InOffset + 48);
 
-	X0.Register = _mm_xor_si128(X0.Register, m_expKey[keyCtr]);
-	X1.Register = _mm_xor_si128(X1.Register, m_expKey[keyCtr]);
-	X2.Register = _mm_xor_si128(X2.Register, m_expKey[keyCtr]);
-	X3.Register = _mm_xor_si128(X3.Register, m_expKey[keyCtr]);
+	X0.xmm = _mm_xor_si128(X0.xmm, m_expKey[keyCtr]);
+	X1.xmm = _mm_xor_si128(X1.xmm, m_expKey[keyCtr]);
+	X2.xmm = _mm_xor_si128(X2.xmm, m_expKey[keyCtr]);
+	X3.xmm = _mm_xor_si128(X3.xmm, m_expKey[keyCtr]);
 
 	while (keyCtr != LRD)
 	{
-		X0.Register = _mm_aesenc_si128(X0.Register, m_expKey[++keyCtr]);
-		X1.Register = _mm_aesenc_si128(X1.Register, m_expKey[keyCtr]);
-		X2.Register = _mm_aesenc_si128(X2.Register, m_expKey[keyCtr]);
-		X3.Register = _mm_aesenc_si128(X3.Register, m_expKey[keyCtr]);
+		X0.xmm = _mm_aesenc_si128(X0.xmm, m_expKey[++keyCtr]);
+		X1.xmm = _mm_aesenc_si128(X1.xmm, m_expKey[keyCtr]);
+		X2.xmm = _mm_aesenc_si128(X2.xmm, m_expKey[keyCtr]);
+		X3.xmm = _mm_aesenc_si128(X3.xmm, m_expKey[keyCtr]);
 	}
 
-	X0.Register = _mm_aesenclast_si128(X0.Register, m_expKey[++keyCtr]);
-	X1.Register = _mm_aesenclast_si128(X1.Register, m_expKey[keyCtr]);
-	X2.Register = _mm_aesenclast_si128(X2.Register, m_expKey[keyCtr]);
-	X3.Register = _mm_aesenclast_si128(X3.Register, m_expKey[keyCtr]);
+	X0.xmm = _mm_aesenclast_si128(X0.xmm, m_expKey[++keyCtr]);
+	X1.xmm = _mm_aesenclast_si128(X1.xmm, m_expKey[keyCtr]);
+	X2.xmm = _mm_aesenclast_si128(X2.xmm, m_expKey[keyCtr]);
+	X3.xmm = _mm_aesenclast_si128(X3.xmm, m_expKey[keyCtr]);
 
-	X0.StoreLE(Output, OutOffset);
-	X1.StoreLE(Output, OutOffset + 16);
-	X2.StoreLE(Output, OutOffset + 32);
-	X3.StoreLE(Output, OutOffset + 48);
+	X0.Store(Output, OutOffset);
+	X1.Store(Output, OutOffset + 16);
+	X2.Store(Output, OutOffset + 32);
+	X3.Store(Output, OutOffset + 48);
 }
 
-void AHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void AHX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Encrypt64(Input, InOffset, Output, OutOffset);
-	Encrypt64(Input, InOffset + 64, Output, OutOffset + 64);
+	Encrypt512(Input, InOffset, Output, OutOffset);
+	Encrypt512(Input, InOffset + 64, Output, OutOffset + 64);
+}
+
+void AHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Encrypt1024(Input, InOffset, Output, OutOffset);
+	Encrypt1024(Input, InOffset + 128, Output, OutOffset + 128);
 }
 
 //~~~Helpers~~~//
@@ -553,12 +637,12 @@ void AHX::LoadState(Digests KdfEngineType)
 		m_legalRounds.resize(15);
 		m_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
 		// change: default at ideal size, a full block to key HMAC
-		m_kdfKeySize = DigestFromName::GetBlockSize(m_kdfEngineType);
+		m_kdfKeySize = Helper::DigestFromName::GetBlockSize(m_kdfEngineType);
 		// calculate max saturation of entropy when distribution code is used as key extension; subtract hash finalizer code + 1 byte HKDF counter
-		m_kdfInfoMax = m_kdfKeySize - (DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
+		m_kdfInfoMax = m_kdfKeySize - (Helper::DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
 		m_legalKeySizes.resize(3);
 		// min allowable HMAC key
-		m_legalKeySizes[0] = SymmetricKeySize(DigestFromName::GetDigestSize(m_kdfEngineType), m_blockSize, m_kdfInfoMax);
+		m_legalKeySizes[0] = SymmetricKeySize(Helper::DigestFromName::GetDigestSize(m_kdfEngineType), m_blockSize, m_kdfInfoMax);
 		// best size, no ipad/opad zero byte post-compressed mix in HMAC
 		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, m_blockSize, m_kdfInfoMax);
 		// triggers HKDF Extract

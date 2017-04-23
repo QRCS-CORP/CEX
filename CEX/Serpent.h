@@ -24,6 +24,202 @@
 NAMESPACE_BLOCK
 
 template<typename T>
+void SHX::DecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+{
+#if defined(__AVX__)
+
+	const size_t FNLRND = 4;
+	const size_t INPOFF = T::size();
+	size_t keyCtr = Key.size();
+
+	// input round
+	T R0(Input, InOffset);
+	T R1(Input, InOffset + INPOFF);
+	T R2(Input, InOffset + (INPOFF * 2));
+	T R3(Input, InOffset + (INPOFF * 3));
+	T::Transpose(R0, R1, R2, R3);
+
+	R3 ^= T(Key[--keyCtr]);
+	R2 ^= T(Key[--keyCtr]);
+	R1 ^= T(Key[--keyCtr]);
+	R0 ^= T(Key[--keyCtr]);
+
+	// process 8 round blocks
+	do
+	{
+		Ib7(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib6(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib5(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib4(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib3(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib2(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib1(R0, R1, R2, R3);
+		R3 ^= T(Key[--keyCtr]);
+		R2 ^= T(Key[--keyCtr]);
+		R1 ^= T(Key[--keyCtr]);
+		R0 ^= T(Key[--keyCtr]);
+		InverseTransformW(R0, R1, R2, R3);
+
+		Ib0(R0, R1, R2, R3);
+
+		// skip on last block
+		if (keyCtr != FNLRND)
+		{
+			R3 ^= T(Key[--keyCtr]);
+			R2 ^= T(Key[--keyCtr]);
+			R1 ^= T(Key[--keyCtr]);
+			R0 ^= T(Key[--keyCtr]);
+			InverseTransformW(R0, R1, R2, R3);
+		}
+	} while (keyCtr != FNLRND);
+
+	// last round
+	R3 ^= T(Key[--keyCtr]);
+	R2 ^= T(Key[--keyCtr]);
+	R1 ^= T(Key[--keyCtr]);
+	R0 ^= T(Key[--keyCtr]);
+
+	T::Transpose(R0, R1, R2, R3);
+	R0.Store(Output, OutOffset);
+	R1.Store(Output, OutOffset + INPOFF);
+	R2.Store(Output, OutOffset + (INPOFF * 2));
+	R3.Store(Output, OutOffset + (INPOFF * 3));
+
+#endif
+}
+
+template<typename T>
+void EncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+{
+#if defined(__AVX__)
+
+	const size_t FNLRND = Key.size() - 5;
+	const size_t INPOFF = T::size();
+	int keyCtr = -1;
+
+	// input round
+	T R0(Input, InOffset);
+	T R1(Input, InOffset + INPOFF);
+	T R2(Input, InOffset + (INPOFF * 2));
+	T R3(Input, InOffset + (INPOFF * 3));
+	T::Transpose(R0, R1, R2, R3);
+
+	// process 8 round blocks
+	do
+	{
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb0(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb1(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb2(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb3(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb4(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb5(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb6(R0, R1, R2, R3);
+		LinearTransformW(R0, R1, R2, R3);
+
+		R0 ^= T(Key[++keyCtr]);
+		R1 ^= T(Key[++keyCtr]);
+		R2 ^= T(Key[++keyCtr]);
+		R3 ^= T(Key[++keyCtr]);
+		Sb7(R0, R1, R2, R3);
+
+		// skip on last block
+		if (keyCtr != FNLRND)
+			LinearTransformW(R0, R1, R2, R3);
+	} 
+	while (keyCtr != FNLRND);
+
+	// last round
+	R0 ^= T(Key[++keyCtr]);
+	R1 ^= T(Key[++keyCtr]);
+	R2 ^= T(Key[++keyCtr]);
+	R3 ^= T(Key[++keyCtr]);
+
+	T::Transpose(R0, R1, R2, R3);
+	R0.Store(Output, OutOffset);
+	R1.Store(Output, OutOffset + INPOFF);
+	R2.Store(Output, OutOffset + (INPOFF * 2));
+	R3.Store(Output, OutOffset + (INPOFF * 3));
+
+#endif
+}
+
+template<typename T>
 void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
 	R0 = Utility::IntUtils::RotL32(R0, 13);
@@ -39,7 +235,7 @@ void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 }
 
 template<typename T>
-void LinearTransform64(T &R0, T &R1, T &R2, T &R3)
+void LinearTransformW(T &R0, T &R1, T &R2, T &R3)
 {
 	R0.RotL32(13);
 	R2.RotL32(3);
@@ -69,7 +265,7 @@ void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 }
 
 template<typename T>
-void InverseTransform64(T &R0, T &R1, T &R2, T &R3)
+void InverseTransformW(T &R0, T &R1, T &R2, T &R3)
 {
 	R2.RotR32(22);
 	R0.RotR32(5);

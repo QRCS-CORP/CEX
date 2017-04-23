@@ -1,12 +1,99 @@
 #include "GCM.h"
-#include "ArrayUtils.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MODE
 
-using Utility::ArrayUtils;
-using Utility::IntUtils;
+const std::string GCM::CLASS_NAME("GCM");
+
+//~~~Properties~~~//
+
+
+//~~~Properties~~~//
+
+bool &GCM::AutoIncrement()
+{
+	return m_autoIncrement;
+}
+
+const size_t GCM::BlockSize()
+{
+	return BLOCK_SIZE;
+}
+
+const BlockCiphers GCM::CipherType()
+{
+	return m_cipherType;
+}
+
+IBlockCipher* GCM::Engine()
+{
+	return m_cipherMode.Engine();
+}
+
+const CipherModes GCM::Enumeral()
+{
+	return CipherModes::GCM;
+}
+
+const bool GCM::IsEncryption()
+{
+	return m_isEncryption;
+}
+
+const bool GCM::IsInitialized()
+{
+	return m_isInitialized;
+}
+
+const bool GCM::IsParallel()
+{
+	return m_parallelProfile.IsParallel();
+}
+
+const std::vector<SymmetricKeySize> &GCM::LegalKeySizes()
+{
+	return m_legalKeySizes;
+}
+
+const size_t GCM::MaxTagSize()
+{
+	return BLOCK_SIZE;
+}
+
+const size_t GCM::MinTagSize()
+{
+	return MIN_TAGSIZE;
+}
+
+const std::string &GCM::Name()
+{
+	return CLASS_NAME;
+}
+
+const size_t GCM::ParallelBlockSize()
+{
+	return m_parallelProfile.ParallelBlockSize();
+}
+
+ParallelOptions &GCM::ParallelProfile()
+{
+	return m_cipherMode.ParallelProfile();
+}
+
+bool &GCM::PreserveAD()
+{
+	return m_aadPreserve;
+}
+
+const std::vector<byte> GCM::Tag()
+{
+	if (!m_isFinalized)
+		throw CryptoCipherModeException("GCM:Tag", "The cipher mode has not been finalized!");
+
+	return m_msgTag;
+}
 
 //~~~Constructor~~~//
 
@@ -73,17 +160,12 @@ GCM::~GCM()
 
 void GCM::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	DecryptBlock(Input, 0, Output, 0);
+	Decrypt128(Input, 0, Output, 0);
 }
 
 void GCM::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
-	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
-	m_msgSize += BLOCK_SIZE;
+	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void GCM::Destroy()
@@ -104,12 +186,12 @@ void GCM::Destroy()
 	{
 		m_gcmHash->Reset();
 
-		Utility::ArrayUtils::ClearVector(m_aadData);
-		Utility::ArrayUtils::ClearVector(m_gcmNonce);
-		Utility::ArrayUtils::ClearVector(m_gcmVector);
-		Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-		Utility::ArrayUtils::ClearVector(m_msgTag);
-		Utility::ArrayUtils::ClearVector(m_checkSum);
+		Utility::IntUtils::ClearVector(m_aadData);
+		Utility::IntUtils::ClearVector(m_gcmNonce);
+		Utility::IntUtils::ClearVector(m_gcmVector);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_msgTag);
+		Utility::IntUtils::ClearVector(m_checkSum);
 
 		if (m_destroyEngine)
 		{
@@ -127,28 +209,23 @@ void GCM::Destroy()
 
 void GCM::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	EncryptBlock(Input, 0, Output, 0);
+	Encrypt128(Input, 0, Output, 0);
 }
 
 void GCM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
-
-	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
-	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
-	m_msgSize += BLOCK_SIZE;
+	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void GCM::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length)
 {
 	if (!m_isInitialized)
 		throw CryptoCipherModeException("GCM:Finalize", "The cipher mode has not been initialized!");
-	if (Length < TAG_MINLEN || Length > BLOCK_SIZE)
+	if (Length < MIN_TAGSIZE || Length > BLOCK_SIZE)
 		throw CryptoCipherModeException("GCM:Finalize", "The length must be minimum of 12 and maximum of MAC code size!");
 
 	CalculateMac();
-	memcpy(&Output[Offset], &m_msgTag[0], Length);
+	Utility::MemUtils::Copy<byte>(m_msgTag, 0, Output, Offset, Length);
 }
 
 void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -182,8 +259,8 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 		std::vector<ulong> gKey = //505,807
 		{
-			IntUtils::BytesToBe64(tmpH, 0),
-			IntUtils::BytesToBe64(tmpH, 8)
+			Utility::IntUtils::BeBytesTo64(tmpH, 0),
+			Utility::IntUtils::BeBytesTo64(tmpH, 8)
 		};
 
 		m_gcmHash = new Mac::GHASH(gKey);
@@ -209,15 +286,27 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	m_cipherMode.Initialize(true, Key::Symmetric::SymmetricKey(m_gcmKey, m_gcmVector));
 	std::vector<byte> tmpN(BLOCK_SIZE);
-	m_cipherMode.Transform(tmpN, m_gcmVector);
+	m_cipherMode.Transform(tmpN, 0, m_gcmVector, 0, BLOCK_SIZE);
 
 	if (m_isFinalized)
 	{
-		memset(&m_msgTag[0], (byte)0, m_msgTag.size());
+		Utility::MemUtils::Clear<byte>(m_msgTag, 0, m_msgTag.size());
 		m_isFinalized = false;
 	}
 
 	m_isInitialized = true;
+}
+
+void GCM::ParallelMaxDegree(size_t Degree)
+{
+	if (Degree == 0)
+		throw CryptoCipherModeException("GCM:ParallelMaxDegree", "Parallel degree can not be zero!");
+	if (Degree % 2 != 0)
+		throw CryptoCipherModeException("GCM:ParallelMaxDegree", "Parallel degree must be an even number!");
+	if (Degree > m_parallelProfile.ProcessorCount())
+		throw CryptoCipherModeException("GCM:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+
+	m_parallelProfile.SetMaxDegree(Degree);
 }
 
 void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
@@ -228,41 +317,16 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 		throw CryptoSymmetricCipherException("GCM:SetAssociatedData", "The associated data has already been set!");
 
 	m_aadData.resize(Length);
-	memcpy(&m_aadData[0], &Input[Offset], Length);
+	Utility::MemUtils::Copy<byte>(Input, Offset, m_aadData, 0, Length);
 	m_gcmHash->ProcessSegment(Input, Offset, m_checkSum, Length);
 	m_aadSize = Length;
 	m_aadLoaded = true;
 }
 
-size_t GCM::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	const size_t PRCSZE = IntUtils::Min(Output.size(), Input.size());
-	Transform(Input, 0, Output, 0, PRCSZE);
-	return PRCSZE;
-}
-
-size_t GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	if (m_parallelProfile.IsParallel() && (IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_parallelProfile.ParallelBlockSize()))
-	{
-		Transform(Input, InOffset, Output, OutOffset, m_parallelProfile.ParallelBlockSize());
-		return m_parallelProfile.ParallelBlockSize();
-	}
-	else
-	{
-		if (m_isEncryption)
-			EncryptBlock(Input, InOffset, Output, OutOffset);
-		else
-			DecryptBlock(Input, InOffset, Output, OutOffset);
-
-		return BLOCK_SIZE;
-	}
-}
-
 void GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
 
 	if (m_isEncryption)
 	{
@@ -284,26 +348,26 @@ bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 		throw CryptoCipherModeException("GCM:Verify", "The cipher mode has not been initialized for decryption!");
 	if (!m_isInitialized && !m_isFinalized)
 		throw CryptoCipherModeException("GCM:Verify", "The cipher mode has not been initialized!");
-	if (Length < TAG_MINLEN || Length > BLOCK_SIZE)
+	if (Length < MIN_TAGSIZE || Length > BLOCK_SIZE)
 		throw CryptoCipherModeException("GCM:Verify", "The length must be minimum of 12 and maximum of MAC code size!");
 
 	if (!m_isFinalized)
 		CalculateMac();
 
-	return Utility::ArrayUtils::Compare(m_msgTag, 0, Input, Offset, Length);
+	return Utility::IntUtils::Compare<byte>(m_msgTag, 0, Input, Offset, Length);
 }
 
 void GCM::CalculateMac()
 {
 	m_gcmHash->FinalizeBlock(m_checkSum, m_aadSize, m_msgSize);
-	IntUtils::XORBLK(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
-	memcpy(&m_msgTag[0], &m_checkSum[0], BLOCK_SIZE);
+	Utility::MemUtils::XorBlock<byte>(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
+	Utility::MemUtils::COPY128<byte, byte>(m_checkSum, 0, m_msgTag, 0);
 	Reset();
 
 	if (m_autoIncrement)
 	{
 		std::vector<byte> tmpN = m_gcmNonce;
-		ArrayUtils::IncrementBE8(tmpN);
+		Utility::IntUtils::BeIncrement8(tmpN);
 		std::vector<byte> zero(0);
 		Initialize(m_isEncryption, Key::Symmetric::SymmetricKey(zero, tmpN));
 
@@ -314,12 +378,32 @@ void GCM::CalculateMac()
 	m_isFinalized = true;
 }
 
+void GCM::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+
+	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
+	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
+	m_msgSize += BLOCK_SIZE;
+}
+
+void GCM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+
+	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
+	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
+	m_msgSize += BLOCK_SIZE;
+}
+
 void GCM::Reset()
 {
 	if (!m_aadPreserve)
 	{
 		if (m_aadSize != 0)
-			memset(&m_aadData[0], (byte)0, m_aadData.size());
+			Utility::MemUtils::Clear<byte>(m_aadData, 0, m_aadData.size());
 
 		m_aadLoaded = false;
 		m_aadSize = 0;
@@ -327,8 +411,8 @@ void GCM::Reset()
 
 	m_gcmHash->Reset();
 	m_isInitialized = false;
-	memset(&m_gcmVector[0], (byte)0, m_gcmVector.size());
-	memset(&m_checkSum[0], (byte)0, m_checkSum.size());
+	Utility::MemUtils::Clear<byte>(m_gcmVector, 0, m_gcmVector.size());
+	Utility::MemUtils::Clear<byte>(m_checkSum, 0, m_checkSum.size());
 	m_msgSize = 0;
 }
 

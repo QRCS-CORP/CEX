@@ -5,12 +5,52 @@
 
 NAMESPACE_PROVIDER
 
+const std::string CJP::CLASS_NAME("CJP");
+
+//~~~Properties~~~//
+
+bool &CJP::EnableAccess()
+{ 
+	return m_enableAccess;
+}
+
+bool &CJP::EnableDebias() 
+{ 
+	return m_enableDebias; 
+}
+
+const Enumeration::Providers CJP::Enumeral()
+{
+	return Enumeration::Providers::CJP;
+}
+
+const bool CJP::IsAvailable()
+{
+	return m_isAvailable;
+}
+
+const std::string &CJP::Name()
+{ 
+	return CLASS_NAME; 
+}
+
+uint &CJP::OverSampleRate() 
+{
+	return m_overSampleRate; 
+}
+
+bool &CJP::SecureCache()
+{
+	return m_secureCache;
+}
+
 //~~~Constructor~~~//
 
 CJP::CJP()
 	:
 	m_enableAccess(true),
 	m_enableDebias(true),
+	m_hasTsc(Utility::SysUtils::HasRdtsc()),
 	m_isAvailable(false),
 	m_lastDelta(0),
 	m_lastDelta2(0),
@@ -52,7 +92,7 @@ void CJP::Destroy()
 	{
 		if (m_memState && m_memTotalSize != 0)
 		{
-			memset(m_memState, 0, m_memTotalSize);
+			std::memset(m_memState, 0, m_memTotalSize);
 			free(m_memState);
 			m_memState = 0;
 		}
@@ -114,10 +154,10 @@ uint CJP::Next()
 
 	std::vector<byte> data(sizeof(uint));
 	Generate(data, 0, data.size());
-	uint rnd = 0;
-	memcpy(&rnd, &data[0], sizeof(uint));
+	uint rndNum = 0;
+	Utility::MemUtils::Copy<byte, uint>(data, 0, rndNum, sizeof(uint));
 
-	return rnd;
+	return rndNum;
 }
 
 void CJP::Reset()
@@ -226,12 +266,13 @@ size_t CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 	do
 	{
-		size_t rmd = (Length < RNDSZE) ? Length : RNDSZE;
+		size_t rmdLen = (Length < RNDSZE) ? Length : RNDSZE;
 		Generate64();
-		memcpy(&Output[Offset], &m_rndState, rmd);
-		Length -= rmd;
-		Offset += rmd;
-	} while (Length != 0);
+		Utility::MemUtils::Copy<ulong, byte>(m_rndState, Output, Offset, rmdLen);
+		Length -= rmdLen;
+		Offset += rmdLen;
+	} 
+	while (Length != 0);
 
 	// To be on the safe side, we generate one more round of entropy which we do not give out to the caller. 
 	// That round shall ensure that in case the calling application crashes, memory dumps, pages out, 
@@ -289,7 +330,7 @@ void CJP::Generate64()
 
 ulong CJP::GetTimeStamp()
 {
-	return Utility::SysUtils::TimeStamp();
+	return Utility::SysUtils::TimeStamp(m_hasTsc);
 }
 
 // The heart of the entropy generation process; calculate time deltas and use the CPU jitter in the time deltas.
@@ -320,7 +361,7 @@ void CJP::Prime()
 	if (m_memState != 0 && m_memTotalSize != 0)
 	{
 		m_rndState = 0;
-		memset(m_memState, 0, m_memTotalSize);
+		std::memset(m_memState, 0, m_memTotalSize);
 		free(m_memState);
 		m_memState = 0;
 		m_memPosition = 0;
@@ -331,7 +372,7 @@ void CJP::Prime()
 	}
 
 	m_memState = (byte*)malloc(m_memTotalSize);
-	memset(m_memState, 0, m_memTotalSize);
+	std::memset(m_memState, 0, m_memTotalSize);
 
 	// verify oversampling rate; minimum sampling rate is 1
 	if (m_overSampleRate == 0)
@@ -434,9 +475,9 @@ bool CJP::TimerCheck()
 		ulong delta = 0;
 		ulong folded = 0;
 
-		ulong time = Utility::SysUtils::TimeStamp();
+		ulong time = Utility::SysUtils::TimeStamp(m_hasTsc);
 		FoldTime(time, folded);
-		ulong time2 = Utility::SysUtils::TimeStamp();
+		ulong time2 = Utility::SysUtils::TimeStamp(m_hasTsc);
 
 		// test whether timer works
 		if (time == 0 || time2 == 0)

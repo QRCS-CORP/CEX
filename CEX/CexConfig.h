@@ -1,7 +1,9 @@
 #ifndef _CEX_CEXCONFIG_H
 #define _CEX_CEXCONFIG_H
 
-// some of this file borrowed from crypto++ config.h file and Botan Buildh.in
+#if !defined(__cplusplus) || __cplusplus < 199711L
+#	error compiler is incompatible with this library!
+#endif
 
 // common headers
 #include <cstring>
@@ -16,7 +18,7 @@
 static const int CEX_VERSION_MAJOR = 1; // A1 series
 static const int CEX_VERSION_MINOR = 0;
 static const int CEX_VERSION_PATCH = 1;
-static const int CEX_VERSION_RELEASE = 1;
+static const int CEX_VERSION_RELEASE = 2;
 
 // compiler types; not all will be supported (targets are msvc, mingw, gcc, intel, and clang)
 #if defined(_MSC_VER)
@@ -161,6 +163,8 @@ static const int CEX_VERSION_RELEASE = 1;
 #define GETBITMASK(index, size) (((1 << (size)) - 1) << (index))
 #define READBITSFROM(data, index, size) (((data) & GETBITMASK((index), (size))) >> (index))
 #define WRITEBITSTO(data, index, size, value) ((data) = ((data) & (~GETBITMASK((index), (size)))) | ((value) << (index)))
+#define STR_HELPER(x) #x
+#define TOSTRING(x) STR_HELPER(x)
 
 // define endianess of CPU
 #if !defined(IS_LITTLE_ENDIAN)
@@ -280,7 +284,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #if !(CEX_SECTION_ALIGN16)
 #	if defined(__GNUC__) && !defined(__APPLE__)
 		// the alignment attribute doesn't seem to work without this section attribute when -fdata-sections is turned on
-#		define CEX_SECTION_ALIGN16 __attribute__((section ("CryptoPP_Align16")))
+#		define CEX_SECTION_ALIGN16 __attribute__((section ("CEX_Align16")))
 #	else
 #		define CEX_SECTION_ALIGN16
 #	endif
@@ -388,6 +392,33 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define CEX_HAS_AVX2
 #endif
 
+// TODO: future expansion (if you can test it, I'll add it)
+// links: 
+// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
+// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
+// https://colfaxresearch.com/knl-avx512/
+// 
+// #include <immintrin.h>
+// supported is 1: ex. __AVX512CD__ 1
+//F		__AVX512F__					Foundation
+//CD	__AVX512CD__				Conflict Detection Instructions(CDI)
+//ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
+//PF	__AVX512PF__				Prefetch Instructions(PFI)
+//DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
+//BW	__AVX512BW__				Byte and Word Instructions(BW)
+//VL	__AVX512VL__				Vector Length Extensions(VL)
+//IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
+//VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
+//VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
+//FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
+//VPOPCNT	__AVX512VPOPCNTDQ__		?
+
+#if defined(__AVX512F__) && __AVX512F__ == 1
+#	if !defined(__AVX512__)
+#		define __AVX512__
+#	endif
+#endif
+
 #if defined(CEX_HAS_AVX2)
 #if !defined(CEX_HAS_AVX)
 #		define CEX_HAS_AVX
@@ -432,8 +463,6 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 // enables fast rotation intrinsics
 #define CEX_FASTROTATE_ENABLED
 
-#define TOSTRING(a) #a
-
 // instructs the compiler to skip optimizations on the contained function; closed with CEX_OPTIMIZE_RESUME
 #if defined(CEX_COMPILER_MSC)
 #	define CEX_OPTIMIZE_IGNORE __pragma(optimize("", off))
@@ -466,8 +495,8 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #   define CEXASSERT(condition, message) \
     do { \
         if (! (condition)) { \
-            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
-                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__	\
+                      << " line " << __LINE__ << ": " << message << std::endl;	\
             std::terminate(); \
         } \
     } while (false)
@@ -475,8 +504,21 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #   define CEXASSERT(condition, message) do { } while (false)
 #endif
 
-// prefetch base offset in parallel block calculation
+// TODO: integrate this into parallel profile as multiple of split-channels
+#define CEX_PARALLEL_PROFILE_COMBINED
+#define CEX_PARALLEL_PROFILE_DISTRIBUTED
+
+#if defined(CEX_PARALLEL_PROFILE_COMBINED)
+#	define CEX_PARALLEL_CHANNELS 1
+#else
+#	define CEX_PARALLEL_CHANNELS 8
+#endif
+
+// prefetch base offset used by parallel block calculation
 #define CEX_PREFETCH_BASE size_t = 2048
+// pre-loads tables in rhx and thx into L1 for perfoormance and as a timing attack counter measure
+#define CEX_PREFETCH_RHX_TABLES
+#define CEX_PREFETCH_THX_TABLES
 
 // EOF
 #endif

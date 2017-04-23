@@ -43,13 +43,13 @@ private:
 		return parity;
 	}
 
-	static inline void Mix(ulong &A, ulong &B, uint R)
+	inline static void Mix(ulong &A, ulong &B, uint R)
 	{
 		A += B;
 		B = Utility::IntUtils::RotL64(B, R) ^ A;
 	}
 
-	static inline void Inject(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
+	inline static void Inject(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
 	{
 		B += K1;
 		A += B + K0;

@@ -26,22 +26,22 @@ public:
 	/// <summary>
 	/// Get: Return a copy of the personalization string; can used as an optional source of entropy
 	/// </summary>
-	virtual const std::vector<byte> Info() { return m_info; }
+	const std::vector<byte> Info() override;
 
 	/// <summary>
 	/// Get: Return a copy of the primary key
 	/// </summary>
-	virtual const std::vector<byte> Key() { return m_key; }
+	const std::vector<byte> Key() override;
 
 	/// <summary>
 	/// Get: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
 	/// </summary>
-	virtual const SymmetricKeySize KeySizes() { return m_keySizes; }
+	const SymmetricKeySize KeySizes() override;
 
 	/// <summary>
 	/// Get: Return a copy of the nonce
 	/// </summary>
-	virtual const std::vector<byte> Nonce() { return m_nonce; }
+	const std::vector<byte> Nonce() override;
 
 	//~~~Constructors~~~//
 
@@ -77,7 +77,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~SymmetricKey();
+	~SymmetricKey() override;
 
 	//~~~Public Functions~~~//
 
@@ -99,7 +99,7 @@ public:
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Compare this SymmetricKey instance with another
@@ -108,7 +108,7 @@ public:
 	/// <param name="Obj">SymmetricKey to compare</param>
 	/// 
 	/// <returns>Returns true if equal</returns>
-	virtual bool Equals(ISymmetricKey &Obj);
+	bool Equals(ISymmetricKey &Obj) override;
 
 	/// <summary>
 	/// Serialize a SymmetricKey class.

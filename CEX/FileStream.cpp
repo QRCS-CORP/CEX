@@ -10,6 +10,65 @@
 
 NAMESPACE_IO
 
+const std::string FileStream::CLASS_NAME("FileStream");
+
+//~~~Properties~~~//
+
+const FileStream::FileAccess FileStream::Access() 
+{ 
+	return m_fileAccess; 
+}
+
+const bool FileStream::CanRead() 
+{ 
+	return m_fileAccess != FileAccess::Write; 
+}
+
+const bool FileStream::CanSeek()
+{
+	return true; 
+}
+
+const bool FileStream::CanWrite() 
+{
+	return m_fileAccess != FileAccess::Read; 
+}
+
+const StreamModes FileStream::Enumeral() 
+{
+	return StreamModes::FileStream;
+}
+
+const FileStream::FileModes FileStream::FileMode() 
+{ 
+	return m_fileMode;
+}
+
+std::string FileStream::FileName() 
+{ 
+	return m_fileName; 
+}
+
+const ulong FileStream::Length() 
+{ 
+	return m_fileSize;
+}
+
+const std::string &FileStream::Name()
+{
+	return CLASS_NAME;
+}
+
+const ulong FileStream::Position()
+{ 
+	return m_filePosition;
+}
+
+std::fstream &FileStream::Stream() 
+{
+	return m_fileStream; 
+}
+
 //~~~Constructor~~~//
 
 FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes Mode)
@@ -51,6 +110,7 @@ void FileStream::Close()
 	{
 		if (m_fileWritten != 0)
 			m_fileStream.flush();
+
 		m_fileStream.close();
 		m_fileSize = 0;
 		m_filePosition = 0;
@@ -59,8 +119,7 @@ void FileStream::Close()
 
 void FileStream::CopyTo(IByteStream* Destination)
 {
-	if (m_fileSize == 0)
-		throw CryptoProcessingException("FileStream:CopyTo", "The output array is too short!");
+	CEXASSERT(m_fileSize != 0, "stream is too short");
 
 	Destination->Seek(0, IO::SeekOrigin::Begin);
 
@@ -77,7 +136,8 @@ void FileStream::CopyTo(IByteStream* Destination)
 			Destination->Write(buffer, ctr, CHUNK_SIZE);
 			ctr += CHUNK_SIZE;
 
-		} while (ctr != aln);
+		} 
+		while (ctr != aln);
 
 		if (aln != m_fileSize)
 		{
@@ -120,14 +180,15 @@ ulong FileStream::FileSize(const std::string &FileName)
 
 void FileStream::Flush()
 {
+	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
+
 	if (m_fileStream && m_fileWritten != 0)
 		m_fileStream.flush();
 }
 
 size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (m_fileAccess == FileAccess::Write)
-		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
+	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
 
 	if (Offset + Length > m_fileSize - m_filePosition)
 		Length = m_fileSize - m_filePosition;
@@ -144,15 +205,13 @@ size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 byte FileStream::ReadByte()
 {
-	if (m_fileSize - m_filePosition < 1)
-		throw CryptoProcessingException("FileStream:ReadByte", "The output array is too short!");
-	if (m_fileAccess == FileAccess::Write)
-		throw CryptoProcessingException("FileStream:Write", "The file was opened as write only!");
+	CEXASSERT(m_fileSize - m_filePosition >= 1, "Reached end of file");
+	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
 
 	byte data(1);
-
 	m_fileStream.read((char*)&data, 1);
 	m_filePosition += 1;
+
 	return data;
 }
 
@@ -176,8 +235,7 @@ void FileStream::Seek(ulong Offset, SeekOrigin Origin)
 
 void FileStream::SetLength(ulong Length)
 {
-	if (m_fileAccess == FileAccess::Read)
-		throw CryptoProcessingException("FileStream:SetLength", "The file was opened as read only!");
+	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
 	if (Length < m_fileSize)
 	{
@@ -203,8 +261,7 @@ void FileStream::SetLength(ulong Length)
 
 void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	if (m_fileAccess == FileAccess::Read)
-		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
+	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
 	m_fileStream.write((char*)&Input[Offset], Length);
 	m_filePosition += Length;
@@ -220,8 +277,7 @@ void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Len
 
 void FileStream::WriteByte(byte Value)
 {
-	if (m_fileAccess == FileAccess::Read)
-		throw CryptoProcessingException("FileStream:Write", "The file was opened as read only!");
+	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
 
 	m_fileStream.write((char*)&Value, 1);
 	m_filePosition++;

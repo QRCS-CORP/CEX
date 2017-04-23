@@ -19,6 +19,73 @@ namespace Test
 	{
 	}
 
+	std::string DigestSpeedTest::Run()
+	{
+		using namespace Enumeration;
+
+		try
+		{
+			using Enumeration::Digests;
+
+			OnProgress(std::string("### Message Digest Speed Tests: 10 loops * 100MB ###"));
+
+			OnProgress(std::string("***The sequential Blake 256 digest***"));
+			DigestBlockLoop(Digests::Blake256, MB100);
+			OnProgress(std::string("***The sequential parallel Blake 256 digest***"));
+			DigestBlockLoop(Digests::Blake256, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential Blake 512 digest***"));
+			DigestBlockLoop(Digests::Blake512, MB100);
+			OnProgress(std::string("***The parallel Blake 512 digest***"));
+			DigestBlockLoop(Digests::Blake512, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential Keccak 256 digest***"));
+			DigestBlockLoop(Digests::Keccak256, MB100);
+			OnProgress(std::string("***The parallel Keccak 256 digest***"));
+			DigestBlockLoop(Digests::Keccak256, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential Keccak 512 digest***"));
+			DigestBlockLoop(Digests::Keccak512, MB100);
+			OnProgress(std::string("***The parallel Keccak 512 digest***"));
+			DigestBlockLoop(Digests::Keccak512, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential SHA2 256 digest***"));
+			DigestBlockLoop(Digests::SHA256, MB100);
+			OnProgress(std::string("***The parallel SHA2 256 digest***"));
+			DigestBlockLoop(Digests::SHA256, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential SHA2 512 digest***"));
+			DigestBlockLoop(Digests::SHA512, MB100);
+			OnProgress(std::string("***The parallel SHA2 512 digest***"));
+			DigestBlockLoop(Digests::SHA512, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential Skein 256 digest***"));
+			DigestBlockLoop(Digests::Skein256, MB100);
+			OnProgress(std::string("***The parallel Skein 256 digest***"));
+			DigestBlockLoop(Digests::Skein256, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential Skein 512 digest***"));
+			DigestBlockLoop(Digests::Skein512, MB100);
+			OnProgress(std::string("***The parallel Skein 512 digest***"));
+			DigestBlockLoop(Digests::Skein512, MB100, 10, true);
+
+			OnProgress(std::string("***The sequential Skein 1024 digest***"));
+			DigestBlockLoop(Digests::Skein1024, MB100);
+			OnProgress(std::string("***The parallel Skein 1024 digest***"));
+			DigestBlockLoop(Digests::Skein1024, MB100, 10, true);
+
+			return MESSAGE;
+		}
+		catch (std::exception const &ex)
+		{
+			return FAILURE + " : " + ex.what();
+		}
+		catch (...)
+		{
+			return FAILURE + " : Unknown Error";
+		}
+	}
+
 	void DigestSpeedTest::DigestBlockLoop(Enumeration::Digests DigestType, size_t SampleSize, size_t Loops, bool Parallel)
 	{
 		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType, Parallel);
@@ -40,7 +107,7 @@ namespace Test
 				dgt->Update(buffer, 0, buffer.size());
 				counter += buffer.size();
 			}
-			std::string calc = Utility::IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
+			std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
 			OnProgress(calc);
 		}
 		dgt->Finalize(hash, 0);
@@ -49,9 +116,9 @@ namespace Test
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
 		uint64_t len = Loops * SampleSize;
 		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string glen = Utility::IntUtils::ToString(len / GB1);
-		std::string mbps = Utility::IntUtils::ToString((rate / MB1));
-		std::string secs = Utility::IntUtils::ToString((double)dur / 1000.0);
+		std::string glen = TestUtils::ToString(len / GB1);
+		std::string mbps = TestUtils::ToString((rate / MB1));
+		std::string secs = TestUtils::ToString((double)dur / 1000.0);
 		std::string resp = std::string(glen + "GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
 
 		OnProgress(resp);

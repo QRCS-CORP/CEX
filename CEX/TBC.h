@@ -8,7 +8,7 @@ NAMESPACE_PADDING
 /// <summary>
 /// The Trailing Bit Compliment Padding Scheme.
 /// </summary>
-class TBC : public IPadding
+class TBC final : public IPadding
 {
 private:
 
@@ -16,33 +16,35 @@ private:
 	TBC& operator=(const TBC&) = delete;
 	TBC& operator=(TBC&&) = delete;
 
-	static const byte ZBCODE = (byte)0x00;
+	static const std::string CLASS_NAME;
 	static const byte MKCODE = (byte)0xff;
+	static const byte ZBCODE = (byte)0x00;
 
 public:
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// CTor: Instantiate this class
-	/// </summary>
-	TBC() {}
-
-	/// <summary>
-	/// Destructor
-	/// </summary>
-	virtual ~TBC() {}
 
 	//~~~Properties~~~//
 
 	/// <summary>
 	/// Get: The padding modes type name
 	/// </summary>
-	virtual const PaddingModes Enumeral() { return PaddingModes::TBC; }
+	const PaddingModes Enumeral() override;
 
 	/// <summary>
 	/// Get: The padding modes class name
 	/// </summary>
-	virtual const std::string Name() { return "TBC"; }
+	const std::string &Name() override;
+
+	//~~~Constructor~~~//
+
+	/// <summary>
+	/// CTor: Instantiate this class
+	/// </summary>
+	TBC();
+
+	/// <summary>
+	/// Destructor
+	/// </summary>
+	~TBC() override;
 
 	//~~~Public Functions~~~//
 
@@ -56,7 +58,7 @@ public:
 	/// <returns>Length of padding</returns>
 	///
 	/// <exception cref="Exception::CryptoPaddingException">Thrown if the padding offset value is longer than the array length</exception>
-	virtual size_t AddPadding(std::vector<byte> &Input, size_t Offset);
+	size_t AddPadding(std::vector<byte> &Input, size_t Offset) override;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -65,7 +67,7 @@ public:
 	/// <param name="Input">Padded array of bytes</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual size_t GetPaddingLength(const std::vector<byte> &Input);
+	size_t GetPaddingLength(const std::vector<byte> &Input) override;
 
 	/// <summary>
 	/// Get the length of padding in an array
@@ -75,7 +77,7 @@ public:
 	/// <param name="Offset">Offset into array</param>
 	///
 	/// <returns>Length of padding</returns>
-	virtual size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset);
+	size_t GetPaddingLength(const std::vector<byte> &Input, size_t Offset) override;
 };
 
 NAMESPACE_PADDINGEND

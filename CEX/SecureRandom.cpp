@@ -1,13 +1,10 @@
 #include "SecureRandom.h"
-#include "ArrayUtils.h"
 #include "BitConverter.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_PRNG
-
-using IO::BitConverter;
-using Utility::IntUtils;
 
 //~~~Constructor~~~//
 
@@ -43,7 +40,7 @@ void SecureRandom::Destroy()
 
 		try
 		{
-			Utility::ArrayUtils::ClearVector(m_byteBuffer);
+			Utility::IntUtils::ClearVector(m_byteBuffer);
 
 			if (m_rngGenerator != 0)
 				delete m_rngGenerator;
@@ -72,7 +69,7 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 		size_t bufSize = m_byteBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], bufSize);
+			Utility::MemUtils::Copy<byte>(m_byteBuffer, m_bufferIndex, Output, 0, bufSize);
 
 		size_t rem = Output.size() - bufSize;
 
@@ -83,13 +80,13 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 
 			if (rem > m_byteBuffer.size())
 			{
-				memcpy(&Output[bufSize], &m_byteBuffer[0], m_byteBuffer.size());
+				Utility::MemUtils::Copy<byte>(m_byteBuffer, 0, Output, bufSize, m_byteBuffer.size());
 				bufSize += m_byteBuffer.size();
 				rem -= m_byteBuffer.size();
 			}
 			else
 			{
-				memcpy(&Output[bufSize], &m_byteBuffer[0], rem);
+				Utility::MemUtils::Copy<byte>(m_byteBuffer, 0, Output, bufSize, rem);
 				m_bufferIndex = rem;
 				rem = 0;
 			}
@@ -97,32 +94,30 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 	}
 	else
 	{
-		memcpy(&Output[0], &m_byteBuffer[m_bufferIndex], Output.size());
+		Utility::MemUtils::Copy<byte>(m_byteBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
 
 char SecureRandom::NextChar()
 {
-	int sze = sizeof(char);
-	return BitConverter::ToChar(GetBytes(sze), 0);
+	return IO::BitConverter::ToChar(GetBytes(sizeof(char)), 0);
 }
 
 unsigned char SecureRandom::NextUChar()
 {
-	int sze = sizeof(unsigned char);
-	return BitConverter::ToUChar(GetBytes(sze), 0);
+	return IO::BitConverter::ToUChar(GetBytes(sizeof(unsigned char)), 0);
 }
 
 double SecureRandom::NextDouble()
 {
 	int sze = sizeof(double);
-	return BitConverter::ToDouble(GetBytes(sze), 0);
+	return IO::BitConverter::ToDouble(GetBytes(sizeof(double)), 0);
 }
 
 short SecureRandom::NextInt16()
 {
-	return BitConverter::ToInt16(GetBytes(2), 0);
+	return static_cast<short>(Utility::IntUtils::LeBytesTo16(GetBytes(2), 0));
 }
 
 short SecureRandom::NextInt16(short Maximum)
@@ -133,7 +128,7 @@ short SecureRandom::NextInt16(short Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<short>(rand, 0);
+		num = static_cast<short>(Utility::IntUtils::LeBytesTo16(rand, 0));
 	} 
 	while (num > Maximum);
 
@@ -149,7 +144,7 @@ short SecureRandom::NextInt16(short Minimum, short Maximum)
 
 ushort SecureRandom::NextUInt16()
 {
-	return BitConverter::ToUInt16(GetBytes(2), 0);
+	return Utility::IntUtils::LeBytesTo16(GetBytes(2), 0);
 }
 
 ushort SecureRandom::NextUInt16(ushort Maximum)
@@ -160,7 +155,7 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<ushort>(rand, 0);
+		num = Utility::IntUtils::LeBytesTo16(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -176,12 +171,12 @@ ushort SecureRandom::NextUInt16(ushort Minimum, ushort Maximum)
 
 int SecureRandom::Next()
 {
-	return BitConverter::ToInt32(GetBytes(4), 0);
+	return static_cast<int>(Utility::IntUtils::LeBytesTo32(GetBytes(4), 0));
 }
 
 int SecureRandom::NextInt32()
 {
-	return BitConverter::ToInt32(GetBytes(4), 0);
+	return static_cast<int>(Utility::IntUtils::LeBytesTo32(GetBytes(4), 0));
 }
 
 int SecureRandom::NextInt32(int Maximum)
@@ -192,7 +187,7 @@ int SecureRandom::NextInt32(int Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<int>(rand, 0);
+		num = static_cast<int>(Utility::IntUtils::LeBytesTo32(rand, 0));
 	} 
 	while (num > Maximum);
 
@@ -208,7 +203,7 @@ int SecureRandom::NextInt32(int Minimum, int Maximum)
 
 uint SecureRandom::NextUInt32()
 {
-	return BitConverter::ToUInt32(GetBytes(4), 0);
+	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
 }
 
 uint SecureRandom::NextUInt32(uint Maximum)
@@ -219,7 +214,7 @@ uint SecureRandom::NextUInt32(uint Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<uint>(rand, 0);
+		num = Utility::IntUtils::LeBytesTo32(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -235,12 +230,12 @@ uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
 
 long SecureRandom::NextLong()
 {
-	return BitConverter::ToInt64(GetBytes(8), 0);
+	return static_cast<long>(Utility::IntUtils::LeBytesTo64(GetBytes(8), 0));
 }
 
 long SecureRandom::NextInt64()
 {
-	return BitConverter::ToInt64(GetBytes(8), 0);
+	return static_cast<long>(Utility::IntUtils::LeBytesTo64(GetBytes(8), 0));
 }
 
 long SecureRandom::NextInt64(long Maximum)
@@ -251,7 +246,7 @@ long SecureRandom::NextInt64(long Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<long>(rand, 0);
+		num = static_cast<long>(Utility::IntUtils::LeBytesTo64(rand, 0));
 	} 
 	while (num > Maximum);
 
@@ -267,7 +262,7 @@ long SecureRandom::NextInt64(long Minimum, long Maximum)
 
 ulong SecureRandom::NextUInt64()
 {
-	return BitConverter::ToUInt64(GetBytes(8), 0);
+	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
 }
 
 ulong SecureRandom::NextUInt64(ulong Maximum)
@@ -278,7 +273,7 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<ulong>(rand, 0);
+		num = Utility::IntUtils::LeBytesTo64(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -327,7 +322,8 @@ std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
 
 std::vector<byte> SecureRandom::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
-	ulong val = IntUtils::BytesToLe<ulong>(Data, 0);
+	ulong val = 0;
+	Utility::MemUtils::Copy<byte, ulong>(Data, 0, val, Data.size());
 	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
@@ -335,8 +331,9 @@ std::vector<byte> SecureRandom::GetBits(std::vector<byte> &Data, ulong Maximum)
 		val >>= 1;
 		bits--;
 	}
+	std::vector<byte> ret(sizeof(ulong));
+	Utility::MemUtils::Copy<ulong, byte>(val, ret, 0, sizeof(ulong));
 
-	std::vector<byte> ret = IntUtils::LeToBytes<ulong>(val, Data.size());
 	return ret;
 }
 

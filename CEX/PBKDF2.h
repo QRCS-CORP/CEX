@@ -21,6 +21,7 @@
 // An implementation of Passphrase Based Key Derivation Function 2 (PBKDF2).
 // Written by John Underhill, September 24, 2014
 // Updated September 22, 2016
+// Updated April 19, 2017
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_PBKDF2_H
@@ -36,7 +37,6 @@ NAMESPACE_KDF
 using Enumeration::Digests;
 using Digest::IDigest;
 using Mac::HMAC;
-
 
 /// <summary>
 /// An implementation of the Passphrase Based Key Derivation Version 2 (PBKDF2)
@@ -96,6 +96,7 @@ class PBKDF2 : public IKdf
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const size_t MIN_PASSLEN = 4;
 	static const size_t MIN_SALTLEN = 4;
 
@@ -124,28 +125,28 @@ public:
 	/// <summary>
 	/// Get: The Kdf generators type name
 	/// </summary>
-	virtual const Kdfs Enumeral() { return Kdfs::PBKDF2; }
+	const Kdfs Enumeral() override;
 
 	/// <summary>
 	/// Get: Generator is ready to produce random
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Available Kdf Key Sizes in bytes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; };
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	virtual size_t MinKeySize() { return m_macSize; }
+	size_t MinKeySize() override;
 
 	/// <summary>
 	/// Get: The Kdf generators class name
 	/// </summary>
-	virtual const std::string Name() { return "PBKDF2"; }
+	const std::string &Name() override;
 
 	//~~~Constructor~~~//
 
@@ -182,14 +183,14 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~PBKDF2();
+	~PBKDF2() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -198,7 +199,7 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
-	virtual size_t Generate(std::vector<byte> &Output);
+	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Generate pseudo random bytes using offset and length parameters
@@ -209,7 +210,7 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
-	virtual size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
 	/// Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string.
@@ -217,7 +218,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
-	virtual void Initialize(ISymmetricKey &GenParam);
+	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
 	/// Initialize the generator with a key (password).
@@ -228,7 +229,7 @@ public:
 	/// <para>The minimum passphrase size is 4 bytes.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
-	virtual void Initialize(const std::vector<byte> &Key);
+	void Initialize(const std::vector<byte> &Key) override;
 
 	/// <summary>
 	/// Initialize the generator with key and salt arrays
@@ -236,7 +237,7 @@ public:
 	/// 
 	/// <param name="Key">The primary key (password) array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
-	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt);
+	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
 	/// Initialize the generator with a key, a salt array, and an information string or nonce
@@ -245,7 +246,7 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
-	virtual void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info);
+	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
 
 	/// <summary>
 	/// Update the generators salt array.
@@ -255,12 +256,12 @@ public:
 	/// <param name="Seed">The new seed value array</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
-	virtual void ReSeed(const std::vector<byte> &Seed);
+	void ReSeed(const std::vector<byte> &Seed) override;
 
 	/// <summary>
 	/// Reset the internal state; Kdf must be re-initialized before it can be used again
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 private:
 

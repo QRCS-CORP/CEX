@@ -1,32 +1,98 @@
 #include "THX.h"
 #include "Twofish.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "IntUtils.h"
-#include "UInt128.h"
-#include "UInt256.h"
+#include "MemUtils.h"
+#if defined(CEX_COMPILER_MSC)
+#	if defined(__AVX512__)
+#		include "UInt512.h"
+#	elif defined(__AVX2__)
+#		include "UInt256.h"
+#	elif defined(__AVX__)
+#		include "UInt128.h"
+#	endif
+#endif
 
 NAMESPACE_BLOCK
 
-using Helper::DigestFromName;
-using Utility::IntUtils;
-using Numeric::UInt128;
-using Numeric::UInt256;
+const std::string THX::CLASS_NAME("THX");
+const std::string THX::DEF_DSTINFO("THX version 1 information string");
 
-const std::string THX::DEF_INFO = "THX version 1 information string";
+//~~~Properties~~~//
+
+const size_t THX::BlockSize()
+{
+	return BLOCK_SIZE;
+}
+
+std::vector<byte> &THX::DistributionCode()
+{
+	return m_kdfInfo;
+}
+
+const size_t THX::DistributionCodeMax()
+{
+	return m_kdfInfoMax;
+}
+
+const BlockCiphers THX::Enumeral()
+{
+	return (m_kdfEngineType == Digests::None) ? BlockCiphers::Twofish : BlockCiphers::THX;
+}
+
+const bool THX::IsEncryption()
+{
+	return m_isEncryption;
+}
+
+const bool THX::IsInitialized()
+{
+	return m_isInitialized;
+}
+
+const Digests THX::KdfEngine()
+{
+	return m_kdfEngineType;
+}
+
+const std::vector<SymmetricKeySize> &THX::LegalKeySizes()
+{
+	return m_legalKeySizes;
+}
+
+const std::vector<size_t> &THX::LegalRounds()
+{
+	return m_legalRounds;
+}
+
+const std::string &THX::Name()
+{
+	return CLASS_NAME;
+}
+
+const size_t THX::Rounds()
+{
+	return m_rndCount;
+}
+
+const size_t THX::StateCacheSize()
+{
+	return STATE_PRECACHED;
+}
 
 //~~~Constructor~~~//
 
 THX::THX(Digests KdfEngineType, uint Rounds)
 	:
 	m_destroyEngine(true),
+	m_expKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(KdfEngineType == Digests::None ? 0 : DigestFromName::GetInstance(KdfEngineType)),
+	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
 	m_kdfEngineType(KdfEngineType),
-	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_kdfInfoMax(0),
 	m_kdfKeySize(0),
 	m_legalKeySizes(0),
@@ -43,12 +109,13 @@ THX::THX(Digests KdfEngineType, uint Rounds)
 THX::THX(IDigest *KdfEngine, size_t Rounds)
 	:
 	m_destroyEngine(false),
+	m_expKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_kdfEngine(KdfEngine),
 	m_kdfEngineType(m_kdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
-	m_kdfInfo(DEF_INFO.begin(), DEF_INFO.end()),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_kdfInfoMax(0),
 	m_kdfKeySize(0),
 	m_legalKeySizes(0),
@@ -71,12 +138,22 @@ THX::~THX()
 
 void THX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	Decrypt16(Input, 0, Output, 0);
+	Decrypt128(Input, 0, Output, 0);
 }
 
 void THX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	Decrypt16(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset, Output, OutOffset);
+}
+
+void THX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
+{
+	Encrypt128(Input, 0, Output, 0);
+}
+
+void THX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
 void THX::Destroy()
@@ -93,11 +170,11 @@ void THX::Destroy()
 
 		try
 		{
-			Utility::ArrayUtils::ClearVector(m_expKey);
-			Utility::ArrayUtils::ClearVector(m_sBox);
-			Utility::ArrayUtils::ClearVector(m_kdfInfo);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_legalRounds);
+			Utility::IntUtils::ClearVector(m_expKey);
+			Utility::IntUtils::ClearVector(m_sBox);
+			Utility::IntUtils::ClearVector(m_kdfInfo);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_legalRounds);
 
 			if (m_kdfEngine != 0 && m_destroyEngine)
 				delete m_kdfEngine;
@@ -110,16 +187,6 @@ void THX::Destroy()
 		}
 
 	}
-}
-
-void THX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
-{
-	Encrypt16(Input, 0, Output, 0);
-}
-
-void THX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	Encrypt16(Input, InOffset, Output, OutOffset);
 }
 
 void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -136,6 +203,10 @@ void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	// expand the key
 	ExpandKey(KeyParams.Key());
 
+	// load tables into L1
+#if defined(CEX_PREFETCH_THX_TABLES)
+	Prefetch();
+#endif
 	// ready to transform data
 	m_isInitialized = true;
 }
@@ -143,33 +214,41 @@ void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 void THX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (m_isEncryption)
-		EncryptBlock(Input, Output);
+		Encrypt128(Input, 0, Output, 0);
 	else
-		DecryptBlock(Input, Output);
+		Decrypt128(Input, 0, Output, 0);
 }
 
 void THX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
-		EncryptBlock(Input, InOffset, Output, OutOffset);
-	else
-		DecryptBlock(Input, InOffset, Output, OutOffset);
-}
-
-void THX::Transform64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	if (m_isEncryption)
-		Encrypt64(Input, InOffset, Output, OutOffset);
-	else
-		Decrypt64(Input, InOffset, Output, OutOffset);
-}
-
-void THX::Transform128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
-{
-	if (m_isEncryption)
 		Encrypt128(Input, InOffset, Output, OutOffset);
 	else
 		Decrypt128(Input, InOffset, Output, OutOffset);
+}
+
+void THX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt512(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt512(Input, InOffset, Output, OutOffset);
+}
+
+void THX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt1024(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt1024(Input, InOffset, Output, OutOffset);
+}
+
+void THX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	if (m_isEncryption)
+		Encrypt2048(Input, InOffset, Output, OutOffset);
+	else
+		Decrypt2048(Input, InOffset, Output, OutOffset);
 }
 
 //~~~Key Schedule~~~//
@@ -212,10 +291,10 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 		// seperate salt and key
 		m_kdfKeySize = m_kdfEngine->BlockSize();
 		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		memcpy(&kdfKey[0], &Key[0], m_kdfKeySize);
+		Utility::MemUtils::Copy<byte>(Key, 0, kdfKey, 0, m_kdfKeySize);
 		size_t saltSize = Key.size() - m_kdfKeySize;
 		std::vector<byte> kdfSalt(saltSize, 0);
-		memcpy(&kdfSalt[0], &Key[m_kdfKeySize], saltSize);
+		Utility::MemUtils::Copy<byte>(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
 		// info can be null
 		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
 	}
@@ -234,18 +313,18 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 	m_expKey.resize(keySize, 0);
 	// copy bytes to working key
 	for (size_t i = 0; i < wK.size(); ++i)
-		wK[i] = IntUtils::BytesToLe32(rawKey, i * sizeof(uint));
+		wK[i] = Utility::IntUtils::LeBytesTo32(rawKey, i * sizeof(uint));
 
 	// sbox encoding steps
 	for (uint i = 0; i < k64Cnt; i++)
 	{
 		// round key material
-		eKm[i] = IntUtils::BytesToLe32(rawKey, keyCtr);
+		eKm[i] = Utility::IntUtils::LeBytesTo32(rawKey, keyCtr);
 		keyCtr += 4;
-		oKm[i] = IntUtils::BytesToLe32(rawKey, keyCtr);
+		oKm[i] = Utility::IntUtils::LeBytesTo32(rawKey, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		Utility::IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	keyCtr = 0;
@@ -281,12 +360,12 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 	for (size_t i = 0; i < k64Cnt; ++i)
 	{
 		// round key material
-		eKm[i] = IntUtils::BytesToLe32(Key, keyCtr);
+		eKm[i] = Utility::IntUtils::LeBytesTo32(Key, keyCtr);
 		keyCtr += 4;
-		oKm[i] = IntUtils::BytesToLe32(Key, keyCtr);
+		oKm[i] = Utility::IntUtils::LeBytesTo32(Key, keyCtr);
 		keyCtr += 4;
 		// sbox key material
-		IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		Utility::IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
 	}
 
 	// gen s-box members
@@ -321,14 +400,14 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 
 //~~~Rounds Processing~~~//
 
-void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = 8;
+	const size_t FNLRND = 8;
 	size_t keyCtr = 4;
-	uint X2 = IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X3 = IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X0 = IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X1 = IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X2 = Utility::IntUtils::LeBytesTo32(Input, InOffset) ^ m_expKey[keyCtr];
+	uint X3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
+	uint X0 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
+	uint X1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = m_expKey.size();
@@ -348,153 +427,86 @@ void THX::Decrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 		X2 ^= (T0 + T1 + m_expKey[--keyCtr]);
 		X3 = (X3 >> 1) | (X3 << 31);
 	} 
-	while (keyCtr != LRD);
+	while (keyCtr != FNLRND);
 
 	keyCtr = 0;
-	IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
-	IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
-	IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
-	IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
+	Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
+	Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
+	Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
+	Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
 }
 
-void THX::Decrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void THX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(__AVX__)
-
-	const size_t LRD = 8;
-	size_t keyCtr = 4;
-
-	// input round
-	UInt128 X2(Input, InOffset);
-	UInt128 X3(Input, InOffset + 16);
-	UInt128 X0(Input, InOffset + 32);
-	UInt128 X1(Input, InOffset + 48);
-	UInt128::Transpose(X2, X3, X0, X1);
-	UInt128 T0, T1;
-	UInt128 N2(2);
-
-	X2 ^= UInt128(m_expKey[keyCtr]);
-	X3 ^= UInt128(m_expKey[++keyCtr]);
-	X0 ^= UInt128(m_expKey[++keyCtr]);
-	X1 ^= UInt128(m_expKey[++keyCtr]);
-
-	keyCtr = m_expKey.size();
-	do
-	{
-		T0 = I4Fe0(X2, m_sBox);
-		T1 = I4Fe3(X3, m_sBox);
-		X1 ^= T0 + N2 * T1 + UInt128(m_expKey[--keyCtr]);
-		X0 = (X0 << 1) | (X0 >> 31);
-		X0 ^= (T0 + T1 + UInt128(m_expKey[--keyCtr]));
-		X1 = (X1 >> 1) | (X1 << 31);
-
-		T0 = I4Fe0(X0, m_sBox);
-		T1 = I4Fe3(X1, m_sBox);
-		X3 ^= T0 + N2 * T1 + UInt128(m_expKey[--keyCtr]);
-		X2 = (X2 << 1) | (X2 >> 31);
-		X2 ^= (T0 + T1 + UInt128(m_expKey[--keyCtr]));
-		X3 = (X3 >> 1) | (X3 << 31);
-	} 
-	while (keyCtr != LRD);
-
-	// last round
-	keyCtr = 0;
-	X0 ^= UInt128(m_expKey[keyCtr]);
-	X1 ^= UInt128(m_expKey[++keyCtr]);
-	X2 ^= UInt128(m_expKey[++keyCtr]);
-	X3 ^= UInt128(m_expKey[++keyCtr]);
-
-	UInt128::Transpose(X0, X1, X2, X3);
-	X0.StoreLE(Output, OutOffset);
-	X1.StoreLE(Output, OutOffset + 16);
-	X2.StoreLE(Output, OutOffset + 32);
-	X3.StoreLE(Output, OutOffset + 48);
-
+#if !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 #else
-
-	Decrypt16(Input, InOffset, Output, OutOffset);
-	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-
+	Decrypt128(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt128(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt128(Input, InOffset + 48, Output, OutOffset + 48);
 #endif
 }
 
-void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void THX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(__AVX2__)
-
-	const size_t LRD = 8;
-	size_t keyCtr = 4;
-
-	// input round
-	UInt256 X2(Input, InOffset);
-	UInt256 X3(Input, InOffset + 32);
-	UInt256 X0(Input, InOffset + 64);
-	UInt256 X1(Input, InOffset + 96);
-	UInt256::Transpose(X2, X3, X0, X1);
-	UInt256 T0, T1;
-	UInt256 N2(2);
-
-	X2 ^= UInt256(m_expKey[keyCtr]);
-	X3 ^= UInt256(m_expKey[++keyCtr]);
-	X0 ^= UInt256(m_expKey[++keyCtr]);
-	X1 ^= UInt256(m_expKey[++keyCtr]);
-
-	keyCtr = m_expKey.size();
-	do
-	{
-		T0 = I8Fe0(X2, m_sBox);
-		T1 = I8Fe3(X3, m_sBox);
-		X1 ^= T0 + N2 * T1 + UInt256(m_expKey[--keyCtr]);
-		X0 = (X0 << 1) | (X0 >> 31);
-		X0 ^= (T0 + T1 + UInt256(m_expKey[--keyCtr]));
-		X1 = (X1 >> 1) | (X1 << 31);
-
-		T0 = I8Fe0(X0, m_sBox);
-		T1 = I8Fe3(X1, m_sBox);
-		X3 ^= T0 + N2 * T1 + UInt256(m_expKey[--keyCtr]);
-		X2 = (X2 << 1) | (X2 >> 31);
-		X2 ^= (T0 + T1 + UInt256(m_expKey[--keyCtr]));
-		X3 = (X3 >> 1) | (X3 << 31);
-	} 
-	while (keyCtr != LRD);
-
-	// last round
-	keyCtr = 0;
-	X0 ^= UInt256(m_expKey[keyCtr]);
-	X1 ^= UInt256(m_expKey[++keyCtr]);
-	X2 ^= UInt256(m_expKey[++keyCtr]);
-	X3 ^= UInt256(m_expKey[++keyCtr]);
-
-	UInt256::Transpose(X0, X1, X2, X3);
-	X0.StoreLE(Output, OutOffset);
-	X1.StoreLE(Output, OutOffset + 32);
-	X2.StoreLE(Output, OutOffset + 64);
-	X3.StoreLE(Output, OutOffset + 96);
-
+#if !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
 #else
-
-	Decrypt16(Input, InOffset, Output, OutOffset);
-	Decrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Decrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Decrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-	Decrypt16(Input, InOffset + 64, Output, OutOffset + 64);
-	Decrypt16(Input, InOffset + 80, Output, OutOffset + 80);
-	Decrypt16(Input, InOffset + 96, Output, OutOffset + 96);
-	Decrypt16(Input, InOffset + 112, Output, OutOffset + 112);
-
+	Decrypt128(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt128(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt128(Input, InOffset + 48, Output, OutOffset + 48);
+	Decrypt128(Input, InOffset + 64, Output, OutOffset + 64);
+	Decrypt128(Input, InOffset + 80, Output, OutOffset + 80);
+	Decrypt128(Input, InOffset + 96, Output, OutOffset + 96);
+	Decrypt128(Input, InOffset + 112, Output, OutOffset + 112);
 #endif
 }
 
-void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void THX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = m_expKey.size() - 1;
+#if defined(__AVX512__) && defined(CEX_COMPILER_MSC)
+	DecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+#elif !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+	DecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
+#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
+	DecryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey, m_sBox);
+#else
+	Decrypt128(Input, InOffset, Output, OutOffset);
+	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+	Decrypt128(Input, InOffset + 32, Output, OutOffset + 32);
+	Decrypt128(Input, InOffset + 48, Output, OutOffset + 48);
+	Decrypt128(Input, InOffset + 64, Output, OutOffset + 64);
+	Decrypt128(Input, InOffset + 80, Output, OutOffset + 80);
+	Decrypt128(Input, InOffset + 96, Output, OutOffset + 96);
+	Decrypt128(Input, InOffset + 112, Output, OutOffset + 112);
+	Decrypt128(Input, InOffset + 128, Output, OutOffset + 128);
+	Decrypt128(Input, InOffset + 144, Output, OutOffset + 144);
+	Decrypt128(Input, InOffset + 160, Output, OutOffset + 160);
+	Decrypt128(Input, InOffset + 176, Output, OutOffset + 176);
+	Decrypt128(Input, InOffset + 192, Output, OutOffset + 192);
+	Decrypt128(Input, InOffset + 208, Output, OutOffset + 208);
+	Decrypt128(Input, InOffset + 224, Output, OutOffset + 224);
+	Decrypt128(Input, InOffset + 240, Output, OutOffset + 240);
+#endif
+}
+
+void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+	const size_t FNLRND = m_expKey.size() - 1;
 	size_t keyCtr = 0;
-	uint X0 = IntUtils::BytesToLe32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X1 = IntUtils::BytesToLe32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X2 = IntUtils::BytesToLe32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X3 = IntUtils::BytesToLe32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X0 = Utility::IntUtils::LeBytesTo32(Input, InOffset) ^ m_expKey[keyCtr];
+	uint X1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
+	uint X2 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
+	uint X3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
 	uint T0, T1;
 
 	keyCtr = 7;
@@ -514,7 +526,7 @@ void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 		X1 = (X1 << 1) | (X1 >> 31);
 		X1 ^= (T0 + 2 * T1 + m_expKey[++keyCtr]);
 	} 
-	while (keyCtr != LRD);
+	while (keyCtr != FNLRND);
 
 	keyCtr = 4;
 	X2 ^= m_expKey[keyCtr];
@@ -522,139 +534,72 @@ void THX::Encrypt16(const std::vector<byte> &Input, const size_t InOffset, std::
 	X0 ^= m_expKey[++keyCtr];
 	X1 ^= m_expKey[++keyCtr];
 
-	IntUtils::Le32ToBytes(X2, Output, OutOffset);
-	IntUtils::Le32ToBytes(X3, Output, OutOffset + 4);
-	IntUtils::Le32ToBytes(X0, Output, OutOffset + 8);
-	IntUtils::Le32ToBytes(X1, Output, OutOffset + 12);
+	Utility::IntUtils::Le32ToBytes(X2, Output, OutOffset);
+	Utility::IntUtils::Le32ToBytes(X3, Output, OutOffset + 4);
+	Utility::IntUtils::Le32ToBytes(X0, Output, OutOffset + 8);
+	Utility::IntUtils::Le32ToBytes(X1, Output, OutOffset + 12);
 }
 
-void THX::Encrypt64(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void THX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(__AVX__)
-
-	const size_t LRD = m_expKey.size() - 1;
-	size_t keyCtr = 0;
-
-	// input round
-	UInt128 X0(Input, InOffset);
-	UInt128 X1(Input, InOffset + 16);
-	UInt128 X2(Input, InOffset + 32);
-	UInt128 X3(Input, InOffset + 48);
-	UInt128::Transpose(X0, X1, X2, X3);
-	UInt128 T0, T1;
-	UInt128 N2(2);
-
-	X0 ^= UInt128(m_expKey[keyCtr]);
-	X1 ^= UInt128(m_expKey[++keyCtr]);
-	X2 ^= UInt128(m_expKey[++keyCtr]);
-	X3 ^= UInt128(m_expKey[++keyCtr]);
-	
-	keyCtr = 7;
-	do
-	{
-		T0 = I4Fe0(X0, m_sBox);
-		T1 = I4Fe3(X1, m_sBox);
-		X2 ^= T0 + T1 + UInt128(m_expKey[++keyCtr]);
-		X2 = (X2 >> 1) | (X2 << 31);
-		X3 = (X3 << 1) | (X3 >> 31);
-		X3 ^= (T0 + N2 * T1 + UInt128(m_expKey[++keyCtr]));
-
-		T0 = I4Fe0(X2, m_sBox);
-		T1 = I4Fe3(X3, m_sBox);
-		X0 ^= T0 + T1 + UInt128(m_expKey[++keyCtr]);
-		X0 = (X0 >> 1) | (X0 << 31);
-		X1 = ((X1 << 1) | (X1 >> 31));
-		X1 ^= (T0 + N2 * T1 + UInt128(m_expKey[++keyCtr]));
-	} 
-	while (keyCtr != LRD);
-
-	// last round
-	keyCtr = 4;
-	X2 ^= UInt128(m_expKey[keyCtr]);
-	X3 ^= UInt128(m_expKey[++keyCtr]);
-	X0 ^= UInt128(m_expKey[++keyCtr]);
-	X1 ^= UInt128(m_expKey[++keyCtr]);
-
-	UInt128::Transpose(X2, X3, X0, X1);
-	X2.StoreLE(Output, OutOffset);
-	X3.StoreLE(Output, OutOffset + 16);
-	X0.StoreLE(Output, OutOffset + 32);
-	X1.StoreLE(Output, OutOffset + 48);
-
+#if !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 #else
-
-	Encrypt16(Input, InOffset, Output, OutOffset);
-	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-
+	Encrypt128(Input, InOffset, Output, OutOffset);
+	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt128(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt128(Input, InOffset + 48, Output, OutOffset + 48);
 #endif
 }
 
-void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+void THX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if defined(__AVX2__)
-
-	const size_t LRD = m_expKey.size() - 1;
-	size_t keyCtr = 0;
-
-	// input round
-	UInt256 X0(Input, InOffset);
-	UInt256 X1(Input, InOffset + 32);
-	UInt256 X2(Input, InOffset + 64);
-	UInt256 X3(Input, InOffset + 96);
-	UInt256::Transpose(X0, X1, X2, X3);
-	UInt256 T0, T1;
-	UInt256 N2(2);
-
-	X0 ^= UInt256(m_expKey[keyCtr]);
-	X1 ^= UInt256(m_expKey[++keyCtr]);
-	X2 ^= UInt256(m_expKey[++keyCtr]);
-	X3 ^= UInt256(m_expKey[++keyCtr]);
-
-	keyCtr = 7;
-	do
-	{
-		T0 = I8Fe0(X0, m_sBox);
-		T1 = I8Fe3(X1, m_sBox);
-		X2 ^= T0 + T1 + UInt256(m_expKey[++keyCtr]);
-		X2 = (X2 >> 1) | (X2 << 31);
-		X3 = (X3 << 1) | (X3 >> 31);
-		X3 ^= (T0 + N2 * T1 + UInt256(m_expKey[++keyCtr]));
-
-		T0 = I8Fe0(X2, m_sBox);
-		T1 = I8Fe3(X3, m_sBox);
-		X0 ^= T0 + T1 + UInt256(m_expKey[++keyCtr]);
-		X0 = (X0 >> 1) | (X0 << 31);
-		X1 = ((X1 << 1) | (X1 >> 31));
-		X1 ^= (T0 + N2 * T1 + UInt256(m_expKey[++keyCtr]));
-	} 
-	while (keyCtr != LRD);
-
-	// last round
-	keyCtr = 4;
-	X2 ^= UInt256(m_expKey[keyCtr]);
-	X3 ^= UInt256(m_expKey[++keyCtr]);
-	X0 ^= UInt256(m_expKey[++keyCtr]);
-	X1 ^= UInt256(m_expKey[++keyCtr]);
-
-	UInt256::Transpose(X2, X3, X0, X1);
-	X2.StoreLE(Output, OutOffset);
-	X3.StoreLE(Output, OutOffset + 32);
-	X0.StoreLE(Output, OutOffset + 64);
-	X1.StoreLE(Output, OutOffset + 96);
-
+#if !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
 #else
+	Encrypt128(Input, InOffset, Output, OutOffset);
+	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt128(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt128(Input, InOffset + 48, Output, OutOffset + 48);
+	Encrypt128(Input, InOffset + 64, Output, OutOffset + 64);
+	Encrypt128(Input, InOffset + 80, Output, OutOffset + 80);
+	Encrypt128(Input, InOffset + 96, Output, OutOffset + 96);
+	Encrypt128(Input, InOffset + 112, Output, OutOffset + 112);
+#endif
+}
 
-	Encrypt16(Input, InOffset, Output, OutOffset);
-	Encrypt16(Input, InOffset + 16, Output, OutOffset + 16);
-	Encrypt16(Input, InOffset + 32, Output, OutOffset + 32);
-	Encrypt16(Input, InOffset + 48, Output, OutOffset + 48);
-	Encrypt16(Input, InOffset + 64, Output, OutOffset + 64);
-	Encrypt16(Input, InOffset + 80, Output, OutOffset + 80);
-	Encrypt16(Input, InOffset + 96, Output, OutOffset + 96);
-	Encrypt16(Input, InOffset + 112, Output, OutOffset + 112);
-
+void THX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
+{
+#if defined(__AVX512__) && defined(CEX_COMPILER_MSC)
+	EncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+#elif !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+	EncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
+#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
+	EncryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey, m_sBox);
+#else
+	Encrypt128(Input, InOffset, Output, OutOffset);
+	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
+	Encrypt128(Input, InOffset + 32, Output, OutOffset + 32);
+	Encrypt128(Input, InOffset + 48, Output, OutOffset + 48);
+	Encrypt128(Input, InOffset + 64, Output, OutOffset + 64);
+	Encrypt128(Input, InOffset + 80, Output, OutOffset + 80);
+	Encrypt128(Input, InOffset + 96, Output, OutOffset + 96);
+	Encrypt128(Input, InOffset + 112, Output, OutOffset + 112);
+	Encrypt128(Input, InOffset + 128, Output, OutOffset + 128);
+	Encrypt128(Input, InOffset + 144, Output, OutOffset + 144);
+	Encrypt128(Input, InOffset + 160, Output, OutOffset + 160);
+	Encrypt128(Input, InOffset + 176, Output, OutOffset + 176);
+	Encrypt128(Input, InOffset + 192, Output, OutOffset + 192);
+	Encrypt128(Input, InOffset + 208, Output, OutOffset + 208);
+	Encrypt128(Input, InOffset + 224, Output, OutOffset + 224);
+	Encrypt128(Input, InOffset + 240, Output, OutOffset + 240);
 #endif
 }
 
@@ -679,12 +624,12 @@ void THX::LoadState(Digests ExtractorType)
 		m_legalRounds = { 16, 18, 20, 22, 24, 26, 28, 30, 32 };
 
 		// change: default at ideal size, a full block to key HMAC
-		m_kdfKeySize = DigestFromName::GetBlockSize(m_kdfEngineType);
+		m_kdfKeySize = Helper::DigestFromName::GetBlockSize(m_kdfEngineType);
 		// calculate max saturation of entropy when distribution code is used as key extension; subtract hash finalizer code + 1 byte HKDF counter
-		m_kdfInfoMax = m_kdfKeySize - (DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
+		m_kdfInfoMax = m_kdfKeySize - (Helper::DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
 		m_legalKeySizes.resize(3);
 		// min allowable HMAC key
-		m_legalKeySizes[0] = SymmetricKeySize(DigestFromName::GetDigestSize(m_kdfEngineType), BLOCK_SIZE, m_kdfInfoMax);
+		m_legalKeySizes[0] = SymmetricKeySize(Helper::DigestFromName::GetDigestSize(m_kdfEngineType), BLOCK_SIZE, m_kdfInfoMax);
 		// best size, no ipad/opad zero-byte mix in HMAC
 		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, BLOCK_SIZE, m_kdfInfoMax);
 		// triggers HKDF Extract
@@ -837,5 +782,39 @@ void THX::Mix16(const uint X, const std::vector<byte> &Key, const size_t Count, 
 
 	Output = tmp;
 }
+
+CEX_OPTIMIZE_IGNORE
+void THX::Prefetch()
+{
+	// timing defence: pre-load tables into cache
+#if defined(__AVX__)
+	PREFETCHT0(&m_sBox[0], m_sBox.size() * sizeof(uint));
+	PREFETCHT0(&M0[0], 256 * sizeof(uint));
+	PREFETCHT0(&M1[0], 256 * sizeof(uint));
+	PREFETCHT0(&M2[0], 256 * sizeof(uint));
+	PREFETCHT0(&M3[0], 256 * sizeof(uint));
+	PREFETCHT0(&Q0[0], 256 * sizeof(uint));
+	PREFETCHT0(&Q1[0], 256 * sizeof(uint));
+#else
+	volatile uint dummy;
+	for (size_t i = 0; i < m_sBox.size(); ++i)
+		dummy ^= m_sBox[i];
+	for (size_t i = 0; i < 256; ++i)
+		dummy ^= M0[i];
+	for (size_t i = 0; i < 256; ++i)
+		dummy ^= M1[i];
+	for (size_t i = 0; i < 256; ++i)
+		dummy ^= M2[i];
+	for (size_t i = 0; i < 256; ++i)
+		dummy ^= M3[i];
+	for (size_t i = 0; i < 256; ++i)
+		dummy ^= Q0[i];
+	for (size_t i = 0; i < 256; ++i)
+		dummy ^= Q1[i];
+
+#endif
+
+}
+CEX_OPTIMIZE_RESUME
 
 NAMESPACE_BLOCKEND

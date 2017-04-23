@@ -2,9 +2,24 @@
 
 NAMESPACE_PADDING
 
+const std::string PKCS7::CLASS_NAME("PKCS7");
+
+PKCS7::PKCS7() {}
+
+PKCS7::~PKCS7() {}
+
+const PaddingModes PKCS7::Enumeral() 
+{ 
+	return PaddingModes::PKCS7; 
+}
+
+const std::string &PKCS7::Name() 
+{ 
+	return CLASS_NAME; 
+}
+
 size_t PKCS7::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
-
 	if (Offset > Input.size())
 		throw CryptoPaddingException("PKCS7:AddPadding", "The padding offset value is longer than the array length!");
 

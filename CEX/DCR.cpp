@@ -1,11 +1,22 @@
 #include "DCR.h"
-#include "ArrayUtils.h"
 #include "IntUtils.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_PRNG
 
-using Utility::IntUtils;
+const std::string DCR::CLASS_NAME("DCR");
+
+//~~~Properties~~~//
+
+const Prngs DCR::Enumeral()
+{
+	return Prngs::DCR;
+}
+
+const std::string &DCR::Name()
+{
+	return CLASS_NAME;
+}
 
 //~~~Constructor~~~//
 
@@ -57,8 +68,8 @@ void DCR::Destroy()
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
 
-		Utility::ArrayUtils::ClearVector(m_rngBuffer);
-		Utility::ArrayUtils::ClearVector(m_stateSeed);
+		Utility::IntUtils::ClearVector(m_rngBuffer);
+		Utility::IntUtils::ClearVector(m_stateSeed);
 
 		if (m_rngGenerator != 0)
 			delete m_rngGenerator;
@@ -84,7 +95,7 @@ void DCR::GetBytes(std::vector<byte> &Output)
 		size_t bufSize = m_rngBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			memcpy(&Output[0], &m_rngBuffer[m_bufferIndex], bufSize);
+			Utility::MemUtils::Copy<byte>(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 
 		size_t rem = Output.size() - bufSize;
 
@@ -95,13 +106,13 @@ void DCR::GetBytes(std::vector<byte> &Output)
 
 			if (rem > m_rngBuffer.size())
 			{
-				memcpy(&Output[bufSize], &m_rngBuffer[0], m_rngBuffer.size());
+				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
 				rem -= m_rngBuffer.size();
 			}
 			else
 			{
-				memcpy(&Output[bufSize], &m_rngBuffer[0], rem);
+				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, rem);
 				m_bufferIndex = rem;
 				rem = 0;
 			}
@@ -109,14 +120,14 @@ void DCR::GetBytes(std::vector<byte> &Output)
 	}
 	else
 	{
-		memcpy(&Output[0], &m_rngBuffer[m_bufferIndex], Output.size());
+		Utility::MemUtils::Copy<byte>(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
 
 uint DCR::Next()
 {
-	return Utility::IntUtils::ToInt32(GetBytes(4));
+	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
 }
 
 uint DCR::Next(uint Maximum)
@@ -127,7 +138,7 @@ uint DCR::Next(uint Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<uint>(rand, 0);
+		num = Utility::IntUtils::LeBytesTo32(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -143,7 +154,7 @@ uint DCR::Next(uint Minimum, uint Maximum)
 
 ulong DCR::NextLong()
 {
-	return Utility::IntUtils::ToInt64(GetBytes(8));
+	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
 }
 
 ulong DCR::NextLong(ulong Maximum)
@@ -154,7 +165,7 @@ ulong DCR::NextLong(ulong Maximum)
 	do
 	{
 		rand = GetByteRange(Maximum);
-		num = IntUtils::BytesToLe<ulong>(rand, 0);
+		num = Utility::IntUtils::LeBytesTo64(rand, 0);
 	} 
 	while (num > Maximum);
 
@@ -196,7 +207,8 @@ void DCR::Reset()
 
 std::vector<byte> DCR::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
-	ulong val = IntUtils::BytesToLe<ulong>(Data, 0);
+	ulong val = 0;
+	Utility::MemUtils::Copy<byte, ulong>(Data, 0, val, Data.size());
 	ulong bits = Data.size() * 8;
 
 	while (val > Maximum && bits != 0)
@@ -204,8 +216,9 @@ std::vector<byte> DCR::GetBits(std::vector<byte> &Data, ulong Maximum)
 		val >>= 1;
 		bits--;
 	}
+	std::vector<byte> ret(sizeof(ulong));
+	Utility::MemUtils::Copy<ulong, byte>(val, ret, 0, sizeof(ulong));
 
-	std::vector<byte> ret = IntUtils::LeToBytes<ulong>(val, Data.size());
 	return ret;
 }
 

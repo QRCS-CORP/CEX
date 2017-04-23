@@ -93,11 +93,12 @@ NAMESPACE_STREAM
 /// </list>
 /// 
 /// </remarks>
-class Salsa20 : public IStreamCipher
+class Salsa20 final : public IStreamCipher
 {
 private:
 
 	static const size_t BLOCK_SIZE = 64;
+	static const std::string CLASS_NAME;
 	static const size_t CTR_SIZE = 8;
 	static const size_t MAX_ROUNDS = 30;
 	static const size_t MIN_ROUNDS = 8;
@@ -127,7 +128,7 @@ public:
 	/// Get: Unit block size of internal cipher in bytes.
 	/// <para>Block size is 64 bytes wide.</para>
 	/// </summary>
-	virtual const size_t BlockSize() { return BLOCK_SIZE; }
+	const size_t BlockSize() override;
 
 	/// <summary>
 	/// Get/Set: The salt value in the initialization parameters (Tau-Sigma).
@@ -136,45 +137,45 @@ public:
 	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
 	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
-	virtual std::vector<byte> &DistributionCode() { return m_dstCode; }
+	std::vector<byte> &DistributionCode() override;
 
 	/// <summary>
 	/// Get: The stream ciphers type name
 	/// </summary>
-	virtual const StreamCiphers Enumeral() { return StreamCiphers::Salsa20; }
+	const StreamCiphers Enumeral() override;
 
 	/// <summary>
 	/// Get: Cipher is ready to transform data
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	virtual const bool IsParallel() { return m_parallelProfile.IsParallel(); }
+	const bool IsParallel() override;
 
 	/// <summary>
 	/// Get: Array of allowed cipher input key byte-sizes
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; }
+	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
 	/// Get: Available transformation round assignments
 	/// </summary>
-	virtual const std::vector<size_t> LegalRounds() { return m_legalRounds; }
+	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
 	/// Get: The stream ciphers class name
 	/// </summary>
-	virtual const std::string Name() { return std::string("Salsa") + IntUtils::ToString(m_rndCount); }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	virtual const size_t ParallelBlockSize() { return m_parallelProfile.ParallelBlockSize(); }
+	const size_t ParallelBlockSize() override;
 
 	/// <summary>
 	/// Get/Set: Parallel and SIMD capability flags and sizes 
@@ -182,12 +183,12 @@ public:
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
 	/// </summary>
-	virtual ParallelOptions &ParallelProfile() { return m_parallelProfile; }
+	ParallelOptions &ParallelProfile() override;
 
 	/// <summary>
 	/// Get: Number of rounds
 	/// </summary>
-	virtual const size_t Rounds() { return m_rndCount; }
+	const size_t Rounds() override;
 
 	//~~~Constructor~~~//
 
@@ -203,14 +204,14 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~Salsa20();
+	~Salsa20() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Destroy of this class
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Initialize the cipher
@@ -221,7 +222,7 @@ public:
 	/// The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
 	/// Nonce must be 8 bytes in size.</para>
 	/// </param>
-	virtual void Initialize(ISymmetricKey &KeyParams);
+	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
@@ -232,32 +233,25 @@ public:
 	/// <param name="Degree">The desired number of threads</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
-	virtual void ParallelMaxDegree(size_t Degree);
+	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
-	/// Reset the primary internal counter
-	/// </summary>
-	virtual void Reset();
-
-	/// <summary>
-	/// Encrypt/Decrypt an array of bytes.
-	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
+	/// Encrypt/Decrypt one block of bytes
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="Output">The output array of transformed bytes</param>
-	virtual void Transform(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void TransformBlock(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Encrypt/Decrypt an array of bytes with offset parameters.
-	/// <para><see cref="Initialize(SymmetricKey)"/> must be called before this method can be used.</para>
+	/// Encrypt/Decrypt one block of bytes
 	/// </summary>
 	/// 
 	/// <param name="Input">The input array of bytes to transform</param>
 	/// <param name="InOffset">Starting offset within the input array</param>
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
+	void TransformBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
 	/// Encrypt/Decrypt an array of bytes with offset and length parameters.
@@ -269,13 +263,14 @@ public:
 	/// <param name="Output">The output array of transformed bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">Number of bytes to process</param>
-	virtual void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+	void Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 private:
 
 	void Expand(const std::vector<byte> &Key, const std::vector<byte> &Iv);
 	void Generate(std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Counter, const size_t Length);
 	void Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length);
+	void Reset();
 	void Scope();
 };
 

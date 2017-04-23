@@ -2,6 +2,22 @@
 
 NAMESPACE_PADDING
 
+const std::string ISO7816::CLASS_NAME("ISO7816");
+
+ISO7816::ISO7816() {}
+
+ISO7816::~ISO7816() {}
+
+const PaddingModes ISO7816::Enumeral() 
+{ 
+	return PaddingModes::ISO7816; 
+}
+
+const std::string &ISO7816::Name()
+{ 
+	return CLASS_NAME; 
+}
+
 size_t ISO7816::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())

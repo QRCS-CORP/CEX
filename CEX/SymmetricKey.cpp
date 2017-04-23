@@ -1,15 +1,36 @@
 #include "SymmetricKey.h"
-#include "ArrayUtils.h"
+#include "IntUtils.h"
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
 NAMESPACE_KEYSYMMETRIC
 
+//~~~Public Properties~~~//
+
+const std::vector<byte> SymmetricKey::Info() 
+{ 
+	return m_info;
+}
+
+const std::vector<byte> SymmetricKey::Key()
+{
+	return m_key;
+}
+
+const SymmetricKeySize SymmetricKey::KeySizes() 
+{ 
+	return m_keySizes; 
+}
+
+const std::vector<byte> SymmetricKey::Nonce() 
+{ 
+	return m_nonce;
+}
+
 //~~~Constructors~~~//
 
 SymmetricKey::SymmetricKey()
 	:
-
 	m_info(0),
 	m_isDestroyed(false),
 	m_key(0),
@@ -73,11 +94,11 @@ void SymmetricKey::Destroy()
 	if (!m_isDestroyed)
 	{
 		if (m_key.capacity() > 0)
-			Utility::ArrayUtils::ClearVector(m_key);
+			Utility::IntUtils::ClearVector(m_key);
 		if (m_nonce.capacity() > 0)
-			Utility::ArrayUtils::ClearVector(m_nonce);
+			Utility::IntUtils::ClearVector(m_nonce);
 		if (m_info.capacity() > 0)
-			Utility::ArrayUtils::ClearVector(m_info);
+			Utility::IntUtils::ClearVector(m_info);
 
 		m_isDestroyed = true;
 	}
@@ -86,19 +107,19 @@ void SymmetricKey::Destroy()
 SymmetricKey* SymmetricKey::DeSerialize(const MemoryStream &KeyStream)
 {
 	IO::StreamReader reader(KeyStream);
-	short keyLen = reader.ReadInt16();
-	short ivLen = reader.ReadInt16();
-	short ikmLen = reader.ReadInt16();
+	short kLen = reader.ReadInt<short>();
+	short nLen = reader.ReadInt<short>();
+	short iLen = reader.ReadInt<short>();
 	std::vector<byte> key;
 	std::vector<byte> nonce;
 	std::vector<byte> info;
 
-	if (keyLen > 0)
-		key = reader.ReadBytes(keyLen);
-	if (ivLen > 0)
-		nonce = reader.ReadBytes(ivLen);
-	if (ikmLen > 0)
-		info = reader.ReadBytes(ikmLen);
+	if (kLen > 0)
+		key = reader.ReadBytes(kLen);
+	if (nLen > 0)
+		nonce = reader.ReadBytes(nLen);
+	if (iLen > 0)
+		info = reader.ReadBytes(iLen);
 
 	return new SymmetricKey(key, nonce, info);
 }
@@ -110,22 +131,22 @@ bool SymmetricKey::Equals(ISymmetricKey &Obj)
 
 MemoryStream* SymmetricKey::Serialize(SymmetricKey &KeyObj)
 {
-	short klen = (short)KeyObj.Key().size();
-	short vlen = (short)KeyObj.Nonce().size();
-	short mlen = (short)KeyObj.Info().size();
-	int len = 6 + klen + vlen + mlen;
+	size_t kLen = KeyObj.Key().size();
+	size_t nLen = KeyObj.Nonce().size();
+	size_t iLen = KeyObj.Info().size();
+	size_t tLen = 6 + kLen + nLen + iLen;
 
-	IO::StreamWriter writer(len);
-	writer.Write(klen);
-	writer.Write(vlen);
-	writer.Write(mlen);
+	IO::StreamWriter writer(tLen);
+	writer.Write(static_cast<ushort>(kLen));
+	writer.Write(static_cast<ushort>(nLen));
+	writer.Write(static_cast<ushort>(iLen));
 
-	if (KeyObj.Key().size() != 0)
-		writer.Write(KeyObj.Key());
-	if (KeyObj.Nonce().size() != 0)
-		writer.Write(KeyObj.Nonce());
-	if (KeyObj.Info().size() != 0)
-		writer.Write(KeyObj.Info());
+	if (kLen != 0)
+		writer.Write(KeyObj.Key(), 0, kLen);
+	if (nLen != 0)
+		writer.Write(KeyObj.Nonce(), 0, nLen);
+	if (iLen != 0)
+		writer.Write(KeyObj.Info(), 0, iLen);
 
 	IO::MemoryStream* strm = writer.GetStream();
 	strm->Seek(0, IO::SeekOrigin::Begin);

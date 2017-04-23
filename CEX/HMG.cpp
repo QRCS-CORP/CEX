@@ -1,13 +1,75 @@
 #include "HMG.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_DRBG
 
-using Utility::IntUtils;
+const std::string HMG::CLASS_NAME("HMG");
+
+//~~~Properties~~~//
+
+std::vector<byte> &HMG::DistributionCode() 
+{
+	return m_distributionCode; 
+}
+
+const size_t HMG::DistributionCodeMax() 
+{ 
+	return m_distributionCodeMax; 
+}
+
+const Drbgs HMG::Enumeral() 
+{
+	return Drbgs::HMG;
+}
+
+const bool HMG::IsInitialized() 
+{
+	return m_isInitialized; 
+}
+
+std::vector<SymmetricKeySize> HMG::LegalKeySizes() const 
+{
+	return m_legalKeySizes; 
+}
+
+const ulong HMG::MaxOutputSize() 
+{ 
+	return MAX_OUTPUT; 
+}
+
+const size_t HMG::MaxRequestSize() 
+{
+	return MAX_REQUEST; 
+}
+
+const size_t HMG::MaxReseedCount()
+{ 
+	return MAX_RESEED; 
+}
+
+const std::string &HMG::Name()
+{
+	return CLASS_NAME; 
+}
+
+const size_t HMG::NonceSize() 
+{
+	return STATECTR_SIZE; 
+}
+
+size_t &HMG::ReseedThreshold()
+{ 
+	return m_reseedThreshold;
+}
+
+const size_t HMG::SecurityStrength()
+{
+	return m_secStrength;
+}
 
 //~~~Constructor~~~//
 
@@ -82,12 +144,12 @@ void HMG::Destroy()
 
 		try
 		{
-			Utility::ArrayUtils::ClearVector(m_distributionCode);
-			Utility::ArrayUtils::ClearVector(m_hmacKey);
-			Utility::ArrayUtils::ClearVector(m_hmacState);
-			Utility::ArrayUtils::ClearVector(m_legalKeySizes);
-			Utility::ArrayUtils::ClearVector(m_seedCtr);
-			Utility::ArrayUtils::ClearVector(m_stateCtr);
+			Utility::IntUtils::ClearVector(m_distributionCode);
+			Utility::IntUtils::ClearVector(m_hmacKey);
+			Utility::IntUtils::ClearVector(m_hmacState);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_seedCtr);
+			Utility::IntUtils::ClearVector(m_stateCtr);
 
 			if (m_destroyEngine)
 			{
@@ -179,8 +241,7 @@ void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("HMG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// added: nonce becomes the initial state counter value
-	memcpy(&m_stateCtr[0], &Nonce[0], IntUtils::Min(Nonce.size(), m_stateCtr.size()));
-
+	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	Initialize(Seed);
 }
 
@@ -190,7 +251,7 @@ void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("HMG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// copy nonce to state counter
-	memcpy(&m_stateCtr[0], &Nonce[0], IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 
 	// info can be a secret salt or domain identifier; added to derivation function input
 	// for best security, info should be secret, random, and DistributionCodeMax size
@@ -202,7 +263,7 @@ void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	{
 		// info is too large; size to optimal max, ignore remainder
 		std::vector<byte> tmpInfo(m_distributionCodeMax);
-		memcpy(&tmpInfo[0], &Info[0], tmpInfo.size());
+		Utility::MemUtils::Copy<byte>(Info, 0, tmpInfo, 0, tmpInfo.size());
 		m_distributionCode = tmpInfo;
 	}
 
@@ -237,7 +298,7 @@ void HMG::Derive(const std::vector<byte> &Seed)
 
 	do
 	{
-		size_t keyRmd = IntUtils::Min(macCode.size(), keyLen);
+		size_t keyRmd = Utility::IntUtils::Min(macCode.size(), keyLen);
 		// 1) increment seed counter by key-bytes copied
 		Increase(m_seedCtr, static_cast<uint>(keyRmd));
 		// 2) process the seed counter
@@ -248,8 +309,7 @@ void HMG::Derive(const std::vector<byte> &Seed)
 		RandomPad(blkOffset);
 		// 5) compress and add to HMAC key
 		m_hmacEngine.Finalize(macCode, 0);
-		memcpy(&tmpKey[keyOffset], &macCode[0], keyRmd);
-
+		Utility::MemUtils::Copy<byte>(macCode, 0, tmpKey, keyOffset, keyRmd);
 		keyLen -= keyRmd;
 		keyOffset += keyRmd;
 	} 
@@ -270,7 +330,7 @@ void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 
 	do
 	{
-		size_t rmdLen = IntUtils::Min(m_hmacState.size(), prcLen);
+		size_t rmdLen = Utility::IntUtils::Min(m_hmacState.size(), prcLen);
 		// 1) increase state counter by output-bytes generated
 		Increase(m_stateCtr, static_cast<uint>(rmdLen));
 		// 2) process the state counter
@@ -282,7 +342,7 @@ void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 			m_hmacEngine.Update(m_distributionCode, 0, m_distributionCode.size());
 		// 5) output the state
 		m_hmacEngine.Finalize(m_hmacState, 0);
-		memcpy(&Output[OutOffset], &m_hmacState[0], rmdLen);
+		Utility::MemUtils::Copy<byte>(m_hmacState, 0, Output, OutOffset, rmdLen);
 
 		prcLen -= rmdLen;
 		OutOffset += rmdLen;
@@ -294,7 +354,7 @@ void HMG::Increase(std::vector<byte> &Counter, const uint Length)
 {
 	const size_t CTRSZE = Counter.size() - 1;
 	std::vector<byte> ctrInc(sizeof(uint));
-	IntUtils::Le32ToBytes(Length, ctrInc, 0);
+	Utility::IntUtils::Le32ToBytes(Length, ctrInc, 0);
 	byte carry = 0;
 
 	for (size_t i = CTRSZE; i > 0; --i)

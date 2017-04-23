@@ -90,7 +90,7 @@ public:
 	/// <param name="InOffset">The starting position within the Input array</param>
 	/// 
 	/// <returns>An unsigned 32 bit integer value</returns>
-	static uint ToUInt32(const std::vector<byte> &Input, const uint InOffset);
+	static uint ToUInt32(const std::vector<byte> &Input, const size_t InOffset);
 
 	/// <summary>
 	/// Convert bytes to a 64 bit integer value

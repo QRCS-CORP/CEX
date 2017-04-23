@@ -8,6 +8,7 @@
 NAMESPACE_PROVIDER
 
 using Exception::CryptoRandomException;
+using Enumeration::Providers;
 
 /// <summary>
 /// Entropy source collectors and concentrators interface
@@ -33,7 +34,7 @@ public:
 	/// <summary>
 	/// Get: The providers type name
 	/// </summary>
-	virtual const Enumeration::Providers Enumeral() = 0;
+	virtual const Providers Enumeral() = 0;
 
 	/// <summary>
 	/// Get: The entropy provider is available on this system
@@ -43,7 +44,7 @@ public:
 	/// <summary>
 	/// Get: The provider class name
 	/// </summary>
-	virtual const std::string Name() = 0;
+	virtual const std::string &Name() = 0;
 
 	//~~~Public Functions~~~//
 

@@ -36,40 +36,10 @@ namespace Test
 
 		try
 		{
-			std::vector<byte> key(64);
-			std::vector<byte> iv(32);
-			Prng::SecureRandom rnd;
-
-			rnd.GetBytes(key);
-			rnd.GetBytes(iv);
-
-			Digest::SHA256* sha = new Digest::SHA256();
-			HMAC* hmac1 = new HMAC(sha);
-			SymmetricKey kp1(key, iv);
-			hmac1->Initialize(kp1);
-			// test enum initialization
-			HMAC* hmac2 = new HMAC(Enumeration::Digests::SHA256);
-			hmac2->Initialize(kp1);
-			CompareOutput(hmac1, hmac2);
+			CompareHmac();
 			OnProgress(std::string("Passed MacStream HMAC comparison tests.."));
-			delete hmac1;
-			delete hmac2;
-			delete sha;
-
-			key.resize(32);
-			Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-			CMAC* cmac1 = new CMAC(eng);
-			SymmetricKey kp2(key);
-			cmac1->Initialize(kp2);
-			CMAC* cmac2 = new CMAC(Enumeration::BlockCiphers::Rijndael);
-			cmac2->Initialize(kp2);
-			CompareOutput(cmac1, cmac2);
+			CompareCmac();
 			OnProgress(std::string("Passed MacStream CMAC comparison tests.."));
-			delete cmac1;
-			delete cmac2;
-			delete eng;
-			OnProgress(std::string("Passed CMAC enum initialization test.."));
-
 			CmacDescriptionTest();
 			OnProgress(std::string("Passed CMAC description initialization test.."));
 			HmacDescriptionTest();
@@ -87,30 +57,72 @@ namespace Test
 		}
 	}
 
-	void MacStreamTest::CompareOutput(Mac::IMac* Engine1, Mac::IMac* Engine2)
+	void MacStreamTest::CompareCmac()
 	{
-		using IO::IByteStream;
-		using IO::MemoryStream;
-
 		Prng::SecureRandom rnd;
 		std::vector<byte> data(rnd.NextInt32(1000, 10000));
 		rnd.GetBytes(data);
+		std::vector<byte> key = rnd.GetBytes(32);
+		SymmetricKey kp(key);
 
-		// mac instance for baseline
-		size_t macSze = Engine1->MacSize();
-		std::vector<byte> code1(macSze);
-		Engine1->Compute(data, code1);
+		// digest instance for baseline
+		Mac::CMAC* eng = new Mac::CMAC(Enumeration::BlockCiphers::Rijndael);
+		size_t macSze = eng->MacSize();
+		std::vector<byte> hash1(macSze);
+		eng->Initialize(kp);
+		eng->Compute(data, hash1);
+		eng->Reset();
 
 		// test stream method
-		std::vector<byte> code2(macSze);
-		Processing::MacStream ds(Engine2);
+		std::vector<byte> hash2(macSze);
+		Processing::MacStream ds(eng);
+		ds.Initialize(kp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
-		code2 = ds.Compute(ms);
+		hash2 = ds.Compute(ms);
 
-		if (code1 != code2)
-			throw TestException("MacStreamTest: Expected hash is not equal!");
+		if (hash1 != hash2)
+			throw TestException("DigestStreamTest: Expected hash is not equal!");
 
-		delete ms;
+		// test byte access method
+		ds.Initialize(kp);
+		hash2 = ds.Compute(data, 0, data.size());
+
+		if (hash1 != hash2)
+			throw TestException("DigestStreamTest: Expected hash is not equal!");
+	}
+
+	void MacStreamTest::CompareHmac()
+	{
+		Prng::SecureRandom rnd;
+		std::vector<byte> data(rnd.NextInt32(1000, 10000));
+		rnd.GetBytes(data);
+		std::vector<byte> key = rnd.GetBytes(32);
+		SymmetricKey kp(key);
+
+		// digest instance for baseline
+		Mac::HMAC* eng = new Mac::HMAC(Enumeration::Digests::SHA256);
+		size_t macSze = eng->MacSize();
+		std::vector<byte> hash1(macSze);
+		eng->Initialize(kp);
+		eng->Compute(data, hash1);
+		eng->Reset();
+
+		// test stream method
+		std::vector<byte> hash2(macSze);
+		Processing::MacStream ds(eng);
+		ds.Initialize(kp);
+		IO::IByteStream* ms = new IO::MemoryStream(data);
+		hash2 = ds.Compute(ms);
+
+		if (hash1 != hash2)
+			throw TestException("DigestStreamTest: Expected hash is not equal!");
+
+		// test byte access method
+		ds.Initialize(kp);
+		hash2 = ds.Compute(data, 0, data.size());
+
+		if (hash1 != hash2)
+			throw TestException("DigestStreamTest: Expected hash is not equal!");
 	}
 
 	void MacStreamTest::CmacDescriptionTest()
@@ -126,7 +138,8 @@ namespace Test
 		Key::Symmetric::SymmetricKey mp(kp);
 
 		Processing::MacDescription mds(32, Enumeration::BlockCiphers::Rijndael, Enumeration::IVSizes::V128);
-		Processing::MacStream mst(mds, mp);
+		Processing::MacStream mst(mds);
+		mst.Initialize(mp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
 		std::vector<byte> c2 = mst.Compute(ms);
 		delete ms;
@@ -148,7 +161,8 @@ namespace Test
 
 		Key::Symmetric::SymmetricKey mp(key);
 		Processing::MacDescription mds(64, Enumeration::Digests::SHA256);
-		Processing::MacStream mst(mds, mp);
+		Processing::MacStream mst(mds);
+		mst.Initialize(mp);
 		IO::IByteStream* ms = new IO::MemoryStream(data);
 		std::vector<byte> c2 = mst.Compute(ms);
 		delete ms;

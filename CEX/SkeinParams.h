@@ -175,14 +175,14 @@ public:
 		CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
 
 		memcpy(&m_treeSchema[0], &TreeArray[0], 4);
-		m_treeVersion = IntUtils::BytesToLe16(TreeArray, 4);
-		m_reserved1 = IntUtils::BytesToLe16(TreeArray, 6);
-		m_outputSize = IntUtils::BytesToLe64(TreeArray, 8);
+		m_treeVersion = IntUtils::LeBytesTo16(TreeArray, 4);
+		m_reserved1 = IntUtils::LeBytesTo16(TreeArray, 6);
+		m_outputSize = IntUtils::LeBytesTo64(TreeArray, 8);
 		memcpy(&m_leafSize, &TreeArray[16], 1);
 		memcpy(&m_treeDepth, &TreeArray[17], 1);
 		memcpy(&m_treeFanout, &TreeArray[18], 1);
 		memcpy(&m_reserved2, &TreeArray[19], 1);
-		m_reserved3 = IntUtils::BytesToLe32(TreeArray, 20);
+		m_reserved3 = IntUtils::LeBytesTo32(TreeArray, 20);
 		m_dstCode.resize(DistributionCodeMax());
 		memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
 	}
@@ -231,7 +231,7 @@ public:
 		std::vector<ulong> config(m_outputSize / sizeof(ulong));
 
 		// set schema bytes
-		config[0] = IntUtils::BytesToLe32(m_treeSchema, 0);
+		config[0] = IntUtils::LeBytesTo32(m_treeSchema, 0);
 		// version and key size
 		config[0] |= ((ulong)m_treeVersion << 32);
 		config[0] |= ((ulong)m_reserved1 << 48);
@@ -246,7 +246,7 @@ public:
 
 		// distribution code
 		for (size_t i = 3; i < config.size(); ++i)
-			config[i] = IntUtils::BytesToLe64(m_dstCode, (i - 3) * sizeof(ulong));
+			config[i] = IntUtils::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
 
 		return config;
 	}

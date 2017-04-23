@@ -25,8 +25,6 @@ using Enumeration::SimdProfiles;
 /// </example>
 class ParallelOptions
 {
-public:
-
 private:
 
 	struct AutoParallelParams
@@ -44,9 +42,11 @@ private:
 	bool m_autoInit;
 	size_t m_blockSize;
 	AutoParallelParams m_defaultParams;
+	bool m_hasPrefetch;
 	bool m_hasSHA2;
 	bool m_hasSimd128;
 	bool m_hasSimd256;
+	bool m_hasSimd512;
 	bool m_isParallel;
 	size_t m_l1DataCacheReserved;
 	size_t m_l1DataCacheTotal;
@@ -69,37 +69,37 @@ public:
 	/// <summary>
 	/// Get: The settings are the default auto-generated recommended values
 	/// </summary>
-	const bool IsDefault()
-	{
-		return (m_defaultParams.IsParallel == m_isParallel &&
-			m_defaultParams.MaxDegree == m_parallelMaxDegree &&
-			m_defaultParams.ParallelBlockSize == m_parallelBlockSize);
-	}
+	const bool IsDefault();
 
 	/// <summary>
 	/// Get: Block size of the algorithm in bytes
 	/// </summary>
-	const size_t BlockSize() { return m_blockSize; }
+	const size_t BlockSize();
+
+	/// <summary>
+	/// Get: Returns True if the system supports prefetch intrinsics
+	/// </summary>
+	const bool HasPrefetch();
 
 	/// <summary>
 	/// Get: Returns True if the system supports SHA2 intrinsics
 	/// </summary>
-	const bool HasSHA2() { return m_hasSHA2; }
+	const bool HasSHA2();
 
 	/// <summary>
 	/// Get: Returns True if the system supports 128bit SSE3 SIMD intrinsics
 	/// </summary>
-	const bool HasSimd128() { return m_hasSimd128; }
+	const bool HasSimd128();
 
 	/// <summary>
 	/// Get: Returns True if the system supports 256bit AVX2 intrinsics
 	/// </summary>
-	const bool HasSimd256() { return m_hasSimd256; }
+	const bool HasSimd256();
 
 	/// <summary>
 	/// Get: The total size in bytes of the L1 Data cache available on the system
 	/// </summary>
-	const size_t L1DataCacheTotalSize() { return m_l1DataCacheTotal; }
+	const size_t L1DataCacheTotalSize();
 
 	/// <summary>
 	/// Get: The amount of L1 cache in bytes to reserve for tables and working variables used by the calling algorithm.
@@ -107,58 +107,58 @@ public:
 	/// can reduce the frequency of L1 cache eviction for that state, 
 	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.<para>
 	/// </summary>
-	const size_t L1DataCacheReserved() { return m_l1DataCacheReserved; }
+	const size_t L1DataCacheReserved();
 
 	/// <summary>
 	/// Get/Set: Enable automatic processor parallelization
 	/// </summary>
-	bool &IsParallel() { return m_isParallel; }
+	bool &IsParallel();
 
 	/// <summary>
 	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.</para>
 	/// </summary>
-	size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+	size_t &ParallelBlockSize();
 
 	/// <summary>
 	/// Get: Maximum input block byte length when using multi-threaded processing
 	/// </summary>
-	const size_t ParallelMaximumSize() { return MAX_PRLALLOC; }
+	const size_t ParallelMaximumSize();
 
 	/// <summary>
 	/// Get: The smallest valid ParallelBlockSize; parallel blocks must be a multiple of this size
 	/// </summary>
-	const size_t ParallelMinimumSize() { return m_parallelMinimumSize; }
+	const size_t ParallelMinimumSize();
 
 	/// <summary>
 	/// Get: The maximum number of threads allocated when using multi-threaded processing.
 	/// <para>Changes to this value must be made through the SetMaxDegree(size_t) function.</para>
 	/// </summary>
-	const size_t ParallelMaxDegree() { return m_parallelMaxDegree; }
+	const size_t ParallelMaxDegree();
 
 	/// <summary>
 	/// Get: The number of processor cores available on the system
 	/// </summary>
-	const size_t PhysicalCores() { return m_physicalCores; }
+	const size_t PhysicalCores();
 
 	/// <summary>
 	/// Get: The maximum number of processor cores available on the system
 	/// </summary>
-	const size_t ProcessorCount() { return m_virtualCores != 0 ? m_virtualCores : m_physicalCores; }
+	const size_t ProcessorCount();
 
 	/// <summary>
 	/// Get: The maximum supported SIMD instruction set
 	/// </summary>
-	const SimdProfiles SimdProfile() { return m_simdDetected; }
+	const SimdProfiles SimdProfile();
 
 	/// <summary>
 	/// Get: The number of virtual (hyper-threading) processor cores available on the system
 	/// </summary>
-	const size_t VirtualCores() { return m_virtualCores; }
+	const size_t VirtualCores();
 
 	/// <summary>
 	/// Get/Set: Enable wide block initialization parameters (in development)
 	/// </summary>
-	bool &WideBlock() { return m_wideBlock; }
+	bool &WideBlock();
 
 	//~~~Constructor~~~//
 

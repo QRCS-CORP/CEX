@@ -136,7 +136,7 @@ namespace Test
 		Mode::CTR cpr(eng);
 		Key::Symmetric::SymmetricKey kp(key, iv);
 		cpr.Initialize(true, kp);
-		cpr.Transform(input, output2);
+		cpr.Transform(input, 0, output2, 0, output2.size());
 
 		delete eng;
 

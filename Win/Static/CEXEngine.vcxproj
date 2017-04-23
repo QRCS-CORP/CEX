@@ -102,7 +102,7 @@
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,12 +144,12 @@
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <DebugInformationFormat>None</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -179,7 +179,7 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -269,6 +269,7 @@
     <ClInclude Include="..\..\CEX\Keccak256.h" />
     <ClInclude Include="..\..\CEX\Keccak512.h" />
     <ClInclude Include="..\..\CEX\KeccakParams.h" />
+    <ClInclude Include="..\..\CEX\MemUtils.h" />
     <ClInclude Include="..\..\CEX\OCB.h" />
     <ClInclude Include="..\..\CEX\ParallelOptions.h" />
     <ClInclude Include="..\..\CEX\SCRYPT.h" />
@@ -340,6 +341,7 @@
     <ClInclude Include="..\..\CEX\THX.h" />
     <ClInclude Include="..\..\CEX\Twofish.h" />
     <ClInclude Include="..\..\CEX\UInt256.h" />
+    <ClInclude Include="..\..\CEX\UInt512.h" />
     <ClInclude Include="..\..\CEX\ULong256.h" />
     <ClInclude Include="..\..\CEX\X923.h" />
     <ClInclude Include="..\..\CEX\ZeroPad.h" />
@@ -362,6 +364,17 @@
     <ClCompile Include="..\..\CEX\CMAC.cpp" />
     <ClCompile Include="..\..\CEX\CMR.cpp" />
     <ClCompile Include="..\..\CEX\CpuDetect.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoAsymmetricException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoCipherModeException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoDigestException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoGeneratorException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoKdfException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoMacException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoPaddingException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoProcessingException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoRandomException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoSymmetricCipherException.cpp" />
     <ClCompile Include="..\..\CEX\CSP.cpp" />
     <ClCompile Include="..\..\CEX\CTR.cpp" />
     <ClCompile Include="..\..\CEX\CMG.cpp" />
@@ -375,12 +388,12 @@
     <ClCompile Include="..\..\CEX\ECP.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />
+    <ClCompile Include="..\..\CEX\GHASH.cpp" />
     <ClCompile Include="..\..\CEX\GMAC.cpp" />
     <ClCompile Include="..\..\CEX\HKDF.cpp" />
     <ClCompile Include="..\..\CEX\HMAC.cpp" />
     <ClCompile Include="..\..\CEX\HMG.cpp" />
     <ClCompile Include="..\..\CEX\ICM.cpp" />
-    <ClCompile Include="..\..\CEX\IntUtils.cpp" />
     <ClCompile Include="..\..\CEX\ISO7816.cpp" />
     <ClCompile Include="..\..\CEX\KDF2.cpp" />
     <ClCompile Include="..\..\CEX\KdfFromName.cpp" />
@@ -411,6 +424,7 @@
     <ClCompile Include="..\..\CEX\RDP.cpp" />
     <ClCompile Include="..\..\CEX\RHX.cpp" />
     <ClCompile Include="..\..\CEX\Salsa20.cpp" />
+    <ClCompile Include="..\..\CEX\SymmetricKeySize.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricSecureKey.cpp" />
     <ClCompile Include="..\..\CEX\SecureRandom.cpp" />
     <ClCompile Include="..\..\CEX\ProviderFromName.cpp" />
@@ -422,9 +436,6 @@
     <ClCompile Include="..\..\CEX\SysUtils.cpp" />
     <ClCompile Include="..\..\CEX\TBC.cpp" />
     <ClCompile Include="..\..\CEX\THX.cpp" />
-    <ClCompile Include="..\..\CEX\UInt128.cpp" />
-    <ClCompile Include="..\..\CEX\UInt256.cpp" />
-    <ClCompile Include="..\..\CEX\ULong256.cpp" />
     <ClCompile Include="..\..\CEX\X923.cpp" />
     <ClCompile Include="..\..\CEX\ZeroPad.cpp" />
   </ItemGroup>

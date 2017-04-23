@@ -19,6 +19,7 @@
 // 
 // Written by John Underhill, January 21, 2015
 // Updated December 9, 2016
+// Updated April 20, 2016
 // Contact: develop@vtdev.com
 
 #ifndef _CEX_CIPHERSTREAM_H
@@ -33,6 +34,7 @@
 #include "ICipherMode.h"
 #include "IPadding.h"
 #include "IStreamCipher.h"
+#include "ParallelOptions.h"
 #include "SymmetricKeySize.h"
 #include "SymmetricEngines.h"
 
@@ -49,10 +51,11 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 using Cipher::Symmetric::Block::Padding::IPadding;
 using Cipher::Symmetric::Stream::IStreamCipher;
 using Key::Symmetric::ISymmetricKey;
-using Key::Symmetric::SymmetricKeySize;
 using Enumeration::PaddingModes;
+using Common::ParallelOptions;
 using Enumeration::StreamCiphers;
 using Enumeration::SymmetricEngines;
+using Key::Symmetric::SymmetricKeySize;
 
 /// <summary>
 /// Used to wrap a streaming transformation.
@@ -145,14 +148,9 @@ using Enumeration::SymmetricEngines;
 /// </remarks>
 class CipherStream
 {
-public:
-
 private:
 
-	static const size_t MAX_PRLALLOC = 100000000;
-
 	IBlockCipher* m_blockCipher;
-	size_t m_blockSize;
 	ICipherMode* m_cipherEngine;
 	IPadding* m_cipherPadding;
 	bool m_destroyEngine;
@@ -164,8 +162,6 @@ private:
 	bool m_isParallel;
 	bool m_isStreamCipher;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	size_t m_parallelBlockSize;
-	size_t m_parallelMinimumSize;
 	IStreamCipher* m_streamCipher;
 
 public:
@@ -187,27 +183,26 @@ public:
 	/// <para>This value is true if the host supports parallelization.
 	/// If the system and cipher configuration both support parallelization, it can be disabled by setting this value to false.</para>
 	/// </summary>
-	bool &IsParallel() { return m_isParallel; }
+	bool IsParallel();
 
 	/// <summary>
 	/// Get: The supported key, nonce, and info sizes for the selected cipher configuration
 	/// </summary>
-	const std::vector<SymmetricKeySize> LegalKeySizes() { return m_legalKeySizes; }
+	const std::vector<SymmetricKeySize> LegalKeySizes();
 
 	/// <summary>
 	/// Get/Set: Parallel block size. Must be a multiple of <see cref="ParallelMinimumSize"/>.
 	/// </summary>
-	size_t &ParallelBlockSize() { return m_parallelBlockSize; }
+	size_t ParallelBlockSize();
 
 	/// <summary>
-	/// Get: The maximum parallel input block size
+	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state, or initialize the digest using a BlakeParams with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	const size_t ParallelMaximumSize() { return MAX_PRLALLOC; }
-
-	/// <summary>
-	/// Get: The minimum parallel input block size
-	/// </summary>
-	const size_t ParallelMinimumSize() { return m_parallelBlockSize; }
+	ParallelOptions &ParallelProfile();
 
 	//~~~Constructor~~~//
 
@@ -290,6 +285,17 @@ public:
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams);
 
 	/// <summary>
+	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
+	/// <para>Thread count must be an even number, and not exceed the number of processor cores.
+	/// Changing this value from the default (8 threads), will change the output hash value.</para>
+	/// </summary>
+	///
+	/// <param name="Degree">The desired number of threads</param>
+	///
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
+	void ParallelMaxDegree(size_t Degree);
+
+	/// <summary>
 	/// Process using file or memory streams.
 	/// <para>When using FileStreams the InStream must be initialized as Read, and the OutStream initialized as ReadWrite.</para>
 	/// </summary>
@@ -321,7 +327,6 @@ private:
 	ICipherMode* GetCipherMode(CipherModes ModeType, BlockCiphers CipherType, int BlockSize, int RoundCount, Digests KdfEngine);
 	IPadding* GetPaddingMode(PaddingModes PaddingType);
 	IStreamCipher* GetStreamCipher(StreamCiphers CipherType, size_t RoundCount);
-	void ParametersCheck();
 	void StreamTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void StreamTransform(IByteStream* InStream, IByteStream* OutStream);
 	void Scope();

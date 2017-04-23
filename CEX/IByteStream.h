@@ -58,6 +58,11 @@ public:
 	virtual const ulong Length() = 0;
 
 	/// <summary>
+	/// Get: The streams class name
+	/// </summary>
+	virtual const std::string &Name() = 0;
+
+	/// <summary>
 	/// Get: The streams current position
 	/// </summary>
 	virtual const ulong Position() = 0;

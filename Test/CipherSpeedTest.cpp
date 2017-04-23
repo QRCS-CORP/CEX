@@ -33,7 +33,7 @@ namespace Test
 	CipherSpeedTest::CipherSpeedTest()
 		:
 		m_hasAESNI(false),
-		m_hasSSE(false),
+		m_hasAVX(false),
 		m_progressEvent()
 	{
 	}
@@ -286,12 +286,12 @@ namespace Test
 		{
 			Common::CpuDetect detect;
 			m_hasAESNI = detect.AESNI();
-			m_hasSSE = detect.SSE();
+			m_hasAVX = detect.AVX();
 		}
 		catch (...)
 		{
 			m_hasAESNI = false;
-			m_hasSSE = false;
+			m_hasAVX = false;
 		}
 	}
 
@@ -330,7 +330,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		std::string calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
 
 
@@ -350,7 +350,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
 
 
@@ -365,7 +365,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
 
 
@@ -386,7 +386,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
 
 
@@ -401,75 +401,7 @@ namespace Test
 
 		} while (--itr != 0);
 
-		calc = IntUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
+		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
-	}
-
-	// Note: internal test, ignore
-	void CipherSpeedTest::WideModeLoop(IBlockCipher* Engine, size_t SampleSize, bool Parallel, size_t KeySize, size_t IvSize, size_t Loops)
-	{
-		// not fully implemented, for future use..
-		std::vector<byte> buffer1(IvSize, 0);
-		std::vector<byte> buffer2(IvSize, 0);
-		SampleSize -= (SampleSize % IvSize);
-		Mode::CBC cipher(Engine);
-		Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-
-		if (!Parallel)
-		{
-			cipher.Initialize(true, keyParam);
-			cipher.ParallelProfile().IsParallel() = false;
-		}
-		else
-		{
-			cipher.Initialize(false, keyParam);
-			cipher.ParallelProfile().IsParallel() = true;
-			buffer1.resize(cipher.ParallelBlockSize());
-			buffer2.resize(cipher.ParallelBlockSize());
-		}
-
-		uint64_t start = TestUtils::GetTimeMs64();
-
-		if (IvSize == 128)
-		{
-			for (size_t i = 0; i < Loops; ++i)
-			{
-				size_t counter = 0;
-				uint64_t lstart = TestUtils::GetTimeMs64();
-
-				while (counter < SampleSize)
-				{
-					cipher.Transform128(buffer1, 0, buffer2, 0);
-					counter += buffer1.size();
-				}
-				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				OnProgress(calc);
-			}
-		}
-		else
-		{
-			for (size_t i = 0; i < Loops; ++i)
-			{
-				size_t counter = 0;
-				uint64_t lstart = TestUtils::GetTimeMs64();
-
-				while (counter < SampleSize)
-				{
-					cipher.Transform64(buffer1, 0, buffer2, 0);
-					counter += buffer1.size();
-				}
-				std::string calc = IntUtils::ToString((TestUtils::GetTimeMs64() - lstart) / 1000.0);
-				OnProgress(calc);
-			}
-		}
-
-		uint64_t dur = TestUtils::GetTimeMs64() - start;
-		uint64_t len = Loops * SampleSize;
-		uint64_t rate = GetBytesPerSecond(dur, len);
-		std::string mbps = IntUtils::ToString(rate / MB1);
-		std::string secs = IntUtils::ToString((double)dur / 1000.0);
-		std::string resp = std::string("1GB in " + secs + " seconds, avg. " + mbps + " MB per Second");
-		OnProgress(resp);
-		OnProgress(std::string(""));
 	}
 }

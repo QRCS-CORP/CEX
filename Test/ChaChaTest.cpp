@@ -72,12 +72,12 @@ namespace Test
 		// encrypt linear
 		cipher.Initialize(k);
 		cipher.ParallelProfile().IsParallel() = false;
-		cipher.Transform(data, enc);
+		cipher.Transform(data, 0, enc, 0, data.size());
 		// decrypt parallel
 		cipher.Initialize(k);
 		cipher.ParallelProfile().IsParallel() = true;
 		cipher.ParallelProfile().ParallelBlockSize() = cipher.ParallelProfile().ParallelMinimumSize();
-		cipher.Transform(enc, dec);
+		cipher.Transform(enc, 0, dec, 0, enc.size());
 
 		if (data != dec)
 			throw TestException("ChaCha20: Decrypted arrays are not equal!");

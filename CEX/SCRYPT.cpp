@@ -1,19 +1,52 @@
 #include "SCRYPT.h"
-#include "ArrayUtils.h"
 #include "DigestFromName.h"
 #include "Intrinsics.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "PBKDF2.h"
 #include "ParallelUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
 
-using Utility::ArrayUtils;
-using Utility::IntUtils;
-using Utility::ParallelUtils;
-using Kdf::PBKDF2;
-using Enumeration::SimdProfiles;
+const std::string SCRYPT::CLASS_NAME("SCRYPT");
+
+//~~~Properties~~~//
+
+const Kdfs SCRYPT::Enumeral()
+{
+	return Kdfs::SCRYPT;
+}
+
+const bool SCRYPT::IsInitialized()
+{
+	return m_isInitialized; 
+}
+
+const bool SCRYPT::IsParallel()
+{ 
+	return m_parallelProfile.IsParallel(); 
+}
+
+size_t SCRYPT::MinKeySize() 
+{ 
+	return MIN_PASSLEN; 
+}
+
+std::vector<SymmetricKeySize> SCRYPT::LegalKeySizes() const 
+{ 
+	return m_legalKeySizes; 
+};
+
+const std::string &SCRYPT::Name() 
+{ 
+	return CLASS_NAME;
+}
+
+ParallelOptions &SCRYPT::ParallelProfile() 
+{ 
+	return m_parallelProfile;
+}
 
 //~~~Constructor~~~//
 
@@ -74,9 +107,9 @@ void SCRYPT::Destroy()
 					delete m_kdfDigest;
 			}
 
-			ArrayUtils::ClearVector(m_kdfKey);
-			ArrayUtils::ClearVector(m_kdfSalt);
-			ArrayUtils::ClearVector(m_legalKeySizes);
+			Utility::IntUtils::ClearVector(m_kdfKey);
+			Utility::IntUtils::ClearVector(m_kdfSalt);
+			Utility::IntUtils::ClearVector(m_legalKeySizes);
 		}
 		catch (std::exception& ex)
 		{
@@ -87,20 +120,16 @@ void SCRYPT::Destroy()
 
 size_t SCRYPT::Generate(std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("HKDF:Generate", "The generator must be initialized before use!");
-	if (Output.size() == 0)
-		throw CryptoKdfException("HKDF:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
 
 	return Expand(Output, 0, Output.size());
 }
 
 size_t SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoKdfException("SCRYPT:Generate", "The generator must be initialized before use!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoKdfException("SCRYPT:Generate", "Output buffer too small!");
+	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
+	CEXASSERT(Output.size() != 0, "the output buffer too small");
 
 	return Expand(Output, OutOffset, Length);
 }
@@ -132,7 +161,7 @@ void SCRYPT::Initialize(const std::vector<byte> &Key)
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], m_kdfKey.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 
 	m_isInitialized = true;
 }
@@ -148,9 +177,9 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size());
-	memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+	Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
 
 	m_isInitialized = true;
 }
@@ -166,13 +195,13 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	memcpy(&m_kdfKey[0], &Key[0], Key.size());
+	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size() + Info.size());
 
 	if (Salt.size() > 0)
-		memcpy(&m_kdfSalt[0], &Salt[0], Salt.size());
+		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
 	if (Info.size() > 0)
-		memcpy(&m_kdfSalt[Salt.size()], &Info[0], Info.size());
+		Utility::MemUtils::Copy<byte>(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 
 	m_isInitialized = true;
 }
@@ -185,7 +214,7 @@ void SCRYPT::ReSeed(const std::vector<byte> &Seed)
 	if (Seed.size() > m_kdfSalt.size())
 		m_kdfSalt.resize(Seed.size());
 
-	memcpy(&m_kdfSalt[0], &Seed[0], Seed.size());
+	Utility::MemUtils::Copy<byte>(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
 
 void SCRYPT::Reset()
@@ -200,20 +229,20 @@ void SCRYPT::Reset()
 void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
 {
 	std::vector<uint> X(16);
-	ArrayUtils::Copy(State, State.size() - 16, X, 0, 16);
+	Utility::MemUtils::Copy<uint>(State, State.size() - 16, X, 0, 16 * sizeof(uint));
 
 	for (size_t i = 0; i < 2 * MEM_COST; i += 2)
 	{
-		IntUtils::XORULBLK(State, i * 16, X, 0, X.size());
+		Utility::MemUtils::XorBlock<uint>(State, i * 16, X, 0, X.size() * sizeof(uint));
 		SalsaCore(X);
-		ArrayUtils::Copy(X, 0, Y, i * 8, 16);
+		Utility::MemUtils::Copy<uint>(X, 0, Y, i * 8, 16 * sizeof(uint));
 
-		IntUtils::XORULBLK(State, i * 16 + 16, X, 0, X.size());
+		Utility::MemUtils::XorBlock<uint>(State, i * 16 + 16, X, 0, X.size() * sizeof(uint));
 		SalsaCore(X);
-		ArrayUtils::Copy(X, 0, Y, i * 8 + MEM_COST * 16, 16);
+		Utility::MemUtils::Copy<uint>(X, 0, Y, i * 8 + MEM_COST * 16, 16 * sizeof(uint));
 	}
 
-	ArrayUtils::Copy(Y, 0, State, 0, Y.size());
+	Utility::MemUtils::Copy<uint>(Y, 0, State, 0, Y.size() * sizeof(uint));
 }
 
 size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -234,10 +263,10 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
 	{
 		for (size_t i = 0; i < 16; i++)
-			stateK[k * 16 + i] = IntUtils::BytesToLe32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
+			stateK[k * 16 + i] = Utility::IntUtils::LeBytesTo32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
 	}
 #else
-	IntUtils::BlockToLe32(tmpK, 0, stateK);
+	Utility::IntUtils::BlockToLe<uint>(tmpK, 0, stateK, 0, tmpK.size());
 #endif
 
 	if (!m_parallelProfile.IsParallel() && PRLBLK >= MFLWRD)
@@ -261,10 +290,10 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
 	{
 		for (size_t i = 0; i < 16; i++)
-			IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
+			Utility::IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
 	}
 #else
-	IntUtils::Le32ToBlock(stateK, tmpK, 0);
+	Utility::IntUtils::LeToBlock<uint>(stateK, 0, tmpK, 0, tmpK.size());
 #endif
 
 	Extract(Output, OutOffset, m_kdfKey, tmpK, Length);
@@ -274,7 +303,7 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 
 void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length)
 {
-	PBKDF2 kdf(m_kdfDigest, 1);
+	Kdf::PBKDF2 kdf(m_kdfDigest, 1);
 	kdf.Initialize(Key::Symmetric::SymmetricKey(Key, Salt));
 	kdf.Generate(Output, OutOffset, Length);
 }
@@ -358,38 +387,38 @@ void SCRYPT::SalsaCore(std::vector<uint> &State)
 	size_t ctr = 8;
 	while (ctr != 0)
 	{
-		X4 ^= IntUtils::RotFL32(X0 + X12, 7);
-		X8 ^= IntUtils::RotFL32(X4 + X0, 9);
-		X12 ^= IntUtils::RotFL32(X8 + X4, 13);
-		X0 ^= IntUtils::RotFL32(X12 + X8, 18);
-		X9 ^= IntUtils::RotFL32(X5 + X1, 7);
-		X13 ^= IntUtils::RotFL32(X9 + X5, 9);
-		X1 ^= IntUtils::RotFL32(X13 + X9, 13);
-		X5 ^= IntUtils::RotFL32(X1 + X13, 18);
-		X14 ^= IntUtils::RotFL32(X10 + X6, 7);
-		X2 ^= IntUtils::RotFL32(X14 + X10, 9);
-		X6 ^= IntUtils::RotFL32(X2 + X14, 13);
-		X10 ^= IntUtils::RotFL32(X6 + X2, 18);
-		X3 ^= IntUtils::RotFL32(X15 + X11, 7);
-		X7 ^= IntUtils::RotFL32(X3 + X15, 9);
-		X11 ^= IntUtils::RotFL32(X7 + X3, 13);
-		X15 ^= IntUtils::RotFL32(X11 + X7, 18);
-		X1 ^= IntUtils::RotFL32(X0 + X3, 7);
-		X2 ^= IntUtils::RotFL32(X1 + X0, 9);
-		X3 ^= IntUtils::RotFL32(X2 + X1, 13);
-		X0 ^= IntUtils::RotFL32(X3 + X2, 18);
-		X6 ^= IntUtils::RotFL32(X5 + X4, 7);
-		X7 ^= IntUtils::RotFL32(X6 + X5, 9);
-		X4 ^= IntUtils::RotFL32(X7 + X6, 13);
-		X5 ^= IntUtils::RotFL32(X4 + X7, 18);
-		X11 ^= IntUtils::RotFL32(X10 + X9, 7);
-		X8 ^= IntUtils::RotFL32(X11 + X10, 9);
-		X9 ^= IntUtils::RotFL32(X8 + X11, 13);
-		X10 ^= IntUtils::RotFL32(X9 + X8, 18);
-		X12 ^= IntUtils::RotFL32(X15 + X14, 7);
-		X13 ^= IntUtils::RotFL32(X12 + X15, 9);
-		X14 ^= IntUtils::RotFL32(X13 + X12, 13);
-		X15 ^= IntUtils::RotFL32(X14 + X13, 18);
+		X4 ^= Utility::IntUtils::RotFL32(X0 + X12, 7);
+		X8 ^= Utility::IntUtils::RotFL32(X4 + X0, 9);
+		X12 ^= Utility::IntUtils::RotFL32(X8 + X4, 13);
+		X0 ^= Utility::IntUtils::RotFL32(X12 + X8, 18);
+		X9 ^= Utility::IntUtils::RotFL32(X5 + X1, 7);
+		X13 ^= Utility::IntUtils::RotFL32(X9 + X5, 9);
+		X1 ^= Utility::IntUtils::RotFL32(X13 + X9, 13);
+		X5 ^= Utility::IntUtils::RotFL32(X1 + X13, 18);
+		X14 ^= Utility::IntUtils::RotFL32(X10 + X6, 7);
+		X2 ^= Utility::IntUtils::RotFL32(X14 + X10, 9);
+		X6 ^= Utility::IntUtils::RotFL32(X2 + X14, 13);
+		X10 ^= Utility::IntUtils::RotFL32(X6 + X2, 18);
+		X3 ^= Utility::IntUtils::RotFL32(X15 + X11, 7);
+		X7 ^= Utility::IntUtils::RotFL32(X3 + X15, 9);
+		X11 ^= Utility::IntUtils::RotFL32(X7 + X3, 13);
+		X15 ^= Utility::IntUtils::RotFL32(X11 + X7, 18);
+		X1 ^= Utility::IntUtils::RotFL32(X0 + X3, 7);
+		X2 ^= Utility::IntUtils::RotFL32(X1 + X0, 9);
+		X3 ^= Utility::IntUtils::RotFL32(X2 + X1, 13);
+		X0 ^= Utility::IntUtils::RotFL32(X3 + X2, 18);
+		X6 ^= Utility::IntUtils::RotFL32(X5 + X4, 7);
+		X7 ^= Utility::IntUtils::RotFL32(X6 + X5, 9);
+		X4 ^= Utility::IntUtils::RotFL32(X7 + X6, 13);
+		X5 ^= Utility::IntUtils::RotFL32(X4 + X7, 18);
+		X11 ^= Utility::IntUtils::RotFL32(X10 + X9, 7);
+		X8 ^= Utility::IntUtils::RotFL32(X11 + X10, 9);
+		X9 ^= Utility::IntUtils::RotFL32(X8 + X11, 13);
+		X10 ^= Utility::IntUtils::RotFL32(X9 + X8, 18);
+		X12 ^= Utility::IntUtils::RotFL32(X15 + X14, 7);
+		X13 ^= Utility::IntUtils::RotFL32(X12 + X15, 9);
+		X14 ^= Utility::IntUtils::RotFL32(X13 + X12, 13);
+		X15 ^= Utility::IntUtils::RotFL32(X14 + X13, 18);
 		ctr -= 2;
 	}
 
@@ -448,7 +477,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 	std::vector<uint> Y(bCount);
 	std::vector<std::vector<uint>> V(N);
 
-	ArrayUtils::Copy(State, StateOffset, X, 0, bCount);
+	Utility::MemUtils::Copy<uint>(State, StateOffset, X, 0, bCount * sizeof(uint));
 
 	for (size_t i = 0; i < N; ++i)
 	{
@@ -460,11 +489,11 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 	for (size_t i = 0; i < N; ++i)
 	{
 		uint j = X[bCount - 16] & NMASK;
-		IntUtils::XORULBLK(V[j], 0, X, 0, X.size());
+		Utility::MemUtils::XorBlock<uint>(V[j], 0, X, 0, X.size() * sizeof(uint));
 		BlockMix(X, Y);
 	}
 
-	ArrayUtils::Copy(X, 0, State, StateOffset, bCount);
+	Utility::MemUtils::Copy<uint>(X, 0, State, StateOffset, bCount * sizeof(uint));
 }
 
 NAMESPACE_KDFEND

@@ -88,6 +88,7 @@ class HMAC : public IMac
 {
 private:
 
+	static const std::string CLASS_NAME;
 	static const byte IPAD = 0x36;
 	static const byte OPAD = 0x5C;
 
@@ -112,50 +113,50 @@ public:
 	/// <summary>
 	/// Get: The Digests internal blocksize in bytes
 	/// </summary>
-	virtual const size_t BlockSize() { return m_msgDigest->BlockSize(); }
+	const size_t BlockSize() override;
 
 	/// <summary>
 	/// Get: The message digest engine type
 	/// </summary>
-	const Digests DigestType() { return m_msgDigestType; }
+	const Digests DigestType();
 
 	/// <summary>
 	/// Get: Mac generators type name
 	/// </summary>
-	virtual const Macs Enumeral() { return Macs::HMAC; }
+	const Macs Enumeral() override;
 
 	/// <summary>
 	/// Get: Size of returned mac in bytes
 	/// </summary>
-	virtual const size_t MacSize() { return m_msgDigest->DigestSize(); }
+	const size_t MacSize() override;
 
 	/// <summary>
 	/// Get: Mac is ready to digest data
 	/// </summary>
-	virtual const bool IsInitialized() { return m_isInitialized; }
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
-	virtual std::vector<SymmetricKeySize> LegalKeySizes() const { return m_legalKeySizes; };
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
 	/// Get: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
-	const bool IsParallel() { return m_msgDigest->IsParallel(); }
+	const bool IsParallel();
 
 	/// <summary>
 	/// Get: Mac generators class name
 	/// </summary>
-	virtual const std::string Name() { return "HMAC"; }
+	const std::string &Name() override;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.<para>
 	/// </summary>
-	const size_t ParallelBlockSize() { return m_msgDigest->ParallelBlockSize(); }
+	const size_t ParallelBlockSize();
 
 	/// <summary>
 	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
@@ -164,7 +165,7 @@ public:
 	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
 	/// and reinitialize the state, or initialize the digest manually using a digest Params structure with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
-	ParallelOptions &ParallelProfile() { return m_msgDigest->ParallelProfile(); }
+	ParallelOptions &ParallelProfile();
 
 	//~~~Constructor~~~//
 
@@ -188,7 +189,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~HMAC();
+	~HMAC() override;
 
 	//~~~Public Functions~~~//
 
@@ -201,12 +202,12 @@ public:
 	/// <param name="Output">The output Mac code array</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output);
+	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Release all resources associated with the object
 	/// </summary>
-	virtual void Destroy();
+	void Destroy() override;
 
 	/// <summary>
 	/// Process the data and return a Mac code
@@ -219,7 +220,7 @@ public:
 	/// <returns>The number of bytes processed</returns>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
-	virtual size_t Finalize(std::vector<byte> &Output, size_t OutOffset);
+	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Initialize the MAC generator with a SymmetricKey key container.
@@ -228,7 +229,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
-	virtual void Initialize(ISymmetricKey &KeyParams);
+	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
 	/// Set the number of threads allocated when using multi-threaded tree hashing processing.
@@ -244,14 +245,14 @@ public:
 	/// <summary>
 	/// Reset to the default state; Mac must be re-initialized after this call
 	/// </summary>
-	virtual void Reset();
+	void Reset() override;
 
 	/// <summary>
 	/// Update the Mac with a single byte
 	/// </summary>
 	/// 
 	/// <param name="Input">Input byte to process</param>
-	virtual void Update(byte Input);
+	void Update(byte Input) override;
 
 	/// <summary>
 	/// Update the Mac with a block of bytes
@@ -260,9 +261,10 @@ public:
 	/// <param name="Input">The input data array to process</param>
 	/// <param name="InOffset">Starting position with the input array</param>
 	/// <param name="Length">The length of data to process in bytes</param>
-	virtual void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void Update(const std::vector<byte> &Input, size_t InOffset, size_t Length) override;
 
 private:
+
 	void Scope();
 	void XorPad(std::vector<byte> &A, byte N);
 };
