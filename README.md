@@ -3,7 +3,7 @@ The CEX Cryptographic library in C++
 
 ## Intro
 ### Welcome
-CEX is being written from the ground-up as a powerful and accessable post-quantum secure cryptographic library; a flexible security model, performance-oriented, designed for ease of use, automation of complex tasks, and the ability to upwardly adjust the security of the contained encryption protocols.
+CEX is being written from the ground-up as a powerful and accessable post-quantum secure cryptographic library; a flexible security model, performance-oriented, designed for ease of use, and the automation of complex tasks.
 
 There are some new ideas, and new technologies, as I intend to push the envelope a little, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
 
@@ -12,12 +12,12 @@ That work is still evolving however, as improvments and additions to the symmetr
 The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and the next release will have the first asymmetric cipher (RingLWE) and asymmetric framework.
 
 Though efforts have been made towards future compatability with other platforms, this is currently a Windows-only library. 
-This has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, using MSVC toolkits and the Intel compiler add-in toolkit, future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
+This has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, using the MSVC and Intel compiler tool-chains, and future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
 
 Only a limited number of CPUs have been tested so far; an AMD K9, and Intel i3, i5, and i7 processors; for the moment, newer Intel and AMD cpu's are all that is supported, (testing on a wider range of hardware profiles is ongoing, if you would like to help, contact me: john at vtdev.com). 
 
-The SIMD support is set to AVX2 by default, (AVX implementations are also in place on a number of ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). 
 Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics implementations.
+The SIMD support is set to AVX2 by default, (AVX implementations are also in place on a number of ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). 
 
 This is still an early stage in the development of this library, so stay tuned, be patient..
 
@@ -29,10 +29,9 @@ For more information on the current capabilities of the library, read the Introd
 ## Roadmap
 The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, patch, and release codes.
  
-### Release 1.0.0.2 (version A2):
+### Release 1.0.0.3 (version A3):
 * The RingLWE asymmetric cipher
 * The RLWE-SIG asymmetric signature scheme
-
 * The asymmetric cipher framework
 
 ### Release 1.1.0.1
@@ -44,16 +43,19 @@ The current version is <B>1.0.0.1</B> (A1 version), which are the major, minor, 
 
 ### Release 1.2.0.1
 * Cross platform Networking
-
 * TLS
-
 * STM-KEX
-
 * Android/iOS/Linux Compatability
-
 * DLL API
 
 ## Updates
+
+### Version 1.0.0.2: April 23, 2017
+Last of 1.0 sweep of the symmetric library before the second half of the project engages, with thousands of changes made throughout, and the addition of (!experimental) AVX512 support.
+* Added a vectorized MemUtils class, with SIMD 128/256/512 copy, clear, set-value, and xor functions.
+* Integrated vectorized replacements for memcpy, xor, and memset throughout, including cipher mode support for AVX512, (I don't have a xeon to test this, maybe you can help?).
+* Reformatting of headers (inline accessors removed and the override hint added).
+* Many small TODOs finished, api synchronized, and formatting and documentation changes throughout.
 
 ### Version 1.0: March 28, 2017
 The first official release of the library, (ciphers and protocols are now tested, documented, and ready for deployment).
