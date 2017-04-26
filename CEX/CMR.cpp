@@ -1,6 +1,7 @@
 #include "CMR.h"
 #include "IntUtils.h"
 #include "ProviderFromName.h"
+#include "SymmetricKey.h"
 
 NAMESPACE_PRNG
 
@@ -193,10 +194,13 @@ void CMR::Reset()
 	else
 	{
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
+		std::vector<byte> nonce(m_rngGenerator->LegalKeySizes()[1].NonceSize());
 		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType);
 		seedGen->GetBytes(seed);
+		seedGen->GetBytes(nonce);
+		Key::Symmetric::SymmetricKey kp(seed, nonce);
+		m_rngGenerator->Initialize(kp);
 		delete seedGen;
-		m_rngGenerator->Initialize(seed);
 	}
 
 	m_rngGenerator->Generate(m_rngBuffer);
