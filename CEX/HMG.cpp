@@ -175,16 +175,12 @@ size_t HMG::Generate(std::vector<byte> &Output)
 
 size_t HMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoGeneratorException("HMG:Generate", "The generator has not been initialized!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoGeneratorException("HMG:Generate", "Output buffer too small!");
-	if (m_reseedRequests > MAX_RESEED)
-		throw CryptoGeneratorException("HMG:Generate", "The maximum reseed requests have been exceeded!");
-	if (Length > MAX_REQUEST)
-		throw CryptoGeneratorException("HMG:Generate", "The maximum request size is 32768 bytes!");
+	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
+	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	CEXASSERT(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
+	CEXASSERT(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
-	Generate(Output, OutOffset);
+	GenerateBlock(Output, OutOffset, Length);
 	m_reseedCounter += Length;
 
 	if (m_reseedCounter >= m_reseedThreshold)
@@ -193,7 +189,7 @@ size_t HMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		m_reseedCounter = 0;
 		// use next block of state as seed material
 		std::vector<byte> state(m_hmacEngine.BlockSize());
-		Generate(state, 0);
+		Generate(state, 0, state.size());
 		// combine with salt from provider, extract, and re-key
 		Derive(state);
 	}
@@ -324,15 +320,13 @@ void HMG::Derive(const std::vector<byte> &Seed)
 	m_providerSource->GetBytes(m_hmacState);
 }
 
-void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
+void HMG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	size_t prcLen = Output.size();
-
 	do
 	{
-		size_t rmdLen = Utility::IntUtils::Min(m_hmacState.size(), prcLen);
+		const size_t RMDSZE = Utility::IntUtils::Min(m_hmacState.size(), Length);
 		// 1) increase state counter by output-bytes generated
-		Increase(m_stateCtr, static_cast<uint>(rmdLen));
+		Increase(m_stateCtr, static_cast<uint>(RMDSZE));
 		// 2) process the state counter
 		m_hmacEngine.Update(m_stateCtr, 0, m_stateCtr.size());
 		// 3) process the current state
@@ -342,12 +336,12 @@ void HMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 			m_hmacEngine.Update(m_distributionCode, 0, m_distributionCode.size());
 		// 5) output the state
 		m_hmacEngine.Finalize(m_hmacState, 0);
-		Utility::MemUtils::Copy<byte>(m_hmacState, 0, Output, OutOffset, rmdLen);
+		Utility::MemUtils::Copy<byte>(m_hmacState, 0, Output, OutOffset, RMDSZE);
 
-		prcLen -= rmdLen;
-		OutOffset += rmdLen;
+		Length -= RMDSZE;
+		OutOffset += RMDSZE;
 	} 
-	while (prcLen != 0);
+	while (Length != 0);
 }
 
 void HMG::Increase(std::vector<byte> &Counter, const uint Length)

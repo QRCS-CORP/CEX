@@ -175,14 +175,10 @@ size_t DCG::Generate(std::vector<byte> &Output)
 
 size_t DCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoGeneratorException("DCG:Generate", "The generator has not been initialized!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoGeneratorException("DCG:Generate", "Output buffer too small!");
-	if (m_reseedRequests > MAX_RESEED)
-		throw CryptoGeneratorException("DCG:Generate", "The maximum reseed requests have been exceeded!");
-	if (Length > MAX_REQUEST)
-		throw CryptoGeneratorException("DCG:Generate", "The maximum request size is 32768 bytes!");
+	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
+	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	CEXASSERT(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
+	CEXASSERT(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
 	size_t prcLen = Length;
 

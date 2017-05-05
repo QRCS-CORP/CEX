@@ -203,16 +203,12 @@ size_t CMG::Generate(std::vector<byte> &Output)
 
 size_t CMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoGeneratorException("CMG:Generate", "The generator must be initialized before use!");
-	if ((Output.size() - Length) < OutOffset)
-		throw CryptoGeneratorException("CMG:Generate", "Output buffer too small!");
-	if (m_reseedRequests > MAX_RESEED)
-		throw CryptoGeneratorException("DCG:Generate", "The maximum reseed requests have been exceeded!");
-	if (Length > ParallelBlockSize())
-		throw CryptoGeneratorException("DCG:Generate", "The maximum request size is has been exceeded!");
+	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
+	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	CEXASSERT(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
+	CEXASSERT(Length <= ParallelBlockSize(), "The maximum request size is has been exceeded!");
 
-	Generate(Output, OutOffset);
+	GenerateBlock(Output, OutOffset, Length);
 
 	// added: reseed for prediction resistance
 	if (m_providerType != Providers::None)
@@ -224,7 +220,7 @@ size_t CMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 			m_reseedCounter = 0;
 			// use next block of state as seed material
 			std::vector<byte> state(m_kdfEngine->BlockSize());
-			Generate(state, 0);
+			GenerateBlock(state, 0, state.size());
 			// combine with salt from provider, extract, and re-key
 			Derive(state);
 		}
@@ -356,18 +352,16 @@ void CMG::Derive(std::vector<byte> &Seed)
 	Initialize(tmpK);
 }
 
-void CMG::Generate(std::vector<byte> &Output, size_t OutOffset)
+void CMG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	size_t outSize = Output.size() - OutOffset;
-
-	if (!IsParallel() || outSize < ParallelBlockSize())
+	if (!IsParallel() || Length < ParallelBlockSize())
 	{
-		// not parallel or too small; generate p-rand block
-		Transform(Output, OutOffset, outSize, m_ctrVector);
+		// not parallel or too small; generate 1 p-rand block
+		Transform(Output, OutOffset, Length, m_ctrVector);
 	}
 	else
 	{
-		const size_t OUTSZE = outSize;
+		const size_t OUTSZE = Length;
 		const size_t CNKSZE = ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
 		const size_t CTRLEN = (CNKSZE / BLOCK_SIZE);
 		std::vector<byte> tmpCtr(m_ctrVector.size());
@@ -392,8 +386,8 @@ void CMG::Generate(std::vector<byte> &Output, size_t OutOffset)
 
 		if (ALNSZE < OUTSZE)
 		{
-			size_t fnlSize = Output.size() % ALNSZE;
-			Transform(Output, ALNSZE, fnlSize, m_ctrVector);
+			const size_t FNLSZE = Length % ALNSZE;
+			Transform(Output, ALNSZE, FNLSZE, m_ctrVector);
 		}
 	}
 }

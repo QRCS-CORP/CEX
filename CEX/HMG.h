@@ -369,7 +369,7 @@ public:
 private:
 
 	void Derive(const std::vector<byte> &Seed);
-	void Generate(std::vector<byte> &Output, size_t OutOffset);
+	void GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Increase(std::vector<byte> &Counter, const uint Length);
 	void RandomPad(size_t BlockOffset);
 	void Scope();
