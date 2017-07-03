@@ -23,11 +23,19 @@ public:
 	//~~~ Constants~~~//
 
 	/// <summary>
-	/// A UInt256 initialized at one
+	/// A UInt128 initialized with 4x 32bit integers to the value one
 	/// </summary>
-	static inline const UInt128 XMM1() 
+	inline static const UInt128 ONE() 
 	{
-		return  UInt128((uint)1);
+		return UInt128(_mm_set1_epi32(1));
+	}
+
+	/// <summary>
+	/// A UInt128 initialized with 4x 32bit integers to the value 0
+	/// </summary>
+	inline static const UInt128 ZERO()
+	{
+		return UInt128(_mm_set1_epi32(0));
 	}
 
 	//~~~ Constructors~~~//
@@ -129,16 +137,27 @@ public:
 	}
 
 	/// <summary>
-	/// Load with 4 * 32bit unsigned integers in Little Endian format
+	/// Load an array into a register in Little Endian format.
 	/// </summary>
 	///
-	/// <param name="X0">uint 0</param>
-	/// <param name="X1">uint 1</param>
-	/// <param name="X2">uint 2</param>
-	/// <param name="X3">uint 3</param>
-	inline void Load(uint X0, uint X1, uint X2, uint X3)
+	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	inline void Load(const std::vector<uint> &Input, size_t Offset)
 	{
-		xmm = _mm_set_epi32(X0, X1, X2, X3);
+		xmm = _mm_set_epi32(Input[Offset], Input[Offset + 1], Input[Offset + 2], Input[Offset + 3]);
+	}
+
+	/// <summary>
+	/// Load an array of T into a register in Little Endian format.
+	/// <para>Integers are loaded as 32bit integers regardless the natural size of T</para>
+	/// </summary>
+	///
+	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	template <typename T>
+	inline void LoadT(const std::vector<T> &Input, size_t Offset)
+	{
+		xmm = _mm_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3]);
 	}
 
 	/// <summary>
@@ -152,7 +171,7 @@ public:
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
 	template <typename T>
-	static inline void Load4(const std::vector<T> &Input, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
+	inline static void Load4(const std::vector<T> &Input, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		X0.Load(Input, Offset);
 		X1.Load(Input, Offset + sizeof(T));
@@ -184,7 +203,7 @@ public:
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
 	template <typename T>
-	static inline void Store4(std::vector<T> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
+	inline static void Store4(std::vector<T> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		Transpose(X0, X1, X2, X3);
 		X0.Store(Output, Offset);
@@ -216,7 +235,7 @@ public:
 	/// <param name="X2">Operand 14</param>
 	/// <param name="X3">Operand 15</param>
 	template <typename T>
-	static inline void Store16(std::vector<T> &Output, size_t OutOffset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3, UInt128 &X4, UInt128 &X5,
+	inline static void Store16(std::vector<T> &Output, size_t OutOffset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3, UInt128 &X4, UInt128 &X5,
 		UInt128 &X6, UInt128 &X7, UInt128 &X8, UInt128 &X9, UInt128 &X10, UInt128 &X11, UInt128 &X12, UInt128 &X13, UInt128 &X14, UInt128 &X15)
 	{
 		__m128i T0 = _mm_unpacklo_epi32(X0.xmm, X1.xmm);
@@ -280,7 +299,7 @@ public:
 	/// <param name="X">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
-	static inline UInt128 Abs(const UInt128 &Value)
+	inline static UInt128 Abs(const UInt128 &Value)
 	{
 		return UInt128(_mm_abs_epi32(Value.xmm));
 	}
@@ -295,6 +314,18 @@ public:
 	inline UInt128 AndNot(const UInt128 &Value)
 	{
 		return UInt128(_mm_andnot_si128(xmm, Value.xmm));
+	}
+
+	/// <summary>
+	/// Returns the bitwise negation of 4 32bit integers
+	/// </summary>
+	///
+	/// <param name="Value">The integers to negate</param>
+	/// 
+	/// <returns>The processed UInt128</returns>
+	inline static UInt128 Negate(const UInt128 &Value)
+	{
+		return UInt128(_mm_sub_epi32(_mm_set1_epi32(0), Value.xmm));
 	}
 
 	/// <summary>
@@ -315,7 +346,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt128</returns>
-	static inline UInt128 RotL32(const UInt128 &Value, const int Shift)
+	inline static UInt128 RotL32(const UInt128 &Value, const int Shift)
 	{
 		return UInt128(_mm_or_si128(_mm_slli_epi32(Value.xmm, static_cast<int>(Shift)), _mm_srli_epi32(Value.xmm, static_cast<int>(32 - Shift))));
 	}
@@ -338,9 +369,33 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt128</returns>
-	static inline UInt128 RotR32(const UInt128 &Value, const int Shift)
+	inline static UInt128 RotR32(const UInt128 &Value, const int Shift)
 	{
 		return RotL32(Value, 32 - Shift);
+	}
+
+	/// <summary>
+	/// Shifts the 4 signed 32-bit integers in a right by count bits while shifting in the sign bit
+	/// </summary>
+	///
+	/// <param name="Value">The base integer</param>
+	/// 
+	/// <returns>The processed UInt128</returns>
+	inline static UInt128 ShiftRA(const UInt128 &Value, const int Shift)
+	{
+		return UInt128(_mm_sra_epi32(Value, _mm_set1_epi32(Shift)));
+	}
+
+	/// <summary>
+	/// Shifts the 4 signed or unsigned 32-bit integers in a right by count bits while shifting in zeros.
+	/// </summary>
+	///
+	/// <param name="Value">The base integer</param>
+	/// 
+	/// <returns>The processed UInt128</returns>
+	inline static UInt128 ShiftRL(const UInt128 &Value, const int Shift)
+	{
+		return UInt128(_mm_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
 	/// <summary>
@@ -365,7 +420,7 @@ public:
 	/// <param name="X">The UInt128 to process</param>
 	/// 
 	/// <returns>The byte swapped UInt128</returns>
-	static inline UInt128 Swap(UInt128 &X)
+	inline static UInt128 Swap(UInt128 &X)
 	{
 		__m128i T = X.xmm;
 
@@ -380,7 +435,7 @@ public:
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	static inline const size_t size() { return sizeof(__m128i); }
+	inline static const size_t size() { return sizeof(__m128i); }
 
 	/// <summary>
 	/// Shuffles the registers in 4 * UInt128 structures; to create a sequential chain
@@ -390,7 +445,7 @@ public:
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	static inline void Transpose(UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
+	inline static void Transpose(UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3)
 	{
 		__m128i T0 = _mm_unpacklo_epi32(X0.xmm, X1.xmm);
 		__m128i T1 = _mm_unpacklo_epi32(X2.xmm, X3.xmm);
@@ -439,7 +494,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt128 operator ++ ()
 	{
-		return UInt128(xmm) + XMM1();
+		return UInt128(xmm) + UInt128::ONE();
 	}
 
 	/// <summary>
@@ -449,7 +504,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt128 operator ++ (int)
 	{
-		return UInt128(xmm) + XMM1();
+		return UInt128(xmm) + UInt128::ONE();
 	}
 
 	/// <summary>
@@ -479,7 +534,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt128 operator -- ()
 	{
-		return UInt128(xmm) - XMM1();
+		return UInt128(xmm) - UInt128::ONE();
 	}
 
 	/// <summary>
@@ -489,7 +544,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt128 operator -- (int)
 	{
-		return UInt128(xmm) - XMM1();
+		return UInt128(xmm) - UInt128::ONE();
 	}
 
 	/// <summary>
@@ -535,8 +590,8 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt128 &X)
 	{
-		std::vector<uint> tmpA(16);
-		std::vector<uint> tmpB(16);
+		std::vector<uint> tmpA(4);
+		std::vector<uint> tmpB(4);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
 		xmm = _mm_set_epi32(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);

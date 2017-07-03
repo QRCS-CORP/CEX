@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef _CEX_ICIPHERMODE_H
 #define _CEX_ICIPHERMODE_H
@@ -107,7 +107,7 @@ public:
 	/// <summary>
 	/// Get: The cipher mode name
 	/// </summary>
-	virtual const std::string &Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
@@ -170,7 +170,7 @@ public:
 	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	virtual void Destroy() = 0;
 

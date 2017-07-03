@@ -15,6 +15,7 @@
 
 NAMESPACE_BLOCK
 
+const std::string SHX::CIPHER_NAME("Serpent");
 const std::string SHX::CLASS_NAME("SHX");
 const std::string SHX::DEF_DSTINFO("SHX version 1 information string");
 
@@ -65,9 +66,12 @@ const std::vector<size_t> &SHX::LegalRounds()
 	return m_legalRounds;
 }
 
-const std::string &SHX::Name()
+const std::string SHX::Name()
 {
-	return CLASS_NAME;
+	if (m_kdfEngineType == Digests::None)
+		return CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	else
+		return CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
 }
 
 const size_t SHX::Rounds()
@@ -84,6 +88,7 @@ const size_t SHX::StateCacheSize()
 
 SHX::SHX(Digests KdfEngineType, size_t Rounds)
 	:
+	m_cprKeySize(0),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
@@ -105,6 +110,7 @@ SHX::SHX(Digests KdfEngineType, size_t Rounds)
 
 SHX::SHX(IDigest *KdfEngine, size_t Rounds)
 	:
+	m_cprKeySize(0),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_kdfEngine(KdfEngine),
@@ -156,6 +162,7 @@ void SHX::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_cprKeySize = 0;
 		m_kdfEngineType = Digests::None;
 		m_kdfInfoMax = 0;
 		m_kdfKeySize = 0;
@@ -194,6 +201,7 @@ void SHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
+	m_cprKeySize = KeyParams.Key().size() * 8;
 	// expand the key
 	ExpandKey(KeyParams.Key());
 	// ready to transform data

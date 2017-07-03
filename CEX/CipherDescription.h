@@ -2,6 +2,7 @@
 #define _CEX_CIPHERDESCRIPTION_H
 
 #include "CexDomain.h"
+#include "BlockCiphers.h"
 #include "BlockSizes.h"
 #include "CipherModes.h"
 #include "Digests.h"
@@ -9,17 +10,16 @@
 #include "MemoryStream.h"
 #include "PaddingModes.h"
 #include "RoundCounts.h"
-#include "SymmetricEngines.h"
 
 NAMESPACE_PROCESSING
 
+using Enumeration::BlockCiphers;
 using Enumeration::BlockSizes;
 using Enumeration::CipherModes;
 using Enumeration::Digests;
 using Enumeration::IVSizes;
 using Enumeration::PaddingModes;
 using Enumeration::RoundCounts;
-using Enumeration::SymmetricEngines;
 using IO::MemoryStream;
 
 /// <summary>
@@ -66,7 +66,7 @@ public:
 	/// <summary>
 	/// The Cryptographic Engine type
 	/// </summary>
-	const SymmetricEngines EngineType();
+	const BlockCiphers EngineType();
 
 	/// <summary>
 	/// Get: The cipher Key Size
@@ -127,7 +127,7 @@ public:
 	/// <param name="BlockSize">The cipher block size</param>
 	/// <param name="RoundCount">The number of transformation rounds</param>
 	/// <param name="KdfEngine">The digest engine used to power the key schedule key derivation Function in HX extended ciphers</param>
-	CipherDescription(SymmetricEngines EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType,
+	CipherDescription(BlockCiphers EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType,
 		PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine = Digests::SHA512);
 
 	/// <summary>
@@ -162,11 +162,6 @@ public:
 	static CipherDescription AES256CBC();
 
 	/// <summary>
-	/// An Rijndael-512 preset using CBC mode and PKCS7 padding
-	/// </summary>
-	static CipherDescription AES512CBC();
-
-	/// <summary>
 	/// An Rijndael-512 HX extended preset using CBC mode, PKCS7 padding, and an SHA256 powered KDF
 	/// </summary>
 	static CipherDescription RHX512CBC();
@@ -182,11 +177,6 @@ public:
 	static CipherDescription AES256CTR();
 
 	/// <summary>
-	/// An Rijndael-512 preset using CTR mode
-	/// </summary>
-	static CipherDescription AES512CTR();
-
-	/// <summary>
 	/// An Rijndael-512 HX extended preset using CTR mode, and an SHA256 powered KDF
 	/// </summary>
 	static CipherDescription RHX512CTR();
@@ -194,12 +184,7 @@ public:
 	/// <summary>
 	/// An Serpent-256 preset using CBC mode and PKCS7 padding
 	/// </summary>
-	static CipherDescription SPT256CBC();
-
-	/// <summary>
-	/// An Serpent-512 preset using CBC mode and PKCS7 padding
-	/// </summary>
-	static CipherDescription SPT512CBC();
+	static CipherDescription SERPENT256CBC();
 
 	/// <summary>
 	/// An Serpent-512 HX extended preset using CBC mode, PKCS7 padding, and an SHA256 powered KDF
@@ -209,12 +194,7 @@ public:
 	/// <summary>
 	/// An Serpent-256 preset using CTR mode
 	/// </summary>
-	static CipherDescription SPT256CTR();
-
-	/// <summary>
-	/// An Serpent-512 preset using CTR mode
-	/// </summary>
-	static CipherDescription SPT512CTR();
+	static CipherDescription SERPENT256CTR();
 
 	/// <summary>
 	/// An Serpent-512 HX extended preset using CTR mode, and an SHA256 powered KDF
@@ -224,12 +204,7 @@ public:
 	/// <summary>
 	/// An Twofish-256 preset using CBC mode and PKCS7 padding
 	/// </summary>
-	static CipherDescription TFH256CBC();
-
-	/// <summary>
-	/// An Twofish-512 preset using CBC mode and PKCS7 padding
-	/// </summary>
-	static CipherDescription TFH512CBC();
+	static CipherDescription TWOFISH256CBC();
 
 	/// <summary>
 	/// An Twofish-512 HX extended preset using CBC mode, PKCS7 padding, and an SHA256 powered KDF
@@ -239,12 +214,7 @@ public:
 	/// <summary>
 	/// An Twofish-256 preset using CTR mode
 	/// </summary>
-	static CipherDescription TFH256CTR();
-
-	/// <summary>
-	/// An Twofish-512 preset using CTR mode
-	/// </summary>
-	static CipherDescription TFH512CTR();
+	static CipherDescription TWOFISH256CTR();
 
 	/// <summary>
 	/// An Twofish-512 HX extended preset using CTR mode, and an SHA256 powered KDF

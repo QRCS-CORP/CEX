@@ -1,4 +1,5 @@
 #include "ProviderFromName.h"
+#include "ACP.h"
 #include "CJP.h"
 #include "CSP.h"
 #include "ECP.h"
@@ -12,6 +13,8 @@ IProvider* ProviderFromName::GetInstance(Providers ProviderType)
 	{
 		switch (ProviderType)
 		{
+		case Providers::ACP:
+			return new Provider::ACP();
 		case Providers::CJP:
 			return new Provider::CJP();
 		case Providers::CSP:

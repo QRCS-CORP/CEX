@@ -1,3 +1,71 @@
+// ### CEX 1.0.0.3 ###
+
+// Release 1.0.0.3, June 30, 2017
+// Added asymmetric cipher interfaces and framework
+// Added RingLWE asymmetric cipher
+// Added the Auto Collection seed Provider (ACP)
+// Addition of the HCR prng
+// Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators
+// Overhaul of SecureRandom and prng classes
+//
+// Release 1.0.0.2, April 23, 2017
+// Added and integrated a vectorized MemUtils class
+// Added experimental AVX512 support
+// Added UInt512 class
+// Added MemUtils and SIMD tests
+// Templated Chacha and Salsa
+// Rewrites of Twofish and Serpent
+// Headers are now documentation only (no inline accessors)
+// Added override hint to virtual functions in headers
+// Many small format changes and a couple of bug fixes
+//
+// Release 1.0.1.1, April 08, 2017
+// Fixed a bug in CpuDetect (misreporting SIMD capabilities of some cpu's)
+// Added preprocessor definitions for intrinsics throughout both projects
+// Cleaned up the test project
+// Changes to code required by Intel tool-chain
+// Tested on Intel i3, i5, i7, and an AMD K9
+// Tested on debug and release versions of ARM/x86/x64
+// Tested on MSVC 2015 and 2017 ide
+// Now supports arch:AVX2 (recommended), arch:AVX (minimum), or no intrinsics support, arch:IA32
+// Many misc. internal todo's and rewrites completed
+//
+// Release 1.0.0.1
+// Skein Tree			-done
+// Rewrite SHA2			-done
+// Rewrite Blake2		-done
+// Keccak Tree			-done
+// Scrypt				-done
+// Code review			-done
+// Help review			-done
+//
+// Release 0.14.2.1
+// EAX/GCM/OCB			-done
+// GMAC					-done
+// Code review			-done
+//
+// Release 0.13
+// HX kdf change		-done
+// DCG/BCG/HCG Drbg		-done
+// RDP/ECP/CJP provider -done
+// Secure Key/mem		-done
+// CipherStream rewrite	-done
+// KeyGenerator rewrite	-dome
+
+
+// *** 1.1.0.0 RoadMap ***
+//
+// RingLWE				-added
+// McEliece				-?
+// GMSS					-?
+// RSA-Sig				-?
+// Networking			-?
+// TLS-KEX				-?
+// ASYM-KEX				-?
+// DLL API				-?
+// AVX512 integration	-started
+
+
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
@@ -10,6 +78,7 @@
 #include "../Test/AEADTest.h"
 #include "../Test/AesAvsTest.h"
 #include "../Test/AesFipsTest.h"
+#include "../Test/AsymmetricSpeedTest.h"
 #include "../Test/Blake2Test.h"
 #include "../Test/ChaChaTest.h"
 #include "../Test/CipherModeTest.h"
@@ -34,9 +103,10 @@
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
-#include "../Test/RangedRngTest.h"
+#include "../Test/PrngTest.h"
 #include "../Test/RandomOutputTest.h"
 #include "../Test/RijndaelTest.h"
+#include "../Test/RingLWETest.h"
 #include "../Test/SalsaTest.h"
 #include "../Test/SCRYPTTest.h"
 #include "../Test/SecureStreamTest.h"
@@ -50,67 +120,6 @@
 #include "../Test/TwofishTest.h"
 
 using namespace Test;
-
-// *** CEX 1.0 RoadMap ***
-//
-// Release 0.13
-// HX kdf change		-done
-// DCG/CMG/HMG Drbg		-done
-// RDP/ECP/CJP provider -done
-// Secure Key/mem		-done
-// CipherStream rewrite	-done
-// KeyGenerator rewrite	-dome
-
-// Release 0.14.2.1
-// EAX/GCM/OCB			-done
-// GMAC					-done
-// Code review			-done
-
-// *** 1st Official Version: March 30, 2017 ***
-//
-// Release 1.0.0.1
-// Skein Tree			-done
-// Rewrite SHA2			-done
-// Rewrite Blake2		-done
-// Keccak Tree			-done
-// Scrypt				-done
-// Code review			-done
-// Help review			-done
-
-// Release 1.0.0.2, April 23, 2017
-// Added and integrated a vectorized MemUtils class
-// Added experimental AVX512 support
-// Added UInt512 class
-// Added MemUtils and SIMD tests
-// Templated Chacha and Salsa
-// Rewrites of Twofish and Serpent
-// Headers are now documentation only (no inline accessors)
-// Added override hint to virtual functions in headers
-// Many small format changes and a couple of bug fixes
-
-// Release 1.0.1.1, April 08, 2017
-// Fixed a bug in CpuDetect (misreporting SIMD capabilities of some cpu's)
-// Added preprocessor definitions for intrinsics throughout both projects
-// Cleaned up the test project
-// Changes to code required by Intel tool-chain
-// Tested on Intel i3, i5, i7, and an AMD K9
-// Tested on debug and release versions of ARM/x86/x64
-// Tested on MSVC 2015 and 2017 ide
-// Now supports arch:AVX2 (recommended), arch:AVX (minimum), or no intrinsics support, arch:IA32
-// Many misc. internal todo's and rewrites completed
-
-// *** 1.1.0.0 RoadMap ***
-//
-// RingLWE				-started
-// RLWE-SIG				-?
-// McEliece				-?
-// GMSS					-?
-// RSA-Sig				-?
-// Networking			-?
-// TLS					-?
-// STM-KEX				-?
-// DLL API				-?
-// AVX512 integration	-started
 
 void CpuCheck()
 {
@@ -167,11 +176,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.1.1: CEX Library in C++  *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.3: CEX Library in C++  *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.1.1 (A1)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.3 (A3)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      April 11, 2017                  *");
+	ConsoleUtils::WriteLine("* Date:      June 30, 2017                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -221,6 +230,7 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
+	//RunTest(new RingLWETest());
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
@@ -334,7 +344,7 @@ int main()
 			RunTest(new CMACTest());
 			RunTest(new HMACTest());
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
-			RunTest(new RangedRngTest());
+			RunTest(new PrngTest());
 			PrintHeader("TESTING KEY DERIVATION FUNCTIONS");
 			RunTest(new HKDFTest());
 			RunTest(new KDF2Test());
@@ -351,6 +361,8 @@ int main()
 			PrintHeader("TESTING VECTORIZED MEMORY FUNCTIONS");
 			RunTest(new MemUtilsTest());
 			RunTest(new SimdWrapperTest());
+			PrintHeader("TESTING ASYMMETRIC CIPHERS");
+			RunTest(new RingLWETest());
 		}
 		else
 		{
@@ -388,6 +400,16 @@ int main()
 		else
 		{
 			ConsoleUtils::WriteLine("Digest Speed tests were Cancelled..");
+		}
+		ConsoleUtils::WriteLine("");
+
+		if (CanTest("Press 'Y' then Enter to run Asymmetric Cipher Speed Tests, any other key to cancel: "))
+		{
+			RunTest(new AsymmetricSpeedTest());
+		}
+		else
+		{
+			ConsoleUtils::WriteLine("Asymmetric Cipher Speed tests were Cancelled..");
 		}
 		ConsoleUtils::WriteLine("");
 

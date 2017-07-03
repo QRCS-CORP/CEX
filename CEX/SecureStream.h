@@ -52,7 +52,7 @@ public:
 	/// <summary>
 	/// Get: The streams class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: The streams current position
@@ -112,7 +112,7 @@ public:
 	void CopyTo(IByteStream* Destination) override;
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy() override;
 

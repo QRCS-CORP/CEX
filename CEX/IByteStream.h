@@ -60,7 +60,7 @@ public:
 	/// <summary>
 	/// Get: The streams class name
 	/// </summary>
-	virtual const std::string &Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Get: The streams current position
@@ -82,7 +82,7 @@ public:
 	virtual void CopyTo(IByteStream* Destination) = 0;
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	virtual void Destroy() = 0;
 

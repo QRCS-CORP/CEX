@@ -17,15 +17,19 @@ enum class Prngs : byte
 	/// <summary>
 	/// A Symmetric Cipher Counter mode random number generator
 	/// </summary>
-	CMR = 1,
+	BCR = 1,
 	/// <summary>
 	/// A Digest Counter mode random number generator
 	/// </summary>
 	DCR = 2,
 	/// <summary>
+	/// An HMAC based random number generator
+	/// </summary>
+	HCR = 4,
+	/// <summary>
 	/// An implementation of a passphrase based PKCS#5 random number generator
 	/// </summary>
-	PBR = 4
+	PBR = 8
 };
 
 NAMESPACE_ENUMERATIONEND

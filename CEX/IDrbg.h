@@ -86,7 +86,7 @@ public:
 	/// <summary>
 	/// The Drbg generators class name
 	/// </summary>
-	virtual const std::string &Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Get: The size of the nonce counter value in bytes
@@ -106,7 +106,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	virtual void Destroy() = 0;
 

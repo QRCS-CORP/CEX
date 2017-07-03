@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
 // Implementation Details:
@@ -36,7 +36,7 @@ using Digest::IDigest;
 using Enumeration::Digests;
 
 /// <summary>
-/// An implementation of a message Digest Counter Generator (DCG)
+/// An implementation of a message Digest Counter Generator DRBG
 /// </summary> 
 /// 
 /// <example>
@@ -226,7 +226,7 @@ public:
 	/// <summary>
 	/// Get: The Drbg generators class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: The size of the nonce counter value in bytes
@@ -254,7 +254,7 @@ public:
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized digest type name is used</exception>
-	explicit DCG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::CSP);
+	explicit DCG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Instantiate the class using a digest instance, and an optional entropy source 
@@ -274,7 +274,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy() override;
 

@@ -178,12 +178,13 @@ namespace Test
 			enc2.resize(smpSze);
 			size_t blkCnt = smpSze / blkSze;
 			Cipher->ParallelProfile().IsParallel() = false;
-			std::string name = Cipher->Name();
 
 			// sequential access //
 
 			// with offsets: transform(in, off, out, off, len)
 			Cipher->Initialize(true, keyParam);
+			//std::string name = Cipher->Name();
+
 			// encrypt
 			for (size_t j = 0; j < blkCnt; ++j)
 				Cipher->Transform(data, j * blkSze, enc1, j * blkSze, blkSze);

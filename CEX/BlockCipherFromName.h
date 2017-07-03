@@ -37,14 +37,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="BlockCipherType">The symmetric block ciphers enumeration type name</param>
-	/// <param name="BlockSize">The symmetric ciphers internal block size; 16 bytes with Twofish and Serpent, or 16/32 for Rijndael</param>
 	/// <param name="RoundCount">The symmetric ciphers transformation rounds count; requires KdfEngineType set to a supported digest type</param>
 	/// <param name="KdfEngineType">The extended (HX) ciphers HKDF key expansion digest engine type; set to None for standard key schedule, select a digest for secure key expansion mode</param>
 	/// 
 	/// <returns>A symmetric block cipher instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* GetInstance(BlockCiphers BlockCipherType, uint BlockSize, uint RoundCount, Digests KdfEngineType);
+	static IBlockCipher* GetInstance(BlockCiphers BlockCipherType, Digests KdfEngineType, uint RoundCount);
 };
 
 NAMESPACE_HELPEREND

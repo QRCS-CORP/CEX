@@ -31,7 +31,10 @@ const bool Blake256::IsParallel() { return m_parallelProfile.IsParallel(); }
 
 const std::string Blake256::Name()
 {
-	return CLASS_NAME;
+	if (m_parallelProfile.IsParallel())
+		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	else
+		return CLASS_NAME;
 }
 
 const size_t Blake256::ParallelBlockSize()

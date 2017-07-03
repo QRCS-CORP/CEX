@@ -31,7 +31,10 @@ const bool Skein1024::IsParallel()
 
 const std::string Skein1024::Name() 
 { 
-	return CLASS_NAME; 
+	if (m_parallelProfile.IsParallel())
+		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	else
+		return CLASS_NAME;
 }
 
 const size_t Skein1024::ParallelBlockSize() 

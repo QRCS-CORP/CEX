@@ -9,37 +9,30 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.2 (A2).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.3 (A3).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.2</B> (A2 version), which are the major, minor, patch, and release codes. \n
+The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, patch, and release codes. \n
 \brief
-
-<B>Release 1.0.0.3 (version A3):</B> \n
-The RingLWE asymmetric cipher \n
-The RLWE-SIG asymmetric signature scheme \n
-The asymmetric cipher framework \n  \n
 
 <B>Release 1.1.0.1</B> \n
 RingLWE \n
-RLWE-SIG \n
 McEliece \n
 GMSS \n
 RSA-Sig \n \n
 
 <B>Release 1.2.0.1</B> \n
-Networking \n
 TLS \n
 STM-KEX \n
 Android/iOS/Linux Compatability \n
 DLL API \n
 
 \author    John Underhill
-\version   1.0.0.2
-\date      April 23, 2017
+\version   1.0.0.3
+\date      June 30, 2017
 \copyright GPL version 3 license (GPLv3)
 
 \section intro_link Links
@@ -191,10 +184,10 @@ NAMESPACE_ROOT
 	*  @brief Deterministic Random Byte Generators
 	*/
 	NAMESPACE_DRBG
-		class CMG {};
+		class BCG {};
 		class DCG {};
 		class IDrbg {};
-		class HMG {};
+		class HCG {};
 	NAMESPACE_DRBGEND
 	/*! @} */
 
@@ -348,7 +341,7 @@ NAMESPACE_ROOT
 	*  @brief Pseudo Random Number Generators
 	*/
 	NAMESPACE_PRNG
-		class CMR {};
+		class BCR {};
 		class DCR {};
 		class IPrng {};
 		class PBR {};

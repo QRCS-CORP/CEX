@@ -14,10 +14,10 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_DGCPRNG_H
-#define _CEX_DGCPRNG_H
+#ifndef _CEX_DCR_H
+#define _CEX_DCR_H
 
 #include "IPrng.h"
 #include "DCG.h"
@@ -30,7 +30,8 @@ using Enumeration::Digests;
 using Enumeration::Providers;
 
 /// <summary>
-/// An implementation of a Digest Counter based Random Number Generator
+/// An implementation of a Digest Counter PRNG.
+/// <para>Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
 /// </summary> 
 /// 
 /// <example>
@@ -73,8 +74,8 @@ private:
 	bool m_isDestroyed;
 	Drbg::DCG* m_rngGenerator;
 	Providers m_pvdType;
+	std::vector<byte> m_rndSeed;
 	std::vector<byte> m_rngBuffer;
-	std::vector<byte> m_stateSeed;
 
 public:
 
@@ -88,7 +89,7 @@ public:
 	/// <summary>
 	/// Get: The random generators class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
@@ -97,11 +98,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="DigestEngine">The digest that powers the rng (default is Keccak512)</param>
-	/// <param name="SeedEngine">The Seed engine used to create the salt (default is CSPR)</param>
+	/// <param name="SeedEngine">The Seed engine used to create the salt (default is auto-seed)</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	DCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::CSP, size_t BufferSize = 1024);
+	DCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -122,7 +123,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy();
 
@@ -141,6 +142,32 @@ public:
 	///
 	/// <param name="Output">Output array</param>
 	void GetBytes(std::vector<byte> &Output) override;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <returns>Random UInt16</returns>
+	ushort NextUShort() override;
+
+	/// <summary>
+	/// Get an pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <param name="Maximum">Maximum value</param>
+	/// 
+	/// <returns>Random UInt16</returns>
+	ushort NextUShort(ushort Maximum) override;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
+	/// 
+	/// <returns>Random UInt16</returns>
+	ushort NextUShort(ushort Maximum, ushort Minimum) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -162,18 +189,18 @@ public:
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Minimum, uint Maximum) override;
+	uint Next(uint Maximum, uint Minimum) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextLong() override;
+	ulong NextULong() override;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
@@ -182,17 +209,17 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextLong(ulong Maximum) override;
+	ulong NextULong(ulong Maximum) override;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
+	/// <param name="Maximum">Maximum value</param>
 	/// <param name="Minimum">Minimum value</param>
-	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextLong(ulong Minimum, ulong Maximum) override;
+	ulong NextULong(ulong Maximum, ulong Minimum) override;
 
 	/// <summary>
 	/// Reset the generator instance

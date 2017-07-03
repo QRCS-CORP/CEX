@@ -36,9 +36,9 @@ size_t HKDF::MinKeySize()
 	return m_macSize; 
 }
 
-const std::string &HKDF::Name()
+const std::string HKDF::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_macGenerator->Name();
 }
 
 //~~~Constructor~~~//

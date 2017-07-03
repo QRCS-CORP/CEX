@@ -1,75 +1,70 @@
-#include "CMR.h"
+#include "BCR.h"
 #include "IntUtils.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_PRNG
 
-const std::string CMR::CLASS_NAME("CMR");
+const std::string BCR::CLASS_NAME("BCR");
 
 //~~~Properties~~~//
 
-const Prngs CMR::Enumeral() 
+const Prngs BCR::Enumeral() 
 { 
-	return Prngs::CMR; 
+	return Prngs::BCR; 
 }
 
-const std::string &CMR::Name() 
+const std::string BCR::Name() 
 { 
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_rngGenerator->Name();
 }
 
 //~~~Constructor~~~//
 
-CMR::CMR(BlockCiphers CipherType, Providers ProviderType, size_t BufferSize)
+BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize),
 	m_engineType(CipherType),
 	m_isDestroyed(false),
+	m_isParallel(Parallel),
 	m_pvdType(ProviderType),
-	m_rngBuffer(BufferSize)
+	m_rngBuffer(0)
 {
-	if (BufferSize < BUFFER_MIN)
-		throw CryptoRandomException("CMR:Ctor", "Buffer size must be at least 64 bytes!");
-
 	Reset();
 }
 
-CMR::CMR(std::vector<byte> &Seed, BlockCiphers CipherType, size_t BufferSize)
+BCR::BCR(std::vector<byte> &Seed, BlockCiphers CipherType, bool Parallel)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize),
 	m_engineType(CipherType),
 	m_isDestroyed(false),
-	m_rngBuffer(BufferSize),
-	m_stateSeed(Seed)
+	m_isParallel(Parallel),
+	m_rngBuffer(0),
+	m_rndSeed(Seed)
 {
-	if (BufferSize < BUFFER_MIN)
-		throw CryptoRandomException("CMR:Ctor", "Buffer size must be at least 64 bytes!");
-	if (Seed.size() == 0)
-		throw CryptoRandomException("CMR:Ctor", "Seed can not be null or empty!");
+	if (Seed.size() < 32)
+		throw CryptoRandomException("BCR:Ctor", "Seed size is too small!");
 
 	Reset();
 }
 
-CMR::~CMR()
+BCR::~BCR()
 {
 	Destroy();
 }
 
 //~~~Public Functions~~~//
 
-void CMR::Destroy()
+void BCR::Destroy()
 {
 	if (!m_isDestroyed)
 	{
 		m_engineType = BlockCiphers::None;
 		m_pvdType = Providers::None;
 		m_bufferIndex = 0;
-		m_bufferSize = 0;
+		m_isParallel = false;
 
-		Utility::IntUtils::ClearVector(m_stateSeed);
+		Utility::IntUtils::ClearVector(m_rndSeed);
 		Utility::IntUtils::ClearVector(m_rngBuffer);
 
 		if (m_rngGenerator != 0)
@@ -79,17 +74,17 @@ void CMR::Destroy()
 	}
 }
 
-std::vector<byte> CMR::GetBytes(size_t Size)
+std::vector<byte> BCR::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);
 	GetBytes(data);
 	return data;
 }
 
-void CMR::GetBytes(std::vector<byte> &Output)
+void BCR::GetBytes(std::vector<byte> &Output)
 {
 	if (Output.size() == 0)
-		throw CryptoRandomException("CMR:GetBytes", "Buffer size must be at least 1 byte!");
+		throw CryptoRandomException("BCR:GetBytes", "Buffer size must be at least 1 byte!");
 
 	if (m_rngBuffer.size() - m_bufferIndex < Output.size())
 	{
@@ -98,24 +93,24 @@ void CMR::GetBytes(std::vector<byte> &Output)
 		if (bufSize != 0)
 			Utility::MemUtils::Copy<byte>(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 
-		size_t rem = Output.size() - bufSize;
+		size_t rmd = Output.size() - bufSize;
 
-		while (rem > 0)
+		while (rmd > 0)
 		{
 			// fill buffer
 			m_rngGenerator->Generate(m_rngBuffer);
 
-			if (rem > m_rngBuffer.size())
+			if (rmd > m_rngBuffer.size())
 			{
 				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
-				rem -= m_rngBuffer.size();
+				rmd -= m_rngBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, rem);
-				m_bufferIndex = rem;
-				rem = 0;
+				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, rmd);
+				m_bufferIndex = rmd;
+				rmd = 0;
 			}
 		}
 	}
@@ -126,13 +121,47 @@ void CMR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-uint CMR::Next()
+ushort BCR::NextUShort()
+{
+	return Utility::IntUtils::LeBytesTo16(GetBytes(2), 0);
+}
+
+ushort BCR::NextUShort(ushort Maximum)
+{
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
+	std::vector<byte> rand;
+	uint num(0);
+
+	do
+	{
+		rand = GetByteRange(Maximum);
+		num = Utility::IntUtils::LeBytesTo16(rand, 0);
+	} 
+	while (num > Maximum);
+
+	return num;
+}
+
+ushort BCR::NextUShort(ushort Maximum, ushort Minimum)
+{
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
+	uint num = 0;
+	while ((num = NextUShort(Maximum)) < Minimum) {}
+	return num;
+}
+
+uint BCR::Next()
 {
 	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
 }
 
-uint CMR::Next(uint Maximum)
+uint BCR::Next(uint Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	uint num(0);
 
@@ -146,20 +175,25 @@ uint CMR::Next(uint Maximum)
 	return num;
 }
 
-uint CMR::Next(uint Minimum, uint Maximum)
+uint BCR::Next(uint Maximum, uint Minimum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
 	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
 
-ulong CMR::NextLong()
+ulong BCR::NextULong()
 {
 	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
 }
 
-ulong CMR::NextLong(ulong Maximum)
+ulong BCR::NextULong(ulong Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	ulong num(0);
 
@@ -173,29 +207,34 @@ ulong CMR::NextLong(ulong Maximum)
 	return num;
 }
 
-ulong CMR::NextLong(ulong Minimum, ulong Maximum)
+ulong BCR::NextULong(ulong Maximum, ulong Minimum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
 	ulong num = 0;
-	while ((num = NextLong(Maximum)) < Minimum) {}
+	while ((num = NextULong(Maximum)) < Minimum) {}
 	return num;
 }
 
-void CMR::Reset()
+void BCR::Reset()
 {
-	if (m_rngGenerator != 0)
-		delete m_rngGenerator;
+	m_rngGenerator = new Drbg::BCG(m_engineType, Enumeration::Digests::SHA256, m_pvdType);
 
-	m_rngGenerator = new Drbg::CMG(m_engineType, Enumeration::Digests::SHA256, m_pvdType);
+	if (m_isParallel)
+		m_isParallel = m_rngGenerator->IsParallel();
 
-	if (m_stateSeed.size() != 0)
+	m_rngGenerator->ParallelProfile().IsParallel() = m_isParallel;
+
+	if (m_rndSeed.size() != 0)
 	{
-		m_rngGenerator->Initialize(m_stateSeed);
+		m_rngGenerator->Initialize(m_rndSeed);
 	}
 	else
 	{
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
 		std::vector<byte> nonce(m_rngGenerator->LegalKeySizes()[1].NonceSize());
-		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType);
+		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType == Providers::None ? Providers::CSP : m_pvdType);
 		seedGen->GetBytes(seed);
 		seedGen->GetBytes(nonce);
 		Key::Symmetric::SymmetricKey kp(seed, nonce);
@@ -203,11 +242,12 @@ void CMR::Reset()
 		delete seedGen;
 	}
 
+	m_rngBuffer.resize(m_isParallel ? m_rngGenerator->ParallelBlockSize() : BUFFER_DEF);
 	m_rngGenerator->Generate(m_rngBuffer);
 	m_bufferIndex = 0;
 }
 
-std::vector<byte> CMR::GetBits(std::vector<byte> &Data, ulong Maximum)
+std::vector<byte> BCR::GetBits(std::vector<byte> &Data, ulong Maximum)
 {
 	ulong val = 0;
 	Utility::MemUtils::Copy<byte, ulong>(Data, 0, val, Data.size());
@@ -224,7 +264,7 @@ std::vector<byte> CMR::GetBits(std::vector<byte> &Data, ulong Maximum)
 	return ret;
 }
 
-std::vector<byte> CMR::GetByteRange(ulong Maximum)
+std::vector<byte> BCR::GetByteRange(ulong Maximum)
 {
 	std::vector<byte> data;
 

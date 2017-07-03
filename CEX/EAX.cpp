@@ -66,9 +66,9 @@ const size_t EAX::MinTagSize()
 	return MIN_TAGSIZE; 
 }
 
-const std::string &EAX::Name()
+const std::string EAX::Name()
 { 
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_cipherMode.Engine()->Name();
 }
 
 const size_t EAX::ParallelBlockSize()

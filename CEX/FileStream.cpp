@@ -54,7 +54,7 @@ const ulong FileStream::Length()
 	return m_fileSize;
 }
 
-const std::string &FileStream::Name()
+const std::string FileStream::Name()
 {
 	return CLASS_NAME;
 }

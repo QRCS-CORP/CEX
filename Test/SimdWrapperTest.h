@@ -89,17 +89,21 @@ namespace Test
 			std::vector<uint> tmpA(A.size() / sizeof(uint));
 			std::vector<uint> tmpB(tmpA.size());
 			std::vector<uint> tmpQ(tmpA.size());
+			std::vector<byte> tmpR1;
+			std::vector<byte> tmpR2;
 
 			for (size_t i = 0; i < 100; ++i)
 			{
-				tmpA = Convert(rnd.GetBytes(A.size()));
-				tmpB = Convert(rnd.GetBytes(B.size()));
+				tmpR1 = rnd.GetBytes(A.size());
+				tmpA = Convert(tmpR1);
+				tmpR2 = rnd.GetBytes(B.size());
+				tmpB = Convert(tmpR2);
 
 				A = T(tmpA, 0);
 				B = T(tmpB, 0);
 
-				for (size_t i = 0; i < tmpA.size(); ++i)
-					tmpQ[i] = tmpA[i] + tmpB[i];
+				for (size_t j = 0; j < tmpA.size(); ++j)
+					tmpQ[j] = tmpA[j] + tmpB[j];
 
 				Q = T(tmpQ, 0);
 				C = A + B;
@@ -109,8 +113,8 @@ namespace Test
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 					throw TestException("SimdMathCheck: addition test failed!");
 
-				for (size_t i = 0; i < tmpA.size(); ++i)
-					tmpQ[i] = tmpA[i] * tmpB[i];
+				for (size_t j = 0; j < tmpA.size(); ++j)
+					tmpQ[j] = tmpA[j] * tmpB[j];
 
 				Q = T(tmpQ, 0);
 				C = A * B;
@@ -120,8 +124,8 @@ namespace Test
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 					throw TestException("SimdMathCheck: multiplication test failed!");
 
-				for (size_t i = 0; i < tmpA.size(); ++i)
-					tmpQ[i] = tmpA[i] - tmpB[i];
+				for (size_t j = 0; j < tmpA.size(); ++j)
+					tmpQ[j] = tmpA[j] - tmpB[j];
 
 				Q = T(tmpQ, 0);
 				C = A - B;
@@ -131,8 +135,8 @@ namespace Test
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 					throw TestException("SimdMathCheck: subtraction test failed!");
 
-				for (size_t i = 0; i < tmpA.size(); ++i)
-					tmpQ[i] = tmpA[i] / tmpB[i];
+				for (size_t j = 0; j < tmpA.size(); ++j)
+					tmpQ[j] = tmpA[j] / tmpB[j];
 
 				Q = T(tmpQ, 0);
 				C = A / B;
@@ -143,8 +147,8 @@ namespace Test
 					throw TestException("SimdMathCheck: division test failed!");
 
 
-				for (size_t i = 0; i < tmpA.size(); ++i)
-					tmpQ[i] = tmpA[i] % tmpB[i];
+				for (size_t j = 0; j < tmpA.size(); ++j)
+					tmpQ[j] = tmpA[j] % tmpB[j];
 
 				Q = T(tmpQ, 0);
 				C = A % B;

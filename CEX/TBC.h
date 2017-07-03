@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// Get: The padding modes class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	//~~~Constructor~~~//
 

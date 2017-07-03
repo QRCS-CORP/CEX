@@ -26,8 +26,8 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <para>The Entropy Collection Provider is a two stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a block cipher CTR generator. \n 
 /// The first stage collects numerous caches of low entropy states; high-resolution timers, process and thread ids, the system random provider, and statistics for various hardware devices and system operations. \n
 /// These sources of entropy are compressed using Keccak to create a 512 bit cipher key. 
-/// The key initializes an (HX extended) instance of Rijndael using 22 rounds and an HKDF(SHA256) key schedule. \n
-/// The 16 byte counter and the HKDF distribution code (personalization string) are then created with the system entropy provider and the cipher initialized. \n
+/// The key initializes an (HX extended) instance of Rijndael using 38 rounds and an HKDF(SHA512) key schedule. \n
+/// The 16 byte counter and the HKDF distribution code (personalization string) are then created with the system entropy provider and used to initialize the cipher. \n
 /// Output from the ECP provider is the product of encrypting the incrementing counter.
 /// </para>
 /// 
@@ -72,7 +72,7 @@ public:
 	/// <summary>
 	/// Get: The provider class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
@@ -89,7 +89,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy() override;
 

@@ -86,7 +86,7 @@ public:
 	/// <summary>
 	/// Get: The stream ciphers class name
 	/// </summary>
-	virtual const std::string &Name() = 0;
+	virtual const std::string Name() = 0;
 
 	/// <summary>
 	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
@@ -110,7 +110,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	virtual void Destroy() = 0;
 

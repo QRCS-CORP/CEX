@@ -14,10 +14,10 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_PBPRNG_H
-#define _CEX_PBPRNG_H
+#ifndef _CEX_PBR_H
+#define _CEX_PBR_H
 
 #include "IPrng.h"
 #include "Digests.h"
@@ -28,7 +28,8 @@ NAMESPACE_PRNG
 using Enumeration::Digests;
 
 /// <summary>
-/// An implementation of a Passphrase Based Pseudo Random Number Generator
+/// An implementation of a Passphrase Based PRNG.
+/// <para>Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
 /// </summary>
 /// 
 /// <example>
@@ -70,9 +71,9 @@ private:
 	size_t m_digestIterations;
 	Digests m_digestType;
 	bool m_isDestroyed;
+	std::vector<byte> m_rndSeed;
 	std::vector<byte> m_rngBuffer;
 	Kdf::PBKDF2* m_rngGenerator;
-	std::vector<byte> m_stateSeed;
 
 public:
 
@@ -86,7 +87,7 @@ public:
 	/// <summary>
 	/// Get: The random generators class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
@@ -110,7 +111,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy() override;
 
@@ -129,6 +130,32 @@ public:
 	///
 	/// <param name="Output">Output array</param>
 	void GetBytes(std::vector<byte> &Output) override;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <returns>Random UInt16</returns>
+	ushort NextUShort() override;
+
+	/// <summary>
+	/// Get an pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <param name="Maximum">Maximum value</param>
+	/// 
+	/// <returns>Random UInt16</returns>
+	ushort NextUShort(ushort Maximum) override;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
+	/// 
+	/// <returns>Random UInt16</returns>
+	ushort NextUShort(ushort Maximum, ushort Minimum) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -150,18 +177,18 @@ public:
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Minimum, uint Maximum) override;
+	uint Next(uint Maximum, uint Minimum) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextLong() override;
+	ulong NextULong() override;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
@@ -170,17 +197,17 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextLong(ulong Maximum) override;
+	ulong NextULong(ulong Maximum) override;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
+	/// <param name="Maximum">Maximum value</param>
 	/// <param name="Minimum">Minimum value</param>
-	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextLong(ulong Minimum, ulong Maximum) override;
+	ulong NextULong(ulong Maximum, ulong Minimum) override;
 
 	/// <summary>
 	/// Reset the generator instance

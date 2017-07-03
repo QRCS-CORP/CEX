@@ -43,9 +43,9 @@ const bool HMAC::IsParallel()
 	return m_msgDigest->IsParallel(); 
 }
 
-const std::string &HMAC::Name()
+const std::string HMAC::Name()
 { 
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_msgDigest->Name();
 }
 
 const size_t HMAC::ParallelBlockSize() 

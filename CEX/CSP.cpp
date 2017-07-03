@@ -36,7 +36,7 @@ const bool CSP::IsAvailable()
 	return m_isAvailable; 
 }
 
-const std::string &CSP::Name() 
+const std::string CSP::Name() 
 { 
 	return CLASS_NAME;
 }
@@ -152,8 +152,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 
 void CSP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (Offset + Length > Output.size())
-		throw CryptoRandomException("CSP:GetBytes", "The array is too small to fulfill this request!");
+	CEXASSERT(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rndData(Length);
 	GetBytes(rndData);

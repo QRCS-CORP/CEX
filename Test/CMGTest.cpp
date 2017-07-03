@@ -1,6 +1,6 @@
 #include "CMGTest.h"
 #include "../CEX/CTR.h"
-#include "../CEX/CMG.h"
+#include "../CEX/BCG.h"
 #include "../CEX/SymmetricKey.h"
 #include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
@@ -11,9 +11,9 @@
 
 namespace Test
 {
-	const std::string CMGTest::DESCRIPTION = "CMG implementations vector comparison tests.";
+	const std::string CMGTest::DESCRIPTION = "BCG implementations vector comparison tests.";
 	const std::string CMGTest::FAILURE = "FAILURE! ";
-	const std::string CMGTest::SUCCESS = "SUCCESS! All CMG tests have executed succesfully.";
+	const std::string CMGTest::SUCCESS = "SUCCESS! All BCG tests have executed succesfully.";
 
 	CMGTest::CMGTest()
 		:
@@ -30,9 +30,9 @@ namespace Test
 		try
 		{
 			CheckInit();
-			OnProgress(std::string("CMG: Passed initialization tests.."));
+			OnProgress(std::string("BCG: Passed initialization tests.."));
 			CompareOutput();
-			OnProgress(std::string("CMG: Passed output comparison tests.."));
+			OnProgress(std::string("BCG: Passed output comparison tests.."));
 
 			return SUCCESS;
 		}
@@ -58,7 +58,7 @@ namespace Test
 		try
 		{
 			// test enumeration instantiation
-			Drbg::CMG ctd(BlockCiphers::Rijndael, Digests::SHA256);
+			Drbg::BCG ctd(BlockCiphers::Rijndael, Digests::SHA256);
 			output.resize(ctd.ParallelBlockSize());
 			// test seed + nonce + info init
 			ctd.Initialize(key, nonce, info);
@@ -100,7 +100,7 @@ namespace Test
 			// test primitive instantiation
 			Digest::SHA256* dgt = new Digest::SHA256;
 			RHX* cpr = new RHX;
-			Drbg::CMG ctd2(cpr, dgt);
+			Drbg::BCG ctd2(cpr, dgt);
 			output.resize(ctd2.ParallelBlockSize());
 			ctd2.Initialize(key);
 			ctd2.Generate(output);
@@ -125,7 +125,7 @@ namespace Test
 		std::vector<byte> key(32, 0x02);
 		std::vector<byte> output1(SAMPLE_SIZE);
 
-		Drbg::CMG ctd(BlockCiphers::Rijndael, Digests::None, Providers::None);
+		Drbg::BCG ctd(BlockCiphers::Rijndael, Digests::None, Providers::None);
 		ctd.Initialize(key, iv);
 		ctd.Generate(output1);
 
@@ -141,7 +141,7 @@ namespace Test
 		delete eng;
 
 		if (output1 != output2)
-			throw TestException("CMG: Failed output comparison test!");
+			throw TestException("BCG: Failed output comparison test!");
 	}
 
 	bool CMGTest::CheckRuns(const std::vector<byte> &Input)

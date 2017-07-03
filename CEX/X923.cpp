@@ -15,7 +15,7 @@ const PaddingModes X923::Enumeral()
 	return PaddingModes::X923; 
 }
 
-const std::string &X923::Name()
+const std::string X923::Name()
 {
 	return CLASS_NAME; 
 }

@@ -9,7 +9,7 @@
 
 NAMESPACE_STREAM
 
-const std::string Salsa20::CLASS_NAME("Salsa20");
+const std::string Salsa20::CLASS_NAME("Salsa");
 const std::string Salsa20::SIGMA_INFO("expand 32-byte k");
 const std::string Salsa20::TAU_INFO("expand 16-byte k");
 
@@ -50,6 +50,11 @@ const std::vector<size_t> &Salsa20::LegalRounds()
 	return m_legalRounds;
 }
 
+const std::string Salsa20::Name()
+{
+	return CLASS_NAME + Utility::IntUtils::ToString(m_rndCount);
+}
+
 const size_t Salsa20::ParallelBlockSize()
 {
 	return m_parallelProfile.ParallelBlockSize();
@@ -58,11 +63,6 @@ const size_t Salsa20::ParallelBlockSize()
 ParallelOptions &Salsa20::ParallelProfile()
 {
 	return m_parallelProfile;
-}
-
-const std::string &Salsa20::Name()
-{
-	return CLASS_NAME;
 }
 
 const size_t Salsa20::Rounds()

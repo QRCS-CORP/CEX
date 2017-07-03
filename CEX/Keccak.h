@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef _CEX_KECCAK_H
 #define _CEX_KECCAK_H
@@ -58,7 +58,7 @@ private:
 
 public:
 
-	static void Compress(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State);
+	static void Permute(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State);
 };
 
 NAMESPACE_DIGESTEND

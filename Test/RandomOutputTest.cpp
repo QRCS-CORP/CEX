@@ -5,12 +5,12 @@
 #	include "../CEX/RHX.h"
 #endif
 #include "../CEX/CJP.h"
-#include "../CEX/CMG.h"
+#include "../CEX/BCG.h"
 #include "../CEX/CSP.h"
 #include "../CEX/DCG.h"
 #include "../CEX/ECP.h"
 #include "../CEX/FileStream.h"
-#include "../CEX/HMG.h"
+#include "../CEX/HCG.h"
 #include "../CEX/RDP.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SHA512.h"
@@ -83,7 +83,7 @@ namespace Test
 #endif
 		Digest::SHA512* dgt2 = new Digest::SHA512();
 		Provider::CSP* pvd = new Provider::CSP();
-		Drbg::CMG ctd(cpr, dgt2, pvd);
+		Drbg::BCG ctd(cpr, dgt2, pvd);
 
 		std::vector<byte> seed(ctd.LegalKeySizes()[1].KeySize() - ctd.NonceSize());
 		std::vector<byte> nonce(ctd.NonceSize());
@@ -154,7 +154,7 @@ namespace Test
 	{
 		Digest::SHA256* dgt = new Digest::SHA256();
 		Provider::CSP* pvd = new Provider::CSP();
-		Drbg::HMG ctd(dgt, pvd);
+		Drbg::HCG ctd(dgt, pvd);
 
 		std::vector<byte> seed(ctd.LegalKeySizes()[1].KeySize());
 		std::vector<byte> nonce(ctd.NonceSize());

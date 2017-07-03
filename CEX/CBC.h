@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 // 
 //
 // Implementation Details:
@@ -185,7 +185,7 @@ public:
 	/// <summary>
 	/// Get: The cipher modes class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: The CBC initialization vector (exposed for CMAC)
@@ -253,7 +253,7 @@ public:
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>

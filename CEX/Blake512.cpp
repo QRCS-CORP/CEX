@@ -34,7 +34,10 @@ const bool Blake512::IsParallel()
 
 const std::string Blake512::Name()
 {
-	return CLASS_NAME;
+	if (m_parallelProfile.IsParallel())
+		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	else
+		return CLASS_NAME;
 }
 
 const size_t Blake512::ParallelBlockSize() 

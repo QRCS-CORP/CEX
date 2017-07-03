@@ -1,5 +1,4 @@
 #include "ParallelUtils.h"
-#include <functional>
 
 #if defined(_OPENMP)
 #	include <omp.h>
@@ -21,9 +20,9 @@ size_t ParallelUtils::ProcessorCount()
 void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F)
 {
 #if defined(_OPENMP)
-#pragma omp parallel num_threads((int)To)
+#	pragma omp parallel num_threads((int)To)
 	{
-		size_t i = (size_t)omp_get_thread_num();
+		size_t i = From + (size_t)omp_get_thread_num();
 		F(i);
 	}
 #else
@@ -42,6 +41,36 @@ void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void
 		futures[i].wait();
 
 	futures.clear();
+#endif
+}
+
+void ParallelUtils::ParallelTask(const std::function<void()> &F)
+{
+#if defined(_OPENMP)
+#	pragma omp parallel
+	{
+#		pragma omp single nowait
+		{
+			F();
+		}
+	}
+#else
+	std::future<void> fut = std::async(std::launch::async, [F]()
+	{
+		F();
+	});
+
+	fut.get();
+#endif
+}
+
+void ParallelUtils::Vectorize(const std::function<void()> &F)
+{
+#if defined(CEX_OPENMP_VERSION_30)
+#	pragma omp simd
+	F();
+#else
+	F();
 #endif
 }
 

@@ -15,17 +15,17 @@ enum class Drbgs : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An implementation of a Encryption Counter based DRBG
+	/// An implementation of a Block Counter mode Generator
 	/// </summary>
-	CMG = 1,
+	BCG = 1,
 	/// <summary>
-	/// An implementation of a Digest Counter based DRBG
+	/// An implementation of a Digest Counter Generator
 	/// </summary>
 	DCG = 2,
 	/// <summary>
-	/// An implementation of an HMAC based DRBG
+	/// An implementation of an HMAC Counter Generator
 	/// </summary>
-	HMG = 4
+	HCG = 4
 };
 
 NAMESPACE_ENUMERATIONEND

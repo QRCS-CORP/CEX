@@ -32,7 +32,10 @@ const bool Keccak256::IsParallel()
 
 const std::string Keccak256::Name()
 { 
-	return CLASS_NAME;
+	if (m_parallelProfile.IsParallel())
+		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	else
+		return CLASS_NAME;
 }
 
 const size_t Keccak256::ParallelBlockSize() 
@@ -311,7 +314,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 void Keccak256::Compress(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State)
 {
-	Keccak::Compress(Input, InOffset, BLOCK_SIZE, State.H);
+	Keccak::Permute(Input, InOffset, BLOCK_SIZE, State.H);
 }
 
 void Keccak256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak256State &State)

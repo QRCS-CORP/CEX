@@ -1,15 +1,15 @@
 #include "HMGTest.h"
 #include "../CEX/CSP.h"
-#include "../CEX/HMG.h"
+#include "../CEX/HCG.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
-	const std::string HMGTest::DESCRIPTION = "HMG implementations vector comparison tests.";
+	const std::string HMGTest::DESCRIPTION = "HCG implementations vector comparison tests.";
 	const std::string HMGTest::FAILURE = "FAILURE! ";
-	const std::string HMGTest::SUCCESS = "SUCCESS! All HMG tests have executed succesfully.";
+	const std::string HMGTest::SUCCESS = "SUCCESS! All HCG tests have executed succesfully.";
 
 	HMGTest::HMGTest()
 		:
@@ -26,9 +26,9 @@ namespace Test
 		try
 		{
 			CheckMac();
-			OnProgress(std::string("HMG: Passed mac engine tests.."));
+			OnProgress(std::string("HCG: Passed mac engine tests.."));
 			CheckInit();
-			OnProgress(std::string("HMG: Passed initialization tests.."));
+			OnProgress(std::string("HCG: Passed initialization tests.."));
 
 			return SUCCESS;
 		}
@@ -53,7 +53,7 @@ namespace Test
 			Provider::CSP* pvd = new Provider::CSP();
 
 			// test primitive instantiation
-			Drbg::HMG ctd(dgt, pvd);
+			Drbg::HCG ctd(dgt, pvd);
 			size_t seedLen = ctd.LegalKeySizes()[0].KeySize();
 			std::vector<byte> seed(seedLen, 0x01);
 			size_t nonceLen = ctd.NonceSize();
@@ -78,7 +78,7 @@ namespace Test
 		try
 		{
 			// test enumeration instantiation
-			Drbg::HMG ctd(Enumeration::Digests::SHA512, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::SHA512, CEX::Enumeration::Providers::CSP);
 			std::vector<byte> info(ctd.DistributionCodeMax(), 0x01);
 			std::vector<byte> nonce(ctd.NonceSize(), 0x02);
 			// first legal key size
@@ -123,7 +123,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Blake512, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Blake512, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -140,7 +140,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Blake256, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Blake256, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -157,7 +157,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Keccak256, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Keccak256, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -174,7 +174,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Keccak512, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Keccak512, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -191,7 +191,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::SHA256, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::SHA256, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -208,7 +208,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::SHA512, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::SHA512, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -225,7 +225,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Skein1024, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Skein1024, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -242,7 +242,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Skein256, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Skein256, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);
@@ -259,7 +259,7 @@ namespace Test
 
 		try
 		{
-			Drbg::HMG ctd(Enumeration::Digests::Skein512, CEX::Enumeration::Providers::CSP);
+			Drbg::HCG ctd(Enumeration::Digests::Skein512, CEX::Enumeration::Providers::CSP);
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x01);
 			nonce.resize(ctd.NonceSize(), 0x02);
 			info.resize(ctd.DistributionCodeMax(), 0x03);

@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
 // Implementation Details:
@@ -28,17 +28,27 @@
 
 #include "IProvider.h"
 #include "CryptoRandomException.h"
+#include "Drbgs.h"
+#include "IDigest.h"
+#include "IPrng.h"
+#include "MemUtils.h"
 
 NAMESPACE_PRNG
 
-using Provider::IProvider;
-using Enumeration::Providers;
 using Exception::CryptoRandomException;
+using Enumeration::Digests;
+using Prng::IPrng;
+using Enumeration::Prngs;
+using Enumeration::Providers;
+using Provider::IProvider;
 
 /// <summary>
-/// An implementation of a Cryptographically Secure Pseudo Random Number Generator: SecureRandom
-/// 
-/// <para>Uses a selectable entropy provider to generate random numbers.</para>
+/// An implementation of a cryptographically secure pseudo random number generator.
+/// <para>This class is an extension wrapper that uses one of the PRNG and random provider implementations. \n
+/// The PRNG and random provider type names are loaded through the constructor, instantiating internal instances of those classes and auto-initializing the base PRNG. \n
+/// The default configuration uses and AES-256 CTR mode generator (BCR), and the auto seed collection provider. \n
+/// The secure random class can use any combination of the base PRNGs and random providers. \n
+/// Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
 /// </summary>
 /// 
 /// <example>
@@ -52,14 +62,16 @@ class SecureRandom
 private:
 
 	static const size_t BUFFER_SIZE = 4096;
-	static const size_t MAXD16 = 16368;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
-	std::vector<byte> m_byteBuffer;
+	bool m_destEngine;
+	Digests m_digestType;
 	bool m_isDestroyed;
-	IProvider* m_rngGenerator;
-	Providers m_pvdType;
+	Prngs m_prngEngineType;
+	IPrng* m_prngEngine;
+	Providers m_providerType;
+	std::vector<byte> m_rndBuffer;
 
 	SecureRandom(const SecureRandom&) = delete;
 	SecureRandom& operator=(const SecureRandom&) = delete;
@@ -69,15 +81,17 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class.
-	/// <para>Creates the selectable pseudo-random seed generator and initializes the internal state.</para>
+	/// Instantiate this class and initialize the rng.
+	/// <para>Creates the pseudo-random seed generator and the base PRNG, and initializes the internal state.
+	/// The default configuration is the Block cipher Counter Rng (BCR), using an AES-256 CTR cipher, seeded with the Auto Collection seed Provider (ACP)</para>
 	/// </summary>
 	/// 
-	/// <param name="ProviderType">The type of entropy provider to create; the default is the system crypto service provider (CSP)</param>
-	/// <param name="BufferSize">Size of the internal buffer; must be at least 64 bytes</param>
+	/// <param name="EngineType">The base random bytes generator (PRNG) used to power this wrapper; default is block cipher counter</param>
+	/// <param name="ProviderType">The entropy provider type used to initialize the prng</param>
+	/// <param name="ExtractionType">The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</param>
 	/// 
-	/// <exception cref="CryptoRandomException">Thrown if buffer size is too small</exception>
-	explicit SecureRandom(Providers ProviderType = Providers::CSP, size_t BufferSize = 4096);
+	/// <exception cref="CryptoRandomException">Thrown if and invalid prng or random provider is used</exception>
+	explicit SecureRandom(Prngs EngineType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None);
 
 	/// <summary>
 	/// Finalize objects
@@ -87,9 +101,24 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy();
+
+	/// <summary>
+	/// Fill an array of T with pseudo random
+	/// </summary>
+	///
+	/// <param name="Output">The T type Output array</param>
+	/// <param name="Offset">The starting index of T in the Output array</param>
+	template <class T>
+	void Fill(std::vector<T> &Output, size_t Offset)
+	{
+		size_t bufSze = Output.size() * sizeof(T);
+		std::vector<byte> buf(bufSze);
+		GetBytes(buf);
+		Utility::MemUtils::Copy(buf, 0, Output, Offset, bufSze);
+	}
 
 	//~~~Byte~~~//
 
@@ -155,11 +184,11 @@ public:
 	/// Get a random non-negative short integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random Int16</returns>
-	short NextInt16(short Minimum, short Maximum);
+	short NextInt16(short Maximum, short Minimum);
 
 
 	//~~~UInt16~~~//
@@ -184,11 +213,11 @@ public:
 	/// Get a random 16bit ushort integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUInt16(ushort Minimum, ushort Maximum);
+	ushort NextUInt16(ushort Maximum, ushort Minimum);
 
 	//~~~Int32~~~//
 
@@ -219,11 +248,11 @@ public:
 	/// Get a random 32bit non-negative integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random Int32</returns>
-	int NextInt32(int Minimum, int Maximum);
+	int NextInt32(int Maximum, int Minimum);
 
 	//~~~UInt32~~~//
 
@@ -247,11 +276,11 @@ public:
 	/// Get a random 32bit unsigned integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt32</returns>
-	uint NextUInt32(uint Minimum, uint Maximum);
+	uint NextUInt32(uint Maximum, uint Minimum);
 
 	//~~~Int64~~~//
 
@@ -282,11 +311,11 @@ public:
 	/// Get a random 64bit long integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random Int64</returns>
-	long NextInt64(long Minimum, long Maximum);
+	long NextInt64(long Maximum, long Minimum);
 
 	//~~~UInt64~~~//
 
@@ -310,11 +339,11 @@ public:
 	/// Get a random 64bit ulong integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt64</returns>
-	ulong NextUInt64(ulong Minimum, ulong Maximum);
+	ulong NextUInt64(ulong Maximum, ulong Minimum);
 
 	/// <summary>
 	/// Reset the generator instance

@@ -93,11 +93,11 @@ void SymmetricKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		if (m_key.capacity() > 0)
+		if (m_key.size() > 0)
 			Utility::IntUtils::ClearVector(m_key);
-		if (m_nonce.capacity() > 0)
+		if (m_nonce.size() > 0)
 			Utility::IntUtils::ClearVector(m_nonce);
-		if (m_info.capacity() > 0)
+		if (m_info.size() > 0)
 			Utility::IntUtils::ClearVector(m_info);
 
 		m_isDestroyed = true;

@@ -14,19 +14,19 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
 // Implementation Details:
-// An implementation of a Counter based Deterministic Random Byte Generator (CMG)
+// An implementation of a block cipher Counter mode Generator
 // Written by John Underhill, November 21, 2015
 // Updated October 23, 2016
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
 
-#ifndef _CEX_CMG_H
-#define _CEX_CMG_H
+#ifndef _CEX_BCG_H
+#define _CEX_BCG_H
 
 #include "IDrbg.h"
 #include "BlockCiphers.h"
@@ -44,13 +44,13 @@ using Digest::IDigest;
 using Common::ParallelOptions;
 
 /// <summary>
-/// An implementation of a block cipher Counter Mode Generator (CMG)
+/// An implementation of a Block cipher Counter mode Generator DRBG
 /// </summary> 
 /// 
 /// <example>
 /// <description>Generate an array of pseudo random bytes:</description>
 /// <code>
-/// CMG rng(BlockCiphers::RHX, Digests::SHA512, [Providers::CSP]);
+/// BCG rng(BlockCiphers::RHX, Digests::SHA512, [Providers::CSP]);
 /// // initialize
 /// rng.Initialize(Seed, [Nonce], [Info]);
 /// // generate bytes
@@ -102,7 +102,7 @@ using Common::ParallelOptions;
 /// <item><description>The generator can be initialized with either a SymmetricKey key container class, or with a Seed and optional inputs of Nonce and Info.</description></item>
 /// <item><description>The LegalKeySizes() property contains a list of supported seed sizes.</description></item>
 /// <item><description>The LegalKeySizes() property contains a list of the supported seed sizes; note that if using the Nonce parameter of the Initialize function the combined (Seed + Nonce) must equal a legal size.</description></item>
-/// <item><description>There are three LegalKeySizes, minimum, recommended, and maximum, with CMG, the middle value is the recommended seed length for best security; i.e. LegalKeySizes()[1].</description></item>
+/// <item><description>There are three LegalKeySizes, minimum, recommended, and maximum, with BCG, the middle value is the recommended seed length for best security; i.e. LegalKeySizes()[1].</description></item>
 /// <item><description>The Generate() methods can not be used until an Initialize() function has been called, and the generator is seeded.</description></item>
 /// <item><description>In a block cipher counter based generator, the encryption function can be both pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
 /// <item><description>If the system supports Parallel processing, IsParallel() is set to true; passing an output block of ParallelBlockSize() to the Generate function.</description></item>
@@ -120,7 +120,7 @@ using Common::ParallelOptions;
 /// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
-class CMG : public IDrbg
+class BCG : public IDrbg
 {
 private:
 
@@ -159,9 +159,9 @@ private:
 
 public:
 
-	CMG(const CMG&) = delete;
-	CMG& operator=(const CMG&) = delete;
-	CMG& operator=(CMG&&) = delete;
+	BCG(const BCG&) = delete;
+	BCG& operator=(const BCG&) = delete;
+	BCG& operator=(BCG&&) = delete;
 
 	//~~~Properties~~~//
 
@@ -220,7 +220,7 @@ public:
 	/// <summary>
 	/// Get: The Drbg generators class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: The size of the nonce counter value in bytes
@@ -262,10 +262,10 @@ public:
 	/// <param name="KdfEngineType">The KDF2 key derivation functions hash engine-type.
 	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
 	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source. 
-	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
+	/// <para>Adding a random provider enables predictive resistance, and is recommended for large data (>= 1MB).</para></param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit CMG(BlockCiphers CipherType = BlockCiphers::AHX, Digests KdfEngineType = Digests::SHA512, Providers ProviderType = Providers::CSP);
+	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, Digests KdfEngineType = Digests::SHA512, Providers ProviderType = Providers::None);
 
 	/// <summary>
 	/// Instantiate the class using a block cipher instance and an optional entropy source
@@ -278,17 +278,17 @@ public:
 	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
-	explicit CMG(IBlockCipher* Cipher, IDigest* KdfEngine = 0, IProvider* Provider = 0);
+	explicit BCG(IBlockCipher* Cipher, IDigest* KdfEngine = 0, IProvider* Provider = 0);
 
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	~CMG() override;
+	~BCG() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy() override;
 

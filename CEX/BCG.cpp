@@ -1,4 +1,4 @@
-#include "CMG.h"
+#include "BCG.h"
 #include "BlockCipherFromName.h"
 #include "DigestFromName.h"
 #include "KDF2.h"
@@ -11,88 +11,88 @@
 
 NAMESPACE_DRBG
 
-const std::string CMG::CLASS_NAME("CMG");
+const std::string BCG::CLASS_NAME("BCG");
 
 //~~~Properties~~~//
 
-std::vector<byte> &CMG::DistributionCode() 
+std::vector<byte> &BCG::DistributionCode() 
 {
 	return m_distributionCode; 
 }
 
-const size_t CMG::DistributionCodeMax()
+const size_t BCG::DistributionCodeMax()
 { 
 	return m_distributionCodeMax; 
 }
 
-const Drbgs CMG::Enumeral() 
+const Drbgs BCG::Enumeral() 
 { 
-	return Drbgs::CMG; 
+	return Drbgs::BCG; 
 }
 
-const bool CMG::IsInitialized() 
+const bool BCG::IsInitialized() 
 { 
 	return m_isInitialized; 
 }
 
-const bool CMG::IsParallel()
+const bool BCG::IsParallel()
 { 
 	return m_parallelProfile.IsParallel();
 }
 
-std::vector<SymmetricKeySize> CMG::LegalKeySizes() const 
+std::vector<SymmetricKeySize> BCG::LegalKeySizes() const 
 { 
 	return m_legalKeySizes; 
 };
 
-const ulong CMG::MaxOutputSize() 
+const ulong BCG::MaxOutputSize() 
 {
 	return MAX_OUTPUT; 
 }
 
-const size_t CMG::MaxRequestSize()
+const size_t BCG::MaxRequestSize()
 { 
 	return MAX_REQUEST; 
 }
 
-const size_t CMG::MaxReseedCount() 
+const size_t BCG::MaxReseedCount() 
 { 
 	return MAX_RESEED;
 }
 
-const std::string &CMG::Name()
+const std::string BCG::Name()
 { 
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
-const size_t CMG::NonceSize()
+const size_t BCG::NonceSize()
 {
 	return COUNTER_SIZE; 
 }
 
-const size_t CMG::ParallelBlockSize() 
+const size_t BCG::ParallelBlockSize() 
 { 
 	return m_parallelProfile.ParallelBlockSize();
 }
 
-ParallelOptions &CMG::ParallelProfile() 
+ParallelOptions &BCG::ParallelProfile() 
 {
 	return m_parallelProfile; 
 }
 
-size_t &CMG::ReseedThreshold() 
+size_t &BCG::ReseedThreshold() 
 {
 	return m_reseedThreshold; 
 }
 
-const size_t CMG::SecurityStrength()
+const size_t BCG::SecurityStrength()
 {
 	return m_secStrength;
 }
 
 //~~~Constructor~~~//
 
-CMG::CMG(BlockCiphers CipherType, Digests KdfEngineType, Providers ProviderType)
+BCG::BCG(BlockCiphers CipherType, Digests KdfEngineType, Providers ProviderType)
 	:
 	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType, KdfEngineType)),
 	m_cipherType(CipherType),
@@ -119,9 +119,9 @@ CMG::CMG(BlockCiphers CipherType, Digests KdfEngineType, Providers ProviderType)
 {
 }
 
-CMG::CMG(IBlockCipher* Cipher, IDigest* KdfEngine, IProvider* Provider)
+BCG::BCG(IBlockCipher* Cipher, IDigest* KdfEngine, IProvider* Provider)
 	:
-	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoGeneratorException("CMG:CTor", "The Cipher can not be null!")),
+	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoGeneratorException("BCG:CTor", "The Cipher can not be null!")),
 	m_cipherType(m_blockCipher->Enumeral()),
 	m_ctrVector(COUNTER_SIZE),
 	m_destroyEngine(false),
@@ -146,14 +146,14 @@ CMG::CMG(IBlockCipher* Cipher, IDigest* KdfEngine, IProvider* Provider)
 {
 }
 
-CMG::~CMG()
+BCG::~BCG()
 {
 	Destroy();
 }
 
 //~~~Public Functions~~~//
 
-void CMG::Destroy()
+void BCG::Destroy()
 {
 	if (!m_isDestroyed)
 	{
@@ -191,22 +191,22 @@ void CMG::Destroy()
 		}
 		catch(std::exception& ex)
 		{
-			throw CryptoGeneratorException("CMG::Destroy", "Could not clear all variables!", std::string(ex.what()));
+			throw CryptoGeneratorException("BCG::Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
 
-size_t CMG::Generate(std::vector<byte> &Output)
+size_t BCG::Generate(std::vector<byte> &Output)
 {
 	return Generate(Output, 0, Output.size());
 }
 
-size_t CMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
 	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
 	CEXASSERT(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
-	CEXASSERT(Length <= ParallelBlockSize(), "The maximum request size is has been exceeded!");
+	CEXASSERT(Length <= ParallelBlockSize(), "The maximum request size has been exceeded!");
 
 	GenerateBlock(Output, OutOffset, Length);
 
@@ -221,7 +221,7 @@ size_t CMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 			// use next block of state as seed material
 			std::vector<byte> state(m_kdfEngine->BlockSize());
 			GenerateBlock(state, 0, state.size());
-			// combine with salt from provider, extract, and re-key
+			// combine with salt from entropy provider, extract, and re-key
 			Derive(state);
 		}
 	}
@@ -229,7 +229,7 @@ size_t CMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	return Length;
 }
 
-void CMG::Initialize(ISymmetricKey &GenParam)
+void BCG::Initialize(ISymmetricKey &GenParam)
 {
 	if (GenParam.Nonce().size() != 0)
 	{
@@ -244,12 +244,12 @@ void CMG::Initialize(ISymmetricKey &GenParam)
 	}
 }
 
-void CMG::Initialize(const std::vector<byte> &Seed)
+void BCG::Initialize(const std::vector<byte> &Seed)
 {
 	if (!m_isInitialized)
 	{
 		if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size() - BLOCK_SIZE, BLOCK_SIZE))
-			throw CryptoGeneratorException("CMG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+			throw CryptoGeneratorException("BCG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
 
 		m_seedSize = Seed.size();
 	}
@@ -259,14 +259,14 @@ void CMG::Initialize(const std::vector<byte> &Seed)
 	// initialize the block cipher
 	size_t keyLen = Seed.size() - BLOCK_SIZE;
 	// security upper bound is 256, could actually be more depending on cipher configuration
-	m_secStrength = (keyLen > 32) ? 256 : keyLen * 8;
+	m_secStrength = (keyLen >= 32) ? 256 : keyLen * 8;
 	std::vector<byte> key(keyLen);
 	Utility::MemUtils::Copy<byte>(Seed, BLOCK_SIZE, key, 0, keyLen);
 	m_blockCipher->Initialize(true, Key::Symmetric::SymmetricKey(key));
 	m_isInitialized = true;
 }
 
-void CMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
+void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
 {
 	std::vector<byte> key(Seed.size() + Nonce.size());
 	if (Nonce.size() > 0)
@@ -277,7 +277,7 @@ void CMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	Initialize(key);
 }
 
-void CMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
+void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
 {
 	std::vector<byte> key(Nonce.size() + Seed.size());
 
@@ -314,29 +314,29 @@ void CMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	Initialize(key);
 }
 
-void CMG::ParallelMaxDegree(size_t Degree)
+void BCG::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0)
-		throw CryptoGeneratorException("CMG::ParallelMaxDegree", "Parallel degree can not be zero!");
+		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree % 2 != 0)
-		throw CryptoGeneratorException("CMG::ParallelMaxDegree", "Parallel degree must be an even number!");
+		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Parallel degree must be an even number!");
 	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoGeneratorException("CMG::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
-void CMG::Update(const std::vector<byte> &Seed)
+void BCG::Update(const std::vector<byte> &Seed)
 {
 	if (Seed.size() != m_seedSize)
-		throw CryptoGeneratorException("CMG::Update", "Update seed size must be equal to seed size used to initialize the generator!");
+		throw CryptoGeneratorException("BCG::Update", "Update seed size must be equal to seed size used to initialize the generator!");
 
 	Initialize(Seed);
 }
 
 //~~~Private Functions~~~//
 
-void CMG::Derive(std::vector<byte> &Seed)
+void BCG::Derive(std::vector<byte> &Seed)
 {
 	// size the salt for max unpadded hash size; subtract counter and hash finalizer code lengths
 	size_t saltLen = m_kdfEngine->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfEngineType) + 4);
@@ -352,7 +352,7 @@ void CMG::Derive(std::vector<byte> &Seed)
 	Initialize(tmpK);
 }
 
-void CMG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void BCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	if (!IsParallel() || Length < ParallelBlockSize())
 	{
@@ -392,7 +392,7 @@ void CMG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 	}
 }
 
-void CMG::Transform(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
+void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
 {
 	size_t blkCtr = 0;
 

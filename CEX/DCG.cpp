@@ -50,9 +50,9 @@ const size_t DCG::MaxReseedCount()
 	return MAX_RESEED; 
 }
 
-const std::string &DCG::Name() 
+const std::string DCG::Name() 
 { 
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_msgDigest->Name();
 }
 
 const size_t DCG::NonceSize()

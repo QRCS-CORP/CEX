@@ -13,9 +13,9 @@ const Prngs DCR::Enumeral()
 	return Prngs::DCR;
 }
 
-const std::string &DCR::Name()
+const std::string DCR::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_rngGenerator->Name();
 }
 
 //~~~Constructor~~~//
@@ -45,7 +45,7 @@ DCR::DCR(std::vector<byte> Seed, Digests DigestEngine, size_t BufferSize)
 {
 	if (Seed.size() == 0)
 		throw CryptoRandomException("DCR:Ctor", "Seed can not be null!");
-	if (GetMinimumSeedSize(DigestEngine) < Seed.size())
+	if (GetMinimumSeedSize(DigestEngine) > Seed.size())
 		throw CryptoRandomException("DCR:Ctor", "The state seed is too small! must be at least digest block size + 8 bytes");
 	if (BufferSize < BUFFER_MIN)
 		throw CryptoRandomException("DCR:Ctor", "BufferSize must be at least 128 bytes!");
@@ -69,7 +69,7 @@ void DCR::Destroy()
 		m_bufferSize = 0;
 
 		Utility::IntUtils::ClearVector(m_rngBuffer);
-		Utility::IntUtils::ClearVector(m_stateSeed);
+		Utility::IntUtils::ClearVector(m_rndSeed);
 
 		if (m_rngGenerator != 0)
 			delete m_rngGenerator;
@@ -88,7 +88,7 @@ std::vector<byte> DCR::GetBytes(size_t Size)
 void DCR::GetBytes(std::vector<byte> &Output)
 {
 	if (Output.size() == 0)
-		throw CryptoRandomException("CMR:GetBytes", "Buffer size must be at least 1 byte!");
+		throw CryptoRandomException("BCR:GetBytes", "Buffer size must be at least 1 byte!");
 
 	if (m_rngBuffer.size() - m_bufferIndex < Output.size())
 	{
@@ -97,24 +97,24 @@ void DCR::GetBytes(std::vector<byte> &Output)
 		if (bufSize != 0)
 			Utility::MemUtils::Copy<byte>(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 
-		size_t rem = Output.size() - bufSize;
+		size_t rmd = Output.size() - bufSize;
 
-		while (rem > 0)
+		while (rmd > 0)
 		{
 			// fill buffer
 			m_rngGenerator->Generate(m_rngBuffer);
 
-			if (rem > m_rngBuffer.size())
+			if (rmd > m_rngBuffer.size())
 			{
 				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
-				rem -= m_rngBuffer.size();
+				rmd -= m_rngBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, rem);
-				m_bufferIndex = rem;
-				rem = 0;
+				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, rmd);
+				m_bufferIndex = rmd;
+				rmd = 0;
 			}
 		}
 	}
@@ -125,6 +125,38 @@ void DCR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
+ushort DCR::NextUShort()
+{
+	return Utility::IntUtils::LeBytesTo16(GetBytes(2), 0);
+}
+
+ushort DCR::NextUShort(ushort Maximum)
+{
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
+	std::vector<byte> rand;
+	uint num(0);
+
+	do
+	{
+		rand = GetByteRange(Maximum);
+		num = Utility::IntUtils::LeBytesTo16(rand, 0);
+	} 
+	while (num > Maximum);
+
+	return num;
+}
+
+ushort DCR::NextUShort(ushort Maximum, ushort Minimum)
+{
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
+	uint num = 0;
+	while ((num = NextUShort(Maximum)) < Minimum) {}
+	return num;
+}
+
 uint DCR::Next()
 {
 	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
@@ -132,6 +164,8 @@ uint DCR::Next()
 
 uint DCR::Next(uint Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	uint num(0);
 
@@ -145,20 +179,25 @@ uint DCR::Next(uint Maximum)
 	return num;
 }
 
-uint DCR::Next(uint Minimum, uint Maximum)
+uint DCR::Next(uint Maximum, uint Minimum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
 	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
 
-ulong DCR::NextLong()
+ulong DCR::NextULong()
 {
 	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
 }
 
-ulong DCR::NextLong(ulong Maximum)
+ulong DCR::NextULong(ulong Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	ulong num(0);
 
@@ -172,27 +211,27 @@ ulong DCR::NextLong(ulong Maximum)
 	return num;
 }
 
-ulong DCR::NextLong(ulong Minimum, ulong Maximum)
+ulong DCR::NextULong(ulong Maximum, ulong Minimum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
 	ulong num = 0;
-	while ((num = NextLong(Maximum)) < Minimum) {}
+	while ((num = NextULong(Maximum)) < Minimum) {}
 	return num;
 }
 
 void DCR::Reset()
 {
-	if (m_rngGenerator != 0)
-		delete m_rngGenerator;
-
 	m_rngGenerator = new Drbg::DCG(m_digestType);
 
-	if (m_stateSeed.size() != 0)
+	if (m_rndSeed.size() != 0)
 	{
-		m_rngGenerator->Initialize(m_stateSeed);
+		m_rngGenerator->Initialize(m_rndSeed);
 	}
 	else
 	{
-		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType);
+		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType == Providers::None ? Providers::CSP : m_pvdType);
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
 		seedGen->GetBytes(seed);
 		delete seedGen;

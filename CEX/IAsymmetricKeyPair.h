@@ -16,9 +16,6 @@ class IAsymmetricKeyPair
 {
 public:
 
-	IAsymmetricKeyPair(const IAsymmetricKeyPair&) = delete;
-	IAsymmetricKeyPair& operator=(const IAsymmetricKeyPair&) = delete;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -34,21 +31,19 @@ public:
 	//~~~Properties~~~//
 
 	/// <summary>
+	/// The public key
+	/// </summary>
+	virtual IAsymmetricKey* PublicKey() = 0;
+
+	/// <summary>
+	/// The secret private Key
+	/// </summary>
+	virtual IAsymmetricKey* PrivateKey() = 0;
+
+	/// <summary>
 	/// Get: An optional unique tag identifying this key-pair
 	/// </summary>
-	virtual const std::vector<byte> Tag() = 0;
-
-	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// The Public key
-	/// </summary>
-	virtual const IAsymmetricKey &PublicKey() = 0;
-
-	/// <summary>
-	/// The Private Key
-	/// </summary>
-	virtual const IAsymmetricKey &PrivateKey() = 0;
+	virtual const std::vector<byte> &Tag() = 0;
 };
 
 NAMESPACE_KEYASYMMETRICEND

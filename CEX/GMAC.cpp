@@ -40,9 +40,9 @@ std::vector<SymmetricKeySize> GMAC::LegalKeySizes() const
 	return m_legalKeySizes; 
 };
 
-const std::string &GMAC::Name()
+const std::string GMAC::Name()
 { 
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 GMAC::GMAC(BlockCiphers CipherType)

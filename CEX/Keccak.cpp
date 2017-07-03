@@ -5,7 +5,7 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-void Keccak::Compress(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State)
+void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State)
 {
 	const size_t BLKLEN = Length / sizeof(ulong);
 	for (size_t i = 0; i < BLKLEN; ++i)

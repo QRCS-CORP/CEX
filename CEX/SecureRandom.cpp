@@ -1,24 +1,23 @@
 #include "SecureRandom.h"
 #include "BitConverter.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ProviderFromName.h"
+#include "PrngFromName.h"
 
 NAMESPACE_PRNG
 
 //~~~Constructor~~~//
 
-SecureRandom::SecureRandom(Providers ProviderType, size_t BufferSize)
+SecureRandom::SecureRandom(Prngs EngineType, Providers ProviderType, Digests DigestType)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize),
-	m_byteBuffer(BufferSize),
+	m_bufferSize(BUFFER_SIZE),
+	m_rndBuffer(BUFFER_SIZE),
+	m_digestType(DigestType),
 	m_isDestroyed(false),
-	m_pvdType(ProviderType)
+	m_prngEngineType(EngineType),
+	m_providerType(ProviderType)
 {
-	if (BufferSize < 64)
-		throw CryptoRandomException("SecureRandom:Ctor", "Buffer size must be at least 64 bytes!");
-
 	Reset();
 }
 
@@ -36,14 +35,16 @@ void SecureRandom::Destroy()
 		m_isDestroyed = true;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
-		m_pvdType = Providers::None;
+		m_digestType = Digests::None;
+		m_prngEngineType = Prngs::None;
+		m_providerType = Providers::None;
 
 		try
 		{
-			Utility::IntUtils::ClearVector(m_byteBuffer);
+			Utility::IntUtils::ClearVector(m_rndBuffer);
 
-			if (m_rngGenerator != 0)
-				delete m_rngGenerator;
+			if (m_prngEngine != 0)
+				delete m_prngEngine;
 		}
 		catch(std::exception& ex)
 		{
@@ -64,37 +65,37 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 	if (Output.size() == 0)
 		throw CryptoRandomException("SecureRandom:GetBytes", "Buffer size must be at least 1 byte!");
 
-	if (m_byteBuffer.size() - m_bufferIndex < Output.size())
+	if (m_rndBuffer.size() - m_bufferIndex < Output.size())
 	{
-		size_t bufSize = m_byteBuffer.size() - m_bufferIndex;
+		size_t bufSize = m_rndBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			Utility::MemUtils::Copy<byte>(m_byteBuffer, m_bufferIndex, Output, 0, bufSize);
+			Utility::MemUtils::Copy<byte>(m_rndBuffer, m_bufferIndex, Output, 0, bufSize);
 
-		size_t rem = Output.size() - bufSize;
+		size_t rmd = Output.size() - bufSize;
 
-		while (rem > 0)
+		while (rmd > 0)
 		{
 			// fill buffer
-			m_rngGenerator->GetBytes(m_byteBuffer);
+			m_prngEngine->GetBytes(m_rndBuffer);
 
-			if (rem > m_byteBuffer.size())
+			if (rmd > m_rndBuffer.size())
 			{
-				Utility::MemUtils::Copy<byte>(m_byteBuffer, 0, Output, bufSize, m_byteBuffer.size());
-				bufSize += m_byteBuffer.size();
-				rem -= m_byteBuffer.size();
+				Utility::MemUtils::Copy<byte>(m_rndBuffer, 0, Output, bufSize, m_rndBuffer.size());
+				bufSize += m_rndBuffer.size();
+				rmd -= m_rndBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy<byte>(m_byteBuffer, 0, Output, bufSize, rem);
-				m_bufferIndex = rem;
-				rem = 0;
+				Utility::MemUtils::Copy<byte>(m_rndBuffer, 0, Output, bufSize, rmd);
+				m_bufferIndex = rmd;
+				rmd = 0;
 			}
 		}
 	}
 	else
 	{
-		Utility::MemUtils::Copy<byte>(m_byteBuffer, m_bufferIndex, Output, 0, Output.size());
+		Utility::MemUtils::Copy<byte>(m_rndBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -135,8 +136,10 @@ short SecureRandom::NextInt16(short Maximum)
 	return num;
 }
 
-short SecureRandom::NextInt16(short Minimum, short Maximum)
+short SecureRandom::NextInt16(short Maximum, short Minimum)
 {
+	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+
 	short num = 0;
 	while ((num = NextInt16(Maximum)) < Minimum) {}
 	return num;
@@ -149,6 +152,8 @@ ushort SecureRandom::NextUInt16()
 
 ushort SecureRandom::NextUInt16(ushort Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	ushort num(0);
 
@@ -162,8 +167,10 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 	return num;
 }
 
-ushort SecureRandom::NextUInt16(ushort Minimum, ushort Maximum)
+ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 {
+	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+
 	ushort num = 0;
 	while ((num = NextUInt16(Maximum)) < Minimum) {}
 	return num;
@@ -194,8 +201,10 @@ int SecureRandom::NextInt32(int Maximum)
 	return num;
 }
 
-int SecureRandom::NextInt32(int Minimum, int Maximum)
+int SecureRandom::NextInt32(int Maximum, int Minimum)
 {
+	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+
 	int num = 0;
 	while ((num = NextInt32(Maximum)) < Minimum) {}
 	return num;
@@ -208,6 +217,8 @@ uint SecureRandom::NextUInt32()
 
 uint SecureRandom::NextUInt32(uint Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	uint num(0);
 
@@ -221,8 +232,10 @@ uint SecureRandom::NextUInt32(uint Maximum)
 	return num;
 }
 
-uint SecureRandom::NextUInt32(uint Minimum, uint Maximum)
+uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 {
+	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+
 	uint num = 0;
 	while ((num = NextUInt32(Maximum)) < Minimum) {}
 	return num;
@@ -253,8 +266,10 @@ long SecureRandom::NextInt64(long Maximum)
 	return num;
 }
 
-long SecureRandom::NextInt64(long Minimum, long Maximum)
+long SecureRandom::NextInt64(long Maximum, long Minimum)
 {
+	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+
 	long num = 0;
 	while ((num = NextInt64(Maximum)) < Minimum) {}
 	return num;
@@ -267,6 +282,8 @@ ulong SecureRandom::NextUInt64()
 
 ulong SecureRandom::NextUInt64(ulong Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	ulong num(0);
 
@@ -280,8 +297,10 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 	return num;
 }
 
-ulong SecureRandom::NextUInt64(ulong Minimum, ulong Maximum)
+ulong SecureRandom::NextUInt64(ulong Maximum, ulong Minimum)
 {
+	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+
 	ulong num = 0;
 	while ((num = NextUInt64(Maximum)) < Minimum) {}
 	return num;
@@ -289,8 +308,11 @@ ulong SecureRandom::NextUInt64(ulong Minimum, ulong Maximum)
 
 void SecureRandom::Reset()
 {
-	m_rngGenerator = Helper::ProviderFromName::GetInstance(m_pvdType);
-	m_rngGenerator->GetBytes(m_byteBuffer);
+	if (m_digestType == Digests::None && m_prngEngineType != Prngs::BCR)
+		m_digestType = Digests::SHA256;
+
+	m_prngEngine = Helper::PrngFromName::GetInstance(m_prngEngineType, m_providerType, m_digestType);
+	m_prngEngine->GetBytes(m_rndBuffer);
 	m_bufferIndex = 0;
 }
 

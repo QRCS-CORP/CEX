@@ -41,9 +41,9 @@ std::vector<SymmetricKeySize> CMAC::LegalKeySizes() const
 	return m_legalKeySizes; 
 };
 
-const std::string &CMAC::Name() 
+const std::string CMAC::Name() 
 { 
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_cipherMode->Name();
 }
 
 //~~~Constructor~~~//

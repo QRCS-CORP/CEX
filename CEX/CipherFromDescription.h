@@ -9,7 +9,7 @@ NAMESPACE_HELPER
 
 using Processing::CipherDescription;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
-using Enumeration::SymmetricEngines;
+using Enumeration::BlockCiphers;
 
 /// <summary>
 /// Get a symmetric cipher instance from it's description.

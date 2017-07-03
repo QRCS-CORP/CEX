@@ -113,7 +113,7 @@ namespace Test
 
 			OnProgress(std::string("***Testing Cipher Description Initialization***"));
 			Processing::CipherDescription cd(
-				SymmetricEngines::RHX,		// cipher engine
+				BlockCiphers::Rijndael,		// cipher engine
 				32,							// key size in bytes
 				IVSizes::V128,				// cipher iv size
 				CipherModes::CTR,			// cipher mode
@@ -849,7 +849,7 @@ namespace Test
 	{
 		using namespace Enumeration;
 
-		Processing::CipherDescription cd(SymmetricEngines::RHX,
+		Processing::CipherDescription cd(BlockCiphers::Rijndael,
 			192,
 			IVSizes::V128,
 			CipherModes::CTR,
@@ -1081,7 +1081,6 @@ namespace Test
 		const size_t BLKSZE = Cipher->BlockSize();
 		const size_t INPSZE = Input.size() - InOffset;
 		const size_t ALNSZE = (INPSZE < BLKSZE) ? 0 : ((INPSZE / BLKSZE) * BLKSZE) - BLKSZE;
-		size_t prcLen = 0;
 
 		if (INPSZE > BLKSZE)
 		{
@@ -1110,7 +1109,6 @@ namespace Test
 		const size_t BLKSZE = Cipher->BlockSize();
 		const size_t INPSZE = Input.size() - InOffset;
 		const size_t ALNSZE = (INPSZE < BLKSZE) ? 0 : INPSZE - (INPSZE % BLKSZE);
-		size_t prcLen = 0;
 
 		if (INPSZE > BLKSZE)
 		{

@@ -30,9 +30,9 @@ size_t PBKDF2::MinKeySize()
 	return m_macSize; 
 }
 
-const std::string &PBKDF2::Name()
+const std::string PBKDF2::Name()
 { 
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_macGenerator->Name();
 }
 
 //~~~Constructor~~~//

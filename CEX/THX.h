@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
 // Principal Algorithms:
@@ -116,6 +116,7 @@ class THX final : public IBlockCipher
 private:
 
 	static const size_t BLOCK_SIZE = 16;
+	static const std::string CIPHER_NAME;
 	static const std::string CLASS_NAME;
 	static const std::string DEF_DSTINFO;
 	static const uint DEF_ROUNDS = 16;
@@ -141,6 +142,7 @@ private:
 	std::vector<byte> m_kdfInfo;
 	size_t m_kdfInfoMax;
 	size_t m_kdfKeySize;
+	size_t m_cprKeySize;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	size_t m_rndCount;
@@ -211,7 +213,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: The number of transformation rounds processed by the transform

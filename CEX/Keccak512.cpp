@@ -32,7 +32,10 @@ const bool Keccak512::IsParallel()
 
 const std::string Keccak512::Name() 
 { 
-	return CLASS_NAME; 
+	if (m_parallelProfile.IsParallel())
+		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	else
+		return CLASS_NAME;
 }
 
 const size_t Keccak512::ParallelBlockSize() 
@@ -312,7 +315,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 void Keccak512::Compress(const std::vector<byte> &Input, size_t InOffset, Keccak512State &State)
 {
-	Keccak::Compress(Input, InOffset, BLOCK_SIZE, State.H);
+	Keccak::Permute(Input, InOffset, BLOCK_SIZE, State.H);
 }
 
 void Keccak512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak512State &State)

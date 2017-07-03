@@ -67,9 +67,9 @@ const size_t GCM::MinTagSize()
 	return MIN_TAGSIZE;
 }
 
-const std::string &GCM::Name()
+const std::string GCM::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_cipherMode.Engine()->Name();
 }
 
 const size_t GCM::ParallelBlockSize()

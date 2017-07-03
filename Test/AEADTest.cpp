@@ -212,7 +212,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint32_t dataLen = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10));
+			uint32_t dataLen = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2));
 			// important! if manually sizing parallel block, make it evenly divisible by parallel minimum size
 			Cipher->ParallelProfile().ParallelBlockSize() = dataLen - (dataLen % Cipher->ParallelProfile().ParallelMinimumSize());
 
@@ -285,7 +285,7 @@ namespace Test
 		//815
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t dataLen = rng.NextUInt32(100, 1000);
+			size_t dataLen = rng.NextUInt32(1000, 100);
 			data.resize(dataLen);
 			rng.GetBytes(data);
 			rng.GetBytes(nonce);

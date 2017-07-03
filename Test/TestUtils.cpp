@@ -15,6 +15,33 @@ namespace Test
 {
 	using CEX::Provider::CSP;
 
+#define	ex(x) (((x) < -BIGX) ? 0.0 : exp(x))
+
+	const double TestUtils::Z_MAX = 6.0;
+	const double TestUtils::LOG_SQRT_PI = 0.5723649429247000870717135;
+	const double TestUtils::I_SQRT_PI = 0.5641895835477562869480795;
+	const double TestUtils::BIGX = 20.0;
+
+	double TestUtils::ChiSquare(std::vector<byte> &Input)
+	{
+		std::vector<long> count(256, 0);
+		double chisq = 0.0;
+		long totalc = (long)Input.size();
+
+		for (size_t i = 0; i < Input.size(); ++i)
+			count[Input[i]]++;
+
+		// Expected count per bin
+		double cexp = totalc / 256.0;
+		for (size_t i = 0; i < 256; i++)
+		{
+			double a = count[i] - cexp;;
+			chisq += (a * a) / cexp;
+		}
+
+		return PoChiSq(chisq, 255);
+	}
+
 	void TestUtils::CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length)
 	{
 		memcpy(&DstArray[DstIndex], &SrcArray[SrcIndex], Length * sizeof(SrcArray[SrcIndex]));
@@ -95,6 +122,113 @@ namespace Test
 	{
 		CSP rng;
 		rng.GetBytes(Data);
+	}
+
+	double TestUtils::MeanValue(std::vector<byte> &Input)
+	{
+		double ret = 0;
+
+		for (size_t i = 0; i < Input.size(); ++i)
+			ret += Input[i];
+
+		return ret / Input.size();
+	}
+
+	double TestUtils::Poz(const double Z)
+	{
+		// borrowed from the ENT project: https://www.fourmilab.ch/random/
+		// returns cumulative probability from -oo to z 
+		double y, x, w;
+
+		if (Z == 0.0)
+		{
+			x = 0.0;
+		}
+		else
+		{
+			y = 0.5 * fabs(Z);
+			if (y >= (Z_MAX * 0.5))
+			{
+				x = 1.0;
+			}
+			else if (y < 1.0)
+			{
+				w = y * y;
+				x = ((((((((0.000124818987 * w
+					- 0.001075204047) * w + 0.005198775019) * w
+					- 0.019198292004) * w + 0.059054035642) * w
+					- 0.151968751364) * w + 0.319152932694) * w
+					- 0.531923007300) * w + 0.797884560593) * y * 2.0;
+			}
+			else
+			{
+				y -= 2.0;
+				x = (((((((((((((-0.000045255659 * y
+					+ 0.000152529290) * y - 0.000019538132) * y
+					- 0.000676904986) * y + 0.001390604284) * y
+					- 0.000794620820) * y - 0.002034254874) * y
+					+ 0.006549791214) * y - 0.010557625006) * y
+					+ 0.011630447319) * y - 0.009279453341) * y
+					+ 0.005353579108) * y - 0.002141268741) * y
+					+ 0.000535310849) * y + 0.999936657524;
+			}
+		}
+		return (Z > 0.0 ? ((x + 1.0) * 0.5) : ((1.0 - x) * 0.5));
+	}
+
+	double TestUtils::PoChiSq(const double Ax, const int Df)
+	{
+		// obtained chi-square value
+		// degrees of freedom
+		double x = Ax;
+		double a, y, s;
+		double e, c, z;
+		// true if df is an even number
+		int even;
+
+		if (x <= 0.0 || Df < 1)
+			return 1.0;
+
+		a = 0.5 * x;
+		even = (2 * (Df / 2)) == Df;
+
+		if (Df > 1)
+			y = ex(-a);
+
+		s = (even ? y : (2.0 * Poz(-sqrt(x))));
+		if (Df > 2)
+		{
+			x = 0.5 * (Df - 1.0);
+			z = (even ? 1.0 : 0.5);
+			if (a > BIGX)
+			{
+				e = (even ? 0.0 : LOG_SQRT_PI);
+				c = log(a);
+				while (z <= x)
+				{
+					e = log(z) + e;
+					s += ex(c * z - a - e);
+					z += 1.0;
+				}
+				return (s);
+			}
+			else
+			{
+				e = (even ? 1.0 : (I_SQRT_PI / sqrt(a)));
+				c = 0.0;
+				while (z <= x)
+				{
+					e = e * (a / z);
+					c = c + e;
+					z += 1.0;
+				}
+				return (c * y + s);
+			}
+		}
+		else
+		{
+			return s;
+		}
 	}
 
 	bool TestUtils::Read(const std::string &FilePath, std::string &Contents)

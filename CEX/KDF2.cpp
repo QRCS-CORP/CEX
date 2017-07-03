@@ -29,9 +29,9 @@ std::vector<SymmetricKeySize> KDF2::LegalKeySizes() const
 	return m_legalKeySizes; 
 }
 
-const std::string &KDF2::Name() 
+const std::string KDF2::Name() 
 { 
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_msgDigest->Name();
 }
 
 //~~~Constructor~~~//

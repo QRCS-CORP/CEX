@@ -25,11 +25,19 @@ public:
 	//~~~ Constants~~~//
 
 	/// <summary>
-	/// A UInt256 initialized at one
+	/// A UInt256 initialized with 8x 32bit integers to the value one
 	/// </summary>
-	static inline const UInt256 YMM1()
+	inline static const UInt256 ONE()
 	{
-		return UInt256((uint)1);
+		return UInt256(_mm256_set1_epi32(1));
+	}
+
+	/// <summary>
+	/// A UInt256 initialized with 8x 32bit integers to the value 0
+	/// </summary>
+	inline static const UInt256 ZERO()
+	{
+		return UInt256(_mm256_set1_epi32(0));
 	}
 
 	//~~~ Constructor~~~//
@@ -152,6 +160,20 @@ public:
 	}
 
 	/// <summary>
+	/// Load an array of T into a register in Little Endian format.
+	/// <para>Integers are loaded as 32bit integers regardless the natural size of T</para>
+	/// </summary>
+	///
+	/// <param name="Input">The array containing the data; must be at least 256 bits in length</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	template <typename T>
+	inline void LoadT(const std::vector<T> &Input, size_t Offset)
+	{
+		ymm = _mm256_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3],
+			(uint)Input[Offset + 4], (uint)Input[Offset + 5], (uint)Input[Offset + 6], (uint)Input[Offset + 7]);
+	}
+
+	/// <summary>
 	/// Transposes and loads 4 * UInt256 at 64bit boundaries in Little Endian format to an array of T
 	/// </summary>
 	///
@@ -162,7 +184,7 @@ public:
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
 	template <typename T>
-	static inline void Load4(const std::vector<T> &Input, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
+	inline static void Load4(const std::vector<T> &Input, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
 	{
 		X0.Load(Input, Offset);
 		X1.Load(Input, Offset + (32 / sizeof(T)));
@@ -194,7 +216,7 @@ public:
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
 	template <typename T>
-	static inline void Store4(std::vector<T> &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
+	inline static void Store4(std::vector<T> &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
 	{
 		Transpose(X0, X1, X2, X3);
 		X0.Store(Output, Offset);
@@ -226,7 +248,7 @@ public:
 	/// <param name="X2">Operand 14</param>
 	/// <param name="X3">Operand 15</param>
 	template <typename T>
-	static inline void Store16(std::vector<T> &Output, size_t OutOffset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
+	inline static void Store16(std::vector<T> &Output, size_t OutOffset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
 		UInt256 &X6, UInt256 &X7, UInt256 &X8, UInt256 &X9, UInt256 &X10, UInt256 &X11, UInt256 &X12, UInt256 &X13, UInt256 &X14, UInt256 &X15)
 	{
 		__m256i W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
@@ -286,7 +308,7 @@ public:
 	/// <param name="X">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt256</returns>
-	static inline UInt256 Abs(const UInt256 &Value)
+	inline static UInt256 Abs(const UInt256 &Value)
 	{
 		return UInt256(_mm256_abs_epi32(Value.ymm));
 	}
@@ -304,11 +326,23 @@ public:
 	}
 
 	/// <summary>
+	/// Returns the bitwise negation of 8 32bit integers
+	/// </summary>
+	///
+	/// <param name="Value">The integers to negate</param>
+	/// 
+	/// <returns>The processed UInt256</returns>
+	inline static UInt256 Negate(const UInt256 &Value)
+	{
+		return UInt256(_mm256_sub_epi32(_mm256_set1_epi32(0), Value.ymm));
+	}
+
+	/// <summary>
 	/// Returns the length of the register in bytes
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	static inline const size_t size() 
+	inline static const size_t size() 
 	{ 
 		return sizeof(__m256i); 
 	}
@@ -331,7 +365,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt256</returns>
-	static inline UInt256 RotL32(const UInt256 &X, const int Shift)
+	inline static UInt256 RotL32(const UInt256 &X, const int Shift)
 	{
 		return UInt256(_mm256_or_si256(_mm256_slli_epi32(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi32(X.ymm, static_cast<int>(32 - Shift))));
 	}
@@ -354,9 +388,33 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt256</returns>
-	static inline UInt256 RotR32(const UInt256 &X, const int Shift)
+	inline static UInt256 RotR32(const UInt256 &X, const int Shift)
 	{
 		return RotL32(X, 32 - Shift);
+	}
+
+	/// <summary>
+	/// Shifts the 8 signed 32-bit integers in a right by count bits while shifting in the sign bit
+	/// </summary>
+	///
+	/// <param name="Value">The base integer</param>
+	/// 
+	/// <returns>The processed UInt256</returns>
+	inline static UInt256 ShiftRA(const UInt256 &Value, const int Shift)
+	{
+		return UInt256(_mm256_sra_epi32(Value, _mm_set1_epi32(Shift)));
+	}
+
+	/// <summary>
+	/// Shifts the 8 signed or unsigned 32-bit integers in a right by count bits while shifting in zeros.
+	/// </summary>
+	///
+	/// <param name="Value">The base integer</param>
+	/// 
+	/// <returns>The processed UInt256</returns>
+	inline static UInt256 ShiftRL(const UInt256 &Value, const int Shift)
+	{
+		return UInt256(_mm256_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
 	/// <summary>
@@ -381,7 +439,7 @@ public:
 	/// <param name="X">The UInt256 to process</param>
 	/// 
 	/// <returns>The byte swapped UInt256</returns>
-	static inline UInt256 Swap(UInt256 &X)
+	inline static UInt256 Swap(UInt256 &X)
 	{
 		__m256i T = X.ymm;
 
@@ -399,7 +457,7 @@ public:
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	static inline void Transpose(UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
+	inline static void Transpose(UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
 	{
 		__m256i T0 = _mm256_unpacklo_epi32(X0.ymm, X1.ymm);
 		__m256i T1 = _mm256_unpacklo_epi32(X2.ymm, X3.ymm);
@@ -448,7 +506,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt256 operator ++ ()
 	{
-		return UInt256(ymm) + YMM1();
+		return UInt256(ymm) + UInt256::ONE();
 	}
 
 	/// <summary>
@@ -458,7 +516,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt256 operator ++ (int)
 	{
-		return UInt256(ymm) + YMM1();
+		return UInt256(ymm) + UInt256::ONE();
 	}
 
 	/// <summary>
@@ -488,7 +546,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt256 operator -- ()
 	{
-		return UInt256(ymm) - YMM1();
+		return UInt256(ymm) - UInt256::ONE();
 	}
 
 	/// <summary>
@@ -498,7 +556,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt256 operator -- (int)
 	{
-		return UInt256(ymm) - YMM1();
+		return UInt256(ymm) - UInt256::ONE();
 	}
 
 	/// <summary>

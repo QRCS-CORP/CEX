@@ -59,7 +59,7 @@ public:
 	~StreamWriter();
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy();
 

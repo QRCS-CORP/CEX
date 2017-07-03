@@ -28,7 +28,7 @@ const StreamModes MemoryStream::Enumeral()
 	return StreamModes::MemoryStream;
 }
 
-const std::string &MemoryStream::Name()
+const std::string MemoryStream::Name()
 {
 	return CLASS_NAME;
 }

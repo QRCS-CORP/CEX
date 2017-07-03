@@ -23,11 +23,19 @@ public:
 	//~~~ Constants~~~//
 
 	/// <summary>
-	/// A UInt256 initialized at one
+	/// A ULong256 initialized with 4x 64bit integers to the value one
 	/// </summary>
-	static inline const ULong256 YMM1()
+	inline static const ULong256 ONE()
 	{
-		return ULong256((uint)1);
+		return ULong256(_mm256_set1_epi64x(1));
+	}
+
+	/// <summary>
+	/// A ULong256 initialized with 4x 64bit integers to the value 0
+	/// </summary>
+	inline static const ULong256 ZERO()
+	{
+		return ULong256(_mm256_set1_epi64x(0));
 	}
 
 	//~~~Constructor~~~//
@@ -136,6 +144,19 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
+	/// Returns the absolute value.
+	/// <para>Note: returns the absolute value of the 32 bit integers</para>
+	/// </summary>
+	///
+	/// <param name="X">The comparison integer</param>
+	/// 
+	/// <returns>The processed ULong256</returns>
+	inline static ULong256 Abs(const ULong256 &Value)
+	{
+		return ULong256(_mm_abs_epi32(Value.xmm));
+	}
+
+	/// <summary>
 	/// Computes the bitwise AND of the 256-bit value in *this* and the bitwise NOT of the 256-bit value in X
 	/// </summary>
 	///
@@ -148,11 +169,23 @@ public:
 	}
 
 	/// <summary>
+	/// Returns the bitwise negation of 4 32bit integers
+	/// </summary>
+	///
+	/// <param name="Value">The integers to negate</param>
+	/// 
+	/// <returns>The processed ULong256</returns>
+	inline static ULong256 Negate(const ULong256 &Value)
+	{
+		return ULong256(_mm_sub_epi64(_mm_set1_epi64(0), Value.xmm));
+	}
+
+	/// <summary>
 	/// Returns the length of the register in bytes
 	/// </summary>
 	///
 	/// <returns>The registers size</returns>
-	static inline const size_t size()
+	inline static const size_t size()
 	{
 		return sizeof(__m256i);
 	}
@@ -175,7 +208,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 64</param>
 	/// 
 	/// <returns>The rotated ULong256</returns>
-	static inline ULong256 RotL64(const ULong256 &X, const int Shift)
+	inline static ULong256 RotL64(const ULong256 &X, const int Shift)
 	{
 		return ULong256(_mm256_or_si256(_mm256_slli_epi64(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi64(X.ymm, static_cast<int>(64 - Shift))));
 	}
@@ -225,7 +258,7 @@ public:
 	/// <param name="X">The ULong256 to process</param>
 	/// 
 	/// <returns>The byte swapped ULong256</returns>
-	static inline ULong256 Swap(ULong256 &X)
+	inline static ULong256 Swap(ULong256 &X)
 	{
 		__m256i T = X.ymm;
 
@@ -264,7 +297,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline ULong256 operator ++ ()
 	{
-		return ULong256(ymm) + YMM1();
+		return ULong256(ymm) + ULong256::ONE();
 	}
 
 	/// <summary>
@@ -274,7 +307,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline ULong256 operator ++ (int)
 	{
-		return ULong256(ymm) + YMM1();
+		return ULong256(ymm) + ULong256::ONE();
 	}
 
 	/// <summary>

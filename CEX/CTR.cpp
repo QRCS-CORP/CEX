@@ -50,9 +50,9 @@ const std::vector<SymmetricKeySize> &CTR::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
-const std::string &CTR::Name()
+const std::string CTR::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 const size_t CTR::ParallelBlockSize()

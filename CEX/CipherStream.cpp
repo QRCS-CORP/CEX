@@ -102,19 +102,11 @@ CipherStream::CipherStream(CipherDescription* Header)
 	if (Header == 0)
 		throw CryptoProcessingException("CipherStream:CTor", "The key Header is invalid!");
 
-	if (Header->EngineType() == SymmetricEngines::ChaCha20 || Header->EngineType() == SymmetricEngines::Salsa)
-	{
-		m_isStreamCipher = true;
-		m_streamCipher = GetStreamCipher((StreamCiphers)Header->EngineType(), (int)Header->RoundCount());
-	}
-	else
-	{
-		m_isStreamCipher = false;
-		m_cipherEngine = GetCipherMode(Header->CipherType(), (BlockCiphers)Header->EngineType(), (int)Header->BlockSize(), (int)Header->RoundCount(), Header->KdfEngine());
+	m_isStreamCipher = false;
+	m_cipherEngine = GetCipherMode(Header->CipherType(), Header->EngineType(), (int)Header->BlockSize(), (int)Header->RoundCount(), Header->KdfEngine());
 
-		if (!m_isCounterMode && Header->PaddingType() != PaddingModes::None)
-			m_cipherPadding = GetPaddingMode(Header->PaddingType());
-	}
+	if (!m_isCounterMode && Header->PaddingType() != PaddingModes::None)
+		m_cipherPadding = GetPaddingMode(Header->PaddingType());
 
 	Scope();
 }

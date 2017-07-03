@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public License
-// along with this program.If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 // 
 // Principal Algorithms:
@@ -120,6 +120,7 @@ class SHX final : public IBlockCipher
 private:
 
 	static const size_t BLOCK_SIZE = 16;
+	static const std::string CIPHER_NAME;
 	static const std::string CLASS_NAME;
 	static const std::string DEF_DSTINFO;
 	static const size_t MAX_ROUNDS = 64;
@@ -128,6 +129,7 @@ private:
 	// size of state buffer subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
+	size_t m_cprKeySize;
 	bool m_destroyEngine;
 	std::vector<uint> m_expKey;
 	IDigest* m_kdfEngine;
@@ -207,7 +209,7 @@ public:
 	/// <summary>
 	/// Get: The block ciphers class name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	/// <summary>
 	/// Get: The number of transformation rounds processed by the transform

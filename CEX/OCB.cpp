@@ -67,9 +67,9 @@ const size_t OCB::MinTagSize()
 	return MIN_TAGSIZE;
 }
 
-const std::string &OCB::Name()
+const std::string OCB::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 const size_t OCB::ParallelBlockSize()

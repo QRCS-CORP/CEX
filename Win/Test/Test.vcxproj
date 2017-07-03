@@ -289,6 +289,7 @@
     <ClInclude Include="..\..\Test\AEADTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\AesFipsTest.h" />
+    <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
     <ClInclude Include="..\..\Test\ChaChaTest.h" />
     <ClInclude Include="..\..\Test\CipherModeTest.h" />
@@ -306,6 +307,7 @@
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
     <ClInclude Include="..\..\Test\RandomOutputTest.h" />
+    <ClInclude Include="..\..\Test\RingLWETest.h" />
     <ClInclude Include="..\..\Test\SCRYPTTest.h" />
     <ClInclude Include="..\..\Test\SecureStreamTest.h" />
     <ClInclude Include="..\..\Test\SimdSpeedTest.h" />
@@ -321,7 +323,7 @@
     <ClInclude Include="..\..\Test\KeccakTest.h" />
     <ClInclude Include="..\..\Test\ParallelModeTest.h" />
     <ClInclude Include="..\..\Test\PBKDF2Test.h" />
-    <ClInclude Include="..\..\Test\RangedRNGTest.h" />
+    <ClInclude Include="..\..\Test\PrngTest.h" />
     <ClInclude Include="..\..\Test\RijndaelTest.h" />
     <ClInclude Include="..\..\Test\SalsaTest.h" />
     <ClInclude Include="..\..\Test\SerpentTest.h" />
@@ -339,6 +341,7 @@
     <ClCompile Include="..\..\Test\AEADTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\AesFipsTest.cpp" />
+    <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
     <ClCompile Include="..\..\Test\ChaChaTest.cpp" />
     <ClCompile Include="..\..\Test\CipherModeTest.cpp" />
@@ -363,8 +366,9 @@
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
     <ClCompile Include="..\..\Test\RandomOutputTest.cpp" />
-    <ClCompile Include="..\..\Test\RangedRngTest.cpp" />
+    <ClCompile Include="..\..\Test\PrngTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
+    <ClCompile Include="..\..\Test\RingLWETest.cpp" />
     <ClCompile Include="..\..\Test\SalsaTest.cpp" />
     <ClCompile Include="..\..\Test\SCRYPTTest.cpp" />
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />

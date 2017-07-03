@@ -6,7 +6,7 @@
 namespace Test
 {
 	/// <summary>
-	/// HMG output comparison test.
+	/// HCG output comparison test.
 	/// <para></para>
 	/// </summary>
 	class HMGTest : public ITest

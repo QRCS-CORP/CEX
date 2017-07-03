@@ -32,7 +32,10 @@ const bool SHA256::IsParallel()
 
 const std::string SHA256::Name()
 { 
-	return CLASS_NAME; 
+	if (m_parallelProfile.IsParallel())
+		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	else
+		return CLASS_NAME;
 }
 
 const size_t SHA256::ParallelBlockSize()

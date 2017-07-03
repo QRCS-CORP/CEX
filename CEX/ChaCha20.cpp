@@ -9,7 +9,7 @@
 
 NAMESPACE_STREAM
 
-const std::string ChaCha20::CLASS_NAME("ChaCha20");
+const std::string ChaCha20::CLASS_NAME("ChaCha");
 const std::string ChaCha20::SIGMA_INFO("expand 32-byte k");
 const std::string ChaCha20::TAU_INFO("expand 16-byte k");
 
@@ -50,6 +50,11 @@ const std::vector<size_t> &ChaCha20::LegalRounds()
 	return m_legalRounds; 
 }
 
+const std::string ChaCha20::Name() 
+{ 
+	return CLASS_NAME + Utility::IntUtils::ToString(m_rndCount);
+}
+
 const size_t ChaCha20::ParallelBlockSize() 
 {
 	return m_parallelProfile.ParallelBlockSize(); 
@@ -58,11 +63,6 @@ const size_t ChaCha20::ParallelBlockSize()
 ParallelOptions &ChaCha20::ParallelProfile() 
 {
 	return m_parallelProfile;
-}
-
-const std::string &ChaCha20::Name() 
-{ 
-	return CLASS_NAME;
 }
 
 const size_t ChaCha20::Rounds() 

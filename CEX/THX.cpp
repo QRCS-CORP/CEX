@@ -16,6 +16,7 @@
 
 NAMESPACE_BLOCK
 
+const std::string THX::CIPHER_NAME("Twofish");
 const std::string THX::CLASS_NAME("THX");
 const std::string THX::DEF_DSTINFO("THX version 1 information string");
 
@@ -66,9 +67,12 @@ const std::vector<size_t> &THX::LegalRounds()
 	return m_legalRounds;
 }
 
-const std::string &THX::Name()
+const std::string THX::Name()
 {
-	return CLASS_NAME;
+	if (m_kdfEngineType == Digests::None)
+		return CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	else
+		return CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
 }
 
 const size_t THX::Rounds()
@@ -85,6 +89,7 @@ const size_t THX::StateCacheSize()
 
 THX::THX(Digests KdfEngineType, uint Rounds)
 	:
+	m_cprKeySize(0),
 	m_destroyEngine(true),
 	m_expKey(0),
 	m_isDestroyed(false),
@@ -108,6 +113,7 @@ THX::THX(Digests KdfEngineType, uint Rounds)
 
 THX::THX(IDigest *KdfEngine, size_t Rounds)
 	:
+	m_cprKeySize(0),
 	m_destroyEngine(false),
 	m_expKey(0),
 	m_isDestroyed(false),
@@ -161,6 +167,7 @@ void THX::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_cprKeySize = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_kdfEngineType = Digests::None;
@@ -185,7 +192,6 @@ void THX::Destroy()
 		{
 			throw CryptoSymmetricCipherException("THX:Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
-
 	}
 }
 
@@ -200,6 +206,7 @@ void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
+	m_cprKeySize = KeyParams.Key().size() * 8;
 	// expand the key
 	ExpandKey(KeyParams.Key());
 

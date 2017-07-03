@@ -25,11 +25,19 @@ public:
 	//~~~ Constants~~~//
 
 	/// <summary>
-	/// A UInt512 initialized at one
+	/// A UInt512 initialized with 16x 32bit integers to the value one
 	/// </summary>
-	static inline const UInt512 ZMM1()
+	inline static const UInt512 ONE()
 	{
-		return UInt512((uint)1);
+		return UInt512(_mm512_set1_epi32(1));
+	}
+
+	/// <summary>
+	/// A UInt512 initialized with 16x 32bit integers to the value 0
+	/// </summary>
+	inline static const UInt512 ZERO()
+	{
+		return UInt512(_mm512_set1_epi32(0));
 	}
 
 	//~~~ Constructor~~~//
@@ -175,6 +183,22 @@ public:
 	}
 
 	/// <summary>
+	/// Load an array of T into a register in Little Endian format.
+	/// <para>Integers are loaded as 32bit integers regardless the natural size of T</para>
+	/// </summary>
+	///
+	/// <param name="Input">The array containing the data; must be at least 512 bits in length</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	template <typename T>
+	inline void LoadT(const std::vector<T> &Input, size_t Offset)
+	{
+		zmm = _mm512_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3],
+			(uint)Input[Offset + 4], (uint)Input[Offset + 5], (uint)Input[Offset + 6], (uint)Input[Offset + 7],
+				(uint)Input[Offset + 8], (uint)Input[Offset + 9], (uint)Input[Offset + 10], (uint)Input[Offset + 11], 
+					(uint)Input[Offset + 12], (uint)Input[Offset + 13], (uint)Input[Offset + 14], (uint)Input[Offset + 15]);
+	}
+
+	/// <summary>
 	/// Transposes and loads 4 * UInt512 to a T sized array
 	/// </summary>
 	///
@@ -185,7 +209,7 @@ public:
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
 	template <typename T>
-	static inline void Load4(const std::vector<T> &Input, size_t Offset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3)
+	inline static void Load4(const std::vector<T> &Input, size_t Offset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3)
 	{
 		X0.Load(Input, Offset);
 		X1.Load(Input, Offset + (64 / sizeof(T)));
@@ -217,7 +241,7 @@ public:
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
 	template <typename T>
-	static inline void Store4(std::vector<T> &Output, size_t Offset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3)
+	inline static void Store4(std::vector<T> &Output, size_t Offset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3)
 	{
 		Transpose(X0, X1, X2, X3);
 		X0.Store(Output, Offset);
@@ -249,7 +273,7 @@ public:
 	/// <param name="X2">Operand 14</param>
 	/// <param name="X3">Operand 15</param>
 	template <typename T>
-	static inline void Store16(std::vector<T> &Output, size_t OutOffset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3, UInt512 &X4, UInt512 &X5,
+	inline static void Store16(std::vector<T> &Output, size_t OutOffset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3, UInt512 &X4, UInt512 &X5,
 		UInt512 &X6, UInt512 &X7, UInt512 &X8, UInt512 &X9, UInt512 &X10, UInt512 &X11, UInt512 &X12, UInt512 &X13, UInt512 &X14, UInt512 &X15)
 	{
 		__m512i T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15;
@@ -349,7 +373,7 @@ public:
 	/// <param name="X">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt512</returns>
-	static inline UInt512 Abs(const UInt512 &Value)
+	inline static UInt512 Abs(const UInt512 &Value)
 	{
 		return UInt512(_mm512_abs_epi32(Value.zmm));
 	}
@@ -364,6 +388,18 @@ public:
 	inline UInt512 AndNot(const UInt512 &X)
 	{
 		return UInt512(_mm512_andnot_si512(zmm, X.zmm));
+	}
+
+	/// <summary>
+	/// Returns the bitwise negation of 16 32bit integers
+	/// </summary>
+	///
+	/// <param name="Value">The integers to negate</param>
+	/// 
+	/// <returns>The processed UInt512</returns>
+	inline static UInt512 Negate(const UInt512 &Value)
+	{
+		return UInt512(_mm512_sub_epi32(_mm512_set1_epi32(0), Value.zmm));
 	}
 
 	/// <summary>
@@ -391,7 +427,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt512</returns>
-	static inline  UInt512 RotL32(const UInt512 &X, const int Shift)
+	inline static  UInt512 RotL32(const UInt512 &X, const int Shift)
 	{
 		return UInt512(_mm512_or_si512(_mm512_slli_epi32(X.zmm, static_cast<int>(Shift)), _mm512_srli_epi32(X.zmm, static_cast<int>(32 - Shift))));
 	}
@@ -414,9 +450,33 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt512</returns>
-	static inline UInt512 RotR32(const UInt512 &X, const int Shift)
+	inline static UInt512 RotR32(const UInt512 &X, const int Shift)
 	{
 		return RotL32(X, 32 - Shift);
+	}
+
+	/// <summary>
+	/// Shifts the 16 signed 32-bit integers in a right by count bits while shifting in the sign bit
+	/// </summary>
+	///
+	/// <param name="Value">The base integer</param>
+	/// 
+	/// <returns>The processed UInt512</returns>
+	inline static UInt512 ShiftRA(const UInt512 &Value, const int Shift)
+	{
+		return UInt512(_mm512_sra_epi32(Value, _mm_set1_epi32(Shift)));
+	}
+
+	/// <summary>
+	/// Shifts the 16 signed or unsigned 32-bit integers in a right by count bits while shifting in zeros
+	/// </summary>
+	///
+	/// <param name="Value">The base integer</param>
+	/// 
+	/// <returns>The processed UInt512</returns>
+	inline static UInt512 ShiftRL(const UInt512 &Value, const int Shift)
+	{
+		return UInt512(_mm512_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
 	/// <summary>
@@ -441,7 +501,7 @@ public:
 	/// <param name="X">The UInt512 to process</param>
 	/// 
 	/// <returns>The byte swapped UInt512</returns>
-	static inline UInt512 Swap(UInt512 &X)
+	inline static UInt512 Swap(UInt512 &X)
 	{
 		__m512i T = X.zmm;
 
@@ -508,7 +568,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt512 operator ++ ()
 	{
-		return UInt512(zmm) + YMM1;
+		return UInt512(zmm) + UInt512::ONE();
 	}
 
 	/// <summary>
@@ -518,7 +578,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt512 operator ++ (int)
 	{
-		return UInt512(zmm) + YMM1;
+		return UInt512(zmm) + UInt512::ONE();
 	}
 
 	/// <summary>
@@ -558,7 +618,7 @@ public:
 	/// <param name="X">The value to increase</param>
 	inline UInt512 operator -- (int)
 	{
-		return UInt512(zmm) - YMM1;
+		return UInt512(zmm) - UInt512::ONE();
 	}
 
 	/// <summary>

@@ -520,6 +520,23 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #define CEX_PREFETCH_RHX_TABLES
 #define CEX_PREFETCH_THX_TABLES
 
+// native openmp support
+#if defined(_OPENMP)
+#	if _OPENMP == 201511
+#		define CEX_OPENMP_VERSION_45
+#	elif _OPENMP == 201307
+#		define CEX_OPENMP_VERSION_40
+#	elif _OPENMP == 201107
+#		define CEX_OPENMP_VERSION_31
+#	elif _OPENMP == 200805
+#		define CEX_OPENMP_VERSION_30
+#	elif _OPENMP == 200505
+#		define CEX_OPENMP_VERSION_25
+#	elif _OPENMP == 200203
+#		define CEX_OPENMP_VERSION_20
+#	endif
+#endif
+
 // EOF
 #endif
 

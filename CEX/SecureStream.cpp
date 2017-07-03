@@ -37,7 +37,7 @@ const ulong SecureStream::Length()
 	return static_cast<ulong>(m_streamData.size());
 }
 
-const std::string &SecureStream::Name()
+const std::string SecureStream::Name()
 {
 	return CLASS_NAME;
 }

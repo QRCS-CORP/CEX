@@ -50,9 +50,9 @@ const std::vector<SymmetricKeySize> &ECB::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
-const std::string &ECB::Name()
+const std::string ECB::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 const size_t ECB::ParallelBlockSize()

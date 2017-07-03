@@ -13,7 +13,7 @@ const PaddingModes PKCS7::Enumeral()
 	return PaddingModes::PKCS7; 
 }
 
-const std::string &PKCS7::Name() 
+const std::string PKCS7::Name() 
 { 
 	return CLASS_NAME; 
 }

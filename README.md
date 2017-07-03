@@ -50,6 +50,16 @@ The current version is <B>1.0.0.2</B> (A2 version), which are the major, minor, 
 
 ## Updates
 
+### Version 1.0.0.3, June 30, 2017
+* Added asymmetric cipher interfaces and framework
+
+* Added RingLWE asymmetric cipher
+* Added the Auto Collection seed Provider (ACP)
+
+* Addition of the HCR prng
+* Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators
+* Overhaul of SecureRandom and prng classes
+
 ### Version 1.0.0.2: April 23, 2017
 Last of 1.0 sweep of the symmetric library before the second half of the project engages, with thousands of changes made throughout, and the addition of (!experimental) AVX512 support.
 * Added a vectorized MemUtils class, with SIMD 128/256/512 copy, clear, set-value, and xor functions.

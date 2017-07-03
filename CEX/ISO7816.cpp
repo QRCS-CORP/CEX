@@ -13,7 +13,7 @@ const PaddingModes ISO7816::Enumeral()
 	return PaddingModes::ISO7816; 
 }
 
-const std::string &ISO7816::Name()
+const std::string ISO7816::Name()
 { 
 	return CLASS_NAME; 
 }

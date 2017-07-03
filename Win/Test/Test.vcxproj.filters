@@ -97,6 +97,24 @@
     <Filter Include="Vectors\Nessie">
       <UniqueIdentifier>{323f7e15-acb7-4eac-9f7d-90345efb0252}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Test\Asymmetric">
+      <UniqueIdentifier>{271b1ecc-8efc-43d0-9ae0-e73447e64f70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Asymmetric\Cipher">
+      <UniqueIdentifier>{d59d69c6-7df8-4d0f-99f3-069de9b8dffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Test\Asymmetric\Sign">
+      <UniqueIdentifier>{cec01327-a6db-4ea7-ae41-4a09158cc4d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\Asymmetric">
+      <UniqueIdentifier>{c727b7fe-a8cb-4c0f-9956-afaec4daff2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\Asymmetric\Cipher">
+      <UniqueIdentifier>{dc18568d-c547-4303-9d6d-0df4f6275a46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Test\Asymmetric\Sign">
+      <UniqueIdentifier>{2810e76a-f08a-45d8-8adc-e23c81b315b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\Test\NistStsResults.txt">
@@ -296,9 +314,6 @@
     <ClInclude Include="..\..\Test\ConsoleUtils.h">
       <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\RangedRNGTest.h">
-      <Filter>Header Files\Test\PrngTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\TestEvent.h">
       <Filter>Header Files\Test\Common</Filter>
     </ClInclude>
@@ -383,6 +398,15 @@
     <ClInclude Include="..\..\Test\SimdWrapperTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\RingLWETest.h">
+      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\PrngTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -414,9 +438,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\HMACTest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\RangedRngTest.cpp">
-      <Filter>Source Files\Test\PrngTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\CipherStreamTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
@@ -513,6 +534,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\SimdWrapperTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RingLWETest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\PrngTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

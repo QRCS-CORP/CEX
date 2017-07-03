@@ -6,9 +6,9 @@ NAMESPACE_PROCESSING
 
 //~~~Properties~~~//
 
-const SymmetricEngines CipherDescription::EngineType() 
+const BlockCiphers CipherDescription::EngineType()
 { 
-	return static_cast<SymmetricEngines>(m_engineType); 
+	return static_cast<BlockCiphers>(m_engineType);
 }
 
 const short CipherDescription::KeySize() const
@@ -65,7 +65,7 @@ CipherDescription::CipherDescription()
 	m_kdfEngine(0)
 {}
 
-CipherDescription::CipherDescription(SymmetricEngines EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
+CipherDescription::CipherDescription(BlockCiphers EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
 {
 	m_engineType = static_cast<byte>(EngineType);
 	m_keySize = KeySize;
@@ -113,102 +113,72 @@ CipherDescription::~CipherDescription()
 
 CipherDescription CipherDescription::AES128CBC()
 {
-	return CipherDescription(SymmetricEngines::RHX, 16, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R10, Digests::None);
+	return CipherDescription(BlockCiphers::Rijndael, 16, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R10, Digests::None);
 }
 
 CipherDescription CipherDescription::AES256CBC()
 {
-	return CipherDescription(SymmetricEngines::RHX, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R14, Digests::None);
-}
-
-CipherDescription CipherDescription::AES512CBC()
-{
-	return CipherDescription(SymmetricEngines::RHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R22, Digests::None);
+	return CipherDescription(BlockCiphers::Rijndael, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R14, Digests::None);
 }
 
 CipherDescription CipherDescription::RHX512CBC()
 {
-	return CipherDescription(SymmetricEngines::RHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R22, Digests::SHA256);
+	return CipherDescription(BlockCiphers::RHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R22, Digests::SHA256);
 }
 
 CipherDescription CipherDescription::AES128CTR()
 {
-	return CipherDescription(SymmetricEngines::RHX, 16, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R10, Digests::None);
+	return CipherDescription(BlockCiphers::Rijndael, 16, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R10, Digests::None);
 }
 
 CipherDescription CipherDescription::AES256CTR()
 {
-	return CipherDescription(SymmetricEngines::RHX, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R14, Digests::None);
-}
-
-CipherDescription CipherDescription::AES512CTR()
-{
-	return CipherDescription(SymmetricEngines::RHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R22, Digests::None);
+	return CipherDescription(BlockCiphers::Rijndael, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R14, Digests::None);
 }
 
 CipherDescription CipherDescription::RHX512CTR()
 {
-	return CipherDescription(SymmetricEngines::RHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R22, Digests::SHA256);
+	return CipherDescription(BlockCiphers::RHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R22, Digests::SHA256);
 }
 
-CipherDescription CipherDescription::SPT256CBC()
+CipherDescription CipherDescription::SERPENT256CBC()
 {
-	return CipherDescription(SymmetricEngines::SHX, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R32, Digests::None);
-}
-
-CipherDescription CipherDescription::SPT512CBC()
-{
-	return CipherDescription(SymmetricEngines::SHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R40, Digests::None);
+	return CipherDescription(BlockCiphers::Serpent, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R32, Digests::None);
 }
 
 CipherDescription CipherDescription::SHX512CBC()
 {
-	return CipherDescription(SymmetricEngines::SHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R40, Digests::SHA256);
+	return CipherDescription(BlockCiphers::SHX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R40, Digests::SHA256);
 }
 
-CipherDescription CipherDescription::SPT256CTR()
+CipherDescription CipherDescription::SERPENT256CTR()
 {
-	return CipherDescription(SymmetricEngines::SHX, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R32, Digests::None);
-}
-
-CipherDescription CipherDescription::SPT512CTR()
-{
-	return CipherDescription(SymmetricEngines::SHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R40, Digests::None);
+	return CipherDescription(BlockCiphers::Serpent, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R32, Digests::None);
 }
 
 CipherDescription CipherDescription::SHX512CTR()
 {
-	return CipherDescription(SymmetricEngines::SHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R40, Digests::SHA256);
+	return CipherDescription(BlockCiphers::SHX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R40, Digests::SHA256);
 }
 
-CipherDescription CipherDescription::TFH256CBC()
+CipherDescription CipherDescription::TWOFISH256CBC()
 {
-	return CipherDescription(SymmetricEngines::THX, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R16, Digests::None);
-}
-
-CipherDescription CipherDescription::TFH512CBC()
-{
-	return CipherDescription(SymmetricEngines::THX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R20, Digests::None);
+	return CipherDescription(BlockCiphers::Twofish, 32, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R16, Digests::None);
 }
 
 CipherDescription CipherDescription::THX512CBC()
 {
-	return CipherDescription(SymmetricEngines::THX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R20, Digests::SHA256);
+	return CipherDescription(BlockCiphers::THX, 64, IVSizes::V128, CipherModes::CBC, PaddingModes::PKCS7, BlockSizes::B128, RoundCounts::R20, Digests::SHA256);
 }
 
-CipherDescription CipherDescription::TFH256CTR()
+CipherDescription CipherDescription::TWOFISH256CTR()
 {
-	return CipherDescription(SymmetricEngines::THX, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R16, Digests::None);
-}
-
-CipherDescription CipherDescription::TFH512CTR()
-{
-	return CipherDescription(SymmetricEngines::THX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R20, Digests::None);
+	return CipherDescription(BlockCiphers::Twofish, 32, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R16, Digests::None);
 }
 
 CipherDescription CipherDescription::THX512CTR()
 {
-	return CipherDescription(SymmetricEngines::THX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R20, Digests::SHA256);
+	return CipherDescription(BlockCiphers::THX, 64, IVSizes::V128, CipherModes::CTR, PaddingModes::None, BlockSizes::B128, RoundCounts::R20, Digests::SHA256);
 }
 
 int CipherDescription::GetHeaderSize()

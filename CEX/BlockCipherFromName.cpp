@@ -56,7 +56,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Dig
 	}
 }
 
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, uint BlockSize, uint RoundCount, Digests KdfEngineType)
+IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests KdfEngineType, uint RoundCount)
 {
 	try
 	{

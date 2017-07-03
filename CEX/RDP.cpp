@@ -1,9 +1,7 @@
 #include "RDP.h"
-#include "IntUtils.h"
 #include "CpuDetect.h"
-#if !defined(CEX_USE_GCC_INLINE_ASM)
-#	include <immintrin.h>
-#endif
+#include "Intrinsics.h"
+#include "IntUtils.h"
 
 NAMESPACE_PROVIDER
 
@@ -21,7 +19,7 @@ const bool RDP::IsAvailable()
 	return m_isAvailable; 
 }
 
-const std::string &RDP::Name() 
+const std::string RDP::Name() 
 { 
 	return CLASS_NAME; 
 }
@@ -69,9 +67,11 @@ void RDP::GetBytes(std::vector<byte> &Output)
 
 void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	if (Offset + Length > Output.size())
-		throw CryptoRandomException("CSP:GetBytes", "The array is too small to fulfill this request!");
+	CEXASSERT(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
+	if (!m_isAvailable)
+		throw CryptoRandomException("RDP:GetBytes", "Random provider is not available!");
+ 
 	std::vector<byte> rndData(Length);
 	GetBytes(rndData);
 	Utility::MemUtils::Copy<byte>(rndData, 0, Output, Offset, rndData.size());
@@ -88,7 +88,7 @@ std::vector<byte> RDP::GetBytes(size_t Length)
 uint RDP::Next()
 {
 	if (!m_isAvailable)
-		throw CryptoRandomException("RDP:Engine", "Random provider is not available!");
+		throw CryptoRandomException("RDP:Next", "Random provider is not available!");
 
 	const size_t RTRCNT = (m_engineType == RdEngines::RdRand) ? RDRRETRY : RDSRETRY;
 	uint rnd = 0;
@@ -96,7 +96,7 @@ uint RDP::Next()
 	for (size_t i = 0; i != RTRCNT + 1; ++i)
 	{
 		if (i == RTRCNT)
-			throw CryptoRandomException("RDP:GetBytes", "The provider retry count has been exceeded!");
+			throw CryptoRandomException("RDP:Next", "The provider retry count has been exceeded!");
 
 		int res = 0;
 

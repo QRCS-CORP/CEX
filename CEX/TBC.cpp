@@ -13,7 +13,7 @@ const PaddingModes TBC::Enumeral()
 	return PaddingModes::TBC;
 }
 
-const std::string &TBC::Name() 
+const std::string TBC::Name() 
 { 
 	return CLASS_NAME; 
 }

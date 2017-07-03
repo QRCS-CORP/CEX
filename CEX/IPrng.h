@@ -38,12 +38,12 @@ public:
 	/// <summary>
 	/// Get: The random generators class name
 	/// </summary>
-	virtual const std::string &Name() = 0;
+	virtual const std::string Name() = 0;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	virtual void Destroy() = 0;
 
@@ -62,6 +62,32 @@ public:
 	///
 	/// <param name="Output">Output array</param>
 	virtual void GetBytes(std::vector<byte> &Output) = 0;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <returns>Random UInt16</returns>
+	virtual ushort NextUShort() = 0;
+
+	/// <summary>
+	/// Get an pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <param name="Maximum">Maximum value</param>
+	/// 
+	/// <returns>Random UInt16</returns>
+	virtual ushort NextUShort(ushort Maximum) = 0;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 16bit integer
+	/// </summary>
+	/// 
+	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
+	/// 
+	/// <returns>Random UInt16</returns>
+	virtual ushort NextUShort(ushort Maximum, ushort Minimum) = 0;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
@@ -83,18 +109,18 @@ public:
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
-	/// <param name="Minimum">Minimum value</param>
 	/// <param name="Maximum">Maximum value</param>
+	/// <param name="Minimum">Minimum value</param>
 	/// 
 	/// <returns>Random UInt32</returns>
-	virtual uint Next(uint Minimum, uint Maximum) = 0;
+	virtual uint Next(uint Maximum, uint Minimum) = 0;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt64</returns>
-	virtual ulong NextLong() = 0;
+	virtual ulong NextULong() = 0;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
@@ -103,17 +129,17 @@ public:
 	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random UInt64</returns>
-	virtual ulong NextLong(ulong Maximum) = 0;
+	virtual ulong NextULong(ulong Maximum) = 0;
 
 	/// <summary>
 	/// Get a ranged pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
+	/// <param name="Maximum">Maximum value</param>
 	/// <param name="Minimum">Minimum value</param>
-	/// <param name="Maximum">Maximum value</param>
 	/// 
 	/// <returns>Random UInt64</returns>
-	virtual ulong NextLong(ulong Minimum, ulong Maximum) = 0;
+	virtual ulong NextULong(ulong Maximum, ulong Minimum) = 0;
 
 	/// <summary>
 	/// Reset the generator instance

@@ -13,7 +13,7 @@ const PaddingModes ZeroPad::Enumeral()
 	return PaddingModes::None; 
 }
 
-const std::string &ZeroPad::Name() 
+const std::string ZeroPad::Name() 
 { 
 	return CLASS_NAME; 
 }

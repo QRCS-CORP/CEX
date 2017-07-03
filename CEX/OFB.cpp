@@ -49,14 +49,19 @@ const std::vector<SymmetricKeySize> &OFB::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
-const std::string &OFB::Name() 
+const std::string OFB::Name() 
 { 
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 const size_t OFB::ParallelBlockSize() 
 { 
 	return m_parallelProfile.ParallelBlockSize(); 
+}
+
+void OFB::ParallelMaxDegree(size_t Degree)
+{
+	// ignore; not a parallel capable mode
 }
 
 ParallelOptions &OFB::ParallelProfile() 

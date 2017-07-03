@@ -50,9 +50,9 @@ const std::vector<SymmetricKeySize> &CBC::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
-const std::string &CBC::Name()
+const std::string CBC::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 const size_t CBC::ParallelBlockSize()

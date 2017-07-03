@@ -11,6 +11,7 @@ NAMESPACE_BLOCK
 
 #if defined(__AVX__)
 
+const std::string AHX::CIPHER_NAME("Rijndael");
 const std::string AHX::CLASS_NAME("AHX");
 const std::string AHX::DEF_DSTINFO("information string RHX version 1");
 
@@ -61,9 +62,12 @@ const std::vector<size_t> &AHX::LegalRounds()
 	return m_legalRounds;
 }
 
-const std::string &AHX::Name()
+const std::string AHX::Name()
 {
-	return CLASS_NAME;
+	if (m_kdfEngineType == Digests::None)
+		return CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	else
+		return CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
 }
 
 const size_t AHX::Rounds()
@@ -81,6 +85,7 @@ const size_t AHX::StateCacheSize()
 AHX::AHX(Digests KdfEngineType, size_t Rounds)
 	:
 	m_blockSize(BLOCK_SIZE),
+	m_cprKeySize(0),
 	m_destroyEngine(true),
 	m_expKey(0),
 	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
@@ -107,6 +112,7 @@ AHX::AHX(Digests KdfEngineType, size_t Rounds)
 AHX::AHX(IDigest *KdfEngine, size_t Rounds)
 	:
 	m_blockSize(BLOCK_SIZE),
+	m_cprKeySize(0),
 	m_destroyEngine(false),
 	m_expKey(0),
 	m_kdfEngine(KdfEngine),
@@ -149,6 +155,7 @@ void AHX::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_cprKeySize = 0;
 		m_blockSize = 0;
 		m_kdfEngineType = Digests::None;
 		m_kdfInfoMax = 0;
@@ -197,6 +204,7 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
+	m_cprKeySize = KeyParams.Key().size() * 8;
 	// expand the key
 	ExpandKey(Encryption, KeyParams.Key());
 	// ready to transform data

@@ -58,7 +58,7 @@ public:
 	/// <summary>
 	/// Get: Cipher name
 	/// </summary>
-	const std::string &Name() override;
+	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
@@ -75,7 +75,7 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	void Destroy() override;
 

@@ -1,14 +1,15 @@
-#ifndef _CEXTEST_RANGEDRNGTEST_H
-#define _CEXTEST_RANGEDRNGTEST_H
+#ifndef _CEXTEST_PRNGTEST_H
+#define _CEXTEST_PRNGTEST_H
 
 #include "ITest.h"
+#include "../CEX/IPrng.h"
 
 namespace Test
 {
 	/// <summary>
 	/// Tests the minimum to maximum ranged returns from a PRNG
 	/// </summary>
-	class RangedRngTest : public ITest
+	class PrngTest : public ITest
 	{
 	private:
 		static const std::string DESCRIPTION;
@@ -31,12 +32,12 @@ namespace Test
 		/// <summary>
 		/// PRNG operational range tests
 		/// </summary>
-		RangedRngTest();
+		PrngTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~RangedRngTest();
+		~PrngTest();
 
 		/// <summary>
 		/// Start the tests
@@ -44,7 +45,8 @@ namespace Test
 		virtual std::string Run();
 
 	private:
-		void EvaluateRange();
+		void ChiSquare(Prng::IPrng* Rng);
+		void MeanValue(Prng::IPrng* Rng);
 		void OnProgress(std::string Data);
 	};
 }

@@ -7,6 +7,7 @@
 
 NAMESPACE_BLOCK
 
+const std::string RHX::CIPHER_NAME("Rijndael");
 const std::string RHX::CLASS_NAME("RHX");
 const std::string RHX::DEF_DSTINFO("information string RHX version 1");
 
@@ -57,9 +58,12 @@ const std::vector<size_t> &RHX::LegalRounds()
 	return m_legalRounds; 
 }
 
-const std::string &RHX::Name()
+const std::string RHX::Name()
 { 
-	return CLASS_NAME; 
+	if (m_kdfEngineType == Digests::None)
+		return CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	else
+		return CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
 }
 
 const size_t RHX::Rounds()
@@ -76,6 +80,7 @@ const size_t RHX::StateCacheSize()
 
 RHX::RHX(Digests KdfEngineType, size_t Rounds)
 	:
+	m_cprKeySize(0),
 	m_destroyEngine(true),
 	m_expKey(0),
 	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
@@ -98,6 +103,7 @@ RHX::RHX(Digests KdfEngineType, size_t Rounds)
 
 RHX::RHX(IDigest *KdfEngine, size_t Rounds)
 	:
+	m_cprKeySize(0),
 	m_destroyEngine(false),
 	m_expKey(0),
 	m_kdfEngine(KdfEngine),
@@ -140,7 +146,7 @@ void RHX::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_isDestroyed = false;
+		m_cprKeySize = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_kdfEngineType = Digests::None;
@@ -188,6 +194,7 @@ void RHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		m_kdfInfo = KeyParams.Info();
 
 	m_isEncryption = Encryption;
+	m_cprKeySize = KeyParams.Key().size() * 8;
 	// expand the key
 	ExpandKey(Encryption, KeyParams.Key());
 

@@ -62,7 +62,7 @@ public:
 	/// <summary>
 	/// Get: Mac generators class name
 	/// </summary>
-	virtual const std::string &Name() = 0;
+	virtual const std::string Name() = 0;
 
 	//~~~Public Functions~~~//
 
@@ -75,7 +75,7 @@ public:
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Release all resources associated with the object
+	/// Release all resources associated with the object; optional, called by the finalizer
 	/// </summary>
 	virtual void Destroy() = 0;
 

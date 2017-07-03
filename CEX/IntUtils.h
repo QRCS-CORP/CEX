@@ -173,6 +173,19 @@ public:
 		return ((A) < (B) ? (A) : (B));
 	}
 
+	/// <summary>
+	/// Convert an integer to a string
+	/// </summary>
+	/// 
+	/// <param name="Input">The integer to convert</param>
+	/// 
+	/// <returns>The string representation</returns>
+	template <typename T>
+	static std::string ToString(T Value)
+	{
+		return std::to_string(Value);
+	}
+
 	// Different computer architectures store data using different byte orders. "Big-endian"
 	// means the most significant byte is on the left end of a word. "Little-endian" means the 
 	// most significant byte is on the right end of a word. i.e.: 
@@ -224,6 +237,7 @@ public:
 	/// <param name="Input">The 32bit word array</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
+	/// <param name="Length">The number of bytes to convert</param>
 	template<typename T>
 	static void BeToBlock(std::vector<T> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	{
@@ -515,6 +529,7 @@ public:
 	/// <param name="Input">The 32bit word array</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
+	/// <param name="Length">The number of bytes to convert</param>
 	template<typename T>
 	static void LeToBlock(std::vector<T> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	{

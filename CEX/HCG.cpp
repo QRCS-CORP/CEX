@@ -1,4 +1,4 @@
-#include "HMG.h"
+#include "HCG.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
 #include "MemUtils.h"
@@ -7,73 +7,73 @@
 
 NAMESPACE_DRBG
 
-const std::string HMG::CLASS_NAME("HMG");
+const std::string HCG::CLASS_NAME("HCG");
 
 //~~~Properties~~~//
 
-std::vector<byte> &HMG::DistributionCode() 
+std::vector<byte> &HCG::DistributionCode() 
 {
 	return m_distributionCode; 
 }
 
-const size_t HMG::DistributionCodeMax() 
+const size_t HCG::DistributionCodeMax() 
 { 
 	return m_distributionCodeMax; 
 }
 
-const Drbgs HMG::Enumeral() 
+const Drbgs HCG::Enumeral() 
 {
-	return Drbgs::HMG;
+	return Drbgs::HCG;
 }
 
-const bool HMG::IsInitialized() 
+const bool HCG::IsInitialized() 
 {
 	return m_isInitialized; 
 }
 
-std::vector<SymmetricKeySize> HMG::LegalKeySizes() const 
+std::vector<SymmetricKeySize> HCG::LegalKeySizes() const 
 {
 	return m_legalKeySizes; 
 }
 
-const ulong HMG::MaxOutputSize() 
+const ulong HCG::MaxOutputSize() 
 { 
 	return MAX_OUTPUT; 
 }
 
-const size_t HMG::MaxRequestSize() 
+const size_t HCG::MaxRequestSize() 
 {
 	return MAX_REQUEST; 
 }
 
-const size_t HMG::MaxReseedCount()
+const size_t HCG::MaxReseedCount()
 { 
 	return MAX_RESEED; 
 }
 
-const std::string &HMG::Name()
+const std::string HCG::Name()
 {
-	return CLASS_NAME; 
+	return CLASS_NAME + "-" + m_hmacEngine.Name();
 }
 
-const size_t HMG::NonceSize() 
+const size_t HCG::NonceSize() 
 {
 	return STATECTR_SIZE; 
 }
 
-size_t &HMG::ReseedThreshold()
+size_t &HCG::ReseedThreshold()
 { 
 	return m_reseedThreshold;
 }
 
-const size_t HMG::SecurityStrength()
+const size_t HCG::SecurityStrength()
 {
 	return m_secStrength;
 }
 
 //~~~Constructor~~~//
 
-HMG::HMG(Digests DigestType, Providers ProviderType)
+HCG::HCG(Digests DigestType, Providers ProviderType)
 	:
 	m_hmacEngine(DigestType),
 	m_destroyEngine(true),
@@ -97,9 +97,9 @@ HMG::HMG(Digests DigestType, Providers ProviderType)
 	Scope();
 }
 
-HMG::HMG(IDigest* Digest, IProvider* Provider)
+HCG::HCG(IDigest* Digest, IProvider* Provider)
 	:
-	m_hmacEngine(Digest != 0 ? Digest : throw CryptoGeneratorException("HMG:Ctor", "Digest can not be null!")),
+	m_hmacEngine(Digest != 0 ? Digest : throw CryptoGeneratorException("HCG:Ctor", "Digest can not be null!")),
 	m_destroyEngine(false),
 	m_digestType(Digest->Enumeral()),
 	m_distributionCode(0),
@@ -109,7 +109,7 @@ HMG::HMG(IDigest* Digest, IProvider* Provider)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
-	m_providerSource(Provider != 0 ? Provider : throw CryptoGeneratorException("HMG:Ctor", "Provider can not be null!")),
+	m_providerSource(Provider != 0 ? Provider : throw CryptoGeneratorException("HCG:Ctor", "Provider can not be null!")),
 	m_providerType(Provider->Enumeral()),
 	m_reseedCounter(0),
 	m_reseedRequests(0),
@@ -121,14 +121,14 @@ HMG::HMG(IDigest* Digest, IProvider* Provider)
 	Scope();
 }
 
-HMG::~HMG()
+HCG::~HCG()
 {
 	Destroy();
 }
 
 //~~~Public Functions~~~//
 
-void HMG::Destroy()
+void HCG::Destroy()
 {
 	if (!m_isDestroyed)
 	{
@@ -163,17 +163,17 @@ void HMG::Destroy()
 		}
 		catch (std::exception& ex)
 		{
-			throw CryptoGeneratorException("HMG::Destroy", "Could not clear all variables!", std::string(ex.what()));
+			throw CryptoGeneratorException("HCG::Destroy", "Could not clear all variables!", std::string(ex.what()));
 		}
 	}
 }
 
-size_t HMG::Generate(std::vector<byte> &Output)
+size_t HCG::Generate(std::vector<byte> &Output)
 {
 	return Generate(Output, 0, Output.size());
 }
 
-size_t HMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
 	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
@@ -197,7 +197,7 @@ size_t HMG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	return Length;
 }
 
-void HMG::Initialize(ISymmetricKey &GenParam)
+void HCG::Initialize(ISymmetricKey &GenParam)
 {
 	if (GenParam.Nonce().size() != 0)
 	{
@@ -212,10 +212,10 @@ void HMG::Initialize(ISymmetricKey &GenParam)
 	}
 }
 
-void HMG::Initialize(const std::vector<byte> &Seed)
+void HCG::Initialize(const std::vector<byte> &Seed)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
-		throw CryptoGeneratorException("HMG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+		throw CryptoGeneratorException("HCG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
 
 	// pre-initialize the HMAC
 	m_hmacKey = Seed;
@@ -231,20 +231,20 @@ void HMG::Initialize(const std::vector<byte> &Seed)
 	m_isInitialized = true;
 }
 
-void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
+void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
 {
 	if (Nonce.size() != NonceSize())
-		throw CryptoGeneratorException("HMG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
+		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// added: nonce becomes the initial state counter value
 	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	Initialize(Seed);
 }
 
-void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
+void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
 {
 	if (Nonce.size() != NonceSize())
-		throw CryptoGeneratorException("HMG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
+		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// copy nonce to state counter
 	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
@@ -266,17 +266,17 @@ void HMG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	Initialize(Seed);
 }
 
-void HMG::Update(const std::vector<byte> &Seed)
+void HCG::Update(const std::vector<byte> &Seed)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
-		throw CryptoGeneratorException("HMG:Update", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+		throw CryptoGeneratorException("HCG:Update", "Seed size is invalid! Check LegalKeySizes for accepted values.");
 
 	Derive(Seed);
 }
 
 //~~~Private Functions~~~//
 
-void HMG::Derive(const std::vector<byte> &Seed)
+void HCG::Derive(const std::vector<byte> &Seed)
 {
 	// key expansion/strengthening function
 	size_t blkOffset = m_seedCtr.size() + Seed.size();
@@ -320,7 +320,7 @@ void HMG::Derive(const std::vector<byte> &Seed)
 	m_providerSource->GetBytes(m_hmacState);
 }
 
-void HMG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	do
 	{
@@ -344,7 +344,7 @@ void HMG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 	while (Length != 0);
 }
 
-void HMG::Increase(std::vector<byte> &Counter, const uint Length)
+void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 {
 	const size_t CTRSZE = Counter.size() - 1;
 	std::vector<byte> ctrInc(sizeof(uint));
@@ -361,7 +361,7 @@ void HMG::Increase(std::vector<byte> &Counter, const uint Length)
 	}
 }
 
-void HMG::Scope()
+void HCG::Scope()
 {
 	m_distributionCodeMax = m_hmacEngine.BlockSize() + (m_hmacEngine.BlockSize() - (m_stateCtr.size() + m_hmacState.size() + Helper::DigestFromName::GetPaddingSize(m_digestType)));
 
@@ -374,7 +374,7 @@ void HMG::Scope()
 	m_legalKeySizes[2] = SymmetricKeySize(m_legalKeySizes[1].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distributionCodeMax);
 }
 
-void HMG::RandomPad(size_t BlockOffset)
+void HCG::RandomPad(size_t BlockOffset)
 {
 	size_t padLen = (BlockOffset > m_hmacEngine.BlockSize()) ? m_hmacEngine.BlockSize() - (BlockOffset % m_hmacEngine.BlockSize()) : m_hmacEngine.BlockSize() - BlockOffset;
 

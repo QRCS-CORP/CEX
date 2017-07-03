@@ -87,7 +87,7 @@ Universal P-Value: 0.919928531932199 State: PASS
 
 ### DRBGs ###
 
->>> Counter Mode Generator (CMG) <<<
+>>> Counter Mode Generator (BCG) <<<
 
 Recorded at: November 26, 2016 : 5:08:18 PM
 ApproximateEntropy P-Value: 0.27237056989931 State: PASS
@@ -127,7 +127,7 @@ Serial P-Value: 0.350766793714353 State: PASS
 Universal P-Value: 0.566304107234101 State: PASS
 
 
->>> Hash based MAC Generator (HMG) <<<
+>>> Hash based MAC Generator (HCG) <<<
 
 Recorded at: November 26, 2016 : 5:12:42 PM
 ApproximateEntropy P-Value: 0.207201172388887 State: PASS

@@ -50,9 +50,9 @@ const std::vector<SymmetricKeySize> &ICM::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
-const std::string &ICM::Name()
+const std::string ICM::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
 const size_t ICM::ParallelBlockSize()

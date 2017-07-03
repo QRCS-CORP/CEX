@@ -38,9 +38,9 @@ std::vector<SymmetricKeySize> SCRYPT::LegalKeySizes() const
 	return m_legalKeySizes; 
 };
 
-const std::string &SCRYPT::Name() 
+const std::string SCRYPT::Name() 
 { 
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_kdfDigest->Name();
 }
 
 ParallelOptions &SCRYPT::ParallelProfile() 

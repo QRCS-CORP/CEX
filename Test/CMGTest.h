@@ -6,7 +6,7 @@
 namespace Test
 {
 	/// <summary>
-	/// CMG output comparison test.
+	/// BCG output comparison test.
 	/// <para>Compares drbg output with CTR mode encrypting all zeroes input.</para>
 	/// </summary>
 	class CMGTest : public ITest

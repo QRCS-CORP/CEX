@@ -13,9 +13,9 @@ const Prngs PBR::Enumeral()
 	return Prngs::PBR;
 }
 
-const std::string &PBR::Name()
+const std::string PBR::Name()
 {
-	return CLASS_NAME;
+	return CLASS_NAME + "-" + m_rngGenerator->Name();
 }
 
 //~~~Constructor~~~//
@@ -28,11 +28,11 @@ PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestEngine, size_t B
 	m_digestType(DigestEngine),
 	m_isDestroyed(false),
 	m_rngBuffer(BufferSize),
-	m_stateSeed(Seed)
+	m_rndSeed(Seed)
 {
 	if (Iterations == 0)
 		throw CryptoRandomException("PBR:Ctor", "Iterations can not be zero; at least 1 iteration is required!");
-	if (GetMinimumSeedSize(DigestEngine) < Seed.size())
+	if (GetMinimumSeedSize(DigestEngine) > Seed.size())
 		throw CryptoRandomException("PBR:Ctor", "The state seed is too small! must be at least digests block size!");
 	if (BufferSize < 64)
 		throw CryptoRandomException("PBR:Ctor", "BufferSize must be at least 64 bytes!");
@@ -56,7 +56,7 @@ void PBR::Destroy()
 		m_digestIterations = 0;
 
 		Utility::IntUtils::ClearVector(m_rngBuffer);
-		Utility::IntUtils::ClearVector(m_stateSeed);
+		Utility::IntUtils::ClearVector(m_rndSeed);
 
 		if (m_rngGenerator != 0)
 			delete m_rngGenerator;
@@ -112,6 +112,38 @@ void PBR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
+ushort PBR::NextUShort()
+{
+	return Utility::IntUtils::LeBytesTo16(GetBytes(2), 0);
+}
+
+ushort PBR::NextUShort(ushort Maximum)
+{
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
+	std::vector<byte> rand;
+	uint num(0);
+
+	do
+	{
+		rand = GetByteRange(Maximum);
+		num = Utility::IntUtils::LeBytesTo16(rand, 0);
+	} 
+	while (num > Maximum);
+
+	return num;
+}
+
+ushort PBR::NextUShort(ushort Maximum, ushort Minimum)
+{
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
+	uint num = 0;
+	while ((num = NextUShort(Maximum)) < Minimum) {}
+	return num;
+}
+
 uint PBR::Next()
 {
 	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
@@ -119,6 +151,8 @@ uint PBR::Next()
 
 uint PBR::Next(uint Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	uint num(0);
 
@@ -132,20 +166,25 @@ uint PBR::Next(uint Maximum)
 	return num;
 }
 
-uint PBR::Next(uint Minimum, uint Maximum)
+uint PBR::Next(uint Maximum, uint Minimum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
 	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
 	return num;
 }
 
-ulong PBR::NextLong()
+ulong PBR::NextULong()
 {
 	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
 }
 
-ulong PBR::NextLong(ulong Maximum)
+ulong PBR::NextULong(ulong Maximum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+
 	std::vector<byte> rand;
 	ulong num(0);
 
@@ -159,20 +198,20 @@ ulong PBR::NextLong(ulong Maximum)
 	return num;
 }
 
-ulong PBR::NextLong(ulong Minimum, ulong Maximum)
+ulong PBR::NextULong(ulong Maximum, ulong Minimum)
 {
+	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+
 	ulong num = 0;
-	while ((num = NextLong(Maximum)) < Minimum) {}
+	while ((num = NextULong(Maximum)) < Minimum) {}
 	return num;
 }
 
 void PBR::Reset()
 {
-	if (m_rngGenerator != 0)
-		delete m_rngGenerator;
-
 	m_rngGenerator = new Kdf::PBKDF2(m_digestType, m_digestIterations);
-	m_rngGenerator->Initialize(m_stateSeed);
+	m_rngGenerator->Initialize(m_rndSeed);
 	m_rngGenerator->Generate(m_rngBuffer);
 	m_bufferIndex = 0;
 }

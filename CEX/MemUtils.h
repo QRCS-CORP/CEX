@@ -213,7 +213,6 @@ public:
 	{
 		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= Length, "Length is larger than input capacity");
 		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
-		CEXASSERT(sizeof(A) <= 16, "Integer type is larger than 128 bits");
 
 		std::memcpy(&Value, &Input[InOffset], Length);
 	}
@@ -233,7 +232,6 @@ public:
 	{
 		CEXASSERT((Output.size() - OutOffset) * sizeof(A) >= Length, "Length is larger than input capacity");
 		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
-		CEXASSERT(sizeof(A) <= 16, "Integer type is larger than 128 bits");
 
 		std::memcpy(&Output[OutOffset], &Value, Length);
 	}
@@ -385,7 +383,6 @@ public:
 	{
 		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= 32, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= 32, "Length is larger than output capacity");
-		CEXASSERT(sizeof(A) <= 32 && sizeof(B) <= 32, "Integer type is larger than 256 bits");
 
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
@@ -410,7 +407,6 @@ public:
 	{
 		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= 64, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= 64, "Length is larger than output capacity");
-		CEXASSERT(sizeof(A) <= 64 && sizeof(B) <= 64, "Integer type is larger than 512 bits");
 
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])));
