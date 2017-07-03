@@ -23,8 +23,12 @@
 
 NAMESPACE_BLOCK
 
+/**
+* \internal
+*/
+
 template<typename T>
-void SHX::DecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
 {
 #if defined(__AVX__)
 
@@ -125,7 +129,7 @@ void SHX::DecryptW(const std::vector<byte> &Input, const size_t InOffset, std::v
 }
 
 template<typename T>
-void EncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
 {
 #if defined(__AVX__)
 

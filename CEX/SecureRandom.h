@@ -88,7 +88,7 @@ public:
 	/// 
 	/// <param name="EngineType">The base random bytes generator (PRNG) used to power this wrapper; default is block cipher counter</param>
 	/// <param name="ProviderType">The entropy provider type used to initialize the prng</param>
-	/// <param name="ExtractionType">The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</param>
+	/// <param name="DigestType">The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</param>
 	/// 
 	/// <exception cref="CryptoRandomException">Thrown if and invalid prng or random provider is used</exception>
 	explicit SecureRandom(Prngs EngineType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None);

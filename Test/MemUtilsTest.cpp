@@ -46,7 +46,7 @@ namespace Test
 		// block copy
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint inpSze = rng.NextUInt32(100, 10000);
+			uint inpSze = rng.NextUInt32(10000, 100);
 			std::vector<byte> input = rng.GetBytes(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::Copy(input, 0, output, 0, inpSze);
@@ -94,7 +94,7 @@ namespace Test
 		// byte to ulong
 		for (size_t i = 0; i < 100; ++i)
 		{
-			ulong inpVal = rng.NextUInt64(100, 1000000);
+			ulong inpVal = rng.NextUInt64(1000000, 100);
 			std::vector<byte> output(8);
 			MemUtils::Copy<ulong, byte>(inpVal, output, 0, 8);
 			ulong cmpVal = 0;
@@ -108,7 +108,7 @@ namespace Test
 		// block clear
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint inpSze = rng.NextUInt32(100, 10000);
+			uint inpSze = rng.NextUInt32(10000, 100);
 			std::vector<byte> input = rng.GetBytes(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::Clear(input, 0, inpSze);
@@ -158,7 +158,7 @@ namespace Test
 		// block set
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint inpSze = rng.NextUInt32(100, 10000);
+			uint inpSze = rng.NextUInt32(10000, 100);
 			std::vector<byte> input(inpSze);
 			std::vector<byte> output(inpSze);
 			std::memset(&input[0], (byte)0xff, inpSze);
@@ -172,7 +172,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 16;
-			byte val = (byte)rng.NextInt16(0, 255);
+			byte val = (byte)rng.NextInt16(255, 1);
 			std::vector<byte> input(inpSze, val);
 			std::vector<byte> output(input.size());
 			MemUtils::SETVAL128(output, 0, val);
@@ -185,7 +185,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 32;
-			byte val = (byte)rng.NextInt16(0, 255);
+			byte val = (byte)rng.NextInt16(255, 1);
 			std::vector<byte> input(inpSze, val);
 			std::vector<byte> output(input.size());
 			MemUtils::SETVAL256(output, 0, val);
@@ -198,7 +198,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 64;
-			byte val = (byte)rng.NextInt16(0, 255);
+			byte val = (byte)rng.NextInt16(255, 1);
 			std::vector<byte> input(inpSze, val);
 			std::vector<byte> output(input.size());
 			MemUtils::SETVAL512(output, 0, val);

@@ -231,7 +231,6 @@ public:
 	/// In default mode (KdfEngineType is set to None), the rounds count is automatically calculated based on the key size in a standard AES implementation.
 	/// If the Kdf engine is specified, the number of rounds can be user-defined to a value from 10 to 38 (mod 2).
 	/// Adding rounds increases diffusion in the ciphertext output, but takes longer to process.</para></param>
-	/// <param name="BlockSize">Cipher input <see cref="BlockSize"/>. The <see cref="LegalBlockSizes"/> property contains available sizes. Default is 16 bytes.</param>
 	/// 
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
 	explicit RHX(Digests KdfEngineType = Digests::None, size_t Rounds = 14);
@@ -244,7 +243,6 @@ public:
 	/// <para>Can be any one of the message digest implementations.</para></param>
 	/// <param name="Rounds">Number of transformation rounds, the default is 22 rounds (Rijndael-512).
 	/// <para>The <see cref="LegalRounds"/> property contains available sizes. <para></param>
-	/// <param name="BlockSize">Cipher input block-size, the default is 16 bytes.</param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
 	explicit RHX(IDigest *KdfEngine, size_t Rounds = 22);

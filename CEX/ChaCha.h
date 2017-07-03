@@ -29,11 +29,9 @@ NAMESPACE_STREAM
 */
 class ChaCha
 {
-private:
-
 public:
 
-	static void Transform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
+	static void ChaChaTransform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
 		size_t ctr = 0;
 		uint X0 = State[ctr];
@@ -142,7 +140,7 @@ public:
 	}
 
 	template<class T>
-	static void TransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
+	static void ChaChaTransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
 #if defined(__AVX__)
 

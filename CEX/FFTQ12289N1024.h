@@ -54,6 +54,19 @@ public:
 	/// </summary>
 	static const std::string Name;
 
+	/**
+	* \internal
+	*/
+
+	static void DecodeA(std::vector<ushort> &Pk, std::vector<byte> &Seed, const std::vector<byte> &R);
+	static void DecodeB(std::vector<ushort> &B, std::vector<ushort> &C, const std::vector<byte> &R);
+	static void EncodeA(std::vector<byte> &R, const std::vector<ushort> &Pk, const std::vector<byte> &Seed);
+	static void EncodeB(std::vector<byte> &R, const std::vector<ushort> &B, const std::vector<ushort> &C);
+	static void GenA(std::vector<ushort> &A, const std::vector<byte> &Seed, bool Parallel);
+	static void KeyGen(std::vector<byte> &Send, std::vector<ushort> &Sk, Prng::IPrng* Rng, bool Parallel);
+	static void SharedA(std::vector<byte> &SharedKey, const std::vector<ushort> &Sk, const std::vector<byte> &Received, Digest::IDigest* Digest);
+	static void SharedB(std::vector<byte> &SharedKey, std::vector<byte> &Send, const std::vector<byte> &Received, Prng::IPrng *Rng, Digest::IDigest* Digest, bool Parallel);
+
 private:
 
 	static const uint QINV = 12287;
@@ -63,25 +76,6 @@ private:
 	static const std::vector<ushort> OmegasInvMontgomery;
 	static const std::vector<ushort> PsisBitrevMontgomery;
 	static const std::vector<ushort> PsisInvMontgomery;
-
-public:
-
-	/**
-	* \cond internal
-	*/
-	static void DecodeA(std::vector<ushort> &Pk, std::vector<byte> &Seed, const std::vector<byte> &R);
-	static void DecodeB(std::vector<ushort> &B, std::vector<ushort> &C, const std::vector<byte> &R);
-	static void EncodeA(std::vector<byte> &R, const std::vector<ushort> &Pk, const std::vector<byte> &Seed);
-	static void EncodeB(std::vector<byte> &R, const std::vector<ushort> &B, const std::vector<ushort> &C);
-	static void GenA(std::vector<ushort> &A, const std::vector<byte> &Seed, bool Parallel);
-	static void KeyGen(std::vector<byte> &Send, std::vector<ushort> &Sk, Prng::IPrng* Rng, bool Parallel);
-	static void SharedA(std::vector<byte> &SharedKey, const std::vector<ushort> &Sk, const std::vector<byte> &Received, Digest::IDigest* Digest);
-	static void SharedB(std::vector<byte> &SharedKey, std::vector<byte> &Send, const std::vector<byte> &Received, Prng::IPrng *Rng, Digest::IDigest* Digest, bool Parallel);
-	/**
-	* \endcond
-	*/
-
-private:
 
 	static ushort BarrettReduce(ushort A);
 	static void BitReverse(std::vector<ushort> &Poly);

@@ -23,8 +23,12 @@
 
 NAMESPACE_BLOCK
 
+/**
+* \internal
+*/
+
 template<typename T>
-void DecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
+void THXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
 {
 #if defined(__AVX__)
 
@@ -82,7 +86,7 @@ void DecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector
 }
 
 template<typename T>
-void THX::EncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
+void THXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
 {
 #if defined(__AVX__)
 

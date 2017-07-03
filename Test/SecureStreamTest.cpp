@@ -50,7 +50,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			cnt = rnd.NextUInt32(40, 4000);
+			cnt = rnd.NextUInt32(4000, 40);
 			data = rnd.GetBytes(cnt);
 
 			// add array via constructor

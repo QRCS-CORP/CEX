@@ -231,7 +231,7 @@ namespace Test
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize(), cipher.ParallelProfile().ParallelMinimumSize() * 4);
+			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -339,7 +339,7 @@ namespace Test
 
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize(), cipher.ParallelProfile().ParallelMinimumSize() * 4);
+			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -448,7 +448,7 @@ namespace Test
 		// ctr test
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize(), cipher.ParallelProfile().ParallelMinimumSize() * 4);
+			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_encText.resize(smpSze);
@@ -707,10 +707,10 @@ namespace Test
 
 		// random block sizes with byte arrays
 		{
-			for (unsigned int i = 0; i < 100; i++)
+			for (unsigned int i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize(), cipher->ParallelProfile().ParallelMinimumSize() * 4);
+				size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -732,10 +732,10 @@ namespace Test
 		}
 		// random block sizes with stream
 		{
-			for (unsigned int i = 0; i < 100; i++)
+			for (unsigned int i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize(), cipher->ParallelProfile().ParallelMinimumSize() * 4);
+				size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -779,7 +779,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize(), cipher.ParallelProfile().ParallelMinimumSize() * 4);
+			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -883,7 +883,7 @@ namespace Test
 		// ctr test
 		for (unsigned int i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize(), cipher->ParallelProfile().ParallelMinimumSize() * 4);
+			size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -1046,7 +1046,7 @@ namespace Test
 
 	size_t CipherStreamTest::AllocateRandom(std::vector<byte> &Data, size_t Size, size_t NonAlign)
 	{
-		Prng::SecureRandom rng;
+		Prng::SecureRandom rng(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
 
 		if (Size != 0)
 		{
@@ -1057,11 +1057,11 @@ namespace Test
 			unsigned int blkSze = 0;
 			if (NonAlign != 0)
 			{
-				while ((blkSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC)) % NonAlign == 0);
+				while ((blkSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC)) % NonAlign == 0);
 			}
 			else
 			{
-				blkSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+				blkSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 			}
 			Data.resize(blkSze);
 		}

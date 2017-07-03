@@ -65,8 +65,8 @@ struct MPKCParamSet
 	/// <summary>
 	/// Load the parameter values
 	/// </summary>
-	/// <param name="Gf">The finite field GF(2^m)</param>
-	/// <param name="T">The error correction capability of the code</param>
+	/// <param name="Field">The finite field GF(2^m)</param>
+	/// <param name="Correction">The error correction capability of the code</param>
 	/// <param name="SeedByteSize">The byte size of the secret seed array</param>
 	/// <param name="ForwardByteSize">The byte size of A's forward message to host B</param>
 	/// <param name="ReturnByteSize">The byte size of B's reply message to host A</param>

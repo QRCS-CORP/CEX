@@ -31,8 +31,6 @@ public:
 	/// An SIMD vectorized For loop
 	/// </summary>
 	/// 
-	/// <param name="From">The inclusive starting position</param> 
-	/// <param name="To">The exclusive ending position</param>
 	/// <param name="F">The function delegate</param>
 	static void Vectorize(const std::function<void()> &F);
 

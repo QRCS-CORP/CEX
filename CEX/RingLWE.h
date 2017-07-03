@@ -173,7 +173,7 @@ public:
 	///
 	/// <param name="Parameters">The ciphers parameter settings type</param>
 	/// <param name="Prng">A pointer to the Prng function</param>
-	/// <param name="DigestType">A pointer to the digest function</param>
+	/// <param name="Digest">A pointer to the digest function</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
 	RingLWE(RLWEParams Parameters, IPrng* Prng, IDigest* Digest, bool Parallel = false);
 

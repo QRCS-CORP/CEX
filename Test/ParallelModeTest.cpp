@@ -168,7 +168,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			size_t smpSze = rng.NextInt32(Cipher->ParallelProfile().ParallelMinimumSize(), Cipher->ParallelProfile().ParallelMinimumSize() * 4);
+			size_t smpSze = rng.NextInt32(Cipher->ParallelProfile().ParallelMinimumSize() * 4, Cipher->ParallelProfile().ParallelMinimumSize());
 			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(smpSze);
@@ -306,7 +306,7 @@ namespace Test
 		// compare rhx/ahx parallel ctr
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 			smpSze -= (smpSze % cpr1.BlockSize());
 			data.resize(smpSze);
 			dec.resize(smpSze);
@@ -339,7 +339,7 @@ namespace Test
 		// compare rhx/ahx cbc
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 			smpSze -= (smpSze % cpr1.BlockSize());
 			data.resize(smpSze);
 			dec.resize(smpSze);
@@ -431,7 +431,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 			data.resize(smpSze);
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
@@ -506,7 +506,7 @@ namespace Test
 		// compare to sequential decryption output
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelProfile().ParallelMinimumSize(), (uint)cipher1.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelBlockSize(), (uint)cipher1.ParallelProfile().ParallelMinimumSize());
 			smpSze -= (smpSze % cipher1.BlockSize());
 			//smpSze = 38176;
 			data.resize(smpSze);
@@ -532,7 +532,7 @@ namespace Test
 		// decryption output integrity
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelProfile().ParallelMinimumSize(), (uint)cipher1.ParallelBlockSize());
+			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelBlockSize(), (uint)cipher1.ParallelProfile().ParallelMinimumSize());
 			smpSze -= (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			data.resize(smpSze);
 			dec1.resize(smpSze);
@@ -578,7 +578,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 				enc1.resize(smpSze);
 				enc2.resize(smpSze);
 				dec1.resize(smpSze);
@@ -617,7 +617,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 				enc1.resize(smpSze);
 				enc2.resize(smpSze);
 				dec1.resize(smpSze);
@@ -658,7 +658,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 				smpSze -= (smpSze % cipher.BlockSize());
 				enc1.resize(smpSze);
 				dec1.resize(smpSze);
@@ -688,7 +688,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 				smpSze -= (smpSze % cipher.BlockSize());
 				enc1.resize(smpSze);
 				dec1.resize(smpSze);
@@ -1084,7 +1084,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 #if !defined(STAT_INP)
-			size_t smpSze = rng.NextInt32(MIN_ALLOC, MAX_ALLOC);
+			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
 			data.resize(smpSze);
 			dec.resize(smpSze);
 			enc1.resize(smpSze);

@@ -23,6 +23,10 @@
 
 NAMESPACE_BLOCK
 
+/**
+* \internal
+*/
+
 //~~~Rijndael S-Box and Lookup Tables~~~//
 
 static const uint Rcon[] = {

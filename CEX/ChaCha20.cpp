@@ -258,7 +258,7 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 7, 4);
 			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 15, 4);
 			IntUtils::LeIncrement32(Counter);
-			ChaCha::TransformW<Numeric::UInt256>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
+			ChaCha::ChaChaTransformW<Numeric::UInt256>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVX2BLK;
 		}
 	}
@@ -285,7 +285,7 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 3, 4);
 			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 7, 4);
 			IntUtils::LeIncrement32(Counter);
-			ChaCha::TransformW<Numeric::UInt128>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
+			ChaCha::ChaChaTransformW<Numeric::UInt128>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVXBLK;
 		}
 	}
@@ -294,7 +294,7 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 	const size_t ALNSZE = Length - (Length % BLOCK_SIZE);
 	while (ctr != ALNSZE)
 	{
-		ChaCha::Transform512(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
+		ChaCha::ChaChaTransform512(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
 		IntUtils::LeIncrement32(Counter);
 		ctr += BLOCK_SIZE;
 	}
@@ -302,7 +302,7 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 	if (ctr != Length)
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
-		ChaCha::Transform512(outputBlock, 0, Counter, m_wrkState, m_rndCount);
+		ChaCha::ChaChaTransform512(outputBlock, 0, Counter, m_wrkState, m_rndCount);
 		const size_t FNLSZE = Length % BLOCK_SIZE;
 		Utility::MemUtils::Copy<byte>(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
 		IntUtils::LeIncrement32(Counter);

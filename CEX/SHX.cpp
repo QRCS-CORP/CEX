@@ -470,7 +470,7 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 void SHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
-	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -482,10 +482,10 @@ void SHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 void SHX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if !defined(__AVX512__) && defined(__AVX2__)
-	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXDecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
 #elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
-	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -501,15 +501,15 @@ void SHX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std
 void SHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if defined(__AVX512__)
-	DecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXDecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey);
 #elif !defined(__AVX512__) && defined(__AVX2__)
-	DecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
-	DecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
+	SHXDecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXDecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
 #elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
-	DecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	DecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
-	DecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
-	DecryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
+	SHXDecryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
 	Decrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -615,7 +615,7 @@ void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 void SHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
-	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -627,10 +627,10 @@ void SHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 void SHX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if !defined(__AVX512__) && defined(__AVX2__)
-	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXEncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
 #elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
-	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);
@@ -646,15 +646,15 @@ void SHX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std
 void SHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 #if defined(__AVX512__)
-	EncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXEncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey);
 #elif !defined(__AVX512__) && defined(__AVX2__)
-	EncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
-	EncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
+	SHXEncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXEncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
 #elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
-	EncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
-	EncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
-	EncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
-	EncryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey);
+	SHXEncryptW<Numeric::UInt128>(Input, InOffset + 192, Output, OutOffset + 192, m_expKey);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
 	Encrypt128(Input, InOffset + 16, Output, OutOffset + 16);

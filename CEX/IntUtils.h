@@ -62,7 +62,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The initial value</param>
-	/// <param name="Size">The number of bits in the new integer</param>
+	/// <param name="Length">The number of bits in the new integer</param>
 	/// 
 	/// <returns>The cropped integer</returns>
 	inline static ulong Crop(ulong Value, size_t Length)
@@ -177,7 +177,7 @@ public:
 	/// Convert an integer to a string
 	/// </summary>
 	/// 
-	/// <param name="Input">The integer to convert</param>
+	/// <param name="Value">The integer to convert</param>
 	/// 
 	/// <returns>The string representation</returns>
 	template <typename T>
@@ -234,7 +234,8 @@ public:
 	/// <para>The entire input array is copied to bytes, must be 32bit aligned.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The 32bit word array</param>
+	/// <param name="Input">The 32bit word input array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
 	/// <param name="Length">The number of bytes to convert</param>
@@ -504,6 +505,8 @@ public:
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <param name="Output">The destination array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	/// <param name="Length">The number of bytes to process</param>
 	template<typename T>
 	static void BlockToLe(const std::vector<byte> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
 	{
@@ -527,6 +530,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The 32bit word array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <param name="Output">The destination bytes</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
 	/// <param name="Length">The number of bytes to convert</param>

@@ -97,7 +97,7 @@ public:
 	/// 
 	/// <param name="Input">The T integer source array</param>
 	/// <param name="InOffset">The starting offset in the T integer array</param>
-	/// <param name="Length">The number of T integers to write to the array</param>
+	/// <param name="Elements">The number of T integers to write to the array</param>
 	template <typename T>
 	void Write(const std::vector<T> &Input, size_t InOffset, size_t Elements)
 	{

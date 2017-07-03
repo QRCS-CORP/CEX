@@ -109,7 +109,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t prlSze = (size_t)rnd.NextUInt32((uint)(PRLMIN * 2), (uint)(PRLMIN * 8));
+			size_t prlSze = (size_t)rnd.NextUInt32((uint)(PRLMIN * 8), (uint)(PRLMIN * 2));
 			prlSze -= (prlSze % PRLMIN);
 			// set to parallel, but block will be too small.. processed with alternate
 			std::vector<byte> input(prlSze);
@@ -128,7 +128,7 @@ namespace Test
 				throw TestException("SKein Vector: Expected hash is not equal!");
 
 			// test partial block-size and compute method
-			input.resize(input.size() + rnd.NextUInt32(1, 200), (byte)199);
+			input.resize(input.size() + rnd.NextUInt32(200, 1), (byte)199);
 			Dgt1->Compute(input, hash1);
 
 			Dgt2->Update(input, 0, input.size());

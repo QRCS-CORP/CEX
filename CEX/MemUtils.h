@@ -14,7 +14,7 @@ NAMESPACE_UTILITY
 /// </summary>
 ///
 /// <remarks>
-/// <para>The inlined intrinsics function use arrays of at least the size indicated by their suffix, i.e. COPY256, expects arrays of at least 256 bits in length.
+/// <para>The inlined intrinsics functions use arrays of at least the size indicated by their suffix, i.e. COPY256, expects an array of at least 256 bits in length.
 /// All functions have sequential fallbacks, and the SIMD instruction set will default to the highest available on the compiling system (AVX/AVX2/AVX512).
 /// The size of an operation relates to the size of the intrinsic function: a 128 copy, clear, set or xor function will use AVX, 
 /// 256 will process 256 bits with AVX2, and the 512/1024 bit functions can use an experimental AVX512 implementation.
@@ -137,7 +137,6 @@ public:
 	/// 
 	/// <param name="Output">The destination array to clear</param>
 	/// <param name="Offset">The offset T within the destination array</param>
-	/// <param name="Length">The number of bytes to clear</param>
 	template <typename T>
 	inline static void CLEAR256(std::vector<T> &Output, size_t Offset)
 	{
@@ -159,7 +158,6 @@ public:
 	/// 
 	/// <param name="Output">The destination array to clear</param>
 	/// <param name="Offset">The offset T within the destination array</param>
-	/// <param name="Length">The number of bytes to clear</param>
 	template <typename T>
 	inline static void CLEAR512(std::vector<T> &Output, size_t Offset)
 	{
@@ -353,7 +351,6 @@ public:
 	/// <param name="InOffset">The offset A within the source array</param>
 	/// <param name="Output">The type B destination array</param>
 	/// <param name="OutOffset">The offset B within the destination array</param>
-	/// <param name="Length">The number of bytes to copy</param>
 	template <typename A, typename B>
 	inline static void COPY128(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset)
 	{
@@ -377,7 +374,6 @@ public:
 	/// <param name="InOffset">The offset A within the source array</param>
 	/// <param name="Output">The type B destination array</param>
 	/// <param name="OutOffset">The offset B within the destination array</param>
-	/// <param name="Length">The number of bytes to copy</param>
 	template <typename A, typename B>
 	inline static void COPY256(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset)
 	{
@@ -401,7 +397,6 @@ public:
 	/// <param name="InOffset">The offset A within the source array</param>
 	/// <param name="Output">The type B destination array</param>
 	/// <param name="OutOffset">The offset B within the destination array</param>
-	/// <param name="Length">The number of bytes to copy</param>
 	template <typename A, typename B>
 	inline static void COPY512(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset)
 	{
