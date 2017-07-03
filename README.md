@@ -52,10 +52,8 @@ The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, 
 
 ### Version 1.0.0.3, June 30, 2017
 * Added asymmetric cipher interfaces and framework
-
 * Added RingLWE asymmetric cipher
 * Added the Auto Collection seed Provider (ACP)
-
 * Addition of the HCR prng
 * Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators
 * Overhaul of SecureRandom and prng classes
