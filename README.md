@@ -27,7 +27,7 @@ If running the executable, the Win\Test\Vectors folder containing the cipher KAT
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
 ## Roadmap
-The current version is <B>1.0.0.2</B> (A2 version), which are the major, minor, patch, and release codes.
+The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, patch, and release codes.
  
 ### Release 1.0.0.3 (version A3):
 * The RingLWE asymmetric cipher
