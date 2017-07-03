@@ -31,18 +31,16 @@ The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, 
  
 ### Release 1.0.0.3 (version A3):
 * The RingLWE asymmetric cipher
-* The RLWE-SIG asymmetric signature scheme
 * The asymmetric cipher framework
+* Additions and improvements to the Drbg and Prng protocols
 
 ### Release 1.1.0.1
 * RingLWE
-* RLWE-SIG
 * McEliece
 * GMSS
 * RSA-Sig
 
 ### Release 1.2.0.1
-* Cross platform Networking
 * TLS
 * STM-KEX
 * Android/iOS/Linux Compatability
