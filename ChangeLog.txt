@@ -62,18 +62,11 @@ Added SIMD parallelization to Skein512.
 Rewrote SHA-2 tree hashing and added support for the SHA-NI SIMD to SHA-256.
 Added a multi-threaded and SIMD parallel implementation of the SCRYPT key derivation function.
 
-
 Version 1.0.0.3, June 30, 2017
-
 Note! Order of input values have changed in all PRNG implementations, was NextIntXX(min, max), is now NextIntXX(max, min).
-
 Added asymmetric cipher interfaces and framework
-
 Added RingLWE asymmetric cipher
-
 Added the Auto Collection seed Provider (ACP)
 Addition of the HCR prng
-
 Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators
-
 Overhaul of SecureRandom and prng classes
