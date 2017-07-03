@@ -138,9 +138,9 @@ This project is licensed under the GPL version 3 (GPLv3):
 https://www.gnu.org/licenses/gpl-3.0.en.html
 
 ## Links
-##### Introduction to CEX++ 0.14: http://www.vtdev.com/CEX-Plus/CEX_0.14.pdf
-##### CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 ##### API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html 
+##### Introduction to CEX++ 1.0: http://www.vtdev.com/CEX-Plus/CEX_1.0.pdf
+##### CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
 
 ## Disclaimer
 This project contains strong cryptography, before downloading the source files, 
