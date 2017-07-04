@@ -4,7 +4,7 @@
 #include "CexDomain.h"
 #include "AsymmetricEngines.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 using Enumeration::AsymmetricEngines;
 
@@ -47,6 +47,6 @@ public:
 	virtual std::vector<byte> ToBytes() = 0;
 };
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND
 #endif
 

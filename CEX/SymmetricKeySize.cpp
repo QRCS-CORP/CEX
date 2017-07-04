@@ -2,7 +2,7 @@
 #include "CryptoProcessingException.h"
 #include "MemUtils.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 //~~~Properties~~~//
 
@@ -125,4 +125,4 @@ std::vector<byte> SymmetricKeySize::ToBytes()
 	return trs;
 }
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND

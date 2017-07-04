@@ -7,7 +7,8 @@
 NAMESPACE_NUMERIC
 
 /// <summary>
-/// An AVX-256 intrinsics wrapper for unsigned 64bit integer operations
+/// An AVX2 256bit SIMD intrinsics wrapper.
+/// <para>Processes blocks of 64bit unsigned integers.<para>
 /// </summary>
 class ULong256
 {

@@ -6,7 +6,7 @@
 #include "RLWEPrivateKey.h"
 #include "RLWEPublicKey.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 /// <summary>
 /// A RingLWE public and private key container
@@ -71,6 +71,6 @@ private:
 	void Destroy();
 };
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND
 #endif
 

@@ -3,7 +3,7 @@
 
 #include "CexDomain.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 /// <summary>
 /// Contains key and vector sizes
@@ -123,5 +123,5 @@ public:
 	std::vector<byte> ToBytes();
 };
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND
 #endif

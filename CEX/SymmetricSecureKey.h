@@ -3,7 +3,7 @@
 
 #include "ISymmetricKey.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 /// <summary>
 /// An encrypted symmetric key container class.
@@ -142,5 +142,5 @@ private:
 	void Transform();
 };
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND
 #endif

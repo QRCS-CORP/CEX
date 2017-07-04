@@ -3,7 +3,7 @@
 
 #include "ISymmetricKey.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 /// <summary>
 /// A symmetric key container class.
@@ -121,5 +121,5 @@ public:
 	static MemoryStream* Serialize(SymmetricKey &KeyObj);
 };
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND
 #endif

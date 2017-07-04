@@ -3,7 +3,7 @@
 #include "StreamReader.h"
 #include "StreamWriter.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 //~~~Public Properties~~~//
 
@@ -154,4 +154,4 @@ MemoryStream* SymmetricKey::Serialize(SymmetricKey &KeyObj)
 	return strm;
 }
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND

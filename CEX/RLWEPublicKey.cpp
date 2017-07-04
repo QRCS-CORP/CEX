@@ -1,7 +1,7 @@
 #include "RLWEPublicKey.h"
 #include "IntUtils.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 //~~~Properties~~~//
 
@@ -73,4 +73,4 @@ std::vector<byte> RLWEPublicKey::ToBytes()
 	return p;
 }
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND

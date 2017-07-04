@@ -1,6 +1,6 @@
 #include "RLWEKeyPair.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
@@ -50,4 +50,4 @@ void RLWEKeyPair::Destroy()
 		m_Tag.clear();
 }
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND

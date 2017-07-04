@@ -10,7 +10,7 @@
 #include "SymmetricKeySize.h"
 #include "SymmetricSecureKey.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 using Exception::CryptoGeneratorException;
 using Enumeration::Digests;
@@ -123,5 +123,5 @@ private:
 	std::vector<byte> GenerateBlock();
 };
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND
 #endif

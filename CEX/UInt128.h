@@ -7,7 +7,8 @@
 NAMESPACE_NUMERIC
 
 /// <summary>
-/// An SSE 128 intrinsics wrapper
+/// An AVX 128bit SIMD intrinsics wrapper.
+/// <para>Processes blocks of 32bit unsigned integers.<para>
 /// </summary>
 class UInt128
 {

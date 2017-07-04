@@ -9,7 +9,8 @@ NAMESPACE_NUMERIC
 // TODO: None of this is tested!
 
 /// <summary>
-/// An AVX 512 intrinsics wrapper
+/// An AVX512 512bit SIMD intrinsics wrapper.
+/// <para>Processes blocks of 32bit unsigned integers.<para>
 /// </summary>
 class UInt512
 {

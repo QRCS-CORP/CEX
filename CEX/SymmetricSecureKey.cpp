@@ -9,7 +9,7 @@
 #include "SymmetricKey.h"
 #include "SysUtils.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 //~~~Properties~~~//
 
@@ -234,4 +234,4 @@ void SymmetricSecureKey::Transform()
 	m_keyState = state;
 }
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND

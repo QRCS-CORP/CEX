@@ -31,7 +31,6 @@
 // Updated April 16, 2017
 // Contact: develop@vtdev.com
 
-
 #ifndef _CEX_AHX_H
 #define _CEX_AHX_H
 

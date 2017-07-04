@@ -1,7 +1,7 @@
 #include "MPKCPublicKey.h"
 #include "IntUtils.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 //~~~Properties~~~//
 
@@ -73,4 +73,4 @@ std::vector<byte> MPKCPublicKey::ToBytes()
 	return p;
 }
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND

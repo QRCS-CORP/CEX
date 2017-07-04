@@ -5,7 +5,7 @@
 #include "CryptoAsymmetricException.h"
 #include "IAsymmetricKey.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 using Exception::CryptoAsymmetricException;
 
@@ -46,6 +46,6 @@ public:
 	virtual const std::vector<byte> &Tag() = 0;
 };
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND
 #endif
 

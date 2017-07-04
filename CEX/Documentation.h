@@ -32,7 +32,7 @@ DLL API \n
 
 \author    John Underhill
 \version   1.0.0.3
-\date      June 30, 2017
+\date      July 04, 2017
 \copyright GPL version 3 license (GPLv3)
 
 \section intro_link Links
@@ -52,21 +52,44 @@ The Code Project article on CEX .NET: http://www.codeproject.com/Articles/828477
 */
 NAMESPACE_ROOT
 
-	//NAMESPACE_ASYMMETRIC
-	//NAMESPACE_ASYMMETRICEND
-	//NAMESPACE_ASYENCRYPT
-	//NAMESPACE_ASYENCRYPTEND
-	//NAMESPACE_ASYKEX
-	//NAMESPACE_ASYKEXEND
-	//NAMESPACE_ASYSIGN
-	//NAMESPACE_ASYSIGNEND
-
 	/*!
 	*  \addtogroup Cipher
 	*  @{
 	*  @brief Cryptographic Cipher Namespace
 	*/
 	NAMESPACE_CIPHER
+
+		/*!
+		*  \addtogroup Asymmetric
+		*  @{
+		*  @brief Asymmetric Ciphers Namespace
+		*/
+		NAMESPACE_ASYMMETRIC
+
+			/*!
+			*  \addtogroup McEliece
+			*  @{
+			*  @brief The McEliece Cipher Namespace
+			*/
+			NAMESPACE_MCELIECE
+				class McEliece {};
+				struct MPKCParamSet {};
+			NAMESPACE_MCELIECEEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup RingLWE
+			*  @{
+			*  @brief The RingLWE Cipher Namespace
+			*/
+			NAMESPACE_RINGLWE
+				class RingLWE {};
+				struct RLWEParamSet {};
+			NAMESPACE_RINGLWEEND
+			/*! @} */
+
+		NAMESPACE_ASYMMETRICEND
+		/*! @} */
 
 		/*!
 		*  \addtogroup Symmetric
@@ -141,6 +164,7 @@ NAMESPACE_ROOT
 		/*! @} */
 	NAMESPACE_CIPHEREND
 	/*! @} */
+
 	/*!
 	*  \addtogroup Common
 	*  @brief Cipher Common Utilities
@@ -207,12 +231,15 @@ NAMESPACE_ROOT
 		enum class Kdfs {};
 		enum class KeySizes {};
 		enum class Macs {};
+		enum class MPKCParams {};
 		enum class PaddingModes {};
 		enum class Prngs {};
-		enum class RoundCounts {};
 		enum class Providers {};
+		enum class RLWEParams {};
+		enum class RoundCounts {};
 		enum class SimdProfiles {};
 		enum class StreamCiphers {};
+		enum class StreamModes {};
 		enum class SymmetricEngines {};
 	NAMESPACE_ENUMERATIONEND
 	/*! @} */
@@ -223,6 +250,7 @@ NAMESPACE_ROOT
 	*  @brief Cryptographic Exceptions
 	*/
 	NAMESPACE_EXCEPTION
+		class CryptoAsymmetricException {};
 		class CryptoCipherModeException {};
 		class CryptoDigestException {};
 		class CryptoException {};
@@ -246,6 +274,8 @@ NAMESPACE_ROOT
 		class CipherFromDescription {};
 		class CipherModeFromName {};
 		class DigestFromName {};
+		class DrbgFromName {};
+		class KdfFromName {};
 		class MacFromDescription {};
 		class PaddingFromName {};
 		class PrngFromName {};
@@ -264,6 +294,7 @@ NAMESPACE_ROOT
 		class FileStream {};
 		class IByteStream {};
 		class MemoryStream {};
+		class SecureStream {};
 		enum class SeekOrigin {};
 		class StreamReader {};
 		class StreamWriter {};
@@ -295,14 +326,32 @@ NAMESPACE_ROOT
 		*  @{
 		*  @brief Symmetric Key containers and generator
 		*/
-		NAMESPACE_KEYSYMMETRIC
-		class ISymmetricKey {};
-		class SymmetricKeyGenerator {};
-		class SymmetricKey {};
-		class SymmetricKeySize {};
-		class SymmetricSecureKey {};
-		NAMESPACE_KEYSYMMETRICEND
+		NAMESPACE_ASYMMETRICKEY
+			class IAsymmetricKey {};
+			class IAsymmetricKeyPair {};
+			class MPKCKeyPair {};
+			class MPKCPrivateKey {};
+			class MPKCPublicKey {};
+			class RLWEKeyPair {};
+			class RLWEPrivateKey {};
+			class RLWEPublicKey {};
+		NAMESPACE_ASYMMETRICKEYEND
 		/*! @} */
+
+		/*!
+		*  \addtogroup SymmetricKey
+		*  @{
+		*  @brief Symmetric Key containers and generator
+		*/
+		NAMESPACE_SYMMETRICKEY
+			class ISymmetricKey {};
+			class SymmetricKeyGenerator {};
+			class SymmetricKey {};
+			class SymmetricKeySize {};
+			class SymmetricSecureKey {};
+		NAMESPACE_SYMMETRICKEYEND
+		/*! @} */
+
 	NAMESPACE_KEYEND
 	/*! @} */
 

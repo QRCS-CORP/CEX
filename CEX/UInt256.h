@@ -7,7 +7,8 @@
 NAMESPACE_NUMERIC
 
 /// <summary>
-/// An AVX 256 intrinsics wrapper
+/// An AVX2 256bit SIMD intrinsics wrapper.
+/// <para>Processes blocks of 32bit unsigned integers.<para>
 /// </summary>
 class UInt256
 {

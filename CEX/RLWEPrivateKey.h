@@ -5,7 +5,7 @@
 #include "IAsymmetricKey.h"
 #include "RLWEParams.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 using Enumeration::RLWEParams;
 
@@ -79,5 +79,5 @@ public:
 	std::vector<byte> ToBytes() override;
 };
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND
 #endif

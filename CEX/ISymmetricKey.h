@@ -6,7 +6,7 @@
 #include "MemoryStream.h"
 #include "SymmetricKeySize.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 using Exception::CryptoProcessingException;
 using IO::MemoryStream;
@@ -70,5 +70,5 @@ public:
 	virtual bool Equals(ISymmetricKey &Obj) = 0;
 };
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND
 #endif

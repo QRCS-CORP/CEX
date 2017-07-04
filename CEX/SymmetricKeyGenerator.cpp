@@ -5,7 +5,7 @@
 #include "IntUtils.h"
 #include "ProviderFromName.h"
 
-NAMESPACE_KEYSYMMETRIC
+NAMESPACE_SYMMETRICKEY
 
 //~~~Constructor~~~//
 
@@ -162,4 +162,4 @@ std::vector<byte> SymmetricKeyGenerator::GenerateBlock()
 	return output;
 }
 
-NAMESPACE_KEYSYMMETRICEND
+NAMESPACE_SYMMETRICKEYEND

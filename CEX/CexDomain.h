@@ -25,8 +25,6 @@
 #define NAMESPACE_ASYMMETRICSIGNEND } } } }
 #define NAMESPACE_GMSS namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace GMSS {
 #define NAMESPACE_GMSSEND } } } } }
-#define NAMESPACE_RLWESIG namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace RingLWESIG {
-#define NAMESPACE_RLWESIGEND } } } } }
 
 #define NAMESPACE_SYMMETRIC namespace CEX { namespace Cipher { namespace Symmetric {
 #define NAMESPACE_SYMMETRICEND } } }
@@ -58,10 +56,10 @@
 
 #define NAMESPACE_KEY namespace CEX { namespace Key {
 #define NAMESPACE_KEYEND } } 
-#define NAMESPACE_KEYSYMMETRIC namespace CEX { namespace Key { namespace Symmetric {
-#define NAMESPACE_KEYSYMMETRICEND } } }
-#define NAMESPACE_KEYASYMMETRIC namespace CEX { namespace Key { namespace Asymmetric {
-#define NAMESPACE_KEYASYMMETRICEND } } }
+#define NAMESPACE_ASYMMETRICKEY namespace CEX { namespace Key { namespace Asymmetric {
+#define NAMESPACE_ASYMMETRICKEYEND } } }
+#define NAMESPACE_SYMMETRICKEY namespace CEX { namespace Key { namespace Symmetric {
+#define NAMESPACE_SYMMETRICKEYEND } } }
 
 #define NAMESPACE_MAC namespace CEX { namespace Mac {
 #define NAMESPACE_MACEND } } 

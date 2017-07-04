@@ -6,7 +6,7 @@
 #include "MPKCPrivateKey.h"
 #include "MPKCPublicKey.h"
 
-NAMESPACE_KEYASYMMETRIC
+NAMESPACE_ASYMMETRICKEY
 
 /// <summary>
 /// A McEliece public and private key container
@@ -71,6 +71,6 @@ private:
 	void Destroy();
 };
 
-NAMESPACE_KEYASYMMETRICEND
+NAMESPACE_ASYMMETRICKEYEND
 #endif
 
