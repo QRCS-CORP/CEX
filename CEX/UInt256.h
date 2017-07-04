@@ -8,7 +8,7 @@ NAMESPACE_NUMERIC
 
 /// <summary>
 /// An AVX2 256bit SIMD intrinsics wrapper.
-/// <para>Processes blocks of 32bit unsigned integers.<para>
+/// <para>Processes blocks of 32bit unsigned integers.</para>
 /// </summary>
 class UInt256
 {
@@ -847,6 +847,7 @@ private:
 		Xl = _mm256_permute2x128_si256(X0, X1, _MM_SHUFFLE(0, 2, 0, 0));
 		Xh = _mm256_permute2x128_si256(X0, X1, _MM_SHUFFLE(0, 3, 0, 1));
 	}
+
 #endif
 };
 

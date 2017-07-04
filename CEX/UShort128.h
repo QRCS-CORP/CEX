@@ -8,7 +8,7 @@ NAMESPACE_NUMERIC
 
 /// <summary>
 /// An AVX 128bit intrinsics wrapper.
-/// <para>Processes blocks of 16bit unsigned integers.<para>
+/// <para>Processes blocks of 16bit unsigned integers.</para>
 /// </summary>
 class UShort128
 {
