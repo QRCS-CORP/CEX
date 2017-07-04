@@ -26,6 +26,76 @@ If running the executable, the Win\Test\Vectors folder containing the cipher KAT
 
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
+## Contents
+### Asymmetric Ciphers
+* The RingLWE asymmetric cipher
+
+### Block Ciphers
+* The AES-NI HKDF eXtended cipher (AHX)
+* The Rijndael HKDF eXtended cipher (RHX)
+* The Serpent HKDF eXtended cipher (SHX)
+* The Twofish HKDF eXtended cipher (THX)
+
+### Block Cipher Modes
+* Encrypt and Authenticate AEAD block cipher mode (EAX) 
+* Galois Counter authenticated block cipher Mode (GCM)
+* Offset CodeBook authenticated block cipher Mode (OCB)
+* Cipher Block Chaining mode (CBC)
+* Cipher FeedBack mode (CFB)
+* Big-Endian integer Counter mode (CTR)
+* Electronic CodeBook mode (ECB)
+* Little-Endian Integer Counter Mode (ICM)
+* Output FeedBack Mode (OFB)
+
+### Block Cipher Padding
+* The ISO7816 Padding Scheme
+* The PKCS7 Padding Scheme
+* The Trailing Bit Compliment Padding Scheme (TBC)
+* The X.923 Padding Scheme
+
+### Stream Ciphers
+* ChaCha20 stream cipher
+* Salsa20 stream cipher
+
+### Digests
+* The 256bit Blake2S and Blake2SP sequential and parallel digests (Blake256)
+* The 512bit Blake2B and Blake2BP sequential and parallel digests (Blake512)
+* The 256bit Keccak SHA-3 digest (Keccak256)
+* The 512bit Keccak SHA-3 digest (Keccak512)
+* The 256bit SHA-2 (optional SHA-NI) sequential and parallel digests (SHA256)
+* The 512bit SHA-2 sequential and parallel digests (SHA512)
+* The 256bit Skein sequential and parallel digests (Skein256)
+* The 512bit Skein sequential and parallel digests (Skein512)
+* The 1024bit Skein sequential and parallel digests (Skein1024)
+
+### DRBGs
+* The Block cipher Counter mode Generator (BCG)
+* The message Digest Counter Generator (DCG)
+* The HMAC Counter Generator (HCG)
+
+### KDFs
+* Hash based Key Derivation Function (HKDF)
+* Key Derivation Function Version 2 (KDF2)
+* Passphrase Based Key Derivation Version 2 (PBKDF2)
+* The SCRYPT key derivation function
+
+### MACs
+* Cipher based Message Authentication Code generator (CMAC)
+* Galois/Counter Message Authentication Code generator (GMAC)
+* Hash based Message Authentication Code generator (HMAC)
+
+### PRNGs
+* The auto-seeded Block cipher Counter mode Rng (BCR)
+* The auto-seeded message Digest Counter Generator (DCR)
+* The auto-seeded HMAC Counter Generator (HCR)
+
+### Entropy Providers
+* Auto Collection seed Provider (ACP)
+* CPU Jitter entropy Provider (CJP)
+* Local Crypto Service Provider (CSP)
+* System Entropy Collector Provider (ECP)
+* Intel RdRand/RdSeed Provider (RDP)
+
 ## Roadmap
 The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, patch, and release codes.
  
