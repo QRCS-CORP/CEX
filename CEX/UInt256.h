@@ -13,8 +13,6 @@ class UInt256
 {
 #if defined(__AVX2__)
 
-private:
-
 public:
 
 	/// <summary>
@@ -209,7 +207,7 @@ public:
 	/// Transposes and stores 4 * UInt256 to a T sized array
 	/// </summary>
 	///
-	/// <param name="Input">The T data destination array</param>
+	/// <param name="Output">The T data destination array</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
@@ -229,26 +227,26 @@ public:
 	/// Transposes and stores 16 * UInt256 to a T sized array
 	/// </summary>
 	///
-	/// <param name="Input">The destination data array</param>
+	/// <param name="Output">The destination data array</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	/// <param name="X0">Operand 4</param>
-	/// <param name="X1">Operand 5</param>
-	/// <param name="X2">Operand 6</param>
-	/// <param name="X3">Operand 7</param>
-	/// <param name="X0">Operand 8</param>
-	/// <param name="X1">Operand 9</param>
-	/// <param name="X2">Operand 10</param>
-	/// <param name="X3">Operand 11</param>
-	/// <param name="X0">Operand 12</param>
-	/// <param name="X1">Operand 13</param>
-	/// <param name="X2">Operand 14</param>
-	/// <param name="X3">Operand 15</param>
+	/// <param name="X4">Operand 4</param>
+	/// <param name="X5">Operand 5</param>
+	/// <param name="X6">Operand 6</param>
+	/// <param name="X7">Operand 7</param>
+	/// <param name="X8">Operand 8</param>
+	/// <param name="X9">Operand 9</param>
+	/// <param name="X10">Operand 10</param>
+	/// <param name="X11">Operand 11</param>
+	/// <param name="X12">Operand 12</param>
+	/// <param name="X13">Operand 13</param>
+	/// <param name="X14">Operand 14</param>
+	/// <param name="X15">Operand 15</param>
 	template <typename T>
-	inline static void Store16(std::vector<T> &Output, size_t OutOffset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
+	inline static void Store16(std::vector<T> &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
 		UInt256 &X6, UInt256 &X7, UInt256 &X8, UInt256 &X9, UInt256 &X10, UInt256 &X11, UInt256 &X12, UInt256 &X13, UInt256 &X14, UInt256 &X15)
 	{
 		__m256i W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
@@ -281,22 +279,22 @@ public:
 		_mm256_merge_si128(Y12, Y14, X12.ymm, X13.ymm);
 		_mm256_merge_si128(Y13, Y15, X14.ymm, X15.ymm);
 
-		X0.Store(Output, OutOffset);
-		X8.Store(Output, OutOffset + (32 / sizeof(T)));
-		X1.Store(Output, OutOffset + (64 / sizeof(T)));
-		X9.Store(Output, OutOffset + (96 / sizeof(T)));
-		X2.Store(Output, OutOffset + (128 / sizeof(T)));
-		X10.Store(Output, OutOffset + (160 / sizeof(T)));
-		X3.Store(Output, OutOffset + (192 / sizeof(T)));
-		X11.Store(Output, OutOffset + (224 / sizeof(T)));
-		X4.Store(Output, OutOffset + (256 / sizeof(T)));
-		X12.Store(Output, OutOffset + (288 / sizeof(T)));
-		X5.Store(Output, OutOffset + (320 / sizeof(T)));
-		X13.Store(Output, OutOffset + (352 / sizeof(T)));
-		X6.Store(Output, OutOffset + (384 / sizeof(T)));
-		X14.Store(Output, OutOffset + (416 / sizeof(T)));
-		X7.Store(Output, OutOffset + (448 / sizeof(T)));
-		X15.Store(Output, OutOffset + (480 / sizeof(T)));
+		X0.Store(Output, Offset);
+		X8.Store(Output, Offset + (32 / sizeof(T)));
+		X1.Store(Output, Offset + (64 / sizeof(T)));
+		X9.Store(Output, Offset + (96 / sizeof(T)));
+		X2.Store(Output, Offset + (128 / sizeof(T)));
+		X10.Store(Output, Offset + (160 / sizeof(T)));
+		X3.Store(Output, Offset + (192 / sizeof(T)));
+		X11.Store(Output, Offset + (224 / sizeof(T)));
+		X4.Store(Output, Offset + (256 / sizeof(T)));
+		X12.Store(Output, Offset + (288 / sizeof(T)));
+		X5.Store(Output, Offset + (320 / sizeof(T)));
+		X13.Store(Output, Offset + (352 / sizeof(T)));
+		X6.Store(Output, Offset + (384 / sizeof(T)));
+		X14.Store(Output, Offset + (416 / sizeof(T)));
+		X7.Store(Output, Offset + (448 / sizeof(T)));
+		X15.Store(Output, Offset + (480 / sizeof(T)));
 	}
 
 	//~~~ Methods~~~//
@@ -305,7 +303,7 @@ public:
 	/// Returns the absolute value
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 Abs(const UInt256 &Value)
@@ -398,6 +396,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The base integer</param>
+	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 ShiftRA(const UInt256 &Value, const int Shift)
@@ -410,6 +409,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The base integer</param>
+	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 ShiftRL(const UInt256 &Value, const int Shift)
@@ -502,8 +502,6 @@ public:
 	/// <summary>
 	/// Increase prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt256 operator ++ ()
 	{
 		return UInt256(ymm) + UInt256::ONE();
@@ -512,8 +510,6 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt256 operator ++ (int)
 	{
 		return UInt256(ymm) + UInt256::ONE();
@@ -542,8 +538,6 @@ public:
 	/// <summary>
 	/// Decrease prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt256 operator -- ()
 	{
 		return UInt256(ymm) - UInt256::ONE();
@@ -552,8 +546,6 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt256 operator -- (int)
 	{
 		return UInt256(ymm) - UInt256::ONE();
@@ -816,8 +808,6 @@ public:
 	/// <summary>
 	/// Compare two sets of integers for inequality, returns max integer size if inequal
 	/// </summary>
-	///
-	/// <param name="X">The values to compare</param>
 	inline UInt256 operator ! () const
 	{
 		return UInt256(_mm256_cmpeq_epi32(ymm, _mm256_setzero_si256()));

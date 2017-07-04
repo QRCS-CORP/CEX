@@ -13,7 +13,7 @@ NAMESPACE_NUMERIC
 /// </summary>
 class UInt512
 {
-	#if defined(__AVX512__)
+#if defined(__AVX512__)
 
 public:
 
@@ -118,14 +118,14 @@ public:
 	/// <param name="X5">uint32 5</param>
 	/// <param name="X6">uint32 6</param>
 	/// <param name="X7">uint32 7</param>
-	/// <param name="X0">uint32 8</param>
-	/// <param name="X1">uint32 9</param>
-	/// <param name="X2">uint32 10</param>
-	/// <param name="X3">uint32 11</param>
-	/// <param name="X4">uint32 12</param>
-	/// <param name="X5">uint32 13</param>
-	/// <param name="X6">uint32 14</param>
-	/// <param name="X7">uint32 15</param>
+	/// <param name="X8">uint32 8</param>
+	/// <param name="X9">uint32 9</param>
+	/// <param name="X10">uint32 10</param>
+	/// <param name="X11">uint32 11</param>
+	/// <param name="X12">uint32 12</param>
+	/// <param name="X13">uint32 13</param>
+	/// <param name="X14">uint32 14</param>
+	/// <param name="X15">uint32 15</param>
 	explicit UInt512(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7,
 		uint X8, uint X9, uint X10, uint X11, uint X12, uint X13, uint X14, uint X15)
 	{
@@ -168,14 +168,14 @@ public:
 	/// <param name="X5">uint32 5</param>
 	/// <param name="X6">uint32 6</param>
 	/// <param name="X7">uint32 7</param>
-	/// <param name="X0">uint32 8</param>
-	/// <param name="X1">uint32 9</param>
-	/// <param name="X2">uint32 10</param>
-	/// <param name="X3">uint32 11</param>
-	/// <param name="X4">uint32 12</param>
-	/// <param name="X5">uint32 13</param>
-	/// <param name="X6">uint32 14</param>
-	/// <param name="X7">uint32 15</param>
+	/// <param name="X8">uint32 8</param>
+	/// <param name="X9">uint32 9</param>
+	/// <param name="X10">uint32 10</param>
+	/// <param name="X11">uint32 11</param>
+	/// <param name="X12">uint32 12</param>
+	/// <param name="X13">uint32 13</param>
+	/// <param name="X14">uint32 14</param>
+	/// <param name="X15">uint32 15</param>
 	inline void Load(uint X0, uint X1, uint X2, uint X3, uint X4, uint X5, uint X6, uint X7,
 		uint X8, uint X9, uint X10, uint X11, uint X12, uint X13, uint X14, uint X15)
 	{
@@ -234,7 +234,7 @@ public:
 	/// Transposes and stores 4 * UInt512 to a T sized array
 	/// </summary>
 	///
-	/// <param name="Input">The T data destination array</param>
+	/// <param name="Output">The T data destination array</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
@@ -254,26 +254,26 @@ public:
 	/// Transposes and stores 16 * UInt512 to a T sized array
 	/// </summary>
 	///
-	/// <param name="Input">The destination data array</param>
+	/// <param name="Output">The destination data array</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	/// <param name="X0">Operand 4</param>
-	/// <param name="X1">Operand 5</param>
-	/// <param name="X2">Operand 6</param>
-	/// <param name="X3">Operand 7</param>
-	/// <param name="X0">Operand 8</param>
-	/// <param name="X1">Operand 9</param>
-	/// <param name="X2">Operand 10</param>
-	/// <param name="X3">Operand 11</param>
-	/// <param name="X0">Operand 12</param>
-	/// <param name="X1">Operand 13</param>
-	/// <param name="X2">Operand 14</param>
-	/// <param name="X3">Operand 15</param>
+	/// <param name="X4">Operand 4</param>
+	/// <param name="X5">Operand 5</param>
+	/// <param name="X6">Operand 6</param>
+	/// <param name="X7">Operand 7</param>
+	/// <param name="X8">Operand 8</param>
+	/// <param name="X9">Operand 9</param>
+	/// <param name="X10">Operand 10</param>
+	/// <param name="X11">Operand 11</param>
+	/// <param name="X12">Operand 12</param>
+	/// <param name="X13">Operand 13</param>
+	/// <param name="X14">Operand 14</param>
+	/// <param name="X15">Operand 15</param>
 	template <typename T>
-	inline static void Store16(std::vector<T> &Output, size_t OutOffset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3, UInt512 &X4, UInt512 &X5,
+	inline static void Store16(std::vector<T> &Output, size_t Offset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3, UInt512 &X4, UInt512 &X5,
 		UInt512 &X6, UInt512 &X7, UInt512 &X8, UInt512 &X9, UInt512 &X10, UInt512 &X11, UInt512 &X12, UInt512 &X13, UInt512 &X14, UInt512 &X15)
 	{
 		__m512i T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15;
@@ -346,22 +346,22 @@ public:
 		X14 = _mm512_shuffle_i32x4(T6, T14, 0xdd);
 		X15 = _mm512_shuffle_i32x4(T7, T15, 0xdd);
 
-		X0.Store(Output, OutOffset);
-		X1.Store(Output, OutOffset + (64 / sizeof(T)));
-		X2.Store(Output, OutOffset + (128 / sizeof(T)));
-		X3.Store(Output, OutOffset + (192 / sizeof(T)));
-		X4.Store(Output, OutOffset + (256 / sizeof(T)));
-		X5.Store(Output, OutOffset + (320 / sizeof(T)));
-		X6.Store(Output, OutOffset + (384 / sizeof(T)));
-		X7.Store(Output, OutOffset + (448 / sizeof(T)));
-		X8.Store(Output, OutOffset + (512 / sizeof(T)));
-		X9.Store(Output, OutOffset + (576 / sizeof(T)));
-		X10.Store(Output, OutOffset + (640 / sizeof(T)));
-		X11.Store(Output, OutOffset + (704 / sizeof(T)));
-		X12.Store(Output, OutOffset + (768 / sizeof(T)));
-		X13.Store(Output, OutOffset + (832 / sizeof(T)));
-		X14.Store(Output, OutOffset + (896 / sizeof(T)));
-		X15.Store(Output, OutOffset + (960 / sizeof(T)));
+		X0.Store(Output, Offset);
+		X1.Store(Output, Offset + (64 / sizeof(T)));
+		X2.Store(Output, Offset + (128 / sizeof(T)));
+		X3.Store(Output, Offset + (192 / sizeof(T)));
+		X4.Store(Output, Offset + (256 / sizeof(T)));
+		X5.Store(Output, Offset + (320 / sizeof(T)));
+		X6.Store(Output, Offset + (384 / sizeof(T)));
+		X7.Store(Output, Offset + (448 / sizeof(T)));
+		X8.Store(Output, Offset + (512 / sizeof(T)));
+		X9.Store(Output, Offset + (576 / sizeof(T)));
+		X10.Store(Output, Offset + (640 / sizeof(T)));
+		X11.Store(Output, Offset + (704 / sizeof(T)));
+		X12.Store(Output, Offset + (768 / sizeof(T)));
+		X13.Store(Output, Offset + (832 / sizeof(T)));
+		X14.Store(Output, Offset + (896 / sizeof(T)));
+		X15.Store(Output, Offset + (960 / sizeof(T)));
 	}
 
 	//~~~ Methods~~~//
@@ -370,7 +370,7 @@ public:
 	/// Returns the absolute value
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 Abs(const UInt512 &Value)
@@ -388,18 +388,6 @@ public:
 	inline UInt512 AndNot(const UInt512 &X)
 	{
 		return UInt512(_mm512_andnot_si512(zmm, X.zmm));
-	}
-
-	/// <summary>
-	/// Returns the bitwise negation of 16 32bit integers
-	/// </summary>
-	///
-	/// <param name="Value">The integers to negate</param>
-	/// 
-	/// <returns>The processed UInt512</returns>
-	inline static UInt512 Negate(const UInt512 &Value)
-	{
-		return UInt512(_mm512_sub_epi32(_mm512_set1_epi32(0), Value.zmm));
 	}
 
 	/// <summary>
@@ -460,6 +448,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The base integer</param>
+	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 ShiftRA(const UInt512 &Value, const int Shift)
@@ -472,6 +461,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The base integer</param>
+	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 ShiftRL(const UInt512 &Value, const int Shift)
@@ -564,8 +554,6 @@ public:
 	/// <summary>
 	/// Increase prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt512 operator ++ ()
 	{
 		return UInt512(zmm) + UInt512::ONE();
@@ -574,8 +562,6 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt512 operator ++ (int)
 	{
 		return UInt512(zmm) + UInt512::ONE();
@@ -604,8 +590,6 @@ public:
 	/// <summary>
 	/// Decrease prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt512 operator -- ()
 	{
 		return UInt512(zmm) - ZMM1();
@@ -614,8 +598,6 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt512 operator -- (int)
 	{
 		return UInt512(zmm) - UInt512::ONE();
@@ -652,7 +634,7 @@ public:
 		std::vector<uint> tmpB(16);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
-		return UInt256(tmpA[15] / tmpB[15], tmpA[14] / tmpB[14], tmpA[13] / tmpB[13], tmpA[12] / tmpB[12],
+		return UInt512(tmpA[15] / tmpB[15], tmpA[14] / tmpB[14], tmpA[13] / tmpB[13], tmpA[12] / tmpB[12],
 			tmpA[11] / tmpB[11], tmpA[10] / tmpB[10], tmpA[9] / tmpB[9], tmpA[8] / tmpB[8],
 			tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
@@ -882,8 +864,6 @@ public:
 	/// <summary>
 	/// Compare two sets of integers for inequality, returns max integer size if inequal
 	/// </summary>
-	///
-	/// <param name="X">The values to compare</param>
 	inline UInt512 operator ! () const
 	{
 		return UInt512(_mm512_cmpeq_epi32(zmm, _mm512_setzero_si512()));
@@ -899,30 +879,7 @@ public:
 		return ~UInt512(_mm512_cmpneq_epi32_mask(zmm, X.zmm));
 	}
 
-private:
-
-	inline static void _mm512_merge_epi32(const __m512i &X0, const __m512i &X1, __m512i &Xl, __m512i &Xh)
-	{
-		__m512i va = _mm512_permute8x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
-		__m512i vb = _mm512_permute8x64_epi64(X1, _MM_SHUFFLE(3, 1, 2, 0));
-		Xl = _mm512_unpacklo_epi32(va, vb);
-		Xh = _mm512_unpackhi_epi32(va, vb);
-	}
-
-	inline static void _mm512_merge_epi64(const __m512i &X0, const __m512i &X1, __m512i &Xl, __m512i &Xh)
-	{
-		__m512i va = _mm512_permute4x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
-		__m512i vb = _mm512_permute4x64_epi64(X1, _MM_SHUFFLE(3, 1, 2, 0));
-		Xl = _mm512_unpacklo_epi64(va, vb);
-		Xh = _mm512_unpackhi_epi64(va, vb);
-	}
-
-	inline static void _mm512_merge_si128(const __m512i &X0, const __m512i &X1, __m512i &Xl, __m512i &Xh)
-	{
-		Xl = _mm512_permute2x128_si512(X0, X1, _MM_SHUFFLE(0, 2, 0, 0));
-		Xh = _mm512_permute2x128_si512(X0, X1, _MM_SHUFFLE(0, 3, 0, 1));
-	}
-	#endif
+#endif
 };
 
 NAMESPACE_NUMERICEND

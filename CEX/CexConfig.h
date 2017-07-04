@@ -413,7 +413,11 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 //FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
 //VPOPCNT	__AVX512VPOPCNTDQ__		?
 
-#if defined(__AVX512F__) && __AVX512F__ == 1
+// Note: AVX512 is currently untested, this flag enables support on a compliant system
+//#define CEX_AVX512_SUPPORTED
+
+#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
+#	include <immintrin.h>
 #	if !defined(__AVX512__)
 #		define __AVX512__
 #	endif

@@ -51,7 +51,7 @@ public:
 	/// Initialize with an __m256i integer
 	/// </summary>
 	///
-	/// <param name="Input">The register to copy</param>
+	/// <param name="Y">The register to copy</param>
 	explicit ULong256(__m256i const &Y)
 	{
 		ymm = Y;
@@ -148,12 +148,12 @@ public:
 	/// <para>Note: returns the absolute value of the 32 bit integers</para>
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed ULong256</returns>
 	inline static ULong256 Abs(const ULong256 &Value)
 	{
-		return ULong256(_mm_abs_epi32(Value.xmm));
+		return ULong256(_mm256_abs_epi32(Value.ymm));
 	}
 
 	/// <summary>
@@ -166,18 +166,6 @@ public:
 	inline ULong256 AndNot(const ULong256 &X)
 	{
 		return ULong256(_mm256_andnot_si256(ymm, X.ymm));
-	}
-
-	/// <summary>
-	/// Returns the bitwise negation of 4 32bit integers
-	/// </summary>
-	///
-	/// <param name="Value">The integers to negate</param>
-	/// 
-	/// <returns>The processed ULong256</returns>
-	inline static ULong256 Negate(const ULong256 &Value)
-	{
-		return ULong256(_mm_sub_epi64(_mm_set1_epi64(0), Value.xmm));
 	}
 
 	/// <summary>
@@ -293,8 +281,6 @@ public:
 	/// <summary>
 	/// Increase prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline ULong256 operator ++ ()
 	{
 		return ULong256(ymm) + ULong256::ONE();
@@ -303,8 +289,6 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline ULong256 operator ++ (int)
 	{
 		return ULong256(ymm) + ULong256::ONE();
@@ -596,8 +580,6 @@ public:
 	/// <summary>
 	/// Compare two sets of integers for inequality, returns max integer size if inequal
 	/// </summary>
-	///
-	/// <param name="X">The values to compare</param>
 	inline ULong256 operator ! () const
 	{
 		return ULong256(_mm256_cmpeq_epi64(ymm, _mm256_setzero_si256()));

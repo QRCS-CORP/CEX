@@ -36,9 +36,9 @@
 #define _CEX_AHX_H
 
 #if defined(__AVX__)
+
 #include "IBlockCipher.h"
 #include <wmmintrin.h>
-
 
 NAMESPACE_BLOCK
 

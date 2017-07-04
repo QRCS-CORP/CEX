@@ -196,7 +196,7 @@ public:
 	/// Transposes and stores 4 * UInt128 to a T sized array
 	/// </summary>
 	///
-	/// <param name="Input">The data destination array</param>
+	/// <param name="Output">The data destination array</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
@@ -216,26 +216,26 @@ public:
 	/// Transposes and stores 16 * UInt128 to a byte array
 	/// </summary>
 	///
-	/// <param name="Input">The destination data array</param>
+	/// <param name="Output">The destination data array</param>
 	/// <param name="Offset">The starting position within the destination array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	/// <param name="X0">Operand 4</param>
-	/// <param name="X1">Operand 5</param>
-	/// <param name="X2">Operand 6</param>
-	/// <param name="X3">Operand 7</param>
-	/// <param name="X0">Operand 8</param>
-	/// <param name="X1">Operand 9</param>
-	/// <param name="X2">Operand 10</param>
-	/// <param name="X3">Operand 11</param>
-	/// <param name="X0">Operand 12</param>
-	/// <param name="X1">Operand 13</param>
-	/// <param name="X2">Operand 14</param>
-	/// <param name="X3">Operand 15</param>
+	/// <param name="X4">Operand 4</param>
+	/// <param name="X5">Operand 5</param>
+	/// <param name="X6">Operand 6</param>
+	/// <param name="X7">Operand 7</param>
+	/// <param name="X8">Operand 8</param>
+	/// <param name="X9">Operand 9</param>
+	/// <param name="X10">Operand 10</param>
+	/// <param name="X11">Operand 11</param>
+	/// <param name="X12">Operand 12</param>
+	/// <param name="X13">Operand 13</param>
+	/// <param name="X14">Operand 14</param>
+	/// <param name="X15">Operand 15</param>
 	template <typename T>
-	inline static void Store16(std::vector<T> &Output, size_t OutOffset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3, UInt128 &X4, UInt128 &X5,
+	inline static void Store16(std::vector<T> &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3, UInt128 &X4, UInt128 &X5,
 		UInt128 &X6, UInt128 &X7, UInt128 &X8, UInt128 &X9, UInt128 &X10, UInt128 &X11, UInt128 &X12, UInt128 &X13, UInt128 &X14, UInt128 &X15)
 	{
 		__m128i T0 = _mm_unpacklo_epi32(X0.xmm, X1.xmm);
@@ -272,22 +272,22 @@ public:
 		X14.xmm = _mm_unpackhi_epi64(T12, T13);
 		X15.xmm = _mm_unpackhi_epi64(T14, T15);
 
-		X0.Store(Output, OutOffset);
-		X1.Store(Output, OutOffset + (16 / sizeof(T)));
-		X2.Store(Output, OutOffset + (32 / sizeof(T)));
-		X3.Store(Output, OutOffset + (48 / sizeof(T)));
-		X4.Store(Output, OutOffset + (64 / sizeof(T)));
-		X5.Store(Output, OutOffset + (80 / sizeof(T)));
-		X6.Store(Output, OutOffset + (96 / sizeof(T)));
-		X7.Store(Output, OutOffset + (112 / sizeof(T)));
-		X8.Store(Output, OutOffset + (128 / sizeof(T)));
-		X9.Store(Output, OutOffset + (144 / sizeof(T)));
-		X10.Store(Output, OutOffset + (160 / sizeof(T)));
-		X11.Store(Output, OutOffset + (176 / sizeof(T)));
-		X12.Store(Output, OutOffset + (192 / sizeof(T)));
-		X13.Store(Output, OutOffset + (208 / sizeof(T)));
-		X14.Store(Output, OutOffset + (224 / sizeof(T)));
-		X15.Store(Output, OutOffset + (240 / sizeof(T)));
+		X0.Store(Output, Offset);
+		X1.Store(Output, Offset + (16 / sizeof(T)));
+		X2.Store(Output, Offset + (32 / sizeof(T)));
+		X3.Store(Output, Offset + (48 / sizeof(T)));
+		X4.Store(Output, Offset + (64 / sizeof(T)));
+		X5.Store(Output, Offset + (80 / sizeof(T)));
+		X6.Store(Output, Offset + (96 / sizeof(T)));
+		X7.Store(Output, Offset + (112 / sizeof(T)));
+		X8.Store(Output, Offset + (128 / sizeof(T)));
+		X9.Store(Output, Offset + (144 / sizeof(T)));
+		X10.Store(Output, Offset + (160 / sizeof(T)));
+		X11.Store(Output, Offset + (176 / sizeof(T)));
+		X12.Store(Output, Offset + (192 / sizeof(T)));
+		X13.Store(Output, Offset + (208 / sizeof(T)));
+		X14.Store(Output, Offset + (224 / sizeof(T)));
+		X15.Store(Output, Offset + (240 / sizeof(T)));
 	}
 
 	//~~~ Methods~~~//
@@ -296,7 +296,7 @@ public:
 	/// Returns the absolute value
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
 	inline static UInt128 Abs(const UInt128 &Value)
@@ -308,7 +308,7 @@ public:
 	/// Computes the bitwise AND of the 128-bit value in *this* and the bitwise NOT of the 128-bit value in X
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
 	inline UInt128 AndNot(const UInt128 &Value)
@@ -342,7 +342,7 @@ public:
 	/// Computes the 32 bit left rotation of four unsigned integers
 	/// </summary>
 	///
-	/// <param name="X">The integer to rotate</param>
+	/// <param name="Value">The integer to rotate</param>
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt128</returns>
@@ -365,7 +365,7 @@ public:
 	/// Computes the 32 bit right rotation of four unsigned integers
 	/// </summary>
 	///
-	/// <param name="X">The integer to rotate</param>
+	/// <param name="Value">The integer to rotate</param>
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt128</returns>
@@ -379,6 +379,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The base integer</param>
+	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
 	inline static UInt128 ShiftRA(const UInt128 &Value, const int Shift)
@@ -391,6 +392,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Value">The base integer</param>
+	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The processed UInt128</returns>
 	inline static UInt128 ShiftRL(const UInt128 &Value, const int Shift)
@@ -490,8 +492,6 @@ public:
 	/// <summary>
 	/// Increase prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt128 operator ++ ()
 	{
 		return UInt128(xmm) + UInt128::ONE();
@@ -500,8 +500,6 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt128 operator ++ (int)
 	{
 		return UInt128(xmm) + UInt128::ONE();
@@ -530,8 +528,6 @@ public:
 	/// <summary>
 	/// Decrease prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt128 operator -- ()
 	{
 		return UInt128(xmm) - UInt128::ONE();
@@ -540,8 +536,6 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UInt128 operator -- (int)
 	{
 		return UInt128(xmm) - UInt128::ONE();
@@ -800,8 +794,6 @@ public:
 	/// <summary>
 	/// Compare two sets of integers for inequality, returns max integer size if inequal
 	/// </summary>
-	///
-	/// <param name="X">The values to compare</param>
 	inline UInt128 operator ! () const
 	{
 		return UInt128(_mm_cmpeq_epi32(xmm, _mm_setzero_si128()));

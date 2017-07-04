@@ -330,8 +330,8 @@ NAMESPACE_ROOT
 	NAMESPACE_NUMERIC
 		class UInt128 {};
 		class UInt256 {};
-		class UInt512 {};
 		class ULong256 {};
+		class UInt512 {};
 	NAMESPACE_NUMERICEND
 	/*! @} */
 

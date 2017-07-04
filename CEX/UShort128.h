@@ -175,7 +175,7 @@ public:
 	/// Returns the absolute value
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed UShort128</returns>
 	inline static UShort128 Abs(const UShort128 &Value)
@@ -187,7 +187,7 @@ public:
 	/// Computes the bitwise AND of the 128-bit value in *this* and the bitwise NOT of the 128-bit value in X
 	/// </summary>
 	///
-	/// <param name="X">The comparison integer</param>
+	/// <param name="Value">The comparison integer</param>
 	/// 
 	/// <returns>The processed UShort128</returns>
 	inline UShort128 AndNot(const UShort128 &Value)
@@ -221,7 +221,7 @@ public:
 	/// Computes the 16 bit left rotation of eight 16bit unsigned integers
 	/// </summary>
 	///
-	/// <param name="X">The integer to rotate</param>
+	/// <param name="Value">The integer to rotate</param>
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	/// 
 	/// <returns>The rotated UShort128</returns>
@@ -244,7 +244,7 @@ public:
 	/// Computes the 16 bit right rotation of eight 16bit unsigned integers
 	/// </summary>
 	///
-	/// <param name="X">The integer to rotate</param>
+	/// <param name="Value">The integer to rotate</param>
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	/// 
 	/// <returns>The rotated UShort128</returns>
@@ -300,10 +300,10 @@ public:
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	/// <param name="X0">Operand 4</param>
-	/// <param name="X1">Operand 5</param>
-	/// <param name="X2">Operand 6</param>
-	/// <param name="X3">Operand 7</param>
+	/// <param name="X4">Operand 4</param>
+	/// <param name="X5">Operand 5</param>
+	/// <param name="X6">Operand 6</param>
+	/// <param name="X7">Operand 7</param>
 	inline static void Transpose8(UShort128 &X0, UShort128 &X1, UShort128 &X2, UShort128 &X3, UShort128 &X4, UShort128 &X5, UShort128 &X6, UShort128 &X7)
 	{
 		__m128i T0 = _mm_unpacklo_epi16(X0.xmm, X1.xmm); // TODO: check this
@@ -367,8 +367,6 @@ public:
 	/// <summary>
 	/// Increase prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UShort128 operator ++ ()
 	{
 		return UShort128(xmm) + ONE();
@@ -377,8 +375,6 @@ public:
 	/// <summary>
 	/// Increase postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UShort128 operator ++ (int)
 	{
 		return UShort128(xmm) + ONE();
@@ -407,8 +403,6 @@ public:
 	/// <summary>
 	/// Decrease prefix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UShort128 operator -- ()
 	{
 		return UShort128(xmm) - ONE();
@@ -417,8 +411,6 @@ public:
 	/// <summary>
 	/// Decrease postfix operator
 	/// </summary>
-	///
-	/// <param name="X">The value to increase</param>
 	inline UShort128 operator -- (int)
 	{
 		return UShort128(xmm) - ONE();
@@ -677,8 +669,6 @@ public:
 	/// <summary>
 	/// Compare two sets of integers for inequality, returns max integer size if inequal
 	/// </summary>
-	///
-	/// <param name="X">The values to compare</param>
 	inline UShort128 operator ! () const
 	{
 		return UShort128(_mm_cmpeq_epi16(xmm, _mm_setzero_si128()));

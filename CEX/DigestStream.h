@@ -140,7 +140,7 @@ public:
 	/// Process the entire length of the source stream
 	/// </summary>
 	///
-	/// <param name="Input">The source stream to process</param>
+	/// <param name="InStream">The source stream to process</param>
 	/// 
 	/// <returns>The message hash output code</returns>
 	std::vector<byte> Compute(IByteStream* InStream);
