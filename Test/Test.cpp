@@ -180,7 +180,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.3 (A3)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      June 30, 2017                  *");
+	ConsoleUtils::WriteLine("* Date:      July 04, 2017                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -230,7 +230,6 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-	//RunTest(new RingLWETest());
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
