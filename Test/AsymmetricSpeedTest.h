@@ -23,11 +23,7 @@ namespace Test
 		static const uint64_t MB100 = MB1 * 100;
 		static const uint64_t GB1 = MB1 * 1000;
 		static const uint64_t DEF_DATA_SIZE = MB100;
-#if defined(__DEBUG)
 		static const uint64_t DEF_TEST_ITER = 1000;
-#else
-		static const uint64_t DEF_TEST_ITER = 10000;
-#endif
 
 		TestEventHandler m_progressEvent;
 

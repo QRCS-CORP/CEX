@@ -5,7 +5,6 @@
 #	error compiler is incompatible with this library!
 #endif
 
-// common headers
 #include <cstring>
 #include <exception>
 #include <iostream>
@@ -14,11 +13,16 @@
 #include <string>
 #include <vector>
 
+//////////////////////////////////////////////////////
+//		 *** Constants and System Macros ***		//
+// Settings in this section can not be modified		//
+//////////////////////////////////////////////////////
+
 // library version info
-static const int CEX_VERSION_MAJOR = 1; // A1 series
+static const int CEX_VERSION_MAJOR = 1; // A3 series
 static const int CEX_VERSION_MINOR = 0;
-static const int CEX_VERSION_PATCH = 1;
-static const int CEX_VERSION_RELEASE = 2;
+static const int CEX_VERSION_PATCH = 0;
+static const int CEX_VERSION_RELEASE = 3;
 
 // compiler types; not all will be supported (targets are msvc, mingw, gcc, intel, and clang)
 #if defined(_MSC_VER)
@@ -210,7 +214,7 @@ typedef unsigned char byte;
 const unsigned int WORD_SIZE = sizeof(uint);
 const unsigned int WORD_BITS = WORD_SIZE * 8;
 
-// intrensics flags
+// OS intrinsics flags
 #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
 #	define CEX_HAS_MINSSE
 #	define CEX_FAST_ROTATE
@@ -260,6 +264,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	endif
 #endif
 
+// data alignment on msc
 #if defined(_MSC_VER)
 #	if _MSC_VER == 1200
 #		include <malloc.h>
@@ -392,37 +397,6 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define CEX_HAS_AVX2
 #endif
 
-// TODO: future expansion (if you can test it, I'll add it)
-// links: 
-// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
-// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
-// https://colfaxresearch.com/knl-avx512/
-// 
-// #include <immintrin.h>
-// supported is 1: ex. __AVX512CD__ 1
-//F		__AVX512F__					Foundation
-//CD	__AVX512CD__				Conflict Detection Instructions(CDI)
-//ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
-//PF	__AVX512PF__				Prefetch Instructions(PFI)
-//DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
-//BW	__AVX512BW__				Byte and Word Instructions(BW)
-//VL	__AVX512VL__				Vector Length Extensions(VL)
-//IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
-//VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
-//VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
-//FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
-//VPOPCNT	__AVX512VPOPCNTDQ__		?
-
-// Note: AVX512 is currently untested, this flag enables support on a compliant system
-//#define CEX_AVX512_SUPPORTED
-
-#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
-#	include <immintrin.h>
-#	if !defined(__AVX512__)
-#		define __AVX512__
-#	endif
-#endif
-
 #if defined(CEX_HAS_AVX2)
 #if !defined(CEX_HAS_AVX)
 #		define CEX_HAS_AVX
@@ -464,8 +438,22 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	endif
 #endif
 
-// enables fast rotation intrinsics
-#define CEX_FASTROTATE_ENABLED
+// native openmp support
+#if defined(_OPENMP)
+#	if _OPENMP == 201511
+#		define CEX_OPENMP_VERSION_45
+#	elif _OPENMP == 201307
+#		define CEX_OPENMP_VERSION_40
+#	elif _OPENMP == 201107
+#		define CEX_OPENMP_VERSION_31
+#	elif _OPENMP == 200805
+#		define CEX_OPENMP_VERSION_30
+#	elif _OPENMP == 200505
+#		define CEX_OPENMP_VERSION_25
+#	elif _OPENMP == 200203
+#		define CEX_OPENMP_VERSION_20
+#	endif
+#endif
 
 // instructs the compiler to skip optimizations on the contained function; closed with CEX_OPTIMIZE_RESUME
 #if defined(CEX_COMPILER_MSC)
@@ -508,36 +496,53 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #   define CEXASSERT(condition, message) do { } while (false)
 #endif
 
-// TODO: integrate this into parallel profile as multiple of split-channels
-#define CEX_PARALLEL_PROFILE_COMBINED
-#define CEX_PARALLEL_PROFILE_DISTRIBUTED
 
-#if defined(CEX_PARALLEL_PROFILE_COMBINED)
-#	define CEX_PARALLEL_CHANNELS 1
-#else
-#	define CEX_PARALLEL_CHANNELS 8
+//////////////////////////////////////////////////
+//		*** User Configurable Section ***		//
+// Settings in this section can be modified		//
+//////////////////////////////////////////////////
+
+// enables/disables OS rotation intrinsics
+#if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)
+#	define CEX_FASTROTATE_ENABLED
 #endif
 
-// prefetch base offset used by parallel block calculation
+// prefetch base multiplier used by the symmetric cipher modes parallel block calculation
 #define CEX_PREFETCH_BASE size_t = 2048
-// pre-loads tables in rhx and thx into L1 for perfoormance and as a timing attack counter measure
+
+// pre-loads tables in rhx and thx into L1 for performance and as a timing attack counter measure
 #define CEX_PREFETCH_RHX_TABLES
 #define CEX_PREFETCH_THX_TABLES
 
-// native openmp support
-#if defined(_OPENMP)
-#	if _OPENMP == 201511
-#		define CEX_OPENMP_VERSION_45
-#	elif _OPENMP == 201307
-#		define CEX_OPENMP_VERSION_40
-#	elif _OPENMP == 201107
-#		define CEX_OPENMP_VERSION_31
-#	elif _OPENMP == 200805
-#		define CEX_OPENMP_VERSION_30
-#	elif _OPENMP == 200505
-#		define CEX_OPENMP_VERSION_25
-#	elif _OPENMP == 200203
-#		define CEX_OPENMP_VERSION_20
+// AVX512 Capabilities Check
+// TODO: future expansion (if you can test it, I'll add it)
+// links: 
+// https://software.intel.com/en-us/intel-cplusplus-compiler-16.0-user-and-reference-guide
+// https://software.intel.com/en-us/articles/compiling-for-the-intel-xeon-phi-processor-and-the-intel-avx-512-isa
+// https://colfaxresearch.com/knl-avx512/
+// 
+// #include <immintrin.h>
+// supported is 1: ex. __AVX512CD__ 1
+//F		__AVX512F__					Foundation
+//CD	__AVX512CD__				Conflict Detection Instructions(CDI)
+//ER	__AVX512ER__				Exponential and Reciprocal Instructions(ERI)
+//PF	__AVX512PF__				Prefetch Instructions(PFI)
+//DQ	__AVX512DQ__				Doubleword and Quadword Instructions(DQ)
+//BW	__AVX512BW__				Byte and Word Instructions(BW)
+//VL	__AVX512VL__				Vector Length Extensions(VL)
+//IFMA	__AVX512IFMA__				Integer Fused Multiply Add(IFMA)
+//VBMI	__AVX512VBMI__				Vector Byte Manipulation Instructions(VBMI)
+//VNNIW	__AVX5124VNNIW__			Vector instructions for deep learning enhanced word variable precision
+//FMAPS	__AVX5124FMAPS__			Vector instructions for deep learning floating - point single precision
+//VPOPCNT	__AVX512VPOPCNTDQ__		?
+
+// Note: AVX512 is currently untested, this flag enables support on a compliant system
+//#define CEX_AVX512_SUPPORTED
+
+#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
+#	include <immintrin.h>
+#	if !defined(__AVX512__)
+#		define __AVX512__
 #	endif
 #endif
 

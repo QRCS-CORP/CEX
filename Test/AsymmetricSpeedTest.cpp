@@ -29,6 +29,7 @@ namespace Test
 			std::string itrCnt = TestUtils::ToString(DEF_TEST_ITER);
 
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests in sequential and parallel modes:"));
+			OnProgress("");
 
 			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using RingLWE Q12289N1024***"));
 			RlweGenerateLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false);
@@ -57,7 +58,7 @@ namespace Test
 
 	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel)
 	{
-		Prng::IPrng* rng = Helper::PrngFromName::GetInstance(Enumeration::Prngs::BCR);
+		Prng::IPrng* rng = Helper::PrngFromName::GetInstance(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
 		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(Enumeration::Digests::SHA256, false);
 		Cipher::Asymmetric::RLWE::RingLWE cpr(Params, rng, dgt, Parallel);
 		Key::Asymmetric::IAsymmetricKeyPair* kp;
