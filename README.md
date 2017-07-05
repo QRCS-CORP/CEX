@@ -60,8 +60,8 @@ For more information on the current capabilities of the library, read the Introd
 ### Digests
 * The 256bit Blake2S and Blake2SP sequential and parallel digests (Blake256)
 * The 512bit Blake2B and Blake2BP sequential and parallel digests (Blake512)
-* The 256bit Keccak SHA-3 digest (Keccak256)
-* The 512bit Keccak SHA-3 digest (Keccak512)
+* The 256bit Keccak SHA-3 sequential and parallel digests (Keccak256)
+* The 512bit Keccak SHA-3 sequential and parallel digests (Keccak512)
 * The 256bit SHA-2 (optional SHA-NI) sequential and parallel digests (SHA256)
 * The 512bit SHA-2 sequential and parallel digests (SHA512)
 * The 256bit Skein sequential and parallel digests (Skein256)
