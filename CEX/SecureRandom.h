@@ -114,10 +114,10 @@ public:
 	template <class T>
 	void Fill(std::vector<T> &Output, size_t Offset)
 	{
-		size_t bufSze = Output.size() * sizeof(T);
-		std::vector<byte> buf(bufSze);
+		size_t bufLen = (Output.size() - Offset) * sizeof(T);
+		std::vector<byte> buf(bufLen);
 		GetBytes(buf);
-		Utility::MemUtils::Copy(buf, 0, Output, Offset, bufSze);
+		Utility::MemUtils::Copy(buf, 0, Output, Offset * sizeof(T), bufLen);
 	}
 
 	//~~~Byte~~~//
