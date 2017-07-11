@@ -78,6 +78,36 @@ void HCR::Destroy()
 	}
 }
 
+void HCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
+{
+	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(ushort);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
+void HCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
+{
+	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(uint);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
+void HCR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
+{
+	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(ulong);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
 std::vector<byte> HCR::GetBytes(size_t Size)
 {
 	std::vector<byte> data(Size);

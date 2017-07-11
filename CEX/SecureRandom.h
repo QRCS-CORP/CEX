@@ -106,19 +106,31 @@ public:
 	void Destroy();
 
 	/// <summary>
-	/// Fill an array of T with pseudo random
+	/// Fill an array of uint16 with pseudo-random
 	/// </summary>
 	///
-	/// <param name="Output">The T type Output array</param>
-	/// <param name="Offset">The starting index of T in the Output array</param>
-	template <class T>
-	void Fill(std::vector<T> &Output, size_t Offset)
-	{
-		size_t bufLen = (Output.size() - Offset) * sizeof(T);
-		std::vector<byte> buf(bufLen);
-		GetBytes(buf);
-		Utility::MemUtils::Copy(buf, 0, Output, Offset * sizeof(T), bufLen);
-	}
+	/// <param name="Output">The uint16 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements);
+
+	/// <summary>
+	/// Fill an array of uint32 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The uint32 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements);
+
+	/// <summary>
+	/// Fill an array of uint64 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The uint64 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements);
 
 	//~~~Byte~~~//
 
