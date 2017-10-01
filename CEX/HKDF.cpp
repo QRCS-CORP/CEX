@@ -109,24 +109,17 @@ void HKDF::Destroy()
 		m_kdfCounter = 0;
 		m_kdfDigestType = Digests::None;
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_macGenerator != 0)
-					delete m_macGenerator;
-			}
+			if (m_macGenerator != 0)
+				delete m_macGenerator;
+		}
 
-			Utility::IntUtils::ClearVector(m_kdfInfo);
-			Utility::IntUtils::ClearVector(m_kdfState);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-		}
-		catch(std::exception& ex)
-		{
-			throw CryptoKdfException("HKDF:Destroy", "The class state was not disposed!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_kdfState);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
 	}
 }
 
@@ -246,7 +239,7 @@ size_t HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		m_macGenerator->Finalize(m_kdfState, 0);
 
 		const size_t RMDSZE = Utility::IntUtils::Min(m_macSize, Length - prcLen);
-		Utility::MemUtils::Copy<byte>(m_kdfState, 0, Output, OutOffset, RMDSZE);
+		Utility::MemUtils::Copy(m_kdfState, 0, Output, OutOffset, RMDSZE);
 		prcLen += RMDSZE;
 		OutOffset += RMDSZE;
 	}

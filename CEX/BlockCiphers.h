@@ -1,5 +1,5 @@
-#ifndef _CEX_BLOCKCIPHERS_H
-#define _CEX_BLOCKCIPHERS_H
+#ifndef CEX_BLOCKCIPHERS_H
+#define CEX_BLOCKCIPHERS_H
 
 #include "CexDomain.h"
 

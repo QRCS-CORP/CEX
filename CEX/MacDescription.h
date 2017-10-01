@@ -1,5 +1,5 @@
-#ifndef _CEX_MACDESCRIPTION_H
-#define _CEX_MACDESCRIPTION_H
+#ifndef CEX_MACDESCRIPTION_H
+#define CEX_MACDESCRIPTION_H
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"
@@ -181,10 +181,10 @@ public:
 	/// Compare this object instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Object to compare</param>
+	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(MacDescription &Obj);
+	bool Equals(MacDescription &Input);
 
 	/// <summary>
 	/// Get the hash code for this object

@@ -23,8 +23,8 @@
 // Updated December 20, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_CMAC_H
-#define _CEX_CMAC_H
+#ifndef CEX_CMAC_H
+#define CEX_CMAC_H
 
 #include "IMac.h"
 #include "BlockCiphers.h"
@@ -37,7 +37,7 @@ using Cipher::Symmetric::Block::IBlockCipher;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
 
 /// <summary>
-/// An implementation of a symmetric cipher based Message Authentication Code generator
+/// An implementation of a symmetric Cipher based Message Authentication Code generator
 /// </summary>
 /// 
 /// <example>

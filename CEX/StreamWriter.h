@@ -1,5 +1,5 @@
-#ifndef _CEX_STREAMWRITER_H
-#define _CEX_STREAMWRITER_H
+#ifndef CEX_STREAMWRITER_H
+#define CEX_STREAMWRITER_H
 
 #include "MemoryStream.h"
 #include "MemUtils.h"
@@ -87,7 +87,7 @@ public:
 		if (m_streamPosition + INPSZE > m_streamData.size())
 			m_streamData.resize(m_streamPosition + INPSZE);
 
-		Utility::MemUtils::Copy<T, byte>(Input, 0, m_streamData, m_streamPosition, INPSZE);
+		Utility::MemUtils::Copy(Input, 0, m_streamData, m_streamPosition, INPSZE);
 		m_streamPosition += INPSZE;
 	}
 
@@ -105,7 +105,7 @@ public:
 		if (m_streamPosition + INPSZE > m_streamData.size())
 			m_streamData.resize(m_streamPosition + INPSZE);
 
-		Utility::MemUtils::Copy<T, byte>(Input, InOffset, m_streamData, m_streamPosition, INPSZE);
+		Utility::MemUtils::Copy(Input, InOffset, m_streamData, m_streamPosition, INPSZE);
 		m_streamPosition += INPSZE;
 	}
 
@@ -121,7 +121,7 @@ public:
 		if (m_streamPosition + VALSZE > m_streamData.size())
 			m_streamData.resize(m_streamPosition + VALSZE);
 
-		Utility::MemUtils::Copy<T, byte>(Value, m_streamData, m_streamPosition, VALSZE);
+		Utility::MemUtils::CopyFromValue(Value, m_streamData, m_streamPosition, VALSZE);
 		m_streamPosition += VALSZE;
 	}
 };

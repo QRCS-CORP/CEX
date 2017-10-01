@@ -88,24 +88,17 @@ void KDF2::Destroy()
 		m_hashSize = 0;
 		m_isInitialized = false;
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_msgDigest != 0)
-					delete m_msgDigest;
-			}
+			if (m_msgDigest != 0)
+				delete m_msgDigest;
+		}
 
-			Utility::IntUtils::ClearVector(m_kdfKey);
-			Utility::IntUtils::ClearVector(m_kdfSalt);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-		}
-		catch(std::exception& ex)
-		{
-			throw CryptoKdfException("KDF2:Destroy", "The class state was not disposed!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_kdfKey);
+		Utility::IntUtils::ClearVector(m_kdfSalt);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
 	}
 }
 
@@ -159,14 +152,14 @@ void KDF2::Initialize(const std::vector<byte> &Key)
 	{
 		// pad the key to one block
 		m_kdfKey.resize(m_blockSize);
-		Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, Key.size());
+		Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, Key.size());
 	}
 	else
 	{
 		m_kdfKey.resize(m_blockSize);
-		Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_blockSize);
+		Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_blockSize);
 		m_kdfSalt.resize(Key.size() - m_blockSize);
-		Utility::MemUtils::Copy<byte>(Key, m_blockSize, m_kdfSalt, 0, m_kdfSalt.size());
+		Utility::MemUtils::Copy(Key, m_blockSize, m_kdfSalt, 0, m_kdfSalt.size());
 	}
 
 	m_isInitialized = true;
@@ -183,12 +176,12 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, Key.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, Key.size());
 
 	if (Salt.size() > 0)
 	{
 		m_kdfSalt.resize(Salt.size());
-		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
+		Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
 	}
 
 	m_isInitialized = true;
@@ -205,15 +198,15 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, Key.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, Key.size());
 
 	if (Salt.size() > 0)
 	{
 		m_kdfSalt.resize(Salt.size() + Info.size());
-		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
+		Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
 		// add info as extension of salt
 		if (Info.size() > 0)
-			Utility::MemUtils::Copy<byte>(Info, 0, m_kdfSalt, Salt.size(), Info.size());
+			Utility::MemUtils::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 	}
 
 	m_isInitialized = true;
@@ -262,7 +255,7 @@ size_t KDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		++m_kdfCounter;
 
 		size_t prcRmd = Utility::IntUtils::Min(m_hashSize, prcLen);
-		Utility::MemUtils::Copy<byte>(hash, 0, Output, OutOffset, prcRmd);
+		Utility::MemUtils::Copy(hash, 0, Output, OutOffset, prcRmd);
 		prcLen -= prcRmd;
 		OutOffset += prcRmd;
 	}

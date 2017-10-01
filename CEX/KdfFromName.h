@@ -1,5 +1,5 @@
-#ifndef _CEX_KDFFROMNAME_H
-#define _CEX_KDFFROMNAME_H
+#ifndef CEX_KDFFROMNAME_H
+#define CEX_KDFFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

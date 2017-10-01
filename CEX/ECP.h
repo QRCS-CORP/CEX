@@ -1,5 +1,5 @@
-#ifndef _CEX_ECP_H
-#define _CEX_ECP_H
+#ifndef CEX_ECP_H
+#define CEX_ECP_H
 
 #include "IProvider.h"
 #include "ICipherMode.h"

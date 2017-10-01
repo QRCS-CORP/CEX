@@ -47,7 +47,7 @@ StreamWriter::~StreamWriter()
 void StreamWriter::Destroy()
 {
 	if (m_streamData.capacity() > 0)
-		Utility::MemUtils::Clear<byte>(m_streamData, 0, m_streamData.size());
+		Utility::MemUtils::Clear(m_streamData, 0, m_streamData.size());
 
 	m_streamData.clear();
 	m_streamPosition = 0;

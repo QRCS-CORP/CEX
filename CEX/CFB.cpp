@@ -134,22 +134,15 @@ void CFB::Destroy()
 		m_isLoaded = false;
 		m_parallelProfile.Reset();
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_blockCipher != 0)
-					delete m_blockCipher;
-			}
+			if (m_blockCipher != 0)
+				delete m_blockCipher;
+		}
 
-			Utility::IntUtils::ClearVector(m_cfbVector);
-		}
-		catch(std::exception& ex) 
-		{
-			throw CryptoCipherModeException("CFB:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_cfbVector);
 	}
 }
 
@@ -177,8 +170,8 @@ void CFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	Scope();
 	std::vector<byte> iv = KeyParams.Nonce();
 	size_t diff = m_cfbVector.size() - iv.size();
-	Utility::MemUtils::Copy<byte>(iv, 0, m_cfbVector, diff, iv.size());
-	Utility::MemUtils::Clear<byte>(m_cfbVector, 0, diff);
+	Utility::MemUtils::Copy(iv, 0, m_cfbVector, diff, iv.size());
+	Utility::MemUtils::Clear(m_cfbVector, 0, diff);
 	m_blockCipher->Initialize(true, KeyParams);
 	m_isEncryption = Encryption;
 	m_isInitialized = true;
@@ -212,10 +205,10 @@ void CFB::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	// left shift the register
 	if (m_cfbVector.size() - m_blockSize > 0)
-		Utility::MemUtils::Copy<byte>(m_cfbVector, m_blockSize, m_cfbVector, 0, m_cfbVector.size() - m_blockSize);
+		Utility::MemUtils::Copy(m_cfbVector, m_blockSize, m_cfbVector, 0, m_cfbVector.size() - m_blockSize);
 
 	// copy ciphertext to register
-	Utility::MemUtils::Copy<byte>(Input, InOffset, m_cfbVector, m_cfbVector.size() - m_blockSize, m_blockSize);
+	Utility::MemUtils::Copy(Input, InOffset, m_cfbVector, m_cfbVector.size() - m_blockSize, m_blockSize);
 
 	// xor the iv with the ciphertext producing the plaintext
 	for (size_t i = 0; i < m_blockSize; i++)
@@ -233,17 +226,17 @@ void CFB::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset,
 		std::vector<byte> thdIv(m_blockSize);
 
 		if (i != 0)
-			Utility::MemUtils::Copy<byte>(Input, (InOffset + (i * SEGSZE)) - m_blockSize, thdIv, 0, m_blockSize);
+			Utility::MemUtils::Copy(Input, (InOffset + (i * SEGSZE)) - m_blockSize, thdIv, 0, m_blockSize);
 		else
-			Utility::MemUtils::Copy<byte>(m_cfbVector, 0, thdIv, 0, m_blockSize);
+			Utility::MemUtils::Copy(m_cfbVector, 0, thdIv, 0, m_blockSize);
 
 		this->DecryptSegment(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, thdIv, BLKCNT);
 
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
-			Utility::MemUtils::Copy<byte>(thdIv, 0, tmpIv, 0, m_blockSize);
+			Utility::MemUtils::Copy(thdIv, 0, tmpIv, 0, m_blockSize);
 	});
 
-	Utility::MemUtils::Copy<byte>(tmpIv, 0, m_cfbVector, 0, m_blockSize);
+	Utility::MemUtils::Copy(tmpIv, 0, m_cfbVector, 0, m_blockSize);
 }
 
 void CFB::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Iv, const size_t BlockCount)
@@ -254,10 +247,10 @@ void CFB::DecryptSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 		// left shift the register
 		if (Iv.size() - m_blockSize > 0)
-			Utility::MemUtils::Copy<byte>(Iv, m_blockSize, Iv, 0, Iv.size() - m_blockSize);
+			Utility::MemUtils::Copy(Iv, m_blockSize, Iv, 0, Iv.size() - m_blockSize);
 
 		// copy ciphertext to register
-		Utility::MemUtils::Copy<byte>(Input, InOffset, Iv, Iv.size() - m_blockSize, m_blockSize);
+		Utility::MemUtils::Copy(Input, InOffset, Iv, Iv.size() - m_blockSize, m_blockSize);
 
 		// xor the iv with the ciphertext producing the plaintext
 		for (size_t i = 0; i < m_blockSize; i++)
@@ -282,10 +275,10 @@ void CFB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	// left shift the register
 	if (m_cfbVector.size() - m_blockSize > 0)
-		Utility::MemUtils::Copy<byte>(m_cfbVector, m_blockSize, m_cfbVector, 0, m_cfbVector.size() - m_blockSize);
+		Utility::MemUtils::Copy(m_cfbVector, m_blockSize, m_cfbVector, 0, m_cfbVector.size() - m_blockSize);
 
 	// copy cipher text to the register
-	Utility::MemUtils::Copy<byte>(Output, OutOffset, m_cfbVector, m_cfbVector.size() - m_blockSize, m_blockSize);
+	Utility::MemUtils::Copy(Output, OutOffset, m_cfbVector, m_cfbVector.size() - m_blockSize, m_blockSize);
 }
 
 void CFB::Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)

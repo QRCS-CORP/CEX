@@ -1,5 +1,5 @@
-#ifndef _CEX_MPKCPRIVATEKEY_H
-#define _CEX_MPKCPRIVATEKEY_H
+#ifndef CEX_MPKCPRIVATEKEY_H
+#define CEX_MPKCPRIVATEKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
@@ -17,8 +17,8 @@ class MPKCPrivateKey final : public IAsymmetricKey
 private:
 
 	bool m_isDestroyed;
-	std::vector<byte> m_sCoeffs;
 	MPKCParams m_mpkcParameters;
+	std::vector<byte> m_sCoeffs;
 
 public:
 
@@ -40,9 +40,9 @@ public:
 	const MPKCParams Parameters();
 
 	/// <summary>
-	/// Get: the private key polynomial S
+	/// Get: The private key polynomial
 	/// </summary>
-	const std::vector<byte> &S();
+	const std::vector<byte> &S() { return m_sCoeffs; }
 
 	//~~~Constructor~~~//
 
@@ -52,14 +52,14 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="S">The private key polynomial</param>
-	MPKCPrivateKey(MPKCParams Parameters, std::vector<byte> &S);
+	explicit MPKCPrivateKey(MPKCParams Params, std::vector<byte> &S);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The serialized private key</param>
-	MPKCPrivateKey(const std::vector<byte> &KeyStream);
+	explicit MPKCPrivateKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Finalize objects

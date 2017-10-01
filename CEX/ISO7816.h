@@ -1,5 +1,5 @@
-#ifndef _CEX_ISO7816_H
-#define _CEX_ISO7816_H
+#ifndef CEX_ISO7816_H
+#define CEX_ISO7816_H
 
 #include "IPadding.h"
 

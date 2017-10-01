@@ -1,98 +1,117 @@
-#ifndef _CEX_MPKCPARAMSET_H
-#define _CEX_MPKCPARAMSET_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_MPKCPARAMSET_H
+#define CEX_MPKCPARAMSET_H
 
 #include "CexDomain.h"
+#include "MPKCParams.h"
 
 NAMESPACE_MCELIECE
+
+using Enumeration::MPKCParams;
 
 /// <summary>
 /// McEliece parameter settings
 /// </summary>
 struct MPKCParamSet
 {
+	//~~~Properties~~~//
 
 	/// <summary>
 	/// The finite field GF(2^m)
 	/// </summary>
-	int GF;
+	uint GF;
 
 	/// <summary>
 	/// The error correction capability of the code
 	/// </summary>
-	int T;
+	uint T;
 
 	/// <summary>
-	/// The byte size of the secret seed array
+	/// The public keys byte size
 	/// </summary>
-	size_t SeedSize;
+	uint PublicKeySize;
 
 	/// <summary>
-	/// The byte size of A's forward message to host B
+	/// The private keys byte size
 	/// </summary>
-	size_t ForwardMessageSize;
+	uint PrivateKeySize;
 
 	/// <summary>
-	/// The parameter sets formal name
+	/// The parameter sets enumeration name
 	/// </summary>
-	std::string Name;
+	MPKCParams ParamName;
+
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// The byte size of B's reply message to host A
+	/// An empty McEliece parameter structure
 	/// </summary>
-	size_t ReturnMessageSize;
+	MPKCParamSet();
 
 	/// <summary>
-	/// Empty constructor
+	/// Initialize the McEliece parameter structure
 	/// </summary>
-	MPKCParamSet()
-		:
-		GF(0),
-		T(0),
-		ForwardMessageSize(0),
-		Name(""),
-		ReturnMessageSize(0),
-		SeedSize(0)
-	{}
+	///
+	/// <param name="Field">The finite field GF(2^m)</param>
+	/// <param name="Correction">The error correction capability of the code</param>
+	/// <param name="PubKeySize">The public keys byte size</param>
+	/// <param name="PriKeySize">The private keys byte size</param>
+	/// <param name="ParamName">The parameter sets enumeration name</param>
+	MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamSet);
+
+	/// <summary>
+	/// Initialize the McEliece parameter structure using a byte array
+	/// </summary>
+	/// 
+	/// <param name="ParamArray">The byte array containing the MPKCParamSet</param>
+	MPKCParamSet(const std::vector<byte> &ParamArray);
 
 	/// <summary>
 	/// Finalize state
 	/// </summary>
-	~MPKCParamSet()
-	{
-		Reset();
-	}
+	~MPKCParamSet();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Load the parameter values
 	/// </summary>
+	///
 	/// <param name="Field">The finite field GF(2^m)</param>
 	/// <param name="Correction">The error correction capability of the code</param>
-	/// <param name="SeedByteSize">The byte size of the secret seed array</param>
-	/// <param name="ForwardByteSize">The byte size of A's forward message to host B</param>
-	/// <param name="ReturnByteSize">The byte size of B's reply message to host A</param>
-	/// <param name="ParamName">The parameter sets formal name</param>
-	void Load(int Field, int Correction, size_t SeedByteSize, size_t ForwardByteSize, size_t ReturnByteSize, std::string ParamName)
-	{
-		GF = Field;
-		T = Correction;
-		ForwardMessageSize = ForwardByteSize;
-		Name = ParamName;
-		ReturnMessageSize = ReturnByteSize;
-		SeedSize = SeedByteSize;
-	}
+	/// <param name="PubKeySize">The public keys byte size</param>
+	/// <param name="PriKeySize">The private keys byte size</param>
+	/// <param name="ParamName">The parameter sets enumeration name</param>
+	void Load(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamSet);
 
 	/// <summary>
 	/// Reset current parameters
 	/// </summary>
-	void Reset()
-	{
-		GF = 0;
-		T = 0;
-		ForwardMessageSize = 0;
-		Name = "";
-		ReturnMessageSize = 0;
-		SeedSize = 0;
-	}
+	void Reset();
+
+	/// <summary>
+	/// Convert the MPKCParamSet structure to a byte array
+	/// </summary>
+	/// 
+	/// <returns>The byte array containing the MPKCParamSet</returns>
+	std::vector<byte> ToBytes();
 };
 
 NAMESPACE_MCELIECEEND

@@ -111,27 +111,20 @@ void CMAC::Destroy()
 		m_macSize = 0;
 		m_wrkOffset = 0;
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_cipherMode != 0)
-					delete m_cipherMode;
-			}
+			if (m_cipherMode != 0)
+				delete m_cipherMode;
+		}
 
-			Utility::IntUtils::ClearVector(m_cipherKey);
-			Utility::IntUtils::ClearVector(m_K1);
-			Utility::IntUtils::ClearVector(m_K2);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_msgCode);
-			Utility::IntUtils::ClearVector(m_wrkBuffer);
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoMacException("CMAC:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_cipherKey);
+		Utility::IntUtils::ClearVector(m_K1);
+		Utility::IntUtils::ClearVector(m_K2);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_msgCode);
+		Utility::IntUtils::ClearVector(m_wrkBuffer);
 	}
 }
 
@@ -146,15 +139,15 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	{
 		Cipher::Symmetric::Block::Padding::ISO7816 pad;
 		pad.AddPadding(m_wrkBuffer, m_wrkOffset);
-		Utility::MemUtils::XorBlock<byte>(m_K2, 0, m_wrkBuffer, 0, m_macSize);
+		Utility::MemUtils::XorBlock(m_K2, 0, m_wrkBuffer, 0, m_macSize);
 	}
 	else
 	{
-		Utility::MemUtils::XorBlock<byte>(m_K1, 0, m_wrkBuffer, 0, m_macSize);
+		Utility::MemUtils::XorBlock(m_K1, 0, m_wrkBuffer, 0, m_macSize);
 	}
 
 	m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
-	Utility::MemUtils::Copy<byte>(m_msgCode, 0, Output, OutOffset, m_macSize);
+	Utility::MemUtils::Copy(m_msgCode, 0, Output, OutOffset, m_macSize);
 	Reset();
 
 	return m_macSize;
@@ -186,7 +179,7 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 		{
 			// info is too large; size to optimal max, ignore remainder
 			std::vector<byte> tmpInfo(m_cipherMode->Engine()->DistributionCodeMax());
-			Utility::MemUtils::Copy<byte>(KeyParams.Info(), 0, tmpInfo, 0, tmpInfo.size());
+			Utility::MemUtils::Copy(KeyParams.Info(), 0, tmpInfo, 0, tmpInfo.size());
 			m_cipherMode->Engine()->DistributionCode() = tmpInfo;
 		}
 	}
@@ -204,9 +197,9 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 void CMAC::Reset()
 {
 	// reinitialize the cbc iv
-	Utility::MemUtils::Clear<byte>(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode)->Nonce(), 0, BLOCK_SIZE);
-	Utility::MemUtils::Clear<byte>(m_msgCode, 0, m_msgCode.size());
-	Utility::MemUtils::Clear<byte>(m_wrkBuffer, 0, m_wrkBuffer.size());
+	Utility::MemUtils::Clear(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode)->Nonce(), 0, BLOCK_SIZE);
+	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
+	Utility::MemUtils::Clear(m_wrkBuffer, 0, m_wrkBuffer.size());
 	m_wrkOffset = 0;
 }
 
@@ -239,7 +232,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	size_t diff = m_cipherMode->BlockSize() - m_wrkOffset;
 	if (Length > diff)
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, m_wrkBuffer, m_wrkOffset, diff);
+		Utility::MemUtils::Copy(Input, InOffset, m_wrkBuffer, m_wrkOffset, diff);
 		m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
 		m_wrkOffset = 0;
 		Length -= diff;
@@ -255,7 +248,7 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 	if (Length > 0)
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, m_wrkBuffer, m_wrkOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, m_wrkBuffer, m_wrkOffset, Length);
 		m_wrkOffset += Length;
 	}
 }

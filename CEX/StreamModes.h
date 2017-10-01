@@ -1,5 +1,5 @@
-#ifndef _CEX_STREAMMODES_H
-#define _CEX_STREAMMODES_H
+#ifndef CEX_STREAMMODES_H
+#define CEX_STREAMMODES_H
 
 #include "CexDomain.h"
 

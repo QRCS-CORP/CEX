@@ -108,28 +108,21 @@ void HMAC::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		m_msgDigestType = Digests::None;
 		m_isDestroyed = true;
+		m_msgDigestType = Digests::None;
 		m_isInitialized = false;
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_msgDigest != 0)
-					delete m_msgDigest;
-			}
+			if (m_msgDigest != 0)
+				delete m_msgDigest;
+		}
 
-			Utility::IntUtils::ClearVector(m_inputPad);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_outputPad);
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoMacException("HMAC:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_inputPad);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_outputPad);
 	}
 }
 
@@ -173,13 +166,13 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		Utility::MemUtils::Copy<byte>(KeyParams.Key(), 0, m_inputPad, 0, keyLen);
+		Utility::MemUtils::Copy(KeyParams.Key(), 0, m_inputPad, 0, keyLen);
 	}
 
-	if (m_msgDigest->BlockSize() - keyLen > 0)
-		Utility::MemUtils::Clear<byte>(m_inputPad, keyLen, m_msgDigest->BlockSize() - keyLen);
+	if ((int)m_msgDigest->BlockSize() - (int)keyLen > 0)
+		Utility::MemUtils::Clear(m_inputPad, keyLen, m_msgDigest->BlockSize() - keyLen);
 
-	Utility::MemUtils::Copy<byte>(m_inputPad, 0, m_outputPad, 0, m_inputPad.size());
+	Utility::MemUtils::Copy(m_inputPad, 0, m_outputPad, 0, m_inputPad.size());
 	XorPad(m_inputPad, IPAD);
 	XorPad(m_outputPad, OPAD);
 	m_msgDigest->Update(m_inputPad, 0, m_inputPad.size());

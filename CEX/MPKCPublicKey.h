@@ -1,5 +1,5 @@
-#ifndef _CEX_MPKCPUUBLICKEY_H
-#define _CEX_MPKCPUUBLICKEY_H
+#ifndef CEX_MPKCPUUBLICKEY_H
+#define CEX_MPKCPUUBLICKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
@@ -17,7 +17,7 @@ class MPKCPublicKey final : public IAsymmetricKey
 private:
 
 	bool m_isDestroyed;
-	std::vector<byte> m_pCoeffs;
+	std::vector<byte> m_pubMat;
 	MPKCParams m_mpkcParameters;
 
 public:
@@ -50,16 +50,16 @@ public:
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
-	/// <param name="Parameters">The cipher parameter enumeration name</param>
+	/// <param name="Params">The cipher parameter enumeration name</param>
 	/// <param name="P">The The public keys polynomial</param>
-	MPKCPublicKey(MPKCParams Parameters, std::vector<byte> &P);
+	explicit MPKCPublicKey(MPKCParams Params, const std::vector<byte> &P);
 
 	/// <summary>
 	/// Initialize this class with a serialized public key
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The serialized public key</param>
-	MPKCPublicKey(const std::vector<byte> &KeyStream);
+	explicit MPKCPublicKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Finalize objects

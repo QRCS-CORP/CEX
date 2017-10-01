@@ -83,7 +83,7 @@ MemoryStream::MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t 
 {
 	CEXASSERT(Length <= Data.size() - Offset, "Length exceeds input capacity");
 	m_streamData.resize(Length);
-	Utility::MemUtils::Copy<byte>(Data, Offset, m_streamData, 0, Length);
+	Utility::MemUtils::Copy(Data, Offset, m_streamData, 0, Length);
 }
 
 MemoryStream::~MemoryStream()
@@ -108,9 +108,9 @@ void MemoryStream::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_streamPosition = 0;
 		Utility::IntUtils::ClearVector(m_streamData);
-		m_isDestroyed = true;
 	}
 }
 
@@ -121,7 +121,7 @@ size_t MemoryStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 	if (Length > 0)
 	{
-		Utility::MemUtils::Copy<byte>(m_streamData, m_streamPosition, Output, Offset, Length);
+		Utility::MemUtils::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
 		m_streamPosition += Length;
 	}
 
@@ -132,7 +132,7 @@ byte MemoryStream::ReadByte()
 {
 	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream length exceeded");
 	byte data = 0;
-	Utility::MemUtils::Copy<byte, byte>(m_streamData, m_streamPosition, data, 1);
+	Utility::MemUtils::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	m_streamPosition += 1;
 
 	return data;
@@ -140,7 +140,7 @@ byte MemoryStream::ReadByte()
 
 void MemoryStream::Reset()
 {
-	Utility::MemUtils::Clear<byte>(m_streamData, 0, m_streamData.size());
+	Utility::MemUtils::Clear(m_streamData, 0, m_streamData.size());
 	m_streamData.resize(0);
 	m_streamPosition = 0;
 }
@@ -170,7 +170,7 @@ void MemoryStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 	if (m_streamData.size() < len)
 		m_streamData.resize(len);
 
-	Utility::MemUtils::Copy<byte>(Input, Offset, m_streamData, m_streamPosition, Length);
+	Utility::MemUtils::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
 	m_streamPosition += Length;
 }
 
@@ -179,7 +179,7 @@ void MemoryStream::WriteByte(byte Value)
 	if (m_streamData.size() - m_streamPosition < 1)
 		m_streamData.resize(m_streamData.size() + 1);
 
-	Utility::MemUtils::Copy<byte, byte>(Value, m_streamData, m_streamPosition, 1);
+	Utility::MemUtils::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
 	m_streamPosition += 1;
 }
 

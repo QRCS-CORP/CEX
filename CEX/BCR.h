@@ -22,8 +22,8 @@
 // Written by John Underhill, January 6, 2014
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_BCR_H
-#define _CEX_BCR_H
+#ifndef CEX_BCR_H
+#define CEX_BCR_H
 
 #include "BlockCiphers.h"
 #include "BCG.h"
@@ -262,8 +262,7 @@ public:
 
 private:
 
-	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
-	std::vector<byte> GetByteRange(ulong Maximum);
+	ulong GetRanged(ulong Maximum, size_t Length);
 };
 
 NAMESPACE_PRNGEND

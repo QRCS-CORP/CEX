@@ -1,8 +1,8 @@
 #include "FFTQ12289N1024.h"
 #include "BCG.h"
-#include <future>
 #include "MemUtils.h"
 #include "PolyMath.h"
+
 #if defined(__AVX512__)
 #	include "UInt512.h"
 #elif defined(__AVX2__)
@@ -17,43 +17,7 @@ NAMESPACE_RINGLWE
 
 const std::string FFTQ12289N1024::Name = "Q12289N1024";
 
-const std::vector<ushort> FFTQ12289N1024::BitrevTable =
-{
-	0, 512, 256, 768, 128, 640, 384, 896, 64, 576, 320, 832, 192, 704, 448, 960, 32, 544, 288, 800, 160, 672, 416, 928, 96, 608, 352, 864, 224, 736, 480, 992,
-	16, 528, 272, 784, 144, 656, 400, 912, 80, 592, 336, 848, 208, 720, 464, 976, 48, 560, 304, 816, 176, 688, 432, 944, 112, 624, 368, 880, 240, 752, 496, 1008,
-	8, 520, 264, 776, 136, 648, 392, 904, 72, 584, 328, 840, 200, 712, 456, 968, 40, 552, 296, 808, 168, 680, 424, 936, 104, 616, 360, 872, 232, 744, 488, 1000,
-	24, 536, 280, 792, 152, 664, 408, 920, 88, 600, 344, 856, 216, 728, 472, 984, 56, 568, 312, 824, 184, 696, 440, 952, 120, 632, 376, 888, 248, 760, 504, 1016,
-	4, 516, 260, 772, 132, 644, 388, 900, 68, 580, 324, 836, 196, 708, 452, 964, 36, 548, 292, 804, 164, 676, 420, 932, 100, 612, 356, 868, 228, 740, 484, 996,
-	20, 532, 276, 788, 148, 660, 404, 916, 84, 596, 340, 852, 212, 724, 468, 980, 52, 564, 308, 820, 180, 692, 436, 948, 116, 628, 372, 884, 244, 756, 500, 1012,
-	12, 524, 268, 780, 140, 652, 396, 908, 76, 588, 332, 844, 204, 716, 460, 972, 44, 556, 300, 812, 172, 684, 428, 940, 108, 620, 364, 876, 236, 748, 492, 1004,
-	28, 540, 284, 796, 156, 668, 412, 924, 92, 604, 348, 860, 220, 732, 476, 988, 60, 572, 316, 828, 188, 700, 444, 956, 124, 636, 380, 892, 252, 764, 508, 1020,
-	2, 514, 258, 770, 130, 642, 386, 898, 66, 578, 322, 834, 194, 706, 450, 962, 34, 546, 290, 802, 162, 674, 418, 930, 98, 610, 354, 866, 226, 738, 482, 994,
-	18, 530, 274, 786, 146, 658, 402, 914, 82, 594, 338, 850, 210, 722, 466, 978, 50, 562, 306, 818, 178, 690, 434, 946, 114, 626, 370, 882, 242, 754, 498, 1010,
-	10, 522, 266, 778, 138, 650, 394, 906, 74, 586, 330, 842, 202, 714, 458, 970, 42, 554, 298, 810, 170, 682, 426, 938, 106, 618, 362, 874, 234, 746, 490, 1002,
-	26, 538, 282, 794, 154, 666, 410, 922, 90, 602, 346, 858, 218, 730, 474, 986, 58, 570, 314, 826, 186, 698, 442, 954, 122, 634, 378, 890, 250, 762, 506, 1018,
-	6, 518, 262, 774, 134, 646, 390, 902, 70, 582, 326, 838, 198, 710, 454, 966, 38, 550, 294, 806, 166, 678, 422, 934, 102, 614, 358, 870, 230, 742, 486, 998,
-	22, 534, 278, 790, 150, 662, 406, 918, 86, 598, 342, 854, 214, 726, 470, 982, 54, 566, 310, 822, 182, 694, 438, 950, 118, 630, 374, 886, 246, 758, 502, 1014,
-	14, 526, 270, 782, 142, 654, 398, 910, 78, 590, 334, 846, 206, 718, 462, 974, 46, 558, 302, 814, 174, 686, 430, 942, 110, 622, 366, 878, 238, 750, 494, 1006,
-	30, 542, 286, 798, 158, 670, 414, 926, 94, 606, 350, 862, 222, 734, 478, 990, 62, 574, 318, 830, 190, 702, 446, 958, 126, 638, 382, 894, 254, 766, 510, 1022,
-	1, 513, 257, 769, 129, 641, 385, 897, 65, 577, 321, 833, 193, 705, 449, 961, 33, 545, 289, 801, 161, 673, 417, 929, 97, 609, 353, 865, 225, 737, 481, 993,
-	17, 529, 273, 785, 145, 657, 401, 913, 81, 593, 337, 849, 209, 721, 465, 977, 49, 561, 305, 817, 177, 689, 433, 945, 113, 625, 369, 881, 241, 753, 497, 1009,
-	9, 521, 265, 777, 137, 649, 393, 905, 73, 585, 329, 841, 201, 713, 457, 969, 41, 553, 297, 809, 169, 681, 425, 937, 105, 617, 361, 873, 233, 745, 489, 1001,
-	25, 537, 281, 793, 153, 665, 409, 921, 89, 601, 345, 857, 217, 729, 473, 985, 57, 569, 313, 825, 185, 697, 441, 953, 121, 633, 377, 889, 249, 761, 505, 1017,
-	5, 517, 261, 773, 133, 645, 389, 901, 69, 581, 325, 837, 197, 709, 453, 965, 37, 549, 293, 805, 165, 677, 421, 933, 101, 613, 357, 869, 229, 741, 485, 997,
-	21, 533, 277, 789, 149, 661, 405, 917, 85, 597, 341, 853, 213, 725, 469, 981, 53, 565, 309, 821, 181, 693, 437, 949, 117, 629, 373, 885, 245, 757, 501, 1013,
-	13, 525, 269, 781, 141, 653, 397, 909, 77, 589, 333, 845, 205, 717, 461, 973, 45, 557, 301, 813, 173, 685, 429, 941, 109, 621, 365, 877, 237, 749, 493, 1005,
-	29, 541, 285, 797, 157, 669, 413, 925, 93, 605, 349, 861, 221, 733, 477, 989, 61, 573, 317, 829, 189, 701, 445, 957, 125, 637, 381, 893, 253, 765, 509, 1021,
-	3, 515, 259, 771, 131, 643, 387, 899, 67, 579, 323, 835, 195, 707, 451, 963, 35, 547, 291, 803, 163, 675, 419, 931, 99, 611, 355, 867, 227, 739, 483, 995,
-	19, 531, 275, 787, 147, 659, 403, 915, 83, 595, 339, 851, 211, 723, 467, 979, 51, 563, 307, 819, 179, 691, 435, 947, 115, 627, 371, 883, 243, 755, 499, 1011,
-	11, 523, 267, 779, 139, 651, 395, 907, 75, 587, 331, 843, 203, 715, 459, 971, 43, 555, 299, 811, 171, 683, 427, 939, 107, 619, 363, 875, 235, 747, 491, 1003,
-	27, 539, 283, 795, 155, 667, 411, 923, 91, 603, 347, 859, 219, 731, 475, 987, 59, 571, 315, 827, 187, 699, 443, 955, 123, 635, 379, 891, 251, 763, 507, 1019,
-	7, 519, 263, 775, 135, 647, 391, 903, 71, 583, 327, 839, 199, 711, 455, 967, 39, 551, 295, 807, 167, 679, 423, 935, 103, 615, 359, 871, 231, 743, 487, 999,
-	23, 535, 279, 791, 151, 663, 407, 919, 87, 599, 343, 855, 215, 727, 471, 983, 55, 567, 311, 823, 183, 695, 439, 951, 119, 631, 375, 887, 247, 759, 503, 1015,
-	15, 527, 271, 783, 143, 655, 399, 911, 79, 591, 335, 847, 207, 719, 463, 975, 47, 559, 303, 815, 175, 687, 431, 943, 111, 623, 367, 879, 239, 751, 495, 1007,
-	31, 543, 287, 799, 159, 671, 415, 927, 95, 607, 351, 863, 223, 735, 479, 991, 63, 575, 319, 831, 191, 703, 447, 959, 127, 639, 383, 895, 255, 767, 511, 1023
-};
-
-const std::vector<ushort> FFTQ12289N1024::OmegasMontgomery =
+const ushort FFTQ12289N1024::OmegasMontgomery[512] =
 {
 	4075, 6974, 7373, 7965, 3262, 5079, 522, 2169, 6364, 1018, 1041, 8775, 2344, 11011, 5574, 1973, 4536, 1050, 6844, 3860, 3818, 6118, 2683, 1190, 4789, 7822,
 	7540, 6752, 5456, 4449, 3789, 12142, 11973, 382, 3988, 468, 6843, 5339, 6196, 3710, 11316, 1254, 5435, 10930, 3998, 10256, 10367, 3879, 11889, 1728, 6137,
@@ -78,7 +42,7 @@ const std::vector<ushort> FFTQ12289N1024::OmegasMontgomery =
 	7917, 2174
 };
 
-const std::vector<ushort> FFTQ12289N1024::OmegasInvMontgomery =
+const ushort FFTQ12289N1024::OmegasInvMontgomery[512] =
 {
 	4075, 5315, 4324, 4916, 10120, 11767, 7210, 9027, 10316, 6715, 1278, 9945, 3514, 11248, 11271, 5925, 147, 8500, 7840, 6833, 5537, 4749, 4467, 7500, 11099,
 	9606, 6171, 8471, 8429, 5445, 11239, 7753, 9090, 12233, 5529, 5206, 10587, 1987, 11635, 3565, 5415, 8646, 6153, 6427, 7341, 6152, 10561, 400, 8410, 1922,
@@ -103,7 +67,7 @@ const std::vector<ushort> FFTQ12289N1024::OmegasInvMontgomery =
 	7393, 2366, 9238
 };
 
-const std::vector<ushort> FFTQ12289N1024::PsisBitrevMontgomery =
+const ushort FFTQ12289N1024::PsisBitrevMontgomery[1024] =
 {
 	4075, 6974, 7373, 7965, 3262, 5079, 522, 2169, 6364, 1018, 1041, 8775, 2344, 11011, 5574, 1973, 4536, 1050, 6844, 3860, 3818, 6118, 2683, 1190, 4789, 7822,
 	7540, 6752, 5456, 4449, 3789, 12142, 11973, 382, 3988, 468, 6843, 5339, 6196, 3710, 11316, 1254, 5435, 10930, 3998, 10256, 10367, 3879, 11889, 1728, 6137,
@@ -148,7 +112,7 @@ const std::vector<ushort> FFTQ12289N1024::PsisBitrevMontgomery =
 	11259, 10608, 3821, 6320, 4649, 6263, 2929
 };
 
-const std::vector<ushort> FFTQ12289N1024::PsisInvMontgomery =
+const ushort FFTQ12289N1024::PsisInvMontgomery[1024] =
 {
 	256, 10570, 1510, 7238, 1034, 7170, 6291, 7921, 11665, 3422, 4000, 2327, 2088, 5565, 795, 10647, 1521, 5484, 2539, 7385, 1055, 7173, 8047, 11683, 1669, 1994,
 	3796, 5809, 4341, 9398, 11876, 12230, 10525, 12037, 12253, 3506, 4012, 9351, 4847, 2448, 7372, 9831, 3160, 2207, 5582, 2553, 7387, 6322, 9681, 1383, 10731,
@@ -195,13 +159,154 @@ const std::vector<ushort> FFTQ12289N1024::PsisInvMontgomery =
 
 //~~~Public Functions~~~//
 
-void FFTQ12289N1024::DecodeA(std::vector<ushort> &Pk, std::vector<byte> &Seed, const std::vector<byte> &R)
+void FFTQ12289N1024::KeyGen(std::vector<byte> &PubKey, std::vector<ushort> &PriKey, Prng::IPrng* Rng, bool Parallel)
 {
-	FromBytes(Pk, R);
+	std::array<ushort, N> a;
+	std::array<ushort, N> e;
+	std::array<ushort, N> r;
+	std::array<ushort, N> pk;
+	std::vector<byte> seed(SEED_BYTES);
+	std::vector<byte> buf1(4 * N);
+	std::vector<byte> buf2(4 * N);
+
+	Rng->GetBytes(buf1);
+	Rng->GetBytes(buf2);
+	Rng->GetBytes(seed);
+
+#if defined(_OPENMP)
+	if (Parallel)
+	{
+#		pragma omp parallel
+		{
+#			pragma omp single nowait
+			{
+				PolyUniform(a, seed, Parallel);
+			}
+#			pragma omp single nowait
+			{
+				PolyGetNoise(PriKey, buf1);
+				FwdNTT(PriKey);
+			}
+#			pragma omp single nowait
+			{
+				PolyGetNoise(e, buf2);
+				FwdNTT(e);
+			}
+		}
+	}
+	else
+#endif
+	{
+		PolyUniform(a, seed, Parallel);
+
+		PolyGetNoise(PriKey, buf1);
+		FwdNTT(PriKey);
+
+		PolyGetNoise(e, buf2);
+		FwdNTT(e);
+	}
+
+	PolyPointwise(r, PriKey, a);
+	PolyAdd(pk, e, r);
+	EncodeA(PubKey, pk, seed);
+}
+
+void FFTQ12289N1024::SharedA(std::vector<byte> &Secret, const std::vector<ushort> &PriKey, const std::vector<byte> &Received, Digest::IDigest* Digest)
+{
+	std::array<ushort, N> v;
+	std::array<ushort, N> bp;
+	std::array<ushort, N> c;
+
+	DecodeB(bp, c, Received);
+	PolyPointwise(v, PriKey, bp);
+	Utility::PolyMath::BitReverse(v);
+	InvNTT(v);
+	Reconcile(Secret, v, c);
+
+	Digest->Update(Secret, 0, Secret.size());
+	Digest->Finalize(Secret, 0);
+}
+
+void FFTQ12289N1024::SharedB(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, Prng::IPrng *Rng, Digest::IDigest* Digest, bool Parallel)
+{
+	std::array<ushort, N> sp;
+	std::array<ushort, N> ep;
+	std::array<ushort, N> v;
+	std::array<ushort, N> a;
+	std::array<ushort, N> pka;
+	std::array<ushort, N> c;
+	std::array<ushort, N> epp;
+	std::array<ushort, N> bp;
+	std::array<ushort, N> tbp;
+	std::vector<byte> seed(SEED_BYTES);
+	std::vector<byte> buf1(4 * N);
+	std::vector<byte> buf2(4 * N);
+
+	DecodeA(pka, seed, Received);
+	Rng->GetBytes(buf1);
+	Rng->GetBytes(buf2);
+
+#if defined(_OPENMP)
+	if (Parallel)
+	{
+#		pragma omp parallel
+		{
+#			pragma omp single nowait
+			{
+				PolyUniform(a, seed, Parallel);
+			}
+#			pragma omp single nowait
+			{
+				PolyGetNoise(sp, buf1);
+				FwdNTT(sp);
+			}
+#			pragma omp single nowait
+			{
+				PolyGetNoise(ep, buf2);
+				FwdNTT(ep);
+			}
+		}
+	}
+	else
+#endif
+	{
+		PolyUniform(a, seed, Parallel);
+
+		PolyGetNoise(sp, buf1);
+		FwdNTT(sp);
+
+		PolyGetNoise(ep, buf2);
+		FwdNTT(ep);
+	}
+
+	PolyPointwise(bp, a, sp);
+	PolyAdd(tbp, bp, ep);
+
+	PolyPointwise(v, pka, sp);
+	Utility::PolyMath::BitReverse(v);
+	InvNTT(v);
+	Rng->GetBytes(buf1);
+	PolyGetNoise(epp, buf1);
+	PolyAdd(v, v, epp);
+
+	Rng->GetBytes(seed);
+	RecHelper(c, v, seed);
+	EncodeB(Send, tbp, c);
+	Reconcile(Secret, v, c);
+
+	Digest->Update(Secret, 0, Secret.size());
+	Digest->Finalize(Secret, 0);
+}
+
+//~~~Private Functions~~~//
+
+void FFTQ12289N1024::DecodeA(std::array<ushort, N> &PubKey, std::vector<byte> &Seed, const std::vector<byte> &R)
+{
+	FromBytes(PubKey, R);
 	Utility::MemUtils::Copy(R, POLY_BYTES, Seed, 0, SEED_BYTES);
 }
 
-void FFTQ12289N1024::DecodeB(std::vector<ushort> &B, std::vector<ushort> &C, const std::vector<byte> &R)
+void FFTQ12289N1024::DecodeB(std::array<ushort, N> &B, std::array<ushort, N> &C, const std::vector<byte> &R)
 {
 	FromBytes(B, R);
 
@@ -214,189 +319,23 @@ void FFTQ12289N1024::DecodeB(std::vector<ushort> &B, std::vector<ushort> &C, con
 	}
 }
 
-void FFTQ12289N1024::EncodeA(std::vector<byte> &R, const std::vector<ushort> &Pk, const std::vector<byte> &Seed)
+void FFTQ12289N1024::EncodeA(std::vector<byte> &R, const std::array<ushort, N> &PubKey, const std::vector<byte> &Seed)
 {
-	ToBytes(R, Pk);
+	ToBytes(R, PubKey);
 	Utility::MemUtils::Copy(Seed, 0, R, POLY_BYTES, SEED_BYTES);
 }
 
-void FFTQ12289N1024::EncodeB(std::vector<byte> &R, const std::vector<ushort> &B, const std::vector<ushort> &C)
+void FFTQ12289N1024::EncodeB(std::vector<byte> &R, const std::array<ushort, N> &B, const std::array<ushort, N> &C)
 {
 	ToBytes(R, B);
 
 	for (size_t i = 0; i < N / 4; i++)
+	{
 		R[POLY_BYTES + i] = C[4 * i] | (C[4 * i + 1] << 2) | (C[4 * i + 2] << 4) | (C[4 * i + 3] << 6);
-}
-
-void FFTQ12289N1024::GenA(std::vector<ushort> &A, const std::vector<byte> &Seed, bool Parallel)
-{
-	PolyUniform(A, Seed, Parallel);
-}
-
-void FFTQ12289N1024::KeyGen(std::vector<byte> &Send, std::vector<ushort> &Sk, Prng::IPrng* Rng, bool Parallel)
-{
-	std::vector<ushort> a(N);
-	std::vector<ushort> e(N);
-	std::vector<ushort> r(N);
-	std::vector<ushort> pk(N);
-	std::vector<byte> seed(SEED_BYTES);
-	std::vector<byte> buf1(4 * N);
-	std::vector<byte> buf2(4 * N);
-
-	Rng->GetBytes(buf1);
-	Rng->GetBytes(buf2);
-	Rng->GetBytes(seed);
-
-	if (Parallel)
-	{
-		auto fut1 = std::async(std::launch::async, [&a, &seed, Parallel]()
-		{
-			GenA(a, seed, Parallel);
-		});
-		auto fut2 = std::async(std::launch::async, [&Sk, &buf1]()
-		{
-			PolyGetNoise(Sk, buf1);
-			PolyNTT(Sk);
-		});
-		auto fut3 = std::async(std::launch::async, [&e, &buf2]()
-		{
-			PolyGetNoise(e, buf2);
-			PolyNTT(e);
-		});
-
-		fut1.get();
-		fut2.get();
-		fut3.get();
-	}
-	else
-	{
-		GenA(a, seed, Parallel);
-
-		PolyGetNoise(Sk, buf1);
-		PolyNTT(Sk);
-
-		PolyGetNoise(e, buf2);
-		PolyNTT(e);
-	}
-
-	PolyPointwise(r, Sk, a);
-	PolyAdd(pk, e, r);
-	EncodeA(Send, pk, seed);
-}
-
-void FFTQ12289N1024::SharedA(std::vector<byte> &SharedKey, const std::vector<ushort> &Sk, const std::vector<byte> &Received, Digest::IDigest* Digest)
-{
-	std::vector<ushort> v(N);
-	std::vector<ushort> bp(N);
-	std::vector<ushort> c(N);
-
-	DecodeB(bp, c, Received);
-	PolyPointwise(v, Sk, bp);
-	InvNTT(v);
-	Rec(SharedKey, v, c);
-
-	Digest->Update(SharedKey, 0, SharedKey.size());
-	Digest->Finalize(SharedKey, 0);
-}
-
-void FFTQ12289N1024::SharedB(std::vector<byte> &SharedKey, std::vector<byte> &Send, const std::vector<byte> &Received, Prng::IPrng *Rng, Digest::IDigest* Digest, bool Parallel)
-{
-	std::vector<ushort> sp(N);
-	std::vector<ushort> ep(N);
-	std::vector<ushort> v(N);
-	std::vector<ushort> a(N);
-	std::vector<ushort> pka(N);
-	std::vector<ushort> c(N);
-	std::vector<ushort> epp(N);
-	std::vector<ushort> bp(N);
-	std::vector<ushort> tbp(N);
-	std::vector<byte> seed(SEED_BYTES);
-	std::vector<byte> buf1(4 * N);
-	std::vector<byte> buf2(4 * N);
-
-	DecodeA(pka, seed, Received);
-	Rng->GetBytes(buf1);
-	Rng->GetBytes(buf2);
-
-	if (Parallel)
-	{
-		auto fut1 = std::async(std::launch::async, [&a, &seed, Parallel]()
-		{
-			GenA(a, seed, Parallel);
-		});
-		auto fut2 = std::async(std::launch::async, [&sp, &buf1]()
-		{
-			PolyGetNoise(sp, buf1);
-			PolyNTT(sp);
-		});
-		auto fut3 = std::async(std::launch::async, [&ep, &buf2]()
-		{
-			PolyGetNoise(ep, buf2);
-			PolyNTT(ep);
-		});
-
-		fut1.get();
-		fut2.get();
-		fut3.get();
-	}
-	else
-	{
-		GenA(a, seed, Parallel);
-
-		PolyGetNoise(sp, buf1);
-		PolyNTT(sp);
-
-		PolyGetNoise(ep, buf2);
-		PolyNTT(ep);
-	}
-
-	PolyPointwise(bp, a, sp);
-	PolyAdd(tbp, bp, ep);
-
-	PolyPointwise(v, pka, sp);
-	InvNTT(v);
-	Rng->GetBytes(buf1);
-	PolyGetNoise(epp, buf1);
-	PolyAdd(v, v, epp);
-
-	Rng->GetBytes(seed);
-	HelpRec(c, v, seed);
-	EncodeB(Send, tbp, c);
-	Rec(SharedKey, v, c);
-
-	Digest->Update(SharedKey, 0, SharedKey.size());
-	Digest->Finalize(SharedKey, 0);
-}
-
-//~~~Private Functions~~~//
-
-ushort FFTQ12289N1024::BarrettReduce(ushort A)
-{
-	uint u = ((uint)A * 5) >> 16;
-	u *= Q;
-	A -= u;
-
-	return A;
-}
-
-void FFTQ12289N1024::BitReverse(std::vector<ushort> &Poly)
-{
-	uint r;
-	ushort tmp;
-
-	for (size_t i = 0; i < Poly.size(); ++i)
-	{
-		r = BitrevTable[i];
-		if (i < r)
-		{
-			tmp = Poly[i];
-			Poly[i] = Poly[r];
-			Poly[r] = tmp;
-		}
 	}
 }
 
-void FFTQ12289N1024::FromBytes(std::vector<ushort> &R, const std::vector<byte> &A)
+void FFTQ12289N1024::FromBytes(std::array<ushort, N> &R, const std::vector<byte> &A)
 {
 	for (size_t i = 0; i < R.size() / 4; ++i)
 	{
@@ -407,128 +346,13 @@ void FFTQ12289N1024::FromBytes(std::vector<ushort> &R, const std::vector<byte> &
 	}
 }
 
-void FFTQ12289N1024::FwdNTT(std::vector<ushort> &A, const std::vector<ushort> &Omega)
-{
-	// TODO?: this could be vectorized, but would require some unrolling..
-	int i, start, j, jTwiddle, distance;
-	ushort temp, W;
-
-	// GS_bo_to_no; omegas need to be in Montgomery domain
-	for (i = 0; i < 10; i += 2)
-	{
-		// Even level
-		distance = (1 << i);
-
-		for (start = 0; start < distance; start++)
-		{
-			jTwiddle = 0;
-			for (j = start; j < N - 1; j += 2 * distance)
-			{
-				W = Omega[jTwiddle++];
-				temp = A[j];
-				A[j] = (temp + A[j + distance]); // Omit reduction (be lazy)
-				A[j + distance] = MontgomeryReduce(W * (((uint)temp + (3 * Q)) - A[j + distance]));
-			}
-		}
-
-		// Odd level
-		distance <<= 1;
-		for (start = 0; start < distance; start++)
-		{
-			jTwiddle = 0;
-			for (j = start; j < N - 1; j += 2 * distance)
-			{
-				W = Omega[jTwiddle++];
-				temp = A[j];
-				A[j] = BarrettReduce((temp + A[j + distance]));
-				A[j + distance] = MontgomeryReduce(W * (((uint)temp + (3 * Q)) - A[j + distance]));
-			}
-		}
-	}
-}
-
-void FFTQ12289N1024::HelpRec(std::vector<ushort> &C, const std::vector<ushort> &V, std::vector<byte> &Random)
-{
-#if defined(__AVX512__)
-	PolyMath::HelpRec<Numeric::UInt512>(C, V, Random, Q);
-#elif defined(__AVX2__)
-	PolyMath::HelpRec<Numeric::UInt256>(C, V, Random, Q);
-#elif defined(__AVX__)
-	PolyMath::HelpRec<Numeric::UInt128>(C, V, Random, Q);
-#else
-	PolyMath::HelpRec<int>(C, V, Random, Q);
-#endif
-}
-
-void FFTQ12289N1024::InvNTT(std::vector<ushort> &R)
-{
-	BitReverse(R);
-	FwdNTT(R, OmegasInvMontgomery);
-	PolyMul(R, PsisInvMontgomery);
-}
-
-ushort FFTQ12289N1024::MontgomeryReduce(uint A)
-{
-	uint u = (A * QINV);
-	u &= ((1 << RLOG) - 1);
-	u *= Q;
-	A = A + u;
-
-	return A >> 18;
-}
-
-void FFTQ12289N1024::PolyAdd(std::vector<ushort> &R, const std::vector<ushort> &A, const std::vector<ushort> &B)
-{
-	for (size_t i = 0; i < R.size(); ++i)
-		R[i] = BarrettReduce(A[i] + B[i]);
-}
-
-void FFTQ12289N1024::PolyGetNoise(std::vector<ushort> &R, std::vector<byte> &Random)
-{
-#if defined(__AVX512__)
-	PolyMath::GetNoise<Numeric::UInt512>(R, Random, Q);
-#elif defined(__AVX2__)
-	PolyMath::GetNoise<Numeric::UInt256>(R, Random, Q);
-#elif defined(__AVX__)
-	PolyMath::GetNoise<Numeric::UInt128>(R, Random, Q);
-#else
-	PolyMath::GetNoise<uint>(R, Random, Q);
-#endif
-}
-
-void FFTQ12289N1024::PolyMul(std::vector<ushort> &Poly, const std::vector<ushort> &Factors)
-{
-	for (size_t i = 0; i < Poly.size(); ++i)
-		Poly[i] = MontgomeryReduce((Poly[i] * Factors[i]));
-}
-
-void FFTQ12289N1024::PolyNTT(std::vector<ushort> &R)
-{
-	PolyMul(R, PsisBitrevMontgomery);
-	FwdNTT(R, OmegasMontgomery);
-}
-
-void FFTQ12289N1024::PolyPointwise(std::vector<ushort> &R, const std::vector<ushort> &A, const std::vector<ushort> &B)
-{
-	ushort t;
-
-	for (size_t i = 0; i < N; i++)
-	{
-		// t is now in Montgomery domain
-		t = MontgomeryReduce(3186 * B[i]);
-		// R[i] is back in normal domain
-		R[i] = MontgomeryReduce(A[i] * t);
-	}
-}
-
-void FFTQ12289N1024::PolyUniform(std::vector<ushort> &A, const std::vector<byte> &Seed, bool Parallel)
+void FFTQ12289N1024::PolyUniform(std::array<ushort, N> &A, const std::vector<byte> &Seed, bool Parallel)
 {
 	size_t ctr = 0;
 	size_t pos = 0;
 	ushort val;
 	size_t bufLen = 2 * N * sizeof(ushort);
 
-	// AES128/CTR-BE generator
 	Drbg::BCG eng(Enumeration::BlockCiphers::Rijndael);
 
 	if (Parallel)
@@ -553,7 +377,9 @@ void FFTQ12289N1024::PolyUniform(std::vector<ushort> &A, const std::vector<byte>
 		// 0x3fff/16393 - Specialized for q = 12889
 		val = (buf[pos] | ((ushort)buf[pos + 1] << 8)) & 0x3fff;
 		if (val < Q)
+		{
 			A[ctr++] = val;
+		}
 
 		pos += 2;
 		if (pos >= buf.size())
@@ -564,20 +390,33 @@ void FFTQ12289N1024::PolyUniform(std::vector<ushort> &A, const std::vector<byte>
 	}
 }
 
-void FFTQ12289N1024::Rec(std::vector<byte> &Key, const std::vector<ushort> &V, const std::vector<ushort> &C)
+void FFTQ12289N1024::RecHelper(std::array<ushort, N> &C, const std::array<ushort, N> &V, std::vector<byte> &Random)
 {
 #if defined(__AVX512__)
-	PolyMath::Rec<Numeric::UInt512>(Key, V, C, Q);
+	HelpRec<Numeric::UInt512, std::array<ushort, N>, std::vector<byte>>(C, V, Random, Q);
 #elif defined(__AVX2__)
-	PolyMath::Rec<Numeric::UInt256>(Key, V, C, Q);
+	HelpRec<Numeric::UInt256, std::array<ushort, N>, std::vector<byte>>(C, V, Random, Q);
 #elif defined(__AVX__)
-	PolyMath::Rec<Numeric::UInt128>(Key, V, C, Q);
+	HelpRec<Numeric::UInt128, std::array<ushort, N>, std::vector<byte>>(C, V, Random, Q);
 #else
-	PolyMath::Rec<int>(Key, V, C, Q);
+	HelpRec<int, std::array<ushort, N>, std::vector<byte>>(C, V, Random, Q);
 #endif
 }
 
-void FFTQ12289N1024::ToBytes(std::vector<byte> &R, const std::vector<ushort> &Poly)
+void FFTQ12289N1024::Reconcile(std::vector<byte> &Key, const std::array<ushort, N> &V, const std::array<ushort, N> &C)
+{
+#if defined(__AVX512__)
+	Rec<Numeric::UInt512, std::vector<byte>, std::array<ushort, N>>(Key, V, C, Q);
+#elif defined(__AVX2__)
+	Rec<Numeric::UInt256, std::vector<byte>, std::array<ushort, N>>(Key, V, C, Q);
+#elif defined(__AVX__)
+	Rec<Numeric::UInt128, std::vector<byte>, std::array<ushort, N>>(Key, V, C, Q);
+#else
+	Rec<int, std::vector<byte>, std::array<ushort, N>>(Key, V, C, Q);
+#endif
+}
+
+void FFTQ12289N1024::ToBytes(std::vector<byte> &R, const std::array<ushort, N> &Poly)
 {
 	ushort t0, t1, t2, t3, m;
 	short c;

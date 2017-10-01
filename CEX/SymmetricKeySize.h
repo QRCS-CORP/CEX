@@ -1,5 +1,5 @@
-#ifndef _CEX_SYMMETRICKEYSIZE_H
-#define _CEX_SYMMETRICKEYSIZE_H
+#ifndef CEX_SYMMETRICKEYSIZE_H
+#define CEX_SYMMETRICKEYSIZE_H
 
 #include "CexDomain.h"
 
@@ -91,10 +91,10 @@ public:
 	/// Compare this object instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Object to compare</param>
+	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(SymmetricKeySize &Obj);
+	bool Equals(SymmetricKeySize &Input);
 
 	/// <summary>
 	/// Get the hash code for this object

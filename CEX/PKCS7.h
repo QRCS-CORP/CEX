@@ -1,5 +1,5 @@
-#ifndef _CEX_PKCS7_H
-#define _CEX_PKCS7_H
+#ifndef CEX_PKCS7_H
+#define CEX_PKCS7_H
 
 #include "IPadding.h"
 

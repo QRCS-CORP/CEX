@@ -175,23 +175,16 @@ void THX::Destroy()
 		m_kdfKeySize = 0;
 		m_rndCount = 0;
 
-		try
-		{
-			Utility::IntUtils::ClearVector(m_expKey);
-			Utility::IntUtils::ClearVector(m_sBox);
-			Utility::IntUtils::ClearVector(m_kdfInfo);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_legalRounds);
+		Utility::IntUtils::ClearVector(m_expKey);
+		Utility::IntUtils::ClearVector(m_sBox);
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_legalRounds);
 
-			if (m_kdfEngine != 0 && m_destroyEngine)
-				delete m_kdfEngine;
+		if (m_kdfEngine != 0 && m_destroyEngine)
+			delete m_kdfEngine;
 
-			m_destroyEngine = false;
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoSymmetricCipherException("THX:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		m_destroyEngine = false;
 	}
 }
 
@@ -298,10 +291,10 @@ void THX::SecureExpand(const std::vector<byte> &Key)
 		// seperate salt and key
 		m_kdfKeySize = m_kdfEngine->BlockSize();
 		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		Utility::MemUtils::Copy<byte>(Key, 0, kdfKey, 0, m_kdfKeySize);
+		Utility::MemUtils::Copy(Key, 0, kdfKey, 0, m_kdfKeySize);
 		size_t saltSize = Key.size() - m_kdfKeySize;
 		std::vector<byte> kdfSalt(saltSize, 0);
-		Utility::MemUtils::Copy<byte>(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
+		Utility::MemUtils::Copy(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
 		// info can be null
 		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
 	}

@@ -24,8 +24,8 @@
 // Updated April 19, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_KDF2_H
-#define _CEX_KDF2_H
+#ifndef CEX_KDF2_H
+#define CEX_KDF2_H
 
 #include "IKdf.h"
 #include "IDigest.h"

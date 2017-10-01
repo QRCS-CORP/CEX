@@ -1,5 +1,5 @@
-#ifndef _CEX_PRNGS_H
-#define _CEX_PRNGS_H
+#ifndef CEX_PRNGS_H
+#define CEX_PRNGS_H
 
 #include "CexDomain.h"
 

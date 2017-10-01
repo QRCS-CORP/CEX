@@ -25,8 +25,8 @@
 // Contact: develop@vtdev.com
 
 
-#ifndef _CEX_BCG_H
-#define _CEX_BCG_H
+#ifndef CEX_BCG_H
+#define CEX_BCG_H
 
 #include "IDrbg.h"
 #include "BlockCiphers.h"

@@ -38,7 +38,9 @@ void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void
 	}
 
 	for (size_t i = 0; i < futures.size(); ++i)
+	{
 		futures[i].wait();
+	}
 
 	futures.clear();
 #endif

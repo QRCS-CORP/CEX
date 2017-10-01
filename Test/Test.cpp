@@ -1,5 +1,20 @@
-// ### CEX 1.0.0.3 ###
-
+// HISTORY
+//
+// ### CEX 1.0.1.3 ###
+// Release 1.0.1.3, October 1, 2017
+// Pre-release of 1.0.0.4 spawned by bug fix
+// Importance: Critical
+// Bug found in RingLWE FFTQ12289N1024::GetNoise template
+// Status: Fixed, and classes rewritten during optimization and security compliance review
+//
+// Release 1.0.0.4, On Schedule (eta. is mid October 2017)
+// Added McEliece public key crypto system	-done
+// Added Keccak1024 message digest	-done
+// Added Poly1305 Mac and ChaCha/Poly1305 AEAD mode -todo
+// Reworked public classes/interfaces for POD data types in preparation for DLL interface -ongoing..
+// Complete preformance optimization cycle; strategic memory allocation (stack or heap), and review class/function variables -ongoing..
+// Complete security compliance cycle; all code reviewed and updated to MISRA/SEI-CERT security recommendations -ongoing..
+//
 // Release 1.0.0.3, June 30, 2017
 // Added asymmetric cipher interfaces and framework
 // Added RingLWE asymmetric cipher
@@ -50,21 +65,87 @@
 // RDP/ECP/CJP provider -done
 // Secure Key/mem		-done
 // CipherStream rewrite	-done
-// KeyGenerator rewrite	-dome
+// KeyGenerator rewrite	-dome	
 
+// TRAJECTORY
+//
+// ***JSF/MISRA/SEI CERT Check List***
+// **Local Changes**
+// do not cast between different size integers (unless it would seriously/unavoidably impede performance)
+// ensure that operations on signed integers do not result in overflow
+// ensure that division and remainder operations do not result in divide-by-zero errors
+// do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand
+// organize struct and class variable declarations by size large to small (avoid unnecessary padding)
+// make all functions const correct
+// reduce the number of class level variables(consider performance vs safety)
+// make as many class functions static as possible
+// reduce the number of function parameters whenever possible
+// replace macros with inline functions
+// mark single parameter constructors as explicit
+// replace all instances of pointer math (and C* pointers)
+//
+// **Global Changes**
+// all hex codes should be expressed in capitals, ex. 0xFF
+// enum members should all be byte sized and sequential, i.e. 1,2,3.. (promote jump lists)
+// delete unused default/copy/move constructors
+// move from C style pointers (*) to std::unique_ptr
+// use std::static_assert for constant eveluatons (debug)
+// replace all C style casts with C++ equivalents, ex. static_cast<>()
+// add GNU header to each header file
+// remove unused macros and defines in CEXCommon.h
+// reduce the number of global includes, and replace all C headers with C++ versions
+// prefer global static const integers to #define
+// replace all macros (release build, assert excepted) with inline/templated functions
 
+// ***Optimization Cycle 1: Sept 26, 2017***
+// Performance of various algorithms pre/post memory and code optimizations
+//
+// **Stage 1 (baseline)
+// *asymmetric ciphers in operations per second
+// RingLWE: Gen 14285/17345, Enc 10000/12547, Dec 33333
+// McEliece: Gen 12, Enc 7692, Dec 4000
+// *symmetric algorithms in MB per second
+// AHX: ECB 11299, CTR 426/7633, ICM 172/8064, CBC 715/9803, CFB 352/2277, OFB 307, EAX 205/616, OCB 107/1013, GCM 311/1060
+// SHX: ECB 2418
+// THX: ECB 1002
+// ChaCha: 6097
+// Salsa: 6622
+// Blake2: 512- 677/1831, 256- 376/1636
+// Keccak: 1024- 79/314, 512- 155/400, 256- 294/1152
+// SHA2: 512- 335/1312, 256- 193/788
+// Skein: 1024- 350/1412, 512- 236/1204, 256- 221/929
+// Memory: LB Clear 6993, Clear 10309, LB Copy 4761, Copy 10416, LB Memset 6896, Memset 10309, LB XOR 4524, XOR 1329
+//
+// **Stage 2 (post optimization)
+// *asymmetric ciphers in operations per second
+// RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000
+// McEliece: Gen 12, Enc 12500, Dec 4577
+// *symmetric algorithms in MB per second
+// AHX: CTR , CBC , EAX , OFB , GCM
+// SHX: CTR , CBC , EAX , OFB , GCM
+// THX: CTR , CBC , EAX , OFB , GCM
+// ChaCha: 
+// Salsa: 
+// Blake2: 512- , 256- 
+// Keccak: 1024- , 512- , 256- 
+// SHA2: 512- , 256- 
+// Skein: 1024- , 512- , 256- 
+// Memory: 
+//
 // *** 1.1.0.0 RoadMap ***
 //
-// RingLWE				-added
-// McEliece				-?
-// GMSS					-?
-// RSA-Sig				-?
-// Networking			-?
-// TLS-KEX				-?
-// ASYM-KEX				-?
-// DLL API				-?
-// AVX512 integration	-started
-
+// AVX512 integration		-started
+// RingLWE					-added
+// McEliece					-?
+// RSA						-?
+// ModuleLWE				-?
+// RSA-Sig					-?
+// GMSS						-?
+// TLS-KEX					-?
+// P2P-KEX					-?
+// DLL API					-?
+// Android/Linux support	-?
+// expand cpu/simd support	-?
 
 #include <algorithm>
 #include <cstdio>
@@ -99,6 +180,7 @@
 #include "../Test/HXCipherTest.h"
 #include "../Test/ITest.h"
 #include "../Test/MacStreamTest.h"
+#include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
@@ -176,11 +258,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.3: CEX Library in C++  *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.1.3: CEX Library in C++  *");
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.3 (A3)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      July 04, 2017                  *");
+	ConsoleUtils::WriteLine("* Date:      October 01, 2017                *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -231,6 +313,18 @@ int main()
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 
+	//for (size_t i = 0; i < 4; ++i)
+	//RunTest(new AsymmetricSpeedTest());
+	// McEliece Baseline
+	// original
+	// Gen: 16, Enc: 9090, Dec: 3484
+	// optimization 1
+	// Gen: 17, Enc: 9523, Dec: 3717
+	// optimization 2
+	// Gen: 16, Enc: 11111, Dec: 4000
+	// optimization 3
+	// Gen: , Enc: , Dec: 
+
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
 	PrintHeader("An error has occurred! Press any key to close..", "");
@@ -262,7 +356,7 @@ int main()
 	if (detect.AESNI())
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
 	else
-		PrintHeader("AES-NI intrinsics support has not been detected on this system.");
+		PrintHeader("AES-NI intrinsics support was not detected on this system.");
 	PrintHeader("", "");
 
 	if (detect.AVX2())
@@ -362,6 +456,7 @@ int main()
 			RunTest(new SimdWrapperTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
 			RunTest(new RingLWETest());
+			RunTest(new McElieceTest());
 		}
 		else
 		{

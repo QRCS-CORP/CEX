@@ -23,8 +23,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_EAX_H
-#define _CEX_EAX_H
+#ifndef CEX_EAX_H
+#define CEX_EAX_H
 
 #include "IAeadMode.h"
 #include "CMAC.h"
@@ -33,7 +33,7 @@
 NAMESPACE_MODE
 
 /// <summary>
-/// An Encrypt and Authenticate AEAD Block Cipher Mode (EAX) 
+/// An Encrypt and Authenticate AEAD Block Cipher Mode
 /// </summary> 
 /// 
 /// <example>

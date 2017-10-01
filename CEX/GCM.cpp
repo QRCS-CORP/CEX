@@ -9,9 +9,6 @@ const std::string GCM::CLASS_NAME("GCM");
 
 //~~~Properties~~~//
 
-
-//~~~Properties~~~//
-
 bool &GCM::AutoIncrement()
 {
 	return m_autoIncrement;
@@ -170,21 +167,22 @@ void GCM::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void GCM::Destroy()
 {
-	m_aadLoaded = false;
-	m_aadPreserve = false;
-	m_aadSize = 0;
-	m_autoIncrement = false;
-	m_cipherType = BlockCiphers::None;
-	m_isDestroyed = true;
-	m_isEncryption = false;
-	m_isFinalized = false;
-	m_isInitialized = false;
-	m_msgSize = 0;
-	m_parallelProfile.Reset();
-
-	try
+	if (!m_isDestroyed)
 	{
-		m_gcmHash->Reset();
+		m_isDestroyed = true;
+		m_aadLoaded = false;
+		m_aadPreserve = false;
+		m_aadSize = 0;
+		m_autoIncrement = false;
+		m_cipherType = BlockCiphers::None;
+		m_isEncryption = false;
+		m_isFinalized = false;
+		m_isInitialized = false;
+		m_msgSize = 0;
+		m_parallelProfile.Reset();
+
+		if (m_gcmHash)
+			m_gcmHash->Reset();
 
 		Utility::IntUtils::ClearVector(m_aadData);
 		Utility::IntUtils::ClearVector(m_gcmNonce);
@@ -196,14 +194,10 @@ void GCM::Destroy()
 		if (m_destroyEngine)
 		{
 			m_destroyEngine = false;
-
 			if (m_cipherMode.IsInitialized())
 				m_cipherMode.Destroy();
+
 		}
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoCipherModeException("GCM:Destroy", "Could not clear all variables!", std::string(ex.what()));
 	}
 }
 
@@ -225,7 +219,7 @@ void GCM::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t 
 		throw CryptoCipherModeException("GCM:Finalize", "The length must be minimum of 12 and maximum of MAC code size!");
 
 	CalculateMac();
-	Utility::MemUtils::Copy<byte>(m_msgTag, 0, Output, Offset, Length);
+	Utility::MemUtils::Copy(m_msgTag, 0, Output, Offset, Length);
 }
 
 void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -257,7 +251,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		const std::vector<byte> ZEROES(BLOCK_SIZE);
 		m_cipherMode.Engine()->Transform(ZEROES, 0, tmpH, 0);
 
-		std::vector<ulong> gKey = //505,807
+		std::vector<ulong> gKey = 
 		{
 			Utility::IntUtils::BeBytesTo64(tmpH, 0),
 			Utility::IntUtils::BeBytesTo64(tmpH, 8)
@@ -290,7 +284,7 @@ void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	if (m_isFinalized)
 	{
-		Utility::MemUtils::Clear<byte>(m_msgTag, 0, m_msgTag.size());
+		Utility::MemUtils::Clear(m_msgTag, 0, m_msgTag.size());
 		m_isFinalized = false;
 	}
 
@@ -317,7 +311,7 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 		throw CryptoSymmetricCipherException("GCM:SetAssociatedData", "The associated data has already been set!");
 
 	m_aadData.resize(Length);
-	Utility::MemUtils::Copy<byte>(Input, Offset, m_aadData, 0, Length);
+	Utility::MemUtils::Copy(Input, Offset, m_aadData, 0, Length);
 	m_gcmHash->ProcessSegment(Input, Offset, m_checkSum, Length);
 	m_aadSize = Length;
 	m_aadLoaded = true;
@@ -354,14 +348,16 @@ bool GCM::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 	if (!m_isFinalized)
 		CalculateMac();
 
-	return Utility::IntUtils::Compare<byte>(m_msgTag, 0, Input, Offset, Length);
+	return Utility::IntUtils::Compare(m_msgTag, 0, Input, Offset, Length);
 }
+
+//~~~Private Functions~~~//
 
 void GCM::CalculateMac()
 {
 	m_gcmHash->FinalizeBlock(m_checkSum, m_aadSize, m_msgSize);
-	Utility::MemUtils::XorBlock<byte>(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
-	Utility::MemUtils::COPY128<byte, byte>(m_checkSum, 0, m_msgTag, 0);
+	Utility::MemUtils::XorBlock(m_gcmVector, 0, m_checkSum, 0, BLOCK_SIZE);
+	Utility::MemUtils::COPY128(m_checkSum, 0, m_msgTag, 0);
 	Reset();
 
 	if (m_autoIncrement)
@@ -403,7 +399,7 @@ void GCM::Reset()
 	if (!m_aadPreserve)
 	{
 		if (m_aadSize != 0)
-			Utility::MemUtils::Clear<byte>(m_aadData, 0, m_aadData.size());
+			Utility::MemUtils::Clear(m_aadData, 0, m_aadData.size());
 
 		m_aadLoaded = false;
 		m_aadSize = 0;
@@ -411,8 +407,8 @@ void GCM::Reset()
 
 	m_gcmHash->Reset();
 	m_isInitialized = false;
-	Utility::MemUtils::Clear<byte>(m_gcmVector, 0, m_gcmVector.size());
-	Utility::MemUtils::Clear<byte>(m_checkSum, 0, m_checkSum.size());
+	Utility::MemUtils::Clear(m_gcmVector, 0, m_gcmVector.size());
+	Utility::MemUtils::Clear(m_checkSum, 0, m_checkSum.size());
 	m_msgSize = 0;
 }
 

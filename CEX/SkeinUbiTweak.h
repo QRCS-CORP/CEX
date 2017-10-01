@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_SKEINUBITWEAK_H
-#define _CEX_SKEINUBITWEAK_H
+#ifndef CEX_SKEINUBITWEAK_H
+#define CEX_SKEINUBITWEAK_H
 
 #include "CexDomain.h"
 #include "CryptoDigestException.h"

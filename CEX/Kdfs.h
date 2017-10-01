@@ -1,5 +1,5 @@
-#ifndef _CEX_KDFS_H
-#define _CEX_KDFS_H
+#ifndef CEX_KDFS_H
+#define CEX_KDFS_H
 
 #include "CexDomain.h"
 

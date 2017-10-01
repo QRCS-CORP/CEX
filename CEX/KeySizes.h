@@ -1,5 +1,5 @@
-#ifndef _CEX_KEYSIZES_H
-#define _CEX_KEYSIZES_H
+#ifndef CEX_KEYSIZES_H
+#define CEX_KEYSIZES_H
 
 #include "CexDomain.h"
 

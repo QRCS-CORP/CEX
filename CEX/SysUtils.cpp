@@ -4,43 +4,45 @@ NAMESPACE_UTILITY
 
 bool SysUtils::TMR_RDTSC = false;
 
-std::vector<char> SysUtils::ComputerName()
+std::string SysUtils::ComputerName()
 {
+	std::string ret("");
+
 #if defined(CEX_OS_WINDOWS)
-
-	std::vector<char> retName(0);
-
 	try
 	{
 		TCHAR buffer[MAX_COMPUTERNAME_LENGTH + 1];
-		DWORD buffLen = sizeof(buffer) / sizeof(buffer[0]);
+		DWORD buffLen = sizeof(buffer) / sizeof(TCHAR);
 		GetComputerName(buffer, &buffLen);
-		retName.resize(buffLen);
-		memcpy(&retName[0], &buffer[0], buffLen);
+
+#if defined(UNICODE)
+		std::wstring cpy((wchar_t*)buffer, buffLen);
+		ret.assign(cpy.begin(), cpy.end());
+#else
+		ret.assign((char*)buffer, buffLen);
+#endif
 	}
 	catch (...) {}
 
-	return retName;
-
 #elif defined(CEX_OS_POSIX)
-
-	std::vector<char> retName(0);
 
 	try
 	{
 		char buffer[HOST_NAME_MAX];
 		gethostname(buffer, HOST_NAME_MAX);
-		size_t buffLen = sizeof(buffer) / sizeof(buffer[0]);
-		retName.resize(buffLen);
-		memcpy(&retName[0], &buffer[0], buffLen);
+
+#if defined(UNICODE)
+		std::wstring cpy((wchar_t*)buffer, buffLen);
+		ret.assign(cpy.begin(), cpy.end());
+#else
+		ret.assign((char*)buffer, buffLen);
+#endif
 	}
 	catch (...) {}
 
-	return retName;
-
-#else
-	return std::vector<char>(0);
 #endif
+	
+	return ret;
 }
 
 std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
@@ -146,6 +148,7 @@ ulong SysUtils::MemoryPhysicalTotal()
 		sysinfo(&memInfo);
 		totalPhysMem = memInfo.totalram;
 		totalPhysMem *= memInfo.mem_unit;
+
 		return static_cast<ulong>(totalPhysMem);
 	}
 	catch (...) 
@@ -168,6 +171,7 @@ ulong SysUtils::MemoryPhysicalUsed()
 	{
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
+
 		return static_cast<ulong>(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
 	}
 	catch (...) 
@@ -205,6 +209,7 @@ ulong SysUtils::MemoryVirtualTotal()
 	{
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
+
 		return static_cast<ulong>(memInfo.ullTotalPageFile);
 	}
 	catch (...) 
@@ -243,6 +248,7 @@ ulong SysUtils::MemoryVirtualUsed()
 	{
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
+
 		return static_cast<ulong>(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
 	}
 	catch (...) 
@@ -313,43 +319,45 @@ uint SysUtils::ProcessId()
 #endif
 }
 
-std::vector<char> SysUtils::UserName()
+std::string SysUtils::UserName()
 {
-#if defined(CEX_OS_WINDOWS)
+	std::string ret("");
 
-	std::vector<char> retName(0);
+#if defined(CEX_OS_WINDOWS)
 
 	try
 	{
 		TCHAR buffer[UNLEN + 1];
-		DWORD buffLen = sizeof(buffer) / sizeof(buffer[0]);
+		DWORD buffLen = sizeof(buffer) / sizeof(TCHAR);
 		GetUserName(buffer, &buffLen);
-		retName.resize(buffLen);
-		memcpy(&retName[0], &buffer[0], buffLen);
+#if defined(UNICODE)
+		std::wstring cpy((wchar_t*)buffer, buffLen);
+		ret.assign(cpy.begin(), cpy.end());
+#else
+		ret.assign((char*)buffer, buffLen);
+#endif
 	}
 	catch (...) {}
 
-	return retName;
-
 #elif defined(CEX_OS_POSIX)
-
-	std::vector<char> retName(0);
 
 	try
 	{
 		char buffer[LOGIN_NAME_MAX];
 		getlogin_r(buffer, LOGIN_NAME_MAX);
-		size_t buffLen = sizeof(buffer) / sizeof(buffer[0]);
-		retName.resize(buffLen);
-		memcpy(&retName[0], &buffer[0], buffLen);
+		size_t buffLen = sizeof(buffer) / sizeof(char);
+#if defined(UNICODE)
+		std::wstring cpy((wchar_t*)buffer, buffLen);
+		ret.assign(cpy.begin(), cpy.end());
+#else
+		ret.assign((char*)buffer, buffLen);
+#endif
 	}
 	catch (...) {}
 
-	return retName;
-
-#else
-	return std::vector<char>(0);
 #endif
+
+	return ret;
 }
 
 ulong SysUtils::TimeCurrentNS()
@@ -401,6 +409,7 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
+
 		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
@@ -465,13 +474,16 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		try
 		{
 			if (id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
+			{
 				return static_cast<ulong>(ts.tv_sec + ts.tv_nsec);
+			}
 		}
 		catch (...)
 		{
 			std::chrono::high_resolution_clock::time_point epoch;
 			auto now = std::chrono::high_resolution_clock::now();
 			auto elapsed = now - epoch;
+
 			return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 		}
 	}
@@ -483,6 +495,7 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 	{
 		struct timeval tm;
 		gettimeofday(&tm, NULL);
+
 		return static_cast<ulong>(tm.tv_sec + tm.tv_usec);
 	}
 	catch (...)
@@ -490,6 +503,7 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
+
 		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
@@ -497,6 +511,7 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 	std::chrono::high_resolution_clock::time_point epoch;
 	auto now = std::chrono::high_resolution_clock::now();
 	auto elapsed = now - epoch;
+
 	return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 #endif
 }
@@ -515,6 +530,7 @@ ulong SysUtils::TimeSinceBoot()
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
+
 		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
@@ -570,18 +586,21 @@ std::string SysUtils::Version()
 			PIP_ADAPTER_INFO pAdapter = NULL;
 			ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
-
 			pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC(sizeof(IP_ADAPTER_INFO));
 
 			if (pAdapterInfo == NULL)
+			{
 				return serInf;
+			}
 
 			if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
 			{
 				FREE(pAdapterInfo);
 				pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC(ulOutBufLen);
 				if (pAdapterInfo == NULL)
+				{
 					return serInf;
+				}
 			}
 
 			if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == NO_ERROR)
@@ -596,7 +615,9 @@ std::string SysUtils::Version()
 			}
 
 			if (pAdapterInfo)
+			{
 				FREE(pAdapterInfo);
+			}
 		}
 		catch (...) {}
 
@@ -648,7 +669,9 @@ std::string SysUtils::Version()
 				do
 				{
 					if (++heapCount > HEAP_LISTS_MAX)
+					{
 						break;
+					}
 
 					HEAPENTRY32 heapEntry;
 					heapEntry.dwSize = sizeof(HEAPENTRY32);
@@ -660,12 +683,16 @@ std::string SysUtils::Version()
 						do
 						{
 							if (heapObjs++ > HEAP_OBJS_PER_LIST)
+							{
 								break;
+							}
 
 							serInf.push_back(heapEntry);
-						} while (Heap32Next(&heapEntry));
+						} 
+						while (Heap32Next(&heapEntry));
 					}
-				} while (Heap32ListNext(snapshot, &heapList));
+				} 
+				while (Heap32ListNext(snapshot, &heapList));
 			}
 		}
 		catch (...) {}
@@ -681,6 +708,7 @@ std::string SysUtils::Version()
 		{
 			TCHAR buffer[(4 * 26) + 1] = { 0 };
 			GetLogicalDriveStrings(sizeof(buffer) / sizeof(TCHAR), buffer);
+
 			for (LPTSTR lpDrive = buffer; *lpDrive != 0; lpDrive += 4)
 			{
 				std::wstring ws = lpDrive;
@@ -714,8 +742,8 @@ std::string SysUtils::Version()
 		{
 			MODULEENTRY32 info;
 			info.dwSize = sizeof(MODULEENTRY32);
-
 			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
+
 			if (Module32First(snapshot, &info))
 			{
 				do
@@ -740,40 +768,72 @@ std::string SysUtils::Version()
 			if (IsWindowsServer())
 			{
 				if (IsWindowsVersionOrGreater(10, 0, 0))
+				{
 					return "Windows Server 2016";
+				}
 				else if (IsWindowsVersionOrGreater(6, 3, 0))
+				{
 					return "Windows Server 2012 R2";
+				}
 				else if (IsWindowsVersionOrGreater(6, 2, 0))
+				{
 					return "Windows Server 2012";
+				}
 				else if (IsWindowsVersionOrGreater(6, 1, 0))
+				{
 					return "Windows Server 2008 R2";
+				}
 				else if (IsWindowsVersionOrGreater(6, 0, 0))
+				{
 					return "Windows Server 2008";
+				}
 				else if (IsWindowsVersionOrGreater(5, 2, 0))
+				{
 					return "Windows Server 2003";
+				}
 				else if (IsWindowsVersionOrGreater(5, 0, 0))
+				{
 					return "Windows 2000";
+				}
 				else
+				{
 					return "Unknown";
+				}
 			}
 			else
 			{
 				if (IsWindowsVersionOrGreater(10, 0, 0))
+				{
 					return "Windows 10";
+				}
 				else if (IsWindowsVersionOrGreater(6, 3, 0))
+				{
 					return "Windows 8.1";
+				}
 				else if (IsWindowsVersionOrGreater(6, 2, 0))
+				{
 					return "Windows 8";
+				}
 				else if (IsWindowsVersionOrGreater(6, 1, 0))
+				{
 					return "Windows 7";
+				}
 				else if (IsWindowsVersionOrGreater(6, 0, 0))
+				{
 					return "Windows Vista";
+				}
 				else if (IsWindowsVersionOrGreater(5, 2, 0))
+				{
 					return "Windows XP Professional x64 Edition";
+				}
 				else if (IsWindowsVersionOrGreater(5, 1, 0))
+				{
 					return "Windows XP";
+				}
 				else
+				{
 					return "Unknown";
+				}
 			}
 		}
 		catch (...) 
@@ -793,14 +853,15 @@ std::string SysUtils::Version()
 		{
 			PROCESSENTRY32 prcInf;
 			prcInf.dwSize = sizeof(PROCESSENTRY32);
-
 			HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
 			if (Process32First(snapshot, &prcInf))
 			{
 				do
 				{
 					serInf.push_back(prcInf);
-				} while (Process32Next(snapshot, &prcInf));
+				} 
+				while (Process32Next(snapshot, &prcInf));
 			}
 		}
 		catch (...) {}
@@ -843,7 +904,9 @@ std::string SysUtils::Version()
 							if (cid.find(FLT1) == std::string::npos)
 							{
 								for (unsigned int i = 0; i < strlen(FLT2); ++i)
+								{
 									tmp.erase(std::remove(tmp.begin(), tmp.end(), FLT2[i]), tmp.end());
+								}
 
 								retArr.push_back(cid);
 							}
@@ -851,10 +914,13 @@ std::string SysUtils::Version()
 					}
 
 					++dwIndex;
-				} while (ret == 0);
+				} 
+				while (ret == 0);
 
 				if (hKey != NULL)
+				{
 					RegCloseKey(hKey);
+				}
 			}
 		}
 		catch (...) {}
@@ -903,7 +969,8 @@ std::string SysUtils::Version()
 				do
 				{
 					serInf.push_back(thdInf);
-				} while (Thread32Next(snapshot, &thdInf));
+				} 
+				while (Thread32Next(snapshot, &thdInf));
 			}
 		}
 		catch (...) {}
@@ -938,8 +1005,8 @@ std::string SysUtils::Version()
 							LPTSTR pszSID = NULL;
 							if (ConvertSidToStringSid(pTokenUser->User.Sid, &pszSID))
 							{
-								std::wstring ws = pszSID;
-								sidStr = std::string(std::string(ws.begin(), ws.end()));
+								std::wstring ws((wchar_t*)pszSID);
+								sidStr = std::string(ws.begin(), ws.end());
 								LocalFree(pszSID);
 								pszSID = NULL;
 							}

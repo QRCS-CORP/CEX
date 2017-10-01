@@ -157,9 +157,9 @@ void FileStream::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_filePosition = 0;
 		Close();
-		m_isDestroyed = true;
 	}
 }
 

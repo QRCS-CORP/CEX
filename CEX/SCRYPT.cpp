@@ -97,24 +97,17 @@ void SCRYPT::Destroy()
 		m_parallelProfile.Reset();
 		m_scryptParameters.Reset();
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_kdfDigest != 0)
-					delete m_kdfDigest;
-			}
+			if (m_kdfDigest != 0)
+				delete m_kdfDigest;
+		}
 
-			Utility::IntUtils::ClearVector(m_kdfKey);
-			Utility::IntUtils::ClearVector(m_kdfSalt);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoKdfException("SCRYPT:Destroy", "The class state was not disposed!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_kdfKey);
+		Utility::IntUtils::ClearVector(m_kdfSalt);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
 	}
 }
 
@@ -161,7 +154,7 @@ void SCRYPT::Initialize(const std::vector<byte> &Key)
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 
 	m_isInitialized = true;
 }
@@ -177,9 +170,9 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size());
-	Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
+	Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
 
 	m_isInitialized = true;
 }
@@ -195,13 +188,13 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size() + Info.size());
 
 	if (Salt.size() > 0)
-		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
+		Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
 	if (Info.size() > 0)
-		Utility::MemUtils::Copy<byte>(Info, 0, m_kdfSalt, Salt.size(), Info.size());
+		Utility::MemUtils::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 
 	m_isInitialized = true;
 }
@@ -214,7 +207,7 @@ void SCRYPT::ReSeed(const std::vector<byte> &Seed)
 	if (Seed.size() > m_kdfSalt.size())
 		m_kdfSalt.resize(Seed.size());
 
-	Utility::MemUtils::Copy<byte>(Seed, 0, m_kdfSalt, 0, Seed.size());
+	Utility::MemUtils::Copy(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
 
 void SCRYPT::Reset()
@@ -229,20 +222,20 @@ void SCRYPT::Reset()
 void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
 {
 	std::vector<uint> X(16);
-	Utility::MemUtils::Copy<uint>(State, State.size() - 16, X, 0, 16 * sizeof(uint));
+	Utility::MemUtils::Copy(State, State.size() - 16, X, 0, 16 * sizeof(uint));
 
 	for (size_t i = 0; i < 2 * MEM_COST; i += 2)
 	{
-		Utility::MemUtils::XorBlock<uint>(State, i * 16, X, 0, X.size() * sizeof(uint));
+		Utility::MemUtils::XorBlock(State, i * 16, X, 0, X.size() * sizeof(uint));
 		SalsaCore(X);
-		Utility::MemUtils::Copy<uint>(X, 0, Y, i * 8, 16 * sizeof(uint));
+		Utility::MemUtils::Copy(X, 0, Y, i * 8, 16 * sizeof(uint));
 
-		Utility::MemUtils::XorBlock<uint>(State, i * 16 + 16, X, 0, X.size() * sizeof(uint));
+		Utility::MemUtils::XorBlock(State, i * 16 + 16, X, 0, X.size() * sizeof(uint));
 		SalsaCore(X);
-		Utility::MemUtils::Copy<uint>(X, 0, Y, i * 8 + MEM_COST * 16, 16 * sizeof(uint));
+		Utility::MemUtils::Copy(X, 0, Y, i * 8 + MEM_COST * 16, 16 * sizeof(uint));
 	}
 
-	Utility::MemUtils::Copy<uint>(Y, 0, State, 0, Y.size() * sizeof(uint));
+	Utility::MemUtils::Copy(Y, 0, State, 0, Y.size() * sizeof(uint));
 }
 
 size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -477,7 +470,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 	std::vector<uint> Y(bCount);
 	std::vector<std::vector<uint>> V(N);
 
-	Utility::MemUtils::Copy<uint>(State, StateOffset, X, 0, bCount * sizeof(uint));
+	Utility::MemUtils::Copy(State, StateOffset, X, 0, bCount * sizeof(uint));
 
 	for (size_t i = 0; i < N; ++i)
 	{
@@ -489,11 +482,11 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 	for (size_t i = 0; i < N; ++i)
 	{
 		uint j = X[bCount - 16] & NMASK;
-		Utility::MemUtils::XorBlock<uint>(V[j], 0, X, 0, X.size() * sizeof(uint));
+		Utility::MemUtils::XorBlock(V[j], 0, X, 0, X.size() * sizeof(uint));
 		BlockMix(X, Y);
 	}
 
-	Utility::MemUtils::Copy<uint>(X, 0, State, StateOffset, bCount * sizeof(uint));
+	Utility::MemUtils::Copy(X, 0, State, StateOffset, bCount * sizeof(uint));
 }
 
 NAMESPACE_KDFEND

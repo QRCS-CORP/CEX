@@ -1,5 +1,5 @@
-#ifndef _CEX_STREAMCIPHERFROMNAME_H
-#define _CEX_STREAMCIPHERFROMNAME_H
+#ifndef CEX_STREAMCIPHERFROMNAME_H
+#define CEX_STREAMCIPHERFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

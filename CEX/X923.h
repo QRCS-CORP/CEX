@@ -1,5 +1,5 @@
-#ifndef _CEX_X923_H
-#define _CEX_X923_H
+#ifndef CEX_X923_H
+#define CEX_X923_H
 
 #include "IPadding.h"
 

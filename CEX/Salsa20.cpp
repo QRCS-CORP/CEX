@@ -20,7 +20,7 @@ const size_t Salsa20::BlockSize()
 	return BLOCK_SIZE;
 }
 
-std::vector<byte> &Salsa20::DistributionCode()
+const std::vector<byte> &Salsa20::DistributionCode()
 {
 	return m_dstCode;
 }
@@ -75,6 +75,7 @@ const size_t Salsa20::Rounds()
 Salsa20::Salsa20(size_t Rounds)
 	:
 	m_ctrVector(2, 0),
+	m_dstCode(16),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
@@ -130,7 +131,7 @@ void Salsa20::Initialize(ISymmetricKey &KeyParams)
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		m_dstCode = KeyParams.Info();
+		Utility::MemUtils::Copy(KeyParams.Info(), 0, m_dstCode, 0, (KeyParams.Info().size() > m_dstCode.size()) ? m_dstCode.size() : KeyParams.Info().size());
 	}
 	else
 	{
@@ -233,30 +234,30 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 		// process 8 blocks (uses avx if available)
 		while (ctr != paln)
 		{
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 0, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 8, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 1, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 9, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 2, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 10, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 3, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 11, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 4, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 12, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 5, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 13, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 6, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 14, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 7, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 15, 4);
-			IntUtils::LeIncrement32(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 0, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 8, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 1, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 9, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 2, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 10, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 3, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 11, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 4, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 12, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 5, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 13, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 6, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 14, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 7, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 15, 4);
+			IntUtils::LeIncrementW(Counter);
 			Salsa::SalsaTransformW<Numeric::UInt256>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVX2BLK;
 		}
@@ -272,18 +273,18 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 		// process 4 blocks (uses sse intrinsics if available)
 		while (ctr != paln)
 		{
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 0, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 4, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 1, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 5, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 2, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 6, 4);
-			IntUtils::LeIncrement32(Counter);
-			Utility::MemUtils::Copy<uint>(Counter, 0, ctrBlk, 3, 4);
-			Utility::MemUtils::Copy<uint>(Counter, 1, ctrBlk, 7, 4);
-			IntUtils::LeIncrement32(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 0, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 4, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 1, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 5, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 2, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 6, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 3, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 7, 4);
+			IntUtils::LeIncrementW(Counter);
 			Salsa::SalsaTransformW<Numeric::UInt128>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVXBLK;
 		}
@@ -294,7 +295,7 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 	while (ctr != ALNSZE)
 	{
 		Salsa::SalsaTransform512(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
-		IntUtils::LeIncrement32(Counter);
+		IntUtils::LeIncrementW(Counter);
 		ctr += BLOCK_SIZE;
 	}
 
@@ -303,8 +304,8 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
 		Salsa::SalsaTransform512(outputBlock, 0, Counter, m_wrkState, m_rndCount);
 		const size_t FNLSZE = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy<byte>(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
-		IntUtils::LeIncrement32(Counter);
+		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
+		IntUtils::LeIncrementW(Counter);
 	}
 }
 
@@ -320,7 +321,7 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 		const size_t ALNSZE = PRCSZE - (PRCSZE % BLOCK_SIZE);
 
 		if (ALNSZE != 0)
-			Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, ALNSZE);
+			Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNSZE);
 
 		// get the remaining bytes
 		if (ALNSZE != PRCSZE)
@@ -342,18 +343,18 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 			// thread level counter
 			std::vector<uint> thdCtr(m_ctrVector.size());
 			// offset counter by chunk size / block size
-			IntUtils::LeIncrease32(m_ctrVector, thdCtr, CTRLEN * i);
+			IntUtils::LeIncreaseW(m_ctrVector, thdCtr, CTRLEN * i);
 			// create random at offset position
 			this->Generate(Output, OutOffset + (i * CNKSZE), thdCtr, CNKSZE);
 			// xor with input at offset
-			Utility::MemUtils::XorBlock<byte>(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
+			Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
-				Utility::MemUtils::Copy<uint>(thdCtr, 0, tmpCtr, 0, CTR_SIZE);
+				Utility::MemUtils::Copy(thdCtr, 0, tmpCtr, 0, CTR_SIZE);
 		});
 
 		// copy last counter to class variable
-		Utility::MemUtils::Copy<uint>(tmpCtr, 0, m_ctrVector, 0, CTR_SIZE);
+		Utility::MemUtils::Copy(tmpCtr, 0, m_ctrVector, 0, CTR_SIZE);
 
 		// last block processing
 		if (RNDSZE < PRCSZE)

@@ -175,18 +175,18 @@ void OCB::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void OCB::Destroy()
 {
-	m_aadLoaded = false;
-	m_aadPreserve = false;
-	m_cipherType = BlockCiphers::None;
-	m_isDestroyed = false;
-	m_isFinalized = false;
-	m_isEncryption = false;
-	m_isInitialized = false;
-	m_mainBlockCount = 0;
-	m_parallelProfile.Reset();
-
-	try
+	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
+		m_aadLoaded = false;
+		m_aadPreserve = false;
+		m_cipherType = BlockCiphers::None;
+		m_isFinalized = false;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_mainBlockCount = 0;
+		m_parallelProfile.Reset();
+
 		Utility::IntUtils::ClearVector(m_aadData);
 		Utility::IntUtils::ClearVector(m_checkSum);
 		Utility::IntUtils::ClearVector(m_hashList);
@@ -211,10 +211,6 @@ void OCB::Destroy()
 				m_hashCipher->Destroy();
 		}
 	}
-	catch (std::exception& ex)
-	{
-		throw CryptoCipherModeException("OCB:Destroy", "Could not clear all variables!", std::string(ex.what()));
-	}
 }
 
 void OCB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -233,7 +229,7 @@ void OCB::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t 
 		throw CryptoCipherModeException("OCB:Finalize", "The output length must be between 12 and 16 bytes!");
 
 	CalculateMac();
-	Utility::MemUtils::Copy<byte>(m_msgTag, 0, Output, Offset, Length);
+	Utility::MemUtils::Copy(m_msgTag, 0, Output, Offset, Length);
 }
 
 void OCB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -275,7 +271,7 @@ void OCB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	if (m_isFinalized)
 	{
-		Utility::MemUtils::Clear<byte>(m_msgTag, 0, m_msgTag.size());
+		Utility::MemUtils::Clear(m_msgTag, 0, m_msgTag.size());
 		m_isFinalized = false;
 	}
 
@@ -311,11 +307,11 @@ void OCB::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 		std::vector<byte> offset(BLOCK_SIZE);
 		GetLSub(Ntz(++blkCnt), offset);
 		std::vector<byte> tmp(BLOCK_SIZE);
-		Utility::MemUtils::COPY128<byte, byte>(Input, blkOff, tmp, 0);
-		Utility::MemUtils::XorBlock<byte>(offset, 0, offsetHash, 0, BLOCK_SIZE);
-		Utility::MemUtils::XorBlock<byte>(offsetHash, 0, tmp, 0, BLOCK_SIZE);
+		Utility::MemUtils::COPY128(Input, blkOff, tmp, 0);
+		Utility::MemUtils::XorBlock(offset, 0, offsetHash, 0, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(offsetHash, 0, tmp, 0, BLOCK_SIZE);
 		m_hashCipher->Transform(tmp, 0, tmp, 0);
-		Utility::MemUtils::XorBlock<byte>(tmp, 0, m_aadData, 0, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(tmp, 0, m_aadData, 0, BLOCK_SIZE);
 		blkOff += BLOCK_SIZE;
 		blkLen -= BLOCK_SIZE;
 	}
@@ -323,12 +319,12 @@ void OCB::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 	if (blkLen != 0)
 	{
 		std::vector<byte> tmp(BLOCK_SIZE);
-		Utility::MemUtils::Copy<byte>(Input, blkOff, tmp, 0, blkLen);
+		Utility::MemUtils::Copy(Input, blkOff, tmp, 0, blkLen);
 		ExtendBlock(tmp, blkLen);
-		Utility::MemUtils::XorBlock<byte>(m_listAsterisk, 0, offsetHash, 0, BLOCK_SIZE);
-		Utility::MemUtils::XorBlock<byte>(offsetHash, 0, tmp, 0, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(m_listAsterisk, 0, offsetHash, 0, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(offsetHash, 0, tmp, 0, BLOCK_SIZE);
 		m_hashCipher->Transform(tmp, 0, tmp, 0);
-		Utility::MemUtils::XorBlock<byte>(tmp, 0, m_aadData, 0, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(tmp, 0, m_aadData, 0, BLOCK_SIZE);
 	}
 
 	m_aadLoaded = true;
@@ -380,18 +376,18 @@ bool OCB::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 	if (!m_isFinalized)
 		CalculateMac();
 
-	return Utility::IntUtils::Compare<byte>(m_msgTag, 0, Input, Offset, Length);
+	return Utility::IntUtils::Compare(m_msgTag, 0, Input, Offset, Length);
 }
 
 //~~~Private Functions~~~//
 
 void OCB::CalculateMac()
 {
-	Utility::MemUtils::XOR128<byte>(m_mainOffset, 0, m_checkSum, 0);
-	Utility::MemUtils::XOR128<byte>(m_listDollar, 0, m_checkSum, 0);
+	Utility::MemUtils::XOR128(m_mainOffset, 0, m_checkSum, 0);
+	Utility::MemUtils::XOR128(m_listDollar, 0, m_checkSum, 0);
 	m_hashCipher->Transform(m_checkSum, 0, m_checkSum, 0);
-	Utility::MemUtils::XOR128<byte>(m_aadData, 0, m_checkSum, 0);
-	Utility::MemUtils::COPY128<byte, byte>(m_checkSum, 0, m_msgTag, 0);
+	Utility::MemUtils::XOR128(m_aadData, 0, m_checkSum, 0);
+	Utility::MemUtils::COPY128(m_checkSum, 0, m_msgTag, 0);
 	Reset();
 
 	if (m_autoIncrement)
@@ -409,14 +405,14 @@ void OCB::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
 	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
-	Utility::MemUtils::COPY128<byte, byte>(Input, InOffset, Output, OutOffset);
+	Utility::MemUtils::COPY128(Input, InOffset, Output, OutOffset);
 	std::vector<byte> hash(BLOCK_SIZE);
 	GetLSub(Ntz(++m_mainBlockCount), hash);
-	Utility::MemUtils::XorBlock<byte>(hash, 0, m_mainOffset, 0, BLOCK_SIZE);
-	Utility::MemUtils::XorBlock<byte>(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(hash, 0, m_mainOffset, 0, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
 	m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-	Utility::MemUtils::XorBlock<byte>(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
-	Utility::MemUtils::XorBlock<byte>(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE);
 }
 
 void OCB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -424,14 +420,14 @@ void OCB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
 	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
-	Utility::MemUtils::COPY128<byte, byte>(Input, InOffset, Output, OutOffset);
-	Utility::MemUtils::XorBlock<byte>(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE);
+	Utility::MemUtils::COPY128(Input, InOffset, Output, OutOffset);
+	Utility::MemUtils::XorBlock(Output, OutOffset, m_checkSum, 0, BLOCK_SIZE);
 	std::vector<byte> hash(BLOCK_SIZE);
 	GetLSub(Ntz(++m_mainBlockCount), hash);
-	Utility::MemUtils::XorBlock<byte>(hash, 0, m_mainOffset, 0, BLOCK_SIZE);
-	Utility::MemUtils::XorBlock<byte>(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(hash, 0, m_mainOffset, 0, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
 	m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-	Utility::MemUtils::XorBlock<byte>(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(m_mainOffset, 0, Output, OutOffset, BLOCK_SIZE);
 }
 
 void OCB::DoubleBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -448,13 +444,13 @@ void OCB::ExtendBlock(std::vector<byte> &Output, size_t Position)
 	Output[Position] = (byte)0x80;
 	++Position;
 	if (Position < BLOCK_SIZE)
-		Utility::MemUtils::Clear<byte>(Output, Position, Output.size() - Position);
+		Utility::MemUtils::Clear(Output, Position, Output.size() - Position);
 }
 
 void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 {
 	std::vector<byte> tmpNonce(BLOCK_SIZE);
-	Utility::MemUtils::Copy<byte>(Nonce, 0, tmpNonce, BLOCK_SIZE - Nonce.size(), Nonce.size());
+	Utility::MemUtils::Copy(Nonce, 0, tmpNonce, BLOCK_SIZE - Nonce.size(), Nonce.size());
 	tmpNonce[0] = (byte)(BLOCK_SIZE << 4);
 	tmpNonce[MAX_NONCESIZE - Nonce.size()] |= 1;
 	uint bottom = tmpNonce[MAX_NONCESIZE] & 0x3F;
@@ -466,7 +462,7 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 		std::vector<byte> kTop(BLOCK_SIZE);
 		m_topInput = tmpNonce;
 		m_hashCipher->Transform(m_topInput, 0, kTop, 0);
-		Utility::MemUtils::COPY128<byte, byte>(kTop, 0, m_mainStretch, 0);
+		Utility::MemUtils::COPY128(kTop, 0, m_mainStretch, 0);
 
 		for (size_t i = 0; i < 8; ++i)
 			m_mainStretch[BLOCK_SIZE + i] = (byte)(kTop[i] ^ kTop[i + 1]);
@@ -477,7 +473,7 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 
 	if (BTMSZE == 0)
 	{
-		Utility::MemUtils::COPY128<byte, byte>(m_mainStretch, btmLen, m_mainOffset0, 0);
+		Utility::MemUtils::COPY128(m_mainStretch, btmLen, m_mainOffset0, 0);
 	}
 	else
 	{
@@ -490,7 +486,7 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 		}
 	}
 
-	Utility::MemUtils::COPY128<byte, byte>(m_mainOffset0, 0, m_mainOffset, 0);
+	Utility::MemUtils::COPY128(m_mainOffset0, 0, m_mainOffset, 0);
 }
 
 void OCB::GetLSub(size_t N, std::vector<byte> &LSub)
@@ -503,7 +499,7 @@ void OCB::GetLSub(size_t N, std::vector<byte> &LSub)
 		++hashCtr;
 	}
 
-	Utility::MemUtils::COPY128<byte, byte>(m_hashList[N], 0, LSub, 0);
+	Utility::MemUtils::COPY128(m_hashList[N], 0, LSub, 0);
 }
 
 uint OCB::Ntz(ulong X)
@@ -528,10 +524,10 @@ void OCB::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 		const size_t PBKALN = Length - (Length % AVX512BLK);
 		const size_t SUBBLK = PBKALN / AVX512BLK;
 
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 		for (size_t i = 0; i < SUBBLK; ++i)
 			m_blockCipher->Transform1024(Output, OutOffset + (i * AVX512BLK), Output, OutOffset + (i * AVX512BLK));
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 	}
 #elif defined(__AVX2__)
 	const size_t AVX2BLK = 8 * BLOCK_SIZE;
@@ -540,10 +536,10 @@ void OCB::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 		const size_t PBKALN = Length - (Length % AVX2BLK);
 		const size_t SUBBLK = PBKALN / AVX2BLK;
 
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 		for (size_t i = 0; i < SUBBLK; ++i)
 			m_blockCipher->Transform1024(Output, OutOffset + (i * AVX2BLK), Output, OutOffset + (i * AVX2BLK));
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 	}
 #elif defined(__AVX__)
 	const size_t AVXBLK = 4 * BLOCK_SIZE;
@@ -551,18 +547,18 @@ void OCB::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 	{
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		const size_t SUBBLK = PBKALN / AVXBLK;
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 		for (size_t i = 0; i < SUBBLK; ++i)
 			m_blockCipher->Transform512(Output, OutOffset + (i * AVXBLK), Output, OutOffset + (i * AVXBLK));
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 	}
 #else
 	const size_t PBKALN = Length - (Length % BLOCK_SIZE);
 	const size_t SUBBLK = PBKALN / BLOCK_SIZE;
-	Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+	Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 	for (size_t i = 0; i < SUBBLK; ++i)
 		m_blockCipher->Transform(Output, OutOffset + (i * BLOCK_SIZE), Output, OutOffset + (i * BLOCK_SIZE));
-	Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, PBKALN);
+	Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);
 #endif
 }
 
@@ -573,7 +569,7 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t OUTOFF = OutOffset;
 
 	// copy data into working output
-	Utility::MemUtils::Copy<byte>(Input, InOffset, Output, OutOffset, ALNLEN);
+	Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, ALNLEN);
 	// create the offset chain
 	std::vector<byte> offsetChain(ALNLEN);
 	std::vector<byte> hash(BLOCK_SIZE);
@@ -582,8 +578,8 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	for (size_t i = 0; i < BLKCNT; ++i)
 	{
 		GetLSub(Ntz(++m_mainBlockCount), hash);
-		Utility::MemUtils::XorBlock<byte>(hash, 0, m_mainOffset, 0, BLOCK_SIZE);
-		Utility::MemUtils::COPY128<byte, byte>(m_mainOffset, 0, offsetChain, i * BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(hash, 0, m_mainOffset, 0, BLOCK_SIZE);
+		Utility::MemUtils::COPY128(m_mainOffset, 0, offsetChain, i * BLOCK_SIZE);
 	}
 
 	// parallel offsets
@@ -607,9 +603,9 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	{
 		while (Length >= BLOCK_SIZE)
 		{
-			Utility::MemUtils::XorBlock<byte>(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE);
+			Utility::MemUtils::XorBlock(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE);
 			m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-			Utility::MemUtils::XorBlock<byte>(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE);
+			Utility::MemUtils::XorBlock(offsetChain, chainPos, Output, OutOffset, BLOCK_SIZE);
 
 			Length -= BLOCK_SIZE;
 			OutOffset += BLOCK_SIZE;
@@ -622,7 +618,7 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 
 	// update the checksum
 	for (size_t i = 0; i < BLKCNT; ++i)
-		Utility::MemUtils::XorBlock<byte>(Output, OUTOFF + (i * BLOCK_SIZE), m_checkSum, 0, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(Output, OUTOFF + (i * BLOCK_SIZE), m_checkSum, 0, BLOCK_SIZE);
 }
 
 void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -631,11 +627,11 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);
 
 	// copy data into working output
-	Utility::MemUtils::Copy<byte>(Input, InOffset, Output, OutOffset, ALNLEN);
+	Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, ALNLEN);
 
 	// pre-fold the checksum
 	for (size_t i = 0; i < BLKCNT; ++i)
-		Utility::MemUtils::XOR128<byte>(Output, OutOffset + (i * BLOCK_SIZE), m_checkSum, 0);
+		Utility::MemUtils::XOR128(Output, OutOffset + (i * BLOCK_SIZE), m_checkSum, 0);
 
 	// create the offset chain
 	std::vector<byte> offsetChain(ALNLEN);
@@ -645,8 +641,8 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	for (size_t i = 0; i < BLKCNT; ++i)
 	{
 		GetLSub(Ntz(++m_mainBlockCount), hash);
-		Utility::MemUtils::XOR128<byte>(hash, 0, m_mainOffset, 0);
-		Utility::MemUtils::COPY128<byte, byte>(m_mainOffset, 0, offsetChain, i * BLOCK_SIZE);
+		Utility::MemUtils::XOR128(hash, 0, m_mainOffset, 0);
+		Utility::MemUtils::COPY128(m_mainOffset, 0, offsetChain, i * BLOCK_SIZE);
 	}
 
 	// parallel offsets
@@ -670,9 +666,9 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	{
 		while (Length >= BLOCK_SIZE)
 		{
-			Utility::MemUtils::XOR128<byte>(offsetChain, chainPos, Output, OutOffset);
+			Utility::MemUtils::XOR128(offsetChain, chainPos, Output, OutOffset);
 			m_blockCipher->Transform(Output, OutOffset, Output, OutOffset);
-			Utility::MemUtils::XOR128<byte>(offsetChain, chainPos, Output, OutOffset);
+			Utility::MemUtils::XOR128(offsetChain, chainPos, Output, OutOffset);
 
 			Length -= BLOCK_SIZE;
 			OutOffset += BLOCK_SIZE;
@@ -688,29 +684,29 @@ void OCB::ProcessPartial(const std::vector<byte> &Input, const size_t InOffset, 
 {
 	if (m_isEncryption)
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, Output, OutOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 		ExtendBlock(Output, OutOffset + Length);
 
-		Utility::MemUtils::XorBlock<byte>(Output, OutOffset, m_checkSum, 0, Length + 1);
-		Utility::MemUtils::XOR128<byte>(m_listAsterisk, 0, m_mainOffset, 0);
+		Utility::MemUtils::XorBlock(Output, OutOffset, m_checkSum, 0, Length + 1);
+		Utility::MemUtils::XOR128(m_listAsterisk, 0, m_mainOffset, 0);
 
 		std::vector<byte> pad(BLOCK_SIZE);
 		m_hashCipher->Transform(m_mainOffset, 0, pad, 0);
-		Utility::MemUtils::XOR128<byte>(pad, 0, Output, OutOffset);
+		Utility::MemUtils::XOR128(pad, 0, Output, OutOffset);
 	}
 	else
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, Output, OutOffset, Length);
-		Utility::MemUtils::XOR128<byte>(m_listAsterisk, 0, m_mainOffset, 0);
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
+		Utility::MemUtils::XOR128(m_listAsterisk, 0, m_mainOffset, 0);
 
 		std::vector<byte> pad(BLOCK_SIZE);
 		m_hashCipher->Transform(m_mainOffset, 0, pad, 0);
-		Utility::MemUtils::XorBlock<byte>(pad, 0, Output, OutOffset, Length);
+		Utility::MemUtils::XorBlock(pad, 0, Output, OutOffset, Length);
 
 		std::vector<byte> tmp(BLOCK_SIZE);
-		Utility::MemUtils::Copy<byte>(Output, OutOffset, tmp, 0, Length);
+		Utility::MemUtils::Copy(Output, OutOffset, tmp, 0, Length);
 		ExtendBlock(tmp, Length);
-		Utility::MemUtils::XOR128<byte>(tmp, 0, m_checkSum, 0);
+		Utility::MemUtils::XOR128(tmp, 0, m_checkSum, 0);
 	}
 }
 
@@ -719,18 +715,18 @@ void OCB::Reset()
 	if (!m_aadPreserve)
 	{
 		m_aadLoaded = false;
-		Utility::MemUtils::Clear<byte>(m_aadData, 0, m_aadData.size());
+		Utility::MemUtils::Clear(m_aadData, 0, m_aadData.size());
 	}
 
 	m_mainBlockCount = 0;
-	Utility::MemUtils::Clear<byte>(m_checkSum, 0, m_checkSum.size());
-	Utility::MemUtils::Clear<byte>(m_listAsterisk, 0, m_listAsterisk.size());
-	Utility::MemUtils::Clear<byte>(m_listDollar, 0, m_listDollar.size());
-	Utility::MemUtils::Clear<byte>(m_mainOffset, 0, m_mainOffset.size());
-	Utility::MemUtils::Clear<byte>(m_mainOffset0, 0, m_mainOffset0.size());
-	Utility::MemUtils::Clear<byte>(m_mainStretch, 0, m_mainStretch.size());
-	Utility::MemUtils::Clear<byte>(m_ocbVector, 0, m_ocbVector.size());
-	Utility::MemUtils::Clear<byte>(m_topInput, 0, m_topInput.size());
+	Utility::MemUtils::Clear(m_checkSum, 0, m_checkSum.size());
+	Utility::MemUtils::Clear(m_listAsterisk, 0, m_listAsterisk.size());
+	Utility::MemUtils::Clear(m_listDollar, 0, m_listDollar.size());
+	Utility::MemUtils::Clear(m_mainOffset, 0, m_mainOffset.size());
+	Utility::MemUtils::Clear(m_mainOffset0, 0, m_mainOffset0.size());
+	Utility::MemUtils::Clear(m_mainStretch, 0, m_mainStretch.size());
+	Utility::MemUtils::Clear(m_ocbVector, 0, m_ocbVector.size());
+	Utility::MemUtils::Clear(m_topInput, 0, m_topInput.size());
 	m_hashList.clear();
 	m_isInitialized = false;
 }

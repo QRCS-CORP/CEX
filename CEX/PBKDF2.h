@@ -24,8 +24,8 @@
 // Updated April 19, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_PBKDF2_H
-#define _CEX_PBKDF2_H
+#ifndef CEX_PBKDF2_H
+#define CEX_PBKDF2_H
 
 #include "IKdf.h"
 #include "Digests.h"

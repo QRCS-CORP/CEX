@@ -24,8 +24,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_DCG_H
-#define _CEX_DCG_H
+#ifndef CEX_DCG_H
+#define CEX_DCG_H
 
 #include "IDrbg.h"
 #include "IDigest.h"

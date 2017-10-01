@@ -1,5 +1,5 @@
-#ifndef _CEX_IDRBG_H
-#define _CEX_IDRBG_H
+#ifndef CEX_IDRBG_H
+#define CEX_IDRBG_H
 
 #include "CexDomain.h"
 #include "CryptoGeneratorException.h"

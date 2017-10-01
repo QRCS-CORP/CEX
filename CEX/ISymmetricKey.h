@@ -1,5 +1,5 @@
-#ifndef _CEX_ISYMMETRICKEY_H
-#define _CEX_ISYMMETRICKEY_H
+#ifndef CEX_ISYMMETRICKEY_H
+#define CEX_ISYMMETRICKEY_H
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"
@@ -64,10 +64,10 @@ public:
 	/// Compare this Key instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Key to compare</param>
+	/// <param name="Input">Key to compare</param>
 	/// 
 	/// <returns>Returns true if equal</returns>
-	virtual bool Equals(ISymmetricKey &Obj) = 0;
+	virtual bool Equals(ISymmetricKey &Input) = 0;
 };
 
 NAMESPACE_SYMMETRICKEYEND

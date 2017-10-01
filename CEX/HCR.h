@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_HCR_H
-#define _CEX_HCR_H
+#ifndef CEX_HCR_H
+#define CEX_HCR_H
 
 #include "IPrng.h"
 #include "HCG.h"
@@ -255,8 +255,7 @@ public:
 
 private:
 
-	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
-	std::vector<byte> GetByteRange(ulong Maximum);
+	ulong GetRanged(ulong Maximum, size_t Length);
 	uint GetMinimumSeedSize(Digests RngEngine);
 };
 

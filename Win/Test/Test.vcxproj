@@ -157,7 +157,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -303,6 +303,7 @@
     <ClInclude Include="..\..\Test\HMACTest.h" />
     <ClInclude Include="..\..\Test\HMGTest.h" />
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
+    <ClInclude Include="..\..\Test\McElieceTest.h" />
     <ClInclude Include="..\..\Test\MemUtilsTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
@@ -361,6 +362,7 @@
     <ClCompile Include="..\..\Test\KDF2Test.cpp" />
     <ClCompile Include="..\..\Test\KeccakTest.cpp" />
     <ClCompile Include="..\..\Test\MacStreamTest.cpp" />
+    <ClCompile Include="..\..\Test\McElieceTest.cpp" />
     <ClCompile Include="..\..\Test\MemUtilsTest.cpp" />
     <ClCompile Include="..\..\Test\PaddingTest.cpp" />
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />

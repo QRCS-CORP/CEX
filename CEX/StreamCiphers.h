@@ -1,5 +1,5 @@
-#ifndef _CEX_STREAMCIPHERS_H
-#define _CEX_STREAMCIPHERS_H
+#ifndef CEX_STREAMCIPHERS_H
+#define CEX_STREAMCIPHERS_H
 
 #include "CexDomain.h"
 

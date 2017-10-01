@@ -1,5 +1,5 @@
-#ifndef _CEX_CRYPTOEXCEPTION_H
-#define _CEX_CRYPTOEXCEPTION_H
+#ifndef CEX_CRYPTOEXCEPTION_H
+#define CEX_CRYPTOEXCEPTION_H
 
 #include "CexDomain.h"
 

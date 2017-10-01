@@ -36,7 +36,7 @@ void GHASH::FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextS
 	if (m_msgOffset != 0)
 	{
 		if (m_msgOffset != BLOCK_SIZE)
-			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgOffset, m_msgBuffer.size() - m_msgOffset);
+			Utility::MemUtils::Clear(m_msgBuffer, m_msgOffset, m_msgBuffer.size() - m_msgOffset);
 
 		ProcessSegment(m_msgBuffer, 0, Output, m_msgOffset);
 	}
@@ -44,7 +44,7 @@ void GHASH::FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextS
 	std::vector<byte> fnlBlock(BLOCK_SIZE);
 	Utility::IntUtils::Be64ToBytes(8 * AdSize, fnlBlock, 0);
 	Utility::IntUtils::Be64ToBytes(8 * TextSize, fnlBlock, 8);
-	Utility::MemUtils::XOR128<byte>(fnlBlock, 0, Output, 0);
+	Utility::MemUtils::XOR128(fnlBlock, 0, Output, 0);
 	GcmMultiply(Output);
 }
 
@@ -53,20 +53,20 @@ void GHASH::Reset(bool Erase)
 	if (Erase)
 	{
 		if (m_ghashKey.size() != 0)
-			Utility::MemUtils::Clear<ulong>(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
+			Utility::MemUtils::Clear(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
 
 		m_hasCMul = false;
 	}
 
 	if (m_msgBuffer.size() != 0)
-		Utility::MemUtils::Clear<byte>(m_msgBuffer, 0, m_msgBuffer.size());
+		Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 
 	m_msgOffset = 0;
 }
 
 void GHASH::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output)
 {
-	Utility::MemUtils::XOR128<byte>(Input, InOffset, Output, 0);
+	Utility::MemUtils::XOR128(Input, InOffset, Output, 0);
 	GcmMultiply(Output);
 }
 
@@ -75,7 +75,7 @@ void GHASH::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std:
 	while (Length)
 	{
 		const size_t DIFF = Utility::IntUtils::Min(Length, BLOCK_SIZE);
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, 0, DIFF);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, 0, DIFF);
 		GcmMultiply(Output);
 		InOffset += DIFF;
 		Length -= DIFF;
@@ -96,7 +96,7 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 	const size_t RMD = BLOCK_SIZE - m_msgOffset;
 	if (Length > RMD)
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgOffset, RMD);
+		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMD);
 		ProcessBlock(m_msgBuffer, 0, Output);
 		m_msgOffset = 0;
 		Length -= RMD;
@@ -112,7 +112,7 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 
 	if (Length > 0)
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
 		m_msgOffset += Length;
 	}
 }

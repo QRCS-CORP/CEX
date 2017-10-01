@@ -22,8 +22,8 @@
 // Written by John Underhill, March 24, 2017// Updated April 19, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_SCRYPT_H
-#define _CEX_SCRYPT_H
+#ifndef CEX_SCRYPT_H
+#define CEX_SCRYPT_H
 
 #include "IKdf.h"
 #include "Digests.h"

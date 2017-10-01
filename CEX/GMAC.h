@@ -22,8 +22,8 @@
 // Written by John Underhill, February 14, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_GMAC_H
-#define _CEX_GMAC_H
+#ifndef CEX_GMAC_H
+#define CEX_GMAC_H
 
 #include "BlockCiphers.h"
 #include "GHASH.h"

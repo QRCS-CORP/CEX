@@ -21,8 +21,8 @@
 // Updated April 21, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_DIGESTSTREAM_H
-#define _CEX_DIGESTSTREAM_H
+#ifndef CEX_DIGESTSTREAM_H
+#define CEX_DIGESTSTREAM_H
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"

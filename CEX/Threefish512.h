@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_THREEFISH512_H
-#define _CEX_THREEFISH512_H
+#ifndef CEX_THREEFISH512_H
+#define CEX_THREEFISH512_H
 
 #include "Intrinsics.h"
 #include "IntUtils.h"
@@ -107,7 +107,7 @@ public:
 
 #if defined(__AVX2__)
 	template <typename T>
-	static void Transfrom64(std::vector<ulong> &Input, size_t InOffset, T &Output)
+	static void Transfrom(std::vector<ulong> &Input, size_t InOffset, T &Output)
 	{
 		__m256i R0 = _mm256_set_epi64x(0, 0, 0, 0);
 		const __m256i R1 = _mm256_set_epi64x(37, 19, 36, 46);
@@ -156,7 +156,7 @@ public:
 #else
 
 	template <typename T>
-	static void Transfrom64(std::vector<ulong> &Input, size_t InOffset, T &Output)
+	static void Transfrom(std::vector<ulong> &Input, size_t InOffset, T &Output)
 	{
 		// cache the block, key, and tweak
 		ulong B0 = Input[0];

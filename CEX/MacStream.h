@@ -21,8 +21,8 @@
 // Updated April 21, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_MACSTREAM_H
-#define _CEX_MACSTREAM_H
+#ifndef CEX_MACSTREAM_H
+#define CEX_MACSTREAM_H
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"

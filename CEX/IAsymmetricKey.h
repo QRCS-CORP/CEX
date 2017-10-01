@@ -1,5 +1,5 @@
-#ifndef _CEX_IASYMMETRICKEY_H
-#define _CEX_IASYMMETRICKEY_H
+#ifndef CEX_IASYMMETRICKEY_H
+#define CEX_IASYMMETRICKEY_H
 
 #include "CexDomain.h"
 #include "AsymmetricEngines.h"

@@ -1,5 +1,5 @@
-#ifndef _CEX_BITCONVERTER_H
-#define _CEX_BITCONVERTER_H
+#ifndef CEX_BITCONVERTER_H
+#define CEX_BITCONVERTER_H
 
 #include "CexDomain.h"
 

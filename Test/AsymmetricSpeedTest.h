@@ -3,9 +3,12 @@
 
 #include "ITest.h"
 #include "../CEX/AsymmetricEngines.h"
+#include "../CEX/MPKCParams.h"
 #include "../CEX/RLWEParams.h"
+
 namespace Test
 {
+	using Enumeration::MPKCParams;
 	using Enumeration::RLWEParams;
 
 	/// <summary>
@@ -23,7 +26,11 @@ namespace Test
 		static const uint64_t MB100 = MB1 * 100;
 		static const uint64_t GB1 = MB1 * 1000;
 		static const uint64_t DEF_DATA_SIZE = MB100;
-		static const uint64_t DEF_TEST_ITER = 1000;
+#if defined (_DEBUG)
+		static const uint64_t DEF_TEST_ITER = 10;
+#else
+		static const uint64_t DEF_TEST_ITER = 100; //TODO: should be 1000?
+#endif
 
 		TestEventHandler m_progressEvent;
 
@@ -56,6 +63,9 @@ namespace Test
 
 	private:
 
+		void MpkcDecryptLoop(MPKCParams Params, size_t Loops);
+		void MpkcEncryptLoop(MPKCParams Params, size_t Loops);
+		void MpkcGenerateLoop(MPKCParams Params, size_t Loops);
 		void RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel);
 		void RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel);
 		void RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel);

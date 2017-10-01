@@ -1,5 +1,5 @@
-#ifndef _CEX_INTRINSICS_H
-#define _CEX_INTRINSICS_H
+#ifndef CEX_INTRINSICS_H
+#define CEX_INTRINSICS_H
 
 #include "CexConfig.h"
 

@@ -1,7 +1,7 @@
 #include "RingLWETest.h"
 #include "../CEX/DrbgFromName.h"
-#include "../CEX/RingLWE.h"
 #include "../CEX/IAsymmetricKeyPair.h"
+#include "../CEX/RingLWE.h"
 #include "../CEX/RLWEKeyPair.h"
 #include "../CEX/RLWEPrivateKey.h"
 #include "../CEX/RLWEPublicKey.h"
@@ -79,15 +79,14 @@ namespace Test
 		std::vector<byte> msg(32);
 		Prng::SecureRandom rnd;
 
-		Cipher::Asymmetric::RLWE::RingLWE cpr(Enumeration::RLWEParams::Q12289N1024);
+		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			//rnd.GetBytes(msg);
-			Key::Asymmetric::IAsymmetricKeyPair* kp = cpr.Generate();
+			IAsymmetricKeyPair* kp = cpr.Generate();
 
 			cpr.Initialize(true, kp);
-			// no rand input; populates the message when using rlwe reconciliation mode
+			// no rand input required; populates the message using new-hope reconciliation method
 			enc = cpr.Encrypt(msg);
 
 			cpr.Initialize(false, kp);
@@ -97,7 +96,7 @@ namespace Test
 				throw TestException("RingLWETest: Decrypted output is not equal!");
 		}
 
-		msg.resize(0);
+		/*msg.resize(0);
 		std::vector<byte> sk1(0);
 		std::vector<byte> sk2(0);
 		std::vector<byte> msgA(0);
@@ -105,17 +104,17 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			Key::Asymmetric::IAsymmetricKeyPair* kp = cpr.Generate();
+			IAsymmetricKeyPair* kp = cpr.Generate();
 
-			msgA = ((Key::Asymmetric::RLWEPublicKey*)kp->PublicKey())->P();
-			cpr.Encapsulate(msgA, msgB, sk1);
+			msgA = ((RLWEPublicKey*)kp->PublicKey())->P();
+			cpr.Encapsulate(msgA, msgB, sk1);// 
 
-			Key::Asymmetric::RLWEPrivateKey* pri = (Key::Asymmetric::RLWEPrivateKey*)kp->PrivateKey();
+			RLWEPrivateKey* pri = (RLWEPrivateKey*)kp->PrivateKey();
 			cpr.Decapsulate(pri, msgB, sk2);
 
 			if (sk1 != sk2)
 				throw TestException("RingLWETest: Decrypted output is not equal!");
-		}
+		}*/
 	}
 
 	void RingLWETest::OnProgress(std::string Data)

@@ -1,5 +1,5 @@
-#ifndef _CEX_CPUDETECT_H
-#define _CEX_CPUDETECT_H
+#ifndef CEX_CPUDETECT_H
+#define CEX_CPUDETECT_H
 
 #include "CexDomain.h"
 

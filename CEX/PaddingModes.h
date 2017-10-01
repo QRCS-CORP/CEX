@@ -1,5 +1,5 @@
-#ifndef _CEX_PADDINGMODES_H
-#define _CEX_PADDINGMODES_H
+#ifndef CEX_PADDINGMODES_H
+#define CEX_PADDINGMODES_H
 
 #include "CexDomain.h"
 

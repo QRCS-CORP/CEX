@@ -22,8 +22,8 @@
 // Updated April 20, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_CIPHERSTREAM_H
-#define _CEX_CIPHERSTREAM_H
+#ifndef CEX_CIPHERSTREAM_H
+#define CEX_CIPHERSTREAM_H
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"

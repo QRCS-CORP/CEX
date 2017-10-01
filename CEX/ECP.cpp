@@ -86,7 +86,7 @@ uint ECP::Next()
 	uint rndNum;
 	std::vector<byte> rndData(sizeof(uint));
 	GetBytes(rndData);
-	Utility::MemUtils::Copy<byte, uint>(rndData, 0, rndNum, sizeof(uint));
+	Utility::MemUtils::CopyToValue(rndData, 0, rndNum, sizeof(uint));
 
 	return rndNum;
 }
@@ -404,14 +404,14 @@ std::vector<byte> ECP::SystemInfo()
 
 	Utility::ArrayUtils::Append(pnt.x, state);
 	Utility::ArrayUtils::Append(pnt.y, state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::ComputerName(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::CurrentThreadId(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::OsVersion(), state);
 
 	std::vector<std::string> clsids = Utility::SysUtils::SystemIds();
 	for (size_t i = 0; i < clsids.size(); ++i)
-		Utility::ArrayUtils::Append(clsids[i], state);
+		Utility::ArrayUtils::AppendString(clsids[i], state);
 
 	try
 	{
@@ -435,7 +435,7 @@ std::vector<byte> ECP::SystemInfo()
 
 	try
 	{
-		Utility::ArrayUtils::Append(Utility::SysUtils::ComputerName(), state);
+		Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::SystemInfo(), state);
 	}
@@ -463,8 +463,8 @@ std::vector<byte> ECP::UserInfo()
 {
 	std::vector<byte> state(0);
 
-	Utility::ArrayUtils::Append(Utility::SysUtils::UserName(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::UserId(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserName(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserId(), state);
 
 	return state;
 }

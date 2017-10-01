@@ -110,13 +110,16 @@ void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 
 void DigestStream::Destroy()
 {
-	m_isDestroyed = true;
-	m_progressInterval = 0;
-
-	if (m_destroyEngine)
+	if (!m_isDestroyed)
 	{
-		delete m_digestEngine;
-		m_destroyEngine = false;
+		m_isDestroyed = true;
+		m_progressInterval = 0;
+
+		if (m_destroyEngine)
+		{
+			delete m_digestEngine;
+			m_destroyEngine = false;
+		}
 	}
 }
 

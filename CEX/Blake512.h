@@ -22,7 +22,7 @@
 // Blake2 whitepaper <a href="https://blake2.net/blake2.pdf">BLAKE2: simpler, smaller, fast as MD5</a>.
 // 
 // Implementation Details:
-// An implementation of the Blake512Compress and Blake2BP digests with a 512 bit digest output size.
+// An implementation of the Blake2B and Blake2BP digests with a 512 bit digest output size.
 // Based on the Blake2 Github projects by Samuel Neves and Christian Winnerlein.
 // Blake2: https://github.com/BLAKE2/BLAKE2
 //
@@ -32,8 +32,8 @@
 // Contact: develop@vtdev.com
 
 
-#ifndef _CEX_BLAKE2B512_H
-#define _CEX_BLAKE2B512_H
+#ifndef CEX_BLAKE512_H
+#define CEX_BLAKE512_H
 
 #include "BlakeParams.h"
 #include "IDigest.h"
@@ -44,7 +44,7 @@ NAMESPACE_DIGEST
 using Key::Symmetric::ISymmetricKey;
 
 /// <summary>
-/// An implementation of the Blake512Compress and Blake2BP digests with a 512 bit digest output size
+/// An implementation of the Blake2B and Blake2BP digests with a 512 bit digest output size
 /// </summary> 
 /// 
 /// <example>
@@ -84,7 +84,7 @@ using Key::Symmetric::ISymmetricKey;
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
 /// <item><description>Algorithm is selected through the constructor (2B or 2BP), parallel version is selected through either the Parallel flag, or via the BlakeParams ThreadCount() configuration parameter.</description></item>
-/// <item><description>Parallel and sequential algorithms (Blake512Compress or Blake2BP) produce different digest outputs, this is expected.</description></item>
+/// <item><description>Parallel and sequential algorithms (Blake2B or Blake2BP) produce different digest outputs, this is expected.</description></item>
 /// <item><description>Sequential Block size 128 bytes, (1024 bits), but smaller or larger blocks can be processed, for best performance, align message input to a multiple of the internal block size.</description></item>
 /// <item><description>Parallel Block input size to the Update function should be aligned to a multiple of ParallelMinimumSize() for best performance.</description></item>
 /// <item><description>Best performance for parallel mode is to use a large input block size to minimize parallel loop creation cost, block size should be in a range of 32KiB to 25MiB.</description></item>
@@ -224,7 +224,7 @@ public:
 
 	/// <summary>
 	/// Initialize the class as either the 2B or 2BP.
-	/// <para>Initialize as either the parallel version Blake2BP, or sequential Blake512Compress.</para>
+	/// <para>Initialize as either the parallel version Blake2BP, or sequential Blake2B.</para>
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2BP variant.</param>

@@ -106,35 +106,28 @@ void GMAC::Destroy()
 {
 	if (!m_isDestroyed)
 	{
-		m_cipherType = BlockCiphers::None;
 		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
 		m_isInitialized = false;
 		m_msgCounter = 0;
 		m_msgOffset = 0;
 
-		try
+		m_gmacHash->Reset();
+
+		if (m_destroyEngine)
 		{
-			m_gmacHash->Reset();
+			m_destroyEngine = false;
 
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
-
-				if (m_blockCipher != 0)
-					delete m_blockCipher;
-			}
-
-			Utility::IntUtils::ClearVector(m_gmacNonce);
-			Utility::IntUtils::ClearVector(m_gmacKey);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_msgBuffer);
-			Utility::IntUtils::ClearVector(m_msgCode);
-
+			if (m_blockCipher != 0)
+				delete m_blockCipher;
 		}
-		catch (std::exception& ex)
-		{
-			throw CryptoMacException("GMAC:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+
+		Utility::IntUtils::ClearVector(m_gmacNonce);
+		Utility::IntUtils::ClearVector(m_gmacKey);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_msgBuffer);
+		Utility::IntUtils::ClearVector(m_msgCode);
+
 	}
 }
 
@@ -146,8 +139,8 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 		throw CryptoMacException("GMAC:Finalize", "The Output buffer is too short!");
 
 	m_gmacHash->FinalizeBlock(m_msgCode, m_msgCounter, 0);
-	Utility::MemUtils::XorBlock<byte>(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
-	Utility::MemUtils::Copy<byte>(m_msgCode, 0, Output, OutOffset, BLOCK_SIZE);
+	Utility::MemUtils::XorBlock(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
+	Utility::MemUtils::Copy(m_msgCode, 0, Output, OutOffset, BLOCK_SIZE);
 	Reset();
 
 	return BLOCK_SIZE;
@@ -202,9 +195,9 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 
 void GMAC::Reset()
 {
-	Utility::MemUtils::Clear<byte>(m_gmacNonce, 0, m_gmacNonce.size());
-	Utility::MemUtils::Clear<byte>(m_msgCode, 0, m_msgCode.size());
-	Utility::MemUtils::Clear<byte>(m_msgBuffer, 0, m_msgBuffer.size());
+	Utility::MemUtils::Clear(m_gmacNonce, 0, m_gmacNonce.size());
+	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
+	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgCounter = 0;
 	m_msgOffset = 0;
 }

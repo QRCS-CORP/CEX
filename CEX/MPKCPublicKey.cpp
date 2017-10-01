@@ -17,16 +17,16 @@ const MPKCParams MPKCPublicKey::Parameters()
 
 const std::vector<byte> &MPKCPublicKey::P()
 {
-	return m_pCoeffs;
+	return m_pubMat;
 }
 
 //~~~Constructor~~~//
 
-MPKCPublicKey::MPKCPublicKey(MPKCParams Parameters, std::vector<byte> &P)
+MPKCPublicKey::MPKCPublicKey(MPKCParams Params, const std::vector<byte> &P)
 	:
+	m_mpkcParameters(Params),
 	m_isDestroyed(false),
-	m_mpkcParameters(Parameters),
-	m_pCoeffs(P)
+	m_pubMat(P)
 {
 }
 
@@ -34,12 +34,12 @@ MPKCPublicKey::MPKCPublicKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false),
 	m_mpkcParameters(MPKCParams::None),
-	m_pCoeffs(0)
+	m_pubMat(0)
 {
-	m_mpkcParameters = static_cast<MPKCParams>(Utility::IntUtils::LeBytesTo16(KeyStream, 0));
-	uint pLen = Utility::IntUtils::LeBytesTo16(KeyStream, 2);
-	m_pCoeffs.resize(pLen);
-	Utility::MemUtils::Copy<byte, byte>(KeyStream, 4, m_pCoeffs, 0, pLen);
+	m_mpkcParameters = static_cast<MPKCParams>(KeyStream[0]);
+	uint pLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
+	m_pubMat.resize(pLen);
+	Utility::MemUtils::Copy(KeyStream, 5, m_pubMat, 0, pLen);
 }
 
 MPKCPublicKey::~MPKCPublicKey()
@@ -53,22 +53,21 @@ void MPKCPublicKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_mpkcParameters = MPKCParams::None;
 
-		if (m_pCoeffs.size() > 0)
-			Utility::IntUtils::ClearVector(m_pCoeffs);
-
-		m_isDestroyed = true;
+		if (m_pubMat.size() > 0)
+			Utility::IntUtils::ClearVector(m_pubMat);
 	}
 }
 
 std::vector<byte> MPKCPublicKey::ToBytes()
 {
-	ushort pLen = static_cast<ushort>(m_pCoeffs.size());
-	std::vector<byte> p(pLen + 4);
-	Utility::IntUtils::Le16ToBytes(static_cast<ushort>(m_mpkcParameters), p, 0);
-	Utility::IntUtils::Le16ToBytes(pLen, p, 2);
-	Utility::MemUtils::Copy<byte, byte>(m_pCoeffs, 0, p, 4, pLen);
+	uint pLen = static_cast<uint>(m_pubMat.size());
+	std::vector<byte> p(pLen + 5);
+	p[0] = static_cast<byte>(m_mpkcParameters);
+	Utility::IntUtils::Le32ToBytes(pLen, p, 1);
+	Utility::MemUtils::Copy(m_pubMat, 0, p, 5, pLen);
 
 	return p;
 }

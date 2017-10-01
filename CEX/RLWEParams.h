@@ -1,5 +1,5 @@
-#ifndef _CEX_RLWEPARAMS_H
-#define _CEX_RLWEPARAMS_H
+#ifndef CEX_RLWEPARAMS_H
+#define CEX_RLWEPARAMS_H
 
 #include "CexDomain.h"
 
@@ -8,7 +8,7 @@ NAMESPACE_ENUMERATION
 /// <summary>
 /// The RingLWE parameter sets enumeration
 /// </summary>
-enum class RLWEParams : ushort
+enum class RLWEParams : byte
 {
 	/// <summary>
 	/// No parameter set is specified
@@ -17,11 +17,11 @@ enum class RLWEParams : ushort
 	/// <summary>
 	/// A modulus of 12289 with 1024 coefficients
 	/// </summary>
-	Q12289N1024 = 1
-	/// <summary>
-	/// A modulus of 40961 with 1024 coefficients
+	Q12289N1024 = 1,
+	/*/// <summary>
+	/// A modulus of ????? with ???? coefficients
 	/// </summary>
-	//Q40961N1024 = 2
+	Q?????N???? = 2*/
 };
 
 NAMESPACE_ENUMERATIONEND

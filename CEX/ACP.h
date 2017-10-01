@@ -1,5 +1,5 @@
-#ifndef _CEX_ACP_H
-#define _CEX_ACP_H
+#ifndef CEX_ACP_H
+#define CEX_ACP_H
 
 #include "IProvider.h"
 #include "ICipherMode.h"
@@ -7,8 +7,7 @@
 NAMESPACE_PROVIDER
 
 /// <summary>
-/// An implementation of an Auto Collection seed Provider.
-/// <para></para>
+/// An implementation of an Auto Collection seed Provider
 /// </summary>
 /// 
 /// <example>

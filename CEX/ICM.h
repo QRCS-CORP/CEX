@@ -24,8 +24,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_ICM_H
-#define _CEX_ICM_H
+#ifndef CEX_ICM_H
+#define CEX_ICM_H
 
 #include "ICipherMode.h"
 
@@ -100,6 +100,7 @@ NAMESPACE_MODE
 /// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf">SP800-38A</a>.</description></item>
+/// <item><description>Comments to NIST concerning AES Modes of Operations: <a href="http://csrc.nist.gov/groups/ST/toolkit/BCM/documents/proposedmodes/ctr/ctr-spec.pdf">CTR-Mode Encryption</a>.</description></item>
 /// <item><description>Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/chap7.pdf">Chapter 7: Block Ciphers</a>.</description></item>
 /// </list>
 /// </remarks>

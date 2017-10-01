@@ -24,8 +24,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_OFB_H
-#define _CEX_OFB_H
+#ifndef CEX_OFB_H
+#define CEX_OFB_H
 
 #include "ICipherMode.h"
 

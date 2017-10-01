@@ -108,18 +108,11 @@ void Keccak512::Destroy()
 		m_isDestroyed = true;
 		m_msgLength = 0;
 
-		try
-		{
-			for (size_t i = 0; i < m_dgtState.size(); ++i)
-				m_dgtState[i].Reset();
+		for (size_t i = 0; i < m_dgtState.size(); ++i)
+			m_dgtState[i].Reset();
 
-			Utility::IntUtils::ClearVector(m_dgtState);
-			Utility::IntUtils::ClearVector(m_msgBuffer);
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoDigestException("Keccak512:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_dgtState);
+		Utility::IntUtils::ClearVector(m_msgBuffer);
 	}
 }
 
@@ -131,7 +124,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
-			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 
 		// process buffer
 		if (m_msgLength != 0)
@@ -153,7 +146,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			Utility::IntUtils::LeULL512ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * BLOCK_SIZE);
+			Utility::IntUtils::LeULL512ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * DIGEST_SIZE);
 			m_msgLength += DIGEST_SIZE;
 		}
 
@@ -164,7 +157,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
 
 			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
-				Compress(m_msgBuffer, i * BLOCK_SIZE, rootState);
+				Keccak::Permute(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, rootState.H);
 
 			m_msgLength -= BLKRMD;
 			blkOff = BLKRMD;
@@ -178,7 +171,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	{
 
 		if (m_msgLength != m_msgBuffer.size())
-			Utility::MemUtils::Clear<byte>(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
 		Utility::IntUtils::LeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
@@ -192,11 +185,11 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 void Keccak512::ParallelMaxDegree(size_t Degree)
 {
 	if (Degree == 0)
-		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree can not be zero!");
+		throw CryptoDigestException("Keccak512:ParallelMaxDegree", "Parallel degree can not be zero!");
 	if (Degree > 254)
-		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree can not exceed 254!");
+		throw CryptoDigestException("Keccak512:ParallelMaxDegree", "Parallel degree can not exceed 254!");
 	if (Degree % 2 != 0)
-		throw CryptoDigestException("Skein256:ParallelMaxDegree", "Parallel degree must be an even number!");
+		throw CryptoDigestException("Keccak512:ParallelMaxDegree", "Parallel degree must be an even number!");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	Reset();
@@ -204,7 +197,7 @@ void Keccak512::ParallelMaxDegree(size_t Degree)
 
 void Keccak512::Reset()
 {
-	Utility::MemUtils::Clear<byte>(m_msgBuffer, 0, m_msgBuffer.size());
+	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -214,7 +207,7 @@ void Keccak512::Reset()
 		if (m_parallelProfile.IsParallel())
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
-			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
+			Keccak::Permute(m_treeParams.ToBytes(), 0, BLOCK_SIZE, m_dgtState[i].H);
 		}
 	}
 }
@@ -239,12 +232,12 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			// fill buffer
 			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 			if (RMDLEN != 0)
-				Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 
 			// empty the message buffer
 			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 			{
-				Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
+				Keccak::Permute(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, m_dgtState[i].H);
 			});
 
 			m_msgLength = 0;
@@ -286,9 +279,9 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		{
 			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 			if (RMDLEN != 0)
-				Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 
-			Compress(m_msgBuffer, 0, m_dgtState[0]);
+			Keccak::Permute(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0].H);
 			m_msgLength = 0;
 			InOffset += RMDLEN;
 			Length -= RMDLEN;
@@ -297,7 +290,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		// sequential loop through blocks
 		while (Length >= BLOCK_SIZE)
 		{
-			Compress(Input, InOffset, m_dgtState[0]);
+			Keccak::Permute(Input, InOffset, BLOCK_SIZE, m_dgtState[0].H);
 			InOffset += BLOCK_SIZE;
 			Length -= BLOCK_SIZE;
 		}
@@ -306,23 +299,18 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 	// store unaligned bytes
 	if (Length != 0)
 	{
-		Utility::MemUtils::Copy<byte>(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 		m_msgLength += Length;
 	}
 }
 
 //~~~Private Functions~~~//
 
-void Keccak512::Compress(const std::vector<byte> &Input, size_t InOffset, Keccak512State &State)
-{
-	Keccak::Permute(Input, InOffset, BLOCK_SIZE, State.H);
-}
-
 void Keccak512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak512State &State)
 {
 	Input[InOffset + Length] = 1;
 	Input[InOffset + BLOCK_SIZE - 1] |= 128;
-	Compress(Input, InOffset, State);
+	Keccak::Permute(Input, InOffset, BLOCK_SIZE, State.H);
 
 	State.H[1] = ~State.H[1];
 	State.H[2] = ~State.H[2];
@@ -335,7 +323,7 @@ void Keccak512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Kec
 {
 	do
 	{
-		Compress(Input, InOffset, State);
+		Keccak::Permute(Input, InOffset, BLOCK_SIZE, State.H);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 

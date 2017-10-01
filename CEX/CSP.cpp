@@ -102,7 +102,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 		{
 			size_t prcRmd = Utility::IntUtils::Min(sizeof(uint), prcLen);
 			uint rndNum = arc4random();
-			Utility::MemUtils::Copy<uint, byte>(rndNum, Output, prcOffset, prcRmd);
+			Utility::MemUtils::Copy(rndNum, Output, prcOffset, prcRmd);
 			prcOffset += prcRmd;
 			prcLen -= prcRmd;
 		} 
@@ -156,7 +156,7 @@ void CSP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 	std::vector<byte> rndData(Length);
 	GetBytes(rndData);
-	Utility::MemUtils::Copy<byte>(rndData, 0, Output, Offset, rndData.size());
+	Utility::MemUtils::Copy(rndData, 0, Output, Offset, rndData.size());
 }
 
 std::vector<byte> CSP::GetBytes(size_t Length)
@@ -172,7 +172,7 @@ uint CSP::Next()
 	uint rndNum = 0;
 	std::vector<byte> rndData(sizeof(uint));
 	GetBytes(rndData);
-	Utility::MemUtils::Copy<byte, uint>(rndData, 0, rndNum, sizeof(uint));
+	Utility::MemUtils::CopyToValue(rndData, 0, rndNum, sizeof(uint));
 
 	return rndNum;
 }

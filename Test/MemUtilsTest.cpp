@@ -96,9 +96,9 @@ namespace Test
 		{
 			ulong inpVal = rng.NextUInt64(1000000, 100);
 			std::vector<byte> output(8);
-			MemUtils::Copy<ulong, byte>(inpVal, output, 0, 8);
+			MemUtils::CopyFromValue(inpVal, output, 0, 8);
 			ulong cmpVal = 0;
-			MemUtils::Copy<byte, ulong>(output, 0, cmpVal, 8);
+			MemUtils::CopyToValue(output, 0, cmpVal, 8);
 
 			if (cmpVal != inpVal)
 				throw TestException("CompareOutput: byte comparison failed!");
@@ -162,7 +162,7 @@ namespace Test
 			std::vector<byte> input(inpSze);
 			std::vector<byte> output(inpSze);
 			std::memset(&input[0], (byte)0xff, inpSze);
-			MemUtils::SetValue<byte>(output, 0, inpSze, (byte)0xff);
+			MemUtils::SetValue(output, 0, inpSze, (byte)0xff);
 
 			if (input != output)
 				throw TestException("CompareOutput: byte comparison failed!");

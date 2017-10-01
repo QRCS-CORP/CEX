@@ -87,7 +87,7 @@ SymmetricSecureKey SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize)
 void SymmetricKeyGenerator::GetBytes(std::vector<byte> &Output)
 {
 	std::vector<byte> rnd = Generate(Output.size());
-	Utility::MemUtils::Copy<byte>(rnd, 0, Output, 0, rnd.size());
+	Utility::MemUtils::Copy(rnd, 0, Output, 0, rnd.size());
 }
 
 std::vector<byte> SymmetricKeyGenerator::GetBytes(size_t Size)
@@ -128,7 +128,7 @@ std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 	{
 		std::vector<byte> rnd = GenerateBlock();
 		size_t alnLen = Utility::IntUtils::Min(keyLen, rnd.size());
-		Utility::MemUtils::Copy<byte>(rnd, 0, key, blkOff, alnLen);
+		Utility::MemUtils::Copy(rnd, 0, key, blkOff, alnLen);
 		keyLen -= alnLen;
 		blkOff += alnLen;
 	} 

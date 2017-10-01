@@ -1,12 +1,12 @@
-#ifndef _CEX_TBC_H
-#define _CEX_TBC_H
+#ifndef CEX_TBC_H
+#define CEX_TBC_H
 
 #include "IPadding.h"
 
 NAMESPACE_PADDING
 
 /// <summary>
-/// The Trailing Bit Compliment Padding Scheme.
+/// The Trailing Bit Compliment Padding Scheme
 /// </summary>
 class TBC final : public IPadding
 {

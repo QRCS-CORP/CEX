@@ -119,14 +119,17 @@ void MacStream::CalculateProgress(size_t Length, size_t Processed)
 
 void MacStream::Destroy()
 {
-	m_isDestroyed = true;
-	m_isInitialized = false;
-	m_progressInterval = 0;
-
-	if (m_destroyEngine)
+	if (!m_isDestroyed)
 	{
-		delete m_macEngine;
-		m_destroyEngine = false;
+		m_isDestroyed = true;
+		m_isInitialized = false;
+		m_progressInterval = 0;
+
+		if (m_destroyEngine)
+		{
+			delete m_macEngine;
+			m_destroyEngine = false;
+		}
 	}
 }
 

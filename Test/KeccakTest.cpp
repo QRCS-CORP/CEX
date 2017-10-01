@@ -2,7 +2,10 @@
 #include "../CEX/HMAC.h"
 #include "../CEX/Keccak256.h"
 #include "../CEX/Keccak512.h"
+#include "../CEX/Keccak1024.h"
 #include "../CEX/SymmetricKey.h"
+
+//#define ENABLE_LONGKAT_TEST
 
 namespace Test
 {
@@ -47,19 +50,25 @@ namespace Test
 
 			Keccak256* kc256 = new Keccak256;
 			Keccak512* kc512 = new Keccak512;
+			Keccak1024* kc1024 = new Keccak1024;
 
 			CompareVector(kc256, m_expected256);
 			OnProgress(std::string("Passed Keccak 256 bit digest vector tests.."));
 			CompareVector(kc512, m_expected512);
 			OnProgress(std::string("KeccakTest: Passed Keccak 512 bit digest vector tests.."));
+			CompareVector(kc1024, m_expected1024);
+			OnProgress(std::string("KeccakTest: Passed Keccak 1024 bit digest vector tests.."));
 
 			CompareHMAC(kc256, m_mac256, m_trunc256);
 			OnProgress(std::string("Passed Keccak 256 bit digest HMAC tests.."));
 			CompareHMAC(kc512, m_mac512, m_trunc512);
 			OnProgress(std::string("KeccakTest: Passed Keccak 512 bit digest HMAC tests.."));
+			CompareHMAC(kc1024, m_mac1024, m_trunc1024);
+			OnProgress(std::string("KeccakTest: Passed Keccak 1024 bit digest HMAC tests.."));
 
 			delete kc256;
 			delete kc512;
+			delete kc1024;
 
 			return SUCCESS;
 		}
@@ -129,17 +138,19 @@ namespace Test
 
 		CompareDoFinal(Digest);
 
-		/*// very long test (it passes)
+#if defined(ENABLE_LONGKAT_TEST)
+		// very long test (it passes)
 		for (unsigned int i = 0; i != 16384; i++)
 		{
-		for (int j = 0; j != 1024; j++)
-		Digest->Update(m_xtremeData, 0, m_xtremeData.size());
+			for (int j = 0; j != 1024; j++)
+				Digest->Update(m_xtremeData, 0, m_xtremeData.size());
 		}
 
 		Digest->Finalize(hash, 0);
 
 		if ((Expected[m_messages.size() + 2]) != hash)
-		throw TestException("Keccak: Expected hash is not equal!");*/
+			throw TestException("Keccak: Expected hash is not equal!");
+#endif
 	}
 
 	void KeccakTest::CompareDoFinal(IDigest* Digest)
@@ -165,6 +176,7 @@ namespace Test
 	{
 		HMAC mac(Digest);
 		std::vector<byte> macV2(mac.MacSize(), 0);
+		std::string ret = "";
 
 		for (unsigned int i = 0; i != m_macKeys.size(); i++)
 		{
@@ -224,6 +236,18 @@ namespace Test
 		};
 		HexConverter::Decode(expected512Enc, 6, m_expected512);
 
+		// note: this is an original kat-set
+		const char* expected1024Enc[6] =
+		{
+			("4ed0ad69e8cd211d65e2c0158b67ae4f86263b5014ab79fff1471885303cb79fbe78f8281310234e893b564f3e964f1d66dd6a24006da3e9111f62aac7e73fbdae5199bc6a07eec52acc0636a294bd1b2e8d749ad0a015b7f3a8278fdcbc92252e7f0fd1900af709b597ff1c419b0a733e7018347e8504173c457edaeb19ddb5"),
+			("04ddc8ff4a0ebeedbc37e9a044cb3ef3a8f250225747e83f280044f10a37724fa570bd59006d9b641209e04fddde79bfbedd306db759aba64496d999d486b9b8b64196e93cf0d1a59e9cfb583a8ec1f5fad13cf746174a7bf41d802bd39a38e749cc5b7ccf32f80cd07548a9b104e526e63837df637e7baf0b44fae23cfe729b"),
+			("5c3092ad41d4b5477eb781d4764dc73904029999ded12e760098827c0eb5732c2c1a4a6cf0503e43f87cc447c1651ca4c8152bb21a2084b5893989809aa4fe8f1e17b216f91fe2ee2111a0b939a2ad090bd9dc1ef7c4a1f85a1ad1ce1376d9665bf1c5424b6466b3146be185da89a6546fdd8aa1524039b7077a109f9cf90fea"),
+			("424be4b5ab9291d45952e4de138db20782b478e0401ac3d6299bab3735c5b4477fcc34b39ca58d0f50078dc51f1ca51a6e749c4cd047c99ac1298aefc675a8912d74d113843afa205665bdc9ed47811addb0c0530ad767d1bead9296049d46d3b6dd092216fd65183dd9a728d31738ba09180aaeb43c4b1cb39b95b04445a97c"),
+			("8bca0faa51893c9fdacc7c26ed623ddb8009a1aa9afd2df7fbdb911160fa8d9728ef97f7347751711d41d43e012973a0f8e5193b27117a8683818d4fdd05b05744f0cd20f064d217ca757c872de0b90ab8bed5637f8d25d631319914a82142fa0ff0d721b19d67ab1ecb8aa1c3bf62c55f24a4169c16a39330e432c99b7edcb0"),
+			("a3becd77b98cf5ac678a47cd2e76572ddd982eef4cb2040fb72331d3c2fc9d4d2cd8c4e3840b361acc8fc80b17cb1b8dff4d016012d58b6fc87210da3a244bafb26dff66f4f4309257a427f0b423e2e3f6aa1b5febae817d98e55bd3beca224852f5d3e3d93bc2145082db11e43457d8a56d57aa54a5b433c9c21ee7ecda1fdb")
+		};
+		HexConverter::Decode(expected1024Enc, 6, m_expected1024);
+
 		const char* macKeysEnc[7] =
 		{
 			("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"),
@@ -279,10 +303,24 @@ namespace Test
 		};
 		HexConverter::Decode(mac512Enc, 7, m_mac512);
 
+		// note: this is an original kat-set
+		const char* mac1024Enc[7] =
+		{
+			("42805c510f82fd49e3ac858b1d53d42de7214823febb9794feb2c2e01fceabce0f0027c82afacf5ecebc1a60877d543248a5ed6af1e306116682dae1ece0ff3b35325004cb59e6982b133ff5f41dae2fc4b0171f117393531af4c98ffb2a353b21f22f301de64a23ae6d09710a03a26f14f122132823bac930af7b39eb8d95da"),
+			("e5b8b469a82653ccc186e7b23ff1ccd0e16eee7d950ec56b7343237be39bfa963179948b1c85551c31821476efae2b7fbf6aebe0e5d2ebda32502fa524e4b296aa1cfd0e7bba76fc0f8860a33367a1d21ad4cfa45ae0490f26a8d7613caedc67f7ab706662364451740eacd399b4407bd7dddda38cda0eea90e69107e14fb064"),
+			("9656e52c565bae75b19260211519d09d185cfd3a8f846fa643b123f4bc1bd7609762ec0dfe61f8cf87570ce77e7021bad356266a80ac02d41c754ff7b786500830d3187b5407877b97c599a52ade3c568e611cf2edaa721295b34dc5145f7af290bf460ebe726ee451d0d633ff2d09faa5384744bdb7fbb2b56f989320c98204"),
+			("469d9fbb6df60ff2058ae9a49946f62ffc6da5b5752ba1c91480e143a9c0e776e7c322c7c2813cb3589d329548b2f177f0f98073aa54fc4c70b26e1056656af9d9e01ab174da9c23072c46f3a57b0bef5fe2ce2d8b9dfe41248fd7118d8644b783b806dbdf3e3f32a0598229e4713d44ef4671aa9b4df4026468c85ba61c57b6"),
+			("83befc14425f9140334df3ae73b007073e78b17a338210bc464856fb4527ca63c64efa81fa305a00a9c3902e965dfd4869e18210bab7fe2e2c7f40bb0bead5d2cd14405bada15c637bb26dac378bcd6a1cc2853577259b753865f6175ed278ddceabb23868b5f9dbbce0e19f5df6e897d56c4d069f4425fd85cc944506350ac3"),
+			("c5836097ffb8344c595146a15ad6c9103d57c565f2ca693f0efaab8e7e9b9345c21cf056b0a66238f0691be0b96f7fd31ac0157dcab016b183c07c1539c0ed9a522135c168f0e6a2893bceeab84fa38a4f4b13312fb0e07534ad85fd88931fc1ee517bfd84ebeb0585ad28ddc5859bb187e832fcaf09ff7f68c4dc63bc0d5092"),
+			("26e07c5d1badfd4fcdda85f22595f09a57c54fc49856e87621afa9ed4dd3ede5412b37a2b2ed57ca7f18fd604e4fb341e56d0b469326ccc4f6e3025d4f3e0629bd0a5cf89242fa892a51872bf42b9fbda0fdf93643d39cbda6d9fb3737e109ab91352745f1262089804f613bf0f9f5d76197b4f58f0fa1bc569ea45cc9290b3e")
+		};
+		HexConverter::Decode(mac1024Enc, 7, m_mac1024);
+
 		HexConverter::Decode("0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", m_truncKey);
 		HexConverter::Decode("546573742057697468205472756e636174696f6e", m_truncData);
 		HexConverter::Decode("745e7e687f8335280d54202ef13cecc6", m_trunc256);
 		HexConverter::Decode("04c929fead434bba190dacfa554ce3f5", m_trunc512);
+		HexConverter::Decode("13546420cecd906398c95da09ac9880cb171ff43a367ef5c8354343c0d670665752fa4e5a69312994455e2f6d66aad941c8dd83818c539678c973112ff745c0e7e1ba1f314cf5e9f1aa7b21866ebd6fb21c502c5f344f18bb544f95f2aa95d0178800871302e7515872597ee2b1f0c7f32d56714dd991c1c0be96a243001a752", m_trunc1024);
 		HexConverter::Decode("61626364656667686263646566676869636465666768696a6465666768696a6b65666768696a6b6c666768696a6b6c6d6768696a6b6c6d6e68696a6b6c6d6e6f", m_xtremeData);
 	}
 

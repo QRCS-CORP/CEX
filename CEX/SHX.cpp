@@ -12,7 +12,6 @@
 #	include "UInt128.h"
 #endif
 
-
 NAMESPACE_BLOCK
 
 const std::string SHX::CIPHER_NAME("Serpent");
@@ -166,27 +165,19 @@ void SHX::Destroy()
 		m_kdfEngineType = Digests::None;
 		m_kdfInfoMax = 0;
 		m_kdfKeySize = 0;
-		m_isDestroyed = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_rndCount = 0;
 
-		try
-		{
-			Utility::IntUtils::ClearVector(m_expKey);
-			Utility::IntUtils::ClearVector(m_kdfInfo);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_legalRounds);
+		Utility::IntUtils::ClearVector(m_expKey);
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_legalRounds);
 
-			if (m_kdfEngine != 0 && m_destroyEngine)
-				delete m_kdfEngine;
+		if (m_kdfEngine != 0 && m_destroyEngine)
+			delete m_kdfEngine;
 
-			m_destroyEngine = false;
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoSymmetricCipherException("SHX:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		m_destroyEngine = false;
 	}
 }
 
@@ -278,10 +269,10 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 		// seperate salt and key
 		m_kdfKeySize = m_kdfEngine->BlockSize();
 		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		Utility::MemUtils::Copy<byte>(Key, 0, kdfKey, 0, m_kdfKeySize);
+		Utility::MemUtils::Copy(Key, 0, kdfKey, 0, m_kdfKeySize);
 		size_t saltSize = Key.size() - m_kdfKeySize;
 		std::vector<byte> kdfSalt(saltSize, 0);
-		Utility::MemUtils::Copy<byte>(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
+		Utility::MemUtils::Copy(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
 		// info can be null
 		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
 	}
@@ -335,7 +326,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 			Wp[i] = Utility::IntUtils::RotL32((uint)(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
 
 		// copy to expanded key
-		Utility::MemUtils::Copy<uint>(Wp, 8, Wk, 0, 8 * sizeof(uint));
+		Utility::MemUtils::Copy(Wp, 8, Wk, 0, 8 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 8; i < keySize; i++)
@@ -350,7 +341,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 			Wp[i] = Utility::IntUtils::RotL32((uint)(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
 
 		// copy to expanded key
-		Utility::MemUtils::Copy<uint>(Wp, 16, Wk, 0, 16 * sizeof(uint));
+		Utility::MemUtils::Copy(Wp, 16, Wk, 0, 16 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 16; i < keySize; i++)

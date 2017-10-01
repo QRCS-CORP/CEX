@@ -131,9 +131,9 @@ void DCG::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_reseedCounter = 0;
 		m_reseedThreshold = 0;
-		m_isDestroyed = true;
 		m_isInitialized = true;
 		m_isInitialized = false;
 		m_prdResistant = false;
@@ -143,27 +143,20 @@ void DCG::Destroy()
 		m_reseedThreshold = 0;
 		m_secStrength = 0;
 
-		try
-		{
-			Utility::IntUtils::ClearVector(m_priSeed);
-			Utility::IntUtils::ClearVector(m_priState);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_seedCtr);
-			Utility::IntUtils::ClearVector(m_stateCtr);
+		Utility::IntUtils::ClearVector(m_priSeed);
+		Utility::IntUtils::ClearVector(m_priState);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_seedCtr);
+		Utility::IntUtils::ClearVector(m_stateCtr);
 
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
-
-				if (m_msgDigest != 0)
-					delete m_msgDigest;
-				if (m_providerSource != 0)
-					delete m_providerSource;
-			}
-		}
-		catch (std::exception& ex)
+		if (m_destroyEngine)
 		{
-			throw CryptoGeneratorException("DCG::Destroy", "Could not clear all variables!", std::string(ex.what()));
+			m_destroyEngine = false;
+
+			if (m_msgDigest != 0)
+				delete m_msgDigest;
+			if (m_providerSource != 0)
+				delete m_providerSource;
 		}
 	}
 }
@@ -191,7 +184,7 @@ size_t DCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		m_msgDigest->Finalize(m_priState, 0);
 
 		size_t rmdLen = Utility::IntUtils::Min(m_priState.size(), prcLen);
-		Utility::MemUtils::Copy<byte>(m_priState, 0, Output, OutOffset, rmdLen);
+		Utility::MemUtils::Copy(m_priState, 0, Output, OutOffset, rmdLen);
 		prcLen -= rmdLen;
 		OutOffset += rmdLen;
 		m_reseedCounter += rmdLen;
@@ -245,7 +238,7 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("DCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// added: nonce becomes the initial state counter value
-	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	// update the seed
 	Update(Seed);
 
@@ -264,7 +257,7 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("DCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// copy nonce to state counter
-	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	// update the seed and info
 	Update(Seed);
 	Update(Info);

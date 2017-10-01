@@ -1,5 +1,5 @@
-#ifndef _CEX_PADDINGFROMNAME_H
-#define _CEX_PADDINGFROMNAME_H
+#ifndef CEX_PADDINGFROMNAME_H
+#define CEX_PADDINGFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

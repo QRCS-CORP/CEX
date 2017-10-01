@@ -83,7 +83,7 @@ uint ACP::Next()
 	uint rndNum;
 	std::vector<byte> rndData(sizeof(uint));
 	GetBytes(rndData);
-	Utility::MemUtils::Copy<byte, uint>(rndData, 0, rndNum, sizeof(uint));
+	Utility::MemUtils::CopyToValue(rndData, 0, rndNum, sizeof(uint));
 
 	return rndNum;
 }
@@ -325,7 +325,7 @@ std::vector<byte> ACP::SystemInfo()
 	POINT pnt = Utility::SysUtils::CursorPosition();
 	Utility::ArrayUtils::Append(pnt.x, state);
 	Utility::ArrayUtils::Append(pnt.y, state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::ComputerName(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::CurrentThreadId(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::OsVersion(), state);
@@ -352,7 +352,7 @@ std::vector<byte> ACP::SystemInfo()
 
 	try
 	{
-		Utility::ArrayUtils::Append(Utility::SysUtils::ComputerName(), state);
+		Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::SystemInfo(), state);
 	}

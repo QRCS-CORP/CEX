@@ -1,5 +1,23 @@
-#ifndef _CEX_MEMUTILS_H
-#define _CEX_MEMUTILS_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_MEMUTILS_H
+#define CEX_MEMUTILS_H
 
 #include "CexDomain.h"
 #if defined(__AVX__)
@@ -41,7 +59,6 @@ public:
 		_mm_prefetch(((char*)(address)) + length, _MM_HINT_T1);	\
     } while (false)
 
-
 #define PREFETCHT2(address, length)								\
     do {														\
 		_mm_prefetch(((char*)(address)) + length, _MM_HINT_T2);	\
@@ -60,69 +77,72 @@ public:
 #endif
 
 	/// <summary>
-	/// Clear bytes from a type T integer array.
+	/// Clear bytes from an integer array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Clear.
-	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), the operation is vectorized, otherwise this is a sequential clear operation.</para>
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64/128=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential clear operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The destination type T array to clear</param>
-	/// <param name="Offset">The offset T within the destination array</param>
+	/// <param name="Output">The destination integer array to clear</param>
+	/// <param name="Offset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to clear</param>
-	template <typename T>
-	static void Clear(std::vector<T> &Output, size_t Offset, size_t Length)
+	template <typename Array>
+	inline static void Clear(Array &Output, size_t Offset, size_t Length)
 	{
 		if (Length == 0)
+		{
 			return;
+		}
 
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= Length, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= Length, "Integer type is larger than length");
+		const size_t ELMSZE = sizeof(Output[0]);
+		CEXASSERT((Output.size() - Offset) * ELMSZE >= Length, "Length is larger than output capacity");
+		CEXASSERT(ELMSZE <= Length, "Integer type is larger than length");
 
 		size_t prcCtr = 0;
 
 #if defined(__AVX__)
 #	if defined(__AVX512__)
-		const size_t SMDBLK = 64 / sizeof(T);
+		const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
-		const size_t SMDBLK = 32 / sizeof(T);
+		const size_t SMDBLK = 32 / ELMSZE;
 #	else
-		const size_t SMDBLK = 16 / sizeof(T);
+		const size_t SMDBLK = 16 / ELMSZE;
 #	endif
 
-		if (Length / sizeof(T) >= SMDBLK)
+		if (Length / ELMSZE >= SMDBLK)
 		{
-			const size_t ALNSZE = (Length / (SMDBLK * sizeof(T))) * SMDBLK;
+			const size_t ALNSZE = (Length / (SMDBLK * ELMSZE)) * SMDBLK;
 
 			while (prcCtr != ALNSZE)
 			{
 #if defined(__AVX512__)
-				CLEAR512<T>(Output, Offset + prcCtr);
+				CLEAR512(Output, Offset + prcCtr);
 #elif defined(__AVX2__)
-				CLEAR256<T>(Output, Offset + prcCtr);
+				CLEAR256(Output, Offset + prcCtr);
 #elif defined(__AVX__)
-				CLEAR128<T>(Output, Offset + prcCtr);
+				CLEAR128(Output, Offset + prcCtr);
 #endif
 				prcCtr += SMDBLK;
 			}
 		}
 #endif
 
-		if (prcCtr * sizeof(T) != Length)
-			std::memset(&Output[Offset + prcCtr], (byte)0x0, Length - (prcCtr * sizeof(T)));
+		if (prcCtr * ELMSZE != Length)
+		{
+			std::memset(&Output[Offset + prcCtr], (byte)0x0, Length - (prcCtr * ELMSZE));
+		}
 	}
 
 	/// <summary>
-	/// Clear 128 bits in a type T integer array.
+	/// Clear 128 bits from an integer array.
 	/// <para>This is an AVX vectorized function.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The destination array to clear</param>
-	/// <param name="Offset">The offset T within the destination array</param>
-	template <typename T>
-	inline static void CLEAR128(std::vector<T> &Output, size_t Offset)
+	/// <param name="Offset">The offset Array within the destination array</param>
+	template <typename Array>
+	inline static void CLEAR128(Array &Output, size_t Offset)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= 16, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 16, "Integer type is larger than 128 bits");
-
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), _mm_setzero_si128());
 #else
@@ -131,67 +151,63 @@ public:
 	}
 
 	/// <summary>
-	/// Clear 256 bits in a type T integer array.
+	/// Clear 256 bits from an integer array.
 	/// <para>This is an AVX/AVX2 vectorized function.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The destination array to clear</param>
-	/// <param name="Offset">The offset T within the destination array</param>
-	template <typename T>
-	inline static void CLEAR256(std::vector<T> &Output, size_t Offset)
+	/// <param name="Offset">The offset within the destination array</param>
+	template <typename Array>
+	inline static void CLEAR256(Array &Output, size_t Offset)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= 32, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 32, "Integer type is larger than 256 bits");
-
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_setzero_si256());
 #else
 		CLEAR128(Output, Offset);
-		CLEAR128(Output, Offset + (16 / sizeof(T)));
+		CLEAR128(Output, Offset + (16 / sizeof(Output[0])));
 #endif
 	}
 
 	/// <summary>
-	/// Clear 512 bits in a type T integer array.
+	/// Clear 512 bits in an integer array.
 	/// <para>This is an AVX/AVX2/AVX512 vectorized function.</para>
 	/// </summary>
 	/// 
 	/// <param name="Output">The destination array to clear</param>
-	/// <param name="Offset">The offset T within the destination array</param>
-	template <typename T>
-	inline static void CLEAR512(std::vector<T> &Output, size_t Offset)
+	/// <param name="Offset">The offset within the destination array</param>
+	template <typename Array>
+	inline static void CLEAR512(Array &Output, size_t Offset)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= 64, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 64, "Integer type is larger than 512 bits");
-
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_setzero_si512());
 #else
 		CLEAR256(Output, Offset);
-		CLEAR256(Output, Offset + (32 / sizeof(T)));
+		CLEAR256(Output, Offset + (32 / sizeof(Output[0])));
 #endif
 	}
 
 	/// <summary>
-	/// Compare two type T arrays for equality.
+	/// Compare two arrays for equality.
 	/// <para>This is a constant time (not vectorized) function.</para>
 	/// </summary>
 	/// 
-	/// <param name="A">The first type T array</param>
-	/// <param name="AOffset">The offset T within the first array</param>
-	/// <param name="B">The second type T array</param>
-	/// <param name="BOffset">The offset T within the second array</param>
-	/// <param name="Length">The number of integers to compare</param>
-	template<typename T>
-	static bool Compare(const std::vector<T> &A, size_t AOffset, const std::vector<T> &B, size_t BOffset, size_t Length)
+	/// <param name="A">The first integer array</param>
+	/// <param name="AOffset">The offset within the first array</param>
+	/// <param name="B">The second integer array</param>
+	/// <param name="BOffset">The offset within the second array</param>
+	/// <param name="Elements">The number of array element to compare</param>
+	template<typename Array>
+	inline static bool Compare(const Array &A, size_t AOffset, const Array &B, size_t BOffset, size_t Elements)
 	{
-		CEXASSERT((A.size() - AOffset) >= Length, "Length is larger than A capacity");
-		CEXASSERT((B.size() - BOffset) >= Length, "Length is larger than B capacity");
+		CEXASSERT((A.size() - AOffset) >= Length, "Length is larger than A size");
+		CEXASSERT((B.size() - BOffset) >= Length, "Length is larger than B size");
 
-		T diff = 0;
+		size_t diff = 0;
 
-		for (size_t i = 0; i != Length; ++i)
+		for (size_t i = 0; i != Elements; ++i)
+		{
 			diff |= (A[AOffset + i] ^ B[BOffset + i]);
+		}
 
 		return diff == 0;
 	}
@@ -202,14 +218,14 @@ public:
 	/// The length must not be larger than the integer (V) type byte size.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
+	/// <param name="Input">The integer source array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Value">The destination value</param>
 	/// <param name="Length">The number of bytes to copy</param>
-	template <typename A, typename V>
-	static void Copy(const std::vector<A> &Input, size_t InOffset, V &Value, size_t Length)
+	template <typename Array, typename V>
+	inline static void CopyToValue(const Array &Input, size_t InOffset, V &Value, size_t Length)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= Length, "Length is larger than input capacity");
+		CEXASSERT((Input.size() - InOffset) * sizeof(Input[0]) >= Length, "Length is larger than input capacity");
 		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
 
 		std::memcpy(&Value, &Input[InOffset], Length);
@@ -218,17 +234,17 @@ public:
 	/// <summary>
 	/// Copy bytes from an integer to an array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// The length must not be larger than the integer (V) type byte size.</para>
+	/// The length must not be larger than the integer arrays byte size.</para>
 	/// </summary>
 	/// 
 	/// <param name="Value">The source integer value</param>
-	/// <param name="Output">The type A destination array</param>
-	/// <param name="OutOffset">The offset A within the destination array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to copy</param>
-	template <typename V, typename A>
-	inline static void Copy(const V &Value, std::vector<A> &Output, size_t OutOffset, size_t Length)
+	template <typename V, typename Array>
+	inline static void CopyFromValue(const V Value, Array &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT((Output.size() - OutOffset) * sizeof(A) >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * sizeof(Output[0]) >= Length, "Length is larger than input capacity");
 		CEXASSERT(Length <= sizeof(V), "Length is larger than value");
 
 		std::memcpy(&Output[OutOffset], &Value, Length);
@@ -237,77 +253,89 @@ public:
 	/// <summary>
 	/// Copy an integer array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), the operation is vectorized, otherwise this is a sequential copy operation.</para>
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512),
+	/// the operation is vectorized, otherwise this is a sequential copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
-	/// <param name="Output">The type B destination array</param>
-	/// <param name="OutOffset">The offset B within the destination array</param>
+	/// <param name="Input">The integer source array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The integer destination array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to copy</param>
-	template <typename T>
-	inline static void Copy(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
+	template <typename Array>
+	inline static void Copy(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length)
 	{
 		if (Length == 0)
+		{
 			return;
+		}
 
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= Length, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 16, "Integer type is larger than 128 bits");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= Length, "Length is larger than output capacity");
 
 		size_t prcCtr = 0;
 
 #if defined(__AVX__)
 #	if defined(__AVX512__)
-		const size_t SMDBLK = 64 / sizeof(T);
+		const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
-		const size_t SMDBLK = 32 / sizeof(T);
+		const size_t SMDBLK = 32 / ELMSZE;
 #	else
-		const size_t SMDBLK = 16 / sizeof(T);
+		const size_t SMDBLK = 16 / ELMSZE;
 #	endif
 
-		if (Length / sizeof(T) >= SMDBLK)
+		if (Length / ELMSZE >= SMDBLK)
 		{
-			const size_t ALNSZE = (Length / (SMDBLK * sizeof(T))) * SMDBLK;
+			const size_t ALNSZE = (Length / (SMDBLK * ELMSZE)) * SMDBLK;
 
 			while (prcCtr != ALNSZE)
 			{
 #if defined(__AVX512__)
-				COPY512<T, T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+				COPY512(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
 #elif defined(__AVX2__)
-				COPY256<T, T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+				COPY256(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
 #elif defined(__AVX__)
-				COPY128<T, T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+				COPY128(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
 #endif
 				prcCtr += SMDBLK;
 			}
 		}
 #endif
 
-		if (prcCtr * sizeof(T) != Length)
-			std::memcpy(&Output[OutOffset + prcCtr], &Input[InOffset + prcCtr], Length - (prcCtr * sizeof(T)));
+		if (prcCtr * ELMSZE != Length)
+		{
+			std::memcpy(&Output[OutOffset + prcCtr], &Input[InOffset + prcCtr], Length - (prcCtr * ELMSZE));
+		}
 	}
 
 	/// <summary>
 	/// Copy an integer array.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Copy.
-	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), the operation is vectorized, otherwise this is a sequential copy operation.</para>
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
-	/// <param name="Output">The type B destination array</param>
-	/// <param name="OutOffset">The offset B within the destination array</param>
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to copy</param>
-	template <typename A, typename B>
-	inline static void Copy(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset, size_t Length)
+	template <typename ArrayA, typename ArrayB>
+	inline static void Copy(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
 		if (Length == 0)
+		{
 			return;
+		}
 
-		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= Length, "Length is larger than output capacity");
-		CEXASSERT(sizeof(A) <= 16 && sizeof(B) <= 16, "Integer type is larger than 128 bits");
+		const size_t INPSZE = sizeof(Input[0]);
+		const size_t OUTSZE = sizeof(Output[0]);
+
+		CEXASSERT((Input.size() - InOffset) * INPSZE >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * OUTSZE >= Length, "Length is larger than output capacity");
+		CEXASSERT(INPSZE <= 16 && OUTSZE <= 16, "Integer type is larger than 128 bits");
 
 #if defined(__AVX512__)
 		const size_t SMDBLK = 64;
@@ -327,11 +355,11 @@ public:
 			while (prcCtr != ALNSZE)
 			{
 #if defined(__AVX512__)
-				COPY512<A, B>(Input, InOffset + (prcCtr / sizeof(A)), Output, OutOffset + (prcCtr / sizeof(B)));
+				COPY512(Input, InOffset + (prcCtr / INPSZE), Output, OutOffset + (prcCtr / OUTSZE));
 #elif defined(__AVX2__)
-				COPY256<A, B>(Input, InOffset + (prcCtr / sizeof(A)), Output, OutOffset + (prcCtr / sizeof(B)));
+				COPY256(Input, InOffset + (prcCtr / INPSZE), Output, OutOffset + (prcCtr / OUTSZE));
 #elif defined(__AVX__)
-				COPY128<A, B>(Input, InOffset + (prcCtr / sizeof(A)), Output, OutOffset + (prcCtr / sizeof(B)));
+				COPY128(Input, InOffset + (prcCtr / INPSZE), Output, OutOffset + (prcCtr / OUTSZE));
 #endif
 				prcCtr += SMDBLK;
 			}
@@ -339,7 +367,9 @@ public:
 #endif
 
 		if (prcCtr != Length)
-			std::memcpy(&Output[OutOffset + (prcCtr / sizeof(B))], &Input[InOffset + (prcCtr / sizeof(A))], Length - prcCtr);
+		{
+			std::memcpy(&Output[OutOffset + (prcCtr / OUTSZE)], &Input[InOffset + (prcCtr / INPSZE)], Length - prcCtr);
+		}
 	}
 
 	/// <summary>
@@ -347,17 +377,13 @@ public:
 	/// <para>This is an AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
-	/// <param name="Output">The type B destination array</param>
-	/// <param name="OutOffset">The offset B within the destination array</param>
-	template <typename A, typename B>
-	inline static void COPY128(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void COPY128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= 16, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= 16, "Length is larger than output capacity");
-		CEXASSERT(sizeof(A) <= 16 && sizeof(B) <= 16, "Integer type is larger than 128 bits");
-
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])));
 #else
@@ -370,21 +396,18 @@ public:
 	/// <para>This is an AVX2/AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
-	/// <param name="Output">The type B destination array</param>
-	/// <param name="OutOffset">The offset B within the destination array</param>
-	template <typename A, typename B>
-	inline static void COPY256(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void COPY256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= 32, "Length is larger than output capacity");
-
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
 #else
-		COPY128<A, B>(Input, InOffset, Output, OutOffset);
-		COPY128<A, B>(Input, InOffset + (16 / sizeof(A)), Output, OutOffset + (16 / sizeof(B)));
+		COPY128(Input, InOffset, Output, OutOffset);
+		COPY128(Input, InOffset + (16 / sizeof(Input[0])), Output, OutOffset + (16 / sizeof(Output[0])));
 #endif
 	}
 
@@ -393,21 +416,18 @@ public:
 	/// <para>This is an AVX512/AVX2/AVX vectorized copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
-	/// <param name="Output">The type B destination array</param>
-	/// <param name="OutOffset">The offset B within the destination array</param>
-	template <typename A, typename B>
-	inline static void COPY512(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename ArrayA, typename ArrayB>
+	inline static void COPY512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= 64, "Length is larger than output capacity");
-
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])));
 #else
-		COPY256<A, B>(Input, InOffset, Output, OutOffset);
-		COPY256<A, B>(Input, InOffset + (32 / sizeof(A)), Output, OutOffset + (32 / sizeof(B)));
+		COPY256(Input, InOffset, Output, OutOffset);
+		COPY256(Input, InOffset + (32 / sizeof(Input[0])), Output, OutOffset + (32 / sizeof(Output[0])));
 #endif
 	}
 
@@ -417,19 +437,21 @@ public:
 	/// The Length is the number of *bytes* (8 bit integers) to Move.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type A source array to copy</param>
-	/// <param name="InOffset">The offset A within the source array</param>
-	/// <param name="Output">The type B destination array</param>
-	/// <param name="OutOffset">The offset B within the destination array</param>
+	/// <param name="Input">The source integer array to copy</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to clear</param>
-	template <typename A, typename B>
-	inline static void Move(const std::vector<A> &Input, size_t InOffset, std::vector<B> &Output, size_t OutOffset, size_t Length)
+	template <typename ArrayA, typename ArrayB>
+	inline static void Move(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
 		if (Length == 0)
+		{
 			return;
+		}
 
-		CEXASSERT((Input.size() - InOffset) * sizeof(A) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(B) >= Length, "Length is larger than output capacity");
+		CEXASSERT((Input.size() - InOffset) * sizeof(Input[0]) >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * sizeof(Output[0]) >= Length, "Length is larger than output capacity");
 
 		std::memmove(&Output[OutOffset], &Input[InOffset], Length);
 	}
@@ -437,53 +459,60 @@ public:
 	/// <summary>
 	/// Set memory to a fixed value.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to Set.
-	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), the operation is vectorized, otherwise this is a sequential copy operation.</para>
+	/// If length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential copy operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The type T source array to modify</param>
-	/// <param name="Offset">The offset T within the source array</param>
+	/// <param name="Output">The source integer array to modify</param>
+	/// <param name="Offset">The offset within the source array</param>
 	/// <param name="Length">The number of bytes to change</param>
 	/// <param name="Value">The 8 bit byte value to set</param>
-	template <typename T>
-	static void SetValue(std::vector<T> &Output, size_t Offset, size_t Length, byte Value)
+	template <typename Array>
+	inline static void SetValue(Array &Output, size_t Offset, size_t Length, byte Value)
 	{
 		if (Length == 0)
+		{
 			return;
+		}
 
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= Length, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= Length, "Integer type is larger than length");
+		const size_t ELMSZE = sizeof(Output[0]);
+
+		CEXASSERT((Output.size() - Offset) * ELMSZE >= Length, "Length is larger than output capacity");
+		CEXASSERT(ELMSZE <= Length, "Integer type is larger than length");
 
 		size_t prcCtr = 0;
 
 #if defined(__AVX__)
 #	if defined(__AVX512__)
-		const size_t SMDBLK = 64 / sizeof(T);
+		const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
-		const size_t SMDBLK = 32 / sizeof(T);
+		const size_t SMDBLK = 32 / ELMSZE;
 #	else
-		const size_t SMDBLK = 16 / sizeof(T);
+		const size_t SMDBLK = 16 / ELMSZE;
 #	endif
 
-		if (Length / sizeof(T) >= SMDBLK)
+		if (Length / ELMSZE >= SMDBLK)
 		{
-			const size_t ALNSZE = (Length / (SMDBLK * sizeof(T))) * SMDBLK;
+			const size_t ALNSZE = (Length / (SMDBLK * ELMSZE)) * SMDBLK;
 
 			while (prcCtr != ALNSZE)
 			{
 #if defined(__AVX512__)
-				SETVAL512<T>(Output, Offset + prcCtr, Value);
+				SETVAL512(Output, Offset + prcCtr, Value);
 #elif defined(__AVX2__)
-				SETVAL256<T>(Output, Offset + prcCtr, Value);
+				SETVAL256(Output, Offset + prcCtr, Value);
 #elif defined(__AVX__)
-				SETVAL128<T>(Output, Offset + prcCtr, Value);
+				SETVAL128(Output, Offset + prcCtr, Value);
 #endif
 				prcCtr += SMDBLK;
 			}
 		}
 #endif
 
-		if (prcCtr * sizeof(T) != Length)
-			std::memset(&Output[Offset + prcCtr], Value, Length - (prcCtr * sizeof(T)));
+		if (prcCtr * ELMSZE != Length)
+		{
+			std::memset(&Output[Offset + prcCtr], Value, Length - (prcCtr * ELMSZE));
+		}
 	}
 
 	/// <summary>
@@ -491,14 +520,13 @@ public:
 	/// <para>This is a sequential memset operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The type T source array to modify</param>
-	/// <param name="Offset">The offset T within the source array</param>
+	/// <param name="Output">The source integer array to modify</param>
+	/// <param name="Offset">The offset within the source array</param>
 	/// <param name="Value">The 8 bit byte value to set</param>
-	template <typename T>
-	inline static void SETVAL128(std::vector<T> &Output, size_t Offset, byte Value)
+	template <typename Array>
+	inline static void SETVAL128(Array &Output, size_t Offset, byte Value)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= 16, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 16, "Integer type is larger than 128 bits");
+		CEXASSERT((Output.size() - Offset) * sizeof(Output[0]) >= 16, "Length is larger than output capacity");
 
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), _mm_set1_epi8(Value));
@@ -512,20 +540,19 @@ public:
 	/// <para>This is a sequential memset operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The type T source array to modify</param>
-	/// <param name="Offset">The offset T within the source array</param>
+	/// <param name="Output">The source integer array to modify</param>
+	/// <param name="Offset">The offset within the source array</param>
 	/// <param name="Value">The 8 bit byte value to set</param>
-	template <typename T>
-	inline static void SETVAL256(std::vector<T> &Output, size_t Offset, byte Value)
+	template <typename Array>
+	inline static void SETVAL256(Array &Output, size_t Offset, byte Value)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= 32, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 32, "Integer type is larger than 256 bits");
+		CEXASSERT((Output.size() - Offset) * sizeof(Output[0]) >= 32, "Length is larger than output capacity");
 
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_set1_epi8(Value));
 #else
 		SETVAL128(Output, Offset, Value);
-		SETVAL128(Output, Offset + (16 / sizeof(T)), Value);
+		SETVAL128(Output, Offset + (16 / sizeof(Output[0])), Value);
 #endif
 	}
 
@@ -534,95 +561,103 @@ public:
 	/// <para>This is a sequential memset operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Output">The type T source array to modify</param>
-	/// <param name="Offset">The offset T within the source array</param>
+	/// <param name="Output">The source integer array to modify</param>
+	/// <param name="Offset">The offset within the source array</param>
 	/// <param name="Value">The 8 bit byte value to set</param>
-	template <typename T>
-	inline static void SETVAL512(std::vector<T> &Output, size_t Offset, byte Value)
+	template <typename Array>
+	inline static void SETVAL512(Array &Output, size_t Offset, byte Value)
 	{
-		CEXASSERT((Output.size() - Offset) * sizeof(T) >= 64, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 64, "Integer type is larger than 512 bits");
+		CEXASSERT((Output.size() - Offset) * sizeof(Output[0]) >= 64, "Length is larger than output capacity");
 
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_set1_epi8(Value));
 #else
 		SETVAL256(Output, Offset, Value);
-		SETVAL256(Output, Offset + (32 / sizeof(T)), Value);
+		SETVAL256(Output, Offset + (32 / sizeof(Output[0])), Value);
 #endif
 	}
 
 	/// <summary>
 	/// Block XOR a specified number of 8 bit bytes to process.
 	/// <para>The Length is the number of *bytes* (8 bit integers) to XOR.
-	/// If the length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), the operation is vectorized, otherwise this is a sequential XOR operation.</para>
+	/// If the length is at least the size of an intrinsics integer boundary: (16=AVX, 32=AVX2, 64=AVX512), 
+	/// the operation is vectorized, otherwise this is a sequential XOR operation.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type T source array</param>
-	/// <param name="InOffset">The T sized offset within the source array</param>
-	/// <param name="Output">The type T destination array</param>
-	/// <param name="OutOffset">The sized T offset within the destination array</param>
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to process</param>
-	template <typename T>
-	static void XorBlock(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
+	template <typename Array>
+	inline static void XorBlock(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= Length, "Length is larger than output capacity");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= Length, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= Length, "Length is larger than output capacity");
 		CEXASSERT(Length > 0, "Length can not be zero");
-		CEXASSERT(sizeof(T) <= Length, "Integer type is larger than length");
+		CEXASSERT(ELMSZE <= Length, "Integer type is larger than length");
 
 		size_t prcCtr = 0;
 
 #if defined(__AVX__)
 #	if defined(__AVX512__)
-		const size_t SMDBLK = 64 / sizeof(T);
+		const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
-		const size_t SMDBLK = 32 / sizeof(T);
+		const size_t SMDBLK = 32 / ELMSZE;
 #	else
-		const size_t SMDBLK = 16 / sizeof(T);
+		const size_t SMDBLK = 16 / ELMSZE;
 #	endif
 
-		if (Length / sizeof(T) >= SMDBLK)
+		if (Length / ELMSZE >= SMDBLK)
 		{
-			const size_t ALNSZE = (Length / (SMDBLK * sizeof(T))) * SMDBLK;
+			const size_t ALNSZE = (Length / (SMDBLK * ELMSZE)) * SMDBLK;
 
 			while (prcCtr != ALNSZE)
 			{
 #if defined(__AVX512__)
-				XOR512<T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+				XOR512(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
 #elif defined(__AVX2__)
-				XOR256<T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+				XOR256(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
 #elif defined(__AVX__)
-				XOR128<T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
+				XOR128(Input, InOffset + prcCtr, Output, OutOffset + prcCtr);
 #endif
 				prcCtr += SMDBLK;
 			} 
 		}
 #endif
 
-		if (prcCtr * sizeof(T) != Length)
-			XorPartial<T>(Input, InOffset + prcCtr, Output, OutOffset + prcCtr, Length - (prcCtr * sizeof(T)));
+		if (prcCtr * ELMSZE != Length)
+		{
+			XorPartial(Input, InOffset + prcCtr, Output, OutOffset + prcCtr, Length - (prcCtr * ELMSZE));
+		}
 	}
 
 	/// <summary>
 	/// Block XOR 128 bits
 	/// </summary>
 	/// 
-	/// <param name="Input">The type T source array</param>
-	/// <param name="InOffset">The T sized offset within the source array</param>
-	/// <param name="Output">The type T destination array</param>
-	/// <param name="OutOffset">The sized T offset within the destination array</param>
-	template <typename T>
-	inline static void XOR128(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename Array>
+	inline static void XOR128(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= 16, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= 16, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 16, "Integer type is larger than 128 bits");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= 16, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= 16, "Length is larger than output capacity");
+		CEXASSERT(ELMSZE <= 16, "Integer type is larger than 128 bits");
 
 #if defined(__AVX__)
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset])), _mm_loadu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]))));
 #else
-		for (size_t i = 0; i < (16 / sizeof(T)); ++i)
+		for (size_t i = 0; i < (16 / ELMSZE); ++i)
+		{
 			Output[OutOffset + i] ^= Input[InOffset + i];
+		}
 #endif
 	}
 
@@ -630,22 +665,23 @@ public:
 	/// Block XOR 256 bits
 	/// </summary>
 	/// 
-	/// <param name="Input">The type T source array</param>
-	/// <param name="InOffset">The offset T within the source array</param>
-	/// <param name="Output">The type T destination array</param>
-	/// <param name="OutOffset">The offset T within the destination array</param>
-	template <typename T>
-	inline static void XOR256(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename Array>
+	inline static void XOR256(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= 32, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 32, "Integer type is larger than 256 bits");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= 32, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= 32, "Length is larger than output capacity");
 
 #if defined(__AVX2__)
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_xor_si256(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Output[OutOffset]))));
 #else
 		XOR128(Input, InOffset, Output, OutOffset);
-		XOR128(Input, InOffset + (16 / sizeof(T)), Output, OutOffset + (16 / sizeof(T)));
+		XOR128(Input, InOffset + (16 / ELMSZE), Output, OutOffset + (16 / ELMSZE));
 #endif
 	}
 
@@ -653,22 +689,24 @@ public:
 	/// Block XOR 512 bits
 	/// </summary>
 	/// 
-	/// <param name="Input">The type T source array</param>
-	/// <param name="InOffset">The offset T within the source array</param>
-	/// <param name="Output">The type T destination array</param>
-	/// <param name="OutOffset">The offset T within the destination array</param>
-	template <typename T>
-	inline static void XOR512(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename Array>
+	inline static void XOR512(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= 64, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 64, "Integer type is larger than 512 bits");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= 64, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= 64, "Length is larger than output capacity");
+		CEXASSERT(ELMSZE <= 64, "Integer type is larger than 512 bits");
 
 #if defined(__AVX512__)
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_xor_si512(_mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Output[OutOffset]))));
 #else
 		XOR256(Input, InOffset, Output, OutOffset);
-		XOR256(Input, InOffset + (32 / sizeof(T)), Output, OutOffset + (32 / sizeof(T)));
+		XOR256(Input, InOffset + (32 / ELMSZE), Output, OutOffset + (32 / ELMSZE));
 #endif
 	}
 
@@ -676,36 +714,40 @@ public:
 	/// Block XOR 1024 bits
 	/// </summary>
 	/// 
-	/// <param name="Input">The type T source array</param>
-	/// <param name="InOffset">The offset T within the source array</param>
-	/// <param name="Output">The type T destination array</param>
-	/// <param name="OutOffset">The offset T within the destination array</param>
-	template <typename T>
-	inline static void XOR1024(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset)
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
+	template <typename Array>
+	inline static void XOR1024(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= 128, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= 128, "Length is larger than output capacity");
-		CEXASSERT(sizeof(T) <= 128, "Integer type is larger than 1024 bits");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= 128, "Length is larger than input capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= 128, "Length is larger than output capacity");
+		CEXASSERT(ELMSZE <= 128, "Integer type is larger than 1024 bits");
 
 		XOR512(Input, InOffset, Output, OutOffset);
-		XOR512(Input, InOffset + (64 / sizeof(T)), Output, OutOffset + (64 / sizeof(T)));
+		XOR512(Input, InOffset + (64 / ELMSZE), Output, OutOffset + (64 / ELMSZE));
 	}
 
 	/// <summary>
-	/// Block XOR unaligned bit blocks less than 16 / T.
+	/// XOR unaligned bit blocks less than 16 bytes.
 	/// <para>The Length must be the size in bytes (8 bit integers) to XOR.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The type T source array</param>
-	/// <param name="InOffset">The T sized offset within the source array</param>
-	/// <param name="Output">The type T destination array</param>
-	/// <param name="OutOffset">The sized T offset within the destination array</param>
+	/// <param name="Input">The source integer array</param>
+	/// <param name="InOffset">The offset within the source array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to process</param>
-	template <typename T>
-	inline static void XorPartial(const std::vector<T> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
+	template <typename Array>
+	inline static void XorPartial(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length)
 	{
-		for (size_t i = 0; i < (Length / sizeof(T)); ++i)
+		for (size_t i = 0; i < (Length / sizeof(Input[0])); ++i)
+		{
 			Output[OutOffset + i] ^= Input[InOffset + i];
+		}
 	}
 };
 

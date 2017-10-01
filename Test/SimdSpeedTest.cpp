@@ -330,7 +330,7 @@ namespace Test
 		{
 			while (blkCtr < Length)
 			{
-				MemUtils::Copy<byte>(buffer3, 0, buffer4, 0, buffer4.size());
+				MemUtils::Copy(buffer3, 0, buffer4, 0, buffer4.size());
 				blkCtr += buffer4.size();
 			}
 			blkCtr = 0;

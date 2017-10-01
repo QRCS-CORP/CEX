@@ -1,5 +1,5 @@
-#ifndef _CEX_GENERATORS_H
-#define _CEX_GENERATORS_H
+#ifndef CEX_DRBGS_H
+#define CEX_DRBGS_H
 
 #include "CexDomain.h"
 

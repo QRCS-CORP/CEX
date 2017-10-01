@@ -29,8 +29,8 @@
 // Contact: develop@vtdev.com
 
 
-#ifndef _CEX_SHA512_H
-#define _CEX_SHA512_H
+#ifndef CEX_SHA512_H
+#define CEX_SHA512_H
 
 #include "IDigest.h"
 #include "SHA2Params.h"
@@ -284,9 +284,16 @@ public:
 
 private:
 
+	static ulong BigSigma0(ulong W);
+	static ulong BigSigma1(ulong W);
+	static ulong Ch(ulong B, ulong C, ulong D);
 	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
+	static ulong Maj(ulong B, ulong C, ulong D);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length);
+	static void Round(ulong A, ulong B, ulong C, ulong &D, ulong E, ulong F, ulong G, ulong &H, ulong M, ulong P);
+	static ulong Sigma0(ulong W);
+	static ulong Sigma1(ulong W);
 };
 
 NAMESPACE_DIGESTEND

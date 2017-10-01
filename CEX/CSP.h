@@ -1,5 +1,5 @@
-#ifndef _CEX_CSP_H
-#define _CEX_CSP_H
+#ifndef CEX_CSP_H
+#define CEX_CSP_H
 
 #include "IProvider.h"
 

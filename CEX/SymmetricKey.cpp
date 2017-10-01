@@ -93,14 +93,14 @@ void SymmetricKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
+
 		if (m_key.size() > 0)
 			Utility::IntUtils::ClearVector(m_key);
 		if (m_nonce.size() > 0)
 			Utility::IntUtils::ClearVector(m_nonce);
 		if (m_info.size() > 0)
 			Utility::IntUtils::ClearVector(m_info);
-
-		m_isDestroyed = true;
 	}
 }
 
@@ -124,9 +124,9 @@ SymmetricKey* SymmetricKey::DeSerialize(const MemoryStream &KeyStream)
 	return new SymmetricKey(key, nonce, info);
 }
 
-bool SymmetricKey::Equals(ISymmetricKey &Obj)
+bool SymmetricKey::Equals(ISymmetricKey &Input)
 {
-	return (Obj.Key() == Key() && Obj.Nonce() == Nonce() && Obj.Info() == Info());
+	return (Input.Key() == Key() && Input.Nonce() == Nonce() && Input.Info() == Info());
 }
 
 MemoryStream* SymmetricKey::Serialize(SymmetricKey &KeyObj)

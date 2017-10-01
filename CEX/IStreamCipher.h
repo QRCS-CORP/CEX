@@ -1,5 +1,5 @@
-﻿#ifndef _CEX_IStreamCipher_H
-#define _CEX_IStreamCipher_H
+﻿#ifndef CEX_ISTREAMCIPHER_H
+#define CEX_ISTREAMCIPHER_H
 
 #include "CexDomain.h"
 #include "CryptoSymmetricCipherException.h"
@@ -48,13 +48,14 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get/Set: The salt value in the initialization parameters (Tau-Sigma).
-	/// <para>This value can also be set with the Info parameter of an ISymmetricKey member, or use the default.
+	/// Get: The salt value in the initialization parameters (Tau-Sigma).
+	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
 	/// Changing this code will create a unique distribution of the cipher.
+	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
 	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
 	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
-	virtual std::vector<byte> &DistributionCode() = 0;
+	virtual const std::vector<byte> &DistributionCode() = 0;
 
 	/// <summary>
 	/// Get: The stream ciphers type name

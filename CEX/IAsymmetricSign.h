@@ -1,5 +1,5 @@
-#ifndef _CEX_IASYMMETRICSIGN_H
-#define _CEX_IASYMMETRICSIGN_H
+#ifndef CEX_IASYMMETRICSIGN_H
+#define CEX_IASYMMETRICSIGN_H
 
 #include "CexDomain.h"
 #include "CryptoAsymmetricException.h"

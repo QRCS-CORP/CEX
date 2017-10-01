@@ -1,6 +1,7 @@
 #include "SecureRandom.h"
 #include "BitConverter.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ProviderFromName.h"
 #include "PrngFromName.h"
 
@@ -39,17 +40,10 @@ void SecureRandom::Destroy()
 		m_prngEngineType = Prngs::None;
 		m_providerType = Providers::None;
 
-		try
-		{
-			Utility::IntUtils::ClearVector(m_rndBuffer);
+		Utility::IntUtils::ClearVector(m_rndBuffer);
 
-			if (m_prngEngine != 0)
-				delete m_prngEngine;
-		}
-		catch(std::exception& ex)
-		{
-			throw CryptoRandomException("SecureRandom:Destroy", "Not all objects were destroyed!", std::string(ex.what()));
-		}
+		if (m_prngEngine != 0)
+			delete m_prngEngine;
 	}
 }
 
@@ -100,7 +94,7 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 		size_t bufSize = m_rndBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			Utility::MemUtils::Copy<byte>(m_rndBuffer, m_bufferIndex, Output, 0, bufSize);
+			Utility::MemUtils::Copy(m_rndBuffer, m_bufferIndex, Output, 0, bufSize);
 
 		size_t rmd = Output.size() - bufSize;
 
@@ -111,13 +105,13 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 
 			if (rmd > m_rndBuffer.size())
 			{
-				Utility::MemUtils::Copy<byte>(m_rndBuffer, 0, Output, bufSize, m_rndBuffer.size());
+				Utility::MemUtils::Copy(m_rndBuffer, 0, Output, bufSize, m_rndBuffer.size());
 				bufSize += m_rndBuffer.size();
 				rmd -= m_rndBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy<byte>(m_rndBuffer, 0, Output, bufSize, rmd);
+				Utility::MemUtils::Copy(m_rndBuffer, 0, Output, bufSize, rmd);
 				m_bufferIndex = rmd;
 				rmd = 0;
 			}
@@ -125,7 +119,7 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 	}
 	else
 	{
-		Utility::MemUtils::Copy<byte>(m_rndBuffer, m_bufferIndex, Output, 0, Output.size());
+		Utility::MemUtils::Copy(m_rndBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -153,13 +147,11 @@ short SecureRandom::NextInt16()
 
 short SecureRandom::NextInt16(short Maximum)
 {
-	std::vector<byte> rand;
-	short num(0);
+	short num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = static_cast<short>(Utility::IntUtils::LeBytesTo16(rand, 0));
+		num = (short)GetRanged(Maximum, sizeof(short));
 	} 
 	while (num > Maximum);
 
@@ -184,13 +176,11 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 {
 	CEXASSERT(Maximum != 0, "maximum can not be zero");
 
-	std::vector<byte> rand;
-	ushort num(0);
+	ushort num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = Utility::IntUtils::LeBytesTo16(rand, 0);
+		num = (ushort)GetRanged(Maximum, sizeof(ushort));
 	} 
 	while (num > Maximum);
 
@@ -218,13 +208,11 @@ int SecureRandom::NextInt32()
 
 int SecureRandom::NextInt32(int Maximum)
 {
-	std::vector<byte> rand;
-	int num(0);
+	int num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = static_cast<int>(Utility::IntUtils::LeBytesTo32(rand, 0));
+		num = (int)GetRanged(Maximum, sizeof(int));
 	} 
 	while (num > Maximum);
 
@@ -249,13 +237,11 @@ uint SecureRandom::NextUInt32(uint Maximum)
 {
 	CEXASSERT(Maximum != 0, "maximum can not be zero");
 
-	std::vector<byte> rand;
-	uint num(0);
+	uint num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = Utility::IntUtils::LeBytesTo32(rand, 0);
+		num = (uint)GetRanged(Maximum, sizeof(uint));
 	} 
 	while (num > Maximum);
 
@@ -283,13 +269,11 @@ long SecureRandom::NextInt64()
 
 long SecureRandom::NextInt64(long Maximum)
 {
-	std::vector<byte> rand;
-	long num(0);
+	long num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = static_cast<long>(Utility::IntUtils::LeBytesTo64(rand, 0));
+		num = (long)GetRanged(Maximum, sizeof(long));
 	} 
 	while (num > Maximum);
 
@@ -314,13 +298,11 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 {
 	CEXASSERT(Maximum != 0, "maximum can not be zero");
 
-	std::vector<byte> rand;
-	ulong num(0);
+	ulong num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = Utility::IntUtils::LeBytesTo64(rand, 0);
+		num = GetRanged(Maximum, sizeof(ulong));
 	} 
 	while (num > Maximum);
 
@@ -348,45 +330,38 @@ void SecureRandom::Reset()
 
 //~~~Private Functions~~~//
 
-std::vector<byte> SecureRandom::GetByteRange(ulong Maximum)
+ulong SecureRandom::GetRanged(ulong Maximum, size_t Length)
 {
-	std::vector<byte> data;
+	std::vector<byte> rand;
 
 	if (Maximum < 256)
-		data = GetBytes(1);
+		rand = GetBytes(1);
 	else if (Maximum < 65536)
-		data = GetBytes(2);
+		rand = GetBytes(2);
 	else if (Maximum < 16777216)
-		data = GetBytes(3);
+		rand = GetBytes(3);
 	else if (Maximum < 4294967296)
-		data = GetBytes(4);
+		rand = GetBytes(4);
 	else if (Maximum < 1099511627776)
-		data = GetBytes(5);
+		rand = GetBytes(5);
 	else if (Maximum < 281474976710656)
-		data = GetBytes(6);
+		rand = GetBytes(6);
 	else if (Maximum < 72057594037927936)
-		data = GetBytes(7);
+		rand = GetBytes(7);
 	else
-		data = GetBytes(8);
+		rand = GetBytes(8);
 
-	return GetBits(data, Maximum);
-}
-
-std::vector<byte> SecureRandom::GetBits(std::vector<byte> &Data, ulong Maximum)
-{
 	ulong val = 0;
-	Utility::MemUtils::Copy<byte, ulong>(Data, 0, val, Data.size());
-	ulong bits = Data.size() * 8;
+	Utility::MemUtils::CopyToValue(rand, 0, val, rand.size());
 
+	ulong bits = Length * 8;
 	while (val > Maximum && bits != 0)
 	{
 		val >>= 1;
 		bits--;
 	}
-	std::vector<byte> ret(sizeof(ulong));
-	Utility::MemUtils::Copy<ulong, byte>(val, ret, 0, sizeof(ulong));
 
-	return ret;
+	return val;
 }
 
 NAMESPACE_PRNGEND

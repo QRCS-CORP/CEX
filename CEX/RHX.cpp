@@ -154,22 +154,15 @@ void RHX::Destroy()
 		m_kdfKeySize = 0;
 		m_rndCount = 0;
 
-		try
-		{
-			Utility::IntUtils::ClearVector(m_expKey);
-			Utility::IntUtils::ClearVector(m_kdfInfo);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_legalRounds);
+		Utility::IntUtils::ClearVector(m_expKey);
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_legalRounds);
 
-			if (m_kdfEngine != 0 && m_destroyEngine)
-				delete m_kdfEngine;
+		if (m_kdfEngine != 0 && m_destroyEngine)
+			delete m_kdfEngine;
 
-			m_destroyEngine = false;
-		}
-		catch (std::exception& ex)
-		{
-			throw CryptoSymmetricCipherException("RHX:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		m_destroyEngine = false;
 	}
 }
 
@@ -269,7 +262,7 @@ void RHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 		// reverse key
 		for (size_t i = 0, k = m_expKey.size() - blkWords; i < k; i += blkWords, k -= blkWords)
 		{
-			for (size_t j = 0; j < blkWords; j++) //0-112, 1-113.. 7-119
+			for (size_t j = 0; j < blkWords; j++)
 			{
 				uint temp = m_expKey[i + j];
 				m_expKey[i + j] = m_expKey[k + j];
@@ -303,10 +296,10 @@ void RHX::SecureExpand(const std::vector<byte> &Key)
 		// seperate salt and key
 		m_kdfKeySize = m_kdfEngine->BlockSize();
 		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		Utility::MemUtils::Copy<byte>(Key, 0, kdfKey, 0, m_kdfKeySize);
+		Utility::MemUtils::Copy(Key, 0, kdfKey, 0, m_kdfKeySize);
 		size_t saltSize = Key.size() - m_kdfKeySize;
 		std::vector<byte> kdfSalt(saltSize, 0);
-		Utility::MemUtils::Copy<byte>(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
+		Utility::MemUtils::Copy(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
 		// info can be null
 		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
 	}

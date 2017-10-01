@@ -58,7 +58,7 @@ void RDP::GetBytes(std::vector<byte> &Output)
 	{
 		int32_t rndNum = Next();
 		size_t prcRmd = Utility::IntUtils::Min(sizeof(int32_t), prcLen);
-		Utility::MemUtils::Copy<int32_t, byte>(rndNum, Output, prcOff, prcRmd);
+		Utility::MemUtils::CopyFromValue(rndNum, Output, prcOff, prcRmd);
 		prcOff += prcRmd;
 		prcLen -= prcRmd;
 	} 
@@ -74,7 +74,7 @@ void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
  
 	std::vector<byte> rndData(Length);
 	GetBytes(rndData);
-	Utility::MemUtils::Copy<byte>(rndData, 0, Output, Offset, rndData.size());
+	Utility::MemUtils::Copy(rndData, 0, Output, Offset, rndData.size());
 }
 
 std::vector<byte> RDP::GetBytes(size_t Length)

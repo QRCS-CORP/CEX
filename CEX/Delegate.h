@@ -1,5 +1,5 @@
-#ifndef _CEX_DELEGATE_H
-#define _CEX_DELEGATE_H
+#ifndef CEX_DELEGATE_H
+#define CEX_DELEGATE_H
 
 #include "CexDomain.h"
 

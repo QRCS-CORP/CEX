@@ -1,13 +1,43 @@
-#ifndef _CEX_POLYMATH_H
-#define _CEX_POLYMATH_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_POLYMATH_H
+#define CEX_POLYMATH_H
 
 #include "CexDomain.h"
 
-NAMESPACE_RINGLWE
+#if defined(__AVX512__)
+#	include "UInt512.h"
+#elif defined(__AVX2__)
+#	include "UInt256.h"
+#elif defined(__AVX__)
+#	include "UInt128.h"
+#endif
+
+NAMESPACE_UTILITY
 
 /**
 * \internal
 */
+
+/// <summary>
+/// Internal class used by RingLWE
+/// </summary>
 class PolyMath
 {
 public:
@@ -23,21 +53,21 @@ public:
 #endif
 	}
 
-	template <class T>
-	inline static void Add(std::vector<ushort> &R, const std::vector<ushort> &A, const std::vector<ushort> &B, int Q)
+	template <typename Array, class T>
+	inline static void Add(Array &R, const Array &A, const Array &B, int Q)
 	{
 		const T VN(5);
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const size_t VCTSZE = T::size() / sizeof(uint);
-		std::vector<uint> tmpR(VCTSZE);
+		const size_t VULSZE = T::size() / sizeof(uint);
+		std::array<uint, VULSZE> tmpR;
 		const T NQ(Q);
 		T tmpA, tmpB;
 #else
-		const size_t VCTSZE = 1;
+		const size_t VULSZE = 1;
 #endif
 
-		for (size_t i = 0; i < R.size(); i += VCTSZE)
+		for (size_t i = 0; i < R.size(); i += VULSZE)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -57,8 +87,10 @@ public:
 			VF -= VU;
 			VF.Store(tmpR, 0);
 
-			for (size_t j = 0; j < VCTSZE; ++j)
+			for (size_t j = 0; j < VULSZE; ++j)
+			{
 				R[j + i] = static_cast<ushort>(tmpR[j]);
+			}
 #else
 			T F = A[i] + B[i];
 			uint U = ((uint)F * VN) >> 16;
@@ -69,244 +101,82 @@ public:
 		}
 	}
 
-	template <class T>
-	inline static T F(T &V0, T &V1, T &X, int Q)
+	template <typename Array>
+	inline static void BitReverse(Array &P)
 	{
-		const T NQ(Q);
-		const T N1(1);
-		T xit, t, r, b;
+		uint r;
+		ushort tmp;
 
-		b = X * T(2730);
-		t = b >> 25;
-		b = X - t * NQ;
-		b = T(12288) - b;
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		b = T::ShiftRA(b, 31);
-#else
-		b >>= 31;
-#endif
-		t -= b;
-		r = t & N1;
-		xit = (t >> 1);
-		V0 = xit + r;
-		t -= N1;
-		r = t & N1;
-		V1 = (t >> 1) + r;
-		T v = X - (V0 * T(2) * NQ);
-
-		return PolyMath::Abs<T>(v);
-	}
-
-	template <class T>
-	inline static T G(T &X, const int Q)
-	{
-		T t, c, b;
-
-		b = X * T(2730);
-		t = b >> 27;
-		b = X - t * T(49156);
-		b = T(49155) - b;
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		b = T::ShiftRA(b, 31);
-#else
-		b >>= 31;
-#endif
-		t -= b;
-		c = t & T(1);
-		t >>= 1;
-		t += c;
-		t *= (T(8) * T(Q));
-		t -= X;
-
-		return PolyMath::Abs<T>(t);
-	}
-
-	template <class T>
-	inline static void GetNoise(std::vector<ushort> &R, std::vector<byte> &Random, int Q)
-	{
-		T a, b, r;
-		const T AIBMASK(0x01010101);
-		const T BITMASK(0xff);
-
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const T NQ(Q);
-		const size_t VCTSZE = T::size() / sizeof(uint);
-		std::vector<uint> tmpR(VCTSZE);
-#else
-		const size_t VCTSZE = 1;
-#endif
-
-		for (size_t i = 0; i < R.size(); i += VCTSZE)
+		const ushort BITREV[1024] =
 		{
-#if defined(__AVX512__)
-			r.Load(Random[i + 15], Random[i + 14], Random[i + 13], Random[i + 12], Random[i + 11], Random[i + 10], Random[i + 9], Random[i] + 8), Random[i + 7], Random[i + 6], Random[i + 5], Random[i + 4], Random[i + 3], Random[i + 2], Random[i + 1], Random[i]);
-#elif defined(__AVX2__)
-			r.Load(Random[i + 7], Random[i + 6], Random[i + 5], Random[i + 4], Random[i + 3], Random[i + 2], Random[i + 1], Random[i]);
-#elif defined(__AVX__)
-			r.Load(Random[i + 3], Random[i + 2], Random[i + 1], Random[i]);
-#else
-			r = Random[i];
-#endif
-			T d(0);
+			0, 512, 256, 768, 128, 640, 384, 896, 64, 576, 320, 832, 192, 704, 448, 960, 32, 544, 288, 800, 160, 672, 416, 928, 96, 608, 352, 864, 224, 736, 480, 992,
+			16, 528, 272, 784, 144, 656, 400, 912, 80, 592, 336, 848, 208, 720, 464, 976, 48, 560, 304, 816, 176, 688, 432, 944, 112, 624, 368, 880, 240, 752, 496, 1008,
+			8, 520, 264, 776, 136, 648, 392, 904, 72, 584, 328, 840, 200, 712, 456, 968, 40, 552, 296, 808, 168, 680, 424, 936, 104, 616, 360, 872, 232, 744, 488, 1000,
+			24, 536, 280, 792, 152, 664, 408, 920, 88, 600, 344, 856, 216, 728, 472, 984, 56, 568, 312, 824, 184, 696, 440, 952, 120, 632, 376, 888, 248, 760, 504, 1016,
+			4, 516, 260, 772, 132, 644, 388, 900, 68, 580, 324, 836, 196, 708, 452, 964, 36, 548, 292, 804, 164, 676, 420, 932, 100, 612, 356, 868, 228, 740, 484, 996,
+			20, 532, 276, 788, 148, 660, 404, 916, 84, 596, 340, 852, 212, 724, 468, 980, 52, 564, 308, 820, 180, 692, 436, 948, 116, 628, 372, 884, 244, 756, 500, 1012,
+			12, 524, 268, 780, 140, 652, 396, 908, 76, 588, 332, 844, 204, 716, 460, 972, 44, 556, 300, 812, 172, 684, 428, 940, 108, 620, 364, 876, 236, 748, 492, 1004,
+			28, 540, 284, 796, 156, 668, 412, 924, 92, 604, 348, 860, 220, 732, 476, 988, 60, 572, 316, 828, 188, 700, 444, 956, 124, 636, 380, 892, 252, 764, 508, 1020,
+			2, 514, 258, 770, 130, 642, 386, 898, 66, 578, 322, 834, 194, 706, 450, 962, 34, 546, 290, 802, 162, 674, 418, 930, 98, 610, 354, 866, 226, 738, 482, 994,
+			18, 530, 274, 786, 146, 658, 402, 914, 82, 594, 338, 850, 210, 722, 466, 978, 50, 562, 306, 818, 178, 690, 434, 946, 114, 626, 370, 882, 242, 754, 498, 1010,
+			10, 522, 266, 778, 138, 650, 394, 906, 74, 586, 330, 842, 202, 714, 458, 970, 42, 554, 298, 810, 170, 682, 426, 938, 106, 618, 362, 874, 234, 746, 490, 1002,
+			26, 538, 282, 794, 154, 666, 410, 922, 90, 602, 346, 858, 218, 730, 474, 986, 58, 570, 314, 826, 186, 698, 442, 954, 122, 634, 378, 890, 250, 762, 506, 1018,
+			6, 518, 262, 774, 134, 646, 390, 902, 70, 582, 326, 838, 198, 710, 454, 966, 38, 550, 294, 806, 166, 678, 422, 934, 102, 614, 358, 870, 230, 742, 486, 998,
+			22, 534, 278, 790, 150, 662, 406, 918, 86, 598, 342, 854, 214, 726, 470, 982, 54, 566, 310, 822, 182, 694, 438, 950, 118, 630, 374, 886, 246, 758, 502, 1014,
+			14, 526, 270, 782, 142, 654, 398, 910, 78, 590, 334, 846, 206, 718, 462, 974, 46, 558, 302, 814, 174, 686, 430, 942, 110, 622, 366, 878, 238, 750, 494, 1006,
+			30, 542, 286, 798, 158, 670, 414, 926, 94, 606, 350, 862, 222, 734, 478, 990, 62, 574, 318, 830, 190, 702, 446, 958, 126, 638, 382, 894, 254, 766, 510, 1022,
+			1, 513, 257, 769, 129, 641, 385, 897, 65, 577, 321, 833, 193, 705, 449, 961, 33, 545, 289, 801, 161, 673, 417, 929, 97, 609, 353, 865, 225, 737, 481, 993,
+			17, 529, 273, 785, 145, 657, 401, 913, 81, 593, 337, 849, 209, 721, 465, 977, 49, 561, 305, 817, 177, 689, 433, 945, 113, 625, 369, 881, 241, 753, 497, 1009,
+			9, 521, 265, 777, 137, 649, 393, 905, 73, 585, 329, 841, 201, 713, 457, 969, 41, 553, 297, 809, 169, 681, 425, 937, 105, 617, 361, 873, 233, 745, 489, 1001,
+			25, 537, 281, 793, 153, 665, 409, 921, 89, 601, 345, 857, 217, 729, 473, 985, 57, 569, 313, 825, 185, 697, 441, 953, 121, 633, 377, 889, 249, 761, 505, 1017,
+			5, 517, 261, 773, 133, 645, 389, 901, 69, 581, 325, 837, 197, 709, 453, 965, 37, 549, 293, 805, 165, 677, 421, 933, 101, 613, 357, 869, 229, 741, 485, 997,
+			21, 533, 277, 789, 149, 661, 405, 917, 85, 597, 341, 853, 213, 725, 469, 981, 53, 565, 309, 821, 181, 693, 437, 949, 117, 629, 373, 885, 245, 757, 501, 1013,
+			13, 525, 269, 781, 141, 653, 397, 909, 77, 589, 333, 845, 205, 717, 461, 973, 45, 557, 301, 813, 173, 685, 429, 941, 109, 621, 365, 877, 237, 749, 493, 1005,
+			29, 541, 285, 797, 157, 669, 413, 925, 93, 605, 349, 861, 221, 733, 477, 989, 61, 573, 317, 829, 189, 701, 445, 957, 125, 637, 381, 893, 253, 765, 509, 1021,
+			3, 515, 259, 771, 131, 643, 387, 899, 67, 579, 323, 835, 195, 707, 451, 963, 35, 547, 291, 803, 163, 675, 419, 931, 99, 611, 355, 867, 227, 739, 483, 995,
+			19, 531, 275, 787, 147, 659, 403, 915, 83, 595, 339, 851, 211, 723, 467, 979, 51, 563, 307, 819, 179, 691, 435, 947, 115, 627, 371, 883, 243, 755, 499, 1011,
+			11, 523, 267, 779, 139, 651, 395, 907, 75, 587, 331, 843, 203, 715, 459, 971, 43, 555, 299, 811, 171, 683, 427, 939, 107, 619, 363, 875, 235, 747, 491, 1003,
+			27, 539, 283, 795, 155, 667, 411, 923, 91, 603, 347, 859, 219, 731, 475, 987, 59, 571, 315, 827, 187, 699, 443, 955, 123, 635, 379, 891, 251, 763, 507, 1019,
+			7, 519, 263, 775, 135, 647, 391, 903, 71, 583, 327, 839, 199, 711, 455, 967, 39, 551, 295, 807, 167, 679, 423, 935, 103, 615, 359, 871, 231, 743, 487, 999,
+			23, 535, 279, 791, 151, 663, 407, 919, 87, 599, 343, 855, 215, 727, 471, 983, 55, 567, 311, 823, 183, 695, 439, 951, 119, 631, 375, 887, 247, 759, 503, 1015,
+			15, 527, 271, 783, 143, 655, 399, 911, 79, 591, 335, 847, 207, 719, 463, 975, 47, 559, 303, 815, 175, 687, 431, 943, 111, 623, 367, 879, 239, 751, 495, 1007,
+			31, 543, 287, 799, 159, 671, 415, 927, 95, 607, 351, 863, 223, 735, 479, 991, 63, 575, 319, 831, 191, 703, 447, 959, 127, 639, 383, 895, 255, 767, 511, 1023
+		};
 
-			for (size_t j = 0; j < 8; j++)
-				d += (r >> j) & AIBMASK;
-
-			a = ((d >> 8) & BITMASK) + (d & BITMASK);
-			b = (d >> 24) + ((d >> 16) & BITMASK);
-
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-			T vR(a + NQ - b);
-			vR.Store(tmpR, 0);
-			for (size_t j = 0; j < VCTSZE; ++j)
-				R[j + i] = static_cast<ushort>(tmpR[j]);
-#else
-			R[i] = a + Q - b;
-#endif
-		}
-	}
-
-	template <class T>
-	inline static void HelpRec(std::vector<ushort> &C, const std::vector<ushort> &V, std::vector<byte> &Random, int Q)
-	{
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const T NQ(Q);
-		const T N1(1);
-		const T N2(2);
-		const T N3(3);
-		const T N4(4);
-		const T N8(8);
-		const size_t VCTSZE = T::size() / sizeof(uint);
-
-		T k, r;
-		T c0, c1, c2, c3;
-		T t0, t1, t2, t3;
-		std::vector<T> v0(4);
-		std::vector<T> v1(4);
-		std::vector<T> tmpV(4);
-		std::vector<int> tmpC(VCTSZE * 4);
-
-		for (size_t i = 0; i < V.size() / 4; i += VCTSZE)
+		for (size_t i = 0; i < P.size(); ++i)
 		{
-#	if defined(__AVX512__)
-			r.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1),
-				(byte)((Random[(i + 4) >> 3] >> ((i + 4) & 7)) & 1), (byte)((Random[(i + 5) >> 3] >> ((i + 5) & 7)) & 1), (byte)((Random[(i + 6) >> 3] >> ((i + 6) & 7)) & 1), (byte)((Random[(i + 7) >> 3] >> ((i + 7) & 7)) & 1),
-				(byte)((Random[(i + 8) >> 3] >> ((i + 8) & 7)) & 1), (byte)((Random[(i + 9) >> 3] >> ((i + 9) & 7)) & 1), (byte)((Random[(i +10) >> 3] >> ((i + 10) & 7)) & 1), (byte)((Random[(i + 11) >> 3] >> ((i + 11) & 7)) & 1),
-				(byte)((Random[(i + 12) >> 3] >> ((i + 12) & 7)) & 1), (byte)((Random[(i + 13) >> 3] >> ((i + 13) & 7)) & 1), (byte)((Random[(i + 14) >> 3] >> ((i + 14) & 7)) & 1), (byte)((Random[(i + 15) >> 3] >> ((i + 15) & 7)) & 1));
-#	elif defined(__AVX2__)
-			r.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1), 
-				(byte)((Random[(i + 4) >> 3] >> ((i + 4) & 7)) & 1), (byte)((Random[(i + 5) >> 3] >> ((i + 5) & 7)) & 1), (byte)((Random[(i + 6) >> 3] >> ((i + 6) & 7)) & 1), (byte)((Random[(i + 7) >> 3] >> ((i + 7) & 7)) & 1));
-#	elif defined(__AVX__)
-			r.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1));
-#	endif 
-
-			t0.LoadT(V, i);
-			t1.LoadT(V, i + 256);
-			t2.LoadT(V, i + 512);
-			t3.LoadT(V, i + 768);
-
-			k = F<T>(v0[0], v1[0], N8 * t0 + N4 * r, Q);
-			k += F<T>(v0[1], v1[1], N8 * t1 + N4 * r, Q);
-			k += F<T>(v0[2], v1[2], N8 * t2 + N4 * r, Q);
-			k += F<T>(v0[3], v1[3], N8 * t3 + N4 * r, Q);
-			k = T::ShiftRA((N2 * NQ - N1 - k), 31);
-
-			tmpV[0] = ((~k) & v0[0]) ^ (k & v1[0]);
-			tmpV[1] = ((~k) & v0[1]) ^ (k & v1[1]);
-			tmpV[2] = ((~k) & v0[2]) ^ (k & v1[2]);
-			tmpV[3] = ((~k) & v0[3]) ^ (k & v1[3]);
-
-			c0 = (tmpV[0] - tmpV[3]) & N3;
-			c1 = (tmpV[1] - tmpV[3]) & N3;
-			c2 = (tmpV[2] - tmpV[3]) & N3;
-			c3 = (T::Negate(k) + N2 * tmpV[3]) & N3;
-
-			c0.Store(tmpC, 0);
-			c1.Store(tmpC, VCTSZE);
-			c2.Store(tmpC, VCTSZE * 2);
-			c3.Store(tmpC, VCTSZE * 3);
-
-			for (uint j = tmpC.size() - 1, k = 0; k < VCTSZE; --j, ++k)
+			r = BITREV[i];
+			if (i < r)
 			{
-				C[i + k + 768] = static_cast<ushort>(tmpC[j]);
-				C[i + k + 512] = static_cast<ushort>(tmpC[j - VCTSZE]);
-				C[i + k + 256] = static_cast<ushort>(tmpC[j - (VCTSZE * 2)]);
-				C[i + k] = static_cast<ushort>(tmpC[j - (VCTSZE * 3)]);
+				tmp = P[i];
+				P[i] = P[r];
+				P[r] = tmp;
 			}
 		}
-
-#else
-		std::vector<int> v0(4);
-		std::vector<int> v1(4);
-		std::vector<uint> tmpV(4);
-		int k, x;
-		byte rbit;
-
-		for (size_t i = 0; i < V.size() / 4; i++)
-		{
-			rbit = (Random[i >> 3] >> (i & 7)) & 1;
-
-			x = 8 * V[0 + i] + 4 * rbit;
-			k = F<int>(v0[0], v1[0], x, Q);
-			x = 8 * V[256 + i] + 4 * rbit;
-			k += F<int>(v0[1], v1[1], x, Q);
-			x = 8 * V[512 + i] + 4 * rbit;
-			k += F<int>(v0[2], v1[2], x, Q);
-			x = 8 * V[768 + i] + 4 * rbit;
-			k += F<int>(v0[3], v1[3], x, Q);
-			k = (2 * Q - 1 - k) >> 31;
-
-			tmpV[0] = ((~k) & v0[0]) ^ (k & v1[0]);
-			tmpV[1] = ((~k) & v0[1]) ^ (k & v1[1]);
-			tmpV[2] = ((~k) & v0[2]) ^ (k & v1[2]);
-			tmpV[3] = ((~k) & v0[3]) ^ (k & v1[3]);
-
-			C[0 + i] = (tmpV[0] - tmpV[3]) & 3;
-			C[256 + i] = (tmpV[1] - tmpV[3]) & 3;
-			C[512 + i] = (tmpV[2] - tmpV[3]) & 3;
-			C[768 + i] = (-k + 2 * tmpV[3]) & 3;
-		}
-#endif
 	}
 
-	template <class T>
-	inline static T LdDecode(T &X0, T &X1, T &X2, T &X3, const int Q)
-	{
-		T t;
-
-		t = G<T>(X0, Q);
-		t += G<T>(X1, Q);
-		t += G<T>(X2, Q);
-		t += G<T>(X3, Q);
-		t -= T(8) * T(Q);
-		t >>= 31;
-		t &= T(1);
-
-		return t;
-	}
-
-	template <class T>
-	inline static void Mul(std::vector<ushort> &Poly, const std::vector<ushort> &Factors, int Q, uint QInv, uint RLog)
+	template <typename Array, class T>
+	inline static void Mul(Array &R, const Array &Factors, int Q, uint QInv, uint RLog)
 	{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const size_t VCTSZE = T::size() / sizeof(uint);
-		std::vector<uint> tmpR(VCTSZE);
+		const size_t VULSZE = T::size() / sizeof(uint);
+		std::array<uint, VULSZE> tmpR;
 		T tmpP, tmpF;
 #else
-		const size_t VCTSZE = 1;
+		const size_t VULSZE = 1;
 #endif
 
-		for (size_t i = 0; i < Poly.size(); i += VCTSZE)
+		for (size_t i = 0; i < R.size(); i += VULSZE)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
-			tmpP.Load(Poly[i + 15], Poly[i + 14], Poly[i + 13], Poly[i + 12], Poly[i + 11], Poly[i + 10], Poly[i + 9], Poly[i + 8], Poly[i + 7], Poly[i + 6], Poly[i + 5], Poly[i + 4], Poly[i + 3], Poly[i + 2], Poly[i + 1], Poly[i]);
+			tmpP.Load(R[i + 15], R[i + 14], R[i + 13], R[i + 12], R[i + 11], R[i + 10], R[i + 9], R[i + 8], R[i + 7], R[i + 6], R[i + 5], R[i + 4], R[i + 3], R[i + 2], R[i + 1], R[i]);
 			tmpF.Load(Factors[i + 15], Factors[i + 14], Factors[i + 13], Factors[i + 12], Factors[i + 11], Factors[i + 10], Factors[i + 9], Factors[i + 8], Factors[i + 7], Factors[i + 6], Factors[i + 5], Factors[i + 4], Factors[i + 3], Factors[i + 2], Factors[i + 1], Factors[i]);
 #	elif defined(__AVX2__)
-			tmpP.Load(Poly[i + 7], Poly[i + 6], Poly[i + 5], Poly[i + 4], Poly[i + 3], Poly[i + 2], Poly[i + 1], Poly[i]);
+			tmpP.Load(R[i + 7], R[i + 6], R[i + 5], R[i + 4], R[i + 3], R[i + 2], R[i + 1], R[i]);
 			tmpF.Load(Factors[i + 7], Factors[i + 6], Factors[i + 5], Factors[i + 4], Factors[i + 3], Factors[i + 2], Factors[i + 1], Factors[i]);
 #	elif defined(__AVX__) 
-			tmpP.Load(Poly[i + 3], Poly[i + 2], Poly[i + 1], Poly[i]);
+			tmpP.Load(R[i + 3], R[i + 2], R[i + 1], R[i]);
 			tmpF.Load(Factors[i + 3], Factors[i + 2], Factors[i + 1], Factors[i]);
 #	endif
 
@@ -318,77 +188,22 @@ public:
 			a >>= 18;
 			a.Store(tmpR, 0);
 
-			for (size_t j = 0; j < VCTSZE; ++j)
-				Poly[j + i] = static_cast<ushort>(tmpR[j]);
+			for (size_t j = 0; j < VULSZE; ++j)
+			{
+				R[j + i] = static_cast<ushort>(tmpR[j]);
+			}
 #else
-			T a = Poly[i] * Factors[i];
+			T a = R[i] * Factors[i];
 			T u = (a * QInv);
 			u &= ((1 << RLog) - 1);
 			u *= Q;
 			a += u;
-			Poly[i] = a >> 18;
+			R[i] = a >> 18;
 #endif
 		}
-	}
-
-	template <class T>
-	inline static void Rec(std::vector<byte> &Key, const std::vector<ushort> &V, const std::vector<ushort> &C, const int Q)
-	{
-		Utility::MemUtils::Clear(Key, 0, Key.size());
-
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-
-		const T NQ(Q);
-		const T N2(2);
-		const T N8(8);
-		const T N16(16);
-		const size_t VCTSZE = T::size() / sizeof(uint);
-
-		T c0, c1, c2, c3;
-		T v0, v1, v2, v3;
-		std::vector<T> tmpV(4);
-		std::vector<uint> tmpK(VCTSZE);
-
-		for (size_t i = 0; i < V.size() / 4; i += VCTSZE)
-		{
-			c0.LoadT(C, i);
-			c1.LoadT(C, 256 + i);
-			c2.LoadT(C, 512 + i);
-			c3.LoadT(C, 768 + i);
-
-			v0.LoadT(V, i);
-			v1.LoadT(V, 256 + i);
-			v2.LoadT(V, 512 + i);
-			v3.LoadT(V, 768 + i);
-
-			tmpV[0] = N16 * NQ + N8 * v0 - NQ * (N2 * c0 + c3);
-			tmpV[1] = N16 * NQ + N8 * v1 - NQ * (N2 * c1 + c3);
-			tmpV[2] = N16 * NQ + N8 * v2 - NQ * (N2 * c2 + c3);
-			tmpV[3] = N16 * NQ + N8 * v3 - NQ * c3;
-
-			T K = LdDecode<T>(tmpV[0], tmpV[1], tmpV[2], tmpV[3], Q);
-
-			K.Store(tmpK, 0);
-
-			for (uint j = VCTSZE, k = 0; j > 0; --j, ++k)
-				Key[((i + k) >> 3)] |= (byte)(tmpK[j - 1] << ((i + k) & 7));
-		}
-
-#else
-
-		std::vector<int> tmp(4);
-		for (uint i = 0; i < 256; i++)
-		{
-			tmp[0] = 16 * Q + 8 * (int)V[0 + i] - Q * (2 * C[0 + i] + C[768 + i]);
-			tmp[1] = 16 * Q + 8 * (int)V[256 + i] - Q * (2 * C[256 + i] + C[768 + i]);
-			tmp[2] = 16 * Q + 8 * (int)V[512 + i] - Q * (2 * C[512 + i] + C[768 + i]);
-			tmp[3] = 16 * Q + 8 * (int)V[768 + i] - Q * (C[768 + i]);
-			Key[i >> 3] |= LdDecode<int>(tmp[0], tmp[1], tmp[2], tmp[3], Q) << (i & 7);
-		}
-#endif
 	}
 };
 
-NAMESPACE_RINGLWEEND
+NAMESPACE_UTILITYEND
 #endif
 

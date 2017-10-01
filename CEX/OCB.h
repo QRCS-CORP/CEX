@@ -29,8 +29,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_OCB_H
-#define _CEX_OCB_H
+#ifndef CEX_OCB_H
+#define CEX_OCB_H
 
 #include "IAeadMode.h"
 #include "ISymmetricKey.h"

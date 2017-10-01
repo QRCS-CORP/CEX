@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_IBLOCKCIPHER_H
-#define _CEX_IBLOCKCIPHER_H
+#ifndef CEX_IBLOCKCIPHER_H
+#define CEX_IBLOCKCIPHER_H
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"

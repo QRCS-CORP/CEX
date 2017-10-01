@@ -1,5 +1,5 @@
-#ifndef _CEX_MACFROMDESCRIPTION_H
-#define _CEX_MACFROMDESCRIPTION_H
+#ifndef CEX_MACFROMDESCRIPTION_H
+#define CEX_MACFROMDESCRIPTION_H
 
 #include "CexDomain.h"
 #include "MacDescription.h"

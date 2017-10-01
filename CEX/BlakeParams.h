@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_BLAKE2PARAMS_H
-#define _CEX_BLAKE2PARAMS_H
+#ifndef CEX_BLAKEPARAMS_H
+#define CEX_BLAKEPARAMS_H
 
 #include "CexDomain.h"
 #include "CryptoDigestException.h"
@@ -224,12 +224,12 @@ public:
 	/// Compare this object instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Object to compare</param>
+	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(BlakeParams &Obj)
+	bool Equals(BlakeParams &Input)
 	{
-		if (this->GetHashCode() != Obj.GetHashCode())
+		if (this->GetHashCode() != Input.GetHashCode())
 			return false;
 
 		return true;

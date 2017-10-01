@@ -1,5 +1,5 @@
-#ifndef _CEX_IPADDING_H
-#define _CEX_IPADDING_H
+#ifndef CEX_IPADDING_H
+#define CEX_IPADDING_H
 
 #include "CexDomain.h"
 #include "CryptoPaddingException.h"

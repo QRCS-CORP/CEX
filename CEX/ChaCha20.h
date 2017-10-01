@@ -25,10 +25,11 @@
 // ChaCha20: An implementation of the ChaCha stream cipher
 // Written by John Underhill, October 21, 2014
 // Updated January 27, 2017
+// Updated August 29, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_CHACHA20_H
-#define _CEX_CHACHA20_H
+#ifndef CEX_CHACHA20_H
+#define CEX_CHACHA20_H
 
 #include "IStreamCipher.h"
 
@@ -74,7 +75,7 @@ NAMESPACE_STREAM
 /// <list type="bullet">
 /// <item><description>Valid Key sizes are 128, 256 (16 and 32 bytes).</description></item>
 /// <item><description>Block size is 64 bytes wide.</description></item>
-/// <item><description>Valid rounds are 8 through 30 in increments of 2.</description></item>
+/// <item><description>Valid rounds are 8 through 80 in increments of 2, the default is 20 rounds.</description></item>
 /// <item><description>Encryption can both be pipelined (SSE3-128 or AVX2-256), and multi-threaded.</description></item>
 /// <item><description>The Transform functions are virtual, and can be accessed from an ICipherMode instance.</description></item>
 /// <item><description>The transformation methods can not be called until the Initialize(SymmetricKey) function has been called.</description></item>
@@ -99,7 +100,7 @@ private:
 	static const size_t BLOCK_SIZE = 64;
 	static const std::string CLASS_NAME;
 	static const size_t CTR_SIZE = 8;
-	static const size_t MAX_ROUNDS = 30;
+	static const size_t MAX_ROUNDS = 80;
 	static const size_t MIN_ROUNDS = 8;
 	static const size_t STATE_PRECACHED = 2048;
 	static const std::string SIGMA_INFO;
@@ -130,13 +131,14 @@ public:
 	const size_t BlockSize() override;
 
 	/// <summary>
-	/// Get/Set: The salt value in the initialization parameters (Tau-Sigma).
-	/// <para>This value can also be set with the Info parameter of an ISymmetricKey member, or use the default.
+	/// Get: The salt value in the initialization parameters (Tau-Sigma).
+	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
 	/// Changing this code will create a unique distribution of the cipher.
+	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
 	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
 	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
-	std::vector<byte> &DistributionCode() override;
+	const std::vector<byte> &DistributionCode() override;
 
 	/// <summary>
 	/// Get: The stream ciphers type name
@@ -195,7 +197,9 @@ public:
 	/// Initialize the class
 	/// </summary>
 	///
-	/// <param name="Rounds">Number of transformation rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 20 rounds.</param>
+	/// <param name="Rounds">Number of transformation rounds. 
+	/// <para>The LegalRounds property contains available sizes. 
+	/// Default is 20 rounds, minimum is 8, and maximum is 80 rounds.</para></param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
 	explicit ChaCha20(size_t Rounds = 20);

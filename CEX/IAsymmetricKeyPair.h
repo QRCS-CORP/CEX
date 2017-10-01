@@ -1,5 +1,5 @@
-#ifndef _CEX_IASYMMETRICKEYPAIR_H
-#define _CEX_IASYMMETRICKEYPAIR_H
+#ifndef CEX_IASYMMETRICKEYPAIR_H
+#define CEX_IASYMMETRICKEYPAIR_H
 
 #include "CexDomain.h"
 #include "CryptoAsymmetricException.h"

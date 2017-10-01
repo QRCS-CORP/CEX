@@ -1,5 +1,5 @@
-#ifndef _CEX_CIPHERDESCRIPTION_H
-#define _CEX_CIPHERDESCRIPTION_H
+#ifndef CEX_CIPHERDESCRIPTION_H
+#define CEX_CIPHERDESCRIPTION_H
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"
@@ -225,10 +225,10 @@ public:
 	/// Compare this object instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Object to compare</param>
+	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(CipherDescription &Obj);
+	bool Equals(CipherDescription &Input);
 
 	/// <summary>
 	/// Get the hash code for this object

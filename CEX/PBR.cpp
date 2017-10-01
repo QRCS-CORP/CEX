@@ -51,6 +51,7 @@ void PBR::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
 		m_digestIterations = 0;
@@ -60,8 +61,6 @@ void PBR::Destroy()
 
 		if (m_rngGenerator != 0)
 			delete m_rngGenerator;
-
-		m_isDestroyed = true;
 	}
 }
 
@@ -112,7 +111,7 @@ void PBR::GetBytes(std::vector<byte> &Output)
 		size_t bufSize = m_rngBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
-			Utility::MemUtils::Copy<byte>(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
+			Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
 
 		size_t rem = Output.size() - bufSize;
 
@@ -123,13 +122,13 @@ void PBR::GetBytes(std::vector<byte> &Output)
 
 			if (rem > m_rngBuffer.size())
 			{
-				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
+				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, m_rngBuffer.size());
 				bufSize += m_rngBuffer.size();
 				rem -= m_rngBuffer.size();
 			}
 			else
 			{
-				Utility::MemUtils::Copy<byte>(m_rngBuffer, 0, Output, bufSize, rem);
+				Utility::MemUtils::Copy(m_rngBuffer, 0, Output, bufSize, rem);
 				m_bufferIndex = rem;
 				rem = 0;
 			}
@@ -137,7 +136,7 @@ void PBR::GetBytes(std::vector<byte> &Output)
 	}
 	else
 	{
-		Utility::MemUtils::Copy<byte>(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
+		Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, Output.size());
 		m_bufferIndex += Output.size();
 	}
 }
@@ -151,15 +150,12 @@ ushort PBR::NextUShort(ushort Maximum)
 {
 	CEXASSERT(Maximum != 0, "maximum can not be zero");
 
-	std::vector<byte> rand;
-	uint num(0);
+	ushort num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = Utility::IntUtils::LeBytesTo16(rand, 0);
-	} 
-	while (num > Maximum);
+		num = (ushort)GetRanged(Maximum, sizeof(ushort));
+	} while (num > Maximum);
 
 	return num;
 }
@@ -183,15 +179,12 @@ uint PBR::Next(uint Maximum)
 {
 	CEXASSERT(Maximum != 0, "maximum can not be zero");
 
-	std::vector<byte> rand;
-	uint num(0);
+	uint num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = Utility::IntUtils::LeBytesTo32(rand, 0);
-	} 
-	while (num > Maximum);
+		num = (uint)GetRanged(Maximum, sizeof(uint));
+	} while (num > Maximum);
 
 	return num;
 }
@@ -215,15 +208,12 @@ ulong PBR::NextULong(ulong Maximum)
 {
 	CEXASSERT(Maximum != 0, "maximum can not be zero");
 
-	std::vector<byte> rand;
-	ulong num(0);
+	ulong num;
 
 	do
 	{
-		rand = GetByteRange(Maximum);
-		num = Utility::IntUtils::LeBytesTo64(rand, 0);
-	} 
-	while (num > Maximum);
+		num = GetRanged(Maximum, sizeof(ulong));
+	} while (num > Maximum);
 
 	return num;
 }
@@ -248,45 +238,38 @@ void PBR::Reset()
 
 //~~~Private Functions~~~//
 
-std::vector<byte> PBR::GetBits(std::vector<byte> &Data, ulong Maximum)
+ulong PBR::GetRanged(ulong Maximum, size_t Length)
 {
-	ulong val = 0;
-	Utility::MemUtils::Copy<byte, ulong>(Data, 0, val, Data.size());
-	ulong bits = Data.size() * 8;
+	std::vector<byte> rand;
 
+	if (Maximum < 256)
+		rand = GetBytes(1);
+	else if (Maximum < 65536)
+		rand = GetBytes(2);
+	else if (Maximum < 16777216)
+		rand = GetBytes(3);
+	else if (Maximum < 4294967296)
+		rand = GetBytes(4);
+	else if (Maximum < 1099511627776)
+		rand = GetBytes(5);
+	else if (Maximum < 281474976710656)
+		rand = GetBytes(6);
+	else if (Maximum < 72057594037927936)
+		rand = GetBytes(7);
+	else
+		rand = GetBytes(8);
+
+	ulong val = 0;
+	Utility::MemUtils::CopyToValue(rand, 0, val, rand.size());
+
+	ulong bits = Length * 8;
 	while (val > Maximum && bits != 0)
 	{
 		val >>= 1;
 		bits--;
 	}
-	std::vector<byte> ret(sizeof(ulong));
-	Utility::MemUtils::Copy<ulong, byte>(val, ret, 0, sizeof(ulong));
 
-	return ret;
-}
-
-std::vector<byte> PBR::GetByteRange(ulong Maximum)
-{
-	std::vector<byte> data;
-
-	if (Maximum < 256)
-		data = GetBytes(1);
-	else if (Maximum < 65536)
-		data = GetBytes(2);
-	else if (Maximum < 16777216)
-		data = GetBytes(3);
-	else if (Maximum < 4294967296)
-		data = GetBytes(4);
-	else if (Maximum < 1099511627776)
-		data = GetBytes(5);
-	else if (Maximum < 281474976710656)
-		data = GetBytes(6);
-	else if (Maximum < 72057594037927936)
-		data = GetBytes(7);
-	else
-		data = GetBytes(8);
-
-	return GetBits(data, Maximum);
+	return val;
 }
 
 uint PBR::GetMinimumSeedSize(Digests RngEngine)
@@ -294,17 +277,18 @@ uint PBR::GetMinimumSeedSize(Digests RngEngine)
 	switch (RngEngine)
 	{
 		case Digests::Blake256:
-			return 32;
-		case Digests::Blake512:
 			return 64;
+		case Digests::Blake512:
+			return 128;
 		case Digests::Keccak256:
 			return 136;
 		case Digests::Keccak512:
+		case Digests::Keccak1024:
 			return 72;
 		case Digests::SHA256:
-			return 64;
+			return 55;
 		case Digests::SHA512:
-			return 128;
+			return 111;
 		case Digests::Skein1024:
 			return 128;
 		case Digests::Skein256:

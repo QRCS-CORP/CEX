@@ -149,9 +149,9 @@ MacDescription::MacDescription(const std::vector<byte> &DescriptionArray)
 
 //~~~Public Functions~~~//
 
-bool MacDescription::Equals(MacDescription &Obj)
+bool MacDescription::Equals(MacDescription &Input)
 {
-	if (this->GetHashCode() != Obj.GetHashCode())
+	if (this->GetHashCode() != Input.GetHashCode())
 		return false;
 
 	return true;

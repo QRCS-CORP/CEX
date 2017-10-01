@@ -49,6 +49,11 @@ namespace Test
 			OnProgress(std::string("***The parallel Keccak 512 digest***"));
 			DigestBlockLoop(Digests::Keccak512, MB100, 10, true);
 
+			OnProgress(std::string("***The sequential Keccak 1024 digest***"));
+			DigestBlockLoop(Digests::Keccak1024, MB100);
+			OnProgress(std::string("***The parallel Keccak 1024 digest***"));
+			DigestBlockLoop(Digests::Keccak1024, MB100, 10, true);
+
 			OnProgress(std::string("***The sequential SHA2 256 digest***"));
 			DigestBlockLoop(Digests::SHA256, MB100);
 			OnProgress(std::string("***The parallel SHA2 256 digest***"));

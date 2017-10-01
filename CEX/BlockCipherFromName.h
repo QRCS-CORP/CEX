@@ -1,5 +1,5 @@
-#ifndef _CEX_BLOCKCIPHERFROMNAME_H
-#define _CEX_BLOCKCIPHERFROMNAME_H
+#ifndef CEX_BLOCKCIPHERFROMNAME_H
+#define CEX_BLOCKCIPHERFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

@@ -23,8 +23,8 @@
 // Updated October 3, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_HMAC_H
-#define _CEX_HMAC_H
+#ifndef CEX_HMAC_H
+#define CEX_HMAC_H
 
 #include "IMac.h"
 #include "IDigest.h"

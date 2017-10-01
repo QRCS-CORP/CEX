@@ -1,5 +1,5 @@
-#ifndef _CEX_IKDF_H
-#define _CEX_IKDF_H
+#ifndef CEX_IKDF_H
+#define CEX_IKDF_H
 
 #include "CexDomain.h"
 #include "CryptoKdfException.h"

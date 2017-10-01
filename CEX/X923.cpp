@@ -33,7 +33,7 @@ size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 		std::vector<byte> data(inpLen);
 		Provider::CSP rnd;
 		rnd.GetBytes(data);
-		Utility::MemUtils::Copy<byte>(data, 0, Input, Offset, inpLen);
+		Utility::MemUtils::Copy(data, 0, Input, Offset, inpLen);
 	}
 
 	Input[Input.size() - 1] = code;

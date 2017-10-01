@@ -35,8 +35,8 @@
 // Updated April 16, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_SHX_H
-#define _CEX_SHX_H
+#ifndef CEX_SHX_H
+#define CEX_SHX_H
 
 #include "IBlockCipher.h"
 

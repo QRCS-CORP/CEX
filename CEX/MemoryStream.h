@@ -1,5 +1,5 @@
-#ifndef _CEX_MEMORYSTREAM_H
-#define _CEX_MEMORYSTREAM_H
+#ifndef CEX_MEMORYSTREAM_H
+#define CEX_MEMORYSTREAM_H
 
 #include "IByteStream.h"
 

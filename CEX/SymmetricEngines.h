@@ -1,5 +1,5 @@
-#ifndef _CEX_SYMMETRICENGINES_H
-#define _CEX_SYMMETRICENGINES_H
+#ifndef CEX_SYMMETRICENGINES_H
+#define CEX_SYMMETRICENGINES_H
 
 #include "CexDomain.h"
 

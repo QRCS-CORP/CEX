@@ -1,11 +1,28 @@
-#ifndef _CEX_INTUTILS_H
-#define _CEX_INTUTILS_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_INTUTILS_H
+#define CEX_INTUTILS_H
 
 #include "CexDomain.h"
 #include "MemUtils.h"
-
-// Note: hides functions not currently used by the library
-#define CEX_INTUTILS_FULLSCOPE
+#include <iomanip>
+#include <sstream>
 
 NAMESPACE_UTILITY
 
@@ -18,7 +35,111 @@ public:
 
 	//~~~Misc~~~//
 
-#if defined(CEX_INTUTILS_FULLSCOPE)
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_IGNORE
+	/*! \endcond */
+	/// <summary>
+	/// Clear nested arrays of objects
+	/// </summary>
+	///
+	/// <param name="Input">A nested vector integer array</param>
+	template <typename T, size_t Dimensions, size_t Length>
+	inline static void ClearArray(std::array<std::array<T, Length>, Dimensions> &Input)
+	{
+		if (Input.size() == 0)
+		{
+			return;
+		}
+
+		for (size_t i = 0; i < Input.size(); i++)
+			ClearArray(Input[i]);
+
+		Input.clear();
+	}
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_RESUME
+	/*!
+
+	/// <summary>
+	/// Clear an array of objects
+	/// </summary>
+	///
+	/// <param name="Input">A byte vector array</param>
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_IGNORE
+	/*! \endcond */
+	template <typename T, size_t Length>
+	inline static void ClearArray(std::array<T, Length> &Input)
+	{
+		if (Input.capacity() == 0)
+		{
+			return;
+		}
+
+		if (Input.size() != 0)
+		{
+			std::memset(Input.data(), 0, Input.size() * sizeof(T));
+		}
+
+		Input.clear();
+	}
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_RESUME
+	/*! \endcond */
+
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_IGNORE
+	/*! \endcond */
+	/// <summary>
+	/// Clear nested arrays of objects
+	/// </summary>
+	///
+	/// <param name="Input">A nested vector integer array</param>
+	template <typename T>
+	inline static void ClearVector(std::vector<std::vector<T>> &Input)
+	{
+		if (Input.size() == 0)
+		{
+			return;
+		}
+
+		for (size_t i = 0; i < Input.size(); i++)
+		{
+			ClearVector(Input[i]);
+		}
+
+		Input.clear();
+	}
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_RESUME
+	/*! \endcond */
+
+	/// <summary>
+	/// Clear an array of objects
+	/// </summary>
+	///
+	/// <param name="Input">A byte vector array</param>
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_IGNORE
+	/*! \endcond */
+	template <typename T>
+	inline static void ClearVector(std::vector<T> &Input)
+	{
+		if (Input.capacity() == 0)
+		{
+			return;
+		}
+
+		if (Input.size() != 0)
+		{
+			std::memset(Input.data(), 0, Input.size() * sizeof(T));
+		}
+
+		Input.clear();
+	}
+	/*! \cond PRIVATE */
+	CEX_OPTIMIZE_RESUME
+	/*! \endcond */
 
 	/// <summary>
 	/// Return the absolute positive value difference between two integers
@@ -34,29 +155,6 @@ public:
 		return A > B ? A - B : B - A;
 	}
 
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
-	/// <summary>
-	/// Clear nested arrays of objects
-	/// </summary>
-	///
-	/// <param name="Obj">A byte vector array</param>
-	template <typename T>
-	inline static void ClearArray(std::vector<std::vector<T>> &Obj)
-	{
-		if (Obj.size() == 0)
-			return;
-
-		for (size_t i = 0; i < Obj.size(); i++)
-			ClearVector(Obj[i]);
-
-		Obj.clear();
-	}
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
-
 	/// <summary>
 	/// Crop a 64 bit integer value
 	/// </summary>
@@ -68,9 +166,51 @@ public:
 	inline static ulong Crop(ulong Value, size_t Length)
 	{
 		if (Length < 8 * sizeof(Value))
+		{
 			return (Value & ((1L << Length) - 1));
+		}
 		else
+		{
 			return Value;
+		}
+	}
+
+	/// <summary>
+	/// Copies a string to a byte array.
+	/// <para>The output from this function is endian dependant.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The string to convert</param>
+	/// 
+	/// <returns>The string copied to a byte array</returns>
+	inline static std::vector<byte> FromString(std::string &Input)
+	{
+		std::vector<byte> output(Input.size());
+		std::memcpy(&output[0], Input.data(), Input.size());
+
+		return output;
+	}
+
+	/// <summary>
+	/// Copies a hex formatted string to an array of bytes
+	/// </summary>
+	/// 
+	/// <param name="Input">The string to convert</param>
+	/// <param name="Length">The number of bytes to convert</param>
+	/// 
+	/// <returns>The hex string copied to an array of bytes</returns>
+	inline static std::vector<byte> FromHex(std::string &Input, size_t Length)
+	{
+		std::vector<byte> output;
+
+		for (unsigned int i = 0; i < Length; i += 2)
+		{
+			std::string nhex = Input.substr(i, 2);
+			byte num = (byte)strtol(nhex.c_str(), NULL, 16);
+			output.push_back(num);
+		}
+
+		return output;
 	}
 
 	/// <summary>
@@ -103,49 +243,6 @@ public:
 	}
 
 	/// <summary>
-	/// Get the parity bit from a 64 bit integer
-	/// </summary>
-	/// 
-	/// <param name="Value">The initial value</param>
-	/// 
-	/// <returns>The parity value</returns>
-	inline static uint Parity(ulong Value)
-	{
-		for (size_t i = 8 * sizeof(Value) / 2; i > 0; i /= 2)
-			Value ^= Value >> i;
-
-		return (uint)Value & 1;
-	}
-
-#endif
-
-	/// <summary>
-	/// Clear an array of objects
-	/// </summary>
-	///
-	/// <param name="Obj">A byte vector array</param>
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
-	template <typename T>
-	inline static void ClearVector(std::vector<T> &Obj)
-	{
-		if (Obj.capacity() == 0)
-			return;
-
-		if (Obj.size() != 0)
-		{
-			static void *(*const volatile memset_v)(void *, int, size_t) = &memset;
-			memset_v(Obj.data(), 0, Obj.size() * sizeof(T));
-		}
-
-		Obj.clear();
-	}
-	/*! \cond PRIVATE */
-	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
-
-	/// <summary>
 	/// Return the larger of two values
 	/// </summary>
 	/// 
@@ -174,6 +271,46 @@ public:
 	}
 
 	/// <summary>
+	/// Get the parity bit from a 64 bit integer
+	/// </summary>
+	/// 
+	/// <param name="Value">The initial value</param>
+	/// 
+	/// <returns>The parity value</returns>
+	inline static uint Parity(ulong Value)
+	{
+		for (size_t i = 8 * sizeof(Value) / 2; i > 0; i /= 2)
+		{
+			Value ^= Value >> i;
+		}
+
+		return (uint)Value & 1;
+	}
+
+	/// <summary>
+	/// Convert an array of T to a hexadecimal string
+	/// </summary>
+	/// 
+	/// <param name="Input">The array of T to convert</param>
+	/// <param name="Offset">The initial input offset</param>
+	/// <param name="Length">The number of T values to convert</param>
+	/// 
+	/// <returns>The hex string representation</returns>
+	template <typename T>
+	inline static std::string ToHex(std::vector<T> &Input, size_t Offset, size_t Length)
+	{
+		std::stringstream ss;
+		ss << std::hex;
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			ss << Input[Offset + i];
+		}
+
+		return ss.str();
+	}
+
+	/// <summary>
 	/// Convert an integer to a string
 	/// </summary>
 	/// 
@@ -181,9 +318,31 @@ public:
 	/// 
 	/// <returns>The string representation</returns>
 	template <typename T>
-	static std::string ToString(T Value)
+	inline static std::string ToString(T Value)
 	{
 		return std::to_string(Value);
+	}
+
+	/// <summary>
+	/// Convert an array of T to a string
+	/// </summary>
+	/// 
+	/// <param name="Input">The integer array to convert</param>
+	/// <param name="Offset">The initial input offset</param>
+	/// <param name="Length">The number of T values to convert</param>
+	/// 
+	/// <returns>The string representation</returns>
+	template <typename T>
+	inline static std::string ToString(std::vector<T> &Input, size_t Offset, size_t Length)
+	{
+		std::stringstream ss;
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			ss << Input[Offset + i];
+		}
+
+		return ss.str();
 	}
 
 	// Different computer architectures store data using different byte orders. "Big-endian"
@@ -200,58 +359,69 @@ public:
 	inline static bool IsBigEndian()
 	{
 		int num = 1;
+
 		return (*(byte*)&num != 1);
 	}
 
 	/// <summary>
-	/// Convert 8bit byte array to a Big Endian T sized array
+	/// Convert 8bit byte array to a Big Endian integer array
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
-	/// <param name="Output">The destination T array</param>
-	/// <param name="OutOffset">The starting offset within the destination T array</param>
+	/// <param name="Output">The destination integer array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
 	/// <param name="Length">The number of bytes to copy</param>
-	template<typename T>
-	static void BlockToBe(const std::vector<byte> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
+	template<typename ArrayA, typename ArrayB>
+	inline static void BlockToBe(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
+		const size_t ELMSZE = sizeof(Output[0]);
+
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= Length, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= Length, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::Utility::MemUtils::Copy<byte, T>(Input, InOffset, Output, OutOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		for (size_t i = 0; i < Length; i += sizeof(T))
+		for (size_t i = 0; i < Length; i += ELMSZE)
 		{
-			for (size_t j = 0; j < sizeof(T); ++j)
-				Output[OutOffset + i] |= static_cast<T>(Input[InOffset + j] >> (8 * j));
+			for (size_t j = 0; j < ELMSZE; ++j)
+			{
+				Output[OutOffset + i] |= static_cast<decltype(Output)::value_type>(Input[InOffset + j] >> (8 * j));
+			}
 		}
 #endif
 	}
 
 	/// <summary>
-	/// Convert a Big Endian T sized word array to a byte array.
-	/// <para>The entire input array is copied to bytes, must be 32bit aligned.</para>
+	/// Convert a Big Endian integer array to a byte array.
+	/// <para>The entire input array is copied to bytes.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The 32bit word input array</param>
+	/// <param name="Input">The integer input array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
+	/// <param name="Output">The destination byte array</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
 	/// <param name="Length">The number of bytes to convert</param>
-	template<typename T>
-	static void BeToBlock(std::vector<T> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+	template<typename ArrayA, typename ArrayB>
+	inline static void BeToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= Length, "Length is larger than input capacity");
+		const size_t ELMSZE = sizeof(Input[0]);
+
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CEXASSERT((Input.size() - InOffset) * ELMSZE >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::Utility::MemUtils::Copy<T, byte>(Input, InOffset, Output, OutOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		for (size_t i = 0; i < Length; i += sizeof(T))
+		for (size_t i = 0; i < Length; i += ELMSZE)
 		{
-			for (size_t j = 0; j < sizeof(T); ++j)
+			for (size_t j = 0; j < ELMSZE; ++j)
+			{
 				Output[OutOffset + j] = static_cast<byte>(Input[InOffset + i] << (j * 8));
+			}
 		}
 #endif
 	}
@@ -260,15 +430,17 @@ public:
 	/// Convert a Big Endian 16 bit word to bytes
 	/// </summary>
 	/// 
-	/// <param name="Value">The 16 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination array</param>
-	inline static void Be16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Value">The 16 bit integer</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename Array>
+	inline static void Be16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::Utility::MemUtils::Copy<ushort, byte>(Value, Output, OutOffset, sizeof(ushort));
+		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
 #else
 		Output[OutOffset + 1] = static_cast<byte>(Value);
 		Output[OutOffset] = static_cast<byte>(Value >> 8);
@@ -279,15 +451,17 @@ public:
 	/// Convert a Big Endian 32 bit word to bytes
 	/// </summary>
 	/// 
-	/// <param name="Value">The 32 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination array</param>
-	inline static void Be32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Value">The 32 bit integer</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename Array>
+	inline static void Be32ToBytes(const uint Value, Array &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than output capacity");
 
 #if defined IS_BIG_ENDIAN
-		Utility::Utility::MemUtils::Copy<uint, byte>(Value, Output, OutOffset, sizeof(uint));
+		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
 #else
 		Output[OutOffset + 3] = static_cast<byte>(Value);
 		Output[OutOffset + 2] = static_cast<byte>(Value >> 8);
@@ -301,14 +475,16 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Value">The 64 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination array</param>
-	inline static void Be64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename Array>
+	inline static void Be64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::Utility::MemUtils::Copy<ulong, byte>(Value, Output, OutOffset, sizeof(ulong));
+		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
 #else
 		Output[OutOffset + 7] = static_cast<byte>(Value);
 		Output[OutOffset + 6] = static_cast<byte>(Value >> 8);
@@ -325,26 +501,29 @@ public:
 	/// Convert a Big Endian 8 * 32bit word array to a byte array
 	/// </summary>
 	/// 
-	/// <param name="Input">The 32bit word array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void BeUL256ToBlock(std::vector<uint> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Input">The 32bit integer source array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename ArrayA, typename ArrayB>
+	inline static void BeUL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(uint), "Input must be a 32bit integer array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= 32 / sizeof(uint), "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::Utility::MemUtils::COPY256<uint, byte>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
 #else
-		Be32ToBytes(Input[0], Output, OutOffset);
-		Be32ToBytes(Input[1], Output, OutOffset + 4);
-		Be32ToBytes(Input[2], Output, OutOffset + 8);
-		Be32ToBytes(Input[3], Output, OutOffset + 12);
-		Be32ToBytes(Input[4], Output, OutOffset + 16);
-		Be32ToBytes(Input[5], Output, OutOffset + 20);
-		Be32ToBytes(Input[6], Output, OutOffset + 24);
-		Be32ToBytes(Input[7], Output, OutOffset + 28);
+		Be32ToBytes(Input[InOffset], Output, OutOffset);
+		Be32ToBytes(Input[InOffset + 1], Output, OutOffset + 4);
+		Be32ToBytes(Input[InOffset + 2], Output, OutOffset + 8);
+		Be32ToBytes(Input[InOffset + 3], Output, OutOffset + 12);
+		Be32ToBytes(Input[InOffset + 4], Output, OutOffset + 16);
+		Be32ToBytes(Input[InOffset + 5], Output, OutOffset + 20);
+		Be32ToBytes(Input[InOffset + 6], Output, OutOffset + 24);
+		Be32ToBytes(Input[InOffset + 7], Output, OutOffset + 28);
 #endif
 	}
 
@@ -352,26 +531,29 @@ public:
 	/// Convert a Big Endian 8 * 64bit word array to a byte array
 	/// </summary>
 	/// 
-	/// <param name="Input">The 64bit word array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void BeULL512ToBlock(std::vector<ulong> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Input">The 64bit integer source array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename ArrayA, typename ArrayB>
+	inline static void BeULL512ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= 64 / sizeof(ulong), "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
-		Utility::Utility::MemUtils::COPY512<ulong, byte>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
 #else
-		Be64ToBytes(Input[0], Output, OutOffset);
-		Be64ToBytes(Input[1], Output, OutOffset + 8);
-		Be64ToBytes(Input[2], Output, OutOffset + 16);
-		Be64ToBytes(Input[3], Output, OutOffset + 24);
-		Be64ToBytes(Input[4], Output, OutOffset + 32);
-		Be64ToBytes(Input[5], Output, OutOffset + 40);
-		Be64ToBytes(Input[6], Output, OutOffset + 48);
-		Be64ToBytes(Input[7], Output, OutOffset + 56);
+		Be64ToBytes(Input[InOffset], Output, OutOffset);
+		Be64ToBytes(Input[InOffset + 1], Output, OutOffset + 8);
+		Be64ToBytes(Input[InOffset + 2], Output, OutOffset + 16);
+		Be64ToBytes(Input[InOffset + 3], Output, OutOffset + 24);
+		Be64ToBytes(Input[InOffset + 4], Output, OutOffset + 32);
+		Be64ToBytes(Input[InOffset + 5], Output, OutOffset + 40);
+		Be64ToBytes(Input[InOffset + 6], Output, OutOffset + 48);
+		Be64ToBytes(Input[InOffset + 7], Output, OutOffset + 56);
 #endif
 	}
 
@@ -380,15 +562,17 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <returns>A 16 bit word in Big Endian format</returns>
-	inline static ushort BeBytesTo16(const std::vector<byte> &Input, size_t InOffset)
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <returns>A 16 bit integer in Big Endian format</returns>
+	template<typename Array>
+	inline static ushort BeBytesTo16(const Array &Input, size_t InOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		ushort value = 0;
-		Utility::Utility::MemUtils::Copy<byte, ushort>(Input, InOffset, value, sizeof(ushort));
+		Utility::MemUtils::CopyToValue(Input, InOffset, value, sizeof(ushort));
 		return value;
 #else
 		return
@@ -402,15 +586,18 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <returns>A 32 bit word in Big Endian format</returns>
-	inline static uint BeBytesTo32(const std::vector<byte> &Input, size_t InOffset)
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <returns>A 32 bit integer in Big Endian format</returns>
+	template<typename Array>
+	inline static uint BeBytesTo32(const Array &Input, size_t InOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		uint value = 0;
-		Utility::Utility::MemUtils::Copy<byte, uint>(Input, InOffset, value, sizeof(uint));
+		Utility::MemUtils::CopyToValue(Input, InOffset, value, sizeof(uint));
+
 		return value;
 #else
 		return
@@ -426,15 +613,17 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <returns>A 64 bit word in Big Endian format</returns>
-	inline static ulong BeBytesTo64(const std::vector<byte> &Input, size_t InOffset)
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <returns>A 64 bit integer in Big Endian format</returns>
+	template<typename Array>
+	inline static ulong BeBytesTo64(const Array &Input, size_t InOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		ulong value = 0;
-		Utility::Utility::MemUtils::Copy<byte, ulong>(Input, InOffset, value, sizeof(ulong));
+		Utility::MemUtils::CopyToValue(Input, InOffset, value, sizeof(ulong));
 		return value;
 #else
 		return
@@ -453,11 +642,17 @@ public:
 	/// Treats a byte array as a large Big Endian integer, incrementing the total value by one
 	/// </summary>
 	/// 
-	/// <param name="Counter">The vector array of values</param>
-	inline static void BeIncrement8(std::vector<byte> &Counter)
+	/// <param name="Output">The counter byte array</param>
+	template<typename Array>
+	inline static void BeIncrement8(Array &Output)
 	{
-		size_t i = Counter.size();
-		while (--i >= 0 && ++Counter[i] == 0) {}
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be an array of 8bit integers");
+		CEXASSERT(!std::numeric_limits<decltype(Output[0])>::is_signed, "Output must be an unsigned integer array");
+
+		int i = (int)Output.size();
+		while (--i >= 0 && ++Output[i] == 0) 
+		{
+		}
 	}
 
 	/// <summary>
@@ -465,21 +660,26 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output array</param>
+	/// <param name="Output">The modified output byte array</param>
 	/// <param name="Length">The number to increase by</param>
-	inline static void BeIncrease8(const std::vector<byte> &Input, std::vector<byte> &Output, const size_t Length)
+	template<typename Array>
+	inline static void BeIncrease8(const Array &Input, Array &Output, const size_t Length)
 	{
-		const size_t CTRSZE = Output.size() - 1;
-		uint ctrLen = static_cast<uint>(Length);
-		std::vector<byte> ctrInc(sizeof(ctrLen));
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Input and Output must be an array of 8bit integers");
+		CEXASSERT(!std::numeric_limits<decltype(Output[0])>::is_signed, "Input and Output must be an unsigned integer array");
+
+		const int CTRSZE = (int)Output.size() - 1;
+		uint ctrLen = (uint)Length;
+		std::array<byte, sizeof(uint)> ctrInc;
+
 		memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
 		memcpy(&Output[0], &Input[0], Input.size());
 		byte carry = 0;
 
-		for (size_t i = CTRSZE; i > 0; --i)
+		for (int i = CTRSZE; i >= 0; --i)
 		{
 			byte odst = Output[i];
-			byte osrc = CTRSZE - i < ctrInc.size() ? ctrInc[CTRSZE - i] : (byte)0;
+			byte osrc = CTRSZE - i < (int)ctrInc.size() ? (byte)ctrInc[CTRSZE - i] : (byte)0;
 			byte ndst = (byte)(odst + osrc + carry);
 			carry = ndst < odst ? 1 : 0;
 			Output[i] = ndst;
@@ -494,59 +694,64 @@ public:
 	inline static bool IsLittleEndian()
 	{
 		int num = 1;
-		return (*(byte *)&num == 1);
+		return (*(byte*)&num == 1);
 	}
 
 	/// <summary>
-	/// Convert a Little Endian N * 8bit word array to a uint32 array.
-	/// <para>The entire input array is copied to 32bit uints, input must be 32bit aligned.</para>
+	/// Convert a Little Endian N * 8bit word array to an unsigned integer array.
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
-	/// <param name="Output">The destination array</param>
+	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
 	/// <param name="Length">The number of bytes to process</param>
-	template<typename T>
-	static void BlockToLe(const std::vector<byte> &Input, size_t InOffset, std::vector<T> &Output, size_t OutOffset, size_t Length)
+	template<typename ArrayA, typename ArrayB>
+	inline static void BlockToLe(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(T) >= Length, "Length is larger than output capacity");
+		CEXASSERT((Output.size() - OutOffset) * sizeof(Output[0]) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::Copy<byte, T>(Input, InOffset, Output, OutOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		for (size_t i = 0; i < Length; i += sizeof(T))
+		for (size_t i = 0; i < Length; i += sizeof(Output[0]))
 		{
-			for (size_t j = 0; j < sizeof(T); ++j)
-				Output[OutOffset + i] |= static_cast<T>(Input[InOffset + j] << (8 * j));
+			for (size_t j = 0; j < sizeof(Output[0]); ++j)
+			{
+				Output[OutOffset + i] |= static_cast<decltype(Output)::value_type>(Input[InOffset + j] << (8 * j));
+			}
 		}
 #endif
 	}
 
 	/// <summary>
-	/// Convert a Little Endian N * 32bit word array to a byte array.
-	/// <para>The entire input array is copied to bytes, must be 32bit aligned.</para>
+	/// Convert a Little Endian unsigned integer array to a byte array.
+	/// <para>The entire input array is copied to bytes.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The 32bit word array</param>
+	/// <param name="Input">The source integer array</param>
 	/// <param name="InOffset">The starting offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
+	/// <param name="Output">The destination byte array</param>
 	/// <param name="OutOffset">The starting offset within the destination array</param>
 	/// <param name="Length">The number of bytes to convert</param>
-	template<typename T>
-	static void LeToBlock(std::vector<T> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT((Input.size() - InOffset) * sizeof(T) >= Length, "Length is larger than input capacity");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CEXASSERT((Input.size() - InOffset) * sizeof(Input[0]) >= Length, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::Copy<T, byte>(Input, InOffset, Output, OutOffset, Length);
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		for (size_t i = 0; i < Length; i += sizeof(T))
+		for (size_t i = 0; i < Length; i += sizeof(Input[0]))
 		{
-			for (size_t j = 0; j < sizeof(T); ++j)
+			for (size_t j = 0; j < sizeof(Input[0]); ++j)
+			{
 				Output[OutOffset + j] = static_cast<byte>(Input[InOffset + i] >> (j * 8));
+			}
 		}
 #endif
 	}
@@ -555,15 +760,17 @@ public:
 	/// Convert a Little Endian 16 bit word to bytes
 	/// </summary>
 	/// 
-	/// <param name="Value">The 16 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void Le16ToBytes(const ushort Value, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Value">The 16bit integer</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename Array>
+	inline static void Le16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::Copy<ushort, byte>(Value, Output, OutOffset, sizeof(ushort));
+		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
@@ -576,15 +783,17 @@ public:
 	/// Convert a Little Endian 32 bit word to bytes
 	/// </summary>
 	/// 
-	/// <param name="Value">The 32 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void Le32ToBytes(const uint Value, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Value">The 32 bit integer</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename Array>
+	inline static void Le32ToBytes(const uint Value, Array &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::Copy<uint, byte>(Value, Output, OutOffset, sizeof(uint));
+		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
@@ -597,15 +806,17 @@ public:
 	/// Convert a Little Endian 64 bit dword to bytes
 	/// </summary>
 	/// 
-	/// <param name="Value">The 64 bit word</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void Le64ToBytes(const ulong Value, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Value">The 64 bit integer</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename Array>
+	inline static void Le64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::Copy<ulong, byte>(Value, Output, OutOffset, sizeof(ulong));
+		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
@@ -622,26 +833,29 @@ public:
 	/// Convert a Little Endian 8 * 32bit word array to a byte array
 	/// </summary>
 	/// 
-	/// <param name="Input">The 32bit word array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void LeUL256ToBlock(std::vector<uint> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Input">The 32bit integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeUL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(uint), "Input must be a 32bit integer array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) * sizeof(uint) >= 32, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY256<uint, byte>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
 #else
-		Le32ToBytes(Input[0], Output, OutOffset);
-		Le32ToBytes(Input[1], Output, OutOffset + 4);
-		Le32ToBytes(Input[2], Output, OutOffset + 8);
-		Le32ToBytes(Input[3], Output, OutOffset + 12);
-		Le32ToBytes(Input[4], Output, OutOffset + 16);
-		Le32ToBytes(Input[5], Output, OutOffset + 20);
-		Le32ToBytes(Input[6], Output, OutOffset + 24);
-		Le32ToBytes(Input[7], Output, OutOffset + 28);
+		Le32ToBytes(Input[InOffset], Output, OutOffset);
+		Le32ToBytes(Input[InOffset + 1], Output, OutOffset + 4);
+		Le32ToBytes(Input[InOffset + 2], Output, OutOffset + 8);
+		Le32ToBytes(Input[InOffset + 3], Output, OutOffset + 12);
+		Le32ToBytes(Input[InOffset + 4], Output, OutOffset + 16);
+		Le32ToBytes(Input[InOffset + 5], Output, OutOffset + 20);
+		Le32ToBytes(Input[InOffset + 6], Output, OutOffset + 24);
+		Le32ToBytes(Input[InOffset + 7], Output, OutOffset + 28);
 #endif
 	}
 
@@ -649,22 +863,25 @@ public:
 	/// Convert a Little Endian 4 * 64bit word array to a byte array
 	/// </summary>
 	/// 
-	/// <param name="Input">The 32bit word array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void LeULL256ToBlock(std::vector<ulong> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Input">The 64bit integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeULL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) * sizeof(ulong) >= 32, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY256<ulong, byte>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
 #else
-		Le64ToBytes(Input[0], Output, OutOffset);
-		Le64ToBytes(Input[1], Output, OutOffset + 8);
-		Le64ToBytes(Input[2], Output, OutOffset + 16);
-		Le64ToBytes(Input[3], Output, OutOffset + 24);
+		Le64ToBytes(Input[InOffset], Output, OutOffset);
+		Le64ToBytes(Input[InOffset + 1], Output, OutOffset + 8);
+		Le64ToBytes(Input[InOffset + 2], Output, OutOffset + 16);
+		Le64ToBytes(Input[InOffset + 3], Output, OutOffset + 24);
 #endif
 	}
 
@@ -672,26 +889,29 @@ public:
 	/// Convert a Little Endian 8 * 64bit word array to a byte array
 	/// </summary>
 	/// 
-	/// <param name="Input">The 64bit word array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void LeULL512ToBlock(std::vector<ulong> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Input">The 64bit integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeULL512ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) * sizeof(ulong) >= 64, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY512<ulong, byte>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
 #else
-		Le64ToBytes(Input[0], Output, OutOffset);
-		Le64ToBytes(Input[1], Output, OutOffset + 8);
-		Le64ToBytes(Input[2], Output, OutOffset + 16);
-		Le64ToBytes(Input[3], Output, OutOffset + 24);
-		Le64ToBytes(Input[4], Output, OutOffset + 32);
-		Le64ToBytes(Input[5], Output, OutOffset + 40);
-		Le64ToBytes(Input[6], Output, OutOffset + 48);
-		Le64ToBytes(Input[7], Output, OutOffset + 56);
+		Le64ToBytes(Input[InOffset], Output, OutOffset);
+		Le64ToBytes(Input[InOffset + 1], Output, OutOffset + 8);
+		Le64ToBytes(Input[InOffset + 2], Output, OutOffset + 16);
+		Le64ToBytes(Input[InOffset + 3], Output, OutOffset + 24);
+		Le64ToBytes(Input[InOffset + 4], Output, OutOffset + 32);
+		Le64ToBytes(Input[InOffset + 5], Output, OutOffset + 40);
+		Le64ToBytes(Input[InOffset + 6], Output, OutOffset + 48);
+		Le64ToBytes(Input[InOffset + 7], Output, OutOffset + 56);
 #endif
 	}
 
@@ -699,18 +919,21 @@ public:
 	/// Convert a Little Endian 16 * 64bit word array to a byte array
 	/// </summary>
 	/// 
-	/// <param name="Input">The 64bit word array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The destination bytes</param>
-	/// <param name="OutOffset">OutOffset within the destination block</param>
-	inline static void LeULL1024ToBlock(std::vector<ulong> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
+	/// <param name="Input">The 64bit integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination byte array</param>
+	/// <param name="OutOffset">The starting offset within the destination array</param>
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeULL1024ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
 		CEXASSERT((Input.size() - InOffset) * sizeof(ulong) >= 128, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) >= 128, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY512<ulong, byte>(Input, InOffset, Output, OutOffset);
-		Utility::MemUtils::COPY512<ulong, byte>(Input, InOffset + 8, Output, OutOffset + 64);
+		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY512(Input, InOffset + 8, Output, OutOffset + 64);
 #else
 		LeULL512ToBlock(Input, InOffset, Output, OutOffset);
 		LeULL512ToBlock(Input, InOffset + 8, Output, OutOffset + 64);
@@ -722,15 +945,18 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <returns>A 16 bit word in Little Endian format</returns>
-	inline static ushort LeBytesTo16(const std::vector<byte> &Input, size_t InOffset)
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <returns>A 16 bit integer in Little Endian format</returns>
+	template<typename Array>
+	inline static ushort LeBytesTo16(const Array &Input, size_t InOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		ushort value = 0;
-		Utility::MemUtils::Copy<byte, ushort>(Input, InOffset, value, sizeof(ushort));
+		Utility::MemUtils::CopyToValue(Input, InOffset, value, sizeof(ushort));
+
 		return value;
 #else
 		return
@@ -744,15 +970,18 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <returns>A 32 bit word in Little Endian format</returns>
-	inline static uint LeBytesTo32(const std::vector<byte> &Input, size_t InOffset)
+	template<typename Array>
+	inline static uint LeBytesTo32(const Array &Input, size_t InOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		uint value = 0;
-		Utility::MemUtils::Copy<byte, uint>(Input, InOffset, value, sizeof(uint));
+		Utility::MemUtils::CopyToValue(Input, InOffset, value, sizeof(uint));
+
 		return value;
 #else
 		return
@@ -768,15 +997,18 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
 	/// <returns>A 64 bit word in Little Endian format</returns>
-	inline static ulong LeBytesTo64(const std::vector<byte> &Input, size_t InOffset)
+	template<typename Array>
+	inline static ulong LeBytesTo64(const Array &Input, size_t InOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
 		CEXASSERT((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		ulong value = 0;
-		Utility::MemUtils::Copy<byte, ulong>(Input, InOffset, value, sizeof(ulong));
+		Utility::MemUtils::CopyToValue(Input, InOffset, value, sizeof(ulong));
+
 		return value;
 #else
 		return
@@ -796,17 +1028,19 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The output integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination 32bit integer array</param>
 	/// <param name="OutOffset">The starting offset within the output array</param>
-	/// <returns>An array of 32 bit words in Little Endian format</returns>
-	inline static void LeBytesToUL512(const std::vector<byte> &Input, size_t InOffset, std::vector<uint> &Output, size_t OutOffset)
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeBytesToUL512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(uint), "Output must be a 32bit integer array");
 		CEXASSERT((Input.size() - InOffset) >= 64, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(uint) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY512<byte, uint>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
 #else
 		Output[OutOffset] = LeBytesTo32(Input, InOffset);
 		Output[OutOffset + 1] = LeBytesTo32(Input, InOffset + 4);
@@ -832,17 +1066,19 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The output integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination 64bit integer array</param>
 	/// <param name="OutOffset">The starting offset within the output array</param>
-	/// <returns>An array of 32 bit words in Little Endian format</returns>
-	inline static void LeBytesToULL256(const std::vector<byte> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeBytesToULL256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
 		CEXASSERT((Input.size() - InOffset) >= 32, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY256<byte, ulong>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
 #else
 		Output[OutOffset] = LeBytesTo64(Input, InOffset);
 		Output[OutOffset + 1] = LeBytesTo64(Input, InOffset + 8);
@@ -856,17 +1092,19 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The output integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination 64bit integer array</param>
 	/// <param name="OutOffset">The starting offset within the output array</param>
-	/// <returns>An array of 64 bit dwords in Little Endian format</returns>
-	inline static void LeBytesToULL512(const std::vector<byte> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeBytesToULL512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
 		CEXASSERT((Input.size() - InOffset) >= 64, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY512<byte, ulong>(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
 #else
 		Output[OutOffset] = LeBytesTo64(Input, InOffset);
 		Output[OutOffset + 1] = LeBytesTo64(Input, InOffset + 8);
@@ -884,18 +1122,20 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The source byte array</param>
-	/// <param name="InOffset">Offset within the source array</param>
-	/// <param name="Output">The output integer array</param>
+	/// <param name="InOffset">The starting offset within the source array</param>
+	/// <param name="Output">The destination 64bit integer array</param>
 	/// <param name="OutOffset">The starting offset within the output array</param>
-	/// <returns>An array of 32 bit words in Little Endian format</returns>
-	inline static void LeBytesToULL1024(const std::vector<byte> &Input, size_t InOffset, std::vector<ulong> &Output, size_t OutOffset)
+	template<typename ArrayA, typename ArrayB>
+	inline static void LeBytesToULL1024(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
 		CEXASSERT((Input.size() - InOffset) >= 128, "Length is larger than input capacity");
 		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 128, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
-		Utility::MemUtils::COPY512<byte, ulong>(Input, InOffset, Output, OutOffset);
-		Utility::MemUtils::COPY512<byte, ulong>(Input, InOffset + 64, Output, OutOffset + 8);
+		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
+		Utility::MemUtils::COPY512(Input, InOffset + 64, Output, OutOffset + 8);
 #else
 		LeBytesToULL512(Input, InOffset, Output, OutOffset);
 		LeBytesToULL512(Input, InOffset + 64, Output, OutOffset + 64);
@@ -903,78 +1143,57 @@ public:
 	}
 
 	/// <summary>
-	/// Treats a byte array as a large Little Endian integer, incrementing the total value by one
+	/// Treats an array as a large Little Endian integer, incrementing the total value by one
 	/// </summary>
 	/// 
-	/// <param name="Counter">The vector array of values</param>
-	inline static void LeIncrement8(std::vector<byte> &Counter)
+	/// <param name="Output">The counter array</param>
+	template <typename Array>
+	inline static void LeIncrement(Array &Output)
 	{
-		int i = -1;
-		while (++i < static_cast<int>(Counter.size()) && ++Counter[i] == 0) {}
+		int i = (int)Output.size();
+		while (--i >= 0 && ++Output[i] == 0) 
+		{
+		}
 	}
 
 	/// <summary>
-	/// Treats the array as a large Big Endian integer, incrementing the total value by one
+	/// Treats an integer array as a large Little Endian integer, incrementing the total value by one.
+	/// <para>Uses only the first two elements of the Output array; used by 32 or 64 bit integer types.
+	/// Uses only unsigned integer types; signed types are UB.</para>
 	/// </summary>
 	/// 
-	/// <param name="Counter">The vector array of values</param>
-	template <typename T>
-	static void LeIncrement(std::vector<T> &Counter)
+	/// <param name="Output">The counter array to increment</param>
+	template <typename Array>
+	inline static void LeIncrementW(Array &Output)
 	{
-		size_t i = Counter.size();
-		while (--i >= 0 && ++Counter[i] == 0) {}
+		CEXASSERT(!std::numeric_limits<decltype(Output[0])>::is_signed, "Output must be an unsigned integer array");
+
+		if (++Output[0] == 0)
+		{
+			++Output[1];
+		}
 	}
 
 	/// <summary>
-	/// Treats a 2x 64bit integer array as a large Little Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The counter array to increment</param>
-	inline static void LeIncrement32(std::vector<uint> &Counter)
-	{
-		if (++Counter[0] == 0)
-			++Counter[1];
-	}
-
-	/// <summary>
-	/// Treats a 2x 64bit integer array as a large Little Endian integer, incrementing the total value by one
-	/// </summary>
-	/// 
-	/// <param name="Counter">The counter array to increment</param>
-	inline static void LeIncrement64(std::vector<ulong> &Counter)
-	{
-		if (++Counter[0] == 0)
-			++Counter[1];
-	}
-
-	/// <summary>
-	/// Treats a 2x 32bit integer array as a large Little Endian integer, incrementing the total value by a defined length
+	/// Treats an integer array as a large Little Endian integer, incrementing the total value by a defined length.
+	/// <para>Uses only unsigned integer types; signed types are UB.</para>
 	/// </summary>
 	/// 
 	/// <param name="Input">The initial array of bytes</param>
 	/// <param name="Output">The modified output array</param>
 	/// <param name="Length">The number to increase by</param>
-	inline static void LeIncrease32(const std::vector<uint> &Input, std::vector<uint> &Output, const size_t Length)
+	template <typename Array>
+	inline static void LeIncreaseW(const Array &Input, Array &Output, const size_t Length)
 	{
-		memcpy(&Output[0], &Input[0], Input.size() * sizeof(uint));
-		Output[0] += static_cast<uint>(Length);
-		if (Output[0] < Input[0])
-			++Output[1];
-	}
+		CEXASSERT(!std::numeric_limits<decltype(Input[0])>::is_signed, "Input and Output must be an unsigned integer array");
 
-	/// <summary>
-	/// Treats a 2x 64bit integer array as a large Little Endian integer, incrementing the total value by a defined length
-	/// </summary>
-	/// 
-	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output array</param>
-	/// <param name="Length">The number to increase by</param>
-	inline static void LeIncrease64(const std::vector<ulong> &Input, std::vector<ulong> &Output, const size_t Length)
-	{
-		memcpy(&Output[0], &Input[0], Input.size() * sizeof(ulong));
-		Output[0] += static_cast<uint>(Length);
+		std::memcpy(&Output[0], &Input[0], Input.size() * sizeof(Input[0]));
+		Output[0] += Length;
+
 		if (Output[0] < Input[0])
+		{
 			++Output[1];
+		}
 	}
 
 	//~~~Constant Time~~~//
@@ -990,13 +1209,15 @@ public:
 	/// <param name="Length">The number of elements to compare</param>
 	/// 
 	/// <returns>True if arrays are equivalant</returns>
-	template <typename T>
-	static bool Compare(const std::vector<T> &A, size_t AOffset, const std::vector<T> &B, size_t BOffset, size_t Length)
+	template <typename Array>
+	inline static bool Compare(const Array &A, size_t AOffset, const Array &B, size_t BOffset, size_t Length)
 	{
 		size_t delta = 0;
 
 		for (size_t i = 0; i < Length; ++i)
+		{
 			delta |= (A[AOffset + i] ^ B[BOffset + i]);
+		}
 
 		return (delta == 0);
 	}
@@ -1014,7 +1235,9 @@ public:
 		T r = X;
 		// fold r down to a single bit
 		for (size_t i = 1; i != sizeof(T) * 8; i *= 2)
+		{
 			r |= r >> i;
+		}
 
 		r &= 1;
 		r = ~(r - 1);
@@ -1121,7 +1344,9 @@ public:
 		const T MASK = ExpandMask<T>(Value);
 
 		for (size_t i = 0; i != Length; ++i)
+		{
 			To[i] = Select<T>(MASK, From0[i], From1[i]);
+		}
 	}
 
 	/// <summary>
@@ -1138,7 +1363,9 @@ public:
 		const T ZERO(0);
 
 		for (size_t i = 0; i != Length; ++i)
+		{
 			Array[i] = Select<T>(MASK, ZERO, Array[i]);
+		}
 	}
 
 	/// <summary>
@@ -1190,8 +1417,12 @@ public:
 	/// <param name="Output">The output integer array</param>
 	/// 
 	/// <returns>The bit count</returns>
-	static uint ShiftLeft(const std::vector<byte> &Input, std::vector<byte> &Output)
+	template <typename Array>
+	inline static uint ShiftLeft(const Array &Input, Array &Output)
 	{
+		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Input must be a byte array");
+
 		size_t ctr = Input.size();
 		uint bit = 0;
 
@@ -1201,7 +1432,8 @@ public:
 			uint b = Input[ctr];
 			Output[ctr] = (byte)((b << 1) | bit);
 			bit = (b >> 7) & 1;
-		} while (ctr > 0);
+		} 
+		while (ctr > 0);
 
 		return bit;
 	}
@@ -1221,7 +1453,8 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotFL32(uint Value, uint Shift)
 	{
-		return _lrotl(Value, Shift);
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		return _lrotl(Value, static_cast<int>(Shift));
 	}
 
 	/// <summary>
@@ -1234,7 +1467,8 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotFL64(ulong Value, uint Shift)
 	{
-		return _rotl64(Value, Shift);
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		return _rotl64(Value, static_cast<int>(Shift));
 	}
 
 	/// <summary>
@@ -1247,7 +1481,8 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotFR32(uint Value, uint Shift)
 	{
-		return _lrotr(Value, Shift);
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		return _lrotr(Value, static_cast<int>(Shift));
 	}
 
 	/// <summary>
@@ -1260,7 +1495,8 @@ public:
 	/// <returns>The right shifted 64 bit integer</returns>
 	inline static ulong RotFR64(ulong Value, uint Shift)
 	{
-		return _rotr64(Value, Shift);
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		return _rotr64(Value, static_cast<int>(Shift));
 	}
 
 	/// <summary>
@@ -1273,7 +1509,8 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotL32(uint Value, uint Shift)
 	{
-		return Shift ? _rotl(Value, Shift) : Value;
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		return Shift ? _rotl(Value, static_cast<int>(Shift)) : Value;
 	}
 
 	/// <summary>
@@ -1286,7 +1523,8 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotL64(ulong Value, uint Shift)
 	{
-		return Shift ? _rotl64(Value, Shift) : Value;
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		return Shift ? _rotl64(Value, static_cast<int>(Shift)) : Value;
 	}
 
 	/// <summary>
@@ -1299,7 +1537,8 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotR32(uint Value, uint Shift)
 	{
-		return Shift ? _rotr(Value, Shift) : Value;
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		return Shift ? _rotr(Value, static_cast<int>(Shift)) : Value;
 	}
 
 	/// <summary>
@@ -1312,7 +1551,8 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static ulong RotR64(ulong Value, uint Shift)
 	{
-		return Shift ? _rotr64(Value, Shift) : Value;
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		return Shift ? _rotr64(Value, static_cast<int>(Shift)) : Value;
 	}
 
 #else
@@ -1327,6 +1567,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotFL32(uint Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (32 - Shift));
 	}
 
@@ -1340,6 +1581,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotFL64(ulong Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (64 - Shift));
 	}
 
@@ -1353,6 +1595,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotFR32(uint Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value >> Shift) | (Value << (32 - Shift));
 	}
 
@@ -1366,6 +1609,7 @@ public:
 	/// <returns>The right shifted 64 bit integer</returns>
 	inline static ulong RotFR64(ulong Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
 
@@ -1379,6 +1623,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotL32(uint Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
 	}
 
@@ -1392,6 +1637,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotL64(ulong Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (sizeof(ulong) * 8 - Shift));
 	}
 
@@ -1405,6 +1651,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotR32(uint Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
 	}
 
@@ -1418,6 +1665,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static ulong RotR64(ulong Value, uint Shift)
 	{
+		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return (Value >> Shift) | (Value << (sizeof(ulong) * 8 - Shift));
 	}
 

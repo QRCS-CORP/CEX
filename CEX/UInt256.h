@@ -1,5 +1,23 @@
-#ifndef _CEX_UINT256_H
-#define _CEX_UINT256_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_UINT256_H
+#define CEX_UINT256_H
 
 #include "CexDomain.h"
 #include "Intrinsics.h"
@@ -32,7 +50,7 @@ public:
 	}
 
 	/// <summary>
-	/// A UInt256 initialized with 8x 32bit integers to the value 0
+	/// A UInt256 initialized with 8x 32bit integers to the value zero
 	/// </summary>
 	inline static const UInt256 ZERO()
 	{
@@ -51,51 +69,19 @@ public:
 	/// </summary>
 	///
 	/// <param name="Y">The 256bit register</param>
-	explicit UInt256(__m256i const Y)
+	explicit UInt256(__m256i const &Y)
 	{
 		ymm = Y;
 	}
 
 	/// <summary>
-	/// Initialize with an 8bit unsigned integer array
+	/// Initialize with an integer array
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 16 bytes</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UInt256(const std::vector<byte> &Input, size_t Offset)
-	{
-		ymm = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[Offset]));
-	}
-
-	/// <summary>
-	/// Initialize with a 16bit unsigned integer array in Little Endian format
-	/// </summary>
-	///
-	/// <param name="Input">The array containing the data; must be at least 16 * 16bit uints</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UInt256(const std::vector<ushort> &Input, size_t Offset)
-	{
-		ymm = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[Offset]));
-	}
-
-	/// <summary>
-	/// Initialize with a 32bit unsigned integer array
-	/// </summary>
-	///
-	/// <param name="Input">The array containing the data; must be at least 4 * 32bit uints</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UInt256(const std::vector<uint> &Input, size_t Offset)
-	{
-		ymm = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[Offset]));
-	}
-
-	/// <summary>
-	/// Initialize with a 64bit unsigned integer array
-	/// </summary>
-	///
-	/// <param name="Input">The array containing the data; must be at least 2 * 64bit uints</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UInt256(const std::vector<ulong> &Input, size_t Offset)
+	template<typename Array>
+	explicit UInt256(const Array &Input, size_t Offset)
 	{
 		ymm = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[Offset]));
 	}
@@ -118,7 +104,7 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize with 1 * 32bit unsigned integer
+	/// Initialize with 1 * 32bit unsigned integer; copied to every register
 	/// </summary>
 	///
 	/// <param name="X">The uint to add</param>
@@ -130,19 +116,19 @@ public:
 	//~~~ Load and Store~~~//
 
 	/// <summary>
-	/// Load an array into a register in Little Endian format
+	/// Load an integer array into a register
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 256 bits in length</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
-	template <typename T>
-	inline void Load(const std::vector<T> &Input, size_t Offset)
+	template <typename Array>
+	inline void Load(const Array &Input, size_t Offset)
 	{
 		ymm = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[Offset]));
 	}
 
 	/// <summary>
-	/// Load with 8 * 32bit unsigned integers in Little Endian format
+	/// Load with 8 * 32bit unsigned integers
 	/// </summary>
 	///
 	/// <param name="X0">uint32 0</param>
@@ -159,77 +145,77 @@ public:
 	}
 
 	/// <summary>
-	/// Load an array of T into a register in Little Endian format.
-	/// <para>Integers are loaded as 32bit integers regardless the natural size of T</para>
+	/// Load an integer array into a register.
+	/// <para>Integers are loaded as 32bit integers regardless the arrays integer size</para>
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 256 bits in length</param>
+	/// <param name="Input">The source integer array; must be at least 256 bits in length</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
-	template <typename T>
-	inline void LoadT(const std::vector<T> &Input, size_t Offset)
+	template <typename Array>
+	inline void LoadUL(const Array &Input, size_t Offset)
 	{
 		ymm = _mm256_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3],
 			(uint)Input[Offset + 4], (uint)Input[Offset + 5], (uint)Input[Offset + 6], (uint)Input[Offset + 7]);
 	}
 
 	/// <summary>
-	/// Transposes and loads 4 * UInt256 at 64bit boundaries in Little Endian format to an array of T
+	/// Transposes and loads 4 * UInt256 at 32bit boundaries into an array
 	/// </summary>
 	///
-	/// <param name="Input">The T data input array</param>
-	/// <param name="Offset">The starting position within the input array</param>
+	/// <param name="Input">The source integer array; must be at least 1024 bits in length</param>
+	/// <param name="Offset">The starting position within the Input array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	template <typename T>
-	inline static void Load4(const std::vector<T> &Input, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
+	template <typename Array>
+	inline static void Load4(const Array &Input, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
 	{
 		X0.Load(Input, Offset);
-		X1.Load(Input, Offset + (32 / sizeof(T)));
-		X2.Load(Input, Offset + (64 / sizeof(T)));
-		X3.Load(Input, Offset + (96 / sizeof(T)));
+		X1.Load(Input, Offset + (32 / sizeof(Input[0])));
+		X2.Load(Input, Offset + (64 / sizeof(Input[0])));
+		X3.Load(Input, Offset + (96 / sizeof(Input[0])));
 		Transpose(X0, X1, X2, X3);
 	}
 
 	/// <summary>
-	/// Store register in an integer array in Little Endian format
+	/// Store register in an integer array
 	/// </summary>
 	///
-	/// <param name="Output">The array containing the data; must be at least 256 bits in length</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	template <typename T>
-	inline void Store(std::vector<T> &Output, size_t Offset) const
+	/// <param name="Output">The destination integer array; must be at least 256 bits in length</param>
+	/// <param name="Offset">The starting offset within the Output array</param>
+	template <typename Array>
+	inline void Store(Array &Output, size_t Offset) const
 	{
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), ymm);
 	}
 
 	/// <summary>
-	/// Transposes and stores 4 * UInt256 to a T sized array
+	/// Transposes and stores 4 * UInt256 to an array
 	/// </summary>
 	///
-	/// <param name="Output">The T data destination array</param>
-	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Output">The destination integer array; must be at least 1024 bits in length</param>
+	/// <param name="Offset">The starting offset within the Output array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
 	/// <param name="X3">Operand 3</param>
-	template <typename T>
-	inline static void Store4(std::vector<T> &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
+	template <typename Array>
+	inline static void Store4(Array &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3)
 	{
 		Transpose(X0, X1, X2, X3);
 		X0.Store(Output, Offset);
-		X1.Store(Output, Offset + (32 / sizeof(T)));
-		X2.Store(Output, Offset + (64 / sizeof(T)));
-		X3.Store(Output, Offset + (96 / sizeof(T)));
+		X1.Store(Output, Offset + (32 / sizeof(Output[0])));
+		X2.Store(Output, Offset + (64 / sizeof(Output[0])));
+		X3.Store(Output, Offset + (96 / sizeof(Output[0])));
 	}
 
 	/// <summary>
-	/// Transposes and stores 16 * UInt256 to a T sized array
+	/// Transposes and stores 16 * UInt256 to an array
 	/// </summary>
 	///
-	/// <param name="Output">The destination data array</param>
-	/// <param name="Offset">The starting position within the destination array</param>
+	/// <param name="Output">The destination integer array; must be at least 4096 bits in length</param>
+	/// <param name="Offset">The starting offset within the Output array</param>
 	/// <param name="X0">Operand 0</param>
 	/// <param name="X1">Operand 1</param>
 	/// <param name="X2">Operand 2</param>
@@ -246,8 +232,8 @@ public:
 	/// <param name="X13">Operand 13</param>
 	/// <param name="X14">Operand 14</param>
 	/// <param name="X15">Operand 15</param>
-	template <typename T>
-	inline static void Store16(std::vector<T> &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
+	template <typename Array>
+	inline static void Store16(Array &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
 		UInt256 &X6, UInt256 &X7, UInt256 &X8, UInt256 &X9, UInt256 &X10, UInt256 &X11, UInt256 &X12, UInt256 &X13, UInt256 &X14, UInt256 &X15)
 	{
 		__m256i W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
@@ -281,21 +267,21 @@ public:
 		_mm256_merge_si128(Y13, Y15, X14.ymm, X15.ymm);
 
 		X0.Store(Output, Offset);
-		X8.Store(Output, Offset + (32 / sizeof(T)));
-		X1.Store(Output, Offset + (64 / sizeof(T)));
-		X9.Store(Output, Offset + (96 / sizeof(T)));
-		X2.Store(Output, Offset + (128 / sizeof(T)));
-		X10.Store(Output, Offset + (160 / sizeof(T)));
-		X3.Store(Output, Offset + (192 / sizeof(T)));
-		X11.Store(Output, Offset + (224 / sizeof(T)));
-		X4.Store(Output, Offset + (256 / sizeof(T)));
-		X12.Store(Output, Offset + (288 / sizeof(T)));
-		X5.Store(Output, Offset + (320 / sizeof(T)));
-		X13.Store(Output, Offset + (352 / sizeof(T)));
-		X6.Store(Output, Offset + (384 / sizeof(T)));
-		X14.Store(Output, Offset + (416 / sizeof(T)));
-		X7.Store(Output, Offset + (448 / sizeof(T)));
-		X15.Store(Output, Offset + (480 / sizeof(T)));
+		X8.Store(Output, Offset + (32 / sizeof(Output[0])));
+		X1.Store(Output, Offset + (64 / sizeof(Output[0])));
+		X9.Store(Output, Offset + (96 / sizeof(Output[0])));
+		X2.Store(Output, Offset + (128 / sizeof(Output[0])));
+		X10.Store(Output, Offset + (160 / sizeof(Output[0])));
+		X3.Store(Output, Offset + (192 / sizeof(Output[0])));
+		X11.Store(Output, Offset + (224 / sizeof(Output[0])));
+		X4.Store(Output, Offset + (256 / sizeof(Output[0])));
+		X12.Store(Output, Offset + (288 / sizeof(Output[0])));
+		X5.Store(Output, Offset + (320 / sizeof(Output[0])));
+		X13.Store(Output, Offset + (352 / sizeof(Output[0])));
+		X6.Store(Output, Offset + (384 / sizeof(Output[0])));
+		X14.Store(Output, Offset + (416 / sizeof(Output[0])));
+		X7.Store(Output, Offset + (448 / sizeof(Output[0])));
+		X15.Store(Output, Offset + (480 / sizeof(Output[0])));
 	}
 
 	//~~~ Methods~~~//
@@ -353,6 +339,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotL32(const int Shift)
 	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		ymm = _mm256_or_si256(_mm256_slli_epi32(ymm, static_cast<int>(Shift)), _mm256_srli_epi32(ymm, static_cast<int>(32 - Shift)));
 	}
 
@@ -366,6 +353,7 @@ public:
 	/// <returns>The rotated UInt256</returns>
 	inline static UInt256 RotL32(const UInt256 &X, const int Shift)
 	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_or_si256(_mm256_slli_epi32(X.ymm, static_cast<int>(Shift)), _mm256_srli_epi32(X.ymm, static_cast<int>(32 - Shift))));
 	}
 
@@ -376,6 +364,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotR32(const int Shift)
 	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
 	}
 
@@ -389,6 +378,7 @@ public:
 	/// <returns>The rotated UInt256</returns>
 	inline static UInt256 RotR32(const UInt256 &X, const int Shift)
 	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return RotL32(X, 32 - Shift);
 	}
 
@@ -402,6 +392,7 @@ public:
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 ShiftRA(const UInt256 &Value, const int Shift)
 	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_sra_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -415,6 +406,7 @@ public:
 	/// <returns>The processed UInt256</returns>
 	inline static UInt256 ShiftRL(const UInt256 &Value, const int Shift)
 	{
+		CEXASSERT(Shift <= 32, "Shift size is too large");
 		return UInt256(_mm256_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -425,12 +417,12 @@ public:
 	/// <returns>The byte swapped UInt256</returns>
 	UInt256 Swap() const
 	{
-		__m256i T = ymm;
+		__m256i tmpX = ymm;
 
-		T = _mm256_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
-		T = _mm256_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm256_shufflehi_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm256_shufflelo_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
 
-		return UInt256(_mm256_or_si256(_mm256_srli_epi16(T, 8), _mm256_slli_epi16(T, 8)));
+		return UInt256(_mm256_or_si256(_mm256_srli_epi16(tmpX, 8), _mm256_slli_epi16(tmpX, 8)));
 	}
 
 	/// <summary>
@@ -442,12 +434,12 @@ public:
 	/// <returns>The byte swapped UInt256</returns>
 	inline static UInt256 Swap(UInt256 &X)
 	{
-		__m256i T = X.ymm;
+		__m256i tmpX = X.ymm;
 
-		T = _mm256_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
-		T = _mm256_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm256_shufflehi_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm256_shufflelo_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
 
-		return UInt256(_mm256_or_si256(_mm256_srli_epi16(T, 8), _mm256_slli_epi16(T, 8)));
+		return UInt256(_mm256_or_si256(_mm256_srli_epi16(tmpX, 8), _mm256_slli_epi16(tmpX, 8)));
 	}
 
 	/// <summary>
@@ -579,10 +571,12 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UInt256 operator / (const UInt256 &X) const
 	{
-		std::vector<uint> tmpA(8);
-		std::vector<uint> tmpB(8);
+		std::array<uint, 8> tmpA;
+		std::array<uint, 8> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+
 		return UInt256(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 
@@ -597,10 +591,12 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UInt256 &X)
 	{
-		std::vector<uint> tmpA(8);
-		std::vector<uint> tmpB(8);
+		std::array<uint, 8> tmpA;
+		std::array<uint, 8> tmpB;
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpA[0]), ymm);
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+
 		ymm = _mm256_set_epi32(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4],
 			tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 

@@ -1,5 +1,5 @@
-#ifndef _CEX_STREAMREADER_H
-#define _CEX_STREAMREADER_H
+#ifndef CEX_STREAMREADER_H
+#define CEX_STREAMREADER_H
 
 #include "MemoryStream.h"
 #include "MemUtils.h"
@@ -73,7 +73,7 @@ public:
 		const size_t VALSZE = sizeof(T);
 		CEXASSERT(m_streamData.Position() + VALSZE <= m_streamData.Length(), "Stream length exceeded");
 		T val = 0;
-		Utility::MemUtils::Copy<byte, T>(m_streamData.ToArray(), m_streamData.Position(), val, VALSZE);
+		Utility::MemUtils::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, sizeof(val));
 		m_streamData.Seek(m_streamData.Position() + VALSZE, SeekOrigin::Begin);
 
 		return val;

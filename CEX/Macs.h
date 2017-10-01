@@ -1,5 +1,5 @@
-#ifndef _CEX_MACS_H
-#define _CEX_MACS_H
+#ifndef CEX_MACS_H
+#define CEX_MACS_H
 
 #include "CexDomain.h"
 

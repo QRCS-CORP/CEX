@@ -1,5 +1,5 @@
-#ifndef _CEX_EVENT_H
-#define _CEX_EVENT_H
+#ifndef CEX_EVENT_H
+#define CEX_EVENT_H
 
 #include "CexDomain.h"
 #include "Delegate.h"

@@ -110,24 +110,17 @@ void PBKDF2::Destroy()
 		m_kdfIterations = 0;
 		m_macSize = 0;
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_macGenerator != 0)
-					delete m_macGenerator;
-			}
+			if (m_macGenerator != 0)
+				delete m_macGenerator;
+		}
 
-			Utility::IntUtils::ClearVector(m_kdfKey);
-			Utility::IntUtils::ClearVector(m_kdfSalt);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-		}
-		catch(std::exception& ex)
-		{
-			throw CryptoKdfException("PBKDF2:Destroy", "The class state was not disposed!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_kdfKey);
+		Utility::IntUtils::ClearVector(m_kdfSalt);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
 	}
 }
 
@@ -174,7 +167,7 @@ void PBKDF2::Initialize(const std::vector<byte> &Key)
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_isInitialized = true;
 }
 
@@ -189,9 +182,9 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size());
-	Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
+	Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
 
 	m_isInitialized = true;
 }
@@ -207,13 +200,13 @@ void PBKDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 		Reset();
 
 	m_kdfKey.resize(Key.size());
-	Utility::MemUtils::Copy<byte>(Key, 0, m_kdfKey, 0, m_kdfKey.size());
+	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size() + Info.size());
 
 	if (Salt.size() > 0)
-		Utility::MemUtils::Copy<byte>(Salt, 0, m_kdfSalt, 0, Salt.size());
+		Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, Salt.size());
 	if (Info.size() > 0)
-		Utility::MemUtils::Copy<byte>(Info, 0, m_kdfSalt, Salt.size(), Info.size());
+		Utility::MemUtils::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
 
 	m_isInitialized = true;
 }
@@ -226,7 +219,7 @@ void PBKDF2::ReSeed(const std::vector<byte> &Seed)
 	if (Seed.size() > m_kdfSalt.size())
 		m_kdfSalt.resize(Seed.size());
 
-	Utility::MemUtils::Copy<byte>(Seed, 0, m_kdfSalt, 0, Seed.size());
+	Utility::MemUtils::Copy(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
 
 void PBKDF2::Reset()
@@ -256,7 +249,7 @@ size_t PBKDF2::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 		{
 			std::vector<byte> tmp(m_macSize);
 			Process(tmp, 0);
-			Utility::MemUtils::Copy<byte>(tmp, 0, Output, OutOffset, prcRmd);
+			Utility::MemUtils::Copy(tmp, 0, Output, OutOffset, prcRmd);
 		}
 
 		prcLen -= prcRmd;
@@ -282,7 +275,7 @@ void PBKDF2::Process(std::vector<byte> &Output, size_t OutOffset)
 
 	std::vector<byte> state(m_macSize);
 	m_macGenerator->Finalize(state, 0);
-	Utility::MemUtils::Copy<byte>(state, 0, Output, OutOffset, state.size());
+	Utility::MemUtils::Copy(state, 0, Output, OutOffset, state.size());
 
 	for (int i = 1; i != m_kdfIterations; ++i)
 	{

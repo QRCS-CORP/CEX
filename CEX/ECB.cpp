@@ -121,19 +121,12 @@ void ECB::Destroy()
 		m_isLoaded = false;
 		m_parallelProfile.Reset();
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_blockCipher != 0)
-					delete m_blockCipher;
-			}
-		}
-		catch(std::exception& ex) 
-		{
-			throw CryptoCipherModeException("ECB:Destroy", "Could not clear all variables!", std::string(ex.what()));
+			if (m_blockCipher != 0)
+				delete m_blockCipher;
 		}
 	}
 }

@@ -27,8 +27,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_KECCAK512_H
-#define _CEX_KECCAK512_H
+#ifndef CEX_KECCAK512_H
+#define CEX_KECCAK512_H
 
 #include "IDigest.h"
 #include "KeccakParams.h"
@@ -52,9 +52,8 @@ NAMESPACE_DIGEST
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>Hash sizes are 48 and 64 bytes (384 and 512 bits).</description></item>
-/// <item><description>Block sizes are 104, and 72 bytes (832, 576 bits).</description></item>
-/// <item><description>Use the <see cref="BlockSize"/> property to determine block sizes at runtime.</description></item>
+/// <item><description>The output hash size is 64 bytes (512 bits).</description></item>
+/// <item><description>The input block size is 72 bytes (576 bits).</description></item>
 /// <item><description>The <see cref="Compute(byte[])"/> method wraps the <see cref="Update(byte[], int, int)"/> and Finalize methods.</description>/></item>
 /// <item><description>The <see cref="Finalize(byte[], int)"/> method resets the internal state.</description></item>
 /// </list>
@@ -64,6 +63,8 @@ NAMESPACE_DIGEST
 /// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</a>.</description></item>
 /// <item><description>SHA3 <a href="http://csrc.nist.gov/groups/ST/hash/sha-3/documents/Keccak-slides-at-NIST.pdf">Keccak Slides</a>.</description></item>
 /// <item><description>SHA3 <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition.</description></item>
+/// <item><description>Team Keccak <a href="https://keccak.team/keccak_specs_summary.html">Specifications</a> summary.</description></item>
+/// <item><description>Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a> Guide.</description></item>
 /// </list>
 /// </remarks>
 class Keccak512 : public IDigest
@@ -263,7 +264,6 @@ public:
 
 private:
 
-	void Compress(const std::vector<byte> &Input, size_t InOffset, Keccak512State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak512State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak512State &State, ulong Length);
 };

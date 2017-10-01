@@ -1,5 +1,5 @@
-#ifndef _CEX_FILESTREAM_H
-#define _CEX_FILESTREAM_H
+#ifndef CEX_FILESTREAM_H
+#define CEX_FILESTREAM_H
 
 #include "IByteStream.h"
 #include <fstream>

@@ -36,12 +36,12 @@ RLWEPrivateKey::RLWEPrivateKey(const std::vector<byte> &KeyStream)
 	m_rlweParameters(RLWEParams::None),
 	m_rCoeffs(0)
 {
-	m_rlweParameters = static_cast<RLWEParams>(Utility::IntUtils::LeBytesTo16(KeyStream, 0));
-	uint rLen = Utility::IntUtils::LeBytesTo16(KeyStream, 2);
+	m_rlweParameters = static_cast<RLWEParams>(KeyStream[0]);
+	uint rLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_rCoeffs.resize(rLen);
 
 	for (size_t i = 0; i < rLen; ++i)
-		m_rCoeffs[i] = Utility::IntUtils::LeBytesTo16(KeyStream, 4 + (i * sizeof(ushort)));
+		m_rCoeffs[i] = Utility::IntUtils::LeBytesTo16(KeyStream, 5 + (i * sizeof(ushort)));
 }
 
 RLWEPrivateKey::~RLWEPrivateKey()
@@ -55,24 +55,23 @@ void RLWEPrivateKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_rlweParameters = RLWEParams::None;
 
 		if (m_rCoeffs.size() > 0)
 			Utility::IntUtils::ClearVector(m_rCoeffs);
-
-		m_isDestroyed = true;
 	}
 }
 
 std::vector<byte> RLWEPrivateKey::ToBytes()
 {
-	ushort rLen = static_cast<ushort>(m_rCoeffs.size());
-	std::vector<byte> r((rLen * sizeof(ushort)) + 4);
-	Utility::IntUtils::Le16ToBytes(static_cast<ushort>(m_rlweParameters), r, 0);
-	Utility::IntUtils::Le16ToBytes(rLen, r, 2);
+	uint rLen = static_cast<uint>(m_rCoeffs.size());
+	std::vector<byte> r((rLen * sizeof(ushort)) + 5);
+	r[0] = static_cast<byte>(m_rlweParameters);
+	Utility::IntUtils::Le32ToBytes(rLen, r, 1);
 
 	for (size_t i = 0; i < rLen; ++i)
-		Utility::IntUtils::Le16ToBytes(m_rCoeffs[i], r, 4 + (i * sizeof(ushort)));
+		Utility::IntUtils::Le16ToBytes(m_rCoeffs[i], r, 5 + (i * sizeof(ushort)));
 
 	return r;
 }

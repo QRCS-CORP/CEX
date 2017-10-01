@@ -1,5 +1,23 @@
-#ifndef _CEX_SYSUTILS_H
-#define _CEX_SYSUTILS_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_SYSUTILS_H
+#define CEX_SYSUTILS_H
 
 #include "CexDomain.h"
 #include "ArrayUtils.h"
@@ -61,7 +79,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A char vector</returns>
-	static std::vector<char> ComputerName();
+	static std::string ComputerName();
 
 	/// <summary>
 	/// Return an array of free space, total bytes, and available bytes for a drive
@@ -133,7 +151,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A char vector</returns>
-	static std::vector<char> UserName();
+	static std::string UserName();
 
 	/// <summary>
 	/// Return the current time in nanoseconds

@@ -1,5 +1,5 @@
-#ifndef _CEX_CIPHERMODEFROMNAME_H
-#define _CEX_CIPHERMODEFROMNAME_H
+#ifndef CEX_CIPHERMODEFROMNAME_H
+#define CEX_CIPHERMODEFROMNAME_H
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"

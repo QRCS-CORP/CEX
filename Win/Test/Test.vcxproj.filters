@@ -28,9 +28,6 @@
     <Filter Include="Header Files\Test\MacTest">
       <UniqueIdentifier>{cce8889d-16c4-4ff6-9bd8-9a84693ad782}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Test\Common">
-      <UniqueIdentifier>{c211bc53-6ee2-42bf-9515-ef7f7147a739}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Test\ProcessorTest">
       <UniqueIdentifier>{c1f92de4-0b88-47b3-8659-c344c730f333}</UniqueIdentifier>
     </Filter>
@@ -42,9 +39,6 @@
     </Filter>
     <Filter Include="Source Files\Test\CipherTest">
       <UniqueIdentifier>{d08b3715-4367-4581-b871-228237531643}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Test\Common">
-      <UniqueIdentifier>{8a3cb425-db48-4fd1-8d1c-a868004736b8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Test\DigestTest">
       <UniqueIdentifier>{a71af0e1-95df-4c79-ba69-371a66e93ef2}</UniqueIdentifier>
@@ -114,6 +108,12 @@
     </Filter>
     <Filter Include="Source Files\Test\Asymmetric\Sign">
       <UniqueIdentifier>{2810e76a-f08a-45d8-8adc-e23c81b315b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Common">
+      <UniqueIdentifier>{c211bc53-6ee2-42bf-9515-ef7f7147a739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{8a3cb425-db48-4fd1-8d1c-a868004736b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -297,28 +297,28 @@
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\HexConverter.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TestCommon.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TestFiles.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TestUtils.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\ITest.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\ConsoleUtils.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TestEvent.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TestEventHandler.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\PaddingTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
@@ -339,7 +339,7 @@
       <Filter>Header Files\Test\ProcessorTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\TestException.h">
-      <Filter>Header Files\Test\Common</Filter>
+      <Filter>Header Files\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\CipherSpeedTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
@@ -406,6 +406,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\PrngTest.h">
       <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\McElieceTest.h">
+      <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -515,13 +518,13 @@
       <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\HexConverter.cpp">
-      <Filter>Source Files\Test\Common</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\ConsoleUtils.cpp">
-      <Filter>Source Files\Test\Common</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\TestUtils.cpp">
-      <Filter>Source Files\Test\Common</Filter>
+      <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\Test.cpp">
       <Filter>Source Files\Test</Filter>
@@ -543,6 +546,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\PrngTest.cpp">
       <Filter>Source Files\Test\PrngTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\McElieceTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

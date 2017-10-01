@@ -7,8 +7,7 @@ using Utility::IntUtils;
 
 void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State)
 {
-	const size_t BLKLEN = Length / sizeof(ulong);
-	for (size_t i = 0; i < BLKLEN; ++i)
+	for (size_t i = 0; i < Length / sizeof(ulong); ++i)
 		State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
 
 	ulong Aba, Abe, Abi, Abo, Abu;
@@ -61,13 +60,13 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Ci = Abi ^ Agi ^ Aki ^ Ami ^ Asi;
 	Co = Abo ^ Ago ^ Ako ^ Amo ^ Aso;
 	Cu = Abu ^ Agu ^ Aku ^ Amu ^ Asu;
-	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
-	De = Ca ^ IntUtils::RotFL64(Ci, 1);
-	Di = Ce ^ IntUtils::RotFL64(Co, 1);
-	Do = Ci ^ IntUtils::RotFL64(Cu, 1);
-	Du = Co ^ IntUtils::RotFL64(Ca, 1);
 
 	// round 1
+	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
+	De = Ca ^ IntUtils::RotFL64(Ci, 1);
+	Di = Ce ^ IntUtils::RotFL64(Co, 1);
+	Do = Ci ^ IntUtils::RotFL64(Cu, 1);
+	Du = Co ^ IntUtils::RotFL64(Ca, 1);
 	Aba ^= Da;
 	Bba = Aba;
 	Age ^= De;
@@ -79,7 +78,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C0;
+	Eba ^= 0x0000000000000001;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -170,6 +169,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 2
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -186,7 +186,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C1;
+	Aba ^= 0x0000000000008082;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -277,6 +277,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 3
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -293,7 +294,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C2;
+	Eba ^= 0x800000000000808a;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -384,6 +385,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 4
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -400,7 +402,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C3;
+	Aba ^= 0x8000000080008000;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -491,6 +493,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 5
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -507,7 +510,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C4;
+	Eba ^= 0x000000000000808b;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -598,6 +601,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 6
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -614,7 +618,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C5;
+	Aba ^= 0x0000000080000001;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -705,6 +709,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 7
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -721,7 +726,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C6;
+	Eba ^= 0x8000000080008081;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -812,6 +817,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 8
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -828,7 +834,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C7;
+	Aba ^= 0x8000000000008009;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -919,6 +925,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 9
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -935,7 +942,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C8;
+	Eba ^= 0x000000000000008a;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -1026,6 +1033,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 10
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1042,7 +1050,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C9;
+	Aba ^= 0x0000000000000088;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -1133,6 +1141,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 11
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1149,7 +1158,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C10;
+	Eba ^= 0x0000000080008009;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -1240,6 +1249,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 12
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1256,7 +1266,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C11;
+	Aba ^= 0x000000008000000a;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -1347,6 +1357,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 13
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1363,7 +1374,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C12;
+	Eba ^= 0x000000008000808b;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -1454,6 +1465,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 14
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1470,7 +1482,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C13;
+	Aba ^= 0x800000000000008b;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -1561,6 +1573,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 15
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1577,7 +1590,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C14;
+	Eba ^= 0x8000000000008089;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -1668,6 +1681,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 16
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1684,7 +1698,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C15;
+	Aba ^= 0x8000000000008003;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -1775,6 +1789,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 17
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1791,7 +1806,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C16;
+	Eba ^= 0x8000000000008002;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -1882,6 +1897,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 18
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -1898,7 +1914,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C17;
+	Aba ^= 0x8000000000000080;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -1989,6 +2005,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 19
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -2005,7 +2022,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C18;
+	Eba ^= 0x000000000000800a;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -2096,6 +2113,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 20
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -2112,7 +2130,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C19;
+	Aba ^= 0x800000008000000a;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -2203,6 +2221,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 21
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -2219,7 +2238,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C20;
+	Eba ^= 0x8000000080008081;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -2310,6 +2329,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 22
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -2326,7 +2346,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C21;
+	Aba ^= 0x8000000000008080;
 	Ca = Aba;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Ce = Abe;
@@ -2417,6 +2437,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu = Bsu ^ (Bsa & Bse);
 	Cu ^= Asu;
 
+	// round 23
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -2433,7 +2454,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Asu ^= Du;
 	Bbu = IntUtils::RotFL64(Asu, 14);
 	Eba = Bba ^ (Bbe | Bbi);
-	Eba ^= C22;
+	Eba ^= 0x0000000080000001;
 	Ca = Eba;
 	Ebe = Bbe ^ (~Bbi | Bbo);
 	Ce = Ebe;
@@ -2524,6 +2545,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu = Bsu ^ (Bsa & Bse);
 	Cu ^= Esu;
 
+	// round 24
 	Da = Cu ^ IntUtils::RotFL64(Ce, 1);
 	De = Ca ^ IntUtils::RotFL64(Ci, 1);
 	Di = Ce ^ IntUtils::RotFL64(Co, 1);
@@ -2540,7 +2562,7 @@ void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Len
 	Esu ^= Du;
 	Bbu = IntUtils::RotFL64(Esu, 14);
 	Aba = Bba ^ (Bbe | Bbi);
-	Aba ^= C23;
+	Aba ^= 0x8000000080008008;
 	Abe = Bbe ^ (~Bbi | Bbo);
 	Abi = Bbi ^ (Bbo & Bbu);
 	Abo = Bbo ^ (Bbu | Bba);

@@ -61,14 +61,14 @@ SecureStream::SecureStream()
 SecureStream::SecureStream(size_t Length, ulong KeySalt)
 	:
 	m_isDestroyed(false),
-	m_keySalt(0),
+	m_keySalt(KeySalt),
 	m_streamData(0),
 	m_streamPosition(0)
 {
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::MemUtils::Copy<ulong, byte>(KeySalt, m_keySalt, 0, sizeof(ulong));
+		Utility::MemUtils::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
 	}
 
 	m_streamData.reserve(Length);
@@ -77,14 +77,14 @@ SecureStream::SecureStream(size_t Length, ulong KeySalt)
 SecureStream::SecureStream(const std::vector<byte> &Data, ulong KeySalt)
 	:
 	m_isDestroyed(false),
-	m_keySalt(0),
+	m_keySalt(KeySalt),
 	m_streamData(Data),
 	m_streamPosition(0)
 {
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::MemUtils::Copy<ulong, byte>(KeySalt, m_keySalt, 0, sizeof(ulong));
+		Utility::MemUtils::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
 	}
 
 	Transform();
@@ -93,19 +93,19 @@ SecureStream::SecureStream(const std::vector<byte> &Data, ulong KeySalt)
 SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, ulong KeySalt)
 	:
 	m_isDestroyed(false),
-	m_keySalt(0),
+	m_keySalt(KeySalt),
 	m_streamData(0),
 	m_streamPosition(0)
 {
 	CEXASSERT(Length <= Data.size() - Offset, "length is longer than the array size");
 
 	m_streamData.resize(Length);
-	Utility::MemUtils::Copy<byte>(Data, Offset, m_streamData, 0, Length);
+	Utility::MemUtils::Copy(Data, Offset, m_streamData, 0, Length);
 
 	if (KeySalt != 0)
 	{
 		m_keySalt.resize(sizeof(ulong));
-		Utility::MemUtils::Copy<ulong, byte>(KeySalt, m_keySalt, 0, sizeof(ulong));
+		Utility::MemUtils::CopyFromValue(KeySalt, m_keySalt, 0, sizeof(ulong));
 	}
 
 	Transform();
@@ -135,9 +135,9 @@ void SecureStream::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_streamPosition = 0;
 		Utility::IntUtils::ClearVector(m_streamData);
-		m_isDestroyed = true;
 	}
 }
 
@@ -149,7 +149,7 @@ size_t SecureStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 	if (Length > 0)
 	{
 		Transform();
-		Utility::MemUtils::Copy<byte>(m_streamData, m_streamPosition, Output, Offset, Length);
+		Utility::MemUtils::Copy(m_streamData, m_streamPosition, Output, Offset, Length);
 		Transform();
 		m_streamPosition += Length;
 	}
@@ -163,7 +163,7 @@ byte SecureStream::ReadByte()
 
 	byte data = 0;
 	Transform();
-	Utility::MemUtils::Copy<byte>(m_streamData, m_streamPosition, data, 1);
+	Utility::MemUtils::CopyToValue(m_streamData, m_streamPosition, data, 1);
 	Transform();
 	m_streamPosition += 1;
 
@@ -215,7 +215,7 @@ void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 		m_streamData.resize(len);
 
 	Transform();
-	Utility::MemUtils::Copy<byte>(Input, Offset, m_streamData, m_streamPosition, Length);
+	Utility::MemUtils::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
 	Transform();
 	m_streamPosition += Length;
 }
@@ -226,7 +226,7 @@ void SecureStream::WriteByte(byte Value)
 		m_streamData.resize(m_streamData.size() + 1);
 
 	Transform();
-	Utility::MemUtils::Copy<byte, byte>(Value, m_streamData, m_streamPosition, 1);
+	Utility::MemUtils::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
 	Transform();
 	m_streamPosition += 1;
 }
@@ -236,11 +236,11 @@ void SecureStream::WriteByte(byte Value)
 std::vector<byte> SecureStream::GetSystemKey()
 {
 	std::vector<byte> state(0);
-	Utility::ArrayUtils::Append(Utility::SysUtils::ComputerName(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::OsName(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::ComputerName(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::OsName(), state);
 	Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::UserId(), state);
-	Utility::ArrayUtils::Append(Utility::SysUtils::UserName(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserId(), state);
+	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserName(), state);
 
 	if (m_keySalt.size() != 0)
 		Utility::ArrayUtils::Append(m_keySalt, state);
@@ -261,8 +261,8 @@ void SecureStream::Transform()
 	std::vector<byte> key(32);
 	std::vector<byte> iv(16);
 
-	Utility::MemUtils::Copy<byte>(seed, 0, key, 0, key.size());
-	Utility::MemUtils::Copy<byte>(seed, key.size(), iv, 0, iv.size());
+	Utility::MemUtils::Copy(seed, 0, key, 0, key.size());
+	Utility::MemUtils::Copy(seed, key.size(), iv, 0, iv.size());
 	Key::Symmetric::SymmetricKey kp(key, iv);
 
 	// AES256-CTR

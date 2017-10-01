@@ -1,5 +1,5 @@
-#ifndef _CEX_CIPHERFROMDESCRIPTION_H
-#define _CEX_CIPHERFROMDESCRIPTION_H
+#ifndef CEX_CIPHERFROMDESCRIPTION_H
+#define CEX_CIPHERFROMDESCRIPTION_H
 
 #include "CexDomain.h"
 #include "CipherDescription.h"

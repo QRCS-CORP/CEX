@@ -1,5 +1,5 @@
-#ifndef _CEX_DOCUMENTATION_H
-#define _CEX_DOCUMENTATION_H
+#ifndef CEX_DOCUMENTATION_H
+#define CEX_DOCUMENTATION_H
 
 #error Documentation only!
 
@@ -9,13 +9,13 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.3 (A3).
+Welcome to the CEX++ Cryptographic Library, version 1.0.1.3 (A3).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, patch, and release codes. \n
+The current version is <B>1.0.1.3</B> (A3 version), which are the major, minor, patch, and release codes. \n
 \brief
 
 <B>Release 1.1.0.1</B> \n
@@ -189,6 +189,7 @@ NAMESPACE_ROOT
 		class IDigest {};
 		class Keccak256 {};
 		class Keccak512 {};
+		class Keccak1024 {};
 		class KeccakParams {};
 		class SHA256 {};
 		class SHA512 {};
@@ -322,9 +323,9 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_KEY
 		/*!
-		*  \addtogroup SymmetricKey
+		*  \addtogroup AsymmetricKey
 		*  @{
-		*  @brief Symmetric Key containers and generator
+		*  @brief Asymmetric Key containers and generator
 		*/
 		NAMESPACE_ASYMMETRICKEY
 			class IAsymmetricKey {};
@@ -453,4 +454,5 @@ NAMESPACE_ROOT
 
 NAMESPACE_ROOTEND
 /*! @} */
+
 #endif

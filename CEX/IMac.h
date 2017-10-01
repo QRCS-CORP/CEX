@@ -1,5 +1,5 @@
-#ifndef _CEX_IMAC_H
-#define _CEX_IMAC_H
+#ifndef CEX_IMAC_H
+#define CEX_IMAC_H
 
 #include "CexDomain.h"
 #include "CryptoMacException.h"

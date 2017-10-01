@@ -1,15 +1,17 @@
-#ifndef _CEX_CEXCONFIG_H
-#define _CEX_CEXCONFIG_H
+#ifndef CEX_CEXCONFIG_H
+#define CEX_CEXCONFIG_H
 
 #if !defined(__cplusplus) || __cplusplus < 199711L
 #	error compiler is incompatible with this library!
 #endif
 
+#include <array>	// TODO: move fixed sized vectors to arrays in critical sections
+#include <cstdint>	// TODO: get rid of some of these C headers?
+#include <cstdio>
 #include <cstring>
 #include <exception>
 #include <iostream>
-#include <cstdint>
-#include <cstdio>
+//#include <memory> for std::unique_ptr
 #include <string>
 #include <vector>
 
@@ -494,6 +496,21 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
     } while (false)
 #else
 #   define CEXASSERT(condition, message) do { } while (false)
+#endif
+
+#if !defined(CEX_NODEBUG)
+#	if defined(__GNUC__)
+#		define CEXSTATICASSERTHELPER(condition, message) \
+		(!!sizeof \ (struct { unsigned int STATIC_ASSERTION__##message: (condition) ? 1 : -1; }))
+#		define CEXASSERTSTATIC(condition, message) \
+		extern int (*assert_function__(void)) [CEXSTATICASSERTHELPER(condition, message)]
+#	else
+#		define CEXASSERTSTATIC(condition, message)   \
+		extern char STATIC_ASSERTION__##message[1]; \
+		extern char STATIC_ASSERTION__##message[(condition)?1:2]
+#	endif
+#else
+#   define CEXASSERTSTATIC(condition, message) do { } while (false)
 #endif
 
 

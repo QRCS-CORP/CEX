@@ -67,9 +67,6 @@
     <Filter Include="Source Files\Common">
       <UniqueIdentifier>{590a8fb3-2d8d-4dc2-97d2-f3b7354d8c2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\CryptoException">
-      <UniqueIdentifier>{1a9e4120-3020-4d50-810a-9407e6bbac86}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Digest">
       <UniqueIdentifier>{080f52a4-81f5-4f7a-b1ad-6ba942789bf8}</UniqueIdentifier>
     </Filter>
@@ -669,23 +666,11 @@
     <ClInclude Include="..\..\CEX\Skein1024.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA256Compress.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHA512Compress.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SHA256.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA512.h">
       <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake256Compress.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake512Compress.h">
-      <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\BlakeParams.h">
       <Filter>Header Files\Digest\Support</Filter>
@@ -738,9 +723,6 @@
     <ClInclude Include="..\..\CEX\RLWEParams.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\PolyMath.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEParamSet.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClInclude>
@@ -777,9 +759,6 @@
     <ClInclude Include="..\..\CEX\RLWEKeyPair.h">
       <Filter>Header Files\Key\Asymmetric\RingLWE</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\MPKCParamSet.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCParams.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -791,6 +770,39 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCKeyPair.h">
       <Filter>Header Files\Key\Asymmetric\McEliece</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\McEliece.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PolyMath.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\TimeStamp.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Keccak1024.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2S.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2B.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\FFTM12T62.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AeadModeFromName.h">
+      <Filter>Header Files\Helper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\AeadModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCParamSet.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\McElieceUtils.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1096,6 +1108,24 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\MPKCKeyPair.cpp">
       <Filter>Source Files\Key\Asymmetric\McEliece</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\McEliece.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Keccak1024.cpp">
+      <Filter>Source Files\Digest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\AeadModeFromName.cpp">
+      <Filter>Source Files\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MPKCParamSet.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RLWEParamSet.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\FFTM12T62.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

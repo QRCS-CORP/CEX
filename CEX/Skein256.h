@@ -27,8 +27,8 @@
 // Contact: develop@vtdev.com
 
 
-#ifndef _CEX_SKEIN256_H
-#define _CEX_SKEIN256_H
+#ifndef CEX_SKEIN256_H
+#define CEX_SKEIN256_H
 
 #include "IDigest.h"
 #include "SkeinParams.h"

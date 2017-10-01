@@ -1,5 +1,5 @@
-﻿#ifndef _CEX_ZEROPAD_H
-#define _CEX_ZEROPAD_H
+﻿#ifndef CEX_ZEROPAD_H
+#define CEX_ZEROPAD_H
 
 #include "IPadding.h"
 

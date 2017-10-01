@@ -166,6 +166,7 @@ void CipherStream::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_isCounterMode = false;
 		m_isEncryption = false;
 		m_isInitialized = false;
@@ -174,25 +175,15 @@ void CipherStream::Destroy()
 
 		if (m_destroyEngine)
 		{
-			try
-			{
-				if (m_blockCipher != 0)
-					delete m_blockCipher;
-				if (m_cipherEngine != 0)
-					delete m_cipherEngine;
-				if (m_streamCipher != 0)
-					delete m_streamCipher;
-				if (m_cipherPadding != 0)
-					delete m_cipherPadding;
-
-				m_isDestroyed = true;
-			}
-			catch(std::exception& ex) 
-			{
-				throw CryptoProcessingException("CipherStream:Destroy", "The engines were not heap allocated!", std::string(ex.what()));
-			}
+			if (m_blockCipher != 0)
+				delete m_blockCipher;
+			if (m_cipherEngine != 0)
+				delete m_cipherEngine;
+			if (m_streamCipher != 0)
+				delete m_streamCipher;
+			if (m_cipherPadding != 0)
+				delete m_cipherPadding;
 		}
-
 	}
 }
 
@@ -306,17 +297,17 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 		{
 			const size_t FNLSZE = INPSZE - ALNSZE;
 			std::vector<byte> inpBuffer(BLKSZE);
-			Utility::MemUtils::Copy<byte>(Input, InOffset, inpBuffer, 0, FNLSZE);
+			Utility::MemUtils::Copy(Input, InOffset, inpBuffer, 0, FNLSZE);
 			std::vector<byte> outBuffer(BLKSZE);
 			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, FNLSZE);
-			Utility::MemUtils::Copy<byte>(outBuffer, 0, Output, OutOffset, FNLSZE);
+			Utility::MemUtils::Copy(outBuffer, 0, Output, OutOffset, FNLSZE);
 			prcLen += FNLSZE;
 		}
 		else if (m_isEncryption)
 		{
 			const size_t FNLSZE = INPSZE - ALNSZE;
 			std::vector<byte> inpBuffer(BLKSZE);
-			Utility::MemUtils::Copy<byte>(Input, InOffset, inpBuffer, 0, FNLSZE);
+			Utility::MemUtils::Copy(Input, InOffset, inpBuffer, 0, FNLSZE);
 			if (FNLSZE != BLKSZE)
 				m_cipherPadding->AddPadding(inpBuffer, FNLSZE);
 			prcLen += BLKSZE;
@@ -332,7 +323,7 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 			m_cipherEngine->DecryptBlock(Input, InOffset, outBuffer, 0);
 			const size_t PADLEN = m_cipherPadding->GetPaddingLength(outBuffer, 0);
 			const size_t FNLSZE = (PADLEN == 0) ? BLKSZE : BLKSZE - PADLEN;
-			Utility::MemUtils::Copy<byte>(outBuffer, 0, Output, OutOffset, FNLSZE);
+			Utility::MemUtils::Copy(outBuffer, 0, Output, OutOffset, FNLSZE);
 			prcLen += FNLSZE;
 
 			if (Output.size() != prcLen)
@@ -394,8 +385,8 @@ void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 		if (m_isCounterMode)
 		{
 			const size_t FNLSZE = INPSZE - ALNSZE;
-			Utility::MemUtils::Clear<byte>(outBuffer, 0, outBuffer.size());
-			Utility::MemUtils::Clear<byte>(inpBuffer, 0, inpBuffer.size());
+			Utility::MemUtils::Clear(outBuffer, 0, outBuffer.size());
+			Utility::MemUtils::Clear(inpBuffer, 0, inpBuffer.size());
 			prcRead = InStream->Read(inpBuffer, 0, FNLSZE);
 			m_cipherEngine->Transform(inpBuffer, 0, outBuffer, 0, prcRead);
 			OutStream->Write(outBuffer, 0, prcRead);

@@ -123,22 +123,15 @@ void CTR::Destroy()
 		m_isLoaded = false;
 		m_parallelProfile.Reset();
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_blockCipher != 0)
-					delete m_blockCipher;
-			}
+			if (m_blockCipher != 0)
+				delete m_blockCipher;
+		}
 
-			Utility::IntUtils::ClearVector(m_ctrVector);
-		}
-		catch(std::exception& ex) 
-		{
-			throw CryptoCipherModeException("CTR:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_ctrVector);
 	}
 }
 
@@ -200,7 +193,7 @@ void CTR::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	m_blockCipher->EncryptBlock(m_ctrVector, 0, Output, OutOffset);
 	Utility::IntUtils::BeIncrement8(m_ctrVector);
-	Utility::MemUtils::XOR128<byte>(Input, InOffset, Output, OutOffset);
+	Utility::MemUtils::XOR128(Input, InOffset, Output, OutOffset);
 }
 
 void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size_t Length, std::vector<byte> &Counter)
@@ -217,37 +210,37 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		// stagger counters and process 8 blocks with avx
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 0);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 16);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 16);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 32);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 32);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 48);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 48);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 64);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 64);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 80);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 80);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 96);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 96);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 112);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 112);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 128);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 128);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 144);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 144);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 160);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 160);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 176);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 176);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 192);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 192);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 208);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 208);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 224);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 224);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 240);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 240);
 			Utility::IntUtils::BeIncrement8(Counter);
 			m_blockCipher->Transform2048(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX512BLK;
@@ -263,21 +256,21 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		// stagger counters and process 8 blocks with avx
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 0);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 16);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 16);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 32);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 32);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 48);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 48);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 64);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 64);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 80);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 80);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 96);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 96);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 112);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 112);
 			Utility::IntUtils::BeIncrement8(Counter);
 			m_blockCipher->Transform1024(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX2BLK;
@@ -293,13 +286,13 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		// 4 blocks with sse
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 0);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 16);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 16);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 32);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 32);
 			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128<byte, byte>(Counter, 0, ctrBlk, 48);
+			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 48);
 			Utility::IntUtils::BeIncrement8(Counter);
 			m_blockCipher->Transform512(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVXBLK;
@@ -320,7 +313,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		std::vector<byte> outputBlock(BLOCK_SIZE);
 		m_blockCipher->EncryptBlock(Counter, outputBlock);
 		const size_t FNLSZE = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy<byte>(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
+		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
 		Utility::IntUtils::BeIncrement8(Counter);
 	}
 }
@@ -341,15 +334,15 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 		// generate random at output offset
 		this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 		// xor with input at offsets
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
+		Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
-			Utility::MemUtils::COPY128<byte, byte>(thdCtr, 0, tmpCtr, 0);
+			Utility::MemUtils::COPY128(thdCtr, 0, tmpCtr, 0);
 	});
 
 	// copy last counter to class variable
-	Utility::MemUtils::COPY128<byte, byte>(tmpCtr, 0, m_ctrVector, 0);
+	Utility::MemUtils::COPY128(tmpCtr, 0, m_ctrVector, 0);
 
 	// last block processing
 	const size_t ALNSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
@@ -371,7 +364,7 @@ void CTR::ProcessSequential(const std::vector<byte> &Input, const size_t InOffse
 	size_t ALNSZE = Length - (Length % BLOCK_SIZE);
 
 	if (ALNSZE != 0)
-		Utility::MemUtils::XorBlock<byte>(Input, InOffset, Output, OutOffset, ALNSZE);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNSZE);
 
 	// get the remaining bytes
 	if (ALNSZE != Length)

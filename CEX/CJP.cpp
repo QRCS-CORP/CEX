@@ -155,7 +155,7 @@ uint CJP::Next()
 	std::vector<byte> data(sizeof(uint));
 	Generate(data, 0, data.size());
 	uint rndNum = 0;
-	Utility::MemUtils::Copy<byte, uint>(data, 0, rndNum, sizeof(uint));
+	Utility::MemUtils::CopyToValue(data, 0, rndNum, sizeof(uint));
 
 	return rndNum;
 }
@@ -265,7 +265,7 @@ size_t CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		size_t rmdLen = (Length < RNDSZE) ? Length : RNDSZE;
 		Generate64();
-		Utility::MemUtils::Copy<ulong, byte>(m_rndState, Output, Offset, rmdLen);
+		Utility::MemUtils::CopyFromValue(m_rndState, Output, Offset, rmdLen);
 		Length -= rmdLen;
 		Offset += rmdLen;
 	} 

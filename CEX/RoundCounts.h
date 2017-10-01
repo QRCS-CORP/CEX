@@ -1,5 +1,5 @@
-#ifndef _CEX_ROUNDCOUNTS_H
-#define _CEX_ROUNDCOUNTS_H
+#ifndef CEX_ROUNDCOUNTS_H
+#define CEX_ROUNDCOUNTS_H
 
 #include "CexDomain.h"
 

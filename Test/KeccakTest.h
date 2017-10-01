@@ -29,14 +29,17 @@ namespace Test
 		std::vector<std::vector<byte>> m_messages;
 		std::vector<std::vector<byte>> m_expected256;
 		std::vector<std::vector<byte>> m_expected512;
+		std::vector<std::vector<byte>> m_expected1024;
 		std::vector<std::vector<byte>> m_macKeys;
 		std::vector<std::vector<byte>> m_macData;
 		std::vector<std::vector<byte>> m_mac256;
 		std::vector<std::vector<byte>> m_mac512;
+		std::vector<std::vector<byte>> m_mac1024;
 		std::vector<byte> m_truncKey;
 		std::vector<byte> m_truncData;
 		std::vector<byte> m_trunc256;
 		std::vector<byte> m_trunc512;
+		std::vector<byte> m_trunc1024;
 		std::vector<byte> m_xtremeData;
 		TestEventHandler m_progressEvent;
 

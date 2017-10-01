@@ -23,15 +23,15 @@
 // Written by John Underhill, November 26, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_CJP_H
-#define _CEX_CJP_H
+#ifndef CEX_CJP_H
+#define CEX_CJP_H
 
 #include "IProvider.h"
 
 NAMESPACE_PROVIDER
 
 /// <summary>
-/// The CPU Jitter entropy Provider (CJP).
+/// The CPU Jitter entropy Provider
 /// <para>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time.
 /// Because the CPU and cache memory are continuously being accessed by various operating system and application processes, 
 /// small timing differences can be observed and measured using a high-resolution timestamp.

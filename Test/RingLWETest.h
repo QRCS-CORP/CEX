@@ -6,7 +6,7 @@
 namespace Test
 {
 	/// <summary>
-	/// 
+	/// RingLWE key generation, encryption, and decryption tests
 	/// </summary>
 	class RingLWETest : public ITest
 	{

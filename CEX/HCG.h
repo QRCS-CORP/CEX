@@ -23,8 +23,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_HCG_H
-#define _CEX_HCG_H
+#ifndef CEX_HCG_H
+#define CEX_HCG_H
 
 #include "IDrbg.h"
 #include "IDigest.h"

@@ -36,10 +36,10 @@ RLWEPublicKey::RLWEPublicKey(const std::vector<byte> &KeyStream)
 	m_rlweParameters(RLWEParams::None),
 	m_pCoeffs(0)
 {
-	m_rlweParameters = static_cast<RLWEParams>(Utility::IntUtils::LeBytesTo16(KeyStream, 0));
-	uint pLen = Utility::IntUtils::LeBytesTo16(KeyStream, 2);
+	m_rlweParameters = static_cast<RLWEParams>(KeyStream[0]);
+	uint pLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_pCoeffs.resize(pLen);
-	Utility::MemUtils::Copy<byte, byte>(KeyStream, 4, m_pCoeffs, 0, pLen);
+	Utility::MemUtils::Copy(KeyStream, 5, m_pCoeffs, 0, pLen);
 }
 
 RLWEPublicKey::~RLWEPublicKey()
@@ -53,22 +53,21 @@ void RLWEPublicKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_rlweParameters = RLWEParams::None;
 
 		if (m_pCoeffs.size() > 0)
 			Utility::IntUtils::ClearVector(m_pCoeffs);
-
-		m_isDestroyed = true;
 	}
 }
 
 std::vector<byte> RLWEPublicKey::ToBytes()
 {
-	ushort pLen = static_cast<ushort>(m_pCoeffs.size());
-	std::vector<byte> p(pLen + 4);
-	Utility::IntUtils::Le16ToBytes(static_cast<ushort>(m_rlweParameters), p, 0);
-	Utility::IntUtils::Le16ToBytes(pLen, p, 2);
-	Utility::MemUtils::Copy<byte, byte>(m_pCoeffs, 0, p, 4, pLen);
+	uint pLen = static_cast<uint>(m_pCoeffs.size());
+	std::vector<byte> p(pLen + 5);
+	p[0] = static_cast<byte>(m_rlweParameters);
+	Utility::IntUtils::Le32ToBytes(pLen, p, 1);
+	Utility::MemUtils::Copy(m_pCoeffs, 0, p, 5, pLen);
 
 	return p;
 }

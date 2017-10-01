@@ -28,8 +28,8 @@
 // Updated April 19, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_HKDF_H
-#define _CEX_HKDF_H
+#ifndef CEX_HKDF_H
+#define CEX_HKDF_H
 
 #include "IKdf.h"
 #include "Digests.h"

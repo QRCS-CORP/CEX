@@ -1,5 +1,5 @@
-#ifndef _CEX_IPROVIDER_H
-#define _CEX_IPROVIDER_H
+#ifndef CEX_IPROVIDER_H
+#define CEX_IPROVIDER_H
 
 #include "CexDomain.h"
 #include "CryptoRandomException.h"

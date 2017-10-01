@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_SALSA_H
-#define _CEX_SALSA_H
+#ifndef CEX_SALSA_H
+#define CEX_SALSA_H
 
 #include "CexDomain.h"
 #include "IntUtils.h"

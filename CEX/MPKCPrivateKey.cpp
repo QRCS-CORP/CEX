@@ -15,31 +15,25 @@ const MPKCParams MPKCPrivateKey::Parameters()
 	return m_mpkcParameters;
 }
 
-const std::vector<byte> &MPKCPrivateKey::S()
-{
-	return m_sCoeffs;
-}
 
 //~~~Constructor~~~//
 
-MPKCPrivateKey::MPKCPrivateKey(MPKCParams Parameters, std::vector<byte> &S)
+MPKCPrivateKey::MPKCPrivateKey(MPKCParams Params, std::vector<byte> &S)
 	:
 	m_isDestroyed(false),
-	m_mpkcParameters(Parameters),
+	m_mpkcParameters(Params),
 	m_sCoeffs(S)
 {
 }
 
 MPKCPrivateKey::MPKCPrivateKey(const std::vector<byte> &KeyStream)
 	:
-	m_isDestroyed(false),
-	m_mpkcParameters(MPKCParams::None),
-	m_sCoeffs(0)
+	m_isDestroyed(false)
 {
-	m_mpkcParameters = static_cast<MPKCParams>(Utility::IntUtils::LeBytesTo16(KeyStream, 0));
-	uint sLen = Utility::IntUtils::LeBytesTo16(KeyStream, 2);
+	m_mpkcParameters = static_cast<MPKCParams>(KeyStream[0]);
+	uint sLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_sCoeffs.resize(sLen);
-	Utility::MemUtils::Copy<byte, byte>(KeyStream, 4, m_sCoeffs, 0, sLen);
+	Utility::MemUtils::Copy(KeyStream, 5, m_sCoeffs, 0, sLen);
 }
 
 MPKCPrivateKey::~MPKCPrivateKey()
@@ -53,22 +47,21 @@ void MPKCPrivateKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
 		m_mpkcParameters = MPKCParams::None;
 
 		if (m_sCoeffs.size() > 0)
 			Utility::IntUtils::ClearVector(m_sCoeffs);
-
-		m_isDestroyed = true;
 	}
 }
 
 std::vector<byte> MPKCPrivateKey::ToBytes()
 {
-	ushort sLen = static_cast<ushort>(m_sCoeffs.size());
-	std::vector<byte> s(sLen + 4);
-	Utility::IntUtils::Le16ToBytes(static_cast<ushort>(m_mpkcParameters), s, 0);
-	Utility::IntUtils::Le16ToBytes(sLen, s, 2);
-	Utility::MemUtils::Copy<byte, byte>(s, 4, m_sCoeffs, 0, sLen);
+	uint sLen = static_cast<uint>(m_sCoeffs.size());
+	std::vector<byte> s(sLen + 5);
+	s[0] = static_cast<byte>(m_mpkcParameters);
+	Utility::IntUtils::Le32ToBytes(sLen, s, 1);
+	Utility::MemUtils::Copy(s, 5, m_sCoeffs, 0, sLen);
 
 	return s;
 }

@@ -1,5 +1,5 @@
-#ifndef _CEX_DIGESTFROMNAME_H
-#define _CEX_DIGESTFROMNAME_H
+#ifndef CEX_DIGESTFROMNAME_H
+#define CEX_DIGESTFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

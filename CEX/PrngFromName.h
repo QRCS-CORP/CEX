@@ -1,5 +1,5 @@
-#ifndef _CEX_PRNGFROMNAME_H
-#define _CEX_PRNGFROMNAME_H
+#ifndef CEX_PRNGFROMNAME_H
+#define CEX_PRNGFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

@@ -1,5 +1,5 @@
-#ifndef _CEX_DRBGFROMNAME_H
-#define _CEX_DRBGFROMNAME_H
+#ifndef CEX_DRBGFROMNAME_H
+#define CEX_DRBGFROMNAME_H
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"

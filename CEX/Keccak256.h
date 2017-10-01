@@ -27,8 +27,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_KECCAK256_H
-#define _CEX_KECCAK256_H
+#ifndef CEX_KECCAK256_H
+#define CEX_KECCAK256_H
 
 #include "IDigest.h"
 #include "KeccakParams.h"
@@ -63,6 +63,8 @@ NAMESPACE_DIGEST
 /// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</a>.</description></item>
 /// <item><description>SHA3 <a href="http://csrc.nist.gov/groups/ST/hash/sha-3/documents/Keccak-slides-at-NIST.pdf">Keccak Slides</a>.</description></item>
 /// <item><description>SHA3 <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition.</description></item>
+/// <item><description>Team Keccak <a href="https://keccak.team/keccak_specs_summary.html">Specifications</a> summary.</description></item>
+/// <item><description>Keccak <a href="https://keccak.team/files/Keccak-reference-3.0.pdf">Reference</a> Guide.</description></item>
 /// </list>
 /// </remarks>
 class Keccak256 : public IDigest
@@ -261,7 +263,6 @@ public:
 
 private:
 
-	void Compress(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak256State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State, ulong Length);
 };

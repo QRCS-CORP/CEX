@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_THREEFISH256_H
-#define _CEX_THREEFISH256_H
+#ifndef CEX_THREEFISH256_H
+#define CEX_THREEFISH256_H
 
 #include "CexDomain.h"
 #include "IntUtils.h"
@@ -59,7 +59,7 @@ private:
 public:
 
 	template <typename T>
-	static void Transfrom32(std::vector<ulong> &Input, size_t InOffset, T &Output)
+	static void Transfrom(std::vector<ulong> &Input, size_t InOffset, T &Output)
 	{
 		// Cache the block, key, and tweak
 		ulong b0 = Input[0];

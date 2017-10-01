@@ -16,13 +16,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_IAEADMODE_H
-#define _CEX_IAEADMODE_H
+#ifndef CEX_IAEADMODE_H
+#define CEX_IAEADMODE_H
 
 #include "CexDomain.h"
 #include "ICipherMode.h"
+#include "AeadModes.h"
 
 NAMESPACE_MODE
+
+using Enumeration::AeadModes;
 
 /// <summary>
 /// An AEAD Cipher Mode virtual interface class.

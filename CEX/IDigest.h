@@ -1,5 +1,5 @@
-#ifndef _CEX_IDIGEST_H
-#define _CEX_IDIGEST_H
+#ifndef CEX_IDIGEST_H
+#define CEX_IDIGEST_H
 
 #include "CexDomain.h"
 #include "CryptoDigestException.h"

@@ -1,5 +1,5 @@
-#ifndef _CEX_SECURESTREAM_H
-#define _CEX_SECURESTREAM_H
+#ifndef CEX_SECURESTREAM_H
+#define CEX_SECURESTREAM_H
 
 #include "IByteStream.h"
 

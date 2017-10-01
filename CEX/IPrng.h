@@ -1,5 +1,5 @@
-#ifndef _CEX_IRANDOM_H
-#define _CEX_IRANDOM_H
+#ifndef CEX_IPRNG_H
+#define CEX_IPRNG_H
 
 #include "CexDomain.h"
 #include "CryptoRandomException.h"

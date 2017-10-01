@@ -1,5 +1,5 @@
-#ifndef _CEX_SIMDPROFILES_H
-#define _CEX_SIMDPROFILES_H
+#ifndef CEX_SIMDPROFILES_H
+#define CEX_SIMDPROFILES_H
 
 #include "CexDomain.h"
 

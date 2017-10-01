@@ -23,8 +23,8 @@
 // Updated by December 1, 2016
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_SECURERANDOM_H
-#define _CEX_SECURERANDOM_H
+#ifndef CEX_SECURERANDOM_H
+#define CEX_SECURERANDOM_H
 
 #include "IProvider.h"
 #include "CryptoRandomException.h"
@@ -364,8 +364,7 @@ public:
 
 private:
 
-	std::vector<byte> GetByteRange(ulong Maximum);
-	std::vector<byte> GetBits(std::vector<byte> &Data, ulong Maximum);
+	ulong GetRanged(ulong Maximum, size_t Length);
 };
 
 NAMESPACE_PRNGEND

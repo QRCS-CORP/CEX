@@ -138,23 +138,16 @@ void OFB::Destroy()
 		m_isParallel = false;
 		m_parallelProfile.Reset();
 
-		try
+		if (m_destroyEngine)
 		{
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
+			m_destroyEngine = false;
 
-				if (m_blockCipher != 0)
-					delete m_blockCipher;
-			}
+			if (m_blockCipher != 0)
+				delete m_blockCipher;
+		}
 
-			Utility::IntUtils::ClearVector(m_ofbVector);
-			Utility::IntUtils::ClearVector(m_ofbBuffer);
-		}
-		catch(std::exception& ex) 
-		{
-			throw CryptoCipherModeException("OFB:Destroy", "Could not clear all variables!", std::string(ex.what()));
-		}
+		Utility::IntUtils::ClearVector(m_ofbVector);
+		Utility::IntUtils::ClearVector(m_ofbBuffer);
 	}
 }
 
@@ -183,14 +176,14 @@ void OFB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	if (tmpIv.size() < m_ofbVector.size())
 	{
 		// prepend the supplied tmpIv with zeros per FIPS PUB81
-		Utility::MemUtils::Copy<byte>(tmpIv, 0, m_ofbVector, m_ofbVector.size() - tmpIv.size(), tmpIv.size());
+		Utility::MemUtils::Copy(tmpIv, 0, m_ofbVector, m_ofbVector.size() - tmpIv.size(), tmpIv.size());
 
 		for (size_t i = 0; i < m_ofbVector.size() - tmpIv.size(); i++)
 			m_ofbVector[i] = 0;
 	}
 	else
 	{
-		Utility::MemUtils::Copy<byte>(tmpIv, 0, m_ofbVector, 0, m_ofbVector.size());
+		Utility::MemUtils::Copy(tmpIv, 0, m_ofbVector, 0, m_ofbVector.size());
 	}
 
 	m_isEncryption = Encryption;
@@ -227,10 +220,10 @@ void OFB::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	// change over the Input block
 	if (m_ofbVector.size() - m_blockSize > 0)
-		Utility::MemUtils::Copy<byte>(m_ofbVector, m_blockSize, m_ofbVector, 0, m_ofbVector.size() - m_blockSize);
+		Utility::MemUtils::Copy(m_ofbVector, m_blockSize, m_ofbVector, 0, m_ofbVector.size() - m_blockSize);
 
 	// shift output into right end of shift register per Fips PUB81
-	Utility::MemUtils::Copy<byte>(m_ofbBuffer, 0, m_ofbVector, m_ofbVector.size() - m_blockSize, m_blockSize);
+	Utility::MemUtils::Copy(m_ofbBuffer, 0, m_ofbVector, m_ofbVector.size() - m_blockSize, m_blockSize);
 }
 
 NAMESPACE_MODEEND

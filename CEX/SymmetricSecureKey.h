@@ -1,5 +1,5 @@
-#ifndef _CEX_SYMMETRICSECUREKEY_H
-#define _CEX_SYMMETRICSECUREKEY_H
+#ifndef CEX_SYMMETRICSECUREKEY_H
+#define CEX_SYMMETRICSECUREKEY_H
 
 #include "ISymmetricKey.h"
 
@@ -121,10 +121,10 @@ public:
 	/// Compare this SymmetricSecureKey instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Key to compare</param>
+	/// <param name="Input">Key to compare</param>
 	/// 
 	/// <returns>Returns true if equal</returns>
-	bool Equals(ISymmetricKey &Obj) override;
+	bool Equals(ISymmetricKey &Input) override;
 
 	/// <summary>
 	/// Decrypt a SymmetricSecureKey and serialize it as a SymmetricKey stream

@@ -29,8 +29,8 @@
 // Contact: develop@vtdev.com
 
 
-#ifndef _CEX_SHA256_H
-#define _CEX_SHA256_H
+#ifndef CEX_SHA256_H
+#define CEX_SHA256_H
 
 #include "IDigest.h"
 #include "SHA2Params.h"
@@ -272,9 +272,18 @@ public:
 
 private:
 
+	static uint BigSigma0(uint W);
+	static uint BigSigma1(uint W);
+	static uint Ch(uint B, uint C, uint D);
 	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
+	void Compress64(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
+	void Compress64W(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA256State &State);
+	static uint Maj(uint B, uint C, uint D);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA256State &State, ulong Length);
+	static void Round(uint A, uint B, uint C, uint &D, uint E, uint F, uint G, uint &H, uint M, uint P);
+	static uint Sigma0(uint W);
+	static uint Sigma1(uint W);
 };
 
 NAMESPACE_DIGESTEND

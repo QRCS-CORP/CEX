@@ -1,5 +1,5 @@
-#ifndef _CEX_CIPHERMODES_H
-#define _CEX_CIPHERMODES_H
+#ifndef CEX_CIPHERMODES_H
+#define CEX_CIPHERMODES_H
 
 #include "CexDomain.h"
 

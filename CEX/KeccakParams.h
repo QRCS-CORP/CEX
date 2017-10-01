@@ -218,12 +218,12 @@ public:
 	/// Compare this object instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">Object to compare</param>
+	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(KeccakParams &Obj)
+	bool Equals(KeccakParams &Input)
 	{
-		if (this->GetHashCode() != Obj.GetHashCode())
+		if (this->GetHashCode() != Input.GetHashCode())
 			return false;
 
 		return true;

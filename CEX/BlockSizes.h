@@ -1,5 +1,5 @@
-#ifndef _CEX_BLOCKSIZES_H
-#define _CEX_BLOCKSIZES_H
+#ifndef CEX_BLOCKSIZES_H
+#define CEX_BLOCKSIZES_H
 
 #include "CexDomain.h"
 

@@ -1,5 +1,23 @@
-#ifndef _CEX_USHORT128_H
-#define _CEX_USHORT128_H
+// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_USHORT128_H
+#define CEX_USHORT128_H
 
 #include "CexDomain.h"
 #include "Intrinsics.h"
@@ -32,7 +50,7 @@ public:
 	}
 
 	/// <summary>
-	/// A UShort128 initialized with 8x 16bit integers to the value 0
+	/// A UShort128 initialized with 8x 16bit integers to the value zero
 	/// </summary>
 	inline static const UShort128 ZERO()
 	{
@@ -57,45 +75,13 @@ public:
 	}
 
 	/// <summary>
-	/// Initialize with an 8bit unsigned integer array in Little Endian format
+	/// Initialize with an integer array
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 16 bytes</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UShort128(const std::vector<byte> &Input, size_t Offset)
-	{
-		xmm = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
-	}
-
-	/// <summary>
-	/// Initialize with a 16bit unsigned integer array in Little Endian format
-	/// </summary>
-	///
-	/// <param name="Input">The array containing the data; must be at least 8 * 16bit uints</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UShort128(const std::vector<ushort> &Input, size_t Offset)
-	{
-		xmm = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
-	}
-
-	/// <summary>
-	/// Initialize with a 32bit unsigned integer array in Little Endian format
-	/// </summary>
-	///
-	/// <param name="Input">The array containing the data; must be at least 4 * 32bit uints</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UShort128(const std::vector<uint> &Input, size_t Offset)
-	{
-		xmm = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
-	}
-
-	/// <summary>
-	/// Initialize with a 64bit unsigned integer array in Little Endian format
-	/// </summary>
-	///
-	/// <param name="Input">The array containing the data; must be at least 2 * 64bit uints</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	explicit UShort128(const std::vector<ulong> &Input, size_t Offset)
+	/// <param name="Input">The source integer array; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting position within the Input array</param>
+	template<typename Array>
+	explicit UShort128(const Array &Input, size_t Offset)
 	{
 		xmm = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
 	}
@@ -130,13 +116,13 @@ public:
 	//~~~ Load and Store~~~//
 
 	/// <summary>
-	/// Load an array into a register in Little Endian format
+	/// Load an array into a register
 	/// </summary>
 	///
-	/// <param name="Input">The array containing the data; must be at least 128 bits in length</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	template <typename T>
-	inline void Load(const std::vector<T> &Input, size_t Offset)
+	/// <param name="Input">The source integer array; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting position within the Input array</param>
+	template<typename Array>
+	inline void Load(const Array &Input, size_t Offset)
 	{
 		xmm = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[Offset]));
 	}
@@ -162,10 +148,10 @@ public:
 	/// Store register in a T size integer array in Little Endian format
 	/// </summary>
 	///
-	/// <param name="Output">The array containing the data; must be at least 128 bits in length</param>
-	/// <param name="Offset">The starting offset within the Input array</param>
-	template <typename T>
-	inline void Store(std::vector<T> &Output, size_t Offset) const
+	/// <param name="Input">The destination integer array; must be at least 128 bits in length</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	template<typename Array>
+	inline void Store(Array &Output, size_t Offset) const
 	{
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[Offset]), xmm);
 	}
@@ -215,6 +201,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	inline void RotL16(const int Shift)
 	{
+		CEXASSERT(Shift <= 16, "Shift size is too large");
 		xmm = _mm_or_si128(_mm_slli_epi16(xmm, static_cast<int>(Shift)), _mm_srli_epi16(xmm, static_cast<int>(16 - Shift)));
 	}
 
@@ -228,6 +215,7 @@ public:
 	/// <returns>The rotated UShort128</returns>
 	inline static UShort128 RotL16(const UShort128 &Value, const int Shift)
 	{
+		CEXASSERT(Shift <= 16, "Shift size is too large");
 		return UShort128(_mm_or_si128(_mm_slli_epi16(Value.xmm, static_cast<int>(Shift)), _mm_srli_epi16(Value.xmm, static_cast<int>(16 - Shift))));
 	}
 
@@ -238,6 +226,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	inline void RotR16(const int Shift)
 	{
+		CEXASSERT(Shift <= 16, "Shift size is too large");
 		RotL16(16 - Shift);
 	}
 
@@ -251,6 +240,7 @@ public:
 	/// <returns>The rotated UShort128</returns>
 	inline static UShort128 RotR16(const UShort128 &Value, const int Shift)
 	{
+		CEXASSERT(Shift <= 16, "Shift size is too large");
 		return RotL16(Value, 16 - Shift);
 	}
 
@@ -261,12 +251,12 @@ public:
 	/// <returns>The byte swapped UShort128</returns>
 	inline UShort128 Swap() const
 	{
-		__m128i T = xmm;
+		__m128i tmpX = xmm;
 
-		T = _mm_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1)); // ?
-		T = _mm_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm_shufflehi_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1)); // ?
+		tmpX = _mm_shufflelo_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
 
-		return UShort128(_mm_or_si128(_mm_srli_epi16(T, 8), _mm_slli_epi16(T, 8)));
+		return UShort128(_mm_or_si128(_mm_srli_epi16(tmpX, 8), _mm_slli_epi16(tmpX, 8)));
 	}
 
 	/// <summary>
@@ -278,12 +268,12 @@ public:
 	/// <returns>The byte swapped UShort128</returns>
 	inline static UShort128 Swap(UShort128 &X)
 	{
-		__m128i T = X.xmm;
+		__m128i tmpX = X.xmm;
 
-		T = _mm_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
-		T = _mm_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm_shufflehi_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
+		tmpX = _mm_shufflelo_epi16(tmpX, _MM_SHUFFLE(2, 3, 0, 1));
 
-		return UShort128(_mm_or_si128(_mm_srli_epi16(T, 8), _mm_slli_epi16(T, 8)));
+		return UShort128(_mm_or_si128(_mm_srli_epi16(tmpX, 8), _mm_slli_epi16(tmpX, 8)));
 	}
 
 	/// <summary>
@@ -444,13 +434,13 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline UShort128 operator / (const UShort128 &X) const
 	{
-		std::vector<ushort> tmpA(8);
-		std::vector<ushort> tmpB(8);
+		std::array<ushort, 8> tmpA;
+		std::array<ushort, 8> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+
 		return UShort128(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4], tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
-		// TODO: finish this
-		//return UShort128(_mm_cvtps_epi16(_mm_round_ps(_mm_div_ps(_mm_cvtepi16_ps(xmm), _mm_cvtepi16_ps(X.xmm)), _MM_FROUND_TO_ZERO)));
 	}
 
 	/// <summary>
@@ -460,13 +450,13 @@ public:
 	/// <param name="X">The divisor value</param>
 	inline void operator /= (const UShort128 &X)
 	{
-		std::vector<uint> tmpA(8);
-		std::vector<uint> tmpB(8);
+		std::array<ushort, 8> tmpA;
+		std::array<ushort, 8> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
+		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+
 		xmm = _mm_set_epi16(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4], tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
-		// TODO: finish this
-		//xmm = _mm_cvtps_epi16(_mm_round_ps(_mm_div_ps(_mm_cvtepi16_ps(xmm), _mm_cvtepi16_ps(X.xmm)), _MM_FROUND_TO_ZERO));
 	}
 
 	/// <summary>

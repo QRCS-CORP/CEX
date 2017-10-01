@@ -1,5 +1,5 @@
-#ifndef _CEX_IVSIZES_H
-#define _CEX_IVSIZES_H
+#ifndef CEX_IVSIZES_H
+#define CEX_IVSIZES_H
 
 #include "CexDomain.h"
 

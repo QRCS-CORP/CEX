@@ -142,28 +142,21 @@ void HCG::Destroy()
 		m_reseedThreshold = 0;
 		m_secStrength = 0;
 
-		try
-		{
-			Utility::IntUtils::ClearVector(m_distributionCode);
-			Utility::IntUtils::ClearVector(m_hmacKey);
-			Utility::IntUtils::ClearVector(m_hmacState);
-			Utility::IntUtils::ClearVector(m_legalKeySizes);
-			Utility::IntUtils::ClearVector(m_seedCtr);
-			Utility::IntUtils::ClearVector(m_stateCtr);
+		Utility::IntUtils::ClearVector(m_distributionCode);
+		Utility::IntUtils::ClearVector(m_hmacKey);
+		Utility::IntUtils::ClearVector(m_hmacState);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_seedCtr);
+		Utility::IntUtils::ClearVector(m_stateCtr);
 
-			if (m_destroyEngine)
-			{
-				m_destroyEngine = false;
-
-				if (m_hmacEngine.IsInitialized())
-					m_hmacEngine.Destroy();
-				if (m_providerSource != 0)
-					delete m_providerSource;
-			}
-		}
-		catch (std::exception& ex)
+		if (m_destroyEngine)
 		{
-			throw CryptoGeneratorException("HCG::Destroy", "Could not clear all variables!", std::string(ex.what()));
+			m_destroyEngine = false;
+
+			if (m_hmacEngine.IsInitialized())
+				m_hmacEngine.Destroy();
+			if (m_providerSource != 0)
+				delete m_providerSource;
 		}
 	}
 }
@@ -237,7 +230,7 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// added: nonce becomes the initial state counter value
-	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	Initialize(Seed);
 }
 
@@ -247,7 +240,7 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 
 	// copy nonce to state counter
-	Utility::MemUtils::Copy<byte>(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 
 	// info can be a secret salt or domain identifier; added to derivation function input
 	// for best security, info should be secret, random, and DistributionCodeMax size
@@ -259,7 +252,7 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	{
 		// info is too large; size to optimal max, ignore remainder
 		std::vector<byte> tmpInfo(m_distributionCodeMax);
-		Utility::MemUtils::Copy<byte>(Info, 0, tmpInfo, 0, tmpInfo.size());
+		Utility::MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
 		m_distributionCode = tmpInfo;
 	}
 
@@ -305,7 +298,7 @@ void HCG::Derive(const std::vector<byte> &Seed)
 		RandomPad(blkOffset);
 		// 5) compress and add to HMAC key
 		m_hmacEngine.Finalize(macCode, 0);
-		Utility::MemUtils::Copy<byte>(macCode, 0, tmpKey, keyOffset, keyRmd);
+		Utility::MemUtils::Copy(macCode, 0, tmpKey, keyOffset, keyRmd);
 		keyLen -= keyRmd;
 		keyOffset += keyRmd;
 	} 
@@ -336,7 +329,7 @@ void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 			m_hmacEngine.Update(m_distributionCode, 0, m_distributionCode.size());
 		// 5) output the state
 		m_hmacEngine.Finalize(m_hmacState, 0);
-		Utility::MemUtils::Copy<byte>(m_hmacState, 0, Output, OutOffset, RMDSZE);
+		Utility::MemUtils::Copy(m_hmacState, 0, Output, OutOffset, RMDSZE);
 
 		Length -= RMDSZE;
 		OutOffset += RMDSZE;

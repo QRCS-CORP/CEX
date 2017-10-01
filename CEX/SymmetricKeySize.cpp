@@ -31,9 +31,9 @@ SymmetricKeySize::SymmetricKeySize(const std::vector<byte> &KeyArray)
 	if (KeyArray.size() < HDR_SIZE)
 		throw Exception::CryptoProcessingException("SymmetricKeySize:Ctor", "The KeyArray buffer is too small!");
 
-	Utility::MemUtils::Copy<byte, uint>(KeyArray, 0, m_infoSize, sizeof(uint));
-	Utility::MemUtils::Copy<byte, uint>(KeyArray, sizeof(uint), m_keySize, sizeof(uint));
-	Utility::MemUtils::Copy<byte, uint>(KeyArray, 2 * sizeof(uint), m_nonceSize, sizeof(uint));
+	Utility::MemUtils::CopyToValue(KeyArray, 0, m_infoSize, sizeof(uint));
+	Utility::MemUtils::CopyToValue(KeyArray, sizeof(uint), m_keySize, sizeof(uint));
+	Utility::MemUtils::CopyToValue(KeyArray, 2 * sizeof(uint), m_nonceSize, sizeof(uint));
 }
 
 //~~~Public Functions~~~//
@@ -85,9 +85,9 @@ SymmetricKeySize* SymmetricKeySize::DeepCopy()
 	return new SymmetricKeySize(KeySize(), NonceSize(), InfoSize());
 }
 
-bool SymmetricKeySize::Equals(SymmetricKeySize &Obj)
+bool SymmetricKeySize::Equals(SymmetricKeySize &Input)
 {
-	if (this->GetHashCode() != Obj.GetHashCode())
+	if (this->GetHashCode() != Input.GetHashCode())
 		return false;
 
 	return true;
@@ -118,9 +118,9 @@ std::vector<byte> SymmetricKeySize::ToBytes()
 {
 	std::vector<byte> trs(HDR_SIZE, 0);
 
-	Utility::MemUtils::Copy<uint, byte>(m_infoSize, trs, 0, sizeof(uint));
-	Utility::MemUtils::Copy<uint, byte>(m_keySize, trs, sizeof(uint), sizeof(uint));
-	Utility::MemUtils::Copy<uint, byte>(m_nonceSize, trs, 2 * sizeof(uint), sizeof(uint));
+	Utility::MemUtils::CopyFromValue(m_infoSize, trs, 0, sizeof(uint));
+	Utility::MemUtils::CopyFromValue(m_keySize, trs, sizeof(uint), sizeof(uint));
+	Utility::MemUtils::CopyFromValue(m_nonceSize, trs, 2 * sizeof(uint), sizeof(uint));
 
 	return trs;
 }

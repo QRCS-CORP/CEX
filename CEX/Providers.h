@@ -1,5 +1,5 @@
-#ifndef _CEX_PROVIDERS_H
-#define _CEX_PROVIDERS_H
+#ifndef CEX_PROVIDERS_H
+#define CEX_PROVIDERS_H
 
 #include "CexDomain.h"
 

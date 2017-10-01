@@ -1,5 +1,5 @@
-#ifndef _CEX_KEYGENERATOR_H
-#define _CEX_KEYGENERATOR_H
+#ifndef CEX_SYMMETRICKEYGENERATOR_H
+#define CEX_SYMMETRICKEYGENERATOR_H
 
 #include "CexDomain.h"
 #include "CryptoGeneratorException.h"

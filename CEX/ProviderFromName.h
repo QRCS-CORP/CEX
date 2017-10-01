@@ -1,5 +1,5 @@
-#ifndef _CEX_PROVIDERFROMNAME_H
-#define _CEX_PROVIDERFROMNAME_H
+#ifndef CEX_PROVIDERFROMNAME_H
+#define CEX_PROVIDERFROMNAME_H
 
 #include "CexDomain.h"
 #include "CryptoException.h"

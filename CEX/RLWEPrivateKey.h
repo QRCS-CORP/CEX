@@ -1,5 +1,5 @@
-#ifndef _CEX_RLWEPRIVATEKEY_H
-#define _CEX_RLWEPRIVATEKEY_H
+#ifndef CEX_RLWEPRIVATEKEY_H
+#define CEX_RLWEPRIVATEKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
@@ -52,14 +52,14 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="R">The private key polynomial</param>
-	RLWEPrivateKey(RLWEParams Parameters, std::vector<ushort> &R);
+	explicit RLWEPrivateKey(RLWEParams Parameters, std::vector<ushort> &R);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The serialized private key</param>
-	RLWEPrivateKey(const std::vector<byte> &KeyStream);
+	explicit RLWEPrivateKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Finalize objects

@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_TWOFISH_H
-#define _CEX_TWOFISH_H
+#ifndef CEX_TWOFISH_H
+#define CEX_TWOFISH_H
 
 #include "CexDomain.h"
 

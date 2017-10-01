@@ -246,9 +246,9 @@ int CipherDescription::GetHashCode()
 	return result;
 }
 
-bool CipherDescription::Equals(CipherDescription &Obj)
+bool CipherDescription::Equals(CipherDescription &Input)
 {
-	if (this->GetHashCode() != Obj.GetHashCode())
+	if (this->GetHashCode() != Input.GetHashCode())
 		return false;
 
 	return true;

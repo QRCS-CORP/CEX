@@ -29,8 +29,8 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-#ifndef _CEX_GCM_H
-#define _CEX_GCM_H
+#ifndef CEX_GCM_H
+#define CEX_GCM_H
 
 #include "IAeadMode.h"
 #include "CTR.h"

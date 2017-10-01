@@ -1,5 +1,5 @@
-#ifndef _CEX_SEEKORIGIN_H
-#define _CEX_SEEKORIGIN_H
+#ifndef CEX_SEEKORIGIN_H
+#define CEX_SEEKORIGIN_H
 
 #include "CexDomain.h"
 

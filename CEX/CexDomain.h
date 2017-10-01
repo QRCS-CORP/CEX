@@ -1,5 +1,5 @@
-#ifndef _CEX_CEXNS_H
-#define _CEX_CEXNS_H
+#ifndef CEX_CEXDOMAIN_H
+#define CEX_CEXDOMAIN_H
 
 #include "CexConfig.h"
 

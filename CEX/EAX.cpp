@@ -169,19 +169,19 @@ void EAX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void EAX::Destroy()
 {
-	m_isDestroyed = true;
-	m_aadPreserve = false;
-	m_blockSize = 0;
-	m_cipherType = BlockCiphers::None;
-	m_aadLoaded = false;
-	m_isEncryption = false;
-	m_isInitialized = false;
-	m_isLoaded = false;
-	m_macSize = 0;
-	m_parallelProfile.Reset();
-
-	try
+	if (!m_isDestroyed)
 	{
+		m_isDestroyed = true;
+		m_aadPreserve = false;
+		m_blockSize = 0;
+		m_cipherType = BlockCiphers::None;
+		m_aadLoaded = false;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isLoaded = false;
+		m_macSize = 0;
+		m_parallelProfile.Reset();
+
 		Utility::IntUtils::ClearVector(m_aadData);
 		Utility::IntUtils::ClearVector(m_cipherKey);
 		Utility::IntUtils::ClearVector(m_eaxNonce);
@@ -197,10 +197,6 @@ void EAX::Destroy()
 			if (m_macGenerator.IsInitialized())
 				m_macGenerator.Destroy();
 		}
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoCipherModeException("EAX:Destroy", "Could not clear all variables!", std::string(ex.what()));
 	}
 }
 
@@ -222,7 +218,7 @@ void EAX::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t 
 		throw CryptoCipherModeException("EAX:Finalize", "The length must be minimum of 12 and maximum of MAC code size!");
 
 	CalculateMac();
-	Utility::MemUtils::Copy<byte>(m_msgTag, 0, Output, Offset, Length);
+	Utility::MemUtils::Copy(m_msgTag, 0, Output, Offset, Length);
 }
 
 void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -268,7 +264,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	if (m_isFinalized)
 	{
-		Utility::MemUtils::Clear<byte>(m_msgTag, 0, m_msgTag.size());
+		Utility::MemUtils::Clear(m_msgTag, 0, m_msgTag.size());
 		m_isFinalized = false;
 	}
 
@@ -330,7 +326,7 @@ bool EAX::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 	if (!m_isFinalized)
 		CalculateMac();
 
-	return Utility::IntUtils::Compare<byte>(m_msgTag, 0, Input, Offset, Length);
+	return Utility::IntUtils::Compare(m_msgTag, 0, Input, Offset, Length);
 }
 
 //~~~Private Functions~~~//
@@ -379,12 +375,12 @@ void EAX::Reset()
 	if (!m_aadPreserve)
 	{
 		m_aadLoaded = false;
-		Utility::MemUtils::Clear<byte>(m_aadData, 0, m_aadData.size());
+		Utility::MemUtils::Clear(m_aadData, 0, m_aadData.size());
 	}
 
 	m_isInitialized = false;
 	m_macGenerator.Reset();
-	Utility::MemUtils::Clear<byte>(m_eaxVector, 0, m_eaxVector.size());
+	Utility::MemUtils::Clear(m_eaxVector, 0, m_eaxVector.size());
 }
 
 void EAX::Scope()

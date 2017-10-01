@@ -1,5 +1,5 @@
-#ifndef _CEX_MPKCKEYPAIR_H
-#define _CEX_MPKCKEYPAIR_H
+#ifndef CEX_MPKCKEYPAIR_H
+#define CEX_MPKCKEYPAIR_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKeyPair.h"
@@ -33,7 +33,7 @@ public:
 	/// 
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
-	MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey);
+	explicit MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey);
 
 	/// <summary>
 	/// Instantiate this class with the public/private keys and an identification tag
@@ -42,7 +42,7 @@ public:
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
 	/// <param name="Tag">The identification tag</param>
-	MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey, std::vector<byte> &Tag);
+	explicit MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey, std::vector<byte> &Tag);
 
 	/// <summary>
 	/// Finalize objects

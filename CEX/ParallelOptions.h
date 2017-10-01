@@ -1,5 +1,5 @@
-#ifndef _CEX_PARALLELOPTIONS_H
-#define _CEX_PARALLELOPTIONS_H
+#ifndef CEX_PARALLELOPTIONS_H
+#define CEX_PARALLELOPTIONS_H
 
 #include "CexDomain.h"
 #include "SimdProfiles.h"

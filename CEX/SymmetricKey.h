@@ -1,5 +1,5 @@
-#ifndef _CEX_SYMMETRICKEY_H
-#define _CEX_SYMMETRICKEY_H
+#ifndef CEX_SYMMETRICKEY_H
+#define CEX_SYMMETRICKEY_H
 
 #include "ISymmetricKey.h"
 
@@ -105,10 +105,10 @@ public:
 	/// Compare this SymmetricKey instance with another
 	/// </summary>
 	/// 
-	/// <param name="Obj">SymmetricKey to compare</param>
+	/// <param name="Input">SymmetricKey to compare</param>
 	/// 
 	/// <returns>Returns true if equal</returns>
-	bool Equals(ISymmetricKey &Obj) override;
+	bool Equals(ISymmetricKey &Input) override;
 
 	/// <summary>
 	/// Serialize a SymmetricKey class.

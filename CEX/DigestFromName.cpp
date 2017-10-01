@@ -3,6 +3,7 @@
 #include "Blake256.h"
 #include "Keccak256.h"
 #include "Keccak512.h"
+#include "Keccak1024.h"
 #include "SHA256.h"
 #include "SHA512.h"
 #include "Skein256.h"
@@ -17,14 +18,16 @@ IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 	{
 		switch (DigestType)
 		{
-		case Digests::Blake512:
-			return new Digest::Blake512(Parallel);
 		case Digests::Blake256:
 			return new Digest::Blake256(Parallel);
+		case Digests::Blake512:
+			return new Digest::Blake512(Parallel);
 		case Digests::Keccak256:
 			return new Digest::Keccak256(Parallel);
 		case Digests::Keccak512:
 			return new Digest::Keccak512(Parallel);
+		case Digests::Keccak1024:
+			return new Digest::Keccak1024(Parallel);
 		case Digests::SHA256:
 			return new Digest::SHA256(Parallel);
 		case Digests::SHA512:
@@ -64,6 +67,7 @@ size_t DigestFromName::GetBlockSize(Digests DigestType)
 		case Digests::Keccak256:
 			return 136;
 		case Digests::Keccak512:
+		case Digests::Keccak1024:
 			return 72;
 
 		case Digests::None:
@@ -94,6 +98,7 @@ size_t DigestFromName::GetDigestSize(Digests DigestType)
 		case Digests::SHA512:
 		case Digests::Skein512:
 			return 64;
+		case Digests::Keccak1024:
 		case Digests::Skein1024:
 			return 128;
 		case Digests::None:
@@ -118,6 +123,7 @@ size_t DigestFromName::GetPaddingSize(Digests DigestType)
 		case Digests::Blake512:
 		case Digests::Keccak256:
 		case Digests::Keccak512:
+		case Digests::Keccak1024:
 		case Digests::Skein256:
 		case Digests::Skein512:
 		case Digests::Skein1024:

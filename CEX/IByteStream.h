@@ -1,5 +1,5 @@
-#ifndef _CEX_ISTREAM_H
-#define _CEX_ISTREAM_H
+#ifndef CEX_IBYTESTREAM_H
+#define CEX_IBYTESTREAM_H
 
 #include "CexDomain.h"
 #include "CryptoProcessingException.h"
