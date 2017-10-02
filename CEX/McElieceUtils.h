@@ -34,6 +34,11 @@ class McElieceUtils
 {
 public:
 
+	McElieceUtils() = delete;
+	McElieceUtils(const McElieceUtils&) = delete;
+	McElieceUtils& operator=(const McElieceUtils&) = delete;
+	McElieceUtils& operator=(McElieceUtils&&) = delete;
+
 	static ushort Diff(ushort A, ushort B)
 	{
 		uint t = (uint)(A ^ B);

@@ -69,8 +69,8 @@
 
 // TRAJECTORY
 //
-// ***JSF/MISRA/SEI CERT Check List***
-// **Local Changes**
+// ###JSF/MISRA/SEI CERT Check List###
+// ##Local Changes##
 // do not cast between different size integers (unless it would seriously/unavoidably impede performance)
 // ensure that operations on signed integers do not result in overflow
 // ensure that division and remainder operations do not result in divide-by-zero errors
@@ -84,27 +84,28 @@
 // mark single parameter constructors as explicit
 // replace all instances of pointer math (and C* pointers)
 //
-// **Global Changes**
+// ##Global Changes##
 // all hex codes should be expressed in capitals, ex. 0xFF
 // enum members should all be byte sized and sequential, i.e. 1,2,3.. (promote jump lists)
 // delete unused default/copy/move constructors
 // move from C style pointers (*) to std::unique_ptr
-// use std::static_assert for constant eveluatons (debug)
-// replace all C style casts with C++ equivalents, ex. static_cast<>()
+// use std::static_assert for constant evaluatons (debug)
+// replace all C style casts with C++ equivalents, ex. static_cast<>() (except where it strongle diminishes readability, ex. within array braces)
+// compound integer operations should be expressed within parenthesis to define operation flow, ex.  a = (b * (c << 3))
 // add GNU header to each header file
 // remove unused macros and defines in CEXCommon.h
 // reduce the number of global includes, and replace all C headers with C++ versions
 // prefer global static const integers to #define
 // replace all macros (release build, assert excepted) with inline/templated functions
 
-// ***Optimization Cycle 1: Sept 26, 2017***
+// ###Optimization Cycle 1: Sept 26, 2017###
 // Performance of various algorithms pre/post memory and code optimizations
 //
-// **Stage 1 (baseline)
-// *asymmetric ciphers in operations per second
+// ##Stage 1 (baseline)##
+// #asymmetric ciphers in operations per second
 // RingLWE: Gen 14285/17345, Enc 10000/12547, Dec 33333
 // McEliece: Gen 12, Enc 7692, Dec 4000
-// *symmetric algorithms in MB per second
+// #symmetric algorithms in MB per second
 // AHX: ECB 11299, CTR 426/7633, ICM 172/8064, CBC 715/9803, CFB 352/2277, OFB 307, EAX 205/616, OCB 107/1013, GCM 311/1060
 // SHX: ECB 2418
 // THX: ECB 1002
@@ -116,11 +117,11 @@
 // Skein: 1024- 350/1412, 512- 236/1204, 256- 221/929
 // Memory: LB Clear 6993, Clear 10309, LB Copy 4761, Copy 10416, LB Memset 6896, Memset 10309, LB XOR 4524, XOR 1329
 //
-// **Stage 2 (post optimization)
-// *asymmetric ciphers in operations per second
+// ##Stage 2 (post optimization)##
+// #asymmetric ciphers in operations per second
 // RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000
 // McEliece: Gen 12, Enc 12500, Dec 4577
-// *symmetric algorithms in MB per second
+// #symmetric algorithms in MB per second
 // AHX: CTR , CBC , EAX , OFB , GCM
 // SHX: CTR , CBC , EAX , OFB , GCM
 // THX: CTR , CBC , EAX , OFB , GCM
@@ -132,11 +133,11 @@
 // Skein: 1024- , 512- , 256- 
 // Memory: 
 //
-// *** 1.1.0.0 RoadMap ***
+// ### 1.1.0.0 RoadMap ###
 //
 // AVX512 integration		-started
 // RingLWE					-added
-// McEliece					-?
+// McEliece					-added
 // RSA						-?
 // ModuleLWE				-?
 // RSA-Sig					-?
@@ -456,7 +457,7 @@ int main()
 			RunTest(new SimdWrapperTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
 			RunTest(new RingLWETest());
-			RunTest(new McElieceTest());
+			//RunTest(new McElieceTest()); // not ready until 1.0.0.4..
 		}
 		else
 		{

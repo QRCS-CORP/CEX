@@ -112,6 +112,19 @@ public:
 	//~~~ Load and Store~~~//
 
 	/// <summary>
+	/// Load with 4 * 32bit unsigned integers
+	/// </summary>
+	///
+	/// <param name="X0">uint32 0</param>
+	/// <param name="X1">uint32 1</param>
+	/// <param name="X2">uint32 2</param>
+	/// <param name="X3">uint32 3</param>
+	inline void Load(uint X0, uint X1, uint X2, uint X3)
+	{
+		xmm = _mm_set_epi32(X0, X1, X2, X3);
+	}
+
+	/// <summary>
 	/// Load an array into a register in Little Endian format
 	/// </summary>
 	///
@@ -133,7 +146,7 @@ public:
 	template <typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		xmm = _mm128_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3]);
+		xmm = _mm_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3]);
 	}
 
 	/// <summary>

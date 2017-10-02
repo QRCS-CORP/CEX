@@ -31,7 +31,6 @@ using Enumeration::RLWEParams;
 /// </summary>
 struct RLWEParamSet
 {
-
 	RLWEParamSet(const RLWEParamSet&) = delete;
 	RLWEParamSet& operator=(const RLWEParamSet&) = delete;
 	RLWEParamSet& operator=(RLWEParamSet&&) = delete;

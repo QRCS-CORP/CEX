@@ -31,6 +31,10 @@ using Enumeration::MPKCParams;
 /// </summary>
 struct MPKCParamSet
 {
+	MPKCParamSet(const MPKCParamSet&) = delete;
+	MPKCParamSet& operator=(const MPKCParamSet&) = delete;
+	MPKCParamSet& operator=(MPKCParamSet&&) = delete;
+
 	//~~~Properties~~~//
 
 	/// <summary>
@@ -81,7 +85,7 @@ struct MPKCParamSet
 	/// </summary>
 	/// 
 	/// <param name="ParamArray">The byte array containing the MPKCParamSet</param>
-	MPKCParamSet(const std::vector<byte> &ParamArray);
+	explicit MPKCParamSet(const std::vector<byte> &ParamArray);
 
 	/// <summary>
 	/// Finalize state

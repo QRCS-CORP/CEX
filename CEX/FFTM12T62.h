@@ -37,8 +37,13 @@ class FFTM12T62
 {
 public:
 
+	FFTM12T62() = delete;
+	FFTM12T62(const FFTM12T62&) = delete;
+	FFTM12T62& operator=(const FFTM12T62&) = delete;
+	FFTM12T62& operator=(FFTM12T62&&) = delete;
+
 	static const size_t M = 12;
-	static const size_t T = 62;
+	static const size_t T = 62; 
 
 private:
 
@@ -46,14 +51,14 @@ private:
 	static const size_t PKN_COLS = (((size_t)1 << M) - T * M);
 	static const size_t IRR_SIZE = (M * 8);
 	static const size_t CND_SIZE = ((PKN_ROWS - 8) * 8);
-	static const size_t GEN_MAXR = 1000;
+	static const size_t GEN_MAXR = 10000;
 	static const ulong ButterflyConsts[63][12];
 
 public:
 
 	static const size_t SECRET_SIZE = (PKN_ROWS / 8);
 	static const size_t PRIKEY_SIZE = CND_SIZE + IRR_SIZE;
-	static const size_t PUBKEY_SIZE = (PKN_ROWS * ((64 - M) * 8)) + (PKN_ROWS * (8 - ((PKN_ROWS & 63) >> 3)));;
+	static const size_t PUBKEY_SIZE = (PKN_ROWS * ((64 - M) * 8)) + (PKN_ROWS * (8 - ((PKN_ROWS & 63) >> 3)));
 
 	static int Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S);
 

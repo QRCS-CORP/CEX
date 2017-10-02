@@ -259,7 +259,7 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 			stateK[k * 16 + i] = Utility::IntUtils::LeBytesTo32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
 	}
 #else
-	Utility::IntUtils::BlockToLe<uint>(tmpK, 0, stateK, 0, tmpK.size());
+	Utility::IntUtils::BlockToLe(tmpK, 0, stateK, 0, tmpK.size());
 #endif
 
 	if (!m_parallelProfile.IsParallel() && PRLBLK >= MFLWRD)
@@ -286,7 +286,7 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 			Utility::IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
 	}
 #else
-	Utility::IntUtils::LeToBlock<uint>(stateK, 0, tmpK, 0, tmpK.size());
+	Utility::IntUtils::LeToBlock(stateK, 0, tmpK, 0, tmpK.size());
 #endif
 
 	Extract(Output, OutOffset, m_kdfKey, tmpK, Length);
