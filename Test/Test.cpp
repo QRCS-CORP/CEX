@@ -355,9 +355,13 @@ int main()
 	Common::CpuDetect detect;
 
 	if (detect.AESNI())
+	{
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
+	}
 	else
+	{
 		PrintHeader("AES-NI intrinsics support was not detected on this system.");
+	}
 	PrintHeader("", "");
 
 	if (detect.AVX2())
@@ -457,7 +461,7 @@ int main()
 			RunTest(new SimdWrapperTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
 			RunTest(new RingLWETest());
-			//RunTest(new McElieceTest()); // not ready until 1.0.0.4..
+			RunTest(new McElieceTest());
 		}
 		else
 		{

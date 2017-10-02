@@ -15,13 +15,11 @@ using Utility::MemUtils;
 
 const ulong FFTM12T62::ButterflyConsts[63][12] =
 {
-	//64
 	{
 		0XF00F0FF0F00F0FF0, 0XF0F00F0F0F0FF0F0, 0X0FF00FF00FF00FF0, 0XAA5555AAAA5555AA,
 		0XF00F0FF0F00F0FF0, 0X33CCCC33CC3333CC, 0XFFFF0000FFFF0000, 0XCC33CC3333CC33CC,
 		0X33CC33CC33CC33CC, 0X5A5A5A5A5A5A5A5A, 0XFF00FF00FF00FF00, 0XF00F0FF0F00F0FF0,
 	},
-	//128
 	{
 		0X3C3C3C3C3C3C3C3C, 0XF0F0F0F0F0F0F0F0, 0X5555AAAA5555AAAA, 0XCC3333CCCC3333CC,
 		0XC33CC33CC33CC33C, 0X55555555AAAAAAAA, 0X33333333CCCCCCCC, 0X00FF00FFFF00FF00,
@@ -32,7 +30,6 @@ const ulong FFTM12T62::ButterflyConsts[63][12] =
 		0XC33CC33CC33CC33C, 0X55555555AAAAAAAA, 0X33333333CCCCCCCC, 0XFF00FF0000FF00FF,
 		0X0F0F0F0F0F0F0F0F, 0X0000000000000000, 0X0000FFFFFFFF0000, 0XF0F00F0F0F0FF0F0,
 	},
-	//256
 	{
 		0XAA55AA5555AA55AA, 0XCC33CC3333CC33CC, 0X33CCCC33CC3333CC, 0X55555555AAAAAAAA,
 		0XFF0000FF00FFFF00, 0X3CC33CC3C33CC33C, 0X5555AAAA5555AAAA, 0X0FF00FF00FF00FF0,
@@ -53,7 +50,6 @@ const ulong FFTM12T62::ButterflyConsts[63][12] =
 		0X00FFFF00FF0000FF, 0XC33CC33C3CC33CC3, 0XAAAA5555AAAA5555, 0XF00FF00FF00FF00F,
 		0XCCCC33333333CCCC, 0X0F0F0F0F0F0F0F0F, 0XFF0000FFFF0000FF, 0XC33CC33CC33CC33C,
 	},
-	//512
 	{
 		0X6699669999669966, 0X33CCCC33CC3333CC, 0XA5A5A5A55A5A5A5A, 0X3C3CC3C3C3C33C3C,
 		0XF00FF00F0FF00FF0, 0X55AA55AA55AA55AA, 0X3C3CC3C3C3C33C3C, 0X0F0F0F0FF0F0F0F0,
@@ -94,7 +90,6 @@ const ulong FFTM12T62::ButterflyConsts[63][12] =
 		0X0FF00FF0F00FF00F, 0X55AA55AA55AA55AA, 0XC3C33C3C3C3CC3C3, 0XF0F0F0F00F0F0F0F,
 		0X55AA55AA55AA55AA, 0XCC3333CC33CCCC33, 0X0F0F0F0F0F0F0F0F, 0XA55A5AA55AA5A55A,
 	},
-	//1024
 	{
 		0X9669699696696996, 0X6996699669966996, 0X6996699669966996, 0X00FFFF0000FFFF00,
 		0XFF00FF00FF00FF00, 0XF00FF00F0FF00FF0, 0XF0F00F0F0F0FF0F0, 0XC33C3CC33CC3C33C,
@@ -175,7 +170,6 @@ const ulong FFTM12T62::ButterflyConsts[63][12] =
 		0X00FF00FF00FF00FF, 0XF00FF00F0FF00FF0, 0XF0F00F0F0F0FF0F0, 0X3CC3C33CC33C3CC3,
 		0X3CC3C33CC33C3CC3, 0XA55A5AA55AA5A55A, 0XC33C3CC33CC3C33C, 0X3CC3C33C3CC3C33C,
 	},
-	//2048
 	{
 		0X0000000000000000, 0X0000000000000000, 0X0000000000000000, 0X0000000000000000,
 		0X0000000000000000, 0X0000000000000000, 0XFFFFFFFF00000000, 0XFFFF0000FFFF0000,
@@ -470,7 +464,7 @@ void FFTM12T62::BerlekampMassey(std::array<ulong, M> &Output, std::array<std::ar
 	std::array<ulong, M> tmpC;
 
 	Output[0] = 1;
-	std::memcpy(&B[0], &Output[0], M * sizeof(ulong));
+	MemUtils::Copy(Output, 0, B, 0, M * sizeof(ulong));
 	Output[0] <<= 63;
 	B[0] <<= 62;
 	b = 1;
@@ -594,7 +588,7 @@ void FFTM12T62::Scaling(std::array<std::array<ulong, M>, 64> &Output, std::array
 	std::array<ulong, M> tmp;
 
 	// computing inverses
-	std::memcpy(&skInt[0], &PrivateKey[0], M * sizeof(ulong));
+	MemUtils::Copy(PrivateKey, 0, skInt, 0, M * sizeof(ulong));
 	AdditiveFFT::Transform(eval, skInt);
 	Square(eval[0], eval[0]);
 	McElieceUtils::Copy(eval[0], Inverse[0]);
@@ -740,120 +734,43 @@ void FFTM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKe
 {
 	const size_t ARRSZE = ((PKN_COLS + 63) / 64); // TODO: intrinsics
 	const size_t COLSZE = PKN_COLS / 8;
-	size_t t;
-	byte b;
+
 	std::array<ulong, ARRSZE> eInt;
 	MemUtils::Copy(E, SECRET_SIZE, eInt, 0, COLSZE);
 	std::array<ulong, ARRSZE> rowInt;
 	std::array<ulong, 8> tmp;
+	int t;
+	byte b;
 
 	for (size_t i = 0; i < PKN_ROWS; i += 8)
 	{
-		for (t = 0; t < 8; t++)
+		for (t = 0; t < 8; t++) 
 		{
-			MemUtils::Copy(PublicKey, (i + t) * COLSZE, rowInt, 0, COLSZE);
-			tmp[t] = eInt[0] & rowInt[0];
-			tmp[t] ^= eInt[1] & rowInt[1];
-			tmp[t] ^= eInt[2] & rowInt[2];
-			tmp[t] ^= eInt[3] & rowInt[3];
-			tmp[t] ^= eInt[4] & rowInt[4];
-			tmp[t] ^= eInt[5] & rowInt[5];
-			tmp[t] ^= eInt[6] & rowInt[6];
-			tmp[t] ^= eInt[7] & rowInt[7];
-			tmp[t] ^= eInt[8] & rowInt[8];
-			tmp[t] ^= eInt[9] & rowInt[9];
-			tmp[t] ^= eInt[10] & rowInt[10];
-			tmp[t] ^= eInt[11] & rowInt[11];
-			tmp[t] ^= eInt[12] & rowInt[12];
-			tmp[t] ^= eInt[13] & rowInt[13];
-			tmp[t] ^= eInt[14] & rowInt[14];
-			tmp[t] ^= eInt[15] & rowInt[15];
-			tmp[t] ^= eInt[16] & rowInt[16];
-			tmp[t] ^= eInt[17] & rowInt[17];
-			tmp[t] ^= eInt[18] & rowInt[18];
-			tmp[t] ^= eInt[19] & rowInt[19];
-			tmp[t] ^= eInt[20] & rowInt[20];
-			tmp[t] ^= eInt[21] & rowInt[21];
-			tmp[t] ^= eInt[22] & rowInt[22];
-			tmp[t] ^= eInt[23] & rowInt[23];
-			tmp[t] ^= eInt[24] & rowInt[24];
-			tmp[t] ^= eInt[25] & rowInt[25];
-			tmp[t] ^= eInt[26] & rowInt[26];
-			tmp[t] ^= eInt[27] & rowInt[27];
-			tmp[t] ^= eInt[28] & rowInt[28];
-			tmp[t] ^= eInt[29] & rowInt[29];
-			tmp[t] ^= eInt[30] & rowInt[30];
-			tmp[t] ^= eInt[31] & rowInt[31];
-			tmp[t] ^= eInt[32] & rowInt[32];
-			tmp[t] ^= eInt[33] & rowInt[33];
-			tmp[t] ^= eInt[34] & rowInt[34];
-			tmp[t] ^= eInt[35] & rowInt[35];
-			tmp[t] ^= eInt[36] & rowInt[36];
-			tmp[t] ^= eInt[37] & rowInt[37];
-			tmp[t] ^= eInt[38] & rowInt[38];
-			tmp[t] ^= eInt[39] & rowInt[39];
-			tmp[t] ^= eInt[40] & rowInt[40];
-			tmp[t] ^= eInt[41] & rowInt[41];
-			tmp[t] ^= eInt[42] & rowInt[42];
-			tmp[t] ^= eInt[43] & rowInt[43];
-			tmp[t] ^= eInt[44] & rowInt[44];
-			tmp[t] ^= eInt[45] & rowInt[45];
-			tmp[t] ^= eInt[46] & rowInt[46];
-			tmp[t] ^= eInt[47] & rowInt[47];
-			tmp[t] ^= eInt[48] & rowInt[48];
-			tmp[t] ^= eInt[49] & rowInt[49];
-			tmp[t] ^= eInt[50] & rowInt[50];
-			tmp[t] ^= eInt[51] & rowInt[51];
-			tmp[t] ^= eInt[52] & rowInt[52];
+			rowInt[ARRSZE - 1] = 0;
+			MemUtils::Copy(PublicKey, ((i + t) * COLSZE), rowInt, 0, COLSZE);
+			tmp[t] = 0;
+
+			for (size_t j = 0; j < ARRSZE; j++)
+			{
+				tmp[t] ^= eInt[j] & rowInt[j];
+			}
 		}
 
-		tmp[7] ^= (tmp[7] >> 32);
-		tmp[7] ^= (tmp[7] >> 16);
-		tmp[7] ^= (tmp[7] >> 8);
-		tmp[7] ^= (tmp[7] >> 4);
-		b = (0x6996 >> (tmp[7] & 0xF)) & 1;
-		tmp[6] ^= (tmp[6] >> 32);
-		tmp[6] ^= (tmp[6] >> 16);
-		tmp[6] ^= (tmp[6] >> 8);
-		tmp[6] ^= (tmp[6] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[6] & 0xF)) & 1;
-		tmp[5] ^= (tmp[5] >> 32);
-		tmp[5] ^= (tmp[5] >> 16);
-		tmp[5] ^= (tmp[5] >> 8);
-		tmp[5] ^= (tmp[5] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[5] & 0xF)) & 1;
-		tmp[4] ^= (tmp[4] >> 32);
-		tmp[4] ^= (tmp[4] >> 16);
-		tmp[4] ^= (tmp[4] >> 8);
-		tmp[4] ^= (tmp[4] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[4] & 0xF)) & 1;
-		tmp[3] ^= (tmp[3] >> 32);
-		tmp[3] ^= (tmp[3] >> 16);
-		tmp[3] ^= (tmp[3] >> 8);
-		tmp[3] ^= (tmp[3] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[3] & 0xF)) & 1;
-		tmp[2] ^= (tmp[2] >> 32);
-		tmp[2] ^= (tmp[2] >> 16);
-		tmp[2] ^= (tmp[2] >> 8);
-		tmp[2] ^= (tmp[2] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[2] & 0xF)) & 1;
-		tmp[1] ^= (tmp[1] >> 32);
-		tmp[1] ^= (tmp[1] >> 16);
-		tmp[1] ^= (tmp[1] >> 8);
-		tmp[1] ^= (tmp[1] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[1] & 0xF)) & 1;
-		tmp[0] ^= (tmp[0] >> 32);
-		tmp[0] ^= (tmp[0] >> 16);
-		tmp[0] ^= (tmp[0] >> 8);
-		tmp[0] ^= (tmp[0] >> 4);
-		b <<= 1;
-		b |= (0x6996 >> (tmp[0] & 0xF)) & 1;
+		b = 0;
+
+		for (t = 7; t >= 0; t--)
+		{
+			tmp[t] ^= (tmp[t] >> 32);
+			tmp[t] ^= (tmp[t] >> 16);
+			tmp[t] ^= (tmp[t] >> 8);
+			tmp[t] ^= (tmp[t] >> 4);
+		}
+
+		for (t = 7; t >= 0; t--)
+		{
+			b <<= 1;
+			b |= (0x6996 >> (tmp[t] & 0xF)) & 1;
+		}
 
 		S[i / 8] = E[i / 8] ^ b;
 	}
@@ -2005,7 +1922,7 @@ void FFTM12T62::Square(std::array<ulong, M> &Output, std::array<ulong, M> &Input
 	sum[10] = Input[5] ^ Input[11];
 	sum[11] = Input[10];
 
-	std::memcpy(&Output[0], &sum[0], M * sizeof(ulong));
+	MemUtils::Copy(sum, 0, Output, 0, M * sizeof(ulong));
 }
 
 NAMESPACE_MCELIECEEND

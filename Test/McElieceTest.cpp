@@ -36,7 +36,7 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
 			throw TestException(std::string(FAILURE + " : " + ex.what()));
 		}
@@ -76,7 +76,7 @@ namespace Test
 		McEliece cpr(Enumeration::MPKCParams::M12T62, Enumeration::Prngs::BCR, Enumeration::BlockCiphers::RHX);
 		Prng::SecureRandom rnd;
 
-		for (size_t i = 0; i < 4; ++i) //TODO: should be 10
+		for (size_t i = 0; i < 10; ++i)
 		{
 			rnd.GetBytes(msg);
 			IAsymmetricKeyPair* kp = cpr.Generate();

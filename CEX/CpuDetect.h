@@ -51,6 +51,7 @@ private:
 		CPUID_RDRAND = 30,  // ecx 30
 		CPUID_SSE2 = 32 + 26, // edx 26
 		CPUID_HYPERTHREAD = 32 + 28, // edx 28
+		CPUID_X86EMU = 32 + 30, // edx 30
 		// EAX=7
 		CPUID_SGX = 64 + 2, // ebx 2
 		CPUID_AVX2 = 64 + 5, // ebx 5
@@ -164,6 +165,11 @@ public:
 	/// Hardware supports hyper-threading
 	/// </summary>
 	const bool HyperThread();
+
+	/// <summary>
+	/// Cpu is x64 emulating an x86 architecture
+	/// </summary>
+	const bool IsX86Emulation();
 
 	/// <summary>
 	/// Cpu is x64

@@ -98,8 +98,21 @@ const bool CpuDetect::HyperThread()
 	return GetFlag(CpuidFlags::CPUID_HYPERTHREAD); 
 }
 
+const bool CpuDetect::IsX86Emulation()
+{
+	if (GetFlag(CpuidFlags::CPUID_X86EMU))
+	{
+		printf("CPUID_X86EMU");
+	}
+	return GetFlag(CpuidFlags::CPUID_X86EMU);
+}
+
 const bool CpuDetect::IsX64() 
 {
+	if (GetFlag(CpuidFlags::CPUID_X64))
+	{
+		printf("CPUID_X64");
+	}
 	return GetFlag(CpuidFlags::CPUID_X64);
 }
 
@@ -334,7 +347,7 @@ void CpuDetect::Initialize()
 	if (maxSublevel == 0)
 		return;
 
-	memset(cpuInfo, 0, 4);
+	std::memset(cpuInfo, 0, 4);
 	X86_CPUID(1, cpuInfo);
 
 	m_hyperThread = READBITSFROM(cpuInfo[3], 28, 1) != 0;
@@ -350,19 +363,19 @@ void CpuDetect::Initialize()
 
 	if (maxSublevel >= 7)
 	{
-		memset(cpuInfo, 0, 16);
+		std::memset(cpuInfo, 0, 16);
 		X86_CPUID_SUBLEVEL(7, 0, cpuInfo);
 		m_x86CpuFlags[1] = (static_cast<ulong>(cpuInfo[2]) << 32) | cpuInfo[1]; // f7 ebx, ecx
 	}
 
 	if (maxSublevel >= 5)
 	{
-		memset(cpuInfo, 0, 16);
+		std::memset(cpuInfo, 0, 16);
 		X86_CPUID(0x80000005, cpuInfo);
 		if (m_cpuVendor == CpuVendors::AMD)
 			m_cacheLineSize = READBITSFROM(cpuInfo[2], 24, 8);
 
-		memset(cpuInfo, 0, 16);
+		std::memset(cpuInfo, 0, 16);
 		X86_CPUID(0x80000001, cpuInfo);
 		m_x86CpuFlags[2] = (static_cast<ulong>(cpuInfo[3]) << 32) | cpuInfo[2]; // f8..1 ecx, edx
 
@@ -380,7 +393,7 @@ void CpuDetect::Initialize()
 
 bool CpuDetect::GetFlag(CpuidFlags Flag)
 {
-	return ((m_x86CpuFlags[Flag / 64] >> (Flag % 64)) & 1);
+	return static_cast<bool>((m_x86CpuFlags[(Flag / 64)] >> (Flag % 64)) & 1);
 }
 
 void CpuDetect::GetFrequency()
@@ -390,7 +403,7 @@ void CpuDetect::GetFrequency()
 
 	if (cpuInfo[0] >= 0x16)
 	{
-		memset(cpuInfo, 0, 16);
+		std::memset(cpuInfo, 0, 16);
 		X86_CPUID(0x16, cpuInfo);
 		m_frequencyBase = cpuInfo[0];
 		m_frequencyMax = cpuInfo[1];
@@ -404,7 +417,7 @@ void CpuDetect::GetSerialNumber()
 	X86_CPUID(0x00000003, cpuInfo);
 
 	char prcId[8];
-	memset(prcId, 0, sizeof(prcId));
+	std::memset(prcId, 0, sizeof(prcId));
 	*((int*)(prcId)) = cpuInfo[3];
 	*((int*)(prcId + 4)) = cpuInfo[2];
 
@@ -469,7 +482,7 @@ std::string CpuDetect::GetVendorString(uint CpuInfo[4])
 	// cpu vendor name
 	char vendId[0x20];
 
-	memset(vendId, 0, sizeof(vendId));
+	std::memset(vendId, 0, sizeof(vendId));
 	*((int*)vendId) = CpuInfo[1];
 	*((int*)(vendId + 4)) = CpuInfo[3];
 	*((int*)(vendId + 8)) = CpuInfo[2];

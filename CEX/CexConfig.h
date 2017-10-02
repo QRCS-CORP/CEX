@@ -341,7 +341,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #endif
 
 // Intrinsics availible in GCC 4.3 (http://gcc.gnu.org/gcc-4.3/changes.html) and
-//   MSVC 2008 (http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx)
+// MSVC 2008 (http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx)
 #if !defined(CEX_DISABLE_SSE2) && !defined(CEX_DISABLE_SSE4) && (((_MSC_VER >= 1500) && !defined(_M_ARM)) || defined(__SSE4_2__))
 #	define CEX_BOOL_SSE4_INTRINSICS_AVAILABLE 1
 #else
