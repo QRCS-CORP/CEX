@@ -5,13 +5,11 @@
 #	error compiler is incompatible with this library!
 #endif
 
-#include <array>	// TODO: move fixed sized vectors to arrays in critical sections
-#include <cstdint>	// TODO: get rid of some of these C headers?
-#include <cstdio>
-#include <cstring>
+#include <array>
 #include <exception>
 #include <iostream>
-//#include <memory> for std::unique_ptr
+#include <memory>
+#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -19,12 +17,6 @@
 //		 *** Constants and System Macros ***		//
 // Settings in this section can not be modified		//
 //////////////////////////////////////////////////////
-
-// library version info
-static const int CEX_VERSION_MAJOR = 1; // A3 series
-static const int CEX_VERSION_MINOR = 0;
-static const int CEX_VERSION_PATCH = 0;
-static const int CEX_VERSION_RELEASE = 3;
 
 // compiler types; not all will be supported (targets are msvc, mingw, gcc, intel, and clang)
 #if defined(_MSC_VER)
@@ -55,9 +47,9 @@ static const int CEX_VERSION_RELEASE = 3;
 
 // is a supported compiler target
 #if (defined(CEX_COMPILER_MSC) || defined(CEX_COMPILER_MINGW) || defined(CEX_COMPILER_CLANG) || defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_INTEL))
-	static const int CEX_SUPPORTED_COMPILER = 1;
+#	define CEX_SUPPORTED_COMPILER
 #else
-	static const int CEX_SUPPORTED_COMPILER = 0;
+#	error compiler is incompatible with this library!
 #endif
 
 // preprocessor os selection (not all OS's will be supported; targets are win/android/linux/ios)
@@ -154,21 +146,17 @@ static const int CEX_VERSION_RELEASE = 3;
 
 // msc specific
 #if defined(_MSC_VER)
-#	define CEX_MSC_VERSION  (_MSC_VER)
+#	define CEX_MSC_VERSION (_MSC_VER)
 #endif
-#ifdef _MSC_VER
+// integer type converted to a smaller integer type
+#if defined(_MSC_VER)
 #	pragma warning(disable: 4244)
 #endif
 
 // detect endianess
 #define IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
 
-// common functions
-#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x)) 
-#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
-#define GETBITMASK(index, size) (((1 << (size)) - 1) << (index))
-#define READBITSFROM(data, index, size) (((data) & GETBITMASK((index), (size))) >> (index))
-#define WRITEBITSTO(data, index, size, value) ((data) = ((data) & (~GETBITMASK((index), (size)))) | ((value) << (index)))
+// stringify helper
 #define STR_HELPER(x) #x
 #define TOSTRING(x) STR_HELPER(x)
 
@@ -212,10 +200,6 @@ typedef unsigned char byte;
 	typedef unsigned long ulong;
 #endif
 
-// store word size
-const unsigned int WORD_SIZE = sizeof(uint);
-const unsigned int WORD_BITS = WORD_SIZE * 8;
-
 // OS intrinsics flags
 #if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
 #	define CEX_HAS_MINSSE
@@ -244,139 +228,7 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #	define CEX_APPLE_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
-// Need GCC 4.6/Clang 1.7/Apple Clang 2.0 or above due to "GCC diagnostic {push|pop}"
-#if (CEX_GCC_VERSION >= 40600) || (CEX_CLANG_VERSION >= 10700) || (CEX_APPLE_CLANG_VERSION >= 20000)
-#	define CEX_GCC_DIAGNOSTIC_AVAILABLE 1
-#endif
-
-// Clang due to "Inline assembly operands don't work with .intel_syntax", http://llvm.org/bugs/show_bug.cgi?id=24232
-// TODO: supply the upper version when LLVM fixes it. We set it to 20.0 for compilation purposes.
-#if (defined(CEX_CLANG_VERSION) && CEX_CLANG_VERSION <= 200000) || (defined(CEX_APPLE_CLANG_VERSION) && CEX_APPLE_CLANG_VERSION <= 200000)
-#	define CEX_DISABLE_INTEL_ASM 1
-#endif
-
-#if !defined(CEX_L1_CACHE_LINE_SIZE)
-// This should be a lower bound on the L1 cache line size. It's used for defense against timing attacks.
-// Also see http://stackoverflow.com/questions/794632/programmatically-get-the-cache-line-size.
-#	if defined(_M_X64) || defined(__x86_64__) || (__ILP32__ >= 1)
-#		define CEX_L1_CACHE_LINE_SIZE 64
-#	else
-		// L1 cache line size is 32 on Pentium III and earlier
-#		define CEX_L1_CACHE_LINE_SIZE 32
-#	endif
-#endif
-
-// data alignment on msc
-#if defined(_MSC_VER)
-#	if _MSC_VER == 1200
-#		include <malloc.h>
-#	endif
-#	if _MSC_VER > 1200 || defined(_mm_free)
-#		define CEX_MSVC6PP_OR_LATER		// VC 6 processor pack or later
-#	else
-#		define CEX_MSVC6_NO_PP		   // VC 6 without processor pack
-#	endif
-#endif
-
-#if !defined(CEX_ALIGN_DATA)
-#	if defined(CEX_MSVC6PP_OR_LATER)
-#		define CEX_ALIGN_DATA(x) __declspec(align(x))
-#	elif defined(__GNUC__)
-#		define CEX_ALIGN_DATA(x) __attribute__((aligned(x)))
-#	else
-#		define CEX_ALIGN_DATA(x)
-#	endif
-#endif
-
-#if !(CEX_SECTION_ALIGN16)
-#	if defined(__GNUC__) && !defined(__APPLE__)
-		// the alignment attribute doesn't seem to work without this section attribute when -fdata-sections is turned on
-#		define CEX_SECTION_ALIGN16 __attribute__((section ("CEX_Align16")))
-#	else
-#		define CEX_SECTION_ALIGN16
-#	endif
-#endif
-
-// for backwards compatibility: this macro had both meanings
-#if defined(CEX_DISABLE_X86ASM)	
-#	define CEX_DISABLE_ASM
-#	define CEX_DISABLE_SSE2
-#endif
-
-// Apple's Clang prior to 5.0 cannot handle SSE (and Apple does not use LLVM Clang numbering...)
-#if defined(CEX_APPLE_CLANG_VERSION) && (CEX_APPLE_CLANG_VERSION < 50000)
-#	define CEX_DISABLE_ASM
-#endif
-
-#if !defined(CEX_DISABLE_ASM) && (defined(_MSC_VER) && defined(_M_IX86) || (defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))))
-	// C++Builder 2010 does not allow "call label" where label is defined within inline assembly
-#	define CEX_X86_ASM_AVAILABLE
-#	if !defined(CEX_DISABLE_SSE2) && (defined(CEX_MSVC6PP_OR_LATER) || CEX_GCC_VERSION >= 30300 || defined(__SSE2__))
-#		define CEX_BOOL_SSE2_ASM_AVAILABLE 1
-#	else
-#		define CEX_BOOL_SSE2_ASM_AVAILABLE 0
-#	endif
-	// SSE3 was actually introduced in GNU as 2.17, which was released 6/23/2006, but we can't tell what version of binutils is installed.
-	// GCC 4.1.2 was released on 2/13/2007, so we'll use that as a proxy for the binutils version. Also see the output of
-	// gcc -dM -E -march=native - < /dev/null | grep -i SSE` for preprocessor defines available.
-#	if !defined(CEX_DISABLE_SSSE3) && (_MSC_VER >= 1400 || CEX_GCC_VERSION >= 40102 || defined(__SSSE3__) || defined(__SSE3__))
-#		define CEX_BOOL_SSSE3_ASM_AVAILABLE 1
-#	else
-#		define CEX_BOOL_SSSE3_ASM_AVAILABLE 0
-#	endif
-#endif
-
-// x64 asm support
-#if !defined(CEX_DISABLE_ASM) && defined(_MSC_VER) && defined(_M_X64)
-#	define CEX_X64_MASM_AVAILABLE
-#endif
-#if !defined(CEX_DISABLE_ASM) && defined(__GNUC__) && defined(__x86_64__)
-#	define CEX_X64_ASM_AVAILABLE
-#endif
-
-#if !defined(CEX_DISABLE_SSE2) && (defined(CEX_MSVC6PP_OR_LATER) || defined(__SSE2__)) && !defined(_M_ARM)
-#	define CEX_BOOL_SSE2_INTRINSICS_AVAILABLE 1
-#else
-#	define CEX_BOOL_SSE2_INTRINSICS_AVAILABLE 0
-#endif
-
-// Intrinsics availible in GCC 4.3 (http://gcc.gnu.org/gcc-4.3/changes.html) and
-// MSVC 2008 (http://msdn.microsoft.com/en-us/library/bb892950%28v=vs.90%29.aspx)
-#if !defined(CEX_DISABLE_SSE2) && !defined(CEX_DISABLE_SSE4) && (((_MSC_VER >= 1500) && !defined(_M_ARM)) || defined(__SSE4_2__))
-#	define CEX_BOOL_SSE4_INTRINSICS_AVAILABLE 1
-#else
-#	define CEX_BOOL_SSE4_INTRINSICS_AVAILABLE 0
-#endif
-
-#if !defined(CEX_DISABLE_SSSE3) && !defined(CEX_DISABLE_AESNI) && CEX_BOOL_SSE2_INTRINSICS_AVAILABLE && (CEX_GCC_VERSION >= 40400 || _MSC_FULL_VER >= 150030729 || __INTEL_COMPILER >= 1110 || defined(__AES__))
-#	define CEX_BOOL_AESNI_INTRINSICS_AVAILABLE 1
-#else
-#	define CEX_BOOL_AESNI_INTRINSICS_AVAILABLE 0
-#endif
-
-#if CEX_BOOL_SSE2_INTRINSICS_AVAILABLE || CEX_BOOL_SSE2_ASM_AVAILABLE || defined(CEX_X64_MASM_AVAILABLE)
-#	define CEX_BOOL_ALIGN16 1
-#else
-#	define CEX_BOOL_ALIGN16 0
-#endif
-
-// how to allocate 16-byte aligned memory (for SSE)
-#if defined(CEX_MSVC6PP_OR_LATER)
-#		define CEX_MM_MALLOC_AVAILABLE
-#	elif defined(__APPLE__)
-#		define CEX_APPLE_MALLOC_AVAILABLE
-#	elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-#		define CEX_MALLOC_ALIGNMENT_IS_16
-#	elif defined(__linux__) || defined(__sun__) || defined(__CYGWIN__)
-#		define CEX_MEMALIGN_AVAILABLE
-#	else
-#		define CEX_NO_ALIGNED_ALLOC
-#endif
-
-#if CEX_BOOL_AESNI_INTRINSICS_AVAILABLE
-#	define CEX_AESNI_AVAILABLE
-#endif
-
+// intrinsics support level
 #if defined(__SSE2__)
 #	define CEX_HAS_SSE2
 #endif
@@ -398,7 +250,6 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #if defined(__AVX2__)
 #	define CEX_HAS_AVX2
 #endif
-
 #if defined(CEX_HAS_AVX2)
 #if !defined(CEX_HAS_AVX)
 #		define CEX_HAS_AVX
@@ -482,37 +333,19 @@ const unsigned int WORD_BITS = WORD_SIZE * 8;
 #endif
 
 #if !defined(_DEBUG)
-#	define CEX_NODEBUG
+#	define CEX_NO_DEBUG
 #endif
 
-#if !defined(CEX_NODEBUG)
-#   define CEXASSERT(condition, message) \
-    do { \
-        if (! (condition)) { \
-            std::cerr << "Assertion `" #condition "` failed in " << __FILE__	\
-                      << " line " << __LINE__ << ": " << message << std::endl;	\
-            std::terminate(); \
-        } \
-    } while (false)
-#else
-#   define CEXASSERT(condition, message) do { } while (false)
+inline static void CexAssert(bool Condition, const char* Message)
+{
+#if !defined(CEX_NO_DEBUG)
+	if (!Condition)
+	{
+		std::cerr << "Assertion failed in " << __FILE__ << " line " << __LINE__ << ": " << Message << std::endl;
+		std::terminate();
+	} 
 #endif
-
-#if !defined(CEX_NODEBUG)
-#	if defined(__GNUC__)
-#		define CEXSTATICASSERTHELPER(condition, message) \
-		(!!sizeof \ (struct { unsigned int STATIC_ASSERTION__##message: (condition) ? 1 : -1; }))
-#		define CEXASSERTSTATIC(condition, message) \
-		extern int (*assert_function__(void)) [CEXSTATICASSERTHELPER(condition, message)]
-#	else
-#		define CEXASSERTSTATIC(condition, message)   \
-		extern char STATIC_ASSERTION__##message[1]; \
-		extern char STATIC_ASSERTION__##message[(condition)?1:2]
-#	endif
-#else
-#   define CEXASSERTSTATIC(condition, message) do { } while (false)
-#endif
-
+}
 
 //////////////////////////////////////////////////
 //		*** User Configurable Section ***		//

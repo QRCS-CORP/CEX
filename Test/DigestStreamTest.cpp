@@ -19,13 +19,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 

@@ -59,15 +59,15 @@ public:
 		const T VN(5);
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const size_t VULSZE = T::size() / sizeof(uint);
-		std::array<uint, VULSZE> tmpR;
+		const size_t ULVSZE = T::size() / sizeof(uint);
+		std::array<uint, ULVSZE> tmpR;
 		const T NQ(Q);
 		T tmpA, tmpB;
 #else
-		const size_t VULSZE = 1;
+		const size_t ULVSZE = 1;
 #endif
 
-		for (size_t i = 0; i < R.size(); i += VULSZE)
+		for (size_t i = 0; i < R.size(); i += ULVSZE)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -87,7 +87,7 @@ public:
 			VF -= VU;
 			VF.Store(tmpR, 0);
 
-			for (size_t j = 0; j < VULSZE; ++j)
+			for (size_t j = 0; j < ULVSZE; ++j)
 			{
 				R[j + i] = static_cast<ushort>(tmpR[j]);
 			}
@@ -107,7 +107,7 @@ public:
 		uint r;
 		ushort tmp;
 
-		const ushort BITREV[1024] =
+		static const ushort BitrevTable[1024] =
 		{
 			0, 512, 256, 768, 128, 640, 384, 896, 64, 576, 320, 832, 192, 704, 448, 960, 32, 544, 288, 800, 160, 672, 416, 928, 96, 608, 352, 864, 224, 736, 480, 992,
 			16, 528, 272, 784, 144, 656, 400, 912, 80, 592, 336, 848, 208, 720, 464, 976, 48, 560, 304, 816, 176, 688, 432, 944, 112, 624, 368, 880, 240, 752, 496, 1008,
@@ -145,7 +145,7 @@ public:
 
 		for (size_t i = 0; i < P.size(); ++i)
 		{
-			r = BITREV[i];
+			r = BitrevTable[i];
 			if (i < r)
 			{
 				tmp = P[i];
@@ -159,14 +159,14 @@ public:
 	inline static void Mul(Array &R, const Array &Factors, int Q, uint QInv, uint RLog)
 	{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const size_t VULSZE = T::size() / sizeof(uint);
-		std::array<uint, VULSZE> tmpR;
+		const size_t ULVSZE = T::size() / sizeof(uint);
+		std::array<uint, ULVSZE> tmpR;
 		T tmpP, tmpF;
 #else
-		const size_t VULSZE = 1;
+		const size_t ULVSZE = 1;
 #endif
 
-		for (size_t i = 0; i < R.size(); i += VULSZE)
+		for (size_t i = 0; i < R.size(); i += ULVSZE)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -188,7 +188,7 @@ public:
 			a >>= 18;
 			a.Store(tmpR, 0);
 
-			for (size_t j = 0; j < VULSZE; ++j)
+			for (size_t j = 0; j < ULVSZE; ++j)
 			{
 				R[j + i] = static_cast<ushort>(tmpR[j]);
 			}

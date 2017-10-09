@@ -1,0 +1,3 @@
+﻿cl : Command line warning D9025: overriding '/sdl' with '/GS-'
+  Test.cpp
+  Test.vcxproj -> C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Debug\Test.exe

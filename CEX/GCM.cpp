@@ -319,8 +319,8 @@ void GCM::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 
 void GCM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
 
 	if (m_isEncryption)
 	{
@@ -376,8 +376,8 @@ void GCM::CalculateMac()
 
 void GCM::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
 	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
@@ -386,8 +386,8 @@ void GCM::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void GCM::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
 	m_gcmHash->Update(Input, InOffset, m_checkSum, BLOCK_SIZE);
@@ -414,11 +414,18 @@ void GCM::Reset()
 
 void GCM::Scope()
 {
-	if (m_legalKeySizes.size() == 0)
-		m_legalKeySizes = m_cipherMode.LegalKeySizes();
+	std::vector<SymmetricKeySize> keySizes = m_cipherMode.LegalKeySizes();
+	m_legalKeySizes.resize(keySizes.size());
+
+	for (size_t i = 0; i < m_legalKeySizes.size(); i++)
+	{	
+		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), keySizes[i].NonceSize(), keySizes[i].NonceSize());
+	}
 
 	if (!m_cipherMode.ParallelProfile().IsDefault())
+	{
 		m_cipherMode.ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_cipherMode.ParallelProfile().ParallelBlockSize(), m_cipherMode.ParallelProfile().ParallelMaxDegree());
+	}
 }
 
 NAMESPACE_MODEEND

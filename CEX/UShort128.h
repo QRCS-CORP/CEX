@@ -201,7 +201,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	inline void RotL16(const int Shift)
 	{
-		CEXASSERT(Shift <= 16, "Shift size is too large");
+		CexAssert(Shift <= 16, "Shift size is too large");
 		xmm = _mm_or_si128(_mm_slli_epi16(xmm, static_cast<int>(Shift)), _mm_srli_epi16(xmm, static_cast<int>(16 - Shift)));
 	}
 
@@ -215,7 +215,7 @@ public:
 	/// <returns>The rotated UShort128</returns>
 	inline static UShort128 RotL16(const UShort128 &Value, const int Shift)
 	{
-		CEXASSERT(Shift <= 16, "Shift size is too large");
+		CexAssert(Shift <= 16, "Shift size is too large");
 		return UShort128(_mm_or_si128(_mm_slli_epi16(Value.xmm, static_cast<int>(Shift)), _mm_srli_epi16(Value.xmm, static_cast<int>(16 - Shift))));
 	}
 
@@ -226,7 +226,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 16</param>
 	inline void RotR16(const int Shift)
 	{
-		CEXASSERT(Shift <= 16, "Shift size is too large");
+		CexAssert(Shift <= 16, "Shift size is too large");
 		RotL16(16 - Shift);
 	}
 
@@ -240,7 +240,7 @@ public:
 	/// <returns>The rotated UShort128</returns>
 	inline static UShort128 RotR16(const UShort128 &Value, const int Shift)
 	{
-		CEXASSERT(Shift <= 16, "Shift size is too large");
+		CexAssert(Shift <= 16, "Shift size is too large");
 		return RotL16(Value, 16 - Shift);
 	}
 
@@ -438,7 +438,7 @@ public:
 		std::array<ushort, 8> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
 
 		return UShort128(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4], tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 	}
@@ -454,7 +454,7 @@ public:
 		std::array<ushort, 8> tmpB;
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpA[0]), xmm);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&tmpB[0]), X.xmm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
+		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0, "Division by zero");
 
 		xmm = _mm_set_epi16(tmpA[7] / tmpB[7], tmpA[6] / tmpB[6], tmpA[5] / tmpB[5], tmpA[4] / tmpB[4], tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 	}

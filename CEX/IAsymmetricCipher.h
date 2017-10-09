@@ -21,6 +21,7 @@
 
 #include "CexDomain.h"
 #include "CryptoAsymmetricException.h"
+#include "CryptoAuthenticationFailure.h"
 #include "Digests.h"
 #include "IAsymmetricKey.h"
 #include "IAsymmetricKeyPair.h"
@@ -32,6 +33,7 @@ NAMESPACE_ASYMMETRIC
 
 using Enumeration::AsymmetricEngines;
 using Exception::CryptoAsymmetricException;
+using Exception::CryptoAuthenticationFailure;
 using Key::Asymmetric::IAsymmetricKey;
 using Key::Asymmetric::IAsymmetricKeyPair;
 using Digest::IDigest;
@@ -56,7 +58,7 @@ public:
 	/// <summary>
 	/// Finalizer
 	/// </summary>
-	virtual ~IAsymmetricCipher() {}
+	virtual ~IAsymmetricCipher() noexcept {}
 
 	//~~~Properties~~~//
 
@@ -93,7 +95,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="CipherText">The input cipher-text</param>
-	virtual std::vector<byte> Decrypt(std::vector<byte> &CipherText) = 0;
+	virtual std::vector<byte> Decrypt(const std::vector<byte> &CipherText) = 0;
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
@@ -105,7 +107,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Message">The shared secret array</param>
-	virtual std::vector<byte> Encrypt(std::vector<byte> &Message) = 0;
+	virtual std::vector<byte> Encrypt(const std::vector<byte> &Message) = 0;
 
 	/// <summary>
 	/// Generate a public/private key-pair

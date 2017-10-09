@@ -1,0 +1,6 @@
+
+#include "gf2m_small_m.h"
+
+NAMESPACE_MCELIECE
+
+NAMESPACE_MCELIECEEND

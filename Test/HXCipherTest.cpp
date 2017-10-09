@@ -54,13 +54,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -91,12 +91,18 @@ namespace Test
 		};
 		HexConverter::Decode(thxEncoded, 3, m_thxExpected);
 
-		for (unsigned int i = 0; i < m_key.size(); i++)
-			m_key[i] = (byte)i;
-		for (unsigned int i = 0; i < m_key2.size(); i++)
-			m_key2[i] = (byte)i;
-		for (unsigned int i = 0; i < m_iv.size(); i++)
-			m_iv[i] = (byte)i;
+		for (byte i = 0; i < m_key.size(); i++)
+		{
+			m_key[i] = i;
+		}
+		for (byte i = 0; i < m_key2.size(); i++)
+		{
+			m_key2[i] = i;
+		}
+		for (byte i = 0; i < m_iv.size(); i++)
+		{
+			m_iv[i] = i;
+		}
 	}
 
 	void HXCipherTest::OnProgress(std::string Data)
@@ -121,26 +127,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_rhxExpected[0])
+			{
 				throw TestException("AHX: Failed encryption test!");
+			}
 
 			cipher.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("AHX: Failed decryption test!");
+			}
 		}
 		// AHX, 22 rounds
 		{
@@ -150,26 +160,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_rhxExpected[1])
+			{
 				throw TestException("AHX: Failed encryption test!");
+			}
 
 			cipher.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("AHX: Failed decryption test!");
+			}
 		}
 
 		// AHX, 22 rounds, standard key schedule
@@ -179,26 +193,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			cipher.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_rhxExpected[2])
+			{
 				throw TestException("AHX: Failed encryption test!");
+			}
 
 			cipher.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("AHX: Failed decryption test!");
+			}
 		}
 	}
 #endif
@@ -217,25 +235,29 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 			if (outBytes != m_rhxExpected[0])
+			{
 				throw TestException("RHX: Failed encryption test!");
+			}
 
 			cipher.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("RHX: Failed decryption test!");
+			}
 		}
 		// RHX, 22 rounds
 		{
@@ -245,26 +267,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			cipher.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_rhxExpected[1])
+			{
 				throw TestException("RHX: Failed encryption test!");
+			}
 
 			cipher.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("RHX: Failed decryption test!");
+			}
 		}
 
 		// RHX, 22 rounds, standard key schedule
@@ -274,26 +300,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			cipher.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_rhxExpected[2])
+			{
 				throw TestException("RHX: Failed encryption test!");
+			}
 
 			cipher.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("RHX: Failed decryption test!");
+			}
 		}
 	}
 
@@ -311,26 +341,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_shxExpected[0])
+			{
 				throw TestException("SHX: Failed encryption test!");
+			}
 
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("SHX: Failed decryption test!");
+			}
 		}
 		// SHX, 40 rounds
 		{
@@ -340,26 +374,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_shxExpected[1])
+			{
 				throw TestException("SHX: Failed encryption test!");
+			}
 
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("SHX: Failed decryption test!");
+			}
 		}
 		// SHX, 32 rounds, standard key schedule
 		{
@@ -368,26 +406,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_shxExpected[2])
+			{
 				throw TestException("SHX: Failed encryption test!");
+			}
 
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("SHX: Failed decryption test!");
+			}
 		}
 	}
 
@@ -405,26 +447,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_thxExpected[0])
+			{
 				throw TestException("THX: Failed encryption test!");
+			}
 
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("THX: Failed decryption test!");
+			}
 		}
 		// THX, 20 rounds
 		{
@@ -434,26 +480,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key, m_iv);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_thxExpected[1])
+			{
 				throw TestException("THX: Failed encryption test!");
+			}
 
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("THX: Failed decryption test!");
+			}
 		}
 		// THX, 20 rounds, standard key schedule
 		{
@@ -462,26 +512,30 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
+				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
 			}
 
 			if (outBytes != m_thxExpected[2])
+			{
 				throw TestException("THX: Failed encryption test!");
+			}
 
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 100; i++)
+			for (size_t i = 0; i != 100; i++)
 			{
 				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
+				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
 			}
 			delete eng;
 
 			if (outBytes != decBytes)
+			{
 				throw TestException("THX: Failed decryption test!");
+			}
 		}
 	}
 }

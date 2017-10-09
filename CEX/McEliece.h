@@ -111,23 +111,20 @@ class McEliece final : public IAsymmetricCipher
 private:
 
 	static const std::string CLASS_NAME;
-	static const size_t NONCE_SIZE = 16;
 	static const size_t TAG_SIZE = 16;
 
+	std::unique_ptr<IAeadMode> m_cprMode;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isEncryption;
-	bool m_isExtended;
 	bool m_isInitialized;
-	IAeadMode* m_cprMode;
-	IAsymmetricKeyPair* m_keyPair;
-	IDigest* m_msgDigest;
+	MPKCParamSet m_paramSet;
 	std::vector<byte> m_keyTag;
 	MPKCParams m_mpkcParameters;
-	MPKCParamSet m_paramSet;
-	MPKCPrivateKey* m_privateKey;
-	MPKCPublicKey* m_publicKey;
-	IPrng* m_rndGenerator;
+	std::unique_ptr<IDigest> m_msgDigest;
+	std::unique_ptr<MPKCPrivateKey> m_privateKey;
+	std::unique_ptr<MPKCPublicKey> m_publicKey;
+	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
 
@@ -180,9 +177,9 @@ public:
 	/// Instantiate the cipher with auto-initialized prng and digest functions
 	/// </summary>
 	///
-	/// <param name="Parameters">The cipher parameter enumeration name</param>
-	/// <param name="PrngType">The Prng function type</param>
-	/// <param name="DigestType">The digest function type</param>
+	/// <param name="Parameters">The parameter set enumeration name</param>
+	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
+	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
 	explicit McEliece(MPKCParams Parameters, Prngs PrngType = Prngs::BCR, BlockCiphers CipherType = BlockCiphers::Rijndael);
 
@@ -190,9 +187,9 @@ public:
 	/// Instantiate this class using external Prng and Digest instances
 	/// </summary>
 	///
-	/// <param name="Parameters">The ciphers parameter settings type</param>
-	/// <param name="Prng">A pointer to the Prng function</param>
-	/// <param name="Digest">A pointer to the digest function</param>
+	/// <param name="Parameters">The parameter set enumeration name</param>
+	/// <param name="Prng">A pointer to the seed Prng function</param>
+	/// <param name="Cipher">A pointer to the authentication block cipher</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
 	McEliece(MPKCParams Parameters, IPrng* Prng, IBlockCipher* Cipher);
 
@@ -210,7 +207,9 @@ public:
 	/// <param name="Message">The input cipher-text</param>
 	/// 
 	/// <returns>The decrypted message</returns>
-	std::vector<byte> Decrypt(std::vector<byte> &CipherText) override;
+	///
+	/// <exception cref="Exception::CryptoAuthenticationFailure">Thrown if the message has failed authentication</exception>
+	std::vector<byte> Decrypt(const std::vector<byte> &CipherText) override;
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
@@ -224,7 +223,7 @@ public:
 	/// <param name="Message">The shared secret array</param>
 	/// 
 	/// <returns>The encrypted message</returns>
-	std::vector<byte> Encrypt(std::vector<byte> &Message) override;
+	std::vector<byte> Encrypt(const std::vector<byte> &Message) override;
 
 	/// <summary>
 	/// Generate a public/private key-pair
@@ -243,8 +242,8 @@ public:
 
 private:
 
-	int MPKCDecrypt(std::vector<byte> &Message, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey);
-	int MPKCEncrypt(std::vector<byte> &CipherText, const std::vector<byte> &Message, const std::vector<byte> &PublicKey, Prng::IPrng* Random);
+	bool MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message);
+	void MPKCEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText);
 	void Scope();
 };
 

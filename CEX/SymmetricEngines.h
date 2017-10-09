@@ -15,29 +15,41 @@ enum class SymmetricEngines : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An AES-NI block cipher implementation with optional HKDF key expansion
+	/// An implementation based on the Rijndael Block Cipher
 	/// </summary>
-	AHX = 1,
+	Rijndael = 1,
 	/// <summary>
-	/// An implementation based on the Rijndael block cipher with optional HKDF key expansion
+	/// An implementation based on the Serpent Block Cipher
 	/// </summary>
-	RHX = 2,
+	Serpent = 2,
 	/// <summary>
-	/// The Serpent block cipher with optional HKDF key expansion
+	/// An implementation based on the Twofish Block Cipher
 	/// </summary>
-	SHX = 4,
+	Twofish = 3,
 	/// <summary>
-	/// A Twofish Block Cipher with optional HKDF key expansion
+	/// An AES-NI implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF key schedule
 	/// </summary>
-	THX = 8,
+	AHX = 32,
+	/// <summary>
+	/// An implementation based on the Rijndael Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	RHX = 33,
+	/// <summary>
+	/// An implementation based on the Serpent Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	SHX = 34,
+	/// <summary>
+	/// An implementation based on the Twofish Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	THX = 35,
 	/// <summary>
 	/// An implementation of the ChaCha stream cipher
 	/// </summary>
-	ChaCha20 = 16,
+	ChaCha20 = 64,
 	/// <summary>
 	/// An implementation of the Salsa stream cipher
 	/// </summary>
-	Salsa = 32
+	Salsa = 65
 };
 
 NAMESPACE_ENUMERATIONEND

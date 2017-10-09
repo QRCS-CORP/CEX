@@ -44,6 +44,7 @@ public:
 
 	static const size_t M = 12;
 	static const size_t T = 62; 
+	static const ulong ButterflyConsts[63][12];
 
 private:
 
@@ -52,7 +53,6 @@ private:
 	static const size_t IRR_SIZE = (M * 8);
 	static const size_t CND_SIZE = ((PKN_ROWS - 8) * 8);
 	static const size_t GEN_MAXR = 10000;
-	static const ulong ButterflyConsts[63][12];
 
 public:
 
@@ -60,11 +60,11 @@ public:
 	static const size_t PRIKEY_SIZE = CND_SIZE + IRR_SIZE;
 	static const size_t PUBKEY_SIZE = (PKN_ROWS * ((64 - M) * 8)) + (PKN_ROWS * (8 - ((PKN_ROWS & 63) >> 3)));
 
-	static int Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S);
+	static bool Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S);
 
-	static void Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, IPrng* Random);
+	static void Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Random);
 
-	static int Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, IPrng* Random);
+	static bool Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Random);
 
 private:
 
@@ -82,7 +82,7 @@ private:
 
 	//~~~Encrypt~~~//
 
-	static void GenE(std::vector<byte> &E, IPrng* Random);
+	static void GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Random);
 
 	static void Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E);
 
@@ -90,7 +90,7 @@ private:
 
 	static int IrrGen(std::array<ushort, T + 1> &Output, std::vector<ushort> &F);
 
-	static void SkGen(std::vector<byte> &PrivateKey, Prng::IPrng* Random);
+	static void SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Random);
 
 	static int PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey);
 

@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// Finalizer
 	/// </summary>
-	virtual ~IAsymmetricKeyPair() {}
+	virtual ~IAsymmetricKeyPair() noexcept {}
 
 	//~~~Properties~~~//
 

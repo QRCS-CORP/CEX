@@ -40,19 +40,16 @@ namespace Test
 			CompareVector(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
 			CompareVector(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
 			OnProgress(std::string("SalsaTest: Passed 256 bit key vector tests.."));
-			// TODO: failing on i3
-			//CompareParallel();
-			//OnProgress(std::string("SalsaTest: Passed parallel/linear equality tests.."));
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -85,7 +82,9 @@ namespace Test
 		cipher2.Transform(data, 0, enc2, 0, data.size());
 
 		if (enc != enc2)
+		{
 			throw TestException("Salsa20: Encrypted arrays are not equal!");
+		}
 
 		// decrypt linear
 		cipher2.Initialize(k);
@@ -99,9 +98,13 @@ namespace Test
 		cipher.Transform(enc2, 0, dec2, 0, enc2.size());
 
 		if (dec != data)
+		{
 			throw TestException("Salsa20: Decrypted arrays are not equal!");
+		}
 		if (dec != dec2)
+		{
 			throw TestException("Salsa20: Decrypted arrays are not equal!");
+		}
 	}
 
 	void SalsaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -113,16 +116,22 @@ namespace Test
 		cipher.Transform(Input, 0, outBytes, 0, Input.size());
 
 		if (outBytes != Output)
+		{
 			throw TestException("Salsa20: Encrypted arrays are not equal!");
+		}
 
 		if (!Test::TestUtils::IsEqual(outBytes, Output))
+		{
 			throw TestException("Salsa20: Encrypted arrays are not equal!");
+		}
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, 0, outBytes, 0, Output.size());
 
 		if (!Test::TestUtils::IsEqual(outBytes, Input))
+		{
 			throw TestException("Salsa20: Decrypted arrays are not equal!");
+		}
 	}
 
 	void SalsaTest::Initialize()

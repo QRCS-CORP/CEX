@@ -67,9 +67,6 @@ CJP::CJP()
 	m_stirPool(true),
 	m_stuckTest(1)
 {
-	if (CEX_SUPPORTED_COMPILER != 1)
-		throw CryptoRandomException("CJP:Ctor", "This RNG is not supported by your compiler!");
-
 	m_isAvailable = TimerCheck();
 
 	if (m_isAvailable)
@@ -128,7 +125,7 @@ void CJP::GetBytes(std::vector<byte> &Output)
 
 void CJP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CEXASSERT(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
 		throw CryptoRandomException("CJP:GetBytes", "High resolution timer not available or too coarse for RNG!");
@@ -187,7 +184,7 @@ void CJP::AccessMemory()
 	{
 		tmpState = m_memState + m_memPosition;
 		// memory access; just add 1 to one byte, wrap at 255; memory access implies read from and write to memory location
-		*tmpState = (*tmpState + 1) & 0xff;
+		*tmpState = (*tmpState + 1) & 0xFF;
 		// addition of memBlockSize - 1 to pointer with wrap around logic to ensure that every memory location is hit evenly
 		m_memPosition = m_memPosition + m_memBlockSize - 1;
 		m_memPosition = m_memPosition % WRPSZE;
@@ -426,8 +423,8 @@ void CJP::StirPool()
 	// it reverses as expected. But this really does not matter as we do not rely on the specific numbers. 
 	// We just pick the SHA-1 constants as they have a good mix of bit set and unset.
 	constant.u32[1] = 0x67452301;
-	constant.u32[0] = 0xefcdab89;
-	mixer.u32[1] = 0x98badcfe;
+	constant.u32[0] = 0xEFCDAB89;
+	mixer.u32[1] = 0x98BADCFE;
 	mixer.u32[0] = 0x10325476;
 
 	for (size_t i = 0; i < DATA_SIZE_BITS; ++i)

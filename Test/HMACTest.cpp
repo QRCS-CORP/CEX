@@ -55,13 +55,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -75,7 +75,7 @@ namespace Test
 		mac.Initialize(kp);
 
 		std::vector<byte> input(256);
-		for (unsigned int i = 0; i < input.size(); ++i)
+		for (size_t i = 0; i < input.size(); ++i)
 			input[i] = (byte)i;
 
 		mac.Compute(input, hash1);
@@ -107,7 +107,7 @@ namespace Test
 		{
 			std::vector<byte> tmph;
 			tmph.resize(Expected.size(), 0);
-			memcpy(&tmph[0], &hash[0], Expected.size());
+			std::memcpy(&tmph[0], &hash[0], Expected.size());
 
 			if (Expected != tmph)
 				throw TestException("HMACTest: return code is not equal!");
@@ -135,7 +135,7 @@ namespace Test
 		{
 			std::vector<byte> tmph;
 			tmph.resize(Expected.size(), 0);
-			memcpy(&tmph[0], &hash[0], Expected.size());
+			std::memcpy(&tmph[0], &hash[0], Expected.size());
 
 			if (Expected != tmph)
 				throw TestException("HMACTest: return code is not equal!");

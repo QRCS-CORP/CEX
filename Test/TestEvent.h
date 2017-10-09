@@ -20,7 +20,7 @@ namespace Test
 
 		void operator -= (ListenerType* Listener)
 		{
-			for (unsigned int i = 0; i < _listeners.size(); i++)
+			for (size_t i = 0; i < _listeners.size(); i++)
 			{
 				if (_listeners[i] == Listener)
 				{

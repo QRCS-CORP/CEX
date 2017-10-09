@@ -80,7 +80,7 @@ namespace Test
 		{
 			int vct = Input[i];
 			Output[counter++] = encTable[vct >> 4];
-			Output[counter++] = encTable[vct & 0xf];
+			Output[counter++] = encTable[vct & 0xF];
 		}
 	}
 

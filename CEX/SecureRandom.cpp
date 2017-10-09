@@ -49,7 +49,7 @@ void SecureRandom::Destroy()
 
 void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
-	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(ushort);
 	std::vector<byte> buf(bufLen);
@@ -59,7 +59,7 @@ void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Eleme
 
 void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
-	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(uint);
 	std::vector<byte> buf(bufLen);
@@ -69,7 +69,7 @@ void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Element
 
 void SecureRandom::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
 {
-	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(ulong);
 	std::vector<byte> buf(bufLen);
@@ -160,7 +160,7 @@ short SecureRandom::NextInt16(short Maximum)
 
 short SecureRandom::NextInt16(short Maximum, short Minimum)
 {
-	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	short num = 0;
 	while ((num = NextInt16(Maximum)) < Minimum) {}
@@ -174,7 +174,7 @@ ushort SecureRandom::NextUInt16()
 
 ushort SecureRandom::NextUInt16(ushort Maximum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum != 0, "maximum can not be zero");
 
 	ushort num;
 
@@ -189,7 +189,7 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 
 ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 {
-	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	ushort num = 0;
 	while ((num = NextUInt16(Maximum)) < Minimum) {}
@@ -221,7 +221,7 @@ int SecureRandom::NextInt32(int Maximum)
 
 int SecureRandom::NextInt32(int Maximum, int Minimum)
 {
-	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	int num = 0;
 	while ((num = NextInt32(Maximum)) < Minimum) {}
@@ -235,7 +235,7 @@ uint SecureRandom::NextUInt32()
 
 uint SecureRandom::NextUInt32(uint Maximum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum != 0, "maximum can not be zero");
 
 	uint num;
 
@@ -250,7 +250,7 @@ uint SecureRandom::NextUInt32(uint Maximum)
 
 uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 {
-	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	uint num = 0;
 	while ((num = NextUInt32(Maximum)) < Minimum) {}
@@ -282,7 +282,7 @@ long SecureRandom::NextInt64(long Maximum)
 
 long SecureRandom::NextInt64(long Maximum, long Minimum)
 {
-	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	long num = 0;
 	while ((num = NextInt64(Maximum)) < Minimum) {}
@@ -296,7 +296,7 @@ ulong SecureRandom::NextUInt64()
 
 ulong SecureRandom::NextUInt64(ulong Maximum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum != 0, "maximum can not be zero");
 
 	ulong num;
 
@@ -311,7 +311,7 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 
 ulong SecureRandom::NextUInt64(ulong Maximum, ulong Minimum)
 {
-	CEXASSERT(Maximum > Minimum, "maximum must be more than minimum");
+	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	ulong num = 0;
 	while ((num = NextUInt64(Maximum)) < Minimum) {}

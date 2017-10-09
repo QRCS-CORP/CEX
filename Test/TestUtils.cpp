@@ -44,7 +44,7 @@ namespace Test
 
 	void TestUtils::CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length)
 	{
-		memcpy(&DstArray[DstIndex], &SrcArray[SrcIndex], Length * sizeof(SrcArray[SrcIndex]));
+		std::memcpy(&DstArray[DstIndex], &SrcArray[SrcIndex], Length * sizeof(SrcArray[SrcIndex]));
 	}
 
 	bool TestUtils::IsEqual(std::vector<byte> &A, std::vector<byte> &B)
@@ -181,8 +181,12 @@ namespace Test
 		// obtained chi-square value
 		// degrees of freedom
 		double x = Ax;
-		double a, y, s;
-		double e, c, z;
+		double a; 
+		double s;
+		double e;
+		double c;
+		double z;
+		double y = 0;
 		// true if df is an even number
 		int even;
 
@@ -265,10 +269,10 @@ namespace Test
 
 	std::vector<byte> TestUtils::Reduce(std::vector<byte> Seed)
 	{
-		unsigned int len = (unsigned int)(Seed.size() / 2);
+		size_t len = Seed.size() / 2;
 		std::vector<byte> data(len);
 
-		for (unsigned int i = 0; i < len; i++)
+		for (size_t i = 0; i < len; i++)
 			data[i] = (byte)(Seed[i] ^ Seed[len + i]);
 
 		return data;

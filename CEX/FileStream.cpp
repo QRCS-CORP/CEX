@@ -119,7 +119,7 @@ void FileStream::Close()
 
 void FileStream::CopyTo(IByteStream* Destination)
 {
-	CEXASSERT(m_fileSize != 0, "stream is too short");
+	CexAssert(m_fileSize != 0, "stream is too short");
 
 	Destination->Seek(0, IO::SeekOrigin::Begin);
 
@@ -180,7 +180,7 @@ ulong FileStream::FileSize(const std::string &FileName)
 
 void FileStream::Flush()
 {
-	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
+	CexAssert(m_fileAccess != FileAccess::Read, "File is read only");
 
 	if (m_fileStream && m_fileWritten != 0)
 		m_fileStream.flush();
@@ -188,7 +188,7 @@ void FileStream::Flush()
 
 size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
+	CexAssert(m_fileAccess != FileAccess::Write, "File is write only");
 
 	if (Offset + Length > m_fileSize - m_filePosition)
 		Length = m_fileSize - m_filePosition;
@@ -205,8 +205,8 @@ size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 byte FileStream::ReadByte()
 {
-	CEXASSERT(m_fileSize - m_filePosition >= 1, "Reached end of file");
-	CEXASSERT(m_fileAccess != FileAccess::Write, "File is write only");
+	CexAssert(m_fileSize - m_filePosition >= 1, "Reached end of file");
+	CexAssert(m_fileAccess != FileAccess::Write, "File is write only");
 
 	byte data(1);
 	m_fileStream.read((char*)&data, 1);
@@ -235,7 +235,7 @@ void FileStream::Seek(ulong Offset, SeekOrigin Origin)
 
 void FileStream::SetLength(ulong Length)
 {
-	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
+	CexAssert(m_fileAccess != FileAccess::Read, "File is read only");
 
 	if (Length < m_fileSize)
 	{
@@ -261,7 +261,7 @@ void FileStream::SetLength(ulong Length)
 
 void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
+	CexAssert(m_fileAccess != FileAccess::Read, "File is read only");
 
 	m_fileStream.write((char*)&Input[Offset], Length);
 	m_filePosition += Length;
@@ -277,7 +277,7 @@ void FileStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Len
 
 void FileStream::WriteByte(byte Value)
 {
-	CEXASSERT(m_fileAccess != FileAccess::Read, "File is read only");
+	CexAssert(m_fileAccess != FileAccess::Read, "File is read only");
 
 	m_fileStream.write((char*)&Value, 1);
 	m_filePosition++;

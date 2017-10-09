@@ -71,7 +71,7 @@ public:
 	T ReadInt()
 	{
 		const size_t VALSZE = sizeof(T);
-		CEXASSERT(m_streamData.Position() + VALSZE <= m_streamData.Length(), "Stream length exceeded");
+		CexAssert(m_streamData.Position() + VALSZE <= m_streamData.Length(), "Stream length exceeded");
 		T val = 0;
 		Utility::MemUtils::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, sizeof(val));
 		m_streamData.Seek(m_streamData.Position() + VALSZE, SeekOrigin::Begin);

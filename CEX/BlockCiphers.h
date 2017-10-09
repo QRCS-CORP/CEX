@@ -7,6 +7,7 @@ NAMESPACE_ENUMERATION
 
 /// <summary>
 /// Symmetric block cipher enmumeration names
+/// <para>Note: HX ciphers are always ordinally higher in value than standard ciphers.</para>
 /// </summary>
 enum class BlockCiphers : byte
 {
@@ -15,33 +16,35 @@ enum class BlockCiphers : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An AES-NI implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF key schedule
-	/// </summary>
-	AHX = 1,
-	/// <summary>
 	/// An implementation based on the Rijndael Block Cipher
 	/// </summary>
-	Rijndael = 2,
-	/// <summary>
-	/// An implementation based on the Rijndael Block Cipher extended with an HKDF key schedule
-	/// </summary>
-	RHX = 4,
+	Rijndael = 1,
 	/// <summary>
 	/// An implementation based on the Serpent Block Cipher
 	/// </summary>
-	Serpent = 8,
-	/// <summary>
-	/// An implementation based on the Serpent Block Cipher extended with an HKDF key schedule
-	/// </summary>
-	SHX = 16,
+	Serpent = 2,
 	/// <summary>
 	/// An implementation based on the Twofish Block Cipher
 	/// </summary>
-	Twofish = 32,
+	Twofish = 3,
+	/// <summary>
+	/// An AES-NI implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	AHX = 32,
+	/// <summary>
+	/// An implementation based on the Rijndael Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	RHX = 33,
+	/// <summary>
+	/// An implementation based on the Serpent Block Cipher extended with an HKDF key schedule
+	/// </summary>
+	SHX = 34,
 	/// <summary>
 	/// An implementation based on the Twofish Block Cipher extended with an HKDF key schedule
 	/// </summary>
-	THX = 64
+	THX = 35
+
+
 };
 
 NAMESPACE_ENUMERATIONEND

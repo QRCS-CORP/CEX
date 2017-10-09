@@ -20,7 +20,6 @@
 #define CEX_FFTQ12289N1024_H
 
 #include "CexDomain.h"
-#include "IDigest.h"
 #include "IPrng.h"
 
 NAMESPACE_RINGLWE
@@ -85,15 +84,14 @@ public:
 
 	//~~~Public Functions~~~//
 
-	static void KeyGen(std::vector<byte> &PubKey, std::vector<ushort> &PriKey, Prng::IPrng* Rng, bool Parallel);
-	static void SharedA(std::vector<byte> &Secret, const std::vector<ushort> &PriKey, const std::vector<byte> &Received, Digest::IDigest* Digest);
-	static void SharedB(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, Prng::IPrng *Rng, Digest::IDigest* Digest, bool Parallel);
+	static void Decrypt(std::vector<byte> &Secret, const std::vector<ushort> &PriKey, const std::vector<byte> &Received);
+	static void Encrypt(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel);
+	static void Generate(std::vector<byte> &PubKey, std::vector<ushort> &PriKey, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel);
 
 private:
 
 	static const uint QINV = 12287;
 	static const uint RLOG = 18;
-	static const std::vector<ushort> BitrevTable;
 	static const ushort OmegasMontgomery[512];
 	static const ushort OmegasInvMontgomery[512];
 	static const ushort PsisBitrevMontgomery[1024];
@@ -262,24 +260,22 @@ private:
 	{
 		Vector tmpA, tmpB, tmpR;
 		const Vector AIBMASK(0x01010101);
-		const Vector BITMASK(0xff);
+		const Vector BITMASK(0xFF);
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 		const Vector NQ(Q);
-		const size_t VULSZE = Vector::size() / sizeof(uint);
-		std::vector<uint> tmpU(VULSZE);
+		const size_t ULVSZE = Vector::size() / sizeof(uint);
+		std::vector<uint> tmpU(ULVSZE);
 #else
-		const size_t VULSZE = 1;
+		const size_t ULVSZE = 1;
 #endif
 
-		uint* tmpRnd = (uint*)Random.data();
-
-		for (size_t i = 0; i < R.size(); i += VULSZE)
+		for (size_t i = 0; i < R.size(); i += ULVSZE)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-			tmpR.Load(tmpRnd, i);
+			tmpR.Load(Random, i);
 #else
-			tmpR = tmpRnd[i];
+			tmpR = Random[i];
 #endif
 			Vector d(0);
 
@@ -295,7 +291,7 @@ private:
 			Vector vR(tmpA + NQ - tmpB);
 			vR.Store(tmpU, 0);
 
-			for (size_t j = 0; j < VULSZE; ++j)
+			for (size_t j = 0; j < ULVSZE; ++j)
 			{
 				R[j + i] = static_cast<ushort>(tmpU[j]);
 			}
@@ -315,7 +311,7 @@ private:
 		const Vector N3(3);
 		const Vector N4(4);
 		const Vector N8(8);
-		const size_t VULSZE = Vector::size() / sizeof(uint);
+		const size_t ULVSZE = Vector::size() / sizeof(uint);
 
 		Vector tmpK, tmpR;
 		Vector c0, c1, c2, c3;
@@ -323,9 +319,9 @@ private:
 		std::array<Vector, 4> v0;
 		std::array<Vector, 4> v1;
 		std::array<Vector, 4> tmpV;
-		std::vector<int> tmpC(VULSZE * 4);
+		std::vector<int> tmpC(ULVSZE * 4);
 
-		for (size_t i = 0; i < V.size() / 4; i += VULSZE)
+		for (size_t i = 0; i < V.size() / 4; i += ULVSZE)
 		{
 #	if defined(__AVX512__)
 			tmpR.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1),
@@ -361,16 +357,16 @@ private:
 			c3 = (Vector::Negate(tmpK) + N2 * tmpV[3]) & N3;
 
 			c0.Store(tmpC, 0);
-			c1.Store(tmpC, VULSZE);
-			c2.Store(tmpC, VULSZE * 2);
-			c3.Store(tmpC, VULSZE * 3);
+			c1.Store(tmpC, ULVSZE);
+			c2.Store(tmpC, ULVSZE * 2);
+			c3.Store(tmpC, ULVSZE * 3);
 
-			for (uint j = (uint)tmpC.size() - 1, k = 0; k < VULSZE; --j, ++k)
+			for (uint j = (uint)tmpC.size() - 1, k = 0; k < ULVSZE; --j, ++k)
 			{
 				C[i + k + 768] = static_cast<ushort>(tmpC[j]);
-				C[i + k + 512] = static_cast<ushort>(tmpC[j - VULSZE]);
-				C[i + k + 256] = static_cast<ushort>(tmpC[j - (VULSZE * 2)]);
-				C[i + k] = static_cast<ushort>(tmpC[j - (VULSZE * 3)]);
+				C[i + k + 512] = static_cast<ushort>(tmpC[j - ULVSZE]);
+				C[i + k + 256] = static_cast<ushort>(tmpC[j - (ULVSZE * 2)]);
+				C[i + k] = static_cast<ushort>(tmpC[j - (ULVSZE * 3)]);
 			}
 		}
 
@@ -481,14 +477,14 @@ private:
 		const Vector N2(2);
 		const Vector N8(8);
 		const Vector N16(16);
-		const size_t VULSZE = Vector::size() / sizeof(uint);
+		const size_t ULVSZE = Vector::size() / sizeof(uint);
 
 		Vector c0, c1, c2, c3;
 		Vector v0, v1, v2, v3;
 		std::array<Vector, 4> tmpV;
-		std::vector<uint> tmpK(VULSZE);
+		std::vector<uint> tmpK(ULVSZE);
 
-		for (size_t i = 0; i < V.size() / 4; i += VULSZE)
+		for (size_t i = 0; i < V.size() / 4; i += ULVSZE)
 		{
 			c0.LoadUL(C, i);
 			c1.LoadUL(C, 256 + i);
@@ -509,7 +505,7 @@ private:
 
 			K.Store(tmpK, 0);
 
-			for (size_t j = VULSZE, k = 0; j > 0; --j, ++k)
+			for (size_t j = ULVSZE, k = 0; j > 0; --j, ++k)
 			{
 				Key[((i + k) >> 3)] |= (byte)(tmpK[j - 1] << ((i + k) & 7));
 			}

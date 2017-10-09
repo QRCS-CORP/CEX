@@ -67,7 +67,7 @@ void RDP::GetBytes(std::vector<byte> &Output)
 
 void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CEXASSERT(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
 		throw CryptoRandomException("RDP:GetBytes", "Random provider is not available!");

@@ -70,6 +70,12 @@ class SysUtils
 {
 private:
 
+	// library version info
+	static const int CEX_VERSION_MAJOR = 1; // A4 series
+	static const int CEX_VERSION_MINOR = 0;
+	static const int CEX_VERSION_PATCH = 0;
+	static const int CEX_VERSION_RELEASE = 4;
+
 	static bool TMR_RDTSC;
 
 public:

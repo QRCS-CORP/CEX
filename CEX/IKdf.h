@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~IKdf() {}
+	virtual ~IKdf() noexcept {}
 
 	//~~~Properties~~~//
 

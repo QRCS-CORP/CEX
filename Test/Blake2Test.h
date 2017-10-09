@@ -20,8 +20,8 @@ namespace Test
 		static const std::string DMK_KEY;
 		static const std::string DMK_HSH;
 
-		std::vector<std::vector<uint8_t>> m_expected;
-		std::vector<std::vector<uint8_t>> m_message;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<byte>> m_message;
 		TestEventHandler m_progressEvent;
 
 	public:

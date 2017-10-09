@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~IMac() {}
+	virtual ~IMac() noexcept {}
 
 	//~~~Properties~~~//
 

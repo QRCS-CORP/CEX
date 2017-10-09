@@ -15,13 +15,17 @@ enum class SimdProfiles : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// The system supports SSE3 intrinsics
+	/// The system supports AVX intrinsics
 	/// </summary>
 	Simd128 = 1,
 	/// <summary>
 	/// The system supports AVX2 intrinsics
 	/// </summary>
-	Simd256 = 2
+	Simd256 = 2,
+	/// <summary>
+	/// The system supports AVX512 intrinsics
+	/// </summary>
+	Simd512 = 3
 };
 
 NAMESPACE_ENUMERATIONEND

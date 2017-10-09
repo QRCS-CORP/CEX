@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// Finalizer
 	/// </summary>
-	virtual ~IAsymmetricKey() {}
+	virtual ~IAsymmetricKey() noexcept {}
 
 	//~~~Public Functions~~~//
 

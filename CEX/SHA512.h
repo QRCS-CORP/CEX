@@ -127,14 +127,14 @@ private:
 		{
 			T[0] = 0;
 			T[1] = 0;
-			H[0] = 0x6a09e667f3bcc908;
-			H[1] = 0xbb67ae8584caa73b;
-			H[2] = 0x3c6ef372fe94f82b;
-			H[3] = 0xa54ff53a5f1d36f1;
-			H[4] = 0x510e527fade682d1;
-			H[5] = 0x9b05688c2b3e6c1f;
-			H[6] = 0x1f83d9abfb41bd6b;
-			H[7] = 0x5be0cd19137e2179;
+			H[0] = 0x6A09E667F3BCC908;
+			H[1] = 0xBB67AE8584CAA73B;
+			H[2] = 0x3C6EF372FE94F82B;
+			H[3] = 0xA54FF53A5F1D36F1;
+			H[4] = 0x510E527FADE682D1;
+			H[5] = 0x9B05688C2B3E6C1F;
+			H[6] = 0x1F83D9ABFB41BD6B;
+			H[7] = 0x5BE0CD19137E2179;
 		}
 	};
 

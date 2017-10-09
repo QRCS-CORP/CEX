@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~IBlockCipher() {}
+	virtual ~IBlockCipher() noexcept {}
 
 	//~~~Properties~~~//
 

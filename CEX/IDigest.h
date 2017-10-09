@@ -32,7 +32,7 @@ public:
 	/// <summary>
 	/// Finalizer
 	/// </summary>
-	virtual ~IDigest() {}
+	virtual ~IDigest() noexcept {}
 
 	//~~~Properties~~~//
 

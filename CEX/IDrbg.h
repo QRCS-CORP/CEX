@@ -34,7 +34,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~IDrbg() {}
+	virtual ~IDrbg() noexcept {}
 
 	//~~~Properties~~~//
 	/// <summary>

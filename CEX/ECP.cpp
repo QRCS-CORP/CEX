@@ -64,7 +64,7 @@ void ECP::GetBytes(std::vector<byte> &Output)
 
 void ECP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CEXASSERT(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
 		throw CryptoRandomException("ECP:GetBytes", "Random provider is not available!");
@@ -385,7 +385,7 @@ std::vector<byte> ECP::ProcessorInfo()
 	std::vector<byte> state(0);
 	Common::CpuDetect detect;
 
-	Utility::ArrayUtils::Append(detect.BusSpeed(), state);
+	Utility::ArrayUtils::Append(detect.BusRefFrequency(), state);
 	Utility::ArrayUtils::Append(detect.FrequencyBase(), state);
 	Utility::ArrayUtils::Append(detect.FrequencyMax(), state);
 	Utility::ArrayUtils::Append(detect.FrequencyBase(), state);

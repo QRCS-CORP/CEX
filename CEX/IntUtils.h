@@ -237,7 +237,7 @@ public:
 	template <typename T1, typename T2>
 	inline static T2 ModPowerOf2(T1 A, T2 B)
 	{
-		CEXASSERT(IsPowerOf2(B), "Not a power of two");
+		CexAssert(IsPowerOf2(B), "Not a power of two");
 
 		return T2(A) & (B - 1);
 	}
@@ -377,9 +377,9 @@ public:
 	{
 		const size_t ELMSZE = sizeof(Output[0]);
 
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * ELMSZE >= Length, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) * ELMSZE >= Length, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
@@ -409,9 +409,9 @@ public:
 	{
 		const size_t ELMSZE = sizeof(Input[0]);
 
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) * ELMSZE >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) * ELMSZE >= Length, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
@@ -436,8 +436,8 @@ public:
 	template<typename Array>
 	inline static void Be16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than output capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
@@ -457,8 +457,8 @@ public:
 	template<typename Array>
 	inline static void Be32ToBytes(const uint Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than output capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than output capacity");
 
 #if defined IS_BIG_ENDIAN
 		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
@@ -480,8 +480,8 @@ public:
 	template<typename Array>
 	inline static void Be64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than output capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
@@ -508,10 +508,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BeUL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(uint), "Input must be a 32bit integer array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= 32 / sizeof(uint), "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(uint), "Input must be a 32bit integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) >= 32 / sizeof(uint), "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
@@ -538,10 +538,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BeULL512ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= 64 / sizeof(ulong), "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) >= 64 / sizeof(ulong), "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
@@ -567,8 +567,8 @@ public:
 	template<typename Array>
 	inline static ushort BeBytesTo16(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		ushort value = 0;
@@ -591,8 +591,8 @@ public:
 	template<typename Array>
 	inline static uint BeBytesTo32(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		uint value = 0;
@@ -618,8 +618,8 @@ public:
 	template<typename Array>
 	inline static ulong BeBytesTo64(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_BIG_ENDIAN)
 		ulong value = 0;
@@ -646,8 +646,8 @@ public:
 	template<typename Array>
 	inline static void BeIncrement8(Array &Output)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be an array of 8bit integers");
-		CEXASSERT(!std::numeric_limits<decltype(Output[0])>::is_signed, "Output must be an unsigned integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be an array of 8bit integers");
+		CexAssert(!std::numeric_limits<decltype(Output[0])>::is_signed, "Output must be an unsigned integer array");
 
 		int i = (int)Output.size();
 		while (--i >= 0 && ++Output[i] == 0) 
@@ -665,8 +665,8 @@ public:
 	template<typename Array>
 	inline static void BeIncrease8(const Array &Input, Array &Output, const size_t Length)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Input and Output must be an array of 8bit integers");
-		CEXASSERT(!std::numeric_limits<decltype(Output[0])>::is_signed, "Input and Output must be an unsigned integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Input and Output must be an array of 8bit integers");
+		CexAssert(!std::numeric_limits<decltype(Output[0])>::is_signed, "Input and Output must be an unsigned integer array");
 
 		const int CTRSZE = (int)Output.size() - 1;
 		uint ctrLen = (uint)Length;
@@ -709,9 +709,9 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void BlockToLe(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(Output[0]) >= Length, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= Length, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) * sizeof(Output[0]) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
@@ -739,9 +739,9 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) * sizeof(Input[0]) >= Length, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) * sizeof(Input[0]) >= Length, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
@@ -766,8 +766,8 @@ public:
 	template<typename Array>
 	inline static void Le16ToBytes(const ushort Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than input capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Output.size() - OutOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ushort));
@@ -789,8 +789,8 @@ public:
 	template<typename Array>
 	inline static void Le32ToBytes(const uint Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than input capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Output.size() - OutOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(uint));
@@ -812,8 +812,8 @@ public:
 	template<typename Array>
 	inline static void Le64ToBytes(const ulong Value, Array &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than input capacity");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Output.size() - OutOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::CopyFromValue(Value, Output, OutOffset, sizeof(ulong));
@@ -840,10 +840,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeUL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(uint), "Input must be a 32bit integer array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) * sizeof(uint) >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(uint), "Input must be a 32bit integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) * sizeof(uint) >= 32, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
@@ -870,10 +870,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeULL256ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) * sizeof(ulong) >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) * sizeof(ulong) >= 32, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
@@ -896,10 +896,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeULL512ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) * sizeof(ulong) >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) * sizeof(ulong) >= 64, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
@@ -926,10 +926,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeULL1024ToBlock(ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
-		CEXASSERT((Input.size() - InOffset) * sizeof(ulong) >= 128, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) >= 128, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(ulong), "Input must be a 64bit integer array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Output must be a byte array");
+		CexAssert((Input.size() - InOffset) * sizeof(ulong) >= 128, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) >= 128, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
@@ -950,8 +950,8 @@ public:
 	template<typename Array>
 	inline static ushort LeBytesTo16(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= sizeof(ushort), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		ushort value = 0;
@@ -975,8 +975,8 @@ public:
 	template<typename Array>
 	inline static uint LeBytesTo32(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= sizeof(uint), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		uint value = 0;
@@ -1002,8 +1002,8 @@ public:
 	template<typename Array>
 	inline static ulong LeBytesTo64(const Array &Input, size_t InOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert((Input.size() - InOffset) >= sizeof(ulong), "Length is larger than input capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		ulong value = 0;
@@ -1034,10 +1034,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeBytesToUL512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(uint), "Output must be a 32bit integer array");
-		CEXASSERT((Input.size() - InOffset) >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(uint) >= 64, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert(sizeof(Output[0]) == sizeof(uint), "Output must be a 32bit integer array");
+		CexAssert((Input.size() - InOffset) >= 64, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) * sizeof(uint) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
@@ -1072,10 +1072,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeBytesToULL256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
-		CEXASSERT((Input.size() - InOffset) >= 32, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 32, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
+		CexAssert((Input.size() - InOffset) >= 32, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) * sizeof(ulong) >= 32, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY256(Input, InOffset, Output, OutOffset);
@@ -1098,10 +1098,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeBytesToULL512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
-		CEXASSERT((Input.size() - InOffset) >= 64, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 64, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
+		CexAssert((Input.size() - InOffset) >= 64, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) * sizeof(ulong) >= 64, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
@@ -1128,10 +1128,10 @@ public:
 	template<typename ArrayA, typename ArrayB>
 	inline static void LeBytesToULL1024(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
-		CEXASSERT((Input.size() - InOffset) >= 128, "Length is larger than input capacity");
-		CEXASSERT((Output.size() - OutOffset) * sizeof(ulong) >= 128, "Length is larger than output capacity");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert(sizeof(Output[0]) == sizeof(ulong), "Output must be a 64bit integer array");
+		CexAssert((Input.size() - InOffset) >= 128, "Length is larger than input capacity");
+		CexAssert((Output.size() - OutOffset) * sizeof(ulong) >= 128, "Length is larger than output capacity");
 
 #if defined(IS_LITTLE_ENDIAN)
 		Utility::MemUtils::COPY512(Input, InOffset, Output, OutOffset);
@@ -1166,7 +1166,7 @@ public:
 	template <typename Array>
 	inline static void LeIncrementW(Array &Output)
 	{
-		CEXASSERT(!std::numeric_limits<decltype(Output[0])>::is_signed, "Output must be an unsigned integer array");
+		CexAssert(!std::numeric_limits<decltype(Output[0])>::is_signed, "Output must be an unsigned integer array");
 
 		if (++Output[0] == 0)
 		{
@@ -1185,10 +1185,10 @@ public:
 	template <typename Array>
 	inline static void LeIncreaseW(const Array &Input, Array &Output, const size_t Length)
 	{
-		CEXASSERT(!std::numeric_limits<decltype(Input[0])>::is_signed, "Input and Output must be an unsigned integer array");
+		CexAssert(!std::numeric_limits<decltype(Input[0])>::is_signed, "Input and Output must be an unsigned integer array");
 
 		std::memcpy(&Output[0], &Input[0], Input.size() * sizeof(Input[0]));
-		Output[0] += Length;
+		Output[0] += static_cast<uint>(Length);
 
 		if (Output[0] < Input[0])
 		{
@@ -1420,8 +1420,8 @@ public:
 	template <typename Array>
 	inline static uint ShiftLeft(const Array &Input, Array &Output)
 	{
-		CEXASSERT(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
-		CEXASSERT(sizeof(Output[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert(sizeof(Input[0]) == sizeof(byte), "Input must be a byte array");
+		CexAssert(sizeof(Output[0]) == sizeof(byte), "Input must be a byte array");
 
 		size_t ctr = Input.size();
 		uint bit = 0;
@@ -1453,7 +1453,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotFL32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return _lrotl(Value, static_cast<int>(Shift));
 	}
 
@@ -1467,7 +1467,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotFL64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return _rotl64(Value, static_cast<int>(Shift));
 	}
 
@@ -1481,7 +1481,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotFR32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return _lrotr(Value, static_cast<int>(Shift));
 	}
 
@@ -1495,7 +1495,7 @@ public:
 	/// <returns>The right shifted 64 bit integer</returns>
 	inline static ulong RotFR64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return _rotr64(Value, static_cast<int>(Shift));
 	}
 
@@ -1509,7 +1509,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotL32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return Shift ? _rotl(Value, static_cast<int>(Shift)) : Value;
 	}
 
@@ -1523,7 +1523,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotL64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return Shift ? _rotl64(Value, static_cast<int>(Shift)) : Value;
 	}
 
@@ -1537,7 +1537,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotR32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return Shift ? _rotr(Value, static_cast<int>(Shift)) : Value;
 	}
 
@@ -1551,7 +1551,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static ulong RotR64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return Shift ? _rotr64(Value, static_cast<int>(Shift)) : Value;
 	}
 
@@ -1567,7 +1567,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotFL32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (32 - Shift));
 	}
 
@@ -1581,7 +1581,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotFL64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (64 - Shift));
 	}
 
@@ -1595,7 +1595,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotFR32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value >> Shift) | (Value << (32 - Shift));
 	}
 
@@ -1609,7 +1609,7 @@ public:
 	/// <returns>The right shifted 64 bit integer</returns>
 	inline static ulong RotFR64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return ((Value >> Shift) | (Value << (64 - Shift)));
 	}
 
@@ -1623,7 +1623,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static uint RotL32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (sizeof(uint) * 8 - Shift));
 	}
 
@@ -1637,7 +1637,7 @@ public:
 	/// <returns>The left shifted integer</returns>
 	inline static ulong RotL64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return (Value << Shift) | (Value >> (sizeof(ulong) * 8 - Shift));
 	}
 
@@ -1651,7 +1651,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static uint RotR32(uint Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(uint) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(uint) * 8, "Shift size is too large");
 		return (Value >> Shift) | (Value << (sizeof(uint) * 8 - Shift));
 	}
 
@@ -1665,7 +1665,7 @@ public:
 	/// <returns>The right shifted integer</returns>
 	inline static ulong RotR64(ulong Value, uint Shift)
 	{
-		CEXASSERT(Shift <= sizeof(ulong) * 8, "Shift size is too large");
+		CexAssert(Shift <= sizeof(ulong) * 8, "Shift size is too large");
 		return (Value >> Shift) | (Value << (sizeof(ulong) * 8 - Shift));
 	}
 

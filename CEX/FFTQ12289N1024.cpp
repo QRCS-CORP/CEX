@@ -159,92 +159,37 @@ const ushort FFTQ12289N1024::PsisInvMontgomery[1024] =
 
 //~~~Public Functions~~~//
 
-void FFTQ12289N1024::KeyGen(std::vector<byte> &PubKey, std::vector<ushort> &PriKey, Prng::IPrng* Rng, bool Parallel)
+void FFTQ12289N1024::Decrypt(std::vector<byte> &Secret, const std::vector<ushort> &PriKey, const std::vector<byte> &Received)
 {
-	std::array<ushort, N> a;
-	std::array<ushort, N> e;
-	std::array<ushort, N> r;
-	std::array<ushort, N> pk;
-	std::vector<byte> seed(SEED_BYTES);
-	std::vector<byte> buf1(4 * N);
-	std::vector<byte> buf2(4 * N);
-
-	Rng->GetBytes(buf1);
-	Rng->GetBytes(buf2);
-	Rng->GetBytes(seed);
-
-#if defined(_OPENMP)
-	if (Parallel)
-	{
-#		pragma omp parallel
-		{
-#			pragma omp single nowait
-			{
-				PolyUniform(a, seed, Parallel);
-			}
-#			pragma omp single nowait
-			{
-				PolyGetNoise(PriKey, buf1);
-				FwdNTT(PriKey);
-			}
-#			pragma omp single nowait
-			{
-				PolyGetNoise(e, buf2);
-				FwdNTT(e);
-			}
-		}
-	}
-	else
-#endif
-	{
-		PolyUniform(a, seed, Parallel);
-
-		PolyGetNoise(PriKey, buf1);
-		FwdNTT(PriKey);
-
-		PolyGetNoise(e, buf2);
-		FwdNTT(e);
-	}
-
-	PolyPointwise(r, PriKey, a);
-	PolyAdd(pk, e, r);
-	EncodeA(PubKey, pk, seed);
-}
-
-void FFTQ12289N1024::SharedA(std::vector<byte> &Secret, const std::vector<ushort> &PriKey, const std::vector<byte> &Received, Digest::IDigest* Digest)
-{
-	std::array<ushort, N> v;
 	std::array<ushort, N> bp;
 	std::array<ushort, N> c;
+	std::array<ushort, N> v;
 
 	DecodeB(bp, c, Received);
 	PolyPointwise(v, PriKey, bp);
 	Utility::PolyMath::BitReverse(v);
 	InvNTT(v);
 	Reconcile(Secret, v, c);
-
-	Digest->Update(Secret, 0, Secret.size());
-	Digest->Finalize(Secret, 0);
 }
 
-void FFTQ12289N1024::SharedB(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, Prng::IPrng *Rng, Digest::IDigest* Digest, bool Parallel)
+void FFTQ12289N1024::Encrypt(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel)
 {
-	std::array<ushort, N> sp;
-	std::array<ushort, N> ep;
-	std::array<ushort, N> v;
 	std::array<ushort, N> a;
-	std::array<ushort, N> pka;
-	std::array<ushort, N> c;
-	std::array<ushort, N> epp;
 	std::array<ushort, N> bp;
+	std::array<ushort, N> c;
+	std::array<ushort, N> ep;
+	std::array<ushort, N> epp;
+	std::array<ushort, N> pka;
+	std::array<ushort, N> sp;
 	std::array<ushort, N> tbp;
-	std::vector<byte> seed(SEED_BYTES);
-	std::vector<byte> buf1(4 * N);
-	std::vector<byte> buf2(4 * N);
+	std::array<ushort, N> v;
 
+	std::vector<byte> seed(SEED_BYTES);
 	DecodeA(pka, seed, Received);
-	Rng->GetBytes(buf1);
-	Rng->GetBytes(buf2);
+	std::vector<uint> buf1(N);
+	Rng->Fill(buf1, 0, N);
+	std::vector<uint> buf2(N);
+	Rng->Fill(buf2, 0, N);
 
 #if defined(_OPENMP)
 	if (Parallel)
@@ -285,7 +230,7 @@ void FFTQ12289N1024::SharedB(std::vector<byte> &Secret, std::vector<byte> &Send,
 	PolyPointwise(v, pka, sp);
 	Utility::PolyMath::BitReverse(v);
 	InvNTT(v);
-	Rng->GetBytes(buf1);
+	Rng->Fill(buf1, 0, N);;
 	PolyGetNoise(epp, buf1);
 	PolyAdd(v, v, epp);
 
@@ -293,9 +238,58 @@ void FFTQ12289N1024::SharedB(std::vector<byte> &Secret, std::vector<byte> &Send,
 	RecHelper(c, v, seed);
 	EncodeB(Send, tbp, c);
 	Reconcile(Secret, v, c);
+}
 
-	Digest->Update(Secret, 0, Secret.size());
-	Digest->Finalize(Secret, 0);
+void FFTQ12289N1024::Generate(std::vector<byte> &PubKey, std::vector<ushort> &PriKey, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel)
+{
+	std::array<ushort, N> a;
+	std::array<ushort, N> e;
+	std::array<ushort, N> pk;
+	std::array<ushort, N> r;
+
+	std::vector<uint> buf1(N);
+	Rng->Fill(buf1, 0, N);
+	std::vector<uint> buf2(N);
+	Rng->Fill(buf2, 0, N);
+	std::vector<byte> seed(SEED_BYTES);
+	Rng->GetBytes(seed);
+
+#if defined(_OPENMP)
+	if (Parallel)
+	{
+#		pragma omp parallel
+		{
+#			pragma omp single nowait
+			{
+				PolyUniform(a, seed, Parallel);
+			}
+#			pragma omp single nowait
+			{
+				PolyGetNoise(PriKey, buf1);
+				FwdNTT(PriKey);
+			}
+#			pragma omp single nowait
+			{
+				PolyGetNoise(e, buf2);
+				FwdNTT(e);
+			}
+		}
+	}
+	else
+#endif
+	{
+		PolyUniform(a, seed, Parallel);
+
+		PolyGetNoise(PriKey, buf1);
+		FwdNTT(PriKey);
+
+		PolyGetNoise(e, buf2);
+		FwdNTT(e);
+	}
+
+	PolyPointwise(r, PriKey, a);
+	PolyAdd(pk, e, r);
+	EncodeA(PubKey, pk, seed);
 }
 
 //~~~Private Functions~~~//
@@ -312,10 +306,10 @@ void FFTQ12289N1024::DecodeB(std::array<ushort, N> &B, std::array<ushort, N> &C,
 
 	for (size_t i = 0; i < N / 4; i++)
 	{
-		C[4 * i + 0] = R[POLY_BYTES + i] & 0x03;
-		C[4 * i + 1] = (R[POLY_BYTES + i] >> 2) & 0x03;
-		C[4 * i + 2] = (R[POLY_BYTES + i] >> 4) & 0x03;
-		C[4 * i + 3] = (R[POLY_BYTES + i] >> 6);
+		C[4 * i + 0] = static_cast<ushort>(R[POLY_BYTES + i] & 0x03);
+		C[4 * i + 1] = static_cast<ushort>((R[POLY_BYTES + i] >> 2) & 0x03);
+		C[4 * i + 2] = static_cast<ushort>((R[POLY_BYTES + i] >> 4) & 0x03);
+		C[4 * i + 3] = static_cast<ushort>((R[POLY_BYTES + i] >> 6));
 	}
 }
 
@@ -337,7 +331,7 @@ void FFTQ12289N1024::EncodeB(std::vector<byte> &R, const std::array<ushort, N> &
 
 void FFTQ12289N1024::FromBytes(std::array<ushort, N> &R, const std::vector<byte> &A)
 {
-	for (size_t i = 0; i < R.size() / 4; ++i)
+	for (size_t i = 0; i < N / 4; ++i)
 	{
 		R[4 * i + 0] = A[7 * i + 0] | (((ushort)A[7 * i + 1] & 0x3f) << 8);
 		R[4 * i + 1] = (A[7 * i + 1] >> 6) | (((ushort)A[7 * i + 2]) << 2) | (((ushort)A[7 * i + 3] & 0x0f) << 10);
@@ -348,12 +342,8 @@ void FFTQ12289N1024::FromBytes(std::array<ushort, N> &R, const std::vector<byte>
 
 void FFTQ12289N1024::PolyUniform(std::array<ushort, N> &A, const std::vector<byte> &Seed, bool Parallel)
 {
-	size_t ctr = 0;
-	size_t pos = 0;
-	ushort val;
-	size_t bufLen = 2 * N * sizeof(ushort);
-
 	Drbg::BCG eng(Enumeration::BlockCiphers::Rijndael);
+	size_t bufLen = 2 * N * sizeof(ushort);
 
 	if (Parallel)
 	{
@@ -371,6 +361,10 @@ void FFTQ12289N1024::PolyUniform(std::array<ushort, N> &A, const std::vector<byt
 	eng.Initialize(Seed);
 	std::vector<byte> buf(bufLen);
 	eng.Generate(buf, 0, buf.size());
+
+	size_t ctr = 0;
+	size_t pos = 0;
+	ushort val;
 
 	while (ctr < N)
 	{
@@ -418,8 +412,12 @@ void FFTQ12289N1024::Reconcile(std::vector<byte> &Key, const std::array<ushort, 
 
 void FFTQ12289N1024::ToBytes(std::vector<byte> &R, const std::array<ushort, N> &Poly)
 {
-	ushort t0, t1, t2, t3, m;
 	short c;
+	ushort m;
+	ushort t0;
+	ushort t1;
+	ushort t2;
+	ushort t3;
 
 	for (size_t i = 0; i < Poly.size() / 4; i++)
 	{
@@ -447,13 +445,13 @@ void FFTQ12289N1024::ToBytes(std::vector<byte> &R, const std::array<ushort, N> &
 		c >>= 15;
 		t3 = m ^ ((t3 ^ m) & c);
 
-		R[7 * i + 0] = t0 & 0xff;
-		R[7 * i + 1] = (t0 >> 8) | (t1 << 6);
-		R[7 * i + 2] = (t1 >> 2);
-		R[7 * i + 3] = (t1 >> 10) | (t2 << 4);
-		R[7 * i + 4] = (t2 >> 4);
-		R[7 * i + 5] = (t2 >> 12) | (t3 << 2);
-		R[7 * i + 6] = (t3 >> 6);
+		R[7 * i + 0] = static_cast<byte>(t0 & 0xFF);
+		R[7 * i + 1] = static_cast<byte>((t0 >> 8) | (t1 << 6));
+		R[7 * i + 2] = static_cast<byte>(t1 >> 2);
+		R[7 * i + 3] = static_cast<byte>((t1 >> 10) | (t2 << 4));
+		R[7 * i + 4] = static_cast<byte>(t2 >> 4);
+		R[7 * i + 5] = static_cast<byte>((t2 >> 12) | (t3 << 2));
+		R[7 * i + 6] = static_cast<byte>(t3 >> 6);
 	}
 }
 

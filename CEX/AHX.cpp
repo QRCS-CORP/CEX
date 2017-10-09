@@ -365,7 +365,7 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 		m_expKey[18] = _mm_aeskeygenassist_si128(m_expKey[17], 0x80);
 		ExpandRotBlock(m_expKey, 18, 4);
 		ExpandSubBlock(m_expKey, 19, 4);
-		m_expKey[20] = _mm_aeskeygenassist_si128(m_expKey[19], 0x1b);
+		m_expKey[20] = _mm_aeskeygenassist_si128(m_expKey[19], 0x1B);
 		ExpandRotBlock(m_expKey, 20, 4);
 		ExpandSubBlock(m_expKey, 21, 4);
 		m_expKey[22] = _mm_aeskeygenassist_si128(m_expKey[21], 0x36);
@@ -432,7 +432,7 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 		ExpandRotBlock(m_expKey, 7, 1);
 		m_expKey[8] = _mm_aeskeygenassist_si128(m_expKey[7], 0x80);
 		ExpandRotBlock(m_expKey, 8, 1);
-		m_expKey[9] = _mm_aeskeygenassist_si128(m_expKey[8], 0x1b);
+		m_expKey[9] = _mm_aeskeygenassist_si128(m_expKey[8], 0x1B);
 		ExpandRotBlock(m_expKey, 9, 1);
 		m_expKey[10] = _mm_aeskeygenassist_si128(m_expKey[9], 0x36);
 		ExpandRotBlock(m_expKey, 10, 1);
@@ -474,7 +474,7 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const si
 {
 	// 128, 256, 512 bit key method
 	__m128i pkb = Key[Index - Offset];
-	Key[Index] = _mm_shuffle_epi32(Key[Index], 0xff);
+	Key[Index] = _mm_shuffle_epi32(Key[Index], 0xFF);
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
@@ -485,7 +485,7 @@ void AHX::ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const si
 {
 	// used with 256 and 512 bit keys
 	__m128i pkb = Key[Index - Offset];
-	Key[Index] = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(Key[Index - 1], 0x0), 0xaa);
+	Key[Index] = _mm_shuffle_epi32(_mm_aeskeygenassist_si128(Key[Index - 1], 0x0), 0xAA);
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));
 	pkb = _mm_xor_si128(pkb, _mm_slli_si128(pkb, 0x4));

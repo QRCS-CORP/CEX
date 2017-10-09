@@ -49,9 +49,9 @@ MacStream::~MacStream()
 
 std::vector<byte> MacStream::Compute(IByteStream* InStream)
 {
-	CEXASSERT(m_isInitialized, "the mac has not been initialized");
-	CEXASSERT(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
-	CEXASSERT(InStream->CanRead(), "the input stream is set to write only!");
+	CexAssert(m_isInitialized, "the mac has not been initialized");
+	CexAssert(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
+	CexAssert(InStream->CanRead(), "the input stream is set to write only!");
 
 	size_t dataLen = InStream->Length() - InStream->Position();
 	CalculateInterval(dataLen);
@@ -61,8 +61,8 @@ std::vector<byte> MacStream::Compute(IByteStream* InStream)
 
 std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(m_isInitialized, "the mac has not been initialized");
-	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
+	CexAssert(m_isInitialized, "the mac has not been initialized");
+	CexAssert((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
 
 	size_t dataLen = Length - InOffset;
 	CalculateInterval(dataLen);

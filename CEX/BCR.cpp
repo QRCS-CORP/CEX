@@ -75,7 +75,7 @@ void BCR::Destroy()
 
 void BCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
-	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(ushort);
 	std::vector<byte> buf(bufLen);
@@ -85,7 +85,7 @@ void BCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 
 void BCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
-	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(uint);
 	std::vector<byte> buf(bufLen);
@@ -95,7 +95,7 @@ void BCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 
 void BCR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
 {
-	CEXASSERT(Output.size() - Offset <= Elements, "the output array is too short");
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(ulong);
 	std::vector<byte> buf(bufLen);
@@ -157,7 +157,7 @@ ushort BCR::NextUShort()
 
 ushort BCR::NextUShort(ushort Maximum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum != 0, "maximum can not be zero");
 
 	ushort num;
 
@@ -171,8 +171,8 @@ ushort BCR::NextUShort(ushort Maximum)
 
 ushort BCR::NextUShort(ushort Maximum, ushort Minimum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
-	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+	CexAssert(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum > Minimum, "minimum can not be more than maximum");
 
 	uint num = 0;
 	while ((num = NextUShort(Maximum)) < Minimum) {}
@@ -186,7 +186,7 @@ uint BCR::Next()
 
 uint BCR::Next(uint Maximum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum != 0, "maximum can not be zero");
 
 	uint num;
 
@@ -200,8 +200,8 @@ uint BCR::Next(uint Maximum)
 
 uint BCR::Next(uint Maximum, uint Minimum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
-	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+	CexAssert(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum > Minimum, "minimum can not be more than maximum");
 
 	uint num = 0;
 	while ((num = Next(Maximum)) < Minimum) {}
@@ -215,7 +215,7 @@ ulong BCR::NextULong()
 
 ulong BCR::NextULong(ulong Maximum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum != 0, "maximum can not be zero");
 
 	ulong num;
 
@@ -229,8 +229,8 @@ ulong BCR::NextULong(ulong Maximum)
 
 ulong BCR::NextULong(ulong Maximum, ulong Minimum)
 {
-	CEXASSERT(Maximum != 0, "maximum can not be zero");
-	CEXASSERT(Maximum > Minimum, "minimum can not be more than maximum");
+	CexAssert(Maximum != 0, "maximum can not be zero");
+	CexAssert(Maximum > Minimum, "minimum can not be more than maximum");
 
 	ulong num = 0;
 	while ((num = NextULong(Maximum)) < Minimum) {}

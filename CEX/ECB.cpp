@@ -171,9 +171,9 @@ void ECB::ParallelMaxDegree(size_t Degree)
 
 void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length");
-	CEXASSERT(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block size");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the length");
+	CexAssert(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block size");
 
 	const size_t PRLBLK = m_parallelProfile.ParallelBlockSize();
 
@@ -199,8 +199,8 @@ void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 void ECB::Encrypt128(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 
 	m_blockCipher->EncryptBlock(Input, InOffset, Output, OutOffset);
 }

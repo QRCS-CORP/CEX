@@ -25,7 +25,7 @@ enum class Macs : byte
 	/// <summary>
 	/// A Cipher based Message Authentication Code wrapper (GMAC)
 	/// </summary>
-	GMAC = 4
+	GMAC = 3
 };
 
 NAMESPACE_ENUMERATIONEND

@@ -21,13 +21,13 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
-		static const unsigned int MIN_ALLOC = 1024;
-		static const unsigned int MAX_ALLOC = 4096;
-		static const unsigned int DEF_BLOCK = 64000;
+		static const size_t MIN_ALLOC = 1024;
+		static const size_t MAX_ALLOC = 4096;
+		static const size_t DEF_BLOCK = 64000;
 #if defined(_DEBUG)
-		static const unsigned int TEST_LOOPS = 10;
+		static const size_t TEST_LOOPS = 10;
 #else
-		static const unsigned int TEST_LOOPS = 100;
+		static const size_t TEST_LOOPS = 100;
 #endif
 
 		bool m_hasAESNI;

@@ -126,7 +126,7 @@ void Skein1024::Destroy()
 
 size_t Skein1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
+	CexAssert(Output.size() - OutOffset >= DIGEST_SIZE, "The Output buffer is too short!");
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -223,7 +223,7 @@ void Skein1024::Update(byte Input)
 
 void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
 	if (Length == 0)
 		return;

@@ -55,7 +55,7 @@ public:
 	/// <summary>
 	/// Finalizer
 	/// </summary>
-	virtual ~IAsymmetricSign() {}
+	virtual ~IAsymmetricSign() noexcept {}
 
 	//~~~Properties~~~//
 

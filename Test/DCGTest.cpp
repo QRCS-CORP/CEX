@@ -30,21 +30,15 @@ namespace Test
 			CheckInit();
 			OnProgress(std::string("DCG: Passed initialization tests.."));
 
-			// Note: old tests do not meet minimum seed size requirements
-			//Initialize();
-			//CompareOutput(m_seed256[0], m_expected256[0]);
-			//CompareOutput(m_seed256[1], m_expected256[1]);
-			//OnProgress(std::string("DCG: Passed output comparison tests.."));
-
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 

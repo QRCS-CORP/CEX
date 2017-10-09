@@ -72,13 +72,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace Test
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
-		for (unsigned int i = 0; i != m_messages.size(); i++)
+		for (size_t i = 0; i != m_messages.size(); i++)
 		{
 			if (m_messages[i].size() != 0)
 				Digest->Update(m_messages[i], 0, m_messages[i].size());
@@ -99,7 +99,7 @@ namespace Test
 
 		std::vector<byte> k64(1024 * 64, 0);
 
-		for (unsigned int i = 0; i != k64.size(); i++)
+		for (size_t i = 0; i != k64.size(); i++)
 			k64[i] = (byte)'a';
 
 		Digest->Update(k64, 0, k64.size());
@@ -108,7 +108,7 @@ namespace Test
 		if (Expected[m_messages.size()] != hash)
 			throw TestException("Keccak: Expected hash is not equal!");
 
-		for (unsigned int i = 0; i != k64.size(); i++)
+		for (size_t i = 0; i != k64.size(); i++)
 			Digest->Update((byte)'a');
 
 		Digest->Finalize(hash, 0);
@@ -116,7 +116,7 @@ namespace Test
 		if (Expected[m_messages.size()] != hash)
 			throw TestException("Keccak: Expected hash is not equal!");
 
-		for (unsigned int i = 0; i != k64.size(); i++)
+		for (size_t i = 0; i != k64.size(); i++)
 			k64[i] = (byte)('a' + (i % 26));
 
 		Digest->Update(k64, 0, k64.size());
@@ -125,7 +125,7 @@ namespace Test
 		if (Expected[m_messages.size() + 1] != hash)
 			throw TestException("Keccak: Expected hash is not equal!");
 
-		for (unsigned int i = 0; i != 64; i++)
+		for (size_t i = 0; i != 64; i++)
 		{
 			Digest->Update(k64[i * 1024]);
 			Digest->Update(k64, i * 1024 + 1, 1023);
@@ -140,7 +140,7 @@ namespace Test
 
 #if defined(ENABLE_LONGKAT_TEST)
 		// very long test (it passes)
-		for (unsigned int i = 0; i != 16384; i++)
+		for (size_t i = 0; i != 16384; i++)
 		{
 			for (int j = 0; j != 1024; j++)
 				Digest->Update(m_xtremeData, 0, m_xtremeData.size());
@@ -159,10 +159,10 @@ namespace Test
 
 		Digest->Finalize(hash, 0);
 
-		for (unsigned int i = 0; i <= Digest->DigestSize(); ++i)
+		for (size_t i = 0; i <= Digest->DigestSize(); ++i)
 		{
 			std::vector<byte> expected(2 * Digest->DigestSize(), 0);
-			memcpy(&expected[i], &hash[0], hash.size());
+			std::memcpy(&expected[i], &hash[0], hash.size());
 			std::vector<byte> outBytes(2 * Digest->DigestSize(), 0);
 
 			Digest->Finalize(outBytes, i);
@@ -178,7 +178,7 @@ namespace Test
 		std::vector<byte> macV2(mac.MacSize(), 0);
 		std::string ret = "";
 
-		for (unsigned int i = 0; i != m_macKeys.size(); i++)
+		for (size_t i = 0; i != m_macKeys.size(); i++)
 		{
 			SymmetricKey kp(m_macKeys[i]);
 			mac.Initialize(kp);
@@ -197,7 +197,7 @@ namespace Test
 		mac2.Update(m_truncData, 0, m_truncData.size());
 		mac2.Finalize(macV2, 0);
 
-		for (unsigned int i = 0; i != TruncExpected.size(); i++)
+		for (size_t i = 0; i != TruncExpected.size(); i++)
 		{
 			if (macV2[i] != TruncExpected[i])
 				throw TestException("Keccak HMAC: Expected hash is not equal!");
@@ -335,7 +335,7 @@ namespace Test
 
 		KeccakParams tree1(32, 32, 8);
 		tree1.DistributionCode() = code1;
-		std::vector<uint8_t> tres = tree1.ToBytes();
+		std::vector<byte> tres = tree1.ToBytes();
 		KeccakParams tree2(tres);
 
 		if (!tree1.Equals(tree2))

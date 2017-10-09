@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~IPrng() {}
+	virtual ~IPrng() noexcept {}
 
 	//~~~Properties~~~//
 

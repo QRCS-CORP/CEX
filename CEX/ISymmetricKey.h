@@ -19,6 +19,18 @@ class ISymmetricKey
 {
 public:
 
+	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Initialize the ISymmetricKey virtual interface class
+	/// </summary>
+	ISymmetricKey() {}
+
+	/// <summary>
+	/// Finalize objects
+	/// </summary>
+	virtual ~ISymmetricKey() noexcept {}
+
 	//~~~Properties~~~//
 
 	/// <summary>
@@ -40,18 +52,6 @@ public:
 	/// Get/Set: The personalization string; can used as an optional source of entropy
 	/// </summary>
 	virtual const std::vector<byte> Info() = 0;
-
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// Initialize the ISymmetricKey virtual interface class
-	/// </summary>
-	ISymmetricKey() {}
-
-	/// <summary>
-	/// Finalize objects
-	/// </summary>
-	virtual ~ISymmetricKey() {}
 
 	//~~~Public Functions~~~//
 

@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~IByteStream() {}
+	virtual ~IByteStream() noexcept {}
 
 	//~~~Properties~~~//
 

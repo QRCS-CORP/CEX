@@ -50,13 +50,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -116,7 +116,7 @@ namespace Test
 
 		SHA2Params tree1(32, 32, 8);
 		tree1.DistributionCode() = code1;
-		std::vector<uint8_t> tres = tree1.ToBytes();
+		std::vector<byte> tres = tree1.ToBytes();
 		SHA2Params tree2(tres);
 
 		if (!tree1.Equals(tree2))

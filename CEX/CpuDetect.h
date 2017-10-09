@@ -15,7 +15,7 @@ public:
 	/// <summary>
 	/// Enumeration of cpu vendors
 	/// </summary>
-	enum class CpuVendors : int
+	enum class CpuVendors : uint
 	{
 		UNKNOWN = 0,
 		AMD = 1,
@@ -25,7 +25,7 @@ public:
 	/// <summary>
 	/// The L2 cache associativity setting
 	/// </summary>
-	enum class CacheAssociations
+	enum class CacheAssociations : uint
 	{
 		Disabled = 0,
 		DirectMapped = 1,
@@ -38,7 +38,7 @@ public:
 
 private:
 
-	enum CpuidFlags : ulong
+	enum CpuidFlags : uint
 	{
 		// EAX=1
 		CPUID_SSE3 = 0, // ecx 0
@@ -51,7 +51,7 @@ private:
 		CPUID_RDRAND = 30,  // ecx 30
 		CPUID_SSE2 = 32 + 26, // edx 26
 		CPUID_HYPERTHREAD = 32 + 28, // edx 28
-		CPUID_X86EMU = 32 + 30, // edx 30
+		CPUID_X86EMU = 32 + 30, // edx 30 -index 0, 1
 		// EAX=7
 		CPUID_SGX = 64 + 2, // ebx 2
 		CPUID_AVX2 = 64 + 5, // ebx 5
@@ -65,22 +65,22 @@ private:
 		CPUID_ADX = 64 + 19, // ebx 18
 		CPUID_SMAP = 64 + 20, // ebx 20
 		CPUID_SHA = 64 + 29, // ebx 29
-		CPUID_PREFETCH = 64 + 32, // ebx 32
-		// EAX=80000001h
+		CPUID_PREFETCH = 64 + 32, // ebx 32 -index 2, 3
+		// EAX=80000001
 		CPUID_ABM = 128 + 5, // ecx 5
 		CPUID_SSE4A = 128 + 6, // ecx 6
 		CPUID_XOP = 128 + 11, // ecx 11
 		CPUID_FMA4 = 128 + 16, // ecx 16
-		CPUID_X64 = 128 + 29, // ecx 29
-		CPUID_RDTSCP = 192 + 27, // edx 29
+		CPUID_RDTSCP = 160 + 27, // edx 27
+		CPUID_X64 = 160 + 29, // edx 29 -index 4, 5
 	};
 
 	static const size_t KB1 = 1024;
-	static const size_t KB32 = 32 * 1024;
-	static const size_t KB128 = 128 * 1024;
-	static const size_t KB256 = 256 * 1024;
+	static const size_t KB32 = 32 * KB1;
+	static const size_t KB128 = 128 * KB1;
+	static const size_t KB256 = 256 * KB1;
 
-	uint m_busSpeed;
+	uint m_busRefFrequency;
 	size_t m_cacheLineSize;
 	CpuVendors m_cpuVendor;
 	std::string m_cpuVendorString;
@@ -95,7 +95,7 @@ private:
 	size_t m_physCores;
 	std::string m_serialNumber;
 	size_t m_virtCores;
-	ulong m_x86CpuFlags[4];
+	std::vector<uint> m_x86CpuFlags;
 
 public:
 
@@ -137,9 +137,9 @@ public:
 	const bool BMT2();
 
 	/// <summary>
-	/// The processor bus speed (newer Intel only) 
+	/// The bus reference frequency (newer Intel only) 
 	/// </summary>
-	const size_t BusSpeed();
+	const size_t BusRefFrequency();
 
 	/// <summary>
 	/// Intel CMUL available
@@ -337,15 +337,17 @@ private:
 
 	bool AvxEnabled();
 	bool Avx2Enabled();
-	bool GetFlag(CpuidFlags Flag);
-	void GetFrequency();
-	size_t GetMaxCoresPerPackage();
-	size_t GetMaxLogicalPerCore();
-	void GetSerialNumber();
-	void GetTopology();
+	void BusInfo();
+	bool HasFeature(CpuidFlags Flag);
 	void Initialize();
-	const CpuVendors GetVendor(std::string &Name);
-	std::string GetVendorString(uint CpuInfo[4]);
+	size_t MaxCoresPerPackage();
+	size_t MaxLogicalPerCores();
+	const CpuVendors VendorName(std::string &Name);
+	std::string VendorString(uint CpuInfo[4]);
+	void PrintCpuStats();
+	uint ReadBits(uint Value, int Index, int Length);
+	void StoreSerialNumber();
+	void StoreTopology();
 };
 
 NAMESPACE_COMMONEND

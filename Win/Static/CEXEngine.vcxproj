@@ -183,7 +183,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>
       </AdditionalOptions>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
@@ -223,8 +223,10 @@
     <ClInclude Include="..\..\CEX\CexDomain.h" />
     <ClInclude Include="..\..\CEX\BCR.h" />
     <ClInclude Include="..\..\CEX\CexConfig.h" />
+    <ClInclude Include="..\..\CEX\CpuCores.h" />
     <ClInclude Include="..\..\CEX\CpuDetect.h" />
     <ClInclude Include="..\..\CEX\CryptoAsymmetricException.h" />
+    <ClInclude Include="..\..\CEX\CryptoAuthenticationFailure.h" />
     <ClInclude Include="..\..\CEX\CryptoCipherModeException.h" />
     <ClInclude Include="..\..\CEX\CryptoDigestException.h" />
     <ClInclude Include="..\..\CEX\CryptoException.h" />
@@ -393,6 +395,7 @@
     <ClCompile Include="..\..\CEX\BCR.cpp" />
     <ClCompile Include="..\..\CEX\CpuDetect.cpp" />
     <ClCompile Include="..\..\CEX\CryptoAsymmetricException.cpp" />
+    <ClCompile Include="..\..\CEX\CryptoAuthenticationFailure.cpp" />
     <ClCompile Include="..\..\CEX\CryptoCipherModeException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoDigestException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoException.cpp" />

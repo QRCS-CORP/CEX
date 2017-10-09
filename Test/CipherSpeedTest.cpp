@@ -314,10 +314,10 @@ namespace Test
 		std::vector<byte> ctr4(16, 0);
 		std::vector<byte> ctr5(16, 0);
 		TestUtils::GetRandom(ctr1);
-		memcpy(&ctr2[0], &ctr1[0], 16);
-		memcpy(&ctr3[0], &ctr1[0], 16);
-		memcpy(&ctr4[0], &ctr1[0], 16);
-		memcpy(&ctr5[0], &ctr1[0], 16);
+		std::memcpy(&ctr2[0], &ctr1[0], 16);
+		std::memcpy(&ctr3[0], &ctr1[0], 16);
+		std::memcpy(&ctr4[0], &ctr1[0], 16);
+		std::memcpy(&ctr5[0], &ctr1[0], 16);
 
 		// counter 1
 		itr = LOOPS;

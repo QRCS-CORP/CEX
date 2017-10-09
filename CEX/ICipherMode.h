@@ -58,7 +58,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~ICipherMode() {}
+	virtual ~ICipherMode() noexcept {}
 
 	//~~~Properties~~~//
 

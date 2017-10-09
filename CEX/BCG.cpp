@@ -196,10 +196,10 @@ size_t BCG::Generate(std::vector<byte> &Output)
 
 size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
-	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CEXASSERT(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
-	CEXASSERT(Length <= ParallelBlockSize(), "The maximum request size has been exceeded!");
+	CexAssert(m_isInitialized, "The generator must be initialized before use!");
+	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	CexAssert(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
+	CexAssert(Length <= ParallelBlockSize(), "The maximum request size has been exceeded!");
 
 	GenerateBlock(Output, OutOffset, Length);
 

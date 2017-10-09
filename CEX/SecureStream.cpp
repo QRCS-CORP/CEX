@@ -97,7 +97,7 @@ SecureStream::SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length
 	m_streamData(0),
 	m_streamPosition(0)
 {
-	CEXASSERT(Length <= Data.size() - Offset, "length is longer than the array size");
+	CexAssert(Length <= Data.size() - Offset, "length is longer than the array size");
 
 	m_streamData.resize(Length);
 	Utility::MemUtils::Copy(Data, Offset, m_streamData, 0, Length);
@@ -159,7 +159,7 @@ size_t SecureStream::Read(std::vector<byte> &Output, size_t Offset, size_t Lengt
 
 byte SecureStream::ReadByte()
 {
-	CEXASSERT(m_streamData.size() - m_streamPosition >= 1, "Stream capacity exceeded");
+	CexAssert(m_streamData.size() - m_streamPosition >= 1, "Stream capacity exceeded");
 
 	byte data = 0;
 	Transform();
@@ -206,7 +206,7 @@ std::vector<byte> SecureStream::ToArray()
 
 void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t Length)
 {
-	CEXASSERT(Offset + Length <= Input.size(), "length is longer than the array size");
+	CexAssert(Offset + Length <= Input.size(), "length is longer than the array size");
 
 	size_t len = m_streamPosition + Length;
 	if (m_streamData.capacity() - m_streamPosition < Length)

@@ -17,7 +17,7 @@ private:
 	TBC& operator=(TBC&&) = delete;
 
 	static const std::string CLASS_NAME;
-	static const byte MKCODE = (byte)0xff;
+	static const byte MKCODE = (byte)0xFF;
 	static const byte ZBCODE = (byte)0x00;
 
 public:

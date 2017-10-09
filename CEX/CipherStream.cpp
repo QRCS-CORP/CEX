@@ -224,10 +224,10 @@ void CipherStream::ParallelMaxDegree(size_t Degree)
 
 void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 {
-	CEXASSERT(m_isInitialized, "the cipher has not been initialized");
-	CEXASSERT(InStream->Length() - InStream->Position() > 0, "the Input stream is too short");
-	CEXASSERT(InStream->CanRead(), "the Input stream is set to write only!");
-	CEXASSERT(OutStream->CanRead() || OutStream->CanWrite(), "the Output stream is to read only!");
+	CexAssert(m_isInitialized, "the cipher has not been initialized");
+	CexAssert(InStream->Length() - InStream->Position() > 0, "the Input stream is too short");
+	CexAssert(InStream->CanRead(), "the Input stream is set to write only!");
+	CexAssert(OutStream->CanRead() || OutStream->CanWrite(), "the Output stream is to read only!");
 
 	if (!m_isStreamCipher)
 		BlockTransform(InStream, OutStream);
@@ -240,9 +240,9 @@ void CipherStream::Write(IByteStream* InStream, IByteStream* OutStream)
 
 void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "the cipher has not been initialized");
-	CEXASSERT(Input.size() - InOffset > 0, "the input array is too short");
-	CEXASSERT(Input.size() - InOffset <= Output.size() - OutOffset, "the output array is too short!");
+	CexAssert(m_isInitialized, "the cipher has not been initialized");
+	CexAssert(Input.size() - InOffset > 0, "the input array is too short");
+	CexAssert(Input.size() - InOffset <= Output.size() - OutOffset, "the output array is too short!");
 
 	if (!m_isStreamCipher)
 		BlockTransform(Input, InOffset, Output, OutOffset);

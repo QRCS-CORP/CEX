@@ -712,13 +712,13 @@ CEX_OPTIMIZE_RESUME
 
 uint RHX::SubByte(uint Rot)
 {
-	uint value = 0xff & Rot;
+	uint value = 0xFF & Rot;
 	uint result = SBox[value];
-	value = 0xff & (Rot >> 8);
+	value = 0xFF & (Rot >> 8);
 	result |= (uint)SBox[value] << 8;
-	value = 0xff & (Rot >> 16);
+	value = 0xFF & (Rot >> 16);
 	result |= (uint)SBox[value] << 16;
-	value = 0xff & (Rot >> 24);
+	value = 0xFF & (Rot >> 24);
 	return result | (uint)(SBox[value] << 24);
 }
 

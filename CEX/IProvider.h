@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~IProvider() {}
+	virtual ~IProvider() noexcept {}
 
 	//~~~Properties~~~//
 

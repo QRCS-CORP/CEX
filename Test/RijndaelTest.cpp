@@ -28,20 +28,22 @@ namespace Test
 		{
 			Initialize();
 
-			for (unsigned int i = 0; i < m_plainText.size(); ++i)
+			for (size_t i = 0; i < m_plainText.size(); ++i)
+			{
 				CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
+			}
 
 			OnProgress(std::string("RijndaelTest : Passed Gladman 128bit block Rijndael tests.."));
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -56,13 +58,17 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
+		{
 			throw TestException("RijndaelTest: Encrypted arrays are not equal!");
+		}
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
+		{
 			throw TestException("RijndaelTest: Decrypted arrays are not equal!");
+		}
 	}
 
 	void RijndaelTest::Initialize()

@@ -334,11 +334,12 @@ const ulong FFTM12T62::ButterflyConsts[63][12] =
 
 //~~~Public Functions~~~//
 
-int FFTM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S)
+bool FFTM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S)
 {
 	size_t i;
-	ulong t;
 	ulong diff;
+	ulong t;
+
 	std::array<ulong, CND_SIZE / 8> cond;
 
 	IntUtils::BlockToLe(PrivateKey, IRR_SIZE, cond, 0, CND_SIZE);
@@ -416,16 +417,16 @@ int FFTM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey
 	t -= 1;
 	t >>= 63;
 
-	return (t - 1);
+	return (t - 1 == 0) ? true : false;
 }
 
-void FFTM12T62::Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, IPrng* Random)
+void FFTM12T62::Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Random)
 {
 	GenE(E, Random);
 	Syndrome(S, PublicKey, E);
 }
 
-int FFTM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, IPrng* Random)
+bool FFTM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Random)
 {
 	size_t ctr;
 
@@ -439,7 +440,7 @@ int FFTM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Private
 		}
 	}
 
-	return (ctr < GEN_MAXR) ? 0 : -1;
+	return (ctr < GEN_MAXR) ? true : false;
 }
 
 //~~~Private Functions~~~//
@@ -606,6 +607,7 @@ void FFTM12T62::Scaling(std::array<std::array<ulong, M>, 64> &Output, std::array
 		McElieceUtils::Multiply(Inverse[i + 1], tmp, Inverse[i]);
 		McElieceUtils::Multiply(tmp, tmp, eval[i + 1]);
 	}
+
 	McElieceUtils::Copy(tmp, Inverse[0]);
 
 	for (i = 0; i < 64; i++)
@@ -676,7 +678,7 @@ void FFTM12T62::SyndromeAdjust(std::array<std::array<ulong, M>, 2> &Output)
 
 //~~~Encrypt~~~//
 
-void FFTM12T62::GenE(std::vector<byte> &E, IPrng* Random)
+void FFTM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Random)
 {
 	size_t i;
 	size_t j;
@@ -711,7 +713,9 @@ void FFTM12T62::GenE(std::vector<byte> &E, IPrng* Random)
 
 	std::array<ulong, T> val;
 	for (j = 0; j < T; j++)
+	{
 		val[j] = ((ulong)1 << (ind[j] & 63));
+	}
 
 	std::array<ulong, 64> eInt;
 	for (i = 0; i < 64; i++)
@@ -780,12 +784,12 @@ void FFTM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKe
 
 int FFTM12T62::IrrGen(std::array<ushort, T + 1> &Output, std::vector<ushort> &F)
 {
+	size_t c;
 	size_t i;
 	size_t j;
 	size_t k;
-	size_t c;
-	ushort mask;
 	ushort inverse;
+	ushort mask;
 	ushort t;
 	std::array<std::array<ushort, T>, T + 1> mat;
 
@@ -855,11 +859,11 @@ int FFTM12T62::IrrGen(std::array<ushort, T + 1> &Output, std::vector<ushort> &F)
 	return 0;
 }
 
-void FFTM12T62::SkGen(std::vector<byte> &PrivateKey, Prng::IPrng* Random)
+void FFTM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Random)
 {
 	size_t i;
-	std::vector<ushort> f(T);
 	std::array<ushort, T + 1> irr;
+	std::vector<ushort> f(T);
 
 	while (1)
 	{
@@ -948,7 +952,7 @@ int FFTM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Priv
 		}
 	}
 
-	const ulong GfPoints[64][12] =
+	static const ulong GfPoints[64][12] =
 	{
 		{
 			0X0000000000000000, 0X0000000000000000, 0X0000000000000000, 0X0000000000000000,
@@ -1387,7 +1391,7 @@ void FFTM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, M>, 64> &O
 	size_t s;
 	size_t constsPos;
 
-	const byte ButterflyReverse[64] =
+	static const byte ButterflyReverse[64] =
 	{
 		0, 32, 16, 48, 8, 40, 24, 56,
 		4, 36, 20, 52, 12, 44, 28, 60,
@@ -1471,7 +1475,7 @@ void FFTM12T62::AdditiveFFT::RadixConversions(std::array<ulong, M> &Output)
 	size_t j;
 	size_t k;
 
-	const ulong RadixMask[5][2] =
+	static const ulong RadixMask[5][2] =
 	{
 		{ 0x8888888888888888, 0x4444444444444444 },
 		{ 0xC0C0C0C0C0C0C0C0, 0x3030303030303030 },
@@ -1480,7 +1484,7 @@ void FFTM12T62::AdditiveFFT::RadixConversions(std::array<ulong, M> &Output)
 		{ 0xFFFF000000000000, 0x0000FFFF00000000 }
 	};
 
-	const ulong RadixScalar[5][12] =
+	static const ulong RadixScalar[5][12] =
 	{
 		{
 			0XF3CFC030FC30F003, 0X3FCF0F003C00C00C, 0X30033CC300C0C03C, 0XCCFF0F3C0F30F0C0,
@@ -1560,7 +1564,7 @@ void FFTM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, M>, 2> &
 	}
 
 	// transpose
-	const byte ButterflyReverse[64] =
+	static const byte ButterflyReverse[64] =
 	{
 		0, 32, 16, 48, 8, 40, 24, 56,
 		4, 36, 20, 52, 12, 44, 28, 60,
@@ -1749,7 +1753,7 @@ void FFTM12T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, M>,
 	size_t j;
 	size_t k;
 
-	const ulong RadixTrMask[6][2] =
+	static const ulong RadixTrMask[6][2] =
 	{
 		{ 0x2222222222222222, 0x4444444444444444 },
 		{ 0x0C0C0C0C0C0C0C0C, 0x3030303030303030 },
@@ -1759,7 +1763,7 @@ void FFTM12T62::TransposedFFT::RadixConversions(std::array<std::array<ulong, M>,
 		{ 0xFFFFFFFF00000000, 0x00000000FFFFFFFF }
 	};
 
-	const ulong RadixTrScalar[5][2][12] =
+	static const ulong RadixTrScalar[5][2][12] =
 	{
 		{
 			{

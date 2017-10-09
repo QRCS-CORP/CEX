@@ -60,7 +60,7 @@ namespace Test
 
 			CbcModeTest();
 			OnProgress(std::string("Passed CBC Mode tests.."));
-			CfbModeTest();
+			CfbModeTest(); // TODO: failed here (once) vet this class and re-test
 			OnProgress(std::string("Passed CFB Mode tests.."));
 			CtrModeTest();
 			OnProgress(std::string("Passed CTR Mode tests.."));
@@ -137,7 +137,7 @@ namespace Test
 			OnProgress(std::string("Passed SHX CipherStream test.."));
 
 			m_key.resize(192);
-			for (unsigned int i = 0; i < 192; i++)
+			for (size_t i = 0; i < 192; i++)
 				m_key[i] = (byte)i;
 
 			// test extended ciphers
@@ -157,13 +157,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -198,7 +198,7 @@ namespace Test
 		fIn2.Close();
 		fOut2.Close();
 
-		/*// encrypt and copy to a new file
+		// encrypt and copy to a new file
 		FileStream fIn3(INPFILE, FileStream::FileAccess::Read);
 		FileStream fOut3(ENCFILE, FileStream::FileAccess::ReadWrite);
 		cs.Initialize(true, kp);
@@ -212,7 +212,7 @@ namespace Test
 		cs.Initialize(false, kp);
 		cs.Write(&fIn4, &fOut4);
 		fIn4.Close();
-		fOut4.Close();*/
+		fOut4.Close();/**/
 	}
 
 	void CipherStreamTest::CbcModeTest()
@@ -229,9 +229,9 @@ namespace Test
 		Processing::CipherStream cs(&cipher2, padding);
 		Prng::SecureRandom rng;
 
-		for (unsigned int i = 0; i < 10; i++)
+		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -337,9 +337,9 @@ namespace Test
 		Processing::CipherStream cs(&cipher2, padding);
 		Prng::SecureRandom rng;
 
-		for (unsigned int i = 0; i < 10; i++)
+		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -446,9 +446,9 @@ namespace Test
 		Prng::SecureRandom rng;
 
 		// ctr test
-		for (unsigned int i = 0; i < 10; i++)
+		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_encText.resize(smpSze);
@@ -590,7 +590,7 @@ namespace Test
 		ms.WriteByte((byte)12);
 
 		std::vector<byte> data(255);
-		for (unsigned int i = 0; i < 255; i++)
+		for (size_t i = 0; i < 255; i++)
 			data[i] = (byte)i;
 		ms.Write(data, 0, 255);
 
@@ -707,10 +707,10 @@ namespace Test
 
 		// random block sizes with byte arrays
 		{
-			for (unsigned int i = 0; i < 10; i++)
+			for (size_t i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
+				size_t smpSze = (size_t)rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -732,10 +732,10 @@ namespace Test
 		}
 		// random block sizes with stream
 		{
-			for (unsigned int i = 0; i < 10; i++)
+			for (size_t i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
+				size_t smpSze = (size_t)rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -780,7 +780,7 @@ namespace Test
 		for (size_t i = 0; i < 10; i++)
 		{
 			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
-			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
+			size_t prlBlock = (size_t)smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
 			m_decText.resize(smpSze);
@@ -881,9 +881,9 @@ namespace Test
 		Prng::SecureRandom rng;
 
 		// ctr test
-		for (unsigned int i = 0; i < 10; i++)
+		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
 			size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -1054,7 +1054,7 @@ namespace Test
 		}
 		else
 		{
-			unsigned int blkSze = 0;
+			size_t blkSze = 0;
 			if (NonAlign != 0)
 			{
 				while ((blkSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC)) % NonAlign == 0);
@@ -1092,12 +1092,12 @@ namespace Test
 
 		// last block
 		std::vector<byte> inpBuffer(BLKSZE);
-		memcpy(&inpBuffer[0], &Input[InOffset], BLKSZE);
+		std::memcpy(&inpBuffer[0], &Input[InOffset], BLKSZE);
 		std::vector<byte> outBuffer(BLKSZE);
 		Cipher->DecryptBlock(inpBuffer, 0, outBuffer, 0);
 		const size_t PADLEN = Padding->GetPaddingLength(outBuffer, 0);
 		const size_t FNLSZE = (PADLEN == 0) ? BLKSZE : BLKSZE - PADLEN;
-		memcpy(&Output[OutOffset], &outBuffer[0], FNLSZE);
+		std::memcpy(&Output[OutOffset], &outBuffer[0], FNLSZE);
 		OutOffset += FNLSZE;
 
 		if (Output.size() != OutOffset)
@@ -1123,14 +1123,14 @@ namespace Test
 		{
 			size_t FNLSZE = INPSZE - ALNSZE;
 			std::vector<byte> inpBuffer(BLKSZE);
-			memcpy(&inpBuffer[0], &Input[InOffset], FNLSZE);
+			std::memcpy(&inpBuffer[0], &Input[InOffset], FNLSZE);
 			if (FNLSZE != BLKSZE)
 				Padding->AddPadding(inpBuffer, FNLSZE);
 			std::vector<byte> outBuffer(BLKSZE);
 			Cipher->EncryptBlock(inpBuffer, 0, outBuffer, 0);
 			if (Output.size() != OutOffset + BLKSZE)
 				Output.resize(OutOffset + BLKSZE);
-			memcpy(&Output[OutOffset], &outBuffer[0], BLKSZE);
+			std::memcpy(&Output[OutOffset], &outBuffer[0], BLKSZE);
 		}
 	}
 

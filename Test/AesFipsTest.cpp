@@ -32,39 +32,47 @@ namespace Test
 		{
 			Initialize();
 
-			for (unsigned int i = 0; i < 12; i++)
+			for (size_t i = 0; i < 12; i++)
 			{
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(m_keys[i], m_plainText[i], m_cipherText[i]);
+				}
 				else
 #endif
+				{
 					CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
+				}
 			}
 
 			OnProgress(std::string("AesFipsTest: Passed FIPS 197 Monte Carlo tests.."));
 
-			for (unsigned int i = 12; i < m_plainText.size(); i++)
+			for (size_t i = 12; i < m_plainText.size(); i++)
 			{
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareMonteCarloNI(m_keys[i], m_plainText[i], m_cipherText[i]);
+				}
 				else
 #endif
+				{
 					CompareMonteCarlo(m_keys[i], m_plainText[i], m_cipherText[i]);
+				}
 			}
 
 			OnProgress(std::string("AesFipsTest: Passed Extended Monte Carlo tests.."));
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -77,13 +85,17 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
+		{
 			throw TestException("AesFipsTest: AES: Encrypted arrays are not equal!");
+		}
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
+		{
 			throw TestException("AesFipsTest: AES: Decrypted arrays are not equal!");
+		}
 	}
 
 #if defined(__AVX__)
@@ -97,74 +109,94 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
+		{
 			throw TestException("AesFipsTest: AES: Encrypted arrays are not equal!");
+		}
 
 		engine.Initialize(false, k);
 		engine.Transform(Output, outBytes);
 
 		if (outBytes != Input)
+		{
 			throw TestException("AesFipsTest: AES: Decrypted arrays are not equal!");
+		}
 	}
 #endif
 
 	void AesFipsTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		memcpy(&outBytes[0], &Input[0], outBytes.size());
+		std::memcpy(&outBytes[0], &Input[0], outBytes.size());
 
 		{
 			RHX engine;
 			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 10000; i++)
+			for (size_t i = 0; i != 10000; i++)
+			{
 				engine.Transform(outBytes, outBytes);
+			}
 		}
 
 		if (outBytes != Output)
+		{
 			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+		}
 
 		{
 			RHX engine;
 			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 10000; i++)
+			for (size_t i = 0; i != 10000; i++)
+			{
 				engine.Transform(outBytes, outBytes);
+			}
 		}
 
 		if (outBytes != Input)
+		{
 			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+		}
 	}
 
 #if defined(__AVX__)
 	void AesFipsTest::CompareMonteCarloNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		memcpy(&outBytes[0], &Input[0], outBytes.size());
+		std::memcpy(&outBytes[0], &Input[0], outBytes.size());
 		{
 			AHX engine;
 			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(true, k);
 
-			for (unsigned int i = 0; i != 10000; i++)
+			for (size_t i = 0; i != 10000; i++)
+			{
 				engine.Transform(outBytes, outBytes);
+			}
 		}
 
 		if (outBytes != Output)
+		{
 			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+		}
 
 		{
 			AHX engine;
 			Key::Symmetric::SymmetricKey k(Key);
 			engine.Initialize(false, k);
 
-			for (unsigned int i = 0; i != 10000; i++)
+			for (size_t i = 0; i != 10000; i++)
+			{
 				engine.Transform(outBytes, outBytes);
+			}
 		}
 
 		if (outBytes != Input)
+		{
 			throw TestException("AesFipsTest: AES MonteCarlo: Arrays are not equal!");
+		}
 	}
 #endif
 

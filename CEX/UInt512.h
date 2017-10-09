@@ -298,18 +298,18 @@ public:
 		T1 = _mm512_shuffle_i32x4(X1, X5, 0x88);
 		T2 = _mm512_shuffle_i32x4(X2, X6, 0x88);
 		T3 = _mm512_shuffle_i32x4(X3, X7, 0x88);
-		T4 = _mm512_shuffle_i32x4(X0, X4, 0xdd);
-		T5 = _mm512_shuffle_i32x4(X1, X5, 0xdd);
-		T6 = _mm512_shuffle_i32x4(X2, X6, 0xdd);
-		T7 = _mm512_shuffle_i32x4(X3, X7, 0xdd);
+		T4 = _mm512_shuffle_i32x4(X0, X4, 0xDD);
+		T5 = _mm512_shuffle_i32x4(X1, X5, 0xDD);
+		T6 = _mm512_shuffle_i32x4(X2, X6, 0xDD);
+		T7 = _mm512_shuffle_i32x4(X3, X7, 0xDD);
 		T8 = _mm512_shuffle_i32x4(X8, X12, 0x88);
 		T9 = _mm512_shuffle_i32x4(X9, X13, 0x88);
 		T10 = _mm512_shuffle_i32x4(X10, X14, 0x88);
 		T11 = _mm512_shuffle_i32x4(X11, X15, 0x88);
-		T12 = _mm512_shuffle_i32x4(X8, X12, 0xdd);
-		T13 = _mm512_shuffle_i32x4(X9, X13, 0xdd);
-		T14 = _mm512_shuffle_i32x4(X10, X14, 0xdd);
-		T15 = _mm512_shuffle_i32x4(X11, X15, 0xdd);
+		T12 = _mm512_shuffle_i32x4(X8, X12, 0xDD);
+		T13 = _mm512_shuffle_i32x4(X9, X13, 0xDD);
+		T14 = _mm512_shuffle_i32x4(X10, X14, 0xDD);
+		T15 = _mm512_shuffle_i32x4(X11, X15, 0xDD);
 
 		X0 = _mm512_shuffle_i32x4(T0, T8, 0x88);
 		X1 = _mm512_shuffle_i32x4(T1, T9, 0x88);
@@ -319,14 +319,14 @@ public:
 		X5 = _mm512_shuffle_i32x4(T5, T13, 0x88);
 		X6 = _mm512_shuffle_i32x4(T6, T14, 0x88);
 		X7 = _mm512_shuffle_i32x4(T7, T15, 0x88);
-		X8 = _mm512_shuffle_i32x4(T0, T8, 0xdd);
-		X9 = _mm512_shuffle_i32x4(T1, T9, 0xdd);
-		X10 = _mm512_shuffle_i32x4(T2, T10, 0xdd);
-		X11 = _mm512_shuffle_i32x4(T3, T11, 0xdd);
-		X12 = _mm512_shuffle_i32x4(T4, T12, 0xdd);
-		X13 = _mm512_shuffle_i32x4(T5, T13, 0xdd);
-		X14 = _mm512_shuffle_i32x4(T6, T14, 0xdd);
-		X15 = _mm512_shuffle_i32x4(T7, T15, 0xdd);
+		X8 = _mm512_shuffle_i32x4(T0, T8, 0xDD);
+		X9 = _mm512_shuffle_i32x4(T1, T9, 0xDD);
+		X10 = _mm512_shuffle_i32x4(T2, T10, 0xDD);
+		X11 = _mm512_shuffle_i32x4(T3, T11, 0xDD);
+		X12 = _mm512_shuffle_i32x4(T4, T12, 0xDD);
+		X13 = _mm512_shuffle_i32x4(T5, T13, 0xDD);
+		X14 = _mm512_shuffle_i32x4(T6, T14, 0xDD);
+		X15 = _mm512_shuffle_i32x4(T7, T15, 0xDD);
 
 		X0.Store(Output, Offset);
 		X1.Store(Output, Offset + (64 / sizeof(Output[0])));
@@ -386,7 +386,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotL32(const int Shift)
 	{
-		CEXASSERT(Shift <= 32, "Shift size is too large");
+		CexAssert(Shift <= 32, "Shift size is too large");
 		zmm = _mm512_or_si512(_mm512_slli_epi32(zmm, static_cast<int>(Shift)), _mm512_srli_epi32(zmm, static_cast<int>(32 - Shift)));
 	}
 
@@ -400,7 +400,7 @@ public:
 	/// <returns>The rotated UInt512</returns>
 	inline static  UInt512 RotL32(const UInt512 &X, const int Shift)
 	{
-		CEXASSERT(Shift <= 32, "Shift size is too large");
+		CexAssert(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_or_si512(_mm512_slli_epi32(X.zmm, static_cast<int>(Shift)), _mm512_srli_epi32(X.zmm, static_cast<int>(32 - Shift))));
 	}
 
@@ -411,7 +411,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	inline void RotR32(const int Shift)
 	{
-		CEXASSERT(Shift <= 32, "Shift size is too large");
+		CexAssert(Shift <= 32, "Shift size is too large");
 		RotL32(32 - Shift);
 	}
 
@@ -425,7 +425,7 @@ public:
 	/// <returns>The rotated UInt512</returns>
 	inline static UInt512 RotR32(const UInt512 &X, const int Shift)
 	{
-		CEXASSERT(Shift <= 32, "Shift size is too large");
+		CexAssert(Shift <= 32, "Shift size is too large");
 		return RotL32(X, 32 - Shift);
 	}
 
@@ -439,7 +439,7 @@ public:
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 ShiftRA(const UInt512 &Value, const int Shift)
 	{
-		CEXASSERT(Shift <= 32, "Shift size is too large");
+		CexAssert(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_sra_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -453,7 +453,7 @@ public:
 	/// <returns>The processed UInt512</returns>
 	inline static UInt512 ShiftRL(const UInt512 &Value, const int Shift)
 	{
-		CEXASSERT(Shift <= 32, "Shift size is too large");
+		CexAssert(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_srl_epi32(Value, _mm_set1_epi32(Shift)));
 	}
 
@@ -622,7 +622,7 @@ public:
 		std::array<uint, 16> tmpB;
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 && 
+		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 && 
 			tmpB[8] != 0 && tmpB[9] != 0 && tmpB[10] != 0 && tmpB[11] != 0 && tmpB[12] != 0 && tmpB[13] != 0 && tmpB[14] != 0 && tmpB[15] != 0, "Division by zero");
 
 		return UInt512(tmpA[15] / tmpB[15], tmpA[14] / tmpB[14], tmpA[13] / tmpB[13], tmpA[12] / tmpB[12],
@@ -645,7 +645,7 @@ public:
 		std::array<uint, 16> tmpB;
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpA[0]), zmm);
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&tmpB[0]), X.zmm);
-		CEXASSERT(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 &&
+		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0 && tmpB[4] != 0 && tmpB[5] != 0 && tmpB[6] != 0 && tmpB[7] != 0 &&
 			tmpB[8] != 0 && tmpB[9] != 0 && tmpB[10] != 0 && tmpB[11] != 0 && tmpB[12] != 0 && tmpB[13] != 0 && tmpB[14] != 0 && tmpB[15] != 0, "Division by zero");
 
 		zmm = _mm512_set_epi32(tmpA[15] / tmpB[15], tmpA[14] / tmpB[14], tmpA[13] / tmpB[13], tmpA[12] / tmpB[12],

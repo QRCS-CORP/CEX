@@ -25,19 +25,19 @@ enum class AsymmetricEngines : byte
 	/// <summary>
 	/// An NTRU cipher implementation
 	/// </summary>
-	NTRU = 4,
+	NTRU = 3,
 	/// <summary>
 	/// A Rainbow signature scheme implementation
 	/// </summary>
-	Rainbow = 8,
+	Rainbow = 4,
 	/// <summary>
 	/// A Ring-LWE cipher implementation
 	/// </summary>
-	RingLWE = 16,
+	RingLWE = 5,
 	/// <summary>
 	/// A Supersingular Isogeny Diffie Hellman implementation
 	/// </summary>
-	SIDH = 32
+	SIDH = 6
 };
 
 NAMESPACE_ENUMERATIONEND

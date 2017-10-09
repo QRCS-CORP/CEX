@@ -168,10 +168,10 @@ size_t HCG::Generate(std::vector<byte> &Output)
 
 size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The generator must be initialized before use!");
-	CEXASSERT((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CEXASSERT(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
-	CEXASSERT(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
+	CexAssert(m_isInitialized, "The generator must be initialized before use!");
+	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	CexAssert(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
+	CexAssert(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
 	GenerateBlock(Output, OutOffset, Length);
 	m_reseedCounter += Length;

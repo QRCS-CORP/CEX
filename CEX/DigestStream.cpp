@@ -50,8 +50,8 @@ DigestStream::~DigestStream()
 
 std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 {
-	CEXASSERT(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
-	CEXASSERT(InStream->CanRead(), "the input stream is set to write only!");
+	CexAssert(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
+	CexAssert(InStream->CanRead(), "the input stream is set to write only!");
 
 	size_t dataLen = InStream->Length() - InStream->Position();
 	CalculateInterval(dataLen);
@@ -62,7 +62,7 @@ std::vector<byte> DigestStream::Compute(IByteStream* InStream)
 
 std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
+	CexAssert((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
 
 	CalculateInterval(Length);
 	m_digestEngine->Reset();

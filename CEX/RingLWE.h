@@ -20,7 +20,10 @@
 #define CEX_RINGLWE_H
 
 #include "CexDomain.h"
+#include "BlockCiphers.h"
+#include "IAeadMode.h"
 #include "IAsymmetricCipher.h"
+#include "IBlockCipher.h"
 #include "RLWEKeyPair.h"
 #include "RLWEParams.h"
 #include "RLWEParamSet.h"
@@ -29,10 +32,14 @@
 
 NAMESPACE_RINGLWE
 
+using Cipher::Symmetric::Block::Mode::IAeadMode;
+using Cipher::Symmetric::Block::IBlockCipher;
 using Key::Asymmetric::RLWEKeyPair;
 using Enumeration::RLWEParams;
 using Key::Asymmetric::RLWEPrivateKey;
 using Key::Asymmetric::RLWEPublicKey;
+using Key::Asymmetric::RLWEPublicKey;
+using Enumeration::BlockCiphers;
 
 /// <summary>
 /// An implementation of the Ring Learning With Errors asymmetric cipher (RingLWE)
@@ -96,19 +103,20 @@ private:
 
 	static const std::string CLASS_NAME;
 
+	std::unique_ptr<IAeadMode> m_cprMode;
 	bool m_destroyEngine;
-	IDigest* m_dgtFinalizer;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	bool m_isParallel;
-	RLWEParamSet m_paramSet;
-	RLWEParams m_rlweParameters;
-	IAsymmetricKeyPair* m_keyPair;
+	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::vector<byte> m_keyTag;
-	RLWEPrivateKey* m_privateKey;
-	RLWEPublicKey* m_publicKey;
-	IPrng* m_rndGenerator;
+	std::unique_ptr<IDigest> m_msgDigest;
+	RLWEParamSet m_paramSet;
+	std::unique_ptr<RLWEPrivateKey> m_privateKey;
+	std::unique_ptr<RLWEPublicKey> m_publicKey;
+	RLWEParams m_rlweParameters;
+	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
 
@@ -161,21 +169,21 @@ public:
 	/// Instantiate the cipher with auto-initialized prng and digest functions
 	/// </summary>
 	///
-	/// <param name="Parameters">The cipher parameter enumeration name</param>
-	/// <param name="PrngType">The Prng function type</param>
-	/// <param name="DigestType">The message digest finalizer type</param>
+	/// <param name="Parameters">The parameter set enumeration name</param>
+	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
+	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
-	explicit RingLWE(RLWEParams Parameters, Prngs PrngType = Prngs::BCR, Digests DigestType = Digests::SHA256, bool Parallel = false);
+	explicit RingLWE(RLWEParams Parameters, Prngs PrngType = Prngs::BCR, BlockCiphers CipherType = BlockCiphers::Rijndael, bool Parallel = false);
 
 	/// <summary>
 	/// Instantiate this class using external Prng and Digest instances
 	/// </summary>
 	///
-	/// <param name="Parameters">The ciphers parameter settings type</param>
-	/// <param name="Prng">A pointer to the Prng function</param>
-	/// <param name="Digest">A pointer to the message digest finalizer</param>
+	/// <param name="Parameters">The parameter set enumeration name</param>
+	/// <param name="Prng">A pointer to the seed Prng function</param>
+	/// <param name="Cipher">A pointer to the authentication block cipher</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
-	RingLWE(RLWEParams Parameters, IPrng* Prng, IDigest* Digest, bool Parallel = false);
+	RingLWE(RLWEParams Parameters, IPrng* Prng, IBlockCipher* Cipher, bool Parallel = false);
 
 	/// <summary>
 	/// Finalize objects
@@ -191,7 +199,7 @@ public:
 	/// <param name="CipherText">The input cipher-text</param>
 	/// 
 	/// <returns>The decrypted message</returns>
-	std::vector<byte> Decrypt(std::vector<byte> &CipherText) override;
+	std::vector<byte> Decrypt(const std::vector<byte> &CipherText) override;
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer
@@ -199,13 +207,13 @@ public:
 	void Destroy() override;
 
 	/// <summary>
-	/// Encrypt a shared secret and return the encrypted message
+	/// Encrypt a secret and return the encrypted message
 	/// </summary>
 	/// 
 	/// <param name="Message">The shared secret array</param>
 	/// 
 	/// <returns>The encrypted message</returns>
-	std::vector<byte> Encrypt(std::vector<byte> &Message) override;
+	std::vector<byte> Encrypt(const std::vector<byte> &Message) override;
 
 	/// <summary>
 	/// Generate a public/private key-pair
@@ -224,6 +232,8 @@ public:
 
 private:
 
+	bool RLWEDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message, std::vector<byte> &Secret);
+	void RLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, std::vector<byte> &Secret);
 	void Scope();
 };
 

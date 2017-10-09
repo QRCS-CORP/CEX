@@ -48,22 +48,31 @@ namespace Test
 
 			TestUtils::Read(SERPENTCTEXT128, cipStr);
 			if (cipStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTKEY128, keyStr);
 			if (keyStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTPTEXT128, plnStr);
 			if (plnStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTM100X128, mntStr);
 			if (mntStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTM1000X128, mnt1kStr);
 			if (mnt1kStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-
-			for (unsigned int i = 0; i < keyStr.size(); i += 32)
+			for (size_t i = 0; i < keyStr.size(); i += 32)
 			{
 				// less monte carlo tests than vector
 				bool doMonte = i * 32 < mntStr.size();
@@ -90,13 +99,12 @@ namespace Test
 				// vector comparison
 				CompareVector(key, pln, cip);
 			}
-			//
+			
 			rcnt = TestUtils::ToString(rcount);
 			klen = TestUtils::ToString((int)(keyStr.size() / 32));
 			resp = "Serpent128: Passed Monte Carlo " + rcnt + std::string(" rounds and " + klen + std::string(" vectors.."));
 			OnProgress(resp);
 			rcount = 0;
-
 			cipStr = "";
 			keyStr = "";
 			plnStr = "";
@@ -106,21 +114,31 @@ namespace Test
 			// 192 bit keys
 			TestUtils::Read(SERPENTCTEXT192, cipStr);
 			if (cipStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTKEY192, keyStr);
 			if (keyStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTPTEXT192, plnStr);
 			if (plnStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTM100X192, mntStr);
 			if (mntStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTM1000X192, mnt1kStr);
 			if (mnt1kStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
+			for (size_t i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
 			{
 				bool doMonte = i * 32 < mntStr.size();
 
@@ -160,21 +178,31 @@ namespace Test
 			// 256 bit keys
 			TestUtils::Read(SERPENTCTEXT256, cipStr);
 			if (cipStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTKEY256, keyStr);
 			if (keyStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTPTEXT256, plnStr);
 			if (plnStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTM100X256, mntStr);
 			if (mntStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 			TestUtils::Read(SERPENTM1000X256, mnt1kStr);
 			if (mnt1kStr.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
+			for (size_t i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
 			{
 				bool doMonte = i * 32 < mntStr.size();
 
@@ -211,30 +239,34 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
-	void SerpentTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, unsigned int Count)
+	void SerpentTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, size_t Count)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		memcpy(&outBytes[0], &Input[0], outBytes.size());
+		std::memcpy(&outBytes[0], &Input[0], outBytes.size());
 		SHX eng;
 		Key::Symmetric::SymmetricKey k(Key);
 
 		eng.Initialize(true, k);
 
-		for (unsigned int i = 0; i != Count; i++)
+		for (size_t i = 0; i != Count; i++)
+		{
 			eng.Transform(outBytes, outBytes);
+		}
 
 		if (outBytes != Output)
+		{
 			throw TestException("Serpent MonteCarlo: Arrays are not equal!");
+		}
 	}
 
 	void SerpentTest::CompareOutput()
@@ -244,10 +276,14 @@ namespace Test
 		std::vector<byte> decBytes(16, 0);
 		std::vector<byte> key(64, 0);
 
-		for (unsigned int i = 0; i < 16; i++)
-			inBytes[i] = (byte)i;
-		for (unsigned int i = 0; i < 64; i++)
-			key[i] = (byte)i;
+		for (byte i = 0; i < 16; i++)
+		{
+			inBytes[i] = i;
+		}
+		for (byte i = 0; i < 64; i++)
+		{
+			key[i] = i;
+		}
 
 		SHX eng;
 		Key::Symmetric::SymmetricKey k(key);
@@ -259,7 +295,9 @@ namespace Test
 		eng.DecryptBlock(outBytes, decBytes);
 
 		if (inBytes != decBytes)
+		{
 			throw TestException("Serpent: Decrypted arrays are not equal!");
+		}
 	}
 
 	void SerpentTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -267,7 +305,7 @@ namespace Test
 		std::vector<byte> expBytes(16, 0);
 		std::vector<byte> outBytes(16, 0);
 		std::vector<byte> inBytes(16, 0);
-		memcpy(&inBytes[0], &Input[0], 16);
+		std::memcpy(&inBytes[0], &Input[0], 16);
 
 		SHX enc;
 		Key::Symmetric::SymmetricKey k(Key);
@@ -275,7 +313,9 @@ namespace Test
 		enc.EncryptBlock(inBytes, outBytes);
 
 		if (Output != outBytes)
+		{
 			throw TestException("Serpent Vector: Arrays are not equal!");
+		}
 
 		//TestUtils::Reverse(outBytes);
 		SHX dec;
@@ -283,7 +323,9 @@ namespace Test
 		dec.DecryptBlock(outBytes, expBytes);
 
 		if (Input != expBytes)
+		{
 			throw TestException("Serpent Vector: Arrays are not equal!");
+		}
 	}
 
 	void SerpentTest::OnProgress(std::string Data)

@@ -152,7 +152,7 @@ public:
 		m_reserved(0),
 		m_dstCode(0)
 	{
-		CEXASSERT(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
+		CexAssert(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
 
 		m_nodeOffset = IntUtils::LeBytesTo32(TreeArray, 0);
 		m_treeVersion = IntUtils::LeBytesTo16(TreeArray, 4);
@@ -189,7 +189,7 @@ public:
 	{
 		m_dstCode.resize(DistributionCodeMax());
 
-		CEXASSERT(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
+		CexAssert(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
 	}
 
 	//~~~Public Functions~~~//

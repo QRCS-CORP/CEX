@@ -804,6 +804,12 @@
     <ClInclude Include="..\..\CEX\McElieceUtils.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\CryptoAuthenticationFailure.h">
+      <Filter>Header Files\Exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CpuCores.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1126,6 +1132,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\FFTM12T62.cpp">
       <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CryptoAuthenticationFailure.cpp">
+      <Filter>Source Files\Exception</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

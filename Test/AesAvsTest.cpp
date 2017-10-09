@@ -35,9 +35,11 @@ namespace Test
 			std::string data = "";
 			TestUtils::Read(AESAVSKEY128, data);
 			if (data.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
+			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
 				std::string istr = data.substr(i, 32);
 				std::string jstr = data.substr(j, 32);
@@ -46,48 +48,64 @@ namespace Test
 				HexConverter::Decode(jstr, cipherText);
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(key, plainText, cipherText);
+				}
 				else
 #endif
+				{
 					CompareVector(key, plainText, cipherText);
+				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit key vectors test.."));
 
 			data = "";
 			TestUtils::Read(AESAVSKEY192, data);
 			if (data.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 48; i < data.size(); i += 80, j += 80)
+			for (size_t i = 0, j = 48; i < data.size(); i += 80, j += 80)
 			{
 				HexConverter::Decode(data.substr(i, 48), key);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(key, plainText, cipherText);
+				}
 				else
 #endif
+				{
 					CompareVector(key, plainText, cipherText);
+				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit key vectors test.."));
 
 			data = "";
 			TestUtils::Read(AESAVSKEY256, data);
 			if (data.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 64; i < data.size(); i += 96, j += 96)
+			for (size_t i = 0, j = 64; i < data.size(); i += 96, j += 96)
 			{
 				HexConverter::Decode(data.substr(i, 64), key);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(key, plainText, cipherText);
+				}
 				else
 #endif
+				{
 					CompareVector(key, plainText, cipherText);
+				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
 
@@ -95,19 +113,25 @@ namespace Test
 			data = "";
 			TestUtils::Read(AESAVSPTEXT128, data);
 			if (data.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
+			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
 				HexConverter::Decode(data.substr(i, 32), plainText);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(key, plainText, cipherText);
+				}
 				else
 #endif
+				{
 					CompareVector(key, plainText, cipherText);
+				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
 
@@ -115,19 +139,25 @@ namespace Test
 			data = "";
 			TestUtils::Read(AESAVSPTEXT192, data);
 			if (data.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
+			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
 				HexConverter::Decode(data.substr(i, 32), plainText);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(key, plainText, cipherText);
+			}
 				else
 #endif
+				{
 					CompareVector(key, plainText, cipherText);
+				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
 
@@ -135,31 +165,37 @@ namespace Test
 			data = "";
 			TestUtils::Read(AESAVSPTEXT256, data);
 			if (data.size() == 0)
+			{
 				throw TestException("Could not find the test file!");
+			}
 
-			for (unsigned int i = 0, j = 32; i < data.size(); i += 64, j += 64)
+			for (size_t i = 0, j = 32; i < data.size(); i += 64, j += 64)
 			{
 				HexConverter::Decode(data.substr(i, 32), plainText);
 				HexConverter::Decode(data.substr(j, 32), cipherText);
 
 #if defined(__AVX__)
 				if (m_testNI)
+				{
 					CompareVectorNI(key, plainText, cipherText);
+				}
 				else
 #endif
+				{
 					CompareVector(key, plainText, cipherText);
+				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed"));
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -173,7 +209,9 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
+		{
 			throw TestException("AESAVS: Encrypted arrays are not equal!");
+		}
 	}
 
 #if defined(__AVX__)
@@ -187,7 +225,9 @@ namespace Test
 		engine.Transform(Input, outBytes);
 
 		if (outBytes != Output)
+		{
 			throw TestException("AESAVS: AES-NI Encrypted arrays are not equal!");
+		}
 	}
 #endif
 

@@ -133,13 +133,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -168,7 +168,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			size_t smpSze = rng.NextInt32(Cipher->ParallelProfile().ParallelMinimumSize() * 4, Cipher->ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextInt32(Cipher->ParallelProfile().ParallelMinimumSize() * 4, Cipher->ParallelProfile().ParallelMinimumSize());
 			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(smpSze);
@@ -183,61 +183,71 @@ namespace Test
 
 			// with offsets: transform(in, off, out, off, len)
 			Cipher->Initialize(true, keyParam);
-			//std::string name = Cipher->Name();
 
 			// encrypt
 			for (size_t j = 0; j < blkCnt; ++j)
+			{
 				Cipher->Transform(data, j * blkSze, enc1, j * blkSze, blkSze);
+			}
 
 			Cipher->Initialize(false, keyParam);
 			// decrypt
 			for (size_t j = 0; j < blkCnt; ++j)
+			{
 				Cipher->Transform(enc1, j * blkSze, dec, j * blkSze, blkSze);
+			}
 
 			if (dec != data)
+			{
 				throw TestException("Decrypted output is not equal!");
-
+			}
 
 			Cipher->Initialize(true, keyParam);
 			for (size_t j = 0; j < blkCnt; ++j)
 			{
-				memcpy(&datBuf[0], &data[j * blkSze], blkSze);
+				std::memcpy(&datBuf[0], &data[j * blkSze], blkSze);
 				Cipher->Transform(datBuf, 0, encBuf, 0, blkSze);
-				memcpy(&enc2[j * blkSze], &encBuf[0], blkSze);
+				std::memcpy(&enc2[j * blkSze], &encBuf[0], blkSze);
 			}
 
 			if (enc1 != enc2)
+			{
 				throw TestException("Encrypted output is not equal!");
+			}
 
 			Cipher->Initialize(false, keyParam);
-			memset(&dec[0], 0, dec.size());
+			std::memset(&dec[0], 0, dec.size());
 			// decrypt
 			for (size_t j = 0; j < blkCnt; ++j)
 			{
-				memcpy(&encBuf[0], &enc2[j * blkSze], blkSze);
+				std::memcpy(&encBuf[0], &enc2[j * blkSze], blkSze);
 				Cipher->Transform(encBuf, 0, decBuf, 0, blkSze);
-				memcpy(&dec[j * blkSze], &decBuf[0], blkSze);
+				std::memcpy(&dec[j * blkSze], &decBuf[0], blkSze);
 			}
 
 			if (dec != data)
+			{
 				throw TestException("Decrypted output is not equal!");
-
+			}
 
 			// with size param: transform(in, off, out, off, size)
-			memset(&enc2[0], 0, enc2.size());
+			std::memset(&enc2[0], 0, enc2.size());
 			Cipher->Initialize(true, keyParam);
 			Cipher->Transform(data, 0, enc2, 0, data.size());
 
 			if (enc1 != enc2)
+			{
 				throw TestException("Encrypted output is not equal!");
+			}
 
-			memset(&dec[0], 0, dec.size());
+			std::memset(&dec[0], 0, dec.size());
 			Cipher->Initialize(false, keyParam);
 			Cipher->Transform(enc2, 0, dec, 0, data.size());
 
 			if (dec != data)
+			{
 				throw TestException("Decrypted output is not equal!");
-
+			}
 
 			// parallel access //
 
@@ -248,40 +258,48 @@ namespace Test
 			if (prlEncrypt)
 			{
 				// with offsets: transform(in, off, out, off)
-				memset(&enc2[0], 0, enc2.size());
+				 std::memset(&enc2[0], 0, enc2.size());
 				Cipher->Initialize(true, keyParam);
 				// encrypt
 				Cipher->Transform(data, 0, enc2, 0, enc2.size());
 
 				if (enc1 != enc2)
+				{
 					throw TestException("Encrypted output is not equal!");
+				}
 			}
 
-			memset(&dec[0], 0, dec.size());
+			std::memset(&dec[0], 0, dec.size());
 			Cipher->Initialize(false, keyParam);
 			// decrypt
 			Cipher->Transform(enc2, 0, dec, 0, enc2.size());
 
 			if (dec != data)
+			{
 				throw TestException("Decrypted output is not equal!");
+			}
 
 			if (prlEncrypt)
 			{
 				// with size param: transform(in, off, out, off, size)
-				memset(&enc2[0], 0, enc2.size());
+				std::memset(&enc2[0], 0, enc2.size());
 				Cipher->Initialize(true, keyParam);
 				Cipher->Transform(data, 0, enc2, 0, data.size());
 
 				if (enc1 != enc2)
+				{
 					throw TestException("Encrypted output is not equal!");
+				}
 			}
 
-			memset(&dec[0], 0, dec.size());
+			std::memset(&dec[0], 0, dec.size());
 			Cipher->Initialize(false, keyParam);
 			Cipher->Transform(enc2, 0, dec, 0, enc2.size());
 
 			if (dec != data)
+			{
 				throw TestException("Decrypted output is not equal!");
+			}
 		}
 	}
 
@@ -330,7 +348,9 @@ namespace Test
 			Transform1(&cpr2, data, blockSize, enc2);
 
 			if (enc1 != enc2)
+			{
 				throw TestException("Parallel CTR: Encrypted output is not equal!");
+			}
 		}
 
 		Mode::CBC cpr3(eng1);
@@ -359,19 +379,25 @@ namespace Test
 			BlockEncrypt(&cpr4, data, 0, enc2, 0);
 
 			if (enc1 != enc2)
+			{
 				throw TestException("CBC: Encrypted output is not equal!");
+			}
 
 			cpr3.Initialize(false, keyParam);
 			BlockDecrypt(&cpr3, enc1, 0, dec, 0);
 
 			if (dec != data)
+			{
 				throw TestException("CBC: Decrypted output is not equal!");
+			}
 
 			cpr4.Initialize(false, keyParam);
 			BlockDecrypt(&cpr4, enc2, 0, dec, 0);
 
 			if (dec != data)
+			{
 				throw TestException("CBC: Decrypted output is not equal!");
+			}
 		}
 
 		delete eng1;
@@ -388,10 +414,14 @@ namespace Test
 		std::vector<byte> iv(16);
 
 		data[0] = 128;
-		for (uint8_t i = 0; i < key.size(); ++i)
+		for (byte i = 0; i < key.size(); ++i)
+		{
 			key[i] = i;
-		for (uint8_t i = 0; i < iv.size(); ++i)
+		}
+		for (byte i = 0; i < iv.size(); ++i)
+		{
 			iv[i] = i;
+		}
 
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 		Mode::CTR cipher(Engine);
@@ -403,10 +433,14 @@ namespace Test
 		Transform1(&cipher, data, data.size(), enc);
 
 		while (enc.size() > 32)
+		{
 			enc = TestUtils::Reduce(enc);
+		}
 
 		if (enc != Expected)
+		{
 			throw TestException("ParallelModeTest: Failed Kat comparison test!");
+		}
 	}
 
 	void ParallelModeTest::CompareBcrSimd(IBlockCipher* Engine)
@@ -423,10 +457,14 @@ namespace Test
 		enc2.reserve(MAX_ALLOC);
 
 #if defined STAT_INP
-		for (size_t i = 0; i < key.size(); ++i)
+		for (byte i = 0; i < key.size(); ++i)
+		{
 			key[i] = i;
-		for (size_t i = 0; i < iv.size(); ++i)
+		}
+		for (byte i = 0; i < iv.size(); ++i)
+		{
 			iv[i] = i;
+		}
 #endif
 
 		for (size_t i = 0; i < 100; ++i)
@@ -458,7 +496,9 @@ namespace Test
 			Transform1(&cipher, data, blockSize, enc2);
 
 			if (enc1 != enc2)
+			{
 				throw TestException("Parallel CTR: Encrypted output is not equal!");
+			}
 
 			// decrypt
 			cipher.Initialize(false, keyParam);
@@ -467,7 +507,9 @@ namespace Test
 			Transform1(&cipher, enc1, blockSize, dec);
 
 			if (dec != data)
+			{
 				throw TestException("Parallel CTR: Decrypted output is not equal!");
+			}
 		}
 	}
 
@@ -486,10 +528,15 @@ namespace Test
 		dec1.resize(blkSize);
 		dec2.resize(blkSize);
 		data[0] = 128;
-		for (uint8_t i = 0; i < key.size(); ++i)
+		for (byte i = 0; i < key.size(); ++i)
+		{
 			key[i] = i;
-		for (uint8_t i = 0; i < iv.size(); ++i)
+		}
+		for (byte i = 0; i < iv.size(); ++i)
+		{
 			iv[i] = i;
+		}
+
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 #else
 		data.reserve(MAX_ALLOC);
@@ -526,7 +573,9 @@ namespace Test
 			Transform1(&cipher2, data, cipher2.ParallelBlockSize(), dec2);
 
 			if (dec1 != dec2)
+			{
 				throw TestException("ParallelModeTest: Failed CBC decryption test!");
+			}
 		}
 
 		// decryption output integrity
@@ -551,7 +600,9 @@ namespace Test
 			Transform1(&cipher2, dec1, smpSze, dec2);
 
 			if (data != dec2)
+			{
 				throw TestException("ParallelModeTest: Failed CBC decryption test!");
+			}
 		}
 	}
 
@@ -592,19 +643,25 @@ namespace Test
 				ParallelCTR(&cipher, data, 0, enc2, 0);
 
 				if (enc1[i] != enc2[i])
+				{
 					throw TestException("ParallelModeTest: Encrypted arrays are not equal!");
+				}
 
 				cipher.Initialize(false, kp);
 				BlockCTR(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
+				{
 					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
+				}
 
 				cipher.Initialize(false, kp);
 				ParallelCTR(&cipher, enc2, 0, dec1, 0);
 
 				if (dec1 != data)
+				{
 					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
+				}
 			}
 
 			delete eng;
@@ -631,19 +688,25 @@ namespace Test
 				ParallelCTR(&cipher, data, 0, enc2, 0);
 
 				if (enc1[i] != enc2[i])
+				{
 					throw TestException("ParallelModeTest: Encrypted arrays are not equal!");
+				}
 
 				cipher.Initialize(false, kp);
 				BlockCTR(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
+				{
 					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
+				}
 
 				cipher.Initialize(false, kp);
 				ParallelCTR(&cipher, enc2, 0, dec1, 0);
 
 				if (dec1 != data)
+				{
 					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
+				}
 			}
 
 			delete eng;
@@ -673,7 +736,9 @@ namespace Test
 				ParallelDecrypt(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
+				{
 					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
+				}
 			}
 
 			delete eng;
@@ -703,7 +768,9 @@ namespace Test
 				ParallelDecrypt(&cipher, enc1, 0, dec1, 0);
 
 				if (dec1 != data)
+				{
 					throw TestException("ParallelModeTest: Decrypted arrays are not equal!");
+				}
 			}
 
 			delete eng;
@@ -734,10 +801,14 @@ namespace Test
 			IBlockCipher* eng;
 #if defined(__AVX__)
 			if (m_hasAESNI)
+			{
 				eng = new AHX();
+			}
 			else
 #endif
+			{
 				eng = new RHX();
+			}
 
 			Mode::CTR cipher(eng);
 
@@ -755,7 +826,9 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel CTR: Encrypted output is not equal!");
+			}
 
 			// linear 1
 			cipher.Initialize(true, keyParam);
@@ -764,7 +837,9 @@ namespace Test
 			Transform1(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel CTR: Encrypted output is not equal!");
+			}
 
 			// linear 3
 			cipher.Initialize(true, keyParam);
@@ -772,7 +847,9 @@ namespace Test
 			Transform3(&cipher, data, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel CTR: Encrypted output is not equal!");
+			}
 
 			// decrypt //
 
@@ -789,7 +866,9 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CTR: Decrypted output is not equal!");
+			}
 
 			// linear 3
 			cipher.Initialize(false, keyParam);
@@ -797,7 +876,9 @@ namespace Test
 			Transform3(&cipher, enc1, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CTR: Decrypted output is not equal!");
+			}
 
 			// linear 2
 			cipher.Initialize(false, keyParam);
@@ -806,15 +887,21 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CTR: Decrypted output is not equal!");
+			}
 
 			delete eng;
 		}
 
 		if (data != dec1)
+		{
 			throw TestException("Parallel CTR: Decrypted output is not equal!");
+		}
 		if (data != dec2)
+		{
 			throw TestException("Parallel CTR: Decrypted output is not equal!");
+		}
 
 		OnProgress(std::string("ParallelModeTest: Passed Parallel CTR encryption and decryption tests"));
 
@@ -823,10 +910,14 @@ namespace Test
 			IBlockCipher* eng;
 #if defined(__AVX__)
 			if (m_hasAESNI)
+			{
 				eng = new AHX();
+			}
 			else
 #endif
+			{
 				eng = new RHX();
+			}
 
 			Mode::ICM cipher(eng);
 
@@ -844,7 +935,9 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel ICM: Encrypted output is not equal!");
+			}
 
 			// linear 3
 			cipher.Initialize(true, keyParam);
@@ -852,7 +945,9 @@ namespace Test
 			Transform3(&cipher, data, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel ICM: Encrypted output is not equal!");
+			}
 
 			// linear 2
 			cipher.Initialize(true, keyParam);
@@ -861,7 +956,9 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel ICM: Encrypted output is not equal!");
+			}
 
 			// decrypt //
 			// parallel 1
@@ -877,7 +974,9 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel ICM: Decrypted output is not equal!");
+			}
 
 			// linear 3
 			cipher.Initialize(false, keyParam);
@@ -885,7 +984,9 @@ namespace Test
 			Transform3(&cipher, enc1, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel ICM: Decrypted output is not equal!");
+			}
 
 			// linear 2
 			cipher.Initialize(false, keyParam);
@@ -894,15 +995,21 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel ICM: Decrypted output is not equal!");
+			}
 
 			delete eng;
 		}
 
 		if (data != dec1)
+		{
 			throw TestException("Parallel ICM: Decrypted output is not equal!");
+		}
 		if (data != dec2)
+		{
 			throw TestException("Parallel ICM: Decrypted output is not equal!");
+		}
 
 		OnProgress(std::string("ParallelModeTest: Passed Parallel ICM encryption and decryption tests"));
 
@@ -926,7 +1033,9 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel CBC: Decrypted output is not equal!");
+			}
 
 			// decrypt //
 
@@ -943,7 +1052,9 @@ namespace Test
 			Transform2(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CBC: Decrypted output is not equal!");
+			}
 
 			// t1 parallel
 			cipher.Initialize(false, keyParam);
@@ -958,15 +1069,21 @@ namespace Test
 			Transform2(&cipher, enc1, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CBC: Decrypted output is not equal!");
+			}
 
 			delete eng;
 		}
 
 		if (dec1 != data)
+		{
 			throw TestException("Parallel CBC: Decrypted output is not equal!");
+		}
 		if (dec2 != data)
+		{
 			throw TestException("Parallel CBC: Decrypted output is not equal!");
+		}
 
 		OnProgress(std::string("ParallelModeTest: Passed Parallel CBC decryption tests"));
 
@@ -989,7 +1106,9 @@ namespace Test
 			Transform2(&cipher, data, blockSize, enc2);
 
 			if (!Test::TestUtils::IsEqual(enc1, enc2))
+			{
 				throw TestException("Parallel CFB: Decrypted output is not equal!");
+			}
 
 			// decrypt //
 
@@ -1005,7 +1124,9 @@ namespace Test
 			Transform1(&cipher, enc2, blockSize, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CFB: Decrypted output is not equal!");
+			}
 
 			// t2 parallel
 			cipher.Initialize(false, keyParam);
@@ -1019,15 +1140,21 @@ namespace Test
 			Transform3(&cipher, enc1, dec2);
 
 			if (!Test::TestUtils::IsEqual(dec1, dec2))
+			{
 				throw TestException("Parallel CFB: Decrypted output is not equal!");
+			}
 
 			delete eng;
 		}
 
 		if (data != dec1)
+		{
 			throw TestException("Parallel CFB: Decrypted output is not equal!");
+		}
 		if (data != dec2)
+		{
 			throw TestException("Parallel CFB: Decrypted output is not equal!");
+		}
 
 		OnProgress(std::string("ParallelModeTest: Passed Parallel CFB decryption tests"));
 	}
@@ -1041,10 +1168,14 @@ namespace Test
 		std::vector<byte> iv(8);
 		data[0] = 128;
 
-		for (uint8_t i = 0; i < key.size(); ++i)
+		for (byte i = 0; i < key.size(); ++i)
+		{
 			key[i] = i;
-		for (uint8_t i = 0; i < iv.size(); ++i)
+		}
+		for (byte i = 0; i < iv.size(); ++i)
+		{
 			iv[i] = i;
+		}
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 
 		// parallel with intrinsics (if available)
@@ -1054,10 +1185,14 @@ namespace Test
 		Engine->Transform(data, 0, enc, 0, data.size());
 
 		while (enc.size() > 32)
+		{
 			enc = TestUtils::Reduce(enc);
+		}
 
 		if (enc != Expected)
+		{
 			throw TestException("ParallelModeTest: Failed Stream Cipher Kat comparison test!");
+		}
 	}
 
 	void ParallelModeTest::CompareStmSimd(IStreamCipher* Engine)
@@ -1075,10 +1210,14 @@ namespace Test
 		enc2.reserve(MAX_ALLOC);
 
 #if defined(STAT_INP)
-		for (size_t i = 0; i < key.size(); ++i)
+		for (byte i = 0; i < key.size(); ++i)
+		{
 			key[i] = i;
-		for (size_t i = 0; i < iv.size(); ++i)
+		}
+		for (byte i = 0; i < iv.size(); ++i)
+		{
 			iv[i] = i;
+		}
 #endif
 
 		for (size_t i = 0; i < 100; ++i)
@@ -1113,7 +1252,9 @@ namespace Test
 			Engine->Transform(data, 0, enc1, 0, data.size());
 
 			if (enc1 != enc2)
+			{
 				throw TestException("Parallel Stream: Encrypted output is not equal!");
+			}
 
 			// decrypt
 			Engine->Initialize(keyParam);
@@ -1121,7 +1262,9 @@ namespace Test
 			Engine->Transform(enc1, 0, dec, 0, enc1.size());
 
 			if (dec != data)
+			{
 				throw TestException("Parallel Stream: Decrypted output is not equal!");
+			}
 		}
 	}
 
@@ -1149,10 +1292,10 @@ namespace Test
 		{
 			size_t cnkSize = inpSize - alnSize;
 			std::vector<byte> inpBuffer(blkSize);
-			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
+			std::memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 			std::vector<byte> outBuffer(blkSize);
 			Cipher->Transform(inpBuffer, 0, outBuffer, 0, cnkSize);
-			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
+			std::memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
 		}
 	}
 
@@ -1250,10 +1393,10 @@ namespace Test
 		{
 			size_t cnkSize = inpSize - alnSize;
 			std::vector<byte> inpBuffer(cnkSize);
-			memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
+			std::memcpy(&inpBuffer[0], &Input[InOffset], cnkSize);
 			std::vector<byte> outBuffer(cnkSize);
 			Cipher->Transform(inpBuffer, 0, outBuffer, 0, cnkSize);
-			memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
+			std::memcpy(&Output[OutOffset], &outBuffer[0], cnkSize);
 		}
 	}
 
@@ -1297,10 +1440,10 @@ namespace Test
 				size_t sze = Input.size() - (blocks * BlockSize);
 				std::vector<byte> inpBuffer(sze);
 				size_t oft = Input.size() - sze;
-				memcpy(&inpBuffer[0], &Input[oft], sze);
+				std::memcpy(&inpBuffer[0], &Input[oft], sze);
 				std::vector<byte> outBuffer(sze);
 				Cipher->Transform(inpBuffer, 0, outBuffer, 0, sze);
-				memcpy(&Output[oft], &outBuffer[0], sze);
+				std::memcpy(&Output[oft], &outBuffer[0], sze);
 			}
 			else
 			{
@@ -1321,9 +1464,9 @@ namespace Test
 
 		for (size_t i = 0; i < blocks; i++)
 		{
-			memcpy(&inBlock[0], &Input[i * BlockSize], BlockSize);
+			std::memcpy(&inBlock[0], &Input[i * BlockSize], BlockSize);
 			Cipher->Transform(inBlock, 0, outBlock, 0, BlockSize);
-			memcpy(&Output[i * BlockSize], &outBlock[0], BlockSize);
+			std::memcpy(&Output[i * BlockSize], &outBlock[0], BlockSize);
 		}
 
 		if (blocks * BlockSize < Input.size())

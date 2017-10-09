@@ -25,11 +25,11 @@ enum class Prngs : byte
 	/// <summary>
 	/// An HMAC based random number generator
 	/// </summary>
-	HCR = 4,
+	HCR = 3,
 	/// <summary>
 	/// An implementation of a passphrase based PKCS#5 random number generator
 	/// </summary>
-	PBR = 8
+	PBR = 4
 };
 
 NAMESPACE_ENUMERATIONEND

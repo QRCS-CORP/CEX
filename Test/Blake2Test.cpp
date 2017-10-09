@@ -52,13 +52,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -76,10 +76,10 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<uint8_t> input(0);
-					std::vector<uint8_t> expect(64);
-					std::vector<uint8_t> key;
-					std::vector<uint8_t> hash(64);
+					std::vector<byte> input(0);
+					std::vector<byte> expect(64);
+					std::vector<byte> key;
+					std::vector<byte> hash(64);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -122,11 +122,11 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<uint8_t> input(0);
-					std::vector<uint8_t> expect(64);
-					std::vector<uint8_t> key;
-					std::vector<uint8_t> hash(64);
-					std::vector<uint8_t> hash2(64);
+					std::vector<byte> input(0);
+					std::vector<byte> expect(64);
+					std::vector<byte> key;
+					std::vector<byte> hash(64);
+					std::vector<byte> hash2(64);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -173,10 +173,10 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<uint8_t> input(0);
-					std::vector<uint8_t> expect(32);
-					std::vector<uint8_t> key;
-					std::vector<uint8_t> hash(32);
+					std::vector<byte> input(0);
+					std::vector<byte> expect(32);
+					std::vector<byte> key;
+					std::vector<byte> hash(32);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -219,10 +219,10 @@ namespace Test
 			{
 				if (line.find(DMK_INP) != std::string::npos)
 				{
-					std::vector<uint8_t> input(0);
-					std::vector<uint8_t> expect(32);
-					std::vector<uint8_t> key;
-					std::vector<uint8_t> hash(32);
+					std::vector<byte> input(0);
+					std::vector<byte> expect(32);
+					std::vector<byte> key;
+					std::vector<byte> hash(32);
 
 					size_t sze = DMK_INP.length();
 					if (line.length() - sze > 0)
@@ -255,8 +255,8 @@ namespace Test
 
 	void Blake2Test::MacParamsTest()
 	{
-		std::vector<uint8_t> key(64);
-		for (uint8_t i = 0; i < key.size(); ++i)
+		std::vector<byte> key(64);
+		for (byte i = 0; i < key.size(); ++i)
 			key[i] = i;
 
 		Key::Symmetric::SymmetricKey mkey(key, key, key);
@@ -271,7 +271,7 @@ namespace Test
 		std::vector<byte> code1(40, 7);
 
 		BlakeParams tree1(64, 64, 2, 1, 64000, 64, 1, 32, code1);
-		std::vector<uint8_t> tres = tree1.ToBytes();
+		std::vector<byte> tres = tree1.ToBytes();
 		BlakeParams tree2(tres);
 
 		if (!tree1.Equals(tree2))

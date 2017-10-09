@@ -125,8 +125,8 @@ void HKDF::Destroy()
 
 size_t HKDF::Generate(std::vector<byte> &Output)
 {
-	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
-	CEXASSERT(Output.size() != 0, "the output buffer too small");
+	CexAssert(m_isInitialized, "the generator must be initialized before use");
+	CexAssert(Output.size() != 0, "the output buffer too small");
 
 	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
 		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
@@ -136,8 +136,8 @@ size_t HKDF::Generate(std::vector<byte> &Output)
 
 size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
-	CEXASSERT(Output.size() != 0, "the output buffer too small");
+	CexAssert(m_isInitialized, "the generator must be initialized before use");
+	CexAssert(Output.size() != 0, "the output buffer too small");
 
 	if (m_kdfCounter + (Length / m_macSize) > 255)
 		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");

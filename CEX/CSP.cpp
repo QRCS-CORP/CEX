@@ -152,7 +152,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 
 void CSP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CEXASSERT(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rndData(Length);
 	GetBytes(rndData);

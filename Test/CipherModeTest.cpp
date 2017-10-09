@@ -62,13 +62,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -79,9 +79,13 @@ namespace Test
 		int index = 6;
 
 		if (Key.size() == 24)
+		{
 			index = 8;
+		}
 		else if (Key.size() == 32)
+		{
 			index = 10;
+		}
 
 		{
 			RHX* eng = new RHX();
@@ -89,12 +93,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
+				{
 					throw TestException("CBC Mode: Encrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -106,12 +112,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(false, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
+				{
 					throw TestException("CBC Mode: Decrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -124,9 +132,13 @@ namespace Test
 		int index = 12;
 
 		if (Key.size() == 24)
+		{
 			index = 14;
+		}
 		else if (Key.size() == 32)
+		{
 			index = 16;
+		}
 
 		{
 			RHX* eng = new RHX();
@@ -134,12 +146,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
+				{
 					throw TestException("CFB Mode: Encrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -152,12 +166,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(false, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
+				{
 					throw TestException("CFB Mode: Decrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -170,9 +186,13 @@ namespace Test
 		int index = 24;
 
 		if (Key.size() == 24)
+		{
 			index = 26;
+		}
 		else if (Key.size() == 32)
+		{
 			index = 28;
+		}
 
 		{
 			RHX* eng = new RHX();
@@ -180,12 +200,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
+				{
 					throw TestException("CTR Mode: Encrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -197,12 +219,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(false, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
+				{
 					throw TestException("CTR Mode: Decrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -214,9 +238,13 @@ namespace Test
 		int index = 0;
 
 		if (Key.size() == 24)
+		{
 			index = 2;
+		}
 		else if (Key.size() == 32)
+		{
 			index = 4;
+		}
 
 		{
 			RHX* eng = new RHX();
@@ -224,12 +252,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key);
 			mode.Initialize(true, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
+				{
 					throw TestException("ECB Mode: Encrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -242,12 +272,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key);
 			mode.Initialize(false, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
+				{
 					throw TestException("ECB Mode: Decrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -260,9 +292,13 @@ namespace Test
 		int index = 18;
 
 		if (Key.size() == 24)
+		{
 			index = 20;
+		}
 		else if (Key.size() == 32)
+		{
 			index = 22;
+		}
 
 		{
 			RHX* eng = new RHX();
@@ -270,12 +306,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != Output[index][i])
+				{
 					throw TestException("OFB Mode: Encrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -288,12 +326,14 @@ namespace Test
 			Key::Symmetric::SymmetricKey k(Key, iv);
 			mode.Initialize(true, k);
 
-			for (unsigned int i = 0; i < 4; i++)
+			for (size_t i = 0; i < 4; i++)
 			{
 				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
 
 				if (outBytes != m_output[index][i])
+				{
 					throw TestException("OFB Mode: Decrypted arrays are not equal!");
+				}
 			}
 			delete eng;
 		}
@@ -508,7 +548,7 @@ namespace Test
 		size_t inputSize = sizeof(inputEncoded) / sizeof(inputEncoded[0]);
 		m_input.resize(inputSize);
 
-		for (unsigned int i = 0; i < inputSize; ++i)
+		for (size_t i = 0; i < inputSize; ++i)
 			HexConverter::Decode(inputEncoded[i], 4, m_input[i]);
 
 		const char *outputEncoded[][4] =
@@ -703,7 +743,7 @@ namespace Test
 		size_t outputSize = sizeof(outputEncoded) / sizeof(outputEncoded[0]);
 		m_output.resize(outputSize);
 
-		for (unsigned int i = 0; i < outputSize; ++i)
+		for (size_t i = 0; i < outputSize; ++i)
 			HexConverter::Decode(outputEncoded[i], 4, m_output[i]);
 	}
 

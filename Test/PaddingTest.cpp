@@ -36,13 +36,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -51,33 +51,44 @@ namespace Test
 		CEX::Provider::CSP rng;
 		std::vector<byte> fill(16);
 		rng.GetBytes(fill);
-		const unsigned int BLOCK = 16;
+		const size_t BLOCK = 16;
 
-		for (unsigned int i = 0; i < BLOCK; i++)
+		for (size_t i = 0; i < BLOCK; i++)
 		{
 			std::vector<byte> data(BLOCK);
 			// fill with rand
 			if (i > 0)
-				memcpy(&data[0], &fill[0], BLOCK - i);
+			{
+				std::memcpy(&data[0], &fill[0], BLOCK - i);
+			}
 
 			// pad array
 			Padding->AddPadding(data, i);
 			// verify length
-			unsigned int len = (unsigned int)Padding->GetPaddingLength(data);
+			size_t len = Padding->GetPaddingLength(data);
+
 			if (len == 0 && i != 0)
+			{
 				throw TestException("PaddingTest: Failed the padding value return check!");
+			}
 			else if (i != 0 && len != BLOCK - i)
+			{
 				throw TestException("PaddingTest: Failed the padding value return check!");
+			}
 
 			// test offset method
 			if (i > 0 && i < 15)
 			{
-				len = (unsigned int)Padding->GetPaddingLength(data, i);
+				len = Padding->GetPaddingLength(data, i);
 
 				if (len == 0 && i != 0)
+				{
 					throw TestException("PaddingTest: Failed the padding value return check!");
+				}
 				else if (i != 0 && len != BLOCK - i)
+				{
 					throw TestException("PaddingTest: Failed the offset padding value return check!");
+				}
 			}
 		}
 

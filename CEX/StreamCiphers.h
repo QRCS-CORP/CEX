@@ -17,11 +17,11 @@ enum class StreamCiphers : byte
 	/// <summary>
 	/// An implementation of the ChaCha Stream Cipher
 	/// </summary>
-	ChaCha20 = 16,
+	ChaCha20 = 64,
 	/// <summary>
 	/// A Salsa20 Stream Cipher
 	/// </summary>
-	Salsa20 = 32
+	Salsa20 = 65
 };
 
 NAMESPACE_ENUMERATIONEND

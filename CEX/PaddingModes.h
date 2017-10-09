@@ -25,11 +25,11 @@ enum class PaddingModes : byte
 	/// <summary>
 	/// Trailing Bit Complement Padding Mode
 	/// </summary>
-	TBC = 4,
+	TBC = 3,
 	/// <summary>
 	/// X923 Padding Mode
 	/// </summary>
-	X923 = 8
+	X923 = 4
 };
 
 NAMESPACE_ENUMERATIONEND

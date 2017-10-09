@@ -586,7 +586,7 @@ std::string SysUtils::Version()
 			PIP_ADAPTER_INFO pAdapter = NULL;
 			ULONG ulOutBufLen = sizeof(IP_ADAPTER_INFO);
 
-			pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC(sizeof(IP_ADAPTER_INFO));
+			pAdapterInfo = (IP_ADAPTER_INFO*)HeapAlloc(GetProcessHeap(), 0, sizeof(IP_ADAPTER_INFO));
 
 			if (pAdapterInfo == NULL)
 			{
@@ -595,8 +595,8 @@ std::string SysUtils::Version()
 
 			if (GetAdaptersInfo(pAdapterInfo, &ulOutBufLen) == ERROR_BUFFER_OVERFLOW)
 			{
-				FREE(pAdapterInfo);
-				pAdapterInfo = (IP_ADAPTER_INFO *)MALLOC(ulOutBufLen);
+				HeapFree(GetProcessHeap(), 0, pAdapterInfo);
+				pAdapterInfo = (IP_ADAPTER_INFO*)HeapAlloc(GetProcessHeap(), 0, ulOutBufLen);
 				if (pAdapterInfo == NULL)
 				{
 					return serInf;
@@ -616,7 +616,7 @@ std::string SysUtils::Version()
 
 			if (pAdapterInfo)
 			{
-				FREE(pAdapterInfo);
+				HeapFree(GetProcessHeap(), 0, pAdapterInfo);
 			}
 		}
 		catch (...) {}

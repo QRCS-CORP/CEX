@@ -26,7 +26,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	virtual ~IPadding() {}
+	virtual ~IPadding() noexcept {}
 
 	//~~~Properties~~~//
 

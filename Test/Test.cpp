@@ -69,40 +69,54 @@
 
 // TRAJECTORY
 //
-// ###JSF/MISRA/SEI CERT Check List###
+// ###SCHEDULE FOR 1.0.0.4 RELEASE###
+// ##ETA is October 22, 2017##
+// Complete performance optimizations on all classes
+// Complete security audit and rewrite
+// Add Poly1305 MAC
+// Make authenticated KEX changes to RingLWE
+//
+// ###JSF/MISRA/SEI CERT Check LIST###
 // ##Local Changes##
 // do not cast between different size integers (unless it would seriously/unavoidably impede performance)
 // ensure that operations on signed integers do not result in overflow
 // ensure that division and remainder operations do not result in divide-by-zero errors
 // do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand
 // organize struct and class variable declarations by size large to small (avoid unnecessary padding)
-// make all functions const correct
-// reduce the number of class level variables(consider performance vs safety)
+// make all (public) functions const correct
+// reduce the number of class level variables (consider performance vs safety)
 // make as many class functions static as possible
 // reduce the number of function parameters whenever possible
 // replace macros with inline functions
 // mark single parameter constructors as explicit
-// replace all instances of pointer math (and C* pointers)
+// replace all instances of pointer math (and C* pointers where practical)
+// replace all C style casts with C++ equivalents, ex. static_cast<>() (except where it diminishes readability, ex. within array braces)
+// compound integer operations should be expressed within parenthesis to statically define operation flow, ex.  a = (b * (c << 3))
+// verify that all class scope variables are destroyed/reset in the destructor
+// make the Destroy() functions private (confusing, and no need for them to be public)
+// delete unused default/copy/move constructors from all structs and classes
+// replace all macros with inline/templated functions
+// on pointer comparisons replace '0' with nullptr (ex. y* != nullptr)
 //
 // ##Global Changes##
-// all hex codes should be expressed in capitals, ex. 0xFF
-// enum members should all be byte sized and sequential, i.e. 1,2,3.. (promote jump lists)
-// delete unused default/copy/move constructors
+// all hex codes should be expressed in capitals, ex. 0xFF -done
+// enum members should all be byte sized and sequential, i.e. 1,2,3.. (promote jump lists) -done
+// reduce the number of global includes, and replace all C headers with C++ versions -done
+// remove unused macros and defines in CEXCommon.h -done
+// prefer static/extern const integers to #define -done
+// add GNU header to each (major) header file
 // move from C style pointers (*) to std::unique_ptr
-// use std::static_assert for constant evaluatons (debug)
-// replace all C style casts with C++ equivalents, ex. static_cast<>() (except where it strongle diminishes readability, ex. within array braces)
-// compound integer operations should be expressed within parenthesis to define operation flow, ex.  a = (b * (c << 3))
-// add GNU header to each header file
-// remove unused macros and defines in CEXCommon.h
-// reduce the number of global includes, and replace all C headers with C++ versions
-// prefer global static const integers to #define
-// replace all macros (release build, assert excepted) with inline/templated functions
+//
+// ##Upgrades##
+// add GCM authentication mode to RingLWE
+// add Padding property (and mechanism) to IAsymmetricCipher and children
+// revise parallel options, replace Parallel parameter with cpu count (CpuCores), and make core count assignable
 
 // ###Optimization Cycle 1: Sept 26, 2017###
 // Performance of various algorithms pre/post memory and code optimizations
 //
 // ##Stage 1 (baseline)##
-// #asymmetric ciphers in operations per second
+// #asymmetric ciphers in operations per second, best of 4
 // RingLWE: Gen 14285/17345, Enc 10000/12547, Dec 33333
 // McEliece: Gen 12, Enc 7692, Dec 4000
 // #symmetric algorithms in MB per second
@@ -118,7 +132,7 @@
 // Memory: LB Clear 6993, Clear 10309, LB Copy 4761, Copy 10416, LB Memset 6896, Memset 10309, LB XOR 4524, XOR 1329
 //
 // ##Stage 2 (post optimization)##
-// #asymmetric ciphers in operations per second
+// #asymmetric ciphers in operations per second, best of 4
 // RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000
 // McEliece: Gen 12, Enc 12500, Dec 4577
 // #symmetric algorithms in MB per second
@@ -246,7 +260,9 @@ bool CanTest(std::string Message)
 
 	const std::string CONFIRM = "Y";
 	if (resp.find(CONFIRM) != std::string::npos)
+	{
 		return true;
+	}
 
 	return false;
 }
@@ -294,7 +310,9 @@ void RunTest(Test::ITest* Test)
 		ConsoleUtils::WriteLine("An error has occured!");
 
 		if (ex.Message().size() != 0)
+		{
 			ConsoleUtils::WriteLine(ex.Message());
+		}
 
 		ConsoleUtils::WriteLine("");
 		ConsoleUtils::WriteLine("Continue Testing? Press 'Y' to continue, all other keys abort..");
@@ -305,7 +323,9 @@ void RunTest(Test::ITest* Test)
 
 		const std::string CONTINUE = "Y";
 		if (resp.find(CONTINUE) == std::string::npos)
+		{
 			CloseApp();
+		}
 	}
 }
 
@@ -313,18 +333,6 @@ int main()
 {
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
-
-	//for (size_t i = 0; i < 4; ++i)
-	//RunTest(new AsymmetricSpeedTest());
-	// McEliece Baseline
-	// original
-	// Gen: 16, Enc: 9090, Dec: 3484
-	// optimization 1
-	// Gen: 17, Enc: 9523, Dec: 3717
-	// optimization 2
-	// Gen: 16, Enc: 11111, Dec: 4000
-	// optimization 3
-	// Gen: , Enc: , Dec: 
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
@@ -353,6 +361,18 @@ int main()
 	}
 
 	Common::CpuDetect detect;
+
+#if (!defined(_M_X64) && !defined(__x86_64__)) && ((defined(__AVX__) || defined(__AVX2__)) && !defined(_DEBUG))
+	if (detect.IsX64() || detect.IsX86Emulation())
+	{
+		PrintHeader("Warning! Compiling x86/Release on a 64bit system using AVX/AVX2 will cause memory alignment errors.", "");
+		PrintHeader("To test x86/Release, compile on a true x86 system, or disable enhanced instruction sets (arch:IA32), or run in x86/Debug mode.", "");
+		PrintHeader("Tests aborted! Press any key to close..", "");
+		GetResponse();
+
+		return 0;
+	}
+#endif
 
 	if (detect.AESNI())
 	{

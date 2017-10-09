@@ -39,7 +39,7 @@ namespace Test
 			std::string keyStr;
 			TestUtils::Read(TWOFISHKEY128, keyStr);
 
-			for (unsigned int i = 0; i < keyStr.size(); i += 32)
+			for (size_t i = 0; i < keyStr.size(); i += 32)
 			{
 				HexConverter::Decode(cipStr.substr(i, 32), cip);
 				HexConverter::Decode(keyStr.substr(i, 32), key);
@@ -53,7 +53,7 @@ namespace Test
 			TestUtils::Read(TWOFISHCTEXT192, cipStr);
 			TestUtils::Read(TWOFISHKEY192, keyStr);
 
-			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
+			for (size_t i = 0, j = 0; j < keyStr.size(); i += 32, j += 48)
 			{
 				HexConverter::Decode(cipStr.substr(i, 32), cip);
 				HexConverter::Decode(keyStr.substr(j, 48), key);
@@ -67,7 +67,7 @@ namespace Test
 			TestUtils::Read(TWOFISHCTEXT256, cipStr);
 			TestUtils::Read(TWOFISHKEY256, keyStr);
 
-			for (unsigned int i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
+			for (size_t i = 0, j = 0; j < keyStr.size(); i += 32, j += 64)
 			{
 				HexConverter::Decode(cipStr.substr(i, 32), cip);
 				HexConverter::Decode(keyStr.substr(j, 64), key);
@@ -120,30 +120,34 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
-	void TwofishTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, bool Encrypt, unsigned int Count)
+	void TwofishTest::CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, bool Encrypt, size_t Count)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
-		memcpy(&outBytes[0], &Input[0], outBytes.size());
+		std::memcpy(&outBytes[0], &Input[0], outBytes.size());
 		THX engine;
 
 		Key::Symmetric::SymmetricKey k(Key);
 		engine.Initialize(Encrypt, k);
 
-		for (unsigned int i = 0; i < Count; i++)
+		for (size_t i = 0; i < Count; i++)
+		{
 			engine.Transform(outBytes, outBytes);
+		}
 
 		if (outBytes != Output)
+		{
 			throw TestException("Twofish MonteCarlo: Arrays are not equal!");
+		}
 	}
 
 	void TwofishTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -156,13 +160,17 @@ namespace Test
 		tfx.EncryptBlock(Input, outBytes);
 
 		if (outBytes != Output)
+		{
 			throw TestException("Twofish Vector: Encrypted arrays are not equal!");
+		}
 
 		tfx.Initialize(false, k);
 		tfx.Transform(Output, outBytes);
 
 		if (outBytes != Input)
+		{
 			throw TestException("Twofish Vector: Decrypted arrays are not equal!");
+		}
 	}
 
 	void TwofishTest::Initialize()

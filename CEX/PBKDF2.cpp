@@ -126,16 +126,16 @@ void PBKDF2::Destroy()
 
 size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
-	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
-	CEXASSERT(Output.size() != 0, "the output buffer too small");
+	CexAssert(m_isInitialized, "the generator must be initialized before use");
+	CexAssert(Output.size() != 0, "the output buffer too small");
 
 	return Expand(Output, 0, Output.size());
 }
 
 size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CEXASSERT(m_isInitialized, "the generator must be initialized before use");
-	CEXASSERT(Output.size() != 0, "the output buffer too small");
+	CexAssert(m_isInitialized, "the generator must be initialized before use");
+	CexAssert(Output.size() != 0, "the output buffer too small");
 
 	return Expand(Output, OutOffset, Length);
 }

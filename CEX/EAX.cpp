@@ -108,9 +108,9 @@ EAX::EAX(BlockCiphers CipherType)
 	m_destroyEngine(true),
 	m_eaxNonce(0),
 	m_eaxVector(m_blockSize),
-	m_isFinalized(false),
 	m_isDestroyed(false),
 	m_isEncryption(false),
+	m_isFinalized(false),
 	m_isInitialized(false),
 	m_isLoaded(false),
 	m_legalKeySizes(0),
@@ -135,9 +135,9 @@ EAX::EAX(IBlockCipher* Cipher)
 	m_destroyEngine(false),
 	m_eaxNonce(0),
 	m_eaxVector(m_blockSize),
-	m_isFinalized(false),
 	m_isDestroyed(false),
 	m_isEncryption(false),
+	m_isFinalized(false),
 	m_isInitialized(false),
 	m_isLoaded(false),
 	m_legalKeySizes(0),
@@ -299,8 +299,8 @@ void EAX::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset,
 
 void EAX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
 
 	if (m_isEncryption)
 	{
@@ -355,7 +355,7 @@ void EAX::CalculateMac()
 
 void EAX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
 
 	m_macGenerator.Update(Input, InOffset, m_blockSize);
 	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
@@ -363,8 +363,8 @@ void EAX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void EAX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	CEXASSERT(m_isInitialized, "The cipher mode has not been initialized!");
-	CEXASSERT(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
 	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
 	m_macGenerator.Update(Input, InOffset, m_blockSize);
@@ -385,11 +385,18 @@ void EAX::Reset()
 
 void EAX::Scope()
 {
-	if (m_legalKeySizes.size() == 0)
-		m_legalKeySizes = m_cipherMode.LegalKeySizes();
+	std::vector<SymmetricKeySize> keySizes = m_cipherMode.LegalKeySizes();
+	m_legalKeySizes.resize(keySizes.size());
+
+	for (size_t i = 0; i < m_legalKeySizes.size(); i++)
+	{
+		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), keySizes[i].NonceSize(), keySizes[i].NonceSize());
+	}
 
 	if (!m_cipherMode.ParallelProfile().IsDefault())
+	{
 		m_cipherMode.ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_cipherMode.ParallelProfile().ParallelBlockSize(), m_cipherMode.ParallelProfile().ParallelMaxDegree());
+	}
 }
 
 void EAX::UpdateTag(byte Tag, const std::vector<byte> &Nonce)

@@ -25,7 +25,7 @@ enum class Drbgs : byte
 	/// <summary>
 	/// An implementation of an HMAC Counter Generator
 	/// </summary>
-	HCG = 4
+	HCG = 3
 };
 
 NAMESPACE_ENUMERATIONEND

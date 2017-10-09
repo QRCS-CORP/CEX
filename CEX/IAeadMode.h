@@ -20,8 +20,8 @@
 #define CEX_IAEADMODE_H
 
 #include "CexDomain.h"
-#include "ICipherMode.h"
 #include "AeadModes.h"
+#include "ICipherMode.h"
 
 NAMESPACE_MODE
 
@@ -48,7 +48,7 @@ public:
 	/// <summary>
 	/// Finalize objects
 	/// </summary>
-	virtual ~IAeadMode() {}
+	virtual ~IAeadMode() noexcept {}
 
 	//~~~Properties~~~//
 

@@ -43,7 +43,7 @@ size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 
 size_t X923::GetPaddingLength(const std::vector<byte> &Input)
 {
-	size_t code = Input[Input.size() - 1] & 0xff;
+	size_t code = Input[Input.size() - 1] & 0xFF;
 
 	if (code > Input.size() - 1)
 		code = 0;
@@ -53,7 +53,7 @@ size_t X923::GetPaddingLength(const std::vector<byte> &Input)
 
 size_t X923::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t code = Input[Input.size() - 1] & 0xff;
+	size_t code = Input[Input.size() - 1] & 0xFF;
 
 	if (code > Input.size() - 1)
 		code = 0;

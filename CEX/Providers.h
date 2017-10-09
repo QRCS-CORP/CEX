@@ -25,15 +25,15 @@ enum class Providers : byte
 	/// <summary>
 	/// An entropy provider using the system random provider
 	/// </summary>
-	CSP = 4,
+	CSP = 3,
 	/// <summary>
 	/// An entropy provider using collected system entropy
 	/// </summary>
-	ECP = 8,
+	ECP = 4,
 	/// <summary>
 	/// A entropy provider using the Intel RDSeed provider
 	/// </summary>
-	RDP = 16
+	RDP = 5
 };
 
 NAMESPACE_ENUMERATIONEND

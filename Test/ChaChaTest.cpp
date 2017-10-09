@@ -45,13 +45,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
 		}
 	}
 
@@ -80,7 +80,9 @@ namespace Test
 		cipher.Transform(enc, 0, dec, 0, enc.size());
 
 		if (data != dec)
+		{
 			throw TestException("ChaCha20: Decrypted arrays are not equal!");
+		}
 	}
 
 	void ChaChaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
@@ -93,13 +95,17 @@ namespace Test
 		cipher.Transform(Input, 0, outBytes, 0, Input.size());
 
 		if (outBytes != Output)
+		{
 			throw TestException("ChaCha20: Encrypted arrays are not equal!"); //251,184
+		}
 
 		cipher.Initialize(k);
 		cipher.Transform(Output, 0, outBytes, 0, Output.size());
 
 		if (outBytes != Input)
+		{
 			throw TestException("ChaCha20: Decrypted arrays are not equal!");
+		}
 	}
 
 	void ChaChaTest::Initialize()

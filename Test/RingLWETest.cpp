@@ -1,6 +1,8 @@
 #include "RingLWETest.h"
+#include "../CEX/BCR.h"
 #include "../CEX/DrbgFromName.h"
 #include "../CEX/IAsymmetricKeyPair.h"
+#include "../CEX/RHX.h"
 #include "../CEX/RingLWE.h"
 #include "../CEX/RLWEKeyPair.h"
 #include "../CEX/RLWEPrivateKey.h"
@@ -37,13 +39,13 @@ namespace Test
 
 			return SUCCESS;
 		}
-		catch (std::exception const &ex)
+		catch (TestException const &ex)
 		{
-			throw TestException(std::string(FAILURE + " : " + ex.what()));
+			throw TestException(FAILURE + std::string(" : ") + ex.Message());
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + " : Unknown Error"));
+			throw TestException(FAILURE + std::string(" : Unknown Error"));
 		}
 	}
 
@@ -61,14 +63,22 @@ namespace Test
 			RLWEPrivateKey priK2(skey);
 
 			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
+			{
 				throw TestException("RingLWETest: Private key serialization test has failed!");
+			}
 
 			RLWEPublicKey* pubK1 = (RLWEPublicKey*)kp->PublicKey();
 			skey = pubK1->ToBytes();
 			RLWEPublicKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
+			{
 				throw TestException("RingLWETest: Public key serialization test has failed!");
+			}
+
+			delete kp;
+			delete priK1;
+			delete pubK1;
 		}
 	}
 
@@ -76,45 +86,70 @@ namespace Test
 	{
 		std::vector<byte> enc;
 		std::vector<byte> dec;
-		std::vector<byte> msg(32);
+		std::vector<byte> msg(128);
 		Prng::SecureRandom rnd;
+		Prng::BCR* rngPtr = new Prng::BCR();
 
-		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024);
+		// test the extended cipher implementation
+		Cipher::Symmetric::Block::RHX* sycPtr = new Cipher::Symmetric::Block::RHX(Enumeration::Digests::SHA256);
+
+		// note: setting the block cipher to an HX cipher uses k512=keccak1024(e) -> GCM(AHX||SHX||THX(k512))
+		// standard cipher is: k256=keccak512(e) -> GCM(AES||Serpent||Twofish(k256))
+		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, rngPtr, sycPtr);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr.Generate();
+			rnd.GetBytes(msg);
+			IAsymmetricKeyPair* kp = cpr1.Generate();
 
-			cpr.Initialize(true, kp);
-			// no rand input required; populates the message using new-hope reconciliation method
-			enc = cpr.Encrypt(msg);
+			cpr1.Initialize(true, kp);
+			enc = cpr1.Encrypt(msg);
 
-			cpr.Initialize(false, kp);
-			dec = cpr.Decrypt(enc);
+			cpr1.Initialize(false, kp);
+			dec = cpr1.Decrypt(enc);
+
+			delete kp;
 
 			if (dec != msg)
+			{
 				throw TestException("RingLWETest: Decrypted output is not equal!");
+			}
 		}
 
-		/*msg.resize(0);
-		std::vector<byte> sk1(0);
-		std::vector<byte> sk2(0);
-		std::vector<byte> msgA(0);
-		std::vector<byte> msgB(0);
+		// test the standard cipher implementation
+		RingLWE cpr2(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::BCR, Enumeration::BlockCiphers::Rijndael);
+		msg.resize(64);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr.Generate();
+			rnd.GetBytes(msg);
+			IAsymmetricKeyPair* kp = cpr2.Generate();
 
-			msgA = ((RLWEPublicKey*)kp->PublicKey())->P();
-			cpr.Encapsulate(msgA, msgB, sk1);// 
+			cpr2.Initialize(true, kp);
+			enc = cpr2.Encrypt(msg);
 
-			RLWEPrivateKey* pri = (RLWEPrivateKey*)kp->PrivateKey();
-			cpr.Decapsulate(pri, msgB, sk2);
+			cpr2.Initialize(false, kp);
+			dec = cpr2.Decrypt(enc);
 
-			if (sk1 != sk2)
+			delete kp;
+
+			if (dec != msg)
+			{
 				throw TestException("RingLWETest: Decrypted output is not equal!");
-		}*/
+			}
+		}
+
+		if (rngPtr == nullptr)
+		{
+			throw TestException("RingLWETest: Prng was reset!");
+		}
+		if (sycPtr == nullptr)
+		{
+			throw TestException("RingLWETest: Block cipher was reset!");
+		}
+
+		delete rngPtr;
+		delete sycPtr;
 	}
 
 	void RingLWETest::OnProgress(std::string Data)

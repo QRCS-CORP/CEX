@@ -192,7 +192,7 @@ size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		else
 		{
 			for (size_t i = 0; i < OUTLEN / sizeof(ulong); ++i)
-				Utility::IntUtils::Le64ToBytes(m_dgtState[0].H[i], Output, OutOffset + i * sizeof(ulong));
+				Utility::IntUtils::Le64ToBytes(m_dgtState[0].H[i], Output, OutOffset + (i * sizeof(ulong)));
 		}
 	}
 
@@ -289,7 +289,7 @@ void Keccak1024::Update(byte Input)
 
 void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CEXASSERT(Input.size() - InOffset >= Length, "The Output buffer is too short!");
+	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
 	if (Length == 0)
 		return;
