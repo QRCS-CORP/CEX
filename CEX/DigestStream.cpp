@@ -2,7 +2,36 @@
 
 NAMESPACE_PROCESSING
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+DigestStream::DigestStream(Digests DigestType, bool Parallel)
+	:
+	m_digestEngine(DigestType != Digests::None ? DigestFromName::GetInstance(DigestType, Parallel) :
+		throw CryptoProcessingException("DigestStream:CTor", "The Digest type can not be none!")),
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isParallel(Parallel),
+	m_progressInterval(0)
+{
+}
+
+DigestStream::DigestStream(IDigest* Digest)
+	:
+	m_digestEngine(Digest != nullptr ? Digest :
+		throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!")),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isParallel(m_digestEngine->IsParallel()),
+	m_progressInterval(0)
+{
+}
+
+DigestStream::~DigestStream()
+{
+	Destroy();
+}
+
+//~~~Accessors~~~//
 
 bool DigestStream::IsParallel()
 {
@@ -17,33 +46,6 @@ size_t DigestStream::ParallelBlockSize()
 ParallelOptions &DigestStream::ParallelProfile()
 {
 	return m_digestEngine->ParallelProfile();
-}
-
-//~~~Constructor~~~//
-
-DigestStream::DigestStream(Digests Digest, bool Parallel)
-	:
-	m_digestEngine(DigestFromName::GetInstance(Digest, Parallel)),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_isParallel(Parallel),
-	m_progressInterval(0)
-{
-}
-
-DigestStream::DigestStream(IDigest* Digest)
-	:
-	m_digestEngine(Digest != 0 ? Digest : throw CryptoProcessingException("DigestStream:CTor", "The Digest can not be null!")),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isParallel(m_digestEngine->IsParallel()),
-	m_progressInterval(0)
-{
-}
-
-DigestStream::~DigestStream()
-{
-	Destroy();
 }
 
 //~~~Public Functions~~~//
@@ -77,33 +79,45 @@ void DigestStream::CalculateInterval(size_t Length)
 	size_t interval = Length / 100;
 
 	if (interval < m_digestEngine->BlockSize())
+	{
 		m_progressInterval = m_digestEngine->BlockSize();
+	}
 	else
+	{
 		m_progressInterval = (interval - (interval % m_digestEngine->BlockSize()));
+	}
 
 	if (m_progressInterval == 0)
+	{
 		m_progressInterval = m_digestEngine->BlockSize();
+	}
 }
 
 void DigestStream::CalculateProgress(size_t Length, size_t Processed)
 {
 	if (Length >= Processed)
 	{
-		double progress = 100.0 * ((double)Processed / Length);
+		double progress = 100.0 * (static_cast<double>(Processed) / Length);
 		if (progress > 100.0)
+		{
 			progress = 100.0;
+		}
 
 		if (m_isParallel)
 		{
-			ProgressPercent((int)progress);
+			ProgressPercent(static_cast<int>(progress));
 		}
 		else
 		{
 			size_t block = Length / 100;
 			if (block == 0)
-				ProgressPercent((int)progress);
+			{
+				ProgressPercent(static_cast<int>(progress));
+			}
 			else if (Processed % block == 0)
-				ProgressPercent((int)progress);
+			{
+				ProgressPercent(static_cast<int>(progress));
+			}
 		}
 	}
 }
@@ -117,8 +131,19 @@ void DigestStream::Destroy()
 
 		if (m_destroyEngine)
 		{
-			delete m_digestEngine;
 			m_destroyEngine = false;
+
+			if (m_digestEngine != nullptr)
+			{
+				m_digestEngine.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_digestEngine != nullptr)
+			{
+				m_digestEngine.release();
+			}
 		}
 	}
 }

@@ -30,6 +30,7 @@
 #include "CryptoRandomException.h"
 #include "Drbgs.h"
 #include "IDigest.h"
+#include "IntUtils.h"
 #include "IPrng.h"
 #include "MemUtils.h"
 
@@ -44,12 +45,15 @@ using Provider::IProvider;
 
 /// <summary>
 /// An implementation of a cryptographically secure pseudo random number generator.
+/// </summary>
+///
+/// <remarks>
 /// <para>This class is an extension wrapper that uses one of the PRNG and random provider implementations. \n
 /// The PRNG and random provider type names are loaded through the constructor, instantiating internal instances of those classes and auto-initializing the base PRNG. \n
 /// The default configuration uses and AES-256 CTR mode generator (BCR), and the auto seed collection provider. \n
 /// The secure random class can use any combination of the base PRNGs and random providers. \n
 /// Note* as of version 1.0.0.2, the order of the Minimum and Maximum parameters on the NextIntXX api has changed, it is now with the Maximum parameter first, ex. NextInt16(max, min).</para>
-/// </summary>
+/// </remarks>
 /// 
 /// <example>
 /// <c>
@@ -61,27 +65,33 @@ class SecureRandom
 {
 private:
 
-	static const size_t BUFFER_SIZE = 4096;
+	static const size_t DEF_BUFSZE = 4096;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
-	bool m_destEngine;
 	Digests m_digestType;
 	bool m_isDestroyed;
-	Prngs m_prngEngineType;
-	IPrng* m_prngEngine;
 	Providers m_providerType;
 	std::vector<byte> m_rndBuffer;
-
-	SecureRandom(const SecureRandom&) = delete;
-	SecureRandom& operator=(const SecureRandom&) = delete;
+	Prngs m_rndEngineType;
+	std::unique_ptr<IPrng> m_rngEngine;
 
 public:
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class and initialize the rng.
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	SecureRandom(const SecureRandom&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	SecureRandom& operator=(const SecureRandom&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class and initialize the rng.
 	/// <para>Creates the pseudo-random seed generator and the base PRNG, and initializes the internal state.
 	/// The default configuration is the Block cipher Counter Rng (BCR), using an AES-256 CTR cipher, seeded with the Auto Collection seed Provider (ACP)</para>
 	/// </summary>
@@ -89,21 +99,17 @@ public:
 	/// <param name="EngineType">The base random bytes generator (PRNG) used to power this wrapper; default is block cipher counter</param>
 	/// <param name="ProviderType">The entropy provider type used to initialize the prng</param>
 	/// <param name="DigestType">The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</param>
+	/// <param name="BufferSize">The byte size of the internal buffer; default is 4096</param>
 	/// 
-	/// <exception cref="CryptoRandomException">Thrown if and invalid prng or random provider is used</exception>
-	explicit SecureRandom(Prngs EngineType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None);
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
+	explicit SecureRandom(Prngs EngineType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None, size_t BufferSize = 4096);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~SecureRandom();
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy();
 
 	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
@@ -178,14 +184,14 @@ public:
 	//~~~Int16~~~//
 
 	/// <summary>
-	/// Get a random non-negative short integer
+	/// Get a random short integer
 	/// </summary>
 	/// 
 	/// <returns>Random Int16</returns>
 	short NextInt16();
 
 	/// <summary>
-	/// Get a random non-negative short integer up to a maximum value
+	/// Get a random short integer up to a maximum value
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
@@ -193,7 +199,7 @@ public:
 	short NextInt16(short Maximum);
 
 	/// <summary>
-	/// Get a random non-negative short integer ranged between minimum and maximum sizes
+	/// Get a random short integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
@@ -234,21 +240,14 @@ public:
 	//~~~Int32~~~//
 
 	/// <summary>
-	/// Get a random 32bit non-negative integer
-	/// </summary>
-	/// 
-	/// <returns>Random Int32</returns>
-	int Next();
-
-	/// <summary>
-	/// Get a random 32bit non-negative integer
+	/// Get a random 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random Int32</returns>
 	int NextInt32();
 
 	/// <summary>
-	/// Get a random 32bit non-negative integer up to a maximum value
+	/// Get a random 32bit integer up to a maximum value
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
@@ -257,7 +256,7 @@ public:
 	int NextInt32(int Maximum);
 
 	/// <summary>
-	/// Get a random 32bit non-negative integer ranged between minimum and maximum sizes
+	/// Get a random 32bit integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
@@ -301,13 +300,6 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random Int64</returns>
-	long NextLong();
-
-	/// <summary>
-	/// Get a random 64bit long integer
-	/// </summary>
-	/// 
-	/// <returns>Random Int64</returns>
 	long NextInt64();
 
 	/// <summary>
@@ -332,14 +324,14 @@ public:
 	//~~~UInt64~~~//
 
 	/// <summary>
-	/// Get a random 64bit ulong integer
+	/// Get a random 64bit unsigned integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt64</returns>
 	ulong NextUInt64();
 
 	/// <summary>
-	/// Get a random 64bit ulong integer up to a maximum value
+	/// Get a random 64bit unsigned integer up to a maximum value
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
@@ -348,7 +340,7 @@ public:
 	ulong NextUInt64(ulong Maximum);
 
 	/// <summary>
-	/// Get a random 64bit ulong integer ranged between minimum and maximum sizes
+	/// Get a random 64bit unsigned integer ranged between minimum and maximum sizes
 	/// </summary>
 	/// 
 	/// <param name="Maximum">Maximum value</param>
@@ -357,14 +349,12 @@ public:
 	/// <returns>Random UInt64</returns>
 	ulong NextUInt64(ulong Maximum, ulong Minimum);
 
+	//~~~Reset~~~//
+
 	/// <summary>
 	/// Reset the generator instance
 	/// </summary>
 	void Reset();
-
-private:
-
-	ulong GetRanged(ulong Maximum, size_t Length);
 };
 
 NAMESPACE_PRNGEND

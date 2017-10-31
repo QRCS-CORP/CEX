@@ -35,35 +35,78 @@ using Prng::IPrng;
 /// </summary>
 class FFTM12T62
 {
-public:
-
-	FFTM12T62() = delete;
-	FFTM12T62(const FFTM12T62&) = delete;
-	FFTM12T62& operator=(const FFTM12T62&) = delete;
-	FFTM12T62& operator=(FFTM12T62&&) = delete;
-
-	static const size_t M = 12;
-	static const size_t T = 62; 
-	static const ulong ButterflyConsts[63][12];
-
 private:
 
-	static const size_t PKN_ROWS = (T * M);
-	static const size_t PKN_COLS = (((size_t)1 << M) - T * M);
-	static const size_t IRR_SIZE = (M * 8);
+	static const size_t PKN_ROWS = (62 * 12);
+	static const size_t PKN_COLS = (((size_t)1 << 12) - 62 * 12);
+	static const size_t IRR_SIZE = (12 * 8);
 	static const size_t CND_SIZE = ((PKN_ROWS - 8) * 8);
 	static const size_t GEN_MAXR = 10000;
+	static const std::array<std::array<ulong, 12>, 63> ButterflyConsts;
+	static const std::array<std::array<ulong, 12>, 64> GfPoints;
+	static const std::array<std::array<std::array<ulong, 12>, 2>, 5> RadixTrScalar;
 
 public:
 
+	//~~~Public Constants~~~//
+
+	/// <summary>
+	/// The finite field dimension of GF(2^m): M
+	/// </summary>
+	static const size_t M = 12;
+
+	/// <summary>
+	/// The error correction capability of the code: T
+	/// </summary>
+	static const size_t T = 62; 
+
+	/// <summary>
+	/// The secret size in bytes
+	/// </summary>
 	static const size_t SECRET_SIZE = (PKN_ROWS / 8);
+
+	/// <summary>
+	/// The private key size in bytes
+	/// </summary>
 	static const size_t PRIKEY_SIZE = CND_SIZE + IRR_SIZE;
+
+	/// <summary>
+	/// The public key size in bytes
+	/// </summary>
 	static const size_t PUBKEY_SIZE = (PKN_ROWS * ((64 - M) * 8)) + (PKN_ROWS * (8 - ((PKN_ROWS & 63) >> 3)));
 
+	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Decrypt an encrypted cipher-text and return the shared secret
+	/// </summary>
+	/// 
+	/// <param name="E">The decrypted output array</param>
+	/// <param name="PrivateKey">The private key array</param>
+	/// <param name="S">The ciphertext</param>
+	/// 
+	/// <returns>The message was decrypted succesfully</returns>
 	static bool Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateKey, const std::vector<byte> &S);
 
+	/// <summary>
+	/// Encrypt a message and return the shared secret and cipher-text
+	/// </summary>
+	/// 
+	/// <param name="S">The output ciphertext</param>
+	/// <param name="E">The message array</param>
+	/// <param name="PublicKey">The public key array</param>
+	/// <param name="Random">The random generator instance</param>
 	static void Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Random);
 
+	/// <summary>
+	/// Generate a public/private key pair
+	/// </summary>
+	/// 
+	/// <param name="PublicKey">The public key array</param>
+	/// <param name="PrivateKey">The private key array</param>
+	/// <param name="Random">The random generator instance</param>
+	/// 
+	/// <returns>The message was decrypted succesfully</returns>
 	static bool Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Random);
 
 private:
@@ -88,11 +131,11 @@ private:
 
 	//~~~KeyGen~~~//
 
-	static int IrrGen(std::array<ushort, T + 1> &Output, std::vector<ushort> &F);
+	static bool IrrGen(std::array<ushort, T + 1> &Output, std::vector<ushort> &F);
 
 	static void SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Random);
 
-	static int PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey);
+	static bool PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey);
 
 	//~~~Utils~~~//
 

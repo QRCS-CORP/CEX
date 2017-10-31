@@ -2,6 +2,10 @@
 #include "../CEX/BCR.h"
 #include "../CEX/DCR.h"
 #include "../CEX/HCR.h"
+#include "../CEX/ACP.h"
+#include "../CEX/CJP.h"
+#include "../CEX/CSP.h"
+#include "../CEX/RDP.h"
 
 namespace Test
 {
@@ -22,6 +26,7 @@ namespace Test
 	std::string PrngTest::Run()
 	{
 		using namespace CEX::Prng;
+		using namespace CEX::Provider;
 
 		try
 		{
@@ -29,23 +34,49 @@ namespace Test
 			OnProgress(std::string("### Uses chisquare and mean value tests to evaluate output from each prng"));
 			OnProgress(std::string(""));
 
+			OnProgress(std::string("Testing the HMAC Counter based Rng:"));
+			HCR* hcr = new HCR();
+			OnProgress(ChiSquare(hcr));
+			OnProgress(MeanValue(hcr));
+			delete hcr;
+
 			OnProgress(std::string("Testing the Block cipher Counter based Rng:"));
-			BCR* rnd1 = new BCR();
-			ChiSquare(rnd1);
-			MeanValue(rnd1);
-			delete rnd1;
+			BCR* bcr = new BCR();
+			OnProgress(ChiSquare(bcr));
+			OnProgress(MeanValue(bcr));
+			delete bcr;
 
 			OnProgress(std::string("Testing the Digest Counter based Rng:"));
-			DCR* rnd2 = new DCR();
-			ChiSquare(rnd2);
-			MeanValue(rnd2);
-			delete rnd2;
+			DCR* dcr = new DCR();
+			OnProgress(ChiSquare(dcr));
+			OnProgress(MeanValue(dcr));
+			delete dcr;
 
-			OnProgress(std::string("Testing the HMAC Counter based Rng:"));
-			HCR* rnd3 = new HCR();
-			ChiSquare(rnd3);
-			MeanValue(rnd3);
-			delete rnd3;
+			OnProgress(std::string("Testing the Auto Collection Provider:"));
+			ACP* acp = new ACP();
+			OnProgress(ChiSquare(acp));
+			OnProgress(MeanValue(acp));
+			delete acp;
+
+			// too slow for debug, but passes tests in every config
+#if defined(CEX_NO_DEBUG)
+			OnProgress(std::string("Testing the Cpu/Memory Jitter Provider:"));
+			CJP* cjp = new CJP();
+			OnProgress(ChiSquare(cjp, 10240));
+			OnProgress(MeanValue(cjp, 10240));
+			delete cjp;
+#endif
+			OnProgress(std::string("Testing the Crypto System Provider:"));
+			CSP* csp = new CSP();
+			OnProgress(ChiSquare(csp));
+			OnProgress(MeanValue(csp));
+			delete csp;
+
+			OnProgress(std::string("Testing the RDRAND/RDSEED Provider:"));
+			RDP* rdp = new RDP();
+			OnProgress(ChiSquare(rdp));
+			OnProgress(MeanValue(rdp));
+			delete rdp;
 
 			OnProgress(std::string(".."));
 
@@ -59,42 +90,6 @@ namespace Test
 		{
 			throw FAILURE;
 		}
-	}
-
-	void PrngTest::ChiSquare(Prng::IPrng* Rng)
-	{
-		// converges slowly, needs 1mb or more
-		std::vector<byte> rnd(1024000);
-		Rng->GetBytes(rnd);
-		double x = TestUtils::ChiSquare(rnd) * 100;
-		std::string ret = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
-
-		if (x < 1.0 || x > 99.0)
-			ret += std::string("(FAIL)");
-		else if (x < 5.0 || x > 95.0)
-			ret += std::string("(WARN)");
-		else
-			ret += std::string("(PASS)");
-
-		OnProgress(ret);
-	}
-
-	void PrngTest::MeanValue(Prng::IPrng* Rng)
-	{
-		// 100kb sample
-		std::vector<byte> rnd(102400);
-		Rng->GetBytes(rnd);
-		double x = TestUtils::MeanValue(rnd);
-		std::string ret = (std::string("Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
-
-		if (x < 122.5 || x > 132.5)
-			ret += std::string("(FAIL)");
-		else if (x < 125.0 || x > 130.0)
-			ret += std::string("(WARN)");
-		else
-			ret += std::string("(PASS)");
-
-		OnProgress(ret);
 	}
 
 	void PrngTest::OnProgress(std::string Data)

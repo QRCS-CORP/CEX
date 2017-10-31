@@ -5,7 +5,56 @@
 
 NAMESPACE_SYMMETRICKEY
 
-//~~~Public Properties~~~//
+//~~~Constructors~~~//
+
+SymmetricKey::SymmetricKey(const std::vector<byte> &Key)
+	:
+	m_info(0),
+	m_isDestroyed(false),
+	m_key(Key),
+	m_keySizes(Key.size(), 0, 0),
+	m_nonce(0)
+{
+	if (Key.size() == 0)
+	{
+		throw CryptoProcessingException("SymmetricKey:Ctor", "The key can not be zero sized!");
+	}
+}
+
+SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce)
+	:
+	m_info(0),
+	m_isDestroyed(false),
+	m_key(Key),
+	m_keySizes(Key.size(), Nonce.size(), 0),
+	m_nonce(Nonce)
+{
+	if (Key.size() == 0 && Nonce.size() == 0)
+	{
+		throw CryptoProcessingException("SymmetricKey:Ctor", "The key and nonce can not both be be zero sized!");
+	}
+}
+
+SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
+	:
+	m_info(Info),
+	m_isDestroyed(false),
+	m_key(Key),
+	m_keySizes(Key.size(), Nonce.size(), Info.size()),
+	m_nonce(Nonce)
+{
+	if (Key.size() == 0 && Nonce.size() == 0 && Info.size() == 0)
+	{
+		throw CryptoProcessingException("SymmetricKey:Ctor", "The key, nonce, and info can not all be be zero sized!");
+	}
+}
+
+SymmetricKey::~SymmetricKey()
+{
+	Destroy();
+}
+
+//~~~Accessors~~~//
 
 const std::vector<byte> SymmetricKey::Info() 
 { 
@@ -27,61 +76,6 @@ const std::vector<byte> SymmetricKey::Nonce()
 	return m_nonce;
 }
 
-//~~~Constructors~~~//
-
-SymmetricKey::SymmetricKey()
-	:
-	m_info(0),
-	m_isDestroyed(false),
-	m_key(0),
-	m_keySizes(0, 0, 0),
-	m_nonce(0)
-{
-}
-
-SymmetricKey::SymmetricKey(const std::vector<byte> &Key)
-	:
-	m_info(0),
-	m_isDestroyed(false),
-	m_key(Key),
-	m_keySizes(Key.size(), 0, 0),
-	m_nonce(0)
-
-{
-	if (Key.size() == 0)
-		throw CryptoProcessingException("SymmetricKey:Ctor", "The key can not be zero sized!");
-}
-
-SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce)
-	:
-	m_info(0),
-	m_isDestroyed(false),
-	m_key(Key),
-	m_keySizes(Key.size(), Nonce.size(), 0),
-	m_nonce(Nonce)
-
-{
-	if (Key.size() == 0 && Nonce.size() == 0)
-		throw CryptoProcessingException("SymmetricKey:Ctor", "The key and nonce can not both be be zero sized!");
-}
-
-SymmetricKey::SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
-	:
-	m_info(Info),
-	m_isDestroyed(false),
-	m_key(Key),
-	m_keySizes(Key.size(), Nonce.size(), Info.size()),
-	m_nonce(Nonce)
-{
-	if (Key.size() == 0 && Nonce.size() == 0 && Info.size() == 0)
-		throw CryptoProcessingException("SymmetricKey:Ctor", "The key, nonce, and info can not all be be zero sized!");
-}
-
-SymmetricKey::~SymmetricKey()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 SymmetricKey* SymmetricKey::Clone()
@@ -96,11 +90,17 @@ void SymmetricKey::Destroy()
 		m_isDestroyed = true;
 
 		if (m_key.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_key);
+		}
 		if (m_nonce.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_nonce);
+		}
 		if (m_info.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_info);
+		}
 	}
 }
 
@@ -115,11 +115,17 @@ SymmetricKey* SymmetricKey::DeSerialize(const MemoryStream &KeyStream)
 	std::vector<byte> info;
 
 	if (kLen > 0)
+	{
 		key = reader.ReadBytes(kLen);
+	}
 	if (nLen > 0)
+	{
 		nonce = reader.ReadBytes(nLen);
+	}
 	if (iLen > 0)
+	{
 		info = reader.ReadBytes(iLen);
+	}
 
 	return new SymmetricKey(key, nonce, info);
 }
@@ -141,12 +147,18 @@ MemoryStream* SymmetricKey::Serialize(SymmetricKey &KeyObj)
 	writer.Write(static_cast<ushort>(nLen));
 	writer.Write(static_cast<ushort>(iLen));
 
-	if (kLen != 0)
+	if (kLen > 0)
+	{
 		writer.Write(KeyObj.Key(), 0, kLen);
-	if (nLen != 0)
+	}
+	if (nLen > 0)
+	{
 		writer.Write(KeyObj.Nonce(), 0, nLen);
-	if (iLen != 0)
+	}
+	if (iLen > 0)
+	{
 		writer.Write(KeyObj.Info(), 0, iLen);
+	}
 
 	IO::MemoryStream* strm = writer.GetStream();
 	strm->Seek(0, IO::SeekOrigin::Begin);

@@ -5,9 +5,89 @@
 
 NAMESPACE_DIGEST
 
+using Utility::IntUtils;
+
 const std::string SHA512::CLASS_NAME("SHA512");
 
-// *** Properties *** //
+//~~~Constructor~~~//
+
+SHA512::SHA512(bool Parallel)
+	:
+	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
+	m_isDestroyed(false),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeDestroy(true),
+	m_treeParams(Parallel ? SHA2Params(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SHA2Params(DIGEST_SIZE, 0, 0))
+{
+	// TODO: implement parallel alternate for single core cpu
+	if (Parallel && !m_parallelProfile.IsParallel())
+	{
+		throw CryptoDigestException("SHA512::Ctor", "Cpu does not support parallel processing!");
+	}
+
+	if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = Parallel;
+	}
+
+	Reset();
+}
+
+SHA512::SHA512(SHA2Params &Params)
+	:
+	m_dgtState(1),
+	m_isDestroyed(false),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
+	m_treeDestroy(false),
+	m_treeParams(Params)
+{
+	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
+	{
+		throw CryptoDigestException("SHA512::Ctor", "Cpu does not support parallel processing!");
+	}
+
+	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
+	{
+		m_dgtState.resize(m_treeParams.FanOut());
+		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
+	}
+	else if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = false;
+	}
+
+	Reset();
+}
+
+SHA512::~SHA512()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_msgLength = 0;
+		m_parallelProfile.Reset();
+
+		if (m_treeDestroy)
+		{
+			m_treeParams.Reset();
+			m_treeDestroy = false;
+		}
+
+		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		{
+			m_dgtState[i].Reset();
+		}
+
+		IntUtils::ClearVector(m_dgtState);
+		IntUtils::ClearVector(m_msgBuffer);
+	}
+}
+
+//~~~Accessors~~~//
 
 size_t SHA512::BlockSize() 
 { 
@@ -31,10 +111,18 @@ const bool SHA512::IsParallel()
 
 const std::string SHA512::Name() 
 {
+	std::string txtName = "";
+
 	if (m_parallelProfile.IsParallel())
-		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	{
+		txtName = CLASS_NAME + "-P" + IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	}
 	else
-		return CLASS_NAME;
+	{
+		txtName = CLASS_NAME;
+	}
+
+	return txtName;
 }
 
 const size_t SHA512::ParallelBlockSize() 
@@ -45,50 +133,6 @@ const size_t SHA512::ParallelBlockSize()
 ParallelOptions &SHA512::ParallelProfile()
 {
 	return m_parallelProfile; 
-}
-
-//~~~Constructor~~~//
-
-SHA512::SHA512(bool Parallel)
-	:
-	m_treeParams(DIGEST_SIZE, static_cast<uint>(BLOCK_SIZE), DEF_PRLDEGREE),
-	m_isDestroyed(false),
-	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
-	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_dgtState(Parallel ? DEF_PRLDEGREE : 1)
-{
-	if (m_parallelProfile.IsParallel())
-		m_parallelProfile.IsParallel() = Parallel;
-
-	Reset();
-}
-
-SHA512::SHA512(SHA2Params &Params)
-	:
-	m_treeParams(Params),
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut())
-{
-	if (m_treeParams.FanOut() > 1)
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
-	Reset();
-}
-
-SHA512::~SHA512()
-{
-	Destroy();
 }
 
 //~~~Public Functions~~~//
@@ -108,10 +152,12 @@ void SHA512::Destroy()
 		m_msgLength = 0;
 
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		{
 			m_dgtState[i].Reset();
+		}
 
-		Utility::IntUtils::ClearVector(m_dgtState);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
+		IntUtils::ClearVector(m_dgtState);
+		IntUtils::ClearVector(m_msgBuffer);
 	}
 }
 
@@ -123,7 +169,9 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
+		{
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		}
 
 		// process buffer
 		if (m_msgLength != 0)
@@ -146,7 +194,7 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			Utility::IntUtils::BeULL512ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * BLOCK_SIZE);
+			IntUtils::BeULL512ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * BLOCK_SIZE);
 			m_msgLength += DIGEST_SIZE;
 		}
 
@@ -157,7 +205,9 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
 
 			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
+			{
 				Compress(m_msgBuffer, i * BLOCK_SIZE, rootState);
+			}
 
 			m_msgLength -= BLKRMD;
 			blkOff = BLKRMD;
@@ -165,13 +215,13 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// finalize and store
 		HashFinal(m_msgBuffer, blkOff, m_msgLength, rootState);
-		Utility::IntUtils::BeULL512ToBlock(rootState.H, 0, Output, OutOffset);
+		IntUtils::BeULL512ToBlock(rootState.H, 0, Output, OutOffset);
 	}
 	else
 	{
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
-		Utility::IntUtils::BeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
+		IntUtils::BeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -181,12 +231,9 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 void SHA512::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoDigestException("SHA512:ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree > 254)
-		throw CryptoDigestException("SHA512:ParallelMaxDegree", "Parallel degree can not exceed 254!");
-	if (Degree % 2 != 0)
-		throw CryptoDigestException("SHA512:ParallelMaxDegree", "Parallel degree must be an even number!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	m_dgtState.clear();
@@ -224,84 +271,88 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 {
 	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
-	if (Length == 0)
-		return;
-
-	if (m_parallelProfile.IsParallel())
-	{
-		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
-		{
-			// fill buffer
-			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
-			if (RMDLEN != 0)
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
-
-			// empty the message buffer
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
-			{
-				Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
-			});
-
-			m_msgLength = 0;
-			Length -= RMDLEN;
-			InOffset += RMDLEN;
-		}
-
-		if (Length >= m_parallelProfile.ParallelBlockSize())
-		{
-			// calculate working set size
-			const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
-
-			// process large blocks
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
-			});
-
-			Length -= PRCLEN;
-			InOffset += PRCLEN;
-		}
-
-		if (Length >= m_parallelProfile.ParallelMinimumSize())
-		{
-			const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
-			});
-
-			Length -= PRMLEN;
-			InOffset += PRMLEN;
-		}
-	}
-	else
-	{
-		if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
-		{
-			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-			if (RMDLEN != 0)
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
-
-			Compress(m_msgBuffer, 0, m_dgtState[0]);
-			m_msgLength = 0;
-			InOffset += RMDLEN;
-			Length -= RMDLEN;
-		}
-
-		// sequential loop through blocks
-		while (Length > BLOCK_SIZE)
-		{
-			Compress(Input, InOffset, m_dgtState[0]);
-			InOffset += BLOCK_SIZE;
-			Length -= BLOCK_SIZE;
-		}
-	}
-
-	// store unaligned bytes
 	if (Length != 0)
 	{
-		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
-		m_msgLength += Length;
+		if (m_parallelProfile.IsParallel())
+		{
+			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
+			{
+				// fill buffer
+				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
+				{
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				}
+
+				// empty the message buffer
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				{
+					Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
+				});
+
+				m_msgLength = 0;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
+			}
+
+			if (Length >= m_parallelProfile.ParallelBlockSize())
+			{
+				// calculate working set size
+				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
+
+				// process large blocks
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				{
+					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
+				});
+
+				Length -= PRCLEN;
+				InOffset += PRCLEN;
+			}
+
+			if (Length >= m_parallelProfile.ParallelMinimumSize())
+			{
+				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				{
+					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
+				});
+
+				Length -= PRMLEN;
+				InOffset += PRMLEN;
+			}
+		}
+		else
+		{
+			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			{
+				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				if (RMDLEN != 0)
+				{
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				}
+
+				Compress(m_msgBuffer, 0, m_dgtState[0]);
+				m_msgLength = 0;
+				InOffset += RMDLEN;
+				Length -= RMDLEN;
+			}
+
+			// sequential loop through blocks
+			while (Length > BLOCK_SIZE)
+			{
+				Compress(Input, InOffset, m_dgtState[0]);
+				InOffset += BLOCK_SIZE;
+				Length -= BLOCK_SIZE;
+			}
+		}
+
+		// store unaligned bytes
+		if (Length != 0)
+		{
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			m_msgLength += Length;
+		}
 	}
 }
 
@@ -522,7 +573,7 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 		Length = 0;
 	}
 
-	Input[InOffset + Length] = (byte)128;
+	Input[InOffset + Length] = 128;
 	++Length;
 
 	// padding
@@ -536,8 +587,8 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	}
 
 	// finalize state with counter and last compression
-	Utility::IntUtils::Be64ToBytes(State.T[1], Input, InOffset + 112);
-	Utility::IntUtils::Be64ToBytes(bitLen, Input, InOffset + 120);
+	IntUtils::Be64ToBytes(State.T[1], Input, InOffset + 112);
+	IntUtils::Be64ToBytes(bitLen, Input, InOffset + 120);
 	Compress(Input, InOffset, State);
 }
 

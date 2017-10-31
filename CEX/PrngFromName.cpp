@@ -9,30 +9,51 @@ NAMESPACE_HELPER
 IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests DigestType)
 {
 	if (PrngType == Prngs::None)
-		Exception::CryptoException("PrngFromName:GetPrng", "Prng type can not be none!");
+	{
+		CryptoException("PrngFromName:GetPrng", "Prng type can not be none!");
+	}
 	if (ProviderType == Providers::None)
-		Exception::CryptoException("PrngFromName:GetPrng", "Prng type can not be none!");
+	{
+		CryptoException("PrngFromName:GetPrng", "Prng type can not be none!");
+	}
 	if (PrngType != Prngs::BCR && DigestType == Digests::None)
-		Exception::CryptoException("PrngFromName:GetPrng", "Digest type can not be none when using Digest or HMAC based rng!");
+	{
+		CryptoException("PrngFromName:GetPrng", "Digest type can not be none when using Digest or HMAC based rng!");
+	}
+
+	IPrng* rngPtr;
 
 	try
 	{
 		switch (PrngType)
 		{
 			case Prngs::BCR:
-				return new Prng::BCR(Enumeration::BlockCiphers::AHX, ProviderType);
+			{
+				rngPtr = new Prng::BCR(Enumeration::BlockCiphers::AHX, ProviderType);
+				break;
+			}
 			case Prngs::DCR:
-				return new Prng::DCR(DigestType, ProviderType);
+			{
+				rngPtr = new Prng::DCR(DigestType, ProviderType);
+				break;
+			}
 			case Prngs::HCR:
-				return new Prng::HCR(DigestType, ProviderType);
+			{
+				rngPtr = new Prng::HCR(DigestType, ProviderType);
+				break;
+			}
 			default:
-				throw Exception::CryptoException("PrngFromName:GetPrng", "The specified prng type is unrecognized!");
+			{
+				throw CryptoException("PrngFromName:GetPrng", "The specified prng type is unrecognized!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("PrngFromName:GetInstance", "The prng is unavailable!", std::string(ex.what()));
+		throw CryptoException("PrngFromName:GetInstance", "The prng is unavailable!", std::string(ex.what()));
 	}
+
+	return rngPtr;
 }
 
 NAMESPACE_HELPEREND

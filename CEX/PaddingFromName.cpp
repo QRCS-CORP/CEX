@@ -8,26 +8,44 @@ NAMESPACE_HELPER
 
 IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 {
+	IPadding* padPtr;
+
 	try
 	{
 		switch (PaddingType)
 		{
-		case PaddingModes::ISO7816:
-			return new Cipher::Symmetric::Block::Padding::ISO7816();
-		case PaddingModes::PKCS7:
-			return new Cipher::Symmetric::Block::Padding::PKCS7();
-		case PaddingModes::TBC:
-			return new Cipher::Symmetric::Block::Padding::TBC();
-		case PaddingModes::X923:
-			return new Cipher::Symmetric::Block::Padding::X923();
-		default:
-			throw Exception::CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
+			case PaddingModes::ISO7816:
+			{
+				padPtr = new Cipher::Symmetric::Block::Padding::ISO7816();
+				break;
+			}
+			case PaddingModes::PKCS7:
+			{
+				padPtr = new Cipher::Symmetric::Block::Padding::PKCS7();
+				break;
+			}
+			case PaddingModes::TBC:
+			{
+				padPtr = new Cipher::Symmetric::Block::Padding::TBC();
+				break;
+			}
+			case PaddingModes::X923:
+			{
+				padPtr = new Cipher::Symmetric::Block::Padding::X923();
+				break;
+			}
+			default:
+			{
+				throw CryptoException("PaddingFromName:GetPadding", "The padding mode is not recognized!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("PaddingFromName:GetInstance", "The padding mode is unavailable!", std::string(ex.what()));
+		throw CryptoException("PaddingFromName:GetInstance", "The padding mode is unavailable!", std::string(ex.what()));
 	}
+
+	return padPtr;
 }
 
 NAMESPACE_HELPEREND

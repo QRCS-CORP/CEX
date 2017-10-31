@@ -9,7 +9,7 @@ NAMESPACE_SYMMETRICKEY
 /// A symmetric key container class.
 /// <para>Contains keying material used for initialization of symmetric ciphers, Macs, Rngs, and Drbgs.</para>
 /// </summary>
-class SymmetricKey : public ISymmetricKey
+class SymmetricKey final : public ISymmetricKey
 {
 private:
 
@@ -21,68 +21,84 @@ private:
 
 public:
 
-	//~~~Public Properties~~~//
-
-	/// <summary>
-	/// Get: Return a copy of the personalization string; can used as an optional source of entropy
-	/// </summary>
-	const std::vector<byte> Info() override;
-
-	/// <summary>
-	/// Get: Return a copy of the primary key
-	/// </summary>
-	const std::vector<byte> Key() override;
-
-	/// <summary>
-	/// Get: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
-	/// </summary>
-	const SymmetricKeySize KeySizes() override;
-
-	/// <summary>
-	/// Get: Return a copy of the nonce
-	/// </summary>
-	const std::vector<byte> Nonce() override;
-
 	//~~~Constructors~~~//
 
 	/// <summary>
-	/// Instantiate an empty container
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	SymmetricKey();
+	SymmetricKey(const SymmetricKey&) = delete;
 
 	/// <summary>
-	/// Instantiate this class with an encryption key
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	SymmetricKey& operator=(const SymmetricKey&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	SymmetricKey() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class with an encryption key
 	/// </summary>
 	///
 	/// <param name="Key">The primary encryption key</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	explicit SymmetricKey(const std::vector<byte> &Key);
 
 	/// <summary>
-	/// Instantiate this class with an encryption key, and nonce parameters
+	/// Constructor: instantiate this class with an encryption key, and nonce parameters
 	/// </summary>
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
-	explicit SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce);
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce);
 
 	/// <summary>
-	/// Instantiate this class with an encryption key, nonce, and info parameters
+	/// Constructor: instantiate this class with an encryption key, nonce, and info parameters
 	/// </summary>
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
-	explicit SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~SymmetricKey() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: Return a copy of the personalization string; can used as an optional source of entropy
+	/// </summary>
+	const std::vector<byte> Info() override;
+
+	/// <summary>
+	/// Read Only: Return a copy of the primary key
+	/// </summary>
+	const std::vector<byte> Key() override;
+
+	/// <summary>
+	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
+	/// </summary>
+	const SymmetricKeySize KeySizes() override;
+
+	/// <summary>
+	/// Read Only: Return a copy of the nonce
+	/// </summary>
+	const std::vector<byte> Nonce() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Create a shallow copy of this SymmetricKey class
+	/// Create a copy of this SymmetricKey class
 	/// </summary>
 	SymmetricKey* Clone();
 

@@ -90,7 +90,7 @@ NAMESPACE_BLOCK
 /// <list type="bullet">
 /// <item><description>An input key of up to 64 bytes in length will use a standard key schedule for internal key expansion; greater than 64 bytes implements the HKDF key schedule.</description></item>
 /// <item><description>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.</description></item>
-/// <item><description>The HKDF Digest engine is definable through the <see cref="AHX(uint, Digests)">Constructor</see> type enumeration parameter: KdfEngine.</description></item>
+/// <item><description>The HKDF Digest engine is definable through the <see cref="AHX(uint, Digests)">Constructor</see> type enumeration parameter: Digest.</description></item>
 /// <item><description>Minimum HKDF key size is the Digests Hash output size, recommended is 2* the minimum, or increments of (n * hash-size) in bytes.</description></item>
 /// <item><description>The recommended size for maximum security is 2* the digests block size; this calls HKDF Extract using full blocks of key and salt.</description></item>
 /// <item><description>Valid key sizes can be determined at run time using the <see cref="LegalKeySizes"/> property.</description></item>
@@ -126,11 +126,11 @@ private:
 	// size of state buffer subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	size_t m_cprKeySize;
 	size_t m_blockSize;
+	size_t m_cprKeySize;
 	bool m_destroyEngine;
 	std::vector<__m128i> m_expKey;
-	IDigest* m_kdfEngine;
+	std::unique_ptr<IDigest> m_kdfEngine;
 	Digests m_kdfEngineType;
 	std::vector<byte> m_kdfInfo;
 	size_t m_kdfInfoMax;
@@ -144,116 +144,122 @@ private:
 
 public:
 
-	AHX(const AHX&) = delete;
-	AHX& operator=(const AHX&) = delete;
-	AHX& operator=(AHX&&) = delete;
-
-	//~~~Properties~~~//
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes.
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	AHX(const AHX&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	AHX& operator=(const AHX&) = delete;
+
+	/// <summary>
+	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
+	/// </summary>
+	/// 
+	/// <param name="DigestType">The Key Schedule HKDF hash-engine; can be any one of the Digest implementations. 
+	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
+	/// <param name="Rounds">The number of transformation rounds. 
+	/// <para>The <see cref="LegalRounds"/> property contains available sizes. 
+	/// In default mode (DigestType is set to None), the rounds count is automatically calculated based on the key size in a standard AES implementation.
+	/// If the HKDF digest is specified, the number of rounds can be user-defined to a value from 10 to 38 (mod 2).
+	/// Adding rounds increases diffusion in the ciphertext output, but takes longer to process.</para></param>
+	/// 
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
+	explicit AHX(Digests DigestType = Digests::None, size_t Rounds = 14);
+
+	/// <summary>
+	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
+	/// </summary>
+	///
+	/// <param name="Digest">The Key Schedule KDF hash-engine instance;.
+	/// <para>Can be any one of the message digest implementations.</para></param>
+	/// <param name="Rounds">Number of transformation rounds. 
+	/// <para>The <see cref="LegalRounds"/> property contains available sizes. The default is 14 rounds (AES-256).</para></param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
+	explicit AHX(IDigest* Digest, size_t Rounds = 14);
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	~AHX() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: Unit block size of internal cipher in bytes.
 	/// <para>Block size must be 16 or 32 bytes wide.
 	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
 
 	/// <summary>
-	/// Get/Set: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
+	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
 	/// <para>Changing this code will create a unique distribution of the cipher.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.
-	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax size.
+	/// Note: If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
 	std::vector<byte> &DistributionCode() override;
 
 	/// <summary>
-	/// Get: The maximum size of the distribution code in bytes.
+	/// Read Only: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
 	/// </summary>
 	const size_t DistributionCodeMax() override;
 
 	/// <summary>
-	/// Get: The block ciphers type name
+	/// Read Only: The block ciphers type name
 	/// </summary>
 	const BlockCiphers Enumeral() override;
 
 	/// <summary>
-	/// Get: Initialized for encryption, false for decryption.
+	/// Read Only: Initialized for encryption, false for decryption.
 	/// <para>Value set in <see cref="Initialize(bool, ISymmetricKey)"/>.</para>
 	/// </summary>
 	const bool IsEncryption() override;
 
 	/// <summary>
-	/// Get: Cipher is ready to transform data
+	/// Read Only: Cipher is ready to transform data
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Get: The extended ciphers HKDF digest type
+	/// Read Only: The extended ciphers HKDF digest type
 	/// </summary>
 	const Digests KdfEngine() override;
 
 	/// <summary>
-	/// Get: Available Encryption Key Sizes in bytes
+	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
 
 	/// <summary>
-	/// Get: Available transformation round assignments
+	/// Read Only: Available transformation round assignments
 	/// </summary>
 	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
-	/// Get: The block ciphers class name
+	/// Read Only: The block ciphers class name
 	/// </summary>
 	const std::string Name() override;
 
 	/// <summary>
-	/// Get: The number of transformation rounds processed by the transform
+	/// Read Only: The number of transformation rounds processed by the transform
 	/// </summary>
 	const size_t Rounds() override;
 
 	/// <summary>
-	/// Get: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
+	/// Read Only: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
 	/// <para>Used in the parallel block size calculations, to reduce the occurence of L1 cache eviction of hot tables and class variables. 
 	/// This is a timing and performance optimization, see the ParallelOptions class for more details.</para>
 	/// </summary>
 	const size_t StateCacheSize() override;
-
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
-	/// </summary>
-	/// 
-	/// <param name="KdfEngineType">The Key Schedule HKDF hash-engine; can be any one of the Digest implementations. 
-	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
-	/// <param name="Rounds">The number of transformation rounds. 
-	/// <para>The <see cref="LegalRounds"/> property contains available sizes. 
-	/// In default mode (KdfEngineType is set to None), the rounds count is automatically calculated based on the key size in a standard AES implementation.
-	/// If the Kdf engine is specified, the number of rounds can be user-defined to a value from 10 to 38 (mod 2).
-	/// Adding rounds increases diffusion in the ciphertext output, but takes longer to process.</para></param>
-	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	explicit AHX(Digests KdfEngineType = Digests::None, size_t Rounds = 14);
-
-	/// <summary>
-	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
-	/// </summary>
-	///
-	/// <param name="KdfEngine">The Key Schedule KDF hash-engine instance;.
-	/// <para>Can be any one of the message digest implementations.</para></param>
-	/// <param name="Rounds">Number of transformation rounds. 
-	/// <para>The <see cref="LegalRounds"/> property contains available sizes. The default is 14 rounds (AES-256).<para></param>
-	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	explicit AHX(IDigest *KdfEngine, size_t Rounds = 14);
-
-	/// <summary>
-	/// Finalize objects
-	/// </summary>
-	~AHX() override;
 
 	//~~~Public Functions~~~//
 
@@ -278,11 +284,6 @@ public:
 	/// <param name="Output">Decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
-
-	/// <summary>
-	/// Clear the buffers and reset
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a block of bytes.
@@ -311,9 +312,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
+	/// <param name="KeyParams">Cipher key container. 
+	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	///
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(bool Encryption, ISymmetricKey &KeyParams) override;
 
 	/// <summary>
@@ -388,7 +390,7 @@ private:
 	void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
 	void ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
-	void LoadState(Digests KdfEngineType);
+	void LoadState(Digests DigestType);
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 };

@@ -121,7 +121,7 @@ private:
 	static const size_t MAX_PRLALLOC = 100000000;
 	static const size_t MIN_TAGSIZE = 12;
 
-	CTR m_cipherMode;
+	std::unique_ptr<CTR> m_cipherMode;
 	std::vector<byte> m_aadData;
 	bool m_aadLoaded;
 	bool m_aadPreserve;
@@ -138,113 +138,29 @@ private:
 	bool m_isInitialized;
 	bool m_isLoaded;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	Mac::CMAC m_macGenerator;
+	std::unique_ptr<Mac::CMAC> m_macGenerator;
 	size_t m_macSize;
 	std::vector<byte> m_msgTag;
 	ParallelOptions m_parallelProfile;
 
 public:
 
-	EAX(const EAX&) = delete;
-	EAX& operator=(const EAX&) = delete;
-	EAX& operator=(EAX&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get/Set: Enable auto-incrementing of the input nonce, each time the Finalize method is called.
-	/// <para>Treats the Nonce value loaded during Initialize as a monotonic counter; 
-	/// incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. 
-	/// If set to false, requires a re-key after each finalizer cycle.<para>
-	/// </summary>
-	bool &AutoIncrement() override;
-
-	/// <summary>
-	/// Get: Block size of internal cipher in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Get: The block ciphers formal type name
-	/// </summary>
-	const BlockCiphers CipherType() override;
-
-	/// <summary>
-	/// Get: The underlying Block Cipher instance
-	/// </summary>
-	IBlockCipher* Engine() override;
-
-	/// <summary>
-	/// Get: The Cipher Modes enumeration type name
-	/// </summary>
-	const CipherModes Enumeral() override;
-
-	/// <summary>
-	/// Get: True if initialized for encryption, False for decryption
-	/// </summary>
-	const bool IsEncryption() override;
-
-	/// <summary>
-	/// Get: The Block Cipher is ready to transform data
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
-	/// </summary>
-	const bool IsParallel() override;
-
-	/// <summary>
-	/// Get: Array of allowed cipher input key byte-sizes
-	/// </summary>
-	const  std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Get: The maximum legal tag length in bytes
-	/// </summary>
-	const size_t MaxTagSize() override;
-
-	/// <summary>
-	/// Get: The minimum legal tag length in bytes
-	/// </summary>
-	const size_t MinTagSize() override;
-
-	/// <summary>
-	/// Get: The cipher mode name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
-	/// </summary>
-	const size_t ParallelBlockSize() override;
-
-	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes 
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
-	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
-	/// </summary>
-	ParallelOptions &ParallelProfile() override;
-
-	/// <summary>
-	/// Get/Set: Persist a one-time associated data for the entire session.
-	/// <para>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments.
-	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.<para>
-	/// </summary>
-	bool &PreserveAD() override;
-
-	/// <summary>
-	/// Get: Returns the full finalized MAC code value array
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
-	const std::vector<byte> Tag() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	EAX(const EAX&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	EAX& operator=(const EAX&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	EAX() = delete;
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher type name.
@@ -253,7 +169,7 @@ public:
 	///
 	/// <param name="CipherType">The enumeration name of the block cipher</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an ivalid block cipher type is used</exception>
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid block cipher type is used</exception>
 	explicit EAX(BlockCiphers CipherType);
 
 	/// <summary>
@@ -266,9 +182,104 @@ public:
 	explicit EAX(IBlockCipher* Cipher);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~EAX() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called.
+	/// <para>Treats the Nonce value loaded during Initialize as a monotonic counter; 
+	/// incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. 
+	/// If set to false, requires a re-key after each finalizer cycle.</para>
+	/// </summary>
+	bool &AutoIncrement() override;
+
+	/// <summary>
+	/// Read Only: Block size of internal cipher in bytes
+	/// </summary>
+	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The block ciphers formal type name
+	/// </summary>
+	const BlockCiphers CipherType() override;
+
+	/// <summary>
+	/// Read Only: The underlying Block Cipher instance
+	/// </summary>
+	IBlockCipher* Engine() override;
+
+	/// <summary>
+	/// Read Only: The Cipher Modes enumeration type name
+	/// </summary>
+	const CipherModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: True if initialized for encryption, False for decryption
+	/// </summary>
+	const bool IsEncryption() override;
+
+	/// <summary>
+	/// Read Only: The Block Cipher is ready to transform data
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	const bool IsParallel() override;
+
+	/// <summary>
+	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// </summary>
+	const  std::vector<SymmetricKeySize> &LegalKeySizes() override;
+
+	/// <summary>
+	/// Read Only: The maximum legal tag length in bytes
+	/// </summary>
+	const size_t MaxTagSize() override;
+
+	/// <summary>
+	/// Read Only: The minimum legal tag length in bytes
+	/// </summary>
+	const size_t MinTagSize() override;
+
+	/// <summary>
+	/// Read Only: The cipher mode name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// </summary>
+	const size_t ParallelBlockSize() override;
+
+	/// <summary>
+	/// Read/Write: Parallel and SIMD capability flags and sizes 
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile() override;
+
+	/// <summary>
+	/// Read/Write: Persist a one-time associated data for the entire session.
+	/// <para>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments.
+	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.</para>
+	/// </summary>
+	bool &PreserveAD() override;
+
+	/// <summary>
+	/// Read Only: Returns the full finalized MAC code value array
+	/// </summary>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>
+	const std::vector<byte> Tag() override;
 
 	//~~~Public Functions~~~//
 
@@ -293,13 +304,6 @@ public:
 	/// <param name="Output">The output array of decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>
-	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -357,8 +361,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

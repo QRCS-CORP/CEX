@@ -19,39 +19,45 @@ class ISO7816 final : public IPadding
 {
 private:
 
-	ISO7816(const ISO7816&) = delete;
-	ISO7816& operator=(const ISO7816&) = delete;
-	ISO7816& operator=(ISO7816&&) = delete;
-
 	static const std::string CLASS_NAME;
-	static const byte MKCODE = (byte)0x80;
-	static const byte ZBCODE = (byte)0x00;
+	static const byte MKCODE = 0x80;
+	static const byte ZBCODE = 0x00;
 
 public:
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The padding modes type name
-	/// </summary>
-	const PaddingModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The padding modes class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ISO7816(const ISO7816&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ISO7816& operator=(const ISO7816&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class
 	/// </summary>
 	ISO7816();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class: finalize this class
 	/// </summary>
 	~ISO7816() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The padding modes type name
+	/// </summary>
+	const PaddingModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The padding modes class name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

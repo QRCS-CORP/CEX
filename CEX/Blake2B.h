@@ -31,7 +31,10 @@ class Blake2B
 {
 private:
 
+	//~~~Inline Functions~~~//
+
 #if defined(__AVX__)
+	// Misra exception: this is a common extension of the Intel intrinsics api
 #	define _mm_roti_epi64(x, c) \
 		(-(c) == 32) ? _mm_shuffle_epi32((x), _MM_SHUFFLE(2,3,0,1))  \
 		: (-(c) == 24) ? _mm_shuffle_epi8((x), R24) \
@@ -39,40 +42,45 @@ private:
 		: (-(c) == 63) ? _mm_xor_si128(_mm_srli_epi64((x), -(c)), _mm_add_epi64((x), (x)))  \
 		: _mm_xor_si128(_mm_srli_epi64((x), -(c)), _mm_slli_epi64((x), 64-(-(c))))
 
-#	define DIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
-		T0 = _mm_alignr_epi8(RH2, RL2, 8); \
-		T1 = _mm_alignr_epi8(RL2, RH2, 8); \
-		RL2 = T0; \
-		RH2 = T1; \
-		\
-		T0 = RL3; \
-		RL3 = RH3; \
-		RH3 = T0;    \
-		\
-		T0 = _mm_alignr_epi8(RH4, RL4, 8); \
-		T1 = _mm_alignr_epi8(RL4, RH4, 8); \
-		RL4 = T1; \
+	template<typename T>
+	inline static void Diagonalize(T &RL1, T &RL2, T &RL3, T &RL4, T &RH1, T &RH2, T &RH3, T &RH4)
+	{
+		T T0 = _mm_alignr_epi8(RH2, RL2, 8);
+		T T1 = _mm_alignr_epi8(RL2, RH2, 8);
+		RL2 = T0;
+		RH2 = T1;
+		T0 = RL3;
+		RL3 = RH3;
+		RH3 = T0;   
+		T0 = _mm_alignr_epi8(RH4, RL4, 8);
+		T1 = _mm_alignr_epi8(RL4, RH4, 8);
+		RL4 = T1;
 		RH4 = T0;
+	}
 
-#	define UNDIAGONALIZE(RL1,RL2,RL3,RL4,RH1,RH2,RH3,RH4) \
-		T0 = _mm_alignr_epi8(RL2, RH2, 8); \
-		T1 = _mm_alignr_epi8(RH2, RL2, 8); \
-		RL2 = T0; \
-		RH2 = T1; \
-		\
-		T0 = RL3; \
-		RL3 = RH3; \
-		RH3 = T0; \
-		\
-		T0 = _mm_alignr_epi8(RL4, RH4, 8); \
-		T1 = _mm_alignr_epi8(RH4, RL4, 8); \
-		RL4 = T1; \
+	template<typename T>
+	inline static void UnDiagonalize(T &RL1, T &RL2, T &RL3, T &RL4, T &RH1, T &RH2, T &RH3, T &RH4)
+	{
+		T T0 = _mm_alignr_epi8(RL2, RH2, 8);
+		T T1 = _mm_alignr_epi8(RH2, RL2, 8);
+		RL2 = T0;
+		RH2 = T1;
+		T0 = RL3;
+		RL3 = RH3;
+		RH3 = T0;
+		T0 = _mm_alignr_epi8(RL4, RH4, 8);
+		T1 = _mm_alignr_epi8(RH4, RL4, 8);
+		RL4 = T1;
 		RH4 = T0;
+	}
 #endif
 
 public:
 
+	//~~~Public Functions~~~//
+
 #if defined(__AVX__)
+
 	template <typename T>
 	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
@@ -95,7 +103,7 @@ public:
 		__m128i RH3 = _mm_loadu_si128((const __m128i*)&IV[2]);
 		__m128i RL4 = _mm_xor_si128(_mm_loadu_si128((const __m128i*)&IV[4]), _mm_loadu_si128((const __m128i*)&State.T[0]));
 		__m128i RH4 = _mm_xor_si128(_mm_loadu_si128((const __m128i*)&IV[6]), _mm_loadu_si128((const __m128i*)&State.F[0]));
-		__m128i B0, B1, T0, T1;
+		__m128i B0, B1;
 
 		// round 0
 		// lm 0.1
@@ -132,7 +140,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 		// diag
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// lm 0.3
 		B0 = _mm_unpacklo_epi64(M4, M5);
@@ -168,7 +176,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 		// undiag
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 2
 		B0 = _mm_unpacklo_epi64(M7, M2);
@@ -201,7 +209,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_shuffle_epi32(M0, _MM_SHUFFLE(1, 0, 3, 2));
 		B1 = _mm_unpackhi_epi64(M5, M2);
@@ -233,7 +241,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 3
 		B0 = _mm_alignr_epi8(M6, M5, 8);
@@ -266,7 +274,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_blend_epi16(M5, M1, 0xF0);
 		B1 = _mm_unpackhi_epi64(M3, M4);
@@ -298,7 +306,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 4
 		B0 = _mm_unpackhi_epi64(M3, M1);
@@ -331,7 +339,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_blend_epi16(M1, M2, 0xF0);
 		B1 = _mm_blend_epi16(M2, M7, 0xF0);
@@ -363,7 +371,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 5
 		B0 = _mm_unpackhi_epi64(M4, M2);
@@ -396,7 +404,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_blend_epi16(M7, M5, 0xF0);
 		B1 = _mm_blend_epi16(M3, M1, 0xF0);
@@ -428,7 +436,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 6
 		B0 = _mm_unpacklo_epi64(M1, M3);
@@ -461,7 +469,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_blend_epi16(M2, M3, 0xF0);
 		B1 = _mm_unpackhi_epi64(M7, M0);
@@ -493,7 +501,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 7
 		B0 = _mm_blend_epi16(M6, M0, 0xF0);
@@ -526,7 +534,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_unpacklo_epi64(M0, M3);
 		B1 = _mm_shuffle_epi32(M4, _MM_SHUFFLE(1, 0, 3, 2));
@@ -558,7 +566,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 8
 		B0 = _mm_unpackhi_epi64(M6, M3);
@@ -591,7 +599,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_unpackhi_epi64(M2, M7);
 		B1 = _mm_unpacklo_epi64(M4, M1);
@@ -623,7 +631,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 9
 		B0 = _mm_unpacklo_epi64(M3, M7);
@@ -656,7 +664,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = M6;
 		B1 = _mm_alignr_epi8(M5, M0, 8);
@@ -688,7 +696,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 10
 		B0 = _mm_unpacklo_epi64(M5, M4);
@@ -721,7 +729,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_unpackhi_epi64(M7, M4);
 		B1 = _mm_unpackhi_epi64(M1, M6);
@@ -753,7 +761,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 11
 		B0 = _mm_unpacklo_epi64(M0, M1);
@@ -786,7 +794,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_unpacklo_epi64(M4, M5);
 		B1 = _mm_unpacklo_epi64(M6, M7);
@@ -818,7 +826,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		// round 12
 		B0 = _mm_unpacklo_epi64(M7, M2);
@@ -851,7 +859,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		DIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		Diagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		B0 = _mm_shuffle_epi32(M0, _MM_SHUFFLE(1, 0, 3, 2));
 		B1 = _mm_unpackhi_epi64(M5, M2);
@@ -883,7 +891,7 @@ public:
 		RL2 = _mm_roti_epi64(RL2, -63);
 		RH2 = _mm_roti_epi64(RH2, -63);
 
-		UNDIAGONALIZE(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
+		UnDiagonalize(RL1, RL2, RL3, RL4, RH1, RH2, RH3, RH4);
 
 		RL1 = _mm_xor_si128(RL3, RL1);
 		RH1 = _mm_xor_si128(RH3, RH1);
@@ -900,7 +908,7 @@ public:
 	template <typename T>
 	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
-		std::vector<ulong> M(16);
+		std::array<ulong, 16> M;
 		Utility::IntUtils::LeBytesToULL1024(Input, InOffset, M, 0);
 
 		ulong R0 = State.H[0];
@@ -2189,6 +2197,7 @@ public:
 		State.H[6] ^= R6 ^ R14;
 		State.H[7] ^= R7 ^ R15;
 	}
+
 #endif
 };
 

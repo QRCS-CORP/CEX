@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_CHACHATEST_H
-#define _CEXTEST_CHACHATEST_H
+#ifndef CEXTEST_CHACHATEST_H
+#define CEXTEST_CHACHATEST_H
 
 #include "ITest.h"
 

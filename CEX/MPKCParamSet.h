@@ -31,11 +31,7 @@ using Enumeration::MPKCParams;
 /// </summary>
 struct MPKCParamSet
 {
-	MPKCParamSet(const MPKCParamSet&) = delete;
-	MPKCParamSet& operator=(const MPKCParamSet&) = delete;
-	MPKCParamSet& operator=(MPKCParamSet&&) = delete;
-
-	//~~~Properties~~~//
+	//~~~Public Fields~~~//
 
 	/// <summary>
 	/// The finite field GF(2^m)
@@ -65,7 +61,17 @@ struct MPKCParamSet
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// An empty McEliece parameter structure
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCParamSet(const MPKCParamSet&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCParamSet& operator=(const MPKCParamSet&) = delete;
+
+	/// <summary>
+	/// The default McEliece parameter structure
 	/// </summary>
 	MPKCParamSet();
 
@@ -77,8 +83,8 @@ struct MPKCParamSet
 	/// <param name="Correction">The error correction capability of the code</param>
 	/// <param name="PubKeySize">The public keys byte size</param>
 	/// <param name="PriKeySize">The private keys byte size</param>
-	/// <param name="ParamName">The parameter sets enumeration name</param>
-	MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamSet);
+	/// <param name="ParamType">The parameter sets enumeration name</param>
+	MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamType);
 
 	/// <summary>
 	/// Initialize the McEliece parameter structure using a byte array
@@ -102,8 +108,8 @@ struct MPKCParamSet
 	/// <param name="Correction">The error correction capability of the code</param>
 	/// <param name="PubKeySize">The public keys byte size</param>
 	/// <param name="PriKeySize">The private keys byte size</param>
-	/// <param name="ParamName">The parameter sets enumeration name</param>
-	void Load(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamSet);
+	/// <param name="ParamType">The parameter sets enumeration name</param>
+	void Load(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamType);
 
 	/// <summary>
 	/// Reset current parameters

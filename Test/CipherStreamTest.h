@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_STREAMCIPHERTEST_H
-#define _CEXTEST_STREAMCIPHERTEST_H
+#ifndef CEXTEST_STREAMCIPHERTEST_H
+#define CEXTEST_STREAMCIPHERTEST_H
 
 #include "ITest.h"
 #include "../CEX/CipherDescription.h"

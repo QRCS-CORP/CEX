@@ -25,22 +25,36 @@ private:
 
 public:
 
+	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	GHASH(const GHASH&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	GHASH& operator=(const GHASH&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class; this is an internal class used by GMAC and GCM mode
+	/// </summary>
+	GHASH();
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	~GHASH();
+
+	//~~~Accessors~~~//
+
 	/// <summary>
 	/// 128bit SIMD instructions are available on this system
 	/// </summary>
 	bool HasSimd128();
 
-	/// <summary>
-	/// Instantiate this class; this is an internal class used by GMAC and GCM mode
-	/// </summary>
-	///
-	/// <param name="Key">The ghash key</param>
-	explicit GHASH(std::vector<ulong> &Key);
-
-	/// <summary>
-	/// Finalize objects
-	/// </summary>
-	~GHASH();
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Finalize the GHASH block
@@ -52,11 +66,11 @@ public:
 	void FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextSize);
 
 	/// <summary>
-	/// Reset the hash function
+	/// Initialize the hash key
 	/// </summary>
 	///
-	/// <param name="Erase">Erase the state</param>
-	void Reset(bool Erase = false);
+	/// <param name="Key">The ghash key</param>
+	void Initialize(const std::vector<ulong> &Key);
 
 	/// <summary>
 	/// Process a block of plaintext
@@ -76,6 +90,13 @@ public:
 	/// <param name="Output">The output array</param>
 	/// <param name="Length">The number of bytes to process</param>
 	void ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length);
+
+	/// <summary>
+	/// Reset the hash function
+	/// </summary>
+	///
+	/// <param name="Erase">Erase the state</param>
+	void Reset(bool Erase = false);
 
 	/// <summary>
 	/// Update the hash function

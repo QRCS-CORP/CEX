@@ -42,40 +42,51 @@ class IAsymmetricSign
 {
 public:
 
-	IAsymmetricSign(const IAsymmetricSign&) = delete;
-	IAsymmetricSign& operator=(const IAsymmetricSign&) = delete;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IAsymmetricSign() {}
+	IAsymmetricSign(const IAsymmetricSign&) = delete;
 
 	/// <summary>
-	/// Finalizer
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IAsymmetricSign() noexcept {}
-
-	//~~~Properties~~~//
+	IAsymmetricSign& operator=(const IAsymmetricSign&) = delete;
 
 	/// <summary>
-	/// Get: The signature schemes type-name
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IAsymmetricSign() 
+	{
+	}
+
+	/// <summary>
+	/// Finalizer: destroys the containers objects
+	/// </summary>
+	virtual ~IAsymmetricSign() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The signature schemes type-name
 	/// </summary>
 	virtual const AsymmetricEngines Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The signature scheme has been initialized with a key
+	/// Read Only: The signature scheme has been initialized with a key
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: This class is initialized for Signing with the Private key
+	/// Read Only: This class is initialized for Signing with the Private key
 	/// </summary>
 	virtual const bool IsSigner() = 0;
 
 	/// <summary>
-	/// Get: The signature scheme name
+	/// Read Only: The signature scheme name
 	/// </summary>
 	virtual const std::string Name() = 0;
 

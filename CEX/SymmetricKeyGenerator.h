@@ -44,39 +44,43 @@ using Enumeration::Providers;
 class SymmetricKeyGenerator
 {
 private:
-	SymmetricKeyGenerator(const SymmetricKeyGenerator&) = delete;
-	SymmetricKeyGenerator& operator=(const SymmetricKeyGenerator&) = delete;
-	SymmetricKeyGenerator& operator=(SymmetricKeyGenerator&&) = delete;
 
 	Digests m_dgtType;
 	bool m_isDestroyed;
 	Providers m_pvdType;
-	Provider::IProvider* m_pvdEngine;
+	std::unique_ptr<Provider::IProvider> m_pvdEngine;
 
 public:
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class.
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	SymmetricKeyGenerator(const SymmetricKeyGenerator&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	SymmetricKeyGenerator& operator=(const SymmetricKeyGenerator&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class.
 	/// <para>Select provider and digest type generator options, or take the defaults</para>
 	/// </summary>
 	/// 
 	/// <param name="DigestType">The hash function used to power an hmac used to condition output keying material</param>
 	/// <param name="ProviderType">The entropy provider that supplies the seed material for the key compression cycle</param>
+	/// 
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an invalid parameter is used</exception>
 	explicit SymmetricKeyGenerator(Digests DigestType = Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP);
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class
 	/// </summary>
 	~SymmetricKeyGenerator();
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy();
 
 	/// <summary>
 	/// Create a populated SymmetricKey class
@@ -85,7 +89,9 @@ public:
 	/// <param name="KeySize">The key, nonce and info sizes in bytes to generate</param>
 	/// 
 	/// <returns>A populated SymmetricKey class</returns>
-	SymmetricKey GetSymmetricKey(SymmetricKeySize KeySize);
+	/// 
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key size is zero length</exception>
+	SymmetricKey* GetSymmetricKey(SymmetricKeySize KeySize);
 
 	/// <summary>
 	/// Create a populated SymmetricKey class
@@ -94,7 +100,9 @@ public:
 	/// <param name="KeySize">The key, nonce and info sizes in bytes to generate</param>
 	/// 
 	/// <returns>A populated SymmetricSecureKey class</returns>
-	SymmetricSecureKey GetSecureKey(SymmetricKeySize KeySize);
+	/// 
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key size is zero length</exception>
+	SymmetricSecureKey* GetSecureKey(SymmetricKeySize KeySize);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
@@ -119,6 +127,7 @@ public:
 
 private:
 
+	void Destroy();
 	std::vector<byte> Generate(size_t KeySize);
 	std::vector<byte> GenerateBlock();
 };

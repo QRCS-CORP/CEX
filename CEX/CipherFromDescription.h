@@ -3,21 +3,24 @@
 
 #include "CexDomain.h"
 #include "CipherDescription.h"
+#include "CryptoException.h"
 #include "ICipherMode.h"
 
 NAMESPACE_HELPER
 
 using Processing::CipherDescription;
+using Exception::CryptoException;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
 using Enumeration::BlockCiphers;
 
 /// <summary>
 /// Get a symmetric cipher instance from it's description.
-/// <para>The Cipher modes Initialize function must be called before it can be used.<para>
+/// <para>The Cipher modes Initialize function must be called before it can be used.</para>
 /// </summary>
 class CipherFromDescription
 {
 public:
+
 	/// <summary>
 	/// Get an uninitialized block cipher and mode from a description structure
 	/// </summary>

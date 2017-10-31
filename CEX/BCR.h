@@ -45,7 +45,7 @@ using Enumeration::Providers;
 /// <code>
 /// BCR rnd([BlockCiphers], [Providers]);
 /// // get random int
-/// int num = rnd.Next([Minimum], [Maximum]);
+/// int num = rnd.NextUInt32([Minimum], [Maximum]);
 /// </code>
 /// </example>
 /// 
@@ -66,7 +66,7 @@ using Enumeration::Providers;
 /// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
-class BCR : public IPrng
+class BCR final : public IPrng
 {
 private:
 
@@ -81,35 +81,33 @@ private:
 	bool m_isParallel;
 	Providers m_pvdType;
 	std::vector<byte>  m_rndSeed;
-	Drbg::BCG* m_rngGenerator;
 	std::vector<byte> m_rngBuffer;
+	std::unique_ptr<Drbg::BCG> m_rngGenerator;
 
 public:
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The random generators type name
-	/// </summary>
-	const Prngs Enumeral() override;
-
-	/// <summary>
-	/// Get: The random generators class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	BCR(const BCR&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	BCR& operator=(const BCR&) = delete;
+
+	/// <summary>
+	/// Initialize this class with parameters
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block cipher that powers the rng (default is AHX)</param>
 	/// <param name="ProviderType">The Seed engine used to create keyng material (default is none)</param>
 	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	BCR(BlockCiphers CipherType = BlockCiphers::AHX, Providers ProviderType = Providers::None, bool Parallel = true);
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
+	explicit BCR(BlockCiphers CipherType = BlockCiphers::AHX, Providers ProviderType = Providers::None, bool Parallel = true);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -119,20 +117,27 @@ public:
 	/// <param name="CipherType">The block cipher that powers the rng (default is AHX)</param>
 	/// <param name="Parallel">Run the underlying CTR mode generator in parallel mode</param>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or too small</exception>
-	BCR(std::vector<byte> &Seed, BlockCiphers CipherType = BlockCiphers::AHX, bool Parallel = true);
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
+	explicit BCR(std::vector<byte> &Seed, BlockCiphers CipherType = BlockCiphers::AHX, bool Parallel = true);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~BCR() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The random generators type name
 	/// </summary>
-	void Destroy() override;
+	const Prngs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The random generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
@@ -182,87 +187,26 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUShort() override;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUShort(ushort Maximum) override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUShort(ushort Maximum, ushort Minimum) override;
+	ushort NextUInt16() override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	uint Next() override;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Maximum) override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Maximum, uint Minimum) override;
+	uint NextUInt32() override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextULong() override;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextULong(ulong Maximum) override;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextULong(ulong Maximum, ulong Minimum) override;
+	ulong NextUInt64() override;
 
 	/// <summary>
 	/// Reset the generator instance
 	/// </summary>
 	void Reset() override;
-
-private:
-
-	ulong GetRanged(ulong Maximum, size_t Length);
 };
 
 NAMESPACE_PRNGEND

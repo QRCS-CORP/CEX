@@ -47,7 +47,7 @@ RLWEParamSet::RLWEParamSet(uint Coefficients, int Modulus, uint SeedByteSize, ui
 
 RLWEParamSet::RLWEParamSet(const std::vector<byte> &ParamArray)
 {
-	IO::MemoryStream ms = IO::MemoryStream(ParamArray);
+	IO::MemoryStream ms(ParamArray);
 	IO::StreamReader reader(ms);
 
 	ForwardMessageSize = reader.ReadInt<uint>();
@@ -91,7 +91,7 @@ std::vector<byte> RLWEParamSet::ToBytes()
 
 	writer.Write<uint>(ForwardMessageSize);
 	writer.Write<uint>(N);
-	writer.Write<byte>((byte)ParamName);
+	writer.Write<byte>(static_cast<byte>(ParamName));
 	writer.Write<uint>(Q);
 	writer.Write<uint>(ReturnMessageSize);
 	writer.Write<uint>(SeedSize);

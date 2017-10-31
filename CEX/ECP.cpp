@@ -12,7 +12,33 @@ NAMESPACE_PROVIDER
 
 const std::string ECP::CLASS_NAME("ECP");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+ECP::ECP()
+	:
+	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::Digests::SHA512, 38))),
+	m_hasTsc(Utility::SysUtils::HasRdtsc()),
+#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
+	m_isAvailable(true)
+#else
+	m_isAvailable(false)
+#endif
+{
+	Reset();
+}
+
+ECP::~ECP()
+{
+	m_hasTsc = false;
+	m_isAvailable = false;
+
+	if (m_cipherMode != nullptr)
+	{
+		m_cipherMode.reset(nullptr);
+	}
+}
+
+//~~~Accessors~~~//
 
 const Enumeration::Providers ECP::Enumeral() 
 { 
@@ -29,33 +55,7 @@ const std::string ECP::Name()
 	return CLASS_NAME; 
 }
 
-//~~~Constructor~~~//
-
-ECP::ECP()
-	:
-	m_cipherMode(0),
-	m_hasTsc(Utility::SysUtils::HasRdtsc()),
-	m_isAvailable(false)
-{
-#if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
-	m_isAvailable = true;
-#endif
-
-	Reset();
-}
-
-ECP::~ECP()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void ECP::Destroy()
-{
-	if (m_cipherMode != 0)
-		delete m_cipherMode;
-}
 
 void ECP::GetBytes(std::vector<byte> &Output)
 {
@@ -67,28 +67,30 @@ void ECP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
+	{
 		throw CryptoRandomException("ECP:GetBytes", "Random provider is not available!");
+	}
 
-	std::vector<byte> data(Length);
-	m_cipherMode->Transform(data, 0, Output, Offset, Length);
+	std::vector<byte> rnd(Length);
+	m_cipherMode->Transform(rnd, 0, Output, Offset, Length);
 }
 
 std::vector<byte> ECP::GetBytes(size_t Length)
 {
-	std::vector<byte> data(Length);
-	GetBytes(data);
+	std::vector<byte> rnd(Length);
+	GetBytes(rnd, 0, rnd.size());
 
-	return data;
+	return rnd;
 }
 
 uint ECP::Next()
 {
-	uint rndNum;
-	std::vector<byte> rndData(sizeof(uint));
-	GetBytes(rndData);
-	Utility::MemUtils::CopyToValue(rndData, 0, rndNum, sizeof(uint));
+	uint num;
+	std::vector<byte> rnd(sizeof(uint));
+	GetBytes(rnd, 0, rnd.size());
+	Utility::MemUtils::CopyToValue(rnd, 0, num, sizeof(uint));
 
-	return rndNum;
+	return num;
 }
 
 void ECP::Reset()
@@ -105,9 +107,7 @@ void ECP::Reset()
 		throw CryptoRandomException("ECP:Reset", "Entropy collection has failed!", std::string(ex.what()));
 	}
 
-	// Note: this uses the extended version of rijndael, using 38 rounds for maximum diffusion
-	Cipher::Symmetric::Block::IBlockCipher* eng = Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::Digests::SHA512, 38);
-	m_cipherMode = new Cipher::Symmetric::Block::Mode::CTR(eng);
+	// Note: this provider uses the extended version of rijndael, using 38 rounds for maximum diffusion
 	// get the iv and hkdf info from system provider
 	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[0];
 	std::vector<byte> info(keySize.InfoSize());
@@ -124,9 +124,9 @@ void ECP::Reset()
 
 std::vector<byte> ECP::Collect()
 {
-	const size_t KBLK = 72;
+	const size_t KEYSZE = 72;
 	std::vector<byte> state(0);
-	std::vector<byte> buffer(KBLK);
+	std::vector<byte> buffer(KEYSZE);
 	ulong ts = Utility::SysUtils::TimeStamp(m_hasTsc);
 
 	CSP pvd;
@@ -157,9 +157,11 @@ std::vector<byte> ECP::Collect()
 	Filter(state);
 
 	// size last block
-	size_t padLen = ((state.size() % KBLK) == 0) ? KBLK : KBLK - (state.size() % KBLK);
-	if (padLen < KBLK / 2)
-		padLen += KBLK;
+	size_t padLen = ((state.size() % KEYSZE) == 0) ? KEYSZE : KEYSZE - (state.size() % KEYSZE);
+	if (padLen < KEYSZE / 2)
+	{
+		padLen += KEYSZE;
+	}
 
 	// forward padding
 	buffer.resize(padLen);
@@ -181,10 +183,10 @@ std::vector<byte> ECP::Compress(std::vector<byte> &State)
 void ECP::Filter(std::vector<byte> &State)
 {
 	// filter zero bytes and shuffle
-	if (State.size() == 0)
-		return;
-
-	Utility::ArrayUtils::Remove((byte)0, State);
+	if (State.size() != 0)
+	{
+		Utility::ArrayUtils::Remove(static_cast<byte>(0), State);
+	}
 }
 
 std::vector<byte> ECP::DriveInfo()
@@ -195,7 +197,9 @@ std::vector<byte> ECP::DriveInfo()
 	std::vector<std::string> drives = Utility::SysUtils::LogicalDrives();
 
 	for (size_t i = 0; i < drives.size(); ++i)
+	{
 		Utility::ArrayUtils::Append(Utility::SysUtils::DriveSpace(drives[i]), state);
+	}
 
 #elif defined(CEX_OS_POSIX)
 	// TODO
@@ -411,7 +415,9 @@ std::vector<byte> ECP::SystemInfo()
 
 	std::vector<std::string> clsids = Utility::SysUtils::SystemIds();
 	for (size_t i = 0; i < clsids.size(); ++i)
+	{
 		Utility::ArrayUtils::AppendString(clsids[i], state);
+	}
 
 	try
 	{

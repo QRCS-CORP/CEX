@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_CONSOLEUTILS_H
-#define _CEXTEST_CONSOLEUTILS_H
+#ifndef CEXTEST_CONSOLEUTILS_H
+#define CEXTEST_CONSOLEUTILS_H
 
 #include <string>
 

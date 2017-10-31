@@ -33,12 +33,16 @@ private:
 
 	static const size_t BLOCK_SIZE = 128;
 
-	static ulong GetParity(const std::vector<ulong> &Key)
+	//~~~Inline Functions~~~//
+
+	inline static ulong GetParity(const std::vector<ulong> &Key)
 	{
 		ulong parity = 0x1BD11BDAA9FC1A22;
 
 		for (size_t i = 0; i < Key.size(); i++)
+		{
 			parity ^= Key[i];
+		}
 
 		return parity;
 	}
@@ -57,6 +61,8 @@ private:
 	}
 
 public:
+
+	//~~~Public Functions~~~//
 
 	template <typename T>
 	static void Transfrom(std::vector<ulong> &Input, size_t InOffset, T &Output)

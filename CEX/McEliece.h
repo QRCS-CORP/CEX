@@ -128,50 +128,22 @@ private:
 
 public:
 
-	McEliece() = delete;
-	McEliece(const McEliece&) = delete;
-	McEliece& operator=(const McEliece&) = delete;
-	McEliece& operator=(McEliece&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The cipher type-name
-	/// </summary>
-	const AsymmetricEngines Enumeral() override;
-
-	/// <summary>
-	/// Get: The cipher is initialized for encryption
-	/// </summary>
-	const bool IsEncryption() override;
-
-	/// <summary>
-	/// Get: The cipher has been initialized with a key
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: The cipher and parameter-set formal names
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: The ciphers initialization parameters
-	/// </summary>
-	const MPKCParamSet &ParamSet();
-
-	/// <summary>
-	/// Get: The ciphers parameters enumeration name
-	/// </summary>
-	const MPKCParams Parameters();
-
-	/// <summary>
-	/// Get/Set: A new asymmetric key-pairs optional identification tag.
-	/// <para>Setting this value must be done before the Generate method is called.</para>
-	/// </summary>
-	std::vector<byte> &Tag() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	McEliece(const McEliece&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	McEliece& operator=(const McEliece&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	McEliece() = delete;
 
 	/// <summary>
 	/// Instantiate the cipher with auto-initialized prng and digest functions
@@ -180,23 +152,63 @@ public:
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
-	/// <param name="Parallel">The cipher is multi-threaded</param>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher type, prng type, or parameter set is specified</exception>
 	explicit McEliece(MPKCParams Parameters, Prngs PrngType = Prngs::BCR, BlockCiphers CipherType = BlockCiphers::Rijndael);
 
 	/// <summary>
-	/// Instantiate this class using external Prng and Digest instances
+	/// Constructor: instantiate this class using external Prng and Digest instances
 	/// </summary>
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// <param name="Cipher">A pointer to the authentication block cipher</param>
-	/// <param name="Parallel">The cipher is multi-threaded</param>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
 	McEliece(MPKCParams Parameters, IPrng* Prng, IBlockCipher* Cipher);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~McEliece() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The cipher type-name
+	/// </summary>
+	const AsymmetricEngines Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The cipher is initialized for encryption
+	/// </summary>
+	const bool IsEncryption() override;
+
+	/// <summary>
+	/// Read Only: The cipher has been initialized with a key
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: The cipher and parameter-set formal names
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The ciphers initialization parameters
+	/// </summary>
+	const MPKCParamSet &ParamSet();
+
+	/// <summary>
+	/// Read Only: The ciphers parameters enumeration name
+	/// </summary>
+	const MPKCParams Parameters();
+
+	/// <summary>
+	/// Read/Write: A new asymmetric key-pairs optional identification tag.
+	/// <para>Setting this value must be done before the Generate method is called.</para>
+	/// </summary>
+	std::vector<byte> &Tag() override;
 
 	//~~~Public Functions~~~//
 
@@ -204,17 +216,13 @@ public:
 	/// Decrypt an encrypted cipher-text and return the shared secret
 	/// </summary>
 	/// 
-	/// <param name="Message">The input cipher-text</param>
+	/// <param name="CipherText">The input cipher-text</param>
 	/// 
 	/// <returns>The decrypted message</returns>
 	///
+	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid input or configuration</exception>
 	/// <exception cref="Exception::CryptoAuthenticationFailure">Thrown if the message has failed authentication</exception>
 	std::vector<byte> Decrypt(const std::vector<byte> &CipherText) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a shared secret and return the encrypted message
@@ -223,6 +231,8 @@ public:
 	/// <param name="Message">The shared secret array</param>
 	/// 
 	/// <returns>The encrypted message</returns>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid input or configuration</exception>
 	std::vector<byte> Encrypt(const std::vector<byte> &Message) override;
 
 	/// <summary>
@@ -230,6 +240,8 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A public/private key pair</returns>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
 	IAsymmetricKeyPair* Generate() override;
 
 	/// <summary>
@@ -238,6 +250,8 @@ public:
 	/// 
 	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
 	/// <param name="KeyPair">The <see cref="IAsymmetricKeyPair"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
 	void Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair) override;
 
 private:

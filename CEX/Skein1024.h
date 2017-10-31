@@ -91,7 +91,7 @@ NAMESPACE_DIGEST
 /// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">SHA3 Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition>.</description></item>
 /// </list>
 /// </remarks>
-class Skein1024 : public IDigest
+class Skein1024 final : public IDigest
 {
 private:
 
@@ -150,65 +150,28 @@ private:
 		}
 	};
 
-	SkeinParams m_treeParams;
 	std::vector<Skein1024State> m_dgtState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
+	bool m_treeDestroy;
+	SkeinParams m_treeParams;
 
 public:
 
-	Skein1024(const Skein1024&) = delete;
-	Skein1024& operator=(const Skein1024&) = delete;
-	Skein1024& operator=(Skein1024&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The Digests internal blocksize in bytes
-	/// </summary>
-	size_t BlockSize() override;
-
-	/// <summary>
-	/// Get: Size of returned digest in bytes
-	/// </summary>
-	size_t DigestSize() override;
-
-	/// <summary>
-	/// Get: The digests type name
-	/// </summary>
-	const Digests Enumeral() override;
-
-	/// <summary>
-	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available on this system.
-	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
-	/// </summary>
-	const bool IsParallel() override;
-
-	/// <summary>
-	/// Get: The digests class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
-	/// </summary>
-	const size_t ParallelBlockSize() override;
-
-	/// <summary>
-	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
-	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
-	/// and reinitialize the state, or initialize the digest using a SkeinParams with the FanOut property set to the desired number of threads.</para>
-	/// </summary>
-	ParallelOptions &ParallelProfile() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	Skein1024(const Skein1024&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	Skein1024& operator=(const Skein1024&) = delete;
 
 	/// <summary>
 	/// Initialize the class with either the Parallel or Sequential hashing engine.
@@ -216,6 +179,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the multi-threaded Skein variant.</param>
+	///
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid parallel parameters are used</exception>
 	explicit Skein1024(bool Parallel = false);
 
 	/// <summary>
@@ -232,9 +197,53 @@ public:
 	explicit Skein1024(SkeinParams &Params);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~Skein1024() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Digests internal blocksize in bytes
+	/// </summary>
+	size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: Size of returned digest in bytes
+	/// </summary>
+	size_t DigestSize() override;
+
+	/// <summary>
+	/// Read Only: The digests type name
+	/// </summary>
+	const Digests Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available on this system.
+	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	const bool IsParallel() override;
+
+	/// <summary>
+	/// Read Only: The digests class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// </summary>
+	const size_t ParallelBlockSize() override;
+
+	/// <summary>
+	/// Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state, or initialize the digest using a SkeinParams with the FanOut property set to the desired number of threads.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Public Functions~~~//
 
@@ -245,11 +254,6 @@ public:
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The hash output value array</param>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Do final processing and get the hash value
@@ -270,8 +274,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
-	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_TESTFILES_H
-#define _CEXTEST_TESTFILES_H
+#ifndef CEXTEST_TESTFILES_H
+#define CEXTEST_TESTFILES_H
 
 #include <string>
 

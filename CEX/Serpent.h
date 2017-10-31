@@ -28,11 +28,11 @@ NAMESPACE_BLOCK
 */
 
 template<typename T>
-void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
 {
 #if defined(__AVX__)
 
-	const size_t FNLRND = 4;
+	const size_t RNDCNT = 4;
 	const size_t INPOFF = T::size();
 	size_t keyCtr = Key.size();
 
@@ -103,7 +103,7 @@ void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vec
 		Ib0(R0, R1, R2, R3);
 
 		// skip on last block
-		if (keyCtr != FNLRND)
+		if (keyCtr != RNDCNT)
 		{
 			R3 ^= T(Key[--keyCtr]);
 			R2 ^= T(Key[--keyCtr]);
@@ -111,7 +111,8 @@ void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vec
 			R0 ^= T(Key[--keyCtr]);
 			InverseTransformW(R0, R1, R2, R3);
 		}
-	} while (keyCtr != FNLRND);
+	} 
+	while (keyCtr != RNDCNT);
 
 	// last round
 	R3 ^= T(Key[--keyCtr]);
@@ -129,11 +130,11 @@ void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vec
 }
 
 template<typename T>
-void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
+static void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
 {
 #if defined(__AVX__)
 
-	const size_t FNLRND = Key.size() - 5;
+	const size_t RNDCNT = Key.size() - 5;
 	const size_t INPOFF = T::size();
 	int keyCtr = -1;
 
@@ -203,10 +204,10 @@ void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vec
 		Sb7(R0, R1, R2, R3);
 
 		// skip on last block
-		if (keyCtr != FNLRND)
+		if (keyCtr != RNDCNT)
 			LinearTransformW(R0, R1, R2, R3);
 	} 
-	while (keyCtr != FNLRND);
+	while (keyCtr != RNDCNT);
 
 	// last round
 	R0 ^= T(Key[++keyCtr]);
@@ -224,7 +225,7 @@ void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vec
 }
 
 template<typename T>
-void LinearTransform(T &R0, T &R1, T &R2, T &R3)
+static void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 {
 	R0 = Utility::IntUtils::RotL32(R0, 13);
 	R2 = Utility::IntUtils::RotL32(R2, 3);
@@ -239,7 +240,7 @@ void LinearTransform(T &R0, T &R1, T &R2, T &R3)
 }
 
 template<typename T>
-void LinearTransformW(T &R0, T &R1, T &R2, T &R3)
+static void LinearTransformW(T &R0, T &R1, T &R2, T &R3)
 {
 	R0.RotL32(13);
 	R2.RotL32(3);
@@ -254,7 +255,7 @@ void LinearTransformW(T &R0, T &R1, T &R2, T &R3)
 }
 
 template<typename T>
-void InverseTransform(T &R0, T &R1, T &R2, T &R3)
+static void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 {
 	R2 = Utility::IntUtils::RotR32(R2, 22);
 	R0 = Utility::IntUtils::RotR32(R0, 5);
@@ -269,7 +270,7 @@ void InverseTransform(T &R0, T &R1, T &R2, T &R3)
 }
 
 template<typename T>
-void InverseTransformW(T &R0, T &R1, T &R2, T &R3)
+static void InverseTransformW(T &R0, T &R1, T &R2, T &R3)
 {
 	R2.RotR32(22);
 	R0.RotR32(5);

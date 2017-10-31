@@ -4,14 +4,6 @@
 
 NAMESPACE_SYMMETRICKEY
 
-//~~~Properties~~~//
-
-const uint SymmetricKeySize::InfoSize() { return m_infoSize; }
-
-const uint SymmetricKeySize::KeySize() { return m_keySize; }
-
-const uint SymmetricKeySize::NonceSize() { return m_nonceSize; }
-
 //~~~Constructor~~~//
 
 SymmetricKeySize::SymmetricKeySize()
@@ -29,14 +21,14 @@ SymmetricKeySize::SymmetricKeySize(const std::vector<byte> &KeyArray)
 	m_nonceSize(0)
 {
 	if (KeyArray.size() < HDR_SIZE)
+	{
 		throw Exception::CryptoProcessingException("SymmetricKeySize:Ctor", "The KeyArray buffer is too small!");
+	}
 
 	Utility::MemUtils::CopyToValue(KeyArray, 0, m_infoSize, sizeof(uint));
 	Utility::MemUtils::CopyToValue(KeyArray, sizeof(uint), m_keySize, sizeof(uint));
 	Utility::MemUtils::CopyToValue(KeyArray, 2 * sizeof(uint), m_nonceSize, sizeof(uint));
 }
-
-//~~~Public Functions~~~//
 
 SymmetricKeySize::SymmetricKeySize(const size_t KeySize, const size_t NonceSize, const size_t InfoSize)
 	:
@@ -46,38 +38,69 @@ SymmetricKeySize::SymmetricKeySize(const size_t KeySize, const size_t NonceSize,
 {
 }
 
+//~~~Accessors~~~//
+
+const uint SymmetricKeySize::InfoSize() 
+{ 
+	return m_infoSize; 
+}
+
+const uint SymmetricKeySize::KeySize() 
+{ 
+	return m_keySize; 
+}
+
+const uint SymmetricKeySize::NonceSize()
+{
+	return m_nonceSize; 
+}
+
+//~~~Public Functions~~~//
+
 SymmetricKeySize SymmetricKeySize::Clone()
 {
 	SymmetricKeySize result(KeySize(), NonceSize(), InfoSize());
+
 	return result;
 }
 
 bool SymmetricKeySize::Contains(std::vector<SymmetricKeySize> SymmetricKeySizes, size_t KeySize, size_t NonceSize, size_t InfoSize)
 {
+	bool retCmp = false;
+
 	for (size_t i = 0; i < SymmetricKeySizes.size(); ++i)
 	{
 		if (KeySize != 0 && NonceSize != 0 && InfoSize != 0)
 		{
 			if (SymmetricKeySizes[i].KeySize() == KeySize && SymmetricKeySizes[i].NonceSize() == NonceSize && SymmetricKeySizes[i].InfoSize() == InfoSize)
-				return true;
+			{
+				retCmp = true;
+			}
 		}
 		else if (KeySize != 0 && NonceSize != 0)
 		{
 			if (SymmetricKeySizes[i].KeySize() == KeySize && SymmetricKeySizes[i].NonceSize() == NonceSize)
-				return true;
+			{
+				retCmp = true;
+			}
 		}
 		else if (KeySize != 0 && InfoSize != 0)
 		{
 			if (SymmetricKeySizes[i].KeySize() == KeySize && SymmetricKeySizes[i].InfoSize() == InfoSize)
-				return true;
+			{
+				retCmp = true;
+			}
 		}
 		else
 		{
 			if (SymmetricKeySizes[i].KeySize() == KeySize)
-				return true;
+			{
+				retCmp = true;
+			}
 		}
 	}
-	return false;
+
+	return retCmp;
 }
 
 SymmetricKeySize* SymmetricKeySize::DeepCopy()
@@ -87,10 +110,7 @@ SymmetricKeySize* SymmetricKeySize::DeepCopy()
 
 bool SymmetricKeySize::Equals(SymmetricKeySize &Input)
 {
-	if (this->GetHashCode() != Input.GetHashCode())
-		return false;
-
-	return true;
+	return (this->GetHashCode() == Input.GetHashCode());
 }
 
 uint SymmetricKeySize::GetHashCode()

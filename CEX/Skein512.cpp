@@ -5,9 +5,92 @@
 
 NAMESPACE_DIGEST
 
+using Utility::IntUtils;
+
 const std::string Skein512::CLASS_NAME("Skein512");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+Skein512::Skein512(bool Parallel)
+	:
+	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_msgBuffer(Parallel ? MIN_PRLBLOCK : BLOCK_SIZE, 0),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeDestroy(true),
+	m_treeParams(Parallel ? SkeinParams(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : SkeinParams(DIGEST_SIZE, 0, 0))
+{
+	// TODO: implement parallel alternate for single core cpu
+	if (Parallel && !m_parallelProfile.IsParallel())
+	{
+		throw CryptoDigestException("Skein512::Ctor", "Cpu does not support parallel processing!");
+	}
+
+	if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = Parallel;
+	}
+
+	Initialize();
+}
+
+Skein512::Skein512(SkeinParams &Params)
+	:
+	m_dgtState(1),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
+	m_treeDestroy(false),
+	m_treeParams(Params)
+{
+	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
+	{
+		throw CryptoDigestException("Skein512::Ctor", "Cpu does not support parallel processing!");
+	}
+
+	if (m_treeParams.FanOut() > 1)
+	{
+		m_dgtState.resize(m_treeParams.FanOut());
+		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
+	}
+	else if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = false;
+	}
+
+	Initialize();
+}
+
+Skein512::~Skein512()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_isInitialized = false;
+		m_msgLength = 0;
+		m_parallelProfile.Reset();
+
+		if (m_treeDestroy)
+		{
+			m_treeParams.Reset();
+			m_treeDestroy = false;
+		}
+
+		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		{
+			m_dgtState[i].Reset();
+		}
+
+		IntUtils::ClearVector(m_dgtState);
+		IntUtils::ClearVector(m_msgBuffer);
+	}
+}
+
+//~~~Accessors~~~//
 
 size_t Skein512::BlockSize() 
 { 
@@ -30,11 +113,19 @@ const bool Skein512::IsParallel()
 }
 
 const std::string Skein512::Name()
-{ 
+{
+	std::string txtName = "";
+
 	if (m_parallelProfile.IsParallel())
-		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	{
+		txtName = CLASS_NAME + "-P" + IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	}
 	else
-		return CLASS_NAME;
+	{
+		txtName = CLASS_NAME;
+	}
+
+	return txtName;
 }
 
 const size_t Skein512::ParallelBlockSize()
@@ -47,56 +138,6 @@ ParallelOptions &Skein512::ParallelProfile()
 	return m_parallelProfile; 
 }
 
-//~~~Constructor~~~//
-
-Skein512::Skein512(bool Parallel)
-	:
-	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_msgBuffer(Parallel ? MIN_PRLBLOCK : BLOCK_SIZE, 0),
-	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE)
-{
-	if (m_parallelProfile.IsParallel())
-		m_parallelProfile.IsParallel() = Parallel;
-
-	if (Parallel)
-		m_treeParams = { DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE };
-	else
-		m_treeParams = { DIGEST_SIZE };
-
-	Initialize();
-}
-
-Skein512::Skein512(SkeinParams &Params)
-	:
-	m_treeParams(Params),
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut())
-{
-	if (m_treeParams.FanOut() > 1)
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
-	Initialize();
-}
-
-Skein512::~Skein512()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void Skein512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -104,24 +145,6 @@ void Skein512::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 	Output.resize(DIGEST_SIZE);
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
-}
-
-void Skein512::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_msgLength = 0;
-		m_parallelProfile.Reset();
-		m_treeParams.Reset();
-
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
-			m_dgtState[i].Reset();
-
-		Utility::IntUtils::ClearVector(m_dgtState);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
-	}
 }
 
 size_t Skein512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
@@ -132,7 +155,9 @@ size_t Skein512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
+		{
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		}
 
 		// process buffer
 		if (m_msgLength != 0)
@@ -158,23 +183,25 @@ size_t Skein512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			Utility::IntUtils::LeULL512ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
+			IntUtils::LeULL512ToBlock(m_dgtState[i].S, 0, m_msgBuffer, i * BLOCK_SIZE);
 			m_msgLength += BLOCK_SIZE;
 		}
 
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, rootState, 0);
-		Utility::IntUtils::LeULL512ToBlock(rootState[0].S, 0, Output, OutOffset);
+		IntUtils::LeULL512ToBlock(rootState[0].S, 0, Output, OutOffset);
 	}
 	else
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
+		{
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		}
 
 		// finalize and store
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState, 0);
-		Utility::IntUtils::LeULL512ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
+		IntUtils::LeULL512ToBlock(m_dgtState[0].S, 0, Output, OutOffset);
 	}
 
 	Reset();
@@ -198,12 +225,9 @@ void Skein512::Reset()
 
 void Skein512::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoDigestException("Skein512:ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree > 254)
-		throw CryptoDigestException("Skein512:ParallelMaxDegree", "Parallel degree can not exceed 254!");
-	if (Degree % 2 != 0)
-		throw CryptoDigestException("Skein512:ParallelMaxDegree", "Parallel degree must be an even number!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	m_dgtState.clear();
@@ -225,85 +249,89 @@ void Skein512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 {
 	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
-	if (Length == 0)
-		return;
-
-	if (m_parallelProfile.IsParallel())
-	{
-		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
-		{
-			// fill buffer
-			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
-			if (RMDLEN != 0)
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
-
-			// empty the message buffer
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
-			{
-				ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
-			});
-
-			m_msgLength = 0;
-			Length -= RMDLEN;
-			InOffset += RMDLEN;
-		}
-
-		if (Length >= m_parallelProfile.ParallelBlockSize())
-		{
-			// calculate working set size
-			const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
-
-			// process large blocks
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
-			});
-
-			Length -= PRCLEN;
-			InOffset += PRCLEN;
-		}
-
-		if (Length >= m_parallelProfile.ParallelMinimumSize())
-		{
-			const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
-
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRMLEN);
-			});
-
-			Length -= PRMLEN;
-			InOffset += PRMLEN;
-		}
-	}
-	else
-	{
-		if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
-		{
-			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-			if (RMDLEN != 0)
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
-
-			ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
-			m_msgLength = 0;
-			InOffset += RMDLEN;
-			Length -= RMDLEN;
-		}
-
-		// sequential loop through blocks
-		while (Length > BLOCK_SIZE)
-		{
-			ProcessBlock(Input, InOffset, m_dgtState, 0);
-			InOffset += BLOCK_SIZE;
-			Length -= BLOCK_SIZE;
-		}
-	}
-
-	// store unaligned bytes
 	if (Length != 0)
 	{
-		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
-		m_msgLength += Length;
+		if (m_parallelProfile.IsParallel())
+		{
+			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
+			{
+				// fill buffer
+				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
+				{
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				}
+
+				// empty the message buffer
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				{
+					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
+				});
+
+				m_msgLength = 0;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
+			}
+
+			if (Length >= m_parallelProfile.ParallelBlockSize())
+			{
+				// calculate working set size
+				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
+
+				// process large blocks
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				{
+					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
+				});
+
+				Length -= PRCLEN;
+				InOffset += PRCLEN;
+			}
+
+			if (Length >= m_parallelProfile.ParallelMinimumSize())
+			{
+				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
+
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				{
+					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRMLEN);
+				});
+
+				Length -= PRMLEN;
+				InOffset += PRMLEN;
+			}
+		}
+		else
+		{
+			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			{
+				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				if (RMDLEN != 0)
+				{
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				}
+
+				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
+				m_msgLength = 0;
+				InOffset += RMDLEN;
+				Length -= RMDLEN;
+			}
+
+			// sequential loop through blocks
+			while (Length > BLOCK_SIZE)
+			{
+				ProcessBlock(Input, InOffset, m_dgtState, 0);
+				InOffset += BLOCK_SIZE;
+				Length -= BLOCK_SIZE;
+			}
+		}
+
+		// store unaligned bytes
+		if (Length != 0)
+		{
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			m_msgLength += Length;
+		}
 	}
 }
 
@@ -340,7 +368,7 @@ void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	State[StateOffset].Increase(Length);
 	// encrypt block
 	std::vector<ulong> block(8, 0);
-	Utility::IntUtils::LeBytesToULL512(Input, InOffset, block, 0);
+	IntUtils::LeBytesToULL512(Input, InOffset, block, 0);
 	Compress(block, 0, State[StateOffset]);
 
 	// feed-forward input with state

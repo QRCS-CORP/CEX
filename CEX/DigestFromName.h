@@ -7,6 +7,7 @@
 
 NAMESPACE_HELPER
 
+using Exception::CryptoException;
 using Enumeration::Digests;
 using Digest::IDigest;
 
@@ -16,6 +17,7 @@ using Digest::IDigest;
 class DigestFromName
 {
 public:
+
 	/// <summary>
 	/// Get a Digest instance by name
 	/// </summary>

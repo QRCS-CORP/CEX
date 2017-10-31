@@ -106,7 +106,7 @@ using Key::Symmetric::ISymmetricKey;
 /// <item><description>SHA3 Submission in C: <a href="https://131002.net/blake/blake_ref.c">blake_ref.c</a>.</description></item>
 /// </list>
 /// </remarks>
-class Blake512 : public IDigest
+class Blake512 final : public IDigest
 {
 private:
 
@@ -165,62 +165,24 @@ private:
 	uint m_leafSize;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
+	ParallelOptions m_parallelProfile;
 	std::vector<ulong> m_treeConfig;
 	bool m_treeDestroy;
 	BlakeParams m_treeParams;
-	ParallelOptions m_parallelProfile;
 
 public:
 
-	Blake512(const Blake512&) = delete;
-	Blake512& operator=(const Blake512&) = delete;
-	Blake512& operator=(Blake512&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The Digests internal blocksize in bytes
-	/// </summary>
-	size_t BlockSize() override;
-
-	/// <summary>
-	/// Get: Size of returned digest in bytes
-	/// </summary>
-	size_t DigestSize() override;
-
-	/// <summary>
-	/// Get: The digests type name
-	/// </summary>
-	const Digests Enumeral() override;
-
-	/// <summary>
-	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available on this system.
-	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
-	/// </summary>
-	const bool IsParallel() override;
-
-	/// <summary>
-	/// Get: The digests class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
-	/// </summary>
-	const size_t ParallelBlockSize() override;
-
-	/// <summary>
-	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
-	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
-	/// and reinitialize the state, or initialize the digest using a BlakeParams with the FanOut property set to the desired number of threads.</para>
-	/// </summary>
-	ParallelOptions &ParallelProfile() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	Blake512(const Blake512&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	Blake512& operator=(const Blake512&) = delete;
 
 	/// <summary>
 	/// Initialize the class as either the 2B or 2BP.
@@ -228,6 +190,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Parallel">Setting the Parallel flag to true, instantiates the Blake2BP variant.</param>
+	///
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid parallel parameters are used</exception>
 	explicit Blake512(bool Parallel = false);
 
 	/// <summary>
@@ -239,12 +203,58 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Params">The BlakeParams structure, containing the tree configuration settings.</param>
+	///
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid configuration parameters are used</exception>
 	explicit Blake512(BlakeParams &Params);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~Blake512() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Digests internal blocksize in bytes
+	/// </summary>
+	size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: Size of returned digest in bytes
+	/// </summary>
+	size_t DigestSize() override;
+
+	/// <summary>
+	/// Read Only: The digests type name
+	/// </summary>
+	const Digests Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available on this system.
+	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	const bool IsParallel() override;
+
+	/// <summary>
+	/// Read Only: The digests class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// </summary>
+	const size_t ParallelBlockSize() override;
+
+	/// <summary>
+	/// Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state, or initialize the digest using a BlakeParams with the FanOut property set to the desired number of threads.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Public Functions~~~//
 
@@ -255,11 +265,6 @@ public:
 	/// <param name="Input">The message input data</param>
 	/// <param name="Output">The hash value output array</param>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Perform final processing and return the hash value
@@ -281,6 +286,8 @@ public:
 	/// <para>The input Key must be a maximum size of 32 bytes, and a minimum size of 16 bytes. 
 	/// If either the Salt or Info parameters are used, their size must be 8 bytes.
 	/// The maximum combined size of Key, Salt, and Info, must be 64 bytes or less.</para></param>
+	///
+	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid key size is used</exception>
 	void Initialize(ISymmetricKey &MacKey);
 
 	/// <summary>
@@ -290,8 +297,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
-	///
-	/// <exception cref="Exception::CryptoDigestException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

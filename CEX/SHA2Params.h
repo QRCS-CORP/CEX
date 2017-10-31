@@ -25,11 +25,8 @@
 #define _CEXENGINE_SHA2PARAMS_H
 
 #include "CexDomain.h"
-#include "IntUtils.h"
 
 NAMESPACE_DIGEST
-
-using Utility::IntUtils;
 
 /// <summary>
 /// The SHA2 configuration parameters structure
@@ -62,60 +59,19 @@ private:
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get/Set: The number of leaf nodes in the last tier branch of the tree
-	/// </summary>
-	byte &FanOut() { return m_treeFanout; }
-
-	/// <summary>
-	/// Get/Set: The outer leaf length
-	/// </summary>
-	uint &LeafSize() { return m_leafSize; }
-
-	/// <summary>
-	/// Get/Set: The tree nodes relational offset
-	/// </summary>
-	uint &NodeOffset() { return m_nodeOffset; }
-
-	/// <summary>
-	/// Get/Set: Digest output byte length
-	/// </summary>
-	ulong &OutputSize() { return m_outputSize; }
-
-	/// <summary>
-	/// Get/Set: Reserved for future use
-	/// </summary>
-	uint &Reserved() { return m_reserved; }
-
-	/// <summary>
-	/// Get/Set: The personalization string
-	/// </summary>
-	std::vector<byte> &DistributionCode() { return m_dstCode; }
-
-	/// <summary>
-	/// Get: The maximum recommended size of the distribution code
-	/// </summary>
-	const size_t DistributionCodeMax()
-	{
-		if (m_outputSize == 32)
-			return 112;
-		else
-			return 48;
-	}
-
-	/// <summary>
-	/// Get/Set: The skein version number
-	/// </summary>
-	ushort &Version() { return m_treeVersion; }
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Default instantiation.
-	/// <para>Parameters must be added through their property members, and the Calculate() function called.</para>
-	SHA2Params() {}
+	/// Default constructor; state is initialized to zero defaults
+	/// </summary>
+	SHA2Params();
+
+	/// <summary>
+	/// Initialize the SHA2Params structure using a serialized byte array
+	/// </summary>
+	///
+	/// <param name="TreeArray">A serialized SHA2Params structure</param>
+	explicit SHA2Params(const std::vector<byte> &TreeArray);
 
 	/// <summary>
 	/// Initialize with the default parameters.
@@ -124,46 +80,7 @@ public:
 	/// <param name="OutputSize">Digest output byte length; set to 32 for Skein256, 64 for Skein512 or 128 for Skein1024</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; this must be the digests block size</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
-	SHA2Params(ulong OutputSize, uint LeafSize = 0, byte Fanout = 0)
-		:
-		m_nodeOffset(0),
-		m_treeVersion(1),
-		m_outputSize(OutputSize),
-		m_leafSize(LeafSize),
-		m_treeDepth(0),
-		m_treeFanout(Fanout),
-		m_reserved(0),
-		m_dstCode(0)
-	{
-		m_dstCode.resize(DistributionCodeMax());
-	}
-
-	/// <summary>
-	/// Initialize the SHA2Params structure using a serialized byte array
-	/// </summary>
-	explicit SHA2Params(const std::vector<byte> &TreeArray)
-		:
-		m_nodeOffset(0),
-		m_treeVersion(0),
-		m_outputSize(0),
-		m_leafSize(0),
-		m_treeDepth(0),
-		m_treeFanout(0),
-		m_reserved(0),
-		m_dstCode(0)
-	{
-		CexAssert(TreeArray.size() >= GetHeaderSize(), "The TreeArray buffer is too short!");
-
-		m_nodeOffset = IntUtils::LeBytesTo32(TreeArray, 0);
-		m_treeVersion = IntUtils::LeBytesTo16(TreeArray, 4);
-		m_outputSize = IntUtils::LeBytesTo64(TreeArray, 6);
-		m_leafSize = IntUtils::LeBytesTo32(TreeArray, 14);
-		memcpy(&m_treeDepth, &TreeArray[18], 1);
-		memcpy(&m_treeFanout, &TreeArray[19], 1);
-		m_reserved = IntUtils::LeBytesTo32(TreeArray, 20);
-		m_dstCode.resize(DistributionCodeMax());
-		memcpy(&m_dstCode[0], &TreeArray[24], m_dstCode.size());
-	}
+	explicit SHA2Params(ulong OutputSize, uint LeafSize = 0, byte Fanout = 0);
 
 	/// <summary>
 	/// Initialize this structure with all parameters
@@ -176,21 +93,54 @@ public:
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (one state per processor core is recommended)</param>
 	/// <param name="TreeDepth">The depth of the parallel tree; this value is always zero in this implementation</param>
 	/// <param name="Info">Optional personalization string</param>
-	explicit SHA2Params(uint NodeOffset, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &Info)
-		:
-		m_nodeOffset(NodeOffset),
-		m_treeVersion(Version),
-		m_outputSize(OutputSize),
-		m_leafSize(LeafSize),
-		m_treeDepth(TreeDepth),
-		m_treeFanout(Fanout),
-		m_reserved(0),
-		m_dstCode(Info)
-	{
-		m_dstCode.resize(DistributionCodeMax());
+	SHA2Params(uint NodeOffset, ulong OutputSize, ushort Version, uint LeafSize, byte Fanout, byte TreeDepth, std::vector<byte> &Info);
 
-		CexAssert(m_treeFanout == 0 || m_treeFanout > 0 && (m_leafSize != OutputSize || m_treeFanout % 2 == 0), "The fan-out must be an even number and should align to processor cores!");
-	}
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	~SHA2Params();
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: The number of leaf nodes in the last tier branch of the tree
+	/// </summary>
+	byte &FanOut();
+
+	/// <summary>
+	/// Read/Write: The outer leaf length
+	/// </summary>
+	uint &LeafSize();
+
+	/// <summary>
+	/// Read/Write: The tree nodes relational offset
+	/// </summary>
+	uint &NodeOffset();
+
+	/// <summary>
+	/// Read/Write: Digest output byte length
+	/// </summary>
+	ulong &OutputSize();
+
+	/// <summary>
+	/// Read/Write: Reserved for future use
+	/// </summary>
+	uint &Reserved();
+
+	/// <summary>
+	/// Read/Write: The personalization string
+	/// </summary>
+	std::vector<byte> &DistributionCode();
+
+	/// <summary>
+	/// Read Only: The maximum recommended size of the distribution code
+	/// </summary>
+	const size_t DistributionCodeMax();
+
+	/// <summary>
+	/// Read/Write: The skein version number
+	/// </summary>
+	ushort &Version();
 
 	//~~~Public Functions~~~//
 
@@ -199,10 +149,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A copy of this SHA2Params structure</returns>
-	SHA2Params Clone()
-	{
-		return SHA2Params(ToBytes());
-	}
+	SHA2Params Clone();
 
 	/// <summary>
 	/// Create a deep copy of this structure.
@@ -210,10 +157,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A pointer to a copy of this SHA2Params structure</returns>
-	SHA2Params* DeepCopy()
-	{
-		return new SHA2Params(ToBytes());
-	}
+	SHA2Params* DeepCopy();
 
 	/// <summary>
 	/// Compare this object instance with another
@@ -222,80 +166,33 @@ public:
 	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(SHA2Params &Input)
-	{
-		if (this->GetHashCode() != Input.GetHashCode())
-			return false;
-
-		return true;
-	}
+	bool Equals(SHA2Params &Input);
 
 	/// <summary>
 	/// Get the hash code for this object
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	int GetHashCode()
-	{
-		int result = 31 * m_treeVersion;
-		result += 31 * m_nodeOffset;
-		result += 31 * m_leafSize;
-		result += 31 * m_outputSize;
-		result += 31 * m_treeDepth;
-		result += 31 * m_treeFanout;
-		result += 31 * m_reserved;
-
-		for (size_t i = 0; i < m_dstCode.size(); ++i)
-			result += 31 * m_dstCode[i];
-
-		return result;
-	}
+	int GetHashCode();
 
 	/// <summary>
 	/// Get the header size in bytes
 	/// </summary>
 	/// 
 	/// <returns>Header size</returns>
-	size_t GetHeaderSize()
-	{
-		return HDR_SIZE + DistributionCodeMax();
-	}
+	size_t GetHeaderSize();
 
 	/// <summary>
 	/// Set all struct members to defaults
 	/// </summary>
-	void Reset()
-	{
-		m_nodeOffset = 0;
-		m_treeVersion = 0;
-		m_outputSize = 0;
-		m_leafSize = 0;
-		m_treeDepth = 0;
-		m_treeFanout = 0;
-		m_reserved = 0;
-		m_dstCode.clear();
-	}
+	void Reset();
 
 	/// <summary>
 	/// Convert the SHA2Params structure to a serialized byte array
 	/// </summary>
 	/// 
 	/// <returns>The byte array containing the serialized SHA2Params structure</returns>
-	std::vector<byte> ToBytes()
-	{
-		std::vector<byte> config(GetHeaderSize());
-
-		IntUtils::Le32ToBytes(m_nodeOffset, config, 0);
-		IntUtils::Le16ToBytes(m_treeVersion, config, 4);
-		IntUtils::Le64ToBytes(m_outputSize, config, 6);
-		IntUtils::Le32ToBytes(m_leafSize, config, 14);
-		memcpy(&config[18], &m_treeDepth, 1);
-		memcpy(&config[19], &m_treeFanout, 1);
-		IntUtils::Le32ToBytes(m_reserved, config, 20);
-		memcpy(&config[24], &m_dstCode[0], m_dstCode.size());
-
-		return config;
-	}
+	std::vector<byte> ToBytes();
 };
 
 NAMESPACE_DIGESTEND

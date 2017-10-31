@@ -59,6 +59,8 @@ namespace Test
 			CompareVector(kc1024, m_expected1024);
 			OnProgress(std::string("KeccakTest: Passed Keccak 1024 bit digest vector tests.."));
 
+			// TODO: add parallel tests
+
 			CompareHMAC(kc256, m_mac256, m_trunc256);
 			OnProgress(std::string("Passed Keccak 256 bit digest HMAC tests.."));
 			CompareHMAC(kc512, m_mac512, m_trunc512);

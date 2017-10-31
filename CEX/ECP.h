@@ -10,7 +10,7 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 
 /// <summary>
 /// An implementation of a system Entropy Collector Provider.
-/// <para>Note* This class has only been tested in Windows, other operating systems currently may have limited support.</para>
+/// <para>Note* This class has only been tested in Windows, other operating systems currently have limited support.</para>
 /// </summary>
 /// 
 /// <example>
@@ -40,73 +40,78 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <item><description>ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySources.pdf">X9.82: </a>Entropy and Entropy Sources in X9.82.</description></item>
 /// </list> 
 /// </remarks>
-class ECP : public IProvider
+class ECP final : public IProvider
 {
 private:
 
 	static const std::string CLASS_NAME;
 	static const size_t DEF_STATECAP = 1024;
 
-	ICipherMode* m_cipherMode;
+	std::unique_ptr<ICipherMode> m_cipherMode;
 	bool m_hasTsc;
 	bool m_isAvailable;
 
 public:
 
-	ECP(const ECP&) = delete;
-	ECP& operator=(const ECP&) = delete;
-	ECP& operator=(ECP&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The providers type name
-	/// </summary>
-	const Providers Enumeral() override;
-
-	/// <summary>
-	/// Get: The entropy provider is available on this system
-	/// </summary>
-	const bool IsAvailable() override;
-
-	/// <summary>
-	/// Get: The provider class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ECP(const ECP&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ECP& operator=(const ECP&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class
 	/// </summary>
 	ECP();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class
 	/// </summary>
 	~ECP() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The providers type name
 	/// </summary>
-	void Destroy() override;
+	const Providers Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The entropy provider is available on this system
+	/// </summary>
+	const bool IsAvailable() override;
+
+	/// <summary>
+	/// Read Only: The provider class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Fill a buffer with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	void GetBytes(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill the buffer with pseudo-random bytes
+	/// Fill the buffer with pseudo-random bytes using offsets
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
@@ -116,16 +121,24 @@ public:
 	/// <param name="Length">The size of the expected array returned</param>
 	/// 
 	/// <returns>An array of pseudo-random of bytes</returns>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	std::vector<byte> GetBytes(size_t Length) override;
 
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
+	/// 
+	/// <returns>A pseudo random 32bit unsigned integer</returns>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	uint Next() override;
 
 	/// <summary>
 	/// Reset the internal state
 	/// </summary>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown on entropy collection failure</exception>
 	void Reset() override;
 
 private:

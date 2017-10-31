@@ -4,9 +4,13 @@ NAMESPACE_PADDING
 
 const std::string ISO7816::CLASS_NAME("ISO7816");
 
-ISO7816::ISO7816() {}
+ISO7816::ISO7816() 
+{
+}
 
-ISO7816::~ISO7816() {}
+ISO7816::~ISO7816() 
+{
+}
 
 const PaddingModes ISO7816::Enumeral() 
 { 
@@ -21,46 +25,68 @@ const std::string ISO7816::Name()
 size_t ISO7816::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
+	{
 		throw CryptoPaddingException("ISO7816:AddPadding", "The padding offset value is longer than the array length!");
+	}
 
-	size_t len = (Input.size() - Offset);
+	size_t padlen = (Input.size() - Offset);
 
 	Input[Offset++] = MKCODE;
 
 	while (Offset < Input.size())
+	{
 		Input[Offset++] = ZBCODE;
+	}
 
-	return len;
+	return padlen;
 }
 
 size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input)
 {
-	size_t len = Input.size() - 1;
+	size_t padlen = Input.size() - 1;
 
-	if (Input[len] == MKCODE)
-		return 1;
-	else if (Input[len] != ZBCODE)
-		return 0;
+	if (Input[padlen] == MKCODE)
+	{
+		padlen = 1;
+	}
+	else if (Input[padlen] != ZBCODE)
+	{
+		padlen = 0;
+	}
+	else
+	{
+		while (padlen > 0 && Input[padlen] == ZBCODE)
+		{
+			padlen--;
+		}
+		padlen = Input.size() - padlen;
+	}
 
-	while (len > 0 && Input[len] == ZBCODE)
-		len--;
-
-	return Input.size() - len;
+	return padlen;
 }
 
 size_t ISO7816::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t len = Input.size() - (Offset + 1);
+	size_t padlen = Input.size() - (Offset + 1);
 
-	if (Input[Offset + len] == MKCODE)
-		return 1;
-	else if (Input[Offset + len] != ZBCODE)
-		return 0;
+	if (Input[Offset + padlen] == MKCODE)
+	{
+		padlen = 1;
+	}
+	else if (Input[Offset + padlen] != ZBCODE)
+	{
+		padlen = 0;
+	}
+	else
+	{
+		while (padlen > 0 && Input[Offset + padlen] == ZBCODE)
+		{
+			padlen--;
+		}
+		padlen = (Input.size() - Offset) - padlen;
+	}
 
-	while (len > 0 && Input[Offset + len] == ZBCODE)
-		len--;
-
-	return (Input.size() - Offset) - len;
+	return padlen;
 }
 
 NAMESPACE_PADDINGEND

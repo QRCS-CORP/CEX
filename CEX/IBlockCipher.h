@@ -42,87 +42,98 @@ class IBlockCipher
 {
 public:
 
-	IBlockCipher(const IBlockCipher&) = delete;
-	IBlockCipher& operator=(const IBlockCipher&) = delete;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IBlockCipher() {}
+	IBlockCipher(const IBlockCipher&) = delete;
 
 	/// <summary>
-	/// Destructor
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IBlockCipher() noexcept {}
-
-	//~~~Properties~~~//
+	IBlockCipher& operator=(const IBlockCipher&) = delete;
 
 	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IBlockCipher() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IBlockCipher() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: Unit block size of internal cipher in bytes
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get/Set: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
+	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
 	/// <para>Changing this code will create a unique distribution of the cipher.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.
-	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax size.
+	/// Note: If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
 	/// </summary>
 	virtual std::vector<byte> &DistributionCode() = 0;
 
 	/// <summary>
-	/// Get: The maximum size of the distribution code in bytes.
+	/// Read Only: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the HKDF key expansion phase.
 	/// If used as a nonce the distribution code should be secret, and equal in size to this value</para>
 	/// </summary>
 	virtual const size_t DistributionCodeMax() = 0;
 
 	/// <summary>
-	/// Get: The block ciphers type name
+	/// Read Only: The block ciphers type name
 	/// </summary>
 	virtual const BlockCiphers Enumeral() = 0;
 
 	/// <summary>
-	/// Get: True is initialized for encryption, false for decryption.
+	/// Read Only: True is initialized for encryption, false for decryption.
 	/// <para>Value set in <see cref="Initialize(bool, ISymmetricKey)"/>.</para>
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
 	/// <summary>
-	/// Get: Cipher is ready to transform data
+	/// Read Only: Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: The extended ciphers HKDF digest type
+	/// Read Only: The extended ciphers HKDF digest type
 	/// </summary>
 	virtual const Digests KdfEngine() = 0;
 
 	/// <summary>
-	/// Get: Available Encryption Key Sizes in bytes
+	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Get: Available transformation round assignments
+	/// Read Only: Available transformation round assignments
 	/// </summary>
 	virtual const std::vector<size_t> &LegalRounds() = 0;
 
 	/// <summary>
-	/// Get: The block ciphers class name
+	/// Read Only: The block ciphers class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: The number of transformation rounds processed by the transform
+	/// Read Only: The number of transformation rounds processed by the transform
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
 	/// <summary>
-	/// Get: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
+	/// Read Only: The sum size in bytes (plus some allowance for externals) of the classes persistant state.
 	/// <para>Used in parallel block calculation to reduce L1 cache eviction occurence. see ParallelOptions</para>
 	/// </summary>
 	virtual const size_t StateCacheSize() = 0;
@@ -152,11 +163,6 @@ public:
 	virtual void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
-
-	/// <summary>
 	/// Encrypt a block of bytes.
 	/// <para><see cref="Initialize(bool, ISymmetricKey)"/> must be called with the Encryption flag set to <c>true</c> before this method can be used.
 	/// Input and Output array lengths must be at least <see cref="BlockSize"/> in length.</para>
@@ -183,9 +189,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Using Encryption or Decryption mode</param>
-	/// <param name="KeyParams">Cipher key container. <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
+	/// <param name="KeyParams">Cipher key container. 
+	/// <para>The <see cref="LegalKeySizes"/> property contains valid sizes.</para></param>
 	/// 
-	/// <exception cref="CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>

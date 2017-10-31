@@ -2,21 +2,6 @@
 
 NAMESPACE_EXCEPTION
 
-std::string &CryptoGeneratorException::Details()
-{ 
-	return m_details; 
-}
-
-std::string &CryptoGeneratorException::Message() 
-{ 
-	return m_message; 
-}
-
-std::string &CryptoGeneratorException::Origin()
-{ 
-	return m_origin;
-}
-
 CryptoGeneratorException::CryptoGeneratorException(const std::string &Message)
 	:
 	m_details(""),
@@ -39,6 +24,28 @@ CryptoGeneratorException::CryptoGeneratorException(const std::string &Origin, co
 	m_message(Message),
 	m_origin(Origin)
 {
+}
+
+CryptoGeneratorException::~CryptoGeneratorException()
+{
+	m_details.clear();
+	m_message.clear();
+	m_origin.clear();
+}
+
+std::string &CryptoGeneratorException::Details()
+{ 
+	return m_details; 
+}
+
+std::string &CryptoGeneratorException::Message() 
+{ 
+	return m_message; 
+}
+
+std::string &CryptoGeneratorException::Origin()
+{ 
+	return m_origin;
 }
 
 NAMESPACE_EXCEPTIONEND

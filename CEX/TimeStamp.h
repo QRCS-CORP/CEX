@@ -19,6 +19,9 @@ private:
 
 public:
 
+	/// <summary>
+	/// Constructor: instantiate this class
+	/// </summary>
 	TimeStamp()
 		:
 		m_hasTsc(Utility::SysUtils::HasRdtsc()),

@@ -48,12 +48,12 @@ namespace Test
 		SymmetricKeySize keySize(64, 16, 64);
 		SymmetricKeyGenerator keyGen;
 
-		SymmetricKey symKey = keyGen.GetSymmetricKey(keySize);
-		if (!IsValidKey(symKey))
+		SymmetricKey* symKey = keyGen.GetSymmetricKey(keySize);
+		if (!IsValidKey(*symKey))
 			throw TestException("CheckAccess: The key is invalid!");
 
-		SymmetricSecureKey secKey = keyGen.GetSecureKey(keySize);
-		if (!IsValidKey(secKey))
+		SymmetricSecureKey* secKey = keyGen.GetSecureKey(keySize);
+		if (!IsValidKey(*secKey))
 			throw TestException("CheckAccess: The key is invalid!");
 
 		std::vector<byte> data(128);
@@ -76,26 +76,26 @@ namespace Test
 		if (detect.RDTSCP())
 		{
 			SymmetricKeyGenerator keyGen1(Digests::SHA256, Providers::CJP);
-			SymmetricKey symKey1 = keyGen1.GetSymmetricKey(keySize);
-			if (!IsValidKey(symKey1))
+			SymmetricKey* symKey1 = keyGen1.GetSymmetricKey(keySize);
+			if (!IsValidKey(*symKey1))
 				throw TestException("CheckInit: Key generation has failed!");
 		}
 
 		SymmetricKeyGenerator keyGen2(Digests::Blake512, Providers::CSP);
-		SymmetricKey symKey2 = keyGen2.GetSymmetricKey(keySize);
-		if (!IsValidKey(symKey2))
+		SymmetricKey* symKey2 = keyGen2.GetSymmetricKey(keySize);
+		if (!IsValidKey(*symKey2))
 			throw TestException("CheckInit: Key generation has failed!");
 
 		SymmetricKeyGenerator keyGen3(Digests::Keccak256, Providers::ECP);
-		SymmetricKey symKey3 = keyGen3.GetSymmetricKey(keySize);
-		if (!IsValidKey(symKey3))
+		SymmetricKey* symKey3 = keyGen3.GetSymmetricKey(keySize);
+		if (!IsValidKey(*symKey3))
 			throw TestException("CheckInit: Key generation has failed!");
 
 		if (detect.RDRAND() && detect.RDSEED())
 		{
 			SymmetricKeyGenerator keyGen4(Digests::Skein512, Providers::RDP);
-			SymmetricKey symKey4 = keyGen4.GetSymmetricKey(keySize);
-			if (!IsValidKey(symKey4))
+			SymmetricKey* symKey4 = keyGen4.GetSymmetricKey(keySize);
+			if (!IsValidKey(*symKey4))
 				throw TestException("CheckInit: Key generation has failed!");
 		}
 	}

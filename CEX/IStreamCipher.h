@@ -1,4 +1,22 @@
-﻿#ifndef CEX_ISTREAMCIPHER_H
+﻿// The GPL version 3 License (GPLv3)
+// 
+// Copyright (c) 2017 vtdev.com
+// This file is part of the CEX Cryptographic library.
+// 
+// This program is free software : you can redistribute it and / or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#ifndef CEX_ISTREAMCIPHER_H
 #define CEX_ISTREAMCIPHER_H
 
 #include "CexDomain.h"
@@ -29,26 +47,40 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IStreamCipher() {}
+	IStreamCipher(const IStreamCipher&) = delete;
 
 	/// <summary>
-	/// Destructor
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IStreamCipher() {}
-
-	//~~~Properties~~~//
+	IStreamCipher& operator=(const IStreamCipher&) = delete;
 
 	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes.
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IStreamCipher() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IStreamCipher() 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: Unit block size of internal cipher in bytes.
 	/// <para>Block size must be 16 or 32 bytes wide. 
 	/// Value set in class constructor.</para>
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get: The salt value in the initialization parameters (Tau-Sigma).
+	/// Read Only: The salt value in the initialization parameters (Tau-Sigma).
 	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
 	/// Changing this code will create a unique distribution of the cipher.
 	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
@@ -58,45 +90,45 @@ public:
 	virtual const std::vector<byte> &DistributionCode() = 0;
 
 	/// <summary>
-	/// Get: The stream ciphers type name
+	/// Read Only: The stream ciphers type name
 	/// </summary>
 	virtual const StreamCiphers Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Cipher is ready to transform data
+	/// Read Only: Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: Processor parallelization availability.
+	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Get: Array of allowed cipher input key byte-sizes
+	/// Read Only: Array of allowed cipher input key byte-sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Get: Available transformation round assignments
+	/// Read Only: Available transformation round assignments
 	/// </summary>
 	virtual const std::vector<size_t> &LegalRounds() = 0;
 
 	/// <summary>
-	/// Get: The stream ciphers class name
+	/// Read Only: The stream ciphers class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
+	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// Read/Write: Parallel and SIMD capability flags and sizes 
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
@@ -104,16 +136,11 @@ public:
 	virtual ParallelOptions &ParallelProfile() = 0;
 
 	/// <summary>
-	/// Get: Number of rounds
+	/// Read Only: Number of rounds
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Initialize the cipher

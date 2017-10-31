@@ -9,55 +9,87 @@
 
 NAMESPACE_HELPER
 
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests KdfEngineType)
+IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests DigestType)
 {
+	IBlockCipher* cprPtr;
+
 	try
 	{ 
 		Common::CpuDetect detect;
 
 		switch (BlockCipherType)
 		{
-		case BlockCiphers::AHX:
-		{
-#if defined(__AVX__)
-			if (detect.AESNI())
-				return new Cipher::Symmetric::Block::AHX(KdfEngineType, 22);
-			else
-#endif
-				return new Cipher::Symmetric::Block::RHX(KdfEngineType, 22);
-		}
-		case BlockCiphers::Rijndael:
-		{
-#if defined(__AVX__)
-			if (detect.AESNI())
-				return new Cipher::Symmetric::Block::AHX();
-			else
-#endif
-				return new Cipher::Symmetric::Block::RHX();
-		}
-		case BlockCiphers::RHX:
-			return new Cipher::Symmetric::Block::RHX(KdfEngineType, 22);
-		case BlockCiphers::Serpent:
-			return new Cipher::Symmetric::Block::SHX();
-		case BlockCiphers::SHX:
-			return new Cipher::Symmetric::Block::SHX(KdfEngineType, 40);
-		case BlockCiphers::Twofish:
-			return new Cipher::Symmetric::Block::THX();
-		case BlockCiphers::THX:
-			return new Cipher::Symmetric::Block::THX(KdfEngineType, 20);
-
-		default:
-			throw Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
+			case BlockCiphers::AHX:
+			{
+	#if defined(__AVX__)
+				if (detect.AESNI())
+				{
+					cprPtr = new Cipher::Symmetric::Block::AHX(DigestType, 22);
+				}
+				else
+	#endif
+				{
+					cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, 22);
+				}
+				break;
+			}
+			case BlockCiphers::Rijndael:
+			{
+	#if defined(__AVX__)
+				if (detect.AESNI())
+				{
+					cprPtr = new Cipher::Symmetric::Block::AHX();
+				}
+				else
+	#endif
+				{
+					cprPtr = new Cipher::Symmetric::Block::RHX();
+				}
+				break;
+			}
+			case BlockCiphers::RHX:
+			{
+				cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, 22);
+				break;
+			}
+			case BlockCiphers::Serpent:
+			{
+				cprPtr = new Cipher::Symmetric::Block::SHX();
+				break;
+			}
+			case BlockCiphers::SHX:
+			{
+				cprPtr = new Cipher::Symmetric::Block::SHX(DigestType, 40);
+				break;
+			}
+			case BlockCiphers::Twofish:
+			{
+				cprPtr = new Cipher::Symmetric::Block::THX();
+				break;
+			}
+			case BlockCiphers::THX:
+			{
+				cprPtr = new Cipher::Symmetric::Block::THX(DigestType, 20);
+				break;
+			}
+			default:
+			{
+				throw CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("BlockCipherFromName:GetInstance", "The specified block cipher type is unavailable!", std::string(ex.what()));
+		throw CryptoException("BlockCipherFromName:GetInstance", "The specified block cipher type is unavailable!", std::string(ex.what()));
 	}
+
+	return cprPtr;
 }
 
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests KdfEngineType, uint RoundCount)
+IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests DigestType, uint RoundCount)
 {
+	IBlockCipher* cprPtr;
+
 	try
 	{
 		Common::CpuDetect detect;
@@ -68,39 +100,67 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Dig
 			{
 #if defined(__AVX__)
 				if (detect.AESNI())
-					return new Cipher::Symmetric::Block::AHX(KdfEngineType, RoundCount);
+				{
+					cprPtr = new Cipher::Symmetric::Block::AHX(DigestType, RoundCount);
+				}
 				else
 #endif
-					return new Cipher::Symmetric::Block::RHX(KdfEngineType, RoundCount);
+				{
+					cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, RoundCount);
+				}
+				break;
 			}
 			case BlockCiphers::Rijndael:
 			{
 #if defined(__AVX__)
 				if (detect.AESNI())
-					return new Cipher::Symmetric::Block::AHX();
+				{
+					cprPtr = new Cipher::Symmetric::Block::AHX();
+				}
 				else
 #endif
-					return new Cipher::Symmetric::Block::RHX();
+				{
+					cprPtr = new Cipher::Symmetric::Block::RHX();
+				}
+				break;
 			}
 			case BlockCiphers::RHX:
-				return new Cipher::Symmetric::Block::RHX(KdfEngineType, RoundCount);
+			{
+				cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, RoundCount);
+				break;
+			}
 			case BlockCiphers::Serpent:
-				return new Cipher::Symmetric::Block::SHX();
+			{
+				cprPtr = new Cipher::Symmetric::Block::SHX();
+				break;
+			}
 			case BlockCiphers::SHX:
-				return new Cipher::Symmetric::Block::SHX(KdfEngineType, RoundCount);
+			{
+				cprPtr = new Cipher::Symmetric::Block::SHX(DigestType, RoundCount);
+				break;
+			}
 			case BlockCiphers::Twofish:
-				return new Cipher::Symmetric::Block::THX();
+			{
+				cprPtr = new Cipher::Symmetric::Block::THX();
+				break;
+			}
 			case BlockCiphers::THX:
-				return new Cipher::Symmetric::Block::THX(KdfEngineType, RoundCount);
-
+			{
+				cprPtr = new Cipher::Symmetric::Block::THX(DigestType, RoundCount);
+				break;
+			}
 			default:
-				throw Exception::CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
+			{
+				throw CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("BlockCipherFromName:GetInstance", "The specified block cipher type is unavailable!", std::string(ex.what()));
+		throw CryptoException("BlockCipherFromName:GetInstance", "The specified block cipher type is unavailable!", std::string(ex.what()));
 	}
+
+	return cprPtr;
 }
 
 NAMESPACE_HELPEREND

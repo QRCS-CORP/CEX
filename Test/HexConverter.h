@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_HEXCONVERTER_H
-#define _CEXTEST_HEXCONVERTER_H
+#ifndef CEXTEST_HEXCONVERTER_H
+#define CEXTEST_HEXCONVERTER_H
 
 #include "../CEX/CexDomain.h"
 

@@ -69,30 +69,27 @@ enum class SkeinUbiType : ulong
 class SkeinUbiTweak
 {
 private:
-	static const ulong T1_FINAL = (ulong)1 << 63;
-	static const ulong T1_FIRST = (ulong)1 << 62;
+
+	static const ulong T1_FINAL = static_cast<ulong>(1) << 63;
+	static const ulong T1_FIRST = static_cast<ulong>(1) << 62;
 
 public:
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Gets the number of bits processed so far, inclusive.
 	/// </summary>
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
-	static ulong BitsProcessed(const std::vector<ulong> &Tweak)
-	{
-		return Tweak[0];
-	}
+	static ulong BitsProcessed(const std::vector<ulong> &Tweak);
 
 	/// <summary>
 	/// Gets the current UBI block type.
 	/// </summary>
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
-	static SkeinUbiType BlockType(const std::vector<ulong> &Tweak)
-	{
-		return (SkeinUbiType)(Tweak[1] >> 56);
-	}
+	static SkeinUbiType BlockType(const std::vector<ulong> &Tweak);
 
 	/// <summary>
 	/// Sets the current UBI block type
@@ -100,20 +97,14 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The UBI type value</param>
-	static void BlockType(std::vector<ulong> &Tweak, SkeinUbiType Value)
-	{
-		Tweak[1] = (ulong)Value << 56;
-	}
+	static void BlockType(std::vector<ulong> &Tweak, SkeinUbiType Value);
 
 	/// <summary>
 	/// Gets the final block flag
 	/// </summary>
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
-	static bool IsFinalBlock(const std::vector<ulong> &Tweak)
-	{
-		return (Tweak[1] & T1_FINAL) != 0;
-	}
+	static bool IsFinalBlock(const std::vector<ulong> &Tweak);
 
 	/// <summary>
 	/// Sets the final block flag
@@ -121,21 +112,14 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The final block state value</param>
-	static void IsFinalBlock(std::vector<ulong> &Tweak, ulong Value)
-	{
-		long mask = Value ? 1 : 0;
-		Tweak[1] = (Tweak[1] & ~T1_FINAL) | ((ulong)-mask & T1_FINAL);
-	}
+	static void IsFinalBlock(std::vector<ulong> &Tweak, ulong Value);
 
 	/// <summary>
 	/// Gets the first block flag
 	/// </summary>
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
-	static bool IsFirstBlock(const std::vector<ulong> &Tweak)
-	{
-		return (Tweak[1] & T1_FIRST) != 0;
-	}
+	static bool IsFirstBlock(const std::vector<ulong> &Tweak);
 
 	/// <summary>
 	/// Sets the first block flag
@@ -143,11 +127,7 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The first block state value</param>
-	static void IsFirstBlock(std::vector<ulong> &Tweak, bool Value)
-	{
-		long mask = Value ? 1 : 0;
-		Tweak[1] = (Tweak[1] & ~T1_FIRST) | ((ulong)-mask & T1_FIRST);
-	}
+	static void IsFirstBlock(std::vector<ulong> &Tweak, bool Value);
 
 	/// <summary>
 	/// Gets the current tree level
@@ -156,10 +136,7 @@ public:
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// 
 	/// <returns>The tree level</returns>
-	static byte TreeLevel(const std::vector<ulong> &Tweak)
-	{
-		return (byte)((Tweak[1] >> 48) & 0x3f);
-	}
+	static byte TreeLevel(const std::vector<ulong> &Tweak);
 
 	/// <summary>
 	/// Sets the current tree level
@@ -167,14 +144,7 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The tree level value</param>
-	static void TreeLevel(std::vector<ulong> &Tweak, byte Value)
-	{
-		if (Value > 63)
-			throw Exception::CryptoDigestException("Skein:TreeLevel", "Tree level must be between 0 and 63, inclusive.");
-
-		Tweak[1] &= ~((ulong)0x3f << 48);
-		Tweak[1] |= (ulong)Value << 48;
-	}
+	static void TreeLevel(std::vector<ulong> &Tweak, byte Value);
 
 	/// <summary>
 	/// Sets the tweak value array
@@ -182,10 +152,7 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The tweak value</param>
-	static void SetTweak(std::vector<ulong> &Tweak, const std::vector<ulong> &Value)
-	{
-		Tweak = Value;
-	}
+	static void SetTweak(std::vector<ulong> &Tweak, const std::vector<ulong> &Value);
 
 	/// <summary>
 	/// Starts a new UBI block type by setting BitsProcessed to zero, setting the first flag, and setting the block type
@@ -193,12 +160,7 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The SkeinUbiType value</param>
-	static void StartNewBlockType(std::vector<ulong> &Tweak, const SkeinUbiType Value)
-	{
-		Tweak[0] = 0;
-		BlockType(Tweak, Value);
-		IsFirstBlock(Tweak, true);
-	}
+	static void StartNewBlockType(std::vector<ulong> &Tweak, const SkeinUbiType Value);
 
 	/// <summary>
 	/// Sets the number of bits processed so far, inclusive
@@ -206,11 +168,7 @@ public:
 	///
 	/// <param name="Tweak">The UBI tweak array</param>
 	/// <param name="Value">The number of bits processed</param>
-	static void SetBitsProcessed(std::vector<ulong> &Tweak, ulong Value)
-	{
-		Tweak[0] = Value;
-	}
-
+	static void SetBitsProcessed(std::vector<ulong> &Tweak, ulong Value);
 };
 
 NAMESPACE_DIGESTEND

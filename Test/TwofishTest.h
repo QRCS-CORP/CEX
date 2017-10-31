@@ -1,5 +1,5 @@
-﻿#ifndef _CEXTEST_TWOFISHTEST_H
-#define _CEXTEST_TWOFISHTEST_H
+﻿#ifndef CEXTEST_TWOFISHTEST_H
+#define CEXTEST_TWOFISHTEST_H
 
 #include "ITest.h"
 

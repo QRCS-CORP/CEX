@@ -34,116 +34,21 @@ class McElieceUtils
 {
 public:
 
-	McElieceUtils() = delete;
-	McElieceUtils(const McElieceUtils&) = delete;
-	McElieceUtils& operator=(const McElieceUtils&) = delete;
-	McElieceUtils& operator=(McElieceUtils&&) = delete;
+	//~~~Public Functions~~~//
 
-	static ushort Diff(ushort A, ushort B)
-	{
-		uint t = (uint)(A ^ B);
-		t = ((t - 1) >> 20) ^ 0xFFF;
+	static ushort Diff(ushort A, ushort B);
 
-		return (ushort)t;
-	}
+	static ushort Invert(ushort X, const size_t Degree);
 
-	static ushort Invert(ushort X, const size_t Degree)
-	{
-		ushort tmpA;
-		ushort tmpB;
-		ushort out = X;
+	static ulong MaskNonZero64(ushort A);
 
-		out = Square(out, Degree);
-		tmpA = Multiply(out, X, Degree);
-		out = Square(tmpA, Degree);
-		out = Square(out, Degree);
-		tmpB = Multiply(out, tmpA, Degree);
-		out = Square(tmpB, Degree);
-		out = Square(out, Degree);
-		out = Square(out, Degree);
-		out = Square(out, Degree);
-		out = Multiply(out, tmpB, Degree);
-		out = Square(out, Degree);
-		out = Square(out, Degree);
-		out = Multiply(out, tmpA, Degree);
-		out = Square(out, Degree);
-		out = Multiply(out, X, Degree);
+	static ulong MaskLeq64(ushort A, ushort B);
 
-		return Square(out, Degree);
-	}
+	static ushort Multiply(ushort X, ushort Y, const size_t Degree);
 
-	static ulong MaskNonZero64(ushort A)
-	{
-		ulong ret = A;
+	static ushort Square(ushort X, const size_t Degree);
 
-		ret -= 1;
-		ret >>= 63;
-		ret -= 1;
-
-		return ret;
-	}
-
-	static ulong MaskLeq64(ushort A, ushort B)
-	{
-		ulong tmpA = A;
-		ulong tmpB = B;
-		ulong ret = tmpB - tmpA;
-
-		ret >>= 63;
-		ret -= 1;
-
-		return ret;
-	}
-
-	static ushort Multiply(ushort X, ushort Y, const size_t Degree)
-	{
-		uint t;
-		uint t0;
-		uint t1;
-		uint tmp;
-
-		t0 = X;
-		t1 = Y;
-		tmp = t0 * (t1 & 1);
-
-		for (size_t i = 1; i < Degree; i++)
-		{
-			tmp ^= (t0 * (t1 & (1 << i)));
-		}
-
-		t = tmp & 0x7FC000;
-		tmp ^= t >> 9;
-		tmp ^= t >> 12;
-
-		t = tmp & 0x3000;
-		tmp ^= t >> 9;
-		tmp ^= t >> 12;
-
-		return tmp & ((1 << Degree) - 1);
-	}
-
-	static ushort Square(ushort X, const size_t Degree)
-	{
-		const uint B[4] = { 0x55555555, 0x33333333, 0x0F0F0F0F, 0x00FF00FF };
-
-		uint y = X;
-		uint t;
-
-		y = (y | (y << 8)) & B[3];
-		y = (y | (y << 4)) & B[2];
-		y = (y | (y << 2)) & B[1];
-		y = (y | (y << 1)) & B[0];
-
-		t = y & 0x7FC000;
-		y ^= t >> 9;
-		y ^= t >> 12;
-
-		t = y & 0x3000;
-		y ^= t >> 9;
-		y ^= t >> 12;
-
-		return y & ((1 << Degree) - 1);
-	}
+	//~~~Templates~~~//
 
 	template<typename Array>
 	inline static void Add(Array &X, Array &Y)
@@ -207,6 +112,7 @@ public:
 			BenesHelp(Received, Condition, condPos, low);
 			condPos += inc;
 		}
+
 		for (low = 4; low >= 0; low--)
 		{
 			BenesHelp(Received, Condition, condPos, low);
@@ -223,7 +129,7 @@ public:
 	}
 
 	template<typename ArrayA, typename ArrayB>
-	inline static void BenesHelp(ArrayA &Received, ArrayB &Condition, size_t CondPos, int Low)
+	static void BenesHelp(ArrayA &Received, ArrayB &Condition, size_t CondPos, int Low)
 	{
 		int i, j, x, y;
 		int high = 5 - Low;
@@ -535,14 +441,15 @@ public:
 	}
 
 	template<typename Array>
-	inline static ushort Reduce(Array &Product, const size_t Degree)
+	static ushort Reduce(Array &Product, const size_t Degree)
 	{
 		ushort ret = 0;
-		size_t i = Degree;
+		int i = static_cast<int>(Degree - 1);
 		std::vector<ulong> tmp(Degree);
+
 		std::memcpy(&tmp[0], &Product[0], Degree * sizeof(ulong));
 
-		while (i--)
+		while (i >= 0)
 		{
 			tmp[i] ^= (tmp[i] >> 32);
 			tmp[i] ^= (tmp[i] >> 16);
@@ -550,18 +457,19 @@ public:
 			tmp[i] ^= (tmp[i] >> 4);
 			ret <<= 1;
 			ret |= (0x6996 >> (tmp[i] & 0xF)) & 1;
+			--i;
 		};
 
 		return ret;
 	}
 
 	template<typename Array>
-	inline static void TransposeCompact64x64(Array &Output)
+	static void TransposeCompact64x64(Array &Output)
 	{
 		int i, j, s, p, idx0, idx1;
 		ulong x, y;
 
-		const std::array<std::array<ulong, 2>, 6> mask =
+		static const std::array<std::array<ulong, 2>, 6> mask =
 		{
 			{
 				{ 0X5555555555555555, 0XAAAAAAAAAAAAAAAA },
@@ -593,9 +501,9 @@ public:
 	}
 
 	template<typename Array>
-	inline static void Transpose8x64(Array &Output)
+	static void Transpose8x64(Array &Output)
 	{
-		const std::array<std::array<ulong, 2>, 3> mask =
+		static const std::array<std::array<ulong, 2>, 3> mask =
 		{
 			{
 				{ 0X5555555555555555, 0XAAAAAAAAAAAAAAAA },
@@ -657,11 +565,11 @@ public:
 	}
 
 	template<typename Array>
-	inline static int Weight(Array &A)
+	static int Weight(Array &A)
 	{
 		size_t i;
 		std::array<ulong, 8> state;
-		std::memset(&state[0], (byte)0, 64);
+		std::memset(&state[0], 0, 64);
 
 		for (i = 0; i < 64; i++)
 		{

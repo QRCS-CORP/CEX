@@ -3,23 +3,6 @@
 
 NAMESPACE_ASYMMETRICKEY
 
-//~~~Properties~~~//
-
-const AsymmetricEngines RLWEPublicKey::CipherType()
-{
-	return Enumeration::AsymmetricEngines::RingLWE;
-}
-
-const RLWEParams RLWEPublicKey::Parameters()
-{
-	return m_rlweParameters;
-}
-
-const std::vector<byte> &RLWEPublicKey::P()
-{
-	return m_pCoeffs;
-}
-
 //~~~Constructor~~~//
 
 RLWEPublicKey::RLWEPublicKey(RLWEParams Parameters, std::vector<byte> &P)
@@ -47,6 +30,23 @@ RLWEPublicKey::~RLWEPublicKey()
 	Destroy();
 }
 
+//~~~Accessors~~~//
+
+const AsymmetricEngines RLWEPublicKey::CipherType()
+{
+	return Enumeration::AsymmetricEngines::RingLWE;
+}
+
+const RLWEParams RLWEPublicKey::Parameters()
+{
+	return m_rlweParameters;
+}
+
+const std::vector<byte> &RLWEPublicKey::P()
+{
+	return m_pCoeffs;
+}
+
 //~~~Public Functions~~~//
 
 void RLWEPublicKey::Destroy()
@@ -57,7 +57,9 @@ void RLWEPublicKey::Destroy()
 		m_rlweParameters = RLWEParams::None;
 
 		if (m_pCoeffs.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_pCoeffs);
+		}
 	}
 }
 
@@ -65,6 +67,7 @@ std::vector<byte> RLWEPublicKey::ToBytes()
 {
 	uint pLen = static_cast<uint>(m_pCoeffs.size());
 	std::vector<byte> p(pLen + 5);
+
 	p[0] = static_cast<byte>(m_rlweParameters);
 	Utility::IntUtils::Le32ToBytes(pLen, p, 1);
 	Utility::MemUtils::Copy(m_pCoeffs, 0, p, 5, pLen);

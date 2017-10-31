@@ -12,7 +12,106 @@ NAMESPACE_RINGLWE
 
 const std::string RingLWE::CLASS_NAME = "RingLWE";
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+RingLWE::RingLWE(RLWEParams Parameters, Prngs PrngType, BlockCiphers CipherType, bool Parallel)
+	:
+	m_cprMode(CipherType != BlockCiphers::None ? new Symmetric::Block::Mode::GCM(CipherType) :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The cipher type can not be none!")),
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_keyTag(0),
+	m_isParallel(Parallel),
+	m_msgDigest(static_cast<byte>(CipherType) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
+	m_paramSet(),
+	m_rlweParameters(Parameters != RLWEParams::None ? Parameters :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
+	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The prng type can not be none!"))
+{
+	Scope();
+}
+
+RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng, IBlockCipher* Cipher, bool Parallel)
+	:
+	m_cprMode(Cipher != nullptr ? new Symmetric::Block::Mode::GCM(Cipher) : 
+		throw CryptoAsymmetricException("RingLWE:CTor", "The block cipher can not be null!")),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isParallel(Parallel),
+	m_keyTag(0),
+	m_msgDigest(static_cast<byte>(Cipher->Enumeral()) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
+	m_paramSet(),
+	m_rlweParameters(Parameters != RLWEParams::None ? Parameters :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
+	m_rndGenerator(Prng != nullptr ? Prng :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The prng can not be null!"))
+{
+	if (Cipher->KdfEngine() == Digests::Keccak256 || Cipher->KdfEngine() == Digests::Keccak1024 || Cipher->KdfEngine() == Digests::Skein1024)
+	{
+		throw CryptoAsymmetricException("RingLWE:CTor", "Keccak256, Keccak1024, and Skein1024 are not supported HX cipher kdf engines!");
+	}
+
+	Scope();
+}
+
+RingLWE::~RingLWE()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isParallel = false;
+		m_paramSet.Reset();
+		m_rlweParameters = RLWEParams::None;
+		Utility::IntUtils::ClearVector(m_keyTag);
+
+		// release keys
+		if (m_privateKey != nullptr)
+		{
+			m_privateKey.release();
+		}
+		if (m_publicKey != nullptr)
+		{
+			m_publicKey.release();
+		}
+		// destroy the persistant hash function
+		if (m_msgDigest != nullptr)
+		{
+			m_msgDigest.reset(nullptr);
+		}
+		// destroy the mode
+		if (m_cprMode != nullptr)
+		{
+			m_cprMode.reset(nullptr);
+		}
+
+		if (m_destroyEngine)
+		{
+			if (m_rndGenerator != nullptr)
+			{
+				// destroy internally generated objects
+				m_rndGenerator.reset(nullptr);
+			}
+			m_destroyEngine = false;
+		}
+		else
+		{
+			if (m_rndGenerator != nullptr)
+			{
+				// release the generator (received through ctor2) back to caller
+				m_rndGenerator.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const AsymmetricEngines RingLWE::Enumeral()
 {
@@ -49,71 +148,6 @@ std::vector<byte> &RingLWE::Tag()
 	return m_keyTag;
 }
 
-//~~~Constructor~~~//
-
-RingLWE::RingLWE(RLWEParams Parameters, Prngs PrngType, BlockCiphers CipherType, bool Parallel)
-	:
-	m_cprMode(new Symmetric::Block::Mode::GCM(CipherType)),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_keyTag(0),
-	m_isParallel(Parallel),
-	m_msgDigest(static_cast<byte>(CipherType) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
-	m_paramSet(),
-	m_rlweParameters(Parameters),
-	m_rndGenerator(Helper::PrngFromName::GetInstance(PrngType))
-{
-	if (m_rlweParameters == RLWEParams::None)
-	{
-		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!");
-	}
-	// note: passing "None" as a block cipher or prng type parameter will cause the helper methods to throw,
-	// which will be forwarded back to the caller through this constructor method, so there is no neen for input validity checks
-
-	Scope();
-}
-
-RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng, IBlockCipher* Cipher, bool Parallel)
-	:
-	m_cprMode(new Symmetric::Block::Mode::GCM(Cipher)),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isParallel(Parallel),
-	m_keyTag(0),
-	m_msgDigest(static_cast<byte>(Cipher->Enumeral()) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
-	m_paramSet(),
-	m_rlweParameters(Parameters),
-	m_rndGenerator(Prng)
-{
-	if (m_rlweParameters == RLWEParams::None)
-	{
-		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!");
-	}
-	if (Cipher->KdfEngine() == Digests::Keccak256 || Cipher->KdfEngine() == Digests::Keccak1024 || Cipher->KdfEngine() == Digests::Skein1024)
-	{
-		throw CryptoAsymmetricException("RingLWE:CTor", "Keccak256, Keccak1024, and Skein1024 are not supported HX cipher kdf engines!");
-	}
-	if (m_cprMode == nullptr)
-	{
-		throw CryptoAsymmetricException("RingLWE:CTor", "The block cipher can not be null!");
-	}
-	if (m_rndGenerator == nullptr)
-	{
-		throw CryptoAsymmetricException("RingLWE:CTor", "The prng can not be null!");
-	}
-
-	Scope();
-}
-
-RingLWE::~RingLWE()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 std::vector<byte> RingLWE::Decrypt(const std::vector<byte> &CipherText)
@@ -140,52 +174,6 @@ std::vector<byte> RingLWE::Decrypt(const std::vector<byte> &CipherText)
 	else
 	{
 		throw CryptoAsymmetricException("RingLWE:Decrypt", "The parameter type is invalid!");
-	}
-}
-
-void RingLWE::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_isParallel = false;
-		m_paramSet.Reset();
-		m_rlweParameters = RLWEParams::None;
-		Utility::IntUtils::ClearVector(m_keyTag);
-
-		// release keys
-		if (m_privateKey != nullptr)
-		{
-			m_privateKey.release();
-		}
-		if (m_publicKey != nullptr)
-		{
-			m_publicKey.release();
-		}
-		// destroy the persistant hash function
-		if (m_msgDigest != nullptr)
-		{
-			m_msgDigest.reset(nullptr);
-		}
-		// destroy the mode
-		if (m_cprMode != nullptr)
-		{
-			m_cprMode.reset(nullptr);
-		}
-
-		if (m_destroyEngine)
-		{
-			// destroy internally generated objects
-			m_rndGenerator.reset(nullptr);
-			m_destroyEngine = false;
-		}
-		else
-		{
-			// release the generator (received through ctor2) back to caller
-			m_rndGenerator.release();
-		}
 	}
 }
 
@@ -243,6 +231,20 @@ void RingLWE::Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair)
 	{
 		throw CryptoAsymmetricException("RingLWE:Initialize", "Encryption requires a valid public key!");
 	}
+	if (Encryption)
+	{
+		if (KeyPair->PublicKey()->CipherType() != AsymmetricEngines::RingLWE)
+		{
+			throw CryptoAsymmetricException("RingLWE:Initialize", "Encryption requires a valid public key!");
+		}
+	}
+	else
+	{
+		if (KeyPair->PrivateKey()->CipherType() != AsymmetricEngines::RingLWE)
+		{
+			throw CryptoAsymmetricException("RingLWE:Initialize", "Decryption requires a valid private key!");
+		}
+	}
 
 	m_keyTag = KeyPair->Tag();
 
@@ -264,6 +266,7 @@ void RingLWE::Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair)
 bool RingLWE::RLWEDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message, std::vector<byte> &Secret)
 {
 	Key::Symmetric::SymmetricKeySize keySizes;
+	bool status;
 
 	if (static_cast<byte>(m_cprMode->Engine()->Enumeral()) < static_cast<byte>(BlockCiphers::AHX))
 	{
@@ -293,12 +296,9 @@ bool RingLWE::RLWEDecrypt(const std::vector<byte> &CipherText, std::vector<byte>
 	m_cprMode->Initialize(false, kp);
 	m_cprMode->Transform(CipherText, CipherText.size() - (Message.size() + keySizes.InfoSize()), Message, 0, Message.size());
 
-	if (m_cprMode->Verify(CipherText, CipherText.size() - keySizes.InfoSize(), keySizes.InfoSize()))
-	{
-		return true;
-	}
+	status = (m_cprMode->Verify(CipherText, CipherText.size() - keySizes.InfoSize(), keySizes.InfoSize()));
 
-	return false;
+	return status;
 }
 
 void RingLWE::RLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, std::vector<byte> &Secret)

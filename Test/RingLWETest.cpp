@@ -52,12 +52,12 @@ namespace Test
 	void RingLWETest::SerializationCompare()
 	{
 		std::vector<byte> skey;
-
-		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024);
+		RingLWE asyCpr(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::BCR, Enumeration::BlockCiphers::Rijndael);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr.Generate();
+
+			IAsymmetricKeyPair* kp = asyCpr.Generate();
 			RLWEPrivateKey* priK1 = (RLWEPrivateKey*)kp->PrivateKey();
 			skey = priK1->ToBytes();
 			RLWEPrivateKey priK2(skey);
@@ -76,9 +76,18 @@ namespace Test
 				throw TestException("RingLWETest: Public key serialization test has failed!");
 			}
 
-			delete kp;
-			delete priK1;
-			delete pubK1;
+			if (kp != nullptr)
+			{
+				delete kp;
+			}
+			if (priK1 != nullptr)
+			{
+				delete priK1;
+			}
+			if (pubK1 != nullptr)
+			{
+				delete pubK1;
+			}
 		}
 	}
 

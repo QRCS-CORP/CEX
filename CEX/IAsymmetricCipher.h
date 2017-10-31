@@ -51,39 +51,53 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IAsymmetricCipher() {}
+	IAsymmetricCipher(const IAsymmetricCipher&) = delete;
 
 	/// <summary>
-	/// Finalizer
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IAsymmetricCipher() noexcept {}
-
-	//~~~Properties~~~//
+	IAsymmetricCipher& operator=(const IAsymmetricCipher&) = delete;
 
 	/// <summary>
-	/// Get: The cipher type-name
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IAsymmetricCipher() 
+	{
+	}
+
+	/// <summary>
+	/// Finalizer: destroys the containers objects
+	/// </summary>
+	virtual ~IAsymmetricCipher() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The cipher type-name
 	/// </summary>
 	virtual const AsymmetricEngines Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The cipher is initialized for encryption
+	/// Read Only: The cipher is initialized for encryption
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
 	/// <summary>
-	/// Get: The cipher has been initialized with a key
+	/// Read Only: The cipher has been initialized with a key
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: The ciphers name
+	/// Read Only: The ciphers name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get/Set: A new asymmetric key-pairs optional identification tag.
+	/// Read/Write: A new asymmetric key-pairs optional identification tag.
 	/// <para>Setting this value must be done before the Generate method is called.</para>
 	/// </summary>
 	virtual std::vector<byte> &Tag() = 0;
@@ -96,11 +110,6 @@ public:
 	/// 
 	/// <param name="CipherText">The input cipher-text</param>
 	virtual std::vector<byte> Decrypt(const std::vector<byte> &CipherText) = 0;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Encrypt a shared secret and return the encrypted message

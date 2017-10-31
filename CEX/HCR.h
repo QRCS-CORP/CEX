@@ -38,7 +38,7 @@ using Enumeration::Providers;
 /// <description>Example of generating a pseudo random integer:</description>
 /// <code>
 /// HCR rnd([Digests], [Providers], [Buffer Size]);
-/// int num = rnd.Next([Minimum], [Maximum]);
+/// int num = rnd.NextUInt32([Minimum], [Maximum]);
 /// </code>
 /// </example>
 /// 
@@ -61,40 +61,38 @@ using Enumeration::Providers;
 /// </list>
 /// 
 /// </remarks>
-class HCR : public IPrng
+class HCR final : public IPrng
 {
 private:
 	static const size_t BUFFER_SIZE = 1024;
-	static const size_t BUFFER_MIN = 64;
+	static const size_t MIN_BUFSZE = 64;
 	static const std::string CLASS_NAME;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
 	Digests m_digestType;
 	bool m_isDestroyed;
-	Drbg::HCG* m_rngGenerator;
 	Providers m_pvdType;
 	std::vector<byte> m_rndSeed;
 	std::vector<byte> m_rngBuffer;
+	std::unique_ptr<Drbg::HCG> m_rngGenerator;
 
 public:
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The random generators type name
-	/// </summary>
-	const Prngs Enumeral() override;
-
-	/// <summary>
-	/// Get: The random generators class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize the class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	HCR(const HCR&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	HCR& operator=(const HCR&) = delete;
+
+	/// <summary>
+	/// Initialize the class with parameters
 	/// </summary>
 	/// 
 	/// <param name="DigestEngine">The digest that powers the rng (default is Keccak512)</param>
@@ -102,7 +100,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	HCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
+	explicit HCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -116,16 +114,23 @@ public:
 	explicit HCR(std::vector<byte> Seed, Digests DigestEngine = Digests::Keccak512, size_t BufferSize = 1024);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~HCR() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The random generators type name
 	/// </summary>
-	void Destroy();
+	const Prngs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The random generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
@@ -175,78 +180,21 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUShort() override;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUShort(ushort Maximum) override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUShort(ushort Maximum, ushort Minimum) override;
+	ushort NextUInt16() override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	uint Next() override;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Maximum) override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Maximum, uint Minimum) override;
+	uint NextUInt32() override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextULong() override;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextULong(ulong Maximum) override;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextULong(ulong Maximum, ulong Minimum) override;
+	ulong NextUInt64() override;
 
 	/// <summary>
 	/// Reset the generator instance
@@ -255,7 +203,6 @@ public:
 
 private:
 
-	ulong GetRanged(ulong Maximum, size_t Length);
 	uint GetMinimumSeedSize(Digests RngEngine);
 };
 

@@ -174,10 +174,10 @@ public:
 	template<typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		zmm = _mm512_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3],
-			(uint)Input[Offset + 4], (uint)Input[Offset + 5], (uint)Input[Offset + 6], (uint)Input[Offset + 7],
-				(uint)Input[Offset + 8], (uint)Input[Offset + 9], (uint)Input[Offset + 10], (uint)Input[Offset + 11], 
-					(uint)Input[Offset + 12], (uint)Input[Offset + 13], (uint)Input[Offset + 14], (uint)Input[Offset + 15]);
+		zmm = _mm512_set_epi32(static_cast<uint>(Input[Offset]), static_cast<uint>(Input[Offset + 1]), static_cast<uint>(Input[Offset + 2]), static_cast<uint>(Input[Offset + 3]),
+			static_cast<uint>(Input[Offset + 4]), static_cast<uint>(Input[Offset + 5]), static_cast<uint>(Input[Offset + 6]), static_cast<uint>(Input[Offset + 7]),
+			static_cast<uint>(Input[Offset + 8]), static_cast<uint>(Input[Offset + 9]), static_cast<uint>(Input[Offset + 10]), static_cast<uint>(Input[Offset + 11]),
+			static_cast<uint>(Input[Offset + 12]), static_cast<uint>(Input[Offset + 13]), static_cast<uint>(Input[Offset + 14]), static_cast<uint>(Input[Offset + 15]));
 	}
 
 	/// <summary>

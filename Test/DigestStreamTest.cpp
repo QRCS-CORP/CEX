@@ -32,7 +32,7 @@ namespace Test
 	void DigestStreamTest::CompareOutput(Enumeration::Digests Engine)
 	{
 		Prng::SecureRandom rnd;
-		std::vector<byte> data(rnd.NextInt32(1000, 100));
+		std::vector<byte> data(rnd.NextUInt32(1000, 100));
 		rnd.GetBytes(data);
 
 		// digest instance for baseline

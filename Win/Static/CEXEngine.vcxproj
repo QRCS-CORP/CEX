@@ -91,7 +91,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -116,7 +116,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
@@ -183,7 +183,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>
       </AdditionalOptions>
-      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
@@ -382,6 +382,7 @@
     <ClCompile Include="..\..\CEX\BitConverter.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
     <ClCompile Include="..\..\CEX\Blake512.cpp" />
+    <ClCompile Include="..\..\CEX\BlakeParams.cpp" />
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp" />
     <ClCompile Include="..\..\CEX\CBC.cpp" />
     <ClCompile Include="..\..\CEX\CFB.cpp" />
@@ -435,7 +436,9 @@
     <ClCompile Include="..\..\CEX\Keccak1024.cpp" />
     <ClCompile Include="..\..\CEX\Keccak256.cpp" />
     <ClCompile Include="..\..\CEX\Keccak512.cpp" />
+    <ClCompile Include="..\..\CEX\KeccakParams.cpp" />
     <ClCompile Include="..\..\CEX\McEliece.cpp" />
+    <ClCompile Include="..\..\CEX\McElieceUtils.cpp" />
     <ClCompile Include="..\..\CEX\MPKCKeyPair.cpp" />
     <ClCompile Include="..\..\CEX\MPKCParamSet.cpp" />
     <ClCompile Include="..\..\CEX\MPKCPrivateKey.cpp" />
@@ -451,10 +454,13 @@
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
     <ClCompile Include="..\..\CEX\SHA256.cpp" />
+    <ClCompile Include="..\..\CEX\SHA2Params.cpp" />
     <ClCompile Include="..\..\CEX\SHA512.cpp" />
     <ClCompile Include="..\..\CEX\Skein1024.cpp" />
     <ClCompile Include="..\..\CEX\Skein256.cpp" />
     <ClCompile Include="..\..\CEX\Skein512.cpp" />
+    <ClCompile Include="..\..\CEX\SkeinParams.cpp" />
+    <ClCompile Include="..\..\CEX\SkeinUbiTweak.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricKeyGenerator.cpp" />
     <ClCompile Include="..\..\CEX\MacDescription.cpp" />
     <ClCompile Include="..\..\CEX\MacFromDescription.cpp" />

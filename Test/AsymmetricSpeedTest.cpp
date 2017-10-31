@@ -78,7 +78,7 @@ namespace Test
 	void AsymmetricSpeedTest::MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher)
 	{
 		Cipher::Asymmetric::McEliece::McEliece asyCpr(Params, Rng, Cipher);
-		Key::Asymmetric::IAsymmetricKeyPair* kp;
+		Key::Asymmetric::IAsymmetricKeyPair* kp = nullptr;
 
 		uint64_t start = TestUtils::GetTimeMs64();
 
@@ -167,7 +167,7 @@ namespace Test
 	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher)
 	{
 		Cipher::Asymmetric::RLWE::RingLWE asyCpr(Params, Rng, Cipher, Parallel);
-		Key::Asymmetric::IAsymmetricKeyPair* kp;
+		Key::Asymmetric::IAsymmetricKeyPair* kp = nullptr;
 
 		uint64_t start = TestUtils::GetTimeMs64();
 

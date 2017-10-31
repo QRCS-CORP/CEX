@@ -1,5 +1,5 @@
-﻿#ifndef _CEXTEST_RIJNDAELTEST_H
-#define _CEXTEST_RIJNDAELTEST_H
+﻿#ifndef CEXTEST_RIJNDAELTEST_H
+#define CEXTEST_RIJNDAELTEST_H
 
 #include "ITest.h"
 

@@ -14,7 +14,32 @@ NAMESPACE_PROVIDER
 
 const std::string ACP::CLASS_NAME("ACP");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+ACP::ACP()
+	:
+	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::Digests::SHA512, 38))),
+	m_hasRdrand(false),
+	m_hasTsc(false),
+	m_isAvailable(true)
+{
+	Scope();
+	Reset();
+}
+
+ACP::~ACP()
+{
+	m_hasTsc = false;
+	m_hasRdrand = false;
+	m_isAvailable = false;
+
+	if (m_cipherMode != nullptr)
+	{
+		m_cipherMode.reset(nullptr);
+	}
+}
+
+//~~~Accessors~~~//
 
 const Enumeration::Providers ACP::Enumeral()
 {
@@ -31,31 +56,7 @@ const std::string ACP::Name()
 	return CLASS_NAME;
 }
 
-//~~~Constructor~~~//
-
-ACP::ACP()
-	:
-	m_cipherMode(0),
-	m_hasRdrand(false),
-	m_hasTsc(false),
-	m_isAvailable(true)
-{
-	Scope();
-	Reset();
-}
-
-ACP::~ACP()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void ACP::Destroy()
-{
-	if (m_cipherMode != 0)
-		delete m_cipherMode;
-}
 
 void ACP::GetBytes(std::vector<byte> &Output)
 {
@@ -66,26 +67,31 @@ void ACP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
-	std::vector<byte> data(Length);
-	m_cipherMode->Transform(data, 0, Output, Offset, Length);
+	if (!m_isAvailable)
+	{
+		throw CryptoRandomException("ACP:GetBytes", "Random provider is not available!");
+	}
+
+	std::vector<byte> rnd(Length);
+	m_cipherMode->Transform(rnd, 0, Output, Offset, Length);
 }
 
 std::vector<byte> ACP::GetBytes(size_t Length)
 {
-	std::vector<byte> data(Length);
-	GetBytes(data);
+	std::vector<byte> rnd(Length);
+	GetBytes(rnd, 0, rnd.size());
 
-	return data;
+	return rnd;
 }
 
 uint ACP::Next()
 {
-	uint rndNum;
-	std::vector<byte> rndData(sizeof(uint));
-	GetBytes(rndData);
-	Utility::MemUtils::CopyToValue(rndData, 0, rndNum, sizeof(uint));
+	uint num;
+	std::vector<byte> rnd(sizeof(uint));
+	GetBytes(rnd);
+	Utility::MemUtils::CopyToValue(rnd, 0, num, sizeof(uint));
 
-	return rndNum;
+	return num;
 }
 
 void ACP::Reset()
@@ -102,9 +108,7 @@ void ACP::Reset()
 		throw CryptoRandomException("ACP:Reset", "Entropy collection has failed!", std::string(ex.what()));
 	}
 
-	// Note: this uses the extended version of rijndael, using 38 rounds for maximum diffusion
-	Cipher::Symmetric::Block::IBlockCipher* eng = Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::Digests::SHA512, 38);
-	m_cipherMode = new Cipher::Symmetric::Block::Mode::CTR(eng);
+	// Note: this provider uses the extended version of rijndael, using 38 rounds for maximum diffusion
 	// get the iv and hkdf-info from system provider
 	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[0];
 	std::vector<byte> info(keySize.InfoSize());
@@ -161,7 +165,9 @@ std::vector<byte> ACP::Collect()
 	// last block size
 	size_t padLen = ((state.size() % KBLK) == 0) ? KBLK : KBLK - (state.size() % KBLK);
 	if (padLen < KBLK / 2)
+	{
 		padLen += KBLK;
+	}
 
 	// forward padding
 	CSP cvd;
@@ -185,9 +191,11 @@ std::vector<byte> ACP::Compress(std::vector<byte> &State)
 void ACP::Filter(std::vector<byte> &State)
 {
 	if (State.size() == 0)
+	{
 		return;
+	}
 
-	Utility::ArrayUtils::Remove((byte)0, State);
+	Utility::ArrayUtils::Remove(static_cast<byte>(0), State);
 }
 
 std::vector<byte> ACP::MemoryInfo()

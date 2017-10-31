@@ -59,56 +59,12 @@ private:
 
 public:
 
-	CipherDescription& operator=(const CipherDescription&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// The Cryptographic Engine type
-	/// </summary>
-	const BlockCiphers EngineType();
-
-	/// <summary>
-	/// Get: The cipher Key Size
-	/// </summary>
-	const short KeySize() const;
-
-	/// <summary>
-	/// Set: The cipher Key Size
-	/// </summary>
-	short &KeySize();
-
-	/// <summary>
-	/// Size of the cipher Initialization Vector
-	/// </summary>
-	const IVSizes IvSize();
-
-	/// <summary>
-	/// The type of Cipher Mode
-	/// </summary>
-	const CipherModes CipherType();
-
-	/// <summary>
-	/// The type of cipher Padding Mode
-	/// </summary>
-	const PaddingModes PaddingType();
-
-	/// <summary>
-	/// The cipher Block Size
-	/// </summary>
-	const BlockSizes BlockSize();
-
-	/// <summary>
-	/// The number of transformation Rounds
-	/// </summary>
-	const RoundCounts RoundCount();
-
-	/// <summary>
-	/// The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
-	/// </summary>
-	const Digests KdfEngine();
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	CipherDescription& operator=(const CipherDescription&) = delete;
 
 	/// <summary>
 	/// Default constructor
@@ -116,7 +72,7 @@ public:
 	CipherDescription();
 
 	/// <summary>
-	/// Initialize a CipherDescription struct
+	/// Initialize a CipherDescription struct with parameters
 	/// </summary>
 	/// 
 	/// <param name="EngineType">The cipher type</param>
@@ -126,28 +82,75 @@ public:
 	/// <param name="PaddingType">The type of cipher padding mode</param>
 	/// <param name="BlockSize">The cipher block size</param>
 	/// <param name="RoundCount">The number of transformation rounds</param>
-	/// <param name="KdfEngine">The digest engine used to power the key schedule key derivation Function in HX extended ciphers</param>
+	/// <param name="DigestType">The digest engine used to power the key schedule key derivation Function in HX extended ciphers</param>
 	CipherDescription(BlockCiphers EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType,
-		PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine = Digests::SHA512);
+		PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests DigestType = Digests::SHA512);
 
 	/// <summary>
-	/// Initialize the CipherDescription structure using a byte array
-	/// </summary>
-	/// 
-	/// <param name="DescriptionArray">The byte array containing the CipherDescription</param>
-	explicit CipherDescription(const std::vector<byte> &DescriptionArray);
-
-	/// <summary>
-	/// Initialize the CipherDescription structure using a Stream
+	/// Initialize the CipherDescription structure using a serialized cipher description stream
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the CipherDescription</param>
 	explicit CipherDescription(const MemoryStream &DescriptionStream);
 
 	/// <summary>
-	/// Finalize objects
+	/// Initialize the CipherDescription structure using a serialized cipher description array
+	/// </summary>
+	/// 
+	/// <param name="DescriptionArray">The byte array containing the CipherDescription</param>
+	explicit CipherDescription(const std::vector<byte> &DescriptionArray);
+
+	/// <summary>
+	/// Destructor: finalize this class
 	/// </summary>
 	~CipherDescription();
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Cryptographic Engine type
+	/// </summary>
+	const BlockCiphers EngineType();
+
+	/// <summary>
+	/// Read Only: The cipher Key Size
+	/// </summary>
+	const short KeySize() const;
+
+	/// <summary>
+	/// Read/Write: The cipher Key Size
+	/// </summary>
+	short &KeySize();
+
+	/// <summary>
+	/// Read Only: Size of the cipher Initialization Vector
+	/// </summary>
+	const IVSizes IvSize();
+
+	/// <summary>
+	/// Read Only: The type of Cipher Mode
+	/// </summary>
+	const CipherModes CipherType();
+
+	/// <summary>
+	/// Read Only: The type of cipher Padding Mode
+	/// </summary>
+	const PaddingModes PaddingType();
+
+	/// <summary>
+	/// Read Only: The cipher Block Size
+	/// </summary>
+	const BlockSizes BlockSize();
+
+	/// <summary>
+	/// Read Only: The number of transformation Rounds
+	/// </summary>
+	const RoundCounts RoundCount();
+
+	/// <summary>
+	/// Read Only: The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
+	/// </summary>
+	const Digests KdfEngine();
 
 	//~~~Public Functions~~~//
 

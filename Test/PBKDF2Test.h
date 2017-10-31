@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_PBKDF2DRBGTEST_H
-#define _CEXTEST_PBKDF2DRBGTEST_H
+#ifndef CEXTEST_PBKDF2DRBGTEST_H
+#define CEXTEST_PBKDF2DRBGTEST_H
 
 #include "ITest.h"
 #include "../CEX/IDigest.h"

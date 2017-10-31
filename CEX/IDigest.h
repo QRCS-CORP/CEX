@@ -19,58 +19,69 @@ class IDigest
 {
 public:
 
-	IDigest(const IDigest&) = delete;
-	IDigest& operator=(const IDigest&) = delete;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IDigest() {}
+	IDigest(const IDigest&) = delete;
 
 	/// <summary>
-	/// Finalizer
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IDigest() noexcept {}
-
-	//~~~Properties~~~//
+	IDigest& operator=(const IDigest&) = delete;
 
 	/// <summary>
-	/// Get: The Digests internal block size in bytes
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IDigest() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IDigest() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Digests internal block size in bytes
 	/// </summary>
 	virtual size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get: Size of returned hash value in bytes
+	/// Read Only: Size of returned hash value in bytes
 	/// </summary>
 	virtual size_t DigestSize() = 0;
 
 	/// <summary>
-	/// Get: The digests type name
+	/// Read Only: The digests type name
 	/// </summary>
 	virtual const Digests Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Processor parallelization availability.
+	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Get: The digests class name
+	/// Read Only: The digests class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
+	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// Read/Write: Parallel and SIMD capability flags and sizes 
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
@@ -86,11 +97,6 @@ public:
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The hash output value array</param>
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Do final processing and get the hash value

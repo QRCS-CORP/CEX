@@ -3,46 +3,40 @@
 
 NAMESPACE_PROCESSING
 
-//~~~Properties~~~//
-
-const std::vector<SymmetricKeySize> MacStream::LegalKeySizes()
-{
-	return m_macEngine->LegalKeySizes();
-}
-
 //~~~Constructor~~~//
 
 MacStream::MacStream(MacDescription &Description)
 	:
-	m_macEngine(0),
+	m_macEngine(Description.MacType() != Macs::GMAC ? Helper::MacFromDescription::GetInstance(Description) :
+		throw CryptoProcessingException("MacStream:CTor", "GMAC is not supported!")),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_progressInterval(0)
 {
-	if (Description.MacType() == Macs::GMAC)
-		throw CryptoProcessingException("MacStream:CTor", "GMAC is not supported!");
-
-	m_macEngine = Helper::MacFromDescription::GetInstance(Description);
 }
 
 MacStream::MacStream(IMac* Mac)
 	:
-	m_macEngine(Mac),
+	m_macEngine(Mac != nullptr && Mac->Enumeral() != Macs::GMAC ? Mac :
+		throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!")),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_progressInterval(0)
 {
-	if (Mac == 0)
-		throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!");
-	if (Mac->Enumeral() == Macs::GMAC)
-		throw CryptoProcessingException("MacStream:CTor", "GMAC is not supported!");
 }
 
 MacStream::~MacStream()
 {
 	Destroy();
+}
+
+//~~~Accessors~~~//
+
+const std::vector<SymmetricKeySize> MacStream::LegalKeySizes()
+{
+	return m_macEngine->LegalKeySizes();
 }
 
 //~~~Public Functions~~~//
@@ -73,7 +67,9 @@ std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOf
 void MacStream::Initialize(ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
 		throw CryptoProcessingException("CipherStream:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	}
 
 	try
 	{
@@ -93,27 +89,39 @@ void MacStream::CalculateInterval(size_t Length)
 	size_t interval = Length / 100;
 
 	if (interval < m_macEngine->BlockSize())
+	{
 		m_progressInterval = m_macEngine->BlockSize();
+	}
 	else
+	{
 		m_progressInterval = (interval - (interval % m_macEngine->BlockSize()));
+	}
 
 	if (m_progressInterval == 0)
+	{
 		m_progressInterval = m_macEngine->BlockSize();
+	}
 }
 
 void MacStream::CalculateProgress(size_t Length, size_t Processed)
 {
 	if (Length >= Processed)
 	{
-		double progress = 100.0 * ((double)Processed / Length);
+		double progress = 100.0 * (static_cast<double>(Processed) / Length);
 		if (progress > 100.0)
+		{
 			progress = 100.0;
+		}
 
 		size_t block = Length / 100;
 		if (block == 0)
-			ProgressPercent((int)progress);
+		{
+			ProgressPercent(static_cast<int>(progress));
+		}
 		else if (Processed % block == 0)
-			ProgressPercent((int)progress);
+		{
+			ProgressPercent(static_cast<int>(progress));
+		}
 	}
 }
 
@@ -127,8 +135,19 @@ void MacStream::Destroy()
 
 		if (m_destroyEngine)
 		{
-			delete m_macEngine;
 			m_destroyEngine = false;
+
+			if (m_macEngine != nullptr)
+			{
+				m_macEngine.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_macEngine != nullptr)
+			{
+				m_macEngine.release();
+			}
 		}
 	}
 }

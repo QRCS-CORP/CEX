@@ -68,7 +68,7 @@ class DigestStream
 {
 private:
 
-	IDigest* m_digestEngine;
+	std::unique_ptr<IDigest> m_digestEngine;
 	bool m_destroyEngine;
 	bool m_isDestroyed = false;
 	bool m_isParallel;
@@ -76,40 +76,27 @@ private:
 
 public:
 
-	DigestStream() = delete;
-	DigestStream(const DigestStream&) = delete;
-	DigestStream& operator=(const DigestStream&) = delete;
-	DigestStream& operator=(DigestStream&&) = delete;
-
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
 	Event<int> ProgressPercent;
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get/Set: Automatic processor parallelization capable.
-	/// <para>This value is true if the host supports parallelization.
-	/// If the system and digest configuration both support parallelization, it can be disabled by setting this value to false.</para>
-	/// </summary>
-	bool IsParallel();
-
-	/// <summary>
-	/// Get/Set: Parallel block size. Must be a multiple of ParallelProfile().ParallelMinimumSize()
-	/// </summary>
-	size_t ParallelBlockSize();
-
-	/// <summary>
-	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
-	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
-	/// and reinitialize the state.</para>
-	/// </summary>
-	ParallelOptions &ParallelProfile();
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	DigestStream(const DigestStream&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	DigestStream& operator=(const DigestStream&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	DigestStream() = delete;
 
 	/// <summary>
 	/// Initialize the class with a digest enumeration
@@ -117,6 +104,8 @@ public:
 	/// 
 	/// <param name="Digest">The digest enumeration member</param>
 	/// <param name="Parallel">Instantiates the multi-threaded implementation of the digest</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	explicit DigestStream(Digests Digest, bool Parallel = false);
 
 	/// <summary>
@@ -126,13 +115,36 @@ public:
 	/// 
 	/// <param name="Digest">The initialized Digest instance</param>
 	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null Digest is used</exception>
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null digest is used</exception>
 	explicit DigestStream(IDigest* Digest);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~DigestStream();
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Automatic processor parallelization capable.
+	/// <para>This value is true if the host supports parallelization.
+	/// If the system and digest configuration both support parallelization, it can be disabled by setting this value to false.</para>
+	/// </summary>
+	bool IsParallel();
+
+	/// <summary>
+	/// Read/Write: Parallel block size. Must be a multiple of ParallelProfile().ParallelMinimumSize()
+	/// </summary>
+	size_t ParallelBlockSize();
+
+	/// <summary>
+	/// Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
+	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
+	/// and reinitialize the state.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile();
 
 	//~~~Public Functions~~~//
 

@@ -20,39 +20,48 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IProvider() {}
+	IProvider(const IProvider&) = delete;
 
 	/// <summary>
-	/// Destructor
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IProvider() noexcept {}
-
-	//~~~Properties~~~//
+	IProvider& operator=(const IProvider&) = delete;
 
 	/// <summary>
-	/// Get: The providers type name
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IProvider() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IProvider() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The providers type name
 	/// </summary>
 	virtual const Providers Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The entropy provider is available on this system
+	/// Read Only: The entropy provider is available on this system
 	/// </summary>
 	virtual const bool IsAvailable() = 0;
 
 	/// <summary>
-	/// Get: The provider class name
+	/// Read Only: The provider class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	//~~~Public Functions~~~//
 
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
-	
 	/// <summary>
 	/// Fill a buffer with pseudo-random bytes
 	/// </summary>
@@ -61,7 +70,7 @@ public:
 	virtual void GetBytes(std::vector<byte> &Output) = 0;
 
 	/// <summary>
-	/// Fill the buffer with pseudo-random bytes
+	/// Fill the buffer with pseudo-random bytes using offsets
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>

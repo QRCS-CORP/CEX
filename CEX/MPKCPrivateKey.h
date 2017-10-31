@@ -22,29 +22,22 @@ private:
 
 public:
 
-	MPKCPrivateKey() = delete;
-	MPKCPrivateKey(const MPKCPrivateKey&) = delete;
-	MPKCPrivateKey& operator=(const MPKCPrivateKey&) = delete;
-	MPKCPrivateKey& operator=(MPKCPrivateKey&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The private keys cipher type name
-	/// </summary>
-	const AsymmetricEngines CipherType() override;
-
-	/// <summary>
-	/// Get: The cipher parameters enumeration name
-	/// </summary>
-	const MPKCParams Parameters();
-
-	/// <summary>
-	/// Get: The private key polynomial
-	/// </summary>
-	const std::vector<byte> &S() { return m_sCoeffs; }
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCPrivateKey(const MPKCPrivateKey&) = delete;
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCPrivateKey& operator=(const MPKCPrivateKey&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	MPKCPrivateKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
@@ -52,7 +45,7 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="S">The private key polynomial</param>
-	explicit MPKCPrivateKey(MPKCParams Params, std::vector<byte> &S);
+	explicit MPKCPrivateKey(MPKCParams Parameters, std::vector<byte> &S);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
@@ -62,11 +55,28 @@ public:
 	explicit MPKCPrivateKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~MPKCPrivateKey() override;
 
-	//~~~Public Methods~~~//
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The private keys cipher type name
+	/// </summary>
+	const AsymmetricEngines CipherType() override;
+
+	/// <summary>
+	/// Read Only: The cipher parameters enumeration name
+	/// </summary>
+	const MPKCParams Parameters();
+
+	/// <summary>
+	/// Read Only: The private key polynomial
+	/// </summary>
+	const std::vector<byte> &S();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer

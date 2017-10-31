@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_GMACTEST_H
-#define _CEXTEST_GMACTEST_H
+#ifndef CEXTEST_GMACTEST_H
+#define CEXTEST_GMACTEST_H
 
 #include "ITest.h"
 #include "../CEX/IMac.h"

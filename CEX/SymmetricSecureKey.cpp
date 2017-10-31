@@ -11,35 +11,7 @@
 
 NAMESPACE_SYMMETRICKEY
 
-//~~~Properties~~~//
-
-const std::vector<byte> SymmetricSecureKey::Info()
-{
-	return Extract(m_keySizes.KeySize() + m_keySizes.NonceSize(), m_keySizes.InfoSize());
-}
-
-const std::vector<byte> SymmetricSecureKey::Key()
-{
-	return Extract(0, m_keySizes.KeySize());
-}
-
-const SymmetricKeySize SymmetricSecureKey::KeySizes() { return m_keySizes; }
-
-const std::vector<byte> SymmetricSecureKey::Nonce()
-{
-	return Extract(m_keySizes.KeySize(), m_keySizes.NonceSize());
-}
-
 //~~~Constructors~~~//
-
-SymmetricSecureKey::SymmetricSecureKey()
-	:
-	m_isDestroyed(false),
-	m_keySalt(0),
-	m_keySizes(0, 0, 0),
-	m_keyState(0)
-{
-}
 
 SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySalt)
 	:
@@ -49,7 +21,9 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySa
 	m_keyState(0)
 {
 	if (Key.size() == 0)
+	{
 		throw CryptoProcessingException("SymmetricSecureKey:Ctor", "The key can not be zero sized!");
+	}
 
 	m_keyState.resize(m_keySizes.KeySize());
 	Utility::MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
@@ -71,7 +45,9 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	m_keyState(0)
 {
 	if (Key.size() == 0 || Nonce.size() == 0)
+	{
 		throw CryptoProcessingException("SymmetricSecureKey:Ctor", "The key and nonce can not be zero sized!");
+	}
 
 	m_keyState.resize(m_keySizes.KeySize() + m_keySizes.NonceSize());
 	Utility::MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
@@ -94,7 +70,9 @@ SymmetricSecureKey::SymmetricSecureKey(const std::vector<byte> &Key, const std::
 	m_keyState(0)
 {
 	if (Key.size() == 0 || Nonce.size() == 0 || Info.size() == 0)
+	{
 		throw CryptoProcessingException("SymmetricSecureKey:Ctor", "The key, nonce, and info can not be zero sized!");
+	}
 
 	m_keyState.resize(m_keySizes.KeySize() + m_keySizes.NonceSize() + m_keySizes.InfoSize());
 	Utility::MemUtils::Copy(Key, 0, m_keyState, 0, m_keySizes.KeySize());
@@ -115,6 +93,28 @@ SymmetricSecureKey::~SymmetricSecureKey()
 	Destroy();
 }
 
+//~~~Accessors~~~//
+
+const std::vector<byte> SymmetricSecureKey::Info()
+{
+	return Extract(m_keySizes.KeySize() + m_keySizes.NonceSize(), m_keySizes.InfoSize());
+}
+
+const std::vector<byte> SymmetricSecureKey::Key()
+{
+	return Extract(0, m_keySizes.KeySize());
+}
+
+const SymmetricKeySize SymmetricSecureKey::KeySizes() 
+{ 
+	return m_keySizes; 
+}
+
+const std::vector<byte> SymmetricSecureKey::Nonce()
+{
+	return Extract(m_keySizes.KeySize(), m_keySizes.NonceSize());
+}
+
 //~~~Public Functions~~~//
 
 SymmetricSecureKey* SymmetricSecureKey::Clone()
@@ -129,9 +129,13 @@ void SymmetricSecureKey::Destroy()
 		m_isDestroyed = true;
 
 		if (m_keyState.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_keyState);
+		}
 		if (m_keySalt.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_keySalt);
+		}
 	}
 }
 
@@ -146,11 +150,17 @@ SymmetricSecureKey* SymmetricSecureKey::DeSerialize(MemoryStream &KeyStream)
 	std::vector<byte> info;
 
 	if (kLen > 0)
+	{
 		key = reader.ReadBytes(kLen);
+	}
 	if (nLen > 0)
+	{
 		nonce = reader.ReadBytes(nLen);
+	}
 	if (iLen > 0)
+	{
 		info = reader.ReadBytes(iLen);
+	}
 
 	return new SymmetricSecureKey(key, nonce, info);
 }
@@ -172,12 +182,18 @@ MemoryStream* SymmetricSecureKey::Serialize(SymmetricSecureKey &KeyObj)
 	writer.Write(static_cast<ushort>(nLen));
 	writer.Write(static_cast<ushort>(iLen));
 
-	if (kLen != 0)
+	if (kLen > 0)
+	{
 		writer.Write(KeyObj.Key(), 0, kLen);
-	if (nLen != 0)
+	}
+	if (nLen > 0)
+	{
 		writer.Write(KeyObj.Nonce(), 0, nLen);
-	if (iLen != 0)
+	}
+	if (iLen > 0)
+	{
 		writer.Write(KeyObj.Info(), 0, iLen);
+	}
 
 	IO::MemoryStream* strm = writer.GetStream();
 	strm->Seek(0, IO::SeekOrigin::Begin);
@@ -207,7 +223,9 @@ std::vector<byte> SymmetricSecureKey::GetSystemKey()
 	Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 
 	if (m_keySalt.size() != 0)
+	{
 		Utility::ArrayUtils::Append(m_keySalt, state);
+	}
 
 	Digest::SHA512 dgt;
 	std::vector<byte> hash(dgt.DigestSize());

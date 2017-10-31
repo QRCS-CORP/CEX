@@ -93,16 +93,16 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4493">4493</a>: The AES-CMAC Algorithm.</description></item>
 /// </list>
 /// </remarks>
-class CMAC : public IMac
+class CMAC final : public IMac
 {
 private:
 
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
-	static const byte CT87 = (byte)0x87;
-	static const byte CT1B = (byte)0x1b;
+	static const byte CT87 = 0x87;
+	static const byte CT1B = 0x1b;
 
-	ICipherMode* m_cipherMode;
+	std::unique_ptr<ICipherMode> m_cipherMode;
 	std::vector<byte> m_cipherKey;
 	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
@@ -118,56 +118,29 @@ private:
 
 public:
 
-	CMAC() = delete;
-	CMAC(const CMAC&) = delete;
-	CMAC& operator=(const CMAC&) = delete;
-	CMAC& operator=(CMAC&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The Macs internal blocksize in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Get: The block cipher engine type
-	/// </summary>
-	const BlockCiphers CipherType();
-
-	/// <summary>
-	/// Get: Mac generators type name
-	/// </summary>
-	const Macs Enumeral() override;
-
-	/// <summary>
-	/// Get: Size of returned mac in bytes
-	/// </summary>
-	const size_t MacSize() override;
-
-	/// <summary>
-	/// Get: Mac is ready to digest data
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Get: Mac generators class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	CMAC(const CMAC&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	CMAC& operator=(const CMAC&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	CMAC() = delete;
 
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
 	/// <param name="CipherType">The block cipher enumeration name</param>
 	/// 
-	/// <exception cref="CryptoMacException">Thrown if an invalid block size is used</exception>
+	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
 	explicit CMAC(BlockCiphers CipherType);
 
 	/// <summary>
@@ -176,13 +149,50 @@ public:
 	///
 	/// <param name="Cipher">Instance of the block cipher</param>
 	/// 
-	/// <exception cref="Exception::CryptoMacException">Thrown if an invalid Mac or block size is used</exception>
+	/// <exception cref="Exception::CryptoMacException">Thrown if the block cipher is null</exception>
 	explicit CMAC(IBlockCipher* Cipher);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~CMAC() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Macs internal blocksize in bytes
+	/// </summary>
+	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The block cipher engine type
+	/// </summary>
+	const BlockCiphers CipherType();
+
+	/// <summary>
+	/// Read Only: Mac generators type name
+	/// </summary>
+	const Macs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	const size_t MacSize() override;
+
+	/// <summary>
+	/// Read Only: Mac is ready to digest data
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
+	/// </summary>
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Read Only: Mac generators class name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 
@@ -193,14 +203,7 @@ public:
 	/// 
 	/// <param name="Input">The input data byte array</param>
 	/// <param name="Output">The output Mac code array</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Process the data and return a Mac code
@@ -211,8 +214,6 @@ public:
 	/// <param name="OutOffset">The offset in the output array</param>
 	/// 
 	/// <returns>The number of bytes processed</returns>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
 	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
@@ -223,6 +224,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// 
+	/// <exception cref="Exception::CryptoMacException">Thrown if an invalid keyk size is used</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>

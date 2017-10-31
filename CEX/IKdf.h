@@ -23,24 +23,38 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IKdf() {}
+	IKdf(const IKdf&) = delete;
 
 	/// <summary>
-	/// Finalize objects
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IKdf() noexcept {}
-
-	//~~~Properties~~~//
+	IKdf& operator=(const IKdf&) = delete;
 
 	/// <summary>
-	/// Get: The Kdf generators type name
+	/// Constructor: instantiate this class
+	/// </summary>
+	IKdf() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IKdf() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Kdf generators type name
 	/// </summary>
 	virtual const Enumeration::Kdfs Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Generator is ready to produce random
+	/// Read Only: Generator is ready to produce random
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
@@ -51,7 +65,7 @@ public:
 	virtual size_t MinKeySize() = 0;
 
 	/// <summary>
-	/// Get: List of available legal key sizes
+	/// Read Only: List of available legal key sizes
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
@@ -61,11 +75,6 @@ public:
 	virtual const std::string Name() = 0;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes

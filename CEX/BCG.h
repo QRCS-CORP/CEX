@@ -120,7 +120,7 @@ using Common::ParallelOptions;
 /// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
-class BCG : public IDrbg
+class BCG final : public IDrbg
 {
 private:
 
@@ -134,7 +134,7 @@ private:
 	static const size_t MAX_RESEED = 536870912;
 	static const size_t PRC_DATACACHE = 1024 * 16;
 
-	IBlockCipher* m_blockCipher;
+	std::unique_ptr<IBlockCipher> m_blockCipher;
 	BlockCiphers m_cipherType;
 	std::vector<byte> m_ctrVector;
 	bool m_destroyEngine;
@@ -143,13 +143,13 @@ private:
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	IDigest* m_kdfEngine;
+	std::unique_ptr<IDigest> m_kdfEngine;
 	Digests m_kdfEngineType;
 	std::vector<byte> m_kdfInfo;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ParallelOptions m_parallelProfile;
 	bool m_prdResistant;
-	IProvider* m_providerSource;
+	std::unique_ptr<IProvider> m_providerSource;
 	Providers m_providerType;
 	size_t m_reseedCounter;
 	size_t m_reseedRequests;
@@ -159,14 +159,54 @@ private:
 
 public:
 
-	BCG(const BCG&) = delete;
-	BCG& operator=(const BCG&) = delete;
-	BCG& operator=(BCG&&) = delete;
-
-	//~~~Properties~~~//
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	BCG(const BCG&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	BCG& operator=(const BCG&) = delete;
+
+	/// <summary>
+	/// Instantiate the class using a block cipher type-name, an optional entropy source type, and optional kdf hash-engine
+	/// </summary>
+	///
+	/// <param name="CipherType">The block cipher type to instantiate as the primary generator.
+	/// <para>The primary pseudo random function, the default is AHX/RHX,</para></param>
+	/// <param name="DigestType">The KDF2 key derivation functions hash engine-type.
+	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
+	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source. 
+	/// <para>Adding a random provider enables predictive resistance, and is recommended for large data (>= 1MB).</para></param>
+	///
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
+	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::None);
+
+	/// <summary>
+	/// Instantiate the class using a block cipher instance and an optional entropy source
+	/// </summary>
+	/// 
+	/// <param name="Cipher">The block cipher instance, acting as the primary pseudo random function</param>
+	/// <param name="Digest">The [optional] message digest instance used by the key extraction function.
+	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
+	/// <param name="Provider">The [optional] entropy source, enabling predictive resistance; can be set to null.
+	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
+	/// 
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
+	explicit BCG(IBlockCipher* Cipher, IDigest* Digest = nullptr, IProvider* Provider = nullptr);
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	~BCG() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.
 	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
 	/// Changing this code will create a unique distribution of the generator.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
@@ -175,66 +215,66 @@ public:
 	std::vector<byte> &DistributionCode() override;
 
 	/// <summary>
-	/// Get: The maximum size of the distribution code in bytes.
+	/// Read Only: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in an HX ciphers HKDF key expansion function.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
 	/// </summary>
 	const size_t DistributionCodeMax() override;
 
 	/// <summary>
-	/// Get: The Drbg generators type name
+	/// Read Only: The Drbg generators type name
 	/// </summary>
 	const Drbgs Enumeral() override;
 
 	/// <summary>
-	/// Get: Generator is ready to produce random
+	/// Read Only: Generator is ready to produce random
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Get: Processor parallelization availability.
+	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on the system.</para>
 	/// </summary>
 	const bool IsParallel();
 
 	/// <summary>
-	/// Get: Available Encryption Key Sizes in bytes
+	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
-	/// Get: The maximum number of bytes that can be generated with a generator instance
+	/// Read Only: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
 	const ulong MaxOutputSize() override;
 
 	/// <summary>
-	/// Get: The maximum number of bytes that can be generated in a single request
+	/// Read Only: The maximum number of bytes that can be generated in a single request
 	/// </summary>
 	const size_t MaxRequestSize() override;
 
 	/// <summary>
-	/// Get: The maximum number of times the generator can be reseeded
+	/// Read Only: The maximum number of times the generator can be reseeded
 	/// </summary>
 	const size_t MaxReseedCount() override;
 
 	/// <summary>
-	/// Get: The Drbg generators class name
+	/// Read Only: The Drbg generators class name
 	/// </summary>
 	const std::string Name() override;
 
 	/// <summary>
-	/// Get: The size of the nonce counter value in bytes
+	/// Read Only: The size of the nonce counter value in bytes
 	/// </summary>
 	const size_t NonceSize() override;
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
+	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize();
 
 	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// Read/Write: Parallel and SIMD capability flags and sizes 
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
@@ -242,55 +282,16 @@ public:
 	ParallelOptions &ParallelProfile();
 
 	/// <summary>
-	/// Get/Set: Generating this amount or greater, triggers seed regeneration
+	/// Read/Write: Generating this amount or greater, triggers seed regeneration
 	/// </summary>
 	size_t &ReseedThreshold() override;
 
 	/// <summary>
-	/// Get: The security strength in bits
+	/// Read Only: The security strength in bits
 	/// </summary>
 	const size_t SecurityStrength() override;
 
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// Instantiate the class using a block cipher type-name, an optional entropy source type, and optional kdf hash-engine
-	/// </summary>
-	///
-	/// <param name="CipherType">The block cipher type to instantiate as the primary generator.
-	/// <para>The primary pseudo random function, the default is AHX/RHX,</para></param>
-	/// <param name="KdfEngineType">The KDF2 key derivation functions hash engine-type.
-	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
-	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source. 
-	/// <para>Adding a random provider enables predictive resistance, and is recommended for large data (>= 1MB).</para></param>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, Digests KdfEngineType = Digests::SHA512, Providers ProviderType = Providers::None);
-
-	/// <summary>
-	/// Instantiate the class using a block cipher instance and an optional entropy source
-	/// </summary>
-	/// 
-	/// <param name="Cipher">The block cipher instance, acting as the primary pseudo random function</param>
-	/// <param name="KdfEngine">The [optional] message digest instance used by the key extraction function.
-	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
-	/// <param name="Provider">The [optional] entropy source, enabling predictive resistance; can be set to null.
-	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
-	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
-	explicit BCG(IBlockCipher* Cipher, IDigest* KdfEngine = 0, IProvider* Provider = 0);
-
-	/// <summary>
-	/// Finalize objects
-	/// </summary>
-	~BCG() override;
-
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -299,8 +300,6 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
-	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the output array is too small</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -312,8 +311,6 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
-	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the output array is too small</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
@@ -322,7 +319,7 @@ public:
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -331,7 +328,7 @@ public:
 	/// 
 	/// <param name="Seed">The primary key array used to seed the generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed) override;
 
 	/// <summary>
@@ -342,7 +339,7 @@ public:
 	/// <param name="Seed">The primary key array used to seed the generator</param>
 	/// <param name="Nonce">The nonce value containing an additional source of entropy</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key is not a legal size</exception>
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce) override;
 
 	/// <summary>

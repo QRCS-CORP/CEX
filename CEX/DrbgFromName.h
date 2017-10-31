@@ -12,6 +12,7 @@
 NAMESPACE_HELPER
 
 using Enumeration::BlockCiphers;
+using Exception::CryptoException;
 using Enumeration::Digests;
 using Enumeration::Drbgs;
 using Enumeration::Providers;
@@ -19,7 +20,7 @@ using Drbg::IDrbg;
 
 /// <summary>
 /// Get an uninitialized Deterministic Random Bit Generator from a type name.
-/// <para>The DRBGs Initialize function must be called before a generate function can be called.<para>
+/// <para>The DRBGs Initialize function must be called before a generate function can be called.</para>
 /// </summary>
 class DrbgFromName
 {

@@ -15,24 +15,38 @@ class IAsymmetricKey
 {
 public:
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Get: The keys parent cipher type-name
+	/// Read Only: The keys parent cipher type-name
 	/// </summary>
 	virtual const AsymmetricEngines CipherType() = 0;
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IAsymmetricKey() {}
+	IAsymmetricKey(const IAsymmetricKey&) = delete;
 
 	/// <summary>
-	/// Finalizer
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IAsymmetricKey() noexcept {}
+	IAsymmetricKey& operator=(const IAsymmetricKey&) = delete;
+
+	/// <summary>
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IAsymmetricKey() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IAsymmetricKey() noexcept 
+	{
+	}
 
 	//~~~Public Functions~~~//
 

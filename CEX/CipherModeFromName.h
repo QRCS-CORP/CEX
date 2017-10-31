@@ -10,16 +10,18 @@ NAMESPACE_HELPER
 
 using Enumeration::BlockCiphers;
 using Enumeration::CipherModes;
+using Exception::CryptoException;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
 
 /// <summary>
 /// Get a Cipher Mode instance from it's enumeration name.
-/// <para>The Cipher modes Initialize function must be called before it can be used.<para>
+/// <para>The Cipher modes Initialize function must be called before it can be used.</para>
 /// </summary>
 class CipherModeFromName
 {
 public:
+
 	/// <summary>
 	/// Get an Cipher Mode instance by name using default parameters
 	/// </summary>

@@ -13,7 +13,41 @@ const std::string Salsa20::CLASS_NAME("Salsa");
 const std::string Salsa20::SIGMA_INFO("expand 32-byte k");
 const std::string Salsa20::TAU_INFO("expand 16-byte k");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+Salsa20::Salsa20(size_t Rounds)
+	:
+	m_ctrVector(2, 0),
+	m_dstCode(16),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true),
+	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
+		throw CryptoSymmetricCipherException("Salsa20:CTor", "Invalid rounds count! Sizes supported are even numbers between 8 and 80")),
+	m_wrkState(14, 0)
+{
+	Scope();
+}
+
+Salsa20::~Salsa20()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_isInitialized = false;
+		m_parallelProfile.Reset();
+		m_rndCount = 0;
+		IntUtils::ClearVector(m_ctrVector);
+		IntUtils::ClearVector(m_wrkState);
+		IntUtils::ClearVector(m_dstCode);
+		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_legalRounds);
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t Salsa20::BlockSize()
 {
@@ -70,49 +104,7 @@ const size_t Salsa20::Rounds()
 	return m_rndCount;
 }
 
-//~~~Constructor~~~//
-
-Salsa20::Salsa20(size_t Rounds)
-	:
-	m_ctrVector(2, 0),
-	m_dstCode(16),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true),
-	m_rndCount(Rounds),
-	m_wrkState(14, 0)
-{
-	if (Rounds == 0 || (Rounds & 1) != 0)
-		throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be a positive even number!");
-	if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS)
-		throw CryptoSymmetricCipherException("Salsa20:Ctor", "Rounds must be between 8 and 30!");
-
-	Scope();
-}
-
-Salsa20::~Salsa20()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void Salsa20::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_parallelProfile.Reset();
-		m_rndCount = 0;
-		IntUtils::ClearVector(m_ctrVector);
-		IntUtils::ClearVector(m_wrkState);
-		IntUtils::ClearVector(m_dstCode);
-		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearVector(m_legalRounds);
-	}
-}
 
 void Salsa20::Initialize(ISymmetricKey &KeyParams)
 {
@@ -120,13 +112,21 @@ void Salsa20::Initialize(ISymmetricKey &KeyParams)
 	Scope();
 
 	if (KeyParams.Nonce().size() != 8)
+	{
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "Requires exactly 8 bytes of Nonce!");
+	}
 	if (KeyParams.Key().size() != 16 && KeyParams.Key().size() != 32)
+	{
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "Key must be 16 or 32 bytes!");
+	}
 	if (IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+	{
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "The parallel block size is out of bounds!");
+	}
 	if (IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
+	{
 		throw CryptoSymmetricCipherException("Salsa20:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+	}
 
 	if (KeyParams.Info().size() != 0)
 	{
@@ -136,9 +136,13 @@ void Salsa20::Initialize(ISymmetricKey &KeyParams)
 	else
 	{
 		if (KeyParams.Key().size() == 32)
+		{
 			m_dstCode.assign(SIGMA_INFO.begin(), SIGMA_INFO.end());
+		}
 		else
+		{
 			m_dstCode.assign(TAU_INFO.begin(), TAU_INFO.end());
+		}
 	}
 
 	Reset();
@@ -148,12 +152,9 @@ void Salsa20::Initialize(ISymmetricKey &KeyParams)
 
 void Salsa20::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoSymmetricCipherException("Salsa20::ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree % 2 != 0)
-		throw CryptoSymmetricCipherException("Salsa20::ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoSymmetricCipherException("Salsa20::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
@@ -223,16 +224,79 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 {
 	size_t ctr = 0;
 
-#if defined(__AVX2__)
+#if defined(__AVX512__)
+	const size_t AVX512BLK = 16 * BLOCK_SIZE;
+
+	if (Length >= AVX512BLK)
+	{
+		const size_t SEGALN = Length - (Length % AVX512BLK);
+		std::vector<uint> ctrBlk(32);
+
+		// process 8 blocks (uses avx if available)
+		while (ctr != SEGALN)
+		{
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 0, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 16, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 1, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 17, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 2, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 18, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 3, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 19, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 4, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 20, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 5, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 21, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 6, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 22, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 7, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 23, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 8, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 24, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 9, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 25, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 10, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 26, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 11, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 27, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 12, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 28, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 13, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 29, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 14, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 30, 4);
+			IntUtils::LeIncrementW(Counter);
+			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 15, 4);
+			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 31, 4);
+			IntUtils::LeIncrementW(Counter);
+			ChaCha::TransformW<Numeric::UInt256>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
+			ctr += AVX512BLK;
+		}
+	}
+#elif defined(__AVX2__)
 	const size_t AVX2BLK = 8 * BLOCK_SIZE;
 
 	if (Length >= AVX2BLK)
 	{
-		size_t paln = Length - (Length % AVX2BLK);
+		const size_t SEGALN = Length - (Length % AVX2BLK);
 		std::vector<uint> ctrBlk(16);
 
 		// process 8 blocks (uses avx if available)
-		while (ctr != paln)
+		while (ctr != SEGALN)
 		{
 			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 0, 4);
 			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 8, 4);
@@ -258,7 +322,7 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 7, 4);
 			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 15, 4);
 			IntUtils::LeIncrementW(Counter);
-			Salsa::SalsaTransformW<Numeric::UInt256>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
+			Salsa::TransformW<Numeric::UInt256>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVX2BLK;
 		}
 	}
@@ -267,11 +331,11 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 
 	if (Length >= AVXBLK)
 	{
-		size_t paln = Length - (Length % AVXBLK);
+		const size_t SEGALN = Length - (Length % AVXBLK);
 		std::vector<uint> ctrBlk(8);
 
 		// process 4 blocks (uses sse intrinsics if available)
-		while (ctr != paln)
+		while (ctr != SEGALN)
 		{
 			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 0, 4);
 			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 4, 4);
@@ -285,7 +349,7 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 			Utility::MemUtils::Copy(Counter, 0, ctrBlk, 3, 4);
 			Utility::MemUtils::Copy(Counter, 1, ctrBlk, 7, 4);
 			IntUtils::LeIncrementW(Counter);
-			Salsa::SalsaTransformW<Numeric::UInt128>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
+			Salsa::TransformW<Numeric::UInt128>(Output, OutOffset + ctr, ctrBlk, m_wrkState, m_rndCount);
 			ctr += AVXBLK;
 		}
 	}
@@ -294,7 +358,7 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 	const size_t ALNSZE = Length - (Length % BLOCK_SIZE);
 	while (ctr != ALNSZE)
 	{
-		Salsa::SalsaTransform512(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
+		Salsa::Transform(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
 		IntUtils::LeIncrementW(Counter);
 		ctr += BLOCK_SIZE;
 	}
@@ -302,7 +366,7 @@ void Salsa20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::v
 	if (ctr != Length)
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
-		Salsa::SalsaTransform512(outputBlock, 0, Counter, m_wrkState, m_rndCount);
+		Salsa::Transform(outputBlock, 0, Counter, m_wrkState, m_rndCount);
 		const size_t FNLSZE = Length % BLOCK_SIZE;
 		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
 		IntUtils::LeIncrementW(Counter);
@@ -321,13 +385,17 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 		const size_t ALNSZE = PRCSZE - (PRCSZE % BLOCK_SIZE);
 
 		if (ALNSZE != 0)
+		{
 			Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNSZE);
+		}
 
 		// get the remaining bytes
 		if (ALNSZE != PRCSZE)
 		{
 			for (size_t i = ALNSZE; i < PRCSZE; ++i)
+			{
 				Output[i + OutOffset] ^= Input[i + InOffset];
+			}
 		}
 	}
 	else
@@ -350,7 +418,9 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 			Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
+			{
 				Utility::MemUtils::Copy(thdCtr, 0, tmpCtr, 0, CTR_SIZE);
+			}
 		});
 
 		// copy last counter to class variable
@@ -363,7 +433,9 @@ void Salsa20::Process(const std::vector<byte> &Input, const size_t InOffset, std
 			Generate(Output, RNDSZE, m_ctrVector, FNLSZE);
 
 			for (size_t i = 0; i < FNLSZE; ++i)
-				Output[i + OutOffset + RNDSZE] ^= (byte)(Input[i + InOffset + RNDSZE]);
+			{
+				Output[i + OutOffset + RNDSZE] ^= static_cast<byte>(Input[i + InOffset + RNDSZE]);
+			}
 		}
 	}
 }

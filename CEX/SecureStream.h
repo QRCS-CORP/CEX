@@ -10,7 +10,7 @@ NAMESPACE_IO
 /// <para>Manipulate a byte array through a streaming interface.
 /// State is encrypted, and only decrypted during read/write operations.</para>
 /// </summary>
-class SecureStream : public IByteStream
+class SecureStream final : public IByteStream
 {
 private:
 	static const std::string CLASS_NAME;
@@ -22,47 +22,20 @@ private:
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The stream can be read
-	/// </summary>
-	const bool CanRead() override;
-
-	/// <summary>
-	/// Get: The stream is seekable
-	/// </summary>
-	const bool CanSeek() override;
-
-	/// <summary>
-	/// Get: The stream can be written to
-	/// </summary>
-	const bool CanWrite() override;
-
-	/// <summary>
-	/// Get: The stream container type
-	/// </summary>
-	const StreamModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The stream length
-	/// </summary>
-	const ulong Length() override;
-
-	/// <summary>
-	/// Get: The streams class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: The streams current position
-	/// </summary>
-	const ulong Position() override;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize and empty stream
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	SecureStream(const SecureStream&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	SecureStream& operator=(const SecureStream&) = delete;
+
+	/// <summary>
+	/// Default constructor: initializes state to zero
 	/// </summary>
 	SecureStream();
 
@@ -93,9 +66,46 @@ public:
 	explicit SecureStream(std::vector<byte> &Data, size_t Offset, size_t Length, ulong KeySalt = 0);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~SecureStream() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The stream can be read
+	/// </summary>
+	const bool CanRead() override;
+
+	/// <summary>
+	/// Read Only: The stream is seekable
+	/// </summary>
+	const bool CanSeek() override;
+
+	/// <summary>
+	/// Read Only: The stream can be written to
+	/// </summary>
+	const bool CanWrite() override;
+
+	/// <summary>
+	/// Read Only: The stream container type
+	/// </summary>
+	const StreamModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The stream length
+	/// </summary>
+	const ulong Length() override;
+
+	/// <summary>
+	/// Read Only: The streams class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The streams current position
+	/// </summary>
+	const ulong Position() override;
 
 	//~~~Public Functions~~~//
 

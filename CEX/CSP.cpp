@@ -24,7 +24,7 @@ NAMESPACE_PROVIDER
 
 const std::string CSP::CLASS_NAME("CSP");
 
-//~~~Properties~~~//
+//~~~Accessors~~~//
 
 const Enumeration::Providers CSP::Enumeral()
 {
@@ -45,28 +45,27 @@ const std::string CSP::Name()
 
 CSP::CSP()
 	:
-	m_isAvailable(false)
-{
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_POSIX)
-	m_isAvailable = true;
+	m_isAvailable(true)
+#else
+	m_isAvailable(false)
 #endif
+{
 }
 
 CSP::~CSP()
 {
-	Destroy();
+	m_isAvailable = false;
 }
 
 //~~~Public Functions~~~//
 
-void CSP::Destroy()
-{
-}
-
 void CSP::GetBytes(std::vector<byte> &Output)
 {
 	if (!m_isAvailable)
+	{
 		throw CryptoRandomException("CSP:GetBytes", "Random provider is not available!");
+	}
 
 	size_t prcLen = Output.size();
 	size_t prcOffset = 0;
@@ -75,7 +74,9 @@ void CSP::GetBytes(std::vector<byte> &Output)
 
 	HCRYPTPROV hProvider = NULL;
 	if (!::CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
+	{
 		throw CryptoRandomException("CSP:GetBytes", "Call to CryptAcquireContext failed; random provider is not available!");
+	}
 
 	if (hProvider != NULL)
 	{
@@ -117,8 +118,10 @@ void CSP::GetBytes(std::vector<byte> &Output)
 
 	int fdHandle = ::open(CEX_SYSTEM_RNG_DEVICE, O_RDONLY | O_NOCTTY);
 
-	if (m_fdHandle < 0)
+	if (fdHandle <= 0)
+	{
 		throw CryptoRandomException("CSP:GetBytes", "System RNG failed to open RNG device!");
+	}
 
 	do
 	{
@@ -127,9 +130,13 @@ void CSP::GetBytes(std::vector<byte> &Output)
 		if (rndLen < 0)
 		{
 			if (errno == EINTR)
+			{
 				continue;
+			}
 			else
+			{
 				throw CryptoRandomException("CSP:GetBytes", "System RNG read failed error!");
+			}
 		}
 		else if (rndLen == 0)
 		{

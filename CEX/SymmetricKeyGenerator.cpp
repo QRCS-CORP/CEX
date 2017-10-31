@@ -11,13 +11,13 @@ NAMESPACE_SYMMETRICKEY
 
 SymmetricKeyGenerator::SymmetricKeyGenerator(Digests DigestType, Providers ProviderType)
 	:
-	m_dgtType(DigestType),
+	m_dgtType(DigestType != Digests::None ? DigestType :
+		throw CryptoGeneratorException("SymmetricKeyGenerator::Ctor", "The digest type can not be none!")),
 	m_isDestroyed(false),
-	m_pvdEngine(0),
+	m_pvdEngine(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(m_pvdType) : 
+		throw CryptoGeneratorException("SymmetricKeyGenerator::Ctor", "The provider type can not be none!")),
 	m_pvdType(ProviderType)
 {
-	// initialize the provider
-	Reset();
 }
 
 SymmetricKeyGenerator::~SymmetricKeyGenerator()
@@ -36,11 +36,13 @@ void SymmetricKeyGenerator::Destroy()
 		m_pvdType = Providers::None;
 
 		if (m_pvdEngine != 0)
-			delete m_pvdEngine;
+		{
+			m_pvdEngine.reset(nullptr);
+		}
 	}
 }
 
-SymmetricKey SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
+SymmetricKey* SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 {
 	if (KeySize.KeySize() == 0)
 	{
@@ -48,21 +50,30 @@ SymmetricKey SymmetricKeyGenerator::GetSymmetricKey(SymmetricKeySize KeySize)
 	}
 	else
 	{
+		SymmetricKey* key;
+
 		if (KeySize.NonceSize() != 0)
 		{
 			if (KeySize.InfoSize() != 0)
-				return SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
+			{
+				key = new SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
+
+			}
 			else
-				return SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
+			{
+				key = new SymmetricKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
+			}
 		}
 		else
 		{
-			return SymmetricKey(Generate(KeySize.KeySize()));
+			key = new SymmetricKey(Generate(KeySize.KeySize()));
 		}
+
+		return key;
 	}
 }
 
-SymmetricSecureKey SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize)
+SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize)
 {
 	if (KeySize.KeySize() == 0)
 	{
@@ -70,17 +81,25 @@ SymmetricSecureKey SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize)
 	}
 	else
 	{
+		SymmetricSecureKey* key;
+
 		if (KeySize.NonceSize() != 0)
 		{
 			if (KeySize.InfoSize() != 0)
-				return SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
+			{
+				key = new SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()), Generate(KeySize.InfoSize()));
+			}
 			else
-				return SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
+			{
+				key = new SymmetricSecureKey(Generate(KeySize.KeySize()), Generate(KeySize.NonceSize()));
+			}
 		}
 		else
 		{
-			return SymmetricSecureKey(Generate(KeySize.KeySize()));
+			key = new SymmetricSecureKey(Generate(KeySize.KeySize()));
 		}
+
+		return key;
 	}
 }
 
@@ -95,44 +114,31 @@ std::vector<byte> SymmetricKeyGenerator::GetBytes(size_t Size)
 	return Generate(Size);
 }
 
-void SymmetricKeyGenerator::Reset()
-{
-	if (m_pvdEngine != 0)
-		delete m_pvdEngine;
-
-	try
-	{
-		m_pvdEngine = Helper::ProviderFromName::GetInstance(m_pvdType);
-	}
-	catch (...) 
-	{ 
-	}
-
-	// if provider is unavailable, default to system crypto provider
-	if (m_pvdEngine == 0 || !m_pvdEngine->IsAvailable())
-		m_pvdEngine = Helper::ProviderFromName::GetInstance(Providers::CSP);
-}
-
 //~~~Private Functions~~~//
 
 std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 {
-	if (KeySize == 0)
-		return std::vector<byte>(0);
-
 	std::vector<byte> key(KeySize);
-	size_t keyLen = KeySize;
-	size_t blkOff = 0;
 
-	do
+	if (KeySize == 0)
 	{
-		std::vector<byte> rnd = GenerateBlock();
-		size_t alnLen = Utility::IntUtils::Min(keyLen, rnd.size());
-		Utility::MemUtils::Copy(rnd, 0, key, blkOff, alnLen);
-		keyLen -= alnLen;
-		blkOff += alnLen;
-	} 
-	while (keyLen != 0);
+		key.resize(0);
+	}
+	else
+	{
+		size_t keyLen = KeySize;
+		size_t blkOff = 0;
+
+		do
+		{
+			std::vector<byte> rnd = GenerateBlock();
+			size_t alnLen = Utility::IntUtils::Min(keyLen, rnd.size());
+			Utility::MemUtils::Copy(rnd, 0, key, blkOff, alnLen);
+			keyLen -= alnLen;
+			blkOff += alnLen;
+		} 
+		while (keyLen != 0);
+	}
 
 	return key;
 }

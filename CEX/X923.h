@@ -12,37 +12,43 @@ class X923 final : public IPadding
 {
 private:
 
-	X923(const X923&) = delete;
-	X923& operator=(const X923&) = delete;
-	X923& operator=(X923&&) = delete;
-
 	static const std::string CLASS_NAME;
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The padding modes type name
-	/// </summary>
-	const PaddingModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The padding modes class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	X923(const X923&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	X923& operator=(const X923&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class
 	/// </summary>
 	X923();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class: finalize this class
 	/// </summary>
 	~X923() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The padding modes type name
+	/// </summary>
+	const PaddingModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The padding modes class name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

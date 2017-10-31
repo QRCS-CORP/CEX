@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_PADDINGTEST_H
-#define _CEXTEST_PADDINGTEST_H
+#ifndef CEXTEST_PADDINGTEST_H
+#define CEXTEST_PADDINGTEST_H
 
 #include "ITest.h"
 #include "../CEX/IPadding.h"

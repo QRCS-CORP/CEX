@@ -151,7 +151,7 @@ using Enumeration::Providers;
 /// <item><description>NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the Codebook-based: Deterministic Random Bit Generator.</description></item>
 /// </list>
 /// </remarks>
-class HCG : public IDrbg
+class HCG final : public IDrbg
 {
 private:
 
@@ -174,7 +174,7 @@ private:
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	IProvider* m_providerSource;
+	std::unique_ptr<IProvider> m_providerSource;
 	Providers m_providerType;
 	size_t m_reseedCounter;
 	size_t m_reseedRequests;
@@ -185,80 +185,17 @@ private:
 
 public:
 
-	HCG(const HCG&) = delete;
-	HCG& operator=(const HCG&) = delete;
-	HCG& operator=(HCG&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
-	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
-	/// Changing this code will create a unique distribution of the generator.
-	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
-	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
-	/// </summary>
-	std::vector<byte> &DistributionCode() override;
-
-	/// <summary>
-	/// Get: The maximum size of the distribution code in bytes.
-	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
-	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
-	/// </summary>
-	const size_t DistributionCodeMax() override;
-
-	/// <summary>
-	/// Get: The Drbg generators type name
-	/// </summary>
-	const Drbgs Enumeral() override;
-
-	/// <summary>
-	/// Get: Generator is ready to produce random
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: The legal input seed sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Get: The maximum number of bytes that can be generated with a generator instance
-	/// </summary>
-	const ulong MaxOutputSize() override;
-
-	/// <summary>
-	/// Get: The maximum number of bytes that can be generated in a single request
-	/// </summary>
-	const size_t MaxRequestSize() override;
-
-	/// <summary>
-	/// Get: The maximum number of times the generator can be reseeded
-	/// </summary>
-	const size_t MaxReseedCount() override;
-
-	/// <summary>
-	/// Get: The Drbg generators class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: The size of the nonce counter value in bytes
-	/// </summary>
-	const size_t NonceSize() override;
-
-	/// <summary>
-	/// Get/Set: Generating this amount or greater, triggers a re-seed
-	/// </summary>
-	size_t &ReseedThreshold() override;
-
-	/// <summary>
-	/// Get: The estimated security strength in bits.
-	/// <para>This value depends both on the hash function output size, and the number of bits used to seed the generator.</para>
-	/// </summary>
-	const size_t SecurityStrength() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	HCG(const HCG&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	HCG& operator=(const HCG&) = delete;
 
 	/// <summary>
 	/// Instantiate the class using a block cipher type name, and an optional entropy source type
@@ -267,7 +204,7 @@ public:
 	/// <param name="DigestType">The hash digests enumeration type name; the default is SHA512</param>
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an unrecognized digest type name is used</exception>
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
 	explicit HCG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
@@ -281,16 +218,80 @@ public:
 	explicit HCG(IDigest* Digest, IProvider* Provider = 0);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~HCG() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.
+	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
+	/// Changing this code will create a unique distribution of the generator.
+	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
+	/// For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</para>
 	/// </summary>
-	void Destroy() override;
+	std::vector<byte> &DistributionCode() override;
+
+	/// <summary>
+	/// Read Only: The maximum size of the distribution code in bytes.
+	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
+	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
+	/// </summary>
+	const size_t DistributionCodeMax() override;
+
+	/// <summary>
+	/// Read Only: The Drbg generators type name
+	/// </summary>
+	const Drbgs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Generator is ready to produce random
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: The legal input seed sizes in bytes
+	/// </summary>
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Read Only: The maximum number of bytes that can be generated with a generator instance
+	/// </summary>
+	const ulong MaxOutputSize() override;
+
+	/// <summary>
+	/// Read Only: The maximum number of bytes that can be generated in a single request
+	/// </summary>
+	const size_t MaxRequestSize() override;
+
+	/// <summary>
+	/// Read Only: The maximum number of times the generator can be reseeded
+	/// </summary>
+	const size_t MaxReseedCount() override;
+
+	/// <summary>
+	/// Read Only: The Drbg generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The size of the nonce counter value in bytes
+	/// </summary>
+	const size_t NonceSize() override;
+
+	/// <summary>
+	/// Read/Write: Generating this amount or greater, triggers a re-seed
+	/// </summary>
+	size_t &ReseedThreshold() override;
+
+	/// <summary>
+	/// Read Only: The estimated security strength in bits.
+	/// <para>This value depends both on the hash function output size, and the number of bits used to seed the generator.</para>
+	/// </summary>
+	const size_t SecurityStrength() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -363,7 +364,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is not a legal seed size</exception>
+	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the seed is too small</exception>
 	void Update(const std::vector<byte> &Seed) override;
 
 private:

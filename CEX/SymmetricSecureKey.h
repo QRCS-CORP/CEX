@@ -21,7 +21,7 @@ NAMESPACE_SYMMETRICKEY
 /// <item><description>The internal key is extracted using SHA512, and the internal state is encrypted with AES256 in CTR mode</description></item>
 /// </list>
 /// </remarks>
-class SymmetricSecureKey : public ISymmetricKey
+class SymmetricSecureKey final : public ISymmetricKey
 {
 private:
 
@@ -32,56 +32,48 @@ private:
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: Return a copy of the personalization string; can used as an optional source of entropy
-	/// </summary>
-	const std::vector<byte> Info() override;
-
-	/// <summary>
-	/// Get: Return a copy of the primary key
-	/// </summary>
-	const std::vector<byte> Key() override;
-
-	/// <summary>
-	/// Get: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
-	/// </summary>
-	const SymmetricKeySize KeySizes() override;
-
-	/// <summary>
-	/// Get: Return a copy of the nonce
-	/// </summary>
-	const std::vector<byte> Nonce() override;
-
 	//~~~Constructors~~~//
 
 	/// <summary>
-	/// Instantiate an empty container
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	SymmetricSecureKey();
+	SymmetricSecureKey(const SymmetricSecureKey&) = delete;
 
 	/// <summary>
-	/// Instantiate this class with an encryption key.
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	SymmetricSecureKey& operator=(const SymmetricSecureKey&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	SymmetricSecureKey() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class with an encryption key.
 	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
 	/// </summary>
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
 	explicit SymmetricSecureKey(const std::vector<byte> &Key, ulong KeySalt = 0);
 
 	/// <summary>
-	/// Instantiate this class with an encryption key, and nonce parameters.
+	/// Constructor: instantiate this class with an encryption key, and nonce parameters.
 	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
 	/// </summary>
 	///
 	/// <param name="Key">The primary encryption key</param>
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, ulong KeySalt = 0);
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, ulong KeySalt = 0);
 
 	/// <summary>
-	/// Instantiate this class with an encryption key, nonce, and info parameters.
+	/// Constructor: instantiate this class with an encryption key, nonce, and info parameters.
 	/// <para>The optional KeySalt value can be added to the seed material used by the internal encryption key generator.</para>
 	/// </summary>
 	///
@@ -89,17 +81,41 @@ public:
 	/// <param name="Nonce">The nonce or counter array</param>
 	/// <param name="Info">The personalization string or additional keying material</param>
 	/// <param name="KeySalt">The secret 64bit salt value used in internal encryption</param>
-	explicit SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, ulong KeySalt = 0);
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if an input array size is zero length</exception>
+	SymmetricSecureKey(const std::vector<byte> &Key, const std::vector<byte> &Nonce, const std::vector<byte> &Info, ulong KeySalt = 0);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~SymmetricSecureKey() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: Return a copy of the personalization string; can used as an optional source of entropy
+	/// </summary>
+	const std::vector<byte> Info() override;
+
+	/// <summary>
+	/// Read Only: Return a copy of the primary key
+	/// </summary>
+	const std::vector<byte> Key() override;
+
+	/// <summary>
+	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
+	/// </summary>
+	const SymmetricKeySize KeySizes() override;
+
+	/// <summary>
+	/// Read Only: Return a copy of the nonce
+	/// </summary>
+	const std::vector<byte> Nonce() override;
 
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Create a shallow copy of this SymmetricSecureKey class
+	/// Create a copy of this SymmetricSecureKey class
 	/// </summary>
 	SymmetricSecureKey* Clone();
 

@@ -9,7 +9,7 @@ NAMESPACE_IO
 /// A memory stream container.
 /// <para>Manipulate a byte array through a streaming interface.</para>
 /// </summary>
-class MemoryStream : public IByteStream
+class MemoryStream final : public IByteStream
 {
 private:
 	static const std::string CLASS_NAME;
@@ -20,54 +20,19 @@ private:
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The stream can be read
-	/// </summary>
-	const bool CanRead() override;
-
-	/// <summary>
-	/// Get: The stream is seekable
-	/// </summary>
-	const bool CanSeek() override;
-
-	/// <summary>
-	/// Get: The stream can be written to
-	/// </summary>
-	const bool CanWrite() override;
-
-	/// <summary>
-	/// Get: The stream container type
-	/// </summary>
-	const StreamModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The streams class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: The stream length
-	/// </summary>
-	const ulong Length() override;
-
-	/// <summary>
-	/// Get: The streams current position
-	/// </summary>
-	const ulong Position() override;
-
-	/// <summary>
-	/// Get: The underlying stream
-	/// </summary>
-	std::vector<byte> &ToArray();
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Initialize and empty stream
+	/// Default constructor: initializes state to zero
 	/// </summary>
 	MemoryStream();
+
+	/// <summary>
+	/// Initialize this class and set the streams length
+	/// </summary>
+	///
+	/// <param name="Stream">The reserved length of the stream</param>
+	MemoryStream(const MemoryStream &Stream);
 
 	/// <summary>
 	/// Initialize this class and set the streams length
@@ -93,9 +58,51 @@ public:
 	explicit MemoryStream(const std::vector<byte> &Data, size_t Offset, size_t Length);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~MemoryStream() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The stream can be read
+	/// </summary>
+	const bool CanRead() override;
+
+	/// <summary>
+	/// Read Only: The stream is seekable
+	/// </summary>
+	const bool CanSeek() override;
+
+	/// <summary>
+	/// Read Only: The stream can be written to
+	/// </summary>
+	const bool CanWrite() override;
+
+	/// <summary>
+	/// Read Only: The stream container type
+	/// </summary>
+	const StreamModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The streams class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The stream length
+	/// </summary>
+	const ulong Length() override;
+
+	/// <summary>
+	/// Read Only: The streams current position
+	/// </summary>
+	const ulong Position() override;
+
+	/// <summary>
+	/// Read/Write: Direct read/write access to the underlying byte stream
+	/// </summary>
+	std::vector<byte> &ToArray();
 
 	//~~~Public Functions~~~//
 

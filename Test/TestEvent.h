@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_TESTEVENT_H
-#define _CEXTEST_TESTEVENT_H
+#ifndef CEXTEST_TESTEVENT_H
+#define CEXTEST_TESTEVENT_H
 
 #include <vector>
 #include <iostream>

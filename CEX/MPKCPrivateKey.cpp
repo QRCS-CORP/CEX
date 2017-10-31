@@ -3,25 +3,12 @@
 
 NAMESPACE_ASYMMETRICKEY
 
-//~~~Properties~~~//
-
-const AsymmetricEngines MPKCPrivateKey::CipherType()
-{
-	return AsymmetricEngines::McEliece;
-}
-
-const MPKCParams MPKCPrivateKey::Parameters()
-{
-	return m_mpkcParameters;
-}
-
-
 //~~~Constructor~~~//
 
-MPKCPrivateKey::MPKCPrivateKey(MPKCParams Params, std::vector<byte> &S)
+MPKCPrivateKey::MPKCPrivateKey(MPKCParams Parameters, std::vector<byte> &S)
 	:
 	m_isDestroyed(false),
-	m_mpkcParameters(Params),
+	m_mpkcParameters(Parameters),
 	m_sCoeffs(S)
 {
 }
@@ -41,6 +28,23 @@ MPKCPrivateKey::~MPKCPrivateKey()
 	Destroy();
 }
 
+//~~~Accessors~~~//
+
+const AsymmetricEngines MPKCPrivateKey::CipherType()
+{
+	return AsymmetricEngines::McEliece;
+}
+
+const MPKCParams MPKCPrivateKey::Parameters()
+{
+	return m_mpkcParameters;
+}
+
+const std::vector<byte> &MPKCPrivateKey::S()
+{
+	return m_sCoeffs;
+}
+
 //~~~Public Functions~~~//
 
 void MPKCPrivateKey::Destroy()
@@ -51,7 +55,9 @@ void MPKCPrivateKey::Destroy()
 		m_mpkcParameters = MPKCParams::None;
 
 		if (m_sCoeffs.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_sCoeffs);
+		}
 	}
 }
 

@@ -33,15 +33,52 @@ private:
 
 	static const size_t BLOCK_SIZE = 64;
 
-	static ulong GetParity(const std::vector<ulong> &Key)
+	//~~~Inline Functions~~~//
+
+	inline static ulong GetParity(const std::vector<ulong> &Key)
 	{
 		ulong parity = 0x1BD11BDAA9FC1A22;
 
 		for (size_t i = 0; i < Key.size(); i++)
+		{
 			parity ^= Key[i];
+		}
 
 		return parity;
 	}
+
+#if defined(__AVX2__)
+
+	inline static void Inject(__m256i &X0, __m256i &X1, __m256i &R0, const __m256i &T0, const __m256i &T1, const __m256i &K0, const __m256i &K1, const __m256i &RFN)
+	{
+		X0 = _mm256_add_epi64(X0, K0);
+		X1 = _mm256_add_epi64(X1, K1);
+		X1 = _mm256_add_epi64(X1, R0);
+		X0 = _mm256_add_epi64(X0, T0);
+		X1 = _mm256_add_epi64(X1, T1);
+		R0 = _mm256_add_epi64(R0, RFN);
+	}
+
+	inline static void Interleave(__m256i &X0, __m256i &X1)
+	{
+		const __m256i T0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
+		const __m256i T1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(3, 1, 2, 0));
+
+		X0 = _mm256_unpacklo_epi64(T0, T1);
+		X1 = _mm256_unpackhi_epi64(T0, T1);
+	}
+
+	inline static void  Round(__m256i &X0, __m256i &X1, const __m256i &SHL)
+	{
+		const __m256i SHR = _mm256_sub_epi64(_mm256_set1_epi64x(64), SHL);
+		X0 = _mm256_add_epi64(X0, X1);
+		X1 = _mm256_or_si256(_mm256_sllv_epi64(X1, SHL), _mm256_srlv_epi64(X1, SHR));
+		X1 = _mm256_xor_si256(X1, X0);
+		X0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(0, 3, 2, 1));
+		X1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(1, 2, 3, 0));
+	}
+
+#else
 
 	inline static void Inject(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
 	{
@@ -56,56 +93,14 @@ private:
 		B = Utility::IntUtils::RotL64(B, R) ^ A;
 	}
 
-#if defined(__AVX2__)
-	inline static void Interleave64(__m256i &X0, __m256i &X1)
-	{
-		const __m256i T0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
-		const __m256i T1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(3, 1, 2, 0));
-
-		X0 = _mm256_unpacklo_epi64(T0, T1);
-		X1 = _mm256_unpackhi_epi64(T0, T1);
-	}
-
-	#define TF512ROUND(X0, X1, SHL)														\
-	   do {                                                                             \
-		  const __m256i SHR = _mm256_sub_epi64(_mm256_set1_epi64x(64), SHL);            \
-		  X0 = _mm256_add_epi64(X0, X1);                                                \
-		  X1 = _mm256_or_si256(_mm256_sllv_epi64(X1, SHL), _mm256_srlv_epi64(X1, SHR)); \
-		  X1 = _mm256_xor_si256(X1, X0);                                                \
-		  X0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(0, 3, 2, 1));                   \
-		  X1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(1, 2, 3, 0));                   \
-	   } while(0)
-
-	#define TF512INJECTKEY(X0, X1, R0, K0, K1, I0, I1)									\
-	   do {																				\
-		  const __m256i T0 = _mm256_permute4x64_epi64(T, _MM_SHUFFLE(I0, 0, 0, 0));		\
-		  const __m256i T1 = _mm256_permute4x64_epi64(T, _MM_SHUFFLE(0, I1, 0, 0));		\
-		  X0 = _mm256_add_epi64(X0, K0);												\
-		  X1 = _mm256_add_epi64(X1, K1);												\
-		  X1 = _mm256_add_epi64(X1, R0);												\
-		  X0 = _mm256_add_epi64(X0, T0);												\
-		  X1 = _mm256_add_epi64(X1, T1);												\
-		  R0 = _mm256_add_epi64(R0, RFN);												\
-	   } while(0)
-
-	#define TF512ENC8ROUNDS(X0, X1, R0, K1, K2, K3, T0, T1, T2)			\
-	   do {																\
-		  TF512ROUND(X0, X1, R1);										\
-		  TF512ROUND(X0, X1, R2);										\
-		  TF512ROUND(X0, X1, R3);										\
-		  TF512ROUND(X0, X1, R4);										\
-		  TF512INJECTKEY(X0, X1, R0, K1, K2, T0, T1);					\
-		  TF512ROUND(X0, X1, R5);										\
-		  TF512ROUND(X0, X1, R6);										\
-		  TF512ROUND(X0, X1, R7);										\
-		  TF512ROUND(X0, X1, R8);										\
-		  TF512INJECTKEY(X0, X1, R0, K2, K3, T2, T0);					\
-	   } while(0)
 #endif
 
 public:
 
+	//~~~Public Functions~~~//
+
 #if defined(__AVX2__)
+
 	template <typename T>
 	static void Transfrom(std::vector<ulong> &Input, size_t InOffset, T &Output)
 	{
@@ -130,27 +125,155 @@ public:
 		const __m256i K6 = _mm256_set_epi64x(Output.S[3], Output.S[1], KS, Output.S[6]);
 		const __m256i K7 = _mm256_set_epi64x(Output.S[4], Output.S[2], Output.S[0], Output.S[7]);
 		const __m256i K8 = _mm256_set_epi64x(Output.S[5], Output.S[3], Output.S[1], KS);
-		const __m256i T = _mm256_set_epi64x(Output.T[0], Output.T[1], Output.T[0] ^ Output.T[1], 0);
+		const __m256i TS = _mm256_set_epi64x(Output.T[0], Output.T[1], Output.T[0] ^ Output.T[1], 0);
 
-		__m256i* regOutput = reinterpret_cast<__m256i*>(Output.S.data());
 		__m256i X0 = _mm256_set_epi64x(Input[InOffset + 6], Input[InOffset + 4], Input[InOffset + 2], Input[InOffset]);
 		__m256i X1 = _mm256_set_epi64x(Input[InOffset + 7], Input[InOffset + 5], Input[InOffset + 3], Input[InOffset + 1]);
+		__m256i T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
+		__m256i T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
 
-		TF512INJECTKEY(X0, X1, R0, K0, K1, 2, 3);
-		TF512ENC8ROUNDS(X0, X1, R0, K1, K2, K3, 1, 2, 3);
-		TF512ENC8ROUNDS(X0, X1, R0, K3, K4, K5, 2, 3, 1);
-		TF512ENC8ROUNDS(X0, X1, R0, K5, K6, K7, 3, 1, 2);
-		TF512ENC8ROUNDS(X0, X1, R0, K7, K8, K0, 1, 2, 3);
-		TF512ENC8ROUNDS(X0, X1, R0, K0, K1, K2, 2, 3, 1);
-		TF512ENC8ROUNDS(X0, X1, R0, K2, K3, K4, 3, 1, 2);
-		TF512ENC8ROUNDS(X0, X1, R0, K4, K5, K6, 1, 2, 3);
-		TF512ENC8ROUNDS(X0, X1, R0, K6, K7, K8, 2, 3, 1);
-		TF512ENC8ROUNDS(X0, X1, R0, K8, K0, K1, 3, 1, 2);
+		Inject(X0, X1, R0, T0, T1, K0, K1, RFN);
 
-		Interleave64(X0, X1);
+		// round 0
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K1, K2, RFN);
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K2, K3, RFN);
+		// round 8
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K3, K4, RFN);
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K4, K5, RFN);
+		// round 16
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K5, K6, RFN);
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K6, K7, RFN);
+		// round 24
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K7, K8, RFN);
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K8, K0, RFN);
+		// round 32
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));//t0,t1 
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K0, K1, RFN);//k1,k2
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K1, K2, RFN);
+		// round 40
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));//t0,t1 
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K2, K3, RFN);//k1,k2
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K3, K4, RFN);
+		// round 48
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));//t0,t1 
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K4, K5, RFN);//k1,k2
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K5, K6, RFN);
+		// round 56
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K6, K7, RFN);
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K7, K8, RFN);
+		// round 64
+		Round(X0, X1, R1);
+		Round(X0, X1, R2);
+		Round(X0, X1, R3);
+		Round(X0, X1, R4);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K8, K0, RFN);//k1,k2
+		Round(X0, X1, R5);
+		Round(X0, X1, R6);
+		Round(X0, X1, R7);
+		Round(X0, X1, R8);
+		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
+		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
+		Inject(X0, X1, R0, T0, T1, K0, K1, RFN);
 
-		_mm256_storeu_si256(regOutput++, X0);
-		_mm256_storeu_si256(regOutput, X1);
+		Interleave(X0, X1);
+
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output.S[0]), X0);
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output.S[4]), X1);
 	}
 
 #else
@@ -479,6 +602,7 @@ public:
 		Output.S[6] = B6 + K6 + T1;
 		Output.S[7] = B7 + K7 + 18;
 	}
+
 #endif
 };
 

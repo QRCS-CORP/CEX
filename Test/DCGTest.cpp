@@ -42,19 +42,6 @@ namespace Test
 		}
 	}
 
-	void DCGTest::CompareOutput(std::vector<byte> &Seed, std::vector<byte> &Expected)
-	{
-		std::vector<byte> output(Expected.size());
-		Drbg::DCG ctd(Enumeration::Digests::SHA256);
-		ctd.Initialize(Seed);
-
-		for (int i = 0; i != 1024; i++)
-			ctd.Generate(output);
-
-		if (output != Expected)
-			throw TestException("DCGTest: Failed comparison test!");
-	}
-
 	void DCGTest::CheckInit()
 	{
 		std::vector<byte> info(32, 0x03);
@@ -125,34 +112,21 @@ namespace Test
 
 	bool DCGTest::CheckRuns(const std::vector<byte> &Input)
 	{
+		bool state = false;
+
 		// indicates zeroed output or bad run
 		for (size_t i = 0; i < Input.size() - 4; i += 4)
 		{
 			if (Input[i] == Input[i + 1] &&
 				Input[i + 1] == Input[i + 2] &&
 				Input[i + 2] == Input[i + 3])
-					return true;
+			{
+				state = true;
+				break;
+			}
 		}
-		return false;
-	}
 
-	void DCGTest::Initialize()
-	{
-		const char* seed256Encoded[2] =
-		{
-			("0000000000000000"),
-			("81dcfafc885914057876")
-		};
-		HexConverter::Decode(seed256Encoded, 2, m_seed256);
-
-		// note: to match the old values, initialize m_reseedCounter to 32 (1 cycle for sha256) in DCG ctor
-		// to run this test seed size check must be remmed in DCG::Initialize
-		const char* exp256Encoded[2] =
-		{
-			("0d2d154263ca561a5b60bcb7c780ac78483cd7c057fcb0c99363b936f4524948"), // old: 587e2dfd597d086e47ddcd343eac983a5c913bef8c6a1a560a5c1bc3a74b0991
-			("b0a48955fce5fa7af7544e154872451846847a2af2d69287043f6cb8a139c7f9")  // old: bdab3ca831b472a2fa09bd1bade541ef16c96640a91fcec553679a136061de98 
-		};
-		HexConverter::Decode(exp256Encoded, 2, m_expected256);
+		return state;
 	}
 
 	void DCGTest::OnProgress(std::string Data)

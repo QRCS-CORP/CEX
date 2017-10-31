@@ -64,9 +64,9 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 		{
 			if (GetDiskFreeSpaceEx(ws.c_str(), &freeBytes, &totalBytes, &availBytes))
 			{
-				retSizes.push_back((ulong)freeBytes.QuadPart);
-				retSizes.push_back((ulong)totalBytes.QuadPart);
-				retSizes.push_back((ulong)availBytes.QuadPart);
+				retSizes.push_back(static_cast<ulong>(freeBytes.QuadPart));
+				retSizes.push_back(static_cast<ulong>(totalBytes.QuadPart));
+				retSizes.push_back(static_cast<ulong>(availBytes.QuadPart));
 			}
 		}
 	}
@@ -83,8 +83,8 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 		struct statvfs fsinfo;
 		statvfs("/", &fsinfo);
 
-		retSizes.push_back((ulong)fsinfo.f_frsize * fsinfo.f_blocks);
-		retSizes.push_back((ulong)fsinfo.f_bsize * fsinfo.f_bfree);
+		retSizes.push_back(static_cast<ulong>(fsinfo.f_frsize * fsinfo.f_blocks));
+		retSizes.push_back(static_cast<ulong>(fsinfo.f_bsize * fsinfo.f_bfree));
 	}
 	catch (...) {}
 

@@ -32,7 +32,7 @@ class ParallelUtils
 public:
 
 	/// <summary>
-	/// Get: The number of processors available on the system
+	/// Read Only: The number of processors available on the system
 	/// </summary>
 	static size_t ProcessorCount();
 
@@ -46,7 +46,7 @@ public:
 	static void ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F);
 
 	/// <summary>
-	/// An SIMD vectorized For loop
+	/// An SIMD vectorized For loop (not currently used, requires a higher version of OpenMP)
 	/// </summary>
 	/// 
 	/// <param name="F">The function delegate</param>

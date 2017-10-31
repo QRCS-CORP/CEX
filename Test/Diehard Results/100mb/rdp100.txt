@@ -25,7 +25,7 @@
      :: of 500 j's is taken, and a chi-square goodness of fit test    ::        
      :: provides a p value.  The first test uses bits 1-24 (counting  ::        
      :: from the left) from integers in the specified file.           ::        
-     ::   Then the file is closed and reopened. Next, bits 2-25 are   ::        
+     ::   Then the file is closed and reopened. NextUInt32, bits 2-25 are   ::        
      :: used to provide birthdays, then 3-26 and so on to bits 9-32.  ::        
      :: Each set of bits provides a p-value, and the nine p-values    ::        
      :: provide a sample for a KSTEST.                                ::        

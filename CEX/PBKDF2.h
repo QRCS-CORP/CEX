@@ -92,7 +92,7 @@ using Mac::HMAC;
 /// <item><description>NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf">Recommendation for Password-Based Key Derivation</a>.</description></item>
 /// </list>
 /// </remarks>
-class PBKDF2 : public IKdf
+class PBKDF2 final : public IKdf
 {
 private:
 
@@ -100,7 +100,7 @@ private:
 	static const size_t MIN_PASSLEN = 4;
 	static const size_t MIN_SALTLEN = 4;
 
-	HMAC* m_macGenerator;
+	std::unique_ptr<HMAC> m_macGenerator;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
@@ -115,40 +115,22 @@ private:
 
 public:
 
-	PBKDF2() = delete;
-	PBKDF2(const PBKDF2&) = delete;
-	PBKDF2& operator=(const PBKDF2&) = delete;
-	PBKDF2& operator=(PBKDF2&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The Kdf generators type name
-	/// </summary>
-	const Kdfs Enumeral() override;
-
-	/// <summary>
-	/// Get: Generator is ready to produce random
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: Available Kdf Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Minimum recommended initialization key size in bytes.
-	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
-	/// </summary>
-	size_t MinKeySize() override;
-
-	/// <summary>
-	/// Get: The Kdf generators class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	PBKDF2(const PBKDF2&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	PBKDF2& operator=(const PBKDF2&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	PBKDF2() = delete;
 
 	/// <summary>
 	/// Instantiates a PBKDF2 generator using a message digest type name
@@ -181,16 +163,39 @@ public:
 	PBKDF2(HMAC* Mac, size_t Iterations = 5000);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~PBKDF2() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The Kdf generators type name
 	/// </summary>
-	void Destroy() override;
+	const Kdfs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Generator is ready to produce random
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: Available Kdf Key Sizes in bytes
+	/// </summary>
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Minimum recommended initialization key size in bytes.
+	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
+	/// </summary>
+	size_t MinKeySize() override;
+
+	/// <summary>
+	/// Read Only: The Kdf generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -218,6 +223,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -228,7 +235,7 @@ public:
 	/// <param name="Key">The primary key (password) array used to seed the generator.
 	/// <para>The minimum passphrase size is 4 bytes.</para></param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key) override;
 
 	/// <summary>
@@ -237,6 +244,8 @@ public:
 	/// 
 	/// <param name="Key">The primary key (password) array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
@@ -246,16 +255,17 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
 
 	/// <summary>
 	/// Update the generators salt array.
-	/// <para>The salt length <para>
 	/// </summary>
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void ReSeed(const std::vector<byte> &Seed) override;
 
 	/// <summary>

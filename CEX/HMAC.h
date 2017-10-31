@@ -84,7 +84,7 @@ using Common::ParallelOptions;
 /// <item><description>CRYPTO '06, Lecture <a href="http://cseweb.ucsd.edu/~mihir/papers/hmac-new.pdf">NMAC and HMAC Security</a>: NMAC and HMAC Security Proofs.</description></item>
 /// </list>
 /// </remarks>
-class HMAC : public IMac
+class HMAC final : public IMac
 {
 private:
 
@@ -92,7 +92,7 @@ private:
 	static const byte IPAD = 0x36;
 	static const byte OPAD = 0x5C;
 
-	IDigest* m_msgDigest;
+	std::unique_ptr<IDigest> m_msgDigest;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
@@ -103,93 +103,105 @@ private:
 
 public:
 
-	HMAC() = delete;
-	HMAC(const HMAC&) = delete;
-	HMAC& operator=(const HMAC&) = delete;
-	HMAC& operator=(HMAC&&) = delete;
-
-	//~~~Properties~~~//
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Get: The Digests internal blocksize in bytes
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	HMAC(const HMAC&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	HMAC& operator=(const HMAC&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	HMAC() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class using the digest enumeration name
+	/// </summary>
+	/// 
+	/// <param name="DigestType">The message digest enumeration name</param>
+	/// <param name="Parallel">Initialize the parallelized form of the message digest</param>
+	/// 
+	/// <exception cref="CryptoMacException">Thrown if an invalid digest type is selected</exception>
+	explicit HMAC(Digests DigestType, bool Parallel = false);
+
+	/// <summary>
+	/// Initialize the class with a digest instance
+	/// </summary>
+	/// 
+	/// <param name="Digest">Message Digest instance</param>
+	/// 
+	/// <exception cref="Exception::CryptoMacException">Thrown if the digest is null</exception>
+	explicit HMAC(IDigest* Digest);
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	~HMAC() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Digests internal blocksize in bytes
 	/// </summary>
 	const size_t BlockSize() override;
 
 	/// <summary>
-	/// Get: The message digest engine type
+	/// Read Only: The message digest engine type
 	/// </summary>
 	const Digests DigestType();
 
 	/// <summary>
-	/// Get: Mac generators type name
+	/// Read Only: Mac generators type name
 	/// </summary>
 	const Macs Enumeral() override;
 
 	/// <summary>
-	/// Get: Size of returned mac in bytes
+	/// Read Only: Size of returned mac in bytes
 	/// </summary>
 	const size_t MacSize() override;
 
 	/// <summary>
-	/// Get: Mac is ready to digest data
+	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
+	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
 	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
-	/// Get: Processor parallelization availability.
+	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available on this system.
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	const bool IsParallel();
 
 	/// <summary>
-	/// Get: Mac generators class name
+	/// Read Only: Mac generators class name
 	/// </summary>
 	const std::string Name() override;
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
+	/// Read Only: Parallel block size; the byte-size of the input data array passed to the Update function that triggers parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize();
 
 	/// <summary>
-	/// Get/Set: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
+	/// Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure.
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree(size_t) function.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by the profiles ParallelMinimumSize() property.
 	/// Note: The ParallelMaxDegree property can not be changed through this interface, use the ParallelMaxDegree(size_t) function to change the thread count 
 	/// and reinitialize the state, or initialize the digest manually using a digest Params structure with the FanOut property set to the desired number of threads.</para>
 	/// </summary>
 	ParallelOptions &ParallelProfile();
-
-	//~~~Constructor~~~//
-
-	/// <summary>
-	/// Instantiate this class using the digest enumeration name
-	/// </summary>
-	/// 
-	/// <param name="DigestType">The message digest enumeration name</param>
-	/// <param name="Parallel">Initialize the parallelized form of the message digest</param>
-	explicit HMAC(Digests DigestType, bool Parallel = false);
-
-	/// <summary>
-	/// Initialize the class
-	/// </summary>
-	/// 
-	/// <param name="Digest">Message Digest instance</param>
-	/// 
-	/// <exception cref="Exception::CryptoMacException">Thrown if a null digest is used</exception>
-	explicit HMAC(IDigest* Digest);
-
-	/// <summary>
-	/// Finalize objects
-	/// </summary>
-	~HMAC() override;
 
 	//~~~Public Functions~~~//
 
@@ -200,14 +212,7 @@ public:
 	/// 
 	/// <param name="Input">The input data byte array</param>
 	/// <param name="Output">The output Mac code array</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
 	void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy() override;
 
 	/// <summary>
 	/// Process the data and return a Mac code
@@ -218,8 +223,6 @@ public:
 	/// <param name="OutOffset">The offset in the output array</param>
 	/// 
 	/// <returns>The number of bytes processed</returns>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if Output array is too small</exception>
 	size_t Finalize(std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
@@ -229,6 +232,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// 
+	/// <exception cref="Exception::CryptoMacException">Thrown if an invalid key size is used</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>

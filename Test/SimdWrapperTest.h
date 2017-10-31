@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_SIMDWRAPPERTEST_H
-#define _CEXTEST_SIMDWRAPPERTEST_H
+#ifndef CEXTEST_SIMDWRAPPERTEST_H
+#define CEXTEST_SIMDWRAPPERTEST_H
 
 #include "ITest.h"
 #include "../CEX/IntUtils.h"

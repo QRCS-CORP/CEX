@@ -8,7 +8,71 @@ NAMESPACE_MODE
 
 const std::string CTR::CLASS_NAME("CTR");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+CTR::CTR(BlockCiphers CipherType)
+	:
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+		throw CryptoCipherModeException("CTR:CTor", "The Cipher type can not be none!")),
+	m_cipherType(CipherType),
+	m_ctrVector(BLOCK_SIZE),
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
+{
+}
+
+CTR::CTR(IBlockCipher* Cipher)
+	:
+	m_blockCipher(Cipher != nullptr ? Cipher : 
+		throw CryptoCipherModeException("CTR:CTor", "The Cipher can not be null!")),
+	m_cipherType(m_blockCipher->Enumeral()),
+	m_ctrVector(BLOCK_SIZE),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
+{
+}
+
+CTR::~CTR()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isLoaded = false;
+		m_parallelProfile.Reset();
+
+		Utility::IntUtils::ClearVector(m_ctrVector);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t CTR::BlockSize()
 {
@@ -22,7 +86,7 @@ const BlockCiphers CTR::CipherType()
 
 IBlockCipher* CTR::Engine()
 {
-	return m_blockCipher;
+	return m_blockCipher.get();
 }
 
 const CipherModes CTR::Enumeral()
@@ -65,41 +129,6 @@ ParallelOptions &CTR::ParallelProfile()
 	return m_parallelProfile;
 }
 
-//~~~Constructor~~~//
-
-CTR::CTR(BlockCiphers CipherType)
-	:
-	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType)),
-	m_cipherType(CipherType),
-	m_ctrVector(BLOCK_SIZE),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
-{
-}
-
-CTR::CTR(IBlockCipher* Cipher)
-	:
-	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoCipherModeException("CTR:CTor", "The Cipher can not be null!")),
-	m_cipherType(m_blockCipher->Enumeral()),
-	m_ctrVector(BLOCK_SIZE),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
-{
-}
-
-CTR::~CTR()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void CTR::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -110,29 +139,6 @@ void CTR::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 void CTR::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
-}
-
-void CTR::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cipherType = BlockCiphers::None;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_isLoaded = false;
-		m_parallelProfile.Reset();
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_blockCipher != 0)
-				delete m_blockCipher;
-		}
-
-		Utility::IntUtils::ClearVector(m_ctrVector);
-	}
 }
 
 void CTR::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -148,11 +154,17 @@ void CTR::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 void CTR::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size(), KeyParams.Nonce().size()))
+	{
 		throw CryptoSymmetricCipherException("CTR:Initialize", "Invalid key or nonce size! Key and nonce must be one of the LegalKeySizes() members in length.");
+	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+	{
 		throw CryptoSymmetricCipherException("CTR:Initialize", "The parallel block size is out of bounds!");
+	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
+	{
 		throw CryptoSymmetricCipherException("CTR:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+	}
 
 	Scope();
 	m_blockCipher->Initialize(true, KeyParams);
@@ -163,12 +175,9 @@ void CTR::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void CTR::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoCipherModeException("CTR:ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree % 2 != 0)
-		throw CryptoCipherModeException("CTR:ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoCipherModeException("CTR:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
@@ -178,10 +187,29 @@ void CTR::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
 	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= Length, "The data arrays are smaller than the the block-size!");
 
-	if (m_parallelProfile.IsParallel() && Length >= m_parallelProfile.ParallelBlockSize())
-		ProcessParallel(Input, InOffset, Output, OutOffset, Length);
+	const size_t PRLBLK = m_parallelProfile.ParallelBlockSize();
+
+	if (m_parallelProfile.IsParallel() && Length >= PRLBLK)
+	{
+		const size_t BLKCNT = Length / PRLBLK;
+
+		for (size_t i = 0; i < BLKCNT; ++i)
+		{
+			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
+		}
+
+		const size_t RMDLEN = Length - (PRLBLK * BLKCNT);
+
+		if (RMDLEN != 0)
+		{
+			const size_t BLKOFT = (PRLBLK * BLKCNT);
+			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDLEN);
+		}
+	}
 	else
+	{
 		ProcessSequential(Input, InOffset, Output, OutOffset, Length);
+	}
 }
 
 //~~~Private Functions~~~//
@@ -207,7 +235,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		const size_t PBKALN = Length - (Length % AVX512BLK);
 		std::vector<byte> ctrBlk(AVX512BLK);
 
-		// stagger counters and process 8 blocks with avx
+		// stagger counters and process 8 blocks with avx512
 		while (blkCtr != PBKALN)
 		{
 			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
@@ -253,7 +281,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		const size_t PBKALN = Length - (Length % AVX2BLK);
 		std::vector<byte> ctrBlk(AVX2BLK);
 		
-		// stagger counters and process 8 blocks with avx
+		// stagger counters and process 8 blocks with avx2
 		while (blkCtr != PBKALN)
 		{
 			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
@@ -283,7 +311,7 @@ void CTR::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		const size_t PBKALN = Length - (Length % AVXBLK);
 		std::vector<byte> ctrBlk(AVXBLK);
 
-		// 4 blocks with sse
+		// 4 blocks with avx
 		while (blkCtr != PBKALN)
 		{
 			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
@@ -338,7 +366,9 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
+		{
 			Utility::MemUtils::COPY128(thdCtr, 0, tmpCtr, 0);
+		}
 	});
 
 	// copy last counter to class variable
@@ -348,11 +378,13 @@ void CTR::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 	const size_t ALNSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
 	if (ALNSZE < OUTSZE)
 	{
-		size_t fnlSize = (Output.size() - OutOffset) % ALNSZE;
-		Generate(Output, ALNSZE, fnlSize, m_ctrVector);
+		const size_t FNLSZE = (Output.size() - OutOffset) % ALNSZE;
+		Generate(Output, ALNSZE, FNLSZE, m_ctrVector);
 
 		for (size_t i = ALNSZE; i < OUTSZE; i++)
+		{
 			Output[i] ^= Input[i];
+		}
 	}
 }
 
@@ -364,20 +396,26 @@ void CTR::ProcessSequential(const std::vector<byte> &Input, const size_t InOffse
 	size_t ALNSZE = Length - (Length % BLOCK_SIZE);
 
 	if (ALNSZE != 0)
+	{
 		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNSZE);
+	}
 
 	// get the remaining bytes
 	if (ALNSZE != Length)
 	{
 		for (size_t i = ALNSZE; i < Length; ++i)
+		{
 			Output[i + OutOffset] ^= Input[i + InOffset];
+		}
 	}
 }
 
 void CTR::Scope()
 {
 	if (!m_parallelProfile.IsDefault())
+	{
 		m_parallelProfile.Calculate();
+	}
 }
 
 NAMESPACE_MODEEND

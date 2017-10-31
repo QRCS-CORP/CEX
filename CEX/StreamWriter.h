@@ -2,6 +2,7 @@
 #define CEX_STREAMWRITER_H
 
 #include "MemoryStream.h"
+#include "IntUtils.h"
 #include "MemUtils.h"
 
 NAMESPACE_IO
@@ -14,66 +15,78 @@ class StreamWriter
 private:
 
 	size_t m_streamPosition;
-	std::vector<byte> m_streamData;
+	std::vector<byte> m_streamState;
 
 public:
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// The length of the data
-	/// </summary>
-	const size_t Length();
-
-	/// <summary>
-	/// The current position within the data
-	/// </summary>
-	const size_t Position();
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	StreamWriter(const StreamWriter&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	StreamWriter& operator=(const StreamWriter&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	StreamWriter() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class
 	/// </summary>
 	///
 	/// <param name="Length">The length of the underlying stream</param>
 	explicit StreamWriter(size_t Length);
 
 	/// <summary>
-	/// Instantiate this class with a byte array
+	/// Constructor: instantiate this class with a byte array
 	/// </summary>
 	///
 	/// <param name="DataArray">The byte array to write data to</param>
 	explicit StreamWriter(const std::vector<byte> &DataArray);
 
 	/// <summary>
-	/// Instantiate this class with a MemoryStream
+	/// Constructor: instantiate this class with a MemoryStream
 	/// </summary>
 	///
 	/// <param name="DataStream">The MemoryStream to write data to</param>
 	explicit StreamWriter(MemoryStream &DataStream);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~StreamWriter();
 
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	void Destroy();
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Returns the entire array of raw bytes from the stream
+	/// Read/Write: Returns the entire array of raw bytes from the stream
 	/// </summary>
 	/// <returns>The array of bytes</returns>
 	std::vector<byte> &GetBytes();
 
 	/// <summary>
-	/// Returns the base MemoryStream object
+	/// Read/Write: Returns the base MemoryStream object
 	/// </summary>
 	/// <returns>The state as a MemoryStream</returns>
 	MemoryStream* GetStream();
+
+	/// <summary>
+	/// Read Only: The length of the data
+	/// </summary>
+	const size_t Length();
+
+	/// <summary>
+	/// Read Only: The current position within the data
+	/// </summary>
+	const size_t Position();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Write an array of T to the base stream
@@ -84,10 +97,12 @@ public:
 	void Write(const std::vector<T> &Input)
 	{
 		const size_t INPSZE = Input.size() * sizeof(T);
-		if (m_streamPosition + INPSZE > m_streamData.size())
-			m_streamData.resize(m_streamPosition + INPSZE);
+		if (m_streamPosition + INPSZE > m_streamState.size())
+		{
+			m_streamState.resize(m_streamPosition + INPSZE);
+		}
 
-		Utility::MemUtils::Copy(Input, 0, m_streamData, m_streamPosition, INPSZE);
+		Utility::IntUtils::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPSZE);
 		m_streamPosition += INPSZE;
 	}
 
@@ -98,14 +113,24 @@ public:
 	/// <param name="Input">The T integer source array</param>
 	/// <param name="InOffset">The starting offset in the T integer array</param>
 	/// <param name="Elements">The number of T integers to write to the array</param>
-	template <typename T>
-	void Write(const std::vector<T> &Input, size_t InOffset, size_t Elements)
+	template <typename Array>
+	void Write(const Array &Input, size_t InOffset, size_t Elements)
 	{
-		const size_t INPSZE = sizeof(T) * Elements;
-		if (m_streamPosition + INPSZE > m_streamData.size())
-			m_streamData.resize(m_streamPosition + INPSZE);
+		const size_t INPSZE = sizeof(Array::value_type) * Elements;
+		if (m_streamPosition + INPSZE > m_streamState.size())
+		{
+			m_streamState.resize(m_streamPosition + INPSZE);
+		}
 
-		Utility::MemUtils::Copy(Input, InOffset, m_streamData, m_streamPosition, INPSZE);
+		if (sizeof(Array::value_type) > 1)
+		{
+			Utility::IntUtils::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPSZE);
+		}
+		{
+			Utility::MemUtils::Copy(Input, InOffset, m_streamState, m_streamPosition, INPSZE);
+		}
+
+
 		m_streamPosition += INPSZE;
 	}
 
@@ -118,10 +143,34 @@ public:
 	void Write(T Value)
 	{
 		const size_t VALSZE = sizeof(T);
-		if (m_streamPosition + VALSZE > m_streamData.size())
-			m_streamData.resize(m_streamPosition + VALSZE);
+		if (m_streamPosition + VALSZE > m_streamState.size())
+		{
+			m_streamState.resize(m_streamPosition + VALSZE);
+		}
 
-		Utility::MemUtils::CopyFromValue(Value, m_streamData, m_streamPosition, VALSZE);
+		switch (VALSZE)
+		{
+			case 8:
+			{
+				Utility::IntUtils::Le64ToBytes(Value, m_streamState, m_streamPosition);
+				break;
+			}
+			case 4:
+			{
+				Utility::IntUtils::Le32ToBytes(Value, m_streamState, m_streamPosition);
+				break;
+			}
+			case 2:
+			{
+				Utility::IntUtils::Le16ToBytes(Value, m_streamState, m_streamPosition);
+				break;
+			}
+			default:
+			{
+				Utility::MemUtils::CopyFromValue(Value, m_streamState, m_streamPosition, 1);
+			}
+		}
+
 		m_streamPosition += VALSZE;
 	}
 };

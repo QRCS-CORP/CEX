@@ -20,23 +20,6 @@ private:
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get/Set: The info byte array length
-	/// </summary>
-	const uint InfoSize();
-
-	/// <summary>
-	/// Get/Set: The key byte array length
-	/// </summary>
-	const uint KeySize();
-
-	/// <summary>
-	/// Get/Set: The nonce byte array length
-	/// </summary>
-	const uint NonceSize();
-
 	//~~~Constructor~~~//
 
 	/// <summary>
@@ -49,6 +32,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyArray">Key byte array containing a serialized SymmetricKeySize structure</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if the key array is too small</exception>
 	explicit SymmetricKeySize(const std::vector<byte> &KeyArray);
 
 	/// <summary>
@@ -59,6 +44,23 @@ public:
 	/// <param name="NonceSize">The nonce byte array length</param>
 	/// <param name="InfoSize">The info byte array length</param>
 	explicit SymmetricKeySize(const size_t KeySize, const size_t NonceSize, const size_t InfoSize);
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: The info byte array length
+	/// </summary>
+	const uint InfoSize();
+
+	/// <summary>
+	/// Read/Write: The key byte array length
+	/// </summary>
+	const uint KeySize();
+
+	/// <summary>
+	/// Read/Write: The nonce byte array length
+	/// </summary>
+	const uint NonceSize();
 
 	//~~~Public Functions~~~//
 

@@ -36,7 +36,7 @@ using Enumeration::Digests;
 /// <description>Example of generating a pseudo random integer:</description>
 /// <code>
 /// PBPRng rnd(new SHA512(), PassPhrase, Salt);
-/// int x = rnd.Next();
+/// int x = rnd.NextUInt32();
 /// </code>
 /// </example>
 /// 
@@ -49,7 +49,6 @@ using Enumeration::Digests;
 /// <item><description>Numbers generated with the same seed will produce the same random output.</description></item>
 /// </list>
 /// 
-/// <remarks>
 /// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>RFC <a href="http://tools.ietf.org/html/rfc2898">2898</a>: Password-Based Cryptography Specification Version 2.0.</description></item>
@@ -60,11 +59,12 @@ using Enumeration::Digests;
 /// <item><description>RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requirements for Security.</description></item>
 /// </list>
 /// </remarks>
-class PBR : public IPrng
+class PBR final : public IPrng
 {
 private:
 
 	static const std::string CLASS_NAME;
+	static const size_t MIN_BUFSZE = 64;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
@@ -73,23 +73,26 @@ private:
 	bool m_isDestroyed;
 	std::vector<byte> m_rndSeed;
 	std::vector<byte> m_rngBuffer;
-	Kdf::PBKDF2* m_rngGenerator;
+	std::unique_ptr<Kdf::PBKDF2> m_rngGenerator;
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The random generators type name
-	/// </summary>
-	const Prngs Enumeral() override;
-
-	/// <summary>
-	/// Get: The random generators class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	PBR() = delete;
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	PBR(const PBR&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	PBR& operator=(const PBR&) = delete;
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -101,19 +104,26 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 128 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed or buffer size is too small; (min. seed = 2* digest hash size, min. buffer 64 bytes)</exception>
-	PBR(std::vector<byte> &Seed, int Iterations = 5000, Digests DigestEngine = Digests::SHA512, size_t BufferSize = 1024);
+	explicit PBR(std::vector<byte> &Seed, int Iterations = 5000, Digests DigestEngine = Digests::SHA512, size_t BufferSize = 1024);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~PBR() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The random generators type name
 	/// </summary>
-	void Destroy() override;
+	const Prngs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The random generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
@@ -163,78 +173,21 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	ushort NextUShort() override;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUShort(ushort Maximum) override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	ushort NextUShort(ushort Maximum, ushort Minimum) override;
+	ushort NextUInt16() override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 32bit integer</returns>
-	uint Next() override;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Maximum) override;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random 32bit integer</returns>
-	uint Next(uint Maximum, uint Minimum) override;
+	uint NextUInt32() override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random 64bit integer</returns>
-	ulong NextULong() override;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextULong(ulong Maximum) override;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random 64bit integer</returns>
-	ulong NextULong(ulong Maximum, ulong Minimum) override;
+	ulong NextUInt64() override;
 
 	/// <summary>
 	/// Reset the generator instance
@@ -243,7 +196,6 @@ public:
 
 private:
 
-	ulong GetRanged(ulong Maximum, size_t Length);
 	uint GetMinimumSeedSize(Digests RngEngine);
 };
 

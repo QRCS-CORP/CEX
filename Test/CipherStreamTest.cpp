@@ -54,13 +54,9 @@ namespace Test
 			// local test
 			//FileStreamTest();
 
-			// Note: occasionally a padded block will fail these tests.
-			// If the padding schemes offset code, just happens to be the same value as the last byte in a block,
-			// that last byte is mistaken as padding and removed. This is expected behavior.
-
 			CbcModeTest();
 			OnProgress(std::string("Passed CBC Mode tests.."));
-			CfbModeTest(); // TODO: failed here (once) vet this class and re-test
+			CfbModeTest();
 			OnProgress(std::string("Passed CFB Mode tests.."));
 			CtrModeTest();
 			OnProgress(std::string("Passed CTR Mode tests.."));
@@ -231,7 +227,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = (size_t)rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -339,7 +335,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = (size_t)rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -448,7 +444,7 @@ namespace Test
 		// ctr test
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = (size_t)rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_encText.resize(smpSze);
@@ -710,7 +706,7 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = (size_t)rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
+				size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize()));
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -735,7 +731,7 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = (size_t)rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
+				size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize()));
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -779,7 +775,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = rng.NextInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = (size_t)smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -883,7 +879,7 @@ namespace Test
 		// ctr test
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = (size_t)rng.NextInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -1057,11 +1053,11 @@ namespace Test
 			size_t blkSze = 0;
 			if (NonAlign != 0)
 			{
-				while ((blkSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC)) % NonAlign == 0);
+				while ((blkSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC)) % NonAlign == 0);
 			}
 			else
 			{
-				blkSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+				blkSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 			}
 			Data.resize(blkSze);
 		}

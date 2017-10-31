@@ -4,7 +4,87 @@
 
 NAMESPACE_PROCESSING
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+MacDescription::MacDescription()
+	:
+	m_macType(0),
+	m_keySize(0),
+	m_ivSize(0),
+	m_hmacEngine(0),
+	m_engineType(0),
+	m_blockSize(0),
+	m_roundCount(0),
+	m_kdfEngine(0)
+{}
+
+MacDescription::MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine, BlockCiphers EngineType, 
+	BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
+{
+	m_macType = static_cast<byte>(MacType);
+	m_keySize = KeySize;
+	m_ivSize = IvSize;
+	m_hmacEngine = static_cast<byte>(HmacEngine);
+	m_engineType = static_cast<byte>(EngineType);
+	m_blockSize = static_cast<byte>(BlockSize);
+	m_roundCount = static_cast<byte>(RoundCount);
+	m_kdfEngine = static_cast<byte>(KdfEngine);
+}
+
+MacDescription::MacDescription(uint KeySize, Digests HmacEngine)
+{
+	m_macType = static_cast<byte>(Macs::HMAC);
+	m_keySize = KeySize;
+	m_hmacEngine = static_cast<byte>(HmacEngine);
+	m_ivSize = 0;
+	m_engineType = 0;
+	m_blockSize = 0;
+	m_roundCount = 0;
+	m_kdfEngine = 0;
+}
+
+MacDescription::MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
+{
+	m_macType = static_cast<byte>(Macs::CMAC);
+	m_keySize = KeySize;
+	m_ivSize = static_cast<byte>(IvSize);
+	m_hmacEngine = 0;
+	m_engineType = static_cast<byte>(EngineType);
+	m_blockSize = static_cast<byte>(BlockSize);
+	m_roundCount = static_cast<byte>(RoundCount);
+	m_kdfEngine = static_cast<byte>(KdfEngine);
+}
+
+MacDescription::MacDescription(const MemoryStream &DescriptionStream)
+{
+	IO::StreamReader reader(DescriptionStream);
+
+	m_macType = reader.ReadByte();
+	m_keySize = reader.ReadInt<short>();
+	m_ivSize = reader.ReadByte();
+	m_hmacEngine = reader.ReadByte();
+	m_engineType = reader.ReadByte();
+	m_blockSize = reader.ReadByte();
+	m_roundCount = reader.ReadByte();
+	m_kdfEngine = reader.ReadByte();
+}
+
+MacDescription::MacDescription(const std::vector<byte> &DescriptionArray)
+{
+	MemoryStream ms(DescriptionArray);
+	IO::StreamReader reader(ms);
+
+	m_macType = reader.ReadByte();
+	m_keySize = reader.ReadInt<short>();
+	m_ivSize = reader.ReadByte();
+	m_hmacEngine = reader.ReadByte();
+	m_engineType = reader.ReadByte();
+	m_blockSize = reader.ReadByte();
+	m_roundCount = reader.ReadByte();
+	m_kdfEngine = reader.ReadByte();
+}
+
+//~~~Accessors~~~//
 
 const BlockSizes MacDescription::BlockSize() 
 {
@@ -68,93 +148,11 @@ int MacDescription::GetHeaderSize()
 	return MACHDR_SIZE;
 }
 
-//~~~Constructor~~~//
-
-MacDescription::MacDescription()
-	:
-	m_macType(0),
-	m_keySize(0),
-	m_ivSize(0),
-	m_hmacEngine(0),
-	m_engineType(0),
-	m_blockSize(0),
-	m_roundCount(0),
-	m_kdfEngine(0)
-{}
-
-MacDescription::MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine, BlockCiphers EngineType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
-{
-	m_macType = static_cast<byte>(MacType);
-	m_keySize = KeySize;
-	m_ivSize = IvSize;
-	m_hmacEngine = static_cast<byte>(HmacEngine);
-	m_engineType = static_cast<byte>(EngineType);
-	m_blockSize = static_cast<byte>(BlockSize);
-	m_roundCount = static_cast<byte>(RoundCount);
-	m_kdfEngine = static_cast<byte>(KdfEngine);
-}
-
-MacDescription::MacDescription(uint KeySize, Digests HmacEngine)
-{
-	m_macType = static_cast<byte>(Macs::HMAC);
-	m_keySize = KeySize;
-	m_hmacEngine = static_cast<byte>(HmacEngine);
-	m_ivSize = 0;
-	m_engineType = 0;
-	m_blockSize = 0;
-	m_roundCount = 0;
-	m_kdfEngine = 0;
-}
-
-MacDescription::MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
-{
-	m_macType = static_cast<byte>(Macs::CMAC);
-	m_keySize = KeySize;
-	m_ivSize = static_cast<byte>(IvSize);
-	m_hmacEngine = 0;
-	m_engineType = static_cast<byte>(EngineType);
-	m_blockSize = static_cast<byte>(BlockSize);
-	m_roundCount = static_cast<byte>(RoundCount);
-	m_kdfEngine = static_cast<byte>(KdfEngine);
-}
-
-MacDescription::MacDescription(const MemoryStream &DescriptionStream)
-{
-	IO::StreamReader reader(DescriptionStream);
-
-	m_macType = reader.ReadByte();
-	m_keySize = reader.ReadInt<short>();
-	m_ivSize = reader.ReadByte();
-	m_hmacEngine = reader.ReadByte();
-	m_engineType = reader.ReadByte();
-	m_blockSize = reader.ReadByte();
-	m_roundCount = reader.ReadByte();
-	m_kdfEngine = reader.ReadByte();
-}
-
-MacDescription::MacDescription(const std::vector<byte> &DescriptionArray)
-{
-	MemoryStream ms = MemoryStream(DescriptionArray);
-	IO::StreamReader reader(ms);
-
-	m_macType = reader.ReadByte();
-	m_keySize = reader.ReadInt<short>();
-	m_ivSize = reader.ReadByte();
-	m_hmacEngine = reader.ReadByte();
-	m_engineType = reader.ReadByte();
-	m_blockSize = reader.ReadByte();
-	m_roundCount = reader.ReadByte();
-	m_kdfEngine = reader.ReadByte();
-}
-
 //~~~Public Functions~~~//
 
 bool MacDescription::Equals(MacDescription &Input)
 {
-	if (this->GetHashCode() != Input.GetHashCode())
-		return false;
-
-	return true;
+	return (this->GetHashCode() == Input.GetHashCode());
 }
 
 int MacDescription::GetHashCode()

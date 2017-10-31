@@ -22,6 +22,7 @@
 // Written by John Underhill, September 24, 2014
 // Updated September 16, 2016
 // Updated April 18, 2017
+// Updated October 14, 2017
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CTR_H
@@ -109,7 +110,7 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
 
-	IBlockCipher* m_blockCipher;
+	std::unique_ptr<IBlockCipher> m_blockCipher;
 	BlockCiphers m_cipherType;
 	std::vector<byte> m_ctrVector;
 	bool m_destroyEngine;
@@ -121,76 +122,22 @@ private:
 
 public:
 
-	CTR(const CTR&) = delete;
-	CTR& operator=(const CTR&) = delete;
-	CTR& operator=(CTR&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: Block size of internal cipher in bytes
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Get: The block ciphers formal type name
-	/// </summary>
-	const BlockCiphers CipherType() override;
-
-	/// <summary>
-	/// Get: The underlying Block Cipher instance
-	/// </summary>
-	IBlockCipher* Engine() override;
-
-	/// <summary>
-	/// Get: The cipher modes type name
-	/// </summary>
-	const CipherModes Enumeral() override;
-
-	/// <summary>
-	/// Get: True if initialized for encryption, False for decryption
-	/// </summary>
-	const bool IsEncryption() override;
-
-	/// <summary>
-	/// Get: The Block Cipher is ready to transform data
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
-	/// </summary>
-	const bool IsParallel() override;
-
-	/// <summary>
-	/// Get: Array of allowed cipher input key byte-sizes
-	/// </summary>
-	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Get: The cipher modes class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: The CBC initialization vector (exposed for CMAC)
-	/// </summary>
-	const std::vector<byte> &Nonce() { return m_ctrVector; }
-
-	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
-	/// </summary>
-	const size_t ParallelBlockSize() override;
-
-	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes (Not supported in this mode)
-	/// </summary>
-	ParallelOptions &ParallelProfile() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	CTR(const CTR&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	CTR& operator=(const CTR&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	CTR() = delete;
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher type name
@@ -211,9 +158,74 @@ public:
 	explicit CTR(IBlockCipher* Cipher);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~CTR() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: Block size of internal cipher in bytes
+	/// </summary>
+	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The block ciphers formal type name
+	/// </summary>
+	const BlockCiphers CipherType() override;
+
+	/// <summary>
+	/// Read Only: The underlying Block Cipher instance
+	/// </summary>
+	IBlockCipher* Engine() override;
+
+	/// <summary>
+	/// Read Only: The cipher modes type name
+	/// </summary>
+	const CipherModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: True if initialized for encryption, False for decryption
+	/// </summary>
+	const bool IsEncryption() override;
+
+	/// <summary>
+	/// Read Only: The Block Cipher is ready to transform data
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	const bool IsParallel() override;
+
+	/// <summary>
+	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// </summary>
+	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
+
+	/// <summary>
+	/// Read Only: The cipher modes class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The CBC initialization vector (exposed for CMAC)
+	/// </summary>
+	const std::vector<byte> &Nonce() { return m_ctrVector; }
+
+	/// <summary>
+	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// </summary>
+	const size_t ParallelBlockSize() override;
+
+	/// <summary>
+	/// Read/Write: Parallel and SIMD capability flags and sizes (Not supported in this mode)
+	/// </summary>
+	ParallelOptions &ParallelProfile() override;
 
 	//~~~Public Functions~~~//
 
@@ -238,13 +250,6 @@ public:
 	/// <param name="Output">The output array of decrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the Output array</param>
 	void DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state could not be destroyed</exception>
-	void Destroy() override;
 
 	/// <summary>
 	/// Encrypt a single block of bytes. 
@@ -285,8 +290,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

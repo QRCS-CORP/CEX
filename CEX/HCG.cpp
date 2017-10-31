@@ -9,7 +9,99 @@ NAMESPACE_DRBG
 
 const std::string HCG::CLASS_NAME("HCG");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+HCG::HCG(Digests DigestType, Providers ProviderType)
+	:
+	m_hmacEngine(DigestType != Digests::None ? DigestType : 
+		throw CryptoGeneratorException("HCG:Ctor", "The digest type can not be none!")),
+	m_destroyEngine(true),
+	m_digestType(DigestType),
+	m_distributionCode(0),
+	m_distributionCodeMax(0),
+	m_hmacKey(m_hmacEngine.BlockSize()),
+	m_hmacState(m_hmacEngine.MacSize(), 0x01),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_providerSource(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_providerType(ProviderType),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
+	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
+	m_seedCtr(SEEDCTR_SIZE),
+	m_stateCtr(STATECTR_SIZE)
+{
+	Scope();
+}
+
+HCG::HCG(IDigest* Digest, IProvider* Provider)
+	:
+	m_hmacEngine(Digest != nullptr ? Digest : 
+		throw CryptoGeneratorException("HCG:Ctor", "The digest can not be null!")),
+	m_destroyEngine(false),
+	m_digestType(Digest->Enumeral()),
+	m_distributionCode(0),
+	m_distributionCodeMax(0),
+	m_hmacKey(m_hmacEngine.BlockSize()),
+	m_hmacState(m_hmacEngine.MacSize(), 0x01),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_providerSource(Provider),
+	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
+	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
+	m_seedCtr(SEEDCTR_SIZE),
+	m_stateCtr(STATECTR_SIZE)
+{
+	Scope();
+}
+
+HCG::~HCG()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_digestType = Digests::None;
+		m_distributionCodeMax = 0;
+		m_isInitialized = false;
+		m_providerType = Providers::None;
+		m_reseedCounter = 0;
+		m_reseedRequests = 0;
+		m_reseedThreshold = 0;
+		m_secStrength = 0;
+
+		Utility::IntUtils::ClearVector(m_distributionCode);
+		Utility::IntUtils::ClearVector(m_hmacKey);
+		Utility::IntUtils::ClearVector(m_hmacState);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_seedCtr);
+		Utility::IntUtils::ClearVector(m_stateCtr);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_providerSource != nullptr)
+			{
+				m_providerSource.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_providerSource != nullptr)
+			{
+				m_providerSource.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 std::vector<byte> &HCG::DistributionCode() 
 {
@@ -71,95 +163,7 @@ const size_t HCG::SecurityStrength()
 	return m_secStrength;
 }
 
-//~~~Constructor~~~//
-
-HCG::HCG(Digests DigestType, Providers ProviderType)
-	:
-	m_hmacEngine(DigestType),
-	m_destroyEngine(true),
-	m_digestType(DigestType),
-	m_distributionCode(0),
-	m_distributionCodeMax(0),
-	m_hmacKey(m_hmacEngine.BlockSize()),
-	m_hmacState(m_hmacEngine.MacSize(), 0x01),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_providerSource(Helper::ProviderFromName::GetInstance(ProviderType)),
-	m_providerType(ProviderType),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
-	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
-	m_seedCtr(SEEDCTR_SIZE),
-	m_stateCtr(STATECTR_SIZE)
-{
-	Scope();
-}
-
-HCG::HCG(IDigest* Digest, IProvider* Provider)
-	:
-	m_hmacEngine(Digest != 0 ? Digest : throw CryptoGeneratorException("HCG:Ctor", "Digest can not be null!")),
-	m_destroyEngine(false),
-	m_digestType(Digest->Enumeral()),
-	m_distributionCode(0),
-	m_distributionCodeMax(0),
-	m_hmacKey(m_hmacEngine.BlockSize()),
-	m_hmacState(m_hmacEngine.MacSize(), 0x01),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_providerSource(Provider != 0 ? Provider : throw CryptoGeneratorException("HCG:Ctor", "Provider can not be null!")),
-	m_providerType(Provider->Enumeral()),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
-	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
-	m_seedCtr(SEEDCTR_SIZE),
-	m_stateCtr(STATECTR_SIZE)
-{
-	Scope();
-}
-
-HCG::~HCG()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void HCG::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_digestType = Digests::None;
-		m_distributionCodeMax = 0;
-		m_isInitialized = false;
-		m_providerType = Providers::None;
-		m_reseedCounter = 0;
-		m_reseedRequests = 0;
-		m_reseedThreshold = 0;
-		m_secStrength = 0;
-
-		Utility::IntUtils::ClearVector(m_distributionCode);
-		Utility::IntUtils::ClearVector(m_hmacKey);
-		Utility::IntUtils::ClearVector(m_hmacState);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_seedCtr);
-		Utility::IntUtils::ClearVector(m_stateCtr);
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_hmacEngine.IsInitialized())
-				m_hmacEngine.Destroy();
-			if (m_providerSource != 0)
-				delete m_providerSource;
-		}
-	}
-}
 
 size_t HCG::Generate(std::vector<byte> &Output)
 {
@@ -195,9 +199,13 @@ void HCG::Initialize(ISymmetricKey &GenParam)
 	if (GenParam.Nonce().size() != 0)
 	{
 		if (GenParam.Info().size() != 0)
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+		}
 		else
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce());
+		}
 	}
 	else
 	{
@@ -208,7 +216,9 @@ void HCG::Initialize(ISymmetricKey &GenParam)
 void HCG::Initialize(const std::vector<byte> &Seed)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
+	{
 		throw CryptoGeneratorException("HCG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+	}
 
 	// pre-initialize the HMAC
 	m_hmacKey = Seed;
@@ -219,7 +229,9 @@ void HCG::Initialize(const std::vector<byte> &Seed)
 
 	size_t secLen = Seed.size();
 	if (secLen < m_hmacEngine.MacSize())
+	{
 		m_secStrength = (secLen * 8) / 2;
+	}
 
 	m_isInitialized = true;
 }
@@ -227,7 +239,9 @@ void HCG::Initialize(const std::vector<byte> &Seed)
 void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
 {
 	if (Nonce.size() != NonceSize())
+	{
 		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
+	}
 
 	// added: nonce becomes the initial state counter value
 	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
@@ -237,7 +251,9 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
 {
 	if (Nonce.size() != NonceSize())
+	{
 		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
+	}
 
 	// copy nonce to state counter
 	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
@@ -262,7 +278,9 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 void HCG::Update(const std::vector<byte> &Seed)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
+	{
 		throw CryptoGeneratorException("HCG:Update", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+	}
 
 	Derive(Seed);
 }
@@ -326,7 +344,9 @@ void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 		m_hmacEngine.Update(m_hmacState, 0, m_hmacState.size());
 		// 4) optional personalization string
 		if (m_distributionCode.size() != 0)
+		{
 			m_hmacEngine.Update(m_distributionCode, 0, m_distributionCode.size());
+		}
 		// 5) output the state
 		m_hmacEngine.Finalize(m_hmacState, 0);
 		Utility::MemUtils::Copy(m_hmacState, 0, Output, OutOffset, RMDSZE);
@@ -347,8 +367,8 @@ void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 	for (size_t i = CTRSZE; i > 0; --i)
 	{
 		byte odst = Counter[i];
-		byte osrc = CTRSZE - i < ctrInc.size() ? ctrInc[CTRSZE - i] : (byte)0;
-		byte ndst = (byte)(odst + osrc + carry);
+		byte osrc = CTRSZE - i < ctrInc.size() ? ctrInc[CTRSZE - i] : 0;
+		byte ndst = static_cast<byte>(odst + osrc + carry);
 		carry = ndst < odst ? 1 : 0;
 		Counter[i] = ndst;
 	}
@@ -373,7 +393,9 @@ void HCG::RandomPad(size_t BlockOffset)
 
 	// if less than security size, add a full block
 	if (padLen < m_hmacEngine.MacSize())
+	{
 		padLen += m_hmacEngine.BlockSize();
+	}
 
 	// adjust for finalizer code (Merkle–Damgård constructions)
 	padLen -= Helper::DigestFromName::GetPaddingSize(m_digestType);

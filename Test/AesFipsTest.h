@@ -1,5 +1,5 @@
-﻿#ifndef _CEXTEST_AESFIPSTEST_H
-#define _CEXTEST_AESFIPSTEST_H
+﻿#ifndef CEXTEST_AESFIPSTEST_H
+#define CEXTEST_AESFIPSTEST_H
 
 #include "ITest.h"
 

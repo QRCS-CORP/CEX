@@ -15,18 +15,18 @@ MPKCParamSet::MPKCParamSet()
 	ParamName(MPKCParams::None)
 {}
 
-MPKCParamSet::MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamSet)
+MPKCParamSet::MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamType)
 	:
 	GF(Field),
 	T(Correction),
 	PublicKeySize(PubKeySize),
 	PrivateKeySize(PriKeySize),
-	ParamName(ParamSet)
+	ParamName(ParamType)
 {}
 
 MPKCParamSet::MPKCParamSet(const std::vector<byte> &ParamArray)
 {
-	IO::MemoryStream ms = IO::MemoryStream(ParamArray);
+	IO::MemoryStream ms(ParamArray);
 	IO::StreamReader reader(ms);
 
 	GF = reader.ReadInt<uint>();
@@ -43,11 +43,11 @@ MPKCParamSet::~MPKCParamSet()
 
 //~~~Public Functions~~~//
 
-void MPKCParamSet::Load(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamSet)
+void MPKCParamSet::Load(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamType)
 {
 	GF = Field;
 	T = Correction;
-	ParamName = ParamSet;
+	ParamName = ParamType;
 	PrivateKeySize = PriKeySize;
 	PublicKeySize = PubKeySize;
 }
@@ -66,7 +66,7 @@ std::vector<byte> MPKCParamSet::ToBytes()
 	IO::StreamWriter writer(17);
 
 	writer.Write<uint>(GF);
-	writer.Write<byte>((byte)ParamName);
+	writer.Write<byte>(static_cast<byte>(ParamName));
 	writer.Write<uint>(PrivateKeySize);
 	writer.Write<uint>(PublicKeySize);
 	writer.Write<uint>(T);

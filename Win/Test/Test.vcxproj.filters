@@ -410,6 +410,9 @@
     <ClInclude Include="..\..\Test\McElieceTest.h">
       <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\UtilityTest.h">
+      <Filter>Header Files\Test\ProcessorTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -549,6 +552,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\McElieceTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\UtilityTest.cpp">
+      <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

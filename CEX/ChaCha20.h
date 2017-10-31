@@ -26,6 +26,7 @@
 // Written by John Underhill, October 21, 2014
 // Updated January 27, 2017
 // Updated August 29, 2017
+// Updated October 14, 2017
 // Contact: develop@vtdev.com
 
 #ifndef CEX_CHACHA20_H
@@ -108,8 +109,8 @@ private:
 
 	std::vector<uint> m_ctrVector;
 	std::vector<byte> m_dstCode;
-	bool m_isInitialized;
 	bool m_isDestroyed;
+	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	ParallelOptions m_parallelProfile;
@@ -118,80 +119,17 @@ private:
 
 public:
 
-	ChaCha20(const ChaCha20&) = delete;
-	ChaCha20& operator=(const ChaCha20&) = delete;
-	ChaCha20& operator=(ChaCha20&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: Unit block size of internal cipher in bytes.
-	/// <para>Block size is 64 bytes wide.</para>
-	/// </summary>
-	const size_t BlockSize() override;
-
-	/// <summary>
-	/// Get: The salt value in the initialization parameters (Tau-Sigma).
-	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
-	/// Changing this code will create a unique distribution of the cipher.
-	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
-	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
-	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
-	/// </summary>
-	const std::vector<byte> &DistributionCode() override;
-
-	/// <summary>
-	/// Get: The stream ciphers type name
-	/// </summary>
-	const StreamCiphers Enumeral() override;
-
-	/// <summary>
-	/// Get: Cipher is ready to transform data
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available with this mode.
-	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
-	/// </summary>
-	const bool IsParallel() override;
-
-	/// <summary>
-	/// Get: Array of allowed cipher input key byte-sizes
-	/// </summary>
-	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Get: Available transformation round assignments
-	/// </summary>
-	const std::vector<size_t> &LegalRounds() override;
-
-	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
-	/// </summary>
-	const size_t ParallelBlockSize() override;
-
-	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and recommended sizes.
-	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
-	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
-	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
-	/// </summary>
-	ParallelOptions &ParallelProfile() override;
-
-	/// <summary>
-	/// Get: The stream ciphers class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: Number of rounds
-	/// </summary>
-	const size_t Rounds() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ChaCha20(const ChaCha20&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ChaCha20& operator=(const ChaCha20&) = delete;
 
 	/// <summary>
 	/// Initialize the class
@@ -205,16 +143,80 @@ public:
 	explicit ChaCha20(size_t Rounds = 20);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~ChaCha20() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Destroy of this class
+	/// Read Only: Unit block size of internal cipher in bytes.
+	/// <para>Block size is 64 bytes wide.</para>
 	/// </summary>
-	void Destroy() override;
+	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The salt value in the initialization parameters (Tau-Sigma).
+	/// <para>This value can only be set with the Info parameter of an ISymmetricKey member, or use the default.
+	/// Changing this code will create a unique distribution of the cipher.
+	/// For best security, the code should be a random extenion of the key, with rounds increased to 40 or more.
+	/// Code must be non-zero, 16 bytes in length, and sufficiently asymmetric.
+	/// If the Info parameter of an ISymmetricKey is non-zero, it will overwrite the distribution code.</para>
+	/// </summary>
+	const std::vector<byte> &DistributionCode() override;
+
+	/// <summary>
+	/// Read Only: The stream ciphers type name
+	/// </summary>
+	const StreamCiphers Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Cipher is ready to transform data
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: Processor parallelization availability.
+	/// <para>Indicates whether parallel processing is available with this mode.
+	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
+	/// </summary>
+	const bool IsParallel() override;
+
+	/// <summary>
+	/// Read Only: Array of allowed cipher input key byte-sizes
+	/// </summary>
+	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
+
+	/// <summary>
+	/// Read Only: Available transformation round assignments
+	/// </summary>
+	const std::vector<size_t> &LegalRounds() override;
+
+	/// <summary>
+	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
+	/// </summary>
+	const size_t ParallelBlockSize() override;
+
+	/// <summary>
+	/// Read/Write: Parallel and SIMD capability flags and recommended sizes.
+	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
+	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
+	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
+	/// </summary>
+	ParallelOptions &ParallelProfile() override;
+
+	/// <summary>
+	/// Read Only: The stream ciphers class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: Number of rounds
+	/// </summary>
+	const size_t Rounds() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Initialize the cipher
@@ -224,6 +226,8 @@ public:
 	/// <para>Uses the Key and Nonce fields of KeyParams. The <see cref="LegalKeySizes"/> property contains valid Key sizes. 
 	/// The Nonce must be 8 bytes in size.</para>
 	/// </param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
@@ -233,8 +237,6 @@ public:
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>
-	///
-	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid degree setting is used</exception>
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>

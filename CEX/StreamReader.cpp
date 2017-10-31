@@ -2,18 +2,6 @@
 
 NAMESPACE_IO
 
-//~~~Properties~~~//
-
-const size_t StreamReader::Length() 
-{ 
-	return m_streamData.Length(); 
-}
-
-const size_t StreamReader::Position() 
-{ 
-	return m_streamData.Position(); 
-}
-
 //~~~Constructor~~~//
 
 StreamReader::StreamReader(const MemoryStream &DataStream)
@@ -24,6 +12,18 @@ StreamReader::StreamReader(const MemoryStream &DataStream)
 
 StreamReader::~StreamReader()
 {
+}
+
+//~~~Accessors~~~//
+
+const size_t StreamReader::Length() 
+{ 
+	return m_streamData.Length(); 
+}
+
+const size_t StreamReader::Position() 
+{ 
+	return m_streamData.Position(); 
 }
 
 //~~~Public Functions~~~//

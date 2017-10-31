@@ -3,23 +3,6 @@
 
 NAMESPACE_ASYMMETRICKEY
 
-//~~~Properties~~~//
-
-const AsymmetricEngines RLWEPrivateKey::CipherType()
-{
-	return AsymmetricEngines::RingLWE;
-}
-
-const RLWEParams RLWEPrivateKey::Parameters()
-{
-	return m_rlweParameters;
-}
-
-const std::vector<ushort> &RLWEPrivateKey::R()
-{
-	return m_rCoeffs;
-}
-
 //~~~Constructor~~~//
 
 RLWEPrivateKey::RLWEPrivateKey(RLWEParams Parameters, std::vector<ushort> &R)
@@ -41,12 +24,31 @@ RLWEPrivateKey::RLWEPrivateKey(const std::vector<byte> &KeyStream)
 	m_rCoeffs.resize(rLen);
 
 	for (size_t i = 0; i < rLen; ++i)
+	{
 		m_rCoeffs[i] = Utility::IntUtils::LeBytesTo16(KeyStream, 5 + (i * sizeof(ushort)));
+	}
 }
 
 RLWEPrivateKey::~RLWEPrivateKey()
 {
 	Destroy();
+}
+
+//~~~Accessors~~~//
+
+const AsymmetricEngines RLWEPrivateKey::CipherType()
+{
+	return AsymmetricEngines::RingLWE;
+}
+
+const RLWEParams RLWEPrivateKey::Parameters()
+{
+	return m_rlweParameters;
+}
+
+const std::vector<ushort> &RLWEPrivateKey::R()
+{
+	return m_rCoeffs;
 }
 
 //~~~Public Functions~~~//
@@ -59,7 +61,9 @@ void RLWEPrivateKey::Destroy()
 		m_rlweParameters = RLWEParams::None;
 
 		if (m_rCoeffs.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_rCoeffs);
+		}
 	}
 }
 
@@ -71,7 +75,9 @@ std::vector<byte> RLWEPrivateKey::ToBytes()
 	Utility::IntUtils::Le32ToBytes(rLen, r, 1);
 
 	for (size_t i = 0; i < rLen; ++i)
+	{
 		Utility::IntUtils::Le16ToBytes(m_rCoeffs[i], r, 5 + (i * sizeof(ushort)));
+	}
 
 	return r;
 }

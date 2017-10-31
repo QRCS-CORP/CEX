@@ -8,7 +8,112 @@ NAMESPACE_DRBG
 
 const std::string DCG::CLASS_NAME("DCG");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+DCG::DCG(Digests DigestType, Providers ProviderType)
+	:
+	m_msgDigest(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) : 
+		throw CryptoGeneratorException("DCG:Ctor", "The digest type can not be none!")),
+	m_destroyEngine(true),
+	m_digestType(DigestType),
+	m_distributionCode(0),
+	m_distributionCodeMax(m_msgDigest->BlockSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_prdResistant(ProviderType != Providers::None),
+	m_priSeed(m_msgDigest->DigestSize()),
+	m_priState(m_msgDigest->DigestSize()),
+	m_providerSource(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_providerType(ProviderType),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_msgDigest->DigestSize() * 1000),
+	m_secStrength(((m_msgDigest->DigestSize() * 8) / 2)),
+	m_seedCtr(COUNTER_SIZE),
+	m_stateCtr(COUNTER_SIZE)
+{
+	Scope();
+}
+
+DCG::DCG(IDigest* Digest, IProvider* Provider)
+	:
+	m_msgDigest(Digest != nullptr ? Digest :
+		throw CryptoGeneratorException("DCG:Ctor", "The digest can not be null!")),
+	m_destroyEngine(false),
+	m_digestType(m_msgDigest->Enumeral()),
+	m_distributionCode(0),
+	m_distributionCodeMax(m_msgDigest->BlockSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_prdResistant(Provider != nullptr),
+	m_priSeed(m_msgDigest->DigestSize()),
+	m_priState(m_msgDigest->DigestSize()),
+	m_providerSource(Provider),
+	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(m_msgDigest->DigestSize() * 1000),
+	m_secStrength((m_msgDigest->DigestSize() * 8) / 2),
+	m_seedCtr(COUNTER_SIZE),
+	m_stateCtr(COUNTER_SIZE)
+{
+	Scope();
+}
+
+DCG::~DCG()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_digestType = Digests::None;
+		m_distributionCodeMax = 0;
+		m_isInitialized = true;
+		m_prdResistant = false;
+		m_providerType = Providers::None;
+		m_reseedCounter = 0;
+		m_reseedRequests = 0;
+		m_reseedThreshold = 0;
+		m_secStrength = 0;
+
+		Utility::IntUtils::ClearVector(m_distributionCode);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_priSeed);
+		Utility::IntUtils::ClearVector(m_priState);
+		Utility::IntUtils::ClearVector(m_seedCtr);
+		Utility::IntUtils::ClearVector(m_stateCtr);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_msgDigest != nullptr)
+			{
+				m_msgDigest.reset(nullptr);
+			}
+
+			if (m_providerSource != nullptr)
+			{
+				m_providerSource.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_msgDigest != nullptr)
+			{
+				m_msgDigest.release();
+			}
+
+			if (m_providerSource != nullptr)
+			{
+				m_providerSource.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 std::vector<byte> &DCG::DistributionCode()
 { 
@@ -70,96 +175,7 @@ const size_t DCG::SecurityStrength()
 	return m_secStrength;
 }
 
-//~~~Constructor~~~//
-
-DCG::DCG(Digests DigestType, Providers ProviderType)
-	:
-	m_msgDigest(Helper::DigestFromName::GetInstance(DigestType)),
-	m_destroyEngine(true),
-	m_digestType(DigestType),
-	m_distributionCodeMax(m_msgDigest->BlockSize()),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_prdResistant(ProviderType != Providers::None),
-	m_priSeed(m_msgDigest->DigestSize()),
-	m_priState(m_msgDigest->DigestSize()),
-	m_providerSource(ProviderType == Providers::None ? 0 : Helper::ProviderFromName::GetInstance(ProviderType)),
-	m_providerType(ProviderType),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(m_msgDigest->DigestSize() * 1000),
-	m_secStrength(((m_msgDigest->DigestSize() * 8) / 2)),
-	m_seedCtr(COUNTER_SIZE),
-	m_stateCtr(COUNTER_SIZE)
-{
-	Scope();
-}
-
-DCG::DCG(IDigest* Digest, IProvider* Provider)
-	:
-	m_msgDigest(Digest != 0 ? Digest : throw CryptoGeneratorException("DCG:Ctor", "Digest can not be null!")),
-	m_destroyEngine(false),
-	m_digestType(m_msgDigest->Enumeral()),
-	m_distributionCodeMax(m_msgDigest->BlockSize()),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_prdResistant(Provider != 0),
-	m_priSeed(m_msgDigest->DigestSize()),
-	m_priState(m_msgDigest->DigestSize()),
-	m_providerSource(Provider),
-	m_providerType(m_providerSource != 0 ? m_providerSource->Enumeral() : Providers::None),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(m_msgDigest->DigestSize() * 1000),
-	m_secStrength((m_msgDigest->DigestSize() * 8) / 2),
-	m_seedCtr(COUNTER_SIZE),
-	m_stateCtr(COUNTER_SIZE)
-{
-	Scope();
-}
-
-DCG::~DCG()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void DCG::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_reseedCounter = 0;
-		m_reseedThreshold = 0;
-		m_isInitialized = true;
-		m_isInitialized = false;
-		m_prdResistant = false;
-		m_providerType = Providers::None;
-		m_reseedCounter = 0;
-		m_reseedRequests = 0;
-		m_reseedThreshold = 0;
-		m_secStrength = 0;
-
-		Utility::IntUtils::ClearVector(m_priSeed);
-		Utility::IntUtils::ClearVector(m_priState);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_seedCtr);
-		Utility::IntUtils::ClearVector(m_stateCtr);
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_msgDigest != 0)
-				delete m_msgDigest;
-			if (m_providerSource != 0)
-				delete m_providerSource;
-		}
-	}
-}
 
 size_t DCG::Generate(std::vector<byte> &Output)
 {
@@ -207,9 +223,13 @@ void DCG::Initialize(ISymmetricKey &GenParam)
 	if (GenParam.Nonce().size() != 0)
 	{
 		if (GenParam.Info().size() != 0)
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+		}
 		else
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce());
+		}
 	}
 	else
 	{
@@ -220,12 +240,16 @@ void DCG::Initialize(ISymmetricKey &GenParam)
 void DCG::Initialize(const std::vector<byte> &Seed)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size()))
+	{
 		throw CryptoGeneratorException("DCG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+	}
 
 	Update(Seed);
 
 	if (Seed.size() < (m_msgDigest->DigestSize() / 2))
+	{
 		m_secStrength = (Seed.size() * 8) / 2;
+	}
 
 	m_isInitialized = true;
 }
@@ -233,9 +257,14 @@ void DCG::Initialize(const std::vector<byte> &Seed)
 void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
 {
 	if (Seed.size() < MINSEED_SIZE)
+	{
 		throw CryptoGeneratorException("DCG:Initialize", "Seed must be at least 8 bytes!");
+	}
+
 	if (Nonce.size() != NonceSize())
+	{
 		throw CryptoGeneratorException("DCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
+	}
 
 	// added: nonce becomes the initial state counter value
 	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
@@ -243,8 +272,11 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	Update(Seed);
 
 	size_t secLen = Seed.size() + (Nonce.size() - m_stateCtr.size());
+
 	if (secLen < m_msgDigest->DigestSize())
+	{
 		m_secStrength = (secLen * 8) / 2;
+	}
 
 	m_isInitialized = true;
 }
@@ -252,31 +284,57 @@ void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 void DCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce, const std::vector<byte> &Info)
 {
 	if (Seed.size() < MINSEED_SIZE)
+	{
 		throw CryptoGeneratorException("DCG:Initialize", "Seed must be at least 8 bytes!");
+	}
 	if (Nonce.size() != NonceSize())
+	{
 		throw CryptoGeneratorException("DCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
+	}
 
 	// copy nonce to state counter
 	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	// update the seed and info
 	Update(Seed);
-	Update(Info);
+
+	if (Info.size() <= m_distributionCodeMax)
+	{
+		m_distributionCode = Info;
+	}
+	else
+	{
+		// info is too large; size to optimal max, ignore remainder
+		std::vector<byte> tmpInfo(m_distributionCodeMax);
+		Utility::MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
+		m_distributionCode = tmpInfo;
+	}
+
+	Update(m_distributionCode);
 
 	size_t secLen = Seed.size() + Info.size() + (Nonce.size() - m_stateCtr.size());
 	if (secLen < m_msgDigest->DigestSize())
+	{
 		m_secStrength = secLen * 8;
+	}
 
 	m_isInitialized = true;
 }
 
 void DCG::Update(const std::vector<byte> &Seed)
 {
+	if (Seed.size() < (m_msgDigest->DigestSize() / 2))
+	{
+		throw CryptoGeneratorException("HCG:Update", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+	}
+
 	m_msgDigest->Update(Seed, 0, Seed.size());
 	m_msgDigest->Update(m_priSeed, 0, m_priSeed.size());
 
 	// added for prediction resistance, pads with new entropy
 	if (m_prdResistant)
+	{
 		Extract(Seed.size() + m_priSeed.size());
+	}
 
 	m_msgDigest->Finalize(m_priSeed, 0);
 }
@@ -291,7 +349,9 @@ void DCG::Derive()
 
 	// added for prediction resistance
 	if (m_prdResistant)
+	{
 		Extract(m_priSeed.size() + m_seedCtr.size());
+	}
 
 	m_msgDigest->Finalize(m_priSeed, 0);
 }
@@ -302,7 +362,9 @@ void DCG::Extract(size_t BlockOffset)
 
 	// if less than security size, add a full block
 	if (entLen < m_msgDigest->DigestSize())
+	{
 		entLen += m_msgDigest->BlockSize();
+	}
 
 	// adjust size to account for internal codes appended in hash finalizer (no processing of partial blocks)
 	entLen -= Helper::DigestFromName::GetPaddingSize(m_msgDigest->Enumeral());
@@ -318,7 +380,9 @@ void DCG::LeIncrement(std::vector<byte> &Counter)
 	for (size_t i = 0; i < Counter.size(); ++i)
 	{
 		if (++Counter[i] != 0)
+		{
 			break;
+		}
 	}
 }
 

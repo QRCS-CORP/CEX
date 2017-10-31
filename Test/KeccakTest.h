@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_KECCAKTEST_H
-#define _CEXTEST_KECCAKTEST_H
+#ifndef CEXTEST_KECCAKTEST_H
+#define CEXTEST_KECCAKTEST_H
 
 #include "ITest.h"
 #include "../CEX/IDigest.h"

@@ -6,7 +6,69 @@ NAMESPACE_MAC
 
 const std::string HMAC::CLASS_NAME("HMAC");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+HMAC::HMAC(Digests DigestType, bool Parallel)
+	:
+	m_msgDigest(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType, Parallel) :
+		throw CryptoMacException("HMAC:Ctor", "The digest type can not be none!")),
+	m_destroyEngine(true),
+	m_inputPad(m_msgDigest->BlockSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_msgDigestType(DigestType),
+	m_outputPad(m_msgDigest->BlockSize())
+{
+	Scope();
+}
+
+HMAC::HMAC(IDigest* Digest)
+	:
+	m_msgDigest(Digest != nullptr ? Digest : 
+		throw CryptoMacException("HMAC:Ctor", "The digest can not be null!")),
+	m_destroyEngine(false),
+	m_inputPad(m_msgDigest->BlockSize()),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_msgDigestType(m_msgDigest->Enumeral()),
+	m_outputPad(m_msgDigest->BlockSize())
+{
+	Scope();
+}
+
+HMAC::~HMAC()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_msgDigestType = Digests::None;
+		m_isInitialized = false;
+
+		Utility::IntUtils::ClearVector(m_inputPad);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_outputPad);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+			if (m_msgDigest != nullptr)
+			{
+				m_msgDigest.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_msgDigest != nullptr)
+			{
+				m_msgDigest.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t HMAC::BlockSize()
 { 
@@ -58,80 +120,23 @@ ParallelOptions &HMAC::ParallelProfile()
 	return m_msgDigest->ParallelProfile(); 
 }
 
-//~~~Constructor~~~//
-
-HMAC::HMAC(Digests DigestType, bool Parallel)
-	:
-	m_msgDigest(Helper::DigestFromName::GetInstance(DigestType, Parallel)),
-	m_destroyEngine(true),
-	m_inputPad(m_msgDigest->BlockSize()),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_msgDigestType(DigestType),
-	m_outputPad(m_msgDigest->BlockSize())
-{
-	Scope();
-}
-
-HMAC::HMAC(IDigest* Digest)
-	:
-	m_msgDigest(Digest != 0 ? Digest : throw CryptoMacException("HMAC:Ctor", "The digest can not be null!")),
-	m_destroyEngine(false),
-	m_inputPad(m_msgDigest->BlockSize()),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_msgDigestType(m_msgDigest->Enumeral()),
-	m_outputPad(m_msgDigest->BlockSize())
-{
-	Scope();
-}
-
-HMAC::~HMAC()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (Output.size() != m_msgDigest->DigestSize())
+	{
 		Output.resize(m_msgDigest->DigestSize());
+	}
 
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-void HMAC::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_msgDigestType = Digests::None;
-		m_isInitialized = false;
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_msgDigest != 0)
-				delete m_msgDigest;
-		}
-
-		Utility::IntUtils::ClearVector(m_inputPad);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_outputPad);
-	}
-}
-
 size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	if (!m_isInitialized)
-		throw CryptoMacException("HMAC:Finalize", "The Mc has not been initialized!");
-	if (Output.size() - OutOffset < m_msgDigest->DigestSize())
-		throw CryptoMacException("HMAC:Finalize", "The Output buffer is too short!");
+	CexAssert(m_isInitialized, "The Mac is not initialized!");
+	CexAssert((Output.size() - OutOffset) >= m_msgDigest->DigestSize(), "The Input buffer is too short!");
 
 	std::vector<byte> tmpV(m_msgDigest->DigestSize(), 0);
 	m_msgDigest->Finalize(tmpV, 0);
@@ -149,14 +154,20 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 {
 	// TODO: to enforce good security, this should be at least digest output size, keccak and hmac tests are causing it to throw.. find a solution
 	if (KeyParams.Key().size() == 0)
+	{
 		throw CryptoMacException("HMAC:Initialize", "Key size is too small; should be a minimum of digest output size!");
+	}
 
 	size_t keyLen = KeyParams.Key().size();
 
 	if (!m_isInitialized)
+	{
 		m_msgDigest->Reset();
+	}
 	else
+	{
 		Reset();
+	}
 
 	if (keyLen > m_msgDigest->BlockSize())
 	{
@@ -169,8 +180,10 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 		Utility::MemUtils::Copy(KeyParams.Key(), 0, m_inputPad, 0, keyLen);
 	}
 
-	if ((int)m_msgDigest->BlockSize() - (int)keyLen > 0)
+	if (static_cast<int>(m_msgDigest->BlockSize()) - static_cast<int>(keyLen) > 0)
+	{
 		Utility::MemUtils::Clear(m_inputPad, keyLen, m_msgDigest->BlockSize() - keyLen);
+	}
 
 	Utility::MemUtils::Copy(m_inputPad, 0, m_outputPad, 0, m_inputPad.size());
 	XorPad(m_inputPad, IPAD);
@@ -209,10 +222,8 @@ void HMAC::Update(byte Input)
 
 void HMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoMacException("HMAC:Update", "The Mac has not been initialized!");
-	if (InOffset + Length > Input.size())
-		throw CryptoMacException("HMAC:Update", "The Input buffer is too short!");
+	CexAssert(m_isInitialized, "The Mac is not initialized!");
+	CexAssert((InOffset + Length) <= Input.size(), "The Input buffer is too short!");
 
 	m_msgDigest->Update(Input, InOffset, Length);
 }
@@ -233,7 +244,9 @@ void HMAC::Scope()
 void HMAC::XorPad(std::vector<byte> &A, byte N)
 {
 	for (size_t i = 0; i < A.size(); ++i)
+	{
 		A[i] ^= N;
+	}
 }
 
 NAMESPACE_MACEND

@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_HKDFTEST_H
-#define _CEXTEST_HKDFTEST_H
+#ifndef CEXTEST_HKDFTEST_H
+#define CEXTEST_HKDFTEST_H
 
 #include "ITest.h"
 

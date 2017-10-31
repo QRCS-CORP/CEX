@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_DRBGTEST_H
-#define _CEXTEST_DRBGTEST_H
+#ifndef CEXTEST_DRBGTEST_H
+#define CEXTEST_DRBGTEST_H
 
 #include "ITest.h"
 

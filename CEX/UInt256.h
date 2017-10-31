@@ -154,8 +154,8 @@ public:
 	template <typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		ymm = _mm256_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3],
-			(uint)Input[Offset + 4], (uint)Input[Offset + 5], (uint)Input[Offset + 6], (uint)Input[Offset + 7]);
+		ymm = _mm256_set_epi32(static_cast<uint>(Input[Offset]), static_cast<uint>(Input[Offset + 1]), static_cast<uint>(Input[Offset + 2]), static_cast<uint>(Input[Offset + 3]),
+			static_cast<uint>(Input[Offset + 4]), static_cast<uint>(Input[Offset + 5]), static_cast<uint>(Input[Offset + 6]), static_cast<uint>(Input[Offset + 7]));
 	}
 
 	/// <summary>

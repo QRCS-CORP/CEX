@@ -2,21 +2,24 @@
 #define CEX_MACFROMDESCRIPTION_H
 
 #include "CexDomain.h"
+#include "CryptoException.h"
 #include "MacDescription.h"
 #include "IMac.h"
 
 NAMESPACE_HELPER
 
+using Exception::CryptoException;
 using Mac::IMac;
 using Processing::MacDescription;
 
 /// <summary>
 /// Get a Mac generator instance from it's description.
-/// <para>The MACs Initialize function must be called before it can be used.<para>
+/// <para>The MACs Initialize function must be called before it can be used.</para>
 /// </summary>
 class MacFromDescription
 {
 public:
+
 	/// <summary>
 	/// Get an uninitialized Mac generator from its description structure
 	/// </summary>

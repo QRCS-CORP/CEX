@@ -35,12 +35,7 @@ class FFTQ12289N1024
 {
 public:
 
-	FFTQ12289N1024() = delete;
-	FFTQ12289N1024(const FFTQ12289N1024&) = delete;
-	FFTQ12289N1024& operator=(const FFTQ12289N1024&) = delete;
-	FFTQ12289N1024& operator=(FFTQ12289N1024&&) = delete;
-
-	//~~~Public Properties ~~~//
+	//~~~Public Constants~~~//
 
 	/// <summary>
 	/// The number of coefficients
@@ -84,24 +79,50 @@ public:
 
 	//~~~Public Functions~~~//
 
-	static void Decrypt(std::vector<byte> &Secret, const std::vector<ushort> &PriKey, const std::vector<byte> &Received);
+	/// <summary>
+	/// Decrypt a cipher-text
+	/// </summary>
+	/// 
+	/// <param name="Secret">The shared secret</param>
+	/// <param name="PrivateKey">The private asymmetric key</param>
+	/// <param name="Received">The received ciphertext</param>
+	static void Decrypt(std::vector<byte> &Secret, const std::vector<ushort> &PrivateKey, const std::vector<byte> &Received);
+
+	/// <summary>
+	/// Encrypt a message
+	/// </summary>
+	/// 
+	/// <param name="Secret">The secret message</param>
+	/// <param name="Send">The ciphertext output</param>
+	/// <param name="Received">The public asymmetric key</param>
+	/// <param name="Rng">The random provider</param>
+	/// <param name="Parallel">Run in parallel or sequential mode</param>
 	static void Encrypt(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel);
-	static void Generate(std::vector<byte> &PubKey, std::vector<ushort> &PriKey, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel);
+
+	/// <summary>
+	/// Generate a public/private key-pair
+	/// </summary>
+	///
+	/// <param name="PublicKey">The public asymmetric key</param>
+	/// <param name="PrivateKey">The private asymmetric key</param>
+	/// <param name="Rng">The random provider</param>
+	/// <param name="Parallel">Run in parallel or sequential mode</param>
+	static void Generate(std::vector<byte> &PublicKey, std::vector<ushort> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng, bool Parallel);
 
 private:
 
 	static const uint QINV = 12287;
 	static const uint RLOG = 18;
-	static const ushort OmegasMontgomery[512];
-	static const ushort OmegasInvMontgomery[512];
-	static const ushort PsisBitrevMontgomery[1024];
-	static const ushort PsisInvMontgomery[1024];
+	static const std::array<ushort, 512> OmegasMontgomery;
+	static const std::array<ushort, 512> OmegasInvMontgomery;
+	static const std::array<ushort, 1024> PsisBitrevMontgomery;
+	static const std::array<ushort, 1024> PsisInvMontgomery;
 
 	//~~~Inlined~~~//
 
 	inline static ushort BarrettReduce(ushort A)
 	{
-		uint u = ((uint)A * 5) >> 16;
+		uint u = static_cast<uint>(A * 5) >> 16;
 		u *= Q;
 		A -= u;
 
@@ -115,7 +136,7 @@ private:
 		u *= Q;
 		A = A + u;
 
-		return (ushort)(A >> 18);
+		return static_cast<ushort>(A >> 18);
 	}
 
 	inline static void NTTEvenDist(ushort &A, ushort &B, const ushort Omega)
@@ -199,7 +220,7 @@ private:
 
 		for (i = 0; i < 10; i += 2)
 		{
-			dist = ((ulong)1 << i);
+			dist = (static_cast<ulong>(1) << i);
 
 			for (j = 0; j < dist; j++)
 			{
@@ -228,7 +249,7 @@ private:
 
 		for (i = 0; i < 10; i += 2)
 		{
-			dist = ((ulong)1 << i);
+			dist = (static_cast<ulong>(1) << i);
 
 			for (j = 0; j < dist; j++)
 			{
@@ -324,15 +345,15 @@ private:
 		for (size_t i = 0; i < V.size() / 4; i += ULVSZE)
 		{
 #	if defined(__AVX512__)
-			tmpR.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1),
-				(byte)((Random[(i + 4) >> 3] >> ((i + 4) & 7)) & 1), (byte)((Random[(i + 5) >> 3] >> ((i + 5) & 7)) & 1), (byte)((Random[(i + 6) >> 3] >> ((i + 6) & 7)) & 1), (byte)((Random[(i + 7) >> 3] >> ((i + 7) & 7)) & 1),
-				(byte)((Random[(i + 8) >> 3] >> ((i + 8) & 7)) & 1), (byte)((Random[(i + 9) >> 3] >> ((i + 9) & 7)) & 1), (byte)((Random[(i + 10) >> 3] >> ((i + 10) & 7)) & 1), (byte)((Random[(i + 11) >> 3] >> ((i + 11) & 7)) & 1),
-				(byte)((Random[(i + 12) >> 3] >> ((i + 12) & 7)) & 1), (byte)((Random[(i + 13) >> 3] >> ((i + 13) & 7)) & 1), (byte)((Random[(i + 14) >> 3] >> ((i + 14) & 7)) & 1), (byte)((Random[(i + 15) >> 3] >> ((i + 15) & 7)) & 1));
+			tmpR.Load(static_cast<byte>((Random[i >> 3] >> (i & 7)) & 1), static_cast<byte>((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), static_cast<byte>((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), static_cast<byte>((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1),
+				static_cast<byte>((Random[(i + 4) >> 3] >> ((i + 4) & 7)) & 1), static_cast<byte>((Random[(i + 5) >> 3] >> ((i + 5) & 7)) & 1), static_cast<byte>((Random[(i + 6) >> 3] >> ((i + 6) & 7)) & 1), static_cast<byte>((Random[(i + 7) >> 3] >> ((i + 7) & 7)) & 1),
+				static_cast<byte>((Random[(i + 8) >> 3] >> ((i + 8) & 7)) & 1), static_cast<byte>((Random[(i + 9) >> 3] >> ((i + 9) & 7)) & 1), static_cast<byte>((Random[(i + 10) >> 3] >> ((i + 10) & 7)) & 1), static_cast<byte>((Random[(i + 11) >> 3] >> ((i + 11) & 7)) & 1),
+				static_cast<byte>((Random[(i + 12) >> 3] >> ((i + 12) & 7)) & 1), static_cast<byte>((Random[(i + 13) >> 3] >> ((i + 13) & 7)) & 1), static_cast<byte>((Random[(i + 14) >> 3] >> ((i + 14) & 7)) & 1), static_cast<byte>((Random[(i + 15) >> 3] >> ((i + 15) & 7)) & 1));
 #	elif defined(__AVX2__)
-			tmpR.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1),
-				(byte)((Random[(i + 4) >> 3] >> ((i + 4) & 7)) & 1), (byte)((Random[(i + 5) >> 3] >> ((i + 5) & 7)) & 1), (byte)((Random[(i + 6) >> 3] >> ((i + 6) & 7)) & 1), (byte)((Random[(i + 7) >> 3] >> ((i + 7) & 7)) & 1));
+			tmpR.Load(static_cast<byte>((Random[i >> 3] >> (i & 7)) & 1), static_cast<byte>((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), static_cast<byte>((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), static_cast<byte>((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1),
+				static_cast<byte>((Random[(i + 4) >> 3] >> ((i + 4) & 7)) & 1), static_cast<byte>((Random[(i + 5) >> 3] >> ((i + 5) & 7)) & 1), static_cast<byte>((Random[(i + 6) >> 3] >> ((i + 6) & 7)) & 1), static_cast<byte>((Random[(i + 7) >> 3] >> ((i + 7) & 7)) & 1));
 #	elif defined(__AVX__)
-			tmpR.Load((byte)((Random[i >> 3] >> (i & 7)) & 1), (byte)((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), (byte)((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), (byte)((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1));
+			tmpR.Load(static_cast<byte>((Random[i >> 3] >> (i & 7)) & 1), static_cast<byte>((Random[(i + 1) >> 3] >> ((i + 1) & 7)) & 1), static_cast<byte>((Random[(i + 2) >> 3] >> ((i + 2) & 7)) & 1), static_cast<byte>((Random[(i + 3) >> 3] >> ((i + 3) & 7)) & 1));
 #	endif 
 
 			t0.LoadUL(V, i);
@@ -361,7 +382,7 @@ private:
 			c2.Store(tmpC, ULVSZE * 2);
 			c3.Store(tmpC, ULVSZE * 3);
 
-			for (uint j = (uint)tmpC.size() - 1, k = 0; k < ULVSZE; --j, ++k)
+			for (uint j = static_cast<uint>(tmpC.size() - 1), k = 0; k < ULVSZE; --j, ++k)
 			{
 				C[i + k + 768] = static_cast<ushort>(tmpC[j]);
 				C[i + k + 512] = static_cast<ushort>(tmpC[j - ULVSZE]);
@@ -381,15 +402,15 @@ private:
 		{
 			rbit = (Random[i >> 3] >> (i & 7)) & 1;
 
-			x = 8 * V[0 + i] + 4 * rbit;
+			x = (8 * V[i]) + (4 * rbit);
 			k = CalcK<int>(v0[0], v1[0], x, Q);
-			x = 8 * V[256 + i] + 4 * rbit;
+			x = (8 * V[256 + i]) + (4 * rbit);
 			k += CalcK<int>(v0[1], v1[1], x, Q);
-			x = 8 * V[512 + i] + 4 * rbit;
+			x = (8 * V[512 + i]) + (4 * rbit);
 			k += CalcK<int>(v0[2], v1[2], x, Q);
-			x = 8 * V[768 + i] + 4 * rbit;
+			x = (8 * V[768 + i]) + (4 * rbit);
 			k += CalcK<int>(v0[3], v1[3], x, Q);
-			k = (2 * Q - 1 - k) >> 31;
+			k = ((2 * Q) - 1 - k) >> 31;
 
 			tmpV[0] = ((~k) & v0[0]) ^ (k & v1[0]);
 			tmpV[1] = ((~k) & v0[1]) ^ (k & v1[1]);
@@ -507,7 +528,7 @@ private:
 
 			for (size_t j = ULVSZE, k = 0; j > 0; --j, ++k)
 			{
-				Key[((i + k) >> 3)] |= (byte)(tmpK[j - 1] << ((i + k) & 7));
+				Key[((i + k) >> 3)] |= static_cast<byte>(tmpK[j - 1] << ((i + k) & 7));
 			}
 		}
 
@@ -516,10 +537,10 @@ private:
 		std::array<int, 4> tmp;
 		for (uint i = 0; i < 256; i++)
 		{
-			tmp[0] = 16 * Q + 8 * (int)V[0 + i] - Q * (2 * C[0 + i] + C[768 + i]);
-			tmp[1] = 16 * Q + 8 * (int)V[256 + i] - Q * (2 * C[256 + i] + C[768 + i]);
-			tmp[2] = 16 * Q + 8 * (int)V[512 + i] - Q * (2 * C[512 + i] + C[768 + i]);
-			tmp[3] = 16 * Q + 8 * (int)V[768 + i] - Q * (C[768 + i]);
+			tmp[0] = (16 * Q) + (8 * static_cast<int>(V[0 + i])) - (Q * ((2 * C[0 + i]) + C[768 + i]));
+			tmp[1] = (16 * Q) + (8 * static_cast<int>(V[256 + i])) - (Q * ((2 * C[256 + i]) + C[768 + i]));
+			tmp[2] = (16 * Q) + (8 * static_cast<int>(V[512 + i])) - (Q * ((2 * C[512 + i]) + C[768 + i]));
+			tmp[3] = (16 * Q) + (8 * static_cast<int>(V[768 + i])) - (Q * C[768 + i]);
 			Key[i >> 3] |= LdDecode<int>(tmp[0], tmp[1], tmp[2], tmp[3], Q) << (i & 7);
 		}
 #endif

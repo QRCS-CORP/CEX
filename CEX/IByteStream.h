@@ -21,49 +21,53 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Constructor: Instantiate this class
 	/// </summary>
-	IByteStream() {}
+	IByteStream() 
+	{
+	}
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class
 	/// </summary>
-	virtual ~IByteStream() noexcept {}
+	virtual ~IByteStream() noexcept 
+	{
+	}
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Get: The stream can be read
+	/// Read Only: The stream can be read
 	/// </summary>
 	virtual const bool CanRead() = 0;
 
 	/// <summary>
-	/// Get: The stream is seekable
+	/// Read Only: The stream is seekable
 	/// </summary>
 	virtual const bool CanSeek() = 0;
 
 	/// <summary>
-	/// Get: The stream can be written to
+	/// Read Only: The stream can be written to
 	/// </summary>
 	virtual const bool CanWrite() = 0;
 
 	/// <summary>
-	/// Get: The stream container type
+	/// Read Only: The stream container type
 	/// </summary>
 	virtual const StreamModes Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The stream length
+	/// Read Only: The stream length
 	/// </summary>
 	virtual const ulong Length() = 0;
 
 	/// <summary>
-	/// Get: The streams class name
+	/// Read Only: The streams class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: The streams current position
+	/// Read Only: The streams current position
 	/// </summary>
 	virtual const ulong Position() = 0;
 

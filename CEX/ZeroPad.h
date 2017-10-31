@@ -12,37 +12,43 @@ class ZeroPad final : public IPadding
 {
 private:
 
-	ZeroPad(const ZeroPad&) = delete;
-	ZeroPad& operator=(const ZeroPad&) = delete;
-	ZeroPad& operator=(ZeroPad&&) = delete;
-
 	static const std::string CLASS_NAME;
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The padding modes type name
-	/// </summary>
-	const PaddingModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The padding modes class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ZeroPad(const ZeroPad&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ZeroPad& operator=(const ZeroPad&) = delete;
+
+	/// <summary>
+	/// Constructor: Instantiate this class
 	/// </summary>
 	ZeroPad();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class: finalize this class
 	/// </summary>
 	~ZeroPad() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The padding modes type name
+	/// </summary>
+	const PaddingModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The padding modes class name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

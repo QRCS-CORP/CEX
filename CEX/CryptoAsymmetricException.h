@@ -11,50 +11,71 @@ NAMESPACE_EXCEPTION
 struct CryptoAsymmetricException : std::exception
 {
 private:
+
 	std::string m_details;
 	std::string m_message;
 	std::string m_origin;
 
 public:
 
-	/// <summary>
-	/// Get/Set: The inner exception string
-	/// </summary>
-	std::string &Details();
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Get/Set: The message associated with the error
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	std::string &Message();
+	CryptoAsymmetricException& operator=(const CryptoAsymmetricException&) = delete;
 
 	/// <summary>
-	/// Get/Set: The origin of the exception in the format Class
+	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
-	std::string &Origin();
+	CryptoAsymmetricException() = delete;
 
 	/// <summary>
-	/// Instantiate this class with a message
+	/// Constructor: instantiate this class with a message
 	/// </summary>
 	///
 	/// <param name="Message">A custom message or error data</param>
 	explicit CryptoAsymmetricException(const std::string &Message);
 
 	/// <summary>
-	/// Instantiate this class with an origin and message
+	/// Constructor: instantiate this class with an origin and message
 	/// </summary>
 	///
 	/// <param name="Origin">The origin of the exception</param>
 	/// <param name="Message">A custom message or error data</param>
-	explicit CryptoAsymmetricException(const std::string &Origin, const std::string &Message);
+	CryptoAsymmetricException(const std::string &Origin, const std::string &Message);
 
 	/// <summary>
-	/// Instantiate this class with an origin, message and inner exception
+	/// Constructor: instantiate this class with an origin, message and inner exception
 	/// </summary>
 	///
 	/// <param name="Origin">The origin of the exception</param>
 	/// <param name="Message">A custom message or error data</param>
 	/// <param name="Detail">The inner exception string</param>
-	explicit CryptoAsymmetricException(const std::string &Origin, const std::string &Message, const std::string &Detail);
+	CryptoAsymmetricException(const std::string &Origin, const std::string &Message, const std::string &Detail);
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	~CryptoAsymmetricException();
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: The inner exception string
+	/// </summary>
+	std::string &Details();
+
+	/// <summary>
+	/// Read/Write: The message associated with the error
+	/// </summary>
+	std::string &Message();
+
+	/// <summary>
+	/// Read/Write: The origin of the exception in the format Class
+	/// </summary>
+	std::string &Origin();
+
 };
 
 NAMESPACE_EXCEPTIONEND

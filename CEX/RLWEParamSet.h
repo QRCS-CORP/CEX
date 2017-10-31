@@ -31,11 +31,7 @@ using Enumeration::RLWEParams;
 /// </summary>
 struct RLWEParamSet
 {
-	RLWEParamSet(const RLWEParamSet&) = delete;
-	RLWEParamSet& operator=(const RLWEParamSet&) = delete;
-	RLWEParamSet& operator=(RLWEParamSet&&) = delete;
-
-	//~~~Properties~~~//
+	//~~~Public Fields~~~//
 
 	/// <summary>
 	/// The byte size of A's forward message to host B
@@ -70,6 +66,16 @@ struct RLWEParamSet
 	//~~~Constructor~~~//
 
 	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	RLWEParamSet(const RLWEParamSet&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	RLWEParamSet& operator=(const RLWEParamSet&) = delete;
+
+	/// <summary>
 	/// Initialize an empty RingLWE parameter structure
 	/// </summary>
 	RLWEParamSet();
@@ -98,6 +104,8 @@ struct RLWEParamSet
 	/// </summary>
 	~RLWEParamSet();
 
+	//~~~Public Functions~~~//
+
 	/// <summary>
 	/// Load the parameter values
 	/// </summary>
@@ -106,7 +114,7 @@ struct RLWEParamSet
 	/// <param name="SeedByteSize">The byte size of the secret seed array</param>
 	/// <param name="ForwardByteSize">The byte size of A's forward message to host B</param>
 	/// <param name="ReturnByteSize">The byte size of B's reply message to host A</param>
-	/// <param name="ParamName">The parameter sets formal name</param>
+	/// <param name="ParamSet">The parameter sets formal name</param>
 	void Load(uint Coefficients, int Modulus, uint SeedByteSize, uint ForwardByteSize, uint ReturnByteSize, RLWEParams ParamSet);
 
 	/// <summary>

@@ -8,7 +8,85 @@ NAMESPACE_MAC
 
 const std::string GMAC::CLASS_NAME("GMAC");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+GMAC::GMAC(BlockCiphers CipherType)
+	:
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) : 
+		throw CryptoMacException("GMAC:CTor", "The Cipher type can not be none!")),
+	m_cipherType(CipherType),
+	m_destroyEngine(true),
+	m_gmacHash(),
+	m_gmacNonce(0),
+	m_gmacKey(0),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgCode(BLOCK_SIZE),
+	m_msgCounter(0),
+	m_msgOffset(0)
+{
+	Scope();
+}
+
+GMAC::GMAC(IBlockCipher* Cipher)
+	:
+	m_blockCipher(Cipher != nullptr ? Cipher : 
+		throw CryptoMacException("GMAC:CTor", "The Cipher can not be null!")),
+	m_cipherType(Cipher->Enumeral()),
+	m_destroyEngine(false),
+	m_gmacHash(),
+	m_gmacNonce(0),
+	m_gmacKey(0),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgCode(BLOCK_SIZE),
+	m_msgCounter(0),
+	m_msgOffset(0)
+{
+	Scope();
+}
+
+GMAC::~GMAC()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
+		m_isInitialized = false;
+		m_msgCounter = 0;
+		m_msgOffset = 0;
+
+		Utility::IntUtils::ClearVector(m_gmacKey);
+		Utility::IntUtils::ClearVector(m_gmacNonce);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_msgBuffer);
+		Utility::IntUtils::ClearVector(m_msgCode);
+
+		m_gmacHash->Reset();
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t GMAC::BlockSize() 
 {
@@ -45,98 +123,25 @@ const std::string GMAC::Name()
 	return CLASS_NAME + "-" + m_blockCipher->Name();
 }
 
-GMAC::GMAC(BlockCiphers CipherType)
-	:
-	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType)),
-	m_cipherType(CipherType),
-	m_destroyEngine(true),
-	m_gmacHash(0),
-	m_gmacNonce(0),
-	m_gmacKey(0),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgCode(BLOCK_SIZE),
-	m_msgCounter(0),
-	m_msgOffset(0)
-{
-	Scope();
-}
-
-GMAC::GMAC(IBlockCipher* Cipher)
-	:
-	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoMacException("GMAC:CTor", "The Cipher can not be null!")),
-	m_cipherType(Cipher->Enumeral()),
-	m_destroyEngine(false),
-	m_gmacHash(0),
-	m_gmacNonce(0),
-	m_gmacKey(0),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgCode(BLOCK_SIZE),
-	m_msgCounter(0),
-	m_msgOffset(0)
-{
-	Scope();
-}
-
-GMAC::~GMAC()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	if (!m_isInitialized)
-		throw CryptoMacException("GMAC:Compute", "The Mac is not initialized!");
+	CexAssert(m_isInitialized, "The Mac is not initialized!");
 
 	if (Output.size() != BLOCK_SIZE)
+	{
 		Output.resize(BLOCK_SIZE);
+	}
 
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
 }
 
-void GMAC::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cipherType = BlockCiphers::None;
-		m_isInitialized = false;
-		m_msgCounter = 0;
-		m_msgOffset = 0;
-
-		m_gmacHash->Reset();
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_blockCipher != 0)
-				delete m_blockCipher;
-		}
-
-		Utility::IntUtils::ClearVector(m_gmacNonce);
-		Utility::IntUtils::ClearVector(m_gmacKey);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
-		Utility::IntUtils::ClearVector(m_msgCode);
-
-	}
-}
-
 size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	if (!m_isInitialized)
-		throw CryptoMacException("GMAC:Finalize", "The Mac is not initialized!");
-	if ((Output.size() - OutOffset) < BLOCK_SIZE)
-		throw CryptoMacException("GMAC:Finalize", "The Output buffer is too short!");
+	CexAssert(m_isInitialized, "The Mac is not initialized!");
+	CexAssert((Output.size() - OutOffset) >= BLOCK_SIZE, "The Input buffer is too short!");
 
 	m_gmacHash->FinalizeBlock(m_msgCode, m_msgCounter, 0);
 	Utility::MemUtils::XorBlock(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
@@ -149,12 +154,18 @@ size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 void GMAC::Initialize(ISymmetricKey &KeyParams)
 {
 	if (KeyParams.Nonce().size() < TAG_MINLEN)
-		throw CryptoMacException("GMAC:Initialize", "The length must be minimum of 12 and maximum of MAC code size!");
+	{
+		throw CryptoMacException("GMAC:Initialize", "The length must be minimum of 12, and maximum of MAC code size!");
+	}
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
 		throw CryptoMacException("GMAC:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	}
 
 	if (m_isInitialized)
+	{
 		Reset();
+	}
 
 	if (KeyParams.Key().size() != 0)
 	{
@@ -170,7 +181,7 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 			Utility::IntUtils::BeBytesTo64(tmpH, 8)
 		};
 
-		m_gmacHash = new GHASH(m_gmacKey);
+		m_gmacHash->Initialize(m_gmacKey);
 	}
 
 	// initialize the nonce
@@ -209,24 +220,26 @@ void GMAC::Update(byte Input)
 
 void GMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	if (Length == 0)
-		return;
-	if (!m_isInitialized)
-		throw CryptoMacException("GMAC:Update", "The Mac is not initialized!");
-	if ((InOffset + Length) > Input.size())
-		throw CryptoMacException("GMAC:Update", "The Input buffer is too short!");
+	CexAssert(m_isInitialized, "The Mac is not initialized!");
+	CexAssert((InOffset + Length) <= Input.size(), "The Input buffer is too short!");
 
-	m_gmacHash->Update(Input, InOffset, m_msgCode, Length);
-	m_msgCounter += Length;
+	if (Length != 0)
+	{
+		m_gmacHash->Update(Input, InOffset, m_msgCode, Length);
+		m_msgCounter += Length;
+	}
 }
 
 void GMAC::Scope()
 {
 	m_legalKeySizes.resize(m_blockCipher->LegalKeySizes().size());
 	std::vector<SymmetricKeySize> keySizes = m_blockCipher->LegalKeySizes();
+
 	// recommended iv is 12 bytes with gmac
 	for (size_t i = 0; i < m_legalKeySizes.size(); ++i)
+	{
 		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), 12, keySizes[i].InfoSize());
+	}
 }
 
 NAMESPACE_MACEND

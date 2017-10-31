@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_RINGLWETEST_H
-#define _CEXTEST_RINGLWETEST_H
+#ifndef CEXTEST_RINGLWETEST_H
+#define CEXTEST_RINGLWETEST_H
 
 #include "ITest.h"
 

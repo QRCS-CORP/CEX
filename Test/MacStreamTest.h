@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_MACSTREAMTEST_H
-#define _CEXTEST_MACSTREAMTEST_H
+#ifndef CEXTEST_MACSTREAMTEST_H
+#define CEXTEST_MACSTREAMTEST_H
 
 #include "ITest.h"
 #include "../CEX/IMac.h"

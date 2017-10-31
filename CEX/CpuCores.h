@@ -25,11 +25,11 @@ enum class CpuCores : byte
 	/// <summary>
 	/// Two cpu cores
 	/// </summary>
-	CoresX2 = 2,
+	X2 = 2,
 	/// <summary>
 	/// Four cpu cores
 	/// </summary>
-	CoresX4 = 4,
+	X4 = 4,
 	/// <summary>
 	/// Half of available cores
 	/// </summary>
@@ -37,23 +37,23 @@ enum class CpuCores : byte
 	/// <summary>
 	/// Six cpu cores
 	/// </summary>
-	CoresX6 = 6,
+	X6 = 6,
 	/// <summary>
 	/// Eight cpu cores
 	/// </summary>
-	CoresX8 = 8,
+	X8 = 8,
 	/// <summary>
 	/// Sixteen cpu cores
 	/// </summary>
-	CoresX16 = 16,
+	X16 = 16,
 	/// <summary>
 	/// Thirty-two cpu cores
 	/// </summary>
-	CoresX32 = 32,
+	X32 = 32,
 	/// <summary>
 	/// Sixty-four cpu cores
 	/// </summary>
-	CoresX64 = 64,
+	X64 = 64,
 };
 
 NAMESPACE_ENUMERATIONEND

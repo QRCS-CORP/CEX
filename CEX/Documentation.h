@@ -9,13 +9,13 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.1.3 (A3).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.4 (A4).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.1.3</B> (A3 version), which are the major, minor, patch, and release codes. \n
+The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, patch, and release codes. \n
 \brief
 
 <B>Release 1.1.0.1</B> \n

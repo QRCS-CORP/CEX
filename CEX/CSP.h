@@ -7,8 +7,6 @@ NAMESPACE_PROVIDER
 
 /// <summary>
 /// An implementation of an entropy source provider using the system secure random generator.
-/// <para>On a windows system, the RNGCryptoServiceProvider CryptGenRandom() function is used to generate output. 
-/// On Android, the arc4random() function is used. All other systems (Linux, Unix), use dev/random.</para>
 /// </summary>
 /// 
 /// <example>
@@ -21,6 +19,9 @@ NAMESPACE_PROVIDER
 /// </example>
 /// 
 /// <remarks>
+/// <para>On a windows system, the RNGCryptoServiceProvider CryptGenRandom() function is used to generate output. 
+/// On Android, the arc4random() function is used. All other systems (Linux, Unix), use dev/random.</para>
+///
 /// <description>Guiding Publications::</description>
 /// <list type="number">
 /// <item><description>Microsoft <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</a>: class documentation.</description></item>
@@ -29,7 +30,7 @@ NAMESPACE_PROVIDER
 /// <item><description>RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requirements for Security.</description></item>
 /// </list> 
 /// </remarks>
-class CSP : public IProvider
+class CSP final : public IProvider
 {
 private:
 
@@ -39,60 +40,65 @@ private:
 
 public:
 
-	CSP(const CSP&) = delete;
-	CSP& operator=(const CSP&) = delete;
-	CSP& operator=(CSP&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The providers type name
-	/// </summary>
-	const Providers Enumeral() override;
-
-	/// <summary>
-	/// Get: The entropy provider is available on this system
-	/// </summary>
-	const bool IsAvailable() override;
-
-	/// <summary>
-	/// Get: Cipher name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	CSP(const CSP&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	CSP& operator=(const CSP&) = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class
 	/// </summary>
 	CSP();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class
 	/// </summary>
 	~CSP() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The providers type name
 	/// </summary>
-	void Destroy() override;
+	const Providers Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The entropy provider is available on this system
+	/// </summary>
+	const bool IsAvailable() override;
+
+	/// <summary>
+	/// Read Only: Cipher name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Fill a buffer with pseudo-random bytes
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	void GetBytes(std::vector<byte> &Output) override;
 
 	/// <summary>
-	/// Fill the buffer with pseudo-random bytes
+	/// Fill the buffer with pseudo-random bytes using offsets
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
@@ -102,11 +108,17 @@ public:
 	/// <param name="Length">The size of the expected array returned</param>
 	/// 
 	/// <returns>An array of pseudo-random of bytes</returns>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	std::vector<byte> GetBytes(size_t Length) override;
 
 	/// <summary>
 	/// Returns a pseudo-random unsigned 32bit integer
 	/// </summary>
+	/// 
+	/// <returns>A pseudo random 32bit unsigned integer</returns>
+	/// 
+	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
 	uint Next() override;
 
 	/// <summary>

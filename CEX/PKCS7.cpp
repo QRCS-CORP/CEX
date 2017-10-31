@@ -4,9 +4,13 @@ NAMESPACE_PADDING
 
 const std::string PKCS7::CLASS_NAME("PKCS7");
 
-PKCS7::PKCS7() {}
+PKCS7::PKCS7() 
+{
+}
 
-PKCS7::~PKCS7() {}
+PKCS7::~PKCS7() 
+{
+}
 
 const PaddingModes PKCS7::Enumeral() 
 { 
@@ -21,12 +25,16 @@ const std::string PKCS7::Name()
 size_t PKCS7::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
+	{
 		throw CryptoPaddingException("PKCS7:AddPadding", "The padding offset value is longer than the array length!");
+	}
 
-	byte code = (byte)(Input.size() - Offset);
+	byte code = static_cast<byte>(Input.size() - Offset);
 
 	while (Offset < Input.size())
+	{
 		Input[Offset++] = code;
+	}
 
 	return code;
 }
@@ -39,7 +47,7 @@ size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input)
 	size_t len = Input.size() - 1;
 	byte code = Input[len];
 
-	if ((int)code > len)
+	if (static_cast<int>(code) > len)
 	{
 		return (code > len + 1) ? 0 : len + 1;
 	}
@@ -64,7 +72,7 @@ size_t PKCS7::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 	size_t len = Input.size() - (Offset + 1);
 	byte code = Input[Input.size() - 1];
 
-	if ((int)code > len)
+	if (static_cast<int>(code) > len)
 	{
 		return (code > len + 1) ? 0 : len + 1;
 	}

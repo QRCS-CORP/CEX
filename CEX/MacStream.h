@@ -74,7 +74,7 @@ class MacStream
 {
 private:
 
-	IMac* m_macEngine;
+	std::unique_ptr<IMac> m_macEngine;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
@@ -82,30 +82,35 @@ private:
 
 public:
 
-	MacStream() = delete;
-	MacStream(const MacStream&) = delete;
-	MacStream& operator=(const MacStream&) = delete;
-	MacStream& operator=(MacStream&&) = delete;
-
 	/// <summary>
 	/// The Progress Percent event
 	/// </summary>
 	Event<int> ProgressPercent;
 
-	//~~~Properties~~~//
+	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Get: The supported key sizes for the selected mac configuration
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	const std::vector<SymmetricKeySize> LegalKeySizes();
+	MacStream(const MacStream&) = delete;
 
-	//~~~Constructor~~~//
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	MacStream& operator=(const MacStream&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	MacStream() = delete;
 
 	/// <summary>
 	/// Initialize the class with a MacDescription
 	/// </summary>
 	/// 
 	/// <param name="Description">A MacDescription structure containing details about the Mac generator</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	explicit MacStream(MacDescription &Description);
 
 	/// <summary>
@@ -113,12 +118,21 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Mac">The <see cref="Mac::IMac"/> instance</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
 	explicit MacStream(IMac* Mac);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~MacStream();
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The supported key sizes for the selected mac configuration
+	/// </summary>
+	const std::vector<SymmetricKeySize> LegalKeySizes();
 
 	//~~~Public Functions~~~//
 
@@ -149,6 +163,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">A SymmetricKey key container class</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid key sizes are used</exception>
 	void Initialize(ISymmetricKey &KeyParams);
 
 private:

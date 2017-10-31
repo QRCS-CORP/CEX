@@ -19,16 +19,32 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IAsymmetricKeyPair() {}
+	IAsymmetricKeyPair(const IAsymmetricKeyPair&) = delete;
 
 	/// <summary>
-	/// Finalizer
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IAsymmetricKeyPair() noexcept {}
+	IAsymmetricKeyPair& operator=(const IAsymmetricKeyPair&) = delete;
 
-	//~~~Properties~~~//
+	/// <summary>
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IAsymmetricKeyPair() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class.
+	/// <para>Only the tag is destroyed in the finalizer. Call the Destroy() function on Public/Private key members,
+	/// or let them go out of scope to finalize them.</para>
+	/// </summary>
+	virtual ~IAsymmetricKeyPair() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
 
 	/// <summary>
 	/// The public key
@@ -41,7 +57,7 @@ public:
 	virtual IAsymmetricKey* PrivateKey() = 0;
 
 	/// <summary>
-	/// Get: An optional unique tag identifying this key-pair
+	/// Read Only: An optional unique tag identifying this key-pair
 	/// </summary>
 	virtual const std::vector<byte> &Tag() = 0;
 };

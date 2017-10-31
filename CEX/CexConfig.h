@@ -154,33 +154,15 @@
 #endif
 
 // detect endianess
-#define IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
-
-// stringify helper
-#define STR_HELPER(x) #x
-#define TOSTRING(x) STR_HELPER(x)
+#define CEX_IS_LITTLE_ENDIAN (((union { unsigned x; unsigned char c; }){1}).c)
 
 // define endianess of CPU
-#if !defined(IS_LITTLE_ENDIAN)
+#if !defined(CEX_IS_LITTLE_ENDIAN)
 #	if (defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__PPC__) || defined(__mips__) || (defined(__MWERKS__) && !defined(__INTEL__)))
 #		define IS_BIG_ENDIAN
 #	else
-#		define IS_LITTLE_ENDIAN
+#		define CEX_IS_LITTLE_ENDIAN
 #	endif
-#endif
-
-// get register size
-#if defined(__GNUC__) || defined(__MWERKS__)
-#	define WORD64_AVAILABLE
-#	define W64LIT(x) x##LL
-#elif defined(_MSC_VER) || defined(__BCPLUSPLUS__)
-#	define WORD64_AVAILABLE
-#	define W64LIT(x) x##ui64
-#endif
-
-// not a 64-bit CPU
-#if !defined(WORD64_AVAILABLE) && !defined(__alpha)
-#	define SLOW_WORD64
 #endif
 
 // define universal data types
@@ -308,11 +290,16 @@ typedef unsigned char byte;
 #	endif
 #endif
 
-// instructs the compiler to skip optimizations on the contained function; closed with CEX_OPTIMIZE_RESUME
+// stringify helper TODO: verify changes on GCC
+//#define CEX_STRHELPER(x) #x
+//#define CEX_TO_STRING(x) CEX_STRHELPER(x)
+
+// instructs the compiler to skip optimizations on the contained function; closed with CEX_OPTIMIZE_RESUME 
 #if defined(CEX_COMPILER_MSC)
 #	define CEX_OPTIMIZE_IGNORE __pragma(optimize("", off))
 #elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW)
-#	define CEX_OPTIMIZE_IGNORE _Pragma(TOSTRING(GCC optimize("O0")))
+//	_Pragma(CEX_TO_STRING(GCC optimize("O0")))
+#	define CEX_OPTIMIZE_IGNORE #pragma GCC optimize ("O0"), #pragma GCC optimize ("O0")
 #elif defined(CEX_COMPILER_CLANG)
 #	define CEX_OPTIMIZE_IGNORE __attribute__((optnone))
 #elif defined(CEX_COMPILER_INTEL)
@@ -321,24 +308,35 @@ typedef unsigned char byte;
 #	define CEX_OPTIMIZE_IGNORE 0
 #endif
 
-// end of section; resume compiler optimizations
+// end of section; resume compiler optimizations 
 #if defined(CEX_COMPILER_MSC)
 #	define CEX_OPTIMIZE_RESUME __pragma(optimize("", on))
 #elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW)
-#	define CEX_OPTIMIZE_RESUME _Pragma(TOSTRING(GCC pop_options))
+//	_Pragma(CEX_TO_STRING(GCC pop_options))
+#	define CEX_OPTIMIZE_RESUME #pragma GCC pop_options
 #elif defined(CEX_COMPILER_INTEL)
 #	define CEX_OPTIMIZE_RESUME pragma optimize("", on) 
 #else
 #	define CEX_OPTIMIZE_RESUME 0
 #endif
 
+// disabling
 #if !defined(_DEBUG)
 #	define CEX_NO_DEBUG
 #endif
 
-inline static void CexAssert(bool Condition, const char* Message)
+//////////////////////////////////////////////////
+//		*** User Configurable Section ***		//
+// Settings in this section can be modified		//
+//////////////////////////////////////////////////
+
+// enabling this value will set asserts to throw in both debug and release modes
+//#define CEX_THROW_ASSERTIONS
+
+template<typename T>
+inline static void CexAssert(bool Condition, const T Message)
 {
-#if !defined(CEX_NO_DEBUG)
+#if !defined(CEX_NO_DEBUG) || defined(CEX_THROW_ASSERTIONS)
 	if (!Condition)
 	{
 		std::cerr << "Assertion failed in " << __FILE__ << " line " << __LINE__ << ": " << Message << std::endl;
@@ -346,11 +344,6 @@ inline static void CexAssert(bool Condition, const char* Message)
 	} 
 #endif
 }
-
-//////////////////////////////////////////////////
-//		*** User Configurable Section ***		//
-// Settings in this section can be modified		//
-//////////////////////////////////////////////////
 
 // enables/disables OS rotation intrinsics
 #if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)

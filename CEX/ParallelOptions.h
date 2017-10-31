@@ -2,10 +2,12 @@
 #define CEX_PARALLELOPTIONS_H
 
 #include "CexDomain.h"
+#include "CpuCores.h"
 #include "SimdProfiles.h"
 
 NAMESPACE_COMMON
 
+using Enumeration::CpuCores;
 using Enumeration::SimdProfiles;
 
 /// <summary>
@@ -29,6 +31,14 @@ private:
 
 	struct AutoParallelParams
 	{
+		AutoParallelParams()
+			:
+			IsParallel(false),
+			MaxDegree(0),
+			ParallelBlockSize(0)
+		{
+		}
+
 		bool IsParallel;
 		size_t MaxDegree;
 		size_t ParallelBlockSize;
@@ -59,111 +69,30 @@ private:
 	SimdProfiles m_simdDetected;
 	bool m_simdMultiply;
 	bool m_splitChannel;
-	bool m_wideBlock;
 	size_t m_virtualCores;
+	bool m_wideBlock;
 
 public:
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The settings are the default auto-generated recommended values
-	/// </summary>
-	const bool IsDefault();
-
-	/// <summary>
-	/// Get: Block size of the algorithm in bytes
-	/// </summary>
-	const size_t BlockSize();
-
-	/// <summary>
-	/// Get: Returns True if the system supports prefetch intrinsics
-	/// </summary>
-	const bool HasPrefetch();
-
-	/// <summary>
-	/// Get: Returns True if the system supports SHA2 intrinsics
-	/// </summary>
-	const bool HasSHA2();
-
-	/// <summary>
-	/// Get: Returns True if the system supports 128bit SSE3 SIMD intrinsics
-	/// </summary>
-	const bool HasSimd128();
-
-	/// <summary>
-	/// Get: Returns True if the system supports 256bit AVX2 intrinsics
-	/// </summary>
-	const bool HasSimd256();
-
-	/// <summary>
-	/// Get: The total size in bytes of the L1 Data cache available on the system
-	/// </summary>
-	const size_t L1DataCacheTotalSize();
-
-	/// <summary>
-	/// Get: The amount of L1 cache in bytes to reserve for tables and working variables used by the calling algorithm.
-	/// <para>Setting this value to the sum size (or greater) of the class state variables, 
-	/// can reduce the frequency of L1 cache eviction for that state, 
-	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.<para>
-	/// </summary>
-	const size_t L1DataCacheReserved();
-
-	/// <summary>
-	/// Get/Set: Enable automatic processor parallelization
-	/// </summary>
-	bool &IsParallel();
-
-	/// <summary>
-	/// Get/Set: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.</para>
-	/// </summary>
-	size_t &ParallelBlockSize();
-
-	/// <summary>
-	/// Get: Maximum input block byte length when using multi-threaded processing
-	/// </summary>
-	const size_t ParallelMaximumSize();
-
-	/// <summary>
-	/// Get: The smallest valid ParallelBlockSize; parallel blocks must be a multiple of this size
-	/// </summary>
-	const size_t ParallelMinimumSize();
-
-	/// <summary>
-	/// Get: The maximum number of threads allocated when using multi-threaded processing.
-	/// <para>Changes to this value must be made through the SetMaxDegree(size_t) function.</para>
-	/// </summary>
-	const size_t ParallelMaxDegree();
-
-	/// <summary>
-	/// Get: The number of processor cores available on the system
-	/// </summary>
-	const size_t PhysicalCores();
-
-	/// <summary>
-	/// Get: The maximum number of processor cores available on the system
-	/// </summary>
-	const size_t ProcessorCount();
-
-	/// <summary>
-	/// Get: The maximum supported SIMD instruction set
-	/// </summary>
-	const SimdProfiles SimdProfile();
-
-	/// <summary>
-	/// Get: The number of virtual (hyper-threading) processor cores available on the system
-	/// </summary>
-	const size_t VirtualCores();
-
-	/// <summary>
-	/// Get/Set: Enable wide block initialization parameters (in development)
-	/// </summary>
-	bool &WideBlock();
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class using automated calculation of recommended values based on the hardware profile.
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ParallelOptions(const ParallelOptions&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ParallelOptions& operator=(const ParallelOptions&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	ParallelOptions() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class using automated calculation of recommended values based on the hardware profile.
 	/// <para>Initializes and calculates the default recommended values. 
 	/// Sizes are auto-calculated based on processor cache sizes, cpu core count, and SIMD availability, to favour a high-performance profile.</para>
 	/// </summary>
@@ -172,13 +101,13 @@ public:
 	/// <param name="SimdMultiply">The calling algorithm supports SIMD pipelining; engages a multiplier used to calculate the optimum parallel block size.</param>
 	/// <param name="ReservedCache">The amount of L1 cache in bytes to reserve for arrays and working variables used by the calling algorithm.
 	/// <para>Setting this value to the sum size (or greater) of the classes state variables, can reduce the frequency of L1 cache eviction of that state, 
-	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.<para></param>
+	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.</para></param>
 	/// <param name="SplitChannel">The calling algorithm uses two channels of equal size Input and Output when processing data</param>
 	/// <param name="ParallelMaxDegree">The maximum number of processor cores used by the algorithm during parallel processing; if set to zero, uses total number of processor cores</param>
-	explicit ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree = 0);
+	ParallelOptions(size_t BlockSize, bool SimdMultiply, size_t ReservedCache, bool SplitChannel, size_t ParallelMaxDegree = 0);
 
 	/// <summary>
-	/// Instantiate this class, setting each value manually.
+	/// Constructor: instantiate this class, setting each value manually.
 	/// </summary>
 	/// 
 	/// <param name="BlockSize">The input block-size in bytes of the target algorithm</param>
@@ -188,14 +117,110 @@ public:
 	/// <param name="SimdMultiply">The target algorithm uses SIMD instructions multiplier to calculate parallel block sizes</param>
 	/// <param name="ReservedCache">The amount of L1 cache in bytes to reserve for arrays and working variables used by the calling algorithm.
 	/// <para>Setting this value to the sum size (or greater) of the classes state variables, can reduce the frequency of L1 cache eviction of that state, 
-	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.<para></param>
+	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.</para></param>
 	/// <param name="SplitChannel">The calling algorithm uses two channels of equal size Input and Output when processing data</param>
-	explicit ParallelOptions(size_t BlockSize, bool Parallel, size_t ParallelBlockSize, size_t ParallelMaxDegree, bool SimdMultiply, size_t ReservedCache, bool SplitChannel);
+	ParallelOptions(size_t BlockSize, bool Parallel, size_t ParallelBlockSize, size_t ParallelMaxDegree, bool SimdMultiply, size_t ReservedCache, bool SplitChannel);
 
 	/// <summary>
 	/// Finalize this class and clear resources
 	/// </summary>
 	~ParallelOptions();
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The settings are the default auto-generated recommended values
+	/// </summary>
+	const bool IsDefault();
+
+	/// <summary>
+	/// Read Only: Block size of the algorithm in bytes
+	/// </summary>
+	const size_t BlockSize();
+
+	/// <summary>
+	/// Read Only: Returns True if the system supports prefetch intrinsics
+	/// </summary>
+	const bool HasPrefetch();
+
+	/// <summary>
+	/// Read Only: Returns True if the system supports SHA2 intrinsics
+	/// </summary>
+	const bool HasSHA2();
+
+	/// <summary>
+	/// Read Only: Returns True if the system supports 128bit SSE3 SIMD intrinsics
+	/// </summary>
+	const bool HasSimd128();
+
+	/// <summary>
+	/// Read Only: Returns True if the system supports 256bit AVX2 intrinsics
+	/// </summary>
+	const bool HasSimd256();
+
+	/// <summary>
+	/// Read Only: The total size in bytes of the L1 Data cache available on the system
+	/// </summary>
+	const size_t L1DataCacheTotalSize();
+
+	/// <summary>
+	/// Read Only: The amount of L1 cache in bytes to reserve for tables and working variables used by the calling algorithm.
+	/// <para>Setting this value to the sum size (or greater) of the class state variables, 
+	/// can reduce the frequency of L1 cache eviction for that state, 
+	/// which in turn provides faster run-times and resiliance against some forms of timing attacks.</para>
+	/// </summary>
+	const size_t L1DataCacheReserved();
+
+	/// <summary>
+	/// Read/Write: Enable automatic processor parallelization
+	/// </summary>
+	bool &IsParallel();
+
+	/// <summary>
+	/// Read/Write: Parallel block size; must be a multiple of <see cref="ParallelMinimumSize"/>.
+	/// </summary>
+	size_t &ParallelBlockSize();
+
+	/// <summary>
+	/// Read Only: Maximum input block byte length when using multi-threaded processing
+	/// </summary>
+	const size_t ParallelMaximumSize();
+
+	/// <summary>
+	/// Read Only: The smallest valid ParallelBlockSize; parallel blocks must be a multiple of this size
+	/// </summary>
+	const size_t ParallelMinimumSize();
+
+	/// <summary>
+	/// Read Only: The maximum number of threads allocated when using multi-threaded processing.
+	/// <para>Changes to this value must be made through the SetMaxDegree(size_t) function.</para>
+	/// </summary>
+	const size_t ParallelMaxDegree();
+
+	/// <summary>
+	/// Read Only: The number of processor cores available on the system
+	/// </summary>
+	const size_t PhysicalCores();
+
+	/// <summary>
+	/// Read Only: The maximum number of processor cores available on the system
+	/// </summary>
+	const size_t ProcessorCount();
+
+	/// <summary>
+	/// Read Only: The maximum supported SIMD instruction set
+	/// </summary>
+	const SimdProfiles SimdProfile();
+
+	/// <summary>
+	/// Read Only: The number of virtual (hyper-threading) processor cores available on the system
+	/// </summary>
+	const size_t VirtualCores();
+
+	/// <summary>
+	/// Read/Write: Enable wide block initialization parameters (in development)
+	/// </summary>
+	bool &WideBlock();
 
 	//~~~Public Functions~~~//
 
@@ -220,7 +245,7 @@ public:
 	void Calculate(bool Parallel, size_t ParallelBlockSize, size_t MaxDegree);
 
 	/// <summary>
-	/// Reset the internal state
+	/// Reset all internal data to defaults
 	/// </summary>
 	void Reset();
 

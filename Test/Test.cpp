@@ -1,13 +1,8 @@
 // HISTORY
 //
-// ### CEX 1.0.1.3 ###
-// Release 1.0.1.3, October 1, 2017
-// Pre-release of 1.0.0.4 spawned by bug fix
-// Importance: Critical
-// Bug found in RingLWE FFTQ12289N1024::GetNoise template
-// Status: Fixed, and classes rewritten during optimization and security compliance review
-//
-// Release 1.0.0.4, On Schedule (eta. is mid October 2017)
+// ### CEX 1.0.0.4 ###
+// 1.0.0.4, Preliminary Release
+// The full version will be Misra and SEI-CERT compliant, (eta. is mid November 2017)
 // Added McEliece public key crypto system	-done
 // Added Keccak1024 message digest	-done
 // Added Poly1305 Mac and ChaCha/Poly1305 AEAD mode -todo
@@ -69,53 +64,79 @@
 
 // TRAJECTORY
 //
-// ###SCHEDULE FOR 1.0.0.4 RELEASE###
-// ##ETA is October 22, 2017##
+// ### SCHEDULE FOR 1.0.0.4 RELEASE ###
+// ## ETA is November 14, 2017 ##
 // Complete performance optimizations on all classes
 // Complete security audit and rewrite
 // Add Poly1305 MAC
 // Make authenticated KEX changes to RingLWE
 //
-// ###JSF/MISRA/SEI CERT Check LIST###
-// ##Local Changes##
-// do not cast between different size integers (unless it would seriously/unavoidably impede performance)
-// ensure that operations on signed integers do not result in overflow
-// ensure that division and remainder operations do not result in divide-by-zero errors
-// do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand
-// organize struct and class variable declarations by size large to small (avoid unnecessary padding)
-// make all (public) functions const correct
-// reduce the number of class level variables (consider performance vs safety)
-// make as many class functions static as possible
-// reduce the number of function parameters whenever possible
-// replace macros with inline functions
-// mark single parameter constructors as explicit
-// replace all instances of pointer math (and C* pointers where practical)
-// replace all C style casts with C++ equivalents, ex. static_cast<>() (except where it diminishes readability, ex. within array braces)
-// compound integer operations should be expressed within parenthesis to statically define operation flow, ex.  a = (b * (c << 3))
-// verify that all class scope variables are destroyed/reset in the destructor
-// make the Destroy() functions private (confusing, and no need for them to be public)
-// delete unused default/copy/move constructors from all structs and classes
-// replace all macros with inline/templated functions
-// on pointer comparisons replace '0' with nullptr (ex. y* != nullptr)
+// ### JSF/MISRA/SEI-CERT Check LIST ###
+// ## Local Changes ##
+// ensure that operations on signed integers do not result in overflow -done
+// ensure that division and remainder operations do not result in divide-by-zero errors -done
+// do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand -done
+// make all (public) functions const correct -ongoing
+// reduce the number of class level variables (consider performance vs safety) -1.0.0.5
+// make as many class functions static as possible -1.0.0.5
+// reduce the number of function parameters whenever possible -done
+// replace macros with inline functions -done
+// mark single parameter constructors as explicit -done
+// replace all instances of pointer math -done
+// replave all C (*) pointers with std::unique_ptr, including public constructors and test framework -ongoing
+// replace all C style casts with C++ equivalents, ex. static_cast<>() -done
+// compound integer operations should be expressed within parenthesis to statically define operation flow, ex.  a = (b * (c << 3)) -done
+// verify that all class scope variables are destroyed/reset in the destructor -done
+// make the Destroy() functions private (confusing, and no need for them to be public) -done; kept in keys and streams, moved to finalizer for everything else
+// delete unused default/copy/move constructors from all structs and classes -done
+// replace all macros with inline/templated functions -done
+// on pointer comparisons to zero, replace '0' with nullptr (ex. y* != nullptr) -done
+// review and rewrite the entire test framework for compliance -todo in 1.0.0.5
 //
-// ##Global Changes##
+// ## Global Changes ##
 // all hex codes should be expressed in capitals, ex. 0xFF -done
 // enum members should all be byte sized and sequential, i.e. 1,2,3.. (promote jump lists) -done
 // reduce the number of global includes, and replace all C headers with C++ versions -done
 // remove unused macros and defines in CEXCommon.h -done
 // prefer static/extern const integers to #define -done
-// add GNU header to each (major) header file
-// move from C style pointers (*) to std::unique_ptr
+// add GNU header to each (major) header file -done
+// internally, move from C style pointers (*) to std::unique_ptr -done
+// all input pointers and types are tested and throw in constructor -done
+// move exceptions to constructor initialization list from constructor body -done
+// make sure every exception is documented -done
+// use assert in busy functions, but use exceptions in constructor and initialize -done
+// check every constructor initialize list for order and completeness -done
+// all case statements must have braces and default -done
+// make access to classes as restrictive as possibe (move/copy ctors), and make it so that incorrect usage is impossible or throws -done
+// no increment/decrement operators inside a statement or indice, i.e. arr1[i++] or, while(--i >= 0) -done
+// document all publicly visible functions and constants -done
+// enum member numerical value requires static_cast, remove all C style casting -done
+// new class order; constructors proceed properties -done
+// convert all C-style static arrays to std::array -done
 //
-// ##Upgrades##
-// add GCM authentication mode to RingLWE
-// add Padding property (and mechanism) to IAsymmetricCipher and children
-// revise parallel options, replace Parallel parameter with cpu count (CpuCores), and make core count assignable
-
-// ###Optimization Cycle 1: Sept 26, 2017###
+// ## Style Rules ##
+// 
+// namespace: Single capaitalized word, ex. Network::
+// class name: Pascal case description, maximum of two words, ex. SymmetricKey()
+// function name: Pascal case, maximum of two words, ex. Initialize()
+// function parameters: Pascal case, maximum of two words, ex. Initialize(ISymmetricKey &Key)
+// global variable: Camel Case, with the prefix 'g_', ex. g_globalState
+// class variable: Camel Case, with the prefix 'm_', ex. m_classState
+// function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, blkCtr
+// global constant: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
+// class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
+// function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
+//
+// ## Upgrades ##
+// add GCM authentication mode to RingLWE -done
+// add Padding property (and mechanism) -moved to KEM spec.
+// revise parallel options, replace Parallel parameter with cpu count (CpuCores), and make core count assignable -moved to api eval. 1.0.0.5
+//
+//
+// ### Optimization Cycle 1: Sept 26, 2017 ###
 // Performance of various algorithms pre/post memory and code optimizations
 //
-// ##Stage 1 (baseline)##
+// ## Stage 1 (baseline) ##
 // #asymmetric ciphers in operations per second, best of 4
 // RingLWE: Gen 14285/17345, Enc 10000/12547, Dec 33333
 // McEliece: Gen 12, Enc 7692, Dec 4000
@@ -131,7 +152,7 @@
 // Skein: 1024- 350/1412, 512- 236/1204, 256- 221/929
 // Memory: LB Clear 6993, Clear 10309, LB Copy 4761, Copy 10416, LB Memset 6896, Memset 10309, LB XOR 4524, XOR 1329
 //
-// ##Stage 2 (post optimization)##
+// ## Stage 2 (post optimization in full release) ##
 // #asymmetric ciphers in operations per second, best of 4
 // RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000
 // McEliece: Gen 12, Enc 12500, Dec 4577
@@ -152,21 +173,28 @@
 // AVX512 integration		-started
 // RingLWE					-added
 // McEliece					-added
-// RSA						-?
 // ModuleLWE				-?
-// RSA-Sig					-?
+// ECDH						-?
+// RSA						-?
+//
 // GMSS						-?
+// Tesla					-?
+// RSA-Sig					-?
+//
 // TLS-KEX					-?
 // P2P-KEX					-?
-// DLL API					-?
+//
+// Networking				-?
+// Expand cpu/simd support	-?
 // Android/Linux support	-?
-// expand cpu/simd support	-?
+// DLL API					-?
+
 
 #include <algorithm>
-#include <cstdio>
-#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include "../CEX/CpuDetect.h"
 #include "../Test/TestFiles.h"
@@ -215,6 +243,7 @@
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
 #include "../Test/TwofishTest.h"
+#include "../Test/UtilityTest.h"
 
 using namespace Test;
 
@@ -479,6 +508,8 @@ int main()
 			PrintHeader("TESTING VECTORIZED MEMORY FUNCTIONS");
 			RunTest(new MemUtilsTest());
 			RunTest(new SimdWrapperTest());
+			PrintHeader("TESTING UTILITY CLASS FUNCTIONS");
+			RunTest(new UtilityTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
 			RunTest(new RingLWETest());
 			RunTest(new McElieceTest());
@@ -487,6 +518,7 @@ int main()
 		{
 			ConsoleUtils::WriteLine("Diagnostic tests were Cancelled..");
 		}
+
 		ConsoleUtils::WriteLine("");
 		ConsoleUtils::WriteLine("");
 

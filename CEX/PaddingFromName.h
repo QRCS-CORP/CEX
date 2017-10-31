@@ -7,6 +7,7 @@
 
 NAMESPACE_HELPER
 
+using Exception::CryptoException;
 using Cipher::Symmetric::Block::Padding::IPadding;
 using Enumeration::PaddingModes;
 
@@ -16,6 +17,7 @@ using Enumeration::PaddingModes;
 class PaddingFromName
 {
 public:
+
 	/// <summary>
 	/// Get a Padding Mode by name
 	/// </summary>

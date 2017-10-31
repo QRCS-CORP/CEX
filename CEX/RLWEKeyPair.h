@@ -21,48 +21,61 @@ private:
 
 public:
 
-	RLWEKeyPair(const RLWEKeyPair&) = delete;
-	RLWEKeyPair& operator=(const RLWEKeyPair&) = delete;
-	RLWEKeyPair& operator=(RLWEKeyPair&&) = delete;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class with the public/private keys
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	RLWEKeyPair(const RLWEKeyPair&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	RLWEKeyPair& operator=(const RLWEKeyPair&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	RLWEKeyPair() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class with the public/private keys
 	/// </summary>
 	/// 
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
-	explicit RLWEKeyPair(RLWEPrivateKey* PrivateKey, RLWEPublicKey* PublicKey);
+	RLWEKeyPair(RLWEPrivateKey* PrivateKey, RLWEPublicKey* PublicKey);
 
 	/// <summary>
-	/// Instantiate this class with the public/private keys and an identification tag
+	/// Constructor: instantiate this class with the public/private keys and an identification tag
 	/// </summary>
 	/// 
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
 	/// <param name="Tag">The identification tag</param>
-	explicit RLWEKeyPair(RLWEPrivateKey* PrivateKey, RLWEPublicKey* PublicKey, std::vector<byte> &Tag);
+	RLWEKeyPair(RLWEPrivateKey* PrivateKey, RLWEPublicKey* PublicKey, std::vector<byte> &Tag);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class.
+	/// <para>Only the tag is destroyed in the finalizer. Call the Destroy() function on Public/Private key members,
+	/// or let them go out of scope to finalize them.</para>
 	/// </summary>
 	~RLWEKeyPair() override;
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// The Private Key
+	/// The secret private Key
 	/// </summary>
 	IAsymmetricKey* PrivateKey() override;
 
 	/// <summary>
-	/// The Public key
+	/// The public key
 	/// </summary>
 	IAsymmetricKey* PublicKey() override;
 
 	/// <summary>
-	/// An optional identification tag
+	/// Read Only: An optional identification tag
 	/// </summary>
 	const std::vector<byte> &Tag() override;
 

@@ -7,16 +7,18 @@
 
 NAMESPACE_HELPER
 
+using Exception::CryptoException;
 using Cipher::Symmetric::Stream::IStreamCipher;
 using Enumeration::StreamCiphers;
 
 /// <summary>
 /// Get a Stream Cipher instance from it's enumeration name.
-/// <para>The stream ciphers Initialize function must be called before it can be used.<para>
+/// <para>The stream ciphers Initialize function must be called before it can be used.</para>
 /// </summary>
 class StreamCipherFromName
 {
 public:
+
 	/// <summary>
 	/// Get a stream cipher instance with specified initialization parameters
 	/// </summary>

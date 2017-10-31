@@ -18,7 +18,88 @@ const std::string SHX::CIPHER_NAME("Serpent");
 const std::string SHX::CLASS_NAME("SHX");
 const std::string SHX::DEF_DSTINFO("SHX version 1 information string");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+SHX::SHX(Digests DigestType, size_t Rounds)
+	:
+	m_cprKeySize(0),
+	m_destroyEngine(true),
+	m_expKey(0),
+	m_isDestroyed(false),
+	m_kdfEngine(DigestType == Digests::None ? nullptr : Helper::DigestFromName::GetInstance(DigestType)),
+	m_kdfEngineType(DigestType),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 8 == 0)) ? Rounds :
+		throw CryptoSymmetricCipherException("SHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64."))
+{
+	LoadState(DigestType);
+}
+
+SHX::SHX(IDigest* Digest, size_t Rounds)
+	:
+	m_cprKeySize(0),
+	m_destroyEngine(false),
+	m_expKey(0),
+	m_isDestroyed(false),
+	m_kdfEngine(Digest),
+	m_kdfEngineType(Digest == nullptr ? Digests::None : Digest->Enumeral()),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 8 == 0)) ? Rounds :
+		throw CryptoSymmetricCipherException("SHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64."))
+{
+	LoadState(Digest->Enumeral());
+}
+
+SHX::~SHX()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_cprKeySize = 0;
+		m_kdfEngineType = Digests::None;
+		m_kdfInfoMax = 0;
+		m_kdfKeySize = 0;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_rndCount = 0;
+
+		Utility::IntUtils::ClearVector(m_expKey);
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_legalRounds);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_kdfEngine != nullptr)
+			{
+				m_kdfEngine.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_kdfEngine != nullptr)
+			{
+				m_kdfEngine.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t SHX::BlockSize()
 {
@@ -67,10 +148,18 @@ const std::vector<size_t> &SHX::LegalRounds()
 
 const std::string SHX::Name()
 {
+	std::string txtName = "";
+
 	if (m_kdfEngineType == Digests::None)
-		return CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	{
+		txtName = CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	}
 	else
-		return CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	{
+		txtName = CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	}
+
+	return txtName;
 }
 
 const size_t SHX::Rounds()
@@ -81,57 +170,6 @@ const size_t SHX::Rounds()
 const size_t SHX::StateCacheSize()
 {
 	return STATE_PRECACHED;
-}
-
-//~~~Constructor~~~//
-
-SHX::SHX(Digests KdfEngineType, size_t Rounds)
-	:
-	m_cprKeySize(0),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
-	m_kdfEngineType(KdfEngineType),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(Rounds)
-{
-	if (KdfEngineType != Digests::None && Rounds != 32 && Rounds != 40 && Rounds != 48 && Rounds != 56 && Rounds != 64)
-			throw CryptoSymmetricCipherException("SHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64.");
-
-	LoadState(KdfEngineType);
-}
-
-SHX::SHX(IDigest *KdfEngine, size_t Rounds)
-	:
-	m_cprKeySize(0),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_kdfEngine(KdfEngine),
-	m_kdfEngineType(m_kdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(Rounds)
-{
-	if (Rounds != 32 && Rounds != 40 && Rounds != 48 && Rounds != 56 && Rounds != 64)
-		throw CryptoSymmetricCipherException("SHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64.");
-
-	LoadState(KdfEngine->Enumeral());
-}
-
-SHX::~SHX()
-{
-	Destroy();
 }
 
 //~~~Public Functions~~~//
@@ -156,40 +194,21 @@ void SHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void SHX::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cprKeySize = 0;
-		m_kdfEngineType = Digests::None;
-		m_kdfInfoMax = 0;
-		m_kdfKeySize = 0;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_rndCount = 0;
-
-		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_kdfInfo);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_legalRounds);
-
-		if (m_kdfEngine != 0 && m_destroyEngine)
-			delete m_kdfEngine;
-
-		m_destroyEngine = false;
-	}
-}
-
 void SHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
+	{
 		throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	}
 	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
+	{
 		throw CryptoSymmetricCipherException("SHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
+	}
 
 	if (KeyParams.Info().size() > 0)
+	{
 		m_kdfInfo = KeyParams.Info();
+	}
 
 	m_isEncryption = Encryption;
 	m_cprKeySize = KeyParams.Key().size() * 8;
@@ -202,41 +221,61 @@ void SHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 void SHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (m_isEncryption)
+	{
 		Encrypt128(Input, 0, Output, 0);
+	}
 	else
+	{
 		Decrypt128(Input, 0, Output, 0);
+	}
 }
 
 void SHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt128(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt128(Input, InOffset, Output, OutOffset);
+	}
 }
 
 void SHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt512(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt512(Input, InOffset, Output, OutOffset);
+	}
 }
 
 void SHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt1024(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt1024(Input, InOffset, Output, OutOffset);
+	}
 }
 
 void SHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt2048(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt2048(Input, InOffset, Output, OutOffset);
+	}
 }
 
 //~~~Key Schedule~~~//
@@ -260,8 +299,8 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 	// expanded key size
 	size_t keySize = 4 * (m_rndCount + 1);
 	size_t keyBytes = keySize * 4;
-
-	Kdf::HKDF gen(m_kdfEngine);
+	// HKDF generator expands array 
+	Kdf::HKDF gen(m_kdfEngine.get());
 
 	// change 1.2: use extract only on an oversized key
 	if (Key.size() > m_kdfEngine->BlockSize())
@@ -279,7 +318,9 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 	else
 	{
 		if (m_kdfInfo.size() != 0)
+		{
 			gen.Info() = m_kdfInfo;
+		}
 
 		gen.Initialize(Key);
 	}
@@ -292,7 +333,9 @@ void SHX::SecureExpand(const std::vector<byte> &Key)
 
 	// copy bytes to working key
 	for (size_t i = 0; i < m_expKey.size(); ++i)
+	{
 		m_expKey[i] = Utility::IntUtils::LeBytesTo32(rawKey, i * sizeof(uint));
+	}
 }
 
 void SHX::StandardExpand(const std::vector<byte> &Key)
@@ -302,18 +345,21 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 	size_t padSize = Key.size() < 32 ? 16 : Key.size() / 2;
 	std::vector<uint> Wp(padSize, 0);
 	size_t offset = 0;
-
-	// CHANGE: 512 key gets 8 extra rounds
+	// CHANGE: 512 key gets (fixed) 8 extra rounds
 	m_rndCount = (Key.size() == 64) ? 40 : 32;
 	size_t keySize = 4 * (m_rndCount + 1);
 
 	// step 1: reverse copy key to temp array
 	for (offset = Key.size(); offset > 0; offset -= 4)
+	{
 		Wp[index++] = Utility::IntUtils::BeBytesTo32(Key, offset - 4);
+	}
 
 	// pad small key
 	if (index < 8)
+	{
 		Wp[index] = 1;
+	}
 
 	// initialize the key
 	std::vector<uint> Wk(keySize, 0);
@@ -323,14 +369,18 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// 32 byte key
 		// step 2: rotate k into w(k) ints
 		for (size_t i = 8; i < 16; i++)
-			Wp[i] = Utility::IntUtils::RotL32((uint)(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
+		{
+			Wp[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 8)), 11);
+		}
 
 		// copy to expanded key
 		Utility::MemUtils::Copy(Wp, 8, Wk, 0, 8 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 8; i < keySize; i++)
-			Wk[i] = Utility::IntUtils::RotL32((uint)(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+		{
+			Wk[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+		}
 	}
 	else
 	{
@@ -338,14 +388,18 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 		// step 3: rotate k into w(k) ints, with extended polynominal
 		// Wp := (Wp-16 ^ Wp-13 ^ Wp-11 ^ Wp-10 ^ Wp-8 ^ Wp-5 ^ Wp-3 ^ Wp-1 ^ PHI ^ i) <<< 11
 		for (size_t i = 16; i < 32; i++)
-			Wp[i] = Utility::IntUtils::RotL32((uint)(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
+		{
+			Wp[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wp[i - 16] ^ Wp[i - 13] ^ Wp[i - 11] ^ Wp[i - 10] ^ Wp[i - 8] ^ Wp[i - 5] ^ Wp[i - 3] ^ Wp[i - 1] ^ PHI ^ (i - 16)), 11);
+		}
 
 		// copy to expanded key
 		Utility::MemUtils::Copy(Wp, 16, Wk, 0, 16 * sizeof(uint));
 
 		// step 3: calculate remainder of rounds with rotating polynomial
 		for (size_t i = 16; i < keySize; i++)
-			Wk[i] = Utility::IntUtils::RotL32((uint)(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+		{
+			Wk[i] = Utility::IntUtils::RotL32(static_cast<uint>(Wk[i - 16] ^ Wk[i - 13] ^ Wk[i - 11] ^ Wk[i - 10] ^ Wk[i - 8] ^ Wk[i - 5] ^ Wk[i - 3] ^ Wk[i - 1] ^ PHI ^ i), 11);
+		}
 	}
 
 	// step 4: create the working keys by processing with the Sbox and IP
@@ -371,7 +425,7 @@ void SHX::StandardExpand(const std::vector<byte> &Key)
 
 void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t FNLRND = 4;
+	const size_t RNDCNT = 4;
 	size_t keyCtr = m_expKey.size();
 
 	// input round
@@ -440,7 +494,7 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 		Ib0(R0, R1, R2, R3);
 
 		// skip on last block
-		if (keyCtr != FNLRND)
+		if (keyCtr != RNDCNT)
 		{
 			R3 ^= m_expKey[--keyCtr];
 			R2 ^= m_expKey[--keyCtr];
@@ -449,7 +503,7 @@ void SHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 			InverseTransform(R0, R1, R2, R3);
 		}
 	} 
-	while (keyCtr != FNLRND);
+	while (keyCtr != RNDCNT);
 
 	// last round
 	Utility::IntUtils::Le32ToBytes(R3 ^ m_expKey[--keyCtr], Output, OutOffset + 12);
@@ -523,7 +577,7 @@ void SHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t FNLRND = m_expKey.size() - 5;
+	const size_t RNDCNT = m_expKey.size() - 5;
 	int keyCtr = -1;
 
 	// input round
@@ -591,10 +645,10 @@ void SHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 		Sb7(R0, R1, R2, R3);
 
 		// skip on last block
-		if (keyCtr != FNLRND)
+		if (keyCtr != RNDCNT)
 			LinearTransform(R0, R1, R2, R3);
 	} 
-	while (keyCtr != FNLRND);
+	while (keyCtr != RNDCNT);
 
 	// last round
 	Utility::IntUtils::Le32ToBytes(m_expKey[++keyCtr] ^ R0, Output, OutOffset);

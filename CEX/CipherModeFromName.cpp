@@ -12,58 +12,107 @@ ICipherMode* CipherModeFromName::GetInstance(CipherModes CipherType, IBlockCiphe
 {
 	using namespace Cipher::Symmetric::Block::Mode;
 
+	ICipherMode* mdePtr;
+
 	try
 	{
-	switch (CipherType)
-	{
-		case Enumeration::CipherModes::CTR:
-			return new CTR(Engine);
-		case Enumeration::CipherModes::CBC:
-			return new CBC(Engine);
-		case Enumeration::CipherModes::CFB:
-			return new CFB(Engine);
-		case Enumeration::CipherModes::ICM:
-			return new ICM(Engine);
-		case Enumeration::CipherModes::OFB:
-			return new OFB(Engine);
-		default:
-			throw Exception::CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
-	}
+		switch (CipherType)
+		{
+			case Enumeration::CipherModes::CTR:
+			{
+				mdePtr = new CTR(Engine);
+				break;
+			}
+			case Enumeration::CipherModes::CBC:
+			{
+				mdePtr = new CBC(Engine);
+				break;
+			}
+			case Enumeration::CipherModes::CFB:
+			{
+				mdePtr = new CFB(Engine);
+				break;
+			}
+			case Enumeration::CipherModes::ICM:
+			{
+				mdePtr = new ICM(Engine);
+				break;
+			}
+			case Enumeration::CipherModes::OFB:
+			{
+				mdePtr = new OFB(Engine);
+				break;
+			}
+			default:
+			{
+				throw CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
+			}
+		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("CipherModeFromName:GetInstance", "The symmetric cipher mode is unavailable!", std::string(ex.what()));
+		throw CryptoException("CipherModeFromName:GetInstance", "The symmetric cipher mode is unavailable!", std::string(ex.what()));
 	}
+
+	return mdePtr;
 }
 
 ICipherMode* CipherModeFromName::GetInstance(CipherModes CipherType, BlockCiphers EngineType)
 {
 	using namespace Cipher::Symmetric::Block::Mode;
 
+	ICipherMode* mdePtr;
+	IBlockCipher* cprPtr = BlockCipherFromName::GetInstance(EngineType);
+
 	try
 	{
-		IBlockCipher* cipher = BlockCipherFromName::GetInstance(EngineType);
-
 		switch (CipherType)
 		{
-		case Enumeration::CipherModes::CTR:
-			return new CTR(cipher);
-		case Enumeration::CipherModes::CBC:
-			return new CBC(cipher);
-		case Enumeration::CipherModes::CFB:
-			return new CFB(cipher);
-		case Enumeration::CipherModes::ICM:
-			return new ICM(cipher);
-		case Enumeration::CipherModes::OFB:
-			return new OFB(cipher);
-		default:
-			throw Exception::CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
+			case Enumeration::CipherModes::CTR:
+			{
+				mdePtr = new CTR(cprPtr);
+				break;
+			}
+			case Enumeration::CipherModes::CBC:
+			{
+				mdePtr = new CBC(cprPtr);
+				break;
+			}
+			case Enumeration::CipherModes::CFB:
+			{
+				mdePtr = new CFB(cprPtr);
+				break;
+			}
+			case Enumeration::CipherModes::ICM:
+			{
+				mdePtr = new ICM(cprPtr);
+				break;
+			}
+			case Enumeration::CipherModes::OFB:
+			{
+				mdePtr = new OFB(cprPtr);
+				break;
+			}
+			default:
+			{
+				if (cprPtr != nullptr)
+				{
+					delete cprPtr;
+				}
+				throw CryptoException("CipherModeFromName:GetInstance", "The cipher mode is not supported!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("CipherModeFromName:GetInstance", "The block cipher mode is unavailable!", std::string(ex.what()));
+		if (cprPtr != nullptr)
+		{
+			delete cprPtr;
+		}
+		throw CryptoException("CipherModeFromName:GetInstance", "The block cipher mode is unavailable!", std::string(ex.what()));
 	}
+
+	return mdePtr;
 }
 
 NAMESPACE_HELPEREND

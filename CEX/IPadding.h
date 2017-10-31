@@ -16,27 +16,42 @@ using Exception::CryptoPaddingException;
 class IPadding
 {
 public:
+
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IPadding() {}
+	IPadding(const IPadding&) = delete;
 
 	/// <summary>
-	/// Destructor
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IPadding() noexcept {}
-
-	//~~~Properties~~~//
+	IPadding& operator=(const IPadding&) = delete;
 
 	/// <summary>
-	/// Get: The padding modes type name
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IPadding() 
+	{
+	}
+
+	/// <summary>
+	/// Finalizer: Calls the default destructor
+	/// </summary>
+	virtual ~IPadding() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The padding modes type name
 	/// </summary>
 	virtual const PaddingModes Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The padding modes class name
+	/// Read Only: The padding modes class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 

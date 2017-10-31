@@ -4,9 +4,13 @@ NAMESPACE_PADDING
 
 const std::string ZeroPad::CLASS_NAME("ZeroPad");
 
-ZeroPad::ZeroPad() {}
+ZeroPad::ZeroPad() 
+{
+}
 
-ZeroPad::~ZeroPad() {}
+ZeroPad::~ZeroPad() 
+{
+}
 
 const PaddingModes ZeroPad::Enumeral() 
 { 
@@ -21,9 +25,11 @@ const std::string ZeroPad::Name()
 size_t ZeroPad::AddPadding(std::vector<byte> &Input, size_t Offset)
 {
 	if (Offset > Input.size())
+	{
 		throw CryptoPaddingException("ZeroPad:AddPadding", "The padding offset value is longer than the array length!");
+	}
 
-	byte code = (byte)0;
+	byte code = 0;
 
 	while (Offset < Input.size())
 	{
@@ -36,30 +42,36 @@ size_t ZeroPad::AddPadding(std::vector<byte> &Input, size_t Offset)
 
 size_t ZeroPad::GetPaddingLength(const std::vector<byte> &Input)
 {
-	size_t len = Input.size() - 1;
-	byte code = (byte)0;
+	size_t padlen = Input.size() - 1;
+	byte code = 0;
 
-	for (size_t i = len; i > 0; i--)
+	for (size_t i = padlen; i > 0; i--)
 	{
 		if (Input[i] != code)
-			return (len - i);
+		{
+			padlen = (padlen - i);
+			break;
+		}
 	}
 
-	return 0;
+	return padlen == (Input.size() - 1) ? 0 : padlen;
 }
 
 size_t ZeroPad::GetPaddingLength(const std::vector<byte> &Input, size_t Offset)
 {
-	size_t len = Input.size() - 1;
-	byte code = (byte)0;
+	size_t padlen = Input.size() - (Offset + 1);
+	byte code = 0;
 
-	for (size_t i = len; i > 0; i--)
+	for (int i = static_cast<int>(padlen); i >= 0; i--)
 	{
 		if (Input[Offset + i] != code)
-			return (len - i);
+		{
+			padlen = (padlen - i);
+			break;
+		}
 	}
 
-	return 0;
+	return padlen == (Input.size() - (Offset + 1)) ? 0 : padlen;
 }
 
 NAMESPACE_PADDINGEND

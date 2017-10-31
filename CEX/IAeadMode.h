@@ -35,50 +35,61 @@ class IAeadMode : public ICipherMode
 {
 public:
 
-	IAeadMode(const IAeadMode&) = delete;
-	IAeadMode& operator=(const IAeadMode&) = delete;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	IAeadMode(const IAeadMode&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	IAeadMode& operator=(const IAeadMode&) = delete;
 
 	/// <summary>
 	/// Initialize the IAeadMode virtual interface class
 	/// </summary>
-	IAeadMode() {}
+	IAeadMode() 
+	{
+	}
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
-	virtual ~IAeadMode() noexcept {}
+	virtual ~IAeadMode() noexcept
+	{
+	}
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Get/Set: Enable auto-incrementing of the input nonce, each time the Finalize method is called.
+	/// Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called.
 	/// <para>Treats the Nonce value loaded during Initialize as a monotonic counter; 
 	/// incrementing the value by 1 and re-calculating the working set each time the cipher is finalized. 
-	/// If set to false, requires a re-key after each finalizer cycle.<para>
+	/// If set to false, requires a re-key after each finalizer cycle.</para>
 	/// </summary>
 	virtual bool &AutoIncrement() = 0;
 
 	/// <summary>
-	/// Get: The maximum legal tag length in bytes
+	/// Read Only: The maximum legal tag length in bytes
 	/// </summary>
 	virtual const size_t MaxTagSize() = 0;
 
 	/// <summary>
-	/// Get: The minimum legal tag length in bytes
+	/// Read Only: The minimum legal tag length in bytes
 	/// </summary>
 	virtual const size_t MinTagSize() = 0;
 
 	/// <summary>
-	/// Get/Set: Persist a one-time associated data for the entire session.
+	/// Read/Write: Persist a one-time associated data for the entire session.
 	/// <para>Allows the use of a single SetAssociatedData() call to apply the MAC data to all segments.
-	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.<para>
+	/// Finalize and Verify can be called multiple times, applying the initial associated data to each finalize cycle.</para>
 	/// </summary>
 	virtual bool &PreserveAD() = 0;
 
 	/// <summary>
-	/// Get: Returns the full finalized MAC code value array
+	/// Read Only: Returns the full finalized MAC code value array
 	/// </summary>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher has not been finalized</exception>

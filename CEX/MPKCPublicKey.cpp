@@ -3,23 +3,6 @@
 
 NAMESPACE_ASYMMETRICKEY
 
-//~~~Properties~~~//
-
-const AsymmetricEngines MPKCPublicKey::CipherType()
-{
-	return Enumeration::AsymmetricEngines::McEliece;
-}
-
-const MPKCParams MPKCPublicKey::Parameters()
-{
-	return m_mpkcParameters;
-}
-
-const std::vector<byte> &MPKCPublicKey::P()
-{
-	return m_pubMat;
-}
-
 //~~~Constructor~~~//
 
 MPKCPublicKey::MPKCPublicKey(MPKCParams Params, const std::vector<byte> &P)
@@ -47,6 +30,23 @@ MPKCPublicKey::~MPKCPublicKey()
 	Destroy();
 }
 
+//~~~Accessors~~~//
+
+const AsymmetricEngines MPKCPublicKey::CipherType()
+{
+	return Enumeration::AsymmetricEngines::McEliece;
+}
+
+const MPKCParams MPKCPublicKey::Parameters()
+{
+	return m_mpkcParameters;
+}
+
+const std::vector<byte> &MPKCPublicKey::P()
+{
+	return m_pubMat;
+}
+
 //~~~Public Functions~~~//
 
 void MPKCPublicKey::Destroy()
@@ -57,7 +57,9 @@ void MPKCPublicKey::Destroy()
 		m_mpkcParameters = MPKCParams::None;
 
 		if (m_pubMat.size() > 0)
+		{
 			Utility::IntUtils::ClearVector(m_pubMat);
+		}
 	}
 }
 

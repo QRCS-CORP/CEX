@@ -11,14 +11,11 @@ NAMESPACE_MAC
 
 const std::string GHASH::CLASS_NAME("GHASH");
 
-bool GHASH::HasSimd128() 
-{ 
-	return m_hasCMul; 
-}
+//~~~Constructor~~~//
 
-GHASH::GHASH(std::vector<ulong> &Key)
+GHASH::GHASH()
 	:
-	m_ghashKey(Key),
+	m_ghashKey(0),
 	m_hasCMul(false),
 	m_msgBuffer(BLOCK_SIZE),
 	m_msgOffset(0)
@@ -31,12 +28,23 @@ GHASH::~GHASH()
 	Reset();
 }
 
+//~~~Accessors~~~//
+
+bool GHASH::HasSimd128() 
+{ 
+	return m_hasCMul; 
+}
+
+//~~~Public Functions~~~//
+
 void GHASH::FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextSize)
 {
 	if (m_msgOffset != 0)
 	{
 		if (m_msgOffset != BLOCK_SIZE)
+		{
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgOffset, m_msgBuffer.size() - m_msgOffset);
+		}
 
 		ProcessSegment(m_msgBuffer, 0, Output, m_msgOffset);
 	}
@@ -45,23 +53,14 @@ void GHASH::FinalizeBlock(std::vector<byte> &Output, size_t AdSize, size_t TextS
 	Utility::IntUtils::Be64ToBytes(8 * AdSize, fnlBlock, 0);
 	Utility::IntUtils::Be64ToBytes(8 * TextSize, fnlBlock, 8);
 	Utility::MemUtils::XOR128(fnlBlock, 0, Output, 0);
+
 	GcmMultiply(Output);
 }
 
-void GHASH::Reset(bool Erase)
+void GHASH::Initialize(const std::vector<ulong> &Key)
 {
-	if (Erase)
-	{
-		if (m_ghashKey.size() != 0)
-			Utility::MemUtils::Clear(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
-
-		m_hasCMul = false;
-	}
-
-	if (m_msgBuffer.size() != 0)
-		Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
-
-	m_msgOffset = 0;
+	m_ghashKey.resize(Key.size());
+	std::memcpy(&m_ghashKey[0], &Key[0], Key.size() * sizeof(ulong));
 }
 
 void GHASH::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output)
@@ -72,48 +71,68 @@ void GHASH::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::v
 
 void GHASH::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length)
 {
-	while (Length)
+	while (Length != 0)
 	{
-		const size_t DIFF = Utility::IntUtils::Min(Length, BLOCK_SIZE);
-		Utility::MemUtils::XorBlock(Input, InOffset, Output, 0, DIFF);
+		const size_t DIFFSZE = Utility::IntUtils::Min(Length, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, 0, DIFFSZE);
 		GcmMultiply(Output);
-		InOffset += DIFF;
-		Length -= DIFF;
+		InOffset += DIFFSZE;
+		Length -= DIFFSZE;
 	}
+}
+
+void GHASH::Reset(bool Erase)
+{
+	if (Erase)
+	{
+		if (m_ghashKey.size() != 0)
+		{
+			Utility::MemUtils::Clear(m_ghashKey, 0, m_ghashKey.size() * sizeof(ulong));
+		}
+
+		m_hasCMul = false;
+	}
+
+	if (m_msgBuffer.size() != 0)
+	{
+		Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	}
+
+	m_msgOffset = 0;
 }
 
 void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t Length)
 {
-	if (Length == 0)
-		return;
-
-	if (m_msgOffset == BLOCK_SIZE)
+	if (Length != 0)
 	{
-		ProcessBlock(m_msgBuffer, 0, Output);
-		m_msgOffset = 0;
-	}
-
-	const size_t RMD = BLOCK_SIZE - m_msgOffset;
-	if (Length > RMD)
-	{
-		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMD);
-		ProcessBlock(m_msgBuffer, 0, Output);
-		m_msgOffset = 0;
-		Length -= RMD;
-		InOffset += RMD;
-
-		while (Length > BLOCK_SIZE)
+		if (m_msgOffset == BLOCK_SIZE)
 		{
-			ProcessBlock(Input, InOffset, Output);
-			Length -= BLOCK_SIZE;
-			InOffset += BLOCK_SIZE;
+			ProcessBlock(m_msgBuffer, 0, Output);
+			m_msgOffset = 0;
 		}
-	}
 
-	if (Length > 0)
-	{
-		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
-		m_msgOffset += Length;
+		const size_t RMDSZE = BLOCK_SIZE - m_msgOffset;
+		if (Length > RMDSZE)
+		{
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMDSZE);
+			ProcessBlock(m_msgBuffer, 0, Output);
+			m_msgOffset = 0;
+			Length -= RMDSZE;
+			InOffset += RMDSZE;
+
+			while (Length > BLOCK_SIZE)
+			{
+				ProcessBlock(Input, InOffset, Output);
+				Length -= BLOCK_SIZE;
+				InOffset += BLOCK_SIZE;
+			}
+		}
+
+		if (Length > 0)
+		{
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, Length);
+			m_msgOffset += Length;
+		}
 	}
 }
 
@@ -126,9 +145,13 @@ void GHASH::Detect()
 void GHASH::GcmMultiply(std::vector<byte> &X)
 {
 	if (m_hasCMul)
+	{
 		MultiplyW(m_ghashKey, X);
+	}
 	else
+	{
 		Multiply(m_ghashKey, X);
+	}
 }
 
 void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)

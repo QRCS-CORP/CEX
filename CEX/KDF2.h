@@ -84,14 +84,14 @@ using Digest::IDigest;
 /// <item><description>NIST SP80056A: Recommendation for Pair-Wise Key Establishment Schemes: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf">Chapter 5.8</a>.</description></item>
 /// </list>
 /// </remarks>
-class KDF2 : public IKdf
+class KDF2 final : public IKdf
 {
 private:
 
 	static const std::string CLASS_NAME;
 	static const size_t MIN_SALTLEN = 4;
 
-	IDigest* m_msgDigest;
+	std::unique_ptr<IDigest> m_msgDigest;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	size_t m_hashSize;
@@ -105,40 +105,22 @@ private:
 
 public:
 
-	KDF2() = delete;
-	KDF2(const KDF2&) = delete;
-	KDF2& operator=(const KDF2&) = delete;
-	KDF2& operator=(KDF2&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The Kdf generators type name
-	/// </summary>
-	const Kdfs Enumeral() override;
-
-	/// <summary>
-	/// Get: Generator is ready to produce random
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Minimum recommended initialization key size in bytes.
-	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
-	/// </summary>
-	size_t MinKeySize() override;
-
-	/// <summary>
-	/// Get: Available Kdf Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Get: The Kdf generators class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	KDF2(const KDF2&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	KDF2& operator=(const KDF2&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	KDF2() = delete;
 
 	/// <summary>
 	/// Instantiates a KDF2 generator using a message digest type name
@@ -146,7 +128,7 @@ public:
 	/// 
 	/// <param name="DigestType">The hash functions type-name enumeral</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name or iterations count is used</exception>
+	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest type is used</exception>
 	explicit KDF2(Digests DigestType);
 
 	/// <summary>
@@ -159,16 +141,39 @@ public:
 	explicit KDF2(Digest::IDigest* Digest);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~KDF2() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The Kdf generators type name
 	/// </summary>
-	void Destroy();
+	const Kdfs Enumeral() override;
+
+	/// <summary>
+	/// Read Only: Generator is ready to produce random
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Minimum recommended initialization key size in bytes.
+	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
+	/// </summary>
+	size_t MinKeySize() override;
+
+	/// <summary>
+	/// Read Only: Available Kdf Key Sizes in bytes
+	/// </summary>
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Read Only: The Kdf generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -177,6 +182,8 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -188,6 +195,8 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
@@ -196,6 +205,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -214,6 +225,8 @@ public:
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
@@ -223,6 +236,8 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -231,7 +246,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void ReSeed(const std::vector<byte> &Seed) override;
 
 	/// <summary>
@@ -240,6 +255,7 @@ public:
 	void Reset() override;
 
 private:
+
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void LoadState();
 };

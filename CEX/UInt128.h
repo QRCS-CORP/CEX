@@ -146,7 +146,7 @@ public:
 	template <typename Array>
 	inline void LoadUL(const Array &Input, size_t Offset)
 	{
-		xmm = _mm_set_epi32((uint)Input[Offset], (uint)Input[Offset + 1], (uint)Input[Offset + 2], (uint)Input[Offset + 3]);
+		xmm = _mm_set_epi32(static_cast<uint>(Input[Offset]), static_cast<uint>(Input[Offset + 1]), static_cast<uint>(Input[Offset + 2]), static_cast<uint>(Input[Offset + 3]));
 	}
 
 	/// <summary>

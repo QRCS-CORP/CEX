@@ -8,7 +8,67 @@ NAMESPACE_MODE
 
 const std::string ECB::CLASS_NAME("ECB");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+ECB::ECB(BlockCiphers CipherType)
+	:
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+		throw CryptoCipherModeException("ECB:CTor", "The Cipher type can not be none!")),
+	m_cipherType(CipherType),
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
+{
+}
+
+ECB::ECB(IBlockCipher* Cipher)
+	:
+	m_blockCipher(Cipher != nullptr ? Cipher :
+		throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!")),
+	m_cipherType(m_blockCipher->Enumeral()),
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
+{
+}
+
+ECB::~ECB()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_isLoaded = false;
+		m_parallelProfile.Reset();
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t ECB::BlockSize()
 {
@@ -22,7 +82,7 @@ const BlockCiphers ECB::CipherType()
 
 IBlockCipher* ECB::Engine()
 {
-	return m_blockCipher;
+	return m_blockCipher.get();
 }
 
 const CipherModes ECB::Enumeral()
@@ -65,39 +125,6 @@ ParallelOptions &ECB::ParallelProfile()
 	return m_parallelProfile;
 }
 
-//~~~Constructor~~~//
-
-ECB::ECB(BlockCiphers CipherType)
-	:
-	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType)),
-	m_cipherType(CipherType),
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
-{
-}
-
-ECB::ECB(IBlockCipher* Cipher)
-	:
-	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoCipherModeException("ECB:CTor", "The Cipher can not be null!")),
-	m_cipherType(m_blockCipher->Enumeral()),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), true)
-{
-}
-
-ECB::~ECB()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void ECB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -108,27 +135,6 @@ void ECB::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 void ECB::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Encrypt128(Input, InOffset, Output, OutOffset);
-}
-
-void ECB::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cipherType = BlockCiphers::None;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_isLoaded = false;
-		m_parallelProfile.Reset();
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_blockCipher != 0)
-				delete m_blockCipher;
-		}
-	}
 }
 
 void ECB::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -144,11 +150,17 @@ void ECB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 void ECB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+	{
 		throw CryptoSymmetricCipherException("ECB:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+	{
 		throw CryptoSymmetricCipherException("ECB:Initialize", "The parallel block size is out of bounds!");
+	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
+	{
 		throw CryptoSymmetricCipherException("ECB:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+	}
 
 	Scope();
 
@@ -159,12 +171,9 @@ void ECB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void ECB::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoCipherModeException("ECB:ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree % 2 != 0)
-		throw CryptoCipherModeException("ECB:ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoCipherModeException("ECB:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
@@ -182,12 +191,17 @@ void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 		const size_t BLKCNT = Length / PRLBLK;
 
 		for (size_t i = 0; i < BLKCNT; ++i)
+		{
 			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
+		}
 
 		const size_t RMDLEN = Length - (PRLBLK * BLKCNT);
 
 		if (RMDLEN != 0)
-			ProcessSequential(Input, InOffset, Output, OutOffset, RMDLEN);
+		{
+			const size_t BLKOFT = (PRLBLK * BLKCNT);
+			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDLEN);
+		}
 	}
 	else
 	{
@@ -274,7 +288,9 @@ void ECB::Generate(const std::vector<byte> &Input, size_t InOffset, std::vector<
 void ECB::Scope()
 {
 	if (!m_parallelProfile.IsDefault())
+	{
 		m_parallelProfile.Calculate();
+	}
 }
 
 void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
@@ -293,7 +309,9 @@ void ECB::ProcessSequential(const std::vector<byte> &Input, size_t InOffset, std
 	const size_t BLKCNT = Length / BLOCK_SIZE;
 
 	for (size_t i = 0; i < BLKCNT; ++i)
+	{
 		m_blockCipher->Transform(Input, InOffset + (i * BLOCK_SIZE), Output, OutOffset + (i * BLOCK_SIZE));
+	}
 }
 
 NAMESPACE_MODEEND

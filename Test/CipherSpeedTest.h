@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_CIPHERSPEEDTEST_H
-#define _CEXTEST_CIPHERSPEEDTEST_H
+#ifndef CEXTEST_CIPHERSPEEDTEST_H
+#define CEXTEST_CIPHERSPEEDTEST_H
 
 #include "ITest.h"
 #include "../CEX/IAeadMode.h"
@@ -66,8 +66,8 @@ namespace Test
 			std::vector<byte> buffer1(blkSze, 0);
 			std::vector<byte> buffer2(blkSze, 0);
 
-			Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-			Cipher->Initialize(Encrypt, keyParam);
+			Key::Symmetric::SymmetricKey* keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
+			Cipher->Initialize(Encrypt, *keyParam);
 			Cipher->ParallelProfile().IsParallel() = Parallel;
 			uint64_t start = TestUtils::GetTimeMs64();
 
@@ -99,8 +99,8 @@ namespace Test
 		template<typename T>
 		void ParallelStreamLoop(T* Cipher, size_t KeySize, size_t IvSize, size_t Loops, TestEventHandler &Handler)
 		{
-			Key::Symmetric::SymmetricKey keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-			Cipher->Initialize(keyParam);
+			Key::Symmetric::SymmetricKey* keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
+			Cipher->Initialize(*keyParam);
 			Cipher->ParallelProfile().IsParallel() = true;
 			std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
 			std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);

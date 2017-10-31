@@ -25,7 +25,7 @@ RLWEKeyPair::~RLWEKeyPair()
 	Destroy();
 }
 
-//~~~Properties~~~//
+//~~~Accessors~~~//
 
 IAsymmetricKey* RLWEKeyPair::PrivateKey()
 {
@@ -47,7 +47,9 @@ const std::vector<byte> &RLWEKeyPair::Tag()
 void RLWEKeyPair::Destroy()
 {
 	if (m_Tag.size() != 0)
+	{
 		m_Tag.clear();
+	}
 }
 
 NAMESPACE_ASYMMETRICKEYEND

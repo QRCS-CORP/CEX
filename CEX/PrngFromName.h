@@ -9,6 +9,7 @@
 
 NAMESPACE_HELPER
 
+using Exception::CryptoException;
 using Enumeration::Digests;
 using Prng::IPrng;
 using Enumeration::Prngs;
@@ -20,6 +21,7 @@ using Enumeration::Providers;
 class PrngFromName
 {
 public:
+
 	/// <summary>
 	/// Get a Prng instance with default initialization parameters
 	/// </summary>

@@ -40,6 +40,8 @@ namespace Test
 			delete sha256;
 			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));
 
+			// TODO: add parallel tests
+
 			SHA512* sha512 = new SHA512();
 			CompareVector(sha512, m_message[0], m_expected512[0]);
 			CompareVector(sha512, m_message[1], m_expected512[1]);
@@ -60,7 +62,7 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::CompareVector(IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SHA2Test::CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 

@@ -140,7 +140,7 @@ namespace Test
 		}
 	}
 
-	void SkeinTest::CompareVector(IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SkeinTest::CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 

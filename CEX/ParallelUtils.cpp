@@ -20,7 +20,7 @@ size_t ParallelUtils::ProcessorCount()
 void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F)
 {
 #if defined(_OPENMP)
-#	pragma omp parallel num_threads((int)To)
+#	pragma omp parallel num_threads(static_cast<int>(To))
 	{
 		size_t i = From + (size_t)omp_get_thread_num();
 		F(i);

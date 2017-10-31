@@ -22,37 +22,30 @@ private:
 
 public:
 
-	RLWEPublicKey() = delete;
-	RLWEPublicKey(const RLWEPublicKey&) = delete;
-	RLWEPublicKey& operator=(const RLWEPublicKey&) = delete;
-	RLWEPublicKey& operator=(RLWEPublicKey&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The public keys cipher type name
-	/// </summary>
-	const AsymmetricEngines CipherType() override;
-
-	/// <summary>
-	/// Get: The cipher parameters enumeration name
-	/// </summary>
-	const RLWEParams Parameters();
-
-	/// <summary>
-	/// Get: The public keys polynomial
-	/// </summary>
-	const std::vector<byte> &P();
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	RLWEPublicKey(const RLWEPublicKey&) = delete;
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	RLWEPublicKey& operator=(const RLWEPublicKey&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	RLWEPublicKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
-	/// <param name="P">The The public keys polynomial</param>
-	explicit RLWEPublicKey(RLWEParams Parameters, std::vector<byte> &P);
+	/// <param name="P">The public keys polynomial</param>
+	RLWEPublicKey(RLWEParams Parameters, std::vector<byte> &P);
 
 	/// <summary>
 	/// Initialize this class with a serialized public key
@@ -62,11 +55,28 @@ public:
 	explicit RLWEPublicKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~RLWEPublicKey() override;
 
-	//~~~Public Methods~~~//
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The public keys cipher type name
+	/// </summary>
+	const AsymmetricEngines CipherType() override;
+
+	/// <summary>
+	/// Read Only: The cipher parameters enumeration name
+	/// </summary>
+	const RLWEParams Parameters();
+
+	/// <summary>
+	/// Read Only: The public keys polynomial
+	/// </summary>
+	const std::vector<byte> &P();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer

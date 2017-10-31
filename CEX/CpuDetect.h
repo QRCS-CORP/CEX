@@ -12,6 +12,8 @@ class CpuDetect
 {
 public:
 
+	//~~~ Enumerations~~~//
+
 	/// <summary>
 	/// Enumeration of cpu vendors
 	/// </summary>
@@ -87,8 +89,8 @@ private:
 	uint m_frequencyBase;
 	uint m_frequencyMax;
 	bool m_hyperThread;
-	size_t m_l1CacheSize;
 	size_t m_l1CacheLineSize;
+	size_t m_l1CacheSize;
 	CacheAssociations m_l2Associative;
 	size_t m_l2CacheSize;
 	size_t m_logicalPerCore;
@@ -98,6 +100,28 @@ private:
 	std::vector<uint> m_x86CpuFlags;
 
 public:
+
+	//~~~ Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	CpuDetect(const CpuDetect&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	CpuDetect& operator=(const CpuDetect&) = delete;
+
+	/// <summary>
+	/// Initialization Detects Cpu features
+	/// </summary>
+	CpuDetect();
+
+	/// <summary>
+	/// Finalize this class and clear resources
+	/// </summary>
+	~CpuDetect();
 
 	//~~~ Properties~~~//
 
@@ -137,7 +161,8 @@ public:
 	const bool BMT2();
 
 	/// <summary>
-	/// The bus reference frequency (newer Intel only) 
+	/// The bus reference frequency (newer Intel only)
+	/// <para>A value of 0 is returned if the feature is not available on this cpu</para>
 	/// </summary>
 	const size_t BusRefFrequency();
 
@@ -153,11 +178,13 @@ public:
 
 	/// <summary>
 	/// The processor base frequency (newer Intel only)
+	/// <para>A value of 0 is returned if the feature is not available on this cpu</para>
 	/// </summary>
 	const size_t FrequencyBase();
 
 	/// <summary>
 	/// The processor maximum frequency (newer Intel only)
+	/// <para>A value of 0 is returned if the feature is not available on this cpu</para>
 	/// </summary>
 	const size_t FrequencyMax();
 
@@ -277,7 +304,7 @@ public:
 	const bool SMAP();
 
 	/// <summary>
-	/// Returns true if SSE2 or greater is detected
+	/// Returns true if SSE or greater is detected
 	/// </summary>
 	const bool SSE();
 
@@ -326,28 +353,23 @@ public:
 	/// </summary>
 	const bool XOP();
 
-	//~~~ Constructor~~~//
-
-	/// <summary>
-	/// Initialization Detects Cpu features
-	/// </summary>
-	CpuDetect();
-
 private:
 
-	bool AvxEnabled();
-	bool Avx2Enabled();
+	static bool AvxEnabled();
+	static bool Avx2Enabled();
 	void BusInfo();
+	static void Cpuid(int Flag, std::array<uint, 4> &Output);
+	static void CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output);
 	bool HasFeature(CpuidFlags Flag);
 	void Initialize();
-	size_t MaxCoresPerPackage();
+	static size_t MaxCoresPerPackage();
 	size_t MaxLogicalPerCores();
-	const CpuVendors VendorName(std::string &Name);
-	std::string VendorString(uint CpuInfo[4]);
 	void PrintCpuStats();
-	uint ReadBits(uint Value, int Index, int Length);
+	static uint ReadBits(uint Value, int Index, int Length);
 	void StoreSerialNumber();
 	void StoreTopology();
+	const CpuVendors VendorName(std::string &Name);
+	std::string VendorString(std::array<uint, 4> &CpuInfo);
 };
 
 NAMESPACE_COMMONEND

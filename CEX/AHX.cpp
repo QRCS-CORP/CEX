@@ -12,7 +12,91 @@ const std::string AHX::CIPHER_NAME("Rijndael");
 const std::string AHX::CLASS_NAME("AHX");
 const std::string AHX::DEF_DSTINFO("information string RHX version 1");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+AHX::AHX(Digests DigestType, size_t Rounds)
+	:
+	m_blockSize(BLOCK_SIZE),
+	m_cprKeySize(0),
+	m_destroyEngine(true),
+	m_expKey(0),
+	m_kdfEngine(DigestType == Digests::None ? nullptr : Helper::DigestFromName::GetInstance(DigestType)),
+	m_kdfEngineType(DigestType),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
+		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64."))
+{
+	LoadState(m_kdfEngineType);
+}
+
+AHX::AHX(IDigest* Digest, size_t Rounds)
+	:
+	m_blockSize(BLOCK_SIZE),
+	m_cprKeySize(0),
+	m_destroyEngine(false),
+	m_expKey(0),
+	m_kdfEngine(Digest),
+	m_kdfEngineType(Digest == nullptr ? Digests::None : Digest->Enumeral()),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_kdfInfoMax(0),
+	m_kdfKeySize(0),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_legalKeySizes(0),
+	m_legalRounds(0),
+	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
+		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64."))
+{
+	LoadState(m_kdfEngineType);
+}
+
+AHX::~AHX()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_blockSize = 0;
+		m_cprKeySize = 0;
+		m_kdfEngineType = Digests::None;
+		m_kdfInfoMax = 0;
+		m_kdfKeySize = 0;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_rndCount = 0;
+
+		Utility::IntUtils::ClearVector(m_expKey);
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_legalRounds);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_kdfEngine != nullptr)
+			{
+				m_kdfEngine.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_kdfEngine != nullptr)
+			{
+				m_kdfEngine.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const size_t AHX::BlockSize()
 {
@@ -61,10 +145,18 @@ const std::vector<size_t> &AHX::LegalRounds()
 
 const std::string AHX::Name()
 {
+	std::string txtName = "";
+
 	if (m_kdfEngineType == Digests::None)
-		return CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	{
+		txtName = CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	}
 	else
-		return CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	{
+		txtName = CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+	}
+
+	return txtName;
 }
 
 const size_t AHX::Rounds()
@@ -77,64 +169,6 @@ const size_t AHX::StateCacheSize()
 	return STATE_PRECACHED;
 }
 
-//~~~Constructor~~~//
-
-AHX::AHX(Digests KdfEngineType, size_t Rounds)
-	:
-	m_blockSize(BLOCK_SIZE),
-	m_cprKeySize(0),
-	m_destroyEngine(true),
-	m_expKey(0),
-	m_kdfEngine(KdfEngineType == Digests::None ? 0 : Helper::DigestFromName::GetInstance(KdfEngineType)),
-	m_kdfEngineType(KdfEngineType),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(Rounds)
-{
-	if (KdfEngineType != Digests::None)
-	{
-		if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
-			throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
-	}
-
-	LoadState(m_kdfEngineType);
-}
-
-AHX::AHX(IDigest *KdfEngine, size_t Rounds)
-	:
-	m_blockSize(BLOCK_SIZE),
-	m_cprKeySize(0),
-	m_destroyEngine(false),
-	m_expKey(0),
-	m_kdfEngine(KdfEngine),
-	m_kdfEngineType(m_kdfEngine != 0 ? KdfEngine->Enumeral() : Digests::None),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(Rounds)
-{
-	if (Rounds < MIN_ROUNDS || Rounds > MAX_ROUNDS || Rounds % 2 > 0)
-		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38.");
-
-	LoadState(m_kdfEngineType);
-}
-
-AHX::~AHX()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void AHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -145,32 +179,6 @@ void AHX::DecryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output
 void AHX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	Decrypt128(Input, InOffset, Output, OutOffset);
-}
-
-void AHX::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cprKeySize = 0;
-		m_blockSize = 0;
-		m_kdfEngineType = Digests::None;
-		m_kdfInfoMax = 0;
-		m_kdfKeySize = 0;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_rndCount = 0;
-
-		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_kdfInfo);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_legalRounds);
-
-		if (m_kdfEngine != 0 && m_destroyEngine)
-			delete m_kdfEngine;
-
-		m_destroyEngine = false;
-	}
 }
 
 void AHX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -186,12 +194,18 @@ void AHX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	if (!SymmetricKeySize::Contains(m_legalKeySizes, KeyParams.Key().size()))
+	{
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
+	}
 	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
+	{
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
+	}
 
 	if (KeyParams.Info().size() > 0)
+	{
 		m_kdfInfo = KeyParams.Info();
+	}
 
 	m_isEncryption = Encryption;
 	m_cprKeySize = KeyParams.Key().size() * 8;
@@ -204,41 +218,61 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 void AHX::Transform(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	if (m_isEncryption)
+	{
 		Encrypt128(Input, 0, Output, 0);
+	}
 	else
+	{
 		Decrypt128(Input, 0, Output, 0);
+	}
 }
 
 void AHX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt128(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt128(Input, InOffset, Output, OutOffset);
+	}
 }
 
 void AHX::Transform512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt512(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt512(Input, InOffset, Output, OutOffset);
+	}
 }
 
 void AHX::Transform1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt1024(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt1024(Input, InOffset, Output, OutOffset);
+	}
 }
 
 void AHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	if (m_isEncryption)
+	{
 		Encrypt2048(Input, InOffset, Output, OutOffset);
+	}
 	else
+	{
 		Decrypt2048(Input, InOffset, Output, OutOffset);
+	}
 }
 
 //~~~Key Schedule~~~//
@@ -259,7 +293,8 @@ void AHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 	// inverse cipher
 	if (!Encryption)
 	{
-		size_t i, j;
+		size_t i;
+		size_t j;
 
 		std::swap(m_expKey[0], m_expKey[m_expKey.size() - 1]);
 
@@ -280,9 +315,8 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	size_t blkWords = 4;
 	// expanded key size
 	size_t keySize = (blkWords * (m_rndCount + 1)) / 4;
-
 	// HKDF generator expands array 
-	Kdf::HKDF gen(m_kdfEngine);
+	Kdf::HKDF gen(m_kdfEngine.get());
 
 	// change 1.2: use extract only on an oversized key
 	if (Key.size() > m_kdfEngine->BlockSize())
@@ -300,7 +334,9 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	else
 	{
 		if (m_kdfInfo.size() != 0)
+		{
 			gen.Info() = m_kdfInfo;
+		}
 
 		gen.Initialize(Key);
 	}
@@ -308,7 +344,6 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// generate the round keys
 	std::vector<byte> rawKey(keySize * 16, 0);
 	gen.Generate(rawKey);
-
 	// initialize working key
 	m_expKey.resize(keySize);
 
@@ -321,7 +356,9 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 
 	// copy bytes to working key
 	for (size_t i = 0, j = 0; i < keySize; ++i, j += 16)
+	{
 		m_expKey[i] = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&rawKey[j]));
+	}
 }
 
 void AHX::StandardExpand(const std::vector<byte> &Key)
@@ -454,20 +491,21 @@ void AHX::ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __
 
 	std::memcpy(((byte*)Key.data() + Offset), &key1, 16);
 
-	if (Offset == 192 && Key.size() == 13) // TODO: timing?
-		return;
+	if (!(Offset == 192 && Key.size() == 13))
+	{
+		key2 = _mm_xor_si128(key2, _mm_slli_si128(key2, 4));
+		key2 = _mm_xor_si128(key2, _mm_shuffle_epi32(key1, _MM_SHUFFLE(3, 3, 3, 3)));
+		*K2 = key2;
 
-	key2 = _mm_xor_si128(key2, _mm_slli_si128(key2, 4));
-	key2 = _mm_xor_si128(key2, _mm_shuffle_epi32(key1, _MM_SHUFFLE(3, 3, 3, 3)));
-	*K2 = key2;
+		Offset += 16;
+		std::vector<byte> tmpB(4);
+		Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
+		std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
 
-	Offset += 16;
-	std::vector<byte> tmpB(4);
-	Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(key2), tmpB, 0);
-	std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
-	Offset += 4;
-	Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
-	std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
+		Offset += 4;
+		Utility::IntUtils::Le32ToBytes(_mm_cvtsi128_si32(_mm_srli_si128(key2, 4)), tmpB, 0);
+		std::memcpy((byte*)Key.data() + Offset, &tmpB[0], 4);
+	}
 }
 
 void AHX::ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset)
@@ -496,21 +534,23 @@ void AHX::ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const si
 
 void AHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = m_expKey.size() - 2;
+	const size_t RNDCNT = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
 	__m128i X = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
 	X = _mm_xor_si128(X, m_expKey[keyCtr]);
 
-	while (keyCtr != LRD)
+	while (keyCtr != RNDCNT)
+	{
 		X = _mm_aesdec_si128(X, m_expKey[++keyCtr]);
+	}
 
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesdeclast_si128(X, m_expKey[++keyCtr]));
 }
 
 void AHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = m_expKey.size() - 2;
+	const size_t RNDCNT = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
 	Numeric::UInt128 X0(Input, InOffset);
@@ -523,7 +563,7 @@ void AHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 	X2.xmm = _mm_xor_si128(X2.xmm, m_expKey[keyCtr]);
 	X3.xmm = _mm_xor_si128(X3.xmm, m_expKey[keyCtr]);
 
-	while (keyCtr != LRD)
+	while (keyCtr != RNDCNT)
 	{
 		X0.xmm = _mm_aesdec_si128(X0.xmm, m_expKey[++keyCtr]);
 		X1.xmm = _mm_aesdec_si128(X1.xmm, m_expKey[keyCtr]);
@@ -557,21 +597,23 @@ void AHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 void AHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = m_expKey.size() - 2;
+	const size_t RNDCNT = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
 	__m128i X = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
 	X = _mm_xor_si128(X, m_expKey[keyCtr]);
 
-	while (keyCtr != LRD)
+	while (keyCtr != RNDCNT)
+	{
 		X = _mm_aesenc_si128(X, m_expKey[++keyCtr]);
+	}
 
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesenclast_si128(X, m_expKey[++keyCtr]));
 }
 
 void AHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t LRD = m_expKey.size() - 2;
+	const size_t RNDCNT = m_expKey.size() - 2;
 	size_t keyCtr = 0;
 
 	Numeric::UInt128 X0(Input, InOffset);
@@ -584,7 +626,7 @@ void AHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 	X2.xmm = _mm_xor_si128(X2.xmm, m_expKey[keyCtr]);
 	X3.xmm = _mm_xor_si128(X3.xmm, m_expKey[keyCtr]);
 
-	while (keyCtr != LRD)
+	while (keyCtr != RNDCNT)
 	{
 		X0.xmm = _mm_aesenc_si128(X0.xmm, m_expKey[++keyCtr]);
 		X1.xmm = _mm_aesenc_si128(X1.xmm, m_expKey[keyCtr]);
@@ -617,7 +659,7 @@ void AHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 //~~~Helpers~~~//
 
-void AHX::LoadState(Digests KdfEngineType)
+void AHX::LoadState(Digests DigestType)
 {
 	if (m_kdfEngineType == Digests::None)
 	{

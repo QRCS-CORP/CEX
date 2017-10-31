@@ -7,28 +7,19 @@ NAMESPACE_PRNG
 
 const std::string BCR::CLASS_NAME("BCR");
 
-//~~~Properties~~~//
-
-const Prngs BCR::Enumeral() 
-{ 
-	return Prngs::BCR; 
-}
-
-const std::string BCR::Name() 
-{ 
-	return CLASS_NAME + "-" + m_rngGenerator->Name();
-}
-
 //~~~Constructor~~~//
 
 BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 	:
 	m_bufferIndex(0),
-	m_engineType(CipherType),
+	m_engineType(CipherType != BlockCiphers::None ? CipherType :
+		throw CryptoRandomException("BCR:Ctor", "Cipher type can not be none!")),
 	m_isDestroyed(false),
 	m_isParallel(Parallel),
-	m_pvdType(ProviderType),
-	m_rngBuffer(0)
+	m_pvdType(ProviderType == Providers::None ? Providers::ACP : ProviderType),
+	m_rndSeed(0),
+	m_rngBuffer(0),
+	m_rngGenerator(new Drbg::BCG(CipherType, Enumeration::Digests::SHA256, m_pvdType))
 {
 	Reset();
 }
@@ -36,26 +27,20 @@ BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 BCR::BCR(std::vector<byte> &Seed, BlockCiphers CipherType, bool Parallel)
 	:
 	m_bufferIndex(0),
-	m_engineType(CipherType),
+	m_engineType(CipherType != BlockCiphers::None ? CipherType :
+		throw CryptoRandomException("BCR:Ctor", "Cipher type can not be none!")),
 	m_isDestroyed(false),
 	m_isParallel(Parallel),
+	m_pvdType(Providers::ACP),
+	m_rndSeed(Seed.size() < 32 ? Seed :
+		throw CryptoRandomException("BCR:Ctor", "Seed size is too small!")),
 	m_rngBuffer(0),
-	m_rndSeed(Seed)
+	m_rngGenerator(new Drbg::BCG(CipherType, Enumeration::Digests::SHA256, Providers::ACP))
 {
-	if (Seed.size() < 32)
-		throw CryptoRandomException("BCR:Ctor", "Seed size is too small!");
-
 	Reset();
 }
 
 BCR::~BCR()
-{
-	Destroy();
-}
-
-//~~~Public Functions~~~//
-
-void BCR::Destroy()
 {
 	if (!m_isDestroyed)
 	{
@@ -68,59 +53,78 @@ void BCR::Destroy()
 		Utility::IntUtils::ClearVector(m_rndSeed);
 		Utility::IntUtils::ClearVector(m_rngBuffer);
 
-		if (m_rngGenerator != 0)
-			delete m_rngGenerator;
+		if (m_rngGenerator != nullptr)
+		{
+			m_rngGenerator.reset(nullptr);
+		}
 	}
 }
+
+//~~~Accessors~~~//
+
+const Prngs BCR::Enumeral() 
+{ 
+	return Prngs::BCR; 
+}
+
+const std::string BCR::Name() 
+{ 
+	return CLASS_NAME + "-" + m_rngGenerator->Name();
+}
+
+//~~~Public Functions~~~//
 
 void BCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
-	size_t bufLen = Elements * sizeof(ushort);
-	std::vector<byte> buf(bufLen);
+	const size_t BUFLEN = Elements * sizeof(ushort);
+	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 void BCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
-	size_t bufLen = Elements * sizeof(uint);
-	std::vector<byte> buf(bufLen);
+	const size_t BUFLEN = Elements * sizeof(uint);
+	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 void BCR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
-	size_t bufLen = Elements * sizeof(ulong);
-	std::vector<byte> buf(bufLen);
+	const size_t BUFLEN = Elements * sizeof(ulong);
+	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 std::vector<byte> BCR::GetBytes(size_t Size)
 {
-	std::vector<byte> data(Size);
-	GetBytes(data);
-	return data;
+	std::vector<byte> buf(Size);
+	GetBytes(buf);
+
+	return buf;
 }
 
 void BCR::GetBytes(std::vector<byte> &Output)
 {
-	if (Output.size() == 0)
-		throw CryptoRandomException("BCR:GetBytes", "Buffer size must be at least 1 byte!");
+	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
 
 	if (m_rngBuffer.size() - m_bufferIndex < Output.size())
 	{
 		size_t bufSize = m_rngBuffer.size() - m_bufferIndex;
+
 		// copy remaining bytes
 		if (bufSize != 0)
+		{
 			Utility::MemUtils::Copy(m_rngBuffer, m_bufferIndex, Output, 0, bufSize);
+		}
 
 		size_t rmd = Output.size() - bufSize;
 
@@ -150,99 +154,36 @@ void BCR::GetBytes(std::vector<byte> &Output)
 	}
 }
 
-ushort BCR::NextUShort()
+ushort BCR::NextUInt16()
 {
-	return Utility::IntUtils::LeBytesTo16(GetBytes(2), 0);
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ushort)), 0, x, sizeof(ushort));
+
+	return x;
 }
 
-ushort BCR::NextUShort(ushort Maximum)
+uint BCR::NextUInt32()
 {
-	CexAssert(Maximum != 0, "maximum can not be zero");
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(uint)), 0, x, sizeof(uint));
 
-	ushort num;
-
-	do
-	{
-		num = (ushort)GetRanged(Maximum, sizeof(ushort));
-	} while (num > Maximum);
-
-	return num;
+	return x;
 }
 
-ushort BCR::NextUShort(ushort Maximum, ushort Minimum)
+ulong BCR::NextUInt64()
 {
-	CexAssert(Maximum != 0, "maximum can not be zero");
-	CexAssert(Maximum > Minimum, "minimum can not be more than maximum");
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ulong)), 0, x, sizeof(ulong));
 
-	uint num = 0;
-	while ((num = NextUShort(Maximum)) < Minimum) {}
-	return num;
-}
-
-uint BCR::Next()
-{
-	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
-}
-
-uint BCR::Next(uint Maximum)
-{
-	CexAssert(Maximum != 0, "maximum can not be zero");
-
-	uint num;
-
-	do
-	{
-		num = (uint)GetRanged(Maximum, sizeof(uint));
-	} while (num > Maximum);
-
-	return num;
-}
-
-uint BCR::Next(uint Maximum, uint Minimum)
-{
-	CexAssert(Maximum != 0, "maximum can not be zero");
-	CexAssert(Maximum > Minimum, "minimum can not be more than maximum");
-
-	uint num = 0;
-	while ((num = Next(Maximum)) < Minimum) {}
-	return num;
-}
-
-ulong BCR::NextULong()
-{
-	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
-}
-
-ulong BCR::NextULong(ulong Maximum)
-{
-	CexAssert(Maximum != 0, "maximum can not be zero");
-
-	ulong num;
-
-	do
-	{
-		num = GetRanged(Maximum, sizeof(ulong));
-	} while (num > Maximum);
-
-	return num;
-}
-
-ulong BCR::NextULong(ulong Maximum, ulong Minimum)
-{
-	CexAssert(Maximum != 0, "maximum can not be zero");
-	CexAssert(Maximum > Minimum, "minimum can not be more than maximum");
-
-	ulong num = 0;
-	while ((num = NextULong(Maximum)) < Minimum) {}
-	return num;
+	return x;
 }
 
 void BCR::Reset()
 {
-	m_rngGenerator = new Drbg::BCG(m_engineType, Enumeration::Digests::SHA256, m_pvdType);
-
 	if (m_isParallel)
+	{
 		m_isParallel = m_rngGenerator->IsParallel();
+	}
 
 	m_rngGenerator->ParallelProfile().IsParallel() = m_isParallel;
 
@@ -257,48 +198,14 @@ void BCR::Reset()
 		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType == Providers::None ? Providers::CSP : m_pvdType);
 		seedGen->GetBytes(seed);
 		seedGen->GetBytes(nonce);
+		delete seedGen;
 		Key::Symmetric::SymmetricKey kp(seed, nonce);
 		m_rngGenerator->Initialize(kp);
-		delete seedGen;
 	}
 
 	m_rngBuffer.resize(m_isParallel ? m_rngGenerator->ParallelBlockSize() : BUFFER_DEF);
 	m_rngGenerator->Generate(m_rngBuffer);
 	m_bufferIndex = 0;
-}
-
-ulong BCR::GetRanged(ulong Maximum, size_t Length)
-{
-	std::vector<byte> rand;
-
-	if (Maximum < 256)
-		rand = GetBytes(1);
-	else if (Maximum < 65536)
-		rand = GetBytes(2);
-	else if (Maximum < 16777216)
-		rand = GetBytes(3);
-	else if (Maximum < 4294967296)
-		rand = GetBytes(4);
-	else if (Maximum < 1099511627776)
-		rand = GetBytes(5);
-	else if (Maximum < 281474976710656)
-		rand = GetBytes(6);
-	else if (Maximum < 72057594037927936)
-		rand = GetBytes(7);
-	else
-		rand = GetBytes(8);
-
-	ulong val = 0;
-	Utility::MemUtils::CopyToValue(rand, 0, val, rand.size());
-
-	ulong bits = Length * 8;
-	while (val > Maximum && bits != 0)
-	{
-		val >>= 1;
-		bits--;
-	}
-
-	return val;
 }
 
 NAMESPACE_PRNGEND

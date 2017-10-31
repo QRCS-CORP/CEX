@@ -1136,6 +1136,24 @@
     <ClCompile Include="..\..\CEX\CryptoAuthenticationFailure.cpp">
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\CEX\McElieceUtils.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\BlakeParams.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SkeinUbiTweak.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SkeinParams.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA2Params.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KeccakParams.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="license.txt" />

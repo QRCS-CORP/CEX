@@ -11,7 +11,7 @@ NAMESPACE_IO
 /// A file streaming container.
 /// <para>Manipulate a file through a streaming interface.</para>
 /// </summary>
-class FileStream : public IByteStream
+class FileStream final : public IByteStream
 {
 public:
 
@@ -54,69 +54,25 @@ private:
 
 public:
 
-	FileStream() = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The file read and write file access flags
-	/// </summary>
-	const FileAccess Access();
-
-	/// <summary>
-	/// Get: The stream can be read
-	/// </summary>
-	const bool CanRead() override;
-
-	/// <summary>
-	/// Get: The stream is seekable
-	/// </summary>
-	const bool CanSeek() override;
-
-	/// <summary>
-	/// Get: The stream can be written to
-	/// </summary>
-	const bool CanWrite() override;
-
-	/// <summary>
-	/// Get: The stream container type
-	/// </summary>
-	const StreamModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The file open mode flags
-	/// </summary>
-	const FileModes FileMode();
-
-	/// <summary>
-	/// Get: The file name and path
-	/// </summary>
-	std::string FileName();
-
-	/// <summary>
-	/// Get: The stream length
-	/// </summary>
-	const ulong Length() override;
-
-	/// <summary>
-	/// Get: The streams class name
-	/// </summary>
-	const std::string Name() override;
-
-	/// <summary>
-	/// Get: The streams current position
-	/// </summary>
-	const ulong Position() override;
-
-	/// <summary>
-	/// Get: The underlying stream
-	/// </summary>
-	std::fstream &Stream();
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class with a file name and options
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	FileStream(const FileStream&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	FileStream& operator=(const FileStream&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	FileStream() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class with a file name and options
 	/// </summary>
 	///
 	/// <param name="FileName">The full path and name of the file</param>
@@ -127,9 +83,66 @@ public:
 	explicit FileStream(const std::string &FileName, FileAccess Access = FileAccess::ReadWrite, FileModes Mode = FileModes::Binary);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~FileStream() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The file read and write file access flags
+	/// </summary>
+	const FileAccess Access();
+
+	/// <summary>
+	/// Read Only: The stream can be read
+	/// </summary>
+	const bool CanRead() override;
+
+	/// <summary>
+	/// Read Only: The stream is seekable
+	/// </summary>
+	const bool CanSeek() override;
+
+	/// <summary>
+	/// Read Only: The stream can be written to
+	/// </summary>
+	const bool CanWrite() override;
+
+	/// <summary>
+	/// Read Only: The stream container type
+	/// </summary>
+	const StreamModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The file open mode flags
+	/// </summary>
+	const FileModes FileMode();
+
+	/// <summary>
+	/// Read Only: The file name and path
+	/// </summary>
+	std::string FileName();
+
+	/// <summary>
+	/// Read Only: The stream length
+	/// </summary>
+	const ulong Length() override;
+
+	/// <summary>
+	/// Read Only: The streams class name
+	/// </summary>
+	const std::string Name() override;
+
+	/// <summary>
+	/// Read Only: The streams current position
+	/// </summary>
+	const ulong Position() override;
+
+	/// <summary>
+	/// Read/Write: The underlying stream
+	/// </summary>
+	std::fstream &Stream();
 
 	//~~~Public Functions~~~//
 

@@ -1,5 +1,5 @@
-﻿#ifndef _CEXTEST_PARALLELMODETEST_H
-#define _CEXTEST_PARALLELMODETEST_H
+﻿#ifndef CEXTEST_PARALLELMODETEST_H
+#define CEXTEST_PARALLELMODETEST_H
 
 #include "ITest.h"
 #include "../CEX/IBlockCipher.h"
@@ -85,6 +85,7 @@ namespace Test
 		// test each cipher modes access methods, e.g. sequential and parallel Transform() api
 		void AccessCheck(ICipherMode* Cipher);
 
+		void FuzzyCheck(ICipherMode* Cipher);
 		void BlockCTR(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockDecrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void BlockEncrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
@@ -94,9 +95,9 @@ namespace Test
 		void ParallelCTR(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void ParallelDecrypt(Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		// buffered blocks: t(in, out)
-		void Transform1(Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
+		void Transform1(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
 		// loop through: t(in, inoff, out, outoff)
-		void Transform2(Mode::ICipherMode *Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
+		void Transform2(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output);
 		// whole array: t(in, inoff, out, outoff, len)
 		void Transform3(Mode::ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output);
     };

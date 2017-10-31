@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_ITEST_H
-#define _CEXTEST_ITEST_H
+#ifndef CEXTEST_ITEST_H
+#define CEXTEST_ITEST_H
 
 #include "TestCommon.h"
 #include "TestEventHandler.h"

@@ -23,44 +23,58 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IMac() {}
+	IMac(const IMac&) = delete;
 
 	/// <summary>
-	/// Destructor
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IMac() noexcept {}
-
-	//~~~Properties~~~//
+	IMac& operator=(const IMac&) = delete;
 
 	/// <summary>
-	/// Get: The Mac generators type name
+	/// Constructor: Instantiate this class
+	/// </summary>
+	IMac() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IMac() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The Mac generators type name
 	/// </summary>
 	virtual const Macs Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The Digests internal blocksize in bytes
+	/// Read Only: The Digests internal blocksize in bytes
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get: Size of returned mac in bytes
+	/// Read Only: Size of returned mac in bytes
 	/// </summary>
 	virtual const size_t MacSize() = 0;
 
 	/// <summary>
-	/// Get: Mac is ready to digest data
+	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: Recommended Mac key sizes in a SymmetricKeySize array
+	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Get: Mac generators class name
+	/// Read Only: Mac generators class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
@@ -73,11 +87,6 @@ public:
 	/// <param name="Input">Input data</param>
 	/// <param name="Output">The output Mac code</param>
 	virtual void Compute(const std::vector<byte> &Input, std::vector<byte> &Output) = 0;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Completes processing and returns the HMAC code

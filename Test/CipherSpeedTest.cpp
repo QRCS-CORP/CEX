@@ -130,7 +130,10 @@ namespace Test
 			OnProgress(std::string("***AES-OCB Parallel Encryption***"));
 			OCBSpeedTest(engine, true, true);
 
-			delete engine;
+			if (engine != nullptr)
+			{
+				delete engine;
+			}
 
 			OnProgress(std::string("### STREAM CIPHER TESTS ###"));
 			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
@@ -346,9 +349,11 @@ namespace Test
 				if (++ctr2[i] != 0)
 					break;
 				--i;
-			} while (i != 0);
+			} 
+			while (i != 0);
 
-		} while (--itr != 0);
+		} 
+		while (--itr != 0);
 
 		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
@@ -363,7 +368,8 @@ namespace Test
 			if (++ctr3[0] == 0)
 				++ctr3[1];
 
-		} while (--itr != 0);
+		} 
+		while (--itr != 0);
 
 		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
@@ -382,9 +388,11 @@ namespace Test
 				++ctr4[i];
 				if (ctr4[i] != 0)
 					break;
-			} while (i != 0);
+			} 
+			while (i != 0);
 
-		} while (--itr != 0);
+		} 
+		while (--itr != 0);
 
 		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);
@@ -399,7 +407,8 @@ namespace Test
 			for (size_t j = ctr5.size() - 1, carry = 1; j > 0 && carry; j--)
 				carry = !++ctr5[j];
 
-		} while (--itr != 0);
+		}
+		while (--itr != 0);
 
 		calc = TestUtils::ToString((TestUtils::GetTimeMs64() - start) / 1000.0);
 		OnProgress(calc);

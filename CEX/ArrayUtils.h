@@ -65,7 +65,7 @@ public:
 	static size_t AppendString(std::string &Value, Array &Output)
 	{
 		const size_t STRSZE = Value.size();
-		const size_t ELMSZE = sizeof(Output[0]);
+		const size_t ELMSZE = sizeof(Array::value_type);
 
 		std::vector<byte> tmp(0);
 		std::transform(std::begin(Value), std::end(Value), std::back_inserter(tmp), [](char c)
@@ -95,16 +95,14 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	static size_t Append(const ArrayA &Input, ArrayB &Output)
 	{
-		if (Input.size() == 0)
+		const size_t VARSZE = sizeof(ArrayA::value_type) * Input.size();
+		const size_t ARRSZE = sizeof(ArrayB::value_type) * Output.size();
+
+		if (Input.size() != 0)
 		{
-			return 0;
+			Output.resize(VARSZE + ARRSZE);
+			std::memcpy(&Output[ARRSZE], &Input[0], VARSZE);
 		}
-
-		const size_t VARSZE = sizeof(Input[0]) * Input.size();
-		const size_t ARRSZE = sizeof(Output[0]) * Output.size();
-
-		Output.resize(VARSZE + ARRSZE);
-		std::memcpy(&Output[ARRSZE], &Input[0], VARSZE);
 
 		return VARSZE;
 	}
@@ -167,6 +165,7 @@ public:
 	static size_t Remove(T Value, Array &Output)
 	{
 		std::vector<T> tmp;
+
 		for (size_t i = 0; i < Output.size(); ++i)
 		{
 			if (Output[i] != Value)
@@ -185,7 +184,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The string to split</param>
-	/// <param name="Delim">The delimiting character</param>
+	/// <param name="Delimiter">The delimiting character</param>
 	/// <param name="Output">The array of split strings</param>
 	static void Split(const std::string &Input, char Delimiter, std::vector<std::string> &Output);
 
@@ -194,13 +193,13 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Input">The string to split</param>
-	/// <param name="Delim">The delimiting character</param>
+	/// <param name="Delimiter">The delimiting character</param>
 	/// 
 	/// <returns>The vector array of split strings</returns>
 	static std::vector<std::string> Split(const std::string &Input, char Delimiter);
 
 	/// <summary>
-	/// Convert an integer array to an 8bit byte array
+	/// Convert an integer array (C style) to an 8bit byte array
 	/// </summary>
 	/// 
 	/// <param name="Input">The array to convert</param>
@@ -210,16 +209,14 @@ public:
 	template <typename T>
 	static std::vector<byte> ToByteArray(T* Input, size_t Length)
 	{
-		if (Length == 0 || !Input)
-		{
-			return std::vector<byte>(0);
-		}
-
 		const size_t ELMSZE = sizeof(Input[0]);
 		const size_t RETSZE = Length * ELMSZE;
-
 		std::vector<byte> elems(RETSZE);
-		std::memcpy(&elems[0], &Input[0], RETSZE);
+
+		if (Length != 0)
+		{
+			std::memcpy(&elems[0], &Input[0], RETSZE);
+		}
 
 		return elems;
 	}
@@ -234,15 +231,10 @@ public:
 	template <typename T>
 	static std::string ToString(T* Input)
 	{
-		if (!Input)
-		{
-			return "";
-		}
-
 		size_t len = strlen(reinterpret_cast<char*>(Input));
-		std::string str(reinterpret_cast<char*>(Input), len);
+		std::string ret(reinterpret_cast<char*>(Input), len);
 
-		return str;
+		return ret;
 	}
 
 	/// <summary>
@@ -255,14 +247,9 @@ public:
 	template <typename T>
 	static std::string ToString(const std::vector<T> &Input)
 	{
-		if (!Input)
-		{
-			return "";
-		}
+		std::string ret(Input.begin(), Input.end());
 
-		std::string tmp(Input.begin(), Input.end());
-
-		return tmp;
+		return ret;
 	}
 };
 

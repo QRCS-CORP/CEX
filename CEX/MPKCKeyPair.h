@@ -21,35 +21,48 @@ private:
 
 public:
 
-	MPKCKeyPair(const MPKCKeyPair&) = delete;
-	MPKCKeyPair& operator=(const MPKCKeyPair&) = delete;
-	MPKCKeyPair& operator=(MPKCKeyPair&&) = delete;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate this class with the public/private keys
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCKeyPair(const MPKCKeyPair&) = delete;
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCKeyPair& operator=(const MPKCKeyPair&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	MPKCKeyPair() = delete;
+
+	/// <summary>
+	/// Constructor: instantiate this class with the public/private keys
 	/// </summary>
 	/// 
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
-	explicit MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey);
+	MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey);
 
 	/// <summary>
-	/// Instantiate this class with the public/private keys and an identification tag
+	/// Constructor: instantiate this class with the public/private keys and an identification tag
 	/// </summary>
 	/// 
 	/// <param name="PrivateKey">The private key</param>
 	/// <param name="PublicKey">The public key</param>
 	/// <param name="Tag">The identification tag</param>
-	explicit MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey, std::vector<byte> &Tag);
+	MPKCKeyPair(MPKCPrivateKey* PrivateKey, MPKCPublicKey* PublicKey, std::vector<byte> &Tag);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class.
+	/// <para>Only the tag is destroyed in the finalizer. Call the Destroy() function on Public/Private key members,
+	/// or let them go out of scope to finalize them.</para>
 	/// </summary>
 	~MPKCKeyPair() override;
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
 	/// The Private Key

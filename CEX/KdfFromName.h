@@ -9,17 +9,19 @@
 
 NAMESPACE_HELPER
 
-using Kdf::IKdf;
+using Exception::CryptoException;
 using Enumeration::Digests;
+using Kdf::IKdf;
 using Enumeration::Kdfs;
 
 /// <summary>
 /// Get an uninitialized Key Derivation Function from a type name.
-/// <para>The KDFs Initialize function must be called before Generate can be called.<para>
+/// <para>The KDFs Initialize function must be called before Generate can be called.</para>
 /// </summary>
 class KdfFromName
 {
 public:
+
 	/// <summary>
 	/// Instantiate an uninitialized KDF generator from its enunmeration type name
 	/// </summary>

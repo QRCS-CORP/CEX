@@ -8,18 +8,20 @@
 
 NAMESPACE_HELPER
 
-using Enumeration::BlockCiphers;
 using Enumeration::AeadModes;
+using Enumeration::BlockCiphers;
+using Exception::CryptoException;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Cipher::Symmetric::Block::Mode::IAeadMode;
 
 /// <summary>
 /// Get a Cipher Mode instance from it's enumeration name.
-/// <para>The Cipher modes Initialize function must be called before it can be used.<para>
+/// <para>The Cipher modes Initialize function must be called before it can be used.</para>
 /// </summary>
 class AeadModeFromName
 {
 public:
+
 	/// <summary>
 	/// Get an Cipher Mode instance by name using default parameters
 	/// </summary>

@@ -19,37 +19,43 @@ class PKCS7 final : public IPadding
 {
 private:
 
-	PKCS7(const PKCS7&) = delete;
-	PKCS7& operator=(const PKCS7&) = delete;
-	PKCS7& operator=(PKCS7&&) = delete;
-
 	static const std::string CLASS_NAME;
 
 public:
 
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The padding modes type name
-	/// </summary>
-	const PaddingModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The padding modes class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	PKCS7(const PKCS7&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	PKCS7& operator=(const PKCS7&) = delete;
+
+	/// <summary>
+	/// Constructor: Instantiate this class
 	/// </summary>
 	PKCS7();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class: finalize this class
 	/// </summary>
 	~PKCS7() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The padding modes type name
+	/// </summary>
+	const PaddingModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The padding modes class name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

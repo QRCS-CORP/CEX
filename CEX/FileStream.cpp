@@ -12,7 +12,42 @@ NAMESPACE_IO
 
 const std::string FileStream::CLASS_NAME("FileStream");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes Mode)
+	:
+	m_fileAccess(Access),
+	m_fileMode(Mode),
+	m_fileName(FileName),
+	m_isDestroyed(false),
+	m_filePosition(0),
+	m_fileSize(0),
+	m_fileWritten(0)
+{
+	if (Access == FileAccess::Read && !FileExists(m_fileName))
+	{
+		throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
+	}
+
+	m_fileSize = FileSize(m_fileName);
+
+	try
+	{
+		m_fileStream.open(m_fileName, static_cast<int>(Access) | static_cast<int>(Mode));
+		m_fileStream.unsetf(std::ios::skipws);
+	}
+	catch (std::exception& ex)
+	{
+		throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!", std::string(ex.what()));
+	}
+}
+
+FileStream::~FileStream()
+{
+	Destroy();
+}
+
+//~~~Accessors~~~//
 
 const FileStream::FileAccess FileStream::Access() 
 { 
@@ -69,39 +104,6 @@ std::fstream &FileStream::Stream()
 	return m_fileStream; 
 }
 
-//~~~Constructor~~~//
-
-FileStream::FileStream(const std::string &FileName, FileAccess Access, FileModes Mode)
-	:
-	m_fileAccess(Access),
-	m_fileMode(Mode),
-	m_fileName(FileName),
-	m_isDestroyed(false),
-	m_filePosition(0),
-	m_fileSize(0),
-	m_fileWritten(0)
-{
-	if (Access == FileAccess::Read && !FileExists(m_fileName))
-		throw CryptoProcessingException("FileStream:CTor", "The file does not exist!");
-
-	m_fileSize = FileSize(m_fileName);
-
-	try
-	{
-		m_fileStream.open(m_fileName, (int)Access | (int)Mode);
-		m_fileStream.unsetf(std::ios::skipws);
-	}
-	catch (std::exception& ex)
-	{
-		throw CryptoProcessingException("FileStream:CTor", "The file could not be opened!", std::string(ex.what()));
-	}
-}
-
-FileStream::~FileStream()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void FileStream::Close()
@@ -109,7 +111,9 @@ void FileStream::Close()
 	if (m_fileStream && m_fileStream.is_open())
 	{
 		if (m_fileWritten != 0)
+		{
 			m_fileStream.flush();
+		}
 
 		m_fileStream.close();
 		m_fileSize = 0;
@@ -172,7 +176,9 @@ bool FileStream::FileExists(const std::string &FileName)
 ulong FileStream::FileSize(const std::string &FileName)
 {
 	if (!FileExists(FileName))
+	{
 		return 0;
+	}
 
 	std::ifstream in(FileName.c_str(), std::ifstream::ate | std::ifstream::binary);
 	return static_cast<ulong>(in.tellg());
@@ -183,7 +189,9 @@ void FileStream::Flush()
 	CexAssert(m_fileAccess != FileAccess::Read, "File is read only");
 
 	if (m_fileStream && m_fileWritten != 0)
+	{
 		m_fileStream.flush();
+	}
 }
 
 size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
@@ -191,7 +199,9 @@ size_t FileStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 	CexAssert(m_fileAccess != FileAccess::Write, "File is write only");
 
 	if (Offset + Length > m_fileSize - m_filePosition)
+	{
 		Length = m_fileSize - m_filePosition;
+	}
 
 	if (Length > 0)
 	{
@@ -224,11 +234,17 @@ void FileStream::Reset()
 void FileStream::Seek(ulong Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
+	{
 		m_fileStream.seekg(Offset, std::ios::beg);
+	}
 	else if (Origin == SeekOrigin::End)
+	{
 		m_fileStream.seekg(Offset, std::ios::end);
+	}
 	else
+	{
 		m_fileStream.seekg(Offset, std::ios::cur);
+	}
 
 	m_filePosition = static_cast<ulong>(m_fileStream.tellg());
 }
@@ -240,15 +256,14 @@ void FileStream::SetLength(ulong Length)
 	if (Length < m_fileSize)
 	{
 #if defined(CEX_OS_WINDOWS)
+		int handle = 0;
 
-		int handle;
 		if (_sopen_s(&handle, m_fileName.c_str(), _O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE) == 0)
+		{
 			_chsize(handle, Length);
-
+		}
 #elif defined(CEX_OS_POSIX)
-
 		truncate(m_fileName.c_str(), Length);
-
 #endif
 	}
 	else if (Length > m_fileSize)

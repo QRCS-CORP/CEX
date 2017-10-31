@@ -48,26 +48,31 @@ namespace Test
 
 			CTR* cpr1 = new CTR(BlockCiphers::Rijndael);
 			AccessCheck(cpr1);
+			FuzzyCheck(cpr1);
 			delete cpr1;
 			OnProgress(std::string("ParallelModeTest: Passed CTR parallel/sequential access api tests.."));
 
 			ICM* cpr2 = new ICM(BlockCiphers::Rijndael);
 			AccessCheck(cpr2);
+			FuzzyCheck(cpr2);
 			delete cpr2;
 			OnProgress(std::string("ParallelModeTest: Passed ICM parallel/sequential access api tests.."));
 
 			CBC* cpr3 = new CBC(BlockCiphers::Rijndael);
 			AccessCheck(cpr3);
+			FuzzyCheck(cpr3);
 			delete cpr3;
 			OnProgress(std::string("ParallelModeTest: Passed CBC parallel/sequential access api tests.."));
 
 			CFB* cpr4 = new CFB(BlockCiphers::Rijndael);
 			AccessCheck(cpr4);
+			FuzzyCheck(cpr4);
 			delete cpr4;
 			OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
 
 			ECB* cpr5 = new ECB(BlockCiphers::Rijndael);
 			AccessCheck(cpr5);
+			FuzzyCheck(cpr5);
 			delete cpr5;
 			OnProgress(std::string("ParallelModeTest: Passed CFB parallel/sequential access api tests.."));
 
@@ -168,7 +173,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32(Cipher->ParallelProfile().ParallelMinimumSize() * 4, Cipher->ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = static_cast<size_t>(rng.NextUInt32(Cipher->ParallelProfile().ParallelMinimumSize() * 4, Cipher->ParallelProfile().ParallelMinimumSize()));
 			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(smpSze);
@@ -324,7 +329,7 @@ namespace Test
 		// compare rhx/ahx parallel ctr
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+			size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 			smpSze -= (smpSze % cpr1.BlockSize());
 			data.resize(smpSze);
 			dec.resize(smpSze);
@@ -359,7 +364,7 @@ namespace Test
 		// compare rhx/ahx cbc
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+			size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 			smpSze -= (smpSze % cpr1.BlockSize());
 			data.resize(smpSze);
 			dec.resize(smpSze);
@@ -469,7 +474,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+			size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 			data.resize(smpSze);
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
@@ -553,7 +558,7 @@ namespace Test
 		// compare to sequential decryption output
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelBlockSize(), (uint)cipher1.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextUInt32((uint)cipher1.ParallelBlockSize(), (uint)cipher1.ParallelProfile().ParallelMinimumSize());
 			smpSze -= (smpSze % cipher1.BlockSize());
 			//smpSze = 38176;
 			data.resize(smpSze);
@@ -581,7 +586,7 @@ namespace Test
 		// decryption output integrity
 		for (size_t i = 0; i < TEST_LOOPS; ++i)
 		{
-			size_t smpSze = (size_t)rng.NextInt32((uint)cipher1.ParallelBlockSize(), (uint)cipher1.ParallelProfile().ParallelMinimumSize());
+			size_t smpSze = (size_t)rng.NextUInt32((uint)cipher1.ParallelBlockSize(), (uint)cipher1.ParallelProfile().ParallelMinimumSize());
 			smpSze -= (smpSze % cipher1.ParallelProfile().ParallelMinimumSize());
 			data.resize(smpSze);
 			dec1.resize(smpSze);
@@ -629,7 +634,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+				size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 				enc1.resize(smpSze);
 				enc2.resize(smpSze);
 				dec1.resize(smpSze);
@@ -674,7 +679,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+				size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 				enc1.resize(smpSze);
 				enc2.resize(smpSze);
 				dec1.resize(smpSze);
@@ -721,7 +726,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+				size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 				smpSze -= (smpSze % cipher.BlockSize());
 				enc1.resize(smpSze);
 				dec1.resize(smpSze);
@@ -753,7 +758,7 @@ namespace Test
 
 			for (size_t i = 0; i < TEST_LOOPS; i++)
 			{
-				size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+				size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 				smpSze -= (smpSze % cipher.BlockSize());
 				enc1.resize(smpSze);
 				dec1.resize(smpSze);
@@ -1223,7 +1228,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 #if !defined(STAT_INP)
-			size_t smpSze = rng.NextInt32(MAX_ALLOC, MIN_ALLOC);
+			size_t smpSze = rng.NextUInt32(MAX_ALLOC, MIN_ALLOC);
 			data.resize(smpSze);
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
@@ -1260,6 +1265,62 @@ namespace Test
 			Engine->Initialize(keyParam);
 			Engine->ParallelProfile().IsParallel() = true;
 			Engine->Transform(enc1, 0, dec, 0, enc1.size());
+
+			if (dec != data)
+			{
+				throw TestException("Parallel Stream: Decrypted output is not equal!");
+			}
+		}
+	}
+
+	void ParallelModeTest::FuzzyCheck(ICipherMode* Cipher)
+	{
+		std::vector<byte> data;
+		std::vector<byte> dec;
+		std::vector<byte> enc;
+		std::vector<byte> key(32);
+		std::vector<byte> iv(16);
+		Prng::SecureRandom rng;
+
+		rng.GetBytes(key);
+		rng.GetBytes(iv);
+		Key::Symmetric::SymmetricKey keyParam(key, iv);
+		Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize() * Cipher->ParallelProfile().ProcessorCount();
+		Cipher->ParallelProfile().IsParallel() = true;
+
+		for (size_t i = 0; i < 100; ++i)
+		{
+			// extend/mis-align parallel block size and process the whole segment
+			size_t smpSze = Cipher->ParallelProfile().ParallelBlockSize() + rng.NextUInt32(1024, 1);
+			if (Cipher->Enumeral() == CipherModes::CBC || Cipher->Enumeral() == CipherModes::CFB || Cipher->Enumeral() == CipherModes::ECB)
+			{
+				// block align for cbc/cfb/ecb
+				smpSze = smpSze - (smpSze % Cipher->BlockSize());
+			}
+
+			data.resize(smpSze);
+			dec.resize(data.size(), 0);
+			enc.resize(data.size(), 0);
+			rng.GetBytes(data);
+
+			Cipher->Initialize(true, keyParam);
+			Cipher->Transform(data, 0, enc, 0, data.size());
+			Cipher->Initialize(false, keyParam);
+			Cipher->Transform(enc, 0, dec, 0, data.size());
+
+			// test for empty data
+			uint sum1 = 0;
+			uint sum2 = 0;
+			for (size_t j = 1; j < 16; j++)
+			{
+				sum1 += enc[enc.size() - j];
+				sum2 += dec[dec.size() - j];
+			}
+
+			if (sum1 == 0 || sum2 == 0)
+			{
+				throw TestException("Parallel Stream: Decrypted output is not equal!");
+			}
 
 			if (dec != data)
 			{

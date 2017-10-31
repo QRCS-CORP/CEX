@@ -19,33 +19,42 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	IPrng(const IPrng&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	IPrng& operator=(const IPrng&) = delete;
+
+	/// <summary>
 	/// Initialize this class
 	/// </summary>
-	IPrng() {}
+	IPrng() 
+	{
+	}
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class
 	/// </summary>
-	virtual ~IPrng() noexcept {}
+	virtual ~IPrng() noexcept 
+	{
+	}
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Get: The random generators type name
+	/// Read Only: The random generators type name
 	/// </summary>
 	virtual const Prngs Enumeral() = 0;
 
 	/// <summary>
-	/// Get: The random generators class name
+	/// Read Only: The random generators class name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
@@ -95,78 +104,21 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Random UInt16</returns>
-	virtual ushort NextUShort() = 0;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	virtual ushort NextUShort(ushort Maximum) = 0;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 16bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random UInt16</returns>
-	virtual ushort NextUShort(ushort Maximum, ushort Minimum) = 0;
+	virtual ushort NextUInt16() = 0;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 32bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt32</returns>
-	virtual uint Next() = 0;
-
-	/// <summary>
-	/// Get an pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random UInt32</returns>
-	virtual uint Next(uint Maximum) = 0;
-
-	/// <summary>
-	/// Get a pseudo random unsigned 32bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random UInt32</returns>
-	virtual uint Next(uint Maximum, uint Minimum) = 0;
+	virtual uint NextUInt32() = 0;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 64bit integer
 	/// </summary>
 	/// 
 	/// <returns>Random UInt64</returns>
-	virtual ulong NextULong() = 0;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// 
-	/// <returns>Random UInt64</returns>
-	virtual ulong NextULong(ulong Maximum) = 0;
-
-	/// <summary>
-	/// Get a ranged pseudo random unsigned 64bit integer
-	/// </summary>
-	/// 
-	/// <param name="Maximum">Maximum value</param>
-	/// <param name="Minimum">Minimum value</param>
-	/// 
-	/// <returns>Random UInt64</returns>
-	virtual ulong NextULong(ulong Maximum, ulong Minimum) = 0;
+	virtual ulong NextUInt64() = 0;
 
 	/// <summary>
 	/// Reset the generator instance

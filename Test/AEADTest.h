@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_AEADTEST_H
-#define _CEXTEST_AEADTEST_H
+#ifndef CEXTEST_AEADTEST_H
+#define CEXTEST_AEADTEST_H
 
 #include "ITest.h"
 #include "../CEX/IAeadMode.h"

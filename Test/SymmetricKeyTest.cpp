@@ -125,17 +125,17 @@ namespace Test
 		SymmetricKeyGenerator keyGen;
 
 		// test symmetric key serialization
-		SymmetricKey symKey1 = keyGen.GetSymmetricKey(keySize);
-		MemoryStream* keyStr = SymmetricKey::Serialize(symKey1);
+		SymmetricKey* symKey1 = keyGen.GetSymmetricKey(keySize);
+		MemoryStream* keyStr = SymmetricKey::Serialize(*symKey1);
 		SymmetricKey* symKey2 = SymmetricKey::DeSerialize(*keyStr);
-		if (!symKey1.Equals(*symKey2))
+		if (!symKey1->Equals(*symKey2))
 			throw TestException("CompareSerial: The symmetric key serialization has failed!");
 
 		// test secure key serialization
-		SymmetricSecureKey secKey1 = keyGen.GetSecureKey(keySize);
-		MemoryStream* secStr = SymmetricSecureKey::Serialize(secKey1);
+		SymmetricSecureKey* secKey1 = keyGen.GetSecureKey(keySize);
+		MemoryStream* secStr = SymmetricSecureKey::Serialize(*secKey1);
 		SymmetricSecureKey* secKey2 = SymmetricSecureKey::DeSerialize(*secStr);
-		if (!secKey1.Equals(*secKey2))
+		if (!secKey1->Equals(*secKey2))
 			throw TestException("CompareSerial: The secure key serialization has failed!");
 	}
 

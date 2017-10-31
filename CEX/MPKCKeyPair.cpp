@@ -25,7 +25,7 @@ MPKCKeyPair::~MPKCKeyPair()
 	Destroy();
 }
 
-//~~~Properties~~~//
+//~~~Accessors~~~//
 
 IAsymmetricKey* MPKCKeyPair::PrivateKey()
 {
@@ -47,7 +47,9 @@ const std::vector<byte> &MPKCKeyPair::Tag()
 void MPKCKeyPair::Destroy()
 {
 	if (m_Tag.size() != 0)
+	{
 		m_Tag.clear();
+	}
 }
 
 NAMESPACE_ASYMMETRICKEYEND

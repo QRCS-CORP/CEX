@@ -32,9 +32,10 @@ class Blake2S
 
 private:
 
+	//~~~Inline Functions~~~//
+
 #if defined(__AVX__)
-#	define TOF(reg) _mm_castsi128_ps((reg))
-#	define TOI(reg) _mm_castps_si128((reg))
+	// Misra exception: this is a common extension of the Intel intrinsics api
 #	define _mm_roti_epi32(r, c) ( \
         (8==-(c)) ? _mm_shuffle_epi8(r,R8) \
         : (16==-(c)) ? _mm_shuffle_epi8(r,R16) \
@@ -42,6 +43,8 @@ private:
 #endif
 
 public:
+
+	//~~~Public Functions~~~//
 
 #if defined(__AVX__)
 	template <typename T>
@@ -63,13 +66,13 @@ public:
 		R2 = FF1 = _mm_loadu_si128((const __m128i*)&State.H[4]);
 		R3 = _mm_loadu_si128((const __m128i*)&IV[0]);
 		std::vector<byte> taf(16);
-		memcpy(&taf[0], &State.T[0], 8);
-		memcpy(&taf[8], &State.F[0], 8);
+		std::memcpy(&taf[0], &State.T[0], 8);
+		std::memcpy(&taf[8], &State.F[0], 8);
 		R4 = _mm_xor_si128(_mm_loadu_si128((const __m128i*)&IV[4]), _mm_loadu_si128((const __m128i*)&taf[0]));
 
 		// round 0
 		// lm 0.1
-		B1 = TOI(_mm_shuffle_ps(TOF(M0), TOF(M1), _MM_SHUFFLE(2, 0, 2, 0)));
+		B1 = _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(M0), _mm_castsi128_ps(M1), _MM_SHUFFLE(2, 0, 2, 0)));
 		// g1
 		R1 = _mm_add_epi32(_mm_add_epi32(R1, B1), R2);
 		R4 = _mm_xor_si128(R4, R1);
@@ -79,7 +82,7 @@ public:
 		R2 = _mm_roti_epi32(R2, -12);
 
 		// lm 0.2
-		B2 = TOI(_mm_shuffle_ps(TOF(M0), TOF(M1), _MM_SHUFFLE(3, 1, 3, 1)));
+		B2 = _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(M0), _mm_castsi128_ps(M1), _MM_SHUFFLE(3, 1, 3, 1)));
 		// g2
 		R1 = _mm_add_epi32(_mm_add_epi32(R1, B2), R2);
 		R4 = _mm_xor_si128(R4, R1);
@@ -94,7 +97,7 @@ public:
 		R2 = _mm_shuffle_epi32(R2, _MM_SHUFFLE(0, 3, 2, 1));
 
 		// lm 0.3
-		B3 = TOI(_mm_shuffle_ps(TOF(M2), TOF(M3), _MM_SHUFFLE(2, 0, 2, 0)));
+		B3 = _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(M2), _mm_castsi128_ps(M3), _MM_SHUFFLE(2, 0, 2, 0)));
 		// g1
 		R1 = _mm_add_epi32(_mm_add_epi32(R1, B3), R2);
 		R4 = _mm_xor_si128(R4, R1);
@@ -104,7 +107,7 @@ public:
 		R2 = _mm_roti_epi32(R2, -12);
 
 		// lm 0.4
-		B4 = TOI(_mm_shuffle_ps(TOF(M2), TOF(M3), _MM_SHUFFLE(3, 1, 3, 1)));
+		B4 = _mm_castps_si128(_mm_shuffle_ps(_mm_castsi128_ps(M2), _mm_castsi128_ps(M3), _MM_SHUFFLE(3, 1, 3, 1)));
 		// g2
 		R1 = _mm_add_epi32(_mm_add_epi32(R1, B4), R2);
 		R4 = _mm_xor_si128(R4, R1);
@@ -603,7 +606,7 @@ public:
 	template <typename T>
 	static void Compress64(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<uint> &IV)
 	{
-		std::vector<uint> M(16);
+		std::array<uint, 16> M;
 		Utility::IntUtils::LeBytesToUL512(Input, InOffset, M, 0);
 
 		uint R0 = State.H[0];

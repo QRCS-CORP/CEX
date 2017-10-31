@@ -7,46 +7,76 @@ NAMESPACE_HELPER
 
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 {
+	IDrbg* drbgPtr;
+
 	try
 	{
 		switch (DrbgType)
 		{
-		case Drbgs::BCG:
-			return new Drbg::BCG();
-		case Drbgs::DCG:
-			return new Drbg::DCG();
-		case Drbgs::HCG:
-			return new Drbg::HCG();
-		default:
-			throw Exception::CryptoException("DrbgFromName:GetInstance", "The drbg is not recognized!");
+			case Drbgs::BCG:
+			{
+				drbgPtr = new Drbg::BCG();
+				break;
+			}
+			case Drbgs::DCG:
+			{
+				drbgPtr = new Drbg::DCG();
+				break;
+			}
+			case Drbgs::HCG:
+			{
+				drbgPtr = new Drbg::HCG();
+				break;
+			}
+			default:
+			{
+				throw CryptoException("DrbgFromName:GetInstance", "The drbg is not recognized!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("DrbgFromName:GetInstance", "The drbg is unavailable!", std::string(ex.what()));
+		throw CryptoException("DrbgFromName:GetInstance", "The drbg is unavailable!", std::string(ex.what()));
 	}
+
+	return drbgPtr;
 }
 
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers ProviderType)
 {
+	IDrbg* drbgPtr;
+
 	try
 	{
 		switch (DrbgType)
 		{
-		case Drbgs::BCG:
-			return new Drbg::BCG(BlockCiphers::AHX, DigestType, ProviderType);
-		case Drbgs::DCG:
-			return new Drbg::DCG(DigestType, ProviderType);
-		case Drbgs::HCG:
-			return new Drbg::HCG(DigestType, ProviderType);
-		default:
-			throw Exception::CryptoException("DrbgFromName:GetInstance", "The drbg is not recognized!");
+			case Drbgs::BCG:
+			{
+				drbgPtr = new Drbg::BCG(BlockCiphers::AHX, DigestType, ProviderType);
+				break;
+			}
+			case Drbgs::DCG:
+			{
+				drbgPtr = new Drbg::DCG(DigestType, ProviderType);
+				break;
+			}
+			case Drbgs::HCG:
+			{
+				drbgPtr = new Drbg::HCG(DigestType, ProviderType);
+				break;
+			}
+			default:
+			{
+				throw CryptoException("DrbgFromName:GetInstance", "The drbg is not recognized!");
+			}
 		}
 	}
 	catch (const std::exception &ex)
 	{
-		throw Exception::CryptoException("DrbgFromName:GetInstance", "The drbg is unavailable!", std::string(ex.what()));
+		throw CryptoException("DrbgFromName:GetInstance", "The drbg is unavailable!", std::string(ex.what()));
 	}
+
+	return drbgPtr;
 }
 
 NAMESPACE_HELPEREND

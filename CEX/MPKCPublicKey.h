@@ -22,29 +22,22 @@ private:
 
 public:
 
-	MPKCPublicKey() = delete;
-	MPKCPublicKey(const MPKCPublicKey&) = delete;
-	MPKCPublicKey& operator=(const MPKCPublicKey&) = delete;
-	MPKCPublicKey& operator=(MPKCPublicKey&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The public keys cipher type name
-	/// </summary>
-	const AsymmetricEngines CipherType() override;
-
-	/// <summary>
-	/// Get: The cipher parameters enumeration name
-	/// </summary>
-	const MPKCParams Parameters();
-
-	/// <summary>
-	/// Get: The public keys polynomial
-	/// </summary>
-	const std::vector<byte> &P();
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCPublicKey(const MPKCPublicKey&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	MPKCPublicKey& operator=(const MPKCPublicKey&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	MPKCPublicKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
@@ -62,11 +55,28 @@ public:
 	explicit MPKCPublicKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~MPKCPublicKey() override;
 
-	//~~~Public Methods~~~//
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The public keys cipher type name
+	/// </summary>
+	const AsymmetricEngines CipherType() override;
+
+	/// <summary>
+	/// Read Only: The cipher parameters enumeration name
+	/// </summary>
+	const MPKCParams Parameters();
+
+	/// <summary>
+	/// Read Only: The public keys polynomial
+	/// </summary>
+	const std::vector<byte> &P();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Release all resources associated with the object; optional, called by the finalizer

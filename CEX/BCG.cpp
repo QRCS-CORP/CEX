@@ -13,7 +13,128 @@ NAMESPACE_DRBG
 
 const std::string BCG::CLASS_NAME("BCG");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType)
+	:
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, DigestType) : 
+		throw CryptoGeneratorException("BCG:CTor", "The Cipher type can not be none!")),
+	m_cipherType(CipherType),
+	m_ctrVector(COUNTER_SIZE),
+	m_destroyEngine(true),
+	m_distributionCode(0),
+	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
+	m_kdfEngine(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) : nullptr),
+	m_kdfEngineType(DigestType),
+	m_kdfInfo(0),
+	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
+	m_prdResistant(ProviderType != Providers::None),
+	m_providerSource(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(ProviderType) : nullptr),
+	m_providerType(ProviderType),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(DEF_CYCTHRESH),
+	m_secStrength(0),
+	m_seedSize(0)
+{
+}
+
+BCG::BCG(IBlockCipher* Cipher, IDigest* Digest, IProvider* Provider)
+	:
+	m_blockCipher(Cipher != 0 ? Cipher : 
+		throw CryptoGeneratorException("BCG:CTor", "The Cipher can not be null!")),
+	m_cipherType(m_blockCipher->Enumeral()),
+	m_ctrVector(COUNTER_SIZE),
+	m_destroyEngine(false),
+	m_distributionCode(0),
+	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isInitialized(false),
+	m_kdfEngine(Digest),
+	m_kdfEngineType(m_kdfEngine != nullptr ? m_kdfEngine->Enumeral() : Digests::None),
+	m_kdfInfo(0),
+	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
+	m_prdResistant(Provider != nullptr),
+	m_providerSource(Provider),
+	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
+	m_reseedCounter(0),
+	m_reseedRequests(0),
+	m_reseedThreshold(DEF_CYCTHRESH),
+	m_secStrength(0),
+	m_seedSize(0)
+{
+}
+
+BCG::~BCG()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
+		m_distributionCodeMax = 0;
+		m_isEncryption = false;
+		m_isInitialized = false;
+		m_kdfEngineType = Digests::None;
+		m_parallelProfile.Reset();
+		m_prdResistant = false;
+		m_providerType = Providers::None;
+		m_reseedCounter = 0;
+		m_reseedRequests = 0;
+		m_reseedThreshold = 0;
+		m_secStrength = 0;
+		m_seedSize = 0;
+
+		Utility::IntUtils::ClearVector(m_ctrVector);
+		Utility::IntUtils::ClearVector(m_distributionCode);
+		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.reset(nullptr);
+			}
+
+			if (m_kdfEngine != nullptr)
+			{
+				m_kdfEngine.reset(nullptr);
+			}
+
+			if (m_providerSource != nullptr)
+			{
+				m_providerSource.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_blockCipher != nullptr)
+			{
+				m_blockCipher.release();
+			}
+
+			if (m_kdfEngine != nullptr)
+			{
+				m_kdfEngine.release();
+			}
+
+			if (m_providerSource != nullptr)
+			{
+				m_providerSource.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 std::vector<byte> &BCG::DistributionCode() 
 {
@@ -90,104 +211,7 @@ const size_t BCG::SecurityStrength()
 	return m_secStrength;
 }
 
-//~~~Constructor~~~//
-
-BCG::BCG(BlockCiphers CipherType, Digests KdfEngineType, Providers ProviderType)
-	:
-	m_blockCipher(Helper::BlockCipherFromName::GetInstance(CipherType, KdfEngineType)),
-	m_cipherType(CipherType),
-	m_ctrVector(COUNTER_SIZE),
-	m_destroyEngine(true),
-	m_distributionCode(0),
-	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
-	m_kdfEngine(KdfEngineType != Digests::None ? Helper::DigestFromName::GetInstance(KdfEngineType) : 0),
-	m_kdfEngineType(KdfEngineType),
-	m_kdfInfo(0),
-	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
-	m_prdResistant(ProviderType != Providers::None),
-	m_providerSource(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(ProviderType) : 0),
-	m_providerType(ProviderType),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(DEF_CYCTHRESH),
-	m_secStrength(0),
-	m_seedSize(0)
-{
-}
-
-BCG::BCG(IBlockCipher* Cipher, IDigest* KdfEngine, IProvider* Provider)
-	:
-	m_blockCipher(Cipher != 0 ? Cipher : throw CryptoGeneratorException("BCG:CTor", "The Cipher can not be null!")),
-	m_cipherType(m_blockCipher->Enumeral()),
-	m_ctrVector(COUNTER_SIZE),
-	m_destroyEngine(false),
-	m_distributionCode(0),
-	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isInitialized(false),
-	m_kdfEngine(KdfEngine),
-	m_kdfEngineType(m_kdfEngine != 0 ? m_kdfEngine->Enumeral() : Digests::None),
-	m_kdfInfo(0),
-	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
-	m_prdResistant(Provider != 0),
-	m_providerSource(Provider),
-	m_providerType(m_providerSource != 0 ? m_providerSource->Enumeral() : Providers::None),
-	m_reseedCounter(0),
-	m_reseedRequests(0),
-	m_reseedThreshold(DEF_CYCTHRESH),
-	m_secStrength(0),
-	m_seedSize(0)
-{
-}
-
-BCG::~BCG()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void BCG::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_cipherType = BlockCiphers::None;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_kdfEngineType = Digests::None;
-		m_parallelProfile.Reset();
-		m_prdResistant = false;
-		m_providerType = Providers::None;
-		m_reseedCounter = 0;
-		m_reseedRequests = 0;
-		m_reseedThreshold = 0;
-		m_secStrength = 0;
-		m_seedSize = 0;
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_blockCipher != 0)
-				delete m_blockCipher;
-			if (m_kdfEngine != 0)
-				delete m_kdfEngine;
-			if (m_providerSource != 0)
-				delete m_providerSource;
-		}
-
-		Utility::IntUtils::ClearVector(m_ctrVector);
-		Utility::IntUtils::ClearVector(m_kdfInfo);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-	}
-}
 
 size_t BCG::Generate(std::vector<byte> &Output)
 {
@@ -227,9 +251,13 @@ void BCG::Initialize(ISymmetricKey &GenParam)
 	if (GenParam.Nonce().size() != 0)
 	{
 		if (GenParam.Info().size() != 0)
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+		}
 		else
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce());
+		}
 	}
 	else
 	{
@@ -242,7 +270,9 @@ void BCG::Initialize(const std::vector<byte> &Seed)
 	if (!m_isInitialized)
 	{
 		if (!SymmetricKeySize::Contains(LegalKeySizes(), Seed.size() - BLOCK_SIZE, BLOCK_SIZE))
+		{
 			throw CryptoGeneratorException("BCG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+		}
 
 		m_seedSize = Seed.size();
 	}
@@ -262,10 +292,15 @@ void BCG::Initialize(const std::vector<byte> &Seed)
 void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Nonce)
 {
 	std::vector<byte> key(Seed.size() + Nonce.size());
+
 	if (Nonce.size() > 0)
+	{
 		Utility::MemUtils::Copy(Nonce, 0, key, 0, Nonce.size());
+	}
 	if (Seed.size() > 0)
+	{
 		Utility::MemUtils::Copy(Seed, 0, key, Nonce.size(), Seed.size());
+	}
 
 	Initialize(key);
 }
@@ -275,9 +310,14 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	std::vector<byte> key(Nonce.size() + Seed.size());
 
 	if (Nonce.size() > 0)
+	{
 		Utility::MemUtils::Copy(Nonce, 0, key, 0, Nonce.size());
+	}
+
 	if (Seed.size() > 0)
+	{
 		Utility::MemUtils::Copy(Seed, 0, key, Nonce.size(), Seed.size());
+	}
 
 	if (Info.size() > 0)
 	{
@@ -309,12 +349,9 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 void BCG::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree % 2 != 0)
-		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
@@ -322,7 +359,9 @@ void BCG::ParallelMaxDegree(size_t Degree)
 void BCG::Update(const std::vector<byte> &Seed)
 {
 	if (Seed.size() != m_seedSize)
+	{
 		throw CryptoGeneratorException("BCG::Update", "Update seed size must be equal to seed size used to initialize the generator!");
+	}
 
 	Initialize(Seed);
 }
@@ -337,7 +376,7 @@ void BCG::Derive(std::vector<byte> &Seed)
 	// pull the rand from provider
 	m_providerSource->GetBytes(salt);
 	// extract the new key+counter
-	Kdf::KDF2 kdf(m_kdfEngine);
+	Kdf::KDF2 kdf(m_kdfEngine.get());
 	kdf.Initialize(Seed, salt);
 	std::vector<byte> tmpK(m_seedSize);
 	kdf.Generate(tmpK);
@@ -369,7 +408,9 @@ void BCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 			this->Transform(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
+			{
 				Utility::MemUtils::Copy(thdCtr, 0, tmpCtr, 0, tmpCtr.size());
+			}
 		});
 
 		// copy last counter to class variable

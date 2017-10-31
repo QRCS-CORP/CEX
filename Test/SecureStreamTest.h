@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_SECURESTREAMTEST_H
-#define _CEXTEST_SECURESTREAMTEST_H
+#ifndef CEXTEST_SECURESTREAMTEST_H
+#define CEXTEST_SECURESTREAMTEST_H
 
 #include "ITest.h"
 #include "../CEX/MemoryStream.h"

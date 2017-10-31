@@ -24,21 +24,37 @@ using Key::Symmetric::SymmetricKeySize;
 class IDrbg
 {
 public:
+
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// Instantiate the class and internal state
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IDrbg() {}
+	IDrbg(const IDrbg&) = delete;
 
 	/// <summary>
-	/// Finalize objects
+	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	virtual ~IDrbg() noexcept {}
+	IDrbg& operator=(const IDrbg&) = delete;
 
-	//~~~Properties~~~//
 	/// <summary>
-	/// Get/Set: Reads or Sets the personalization string value in the KDF initialization parameters.
+	/// Constructor: instantiate this class
+	/// </summary>
+	IDrbg() 
+	{
+	}
+
+	/// <summary>
+	/// Destructor: finalize this class
+	/// </summary>
+	virtual ~IDrbg() noexcept 
+	{
+	}
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters.
 	/// <para>Must be set before <see cref="Initialize(ISymmetricKey)"/> is called.
 	/// Changing this code will create a unique distribution of the generator.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
@@ -47,39 +63,39 @@ public:
 	virtual std::vector<byte> &DistributionCode() = 0;
 
 	/// <summary>
-	/// Get: The maximum size of the distribution code in bytes.
+	/// Read Only: The maximum size of the distribution code in bytes.
 	/// <para>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase.
 	/// For best security, the distribution code should be random, secret, and equal in size to this value.</para>
 	/// </summary>
 	virtual const size_t DistributionCodeMax() = 0;
 
 	/// <summary>
-	/// Get: The Drbg generators type name
+	/// Read Only: The Drbg generators type name
 	/// </summary>
 	virtual const Drbgs Enumeral() = 0;
 
 	/// <summary>
-	/// Get: Generator is ready to produce random
+	/// Read Only: Generator is ready to produce random
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: List of available legal key sizes
+	/// Read Only: List of available legal key sizes
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
 
 	/// <summary>
-	/// Get: The maximum number of bytes that can be generated with a generator instance
+	/// Read Only: The maximum number of bytes that can be generated with a generator instance
 	/// </summary>
 	virtual const ulong MaxOutputSize() = 0;
 
 	/// <summary>
-	/// Get: The maximum number of bytes that can be generated in a single request
+	/// Read Only: The maximum number of bytes that can be generated in a single request
 	/// </summary>
 	virtual const size_t MaxRequestSize() = 0;
 
 	/// <summary>
-	/// Get: The maximum number of times the generator can be reseeded
+	/// Read Only: The maximum number of times the generator can be reseeded
 	/// </summary>
 	virtual const size_t MaxReseedCount() = 0;
 
@@ -89,26 +105,21 @@ public:
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: The size of the nonce counter value in bytes
+	/// Read Only: The size of the nonce counter value in bytes
 	/// </summary>
 	virtual const size_t NonceSize() = 0;
 
 	/// <summary>
-	/// Get/Set: The maximum output generated between seed recycling
+	/// Read/Write: The maximum output generated between seed recycling
 	/// </summary>
 	virtual size_t &ReseedThreshold() = 0;
 
 	/// <summary>
-	/// Get: The security strength in bits
+	/// Read Only: The security strength in bits
 	/// </summary>
 	virtual const size_t SecurityStrength() = 0;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes

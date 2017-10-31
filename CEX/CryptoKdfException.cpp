@@ -2,21 +2,6 @@
 
 NAMESPACE_EXCEPTION
 
-std::string &CryptoKdfException::Details() 
-{ 
-	return m_details; 
-}
-
-std::string &CryptoKdfException::Message() 
-{
-	return m_message; 
-}
-
-std::string &CryptoKdfException::Origin() 
-{ 
-	return m_origin;
-}
-
 CryptoKdfException::CryptoKdfException(const std::string &Message)
 	:
 	m_details(""),
@@ -39,6 +24,28 @@ CryptoKdfException::CryptoKdfException(const std::string &Origin, const std::str
 	m_message(Message),
 	m_origin(Origin)
 {
+}
+
+CryptoKdfException::~CryptoKdfException()
+{
+	m_details.clear();
+	m_message.clear();
+	m_origin.clear();
+}
+
+std::string &CryptoKdfException::Details() 
+{ 
+	return m_details; 
+}
+
+std::string &CryptoKdfException::Message() 
+{
+	return m_message; 
+}
+
+std::string &CryptoKdfException::Origin() 
+{ 
+	return m_origin;
 }
 
 NAMESPACE_EXCEPTIONEND

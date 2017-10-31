@@ -1,5 +1,5 @@
-﻿#ifndef _CEXTEST_SALSATEST_H
-#define _CEXTEST_SALSATEST_H
+﻿#ifndef CEXTEST_SALSATEST_H
+#define CEXTEST_SALSATEST_H
 
 #include "ITest.h"
 

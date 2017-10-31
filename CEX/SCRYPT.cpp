@@ -11,7 +11,86 @@ NAMESPACE_KDF
 
 const std::string SCRYPT::CLASS_NAME("SCRYPT");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+SCRYPT::SCRYPT(Digests DigestType, size_t CpuCost, size_t Parallelization)
+	:
+	m_destroyEngine(true),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfDigest(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) :
+		throw CryptoKdfException("SCRYPT:CTor", "Digest type can not be none!")),
+	m_kdfDigestType(DigestType),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0),
+	m_parallelProfile(64, true, 2048, true),
+	m_scryptParameters(CpuCost, Parallelization)
+{
+	if (CpuCost < 1024 || CpuCost % 1024 != 0)
+	{
+		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be greater than 1024 divisible by 1024!");
+	}
+
+	Scope();
+}
+
+SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
+	:
+	m_destroyEngine(false),
+	m_isDestroyed(false),
+	m_isInitialized(false),
+	m_kdfDigest(Digest != nullptr ? Digest :
+		throw CryptoKdfException("SCRYPT:CTor", "Digest instance can not be null!")),
+	m_kdfDigestType(m_kdfDigest->Enumeral()),
+	m_kdfKey(0),
+	m_kdfSalt(0),
+	m_legalKeySizes(0),
+	m_parallelProfile(64, true, 2048, true),
+	m_scryptParameters(CpuCost, Parallelization)
+{
+	if (CpuCost < 1024 || CpuCost % 1024 != 0)
+	{
+		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be greater than 1024 divisible by 1024!");
+	}
+
+	Scope();
+}
+
+SCRYPT::~SCRYPT()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_isInitialized = false;
+		m_kdfDigestType = Digests::None;
+		m_parallelProfile.Reset();
+		m_scryptParameters.Reset();
+
+		Utility::IntUtils::ClearVector(m_kdfKey);
+		Utility::IntUtils::ClearVector(m_kdfSalt);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_kdfDigest != nullptr)
+			{
+				m_kdfDigest.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_kdfDigest != nullptr)
+			{
+				m_kdfDigest.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 const Kdfs SCRYPT::Enumeral()
 {
@@ -48,68 +127,7 @@ ParallelOptions &SCRYPT::ParallelProfile()
 	return m_parallelProfile;
 }
 
-//~~~Constructor~~~//
-
-SCRYPT::SCRYPT(Digests DigestType, size_t CpuCost, size_t Parallelization)
-	:
-	m_destroyEngine(true),
-	m_isDestroyed(false),
-	m_kdfDigest(Helper::DigestFromName::GetInstance(DigestType)),
-	m_kdfDigestType(DigestType),
-	m_parallelProfile(64, true, 2048, true),
-	m_scryptParameters(CpuCost, Parallelization)
-{
-	if (CpuCost < 1024 || CpuCost % 1024 != 0)
-		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be greater than 1024 divisible by 1024!");
-
-	Scope();
-}
-
-SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
-	:
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_kdfDigest(Digest),
-	m_kdfDigestType(m_kdfDigest->Enumeral()),
-	m_parallelProfile(64, true, 2048, true),
-	m_scryptParameters(CpuCost, Parallelization)
-{
-	if (CpuCost < 1024 || CpuCost % 1024 != 0)
-		throw CryptoKdfException("SCRYPT:Ctor", "The cpu cost must be greater than 1024 divisible by 1024!");
-
-	Scope();
-}
-
-SCRYPT::~SCRYPT()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
-
-void SCRYPT::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_isInitialized = false;
-		m_kdfDigestType = Digests::None;
-		m_parallelProfile.Reset();
-		m_scryptParameters.Reset();
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_kdfDigest != 0)
-				delete m_kdfDigest;
-		}
-
-		Utility::IntUtils::ClearVector(m_kdfKey);
-		Utility::IntUtils::ClearVector(m_kdfSalt);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-	}
-}
 
 size_t SCRYPT::Generate(std::vector<byte> &Output)
 {
@@ -130,14 +148,20 @@ size_t SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 void SCRYPT::Initialize(ISymmetricKey &GenParam)
 {
 	if (GenParam.Key().size() < MIN_PASSLEN)
+	{
 		throw CryptoKdfException("SCRYPT:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+	}
 
 	if (GenParam.Nonce().size() != 0)
 	{
 		if (GenParam.Info().size() != 0)
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce(), GenParam.Info());
+		}
 		else
+		{
 			Initialize(GenParam.Key(), GenParam.Nonce());
+		}
 	}
 	else
 	{
@@ -148,10 +172,14 @@ void SCRYPT::Initialize(ISymmetricKey &GenParam)
 void SCRYPT::Initialize(const std::vector<byte> &Key)
 {
 	if (Key.size() < MIN_PASSLEN)
+	{
 		throw CryptoKdfException("SCRYPT:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+	}
 
 	if (m_isInitialized)
+	{
 		Reset();
+	}
 
 	m_kdfKey.resize(Key.size());
 	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
@@ -162,12 +190,18 @@ void SCRYPT::Initialize(const std::vector<byte> &Key)
 void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
 {
 	if (Key.size() < MIN_PASSLEN)
+	{
 		throw CryptoKdfException("SCRYPT:Initialize", "Key size is too small, must be a minumum of 4 bytes!");
+	}
 	if (Salt.size() < MIN_SALTLEN)
+	{
 		throw CryptoKdfException("SCRYPT:Initialize", "Salt size is too small, must be a minumum of 4 bytes!");
+	}
 
 	if (m_isInitialized)
+	{
 		Reset();
+	}
 
 	m_kdfKey.resize(Key.size());
 	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
@@ -180,21 +214,31 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
 {
 	if (Key.size() < MIN_PASSLEN)
+	{
 		throw CryptoKdfException("SCRYPT:Initialize", "Key size is too small, must be a minumum of 4 bytes!");
+	}
 	if (Salt.size() + Info.size() < MIN_SALTLEN)
+	{
 		throw CryptoKdfException("SCRYPT:Initialize", "Salt with info size is too small, combined must be a minumum of 4 bytes!");
+	}
 
 	if (m_isInitialized)
+	{
 		Reset();
+	}
 
 	m_kdfKey.resize(Key.size());
 	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
 	m_kdfSalt.resize(Salt.size() + Info.size());
 
 	if (Salt.size() > 0)
+	{
 		Utility::MemUtils::Copy(Salt, 0, m_kdfSalt, 0, m_kdfSalt.size());
+	}
 	if (Info.size() > 0)
+	{
 		Utility::MemUtils::Copy(Info, 0, m_kdfSalt, Salt.size(), Info.size());
+	}
 
 	m_isInitialized = true;
 }
@@ -202,10 +246,14 @@ void SCRYPT::Initialize(const std::vector<byte> &Key, const std::vector<byte> &S
 void SCRYPT::ReSeed(const std::vector<byte> &Seed)
 {
 	if (Seed.size() < MIN_PASSLEN)
+	{
 		throw CryptoKdfException("SCRYPT:ReSeed", "Seed can not be less than 4 bytes in length!");
+	}
 
 	if (Seed.size() > m_kdfSalt.size())
+	{
 		m_kdfSalt.resize(Seed.size());
+	}
 
 	Utility::MemUtils::Copy(Seed, 0, m_kdfSalt, 0, Seed.size());
 }
@@ -256,7 +304,9 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
 	{
 		for (size_t i = 0; i < 16; i++)
+		{
 			stateK[k * 16 + i] = Utility::IntUtils::LeBytesTo32(tmpK, (k * 16 + (i * 5 % 16)) * 4);
+		}
 	}
 #else
 	Utility::IntUtils::BlockToLe(tmpK, 0, stateK, 0, tmpK.size());
@@ -266,8 +316,10 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	{
 		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &stateK, PRLBLK, MFLWRD](size_t i)
 		{
-			for(size_t j = 0; j < PRLBLK; j += MFLWRD)
+			for (size_t j = 0; j < PRLBLK; j += MFLWRD)
+			{
 				SMix(stateK, (i * PRLBLK) + j, m_scryptParameters.CpuCost);
+			}
 		});
 
 		ttlOff = PRLBLK * m_parallelProfile.ParallelMaxDegree();
@@ -276,14 +328,18 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 	if (ttlOff != SKSZE)
 	{
 		for (size_t i = ttlOff; i < SKSZE; i += MFLWRD)
+		{
 			SMix(stateK, i, m_scryptParameters.CpuCost);
+		}
 	}
 
 #if defined(__AVX__)
 	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
 	{
 		for (size_t i = 0; i < 16; i++)
+		{
 			Utility::IntUtils::Le32ToBytes(stateK[k * 16 + i], tmpK, (k * 16 + (i * 5 % 16)) * 4);
+		}
 	}
 #else
 	Utility::IntUtils::LeToBlock(stateK, 0, tmpK, 0, tmpK.size());
@@ -296,7 +352,7 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 
 void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length)
 {
-	Kdf::PBKDF2 kdf(m_kdfDigest, 1);
+	Kdf::PBKDF2 kdf(m_kdfDigest.get(), 1);
 	kdf.Initialize(Key::Symmetric::SymmetricKey(Key, Salt));
 	kdf.Generate(Output, OutOffset, Length);
 }
@@ -478,7 +534,7 @@ void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)
 		BlockMix(X, Y);
 	}
 
-	const uint NMASK = (uint)N - 1;
+	const uint NMASK = static_cast<uint>(N - 1);
 	for (size_t i = 0; i < N; ++i)
 	{
 		uint j = X[bCount - 16] & NMASK;

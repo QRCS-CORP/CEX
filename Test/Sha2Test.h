@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_SHA2TEST_H
-#define _CEXTEST_SHA2TEST_H
+#ifndef CEXTEST_SHA2TEST_H
+#define CEXTEST_SHA2TEST_H
 
 #include "ITest.h"
 #include "../CEX/IDigest.h"
@@ -50,7 +50,7 @@ namespace Test
 		virtual std::string Run();
         
     private:
-		void CompareVector(Digest::IDigest *Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void CompareVector(Digest::IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);
 		void TreeParamsTest();

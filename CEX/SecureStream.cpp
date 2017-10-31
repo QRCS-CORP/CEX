@@ -10,43 +10,6 @@ NAMESPACE_IO
 
 const std::string SecureStream::CLASS_NAME("SecureStream");
 
-//~~~Properties~~~//
-
-const bool SecureStream::CanRead() 
-{ 
-	return true; 
-}
-
-const bool SecureStream::CanSeek() 
-{ 
-	return true; 
-}
-
-const bool SecureStream::CanWrite() 
-{ 
-	return true; 
-}
-
-const StreamModes SecureStream::Enumeral() 
-{ 
-	return StreamModes::SecureStream; 
-}
-
-const ulong SecureStream::Length() 
-{ 
-	return static_cast<ulong>(m_streamData.size());
-}
-
-const std::string SecureStream::Name()
-{
-	return CLASS_NAME;
-}
-
-const ulong SecureStream::Position() 
-{ 
-	return m_streamPosition; 
-}
-
 //~~~Constructor~~~//
 
 SecureStream::SecureStream()
@@ -116,6 +79,43 @@ SecureStream::~SecureStream()
 	Destroy();
 }
 
+//~~~Accessors~~~//
+
+const bool SecureStream::CanRead() 
+{ 
+	return true; 
+}
+
+const bool SecureStream::CanSeek() 
+{ 
+	return true; 
+}
+
+const bool SecureStream::CanWrite() 
+{ 
+	return true; 
+}
+
+const StreamModes SecureStream::Enumeral() 
+{ 
+	return StreamModes::SecureStream; 
+}
+
+const ulong SecureStream::Length() 
+{ 
+	return static_cast<ulong>(m_streamData.size());
+}
+
+const std::string SecureStream::Name()
+{
+	return CLASS_NAME;
+}
+
+const ulong SecureStream::Position() 
+{ 
+	return m_streamPosition; 
+}
+
 //~~~Public Functions~~~//
 
 void SecureStream::Close()
@@ -144,7 +144,9 @@ void SecureStream::Destroy()
 size_t SecureStream::Read(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	if (Offset + Length > m_streamData.size() - m_streamPosition)
+	{
 		Length = m_streamData.size() - m_streamPosition;
+	}
 
 	if (Length > 0)
 	{
@@ -180,11 +182,17 @@ void SecureStream::Reset()
 void SecureStream::Seek(ulong Offset, SeekOrigin Origin)
 {
 	if (Origin == SeekOrigin::Begin)
+	{
 		m_streamPosition = Offset;
+	}
 	else if (Origin == SeekOrigin::End)
+	{
 		m_streamPosition = m_streamData.size() - Offset;
+	}
 	else
+	{
 		m_streamPosition += Offset;
+	}
 }
 
 void SecureStream::SetLength(ulong Length)
@@ -195,7 +203,9 @@ void SecureStream::SetLength(ulong Length)
 std::vector<byte> SecureStream::ToArray()
 {
 	if (m_streamData.size() == 0)
+	{
 		return std::vector<byte>(0);
+	}
 
 	Transform();
 	std::vector<byte> tmp = m_streamData;
@@ -210,9 +220,13 @@ void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 
 	size_t len = m_streamPosition + Length;
 	if (m_streamData.capacity() - m_streamPosition < Length)
+	{
 		m_streamData.reserve(len);
+	}
 	if (m_streamData.size() < len)
+	{
 		m_streamData.resize(len);
+	}
 
 	Transform();
 	Utility::MemUtils::Copy(Input, Offset, m_streamData, m_streamPosition, Length);
@@ -223,7 +237,9 @@ void SecureStream::Write(const std::vector<byte> &Input, size_t Offset, size_t L
 void SecureStream::WriteByte(byte Value)
 {
 	if (m_streamData.size() - m_streamPosition < 1)
+	{
 		m_streamData.resize(m_streamData.size() + 1);
+	}
 
 	Transform();
 	Utility::MemUtils::CopyFromValue(Value, m_streamData, m_streamPosition, 1);
@@ -243,7 +259,9 @@ std::vector<byte> SecureStream::GetSystemKey()
 	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserName(), state);
 
 	if (m_keySalt.size() != 0)
+	{
 		Utility::ArrayUtils::Append(m_keySalt, state);
+	}
 
 	Digest::SHA512 dgt;
 	std::vector<byte> hash(dgt.DigestSize());
@@ -254,23 +272,23 @@ std::vector<byte> SecureStream::GetSystemKey()
 
 void SecureStream::Transform()
 {
-	if (m_streamData.size() == 0)
-		return;
+	if (m_streamData.size() != 0)
+	{
+		std::vector<byte> seed = GetSystemKey();
+		std::vector<byte> key(32);
+		std::vector<byte> iv(16);
 
-	std::vector<byte> seed = GetSystemKey();
-	std::vector<byte> key(32);
-	std::vector<byte> iv(16);
+		Utility::MemUtils::Copy(seed, 0, key, 0, key.size());
+		Utility::MemUtils::Copy(seed, key.size(), iv, 0, iv.size());
+		Key::Symmetric::SymmetricKey kp(key, iv);
 
-	Utility::MemUtils::Copy(seed, 0, key, 0, key.size());
-	Utility::MemUtils::Copy(seed, key.size(), iv, 0, iv.size());
-	Key::Symmetric::SymmetricKey kp(key, iv);
-
-	// AES256-CTR
-	Cipher::Symmetric::Block::Mode::CTR cpr(Enumeration::BlockCiphers::Rijndael);
-	cpr.Initialize(true, kp);
-	std::vector<byte> state(m_streamData.size());
-	cpr.Transform(m_streamData, 0, state, 0, state.size());
-	m_streamData = state;
+		// AES256-CTR
+		Cipher::Symmetric::Block::Mode::CTR cpr(Enumeration::BlockCiphers::Rijndael);
+		cpr.Initialize(true, kp);
+		std::vector<byte> state(m_streamData.size());
+		cpr.Transform(m_streamData, 0, state, 0, state.size());
+		m_streamData = state;
+	}
 }
 
 NAMESPACE_IOEND

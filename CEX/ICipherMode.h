@@ -45,78 +45,89 @@ class ICipherMode
 {
 public:
 
-	ICipherMode(const ICipherMode&) = delete;
-	ICipherMode& operator=(const ICipherMode&) = delete;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ICipherMode(const ICipherMode&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ICipherMode& operator=(const ICipherMode&) = delete;
 
 	/// <summary>
 	/// Initialize the ICipherMode virtual interface class
 	/// </summary>
-	ICipherMode() {}
+	ICipherMode() 
+	{
+	}
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
-	virtual ~ICipherMode() noexcept {}
+	virtual ~ICipherMode() noexcept 
+	{
+	}
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Get: Block size of internal cipher in bytes
+	/// Read Only: Block size of internal cipher in bytes
 	/// </summary>
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Get: The block ciphers formal type name
+	/// Read Only: The block ciphers formal type name
 	/// </summary>
 	virtual const BlockCiphers CipherType() = 0;
 
 	/// <summary>
-	/// Get: The underlying Block Cipher instance
+	/// Read Only: The underlying Block Cipher instance
 	/// </summary>
 	virtual IBlockCipher* Engine() = 0;
 
 	/// <summary>
-	/// Get: The Cipher Modes enumeration type name
+	/// Read Only: The Cipher Modes enumeration type name
 	/// </summary>
 	virtual const CipherModes Enumeral() = 0;
 
 	/// <summary>
-	/// Get: True if initialized for encryption, False for decryption
+	/// Read Only: True if initialized for encryption, False for decryption
 	/// </summary>
 	virtual const bool IsEncryption() = 0;
 
 	/// <summary>
-	/// Get: The Block Cipher is ready to transform data
+	/// Read Only: The Block Cipher is ready to transform data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Get: Processor parallelization availability.
+	/// Read Only: Processor parallelization availability.
 	/// <para>Indicates whether parallel processing is available with this mode.
 	/// If parallel capable, input/output data arrays passed to the transform must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	virtual const bool IsParallel() = 0;
 
 	/// <summary>
-	/// Get: Array of allowed cipher input key byte-sizes
+	/// Read Only: Array of allowed cipher input key byte-sizes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
 
 	/// <summary>
-	/// Get: The cipher mode name
+	/// Read Only: The cipher mode name
 	/// </summary>
 	virtual const std::string Name() = 0;
 
 	/// <summary>
-	/// Get: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
-	/// <para>This value can be changed through the ParallelProfile class.<para>
+	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	virtual const size_t ParallelBlockSize() = 0;
 
 	/// <summary>
-	/// Get/Set: Parallel and SIMD capability flags and sizes 
+	/// Read/Write: Parallel and SIMD capability flags and sizes 
 	/// <para>The maximum number of threads allocated when using multi-threaded processing can be set with the ParallelMaxDegree() property.
 	/// The ParallelBlockSize() property is auto-calculated, but can be changed; the value must be evenly divisible by ParallelMinimumSize().
 	/// Changes to these values must be made before the <see cref="Initialize(SymmetricKey)"/> function is called.</para>
@@ -168,11 +179,6 @@ public:
 	/// <param name="Output">The output array of encrypted bytes</param>
 	/// <param name="OutOffset">Starting offset within the output array</param>
 	virtual void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) = 0;
-
-	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
-	/// </summary>
-	virtual void Destroy() = 0;
 
 	/// <summary>
 	/// Initialize the Cipher instance

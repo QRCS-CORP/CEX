@@ -7,6 +7,7 @@
 
 NAMESPACE_HELPER
 
+using Exception::CryptoException;
 using Provider::IProvider;
 using Enumeration::Providers;
 
@@ -16,6 +17,7 @@ using Enumeration::Providers;
 class ProviderFromName
 {
 public:
+
 	/// <summary>
 	/// Get a Seed Generator instance with default initialization parameters
 	/// </summary>

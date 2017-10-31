@@ -12,39 +12,45 @@ class TBC final : public IPadding
 {
 private:
 
-	TBC(const TBC&) = delete;
-	TBC& operator=(const TBC&) = delete;
-	TBC& operator=(TBC&&) = delete;
-
 	static const std::string CLASS_NAME;
-	static const byte MKCODE = (byte)0xFF;
-	static const byte ZBCODE = (byte)0x00;
+	static const byte MKCODE = 0xFF;
+	static const byte ZBCODE = 0x00;
 
 public:
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The padding modes type name
-	/// </summary>
-	const PaddingModes Enumeral() override;
-
-	/// <summary>
-	/// Get: The padding modes class name
-	/// </summary>
-	const std::string Name() override;
 
 	//~~~Constructor~~~//
 
 	/// <summary>
-	/// CTor: Instantiate this class
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	TBC(const TBC&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	TBC& operator=(const TBC&) = delete;
+
+	/// <summary>
+	/// Constructor: Instantiate this class
 	/// </summary>
 	TBC();
 
 	/// <summary>
-	/// Destructor
+	/// Destructor: finalize this class: finalize this class
 	/// </summary>
 	~TBC() override;
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The padding modes type name
+	/// </summary>
+	const PaddingModes Enumeral() override;
+
+	/// <summary>
+	/// Read Only: The padding modes class name
+	/// </summary>
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
 

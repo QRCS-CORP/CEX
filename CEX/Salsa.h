@@ -29,11 +29,9 @@ NAMESPACE_STREAM
 */
 class Salsa
 {
-private:
-
 public:
 
-	static void SalsaTransform512(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
+	static void Transform(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
 		size_t ctr = 0;
 		uint X0 = State[ctr];
@@ -52,8 +50,8 @@ public:
 		uint X13 = State[++ctr];
 		uint X14 = State[++ctr];
 		uint X15 = State[++ctr];
-
 		ctr = Rounds;
+
 		while (ctr != 0)
 		{
 			X4 ^= Utility::IntUtils::RotFL32(X0 + X12, 7);
@@ -109,10 +107,11 @@ public:
 		Utility::IntUtils::Le32ToBytes(X15 + State[++ctr], Output, OutOffset);
 	}
 
-	template<class T>
-	static void SalsaTransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
-	{
 #if defined(__AVX__)
+
+	template<class T>
+	static void TransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
+	{
 
 		size_t ctr = 0;
 		T X0(State[ctr]);
@@ -201,8 +200,10 @@ public:
 		X15 += T(State[++ctr]);
 
 		T::Store16(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
-#endif
+
 	}
+
+#endif
 };
 
 NAMESPACE_STREAMEND

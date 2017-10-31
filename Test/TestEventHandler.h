@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_TESTEVENTHANDLER_H
-#define _CEXTEST_TESTEVENTHANDLER_H
+#ifndef CEXTEST_TESTEVENTHANDLER_H
+#define CEXTEST_TESTEVENTHANDLER_H
 
 #include "TestEvent.h"
 #include "ConsoleUtils.h"

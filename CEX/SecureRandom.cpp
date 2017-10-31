@@ -7,101 +7,106 @@
 
 NAMESPACE_PRNG
 
+// TODO: needs review and uniform-distribution testing
+
 //~~~Constructor~~~//
 
-SecureRandom::SecureRandom(Prngs EngineType, Providers ProviderType, Digests DigestType)
+SecureRandom::SecureRandom(Prngs EngineType, Providers ProviderType, Digests DigestType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BUFFER_SIZE),
-	m_rndBuffer(BUFFER_SIZE),
-	m_digestType(DigestType),
+	m_bufferSize(BufferSize < 32 ? DEF_BUFSZE : BufferSize),
+	m_digestType((DigestType == Digests::None && EngineType != Prngs::BCR) ? Digests::SHA256 :
+	DigestType),
 	m_isDestroyed(false),
-	m_prngEngineType(EngineType),
-	m_providerType(ProviderType)
+	m_providerType(ProviderType != Providers::None ? ProviderType : 
+		throw CryptoRandomException("SecureRandom:CTor", "The provider type can not be none!")),
+	m_rndBuffer(m_bufferSize),
+	m_rndEngineType(EngineType != Prngs::None ? EngineType :
+		throw CryptoRandomException("SecureRandom:CTor", "The engine type can not be none!")),
+	m_rngEngine(Helper::PrngFromName::GetInstance(m_rndEngineType, m_providerType, m_digestType))
 {
 	Reset();
 }
 
 SecureRandom::~SecureRandom()
 {
-	Destroy();
-}
-
-//~~~Public Functions~~~//
-
-void SecureRandom::Destroy()
-{
 	if (!m_isDestroyed)
 	{
-		m_isDestroyed = true;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
 		m_digestType = Digests::None;
-		m_prngEngineType = Prngs::None;
+		m_isDestroyed = true;
 		m_providerType = Providers::None;
+		m_rndEngineType = Prngs::None;
 
 		Utility::IntUtils::ClearVector(m_rndBuffer);
 
-		if (m_prngEngine != 0)
-			delete m_prngEngine;
+		if (m_rngEngine != nullptr)
+		{
+			m_rngEngine.reset(nullptr);
+		}
 	}
 }
+
+//~~~Public Functions~~~//
 
 void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
-	size_t bufLen = Elements * sizeof(ushort);
-	std::vector<byte> buf(bufLen);
+	const size_t BUFLEN = Elements * sizeof(ushort);
+	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
-	size_t bufLen = Elements * sizeof(uint);
-	std::vector<byte> buf(bufLen);
+	const size_t BUFLEN = Elements * sizeof(uint);
+	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 void SecureRandom::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
-	size_t bufLen = Elements * sizeof(ulong);
-	std::vector<byte> buf(bufLen);
+	const size_t BUFLEN = Elements * sizeof(ulong);
+	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
 std::vector<byte> SecureRandom::GetBytes(size_t Size)
 {
-	std::vector<byte> data(Size);
-	GetBytes(data);
-	return data;
+	std::vector<byte> buf(Size);
+	GetBytes(buf);
+
+	return buf;
 }
 
 void SecureRandom::GetBytes(std::vector<byte> &Output)
 {
-	if (Output.size() == 0)
-		throw CryptoRandomException("SecureRandom:GetBytes", "Buffer size must be at least 1 byte!");
+	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
 
 	if (m_rndBuffer.size() - m_bufferIndex < Output.size())
 	{
 		size_t bufSize = m_rndBuffer.size() - m_bufferIndex;
 		// copy remaining bytes
 		if (bufSize != 0)
+		{
 			Utility::MemUtils::Copy(m_rndBuffer, m_bufferIndex, Output, 0, bufSize);
+		}
 
 		size_t rmd = Output.size() - bufSize;
 
 		while (rmd > 0)
 		{
 			// fill buffer
-			m_prngEngine->GetBytes(m_rndBuffer);
+			m_rngEngine->GetBytes(m_rndBuffer);
 
 			if (rmd > m_rndBuffer.size())
 			{
@@ -142,226 +147,276 @@ double SecureRandom::NextDouble()
 
 short SecureRandom::NextInt16()
 {
-	return static_cast<short>(Utility::IntUtils::LeBytesTo16(GetBytes(2), 0));
+	short x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(short)), 0, x, sizeof(short));
+
+	return x;
 }
 
 short SecureRandom::NextInt16(short Maximum)
 {
-	short num;
+	const short SMPMAX = static_cast<short>(std::numeric_limits<short>::max() - (std::numeric_limits<short>::max() % Maximum));
+	short x;
+	short ret;
 
 	do
 	{
-		num = (short)GetRanged(Maximum, sizeof(short));
+		x = NextInt16();
+		ret = x % Maximum;
 	} 
-	while (num > Maximum);
+	while (x >= SMPMAX);
 
-	return num;
+	return ret;
 }
 
 short SecureRandom::NextInt16(short Maximum, short Minimum)
 {
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
-	short num = 0;
-	while ((num = NextInt16(Maximum)) < Minimum) {}
-	return num;
+	const short SMPTHR = (Maximum - Minimum + 1);
+	const short SMPMAX = static_cast<short>(std::numeric_limits<short>::max() - (std::numeric_limits<short>::max() % SMPTHR));
+	short x;
+	short ret;
+
+	do
+	{
+		x = NextInt16();
+		ret = x % SMPTHR;
+	}
+	while (x >= SMPMAX);
+
+	return Minimum + ret;
 }
 
 ushort SecureRandom::NextUInt16()
 {
-	return Utility::IntUtils::LeBytesTo16(GetBytes(2), 0);
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ushort)), 0, x, sizeof(ushort));
+
+	return x;
 }
 
 ushort SecureRandom::NextUInt16(ushort Maximum)
 {
 	CexAssert(Maximum != 0, "maximum can not be zero");
 
-	ushort num;
+	const ushort SMPMAX = static_cast<ushort>(std::numeric_limits<ushort>::max() - (std::numeric_limits<ushort>::max() % Maximum));
+	ushort x;
+	ushort ret;
 
 	do
 	{
-		num = (ushort)GetRanged(Maximum, sizeof(ushort));
+		x = NextUInt16();
+		ret = x % Maximum;
 	} 
-	while (num > Maximum);
+	while (x >= SMPMAX);
 
-	return num;
+	return ret;
 }
 
 ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 {
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
-	ushort num = 0;
-	while ((num = NextUInt16(Maximum)) < Minimum) {}
-	return num;
-}
+	const ushort SMPTHR = (Maximum - Minimum + 1);
+	const ushort SMPMAX = static_cast<ushort>(std::numeric_limits<ushort>::max() - (std::numeric_limits<ushort>::max() % SMPTHR));
+	ushort x;
+	ushort ret;
 
-int SecureRandom::Next()
-{
-	return static_cast<int>(Utility::IntUtils::LeBytesTo32(GetBytes(4), 0));
+	do
+	{
+		x = NextUInt16();
+		ret = x % SMPTHR;
+	} 
+	while (x >= SMPMAX);
+
+	return Minimum + ret;
 }
 
 int SecureRandom::NextInt32()
 {
-	return static_cast<int>(Utility::IntUtils::LeBytesTo32(GetBytes(4), 0));
+	int x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(int)), 0, x, sizeof(int));
+
+	return x;
 }
 
 int SecureRandom::NextInt32(int Maximum)
 {
-	int num;
+	CexAssert(Maximum != 0, "maximum can not be zero");
+
+	const int SMPMAX = static_cast<int>(std::numeric_limits<int>::max() - (std::numeric_limits<int>::max() % Maximum));
+	int x;
+	int ret;
 
 	do
 	{
-		num = (int)GetRanged(Maximum, sizeof(int));
+		x = NextInt32();
+		ret = x % Maximum;
 	} 
-	while (num > Maximum);
+	while (x >= SMPMAX);
 
-	return num;
+	return ret;
 }
 
 int SecureRandom::NextInt32(int Maximum, int Minimum)
 {
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
-	int num = 0;
-	while ((num = NextInt32(Maximum)) < Minimum) {}
-	return num;
+	const int SMPTHR = (Maximum - Minimum + 1);
+	const int SMPMAX = static_cast<int>(std::numeric_limits<int>::max() - (std::numeric_limits<int>::max() % SMPTHR));
+	int x;
+	int ret;
+
+	do
+	{
+		x = NextInt32();
+		ret = x % SMPTHR;
+	} 
+	while (x >= SMPMAX);
+
+	return Minimum + ret;
 }
 
 uint SecureRandom::NextUInt32()
 {
-	return Utility::IntUtils::LeBytesTo32(GetBytes(4), 0);
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(uint)), 0, x, sizeof(uint));
+
+	return x;
 }
 
 uint SecureRandom::NextUInt32(uint Maximum)
 {
 	CexAssert(Maximum != 0, "maximum can not be zero");
 
-	uint num;
+	const uint SMPMAX = static_cast<uint>(std::numeric_limits<uint>::max() - (std::numeric_limits<uint>::max() % Maximum));
+	uint x;
+	uint ret;
 
 	do
 	{
-		num = (uint)GetRanged(Maximum, sizeof(uint));
+		x = NextUInt32();
+		ret = x % Maximum;
 	} 
-	while (num > Maximum);
+	while (x >= SMPMAX);
 
-	return num;
+	return ret;
 }
 
 uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 {
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
-	uint num = 0;
-	while ((num = NextUInt32(Maximum)) < Minimum) {}
-	return num;
-}
+	const uint SMPTHR = (Maximum - Minimum + 1);
+	const uint SMPMAX = static_cast<uint>(std::numeric_limits<uint>::max() - (std::numeric_limits<uint>::max() % SMPTHR));
+	uint x;
+	uint ret;
 
-long SecureRandom::NextLong()
-{
-	return static_cast<long>(Utility::IntUtils::LeBytesTo64(GetBytes(8), 0));
+	do
+	{
+		x = NextUInt32();
+		ret = x % SMPTHR;
+	}
+	while (x >= SMPMAX);
+
+	return Minimum + ret;
 }
 
 long SecureRandom::NextInt64()
 {
-	return static_cast<long>(Utility::IntUtils::LeBytesTo64(GetBytes(8), 0));
+	long x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(long)), 0, x, sizeof(long));
+
+	return x;
 }
 
 long SecureRandom::NextInt64(long Maximum)
 {
-	long num;
+	CexAssert(Maximum != 0, "maximum can not be zero");
+
+	const long SMPMAX = static_cast<long>(std::numeric_limits<long>::max() - (std::numeric_limits<long>::max() % Maximum));
+	long x;
+	long ret;
 
 	do
 	{
-		num = (long)GetRanged(Maximum, sizeof(long));
+		x = NextInt64();
+		ret = x % Maximum;
 	} 
-	while (num > Maximum);
+	while (x >= SMPMAX);
 
-	return num;
+	return ret;
 }
 
 long SecureRandom::NextInt64(long Maximum, long Minimum)
 {
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
-	long num = 0;
-	while ((num = NextInt64(Maximum)) < Minimum) {}
-	return num;
+	const long SMPTHR = (Maximum - Minimum + 1);
+	const long SMPMAX = static_cast<long>(std::numeric_limits<long>::max() - (std::numeric_limits<long>::max() % SMPTHR));
+	long x;
+	long ret;
+
+	do
+	{
+		x = NextInt64();
+		ret = x % SMPTHR;
+	}
+	while (x >= SMPMAX);
+
+	return Minimum + ret;
 }
 
 ulong SecureRandom::NextUInt64()
 {
-	return Utility::IntUtils::LeBytesTo64(GetBytes(8), 0);
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ulong)), 0, x, sizeof(ulong));
+
+	return x;
 }
 
 ulong SecureRandom::NextUInt64(ulong Maximum)
 {
 	CexAssert(Maximum != 0, "maximum can not be zero");
 
-	ulong num;
+	const ulong SMPMAX = static_cast<ulong>(std::numeric_limits<ulong>::max() - (std::numeric_limits<ulong>::max() % Maximum));
+	ulong x;
+	ulong ret;
 
 	do
 	{
-		num = GetRanged(Maximum, sizeof(ulong));
-	} 
-	while (num > Maximum);
+		x = NextUInt64();
+		ret = x % Maximum;
+	}
+	while (x >= SMPMAX);
 
-	return num;
+	return ret;
 }
 
 ulong SecureRandom::NextUInt64(ulong Maximum, ulong Minimum)
 {
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
-	ulong num = 0;
-	while ((num = NextUInt64(Maximum)) < Minimum) {}
-	return num;
+	const ulong SMPTHR = (Maximum - Minimum + 1);
+	const ulong SMPMAX = (std::numeric_limits<ulong>::max() - (std::numeric_limits<ulong>::max() % SMPTHR));
+	ulong x;
+	ulong ret;
+
+	do
+	{
+		x = NextUInt64();
+		ret = x % SMPTHR;
+	} 
+	while (x >= SMPMAX);
+
+	return Minimum + ret;
 }
 
 void SecureRandom::Reset()
 {
-	if (m_digestType == Digests::None && m_prngEngineType != Prngs::BCR)
-		m_digestType = Digests::SHA256;
-
-	m_prngEngine = Helper::PrngFromName::GetInstance(m_prngEngineType, m_providerType, m_digestType);
-	m_prngEngine->GetBytes(m_rndBuffer);
+	m_rngEngine->GetBytes(m_rndBuffer);
 	m_bufferIndex = 0;
-}
-
-//~~~Private Functions~~~//
-
-ulong SecureRandom::GetRanged(ulong Maximum, size_t Length)
-{
-	std::vector<byte> rand;
-
-	if (Maximum < 256)
-		rand = GetBytes(1);
-	else if (Maximum < 65536)
-		rand = GetBytes(2);
-	else if (Maximum < 16777216)
-		rand = GetBytes(3);
-	else if (Maximum < 4294967296)
-		rand = GetBytes(4);
-	else if (Maximum < 1099511627776)
-		rand = GetBytes(5);
-	else if (Maximum < 281474976710656)
-		rand = GetBytes(6);
-	else if (Maximum < 72057594037927936)
-		rand = GetBytes(7);
-	else
-		rand = GetBytes(8);
-
-	ulong val = 0;
-	Utility::MemUtils::CopyToValue(rand, 0, val, rand.size());
-
-	ulong bits = Length * 8;
-	while (val > Maximum && bits != 0)
-	{
-		val >>= 1;
-		bits--;
-	}
-
-	return val;
 }
 
 NAMESPACE_PRNGEND

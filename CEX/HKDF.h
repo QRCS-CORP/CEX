@@ -107,7 +107,7 @@ using Mac::HMAC;
 /// <item><description><a href="http://tools.ietf.org/html/rfc5869">RFC 5869</a>: HMAC-based Extract-and-Expand Key Derivation Function.</description></item>
 /// </list>
 /// </remarks>
-class HKDF : public IKdf
+class HKDF final : public IKdf
 {
 private:
 
@@ -115,7 +115,7 @@ private:
 	static const size_t MIN_KEYLEN = 16;
 	static const size_t MIN_SALTLEN = 4;
 
-	HMAC* m_macGenerator;
+	std::unique_ptr<HMAC> m_macGenerator;
 	size_t m_blockSize;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
@@ -129,47 +129,22 @@ private:
 
 public:
 
-	HKDF() = delete;
-	HKDF(const HKDF&) = delete;
-	HKDF& operator=(const HKDF&) = delete;
-	HKDF& operator=(HKDF&&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// Get: The Kdf generators type name
-	/// </summary>
-	const Kdfs Enumeral() override;
-
-	/// <summary>
-	/// Get/Set: Sets the Info value in the HKDF initialization parameters.
-	/// <para>Must be set before Initialize() function is called.
-	/// Code should be either a zero byte array, or a multiple of the HKDF digest engines return size.</para>
-	/// </summary>
-	std::vector<byte> &Info();
-
-	/// <summary>
-	/// Get: Generator is ready to produce random
-	/// </summary>
-	const bool IsInitialized() override;
-
-	/// <summary>
-	/// Get: Available Kdf Key Sizes in bytes
-	/// </summary>
-	std::vector<SymmetricKeySize> LegalKeySizes() const override;
-
-	/// <summary>
-	/// Minimum recommended initialization key size in bytes.
-	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
-	/// </summary>
-	size_t MinKeySize() override;
-
-	/// <summary>
-	/// Get: The Kdf generators class name
-	/// </summary>
-	const std::string Name() override;
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	HKDF(const HKDF&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	HKDF& operator=(const HKDF&) = delete;
+
+	/// <summary>
+	/// Default constructor: default is restricted, this function has been deleted
+	/// </summary>
+	HKDF() = delete;
 
 	/// <summary>
 	/// Instantiates an HKDF generator using a message digest type name
@@ -199,16 +174,46 @@ public:
 	explicit HKDF(HMAC* Mac);
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	~HKDF() override;
 
-	//~~~Public Functions~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Release all resources associated with the object; optional, called by the finalizer
+	/// Read Only: The Kdf generators type name
 	/// </summary>
-	void Destroy() override;
+	const Kdfs Enumeral() override;
+
+	/// <summary>
+	/// Read/Write: Sets the Info value in the HKDF initialization parameters.
+	/// <para>Must be set before Initialize() function is called.
+	/// Code should be either a zero byte array, or a multiple of the HKDF digest engines return size.</para>
+	/// </summary>
+	std::vector<byte> &Info();
+
+	/// <summary>
+	/// Read Only: Generator is ready to produce random
+	/// </summary>
+	const bool IsInitialized() override;
+
+	/// <summary>
+	/// Read Only: Available Kdf Key Sizes in bytes
+	/// </summary>
+	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Minimum recommended initialization key size in bytes.
+	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
+	/// </summary>
+	size_t MinKeySize() override;
+
+	/// <summary>
+	/// Read Only: The Kdf generators class name
+	/// </summary>
+	const std::string Name() override;
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -217,6 +222,8 @@ public:
 	/// <param name="Output">Output array filled with random bytes</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
 	size_t Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
@@ -228,6 +235,8 @@ public:
 	/// <param name="Length">The number of bytes to generate</param>
 	/// 
 	/// <returns>The number of bytes generated</returns>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if more than 255 * HashLen bytes of output is requested</exception>
 	size_t Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length) override;
 
 	/// <summary>
@@ -236,6 +245,8 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="GenParam">The SymmetricKey containing the generators keying material</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
@@ -255,6 +266,8 @@ public:
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value containing an additional source of entropy</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
@@ -265,6 +278,8 @@ public:
 	/// <param name="Key">The primary key array used to seed the generator</param>
 	/// <param name="Salt">The salt value used as an additional source of entropy</param>
 	/// <param name="Info">The information string or nonce used as a third source of entropy</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
 
 	/// <summary>
@@ -273,7 +288,7 @@ public:
 	///
 	/// <param name="Seed">The new seed value array</param>
 	/// 
-	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is too small</exception>
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void ReSeed(const std::vector<byte> &Seed) override;
 
 	/// <summary>
@@ -282,6 +297,7 @@ public:
 	void Reset() override;
 
 private:
+
 	size_t Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, std::vector<byte> &Output);
 	void LoadState();

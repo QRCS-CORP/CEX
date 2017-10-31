@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_SCRYPTTESTTEST_H
-#define _CEXTEST_SCRYPTTESTTEST_H
+#ifndef CEXTEST_SCRYPTTESTTEST_H
+#define CEXTEST_SCRYPTTESTTEST_H
 
 #include "ITest.h"
 #include "../CEX/IDigest.h"

@@ -57,56 +57,17 @@ private:
 
 public:
 
-	MacDescription& operator=(const MacDescription&) = delete;
-
-	//~~~Properties~~~//
-
-	/// <summary>
-	/// The cipher internal Block Size
-	/// </summary>
-	const BlockSizes BlockSize();
-
-	/// <summary>
-	/// The symmetric block cipher Engine type
-	/// </summary>
-	const BlockCiphers EngineType();
-
-	/// <summary>
-	/// The HMAC Digest engine used to authenticate a message file encrypted with this key
-	/// </summary>
-	const Digests HmacEngine();
-
-	/// <summary>
-	/// Size of the cipher Initialization Vector
-	/// </summary>
-	const IVSizes IvSize();
-
-	/// <summary>
-	/// The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
-	/// </summary>
-	const Digests KdfEngine();
-
-	/// <summary>
-	/// The cipher Key Size
-	/// </summary>
-	const short KeySize();
-
-	/// <summary>
-	/// The type of Mac engine to use; CMac, Hmac, or Vmac.
-	/// </summary>
-	const Macs MacType();
-
-	/// <summary>
-	/// The number of cipher transformation Rounds
-	/// </summary>
-	const RoundCounts RoundCount();
-
 	//~~~Constructor~~~//
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	MacDescription& operator=(const MacDescription&) = delete;
 
 	/// <summary>
 	/// Default constructor
 	/// </summary>
-	explicit MacDescription();
+	MacDescription();
 
 	/// <summary>
 	/// Initialize the structure with parameters for any supported type of Mac generator
@@ -119,9 +80,9 @@ public:
 	/// <param name="EngineType">The symmetric block cipher Engine type</param>
 	/// <param name="BlockSize">The cipher Block Size</param>
 	/// <param name="RoundCount">The number of transformation Rounds</param>
-	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	explicit MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
-		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512);
+	/// <param name="DigestType">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
+	MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
+		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests DigestType = Digests::SHA512);
 
 	/// <summary>
 	/// Initialize the structure with parameters for an HMAC generator
@@ -129,7 +90,7 @@ public:
 	/// 
 	/// <param name="KeySize">The Mac key size in bytes</param>
 	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
-	explicit MacDescription(uint KeySize, Digests HmacEngine);
+	MacDescription(uint KeySize, Digests HmacEngine);
 
 	/// <summary>
 	/// Initialize the structure with parameters for an CMAC generator
@@ -140,23 +101,65 @@ public:
 	/// <param name="IvSize">Size of the cipher Initialization Vector</param>
 	/// <param name="BlockSize">The cipher Block Size</param>
 	/// <param name="RoundCount">The number of transformation Rounds</param>
-	/// <param name="KdfEngine">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	explicit MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
-		RoundCounts RoundCount = RoundCounts::R14, Digests KdfEngine = Digests::SHA512);
+	/// <param name="DigestType">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
+	MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
+		RoundCounts RoundCount = RoundCounts::R14, Digests DigestType = Digests::SHA512);
 
 	/// <summary>
-	/// Initialize the MacDescription structure using a Stream
+	/// Initialize the MacDescription structure using a serialized mac description stream
 	/// </summary>
 	/// 
 	/// <param name="DescriptionStream">The Stream containing the MacDescription</param>
 	explicit MacDescription(const MemoryStream &DescriptionStream);
 
 	/// <summary>
-	/// Initialize the MacDescription structure using a byte array
+	/// Initialize the MacDescription structure using a serialized mac description array
 	/// </summary>
 	/// 
 	/// <param name="DescriptionArray">The byte array containing the MacDescription</param>
 	explicit MacDescription(const std::vector<byte> &DescriptionArray);
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read Only: The cipher internal Block Size
+	/// </summary>
+	const BlockSizes BlockSize();
+
+	/// <summary>
+	/// Read Only: The symmetric block cipher Engine type
+	/// </summary>
+	const BlockCiphers EngineType();
+
+	/// <summary>
+	/// Read Only: The HMAC Digest engine used to authenticate a message file encrypted with this key
+	/// </summary>
+	const Digests HmacEngine();
+
+	/// <summary>
+	/// Read Only: Size of the cipher Initialization Vector
+	/// </summary>
+	const IVSizes IvSize();
+
+	/// <summary>
+	/// Read Only: The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
+	/// </summary>
+	const Digests KdfEngine();
+
+	/// <summary>
+	/// Read Only: The cipher Key Size
+	/// </summary>
+	const short KeySize();
+
+	/// <summary>
+	/// Read Only: The type of Mac engine to use; CMac, Hmac, or Vmac.
+	/// </summary>
+	const Macs MacType();
+
+	/// <summary>
+	/// Read Only: The number of cipher transformation Rounds
+	/// </summary>
+	const RoundCounts RoundCount();
 
 	//~~~Presets~~~//
 

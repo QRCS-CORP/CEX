@@ -22,34 +22,44 @@ public:
 	//~~~Constructor~~~//
 
 	/// <summary>
+	/// Copy constructor: copy is restricted, this function has been deleted
+	/// </summary>
+	ISymmetricKey(const ISymmetricKey&) = delete;
+
+	/// <summary>
+	/// Copy operator: copy is restricted, this function has been deleted
+	/// </summary>
+	ISymmetricKey& operator=(const ISymmetricKey&) = delete;
+
+	/// <summary>
 	/// Initialize the ISymmetricKey virtual interface class
 	/// </summary>
 	ISymmetricKey() {}
 
 	/// <summary>
-	/// Finalize objects
+	/// Destructor: finalize this class
 	/// </summary>
 	virtual ~ISymmetricKey() noexcept {}
 
-	//~~~Properties~~~//
+	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Get: The primary key
+	/// Read Only: The primary key
 	/// </summary>
 	virtual const std::vector<byte> Key() = 0;
 
 	/// <summary>
-	/// Get: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
+	/// Read Only: The SymmetricKeySize containing the byte sizes of the key, nonce, and info state members
 	/// </summary>
 	virtual const SymmetricKeySize KeySizes() = 0;
 
 	/// <summary>
-	/// Get: The nonce or initialization vector
+	/// Read Only: The nonce or initialization vector
 	/// </summary>
 	virtual const std::vector<byte> Nonce() = 0;
 
 	/// <summary>
-	/// Get/Set: The personalization string; can used as an optional source of entropy
+	/// Read/Write: The personalization string; can used as an optional source of entropy
 	/// </summary>
 	virtual const std::vector<byte> Info() = 0;
 

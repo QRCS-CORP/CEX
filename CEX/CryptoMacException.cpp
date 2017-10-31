@@ -2,21 +2,6 @@
 
 NAMESPACE_EXCEPTION
 
-std::string &CryptoMacException::Details() 
-{
-	return m_details; 
-}
-
-std::string &CryptoMacException::Message()
-{ 
-	return m_message;
-}
-
-std::string &CryptoMacException::Origin() 
-{ 
-	return m_origin; 
-}
-
 CryptoMacException::CryptoMacException(const std::string &Message)
 	:
 	m_details(""),
@@ -39,6 +24,28 @@ CryptoMacException::CryptoMacException(const std::string &Origin, const std::str
 	m_message(Message),
 	m_origin(Origin)
 {
+}
+
+CryptoMacException::~CryptoMacException()
+{
+	m_details.clear();
+	m_message.clear();
+	m_origin.clear();
+}
+
+std::string &CryptoMacException::Details() 
+{
+	return m_details; 
+}
+
+std::string &CryptoMacException::Message()
+{ 
+	return m_message;
+}
+
+std::string &CryptoMacException::Origin() 
+{ 
+	return m_origin; 
 }
 
 NAMESPACE_EXCEPTIONEND

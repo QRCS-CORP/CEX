@@ -20,12 +20,8 @@
 #define CEX_BLAKEPARAMS_H
 
 #include "CexDomain.h"
-#include "CryptoDigestException.h"
-#include "IntUtils.h"
 
 NAMESPACE_DIGEST
-
-using Utility::IntUtils;
 
 /// <summary>
 /// The Blake2 parameters structure
@@ -50,126 +46,31 @@ private:
 
 public:
 
+	//~~~Constructor~~~//
+
 	/// <summary>
-	/// Get/Set: Fanout (1 byte): an integer in [0, 255] set to the number of desired threads for parallel mode, set to 1 or 0 for sequential mode
+	/// Default constructor; state is initialized to zero defaults
 	/// </summary>
-	byte &FanOut() { return m_fanOut; }
+	BlakeParams();
 
 	/// <summary>
-	/// Get/Set: Key byte length (1 byte): an integer in [0, 64] for BLAKE2b, in [0, 32] for BLAKE2s (set to 0 if no key is used)
+	/// Initialize the MessageHeader structure using a serialized byte array
 	/// </summary>
-	byte &KeyLength() { return m_keyLen; }
-
-	/// <summary>
-	/// Get/Set: Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)
-	/// </summary>
-	byte &InnerLength() { return m_innerLen; }
-
-	/// <summary>
-	/// Get/Set: Leaf maximal byte length (4 bytes): an integer in [0, 232 − 1], that is, up to 4 GiB (set to 0 if unlimited, or in sequential mode)
-	/// </summary>
-	uint &LeafLength() { return m_leafSize; }
-
-	/// <summary>
-	/// Get/Set: Maximal depth (1 byte): an integer in [1, 255] (set to 255 if unlimited, and to 1 only in sequential mode)
-	/// </summary>
-	byte &MaxDepth() { return m_maxDepth; }
-
-	/// <summary>
-	/// Get/Set: Node offset (1 bytes): an integer in [0, 256 −1] (set to 0 for the first, leftmost, leaf, or in sequential mode)
-	/// </summary>
-	byte &NodeOffset() { return m_nodeOffset; }
-
-	/// <summary>
-	/// Get/Set: Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)
-	/// </summary>
-	byte &NodeDepth() { return m_nodeDepth; }
-
-	/// <summary>
-	/// Get/Set: Digest output byte length (1 byte): an integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s
-	/// </summary>
-	byte &OutputSize() { return m_outputSize; }
-
-	/// <summary>
-	/// Get/Set: Flag reserved for future use
-	/// </summary>
-	byte &Reserved() { return m_reserved; }
-
-	/// <summary>
-	/// Get/Set: The personalization string
-	/// </summary>
-	std::vector<byte> &DistributionCode() { return m_dstCode; }
-
-	/// <summary>
-	/// Get: The maximum recommended size of the distribution code
-	/// </summary>
-	const size_t DistributionCodeMax()
-	{
-		return ((m_outputSize == 32) ? 12 : 40);
-	}
-
-
-	/// <summary>
-	/// Default instantiation.
-	/// <para>Parameters must be added through their property members.</para>
-	BlakeParams() {}
+	///
+	/// <param name="TreeArray">A serialized BlakeParams structure</param>
+	explicit BlakeParams(const std::vector<byte> &TreeArray);
 
 	/// <summary>
 	/// Initialize the default structure.
 	/// <para>Default settings are sequential mode.</para>
 	/// </summary>
+	///
 	/// <param name="OutputSize">Digest output byte length; set to 32 for Blake2-256, or 64 for Blake2-512</param>
 	/// <param name="TreeDepth">Maximal depth (1 byte): an integer in [1, 255] (set to 255 if unlimited, and to 1 only in sequential mode)</param>
 	/// <param name="Fanout">The number of state leaf-nodes used by parallel processing (limit of one state per processor core is recommended)</param>
 	/// <param name="LeafSize">The outer leaf length in bytes; set to 0 for unlimited</param>
 	/// <param name="InnerLength">Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)</param>
-	explicit BlakeParams(byte OutputSize, byte TreeDepth = 1, byte Fanout = 1, byte LeafSize = 0, byte InnerLength = 0)
-		:
-		m_dstCode(0),
-		m_fanOut(Fanout),
-		m_innerLen(InnerLength),
-		m_keyLen(0),
-		m_leafSize(LeafSize),
-		m_maxDepth(TreeDepth),
-		m_nodeDepth(0),
-		m_nodeOffset(0),
-		m_outputSize(OutputSize),
-		m_reserved(0)
-	{
-		m_dstCode.resize(DistributionCodeMax());
-	}
-
-	/// <summary>
-	/// Initialize the MessageHeader structure using a serialized byte array
-	/// </summary>
-	explicit BlakeParams(const std::vector<byte> &TreeArray)
-		:
-		m_dstCode(0),
-		m_fanOut(0),
-		m_innerLen(0),
-		m_keyLen(0),
-		m_leafSize(0),
-		m_maxDepth(0),
-		m_nodeDepth(0),
-		m_nodeOffset(0),
-		m_outputSize(0),
-		m_reserved(0)
-	{
-		if (TreeArray.size() != 32 && TreeArray.size() != 64)
-			throw Exception::CryptoDigestException("BlakeParams:Ctor", "The TreeArray buffer is too short!");
-
-		memcpy(&m_outputSize, &TreeArray[0], 1);
-		memcpy(&m_keyLen, &TreeArray[1], 1);
-		memcpy(&m_fanOut, &TreeArray[2], 1);
-		memcpy(&m_maxDepth, &TreeArray[3], 1);
-		m_leafSize = IntUtils::LeBytesTo32(TreeArray, 4);
-		memcpy(&m_nodeOffset, &TreeArray[8], 1);
-		memcpy(&m_nodeDepth, &TreeArray[9], 1);
-		memcpy(&m_innerLen, &TreeArray[10], 1);
-		memcpy(&m_reserved, &TreeArray[11], 1);
-		m_dstCode.resize(DistributionCodeMax());
-		memcpy(&m_dstCode[0], &TreeArray[12], m_dstCode.size());
-	}
+	explicit BlakeParams(byte OutputSize, byte TreeDepth = 1, byte Fanout = 1, byte LeafSize = 0, byte InnerLength = 0);
 
 	/// <summary>
 	/// Initialize this structure with parameters
@@ -184,30 +85,71 @@ public:
 	/// <param name="NodeDepth">Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)</param>
 	/// <param name="InnerLength">Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)</param>
 	/// <param name="DistributionCode">The optional personalization string; must be no longer than DistributionCodeMax in size</param>
-	explicit BlakeParams(byte OutputSize, byte KeyLength, byte FanOut, byte MaxDepth, uint LeafLength, byte NodeOffset, byte NodeDepth, byte InnerLength, std::vector<byte> &DistributionCode)
-		:
-		m_dstCode(DistributionCode),
-		m_fanOut(FanOut),
-		m_innerLen(InnerLength),
-		m_keyLen(KeyLength),
-		m_leafSize(LeafLength),
-		m_maxDepth(MaxDepth),
-		m_nodeDepth(NodeDepth),
-		m_nodeOffset(NodeOffset),
-		m_outputSize(OutputSize),
-		m_reserved(0)
-	{
-		m_dstCode.resize(DistributionCodeMax());
-	}
+	BlakeParams(byte OutputSize, byte KeyLength, byte FanOut, byte MaxDepth, uint LeafLength, byte NodeOffset, byte NodeDepth, byte InnerLength, std::vector<byte> &DistributionCode);
+
+	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Fanout (1 byte): an integer in [0, 255] set to the number of desired threads for parallel mode, set to 1 or 0 for sequential mode
+	/// </summary>
+	byte &FanOut();
+
+	/// <summary>
+	/// Read/Write: Key byte length (1 byte): an integer in [0, 64] for BLAKE2b, in [0, 32] for BLAKE2s (set to 0 if no key is used)
+	/// </summary>
+	byte &KeyLength();
+
+	/// <summary>
+	/// Read/Write: Inner hash byte length (1 byte): an integer in [0, 64] for BLAKE2b, and in [0, 32] for BLAKE2s(set to 0 in sequential mode)
+	/// </summary>
+	byte &InnerLength();
+
+	/// <summary>
+	/// Read/Write: Leaf maximal byte length (4 bytes): an integer in [0, 232 − 1], that is, up to 4 GiB (set to 0 if unlimited, or in sequential mode)
+	/// </summary>
+	uint &LeafLength();
+
+	/// <summary>
+	/// Read/Write: Maximal depth (1 byte): an integer in [1, 255] (set to 255 if unlimited, and to 1 only in sequential mode)
+	/// </summary>
+	byte &MaxDepth();
+
+	/// <summary>
+	/// Read/Write: Node offset (1 bytes): an integer in [0, 256 −1] (set to 0 for the first, leftmost, leaf, or in sequential mode)
+	/// </summary>
+	byte &NodeOffset();
+
+	/// <summary>
+	/// Read/Write: Node depth (1 byte): an integer in [0, 255] (set to 0 for the leaves, or in sequential mode)
+	/// </summary>
+	byte &NodeDepth();
+
+	/// <summary>
+	/// Read/Write: Digest output byte length (1 byte): an integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s
+	/// </summary>
+	byte &OutputSize();
+
+	/// <summary>
+	/// Read/Write: Flag reserved for future use
+	/// </summary>
+	byte &Reserved();
+
+	/// <summary>
+	/// Read/Write: The personalization string
+	/// </summary>
+	std::vector<byte> &DistributionCode();
+
+	/// <summary>
+	/// Read Only: The maximum recommended size of the distribution code
+	/// </summary>
+	const size_t DistributionCodeMax();
+
+	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Create a clone of this structure
 	/// </summary>
-	BlakeParams Clone()
-	{
-		BlakeParams result(ToBytes());
-		return result;
-	}
+	BlakeParams Clone();
 
 	/// <summary>
 	/// Create a deep copy of this structure.
@@ -215,10 +157,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A pointer to a BlakeParams instance</returns>
-	BlakeParams* DeepCopy()
-	{
-		return new BlakeParams(ToBytes());
-	}
+	BlakeParams* DeepCopy();
 
 	/// <summary>
 	/// Compare this object instance with another
@@ -227,46 +166,49 @@ public:
 	/// <param name="Input">Object to compare</param>
 	/// 
 	/// <returns>True if equal, otherwise false</returns>
-	bool Equals(BlakeParams &Input)
-	{
-		if (this->GetHashCode() != Input.GetHashCode())
-			return false;
+	bool Equals(BlakeParams &Input);
 
-		return true;
-	}
-
+	/// <summary>
+	/// Get the default configuration
+	/// </summary>
+	/// 
+	/// <param name="Config">The configuration array</param>
 	template <class T>
 	void GetConfig(std::vector<T> &Config)
 	{
 		if (sizeof(T) == sizeof(ulong))
 		{
 			Config[0] = m_outputSize;
-			Config[0] |= ((ulong)m_keyLen << 8);
-			Config[0] |= ((ulong)m_fanOut << 16);
-			Config[0] |= ((ulong)m_maxDepth << 24);
-			Config[0] |= ((ulong)m_leafSize << 32);
+			Config[0] |= (static_cast<ulong>(m_keyLen) << 8);
+			Config[0] |= (static_cast<ulong>(m_fanOut) << 16);
+			Config[0] |= (static_cast<ulong>(m_maxDepth) << 24);
+			Config[0] |= (static_cast<ulong>(m_leafSize) << 32);
 			Config[1] = m_nodeOffset;
 			Config[2] = m_nodeDepth;
-			Config[2] |= ((ulong)m_innerLen << 8);
-			Config[2] |= ((ulong)m_reserved << 16);
+			Config[2] |= (static_cast<ulong>(m_innerLen) << 8);
+			Config[2] |= (static_cast<ulong>(m_reserved) << 16);
 
 			for (size_t i = 3; i < Config.size(); ++i)
-				Config[i] = IntUtils::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+			{
+				Config[i] = Utility::IntUtils::LeBytesTo64(m_dstCode, (i - 3) * sizeof(ulong));
+			}
 		}
 		else
 		{
 			Config[0] = m_outputSize;
-			Config[0] |= ((uint)m_keyLen << 8);
-			Config[0] |= ((uint)m_fanOut << 16);
-			Config[0] |= ((uint)m_maxDepth << 24);
+			Config[0] |= (static_cast<uint>(m_keyLen) << 8);
+			Config[0] |= (static_cast<uint>(m_fanOut) << 16);
+			Config[0] |= (static_cast<uint>(m_maxDepth) << 24);
 			Config[1] = m_leafSize;
 			Config[2] = m_nodeOffset;
-			Config[3] |= ((uint)m_nodeDepth << 16);
-			Config[3] |= ((uint)m_innerLen << 24);
+			Config[3] |= (static_cast<uint>(m_nodeDepth) << 16);
+			Config[3] |= (static_cast<uint>(m_innerLen) << 24);
 			Config[4] = m_reserved;
 
 			for (size_t i = 5; i < Config.size(); ++i)
-				Config[i] = IntUtils::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
+			{
+				Config[i] = Utility::IntUtils::LeBytesTo32(m_dstCode, (i - 5) * sizeof(uint));
+			}
 		}
 	}
 
@@ -275,75 +217,26 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>Hash code</returns>
-	int GetHashCode()
-	{
-		int result = 31 * m_outputSize;
-
-		result += 31 * m_keyLen;
-		result += 31 * m_fanOut;
-		result += 31 * m_maxDepth;
-		result += 31 * m_leafSize;
-		result += 31 * m_nodeOffset;
-		result += 31 * m_nodeDepth;
-		result += 31 * m_innerLen;
-		result += 31 * m_reserved;
-
-		for (size_t i = 0; i < m_dstCode.size(); ++i)
-			result += 31 * m_dstCode[i];
-
-		return result;
-	}
+	int GetHashCode();
 
 	/// <summary>
 	/// Get the header size in bytes
 	/// </summary>
 	/// 
 	/// <returns>Header size</returns>
-	size_t GetHeaderSize()
-	{
-		return m_outputSize;
-	}
+	size_t GetHeaderSize();
 
 	/// <summary>
 	/// Set all struct members to defaults
 	/// </summary>
-	void Reset()
-	{
-		m_outputSize = 0;
-		m_keyLen = 0;
-		m_fanOut = 0;
-		m_maxDepth = 0;
-		m_leafSize = 0;
-		m_nodeOffset = 0;
-		m_nodeDepth = 0;
-		m_innerLen = 0;
-		m_reserved = 0;
-
-		memset(&m_dstCode[0], (byte)0, m_dstCode.size());
-	}
+	void Reset();
 
 	/// <summary>
 	/// Convert the BlakeParams structure serialized to a byte array
 	/// </summary>
 	/// 
 	/// <returns>The byte array containing the BlakeParams</returns>
-	std::vector<byte> ToBytes()
-	{
-		std::vector<byte> trs(GetHeaderSize());
-
-		memcpy(&trs[0], &m_outputSize, 1);
-		memcpy(&trs[1], &m_keyLen, 1);
-		memcpy(&trs[2], &m_fanOut, 1);
-		memcpy(&trs[3], &m_maxDepth, 1);
-		IntUtils::Le32ToBytes(m_leafSize, trs, 4);
-		memcpy(&trs[8], &m_nodeOffset, 1);
-		memcpy(&trs[9], &m_nodeDepth, 1);
-		memcpy(&trs[10], &m_innerLen, 1);
-		memcpy(&trs[11], &m_reserved, 1);
-		memcpy(&trs[12], &m_dstCode[0], m_dstCode.size());
-
-		return trs;
-	}
+	std::vector<byte> ToBytes();
 };
 
 NAMESPACE_DIGESTEND

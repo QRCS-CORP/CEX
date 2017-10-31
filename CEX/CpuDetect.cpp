@@ -1,40 +1,67 @@
 #include "CpuDetect.h"
 #include <algorithm>
 #include <thread>
-
-// MISRA/SEI-CERT Compliance Note:
-// This macro is temporary (to be replaced before v1.1), but is required until testing is done on multiple cpu's
 #if defined(CEX_ARCH_X86_X64)
 #	if defined(CEX_COMPILER_MSC)
 #		include <intrin.h>
-#		define X86_CPUID(type, out) do { __cpuid((int*)out, type); } while(0)
-#		define X86_CPUID_SUBLEVEL(type, level, out) do { __cpuidex((int*)out, type, level); } while(0)
 #	elif defined(CEX_COMPILER_INTEL)
 #		include <ia32intrin.h>
-#		define X86_CPUID(type, out) do { __cpuid(out, type); } while(0)
-#		define X86_CPUID_SUBLEVEL(type, level, out) do { __cpuidex((int*)out, type, level); } while(0)
-#	elif defined(CEX_ARCH_X64) && defined(CEX_USE_GCC_INLINE_ASM)
-#		define X86_CPUID(type, out)															\
-			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3])	\
-				: "0" (type))
-#		define X86_CPUID_SUBLEVEL(type, level, out)											\
-			asm("cpuid\n\t" : "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3])	\
-				: "0" (type), "2" (level))
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 #		include <cpuid.h>
-#		define X86_CPUID(type, out) do { __get_cpuid(type, out, out+1, out+2, out+3); } while(0)
-#		define X86_CPUID_SUBLEVEL(type, level, out)											\
-			do { __cpuid_count(type, level, out[0], out[1], out[2], out[3]); } while(0)
 #	else
-#		warning "No way of calling cpuid for this compiler"
-#		define X86_CPUID(type, out) do { clear_mem(out, 4); } while(0)
-#		define X86_CPUID_SUBLEVEL(type, level, out) do { clear_mem(out, 4); } while(0)
+#		warning "No way of calling cpuid with this compiler"
 #	endif
 #else
-#	warning "No way of calling cpuid for this compiler"
+#	warning "No way of calling cpuid with this compiler"
 #endif
 
 NAMESPACE_COMMON
+
+//~~~ Constructor~~~//
+
+CpuDetect::CpuDetect()
+	:
+	m_busRefFrequency(0),
+	m_cacheLineSize(0),
+	m_cpuVendor(CpuVendors::UNKNOWN),
+	m_cpuVendorString(""),
+	m_frequencyBase(0),
+	m_frequencyMax(0),
+	m_hyperThread(false),
+	m_l1CacheSize(0),
+	m_l1CacheLineSize(0),
+	m_l2Associative(CacheAssociations::Disabled),
+	m_l2CacheSize(0),
+	m_logicalPerCore(0),
+	m_physCores(0),
+	m_serialNumber(""),
+	m_virtCores(0),
+	m_x86CpuFlags(8)
+{
+	Initialize();
+	// Misra exception: for internal debug purposes only
+	// PrintCpuStats();
+}
+
+CpuDetect::~CpuDetect()
+{
+	m_busRefFrequency = 0;
+	m_cacheLineSize = 0;
+	m_cpuVendor = CpuVendors::UNKNOWN;
+	m_cpuVendorString.clear();
+	m_frequencyBase = 0;
+	m_frequencyMax = 0;
+	m_hyperThread = false;
+	m_l1CacheLineSize = 0;
+	m_l1CacheSize = 0;
+	CacheAssociations m_l2Associative = CacheAssociations::Disabled;
+	m_l2CacheSize = 0;
+	m_logicalPerCore = 0;
+	m_physCores = 0;
+	m_serialNumber.clear();
+	m_virtCores = 0;
+	m_x86CpuFlags.clear();
+}
 
 //~~~ Properties~~~//
 
@@ -302,73 +329,72 @@ const bool CpuDetect::XOP()
 	return HasFeature(CpuidFlags::CPUID_XOP);
 }
 
-//~~~ Constructor~~~//
-
-CpuDetect::CpuDetect()
-	:
-	m_busRefFrequency(0),
-	m_cacheLineSize(0),
-	m_cpuVendor(CpuVendors::UNKNOWN),
-	m_cpuVendorString(""),
-	m_frequencyBase(0),
-	m_frequencyMax(0),
-	m_hyperThread(false),
-	m_l1CacheSize(0),
-	m_l1CacheLineSize(0),
-	m_l2Associative(CacheAssociations::Disabled),
-	m_l2CacheSize(0),
-	m_logicalPerCore(0),
-	m_physCores(0),
-	m_serialNumber(""),
-	m_virtCores(0),
-	m_x86CpuFlags(8)
-{
-	Initialize();
-	//PrintCpuStats();
-}
-
 //~~~Private Functions~~~//
 
 bool CpuDetect::AvxEnabled()
 {
 	std::array<uint, 4> cpuInfo;
-	X86_CPUID(1, cpuInfo.data());
+	Cpuid(1, cpuInfo);
+	bool status = false;
 
 	// check if os saves the ymm registers
 	if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
 	{
-		return (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0x6) != 0;
+		status = (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0x6) != 0;
 	}
 
-	return false;
+	return status;
 }
 
 bool CpuDetect::Avx2Enabled()
 {
 	std::array<uint, 4> cpuInfo;
-	X86_CPUID(1, cpuInfo.data());
+	Cpuid(1, cpuInfo);
+	bool status = false;
 
 	if ((cpuInfo[2] & (1 << 27)) && (cpuInfo[2] & (1 << 28)))
 	{
-		return (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0xE6) != 0;
+		status = (_xgetbv(_XCR_XFEATURE_ENABLED_MASK) & 0xE6) != 0;
 	}
 
-	return false;
+	return status;
 }
 
 void CpuDetect::BusInfo()
 {
 	std::array<uint, 4> cpuInfo;
-	X86_CPUID(0, cpuInfo.data());
+	Cpuid(0, cpuInfo);
 
 	if (cpuInfo[0] >= 0x16)
 	{
-		std::memset(cpuInfo.data(), 0, 16);
-		X86_CPUID(0x16, cpuInfo.data());
+		std::memset(&cpuInfo[0], 0, 16);
+		Cpuid(0x16, cpuInfo);
 		m_frequencyBase = cpuInfo[0];
 		m_frequencyMax = cpuInfo[1];
 		m_busRefFrequency = cpuInfo[2];
 	}
+}
+
+void CpuDetect::Cpuid(int Flag, std::array<uint, 4> &Output)
+{
+#if defined(CEX_ARCH_X86_X64)
+#	if defined(CEX_COMPILER_MSC)
+	__cpuid((int*)Output.data(), Flag);
+#	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
+	__get_cpuid(Flag, Output[0], Output[1], Output[2], Output[3]);
+#	endif
+#endif
+}
+
+void CpuDetect::CpuidSublevel(int Flag, int Level, std::array<uint, 4> &Output)
+{
+#if defined(CEX_ARCH_X86_X64)
+#	if defined(CEX_COMPILER_MSC)
+	__cpuidex((int*)Output.data(), Flag, Level);
+#	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
+	__cpuid_count(Flag, Level, Output[0], Output[1], Output[2], Output[3]);
+#	endif
+#endif
 }
 
 bool CpuDetect::HasFeature(CpuidFlags Flag)
@@ -379,58 +405,55 @@ bool CpuDetect::HasFeature(CpuidFlags Flag)
 void CpuDetect::Initialize()
 {
 	std::array<uint, 4> cpuInfo;
-	X86_CPUID(0, cpuInfo.data());
-
-	m_cpuVendorString = VendorString(cpuInfo.data());
-	m_cpuVendor = VendorName(m_cpuVendorString);
-
+	Cpuid(0, cpuInfo);
 	const uint SUBLVL = cpuInfo[0];
 
-	if (SUBLVL == 0)
+	if (SUBLVL != 0)
 	{
-		return;
-	}
+		m_cpuVendorString = VendorString(cpuInfo);
+		m_cpuVendor = VendorName(m_cpuVendorString);
 
-	std::memset(cpuInfo.data(), 0, 4);
-	X86_CPUID(1, cpuInfo.data());
+		std::memset(cpuInfo.data(), 0, 4);
+		Cpuid(1, cpuInfo);
 
-	m_hyperThread = ReadBits(cpuInfo[3], 28, 1) != 0;
-	// safest way on multi-platform
-	m_virtCores = std::thread::hardware_concurrency();
-	// yes, ht might be disabled in bios, but who does that?
-	m_physCores = (m_hyperThread == true && m_virtCores > 1) ? (m_virtCores / 2) : m_virtCores;
-	m_logicalPerCore = (m_virtCores > m_physCores) ? (m_virtCores / m_physCores) : 1;
-	// f1 ecx, edx
-	std::memcpy(&m_x86CpuFlags[0], &cpuInfo[2], 2 * sizeof(ulong));
+		m_hyperThread = ReadBits(cpuInfo[3], 28, 1) != 0;
+		// safest way on multi-platform
+		m_virtCores = std::thread::hardware_concurrency();
+		// yes, ht might be disabled in bios, but who does that?
+		m_physCores = (m_hyperThread == true && m_virtCores > 1) ? (m_virtCores / 2) : m_virtCores;
+		m_logicalPerCore = (m_virtCores > m_physCores) ? (m_virtCores / m_physCores) : 1;
+		// f1 ecx, edx
+		std::memcpy(&m_x86CpuFlags[0], &cpuInfo[2], 2 * sizeof(ulong));
 
-	if (m_cpuVendor == CpuVendors::INTEL)
-	{
-		m_cacheLineSize = 8 * ReadBits(cpuInfo[1], 16, 8);
-	}
-
-	if (SUBLVL >= 7)
-	{
-		std::memset(cpuInfo.data(), 0, 16);
-		X86_CPUID_SUBLEVEL(7, 0, cpuInfo.data());
-		// f7 ebx, ecx
-		std::memcpy(&m_x86CpuFlags[2], &cpuInfo[1], 2 * sizeof(ulong));
-	}
-
-	if (SUBLVL >= 5)
-	{
-		std::memset(cpuInfo.data(), 0, 16);
-		X86_CPUID(0x80000005, cpuInfo.data());
-
-		if (m_cpuVendor == CpuVendors::AMD)
+		if (m_cpuVendor == CpuVendors::INTEL)
 		{
-			m_cacheLineSize = ReadBits(cpuInfo[2], 24, 8);
+			m_cacheLineSize = 8 * ReadBits(cpuInfo[1], 16, 8);
 		}
 
-		std::memset(cpuInfo.data(), 0, 16);
-		X86_CPUID(0x80000001, cpuInfo.data());
-		// f8..1 ecx, edx
-		std::memcpy(&m_x86CpuFlags[4], &cpuInfo[2], 2 * sizeof(ulong));
-		StoreTopology();
+		if (SUBLVL >= 7)
+		{
+			std::memset(cpuInfo.data(), 0, 16);
+			CpuidSublevel(7, 0, cpuInfo);
+			// f7 ebx, ecx
+			std::memcpy(&m_x86CpuFlags[2], &cpuInfo[1], 2 * sizeof(ulong));
+		}
+
+		if (SUBLVL >= 5)
+		{
+			std::memset(cpuInfo.data(), 0, 16);
+			Cpuid(0x80000005, cpuInfo);
+
+			if (m_cpuVendor == CpuVendors::AMD)
+			{
+				m_cacheLineSize = ReadBits(cpuInfo[2], 24, 8);
+			}
+
+			std::memset(cpuInfo.data(), 0, 16);
+			Cpuid(0x80000001, cpuInfo);
+			// f8..1 ecx, edx
+			std::memcpy(&m_x86CpuFlags[4], &cpuInfo[2], 2 * sizeof(ulong));
+			StoreTopology();
+		}
 	}
 
 	// fallbacks, required by parallel auto-size feature
@@ -438,10 +461,12 @@ void CpuDetect::Initialize()
 	{
 		m_l1CacheSize = 64;
 	}
+
 	if (m_l1CacheLineSize == 0 || m_l1CacheLineSize % 8 != 0)
 	{
 		m_l1CacheLineSize = 64;
 	}
+
 	if (m_l2CacheSize == 0 || m_l2CacheSize % 8 != 0)
 	{
 		m_l2CacheSize = 256;
@@ -455,23 +480,23 @@ size_t CpuDetect::MaxCoresPerPackage()
 
 size_t CpuDetect::MaxLogicalPerCores()
 {
-	if (!m_hyperThread)
+	size_t maxLogical = 1;
+
+	if (m_hyperThread)
 	{
-		return 1;
+		std::array<uint, 4> cpuInfo;
+		Cpuid(1, cpuInfo);
+
+		size_t logical = static_cast<size_t>(ReadBits(cpuInfo[0], 16, 8));
+		size_t cores = MaxCoresPerPackage();
+
+		if (logical % cores == 0)
+		{
+			maxLogical = logical / cores;
+		}
 	}
 
-	std::array<uint, 4> cpuInfo;
-	X86_CPUID(1, cpuInfo.data());
-
-	size_t logical = static_cast<size_t>(ReadBits(cpuInfo[0], 16, 8));
-	size_t cores = MaxCoresPerPackage();
-
-	if (logical % cores == 0)
-	{
-		return logical / cores;
-	}
-
-	return 1;
+	return maxLogical;
 }
 
 void CpuDetect::PrintCpuStats()
@@ -531,14 +556,14 @@ void CpuDetect::PrintCpuStats()
 
 uint CpuDetect::ReadBits(uint Value, int Index, int Length)
 {
-	int mask = (((int)1 << Length) - 1) << Index;
+	int mask = ((static_cast<int>(1) << Length) - 1) << Index;
 	return (Value & mask) >> Index;
 }
 
 void CpuDetect::StoreSerialNumber()
 {
 	std::array<uint, 4> cpuInfo;
-	X86_CPUID(0x00000003, cpuInfo.data());
+	Cpuid(0x00000003, cpuInfo);
 
 	std::array<char, 8> prcId;
 	std::memset(prcId.data(), 0, sizeof(prcId));
@@ -556,7 +581,7 @@ void CpuDetect::StoreTopology()
 	StoreSerialNumber();
 
 	std::array<uint, 4> cpuInfo;
-	X86_CPUID(0x80000006, cpuInfo.data());
+	Cpuid(0x80000006, cpuInfo);
 
 	m_l1CacheSize = static_cast<size_t>(ReadBits(cpuInfo[2], 0, 8));
 	m_l1CacheLineSize = static_cast<size_t>(ReadBits(cpuInfo[2], 0, 11));
@@ -566,6 +591,8 @@ void CpuDetect::StoreTopology()
 
 const CpuDetect::CpuVendors CpuDetect::VendorName(std::string &Name)
 {
+	CpuVendors vendor = CpuVendors::UNKNOWN;
+
 	if (Name.size() > 0)
 	{
 		std::string data = Name;
@@ -573,27 +600,25 @@ const CpuDetect::CpuVendors CpuDetect::VendorName(std::string &Name)
 
 		if (data.find("intel", 0) != std::string::npos)
 		{
-			return CpuVendors::INTEL;
+			vendor = CpuVendors::INTEL;
 		}
 		else if (data.find("amd", 0) != std::string::npos)
 		{
-			return CpuVendors::AMD;
-		}
-		else
-		{
-			return CpuVendors::UNKNOWN;
+			vendor = CpuVendors::AMD;
 		}
 	}
 
-	return CpuVendors::UNKNOWN;
+	return vendor;
 }
 
-std::string CpuDetect::VendorString(uint CpuInfo[4])
+std::string CpuDetect::VendorString(std::array<uint, 4> &CpuInfo)
 {
 	// cpu vendor name
 	std::array<char, 0x20> vendId;
 	std::memset(vendId.data(), 0, sizeof(vendId));
-	std::memcpy(&vendId[0], &CpuInfo[1], 12);
+	std::memcpy(&vendId[0], &CpuInfo[1], 4);
+	std::memcpy(&vendId[4], &CpuInfo[3], 4);
+	std::memcpy(&vendId[8], &CpuInfo[2], 4);
 
 	return std::string(vendId.data());
 }

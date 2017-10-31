@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_DIGESTSPEEDTEST_H
-#define _CEXTEST_DIGESTSPEEDTEST_H
+#ifndef CEXTEST_DIGESTSPEEDTEST_H
+#define CEXTEST_DIGESTSPEEDTEST_H
 
 #include "ITest.h"
 #include "../CEX/Digests.h"

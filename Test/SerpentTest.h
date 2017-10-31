@@ -1,5 +1,5 @@
-﻿#ifndef _CEXTEST_SERPENTTEST_H
-#define _CEXTEST_SERPENTTEST_H
+﻿#ifndef CEXTEST_SERPENTTEST_H
+#define CEXTEST_SERPENTTEST_H
 
 #include "ITest.h"
 

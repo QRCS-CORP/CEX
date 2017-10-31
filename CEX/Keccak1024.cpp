@@ -6,9 +6,89 @@
 
 NAMESPACE_DIGEST
 
+using Utility::IntUtils;
+
 const std::string Keccak1024::CLASS_NAME("Keccak1024");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+Keccak1024::Keccak1024(bool Parallel)
+	:
+	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
+	m_isDestroyed(false),
+	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
+	m_treeDestroy(true),
+	m_treeParams(Parallel ? KeccakParams(DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), DEF_PRLDEGREE) : KeccakParams(DIGEST_SIZE, 0, 0))
+{
+	// TODO: implement parallel alternate for single core cpu
+	if (Parallel && !m_parallelProfile.IsParallel())
+	{
+		throw CryptoDigestException("Keccak1024::Ctor", "Cpu does not support parallel processing!");
+	}
+
+	if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = Parallel;
+	}
+
+	Reset();
+}
+
+Keccak1024::Keccak1024(KeccakParams &Params)
+	:
+	m_dgtState(1),
+	m_isDestroyed(false),
+	m_msgBuffer(BLOCK_SIZE),
+	m_msgLength(0),
+	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut()),
+	m_treeDestroy(false),
+	m_treeParams(Params)
+{
+	if (m_treeParams.FanOut() > 1 && !m_parallelProfile.IsParallel())
+	{
+		throw CryptoDigestException("Keccak1024::Ctor", "Cpu does not support parallel processing!");
+	}
+
+	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
+	{
+		m_dgtState.resize(m_treeParams.FanOut());
+		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
+	}
+	else if (m_parallelProfile.IsParallel())
+	{
+		m_parallelProfile.IsParallel() = false;
+	}
+
+	Reset();
+}
+
+Keccak1024::~Keccak1024()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_msgLength = 0;
+		m_parallelProfile.Reset();
+
+		if (m_treeDestroy)
+		{
+			m_treeParams.Reset();
+			m_treeDestroy = false;
+		}
+
+		for (size_t i = 0; i < m_dgtState.size(); ++i)
+		{
+			m_dgtState[i].Reset();
+		}
+
+		IntUtils::ClearVector(m_dgtState);
+		IntUtils::ClearVector(m_msgBuffer);
+	}
+}
+
+//~~~Accessors~~~//
 
 size_t Keccak1024::BlockSize()
 {
@@ -32,10 +112,18 @@ const bool Keccak1024::IsParallel()
 
 const std::string Keccak1024::Name()
 {
+	std::string txtName = "";
+
 	if (m_parallelProfile.IsParallel())
-		return CLASS_NAME + "-P" + Utility::IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	{
+		txtName = CLASS_NAME + "-P" + IntUtils::ToString(m_parallelProfile.ParallelMaxDegree());
+	}
 	else
-		return CLASS_NAME;
+	{
+		txtName = CLASS_NAME;
+	}
+
+	return txtName;
 }
 
 const size_t Keccak1024::ParallelBlockSize()
@@ -48,50 +136,6 @@ ParallelOptions &Keccak1024::ParallelProfile()
 	return m_parallelProfile;
 }
 
-//~~~Constructor~~~//
-
-Keccak1024::Keccak1024(bool Parallel)
-	:
-	m_treeParams(DIGEST_SIZE, static_cast<uint>(BLOCK_SIZE), DEF_PRLDEGREE),
-	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
-	m_isDestroyed(false),
-	m_msgBuffer(Parallel ? DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
-	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE)
-{
-	if (m_parallelProfile.IsParallel())
-		m_parallelProfile.IsParallel() = Parallel;
-
-	Reset();
-}
-
-Keccak1024::Keccak1024(KeccakParams &Params)
-	:
-	m_treeParams(Params),
-	m_dgtState(1),
-	m_isDestroyed(false),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgLength(0),
-	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, m_treeParams.FanOut())
-{
-	if (m_treeParams.FanOut() > 1)
-	{
-		m_dgtState.resize(m_treeParams.FanOut());
-		m_msgBuffer.resize(m_treeParams.FanOut() * BLOCK_SIZE);
-	}
-	else if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = false;
-	}
-
-	Reset();
-}
-
-Keccak1024::~Keccak1024()
-{
-	Destroy();
-}
-
 //~~~Public Functions~~~//
 
 void Keccak1024::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
@@ -99,21 +143,6 @@ void Keccak1024::Compute(const std::vector<byte> &Input, std::vector<byte> &Outp
 	Output.resize(DIGEST_SIZE);
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
-}
-
-void Keccak1024::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_msgLength = 0;
-
-		for (size_t i = 0; i < m_dgtState.size(); ++i)
-			m_dgtState[i].Reset();
-
-		Utility::IntUtils::ClearVector(m_dgtState);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
-	}
 }
 
 size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
@@ -124,7 +153,9 @@ size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	{
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
+		{
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		}
 
 		// process buffer
 		if (m_msgLength != 0)
@@ -142,12 +173,12 @@ size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// initialize root state
 		Keccak1024State rootState;
-		m_msgBuffer.resize(m_dgtState.size() * DIGEST_SIZE, (byte)0);
+		m_msgBuffer.resize(m_dgtState.size() * DIGEST_SIZE, 0);
 
 		// add state blocks as contiguous message input
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
 		{
-			Utility::IntUtils::LeULL1024ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * DIGEST_SIZE);
+			IntUtils::LeULL1024ToBlock(m_dgtState[i].H, 0, m_msgBuffer, i * DIGEST_SIZE);
 			m_msgLength += DIGEST_SIZE;
 		}
 
@@ -158,7 +189,9 @@ size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
 
 			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
+			{
 				Permute(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, rootState.H);
+			}
 
 			m_msgLength -= BLKRMD;
 			blkOff = BLKRMD;
@@ -169,30 +202,36 @@ size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		if (OUTLEN >= DIGEST_SIZE)
 		{
-			Utility::IntUtils::LeULL1024ToBlock(rootState.H, 0, Output, OutOffset);
+			IntUtils::LeULL1024ToBlock(rootState.H, 0, Output, OutOffset);
 		}
 		else
 		{
 			for (size_t i = 0; i < OUTLEN / sizeof(ulong); ++i)
-				Utility::IntUtils::Le64ToBytes(rootState.H[i], Output, OutOffset + i * sizeof(ulong));
+			{
+				IntUtils::Le64ToBytes(rootState.H[i], Output, OutOffset + i * sizeof(ulong));
+			}
 		}
 	}
 	else
 	{
 
 		if (m_msgLength != m_msgBuffer.size())
+		{
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		}
 
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
 
 		if (OUTLEN >= DIGEST_SIZE)
 		{
-			Utility::IntUtils::LeULL1024ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
+			IntUtils::LeULL1024ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 		}
 		else
 		{
 			for (size_t i = 0; i < OUTLEN / sizeof(ulong); ++i)
-				Utility::IntUtils::Le64ToBytes(m_dgtState[0].H[i], Output, OutOffset + (i * sizeof(ulong)));
+			{
+				IntUtils::Le64ToBytes(m_dgtState[0].H[i], Output, OutOffset + (i * sizeof(ulong)));
+			}
 		}
 	}
 
@@ -203,12 +242,9 @@ size_t Keccak1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 void Keccak1024::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoDigestException("Keccak1024:ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree > 254)
-		throw CryptoDigestException("Keccak1024:ParallelMaxDegree", "Parallel degree can not exceed 254!");
-	if (Degree % 2 != 0)
-		throw CryptoDigestException("Keccak1024:ParallelMaxDegree", "Parallel degree must be an even number!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	Reset();
@@ -230,56 +266,6 @@ void Keccak1024::Reset()
 		}
 	}
 }
-//0: 0x0000000000000001
-//1: 8082
-//2: 800000000000808a
-//3: 8000000080008000
-//4: 808b
-//5: 80000001
-//6: 8000000080008081
-//7: 8000000000008009
-//8: 8a
-//9: 88
-//10: 80008009
-//11: 8000000a
-//12: 8000808b
-//13: 800000000000008b
-//14: 8000000000008089
-//15: 8000000000008003
-//16: 8000000000008002
-//17: 8000000000000080
-//18: 800a
-//19: 800000008000000a
-//20: 8000000080008081
-//21: 8000000000008080
-//22: 80000001
-//23: 8000000080008008
-
-
-//24: 0x8000000080008082
-//25: 0x800000008000800a
-//26: 0x8000000000000003
-//27: 0x8000000080000009
-//28: 0x8000000000008082
-//29: 0x0000000000008009
-//30: 0x8000000000000080
-//31: 0x0000000000008083
-//32: 0x8000000000000081
-//33: 0x0000000000000001
-//34: 0x000000000000800b
-//35: 0x8000000080008001
-//36: 0x0000000000000080
-//37: 0x8000000000008000
-//38: 0x8000000080008001
-//39: 0x0000000000000009
-//40: 0x800000008000808b
-//41: 0x0000000000000081
-//42: 0x8000000000000082
-//43: 0x000000008000008b
-//44: 0x8000000080008009
-//45: 0x8000000080000000
-//46: 0x0000000080000080
-//47: 0x0000000080008003
 
 void Keccak1024::Update(byte Input)
 {
@@ -291,85 +277,89 @@ void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t 
 {
 	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
-	if (Length == 0)
-		return;
-
-	if (m_parallelProfile.IsParallel())
-	{
-		if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
-		{
-			// fill buffer
-			const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
-			if (RMDLEN != 0)
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
-
-			// empty the message buffer
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
-			{
-				Permute(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, m_dgtState[i].H);
-			});
-
-			m_msgLength = 0;
-			Length -= RMDLEN;
-			InOffset += RMDLEN;
-		}
-
-		if (Length >= m_parallelProfile.ParallelBlockSize())
-		{
-			// calculate working set size
-			const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
-
-			// process large blocks
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
-			});
-
-			Length -= PRCLEN;
-			InOffset += PRCLEN;
-		}
-
-		if (Length >= m_parallelProfile.ParallelMinimumSize())
-		{
-			const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
-
-			Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
-			{
-				ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
-			});
-
-			Length -= PRMLEN;
-			InOffset += PRMLEN;
-		}
-	}
-	else
-	{
-		if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
-		{
-			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-			if (RMDLEN != 0)
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
-
-			Permute(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0].H);
-			m_msgLength = 0;
-			InOffset += RMDLEN;
-			Length -= RMDLEN;
-		}
-
-		// sequential loop through blocks
-		while (Length >= BLOCK_SIZE)
-		{
-			Permute(Input, InOffset, BLOCK_SIZE, m_dgtState[0].H);
-			InOffset += BLOCK_SIZE;
-			Length -= BLOCK_SIZE;
-		}
-	}
-
-	// store unaligned bytes
 	if (Length != 0)
 	{
-		Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
-		m_msgLength += Length;
+		if (m_parallelProfile.IsParallel())
+		{
+			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
+			{
+				// fill buffer
+				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
+				{
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				}
+
+				// empty the message buffer
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				{
+					Permute(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, m_dgtState[i].H);
+				});
+
+				m_msgLength = 0;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
+			}
+
+			if (Length >= m_parallelProfile.ParallelBlockSize())
+			{
+				// calculate working set size
+				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
+
+				// process large blocks
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				{
+					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
+				});
+
+				Length -= PRCLEN;
+				InOffset += PRCLEN;
+			}
+
+			if (Length >= m_parallelProfile.ParallelMinimumSize())
+			{
+				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
+
+				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				{
+					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
+				});
+
+				Length -= PRMLEN;
+				InOffset += PRMLEN;
+			}
+		}
+		else
+		{
+			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
+			{
+				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				if (RMDLEN != 0)
+				{
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				}
+
+				Permute(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0].H);
+				m_msgLength = 0;
+				InOffset += RMDLEN;
+				Length -= RMDLEN;
+			}
+
+			// sequential loop through blocks
+			while (Length >= BLOCK_SIZE)
+			{
+				Permute(Input, InOffset, BLOCK_SIZE, m_dgtState[0].H);
+				InOffset += BLOCK_SIZE;
+				Length -= BLOCK_SIZE;
+			}
+		}
+
+		// store unaligned bytes
+		if (Length != 0)
+		{
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			m_msgLength += Length;
+		}
 	}
 }
 
@@ -390,7 +380,9 @@ void Keccak1024::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Len
 void Keccak1024::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State)
 {
 	for (size_t i = 0; i < Length / sizeof(ulong); ++i)
+	{
 		State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+	}
 
 	ulong Aba, Abe, Abi, Abo, Abu;
 	ulong Aga, Age, Agi, Ago, Agu;

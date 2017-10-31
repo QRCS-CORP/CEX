@@ -9,7 +9,115 @@ NAMESPACE_MODE
 
 const std::string EAX::CLASS_NAME("EAX");
 
-//~~~Properties~~~//
+//~~~Constructor~~~//
+
+EAX::EAX(BlockCiphers CipherType)
+	:
+	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
+		throw CryptoCipherModeException("EAX:CTor", "The Cipher type can not be none!")),
+	m_aadData(m_cipherMode->BlockSize()),
+	m_aadLoaded(false),
+	m_aadPreserve(false),
+	m_autoIncrement(false),
+	m_blockSize(m_cipherMode->BlockSize()),
+	m_cipherKey(0),
+	m_cipherType(CipherType),
+	m_destroyEngine(true),
+	m_eaxNonce(0),
+	m_eaxVector(m_blockSize),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isFinalized(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_legalKeySizes(0),
+	m_macGenerator(new Mac::CMAC(m_cipherMode->Engine())),
+	m_macSize(m_blockSize),
+	m_msgTag(m_blockSize),
+	m_parallelProfile(m_blockSize, m_cipherMode->ParallelProfile().IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(),
+		m_cipherMode->ParallelProfile().ParallelMaxDegree(), true, m_cipherMode->Engine()->StateCacheSize(), true)
+{
+	Scope();
+}
+
+EAX::EAX(IBlockCipher* Cipher)
+	:
+	m_cipherMode(Cipher != nullptr ? new CTR(Cipher) :
+		throw CryptoCipherModeException("EAX:CTor", "The Cipher can not be null!")),
+	m_aadData(m_cipherMode->BlockSize()),
+	m_aadLoaded(false),
+	m_aadPreserve(false),
+	m_autoIncrement(false),
+	m_blockSize(m_cipherMode->BlockSize()),
+	m_cipherKey(0),
+	m_cipherType(Cipher->Enumeral()),
+	m_destroyEngine(false),
+	m_eaxNonce(0),
+	m_eaxVector(m_blockSize),
+	m_isDestroyed(false),
+	m_isEncryption(false),
+	m_isFinalized(false),
+	m_isInitialized(false),
+	m_isLoaded(false),
+	m_legalKeySizes(0),
+	m_macGenerator(new Mac::CMAC(Cipher)),
+	m_macSize(m_blockSize),
+	m_msgTag(m_blockSize),
+	m_parallelProfile(m_blockSize, m_cipherMode->ParallelProfile().IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(),
+		m_cipherMode->ParallelProfile().ParallelMaxDegree(), true, m_cipherMode->Engine()->StateCacheSize(), true)
+{
+	Scope();
+}
+
+EAX::~EAX()
+{
+	if (!m_isDestroyed)
+	{
+		m_isDestroyed = true;
+		m_aadLoaded = false;
+		m_aadPreserve = false;
+		m_autoIncrement = false;
+		m_blockSize = 0;
+		m_cipherType = BlockCiphers::None;
+		m_isEncryption = false;
+		m_isFinalized = false;
+		m_isInitialized = false;
+		m_isLoaded = false;
+		m_macSize = 0;
+		m_parallelProfile.Reset();
+
+		Utility::IntUtils::ClearVector(m_aadData);
+		Utility::IntUtils::ClearVector(m_cipherKey);
+		Utility::IntUtils::ClearVector(m_eaxNonce);
+		Utility::IntUtils::ClearVector(m_eaxVector);
+		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		Utility::IntUtils::ClearVector(m_msgTag);
+
+		if (m_macGenerator != nullptr)
+		{
+			m_macGenerator.reset(nullptr);
+		}
+
+		if (m_destroyEngine)
+		{
+			m_destroyEngine = false;
+
+			if (m_cipherMode != nullptr)
+			{
+				m_cipherMode.reset(nullptr);
+			}
+		}
+		else
+		{
+			if (m_cipherMode != nullptr)
+			{
+				m_cipherMode.release();
+			}
+		}
+	}
+}
+
+//~~~Accessors~~~//
 
 bool &EAX::AutoIncrement() 
 {
@@ -28,7 +136,7 @@ const BlockCiphers EAX::CipherType()
 
 IBlockCipher* EAX::Engine() 
 { 
-	return m_cipherMode.Engine();
+	return m_cipherMode->Engine();
 }
 
 const CipherModes EAX::Enumeral()
@@ -68,7 +176,7 @@ const size_t EAX::MinTagSize()
 
 const std::string EAX::Name()
 { 
-	return CLASS_NAME + "-" + m_cipherMode.Engine()->Name();
+	return CLASS_NAME + "-" + m_cipherMode->Engine()->Name();
 }
 
 const size_t EAX::ParallelBlockSize()
@@ -78,7 +186,7 @@ const size_t EAX::ParallelBlockSize()
 
 ParallelOptions &EAX::ParallelProfile()
 {
-	return m_cipherMode.ParallelProfile(); 
+	return m_cipherMode->ParallelProfile(); 
 }
 
 bool &EAX::PreserveAD()
@@ -88,71 +196,9 @@ bool &EAX::PreserveAD()
 
 const std::vector<byte> EAX::Tag()
 {
-	if (!m_isFinalized)
-		throw CryptoCipherModeException("EAX:Tag", "The cipher mode has not been finalized!");
+	CexAssert(m_isFinalized, "The cipher mode has not been finalized");
 
 	return m_msgTag;
-}
-
-//~~~Constructor~~~//
-
-EAX::EAX(BlockCiphers CipherType)
-	:
-	m_cipherMode(CipherType),
-	m_aadData(m_cipherMode.BlockSize()),
-	m_aadLoaded(false),
-	m_aadPreserve(false),
-	m_blockSize(m_cipherMode.BlockSize()),
-	m_cipherKey(0),
-	m_cipherType(CipherType),
-	m_destroyEngine(true),
-	m_eaxNonce(0),
-	m_eaxVector(m_blockSize),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isFinalized(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
-	m_legalKeySizes(0),
-	m_macGenerator(m_cipherMode.Engine()),
-	m_macSize(m_blockSize),
-	m_msgTag(m_blockSize),
-	m_parallelProfile(m_blockSize, m_cipherMode.ParallelProfile().IsParallel(), m_cipherMode.ParallelProfile().ParallelBlockSize(), 
-		m_cipherMode.ParallelProfile().ParallelMaxDegree(), true, m_cipherMode.Engine()->StateCacheSize(), true)
-{
-	Scope();
-}
-
-EAX::EAX(IBlockCipher* Cipher)
-	:
-	m_cipherMode(Cipher != 0 ? Cipher : throw CryptoCipherModeException("EAX:CTor", "The Cipher can not be null!")),
-	m_aadData(m_cipherMode.BlockSize()),
-	m_aadLoaded(false),
-	m_aadPreserve(false),
-	m_blockSize(m_cipherMode.BlockSize()),
-	m_cipherKey(0),
-	m_cipherType(Cipher->Enumeral()),
-	m_destroyEngine(false),
-	m_eaxNonce(0),
-	m_eaxVector(m_blockSize),
-	m_isDestroyed(false),
-	m_isEncryption(false),
-	m_isFinalized(false),
-	m_isInitialized(false),
-	m_isLoaded(false),
-	m_legalKeySizes(0),
-	m_macGenerator(Cipher),
-	m_macSize(m_blockSize),
-	m_msgTag(m_blockSize),
-	m_parallelProfile(m_blockSize, m_cipherMode.ParallelProfile().IsParallel(), m_cipherMode.ParallelProfile().ParallelBlockSize(),
-		m_cipherMode.ParallelProfile().ParallelMaxDegree(), true, m_cipherMode.Engine()->StateCacheSize(), true)
-{
-	Scope();
-}
-
-EAX::~EAX()
-{
-	Destroy();
 }
 
 //~~~Public Functions~~~//
@@ -167,39 +213,6 @@ void EAX::DecryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Decrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void EAX::Destroy()
-{
-	if (!m_isDestroyed)
-	{
-		m_isDestroyed = true;
-		m_aadPreserve = false;
-		m_blockSize = 0;
-		m_cipherType = BlockCiphers::None;
-		m_aadLoaded = false;
-		m_isEncryption = false;
-		m_isInitialized = false;
-		m_isLoaded = false;
-		m_macSize = 0;
-		m_parallelProfile.Reset();
-
-		Utility::IntUtils::ClearVector(m_aadData);
-		Utility::IntUtils::ClearVector(m_cipherKey);
-		Utility::IntUtils::ClearVector(m_eaxNonce);
-		Utility::IntUtils::ClearVector(m_eaxVector);
-		Utility::IntUtils::ClearVector(m_msgTag);
-
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_cipherMode.IsInitialized())
-				m_cipherMode.Destroy();
-			if (m_macGenerator.IsInitialized())
-				m_macGenerator.Destroy();
-		}
-	}
-}
-
 void EAX::EncryptBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Encrypt128(Input, 0, Output, 0);
@@ -212,10 +225,8 @@ void EAX::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void EAX::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoCipherModeException("EAX:Finalize", "The cipher mode has not been initialized!");
-	if (Length < MIN_TAGSIZE || Length > m_macSize)
-		throw CryptoCipherModeException("EAX:Finalize", "The length must be minimum of 12 and maximum of MAC code size!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized");
+	CexAssert(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "The cipher mode has not been initialized");
 
 	CalculateMac();
 	Utility::MemUtils::Copy(m_msgTag, 0, Output, Offset, Length);
@@ -229,38 +240,54 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	if (KeyParams.Key().size() == 0)
 	{
 		if (KeyParams.Nonce() == m_eaxVector)
+		{
 			throw CryptoSymmetricCipherException("EAX:Initialize", "The nonce can not be zeroised or repeating!");
-		if (!m_cipherMode.IsInitialized())
+		}
+		if (!m_cipherMode->IsInitialized())
+		{
 			throw CryptoSymmetricCipherException("EAX:Initialize", "First initialization requires a key and nonce!");
+		}
 	}
 	else
 	{
 		if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
+		{
 			throw CryptoSymmetricCipherException("EAX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
-
+		}
 		m_cipherKey = KeyParams.Key();
 	}
 
-	if (KeyParams.Nonce().size() != m_cipherMode.BlockSize())
+	if (KeyParams.Nonce().size() != m_cipherMode->BlockSize())
+	{
 		throw CryptoSymmetricCipherException("EAX:Initialize", "Requires a nonce equal in size to the ciphers block size!");
+	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
+	{
 		throw CryptoSymmetricCipherException("EAX:Initialize", "The parallel block size is out of bounds!");
+	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() % m_parallelProfile.ParallelMinimumSize() != 0)
+	{
 		throw CryptoSymmetricCipherException("EAX:Initialize", "The parallel block size must be evenly aligned to the ParallelMinimumSize!");
+	}
 
 	m_isEncryption = Encryption;
 	m_eaxNonce = KeyParams.Nonce();
 	Key::Symmetric::SymmetricKey kp(m_cipherKey);
-	m_macGenerator.Initialize(kp);
-	UpdateTag((byte)0, m_eaxNonce);
-	m_macGenerator.Finalize(m_eaxVector, 0);
-	m_macGenerator.Initialize(kp);
+	m_macGenerator->Initialize(kp);
+
+	UpdateTag(0, m_eaxNonce);
+	m_macGenerator->Finalize(m_eaxVector, 0);
+	m_macGenerator->Initialize(kp);
 
 	// hx extended ciphers
-	if (KeyParams.Info().size() != 0 && m_cipherMode.Engine()->KdfEngine() != Digests::None)
-		m_cipherMode.Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector, KeyParams.Info()));
+	if (KeyParams.Info().size() != 0 && m_cipherMode->Engine()->KdfEngine() != Digests::None)
+	{
+		m_cipherMode->Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector, KeyParams.Info()));
+	}
 	else
-		m_cipherMode.Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector));
+	{
+		m_cipherMode->Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector));
+	}
 
 	if (m_isFinalized)
 	{
@@ -273,27 +300,22 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 void EAX::ParallelMaxDegree(size_t Degree)
 {
-	if (Degree == 0)
-		throw CryptoCipherModeException("EAX:ParallelMaxDegree", "Parallel degree can not be zero!");
-	if (Degree % 2 != 0)
-		throw CryptoCipherModeException("EAX:ParallelMaxDegree", "Parallel degree must be an even number!");
-	if (Degree > m_parallelProfile.ProcessorCount())
-		throw CryptoCipherModeException("EAX:ParallelMaxDegree", "Parallel degree can not exceed processor count!");
+	CexAssert(Degree != 0, "parallel degree can not be zero");
+	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
 
 void EAX::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
 {
-	if (!m_isInitialized)
-		throw CryptoSymmetricCipherException("EAX:SetAssociatedData", "The cipher has not been initialized!");
-	if (m_aadLoaded)
-		throw CryptoSymmetricCipherException("EAX:SetAssociatedData", "The associated data has already been set!");
+	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
+	CexAssert(!m_aadLoaded, "The associated data has already been set");
 
-	UpdateTag((byte)1, std::vector<byte>(0));
-	m_macGenerator.Update(Input, Offset, Length);
-	m_macGenerator.Finalize(m_aadData, 0);
-	UpdateTag((byte)2, std::vector<byte>(0));
+	UpdateTag(1, std::vector<byte>(0));
+	m_macGenerator->Update(Input, Offset, Length);
+	m_macGenerator->Finalize(m_aadData, 0);
+	UpdateTag(2, std::vector<byte>(0));
 	m_aadLoaded = true;
 }
 
@@ -304,27 +326,26 @@ void EAX::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 
 	if (m_isEncryption)
 	{
-		m_cipherMode.Transform(Input, InOffset, Output, OutOffset, Length);
-		m_macGenerator.Update(Output, OutOffset, Length);
+		m_cipherMode->Transform(Input, InOffset, Output, OutOffset, Length);
+		m_macGenerator->Update(Output, OutOffset, Length);
 	}
 	else
 	{
-		m_macGenerator.Update(Input, InOffset, Length);
-		m_cipherMode.Transform(Input, InOffset, Output, OutOffset, Length);
+		m_macGenerator->Update(Input, InOffset, Length);
+		m_cipherMode->Transform(Input, InOffset, Output, OutOffset, Length);
 	}
 }
 
 bool EAX::Verify(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
 {
-	if (m_isEncryption)
-		throw CryptoCipherModeException("EAX:Verify", "The cipher mode has not been initialized for decryption!");
-	if (!m_isInitialized && !m_isFinalized)
-		throw CryptoCipherModeException("EAX:Verify", "The cipher mode has not been initialized!");
-	if (Length < MIN_TAGSIZE || Length > m_macSize)
-		throw CryptoCipherModeException("EAX:Verify", "The length must be minimum of 12 and maximum of MAC code size!");
+	CexAssert(!m_isEncryption, "the cipher mode has not been initialized for decryption");
+	CexAssert(Length >= MIN_TAGSIZE || Length <= m_macSize, "the length must be minimum of 12 and maximum of MAC code size");
+	CexAssert(!(!m_isInitialized && !m_isFinalized), "the cipher mode has not been initialized for decryption");
 
 	if (!m_isFinalized)
+	{
 		CalculateMac();
+	}
 
 	return Utility::IntUtils::Compare(m_msgTag, 0, Input, Offset, Length);
 }
@@ -333,10 +354,12 @@ bool EAX::Verify(const std::vector<byte> &Input, const size_t Offset, const size
 
 void EAX::CalculateMac()
 {
-	m_macGenerator.Finalize(m_msgTag, 0);
+	m_macGenerator->Finalize(m_msgTag, 0);
 
 	for (size_t i = 0; i < m_msgTag.size(); ++i)
-		m_msgTag[i] ^= (byte)(m_eaxVector[i] ^ m_aadData[i]);
+	{
+		m_msgTag[i] ^= static_cast<byte>(m_eaxVector[i] ^ m_aadData[i]);
+	}
 
 	Reset();
 
@@ -347,7 +370,9 @@ void EAX::CalculateMac()
 		Initialize(m_isEncryption, Key::Symmetric::SymmetricKey(zero, m_eaxNonce));
 
 		if (m_aadPreserve)
-			UpdateTag((byte)2, std::vector<byte>(0));
+		{
+			UpdateTag(2, std::vector<byte>(0));
+		}
 	}
 
 	m_isFinalized = true;
@@ -357,8 +382,8 @@ void EAX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 {
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
 
-	m_macGenerator.Update(Input, InOffset, m_blockSize);
-	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
+	m_macGenerator->Update(Input, InOffset, m_blockSize);
+	m_cipherMode->EncryptBlock(Input, InOffset, Output, OutOffset);
 }
 
 void EAX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -366,8 +391,8 @@ void EAX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized!");
 	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= BLOCK_SIZE, "The data arrays are smaller than the the block-size!");
 
-	m_cipherMode.EncryptBlock(Input, InOffset, Output, OutOffset);
-	m_macGenerator.Update(Input, InOffset, m_blockSize);
+	m_cipherMode->EncryptBlock(Input, InOffset, Output, OutOffset);
+	m_macGenerator->Update(Input, InOffset, m_blockSize);
 }
 
 void EAX::Reset()
@@ -379,13 +404,13 @@ void EAX::Reset()
 	}
 
 	m_isInitialized = false;
-	m_macGenerator.Reset();
+	m_macGenerator->Reset();
 	Utility::MemUtils::Clear(m_eaxVector, 0, m_eaxVector.size());
 }
 
 void EAX::Scope()
 {
-	std::vector<SymmetricKeySize> keySizes = m_cipherMode.LegalKeySizes();
+	std::vector<SymmetricKeySize> keySizes = m_cipherMode->LegalKeySizes();
 	m_legalKeySizes.resize(keySizes.size());
 
 	for (size_t i = 0; i < m_legalKeySizes.size(); i++)
@@ -393,9 +418,9 @@ void EAX::Scope()
 		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), keySizes[i].NonceSize(), keySizes[i].NonceSize());
 	}
 
-	if (!m_cipherMode.ParallelProfile().IsDefault())
+	if (!m_cipherMode->ParallelProfile().IsDefault())
 	{
-		m_cipherMode.ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_cipherMode.ParallelProfile().ParallelBlockSize(), m_cipherMode.ParallelProfile().ParallelMaxDegree());
+		m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(), m_cipherMode->ParallelProfile().ParallelMaxDegree());
 	}
 }
 
@@ -403,10 +428,12 @@ void EAX::UpdateTag(byte Tag, const std::vector<byte> &Nonce)
 {
 	std::vector<byte> tmp(m_macSize);
 	tmp[tmp.size() - 1] = Tag;
-	m_macGenerator.Update(tmp, 0, tmp.size());
+	m_macGenerator->Update(tmp, 0, tmp.size());
 
 	if (Nonce.size() != 0)
-		m_macGenerator.Update(Nonce, 0, Nonce.size());
+	{
+		m_macGenerator->Update(Nonce, 0, Nonce.size());
+	}
 }
 
 NAMESPACE_MODEEND

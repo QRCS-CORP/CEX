@@ -1,5 +1,5 @@
-#ifndef _CEXTEST_MEMUTILSTEST_H
-#define _CEXTEST_MEMUTILSTEST_H
+#ifndef CEXTEST_MEMUTILSTEST_H
+#define CEXTEST_MEMUTILSTEST_H
 
 #include "ITest.h"
 //#if defined(__AVX__)
