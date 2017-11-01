@@ -12,9 +12,10 @@ namespace Test
 	/// <summary>
 	/// Tests the CipherStream Processer
 	/// </summary>
-	class CipherStreamTest : public ITest
+	class CipherStreamTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -32,15 +33,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Initialize this class
@@ -53,9 +45,19 @@ namespace Test
 		~CipherStreamTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
 

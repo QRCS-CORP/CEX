@@ -2,13 +2,15 @@
 #include "BCG.h"
 #include "MemUtils.h"
 #include "PolyMath.h"
-
 #if defined(__AVX512__)
 #	include "UInt512.h"
 #elif defined(__AVX2__)
 #	include "UInt256.h"
 #elif defined(__AVX__)
 #	include "UInt128.h"
+#endif
+#if defined(CEX_HAS_OPENMP)
+#	include <omp.h>
 #endif
 
 NAMESPACE_RINGLWE
@@ -259,7 +261,7 @@ void FFTQ12289N1024::Encrypt(std::vector<byte> &Secret, std::vector<byte> &Send,
 	std::vector<uint> buf2(N);
 	Rng->Fill(buf2, 0, N);
 
-#if defined(_OPENMP)
+#if defined(CEX_HAS_OPENMP)
 	if (Parallel)
 	{
 #		pragma omp parallel
@@ -322,7 +324,7 @@ void FFTQ12289N1024::Generate(std::vector<byte> &PublicKey, std::vector<ushort> 
 	std::vector<byte> seed(SEED_BYTES);
 	Rng->GetBytes(seed);
 
-#if defined(_OPENMP)
+#if defined(CEX_HAS_OPENMP)
 	if (Parallel)
 	{
 #		pragma omp parallel

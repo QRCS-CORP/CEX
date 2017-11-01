@@ -31,6 +31,16 @@ namespace Test
 	{
 	}
 
+	const std::string HXCipherTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &HXCipherTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string HXCipherTest::Run()
 	{
 		try

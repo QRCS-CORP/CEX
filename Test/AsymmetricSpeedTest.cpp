@@ -25,6 +25,16 @@ namespace Test
 	{
 	}
 
+	const std::string AsymmetricSpeedTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &AsymmetricSpeedTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string AsymmetricSpeedTest::Run()
 	{
 		try

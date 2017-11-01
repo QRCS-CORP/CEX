@@ -8,9 +8,10 @@ namespace Test
 	/// <summary>
 	/// SIMD Speed Tests
 	/// </summary>
-	class SimdSpeedTest : public ITest
+	class SimdSpeedTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string MESSAGE;
@@ -30,15 +31,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Initialize this class
@@ -51,11 +43,22 @@ namespace Test
 		~SimdSpeedTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void ClearBlockSpeed(uint64_t Length, size_t Loops);
 		void ClearVectorSpeed(uint64_t Length, size_t Loops);
 		void CopyBlockSpeed(uint64_t Length, size_t Loops);

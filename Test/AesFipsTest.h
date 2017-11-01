@@ -12,9 +12,10 @@ namespace Test
     /// Monte Carlo AES tests from the Brian Gladman's vector set:
     /// <see href="http://fp.gladman.plus.com/cryptography_technology/rijndael/"/></para>
     /// </summary>
-    class AesFipsTest : public ITest
+    class AesFipsTest final : public ITest
     {
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -26,15 +27,6 @@ namespace Test
 		bool m_testNI;
 
     public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality (FIPS 197)
@@ -47,11 +39,22 @@ namespace Test
 		~AesFipsTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
         
     private:
+
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 #if defined(__AVX__)

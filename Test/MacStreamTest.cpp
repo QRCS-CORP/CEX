@@ -30,6 +30,16 @@ namespace Test
 	{
 	}
 
+	const std::string MacStreamTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &MacStreamTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string MacStreamTest::Run()
 	{
 		using namespace Mac;
@@ -81,14 +91,18 @@ namespace Test
 		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
+		{
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
+		}
 
 		// test byte access method
 		ds.Initialize(kp);
 		hash2 = ds.Compute(data, 0, data.size());
 
 		if (hash1 != hash2)
+		{
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
+		}
 	}
 
 	void MacStreamTest::CompareHmac()
@@ -115,14 +129,18 @@ namespace Test
 		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
+		{
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
+		}
 
 		// test byte access method
 		ds.Initialize(kp);
 		hash2 = ds.Compute(data, 0, data.size());
 
 		if (hash1 != hash2)
+		{
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
+		}
 	}
 
 	void MacStreamTest::CmacDescriptionTest()
@@ -144,7 +162,9 @@ namespace Test
 		delete ms;
 
 		if (c1 != c2)
+		{
 			throw TestException("MacStreamTest: CMAC code arrays are not equal!");
+		}
 	}
 
 	void MacStreamTest::HmacDescriptionTest()
@@ -167,7 +187,9 @@ namespace Test
 		delete ms;
 
 		if (c1 != c2)
+		{
 			throw TestException("MacStreamTest: HMAC code arrays are not equal!");
+		}
 	}
 
 	void MacStreamTest::OnProgress(std::string Data)

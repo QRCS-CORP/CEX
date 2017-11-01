@@ -19,7 +19,19 @@ namespace Test
 	{
 	}
 
-	AesAvsTest::~AesAvsTest() {}
+	AesAvsTest::~AesAvsTest()
+	{
+	}
+
+	const std::string AesAvsTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &AesAvsTest::Progress()
+	{
+		return m_progressEvent;
+	}
 
 	std::string AesAvsTest::Run()
 	{

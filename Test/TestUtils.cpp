@@ -29,7 +29,9 @@ namespace Test
 		long totalc = (long)Input.size();
 
 		for (size_t i = 0; i < Input.size(); ++i)
+		{
 			count[Input[i]]++;
+		}
 
 		// Expected count per bin
 		double cexp = totalc / 256.0;
@@ -52,13 +54,17 @@ namespace Test
 		size_t i = A.size();
 
 		if (i != B.size())
+		{
 			return false;
+		}
 
 		while (i != 0)
 		{
 			--i;
 			if (A[i] != B[i])
+			{
 				return false;
+			}
 		}
 
 		return true;
@@ -129,7 +135,9 @@ namespace Test
 		double ret = 0;
 
 		for (size_t i = 0; i < Input.size(); ++i)
+		{
 			ret += Input[i];
+		}
 
 		return ret / Input.size();
 	}
@@ -173,6 +181,7 @@ namespace Test
 					+ 0.000535310849) * y + 0.999936657524;
 			}
 		}
+
 		return (Z > 0.0 ? ((x + 1.0) * 0.5) : ((1.0 - x) * 0.5));
 	}
 
@@ -191,13 +200,17 @@ namespace Test
 		int even;
 
 		if (x <= 0.0 || Df < 1)
+		{
 			return 1.0;
+		}
 
 		a = 0.5 * x;
 		even = (2 * (Df / 2)) == Df;
 
 		if (Df > 1)
+		{
 			y = ex(-a);
+		}
 
 		s = (even ? y : (2.0 * Poz(-sqrt(x))));
 		if (Df > 2)
@@ -273,7 +286,9 @@ namespace Test
 		std::vector<byte> data(len);
 
 		for (size_t i = 0; i < len; i++)
+		{
 			data[i] = (byte)(Seed[i] ^ Seed[len + i]);
+		}
 
 		return data;
 	}

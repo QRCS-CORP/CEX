@@ -28,6 +28,16 @@ namespace Test
 	{
 	}
 
+	const std::string RingLWETest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &RingLWETest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string RingLWETest::Run()
 	{
 		try

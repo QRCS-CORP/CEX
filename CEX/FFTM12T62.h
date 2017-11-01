@@ -38,7 +38,7 @@ class FFTM12T62
 private:
 
 	static const size_t PKN_ROWS = (62 * 12);
-	static const size_t PKN_COLS = (((size_t)1 << 12) - 62 * 12);
+	static const size_t PKN_COLS = ((static_cast<size_t>(1) << 12) - 62 * 12);
 	static const size_t IRR_SIZE = (12 * 8);
 	static const size_t CND_SIZE = ((PKN_ROWS - 8) * 8);
 	static const size_t GEN_MAXR = 10000;

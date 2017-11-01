@@ -18,7 +18,7 @@ namespace Test
 	/// <summary>
 	/// Asymmetric Cipher and Signature Scheme Speed Tests
 	/// </summary>
-	class AsymmetricSpeedTest : public ITest
+	class AsymmetricSpeedTest final : public ITest
 	{
 	private:
 		static const std::string DESCRIPTION;
@@ -41,16 +41,6 @@ namespace Test
 	public:
 
 		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
-
-		/// <summary>
 		/// Initailize this class
 		/// </summary>
 		AsymmetricSpeedTest();
@@ -61,9 +51,19 @@ namespace Test
 		~AsymmetricSpeedTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
 

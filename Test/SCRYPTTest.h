@@ -10,9 +10,10 @@ namespace Test
 	/// Tests the SCRYPT implementation using vector comparisons.
 	/// <para>Using the official Kats from RFC 7914: https://tools.ietf.org/html/rfc7914 .</para>
 	/// </summary>
-	class SCRYPTTest : public ITest
+	class SCRYPTTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -23,15 +24,6 @@ namespace Test
 		std::vector<std::vector<byte>> m_salt;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer SCRYPT Drbg vectors for equality
@@ -44,11 +36,22 @@ namespace Test
 		~SCRYPTTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t Parallelization, size_t OutputSize);
 		void Initialize();
 		void OnProgress(std::string Data);

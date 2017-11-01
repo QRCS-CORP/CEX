@@ -18,9 +18,10 @@ namespace Test
 	/// <summary>
 	/// Tests the SIMD wrapper implementations
 	/// </summary>
-	class SimdWrapperTest : public ITest
+	class SimdWrapperTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -28,15 +29,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Initialize this class
@@ -49,9 +41,19 @@ namespace Test
 		~SimdWrapperTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
 
@@ -60,7 +62,9 @@ namespace Test
 			std::vector<uint> ret(Input.size() / sizeof(uint));
 
 			for (size_t i = 0; i < ret.size(); ++i)
+			{
 				ret[i] = Utility::IntUtils::LeBytesTo32(Input, i * sizeof(uint));
+			}
 
 			return ret;
 		}
@@ -103,7 +107,9 @@ namespace Test
 				B = T(tmpB, 0);
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
+				{
 					tmpQ[j] = tmpA[j] + tmpB[j];
+				}
 
 				Q = T(tmpQ, 0);
 				C = A + B;
@@ -111,10 +117,14 @@ namespace Test
 				D += B;
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
+				{
 					throw TestException("SimdMathCheck: addition test failed!");
+				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
+				{
 					tmpQ[j] = tmpA[j] * tmpB[j];
+				}
 
 				Q = T(tmpQ, 0);
 				C = A * B;
@@ -122,10 +132,14 @@ namespace Test
 				D *= B;
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
+				{
 					throw TestException("SimdMathCheck: multiplication test failed!");
+				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
+				{
 					tmpQ[j] = tmpA[j] - tmpB[j];
+				}
 
 				Q = T(tmpQ, 0);
 				C = A - B;
@@ -133,10 +147,14 @@ namespace Test
 				D -= B;
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
+				{
 					throw TestException("SimdMathCheck: subtraction test failed!");
+				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
+				{
 					tmpQ[j] = tmpA[j] / tmpB[j];
+				}
 
 				Q = T(tmpQ, 0);
 				C = A / B;
@@ -144,11 +162,14 @@ namespace Test
 				D /= B;
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
+				{
 					throw TestException("SimdMathCheck: division test failed!");
-
+				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
+				{
 					tmpQ[j] = tmpA[j] % tmpB[j];
+				}
 
 				Q = T(tmpQ, 0);
 				C = A % B;
@@ -156,7 +177,9 @@ namespace Test
 				D %= B;
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
+				{
 					throw TestException("SimdMathCheck: modulus test failed!");
+				}
 			}
 		}
 

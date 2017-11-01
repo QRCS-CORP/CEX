@@ -22,6 +22,16 @@ namespace Test
 	{
 	}
 
+	const std::string RijndaelTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &RijndaelTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string RijndaelTest::Run()
 	{
 		try

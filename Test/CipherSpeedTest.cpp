@@ -42,6 +42,16 @@ namespace Test
 	{
 	}
 
+	const std::string CipherSpeedTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &CipherSpeedTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string CipherSpeedTest::Run()
 	{
 		try
@@ -82,10 +92,14 @@ namespace Test
 			IBlockCipher* engine;
 #if defined(__AVX__)
 			if (m_hasAESNI)
+			{
 				engine = new AHX();
+			}
 			else
 #endif
+			{
 				engine = new RHX();
+			}
 
 			OnProgress(std::string("***AES-CBC Sequential Encryption***"));
 			CBCSpeedTest(engine, true, false);
@@ -329,7 +343,9 @@ namespace Test
 		do
 		{
 			i = ctr1.size();
-			while (--i > 0 && ++ctr1[i] == 0) {}
+			while (--i > 0 && ++ctr1[i] == 0) 
+			{
+			}
 
 		} while (--itr != 0);
 
@@ -347,7 +363,9 @@ namespace Test
 			do
 			{
 				if (++ctr2[i] != 0)
+				{
 					break;
+				}
 				--i;
 			} 
 			while (i != 0);
@@ -366,8 +384,9 @@ namespace Test
 		do
 		{
 			if (++ctr3[0] == 0)
+			{
 				++ctr3[1];
-
+			}
 		} 
 		while (--itr != 0);
 
@@ -386,8 +405,11 @@ namespace Test
 			{
 				--i;
 				++ctr4[i];
+
 				if (ctr4[i] != 0)
+				{
 					break;
+				}
 			} 
 			while (i != 0);
 
@@ -405,8 +427,9 @@ namespace Test
 		do
 		{
 			for (size_t j = ctr5.size() - 1, carry = 1; j > 0 && carry; j--)
+			{
 				carry = !++ctr5[j];
-
+			}
 		}
 		while (--itr != 0);
 

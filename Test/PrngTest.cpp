@@ -23,6 +23,16 @@ namespace Test
 	{
 	}
 
+	const std::string PrngTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &PrngTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string PrngTest::Run()
 	{
 		using namespace CEX::Prng;

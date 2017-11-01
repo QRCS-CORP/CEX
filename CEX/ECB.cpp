@@ -300,7 +300,7 @@ void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::
 
 	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGSZE, BLKCNT](size_t i)
 	{
-		this->Generate(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, BLKCNT);
+		this->Generate(Input, InOffset + (i * SEGSZE), Output, OutOffset + (i * SEGSZE), BLKCNT);
 	});
 }
 

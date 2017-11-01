@@ -1538,12 +1538,12 @@ void FFTM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, M>, 64> &O
 	// butterflies
 	for (i = 0; i <= 5; i++)
 	{
-		s = (size_t)1 << i;
+		s = static_cast<size_t>(1) << i;
 
 		// butterflies
 		for (i = 0; i <= 5; i++)
 		{
-			s = (size_t)1 << i;
+			s = static_cast<size_t>(1) << i;
 
 			for (j = 0; j < 64; j += 2 * s)
 			{
@@ -1564,10 +1564,10 @@ void FFTM12T62::AdditiveFFT::Butterflies(std::array<std::array<ulong, M>, 64> &O
 				}
 			}
 
-			pos += ((size_t)1 << i);
+			pos += (static_cast<size_t>(1) << i);
 		}
 
-		pos += ((size_t)1 << i);
+		pos += (static_cast<size_t>(1) << i);
 	}
 }
 
@@ -1654,7 +1654,7 @@ void FFTM12T62::TransposedFFT::Butterflies(std::array<std::array<ulong, M>, 2> &
 	// butterflies
 	for (cnt = 5; cnt >= 0; --cnt)
 	{
-		s = (size_t)1 << cnt;
+		s = static_cast<size_t>(1) << cnt;
 		pos -= s;
 
 		for (j = 0; j < 64; j += 2 * s)

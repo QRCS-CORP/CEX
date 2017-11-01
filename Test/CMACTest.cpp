@@ -24,6 +24,16 @@ namespace Test
 	{
 	}
 
+	const std::string CMACTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &CMACTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string CMACTest::Run()
 	{
 		try
@@ -78,7 +88,9 @@ namespace Test
 		delete eng;
 
 		if (hash1 != hash2)
+		{
 			throw TestException("CMAC is not equal!");
+		}
 	}
 
 	void CMACTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
@@ -95,7 +107,9 @@ namespace Test
 		delete eng;
 
 		if (Expected != hash)
+		{
 			throw TestException("CMAC is not equal!");
+		}
 	}
 
 	void CMACTest::Initialize()

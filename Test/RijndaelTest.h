@@ -11,9 +11,10 @@ namespace Test
     /// <see href="https://www.cosic.esat.kuleuven.be/nessie/testvectors/bc/rijndael/Rijndael-256-256.unverified.test-vectors"/>
     /// Tests supported block sizes of 16 and 32 bytes.</para>
     /// </summary>
-    class RijndaelTest : public ITest
+    class RijndaelTest final : public ITest
     {
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -24,15 +25,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
     public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer Rijndael vectors for equality
@@ -45,11 +37,22 @@ namespace Test
 		~RijndaelTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
         
     private:
+
 		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void Initialize();
 		void OnProgress(std::string Data);

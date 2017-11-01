@@ -28,6 +28,16 @@ namespace Test
 	{
 	}
 
+	const std::string CipherModeTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &CipherModeTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string CipherModeTest::Run()
 	{
 		try
@@ -549,7 +559,9 @@ namespace Test
 		m_input.resize(inputSize);
 
 		for (size_t i = 0; i < inputSize; ++i)
+		{
 			HexConverter::Decode(inputEncoded[i], 4, m_input[i]);
+		}
 
 		const char *outputEncoded[][4] =
 		{
@@ -744,7 +756,9 @@ namespace Test
 		m_output.resize(outputSize);
 
 		for (size_t i = 0; i < outputSize; ++i)
+		{
 			HexConverter::Decode(outputEncoded[i], 4, m_output[i]);
+		}
 	}
 
 	void CipherModeTest::OnProgress(std::string Data)

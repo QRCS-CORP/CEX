@@ -19,6 +19,16 @@ namespace Test
 	{
 	}
 
+	const std::string DigestSpeedTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &DigestSpeedTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string DigestSpeedTest::Run()
 	{
 		using namespace Enumeration;
@@ -96,8 +106,10 @@ namespace Test
 		Digest::IDigest* dgt = Helper::DigestFromName::GetInstance(DigestType, Parallel);
 		size_t bufSze = dgt->BlockSize();
 		if (Parallel)
+		{
 			bufSze = dgt->ParallelBlockSize();
-		
+		}
+
 		std::vector<byte> hash(dgt->DigestSize(), 0);
 		std::vector<byte> buffer(bufSze, 0);
 		uint64_t start = TestUtils::GetTimeMs64();

@@ -21,6 +21,16 @@ namespace Test
 	{
 	}
 
+	const std::string SerpentTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SerpentTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string SerpentTest::Run()
 	{
 		try

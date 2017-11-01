@@ -32,6 +32,16 @@ namespace Test
 	{
 	}
 
+	const std::string RandomOutputTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &RandomOutputTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string RandomOutputTest::Run()
 	{
 		const std::string FILEPATH = "C:/Users/John/Documents/Tests/";

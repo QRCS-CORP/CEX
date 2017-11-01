@@ -34,6 +34,16 @@ namespace Test
 	{
 	}
 
+	const std::string AEADTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &AEADTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string AEADTest::Run()
 	{
 		try

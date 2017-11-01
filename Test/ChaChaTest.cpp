@@ -24,6 +24,16 @@ namespace Test
 	{
 	}
 
+	const std::string ChaChaTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &ChaChaTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string ChaChaTest::Run()
 	{
 		try

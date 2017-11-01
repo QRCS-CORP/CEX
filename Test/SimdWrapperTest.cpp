@@ -16,6 +16,16 @@ namespace Test
 	{
 	}
 
+	const std::string SimdWrapperTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SimdWrapperTest::Progress()
+	{
+		return m_progressEvent;
+}
+
 	std::string SimdWrapperTest::Run()
 	{
 		try

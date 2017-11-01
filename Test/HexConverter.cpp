@@ -18,7 +18,9 @@ namespace Test
 		while (end > 0)
 		{
 			if (!Ignore(Input[end - 1]))
+			{
 				break;
+			}
 
 			end--;
 		}
@@ -31,12 +33,16 @@ namespace Test
 		while (i < end)
 		{
 			while (i < end && Ignore(Input[i]))
+			{
 				i++;
+			}
 
 			byte b1 = decTable[Input[i++]];
 
 			while (i < end && Ignore(Input[i]))
+			{
 				i++;
+			}
 
 			byte b2 = decTable[Input[i++]];
 			Output[j++] = (byte)((b1 << 4) | b2);
@@ -101,7 +107,9 @@ namespace Test
 		std::vector<byte> encTable;
 		encTable.reserve(sizeof(ENCODING_TABLE));
 		for (size_t i = 0; i < sizeof(ENCODING_TABLE); ++i)
+		{
 			encTable.push_back(ENCODING_TABLE[i]);
+		}
 
 		return encTable;
 	}
@@ -112,7 +120,9 @@ namespace Test
 		std::vector<byte> decTable(128, 0);
 
 		for (size_t i = 0; i < encTable.size(); i++)
+		{
 			decTable[encTable[i]] = (byte)i;
+		}
 
 		decTable['A'] = decTable['a'];
 		decTable['B'] = decTable['b'];

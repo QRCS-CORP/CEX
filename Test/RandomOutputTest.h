@@ -8,9 +8,10 @@ namespace Test
 	/// <summary>
 	/// Copies generator output to a file for external testing
 	/// </summary>
-	class RandomOutputTest : public ITest
+	class RandomOutputTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -18,15 +19,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer CMAC vectors for equality
@@ -39,11 +31,22 @@ namespace Test
 		~RandomOutputTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CMGGenerateFile(std::string FilePath, size_t FileSize);
 		void DCGGenerateFile(std::string FilePath, size_t FileSize);
 		void HMGGenerateFile(std::string FilePath, size_t FileSize);

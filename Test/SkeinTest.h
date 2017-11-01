@@ -13,9 +13,10 @@ namespace Test
 	/// <para>Tests the 256, 512, and 1024 bit versions of Skein against known test vectors from the skein 1.3 document, appendix C:
     /// <see href="http://www.skein-hash.info/sites/default/files/skein1.3.pdf"/></para>
 	/// </summary>
-	class SkeinTest : public ITest
+	class SkeinTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -29,15 +30,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Known answer tests for the 256, 512, and 1024 bit versions of Skein
@@ -50,11 +42,22 @@ namespace Test
 		~SkeinTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CompareParallel(IDigest* Dgt1, IDigest* Dgt2);
 		void CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();

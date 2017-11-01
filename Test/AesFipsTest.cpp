@@ -26,6 +26,16 @@ namespace Test
 	{
 	}
 
+	const std::string AesFipsTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &AesFipsTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string AesFipsTest::Run()
 	{
 		try

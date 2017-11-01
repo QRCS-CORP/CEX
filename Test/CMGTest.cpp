@@ -25,6 +25,16 @@ namespace Test
 	{
 	}
 
+	const std::string CMGTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &CMGTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string CMGTest::Run()
 	{
 		try
@@ -65,21 +75,27 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("CMGTest: Failed duplication test!");
+			}
 
 			// test seed + nonce init
 			ctd.Initialize(key, nonce);
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("CMGTest: Failed duplication test!");
+			}
 
 			// test parallel
 			ctd.ParallelProfile().IsParallel() = true;
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("CMGTest: Failed parallel duplication test!");
+			}
 
 			// test seed init
 			key.resize(48, 0x02);
@@ -87,7 +103,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("CMGTest: Failed duplication test!");
+			}
 
 		}
 		catch (...)
@@ -108,7 +126,9 @@ namespace Test
 			delete dgt;
 
 			if (CheckRuns(output))
+			{
 				throw TestException("CMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -141,20 +161,28 @@ namespace Test
 		delete eng;
 
 		if (output1 != output2)
+		{
 			throw TestException("BCG: Failed output comparison test!");
+		}
 	}
 
 	bool CMGTest::CheckRuns(const std::vector<byte> &Input)
 	{
+		bool state = false;
+
 		// indicates zeroed output or bad run
 		for (size_t i = 0; i < Input.size() - 4; i += 4)
 		{
-			if (Input[i] == Input[i + 1] && 
+			if (Input[i] == Input[i + 1] &&
 				Input[i + 1] == Input[i + 2] &&
 				Input[i + 2] == Input[i + 3])
-				return true;
+			{
+				state = true;
+				break;
+			}
 		}
-		return false;
+
+		return state;
 	}
 
 	void CMGTest::OnProgress(std::string Data)

@@ -574,7 +574,7 @@ void OCB::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std::v
 
 		for (size_t i = 0; i < SUBBLK; ++i)
 		{
-			m_blockCipher->Transform1024(Output, OutOffset + (i * AVX512BLK), Output, OutOffset + (i * AVX512BLK));
+			m_blockCipher->Transform2048(Output, OutOffset + (i * AVX512BLK), Output, OutOffset + (i * AVX512BLK));
 		}
 
 		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, PBKALN);

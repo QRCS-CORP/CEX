@@ -275,6 +275,7 @@ typedef unsigned char byte;
 
 // native openmp support
 #if defined(_OPENMP)
+#	define CEX_HAS_OPENMP
 #	if _OPENMP == 201511
 #		define CEX_OPENMP_VERSION_45
 #	elif _OPENMP == 201307

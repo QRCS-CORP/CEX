@@ -27,6 +27,16 @@ namespace Test
 	{
 	}
 
+	const std::string McElieceTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &McElieceTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string McElieceTest::Run()
 	{
 		try

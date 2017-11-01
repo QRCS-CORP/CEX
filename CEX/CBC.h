@@ -46,21 +46,6 @@ NAMESPACE_MODE
 /// cipher.Transform(Input, 0, Output, 0);
 /// </code>
 /// </example>
-///
-/// <example>
-/// <description>Decrypting using multi-threading and CBC-WBV:</description>
-/// <code>
-/// CBC cipher(new AHX());
-/// // enable parallel and set the parallel input block size
-/// cipher.IsParallel() = true;
-/// // calculated automatically based on cache size, but overridable
-/// cipher.ParallelBlockSize() = cipher.ProcessorCount() * 32000;
-/// // initialize for decryption
-/// cipher.Initialize(false, SymmetricKey(Key, Nonce));
-/// // decrypt one parallel sized block
-/// cipher.Transform1024(Input, 0, Output, 0);
-/// </code>
-/// </example>
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
@@ -84,14 +69,6 @@ NAMESPACE_MODE
 /// The CBC parallel decryption mode also leverages SIMD instructions to 'double parallelize' those segments. A block of cipher-text assigned to a thread
 /// uses SIMD instructions to decrypt 4 or 8 blocks in parallel per cycle, depending on which framework is runtime available, 128 or 256 SIMD instructions.</para>
 ///
-/// <description><B>CBC-WBV:</B></description>
-/// <para>Wide Block Vectorization is an extension of the standard CBC mode. Instead of processing a single 16 byte block of input, WBV processes 4 or 8 blocks concurrently using SIMD instructions. \n
-/// The underlying block cipher contains the functions Transform512() and Transform1024(), which use parallel instructions (SSE3 or AVX dedending on runtime availability), to process multiple input blocks simultaneously. \n
-/// This has two adavantages; the first being that if the longer initialization vector is secure (64 or 128 bytes), there is a corresponding increase in security. The second advantage is performance. \n
-/// Even if a mode is limited by dependency chaining, like the encryption function of the CBC mode, it can still be parallelized using this method, processing input several times faster than the standard 
-/// sequential mode configuration. \n
-/// Just as with the standard block size, the decryption function is multi-threaded, maximizing the potential throughput of this extended mode.</para>
-///
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
 /// <item><description>A cipher mode constructor can either be initialized with a block cipher instance, or using the block ciphers enumeration name.</description></item>
@@ -104,10 +81,6 @@ NAMESPACE_MODE
 /// <item><description>Parallel processing is enabled on decryption by setting IsParallel() to true, and passing an input block of ParallelBlockSize() to the transform.</description></item>
 /// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
 /// <item><description>Parallel block calculation ex. <c>ParallelBlockSize() = data.size() - (data.size() % cipher.ParallelMinimumSize());</c></description></item>
-/// <item><description>CBC-WBV Transforms require cipher initialization with either a 64 or 128 byte Initialization Vector.</description></item>
-/// <item><description>CBC-WBV uses the Transform512() or Transform1024() functions to process input in 64 or 128 byte message blocks in sequential mode.</description></item>
-/// <item><description>CBC-WBV output is <B>not equal</B> to the mode run with a smaller block size; Encryption and Decryption must be performed using an identical block length.</description></item>
-/// <item><description>CBC-WBV uses ParallelBlockSize() sized input message blocks to process in multi-threaded mode.</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>

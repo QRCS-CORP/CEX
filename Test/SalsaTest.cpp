@@ -24,6 +24,16 @@ namespace Test
 	{
 	}
 
+	const std::string SalsaTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SalsaTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string SalsaTest::Run()
 	{
 		try

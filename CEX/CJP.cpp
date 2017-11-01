@@ -412,7 +412,7 @@ size_t CJP::ShuffleLoop(uint LowBits, uint MinShift)
 	}
 
 	// add a lower boundary value to ensure we have a minimum RNG loop count
-	return ((size_t)shuffle + ((size_t)1 << MinShift));
+	return (static_cast<size_t>(shuffle) + (static_cast<size_t>(1) << MinShift));
 }
 
 void CJP::StirPool()

@@ -26,6 +26,16 @@ namespace Test
 	{
 	}
 
+	const std::string HMACTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &HMACTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string HMACTest::Run()
 	{
 		try
@@ -76,7 +86,9 @@ namespace Test
 
 		std::vector<byte> input(256);
 		for (size_t i = 0; i < input.size(); ++i)
+		{
 			input[i] = (byte)i;
+		}
 
 		mac.Compute(input, hash1);
 
@@ -87,7 +99,9 @@ namespace Test
 		delete eng;
 
 		if (hash1 != hash2)
+		{
 			throw TestException("CMAC is not equal!");
+		}
 	}
 
 	void HMACTest::CompareVector256(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
@@ -110,12 +124,16 @@ namespace Test
 			std::memcpy(&tmph[0], &hash[0], Expected.size());
 
 			if (Expected != tmph)
+			{
 				throw TestException("HMACTest: return code is not equal!");
+			}
 		}
 		else
 		{
 			if (Expected != hash)
+			{
 				throw TestException("HMACTest: return code is not equal!");
+			}
 		}
 	}
 
@@ -138,12 +156,16 @@ namespace Test
 			std::memcpy(&tmph[0], &hash[0], Expected.size());
 
 			if (Expected != tmph)
+			{
 				throw TestException("HMACTest: return code is not equal!");
+			}
 		}
 		else
 		{
 			if (Expected != hash)
+			{
 				throw TestException("HMACTest: return code is not equal!");
+			}
 		}
 	}
 

@@ -20,6 +20,16 @@ namespace Test
 	{
 	}
 
+	const std::string UtilityTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &UtilityTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string UtilityTest::Run()
 	{
 		try

@@ -9,9 +9,10 @@ namespace Test
 	/// <summary>
 	/// Digest Speed Tests
 	/// </summary>
-	class DigestSpeedTest : public ITest
+	class DigestSpeedTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string MESSAGE;
@@ -28,16 +29,6 @@ namespace Test
 	public:
 
 		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
-
-		/// <summary>
 		/// Initailize this class
 		/// </summary>
 		DigestSpeedTest();
@@ -48,9 +39,19 @@ namespace Test
 		~DigestSpeedTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
 

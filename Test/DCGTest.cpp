@@ -23,6 +23,16 @@ namespace Test
 	{
 	}
 
+	const std::string DCGTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &DCGTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string DCGTest::Run()
 	{
 		try
@@ -66,7 +76,9 @@ namespace Test
 			delete pvd;
 
 			if (CheckRuns(output))
+			{
 				throw TestException("DCGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -81,7 +93,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("DCGTest: Failed duplication test!");
+			}
 
 			// second legal key size + nonce
 			size_t seedLen = ctd.LegalKeySizes()[1].KeySize() - 8;
@@ -91,7 +105,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("DCGTest: Failed duplication test!");
+			}
 
 			// third legal key size + nonce + info
 			seedLen = (ctd.LegalKeySizes()[2].KeySize() / 2) - 8;
@@ -101,7 +117,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("DCGTest: Failed duplication test!");
+			}
 
 		}
 		catch (...)

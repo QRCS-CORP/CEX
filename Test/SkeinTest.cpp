@@ -31,6 +31,16 @@ namespace Test
 	{
 	}
 
+	const std::string SkeinTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SkeinTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string SkeinTest::Run()
 	{
 		try
@@ -125,7 +135,9 @@ namespace Test
 			Dgt2->Reset();
 
 			if (hash1 != hash2)
+			{
 				throw TestException("SKein Vector: Expected hash is not equal!");
+			}
 
 			// test partial block-size and compute method
 			input.resize(input.size() + rnd.NextUInt32(200, 1), (byte)199);
@@ -136,7 +148,9 @@ namespace Test
 			Dgt2->Reset();
 
 			if (hash1 != hash2)
+			{
 				throw TestException("SKein Vector: Expected hash is not equal!");
+			}
 		}
 	}
 
@@ -150,11 +164,15 @@ namespace Test
 		Digest->Reset();
 
 		if (Expected != hash)
+		{
 			throw TestException("SKein Vector: Expected hash is not equal!");
+		}
 
 		Digest->Compute(Input, hash);
 		if (Expected != hash)
+		{
 			throw TestException("SKein Vector: Expected hash is not equal!");
+		}
 	}
 
 	void SkeinTest::Initialize()
@@ -218,7 +236,9 @@ namespace Test
 		SkeinParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
+		{
 			throw std::string("SkeinTest: Tree parameters test failed!");
+		}
 
 		std::vector<byte> code2(20, 7);
 		SkeinParams tree3(std::vector<byte> { 1, 2, 3, 4 }, 64, 1, 64, 8, 0, code2);
@@ -226,7 +246,9 @@ namespace Test
 		SkeinParams tree4(tres);
 
 		if (!tree3.Equals(tree4))
+		{
 			throw std::string("SkeinTest: Tree parameters test failed!");
+		}
 	}
 
 	void SkeinTest::OnProgress(std::string Data)

@@ -40,6 +40,16 @@ namespace Test
 	{
 	}
 
+	const std::string ParallelModeTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &ParallelModeTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string ParallelModeTest::Run()
 	{
 		try

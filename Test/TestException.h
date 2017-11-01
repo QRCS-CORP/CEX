@@ -17,14 +17,6 @@ namespace Test
 		std::string m_message;
 
 	public:
-		/// <summary>
-		/// The origin of the exception in the format Class:Method
-		/// </summary>
-		const std::string &Origin() const { return m_origin; }
-		std::string &Origin() { return m_origin; }
-
-		const std::string &Message() const { return m_message; }
-		std::string &Message() { return m_message; }
 
 		/// <summary>
 		/// Exception constructor
@@ -49,6 +41,29 @@ namespace Test
 			m_origin(Origin),
 			m_message(Message)
 		{
+		}
+
+		/// <summary>
+		/// The origin of the exception in the format Class:Method
+		/// </summary>
+		const std::string &Origin() const
+		{
+			return m_origin;
+		}
+
+		std::string &Origin()
+		{
+			return m_origin;
+		}
+
+		const std::string &Message() const
+		{
+			return m_message;
+		}
+
+		std::string &Message()
+		{
+			return m_message;
 		}
 	};
 }

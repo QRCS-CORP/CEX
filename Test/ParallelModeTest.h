@@ -15,9 +15,10 @@ namespace Test
     /// <remarks>
     /// Kat, integrity, and output comparisons, targeting multi-threaded and SIMD cipher mode operations
     /// </remarks>
-    class ParallelModeTest : public ITest
+    class ParallelModeTest final : public ITest
     {
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -37,15 +38,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
     public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <remarks>
 		/// Compares Output between linear and parallel Cipher Modes
@@ -58,9 +50,19 @@ namespace Test
 		~ParallelModeTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
         
     private:
 

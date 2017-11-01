@@ -9,7 +9,7 @@ namespace Test
 	/// HCG output comparison test.
 	/// <para></para>
 	/// </summary>
-	class HMGTest : public ITest
+	class HMGTest final : public ITest
 	{
 	private:
 		static const std::string DESCRIPTION;
@@ -20,15 +20,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
@@ -41,11 +32,22 @@ namespace Test
 		~HMGTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CheckInit();
 		void CheckMac();
 		bool CheckRuns(const std::vector<byte> &Input);

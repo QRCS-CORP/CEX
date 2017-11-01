@@ -41,6 +41,16 @@ namespace Test
 	{
 	}
 
+	const std::string CipherStreamTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &CipherStreamTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string CipherStreamTest::Run()
 	{
 		using namespace Cipher::Symmetric::Block::Mode;
@@ -134,7 +144,9 @@ namespace Test
 
 			m_key.resize(192);
 			for (size_t i = 0; i < 192; i++)
+			{
 				m_key[i] = (byte)i;
+			}
 
 			// test extended ciphers
 			Cipher::Symmetric::Block::RHX* rhx = new Cipher::Symmetric::Block::RHX();
@@ -253,14 +265,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// ***compare decryption output *** //
 
@@ -268,8 +284,10 @@ namespace Test
 			cipher.Initialize(false, kp);
 			BlockDecrypt(&cipher, padding, m_encText, 0, m_decText, 0);
 
-			//if (m_plnText != m_decText)
-			//	throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			if (m_plnText != m_decText)
+			{
+				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -278,14 +296,18 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt parallel mode
 			cs.ParallelProfile().IsParallel() = true;
@@ -293,10 +315,12 @@ namespace Test
 			mOut.Seek(0, IO::SeekOrigin::Begin);
 			mRes.Seek(0, IO::SeekOrigin::Begin);
 			cs.Initialize(false, kp);
-			cs.Write(&mOut, &mRes);/**/
+			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			m_cmpText.resize(m_encText.size());
 			// byte array interface parallel
@@ -304,7 +328,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			m_cmpText.resize(m_encText.size());
 			// byte array interface sequential
@@ -313,7 +339,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 		}
 
 		delete eng;
@@ -361,14 +389,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// ***compare decryption output *** //
 
@@ -377,7 +409,9 @@ namespace Test
 			BlockDecrypt(&cipher, padding, m_encText, 0, m_decText, 0);
 
 			if (m_plnText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -386,14 +420,18 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_plnText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_plnText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt parallel mode
 			cs.ParallelProfile().IsParallel() = true;
@@ -404,7 +442,9 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			m_cmpText.resize(m_encText.size());
 			// byte array interface parallel
@@ -412,7 +452,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			m_cmpText.resize(m_encText.size());
 			// byte array interface sequential
@@ -421,7 +463,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 		}
 
 		delete eng;
@@ -470,14 +514,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			mIn.Seek(0, IO::SeekOrigin::Begin);
 			mOut.Seek(0, IO::SeekOrigin::Begin);
@@ -488,14 +536,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// ***compare decryption output *** //
 
@@ -504,7 +556,9 @@ namespace Test
 			BlockCTR(&cipher, m_encText, 0, m_decText, 0);
 
 			if (m_plnText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -513,14 +567,18 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt parallel mode
 			cs.ParallelProfile().IsParallel() = true;
@@ -531,14 +589,18 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 		}
 
 		delete eng;
@@ -566,7 +628,9 @@ namespace Test
 		cs.Write(&mOut, &mRes);
 
 		if (mRes.ToArray() != m_plnText)
+		{
 			throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+		}
 	}
 
 	void CipherStreamTest::Initialize()
@@ -587,25 +651,34 @@ namespace Test
 
 		std::vector<byte> data(255);
 		for (size_t i = 0; i < 255; i++)
+		{
 			data[i] = (byte)i;
+		}
 		ms.Write(data, 0, 255);
 
 		ms.Seek(0, IO::SeekOrigin::Begin);
 
 		byte x = ms.ReadByte();
 		if (x != (byte)10)
+		{
 			throw;
+		}
 		x = ms.ReadByte();
 		if (x != (byte)11)
+		{
 			throw;
+		}
 		x = ms.ReadByte();
 		if (x != (byte)12)
+		{
 			throw;
-
+		}
 		std::vector<byte> data2(255);
 		ms.Read(data2, 0, 255);
 		if (data2 != data)
+		{
 			throw;
+		}
 	}
 
 	void CipherStreamTest::ParametersTest()
@@ -633,7 +706,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_decText, 0);
 
 			if (m_decText != m_plnText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			delete cipher;
 		}
@@ -653,7 +728,9 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_plnText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			delete cipher;
 		}
@@ -673,7 +750,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_decText, 0);
 
 			if (m_decText != m_plnText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			delete cipher;
 		}
@@ -696,7 +775,9 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_plnText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			delete cipher;
 		}
@@ -721,7 +802,9 @@ namespace Test
 				cs.Write(m_encText, 0, m_decText, 0);
 
 				if (m_decText != m_plnText)
+				{
 					throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+				}
 
 				delete cipher;
 			}
@@ -750,7 +833,9 @@ namespace Test
 				cs.Write(&mOut, &mRes);
 
 				if (mRes.ToArray() != m_plnText)
+				{
 					throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+				}
 
 				delete cipher;
 			}
@@ -801,14 +886,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// ***compare decryption output *** //
 
@@ -817,7 +906,9 @@ namespace Test
 			BlockDecrypt(&cipher, padding, m_encText, 0, m_decText, 0);
 
 			if (m_plnText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt linear mode
 			cipher2.ParallelProfile().IsParallel() = false;
@@ -826,7 +917,9 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			m_cmpText.resize(m_encText.size());
 			// byte array interface
@@ -834,7 +927,9 @@ namespace Test
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 		}
 
 		delete engine;
@@ -857,11 +952,15 @@ namespace Test
 		Processing::CipherDescription cy(*cd.ToStream());
 
 		if (!cy.Equals(cd))
+		{
 			throw;
+		}
 
 		cy.KeySize() = 0;
 		if (cy.Equals(cd))
+		{
 			throw;
+		}
 	}
 
 	void CipherStreamTest::StreamTest()
@@ -904,14 +1003,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			mIn.Seek(0, IO::SeekOrigin::Begin);
 			mOut.Seek(0, IO::SeekOrigin::Begin);
@@ -923,14 +1026,18 @@ namespace Test
 			cs.Write(&mIn, &mOut);
 
 			if (mOut.ToArray() != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(true, kp);
 			cs.Write(m_plnText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_encText)
+			{
 				throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+			}
 
 			// ***compare decryption output *** //
 
@@ -939,7 +1046,9 @@ namespace Test
 			ProcessStream(cipher, m_encText, 0, m_decText, 0);
 
 			if (m_plnText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt linear mode
 			cs.ParallelProfile().IsParallel() = false;
@@ -948,14 +1057,18 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// decrypt parallel mode
 			cs.ParallelProfile().IsParallel() = true;
@@ -966,14 +1079,18 @@ namespace Test
 			cs.Write(&mOut, &mRes);
 
 			if (mRes.ToArray() != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 
 			// byte array interface
 			cs.Initialize(false, kp);
 			cs.Write(m_encText, 0, m_cmpText, 0);
 
 			if (m_cmpText != m_decText)
+			{
 				throw TestException("CipherStreamTest: Decrypted arrays are not equal!");
+			}
 		}
 
 		delete cipher;
@@ -984,9 +1101,13 @@ namespace Test
 	{
 		Key::Symmetric::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
 		if (keySize.KeySize() > 32)
+		{
 			AllocateRandom(m_key, 192);
+		}
 		else
+		{
 			AllocateRandom(m_key, 32);
+		}
 
 		AllocateRandom(m_iv, 16);
 		// we are testing padding modes, make sure input size is random, but -not- block aligned..
@@ -1006,7 +1127,9 @@ namespace Test
 		cs.Write(&mOut, &mRes);
 
 		if (mRes.ToArray() != m_plnText)
+		{
 			throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+		}
 
 		delete Cipher;
 		delete Padding;
@@ -1035,7 +1158,9 @@ namespace Test
 		delete Cipher;
 
 		if (mRes.ToArray() != m_plnText)
+		{
 			throw TestException("CipherStreamTest: Encrypted arrays are not equal!");
+		}
 	}
 
 	//~~~Helpers~~~//
@@ -1097,7 +1222,9 @@ namespace Test
 		OutOffset += FNLSZE;
 
 		if (Output.size() != OutOffset)
+		{
 			Output.resize(OutOffset);
+		}
 	}
 
 	void CipherStreamTest::BlockEncrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
@@ -1121,11 +1248,15 @@ namespace Test
 			std::vector<byte> inpBuffer(BLKSZE);
 			std::memcpy(&inpBuffer[0], &Input[InOffset], FNLSZE);
 			if (FNLSZE != BLKSZE)
+			{
 				Padding->AddPadding(inpBuffer, FNLSZE);
+			}
 			std::vector<byte> outBuffer(BLKSZE);
 			Cipher->EncryptBlock(inpBuffer, 0, outBuffer, 0);
 			if (Output.size() != OutOffset + BLKSZE)
+			{
 				Output.resize(OutOffset + BLKSZE);
+			}
 			std::memcpy(&Output[OutOffset], &outBuffer[0], BLKSZE);
 		}
 	}

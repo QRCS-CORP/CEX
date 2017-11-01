@@ -20,6 +20,16 @@ namespace Test
 	{
 	}
 
+	const std::string MemUtilsTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &MemUtilsTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string MemUtilsTest::Run()
 	{
 		try
@@ -52,7 +62,9 @@ namespace Test
 			MemUtils::Copy(input, 0, output, 0, inpSze);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// 128 block
@@ -64,7 +76,9 @@ namespace Test
 			MemUtils::COPY128(input, 0, output, 0);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// 256 block
@@ -76,7 +90,9 @@ namespace Test
 			MemUtils::COPY256(input, 0, output, 0);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// 512 block
@@ -88,7 +104,9 @@ namespace Test
 			MemUtils::COPY512(input, 0, output, 0);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// byte to ulong
@@ -101,7 +119,9 @@ namespace Test
 			MemUtils::CopyToValue(output, 0, cmpVal, 8);
 
 			if (cmpVal != inpVal)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		//~~~CLEAR~~~//
@@ -114,7 +134,9 @@ namespace Test
 			MemUtils::Clear(input, 0, inpSze);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 
@@ -127,7 +149,9 @@ namespace Test
 			MemUtils::CLEAR128(input, 0);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// clear 256
@@ -139,7 +163,9 @@ namespace Test
 			MemUtils::CLEAR256(input, 0);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// clear 512
@@ -151,7 +177,9 @@ namespace Test
 			MemUtils::CLEAR512(input, 0);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		//~~~SET~~~//
@@ -165,7 +193,9 @@ namespace Test
 			MemUtils::SetValue(output, 0, inpSze, (byte)0xff);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// memset 128
@@ -178,7 +208,9 @@ namespace Test
 			MemUtils::SETVAL128(output, 0, val);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// memset 256
@@ -191,7 +223,9 @@ namespace Test
 			MemUtils::SETVAL256(output, 0, val);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 
 		// memset 512
@@ -204,7 +238,9 @@ namespace Test
 			MemUtils::SETVAL512(output, 0, val);
 
 			if (input != output)
+			{
 				throw TestException("CompareOutput: byte comparison failed!");
+			}
 		}
 	}
 

@@ -25,6 +25,16 @@ namespace Test
 	{
 	}
 
+	const std::string HKDFTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &HKDFTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string HKDFTest::Run()
 	{
 		try

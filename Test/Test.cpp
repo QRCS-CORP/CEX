@@ -288,12 +288,14 @@ bool CanTest(std::string Message)
 	std::transform(resp.begin(), resp.end(), resp.begin(), ::toupper);
 
 	const std::string CONFIRM = "Y";
+	bool state = false;
+
 	if (resp.find(CONFIRM) != std::string::npos)
 	{
-		return true;
+		state = true;
 	}
 
-	return false;
+	return state;
 }
 
 void PrintHeader(std::string Data, std::string Decoration = "***")

@@ -21,6 +21,16 @@ namespace Test
 	{
 	}
 
+	const std::string PaddingTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &PaddingTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string PaddingTest::Run()
 	{
 		try

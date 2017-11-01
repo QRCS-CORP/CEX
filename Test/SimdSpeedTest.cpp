@@ -45,6 +45,16 @@ namespace Test
 	{
 	}
 
+	const std::string SimdSpeedTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SimdSpeedTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string SimdSpeedTest::Run()
 	{
 		try
@@ -669,8 +679,9 @@ namespace Test
 			while (blkCtr < Length)
 			{
 				for (size_t j = 0; j < buffer1.size(); ++j)
+				{
 					buffer2[j] ^= buffer1[j];
-
+				}
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -725,7 +736,9 @@ namespace Test
 			while (blkCtr < Length)
 			{
 				for (size_t j = 0; j < buffer1.size(); ++j)
+				{
 					buffer2[j] ^= buffer1[j];
+				}
 
 				blkCtr += buffer1.size();
 			}
@@ -765,8 +778,9 @@ namespace Test
 			while (blkCtr < Length)
 			{
 				for (size_t j = 0; j < buffer1.size(); ++j)
+				{
 					buffer2[j] ^= buffer1[j];
-
+				}
 				blkCtr += buffer1.size();
 			}
 			blkCtr = 0;
@@ -804,7 +818,9 @@ namespace Test
 			while (blkCtr < Length)
 			{
 				for (size_t j = 0; j < buffer1.size(); ++j)
+				{
 					buffer2[j] ^= buffer1[j];
+				}
 
 				blkCtr += buffer1.size();
 			}

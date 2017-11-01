@@ -21,6 +21,16 @@ namespace Test
 	{
 	}
 
+	const std::string HMGTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &HMGTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string HMGTest::Run()
 	{
 		try
@@ -68,7 +78,9 @@ namespace Test
 			delete pvd;
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -88,7 +100,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 
 			// second legal key size
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x03);
@@ -97,7 +111,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 
 			// third legal key size + nonce + info
 			seed.resize(ctd.LegalKeySizes()[0].KeySize(), 0x03);
@@ -105,8 +121,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
-
+			}
 		}
 		catch (...)
 		{
@@ -131,7 +148,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -148,7 +167,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -165,7 +186,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -182,7 +205,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -199,7 +224,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -216,7 +243,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -233,7 +262,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -250,7 +281,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -267,7 +300,9 @@ namespace Test
 			ctd.Generate(output);
 
 			if (CheckRuns(output))
+			{
 				throw TestException("HMGTest: Failed duplication test!");
+			}
 		}
 		catch (...)
 		{
@@ -277,15 +312,21 @@ namespace Test
 
 	bool HMGTest::CheckRuns(const std::vector<byte> &Input)
 	{
+		bool state = false;
+
 		// indicates zeroed output or bad run
 		for (size_t i = 0; i < Input.size() - 4; i += 4)
 		{
 			if (Input[i] == Input[i + 1] &&
 				Input[i + 1] == Input[i + 2] &&
 				Input[i + 2] == Input[i + 3])
-				return true;
+			{
+				state = true;
+				break;
+			}
 		}
-		return false;
+
+		return state;
 	}
 
 	void HMGTest::OnProgress(std::string Data)

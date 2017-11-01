@@ -20,6 +20,16 @@ namespace Test
 	{
 	}
 
+	const std::string KDF2Test::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &KDF2Test::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string KDF2Test::Run()
 	{
 		try

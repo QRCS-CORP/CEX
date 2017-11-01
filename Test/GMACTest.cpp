@@ -25,6 +25,16 @@ namespace Test
 	{
 	}
 
+	const std::string GMACTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &GMACTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string GMACTest::Run()
 	{
 		try
@@ -35,7 +45,10 @@ namespace Test
 			GMACCompare(m_key[N], m_nonce[N], m_plainText[N], m_expectedCode[N]);
 
 			for (size_t i = 0; i < m_key.size(); ++i)
+			{
 				GMACCompare(m_key[i], m_nonce[i], m_plainText[i], m_expectedCode[i]);
+			}
+
 			OnProgress(std::string("GMACTest: Passed GMAC known answer vector tests.."));
 
 			return SUCCESS;
@@ -62,7 +75,9 @@ namespace Test
 		code.resize(MacCode.size());
 
 		if (MacCode != code)
+		{
 			throw TestException("GMAC: Tags do not match!");
+		}
 	}
 
 	void GMACTest::Initialize()

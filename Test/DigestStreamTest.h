@@ -9,9 +9,10 @@ namespace Test
 	/// <summary>
 	/// Tests the DigestStream class output against direct output from a digest instance
 	/// </summary>
-	class DigestStreamTest : public ITest
+	class DigestStreamTest final : public ITest
 	{
 	private:
+
 		const std::string DESCRIPTION = "DigestStream output test; compares output from SHA 256/512 digests and DigestStream.";
 		const std::string FAILURE = "FAILURE! ";
 		const std::string SUCCESS = "SUCCESS! All DigestStream tests have executed succesfully.";
@@ -19,15 +20,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compare DigestStream output to the digest output
@@ -44,11 +36,22 @@ namespace Test
 		}
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CompareOutput(Enumeration::Digests Engine);
 		void OnProgress(std::string Data);
 	};

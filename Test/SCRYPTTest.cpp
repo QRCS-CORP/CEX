@@ -24,6 +24,16 @@ namespace Test
 	{
 	}
 
+	const std::string SCRYPTTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SCRYPTTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string SCRYPTTest::Run()
 	{
 		try
@@ -60,7 +70,9 @@ namespace Test
 		gen1.Generate(outBytes, 0, OutputSize);
 
 		if (outBytes != Expected)
+		{
 			throw TestException("SCRYPT: Initialization test failed!");
+		}
 	}
 
 	void SCRYPTTest::Initialize()
@@ -78,22 +90,30 @@ namespace Test
 		std::string p1 = "password";
 		m_key[0].reserve(p1.size());
 		for (size_t i = 0; i < p1.size(); ++i)
+		{
 			m_key[0].push_back(p1[i]);
+		}
 
 		std::string p2 = "pleaseletmein";
 		m_key[1].reserve(p2.size());
 		for (size_t i = 0; i < p2.size(); ++i)
+		{
 			m_key[1].push_back(p2[i]);
+		}
 
 		std::string s1 = "NaCl";
 		m_salt[0].reserve(s1.size());
 		for (size_t i = 0; i < s1.size(); ++i)
+		{
 			m_salt[0].push_back(s1[i]);
+		}
 
 		std::string s2 = "SodiumChloride";
 		m_salt[1].reserve(s2.size());
 		for (size_t i = 0; i < s2.size(); ++i)
+		{
 			m_salt[1].push_back(s2[i]);
+		}
 	}
 
 	void SCRYPTTest::OnProgress(std::string Data)

@@ -20,6 +20,16 @@ namespace Test
 	{
 	}
 
+	const std::string TwofishTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &TwofishTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string TwofishTest::Run()
 	{
 		using namespace TestFiles::Counterpane;

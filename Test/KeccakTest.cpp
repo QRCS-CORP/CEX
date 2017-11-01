@@ -39,6 +39,16 @@ namespace Test
 	{
 	}
 
+	const std::string KeccakTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &KeccakTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string KeccakTest::Run()
 	{
 		try
@@ -91,41 +101,57 @@ namespace Test
 		for (size_t i = 0; i != m_messages.size(); i++)
 		{
 			if (m_messages[i].size() != 0)
+			{
 				Digest->Update(m_messages[i], 0, m_messages[i].size());
+			}
 
 			Digest->Finalize(hash, 0);
 
 			if (Expected[i] != hash)
+			{
 				throw TestException("Keccak: Expected hash is not equal!");
+			}
 		}
 
 		std::vector<byte> k64(1024 * 64, 0);
 
 		for (size_t i = 0; i != k64.size(); i++)
+		{
 			k64[i] = (byte)'a';
+		}
 
 		Digest->Update(k64, 0, k64.size());
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
+		{
 			throw TestException("Keccak: Expected hash is not equal!");
+		}
 
 		for (size_t i = 0; i != k64.size(); i++)
+		{
 			Digest->Update((byte)'a');
+		}
 
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size()] != hash)
+		{
 			throw TestException("Keccak: Expected hash is not equal!");
+		}
 
 		for (size_t i = 0; i != k64.size(); i++)
+		{
 			k64[i] = (byte)('a' + (i % 26));
+		}
 
 		Digest->Update(k64, 0, k64.size());
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
+		{
 			throw TestException("Keccak: Expected hash is not equal!");
+		}
 
 		for (size_t i = 0; i != 64; i++)
 		{
@@ -136,7 +162,9 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected[m_messages.size() + 1] != hash)
+		{
 			throw TestException("Keccak: Expected hash is not equal!");
+		}
 
 		CompareDoFinal(Digest);
 
@@ -145,13 +173,17 @@ namespace Test
 		for (size_t i = 0; i != 16384; i++)
 		{
 			for (int j = 0; j != 1024; j++)
+			{
 				Digest->Update(m_xtremeData, 0, m_xtremeData.size());
+			}
 		}
 
 		Digest->Finalize(hash, 0);
 
 		if ((Expected[m_messages.size() + 2]) != hash)
+		{
 			throw TestException("Keccak: Expected hash is not equal!");
+		}
 #endif
 	}
 
@@ -170,7 +202,9 @@ namespace Test
 			Digest->Finalize(outBytes, i);
 
 			if (expected != outBytes)
+			{
 				throw TestException("Keccak Finalize: Expected hash is not equal!");
+			}
 		}
 	}
 
@@ -189,7 +223,9 @@ namespace Test
 			mac.Finalize(macV, 0);
 
 			if (Expected[i] != macV)
+			{
 				throw TestException("Keccak HMAC: Expected hash is not equal!");
+			}
 		}
 
 		// test truncated keys
@@ -202,7 +238,9 @@ namespace Test
 		for (size_t i = 0; i != TruncExpected.size(); i++)
 		{
 			if (macV2[i] != TruncExpected[i])
+			{
 				throw TestException("Keccak HMAC: Expected hash is not equal!");
+			}
 		}
 	}
 
@@ -341,7 +379,9 @@ namespace Test
 		KeccakParams tree2(tres);
 
 		if (!tree1.Equals(tree2))
+		{
 			throw std::string("KeccakTest: Tree parameters test failed!");
+		}
 
 		std::vector<byte> code2(20, 7);
 		KeccakParams tree3(0, 64, 1, 128, 8, 1, code2);
@@ -349,6 +389,8 @@ namespace Test
 		KeccakParams tree4(tres);
 
 		if (!tree3.Equals(tree4))
+		{
 			throw std::string("KeccakTest: Tree parameters test failed!");
+		}
 	}
 }

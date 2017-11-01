@@ -9,9 +9,10 @@ namespace Test
 	/// BCG output comparison test.
 	/// <para>Compares drbg output with CTR mode encrypting all zeroes input.</para>
 	/// </summary>
-	class CMGTest : public ITest
+	class CMGTest final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -20,15 +21,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
@@ -41,11 +33,22 @@ namespace Test
 		~CMGTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CheckInit();
 		bool CheckRuns(const std::vector<byte> &Input);
 		void CompareOutput();

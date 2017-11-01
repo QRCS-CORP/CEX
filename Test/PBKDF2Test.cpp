@@ -24,6 +24,16 @@ namespace Test
 	{
 	}
 
+	const std::string PBKDF2Test::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &PBKDF2Test::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string PBKDF2Test::Run()
 	{
 		try
@@ -60,7 +70,9 @@ namespace Test
 		gen1.Generate(outBytes, 0, Size);
 
 		if (outBytes != Expected)
+		{
 			throw TestException("PBKDF2: Values are not equal!");
+		}
 
 		// test the auto constructor
 		Kdf::PBKDF2 gen2(Enumeration::Digests::SHA256, Iterations);
@@ -70,7 +82,9 @@ namespace Test
 		delete eng256;
 
 		if (outBytes != Expected)
+		{
 			throw TestException("PBKDF2: Values are not equal!");
+		}
 	}
 
 	void PBKDF2Test::Initialize()
@@ -89,22 +103,30 @@ namespace Test
 		std::string s1 = "salt";
 		m_salt[0].reserve(s1.size());
 		for (size_t i = 0; i < s1.size(); ++i)
+		{
 			m_salt[0].push_back(s1[i]);
+		}
 
 		std::string s2 = "saltSALTsaltSALTsaltSALTsaltSALTsalt";
 		m_salt[1].reserve(s2.size());
 		for (size_t i = 0; i < s2.size(); ++i)
+		{
 			m_salt[1].push_back(s2[i]);
+		}
 
 		std::string p1 = "password";
 		m_key[0].reserve(p1.size());
 		for (size_t i = 0; i < p1.size(); ++i)
+		{
 			m_key[0].push_back(p1[i]);
+		}
 
 		std::string p2 = "passwordPASSWORDpassword";
 		m_key[1].reserve(p2.size());
 		for (size_t i = 0; i < p2.size(); ++i)
+		{
 			m_key[1].push_back(p2[i]);
+		}
 	}
 
 	void PBKDF2Test::OnProgress(std::string Data)
@@ -121,7 +143,9 @@ namespace Test
 		gen1.Initialize(m_key[1], m_salt[1]);
 		gen1.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[3])
+		{
 			throw TestException("PBKDF2: Initialization test failed!");
+		}
 
 		// hmac instance
 		Mac::HMAC hmac(Enumeration::Digests::SHA256);
@@ -129,14 +153,18 @@ namespace Test
 		gen2.Initialize(m_key[1], m_salt[1]);
 		gen2.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[3])
+		{
 			throw TestException("PBKDF2: Initialization test failed!");
+		}
 
 		// test reset
 		gen2.Reset();
 		gen2.Initialize(m_key[1], m_salt[1]);
 		gen2.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output[3])
+		{
 			throw TestException("PBKDF2: Initialization test failed!");
+		}
 
 	}
 }

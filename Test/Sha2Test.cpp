@@ -23,6 +23,16 @@ namespace Test
 	{
 	}
 
+	const std::string SHA2Test::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &SHA2Test::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string SHA2Test::Run()
 	{
 		try
@@ -70,11 +80,15 @@ namespace Test
 		Digest->Finalize(hash, 0);
 
 		if (Expected != hash)
+		{
 			throw TestException("SHA2: Expected hash is not equal!");
+		}
 
 		Digest->Compute(Input, hash);
 		if (Expected != hash)
+		{
 			throw TestException("SHA2: Expected hash is not equal!");
+		}
 	}
 
 	void SHA2Test::Initialize()
@@ -122,7 +136,9 @@ namespace Test
 		SHA2Params tree2(tres);
 
 		if (!tree1.Equals(tree2))
+		{
 			throw std::string("SHA2Test: Tree parameters test failed!");
+		}
 
 		std::vector<byte> code2(20, 7);
 		SHA2Params tree3(0, 64, 1, 128, 8, 1, code2);
@@ -130,6 +146,8 @@ namespace Test
 		SHA2Params tree4(tres);
 
 		if (!tree3.Equals(tree4))
+		{
 			throw std::string("SHA2Test: Tree parameters test failed!");
+		}
 	}
 }

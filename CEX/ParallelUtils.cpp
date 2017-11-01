@@ -1,6 +1,6 @@
 #include "ParallelUtils.h"
 
-#if defined(_OPENMP)
+#if defined(CEX_HAS_OPENMP)
 #	include <omp.h>
 #else
 #	include <future>
@@ -10,7 +10,7 @@ NAMESPACE_UTILITY
 
 size_t ParallelUtils::ProcessorCount()
 {
-#if defined(_OPENMP)
+#if defined(CEX_HAS_OPENMP)
 	return static_cast<size_t>(omp_get_num_procs());
 #else
 	return static_cast<size_t>(std::thread::hardware_concurrency());
@@ -19,10 +19,10 @@ size_t ParallelUtils::ProcessorCount()
 
 void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void(size_t)> &F)
 {
-#if defined(_OPENMP)
+#if defined(CEX_HAS_OPENMP)
 #	pragma omp parallel num_threads(static_cast<int>(To))
 	{
-		size_t i = From + (size_t)omp_get_thread_num();
+		size_t i = From + static_cast<size_t>(omp_get_thread_num());
 		F(i);
 	}
 #else
@@ -48,7 +48,7 @@ void ParallelUtils::ParallelFor(size_t From, size_t To, const std::function<void
 
 void ParallelUtils::ParallelTask(const std::function<void()> &F)
 {
-#if defined(_OPENMP)
+#if defined(CEX_HAS_OPENMP)
 #	pragma omp parallel
 	{
 #		pragma omp single nowait

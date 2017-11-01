@@ -10,9 +10,10 @@ namespace Test
     /// <para>Using vectors from: RFC 4321: Test Vectors for SHA-2 224, 256, 384, and 512 HMACs:
     /// <see href="http://tools.ietf.org/html/rfc4231"/></para>
     /// </summary>
-    class HMACTest : public ITest
+    class HMACTest final : public ITest
     {
     private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -24,15 +25,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
     public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer SHA-2 HMAC vectors for equality
@@ -45,11 +37,22 @@ namespace Test
 		~HMACTest();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
         
     private:
+
 		void CompareAccess(std::vector<byte> &Key);
 		void CompareVector256(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void CompareVector512(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected);

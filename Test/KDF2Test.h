@@ -9,9 +9,10 @@ namespace Test
 	/// Tests the KDF2 implementation using vector comparisons.
 	/// <para>Using the official Kats from RFC 6070: <see href="https://tools.ietf.org/html/rfc6070"/>.</para>
 	/// </summary>
-	class KDF2Test : public ITest
+	class KDF2Test final : public ITest
 	{
 	private:
+
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
@@ -21,15 +22,6 @@ namespace Test
 		TestEventHandler m_progressEvent;
 
 	public:
-		/// <summary>
-		/// Get: The test description
-		/// </summary>
-		virtual const std::string Description() { return DESCRIPTION; }
-
-		/// <summary>
-		/// Progress return event callback
-		/// </summary>
-		virtual TestEventHandler &Progress() { return m_progressEvent; }
 
 		/// <summary>
 		/// Compares known answer KDF2 Drbg vectors for equality
@@ -42,11 +34,22 @@ namespace Test
 		~KDF2Test();
 
 		/// <summary>
+		/// Get: The test description
+		/// </summary>
+		const std::string Description() override;
+
+		/// <summary>
+		/// Progress return event callback
+		/// </summary>
+		TestEventHandler &Progress() override;
+
+		/// <summary>
 		/// Start the tests
 		/// </summary>
-		virtual std::string Run();
+		std::string Run() override;
 
 	private:
+
 		void CompareVector(std::vector<byte> &Salt, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);

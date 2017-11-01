@@ -7,6 +7,17 @@
 
 namespace Test
 {
+
+	const std::string DigestStreamTest::Description()
+	{
+		return DESCRIPTION;
+	}
+
+	TestEventHandler &DigestStreamTest::Progress()
+	{
+		return m_progressEvent;
+	}
+
 	std::string DigestStreamTest::Run()
 	{
 		try
@@ -49,13 +60,17 @@ namespace Test
 		hash2 = ds.Compute(ms);
 
 		if (hash1 != hash2)
+		{
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
+		}
 
 		// test byte access method
 		hash2 = ds.Compute(data, 0, data.size());
 
 		if (hash1 != hash2)
+		{
 			throw TestException("DigestStreamTest: Expected hash is not equal!");
+		}
 	}
 
 	void DigestStreamTest::OnProgress(std::string Data)
