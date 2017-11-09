@@ -2,7 +2,7 @@
   <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/14233/badge.svg"/>
 </a>
 
-# <img src="cnd.png" align="left" />
+# CEX
 
 The CEX Cryptographic library in C++
 
