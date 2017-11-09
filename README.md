@@ -13,7 +13,7 @@ There are some new ideas, and new technologies, as I intend to push the envelope
 
 This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
 That work is still evolving however, as improvments and additions to the symmetric cryptography will continue throughout the libraries lifetime.
-The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and this release contains the first asymmetric cipher (RingLWE) and asymmetric framework.
+The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and this release contains the RingLWE and McEliece asymmetric ciphers.
 
 Though efforts have been made towards future compatability with other platforms, this is currently a Windows-only library. 
 This has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, using the MSVC and Intel compiler tool-chains, and future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
@@ -95,6 +95,8 @@ This is still an early stage in the development of this library, so stay tuned, 
 * The auto-seeded Block cipher Counter mode Rng (BCR)
 * The auto-seeded message Digest Counter Generator (DCR)
 * The auto-seeded HMAC Counter Generator (HCR)
+* An implementation of a Passphrase Based PRNG (PBR)
+* The prng extension wrapper class (SecureRandom)
 
 ### Entropy Providers
 * Auto Collection seed Provider (ACP)
@@ -103,21 +105,16 @@ This is still an early stage in the development of this library, so stay tuned, 
 * System Entropy Collector Provider (ECP)
 * Intel RdRand/RdSeed Provider (RDP)
 
-## Roadmap
+## Trajectory
 The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, patch, and release codes.
   
-### Release 1.0.0.4 (version A4):
+### Current Release 1.0.0.4 (version A4):
 * The McEliece asymmetric cipher
 * The 1024bit Keccak digest
 * The Poly1305 Message Authentication Code generator
 * The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5)
 
-### Release 1.0.0.3 (version A3):
-* The RingLWE asymmetric cipher
-* The asymmetric cipher framework
-* Additions and improvements to the Drbg and Prng protocols
-
-### Release 1.1.0.1
+### Planned Release 1.1.0.1
 * RingLWE
 * McEliece
 * ModuleLWE
@@ -126,21 +123,21 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 * GMSS
 * ECDSA
 
-### Release 1.2.0.1
+### Planned Release 1.2.0.1
 * TLS
 * STM-KEX
 * Android/iOS/Linux Compatability
 * DLL API
 
-## Updates
+## History
 
 ### Version 1.0.0.4, November 11, 2017
 * Added the McEliece asymmetric cipher
-* Adde the 1024bit Keccak digest
+* Added the 1024bit Keccak digest
 * Added the Poly1305 Message Authentication Code generator
 * The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5)
 * Full coding standards sweep of the library
-* Full integration of std::array and std::unique_ptr
+* Integration of std::array and std::unique_ptr throughout
 * A full optimization cycle completed
 
 ### Version 1.0.0.3, June 30, 2017
