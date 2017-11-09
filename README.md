@@ -110,7 +110,7 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 * The McEliece asymmetric cipher
 * The 1024bit Keccak digest
 * The Poly1305 Message Authentication Code generator
-* The library is now SEI-CERT complaint (Misra compliance by 1.0.0.5)
+* The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5)
 
 ### Release 1.0.0.3 (version A3):
 * The RingLWE asymmetric cipher
@@ -138,7 +138,7 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 * Added the McEliece asymmetric cipher
 * Adde the 1024bit Keccak digest
 * Added the Poly1305 Message Authentication Code generator
-* The library is now SEI-CERT complaint (Misra compliance by 1.0.0.5)
+* The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5)
 * Full coding standards sweep of the library
 * Full integration of std::array and std::unique_ptr
 * A full optimization cycle completed
