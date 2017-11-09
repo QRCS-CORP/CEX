@@ -33,7 +33,8 @@ size_t PKCS7::AddPadding(std::vector<byte> &Input, size_t Offset)
 
 	while (Offset < Input.size())
 	{
-		Input[Offset++] = code;
+		Input[Offset] = code;
+		++Offset;
 	}
 
 	return code;

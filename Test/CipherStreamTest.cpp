@@ -949,7 +949,9 @@ namespace Test
 			RoundCounts::R22,
 			Digests::Skein512);
 
-		Processing::CipherDescription cy(*cd.ToStream());
+		CEX::IO::MemoryStream* ms = cd.ToStream();
+		Processing::CipherDescription cy(*ms);
+		delete ms;
 
 		if (!cy.Equals(cd))
 		{

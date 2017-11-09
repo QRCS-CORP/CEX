@@ -1,3 +1,7 @@
+<a href="https://scan.coverity.com/projects/steppenwolfe65-cex">
+  <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/14233/badge.svg"/>
+</a>
+
 # CEX
 The CEX Cryptographic library in C++
 
@@ -19,16 +23,17 @@ Only a limited number of CPUs have been tested so far; an AMD K9, and Intel i3, 
 Works with or without intrinsics, set the test project and the library to a supported instruction set to test the intrinsics implementations.
 The SIMD support is set to AVX2 by default, (AVX implementations are also in place on a number of ciphers and protocols, set the enhanced instruction flag to your system supported set: arch:AVX2, or the minimum supported instructions arch:AVX, or None, arch:IA32). The library also has experimental AVX512 support (untested), that can be enabled through the CexConfig file.
 
-This is still an early stage in the development of this library, so stay tuned, be patient..
-
 The Win folder contains a visual studio test project, which tests each cipher and protocol with it's official test vectors, and has a set of digest and symmetric cipher speed tests. Make sure the project properties SIMD and OpenMP support are enabled before running the project, and for speed tests, compile in release mode.
 If running the executable, the Win\Test\Vectors folder containing the cipher KAT files must be in the executables path.
 
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
+This is still an early stage in the development of this library, so stay tuned, be patient..
+
 ## Contents
 ### Asymmetric Ciphers
 * The RingLWE asymmetric cipher
+* The Niederreiter dual form of the McEliece public key crypto-system
 
 ### Block Ciphers
 * The AES-NI HKDF eXtended cipher (AHX)
@@ -62,6 +67,7 @@ For more information on the current capabilities of the library, read the Introd
 * The 512bit Blake2B and Blake2BP sequential and parallel digests (Blake512)
 * The 256bit Keccak SHA-3 sequential and parallel digests (Keccak256)
 * The 512bit Keccak SHA-3 sequential and parallel digests (Keccak512)
+* The 1024bit Keccak SHA-3 sequential and parallel digests (Keccak1024)
 * The 256bit SHA-2 (optional SHA-NI) sequential and parallel digests (SHA256)
 * The 512bit SHA-2 sequential and parallel digests (SHA512)
 * The 256bit Skein sequential and parallel digests (Skein256)
@@ -83,6 +89,7 @@ For more information on the current capabilities of the library, read the Introd
 * Cipher based Message Authentication Code generator (CMAC)
 * Galois/Counter Message Authentication Code generator (GMAC)
 * Hash based Message Authentication Code generator (HMAC)
+* The Poly1305 Message Authentication Code generator (Poly1305)
 
 ### PRNGs
 * The auto-seeded Block cipher Counter mode Rng (BCR)
@@ -97,8 +104,14 @@ For more information on the current capabilities of the library, read the Introd
 * Intel RdRand/RdSeed Provider (RDP)
 
 ## Roadmap
-The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, patch, and release codes.
- 
+The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, patch, and release codes.
+  
+### Release 1.0.0.4 (version A4):
+* The McEliece asymmetric cipher
+* The 1024bit Keccak digest
+* The Poly1305 Message Authentication Code generator
+* The library is now SEI-CERT complaint (Misra compliance by 1.0.0.5)
+
 ### Release 1.0.0.3 (version A3):
 * The RingLWE asymmetric cipher
 * The asymmetric cipher framework
@@ -107,8 +120,11 @@ The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, 
 ### Release 1.1.0.1
 * RingLWE
 * McEliece
+* ModuleLWE
+* NTRU
+* ECDH
 * GMSS
-* RSA-Sig
+* Elliptic Curve based Signatute Scheme
 
 ### Release 1.2.0.1
 * TLS
@@ -117,6 +133,15 @@ The current version is <B>1.0.0.3</B> (A3 version), which are the major, minor, 
 * DLL API
 
 ## Updates
+
+### Version 1.0.0.4, November 11, 2017
+* Added the McEliece asymmetric cipher
+* Adde the 1024bit Keccak digest
+* Added the Poly1305 Message Authentication Code generator
+* The library is now SEI-CERT complaint (Misra compliance by 1.0.0.5)
+* Full coding standards sweep of the library
+* Full integration of std::array and std::unique_ptr
+* A full optimization cycle completed
 
 ### Version 1.0.0.3, June 30, 2017
 * Added asymmetric cipher interfaces and framework

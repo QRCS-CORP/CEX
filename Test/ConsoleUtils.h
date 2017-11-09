@@ -9,7 +9,7 @@ namespace Test
 	{
 	public:
 		static void SizeConsole();
-		static void WriteLine(std::string Data);
+		static void WriteLine(const std::string &Data);
 	};
 }
 #endif

@@ -143,7 +143,8 @@ public:
 			for (i = 0; i < (1 << high); i++)
 			{
 				diff = Received[x] ^ Received[y];
-				diff &= Condition[CondPos++];
+				diff &= Condition[CondPos];
+				++CondPos;
 				Received[x] ^= diff;
 				Received[y] ^= diff;
 				x += (1 << (Low + 1));

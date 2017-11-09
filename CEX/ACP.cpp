@@ -220,7 +220,7 @@ std::vector<byte> ACP::MemoryInfo()
 		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualTotal(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualUsed(), state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -254,7 +254,7 @@ std::vector<byte> ACP::ProcessInfo()
 			Utility::ArrayUtils::Append(info[i].th32ProcessID, state);
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -275,7 +275,7 @@ std::vector<byte> ACP::ProcessInfo()
 			Utility::ArrayUtils::Append(info[i].th32ProcessID, state);
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -298,7 +298,7 @@ std::vector<byte> ACP::ProcessInfo()
 			}
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -308,7 +308,7 @@ std::vector<byte> ACP::ProcessInfo()
 	{
 		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessEntries(), state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -352,7 +352,7 @@ std::vector<byte> ACP::SystemInfo()
 		Utility::ArrayUtils::Append(info.wProcessorLevel, state);
 		Utility::ArrayUtils::Append(info.wProcessorRevision, state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -364,7 +364,7 @@ std::vector<byte> ACP::SystemInfo()
 		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::SystemInfo(), state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 

@@ -46,25 +46,32 @@ static void THXDecryptW(const std::vector<byte> &Input, const size_t InOffset, s
 	T N2(2);
 
 	X2 ^= T(Key[keyCtr]);
-	X3 ^= T(Key[++keyCtr]);
-	X0 ^= T(Key[++keyCtr]);
-	X1 ^= T(Key[++keyCtr]);
+	++keyCtr;
+	X3 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X0 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X1 ^= T(Key[keyCtr]);
 	keyCtr = Key.size();
 
 	do
 	{
 		T0 = Fe0W(X2, Sbox);
 		T1 = Fe3W(X3, Sbox);
-		X1 ^= T0 + N2 * T1 + T(Key[--keyCtr]);
+		--keyCtr;
+		X1 ^= T0 + N2 * T1 + T(Key[keyCtr]);
 		X0 = (X0 << 1) | (X0 >> 31);
-		X0 ^= (T0 + T1 + T(Key[--keyCtr]));
+		--keyCtr;
+		X0 ^= (T0 + T1 + T(Key[keyCtr]));
 		X1 = (X1 >> 1) | (X1 << 31);
 
 		T0 = Fe0W(X0, Sbox);
 		T1 = Fe3W(X1, Sbox);
-		X3 ^= T0 + N2 * T1 + T(Key[--keyCtr]);
+		--keyCtr;
+		X3 ^= T0 + N2 * T1 + T(Key[keyCtr]);
 		X2 = (X2 << 1) | (X2 >> 31);
-		X2 ^= (T0 + T1 + T(Key[--keyCtr]));
+		--keyCtr;
+		X2 ^= (T0 + T1 + T(Key[keyCtr]));
 		X3 = (X3 >> 1) | (X3 << 31);
 	} 
 	while (keyCtr != RNDCNT);
@@ -72,9 +79,12 @@ static void THXDecryptW(const std::vector<byte> &Input, const size_t InOffset, s
 	// last round
 	keyCtr = 0;
 	X0 ^= T(Key[keyCtr]);
-	X1 ^= T(Key[++keyCtr]);
-	X2 ^= T(Key[++keyCtr]);
-	X3 ^= T(Key[++keyCtr]);
+	++keyCtr;
+	X1 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X2 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X3 ^= T(Key[keyCtr]);
 
 	T::Transpose(X0, X1, X2, X3);
 	X0.Store(Output, OutOffset);
@@ -104,35 +114,45 @@ static void THXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 	T N2(2);
 
 	X0 ^= T(Key[keyCtr]);
-	X1 ^= T(Key[++keyCtr]);
-	X2 ^= T(Key[++keyCtr]);
-	X3 ^= T(Key[++keyCtr]);
+	++keyCtr;
+	X1 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X2 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X3 ^= T(Key[keyCtr]);
 	keyCtr = 7;
 
 	do
 	{
 		T0 = Fe0W(X0, Sbox);
 		T1 = Fe3W(X1, Sbox);
-		X2 ^= T0 + T1 + T(Key[++keyCtr]);
+		++keyCtr;
+		X2 ^= T0 + T1 + T(Key[keyCtr]);
 		X2 = (X2 >> 1) | (X2 << 31);
 		X3 = (X3 << 1) | (X3 >> 31);
-		X3 ^= (T0 + N2 * T1 + T(Key[++keyCtr]));
+		++keyCtr;
+		X3 ^= (T0 + N2 * T1 + T(Key[keyCtr]));
 
 		T0 = Fe0W(X2, Sbox);
 		T1 = Fe3W(X3, Sbox);
-		X0 ^= T0 + T1 + T(Key[++keyCtr]);
+		++keyCtr;
+		X0 ^= T0 + T1 + T(Key[keyCtr]);
 		X0 = (X0 >> 1) | (X0 << 31);
 		X1 = ((X1 << 1) | (X1 >> 31));
-		X1 ^= (T0 + N2 * T1 + T(Key[++keyCtr]));
+		++keyCtr;
+		X1 ^= (T0 + N2 * T1 + T(Key[keyCtr]));
 	} 
 	while (keyCtr != RNDCNT);
 
 	// last round
 	keyCtr = 4;
 	X2 ^= T(Key[keyCtr]);
-	X3 ^= T(Key[++keyCtr]);
-	X0 ^= T(Key[++keyCtr]);
-	X1 ^= T(Key[++keyCtr]);
+	++keyCtr;
+	X3 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X0 ^= T(Key[keyCtr]);
+	++keyCtr;
+	X1 ^= T(Key[keyCtr]);
 
 	T::Transpose(X2, X3, X0, X1);
 	X2.Store(Output, OutOffset);

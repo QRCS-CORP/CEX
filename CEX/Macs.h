@@ -15,17 +15,21 @@ enum class Macs : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// A Cipher based Message Authentication Code wrapper (CMAC)
+	/// A Cipher based Message Authentication Code generator (CMAC)
 	/// </summary>
 	CMAC = 1,
 	/// <summary>
-	/// A Hash based Message Authentication Code wrapper (HMAC)
+	/// A Hash based Message Authentication Code generator (HMAC)
 	/// </summary>
 	HMAC = 2,
 	/// <summary>
-	/// A Cipher based Message Authentication Code wrapper (GMAC)
+	/// A Cipher based Message Authentication Code generator (GMAC)
 	/// </summary>
-	GMAC = 3
+	GMAC = 3,
+	/// <summary>
+	/// The Poly1305 Message Authentication Code generator
+	/// </summary>
+	Poly1305 = 4
 };
 
 NAMESPACE_ENUMERATIONEND

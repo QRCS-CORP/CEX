@@ -88,18 +88,15 @@ namespace Test
 	void AsymmetricSpeedTest::MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher)
 	{
 		Cipher::Asymmetric::McEliece::McEliece asyCpr(Params, Rng, Cipher);
-		Key::Asymmetric::IAsymmetricKeyPair* kp = nullptr;
-
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			kp = asyCpr.Generate();
+			Key::Asymmetric::MPKCKeyPair* kp = reinterpret_cast<Key::Asymmetric::MPKCKeyPair*>(asyCpr.Generate());
+			delete kp;
 		}
 
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
-
-		delete kp;
 
 		std::string nlen = TestUtils::ToString(Loops);
 		std::string secs = TestUtils::ToString((double)dur / 1000.0);
@@ -177,18 +174,15 @@ namespace Test
 	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher)
 	{
 		Cipher::Asymmetric::RLWE::RingLWE asyCpr(Params, Rng, Cipher, Parallel);
-		Key::Asymmetric::IAsymmetricKeyPair* kp = nullptr;
-
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			kp = asyCpr.Generate();
+			Key::Asymmetric::RLWEKeyPair* kp = reinterpret_cast<Key::Asymmetric::RLWEKeyPair*>(asyCpr.Generate());
+			delete kp;
 		}
 
 		uint64_t dur = TestUtils::GetTimeMs64() - start;
-
-		delete kp;
 
 		std::string nlen = TestUtils::ToString(Loops);
 		std::string secs = TestUtils::ToString((double)dur / 1000.0);

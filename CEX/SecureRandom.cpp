@@ -155,7 +155,10 @@ short SecureRandom::NextInt16()
 
 short SecureRandom::NextInt16(short Maximum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt16", "Maximum can not be zero!");
+	}
 
 	const short SMPMAX = static_cast<short>(std::numeric_limits<short>::max() - (std::numeric_limits<short>::max() % Maximum));
 	short x;
@@ -173,9 +176,14 @@ short SecureRandom::NextInt16(short Maximum)
 
 short SecureRandom::NextInt16(short Maximum, short Minimum)
 {
-	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
-	CexAssert(Minimum >= 0, "minimum can not be a negative number");
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt16", "Maximum can not be zero!");
+	}
+	if (Maximum < Minimum)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt16", "Maximum can not be less than Minimum!");
+	}
 
 	const short SMPTHR = (Maximum - Minimum + 1);
 	const short SMPMAX = static_cast<short>(std::numeric_limits<short>::max() - (std::numeric_limits<short>::max() % SMPTHR));
@@ -202,7 +210,10 @@ ushort SecureRandom::NextUInt16()
 
 ushort SecureRandom::NextUInt16(ushort Maximum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt16", "Maximum can not be zero!");
+	}
 
 	const ushort SMPMAX = static_cast<ushort>(std::numeric_limits<ushort>::max() - (std::numeric_limits<ushort>::max() % Maximum));
 	ushort x;
@@ -220,8 +231,14 @@ ushort SecureRandom::NextUInt16(ushort Maximum)
 
 ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
-	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt16", "Maximum can not be zero!");
+	}
+	if (Maximum < Minimum)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt16", "Maximum can not be less than Minimum!");
+	}
 
 	const ushort SMPTHR = (Maximum - Minimum + 1);
 	const ushort SMPMAX = static_cast<ushort>(std::numeric_limits<ushort>::max() - (std::numeric_limits<ushort>::max() % SMPTHR));
@@ -248,7 +265,10 @@ int SecureRandom::NextInt32()
 
 int SecureRandom::NextInt32(int Maximum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt32", "Maximum can not be zero!");
+	}
 
 	const int SMPMAX = static_cast<int>(std::numeric_limits<int>::max() - (std::numeric_limits<int>::max() % Maximum));
 	int x;
@@ -266,9 +286,14 @@ int SecureRandom::NextInt32(int Maximum)
 
 int SecureRandom::NextInt32(int Maximum, int Minimum)
 {
-	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
-	CexAssert(Minimum >= 0, "minimum can not be a negative number");
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt32", "Maximum can not be zero!");
+	}
+	if (Maximum < Minimum)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt32", "Maximum can not be less than Minimum!");
+	}
 
 	const int SMPTHR = (Maximum - Minimum + 1);
 	const int SMPMAX = static_cast<int>(std::numeric_limits<int>::max() - (std::numeric_limits<int>::max() % SMPTHR));
@@ -295,7 +320,10 @@ uint SecureRandom::NextUInt32()
 
 uint SecureRandom::NextUInt32(uint Maximum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt32", "Maximum can not be zero!");
+	}
 
 	const uint SMPMAX = static_cast<uint>(std::numeric_limits<uint>::max() - (std::numeric_limits<uint>::max() % Maximum));
 	uint x;
@@ -313,7 +341,15 @@ uint SecureRandom::NextUInt32(uint Maximum)
 
 uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt32", "Maximum can not be zero!");
+	}
+	if (Maximum < Minimum)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt32", "Maximum can not be less than Minimum!");
+	}
+
 	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
 
 	const uint SMPTHR = (Maximum - Minimum + 1);
@@ -341,7 +377,10 @@ long SecureRandom::NextInt64()
 
 long SecureRandom::NextInt64(long Maximum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt64", "Maximum can not be zero!");
+	}
 
 	const long SMPMAX = static_cast<long>(std::numeric_limits<long>::max() - (std::numeric_limits<long>::max() % Maximum));
 	long x;
@@ -359,9 +398,14 @@ long SecureRandom::NextInt64(long Maximum)
 
 long SecureRandom::NextInt64(long Maximum, long Minimum)
 {
-	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
-	CexAssert(Minimum >= 0, "minimum can not be a negative number");
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt64", "Maximum can not be zero!");
+	}
+	if (Maximum < Minimum)
+	{
+		throw CryptoRandomException("SecureRandom:NextInt64", "Maximum can not be less than Minimum!");
+	}
 
 	const long SMPTHR = (Maximum - Minimum + 1);
 	const long SMPMAX = static_cast<long>(std::numeric_limits<long>::max() - (std::numeric_limits<long>::max() % SMPTHR));
@@ -388,7 +432,10 @@ ulong SecureRandom::NextUInt64()
 
 ulong SecureRandom::NextUInt64(ulong Maximum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt64", "Maximum can not be zero!");
+	}
 
 	const ulong SMPMAX = static_cast<ulong>(std::numeric_limits<ulong>::max() - (std::numeric_limits<ulong>::max() % Maximum));
 	ulong x;
@@ -406,8 +453,14 @@ ulong SecureRandom::NextUInt64(ulong Maximum)
 
 ulong SecureRandom::NextUInt64(ulong Maximum, ulong Minimum)
 {
-	CexAssert(Maximum >= 1, "maximum must be at least 1 in value");
-	CexAssert(Maximum > Minimum, "maximum must be more than minimum");
+	if (Maximum < 1)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt64", "Maximum can not be zero!");
+	}
+	if (Maximum < Minimum)
+	{
+		throw CryptoRandomException("SecureRandom:NextUInt64", "Maximum can not be less than Minimum!");
+	}
 
 	const ulong SMPTHR = (Maximum - Minimum + 1);
 	const ulong SMPMAX = (std::numeric_limits<ulong>::max() - (std::numeric_limits<ulong>::max() % SMPTHR));

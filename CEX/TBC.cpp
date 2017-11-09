@@ -44,7 +44,8 @@ size_t TBC::AddPadding(std::vector<byte> &Input, size_t Offset)
 
 	while (Offset < Input.size())
 	{
-		Input[Offset++] = code;
+		Input[Offset] = code;
+		++Offset;
 	}
 
 	return padlen;

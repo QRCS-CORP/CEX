@@ -84,25 +84,25 @@ public:
 	template <typename T>
 	static void Compress128(const std::vector<byte> &Input, size_t InOffset, T &State, const std::vector<ulong> &IV)
 	{
-		const __m128i M0 = _mm_loadu_si128((const __m128i*)&Input[InOffset]);
-		const __m128i M1 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 16]);
-		const __m128i M2 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 32]);
-		const __m128i M3 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 48]);
-		const __m128i M4 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 64]);
-		const __m128i M5 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 80]);
-		const __m128i M6 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 96]);
-		const __m128i M7 = _mm_loadu_si128((const __m128i*)&Input[InOffset + 112]);
+		const __m128i M0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
+		const __m128i M1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 16]));
+		const __m128i M2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 32]));
+		const __m128i M3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 48]));
+		const __m128i M4 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 64]));
+		const __m128i M5 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 80]));
+		const __m128i M6 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 96]));
+		const __m128i M7 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 112]));
 		const __m128i R16 = _mm_setr_epi8(2, 3, 4, 5, 6, 7, 0, 1, 10, 11, 12, 13, 14, 15, 8, 9);
 		const __m128i R24 = _mm_setr_epi8(3, 4, 5, 6, 7, 0, 1, 2, 11, 12, 13, 14, 15, 8, 9, 10);
 
-		__m128i RL1 = _mm_loadu_si128((const __m128i*)&State.H[0]);
-		__m128i RH1 = _mm_loadu_si128((const __m128i*)&State.H[2]);
-		__m128i RL2 = _mm_loadu_si128((const __m128i*)&State.H[4]);
-		__m128i RH2 = _mm_loadu_si128((const __m128i*)&State.H[6]);
-		__m128i RL3 = _mm_loadu_si128((const __m128i*)&IV[0]);
-		__m128i RH3 = _mm_loadu_si128((const __m128i*)&IV[2]);
-		__m128i RL4 = _mm_xor_si128(_mm_loadu_si128((const __m128i*)&IV[4]), _mm_loadu_si128((const __m128i*)&State.T[0]));
-		__m128i RH4 = _mm_xor_si128(_mm_loadu_si128((const __m128i*)&IV[6]), _mm_loadu_si128((const __m128i*)&State.F[0]));
+		__m128i RL1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[0]));
+		__m128i RH1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[2]));
+		__m128i RL2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[4]));
+		__m128i RH2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[6]));
+		__m128i RL3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&IV[0]));
+		__m128i RH3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&IV[2]));
+		__m128i RL4 = _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&IV[4])), _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.T[0])));
+		__m128i RH4 = _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&IV[6])), _mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.F[0])));
 		__m128i B0, B1;
 
 		// round 0
@@ -895,12 +895,12 @@ public:
 
 		RL1 = _mm_xor_si128(RL3, RL1);
 		RH1 = _mm_xor_si128(RH3, RH1);
-		_mm_storeu_si128((__m128i*)&State.H[0], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[0]), RL1));
-		_mm_storeu_si128((__m128i*)&State.H[2], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[2]), RH1));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&State.H[0]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[0])), RL1));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&State.H[2]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[2])), RH1));
 		RL2 = _mm_xor_si128(RL4, RL2);
 		RH2 = _mm_xor_si128(RH4, RH2);
-		_mm_storeu_si128((__m128i*)&State.H[4], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[4]), RL2));
-		_mm_storeu_si128((__m128i*)&State.H[6], _mm_xor_si128(_mm_loadu_si128((const __m128i*)&State.H[6]), RH2));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&State.H[4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[4])), RL2));
+		_mm_storeu_si128(reinterpret_cast<__m128i*>(&State.H[6]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&State.H[6])), RH2));
 	}
 
 #else

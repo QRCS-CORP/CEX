@@ -88,9 +88,9 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/nistpubs/800-38B/SP_800-38B.pdf">SP800-38B</a>: The CMAC Mode for Authentication.</description></item>
 /// <item><description>RFC <a href="http://tools.ietf.org/html/rfc4493">4493</a>: The AES-CMAC Algorithm.</description></item>
+/// <item><description>NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">Rijndael ammended</a>.</description></item>
 /// </list>
 /// </remarks>
 class CMAC final : public IMac
@@ -112,9 +112,9 @@ private:
 	std::vector<byte> m_K2;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_macSize;
+	std::vector<byte> m_msgBuffer;
 	std::vector<byte> m_msgCode;
-	std::vector<byte> m_wrkBuffer;
-	size_t m_wrkOffset;
+	size_t m_msgLength;
 
 public:
 

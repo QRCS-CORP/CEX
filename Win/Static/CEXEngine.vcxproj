@@ -294,6 +294,7 @@
     <ClInclude Include="..\..\CEX\OCB.h" />
     <ClInclude Include="..\..\CEX\ParallelOptions.h" />
     <ClInclude Include="..\..\CEX\PBR.h" />
+    <ClInclude Include="..\..\CEX\Poly1305.h" />
     <ClInclude Include="..\..\CEX\PolyMath.h" />
     <ClInclude Include="..\..\CEX\RingLWE.h" />
     <ClInclude Include="..\..\CEX\RLWEKeyPair.h" />
@@ -446,6 +447,7 @@
     <ClCompile Include="..\..\CEX\OCB.cpp" />
     <ClCompile Include="..\..\CEX\ParallelOptions.cpp" />
     <ClCompile Include="..\..\CEX\PBR.cpp" />
+    <ClCompile Include="..\..\CEX\Poly1305.cpp" />
     <ClCompile Include="..\..\CEX\RingLWE.cpp" />
     <ClCompile Include="..\..\CEX\RLWEKeyPair.cpp" />
     <ClCompile Include="..\..\CEX\RLWEParamSet.cpp" />

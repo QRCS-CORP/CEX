@@ -230,7 +230,7 @@ std::vector<byte> ECP::MemoryInfo()
 		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualTotal(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::MemoryVirtualUsed(), state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -268,7 +268,7 @@ std::vector<byte> ECP::NetworkInfo()
 			Utility::ArrayUtils::Append(info[i]->LeaseExpires, state);
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -293,7 +293,7 @@ std::vector<byte> ECP::NetworkInfo()
 		Utility::ArrayUtils::Append(info.dwRtoMin, state);
 		Utility::ArrayUtils::Append(info.RtoAlgorithm, state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -321,7 +321,7 @@ std::vector<byte> ECP::ProcessInfo()
 			Utility::ArrayUtils::Append(info[i].th32ProcessID, state);
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -342,7 +342,7 @@ std::vector<byte> ECP::ProcessInfo()
 			Utility::ArrayUtils::Append(info[i].th32ProcessID, state);
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -365,7 +365,7 @@ std::vector<byte> ECP::ProcessInfo()
 			}
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -375,7 +375,7 @@ std::vector<byte> ECP::ProcessInfo()
 	{
 		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessEntries(), state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -433,7 +433,7 @@ std::vector<byte> ECP::SystemInfo()
 		Utility::ArrayUtils::Append(info.wProcessorLevel, state);
 		Utility::ArrayUtils::Append(info.wProcessorRevision, state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -445,7 +445,7 @@ std::vector<byte> ECP::SystemInfo()
 		Utility::ArrayUtils::Append(Utility::SysUtils::ProcessId(), state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::SystemInfo(), state);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 	}
 
@@ -471,6 +471,7 @@ std::vector<byte> ECP::UserInfo()
 
 	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserName(), state);
 	Utility::ArrayUtils::AppendString(Utility::SysUtils::UserId(), state);
+	Utility::ArrayUtils::Append(Utility::SysUtils::UserToken(), state);
 
 	return state;
 }

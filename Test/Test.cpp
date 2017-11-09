@@ -228,6 +228,7 @@
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
+#include "../Test/Poly1305Test.h"
 #include "../Test/PrngTest.h"
 #include "../Test/RandomOutputTest.h"
 #include "../Test/RijndaelTest.h"
@@ -275,8 +276,14 @@ void CpuCheck()
 
 std::string GetResponse()
 {
-	std::string resp;
-	std::getline(std::cin, resp);
+	std::string resp = "";
+	try
+	{
+		std::getline(std::cin, resp);
+	}
+	catch (std::exception&)
+	{
+	}
 
 	return resp;
 }
@@ -369,6 +376,7 @@ int main()
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
 	PrintHeader("An error has occurred! Press any key to close..", "");
 	GetResponse();
+
 	return 0;
 #endif
 
@@ -377,7 +385,7 @@ int main()
 	{
 		TestUtils::Read(TestFiles::AESAVS::AESAVSKEY128, data);
 	}
-	catch (...) 
+	catch (std::exception&) 
 	{
 		data = "";
 	}
@@ -388,13 +396,36 @@ int main()
 		PrintHeader("The Win/Test/Vectors folder must be in the executables path.", "");
 		PrintHeader("An error has occurred! Press any key to close..", "");
 		GetResponse();
+
 		return 0;
 	}
 
-	Common::CpuDetect detect;
+	bool hasAes = false;
+	bool hasAvs = false;
+	bool hasAvs2 = false;
+	bool isx86emu = false;
+	bool is64 = false;
+
+	try
+	{
+		Common::CpuDetect detect;
+
+		hasAes = detect.AESNI();
+		hasAvs = detect.AVX();
+		hasAvs2 = detect.AVX2();
+		isx86emu = detect.IsX86Emulation();
+		is64 = detect.IsX64();
+	}
+	catch (std::exception&)
+	{
+		PrintHeader("An error has occurred! This platform does not support cpudetect!", "");
+		GetResponse();
+
+		return 0;
+	}
 
 #if (!defined(_M_X64) && !defined(__x86_64__)) && ((defined(__AVX__) || defined(__AVX2__)) && !defined(_DEBUG))
-	if (detect.IsX64() || detect.IsX86Emulation())
+	if (is64 || isx86emu)
 	{
 		PrintHeader("Warning! Compiling x86/Release on a 64bit system using AVX/AVX2 will cause memory alignment errors.", "");
 		PrintHeader("To test x86/Release, compile on a true x86 system, or disable enhanced instruction sets (arch:IA32), or run in x86/Debug mode.", "");
@@ -405,7 +436,7 @@ int main()
 	}
 #endif
 
-	if (detect.AESNI())
+	if (hasAes)
 	{
 		PrintHeader("AES-NI intrinsics support has been detected on this system.");
 	}
@@ -415,7 +446,7 @@ int main()
 	}
 	PrintHeader("", "");
 
-	if (detect.AVX2())
+	if (hasAvs2)
 	{
 #if !defined(__AVX2__)
 		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");
@@ -423,7 +454,7 @@ int main()
 		PrintHeader("AVX2 intrinsics support has been enabled.");
 #endif
 	}
-	else if (detect.AVX())
+	else if (hasAvs)
 	{
 #if defined(__AVX2__)
 		PrintHeader("AVX2 is not supported on this system! AVX intrinsics support is available, set enable enhanced instruction set to arch:AVX");
@@ -445,18 +476,19 @@ int main()
 		PrintHeader("Warning! Compile as Release with correct platform (x86/x64) for accurate timings");
 		PrintHeader("", "");
 #endif
+
 		if (CanTest("Press 'Y' then Enter to run Diagnostic Tests, any other key to cancel: "))
 		{
 			PrintHeader("TESTING SYMMETRIC BLOCK CIPHERS");
 
-			if (detect.AESNI())
+			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesAvsTest(true));
 			}
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesAvsTest());
-			if (detect.AESNI())
+			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesFipsTest(true));
@@ -491,7 +523,9 @@ int main()
 			RunTest(new SkeinTest());
 			PrintHeader("TESTING MESSAGE AUTHENTICATION CODE GENERATORS");
 			RunTest(new CMACTest());
+			RunTest(new GMACTest());
 			RunTest(new HMACTest());
+			RunTest(new Poly1305Test());
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
 			RunTest(new PrngTest());
 			PrintHeader("TESTING KEY DERIVATION FUNCTIONS");
@@ -571,7 +605,7 @@ int main()
 
 		return 0;
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		PrintHeader("An error has occurred! Press any key to close..", "");
 		GetResponse();

@@ -16,7 +16,7 @@ GMAC::GMAC(BlockCiphers CipherType)
 		throw CryptoMacException("GMAC:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),
-	m_gmacHash(),
+	m_gmacHash(new Mac::GHASH()),
 	m_gmacNonce(0),
 	m_gmacKey(0),
 	m_isDestroyed(false),
@@ -36,7 +36,7 @@ GMAC::GMAC(IBlockCipher* Cipher)
 		throw CryptoMacException("GMAC:CTor", "The Cipher can not be null!")),
 	m_cipherType(Cipher->Enumeral()),
 	m_destroyEngine(false),
-	m_gmacHash(),
+	m_gmacHash(new Mac::GHASH()),
 	m_gmacNonce(0),
 	m_gmacKey(0),
 	m_isDestroyed(false),
@@ -66,7 +66,11 @@ GMAC::~GMAC()
 		Utility::IntUtils::ClearVector(m_msgBuffer);
 		Utility::IntUtils::ClearVector(m_msgCode);
 
-		m_gmacHash->Reset();
+		if (m_gmacHash != nullptr)
+		{
+			m_gmacHash->Reset();
+			m_gmacHash.reset(nullptr);
+		}
 
 		if (m_destroyEngine)
 		{
@@ -215,6 +219,8 @@ void GMAC::Reset()
 
 void GMAC::Update(byte Input)
 {
+	CexAssert(m_isInitialized, "The Mac is not initialized");
+
 	m_gmacHash->Update(std::vector<byte> { Input }, 0, m_msgCode, 1);
 }
 

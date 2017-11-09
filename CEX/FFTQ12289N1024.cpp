@@ -442,7 +442,8 @@ void FFTQ12289N1024::PolyUniform(std::array<ushort, N> &A, const std::vector<byt
 		val = ((buf[pos] | (static_cast<ushort>(buf[pos + 1]) << 8)) & 0x3FFF);
 		if (val < Q)
 		{
-			A[ctr++] = val;
+			A[ctr] = val;
+			++ctr;
 		}
 
 		pos += 2;

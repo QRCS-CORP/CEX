@@ -95,6 +95,7 @@ CipherStream::CipherStream(IStreamCipher* Cipher)
 	m_cipherPadding(nullptr),
 	m_destroyEngine(false),
 	m_isBufferedIO(false),
+	m_isCounterMode(false),
 	m_isDestroyed(false),
 	m_isEncryption(true),
 	m_isInitialized(false),

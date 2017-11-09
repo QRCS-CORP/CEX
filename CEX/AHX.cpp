@@ -368,7 +368,7 @@ void AHX::StandardExpand(const std::vector<byte> &Key)
 	// key in 32 bit words
 	size_t keyWords = Key.size() / 4;
 	// rounds calculation, 512 gets 22 rounds
-	m_rndCount = (blkWords == 8 && keyWords != 16) ? 14 : keyWords + 6;
+	m_rndCount = keyWords + 6;
 	// setup expanded key
 	m_expKey.resize((blkWords * (m_rndCount + 1)) / 4);
 
@@ -542,10 +542,12 @@ void AHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	while (keyCtr != RNDCNT)
 	{
-		X = _mm_aesdec_si128(X, m_expKey[++keyCtr]);
+		++keyCtr;
+		X = _mm_aesdec_si128(X, m_expKey[keyCtr]);
 	}
 
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesdeclast_si128(X, m_expKey[++keyCtr]));
+	++keyCtr;
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesdeclast_si128(X, m_expKey[keyCtr]));
 }
 
 void AHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -565,13 +567,15 @@ void AHX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	while (keyCtr != RNDCNT)
 	{
-		X0.xmm = _mm_aesdec_si128(X0.xmm, m_expKey[++keyCtr]);
+		++keyCtr;
+		X0.xmm = _mm_aesdec_si128(X0.xmm, m_expKey[keyCtr]);
 		X1.xmm = _mm_aesdec_si128(X1.xmm, m_expKey[keyCtr]);
 		X2.xmm = _mm_aesdec_si128(X2.xmm, m_expKey[keyCtr]);
 		X3.xmm = _mm_aesdec_si128(X3.xmm, m_expKey[keyCtr]);
 	}
 
-	X0.xmm = _mm_aesdeclast_si128(X0.xmm, m_expKey[++keyCtr]);
+	++keyCtr;
+	X0.xmm = _mm_aesdeclast_si128(X0.xmm, m_expKey[keyCtr]);
 	X1.xmm = _mm_aesdeclast_si128(X1.xmm, m_expKey[keyCtr]);
 	X2.xmm = _mm_aesdeclast_si128(X2.xmm, m_expKey[keyCtr]);
 	X3.xmm = _mm_aesdeclast_si128(X3.xmm, m_expKey[keyCtr]);
@@ -605,10 +609,12 @@ void AHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	while (keyCtr != RNDCNT)
 	{
-		X = _mm_aesenc_si128(X, m_expKey[++keyCtr]);
+		++keyCtr;
+		X = _mm_aesenc_si128(X, m_expKey[keyCtr]);
 	}
 
-	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesenclast_si128(X, m_expKey[++keyCtr]));
+	++keyCtr;
+	_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output[OutOffset]), _mm_aesenclast_si128(X, m_expKey[keyCtr]));
 }
 
 void AHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -628,13 +634,15 @@ void AHX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 
 	while (keyCtr != RNDCNT)
 	{
-		X0.xmm = _mm_aesenc_si128(X0.xmm, m_expKey[++keyCtr]);
+		++keyCtr;
+		X0.xmm = _mm_aesenc_si128(X0.xmm, m_expKey[keyCtr]);
 		X1.xmm = _mm_aesenc_si128(X1.xmm, m_expKey[keyCtr]);
 		X2.xmm = _mm_aesenc_si128(X2.xmm, m_expKey[keyCtr]);
 		X3.xmm = _mm_aesenc_si128(X3.xmm, m_expKey[keyCtr]);
 	}
 
-	X0.xmm = _mm_aesenclast_si128(X0.xmm, m_expKey[++keyCtr]);
+	++keyCtr;
+	X0.xmm = _mm_aesenclast_si128(X0.xmm, m_expKey[keyCtr]);
 	X1.xmm = _mm_aesenclast_si128(X1.xmm, m_expKey[keyCtr]);
 	X2.xmm = _mm_aesenclast_si128(X2.xmm, m_expKey[keyCtr]);
 	X3.xmm = _mm_aesenclast_si128(X3.xmm, m_expKey[keyCtr]);

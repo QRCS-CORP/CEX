@@ -52,7 +52,7 @@ RHX::RHX(IDigest* Digest, size_t Rounds)
 	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
 		throw CryptoSymmetricCipherException("RHX:CTor", "Invalid rounds count! Sizes supported are even numbers between 10 and 38"))
 {
-	LoadState(Digest->Enumeral());
+	LoadState(m_kdfEngineType);
 }
 
 RHX::~RHX()
@@ -370,7 +370,7 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 	// key in 32 bit words
 	size_t keyWords = Key.size() / 4;
 	// rounds calculation, 512 gets 22 rounds
-	m_rndCount = (blkWords == 8 && keyWords != 16) ? 14 : keyWords + 6;
+	m_rndCount = keyWords + 6;
 	// setup expanded key
 	m_expKey.resize(blkWords * (m_rndCount + 1), 0);
 
@@ -496,80 +496,87 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 
 void RHX::ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex)
 {
-	size_t sub = KeyIndex - KeyOffset;
+	size_t subKey = KeyIndex - KeyOffset;
 
-	Key[KeyIndex] = Key[sub] ^ SubByte(static_cast<uint>(Key[KeyIndex - 1] << 8) | static_cast<uint>(Key[KeyIndex - 1] >> 24) & 0xFF) ^ Rcon[RconIndex];
+	Key[KeyIndex] = Key[subKey] ^ SubByte(static_cast<uint>(Key[KeyIndex - 1] << 8) | static_cast<uint>(Key[KeyIndex - 1] >> 24) & 0xFF) ^ Rcon[RconIndex];
 	++KeyIndex;
-	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++subKey;
+	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
 	++KeyIndex;
-	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++subKey;
+	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
 	++KeyIndex;
-	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++subKey;
+	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
 }
 
 void RHX::ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset)
 {
-	size_t sub = KeyIndex - KeyOffset;
+	size_t subKey = KeyIndex - KeyOffset;
 
-	Key[KeyIndex] = SubByte(Key[KeyIndex - 1]) ^ Key[sub];
+	Key[KeyIndex] = SubByte(Key[KeyIndex - 1]) ^ Key[subKey];
 	++KeyIndex;
-	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++subKey;
+	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
 	++KeyIndex;
-	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++subKey;
+	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
 	++KeyIndex;
-	Key[KeyIndex] = Key[++sub] ^ Key[KeyIndex - 1];
+	++subKey;
+	Key[KeyIndex] = Key[subKey] ^ Key[KeyIndex - 1];
 }
 
 //~~~Rounds Processing~~~//
 
 void RHX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t RNDCNT = m_expKey.size() - 5;
-	size_t keyCtr = 0;
+	const size_t RNDCNT = m_expKey.size() - 4;
 
 	// round 0
-	uint X0 = Utility::IntUtils::BeBytesTo32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X1 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X2 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X3 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X0 = Utility::IntUtils::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
+	uint X1 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
+	uint X2 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
+	uint X3 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
 
 	// round 1
-	uint Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[++keyCtr];
-	uint Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_expKey[++keyCtr];
-	uint Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_expKey[++keyCtr];
-	uint Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_expKey[++keyCtr];
+	uint Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[4];
+	uint Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_expKey[5];
+	uint Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_expKey[6];
+	uint Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_expKey[7];
 
+	size_t keyCtr = 8;
 	// rounds loop
 	while (keyCtr != RNDCNT)
 	{
-		X0 = IT0[(Y0 >> 24)] ^ IT1[static_cast<byte>(Y3 >> 16)] ^ IT2[static_cast<byte>(Y2 >> 8)] ^ IT3[static_cast<byte>(Y1)] ^ m_expKey[++keyCtr];
-		X1 = IT0[(Y1 >> 24)] ^ IT1[static_cast<byte>(Y0 >> 16)] ^ IT2[static_cast<byte>(Y3 >> 8)] ^ IT3[static_cast<byte>(Y2)] ^ m_expKey[++keyCtr];
-		X2 = IT0[(Y2 >> 24)] ^ IT1[static_cast<byte>(Y1 >> 16)] ^ IT2[static_cast<byte>(Y0 >> 8)] ^ IT3[static_cast<byte>(Y3)] ^ m_expKey[++keyCtr];
-		X3 = IT0[(Y3 >> 24)] ^ IT1[static_cast<byte>(Y2 >> 16)] ^ IT2[static_cast<byte>(Y1 >> 8)] ^ IT3[static_cast<byte>(Y0)] ^ m_expKey[++keyCtr];
+		X0 = IT0[(Y0 >> 24)] ^ IT1[static_cast<byte>(Y3 >> 16)] ^ IT2[static_cast<byte>(Y2 >> 8)] ^ IT3[static_cast<byte>(Y1)] ^ m_expKey[keyCtr];
+		X1 = IT0[(Y1 >> 24)] ^ IT1[static_cast<byte>(Y0 >> 16)] ^ IT2[static_cast<byte>(Y3 >> 8)] ^ IT3[static_cast<byte>(Y2)] ^ m_expKey[keyCtr + 1];
+		X2 = IT0[(Y2 >> 24)] ^ IT1[static_cast<byte>(Y1 >> 16)] ^ IT2[static_cast<byte>(Y0 >> 8)] ^ IT3[static_cast<byte>(Y3)] ^ m_expKey[keyCtr + 2];
+		X3 = IT0[(Y3 >> 24)] ^ IT1[static_cast<byte>(Y2 >> 16)] ^ IT2[static_cast<byte>(Y1 >> 8)] ^ IT3[static_cast<byte>(Y0)] ^ m_expKey[keyCtr + 3];
 
-		Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[++keyCtr];
-		Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_expKey[++keyCtr];
-		Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_expKey[++keyCtr];
-		Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_expKey[++keyCtr];
+		Y0 = IT0[(X0 >> 24)] ^ IT1[static_cast<byte>(X3 >> 16)] ^ IT2[static_cast<byte>(X2 >> 8)] ^ IT3[static_cast<byte>(X1)] ^ m_expKey[keyCtr + 4];
+		Y1 = IT0[(X1 >> 24)] ^ IT1[static_cast<byte>(X0 >> 16)] ^ IT2[static_cast<byte>(X3 >> 8)] ^ IT3[static_cast<byte>(X2)] ^ m_expKey[keyCtr + 5];
+		Y2 = IT0[(X2 >> 24)] ^ IT1[static_cast<byte>(X1 >> 16)] ^ IT2[static_cast<byte>(X0 >> 8)] ^ IT3[static_cast<byte>(X3)] ^ m_expKey[keyCtr + 6];
+		Y3 = IT0[(X3 >> 24)] ^ IT1[static_cast<byte>(X2 >> 16)] ^ IT2[static_cast<byte>(X1 >> 8)] ^ IT3[static_cast<byte>(X0)] ^ m_expKey[keyCtr + 7];
+		keyCtr += 8;
 	}
 
 	// final round
-	Output[OutOffset] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	Output[OutOffset] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 1] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 2] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 3] = static_cast<byte>(ISBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_expKey[keyCtr]));
-
-	Output[OutOffset + 4] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	++keyCtr;
+	Output[OutOffset + 4] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 5] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 6] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 7] = static_cast<byte>(ISBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_expKey[keyCtr]));
-
-	Output[OutOffset + 8] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	++keyCtr;
+	Output[OutOffset + 8] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 9] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 10] = static_cast<byte>(ISBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 11] = static_cast<byte>(ISBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_expKey[keyCtr]));
-
-	Output[OutOffset + 12] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	++keyCtr;
+	Output[OutOffset + 12] = static_cast<byte>(ISBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 13] = static_cast<byte>(ISBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 14] = static_cast<byte>(ISBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 15] = static_cast<byte>(ISBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_expKey[keyCtr]));
@@ -597,50 +604,51 @@ void RHX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 void RHX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t RNDCNT = m_expKey.size() - 5;
-	size_t keyCtr = 0;
+	const size_t RNDCNT = m_expKey.size() - 4;
 
 	// round 0
-	uint X0 = Utility::IntUtils::BeBytesTo32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X1 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X2 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X3 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X0 = Utility::IntUtils::BeBytesTo32(Input, InOffset) ^ m_expKey[0];
+	uint X1 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
+	uint X2 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
+	uint X3 = Utility::IntUtils::BeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
 
 	// round 1
-	uint Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[++keyCtr];
-	uint Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_expKey[++keyCtr];
-	uint Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_expKey[++keyCtr];
-	uint Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_expKey[++keyCtr];
+	uint Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[4];
+	uint Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_expKey[5];
+	uint Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_expKey[6];
+	uint Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_expKey[7];
 
+	size_t keyCtr = 8;
 	while (keyCtr != RNDCNT)
 	{
-		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_expKey[++keyCtr];
-		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_expKey[++keyCtr];
-		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_expKey[++keyCtr];
-		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_expKey[++keyCtr];
-		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[++keyCtr];
-		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_expKey[++keyCtr];
-		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_expKey[++keyCtr];
-		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_expKey[++keyCtr];
+		X0 = T0[static_cast<byte>(Y0 >> 24)] ^ T1[static_cast<byte>(Y1 >> 16)] ^ T2[static_cast<byte>(Y2 >> 8)] ^ T3[static_cast<byte>(Y3)] ^ m_expKey[keyCtr];
+		X1 = T0[static_cast<byte>(Y1 >> 24)] ^ T1[static_cast<byte>(Y2 >> 16)] ^ T2[static_cast<byte>(Y3 >> 8)] ^ T3[static_cast<byte>(Y0)] ^ m_expKey[keyCtr + 1];
+		X2 = T0[static_cast<byte>(Y2 >> 24)] ^ T1[static_cast<byte>(Y3 >> 16)] ^ T2[static_cast<byte>(Y0 >> 8)] ^ T3[static_cast<byte>(Y1)] ^ m_expKey[keyCtr + 2];
+		X3 = T0[static_cast<byte>(Y3 >> 24)] ^ T1[static_cast<byte>(Y0 >> 16)] ^ T2[static_cast<byte>(Y1 >> 8)] ^ T3[static_cast<byte>(Y2)] ^ m_expKey[keyCtr + 3];
+		Y0 = T0[static_cast<byte>(X0 >> 24)] ^ T1[static_cast<byte>(X1 >> 16)] ^ T2[static_cast<byte>(X2 >> 8)] ^ T3[static_cast<byte>(X3)] ^ m_expKey[keyCtr + 4];
+		Y1 = T0[static_cast<byte>(X1 >> 24)] ^ T1[static_cast<byte>(X2 >> 16)] ^ T2[static_cast<byte>(X3 >> 8)] ^ T3[static_cast<byte>(X0)] ^ m_expKey[keyCtr + 5];
+		Y2 = T0[static_cast<byte>(X2 >> 24)] ^ T1[static_cast<byte>(X3 >> 16)] ^ T2[static_cast<byte>(X0 >> 8)] ^ T3[static_cast<byte>(X1)] ^ m_expKey[keyCtr + 6];
+		Y3 = T0[static_cast<byte>(X3 >> 24)] ^ T1[static_cast<byte>(X0 >> 16)] ^ T2[static_cast<byte>(X1 >> 8)] ^ T3[static_cast<byte>(X2)] ^ m_expKey[keyCtr + 7];
+		keyCtr += 8;
 	}
 
 	// final round
-	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	Output[OutOffset] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 1] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 2] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 3] = static_cast<byte>(SBox[static_cast<byte>(Y3)] ^ static_cast<byte>(m_expKey[keyCtr]));
-
-	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	++keyCtr;
+	Output[OutOffset + 4] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 5] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 6] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 7] = static_cast<byte>(SBox[static_cast<byte>(Y0)] ^ static_cast<byte>(m_expKey[keyCtr]));
-
-	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	++keyCtr;
+	Output[OutOffset + 8] = static_cast<byte>(SBox[static_cast<byte>(Y2 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 9] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 10] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 11] = static_cast<byte>(SBox[static_cast<byte>(Y1)] ^ static_cast<byte>(m_expKey[keyCtr]));
-
-	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_expKey[++keyCtr] >> 24));
+	++keyCtr;
+	Output[OutOffset + 12] = static_cast<byte>(SBox[static_cast<byte>(Y3 >> 24)] ^ static_cast<byte>(m_expKey[keyCtr] >> 24));
 	Output[OutOffset + 13] = static_cast<byte>(SBox[static_cast<byte>(Y0 >> 16)] ^ static_cast<byte>(m_expKey[keyCtr] >> 16));
 	Output[OutOffset + 14] = static_cast<byte>(SBox[static_cast<byte>(Y1 >> 8)] ^ static_cast<byte>(m_expKey[keyCtr] >> 8));
 	Output[OutOffset + 15] = static_cast<byte>(SBox[static_cast<byte>(Y2)] ^ static_cast<byte>(m_expKey[keyCtr]));
@@ -713,7 +721,7 @@ void RHX::Prefetch()
 		PREFETCHT1(&T2[0], 256 * sizeof(uint));
 		PREFETCHT1(&T3[0], 256 * sizeof(uint));
 #else
-		volatile uint dummy;
+		volatile uint dummy = 0;
 		for (size_t i = 0; i < 256; ++i)
 		{
 			dummy ^= SBox[i];
@@ -745,7 +753,7 @@ void RHX::Prefetch()
 		PREFETCHT1(&IT2[0], 256 * sizeof(uint));
 		PREFETCHT1(&IT3[0], 256 * sizeof(uint));
 #else
-		volatile uint dummy;
+		volatile uint dummy = 0;
 		for (size_t i = 0; i < 256; ++i)
 		{
 			dummy ^= SBox[i];

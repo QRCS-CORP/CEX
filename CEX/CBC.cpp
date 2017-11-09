@@ -114,6 +114,11 @@ const std::vector<SymmetricKeySize> &CBC::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
+std::vector<byte> &CBC::Nonce()
+{ 
+	return m_cbcVector; 
+}
+
 const std::string CBC::Name()
 {
 	return CLASS_NAME + "-" + m_blockCipher->Name();
@@ -153,9 +158,9 @@ void CBC::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void CBC::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	if (KeyParams.Nonce().size() < 16)
+	if (KeyParams.Nonce().size() != BLOCK_SIZE)
 	{
-		throw CryptoSymmetricCipherException("CBC:Initialize", "Requires a minimum 16 bytes of Nonce!");
+		throw CryptoSymmetricCipherException("CBC:Initialize", "Requires 16 bytes of Nonce!");
 	}
 	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{

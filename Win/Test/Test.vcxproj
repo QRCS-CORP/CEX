@@ -316,6 +316,7 @@
     <ClInclude Include="..\..\Test\MemUtilsTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
+    <ClInclude Include="..\..\Test\Poly1305Test.h" />
     <ClInclude Include="..\..\Test\RandomOutputTest.h" />
     <ClInclude Include="..\..\Test\RingLWETest.h" />
     <ClInclude Include="..\..\Test\SCRYPTTest.h" />
@@ -377,6 +378,7 @@
     <ClCompile Include="..\..\Test\PaddingTest.cpp" />
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
+    <ClCompile Include="..\..\Test\Poly1305Test.cpp" />
     <ClCompile Include="..\..\Test\RandomOutputTest.cpp" />
     <ClCompile Include="..\..\Test\PrngTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />

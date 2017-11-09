@@ -124,6 +124,8 @@ ParallelOptions &HMAC::ParallelProfile()
 
 void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
+	CexAssert(m_isInitialized, "The Mac is not initialized");
+
 	if (Output.size() != m_msgDigest->DigestSize())
 	{
 		Output.resize(m_msgDigest->DigestSize());
@@ -144,7 +146,6 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	m_msgDigest->Update(tmpV, 0, tmpV.size());
 
 	size_t msgLen = m_msgDigest->Finalize(Output, OutOffset);
-	m_msgDigest->Reset(); // TODO: still necessary?
 	m_msgDigest->Update(m_inputPad, 0, m_inputPad.size());
 
 	return msgLen;
@@ -152,7 +153,6 @@ size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 void HMAC::Initialize(ISymmetricKey &KeyParams)
 {
-	// TODO: to enforce good security, this should be at least digest output size, keccak and hmac tests are causing it to throw.. find a solution
 	if (KeyParams.Key().size() == 0)
 	{
 		throw CryptoMacException("HMAC:Initialize", "Key size is too small; should be a minimum of digest output size!");
@@ -199,7 +199,7 @@ void HMAC::ParallelMaxDegree(size_t Degree)
 	{
 		m_msgDigest->ParallelMaxDegree(Degree);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		throw CryptoMacException("HMAC:ParallelMaxDegree", "The Degree value must be a non-zero even number less than the number of processor cores!");
 	}
@@ -217,6 +217,8 @@ void HMAC::Reset()
 
 void HMAC::Update(byte Input)
 {
+	CexAssert(m_isInitialized, "The Mac is not initialized");
+
 	m_msgDigest->Update(Input);
 }
 

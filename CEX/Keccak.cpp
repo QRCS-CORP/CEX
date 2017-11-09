@@ -8,7 +8,9 @@ using Utility::IntUtils;
 void Keccak::Permute(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State)
 {
 	for (size_t i = 0; i < Length / sizeof(ulong); ++i)
+	{
 		State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+	}
 
 	ulong Aba, Abe, Abi, Abo, Abu;
 	ulong Aga, Age, Agi, Ago, Agu;

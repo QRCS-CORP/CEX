@@ -22,7 +22,7 @@ std::string SysUtils::ComputerName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 #elif defined(CEX_OS_POSIX)
 
@@ -38,7 +38,7 @@ std::string SysUtils::ComputerName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 #endif
 	
@@ -70,7 +70,7 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 			}
 		}
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 	return retSizes;
 
@@ -86,7 +86,7 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 		retSizes.push_back(static_cast<ulong>(fsinfo.f_frsize * fsinfo.f_blocks));
 		retSizes.push_back(static_cast<ulong>(fsinfo.f_bsize * fsinfo.f_bfree));
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 	return retSizes;
 
@@ -134,7 +134,7 @@ ulong SysUtils::MemoryPhysicalTotal()
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 	return static_cast<ulong>(memInfo.ullTotalPhys);
 
@@ -151,7 +151,7 @@ ulong SysUtils::MemoryPhysicalTotal()
 
 		return static_cast<ulong>(totalPhysMem);
 	}
-	catch (...) 
+	catch (std::exception&) 
 	{
 		return 0;
 	}
@@ -174,7 +174,7 @@ ulong SysUtils::MemoryPhysicalUsed()
 
 		return static_cast<ulong>(memInfo.ullTotalPhys - memInfo.ullAvailPhys);
 	}
-	catch (...) 
+	catch (std::exception&) 
 	{
 		return 0;
 	}
@@ -190,7 +190,7 @@ ulong SysUtils::MemoryPhysicalUsed()
 		physMemUsed = memInfo.totalram - memInfo.freeram;
 		physMemUsed *= memInfo.mem_unit;
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 	return static_cast<ulong>(physMemUsed);
 
@@ -212,7 +212,7 @@ ulong SysUtils::MemoryVirtualTotal()
 
 		return static_cast<ulong>(memInfo.ullTotalPageFile);
 	}
-	catch (...) 
+	catch (std::exception&) 
 	{
 		return 0;
 	}
@@ -229,7 +229,7 @@ ulong SysUtils::MemoryVirtualTotal()
 		totalVirtualMem += memInfo.totalswap;
 		totalVirtualMem *= memInfo.mem_unit;
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 	return static_cast<ulong>(totalVirtualMem);
 
@@ -251,7 +251,7 @@ ulong SysUtils::MemoryVirtualUsed()
 
 		return static_cast<ulong>(memInfo.ullTotalPageFile - memInfo.ullAvailPageFile);
 	}
-	catch (...) 
+	catch (std::exception&) 
 	{
 		return 0;
 	}
@@ -268,7 +268,7 @@ ulong SysUtils::MemoryVirtualUsed()
 		virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
 		virtualMemUsed *= memInfo.mem_unit;
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 	return static_cast<ulong>(virtualMemUsed);
 
@@ -303,7 +303,7 @@ uint SysUtils::ProcessId()
 	{
 		return static_cast<uint>(GetCurrentProcessId());
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		return 0;
 	}
@@ -312,7 +312,7 @@ uint SysUtils::ProcessId()
 	{
 		return static_cast<uint>(::getpid());
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		return 0;
 	}
@@ -337,7 +337,7 @@ std::string SysUtils::UserName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 #elif defined(CEX_OS_POSIX)
 
@@ -353,7 +353,7 @@ std::string SysUtils::UserName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (...) {}
+	catch (std::exception&) {}
 
 #endif
 
@@ -367,6 +367,8 @@ ulong SysUtils::TimeCurrentNS()
 
 ulong SysUtils::TimeStamp(bool HasRdtsc)
 {
+	ulong tmeStamp = 0;
+
 	// http://nadeausoftware.com/articles/2012/04/c_c_tip_how_measure_elapsed_real_time_benchmarking
 #if defined(CEX_OS_WINDOWS)
 	try
@@ -374,43 +376,44 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		if (HasRdtsc)
 		{
 			// use tsc if available
-			return __rdtsc();
+			tmeStamp = static_cast<ulong>(__rdtsc());
 		}
 		else
 		{
 			int64_t ctr1 = 0;
 			int64_t freq = 0;
+
 			if (QueryPerformanceCounter((LARGE_INTEGER *)&ctr1) != 0)
 			{
 				QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
 				// return microseconds to milliseconds
-				return (uint64_t)(ctr1 * 1000.0 / freq);
+				if (freq > 0)
+				{
+					tmeStamp = static_cast<ulong>(ctr1 * 1000.0 / freq);
+				}
 			}
 			else
 			{
 				FILETIME ft;
 				LARGE_INTEGER li;
-
 				// Get the amount of 100 nano seconds intervals elapsed since January 1, 1601 (UTC) and copy it to a LARGE_INTEGER structure
 				GetSystemTimeAsFileTime(&ft);
 				li.LowPart = ft.dwLowDateTime;
 				li.HighPart = ft.dwHighDateTime;
-
-				uint64_t ret = li.QuadPart;
-				ret -= 116444736000000000LL; // Convert from file time to UNIX epoch time.
-				ret /= 10000; // From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals
-
-				return ret;
+				tmeStamp = static_cast<ulong>(li.QuadPart);
+				// Convert from file time to UNIX epoch time.
+				tmeStamp -= 116444736000000000LL; 
+				// From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals
+				tmeStamp /= 10000;
 			}
 		}
 	}
-	catch (...) 
+	catch (std::exception&) 
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-
-		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif (defined(CEX_OS_HPUX) || defined(CEX_OS_SUNUX)) && (defined(__SVR4) || defined(__svr4__))
@@ -418,14 +421,14 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 	// HP-UX, Solaris
 	try
 	{
-		return static_cast<ulong>(gethrtime());
+		tmeStamp = static_cast<ulong>(gethrtime());
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif defined(CEX_OS_APPLE)
@@ -436,14 +439,14 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		mach_timebase_info_data_t timeBase;
 		(void)mach_timebase_info(&timeBase);
 		timeConvert = timeBase.numer / timeBase.denom;
-		return static_cast<ulong>(mach_absolute_time() * timeConvert);
+		tmeStamp = static_cast<ulong>(mach_absolute_time() * timeConvert);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
-		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -475,16 +478,16 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		{
 			if (id != (clockid_t)-1 && clock_gettime(id, &ts) != -1)
 			{
-				return static_cast<ulong>(ts.tv_sec + ts.tv_nsec);
+				tmeStamp = static_cast<ulong>(ts.tv_sec + ts.tv_nsec);
 			}
 		}
-		catch (...)
+		catch (std::exception&)
 		{
 			std::chrono::high_resolution_clock::time_point epoch;
 			auto now = std::chrono::high_resolution_clock::now();
 			auto elapsed = now - epoch;
 
-			return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+			tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 		}
 	}
 
@@ -496,15 +499,15 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 		struct timeval tm;
 		gettimeofday(&tm, NULL);
 
-		return static_cast<ulong>(tm.tv_sec + tm.tv_usec);
+		tmeStamp = static_cast<ulong>(tm.tv_sec + tm.tv_usec);
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = now - epoch;
 
-		return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+		tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 	}
 
 #else
@@ -512,8 +515,10 @@ ulong SysUtils::TimeStamp(bool HasRdtsc)
 	auto now = std::chrono::high_resolution_clock::now();
 	auto elapsed = now - epoch;
 
-	return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
+	tmeStamp = static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 #endif
+
+	return tmeStamp;
 }
 
 ulong SysUtils::TimeSinceBoot()
@@ -525,7 +530,7 @@ ulong SysUtils::TimeSinceBoot()
 	{
 		return std::chrono::milliseconds(GetTickCount64()).count();
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
@@ -553,7 +558,7 @@ ulong SysUtils::TimeSinceBoot()
 			return static_cast<ulong>(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed).count());
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		std::chrono::high_resolution_clock::time_point epoch;
 		auto now = std::chrono::high_resolution_clock::now();
@@ -619,7 +624,9 @@ std::string SysUtils::Version()
 				HeapFree(GetProcessHeap(), 0, pAdapterInfo);
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return serInf;
 	}
@@ -630,7 +637,7 @@ std::string SysUtils::Version()
 		{
 			return GetCurrentThreadId();
 		}
-		catch (...) 
+		catch (std::exception&) 
 		{
 			return 0;
 		}
@@ -644,7 +651,7 @@ std::string SysUtils::Version()
 		{ 
 			GetCursorPos(&pnt);
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return pnt;
 	}
@@ -695,7 +702,9 @@ std::string SysUtils::Version()
 				while (Heap32ListNext(snapshot, &heapList));
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return serInf;
 	}
@@ -715,7 +724,7 @@ std::string SysUtils::Version()
 				strBuf.push_back(std::string(ws.begin(), ws.end()));
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return strBuf;
 	}
@@ -729,7 +738,7 @@ std::string SysUtils::Version()
 			memInfo.dwLength = sizeof(memInfo);
 			GlobalMemoryStatusEx(&memInfo);
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return memInfo;
 	}
@@ -753,7 +762,7 @@ std::string SysUtils::Version()
 				while (Module32Next(snapshot, &info));
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return serInf;
 	}
@@ -836,7 +845,7 @@ std::string SysUtils::Version()
 				}
 			}
 		}
-		catch (...) 
+		catch (std::exception&) 
 		{
 			return "Windows Unknown";
 		}
@@ -864,7 +873,7 @@ std::string SysUtils::Version()
 				while (Process32Next(snapshot, &prcInf));
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return serInf;
 	}
@@ -923,7 +932,9 @@ std::string SysUtils::Version()
 				}
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return retArr;
 	}
@@ -936,7 +947,9 @@ std::string SysUtils::Version()
 		{
 			GetSystemInfo(&sysInfo);
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return sysInfo;
 	}
@@ -949,7 +962,9 @@ std::string SysUtils::Version()
 		{
 			GetTcpStatistics(&tcpStats);
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return tcpStats;
 	}
@@ -973,7 +988,9 @@ std::string SysUtils::Version()
 				while (Thread32Next(snapshot, &thdInf));
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return serInf;
 	}
@@ -1021,14 +1038,16 @@ std::string SysUtils::Version()
 				hToken = NULL;
 			}
 		}
-		catch (...) {}
+		catch (std::exception&) 
+		{
+		}
 
 		return sidStr;
 	}
 
-	PTOKEN_USER SysUtils::UserToken()
+	std::vector<byte> SysUtils::UserToken()
 	{
-		PTOKEN_USER pTokenUser = NULL;
+		std::vector<byte> buffer(0);
 
 		try
 		{
@@ -1041,11 +1060,9 @@ std::string SysUtils::Version()
 				if (GetTokenInformation(hToken, TokenUser, NULL, 0, &dwBufferSize) && (GetLastError() != ERROR_INSUFFICIENT_BUFFER))
 				{
 					// Allocate buffer for user token data
-					std::vector<BYTE> buffer;
 					buffer.resize(dwBufferSize);
-					pTokenUser = reinterpret_cast<PTOKEN_USER>(&buffer[0]);
 					// Retrieve the token information in a TOKEN_USER structure
-					GetTokenInformation(hToken, TokenUser, pTokenUser, dwBufferSize, &dwBufferSize);
+					GetTokenInformation(hToken, TokenUser, reinterpret_cast<PTOKEN_USER>(&buffer[0]), dwBufferSize, &dwBufferSize);
 				}
 			}
 
@@ -1054,10 +1071,13 @@ std::string SysUtils::Version()
 				CloseHandle(hToken);
 				hToken = NULL;
 			}
-		}
-		catch (...) {}
 
-		return pTokenUser;
+		}
+		catch (std::exception&) 
+		{
+		}
+
+		return buffer;
 	}
 
 #elif defined(CEX_OS_POSIX)
@@ -1074,7 +1094,7 @@ std::string SysUtils::Version()
 			retValues.push_back(static_cast<uint>(::getgid()));
 			retValues.push_back(static_cast<uint>(::getpgrp()));
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return retValues;
 	}
@@ -1087,7 +1107,7 @@ std::string SysUtils::Version()
 		{
 			::getrusage(RUSAGE_SELF, &usage);
 		}
-		catch (...) {}
+		catch (std::exception&) {}
 
 		return usage;
 	}
@@ -1098,7 +1118,7 @@ std::string SysUtils::Version()
 		{
 			return std::string(static_cast<uint>(::getuid()));
 		}
-		catch (...) 
+		catch (std::exception&) 
 		{
 			return std::string("");
 		}

@@ -24,9 +24,9 @@ CMAC::CMAC(BlockCiphers CipherType)
 	m_K2(0),
 	m_legalKeySizes(0),
 	m_macSize(m_cipherMode->BlockSize()),
+	m_msgBuffer(m_macSize),
 	m_msgCode(m_macSize),
-	m_wrkBuffer(m_macSize),
-	m_wrkOffset(0)
+	m_msgLength(0)
 {
 	Scope();
 }
@@ -44,9 +44,9 @@ CMAC::CMAC(IBlockCipher* Cipher)
 	m_K2(0),
 	m_legalKeySizes(0),
 	m_macSize(m_cipherMode->BlockSize()),
+	m_msgBuffer(m_macSize),
 	m_msgCode(m_macSize),
-	m_wrkBuffer(m_macSize),
-	m_wrkOffset(0)
+	m_msgLength(0)
 {
 	Scope();
 }
@@ -59,14 +59,14 @@ CMAC::~CMAC()
 		m_cipherType = BlockCiphers::None;
 		m_isInitialized = false;
 		m_macSize = 0;
-		m_wrkOffset = 0;
+		m_msgLength = 0;
 
 		Utility::IntUtils::ClearVector(m_cipherKey);
 		Utility::IntUtils::ClearVector(m_K1);
 		Utility::IntUtils::ClearVector(m_K2);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
 		Utility::IntUtils::ClearVector(m_msgCode);
-		Utility::IntUtils::ClearVector(m_wrkBuffer);
+		Utility::IntUtils::ClearVector(m_msgBuffer);
 
 		if (m_destroyEngine)
 		{
@@ -144,18 +144,18 @@ size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	CexAssert(m_isInitialized, "The Mac is not initialized");
 	CexAssert((Output.size() - OutOffset) >= m_macSize, "The Output buffer is too short");
 
-	if (m_wrkOffset != m_cipherMode->BlockSize())
+	if (m_msgLength != m_cipherMode->BlockSize())
 	{
 		Cipher::Symmetric::Block::Padding::ISO7816 pad;
-		pad.AddPadding(m_wrkBuffer, m_wrkOffset);
-		Utility::MemUtils::XorBlock(m_K2, 0, m_wrkBuffer, 0, m_macSize);
+		pad.AddPadding(m_msgBuffer, m_msgLength);
+		Utility::MemUtils::XorBlock(m_K2, 0, m_msgBuffer, 0, m_macSize);
 	}
 	else
 	{
-		Utility::MemUtils::XorBlock(m_K1, 0, m_wrkBuffer, 0, m_macSize);
+		Utility::MemUtils::XorBlock(m_K1, 0, m_msgBuffer, 0, m_macSize);
 	}
 
-	m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
+	m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
 	Utility::MemUtils::Copy(m_msgCode, 0, Output, OutOffset, m_macSize);
 	Reset();
 
@@ -212,19 +212,22 @@ void CMAC::Reset()
 	// reinitialize the cbc iv
 	Utility::MemUtils::Clear(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode.get())->Nonce(), 0, BLOCK_SIZE);
 	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
-	Utility::MemUtils::Clear(m_wrkBuffer, 0, m_wrkBuffer.size());
-	m_wrkOffset = 0;
+	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	m_msgLength = 0;
 }
 
 void CMAC::Update(byte Input)
 {
-	if (m_wrkOffset == m_wrkBuffer.size())
+	CexAssert(m_isInitialized, "The Mac is not initialized");
+
+	if (m_msgLength == m_msgBuffer.size())
 	{
-		m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
-		m_wrkOffset = 0;
+		m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
+		m_msgLength = 0;
 	}
 
-	m_wrkBuffer[m_wrkOffset++] = Input;
+	++m_msgLength;
+	m_msgBuffer[m_msgLength] = Input;
 }
 
 void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
@@ -234,18 +237,18 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 	if (Length != 0)
 	{
-		if (m_wrkOffset == m_cipherMode->BlockSize())
+		if (m_msgLength == m_cipherMode->BlockSize())
 		{
-			m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
-			m_wrkOffset = 0;
+			m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
+			m_msgLength = 0;
 		}
 
-		size_t diff = m_cipherMode->BlockSize() - m_wrkOffset;
+		size_t diff = m_cipherMode->BlockSize() - m_msgLength;
 		if (Length > diff)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_wrkBuffer, m_wrkOffset, diff);
-			m_cipherMode->EncryptBlock(m_wrkBuffer, 0, m_msgCode, 0);
-			m_wrkOffset = 0;
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, diff);
+			m_cipherMode->EncryptBlock(m_msgBuffer, 0, m_msgCode, 0);
+			m_msgLength = 0;
 			Length -= diff;
 			InOffset += diff;
 
@@ -259,8 +262,8 @@ void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 		if (Length > 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_wrkBuffer, m_wrkOffset, Length);
-			m_wrkOffset += Length;
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			m_msgLength += Length;
 		}
 	}
 }

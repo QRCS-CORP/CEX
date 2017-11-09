@@ -63,7 +63,7 @@ THX::THX(IDigest* Digest, size_t Rounds)
 		throw CryptoSymmetricCipherException("THX:CTor", "Sizes supported are even numbers between 16 and 32")),
 	m_sBox(SBOX_SIZE, 0)
 {
-	LoadState(Digest->Enumeral());
+	LoadState(m_kdfEngineType);
 }
 
 THX::~THX()
@@ -446,37 +446,37 @@ void THX::StandardExpand(const std::vector<byte> &Key)
 void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t RNDCNT = 8;
-	size_t keyCtr = 4;
-	uint X2 = Utility::IntUtils::LeBytesTo32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X0 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X2 = Utility::IntUtils::LeBytesTo32(Input, InOffset) ^ m_expKey[4];
+	uint X3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4) ^ m_expKey[5];
+	uint X0 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8) ^ m_expKey[6];
+	uint X1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12) ^ m_expKey[7];
 	uint T0, T1;
-	keyCtr = m_expKey.size();
+	size_t keyCtr = m_expKey.size();
 
 	do
 	{
 		T0 = Fe0(X2, m_sBox);
 		T1 = Fe3(X3, m_sBox);
-		X1 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
+		X1 ^= T0 + 2 * T1 + m_expKey[keyCtr - 1];
 		X0 = (X0 << 1) | (X0 >> 31);
-		X0 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X0 ^= (T0 + T1 + m_expKey[keyCtr - 2]);
 		X1 = (X1 >> 1) | (X1 << 31);
 
 		T0 = Fe0(X0, m_sBox);
 		T1 = Fe3(X1, m_sBox);
-		X3 ^= T0 + 2 * T1 + m_expKey[--keyCtr];
+		X3 ^= T0 + 2 * T1 + m_expKey[keyCtr - 3];
 		X2 = (X2 << 1) | (X2 >> 31);
-		X2 ^= (T0 + T1 + m_expKey[--keyCtr]);
+		X2 ^= (T0 + T1 + m_expKey[keyCtr - 4]);
 		X3 = (X3 >> 1) | (X3 << 31);
+		keyCtr -= 4;
 	} 
 	while (keyCtr != RNDCNT);
 
 	keyCtr = 0;
 	Utility::IntUtils::Le32ToBytes(X0 ^ m_expKey[keyCtr], Output, OutOffset);
-	Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[++keyCtr], Output, OutOffset + 4);
-	Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[++keyCtr], Output, OutOffset + 8);
-	Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[++keyCtr], Output, OutOffset + 12);
+	Utility::IntUtils::Le32ToBytes(X1 ^ m_expKey[keyCtr + 1], Output, OutOffset + 4);
+	Utility::IntUtils::Le32ToBytes(X2 ^ m_expKey[keyCtr + 2], Output, OutOffset + 8);
+	Utility::IntUtils::Le32ToBytes(X3 ^ m_expKey[keyCtr + 3], Output, OutOffset + 12);
 }
 
 void THX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
@@ -545,37 +545,37 @@ void THX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
 	const size_t RNDCNT = m_expKey.size() - 1;
-	size_t keyCtr = 0;
-	uint X0 = Utility::IntUtils::LeBytesTo32(Input, InOffset) ^ m_expKey[keyCtr];
-	uint X1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4) ^ m_expKey[++keyCtr];
-	uint X2 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8) ^ m_expKey[++keyCtr];
-	uint X3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12) ^ m_expKey[++keyCtr];
+	uint X0 = Utility::IntUtils::LeBytesTo32(Input, InOffset) ^ m_expKey[0];
+	uint X1 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 4) ^ m_expKey[1];
+	uint X2 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 8) ^ m_expKey[2];
+	uint X3 = Utility::IntUtils::LeBytesTo32(Input, InOffset + 12) ^ m_expKey[3];
 	uint T0, T1;
-	keyCtr = 7;
+	size_t keyCtr = 7;
 
 	do
 	{
 		T0 = Fe0(X0, m_sBox);
 		T1 = Fe3(X1, m_sBox);
-		X2 ^= T0 + T1 + m_expKey[++keyCtr];
+		X2 ^= T0 + T1 + m_expKey[keyCtr + 1];
 		X2 = (X2 >> 1) | (X2 << 31);
 		X3 = (X3 << 1) | (X3 >> 31);
-		X3 ^= (T0 + 2 * T1 + m_expKey[++keyCtr]);
+		X3 ^= (T0 + 2 * T1 + m_expKey[keyCtr + 2]);
 
 		T0 = Fe0(X2, m_sBox);
 		T1 = Fe3(X3, m_sBox);
-		X0 ^= T0 + T1 + m_expKey[++keyCtr];
+		X0 ^= T0 + T1 + m_expKey[keyCtr + 3];
 		X0 = (X0 >> 1) | (X0 << 31);
 		X1 = (X1 << 1) | (X1 >> 31);
-		X1 ^= (T0 + 2 * T1 + m_expKey[++keyCtr]);
+		X1 ^= (T0 + 2 * T1 + m_expKey[keyCtr + 4]);
+		keyCtr += 4;
 	} 
 	while (keyCtr != RNDCNT);
 
 	keyCtr = 4;
 	X2 ^= m_expKey[keyCtr];
-	X3 ^= m_expKey[++keyCtr];
-	X0 ^= m_expKey[++keyCtr];
-	X1 ^= m_expKey[++keyCtr];
+	X3 ^= m_expKey[keyCtr + 1];
+	X0 ^= m_expKey[keyCtr + 2];
+	X1 ^= m_expKey[keyCtr + 3];
 
 	Utility::IntUtils::Le32ToBytes(X2, Output, OutOffset);
 	Utility::IntUtils::Le32ToBytes(X3, Output, OutOffset + 4);
@@ -840,7 +840,7 @@ void THX::Prefetch()
 	PREFETCHT1(&Q0[0], 256 * sizeof(uint));
 	PREFETCHT1(&Q1[0], 256 * sizeof(uint));
 #else
-	volatile uint dummy;
+	volatile uint dummy = 0;
 	for (size_t i = 0; i < m_sBox.size(); ++i)
 	{
 		dummy ^= m_sBox[i];

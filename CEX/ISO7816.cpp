@@ -30,12 +30,13 @@ size_t ISO7816::AddPadding(std::vector<byte> &Input, size_t Offset)
 	}
 
 	size_t padlen = (Input.size() - Offset);
-
-	Input[Offset++] = MKCODE;
+	Input[Offset] = MKCODE;
+	++Offset;
 
 	while (Offset < Input.size())
 	{
-		Input[Offset++] = ZBCODE;
+		Input[Offset] = ZBCODE;
+		++Offset;
 	}
 
 	return padlen;

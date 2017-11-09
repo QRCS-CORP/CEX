@@ -129,24 +129,26 @@ void FileStream::CopyTo(IByteStream* Destination)
 
 	if (m_fileSize > CHUNK_SIZE)
 	{
-		size_t aln = m_fileSize - (m_fileSize % CHUNK_SIZE);
+		const size_t ALNSZE = m_fileSize - (m_fileSize % CHUNK_SIZE);
 		std::vector<byte> buffer(CHUNK_SIZE);
 		m_fileStream.seekg(0, std::ios::beg);
 
-		uint ctr = 0;
-		do
-		{
-			m_fileStream.read((char*)&buffer, CHUNK_SIZE);
-			Destination->Write(buffer, ctr, CHUNK_SIZE);
-			ctr += CHUNK_SIZE;
+		uint bteCtr = 0;
 
-		} 
-		while (ctr != aln);
-
-		if (aln != m_fileSize)
+		if (ALNSZE >= CHUNK_SIZE)
 		{
-			m_fileStream.read((char*)&buffer, m_fileSize - aln);
-			Destination->Write(buffer, aln, m_fileSize - aln);
+			while (bteCtr != ALNSZE)
+			{
+				m_fileStream.read((char*)buffer.data(), CHUNK_SIZE);
+				Destination->Write(buffer, bteCtr, CHUNK_SIZE);
+				bteCtr += CHUNK_SIZE;
+			}
+		}
+
+		if (ALNSZE != m_fileSize)
+		{
+			m_fileStream.read((char*)buffer.data(), m_fileSize - ALNSZE);
+			Destination->Write(buffer, ALNSZE, m_fileSize - ALNSZE);
 		}
 	}
 	else

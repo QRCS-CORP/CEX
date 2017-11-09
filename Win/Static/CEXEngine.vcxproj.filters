@@ -810,6 +810,9 @@
     <ClInclude Include="..\..\CEX\CpuCores.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\Poly1305.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1153,6 +1156,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\KeccakParams.cpp">
       <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Poly1305.cpp">
+      <Filter>Source Files\Mac</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

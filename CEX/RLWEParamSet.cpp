@@ -34,14 +34,14 @@ RLWEParamSet::RLWEParamSet()
 	SeedSize(0)
 {}
 
-RLWEParamSet::RLWEParamSet(uint Coefficients, int Modulus, uint SeedByteSize, uint ForwardByteSize, uint ReturnByteSize, RLWEParams ParamSet)
+RLWEParamSet::RLWEParamSet(uint Coefficients, int Modulus, uint SeedByteSize, uint ForwardByteSize, uint ReturnByteSize, RLWEParams CipherParams)
 	:
 	N(Coefficients),
 	Q(Modulus),
 	SeedSize(SeedByteSize),
 	ForwardMessageSize(ForwardByteSize),
 	ReturnMessageSize(ReturnByteSize),
-	ParamName(ParamSet)
+	ParamName(CipherParams)
 {
 }
 
@@ -70,7 +70,7 @@ void RLWEParamSet::Load(uint Coefficients, int Modulus, uint SeedByteSize, uint 
 	N = Coefficients;
 	Q = Modulus;
 	ForwardMessageSize = ForwardByteSize;
-	ParamName = ParamName;
+	ParamName = ParamSet;
 	ReturnMessageSize = ReturnByteSize;
 	SeedSize = SeedByteSize;
 }

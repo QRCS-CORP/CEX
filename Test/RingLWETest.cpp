@@ -85,19 +85,6 @@ namespace Test
 			{
 				throw TestException("RingLWETest: Public key serialization test has failed!");
 			}
-
-			if (kp != nullptr)
-			{
-				delete kp;
-			}
-			if (priK1 != nullptr)
-			{
-				delete priK1;
-			}
-			if (pubK1 != nullptr)
-			{
-				delete pubK1;
-			}
 		}
 	}
 

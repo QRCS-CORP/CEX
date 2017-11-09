@@ -294,7 +294,7 @@ public:
 	/// </summary>
 	/// 
 	/// <returns>A PTOKEN_USER structure</returns>
-	static PTOKEN_USER UserToken();
+	static std::vector<byte> UserToken();
 
 #elif defined(CEX_OS_POSIX)
 

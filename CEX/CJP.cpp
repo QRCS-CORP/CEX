@@ -227,7 +227,7 @@ void CJP::Detect()
 			m_memAccessLoops = (m_memTotalSize / m_memBlockSize) * 2;
 		}
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		m_memBlocks = MEMORY_BLOCKS;
 		m_memBlockSize = MEMORY_BLOCKSIZE;

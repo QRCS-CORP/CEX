@@ -109,7 +109,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 		} 
 		while (prcLen != 0)
 	}
-	catch (...)
+	catch (std::exception&)
 	{
 		throw CryptoRandomException("CSP:GetBytes", "Call to arc4random failed; random provider is not available!");
 	}

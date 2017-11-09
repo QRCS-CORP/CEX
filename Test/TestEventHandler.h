@@ -10,7 +10,7 @@ namespace Test
 	class TestEventHandler : public TestEvent<TestEventHandler>
 	{
 	public:
-		void operator()(const std::string Data)
+		void operator()(const std::string &Data)
 		{
 			ConsoleUtils::WriteLine(Data);
 		}

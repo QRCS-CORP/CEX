@@ -33,26 +33,25 @@ public:
 
 	static void Transform(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
-		size_t ctr = 0;
-		uint X0 = State[ctr];
-		uint X1 = State[++ctr];
-		uint X2 = State[++ctr];
-		uint X3 = State[++ctr];
-		uint X4 = State[++ctr];
-		uint X5 = State[++ctr];
-		uint X6 = State[++ctr];
-		uint X7 = State[++ctr];
+		uint X0 = State[0];
+		uint X1 = State[1];
+		uint X2 = State[2];
+		uint X3 = State[3];
+		uint X4 = State[4];
+		uint X5 = State[5];
+		uint X6 = State[6];
+		uint X7 = State[7];
 		uint X8 = Counter[0];
 		uint X9 = Counter[1];
-		uint X10 = State[++ctr];
-		uint X11 = State[++ctr];
-		uint X12 = State[++ctr];
-		uint X13 = State[++ctr];
-		uint X14 = State[++ctr];
-		uint X15 = State[++ctr];
-		ctr = Rounds;
+		uint X10 = State[8];
+		uint X11 = State[9];
+		uint X12 = State[10];
+		uint X13 = State[11];
+		uint X14 = State[12];
+		uint X15 = State[13];
 
-		while (ctr != 0)
+		size_t stateCtr = Rounds;
+		while (stateCtr != 0)
 		{
 			X4 ^= Utility::IntUtils::RotFL32(X0 + X12, 7);
 			X8 ^= Utility::IntUtils::RotFL32(X4 + X0, 9);
@@ -86,25 +85,25 @@ public:
 			X13 ^= Utility::IntUtils::RotFL32(X12 + X15, 9);
 			X14 ^= Utility::IntUtils::RotFL32(X13 + X12, 13);
 			X15 ^= Utility::IntUtils::RotFL32(X14 + X13, 18);
-			ctr -= 2;
+			stateCtr -= 2;
 		}
 
-		Utility::IntUtils::Le32ToBytes(X0 + State[ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X1 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X2 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X3 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X4 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X5 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X6 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X7 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X8 + Counter[0], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X9 + Counter[1], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X10 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X11 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X12 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X13 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X14 + State[++ctr], Output, OutOffset); OutOffset += 4;
-		Utility::IntUtils::Le32ToBytes(X15 + State[++ctr], Output, OutOffset);
+		Utility::IntUtils::Le32ToBytes(X0 + State[0], Output, OutOffset);
+		Utility::IntUtils::Le32ToBytes(X1 + State[1], Output, OutOffset + 4);
+		Utility::IntUtils::Le32ToBytes(X2 + State[2], Output, OutOffset + 8);
+		Utility::IntUtils::Le32ToBytes(X3 + State[3], Output, OutOffset + 12);
+		Utility::IntUtils::Le32ToBytes(X4 + State[4], Output, OutOffset + 16);
+		Utility::IntUtils::Le32ToBytes(X5 + State[5], Output, OutOffset + 20);
+		Utility::IntUtils::Le32ToBytes(X6 + State[6], Output, OutOffset + 24);
+		Utility::IntUtils::Le32ToBytes(X7 + State[7], Output, OutOffset + 28);
+		Utility::IntUtils::Le32ToBytes(X8 + Counter[0], Output, OutOffset + 32);
+		Utility::IntUtils::Le32ToBytes(X9 + Counter[1], Output, OutOffset + 36);
+		Utility::IntUtils::Le32ToBytes(X10 + State[8], Output, OutOffset + 40);
+		Utility::IntUtils::Le32ToBytes(X11 + State[9], Output, OutOffset + 44);
+		Utility::IntUtils::Le32ToBytes(X12 + State[10], Output, OutOffset + 48);
+		Utility::IntUtils::Le32ToBytes(X13 + State[11], Output, OutOffset + 52);
+		Utility::IntUtils::Le32ToBytes(X14 + State[12], Output, OutOffset + 56);
+		Utility::IntUtils::Le32ToBytes(X15 + State[13], Output, OutOffset + 60);
 	}
 
 #if defined(__AVX__)
@@ -112,16 +111,14 @@ public:
 	template<class T>
 	static void TransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
-
-		size_t ctr = 0;
-		T X0(State[ctr]);
-		T X1(State[++ctr]);
-		T X2(State[++ctr]);
-		T X3(State[++ctr]);
-		T X4(State[++ctr]);
-		T X5(State[++ctr]);
-		T X6(State[++ctr]);
-		T X7(State[++ctr]);
+		T X0(State[0]);
+		T X1(State[1]);
+		T X2(State[2]);
+		T X3(State[3]);
+		T X4(State[4]);
+		T X5(State[5]);
+		T X6(State[6]);
+		T X7(State[7]);
 		T X8(Counter, 0);
 #if defined(__AVX512__)
 		T X9(Counter, 16);
@@ -130,15 +127,15 @@ public:
 #else
 		T X9(Counter, 4);
 #endif
-		T X10(State[++ctr]);
-		T X11(State[++ctr]);
-		T X12(State[++ctr]);
-		T X13(State[++ctr]);
-		T X14(State[++ctr]);
-		T X15(State[++ctr]);
+		T X10(State[8]);
+		T X11(State[9]);
+		T X12(State[10]);
+		T X13(State[11]);
+		T X14(State[12]);
+		T X15(State[13]);
 
-		ctr = Rounds;
-		while (ctr != 0)
+		size_t stateCtr = Rounds;
+		while (stateCtr != 0)
 		{
 			X4 ^= T::RotL32(X0 + X12, 7);
 			X8 ^= T::RotL32(X4 + X0, 9);
@@ -172,18 +169,18 @@ public:
 			X13 ^= T::RotL32(X12 + X15, 9);
 			X14 ^= T::RotL32(X13 + X12, 13);
 			X15 ^= T::RotL32(X14 + X13, 18);
-			ctr -= 2;
+			stateCtr -= 2;
 		}
 
 		// last round
-		X0 += T(State[ctr]);
-		X1 += T(State[++ctr]);
-		X2 += T(State[++ctr]);
-		X3 += T(State[++ctr]);
-		X4 += T(State[++ctr]);
-		X5 += T(State[++ctr]);
-		X6 += T(State[++ctr]);
-		X7 += T(State[++ctr]);
+		X0 += T(State[0]);
+		X1 += T(State[1]);
+		X2 += T(State[2]);
+		X3 += T(State[3]);
+		X4 += T(State[4]);
+		X5 += T(State[5]);
+		X6 += T(State[6]);
+		X7 += T(State[7]);
 		X8 += T(Counter, 0);
 #if defined(__AVX512__)
 		X9 += T(Counter, 16);
@@ -192,12 +189,12 @@ public:
 #else
 		X9 += T(Counter, 4);
 #endif
-		X10 += T(State[++ctr]);
-		X11 += T(State[++ctr]);
-		X12 += T(State[++ctr]);
-		X13 += T(State[++ctr]);
-		X14 += T(State[++ctr]);
-		X15 += T(State[++ctr]);
+		X10 += T(State[8]);
+		X11 += T(State[9]);
+		X12 += T(State[10]);
+		X13 += T(State[11]);
+		X14 += T(State[12]);
+		X15 += T(State[13]);
 
 		T::Store16(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
 

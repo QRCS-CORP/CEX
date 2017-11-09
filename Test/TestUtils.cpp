@@ -79,6 +79,10 @@ namespace Test
 		if (QueryPerformanceCounter((LARGE_INTEGER *)&ctr1) != 0)
 		{
 			QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
+			if (freq == 0)
+			{
+				throw;
+			}
 			// return microseconds to milliseconds
 			return (uint64_t)(ctr1 * 1000.0 / freq);
 		}

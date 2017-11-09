@@ -28,6 +28,7 @@ OCB::OCB(BlockCiphers CipherType)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isFinalized(false),
+	m_isInitialized(false),
 	m_legalKeySizes(0),
 	m_listAsterisk(BLOCK_SIZE),
 	m_listDollar(BLOCK_SIZE),
@@ -60,6 +61,7 @@ OCB::OCB(IBlockCipher* Cipher)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isFinalized(false),
+	m_isInitialized(false),
 	m_legalKeySizes(0),
 	m_listAsterisk(BLOCK_SIZE),
 	m_listDollar(BLOCK_SIZE),
@@ -526,7 +528,8 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 		for (size_t i = 0; i < BLOCK_SIZE; ++i)
 		{
 			ulong b1 = m_mainStretch[btmLen];
-			ulong b2 = m_mainStretch[++btmLen];
+			++btmLen;
+			ulong b2 = m_mainStretch[btmLen];
 
 			m_mainOffset0[i] = static_cast<byte>((b1 << BTMSZE) | (b2 >> (8 - BTMSZE)));
 		}

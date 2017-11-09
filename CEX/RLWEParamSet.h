@@ -89,8 +89,8 @@ struct RLWEParamSet
 	/// <param name="SeedByteSize">The byte size of the secret seed array</param>
 	/// <param name="ForwardByteSize">The byte size of A's forward message to host B</param>
 	/// <param name="ReturnByteSize">The byte size of B's reply message to host A</param>
-	/// <param name="ParamSet">The parameter sets enumeration name</param>
-	RLWEParamSet(uint Coefficients, int Modulus, uint SeedByteSize, uint ForwardByteSize, uint ReturnByteSize, RLWEParams ParamSet);
+	/// <param name="CipherParams">The parameter sets enumeration name</param>
+	RLWEParamSet(uint Coefficients, int Modulus, uint SeedByteSize, uint ForwardByteSize, uint ReturnByteSize, RLWEParams CipherParams);
 
 	/// <summary>
 	/// Initialize the RingLWE parameter structure using a byte array
