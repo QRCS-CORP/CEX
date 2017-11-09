@@ -124,7 +124,7 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 * NTRU
 * ECDH
 * GMSS
-* Elliptic Curve based Signatute Scheme
+* ECDSA
 
 ### Release 1.2.0.1
 * TLS
