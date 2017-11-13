@@ -579,10 +579,10 @@ public:
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to process</param>
-	template <typename Array>
-	inline static void XorBlock(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length)
+	template <typename ArrayA, typename ArrayB>
+	inline static void XorBlock(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		const size_t ELMSZE = sizeof(Array::value_type);
+		const size_t ELMSZE = sizeof(ArrayA::value_type);
 
 		CexAssert((Input.size() - InOffset) * ELMSZE >= Length, "Length is larger than input capacity");
 		CexAssert((Output.size() - OutOffset) * ELMSZE >= Length, "Length is larger than output capacity");
@@ -632,10 +632,10 @@ public:
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
-	template <typename Array>
-	inline static void XOR128(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
+	template <typename ArrayA, typename ArrayB>
+	inline static void XOR128(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		const size_t ELMSZE = sizeof(Array::value_type);
+		const size_t ELMSZE = sizeof(ArrayA::value_type);
 
 		CexAssert((Input.size() - InOffset) * ELMSZE >= 16, "Length is larger than input capacity");
 		CexAssert((Output.size() - OutOffset) * ELMSZE >= 16, "Length is larger than output capacity");
@@ -659,10 +659,10 @@ public:
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
-	template <typename Array>
-	inline static void XOR256(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
+	template <typename ArrayA, typename ArrayB>
+	inline static void XOR256(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		const size_t ELMSZE = sizeof(Array::value_type);
+		const size_t ELMSZE = sizeof(ArrayA::value_type);
 
 		CexAssert((Input.size() - InOffset) * ELMSZE >= 32, "Length is larger than input capacity");
 		CexAssert((Output.size() - OutOffset) * ELMSZE >= 32, "Length is larger than output capacity");
@@ -683,10 +683,10 @@ public:
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
-	template <typename Array>
-	inline static void XOR512(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
+	template <typename ArrayA, typename ArrayB>
+	inline static void XOR512(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		const size_t ELMSZE = sizeof(Array::value_type);
+		const size_t ELMSZE = sizeof(ArrayA::value_type);
 
 		CexAssert((Input.size() - InOffset) * ELMSZE >= 64, "Length is larger than input capacity");
 		CexAssert((Output.size() - OutOffset) * ELMSZE >= 64, "Length is larger than output capacity");
@@ -708,10 +708,10 @@ public:
 	/// <param name="InOffset">The offset within the source array</param>
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
-	template <typename Array>
-	inline static void XOR1024(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset)
+	template <typename ArrayA, typename ArrayB>
+	inline static void XOR1024(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset)
 	{
-		const size_t ELMSZE = sizeof(Array::value_type);
+		const size_t ELMSZE = sizeof(ArrayA::value_type);
 
 		CexAssert((Input.size() - InOffset) * ELMSZE >= 128, "Length is larger than input capacity");
 		CexAssert((Output.size() - OutOffset) * ELMSZE >= 128, "Length is larger than output capacity");
@@ -731,8 +731,8 @@ public:
 	/// <param name="Output">The destination integer array</param>
 	/// <param name="OutOffset">The offset within the destination array</param>
 	/// <param name="Length">The number of bytes to process</param>
-	template <typename Array>
-	inline static void XorPartial(const Array &Input, size_t InOffset, Array &Output, size_t OutOffset, size_t Length)
+	template <typename ArrayA, typename ArrayB>
+	inline static void XorPartial(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
 		for (size_t i = 0; i < (Length / sizeof(Input[0])); ++i)
 		{

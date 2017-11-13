@@ -157,6 +157,7 @@ namespace Test
 		{
 			throw TestException("AEADTest: Tags do not match!");
 		}
+
 		std::vector<byte> decData(dataLen);
 		if (dataLen != 0)
 		{

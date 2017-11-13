@@ -31,6 +31,7 @@
 
 #include "IDigest.h"
 #include "KeccakParams.h"
+#include "KeccakState.h"
 
 NAMESPACE_DIGEST
 
@@ -91,43 +92,6 @@ private:
 		0x8000000080008009, 0x8000000080000000, 0x0000000080000080, 0x0000000080008003
 	};*/
 
-	struct Keccak1024State
-	{
-		static const ulong MAX_ULL = 0xFFFFFFFFFFFFFFFF;
-		std::vector<ulong> H;
-		ulong T;
-
-		Keccak1024State()
-			:
-			H(25),
-			T(0)
-		{
-			Reset();
-		}
-
-		void Increase(size_t Length)
-		{
-			T += Length;
-		}
-
-		void Reset()
-		{
-			if (H.size() > 0)
-			{
-				for (size_t i = 0; i < H.size(); ++i)
-					H[i] = 0;
-			}
-
-			H[1] = MAX_ULL;
-			H[2] = MAX_ULL;
-			H[8] = MAX_ULL;
-			H[12] = MAX_ULL;
-			H[17] = MAX_ULL;
-			H[20] = MAX_ULL;
-			T = 0;
-		}
-	};
-
 	static const size_t BLOCK_SIZE = 72;
 	static const std::string CLASS_NAME;
 	static const size_t DEF_PRLDEGREE = 8;
@@ -136,7 +100,7 @@ private:
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_SIZE = 25;
 
-	std::vector<Keccak1024State> m_dgtState;
+	std::vector<KeccakState> m_dgtState;
 	bool m_isDestroyed;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
@@ -286,9 +250,9 @@ public:
 
 private:
 
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak1024State &State);
-	void Permute(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<ulong> &State);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak1024State &State, ulong Length);
+	void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
+	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

@@ -34,12 +34,16 @@ public:
 	/// <summary>
 	/// Initialize the ISymmetricKey virtual interface class
 	/// </summary>
-	ISymmetricKey() {}
+	ISymmetricKey() 
+	{
+	}
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	virtual ~ISymmetricKey() noexcept {}
+	virtual ~ISymmetricKey() noexcept 
+	{
+	}
 
 	//~~~Accessors~~~//
 

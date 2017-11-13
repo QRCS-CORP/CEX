@@ -102,12 +102,16 @@ private:
 
 	struct SHA256State
 	{
-		std::vector<uint> H;
+		std::array<uint, 8> H;
 		ulong T;
+
+		void Increase(size_t Length)
+		{
+			T += Length;
+		}
 
 		SHA256State()
 			:
-			H(8),
 			T(0)
 		{
 		}
@@ -115,14 +119,14 @@ private:
 		void Reset()
 		{
 			T = 0;
-			H[0] = 0x6A09E667;
-			H[1] = 0xBB67AE85;
-			H[2] = 0x3C6EF372;
-			H[3] = 0xA54FF53A;
-			H[4] = 0x510E527F;
-			H[5] = 0x9B05688C;
-			H[6] = 0x1F83D9AB;
-			H[7] = 0x5BE0CD19;
+			H[0] = 0x6A09E667UL;
+			H[1] = 0xBB67AE85UL;
+			H[2] = 0x3C6EF372UL;
+			H[3] = 0xA54FF53AUL;
+			H[4] = 0x510E527FUL;
+			H[5] = 0x9B05688CUL;
+			H[6] = 0x1F83D9ABUL;
+			H[7] = 0x5BE0CD19UL;
 		}
 	};
 
@@ -274,18 +278,9 @@ public:
 
 private:
 
-	static uint BigSigma0(uint W);
-	static uint BigSigma1(uint W);
-	static uint Ch(uint B, uint C, uint D);
 	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
-	void Compress64(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
-	void Compress64W(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA256State &State);
-	static uint Maj(uint B, uint C, uint D);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA256State &State, ulong Length);
-	static void Round(uint A, uint B, uint C, uint &D, uint E, uint F, uint G, uint &H, uint M, uint P);
-	static uint Sigma0(uint W);
-	static uint Sigma1(uint W);
 };
 
 NAMESPACE_DIGESTEND

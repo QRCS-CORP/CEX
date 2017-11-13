@@ -1,4 +1,5 @@
 #include "SHA512.h"
+#include "SHA2.h"
 #include "IntUtils.h"
 #include "MemUtils.h"
 #include "ParallelUtils.h"
@@ -206,7 +207,7 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
 			{
-				Compress(m_msgBuffer, i * BLOCK_SIZE, rootState);
+				SHA2::Compress128(m_msgBuffer, i * BLOCK_SIZE, rootState);
 			}
 
 			m_msgLength -= BLKRMD;
@@ -256,7 +257,7 @@ void SHA512::Reset()
 		if (m_parallelProfile.IsParallel())
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
-			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
+			SHA2::Compress128(m_treeParams.ToBytes(), 0, m_dgtState[i]);
 		}
 	}
 }
@@ -278,21 +279,21 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 			{
 				// fill buffer
-				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
-				if (RMDLEN != 0)
+				const size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
+				if (RMDSZE != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 				}
 
 				// empty the message buffer
 				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
+					SHA2::Compress128(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
 				});
 
 				m_msgLength = 0;
-				Length -= RMDLEN;
-				InOffset += RMDLEN;
+				Length -= RMDSZE;
+				InOffset += RMDSZE;
 			}
 
 			if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -326,22 +327,22 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 		{
 			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-				if (RMDLEN != 0)
+				const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
+				if (RMDSZE != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 				}
 
-				Compress(m_msgBuffer, 0, m_dgtState[0]);
+				SHA2::Compress128(m_msgBuffer, 0, m_dgtState[0]);
 				m_msgLength = 0;
-				InOffset += RMDLEN;
-				Length -= RMDLEN;
+				InOffset += RMDSZE;
+				Length -= RMDSZE;
 			}
 
 			// sequential loop through blocks
 			while (Length > BLOCK_SIZE)
 			{
-				Compress(Input, InOffset, m_dgtState[0]);
+				SHA2::Compress128(Input, InOffset, m_dgtState[0]);
 				InOffset += BLOCK_SIZE;
 				Length -= BLOCK_SIZE;
 			}
@@ -358,210 +359,6 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 
 //~~~Private Functions~~~//
 
-ulong SHA512::BigSigma0(ulong W)
-{
-	return ((W << 36) | (W >> 28)) ^ ((W << 30) | (W >> 34)) ^ ((W << 25) | (W >> 39));
-}
-
-ulong SHA512::BigSigma1(ulong W)
-{
-	return ((W << 50) | (W >> 14)) ^ ((W << 46) | (W >> 18)) ^ ((W << 23) | (W >> 41));
-}
-
-ulong SHA512::Ch(ulong B, ulong C, ulong D)
-{
-	return (B & C) ^ (~B & D);
-}
-
-void SHA512::Compress(const std::vector<byte> &Input, size_t InOffset, SHA512State &State)
-{
-	ulong A = State.H[0];
-	ulong B = State.H[1];
-	ulong C = State.H[2];
-	ulong D = State.H[3];
-	ulong E = State.H[4];
-	ulong F = State.H[5];
-	ulong G = State.H[6];
-	ulong H = State.H[7];
-	ulong W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
-
-	W0 = IntUtils::BeBytesTo64(Input, InOffset);
-	Round(A, B, C, D, E, F, G, H, W0, 0x428A2F98D728AE22);
-	W1 = IntUtils::BeBytesTo64(Input, InOffset + 8);
-	Round(H, A, B, C, D, E, F, G, W1, 0x7137449123EF65CD);
-	W2 = IntUtils::BeBytesTo64(Input, InOffset + 16);
-	Round(G, H, A, B, C, D, E, F, W2, 0xB5C0FBCFEC4D3B2F);
-	W3 = IntUtils::BeBytesTo64(Input, InOffset + 24);
-	Round(F, G, H, A, B, C, D, E, W3, 0xE9B5DBA58189DBBC);
-	W4 = IntUtils::BeBytesTo64(Input, InOffset + 32);
-	Round(E, F, G, H, A, B, C, D, W4, 0x3956C25BF348B538);
-	W5 = IntUtils::BeBytesTo64(Input, InOffset + 40);
-	Round(D, E, F, G, H, A, B, C, W5, 0x59F111F1B605D019);
-	W6 = IntUtils::BeBytesTo64(Input, InOffset + 48);
-	Round(C, D, E, F, G, H, A, B, W6, 0x923F82A4AF194F9B);
-	W7 = IntUtils::BeBytesTo64(Input, InOffset + 56);
-	Round(B, C, D, E, F, G, H, A, W7, 0xAB1C5ED5DA6D8118);
-	W8 = IntUtils::BeBytesTo64(Input, InOffset + 64);
-	Round(A, B, C, D, E, F, G, H, W8, 0xD807AA98A3030242);
-	W9 = IntUtils::BeBytesTo64(Input, InOffset + 72);
-	Round(H, A, B, C, D, E, F, G, W9, 0x12835B0145706FBE);
-	W10 = IntUtils::BeBytesTo64(Input, InOffset + 80);
-	Round(G, H, A, B, C, D, E, F, W10, 0x243185BE4EE4B28C);
-	W11 = IntUtils::BeBytesTo64(Input, InOffset + 88);
-	Round(F, G, H, A, B, C, D, E, W11, 0x550C7DC3D5FFB4E2);
-	W12 = IntUtils::BeBytesTo64(Input, InOffset + 96);
-	Round(E, F, G, H, A, B, C, D, W12, 0x72BE5D74F27B896F);
-	W13 = IntUtils::BeBytesTo64(Input, InOffset + 104);
-	Round(D, E, F, G, H, A, B, C, W13, 0x80DEB1FE3B1696B1);
-	W14 = IntUtils::BeBytesTo64(Input, InOffset + 112);
-	Round(C, D, E, F, G, H, A, B, W14, 0x9BDC06A725C71235);
-	W15 = IntUtils::BeBytesTo64(Input, InOffset + 120);
-	Round(B, C, D, E, F, G, H, A, W15, 0xC19BF174CF692694);
-
-	W0 += Sigma1(W14) + W9 + Sigma0(W1);
-	Round(A, B, C, D, E, F, G, H, W0, 0xE49B69C19EF14AD2);
-	W1 += Sigma1(W15) + W10 + Sigma0(W2);
-	Round(H, A, B, C, D, E, F, G, W1, 0xEFBE4786384F25E3);
-	W2 += Sigma1(W0) + W11 + Sigma0(W3);
-	Round(G, H, A, B, C, D, E, F, W2, 0x0FC19DC68B8CD5B5);
-	W3 += Sigma1(W1) + W12 + Sigma0(W4);
-	Round(F, G, H, A, B, C, D, E, W3, 0x240CA1CC77AC9C65);
-	W4 += Sigma1(W2) + W13 + Sigma0(W5);
-	Round(E, F, G, H, A, B, C, D, W4, 0x2DE92C6F592B0275);
-	W5 += Sigma1(W3) + W14 + Sigma0(W6);
-	Round(D, E, F, G, H, A, B, C, W5, 0x4A7484AA6EA6E483);
-	W6 += Sigma1(W4) + W15 + Sigma0(W7);
-	Round(C, D, E, F, G, H, A, B, W6, 0x5CB0A9DCBD41FBD4);
-	W7 += Sigma1(W5) + W0 + Sigma0(W8);
-	Round(B, C, D, E, F, G, H, A, W7, 0x76F988DA831153B5);
-	W8 += Sigma1(W6) + W1 + Sigma0(W9);
-	Round(A, B, C, D, E, F, G, H, W8, 0x983E5152EE66DFAB);
-	W9 += Sigma1(W7) + W2 + Sigma0(W10);
-	Round(H, A, B, C, D, E, F, G, W9, 0xA831C66D2DB43210);
-	W10 += Sigma1(W8) + W3 + Sigma0(W11);
-	Round(G, H, A, B, C, D, E, F, W10, 0xB00327C898FB213F);
-	W11 += Sigma1(W9) + W4 + Sigma0(W12);
-	Round(F, G, H, A, B, C, D, E, W11, 0xBF597FC7BEEF0EE4);
-	W12 += Sigma1(W10) + W5 + Sigma0(W13);
-	Round(E, F, G, H, A, B, C, D, W12, 0xC6E00BF33DA88FC2);
-	W13 += Sigma1(W11) + W6 + Sigma0(W14);
-	Round(D, E, F, G, H, A, B, C, W13, 0xD5A79147930AA725);
-	W14 += Sigma1(W12) + W7 + Sigma0(W15);
-	Round(C, D, E, F, G, H, A, B, W14, 0x06CA6351E003826F);
-	W15 += Sigma1(W13) + W8 + Sigma0(W0);
-	Round(B, C, D, E, F, G, H, A, W15, 0x142929670A0E6E70);
-
-	W0 += Sigma1(W14) + W9 + Sigma0(W1);
-	Round(A, B, C, D, E, F, G, H, W0, 0x27B70A8546D22FFC);
-	W1 += Sigma1(W15) + W10 + Sigma0(W2);
-	Round(H, A, B, C, D, E, F, G, W1, 0x2E1B21385C26C926);
-	W2 += Sigma1(W0) + W11 + Sigma0(W3);
-	Round(G, H, A, B, C, D, E, F, W2, 0x4D2C6DFC5AC42AED);
-	W3 += Sigma1(W1) + W12 + Sigma0(W4);
-	Round(F, G, H, A, B, C, D, E, W3, 0x53380D139D95B3DF);
-	W4 += Sigma1(W2) + W13 + Sigma0(W5);
-	Round(E, F, G, H, A, B, C, D, W4, 0x650A73548BAF63DE);
-	W5 += Sigma1(W3) + W14 + Sigma0(W6);
-	Round(D, E, F, G, H, A, B, C, W5, 0x766A0ABB3C77B2A8);
-	W6 += Sigma1(W4) + W15 + Sigma0(W7);
-	Round(C, D, E, F, G, H, A, B, W6, 0x81C2C92E47EDAEE6);
-	W7 += Sigma1(W5) + W0 + Sigma0(W8);
-	Round(B, C, D, E, F, G, H, A, W7, 0x92722C851482353B);
-	W8 += Sigma1(W6) + W1 + Sigma0(W9);
-	Round(A, B, C, D, E, F, G, H, W8, 0xA2BFE8A14CF10364);
-	W9 += Sigma1(W7) + W2 + Sigma0(W10);
-	Round(H, A, B, C, D, E, F, G, W9, 0xA81A664BBC423001);
-	W10 += Sigma1(W8) + W3 + Sigma0(W11);
-	Round(G, H, A, B, C, D, E, F, W10, 0xC24B8B70D0F89791);
-	W11 += Sigma1(W9) + W4 + Sigma0(W12);
-	Round(F, G, H, A, B, C, D, E, W11, 0xC76C51A30654BE30);
-	W12 += Sigma1(W10) + W5 + Sigma0(W13);
-	Round(E, F, G, H, A, B, C, D, W12, 0xD192E819D6EF5218);
-	W13 += Sigma1(W11) + W6 + Sigma0(W14);
-	Round(D, E, F, G, H, A, B, C, W13, 0xD69906245565A910);
-	W14 += Sigma1(W12) + W7 + Sigma0(W15);
-	Round(C, D, E, F, G, H, A, B, W14, 0xF40E35855771202A);
-	W15 += Sigma1(W13) + W8 + Sigma0(W0);
-	Round(B, C, D, E, F, G, H, A, W15, 0x106AA07032BBD1B8);
-
-	W0 += Sigma1(W14) + W9 + Sigma0(W1);
-	Round(A, B, C, D, E, F, G, H, W0, 0x19A4C116B8D2D0C8);
-	W1 += Sigma1(W15) + W10 + Sigma0(W2);
-	Round(H, A, B, C, D, E, F, G, W1, 0x1E376C085141AB53);
-	W2 += Sigma1(W0) + W11 + Sigma0(W3);
-	Round(G, H, A, B, C, D, E, F, W2, 0x2748774CDF8EEB99);
-	W3 += Sigma1(W1) + W12 + Sigma0(W4);
-	Round(F, G, H, A, B, C, D, E, W3, 0x34B0BCB5E19B48A8);
-	W4 += Sigma1(W2) + W13 + Sigma0(W5);
-	Round(E, F, G, H, A, B, C, D, W4, 0x391C0CB3C5C95A63);
-	W5 += Sigma1(W3) + W14 + Sigma0(W6);
-	Round(D, E, F, G, H, A, B, C, W5, 0x4ED8AA4AE3418ACB);
-	W6 += Sigma1(W4) + W15 + Sigma0(W7);
-	Round(C, D, E, F, G, H, A, B, W6, 0x5B9CCA4F7763E373);
-	W7 += Sigma1(W5) + W0 + Sigma0(W8);
-	Round(B, C, D, E, F, G, H, A, W7, 0x682E6FF3D6B2B8A3);
-	W8 += Sigma1(W6) + W1 + Sigma0(W9);
-	Round(A, B, C, D, E, F, G, H, W8, 0x748F82EE5DEFB2FC);
-	W9 += Sigma1(W7) + W2 + Sigma0(W10);
-	Round(H, A, B, C, D, E, F, G, W9, 0x78A5636F43172F60);
-	W10 += Sigma1(W8) + W3 + Sigma0(W11);
-	Round(G, H, A, B, C, D, E, F, W10, 0x84C87814A1F0AB72);
-	W11 += Sigma1(W9) + W4 + Sigma0(W12);
-	Round(F, G, H, A, B, C, D, E, W11, 0x8CC702081A6439EC);
-	W12 += Sigma1(W10) + W5 + Sigma0(W13);
-	Round(E, F, G, H, A, B, C, D, W12, 0x90BEFFFA23631E28);
-	W13 += Sigma1(W11) + W6 + Sigma0(W14);
-	Round(D, E, F, G, H, A, B, C, W13, 0xA4506CEBDE82BDE9);
-	W14 += Sigma1(W12) + W7 + Sigma0(W15);
-	Round(C, D, E, F, G, H, A, B, W14, 0xBEF9A3F7B2C67915);
-	W15 += Sigma1(W13) + W8 + Sigma0(W0);
-	Round(B, C, D, E, F, G, H, A, W15, 0xC67178F2E372532B);
-
-	W0 += Sigma1(W14) + W9 + Sigma0(W1);
-	Round(A, B, C, D, E, F, G, H, W0, 0xCA273ECEEA26619C);
-	W1 += Sigma1(W15) + W10 + Sigma0(W2);
-	Round(H, A, B, C, D, E, F, G, W1, 0xD186B8C721C0C207);
-	W2 += Sigma1(W0) + W11 + Sigma0(W3);
-	Round(G, H, A, B, C, D, E, F, W2, 0xEADA7DD6CDE0EB1E);
-	W3 += Sigma1(W1) + W12 + Sigma0(W4);
-	Round(F, G, H, A, B, C, D, E, W3, 0xF57D4F7FEE6ED178);
-	W4 += Sigma1(W2) + W13 + Sigma0(W5);
-	Round(E, F, G, H, A, B, C, D, W4, 0x06F067AA72176FBA);
-	W5 += Sigma1(W3) + W14 + Sigma0(W6);
-	Round(D, E, F, G, H, A, B, C, W5, 0x0A637DC5A2C898A6);
-	W6 += Sigma1(W4) + W15 + Sigma0(W7);
-	Round(C, D, E, F, G, H, A, B, W6, 0x113F9804BEF90DAE);
-	W7 += Sigma1(W5) + W0 + Sigma0(W8);
-	Round(B, C, D, E, F, G, H, A, W7, 0x1B710B35131C471B);
-	W8 += Sigma1(W6) + W1 + Sigma0(W9);
-	Round(A, B, C, D, E, F, G, H, W8, 0x28DB77F523047D84);
-	W9 += Sigma1(W7) + W2 + Sigma0(W10);
-	Round(H, A, B, C, D, E, F, G, W9, 0x32CAAB7B40C72493);
-	W10 += Sigma1(W8) + W3 + Sigma0(W11);
-	Round(G, H, A, B, C, D, E, F, W10, 0x3C9EBE0A15C9BEBC);
-	W11 += Sigma1(W9) + W4 + Sigma0(W12);
-	Round(F, G, H, A, B, C, D, E, W11, 0x431D67C49C100D4C);
-	W12 += Sigma1(W10) + W5 + Sigma0(W13);
-	Round(E, F, G, H, A, B, C, D, W12, 0x4CC5D4BECB3E42B6);
-	W13 += Sigma1(W11) + W6 + Sigma0(W14);
-	Round(D, E, F, G, H, A, B, C, W13, 0x597F299CFC657E2A);
-	W14 += Sigma1(W12) + W7 + Sigma0(W15);
-	Round(C, D, E, F, G, H, A, B, W14, 0x5FCB6FAB3AD6FAEC);
-	W15 += Sigma1(W13) + W8 + Sigma0(W0);
-	Round(B, C, D, E, F, G, H, A, W15, 0x6C44198C4A475817);
-
-	State.H[0] += A;
-	State.H[1] += B;
-	State.H[2] += C;
-	State.H[3] += D;
-	State.H[4] += E;
-	State.H[5] += F;
-	State.H[6] += G;
-	State.H[7] += H;
-
-	State.Increase(BLOCK_SIZE);
-}
-
 void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State)
 {
 	State.Increase(Length);
@@ -569,7 +366,7 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 
 	if (Length == BLOCK_SIZE)
 	{
-		Compress(Input, InOffset, State);
+		SHA2::Compress128(Input, InOffset, State);
 		Length = 0;
 	}
 
@@ -582,47 +379,25 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 
 	if (Length > 112)
 	{
-		Compress(Input, InOffset, State);
+		SHA2::Compress128(Input, InOffset, State);
 		Utility::MemUtils::Clear(Input, InOffset, BLOCK_SIZE);
 	}
 
 	// finalize state with counter and last compression
 	IntUtils::Be64ToBytes(State.T[1], Input, InOffset + 112);
 	IntUtils::Be64ToBytes(bitLen, Input, InOffset + 120);
-	Compress(Input, InOffset, State);
-}
-
-ulong SHA512::Maj(ulong B, ulong C, ulong D)
-{
-	return (B & C) ^ (B & D) ^ (C & D);
+	SHA2::Compress128(Input, InOffset, State);
 }
 
 void SHA512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length)
 {
 	do
 	{
-		Compress(Input, InOffset, State);
+		SHA2::Compress128(Input, InOffset, State);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 
 	while (Length > 0);
-}
-
-void SHA512::Round(ulong A, ulong B, ulong C, ulong &D, ulong E, ulong F, ulong G, ulong &H, ulong M, ulong P)
-{
-	ulong R0 = H + BigSigma1(E) + Ch(E, F, G) + P + M;
-	D += R0;
-	H = R0 + BigSigma0(A) + Maj(A, B, C);
-}
-
-ulong SHA512::Sigma0(ulong W)
-{
-	return ((W << 63) | (W >> 1)) ^ ((W << 56) | (W >> 8)) ^ (W >> 7);
-}
-
-ulong SHA512::Sigma1(ulong W)
-{
-	return ((W << 45) | (W >> 19)) ^ ((W << 3) | (W >> 61)) ^ (W >> 6);
 }
 
 NAMESPACE_DIGESTEND

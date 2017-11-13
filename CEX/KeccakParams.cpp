@@ -14,7 +14,8 @@ KeccakParams::KeccakParams()
 	m_treeFanout(0),
 	m_reserved(0),
 	m_dstCode(0)
-{}
+{
+}
 
 KeccakParams::KeccakParams(ulong OutputSize, uint LeafSize, byte Fanout)
 	:

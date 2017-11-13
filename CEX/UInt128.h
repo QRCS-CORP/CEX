@@ -62,7 +62,9 @@ public:
 	/// <summary>
 	/// Default constructor; does not initialize the register
 	/// </summary>
-	UInt128() {}
+	UInt128() 
+	{
+	}
 
 	/// <summary>
 	/// Initialize the register with an __m128i value

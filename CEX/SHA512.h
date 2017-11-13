@@ -102,13 +102,10 @@ private:
 
 	struct SHA512State
 	{
-		std::vector<ulong> H;
-		std::vector<ulong> T;
+		std::array<ulong, 8> H;
+		std::array<ulong, 2> T;
 
 		SHA512State()
-			:
-			H(8),
-			T(2)
 		{
 		}
 
@@ -116,10 +113,10 @@ private:
 		{
 			T[0] += Length;
 
-			if (T[0] > 0x1fffffffffffffffL)
+			if (T[0] > 0x1FFFFFFFFFFFFFFFULL)
 			{
 				T[1] += (int64_t)(T[0] >> 61);
-				T[0] &= 0x1fffffffffffffffL;
+				T[0] &= 0x1FFFFFFFFFFFFFFFULL;
 			}
 		}
 
@@ -127,14 +124,14 @@ private:
 		{
 			T[0] = 0;
 			T[1] = 0;
-			H[0] = 0x6A09E667F3BCC908;
-			H[1] = 0xBB67AE8584CAA73B;
-			H[2] = 0x3C6EF372FE94F82B;
-			H[3] = 0xA54FF53A5F1D36F1;
-			H[4] = 0x510E527FADE682D1;
-			H[5] = 0x9B05688C2B3E6C1F;
-			H[6] = 0x1F83D9ABFB41BD6B;
-			H[7] = 0x5BE0CD19137E2179;
+			H[0] = 0x6A09E667F3BCC908ULL;
+			H[1] = 0xBB67AE8584CAA73BULL;
+			H[2] = 0x3C6EF372FE94F82BULL;
+			H[3] = 0xA54FF53A5F1D36F1ULL;
+			H[4] = 0x510E527FADE682D1ULL;
+			H[5] = 0x9B05688C2B3E6C1FULL;
+			H[6] = 0x1F83D9ABFB41BD6BULL;
+			H[7] = 0x5BE0CD19137E2179ULL;
 		}
 	};
 
@@ -286,17 +283,9 @@ public:
 
 private:
 
-	static ulong BigSigma0(ulong W);
-	static ulong BigSigma1(ulong W);
-	static ulong Ch(ulong B, ulong C, ulong D);
-	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
 	void Destroy();
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
-	static ulong Maj(ulong B, ulong C, ulong D);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length);
-	static void Round(ulong A, ulong B, ulong C, ulong &D, ulong E, ulong F, ulong G, ulong &H, ulong M, ulong P);
-	static ulong Sigma0(ulong W);
-	static ulong Sigma1(ulong W);
 };
 
 NAMESPACE_DIGESTEND

@@ -64,7 +64,9 @@ public:
 	/// <summary>
 	/// Default constructor; does not initialize the register
 	/// </summary>
-	UInt512() {}
+	UInt512() 
+	{
+	}
 
 	/// <summary>
 	/// Initialize the register with an __m512i value

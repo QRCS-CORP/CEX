@@ -90,7 +90,6 @@ namespace Test
 			OnProgress(std::string(""));
 
 			OnProgress(std::string("***Testing Large Block Memory Copy Functions***"));
-			//for (size_t i = 0; i < 10; ++i)
 			CopyBlockSpeed(SMPLEN, 10);
 			OnProgress(std::string(""));
 

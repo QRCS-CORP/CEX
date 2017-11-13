@@ -16,8 +16,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef _CEX_FFTM12T62_H
-#define _CEX_FFTM12T62_H
+#ifndef CEX_FFTM12T62_H
+#define CEX_FFTM12T62_H
 
 #include "CexDomain.h"
 #include "IPrng.h"

@@ -16,7 +16,8 @@ MacDescription::MacDescription()
 	m_blockSize(0),
 	m_roundCount(0),
 	m_kdfEngine(0)
-{}
+{
+}
 
 MacDescription::MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine, BlockCiphers EngineType, 
 	BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)

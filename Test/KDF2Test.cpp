@@ -63,7 +63,9 @@ namespace Test
 		delete dgt;
 
 		if (output != Expected)
+		{
 			throw TestException("KDF2: Values are not equal!");
+		}
 	}
 
 	void KDF2Test::Initialize()
@@ -86,14 +88,17 @@ namespace Test
 		gen.Initialize(m_key);
 		gen.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output)
+		{
 			throw TestException("KDF2: Initialization test failed!");
+		}
 
 		// test reset
 		gen.Reset();
 		gen.Initialize(m_key);
 		gen.Generate(outBytes, 0, outBytes.size());
 		if (outBytes != m_output)
+		{
 			throw TestException("KDF2: Initialization test failed!");
-
+		}
 	}
 }

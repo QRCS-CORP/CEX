@@ -16,7 +16,8 @@ SkeinParams::SkeinParams()
 	m_reserved2(0),
 	m_reserved3(0),
 	m_dstCode(0)
-{}
+{
+}
 
 SkeinParams::SkeinParams(ulong OutputSize, byte LeafSize, byte Fanout)
 	:

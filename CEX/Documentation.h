@@ -18,22 +18,70 @@ This help package contains details on the cryptographic primitives used in the l
 The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, patch, and release codes. \n
 \brief
 
-<B>Release 1.1.0.1</B> \n
-RingLWE \n
-McEliece \n
-GMSS \n
-RSA-Sig \n \n
-
-<B>Release 1.2.0.1</B> \n
-TLS \n
-STM-KEX \n
-Android/iOS/Linux Compatability \n
-DLL API \n
-
 \author    John Underhill
 \version   1.0.0.3
 \date      July 04, 2017
 \copyright GPL version 3 license (GPLv3)
+
+<B>Trajectory</B> \n \n
+
+The current version is 1.0.0.4 (A4 version), which are the major, minor, patch, and release codes. \n \n
+
+<B>Current Release 1.0.0.4 (version A4):</B> \n
+The McEliece asymmetric cipher \n
+The 1024bit Keccak digest \n
+The Poly1305 Message Authentication Code generator \n
+The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5) \n \n
+
+<B>Planned Release 1.1.0.1</B> \n
+RingLWE \n
+McEliece \n
+ModuleLWE \n
+NTRU \n
+ECDH \n
+GMSS \n
+ECDSA \n \n
+
+<B>Planned Release 1.2.0.1</B> \n
+TLS \n
+STM-KEX \n
+Android/iOS/Linux Compatability \n
+DLL API \n \n
+
+<B>History</B> \n \n
+
+<B>Version 1.0.0.4, November 11, 2017</B> \n
+Added the McEliece asymmetric cipher \n
+Added the 1024bit Keccak digest \n
+Added the Poly1305 Message Authentication Code generator \n
+The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5) \n
+Full coding standards sweep of the library \n
+Integration of std::array and std::unique_ptr throughout \n
+A full optimization cycle completed \n \n
+
+<B>Version 1.0.0.3, June 30, 2017</B> \n
+Added asymmetric cipher interfaces and framework \n
+Added RingLWE asymmetric cipher \n
+Added the Auto Collection seed Provider (ACP) \n
+Addition of the HCR prng \n
+Renaming of the drbgs to xCG format: BCG, DCG, and HCG; Block cipher Counter Generator, Digest and HMAC Counter Generators \n
+Overhaul of SecureRandom and prng classes \n \n
+
+<B>Version 1.0.0.2: April 23, 2017</B> \n
+Last of 1.0 sweep of the symmetric library before the second half of the project engages, with thousands of changes made throughout, and the addition of (!experimental) AVX512 support. \n
+Added a vectorized MemUtils class, with SIMD 128/256/512 copy, clear, set-value, and xor functions. \n
+Integrated vectorized replacements for memcpy, xor, and memset throughout, including cipher mode support for AVX512, (I don't have a xeon to test this, maybe you can help?). \n
+Reformatting of headers (inline accessors removed and the override hint added). \n
+Many small TODOs finished, api synchronized, and formatting and documentation changes throughout. \n \n
+
+<B>Version 1.0: March 28, 2017</B> \n
+The first official release of the library, (ciphers and protocols are now tested, documented, and ready for deployment). \n
+Completed Code and Help review cycles. \n
+Added parallelized HMAC implementation. \n
+Added multi-threaded Tree Hashing to all Skein and Keccak digest implementations. \n
+Added SIMD parallelization to Skein512. \n
+Rewrote SHA-2 paralellized tree hashing and added support for the SHA-NI SIMD to SHA-256. \n
+Added a multi-threaded and SIMD parallelized implementation of the SCRYPT key derivation function. \n \n
 
 \section intro_link Links
 The CEX++ Help pages: http://www.vtdev.com/CEX-Plus/Help/html/index.html  \n

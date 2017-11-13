@@ -62,7 +62,9 @@ public:
 	/// <summary>
 	/// Default constructor; does not initialize the register
 	/// </summary>
-	UShort128() {}
+	UShort128() 
+	{
+	}
 
 	/// <summary>
 	/// Initialize the register with an __m128i value

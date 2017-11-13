@@ -321,16 +321,16 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 	{
 		if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 		{
-			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-			if (RMDLEN != 0)
+			const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
+			if (RMDSZE != 0)
 			{
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 			}
 
 			ProcessBlock(m_msgBuffer, 0, BLOCK_SIZE);
 			m_msgLength = 0;
-			InOffset += RMDLEN;
-			Length -= RMDLEN;
+			InOffset += RMDSZE;
+			Length -= RMDSZE;
 		}
 
 		// loop through blocks

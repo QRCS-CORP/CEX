@@ -271,6 +271,12 @@
     <Filter Include="Source Files\Key\Asymmetric\McEliece">
       <UniqueIdentifier>{a20ff313-d972-41d7-90a3-22db4c8f1fec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\Authentication">
+      <UniqueIdentifier>{5123bc26-8329-46fb-8624-7165c860119c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Encrypt\Authenticate">
+      <UniqueIdentifier>{858f71b5-e698-455d-998b-9b9580a6bfbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -642,15 +648,6 @@
     <ClInclude Include="..\..\CEX\SimdProfiles.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish256.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish512.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Threefish1024.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SkeinParams.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
@@ -692,9 +689,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Keccak256.h">
       <Filter>Header Files\Digest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SCRYPT.h">
-      <Filter>Header Files\Kdf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CryptoAsymmetricException.h">
       <Filter>Header Files\Exception</Filter>
@@ -783,12 +777,6 @@
     <ClInclude Include="..\..\CEX\Keccak1024.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2S.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\Blake2B.h">
-      <Filter>Header Files\Digest\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\FFTM12T62.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClInclude>
@@ -812,6 +800,30 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Poly1305.h">
       <Filter>Header Files\Mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MLWEParams.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\IAuthenticate.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\Authenticate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Authenticators.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\ShakeModes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KeccakState.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Skein.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Blake2.h">
+      <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHA2.h">
+      <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1025,9 +1037,6 @@
     <ClCompile Include="..\..\CEX\Blake512.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\Keccak.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak256.cpp">
       <Filter>Source Files\Digest</Filter>
     </ClCompile>
@@ -1143,9 +1152,6 @@
       <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\BlakeParams.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SkeinUbiTweak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\SkeinParams.cpp">

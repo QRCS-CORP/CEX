@@ -32,7 +32,8 @@ RLWEParamSet::RLWEParamSet()
 	ParamName(RLWEParams::None),
 	ReturnMessageSize(0),
 	SeedSize(0)
-{}
+{
+}
 
 RLWEParamSet::RLWEParamSet(uint Coefficients, int Modulus, uint SeedByteSize, uint ForwardByteSize, uint ReturnByteSize, RLWEParams CipherParams)
 	:

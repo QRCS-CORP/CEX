@@ -33,7 +33,6 @@
 #include "IDigest.h"
 #include "SkeinParams.h"
 #include "SkeinUbiTweak.h"
-#include "Threefish1024.h"
 
 NAMESPACE_DIGEST
 
@@ -108,21 +107,15 @@ private:
 	struct Skein1024State
 	{
 		// state
-		std::vector<ulong> S;
+		std::array<ulong, 16> S;
 		// tweak
-		std::vector<ulong> T;
+		std::array<ulong, 2> T;
 		// config
-		std::vector<ulong> V;
+		std::array<ulong, 16> V;
 
 		Skein1024State()
-			:
-			// state
-			S(16),
-			// tweak
-			T(2),
-			// config
-			V(16)
 		{
+			Reset();
 		}
 
 		void Increase(size_t Length)
@@ -132,21 +125,9 @@ private:
 
 		void Reset()
 		{
-			if (S.size() > 0)
-			{
-				for (size_t i = 0; i < S.size(); ++i)
-					S[i] = 0;
-			}
-			if (T.size() > 0)
-			{
-				for (size_t i = 0; i < T.size(); ++i)
-					T[i] = 0;
-			}
-			if (V.size() > 0)
-			{
-				for (size_t i = 0; i < V.size(); ++i)
-					V[i] = 0;
-			}
+			std::memset(&S[0], 0, S.size() * sizeof(ulong));
+			std::memset(&T[0], 0, T.size() * sizeof(ulong));
+			std::memset(&V[0], 0, V.size() * sizeof(ulong));
 		}
 	};
 

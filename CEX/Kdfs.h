@@ -29,7 +29,11 @@ enum class Kdfs : byte
 	/// <summary>
 	/// An implementation of the SCRYPT KDF
 	/// </summary>
-	SCRYPT = 4
+	SCRYPT = 4,
+	/// <summary>
+	/// An implementation of the SHAKE XOF function
+	/// </summary>
+	SHAKE = 5
 };
 
 NAMESPACE_ENUMERATIONEND

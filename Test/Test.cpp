@@ -135,38 +135,49 @@
 //
 // ### Optimization Cycle 1: Sept 26, 2017 ###
 // Performance of various algorithms pre/post memory and code optimizations
+// Best set of five: Win10/i7-6700/VS2015
 //
 // ## Stage 1 (baseline) ##
 // #asymmetric ciphers in operations per second, best of 4
 // RingLWE: Gen 14285/17345, Enc 10000/12547, Dec 33333
 // McEliece: Gen 12, Enc 7692, Dec 4000
-// #symmetric algorithms in MB per second
+//
+// #symmetric ciphers in MB per second
 // AHX: ECB 11299, CTR 426/7633, ICM 172/8064, CBC 715/9803, CFB 352/2277, OFB 307, EAX 205/616, OCB 107/1013, GCM 311/1060
 // SHX: ECB 2418
 // THX: ECB 1002
 // ChaCha: 6097
 // Salsa: 6622
+//
+// #message digests in MB per second
 // Blake2: 512- 677/1831, 256- 376/1636
 // Keccak: 1024- 79/314, 512- 155/400, 256- 294/1152
 // SHA2: 512- 335/1312, 256- 193/788
 // Skein: 1024- 350/1412, 512- 236/1204, 256- 221/929
+//
+// #memory in MB per second
 // Memory: LB Clear 6993, Clear 10309, LB Copy 4761, Copy 10416, LB Memset 6896, Memset 10309, LB XOR 4524, XOR 1329
 //
 // ## Stage 2 (post optimization in full release) ##
 // #asymmetric ciphers in operations per second, best of 4
-// RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000
-// McEliece: Gen 12, Enc 12500, Dec 4577
-// #symmetric algorithms in MB per second
+// RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000 +/+/+
+// McEliece: Gen 12, Enc 12500, Dec 4577 =/+/+
+//
+// #symmetric ciphers in MB per second
 // AHX: CTR , CBC , EAX , OFB , GCM
 // SHX: CTR , CBC , EAX , OFB , GCM
 // THX: CTR , CBC , EAX , OFB , GCM
 // ChaCha: 
 // Salsa: 
-// Blake2: 512- , 256- 
-// Keccak: 1024- , 512- , 256- 
-// SHA2: 512- , 256- 
-// Skein: 1024- , 512- , 256- 
-// Memory: 
+//
+// #message digests in MB per second
+// Blake2: 512- 728/1851, 256- 403/1605 +/=
+// Keccak: 1024- 62/227, 512- 167/626, 256- 310/1149 -/+/=
+// SHA2: 512- 352/1303, 256- 206/790 =/+
+// Skein: 1024- 462/1904, 512- 331/1980, 256- 298/1426  +/+/+
+//
+// #memory in MB per second
+// Memory: LB Clear 8849, Clear 10989, LB Copy 7633, Copy 9803, LB Memset 7575, Memset 10869, LB XOR 5181, XOR 1383
 //
 // ### 1.1.0.0 RoadMap ###
 //
@@ -370,7 +381,10 @@ void RunTest(Test::ITest* Test)
 int main()
 {
 	ConsoleUtils::SizeConsole();
-	PrintTitle();
+	PrintTitle(); 
+
+	//RunTest(new SHAKETest());
+
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");

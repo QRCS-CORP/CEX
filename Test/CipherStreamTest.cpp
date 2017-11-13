@@ -239,7 +239,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -363,7 +363,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -488,7 +488,7 @@ namespace Test
 		// ctr test
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_encText.resize(smpSze);
@@ -787,7 +787,7 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize()));
+				uint smpSze = rng.NextUInt32(static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize()));
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -814,7 +814,7 @@ namespace Test
 			for (size_t i = 0; i < 10; i++)
 			{
 				Cipher::Symmetric::Block::Mode::CTR* cipher = new Cipher::Symmetric::Block::Mode::CTR(engine);
-				size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize()));
+				uint smpSze = rng.NextUInt32(static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize()));
 				size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 				AllocateRandom(m_plnText, smpSze);
 				m_decText.resize(smpSze);
@@ -860,7 +860,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher.ParallelProfile().ParallelMinimumSize() * 4, cipher.ParallelProfile().ParallelMinimumSize()));
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher.ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = (size_t)smpSze - (smpSze % cipher.ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);
@@ -980,7 +980,7 @@ namespace Test
 		// ctr test
 		for (size_t i = 0; i < 10; i++)
 		{
-			size_t smpSze = static_cast<size_t>(rng.NextUInt32(cipher->ParallelProfile().ParallelMinimumSize() * 4, cipher->ParallelProfile().ParallelMinimumSize()));
+			uint smpSze = rng.NextUInt32(static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(cipher->ParallelProfile().ParallelMinimumSize()));
 			size_t prlBlock = smpSze - (smpSze % cipher->ParallelProfile().ParallelMinimumSize());
 			AllocateRandom(m_plnText, smpSze);
 			m_cmpText.resize(smpSze);

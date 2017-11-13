@@ -13,7 +13,8 @@ MPKCParamSet::MPKCParamSet()
 	PublicKeySize(0),
 	PrivateKeySize(0),
 	ParamName(MPKCParams::None)
-{}
+{
+}
 
 MPKCParamSet::MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriKeySize, MPKCParams ParamType)
 	:
@@ -22,7 +23,8 @@ MPKCParamSet::MPKCParamSet(int Field, int Correction, uint PubKeySize, uint PriK
 	PublicKeySize(PubKeySize),
 	PrivateKeySize(PriKeySize),
 	ParamName(ParamType)
-{}
+{
+}
 
 MPKCParamSet::MPKCParamSet(const std::vector<byte> &ParamArray)
 {

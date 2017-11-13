@@ -195,12 +195,12 @@ void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
 		}
 
-		const size_t RMDLEN = Length - (PRLBLK * BLKCNT);
+		const size_t RMDSZE = Length - (PRLBLK * BLKCNT);
 
-		if (RMDLEN != 0)
+		if (RMDSZE != 0)
 		{
 			const size_t BLKOFT = (PRLBLK * BLKCNT);
-			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDLEN);
+			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDSZE);
 		}
 	}
 	else

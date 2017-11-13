@@ -164,7 +164,7 @@ namespace Test
 				if (m_testNI)
 				{
 					CompareVectorNI(key, plainText, cipherText);
-			}
+				}
 				else
 #endif
 				{

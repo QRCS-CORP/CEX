@@ -183,7 +183,7 @@ namespace Test
 
 		for (size_t i = 0; i < 10; ++i)
 		{
-			size_t smpSze = static_cast<size_t>(rng.NextUInt32(Cipher->ParallelProfile().ParallelMinimumSize() * 4, Cipher->ParallelProfile().ParallelMinimumSize()));
+			uint smpSze = rng.NextUInt32(static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize() * 4), static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize()));
 			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(smpSze);
@@ -1491,7 +1491,9 @@ namespace Test
 		}
 
 		if (alnSize != inpSize)
+		{
 			BlockDecrypt(Cipher, Input, InOffset, Output, OutOffset);
+		}
 	}
 
 	void ParallelModeTest::Transform1(Mode::ICipherMode* Cipher, std::vector<byte> &Input, size_t BlockSize, std::vector<byte> &Output)

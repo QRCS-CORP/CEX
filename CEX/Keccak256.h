@@ -32,6 +32,7 @@
 
 #include "IDigest.h"
 #include "KeccakParams.h"
+#include "KeccakState.h"
 
 NAMESPACE_DIGEST
 
@@ -71,42 +72,6 @@ class Keccak256 final : public IDigest
 {
 private:
 
-	struct Keccak256State
-	{
-		static const ulong MAX_ULL = 0xFFFFFFFFFFFFFFFF;
-		std::vector<ulong> H;
-		ulong T;
-
-		Keccak256State()
-			:
-			H(25),
-			T(0)
-		{
-		}
-
-		void Increase(size_t Length)
-		{
-			T += Length;
-		}
-
-		void Reset()
-		{
-			if (H.size() > 0)
-			{
-				for (size_t i = 0; i < H.size(); ++i)
-					H[i] = 0;
-			}
-
-			H[1] = MAX_ULL;
-			H[2] = MAX_ULL;
-			H[8] = MAX_ULL;
-			H[12] = MAX_ULL;
-			H[17] = MAX_ULL;
-			H[20] = MAX_ULL;
-			T = 0;
-		}
-	};
-
 	static const size_t BLOCK_SIZE = 136;
 	static const std::string CLASS_NAME;
 	static const size_t DIGEST_SIZE = 32;
@@ -115,7 +80,7 @@ private:
 	static const size_t STATE_SIZE = 25;
 	static const size_t DEF_PRLDEGREE = 8;
 
-	std::vector<Keccak256State> m_dgtState;
+	std::vector<KeccakState> m_dgtState;
 	bool m_isDestroyed;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
@@ -265,8 +230,9 @@ public:
 
 private:
 
-	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, Keccak256State &State);
-	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Keccak256State &State, ulong Length);
+	void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
+	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
+	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length);
 };
 
 NAMESPACE_DIGESTEND

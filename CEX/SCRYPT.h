@@ -98,7 +98,8 @@ private:
 			:
 			CpuCost(Cost),
 			Parallelization(Parallel)
-		{}
+		{
+		}
 
 		void Reset()
 		{

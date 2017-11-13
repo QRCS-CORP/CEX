@@ -2,6 +2,7 @@
 #include "IntUtils.h"
 #include "MemUtils.h"
 #include "ParallelUtils.h"
+#include "Skein.h"
 
 NAMESPACE_DIGEST
 
@@ -256,10 +257,10 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 			{
 				// fill buffer
-				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
-				if (RMDLEN != 0)
+				const size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
+				if (RMDSZE != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 				}
 
 				// empty the message buffer
@@ -269,8 +270,8 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				});
 
 				m_msgLength = 0;
-				Length -= RMDLEN;
-				InOffset += RMDLEN;
+				Length -= RMDSZE;
+				InOffset += RMDSZE;
 			}
 
 			if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -318,16 +319,16 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		{
 			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-				if (RMDLEN != 0)
+				const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
+				if (RMDSZE != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 				}
 
 				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
 				m_msgLength = 0;
-				InOffset += RMDLEN;
-				Length -= RMDLEN;
+				InOffset += RMDSZE;
+				Length -= RMDSZE;
 			}
 
 			// sequential loop through blocks
@@ -374,9 +375,9 @@ void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	// update length
 	State[StateOffset].Increase(Length);
 	// encrypt block
-	std::vector<ulong> block(4, 0);
+	std::array<ulong, 4> block;
 	IntUtils::LeBytesToULL256(Input, InOffset, block, 0);
-	Threefish256::Transfrom(block, 0, State[StateOffset]);
+	Skein::Compress256(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
 	Utility::MemUtils::XOR256(block, 0, State[StateOffset].S, 0);
@@ -416,7 +417,7 @@ void Skein256::Initialize()
 			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
 			m_dgtState[i].Increase(32);
 			// compress previous state
-			Threefish256::Transfrom(m_dgtState[i - 1].V, 0, m_dgtState[i]);
+			Skein::Compress256(m_dgtState[i - 1].V, 0, m_dgtState[i]);
 			// store the new state in V for reset
 			Utility::MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
@@ -433,7 +434,7 @@ void Skein256::LoadState(Skein256State &State, std::vector<ulong> &Config)
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	State.Increase(32);
-	Threefish256::Transfrom(Config, 0, State);
+	Skein::Compress256(Config, 0, State);
 	// store the initial state for reset
 	Utility::MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string

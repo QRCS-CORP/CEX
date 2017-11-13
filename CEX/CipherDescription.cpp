@@ -16,7 +16,8 @@ CipherDescription::CipherDescription()
 	m_blockSize(0),
 	m_roundCount(0),
 	m_kdfEngine(0)
-{}
+{
+}
 
 CipherDescription::CipherDescription(BlockCiphers EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType, PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
 {

@@ -27,7 +27,7 @@ namespace Test
     public:
 
 		/// <summary>
-		/// Compares known answer HKDF Drbg vectors for equality
+		/// Compares known answer HKDF vectors for equality
 		/// </summary>
 		HKDFTest();
 

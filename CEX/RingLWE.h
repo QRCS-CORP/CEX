@@ -38,7 +38,6 @@ using Key::Asymmetric::RLWEKeyPair;
 using Enumeration::RLWEParams;
 using Key::Asymmetric::RLWEPrivateKey;
 using Key::Asymmetric::RLWEPublicKey;
-using Key::Asymmetric::RLWEPublicKey;
 using Enumeration::BlockCiphers;
 
 /// <summary>

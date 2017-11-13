@@ -2,6 +2,7 @@
 #include "IntUtils.h"
 #include "MemUtils.h"
 #include "ParallelUtils.h"
+#include "Skein.h"
 
 NAMESPACE_DIGEST
 
@@ -255,10 +256,10 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 			{
 				// fill buffer
-				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
-				if (RMDLEN != 0)
+				const size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
+				if (RMDSZE != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 				}
 
 				// empty the message buffer
@@ -268,8 +269,8 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				});
 
 				m_msgLength = 0;
-				Length -= RMDLEN;
-				InOffset += RMDLEN;
+				Length -= RMDSZE;
+				InOffset += RMDSZE;
 			}
 
 			if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -304,16 +305,16 @@ void Skein1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		{
 			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 			{
-				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
-				if (RMDLEN != 0)
+				const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
+				if (RMDSZE != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
 				}
 
 				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
 				m_msgLength = 0;
-				InOffset += RMDLEN;
-				Length -= RMDLEN;
+				InOffset += RMDSZE;
+				Length -= RMDSZE;
 			}
 
 			// sequential loop through blocks
@@ -360,9 +361,9 @@ void Skein1024::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, st
 	// update length
 	State[StateOffset].Increase(Length);
 	// encrypt block
-	std::vector<ulong> block(16, 0);
+	std::array<ulong, 16> block;
 	IntUtils::LeBytesToULL1024(Input, InOffset, block, 0);
-	Threefish1024::Transfrom(block, 0, State[StateOffset]);
+	Skein::Compress1024(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
 	Utility::MemUtils::XOR1024(block, 0, State[StateOffset].S, 0);
@@ -402,7 +403,7 @@ void Skein1024::Initialize()
 			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
 			m_dgtState[i].Increase(32);
 			// compress previous state
-			Threefish1024::Transfrom(m_dgtState[i - 1].V, 0, m_dgtState[i]);
+			Skein::Compress1024(m_dgtState[i - 1].V, 0, m_dgtState[i]);
 			// store the new state in V for reset
 			Utility::MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
@@ -419,7 +420,7 @@ void Skein1024::LoadState(Skein1024State &State, std::vector<ulong> &Config)
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	State.Increase(32);
-	Threefish1024::Transfrom(Config, 0, State);
+	Skein::Compress1024(Config, 0, State);
 	// store the initial state for reset
 	Utility::MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string

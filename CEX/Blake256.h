@@ -126,35 +126,20 @@ private:
 
 	struct Blake2sState
 	{
-		std::vector<uint> F;
-		std::vector<uint> H;
-		std::vector<uint> T;
+		std::array<uint, 2> F;
+		std::array<uint, 8> H;
+		std::array<uint, 2> T;
 
 		Blake2sState()
-			:
-			F(2),
-			H(8),
-			T(2)
 		{
+			Reset();
 		}
 
 		void Reset()
 		{
-			if (F.size() > 0)
-			{
-				for (size_t i = 0; i < F.size(); ++i)
-					F[i] = 0;
-			}
-			if (H.size() > 0)
-			{
-				for (size_t i = 0; i < H.size(); ++i)
-					H[i] = 0;
-			}
-			if (T.size() > 0)
-			{
-				for (size_t i = 0; i < T.size(); ++i)
-					T[i] = 0;
-			}
+			std::memset(&F[0], 0, F.size() * sizeof(uint));
+			std::memset(&H[0], 0, H.size() * sizeof(uint));
+			std::memset(&T[0], 0, T.size() * sizeof(uint));
 		}
 	};
 

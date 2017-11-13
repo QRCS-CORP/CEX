@@ -22,7 +22,9 @@ std::string SysUtils::ComputerName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 #elif defined(CEX_OS_POSIX)
 
@@ -38,7 +40,9 @@ std::string SysUtils::ComputerName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 #endif
 	
@@ -70,7 +74,9 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 			}
 		}
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 	return retSizes;
 
@@ -86,7 +92,9 @@ std::vector<ulong> SysUtils::DriveSpace(const std::string &Drive)
 		retSizes.push_back(static_cast<ulong>(fsinfo.f_frsize * fsinfo.f_blocks));
 		retSizes.push_back(static_cast<ulong>(fsinfo.f_bsize * fsinfo.f_bfree));
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 	return retSizes;
 
@@ -134,7 +142,9 @@ ulong SysUtils::MemoryPhysicalTotal()
 		memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 		GlobalMemoryStatusEx(&memInfo);
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 	return static_cast<ulong>(memInfo.ullTotalPhys);
 
@@ -190,7 +200,9 @@ ulong SysUtils::MemoryPhysicalUsed()
 		physMemUsed = memInfo.totalram - memInfo.freeram;
 		physMemUsed *= memInfo.mem_unit;
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 	return static_cast<ulong>(physMemUsed);
 
@@ -229,7 +241,9 @@ ulong SysUtils::MemoryVirtualTotal()
 		totalVirtualMem += memInfo.totalswap;
 		totalVirtualMem *= memInfo.mem_unit;
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 	return static_cast<ulong>(totalVirtualMem);
 
@@ -268,7 +282,9 @@ ulong SysUtils::MemoryVirtualUsed()
 		virtualMemUsed += memInfo.totalswap - memInfo.freeswap;
 		virtualMemUsed *= memInfo.mem_unit;
 	}
-	catch (std::exception&) {}
+	catch (std::exception&)
+	{
+	}
 
 	return static_cast<ulong>(virtualMemUsed);
 
@@ -337,7 +353,9 @@ std::string SysUtils::UserName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (std::exception&) {}
+	catch (std::exception&)
+	{
+	}
 
 #elif defined(CEX_OS_POSIX)
 
@@ -353,7 +371,9 @@ std::string SysUtils::UserName()
 		ret.assign((char*)buffer, buffLen);
 #endif
 	}
-	catch (std::exception&) {}
+	catch (std::exception&) 
+	{
+	}
 
 #endif
 
@@ -651,7 +671,9 @@ std::string SysUtils::Version()
 		{ 
 			GetCursorPos(&pnt);
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return pnt;
 	}
@@ -724,7 +746,9 @@ std::string SysUtils::Version()
 				strBuf.push_back(std::string(ws.begin(), ws.end()));
 			}
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return strBuf;
 	}
@@ -738,7 +762,9 @@ std::string SysUtils::Version()
 			memInfo.dwLength = sizeof(memInfo);
 			GlobalMemoryStatusEx(&memInfo);
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return memInfo;
 	}
@@ -762,7 +788,9 @@ std::string SysUtils::Version()
 				while (Module32Next(snapshot, &info));
 			}
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return serInf;
 	}
@@ -873,7 +901,9 @@ std::string SysUtils::Version()
 				while (Process32Next(snapshot, &prcInf));
 			}
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return serInf;
 	}
@@ -1094,7 +1124,9 @@ std::string SysUtils::Version()
 			retValues.push_back(static_cast<uint>(::getgid()));
 			retValues.push_back(static_cast<uint>(::getpgrp()));
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return retValues;
 	}
@@ -1107,7 +1139,9 @@ std::string SysUtils::Version()
 		{
 			::getrusage(RUSAGE_SELF, &usage);
 		}
-		catch (std::exception&) {}
+		catch (std::exception&)
+		{
+		}
 
 		return usage;
 	}
