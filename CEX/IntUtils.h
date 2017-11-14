@@ -77,7 +77,6 @@ public:
 		if (Input.size() != 0)
 		{
 			std::memset(Input.data(), 0, Input.size() * sizeof(T));
-			Input.clear();
 		}
 	}
 	/*! \cond PRIVATE */
