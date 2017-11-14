@@ -10,7 +10,7 @@ The CEX Cryptographic library in C++
 ### Welcome
 CEX is being written from the ground-up as a powerful and accessable post-quantum secure cryptographic library; a flexible security model, performance-oriented, designed for ease of use, and the automation of complex tasks.
 
-There are some new ideas, and new technologies, as I intend to push the envelope a little, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
+There are some new ideas, and new technologies, as I intend to push the envelope, and so am authoring this with a determination to make the fastest, most intuitive, most secure implementations possible.
 
 This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
 That work is still evolving however, as improvments and additions to the symmetric cryptography will continue throughout the libraries lifetime.
@@ -63,17 +63,12 @@ This is still an early stage in the development of this library, so stay tuned, 
 * ChaCha20 stream cipher
 * Salsa20 stream cipher
 
-### Digests
-* The 256bit Blake2S and Blake2SP sequential and parallel digests (Blake256)
-* The 512bit Blake2B and Blake2BP sequential and parallel digests (Blake512)
-* The 256bit Keccak SHA-3 sequential and parallel digests (Keccak256)
-* The 512bit Keccak SHA-3 sequential and parallel digests (Keccak512)
-* The 1024bit Keccak SHA-3 sequential and parallel digests (Keccak1024)
-* The 256bit SHA-2 (optional SHA-NI) sequential and parallel digests (SHA256)
-* The 512bit SHA-2 sequential and parallel digests (SHA512)
-* The 256bit Skein sequential and parallel digests (Skein256)
-* The 512bit Skein sequential and parallel digests (Skein512)
-* The 1024bit Skein sequential and parallel digests (Skein1024)
+### Message Digests
+Note: Every message digest implementation has both parallel and sequential modes of operation
+* The Blake2 256 and 512 bit variants (Blake256/Blake512)
+* The Keccak SHA-3 256, 512, and 1024 bit variants (Keccak256/Keccak512/Keccak1024)
+* The SHA2 256 and 512 bit variants (SHA256/SHA512)
+* The Skein 256, 512, and 1024 bit variants(Skein256/Skein512/Skein1024)
 
 ### DRBGs
 * The Block cipher Counter mode Generator (BCG)
@@ -100,10 +95,10 @@ This is still an early stage in the development of this library, so stay tuned, 
 * The prng extension wrapper class (SecureRandom)
 
 ### Entropy Providers
-* Auto Collection seed Provider (ACP)
+* Auto seed Collection Provider (ACP)
 * CPU Jitter entropy Provider (CJP)
 * Local Crypto Service Provider (CSP)
-* System Entropy Collector Provider (ECP)
+* System Entropy Collection Provider (ECP)
 * Intel RdRand/RdSeed Provider (RDP)
 
 ## Trajectory
