@@ -34,7 +34,7 @@ This is still an early stage in the development of this library, so stay tuned, 
 ## Contents
 ### Asymmetric Ciphers
 * The RingLWE asymmetric cipher
-* The Niederreiter dual form of the McEliece public key crypto-system
+* The Niederreiter dual form of the McEliece cipher
 
 ### Block Ciphers
 * The AES-NI HKDF eXtended cipher (AHX)
@@ -108,7 +108,7 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 * The McEliece asymmetric cipher
 * The 1024bit Keccak digest
 * The Poly1305 Message Authentication Code generator
-* The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5)
+* The library is undergoing security standards changes (with SEI/Misra compliance by 1.0.0.5)
 
 ### Planned Release 1.1.0.1
 * RingLWE
