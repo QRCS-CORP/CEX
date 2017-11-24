@@ -131,7 +131,7 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 * Added the McEliece asymmetric cipher
 * Added the 1024bit Keccak digest
 * Added the Poly1305 Message Authentication Code generator
-* The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5)
+* Many changes made towards future SEI-CERT and Misra compliance (Full Misra compliance by 1.0.0.5)
 * Full coding standards sweep of the library
 * Integration of std::array and std::unique_ptr throughout
 * A full optimization cycle completed
