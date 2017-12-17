@@ -23,10 +23,7 @@
 // 
 // Implementation Details:
 // An implementation of an Hash based Key Derivation Function (SHAKE). 
-// Written by John Underhill, September 19, 2014
-// Updated September 30, 2016
-// Updated April 19, 2017
-// Contact: develop@vtdev.com
+// Written by John Underhill, December 12, 2017
 
 #ifndef CEX_SHAKE_H
 #define CEX_SHAKE_H
@@ -73,7 +70,7 @@ using Enumeration::ShakeModes;
 /// <item><description>The generator must be initialized with a key using one of the Initialize() functions before output can be generated.</description></item>
 /// <item><description>The Initialize() function can use a SymmetricKey key container class, or input arrays of Key, and optional Salt and Info.</description></item>
 /// <item><description>Initializing with a salt or info parameters will append those values to the Key.</description></item>
-/// <item><description>The recommended total Key size is the digests internal block-size in bytes; the minumum Key size is half of the blocksize.</description></item>
+/// <item><description>The recommended total Key size is the digests internal block-size in bytes; the minumum key size is half of the digests blocksize.</description></item>
 /// <item><description>The internal block sizes in bytes are: SHAKE128 =168, SHAKE256 =136, with SHAKE512 and SHAKE1024 both using 72 bytes.</description></item>
 /// </list>
 /// 

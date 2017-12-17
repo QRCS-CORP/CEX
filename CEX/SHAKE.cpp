@@ -79,7 +79,7 @@ const std::string SHAKE::Name()
 void SHAKE::DomainString(std::vector<byte> &Input)
 {
 	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
-	CexAssert(Input.size() <= 200, "the input buffer too large");
+	CexAssert(Input.size() <= 200, "the input buffer is too large");
 
 	MemUtils::Copy(Input, 0, m_kdfState, 0, Input.size());
 	Permute(m_kdfState);

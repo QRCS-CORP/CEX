@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// The type of SHAKE variant
+/// The type of SHAKE KDF variant
 /// </summary>
 enum class ShakeModes : byte
 {

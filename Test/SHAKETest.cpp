@@ -6,7 +6,7 @@
 
 namespace Test
 {
-	const std::string SHAKETest::DESCRIPTION = "SHAKE XOF Known Answer Tests";
+	const std::string SHAKETest::DESCRIPTION = "SHAKE KDF Known Answer Tests";
 	const std::string SHAKETest::FAILURE = "FAILURE! ";
 	const std::string SHAKETest::SUCCESS = "SUCCESS! All SHAKE tests have executed succesfully.";
 
