@@ -383,9 +383,6 @@ int main()
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
 
-	//RunTest(new SHAKETest());
-
-
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
 	PrintHeader("An error has occurred! Press any key to close..", "");

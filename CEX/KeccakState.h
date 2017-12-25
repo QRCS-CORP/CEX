@@ -44,13 +44,6 @@ struct KeccakState
 	void Reset()
 	{
 		std::memset(&H[0], 0, H.size() * sizeof(ulong));
-
-		H[1] = 0xFFFFFFFFFFFFFFFFULL;
-		H[2] = 0xFFFFFFFFFFFFFFFFULL;
-		H[8] = 0xFFFFFFFFFFFFFFFFULL;
-		H[12] = 0xFFFFFFFFFFFFFFFFULL;
-		H[17] = 0xFFFFFFFFFFFFFFFFULL;
-		H[20] = 0xFFFFFFFFFFFFFFFFULL;
 	}
 };
 

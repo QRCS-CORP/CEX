@@ -357,16 +357,10 @@ void Keccak512::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 void Keccak512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State)
 {
-	Input[InOffset + Length] = 1;
+	Input[InOffset + Length] = DOMAIN_CODE;
 	Input[InOffset + BLOCK_SIZE - 1] |= 128;
 	Absorb(Input, InOffset, BLOCK_SIZE, State);
 	Keccak::Permute24(State.H);
-
-	State.H[1] = ~State.H[1];
-	State.H[2] = ~State.H[2];
-	State.H[8] = ~State.H[8];
-	State.H[12] = ~State.H[12];
-	State.H[17] = ~State.H[17];
 }
 
 void Keccak512::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length)

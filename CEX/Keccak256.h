@@ -24,7 +24,7 @@
 // Implementation Details:
 // An implementation of the SHA-3 digest with a 256 bit return size. 
 // Written by John Underhill, September 19, 2014
-// Updated April 18, 2017
+// Updated December 25, 2017
 // Contact: develop@vtdev.com
 
 #ifndef CEX_KECCAK256_H
@@ -53,6 +53,7 @@ NAMESPACE_DIGEST
 /// <remarks>
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
+/// <item><description>Output aligns with the Nist SHA3 standard.</description></item>
 /// <item><description>Hash sizes are 28, 32, and 36 bytes (224, 256, and 288 bits).</description></item>
 /// <item><description>Block sizes are 144, 128, and 136 bytes (1152, 1024, 1088 bits).</description></item>
 /// <item><description>Use the <see cref="BlockSize"/> property to determine block sizes at runtime.</description></item>
@@ -61,6 +62,8 @@ NAMESPACE_DIGEST
 /// </list>
 /// 
 /// <list type="number">
+/// <item><description>SHA3 <see href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">Fips202</a>.</description></item>
+/// <item><description>NIST <see href = "http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pd">SP800-185</a>.</description></item>
 /// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">Keccak Submission</a>.</description></item>
 /// <item><description>SHA3 <a href="http://csrc.nist.gov/groups/ST/hash/sha-3/documents/Keccak-slides-at-NIST.pdf">Keccak Slides</a>.</description></item>
 /// <item><description>SHA3 <a href="http://nvlpubs.nist.gov/nistpubs/ir/2012/NIST.IR.7896.pdf">Third-Round Report</a> of the SHA-3 Cryptographic Hash Algorithm Competition.</description></item>
@@ -74,11 +77,12 @@ private:
 
 	static const size_t BLOCK_SIZE = 136;
 	static const std::string CLASS_NAME;
+	static const size_t DEF_PRLDEGREE = 8;
 	static const size_t DIGEST_SIZE = 32;
+	static const byte DOMAIN_CODE = 0x06;
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_SIZE = 25;
-	static const size_t DEF_PRLDEGREE = 8;
 
 	std::vector<KeccakState> m_dgtState;
 	bool m_isDestroyed;
