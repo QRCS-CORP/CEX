@@ -113,7 +113,7 @@ namespace Test
 		}
 		catch (...)
 		{
-			throw TestException(std::string(FAILURE + std::string(" : Unknown Error")));
+			throw TestException(std::string(FAILURE + std::string(" : Unknown Error!")));
 		}
 	}
 

@@ -76,6 +76,19 @@ namespace Test
 		}
 	}
 
+	void HexConverter::Decode(const std::vector<std::string> &Input, size_t Length, std::vector<std::vector<byte>> &Output)
+	{
+		Output.reserve(Length);
+
+		for (size_t i = 0; i < Length; ++i)
+		{
+			std::string encoded = Input[i];
+			std::vector<byte> decoded;
+			Decode(encoded, decoded);
+			Output.push_back(decoded);
+		}
+	}
+
 	void HexConverter::Encode(const std::vector<byte> &Input, size_t Offset, size_t Length, std::vector<byte> &Output)
 	{
 		Output.resize(Length * 2, 0);

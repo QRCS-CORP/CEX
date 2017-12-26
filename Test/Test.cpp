@@ -2,10 +2,10 @@
 //
 // ### CEX 1.0.0.4 ###
 // 1.0.0.4, Preliminary Release
-// The full version will be Misra and SEI-CERT compliant, (eta. is mid November 2017)
+// The full version will be Misra and SEI-CERT compliant, (eta. is mid December 2017)
 // Added McEliece public key crypto system	-done
 // Added Keccak1024 message digest	-done
-// Added Poly1305 Mac and ChaCha/Poly1305 AEAD mode -todo
+// Added Poly1305 Mac and ChaCha/Poly1305 AEAD mode -(mode scheduled for 1.0.0.5)
 // Reworked public classes/interfaces for POD data types in preparation for DLL interface -ongoing..
 // Complete preformance optimization cycle; strategic memory allocation (stack or heap), and review class/function variables -ongoing..
 // Complete security compliance cycle; all code reviewed and updated to MISRA/SEI-CERT security recommendations -ongoing..
@@ -65,7 +65,7 @@
 // TRAJECTORY
 //
 // ### SCHEDULE FOR 1.0.0.4 RELEASE ###
-// ## ETA is November 14, 2017 ##
+// ## ETA is December 14, 2017 ##
 // Complete performance optimizations on all classes
 // Complete security audit and rewrite
 // Add Poly1305 MAC
@@ -91,7 +91,7 @@
 // delete unused default/copy/move constructors from all structs and classes -done
 // replace all macros with inline/templated functions -done
 // on pointer comparisons to zero, replace '0' with nullptr (ex. y* != nullptr) -done
-// review and rewrite the entire test framework for compliance -todo in 1.0.0.5
+// review and rewrite the entire test framework for compliance -todo for 1.0.0.5
 //
 // ## Global Changes ##
 // all hex codes should be expressed in capitals, ex. 0xFF -done
@@ -179,27 +179,22 @@
 // #memory in MB per second
 // Memory: LB Clear 8849, Clear 10989, LB Copy 7633, Copy 9803, LB Memset 7575, Memset 10869, LB XOR 5181, XOR 1383
 //
-// ### 1.1.0.0 RoadMap ###
+// ### Planned Release 1.1.0.1 ###
 //
 // AVX512 integration		-started
 // RingLWE					-added
 // McEliece					-added
-// ModuleLWE				-?
-// ECDH						-?
-// RSA						-?
+// ModuleLWE
+// NTRU
+// ECDH
+// GMSS
+// ECDSA
 //
-// GMSS						-?
-// Tesla					-?
-// RSA-Sig					-?
-//
-// TLS-KEX					-?
-// P2P-KEX					-?
-//
-// Networking				-?
-// Expand cpu/simd support	-?
-// Android/Linux support	-?
-// DLL API					-?
-
+// ### Planned Release 1.2.0.1 ###
+// TLS
+// STM - KEX
+// Android / iOS / Linux compatibility
+// DLL API
 
 #include <algorithm>
 #include <fstream>
@@ -236,6 +231,7 @@
 #include "../Test/MacStreamTest.h"
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
+#include "../Test/ModuleLWETest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
@@ -251,6 +247,7 @@
 #include "../Test/Sha2Test.h"
 #include "../Test/SimdSpeedTest.h"
 #include "../Test/SimdWrapperTest.h"
+#include "../Test/SHAKETest.h"
 #include "../Test/SkeinTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
@@ -383,6 +380,8 @@ int main()
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
 
+	RunTest(new KeccakTest());
+	
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
 	PrintHeader("An error has occurred! Press any key to close..", "");
@@ -544,6 +543,7 @@ int main()
 			RunTest(new KDF2Test());
 			RunTest(new PBKDF2Test());
 			RunTest(new SCRYPTTest());
+			RunTest(new SHAKETest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new CMGTest());
 			RunTest(new DCGTest());

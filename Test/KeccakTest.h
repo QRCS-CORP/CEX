@@ -9,7 +9,7 @@ namespace Test
 	using CEX::Digest::IDigest;
 
 	/// <summary>
-	/// Tests the SHA-3 digest implementation using known vector comparisons
+	/// Tests the SHA-3 digest implementations using known vector comparisons
 	/// </summary>
 	class KeccakTest final : public ITest
 	{
@@ -19,12 +19,17 @@ namespace Test
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
+		std::vector<std::vector<byte>> m_message;
+		std::vector<std::vector<byte>> m_exp256;
+		std::vector<std::vector<byte>> m_exp512;
+		std::vector<std::vector<byte>> m_exp1024;
+
 		TestEventHandler m_progressEvent;
 
 	public:
 
 		/// <summary>
-		/// A range of Vector KATs; tests SHA-3 256/512 and HMACs
+		/// A range of Vector KATs; tests SHA-3 256/512 and the unofficial Keccak1024 implementation
 		/// </summary>
 		KeccakTest();
 
@@ -82,6 +87,7 @@ namespace Test
 		/// </summary>
 		void Keccak1024KatTest();
 
+		void Initialize();
 		void OnProgress(std::string Data);
 		void TreeParamsTest();
 	};

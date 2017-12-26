@@ -93,8 +93,8 @@ namespace Test
 		std::vector<byte> enc;
 		std::vector<byte> dec;
 		std::vector<byte> msg(128);
-		Prng::SecureRandom rnd;
-		Prng::BCR* rngPtr = new Prng::BCR();
+		Prng::SecureRandom rnd(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
+		Prng::BCR* rngPtr = new Prng::BCR(Enumeration::BlockCiphers::Rijndael, Enumeration::Providers::CSP);
 
 		// test the extended cipher implementation
 		Cipher::Symmetric::Block::RHX* sycPtr = new Cipher::Symmetric::Block::RHX(Enumeration::Digests::SHA256);

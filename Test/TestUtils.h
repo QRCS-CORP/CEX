@@ -66,11 +66,11 @@ namespace Test
 		/// <param name="Size">The number of integers to convert</param>
 		/// <param name="Suffix">The integer type suffix</param>
 		template<typename Array>
-		static void PrintHex(Array &Data, size_t Size, std::string &Suffix)
+		static void PrintHex(Array &Data, size_t Size, std::string &Prefix = std::string("0x"), std::string &Suffix = std::string(", "))
 		{
 			for (size_t i = 0; i < Size; i++)
 			{
-				std::cout << std::string("0x") << std::hex << std::uppercase << Data[i] << Suffix << std::string(", ");
+				std::cout << Prefix << std::hex << std::uppercase << Data[i] << Suffix;
 				if (i != 0 && (i + 1) % 16 == 0)
 				{
 					std::cout << std::endl;
@@ -88,6 +88,26 @@ namespace Test
 		static void PrintHex(byte* Data, size_t Size)
 		{
 			std::cout << ToHex(Data, Size);
+		}
+
+		/// <summary>
+		/// Outputs a delineated, formatted hex byte array to console
+		/// </summary>
+		/// 
+		/// <param name="Data">The array to convert</param>
+		/// <param name="Length">The number of bytes to write</param>
+		/// <param name="LineSize">The bumber of bytes to print in each line</param>
+		static void PrintHexArray(const std::vector<byte> &Data, size_t Length, size_t LineSize)
+		{
+			for (size_t i = 0; i < Length; ++i)
+			{
+				if (i != 0 && i % LineSize == 0)
+				{
+					printf("\n");
+				}
+
+				printf("0x%02X, ", Data[i]);
+			}
 		}
 
 		/// <summary>
@@ -136,6 +156,28 @@ namespace Test
 			return ret;
 		}
 
+		/// <summary>
+		/// Outputs formatted hex integer array to a string
+		/// </summary>
+		/// 
+		/// <param name="Data">The array to convert</param>
+		/// <param name="Size">The number of integers to convert</param>
+		/// <param name="Suffix">The integer type suffix</param>
+		template<typename Array>
+		static std::string ToHex(const Array &Data, size_t Size, std::string &Prefix, std::string &Suffix)
+		{
+			std::string ret = "";
+			std::ostringstream oss;
+
+			for (size_t i = 0; i < Size; ++i)
+			{
+				oss << std::hex << std::uppercase << Prefix << Data[i] << Suffix;
+				ret += oss.str();
+			}
+
+			return ret;
+		}
+
 		static double MeanValue(std::vector<byte> &Input);
 		static double ChiSquare(std::vector<byte> &Input);
 		static void CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length);
@@ -143,7 +185,6 @@ namespace Test
 		static uint64_t GetTimeMs64();
 		static SymmetricKey* GetRandomKey(size_t KeySize, size_t IvSize);
 		static void GetRandom(std::vector<byte> &Data);
-
 		static bool Read(const std::string &FilePath, std::string &Contents);
 		static std::vector<byte> Reduce(std::vector<byte> Seed);
 		static void Reverse(std::vector<byte> &Data);
