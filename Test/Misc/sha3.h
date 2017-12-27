@@ -47,7 +47,6 @@ void OQS_SHA3_sha3256(uint8_t* output, const uint8_t* input, size_t inplen);
 */
 void OQS_SHA3_sha3512(uint8_t* output, const uint8_t* input, size_t inplen);
 
-
 /**
 * \brief The Keccak absorb function.
 * Absorb an input message array directly into the state.
@@ -82,7 +81,6 @@ void OQS_SHA3_keccak_permute(uint64_t* state);
 * \param rate The rate of absorbsion, in bytes
 */
 void OQS_SHA3_keccak_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state, size_t rate);
-
 
 /* SHAKE */
 
