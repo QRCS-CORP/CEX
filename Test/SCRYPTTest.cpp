@@ -14,10 +14,10 @@ namespace Test
 	SCRYPTTest::SCRYPTTest()
 		:
 		m_key(2),
-		m_output(0),
 		m_progressEvent(),
 		m_salt(2)
 	{
+		Initialize();
 	}
 
 	SCRYPTTest::~SCRYPTTest()
@@ -38,8 +38,6 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			CompareVector(m_key[0], m_salt[0], m_output[0], 1024, 16, 64);
 			CompareVector(m_key[1], m_salt[1], m_output[1], 16384, 1, 64);
 			// long test
@@ -79,11 +77,11 @@ namespace Test
 	{
 		// Note: skipping zero-byte password/salt test, because it would require removing throws in SymmetricKey constructor
 
-		const char* output[3] =
+		const std::vector<std::string> output =
 		{
-			("fdbabe1c9d3472007856e7190d01e9fe7c6ad7cbc8237830e77376634b3731622eaf30d92e22a3886ff109279d9830dac727afb94a83ee6d8360cbdfa2cc0640"),
-			("7023bdcb3afd7348461c06cd81fd38ebfda8fbba904f8e3ea9b543f6545da1f2d5432955613f0fcf62d49705242a9af9e61e85dc0d651e40dfcf017b45575887"),
-			("2101cb9b6a511aaeaddbbe09cf70f881ec568d574a2ffd4dabe5ee9820adaa478e56fd8f4ba5d09ffa1c6d927c40f4c337304049e8a952fbcbf45c6fa77a41a4")
+			std::string("FDBABE1C9D3472007856E7190D01E9FE7C6AD7CBC8237830E77376634B3731622EAF30D92E22A3886FF109279D9830DAC727AFB94A83EE6D8360CBDFA2CC0640"),
+			std::string("7023BDCB3AFD7348461C06CD81FD38EBFDA8FBBA904F8E3EA9B543F6545DA1F2D5432955613F0FCF62D49705242A9AF9E61E85DC0D651E40DFCF017B45575887"),
+			std::string("2101CB9B6A511AAEADDBBE09CF70F881EC568D574A2FFD4DABE5EE9820ADAA478E56FD8F4BA5D09FFA1C6D927C40F4C337304049E8A952FBCBF45C6FA77A41A4")
 		};
 		HexConverter::Decode(output, 3, m_output);
 

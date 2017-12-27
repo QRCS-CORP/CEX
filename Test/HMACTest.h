@@ -18,8 +18,8 @@ namespace Test
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
-        std::vector<std::vector<byte>> m_expected256;
-		std::vector<std::vector<byte>> m_expected512;
+        std::vector<std::vector<byte>> m_exp256;
+		std::vector<std::vector<byte>> m_exp512;
         std::vector<std::vector<byte>> m_keys;
         std::vector<std::vector<byte>> m_input;
 		TestEventHandler m_progressEvent;

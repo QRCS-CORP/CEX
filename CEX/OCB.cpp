@@ -497,7 +497,7 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 {
 	std::vector<byte> tmpNonce(BLOCK_SIZE);
 	Utility::MemUtils::Copy(Nonce, 0, tmpNonce, BLOCK_SIZE - Nonce.size(), Nonce.size());
-	tmpNonce[0] = static_cast<byte>(BLOCK_SIZE << 4);
+	tmpNonce[0] = static_cast<byte>(tmpNonce.size() << 4);
 	tmpNonce[MAX_NONCESIZE - Nonce.size()] |= 1;
 	uint bottom = tmpNonce[MAX_NONCESIZE] & 0x3F;
 	tmpNonce[MAX_NONCESIZE] &= 0xC0;
@@ -530,7 +530,6 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 			ulong b1 = m_mainStretch[btmLen];
 			++btmLen;
 			ulong b2 = m_mainStretch[btmLen];
-
 			m_mainOffset0[i] = static_cast<byte>((b1 << BTMSZE) | (b2 >> (8 - BTMSZE)));
 		}
 	}

@@ -9,7 +9,7 @@ namespace Test
 	using CEX::Digest::IDigest;
 
 	/// <summary>
-	/// Tests the SHA-3 digest implementations using known vector comparisons
+	/// Tests the SHA-3 digest implementation using known vector comparisons
 	/// </summary>
 	class KeccakTest final : public ITest
 	{
@@ -29,7 +29,7 @@ namespace Test
 	public:
 
 		/// <summary>
-		/// A range of Vector KATs; tests SHA-3 256/512 and the unofficial Keccak1024 implementation
+		/// A range of Vector KATs; tests SHA-3 256/512 and HMACs
 		/// </summary>
 		KeccakTest();
 

@@ -185,6 +185,7 @@ namespace Test
 		static uint64_t GetTimeMs64();
 		static SymmetricKey* GetRandomKey(size_t KeySize, size_t IvSize);
 		static void GetRandom(std::vector<byte> &Data);
+
 		static bool Read(const std::string &FilePath, std::string &Contents);
 		static std::vector<byte> Reduce(std::vector<byte> Seed);
 		static void Reverse(std::vector<byte> &Data);

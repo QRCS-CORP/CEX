@@ -30,10 +30,10 @@ namespace Test
 		:
 		m_hasAESNI(false),
 		m_hasAVX(false),
-		m_katExpected(0),
 		m_processorCount(1),
 		m_progressEvent()
 	{
+		Initialize();
 	}
 
 	ParallelModeTest::~ParallelModeTest()
@@ -54,8 +54,6 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			CTR* cpr1 = new CTR(BlockCiphers::Rijndael);
 			AccessCheck(cpr1);
 			FuzzyCheck(cpr1);
@@ -1412,13 +1410,13 @@ namespace Test
 	void ParallelModeTest::Initialize()
 	{
 		// vectors derived from sequential reduction loop, compared to intrinsic output
-		const char* expected[5] =
+		const std::vector<std::string> expected =
 		{
-			("c07d97f791abc487129f47a6d29f66992d5994fbb3b8b11f3f0e8f479aa353de"), //rijndael
-			("c3d46cf0bfebf80589bb65fef3fab9fc8993f352500a9d71483d4382aab695a6"), //serpent
-			("94e6761273d83ce4f775d21eb37e88fb848b77f16791fa805a64e5750c0684b9"), //twofish
-			("4036af67c0a150992cc6ff649a3204e1e0d5ed3baa822d7b284ce4f7bd0302a5"), //chacha
-			("37287bc9b4706c9450c943cf99ae3d685878f5e906546f36b53adab35f8e91cb")  //salsa
+			std::string("C07D97F791ABC487129F47A6D29F66992D5994FBB3B8B11F3F0E8F479AA353DE"), //rijndael
+			std::string("C3D46CF0BFEBF80589BB65FEF3FAB9FC8993F352500A9D71483D4382AAB695A6"), //serpent
+			std::string("94E6761273D83CE4F775D21EB37E88FB848B77F16791FA805A64E5750C0684B9"), //twofish
+			std::string("4036AF67C0A150992CC6FF649A3204E1E0D5ED3BAA822D7B284CE4F7BD0302A5"), //chacha
+			std::string("37287BC9B4706C9450C943CF99AE3D685878F5E906546F36B53ADAB35F8E91CB")  //salsa
 		};
 		HexConverter::Decode(expected, 5, m_katExpected);
 

@@ -247,7 +247,6 @@
 #include "../Test/Sha2Test.h"
 #include "../Test/SimdSpeedTest.h"
 #include "../Test/SimdWrapperTest.h"
-#include "../Test/SHAKETest.h"
 #include "../Test/SkeinTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
@@ -325,7 +324,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.4 (A4)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      November 11, 2017               *");
+	ConsoleUtils::WriteLine("* Date:      December 27, 2017               *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -380,8 +379,6 @@ int main()
 	ConsoleUtils::SizeConsole();
 	PrintTitle(); 
 
-	RunTest(new KeccakTest());
-	
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
 	PrintHeader("An error has occurred! Press any key to close..", "");
@@ -543,7 +540,6 @@ int main()
 			RunTest(new KDF2Test());
 			RunTest(new PBKDF2Test());
 			RunTest(new SCRYPTTest());
-			RunTest(new SHAKETest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new CMGTest());
 			RunTest(new DCGTest());

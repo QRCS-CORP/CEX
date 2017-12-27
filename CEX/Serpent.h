@@ -30,7 +30,7 @@ NAMESPACE_BLOCK
 template<typename T>
 static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
 {
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
 	const size_t RNDCNT = 4;
 	const size_t INPOFF = T::size();
@@ -172,7 +172,7 @@ static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, s
 template<typename T>
 static void SHXEncryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)
 {
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
 	const size_t RNDCNT = Key.size() - 5;
 	const size_t INPOFF = T::size();

@@ -20,7 +20,7 @@
 #define CEX_MEMUTILS_H
 
 #include "CexDomain.h"
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	include "Intrinsics.h"
 #endif
 
@@ -97,7 +97,7 @@ public:
 
 			size_t prcCtr = 0;
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
 			const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
@@ -272,7 +272,7 @@ public:
 
 			size_t prcCtr = 0;
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
 			const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
@@ -340,7 +340,7 @@ public:
 
 			size_t prcCtr = 0;
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 			if (Length >= SMDBLK)
 			{
 				const size_t ALNSZE = Length - (Length % SMDBLK);
@@ -471,7 +471,7 @@ public:
 
 			size_t prcCtr = 0;
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
 			const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)
@@ -591,7 +591,7 @@ public:
 
 		size_t prcCtr = 0;
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
 		const size_t SMDBLK = 64 / ELMSZE;
 #	elif defined(__AVX2__)

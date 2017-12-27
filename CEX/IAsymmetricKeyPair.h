@@ -10,7 +10,7 @@ NAMESPACE_ASYMMETRICKEY
 using Exception::CryptoAsymmetricException;
 
 /// <summary>
-/// The Asymmetric key interface
+/// The Asymmetric key-pair container interface
 /// </summary>
 class IAsymmetricKeyPair
 {

@@ -130,6 +130,20 @@ public:
 	/*! \endcond */
 
 	/// <summary>
+	/// Extract an 8bit integer from a larger integer
+	/// </summary>
+	/// 
+	/// <param name="Value">The parent integer value to extract from</param>
+	/// <param name="Index">The byte position within the value</param>
+	/// 
+	/// <returns>The extracted byte</returns>
+	template<typename T> 
+	inline static byte GetByte(T Value, size_t Index)
+	{
+		return static_cast<byte>(Value >> (((~Index)&(sizeof(T) - 1)) << 3));
+	}
+
+	/// <summary>
 	/// Return the absolute positive value difference between two integers
 	/// </summary>
 	/// 
@@ -749,7 +763,7 @@ public:
 		CexAssert((Output.size() - OutOffset) >= Length, "Length is larger than output capacity");
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
-		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length); //164, 
+		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
 		const size_t VARSZE = sizeof(ArrayA::value_type);
 

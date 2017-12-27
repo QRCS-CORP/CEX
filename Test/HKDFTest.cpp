@@ -13,12 +13,9 @@ namespace Test
 
 	HKDFTest::HKDFTest()
 		: 
-		m_key(0),
-		m_info(0),
-		m_output(0),
-		m_progressEvent(),
-		m_salt(0)
+		m_progressEvent()
 	{
+		Initialize();
 	}
 
 	HKDFTest::~HKDFTest()
@@ -39,8 +36,6 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			TestInit();
 			OnProgress(std::string("HKDFTest: Passed initialization tests.."));
 			CompareVector(42, m_key[0], m_salt[0], m_info[0], m_output[0]);
@@ -80,36 +75,36 @@ namespace Test
 
 	void HKDFTest::Initialize()
 	{
-		const char* keyEncoded[3] =
+		const std::vector<std::string> keys =
 		{
-			("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"),
-			("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f"),
-			("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b")
+			std::string("0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B"),
+			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F404142434445464748494A4B4C4D4E4F"),
+			std::string("0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B")
 		};
-		HexConverter::Decode(keyEncoded, 3, m_key);
+		HexConverter::Decode(keys, 3, m_key);
 
-		const char* saltEncoded[2] =
+		const std::vector<std::string> salt =
 		{
-			("000102030405060708090a0b0c"),
-			("606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf")
+			std::string("000102030405060708090A0B0C"),
+			std::string("606162636465666768696A6B6C6D6E6F707172737475767778797A7B7C7D7E7F808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAF")
 		};
-		HexConverter::Decode(saltEncoded, 2, m_salt);
+		HexConverter::Decode(salt, 2, m_salt);
 
-		const char* infoEncoded[3] =
+		const std::vector<std::string> info =
 		{
-			("f0f1f2f3f4f5f6f7f8f9"),
-			("b0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff"),
-			("")
+			std::string("F0F1F2F3F4F5F6F7F8F9"),
+			std::string("B0B1B2B3B4B5B6B7B8B9BABBBCBDBEBFC0C1C2C3C4C5C6C7C8C9CACBCCCDCECFD0D1D2D3D4D5D6D7D8D9DADBDCDDDEDFE0E1E2E3E4E5E6E7E8E9EAEBECEDEEEFF0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF"),
+			std::string("")
 		};
-		HexConverter::Decode(infoEncoded, 3, m_info);
+		HexConverter::Decode(info, 3, m_info);
 
-		const char* outputEncoded[3] =
+		const std::vector<std::string> output =
 		{
-			("3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf34007208d5b887185865"),
-			("b11e398dc80327a1c8e7f78c596a49344f012eda2d4efad8a050cc4c19afa97c59045a99cac7827271cb41c65e590e09da3275600c2f09b8367793a9aca3db71cc30c58179ec3e87c14c01d5c1f3434f1d87"),
-			("8da4e775a563c18f715f802a063c5a31b8a11f5c5ee1879ec3454e5f3c738d2d9d201395faa4b61a96c8")
+			std::string("3CB25F25FAACD57A90434F64D0362F2A2D2D0A90CF1A5A4C5DB02D56ECC4C5BF34007208D5B887185865"),
+			std::string("B11E398DC80327A1C8E7F78C596A49344F012EDA2D4EFAD8A050CC4C19AFA97C59045A99CAC7827271CB41C65E590E09DA3275600C2F09B8367793A9ACA3DB71CC30C58179EC3E87C14C01D5C1F3434F1D87"),
+			std::string("8DA4E775A563C18F715F802A063C5A31B8A11F5C5EE1879EC3454E5F3C738D2D9D201395FAA4B61A96C8")
 		};
-		HexConverter::Decode(outputEncoded, 3, m_output);
+		HexConverter::Decode(output, 3, m_output);
 	}
 
 	void HKDFTest::OnProgress(std::string Data)
@@ -159,6 +154,5 @@ namespace Test
 		{
 			throw TestException("HKDF: Initialization test failed!");
 		}
-
 	}
 }

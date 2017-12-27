@@ -13,12 +13,9 @@ namespace Test
 
 	GMACTest::GMACTest()
 		:
-		m_expectedCode(0),
-		m_key(0),
-		m_nonce(0),
-		m_plainText(0),
 		m_progressEvent()
 	{
+		Initialize();
 	}
 
 	GMACTest::~GMACTest()
@@ -39,8 +36,6 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			size_t N = 9; // P: 0-4, 9
 			GMACCompare(m_key[N], m_nonce[N], m_plainText[N], m_expectedCode[N]);
 
@@ -82,69 +77,69 @@ namespace Test
 
 	void GMACTest::Initialize()
 	{
-		const char* keyEncoded[11] =
+		const std::vector<std::string> keys =
 		{
-			("11754cd72aec309bf52f7687212e8957"),
-			("272f16edb81a7abbea887357a58c1917"),
-			("81b6844aab6a568c4556a2eb7eae752f"),
-			("cde2f9a9b1a004165ef9dc981f18651b"),
-			("b01e45cc3088aaba9fa43d81d481823f"),
-			("77be63708971c4e240d1cb79e8d77feb"),
-			("bea48ae4980d27f357611014d4486625"),
-			("99e3e8793e686e571d8285c564f75e2b"),
-			("c77acd1b0918e87053cb3e51651e7013"),
-			("d0f1f4defa1e8c08b4b26d576392027c"),
-			("3cce72d37933394a8cac8a82deada8f0")
+			std::string("11754CD72AEC309BF52F7687212E8957"),
+			std::string("272F16EDB81A7ABBEA887357A58C1917"),
+			std::string("81B6844AAB6A568C4556A2EB7EAE752F"),
+			std::string("CDE2F9A9B1A004165EF9DC981F18651B"),
+			std::string("B01E45CC3088AABA9FA43D81D481823F"),
+			std::string("77BE63708971C4E240D1CB79E8D77FEB"),
+			std::string("BEA48AE4980D27F357611014D4486625"),
+			std::string("99E3E8793E686E571D8285C564F75E2B"),
+			std::string("C77ACD1B0918E87053CB3E51651E7013"),
+			std::string("D0F1F4DEFA1E8C08B4B26D576392027C"),
+			std::string("3CCE72D37933394A8CAC8A82DEADA8F0")
 		};
-		HexConverter::Decode(keyEncoded, 11, m_key);
+		HexConverter::Decode(keys, 11, m_key);
 
-		const char* nonceEncoded[11] =
+		const std::vector<std::string> nonce =
 		{
-			("3c819d9a9bed087615030b65"),
-			("794ec588176c703d3d2a7a07"),
-			("ce600f59618315a6829bef4d"),
-			("29512c29566c7322e1e33e8e"),
-			("5a2c4a66468713456a4bd5e1"),
-			("e0e00f19fed7ba0136a797f3"),
-			("32bddb5c3aa998a08556454c"),
-			("c2dd0ab868da6aa8ad9c0d23"),
-			("39ff857a81745d10f718ac00"),
-			("42b4f01eb9f5a1ea5b1eb73b0fb0baed54f387ecaa0393c7d7dffc6af50146ecc021abf7eb9038d4303d91f8d741a11743166c0860208bcc02c6258fd9511a2fa626f96d60b72fcff773af4e88e7a923506e4916ecbd814651e9f445adef4ad6a6b6c7290cc13b956130eef5b837c939fcac0cbbcc9656cd75b13823ee5acdac"),
-			("aa2f0d676d705d9733c434e481972d4888129cf7ea55c66511b9c0d25a92a174b1e28aa072f27d4de82302828955aadcb817c4907361869bd657b45ff4a6f323871987fcf9413b0702d46667380cd493ed24331a28b9ce5bbfa82d3a6e7679fcce81254ba64abcad14fd18b22c560a9d2c1cd1d3c42dac44c683edf92aced894")
+			std::string("3C819D9A9BED087615030B65"),
+			std::string("794EC588176C703D3D2A7A07"),
+			std::string("CE600F59618315A6829BEF4D"),
+			std::string("29512C29566C7322E1E33E8E"),
+			std::string("5A2C4A66468713456A4BD5E1"),
+			std::string("E0E00F19FED7BA0136A797F3"),
+			std::string("32BDDB5C3AA998A08556454C"),
+			std::string("C2DD0AB868DA6AA8AD9C0D23"),
+			std::string("39FF857A81745D10F718AC00"),
+			std::string("42B4F01EB9F5A1EA5B1EB73B0FB0BAED54F387ECAA0393C7D7DFFC6AF50146ECC021ABF7EB9038D4303D91F8D741A11743166C0860208BCC02C6258FD9511A2FA626F96D60B72FCFF773AF4E88E7A923506E4916ECBD814651E9F445ADEF4AD6A6B6C7290CC13B956130EEF5B837C939FCAC0CBBCC9656CD75B13823EE5ACDAC"),
+			std::string("AA2F0D676D705D9733C434E481972D4888129CF7EA55C66511B9C0D25A92A174B1E28AA072F27D4DE82302828955AADCB817C4907361869BD657B45FF4A6F323871987FCF9413B0702D46667380CD493ED24331A28B9CE5BBFA82D3A6E7679FCCE81254BA64ABCAD14FD18B22C560A9D2C1CD1D3C42DAC44C683EDF92ACED894")
 		};
-		HexConverter::Decode(nonceEncoded, 11, m_nonce);
+		HexConverter::Decode(nonce, 11, m_nonce);
 
-		const char* plainEncoded[11] =
+		const std::vector<std::string> plain =
 		{
-			(""),
-			(""),
-			(""),
-			(""),
-			(""),
-			("7a43ec1d9c0a5a78a0b16533a6213cab"),
-			("8a50b0b8c7654bced884f7f3afda2ead"),
-			("b668e42d4e444ca8b23cfdd95a9fedd5178aa521144890b093733cf5cf22526c5917ee476541809ac6867a8c399309fc"),
-			("407992f82ea23b56875d9a3cb843ceb83fd27cb954f7c5534d58539fe96fb534502a1b38ea4fac134db0a42de4be1137"),
-			(""),
-			("5686b458e9c176f4de8428d9ebd8e12f569d1c7595cf49a4b0654ab194409f86c0dd3fdb8eb18033bb4338c70f0b97d1")
+			std::string(""),
+			std::string(""),
+			std::string(""),
+			std::string(""),
+			std::string(""),
+			std::string("7A43EC1D9C0A5A78A0B16533A6213CAB"),
+			std::string("8A50B0B8C7654BCED884F7F3AFDA2EAD"),
+			std::string("B668E42D4E444CA8B23CFDD95A9FEDD5178AA521144890B093733CF5CF22526C5917EE476541809AC6867A8C399309FC"),
+			std::string("407992F82EA23B56875D9A3CB843CEB83FD27CB954F7C5534D58539FE96FB534502A1B38EA4FAC134DB0A42DE4BE1137"),
+			std::string(""),
+			std::string("5686B458E9C176F4DE8428D9EBD8E12F569D1C7595CF49A4B0654AB194409F86C0DD3FDB8EB18033BB4338C70F0B97D1")
 		};
-		HexConverter::Decode(plainEncoded, 11, m_plainText);
+		HexConverter::Decode(plain, 11, m_plainText);
 
-		const char* codeEncoded[11] =
+		const std::vector<std::string> code =
 		{
-			("250327c674aaf477aef2675748cf6971"),
-			("b6e6f197168f5049aeda32dafbdaeb"),
-			("89b43e9dbc1b4f597dbbc7655bb5"),
-			("2e58ce7dabd107c82759c66a75"),
-			("014280f944f53c681164b2ff"),
-			("209fcc8d3675ed938e9c7166709dd946"),
-			("8e0f6d8bf05ffebe6f500eb1"),
-			("3f4fba100eaf1f34b0baadaae9995d85"),
-			("2a5dc173285375dc82835876"),
-			("7ab49b57ddf5f62c427950111c5c4f0d"),
-			("a3a9444b21f330c3df64c8b6")
+			std::string("250327C674AAF477AEF2675748CF6971"),
+			std::string("B6E6F197168F5049AEDA32DAFBDAEB"),
+			std::string("89B43E9DBC1B4F597DBBC7655BB5"),
+			std::string("2E58CE7DABD107C82759C66A75"),
+			std::string("014280F944F53C681164B2FF"),
+			std::string("209FCC8D3675ED938E9C7166709DD946"),
+			std::string("8E0F6D8BF05FFEBE6F500EB1"),
+			std::string("3F4FBA100EAF1F34B0BAADAAE9995D85"),
+			std::string("2A5DC173285375DC82835876"),
+			std::string("7AB49B57DDF5F62C427950111C5C4F0D"),
+			std::string("A3A9444B21F330C3DF64C8B6")
 		};
-		HexConverter::Decode(codeEncoded, 11, m_expectedCode);
+		HexConverter::Decode(code, 11, m_expectedCode);
 	}
 
 	void GMACTest::OnProgress(std::string Data)

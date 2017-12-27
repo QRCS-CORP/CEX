@@ -2,6 +2,8 @@
 #include "HKDF.h"
 #include "KDF2.h"
 #include "PBKDF2.h"
+#include "SCRYPT.h"
+#include "SHAKE.h"
 
 NAMESPACE_HELPER
 
@@ -31,6 +33,16 @@ IKdf* KdfFromName::GetInstance(Kdfs KdfType, Digests DigestType)
 			case Kdfs::PBKDF2:
 			{
 				kdfPtr = new Kdf::PBKDF2(DigestType);
+				break;
+			}
+			case Kdfs::SCRYPT:
+			{
+				kdfPtr = new Kdf::SCRYPT(DigestType);
+				break;
+			}
+			case Kdfs::SHAKE:
+			{
+				kdfPtr = new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE256);
 				break;
 			}
 			default:

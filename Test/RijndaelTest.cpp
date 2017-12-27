@@ -83,32 +83,32 @@ namespace Test
 
 	void RijndaelTest::Initialize()
 	{
-		const char* keysEncoded[4] =
+		const std::vector<std::string> keys =
 		{
-			("80000000000000000000000000000000"),
-			("00000000000000000000000000000080"),
-			("000000000000000000000000000000000000000000000000"),
-			("0000000000000000000000000000000000000000000000000000000000000000")
+			std::string("80000000000000000000000000000000"),
+			std::string("00000000000000000000000000000080"),
+			std::string("000000000000000000000000000000000000000000000000"),
+			std::string("0000000000000000000000000000000000000000000000000000000000000000")
 		};
-		HexConverter::Decode(keysEncoded, 4, m_keys);
+		HexConverter::Decode(keys, 4, m_keys);
 
-		const char* plainTextEncoded[4] =
+		const std::vector<std::string> plainText =
 		{
-			("00000000000000000000000000000000"),
-			("00000000000000000000000000000000"),
-			("80000000000000000000000000000000"),
-			("80000000000000000000000000000000")
+			std::string("00000000000000000000000000000000"),
+			std::string("00000000000000000000000000000000"),
+			std::string("80000000000000000000000000000000"),
+			std::string("80000000000000000000000000000000")
 		};
-		HexConverter::Decode(plainTextEncoded, 4, m_plainText);
+		HexConverter::Decode(plainText, 4, m_plainText);
 
-		const char* cipherTextEncoded[4] =
+		const std::vector<std::string> cipherText =
 		{
-			("0EDD33D3C621E546455BD8BA1418BEC8"),
-			("172AEAB3D507678ECAF455C12587ADB7"),
-			("6CD02513E8D4DC986B4AFE087A60BD0C"),
-			("DDC6BF790C15760D8D9AEB6F9A75FD4E")
+			std::string("0EDD33D3C621E546455BD8BA1418BEC8"),
+			std::string("172AEAB3D507678ECAF455C12587ADB7"),
+			std::string("6CD02513E8D4DC986B4AFE087A60BD0C"),
+			std::string("DDC6BF790C15760D8D9AEB6F9A75FD4E")
 		};
-		HexConverter::Decode(cipherTextEncoded, 4, m_cipherText);
+		HexConverter::Decode(cipherText, 4, m_cipherText);
 	}
 
 	void RijndaelTest::OnProgress(std::string Data)

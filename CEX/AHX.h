@@ -175,7 +175,7 @@ public:
 	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
 	/// </summary>
 	///
-	/// <param name="Digest">The Key Schedule KDF hash-engine instance;.
+	/// <param name="Digest">The Key Schedule KDF hash-engine instance.
 	/// <para>Can be any one of the message digest implementations.</para></param>
 	/// <param name="Rounds">Number of transformation rounds. 
 	/// <para>The <see cref="LegalRounds"/> property contains available sizes. The default is 14 rounds (AES-256).</para></param>

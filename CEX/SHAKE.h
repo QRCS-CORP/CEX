@@ -86,6 +86,8 @@ class SHAKE final : public IKdf
 private:
 
 	static const std::string CLASS_NAME;
+	static const byte SHAKE_DOMAIN = 0x1F;
+	static const byte CSHAKE_DOMAIN = 0x04;
 
 	size_t m_blockSize;
 	byte m_domainCode;

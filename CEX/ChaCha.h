@@ -31,7 +31,7 @@ class ChaCha
 {
 public:
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
 	template<class T>
 	static void TransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)

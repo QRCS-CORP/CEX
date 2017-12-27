@@ -1,6 +1,7 @@
 #include "PrngFromName.h"
 #include "BlockCiphers.h"
 #include "BCR.h"
+#include "CpuDetect.h"
 #include "DCR.h"
 #include "HCR.h"
 
@@ -29,7 +30,18 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests
 		{
 			case Prngs::BCR:
 			{
-				rngPtr = new Prng::BCR(Enumeration::BlockCiphers::AHX, ProviderType);
+#if defined(__AVX__)
+				Common::CpuDetect detect;
+				if (detect.AESNI())
+				{
+					rngPtr = new Prng::BCR(Enumeration::BlockCiphers::AHX, ProviderType);
+				}
+				else
+#endif
+				{
+					rngPtr = new Prng::BCR(Enumeration::BlockCiphers::RHX, ProviderType);
+				}
+
 				break;
 			}
 			case Prngs::DCR:

@@ -12,11 +12,9 @@ namespace Test
 
 	SHA2Test::SHA2Test()
 		:
-		m_expected256(0),
-		m_expected512(0),
-		m_message(0),
 		m_progressEvent()
 	{
+		Initialize();
 	}
 
 	SHA2Test::~SHA2Test()
@@ -37,26 +35,24 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			TreeParamsTest();
 			OnProgress(std::string("Passed SHA2Params parameter serialization test.."));
 
 			SHA256* sha256 = new SHA256();
-			CompareVector(sha256, m_message[0], m_expected256[0]);
-			CompareVector(sha256, m_message[1], m_expected256[1]);
-			CompareVector(sha256, m_message[2], m_expected256[2]);
-			CompareVector(sha256, m_message[3], m_expected256[3]);
+			CompareVector(sha256, m_message[0], m_exp256[0]);
+			CompareVector(sha256, m_message[1], m_exp256[1]);
+			CompareVector(sha256, m_message[2], m_exp256[2]);
+			CompareVector(sha256, m_message[3], m_exp256[3]);
 			delete sha256;
 			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));
 
 			// TODO: add parallel tests
 
 			SHA512* sha512 = new SHA512();
-			CompareVector(sha512, m_message[0], m_expected512[0]);
-			CompareVector(sha512, m_message[1], m_expected512[1]);
-			CompareVector(sha512, m_message[2], m_expected512[2]);
-			CompareVector(sha512, m_message[3], m_expected512[3]);
+			CompareVector(sha512, m_message[0], m_exp512[0]);
+			CompareVector(sha512, m_message[1], m_exp512[1]);
+			CompareVector(sha512, m_message[2], m_exp512[2]);
+			CompareVector(sha512, m_message[3], m_exp512[3]);
 			delete sha512;
 			OnProgress(std::string("Sha2Test: Passed SHA-2 512 bit digest vector tests.."));
 
@@ -93,32 +89,32 @@ namespace Test
 
 	void SHA2Test::Initialize()
 	{
-		const char* messageEncoded[4] =
+		const std::vector<std::string> message =
 		{
-			("616263"),
-			(""),
-			("6162636462636465636465666465666765666768666768696768696a68696a6b696a6b6c6a6b6c6d6b6c6d6e6c6d6e6f6d6e6f706e6f7071"),
-			("61626364656667686263646566676869636465666768696a6465666768696a6b65666768696a6b6c666768696a6b6c6d6768696a6b6c6d6e68696a6b6c6d6e6f696a6b6c6d6e6f706a6b6c6d6e6f70716b6c6d6e6f7071726c6d6e6f707172736d6e6f70717273746e6f707172737475")
+			std::string("616263"),
+			std::string(""),
+			std::string("6162636462636465636465666465666765666768666768696768696A68696A6B696A6B6C6A6B6C6D6B6C6D6E6C6D6E6F6D6E6F706E6F7071"),
+			std::string("61626364656667686263646566676869636465666768696A6465666768696A6B65666768696A6B6C666768696A6B6C6D6768696A6B6C6D6E68696A6B6C6D6E6F696A6B6C6D6E6F706A6B6C6D6E6F70716B6C6D6E6F7071726C6D6E6F707172736D6E6F70717273746E6F707172737475")
 		};
-		HexConverter::Decode(messageEncoded, 4, m_message);
+		HexConverter::Decode(message, 4, m_message);
 
-		const char* exp256Encoded[4] =
+		const std::vector<std::string> exp256 =
 		{
-			("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"),
-			("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"),
-			("248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"),
-			("cf5b16a778af8380036ce59e7b0492370b249b11e8f07a51afac45037afee9d1")
+			std::string("BA7816BF8F01CFEA414140DE5DAE2223B00361A396177A9CB410FF61F20015AD"),
+			std::string("E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"),
+			std::string("248D6A61D20638B8E5C026930C3E6039A33CE45964FF2167F6ECEDD419DB06C1"),
+			std::string("CF5B16A778AF8380036CE59E7B0492370B249B11E8F07A51AFAC45037AFEE9D1")
 		};
-		HexConverter::Decode(exp256Encoded, 4, m_expected256);
+		HexConverter::Decode(exp256, 4, m_exp256);
 
-		const char* exp512Encoded[4] =
+		const std::vector<std::string> exp512 =
 		{
-			("ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f"),
-			("cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e"),
-			("204a8fc6dda82f0a0ced7beb8e08a41657c16ef468b228a8279be331a703c33596fd15c13b1b07f9aa1d3bea57789ca031ad85c7a71dd70354ec631238ca3445"),
-			("8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909")
+			std::string("DDAF35A193617ABACC417349AE20413112E6FA4E89A97EA20A9EEEE64B55D39A2192992A274FC1A836BA3C23A3FEEBBD454D4423643CE80E2A9AC94FA54CA49F"),
+			std::string("CF83E1357EEFB8BDF1542850D66D8007D620E4050B5715DC83F4A921D36CE9CE47D0D13C5D85F2B0FF8318D2877EEC2F63B931BD47417A81A538327AF927DA3E"),
+			std::string("204A8FC6DDA82F0A0CED7BEB8E08A41657C16EF468B228A8279BE331A703C33596FD15C13B1B07F9AA1D3BEA57789CA031AD85C7A71DD70354EC631238CA3445"),
+			std::string("8E959B75DAE313DA8CF4F72814FC143F8F7779C6EB9F7FA17299AEADB6889018501D289E4900F7E4331B99DEC4B5433AC7D329EEB6DD26545E96E55B874BE909")
 		};
-		HexConverter::Decode(exp512Encoded, 4, m_expected512);
+		HexConverter::Decode(exp512, 4, m_exp512);
 	}
 
 	void SHA2Test::OnProgress(std::string Data)

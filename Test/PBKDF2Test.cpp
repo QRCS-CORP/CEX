@@ -14,10 +14,10 @@ namespace Test
 	PBKDF2Test::PBKDF2Test()
 		:
 		m_key(2),
-		m_output(0),
 		m_progressEvent(),
 		m_salt(2)
 	{
+		Initialize();
 	}
 
 	PBKDF2Test::~PBKDF2Test()
@@ -38,8 +38,6 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
-
 			TestInit();
 			OnProgress(std::string("PBKDF2Test: Passed initialization tests.."));
 			CompareVector(32, 1, m_key[0],m_salt[0],  m_output[0]);
@@ -89,14 +87,14 @@ namespace Test
 
 	void PBKDF2Test::Initialize()
 	{
-		const char* output[6] =
+		const std::vector<std::string> output =
 		{
-			("120fb6cffcf8b32c43e7225256c4f837a86548c92ccc35480805987cb70be17b"),
-			("ae4d0c95af6b46d32d0adff928f06dd02a303f8ef3c251dfd6e2d85a95474c43"),
-			("c5e478d59288c841aa530db6845c4c8d962893a001ce4e11a4963873aa98134a"),
-			("348c89dbcbd32b2f32d814b8116e84cf2b17347ebc1800181c4e2a1fb8dd53e1c635518c7dac47e9"),
-			("a2ab21c1ffd7455f76924b8be3ebb43bc03c591e8d309fc87a8a2483bf4c52d3"),
-			("cc46b9de43b3e3eac0685e5f945458e5da835851645c520f9c8edc91a5da28ee")
+			std::string("120FB6CFFCF8B32C43E7225256C4F837A86548C92CCC35480805987CB70BE17B"),
+			std::string("AE4D0C95AF6B46D32D0ADFF928F06DD02A303F8EF3C251DFD6E2D85A95474C43"),
+			std::string("C5E478D59288C841AA530DB6845C4C8D962893A001CE4E11A4963873AA98134A"),
+			std::string("348C89DBCBD32B2F32D814B8116E84CF2B17347EBC1800181C4E2A1FB8DD53E1C635518C7DAC47E9"),
+			std::string("A2AB21C1FFD7455F76924B8BE3EBB43BC03C591E8D309FC87A8A2483BF4C52D3"),
+			std::string("CC46B9DE43B3E3EAC0685E5F945458E5DA835851645C520F9C8EDC91A5DA28EE")
 		};
 		HexConverter::Decode(output, 6, m_output);
 
@@ -165,6 +163,5 @@ namespace Test
 		{
 			throw TestException("PBKDF2: Initialization test failed!");
 		}
-
 	}
 }

@@ -104,12 +104,20 @@ void BCR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
-std::vector<byte> BCR::GetBytes(size_t Size)
+std::vector<byte> BCR::GetBytes(size_t Length)
 {
-	std::vector<byte> buf(Size);
-	GetBytes(buf);
+	std::vector<byte> rnd(Length);
+	GetBytes(rnd);
 
-	return buf;
+	return rnd;
+}
+
+void BCR::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+{
+	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+
+	std::vector<byte> rnd = GetBytes(Length);
+	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
 }
 
 void BCR::GetBytes(std::vector<byte> &Output)

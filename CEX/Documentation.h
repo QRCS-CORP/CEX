@@ -19,8 +19,8 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 \brief
 
 \author    John Underhill
-\version   1.0.0.3
-\date      July 04, 2017
+\version   1.0.0.4
+\date      December 27, 2017
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
@@ -31,7 +31,7 @@ The current version is 1.0.0.4 (A4 version), which are the major, minor, patch, 
 The McEliece asymmetric cipher \n
 The 1024bit Keccak digest \n
 The Poly1305 Message Authentication Code generator \n
-The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5) \n \n
+The library is scheduled for Misra compliance by 1.0.0.5 \n \n
 
 <B>Planned Release 1.1.0.1</B> \n
 RingLWE \n
@@ -49,6 +49,11 @@ Android/iOS/Linux Compatability \n
 DLL API \n \n
 
 <B>History</B> \n \n
+
+<B>Version 1.0.1.4, December 27, 2017</B> \n
+Keccak updated from the standard (pre-NIST) form to SHA3 compliance \n
+Added a (preliminary) 128/256/512/1024 implementation of SHAKE \n
+Internal changes to prngs and entropy providers  \n \n
 
 <B>Version 1.0.0.4, November 11, 2017</B> \n
 Added the McEliece asymmetric cipher \n

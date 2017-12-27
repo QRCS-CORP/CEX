@@ -3,7 +3,7 @@
 
 #include "CexConfig.h"
 
-#if defined(__AVX__)
+#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(CEX_COMPILER_MSC)
 #		include <intrin.h>		// Microsoft C/C++ compatible compiler
 #	elif defined(__GNUC__) && (defined(__x86_64__) || defined(__i386__)) 

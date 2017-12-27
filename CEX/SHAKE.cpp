@@ -16,7 +16,7 @@ const std::string SHAKE::CLASS_NAME("SHAKE");
 SHAKE::SHAKE(ShakeModes ShakeMode)
 	:
 	m_blockSize((ShakeMode == ShakeModes::SHAKE128) ? 168 : (ShakeMode == ShakeModes::SHAKE256) ? 136 : 72),
-	m_domainCode(0x1F),
+	m_domainCode(SHAKE_DOMAIN),
 	m_hashSize((ShakeMode == ShakeModes::SHAKE128) ? 16 : (ShakeMode == ShakeModes::SHAKE256) ? 32 : (ShakeMode == ShakeModes::SHAKE512) ? 64 : 128),
 	m_isDestroyed(false),
 	m_isInitialized(false),

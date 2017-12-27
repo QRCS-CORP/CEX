@@ -38,7 +38,7 @@ namespace Test
 		using namespace TestFiles::AESAVS;
 
 		std::vector<byte> plainText;
-		HexConverter::Decode("00000000000000000000000000000000", plainText);
+		HexConverter::Decode(std::string("00000000000000000000000000000000"), plainText);
 		std::vector<byte> key;
 		std::vector<byte> cipherText;
 
@@ -121,7 +121,7 @@ namespace Test
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
 
-			HexConverter::Decode("00000000000000000000000000000000", key);
+			HexConverter::Decode(std::string("00000000000000000000000000000000"), key);
 			data = "";
 			TestUtils::Read(AESAVSPTEXT128, data);
 			if (data.size() == 0)
@@ -147,7 +147,7 @@ namespace Test
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
 
-			HexConverter::Decode("000000000000000000000000000000000000000000000000", key);
+			HexConverter::Decode(std::string("000000000000000000000000000000000000000000000000"), key);
 			data = "";
 			TestUtils::Read(AESAVSPTEXT192, data);
 			if (data.size() == 0)
@@ -173,7 +173,7 @@ namespace Test
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
 
-			HexConverter::Decode("0000000000000000000000000000000000000000000000000000000000000000", key);
+			HexConverter::Decode(std::string("0000000000000000000000000000000000000000000000000000000000000000"), key);
 			data = "";
 			TestUtils::Read(AESAVSPTEXT256, data);
 			if (data.size() == 0)

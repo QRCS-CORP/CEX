@@ -87,10 +87,19 @@ public:
 	/// Return an array filled with pseudo random bytes
 	/// </summary>
 	/// 
-	/// <param name="Size">Size of requested byte array</param>
+	/// <param name="Length">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	virtual std::vector<byte> GetBytes(size_t Size) = 0;
+	virtual std::vector<byte> GetBytes(size_t Length) = 0;
+
+	/// <summary>
+	/// Fill the buffer with pseudo-random bytes using offsets
+	/// </summary>
+	///
+	/// <param name="Output">The output array to fill</param>
+	/// <param name="Offset">The starting position within the Output array</param>
+	/// <param name="Length">The number of bytes to write to the Output array</param>
+	virtual void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes

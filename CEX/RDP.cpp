@@ -2,6 +2,7 @@
 #include "CpuDetect.h"
 #include "Intrinsics.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 
 NAMESPACE_PROVIDER
 
@@ -11,16 +12,14 @@ const std::string RDP::CLASS_NAME("RDP");
 
 RDP::RDP(RdEngines RdEngine)
 	:
-	m_engineType(RdEngine),
-	m_isAvailable(false)
+	m_engineType(RdEngine)
 {
 	Reset();
 }
 
 RDP::~RDP()
 {
-	m_engineType = RdEngines::RdRand;
-	m_isAvailable = false;
+	m_engineType = RdEngines::None;
 }
 
 //~~~Accessors~~~//
@@ -32,7 +31,7 @@ const Enumeration::Providers RDP::Enumeral()
 
 const bool RDP::IsAvailable() 
 {
-	return m_isAvailable; 
+	return m_engineType != RdEngines::None;
 }
 
 const std::string RDP::Name() 
@@ -46,34 +45,63 @@ void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
-	if (m_engineType == RdEngines::RdSeed && Output.size() > RDSEEDMAX)
+	if (m_engineType == RdEngines::None)
+	{
+		throw CryptoRandomException("RDP:GetBytes", "Random provider is not available!");
+	}
+	if (m_engineType == RdEngines::RdSeed && Output.size() > SEED_MAX)
 	{
 		throw CryptoRandomException("RDP:GetBytes", "The seed providers maximum output is 64MB per request!");
 	}
 
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("RDP:GetBytes", "Random provider is not available!");
-	}
+	int res = 0;
+	size_t failCtr = 0;
 
-	size_t len = Length;
-	size_t off = Offset;
-	size_t rmd;
-
-	do
+	while (Length != 0)
 	{
-		uint rnd32 = Next();
-		rmd = Utility::IntUtils::Min(sizeof(uint), len);
-		Utility::MemUtils::CopyFromValue(rnd32, Output, off, rmd);
-		off += rmd;
-		len -= rmd;
+#if defined(CEX_IS_X64)
+		ulong rnd = 0;
+		if (m_engineType == RdEngines::RdSeed)
+		{
+			res = _rdseed64_step(&rnd);
+		}
+		else
+		{
+			res = _rdrand64_step(&rnd);
+		}
+#else
+		uint rnd = 0;
+		if (m_engineType == RdEngines::RdSeed)
+		{
+			res = _rdseed32_step(&rnd);
+		}
+		else
+		{
+			res = _rdrand32_step(&rnd);
+		}
+#endif
+
+		if (res == RDR_SUCCESS)
+		{
+			const size_t RMDSZE = Utility::IntUtils::Min(sizeof(rnd), Length);
+			Utility::MemUtils::CopyFromValue(rnd, Output, Offset, RMDSZE);
+			Offset += RMDSZE;
+			Length -= RMDSZE;
+			failCtr = 0;
+		}
+		else
+		{
+			++failCtr;
+			if ((m_engineType == RdEngines::RdRand && failCtr >= RDR_RETRY) || failCtr >= RDS_RETRY)
+			{
+				throw CryptoRandomException("RDP:GetBytes", "Exceeded the maximum number of retries!");
+			}
+		}
 	} 
-	while (len != 0);
 }
 
 void RDP::GetBytes(std::vector<byte> &Output)
 {
-
 	std::vector<byte> rnd(Output.size());
 	GetBytes(rnd, 0, rnd.size());
 	Utility::MemUtils::Copy(rnd, 0, Output, 0, rnd.size());
@@ -89,53 +117,29 @@ std::vector<byte> RDP::GetBytes(size_t Length)
 
 uint RDP::Next()
 {
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("RDP:Next", "Random provider is not available!");
-	}
+	std::vector<byte> rnd(sizeof(uint));
+	GetBytes(rnd);
+	uint val = 0;
+	Utility::MemUtils::CopyToValue(rnd, 0, val, sizeof(uint));
 
-	const size_t MAXITR = (m_engineType == RdEngines::RdRand) ? RDRRETRY : RDSRETRY;
-	uint rnd = 0;
-
-	for (size_t i = 0; i < MAXITR + 1; ++i)
-	{
-		int result = 0;
-
-		if (m_engineType == RdEngines::RdSeed)
-		{
-			result = _rdseed32_step(&rnd);
-		}
-		else
-		{
-			result = _rdrand32_step(&rnd);
-		}
-
-		if (result == RDSUCCESS)
-		{
-			break;
-		}
-
-		if (i == MAXITR)
-		{
-			throw CryptoRandomException("RDP:Next", "The provider retry count has been exceeded!");
-		}
-	}
-
-	return rnd;
+	return val;
 }
 
 void RDP::Reset()
 {
 	Common::CpuDetect detect;
 
-	if (detect.RDRAND() || detect.RDSEED())
+	if (detect.RDSEED())
 	{
-		m_isAvailable = true;
+		m_engineType = RdEngines::RdSeed;
 	}
-
-	if (m_isAvailable && !detect.RDSEED())
+	else if (detect.RDRAND())
 	{
 		m_engineType = RdEngines::RdRand;
+	}
+	else
+	{
+		m_engineType = RdEngines::None;
 	}
 }
 

@@ -64,6 +64,20 @@ static void clear8(uint8_t* input, size_t length)
 }
 
 /**
+* \brief Reset a length of a uint64 arrays elements to zero
+*
+* \param input The array to reset
+* \param length The number of bytes to clear
+*/
+static void clear64(uint64_t* input, size_t length)
+{
+	for (size_t i = 0; i < length; ++i)
+	{
+		input[i] = 0;
+	}
+}
+
+/**
 * \brief Print a byte array as delineated hex formatted output
 *
 * \param input The array to print
@@ -80,7 +94,6 @@ static void print_array8(const uint8_t* a, size_t length, size_t line)
 		}
 
 		printf("0x%02X, ", a[i]);
-
 	}
 }
 
@@ -137,6 +150,8 @@ int sha3_256_kat_test()
 		0x79, 0xF3, 0x8A, 0xDE, 0xC5, 0xC2, 0x03, 0x07, 0xA9, 0x8E, 0xF7, 0x6E, 0x83, 0x24, 0xAF, 0xBF,
 		0xD4, 0x6C, 0xFD, 0x81, 0xB2, 0x2E, 0x39, 0x73, 0xC6, 0x5F, 0xA1, 0xBD, 0x9D, 0xE3, 0x17, 0x87 };
 
+	/* test compact api */
+
 	clear8(output, 32);
 	OQS_SHA3_sha3256(output, msg0, 0);
 
@@ -165,6 +180,51 @@ int sha3_256_kat_test()
 	OQS_SHA3_sha3256(output, msg1600, 200);
 
 	if (are_equal8(output, exp1600, 32) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	/* test long-form api */
+
+	uint64_t state[25];
+	uint8_t hash[200];
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_256_RATE, msg0, 0, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_256_RATE);
+
+	if (are_equal8(hash, exp0, 32) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_256_RATE, msg24, 3, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_256_RATE);
+
+	if (are_equal8(hash, exp24, 32) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_256_RATE, msg448, 56, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_256_RATE);
+
+	if (are_equal8(hash, exp448, 32) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_256_RATE, msg1600, 200, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_256_RATE);
+
+	if (are_equal8(hash, exp1600, 32) == SHA3_STATUS_FAILURE)
 	{
 		status = SHA3_STATUS_FAILURE;
 	}
@@ -233,6 +293,8 @@ int sha3_512_kat_test()
 		0x1B, 0x7C, 0x13, 0xC3, 0x0A, 0xDF, 0x52, 0xA3, 0x65, 0x95, 0x84, 0x73, 0x9A, 0x2D, 0xF4, 0x6B,
 		0xE5, 0x89, 0xC5, 0x1C, 0xA1, 0xA4, 0xA8, 0x41, 0x6D, 0xF6, 0x54, 0x5A, 0x1C, 0xE8, 0xBA, 0x00 };
 
+	/* test compact api */
+
 	clear8(output, 64);
 	OQS_SHA3_sha3512(output, msg0, 0);
 
@@ -261,6 +323,51 @@ int sha3_512_kat_test()
 	OQS_SHA3_sha3512(output, msg1600, 200);
 
 	if (are_equal8(output, exp1600, 64) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	/* test long-form api */
+
+	uint64_t state[25];
+	uint8_t hash[200];
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_512_RATE, msg0, 0, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_512_RATE);
+
+	if (are_equal8(hash, exp0, 64) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_512_RATE, msg24, 3, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_512_RATE);
+
+	if (are_equal8(hash, exp24, 64) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_512_RATE, msg448, 56, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_512_RATE);
+
+	if (are_equal8(hash, exp448, 64) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	clear8(hash, 200);
+	clear64(state, 25);
+	OQS_SHA3_keccak_absorb(state, OQS_SHA3_SHA3_512_RATE, msg1600, 200, OQS_SHA3_SHA3_DOMAIN);
+	OQS_SHA3_keccak_squeezeblocks(hash, 1, state, OQS_SHA3_SHA3_512_RATE);
+
+	if (are_equal8(hash, exp1600, 64) == SHA3_STATUS_FAILURE)
 	{
 		status = SHA3_STATUS_FAILURE;
 	}

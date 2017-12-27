@@ -48,28 +48,31 @@ public:
 	enum RdEngines : byte
 	{
 		/// <summary>
+		/// The random provider is available
+		/// </summary>
+		None = 0,
+		/// <summary>
 		/// The random number provider
 		/// </summary>
-		RdRand = 0,
+		RdRand = 1,
 		/// <summary>
 		/// The random seed generator
 		/// </summary>
-		RdSeed = 1
+		RdSeed = 2
 	};
 
 private:
 
 	static const std::string CLASS_NAME;
 	// the number of times to read from the RDRAND/RDSEED RNGs; each read generates 32 bits of output
-	static const size_t RNGPOLLS = 32;
+	static const size_t RNG_POLLS = 32;
 	// RDRAND is guaranteed to generate a random number within 10 retries on a working CPU
-	static const size_t RDRRETRY = 10;
+	static const size_t RDR_RETRY = 10;
 	// RdSeed is not guaranteed to generate a random number within a specific number of retries
-	static const size_t RDSRETRY = 20;
-	static const size_t RDSEEDMAX = 64 * 1000 * 1000;
-	static const size_t RDSUCCESS = 1;
+	static const size_t RDS_RETRY = 100;
+	static const size_t SEED_MAX = 64 * 1000 * 1000;
+	static const size_t RDR_SUCCESS = 1;
 
-	bool m_isAvailable;
 	RdEngines m_engineType;
 
 public:

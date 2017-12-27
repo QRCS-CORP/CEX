@@ -76,30 +76,30 @@ namespace Test
 
 	void HXCipherTest::Initialize()
 	{
-		const char* rhxEncoded[3] =
+		const std::vector<std::string> rhxexp =
 		{
-			("a36e01f66404b6af9ed09ea6e4faaff2"),	// hkdf extended 14 rounds  old: 2ac5dd436cb2a1c976b25a1edaf1f650
-			("43b4418a1d0b32aeff34df0c189556c4"),	// hkdf extended 22 rounds  old: 497bef5ccb4faee957b7946705c3dc10
-			("05e57d29a9f646d840c070ed3a17da53")	// standard 512 key, 22 rounds  old: same
+			std::string("A36E01F66404B6AF9ED09EA6E4FAAFF2"),	// hkdf extended 14 rounds  old: 2ac5dd436cb2a1c976b25a1edaf1f650
+			std::string("43B4418A1D0B32AEFF34DF0C189556C4"),	// hkdf extended 22 rounds  old: 497bef5ccb4faee957b7946705c3dc10
+			std::string("05E57D29A9F646D840C070ED3A17DA53")	// standard 512 key, 22 rounds  old: same
 		};
-		HexConverter::Decode(rhxEncoded, 3, m_rhxExpected);
+		HexConverter::Decode(rhxexp, 3, m_rhxExpected);
 
 		// Note: kat change with serpent move from BE to LE format
-		const char* shxEncoded[3] =
+		const std::vector<std::string> shxexp =
 		{
-			("b47cc603a10d3c41d93bb98352611635"),	// hkdf extended 32 rounds  old: da87958d7644a9409d39bf8abb1f68a5
-			("eb0942fc83099a30835b479bde4bcf31"),	// hkdf extended 40 rounds  old: 631cfb750c1dccd2af8509af8eed9ee6
-			("71c6c606b65798621dd19fa0f5e7acb0")	// standard 512 key, 40 rounds  old: same
+			std::string("B47CC603A10D3C41D93BB98352611635"),	// hkdf extended 32 rounds  old: da87958d7644a9409d39bf8abb1f68a5
+			std::string("EB0942FC83099A30835B479BDE4BCF31"),	// hkdf extended 40 rounds  old: 631cfb750c1dccd2af8509af8eed9ee6
+			std::string("71C6C606B65798621DD19FA0F5E7ACB0")	// standard 512 key, 40 rounds  old: same
 		};
-		HexConverter::Decode(shxEncoded, 3, m_shxExpected);
+		HexConverter::Decode(shxexp, 3, m_shxExpected);
 
-		const char* thxEncoded[3] =
+		const std::vector<std::string> thxexp =
 		{
-			("b8ee1fec4b6caf2607a84b52934fd3d3"),	// hkdf extended 16 rounds  old: 0b97de0f11367d25ad45d3293072e2bb
-			("1870b32752892a6857f798751a8cc5fd"),	// hkdf extended 20 rounds  old: e0ec1b5807ed879a88a18244237e8bad
-			("32626075c43a30a56aa4cc5ddbf58179")	// standard 512 key, 20 rounds  old: same
+			std::string("B8EE1FEC4B6CAF2607A84B52934FD3D3"),	// hkdf extended 16 rounds  old: 0b97de0f11367d25ad45d3293072e2bb
+			std::string("1870B32752892A6857F798751A8CC5FD"),	// hkdf extended 20 rounds  old: e0ec1b5807ed879a88a18244237e8bad
+			std::string("32626075C43A30A56AA4CC5DDBF58179")	// standard 512 key, 20 rounds  old: same
 		};
-		HexConverter::Decode(thxEncoded, 3, m_thxExpected);
+		HexConverter::Decode(thxexp, 3, m_thxExpected);
 
 		for (byte i = 0; i < m_key.size(); i++)
 		{

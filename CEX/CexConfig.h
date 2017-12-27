@@ -137,6 +137,10 @@
 #	endif
 #endif
 
+#if defined(CEX_ARCH_X64)|| defined(CEX_ARCH_AMD64) || defined(CEX_ARCH_ARM64) || defined(CEX_ARCH_IA64)
+#	define CEX_IS_X64
+#endif
+
 // supported os targets
 #if (defined(CEX_OS_WINDOWS) || defined(CEX_OS_ANDROID) || defined(CEX_OS_APPLE) || defined(CEX_OS_POSIX))
 #	define CEX_SUPPORTED_OS 1
@@ -388,6 +392,11 @@ inline static void CexAssert(bool Condition, const T Message)
 #	if !defined(__AVX512__)
 #		define __AVX512__
 #	endif
+#endif
+
+// avx minimum verification
+#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#	define CEX_AVX_SUPPORTED
 #endif
 
 // EOF
