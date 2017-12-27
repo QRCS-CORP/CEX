@@ -475,6 +475,8 @@ int shake_128_kat_test()
 		0x44, 0xC9, 0xFB, 0x35, 0x9F, 0xD5, 0x6A, 0xC0, 0xA9, 0xA7, 0x5A, 0x74, 0x3C, 0xFF, 0x68, 0x62,
 		0xF1, 0x7D, 0x72, 0x59, 0xAB, 0x07, 0x52, 0x16, 0xC0, 0x69, 0x95, 0x11, 0x64, 0x3B, 0x64, 0x39 };
 
+	/* test compact api */
+
 	clear8(output, 512);
 	OQS_SHA3_shake128(output, 512, msg0, 0);
 
@@ -487,6 +489,21 @@ int shake_128_kat_test()
 	OQS_SHA3_shake128(output, 512, msg1600, 200);
 
 	if (are_equal8(output, exp1600, 512) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	/* test long-form api */
+
+	uint64_t state[25];
+	uint8_t hash[OQS_SHA3_SHAKE128_RATE * 4];
+
+	clear8(hash, OQS_SHA3_SHAKE128_RATE * 4);
+	clear64(state, 25);
+	OQS_SHA3_shake128_absorb(state, msg1600, 200);
+	OQS_SHA3_shake128_squeezeblocks(hash, 4, state, OQS_SHA3_SHAKE128_RATE);
+
+	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
 		status = SHA3_STATUS_FAILURE;
 	}
@@ -594,6 +611,8 @@ int shake_256_kat_test()
 		0x6A, 0x1A, 0x9D, 0x78, 0x46, 0x43, 0x6E, 0x4D, 0xCA, 0x57, 0x28, 0xB6, 0xF7, 0x60, 0xEE, 0xF0,
 		0xCA, 0x92, 0xBF, 0x0B, 0xE5, 0x61, 0x5E, 0x96, 0x95, 0x9D, 0x76, 0x71, 0x97, 0xA0, 0xBE, 0xEB };
 
+	/* test compact api */
+
 	clear8(output, 512);
 	OQS_SHA3_shake256(output, 512, msg0, 0);
 
@@ -606,6 +625,21 @@ int shake_256_kat_test()
 	OQS_SHA3_shake256(output, 512, msg1600, 200);
 
 	if (are_equal8(output, exp1600, 512) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	/* test long-form api */
+
+	uint64_t state[25];
+	uint8_t hash[OQS_SHA3_SHAKE256_RATE * 4];
+
+	clear8(hash, OQS_SHA3_SHAKE256_RATE * 4);
+	clear64(state, 25);
+	OQS_SHA3_shake256_absorb(state, msg1600, 200);
+	OQS_SHA3_shake256_squeezeblocks(hash, 4, state, OQS_SHA3_SHAKE256_RATE);
+
+	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
 		status = SHA3_STATUS_FAILURE;
 	}
@@ -712,6 +746,8 @@ int cshake_simple_128_kat_test()
 		0xC2, 0xE9, 0xCA, 0xF1, 0x1B, 0xC6, 0x85, 0xF5, 0x58, 0xCD, 0x5C, 0x32, 0x4C, 0x7F, 0xFD, 0xAE,
 		0x88, 0x12, 0x73, 0x07, 0x41, 0xBA, 0xD2, 0xEF, 0xBC, 0x32, 0x68, 0xDC, 0xC7, 0x74, 0x81, 0x25 };
 
+	/* test compact api */
+
 	clear8(output, 512);
 	OQS_SHA3_cshake128_simple(output, 512, 1, msg0, 0);
 
@@ -724,6 +760,21 @@ int cshake_simple_128_kat_test()
 	OQS_SHA3_cshake128_simple(output, 512, 1, msg1600, 200);
 
 	if (are_equal8(output, exp1600, 512) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	/* test long-form api */
+
+	uint64_t state[25];
+	uint8_t hash[OQS_SHA3_CSHAKE128_RATE * 4];
+
+	clear8(hash, OQS_SHA3_CSHAKE128_RATE * 4);
+	clear64(state, 25);
+	OQS_SHA3_cshake128_simple_absorb(state, 1, msg1600, 200);
+	OQS_SHA3_cshake128_simple_squeezeblocks(hash, 4, state, OQS_SHA3_CSHAKE128_RATE);
+
+	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
 		status = SHA3_STATUS_FAILURE;
 	}
@@ -830,6 +881,8 @@ int cshake_simple_256_kat_test()
 		0x96, 0xCD, 0xF5, 0x21, 0x2B, 0x3B, 0x69, 0x7C, 0x33, 0x21, 0x96, 0x48, 0x7A, 0xAA, 0x24, 0x33,
 		0xF7, 0x2D, 0x2B, 0x8E, 0xA0, 0x18, 0xE9, 0xDB, 0xC9, 0x65, 0x8D, 0x8B, 0x65, 0x98, 0x48, 0xE8 };
 
+	/* test compact api */
+
 	clear8(output, 512);
 	OQS_SHA3_cshake256_simple(output, 512, 1, msg0, 0);
 
@@ -842,6 +895,21 @@ int cshake_simple_256_kat_test()
 	OQS_SHA3_cshake256_simple(output, 512, 1, msg1600, 200);
 
 	if (are_equal8(output, exp1600, 512) == SHA3_STATUS_FAILURE)
+	{
+		status = SHA3_STATUS_FAILURE;
+	}
+
+	/* test long-form api */
+
+	uint64_t state[25];
+	uint8_t hash[OQS_SHA3_CSHAKE256_RATE * 4];
+
+	clear8(hash, OQS_SHA3_CSHAKE256_RATE * 4);
+	clear64(state, 25);
+	OQS_SHA3_cshake256_simple_absorb(state, 1, msg1600, 200);
+	OQS_SHA3_cshake256_simple_squeezeblocks(hash, 4, state, OQS_SHA3_CSHAKE256_RATE);
+
+	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
 		status = SHA3_STATUS_FAILURE;
 	}
