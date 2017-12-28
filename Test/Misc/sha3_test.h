@@ -6,8 +6,9 @@
 
 /**
 * \file sha3_test.h
-* \brief <b>SHA3 Known Answer Tests</b>
-*
+* \brief <b>SHA3 Known Answer Tests</b> \n
+* Uses Known Answer Tests from official sources to verify the 
+* correct operation of SHA3 digest and SHAKE implementations.
 * \author John Underhill
 * \date December 28, 2017
 */
@@ -17,14 +18,8 @@
 */
 enum SHA3_TEST_STATUS
 {
-	/*! \var SHA3_STATUS_FAILURE
-	* Test failure
-	*/
-	SHA3_STATUS_FAILURE = 0,
-	/*! \var SHA3_STATUS_SUCCESS
-	* Test success
-	*/
-	SHA3_STATUS_SUCCESS = 1
+	SHA3_STATUS_FAILURE = 0, /*!< signals test failure */
+	SHA3_STATUS_SUCCESS = 1  /*!< signals test success */
 };
 
 /**
