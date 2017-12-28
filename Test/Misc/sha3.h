@@ -72,9 +72,9 @@ void OQS_SHA3_keccak_permute(uint64_t* state);
 /**
 * \brief The Keccak squeeze function.
 * Permutes and extracts the state to an output byte array.
-* State must be initialized (zeroed) by the caller.
 *
-* \warning Output array must be initialized to a multiple of the byte rate.
+* \warning Output array must be initialized to a multiple of the byte rate. \n
+* State must be initialized (and zeroed) by the caller.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -113,10 +113,10 @@ void OQS_SHA3_shake128_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 /**
 * \brief The SHAKE-128 squeeze function.
 * Permutes and extracts the state to an output byte array.
-* State must be initialized (zeroed) by the caller.
 * Should be used in conjunction with the shake128_absorb function.
 *
-* \warning Output array must be initialized to at a multiple of the byte rate.
+* \warning Output array must be initialized to at a multiple of the byte rate. \n
+* State must be initialized (and zeroed) by the caller.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -154,7 +154,8 @@ void OQS_SHA3_shake256_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 * Permutes and extracts the state to an output byte array.
 * State must be initialized (zeroed) by the caller.
 *
-* \warning Output array must be initialized to a multiple of the byte rate.
+* \warning Output array must be initialized to a multiple of the byte rate. \n
+* State must be initialized (and zeroed) by the caller.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -168,7 +169,7 @@ void OQS_SHA3_shake256_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* 
 * \brief Seed a cSHAKE-128 instance and generate pseudo-random output.
 * Permutes and extracts the state to an output byte array.
 *
-* \warning This function has a counter period of 2^16
+* \warning This function has a counter period of 2^16.
 *
 * \param output The output byte array
 * \param outlen The number of pseudo-random output bytes to generate
@@ -197,7 +198,8 @@ void OQS_SHA3_cshake128_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 * Permutes and extracts blocks of state to an output byte array.
 * State must be initialized (zeroed) by the caller.
 *
-* \warning Output array must be initialized to a multiple of the byte rate.
+* \warning Output array must be initialized to a multiple of the byte rate. \n
+* State must be initialized (and zeroed) by the caller.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -209,7 +211,7 @@ void OQS_SHA3_cshake128_simple_squeezeblocks(uint8_t* output, size_t nblocks, ui
 * \brief Seed a cSHAKE-256 instance and generate pseudo-random output.
 * Permutes and extracts the state to an output byte array.
 *
-* \warning This function has a counter period of 2^16
+* \warning This function has a counter period of 2^16.
 *
 * \param output The output byte array
 * \param outlen The number of pseudo-random output bytes to generate
@@ -238,7 +240,8 @@ void OQS_SHA3_cshake256_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 * Permutes and extracts blocks of state to an output byte array.
 * State must be initialized (zeroed) by the caller.
 *
-* \warning Output array must be initialized to a multiple of the byte rate.
+* \warning Output array must be initialized to a multiple of the byte rate. \n
+* State must be initialized (and zeroed) by the caller.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
