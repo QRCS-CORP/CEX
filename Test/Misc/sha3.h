@@ -78,7 +78,7 @@ void OQS_SHA3_keccak_permute(uint64_t* state);
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
-* \param state The function state; must be initialized, and for increased security non-zero
+* \param state The function state; must be pre-initialized
 * \param rate The rate of absorbsion, in bytes
 */
 void OQS_SHA3_keccak_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state, size_t rate);
@@ -120,7 +120,7 @@ void OQS_SHA3_shake128_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
-* \param state The function state; must be initialized
+* \param state The function state; must be pre-initialized
 */
 void OQS_SHA3_shake128_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state);
 
@@ -159,7 +159,7 @@ void OQS_SHA3_shake256_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
-* \param state The function state; must be initialized
+* \param state The function state; must be pre-initialized
 */
 void OQS_SHA3_shake256_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state);
 
@@ -203,7 +203,7 @@ void OQS_SHA3_cshake128_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
-* \param state The function state; must be initialized, and for increased security non-zero
+* \param state The function state; must be pre-initialized
 */
 void OQS_SHA3_cshake128_simple_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state);
 
@@ -245,7 +245,7 @@ void OQS_SHA3_cshake256_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
-* \param state The function state; must be initialized, and for increased security non-zero
+* \param state The function state; must be pre-initialized
 */
 void OQS_SHA3_cshake256_simple_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state);
 
