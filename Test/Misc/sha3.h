@@ -3,8 +3,7 @@
 * \brief Header defining the API for OQS SHA3
 * \author John Underhill
 * \date December 27, 2017
-*
-* \remarks For usage examples, see sha3.test.h
+* \remarks For usage examples, see sha3_test.h
 */
 
 #ifndef OQS_SHA3_H
