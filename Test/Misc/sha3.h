@@ -72,6 +72,7 @@ void OQS_SHA3_keccak_permute(uint64_t* state);
 /**
 * \brief The Keccak squeeze function.
 * Permutes and extracts the state to an output byte array.
+* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate.
 *
@@ -112,6 +113,7 @@ void OQS_SHA3_shake128_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 /**
 * \brief The SHAKE-128 squeeze function.
 * Permutes and extracts the state to an output byte array.
+* State must be initialized (zeroed) by the caller.
 * Should be used in conjunction with the shake128_absorb function.
 *
 * \warning Output array must be initialized to at a multiple of the byte rate.
@@ -150,6 +152,7 @@ void OQS_SHA3_shake256_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 /**
 * \brief The SHAKE-256 squeeze function.
 * Permutes and extracts the state to an output byte array.
+* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate.
 *
@@ -192,6 +195,7 @@ void OQS_SHA3_cshake128_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 /**
 * \brief The cSHAKE-128 simple squeeze function.
 * Permutes and extracts blocks of state to an output byte array.
+* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate.
 *
@@ -232,6 +236,7 @@ void OQS_SHA3_cshake256_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 /**
 * \brief The cSHAKE-256 simple squeeze function.
 * Permutes and extracts blocks of state to an output byte array.
+* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate.
 *
