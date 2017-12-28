@@ -1,8 +1,8 @@
 /**
 * \file sha3.h
-* \brief Header defining the API for OQS SHA3
+* \brief <b>Header defining the API for OQS SHA3</b>
 * \author John Underhill
-* \date December 27, 2017
+* \date December 28, 2017
 * \remarks For usage examples, see sha3_test.h
 */
 
@@ -163,7 +163,7 @@ void OQS_SHA3_shake128_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 * Permutes and extracts the state to an output byte array.
 * Should be used in conjunction with the shake128_absorb function.
 *
-* \warning Output array must be initialized to at a multiple of the byte rate. \n
+* \warning Output array must be initialized to a multiple of the byte rate. \n
 * State must be initialized (and zeroed) by the caller.
 *
 * \param output The output byte array

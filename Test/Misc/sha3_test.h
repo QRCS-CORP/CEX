@@ -6,21 +6,24 @@
 
 /**
 * \file sha3_test.h
-* \brief SHA3 Known Answer Tests
+* \brief <b>SHA3 Known Answer Tests</b>
+*
 * \author John Underhill
-* \date December 24, 2017
-* \code
-* sha3_test_run();
-*\endcode
+* \date December 28, 2017
 */
 
-/**
-* \enum
-* \brief The test function result state
+/*! \enum SHA3_TEST_STATUS
+* The test function result state
 */
 enum SHA3_TEST_STATUS
 {
+	/*! \var SHA3_STATUS_FAILURE
+	* Test failure
+	*/
 	SHA3_STATUS_FAILURE = 0,
+	/*! \var SHA3_STATUS_SUCCESS
+	* Test success
+	*/
 	SHA3_STATUS_SUCCESS = 1
 };
 
@@ -105,10 +108,10 @@ static void print_array8(const uint8_t* a, size_t length, size_t line)
 * \return Returns 1 for success, 0 for failure
 *
 * \remarks <b>Test References:</b> \n
-* Fips202: <see href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf"/> \n
-* SHA256(0): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-256_Msg0.pdf"/> \n
-* SHA256(1600): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-256_1600.pdf"/> \n
-* SHA256(24, 448): <see href="https://www.di-mgt.com.au/sha_testvectors.html"/>
+* Fips202: <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">SHA3-Standard</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-256_Msg0.pdf">SHA256(0)</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-256_1600.pdf">SHA256(1600)</a> \n
+* KAT: <a href="https://www.di-mgt.com.au/sha_testvectors.html">SHA256(24, 448)</a>
 */
 int sha3_256_kat_test()
 {
@@ -240,10 +243,10 @@ int sha3_256_kat_test()
 * \return Returns 1 for success, 0 for failure
 *
 * \remarks <b>Test References:</b> \n
-* Fips202: <see href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf"/> \n
-* SHA512(0): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-512_Msg0.pdf"/> \n
-* SHA512(1600): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-512_1600.pdf"/> \n
-* SHA512(24, 448): <see href="https://www.di-mgt.com.au/sha_testvectors.html"/>
+* Fips202: <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">SHA3-Standard</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-512_Msg0.pdf">SHA512(0)</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHA3-512_1600.pdf">SHA512(1600)</a> \n
+* KAT: <a href="https://www.di-mgt.com.au/sha_testvectors.html">SHA512(24, 448)</a>
 */
 int sha3_512_kat_test()
 {
@@ -383,9 +386,9 @@ int sha3_512_kat_test()
 * \return Returns 1 for success, 0 for failure
 *
 * \remarks <b>Test References:</b> \n
-* SP800-185: <see href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf"/> \n
-* SHAKE128(0): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE128_Msg0.pdf"/> \n
-* SHAKE128(1600): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE128_Msg1600.pdf"/>
+* SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE128_Msg0.pdf">SHAKE128(0)</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE128_Msg1600.pdf">SHAKE128(1600)</a>
 */
 int shake_128_kat_test()
 {
@@ -519,9 +522,9 @@ int shake_128_kat_test()
 * \return Returns 1 for success, 0 for failure
 *
 * \remarks <b>Test References:</b> \n
-* SP800-185: <see href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf"/> \n
-* SHAKE256(0): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE256_Msg0.pdf"/> \n
-* SHAKE256(1600): <see href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE256_Msg1600.pdf"/>
+* SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE256_Msg0.pdf">SHAKE256(0)</a> \n
+* KAT: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/SHAKE256_Msg1600.pdf">SHAKE256(1600)</a>
 */
 int shake_256_kat_test()
 {
@@ -655,8 +658,8 @@ int shake_256_kat_test()
 * \return Returns 1 for success, 0 for failure
 *
 * \remarks <b>References:</b> \n
-* Microsoft PQCrypto (fips202.c): <see href="https://github.com/Microsoft/PQCrypto-LWEKE"/> \n
-* SP800-185: <see href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf"/>
+* Microsoft PQCrypto: <a href="https://github.com/Microsoft/PQCrypto-LWEKE/blob/master/src/sha3/fips202.c">fips202.c</a> \n
+* SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a>
 */
 int cshake_simple_128_kat_test()
 {
@@ -790,8 +793,8 @@ int cshake_simple_128_kat_test()
 * \return Returns 1 for success, 0 for failure
 *
 * \remarks <b>References:</b> \n
-* Microsoft PQCrypto (fips202.c): <see href="https://github.com/Microsoft/PQCrypto-LWEKE"/> \n
-* SP800-185: <see href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf"/>
+* Microsoft PQCrypto: <a href="https://github.com/Microsoft/PQCrypto-LWEKE/blob/master/src/sha3/fips202.c">fips202.c</a> \n
+* SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a>
 */
 int cshake_simple_256_kat_test()
 {
