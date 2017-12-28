@@ -15,61 +15,61 @@
 
 /*!
 \def OQS_SHA3_CSHAKE_DOMAIN
-The cSHAKE function domain code
+* The cSHAKE function domain code
 */
 #define OQS_SHA3_CSHAKE_DOMAIN 0x04
 
 /*!
 \def OQS_SHA3_CSHAKE128_RATE
-The cSHAKE-128 byte absorption rate
+* The cSHAKE-128 byte absorption rate
 */
 #define OQS_SHA3_CSHAKE128_RATE 168
 
 /*!
 \def OQS_SHA3_CSHAKE256_RATE
-The cSHAKE-256 byte absorption rate
+* The cSHAKE-256 byte absorption rate
 */
 #define OQS_SHA3_CSHAKE256_RATE 136
 
 /*!
 \def OQS_SHA3_SHA3_DOMAIN
-The SHA3 function domain code
+* The SHA3 function domain code
 */
 #define OQS_SHA3_SHA3_DOMAIN 0x06
 
 /*!
 \def OQS_SHA3_SHA3_256_RATE
-The SHA-256 byte absorption rate
+* The SHA-256 byte absorption rate
 */
 #define OQS_SHA3_SHA3_256_RATE 136
 
 /*!
 \def OQS_SHA3_SHA3_512_RATE
-The SHA-512 byte absorption rate
+* The SHA-512 byte absorption rate
 */
 #define OQS_SHA3_SHA3_512_RATE 72
 
 /*!
 \def OQS_SHA3_SHAKE_DOMAIN
-The function domain code
+* The function domain code
 */
 #define OQS_SHA3_SHAKE_DOMAIN 0x1F
 
 /*!
 \def OQS_SHA3_SHAKE128_RATE
-The SHAKE-128 byte absorption rate
+* The SHAKE-128 byte absorption rate
 */
 #define OQS_SHA3_SHAKE128_RATE 168
 
 /*!
 \def OQS_SHA3_SHAKE256_RATE
-The SHAKE-256 byte absorption rate
+* The SHAKE-256 byte absorption rate
 */
 #define OQS_SHA3_SHAKE256_RATE 136
 
 /*!
 \def OQS_SHA3_STATESIZE
-The Keccak SHA3 state array size
+* The Keccak SHA3 state array size
 */
 #define OQS_SHA3_STATESIZE 25
 
