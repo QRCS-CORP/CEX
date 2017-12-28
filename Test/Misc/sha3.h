@@ -11,15 +11,64 @@
 
 #include <stdint.h>
 
+/*!
+\def OQS_SHA3_CSHAKE_DOMAIN
+The cSHAKE function domain code
+*/
 #define OQS_SHA3_CSHAKE_DOMAIN 0x04
+
+/*!
+\def OQS_SHA3_CSHAKE128_RATE
+The cSHAKE-128 byte absorption rate
+*/
 #define OQS_SHA3_CSHAKE128_RATE 168
+
+/*!
+\def OQS_SHA3_CSHAKE256_RATE
+The cSHAKE-256 byte absorption rate
+*/
 #define OQS_SHA3_CSHAKE256_RATE 136
+
+/*!
+\def OQS_SHA3_SHA3_DOMAIN
+The SHA3 function domain code
+*/
 #define OQS_SHA3_SHA3_DOMAIN 0x06
+
+/*!
+\def OQS_SHA3_SHA3_256_RATE
+The SHA-256 byte absorption rate
+*/
 #define OQS_SHA3_SHA3_256_RATE 136
+
+/*!
+\def OQS_SHA3_SHA3_512_RATE
+The SHA-512 byte absorption rate
+*/
 #define OQS_SHA3_SHA3_512_RATE 72
+
+/*!
+\def OQS_SHA3_SHAKE_DOMAIN
+The function domain code
+*/
 #define OQS_SHA3_SHAKE_DOMAIN 0x1F
+
+/*!
+\def OQS_SHA3_SHAKE128_RATE
+The SHAKE-128 byte absorption rate
+*/
 #define OQS_SHA3_SHAKE128_RATE 168
+
+/*!
+\def OQS_SHA3_SHAKE256_RATE
+The SHAKE-256 byte absorption rate
+*/
 #define OQS_SHA3_SHAKE256_RATE 136
+
+/*!
+\def OQS_SHA3_STATESIZE
+The Keccak SHA3 state array size
+*/
 #define OQS_SHA3_STATESIZE 25
 
 /* SHA3 */
@@ -53,7 +102,7 @@ void OQS_SHA3_sha3512(uint8_t* output, const uint8_t* input, size_t inplen);
 * \warning Finalizes the message state, can not be used in consecutive calls.
 *
 * \param state The function state; must be initialized
-* \param rate The rate of absorbsion, in bytes
+* \param rate The rate of absorption, in bytes
 * \param input The input message byte array
 * \param inplen The number of message bytes to process
 * \param domain The domain seperation code (SHA3=0x06, SHAKE=0x1F, cSHAKE=0x04)
@@ -78,7 +127,7 @@ void OQS_SHA3_keccak_permute(uint64_t* state);
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
 * \param state The function state; must be pre-initialized
-* \param rate The rate of absorbsion, in bytes
+* \param rate The rate of absorption, in bytes
 */
 void OQS_SHA3_keccak_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* state, size_t rate);
 

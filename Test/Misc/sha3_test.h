@@ -11,6 +11,7 @@
 * \date December 24, 2017
 * \code
 * sha3_test_run();
+*\endcode
 */
 
 /**
