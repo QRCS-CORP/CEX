@@ -56,7 +56,7 @@ void OQS_SHA3_sha3512(uint8_t* output, const uint8_t* input, size_t inplen);
 * \param rate The rate of absorbsion, in bytes
 * \param input The input message byte array
 * \param inplen The number of message bytes to process
-* \param domain The domain seperation code (0x06 for SHA3, 0x1F for SHAKE)
+* \param domain The domain seperation code (SHA3=0x06, SHAKE=0x1F, cSHAKE=0x04)
 */
 void OQS_SHA3_keccak_absorb(uint64_t* state, size_t rate, const uint8_t* input, size_t inplen, uint8_t domain);
 
@@ -90,7 +90,7 @@ void OQS_SHA3_keccak_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* st
 * \warning The output array length must not be zero.
 *
 * \param output The output byte array
-* \param outlen The number of pseudo-random output bytes to generate
+* \param outlen The number of output bytes to generate
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -103,7 +103,7 @@ void OQS_SHA3_shake128(uint8_t* output, size_t outlen, const uint8_t* input, siz
 *
 * \warning Finalizes the seed state, should not be used in consecutive calls.
 *
-* \param state The function state; must be initialized, and for increased security non-zero
+* \param state The function state; must be pre-initialized
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -129,7 +129,7 @@ void OQS_SHA3_shake128_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* 
 * \warning The output array length must not be zero.
 *
 * \param output The output byte array
-* \param outlen The number of pseudo-random output bytes to generate
+* \param outlen The number of output bytes to generate
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -142,7 +142,7 @@ void OQS_SHA3_shake256(uint8_t* output, size_t outlen, const uint8_t* input, siz
 *
 * \warning Finalizes the seed state, should not be used in consecutive calls.
 *
-* \param state The function state; must be initialized, and for increased security non-zero
+* \param state The function state; must be pre-initialized
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -151,7 +151,6 @@ void OQS_SHA3_shake256_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 /**
 * \brief The SHAKE-256 squeeze function.
 * Permutes and extracts the state to an output byte array.
-* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate. \n
 * State must be initialized (and zeroed) by the caller.
@@ -171,8 +170,8 @@ void OQS_SHA3_shake256_squeezeblocks(uint8_t* output, size_t nblocks, uint64_t* 
 * \warning This function has a counter period of 2^16.
 *
 * \param output The output byte array
-* \param outlen The number of pseudo-random output bytes to generate
-* \param cstm The customization bit string
+* \param outlen The number of output bytes to generate
+* \param cstm The 16bit customization integer
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -185,8 +184,8 @@ void OQS_SHA3_cshake128_simple(uint8_t* output, size_t outlen, uint16_t cstm, co
 *
 * \warning Finalizes the seed state, should not be used in consecutive calls.
 *
-* \param state The function state; must be initialized
-* \param cstm The custom domain string
+* \param state The function state; must be pre-initialized
+* \param cstm The 16bit customization integer
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -195,7 +194,6 @@ void OQS_SHA3_cshake128_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 /**
 * \brief The cSHAKE-128 simple squeeze function.
 * Permutes and extracts blocks of state to an output byte array.
-* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate. \n
 * State must be initialized (and zeroed) by the caller.
@@ -213,8 +211,8 @@ void OQS_SHA3_cshake128_simple_squeezeblocks(uint8_t* output, size_t nblocks, ui
 * \warning This function has a counter period of 2^16.
 *
 * \param output The output byte array
-* \param outlen The number of pseudo-random output bytes to generate
-* \param cstm The customization bit string
+* \param outlen The number of output bytes to generate
+* \param cstm The 16bit customization integer
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -227,8 +225,8 @@ void OQS_SHA3_cshake256_simple(uint8_t* output, size_t outlen, uint16_t cstm, co
 *
 * \warning Finalizes the seed state, should not be used in consecutive calls.
 *
-* \param state The function state; must be initialized
-* \param cstm The custom domain string
+* \param state The function state; must be pre-initialized
+* \param cstm The 16bit customization integer
 * \param input The input seed byte array
 * \param inplen The number of seed bytes to process
 */
@@ -237,7 +235,6 @@ void OQS_SHA3_cshake256_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 /**
 * \brief The cSHAKE-256 simple squeeze function.
 * Permutes and extracts blocks of state to an output byte array.
-* State must be initialized (zeroed) by the caller.
 *
 * \warning Output array must be initialized to a multiple of the byte rate. \n
 * State must be initialized (and zeroed) by the caller.
