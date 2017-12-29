@@ -4,7 +4,7 @@
 * Contains the public api and documentation for SHA3 digest and SHAKE implementations.
 *
 * \author John Underhill
-* \date December 28, 2017
+* \date December 29, 2017
 * \remarks For usage examples, see sha3_test.h
 */
 
