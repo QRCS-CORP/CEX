@@ -404,7 +404,8 @@ Contains the public api and documentation for SHA3 digest and SHAKE implementati
 </div><div class="memdoc">
 
 <p>The cSHAKE-128 simple absorb function. Absorb and finalize an input seed directly into the state. Should be used in conjunction with the cshake128_simple_squeezeblocks function. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls. <br />
+State must be initialized (and zeroed) by the caller.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state</td><td>The function state; must be pre-initialized </td></tr>
@@ -448,8 +449,7 @@ Contains the public api and documentation for SHA3 digest and SHAKE implementati
 </div><div class="memdoc">
 
 <p>The cSHAKE-128 simple squeeze function. Permutes and extracts blocks of state to an output byte array. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate. <br />
-State must be initialized (and zeroed) by the caller.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">output</td><td>The output byte array </td></tr>
@@ -555,7 +555,8 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The cSHAKE-256 simple absorb function. Absorb and finalize an input seed directly into the state. Should be used in conjunction with the cshake256_simple_squeezeblocks function. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls. <br />
+State must be initialized (and zeroed) by the caller.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state</td><td>The function state; must be pre-initialized </td></tr>
@@ -599,8 +600,7 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The cSHAKE-256 simple squeeze function. Permutes and extracts blocks of state to an output byte array. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate. <br />
-State must be initialized (and zeroed) by the caller.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">output</td><td>The output byte array </td></tr>
@@ -655,7 +655,8 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The Keccak absorb function. Absorb an input message array directly into the state. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Finalizes the message state, can not be used in consecutive calls.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Finalizes the message state, can not be used in consecutive calls. <br />
+State must be initialized (and zeroed) by the caller.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state</td><td>The function state; must be initialized </td></tr>
@@ -730,8 +731,7 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The Keccak squeeze function. Permutes and extracts the state to an output byte array. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate. <br />
-State must be initialized (and zeroed) by the caller.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">output</td><td>The output byte array </td></tr>
@@ -911,7 +911,8 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The SHAKE-128 absorb function. Absorb and finalize an input seed byte array. Should be used in conjunction with the shake128_squeezeblocks function. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls. <br />
+State must be initialized (and zeroed) by the caller.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state</td><td>The function state; must be pre-initialized </td></tr>
@@ -954,8 +955,7 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The SHAKE-128 squeeze function. Permutes and extracts the state to an output byte array. Should be used in conjunction with the shake128_absorb function. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate. <br />
-State must be initialized (and zeroed) by the caller.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">output</td><td>The output byte array </td></tr>
@@ -1048,7 +1048,8 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The SHAKE-256 absorb function. Absorb and finalize an input seed byte array. Should be used in conjunction with the shake256_squeezeblocks function. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Finalizes the seed state, should not be used in consecutive calls. <br />
+State must be initialized (and zeroed) by the caller.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state</td><td>The function state; must be pre-initialized </td></tr>
@@ -1091,8 +1092,7 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><div class="memdoc">
 
 <p>The SHAKE-256 squeeze function. Permutes and extracts the state to an output byte array. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate. <br />
-State must be initialized (and zeroed) by the caller.</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>Output array must be initialized to a multiple of the byte rate.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">output</td><td>The output byte array </td></tr>
@@ -1107,7 +1107,7 @@ State must be initialized (and zeroed) by the caller.</dd></dl>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Dec 28 2017 18:00:41 for SHA3-C by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Dec 29 2017 14:28:14 for SHA3-C by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.9.1
 </small></address>

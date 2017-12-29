@@ -101,7 +101,7 @@ void OQS_SHA3_sha3512(uint8_t* output, const uint8_t* input, size_t inplen);
 * \brief The Keccak absorb function.
 * Absorb an input message array directly into the state.
 *
-* \warning Finalizes the message state, can not be used in consecutive calls.
+* \warning Finalizes the message state, can not be used in consecutive calls. \n
 * State must be initialized (and zeroed) by the caller.
 *
 * \param state The function state; must be initialized
@@ -124,7 +124,7 @@ void OQS_SHA3_keccak_permute(uint64_t* state);
 * \brief The Keccak squeeze function.
 * Permutes and extracts the state to an output byte array.
 *
-* \warning Output array must be initialized to a multiple of the byte rate. \n
+* \warning Output array must be initialized to a multiple of the byte rate.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -152,7 +152,7 @@ void OQS_SHA3_shake128(uint8_t* output, size_t outlen, const uint8_t* input, siz
 * Absorb and finalize an input seed byte array.
 * Should be used in conjunction with the shake128_squeezeblocks function.
 *
-* \warning Finalizes the seed state, should not be used in consecutive calls.
+* \warning Finalizes the seed state, should not be used in consecutive calls. \n
 * State must be initialized (and zeroed) by the caller.
 *
 * \param state The function state; must be pre-initialized
@@ -166,7 +166,7 @@ void OQS_SHA3_shake128_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 * Permutes and extracts the state to an output byte array.
 * Should be used in conjunction with the shake128_absorb function.
 *
-* \warning Output array must be initialized to a multiple of the byte rate. \n
+* \warning Output array must be initialized to a multiple of the byte rate.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -191,7 +191,7 @@ void OQS_SHA3_shake256(uint8_t* output, size_t outlen, const uint8_t* input, siz
 * Absorb and finalize an input seed byte array.
 * Should be used in conjunction with the shake256_squeezeblocks function.
 *
-* \warning Finalizes the seed state, should not be used in consecutive calls.
+* \warning Finalizes the seed state, should not be used in consecutive calls. \n
 * State must be initialized (and zeroed) by the caller.
 *
 * \param state The function state; must be pre-initialized
@@ -204,7 +204,7 @@ void OQS_SHA3_shake256_absorb(uint64_t* state, const uint8_t* input, size_t inpl
 * \brief The SHAKE-256 squeeze function.
 * Permutes and extracts the state to an output byte array.
 *
-* \warning Output array must be initialized to a multiple of the byte rate. \n
+* \warning Output array must be initialized to a multiple of the byte rate.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -233,7 +233,7 @@ void OQS_SHA3_cshake128_simple(uint8_t* output, size_t outlen, uint16_t cstm, co
 * Absorb and finalize an input seed directly into the state.
 * Should be used in conjunction with the cshake128_simple_squeezeblocks function.
 *
-* \warning Finalizes the seed state, should not be used in consecutive calls.
+* \warning Finalizes the seed state, should not be used in consecutive calls. \n
 * State must be initialized (and zeroed) by the caller.
 *
 * \param state The function state; must be pre-initialized
@@ -247,7 +247,7 @@ void OQS_SHA3_cshake128_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 * \brief The cSHAKE-128 simple squeeze function.
 * Permutes and extracts blocks of state to an output byte array.
 *
-* \warning Output array must be initialized to a multiple of the byte rate. \n
+* \warning Output array must be initialized to a multiple of the byte rate.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract
@@ -274,7 +274,7 @@ void OQS_SHA3_cshake256_simple(uint8_t* output, size_t outlen, uint16_t cstm, co
 * Absorb and finalize an input seed directly into the state.
 * Should be used in conjunction with the cshake256_simple_squeezeblocks function.
 *
-* \warning Finalizes the seed state, should not be used in consecutive calls.
+* \warning Finalizes the seed state, should not be used in consecutive calls. \n
 * State must be initialized (and zeroed) by the caller.
 *
 * \param state The function state; must be pre-initialized
@@ -288,7 +288,7 @@ void OQS_SHA3_cshake256_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 * \brief The cSHAKE-256 simple squeeze function.
 * Permutes and extracts blocks of state to an output byte array.
 *
-* \warning Output array must be initialized to a multiple of the byte rate. \n
+* \warning Output array must be initialized to a multiple of the byte rate.
 *
 * \param output The output byte array
 * \param nblocks The number of blocks to extract

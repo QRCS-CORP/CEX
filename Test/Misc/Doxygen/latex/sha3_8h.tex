@@ -164,7 +164,8 @@ This function has a counter period of 2$^\wedge$16.
 The c\+S\+H\+A\+K\+E-\/128 simple absorb function. Absorb and finalize an input seed directly into the state. Should be used in conjunction with the cshake128\+\_\+simple\+\_\+squeezeblocks function. 
 
 \begin{DoxyWarning}{Warning}
-Finalizes the seed state, should not be used in consecutive calls.
+Finalizes the seed state, should not be used in consecutive calls. ~\newline
+State must be initialized (and zeroed) by the caller.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -191,8 +192,7 @@ Finalizes the seed state, should not be used in consecutive calls.
 The c\+S\+H\+A\+K\+E-\/128 simple squeeze function. Permutes and extracts blocks of state to an output byte array. 
 
 \begin{DoxyWarning}{Warning}
-Output array must be initialized to a multiple of the byte rate. ~\newline
-State must be initialized (and zeroed) by the caller.
+Output array must be initialized to a multiple of the byte rate.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -249,7 +249,8 @@ This function has a counter period of 2$^\wedge$16.
 The c\+S\+H\+A\+K\+E-\/256 simple absorb function. Absorb and finalize an input seed directly into the state. Should be used in conjunction with the cshake256\+\_\+simple\+\_\+squeezeblocks function. 
 
 \begin{DoxyWarning}{Warning}
-Finalizes the seed state, should not be used in consecutive calls.
+Finalizes the seed state, should not be used in consecutive calls. ~\newline
+State must be initialized (and zeroed) by the caller.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -276,8 +277,7 @@ Finalizes the seed state, should not be used in consecutive calls.
 The c\+S\+H\+A\+K\+E-\/256 simple squeeze function. Permutes and extracts blocks of state to an output byte array. 
 
 \begin{DoxyWarning}{Warning}
-Output array must be initialized to a multiple of the byte rate. ~\newline
-State must be initialized (and zeroed) by the caller.
+Output array must be initialized to a multiple of the byte rate.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -304,7 +304,8 @@ State must be initialized (and zeroed) by the caller.
 The Keccak absorb function. Absorb an input message array directly into the state. 
 
 \begin{DoxyWarning}{Warning}
-Finalizes the message state, can not be used in consecutive calls.
+Finalizes the message state, can not be used in consecutive calls. ~\newline
+State must be initialized (and zeroed) by the caller.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -350,8 +351,7 @@ The Keccak permute function. Permutes the state array, can be used in conjunctio
 The Keccak squeeze function. Permutes and extracts the state to an output byte array. 
 
 \begin{DoxyWarning}{Warning}
-Output array must be initialized to a multiple of the byte rate. ~\newline
-State must be initialized (and zeroed) by the caller.
+Output array must be initialized to a multiple of the byte rate.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -456,7 +456,8 @@ The output array length must not be zero.
 The S\+H\+A\+K\+E-\/128 absorb function. Absorb and finalize an input seed byte array. Should be used in conjunction with the shake128\+\_\+squeezeblocks function. 
 
 \begin{DoxyWarning}{Warning}
-Finalizes the seed state, should not be used in consecutive calls.
+Finalizes the seed state, should not be used in consecutive calls. ~\newline
+State must be initialized (and zeroed) by the caller.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -481,8 +482,7 @@ Finalizes the seed state, should not be used in consecutive calls.
 The S\+H\+A\+K\+E-\/128 squeeze function. Permutes and extracts the state to an output byte array. Should be used in conjunction with the shake128\+\_\+absorb function. 
 
 \begin{DoxyWarning}{Warning}
-Output array must be initialized to a multiple of the byte rate. ~\newline
-State must be initialized (and zeroed) by the caller.
+Output array must be initialized to a multiple of the byte rate.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -535,7 +535,8 @@ The output array length must not be zero.
 The S\+H\+A\+K\+E-\/256 absorb function. Absorb and finalize an input seed byte array. Should be used in conjunction with the shake256\+\_\+squeezeblocks function. 
 
 \begin{DoxyWarning}{Warning}
-Finalizes the seed state, should not be used in consecutive calls.
+Finalizes the seed state, should not be used in consecutive calls. ~\newline
+State must be initialized (and zeroed) by the caller.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
@@ -560,8 +561,7 @@ Finalizes the seed state, should not be used in consecutive calls.
 The S\+H\+A\+K\+E-\/256 squeeze function. Permutes and extracts the state to an output byte array. 
 
 \begin{DoxyWarning}{Warning}
-Output array must be initialized to a multiple of the byte rate. ~\newline
-State must be initialized (and zeroed) by the caller.
+Output array must be initialized to a multiple of the byte rate.
 \end{DoxyWarning}
 
 \begin{DoxyParams}{Parameters}
