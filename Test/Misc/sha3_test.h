@@ -49,30 +49,30 @@ static int are_equal8(const uint8_t* a, const uint8_t* b, size_t length)
 }
 
 /**
-* \brief Reset a length of a byte arrays elements to zero
+* \brief Set a number of a uint8 array elements to zero
 *
-* \param input The array to reset
-* \param length The number of bytes to clear
+* \param a The array to reset
+* \param count The number of uint8 integers to clear
 */
-static void clear8(uint8_t* input, size_t length)
+static void clear8(uint8_t* a, size_t count)
 {
-	for (size_t i = 0; i < length; ++i)
+	for (size_t i = 0; i < count; ++i)
 	{
-		input[i] = 0;
+		a[i] = 0;
 	}
 }
 
 /**
-* \brief Reset a length of a uint64 arrays elements to zero
+* \brief Set a number of a uint64 array elements to zero
 *
-* \param input The array to reset
-* \param length The number of bytes to clear
+* \param a The array to reset
+* \param count The number of uint64 integers to clear
 */
-static void clear64(uint64_t* input, size_t length)
+static void clear64(uint64_t* a, size_t count)
 {
-	for (size_t i = 0; i < length; ++i)
+	for (size_t i = 0; i < count; ++i)
 	{
-		input[i] = 0;
+		a[i] = 0;
 	}
 }
 
@@ -80,12 +80,12 @@ static void clear64(uint64_t* input, size_t length)
 * \brief Print a byte array as delineated hex formatted output
 *
 * \param input The array to print
-* \param length The number of bytes to print
-* \param line The number of octets in a line
+* \param count The number of bytes to print
+* \param line The number of octets per line
 */
-static void print_array8(const uint8_t* a, size_t length, size_t line)
+static void print_array8(const uint8_t* a, size_t count, size_t line)
 {
-	for (int i = 0; i < length; ++i) 
+	for (int i = 0; i < count; ++i)
 	{
 		if (i != 0 && i % line == 0)
 		{
