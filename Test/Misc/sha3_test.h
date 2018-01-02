@@ -500,7 +500,7 @@ int shake_128_kat_test()
 	clear8(hash, OQS_SHA3_SHAKE128_RATE * 4);
 	clear64(state, 25);
 	OQS_SHA3_shake128_absorb(state, msg1600, 200);
-	OQS_SHA3_shake128_squeezeblocks(hash, 4, state, OQS_SHA3_SHAKE128_RATE);
+	OQS_SHA3_shake128_squeezeblocks(hash, 4, state);
 
 	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
@@ -636,7 +636,7 @@ int shake_256_kat_test()
 	clear8(hash, OQS_SHA3_SHAKE256_RATE * 4);
 	clear64(state, 25);
 	OQS_SHA3_shake256_absorb(state, msg1600, 200);
-	OQS_SHA3_shake256_squeezeblocks(hash, 4, state, OQS_SHA3_SHAKE256_RATE);
+	OQS_SHA3_shake256_squeezeblocks(hash, 4, state);
 
 	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
@@ -771,7 +771,7 @@ int cshake_simple_128_kat_test()
 	clear8(hash, OQS_SHA3_CSHAKE128_RATE * 4);
 	clear64(state, 25);
 	OQS_SHA3_cshake128_simple_absorb(state, 1, msg1600, 200);
-	OQS_SHA3_cshake128_simple_squeezeblocks(hash, 4, state, OQS_SHA3_CSHAKE128_RATE);
+	OQS_SHA3_cshake128_simple_squeezeblocks(hash, 4, state);
 
 	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
@@ -906,7 +906,7 @@ int cshake_simple_256_kat_test()
 	clear8(hash, OQS_SHA3_CSHAKE256_RATE * 4);
 	clear64(state, 25);
 	OQS_SHA3_cshake256_simple_absorb(state, 1, msg1600, 200);
-	OQS_SHA3_cshake256_simple_squeezeblocks(hash, 4, state, OQS_SHA3_CSHAKE256_RATE);
+	OQS_SHA3_cshake256_simple_squeezeblocks(hash, 4, state);
 
 	if (are_equal8(hash, exp1600, 512) == SHA3_STATUS_FAILURE)
 	{
