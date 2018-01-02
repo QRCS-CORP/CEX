@@ -2418,8 +2418,7 @@ void OQS_SHA3_cshake128_simple_absorb(uint64_t* state, uint16_t cstm, const uint
 {
 	/* Note: This function doesn't align exactly to cSHAKE (SP800-185 3.2), which should produce 
 	SHAKE output if S and N = zero (sort of a customized custom-SHAKE function).
-	Padding is hard-coded as the first 32 bits, plus 16 bits of fixed N, 
-	and 16 bits of counter.
+	Padding is hard-coded as the first 32 bits, plus 16 bits of fixed N, and 16 bits of counter.
 	The short integer optimizes this function for a digest counter configuration */
 
 	uint8_t sep[8];
