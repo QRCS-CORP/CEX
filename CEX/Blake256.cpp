@@ -199,7 +199,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
-		uint prtBlk = UL_MAX;
+		uint prtBlk = 0xFFFFFFFFUL;
 
 		// process unaligned blocks
 		if (m_msgLength > m_parallelProfile.ParallelMinimumSize())
@@ -228,13 +228,13 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			// apply f0 bit reversal constant to final blocks
-			m_dgtState[i].F[0] = UL_MAX;
+			m_dgtState[i].F[0] = 0xFFFFFFFFUL;
 			size_t blkLen = BLOCK_SIZE;
 
 			// f1 constant on last block
 			if (i == m_treeParams.FanOut() - 1)
 			{
-				m_dgtState[i].F[1] = UL_MAX;
+				m_dgtState[i].F[1] = 0xFFFFFFFFUL;
 			}
 
 			if (i == prtBlk)
@@ -280,8 +280,8 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		}
 
 		// apply f0 and f1 flags
-		m_dgtState[0].F[0] = UL_MAX;
-		m_dgtState[0].F[1] = UL_MAX;
+		m_dgtState[0].F[0] = 0xFFFFFFFFUL;
+		m_dgtState[0].F[1] = 0xFFFFFFFFUL;
 		// last compression
 		Compress(m_msgBuffer, m_msgLength - BLOCK_SIZE, m_dgtState[0], BLOCK_SIZE);
 		// output the code
@@ -295,7 +295,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, padLen);
 		}
 
-		m_dgtState[0].F[0] = UL_MAX;
+		m_dgtState[0].F[0] = 0xFFFFFFFFUL;
 		Compress(m_msgBuffer, 0, m_dgtState[0], m_msgLength);
 		IntUtils::LeUL256ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}

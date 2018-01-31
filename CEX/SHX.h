@@ -125,7 +125,7 @@ private:
 	static const std::string DEF_DSTINFO;
 	static const size_t MAX_ROUNDS = 64;
 	static const size_t MIN_ROUNDS = 32;
-	static const uint PHI = 0x9E3779B9;
+	static const uint PHI = 0x9E3779B9UL;
 	// size of state buffer subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 

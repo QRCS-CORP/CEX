@@ -23,9 +23,9 @@
 
 NAMESPACE_BLOCK
 
-/**
-* \internal
-*/
+/// 
+/// internal
+/// 
 
 template<typename T>
 static void SHXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key)

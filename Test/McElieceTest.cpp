@@ -100,12 +100,8 @@ namespace Test
 		std::vector<byte> test2(32, (byte)255);
 		std::memcpy((byte*)test1.data(), test2.data(), 32);
 
-		// test the extended cipher implementation with external rng and block cipher
-		Cipher::Symmetric::Block::RHX* sycPtr = new Cipher::Symmetric::Block::RHX(Enumeration::Digests::SHA256);
-
-		// note: setting the block cipher to an HX cipher uses k512=keccak1024(e) -> GCM(AHX||SHX||THX(k512))
-		// standard cipher is: k256=keccak512(e) -> GCM(AES||Serpent||Twofish(k256))
-		McEliece cpr1(Enumeration::MPKCParams::M12T62, rngPtr, sycPtr);
+		// note: setting the block cipher to an HX cipher uses a 512 bit key
+		McEliece cpr1(Enumeration::MPKCParams::M12T62, rngPtr, Enumeration::BlockCiphers::RHX);
 
 		for (size_t i = 0; i < 10; ++i)
 		{
@@ -153,13 +149,8 @@ namespace Test
 		{
 			throw TestException("McElieceTest: Prng was reset!");
 		}
-		if (sycPtr == nullptr)
-		{
-			throw TestException("McElieceTest: Block cipher was reset!");
-		}
 
 		delete rngPtr;
-		delete sycPtr;
 	}
 
 	void McElieceTest::OnProgress(std::string Data)

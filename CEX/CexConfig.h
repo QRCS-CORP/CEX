@@ -1,8 +1,10 @@
 #ifndef CEX_CEXCONFIG_H
 #define CEX_CEXCONFIG_H
 
-#if !defined(__cplusplus) || __cplusplus < 199711L
+#if (!defined(__cplusplus))
 #	error compiler is incompatible with this library!
+#elif (__cplusplus < 199711L)
+#	error compiler must be C++ 14 compatible!
 #endif
 
 #include <array>
@@ -53,7 +55,7 @@
 #endif
 
 // preprocessor os selection (not all OS's will be supported; targets are win/android/linux/ios)
-#if defined(_WIN64) || defined(_WIN32)
+#if (defined(_WIN64) || defined(_WIN32))
 #	define CEX_OS_WINDOWS
 #	if defined(_WIN64)
 #		define CEX_ISWIN64
@@ -62,10 +64,10 @@
 #	endif
 #elif defined(__ANDROID__)
 #	define CEX_OS_ANDROID
-#elif defined(__APPLE__) || defined(__MACH__)
+#elif (defined(__APPLE__) || defined(__MACH__))
 #	include "TargetConditionals.h"
 #	define CEX_OS_APPLE
-#	if TARGET_OS_IPHONE && TARGET_IPHONE_SIMULATOR
+#	if (TARGET_OS_IPHONE && TARGET_IPHONE_SIMULATOR)
 #		define CEX_ISIPHONESIM
 #	elif TARGET_OS_IPHONE
 #		define CEX_ISIPHONE
@@ -76,26 +78,26 @@
 #	define CEX_OS_LINUX
 #elif defined(__unix)
 #	define CEX_OS_UNIX
-#	if defined(__hpux) || defined(hpux)
+#	if (defined(__hpux) || defined(hpux))
 #		define CEX_OS_HPUX
 #	endif
-#	if defined(__sun__) || defined(__sun) || defined(sun)
+#	if (defined(__sun__) || defined(__sun) || defined(sun))
 #		define CEX_OS_SUNUX
 #	endif
 #endif
-#if defined(__posix) || defined(_POSIX_VERSION)
+#if (defined(__posix) || defined(_POSIX_VERSION))
 #	define CEX_OS_POSIX
 #endif
 
 // cpu type (only intel/amd/arm are targeted for support)
 #if defined(CEX_COMPILER_MSC)
-#	if defined(_M_X64) || defined(_M_AMD64)
+#	if (defined(_M_X64) || defined(_M_AMD64))
 #		define CEX_ARCH_X64
 #		define CEX_ARCH_X86_X64
 #		if defined(_M_AMD64)
 #			define CEX_ARCH_AMD64
 #		endif
-#	elif defined(_M_IX86) || defined(_X86_)
+#	elif (defined(_M_IX86) || defined(_X86_))
 #		define CEX_ARCH_IX86
 #		define CEX_ARCH_X86_X64
 #	elif defined(_M_ARM)
@@ -111,13 +113,13 @@
 #		define CEX_ARCH_IA64
 #	endif
 #elif defined(CEX_COMPILER_GCC)
-#	if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64)
+#	if (defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64))
 #		define CEX_ARCH_X64
 #		define CEX_ARCH_X86_X64
 #		if defined(_M_AMD64)
 #			define CEX_ARCH_AMD64
 #		endif
-#	elif defined(i386) || defined(__i386) || defined(__i386__)
+#	elif (defined(i386) || defined(__i386) || defined(__i386__))
 #		define CEX_ARCH_IX86
 #		define CEX_ARCH_X86_X64
 #	elif defined(__arm__)
@@ -125,11 +127,11 @@
 #		if defined(__aarch64__)
 #			define CEX_ARCH_ARM64
 #		endif
-#	elif defined(__ia64) || defined(__ia64__) || defined(__itanium__)
+#	elif (defined(__ia64) || defined(__ia64__) || defined(__itanium__))
 #		define CEX_ARCH_IA64
-#	elif defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(__64BIT__) || defined(_LP64) || defined(__LP64__)
+#	elif (defined(__powerpc64__) || defined(__ppc64__) || defined(__PPC64__) || defined(__64BIT__) || defined(_LP64) || defined(__LP64__))
 #		define CEX_ARCH_PPC
-#	elif defined(__sparc) || defined(__sparc__)
+#	elif (defined(__sparc) || defined(__sparc__))
 #		define CEX_ARCH_SPARC
 #		if defined(__sparc64__)
 #			define CEX_ARCH_SPARC64
@@ -137,7 +139,7 @@
 #	endif
 #endif
 
-#if defined(CEX_ARCH_X64)|| defined(CEX_ARCH_AMD64) || defined(CEX_ARCH_ARM64) || defined(CEX_ARCH_IA64)
+#if (defined(CEX_ARCH_X64)|| defined(CEX_ARCH_AMD64) || defined(CEX_ARCH_ARM64) || defined(CEX_ARCH_IA64))
 #	define CEX_IS_X64
 #endif
 
@@ -172,11 +174,11 @@
 // define universal data types
 typedef unsigned char byte;
 
-#if (defined(__GNUC__) && !defined(__alpha)) || defined(__MWERKS__)
+#if ((defined(__GNUC__) && (!defined(__alpha))) || defined(__MWERKS__))
 	typedef unsigned int ushort;
 	typedef unsigned long uint;
 	typedef unsigned long long ulong;
-#elif defined(_MSC_VER) || defined(__BCPLUSPLUS__)
+#elif (defined(_MSC_VER) || defined(__BCPLUSPLUS__))
 	typedef unsigned __int16 ushort;
 	typedef unsigned __int32 uint;
 	typedef unsigned __int64 ulong;
@@ -187,13 +189,13 @@ typedef unsigned char byte;
 #endif
 
 // OS intrinsics flags
-#if defined(_MSC_VER) || defined(__BCPLUSPLUS__)
+#if (defined(_MSC_VER) || defined(__BCPLUSPLUS__))
 #	define CEX_HAS_MINSSE
 #	define CEX_FAST_ROTATE
-#elif defined(__MWERKS__) && TARGET_CPU_PPC
+#elif (defined(__MWERKS__) && TARGET_CPU_PPC)
 #	define CEX_PPC_INTRINSICS
 #	define CEX_FAST_ROTATE
-#elif defined(__GNUC__) && defined(__i386__)
+#elif (defined(__GNUC__) && defined(__i386__))
 	// GCC does peephole optimizations which should result in using rotate instructions
 #	define CEX_FAST_ROTATE
 #endif
@@ -203,14 +205,14 @@ typedef unsigned char byte;
 #	define CEX_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 // gcc asm support
-#if !defined(CEX_USE_GCC_INLINE_ASM) && defined(__GNUG__)
+#if ((!defined(CEX_USE_GCC_INLINE_ASM)) && defined(__GNUG__))
 #	define CEX_USE_GCC_INLINE_ASM 1
 #endif
 
 // Apple and LLVM's Clang. Apple Clang version 7.0 roughly equals LLVM Clang version 3.7
-#if defined(__clang__ ) && !defined(__apple_build_version__)
+#if (defined(__clang__ ) && (!defined(__apple_build_version__)))
 #	define CEX_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
-#elif defined(__clang__ ) && defined(__apple_build_version__)
+#elif (defined(__clang__ ) && defined(__apple_build_version__))
 #	define CEX_APPLE_CLANG_VERSION (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #endif
 
@@ -246,7 +248,7 @@ typedef unsigned char byte;
 #		define CEX_HAS_SSE4
 #	endif
 #endif
-#if defined(CEX_HAS_SSE41) || defined(CEX_HAS_SSE42)
+#if (defined(CEX_HAS_SSE41) || defined(CEX_HAS_SSE42))
 #	if !defined(CEX_HAS_SSE4)
 #		define CEX_HAS_SSE4
 #	endif
@@ -270,8 +272,8 @@ typedef unsigned char byte;
 #	define CEX_HAS_XOP
 #endif
 #if defined(CEX_OS_WINDOWS)
-#	if defined(_M_AMD64) || defined(_M_X64) || _M_IX86_FP == 2
-#		if !defined(CEX_HAS_SSE2)
+#	if (defined(_M_AMD64) || defined(_M_X64) || (_M_IX86_FP == 2))
+#		if (!defined(CEX_HAS_SSE2))
 #			define CEX_HAS_SSE2
 #		endif
 #	endif
@@ -280,17 +282,17 @@ typedef unsigned char byte;
 // native openmp support
 #if defined(_OPENMP)
 #	define CEX_HAS_OPENMP
-#	if _OPENMP == 201511
+#	if (_OPENMP == 201511)
 #		define CEX_OPENMP_VERSION_45
-#	elif _OPENMP == 201307
+#	elif (_OPENMP == 201307)
 #		define CEX_OPENMP_VERSION_40
-#	elif _OPENMP == 201107
+#	elif (_OPENMP == 201107)
 #		define CEX_OPENMP_VERSION_31
-#	elif _OPENMP == 200805
+#	elif (_OPENMP == 200805)
 #		define CEX_OPENMP_VERSION_30
-#	elif _OPENMP == 200505
+#	elif (_OPENMP == 200505)
 #		define CEX_OPENMP_VERSION_25
-#	elif _OPENMP == 200203
+#	elif (_OPENMP == 200203)
 #		define CEX_OPENMP_VERSION_20
 #	endif
 #endif
@@ -302,7 +304,7 @@ typedef unsigned char byte;
 // instructs the compiler to skip optimizations on the contained function; closed with CEX_OPTIMIZE_RESUME 
 #if defined(CEX_COMPILER_MSC)
 #	define CEX_OPTIMIZE_IGNORE __pragma(optimize("", off))
-#elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW)
+#elif (defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW))
 //	_Pragma(CEX_TO_STRING(GCC optimize("O0")))
 #	define CEX_OPTIMIZE_IGNORE #pragma GCC optimize ("O0"), #pragma GCC optimize ("O0")
 #elif defined(CEX_COMPILER_CLANG)
@@ -316,7 +318,7 @@ typedef unsigned char byte;
 // end of section; resume compiler optimizations 
 #if defined(CEX_COMPILER_MSC)
 #	define CEX_OPTIMIZE_RESUME __pragma(optimize("", on))
-#elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW)
+#elif (defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW))
 //	_Pragma(CEX_TO_STRING(GCC pop_options))
 #	define CEX_OPTIMIZE_RESUME #pragma GCC pop_options
 #elif defined(CEX_COMPILER_INTEL)
@@ -341,22 +343,22 @@ typedef unsigned char byte;
 template<typename T>
 inline static void CexAssert(bool Condition, const T Message)
 {
-#if !defined(CEX_NO_DEBUG) || defined(CEX_THROW_ASSERTIONS)
+#if ((!defined(CEX_NO_DEBUG)) || defined(CEX_THROW_ASSERTIONS))
 	if (!Condition)
 	{
-		std::cerr << "Assertion failed in " << __FILE__ << " line " << __LINE__ << ": " << Message << std::endl;
+		std::cerr << "Assertion failed in " << (__FILE__) << " line " << (__LINE__) << ": " << Message << std::endl;
 		std::terminate();
 	} 
 #endif
 }
 
 // enables/disables OS rotation intrinsics
-#if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)
+#if (defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE))
 #	define CEX_FASTROTATE_ENABLED
 #endif
 
 // prefetch base multiplier used by the symmetric cipher modes parallel block calculation
-#define CEX_PREFETCH_BASE size_t = 2048
+#define CEX_PREFETCH_BASE 2048
 
 // pre-loads tables in rhx and thx into L1 for performance and as a timing attack counter measure
 #define CEX_PREFETCH_RHX_TABLES
@@ -387,7 +389,7 @@ inline static void CexAssert(bool Condition, const T Message)
 // Note: AVX512 is currently untested, this flag enables support on a compliant system
 //#define CEX_AVX512_SUPPORTED
 
-#if defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED)
+#if (defined(__AVX512F__) && (__AVX512F__ == 1) && defined(CEX_AVX512_SUPPORTED))
 #	include <immintrin.h>
 #	if !defined(__AVX512__)
 #		define __AVX512__
@@ -395,7 +397,7 @@ inline static void CexAssert(bool Condition, const T Message)
 #endif
 
 // avx minimum verification
-#if defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512)
+#if (defined(CEX_HAS_AVX) || defined(CEX_HAS_AVX2) || defined(CEX_HAS_AVX512))
 #	define CEX_AVX_SUPPORTED
 #endif
 

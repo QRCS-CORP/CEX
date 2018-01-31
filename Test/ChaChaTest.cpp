@@ -115,6 +115,7 @@ namespace Test
 
 	void ChaChaTest::Initialize()
 	{
+		/*lint -save -e417 */
 		HexConverter::Decode(std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"), m_plainText);
 
 		const std::vector<std::string> key =
@@ -144,6 +145,7 @@ namespace Test
 			std::string("92A2508E2C4084567195F2A1005E552B4874EC0504A9CD5E4DAF739AB553D2E783D79C5BA11E0653BEBB5C116651302E8D381CB728CA627B0B246E83942A2B99")  //20r-256k
 		};
 		HexConverter::Decode(cipherText, 6, m_cipherText);
+		/*lint -restore */
 	}
 
 	void ChaChaTest::OnProgress(std::string Data)

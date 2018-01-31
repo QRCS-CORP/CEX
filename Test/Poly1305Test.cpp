@@ -93,6 +93,8 @@ namespace Test
 
 	void Poly1305Test::Initialize()
 	{
+		/*lint -save -e146 */
+		/*lint -save -e417 */
 		const std::vector<std::string> keys =
 		{
 			std::string("85D6BE7857556D337F4452FE42D506A80103808AFB0DB2FD4ABFF6AF4149F51B"),
@@ -215,6 +217,7 @@ namespace Test
 			std::string("FC5FB58DC65DAF19B14D1D05DA1064E8")
 		};
 		HexConverter::Decode(code, 21, m_expectedCode);
+		/*lint -restore */
 	}
 
 	void Poly1305Test::OnProgress(std::string Data)

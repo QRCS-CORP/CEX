@@ -321,6 +321,7 @@
     <ClInclude Include="..\..\Test\RingLWETest.h" />
     <ClInclude Include="..\..\Test\SCRYPTTest.h" />
     <ClInclude Include="..\..\Test\SecureStreamTest.h" />
+    <ClInclude Include="..\..\Test\SHAKETest.h" />
     <ClInclude Include="..\..\Test\SimdSpeedTest.h" />
     <ClInclude Include="..\..\Test\SimdWrapperTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyGeneratorTest.h" />
@@ -388,6 +389,7 @@
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />
     <ClCompile Include="..\..\Test\SerpentTest.cpp" />
     <ClCompile Include="..\..\Test\Sha2Test.cpp" />
+    <ClCompile Include="..\..\Test\SHAKETest.cpp" />
     <ClCompile Include="..\..\Test\SimdSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\SimdWrapperTest.cpp" />
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />

@@ -212,6 +212,8 @@ namespace Test
 
 	void AesFipsTest::Initialize()
 	{
+		/*lint -save -e122 */
+		/*lint -save -e417 */
 		const std::vector<std::string> keys =
 		{
 			// fips
@@ -257,6 +259,7 @@ namespace Test
 			std::string("00000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
 			std::string("80000000000000000000000000000000"),
+
 			std::string("00000000000000000000000000000000"),
 			std::string("355F697E8B868B65B25A04E18D782AFA"),
 			std::string("F3F6752AE8D7831138F041560631B114"),
@@ -286,6 +289,7 @@ namespace Test
 			std::string("172AEAB3D507678ECAF455C12587ADB7"),
 			std::string("6CD02513E8D4DC986B4AFE087A60BD0C"),
 			std::string("DDC6BF790C15760D8D9AEB6F9A75FD4E"),
+
 			std::string("C34C052CC0DA8D73451AFE5F03BE297F"),
 			std::string("ACC863637868E3E068D2FD6E3508454A"),
 			std::string("77BA00ED5412DFF27C8ED91F3C376172"),
@@ -300,6 +304,7 @@ namespace Test
 			std::string("E58B82BFBA53C0040DC610C642121168")
 		};
 		HexConverter::Decode(cipherText, 24, m_cipherText);
+		/*lint -restore */
 	}
 
 	void AesFipsTest::OnProgress(std::string Data)

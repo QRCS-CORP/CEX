@@ -23,9 +23,9 @@
 
 NAMESPACE_BLOCK
 
-/**
-* \internal
-*/
+/// 
+/// internal
+/// 
 
 template<typename T>
 static void THXDecryptW(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, std::vector<uint> &Key, std::vector<uint> &Sbox)
@@ -189,7 +189,7 @@ static void THXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 			Sbox[2 * X.zmm.m512i_u8[4]] ^ Sbox[2 * X.zmm.m512i_u8[5] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[6] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[7] + 0x201],
 			Sbox[2 * X.zmm.m512i_u8[0]] ^ Sbox[2 * X.zmm.m512i_u8[1] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[2] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[3] + 0x201]
 		);
-	#elif !defined(__AVX512__) && defined(__AVX2__)
+	#elif (!defined(__AVX512__)) && defined(__AVX2__)
 		return T(
 			Sbox[2 * X.ymm.m256i_u8[28]] ^ Sbox[2 * X.ymm.m256i_u8[29] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[30] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[31] + 0x201],
 			Sbox[2 * X.ymm.m256i_u8[24]] ^ Sbox[2 * X.ymm.m256i_u8[25] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[26] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[27] + 0x201],
@@ -200,7 +200,7 @@ static void THXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 			Sbox[2 * X.ymm.m256i_u8[4]] ^ Sbox[2 * X.ymm.m256i_u8[5] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[6] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[7] + 0x201],
 			Sbox[2 * X.ymm.m256i_u8[0]] ^ Sbox[2 * X.ymm.m256i_u8[1] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[2] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[3] + 0x201]
 		);
-	#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
+	#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
 		return T(
 			Sbox[2 * X.xmm.m128i_u8[12]] ^ Sbox[2 * X.xmm.m128i_u8[13] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[14] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[15] + 0x201],
 			Sbox[2 * X.xmm.m128i_u8[8]] ^ Sbox[2 * X.xmm.m128i_u8[9] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[10] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[11] + 0x201],
@@ -234,7 +234,7 @@ static void THXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 			Sbox[2 * X.zmm.m512i_u8[4] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[5] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[6] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[7]],
 			Sbox[2 * X.zmm.m512i_u8[0] + 0x001] ^ Sbox[2 * X.zmm.m512i_u8[1] + 0x200] ^ Sbox[2 * X.zmm.m512i_u8[2] + 0x201] ^ Sbox[2 * X.zmm.m512i_u8[3]]
 		);
-	#elif !defined(__AVX512__) && defined(__AVX2__)
+	#elif (!defined(__AVX512__)) && defined(__AVX2__)
 		return T(
 			Sbox[2 * X.ymm.m256i_u8[28] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[29] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[30] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[31]],
 			Sbox[2 * X.ymm.m256i_u8[24] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[25] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[26] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[27]],
@@ -245,7 +245,7 @@ static void THXEncryptW(const std::vector<byte> &Input, const size_t InOffset, s
 			Sbox[2 * X.ymm.m256i_u8[4] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[5] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[6] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[7]],
 			Sbox[2 * X.ymm.m256i_u8[0] + 0x001] ^ Sbox[2 * X.ymm.m256i_u8[1] + 0x200] ^ Sbox[2 * X.ymm.m256i_u8[2] + 0x201] ^ Sbox[2 * X.ymm.m256i_u8[3]]
 		);
-	#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__)
+	#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__)
 		return T(
 			Sbox[2 * X.xmm.m128i_u8[12] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[13] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[14] + 0x201] ^ Sbox[2 * X.xmm.m128i_u8[15]],
 			Sbox[2 * X.xmm.m128i_u8[8] + 0x001] ^ Sbox[2 * X.xmm.m128i_u8[9] + 0x200] ^ Sbox[2 * X.xmm.m128i_u8[10] + 0x201] ^ Sbox[2 * X.xmm.m128i_u8[11]],

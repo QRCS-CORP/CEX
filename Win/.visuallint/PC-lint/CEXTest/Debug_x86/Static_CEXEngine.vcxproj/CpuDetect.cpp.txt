@@ -1,0 +1,23 @@
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+    '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
+    output'; receiving a syntax error in a library file most likely means
+    something is wrong with your Lint configuration
+
+--- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp (C++)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
+#        warning "No way of calling cpuid with this compiler"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp(12): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-8, all preprocessing directives must be valid)
+#    warning "No way of calling cpuid with this compiler"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp(15): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-8, all preprocessing directives must be valid)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp(627): error 10: (Error -- Expecting '}')
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits(14): error 96: (Error -- Unmatched left brace for namespace std on line 14, file C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits)
+
+    --- Wrap-up for Module: C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp
+
+NAMESPACE_COMMONEND
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp(627): error 766: (Info -- Header file 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\thread' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuDetect.cpp')
+
+--- Global Wrap-up
+
+ error 974: (Note -- Worst case function for stack usage: 'div' is finite, requires 16 bytes total stack in calling 'no function'. See +stack for a full report. [MISRA C++ Rule 7-5-4])
+ error 900: (Note -- Successful completion, 8 messages produced)

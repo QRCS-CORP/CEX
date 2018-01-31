@@ -810,6 +810,9 @@
     <ClInclude Include="..\..\CEX\Authenticators.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\SHAKE.h">
+      <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -824,6 +827,12 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2.h">
       <Filter>Header Files\Digest\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHAKE2.h">
+      <Filter>Header Files\Digest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SCRYPT.h">
+      <Filter>Header Files\Kdf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1165,6 +1174,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Poly1305.cpp">
       <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHAKE.cpp">
+      <Filter>Source Files\Kdf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

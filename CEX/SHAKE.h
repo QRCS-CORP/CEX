@@ -96,8 +96,6 @@ private:
 	bool m_isInitialized;
 	std::array<ulong, 25> m_kdfState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::array<byte, 200> m_msgBuffer;
-	size_t m_msgLength;
 	ShakeModes m_shakeType;
 
 public:
@@ -135,10 +133,7 @@ public:
 	/// Read/Write: The Keccak function-domain separator code.
 	/// <para>This code differentiates Keccak function types, the default code is 0x1F (SHAKE)</para>
 	/// </summary>
-	byte &DomainCode()
-	{
-		return m_domainCode;
-	}
+	byte &DomainCode();
 
 	/// <summary>
 	/// Read Only: The Kdf generators type name
@@ -166,14 +161,20 @@ public:
 	/// </summary>
 	const std::string Name() override;
 
+	/// <summary>
+	/// Read Only: The absorbtion rate; input size in bytes of one block
+	/// </summary>
+	const size_t Rate();
+
 	//~~~Public Functions~~~//
 
 	/// <summary>
 	/// Initialize the internal state with a custom domain string.
-	/// <para>Adds one permutation cycle. The domain string must be set before initialization, and must be less that 200 bytes in length.</para>
+	/// <para>Adds one permutation cycle (simplified cSHAKE). 
+	/// The domain string must be set before initialization, and must be less than 196 bytes in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The custom domain string</param>
+	/// <param name="Input">The custom domain string byte array</param>
 	void DomainString(std::vector<byte> &Input);
 
 	/// <summary>
@@ -267,9 +268,8 @@ private:
 		}
 	}
 
-	void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Expand(std::vector<byte> &Output, size_t Offset, size_t Length);
-	void HashFinal(std::array<ulong, 25> &State);
 	void LoadState();
 	void Permute(std::array<ulong, 25> &State);
 };

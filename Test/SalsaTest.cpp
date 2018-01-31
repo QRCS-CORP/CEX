@@ -141,6 +141,7 @@ namespace Test
 
 	void SalsaTest::Initialize()
 	{
+		/*lint -save -e417 */
 		HexConverter::Decode(std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"), m_plainText);
 
 		const std::vector<std::string> keys =
@@ -170,6 +171,7 @@ namespace Test
 			std::string("3944F6DC9F85B128083879FDF190F7DEE4053A07BC09896D51D0690BD4DA4AC1062F1E47D3D0716F80A9B4D85E6D6085EE06947601C85F1A27A2F76E45A6AA87")  //20r-256k
 		};
 		HexConverter::Decode(cipherText, 6, m_cipherText);
+		/*lint -restore */
 	}
 
 	void SalsaTest::OnProgress(std::string Data)

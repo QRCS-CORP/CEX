@@ -22,7 +22,6 @@ SHAKE::SHAKE(ShakeModes ShakeMode)
 	m_isInitialized(false),
 	m_kdfState(),
 	m_legalKeySizes(0),
-	m_msgLength(0),
 	m_shakeType(ShakeMode != ShakeModes::None ? ShakeMode :
 		throw CryptoKdfException("SHAKE:Ctor", "The SHAKE mode type can not ne none!"))
 {
@@ -38,20 +37,27 @@ SHAKE::~SHAKE()
 		m_domainCode = 0;
 		m_hashSize = 0;
 		m_isInitialized = false;
-		m_msgLength = 0;
 		m_shakeType = ShakeModes::None;
 
 		IntUtils::ClearArray(m_kdfState);
 		IntUtils::ClearVector(m_legalKeySizes);
-		IntUtils::ClearArray(m_msgBuffer);
 	}
 }
 
 //~~~Accessors~~~//
+byte &SHAKE::DomainCode()
+{
+	return m_domainCode;
+}
+
+const size_t SHAKE::Rate()
+{
+	return m_blockSize;
+}
 
 const Kdfs SHAKE::Enumeral()
 {
-	return Kdfs::SHAKE;
+	return Kdfs::SHAKE128;
 }
 
 const bool SHAKE::IsInitialized()
@@ -79,9 +85,20 @@ const std::string SHAKE::Name()
 void SHAKE::DomainString(std::vector<byte> &Input)
 {
 	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
-	CexAssert(Input.size() <= 200, "the input buffer is too large");
+	CexAssert(Input.size() <= 196, "the input buffer is too large");
 
-	MemUtils::Copy(Input, 0, m_kdfState, 0, Input.size());
+	std::vector<byte> sep(200);
+	sep[0] = 0x01;
+	sep[1] = static_cast<byte>(m_blockSize);
+	sep[2] = 0x01;
+	sep[3] = 0x00;
+	MemUtils::Copy(Input, 0, sep, 4, Input.size());
+
+	for (size_t i = 0; i < 200; i += 8)
+	{
+		m_kdfState[i / 8] = IntUtils::BeBytesTo64(sep, i);
+	}
+
 	Permute(m_kdfState);
 }
 
@@ -138,8 +155,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 		Reset();
 	}
 
-	Absorb(Key, 0, Key.size());
-	HashFinal(m_kdfState);
+	FastAbsorb(Key, 0, Key.size());
 	m_isInitialized = true;
 }
 
@@ -168,19 +184,21 @@ void SHAKE::ReSeed(const std::vector<byte> &Seed)
 void SHAKE::Reset()
 {
 	std::memset(&m_kdfState[0], 0, m_kdfState.size() * sizeof(ulong));
-	std::memset(&m_msgBuffer[0], 0, m_msgBuffer.size());
-	m_msgLength = 0;
 	m_isInitialized = false;
 }
 
 //~~~Private Functions~~~//
 
-void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length)
+void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
+	std::array<byte, 200> msg;
+
 	CexAssert(Input.size() - InOffset >= Length, "The Output buffer is too short!");
 
 	if (Length != 0)
 	{
+		MemUtils::Clear(msg, 0, 200);
+
 		// sequential loop through blocks
 		while (Length >= m_blockSize)
 		{
@@ -193,9 +211,13 @@ void SHAKE::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Lengt
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
-			m_msgLength += Length;
+			MemUtils::Copy(Input, InOffset, msg, 0, Length);
 		}
+
+		msg[Length] = m_domainCode;
+		msg[m_blockSize - 1] |= 0x80;
+		AbsorbBlock(msg, 0, msg.size(), m_kdfState);
+		Permute(m_kdfState);
 	}
 }
 
@@ -211,27 +233,14 @@ void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 }
 
-void SHAKE::HashFinal(std::array<ulong, 25> &State)
-{
-	if (m_msgLength != m_msgBuffer.size())
-	{
-		MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
-	}
-
-	m_msgBuffer[m_msgLength] = m_domainCode;
-	m_msgBuffer[m_blockSize - 1] |= 0x80;
-	AbsorbBlock(m_msgBuffer, 0, m_msgBuffer.size(), State);
-	Permute(State);
-}
-
 void SHAKE::LoadState()
 {
 	// initialize state arrays
 	Reset();
 	// define legal key sizes (just a recomendation, only min size is enforced)
 	m_legalKeySizes.resize(3);
-	// minimum security is the digest output size
-	m_legalKeySizes[0] = SymmetricKeySize(m_hashSize, 0, 0);
+	// minimum security is half the digest output size
+	m_legalKeySizes[0] = SymmetricKeySize((m_hashSize / 2), 0, 0);
 	// best perf/sec mix, a full block
 	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, 0, 0);
 	// max key input; add two blocks
@@ -240,13 +249,6 @@ void SHAKE::LoadState()
 
 void SHAKE::Permute(std::array<ulong, 25> &State)
 {
-	m_kdfState[1] ^= 0xFFFFFFFFFFFFFFFFULL;
-	m_kdfState[2] ^= 0xFFFFFFFFFFFFFFFFULL;
-	m_kdfState[8] ^= 0xFFFFFFFFFFFFFFFFULL;
-	m_kdfState[12] ^= 0xFFFFFFFFFFFFFFFFULL;
-	m_kdfState[17] ^= 0xFFFFFFFFFFFFFFFFULL;
-	m_kdfState[20] ^= 0xFFFFFFFFFFFFFFFFULL;
-
 	if (m_shakeType != ShakeModes::SHAKE1024)
 	{
 		Digest::Keccak::Permute24(State);
@@ -255,13 +257,6 @@ void SHAKE::Permute(std::array<ulong, 25> &State)
 	{
 		Digest::Keccak::Permute48(State);
 	}
-
-	State[1] = ~State[1];
-	State[2] = ~State[2];
-	State[8] = ~State[8];
-	State[12] = ~State[12];
-	State[17] = ~State[17];
-	State[20] = ~State[20];
 }
 
 NAMESPACE_KDFEND

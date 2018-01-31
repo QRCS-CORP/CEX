@@ -441,10 +441,10 @@ void CJP::StirPool()
 	// Store the SHA-1 constants in reverse order to make up the 64 bit value; this applies to a little endian system, on a big endian system, 
 	// it reverses as expected. But this really does not matter as we do not rely on the specific numbers. 
 	// We just pick the SHA-1 constants as they have a good mix of bit set and unset.
-	constant.u32[1] = 0x67452301;
-	constant.u32[0] = 0xEFCDAB89;
-	mixer.u32[1] = 0x98BADCFE;
-	mixer.u32[0] = 0x10325476;
+	constant.u32[1] = 0x67452301UL;
+	constant.u32[0] = 0xEFCDAB89UL;
+	mixer.u32[1] = 0x98BADCFEUL;
+	mixer.u32[0] = 0x10325476UL;
 
 	for (size_t i = 0; i < DATA_SIZE_BITS; ++i)
 	{

@@ -4343,7 +4343,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000080008082;
+		Eba ^= 0x8000000080008082ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -4430,7 +4430,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x800000008000800A;
+		Aba ^= 0x800000008000800AULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -4517,7 +4517,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000000000003;
+		Eba ^= 0x8000000000000003ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -4604,7 +4604,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x8000000080000009;
+		Aba ^= 0x8000000080000009ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -4691,7 +4691,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000000008082;
+		Eba ^= 0x8000000000008082ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -4778,7 +4778,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x0000000000008009;
+		Aba ^= 0x0000000000008009ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -4865,7 +4865,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000000000080;
+		Eba ^= 0x8000000000000080ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -4952,7 +4952,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x0000000000008083;
+		Aba ^= 0x0000000000008083ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -5039,7 +5039,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000000000081;
+		Eba ^= 0x8000000000000081ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -5126,7 +5126,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x0000000000000001;
+		Aba ^= 0x0000000000000001ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -5213,7 +5213,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x000000000000800B;
+		Eba ^= 0x000000000000800BULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -5300,7 +5300,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x8000000080008001;
+		Aba ^= 0x8000000080008001ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -5387,7 +5387,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x0000000000000080;
+		Eba ^= 0x0000000000000080ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -5474,7 +5474,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x8000000000008000;
+		Aba ^= 0x8000000000008000ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -5561,7 +5561,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000080008001;
+		Eba ^= 0x8000000080008001ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -5648,7 +5648,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x0000000000000009;
+		Aba ^= 0x0000000000000009ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -5735,7 +5735,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x800000008000808B;
+		Eba ^= 0x800000008000808BULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -5822,7 +5822,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x0000000000000081;
+		Aba ^= 0x0000000000000081ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -5909,7 +5909,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000000000082;
+		Eba ^= 0x8000000000000082ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -5996,7 +5996,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x000000008000008B;
+		Aba ^= 0x000000008000008BULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -6083,7 +6083,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x8000000080008009;
+		Eba ^= 0x8000000080008009ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -6170,7 +6170,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x8000000080000000;
+		Aba ^= 0x8000000080000000ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);
@@ -6257,7 +6257,7 @@ public:
 		Asu ^= Du;
 		Cu = IntUtils::RotFL64(Asu, 14);
 		Eba = Ca ^ ((~Ce) & Ci);
-		Eba ^= 0x0000000080000080;
+		Eba ^= 0x0000000080000080ULL;
 		Ebe = Ce ^ ((~Ci) & Co);
 		Ebi = Ci ^ ((~Co) & Cu);
 		Ebo = Co ^ ((~Cu) & Ca);
@@ -6344,7 +6344,7 @@ public:
 		Esu ^= Du;
 		Cu = IntUtils::RotFL64(Esu, 14);
 		Aba = Ca ^ ((~Ce) & Ci);
-		Aba ^= 0x0000000080008003;
+		Aba ^= 0x0000000080008003ULL;
 		Abe = Ce ^ ((~Ci) & Co);
 		Abi = Ci ^ ((~Co) & Cu);
 		Abo = Co ^ ((~Cu) & Ca);

@@ -24,9 +24,9 @@
 
 NAMESPACE_STREAM
 
-/**
-* \internal
-*/
+///
+/// internal
+///
 class ChaCha
 {
 public:

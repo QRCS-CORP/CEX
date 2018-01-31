@@ -11,6 +11,14 @@
 
 namespace Test
 {
+	using Enumeration::Prngs;
+	using Enumeration::Providers;
+	using Key::Asymmetric::IAsymmetricKeyPair;
+	using Key::Asymmetric::MPKCKeyPair;
+	using Key::Asymmetric::RLWEKeyPair;
+	using Cipher::Asymmetric::McEliece::McEliece;
+	using Cipher::Asymmetric::RLWE::RingLWE;
+
 	const std::string AsymmetricSpeedTest::DESCRIPTION = "Asymmetric Cipher and Signature Scheme Speed Tests.";
 	const std::string AsymmetricSpeedTest::FAILURE = "FAILURE! ";
 	const std::string AsymmetricSpeedTest::MESSAGE = "COMPLETE! Asymmetric Speed tests have executed succesfully.";
@@ -40,37 +48,35 @@ namespace Test
 		try
 		{
 			std::string itrCnt = TestUtils::ToString(DEF_TEST_ITER);
-			IPrng* rngPtr = Helper::PrngFromName::GetInstance(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
-			IBlockCipher* sycPtr = Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::Rijndael);
+			IPrng* rngPtr = Helper::PrngFromName::GetInstance(Prngs::BCR, Providers::CSP);
 
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests in sequential and parallel modes:"));
 			OnProgress("");
 
 			// RingLWE
 			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using RingLWE Q12289N1024***"));
-			RlweGenerateLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false, rngPtr, sycPtr);
+			RlweGenerateLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false, rngPtr, BlockCiphers::Rijndael);
 			OnProgress(std::string("***Parallel: Generating " + itrCnt + " Keypairs using RingLWE Q12289N1024***"));
-			RlweGenerateLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, true, rngPtr, sycPtr);
+			RlweGenerateLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, true, rngPtr, BlockCiphers::Rijndael);
 
 			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using RingLWE Q12289N1024 / GCM(AES256)***"));
-			RlweEncryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false, rngPtr, sycPtr);
+			RlweEncryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false, rngPtr, BlockCiphers::Rijndael);
 			OnProgress(std::string("***Parallel: Encrypting " + itrCnt + " messages using RingLWE Q12289N1024 / GCM(AES256)***"));
-			RlweEncryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, true, rngPtr, sycPtr);
+			RlweEncryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, true, rngPtr, BlockCiphers::Rijndael);
 
 			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using RingLWE Q12289N1024 / GCM(AES256)***"));
-			RlweDecryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false, rngPtr, sycPtr);
+			RlweDecryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, false, rngPtr, BlockCiphers::Rijndael);
 
 			// McEliece
 			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using McEliece M12T62***"));
-			MpkcGenerateLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr, sycPtr);
+			MpkcGenerateLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr, BlockCiphers::Rijndael);
 
 			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using McEliece M12T62 / GCM(AES256)***"));
-			MpkcEncryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr, sycPtr);
+			MpkcEncryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr, BlockCiphers::Rijndael);
 
 			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using McEliece M12T62 / GCM(AES256)***"));
-			MpkcDecryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr, sycPtr);
+			MpkcDecryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr, BlockCiphers::Rijndael);
 
-			delete sycPtr;
 			delete rngPtr;
 
 			return MESSAGE;
@@ -85,14 +91,14 @@ namespace Test
 		}
 	}
 
-	void AsymmetricSpeedTest::MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher)
+	void AsymmetricSpeedTest::MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType)
 	{
-		Cipher::Asymmetric::McEliece::McEliece asyCpr(Params, Rng, Cipher);
+		Cipher::Asymmetric::McEliece::McEliece asyCpr(Params, Rng, CipherType);
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			Key::Asymmetric::MPKCKeyPair* kp = reinterpret_cast<Key::Asymmetric::MPKCKeyPair*>(asyCpr.Generate());
+			MPKCKeyPair* kp = reinterpret_cast<MPKCKeyPair*>(asyCpr.Generate());
 			delete kp;
 		}
 
@@ -107,10 +113,10 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher)
+	void AsymmetricSpeedTest::MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType)
 	{
-		Cipher::Asymmetric::McEliece::McEliece asyCpr(Params, Rng, Cipher);
-		Key::Asymmetric::IAsymmetricKeyPair* kp;
+		McEliece asyCpr(Params, Rng, CipherType);
+		IAsymmetricKeyPair* kp;
 		kp = asyCpr.Generate();
 		asyCpr.Initialize(true, kp);
 		std::vector<byte> msg(32);
@@ -136,10 +142,10 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher)
+	void AsymmetricSpeedTest::MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType)
 	{
-		Cipher::Asymmetric::McEliece::McEliece asyCpr(Params, Rng, Cipher);
-		Key::Asymmetric::IAsymmetricKeyPair* kp;
+		McEliece asyCpr(Params, Rng, CipherType);
+		IAsymmetricKeyPair* kp;
 		kp = asyCpr.Generate();
 
 		std::vector<byte> enc;
@@ -171,14 +177,14 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher)
+	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType)
 	{
-		Cipher::Asymmetric::RLWE::RingLWE asyCpr(Params, Rng, Cipher, Parallel);
+		RingLWE asyCpr(Params, Rng, CipherType, Parallel);
 		uint64_t start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
 		{
-			Key::Asymmetric::RLWEKeyPair* kp = reinterpret_cast<Key::Asymmetric::RLWEKeyPair*>(asyCpr.Generate());
+			RLWEKeyPair* kp = reinterpret_cast<RLWEKeyPair*>(asyCpr.Generate());
 			delete kp;
 		}
 
@@ -193,13 +199,13 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher)
+	void AsymmetricSpeedTest::RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType)
 	{
 		std::vector<byte> cpt;
 		std::vector<byte> msg(32);
 		Rng->GetBytes(msg);
-		Cipher::Asymmetric::RLWE::RingLWE asyCpr(Params, Rng, Cipher, Parallel);
-		Key::Asymmetric::IAsymmetricKeyPair* kp = asyCpr.Generate();
+		RingLWE asyCpr(Params, Rng, CipherType, Parallel);
+		IAsymmetricKeyPair* kp = asyCpr.Generate();
 		asyCpr.Initialize(true, kp);
 
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -222,11 +228,11 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher)
+	void AsymmetricSpeedTest::RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType)
 	{
 		std::vector<byte> cpt;
-		Cipher::Asymmetric::RLWE::RingLWE asyCpr(Params, Rng, Cipher, Parallel);
-		Key::Asymmetric::IAsymmetricKeyPair* kp = asyCpr.Generate();
+		RingLWE asyCpr(Params, Rng, CipherType, Parallel);
+		IAsymmetricKeyPair* kp = asyCpr.Generate();
 		asyCpr.Initialize(true, kp);
 		std::vector<byte> msg(32);
 		Rng->GetBytes(msg);

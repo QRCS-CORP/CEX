@@ -1,0 +1,166 @@
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+    '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
+    output'; receiving a syntax error in a library file most likely means
+    something is wrong with your Lint configuration
+
+--- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.cpp (C++)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoProcessingException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherDescription.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCiphers.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockSizes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Digests.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IVSizes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IByteStream.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CryptoProcessingException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IByteStream.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoProcessingException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SeekOrigin.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\PaddingModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RoundCounts.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Event.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#define LISTENER(thisType, handler, type)                \
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(11): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-4, Function-like macro defined: 'LISTENER' )
+    class __L##handler##__ : public Delegate< (type) >    \
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(12): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(12): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-3-1, Multiple use of '#/##' operators in definition of macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(12): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+            __L##handler##__ ( (thisType) * obj )        \
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(15): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-3-1, Multiple use of '#/##' operators in definition of macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(15): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(15): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-3-1, Multiple use of '#/##' operators in definition of macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(15): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+    __L##handler##__ L##handler;
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(23): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-3-1, Multiple use of '#/##' operators in definition of macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(23): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(23): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-3-1, Multiple use of '#/##' operators in definition of macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(23): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(23): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-3-1, Multiple use of '#/##' operators in definition of macro: 'LISTENER' )
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Delegate.h(23): error 1963: (Note -- Violates MISRA C++ 2008 Advisory Rule 16-3-2, '#/##' operator used in macro: 'LISTENER' )
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "BlockCiphers.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h(23): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCiphers.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoSymmetricCipherException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IDigest.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoDigestException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "Digests.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IDigest.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Digests.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelOptions.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuCores.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SimdProfiles.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CryptoProcessingException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoProcessingException.h')
+#include "MemoryStream.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemoryStream.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h(27): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h')
+#include "IByteStream.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.h(33): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IByteStream.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "BlockCiphers.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h(23): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCiphers.h')
+#include "CipherModes.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h(24): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModes.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoCipherModeException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "IBlockCipher.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h(26): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h')
+#include "ParallelOptions.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h(27): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelOptions.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h(28): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IPadding.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoPaddingException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "PaddingModes.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IPadding.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\PaddingModes.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IStreamCipher.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CryptoSymmetricCipherException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IStreamCipher.h(23): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoSymmetricCipherException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IntUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "ISymmetricKey.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IStreamCipher.h(25): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h')
+#include "ParallelOptions.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IStreamCipher.h(26): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelOptions.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamCiphers.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IStreamCipher.h(29): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h')
+#include "ParallelOptions.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.h(37): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelOptions.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.h(38): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricEngines.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCipherFromName.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "IBlockCipher.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCipherFromName.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModeFromName.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "BlockCiphers.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModeFromName.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCiphers.h')
+#include "CryptoException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModeFromName.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoException.h')
+#include "ICipherMode.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherModeFromName.h(7): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ICipherMode.h')
+#include "MemUtils.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.cpp(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\PaddingFromName.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CryptoException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\PaddingFromName.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoException.h')
+#include "IPadding.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\PaddingFromName.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IPadding.h')
+#include "ParallelUtils.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.cpp(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelUtils.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamCipherFromName.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
+#include "CryptoException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamCipherFromName.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoException.h')
+#include "IStreamCipher.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamCipherFromName.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IStreamCipher.h')
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CipherStream.cpp(644): error 10: (Error -- Expecting '}')
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits(14): error 96: (Error -- Unmatched left brace for namespace std on line 14, file C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits)
+
+--- Global Wrap-up
+
+ error 974: (Note -- Worst case function for stack usage: 'div' is finite, requires 16 bytes total stack in calling 'no function'. See +stack for a full report. [MISRA C++ Rule 7-5-4])
+ error 900: (Note -- Successful completion, 86 messages produced)

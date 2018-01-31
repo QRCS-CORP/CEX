@@ -88,6 +88,7 @@ uint ACP::Next()
 {
 	uint num;
 	std::vector<byte> rnd(sizeof(uint));
+
 	GetBytes(rnd);
 	Utility::MemUtils::CopyToValue(rnd, 0, num, sizeof(uint));
 

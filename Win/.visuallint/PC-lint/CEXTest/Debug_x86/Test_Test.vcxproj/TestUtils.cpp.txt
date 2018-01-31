@@ -1,0 +1,83 @@
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+    '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
+    output'; receiving a syntax error in a library file most likely means
+    something is wrong with your Lint configuration
+
+--- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp (C++)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoRandomException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Providers.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CryptoRandomException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SecureRandom.h(30): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoRandomException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Drbgs.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IDigest.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoDigestException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Digests.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ParallelOptions.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CpuCores.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SimdProfiles.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IntUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\MemUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IPrng.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CryptoRandomException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IPrng.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoRandomException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Prngs.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "MemUtils.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SecureRandom.h(35): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\MemUtils.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ISymmetricKey.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoProcessingException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IByteStream.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CryptoProcessingException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IByteStream.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoProcessingException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SeekOrigin.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\StreamModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SymmetricKeySize.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+                printf("0x%02X, ", Data[i]);
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.h(109): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+#define _CEXENGINE_TESTEXCEPTION_H
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestException.h(2): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 17-0-2, Re-use of C++ identifier pattern: _CEXENGINE_TESTEXCEPTION_H)
+#endif
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestException.h(70): error 783: (Info -- Line does not end with new-line)
+#include "../CEX/CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(3): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "IProvider.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CSP.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IProvider.h')
+#define    ex(x) (((x) < -BIGX) ? 0.0 : exp(x))
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(18): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-4, Function-like macro defined: 'ex' )
+}
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(304): error 783: (Info -- Line does not end with new-line)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(305): error 10: (Error -- Expecting '}')
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits(14): error 96: (Error -- Unmatched left brace for namespace std on line 14, file C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits)
+
+    --- Wrap-up for Module: C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp
+
+}
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(305): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestException.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp')
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(305): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CSP.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp')
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp(305): error 766: (Info -- Header file 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\fstream' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.cpp')
+
+--- Global Wrap-up
+
+ error 974: (Note -- Worst case function for stack usage: 'div' is finite, requires 16 bytes total stack in calling 'no function'. See +stack for a full report. [MISRA C++ Rule 7-5-4])
+ error 900: (Note -- Successful completion, 38 messages produced)

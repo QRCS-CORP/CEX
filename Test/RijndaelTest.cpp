@@ -83,6 +83,8 @@ namespace Test
 
 	void RijndaelTest::Initialize()
 	{
+		/*lint -save -e122 */
+		/*lint -save -e417 */
 		const std::vector<std::string> keys =
 		{
 			std::string("80000000000000000000000000000000"),
@@ -109,6 +111,7 @@ namespace Test
 			std::string("DDC6BF790C15760D8D9AEB6F9A75FD4E")
 		};
 		HexConverter::Decode(cipherText, 4, m_cipherText);
+		/*lint -restore */
 	}
 
 	void RijndaelTest::OnProgress(std::string Data)

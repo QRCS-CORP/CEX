@@ -210,7 +210,7 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 void CMAC::Reset()
 {
 	// reinitialize the cbc iv
-	Utility::MemUtils::Clear(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode.get())->Nonce(), 0, BLOCK_SIZE);
+	Utility::MemUtils::Clear(static_cast<Cipher::Symmetric::Block::Mode::CBC*>(m_cipherMode.get())->IV(), 0, BLOCK_SIZE);
 	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
 	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;

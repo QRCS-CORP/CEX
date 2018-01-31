@@ -64,6 +64,19 @@
 
 // TRAJECTORY
 //
+// ### SCHEDULE FOR 1.0.0.5 RELEASE ###
+// ## ETA is February 14, 2018 ##
+// Full Misra C++ 2014 compliance
+// Add ModuleLWE
+// Add modular asymmetric key generation/authentication framework (IAuthenticator)
+// Add asymmetric Encapsulate/Decapsulate api
+// Changes to asymmetric Initialize (IAsymmetricKey)
+// Add SHAKE KDF
+// Add cSHAKE DRBG
+// Add KMAC
+// Rewrite ACP/ECP
+// Integrate SHAKE option into symmetric cipher extended modes
+//
 // ### SCHEDULE FOR 1.0.0.4 RELEASE ###
 // ## ETA is December 14, 2017 ##
 // Complete performance optimizations on all classes
@@ -231,7 +244,6 @@
 #include "../Test/MacStreamTest.h"
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
-#include "../Test/ModuleLWETest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
@@ -247,6 +259,7 @@
 #include "../Test/Sha2Test.h"
 #include "../Test/SimdSpeedTest.h"
 #include "../Test/SimdWrapperTest.h"
+#include "../Test/SHAKETest.h"
 #include "../Test/SkeinTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
@@ -324,7 +337,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.4 (A4)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      December 27, 2017               *");
+	ConsoleUtils::WriteLine("* Date:      January 31, 2017                *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -431,7 +444,7 @@ int main()
 		return 0;
 	}
 
-#if (!defined(_M_X64) && !defined(__x86_64__)) && ((defined(__AVX__) || defined(__AVX2__)) && !defined(_DEBUG))
+#if ((!defined(_M_X64)) && (!defined(__x86_64__))) && ((defined(__AVX__) || defined(__AVX2__)) && (!defined(_DEBUG)))
 	if (is64 || isx86emu)
 	{
 		PrintHeader("Warning! Compiling x86/Release on a 64bit system using AVX/AVX2 will cause memory alignment errors.", "");
@@ -540,6 +553,7 @@ int main()
 			RunTest(new KDF2Test());
 			RunTest(new PBKDF2Test());
 			RunTest(new SCRYPTTest());
+			RunTest(new SHAKETest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new CMGTest());
 			RunTest(new DCGTest());

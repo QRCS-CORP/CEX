@@ -8,18 +8,18 @@ NAMESPACE_ROUTING
 /// <summary>
 /// The Delegate Listener interface definition
 /// </summary>
-#define LISTENER(thisType, handler, type)\
-    class __L##handler##__ : public Delegate< type >\
-    {\
-        public:\
-            __L##handler##__ ( thisType * obj )\
-            : _obj(obj) {}\
-            inline void operator()( type param )\
-            {\
-                _obj-> handler (param);\
-            }\
-            thisType * _obj;\
-    };\
+#define LISTENER(thisType, handler, type)				\
+    class __L##handler##__ : public Delegate< (type) >	\
+    {													\
+        public:											\
+            __L##handler##__ ( (thisType) * obj )		\
+            : _obj(obj) {}								\
+            inline void operator()( (type) param )		\
+            {											\
+                _obj-> (handler) (param);				\
+            }											\
+            (thisType) * _obj;							\
+    };													\
     __L##handler##__ L##handler;
 
 /// <summary>

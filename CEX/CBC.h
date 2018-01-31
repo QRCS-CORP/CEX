@@ -200,7 +200,7 @@ public:
 	/// <summary>
 	/// Read Only: The CBC initialization vector (exposed for CMAC)
 	/// </summary>
-	std::vector<byte> &Nonce();
+	std::vector<byte> &IV();
 
 	/// <summary>
 	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.

@@ -345,6 +345,7 @@ namespace Test
 
 	void AEADTest::Initialize()
 	{
+		/*lint -save -e417 */
 		const std::vector<std::string> key =
 		{
 			// eax
@@ -656,6 +657,7 @@ namespace Test
 			std::string("A44A8266EE1C8EB0C8B5D4CF5AE9F19A")
 		};
 		HexConverter::Decode(code, 44, m_expectedCode);
+		/*lint -restore */
 	}
 
 	void AEADTest::OnProgress(std::string Data)

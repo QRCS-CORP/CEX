@@ -114,7 +114,7 @@ const std::vector<SymmetricKeySize> &CBC::LegalKeySizes()
 	return m_blockCipher->LegalKeySizes();
 }
 
-std::vector<byte> &CBC::Nonce()
+std::vector<byte> &CBC::IV()
 { 
 	return m_cbcVector; 
 }

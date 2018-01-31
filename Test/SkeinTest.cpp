@@ -170,6 +170,7 @@ namespace Test
 
 	void SkeinTest::Initialize()
 	{
+		/*lint -save -e146 */
 		const std::vector<std::string> message256 =
 		{
 			std::string("FF"),
@@ -217,6 +218,7 @@ namespace Test
 			std::string("842A53C99C12B0CF80CF69491BE5E2F7515DE8733B6EA9422DFD676665B5FA42FFB3A9C48C217777950848CECDB48F640F81FB92BEF6F88F7A85C1F7CD1446C9161C0AFE8F25AE444F40D3680081C35AA43F640FD5FA3C3C030BCC06ABAC01D098BCC984EBD8322712921E00B1BA07D6D01F26907050255EF2C8E24F716C52A5")
 		};
 		HexConverter::Decode(expected1024, 3, m_expected1024);
+		/*lint -restore */
 	}
 
 	void SkeinTest::TreeParamsTest()

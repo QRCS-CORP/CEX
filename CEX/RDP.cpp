@@ -24,19 +24,19 @@ RDP::~RDP()
 
 //~~~Accessors~~~//
 
-const Enumeration::Providers RDP::Enumeral() 
-{ 
-	return Enumeration::Providers::RDP; 
+const Enumeration::Providers RDP::Enumeral()
+{
+	return Enumeration::Providers::RDP;
 }
 
-const bool RDP::IsAvailable() 
+const bool RDP::IsAvailable()
 {
 	return m_engineType != RdEngines::None;
 }
 
-const std::string RDP::Name() 
-{ 
-	return CLASS_NAME; 
+const std::string RDP::Name()
+{
+	return CLASS_NAME;
 }
 
 //~~~Public Functions~~~//
@@ -92,12 +92,13 @@ void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 		else
 		{
 			++failCtr;
+
 			if ((m_engineType == RdEngines::RdRand && failCtr >= RDR_RETRY) || failCtr >= RDS_RETRY)
 			{
 				throw CryptoRandomException("RDP:GetBytes", "Exceeded the maximum number of retries!");
 			}
 		}
-	} 
+	}
 }
 
 void RDP::GetBytes(std::vector<byte> &Output)

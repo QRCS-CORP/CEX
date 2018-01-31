@@ -5,9 +5,10 @@
 
 NAMESPACE_MAC
 
-/**
-* \internal
-*/
+/// 
+/// internal
+/// 
+
 /// <summary>
 /// Instantiate the GHASH class; this is an *internal class* used by GMAC and GCM mode
 /// </summary>

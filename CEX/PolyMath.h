@@ -31,9 +31,9 @@
 
 NAMESPACE_UTILITY
 
-/**
-* \internal
-*/
+/// 
+/// internal
+/// 
 
 /// <summary>
 /// Internal class used by RingLWE

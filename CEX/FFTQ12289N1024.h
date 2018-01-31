@@ -24,9 +24,9 @@
 
 NAMESPACE_RINGLWE
 
-/**
-* \internal
-*/
+/// 
+/// internal
+/// 
 
 /// <summary>
 /// The RingLWE FFT using a modulus of 12289 with 1024 coefficients
@@ -161,7 +161,10 @@ private:
 	{
 		const Vector NQ(Q);
 		const Vector N1(1);
-		Vector xit, tmpT, tmpR, tmpB;
+		Vector xit;
+		Vector tmpT;
+		Vector tmpR;
+		Vector tmpB;
 
 		tmpB = X * Vector(2730);
 		tmpT = tmpB >> 25;
@@ -187,7 +190,9 @@ private:
 	template <typename Vector>
 	inline static Vector Decode(Vector &X, const int Q)
 	{
-		Vector tmpT, tmpC, tmpB;
+		Vector tmpT;
+		Vector tmpC;
+		Vector tmpB;
 
 		tmpB = X * Vector(2730);
 		tmpT = tmpB >> 27;
@@ -245,7 +250,11 @@ private:
 	template <typename Array>
 	inline static void InvNTT(Array &R)
 	{
-		size_t dist, i, j, jt, k;
+		size_t dist;
+		size_t i;
+		size_t j;
+		size_t jt;
+		size_t k;
 
 		for (i = 0; i < 10; i += 2)
 		{
@@ -279,7 +288,9 @@ private:
 	template <typename Vector, typename ArrayA, typename ArrayB>
 	inline static void GetNoise(ArrayA &R, ArrayB &Random, int Q)
 	{
-		Vector tmpA, tmpB, tmpR;
+		Vector tmpA;
+		Vector tmpB;
+		Vector tmpR;
 		const Vector AIBMASK(0x01010101);
 		const Vector BITMASK(0xFF);
 
@@ -333,10 +344,16 @@ private:
 		const Vector N4(4);
 		const Vector N8(8);
 		const size_t ULVSZE = Vector::size() / sizeof(uint);
-
-		Vector tmpK, tmpR;
-		Vector c0, c1, c2, c3;
-		Vector t0, t1, t2, t3;
+		Vector tmpK;
+		Vector tmpR;
+		Vector c0;
+		Vector c1;
+		Vector c2;
+		Vector c3;
+		Vector t0;
+		Vector t1;
+		Vector t2;
+		Vector t3;
 		std::array<Vector, 4> v0;
 		std::array<Vector, 4> v1;
 		std::array<Vector, 4> tmpV;
@@ -395,7 +412,8 @@ private:
 		std::array<int, 4> v0;
 		std::array<int, 4> v1;
 		std::array<uint, 4> tmpV;
-		int k, x;
+		int k;
+		int x;
 		byte rbit;
 
 		for (size_t i = 0; i < V.size() / 4; i++)
@@ -499,9 +517,14 @@ private:
 		const Vector N8(8);
 		const Vector N16(16);
 		const size_t ULVSZE = Vector::size() / sizeof(uint);
-
-		Vector c0, c1, c2, c3;
-		Vector v0, v1, v2, v3;
+		Vector c0;
+		Vector c1;
+		Vector c2;
+		Vector c3;
+		Vector v0;
+		Vector v1;
+		Vector v2;
+		Vector v3;
 		std::array<Vector, 4> tmpV;
 		std::vector<uint> tmpK(ULVSZE);
 

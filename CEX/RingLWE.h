@@ -112,7 +112,7 @@ private:
 
 	static const std::string CLASS_NAME;
 
-	std::unique_ptr<IAeadMode> m_cprMode;
+	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -120,7 +120,6 @@ private:
 	bool m_isParallel;
 	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::vector<byte> m_keyTag;
-	std::unique_ptr<IDigest> m_msgDigest;
 	RLWEParamSet m_paramSet;
 	std::unique_ptr<RLWEPrivateKey> m_privateKey;
 	std::unique_ptr<RLWEPublicKey> m_publicKey;
@@ -159,16 +158,16 @@ public:
 	explicit RingLWE(RLWEParams Parameters, Prngs PrngType = Prngs::BCR, BlockCiphers CipherType = BlockCiphers::Rijndael, bool Parallel = false);
 
 	/// <summary>
-	/// Constructor: instantiate this class using external Prng and Digest instances
+	/// Constructor: instantiate this class using an external Prng instance
 	/// </summary>
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
-	/// <param name="Cipher">A pointer to the authentication block cipher</param>
+	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
-	RingLWE(RLWEParams Parameters, IPrng* Prng, IBlockCipher* Cipher, bool Parallel = false);
+	RingLWE(RLWEParams Parameters, IPrng* Prng, BlockCiphers CipherType = BlockCiphers::Rijndael, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class

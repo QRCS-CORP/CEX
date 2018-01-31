@@ -11,14 +11,14 @@ using Utility::IntUtils;
 
 const std::vector<ulong> BCIV = 
 { 
-	0x6A09E667F3BCC908UL, 
-	0xBB67AE8584CAA73BUL, 
-	0x3C6EF372FE94F82BUL, 
-	0xA54FF53A5F1D36F1UL, 
-	0x510E527FADE682D1UL,
-	0x9B05688C2B3E6C1FUL, 
-	0x1F83D9ABFB41BD6BUL, 
-	0x5BE0CD19137E2179UL 
+	0x6A09E667F3BCC908ULL, 
+	0xBB67AE8584CAA73BULL, 
+	0x3C6EF372FE94F82BULL, 
+	0xA54FF53A5F1D36F1ULL, 
+	0x510E527FADE682D1ULL,
+	0x9B05688C2B3E6C1FULL, 
+	0x1F83D9ABFB41BD6BULL, 
+	0x5BE0CD19137E2179ULL 
 };
 
 const std::string Blake512::CLASS_NAME("Blake512");
@@ -202,7 +202,7 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		}
 
 		std::vector<byte> padLen(m_treeParams.FanOut(), BLOCK_SIZE);
-		ulong prtBlk = ULL_MAX;
+		ulong prtBlk = 0xFFFFFFFFFFFFFFFFULL;
 
 		// process unaligned blocks
 		if (m_msgLength > m_parallelProfile.ParallelMinimumSize())
@@ -231,13 +231,13 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			// apply f0 bit reversal constant to final blocks
-			m_dgtState[i].F[0] = ULL_MAX;
+			m_dgtState[i].F[0] = 0xFFFFFFFFFFFFFFFFULL;
 			size_t blkLen = BLOCK_SIZE;
 
 			// f1 constant on last block
 			if (i == m_treeParams.FanOut() - 1)
 			{
-				m_dgtState[i].F[1] = ULL_MAX;
+				m_dgtState[i].F[1] = 0xFFFFFFFFFFFFFFFFULL;
 			}
 
 			if (i == prtBlk)
@@ -283,8 +283,8 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		}
 
 		// apply f0 and f1 flags
-		m_dgtState[0].F[0] = ULL_MAX;
-		m_dgtState[0].F[1] = ULL_MAX;
+		m_dgtState[0].F[0] = 0xFFFFFFFFFFFFFFFFULL;
+		m_dgtState[0].F[1] = 0xFFFFFFFFFFFFFFFFULL;
 		// last compression
 		Compress(m_msgBuffer, m_msgLength - BLOCK_SIZE, m_dgtState[0], BLOCK_SIZE);
 		// output the code
@@ -298,7 +298,7 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, padLen);
 		}
 
-		m_dgtState[0].F[0] = ULL_MAX;
+		m_dgtState[0].F[0] = 0xFFFFFFFFFFFFFFFFULL;
 		Compress(m_msgBuffer, 0, m_dgtState[0], m_msgLength);
 		IntUtils::LeULL512ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}

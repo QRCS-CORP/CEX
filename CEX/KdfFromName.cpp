@@ -40,9 +40,24 @@ IKdf* KdfFromName::GetInstance(Kdfs KdfType, Digests DigestType)
 				kdfPtr = new Kdf::SCRYPT(DigestType);
 				break;
 			}
-			case Kdfs::SHAKE:
+			case Kdfs::SHAKE128:
+			{
+				kdfPtr = new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE128);
+				break;
+			}
+			case Kdfs::SHAKE256:
 			{
 				kdfPtr = new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE256);
+				break;
+			}
+			case Kdfs::SHAKE512:
+			{
+				kdfPtr = new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE512);
+				break;
+			}
+			case Kdfs::SHAKE1024:
+			{
+				kdfPtr = new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE1024);
 				break;
 			}
 			default:

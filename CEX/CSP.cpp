@@ -73,7 +73,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 #if defined(CEX_OS_WINDOWS)
 
 	HCRYPTPROV hProvider = NULL;
-	if (!::CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
+	if (!::CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
 	{
 		throw CryptoRandomException("CSP:GetBytes", "Call to CryptAcquireContext failed; random provider is not available!");
 	}

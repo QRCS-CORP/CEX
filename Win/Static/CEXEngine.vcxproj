@@ -305,11 +305,14 @@
     <ClInclude Include="..\..\CEX\RLWEParamSet.h" />
     <ClInclude Include="..\..\CEX\RLWEPrivateKey.h" />
     <ClInclude Include="..\..\CEX\RLWEPublicKey.h" />
+    <ClInclude Include="..\..\CEX\SCRYPT.h" />
     <ClInclude Include="..\..\CEX\SecureStream.h" />
     <ClInclude Include="..\..\CEX\SHA2.h" />
     <ClInclude Include="..\..\CEX\SHA256.h" />
     <ClInclude Include="..\..\CEX\SHA2Params.h" />
     <ClInclude Include="..\..\CEX\SHA512.h" />
+    <ClInclude Include="..\..\CEX\SHAKE.h" />
+    <ClInclude Include="..\..\CEX\SHAKE2.h" />
     <ClInclude Include="..\..\CEX\ShakeModes.h" />
     <ClInclude Include="..\..\CEX\SimdProfiles.h" />
     <ClInclude Include="..\..\CEX\Skein1024.h" />
@@ -459,6 +462,7 @@
     <ClCompile Include="..\..\CEX\SHA256.cpp" />
     <ClCompile Include="..\..\CEX\SHA2Params.cpp" />
     <ClCompile Include="..\..\CEX\SHA512.cpp" />
+    <ClCompile Include="..\..\CEX\SHAKE.cpp" />
     <ClCompile Include="..\..\CEX\Skein1024.cpp" />
     <ClCompile Include="..\..\CEX\Skein256.cpp" />
     <ClCompile Include="..\..\CEX\Skein512.cpp" />

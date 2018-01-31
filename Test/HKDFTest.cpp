@@ -75,6 +75,9 @@ namespace Test
 
 	void HKDFTest::Initialize()
 	{
+		/*lint -save -e122 */
+		/*lint -save -e146 */
+		/*lint -save -e417 */
 		const std::vector<std::string> keys =
 		{
 			std::string("0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B"),
@@ -105,6 +108,7 @@ namespace Test
 			std::string("8DA4E775A563C18F715F802A063C5A31B8A11F5C5EE1879EC3454E5F3C738D2D9D201395FAA4B61A96C8")
 		};
 		HexConverter::Decode(output, 3, m_output);
+		/*lint -restore */
 	}
 
 	void HKDFTest::OnProgress(std::string Data)

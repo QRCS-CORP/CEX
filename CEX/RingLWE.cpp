@@ -2,10 +2,9 @@
 #include "FFTQ12289N1024.h"
 #include "GCM.h"
 #include "IntUtils.h"
-#include "Keccak512.h"
-#include "Keccak1024.h"
 #include "MemUtils.h"
 #include "PrngFromName.h"
+#include "SHAKE.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_RINGLWE
@@ -16,15 +15,14 @@ const std::string RingLWE::CLASS_NAME = "RingLWE";
 
 RingLWE::RingLWE(RLWEParams Parameters, Prngs PrngType, BlockCiphers CipherType, bool Parallel)
 	:
-	m_cprMode(CipherType != BlockCiphers::None ? new Symmetric::Block::Mode::GCM(CipherType) :
+	m_cipherType(CipherType != BlockCiphers::None ? CipherType :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The cipher type can not be none!")),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_keyTag(0),
 	m_isParallel(Parallel),
-	m_msgDigest(static_cast<byte>(CipherType) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
+	m_keyTag(0),
 	m_paramSet(),
 	m_rlweParameters(Parameters != RLWEParams::None ? Parameters :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
@@ -34,28 +32,22 @@ RingLWE::RingLWE(RLWEParams Parameters, Prngs PrngType, BlockCiphers CipherType,
 	Scope();
 }
 
-RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng, IBlockCipher* Cipher, bool Parallel)
+RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng, BlockCiphers CipherType, bool Parallel)
 	:
-	m_cprMode(Cipher != nullptr ? new Symmetric::Block::Mode::GCM(Cipher) : 
-		throw CryptoAsymmetricException("RingLWE:CTor", "The block cipher can not be null!")),
+	m_cipherType(CipherType != BlockCiphers::None ? CipherType :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The cipher type can not be none!")),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_isParallel(Parallel),
 	m_keyTag(0),
-	m_msgDigest(static_cast<byte>(Cipher->Enumeral()) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
 	m_paramSet(),
 	m_rlweParameters(Parameters != RLWEParams::None ? Parameters :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The prng can not be null!"))
 {
-	if (Cipher->KdfEngine() == Digests::Keccak256 || Cipher->KdfEngine() == Digests::Keccak1024 || Cipher->KdfEngine() == Digests::Skein1024)
-	{
-		throw CryptoAsymmetricException("RingLWE:CTor", "Keccak256, Keccak1024, and Skein1024 are not supported HX cipher kdf engines!");
-	}
-
 	Scope();
 }
 
@@ -64,6 +56,7 @@ RingLWE::~RingLWE()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_isParallel = false;
@@ -79,16 +72,6 @@ RingLWE::~RingLWE()
 		if (m_publicKey != nullptr)
 		{
 			m_publicKey.release();
-		}
-		// destroy the persistant hash function
-		if (m_msgDigest != nullptr)
-		{
-			m_msgDigest.reset(nullptr);
-		}
-		// destroy the mode
-		if (m_cprMode != nullptr)
-		{
-			m_cprMode.reset(nullptr);
 		}
 
 		if (m_destroyEngine)
@@ -265,76 +248,67 @@ void RingLWE::Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair)
 
 bool RingLWE::RLWEDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message, std::vector<byte> &Secret)
 {
-	Key::Symmetric::SymmetricKeySize keySizes;
 	bool status;
 
-	if (static_cast<byte>(m_cprMode->Engine()->Enumeral()) < static_cast<byte>(BlockCiphers::AHX))
-	{
-		keySizes = m_cprMode->LegalKeySizes()[2];
-	}
-	else
-	{
-		keySizes = m_cprMode->LegalKeySizes()[1];
-	}
+	const size_t KEYSZE = static_cast<byte>(m_cipherType) < static_cast<byte>(BlockCiphers::AHX) ? 32 : 64;
+	const size_t NNCSZE = 16;
+	const size_t TAGSZE = 16;
 
-	// hash the ringlwe secret to create intermediate key
-	m_msgDigest->Update(Secret, 0, Secret.size());
-	Secret.resize(m_msgDigest->DigestSize());
-	m_msgDigest->Finalize(Secret, 0);
+	size_t seedLen = KEYSZE + NNCSZE + TAGSZE;
+	// seed SHAKE with the ringlwe secret, use it to create GCM key
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(Secret);
+	std::vector<byte> seed(seedLen);
+	gen.Generate(seed);
 
 	// HX ciphers get keccak1024 and 512 bits of key, standard 256 bit key
-	Message.resize(CipherText.size() - (FFTQ12289N1024::SENDB_BYTES + keySizes.InfoSize()));
-	std::vector<byte> key(keySizes.KeySize());
-	std::memcpy(&key[0], &Secret[0], key.size());
-	std::vector<byte> nonce(keySizes.NonceSize());
-	std::memcpy(&nonce[0], &Secret[key.size()], keySizes.NonceSize());
-	std::vector<byte> tag(keySizes.InfoSize());
-	std::memcpy(&tag[0], &Secret[key.size() + keySizes.NonceSize()], keySizes.InfoSize());
+	Message.resize(CipherText.size() - (FFTQ12289N1024::SENDB_BYTES + TAGSZE));
+	std::vector<byte> key(KEYSZE);
+	std::memcpy(&key[0], &seed[0], key.size());
+	std::vector<byte> nonce(NNCSZE);
+	std::memcpy(&nonce[0], &seed[key.size()], nonce.size());
+	std::vector<byte> tag(TAGSZE);
+	std::memcpy(&tag[0], &seed[key.size() + nonce.size()], tag.size());
 
 	// decrypt the message and authenticate
 	Key::Symmetric::SymmetricKey kp(key, nonce, tag);
-	m_cprMode->Initialize(false, kp);
-	m_cprMode->Transform(CipherText, CipherText.size() - (Message.size() + keySizes.InfoSize()), Message, 0, Message.size());
+	Cipher::Symmetric::Block::Mode::GCM cpr(m_cipherType);
+	cpr.Initialize(false, kp);
+	cpr.Transform(CipherText, CipherText.size() - (Message.size() + TAGSZE), Message, 0, Message.size());
 
-	status = (m_cprMode->Verify(CipherText, CipherText.size() - keySizes.InfoSize(), keySizes.InfoSize()));
+	status = (cpr.Verify(CipherText, CipherText.size() - TAGSZE, TAGSZE));
 
 	return status;
 }
 
 void RingLWE::RLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, std::vector<byte> &Secret)
 {
-	Key::Symmetric::SymmetricKeySize keySizes;
+	const size_t KEYSZE = static_cast<byte>(m_cipherType) < static_cast<byte>(BlockCiphers::AHX) ? 32 : 64;
+	const size_t NNCSZE = 16;
+	const size_t TAGSZE = 16;
 
-	if (static_cast<byte>(m_cprMode->Engine()->Enumeral()) < static_cast<byte>(BlockCiphers::AHX))
-	{
-		// standard ciphers use keccak512 key compression and a 256bit key
-		keySizes = m_cprMode->LegalKeySizes()[2];
-	}
-	else
-	{
-		// HX ciphers use keccak1024 and a 512bit key
-		keySizes = m_cprMode->LegalKeySizes()[1];
-	}
-
-	// hash the ringlwe secret to create intermediate key
-	m_msgDigest->Update(Secret, 0, Secret.size());
-	Secret.resize(m_msgDigest->DigestSize());
-	m_msgDigest->Finalize(Secret, 0);
+	// use the ringlwe secret to create intermediate key using SHAKE-256
+	size_t seedLen = KEYSZE + NNCSZE + TAGSZE;
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(Secret);
+	std::vector<byte> seed(seedLen);
+	gen.Generate(seed);
 
 	// load the key
-	std::vector<byte> key(keySizes.KeySize());
-	std::memcpy(&key[0], &Secret[0], key.size());
-	std::vector<byte> nonce(keySizes.NonceSize());
-	std::memcpy(&nonce[0], &Secret[key.size()], keySizes.NonceSize());
-	std::vector<byte> tag(keySizes.InfoSize());
-	std::memcpy(&tag[0], &Secret[key.size() + keySizes.NonceSize()], keySizes.InfoSize());
+	std::vector<byte> key(KEYSZE);
+	std::memcpy(&key[0], &seed[0], key.size());
+	std::vector<byte> nonce(NNCSZE);
+	std::memcpy(&nonce[0], &seed[key.size()], nonce.size());
+	std::vector<byte> tag(TAGSZE);
+	std::memcpy(&tag[0], &seed[key.size() + nonce.size()], tag.size());
 
 	// encrypt the message, add it to the ciphertext with the auth-code
-	CipherText.resize(FFTQ12289N1024::SENDB_BYTES + Message.size() + keySizes.InfoSize());
+	CipherText.resize(FFTQ12289N1024::SENDB_BYTES + Message.size() + TAGSZE);
 	Key::Symmetric::SymmetricKey kp(key, nonce, tag);
-	m_cprMode->Initialize(true, kp);
-	m_cprMode->Transform(Message, 0, CipherText, CipherText.size() - (Message.size() + keySizes.InfoSize()), Message.size());
-	m_cprMode->Finalize(CipherText, CipherText.size() - keySizes.InfoSize(), keySizes.InfoSize());
+	Cipher::Symmetric::Block::Mode::GCM cpr(m_cipherType);
+	cpr.Initialize(true, kp);
+	cpr.Transform(Message, 0, CipherText, CipherText.size() - (Message.size() + TAGSZE), Message.size());
+	cpr.Finalize(CipherText, CipherText.size() - TAGSZE, TAGSZE);
 }
 
 void RingLWE::Scope()

@@ -563,7 +563,7 @@ ulong SysUtils::TimeSinceBoot()
 
 	try
 	{
-		std::chrono::milliseconds uptime(0u);
+		std::chrono::milliseconds uptime(0U);
 		struct timespec ts;
 		if (clock_gettime(CLOCK_UPTIME_PRECISE, &ts) == 0)
 		{

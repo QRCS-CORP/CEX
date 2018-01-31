@@ -2,10 +2,9 @@
 #include "FFTM12T62.h"
 #include "GCM.h"
 #include "IntUtils.h"
-#include "Keccak512.h"
-#include "Keccak1024.h"
 #include "MemUtils.h"
 #include "PrngFromName.h"
+#include "SHAKE.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MCELIECE
@@ -16,8 +15,8 @@ const std::string McEliece::CLASS_NAME = "McEliece";
 
 McEliece::McEliece(MPKCParams Parameters, Prngs PrngType, BlockCiphers CipherType)
 	:
-	m_cprMode(CipherType != BlockCiphers::None ? new Symmetric::Block::Mode::GCM(CipherType) : 
-		throw CryptoAsymmetricException("McEliece:CTor", "The cipher type can not be none!")),
+	m_cipherType(CipherType != BlockCiphers::None ? CipherType :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The cipher type can not be none!")),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -25,7 +24,6 @@ McEliece::McEliece(MPKCParams Parameters, Prngs PrngType, BlockCiphers CipherTyp
 	m_keyTag(0),
 	m_mpkcParameters(Parameters != MPKCParams::None ? Parameters : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
-	m_msgDigest(static_cast<byte>(CipherType) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
 	m_paramSet(),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The prng type can not be none!"))
@@ -33,10 +31,10 @@ McEliece::McEliece(MPKCParams Parameters, Prngs PrngType, BlockCiphers CipherTyp
 	Scope();
 }
 
-McEliece::McEliece(MPKCParams Parameters, IPrng* Prng, IBlockCipher* Cipher)
+McEliece::McEliece(MPKCParams Parameters, IPrng* Prng, BlockCiphers CipherType)
 	:
-	m_cprMode(Cipher != nullptr ? new Symmetric::Block::Mode::GCM(Cipher) : 
-		throw CryptoAsymmetricException("McEliece:CTor", "The block cipher can not be null!")),
+	m_cipherType(CipherType != BlockCiphers::None ? CipherType :
+		throw CryptoAsymmetricException("RingLWE:CTor", "The cipher type can not be none!")),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isEncryption(false),
@@ -44,16 +42,10 @@ McEliece::McEliece(MPKCParams Parameters, IPrng* Prng, IBlockCipher* Cipher)
 	m_keyTag(0),
 	m_mpkcParameters(Parameters != MPKCParams::None ? Parameters : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
-	m_msgDigest(static_cast<byte>(Cipher->Enumeral()) > static_cast<byte>(BlockCiphers::Twofish) ? (IDigest*)new Digest::Keccak1024() : (IDigest*)new Digest::Keccak512()),
 	m_paramSet(),
 	m_rndGenerator(Prng != nullptr ? Prng : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The prng can not be null!"))
 {
-	if (Cipher->KdfEngine() == Digests::Keccak256 || Cipher->KdfEngine() == Digests::Keccak1024 || Cipher->KdfEngine() == Digests::Skein1024)
-	{
-		throw CryptoAsymmetricException("McEliece:CTor", "Keccak256, Keccak1024, and Skein1024 are not supported HX cipher kdf engines!");
-	}
-
 	Scope();
 }
 
@@ -62,6 +54,7 @@ McEliece::~McEliece()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
+		m_cipherType = BlockCiphers::None;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_paramSet.Reset();
@@ -77,17 +70,6 @@ McEliece::~McEliece()
 		{
 			m_publicKey.release();
 		}
-		// destroy the persistant hash function
-		if (m_msgDigest != nullptr)
-		{
-			m_msgDigest.reset(nullptr);
-		}
-		// destroy the mode
-		if (m_cprMode != nullptr)
-		{
-			m_cprMode.reset(nullptr);
-		}
-
 		if (m_destroyEngine)
 		{
 			// destroy internally generated objects
@@ -255,24 +237,17 @@ void McEliece::Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair)
 
 bool McEliece::MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message)
 {
-	Key::Symmetric::SymmetricKeySize keySizes;
-	bool status;
-
-	if (static_cast<byte>(m_cprMode->Engine()->Enumeral()) > static_cast<byte>(BlockCiphers::Twofish))
-	{
-		keySizes = m_cprMode->LegalKeySizes()[1];
-	}
-	else
-	{
-		keySizes = m_cprMode->LegalKeySizes()[2];
-	}
+	const size_t KEYSZE = static_cast<byte>(m_cipherType) < static_cast<byte>(BlockCiphers::AHX) ? 32 : 64;
+	const size_t NNCSZE = 16;
+	const size_t TAGSZE = 16;
+	bool status = false;
 
 	std::vector<byte> e(static_cast<ulong>(1) << (m_paramSet.GF - 3));
 
 	// decrypt with McEliece, more fft configurations to be added
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		Message.resize(CipherText.size() - (FFTM12T62::SECRET_SIZE + keySizes.InfoSize()));
+		Message.resize(CipherText.size() - (FFTM12T62::SECRET_SIZE + TAGSZE));
 		status = (FFTM12T62::Decrypt(e, m_privateKey->S(), CipherText));
 	}
 	else
@@ -282,24 +257,27 @@ bool McEliece::MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte
 
 	if (status)
 	{
-		// get the intermediate (GCM) key
-		std::vector<byte> rnd(m_msgDigest->DigestSize());
-		m_msgDigest->Compute(e, rnd);
+		size_t seedLen = KEYSZE + NNCSZE + TAGSZE;
+		// seed SHAKE with e, use it to create GCM key
+		Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+		gen.Initialize(e);
+		std::vector<byte> seed(seedLen);
+		gen.Generate(seed);
 
-		// HX ciphers get keccak1024 and 512 bits of key, standard 256 bit key
-		std::vector<byte> key(keySizes.KeySize());
-		std::memcpy(&key[0], &rnd[0], key.size());
-		std::vector<byte> nonce(keySizes.NonceSize());
-		std::memcpy(&nonce[0], &rnd[key.size()], keySizes.NonceSize());
-		std::vector<byte> tag(keySizes.InfoSize());
-		std::memcpy(&tag[0], &rnd[key.size() + keySizes.NonceSize()], keySizes.InfoSize());
+		// HX ciphers get 512 bits of key, standard 256 bit key
+		std::vector<byte> key(KEYSZE);
+		std::memcpy(&key[0], &seed[0], key.size());
+		std::vector<byte> nonce(NNCSZE);
+		std::memcpy(&nonce[0], &seed[key.size()], nonce.size());
+		std::vector<byte> tag(TAGSZE);
+		std::memcpy(&tag[0], &seed[key.size() + nonce.size()], tag.size());
 
-		// decrypt the message and authenticate
+		// decrypt the message with GCM and authenticate
 		Key::Symmetric::SymmetricKey kp(key, nonce, tag);
-		m_cprMode->Initialize(false, kp);
-		m_cprMode->Transform(CipherText, CipherText.size() - (Message.size() + keySizes.InfoSize()), Message, 0, Message.size());
-
-		status = (m_cprMode->Verify(CipherText, CipherText.size() - keySizes.InfoSize(), keySizes.InfoSize()));
+		Cipher::Symmetric::Block::Mode::GCM cpr(m_cipherType);
+		cpr.Initialize(false, kp);
+		cpr.Transform(CipherText, CipherText.size() - (Message.size() + TAGSZE), Message, 0, Message.size());
+		status = cpr.Verify(CipherText, CipherText.size() - TAGSZE, TAGSZE);
 	}
 
 	return status;
@@ -307,25 +285,16 @@ bool McEliece::MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte
 
 void McEliece::MPKCEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText)
 {
-	Key::Symmetric::SymmetricKeySize keySizes;
-
-	if (static_cast<byte>(m_cprMode->Engine()->Enumeral()) < static_cast<byte>(BlockCiphers::AHX))
-	{
-		// standard ciphers use keccak512 compression and a 256bit key
-		keySizes = m_cprMode->LegalKeySizes()[2];
-	}
-	else
-	{
-		// HX ciphers use keccak1024 and a 512bit key
-		keySizes = m_cprMode->LegalKeySizes()[1];
-	}
+	const size_t KEYSZE = static_cast<byte>(m_cipherType) < static_cast<byte>(BlockCiphers::AHX) ? 32 : 64;
+	const size_t NNCSZE = 16;
+	const size_t TAGSZE = 16;
 
 	std::vector<byte> e(static_cast<ulong>(1) << (m_paramSet.GF - 3));
 
 	// encrypt with McEliece
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		CipherText.resize(FFTM12T62::SECRET_SIZE + Message.size() + keySizes.InfoSize());
+		CipherText.resize(FFTM12T62::SECRET_SIZE + Message.size() + TAGSZE);
 		FFTM12T62::Encrypt(CipherText, e, m_publicKey->P(), m_rndGenerator);
 	}
 	else
@@ -333,23 +302,27 @@ void McEliece::MPKCEncrypt(const std::vector<byte> &Message, std::vector<byte> &
 		throw CryptoAsymmetricException("McEliece:Encrypt", "The parameter type is invalid!");
 	}
 
-	// hash e
-	std::vector<byte> rnd(m_msgDigest->DigestSize());
-	m_msgDigest->Compute(e, rnd);
+	// use the ringlwe secret to create intermediate key using SHAKE-256
+	size_t seedLen = KEYSZE + NNCSZE + TAGSZE;
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(e);
+	std::vector<byte> seed(seedLen);
+	gen.Generate(seed);
 
-	// create the intermediate key from the output hash
-	std::vector<byte> key(keySizes.KeySize());
-	std::memcpy(&key[0], &rnd[0], key.size());
-	std::vector<byte> nonce(keySizes.NonceSize());
-	std::memcpy(&nonce[0], &rnd[key.size()], keySizes.NonceSize());
-	std::vector<byte> tag(keySizes.InfoSize());
-	std::memcpy(&tag[0], &rnd[key.size() + keySizes.NonceSize()], keySizes.InfoSize());
+	// load the key
+	std::vector<byte> key(KEYSZE);
+	std::memcpy(&key[0], &seed[0], key.size());
+	std::vector<byte> nonce(NNCSZE);
+	std::memcpy(&nonce[0], &seed[key.size()], nonce.size());
+	std::vector<byte> tag(TAGSZE);
+	std::memcpy(&tag[0], &seed[key.size() + nonce.size()], tag.size());
 
-	// encrypt the message, add it to the ciphertext with the auth-code
+	// encrypt the message with GCM, add it to the ciphertext with the auth-code
 	Key::Symmetric::SymmetricKey kp(key, nonce, tag);
-	m_cprMode->Initialize(true, kp);
-	m_cprMode->Transform(Message, 0, CipherText, CipherText.size() - (Message.size() + keySizes.InfoSize()), Message.size());
-	m_cprMode->Finalize(CipherText, CipherText.size() - keySizes.InfoSize(), keySizes.InfoSize());
+	Cipher::Symmetric::Block::Mode::GCM cpr(m_cipherType);
+	cpr.Initialize(true, kp);
+	cpr.Transform(Message, 0, CipherText, CipherText.size() - (Message.size() + TAGSZE), Message.size());
+	cpr.Finalize(CipherText, CipherText.size() - TAGSZE, TAGSZE);
 }
 
 void McEliece::Scope()

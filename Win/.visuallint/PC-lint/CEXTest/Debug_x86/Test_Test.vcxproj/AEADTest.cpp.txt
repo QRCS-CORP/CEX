@@ -1,0 +1,210 @@
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+    '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
+    output'; receiving a syntax error in a library file most likely means
+    something is wrong with your Lint configuration
+
+--- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp (C++)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IProvider.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoRandomException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Providers.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CryptoRandomException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SecureRandom.h(30): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoRandomException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Drbgs.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IDigest.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoDigestException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Digests.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ParallelOptions.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CpuCores.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SimdProfiles.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IntUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\MemUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IPrng.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CryptoRandomException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IPrng.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoRandomException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Prngs.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "MemUtils.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SecureRandom.h(35): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\MemUtils.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ISymmetricKey.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoProcessingException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IByteStream.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CryptoProcessingException.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IByteStream.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoProcessingException.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SeekOrigin.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\StreamModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SymmetricKeySize.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+                printf("0x%02X, ", Data[i]);
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestUtils.h(109): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+#define _CEXENGINE_TESTEXCEPTION_H
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestException.h(2): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 17-0-2, Re-use of C++ identifier pattern: _CEXENGINE_TESTEXCEPTION_H)
+#endif
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestException.h(70): error 783: (Info -- Line does not end with new-line)
+#endif
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestEvent.h(47): error 783: (Info -- Line does not end with new-line)
+#endif
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\ConsoleUtils.h(15): error 783: (Info -- Line does not end with new-line)
+#endif
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\TestEventHandler.h(20): error 783: (Info -- Line does not end with new-line)
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IAeadMode.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\AeadModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ICipherMode.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\BlockCiphers.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CipherModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoCipherModeException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "BlockCiphers.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h(23): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\BlockCiphers.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoSymmetricCipherException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "IDigest.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h(25): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IDigest.h')
+#include "ISymmetricKey.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h(26): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ISymmetricKey.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h(27): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SymmetricKeySize.h')
+#include "ParallelOptions.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ICipherMode.h(27): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ParallelOptions.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ICipherMode.h(28): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SymmetricKeySize.h')
+#include "IAeadMode.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\EAX.h(29): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IAeadMode.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IMac.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CryptoMacException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "ISymmetricKey.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IMac.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ISymmetricKey.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\Macs.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "SymmetricKeySize.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IMac.h(8): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SymmetricKeySize.h')
+#include "BlockCiphers.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CMAC.h(30): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\BlockCiphers.h')
+#include "ICipherMode.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CMAC.h(31): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ICipherMode.h')
+#include "ICipherMode.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CTR.h(31): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ICipherMode.h')
+#include "IAeadMode.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GCM.h(36): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IAeadMode.h')
+#include "CTR.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GCM.h(37): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CTR.h')
+#include "CexDomain.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GHASH.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\CexDomain.h')
+#include "BlockCiphers.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GMAC.h(28): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\BlockCiphers.h')
+#include "GHASH.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GMAC.h(29): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GHASH.h')
+#include "IBlockCipher.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GMAC.h(30): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h')
+#include "IMac.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GMAC.h(31): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IMac.h')
+#include "IAeadMode.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\OCB.h(35): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IAeadMode.h')
+#include "ISymmetricKey.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\OCB.h(36): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\ISymmetricKey.h')
+#include "IBlockCipher.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\RHX.h(37): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\IBlockCipher.h')
+#include "../CEX/SecureRandom.h"
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(7): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\SecureRandom.h')
+            std::string("00000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(380): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("00000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(381): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(386): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(387): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("0000000000000000000000000000000000000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(392): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("0000000000000000000000000000000000000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(393): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(432): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(433): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(438): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(439): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(444): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(445): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("0001020304050607"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(468): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("0001020304050607"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(469): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(477): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(478): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(480): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(481): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("0001020304050607"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(520): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("0001020304050607"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(522): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(529): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(531): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(532): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F2021222324252627"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(534): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-3, Unsigned octal and hexadecimal literals require a 'U' suffix)
+            std::string("00000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(537): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("00000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(543): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+            std::string("00000000000000000000000000000000"),
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(549): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 2-13-2, Octal constant used)
+}
+
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(667): error 783: (Info -- Line does not end with new-line)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(668): error 10: (Error -- Expecting '}')
+C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits(14): error 96: (Error -- Unmatched left brace for namespace std on line 14, file C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits)
+
+    --- Wrap-up for Module: C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp
+
+}
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(668): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\GMAC.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp')
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(668): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\OCB.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp')
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp(668): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\..\CEX\RHX.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Test\AEADTest.cpp')
+
+--- Global Wrap-up
+
+ error 974: (Note -- Worst case function for stack usage: 'div' is finite, requires 16 bytes total stack in calling 'no function'. See +stack for a full report. [MISRA C++ Rule 7-5-4])
+ error 900: (Note -- Successful completion, 100 messages produced)

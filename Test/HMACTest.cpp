@@ -166,6 +166,9 @@ namespace Test
 
 	void HMACTest::Initialize()
 	{
+		/*lint -save -e122 */
+		/*lint -save -e146 */
+		/*lint -save -e417 */
 		const std::vector<std::string> keys =
 		{
 			std::string("0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B"),
@@ -219,6 +222,7 @@ namespace Test
 			std::string("E37B6A775DC87DBAA4DFA9F96E5E3FFDDEBD71F8867289865DF5A32D20CDC944B6022CAC3C4982B10D5EEB55C3E4DE15134676FB6DE0446065C97440FA8C6A58")
 		};
 		HexConverter::Decode(exp512, 7, m_exp512);
+		/*lint -restore */
 	}
 
 	void HMACTest::OnProgress(std::string Data)

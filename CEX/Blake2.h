@@ -24,9 +24,9 @@
 
 NAMESPACE_DIGEST
 
-/**
-* \internal
-*/
+///
+/// internal
+///
 class Blake2
 {
 

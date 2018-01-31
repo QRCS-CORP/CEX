@@ -441,7 +441,7 @@ void CpuDetect::Initialize()
 		if (SUBLVL >= 5)
 		{
 			std::memset(cpuInfo.data(), 0, 16);
-			Cpuid(0x80000005, cpuInfo);
+			Cpuid(0x80000005UL, cpuInfo);
 
 			if (m_cpuVendor == CpuVendors::AMD)
 			{
@@ -449,7 +449,7 @@ void CpuDetect::Initialize()
 			}
 
 			std::memset(cpuInfo.data(), 0, 16);
-			Cpuid(0x80000001, cpuInfo);
+			Cpuid(0x80000001UL, cpuInfo);
 			// f8..1 ecx, edx
 			std::memcpy(&m_x86CpuFlags[4], &cpuInfo[2], 2 * sizeof(ulong));
 			StoreTopology();
@@ -581,7 +581,7 @@ void CpuDetect::StoreTopology()
 	StoreSerialNumber();
 
 	std::array<uint, 4> cpuInfo;
-	Cpuid(0x80000006, cpuInfo);
+	Cpuid(0x80000006UL, cpuInfo);
 
 	m_l1CacheSize = static_cast<size_t>(ReadBits(cpuInfo[2], 0, 8));
 	m_l1CacheLineSize = static_cast<size_t>(ReadBits(cpuInfo[2], 0, 11));

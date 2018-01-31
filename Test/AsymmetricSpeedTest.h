@@ -13,7 +13,9 @@ namespace Test
 	using Cipher::Symmetric::Block::IBlockCipher;
 	using Enumeration::MPKCParams;
 	using Prng::IPrng;
+	using Enumeration::BlockCiphers;
 	using Enumeration::RLWEParams;
+
 
 	/// <summary>
 	/// Asymmetric Cipher and Signature Scheme Speed Tests
@@ -67,12 +69,12 @@ namespace Test
 
 	private:
 
-		void MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher);
-		void MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher);
-		void MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, IBlockCipher* Cipher);
-		void RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher);
-		void RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher);
-		void RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, IBlockCipher* Cipher);
+		void MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType);
+		void MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType);
+		void MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType);
+		void RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType);
+		void RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType);
+		void RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
 		void OnProgress(std::string Data);
 	};

@@ -111,6 +111,7 @@ namespace Test
 		}
 
 		index++;
+
 		{
 			RHX* eng = new RHX();
 			Mode::CBC mode(eng);

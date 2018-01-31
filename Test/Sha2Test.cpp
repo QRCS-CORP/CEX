@@ -89,6 +89,7 @@ namespace Test
 
 	void SHA2Test::Initialize()
 	{
+		/*lint -save -e417 */
 		const std::vector<std::string> message =
 		{
 			std::string("616263"),
@@ -115,6 +116,7 @@ namespace Test
 			std::string("8E959B75DAE313DA8CF4F72814FC143F8F7779C6EB9F7FA17299AEADB6889018501D289E4900F7E4331B99DEC4B5433AC7D329EEB6DD26545E96E55B874BE909")
 		};
 		HexConverter::Decode(exp512, 4, m_exp512);
+		/*lint -restore */
 	}
 
 	void SHA2Test::OnProgress(std::string Data)

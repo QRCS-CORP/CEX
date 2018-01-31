@@ -171,6 +171,7 @@ namespace Test
 
 	void KeccakTest::Initialize()
 	{
+		/*lint -save -e417 */
 		const std::vector<std::string> exp256 =
 		{
 			std::string("A7FFC6F8BF1ED76651C14756A061D662F580FF4DE43B49FA82D80A4B80F8434A"),
@@ -224,6 +225,7 @@ namespace Test
 				"A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3A3")
 		};
 		HexConverter::Decode(message, 4, m_message);
+		/*lint -restore */
 	}
 
 	void KeccakTest::OnProgress(std::string Data)

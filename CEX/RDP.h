@@ -69,7 +69,7 @@ private:
 	// RDRAND is guaranteed to generate a random number within 10 retries on a working CPU
 	static const size_t RDR_RETRY = 10;
 	// RdSeed is not guaranteed to generate a random number within a specific number of retries
-	static const size_t RDS_RETRY = 100;
+	static const size_t RDS_RETRY = 1000;
 	static const size_t SEED_MAX = 64 * 1000 * 1000;
 	static const size_t RDR_SUCCESS = 1;
 

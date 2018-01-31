@@ -481,7 +481,7 @@ void THX::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void THX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+#if (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
 	THXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 #else
 	Decrypt128(Input, InOffset, Output, OutOffset);
@@ -493,9 +493,9 @@ void THX::Decrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void THX::Decrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+#if (!defined(__AVX512__)) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
 	THXDecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
-#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
 	THXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 	THXDecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
 #else
@@ -514,10 +514,10 @@ void THX::Decrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 {
 #if defined(__AVX512__) && defined(CEX_COMPILER_MSC)
 	THXDecryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
-#elif !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+#elif (!defined(__AVX512__)) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
 	THXDecryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 	THXDecryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
-#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
 	THXDecryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 	THXDecryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
 	THXDecryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
@@ -585,7 +585,7 @@ void THX::Encrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void THX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+#if (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
 	THXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 #else
 	Encrypt128(Input, InOffset, Output, OutOffset);
@@ -597,9 +597,9 @@ void THX::Encrypt512(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void THX::Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-#if !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+#if (!defined(__AVX512__)) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
 	THXEncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
-#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
 	THXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 	THXEncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
 #else
@@ -618,10 +618,10 @@ void THX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 {
 #if defined(__AVX512__) && defined(CEX_COMPILER_MSC)
 	THXEncryptW<Numeric::UInt512>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
-#elif !defined(__AVX512__) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
+#elif (!defined(__AVX512__)) && defined(__AVX2__) && defined(CEX_COMPILER_MSC)
 	THXEncryptW<Numeric::UInt256>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 	THXEncryptW<Numeric::UInt256>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);
-#elif !defined(__AVX512__) && !defined(__AVX2__) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
+#elif (!defined(__AVX512__)) && (!defined(__AVX2__)) && defined(__AVX__) && defined(CEX_COMPILER_MSC)
 	THXEncryptW<Numeric::UInt128>(Input, InOffset, Output, OutOffset, m_expKey, m_sBox);
 	THXEncryptW<Numeric::UInt128>(Input, InOffset + 64, Output, OutOffset + 64, m_expKey, m_sBox);
 	THXEncryptW<Numeric::UInt128>(Input, InOffset + 128, Output, OutOffset + 128, m_expKey, m_sBox);

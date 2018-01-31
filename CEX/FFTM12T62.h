@@ -26,9 +26,9 @@ NAMESPACE_MCELIECE
 
 using Prng::IPrng;
 
-/**
-* \internal
-*/
+///
+/// internal
+///
 
 /// <summary>
 /// The McEliece M12T62 FFT

@@ -37,9 +37,9 @@ public:
 
 	//~~~Misc~~~//
 
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
+	/// endcond
 	/// <summary>
 	/// Clear nested arrays of objects
 	/// </summary>
@@ -58,14 +58,14 @@ public:
 			Input.clear();
 		}
 	}
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_RESUME
-	/*!
+	/// endcond
 
 
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
+	/// endcond
 	/// <summary>
 	/// Clear an array of objects
 	/// </summary>
@@ -79,13 +79,13 @@ public:
 			std::memset(Input.data(), 0, Input.size() * sizeof(T));
 		}
 	}
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
+	/// endcond
 
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
+	/// endcond
 	/// <summary>
 	/// Clear nested vectors of objects
 	/// </summary>
@@ -104,13 +104,13 @@ public:
 			Input.clear();
 		}
 	}
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
+	/// endcond
 
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_IGNORE
-	/*! \endcond */
+	/// endcond
 	/// <summary>
 	/// Clear a vector of objects
 	/// </summary>
@@ -125,9 +125,9 @@ public:
 			Input.clear();
 		}
 	}
-	/*! \cond PRIVATE */
+	/// cond PRIVATE
 	CEX_OPTIMIZE_RESUME
-	/*! \endcond */
+	/// endcond
 
 	/// <summary>
 	/// Extract an 8bit integer from a larger integer

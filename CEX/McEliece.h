@@ -113,7 +113,7 @@ private:
 	static const std::string CLASS_NAME;
 	static const size_t TAG_SIZE = 16;
 
-	std::unique_ptr<IAeadMode> m_cprMode;
+	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isEncryption;
@@ -121,7 +121,6 @@ private:
 	MPKCParamSet m_paramSet;
 	std::vector<byte> m_keyTag;
 	MPKCParams m_mpkcParameters;
-	std::unique_ptr<IDigest> m_msgDigest;
 	std::unique_ptr<MPKCPrivateKey> m_privateKey;
 	std::unique_ptr<MPKCPublicKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
@@ -162,10 +161,10 @@ public:
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
-	/// <param name="Cipher">A pointer to the authentication block cipher</param>
+	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
-	McEliece(MPKCParams Parameters, IPrng* Prng, IBlockCipher* Cipher);
+	McEliece(MPKCParams Parameters, IPrng* Prng, BlockCiphers CipherType = BlockCiphers::Rijndael);
 
 	/// <summary>
 	/// Destructor: finalize this class

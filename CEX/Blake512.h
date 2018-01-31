@@ -123,7 +123,6 @@ private:
 	static const size_t ROUND_COUNT = 12;
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
-	static const ulong ULL_MAX = 18446744073709551615;
 
 	struct Blake2bState
 	{

@@ -94,14 +94,11 @@ namespace Test
 		std::vector<byte> dec;
 		std::vector<byte> msg(128);
 		Prng::SecureRandom rnd(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
-		Prng::BCR* rngPtr = new Prng::BCR(Enumeration::BlockCiphers::Rijndael, Enumeration::Providers::CSP);
-
-		// test the extended cipher implementation
-		Cipher::Symmetric::Block::RHX* sycPtr = new Cipher::Symmetric::Block::RHX(Enumeration::Digests::SHA256);
+		Prng::BCR* rngPtr = new Prng::BCR(BlockCiphers::Rijndael, Enumeration::Providers::CSP);
 
 		// note: setting the block cipher to an HX cipher uses k512=keccak1024(e) -> GCM(AHX||SHX||THX(k512))
 		// standard cipher is: k256=keccak512(e) -> GCM(AES||Serpent||Twofish(k256))
-		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, rngPtr, sycPtr);
+		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, rngPtr, BlockCiphers::RHX);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
@@ -123,7 +120,7 @@ namespace Test
 		}
 
 		// test the standard cipher implementation
-		RingLWE cpr2(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::BCR, Enumeration::BlockCiphers::Rijndael);
+		RingLWE cpr2(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::BCR, BlockCiphers::Rijndael);
 		msg.resize(64);
 
 		for (size_t i = 0; i < 100; ++i)
@@ -149,13 +146,8 @@ namespace Test
 		{
 			throw TestException("RingLWETest: Prng was reset!");
 		}
-		if (sycPtr == nullptr)
-		{
-			throw TestException("RingLWETest: Block cipher was reset!");
-		}
 
 		delete rngPtr;
-		delete sycPtr;
 	}
 
 	void RingLWETest::OnProgress(std::string Data)

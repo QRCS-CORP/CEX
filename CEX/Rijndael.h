@@ -23,9 +23,9 @@
 
 NAMESPACE_BLOCK
 
-/**
-* \internal
-*/
+/// 
+/// internal
+/// 
 
 //~~~Rijndael S-Box and Lookup Tables~~~//
 
