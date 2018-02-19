@@ -41,6 +41,11 @@ const AsymmetricEngines RLWEPrivateKey::CipherType()
 	return AsymmetricEngines::RingLWE;
 }
 
+const AsymmetricKeyTypes RLWEPrivateKey::KeyType()
+{
+	return AsymmetricKeyTypes::CipherPrivateKey;
+}
+
 const RLWEParams RLWEPrivateKey::Parameters()
 {
 	return m_rlweParameters;

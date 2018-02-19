@@ -1,8 +1,6 @@
 #include "HKDF.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
-#include "Macs.h"
-#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF

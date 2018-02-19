@@ -63,7 +63,7 @@ public:
 	/// <summary>
 	/// The secret size in bytes
 	/// </summary>
-	static const size_t SECRET_SIZE = (PKN_ROWS / 8);
+	static const size_t CPRTXT_SIZE = (PKN_ROWS / 8);
 
 	/// <summary>
 	/// The private key size in bytes
@@ -74,6 +74,11 @@ public:
 	/// The public key size in bytes
 	/// </summary>
 	static const size_t PUBKEY_SIZE = (PKN_ROWS * ((64 - M) * 8)) + (PKN_ROWS * (8 - ((PKN_ROWS & 63) >> 3)));
+
+	/// <summary>
+	/// The seed size in bytes
+	/// </summary>
+	static const size_t SEED_SIZE = 64;
 
 	//~~~Public Functions~~~//
 

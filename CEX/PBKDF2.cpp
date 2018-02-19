@@ -1,7 +1,6 @@
 #include "PBKDF2.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF

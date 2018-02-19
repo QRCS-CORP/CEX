@@ -1,77 +1,11 @@
-C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  14  Warning 686: Option
     '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
     output'; receiving a syntax error in a library file most likely means
     something is wrong with your Lint configuration
 
 --- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp (C++)
 C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoMacException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoProcessingException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IByteStream.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CryptoProcessingException.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IByteStream.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoProcessingException.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SeekOrigin.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Macs.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "SymmetricKeySize.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IMac.h(8): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCiphers.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoSymmetricCipherException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IDigest.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoDigestException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Digests.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ParallelOptions.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CpuCores.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SimdProfiles.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "ISymmetricKey.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h(26): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h')
-#include "SymmetricKeySize.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h(27): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKeySize.h')
-#include "ISymmetricKey.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKey.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\ISymmetricKey.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCipherFromName.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "IBlockCipher.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BlockCipherFromName.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IBlockCipher.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IntUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "MemUtils.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h')
-#include "SymmetricKey.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKey.h')
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp(422): error 10: (Error -- Expecting '}')
-C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits(14): error 96: (Error -- Unmatched left brace for namespace std on line 14, file C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits)
-
-    --- Wrap-up for Module: C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp
-
-NAMESPACE_MACEND
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp(422): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SymmetricKey.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\Poly1305.cpp')
 
 --- Global Wrap-up
 
- error 974: (Note -- Worst case function for stack usage: 'div' is finite, requires 16 bytes total stack in calling 'no function'. See +stack for a full report. [MISRA C++ Rule 7-5-4])
- error 900: (Note -- Successful completion, 35 messages produced)
+ error 900: (Note -- Successful completion, 2 messages produced)

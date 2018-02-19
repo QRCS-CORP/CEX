@@ -8,11 +8,7 @@
 #		include <ia32intrin.h>
 #	elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_CLANG)
 #		include <cpuid.h>
-#	else
-#		warning "No way of calling cpuid with this compiler"
 #	endif
-#else
-#	warning "No way of calling cpuid with this compiler"
 #endif
 
 NAMESPACE_COMMON

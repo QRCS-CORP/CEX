@@ -27,7 +27,6 @@
 #include "IDigest.h"
 #include "MPKCKeyPair.h"
 #include "MPKCParams.h"
-#include "MPKCParamSet.h"
 #include "MPKCPrivateKey.h"
 #include "MPKCPublicKey.h"
 
@@ -113,13 +112,10 @@ private:
 	static const std::string CLASS_NAME;
 	static const size_t TAG_SIZE = 16;
 
-	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	MPKCParamSet m_paramSet;
-	std::vector<byte> m_keyTag;
 	MPKCParams m_mpkcParameters;
 	std::unique_ptr<MPKCPrivateKey> m_privateKey;
 	std::unique_ptr<MPKCPublicKey> m_publicKey;
@@ -140,20 +136,14 @@ public:
 	McEliece& operator=(const McEliece&) = delete;
 
 	/// <summary>
-	/// Default constructor: default is restricted, this function has been deleted
-	/// </summary>
-	McEliece() = delete;
-
-	/// <summary>
 	/// Instantiate the cipher with auto-initialized prng and digest functions
 	/// </summary>
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
-	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher type, prng type, or parameter set is specified</exception>
-	explicit McEliece(MPKCParams Parameters, Prngs PrngType = Prngs::BCR, BlockCiphers CipherType = BlockCiphers::Rijndael);
+	McEliece(MPKCParams Parameters = MPKCParams::M12T62, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -161,10 +151,9 @@ public:
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
-	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
-	McEliece(MPKCParams Parameters, IPrng* Prng, BlockCiphers CipherType = BlockCiphers::Rijndael);
+	McEliece(MPKCParams Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -194,22 +183,27 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The ciphers initialization parameters
-	/// </summary>
-	const MPKCParamSet &ParamSet();
-
-	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
 	const MPKCParams Parameters();
 
-	/// <summary>
-	/// Read/Write: A new asymmetric key-pairs optional identification tag.
-	/// <para>Setting this value must be done before the Generate method is called.</para>
-	/// </summary>
-	std::vector<byte> &Tag() override;
-
 	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Decrypt a ciphertext and return the shared secret
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The input cipher-text</param>
+	/// <param name="SharedSecret">The shared secret key</param>
+	void Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+
+	/// <summary>
+	/// Generate a shared secret and ciphertext
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The output cipher-text</param>
+	/// <param name="SharedSecret">The shared secret key</param>
+	void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
 
 	/// <summary>
 	/// Decrypt an encrypted cipher-text and return the shared secret
@@ -248,16 +242,15 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
-	/// <param name="KeyPair">The <see cref="IAsymmetricKeyPair"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// <param name="Key">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) and/or Private (decryption) key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair) override;
+	void Initialize(bool Encryption, IAsymmetricKey* Key) override;
 
 private:
 
 	bool MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message);
 	void MPKCEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText);
-	void Scope();
 };
 
 NAMESPACE_MCELIECEEND

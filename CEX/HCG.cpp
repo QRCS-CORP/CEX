@@ -1,7 +1,6 @@
 #include "HCG.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 

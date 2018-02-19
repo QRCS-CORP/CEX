@@ -1,41 +1,11 @@
-C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  14  Warning 686: Option
     '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
     output'; receiving a syntax error in a library file most likely means
     something is wrong with your Lint configuration
 
 --- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParamSet.cpp (C++)
 C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParamSet.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParams.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IByteStream.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CryptoProcessingException.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\SeekOrigin.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamModes.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IntUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "CexDomain.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h(22): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CexDomain.h')
-#include "MemUtils.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamReader.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h')
-#include "MemoryStream.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamWriter.h(4): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemoryStream.h')
-#include "IntUtils.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamWriter.h(5): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\IntUtils.h')
-#include "MemUtils.h"
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamWriter.h(6): error 537: (Warning -- Repeated include file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\MemUtils.h')
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParamSet.cpp(104): error 10: (Error -- Expecting '}')
-C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits(14): error 96: (Error -- Unmatched left brace for namespace std on line 14, file C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\type_traits)
-
-    --- Wrap-up for Module: C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParamSet.cpp
-
-NAMESPACE_RINGLWEEND
-C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParamSet.cpp(104): error 766: (Info -- Header file 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\StreamWriter.h' not used in module 'C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\RLWEParamSet.cpp')
 
 --- Global Wrap-up
 
- error 974: (Note -- Worst case function for stack usage: 'div' is finite, requires 16 bytes total stack in calling 'no function'. See +stack for a full report. [MISRA C++ Rule 7-5-4])
- error 900: (Note -- Successful completion, 17 messages produced)
+ error 900: (Note -- Successful completion, 2 messages produced)

@@ -35,6 +35,11 @@ const AsymmetricEngines MPKCPrivateKey::CipherType()
 	return AsymmetricEngines::McEliece;
 }
 
+const AsymmetricKeyTypes MPKCPrivateKey::KeyType()
+{
+	return AsymmetricKeyTypes::CipherPrivateKey;
+}
+
 const MPKCParams MPKCPrivateKey::Parameters()
 {
 	return m_mpkcParameters;

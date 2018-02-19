@@ -1,7 +1,5 @@
 #include "SecureRandom.h"
 #include "BitConverter.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
 #include "ProviderFromName.h"
 #include "PrngFromName.h"
 

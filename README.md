@@ -35,6 +35,7 @@ This is still an early stage in the development of this library, so stay tuned, 
 ### Asymmetric Ciphers
 * The RingLWE asymmetric cipher
 * The Niederreiter dual form of the McEliece cipher
+* The ModuleLWE asymmetric cipher
 
 ### Block Ciphers
 * The AES-NI HKDF eXtended cipher (AHX)
@@ -80,6 +81,7 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Key Derivation Function Version 2 (KDF2)
 * Passphrase Based Key Derivation Version 2 (PBKDF2)
 * The SCRYPT key derivation function
+* The 128/256/512/1024 SHAKE XOF function
 
 ### MACs
 * Cipher based Message Authentication Code generator (CMAC)
@@ -102,22 +104,21 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Intel RdRand/RdSeed Provider (RDP)
 
 ## Trajectory
-The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, patch, and release codes.
+The current version is <B>1.0.0.5</B> (A4 version), which are the major, minor, patch, and release codes.
   
-### Current Release 1.0.0.4 (version A4):
-* The McEliece asymmetric cipher
-* The 1024bit Keccak digest
-* The Poly1305 Message Authentication Code generator
-* The library is undergoing security standards changes (with SEI/Misra compliance by 1.0.0.5)
+### Current Release 1.0.0.5 (version A5):
+* The ModuleLWE asymmetric cipher
+* The SHAKE Key Derivation Function
+* Addition of asymmetric cipher Encapsulate/Decapsulate api
+* The library is now Misra C++ 2014 compliant
 
 ### Planned Release 1.1.0.1
 * RingLWE
 * McEliece
 * ModuleLWE
-* NTRU
-* ECDH
-* GMSS
-* ECDSA
+* NTRU Prime
+* Picnic
+* SPHINCS+
 
 ### Planned Release 1.2.0.1
 * TLS

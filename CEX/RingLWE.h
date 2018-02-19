@@ -26,19 +26,18 @@
 #include "IBlockCipher.h"
 #include "RLWEKeyPair.h"
 #include "RLWEParams.h"
-#include "RLWEParamSet.h"
 #include "RLWEPrivateKey.h"
 #include "RLWEPublicKey.h"
 
 NAMESPACE_RINGLWE
 
+using Enumeration::BlockCiphers;
 using Cipher::Symmetric::Block::Mode::IAeadMode;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Key::Asymmetric::RLWEKeyPair;
 using Enumeration::RLWEParams;
 using Key::Asymmetric::RLWEPrivateKey;
 using Key::Asymmetric::RLWEPublicKey;
-using Enumeration::BlockCiphers;
 
 /// <summary>
 /// An implementation of the Ring Learning With Errors asymmetric cipher (RingLWE)
@@ -105,22 +104,16 @@ using Enumeration::BlockCiphers;
 /// </remarks>
 class RingLWE final : public IAsymmetricCipher
 {
-	// TODO: (I could use some help with this..)
-	// Add at least one other parameter set (>= 200 bits of security). I can provide a template..
-
 private:
 
 	static const std::string CLASS_NAME;
 
-	BlockCiphers m_cipherType;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	bool m_isParallel;
 	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
-	std::vector<byte> m_keyTag;
-	RLWEParamSet m_paramSet;
 	std::unique_ptr<RLWEPrivateKey> m_privateKey;
 	std::unique_ptr<RLWEPublicKey> m_publicKey;
 	RLWEParams m_rlweParameters;
@@ -141,21 +134,15 @@ public:
 	RingLWE& operator=(const RingLWE&) = delete;
 
 	/// <summary>
-	/// Default constructor: default is restricted, this function has been deleted
-	/// </summary>
-	RingLWE() = delete;
-
-	/// <summary>
 	/// Instantiate the cipher with auto-initialized prng and digest functions
 	/// </summary>
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
-	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher type, prng type, or parameter set is specified</exception>
-	explicit RingLWE(RLWEParams Parameters, Prngs PrngType = Prngs::BCR, BlockCiphers CipherType = BlockCiphers::Rijndael, bool Parallel = false);
+	RingLWE(RLWEParams Parameters = RLWEParams::Q12289N1024, Prngs PrngType = Prngs::BCR, bool Parallel = false);
 
 	/// <summary>
 	/// Constructor: instantiate this class using an external Prng instance
@@ -163,11 +150,10 @@ public:
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
-	/// <param name="CipherType">The authentication block ciphers type; the default is AES256</param>
 	/// <param name="Parallel">The cipher is multi-threaded</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
-	RingLWE(RLWEParams Parameters, IPrng* Prng, BlockCiphers CipherType = BlockCiphers::Rijndael, bool Parallel = false);
+	RingLWE(RLWEParams Parameters, IPrng* Prng, bool Parallel);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -197,22 +183,27 @@ public:
 	const std::string Name() override;
 
 	/// <summary>
-	/// Read Only: The ciphers initialization parameters
-	/// </summary>
-	const RLWEParamSet &ParamSet();
-
-	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
 	const RLWEParams Parameters();
 
-	/// <summary>
-	/// Read/Write: A new asymmetric key-pairs optional identification tag.
-	/// <para>Setting this value must be done before the Generate method is called.</para>
-	/// </summary>
-	std::vector<byte> &Tag() override;
-
 	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Decrypt a ciphertext and return the shared secret
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The input cipher-text</param>
+	/// <param name="SharedSecret">The shared secret key</param>
+	void Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+
+	/// <summary>
+	/// Generate a shared secret and ciphertext
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The output cipher-text</param>
+	/// <param name="SharedSecret">The shared secret key</param>
+	void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
 
 	/// <summary>
 	/// Decrypt an encrypted cipher-text and return the shared secret
@@ -251,16 +242,15 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
-	/// <param name="KeyPair">The <see cref="IAsymmetricKeyPair"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// <param name="Key">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) and/or Private (decryption) key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair) override;
+	void Initialize(bool Encryption, IAsymmetricKey* Key) override;
 
 private:
 
 	bool RLWEDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message, std::vector<byte> &Secret);
 	void RLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, std::vector<byte> &Secret);
-	void Scope();
 };
 
 NAMESPACE_RINGLWEEND

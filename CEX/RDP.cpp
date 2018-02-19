@@ -2,7 +2,6 @@
 #include "CpuDetect.h"
 #include "Intrinsics.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 
 NAMESPACE_PROVIDER
 

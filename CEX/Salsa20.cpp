@@ -1,6 +1,5 @@
 #include "Salsa20.h"
 #include "Salsa.h"
-#include "MemUtils.h"
 #if defined(__AVX2__)
 #	include "UInt256.h"
 #elif defined(__AVX__)

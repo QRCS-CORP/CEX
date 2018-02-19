@@ -1,8 +1,6 @@
 #include "Blake256.h"
 #include "Blake2.h"
 #include "CpuDetect.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_DIGEST

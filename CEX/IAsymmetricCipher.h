@@ -34,10 +34,10 @@ NAMESPACE_ASYMMETRIC
 using Enumeration::AsymmetricEngines;
 using Exception::CryptoAsymmetricException;
 using Exception::CryptoAuthenticationFailure;
+using Enumeration::Digests;
 using Key::Asymmetric::IAsymmetricKey;
 using Key::Asymmetric::IAsymmetricKeyPair;
 using Digest::IDigest;
-using Enumeration::Digests;
 using Prng::IPrng;
 using Enumeration::Prngs;
 
@@ -96,23 +96,35 @@ public:
 	/// </summary>
 	virtual const std::string Name() = 0;
 
-	/// <summary>
-	/// Read/Write: A new asymmetric key-pairs optional identification tag.
-	/// <para>Setting this value must be done before the Generate method is called.</para>
-	/// </summary>
-	virtual std::vector<byte> &Tag() = 0;
-
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Decrypt an encrypted cipher-text and return the shared secret
+	/// Decrypt a ciphertext and return the shared secret
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The input cipher-text</param>
+	/// <param name="SharedSecret">The shared secret key</param>
+	virtual void Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
+
+	/// <summary>
+	/// Generate a shared secret and ciphertext
+	/// </summary>
+	/// 
+	/// <param name="CipherText">The output cipher-text</param>
+	/// <param name="SharedSecret">The shared secret key</param>
+	virtual void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
+
+	/// <summary>
+	/// Decrypt an encrypted cipher-text and return the message key.
+	/// <para>This is a CPA-secure transformation function</para>
 	/// </summary>
 	/// 
 	/// <param name="CipherText">The input cipher-text</param>
 	virtual std::vector<byte> Decrypt(const std::vector<byte> &CipherText) = 0;
 
 	/// <summary>
-	/// Encrypt a shared secret and return the encrypted message
+	/// Encrypt a shared secret and return the encrypted message.
+	/// <para>This is a CPA-secure transformation function</para>
 	/// </summary>
 	/// 
 	/// <param name="Message">The shared secret array</param>
@@ -128,8 +140,10 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
-	/// <param name="KeyPair">The <see cref="IAsymmetricKeyPair"/> containing the Public (encrypt) and/or Private (decryption) key</param>
-	virtual void Initialize(bool Encryption, IAsymmetricKeyPair* KeyPair) = 0;
+	/// <param name="Key">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
+	virtual void Initialize(bool Encryption, IAsymmetricKey* Key) = 0;
 };
 
 NAMESPACE_ASYMMETRICEND

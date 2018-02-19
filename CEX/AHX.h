@@ -34,12 +34,14 @@
 #ifndef CEX_AHX_H
 #define CEX_AHX_H
 
-#if defined(__AVX__)
-
 #include "IBlockCipher.h"
-#include <wmmintrin.h>
+#if defined(__AVX__)
+#	include <wmmintrin.h>
+#endif
 
 NAMESPACE_BLOCK
+
+#if defined(__AVX__)
 
 /// <summary>
 /// An Rijndael AES-NI configured Cipher extended with an (optional) HKDF powered Key Schedule
@@ -395,6 +397,6 @@ private:
 	void StandardExpand(const std::vector<byte> &Key);
 };
 
-NAMESPACE_BLOCKEND
 #endif
+NAMESPACE_BLOCKEND
 #endif

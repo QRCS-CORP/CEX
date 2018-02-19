@@ -137,7 +137,7 @@ public:
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
-	/// <param name="CipherType">The block cipher enumeration name</param>
+	/// <param name="BlockCipherType">The block cipher enumeration name</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
 	Poly1305(BlockCiphers BlockCipherType = BlockCiphers::None);

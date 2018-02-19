@@ -57,9 +57,9 @@ public:
 	virtual IAsymmetricKey* PrivateKey() = 0;
 
 	/// <summary>
-	/// Read Only: An optional unique tag identifying this key-pair
+	/// Read/Write: An optional unique tag identifying this key-pair
 	/// </summary>
-	virtual const std::vector<byte> &Tag() = 0;
+	virtual std::vector<byte> &Tag() = 0;
 };
 
 NAMESPACE_ASYMMETRICKEYEND

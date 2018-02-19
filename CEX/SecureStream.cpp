@@ -1,7 +1,6 @@
 #include "SecureStream.h"
 #include "ArrayUtils.h"
 #include "CTR.h"
-#include "MemUtils.h"
 #include "SHA512.h"
 #include "SymmetricKey.h"
 #include "SysUtils.h"

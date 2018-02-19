@@ -2,7 +2,6 @@
 #include "BlockCipherFromName.h"
 #include "CMAC.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 #include "SymmetricKey.h"
 

@@ -37,6 +37,11 @@ const AsymmetricEngines MPKCPublicKey::CipherType()
 	return Enumeration::AsymmetricEngines::McEliece;
 }
 
+const AsymmetricKeyTypes MPKCPublicKey::KeyType()
+{
+	return AsymmetricKeyTypes::CipherPublicKey;
+}
+
 const MPKCParams MPKCPublicKey::Parameters()
 {
 	return m_mpkcParameters;

@@ -117,7 +117,7 @@ public:
 	/// <para>The default is the SHAKE256 mode.</para>
 	/// </summary>
 	/// 
-	/// <param name="ShakeType">The SHAKE mode type</param>
+	/// <param name="ShakeMode">The SHAKE mode type</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid mode type is used</exception>
 	explicit SHAKE(ShakeModes ShakeMode = ShakeModes::SHAKE256);
@@ -128,6 +128,11 @@ public:
 	~SHAKE() override;
 
 	//~~~Accessors~~~//
+
+	/// <summary>
+	/// The internal block size in bytes
+	/// </summary>
+	const size_t BlockSize();
 
 	/// <summary>
 	/// Read/Write: The Keccak function-domain separator code.

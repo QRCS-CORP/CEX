@@ -97,7 +97,8 @@ namespace Test
 		/// <param name="Data">The array to convert</param>
 		/// <param name="Length">The number of bytes to write</param>
 		/// <param name="LineSize">The bumber of bytes to print in each line</param>
-		static void PrintHexArray(const std::vector<byte> &Data, size_t Length, size_t LineSize)
+		template<typename Array>
+		static void PrintHex8(const Array &Data, size_t Length, size_t LineSize)
 		{
 			for (size_t i = 0; i < Length; ++i)
 			{
@@ -107,6 +108,27 @@ namespace Test
 				}
 
 				printf("0x%02X, ", Data[i]);
+			}
+		}
+
+		/// <summary>
+		/// Outputs a delineated, formatted hex byte array to console
+		/// </summary>
+		/// 
+		/// <param name="Data">The array to convert</param>
+		/// <param name="Length">The number of bytes to write</param>
+		/// <param name="LineSize">The bumber of bytes to print in each line</param>
+		template<typename Array>
+		static void PrintHex16(const Array &Data, size_t Length, size_t LineSize)
+		{
+			for (size_t i = 0; i < Length; ++i)
+			{
+				if (i != 0 && i % LineSize == 0)
+				{
+					printf("\n");
+				}
+
+				printf("0x%04X, ", Data[i]);
 			}
 		}
 

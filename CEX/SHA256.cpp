@@ -1,7 +1,6 @@
 #include "SHA256.h"
 #include "SHA2.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 #if defined(__AVX__)
 #	include "Intrinsics.h"

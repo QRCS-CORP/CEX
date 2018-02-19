@@ -1,9 +1,7 @@
 #include "CipherStream.h"
 #include "BlockCipherFromName.h"
 #include "CipherModeFromName.h"
-#include "MemUtils.h"
 #include "PaddingFromName.h"
-#include "ParallelUtils.h"
 #include "StreamCipherFromName.h"
 
 NAMESPACE_PROCESSING

@@ -200,6 +200,8 @@
     <ClInclude Include="..\..\CEX\AHX.h" />
     <ClInclude Include="..\..\CEX\ArrayUtils.h" />
     <ClInclude Include="..\..\CEX\AsymmetricEngines.h" />
+    <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h" />
+    <ClInclude Include="..\..\CEX\AsymmetricTransforms.h" />
     <ClInclude Include="..\..\CEX\Authenticators.h" />
     <ClInclude Include="..\..\CEX\BitConverter.h" />
     <ClInclude Include="..\..\CEX\Blake256.h" />
@@ -252,11 +254,13 @@
     <ClInclude Include="..\..\CEX\ECP.h" />
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\FFTM12T62.h" />
+    <ClInclude Include="..\..\CEX\FFTQ12289N512.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
     <ClInclude Include="..\..\CEX\Drbgs.h" />
     <ClInclude Include="..\..\CEX\GCM.h" />
     <ClInclude Include="..\..\CEX\GHASH.h" />
     <ClInclude Include="..\..\CEX\GMAC.h" />
+    <ClInclude Include="..\..\CEX\IAsymmetricParameters.h" />
     <ClInclude Include="..\..\CEX\IAuthenticate.h" />
     <ClInclude Include="..\..\CEX\KeccakState.h" />
     <ClInclude Include="..\..\CEX\McElieceUtils.h" />
@@ -288,10 +292,14 @@
     <ClInclude Include="..\..\CEX\McEliece.h" />
     <ClInclude Include="..\..\CEX\MemUtils.h" />
     <ClInclude Include="..\..\CEX\FFTQ12289N1024.h" />
+    <ClInclude Include="..\..\CEX\MLWEKeyPair.h" />
     <ClInclude Include="..\..\CEX\MLWEParams.h" />
+    <ClInclude Include="..\..\CEX\MLWEPrivateKey.h" />
+    <ClInclude Include="..\..\CEX\MLWEPublicKey.h" />
+    <ClInclude Include="..\..\CEX\FFTQ7681N256.h" />
+    <ClInclude Include="..\..\CEX\ModuleLWE.h" />
     <ClInclude Include="..\..\CEX\MPKCKeyPair.h" />
     <ClInclude Include="..\..\CEX\MPKCParams.h" />
-    <ClInclude Include="..\..\CEX\MPKCParamSet.h" />
     <ClInclude Include="..\..\CEX\MPKCPrivateKey.h" />
     <ClInclude Include="..\..\CEX\MPKCPublicKey.h" />
     <ClInclude Include="..\..\CEX\OCB.h" />
@@ -302,7 +310,6 @@
     <ClInclude Include="..\..\CEX\RingLWE.h" />
     <ClInclude Include="..\..\CEX\RLWEKeyPair.h" />
     <ClInclude Include="..\..\CEX\RLWEParams.h" />
-    <ClInclude Include="..\..\CEX\RLWEParamSet.h" />
     <ClInclude Include="..\..\CEX\RLWEPrivateKey.h" />
     <ClInclude Include="..\..\CEX\RLWEPublicKey.h" />
     <ClInclude Include="..\..\CEX\SCRYPT.h" />
@@ -426,6 +433,7 @@
     <ClCompile Include="..\..\CEX\ECP.cpp" />
     <ClCompile Include="..\..\CEX\FFTM12T62.cpp" />
     <ClCompile Include="..\..\CEX\FFTQ12289N1024.cpp" />
+    <ClCompile Include="..\..\CEX\FFTQ12289N512.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />
     <ClCompile Include="..\..\CEX\GHASH.cpp" />
@@ -444,8 +452,12 @@
     <ClCompile Include="..\..\CEX\KeccakParams.cpp" />
     <ClCompile Include="..\..\CEX\McEliece.cpp" />
     <ClCompile Include="..\..\CEX\McElieceUtils.cpp" />
+    <ClCompile Include="..\..\CEX\MLWEKeyPair.cpp" />
+    <ClCompile Include="..\..\CEX\MLWEPrivateKey.cpp" />
+    <ClCompile Include="..\..\CEX\MLWEPublicKey.cpp" />
+    <ClCompile Include="..\..\CEX\FFTQ7681N256.cpp" />
+    <ClCompile Include="..\..\CEX\ModuleLWE.cpp" />
     <ClCompile Include="..\..\CEX\MPKCKeyPair.cpp" />
-    <ClCompile Include="..\..\CEX\MPKCParamSet.cpp" />
     <ClCompile Include="..\..\CEX\MPKCPrivateKey.cpp" />
     <ClCompile Include="..\..\CEX\MPKCPublicKey.cpp" />
     <ClCompile Include="..\..\CEX\OCB.cpp" />
@@ -454,7 +466,6 @@
     <ClCompile Include="..\..\CEX\Poly1305.cpp" />
     <ClCompile Include="..\..\CEX\RingLWE.cpp" />
     <ClCompile Include="..\..\CEX\RLWEKeyPair.cpp" />
-    <ClCompile Include="..\..\CEX\RLWEParamSet.cpp" />
     <ClCompile Include="..\..\CEX\RLWEPrivateKey.cpp" />
     <ClCompile Include="..\..\CEX\RLWEPublicKey.cpp" />
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />

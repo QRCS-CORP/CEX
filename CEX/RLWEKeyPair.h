@@ -75,9 +75,9 @@ public:
 	IAsymmetricKey* PublicKey() override;
 
 	/// <summary>
-	/// Read Only: An optional identification tag
+	/// Read/Write: An optional identification tag
 	/// </summary>
-	const std::vector<byte> &Tag() override;
+	std::vector<byte> &Tag() override;
 
 private:
 

@@ -37,6 +37,11 @@ const AsymmetricEngines RLWEPublicKey::CipherType()
 	return Enumeration::AsymmetricEngines::RingLWE;
 }
 
+const AsymmetricKeyTypes RLWEPublicKey::KeyType()
+{
+	return AsymmetricKeyTypes::CipherPublicKey;
+}
+
 const RLWEParams RLWEPublicKey::Parameters()
 {
 	return m_rlweParameters;

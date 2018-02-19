@@ -4,6 +4,7 @@
 #include "ITest.h"
 #include "../CEX/AsymmetricEngines.h"
 #include "../CEX/IBlockCipher.h"
+#include "../CEX/MLWEParams.h"
 #include "../CEX/MPKCParams.h"
 #include "../CEX/IPrng.h"
 #include "../CEX/RLWEParams.h"
@@ -11,6 +12,7 @@
 namespace Test
 {
 	using Cipher::Symmetric::Block::IBlockCipher;
+	using Enumeration::MLWEParams;
 	using Enumeration::MPKCParams;
 	using Prng::IPrng;
 	using Enumeration::BlockCiphers;
@@ -69,12 +71,15 @@ namespace Test
 
 	private:
 
-		void MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType);
-		void MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType);
-		void MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng, BlockCiphers CipherType);
-		void RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType);
-		void RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType);
-		void RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng, BlockCiphers CipherType);
+		void MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng);
+		void MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng);
+		void MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng);
+		void MlweDecryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
+		void MlweEncryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
+		void MlweGenerateLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
+		void RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng);
+		void RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng);
+		void RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
 		void OnProgress(std::string Data);
 	};

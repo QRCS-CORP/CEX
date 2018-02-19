@@ -67,6 +67,11 @@ public:
 	const AsymmetricEngines CipherType() override;
 
 	/// <summary>
+	/// Read Only: The keys type-name
+	/// </summary>
+	const AsymmetricKeyTypes KeyType() override;
+
+	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
 	const MPKCParams Parameters();

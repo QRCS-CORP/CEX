@@ -1,7 +1,6 @@
 #include "KDF2.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 
 NAMESPACE_KDF
 

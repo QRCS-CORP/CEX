@@ -64,68 +64,15 @@
 
 // TRAJECTORY
 //
-// ### SCHEDULE FOR 1.0.0.5 RELEASE ###
-// ## ETA is February 14, 2018 ##
-// Full Misra C++ 2014 compliance
-// Add ModuleLWE
-// Add modular asymmetric key generation/authentication framework (IAuthenticator)
-// Add asymmetric Encapsulate/Decapsulate api
-// Changes to asymmetric Initialize (IAsymmetricKey)
-// Add SHAKE KDF
+// ### SCHEDULE FOR 1.0.0.6 RELEASE ###
+// ## ETA is March 31, 2018 ##
+// 
+// Add NTRU Prime
 // Add cSHAKE DRBG
+// Add asymmetric IAuthenticator CCA interface
 // Add KMAC
 // Rewrite ACP/ECP
-// Integrate SHAKE option into symmetric cipher extended modes
 //
-// ### SCHEDULE FOR 1.0.0.4 RELEASE ###
-// ## ETA is December 14, 2017 ##
-// Complete performance optimizations on all classes
-// Complete security audit and rewrite
-// Add Poly1305 MAC
-// Make authenticated KEX changes to RingLWE
-//
-// ### JSF/MISRA/SEI-CERT Check LIST ###
-// ## Local Changes ##
-// ensure that operations on signed integers do not result in overflow -done
-// ensure that division and remainder operations do not result in divide-by-zero errors -done
-// do not shift an expression by a negative number of bits or by greater than or equal to the number of bits that exist in the operand -done
-// make all (public) functions const correct -ongoing
-// reduce the number of class level variables (consider performance vs safety) -1.0.0.5
-// make as many class functions static as possible -1.0.0.5
-// reduce the number of function parameters whenever possible -done
-// replace macros with inline functions -done
-// mark single parameter constructors as explicit -done
-// replace all instances of pointer math -done
-// replave all C (*) pointers with std::unique_ptr, including public constructors and test framework -ongoing
-// replace all C style casts with C++ equivalents, ex. static_cast<>() -done
-// compound integer operations should be expressed within parenthesis to statically define operation flow, ex.  a = (b * (c << 3)) -done
-// verify that all class scope variables are destroyed/reset in the destructor -done
-// make the Destroy() functions private (confusing, and no need for them to be public) -done; kept in keys and streams, moved to finalizer for everything else
-// delete unused default/copy/move constructors from all structs and classes -done
-// replace all macros with inline/templated functions -done
-// on pointer comparisons to zero, replace '0' with nullptr (ex. y* != nullptr) -done
-// review and rewrite the entire test framework for compliance -todo for 1.0.0.5
-//
-// ## Global Changes ##
-// all hex codes should be expressed in capitals, ex. 0xFF -done
-// enum members should all be byte sized and sequential, i.e. 1,2,3.. (promote jump lists) -done
-// reduce the number of global includes, and replace all C headers with C++ versions -done
-// remove unused macros and defines in CEXCommon.h -done
-// prefer static/extern const integers to #define -done
-// add GNU header to each (major) header file -done
-// internally, move from C style pointers (*) to std::unique_ptr -done
-// all input pointers and types are tested and throw in constructor -done
-// move exceptions to constructor initialization list from constructor body -done
-// make sure every exception is documented -done
-// use assert in busy functions, but use exceptions in constructor and initialize -done
-// check every constructor initialize list for order and completeness -done
-// all case statements must have braces and default -done
-// make access to classes as restrictive as possibe (move/copy ctors), and make it so that incorrect usage is impossible or throws -done
-// no increment/decrement operators inside a statement or indice, i.e. arr1[i++] or, while(--i >= 0) -done
-// document all publicly visible functions and constants -done
-// enum member numerical value requires static_cast, remove all C style casting -done
-// new class order; constructors proceed properties -done
-// convert all C-style static arrays to std::array -done
 //
 // ## Style Rules ##
 // 
@@ -140,68 +87,16 @@
 // class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
 // function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
 //
-// ## Upgrades ##
-// add GCM authentication mode to RingLWE -done
-// add Padding property (and mechanism) -moved to KEM spec.
-// revise parallel options, replace Parallel parameter with cpu count (CpuCores), and make core count assignable -moved to api eval. 1.0.0.5
-//
-//
-// ### Optimization Cycle 1: Sept 26, 2017 ###
-// Performance of various algorithms pre/post memory and code optimizations
-// Best set of five: Win10/i7-6700/VS2015
-//
-// ## Stage 1 (baseline) ##
-// #asymmetric ciphers in operations per second, best of 4
-// RingLWE: Gen 14285/17345, Enc 10000/12547, Dec 33333
-// McEliece: Gen 12, Enc 7692, Dec 4000
-//
-// #symmetric ciphers in MB per second
-// AHX: ECB 11299, CTR 426/7633, ICM 172/8064, CBC 715/9803, CFB 352/2277, OFB 307, EAX 205/616, OCB 107/1013, GCM 311/1060
-// SHX: ECB 2418
-// THX: ECB 1002
-// ChaCha: 6097
-// Salsa: 6622
-//
-// #message digests in MB per second
-// Blake2: 512- 677/1831, 256- 376/1636
-// Keccak: 1024- 79/314, 512- 155/400, 256- 294/1152
-// SHA2: 512- 335/1312, 256- 193/788
-// Skein: 1024- 350/1412, 512- 236/1204, 256- 221/929
-//
-// #memory in MB per second
-// Memory: LB Clear 6993, Clear 10309, LB Copy 4761, Copy 10416, LB Memset 6896, Memset 10309, LB XOR 4524, XOR 1329
-//
-// ## Stage 2 (post optimization in full release) ##
-// #asymmetric ciphers in operations per second, best of 4
-// RingLWE: Gen 16666/33333, Enc 12500/16666, Dec 50000 +/+/+
-// McEliece: Gen 12, Enc 12500, Dec 4577 =/+/+
-//
-// #symmetric ciphers in MB per second
-// AHX: CTR , CBC , EAX , OFB , GCM
-// SHX: CTR , CBC , EAX , OFB , GCM
-// THX: CTR , CBC , EAX , OFB , GCM
-// ChaCha: 
-// Salsa: 
-//
-// #message digests in MB per second
-// Blake2: 512- 728/1851, 256- 403/1605 +/=
-// Keccak: 1024- 62/227, 512- 167/626, 256- 310/1149 -/+/=
-// SHA2: 512- 352/1303, 256- 206/790 =/+
-// Skein: 1024- 462/1904, 512- 331/1980, 256- 298/1426  +/+/+
-//
-// #memory in MB per second
-// Memory: LB Clear 8849, Clear 10989, LB Copy 7633, Copy 9803, LB Memset 7575, Memset 10869, LB XOR 5181, XOR 1383
 //
 // ### Planned Release 1.1.0.1 ###
 //
 // AVX512 integration		-started
 // RingLWE					-added
 // McEliece					-added
-// ModuleLWE
-// NTRU
-// ECDH
-// GMSS
-// ECDSA
+// ModuleLWE				-added
+// NTRU Prime
+// SPHINCS+
+// Picnic
 //
 // ### Planned Release 1.2.0.1 ###
 // TLS
@@ -244,6 +139,7 @@
 #include "../Test/MacStreamTest.h"
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
+#include "../Test/ModuleLWETest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
@@ -333,11 +229,11 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.4: CEX Library in C++  *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.5: CEX Library in C++  *");
 	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.4 (A4)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.5 (A5)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      January 31, 2017                *");
+	ConsoleUtils::WriteLine("* Date:      February 19, 2018               *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -390,7 +286,7 @@ void RunTest(Test::ITest* Test)
 int main()
 {
 	ConsoleUtils::SizeConsole();
-	PrintTitle(); 
+	PrintTitle();
 
 #if !defined(_OPENMP)
 	PrintHeader("Warning! This library requires OpenMP support, the test can not coninue!");
@@ -570,6 +466,7 @@ int main()
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
 			RunTest(new RingLWETest());
 			RunTest(new McElieceTest());
+			RunTest(new ModuleLWETest());
 		}
 		else
 		{

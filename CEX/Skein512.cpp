@@ -1,6 +1,5 @@
 #include "Skein512.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 #include "Skein.h"
 

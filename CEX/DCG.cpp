@@ -1,7 +1,6 @@
 #include "DCG.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ProviderFromName.h"
 
 NAMESPACE_DRBG

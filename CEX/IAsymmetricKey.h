@@ -3,10 +3,12 @@
 
 #include "CexDomain.h"
 #include "AsymmetricEngines.h"
+#include "AsymmetricKeyTypes.h"
 
 NAMESPACE_ASYMMETRICKEY
 
 using Enumeration::AsymmetricEngines;
+using Enumeration::AsymmetricKeyTypes;
 
 /// <summary>
 /// The Asymmetric key interface
@@ -18,9 +20,14 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The keys parent cipher type-name
+	/// Read Only: The keys parent cipher type-name AsymmetricKeyTypes
 	/// </summary>
 	virtual const AsymmetricEngines CipherType() = 0;
+
+	/// <summary>
+	/// Read Only: The keys type-name
+	/// </summary>
+	virtual const AsymmetricKeyTypes KeyType() = 0;
 
 	//~~~Constructor~~~//
 

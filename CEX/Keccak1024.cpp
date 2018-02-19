@@ -1,7 +1,5 @@
 #include "Keccak1024.h"
 #include "Keccak.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_DIGEST

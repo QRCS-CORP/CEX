@@ -3,7 +3,6 @@
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #if defined(CEX_COMPILER_MSC)
 #	if defined(__AVX512__)
 #		include "UInt512.h"

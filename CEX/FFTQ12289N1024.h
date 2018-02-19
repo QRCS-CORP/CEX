@@ -21,6 +21,7 @@
 
 #include "CexDomain.h"
 #include "IPrng.h"
+#include "PolyMath.h"
 
 NAMESPACE_RINGLWE
 
@@ -63,14 +64,19 @@ public:
 	static const size_t SEED_BYTES = 32;
 
 	/// <summary>
-	/// The byte size of A's forward message to host B
+	/// The byte size of the public key polynomial
 	/// </summary>
-	static const size_t SENDA_BYTES = POLY_BYTES + SEED_BYTES;
+	static const size_t PUBKEY_SIZE = POLY_BYTES + SEED_BYTES;
+
+	/// <summary>
+	/// The byte size of the private key polynomial
+	/// </summary>
+	static const size_t PRIKEY_SIZE = N;
 
 	/// <summary>
 	/// The byte size of B's reply message to host A
 	/// </summary>
-	static const size_t SENDB_BYTES = POLY_BYTES + RECD_BYTES;
+	static const size_t CPRTXT_SIZE = POLY_BYTES + RECD_BYTES;
 
 	/// <summary>
 	/// The parameter sets formal name
@@ -111,8 +117,7 @@ public:
 
 private:
 
-	static const uint QINV = 12287;
-	static const uint RLOG = 18;
+	static const std::array<ushort, 1024> BitrevTable;
 	static const std::array<ushort, 512> OmegasMontgomery;
 	static const std::array<ushort, 512> OmegasInvMontgomery;
 	static const std::array<ushort, 1024> PsisBitrevMontgomery;
@@ -120,38 +125,19 @@ private:
 
 	//~~~Inlined~~~//
 
-	inline static ushort BarrettReduce(ushort A)
-	{
-		uint u = static_cast<uint>(A * 5) >> 16;
-		u *= Q;
-		A -= u;
-
-		return A;
-	}
-
-	inline static ushort MontgomeryReduce(uint A)
-	{
-		uint u = (A * QINV);
-		u &= ((1 << RLOG) - 1);
-		u *= Q;
-		A = A + u;
-
-		return static_cast<ushort>(A >> 18);
-	}
-
 	inline static void NTTEvenDist(ushort &A, ushort &B, const ushort Omega)
 	{
 		uint tmpW = Omega * ((A + (3 * Q)) - B);
 		A += B;
-		B = MontgomeryReduce(tmpW);
+		B = Utility::PolyMath::MontgomeryReduce(tmpW);
 	}
 
 	inline static void NTTOddDist(ushort &A, ushort &B, const ushort Omega)
 	{
 		uint tmpW = Omega * ((A + (3 * Q)) - B);
 		ushort tmpB = A + B;
-		A = BarrettReduce(tmpB);
-		B = MontgomeryReduce(tmpW);
+		A = Utility::PolyMath::BarrettReduce(tmpB);
+		B = Utility::PolyMath::MontgomeryReduce(tmpW);
 	}
 
 	//~~~Templates~~~//
@@ -216,12 +202,16 @@ private:
 	template <typename Array>
 	inline static void FwdNTT(Array &A)
 	{
+		size_t dist;
+		size_t i;
+		size_t j;
+		size_t jt;
+		size_t k;
+
 		for (size_t i = 0; i < A.size(); ++i)
 		{
-			A[i] = MontgomeryReduce((A[i] * PsisBitrevMontgomery[i]));
+			A[i] = Utility::PolyMath::MontgomeryReduce((A[i] * PsisBitrevMontgomery[i]));
 		}
-
-		size_t dist, i, j, jt, k;
 
 		for (i = 0; i < 10; i += 2)
 		{
@@ -281,7 +271,7 @@ private:
 
 		for (size_t i = 0; i < R.size(); ++i)
 		{
-			R[i] = MontgomeryReduce((R[i] * PsisInvMontgomery[i]));
+			R[i] = Utility::PolyMath::MontgomeryReduce((R[i] * PsisInvMontgomery[i]));
 		}
 	}
 
@@ -464,7 +454,7 @@ private:
 	{
 		for (size_t i = 0; i < R.size(); ++i)
 		{
-			R[i] = BarrettReduce(A[i] + B[i]);
+			R[i] = Utility::PolyMath::BarrettReduce(A[i] + B[i]);
 		}
 	}
 
@@ -487,7 +477,7 @@ private:
 	{
 		for (size_t i = 0; i < Poly.size(); ++i)
 		{
-			Poly[i] = MontgomeryReduce((Poly[i] * Factors[i]));
+			Poly[i] = Utility::PolyMath::MontgomeryReduce((Poly[i] * Factors[i]));
 		}
 	}
 
@@ -499,9 +489,9 @@ private:
 		for (size_t i = 0; i < N; i++)
 		{
 			// t is now in Montgomery domain
-			t = MontgomeryReduce(3186 * B[i]);
+			t = Utility::PolyMath::MontgomeryReduce(3186 * B[i]);
 			// R[i] is back in normal domain
-			R[i] = MontgomeryReduce(A[i] * t);
+			R[i] = Utility::PolyMath::MontgomeryReduce(A[i] * t);
 		}
 	}
 

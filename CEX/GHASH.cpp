@@ -1,7 +1,6 @@
 #include "GHASH.h"
 #include "CpuDetect.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #if defined(__AVX2__)
 #	include "Intrinsics.h"
 #	include <wmmintrin.h>
@@ -158,12 +157,12 @@ void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)
 {
 	const ulong X0 = Utility::IntUtils::BeBytesTo64(X, 0);
 	const ulong X1 = Utility::IntUtils::BeBytesTo64(X, 8);
-	const ulong R = 0xE100000000000000;
+	const ulong R = 0xE100000000000000ULL;
 	ulong T0 = H[0];
 	ulong T1 = H[1];
 	ulong Z0 = 0;
 	ulong Z1 = 0;
-	ulong maskPos = 0x8000000000000000;
+	ulong maskPos = 0x8000000000000000ULL;
 	ulong xMask = 0;
 	ulong xCarry = 0;
 
@@ -178,7 +177,7 @@ void GHASH::Multiply(const std::vector<ulong> &H, std::vector<byte> &X)
 		T0 = (T0 >> 1) ^ xCarry;
 	}
 
-	maskPos = 0x8000000000000000;
+	maskPos = 0x8000000000000000ULL;
 
 	for (size_t i = 0; i != 63; ++i)
 	{

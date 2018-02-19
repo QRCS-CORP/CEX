@@ -1,12 +1,15 @@
-#if defined(__AVX__)
 #include "AHX.h"
-#include "DigestFromName.h"
-#include "HKDF.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
-#include "UInt128.h"
+#if defined(__AVX__)
+#	include "DigestFromName.h"
+#	include "HKDF.h"
+#	include "IntUtils.h"
+#	include "MemUtils.h"
+#	include "UInt128.h"
+#endif
 
 NAMESPACE_BLOCK
+
+#if defined(__AVX__)
 
 const std::string AHX::CIPHER_NAME("Rijndael");
 const std::string AHX::CLASS_NAME("AHX");
@@ -698,5 +701,6 @@ void AHX::LoadState(Digests DigestType)
 	}
 }
 
-NAMESPACE_BLOCKEND
 #endif
+NAMESPACE_BLOCKEND
+

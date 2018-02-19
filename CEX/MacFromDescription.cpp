@@ -1,7 +1,6 @@
 #include "MacFromDescription.h"
 #include "CMAC.h"
 #include "HMAC.h"
-#include "Macs.h"
 
 NAMESPACE_HELPER
 

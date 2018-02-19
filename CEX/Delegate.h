@@ -5,6 +5,8 @@
 
 NAMESPACE_ROUTING
 
+/*lint -save -e1963 */ // TODO: this will be replaced
+
 /// <summary>
 /// The Delegate Listener interface definition
 /// </summary>
@@ -21,6 +23,8 @@ NAMESPACE_ROUTING
             (thisType) * _obj;							\
     };													\
     __L##handler##__ L##handler;
+
+/*lint -restore */
 
 /// <summary>
 /// A Delegate interface pattern pattern

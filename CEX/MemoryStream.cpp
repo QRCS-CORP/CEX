@@ -1,6 +1,5 @@
 #include "MemoryStream.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 
 NAMESPACE_IO
 

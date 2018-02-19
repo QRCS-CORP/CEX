@@ -1,8 +1,6 @@
 #include "SymmetricSecureKey.h"
 #include "ArrayUtils.h"
 #include "CTR.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
 #include "SHA512.h"
 #include "StreamWriter.h"
 #include "StreamReader.h"

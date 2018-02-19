@@ -51,27 +51,27 @@ public:
 
 #define PREFETCHT0(address, length)								\
     do {														\
-		_mm_prefetch(((char*)(address)) + length, _MM_HINT_T0);	\
+		_mm_prefetch((char*)((address) + (length)), _MM_HINT_T0);	\
     } while (false)
 
 #define PREFETCHT1(address, length)								\
     do {														\
-		_mm_prefetch(((char*)(address)) + length, _MM_HINT_T1);	\
+		_mm_prefetch((char*)((address) + (length)), _MM_HINT_T1);	\
     } while (false)
 
 #define PREFETCHT2(address, length)								\
     do {														\
-		_mm_prefetch(((char*)(address)) + length, _MM_HINT_T2);	\
+		_mm_prefetch((char*)((address) + (length)), _MM_HINT_T2);	\
     } while (false)
 
 #define ALNMALLOC(output, length, alignment)					\
     do {														\
-		output = _mm_malloc(length, alignment);					\
+		(output) = _mm_malloc((length), (alignment));					\
     } while (false)
 
 #define ALNFREE(output)											\
     do {														\
-		_mm_free(output);										\
+		_mm_free((output));										\
     } while (false)
 
 #endif

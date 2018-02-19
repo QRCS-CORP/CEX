@@ -1,7 +1,6 @@
 #include "SHA512.h"
 #include "SHA2.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_DIGEST

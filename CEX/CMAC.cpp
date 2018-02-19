@@ -1,7 +1,6 @@
 #include "CMAC.h"
 #include "CBC.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "ISO7816.h"
 #include "SymmetricKey.h"
 

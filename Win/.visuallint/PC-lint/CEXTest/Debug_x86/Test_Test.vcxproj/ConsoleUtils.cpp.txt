@@ -1,4 +1,4 @@
-C:\Users\John\Documents\PC-Lint\CEX\options.lnt  13  Warning 686: Option
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  14  Warning 686: Option
     '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
     output'; receiving a syntax error in a library file most likely means
     something is wrong with your Lint configuration

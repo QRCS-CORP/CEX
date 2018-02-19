@@ -1,7 +1,5 @@
 #include "SHAKE.h"
 #include "Keccak.h"
-#include "IntUtils.h"
-#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
@@ -45,6 +43,12 @@ SHAKE::~SHAKE()
 }
 
 //~~~Accessors~~~//
+
+const size_t SHAKE::BlockSize()
+{
+	return m_blockSize;
+}
+
 byte &SHAKE::DomainCode()
 {
 	return m_domainCode;

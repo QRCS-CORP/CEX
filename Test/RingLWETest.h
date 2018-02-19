@@ -2,6 +2,7 @@
 #define CEXTEST_RINGLWETEST_H
 
 #include "ITest.h"
+#include "../CEX/BCR.h"
 
 namespace Test
 {
@@ -17,6 +18,7 @@ namespace Test
 		static const std::string SUCCESS;
 
 		TestEventHandler m_progressEvent;
+		Prng::BCR* m_rngPtr;
 
 	public:
 
@@ -47,6 +49,9 @@ namespace Test
 
 	private:
 
+		void CipherTextIntegrity();
+		void MessageAuthentication();
+		void PublicKeyIntegrity();
 		void OnProgress(std::string Data);
 		void StressLoop();
 		void SerializationCompare();

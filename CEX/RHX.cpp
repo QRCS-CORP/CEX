@@ -3,7 +3,6 @@
 #include "DigestFromName.h"
 #include "HKDF.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 
 NAMESPACE_BLOCK
 

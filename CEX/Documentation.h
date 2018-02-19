@@ -25,22 +25,20 @@ The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, 
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.4 (A4 version), which are the major, minor, patch, and release codes. \n \n
+The current version is 1.0.0.5 (A5 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release 1.0.0.4 (version A4):</B> \n
-The McEliece asymmetric cipher \n
-The 1024bit Keccak digest \n
-The Poly1305 Message Authentication Code generator \n
-The library is now SEI-CERT compliant (Misra compliance by 1.0.0.5) \n \n
+<B>Current Release 1.0.0.5 (version A4):</B> \n
+The ModuleLWE asymmetric cipher \n
+The SHAKE XOF function \n
+Full MISRA C++2014 compliant \n \n
 
 <B>Planned Release 1.1.0.1</B> \n
 RingLWE \n
 McEliece \n
 ModuleLWE \n
-NTRU \n
-ECDH \n
-GMSS \n
-ECDSA \n \n
+NTRU Prime \n
+Picnic \n
+SPHINCS+ \n \n
 
 <B>Planned Release 1.2.0.1</B> \n
 TLS \n
@@ -49,6 +47,13 @@ Android/iOS/Linux Compatability \n
 DLL API \n \n
 
 <B>History</B> \n \n
+
+<B>Version 1.0.0.5, February 22, 2018</B> \n
+Added the ModuleLWE asymmetric cipher \n
+Added asymmetric cipher Encapsulate/Decapsulate api \n
+Added the 128/256/512/1024 SHAKE XOF function \n
+Updates to random providers and Prngs \n
+The library is now Misra C++ 2014 compliant \n \n
 
 <B>Version 1.0.0.4, November 11, 2017</B> \n
 Added the McEliece asymmetric cipher \n
@@ -121,8 +126,17 @@ NAMESPACE_ROOT
 			*/
 			NAMESPACE_MCELIECE
 				class McEliece {};
-				struct MPKCParamSet {};
 			NAMESPACE_MCELIECEEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup ModuleLWE
+			*  @{
+			*  @brief The McEliece Cipher Namespace
+			*/
+			NAMESPACE_MODULELWE
+				class ModuleLWE {};
+			NAMESPACE_MODULELWEEND
 			/*! @} */
 
 			/*!
@@ -132,7 +146,6 @@ NAMESPACE_ROOT
 			*/
 			NAMESPACE_RINGLWE
 				class RingLWE {};
-				struct RLWEParamSet {};
 			NAMESPACE_RINGLWEEND
 			/*! @} */
 
@@ -361,6 +374,7 @@ NAMESPACE_ROOT
 		class KDF2 {};
 		class PBKDF2 {};
 		class SCRYPT {};
+		class SHAKE {};
 	NAMESPACE_KDFEND
 	/*! @} */
 

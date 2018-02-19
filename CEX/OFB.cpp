@@ -1,7 +1,6 @@
 #include "OFB.h"
 #include "BlockCipherFromName.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 
 NAMESPACE_MODE
 

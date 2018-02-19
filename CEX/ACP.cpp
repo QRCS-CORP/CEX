@@ -154,6 +154,7 @@ std::vector<byte> ACP::Collect()
 		Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
 	}
 
+#if defined(CEX_ACP_JITTER)
 	// add jitter
 	if (m_hasTsc)
 	{
@@ -162,6 +163,7 @@ std::vector<byte> ACP::Collect()
 		Utility::ArrayUtils::Append(buffer, state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
 	}
+#endif
 
 	// last block size
 	size_t padLen = ((state.size() % KBLK) == 0) ? KBLK : KBLK - (state.size() % KBLK);

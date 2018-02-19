@@ -3,8 +3,6 @@
 #include "DigestFromName.h"
 #include "KDF2.h"
 #include "IntUtils.h"
-#include "ISymmetricKey.h"
-#include "MemUtils.h"
 #include "ParallelUtils.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"

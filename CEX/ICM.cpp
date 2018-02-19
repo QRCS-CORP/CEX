@@ -2,7 +2,6 @@
 #include "BlockCipherFromName.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
-#include "MemUtils.h"
 
 NAMESPACE_MODE
 

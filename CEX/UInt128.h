@@ -812,4 +812,5 @@ public:
 };
 
 NAMESPACE_NUMERICEND
+
 #endif

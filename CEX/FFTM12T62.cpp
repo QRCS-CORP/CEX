@@ -1,9 +1,7 @@
 #include "FFTM12T62.h"
 #include "IAeadMode.h"
-#include "IDigest.h"
 #include "IntUtils.h"
 #include "McElieceUtils.h"
-#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MCELIECE
@@ -971,18 +969,18 @@ void FFTM12T62::BerlekampMassey(std::array<ulong, M> &Output, std::array<std::ar
 
 void FFTM12T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte> &S)
 {
-	IntUtils::BlockToLe(S, 0, Received, 0, SECRET_SIZE - 5);
+	IntUtils::BlockToLe(S, 0, Received, 0, CPRTXT_SIZE - 5);
 
-	Received[SECRET_SIZE / 8] <<= 8;
-	Received[SECRET_SIZE / 8] |= S[((SECRET_SIZE / 8) * 8) + 4];
-	Received[SECRET_SIZE / 8] <<= 8;
-	Received[SECRET_SIZE / 8] |= S[((SECRET_SIZE / 8) * 8) + 3];
-	Received[SECRET_SIZE / 8] <<= 8;
-	Received[SECRET_SIZE / 8] |= S[((SECRET_SIZE / 8) * 8) + 2];
-	Received[SECRET_SIZE / 8] <<= 8;
-	Received[SECRET_SIZE / 8] |= S[((SECRET_SIZE / 8) * 8) + 1];
-	Received[SECRET_SIZE / 8] <<= 8;
-	Received[SECRET_SIZE / 8] |= S[((SECRET_SIZE / 8) * 8)];
+	Received[CPRTXT_SIZE / 8] <<= 8;
+	Received[CPRTXT_SIZE / 8] |= S[((CPRTXT_SIZE / 8) * 8) + 4];
+	Received[CPRTXT_SIZE / 8] <<= 8;
+	Received[CPRTXT_SIZE / 8] |= S[((CPRTXT_SIZE / 8) * 8) + 3];
+	Received[CPRTXT_SIZE / 8] <<= 8;
+	Received[CPRTXT_SIZE / 8] |= S[((CPRTXT_SIZE / 8) * 8) + 2];
+	Received[CPRTXT_SIZE / 8] <<= 8;
+	Received[CPRTXT_SIZE / 8] |= S[((CPRTXT_SIZE / 8) * 8) + 1];
+	Received[CPRTXT_SIZE / 8] <<= 8;
+	Received[CPRTXT_SIZE / 8] |= S[((CPRTXT_SIZE / 8) * 8)];
 }
 
 void FFTM12T62::Scaling(std::array<std::array<ulong, M>, 64> &Output, std::array<std::array<ulong, M>, 64> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
@@ -1146,7 +1144,7 @@ void FFTM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKe
 	const size_t COLSZE = PKN_COLS / 8;
 
 	std::array<ulong, ARRSZE> eInt;
-	MemUtils::Copy(E, SECRET_SIZE, eInt, 0, COLSZE);
+	MemUtils::Copy(E, CPRTXT_SIZE, eInt, 0, COLSZE);
 	std::array<ulong, ARRSZE> rowInt;
 	std::array<ulong, 8> tmp;
 	size_t i;

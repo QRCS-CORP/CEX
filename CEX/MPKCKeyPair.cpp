@@ -37,7 +37,7 @@ IAsymmetricKey* MPKCKeyPair::PublicKey()
 	return m_publicKey;
 }
 
-const std::vector<byte> &MPKCKeyPair::Tag()
+std::vector<byte> &MPKCKeyPair::Tag()
 {
 	return m_Tag;
 }

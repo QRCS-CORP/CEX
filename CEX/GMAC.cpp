@@ -2,7 +2,6 @@
 #include "BlockCipherFromName.h"
 #include "IntUtils.h"
 #include "MemUtils.h"
-#include "SymmetricKey.h"
 
 NAMESPACE_MAC
 

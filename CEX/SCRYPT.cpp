@@ -2,7 +2,6 @@
 #include "DigestFromName.h"
 #include "Intrinsics.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "PBKDF2.h"
 #include "ParallelUtils.h"
 #include "SymmetricKey.h"

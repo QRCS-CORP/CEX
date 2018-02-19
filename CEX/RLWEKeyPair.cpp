@@ -37,7 +37,7 @@ IAsymmetricKey* RLWEKeyPair::PublicKey()
 	return m_publicKey;
 }
 
-const std::vector<byte> &RLWEKeyPair::Tag()
+std::vector<byte> &RLWEKeyPair::Tag()
 {
 	return m_Tag;
 }

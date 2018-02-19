@@ -1,5 +1,5 @@
 #ifndef CEXTEST_SKEINTEST_H
-#define CEXTEST_SkeinTest_H
+#define CEXTEST_SKEINTEST_H
 
 #include "ITest.h"
 #include "../CEX/IDigest.h"
