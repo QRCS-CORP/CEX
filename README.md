@@ -104,7 +104,7 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Intel RdRand/RdSeed Provider (RDP)
 
 ## Trajectory
-The current version is <B>1.0.0.5</B> (A4 version), which are the major, minor, patch, and release codes.
+The current version is <B>1.0.0.5</B> (A5 version), which are the major, minor, patch, and release codes.
   
 ### Current Release 1.0.0.5 (version A5):
 * The ModuleLWE asymmetric cipher
