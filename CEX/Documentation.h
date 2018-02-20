@@ -36,7 +36,7 @@ Full MISRA C++2014 compliant \n \n
 RingLWE \n
 McEliece \n
 ModuleLWE \n
-NTRU Prime \n
+NTRU \n
 Picnic \n
 SPHINCS+ \n \n
 

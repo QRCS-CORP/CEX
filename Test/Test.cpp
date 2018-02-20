@@ -67,11 +67,11 @@
 // ### SCHEDULE FOR 1.0.0.6 RELEASE ###
 // ## ETA is March 31, 2018 ##
 // 
-// Add NTRU Prime
+// Add NTRU asymmetric cipher
 // Add cSHAKE DRBG
 // Add asymmetric IAuthenticator CCA interface
-// Add KMAC
-// Rewrite ACP/ECP
+// Add KMAC Message Authentication Code generator
+// Rewrite ACP/ECP (cSHAKE expansion)
 //
 //
 // ## Style Rules ##
@@ -94,7 +94,7 @@
 // RingLWE					-added
 // McEliece					-added
 // ModuleLWE				-added
-// NTRU Prime
+// NTRU
 // SPHINCS+
 // Picnic
 //
