@@ -1,2 +1,4 @@
 $ cat .gitattributes
 *.rb linguist-language=C++
+Doxygen/* linguist-documentation
+Visual Lint Analysis/* linguist-documentation
