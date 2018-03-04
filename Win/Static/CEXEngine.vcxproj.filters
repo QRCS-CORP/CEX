@@ -873,6 +873,12 @@
     <ClInclude Include="..\..\CEX\FFTQ12289N512.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\CSG.h">
+      <Filter>Header Files\Drbg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\KMAC.h">
+      <Filter>Header Files\Mac</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1228,6 +1234,12 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\FFTQ12289N512.cpp">
       <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CSG.cpp">
+      <Filter>Source Files\Drbg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\KMAC.cpp">
+      <Filter>Source Files\Mac</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

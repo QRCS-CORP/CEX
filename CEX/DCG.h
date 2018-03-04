@@ -201,7 +201,7 @@ public:
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit DCG(IDigest* Digest, IProvider* Provider = 0);
+	explicit DCG(IDigest* Digest, IProvider* Provider = nullptr);
 
 	/// <summary>
 	/// Destructor: finalize this class

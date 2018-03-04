@@ -15,15 +15,19 @@ enum class Drbgs : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An implementation of a Block Counter mode Generator
+	/// A Block-cipher Counter mode Deterministic Random Bit Generator
 	/// </summary>
 	BCG = 1,
 	/// <summary>
-	/// An implementation of a Digest Counter Generator
+	/// A cSHAKE Deterministic Random Bit Generator
+	/// </summary>
+	CSG = 3,
+	/// <summary>
+	/// A Digest Counter Deterministic Random Bit Generator
 	/// </summary>
 	DCG = 2,
 	/// <summary>
-	/// An implementation of an HMAC Counter Generator
+	/// A HMAC Counter  Deterministic Random Bit Generator
 	/// </summary>
 	HCG = 3
 };

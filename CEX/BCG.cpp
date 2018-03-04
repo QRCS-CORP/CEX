@@ -25,11 +25,11 @@ BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
 	m_kdfEngine(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) : nullptr),
 	m_kdfEngineType(DigestType),
 	m_kdfInfo(0),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
+	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
 	m_prdResistant(ProviderType != Providers::None),
 	m_providerSource(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(ProviderType) : nullptr),
 	m_providerType(ProviderType),
@@ -220,18 +220,23 @@ size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CexAssert(m_isInitialized, "The generator must be initialized before use!");
 	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CexAssert(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
 	CexAssert(Length <= ParallelBlockSize(), "The maximum request size has been exceeded!");
 
 	GenerateBlock(Output, OutOffset, Length);
 
-	// added: reseed for prediction resistance
-	if (m_providerType != Providers::None)
+	if (m_prdResistant)
 	{
 		m_reseedCounter += Length;
+
 		if (m_reseedCounter >= m_reseedThreshold)
 		{
 			++m_reseedRequests;
+
+			if (m_reseedRequests > MAX_RESEED)
+			{
+				throw CryptoGeneratorException("BCG:Generate", "The maximum reseed requests can not be exceeded, re-initialize the generator!");
+			}
+
 			m_reseedCounter = 0;
 			// use next block of state as seed material
 			std::vector<byte> state(m_kdfEngine->BlockSize());

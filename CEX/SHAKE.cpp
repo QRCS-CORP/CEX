@@ -20,7 +20,7 @@ SHAKE::SHAKE(ShakeModes ShakeMode)
 	m_isInitialized(false),
 	m_kdfState(),
 	m_legalKeySizes(0),
-	m_shakeType(ShakeMode != ShakeModes::None ? ShakeMode :
+	m_shakeMode(ShakeMode != ShakeModes::None ? ShakeMode :
 		throw CryptoKdfException("SHAKE:Ctor", "The SHAKE mode type can not ne none!"))
 {
 	LoadState();
@@ -35,7 +35,7 @@ SHAKE::~SHAKE()
 		m_domainCode = 0;
 		m_hashSize = 0;
 		m_isInitialized = false;
-		m_shakeType = ShakeModes::None;
+		m_shakeMode = ShakeModes::None;
 
 		IntUtils::ClearArray(m_kdfState);
 		IntUtils::ClearVector(m_legalKeySizes);
@@ -86,21 +86,89 @@ const std::string SHAKE::Name()
 
 //~~~Public Functions~~~//
 
-void SHAKE::DomainString(std::vector<byte> &Input)
+void SHAKE::CustomDomain(const std::vector<byte> &Customization)
 {
 	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
-	CexAssert(Input.size() <= 196, "the input buffer is too large");
+	CexAssert(Customization.size() <= 196, "the input buffer is too large");
 
 	std::vector<byte> sep(200);
 	sep[0] = 0x01;
 	sep[1] = static_cast<byte>(m_blockSize);
 	sep[2] = 0x01;
 	sep[3] = 0x00;
-	MemUtils::Copy(Input, 0, sep, 4, Input.size());
+
+	m_domainCode = CSHAKE_DOMAIN;
+
+	MemUtils::Copy(Customization, 0, sep, 4, Customization.size());
 
 	for (size_t i = 0; i < 200; i += 8)
 	{
-		m_kdfState[i / 8] = IntUtils::BeBytesTo64(sep, i);
+		m_kdfState[i / 8] = IntUtils::LeBytesTo64(sep, i);
+	}
+
+	Permute(m_kdfState);
+}
+
+void SHAKE::CustomDomain(const std::vector<byte> &Customization, const std::vector<byte> &Name)
+{
+	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
+	CexAssert(Customization.size() + Name.size() <= 196, "the input buffer is too large");
+
+	std::vector<byte> pad(200);
+	size_t i;
+	size_t offset;
+
+	offset = 0;
+	offset = LeftEncode(pad, 0, m_blockSize);
+	offset += LeftEncode(pad, offset, Name.size() * 8);
+
+	m_domainCode = CSHAKE_DOMAIN;
+
+	if (Name.size() != 0)
+	{
+		for (i = 0; i < Name.size(); i++)
+		{
+			if (offset == m_blockSize)
+			{
+				for (size_t i = 0; i < 200; i += 8)
+				{
+					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
+				}
+
+				Permute(m_kdfState);
+				offset = 0;
+			}
+
+			pad[offset] = Name[i];
+			++offset;
+		}
+	}
+
+	offset += LeftEncode(pad, offset, Customization.size() * 8);
+
+	if (Customization.size() != 0)
+	{
+		for (i = 0; i < Customization.size(); i++)
+		{
+			if (offset == m_blockSize)
+			{
+				for (size_t i = 0; i < 200; i += 8)
+				{
+					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
+				}
+
+				Permute(m_kdfState);
+				offset = 0;
+			}
+
+			pad[offset] = Customization[i];
+			++offset;
+		}
+	}
+
+	for (size_t i = 0; i < 200; i += 8)
+	{
+		m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
 	}
 
 	Permute(m_kdfState);
@@ -151,7 +219,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 {
 	if (Key.size() < m_legalKeySizes[0].KeySize())
 	{
-		throw CryptoKdfException("SHAKE:Initialize", "Invalid key size! Key must be at least LegalKeySizes[0].Key() size in length.");
+	//	throw CryptoKdfException("SHAKE:Initialize", "Invalid key size! Key must be at least LegalKeySizes[0].Key() size in length.");
 	}
 
 	if (m_isInitialized)
@@ -237,6 +305,29 @@ void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 	}
 }
 
+size_t SHAKE::LeftEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value)
+{
+	uint32_t i;
+	uint32_t n;
+	uint32_t v;
+
+	for (v = Value, n = 0; v && (n < sizeof(uint32_t)); ++n, v >>= 8);
+
+	if (n == 0)
+	{
+		n = 1;
+	}
+
+	for (i = 1; i <= n; ++i)
+	{
+		Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
+	}
+
+	Buffer[Offset] = (uint8_t)n;
+
+	return static_cast<size_t>(n + 1);
+}
+
 void SHAKE::LoadState()
 {
 	// initialize state arrays
@@ -245,15 +336,15 @@ void SHAKE::LoadState()
 	m_legalKeySizes.resize(3);
 	// minimum security is half the digest output size
 	m_legalKeySizes[0] = SymmetricKeySize((m_hashSize / 2), 0, 0);
-	// best perf/sec mix, a full block
-	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, 0, 0);
-	// max key input; add two blocks
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize * 2, 0, 0);
+	// best perf/sec mix, the digest output size
+	m_legalKeySizes[1] = SymmetricKeySize(m_hashSize, 0, 0);
+	// max recommended key input; is one full block
+	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, 0, 0);
 }
 
 void SHAKE::Permute(std::array<ulong, 25> &State)
 {
-	if (m_shakeType != ShakeModes::SHAKE1024)
+	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
 		Digest::Keccak::Permute24(State);
 	}

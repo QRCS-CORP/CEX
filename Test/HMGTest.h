@@ -50,8 +50,8 @@ namespace Test
 
 		void CheckInit();
 		void CheckMac();
-		bool CheckRuns(const std::vector<byte> &Input);
 		void OnProgress(std::string Data);
+		bool OrderedRuns(const std::vector<byte> &Input);
 	};
 }
 

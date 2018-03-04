@@ -1,24 +1,27 @@
-#ifndef CEXTEST_DCGTEST_H
-#define CEXTEST_DCGTEST_H
+#ifndef CEXTEST_CSGTEST_H
+#define CEXTEST_CSGTEST_H
 
 #include "ITest.h"
+#include "../CEX/IDrbg.h"
 
 namespace Test
 {
 	/// <summary>
-	/// DCG output comparison test.
-	/// <para></para>
+	/// CSG output comparison test.
+	/// <para>Test using the iofficial NIST references contained in:
+	/// NIST cSHAKE KATs: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/cSHAKE_samples.pdf">cSHAKE example values</a>
+	/// SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></para>
 	/// </summary>
-	class DCGTest final : public ITest
+	class CSGTest final : public ITest
 	{
 	private:
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
-		static const size_t SAMPLE_SIZE = 1024;
 
-		std::vector<std::vector<byte>> m_expected256;
-		std::vector<std::vector<byte>> m_seed256;
+		std::vector<byte> m_custom;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<byte>> m_seed;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -26,12 +29,12 @@ namespace Test
 		/// <summary>
 		/// Compares known answer CTR Drbg vectors for equality
 		/// </summary>
-		DCGTest();
+		CSGTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~DCGTest();
+		~CSGTest();
 
 		/// <summary>
 		/// Get: The test description
@@ -51,6 +54,8 @@ namespace Test
 	private:
 
 		void CheckInit();
+		void CompareVector(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected);
+		void Initialize();
 		void OnProgress(std::string Data);
 		bool OrderedRuns(const std::vector<byte> &Input);
 	};

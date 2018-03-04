@@ -77,7 +77,7 @@ namespace Test
 			delete dgt;
 			delete pvd;
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -99,7 +99,7 @@ namespace Test
 			ctd.Initialize(seed);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -110,7 +110,7 @@ namespace Test
 			ctd.Initialize(seed, nonce);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -120,7 +120,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -147,7 +147,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -166,7 +166,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -185,7 +185,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -204,7 +204,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -223,7 +223,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -242,7 +242,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -261,7 +261,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -280,7 +280,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -299,7 +299,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("HMGTest: Failed duplication test!");
 			}
@@ -310,7 +310,7 @@ namespace Test
 		}
 	}
 
-	bool HMGTest::CheckRuns(const std::vector<byte> &Input)
+	bool HMGTest::OrderedRuns(const std::vector<byte> &Input)
 	{
 		bool state = false;
 

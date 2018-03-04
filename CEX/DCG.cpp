@@ -185,7 +185,6 @@ size_t DCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CexAssert(m_isInitialized, "The generator must be initialized before use!");
 	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CexAssert(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
 	CexAssert(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
 	size_t prcLen = Length;
@@ -202,14 +201,24 @@ size_t DCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		Utility::MemUtils::Copy(m_priState, 0, Output, OutOffset, rmdLen);
 		prcLen -= rmdLen;
 		OutOffset += rmdLen;
-		m_reseedCounter += rmdLen;
 
-		// recycle the seed and reset counter
-		if (m_reseedCounter >= m_reseedThreshold)
+		if (m_prdResistant)
 		{
-			++m_reseedRequests;
-			Derive();
-			m_reseedCounter = 0;
+			m_reseedCounter += rmdLen;
+
+			// recycle the seed and reset counter
+			if (m_reseedCounter >= m_reseedThreshold)
+			{
+				++m_reseedRequests;
+
+				if (m_reseedRequests > MAX_RESEED)
+				{
+					throw CryptoGeneratorException("DCG:Generate", "The maximum reseed requests can not be exceeded, re-initialize the generator!");
+				}
+
+				Derive();
+				m_reseedCounter = 0;
+			}
 		}
 	} 
 	while (prcLen != 0);

@@ -1,5 +1,5 @@
-#ifndef CEXTEST_DRBGTEST_H
-#define CEXTEST_DRBGTEST_H
+#ifndef CEXTEST_CMGTEST_H
+#define CEXTEST_CMGTEST_H
 
 #include "ITest.h"
 
@@ -50,9 +50,9 @@ namespace Test
 	private:
 
 		void CheckInit();
-		bool CheckRuns(const std::vector<byte> &Input);
 		void CompareOutput();
 		void OnProgress(std::string Data);
+		bool OrderedRuns(const std::vector<byte> &Input);
 	};
 }
 

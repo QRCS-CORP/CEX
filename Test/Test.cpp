@@ -72,6 +72,7 @@
 // Add asymmetric IAuthenticator CCA interface
 // Add KMAC Message Authentication Code generator
 // Rewrite ACP/ECP (cSHAKE expansion)
+// Review of DRBGs and MACs
 //
 //
 // ## Style Rules ##
@@ -125,12 +126,14 @@
 #include "../Test/CMACTest.h"
 #include "../Test/ConsoleUtils.h"
 #include "../Test/CMGTest.h"
+#include "../Test/CSGTest.h"
 #include "../Test/DCGTest.h"
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/KDF2Test.h"
 #include "../Test/KeccakTest.h"
+#include "../Test/KMACTest.h"
 #include "../Test/HKDFTest.h"
 #include "../Test/HMACTest.h"
 #include "../Test/HMGTest.h"
@@ -233,7 +236,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.5 (A5)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      February 19, 2018               *");
+	ConsoleUtils::WriteLine("* Date:      March 04, 2018				  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -441,6 +444,7 @@ int main()
 			RunTest(new CMACTest());
 			RunTest(new GMACTest());
 			RunTest(new HMACTest());
+			RunTest(new KMACTest());
 			RunTest(new Poly1305Test());
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
 			RunTest(new PrngTest());
@@ -452,6 +456,7 @@ int main()
 			RunTest(new SHAKETest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new CMGTest());
+			RunTest(new CSGTest());
 			RunTest(new DCGTest());
 			RunTest(new HMGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");

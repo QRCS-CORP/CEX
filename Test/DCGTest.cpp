@@ -75,7 +75,7 @@ namespace Test
 			delete dgt;
 			delete pvd;
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("DCGTest: Failed duplication test!");
 			}
@@ -92,7 +92,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("DCGTest: Failed duplication test!");
 			}
@@ -104,7 +104,7 @@ namespace Test
 			ctd.Initialize(seed, nonce);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("DCGTest: Failed duplication test!");
 			}
@@ -116,7 +116,7 @@ namespace Test
 			ctd.Initialize(seed, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("DCGTest: Failed duplication test!");
 			}
@@ -128,7 +128,7 @@ namespace Test
 		}
 	}
 
-	bool DCGTest::CheckRuns(const std::vector<byte> &Input)
+	bool DCGTest::OrderedRuns(const std::vector<byte> &Input)
 	{
 		bool state = false;
 

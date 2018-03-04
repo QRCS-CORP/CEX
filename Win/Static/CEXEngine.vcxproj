@@ -239,6 +239,7 @@
     <ClInclude Include="..\..\CEX\CryptoProcessingException.h" />
     <ClInclude Include="..\..\CEX\CryptoRandomException.h" />
     <ClInclude Include="..\..\CEX\CryptoSymmetricCipherException.h" />
+    <ClInclude Include="..\..\CEX\CSG.h" />
     <ClInclude Include="..\..\CEX\CSP.h" />
     <ClInclude Include="..\..\CEX\CTR.h" />
     <ClInclude Include="..\..\CEX\BCG.h" />
@@ -263,6 +264,7 @@
     <ClInclude Include="..\..\CEX\IAsymmetricParameters.h" />
     <ClInclude Include="..\..\CEX\IAuthenticate.h" />
     <ClInclude Include="..\..\CEX\KeccakState.h" />
+    <ClInclude Include="..\..\CEX\KMAC.h" />
     <ClInclude Include="..\..\CEX\McElieceUtils.h" />
     <ClInclude Include="..\..\CEX\HKDF.h" />
     <ClInclude Include="..\..\CEX\HMAC.h" />
@@ -420,6 +422,7 @@
     <ClCompile Include="..\..\CEX\CryptoProcessingException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoRandomException.cpp" />
     <ClCompile Include="..\..\CEX\CryptoSymmetricCipherException.cpp" />
+    <ClCompile Include="..\..\CEX\CSG.cpp" />
     <ClCompile Include="..\..\CEX\CSP.cpp" />
     <ClCompile Include="..\..\CEX\CTR.cpp" />
     <ClCompile Include="..\..\CEX\BCG.cpp" />
@@ -450,6 +453,7 @@
     <ClCompile Include="..\..\CEX\Keccak256.cpp" />
     <ClCompile Include="..\..\CEX\Keccak512.cpp" />
     <ClCompile Include="..\..\CEX\KeccakParams.cpp" />
+    <ClCompile Include="..\..\CEX\KMAC.cpp" />
     <ClCompile Include="..\..\CEX\McEliece.cpp" />
     <ClCompile Include="..\..\CEX\McElieceUtils.cpp" />
     <ClCompile Include="..\..\CEX\MLWEKeyPair.cpp" />

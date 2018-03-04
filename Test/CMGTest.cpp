@@ -74,7 +74,7 @@ namespace Test
 			ctd.Initialize(key, nonce, info);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("CMGTest: Failed duplication test!");
 			}
@@ -83,7 +83,7 @@ namespace Test
 			ctd.Initialize(key, nonce);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("CMGTest: Failed duplication test!");
 			}
@@ -92,7 +92,7 @@ namespace Test
 			ctd.ParallelProfile().IsParallel() = true;
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("CMGTest: Failed parallel duplication test!");
 			}
@@ -102,7 +102,7 @@ namespace Test
 			ctd.Initialize(key);
 			ctd.Generate(output);
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("CMGTest: Failed duplication test!");
 			}
@@ -125,7 +125,7 @@ namespace Test
 			delete cpr;
 			delete dgt;
 
-			if (CheckRuns(output))
+			if (OrderedRuns(output))
 			{
 				throw TestException("CMGTest: Failed duplication test!");
 			}
@@ -166,7 +166,7 @@ namespace Test
 		}
 	}
 
-	bool CMGTest::CheckRuns(const std::vector<byte> &Input)
+	bool CMGTest::OrderedRuns(const std::vector<byte> &Input)
 	{
 		bool state = false;
 

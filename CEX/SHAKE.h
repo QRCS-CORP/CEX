@@ -16,11 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 //
-// 
-// Principal Algorithms:
-// An implementation of the SHA-2 digest with a 512 bit return size.
-// SHA-2 <a href="http://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf">Specification</a>.
-// 
 // Implementation Details:
 // An implementation of an Hash based Key Derivation Function (SHAKE). 
 // Written by John Underhill, December 12, 2017
@@ -96,7 +91,7 @@ private:
 	bool m_isInitialized;
 	std::array<ulong, 25> m_kdfState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	ShakeModes m_shakeType;
+	ShakeModes m_shakeMode;
 
 public:
 
@@ -176,11 +171,21 @@ public:
 	/// <summary>
 	/// Initialize the internal state with a custom domain string.
 	/// <para>Adds one permutation cycle (simplified cSHAKE). 
-	/// The domain string must be set before initialization, and must be less than 196 bytes in length.</para>
+	/// The customization array must be set before initialization, and must be less than 196 bytes in length.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The custom domain string byte array</param>
-	void DomainString(std::vector<byte> &Input);
+	/// <param name="Customization">The custom domain byte array</param>
+	void CustomDomain(const std::vector<byte> &Customization);
+
+	/// <summary>
+	/// Initialize the internal state with a custom domain string.
+	/// <para>Creates an implementation of cSHAKE. 
+	/// The customization and name arrays must be set before initialization, and must be a combined length of less than 196 bytes.</para>
+	/// </summary>
+	/// 
+	/// <param name="Customization">The custom domain byte array</param>
+	/// <param name="Name">The function name byte array</param>
+	void CustomDomain(const std::vector<byte> &Customization, const std::vector<byte> &Name);
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -275,6 +280,7 @@ private:
 
 	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Expand(std::vector<byte> &Output, size_t Offset, size_t Length);
+	size_t LeftEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value);
 	void LoadState();
 	void Permute(std::array<ulong, 25> &State);
 };

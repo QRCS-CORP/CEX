@@ -138,7 +138,7 @@ void HMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 size_t HMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
 	CexAssert(m_isInitialized, "The Mac is not initialized!");
-	CexAssert((Output.size() - OutOffset) >= m_msgDigest->DigestSize(), "The Input buffer is too short!");
+	CexAssert((Output.size() - OutOffset) >= m_msgDigest->DigestSize(), "The Output buffer is too short!");
 
 	std::vector<byte> tmpV(m_msgDigest->DigestSize(), 0);
 	m_msgDigest->Finalize(tmpV, 0);

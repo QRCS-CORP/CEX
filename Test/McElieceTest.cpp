@@ -135,9 +135,9 @@ namespace Test
 		McEliece cpr(Enumeration::MPKCParams::M12T62, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
-		// alter public key
+		// alter public key (proportionate to large pk)
 		std::vector<byte> p2 = ((MPKCPublicKey*)kp->PublicKey())->P();
-		m_rngPtr->GetBytes(p2, 0, 16);
+		m_rngPtr->GetBytes(p2, 0, 4096);
 		MPKCPublicKey* pk2 = new MPKCPublicKey(Enumeration::MPKCParams::M12T62, p2);
 		cpr.Initialize(true, pk2);
 		cpr.Encapsulate(cpt, sec1);

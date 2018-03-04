@@ -95,7 +95,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("CMAC is not equal!");
+			throw TestException("HMACTest: MAC is not equal!");
 		}
 	}
 

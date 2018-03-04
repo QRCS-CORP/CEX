@@ -19,17 +19,21 @@ enum class Macs : byte
 	/// </summary>
 	CMAC = 1,
 	/// <summary>
-	/// A Hash based Message Authentication Code generator (HMAC)
-	/// </summary>
-	HMAC = 2,
-	/// <summary>
 	/// A Cipher based Message Authentication Code generator (GMAC)
 	/// </summary>
-	GMAC = 3,
+	GMAC = 2,
+	/// <summary>
+	/// A Hash based Message Authentication Code generator (HMAC)
+	/// </summary>
+	HMAC = 3,
+	/// <summary>
+	/// The Keccak based Message Authentication Code generator (KMAC)
+	/// </summary>
+	KMAC = 4,
 	/// <summary>
 	/// The Poly1305 Message Authentication Code generator
 	/// </summary>
-	Poly1305 = 4
+	Poly1305 = 5
 };
 
 NAMESPACE_ENUMERATIONEND

@@ -23,6 +23,7 @@ HCG::HCG(Digests DigestType, Providers ProviderType)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
+	m_prdResistant(ProviderType != Providers::None),
 	m_providerSource(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
 	m_providerType(ProviderType),
 	m_reseedCounter(0),
@@ -48,6 +49,7 @@ HCG::HCG(IDigest* Digest, IProvider* Provider)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
+	m_prdResistant(m_providerSource != nullptr),
 	m_providerSource(Provider),
 	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
 	m_reseedCounter(0),
@@ -68,6 +70,7 @@ HCG::~HCG()
 		m_digestType = Digests::None;
 		m_distributionCodeMax = 0;
 		m_isInitialized = false;
+		m_prdResistant = false;
 		m_providerType = Providers::None;
 		m_reseedCounter = 0;
 		m_reseedRequests = 0;
@@ -173,21 +176,30 @@ size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CexAssert(m_isInitialized, "The generator must be initialized before use!");
 	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CexAssert(m_reseedRequests <= MAX_RESEED, "The maximum reseed requests have been exceeded!");
 	CexAssert(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
 	GenerateBlock(Output, OutOffset, Length);
-	m_reseedCounter += Length;
 
-	if (m_reseedCounter >= m_reseedThreshold)
+	if (m_prdResistant)
 	{
-		++m_reseedRequests;
-		m_reseedCounter = 0;
-		// use next block of state as seed material
-		std::vector<byte> state(m_hmacEngine.BlockSize());
-		Generate(state, 0, state.size());
-		// combine with salt from provider, extract, and re-key
-		Derive(state);
+		m_reseedCounter += Length;
+
+		if (m_reseedCounter >= m_reseedThreshold)
+		{
+			++m_reseedRequests;
+
+			if (m_reseedRequests > MAX_RESEED)
+			{
+				throw CryptoGeneratorException("HCG:Generate", "The maximum reseed requests can not be exceeded, re-initialize the generator!");
+			}
+
+			m_reseedCounter = 0;
+			// use next block of state as seed material
+			std::vector<byte> state(m_hmacEngine.BlockSize());
+			Generate(state, 0, state.size());
+			// combine with salt from provider, extract, and re-key
+			Derive(state);
+		}
 	}
 
 	return Length;
@@ -311,8 +323,13 @@ void HCG::Derive(const std::vector<byte> &Seed)
 		m_hmacEngine.Update(m_seedCtr, 0, m_seedCtr.size());
 		// 3) process the seed
 		m_hmacEngine.Update(Seed, 0, Seed.size());
+
 		// 4) pad with new entropy
-		RandomPad(blkOffset);
+		if (m_prdResistant)
+		{
+			RandomPad(blkOffset);
+		}
+
 		// 5) compress and add to HMAC key
 		m_hmacEngine.Finalize(macCode, 0);
 		Utility::MemUtils::Copy(macCode, 0, tmpKey, keyOffset, keyRmd);
@@ -326,8 +343,12 @@ void HCG::Derive(const std::vector<byte> &Seed)
 	// 6) rekey the HMAC
 	Key::Symmetric::SymmetricKey kp(m_hmacKey);
 	m_hmacEngine.Initialize(kp);
+
 	// 7) generate the states initial entropy
-	m_providerSource->GetBytes(m_hmacState);
+	if (m_prdResistant)
+	{
+		m_providerSource->GetBytes(m_hmacState);
+	}
 }
 
 void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)

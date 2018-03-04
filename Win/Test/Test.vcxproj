@@ -305,12 +305,14 @@
     <ClInclude Include="..\..\Test\CMACTest.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
     <ClInclude Include="..\..\Test\CMGTest.h" />
+    <ClInclude Include="..\..\Test\CSGTest.h" />
     <ClInclude Include="..\..\Test\DCGTest.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
     <ClInclude Include="..\..\Test\GMACTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\HMACTest.h" />
     <ClInclude Include="..\..\Test\HMGTest.h" />
+    <ClInclude Include="..\..\Test\KMACTest.h" />
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
     <ClInclude Include="..\..\Test\McElieceTest.h" />
     <ClInclude Include="..\..\Test\MemUtilsTest.h" />
@@ -363,6 +365,7 @@
     <ClCompile Include="..\..\Test\CMACTest.cpp" />
     <ClCompile Include="..\..\Test\CMGTest.cpp" />
     <ClCompile Include="..\..\Test\ConsoleUtils.cpp" />
+    <ClCompile Include="..\..\Test\CSGTest.cpp" />
     <ClCompile Include="..\..\Test\DCGTest.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp" />
@@ -374,6 +377,7 @@
     <ClCompile Include="..\..\Test\HXCipherTest.cpp" />
     <ClCompile Include="..\..\Test\KDF2Test.cpp" />
     <ClCompile Include="..\..\Test\KeccakTest.cpp" />
+    <ClCompile Include="..\..\Test\KMACTest.cpp" />
     <ClCompile Include="..\..\Test\MacStreamTest.cpp" />
     <ClCompile Include="..\..\Test\McElieceTest.cpp" />
     <ClCompile Include="..\..\Test\MemUtilsTest.cpp" />
