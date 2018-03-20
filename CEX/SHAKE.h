@@ -80,16 +80,16 @@ class SHAKE final : public IKdf
 {
 private:
 
+	static const size_t BUFFER_SIZE = 168;
 	static const std::string CLASS_NAME;
 	static const byte SHAKE_DOMAIN = 0x1F;
-	static const byte CSHAKE_DOMAIN = 0x04;
+	static const size_t STATE_SIZE = 25;
 
 	size_t m_blockSize;
-	byte m_domainCode;
 	size_t m_hashSize;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::array<ulong, 25> m_kdfState;
+	std::array<ulong, STATE_SIZE> m_kdfState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ShakeModes m_shakeMode;
 
@@ -130,12 +130,6 @@ public:
 	const size_t BlockSize();
 
 	/// <summary>
-	/// Read/Write: The Keccak function-domain separator code.
-	/// <para>This code differentiates Keccak function types, the default code is 0x1F (SHAKE)</para>
-	/// </summary>
-	byte &DomainCode();
-
-	/// <summary>
 	/// Read Only: The Kdf generators type name
 	/// </summary>
 	const Kdfs Enumeral() override;
@@ -167,25 +161,6 @@ public:
 	const size_t Rate();
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Initialize the internal state with a custom domain string.
-	/// <para>Adds one permutation cycle (simplified cSHAKE). 
-	/// The customization array must be set before initialization, and must be less than 196 bytes in length.</para>
-	/// </summary>
-	/// 
-	/// <param name="Customization">The custom domain byte array</param>
-	void CustomDomain(const std::vector<byte> &Customization);
-
-	/// <summary>
-	/// Initialize the internal state with a custom domain string.
-	/// <para>Creates an implementation of cSHAKE. 
-	/// The customization and name arrays must be set before initialization, and must be a combined length of less than 196 bytes.</para>
-	/// </summary>
-	/// 
-	/// <param name="Customization">The custom domain byte array</param>
-	/// <param name="Name">The function name byte array</param>
-	void CustomDomain(const std::vector<byte> &Customization, const std::vector<byte> &Name);
 
 	/// <summary>
 	/// Generate a block of pseudo random bytes
@@ -270,7 +245,7 @@ public:
 private:
 
 	template<typename Array>
-	inline static void AbsorbBlock(const Array &Input, size_t InOffset, size_t Length, std::array<ulong, 25> &State)
+	inline static void AbsorbBlock(const Array &Input, size_t InOffset, size_t Length, std::array<ulong, STATE_SIZE> &State)
 	{
 		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
 		{
@@ -280,9 +255,8 @@ private:
 
 	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void Expand(std::vector<byte> &Output, size_t Offset, size_t Length);
-	size_t LeftEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value);
 	void LoadState();
-	void Permute(std::array<ulong, 25> &State);
+	void Permute(std::array<ulong, STATE_SIZE> &State);
 };
 
 NAMESPACE_KDFEND

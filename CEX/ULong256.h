@@ -20,7 +20,9 @@
 #define CEX_ULONG256_H
 
 #include "CexDomain.h"
-#include "Intrinsics.h"
+#if defined(__AVX2__)
+#	include "Intrinsics.h"
+#endif
 
 NAMESPACE_NUMERIC
 
@@ -139,6 +141,24 @@ public:
 	}
 
 	/// <summary>
+	/// Load an array of integers into a register.
+	/// <para>Integers are loaded as 32bit integers regardless the natural size of T; but T must be less than or equal to 32bits in size</para>
+	/// </summary>
+	///
+	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
+	/// <param name="Offset">The starting offset within the Input array</param>
+	template<typename Array>
+	inline void LoadUL(const Array &Input, size_t Offset)
+	{
+		CexAssert(sizeof(uint) <= sizeof(Array::value_type), "the input array integer size must be less or equal to uint32");
+
+		zmm = _mm256_set_epi64x(static_cast<uint>(Input[Offset]),
+			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type))]),
+			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type) * 2)]),
+			static_cast<uint>(Input[Offset + (sizeof(uint) / sizeof(Array::value_type) * 3)]));
+	}
+
+	/// <summary>
 	/// Store register in an integer array
 	/// </summary>
 	///
@@ -149,7 +169,27 @@ public:
 	{
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), ymm);
 	}
-	
+
+	/// <summary>
+	/// Store 4 * 64bit unsigned integers
+	/// </summary>
+	///
+	/// <param name="X0">uint64 0</param>
+	/// <param name="X1">uint64 1</param>
+	/// <param name="X2">uint64 2</param>
+	/// <param name="X3">uint64 3</param>
+	inline void Store(ulong &X0, ulong &X1, ulong &X2, ulong &X3) const
+	{
+		std::array<ulong, 4> tmp;
+
+		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmp), ymm);
+
+		X0 = tmp[0];
+		X1 = tmp[1];
+		X2 = tmp[2];
+		X3 = tmp[3];
+	}
+
 	//~~~Public Functions~~~//
 
 	/// <summary>
@@ -328,15 +368,20 @@ public:
 	}
 
 	/// <summary>
-	/// Multiply a value with this integer
+	/// Multiply a value with this integer 
 	/// </summary>
 	///
 	/// <param name="X">The value to multiply</param>
 	inline void operator *= (const ULong256 &X)
 	{
+		// TODO: why is *= so slow?
+#if defined (__AVX512DQ__) && defined (__AVX512VL__)
+		ymm = _mm256_mullo_epi64(ymm, X.ymm);
+#else
 		__m256i tmp1 = _mm256_mul_epu32(ymm, X.ymm);
 		__m256i tmp2 = _mm256_mul_epu32(_mm256_srli_si256(ymm, 4), _mm256_srli_si256(X.ymm, 4));
 		ymm = _mm256_unpacklo_epi32(_mm256_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm256_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
+#endif
 	}
 
 	/// <summary>
@@ -346,9 +391,13 @@ public:
 	/// <param name="X">The value to multiply</param>
 	inline ULong256 operator * (const ULong256 &X) const
 	{
+#if defined (__AVX512DQ__) && defined (__AVX512VL__)
+		return ULong256(_mm256_mullo_epi64(ymm, X.ymm));
+#else
 		__m256i tmp1 = _mm256_mul_epu32(ymm, X.ymm);
 		__m256i tmp2 = _mm256_mul_epu32(_mm256_srli_si256(ymm, 4), _mm256_srli_si256(X.ymm, 4));
 		return ULong256(_mm256_unpacklo_epi32(_mm256_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm256_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0))));
+#endif
 	}
 
 	/// <summary>
@@ -380,7 +429,7 @@ public:
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&tmpB[0]), X.ymm);
 		CexAssert(tmpB[0] != 0 && tmpB[1] != 0 && tmpB[2] != 0 && tmpB[3] != 0, "Division by zero");
 
-		ymm = _mm256_set_epi64(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
+		ymm = _mm256_set_epi64x(tmpA[3] / tmpB[3], tmpA[2] / tmpB[2], tmpA[1] / tmpB[1], tmpA[0] / tmpB[0]);
 	}
 
 	/// <summary>

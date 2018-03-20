@@ -435,7 +435,7 @@ public:
 		S0 = _mm_blend_epi16(TMP, S1, 0xF0); // DCBA
 		S1 = _mm_alignr_epi8(S1, TMP, 8);    // ABEF
 
-											 // Save state
+		// Save state
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output.H[0]), S0);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&Output.H[4]), S1);
 

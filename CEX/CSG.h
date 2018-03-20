@@ -27,6 +27,7 @@
 
 #include "IDrbg.h"
 #include "IProvider.h"
+#include "Keccak.h"
 #include "SHAKE.h"
 #include "ShakeModes.h"
 
@@ -53,7 +54,6 @@ using Enumeration::Providers;
 /// </example>
 /// 
 /// <remarks>
-///
 /// <para><EM>Initialize</EM> \n
 /// The Initialize function can take up to 3 inputs; the generator Seed which is the primary key, a Nonce value which acts as a customization string, \n
 /// and the distribution code (Info parameter) used as the Name parameter in SHAKE. \n
@@ -98,24 +98,25 @@ class CSG final : public IDrbg
 {
 private:
 
-	enum ShakeType : byte
-	{
-		Shake = 1,
-		scShake = 2,
-		cShake = 3
-	};
-
+	static const size_t BUFFER_SIZE = 168;
+	static const byte CSHAKE_DOMAIN = 0x04;
 	static const std::string CLASS_NAME;
-	// max-out: 35184372088832, max-request: 65536, max-reseed: 536870912
 	static const ulong MAX_OUTPUT = 35184372088832;
 	static const size_t MAX_REQUEST = 65536;
 	static const size_t MAX_RESEED = 536870912;
+	static const size_t STATE_SIZE = 25;
+	static const byte SHAKE_DOMAIN = 0x1F;
 
+	bool m_avxEnabled;
 	size_t m_blockSize;
+	size_t m_bufferIndex;
 	std::vector<byte> m_customNonce;
 	bool m_destroyEngine;
 	std::vector<byte> m_distributionCode;
 	size_t m_distributionCodeMax;
+	byte m_domainCode;
+	std::vector<byte> m_drbgBuffer;
+	std::vector<std::array<ulong, STATE_SIZE>> m_drbgState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
@@ -127,9 +128,8 @@ private:
 	size_t m_reseedThreshold;
 	size_t m_secStrength;
 	size_t m_seedSize;
-	std::unique_ptr<SHAKE> m_shakeEngine;
 	ShakeModes m_shakeMode;
-	ShakeType m_shakeType;
+	size_t m_stateSize;
 
 public:
 
@@ -151,9 +151,10 @@ public:
 	///
 	/// <param name="ShakeMode">The underlying SHAKE implementation mode</param>
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
+	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	///
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
-	explicit CSG(ShakeModes ShakeMode = ShakeModes::SHAKE256, Providers ProviderType = Providers::ACP);
+	CSG(ShakeModes ShakeMode = ShakeModes::SHAKE256, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
 	/// Instantiate the class using a digest instance, and an optional entropy source 
@@ -161,9 +162,10 @@ public:
 	/// 
 	/// <param name="ShakeMode">The underlying shake implementation mode</param>
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
+	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit CSG(ShakeModes ShakeMode, IProvider* Provider = 0);
+	explicit CSG(ShakeModes ShakeMode, IProvider* Provider = 0, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -320,8 +322,47 @@ public:
 
 private:
 
+	template<typename ArrayA, typename ArrayB>
+	static void AbsorbBlock(const ArrayA &Input, size_t InOffset, size_t Length, ArrayB &State)
+	{
+		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
+		{
+			State[i] ^= static_cast<ulong>(IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
+		}
+	}
+
+	template<typename Array>
+	static size_t LeftEncode(Array &Buffer, size_t Offset, size_t Value)
+	{
+		size_t i;
+		size_t n;
+		size_t v;
+
+		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
+		}
+
+		Buffer[Offset] = (uint8_t)n;
+
+		return (n + 1);
+	}
+
+	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::array<ulong, STATE_SIZE> &State);
 	void Derive(const std::vector<byte> &Seed);
-	void GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::array<ulong, STATE_SIZE> &State);
+	void Fill();
+	void Permute(std::array<ulong, STATE_SIZE> &State);
+	void PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State);
+	void Reset();
 	void Scope();
 };
 

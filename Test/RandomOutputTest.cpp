@@ -7,7 +7,6 @@
 #include "../CEX/CJP.h"
 #include "../CEX/BCG.h"
 #include "../CEX/CSP.h"
-#include "../CEX/DCG.h"
 #include "../CEX/ECP.h"
 #include "../CEX/FileStream.h"
 #include "../CEX/HCG.h"
@@ -62,7 +61,6 @@ namespace Test
 			// drbg's
 			CMGGenerateFile(FILEPATH + "cmg_10mb.txt", FILESIZE);
 			OnProgress(std::string("Counter Mode Generator completed.."));
-			DCGGenerateFile(FILEPATH + "dcg_10mb.txt", FILESIZE);
 			OnProgress(std::string("Digest Counter Generator completed.."));
 			HMGGenerateFile(FILEPATH + "hmg_10mb.txt", FILESIZE);
 			OnProgress(std::string("Hash based Mac Generator completed.."));
@@ -122,41 +120,6 @@ namespace Test
 		fs.Close();
 
 		delete cpr;
-		delete pvd;
-	}
-
-	void RandomOutputTest::DCGGenerateFile(std::string FilePath, size_t FileSize)
-	{
-		Digest::SHA256* dgt = new Digest::SHA256();
-		Provider::CSP* pvd = new Provider::CSP();
-		Drbg::DCG ctd(dgt, pvd);
-
-		std::vector<byte> seed(ctd.LegalKeySizes()[1].KeySize());
-		std::vector<byte> nonce(ctd.NonceSize());
-		std::vector<byte> info(ctd.DistributionCodeMax());
-		std::vector<byte> output(ctd.MaxRequestSize());
-
-		pvd->GetBytes(seed);
-		pvd->GetBytes(nonce);
-		pvd->GetBytes(info);
-		ctd.Initialize(seed, nonce, info);
-
-		size_t prcLen = FileSize;
-		IO::FileStream fs(FilePath, IO::FileStream::FileAccess::Write);
-
-		do
-		{
-			ctd.Generate(output);
-			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
-			fs.Write(output, 0, rmd);
-			prcLen -= rmd;
-		} 
-		while (prcLen != 0);
-
-		fs.Flush();
-		fs.Close();
-
-		delete dgt;
 		delete pvd;
 	}
 

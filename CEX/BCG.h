@@ -233,7 +233,8 @@ public:
 
 	/// <summary>
 	/// Read Only: Processor parallelization availability.
-	/// <para>Indicates whether parallel processing is available on the system.</para>
+	/// <para>Indicates whether parallel processing is available on this system.
+	/// If parallel capable, the internal buffer is generated using multiple parallel streams.</para>
 	/// </summary>
 	const bool IsParallel();
 
@@ -268,7 +269,7 @@ public:
 	const size_t NonceSize() override;
 
 	/// <summary>
-	/// Read Only: Parallel block size; the byte-size of the input/output data arrays passed to a transform that trigger parallel processing.
+	/// Read Only: Parallel block size; the byte-size of the requested output data array passed from the Generate function that triggers parallel processing.
 	/// <para>This value can be changed through the ParallelProfile class.</para>
 	/// </summary>
 	const size_t ParallelBlockSize();
@@ -360,7 +361,7 @@ public:
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.
 	/// <para>When set to zero, thread count is set automatically. If set to 1, runs in sequential mode. 
-	/// Thread count must be an even number, and not exceed the number of processor cores.</para>
+	/// Thread count must be an even number, and not exceed the number of processor cores (times 2 for hyperthreading).</para>
 	/// </summary>
 	///
 	/// <param name="Degree">The desired number of threads</param>

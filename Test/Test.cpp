@@ -1,7 +1,14 @@
 // HISTORY
 //
+// ### CEX 1.0.0.5 ###
+// Current Release 1.0.0.5 (version A5)
+// The ModuleLWE asymmetric cipher
+// The SHAKE Key Derivation Function
+// Addition of asymmetric cipher Encapsulate / Decapsulate api
+// The library is now Misra C++ 2014 compliant
+//
 // ### CEX 1.0.0.4 ###
-// 1.0.0.4, Preliminary Release
+// 1.0.0.4, Full Release
 // The full version will be Misra and SEI-CERT compliant, (eta. is mid December 2017)
 // Added McEliece public key crypto system	-done
 // Added Keccak1024 message digest	-done
@@ -65,28 +72,18 @@
 // TRAJECTORY
 //
 // ### SCHEDULE FOR 1.0.0.6 RELEASE ###
-// ## ETA is March 31, 2018 ##
+// ## ETA is April 30, 2018 ##
 // 
-// Add NTRU asymmetric cipher
-// Add cSHAKE DRBG
-// Add asymmetric IAuthenticator CCA interface
-// Add KMAC Message Authentication Code generator
-// Rewrite ACP/ECP (cSHAKE expansion)
-// Review of DRBGs and MACs
-//
-//
-// ## Style Rules ##
-// 
-// namespace: Single capaitalized word, ex. Network::
-// class name: Pascal case description, maximum of two words, ex. SymmetricKey()
-// function name: Pascal case, maximum of two words, ex. Initialize()
-// function parameters: Pascal case, maximum of two words, ex. Initialize(ISymmetricKey &Key)
-// global variable: Camel Case, with the prefix 'g_', ex. g_globalState
-// class variable: Camel Case, with the prefix 'm_', ex. m_classState
-// function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, blkCtr
-// global constant: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
-// class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
-// function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
+// Add cSHAKE 128/256/512/1024 DRBG -done
+// Add KMAC Message Authentication Code generator -done
+// Add multi-threaded Drbgs (remove DCG?)
+// Security and performance review of DRBGs and MACs
+// Add vectorized hash functions (AVX2/AVX512) for future expansion
+// Add 'stitched' implementations of AHX-CBC/CTR/GCM..
+// Add 'stitched' implementation of ChaCha/Poly1305
+// Multi-threaded/vectorized CMAC?
+// Rewrite ACP/ECP (change to cSHAKE generator)
+// Add NTRU Prime asymmetric cipher
 //
 //
 // ### Planned Release 1.1.0.1 ###
@@ -104,6 +101,19 @@
 // STM - KEX
 // Android / iOS / Linux compatibility
 // DLL API
+//
+// ## Style Rules ##
+// 
+// namespace: Single capaitalized word, ex. Network::
+// class name: Pascal case description, maximum of two words, ex. SymmetricKey()
+// function name: Pascal case, maximum of two words, ex. Initialize()
+// function parameters: Pascal case, maximum of two words, ex. Initialize(ISymmetricKey &Key)
+// global variable: Camel Case, with the prefix 'g_', ex. g_globalState
+// class variable: Camel Case, with the prefix 'm_', ex. m_classState
+// function variable: a single word or 2 Camel case words in abbreviated form, ex. ctr, or, blkCtr
+// global constant: All Caps, a total of three words with the 'CEX_' prefix, ex. CEX_GLOBAL_CONSTANT
+// class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
+// function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
 
 #include <algorithm>
 #include <fstream>
@@ -127,7 +137,6 @@
 #include "../Test/ConsoleUtils.h"
 #include "../Test/CMGTest.h"
 #include "../Test/CSGTest.h"
-#include "../Test/DCGTest.h"
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
 #include "../Test/GMACTest.h"
@@ -236,7 +245,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                            *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.5 (A5)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      March 04, 2018				  *");
+	ConsoleUtils::WriteLine("* Date:      March 16, 2018                  *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
 	ConsoleUtils::WriteLine("**********************************************");
 	ConsoleUtils::WriteLine("");
@@ -457,7 +466,6 @@ int main()
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new CMGTest());
 			RunTest(new CSGTest());
-			RunTest(new DCGTest());
 			RunTest(new HMGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
 			RunTest(new SymmetricKeyGeneratorTest());

@@ -677,6 +677,35 @@ public:
 	/// Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length
 	/// </summary>
 	/// 
+	/// <param name="Output">The modified output byte array</param>
+	/// <param name="Length">The number to increase by</param>
+	template<typename Array>
+	inline static void BeIncrease8(Array &Output, const size_t Length)
+	{
+		CexAssert(sizeof(Array::value_type) == sizeof(byte), "Input and Output must be an array of 8bit integers");
+		CexAssert(!std::is_signed<Array::value_type>::value, "Input and Output must be an unsigned integer array");
+
+		const int CTRSZE = static_cast<int>(Output.size() - 1);
+		uint ctrLen = static_cast<uint>(Length);
+		std::array<byte, sizeof(uint)> ctrInc;
+
+		std::memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
+		byte carry = 0;
+
+		for (int i = CTRSZE; i >= 0; --i)
+		{
+			byte odst = Output[i];
+			byte osrc = CTRSZE - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRSZE - i]) : static_cast<byte>(0);
+			byte ndst = static_cast<byte>(odst + osrc + carry);
+			carry = ndst < odst ? 1 : 0;
+			Output[i] = ndst;
+		}
+	}
+
+	/// <summary>
+	/// Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length
+	/// </summary>
+	/// 
 	/// <param name="Input">The initial array of bytes</param>
 	/// <param name="Output">The modified output byte array</param>
 	/// <param name="Length">The number to increase by</param>

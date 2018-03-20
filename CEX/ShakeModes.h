@@ -6,7 +6,8 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// The type of SHAKE KDF variant
+/// The type of SHAKE KDF variant.
+/// <para>Must coincide with Digests/Kdfs enumeration.</para>
 /// </summary>
 enum class ShakeModes : byte
 {
@@ -17,19 +18,19 @@ enum class ShakeModes : byte
 	/// <summary>
 	/// The SHAKE128 XOF function
 	/// </summary>
-	SHAKE128 = 1,
+	SHAKE128 = 8,
 	/// <summary>
 	/// The SHAKE256 XOF function
 	/// </summary>
-	SHAKE256 = 2,
+	SHAKE256 = 9,
 	/// <summary>
 	/// The SHAKE512 XOF function
 	/// </summary>
-	SHAKE512 = 3,
+	SHAKE512 = 10,
 	/// <summary>
 	/// The SHAKE1024 XOF function
 	/// </summary>
-	SHAKE1024 = 4
+	SHAKE1024 = 11
 };
 
 NAMESPACE_ENUMERATIONEND

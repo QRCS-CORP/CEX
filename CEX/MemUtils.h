@@ -49,29 +49,29 @@ public:
 #if defined(__AVX__)
 #define CEX_CACHE_SEGMENT 64
 
-#define PREFETCHT0(address, length)								\
-    do {														\
+#define PREFETCHT0(address, length)									\
+    do {															\
 		_mm_prefetch((char*)((address) + (length)), _MM_HINT_T0);	\
     } while (false)
 
-#define PREFETCHT1(address, length)								\
-    do {														\
+#define PREFETCHT1(address, length)									\
+    do {															\
 		_mm_prefetch((char*)((address) + (length)), _MM_HINT_T1);	\
     } while (false)
 
-#define PREFETCHT2(address, length)								\
-    do {														\
+#define PREFETCHT2(address, length)									\
+    do {															\
 		_mm_prefetch((char*)((address) + (length)), _MM_HINT_T2);	\
     } while (false)
 
-#define ALNMALLOC(output, length, alignment)					\
-    do {														\
-		(output) = _mm_malloc((length), (alignment));					\
+#define ALNMALLOC(output, length, alignment)						\
+    do {															\
+		(output) = _mm_malloc((length), (alignment));				\
     } while (false)
 
-#define ALNFREE(output)											\
-    do {														\
-		_mm_free((output));										\
+#define ALNFREE(output)												\
+    do {															\
+		_mm_free((output));											\
     } while (false)
 
 #endif
@@ -162,7 +162,7 @@ public:
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_setzero_si256());
 #else
 		CLEAR128(Output, Offset);
-		CLEAR128(Output, Offset + (16 / sizeof(Output[0])));
+		CLEAR128(Output, Offset + (16 / sizeof(Array::value_type)));
 #endif
 	}
 
@@ -180,7 +180,7 @@ public:
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_setzero_si512());
 #else
 		CLEAR256(Output, Offset);
-		CLEAR256(Output, Offset + (32 / sizeof(Output[0])));
+		CLEAR256(Output, Offset + (32 / sizeof(Array::value_type)));
 #endif
 	}
 
@@ -328,7 +328,7 @@ public:
 
 			CexAssert((Input.size() - InOffset) * INPSZE >= Length, "Length is larger than input capacity");
 			CexAssert((Output.size() - OutOffset) * OUTSZE >= Length, "Length is larger than output capacity");
-			CexAssert(INPSZE <= 16 && OUTSZE <= 16, "Integer type is larger than 128 bits");
+			CexAssert(INPSZE <= 64 && OUTSZE <= 64, "Integer type is larger than 128 bits");
 
 #if defined(__AVX512__)
 			const size_t SMDBLK = 64;
@@ -401,7 +401,7 @@ public:
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[OutOffset]), _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[InOffset])));
 #else
 		COPY128(Input, InOffset, Output, OutOffset);
-		COPY128(Input, InOffset + (16 / sizeof(Input[0])), Output, OutOffset + (16 / sizeof(Output[0])));
+		COPY128(Input, InOffset + (16 / sizeof(ArrayA::value_type)), Output, OutOffset + (16 / sizeof(ArrayB::value_type)));
 #endif
 	}
 
@@ -421,7 +421,7 @@ public:
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[OutOffset]), _mm512_loadu_si512(reinterpret_cast<const __m512i*>(&Input[InOffset])));
 #else
 		COPY256(Input, InOffset, Output, OutOffset);
-		COPY256(Input, InOffset + (32 / sizeof(Input[0])), Output, OutOffset + (32 / sizeof(Output[0])));
+		COPY256(Input, InOffset + (32 / sizeof(ArrayA::value_type)), Output, OutOffset + (32 / sizeof(ArrayB::value_type)));
 #endif
 	}
 
@@ -542,7 +542,7 @@ public:
 		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output[Offset]), _mm256_set1_epi8(Value));
 #else
 		SETVAL128(Output, Offset, Value);
-		SETVAL128(Output, Offset + (16 / sizeof(Output[0])), Value);
+		SETVAL128(Output, Offset + (16 / sizeof(Array::value_type)), Value);
 #endif
 	}
 
@@ -563,7 +563,7 @@ public:
 		_mm512_storeu_si512(reinterpret_cast<__m512i*>(&Output[Offset]), _mm512_set1_epi8(Value));
 #else
 		SETVAL256(Output, Offset, Value);
-		SETVAL256(Output, Offset + (32 / sizeof(Output[0])), Value);
+		SETVAL256(Output, Offset + (32 / sizeof(Array::value_type)), Value);
 #endif
 	}
 
@@ -734,7 +734,7 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	inline static void XorPartial(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t OutOffset, size_t Length)
 	{
-		for (size_t i = 0; i < (Length / sizeof(Input[0])); ++i)
+		for (size_t i = 0; i < (Length / sizeof(ArrayA::value_type)); ++i)
 		{
 			Output[OutOffset + i] ^= Input[InOffset + i];
 		}

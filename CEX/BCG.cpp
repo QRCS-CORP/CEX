@@ -354,7 +354,7 @@ void BCG::ParallelMaxDegree(size_t Degree)
 {
 	CexAssert(Degree != 0, "parallel degree can not be zero");
 	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed profile processor count");
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }

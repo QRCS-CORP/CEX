@@ -2,7 +2,6 @@
 #include "BlockCiphers.h"
 #include "BCR.h"
 #include "CpuDetect.h"
-#include "DCR.h"
 #include "HCR.h"
 
 NAMESPACE_HELPER
@@ -42,11 +41,6 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests
 					rngPtr = new Prng::BCR(Enumeration::BlockCiphers::RHX, ProviderType);
 				}
 
-				break;
-			}
-			case Prngs::DCR:
-			{
-				rngPtr = new Prng::DCR(DigestType, ProviderType);
 				break;
 			}
 			case Prngs::HCR:

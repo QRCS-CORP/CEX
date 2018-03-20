@@ -2,10 +2,12 @@
 #include "../CEX/CpuDetect.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/MemUtils.h"
+#include "../CEX/TimeStamp.h"
 #if defined(__AVX512__)
 #	include "../CEX/UInt512.h"
 #elif defined(__AVX2__)
 #	include "../CEX/UInt256.h"
+#	include "../CEX/ULong256.h"
 #elif defined(__AVX__)
 #	include "../CEX/UInt128.h"
 #endif
@@ -81,9 +83,24 @@ namespace Test
 #endif
 			OnProgress(std::string(""));
 
+			// Internal benchmarking tests..
+
+			/*OnProgress(std::string("***Testing UInt256 Operator Speeds***"));
+			for (size_t i = 0; i < 10; i++)
+			{
+				AVX2ULOperatorSpeed(10000000000);
+			}
+			OnProgress(std::string(""));*/
+
+			/*OnProgress(std::string("***Testing ULong256 Operator Speeds***"));
+			for (size_t i = 0; i < 10; i++)
+			{
+				AVX2ULLOperatorSpeed(10000000000);
+				OnProgress(std::string(""));
+			}*/
+
 			OnProgress(std::string("***Testing Large Block Clear Functions***"));
 			ClearBlockSpeed(SMPLEN, 10);
-			OnProgress(std::string(""));
 
 			OnProgress(std::string("***Testing Vectorized Clear Functions***"));
 			ClearVectorSpeed(SMPLEN, 10);
@@ -479,6 +496,658 @@ namespace Test
 
 		dur = TestUtils::GetTimeMs64() - start;
 		PostPerfResult(dur, Length, std::string("Copied "));
+#endif
+	}
+
+	void SimdSpeedTest::AVX2ULOperatorSpeed(size_t Loops)
+	{
+		const size_t TSTCYCS = Loops;
+		const size_t TSTCYCL = TSTCYCS / 4;
+
+		uint A1 = 11111111;
+		uint B1 = 22222222;
+		uint C1 = 0;
+
+		OnProgress("***Multiplication***");
+		Utility::TimeStamp ts;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = A1 * B1;
+		}
+		OnProgress("SEQM1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			A1 *= B1;
+		}
+		OnProgress("SEQM2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		Numeric::UInt256 A2(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		Numeric::UInt256 B2(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		Numeric::UInt256 C2;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = A2 * B2;
+		}
+		OnProgress("PRLM1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			A2 *= B2;
+		}
+		OnProgress("PRLM2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***Addition***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = A1 + B1;
+		}
+		OnProgress("SEQA1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			A1 += B1;
+		}
+		OnProgress("SEQA2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = A2 + B2;
+		}
+		OnProgress("PRLA1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			A2 += B2;
+		}
+		OnProgress("PRLA2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***Subtraction***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 - A1;
+		}
+		OnProgress("SEQS1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 -= 1;
+		}
+		OnProgress("SEQS2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 - A2;
+		}
+		OnProgress("PRLS1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		C2.Load(1, 1, 1, 1, 1, 1, 1, 1);
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 -= C2;
+		}
+		OnProgress("PRLS2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***XOR***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 ^ A1;
+		}
+		OnProgress("SEQX1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 ^= A1;
+		}
+		OnProgress("SEQX2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 ^ A2;
+		}
+		OnProgress("PRLX1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 ^= A2;
+		}
+		OnProgress("PRLX2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***Rotate***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			IntUtils::RotFL32(A1, 3);
+		}
+		OnProgress("SEQRL: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			IntUtils::RotFR32(A1, 3);
+		}
+		OnProgress("SEQRR: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			Numeric::UInt256::RotL32(A2, 3);
+		}
+		OnProgress("PRLRL: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			Numeric::UInt256::RotR32(A2, 3);
+		}
+		OnProgress("PRLRR: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***OR***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 | A1;
+		}
+		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 |= A1;
+		}
+		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 | A2;
+		}
+		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 |= A2;
+		}
+		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***AND***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 & A1;
+		}
+		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 &= A1;
+		}
+		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0, 0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 & A2;
+		}
+		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 &= A2;
+		}
+		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+	}
+
+	void SimdSpeedTest::AVX2ULLOperatorSpeed(size_t Loops)
+	{
+		const size_t TSTCYCS = Loops;
+		const size_t TSTCYCL = TSTCYCS / 4;
+
+		ulong A1 = 11111111;
+		ulong B1 = 22222222;
+		ulong C1 = 0;
+
+		OnProgress("***Multiplication***");
+		Utility::TimeStamp ts;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = A1 * B1;
+		}
+		OnProgress("SEQM1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			A1 *= B1;
+		}
+		OnProgress("SEQM2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		Numeric::ULong256 A2(11111111, 11111111, 11111111, 11111111);
+		Numeric::ULong256 B2(22222222, 22222222, 22222222, 22222222);
+		Numeric::ULong256 C2;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = A2 * B2;
+		}
+		OnProgress("PRLM1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			A2 *= B2;
+		}
+		OnProgress("PRLM2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***Addition***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = A1 + B1;
+		}
+		OnProgress("SEQA1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			A1 += B1;
+		}
+		OnProgress("SEQA2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = A2 + B2;
+		}
+		OnProgress("PRLA1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			A2 += B2;
+		}
+		OnProgress("PRLA2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***Subtraction***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 - A1;
+		}
+		OnProgress("SEQS1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 -= 1;
+		}
+		OnProgress("SEQS2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 - A2;
+		}
+		OnProgress("PRLS1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		C2.Load(1, 1, 1, 1);
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 -= C2;
+		}
+		OnProgress("PRLS2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***XOR***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 ^ A1;
+		}
+		OnProgress("SEQX1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 ^= A1;
+		}
+		OnProgress("SEQX2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 ^ A2;
+		}
+		OnProgress("PRLX1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		C2.Load(1, 1, 1, 1);
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 ^= A2;
+		}
+		OnProgress("PRLX2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***Rotate***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			IntUtils::RotFL64(A1, 3);
+		}
+		OnProgress("SEQRL: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			IntUtils::RotFR64(A1, 3);
+		}
+		OnProgress("SEQRR: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			Numeric::ULong256::RotL64(A2, 3);
+		}
+		OnProgress("PRLRL: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		C2.Load(1, 1, 1, 1);
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			Numeric::ULong256::RotR64(A2, 3);
+		}
+		OnProgress("PRLRR: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***OR***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 | A1;
+		}
+		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 |= A1;
+		}
+		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 | A2;
+		}
+		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		C2.Load(1, 1, 1, 1);
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 |= A2;
+		}
+		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#endif
+
+		OnProgress("***AND***");
+		A1 = 11111111;
+		B1 = 22222222;
+		C1 = 0;
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			C1 = B1 & A1;
+		}
+		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCS; ++i)
+		{
+			B1 &= A1;
+		}
+		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+#if defined(__AVX2__)
+
+		A2.Load(11111111, 11111111, 11111111, 11111111);
+		B2.Load(22222222, 22222222, 22222222, 22222222);
+		C2.Load(0, 0, 0, 0);
+
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			C2 = B2 & A2;
+		}
+		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
+		C2.Load(1, 1, 1, 1);
+		ts.Start();
+		for (size_t i = 0; i < TSTCYCL; ++i)
+		{
+			B2 &= A2;
+		}
+		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		ts.Reset();
+
 #endif
 	}
 

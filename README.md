@@ -38,6 +38,7 @@ This is still an early stage in the development of this library, so stay tuned, 
 * The ModuleLWE asymmetric cipher
 
 ### Block Ciphers
+Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid
 * The AES-NI HKDF eXtended cipher (AHX)
 * The Rijndael HKDF eXtended cipher (RHX)
 * The Serpent HKDF eXtended cipher (SHX)
@@ -73,7 +74,7 @@ Note: Every message digest implementation has both parallel and sequential modes
 
 ### DRBGs
 * The Block cipher Counter mode Generator (BCG)
-* The message Digest Counter Generator (DCG)
+* The custom cSHAKE Generator (CSG)
 * The HMAC Counter Generator (HCG)
 
 ### KDFs
@@ -127,6 +128,14 @@ The current version is <B>1.0.0.5</B> (A5 version), which are the major, minor, 
 * DLL API
 
 ## History
+
+### Current Release 1.0.0.5, March 16, 2018
+* The library is now Misra C++ 2014 compliant
+* Added the ModuleLWE asymmetric cipher
+* Added the SHAKE Key Derivation Function
+* Added the cSHAKE generator (CSG)
+* Added the KMAC message authentication code generator
+* Addition of asymmetric cipher Encapsulate/Decapsulate api
 
 ### Version 1.0.0.4, November 11, 2017
 * Added the McEliece asymmetric cipher

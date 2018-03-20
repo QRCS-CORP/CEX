@@ -295,6 +295,18 @@
     <Filter Include="Header Files\Cipher\Asymmetric\Encrypt\Authenticate">
       <UniqueIdentifier>{858f71b5-e698-455d-998b-9b9580a6bfbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Encrypt\NTRU">
+      <UniqueIdentifier>{de7c0483-f3e9-4fb0-bca3-c54eeab893d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Encrypt\NTRU\Support">
+      <UniqueIdentifier>{4bd023cb-fab3-4d86-8d94-04017b3045e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\NTRU">
+      <UniqueIdentifier>{6ca5da74-84a2-4866-8587-623982363cbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\NTRU\Support">
+      <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -567,9 +579,6 @@
     <ClInclude Include="..\..\CEX\Drbgs.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\DCG.h">
-      <Filter>Header Files\Drbg</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\Providers.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
@@ -598,9 +607,6 @@
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\IPrng.h">
-      <Filter>Header Files\Prng</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\DCR.h">
       <Filter>Header Files\Prng</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\CexDomain.h">
@@ -879,6 +885,9 @@
     <ClInclude Include="..\..\CEX\KMAC.h">
       <Filter>Header Files\Mac</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\ULong512.h">
+      <Filter>Header Files\Numeric</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -995,9 +1004,6 @@
     <ClCompile Include="..\..\CEX\KDF2.cpp">
       <Filter>Source Files\Kdf</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\DCG.cpp">
-      <Filter>Source Files\Drbg</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\ProviderFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
@@ -1012,9 +1018,6 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\PrngFromName.cpp">
       <Filter>Source Files\Helper</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\DCR.cpp">
-      <Filter>Source Files\Prng</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\ECP.cpp">
       <Filter>Source Files\Provider</Filter>

@@ -20,7 +20,9 @@
 #define CEX_UINT512_H
 
 #include "CexDomain.h"
-#include "Intrinsics.h"
+#if defined(__AVX512__)
+#	include "Intrinsics.h"
+#endif
 
 NAMESPACE_NUMERIC
 
@@ -73,7 +75,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Z">The 256bit register</param>
-	explicit UInt128(__m128i const &Z)
+	explicit UInt128(__m512i const &Z)
 	{
 		zmm = Z;
 	}
@@ -400,7 +402,7 @@ public:
 	/// <param name="Shift">The shift degree; maximum is 32</param>
 	/// 
 	/// <returns>The rotated UInt512</returns>
-	inline static  UInt512 RotL32(const UInt512 &X, const int Shift)
+	inline static UInt512 RotL32(const UInt512 &X, const int Shift)
 	{
 		CexAssert(Shift <= 32, "Shift size is too large");
 		return UInt512(_mm512_or_si512(_mm512_slli_epi32(X.zmm, static_cast<int>(Shift)), _mm512_srli_epi32(X.zmm, static_cast<int>(32 - Shift))));

@@ -43,17 +43,33 @@ enum class Digests : byte
 	/// </summary>
 	SHA512 = 7,
 	/// <summary>
+	/// The SHAKE-128 digest with a 128 bit return size
+	/// </summary>
+	SHAKE128 = 8,
+	/// <summary>
+	/// The SHAKE-256 digest with a 256 bit return size
+	/// </summary>
+	SHAKE256 = 9,
+	/// <summary>
+	/// The SHAKE-512 digest with a 512 bit return size
+	/// </summary>
+	SHAKE512 = 10,
+	/// <summary>
+	/// The SHAKE-1024 digest with a 1024 bit return size
+	/// </summary>
+	SHAKE1024 = 11,
+	/// <summary>
 	/// The Skein digest with a 256 bit return size
 	/// </summary>
-	Skein256 = 8,
+	Skein256 = 12,
 	/// <summary>
 	/// The Skein digest with a 512 bit return size
 	/// </summary>
-	Skein512 = 9,
+	Skein512 = 13,
 	/// <summary>
 	/// The Skein digest with a 1024 bit return size
 	/// </summary>
-	Skein1024 = 10
+	Skein1024 = 14
 };
 
 NAMESPACE_ENUMERATIONEND

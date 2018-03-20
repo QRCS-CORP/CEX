@@ -18,10 +18,11 @@ KMAC::KMAC(ShakeModes ShakeMode)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
-	m_macSize((m_shakeMode == ShakeModes::SHAKE128) ? 16 : (m_shakeMode == ShakeModes::SHAKE256) ? 32 : (m_shakeMode == ShakeModes::SHAKE512) ? 64 : 128),
-	m_msgBuffer(m_blockSize),
+	m_macSize((ShakeMode == ShakeModes::SHAKE128) ? 16 : (ShakeMode == ShakeModes::SHAKE256) ? 32 :
+		(ShakeMode == ShakeModes::SHAKE512) ? 64 : 128),
 	m_msgLength(0),
-	m_shakeMode(ShakeMode)
+	m_shakeMode(ShakeMode != ShakeModes::None ? ShakeMode :
+		throw CryptoMacException("KMAC:Ctor", "The SHAKE mode type can not ne none!"))
 {
 	Scope();
 }
@@ -39,7 +40,7 @@ KMAC::~KMAC()
 
 		Utility::IntUtils::ClearVector(m_distributionCode);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_msgBuffer);
+		Utility::IntUtils::ClearArray(m_msgBuffer);
 	}
 }
 
@@ -108,7 +109,7 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	std::vector<byte> buf(sizeof(size_t) + 1);
 	size_t i;
 	size_t outLen;
-	uint outBits;
+	size_t outBits;
 
 	if (m_msgLength != m_msgBuffer.size())
 	{
@@ -126,8 +127,8 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	m_msgLength += outBits;
 	m_msgBuffer[m_msgLength] = DOMAIN_CODE;
 	m_msgBuffer[m_blockSize - 1] |= 128;
-	AbsorbBlock(m_msgBuffer, 0, m_blockSize, m_kdfState);
 
+	AbsorbBlock(m_msgBuffer, 0, m_blockSize, m_kdfState);
 	Squeeze(m_kdfState, Output, OutOffset, outLen);
 
 	return outLen;
@@ -152,7 +153,7 @@ void KMAC::Initialize(ISymmetricKey &KeyParams)
 		m_distributionCode = KeyParams.Info();
 	}
 
-	LoadCustom(KeyParams.Nonce(), m_distributionCode);
+	Customize(KeyParams.Nonce(), m_distributionCode);
 	LoadKey(KeyParams.Key());
 
 	m_isInitialized = true;
@@ -160,8 +161,8 @@ void KMAC::Initialize(ISymmetricKey &KeyParams)
 
 void KMAC::Reset()
 {
-	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
-	Utility::MemUtils::Clear(m_kdfState, 0, m_kdfState.size());
+	MemUtils::Clear(m_kdfState, 0, STATE_SIZE * sizeof(ulong));
+	MemUtils::Clear(m_msgBuffer, 0, BUFFER_SIZE);
 	m_msgLength = 0;
 
 	m_isInitialized = false;
@@ -215,37 +216,14 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 //~~~Private Functions~~~//
 
-size_t KMAC::LeftEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value)
-{
-	uint32_t i;
-	uint32_t n;
-	uint32_t v;
-
-	for (v = Value, n = 0; v && (n < sizeof(uint32_t)); ++n, v >>= 8);
-
-	if (n == 0)
-	{
-		n = 1;
-	}
-
-	for (i = 1; i <= n; ++i)
-	{
-		Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
-	}
-
-	Buffer[Offset] = (uint8_t)n;
-
-	return static_cast<size_t>(n + 1);
-}
-
-void KMAC::LoadCustom(const std::vector<byte> &Customization, const std::vector<byte> &Name)
+void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name)
 {
 	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
 	CexAssert(Customization.size() + Name.size() <= 196, "the input buffer is too large");
 
-	std::vector<byte> pad(200);
+	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
-	uint32_t offset;
+	size_t offset;
 
 	offset = 0;
 	offset = LeftEncode(pad, 0, m_blockSize);
@@ -257,7 +235,7 @@ void KMAC::LoadCustom(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == m_blockSize)
 			{
-				for (size_t i = 0; i < 200; i += 8)
+				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
 					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
 				}
@@ -279,7 +257,7 @@ void KMAC::LoadCustom(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == m_blockSize)
 			{
-				for (size_t i = 0; i < 200; i += 8)
+				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
 					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
 				}
@@ -293,7 +271,10 @@ void KMAC::LoadCustom(const std::vector<byte> &Customization, const std::vector<
 		}
 	}
 
-	for (size_t i = 0; i < 200; i += 8)
+	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
+
+	for (size_t i = 0; i < offset; i += 8)
 	{
 		m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
 	}
@@ -305,9 +286,9 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 {
 	CexAssert(!m_isInitialized, "the domain string must be set before initialization");
 
-	std::vector<byte> pad(200);
+	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
-	uint32_t offset;
+	size_t offset;
 
 	offset = 0;
 	offset = LeftEncode(pad, 0, m_blockSize);
@@ -319,7 +300,7 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 		{
 			if (offset == m_blockSize)
 			{
-				for (size_t i = 0; i < 200; i += 8)
+				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
 					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
 				}
@@ -333,7 +314,10 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 		}
 	}
 
-	for (size_t i = 0; i < 200; i += 8)
+	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
+
+	for (size_t i = 0; i < offset; i += 8)
 	{
 		m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 	}
@@ -345,62 +329,17 @@ void KMAC::Permute(std::array<ulong, 25> &State)
 {
 	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
-		Digest::Keccak::Permute24(State);
+		Digest::Keccak::PermuteR24P1600(State);
 	}
 	else
 	{
-		Digest::Keccak::Permute48(State);
+		Digest::Keccak::PermuteR48P1600(State);
 	}
-}
-
-uint32_t KMAC::RightEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value)
-{
-	uint32_t i;
-	uint32_t n;
-	uint32_t v;
-
-	for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
-
-	if (n == 0)
-	{
-		n = 1;
-	}
-
-	for (i = 1; i <= n; ++i)
-	{
-		Buffer[Offset + (i - 1)] = (uint8_t)(Value >> (8 * (n - i)));
-	}
-
-	Buffer[Offset + n] = (uint8_t)n;
-
-	return n + 1;
 }
 
 void KMAC::Scope()
 {
-	if (m_shakeMode == ShakeModes::SHAKE1024)
-	{
-		m_blockSize = 72;
-		m_macSize = 128;
-	}
-	else if (m_shakeMode == ShakeModes::SHAKE512)
-	{
-		m_blockSize = 72;
-		m_macSize = 64;
-	}
-	else if (m_shakeMode == ShakeModes::SHAKE256)
-	{
-		m_blockSize = 136;
-		m_macSize = 32;
-	}
-	else
-	{
-		m_blockSize = 168;
-		m_macSize = 16;
-	}
-
-
-	m_msgBuffer.resize(m_blockSize);
+	Reset();
 
 	m_legalKeySizes.resize(3);
 	// minimum seed size

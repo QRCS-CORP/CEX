@@ -98,7 +98,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -117,7 +117,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
@@ -141,11 +141,10 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>None</DebugInformationFormat>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -167,7 +166,6 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <PreprocessorDefinitions>WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;</AdditionalIncludeDirectories>
       <DebugInformationFormat>None</DebugInformationFormat>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -306,7 +304,6 @@
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
     <ClInclude Include="..\..\Test\CMGTest.h" />
     <ClInclude Include="..\..\Test\CSGTest.h" />
-    <ClInclude Include="..\..\Test\DCGTest.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
     <ClInclude Include="..\..\Test\GMACTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
@@ -366,7 +363,6 @@
     <ClCompile Include="..\..\Test\CMGTest.cpp" />
     <ClCompile Include="..\..\Test\ConsoleUtils.cpp" />
     <ClCompile Include="..\..\Test\CSGTest.cpp" />
-    <ClCompile Include="..\..\Test\DCGTest.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\DigestStreamTest.cpp" />
     <ClCompile Include="..\..\Test\GMACTest.cpp" />

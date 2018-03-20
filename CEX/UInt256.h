@@ -20,7 +20,9 @@
 #define CEX_UINT256_H
 
 #include "CexDomain.h"
-#include "Intrinsics.h"
+#if defined(__AVX2__)
+#	include "Intrinsics.h"
+#endif
 
 NAMESPACE_NUMERIC
 

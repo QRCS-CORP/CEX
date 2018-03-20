@@ -1,6 +1,6 @@
 #include "DrbgFromName.h"
 #include "BCG.h"
-#include "DCG.h"
+#include "CSG.h"
 #include "HCG.h"
 
 NAMESPACE_HELPER
@@ -18,9 +18,9 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 				drbgPtr = new Drbg::BCG();
 				break;
 			}
-			case Drbgs::DCG:
+			case Drbgs::CSG:
 			{
-				drbgPtr = new Drbg::DCG();
+				drbgPtr = new Drbg::CSG();
 				break;
 			}
 			case Drbgs::HCG:
@@ -55,9 +55,10 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 				drbgPtr = new Drbg::BCG(BlockCiphers::AHX, DigestType, ProviderType);
 				break;
 			}
-			case Drbgs::DCG:
+			case Drbgs::CSG:
 			{
-				drbgPtr = new Drbg::DCG(DigestType, ProviderType);
+
+				drbgPtr = new Drbg::CSG(static_cast<Enumeration::ShakeModes>(DigestType), ProviderType);
 				break;
 			}
 			case Drbgs::HCG:

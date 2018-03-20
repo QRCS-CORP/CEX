@@ -35,10 +35,8 @@ class FFTQ7681N256
 {
 private:
 
-
 	static const uint QINV = 7679;
 	static const uint RLOG = 18;
-
 
 	static const std::array<ushort, 128> OmegasInvMontgomery;
 	static const std::array<ushort, 256> PsisInvMontgomery;

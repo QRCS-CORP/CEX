@@ -203,7 +203,7 @@ public:
 	const size_t PhysicalCores();
 
 	/// <summary>
-	/// Read Only: The maximum number of processor cores available on the system
+	/// Read Only: The maximum number of processor cores available on the system including virtul cores
 	/// </summary>
 	const size_t ProcessorCount();
 

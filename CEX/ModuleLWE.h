@@ -247,8 +247,8 @@ public:
 
 private:
 
-	bool MLWEDecrypt(const std::vector<byte> &CipherText, size_t CipherTextSize, std::vector<byte> &Message, std::vector<byte> &Secret);
-	void MLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, size_t CipherKeySize, std::vector<byte> &Secret);
+	bool CPADecrypt(const std::vector<byte> &CipherText, size_t CipherTextSize, std::vector<byte> &Message, std::vector<byte> &Secret);
+	void CPAEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, size_t CipherKeySize, std::vector<byte> &Secret);
 };
 
 NAMESPACE_MODULELWEEND

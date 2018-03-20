@@ -129,7 +129,7 @@ void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 
 	std::vector<byte> msg(FFTQ7681N256::SEED_SIZE);
 	uint k = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
-	// encrypt thew message and generate the ciphertext
+	// encrypt the message and generate the ciphertext
 	FFTQ7681N256::Decrypt(msg, CipherText, m_privateKey->R(), k);
 	// hash the message to create the shared secret
 	Digest::Keccak512 dgt;
@@ -164,7 +164,7 @@ std::vector<byte> ModuleLWE::Decrypt(const std::vector<byte> &CipherText)
 	// added authentication step
 	std::vector<byte> msg(FFTQ7681N256::SEED_SIZE);
 
-	if (!MLWEDecrypt(CipherText, (k * FFTQ7681N256::PUBPOLY_SIZE) + (3 * FFTQ7681N256::SEED_SIZE), msg, sec))
+	if (!CPADecrypt(CipherText, (k * FFTQ7681N256::PUBPOLY_SIZE) + (3 * FFTQ7681N256::SEED_SIZE), msg, sec))
 	{
 		throw CryptoAuthenticationFailure("RingLWE:Decrypt", "Decryption authentication failure!");
 	}
@@ -183,7 +183,7 @@ std::vector<byte> ModuleLWE::Encrypt(const std::vector<byte> &Message)
 	// generate the shared secret and ciphertext
 	FFTQ7681N256::Encrypt(ctx, msg, m_publicKey->P(), m_rndGenerator, k);
 	// use the shared secret to key GCM and encrypt the message
-	MLWEEncrypt(Message, ctx, ctx.size(), msg);
+	CPAEncrypt(Message, ctx, ctx.size(), msg);
 
 	return ctx;
 }
@@ -235,7 +235,7 @@ void ModuleLWE::Initialize(bool Encryption, IAsymmetricKey* Key)
 
 //~~~Private Functions~~~//
 
-bool ModuleLWE::MLWEDecrypt(const std::vector<byte> &CipherText, size_t CipherKeySize, std::vector<byte> &Message, std::vector<byte> &Secret)
+bool ModuleLWE::CPADecrypt(const std::vector<byte> &CipherText, size_t CipherKeySize, std::vector<byte> &Message, std::vector<byte> &Secret)
 {
 	bool status;
 	const size_t KEYSZE = 32;
@@ -268,7 +268,7 @@ bool ModuleLWE::MLWEDecrypt(const std::vector<byte> &CipherText, size_t CipherKe
 	return status;
 }
 
-void ModuleLWE::MLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, size_t CipherKeySize, std::vector<byte> &Secret)
+void ModuleLWE::CPAEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, size_t CipherKeySize, std::vector<byte> &Secret)
 {
 	const size_t KEYSZE = 32;
 	const size_t NCESZE = 16;

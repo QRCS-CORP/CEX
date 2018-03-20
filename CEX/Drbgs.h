@@ -21,11 +21,7 @@ enum class Drbgs : byte
 	/// <summary>
 	/// A cSHAKE Deterministic Random Bit Generator
 	/// </summary>
-	CSG = 3,
-	/// <summary>
-	/// A Digest Counter Deterministic Random Bit Generator
-	/// </summary>
-	DCG = 2,
+	CSG = 2,
 	/// <summary>
 	/// A HMAC Counter  Deterministic Random Bit Generator
 	/// </summary>

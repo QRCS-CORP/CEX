@@ -19,10 +19,6 @@ enum class Prngs : byte
 	/// </summary>
 	BCR = 1,
 	/// <summary>
-	/// A Digest Counter mode random number generator
-	/// </summary>
-	DCR = 2,
-	/// <summary>
 	/// An HMAC based random number generator
 	/// </summary>
 	HCR = 3,

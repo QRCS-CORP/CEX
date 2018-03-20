@@ -6,7 +6,8 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// Key Derivation Functions enumeration names
+/// Key Derivation Functions enumeration names.
+/// <para>Note: SHAKE enumerals must coincide with ShakeModes/Digests enumeration members.</para>
 /// </summary>
 enum class Kdfs : byte
 {
@@ -33,19 +34,19 @@ enum class Kdfs : byte
 	/// <summary>
 	/// An implementation of the SHAKE-128 XOF function
 	/// </summary>
-	SHAKE128 = 5,
+	SHAKE128 = 8,
 	/// <summary>
 	/// An implementation of the SHAKE-256 XOF function
 	/// </summary>
-	SHAKE256 = 6,
+	SHAKE256 = 9,
 	/// <summary>
 	/// An implementation of the SHAKE-512 XOF function
 	/// </summary>
-	SHAKE512 = 7,
+	SHAKE512 = 10,
 	/// <summary>
 	/// An implementation of the SHAKE-1024 XOF function
 	/// </summary>
-	SHAKE1024 = 8
+	SHAKE1024 = 11
 };
 
 NAMESPACE_ENUMERATIONEND

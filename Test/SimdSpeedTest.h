@@ -59,6 +59,8 @@ namespace Test
 
 	private:
 
+		void AVX2ULOperatorSpeed(size_t Loops);
+		void AVX2ULLOperatorSpeed(size_t Loops);
 		void ClearBlockSpeed(uint64_t Length, size_t Loops);
 		void ClearVectorSpeed(uint64_t Length, size_t Loops);
 		void CopyBlockSpeed(uint64_t Length, size_t Loops);

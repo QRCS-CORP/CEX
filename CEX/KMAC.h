@@ -75,8 +75,8 @@ class KMAC final : public IMac
 {
 private:
 
+	static const size_t BUFFER_SIZE = 168;
 	static const std::string CLASS_NAME;
-	static const size_t BUFFER_SIZE = 200;
 	static const size_t DOMAIN_CODE = 0x04;
 	static const size_t STATE_SIZE = 25;
 
@@ -87,7 +87,7 @@ private:
 	std::array<ulong, STATE_SIZE> m_kdfState;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_macSize;
-	std::vector<byte> m_msgBuffer;
+	std::array<byte, BUFFER_SIZE> m_msgBuffer;
 	size_t m_msgLength;
 	ShakeModes m_shakeMode;
 
@@ -228,20 +228,66 @@ public:
 
 private:
 
-	template<typename Array>
-	inline static void AbsorbBlock(const Array &Input, size_t InOffset, size_t Length, std::array<ulong, 25> &State)
+	template<typename ArrayA, typename ArrayB>
+	static void AbsorbBlock(const ArrayA &Input, size_t InOffset, size_t Length, ArrayB &State)
 	{
 		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
 		{
-			State[i] ^= IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
+			State[i] ^= static_cast<ulong>(IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
 		}
 	}
 
-	size_t LeftEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value);
-	void LoadCustom(const std::vector<byte> &Customization, const std::vector<byte> &Name);
+	template<typename Array>
+	static size_t LeftEncode(Array &Buffer, size_t Offset, size_t Value)
+	{
+		size_t i;
+		size_t n;
+		size_t v;
+
+		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
+		}
+
+		Buffer[Offset] = (uint8_t)n;
+
+		return (n + 1);
+	}
+
+	template<typename Array>
+	size_t RightEncode(Array &Buffer, size_t Offset, size_t Value)
+	{
+		size_t i;
+		size_t n;
+		size_t v;
+
+		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Buffer[Offset + (i - 1)] = (uint8_t)(Value >> (8 * (n - i)));
+		}
+
+		Buffer[Offset + n] = (uint8_t)n;
+
+		return n + 1;
+	}
+
+	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name);
 	void LoadKey(const std::vector<byte> &Key);
 	void Permute(std::array<ulong, 25> &State);
-	uint32_t RightEncode(std::vector<byte> &Buffer, size_t Offset, uint32_t Value);
 	void Scope();
 	void Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size_t OutOffset, size_t Length);
 };

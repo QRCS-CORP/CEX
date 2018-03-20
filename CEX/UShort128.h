@@ -20,7 +20,9 @@
 #define CEX_USHORT128_H
 
 #include "CexDomain.h"
-#include "Intrinsics.h"
+#if defined(__AVX__)
+#	include "Intrinsics.h"
+#endif
 
 NAMESPACE_NUMERIC
 

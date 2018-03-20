@@ -1,6 +1,5 @@
 #include "PrngTest.h"
 #include "../CEX/BCR.h"
-#include "../CEX/DCR.h"
 #include "../CEX/HCR.h"
 #include "../CEX/ACP.h"
 #include "../CEX/CJP.h"
@@ -55,12 +54,6 @@ namespace Test
 			OnProgress(ChiSquare(bcr));
 			OnProgress(MeanValue(bcr));
 			delete bcr;
-
-			OnProgress(std::string("Testing the Digest Counter based Rng:"));
-			DCR* dcr = new DCR();
-			OnProgress(ChiSquare(dcr));
-			OnProgress(MeanValue(dcr));
-			delete dcr;
 
 			OnProgress(std::string("Testing the Auto Collection Provider:"));
 			ACP* acp = new ACP();

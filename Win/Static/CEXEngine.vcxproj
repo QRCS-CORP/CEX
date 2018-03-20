@@ -91,7 +91,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -116,7 +116,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
@@ -142,7 +142,6 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -170,7 +169,6 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SDLCheck>false</SDLCheck>
       <PrecompiledHeaderFile />
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -243,9 +241,7 @@
     <ClInclude Include="..\..\CEX\CSP.h" />
     <ClInclude Include="..\..\CEX\CTR.h" />
     <ClInclude Include="..\..\CEX\BCG.h" />
-    <ClInclude Include="..\..\CEX\DCR.h" />
     <ClInclude Include="..\..\CEX\Delegate.h" />
-    <ClInclude Include="..\..\CEX\DCG.h" />
     <ClInclude Include="..\..\CEX\DigestFromName.h" />
     <ClInclude Include="..\..\CEX\Digests.h" />
     <ClInclude Include="..\..\CEX\DigestStream.h" />
@@ -385,6 +381,7 @@
     <ClInclude Include="..\..\CEX\UInt256.h" />
     <ClInclude Include="..\..\CEX\UInt512.h" />
     <ClInclude Include="..\..\CEX\ULong256.h" />
+    <ClInclude Include="..\..\CEX\ULong512.h" />
     <ClInclude Include="..\..\CEX\UShort128.h" />
     <ClInclude Include="..\..\CEX\X923.h" />
     <ClInclude Include="..\..\CEX\ZeroPad.h" />
@@ -426,8 +423,6 @@
     <ClCompile Include="..\..\CEX\CSP.cpp" />
     <ClCompile Include="..\..\CEX\CTR.cpp" />
     <ClCompile Include="..\..\CEX\BCG.cpp" />
-    <ClCompile Include="..\..\CEX\DCG.cpp" />
-    <ClCompile Include="..\..\CEX\DCR.cpp" />
     <ClCompile Include="..\..\CEX\DigestFromName.cpp" />
     <ClCompile Include="..\..\CEX\DigestStream.cpp" />
     <ClCompile Include="..\..\CEX\DrbgFromName.cpp" />
