@@ -34,7 +34,7 @@ AHX::AHX(Digests DigestType, size_t Rounds)
 	m_legalKeySizes(0),
 	m_legalRounds(0),
 	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
-		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64."))
+		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38."))
 {
 	LoadState(m_kdfEngineType);
 }
@@ -56,7 +56,7 @@ AHX::AHX(IDigest* Digest, size_t Rounds)
 	m_legalKeySizes(0),
 	m_legalRounds(0),
 	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
-		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are 32, 40, 48, 56, 64."))
+		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38."))
 {
 	LoadState(m_kdfEngineType);
 }

@@ -271,9 +271,9 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 	{
 		// count block bits
 		const size_t CTRIVL = m_blockSize * 8;
-		const size_t CSTSZE = m_customNonce.size() + sizeof(ushort);
-		std::vector<byte> ctr(CSTSZE);
-		// addcustomization string to start of counter
+		const size_t CSTLEN = m_customNonce.size() + sizeof(ushort);
+		std::vector<byte> ctr(CSTLEN);
+		// add customization string to start of counter
 		MemUtils::Copy(m_customNonce, 0, ctr, 0, m_customNonce.size());
 
 		// loop through state members, initializing each to a unique set of initial values
@@ -461,7 +461,6 @@ void CSG::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Len
 		msg[Length] = m_domainCode;
 		++Length;
 		MemUtils::Clear(msg, Length, m_blockSize - Length);
-
 		msg[m_blockSize - 1] |= 0x80;
 
 		AbsorbBlock(msg, 0, m_blockSize, State);
@@ -536,22 +535,20 @@ void CSG::Reset()
 
 void CSG::Scope()
 {
-	Reset();
-
 	if (m_avxEnabled)
 	{
 #if defined(__AVX512__)
 		m_drbgState.resize(8);
 		m_drbgBuffer.resize(m_blockSize * 8);
-#else
+#elif defined(__AVX2__)
 		m_drbgState.resize(4);
 		m_drbgBuffer.resize(m_blockSize * 4);
 #endif
 	}
 
+	Reset();
 
 	m_distributionCodeMax = m_blockSize;
-
 	m_legalKeySizes.resize(3);
 	// minimum seed size
 	m_legalKeySizes[0] = SymmetricKeySize(32, 0, 0);
