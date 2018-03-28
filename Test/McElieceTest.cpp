@@ -9,7 +9,7 @@
 namespace Test
 {
 	using namespace Key::Asymmetric;
-	using namespace Cipher::Asymmetric::McEliece;
+	using namespace Cipher::Asymmetric::MPKC;
 
 	const std::string McElieceTest::DESCRIPTION = "McEliece key generation, encryption, and decryption tests.";
 	const std::string McElieceTest::FAILURE = "FAILURE! ";

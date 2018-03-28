@@ -19,7 +19,7 @@ namespace Test
 	using Key::Asymmetric::MLWEKeyPair;
 	using Key::Asymmetric::MPKCKeyPair;
 	using Key::Asymmetric::RLWEKeyPair;
-	using Cipher::Asymmetric::McEliece::McEliece;
+	using Cipher::Asymmetric::MPKC::McEliece;
 	using Cipher::Asymmetric::MLWE::ModuleLWE;
 	using Cipher::Asymmetric::RLWE::RingLWE;
 

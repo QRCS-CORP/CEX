@@ -2,9 +2,9 @@
 #include "../CEX/CryptoAuthenticationFailure.h"
 #include "../CEX/IAsymmetricKeyPair.h"
 #include "../CEX/ModuleLWE.h"
-#include "../CEX/RLWEKeyPair.h"
-#include "../CEX/RLWEPrivateKey.h"
-#include "../CEX/RLWEPublicKey.h"
+#include "../CEX/MLWEKeyPair.h"
+#include "../CEX/MLWEPrivateKey.h"
+#include "../CEX/MLWEPublicKey.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
@@ -160,18 +160,18 @@ namespace Test
 		{
 
 			IAsymmetricKeyPair* kp = cpr.Generate();
-			RLWEPrivateKey* priK1 = (RLWEPrivateKey*)kp->PrivateKey();
+			MLWEPrivateKey* priK1 = (MLWEPrivateKey*)kp->PrivateKey();
 			skey = priK1->ToBytes();
-			RLWEPrivateKey priK2(skey);
+			MLWEPrivateKey priK2(skey);
 
 			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
 			{
 				throw TestException("ModuleLWETest: Private key serialization test has failed!");
 			}
 
-			RLWEPublicKey* pubK1 = (RLWEPublicKey*)kp->PublicKey();
+			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
 			skey = pubK1->ToBytes();
-			RLWEPublicKey pubK2(skey);
+			MLWEPublicKey pubK2(skey);
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{

@@ -11,10 +11,12 @@
 
 #define NAMESPACE_ASYMMETRIC namespace CEX { namespace Cipher { namespace Asymmetric {
 #define NAMESPACE_ASYMMETRICEND } } }
-#define NAMESPACE_MCELIECE namespace CEX { namespace Cipher { namespace Asymmetric { namespace McEliece {
+#define NAMESPACE_MCELIECE namespace CEX { namespace Cipher { namespace Asymmetric { namespace MPKC {
 #define NAMESPACE_MCELIECEEND } } } }
 #define NAMESPACE_MODULELWE namespace CEX { namespace Cipher { namespace Asymmetric { namespace MLWE {
 #define NAMESPACE_MODULELWEEND } } } }
+#define NAMESPACE_NTRU namespace CEX { namespace Cipher { namespace Asymmetric { namespace NTRU {
+#define NAMESPACE_NTRUEND } } } }
 #define NAMESPACE_RINGLWE namespace CEX { namespace Cipher { namespace Asymmetric { namespace RLWE {
 #define NAMESPACE_RINGLWEEND } } } }
 #define NAMESPACE_ASYMMETRICKEX namespace CEX { namespace Cipher { namespace Asymmetric { namespace KEX {
