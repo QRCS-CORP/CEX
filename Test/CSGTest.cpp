@@ -75,7 +75,6 @@ namespace Test
 			CompareVector(gen512w, m_seed[0], m_expected[6]);
 			delete gen512w;
 
-
 			OnProgress(std::string("CSG: Passed customized cSHAKEW-512 KAT test.."));
 #endif
 

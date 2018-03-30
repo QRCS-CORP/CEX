@@ -225,10 +225,8 @@ size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 				throw CryptoGeneratorException("CSG:Generate", "The maximum reseed requests can not be exceeded, re-initialize the generator!");
 			}
 
+			Derive();
 			m_reseedCounter = 0;
-			std::vector<byte> seed(m_seedSize);
-			m_providerSource->GetBytes(seed);
-			Derive(seed);
 		}
 	}
 
@@ -298,6 +296,7 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 		Fill();
 	}
 
+	m_seedSize = Seed.size();
 	m_isInitialized = true;
 }
 
@@ -328,7 +327,13 @@ void CSG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 void CSG::Update(const std::vector<byte> &Seed)
 {
-	Derive(Seed);
+	// add new entropy equal to original key size to the state
+	for (size_t i = 0; i < m_drbgState.size(); ++i)
+	{
+		FastAbsorb(Seed, 0, Seed.size(), m_drbgState[i]);
+	}
+
+	Fill();
 }
 
 //~~~Private Functions~~~//
@@ -398,9 +403,18 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 	}
 }
 
-void CSG::Derive(const std::vector<byte> &Seed)
+void CSG::Derive()
 {
-	Initialize(Seed, m_customNonce, m_distributionCode);
+	std::vector<byte> seed(m_seedSize);
+
+	// add new entropy equal to original key size to the state
+	for (size_t i = 0; i < m_drbgState.size(); ++i)
+	{
+		m_providerSource->GetBytes(seed);
+		FastAbsorb(seed, 0, seed.size(), m_drbgState[i]);
+	}
+
+	Fill();
 }
 
 void CSG::Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length)

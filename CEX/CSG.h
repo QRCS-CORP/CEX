@@ -356,7 +356,7 @@ private:
 	}
 
 	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name, std::array<ulong, STATE_SIZE> &State);
-	void Derive(const std::vector<byte> &Seed);
+	void Derive();
 	void Extract(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, std::array<ulong, STATE_SIZE> &State);
 	void Fill();
