@@ -264,8 +264,9 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 	if (!m_avxEnabled)
 	{
 		Customize(m_customNonce, m_distributionCode, m_drbgState[0]);
+		Permute(m_drbgState[0]);
 		FastAbsorb(Seed, 0, Seed.size(), m_drbgState[0]);
-		MemUtils::Copy(m_drbgState[0], 0, m_drbgBuffer, 0, m_blockSize);
+		Fill();
 	}
 	else
 	{
@@ -273,17 +274,28 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 		const size_t CTRIVL = m_blockSize * 8;
 		const size_t CSTLEN = m_customNonce.size() + sizeof(ushort);
 		std::vector<byte> ctr(CSTLEN);
+
 		// add customization string to start of counter
 		MemUtils::Copy(m_customNonce, 0, ctr, 0, m_customNonce.size());
 
-		// loop through state members, initializing each to a unique set of initial values
+		// loop through state members, initializing each to a unique set of values
 		for (size_t i = 0; i < m_drbgState.size(); ++i)
 		{
-			IntUtils::BeIncrease8(ctr, CTRIVL * i);
+			IntUtils::BeIncrease8(ctr, CTRIVL * (i + 1));
 			Customize(ctr, m_distributionCode, m_drbgState[i]);
-			FastAbsorb(Seed, 0, Seed.size(), m_drbgState[i]);
-			MemUtils::Copy(m_drbgState[i], 0, m_drbgBuffer, i * m_blockSize, m_blockSize);
 		}
+
+		// permute customizations
+		PermuteW(m_drbgState);
+
+		// add the seed
+		for (size_t i = 0; i < m_drbgState.size(); ++i)
+		{
+			FastAbsorb(Seed, 0, Seed.size(), m_drbgState[i]);
+		}
+
+		// seed permutation, then fill the buffer
+		Fill();
 	}
 
 	m_isInitialized = true;
@@ -384,8 +396,6 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 	{
 		State[i / 8] = IntUtils::LeBytesTo64(pad, i);
 	}
-
-	Permute(State);
 }
 
 void CSG::Derive(const std::vector<byte> &Seed)
@@ -464,7 +474,6 @@ void CSG::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Len
 		msg[m_blockSize - 1] |= 0x80;
 
 		AbsorbBlock(msg, 0, m_blockSize, State);
-		Permute(State);
 	}
 }
 
