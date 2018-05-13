@@ -360,7 +360,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					State[i / 8] = IntUtils::LeBytesTo64(pad, i);
+					State[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 				}
 
 				Permute(State);
@@ -382,7 +382,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					State[i / 8] = IntUtils::LeBytesTo64(pad, i);
+					State[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 				}
 
 				Permute(State);
@@ -399,7 +399,7 @@ void CSG::Customize(const std::vector<byte> &Customization, const std::vector<by
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		State[i / 8] = IntUtils::LeBytesTo64(pad, i);
+		State[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 	}
 }
 
