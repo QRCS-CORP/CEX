@@ -145,6 +145,7 @@ namespace Test
 	{
 		std::vector<byte> name(0);
 		std::vector<byte> output(Expected.size());
+
 		Generator->Initialize(Seed, m_custom, name);
 		Generator->Generate(output);
 

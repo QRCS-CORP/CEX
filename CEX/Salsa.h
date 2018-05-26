@@ -108,96 +108,95 @@ public:
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 
-	template<class T>
+	template<class Vector>
 	static void TransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
 	{
-		T X0(State[0]);
-		T X1(State[1]);
-		T X2(State[2]);
-		T X3(State[3]);
-		T X4(State[4]);
-		T X5(State[5]);
-		T X6(State[6]);
-		T X7(State[7]);
-		T X8(Counter, 0);
+		Vector X0(State[0]);
+		Vector X1(State[1]);
+		Vector X2(State[2]);
+		Vector X3(State[3]);
+		Vector X4(State[4]);
+		Vector X5(State[5]);
+		Vector X6(State[6]);
+		Vector X7(State[7]);
+		Vector X8(Counter, 0);
 #if defined(__AVX512__)
-		T X9(Counter, 16);
+		Vector X9(Counter, 16);
 #elif defined(__AVX2__)
-		T X9(Counter, 8);
+		Vector X9(Counter, 8);
 #else
-		T X9(Counter, 4);
+		Vector X9(Counter, 4);
 #endif
-		T X10(State[8]);
-		T X11(State[9]);
-		T X12(State[10]);
-		T X13(State[11]);
-		T X14(State[12]);
-		T X15(State[13]);
+		Vector X10(State[8]);
+		Vector X11(State[9]);
+		Vector X12(State[10]);
+		Vector X13(State[11]);
+		Vector X14(State[12]);
+		Vector X15(State[13]);
 
 		size_t stateCtr = Rounds;
 		while (stateCtr != 0)
 		{
-			X4 ^= T::RotL32(X0 + X12, 7);
-			X8 ^= T::RotL32(X4 + X0, 9);
-			X12 ^= T::RotL32(X8 + X4, 13);
-			X0 ^= T::RotL32(X12 + X8, 18);
-			X9 ^= T::RotL32(X5 + X1, 7);
-			X13 ^= T::RotL32(X9 + X5, 9);
-			X1 ^= T::RotL32(X13 + X9, 13);
-			X5 ^= T::RotL32(X1 + X13, 18);
-			X14 ^= T::RotL32(X10 + X6, 7);
-			X2 ^= T::RotL32(X14 + X10, 9);
-			X6 ^= T::RotL32(X2 + X14, 13);
-			X10 ^= T::RotL32(X6 + X2, 18);
-			X3 ^= T::RotL32(X15 + X11, 7);
-			X7 ^= T::RotL32(X3 + X15, 9);
-			X11 ^= T::RotL32(X7 + X3, 13);
-			X15 ^= T::RotL32(X11 + X7, 18);
-			X1 ^= T::RotL32(X0 + X3, 7);
-			X2 ^= T::RotL32(X1 + X0, 9);
-			X3 ^= T::RotL32(X2 + X1, 13);
-			X0 ^= T::RotL32(X3 + X2, 18);
-			X6 ^= T::RotL32(X5 + X4, 7);
-			X7 ^= T::RotL32(X6 + X5, 9);
-			X4 ^= T::RotL32(X7 + X6, 13);
-			X5 ^= T::RotL32(X4 + X7, 18);
-			X11 ^= T::RotL32(X10 + X9, 7);
-			X8 ^= T::RotL32(X11 + X10, 9);
-			X9 ^= T::RotL32(X8 + X11, 13);
-			X10 ^= T::RotL32(X9 + X8, 18);
-			X12 ^= T::RotL32(X15 + X14, 7);
-			X13 ^= T::RotL32(X12 + X15, 9);
-			X14 ^= T::RotL32(X13 + X12, 13);
-			X15 ^= T::RotL32(X14 + X13, 18);
+			X4 ^= Vector::RotL32(X0 + X12, 7);
+			X8 ^= Vector::RotL32(X4 + X0, 9);
+			X12 ^= Vector::RotL32(X8 + X4, 13);
+			X0 ^= Vector::RotL32(X12 + X8, 18);
+			X9 ^= Vector::RotL32(X5 + X1, 7);
+			X13 ^= Vector::RotL32(X9 + X5, 9);
+			X1 ^= Vector::RotL32(X13 + X9, 13);
+			X5 ^= Vector::RotL32(X1 + X13, 18);
+			X14 ^= Vector::RotL32(X10 + X6, 7);
+			X2 ^= Vector::RotL32(X14 + X10, 9);
+			X6 ^= Vector::RotL32(X2 + X14, 13);
+			X10 ^= Vector::RotL32(X6 + X2, 18);
+			X3 ^= Vector::RotL32(X15 + X11, 7);
+			X7 ^= Vector::RotL32(X3 + X15, 9);
+			X11 ^= Vector::RotL32(X7 + X3, 13);
+			X15 ^= Vector::RotL32(X11 + X7, 18);
+			X1 ^= Vector::RotL32(X0 + X3, 7);
+			X2 ^= Vector::RotL32(X1 + X0, 9);
+			X3 ^= Vector::RotL32(X2 + X1, 13);
+			X0 ^= Vector::RotL32(X3 + X2, 18);
+			X6 ^= Vector::RotL32(X5 + X4, 7);
+			X7 ^= Vector::RotL32(X6 + X5, 9);
+			X4 ^= Vector::RotL32(X7 + X6, 13);
+			X5 ^= Vector::RotL32(X4 + X7, 18);
+			X11 ^= Vector::RotL32(X10 + X9, 7);
+			X8 ^= Vector::RotL32(X11 + X10, 9);
+			X9 ^= Vector::RotL32(X8 + X11, 13);
+			X10 ^= Vector::RotL32(X9 + X8, 18);
+			X12 ^= Vector::RotL32(X15 + X14, 7);
+			X13 ^= Vector::RotL32(X12 + X15, 9);
+			X14 ^= Vector::RotL32(X13 + X12, 13);
+			X15 ^= Vector::RotL32(X14 + X13, 18);
 			stateCtr -= 2;
 		}
 
 		// last round
-		X0 += T(State[0]);
-		X1 += T(State[1]);
-		X2 += T(State[2]);
-		X3 += T(State[3]);
-		X4 += T(State[4]);
-		X5 += T(State[5]);
-		X6 += T(State[6]);
-		X7 += T(State[7]);
-		X8 += T(Counter, 0);
+		X0 += Vector(State[0]);
+		X1 += Vector(State[1]);
+		X2 += Vector(State[2]);
+		X3 += Vector(State[3]);
+		X4 += Vector(State[4]);
+		X5 += Vector(State[5]);
+		X6 += Vector(State[6]);
+		X7 += Vector(State[7]);
+		X8 += Vector(Counter, 0);
 #if defined(__AVX512__)
-		X9 += T(Counter, 16);
+		X9 += Vector(Counter, 16);
 #elif defined(__AVX2__)
-		X9 += T(Counter, 8);
+		X9 += Vector(Counter, 8);
 #else
-		X9 += T(Counter, 4);
+		X9 += Vector(Counter, 4);
 #endif
-		X10 += T(State[8]);
-		X11 += T(State[9]);
-		X12 += T(State[10]);
-		X13 += T(State[11]);
-		X14 += T(State[12]);
-		X15 += T(State[13]);
+		X10 += Vector(State[8]);
+		X11 += Vector(State[9]);
+		X12 += Vector(State[10]);
+		X13 += Vector(State[11]);
+		X14 += Vector(State[12]);
+		X15 += Vector(State[13]);
 
-		T::Store16(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
-
+		Vector::Store16(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
 	}
 
 #endif

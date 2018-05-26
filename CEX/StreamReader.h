@@ -80,19 +80,19 @@ public:
 	template <typename Array>
 	size_t Read(const Array &Output, size_t OutOffset, size_t Elements)
 	{
-		const size_t OTPSZE = (m_streamData.Position() + (sizeof(Array::value_type) * Elements)) > m_streamData.size() ?
+		const size_t OTPLEN = (m_streamData.Position() + (sizeof(Array::value_type) * Elements)) > m_streamData.size() ?
 			(m_streamData.size() - m_streamData.Position() - ()) :
 			sizeof(Array::value_type) * Elements;
 
 		if (sizeof(Array::value_type) > 1)
 		{
-			Utility::IntUtils::BlockToLe(m_streamData.ToArray(), m_streamData.Position(), Output, OutOffset, OTPSZE);
+			Utility::IntUtils::BlockToLe(m_streamData.ToArray(), m_streamData.Position(), Output, OutOffset, OTPLEN);
 		}
 		{
-			Utility::MemUtils::Copy(m_streamData.ToArray(), m_streamData.Position(), val, OTPSZE);
+			Utility::MemUtils::Copy(m_streamData.ToArray(), m_streamData.Position(), val, OTPLEN);
 		}
 
-		m_streamData.Seek(m_streamData.Position() + OTPSZE, SeekOrigin::Begin);
+		m_streamData.Seek(m_streamData.Position() + OTPLEN, SeekOrigin::Begin);
 	}
 
 	/// <summary>
@@ -101,13 +101,13 @@ public:
 	template <typename T>
 	T ReadInt()
 	{
-		const size_t VALSZE = sizeof(T);
+		const size_t VALLEN = sizeof(T);
 
-		CexAssert(m_streamData.Position() + VALSZE <= m_streamData.Length(), "Stream length exceeded");
+		CexAssert(m_streamData.Position() + VALLEN <= m_streamData.Length(), "Stream length exceeded");
 
 		T val = 0;
 
-		switch (VALSZE)
+		switch (VALLEN)
 		{
 			case 8:
 			{
@@ -126,11 +126,11 @@ public:
 			}
 			default:
 			{
-				Utility::MemUtils::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, VALSZE);
+				Utility::MemUtils::CopyToValue(m_streamData.ToArray(), m_streamData.Position(), val, VALLEN);
 			}
 		}
 
-		m_streamData.Seek(m_streamData.Position() + VALSZE, SeekOrigin::Begin);
+		m_streamData.Seek(m_streamData.Position() + VALLEN, SeekOrigin::Begin);
 
 		return val;
 	}

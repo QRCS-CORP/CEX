@@ -918,7 +918,7 @@ std::string SysUtils::Version()
 			LSTATUS ret = 0;
 			DWORD lpcchName = 0;
 			TCHAR achKey[255];
-			const size_t CLDSZE = 38;
+			const size_t CLDLEN = 38;
 
 			if (RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"), 0, KEY_READ, &hKey) == ERROR_SUCCESS)
 			{
@@ -933,7 +933,7 @@ std::string SysUtils::Version()
 
 					if (ret == ERROR_SUCCESS)
 					{
-						if (lpcchName == CLDSZE)
+						if (lpcchName == CLDLEN)
 						{
 							std::wstring tmp(&achKey[0]);
 							std::string cid(tmp.begin(), tmp.end());

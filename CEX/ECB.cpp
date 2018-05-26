@@ -194,12 +194,12 @@ void ECB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
 		}
 
-		const size_t RMDSZE = Length - (PRLBLK * BLKCNT);
+		const size_t RMDLEN = Length - (PRLBLK * BLKCNT);
 
-		if (RMDSZE != 0)
+		if (RMDLEN != 0)
 		{
 			const size_t BLKOFT = (PRLBLK * BLKCNT);
-			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDSZE);
+			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDLEN);
 		}
 	}
 	else
@@ -294,12 +294,12 @@ void ECB::Scope()
 
 void ECB::ProcessParallel(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	const size_t SEGSZE = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
-	const size_t BLKCNT = (SEGSZE / BLOCK_SIZE);
+	const size_t SEGLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
+	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
 
-	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGSZE, BLKCNT](size_t i)
+	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, SEGLEN, BLKCNT](size_t i)
 	{
-		this->Generate(Input, InOffset + (i * SEGSZE), Output, OutOffset + (i * SEGSZE), BLKCNT);
+		this->Generate(Input, InOffset + (i * SEGLEN), Output, OutOffset + (i * SEGLEN), BLKCNT);
 	});
 }
 

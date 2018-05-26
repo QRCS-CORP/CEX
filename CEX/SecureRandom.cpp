@@ -12,7 +12,7 @@ NAMESPACE_PRNG
 SecureRandom::SecureRandom(Prngs EngineType, Providers ProviderType, Digests DigestType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize < 32 ? DEF_BUFSZE : BufferSize),
+	m_bufferSize(BufferSize < 32 ? DEF_BUFLEN : BufferSize),
 	m_digestType((DigestType == Digests::None && EngineType != Prngs::BCR) ? Digests::SHA256 : DigestType),
 	m_isDestroyed(false),
 	m_providerType(ProviderType != Providers::None ? ProviderType : 

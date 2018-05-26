@@ -158,13 +158,13 @@ std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 	size_t prcRead = 0;
 	std::vector<byte> inpBuffer(0);
 
-	const size_t BLKSZE = m_macEngine->BlockSize();
-	const size_t ALNSZE = (Length / BLKSZE) * BLKSZE;
-	inpBuffer.resize(BLKSZE);
+	const size_t BLKLEN = m_macEngine->BlockSize();
+	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
+	inpBuffer.resize(BLKLEN);
 
-	while (prcLen != ALNSZE)
+	while (prcLen != ALNLEN)
 	{
-		prcRead = InStream->Read(inpBuffer, 0, BLKSZE);
+		prcRead = InStream->Read(inpBuffer, 0, BLKLEN);
 		m_macEngine->Update(inpBuffer, 0, prcRead);
 		prcLen += prcRead;
 		CalculateProgress(Length, InStream->Position());
@@ -173,9 +173,9 @@ std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 	// last block
 	if (prcLen < Length)
 	{
-		const size_t FNLSZE = Length - prcLen;
-		inpBuffer.resize(FNLSZE);
-		prcRead = InStream->Read(inpBuffer, 0, FNLSZE);
+		const size_t FNLLEN = Length - prcLen;
+		inpBuffer.resize(FNLLEN);
+		prcRead = InStream->Read(inpBuffer, 0, FNLLEN);
 		m_macEngine->Update(inpBuffer, 0, prcRead);
 		prcLen += prcRead;
 	}
@@ -193,23 +193,23 @@ std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOf
 	size_t prcLen = 0;
 	std::vector<byte> inpBuffer(0);
 
-	const size_t BLKSZE = m_macEngine->BlockSize();
-	const size_t ALNSZE = (Length / BLKSZE) * BLKSZE;
+	const size_t BLKLEN = m_macEngine->BlockSize();
+	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
 
-	while (prcLen != ALNSZE)
+	while (prcLen != ALNLEN)
 	{
-		m_macEngine->Update(Input, InOffset, BLKSZE);
-		InOffset += BLKSZE;
-		prcLen += BLKSZE;
+		m_macEngine->Update(Input, InOffset, BLKLEN);
+		InOffset += BLKLEN;
+		prcLen += BLKLEN;
 		CalculateProgress(Length, prcLen);
 	}
 
 	// last block
 	if (prcLen < Length)
 	{
-		const size_t FNLSZE = Length - prcLen;
-		m_macEngine->Update(Input, InOffset, FNLSZE);
-		prcLen += FNLSZE;
+		const size_t FNLLEN = Length - prcLen;
+		m_macEngine->Update(Input, InOffset, FNLLEN);
+		prcLen += FNLLEN;
 	}
 
 	// get the hash

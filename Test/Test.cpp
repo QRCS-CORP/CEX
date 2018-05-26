@@ -128,6 +128,7 @@
 #include "../Test/AesAvsTest.h"
 #include "../Test/AesFipsTest.h"
 #include "../Test/AsymmetricSpeedTest.h"
+#include "../Test/BCGTest.h"
 #include "../Test/Blake2Test.h"
 #include "../Test/ChaChaTest.h"
 #include "../Test/CipherModeTest.h"
@@ -135,7 +136,6 @@
 #include "../Test/CipherStreamTest.h"
 #include "../Test/CMACTest.h"
 #include "../Test/ConsoleUtils.h"
-#include "../Test/CMGTest.h"
 #include "../Test/CSGTest.h"
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
@@ -152,6 +152,7 @@
 #include "../Test/McElieceTest.h"
 #include "../Test/MemUtilsTest.h"
 #include "../Test/ModuleLWETest.h"
+#include "../Test/NTRUTest.h"
 #include "../Test/PaddingTest.h"
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
@@ -297,6 +298,12 @@ void RunTest(Test::ITest* Test)
 
 int main()
 {
+	bool hasAes;
+	bool hasAvs;
+	bool hasAvs2;
+	bool isx86emu;
+	bool is64;
+
 	ConsoleUtils::SizeConsole();
 	PrintTitle();
 
@@ -328,11 +335,11 @@ int main()
 		return 0;
 	}
 
-	bool hasAes = false;
-	bool hasAvs = false;
-	bool hasAvs2 = false;
-	bool isx86emu = false;
-	bool is64 = false;
+	hasAes = false;
+	hasAvs = false;
+	hasAvs2 = false;
+	isx86emu = false;
+	is64 = false;
 
 	try
 	{
@@ -464,7 +471,7 @@ int main()
 			RunTest(new SCRYPTTest());
 			RunTest(new SHAKETest());
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
-			RunTest(new CMGTest());
+			RunTest(new BCGTest());
 			RunTest(new CSGTest());
 			RunTest(new HMGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
@@ -480,6 +487,7 @@ int main()
 			RunTest(new RingLWETest());
 			RunTest(new McElieceTest());
 			RunTest(new ModuleLWETest());
+			RunTest(new NTRUTest());
 		}
 		else
 		{

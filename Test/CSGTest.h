@@ -8,7 +8,7 @@ namespace Test
 {
 	/// <summary>
 	/// CSG output comparison test.
-	/// <para>Test using the iofficial NIST references contained in:
+	/// <para>Test using the official NIST references contained in:
 	/// NIST cSHAKE KATs: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/cSHAKE_samples.pdf">cSHAKE example values</a>
 	/// SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></para>
 	/// </summary>

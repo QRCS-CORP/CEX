@@ -121,7 +121,7 @@ private:
 	static const std::string DEF_DSTINFO;
 	static const size_t MAX_ROUNDS = 38;
 	static const size_t MIN_ROUNDS = 10;
-	// size of state buffer and lookup tables subtracted parallel size calculations
+	// size of state buffer and lookup tables subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 5120;
 
 	size_t m_cprKeySize;

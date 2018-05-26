@@ -355,8 +355,8 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 	}
 #endif
 
-	const size_t ALNSZE = Length - (Length % BLOCK_SIZE);
-	while (ctr != ALNSZE)
+	const size_t ALNLEN = Length - (Length % BLOCK_SIZE);
+	while (ctr != ALNLEN)
 	{
 		ChaCha::Transform(Output, OutOffset + ctr, Counter, m_wrkState, m_rndCount);
 		IntUtils::LeIncrementW(Counter);
@@ -367,32 +367,32 @@ void ChaCha20::Generate(std::vector<byte> &Output, const size_t OutOffset, std::
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE, 0);
 		ChaCha::Transform(outputBlock, 0, Counter, m_wrkState, m_rndCount);
-		const size_t FNLSZE = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
+		const size_t FNLLEN = Length % BLOCK_SIZE;
+		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
 		IntUtils::LeIncrementW(Counter);
 	}
 }
 
 void ChaCha20::Process(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	const size_t PRCSZE = (Length >= Input.size() - InOffset) && Length >= Output.size() - OutOffset ? IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) : Length;
+	const size_t PRCLEN = (Length >= Input.size() - InOffset) && Length >= Output.size() - OutOffset ? IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) : Length;
 
-	if (!m_parallelProfile.IsParallel() || PRCSZE < m_parallelProfile.ParallelMinimumSize())
+	if (!m_parallelProfile.IsParallel() || PRCLEN < m_parallelProfile.ParallelMinimumSize())
 	{
 		// generate random
-		Generate(Output, OutOffset, m_ctrVector, PRCSZE);
+		Generate(Output, OutOffset, m_ctrVector, PRCLEN);
 		// output is input xor random
-		const size_t ALNSZE = PRCSZE - (PRCSZE % BLOCK_SIZE);
+		const size_t ALNLEN = PRCLEN - (PRCLEN % BLOCK_SIZE);
 
-		if (ALNSZE != 0)
+		if (ALNLEN != 0)
 		{
-			Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNSZE);
+			Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNLEN);
 		}
 
 		// get the remaining bytes
-		if (ALNSZE != PRCSZE)
+		if (ALNLEN != PRCLEN)
 		{
-			for (size_t i = ALNSZE; i < PRCSZE; ++i)
+			for (size_t i = ALNLEN; i < PRCLEN; ++i)
 			{
 				Output[i + OutOffset] ^= Input[i + InOffset];
 			}
@@ -401,21 +401,21 @@ void ChaCha20::Process(const std::vector<byte> &Input, const size_t InOffset, st
 	else
 	{
 		// parallel CTR processing //
-		const size_t CNKSZE = (PRCSZE / BLOCK_SIZE / m_parallelProfile.ParallelMaxDegree()) * BLOCK_SIZE;
-		const size_t RNDSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
-		const size_t CTRLEN = (CNKSZE / BLOCK_SIZE);
+		const size_t CNKLEN = (PRCLEN / BLOCK_SIZE / m_parallelProfile.ParallelMaxDegree()) * BLOCK_SIZE;
+		const size_t RNDLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
+		const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 		std::vector<uint> tmpCtr(m_ctrVector.size());
 
-		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
+		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
 		{
 			// thread level counter
 			std::vector<uint> thdCtr(m_ctrVector.size());
 			// offset counter by chunk size / block size
 			IntUtils::LeIncreaseW(m_ctrVector, thdCtr, CTRLEN * i);
 			// create random at offset position
-			this->Generate(Output, OutOffset + (i * CNKSZE), thdCtr, CNKSZE);
+			this->Generate(Output, OutOffset + (i * CNKLEN), thdCtr, CNKLEN);
 			// xor with input at offset
-			Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
+			Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
@@ -427,14 +427,14 @@ void ChaCha20::Process(const std::vector<byte> &Input, const size_t InOffset, st
 		Utility::MemUtils::Copy(tmpCtr, 0, m_ctrVector, 0, CTR_SIZE);
 
 		// last block processing
-		if (RNDSZE < PRCSZE)
+		if (RNDLEN < PRCLEN)
 		{
-			const size_t FNLSZE = PRCSZE % RNDSZE;
-			Generate(Output, RNDSZE, m_ctrVector, FNLSZE);
+			const size_t FNLLEN = PRCLEN % RNDLEN;
+			Generate(Output, RNDLEN, m_ctrVector, FNLLEN);
 
-			for (size_t i = 0; i < FNLSZE; ++i)
+			for (size_t i = 0; i < FNLLEN; ++i)
 			{
-				Output[i + OutOffset + RNDSZE] ^= static_cast<byte>(Input[i + InOffset + RNDSZE]);
+				Output[i + OutOffset + RNDLEN] ^= static_cast<byte>(Input[i + InOffset + RNDLEN]);
 			}
 		}
 	}

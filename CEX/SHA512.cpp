@@ -278,10 +278,10 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 			{
 				// fill buffer
-				const size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
-				if (RMDSZE != 0)
+				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
@@ -291,8 +291,8 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				});
 
 				m_msgLength = 0;
-				Length -= RMDSZE;
-				InOffset += RMDSZE;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
 			}
 
 			if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -326,16 +326,16 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 		{
 			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 			{
-				const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
-				if (RMDSZE != 0)
+				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				SHA2::Compress128(m_msgBuffer, 0, m_dgtState[0]);
 				m_msgLength = 0;
-				InOffset += RMDSZE;
-				Length -= RMDSZE;
+				InOffset += RMDLEN;
+				Length -= RMDLEN;
 			}
 
 			// sequential loop through blocks

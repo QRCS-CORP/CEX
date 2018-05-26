@@ -176,7 +176,9 @@
 #	if defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__PPC__) || defined(__mips__) || defined(__MWERKS__) && (!defined(__INTEL__))
 #		define IS_BIG_ENDIAN
 #	else
-#		define CEX_IS_LITTLE_ENDIAN
+#		if !defined(CEX_IS_LITTLE_ENDIAN)
+#			define CEX_IS_LITTLE_ENDIAN
+#		endif
 #	endif
 #endif
 
@@ -366,6 +368,9 @@ inline static void CexAssert(bool Condition, const T Message)
 	} 
 #endif
 }
+
+// enables RingLWE parallel processing
+//#define CEX_RLWE_PARALLEL
 
 // enables/disables OS rotation intrinsics
 #if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)

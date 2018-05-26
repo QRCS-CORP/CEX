@@ -227,7 +227,7 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 	std::vector<byte> tmpR(BLOCK_SIZE);
 	std::memcpy(&tmpR[0], &KeyParams.Key()[0], BLOCK_SIZE);
 
-	// with the Poly1305-AES version, if the input key has not been pre-conditioned nd autoclamp is set, 
+	// with the Poly1305-AES version, if the input key has not been pre-conditioned and autoclamp is set, 
 	// clamp the R portion of the key automatically rather than throw an exception
 	if (m_autoClamp && m_blockCipher != nullptr && KeyParams.Nonce().size() == BLOCK_SIZE && !IsClamped(tmpR))
 	{
@@ -319,16 +319,16 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 	{
 		if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 		{
-			const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
-			if (RMDSZE != 0)
+			const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+			if (RMDLEN != 0)
 			{
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
 			ProcessBlock(m_msgBuffer, 0, BLOCK_SIZE);
 			m_msgLength = 0;
-			InOffset += RMDSZE;
-			Length -= RMDSZE;
+			InOffset += RMDLEN;
+			Length -= RMDLEN;
 		}
 
 		// loop through blocks

@@ -401,13 +401,13 @@ public:
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		const size_t VARSZE = sizeof(ArrayB::value_type);
+		const size_t VARLEN = sizeof(ArrayB::value_type);
 
-		for (size_t i = 0; i < Length / VARSZE; ++i)
+		for (size_t i = 0; i < Length / VARLEN; ++i)
 		{
-			for (size_t j = VARSZE; j > 0; --j)
+			for (size_t j = VARLEN; j > 0; --j)
 			{
-				Output[OutOffset + i] |= static_cast<ArrayB::value_type>(Input[InOffset + (i * VARSZE) + (VARSZE - j)]) << (8 * (j - 1));
+				Output[OutOffset + i] |= static_cast<ArrayB::value_type>(Input[InOffset + (i * VARLEN) + (VARLEN - j)]) << (8 * (j - 1));
 			}
 		}
 #endif
@@ -432,13 +432,13 @@ public:
 #if defined(IS_BIG_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		const size_t VARSZE = sizeof(ArrayA::value_type);
+		const size_t VARLEN = sizeof(ArrayA::value_type);
 
-		for (size_t i = 0; i < Length / VARSZE; ++i)
+		for (size_t i = 0; i < Length / VARLEN; ++i)
 		{
-			for (size_t j = VARSZE; j > 0; --j)
+			for (size_t j = VARLEN; j > 0; --j)
 			{
-				Output[OutOffset + (i * VARSZE) + (j - 1)] = static_cast<ArrayB::value_type>(Input[InOffset + i] >> ((VARSZE - j) * 8));
+				Output[OutOffset + (i * VARLEN) + (j - 1)] = static_cast<ArrayB::value_type>(Input[InOffset + i] >> ((VARLEN - j) * 8));
 			}
 		}
 #endif
@@ -685,17 +685,17 @@ public:
 		CexAssert(sizeof(Array::value_type) == sizeof(byte), "Input and Output must be an array of 8bit integers");
 		CexAssert(!std::is_signed<Array::value_type>::value, "Input and Output must be an unsigned integer array");
 
-		const int CTRSZE = static_cast<int>(Output.size() - 1);
+		const int CTRLEN = static_cast<int>(Output.size() - 1);
 		uint ctrLen = static_cast<uint>(Length);
 		std::array<byte, sizeof(uint)> ctrInc;
 
 		std::memcpy(&ctrInc[0], &ctrLen, ctrInc.size());
 		byte carry = 0;
 
-		for (int i = CTRSZE; i >= 0; --i)
+		for (int i = CTRLEN; i >= 0; --i)
 		{
 			byte odst = Output[i];
-			byte osrc = CTRSZE - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRSZE - i]) : static_cast<byte>(0);
+			byte osrc = CTRLEN - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRLEN - i]) : static_cast<byte>(0);
 			byte ndst = static_cast<byte>(odst + osrc + carry);
 			carry = ndst < odst ? 1 : 0;
 			Output[i] = ndst;
@@ -715,7 +715,7 @@ public:
 		CexAssert(sizeof(Array::value_type) == sizeof(byte), "Input and Output must be an array of 8bit integers");
 		CexAssert(!std::is_signed<Array::value_type>::value, "Input and Output must be an unsigned integer array");
 
-		const int CTRSZE = static_cast<int>(Output.size() - 1);
+		const int CTRLEN = static_cast<int>(Output.size() - 1);
 		uint ctrLen = static_cast<uint>(Length);
 		std::array<byte, sizeof(uint)> ctrInc;
 
@@ -723,10 +723,10 @@ public:
 		std::memcpy(&Output[0], &Input[0], Input.size());
 		byte carry = 0;
 
-		for (int i = CTRSZE; i >= 0; --i)
+		for (int i = CTRLEN; i >= 0; --i)
 		{
 			byte odst = Output[i];
-			byte osrc = CTRSZE - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRSZE - i]) : static_cast<byte>(0);
+			byte osrc = CTRLEN - i < static_cast<int>(ctrInc.size()) ? static_cast<byte>(ctrInc[CTRLEN - i]) : static_cast<byte>(0);
 			byte ndst = static_cast<byte>(odst + osrc + carry);
 			carry = ndst < odst ? 1 : 0;
 			Output[i] = ndst;
@@ -763,13 +763,13 @@ public:
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		const size_t VARSZE = sizeof(ArrayB::value_type);
+		const size_t VARLEN = sizeof(ArrayB::value_type);
 
-		for (size_t i = 0; i < Length / VARSZE; ++i)
+		for (size_t i = 0; i < Length / VARLEN; ++i)
 		{
-			for (size_t j = 0; j < VARSZE; ++j)
+			for (size_t j = 0; j < VARLEN; ++j)
 			{
-				Output[OutOffset + i] |= static_cast<ArrayB::value_type>(Input[InOffset + (i * VARSZE) + j]) << (8 * j);
+				Output[OutOffset + i] |= static_cast<ArrayB::value_type>(Input[InOffset + (i * VARLEN) + j]) << (8 * j);
 			}
 		}
 #endif
@@ -794,13 +794,13 @@ public:
 #if defined(CEX_IS_LITTLE_ENDIAN)
 		Utility::MemUtils::Copy(Input, InOffset, Output, OutOffset, Length);
 #else
-		const size_t VARSZE = sizeof(ArrayA::value_type);
+		const size_t VARLEN = sizeof(ArrayA::value_type);
 
-		for (size_t i = 0; i < Length / VARSZE; ++i)
+		for (size_t i = 0; i < Length / VARLEN; ++i)
 		{
-			for (size_t j = 0; j < VARSZE; ++j)
+			for (size_t j = 0; j < VARLEN; ++j)
 			{
-				Output[OutOffset + (i * VARSZE) + j] = static_cast<ArrayB::value_type>(Input[InOffset + i] >> (8 * j));
+				Output[OutOffset + (i * VARLEN) + j] = static_cast<ArrayB::value_type>(Input[InOffset + i] >> (8 * j));
 			}
 		}
 #endif
@@ -824,8 +824,6 @@ public:
 #else
 		Output[OutOffset] = static_cast<byte>(Value);
 		Output[OutOffset + 1] = static_cast<byte>(Value >> 8);
-		Output[OutOffset + 2] = static_cast<byte>(Value >> 16);
-		Output[OutOffset + 3] = static_cast<byte>(Value >> 24);
 #endif
 	}
 
@@ -1260,6 +1258,29 @@ public:
 	inline static T CMax(T A, T B)
 	{
 		return Select<T>(ExpandTopBit<T>(A), A, B);
+	}
+
+	/// <summary>
+	/// Constant time conditional move
+	/// </summary>
+	/// 
+	/// <param name="R">The destination array</param>
+	/// <param name="ROffset">The starting index in the destination array</param>
+	/// <param name="X">The source array</param>
+	/// <param name="XOffset">The starting index in the source array</param>
+	/// <param name="Length">The number of elements to copy</param>
+	/// <param name="Condition">The condition</param>
+	template <typename Array>
+	inline static void CMov(Array &R, size_t ROffset, const Array &X, size_t XOffset, size_t Length, byte Condition)
+	{
+		size_t i;
+
+		Condition = ~Condition + 1;
+
+		for (i = 0; i < Length; i++)
+		{
+			R[ROffset + i] ^= Condition & (X[XOffset + i] ^ R[ROffset + i]);
+		}
 	}
 
 	/// <summary>

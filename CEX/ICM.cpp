@@ -197,12 +197,12 @@ void ICM::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 			ProcessParallel(Input, InOffset + (i * PRLBLK), Output, OutOffset + (i * PRLBLK), PRLBLK);
 		}
 
-		const size_t RMDSZE = Length - (PRLBLK * BLKCNT);
+		const size_t RMDLEN = Length - (PRLBLK * BLKCNT);
 
-		if (RMDSZE != 0)
+		if (RMDLEN != 0)
 		{
 			const size_t BLKOFT = (PRLBLK * BLKCNT);
-			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDSZE);
+			ProcessSequential(Input, InOffset + BLKOFT, Output, OutOffset + BLKOFT, RMDLEN);
 		}
 	}
 	else
@@ -350,29 +350,29 @@ void ICM::Generate(std::vector<byte> &Output, const size_t OutOffset, const size
 		std::vector<byte> tmp(BLOCK_SIZE);
 		Convert(Counter, tmpCtr, 0);
 		m_blockCipher->EncryptBlock(tmpCtr, 0, tmp, 0);
-		const size_t FNLSZE = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy(tmp, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
+		const size_t FNLLEN = Length % BLOCK_SIZE;
+		Utility::MemUtils::Copy(tmp, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
 		Utility::IntUtils::LeIncrementW(Counter);
 	}
 }
 
 void ICM::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
-	const size_t OUTSZE = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
-	const size_t CNKSZE = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
-	const size_t CTRLEN = (CNKSZE / BLOCK_SIZE);
+	const size_t OUTLEN = Output.size() - OutOffset < Length ? Output.size() - OutOffset : Length;
+	const size_t CNKLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
+	const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 	std::vector<ulong> tmpCtr(m_ctrVector.size());
 
-	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
+	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
 	{
 		// thread level counter
 		std::vector<ulong> thdCtr(2, 0);
 		// offset counter by chunk size / block size  
 		Utility::IntUtils::LeIncreaseW(m_ctrVector, thdCtr, CTRLEN * i);
 		// generate random at output array offset
-		this->Generate(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
+		this->Generate(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
 		// xor with input at offsets
-		Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
+		Utility::MemUtils::XorBlock(Input, InOffset + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 
 		// store last counter
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
@@ -385,13 +385,13 @@ void ICM::ProcessParallel(const std::vector<byte> &Input, const size_t InOffset,
 	Utility::MemUtils::COPY128(tmpCtr, 0, m_ctrVector, 0);
 
 	// last block processing
-	const size_t ALNSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
-	if (ALNSZE < OUTSZE)
+	const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
+	if (ALNLEN < OUTLEN)
 	{
-		const size_t FNLSZE = (Output.size() - OutOffset) % ALNSZE;
-		Generate(Output, ALNSZE, FNLSZE, m_ctrVector);
+		const size_t FNLLEN = (Output.size() - OutOffset) % ALNLEN;
+		Generate(Output, ALNLEN, FNLLEN, m_ctrVector);
 
-		for (size_t i = ALNSZE; i < OUTSZE; i++)
+		for (size_t i = ALNLEN; i < OUTLEN; i++)
 		{
 			Output[i] ^= Input[i];
 		}
@@ -403,17 +403,17 @@ void ICM::ProcessSequential(const std::vector<byte> &Input, const size_t InOffse
 	// generate random
 	Generate(Output, OutOffset, Length, m_ctrVector);
 	// get block aligned
-	size_t ALNSZE = Length - (Length % m_blockCipher->BlockSize());
+	size_t ALNLEN = Length - (Length % m_blockCipher->BlockSize());
 
-	if (ALNSZE != 0)
+	if (ALNLEN != 0)
 	{
-		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNSZE);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, OutOffset, ALNLEN);
 	}
 
 	// get the remaining bytes
-	if (ALNSZE != Length)
+	if (ALNLEN != Length)
 	{
-		for (size_t i = ALNSZE; i < Length; ++i)
+		for (size_t i = ALNLEN; i < Length; ++i)
 		{
 			Output[i + OutOffset] ^= Input[i + InOffset];
 		}

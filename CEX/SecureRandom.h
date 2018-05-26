@@ -65,7 +65,7 @@ class SecureRandom
 {
 private:
 
-	static const size_t DEF_BUFSZE = 4096;
+	static const size_t DEF_BUFLEN = 4096;
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;

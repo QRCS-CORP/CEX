@@ -284,10 +284,10 @@ void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t 
 			if (m_msgLength != 0 && Length + m_msgLength >= m_msgBuffer.size())
 			{
 				// fill buffer
-				const size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
-				if (RMDSZE != 0)
+				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
@@ -298,8 +298,8 @@ void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t 
 				});
 
 				m_msgLength = 0;
-				Length -= RMDSZE;
-				InOffset += RMDSZE;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
 			}
 
 			if (Length >= m_parallelProfile.ParallelBlockSize())
@@ -334,18 +334,18 @@ void Keccak1024::Update(const std::vector<byte> &Input, size_t InOffset, size_t 
 		{
 			if (m_msgLength != 0 && (m_msgLength + Length >= BLOCK_SIZE))
 			{
-				const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
-				if (RMDSZE != 0)
+				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 
 				Absorb(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0]);
 				Keccak::PermuteR48P1600(m_dgtState[0].H);
 				m_msgLength = 0;
-				InOffset += RMDSZE;
-				Length -= RMDSZE;
+				InOffset += RMDLEN;
+				Length -= RMDLEN;
 			}
 
 			// sequential loop through blocks

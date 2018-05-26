@@ -515,10 +515,10 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 		}
 	}
 
-	const size_t BTMSZE = bottom % 8;
+	const size_t BTMLEN = bottom % 8;
 	size_t btmLen = bottom / 8;
 
-	if (BTMSZE == 0)
+	if (BTMLEN == 0)
 	{
 		Utility::MemUtils::COPY128(m_mainStretch, btmLen, m_mainOffset0, 0);
 	}
@@ -529,7 +529,7 @@ void OCB::GenerateOffsets(const std::vector<byte> &Nonce)
 			ulong b1 = m_mainStretch[btmLen];
 			++btmLen;
 			ulong b2 = m_mainStretch[btmLen];
-			m_mainOffset0[i] = static_cast<byte>((b1 << BTMSZE) | (b2 >> (8 - BTMSZE)));
+			m_mainOffset0[i] = static_cast<byte>((b1 << BTMLEN) | (b2 >> (8 - BTMLEN)));
 		}
 	}
 
@@ -645,20 +645,20 @@ void OCB::ParallelDecrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	}
 
 	// parallel offsets
-	const size_t PRLSZE = m_parallelProfile.ParallelBlockSize();
-	const size_t CNKSZE = PRLSZE / m_parallelProfile.ParallelMaxDegree();
+	const size_t PRLLEN = m_parallelProfile.ParallelBlockSize();
+	const size_t CNKLEN = PRLLEN / m_parallelProfile.ParallelMaxDegree();
 	size_t chainPos = 0;
 
-	while (Length >= PRLSZE)
+	while (Length >= PRLLEN)
 	{
-		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &offsetChain, chainPos, CNKSZE](size_t i)
+		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &offsetChain, chainPos, CNKLEN](size_t i)
 		{
-			this->ProcessSegment(offsetChain, chainPos + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
+			this->ProcessSegment(offsetChain, chainPos + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 		});
 
-		Length -= PRLSZE;
-		OutOffset += PRLSZE;
-		chainPos += PRLSZE;
+		Length -= PRLLEN;
+		OutOffset += PRLLEN;
+		chainPos += PRLLEN;
 	}
 
 	if (Length != 0)
@@ -713,20 +713,20 @@ void OCB::ParallelEncrypt(const std::vector<byte> &Input, size_t InOffset, std::
 	}
 
 	// parallel offsets
-	const size_t PRLSZE = m_parallelProfile.ParallelBlockSize();
-	const size_t CNKSZE = PRLSZE / m_parallelProfile.ParallelMaxDegree();
+	const size_t PRLLEN = m_parallelProfile.ParallelBlockSize();
+	const size_t CNKLEN = PRLLEN / m_parallelProfile.ParallelMaxDegree();
 	size_t chainPos = 0;
 
-	while (Length >= PRLSZE)
+	while (Length >= PRLLEN)
 	{
-		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &offsetChain, chainPos, CNKSZE](size_t i)
+		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &offsetChain, chainPos, CNKLEN](size_t i)
 		{
-			this->ProcessSegment(offsetChain, chainPos + (i * CNKSZE), Output, OutOffset + (i * CNKSZE), CNKSZE);
+			this->ProcessSegment(offsetChain, chainPos + (i * CNKLEN), Output, OutOffset + (i * CNKLEN), CNKLEN);
 		});
 
-		Length -= PRLSZE;
-		OutOffset += PRLSZE;
-		chainPos += PRLSZE;
+		Length -= PRLLEN;
+		OutOffset += PRLLEN;
+		chainPos += PRLLEN;
 	}
 
 	if (Length != 0)

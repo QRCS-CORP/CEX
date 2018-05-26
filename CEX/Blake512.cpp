@@ -420,15 +420,15 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			if (ttlLen > PRLMIN)
 			{
 				// fill buffer
-				const size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
-				if (RMDSZE != 0)
+				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				m_msgLength = 0;
-				Length -= RMDSZE;
-				InOffset += RMDSZE;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
 				ttlLen -= m_msgBuffer.size();
 
 				// empty the message buffer
@@ -464,14 +464,14 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			if (ttlLen > m_msgBuffer.size())
 			{
 				// fill buffer
-				size_t RMDSZE = m_msgBuffer.size() - m_msgLength;
-				if (RMDSZE != 0)
+				size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				Length -= RMDSZE;
-				InOffset += RMDSZE;
+				Length -= RMDLEN;
+				InOffset += RMDLEN;
 				m_msgLength = m_msgBuffer.size();
 
 				// process first half of buffer
@@ -490,16 +490,16 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		{
 			if (m_msgLength + Length > BLOCK_SIZE)
 			{
-				const size_t RMDSZE = BLOCK_SIZE - m_msgLength;
-				if (RMDSZE != 0)
+				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
+				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				Compress(m_msgBuffer, 0, m_dgtState[0], BLOCK_SIZE);
 				m_msgLength = 0;
-				InOffset += RMDSZE;
-				Length -= RMDSZE;
+				InOffset += RMDLEN;
+				Length -= RMDLEN;
 			}
 
 			// loop until last block

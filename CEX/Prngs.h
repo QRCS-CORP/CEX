@@ -19,6 +19,10 @@ enum class Prngs : byte
 	/// </summary>
 	BCR = 1,
 	/// <summary>
+	/// A cSHAKE based random number generator
+	/// </summary>
+	CSR = 2,
+	/// <summary>
 	/// An HMAC based random number generator
 	/// </summary>
 	HCR = 3,

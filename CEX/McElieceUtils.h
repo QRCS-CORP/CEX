@@ -393,8 +393,8 @@ public:
 		ulong t207 = t196 ^ t155;
 		ulong t208 = t197 ^ t143;
 
-		const size_t OUTSZE = Output.size();
-		std::vector<ulong> sum(2 * OUTSZE - 1);
+		const size_t OUTLEN = Output.size();
+		std::vector<ulong> sum(2 * OUTLEN - 1);
 		sum[0] = t48;
 		sum[1] = t49;
 		sum[2] = t51;
@@ -419,13 +419,13 @@ public:
 		sum[21] = t13;
 		sum[22] = t1;
 
-		for (size_t i = 2 * OUTSZE - 2; i >= OUTSZE; i--)
+		for (size_t i = 2 * OUTLEN - 2; i >= OUTLEN; i--)
 		{
 			sum[i - 9] ^= sum[i];
-			sum[i - OUTSZE] ^= sum[i];
+			sum[i - OUTLEN] ^= sum[i];
 		}
 
-		std::memcpy(&Output[0], &sum[0], OUTSZE * sizeof(ulong));
+		std::memcpy(&Output[0], &sum[0], OUTLEN * sizeof(ulong));
 	}
 
 	template<typename Array>

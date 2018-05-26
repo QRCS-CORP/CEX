@@ -74,6 +74,16 @@ const std::string BCR::Name()
 
 //~~~Public Functions~~~//
 
+void BCR::Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	const size_t BUFLEN = Elements * sizeof(int16_t);
+	std::vector<byte> buf(BUFLEN);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+}
+
 void BCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
@@ -84,11 +94,31 @@ void BCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
+void BCR::Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	const size_t BUFLEN = Elements * sizeof(int32_t);
+	std::vector<byte> buf(BUFLEN);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+}
+
 void BCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	const size_t BUFLEN = Elements * sizeof(uint);
+	std::vector<byte> buf(BUFLEN);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+}
+
+void BCR::Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	const size_t BUFLEN = Elements * sizeof(int64_t);
 	std::vector<byte> buf(BUFLEN);
 	GetBytes(buf);
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);

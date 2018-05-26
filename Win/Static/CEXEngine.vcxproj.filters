@@ -307,6 +307,12 @@
     <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\NTRU\Support">
       <UniqueIdentifier>{b2ab17b2-f144-4d9a-a1a9-364b52a632db}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Key\Asymmetric\NTRU">
+      <UniqueIdentifier>{87a60d4f-3e15-4aac-bb0c-d132567e07ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Asymmetric\NTRU">
+      <UniqueIdentifier>{3a43ac05-8602-4be5-a9f5-f2b4ce0424af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CEX\CBC.h">
@@ -741,9 +747,6 @@
     <ClInclude Include="..\..\CEX\RLWEParams.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\FFTQ12289N1024.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\UShort128.h">
       <Filter>Header Files\Numeric</Filter>
     </ClInclude>
@@ -798,9 +801,6 @@
     <ClInclude Include="..\..\CEX\Keccak1024.h">
       <Filter>Header Files\Digest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\FFTM12T62.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\AeadModeFromName.h">
       <Filter>Header Files\Helper</Filter>
     </ClInclude>
@@ -834,17 +834,11 @@
     <ClInclude Include="..\..\CEX\MLWEKeyPair.h">
       <Filter>Header Files\Key\Asymmetric\ModuleLWE</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\FFTQ7681N256.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\IAuthenticate.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\Authenticate</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\Authenticators.h">
       <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\SHAKE.h">
-      <Filter>Header Files\Kdf</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ShakeModes.h">
       <Filter>Header Files\Enumeration</Filter>
@@ -876,9 +870,6 @@
     <ClInclude Include="..\..\CEX\AsymmetricKeyTypes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\FFTQ12289N512.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\CSG.h">
       <Filter>Header Files\Drbg</Filter>
     </ClInclude>
@@ -887,6 +878,45 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\ULong512.h">
       <Filter>Header Files\Numeric</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRU.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\NTRU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUKeyPair.h">
+      <Filter>Header Files\Key\Asymmetric\NTRU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUPrivateKey.h">
+      <Filter>Header Files\Key\Asymmetric\NTRU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUPublicKey.h">
+      <Filter>Header Files\Key\Asymmetric\NTRU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUParams.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MLWEQ7681N256.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCM12T62.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RLWEQ12289N512.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\NTRU\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRULQ4591N761.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\NTRU\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\CSR.h">
+      <Filter>Header Files\Prng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SHAKE.h">
+      <Filter>Header Files\Kdf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1142,9 +1172,6 @@
     <ClCompile Include="..\..\CEX\GHASH.cpp">
       <Filter>Source Files\Mac\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\FFTQ12289N1024.cpp">
-      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\RingLWE.cpp">
       <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE</Filter>
     </ClCompile>
@@ -1193,9 +1220,6 @@
     <ClCompile Include="..\..\CEX\AeadModeFromName.cpp">
       <Filter>Source Files\Helper</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\FFTM12T62.cpp">
-      <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\CryptoAuthenticationFailure.cpp">
       <Filter>Source Files\Exception</Filter>
     </ClCompile>
@@ -1229,20 +1253,47 @@
     <ClCompile Include="..\..\CEX\MLWEKeyPair.cpp">
       <Filter>Source Files\Key\Asymmetric\ModuleLWE</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\FFTQ7681N256.cpp">
-      <Filter>Source Files\Cipher\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\SHAKE.cpp">
-      <Filter>Source Files\Kdf</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\FFTQ12289N512.cpp">
-      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\CSG.cpp">
       <Filter>Source Files\Drbg</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\KMAC.cpp">
       <Filter>Source Files\Mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRU.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\NTRU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUKeyPair.cpp">
+      <Filter>Source Files\Key\Asymmetric\NTRU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUPrivateKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\NTRU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUPublicKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\NTRU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MLWEQ7681N256.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\MPKCM12T62.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RLWEQ12289N512.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\NTRU\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\NTRU\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\CSR.cpp">
+      <Filter>Source Files\Prng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHAKE.cpp">
+      <Filter>Source Files\Kdf</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

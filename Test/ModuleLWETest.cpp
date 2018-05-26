@@ -47,7 +47,7 @@ namespace Test
 			MessageAuthentication();
 			OnProgress(std::string("ModuleLWETest: Passed message authentication test.."));
 			PublicKeyIntegrity();
-			OnProgress(std::string("ModuleLWETest: Passed public key integrity test.."));
+			OnProgress(std::string("ModuleLWETest: Passed public key integrity test.."));/**/
 			StressLoop();
 			OnProgress(std::string("ModuleLWETest: Passed encryption and decryption stress tests.."));
 			SerializationCompare();
@@ -68,49 +68,54 @@ namespace Test
 	void ModuleLWETest::CipherTextIntegrity()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(0);
-		std::vector<byte> sec2(0);
+		std::vector<byte> sec1(64);
+		std::vector<byte> sec2(64);
 
 		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K2, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
-		cpr.Initialize(true, kp->PublicKey());
+		cpr.Initialize(kp->PublicKey());
 		cpr.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
 		m_rngPtr->GetBytes(cpt, 0, 4);
 
-		cpr.Initialize(false, kp->PrivateKey());
-		cpr.Decapsulate(cpt, sec2);
+		cpr.Initialize(kp->PrivateKey());
 
-		delete kp;
-
-		if (sec1 == sec2)
+		try
 		{
-			throw TestException("ModuleLWETest: Cipher-text integrity test failed!");
+			cpr.Decapsulate(cpt, sec2);
 		}
+		catch (Exception::CryptoAuthenticationFailure)
+		{
+			// passed
+			delete kp;
+			return;
+		}
+
+		throw TestException("ModuleLWETest: Cipher-text integrity test failed!");
 	}
 
 	void ModuleLWETest::MessageAuthentication()
 	{
-		std::vector<byte> enc;
-		std::vector<byte> dec;
-		std::vector<byte> msg(128);
+		std::vector<byte> cpt(0);
+		std::vector<byte> sec1(32);
+		std::vector<byte> sec2(32);
 
 		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
-		cpr.Initialize(true, kp->PublicKey());
-		enc = cpr.Encrypt(msg);
+		cpr.Initialize(kp->PublicKey());
+		cpr.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(enc, 0, 4);
+		m_rngPtr->GetBytes(cpt, 0, 4);
 
-		cpr.Initialize(false, kp->PrivateKey());
+		cpr.Initialize(kp->PrivateKey());
 
 		try
 		{
-			dec = cpr.Decrypt(enc);
+			cpr.Decapsulate(cpt, sec2);
 		}
 		catch (Exception::CryptoAuthenticationFailure)
 		{
@@ -125,30 +130,34 @@ namespace Test
 	void ModuleLWETest::PublicKeyIntegrity()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(0);
-		std::vector<byte> sec2(0);
+		std::vector<byte> sec1(64);
+		std::vector<byte> sec2(64);
 
 		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		// alter public key
-		std::vector<byte> p2 = ((MLWEPublicKey*)kp->PublicKey())->P();
-		p2[0] += 1;
-		p2[1] += 1;
-		MLWEPublicKey* pk2 = new MLWEPublicKey(Enumeration::MLWEParams::Q7681N256K3, p2);
-		cpr.Initialize(true, pk2);
+		std::vector<byte> pk1 = ((MLWEPublicKey*)kp->PublicKey())->P();
+		pk1[0] += 1;
+		pk1[1] += 1;
+		MLWEPublicKey* pk2 = new MLWEPublicKey(Enumeration::MLWEParams::Q7681N256K3, pk1);
+		cpr.Initialize(pk2);
 		cpr.Encapsulate(cpt, sec1);
 
-		cpr.Initialize(false, kp->PrivateKey());
-		cpr.Decapsulate(cpt, sec2);
+		cpr.Initialize(kp->PrivateKey());
 
-		if (sec1 == sec2)
+		try
 		{
-			throw TestException("ModuleLWETest: PublicKey integrity test failed!");
+			cpr.Decapsulate(cpt, sec2);
+		}
+		catch (Exception::CryptoAuthenticationFailure)
+		{
+			// passed
+			delete kp;
+			return;
 		}
 
-		delete kp;
-		delete pk2;
+		throw TestException("ModuleLWETest: Public key integrity test failed!");
 	}
 
 	void ModuleLWETest::SerializationCompare()
@@ -182,47 +191,20 @@ namespace Test
 
 	void ModuleLWETest::StressLoop()
 	{
-		std::vector<byte> enc;
-		std::vector<byte> dec;
-		std::vector<byte> msg(32);
-
-		// test encrypt/decrypt api
-		ModuleLWE cpr1(Enumeration::MLWEParams::Q7681N256K4, m_rngPtr);
-
-		for (size_t i = 0; i < 100; ++i)
-		{
-			m_rngPtr->GetBytes(msg);
-			IAsymmetricKeyPair* kp = cpr1.Generate();
-
-			cpr1.Initialize(true, kp->PublicKey());
-			enc = cpr1.Encrypt(msg);
-
-			cpr1.Initialize(false, kp->PrivateKey());
-			dec = cpr1.Decrypt(enc);
-
-			delete kp;
-
-			if (dec != msg)
-			{
-				throw TestException("ModuleLWETest: Stress test has failed!");
-			}
-		}
-
-		// test encapsulate/decapsulate
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(0);
-		std::vector<byte> sec2(0);
-		ModuleLWE cpr2(Enumeration::MLWEParams::Q7681N256K4, m_rngPtr);
+		std::vector<byte> sec1(32);
+		std::vector<byte> sec2(32);
+		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr2.Generate();
+			IAsymmetricKeyPair* kp = cpr.Generate();
 
-			cpr2.Initialize(true, kp->PublicKey());
-			cpr2.Encapsulate(cpt, sec1);
+			cpr.Initialize(kp->PublicKey());
+			cpr.Encapsulate(cpt, sec1);
 
-			cpr2.Initialize(false, kp->PrivateKey());
-			cpr2.Decapsulate(cpt, sec2);
+			cpr.Initialize(kp->PrivateKey());
+			cpr.Decapsulate(cpt, sec2);
 
 			delete kp;
 

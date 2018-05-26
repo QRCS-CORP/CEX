@@ -96,14 +96,14 @@ public:
 	template <typename T>
 	void Write(const std::vector<T> &Input)
 	{
-		const size_t INPSZE = Input.size() * sizeof(T);
-		if (m_streamPosition + INPSZE > m_streamState.size())
+		const size_t INPLEN = Input.size() * sizeof(T);
+		if (m_streamPosition + INPLEN > m_streamState.size())
 		{
-			m_streamState.resize(m_streamPosition + INPSZE);
+			m_streamState.resize(m_streamPosition + INPLEN);
 		}
 
-		Utility::IntUtils::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPSZE);
-		m_streamPosition += INPSZE;
+		Utility::IntUtils::LeToBlock(Input, 0, m_streamState, m_streamPosition, INPLEN);
+		m_streamPosition += INPLEN;
 	}
 
 	/// <summary>
@@ -116,22 +116,22 @@ public:
 	template <typename Array>
 	void Write(const Array &Input, size_t InOffset, size_t Elements)
 	{
-		const size_t INPSZE = sizeof(Array::value_type) * Elements;
-		if (m_streamPosition + INPSZE > m_streamState.size())
+		const size_t INPLEN = sizeof(Array::value_type) * Elements;
+		if (m_streamPosition + INPLEN > m_streamState.size())
 		{
-			m_streamState.resize(m_streamPosition + INPSZE);
+			m_streamState.resize(m_streamPosition + INPLEN);
 		}
 
 		if (sizeof(Array::value_type) > 1)
 		{
-			Utility::IntUtils::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPSZE);
+			Utility::IntUtils::LeToBlock(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
 		}
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_streamState, m_streamPosition, INPSZE);
+			Utility::MemUtils::Copy(Input, InOffset, m_streamState, m_streamPosition, INPLEN);
 		}
 
 
-		m_streamPosition += INPSZE;
+		m_streamPosition += INPLEN;
 	}
 
 	/// <summary>
@@ -142,13 +142,13 @@ public:
 	template <typename T>
 	void Write(T Value)
 	{
-		const size_t VALSZE = sizeof(T);
-		if (m_streamPosition + VALSZE > m_streamState.size())
+		const size_t VALLEN = sizeof(T);
+		if (m_streamPosition + VALLEN > m_streamState.size())
 		{
-			m_streamState.resize(m_streamPosition + VALSZE);
+			m_streamState.resize(m_streamPosition + VALLEN);
 		}
 
-		switch (VALSZE)
+		switch (VALLEN)
 		{
 			case 8:
 			{
@@ -171,7 +171,7 @@ public:
 			}
 		}
 
-		m_streamPosition += VALSZE;
+		m_streamPosition += VALLEN;
 	}
 };
 

@@ -273,10 +273,10 @@ size_t HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		m_macGenerator->Update(++m_kdfCounter);
 		m_macGenerator->Finalize(m_kdfState, 0);
 
-		const size_t RMDSZE = Utility::IntUtils::Min(m_macSize, Length - prcLen);
-		Utility::MemUtils::Copy(m_kdfState, 0, Output, OutOffset, RMDSZE);
-		prcLen += RMDSZE;
-		OutOffset += RMDSZE;
+		const size_t RMDLEN = Utility::IntUtils::Min(m_macSize, Length - prcLen);
+		Utility::MemUtils::Copy(m_kdfState, 0, Output, OutOffset, RMDLEN);
+		prcLen += RMDLEN;
+		OutOffset += RMDLEN;
 	}
 
 	return Length;

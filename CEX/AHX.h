@@ -125,7 +125,7 @@ private:
 	static const size_t AES256_ROUNDS = 14;
 	static const size_t MAX_ROUNDS = 38;
 	static const size_t MIN_ROUNDS = 10;
-	// size of state buffer subtracted parallel size calculations
+	// size of state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
 	size_t m_blockSize;

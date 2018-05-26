@@ -211,24 +211,24 @@ void CBC::Decrypt128(const std::vector<byte> &Input, const size_t InOffset, std:
 
 void CBC::DecryptParallel(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset)
 {
-	const size_t SEGSZE = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
-	const size_t BLKCNT = (SEGSZE / BLOCK_SIZE);
+	const size_t SEGLEN = m_parallelProfile.ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
+	const size_t BLKCNT = (SEGLEN / BLOCK_SIZE);
 	std::vector<byte> tmpIv(BLOCK_SIZE);
 
-	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGSZE, BLKCNT](size_t i)
+	Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, &Output, OutOffset, &tmpIv, SEGLEN, BLKCNT](size_t i)
 	{
 		std::vector<byte> thdIv(BLOCK_SIZE);
 
 		if (i != 0)
 		{
-			Utility::MemUtils::COPY128(Input, (InOffset + (i * SEGSZE)) - BLOCK_SIZE, thdIv, 0);
+			Utility::MemUtils::COPY128(Input, (InOffset + (i * SEGLEN)) - BLOCK_SIZE, thdIv, 0);
 		}
 		else
 		{
 			Utility::MemUtils::COPY128(m_cbcVector, 0, thdIv, 0);
 		}
 
-		this->DecryptSegment(Input, InOffset + i * SEGSZE, Output, OutOffset + i * SEGSZE, thdIv, BLKCNT);
+		this->DecryptSegment(Input, InOffset + i * SEGLEN, Output, OutOffset + i * SEGLEN, thdIv, BLKCNT);
 
 		if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 		{

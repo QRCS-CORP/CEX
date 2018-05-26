@@ -14,6 +14,7 @@ const std::string SHAKE::CLASS_NAME("SHAKE");
 SHAKE::SHAKE(ShakeModes ShakeMode)
 	:
 	m_blockSize((ShakeMode == ShakeModes::SHAKE128) ? 168 : (ShakeMode == ShakeModes::SHAKE256) ? 136 : 72),
+	m_domainCode(SHAKE_DOMAIN),
 	m_hashSize((ShakeMode == ShakeModes::SHAKE128) ? 16 : (ShakeMode == ShakeModes::SHAKE256) ? 32 : 
 		(ShakeMode == ShakeModes::SHAKE512) ? 64 : 128),
 	m_isDestroyed(false),
@@ -134,23 +135,23 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
 {
-	std::vector<byte> tmpK(Key.size() + Salt.size());
+	if (Salt.size() != 0)
+	{
+		std::vector<byte> tmp(0);
+		Customize(Salt, tmp);
+	}
 
-	MemUtils::Copy(Key, 0, tmpK, 0, Key.size());
-	MemUtils::Copy(Salt, 0, tmpK, Key.size(), Salt.size());
-
-	Initialize(tmpK);
+	Initialize(Key);
 }
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
 {
-	std::vector<byte> tmpK(Key.size() + Salt.size() + Info.size());
+	if (Salt.size() != 0)
+	{
+		Customize(Salt, Info);
+	}
 
-	MemUtils::Copy(Key, 0, tmpK, 0, Key.size());
-	MemUtils::Copy(Salt, 0, tmpK, Key.size(), Salt.size());
-	MemUtils::Copy(Info, 0, tmpK, Key.size() + Salt.size(), Info.size());
-
-	Initialize(tmpK);
+	Initialize(Key);
 }
 
 void SHAKE::ReSeed(const std::vector<byte> &Seed)
@@ -165,6 +166,77 @@ void SHAKE::Reset()
 }
 
 //~~~Private Functions~~~//
+
+void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name)
+{
+	CexAssert(Customization.size() + Name.size() <= 196, "the input buffer is too large");
+
+	std::array<byte, BUFFER_SIZE> pad;
+	size_t i;
+	size_t offset;
+
+	offset = 0;
+	offset = LeftEncode(pad, 0, m_blockSize);
+	offset += LeftEncode(pad, offset, Name.size() * 8);
+
+	m_domainCode = CSHAKE_DOMAIN;
+
+	if (Name.size() != 0)
+	{
+		for (i = 0; i < Name.size(); i++)
+		{
+			if (offset == m_blockSize)
+			{
+				AbsorbBlock(pad, 0, m_blockSize, m_kdfState);
+				Permute(m_kdfState);
+				offset = 0;
+			}
+
+			pad[offset] = Name[i];
+			++offset;
+		}
+	}
+
+	offset += LeftEncode(pad, offset, Customization.size() * 8);
+
+	if (Customization.size() != 0)
+	{
+		for (i = 0; i < Customization.size(); i++)
+		{
+			if (offset == m_blockSize)
+			{
+				AbsorbBlock(pad, 0, m_blockSize, m_kdfState);
+				Permute(m_kdfState);
+				offset = 0;
+			}
+
+			pad[offset] = Customization[i];
+			++offset;
+		}
+	}
+
+	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
+
+	for (size_t i = 0; i < offset; i += 8)
+	{
+		m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
+	}
+
+	Permute(m_kdfState);
+}
+
+void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+{
+	while (Length != 0)
+	{
+		const size_t BLKLEN = IntUtils::Min(m_blockSize, Length);
+		MemUtils::Copy(m_kdfState, 0, Output, OutOffset, BLKLEN);
+		Permute(m_kdfState);
+		Length -= BLKLEN;
+		OutOffset += BLKLEN;
+	}
+}
 
 void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
@@ -189,25 +261,14 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 			MemUtils::Copy(Input, InOffset, msg, 0, Length);
 		}
 
-		msg[Length] = SHAKE_DOMAIN;
+		msg[Length] = m_domainCode;
 		++Length;
+
 		MemUtils::Clear(msg, Length, m_blockSize - Length);
 		msg[m_blockSize - 1] |= 0x80;
-
 		AbsorbBlock(msg, 0, m_blockSize, m_kdfState);
-		Permute(m_kdfState);
-	}
-}
 
-void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
-{
-	while (Length != 0)
-	{
-		const size_t BLKSZE = IntUtils::Min(m_blockSize, Length);
-		MemUtils::Copy(m_kdfState, 0, Output, OutOffset, BLKSZE);
 		Permute(m_kdfState);
-		Length -= BLKSZE;
-		OutOffset += BLKSZE;
 	}
 }
 

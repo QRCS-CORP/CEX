@@ -183,17 +183,17 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 	{
 		if (m_msgLength != 0 && (m_msgLength + Length >= m_blockSize))
 		{
-			const size_t RMDSZE = m_blockSize - m_msgLength;
-			if (RMDSZE != 0)
+			const size_t RMDLEN = m_blockSize - m_msgLength;
+			if (RMDLEN != 0)
 			{
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDSZE);
+				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
 			AbsorbBlock(m_msgBuffer, 0, m_blockSize, m_kdfState);
 			Permute(m_kdfState);
 			m_msgLength = 0;
-			InOffset += RMDSZE;
-			Length -= RMDSZE;
+			InOffset += RMDLEN;
+			Length -= RMDLEN;
 		}
 
 		// sequential loop through blocks

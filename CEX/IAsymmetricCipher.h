@@ -22,10 +22,8 @@
 #include "CexDomain.h"
 #include "CryptoAsymmetricException.h"
 #include "CryptoAuthenticationFailure.h"
-#include "Digests.h"
 #include "IAsymmetricKey.h"
 #include "IAsymmetricKeyPair.h"
-#include "IDigest.h"
 #include "IPrng.h"
 #include "Prngs.h"
 
@@ -34,10 +32,8 @@ NAMESPACE_ASYMMETRIC
 using Enumeration::AsymmetricEngines;
 using Exception::CryptoAsymmetricException;
 using Exception::CryptoAuthenticationFailure;
-using Enumeration::Digests;
 using Key::Asymmetric::IAsymmetricKey;
 using Key::Asymmetric::IAsymmetricKeyPair;
-using Digest::IDigest;
 using Prng::IPrng;
 using Enumeration::Prngs;
 
@@ -75,6 +71,15 @@ public:
 	}
 
 	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret.
+	/// <para>Changing this code will create a unique distribution of the cipher.
+	/// The domain key can be used as a secondary secret shared between hosts in an authenticated domain.
+	/// The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation.
+	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.</para>
+	/// </summary>
+	virtual std::vector<byte> &DomainKey() = 0;
 
 	/// <summary>
 	/// Read Only: The cipher type-name
@@ -115,35 +120,18 @@ public:
 	virtual void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
 
 	/// <summary>
-	/// Decrypt an encrypted cipher-text and return the message key.
-	/// <para>This is a CPA-secure transformation function</para>
-	/// </summary>
-	/// 
-	/// <param name="CipherText">The input cipher-text</param>
-	virtual std::vector<byte> Decrypt(const std::vector<byte> &CipherText) = 0;
-
-	/// <summary>
-	/// Encrypt a shared secret and return the encrypted message.
-	/// <para>This is a CPA-secure transformation function</para>
-	/// </summary>
-	/// 
-	/// <param name="Message">The shared secret array</param>
-	virtual std::vector<byte> Encrypt(const std::vector<byte> &Message) = 0;
-
-	/// <summary>
 	/// Generate a public/private key-pair
 	/// </summary>
 	virtual IAsymmetricKeyPair* Generate() = 0;
 
 	/// <summary>
-	/// Initialize the cipher for encryption or decryption
+	/// Initialize the cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
-	/// <param name="Key">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// <param name="Encryption">Initialize the cipher with a key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	virtual void Initialize(bool Encryption, IAsymmetricKey* Key) = 0;
+	virtual void Initialize(IAsymmetricKey* Key) = 0;
 };
 
 NAMESPACE_ASYMMETRICEND

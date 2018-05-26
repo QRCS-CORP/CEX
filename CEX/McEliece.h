@@ -21,10 +21,6 @@
 
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
-#include "BlockCiphers.h"
-#include "IAeadMode.h"
-#include "IBlockCipher.h"
-#include "IDigest.h"
 #include "MPKCKeyPair.h"
 #include "MPKCParams.h"
 #include "MPKCPrivateKey.h"
@@ -32,10 +28,6 @@
 
 NAMESPACE_MCELIECE
 
-using Enumeration::BlockCiphers;
-using Cipher::Symmetric::Block::Mode::IAeadMode;
-using Cipher::Symmetric::Block::IBlockCipher;
-using Digest::IDigest;
 using Key::Asymmetric::MPKCKeyPair;
 using Enumeration::MPKCParams;
 using Key::Asymmetric::MPKCPrivateKey;
@@ -63,7 +55,7 @@ using Key::Asymmetric::MPKCPublicKey;
 /// rng->GetBytes(msg);
 /// // initialize the cipher
 /// McEliece cpr(MPKCParams::M12T62, [PrngType], [CipherType]);
-/// cpr.Initialize(true, kp);
+/// cpr.Initialize(kp);
 /// // encrypt the secret
 /// std:vector&lt;byte&gt; enc = cpr.Encrypt(msg);
 /// </code>
@@ -72,7 +64,7 @@ using Key::Asymmetric::MPKCPublicKey;
 /// <code>
 /// // initialize the cipher
 /// McEliece cpr(MPKCParams::M12T62, [PrngType], [CipherType]);
-/// cpr.Initialize(false, kp);
+/// cpr.Initialize(kp);
 /// // decrypt the secret
 /// std:vector&lt;byte&gt; msg = cpr.Decrypt(enc);
 /// </code>
@@ -85,11 +77,10 @@ using Key::Asymmetric::MPKCPublicKey;
 /// <para>This implementation is based on the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/."> 'McBits'</a>. \n
 /// The MPKCParams enumeration member is passed to the constructor along with either an optional Prng and block-cipher enum type values, or uninitialized instances of a Prng and a block cipher. \n
 /// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key tag byte array. \n
-/// The Initialize(bool, *IAsymmetricKeyPair) function takes a boolean indicating initialization type (encryption/decryption), and a pointer to an IAsymmetricKeyPair,
-/// (only the required key type need be populated, public or private key).
 /// The encryption method a standard encryption interface: CipherText = Encrypt(Message), the decryption method uses the inverse: Message = Decrypt(CipherText).</para>
 /// 
 /// <list type="bullet">
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The M12T62 parameter set is the default cipher configuration; as of (1.0.0.4), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The primary pseudo-random function (message digest) can be set through the constructor (default is SHA2-256)</description></item>
@@ -99,7 +90,7 @@ using Key::Asymmetric::MPKCPublicKey;
 /// 
 /// <description>Guiding Publications:</description>//
 /// <list type="number">
-/// <item><description>the Niederreiter dual form of the McEliece: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography.</description></item>
+/// <item><description>the Niederreiter dual form of the McEliece cipher: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography.</description></item>
 /// <item><description>McEliece and <a href="https://www.iacr.org/archive/crypto2011/68410758/68410758.pdf">Niederreiter</a> Cryptosystems That Resist Quantum Fourier Sampling Attacks.</description></item>
 /// <item><description>Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEliece</a> cryptosystem.</description></item>
 /// <item><description>Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEliece</a> cryptosystem.</description></item>
@@ -113,6 +104,7 @@ private:
 	static const size_t TAG_SIZE = 16;
 
 	bool m_destroyEngine;
+	std::vector<byte> m_domainKey;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
@@ -163,6 +155,16 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
+	/// Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.
+	/// <para>Changing this code will create a unique distribution of the cipher.
+	/// The domain key can be used as a secondary secret shared between hosts in an authenticated domain.
+	/// The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation.
+	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.
+	/// This property is used by the Shared Trust Model secure communications protocol.</para>
+	/// </summary>
+	std::vector<byte> &DomainKey();
+
+	/// <summary>
 	/// Read Only: The cipher type-name
 	/// </summary>
 	const AsymmetricEngines Enumeral() override;
@@ -206,29 +208,6 @@ public:
 	void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
 
 	/// <summary>
-	/// Decrypt an encrypted cipher-text and return the shared secret
-	/// </summary>
-	/// 
-	/// <param name="CipherText">The input cipher-text</param>
-	/// 
-	/// <returns>The decrypted message</returns>
-	///
-	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid input or configuration</exception>
-	/// <exception cref="Exception::CryptoAuthenticationFailure">Thrown if the message has failed authentication</exception>
-	std::vector<byte> Decrypt(const std::vector<byte> &CipherText) override;
-
-	/// <summary>
-	/// Encrypt a shared secret and return the encrypted message
-	/// </summary>
-	/// 
-	/// <param name="Message">The shared secret array</param>
-	/// 
-	/// <returns>The encrypted message</returns>
-	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid input or configuration</exception>
-	std::vector<byte> Encrypt(const std::vector<byte> &Message) override;
-
-	/// <summary>
 	/// Generate a public/private key-pair
 	/// </summary>
 	/// 
@@ -238,19 +217,13 @@ public:
 	IAsymmetricKeyPair* Generate() override;
 
 	/// <summary>
-	/// Initialize the cipher for encryption or decryption
+	/// Initialize the cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
-	/// <param name="Key">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// <param name="Encryption">Initialize the cipher with a key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(bool Encryption, IAsymmetricKey* Key) override;
-
-private:
-
-	bool MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message);
-	void MPKCEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText);
+	void Initialize(IAsymmetricKey* Key) override;
 };
 
 NAMESPACE_MCELIECEEND

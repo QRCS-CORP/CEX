@@ -1,8 +1,6 @@
 #include "McEliece.h"
-#include "FFTM12T62.h"
-#include "GCM.h"
+#include "MPKCM12T62.h"
 #include "IntUtils.h"
-#include "Keccak512.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
@@ -16,6 +14,7 @@ const std::string McEliece::CLASS_NAME = "McEliece";
 McEliece::McEliece(MPKCParams Parameters, Prngs PrngType)
 	:
 	m_destroyEngine(true),
+	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -29,6 +28,7 @@ McEliece::McEliece(MPKCParams Parameters, Prngs PrngType)
 McEliece::McEliece(MPKCParams Parameters, IPrng* Prng)
 	:
 	m_destroyEngine(false),
+	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -47,6 +47,7 @@ McEliece::~McEliece()
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_mpkcParameters = MPKCParams::None;
+		Utility::IntUtils::ClearVector(m_domainKey);
 
 		// release keys
 		if (m_privateKey != nullptr)
@@ -57,6 +58,7 @@ McEliece::~McEliece()
 		{
 			m_publicKey.release();
 		}
+
 		if (m_destroyEngine)
 		{
 			// destroy internally generated objects
@@ -78,6 +80,11 @@ McEliece::~McEliece()
 }
 
 //~~~Accessors~~~//
+
+std::vector<byte> &McEliece::DomainKey()
+{
+	return m_domainKey;
+}
 
 const AsymmetricEngines McEliece::Enumeral()
 {
@@ -116,15 +123,16 @@ const MPKCParams McEliece::Parameters()
 void McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
+	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
 
-	std::vector<byte> e(0);
+	std::vector<byte> sct(0);
 
 	// decrypt with McEliece, more fft configurations to be added
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		e.resize(static_cast<ulong>(1) << (FFTM12T62::M - 3));
+		sct.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
 
-		if (!FFTM12T62::Decrypt(e, m_privateKey->S(), CipherText))
+		if (!MPKCM12T62::Decrypt(sct, m_privateKey->S(), CipherText))
 		{
 			throw CryptoAuthenticationFailure("McEliece:Decrypt", "Decryption authentication failure!");
 		}
@@ -135,22 +143,23 @@ void McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 	}
 
 	// hash the message to create the shared secret
-	Digest::Keccak512 dgt;
-	SharedSecret.resize(dgt.DigestSize());
-	dgt.Compute(e, SharedSecret);
+	Kdf::SHAKE gen;
+	gen.Initialize(sct, m_domainKey);
+	gen.Generate(SharedSecret);
 }
 
 void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
+	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
 
-	std::vector<byte> e(0);
+	std::vector<byte> sct(0);
 
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		e.resize(static_cast<ulong>(1) << (FFTM12T62::M - 3));
-		CipherText.resize(FFTM12T62::CPRTXT_SIZE);
-		FFTM12T62::Encrypt(CipherText, e, m_publicKey->P(), m_rndGenerator);
+		sct.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
+		CipherText.resize(MPKCM12T62::MPKC_CIPHERTEXT_SIZE);
+		MPKCM12T62::Encrypt(CipherText, sct, m_publicKey->P(), m_rndGenerator);
 	}
 	else
 	{
@@ -158,49 +167,9 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	}
 
 	// hash the message to create the shared secret
-	Digest::Keccak512 dgt;
-	SharedSecret.resize(dgt.DigestSize());
-	dgt.Compute(e, SharedSecret);
-}
-
-std::vector<byte> McEliece::Decrypt(const std::vector<byte> &CipherText)
-{
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-
-	std::vector<byte> msg(0);
-
-	if (m_mpkcParameters == MPKCParams::M12T62)
-	{
-		if (!MPKCDecrypt(CipherText, msg))
-		{
-			throw CryptoAuthenticationFailure("McEliece:Decrypt", "Decryption authentication failure!");
-		}
-	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Decrypt", "The parameter type is invalid!");
-	}
-
-	return msg;
-}
-
-std::vector<byte> McEliece::Encrypt(const std::vector<byte> &Message)
-{
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-
-	std::vector<byte> cpt(0);
-
-	if (m_mpkcParameters == MPKCParams::M12T62)
-	{
-		cpt.resize(FFTM12T62::CPRTXT_SIZE);
-		MPKCEncrypt(Message, cpt);
-	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Encrypt", "The parameter type is invalid!");
-	}
-
-	return cpt;
+	Kdf::SHAKE gen;
+	gen.Initialize(sct, m_domainKey);
+	gen.Generate(SharedSecret);
 }
 
 IAsymmetricKeyPair* McEliece::Generate()
@@ -212,9 +181,9 @@ IAsymmetricKeyPair* McEliece::Generate()
 
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		pka.resize(FFTM12T62::PUBKEY_SIZE);
-		ska.resize(FFTM12T62::PRIKEY_SIZE);
-		if (!FFTM12T62::Generate(pka, ska, m_rndGenerator))
+		pka.resize(MPKCM12T62::MPKC_PUBLICKEY_SIZE);
+		ska.resize(MPKCM12T62::MPKC_PRIVATEKEY_SIZE);
+		if (!MPKCM12T62::Generate(pka, ska, m_rndGenerator))
 		{
 			throw CryptoAsymmetricException("McEliece:Generate", "Key generation max retries failure!");
 		}
@@ -231,127 +200,27 @@ IAsymmetricKeyPair* McEliece::Generate()
 }
 
 
-void McEliece::Initialize(bool Encryption, IAsymmetricKey* Key)
+void McEliece::Initialize(IAsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::McEliece)
 	{
 		throw CryptoAsymmetricException("McEliece:Initialize", "The key is invalid!");
 	}
-	if (Encryption == false && Key->KeyType() != Enumeration::AsymmetricKeyTypes::CipherPrivateKey)
-	{
-		throw CryptoAsymmetricException("McEliece:Initialize", "Decryption requires a valid private key");
-	}
-	else if (Encryption == true && Key->KeyType() != Enumeration::AsymmetricKeyTypes::CipherPublicKey)
-	{
-		throw CryptoAsymmetricException("McEliece:Initialize", "Encryption requires a valid public key!");
-	}
 
-	if (Encryption)
+	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)
 	{
 		m_publicKey = std::unique_ptr<MPKCPublicKey>((MPKCPublicKey*)Key);
 		m_mpkcParameters = m_publicKey->Parameters();
+		m_isEncryption = true;
 	}
 	else
 	{
 		m_privateKey = std::unique_ptr<MPKCPrivateKey>((MPKCPrivateKey*)Key);
 		m_mpkcParameters = m_privateKey->Parameters();
+		m_isEncryption = false;
 	}
 
-	m_isEncryption = Encryption;
 	m_isInitialized = true;
-}
-
-//~~~Private Functions~~~//
-
-bool McEliece::MPKCDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message)
-{
-	const size_t KEYSZE = 32;
-	const size_t NNCSZE = 16;
-	const size_t TAGSZE = 16;
-	bool status = false;
-
-	std::vector<byte> e(0);
-
-	// decrypt with McEliece, more fft configurations to be added
-	if (m_mpkcParameters == MPKCParams::M12T62)
-	{
-		e.resize(static_cast<ulong>(1) << (FFTM12T62::M - 3));
-		Message.resize(CipherText.size() - (FFTM12T62::CPRTXT_SIZE + TAGSZE));
-		status = (FFTM12T62::Decrypt(e, m_privateKey->S(), CipherText));
-	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Decrypt", "The parameter type is invalid!");
-	}
-
-	if (status)
-	{
-		size_t seedLen = KEYSZE + NNCSZE + TAGSZE;
-		// seed SHAKE with e, use it to create GCM key
-		Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-		gen.Initialize(e);
-		std::vector<byte> seed(seedLen);
-		gen.Generate(seed);
-
-		// HX ciphers get 512 bits of key, standard 256 bit key
-		std::vector<byte> key(KEYSZE);
-		std::memcpy(&key[0], &seed[0], key.size());
-		std::vector<byte> nonce(NNCSZE);
-		std::memcpy(&nonce[0], &seed[key.size()], nonce.size());
-		std::vector<byte> tag(TAGSZE);
-		std::memcpy(&tag[0], &seed[key.size() + nonce.size()], tag.size());
-
-		// decrypt the message with GCM and authenticate
-		Key::Symmetric::SymmetricKey kp(key, nonce, tag);
-		Cipher::Symmetric::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
-		cpr.Initialize(false, kp);
-		cpr.Transform(CipherText, CipherText.size() - (Message.size() + TAGSZE), Message, 0, Message.size());
-		status = cpr.Verify(CipherText, CipherText.size() - TAGSZE, TAGSZE);
-	}
-
-	return status;
-}
-
-void McEliece::MPKCEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText)
-{
-	const size_t KEYSZE = 32;
-	const size_t NNCSZE = 16;
-	const size_t TAGSZE = 16;
-
-	std::vector<byte> e(static_cast<ulong>(1) << (FFTM12T62::M - 3));
-
-	// encrypt with McEliece
-	if (m_mpkcParameters == MPKCParams::M12T62)
-	{
-		CipherText.resize(FFTM12T62::CPRTXT_SIZE + Message.size() + TAGSZE);
-		FFTM12T62::Encrypt(CipherText, e, m_publicKey->P(), m_rndGenerator);
-	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Encrypt", "The parameter type is invalid!");
-	}
-
-	// use the ringlwe secret to create intermediate key using SHAKE-256
-	size_t seedLen = KEYSZE + NNCSZE + TAGSZE;
-	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(e);
-	std::vector<byte> seed(seedLen);
-	gen.Generate(seed);
-
-	// load the key
-	std::vector<byte> key(KEYSZE);
-	std::memcpy(&key[0], &seed[0], key.size());
-	std::vector<byte> nonce(NNCSZE);
-	std::memcpy(&nonce[0], &seed[key.size()], nonce.size());
-	std::vector<byte> tag(TAGSZE);
-	std::memcpy(&tag[0], &seed[key.size() + nonce.size()], tag.size());
-
-	// encrypt the message with GCM, add it to the ciphertext with the auth-code
-	Key::Symmetric::SymmetricKey kp(key, nonce, tag);
-	Cipher::Symmetric::Block::Mode::GCM cpr(BlockCiphers::Rijndael);
-	cpr.Initialize(true, kp);
-	cpr.Transform(Message, 0, CipherText, CipherText.size() - (Message.size() + TAGSZE), Message.size());
-	cpr.Finalize(CipherText, CipherText.size() - TAGSZE, TAGSZE);
 }
 
 NAMESPACE_MCELIECEEND

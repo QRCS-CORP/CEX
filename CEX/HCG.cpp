@@ -12,8 +12,8 @@ const std::string HCG::CLASS_NAME("HCG");
 
 HCG::HCG(Digests DigestType, Providers ProviderType)
 	:
-	m_hmacEngine(DigestType != Digests::None ? DigestType : 
-		throw CryptoGeneratorException("HCG:Ctor", "The digest type can not be none!")),
+	m_hmacEngine(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? DigestType :
+		throw CryptoGeneratorException("HCG:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(true),
 	m_digestType(DigestType),
 	m_distributionCode(0),
@@ -33,13 +33,14 @@ HCG::HCG(Digests DigestType, Providers ProviderType)
 	m_seedCtr(SEEDCTR_SIZE),
 	m_stateCtr(STATECTR_SIZE)
 {
+
 	Scope();
 }
 
 HCG::HCG(IDigest* Digest, IProvider* Provider)
 	:
-	m_hmacEngine(Digest != nullptr ? Digest : 
-		throw CryptoGeneratorException("HCG:Ctor", "The digest can not be null!")),
+	m_hmacEngine(Digest != nullptr && Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() != Digests::SHA512 ? Digest :
+		throw CryptoGeneratorException("HCG:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(false),
 	m_digestType(Digest->Enumeral()),
 	m_distributionCode(0),
@@ -176,7 +177,7 @@ size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CexAssert(m_isInitialized, "The generator must be initialized before use!");
 	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CexAssert(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
+	//CexAssert(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
 	GenerateBlock(Output, OutOffset, Length);
 
@@ -355,9 +356,9 @@ void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 {
 	do
 	{
-		const size_t RMDSZE = Utility::IntUtils::Min(m_hmacState.size(), Length);
+		const size_t RMDLEN = Utility::IntUtils::Min(m_hmacState.size(), Length);
 		// 1) increase state counter by output-bytes generated
-		Increase(m_stateCtr, static_cast<uint>(RMDSZE));
+		Increase(m_stateCtr, static_cast<uint>(RMDLEN));
 		// 2) process the state counter
 		m_hmacEngine.Update(m_stateCtr, 0, m_stateCtr.size());
 		// 3) process the current state
@@ -369,25 +370,25 @@ void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 		}
 		// 5) output the state
 		m_hmacEngine.Finalize(m_hmacState, 0);
-		Utility::MemUtils::Copy(m_hmacState, 0, Output, OutOffset, RMDSZE);
+		Utility::MemUtils::Copy(m_hmacState, 0, Output, OutOffset, RMDLEN);
 
-		Length -= RMDSZE;
-		OutOffset += RMDSZE;
+		Length -= RMDLEN;
+		OutOffset += RMDLEN;
 	} 
 	while (Length != 0);
 }
 
 void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 {
-	const size_t CTRSZE = Counter.size() - 1;
+	const size_t CTRLEN = Counter.size() - 1;
 	std::vector<byte> ctrInc(sizeof(uint));
 	Utility::IntUtils::Le32ToBytes(Length, ctrInc, 0);
 	byte carry = 0;
 
-	for (size_t i = CTRSZE; i > 0; --i)
+	for (size_t i = CTRLEN; i > 0; --i)
 	{
 		byte odst = Counter[i];
-		byte osrc = CTRSZE - i < ctrInc.size() ? ctrInc[CTRSZE - i] : 0;
+		byte osrc = CTRLEN - i < ctrInc.size() ? ctrInc[CTRLEN - i] : 0;
 		byte ndst = static_cast<byte>(odst + osrc + carry);
 		carry = ndst < odst ? 1 : 0;
 		Counter[i] = ndst;

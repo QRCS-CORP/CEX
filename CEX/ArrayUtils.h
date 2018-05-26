@@ -44,13 +44,13 @@ public:
 	template <typename T>
 	static size_t Append(T Value, std::vector<byte> &Output)
 	{
-		const size_t VARSZE = sizeof(T);
-		const size_t ARRSZE = Output.size();
+		const size_t VARLEN = sizeof(T);
+		const size_t ARRLEN = Output.size();
 
-		Output.resize(Output.size() + VARSZE);
-		std::memcpy(&Output[ARRSZE], &Value, VARSZE);
+		Output.resize(Output.size() + VARLEN);
+		std::memcpy(&Output[ARRLEN], &Value, VARLEN);
 
-		return VARSZE;
+		return VARLEN;
 	}
 
 	/// <summary>
@@ -64,8 +64,8 @@ public:
 	template <typename Array>
 	static size_t AppendString(std::string &Value, Array &Output)
 	{
-		const size_t STRSZE = Value.size();
-		const size_t ELMSZE = sizeof(Array::value_type);
+		const size_t STRLEN = Value.size();
+		const size_t ELMLEN = sizeof(Array::value_type);
 
 		std::vector<byte> tmp(0);
 		std::transform(std::begin(Value), std::end(Value), std::back_inserter(tmp), [](char c)
@@ -74,14 +74,14 @@ public:
 		});
 
 		size_t pos = Output.size();
-		Output.resize(pos + (tmp.size() / ELMSZE));
+		Output.resize(pos + (tmp.size() / ELMLEN));
 
 		if (tmp.size() != 0)
 		{
 			std::memcpy(&Output[pos], &tmp[0], tmp.size());
 		}
 
-		return STRSZE;
+		return STRLEN;
 	}
 
 	/// <summary>
@@ -95,16 +95,16 @@ public:
 	template <typename ArrayA, typename ArrayB>
 	static size_t Append(const ArrayA &Input, ArrayB &Output)
 	{
-		const size_t VARSZE = sizeof(ArrayA::value_type) * Input.size();
-		const size_t ARRSZE = sizeof(ArrayB::value_type) * Output.size();
+		const size_t VARLEN = sizeof(ArrayA::value_type) * Input.size();
+		const size_t ARRLEN = sizeof(ArrayB::value_type) * Output.size();
 
 		if (Input.size() != 0)
 		{
-			Output.resize(VARSZE + ARRSZE);
-			std::memcpy(&Output[ARRSZE], &Input[0], VARSZE);
+			Output.resize(VARLEN + ARRLEN);
+			std::memcpy(&Output[ARRLEN], &Input[0], VARLEN);
 		}
 
-		return VARSZE;
+		return VARLEN;
 	}
 
 	/// <summary>
@@ -209,13 +209,13 @@ public:
 	template <typename T>
 	static std::vector<byte> ToByteArray(T* Input, size_t Length)
 	{
-		const size_t ELMSZE = sizeof(Input[0]);
-		const size_t RETSZE = Length * ELMSZE;
-		std::vector<byte> elems(RETSZE);
+		const size_t ELMLEN = sizeof(Input[0]);
+		const size_t RETLEN = Length * ELMLEN;
+		std::vector<byte> elems(RETLEN);
 
 		if (Length != 0)
 		{
-			std::memcpy(&elems[0], &Input[0], RETSZE);
+			std::memcpy(&elems[0], &Input[0], RETLEN);
 		}
 
 		return elems;

@@ -13,7 +13,7 @@ const std::string BCG::CLASS_NAME("BCG");
 
 //~~~Constructor~~~//
 
-BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType)
+BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType, bool Parallel)
 	:
 	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, DigestType) : 
 		throw CryptoGeneratorException("BCG:CTor", "The Cipher type can not be none!")),
@@ -39,9 +39,10 @@ BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType)
 	m_secStrength(0),
 	m_seedSize(0)
 {
+	m_parallelProfile.IsParallel() = Parallel;
 }
 
-BCG::BCG(IBlockCipher* Cipher, IDigest* Digest, IProvider* Provider)
+BCG::BCG(IBlockCipher* Cipher, IDigest* Digest, IProvider* Provider, bool Parallel)
 	:
 	m_blockCipher(Cipher != 0 ? Cipher : 
 		throw CryptoGeneratorException("BCG:CTor", "The Cipher can not be null!")),
@@ -67,6 +68,7 @@ BCG::BCG(IBlockCipher* Cipher, IDigest* Digest, IProvider* Provider)
 	m_secStrength(0),
 	m_seedSize(0)
 {
+	m_parallelProfile.IsParallel() = Parallel;
 }
 
 BCG::~BCG()
@@ -220,7 +222,6 @@ size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CexAssert(m_isInitialized, "The generator must be initialized before use!");
 	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	CexAssert(Length <= ParallelBlockSize(), "The maximum request size has been exceeded!");
 
 	GenerateBlock(Output, OutOffset, Length);
 
@@ -396,19 +397,19 @@ void BCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 	}
 	else
 	{
-		const size_t OUTSZE = Length;
-		const size_t CNKSZE = ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
-		const size_t CTRLEN = (CNKSZE / BLOCK_SIZE);
+		const size_t OUTLEN = Length;
+		const size_t CNKLEN = ParallelBlockSize() / m_parallelProfile.ParallelMaxDegree();
+		const size_t CTRLEN = (CNKLEN / BLOCK_SIZE);
 		std::vector<byte> tmpCtr(m_ctrVector.size());
 
-		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &tmpCtr, CNKSZE, CTRLEN](size_t i)
+		Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Output, OutOffset, &tmpCtr, CNKLEN, CTRLEN](size_t i)
 		{
 			// thread level counter
 			std::vector<byte> thdCtr(m_ctrVector.size());
 			// offset counter by chunk size / block size  
 			Utility::IntUtils::BeIncrease8(m_ctrVector, thdCtr, CTRLEN * i);
 			// generate random at output offset
-			this->Transform(Output, OutOffset + (i * CNKSZE), CNKSZE, thdCtr);
+			this->Transform(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
@@ -419,12 +420,12 @@ void BCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 		// copy last counter to class variable
 		Utility::MemUtils::Copy(tmpCtr, 0, m_ctrVector, 0, m_ctrVector.size());
 		// last block processing
-		const size_t ALNSZE = CNKSZE * m_parallelProfile.ParallelMaxDegree();
+		const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 
-		if (ALNSZE < OUTSZE)
+		if (ALNLEN < OUTLEN)
 		{
-			const size_t FNLSZE = Length % ALNSZE;
-			Transform(Output, ALNSZE, FNLSZE, m_ctrVector);
+			const size_t FNLLEN = Length % ALNLEN;
+			Transform(Output, ALNLEN, FNLLEN, m_ctrVector);
 		}
 	}
 }
@@ -545,8 +546,8 @@ void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 	{
 		std::vector<byte> outputBlock(BLOCK_SIZE);
 		m_blockCipher->EncryptBlock(Counter, outputBlock);
-		const size_t FNLSZE = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLSZE), FNLSZE);
+		const size_t FNLLEN = Length % BLOCK_SIZE;
+		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
 		Utility::IntUtils::BeIncrement8(Counter);
 	}
 }

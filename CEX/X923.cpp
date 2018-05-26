@@ -31,15 +31,15 @@ size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 		throw CryptoPaddingException("X923:AddPadding", "The padding offset value is longer than the array length!");
 	}
 
-	const size_t INPSZE = (Input.size() - Offset) - 1;
+	const size_t INPLEN = (Input.size() - Offset) - 1;
 	byte code = static_cast<byte>(Input.size() - Offset);
 
-	if (INPSZE > 0)
+	if (INPLEN > 0)
 	{
-		std::vector<byte> data(INPSZE);
+		std::vector<byte> data(INPLEN);
 		Provider::CSP rnd;
 		rnd.GetBytes(data);
-		Utility::MemUtils::Copy(data, 0, Input, Offset, INPSZE);
+		Utility::MemUtils::Copy(data, 0, Input, Offset, INPLEN);
 	}
 
 	Input[Input.size() - 1] = code;

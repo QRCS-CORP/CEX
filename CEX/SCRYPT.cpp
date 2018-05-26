@@ -288,16 +288,16 @@ void SCRYPT::BlockMix(std::vector<uint> &State, std::vector<uint> &Y)
 size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	const size_t MFLEN = MEM_COST * 128;
-	const size_t KEYSZE = m_scryptParameters.Parallelization * MFLEN;
-	const size_t SKSZE = KEYSZE >> 2;
+	const size_t KEYLEN = m_scryptParameters.Parallelization * MFLEN;
+	const size_t SKLEN = KEYLEN >> 2;
 
-	std::vector<byte> tmpK(KEYSZE);
+	std::vector<byte> tmpK(KEYLEN);
 	Extract(tmpK, 0, m_kdfKey, m_kdfSalt, tmpK.size());
 
 	const size_t MFLWRD = MFLEN >> 2;
-	const size_t PRLBLK = SKSZE / m_parallelProfile.ParallelMaxDegree();
+	const size_t PRLBLK = SKLEN / m_parallelProfile.ParallelMaxDegree();
 	size_t ttlOff = 0;
-	std::vector<uint> stateK(SKSZE);
+	std::vector<uint> stateK(SKLEN);
 
 #if defined(__AVX__)
 	for (size_t k = 0; k < 2 * MEM_COST * m_scryptParameters.Parallelization; ++k)
@@ -324,9 +324,9 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 		ttlOff = PRLBLK * m_parallelProfile.ParallelMaxDegree();
 	}
 
-	if (ttlOff != SKSZE)
+	if (ttlOff != SKLEN)
 	{
-		for (size_t i = ttlOff; i < SKSZE; i += MFLWRD)
+		for (size_t i = ttlOff; i < SKLEN; i += MFLWRD)
 		{
 			SMix(stateK, i, m_scryptParameters.CpuCost);
 		}

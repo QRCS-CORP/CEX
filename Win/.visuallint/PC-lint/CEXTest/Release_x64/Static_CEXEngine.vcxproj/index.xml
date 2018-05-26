@@ -1,0 +1,1458 @@
+<?xml version="1.0"?>
+<ProjectLintAnalysisReport>
+	<Categories>
+		<Category Level="0" DisplayName="Elective Note" DisplayNamePlural="Elective Notes" Severity="1" Icon="Note" XmlElement="ElectiveNote" IsFatal="0" BuiltInLevel="1" ForegroundColour="0,0,160" BackgroundColour="">
+			<Issues></Issues>
+		</Category>
+		<Category Level="1" DisplayName="Information" DisplayNamePlural="Informational" Severity="2" Icon="Information" XmlElement="Information" IsFatal="0" BuiltInLevel="2" ForegroundColour="128,0,128" BackgroundColour="">
+			<Issues></Issues>
+		</Category>
+		<Category Level="2" DisplayName="Warning" DisplayNamePlural="Warnings" Severity="3" Icon="Warning" XmlElement="Warning" IsFatal="0" BuiltInLevel="3" ForegroundColour="160,128,0" BackgroundColour="">
+			<Issues></Issues>
+		</Category>
+		<Category Level="3" DisplayName="Error" DisplayNamePlural="Errors" Severity="4" Icon="Error" XmlElement="Error" IsFatal="0" BuiltInLevel="4" ForegroundColour="160,0,0" BackgroundColour="">
+			<Issues></Issues>
+		</Category>
+		<Category Level="4" DisplayName="Internal Error" DisplayNamePlural="Internal Errors" Severity="5" Icon="HandYellow" XmlElement="InternalError" IsFatal="0" BuiltInLevel="5" ForegroundColour="0,0,0" BackgroundColour="255,255,160">
+			<Issues></Issues>
+		</Category>
+		<Category Level="5" DisplayName="Fatal Error" DisplayNamePlural="Fatal Errors" Severity="999" Icon="HandRed" XmlElement="FatalError" IsFatal="1" BuiltInLevel="999" ForegroundColour="0,0,0" BackgroundColour="224,128,128">
+			<Issues></Issues>
+		</Category>
+	</Categories>
+	<Application Name="Visual Lint Standard Edition" Version="6.0.7.289" Url="http://www.riverblade.co.uk/products/visual_lint" LicencedUser="John Underhill (1 user licence)"/>
+	<User Name="John" Computer="DCN"/>
+	<Options ShowRules="0"/>
+	<Solution PathName="C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\CEXTest.sln" FileName="CEXTest.sln" Configuration="Release|x64">
+		<Project Name="CEX" PathName="C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Static\CEXEngine.vcxproj" FileName="CEXEngine.vcxproj" Configuration="Release|x64" Status="Complete" AnalysisTime="" LastAnalysed="Monday, February 19, 2018, 15:29:03" AnalysisTool="PC-lint for C/C++ (NT) Vers. 9.00L, Copyright Gimpel Software 1985-2014">
+			<Issues Count="0">
+				<Categories>
+					<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+					<Category Name="Informational" Count="0" Percentage="0.00"/>
+					<Category Name="Warnings" Count="0" Percentage="0.00"/>
+					<Category Name="Errors" Count="0" Percentage="0.00"/>
+					<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+					<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+				</Categories>
+			</Issues>
+			<Files>
+				<File FileName="ACP.cpp" Status="Complete" resultsfile="ACP.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="AeadModeFromName.cpp" Status="Complete" resultsfile="AeadModeFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="AHX.cpp" Status="Complete" resultsfile="AHX.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ArrayUtils.cpp" Status="Complete" resultsfile="ArrayUtils.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="BCG.cpp" Status="Complete" resultsfile="BCG.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="BCR.cpp" Status="Complete" resultsfile="BCR.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="BitConverter.cpp" Status="Complete" resultsfile="BitConverter.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Blake256.cpp" Status="Complete" resultsfile="Blake256.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Blake512.cpp" Status="Complete" resultsfile="Blake512.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="BlakeParams.cpp" Status="Complete" resultsfile="BlakeParams.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="BlockCipherFromName.cpp" Status="Complete" resultsfile="BlockCipherFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CBC.cpp" Status="Complete" resultsfile="CBC.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CFB.cpp" Status="Complete" resultsfile="CFB.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ChaCha20.cpp" Status="Complete" resultsfile="ChaCha20.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CipherDescription.cpp" Status="Complete" resultsfile="CipherDescription.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CipherFromDescription.cpp" Status="Complete" resultsfile="CipherFromDescription.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CipherModeFromName.cpp" Status="Complete" resultsfile="CipherModeFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CipherStream.cpp" Status="Complete" resultsfile="CipherStream.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CJP.cpp" Status="Complete" resultsfile="CJP.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CMAC.cpp" Status="Complete" resultsfile="CMAC.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CpuDetect.cpp" Status="Complete" resultsfile="CpuDetect.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoAsymmetricException.cpp" Status="Complete" resultsfile="CryptoAsymmetricException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoAuthenticationFailure.cpp" Status="Complete" resultsfile="CryptoAuthenticationFailure.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoCipherModeException.cpp" Status="Complete" resultsfile="CryptoCipherModeException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoDigestException.cpp" Status="Complete" resultsfile="CryptoDigestException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoException.cpp" Status="Complete" resultsfile="CryptoException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoGeneratorException.cpp" Status="Complete" resultsfile="CryptoGeneratorException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoKdfException.cpp" Status="Complete" resultsfile="CryptoKdfException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoMacException.cpp" Status="Complete" resultsfile="CryptoMacException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoPaddingException.cpp" Status="Complete" resultsfile="CryptoPaddingException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoProcessingException.cpp" Status="Complete" resultsfile="CryptoProcessingException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoRandomException.cpp" Status="Complete" resultsfile="CryptoRandomException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CryptoSymmetricCipherException.cpp" Status="Complete" resultsfile="CryptoSymmetricCipherException.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CSP.cpp" Status="Complete" resultsfile="CSP.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="CTR.cpp" Status="Complete" resultsfile="CTR.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="DCG.cpp" Status="Complete" resultsfile="DCG.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="DCR.cpp" Status="Complete" resultsfile="DCR.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="DigestFromName.cpp" Status="Complete" resultsfile="DigestFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="DigestStream.cpp" Status="Complete" resultsfile="DigestStream.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="DrbgFromName.cpp" Status="Complete" resultsfile="DrbgFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="EAX.cpp" Status="Complete" resultsfile="EAX.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ECB.cpp" Status="Complete" resultsfile="ECB.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ECP.cpp" Status="Complete" resultsfile="ECP.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="FFTM12T62.cpp" Status="Complete" resultsfile="FFTM12T62.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="FFTQ12289N1024.cpp" Status="Complete" resultsfile="FFTQ12289N1024.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="FFTQ12289N512.cpp" Status="Complete" resultsfile="FFTQ12289N512.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="FFTQ7681N256.cpp" Status="Complete" resultsfile="FFTQ7681N256.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="FileStream.cpp" Status="Complete" resultsfile="FileStream.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="GCM.cpp" Status="Complete" resultsfile="GCM.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="GHASH.cpp" Status="Complete" resultsfile="GHASH.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="GMAC.cpp" Status="Complete" resultsfile="GMAC.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="HCG.cpp" Status="Complete" resultsfile="HCG.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="HCR.cpp" Status="Complete" resultsfile="HCR.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="HKDF.cpp" Status="Complete" resultsfile="HKDF.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="HMAC.cpp" Status="Complete" resultsfile="HMAC.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ICM.cpp" Status="Complete" resultsfile="ICM.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ISO7816.cpp" Status="Complete" resultsfile="ISO7816.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="KDF2.cpp" Status="Complete" resultsfile="KDF2.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="KdfFromName.cpp" Status="Complete" resultsfile="KdfFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Keccak1024.cpp" Status="Complete" resultsfile="Keccak1024.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Keccak256.cpp" Status="Complete" resultsfile="Keccak256.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Keccak512.cpp" Status="Complete" resultsfile="Keccak512.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="KeccakParams.cpp" Status="Complete" resultsfile="KeccakParams.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MacDescription.cpp" Status="Complete" resultsfile="MacDescription.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MacFromDescription.cpp" Status="Complete" resultsfile="MacFromDescription.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MacStream.cpp" Status="Complete" resultsfile="MacStream.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="McEliece.cpp" Status="Complete" resultsfile="McEliece.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="McElieceUtils.cpp" Status="Complete" resultsfile="McElieceUtils.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MemoryStream.cpp" Status="Complete" resultsfile="MemoryStream.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MLWEKeyPair.cpp" Status="Complete" resultsfile="MLWEKeyPair.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MLWEPrivateKey.cpp" Status="Complete" resultsfile="MLWEPrivateKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MLWEPublicKey.cpp" Status="Complete" resultsfile="MLWEPublicKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ModuleLWE.cpp" Status="Complete" resultsfile="ModuleLWE.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MPKCKeyPair.cpp" Status="Complete" resultsfile="MPKCKeyPair.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MPKCPrivateKey.cpp" Status="Complete" resultsfile="MPKCPrivateKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="MPKCPublicKey.cpp" Status="Complete" resultsfile="MPKCPublicKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="OCB.cpp" Status="Complete" resultsfile="OCB.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="OFB.cpp" Status="Complete" resultsfile="OFB.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="PaddingFromName.cpp" Status="Complete" resultsfile="PaddingFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ParallelOptions.cpp" Status="Complete" resultsfile="ParallelOptions.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ParallelUtils.cpp" Status="Complete" resultsfile="ParallelUtils.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="PBKDF2.cpp" Status="Complete" resultsfile="PBKDF2.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="PBR.cpp" Status="Complete" resultsfile="PBR.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="PKCS7.cpp" Status="Complete" resultsfile="PKCS7.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Poly1305.cpp" Status="Complete" resultsfile="Poly1305.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="PrngFromName.cpp" Status="Complete" resultsfile="PrngFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ProviderFromName.cpp" Status="Complete" resultsfile="ProviderFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="RDP.cpp" Status="Complete" resultsfile="RDP.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="RHX.cpp" Status="Complete" resultsfile="RHX.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="RingLWE.cpp" Status="Complete" resultsfile="RingLWE.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="RLWEKeyPair.cpp" Status="Complete" resultsfile="RLWEKeyPair.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="RLWEPrivateKey.cpp" Status="Complete" resultsfile="RLWEPrivateKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="RLWEPublicKey.cpp" Status="Complete" resultsfile="RLWEPublicKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Salsa20.cpp" Status="Complete" resultsfile="Salsa20.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SCRYPT.cpp" Status="Complete" resultsfile="SCRYPT.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SecureRandom.cpp" Status="Complete" resultsfile="SecureRandom.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SecureStream.cpp" Status="Complete" resultsfile="SecureStream.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SHA256.cpp" Status="Complete" resultsfile="SHA256.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SHA2Params.cpp" Status="Complete" resultsfile="SHA2Params.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SHA512.cpp" Status="Complete" resultsfile="SHA512.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SHAKE.cpp" Status="Complete" resultsfile="SHAKE.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SHX.cpp" Status="Complete" resultsfile="SHX.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Skein1024.cpp" Status="Complete" resultsfile="Skein1024.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Skein256.cpp" Status="Complete" resultsfile="Skein256.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="Skein512.cpp" Status="Complete" resultsfile="Skein512.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SkeinParams.cpp" Status="Complete" resultsfile="SkeinParams.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="StreamCipherFromName.cpp" Status="Complete" resultsfile="StreamCipherFromName.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="StreamReader.cpp" Status="Complete" resultsfile="StreamReader.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="StreamWriter.cpp" Status="Complete" resultsfile="StreamWriter.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SymmetricKey.cpp" Status="Complete" resultsfile="SymmetricKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SymmetricKeyGenerator.cpp" Status="Complete" resultsfile="SymmetricKeyGenerator.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SymmetricKeySize.cpp" Status="Complete" resultsfile="SymmetricKeySize.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SymmetricSecureKey.cpp" Status="Complete" resultsfile="SymmetricSecureKey.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="SysUtils.cpp" Status="Complete" resultsfile="SysUtils.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="TBC.cpp" Status="Complete" resultsfile="TBC.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="THX.cpp" Status="Complete" resultsfile="THX.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="X923.cpp" Status="Complete" resultsfile="X923.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+				<File FileName="ZeroPad.cpp" Status="Complete" resultsfile="ZeroPad.cpp.html">
+					<Issues Count="0">
+						<Categories>
+							<Category Name="Elective Notes" Count="0" Percentage="0.00"/>
+							<Category Name="Informational" Count="0" Percentage="0.00"/>
+							<Category Name="Warnings" Count="0" Percentage="0.00"/>
+							<Category Name="Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Internal Errors" Count="0" Percentage="0.00"/>
+							<Category Name="Fatal Errors" Count="0" Percentage="0.00"/>
+						</Categories>
+					</Issues>
+				</File>
+			</Files>
+		</Project>
+	</Solution>
+</ProjectLintAnalysisReport>

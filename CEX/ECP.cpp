@@ -124,9 +124,9 @@ void ECP::Reset()
 
 std::vector<byte> ECP::Collect()
 {
-	const size_t KEYSZE = 72;
+	const size_t KEYLEN = 72;
 	std::vector<byte> state(0);
-	std::vector<byte> buffer(KEYSZE);
+	std::vector<byte> buffer(KEYLEN);
 	ulong ts = Utility::SysUtils::TimeStamp(m_hasTsc);
 
 	CSP pvd;
@@ -157,10 +157,10 @@ std::vector<byte> ECP::Collect()
 	Filter(state);
 
 	// size last block
-	size_t padLen = ((state.size() % KEYSZE) == 0) ? KEYSZE : KEYSZE - (state.size() % KEYSZE);
-	if (padLen < KEYSZE / 2)
+	size_t padLen = ((state.size() % KEYLEN) == 0) ? KEYLEN : KEYLEN - (state.size() % KEYLEN);
+	if (padLen < KEYLEN / 2)
 	{
-		padLen += KEYSZE;
+		padLen += KEYLEN;
 	}
 
 	// forward padding

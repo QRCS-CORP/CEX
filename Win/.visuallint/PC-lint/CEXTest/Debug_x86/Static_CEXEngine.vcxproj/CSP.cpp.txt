@@ -1,0 +1,11 @@
+C:\Users\John\Documents\PC-Lint\CEX\options.lnt  14  Warning 686: Option
+    '-elib(*)' is suspicious because of 'the likelihood of causing meaningless
+    output'; receiving a syntax error in a library file most likely means
+    something is wrong with your Lint configuration
+
+--- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CSP.cpp (C++)
+C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\CSP.cpp(0): error 1960: (Note -- Violates MISRA C++ 2008 Required Rule 16-0-6, unparenthesized macro parameter in definition of macro: '__identifier')
+
+--- Global Wrap-up
+
+ error 900: (Note -- Successful completion, 2 messages produced)

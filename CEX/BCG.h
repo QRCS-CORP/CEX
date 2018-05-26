@@ -176,14 +176,16 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The block cipher type to instantiate as the primary generator.
-	/// <para>The primary pseudo random function, the default is AHX/RHX,</para></param>
+	/// <para>The primary pseudo random function, the default is AHX/RHX.</para></param>
 	/// <param name="DigestType">The KDF2 key derivation functions hash engine-type.
 	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
 	/// <param name="ProviderType">The random provider-type, used to instantiate the entropy source. 
 	/// <para>Adding a random provider enables predictive resistance, and is recommended for large data (>= 1MB).</para></param>
+	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
+	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	///
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::None);
+	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, Digests DigestType = Digests::SHA256, Providers ProviderType = Providers::None, bool Parallel = false);
 
 	/// <summary>
 	/// Instantiate the class using a block cipher instance and an optional entropy source
@@ -194,9 +196,11 @@ public:
 	/// <para>Used at seed recycling intervals to extract keying material, and as an HX ciphers HKDF engine.</para></param>
 	/// <param name="Provider">The [optional] entropy source, enabling predictive resistance; can be set to null.
 	/// <para>Adding a random provider enables predictive resistance, and is strongly recommended.</para></param>
+	/// <param name="Parallel">Enable/disable the multi-threading engine; default is false.
+	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
-	explicit BCG(IBlockCipher* Cipher, IDigest* Digest = nullptr, IProvider* Provider = nullptr);
+	explicit BCG(IBlockCipher* Cipher, IDigest* Digest = nullptr, IProvider* Provider = nullptr, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class

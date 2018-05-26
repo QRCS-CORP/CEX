@@ -302,7 +302,7 @@
     <ClInclude Include="..\..\Test\CipherModeTest.h" />
     <ClInclude Include="..\..\Test\CMACTest.h" />
     <ClInclude Include="..\..\Test\ConsoleUtils.h" />
-    <ClInclude Include="..\..\Test\CMGTest.h" />
+    <ClInclude Include="..\..\Test\BCGTest.h" />
     <ClInclude Include="..\..\Test\CSGTest.h" />
     <ClInclude Include="..\..\Test\DigestSpeedTest.h" />
     <ClInclude Include="..\..\Test\GMACTest.h" />
@@ -314,6 +314,7 @@
     <ClInclude Include="..\..\Test\McElieceTest.h" />
     <ClInclude Include="..\..\Test\MemUtilsTest.h" />
     <ClInclude Include="..\..\Test\ModuleLWETest.h" />
+    <ClInclude Include="..\..\Test\NTRUTest.h" />
     <ClInclude Include="..\..\Test\PaddingTest.h" />
     <ClInclude Include="..\..\Test\DigestStreamTest.h" />
     <ClInclude Include="..\..\Test\Poly1305Test.h" />
@@ -360,7 +361,7 @@
     <ClCompile Include="..\..\Test\CipherModeTest.cpp" />
     <ClCompile Include="..\..\Test\CipherStreamTest.cpp" />
     <ClCompile Include="..\..\Test\CMACTest.cpp" />
-    <ClCompile Include="..\..\Test\CMGTest.cpp" />
+    <ClCompile Include="..\..\Test\BCGTest.cpp" />
     <ClCompile Include="..\..\Test\ConsoleUtils.cpp" />
     <ClCompile Include="..\..\Test\CSGTest.cpp" />
     <ClCompile Include="..\..\Test\DigestSpeedTest.cpp" />
@@ -378,6 +379,7 @@
     <ClCompile Include="..\..\Test\McElieceTest.cpp" />
     <ClCompile Include="..\..\Test\MemUtilsTest.cpp" />
     <ClCompile Include="..\..\Test\ModuleLWETest.cpp" />
+    <ClCompile Include="..\..\Test\NTRUTest.cpp" />
     <ClCompile Include="..\..\Test\PaddingTest.cpp" />
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp" />
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />

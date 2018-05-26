@@ -146,15 +146,15 @@ std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 std::vector<byte> SymmetricKeyGenerator::GenerateBlock()
 {
 	// seed size is 2x mac input block size less finalizer padding
-	const size_t BLKSZE = Helper::DigestFromName::GetBlockSize(m_dgtType);
-	size_t seedLen = (BLKSZE * 2) - Helper::DigestFromName::GetPaddingSize(m_dgtType);
+	const size_t BLKLEN = Helper::DigestFromName::GetBlockSize(m_dgtType);
+	size_t seedLen = (BLKLEN * 2) - Helper::DigestFromName::GetPaddingSize(m_dgtType);
 	std::vector<byte> seed(seedLen);
 
 	// generate the seed
 	m_pvdEngine->GetBytes(seed);
 
 	// get the hmac key from system entropy provider
-	std::vector<byte> key(BLKSZE);
+	std::vector<byte> key(BLKLEN);
 	Provider::CSP pvd;
 	pvd.GetBytes(key);
 

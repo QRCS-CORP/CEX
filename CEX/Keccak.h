@@ -7019,7 +7019,6 @@ public:
 		Asu.Store(State[0][24], State[1][24], State[2][24], State[3][24], State[4][24], State[5][24], State[6][24], State[7][24]);
 	}
 
-
 #elif defined(__AVX2__)
 
 	template<typename Array>

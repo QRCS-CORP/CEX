@@ -20,10 +20,7 @@
 #define CEX_RINGLWE_H
 
 #include "CexDomain.h"
-#include "BlockCiphers.h"
-#include "IAeadMode.h"
 #include "IAsymmetricCipher.h"
-#include "IBlockCipher.h"
 #include "RLWEKeyPair.h"
 #include "RLWEParams.h"
 #include "RLWEPrivateKey.h"
@@ -31,9 +28,6 @@
 
 NAMESPACE_RINGLWE
 
-using Enumeration::BlockCiphers;
-using Cipher::Symmetric::Block::Mode::IAeadMode;
-using Cipher::Symmetric::Block::IBlockCipher;
 using Key::Asymmetric::RLWEKeyPair;
 using Enumeration::RLWEParams;
 using Key::Asymmetric::RLWEPrivateKey;
@@ -57,7 +51,7 @@ using Key::Asymmetric::RLWEPublicKey;
 /// <description>Encryption:</description>
 /// <code>
 /// RingLWE asycpr(Enumeration::RLWEParams::Q12289N1024);
-/// asycpr.Initialize(true, kp);
+/// asycpr.Initialize(kp);
 /// 
 /// std:vector&lt;byte&gt; cpt = asycpr.Encrypt(msg);
 /// </code>
@@ -65,7 +59,7 @@ using Key::Asymmetric::RLWEPublicKey;
 /// <description>Decryption:</description>
 /// <code>
 /// RingLWE asycpr(Enumeration::RLWEParams::Q12289N1024);
-/// asycpr.Initialize(false, kp);
+/// asycpr.Initialize(kp);
 /// 
 /// try
 /// {
@@ -89,6 +83,7 @@ using Key::Asymmetric::RLWEPublicKey;
 /// That seed is compressed with a Keccak digest and used to key the GCM AEAD mode which encrypts and authenticates the message.</para>
 /// 
 /// <list type="bullet">
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The Q12289/N1024 parameter set is the default cipher configuration; as of (1.0.0.3), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The message digest used to condition the seed bytes is set automatically; Keccak512 for standard ciphers, Keccak1024 for extended ciphers</description></item>
@@ -109,10 +104,10 @@ private:
 	static const std::string CLASS_NAME;
 
 	bool m_destroyEngine;
+	std::vector<byte> m_domainKey;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	bool m_isParallel;
 	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::unique_ptr<RLWEPrivateKey> m_privateKey;
 	std::unique_ptr<RLWEPublicKey> m_publicKey;
@@ -139,10 +134,9 @@ public:
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
-	/// <param name="Parallel">The cipher is multi-threaded</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher type, prng type, or parameter set is specified</exception>
-	RingLWE(RLWEParams Parameters = RLWEParams::Q12289N1024, Prngs PrngType = Prngs::BCR, bool Parallel = false);
+	RingLWE(RLWEParams Parameters = RLWEParams::Q12289N1024, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using an external Prng instance
@@ -150,10 +144,9 @@ public:
 	///
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
-	/// <param name="Parallel">The cipher is multi-threaded</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
-	RingLWE(RLWEParams Parameters, IPrng* Prng, bool Parallel);
+	RingLWE(RLWEParams Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -161,6 +154,16 @@ public:
 	~RingLWE() override;
 
 	//~~~Accessors~~~//
+
+	/// <summary>
+	/// Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.
+	/// <para>Changing this code will create a unique distribution of the cipher.
+	/// The domain key can be used as a secondary secret shared between hosts in an authenticated domain.
+	/// The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation.
+	/// For best security, the key should be random, secret, and shared only between hosts within a secure domain.
+	/// This property is used by the Shared Trust Model secure communications protocol.</para>
+	/// </summary>
+	std::vector<byte> &DomainKey();
 
 	/// <summary>
 	/// Read Only: The cipher type-name
@@ -206,29 +209,6 @@ public:
 	void Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
 
 	/// <summary>
-	/// Decrypt an encrypted cipher-text and return the shared secret
-	/// </summary>
-	/// 
-	/// <param name="CipherText">The input cipher-text</param>
-	/// 
-	/// <returns>The decrypted message</returns>
-	///
-	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid input or configuration</exception>
-	/// <exception cref="Exception::CryptoAuthenticationFailure">Thrown if the message has failed authentication, or the configuration is invalid</exception>
-	std::vector<byte> Decrypt(const std::vector<byte> &CipherText) override;
-
-	/// <summary>
-	/// Encrypt a secret and return the encrypted message
-	/// </summary>
-	/// 
-	/// <param name="Message">The shared secret array</param>
-	/// 
-	/// <returns>The encrypted message</returns>
-	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid input or configuration</exception>
-	std::vector<byte> Encrypt(const std::vector<byte> &Message) override;
-
-	/// <summary>
 	/// Generate a public/private key-pair
 	/// </summary>
 	/// 
@@ -238,19 +218,13 @@ public:
 	IAsymmetricKeyPair* Generate() override;
 
 	/// <summary>
-	/// Initialize the cipher for encryption or decryption
+	/// Initialize the cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Initialize the cipher for encryption or decryption</param>
-	/// <param name="Key">The <see cref="IAsymmetricKey"/> containing the Public (encrypt) and/or Private (decryption) key</param>
+	/// <param name="Encryption">Initialize the cipher with a key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
-	void Initialize(bool Encryption, IAsymmetricKey* Key) override;
-
-private:
-
-	bool RLWEDecrypt(const std::vector<byte> &CipherText, std::vector<byte> &Message, std::vector<byte> &Secret);
-	void RLWEEncrypt(const std::vector<byte> &Message, std::vector<byte> &CipherText, std::vector<byte> &Secret);
+	void Initialize(IAsymmetricKey* Key) override;
 };
 
 NAMESPACE_RINGLWEEND

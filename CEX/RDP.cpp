@@ -82,10 +82,10 @@ void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 		if (res == RDR_SUCCESS)
 		{
-			const size_t RMDSZE = Utility::IntUtils::Min(sizeof(rnd), Length);
-			Utility::MemUtils::CopyFromValue(rnd, Output, Offset, RMDSZE);
-			Offset += RMDSZE;
-			Length -= RMDSZE;
+			const size_t RMDLEN = Utility::IntUtils::Min(sizeof(rnd), Length);
+			Utility::MemUtils::CopyFromValue(rnd, Output, Offset, RMDLEN);
+			Offset += RMDLEN;
+			Length -= RMDLEN;
 			failCtr = 0;
 		}
 		else

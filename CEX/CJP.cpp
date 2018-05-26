@@ -177,7 +177,7 @@ void CJP::AccessMemory()
 	// L3 and real memory accesses have even a wider range of wait states. However, to reliably access either L3 or memory, the ec->m_memState memory must be quite large which is usually not desirable.
 
 	byte tmpState;
-	const uint WRPSZE = m_memBlockSize * m_memBlocks;
+	const uint WRPLEN = m_memBlockSize * m_memBlocks;
 	const size_t ACLCNT = (m_memAccessLoops + ShuffleLoop(ACC_LOOP_BIT_MAX, ACC_LOOP_BIT_MIN));
 
 	for (size_t i = 0; i < ACLCNT; ++i)
@@ -188,7 +188,7 @@ void CJP::AccessMemory()
 		m_memState[m_memPosition] = tmpState;
 		// addition of memBlockSize - 1 to pointer with wrap around logic to ensure that every memory location is hit evenly
 		m_memPosition = m_memPosition + m_memBlockSize - 1;
-		m_memPosition = m_memPosition % WRPSZE;
+		m_memPosition = m_memPosition % WRPLEN;
 	}
 }
 CEX_OPTIMIZE_RESUME
@@ -262,11 +262,11 @@ CEX_OPTIMIZE_RESUME
 
 size_t CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	const size_t RNDSZE = sizeof(ulong);
+	const size_t RNDLEN = sizeof(ulong);
 
 	do
 	{
-		size_t rmdLen = (Length < RNDSZE) ? Length : RNDSZE;
+		size_t rmdLen = (Length < RNDLEN) ? Length : RNDLEN;
 		Generate64();
 		Utility::MemUtils::CopyFromValue(m_rndState, Output, Offset, rmdLen);
 		Length -= rmdLen;

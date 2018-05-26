@@ -140,6 +140,15 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
+	/// Fill an array of int16 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The int16 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements) override;
+
+	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
 	/// </summary>
 	///
@@ -149,6 +158,15 @@ public:
 	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements) override;
 
 	/// <summary>
+	/// Fill an array of int32 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The int32 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements) override;
+
+	/// <summary>
 	/// Fill an array of uint32 with pseudo-random
 	/// </summary>
 	///
@@ -156,6 +174,15 @@ public:
 	/// <param name="Offset">The starting index within the Output array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
 	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements) override;
+
+	/// <summary>
+	/// Fill an array of int64 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The int64 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements) override;
 
 	/// <summary>
 	/// Fill an array of uint64 with pseudo-random

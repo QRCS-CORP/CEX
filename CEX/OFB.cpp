@@ -205,18 +205,18 @@ void OFB::Transform(const std::vector<byte> &Input, const size_t InOffset, std::
 	CexAssert(Utility::IntUtils::Min(Input.size() - InOffset, Output.size() - OutOffset) >= m_blockCipher->BlockSize(), "The data arrays are smaller than the the block-size!");
 	CexAssert(Length % m_blockCipher->BlockSize() == 0, "The length must be evenly divisible by the block ciphers block-size!");
 
-	const size_t BLKSZE = m_blockCipher->BlockSize();
+	const size_t BLKLEN = m_blockCipher->BlockSize();
 
-	if (Length % BLKSZE != 0)
+	if (Length % BLKLEN != 0)
 	{
 		throw CryptoCipherModeException("OFB:Transform", "Invalid length, must be evenly divisible by the ciphers block size!");
 	}
 
-	const size_t BLKCNT = Length / BLKSZE;
+	const size_t BLKCNT = Length / BLKLEN;
 
 	for (size_t i = 0; i < BLKCNT; ++i)
 	{
-		EncryptBlock(Input, (i * BLKSZE) + InOffset, Output, (i * BLKSZE) + OutOffset);
+		EncryptBlock(Input, (i * BLKLEN) + InOffset, Output, (i * BLKLEN) + OutOffset);
 	}
 }
 

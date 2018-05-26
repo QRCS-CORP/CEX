@@ -35,15 +35,15 @@ using Digest::IDigest;
 using Enumeration::ShakeModes;
 
 /// <summary>
-/// An implementation of the SHAKE-128/256/512/1024 XOF function
+/// An implementation of the SHAKE and cSHAKE 128/256/512/1024 XOF functions
 /// </summary> 
 /// 
 /// <example>
 /// <description>Generate an array of pseudo random bytes:</description>
 /// <code>
-/// // initialize with a shake mode type
-/// SHAKE kdf(ShakeModes::SHAKE128);
-/// // initialize
+/// // initialize with a 256bit shake mode-rate
+/// SHAKE kdf(ShakeModes::SHAKE256);
+/// // initialize with a key for shake, or use salt and info for cshake
 /// kdf.Initialize(Key, [Salt], [Info]);
 /// // generate bytes
 /// kdf.Generate(Output, [Offset], [Size]);
@@ -52,14 +52,15 @@ using Enumeration::ShakeModes;
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The SHAKE XOF (Extended Output Function) variants use the Keccak sponge and permutation functions to generate a pseudo-random output. \n
+/// <para>The SHAKE/cSHAKE family of XOF (Extended Output Function) functions use the Keccak sponge and permutation functions to generate a pseudo-random output. \n
 /// Typically SHAKE has been implemented as a message digest function, as an alternative to SHA-3, but in this implementation it is used 
-/// to generate keing material like a traditional KDF. \n
-/// The SHAKE128 and SHAKE256 modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental.</para>
+/// to generate keying material like a traditional KDF. \n
+/// The cSHAKE/SHAKE 128 and 256 bit modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental.</para>
 /// 
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
 /// <item><description>The SHAKE512 and SHAKE1024 versions are unofficial variants, and should be considered as only for experimental use.</description></item>
+/// <item><description>Initialize the Kdf using only a key for SHAKE, or use salt and info secret-keys to enable the custom [cSHAKE] variant of the function.</description></item>
 /// <item><description>This class can be instantiated with a Keccak mode type name (SHAKE128/256/512/1024), the default is SHAKE256.</description></item>
 /// <item><description>The SHAKE128 and SHAKE256 modes are standard implementations, the SHAKE512 and SHAKE1024 variants are original extensions.</description></item>
 /// <item><description>The generator must be initialized with a key using one of the Initialize() functions before output can be generated.</description></item>
@@ -82,10 +83,12 @@ private:
 
 	static const size_t BUFFER_SIZE = 168;
 	static const std::string CLASS_NAME;
+	static const byte CSHAKE_DOMAIN = 0x04;
 	static const byte SHAKE_DOMAIN = 0x1F;
 	static const size_t STATE_SIZE = 25;
 
 	size_t m_blockSize;
+	byte m_domainCode;
 	size_t m_hashSize;
 	bool m_isDestroyed;
 	bool m_isInitialized;
@@ -197,7 +200,7 @@ public:
 	void Initialize(ISymmetricKey &GenParam) override;
 
 	/// <summary>
-	/// Initialize the generator with a key
+	/// Initialize the SHAKE generator with a key
 	/// </summary>
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
@@ -206,24 +209,24 @@ public:
 	void Initialize(const std::vector<byte> &Key) override;
 
 	/// <summary>
-	/// Initialize the generator with key and salt arrays.
-	/// <para>This method initiatialzes SHAKE using the Salt array postfixed to the key array.</para>
+	/// Initialize the cSHAKE generator with key and salt arrays.
+	/// <para>This method initiatialzes cSHAKE using the Salt array as the customization parameter.</para>
 	/// </summary>
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value containing an additional source of entropy</param>
+	/// <param name="Salt">The salt value used as a customization string</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt) override;
 
 	/// <summary>
-	/// Initialize the generator with a key, a salt array, and an information string or nonce.
-	/// <para>This method initiatialzes SHAKE using the Salt and Info arrays postfixed to the key array.</para>
+	/// Initialize the cSHAKE generator with a key, a salt array, and an information string.
+	/// <para>This method initiatialzes cSHAKE using the Salt array as the customization parameter, and the Info as the name parameter.</para>
 	/// </summary>
 	/// 
 	/// <param name="Key">The primary key array used to seed the generator</param>
-	/// <param name="Salt">The salt value used as an additional source of entropy</param>
-	/// <param name="Info">The information string which contains the domain separator code</param>
+	/// <param name="Salt">The salt array used as a customization string</param>
+	/// <param name="Info">The Info array used as a name string</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if the seed is not a legal seed size</exception>
 	void Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info) override;
@@ -253,8 +256,33 @@ private:
 		}
 	}
 
-	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
+	template<typename Array>
+	static size_t LeftEncode(Array &Buffer, size_t Offset, size_t Value)
+	{
+		size_t i;
+		size_t n;
+		size_t v;
+
+		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
+		}
+
+		Buffer[Offset] = (uint8_t)n;
+
+		return (n + 1);
+	}
+
+	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name);
 	void Expand(std::vector<byte> &Output, size_t Offset, size_t Length);
+	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
 	void LoadState();
 	void Permute(std::array<ulong, STATE_SIZE> &State);
 };

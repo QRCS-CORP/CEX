@@ -65,7 +65,7 @@ class HCR final : public IPrng
 {
 private:
 	static const size_t BUFFER_SIZE = 1024;
-	static const size_t MIN_BUFSZE = 64;
+	static const size_t MIN_BUFLEN = 64;
 	static const std::string CLASS_NAME;
 
 	size_t m_bufferIndex;
@@ -95,23 +95,23 @@ public:
 	/// Initialize the class with parameters
 	/// </summary>
 	/// 
-	/// <param name="DigestEngine">The digest that powers the rng (default is Keccak512)</param>
+	/// <param name="DigestEngine">The digest that powers the rng (default is SHA512)</param>
 	/// <param name="SeedEngine">The Seed engine used to create the salt (default is auto-seed)</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	explicit HCR(Digests DigestEngine = Digests::Keccak512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
+	explicit HCR(Digests DigestEngine = Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
 	/// </summary>
 	/// 
 	/// <param name="Seed">The Seed bytes used to initialize the digest counter; (min. length is digest blocksize + 8)</param>
-	/// <param name="DigestEngine">The digest that powers the rng (default is Keccak512)</param>
+	/// <param name="DigestEngine">The digest that powers the rng (default is SHA512)</param>
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
-	explicit HCR(std::vector<byte> Seed, Digests DigestEngine = Digests::Keccak512, size_t BufferSize = 1024);
+	explicit HCR(std::vector<byte> Seed, Digests DigestEngine = Digests::SHA512, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -133,6 +133,15 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
+	/// Fill an array of int16 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The int16 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements) override;
+
+	/// <summary>
 	/// Fill an array of uint16 with pseudo-random
 	/// </summary>
 	///
@@ -142,6 +151,15 @@ public:
 	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements) override;
 
 	/// <summary>
+	/// Fill an array of int32 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The int32 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements) override;
+
+	/// <summary>
 	/// Fill an array of uint32 with pseudo-random
 	/// </summary>
 	///
@@ -149,6 +167,15 @@ public:
 	/// <param name="Offset">The starting index within the Output array</param>
 	/// <param name="Elements">The number of array elements to fill</param>
 	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements) override;
+
+	/// <summary>
+	/// Fill an array of int64 with pseudo-random
+	/// </summary>
+	///
+	/// <param name="Output">The int64 output array</param>
+	/// <param name="Offset">The starting index within the Output array</param>
+	/// <param name="Elements">The number of array elements to fill</param>
+	void Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements) override;
 
 	/// <summary>
 	/// Fill an array of uint64 with pseudo-random

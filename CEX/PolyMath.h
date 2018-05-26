@@ -86,15 +86,15 @@ public:
 		const T VN(5);
 
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const size_t ULVSZE = T::size() / sizeof(uint);
-		std::array<uint, ULVSZE> tmpR;
+		const size_t ULVLEN = T::size() / sizeof(uint);
+		std::array<uint, ULVLEN> tmpR;
 		const T NQ(Q);
 		T tmpA, tmpB;
 #else
-		const size_t ULVSZE = 1;
+		const size_t ULVLEN = 1;
 #endif
 
-		for (size_t i = 0; i < R.size(); i += ULVSZE)
+		for (size_t i = 0; i < R.size(); i += ULVLEN)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -114,7 +114,7 @@ public:
 			VF -= VU;
 			VF.Store(tmpR, 0);
 
-			for (size_t j = 0; j < ULVSZE; ++j)
+			for (size_t j = 0; j < ULVLEN; ++j)
 			{
 				R[j + i] = static_cast<ushort>(tmpR[j]);
 			}
@@ -150,14 +150,14 @@ public:
 	inline static void Mul(Array &R, const Array &Factors, int Q, uint QInv, uint RLog)
 	{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
-		const size_t ULVSZE = T::size() / sizeof(uint);
-		std::array<uint, ULVSZE> tmpR;
+		const size_t ULVLEN = T::size() / sizeof(uint);
+		std::array<uint, ULVLEN> tmpR;
 		T tmpP, tmpF;
 #else
-		const size_t ULVSZE = 1;
+		const size_t ULVLEN = 1;
 #endif
 
-		for (size_t i = 0; i < R.size(); i += ULVSZE)
+		for (size_t i = 0; i < R.size(); i += ULVLEN)
 		{
 #if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
 #	if defined(__AVX512__)
@@ -179,7 +179,7 @@ public:
 			a >>= 18;
 			a.Store(tmpR, 0);
 
-			for (size_t j = 0; j < ULVSZE; ++j)
+			for (size_t j = 0; j < ULVLEN; ++j)
 			{
 				R[j + i] = static_cast<ushort>(tmpR[j]);
 			}

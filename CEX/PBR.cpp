@@ -11,7 +11,7 @@ const std::string PBR::CLASS_NAME("PBR");
 PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestEngine, size_t BufferSize)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize >= MIN_BUFSZE ? BufferSize :
+	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize :
 		throw CryptoRandomException("PBR:Ctor", "BufferSize must be at least 64 bytes!")),
 	m_digestIterations(Iterations != 0 ? Iterations : 
 		throw CryptoRandomException("PBR:Ctor", "Iterations can not be zero; at least 1 iteration is required!")),
@@ -60,6 +60,16 @@ const std::string PBR::Name()
 
 //~~~Public Functions~~~//
 
+void PBR::Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(int16_t);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
 void PBR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
@@ -70,11 +80,31 @@ void PBR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
 }
 
+void PBR::Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(int32_t);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
 void PBR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(uint);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
+void PBR::Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(int64_t);
 	std::vector<byte> buf(bufLen);
 	GetBytes(buf);
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);

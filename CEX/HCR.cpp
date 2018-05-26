@@ -23,8 +23,7 @@ const std::string HCR::Name()
 HCR::HCR(Digests DigestEngine, Providers SeedEngine, size_t BufferSize)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize >= MIN_BUFSZE ? BufferSize :
-		throw CryptoRandomException("HCR:Ctor", "BufferSize must be at least 64 bytes!")),
+	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
 	m_digestType(DigestEngine != Digests::None ? DigestEngine :
 		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
@@ -39,8 +38,7 @@ HCR::HCR(Digests DigestEngine, Providers SeedEngine, size_t BufferSize)
 HCR::HCR(std::vector<byte> Seed, Digests DigestEngine, size_t BufferSize)
 	:
 	m_bufferIndex(0),
-	m_bufferSize(BufferSize >= MIN_BUFSZE ? BufferSize :
-		throw CryptoRandomException("HCR:Ctor", "BufferSize must be at least 64 bytes!")),
+	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
 	m_digestType(DigestEngine != Digests::None ? DigestEngine :
 		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
@@ -75,6 +73,16 @@ HCR::~HCR()
 
 //~~~Public Functions~~~//
 
+void HCR::Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(int16_t);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
 void HCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
@@ -85,11 +93,31 @@ void HCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
 }
 
+void HCR::Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(int32_t);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
 void HCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
 {
 	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
 
 	size_t bufLen = Elements * sizeof(uint);
+	std::vector<byte> buf(bufLen);
+	GetBytes(buf);
+	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
+}
+
+void HCR::Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements)
+{
+	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+	size_t bufLen = Elements * sizeof(int64_t);
 	std::vector<byte> buf(bufLen);
 	GetBytes(buf);
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);

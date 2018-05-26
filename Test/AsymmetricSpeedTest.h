@@ -6,6 +6,7 @@
 #include "../CEX/IBlockCipher.h"
 #include "../CEX/MLWEParams.h"
 #include "../CEX/MPKCParams.h"
+#include "../CEX/NTRUParams.h"
 #include "../CEX/IPrng.h"
 #include "../CEX/RLWEParams.h"
 
@@ -14,6 +15,7 @@ namespace Test
 	using Cipher::Symmetric::Block::IBlockCipher;
 	using Enumeration::MLWEParams;
 	using Enumeration::MPKCParams;
+	using Enumeration::NTRUParams;
 	using Prng::IPrng;
 	using Enumeration::BlockCiphers;
 	using Enumeration::RLWEParams;
@@ -77,9 +79,12 @@ namespace Test
 		void MlweDecryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
 		void MlweEncryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
 		void MlweGenerateLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
-		void RlweDecryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng);
-		void RlweEncryptLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng);
-		void RlweGenerateLoop(RLWEParams Params, size_t Loops, bool Parallel, IPrng* Rng);
+		void NtruDecryptLoop(NTRUParams Params, size_t Loops, IPrng* Rng);
+		void NtruEncryptLoop(NTRUParams Params, size_t Loops, IPrng* Rng);
+		void NtruGenerateLoop(NTRUParams Params, size_t Loops, IPrng* Rng);
+		void RlweDecryptLoop(RLWEParams Params, size_t Loops, IPrng* Rng);
+		void RlweEncryptLoop(RLWEParams Params, size_t Loops, IPrng* Rng);
+		void RlweGenerateLoop(RLWEParams Params, size_t Loops, IPrng* Rng);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
 		void OnProgress(std::string Data);
 	};

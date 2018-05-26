@@ -72,11 +72,11 @@ void GHASH::ProcessSegment(const std::vector<byte> &Input, size_t InOffset, std:
 {
 	while (Length != 0)
 	{
-		const size_t DIFFSZE = Utility::IntUtils::Min(Length, BLOCK_SIZE);
-		Utility::MemUtils::XorBlock(Input, InOffset, Output, 0, DIFFSZE);
+		const size_t DIFFLEN = Utility::IntUtils::Min(Length, BLOCK_SIZE);
+		Utility::MemUtils::XorBlock(Input, InOffset, Output, 0, DIFFLEN);
 		GcmMultiply(Output);
-		InOffset += DIFFSZE;
-		Length -= DIFFSZE;
+		InOffset += DIFFLEN;
+		Length -= DIFFLEN;
 	}
 }
 
@@ -110,14 +110,14 @@ void GHASH::Update(const std::vector<byte> &Input, size_t InOffset, std::vector<
 			m_msgOffset = 0;
 		}
 
-		const size_t RMDSZE = BLOCK_SIZE - m_msgOffset;
-		if (Length > RMDSZE)
+		const size_t RMDLEN = BLOCK_SIZE - m_msgOffset;
+		if (Length > RMDLEN)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMDSZE);
+			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgOffset, RMDLEN);
 			ProcessBlock(m_msgBuffer, 0, Output);
 			m_msgOffset = 0;
-			Length -= RMDSZE;
-			InOffset += RMDSZE;
+			Length -= RMDLEN;
+			InOffset += RMDLEN;
 
 			while (Length > BLOCK_SIZE)
 			{
