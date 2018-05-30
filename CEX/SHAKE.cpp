@@ -98,7 +98,6 @@ size_t SHAKE::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Lengt
 	}
 
 	Expand(Output, OutOffset, Length);
-	Reset();
 
 	return Length;
 }

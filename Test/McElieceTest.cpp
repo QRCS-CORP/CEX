@@ -45,7 +45,6 @@ namespace Test
 			OnProgress(std::string("McElieceTest: Passed cipher-text integrity test.."));
 			MessageAuthentication();
 			OnProgress(std::string("McElieceTest: Passed message authentication test.."));
-			// Note: CCA kem by next version release
 			//PublicKeyIntegrity();
 			//OnProgress(std::string("McElieceTest: Passed public key integrity test.."));
 			StressLoop();
@@ -129,7 +128,7 @@ namespace Test
 
 	void McElieceTest::PublicKeyIntegrity()
 	{
-		/*std::vector<byte> cpt(0);
+		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
@@ -157,7 +156,7 @@ namespace Test
 			return;
 		}
 
-		throw TestException("McElieceTest: Public Key integrity test failed!");*/
+		throw TestException("McElieceTest: Public Key integrity test failed!");
 	}
 
 	void McElieceTest::SerializationCompare()

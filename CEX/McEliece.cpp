@@ -158,7 +158,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
 		sct.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
-		CipherText.resize(MPKCM12T62::MPKC_CIPHERTEXT_SIZE);
+		CipherText.resize(MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
 		MPKCM12T62::Encrypt(CipherText, sct, m_publicKey->P(), m_rndGenerator);
 	}
 	else
@@ -181,8 +181,8 @@ IAsymmetricKeyPair* McEliece::Generate()
 
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		pka.resize(MPKCM12T62::MPKC_PUBLICKEY_SIZE);
-		ska.resize(MPKCM12T62::MPKC_PRIVATEKEY_SIZE);
+		pka.resize(MPKCM12T62::MPKC_CPAPUBLICKEY_SIZE);
+		ska.resize(MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE);
 		if (!MPKCM12T62::Generate(pka, ska, m_rndGenerator))
 		{
 			throw CryptoAsymmetricException("McEliece:Generate", "Key generation max retries failure!");

@@ -100,7 +100,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	explicit HCR(Digests DigestEngine = Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
+	HCR(Digests DigestEngine = Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output

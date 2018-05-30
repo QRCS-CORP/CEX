@@ -45,29 +45,34 @@ using Key::Asymmetric::RLWEPublicKey;
 /// 
 /// // serialize the public key
 /// RLWEPublicKey* pubK1 = (RLWEPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; skey = pubK1->ToBytes();
+/// std:vector&lt;byte&gt; pk = pubK1->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// RingLWE asycpr(Enumeration::RLWEParams::Q12289N1024);
-/// asycpr.Initialize(kp);
+/// RingLWE asycpr(RLWEParams::Q12289N1024);
+/// asycpr.Initialize(pk);
 /// 
-/// std:vector&lt;byte&gt; cpt = asycpr.Encrypt(msg);
+/// std:vector&lt;byte&gt; cpt;
+/// std:vector&lt;byte&gt; secret(32);
+/// // generate the ciphertext and shared secret
+/// asycpr.Encapsulate(cpt, secret);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// RingLWE asycpr(Enumeration::RLWEParams::Q12289N1024);
-/// asycpr.Initialize(kp);
+/// RingLWE asycpr(RLWEParams::Q12289N1024);
+/// asycpr.Initialize(sk);
+/// std:vector&lt;byte&gt; secret(32);
 /// 
 /// try
 /// {
-///		std:vector&lt;byte&gt; msg = asycpr.Decrypt(cpt);
+/// // decrypt the ciphertext and output the shared secret
+///		asycpr.Decapsulate(cpt, secret);
 /// }
 /// catch (const CryptoAuthenticationFailure &ex)
 /// {
-///		// handle the failure
+///		// handle the authentication failure
 /// }
 /// </code>
 /// </example>
@@ -93,6 +98,8 @@ using Key::Asymmetric::RLWEPublicKey;
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
+/// <item><description>Nist PQ Round 1 submission: <a href="https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/Round-1-Submissions">New Hope</a>.</description></item>
+/// <item><description>The NewHope website: <a href="https://newhopecrypto.org/">key exchange</a>.</description></item>
 /// <item><description>The NewHope: <a href="https://eprint.iacr.org/2015/1092">key exchange</a> from the ring learning with errors problem.</description></item>
 /// <item><description>A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exchange</a> Scheme Based on the Learning with Errors Problem.</description></item>
 /// </list>
@@ -225,6 +232,10 @@ public:
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
 	void Initialize(IAsymmetricKey* Key) override;
+
+private:
+
+	int32_t Verify(const std::vector<byte> &A, const std::vector<byte> &B, size_t Length);
 };
 
 NAMESPACE_RINGLWEEND

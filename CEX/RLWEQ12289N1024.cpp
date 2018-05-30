@@ -2,6 +2,7 @@
 #include "BCG.h"
 #include "GCM.h"
 #include "MemUtils.h"
+#include "SHAKE.h"
 
 #if defined(__AVX512__)
 #	include "UInt512.h"
@@ -296,290 +297,584 @@ const std::array<ushort, 1024> RLWEQ12289N1024::PsisInvMontgomery =
 	0x2131U, 0x1275U, 0x02A3U, 0x073CU, 0x2A2EU, 0x2F2CU, 0x2907U, 0x0CB8U, 0x241BU, 0x0C04U, 0x0893U, 0x2A5FU, 0x2F33U, 0x2908U, 0x2F02U, 0x2901U
 };
 
+const std::array<ushort, 1024> RLWEQ12289N1024::BitRevTable =
+{
+	0x0000U, 0x0200U, 0x0100U, 0x0300U, 0x0080U, 0x0280U, 0x0180U, 0x0380U, 0x0040U, 0x0240U, 0x0140U, 0x0340U, 0x00C0U, 0x02C0U, 0x01C0U, 0x03C0U,
+	0x0020U, 0x0220U, 0x0120U, 0x0320U, 0x00A0U, 0x02A0U, 0x01A0U, 0x03A0U, 0x0060U, 0x0260U, 0x0160U, 0x0360U, 0x00E0U, 0x02E0U, 0x01E0U, 0x03E0U,
+	0x0010U, 0x0210U, 0x0110U, 0x0310U, 0x0090U, 0x0290U, 0x0190U, 0x0390U, 0x0050U, 0x0250U, 0x0150U, 0x0350U, 0x00D0U, 0x02D0U, 0x01D0U, 0x03D0U,
+	0x0030U, 0x0230U, 0x0130U, 0x0330U, 0x00B0U, 0x02B0U, 0x01B0U, 0x03B0U, 0x0070U, 0x0270U, 0x0170U, 0x0370U, 0x00F0U, 0x02F0U, 0x01F0U, 0x03F0U,
+	0x0008U, 0x0208U, 0x0108U, 0x0308U, 0x0088U, 0x0288U, 0x0188U, 0x0388U, 0x0048U, 0x0248U, 0x0148U, 0x0348U, 0x00C8U, 0x02C8U, 0x01C8U, 0x03C8U,
+	0x0028U, 0x0228U, 0x0128U, 0x0328U, 0x00A8U, 0x02A8U, 0x01A8U, 0x03A8U, 0x0068U, 0x0268U, 0x0168U, 0x0368U, 0x00E8U, 0x02E8U, 0x01E8U, 0x03E8U,
+	0x0018U, 0x0218U, 0x0118U, 0x0318U, 0x0098U, 0x0298U, 0x0198U, 0x0398U, 0x0058U, 0x0258U, 0x0158U, 0x0358U, 0x00D8U, 0x02D8U, 0x01D8U, 0x03D8U,
+	0x0038U, 0x0238U, 0x0138U, 0x0338U, 0x00B8U, 0x02B8U, 0x01B8U, 0x03B8U, 0x0078U, 0x0278U, 0x0178U, 0x0378U, 0x00F8U, 0x02F8U, 0x01F8U, 0x03F8U,
+	0x0004U, 0x0204U, 0x0104U, 0x0304U, 0x0084U, 0x0284U, 0x0184U, 0x0384U, 0x0044U, 0x0244U, 0x0144U, 0x0344U, 0x00C4U, 0x02C4U, 0x01C4U, 0x03C4U,
+	0x0024U, 0x0224U, 0x0124U, 0x0324U, 0x00A4U, 0x02A4U, 0x01A4U, 0x03A4U, 0x0064U, 0x0264U, 0x0164U, 0x0364U, 0x00E4U, 0x02E4U, 0x01E4U, 0x03E4U,
+	0x0014U, 0x0214U, 0x0114U, 0x0314U, 0x0094U, 0x0294U, 0x0194U, 0x0394U, 0x0054U, 0x0254U, 0x0154U, 0x0354U, 0x00D4U, 0x02D4U, 0x01D4U, 0x03D4U,
+	0x0034U, 0x0234U, 0x0134U, 0x0334U, 0x00B4U, 0x02B4U, 0x01B4U, 0x03B4U, 0x0074U, 0x0274U, 0x0174U, 0x0374U, 0x00F4U, 0x02F4U, 0x01F4U, 0x03F4U,
+	0x000CU, 0x020CU, 0x010CU, 0x030CU, 0x008CU, 0x028CU, 0x018CU, 0x038CU, 0x004CU, 0x024CU, 0x014CU, 0x034CU, 0x00CCU, 0x02CCU, 0x01CCU, 0x03CCU,
+	0x002CU, 0x022CU, 0x012CU, 0x032CU, 0x00ACU, 0x02ACU, 0x01ACU, 0x03ACU, 0x006CU, 0x026CU, 0x016CU, 0x036CU, 0x00ECU, 0x02ECU, 0x01ECU, 0x03ECU,
+	0x001CU, 0x021CU, 0x011CU, 0x031CU, 0x009CU, 0x029CU, 0x019CU, 0x039CU, 0x005CU, 0x025CU, 0x015CU, 0x035CU, 0x00DCU, 0x02DCU, 0x01DCU, 0x03DCU,
+	0x003CU, 0x023CU, 0x013CU, 0x033CU, 0x00BCU, 0x02BCU, 0x01BCU, 0x03BCU, 0x007CU, 0x027CU, 0x017CU, 0x037CU, 0x00FCU, 0x02FCU, 0x01FCU, 0x03FCU,
+	0x0002U, 0x0202U, 0x0102U, 0x0302U, 0x0082U, 0x0282U, 0x0182U, 0x0382U, 0x0042U, 0x0242U, 0x0142U, 0x0342U, 0x00C2U, 0x02C2U, 0x01C2U, 0x03C2U,
+	0x0022U, 0x0222U, 0x0122U, 0x0322U, 0x00A2U, 0x02A2U, 0x01A2U, 0x03A2U, 0x0062U, 0x0262U, 0x0162U, 0x0362U, 0x00E2U, 0x02E2U, 0x01E2U, 0x03E2U,
+	0x0012U, 0x0212U, 0x0112U, 0x0312U, 0x0092U, 0x0292U, 0x0192U, 0x0392U, 0x0052U, 0x0252U, 0x0152U, 0x0352U, 0x00D2U, 0x02D2U, 0x01D2U, 0x03D2U,
+	0x0032U, 0x0232U, 0x0132U, 0x0332U, 0x00B2U, 0x02B2U, 0x01B2U, 0x03B2U, 0x0072U, 0x0272U, 0x0172U, 0x0372U, 0x00F2U, 0x02F2U, 0x01F2U, 0x03F2U,
+	0x000AU, 0x020AU, 0x010AU, 0x030AU, 0x008AU, 0x028AU, 0x018AU, 0x038AU, 0x004AU, 0x024AU, 0x014AU, 0x034AU, 0x00CAU, 0x02CAU, 0x01CAU, 0x03CAU,
+	0x002AU, 0x022AU, 0x012AU, 0x032AU, 0x00AAU, 0x02AAU, 0x01AAU, 0x03AAU, 0x006AU, 0x026AU, 0x016AU, 0x036AU, 0x00EAU, 0x02EAU, 0x01EAU, 0x03EAU,
+	0x001AU, 0x021AU, 0x011AU, 0x031AU, 0x009AU, 0x029AU, 0x019AU, 0x039AU, 0x005AU, 0x025AU, 0x015AU, 0x035AU, 0x00DAU, 0x02DAU, 0x01DAU, 0x03DAU,
+	0x003AU, 0x023AU, 0x013AU, 0x033AU, 0x00BAU, 0x02BAU, 0x01BAU, 0x03BAU, 0x007AU, 0x027AU, 0x017AU, 0x037AU, 0x00FAU, 0x02FAU, 0x01FAU, 0x03FAU,
+	0x0006U, 0x0206U, 0x0106U, 0x0306U, 0x0086U, 0x0286U, 0x0186U, 0x0386U, 0x0046U, 0x0246U, 0x0146U, 0x0346U, 0x00C6U, 0x02C6U, 0x01C6U, 0x03C6U,
+	0x0026U, 0x0226U, 0x0126U, 0x0326U, 0x00A6U, 0x02A6U, 0x01A6U, 0x03A6U, 0x0066U, 0x0266U, 0x0166U, 0x0366U, 0x00E6U, 0x02E6U, 0x01E6U, 0x03E6U,
+	0x0016U, 0x0216U, 0x0116U, 0x0316U, 0x0096U, 0x0296U, 0x0196U, 0x0396U, 0x0056U, 0x0256U, 0x0156U, 0x0356U, 0x00D6U, 0x02D6U, 0x01D6U, 0x03D6U,
+	0x0036U, 0x0236U, 0x0136U, 0x0336U, 0x00B6U, 0x02B6U, 0x01B6U, 0x03B6U, 0x0076U, 0x0276U, 0x0176U, 0x0376U, 0x00F6U, 0x02F6U, 0x01F6U, 0x03F6U,
+	0x000EU, 0x020EU, 0x010EU, 0x030EU, 0x008EU, 0x028EU, 0x018EU, 0x038EU, 0x004EU, 0x024EU, 0x014EU, 0x034EU, 0x00CEU, 0x02CEU, 0x01CEU, 0x03CEU,
+	0x002EU, 0x022EU, 0x012EU, 0x032EU, 0x00AEU, 0x02AEU, 0x01AEU, 0x03AEU, 0x006EU, 0x026EU, 0x016EU, 0x036EU, 0x00EEU, 0x02EEU, 0x01EEU, 0x03EEU,
+	0x001EU, 0x021EU, 0x011EU, 0x031EU, 0x009EU, 0x029EU, 0x019EU, 0x039EU, 0x005EU, 0x025EU, 0x015EU, 0x035EU, 0x00DEU, 0x02DEU, 0x01DEU, 0x03DEU,
+	0x003EU, 0x023EU, 0x013EU, 0x033EU, 0x00BEU, 0x02BEU, 0x01BEU, 0x03BEU, 0x007EU, 0x027EU, 0x017EU, 0x037EU, 0x00FEU, 0x02FEU, 0x01FEU, 0x03FEU,
+	0x0001U, 0x0201U, 0x0101U, 0x0301U, 0x0081U, 0x0281U, 0x0181U, 0x0381U, 0x0041U, 0x0241U, 0x0141U, 0x0341U, 0x00C1U, 0x02C1U, 0x01C1U, 0x03C1U,
+	0x0021U, 0x0221U, 0x0121U, 0x0321U, 0x00A1U, 0x02A1U, 0x01A1U, 0x03A1U, 0x0061U, 0x0261U, 0x0161U, 0x0361U, 0x00E1U, 0x02E1U, 0x01E1U, 0x03E1U,
+	0x0011U, 0x0211U, 0x0111U, 0x0311U, 0x0091U, 0x0291U, 0x0191U, 0x0391U, 0x0051U, 0x0251U, 0x0151U, 0x0351U, 0x00D1U, 0x02D1U, 0x01D1U, 0x03D1U,
+	0x0031U, 0x0231U, 0x0131U, 0x0331U, 0x00B1U, 0x02B1U, 0x01B1U, 0x03B1U, 0x0071U, 0x0271U, 0x0171U, 0x0371U, 0x00F1U, 0x02F1U, 0x01F1U, 0x03F1U,
+	0x0009U, 0x0209U, 0x0109U, 0x0309U, 0x0089U, 0x0289U, 0x0189U, 0x0389U, 0x0049U, 0x0249U, 0x0149U, 0x0349U, 0x00C9U, 0x02C9U, 0x01C9U, 0x03C9U,
+	0x0029U, 0x0229U, 0x0129U, 0x0329U, 0x00A9U, 0x02A9U, 0x01A9U, 0x03A9U, 0x0069U, 0x0269U, 0x0169U, 0x0369U, 0x00E9U, 0x02E9U, 0x01E9U, 0x03E9U,
+	0x0019U, 0x0219U, 0x0119U, 0x0319U, 0x0099U, 0x0299U, 0x0199U, 0x0399U, 0x0059U, 0x0259U, 0x0159U, 0x0359U, 0x00D9U, 0x02D9U, 0x01D9U, 0x03D9U,
+	0x0039U, 0x0239U, 0x0139U, 0x0339U, 0x00B9U, 0x02B9U, 0x01B9U, 0x03B9U, 0x0079U, 0x0279U, 0x0179U, 0x0379U, 0x00F9U, 0x02F9U, 0x01F9U, 0x03F9U,
+	0x0005U, 0x0205U, 0x0105U, 0x0305U, 0x0085U, 0x0285U, 0x0185U, 0x0385U, 0x0045U, 0x0245U, 0x0145U, 0x0345U, 0x00C5U, 0x02C5U, 0x01C5U, 0x03C5U,
+	0x0025U, 0x0225U, 0x0125U, 0x0325U, 0x00A5U, 0x02A5U, 0x01A5U, 0x03A5U, 0x0065U, 0x0265U, 0x0165U, 0x0365U, 0x00E5U, 0x02E5U, 0x01E5U, 0x03E5U,
+	0x0015U, 0x0215U, 0x0115U, 0x0315U, 0x0095U, 0x0295U, 0x0195U, 0x0395U, 0x0055U, 0x0255U, 0x0155U, 0x0355U, 0x00D5U, 0x02D5U, 0x01D5U, 0x03D5U,
+	0x0035U, 0x0235U, 0x0135U, 0x0335U, 0x00B5U, 0x02B5U, 0x01B5U, 0x03B5U, 0x0075U, 0x0275U, 0x0175U, 0x0375U, 0x00F5U, 0x02F5U, 0x01F5U, 0x03F5U,
+	0x000DU, 0x020DU, 0x010DU, 0x030DU, 0x008DU, 0x028DU, 0x018DU, 0x038DU, 0x004DU, 0x024DU, 0x014DU, 0x034DU, 0x00CDU, 0x02CDU, 0x01CDU, 0x03CDU,
+	0x002DU, 0x022DU, 0x012DU, 0x032DU, 0x00ADU, 0x02ADU, 0x01ADU, 0x03ADU, 0x006DU, 0x026DU, 0x016DU, 0x036DU, 0x00EDU, 0x02EDU, 0x01EDU, 0x03EDU,
+	0x001DU, 0x021DU, 0x011DU, 0x031DU, 0x009DU, 0x029DU, 0x019DU, 0x039DU, 0x005DU, 0x025DU, 0x015DU, 0x035DU, 0x00DDU, 0x02DDU, 0x01DDU, 0x03DDU,
+	0x003DU, 0x023DU, 0x013DU, 0x033DU, 0x00BDU, 0x02BDU, 0x01BDU, 0x03BDU, 0x007DU, 0x027DU, 0x017DU, 0x037DU, 0x00FDU, 0x02FDU, 0x01FDU, 0x03FDU,
+	0x0003U, 0x0203U, 0x0103U, 0x0303U, 0x0083U, 0x0283U, 0x0183U, 0x0383U, 0x0043U, 0x0243U, 0x0143U, 0x0343U, 0x00C3U, 0x02C3U, 0x01C3U, 0x03C3U,
+	0x0023U, 0x0223U, 0x0123U, 0x0323U, 0x00A3U, 0x02A3U, 0x01A3U, 0x03A3U, 0x0063U, 0x0263U, 0x0163U, 0x0363U, 0x00E3U, 0x02E3U, 0x01E3U, 0x03E3U,
+	0x0013U, 0x0213U, 0x0113U, 0x0313U, 0x0093U, 0x0293U, 0x0193U, 0x0393U, 0x0053U, 0x0253U, 0x0153U, 0x0353U, 0x00D3U, 0x02D3U, 0x01D3U, 0x03D3U,
+	0x0033U, 0x0233U, 0x0133U, 0x0333U, 0x00B3U, 0x02B3U, 0x01B3U, 0x03B3U, 0x0073U, 0x0273U, 0x0173U, 0x0373U, 0x00F3U, 0x02F3U, 0x01F3U, 0x03F3U,
+	0x000BU, 0x020BU, 0x010BU, 0x030BU, 0x008BU, 0x028BU, 0x018BU, 0x038BU, 0x004BU, 0x024BU, 0x014BU, 0x034BU, 0x00CBU, 0x02CBU, 0x01CBU, 0x03CBU,
+	0x002BU, 0x022BU, 0x012BU, 0x032BU, 0x00ABU, 0x02ABU, 0x01ABU, 0x03ABU, 0x006BU, 0x026BU, 0x016BU, 0x036BU, 0x00EBU, 0x02EBU, 0x01EBU, 0x03EBU,
+	0x001BU, 0x021BU, 0x011BU, 0x031BU, 0x009BU, 0x029BU, 0x019BU, 0x039BU, 0x005BU, 0x025BU, 0x015BU, 0x035BU, 0x00DBU, 0x02DBU, 0x01DBU, 0x03DBU,
+	0x003BU, 0x023BU, 0x013BU, 0x033BU, 0x00BBU, 0x02BBU, 0x01BBU, 0x03BBU, 0x007BU, 0x027BU, 0x017BU, 0x037BU, 0x00FBU, 0x02FBU, 0x01FBU, 0x03FBU,
+	0x0007U, 0x0207U, 0x0107U, 0x0307U, 0x0087U, 0x0287U, 0x0187U, 0x0387U, 0x0047U, 0x0247U, 0x0147U, 0x0347U, 0x00C7U, 0x02C7U, 0x01C7U, 0x03C7U,
+	0x0027U, 0x0227U, 0x0127U, 0x0327U, 0x00A7U, 0x02A7U, 0x01A7U, 0x03A7U, 0x0067U, 0x0267U, 0x0167U, 0x0367U, 0x00E7U, 0x02E7U, 0x01E7U, 0x03E7U,
+	0x0017U, 0x0217U, 0x0117U, 0x0317U, 0x0097U, 0x0297U, 0x0197U, 0x0397U, 0x0057U, 0x0257U, 0x0157U, 0x0357U, 0x00D7U, 0x02D7U, 0x01D7U, 0x03D7U,
+	0x0037U, 0x0237U, 0x0137U, 0x0337U, 0x00B7U, 0x02B7U, 0x01B7U, 0x03B7U, 0x0077U, 0x0277U, 0x0177U, 0x0377U, 0x00F7U, 0x02F7U, 0x01F7U, 0x03F7U,
+	0x000FU, 0x020FU, 0x010FU, 0x030FU, 0x008FU, 0x028FU, 0x018FU, 0x038FU, 0x004FU, 0x024FU, 0x014FU, 0x034FU, 0x00CFU, 0x02CFU, 0x01CFU, 0x03CFU,
+	0x002FU, 0x022FU, 0x012FU, 0x032FU, 0x00AFU, 0x02AFU, 0x01AFU, 0x03AFU, 0x006FU, 0x026FU, 0x016FU, 0x036FU, 0x00EFU, 0x02EFU, 0x01EFU, 0x03EFU,
+	0x001FU, 0x021FU, 0x011FU, 0x031FU, 0x009FU, 0x029FU, 0x019FU, 0x039FU, 0x005FU, 0x025FU, 0x015FU, 0x035FU, 0x00DFU, 0x02DFU, 0x01DFU, 0x03DFU,
+	0x003FU, 0x023FU, 0x013FU, 0x033FU, 0x00BFU, 0x02BFU, 0x01BFU, 0x03BFU, 0x007FU, 0x027FU, 0x017FU, 0x037FU, 0x00FFU, 0x02FFU, 0x01FFU, 0x03FFU
+};
+
 //~~~Public Functions~~~//
 
-void RLWEQ12289N1024::Decrypt(std::vector<byte> &Secret, const std::vector<ushort> &PrivateKey, const std::vector<byte> &Received)
+void RLWEQ12289N1024::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey)
 {
-	std::array<ushort, RLWE_N> bp;
-	std::array<ushort, RLWE_N> c;
-	std::array<ushort, RLWE_N> v;
+	std::array<ushort, RLWE_N> vprime;
+	std::array<ushort, RLWE_N> uhat;
+	std::array<ushort, RLWE_N> tmp;
+	std::array<ushort, RLWE_N> shat;
 
-	DecodeB(bp, c, Received);
-	PolyPointwise(v, PrivateKey, bp);
-	Utility::PolyMath::BitReverse(v, BitrevTable);
-	InvNTT(v);
-	Reconcile(Secret, v, c);
+	PolyFromBytes(shat, PrivateKey);
+	DecodeC(uhat, vprime, CipherText);
+
+	PolyMulPointwise(tmp, shat, uhat);
+	PolyInvNtt(tmp);
+	PolySub(tmp, tmp, vprime);
+
+	PolyTomessage(Secret, tmp);
 }
 
-void RLWEQ12289N1024::Encrypt(std::vector<byte> &Secret, std::vector<byte> &Send, const std::vector<byte> &Received, std::unique_ptr<Prng::IPrng> &Rng)
+void RLWEQ12289N1024::Encrypt(std::vector<byte> &CipherText, std::vector<byte> &Secret, const std::vector<byte> &PublicKey, const std::vector<byte> &Coin)
 {
-	std::array<ushort, RLWE_N> a;
-	std::array<ushort, RLWE_N> bp;
-	std::array<ushort, RLWE_N> c;
-	std::array<ushort, RLWE_N> ep;
-	std::array<ushort, RLWE_N> epp;
-	std::array<ushort, RLWE_N> pka;
-	std::array<ushort, RLWE_N> sp;
-	std::array<ushort, RLWE_N> tbp;
+	std::array<ushort, RLWE_N> sprime;
+	std::array<ushort, RLWE_N> eprime;
+	std::array<ushort, RLWE_N> vprime;
+	std::array<ushort, RLWE_N> ahat;
+	std::array<ushort, RLWE_N> bhat;
+	std::array<ushort, RLWE_N> eprimeprime;
+	std::array<ushort, RLWE_N> uhat;
 	std::array<ushort, RLWE_N> v;
-
 	std::vector<byte> seed(RLWE_SEED_SIZE);
-	DecodeA(pka, seed, Received);
 
-	std::vector<uint> buf1(RLWE_N);
-	Rng->Fill(buf1, 0, RLWE_N);
-	std::vector<uint> buf2(RLWE_N);
-	Rng->Fill(buf2, 0, RLWE_N);
+	PolyFromMessage(v, Secret);
 
-#if defined(CEX_HAS_OPENMP) && defined(CEX_RLWE_PARALLEL)
-#	pragma omp parallel
-	{
-#		pragma omp single nowait
-		{
-			PolyUniform(a, seed);
-		}
-#		pragma omp single nowait
-		{
-			PolyGetNoise(sp, buf1);
-			FwdNTT(sp);
-		}
-#		pragma omp single nowait
-		{
-			PolyGetNoise(ep, buf2);
-			FwdNTT(ep);
-		}
-	}
-#else
-	PolyUniform(a, seed);
+	DecodePk(bhat, seed, PublicKey);
+	PolyUniform(ahat, seed);
 
-	PolyGetNoise(sp, buf1);
-	FwdNTT(sp);
+	PolySample(sprime, Coin, 0);
+	PolySample(eprime, Coin, 1);
+	PolySample(eprimeprime, Coin, 2);
 
-	PolyGetNoise(ep, buf2);
-	FwdNTT(ep);
-#endif
+	PolyNtt(sprime);
+	PolyNtt(eprime);
 
-	PolyPointwise(bp, a, sp);
-	PolyAdd(tbp, bp, ep);
+	PolyMulPointwise(uhat, ahat, sprime);
+	PolyAdd(uhat, uhat, eprime);
 
-	PolyPointwise(v, pka, sp);
-	Utility::PolyMath::BitReverse(v, BitrevTable);
-	InvNTT(v);
-	Rng->Fill(buf1, 0, RLWE_N);
-	PolyGetNoise(epp, buf1);
-	PolyAdd(v, v, epp);
+	PolyMulPointwise(vprime, bhat, sprime);
+	PolyInvNtt(vprime);
 
-	Rng->GetBytes(seed);
-	RecHelper(c, v, seed);
-	EncodeB(Send, tbp, c);
-	Reconcile(Secret, v, c);
+	PolyAdd(vprime, vprime, eprimeprime);
+	PolyAdd(vprime, vprime, v);
+
+	EncodeC(CipherText, uhat, vprime);
 }
 
-void RLWEQ12289N1024::Generate(std::vector<byte> &PublicKey, std::vector<ushort> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
+void RLWEQ12289N1024::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
-	std::array<ushort, RLWE_N> a;
-	std::array<ushort, RLWE_N> e;
-	std::array<ushort, RLWE_N> pk;
-	std::array<ushort, RLWE_N> r;
+	std::array<ushort, RLWE_N> ahat;
+	std::array<ushort, RLWE_N> ehat;
+	std::array<ushort, RLWE_N> ahatshat;
+	std::array<ushort, RLWE_N> bhat;
+	std::array<ushort, RLWE_N> shat;
+	std::vector<byte> publicseed(RLWE_SEED_SIZE);
+	std::vector<byte>  noiseseed(RLWE_SEED_SIZE);
 
-	std::vector<uint> buf1(RLWE_N);
-	Rng->Fill(buf1, 0, RLWE_N);
-	std::vector<uint> buf2(RLWE_N);
-	Rng->Fill(buf2, 0, RLWE_N);
-	std::vector<byte> seed(RLWE_SEED_SIZE);
-	Rng->GetBytes(seed);
+	Rng->GetBytes(publicseed);
+	Rng->GetBytes(noiseseed);
 
-#if defined(CEX_HAS_OPENMP) && defined(CEX_RLWE_PARALLEL)
-#	pragma omp parallel
-	{
-#		pragma omp single nowait
-		{
-			PolyUniform(a, seed);
-		}
-#		pragma omp single nowait
-		{
-			PolyGetNoise(PrivateKey, buf1);
-			FwdNTT(PrivateKey);
-		}
-#		pragma omp single nowait
-		{
-			PolyGetNoise(e, buf2);
-			FwdNTT(e);
-		}
-	}
-#else
-	PolyUniform(a, seed);
+	PolyUniform(ahat, publicseed);
 
-	PolyGetNoise(PrivateKey, buf1);
-	FwdNTT(PrivateKey);
+	PolySample(shat, noiseseed, 0);
+	PolyNtt(shat);
 
-	PolyGetNoise(e, buf2);
-	FwdNTT(e);
-#endif
+	PolySample(ehat, noiseseed, 1);
+	PolyNtt(ehat);
 
-	PolyPointwise(r, PrivateKey, a);
-	PolyAdd(pk, e, r);
-	EncodeA(PublicKey, pk, seed);
+	PolyMulPointwise(ahatshat, shat, ahat);
+	PolyAdd(bhat, ehat, ahatshat);
+
+	PolyToBytes(PrivateKey, shat);
+	EncodePk(PublicKey, bhat, publicseed);
 }
 
 //~~~Private Functions~~~//
 
-void RLWEQ12289N1024::DecodeA(std::array<ushort, RLWE_N> &PubKey, std::vector<byte> &Seed, const std::vector<byte> &R)
+void RLWEQ12289N1024::BitRevVector(std::array<ushort, RLWE_N> &P)
 {
-	PolyFromBytes(PubKey, R);
-	Utility::MemUtils::Copy(R, RLWE_PUBPOLY_SIZE, Seed, 0, RLWE_SEED_SIZE);
-}
+	ushort i;
+	ushort r;
+	ushort tmp;
 
-void RLWEQ12289N1024::DecodeB(std::array<ushort, RLWE_N> &B, std::array<ushort, RLWE_N> &C, const std::vector<byte> &R)
-{
-	PolyFromBytes(B, R);
-
-	for (size_t i = 0; i < RLWE_N / 4; i++)
+	for (i = 0; i < RLWE_N; ++i)
 	{
-		C[(4 * i) + 0] = static_cast<ushort>(R[RLWE_PUBPOLY_SIZE + i] & 0x03);
-		C[(4 * i) + 1] = static_cast<ushort>((R[RLWE_PUBPOLY_SIZE + i] >> 2) & 0x03);
-		C[(4 * i) + 2] = static_cast<ushort>((R[RLWE_PUBPOLY_SIZE + i] >> 4) & 0x03);
-		C[(4 * i) + 3] = static_cast<ushort>((R[RLWE_PUBPOLY_SIZE + i] >> 6));
+		r = BitRevTable[i];
+
+		if (i < r)
+		{
+			tmp = P[i];
+			P[i] = P[r];
+			P[r] = tmp;
+		}
 	}
 }
 
-void RLWEQ12289N1024::EncodeA(std::vector<byte> &R, const std::array<ushort, RLWE_N> &PubKey, const std::vector<byte> &Seed)
+void RLWEQ12289N1024::DecodeC(std::array<ushort, RLWE_N> &B, std::array<ushort, RLWE_N> &V, const std::vector<byte> &R)
 {
-	ToBytes(R, PubKey);
-	Utility::MemUtils::Copy(Seed, 0, R, RLWE_PUBPOLY_SIZE, RLWE_SEED_SIZE);
+	// de-serialize the ciphertext; inverse of encode_c
+	PolyFromBytes(B, R);
+	PolyDecompress(V, R);
 }
 
-void RLWEQ12289N1024::EncodeB(std::vector<byte> &R, const std::array<ushort, RLWE_N> &B, const std::array<ushort, RLWE_N> &C)
+void RLWEQ12289N1024::DecodePk(std::array<ushort, RLWE_N> &PublicKey, std::vector<byte> &Seed, const std::vector<byte> &R)
 {
-	ToBytes(R, B);
+	// De-serialize the public key; inverse of encodepk
 
-	for (size_t i = 0; i < RLWE_N / 4; i++)
+	size_t i;
+
+	PolyFromBytes(PublicKey, R);
+
+	for (i = 0; i < RLWE_SEED_SIZE; ++i)
 	{
-		R[RLWE_PUBPOLY_SIZE + i] = C[4 * i] | (C[(4 * i) + 1] << 2) | (C[(4 * i) + 2] << 4) | (C[(4 * i) + 3] << 6);
+		Seed[i] = R[RLWE_POLY_SIZE + i];
+	}
+}
+
+void RLWEQ12289N1024::EncodeC(std::vector<byte> &R, const std::array<ushort, RLWE_N> &B, const std::array<ushort, RLWE_N> &V)
+{
+	// Serialize the ciphertext as concatenation of the
+	// serialization of the polynomial b and serialization
+	// of the compressed polynomial v
+
+	PolyToBytes(R, B);
+	PolyCompress(R, V);
+}
+
+void RLWEQ12289N1024::EncodePk(std::vector<byte> &R, const std::array<ushort, RLWE_N> &PublicKey, const std::vector<byte> &Seed)
+{
+	// Serialize the public key as concatenation of the
+	// serialization of the polynomial pk and the public seed
+	// used to generete the polynomial a.
+
+	size_t i;
+
+	PolyToBytes(R, PublicKey);
+
+	for (i = 0; i < RLWE_SEED_SIZE; ++i)
+	{
+		R[RLWE_POLY_SIZE + i] = Seed[i];
+	}
+}
+
+ushort RLWEQ12289N1024::FlipAbs(ushort X)
+{
+	// Computes |(x mod q) - Q/2|
+	int16_t m;
+	int16_t r;
+
+	r = Freeze(X);
+	r = r - (RLWE_Q / 2);
+	m = r >> 15;
+
+	return (r + m) ^ m;
+}
+
+ushort RLWEQ12289N1024::Freeze(ushort X)
+{
+	// Fully reduces an integer modulo q in constant time
+	int16_t c;
+	ushort m;
+	ushort r;
+
+	r = X % RLWE_Q;
+	m = r - RLWE_Q;
+	c = m;
+	c >>= 15;
+	r = m ^ ((r ^ m) & c);
+
+	return r;
+}
+
+byte RLWEQ12289N1024::HammimgWeight(byte A)
+{
+	// Compute the Hamming weight of a byte
+
+	uint8_t i;
+	uint8_t r;
+
+	r = 0;
+
+	for (i = 0; i < 8; ++i)
+	{
+		r += (A >> i) & 1;
+	}
+
+	return r;
+}
+
+ushort RLWEQ12289N1024::MontgomeryReduce(uint A)
+{
+	uint u;
+
+	u = (A * RLWE_QINV);
+	u &= ((1 << RLWE_RLOG) - 1);
+	u *= RLWE_Q;
+	A = A + u;
+
+	return A >> 18;
+}
+
+void RLWEQ12289N1024::MulCoefficients(std::array<ushort, RLWE_N> &Poly, const std::array<ushort, RLWE_N> &Factors)
+{
+	size_t i;
+
+	for (i = 0; i < RLWE_N; ++i)
+	{
+		Poly[i] = MontgomeryReduce(Poly[i] * Factors[i]);
+	}
+}
+
+void RLWEQ12289N1024::Ntt(std::array<ushort, RLWE_N> &A, const std::array<ushort, 512> &Omega)
+{
+	size_t distance;
+	size_t start;
+	size_t j;
+	size_t jTwiddle;
+	int32_t i;
+	ushort temp;
+	ushort W;
+
+	for (i = 0; i < 10; i += 2)
+	{
+		// Even level
+		distance = ((size_t)1 << i);
+		for (start = 0; start < distance; start++)
+		{
+			jTwiddle = 0;
+			for (j = start; j < RLWE_N - 1; j += 2 * distance)
+			{
+				W = Omega[jTwiddle++];
+				temp = A[j];
+				A[j] = (temp + A[j + distance]);
+				A[j + distance] = MontgomeryReduce((W * (static_cast<uint>(temp) + (3 * RLWE_Q) - A[j + distance])));
+			}
+		}
+
+		// Odd level
+		distance <<= 1;
+		for (start = 0; start < distance; start++)
+		{
+			jTwiddle = 0;
+			for (j = start; j < RLWE_N - 1; j += 2 * distance)
+			{
+				W = Omega[jTwiddle++];
+				temp = A[j];
+				A[j] = (temp + A[j + distance]) % RLWE_Q;
+				A[j + distance] = MontgomeryReduce((W * (static_cast<uint>(temp) + (3 * RLWE_Q) - A[j + distance])));
+			}
+		}
+	}
+}
+
+void RLWEQ12289N1024::PolyAdd(std::array<ushort, RLWE_N> &R, const std::array<ushort, RLWE_N> &A, const std::array<ushort, RLWE_N> &B)
+{
+	size_t i;
+
+	for (i = 0; i < RLWE_N; ++i)
+	{
+		R[i] = (A[i] + B[i]) % RLWE_Q;
+	}
+}
+
+void RLWEQ12289N1024::PolyCompress(std::vector<byte> &R, const std::array<ushort, RLWE_N> &P)
+{
+	std::array<uint, 8> t;
+	size_t i;
+	size_t j;
+	size_t k;
+
+	k = 0;
+
+	for (i = 0; i < RLWE_N; i += 8)
+	{
+		for (j = 0; j < 8; j++)
+		{
+			t[j] = Freeze(P[i + j]);
+			t[j] = (((t[j] << 3) + RLWE_Q / 2) / RLWE_Q) & 0x7;
+		}
+
+		R[RLWE_POLY_SIZE + k] = t[0] | (t[1] << 3) | (t[2] << 6);
+		R[RLWE_POLY_SIZE + k + 1] = (t[2] >> 2) | (t[3] << 1) | (t[4] << 4) | (t[5] << 7);
+		R[RLWE_POLY_SIZE + k + 2] = (t[5] >> 1) | (t[6] << 2) | (t[7] << 5);
+		k += 3;
+	}
+}
+
+void RLWEQ12289N1024::PolyDecompress(std::array<ushort, RLWE_N> &R, const std::vector<byte> &A)
+{
+	size_t i;
+	size_t j;
+	size_t k;
+
+	k = 0;
+
+	for (i = 0; i < RLWE_N; i += 8)
+	{
+		R[i] = A[RLWE_POLY_SIZE + k] & 7;
+		R[i + 1] = (A[RLWE_POLY_SIZE + k] >> 3) & 7;
+		R[i + 2] = (A[RLWE_POLY_SIZE + k] >> 6) | ((A[RLWE_POLY_SIZE + k + 1] << 2) & 4);
+		R[i + 3] = (A[RLWE_POLY_SIZE + k + 1] >> 1) & 7;
+		R[i + 4] = (A[RLWE_POLY_SIZE + k + 1] >> 4) & 7;
+		R[i + 5] = (A[RLWE_POLY_SIZE + k + 1] >> 7) | ((A[RLWE_POLY_SIZE + k + 2] << 1) & 6);
+		R[i + 6] = (A[RLWE_POLY_SIZE + k + 2] >> 2) & 7;
+		R[i + 7] = (A[RLWE_POLY_SIZE + k + 2] >> 5);
+		k += 3;
+
+		for (j = 0; j < 8; ++j)
+		{
+			R[i + j] = (static_cast<uint>(R[i + j]) * RLWE_Q + 4) >> 3;
+		}
 	}
 }
 
 void RLWEQ12289N1024::PolyFromBytes(std::array<ushort, RLWE_N> &R, const std::vector<byte> &A)
 {
-	for (size_t i = 0; i < RLWE_N / 4; ++i)
+	size_t i;
+
+	for (i = 0; i < RLWE_N / 4; ++i)
 	{
 		R[(4 * i)] = A[(7 * i)] | ((static_cast<ushort>(A[(7 * i) + 1]) & 0x3F) << 8);
-		R[(4 * i) + 1] = (A[(7 * i) + 1] >> 6) | ((static_cast<ushort>(A[(7 * i) + 2]) << 2) | ((static_cast<ushort>(A[(7 * i) + 3]) & 0x0F) << 10));
-		R[(4 * i) + 2] = (A[(7 * i) + 3] >> 4) | ((static_cast<ushort>(A[(7 * i) + 4]) << 4) | ((static_cast<ushort>(A[(7 * i) + 5]) & 0x03) << 12));
-		R[(4 * i) + 3] = (A[(7 * i) + 5] >> 2) | ((static_cast<ushort>(A[(7 * i) + 6]) << 6));
+		R[(4 * i) + 1] = (A[(7 * i) + 1] >> 6) | (static_cast<ushort>(A[(7 * i) + 2]) << 2) | ((static_cast<ushort>(A[(7 * i) + 3]) & 0x0F) << 10);
+		R[(4 * i) + 2] = (A[(7 * i) + 3] >> 4) | (static_cast<ushort>(A[(7 * i) + 4]) << 4) | ((static_cast<ushort>(A[(7 * i) + 5]) & 0x03) << 12);
+		R[(4 * i) + 3] = (A[(7 * i) + 5] >> 2) | (static_cast<ushort>(A[(7 * i) + 6]) << 6);
 	}
 }
 
-void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed)
+void RLWEQ12289N1024::PolyFromMessage(std::array<ushort, RLWE_N> &R, const std::vector<byte> &Message)
 {
-	Drbg::BCG eng(Enumeration::BlockCiphers::Rijndael);
-	size_t bufLen = (2 * RLWE_N) * sizeof(ushort);
+	size_t i;
+	size_t j;
+	uint mask;
 
-#if defined(CEX_HAS_OPENMP) && defined(CEX_RLWE_PARALLEL)
-	if (bufLen >= eng.ParallelProfile().ParallelMinimumSize())
+	for (i = 0; i < 32; ++i)
 	{
-		bufLen -= (bufLen % eng.ParallelProfile().ParallelMinimumSize());
-		eng.ParallelProfile().ParallelBlockSize() = bufLen;
-	}
-#else
-	eng.ParallelProfile().IsParallel() = false;
-#endif
-
-	eng.Initialize(Seed);
-	std::vector<byte> buf(bufLen);
-	eng.Generate(buf, 0, buf.size());
-
-	size_t ctr = 0;
-	size_t pos = 0;
-	ushort val;
-
-	while (ctr < RLWE_N)
-	{
-		// 0x3fff/16393 - Specialized for q = 12889
-		val = ((buf[pos] | (static_cast<ushort>(buf[pos + 1]) << 8)) & 0x3FFFU);
-		if (val < RLWE_Q)
+		for (j = 0; j < 8; ++j)
 		{
-			A[ctr] = val;
-			++ctr;
-		}
-
-		pos += 2;
-		if (pos >= buf.size())
-		{
-			eng.Generate(buf, 0, buf.size());
-			pos = 0;
+			mask = -((Message[i] >> j) & 1);
+			R[(8 * i) + j] = mask & (RLWE_Q / 2);
+			R[(8 * i) + j + 256] = mask & (RLWE_Q / 2); // end param 512
+			R[(8 * i) + j + 512] = mask & (RLWE_Q / 2);
+			R[(8 * i) + j + 768] = mask & (RLWE_Q / 2);
 		}
 	}
 }
 
-void RLWEQ12289N1024::RecHelper(std::array<ushort, RLWE_N> &C, const std::array<ushort, RLWE_N> &V, std::vector<byte> &Random)
+void RLWEQ12289N1024::PolyInvNtt(std::array<ushort, RLWE_N> &R)
 {
-#if defined(__AVX512__)
-	HelpRec<Numeric::UInt512, std::array<ushort, RLWE_N>, std::vector<byte>>(C, V, Random, RLWE_Q);
-#elif defined(__AVX2__)
-	HelpRec<Numeric::UInt256, std::array<ushort, RLWE_N>, std::vector<byte>>(C, V, Random, RLWE_Q);
-#elif defined(__AVX__)
-	HelpRec<Numeric::UInt128, std::array<ushort, RLWE_N>, std::vector<byte>>(C, V, Random, RLWE_Q);
-#else
-	HelpRec<int, std::array<ushort, RLWE_N>, std::vector<byte>>(C, V, Random, RLWE_Q);
-#endif
+	BitRevVector(R);
+	Ntt(R, OmegasInvMontgomery);
+	MulCoefficients(R, PsisInvMontgomery);
 }
 
-void RLWEQ12289N1024::Reconcile(std::vector<byte> &Key, const std::array<ushort, RLWE_N> &V, const std::array<ushort, RLWE_N> &C)
+void RLWEQ12289N1024::PolyMulPointwise(std::array<ushort, RLWE_N> &R, const std::array<ushort, RLWE_N> &A, const std::array<ushort, RLWE_N> &B)
 {
-#if defined(__AVX512__)
-	Rec<Numeric::UInt512, std::vector<byte>, std::array<ushort, RLWE_N>>(Key, V, C, RLWE_Q);
-#elif defined(__AVX2__)
-	Rec<Numeric::UInt256, std::vector<byte>, std::array<ushort, RLWE_N>>(Key, V, C, RLWE_Q);
-#elif defined(__AVX__)
-	Rec<Numeric::UInt128, std::vector<byte>, std::array<ushort, RLWE_N>>(Key, V, C, RLWE_Q);
-#else
-	Rec<int, std::vector<byte>, std::array<ushort, RLWE_N>>(Key, V, C, RLWE_Q);
-#endif
+	size_t i;
+	ushort t;
+
+	for (i = 0; i < RLWE_N; ++i)
+	{
+		// t is now in Montgomery domain
+		t = MontgomeryReduce(3186 * B[i]);
+		// r->coeffs[i] is back in normal domain
+		R[i] = MontgomeryReduce(A[i] * t);
+	}
 }
 
-void RLWEQ12289N1024::ToBytes(std::vector<byte> &R, const std::array<ushort, RLWE_N> &Poly)
+void RLWEQ12289N1024::PolyNtt(std::array<ushort, RLWE_N> &R)
 {
-	short c;
-	ushort m;
+	MulCoefficients(R, PsisBitrevMontgomery);
+	Ntt(R, OmegasMontgomery);
+}
+
+void RLWEQ12289N1024::PolySample(std::array<ushort, RLWE_N> &R, const std::vector<byte> &Seed, byte Nonce)
+{
+	std::vector<byte> buf(128);
+	std::vector<byte> extseed(RLWE_SEED_SIZE + 2);
+	size_t i;
+	size_t j;
+	uint8_t a;
+	uint8_t b;
+
+	for (i = 0; i < RLWE_SEED_SIZE; ++i)
+	{
+		extseed[i] = Seed[i];
+	}
+
+	extseed[RLWE_SEED_SIZE] = Nonce;
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+
+	/* Generate noise in blocks of 64 coefficients */
+	for (i = 0; i < RLWE_N / 64; ++i)
+	{
+		extseed[RLWE_SEED_SIZE + 1] = static_cast<uint8_t>(i);
+		gen.Initialize(extseed);
+		gen.Generate(buf);
+
+		for (j = 0; j < 64; j++)
+		{
+			a = buf[(2 * j)];
+			b = buf[(2 * j) + 1];
+			R[(64 * i) + j] = HammimgWeight(a) + (RLWE_Q - HammimgWeight(b));
+		}
+	}
+}
+
+void RLWEQ12289N1024::PolySub(std::array<ushort, RLWE_N> &R, const std::array<ushort, RLWE_N> &A, const std::array<ushort, RLWE_N> &B)
+{
+	size_t i;
+
+	for (i = 0; i < RLWE_N; ++i)
+	{
+		R[i] = (A[i] + 3 * RLWE_Q - B[i]) % RLWE_Q;
+	}
+}
+
+void RLWEQ12289N1024::PolyToBytes(std::vector<byte> &R, const std::array<ushort, RLWE_N> &P)
+{
+	size_t i;
 	ushort t0;
 	ushort t1;
 	ushort t2;
 	ushort t3;
 
-	for (size_t i = 0; i < Poly.size() / 4; i++)
+	for (i = 0; i < RLWE_N / 4; ++i)
 	{
-		// make sure that coefficients have only 14 bits
-		t0 = Utility::PolyMath::BarrettReduce(Poly[(4 * i)]);
-		t1 = Utility::PolyMath::BarrettReduce(Poly[(4 * i) + 1]);
-		t2 = Utility::PolyMath::BarrettReduce(Poly[(4 * i) + 2]);
-		t3 = Utility::PolyMath::BarrettReduce(Poly[(4 * i) + 3]);
+		t0 = Freeze(P[(4 * i)]);
+		t1 = Freeze(P[(4 * i) + 1]);
+		t2 = Freeze(P[(4 * i) + 2]);
+		t3 = Freeze(P[(4 * i) + 3]);
 
-		// make sure that coefficients are in [0,q]
-		m = t0 - RLWE_Q;
-		c = m;
-		c >>= 15;
-		t0 = m ^ ((t0 ^ m) & c);
-		m = t1 - RLWE_Q;
-		c = m;
-		c >>= 15;
-		t1 = m ^ ((t1 ^ m) & c);
-		m = t2 - RLWE_Q;
-		c = m;
-		c >>= 15;
-		t2 = m ^ ((t2 ^ m) & c);
-		m = t3 - RLWE_Q;
-		c = m;
-		c >>= 15;
-		t3 = m ^ ((t3 ^ m) & c);
+		R[(7 * i)] = t0 & 0xff;
+		R[(7 * i) + 1] = (t0 >> 8) | (t1 << 6);
+		R[(7 * i) + 2] = (t1 >> 2);
+		R[(7 * i) + 3] = (t1 >> 10) | (t2 << 4);
+		R[(7 * i) + 4] = (t2 >> 4);
+		R[(7 * i) + 5] = (t2 >> 12) | (t3 << 2);
+		R[(7 * i) + 6] = (t3 >> 6);
+	}
+}
 
-		R[(7 * i)] = static_cast<byte>(t0 & 0xFF);
-		R[(7 * i) + 1] = static_cast<byte>((t0 >> 8) | (t1 << 6));
-		R[(7 * i) + 2] = static_cast<byte>(t1 >> 2);
-		R[(7 * i) + 3] = static_cast<byte>((t1 >> 10) | (t2 << 4));
-		R[(7 * i) + 4] = static_cast<byte>(t2 >> 4);
-		R[(7 * i) + 5] = static_cast<byte>((t2 >> 12) | (t3 << 2));
-		R[(7 * i) + 6] = static_cast<byte>(t3 >> 6);
+void RLWEQ12289N1024::PolyTomessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X)
+{
+	size_t i;
+	ushort t;
+
+	for (i = 0; i < 32; ++i)
+	{
+		Message[i] = 0;
+	}
+
+	for (i = 0; i < 256; ++i)
+	{
+		t = FlipAbs(X[i]);
+		t += FlipAbs(X[i + 256]);
+		t += FlipAbs(X[i + 512]);
+		t += FlipAbs(X[i + 768]);
+		t = ((t - RLWE_Q));
+		t >>= 15;
+		Message[i >> 3] |= t << (i & 7);
+	}
+}
+
+void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed)
+{
+	const size_t SHAKE128_RATE = 168;
+	std::vector<byte> buf(SHAKE128_RATE);
+	std::vector<byte> extseed(RLWE_SEED_SIZE + 1);
+	size_t ctr;
+	size_t i;
+	size_t j;
+	ushort val;
+
+	for (i = 0; i < RLWE_SEED_SIZE; ++i)
+	{
+		extseed[i] = Seed[i];
+	}
+
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE128);
+	ctr = 0;
+	// generate a in blocks of 64 coefficients
+	for (i = 0; i < RLWE_N / 64; ++i)
+	{
+		ctr = 0;
+		// domain-separate the 16 independent calls
+		extseed[RLWE_SEED_SIZE] = (uint8_t)i;
+		gen.Initialize(extseed);
+		// very unlikely to run more than once
+		while (ctr < 64)
+		{
+			gen.Generate(buf);
+
+			for (j = 0; j < SHAKE128_RATE && ctr < 64; j += 2)
+			{
+				val = (buf[j] | ((ushort)buf[j + 1] << 8));
+				if (val < 5 * RLWE_Q)
+				{
+					A[i * 64 + ctr] = val;
+					ctr++;
+				}
+			}
+		}
 	}
 }
 

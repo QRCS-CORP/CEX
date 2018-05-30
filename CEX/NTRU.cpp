@@ -40,7 +40,6 @@ NTRU::NTRU(NTRUParams Parameters, IPrng* Prng)
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("NTRU:CTor", "The prng can not be null!"))
 {
-	NTRUSQ4591N761::SelfTest();
 }
 
 NTRU::~NTRU()

@@ -1,7 +1,7 @@
 #include "RingLWE.h"
-#include "RLWEQ12289N512.h"
 #include "RLWEQ12289N1024.h"
 #include "IntUtils.h"
+#include "Keccak256.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
@@ -38,6 +38,7 @@ RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng)
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The prng can not be null!"))
 {
+	//RLWEQ12289N1024::SelfTest();
 }
 
 RingLWE::~RingLWE()
@@ -110,9 +111,9 @@ const std::string RingLWE::Name()
 	{
 		ret += "Q12289N1024";
 	}
-	else if (m_rlweParameters == RLWEParams::Q12289N512)
+	else
 	{
-		ret += "Q12289N512";
+		ret += "UNKNOWN";
 	}
 
 	return ret;
@@ -130,30 +131,48 @@ void RingLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte>
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
 
-	std::vector<byte> secret(32);
+	std::vector<byte> buf(2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
+	std::vector<byte> cmp(CipherText.size());
+	std::vector<byte> coin(RLWEQ12289N1024::RLWE_SEED_SIZE);
+	std::vector<byte> kr(2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
+	std::vector<byte> pk(RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
 
-	if (m_rlweParameters == RLWEParams::Q12289N1024)
+	int32_t result;
+
+	// decrypt the key
+	RLWEQ12289N1024::Decrypt(buf, CipherText, m_privateKey->R());
+
+	// multitarget countermeasure for coins + contributory KEM
+	std::memcpy((byte*)buf.data() + RLWEQ12289N1024::RLWE_SEED_SIZE, (byte*)m_privateKey->R().data() + (m_privateKey->R().size() - (2 * RLWEQ12289N1024::RLWE_SEED_SIZE)), RLWEQ12289N1024::RLWE_SEED_SIZE);
+
+	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	shk256.Initialize(buf);
+	shk256.Generate(kr);
+
+	// coins are in kr+RLWE_SEED_SIZE
+	std::memcpy((byte*)coin.data(), (byte*)kr.data() + RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	std::memcpy((byte*)pk.data(), (byte*)m_privateKey->R().data() + RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, pk.size());
+	RLWEQ12289N1024::Encrypt(cmp, buf, pk, coin);
+
+	// verify the code
+	result = Verify(CipherText, cmp, CipherText.size());
+
+	// overwrite coins in kr with H(c)
+	Digest::Keccak256 dgt256;
+	dgt256.Update(CipherText, 0, CipherText.size());
+	dgt256.Finalize(kr, RLWEQ12289N1024::RLWE_SEED_SIZE);
+
+	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
+	shk256.Initialize(kr, m_domainKey);
+	shk256.Generate(SharedSecret);
+
+	// overwrite pre-k with z on re-encryption failure
+	Utility::IntUtils::CMov(kr, 0, m_privateKey->R(), m_privateKey->R().size() - RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE, result);
+
+	if (result != 0)
 	{
-		CexAssert(CipherText.size() >= RLWEQ12289N1024::RLWE_CIPHERTEXT_SIZE, "The input message is too small");
-
-		// process message from B and return shared secret
-		RLWEQ12289N1024::Decrypt(secret, m_privateKey->R(), CipherText);
+		throw CryptoAuthenticationFailure("RingLWE:Decrypt", "Decryption authentication failure!");
 	}
-	else if (m_rlweParameters == RLWEParams::Q12289N512)
-	{
-		CexAssert(CipherText.size() >= RLWEQ12289N512::RLWE_CIPHERTEXT_SIZE, "The input message is too small");
-
-		// process message from B and return shared secret
-		RLWEQ12289N512::Decrypt(secret, m_privateKey->R(), CipherText);
-	}
-	else
-	{
-		throw CryptoAsymmetricException("RingLWE:Decrypt", "The parameter type is invalid!");
-	}
-
-	Kdf::SHAKE gen;
-	gen.Initialize(secret, m_domainKey);
-	gen.Generate(SharedSecret);
 }
 
 void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
@@ -161,64 +180,60 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
 
-	std::vector<byte> secret(32);
+	std::vector<byte> buf(2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
+	std::vector<byte> coin(RLWEQ12289N1024::RLWE_SEED_SIZE);
+	std::vector<byte> kr(2 * RLWEQ12289N1024::RLWE_SEED_SIZE);
 
-	if (m_rlweParameters == RLWEParams::Q12289N1024)
-	{
-		CexAssert(m_publicKey->P().size() >= RLWEQ12289N1024::RLWE_PUBLICKEY_SIZE, "The input message is too small");
+	CipherText.resize(RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE);
 
-		CipherText.resize(RLWEQ12289N1024::RLWE_CIPHERTEXT_SIZE);
+	m_rndGenerator->GetBytes(buf, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	// don't release system RNG output
+	Digest::Keccak256 dgt256;
+	dgt256.Update(buf, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	dgt256.Finalize(buf, 0);
 
-		// generate B reply and store secret
-		RLWEQ12289N1024::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
-	}
-	else if (m_rlweParameters == RLWEParams::Q12289N512)
-	{
-		CexAssert(m_publicKey->P().size() >= RLWEQ12289N512::RLWE_PUBLICKEY_SIZE, "The input message is too small");
+	// multitarget countermeasure for coins + contributory KEM
+	dgt256.Update(m_publicKey->P(), 0, m_publicKey->P().size());
+	dgt256.Finalize(buf, RLWEQ12289N1024::RLWE_SEED_SIZE);
 
-		CipherText.resize(RLWEQ12289N512::RLWE_CIPHERTEXT_SIZE);
+	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	shk256.Initialize(buf);
+	shk256.Generate(kr);
 
-		// generate B reply and store secret
-		RLWEQ12289N512::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
-	}
-	else
-	{
-		throw CryptoAsymmetricException("RingLWE:Encrypt", "The parameter type is invalid!");
-	}
+	// coins are in kr+KYBER_KEYBYTES
+	std::memcpy(coin.data(), kr.data() + RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	RLWEQ12289N1024::Encrypt(CipherText, buf, m_publicKey->P(), coin);
 
-	Kdf::SHAKE gen;
-	gen.Initialize(secret, m_domainKey);
-	gen.Generate(SharedSecret);
+	// overwrite coins in kr with H(c)
+	dgt256.Update(CipherText, 0, CipherText.size());
+	dgt256.Finalize(kr, RLWEQ12289N1024::RLWE_SEED_SIZE);
+
+	// hash concatenation of pre-k and H(c) to k
+	shk256.Initialize(kr, m_domainKey);
+	shk256.Generate(SharedSecret);
 }
 
 IAsymmetricKeyPair* RingLWE::Generate()
 {
 	CexAssert(m_rlweParameters != RLWEParams::None, "The parameter setting is invalid");
 
-	std::vector<byte> pka(0);
-	std::vector<ushort> ska(0);
+	std::vector<byte> pkA(RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
+	std::vector<byte> skA(RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE);
+	RLWEQ12289N1024::Generate(pkA, skA, m_rndGenerator);
+	std::vector<byte> buff(64);
 
-	if (m_rlweParameters == RLWEParams::Q12289N1024)
-	{
-		pka.resize(RLWEQ12289N1024::RLWE_PUBLICKEY_SIZE);
-		ska.resize(RLWEQ12289N1024::RLWE_PRIVATEKEY_SIZE);
+	Digest::Keccak256 dgt256;
+	dgt256.Update(pkA, 0, pkA.size());
+	// add the hash of the public key to the secret key
+	dgt256.Finalize(buff, 0);
+	// value z for pseudo-random output on reject
+	m_rndGenerator->GetBytes(buff, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	// copy the private key
+	std::memcpy((byte*)skA.data() + RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, (byte*)pkA.data(), pkA.size());
+	std::memcpy((byte*)skA.data() + skA.size() - (2 * RLWEQ12289N1024::RLWE_SEED_SIZE), buff.data(), (2 * RLWEQ12289N1024::RLWE_SEED_SIZE));
 
-		RLWEQ12289N1024::Generate(pka, ska, m_rndGenerator);
-	}
-	else if (m_rlweParameters == RLWEParams::Q12289N512)
-	{
-		pka.resize(RLWEQ12289N512::RLWE_PUBLICKEY_SIZE);
-		ska.resize(RLWEQ12289N512::RLWE_PRIVATEKEY_SIZE);
-
-		RLWEQ12289N512::Generate(pka, ska, m_rndGenerator);
-	}
-	else
-	{
-		throw CryptoAsymmetricException("RingLWE:Generate", "The parameter type is invalid!");
-	}
-
-	Key::Asymmetric::RLWEPublicKey* pk = new Key::Asymmetric::RLWEPublicKey(m_rlweParameters, pka);
-	Key::Asymmetric::RLWEPrivateKey* sk = new Key::Asymmetric::RLWEPrivateKey(m_rlweParameters, ska);
+	Key::Asymmetric::RLWEPublicKey* pk = new Key::Asymmetric::RLWEPublicKey(m_rlweParameters, pkA);
+	Key::Asymmetric::RLWEPrivateKey* sk = new Key::Asymmetric::RLWEPrivateKey(m_rlweParameters, skA);
 
 	return new Key::Asymmetric::RLWEKeyPair(sk, pk);
 }
@@ -244,6 +259,22 @@ void RingLWE::Initialize(IAsymmetricKey* Key)
 	}
 
 	m_isInitialized = true;
+}
+
+int32_t RingLWE::Verify(const std::vector<byte> &A, const std::vector<byte> &B, size_t Length)
+{
+	// Note: bizzare non-const-time behavior if placed in IntUtils, why?
+	size_t i;
+	int32_t r;
+
+	r = 0;
+
+	for (i = 0; i < Length; ++i)
+	{
+		r |= (A[i] ^ B[i]);
+	}
+
+	return r;
 }
 
 NAMESPACE_RINGLWEEND

@@ -40,30 +40,35 @@ using Key::Asymmetric::NTRUPublicKey;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// NTRU asycpr(NTRUParams::Q4591P761P);
+/// NTRU asycpr(NTRUParams::LQ4591N761);
 /// IAsymmetricKeyPair* kp = asycpr.Generate();
 /// 
 /// // serialize the public key
 /// NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; skey = pubK1->ToBytes();
+/// std:vector&lt;byte&gt; pk = pubK1->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// NTRU asycpr(NTRUParams::Q4591P761P);
-/// asycpr.Initialize(true, kp);
+/// NTRU asycpr(NTRUParams::LQ4591N761);
+/// asycpr.Initialize(pk);
 /// 
-/// std:vector&lt;byte&gt; cpt = asycpr.Encrypt(msg);
+/// std:vector&lt;byte&gt; cpt;
+/// std:vector&lt;byte&gt; secret(32);
+/// // generate the ciphertext and shared secret
+/// asycpr.Encapsulate(cpt, secret);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// NTRU asycpr(NTRUParams::Q4591P761P);
-/// asycpr.Initialize(false, kp);
+/// NTRU asycpr(NTRUParams::LQ4591N761);
+/// asycpr.Initialize(sk);
+/// std:vector&lt;byte&gt; secret(32);
 /// 
 /// try
 /// {
-///		std:vector&lt;byte&gt; msg = asycpr.Decrypt(cpt);
+/// // decrypt the ciphertext and output the shared secret
+///		asycpr.Decapsulate(cpt, secret);
 /// }
 /// catch (const CryptoAuthenticationFailure &ex)
 /// {
@@ -82,15 +87,15 @@ using Key::Asymmetric::NTRUPublicKey;
 /// <item><description></description></item>
 /// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
-/// <item><description></description></item>
-/// <item><description></description></item>
 /// <item><description>The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
 /// 
 /// <description>Guiding Publications:</description>
 /// <list type="number">
-/// <item><description>The NewHope: <a href="https://eprint.iacr.org/2015/1092">key exchange</a> from the ring learning with errors problem.</description></item>
-/// <item><description>A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exchange</a> Scheme Based on the Learning with Errors Problem.</description></item>
+/// <item><description>Software: <a href="https://ntruprime.cr.yp.to/software.html">NTRU Prime</a> Software.</description></item>
+/// <item><description>Reference Paper : <a href="https://ntruprime.cr.yp.to/ntruprime-20160511.pdf">NTRU Prime</a>.</description></item>
+/// <item><description>Reference: <a href="https://ntruprime.cr.yp.to/divergence-20180430.pdf">Divergence bounds for random fixed-weight vectors obtained by sorting</a>.</description></item>
+/// <item><description>Website: <a href="https://ntruprime.cr.yp.to/">NTRU Prime Website</a></description></item>.
 /// </list>
 /// </remarks>
 class NTRU final : public IAsymmetricCipher

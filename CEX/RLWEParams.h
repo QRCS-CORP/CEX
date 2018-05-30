@@ -17,11 +17,7 @@ enum class RLWEParams : byte
 	/// <summary>
 	/// A modulus of 12289 with 1024 coefficients
 	/// </summary>
-	Q12289N1024 = 1,
-	/// <summary>
-	/// A modulus of 12289 with 512 coefficients
-	/// </summary>
-	Q12289N512 = 1
+	Q12289N1024 = 1
 };
 
 NAMESPACE_ENUMERATIONEND

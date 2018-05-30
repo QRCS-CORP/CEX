@@ -253,7 +253,7 @@
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\MPKCM12T62.h" />
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h" />
-    <ClInclude Include="..\..\CEX\RLWEQ12289N512.h" />
+    <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
     <ClInclude Include="..\..\CEX\NTRULQ4591N761.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
     <ClInclude Include="..\..\CEX\Drbgs.h" />
@@ -292,7 +292,6 @@
     <ClInclude Include="..\..\CEX\KeccakParams.h" />
     <ClInclude Include="..\..\CEX\McEliece.h" />
     <ClInclude Include="..\..\CEX\MemUtils.h" />
-    <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
     <ClInclude Include="..\..\CEX\MLWEKeyPair.h" />
     <ClInclude Include="..\..\CEX\MLWEParams.h" />
     <ClInclude Include="..\..\CEX\MLWEPrivateKey.h" />
@@ -441,7 +440,6 @@
     <ClCompile Include="..\..\CEX\MPKCM12T62.cpp" />
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
-    <ClCompile Include="..\..\CEX\RLWEQ12289N512.cpp" />
     <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
     <ClCompile Include="..\..\CEX\GCM.cpp" />

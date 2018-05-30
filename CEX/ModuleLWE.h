@@ -40,30 +40,35 @@ using Key::Asymmetric::MLWEPublicKey;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// ModuleLWE asycpr(MLWEParams::Q12289N1024);
+/// ModuleLWE asycpr(MLWEParams::Q7681N256K3);
 /// IAsymmetricKeyPair* kp = asycpr.Generate();
 /// 
 /// // serialize the public key
 /// MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; skey = pubK1->ToBytes();
+/// std:vector&lt;byte&gt; pk = pubK1->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// ModuleLWE asycpr(MLWEParams::Q12289N1024);
-/// asycpr.Initialize(kp);
+/// ModuleLWE asycpr(MLWEParams::Q7681N256K3);
+/// asycpr.Initialize(pk);
 /// 
-/// std:vector&lt;byte&gt; cpt = asycpr.Encrypt(msg);
+/// std:vector&lt;byte&gt; cpt;
+/// std:vector&lt;byte&gt; secret(32);
+/// // generate the ciphertext and shared secret
+/// asycpr.Encapsulate(cpt, secret);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// ModuleLWE asycpr(MLWEParams::Q12289N1024);
-/// asycpr.Initialize(kp);
+/// ModuleLWE asycpr(MLWEParams::Q7681N256K3);
+/// asycpr.Initialize(sk);
+/// std:vector&lt;byte&gt; secret(32);
 /// 
 /// try
 /// {
-///		std:vector&lt;byte&gt; msg = asycpr.Decrypt(cpt);
+/// // decrypt the ciphertext and output the shared secret
+///		asycpr.Decapsulate(cpt, secret);
 /// }
 /// catch (const CryptoAuthenticationFailure &ex)
 /// {

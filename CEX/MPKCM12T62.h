@@ -37,11 +37,11 @@ class MPKCM12T62
 {
 private:
 
-	static const size_t PKN_ROWS = (62 * 12);
-	static const size_t PKN_COLS = ((static_cast<size_t>(1) << 12) - 62 * 12);
-	static const size_t IRR_SIZE = (12 * 8);
-	static const size_t CND_SIZE = ((PKN_ROWS - 8) * 8);
-	static const size_t GEN_MAXR = 10000;
+	static const size_t MPKC_PKN_ROWS = (62 * 12);
+	static const size_t MPKC_PKN_COLS = ((static_cast<size_t>(1) << 12) - 62 * 12);
+	static const size_t MPKC_IRR_SIZE = (12 * 8);
+	static const size_t MPKC_CND_SIZE = ((MPKC_PKN_ROWS - 8) * 8);
+	static const size_t MPKC_GEN_MAXR = 10000;
 	static const std::array<std::array<ulong, 12>, 63> ButterflyConsts;
 	static const std::array<std::array<ulong, 12>, 64> GfPoints;
 	static const std::array<std::array<std::array<ulong, 12>, 2>, 5> RadixTrScalar;
@@ -61,24 +61,39 @@ public:
 	static const size_t MPKC_T = 62; 
 
 	/// <summary>
+	/// The seed size in bytes
+	/// </summary>
+	static const size_t MPKC_SEED_SIZE = 64;
+
+	/// <summary>
 	/// The secret size in bytes
 	/// </summary>
-	static const size_t MPKC_CIPHERTEXT_SIZE = (PKN_ROWS / 8);
+	static const size_t MPKC_CPACIPHERTEXT_SIZE = (MPKC_PKN_ROWS / 8);
 
 	/// <summary>
 	/// The private key size in bytes
 	/// </summary>
-	static const size_t MPKC_PRIVATEKEY_SIZE = CND_SIZE + IRR_SIZE;
+	static const size_t MPKC_CPAPRIVATEKEY_SIZE = (MPKC_CND_SIZE + MPKC_IRR_SIZE);
 
 	/// <summary>
 	/// The public key size in bytes
 	/// </summary>
-	static const size_t MPKC_PUBLICKEY_SIZE = (PKN_ROWS * ((64 - MPKC_M) * 8)) + (PKN_ROWS * (8 - ((PKN_ROWS & 63) >> 3)));
+	static const size_t MPKC_CPAPUBLICKEY_SIZE = (MPKC_PKN_ROWS * ((64 - MPKC_M) * 8)) + (MPKC_PKN_ROWS * (8 - ((MPKC_PKN_ROWS & 63) >> 3)));
 
 	/// <summary>
-	/// The seed size in bytes
+	/// The byte size of the CCA public key polynomial
 	/// </summary>
-	static const size_t MPKC_SEED_SIZE = 64;
+	static const size_t MPKC_CCAPUBLICKEY_SIZE = MPKC_CPAPUBLICKEY_SIZE;
+
+	/// <summary>
+	/// The byte size of the CCA private key polynomial
+	/// </summary>
+	static const size_t MPKC_CCAPRIVATEKEY_SIZE = (MPKC_CPAPRIVATEKEY_SIZE + (2 * MPKC_SEED_SIZE));
+
+	/// <summary>
+	/// The byte size of the CCA cipher-text
+	/// </summary>
+	static const size_t MPKC_CCACIPHERTEXT_SIZE = (MPKC_CPACIPHERTEXT_SIZE + MPKC_SEED_SIZE);
 
 	//~~~Public Functions~~~//
 

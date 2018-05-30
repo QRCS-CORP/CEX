@@ -17,7 +17,7 @@ class RLWEPrivateKey final : public IAsymmetricKey
 private:
 
 	bool m_isDestroyed;
-	std::vector<ushort> m_rCoeffs;
+	std::vector<byte> m_rCoeffs;
 	RLWEParams m_rlweParameters;
 
 public:
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="R">The private key polynomial</param>
-	RLWEPrivateKey(RLWEParams Parameters, std::vector<ushort> &R);
+	RLWEPrivateKey(RLWEParams Parameters, std::vector<byte> &R);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
@@ -79,7 +79,7 @@ public:
 	/// <summary>
 	/// Read Only: the private key polynomial R
 	/// </summary>
-	const std::vector<ushort> &R();
+	const std::vector<byte> &R();
 
 	//~~~Public Functions~~~//
 

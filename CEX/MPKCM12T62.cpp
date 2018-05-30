@@ -742,9 +742,9 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 	ulong diff;
 	ulong t;
 
-	std::array<ulong, CND_SIZE / 8> cond;
+	std::array<ulong, MPKC_CND_SIZE / 8> cond;
 
-	IntUtils::BlockToLe(PrivateKey, IRR_SIZE, cond, 0, CND_SIZE);
+	IntUtils::BlockToLe(PrivateKey, MPKC_IRR_SIZE, cond, 0, MPKC_CND_SIZE);
 	std::vector<ulong> recv(64);
 	PreProcess(recv, S);
 	McElieceUtils::BenesCompact(recv, cond, 1);
@@ -832,7 +832,7 @@ bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Priva
 {
 	size_t ctr;
 
-	for (ctr = 0; ctr < GEN_MAXR; ++ctr)
+	for (ctr = 0; ctr < MPKC_GEN_MAXR; ++ctr)
 	{
 		SkGen(PrivateKey, Random);
 
@@ -842,7 +842,7 @@ bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Priva
 		}
 	}
 
-	return (ctr < GEN_MAXR) ? true : false;
+	return (ctr < MPKC_GEN_MAXR) ? true : false;
 }
 
 //~~~Private Functions~~~//
@@ -969,18 +969,18 @@ void MPKCM12T62::BerlekampMassey(std::array<ulong, MPKC_M> &Output, std::array<s
 
 void MPKCM12T62::PreProcess(std::vector<ulong> &Received, const std::vector<byte> &S)
 {
-	IntUtils::BlockToLe(S, 0, Received, 0, MPKC_CIPHERTEXT_SIZE - 5);
+	IntUtils::BlockToLe(S, 0, Received, 0, MPKC_CPACIPHERTEXT_SIZE - 5);
 
-	Received[MPKC_CIPHERTEXT_SIZE / 8] <<= 8;
-	Received[MPKC_CIPHERTEXT_SIZE / 8] |= S[((MPKC_CIPHERTEXT_SIZE / 8) * 8) + 4];
-	Received[MPKC_CIPHERTEXT_SIZE / 8] <<= 8;
-	Received[MPKC_CIPHERTEXT_SIZE / 8] |= S[((MPKC_CIPHERTEXT_SIZE / 8) * 8) + 3];
-	Received[MPKC_CIPHERTEXT_SIZE / 8] <<= 8;
-	Received[MPKC_CIPHERTEXT_SIZE / 8] |= S[((MPKC_CIPHERTEXT_SIZE / 8) * 8) + 2];
-	Received[MPKC_CIPHERTEXT_SIZE / 8] <<= 8;
-	Received[MPKC_CIPHERTEXT_SIZE / 8] |= S[((MPKC_CIPHERTEXT_SIZE / 8) * 8) + 1];
-	Received[MPKC_CIPHERTEXT_SIZE / 8] <<= 8;
-	Received[MPKC_CIPHERTEXT_SIZE / 8] |= S[((MPKC_CIPHERTEXT_SIZE / 8) * 8)];
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] <<= 8;
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8) + 4];
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] <<= 8;
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8) + 3];
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] <<= 8;
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8) + 2];
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] <<= 8;
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8) + 1];
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] <<= 8;
+	Received[MPKC_CPACIPHERTEXT_SIZE / 8] |= S[((MPKC_CPACIPHERTEXT_SIZE / 8) * 8)];
 }
 
 void MPKCM12T62::Scaling(std::array<std::array<ulong, MPKC_M>, 64> &Output, std::array<std::array<ulong, MPKC_M>, 64> &Inverse, const std::vector<byte> &PrivateKey, std::vector<ulong> &Received)
@@ -1140,11 +1140,11 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Random)
 
 void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E)
 {
-	const size_t ARRLEN = ((PKN_COLS + 63) / 64); // TODO: intrinsics
-	const size_t COLLEN = PKN_COLS / 8;
+	const size_t ARRLEN = ((MPKC_PKN_COLS + 63) / 64); // TODO: intrinsics
+	const size_t COLLEN = MPKC_PKN_COLS / 8;
 
 	std::array<ulong, ARRLEN> eInt;
-	MemUtils::Copy(E, MPKC_CIPHERTEXT_SIZE, eInt, 0, COLLEN);
+	MemUtils::Copy(E, MPKC_CPACIPHERTEXT_SIZE, eInt, 0, COLLEN);
 	std::array<ulong, ARRLEN> rowInt;
 	std::array<ulong, 8> tmp;
 	size_t i;
@@ -1152,7 +1152,7 @@ void MPKCM12T62::Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicK
 	int cnt;
 	byte b;
 
-	for (i = 0; i < PKN_ROWS; i += 8)
+	for (i = 0; i < MPKC_PKN_ROWS; i += 8)
 	{
 		for (cnt = 0; cnt < 8; cnt++)
 		{
@@ -1306,12 +1306,12 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 		IntUtils::Le64ToBytes(skInt[i], PrivateKey, i * 8);
 	}
 
-	std::vector<ulong> cond(CND_SIZE / 8);
+	std::vector<ulong> cond(MPKC_CND_SIZE / 8);
 	Random->Fill(cond, 0, cond.size());
 
-	for (i = 0; i < CND_SIZE / 8; i++)
+	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
 	{
-		IntUtils::Le64ToBytes(cond[i], PrivateKey, IRR_SIZE + i * 8);
+		IntUtils::Le64ToBytes(cond[i], PrivateKey, MPKC_IRR_SIZE + i * 8);
 	}
 }
 
@@ -1354,7 +1354,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	}
 
 	McElieceUtils::Copy(tmp, inverse[0]);
-	std::array<std::array<ulong, 64>, PKN_ROWS> mat;
+	std::array<std::array<ulong, 64>, MPKC_PKN_ROWS> mat;
 
 	// fill matrix 
 	for (j = 0; j < 64; j++)
@@ -1379,13 +1379,13 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	}
 
 	// permute 
-	std::array<ulong, CND_SIZE / 8> cond;
-	for (i = 0; i < CND_SIZE / 8; i++)
+	std::array<ulong, MPKC_CND_SIZE / 8> cond;
+	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
 	{
-		cond[i] = IntUtils::LeBytesTo64(PrivateKey, IRR_SIZE + i * 8);
+		cond[i] = IntUtils::LeBytesTo64(PrivateKey, MPKC_IRR_SIZE + i * 8);
 	}
 
-	for (i = 0; i < PKN_ROWS; i++)
+	for (i = 0; i < MPKC_PKN_ROWS; i++)
 	{
 		McElieceUtils::BenesCompact(mat[i], cond, 0);
 	}
@@ -1397,12 +1397,12 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 		{
 			row = i * 64 + j;
 
-			if (row >= PKN_ROWS)
+			if (row >= MPKC_PKN_ROWS)
 			{
 				break;
 			}
 
-			for (k = row + 1; k < PKN_ROWS; k++)
+			for (k = row + 1; k < MPKC_PKN_ROWS; k++)
 			{
 				mask = mat[row][i] ^ mat[k][i];
 				mask >>= j;
@@ -1422,7 +1422,7 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 				break;
 			}
 
-			for (k = 0; k < PKN_ROWS; k++)
+			for (k = 0; k < MPKC_PKN_ROWS; k++)
 			{
 				if (k != row)
 				{
@@ -1447,12 +1447,12 @@ bool MPKCM12T62::PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &Pr
 	if (status)
 	{
 		// store pk
-		tail = (PKN_ROWS & 63) >> 3;
+		tail = (MPKC_PKN_ROWS & 63) >> 3;
 		size_t pos = 0;
 
-		for (i = 0; i < PKN_ROWS; i++)
+		for (i = 0; i < MPKC_PKN_ROWS; i++)
 		{
-			u = mat[i][(PKN_ROWS + 63) / 64 - 1];
+			u = mat[i][(MPKC_PKN_ROWS + 63) / 64 - 1];
 
 			for (k = tail; k < 8; k++)
 			{

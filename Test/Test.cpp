@@ -487,7 +487,6 @@ int main()
 			RunTest(new RingLWETest());
 			RunTest(new McElieceTest());
 			RunTest(new ModuleLWETest());
-			RunTest(new NTRUTest());
 		}
 		else
 		{

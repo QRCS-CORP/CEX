@@ -92,10 +92,32 @@ public:
 
 	//~~~Public Functions~~~//
 
+	/// <summary>
+	/// Decrypt a cipher-text
+	/// </summary>
+	/// 
+	/// <param name="Secret">The shared secret</param>
+	/// <param name="CipherText">The private asymmetric key</param>
+	/// <param name="PrivateKey">The received ciphertext</param>
 	static int Decrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey);
 
+	/// <summary>
+	/// Encrypt a message
+	/// </summary>
+	/// 
+	/// <param name="Secret">The shared secret message output</param>
+	/// <param name="CipherText">The ciphertext output</param>
+	/// <param name="PublicKey">The public asymmetric key</param>
+	/// <param name="Coin">The random provider</param>
 	static void Encrypt(std::vector<byte> &Secret, std::vector<byte> &CipherText, const std::vector<byte> &PublicKey, std::unique_ptr<Prng::IPrng> &Rng);
 
+	/// <summary>
+	/// Generate a public/private key-pair
+	/// </summary>
+	///
+	/// <param name="PublicKey">The public asymmetric key</param>
+	/// <param name="PrivateKey">The private asymmetric key</param>
+	/// <param name="Rng">The random provider</param>
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 	//~~~Internal Functions~~~//

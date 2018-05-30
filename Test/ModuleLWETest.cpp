@@ -47,7 +47,7 @@ namespace Test
 			MessageAuthentication();
 			OnProgress(std::string("ModuleLWETest: Passed message authentication test.."));
 			PublicKeyIntegrity();
-			OnProgress(std::string("ModuleLWETest: Passed public key integrity test.."));/**/
+			OnProgress(std::string("ModuleLWETest: Passed public key integrity test.."));
 			StressLoop();
 			OnProgress(std::string("ModuleLWETest: Passed encryption and decryption stress tests.."));
 			SerializationCompare();

@@ -41,13 +41,12 @@ namespace Test
 	{
 		try
 		{
-			// Note: updating to Nist version (with CCA kem) by next release..
-			//CipherTextIntegrity();
-			//OnProgress(std::string("RingLWETest: Passed cipher-text integrity test.."));
-			//MessageAuthentication();
-			//OnProgress(std::string("RingLWETest: Passed message authentication test.."));
-			//PublicKeyIntegrity();
-			//OnProgress(std::string("RingLWETest: Passed public key integrity test.."));
+			CipherTextIntegrity();
+			OnProgress(std::string("RingLWETest: Passed cipher-text integrity test.."));
+			MessageAuthentication();
+			OnProgress(std::string("RingLWETest: Passed message authentication test.."));
+			PublicKeyIntegrity();
+			OnProgress(std::string("RingLWETest: Passed public key integrity test.."));
 			StressLoop();
 			OnProgress(std::string("RingLWETest: Passed encryption and decryption stress tests.."));
 			SerializationCompare();
@@ -67,7 +66,7 @@ namespace Test
 
 	void RingLWETest::CipherTextIntegrity()
 	{
-		/*std::vector<byte> cpt(0);
+		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
@@ -93,12 +92,12 @@ namespace Test
 			return;
 		}
 
-		throw TestException("RingLWETest: Cipher-text integrity test failed!");*/
+		throw TestException("RingLWETest: Cipher-text integrity test failed!");
 	}
 
 	void RingLWETest::MessageAuthentication()
 	{
-		/*std::vector<byte> cpt(0);
+		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
@@ -124,12 +123,12 @@ namespace Test
 			return;
 		}
 
-		throw TestException("RingLWETest: Message authentication test failed!");*/
+		throw TestException("RingLWETest: Message authentication test failed!");
 	}
 
 	void RingLWETest::PublicKeyIntegrity()
 	{
-		/*std::vector<byte> cpt(0);
+		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
@@ -157,7 +156,7 @@ namespace Test
 			return;
 		}
 
-		throw TestException("RingLWETest: Public Key integrity test failed!");*/
+		throw TestException("RingLWETest: Public Key integrity test failed!");
 	}
 
 	void RingLWETest::SerializationCompare()
@@ -196,7 +195,6 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		// Q12289N1024 parameter
 		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
 
 		for (size_t i = 0; i < 100; ++i)
@@ -209,28 +207,6 @@ namespace Test
 
 			cpr1.Initialize(kp->PrivateKey());
 			cpr1.Decapsulate(cpt, sec2);
-
-			delete kp;
-
-			if (sec1 != sec2)
-			{
-				throw TestException("RingLWETest: Stress test has failed!");
-			}
-		}
-
-		// Q12289N512 parameter
-		RingLWE cpr2(Enumeration::RLWEParams::Q12289N512, m_rngPtr);
-
-		for (size_t i = 0; i < 100; ++i)
-		{
-			m_rngPtr->GetBytes(msg);
-			IAsymmetricKeyPair* kp = cpr2.Generate();
-
-			cpr2.Initialize(kp->PublicKey());
-			cpr2.Encapsulate(cpt, sec1);
-
-			cpr2.Initialize(kp->PrivateKey());
-			cpr2.Decapsulate(cpt, sec2);
 
 			delete kp;
 

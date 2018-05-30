@@ -900,12 +900,6 @@
     <ClInclude Include="..\..\CEX\MPKCM12T62.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\RLWEQ12289N512.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h">
-      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\NTRU\Support</Filter>
     </ClInclude>
@@ -917,6 +911,9 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHAKE.h">
       <Filter>Header Files\Kdf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h">
+      <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1277,12 +1274,6 @@
     <ClCompile Include="..\..\CEX\MPKCM12T62.cpp">
       <Filter>Source Files\Cipher\Asymmetric\Encrypt\McEliece\Support</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\RLWEQ12289N512.cpp">
-      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp">
-      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp">
       <Filter>Source Files\Cipher\Asymmetric\Encrypt\NTRU\Support</Filter>
     </ClCompile>
@@ -1294,6 +1285,9 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\SHAKE.cpp">
       <Filter>Source Files\Kdf</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
