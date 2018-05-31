@@ -2,7 +2,6 @@
 #include "BCR.h"
 #include "MLWEQ7681N256.h"
 #include "IntUtils.h"
-#include "Keccak256.h"
 #include "MemUtils.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
@@ -163,9 +162,8 @@ void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	result = Verify(CipherText, cmp, CipherText.size());
 
 	// overwrite coins in kr with H(c)
-	Digest::Keccak256 dgt256;
-	dgt256.Update(CipherText, 0, CipherText.size());
-	dgt256.Finalize(kr, MLWEQ7681N256::MLWE_SEED_SIZE);
+	shk256.Initialize(CipherText);
+	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 	shk256.Initialize(kr, m_domainKey);
@@ -195,15 +193,15 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	m_rndGenerator->GetBytes(buf, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// don't release system RNG output
-	Digest::Keccak256 dgt256;
-	dgt256.Update(buf, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-	dgt256.Finalize(buf, 0);
+	std::memcpy(coin.data(), buf.data(), MLWEQ7681N256::MLWE_SEED_SIZE);
+	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	shk256.Initialize(coin);
+	shk256.Generate(buf, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// multitarget countermeasure for coins + contributory KEM
-	dgt256.Update(m_publicKey->P(), 0, m_publicKey->P().size());
-	dgt256.Finalize(buf, MLWEQ7681N256::MLWE_SEED_SIZE);
-
-	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	shk256.Initialize(m_publicKey->P());
+	shk256.Generate(buf, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	// condition kr
 	shk256.Initialize(buf);
 	shk256.Generate(kr);
 
@@ -212,8 +210,8 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	MLWEQ7681N256::Encrypt(CipherText, buf, m_publicKey->P(), coin);
 
 	// overwrite coins in kr with H(c)
-	dgt256.Update(CipherText, 0, CipherText.size());
-	dgt256.Finalize(kr, MLWEQ7681N256::MLWE_SEED_SIZE);
+	shk256.Initialize(CipherText);
+	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// hash concatenation of pre-k and H(c) to k
 	shk256.Initialize(kr, m_domainKey);
@@ -227,14 +225,15 @@ IAsymmetricKeyPair* ModuleLWE::Generate()
 	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
 	std::vector<byte> pkA((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> skA((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE));
+	std::vector<byte> buff(64);
+
 	MLWEQ7681N256::Generate(pkA, skA, m_rndGenerator);
 
-	std::vector<byte> buff(64);
-	Digest::Keccak256 dgt256;
-	dgt256.Update(pkA, 0, pkA.size());
-
 	// add the hash of the public key to the secret key
-	dgt256.Finalize(buff, 0);
+	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
+	shk256.Initialize(pkA);
+	shk256.Generate(buff, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+
 	// value z for pseudo-random output on reject
 	m_rndGenerator->GetBytes(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// copy H(p) and random coin
