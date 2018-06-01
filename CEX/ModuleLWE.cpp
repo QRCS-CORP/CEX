@@ -115,9 +115,13 @@ const std::string ModuleLWE::Name()
 	{
 		ret += "Q7681N256K3";
 	}
-	else
+	else if (m_mlweParameters == MLWEParams::Q7681N256K4)
 	{
 		ret += "Q7681N256K4";
+	}
+	else
+	{
+		ret += "UNKNOWN";
 	}
 
 	return ret;
@@ -136,27 +140,28 @@ void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
 
 	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
-	std::vector<byte> buf(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
+
 	std::vector<byte> cmp(CipherText.size());
 	std::vector<byte> coin(MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> kr(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> pk((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE);
+	std::vector<byte> sec(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 	int32_t result;
 
 	// decrypt the key
-	MLWEQ7681N256::Decrypt(buf, CipherText, m_privateKey->R());
+	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->R());
 
 	// multitarget countermeasure for coins + contributory KEM
-	std::memcpy((byte*)buf.data() + MLWEQ7681N256::MLWE_SEED_SIZE, (byte*)m_privateKey->R().data() + (m_privateKey->R().size() - (2 * MLWEQ7681N256::MLWE_SEED_SIZE)), MLWEQ7681N256::MLWE_SEED_SIZE);
+	std::memcpy((byte*)sec.data() + MLWEQ7681N256::MLWE_SEED_SIZE, (byte*)m_privateKey->R().data() + (m_privateKey->R().size() - (2 * MLWEQ7681N256::MLWE_SEED_SIZE)), MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
-	shk256.Initialize(buf);
+	shk256.Initialize(sec);
 	shk256.Generate(kr);
 
 	// coins are in kr+MLWE_SEED_SIZE
 	std::memcpy((byte*)coin.data(), (byte*)kr.data() + MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::memcpy((byte*)pk.data(), (byte*)m_privateKey->R().data() + (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE), pk.size());
-	MLWEQ7681N256::Encrypt(cmp, buf, pk, coin);
+	MLWEQ7681N256::Encrypt(cmp, sec, pk, coin);
 
 	// verify the code
 	result = Verify(CipherText, cmp, CipherText.size());
@@ -165,12 +170,12 @@ void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	shk256.Initialize(CipherText);
 	shk256.Generate(kr, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
+	// overwrite pre-k with z on re-encryption failure
+	Utility::IntUtils::CMov(kr, 0, m_privateKey->R(), m_privateKey->R().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
+
 	// hash concatenation of pre-k and H(c) to k + optional domain-key as customization
 	shk256.Initialize(kr, m_domainKey);
 	shk256.Generate(SharedSecret);
-
-	// overwrite pre-k with z on re-encryption failure
-	Utility::IntUtils::CMov(kr, 0, m_privateKey->R(), m_privateKey->R().size() - MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE, result);
 
 	if (result != 0)
 	{
@@ -184,30 +189,31 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
 
 	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
-	std::vector<byte> buf(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
+
 	std::vector<byte> coin(MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> kr(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
+	std::vector<byte> sec(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	CipherText.resize((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE));
 
-	m_rndGenerator->GetBytes(buf, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	m_rndGenerator->GetBytes(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// don't release system RNG output
-	std::memcpy(coin.data(), buf.data(), MLWEQ7681N256::MLWE_SEED_SIZE);
+	std::memcpy((byte*)coin.data(), (byte*)sec.data(), MLWEQ7681N256::MLWE_SEED_SIZE);
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
 	shk256.Initialize(coin);
-	shk256.Generate(buf, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	shk256.Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// multitarget countermeasure for coins + contributory KEM
 	shk256.Initialize(m_publicKey->P());
-	shk256.Generate(buf, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
-	// condition kr
-	shk256.Initialize(buf);
+	shk256.Generate(sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	// condition kr bytes
+	shk256.Initialize(sec);
 	shk256.Generate(kr);
 
 	// coins are in kr+KYBER_KEYBYTES
-	std::memcpy(coin.data(), kr.data() + MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
-	MLWEQ7681N256::Encrypt(CipherText, buf, m_publicKey->P(), coin);
+	std::memcpy((byte*)coin.data(), (byte*)kr.data() + MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	MLWEQ7681N256::Encrypt(CipherText, sec, m_publicKey->P(), coin);
 
 	// overwrite coins in kr with H(c)
 	shk256.Initialize(CipherText);
@@ -225,7 +231,7 @@ IAsymmetricKeyPair* ModuleLWE::Generate()
 	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
 	std::vector<byte> pkA((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> skA((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE));
-	std::vector<byte> buff(64);
+	std::vector<byte> buff(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	MLWEQ7681N256::Generate(pkA, skA, m_rndGenerator);
 
@@ -237,7 +243,7 @@ IAsymmetricKeyPair* ModuleLWE::Generate()
 	// value z for pseudo-random output on reject
 	m_rndGenerator->GetBytes(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// copy H(p) and random coin
-	std::memcpy((byte*)skA.data() + skA.size() - (2 * MLWEQ7681N256::MLWE_SEED_SIZE), buff.data(), (2 * MLWEQ7681N256::MLWE_SEED_SIZE));
+	std::memcpy((byte*)skA.data() + skA.size() - (2 * MLWEQ7681N256::MLWE_SEED_SIZE), (byte*)buff.data(), (2 * MLWEQ7681N256::MLWE_SEED_SIZE));
 
 	Key::Asymmetric::MLWEPublicKey* pk = new Key::Asymmetric::MLWEPublicKey(m_mlweParameters, pkA);
 	Key::Asymmetric::MLWEPrivateKey* sk = new Key::Asymmetric::MLWEPrivateKey(m_mlweParameters, skA);
