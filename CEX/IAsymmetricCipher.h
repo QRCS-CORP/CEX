@@ -109,7 +109,9 @@ public:
 	/// 
 	/// <param name="CipherText">The input cipher-text</param>
 	/// <param name="SharedSecret">The shared secret key</param>
-	virtual void Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
+	/// 
+	/// <returns>Returns true if decryption is sucesssful</returns>
+	virtual bool Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) = 0;
 
 	/// <summary>
 	/// Generate a shared secret and ciphertext

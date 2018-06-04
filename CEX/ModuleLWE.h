@@ -201,7 +201,9 @@ public:
 	/// 
 	/// <param name="CipherText">The input cipher-text</param>
 	/// <param name="SharedSecret">The shared secret key</param>
-	void Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
+	/// 
+	/// <returns>Returns true if decryption is sucesssful</returns>
+	bool Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret) override;
 
 	/// <summary>
 	/// Generate a shared secret and ciphertext.

@@ -260,6 +260,17 @@ public:
 	void Initialize(const std::vector<byte> &Key) override;
 
 	/// <summary>
+	/// Initialize the SHAKE generator with a key, using length and offset arguments
+	/// </summary>
+	/// 
+	/// <param name="Key">The primary key array used to seed the generator</param>
+	/// <param name="Offset">The starting position within the key array</param>
+	/// <param name="Length">The number of key bytes to use</param>
+	/// 
+	/// <exception cref="Exception::CryptoKdfException">Thrown if the key is too small</exception>
+	void Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length) override;
+
+	/// <summary>
 	/// Initialize the generator with key and salt arrays.
 	/// <para>The use of a salt will call the HKDF Extract function.</para>
 	/// </summary>

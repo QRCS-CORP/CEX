@@ -127,24 +127,25 @@ const NTRUParams NTRU::Parameters()
 
 //~~~Public Functions~~~//
 
-void NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> secret(32);
 	int result = 0;
 
 	if (m_ntruParameters == NTRUParams::SQ4591N761)
 	{
-		CexAssert(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The input message is too small");
+		CexAssert(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		// process message from B and return shared secret
 		result = NTRUSQ4591N761::Decrypt(secret, CipherText, m_privateKey->R());
 	}
 	else if (m_ntruParameters == NTRUParams::LQ4591N761)
 	{
-		CexAssert(CipherText.size() >= NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE, "The input message is too small");
+		CexAssert(CipherText.size() >= NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		// process message from B and return shared secret
 		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->R());
@@ -155,20 +156,18 @@ void NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &S
 	}
 
 	// hash the message to create the shared secret
-	Kdf::SHAKE gen;
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 	gen.Initialize(secret, m_domainKey);
 	gen.Generate(SharedSecret);
 
-	if (result != 0)
-	{
-		throw CryptoAuthenticationFailure("ModuleLWE:Decrypt", "Decryption authentication failure!");
-	}
+	return (result == 0);
 }
 
 void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> secret(32);
 
@@ -195,7 +194,7 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 		throw CryptoAsymmetricException("RingLWE:Encrypt", "The parameter type is invalid!");
 	}
 
-	Kdf::SHAKE gen;
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 	gen.Initialize(secret, m_domainKey);
 	gen.Generate(SharedSecret);
 }
@@ -204,22 +203,22 @@ IAsymmetricKeyPair* NTRU::Generate()
 {
 	CexAssert(m_ntruParameters != NTRUParams::None, "The parameter setting is invalid");
 
-	std::vector<byte> pka(0);
-	std::vector<byte> ska(0);
+	std::vector<byte> pk(0);
+	std::vector<byte> sk(0);
 
 	if (m_ntruParameters == NTRUParams::SQ4591N761)
 	{
-		pka.resize(NTRUSQ4591N761::NTRU_PUBLICKEY_SIZE);
-		ska.resize(NTRUSQ4591N761::NTRU_PRIVATEKEY_SIZE);
+		pk.resize(NTRUSQ4591N761::NTRU_PUBLICKEY_SIZE);
+		sk.resize(NTRUSQ4591N761::NTRU_PRIVATEKEY_SIZE);
 
-		NTRUSQ4591N761::Generate(pka, ska, m_rndGenerator);
+		NTRUSQ4591N761::Generate(pk, sk, m_rndGenerator);
 	}
 	else if (m_ntruParameters == NTRUParams::LQ4591N761)
 	{
-		pka.resize(NTRULQ4591N761::NTRU_PUBLICKEY_SIZE);
-		ska.resize(NTRULQ4591N761::NTRU_PRIVATEKEY_SIZE);
+		pk.resize(NTRULQ4591N761::NTRU_PUBLICKEY_SIZE);
+		sk.resize(NTRULQ4591N761::NTRU_PRIVATEKEY_SIZE);
 
-		NTRULQ4591N761::Generate(pka, ska, m_rndGenerator);
+		NTRULQ4591N761::Generate(pk, sk, m_rndGenerator);
 	}
 
 	else
@@ -227,10 +226,10 @@ IAsymmetricKeyPair* NTRU::Generate()
 		throw CryptoAsymmetricException("NTRULWE:Generate", "The parameter type is invalid!");
 	}
 
-	Key::Asymmetric::NTRUPublicKey* pk = new Key::Asymmetric::NTRUPublicKey(m_ntruParameters, pka);
-	Key::Asymmetric::NTRUPrivateKey* sk = new Key::Asymmetric::NTRUPrivateKey(m_ntruParameters, ska);
+	Key::Asymmetric::NTRUPublicKey* apk = new Key::Asymmetric::NTRUPublicKey(m_ntruParameters, pk);
+	Key::Asymmetric::NTRUPrivateKey* ask = new Key::Asymmetric::NTRUPrivateKey(m_ntruParameters, sk);
 
-	return new Key::Asymmetric::NTRUKeyPair(sk, pk);
+	return new Key::Asymmetric::NTRUKeyPair(ask, apk);
 }
 
 void NTRU::Initialize(IAsymmetricKey* Key)

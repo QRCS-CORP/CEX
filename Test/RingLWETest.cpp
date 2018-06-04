@@ -81,18 +81,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("RingLWETest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("RingLWETest: Cipher-text integrity test failed!");
+		delete kp;
 	}
 
 	void RingLWETest::MessageAuthentication()
@@ -112,18 +106,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("RingLWETest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("RingLWETest: Message authentication test failed!");
+		delete kp;
 	}
 
 	void RingLWETest::PublicKeyIntegrity()
@@ -145,18 +133,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("RingLWETest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("RingLWETest: Public Key integrity test failed!");
+		delete kp;
 	}
 
 	void RingLWETest::SerializationCompare()

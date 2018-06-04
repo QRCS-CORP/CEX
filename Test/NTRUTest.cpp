@@ -82,18 +82,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("NTRUTest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("NTRUTest: Message authentication test failed!");
+		delete kp;
 	}
 
 	void NTRUTest::MessageAuthentication()
@@ -113,18 +107,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("NTRUTest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("NTRUTest: Message authentication test failed!");
+		delete kp;
 	}
 
 	void NTRUTest::PublicKeyIntegrity()
@@ -146,18 +134,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("NTRUTest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("NTRUTest: Public Key integrity test failed!");
+		delete kp;
 	}
 
 	void NTRUTest::SerializationCompare()

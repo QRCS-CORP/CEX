@@ -81,19 +81,19 @@ public:
 	static const size_t MPKC_CPAPUBLICKEY_SIZE = (MPKC_PKN_ROWS * ((64 - MPKC_M) * 8)) + (MPKC_PKN_ROWS * (8 - ((MPKC_PKN_ROWS & 63) >> 3)));
 
 	/// <summary>
-	/// The byte size of the CCA public key polynomial
+	/// The byte size of the CCA cipher-text
 	/// </summary>
-	static const size_t MPKC_CCAPUBLICKEY_SIZE = MPKC_CPAPUBLICKEY_SIZE;
+	static const size_t MPKC_CCACIPHERTEXT_SIZE = MPKC_CPACIPHERTEXT_SIZE;
 
 	/// <summary>
 	/// The byte size of the CCA private key polynomial
 	/// </summary>
-	static const size_t MPKC_CCAPRIVATEKEY_SIZE = (MPKC_CPAPRIVATEKEY_SIZE + (2 * MPKC_SEED_SIZE));
+	static const size_t MPKC_CCAPRIVATEKEY_SIZE = MPKC_CPAPRIVATEKEY_SIZE;
 
 	/// <summary>
-	/// The byte size of the CCA cipher-text
+	/// The byte size of the CCA public key polynomial
 	/// </summary>
-	static const size_t MPKC_CCACIPHERTEXT_SIZE = (MPKC_CPACIPHERTEXT_SIZE + MPKC_SEED_SIZE);
+	static const size_t MPKC_CCAPUBLICKEY_SIZE = MPKC_CPAPUBLICKEY_SIZE;
 
 	//~~~Public Functions~~~//
 
@@ -115,8 +115,8 @@ public:
 	/// <param name="S">The output ciphertext</param>
 	/// <param name="E">The message array</param>
 	/// <param name="PublicKey">The public key array</param>
-	/// <param name="Random">The random generator instance</param>
-	static void Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Random);
+	/// <param name="Rng">The random generator instance</param>
+	static void Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Rng);
 
 	/// <summary>
 	/// Generate a public/private key pair
@@ -124,10 +124,10 @@ public:
 	/// 
 	/// <param name="PublicKey">The public key array</param>
 	/// <param name="PrivateKey">The private key array</param>
-	/// <param name="Random">The random generator instance</param>
+	/// <param name="Rng">The random generator instance</param>
 	/// 
 	/// <returns>The message was decrypted succesfully</returns>
-	static bool Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Random);
+	static bool Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Rng);
 
 private:
 
@@ -145,7 +145,7 @@ private:
 
 	//~~~Encrypt~~~//
 
-	static void GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Random);
+	static void GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng);
 
 	static void Syndrome(std::vector<byte> &S, const std::vector<byte> &PublicKey, const std::vector<byte> &E);
 
@@ -153,7 +153,7 @@ private:
 
 	static bool IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<ushort> &F);
 
-	static void SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Random);
+	static void SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 	static bool PkGen(std::vector<byte> &PublicKey, const std::vector<byte> &PrivateKey);
 

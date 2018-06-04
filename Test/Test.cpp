@@ -484,9 +484,10 @@ int main()
 			PrintHeader("TESTING UTILITY CLASS FUNCTIONS");
 			RunTest(new UtilityTest());
 			PrintHeader("TESTING ASYMMETRIC CIPHERS");
-			RunTest(new RingLWETest());
 			RunTest(new McElieceTest());
 			RunTest(new ModuleLWETest());
+			RunTest(new NTRUTest());
+			RunTest(new RingLWETest());
 		}
 		else
 		{

@@ -134,17 +134,23 @@ const MLWEParams ModuleLWE::Parameters()
 
 //~~~Public Functions~~~//
 
-void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
+bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	CexAssert(m_isInitialized, "The cipher has not been initialized");
-	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-
 	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	const size_t CPTSZE = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
+	const size_t PUBSZE = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
+	const size_t PRISZE = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
+	bool status;
 
-	std::vector<byte> cmp(CipherText.size());
+	CexAssert(m_isInitialized, "The cipher has not been initialized");
+	CexAssert(CipherText.size() >= CPTSZE, "The cipher-text array is too small");
+	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
+	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
+
+	std::vector<byte> cmp(CPTSZE);
 	std::vector<byte> coin(MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> kr(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
-	std::vector<byte> pk((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE);
+	std::vector<byte> pk(PUBSZE);
 	std::vector<byte> sec(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 	int32_t result;
 
@@ -152,15 +158,15 @@ void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	MLWEQ7681N256::Decrypt(sec, CipherText, m_privateKey->R());
 
 	// multitarget countermeasure for coins + contributory KEM
-	std::memcpy((byte*)sec.data() + MLWEQ7681N256::MLWE_SEED_SIZE, (byte*)m_privateKey->R().data() + (m_privateKey->R().size() - (2 * MLWEQ7681N256::MLWE_SEED_SIZE)), MLWEQ7681N256::MLWE_SEED_SIZE);
+	Utility::MemUtils::Copy(m_privateKey->R(), PUBSZE + PRISZE, sec, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
 	shk256.Initialize(sec);
 	shk256.Generate(kr);
 
 	// coins are in kr+MLWE_SEED_SIZE
-	std::memcpy((byte*)coin.data(), (byte*)kr.data() + MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
-	std::memcpy((byte*)pk.data(), (byte*)m_privateKey->R().data() + (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE), pk.size());
+	Utility::MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	Utility::MemUtils::Copy(m_privateKey->R(), PRISZE, pk, 0, PUBSZE);
 	MLWEQ7681N256::Encrypt(cmp, sec, pk, coin);
 
 	// verify the code
@@ -177,29 +183,27 @@ void ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	shk256.Initialize(kr, m_domainKey);
 	shk256.Generate(SharedSecret);
 
-	if (result != 0)
-	{
-		throw CryptoAuthenticationFailure("ModuleLWE:Decrypt", "Decryption authentication failure!");
-	}
+	return (result == 0);
 }
 
 void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
+	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	const size_t CPTSZE = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
+
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
 	CexAssert(SharedSecret.size() > 0, "The shared secret size can not be zero");
-
-	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	CexAssert(SharedSecret.size() <= 256, "The shared secret size is too large");
 
 	std::vector<byte> coin(MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> kr(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 	std::vector<byte> sec(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	CipherText.resize((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE));
+	CipherText.resize(CPTSZE);
 
 	m_rndGenerator->GetBytes(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
-
 	// don't release system RNG output
-	std::memcpy((byte*)coin.data(), (byte*)sec.data(), MLWEQ7681N256::MLWE_SEED_SIZE);
+	Utility::MemUtils::Copy(sec, 0, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
 	shk256.Initialize(coin);
 	shk256.Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
@@ -212,7 +216,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 	shk256.Generate(kr);
 
 	// coins are in kr+KYBER_KEYBYTES
-	std::memcpy((byte*)coin.data(), (byte*)kr.data() + MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	Utility::MemUtils::Copy(kr, MLWEQ7681N256::MLWE_SEED_SIZE, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	MLWEQ7681N256::Encrypt(CipherText, sec, m_publicKey->P(), coin);
 
 	// overwrite coins in kr with H(c)
@@ -226,29 +230,33 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 IAsymmetricKeyPair* ModuleLWE::Generate()
 {
+	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	const size_t PUBSZE = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
+	const size_t PRISZE = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
+	const size_t CCAPRI = PUBSZE + PRISZE + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
+
 	CexAssert(m_mlweParameters != MLWEParams::None, "The parameter setting is invalid");
 
-	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
-	std::vector<byte> pkA((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE);
-	std::vector<byte> skA((K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE));
+	std::vector<byte> pk(PUBSZE);
+	std::vector<byte> sk(CCAPRI);
 	std::vector<byte> buff(2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	MLWEQ7681N256::Generate(pkA, skA, m_rndGenerator);
+	MLWEQ7681N256::Generate(pk, sk, m_rndGenerator);
 
 	// add the hash of the public key to the secret key
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
-	shk256.Initialize(pkA);
+	shk256.Initialize(pk);
 	shk256.Generate(buff, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// value z for pseudo-random output on reject
 	m_rndGenerator->GetBytes(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// copy H(p) and random coin
-	std::memcpy((byte*)skA.data() + skA.size() - (2 * MLWEQ7681N256::MLWE_SEED_SIZE), (byte*)buff.data(), (2 * MLWEQ7681N256::MLWE_SEED_SIZE));
+	Utility::MemUtils::Copy(buff, 0, sk, PUBSZE + PRISZE, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
-	Key::Asymmetric::MLWEPublicKey* pk = new Key::Asymmetric::MLWEPublicKey(m_mlweParameters, pkA);
-	Key::Asymmetric::MLWEPrivateKey* sk = new Key::Asymmetric::MLWEPrivateKey(m_mlweParameters, skA);
+	Key::Asymmetric::MLWEPublicKey* apk = new Key::Asymmetric::MLWEPublicKey(m_mlweParameters, pk);
+	Key::Asymmetric::MLWEPrivateKey* ask = new Key::Asymmetric::MLWEPrivateKey(m_mlweParameters, sk);
 
-	return new Key::Asymmetric::MLWEKeyPair(sk, pk);
+	return new Key::Asymmetric::MLWEKeyPair(ask, apk);
 }
 
 void ModuleLWE::Initialize(IAsymmetricKey* Key)
@@ -278,6 +286,7 @@ void ModuleLWE::Initialize(IAsymmetricKey* Key)
 
 int32_t ModuleLWE::Verify(const std::vector<byte> &A, const std::vector<byte> &B, size_t Length)
 {
+	// TODO: bizzare non-const-time behavior if placed in IntUtils, why?
 	size_t i;
 	int32_t r;
 

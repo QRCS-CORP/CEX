@@ -152,6 +152,16 @@ void KDF2::Initialize(ISymmetricKey &GenParam)
 	}
 }
 
+void KDF2::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
+{
+	CexAssert(Key.size() >= Length + Offset, "The key is too small");
+
+	std::vector<byte> tmpK(Length);
+
+	Utility::MemUtils::Copy(Key, Offset, tmpK, 0, Length);
+	Initialize(tmpK);
+}
+
 void KDF2::Initialize(const std::vector<byte> &Key)
 {
 	if (Key.size() < m_hashSize)

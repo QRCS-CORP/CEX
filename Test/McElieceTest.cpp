@@ -46,7 +46,7 @@ namespace Test
 			MessageAuthentication();
 			OnProgress(std::string("McElieceTest: Passed message authentication test.."));
 			//PublicKeyIntegrity();
-			//OnProgress(std::string("McElieceTest: Passed public key integrity test.."));
+			//OnProgress(std::string("McElieceTest: Passed public key integrity test.."));/**/
 			StressLoop();
 			OnProgress(std::string("McElieceTest: Passed encryption and decryption stress tests.."));
 			SerializationCompare();
@@ -81,18 +81,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
+			throw TestException("McElieceTest: Cipher-text integrity test failed!");
 		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
-		}
-
-		throw TestException("McElieceTest: Cipher-text integrity test failed!");
+			
+		delete kp;
 	}
 
 	void McElieceTest::MessageAuthentication()
@@ -112,18 +106,12 @@ namespace Test
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("McElieceTest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("McElieceTest: Message authentication test failed!");
+		delete kp;
 	}
 
 	void McElieceTest::PublicKeyIntegrity()
@@ -139,24 +127,19 @@ namespace Test
 		std::vector<byte> pk1 = ((MPKCPublicKey*)kp->PublicKey())->P();
 		pk1[0] += 1;
 		pk1[1] += 1;
+
 		MPKCPublicKey* pk2 = new MPKCPublicKey(Enumeration::MPKCParams::M12T62, pk1);
 		cpr.Initialize(pk2);
 		cpr.Encapsulate(cpt, sec1);
 
 		cpr.Initialize(kp->PrivateKey());
 
-		try
+		if (cpr.Decapsulate(cpt, sec2))
 		{
-			cpr.Decapsulate(cpt, sec2);
-		}
-		catch (Exception::CryptoAuthenticationFailure)
-		{
-			// passed
-			delete kp;
-			return;
+			throw TestException("McElieceTest: Cipher-text integrity test failed!");
 		}
 
-		throw TestException("McElieceTest: Public Key integrity test failed!");
+		delete kp;
 	}
 
 	void McElieceTest::SerializationCompare()

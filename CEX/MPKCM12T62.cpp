@@ -822,19 +822,19 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 	return (t - 1 == 0) ? true : false;
 }
 
-void MPKCM12T62::Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Random)
+void MPKCM12T62::Encrypt(std::vector<byte> &S, std::vector<byte> &E, const std::vector<byte> &PublicKey, std::unique_ptr<IPrng> &Rng)
 {
-	GenE(E, Random);
+	GenE(E, Rng);
 	Syndrome(S, PublicKey, E);
 }
 
-bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Random)
+bool MPKCM12T62::Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<IPrng> &Rng)
 {
 	size_t ctr;
 
 	for (ctr = 0; ctr < MPKC_GEN_MAXR; ++ctr)
 	{
-		SkGen(PrivateKey, Random);
+		SkGen(PrivateKey, Rng);
 
 		if (PkGen(PublicKey, PrivateKey)) 
 		{
@@ -1080,7 +1080,7 @@ void MPKCM12T62::SyndromeAdjust(std::array<std::array<ulong, MPKC_M>, 2> &Output
 
 //~~~Encrypt~~~//
 
-void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Random)
+void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 {
 	size_t i;
 	size_t j;
@@ -1090,7 +1090,7 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Random)
 
 	while (1)
 	{
-		Random->Fill(ind, 0, ind.size());
+		Rng->Fill(ind, 0, ind.size());
 
 		for (i = 0; i < MPKC_T; i++) 
 		{
@@ -1272,7 +1272,7 @@ bool MPKCM12T62::IrrGen(std::array<ushort, MPKC_T + 1> &Output, std::vector<usho
 	return status;
 }
 
-void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Random)
+void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	size_t i;
 	std::array<ushort, MPKC_T + 1> irr;
@@ -1280,7 +1280,7 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 
 	while (1)
 	{
-		Random->Fill(f, 0, f.size());
+		Rng->Fill(f, 0, f.size());
 
 		for (i = 0; i < MPKC_T; i++) 
 		{
@@ -1307,7 +1307,7 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 	}
 
 	std::vector<ulong> cond(MPKC_CND_SIZE / 8);
-	Random->Fill(cond, 0, cond.size());
+	Rng->Fill(cond, 0, cond.size());
 
 	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
 	{
