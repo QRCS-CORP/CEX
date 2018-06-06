@@ -43,7 +43,7 @@ int NTRUSQ4591N761::Decrypt(std::vector<byte> &Secret, const std::vector<byte> &
 	}
 	weight -= NTRU_W;
 
-	/* XXX: puts limit on p */
+	// XXX: puts limit on p
 	result = 0;
 	result |= ModqNonZeroMask(weight);
 	RqMult(hr, h, r);
@@ -137,7 +137,7 @@ void NTRUSQ4591N761::MinMax(int32_t &X, int32_t &Y)
 
 int16_t NTRUSQ4591N761::ModqFreeze(int32_t A)
 {
-	/* input between -9000000 and 9000000 output between -2295 and 2295 */
+	// input between -9000000 and 9000000 output between -2295 and 2295
 	A -= 4591 * ((228 * A) >> 20);
 	A -= 4591 * ((58470 * A + 134217728) >> 28);
 
@@ -178,28 +178,28 @@ void NTRUSQ4591N761::RqDecodeRounded(std::array<int16_t, NTRU_P> &F, const std::
 		c2 = C[COffset + (i * 4) + 2];
 		c3 = C[COffset + (i * 4) + 3];
 
-		/* f0 + f1*1536 + f2*1536^2 */
-		/* = c0 + c1*256 + c2*256^2 + c3*256^3 */
-		/* with each F between 0 and 1530 */
-		/* f2 = (64/9)c3 + (1/36)c2 + (1/9216)c1 + (1/2359296)c0 - [0,0.99675] */
-		/* claim: 2^21 f2 < x < 2^21(f2+1) */
-		/* where x = 14913081*c3 + 58254*c2 + 228*(c1+2) */
-		/* proof: x - 2^21 f2 = 456 - (8/9)c0 + (4/9)c1 - (2/9)c2 + (1/9)c3 + 2^21 [0,0.99675] */
-		/* at least 456 - (8/9)255 - (2/9)255 > 0 */
-		/* at most 456 + (4/9)255 + (1/9)255 + 2^21 0.99675 < 2^21 */
+		// f0 + f1*1536 + f2*1536^2
+		// = c0 + c1*256 + c2*256^2 + c3*256^3
+		// with each F between 0 and 1530
+		// f2 = (64/9)c3 + (1/36)c2 + (1/9216)c1 + (1/2359296)c0 - [0,0.99675]
+		// claim: 2^21 f2 < x < 2^21(f2+1)
+		// where x = 14913081*c3 + 58254*c2 + 228*(c1+2)
+		// proof: x - 2^21 f2 = 456 - (8/9)c0 + (4/9)c1 - (2/9)c2 + (1/9)c3 + 2^21 [0,0.99675]
+		// at least 456 - (8/9)255 - (2/9)255 > 0
+		// at most 456 + (4/9)255 + (1/9)255 + 2^21 0.99675 < 2^21
 		f2 = ((14913081 * c3) + (58254 * c2) + (228 * (c1 + 2))) >> 21;
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 2;
 
-		/* f0 + f1*1536 */
-		/* = c0 + c1*256 + c2*256^2 */
-		/* c2 <= 35 = floor((1530+1530*1536)/256^2) */
-		/* f1 = (128/3)c2 + (1/6)c1 + (1/1536)c0 - (1/1536)f0 */
-		/* claim: 2^21 f1 < x < 2^21(f1+1) */
-		/* where x = 89478485*c2 + 349525*c1 + 1365*(c0+1) */
-		/* proof: x - 2^21 f1 = 1365 - (1/3)c2 - (1/3)c1 - (1/3)c0 + (4096/3)f0 */
-		/* at least 1365 - (1/3)35 - (1/3)255 - (1/3)255 > 0 */
-		/* at most 1365 + (4096/3)1530 < 2^21 */
+		// f0 + f1*1536
+		// = c0 + c1*256 + c2*256^2
+		// c2 <= 35 = floor((1530+1530*1536)/256^2)
+		// f1 = (128/3)c2 + (1/6)c1 + (1/1536)c0 - (1/1536)f0
+		// claim: 2^21 f1 < x < 2^21(f1+1)
+		// where x = 89478485*c2 + 349525*c1 + 1365*(c0+1)
+		// proof: x - 2^21 f1 = 1365 - (1/3)c2 - (1/3)c1 - (1/3)c0 + (4096/3)f0
+		// at least 1365 - (1/3)35 - (1/3)255 - (1/3)255 > 0
+		// at most 1365 + (4096/3)1530 < 2^21
 		f1 = ((89478485 * c2) + (349525 * c1) + (1365 * (c0 + 1))) >> 21;
 		c1 += c2 << 8;
 		c1 -= (f1 * 3) << 1;
@@ -240,7 +240,7 @@ void NTRUSQ4591N761::RqEncodeRounded(std::vector<byte> &C, size_t COffset, const
 		f0 = (21846 * f0) >> 16;
 		f1 = (21846 * f1) >> 16;
 		f2 = (21846 * f2) >> 16;
-		/* now want f0 + f1*1536 + f2*1536^2 as a 32-bit integer */
+		// now want f0 + f1*1536 + f2*1536^2 as a 32-bit integer
 		f2 *= 3;
 		f1 += f2 << 9;
 		f1 *= 3;
@@ -254,7 +254,7 @@ void NTRUSQ4591N761::RqEncodeRounded(std::vector<byte> &C, size_t COffset, const
 		C[COffset + (i * 4) + 3] = f0;
 	}
 
-	/* XXX: using p mod 3 = 2 */
+	// XXX: using p mod 3 = 2
 	f0 = F[(i * 3)] + NTRU_QSHIFT;
 	f1 = F[(i * 3) + 1] + NTRU_QSHIFT;
 	f0 = (21846 * f0) >> 16;
@@ -417,8 +417,8 @@ int32_t NTRUSQ4591N761::Mod3NonZeroMask(int8_t X)
 
 int8_t NTRUSQ4591N761::Mod3Freeze(int32_t a)
 {
-	/* input between -100000 and 100000 */
-	/* output between -1 and 1 */
+	// input between -100000 and 100000
+	// output between -1 and 1
 	a -= 3 * ((10923 * a) >> 15);
 	a -= 3 * (((89478485 * a) + 134217728) >> 28);
 
@@ -477,7 +477,7 @@ int16_t NTRUSQ4591N761::ModqMinusProduct(int16_t A, int16_t B, int16_t C)
 
 int NTRUSQ4591N761::ModqNonZeroMask(int16_t X)
 {
-	/* -1 if x is nonzero, 0 otherwise */
+	// -1 if x is nonzero, 0 otherwise
 	int32_t r;
 
 	r = (ushort)X;
@@ -652,7 +652,7 @@ void NTRUSQ4591N761::VectorMod3Shift(std::vector<int8_t> &Z, size_t ZOffset, siz
 {
 	int32_t i;
 
-	for (i = Length - 1; i > 0; --i)
+	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
 	{
 		Z[ZOffset + i] = Z[ZOffset + i - 1];
 	}
@@ -738,58 +738,58 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		c6 = C[COffset + (i * 8) + 6];
 		c7 = C[COffset + (i * 8) + 7];
 
-		/* f0 + f1*6144 + f2*6144^2 + f3*6144^3 + f4*6144^4 */
-		/* = c0 + c1*256 + ... + c6*256^6 + c7*256^7 */
-		/* with each F between 0 and 4590 */
+		// f0 + f1*6144 + f2*6144^2 + f3*6144^3 + f4*6144^4
+		// = c0 + c1*256 + ... + c6*256^6 + c7*256^7
+		// with each F between 0 and 4590
 		c6 += c7 << 8;
-		/* c6 <= 23241 = floor(4591*6144^4/2^48) */
-		/* f4 = (16/81)c6 + (1/1296)(c5+[0,1]) - [0,0.75] */
-		/* claim: 2^19 f4 < x < 2^19(f4+1) */
-		/* where x = 103564 c6 + 405(c5+1) */
-		/* proof: x - 2^19 f4 = (76/81)c6 + (37/81)c5 + 405 - (32768/81)[0,1] + 2^19[0,0.75] */
-		/* at least 405 - 32768/81 > 0 */
-		/* at most (76/81)23241 + (37/81)255 + 405 + 2^19 0.75 < 2^19 */
+		// c6 <= 23241 = floor(4591*6144^4/2^48)
+		// f4 = (16/81)c6 + (1/1296)(c5+[0,1]) - [0,0.75]
+		// claim: 2^19 f4 < x < 2^19(f4+1)
+		// where x = 103564 c6 + 405(c5+1)
+		// proof: x - 2^19 f4 = (76/81)c6 + (37/81)c5 + 405 - (32768/81)[0,1] + 2^19[0,0.75]
+		// at least 405 - 32768/81 > 0
+		// at most (76/81)23241 + (37/81)255 + 405 + 2^19 0.75 < 2^19
 		f4 = (103564 * c6 + 405 * (c5 + 1)) >> 19;
 		c5 += c6 << 8;
 		c5 -= (f4 * 81) << 4;
 		c4 += c5 << 8;
 
-		/* f0 + f1*6144 + f2*6144^2 + f3*6144^3 */
-		/* = c0 + c1*256 + c2*256^2 + c3*256^3 + c4*256^4 */
-		/* c4 <= 247914 = floor(4591*6144^3/2^32) */
-		/* f3 = (1/54)(c4+[0,1]) - [0,0.75] */
-		/* claim: 2^19 f3 < x < 2^19(f3+1) */
-		/* where x = 9709(c4+2) */
-		/* proof: x - 2^19 f3 = 19418 - (1/27)c4 - (262144/27)[0,1] + 2^19[0,0.75] */
-		/* at least 19418 - 247914/27 - 262144/27 > 0 */
-		/* at most 19418 + 2^19 0.75 < 2^19 */
+		// f0 + f1*6144 + f2*6144^2 + f3*6144^3
+		// = c0 + c1*256 + c2*256^2 + c3*256^3 + c4*256^4
+		// c4 <= 247914 = floor(4591*6144^3/2^32)
+		// f3 = (1/54)(c4+[0,1]) - [0,0.75]
+		// claim: 2^19 f3 < x < 2^19(f3+1)
+		// where x = 9709(c4+2)
+		// proof: x - 2^19 f3 = 19418 - (1/27)c4 - (262144/27)[0,1] + 2^19[0,0.75]
+		// at least 19418 - 247914/27 - 262144/27 > 0
+		// at most 19418 + 2^19 0.75 < 2^19
 		f3 = (9709 * (c4 + 2)) >> 19;
 		c4 -= (f3 * 27) << 1;
 		c3 += c4 << 8;
 
-		/* f0 + f1*6144 + f2*6144^2 */
-		/* = c0 + c1*256 + c2*256^2 + c3*256^3 */
-		/* c3 <= 10329 = floor(4591*6144^2/2^24) */
-		/* f2 = (4/9)c3 + (1/576)c2 + (1/147456)c1 + (1/37748736)c0 - [0,0.75] */
-		/* claim: 2^19 f2 < x < 2^19(f2+1) */
-		/* where x = 233017 c3 + 910(c2+2) */
-		/* proof: x - 2^19 f2 = 1820 + (1/9)c3 - (2/9)c2 - (32/9)c1 - (1/72)c0 + 2^19[0,0.75] */
-		/* at least 1820 - (2/9)255 - (32/9)255 - (1/72)255 > 0 */
-		/* at most 1820 + (1/9)10329 + 2^19 0.75 < 2^19 */
+		// f0 + f1*6144 + f2*6144^2
+		// = c0 + c1*256 + c2*256^2 + c3*256^3
+		// c3 <= 10329 = floor(4591*6144^2/2^24)
+		// f2 = (4/9)c3 + (1/576)c2 + (1/147456)c1 + (1/37748736)c0 - [0,0.75]
+		// claim: 2^19 f2 < x < 2^19(f2+1)
+		// where x = 233017 c3 + 910(c2+2)
+		// proof: x - 2^19 f2 = 1820 + (1/9)c3 - (2/9)c2 - (32/9)c1 - (1/72)c0 + 2^19[0,0.75]
+		// at least 1820 - (2/9)255 - (32/9)255 - (1/72)255 > 0
+		// at most 1820 + (1/9)10329 + 2^19 0.75 < 2^19
 		f2 = ((233017 * c3) + (910 * (c2 + 2))) >> 19;
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 6;
 		c1 += c2 << 8;
 
-		/* f0 + f1*6144 */
-		/* = c0 + c1*256 */
-		/* c1 <= 110184 = floor(4591*6144/2^8) */
-		/* f1 = (1/24)c1 + (1/6144)c0 - (1/6144)f0 */
-		/* claim: 2^19 f1 < x < 2^19(f1+1) */
-		/* where x = 21845(c1+2) + 85 c0 */
-		/* proof: x - 2^19 f1 = 43690 - (1/3)c1 - (1/3)c0 + 2^19 [0,0.75] */
-		/* at least 43690 - (1/3)110184 - (1/3)255 > 0 */
-		/* at most 43690 + 2^19 0.75 < 2^19 */
+		// f0 + f1*6144
+		// = c0 + c1*256
+		// c1 <= 110184 = floor(4591*6144/2^8)
+		// f1 = (1/24)c1 + (1/6144)c0 - (1/6144)f0
+		// claim: 2^19 f1 < x < 2^19(f1+1)
+		// where x = 21845(c1+2) + 85 c0
+		// proof: x - 2^19 f1 = 43690 - (1/3)c1 - (1/3)c0 + 2^19 [0,0.75]
+		// at least 43690 - (1/3)110184 - (1/3)255 > 0
+		// at most 43690 + 2^19 0.75 < 2^19
 		f1 = ((21845 * (c1 + 2)) + (85 * c0)) >> 19;
 		c1 -= (f1 * 3) << 3;
 		c0 += c1 << 8;
@@ -836,58 +836,58 @@ void NTRUSQ4591N761::RqDecode(std::array<int16_t, NTRU_P> &F, const std::vector<
 		c6 = C[(i * 8) + 6];
 		c7 = C[(i * 8) + 7];
 
-		/* f0 + f1*6144 + f2*6144^2 + f3*6144^3 + f4*6144^4 */
-		/* = c0 + c1*256 + ... + c6*256^6 + c7*256^7 */
-		/* with each F between 0 and 4590 */
+		// f0 + f1*6144 + f2*6144^2 + f3*6144^3 + f4*6144^4
+		// = c0 + c1*256 + ... + c6*256^6 + c7*256^7
+		// with each F between 0 and 4590
 		c6 += c7 << 8;
-		/* c6 <= 23241 = floor(4591*6144^4/2^48) */
-		/* f4 = (16/81)c6 + (1/1296)(c5+[0,1]) - [0,0.75] */
-		/* claim: 2^19 f4 < x < 2^19(f4+1) */
-		/* where x = 103564 c6 + 405(c5+1) */
-		/* proof: x - 2^19 f4 = (76/81)c6 + (37/81)c5 + 405 - (32768/81)[0,1] + 2^19[0,0.75] */
-		/* at least 405 - 32768/81 > 0 */
-		/* at most (76/81)23241 + (37/81)255 + 405 + 2^19 0.75 < 2^19 */
+		// c6 <= 23241 = floor(4591*6144^4/2^48)
+		// f4 = (16/81)c6 + (1/1296)(c5+[0,1]) - [0,0.75]
+		// claim: 2^19 f4 < x < 2^19(f4+1)
+		// where x = 103564 c6 + 405(c5+1)
+		// proof: x - 2^19 f4 = (76/81)c6 + (37/81)c5 + 405 - (32768/81)[0,1] + 2^19[0,0.75]
+		// at least 405 - 32768/81 > 0
+		// at most (76/81)23241 + (37/81)255 + 405 + 2^19 0.75 < 2^19
 		f4 = ((103564 * c6) + (405 * (c5 + 1))) >> 19;
 		c5 += c6 << 8;
 		c5 -= (f4 * 81) << 4;
 		c4 += c5 << 8;
 
-		/* f0 + f1*6144 + f2*6144^2 + f3*6144^3 */
-		/* = c0 + c1*256 + c2*256^2 + c3*256^3 + c4*256^4 */
-		/* c4 <= 247914 = floor(4591*6144^3/2^32) */
-		/* f3 = (1/54)(c4+[0,1]) - [0,0.75] */
-		/* claim: 2^19 f3 < x < 2^19(f3+1) */
-		/* where x = 9709(c4+2) */
-		/* proof: x - 2^19 f3 = 19418 - (1/27)c4 - (262144/27)[0,1] + 2^19[0,0.75] */
-		/* at least 19418 - 247914/27 - 262144/27 > 0 */
-		/* at most 19418 + 2^19 0.75 < 2^19 */
+		// f0 + f1*6144 + f2*6144^2 + f3*6144^3
+		// = c0 + c1*256 + c2*256^2 + c3*256^3 + c4*256^4
+		// c4 <= 247914 = floor(4591*6144^3/2^32)
+		// f3 = (1/54)(c4+[0,1]) - [0,0.75]
+		// claim: 2^19 f3 < x < 2^19(f3+1)
+		// where x = 9709(c4+2)
+		// proof: x - 2^19 f3 = 19418 - (1/27)c4 - (262144/27)[0,1] + 2^19[0,0.75]
+		// at least 19418 - 247914/27 - 262144/27 > 0
+		// at most 19418 + 2^19 0.75 < 2^19
 		f3 = (9709 * (c4 + 2)) >> 19;
 		c4 -= (f3 * 27) << 1;
 		c3 += c4 << 8;
 
-		/* f0 + f1*6144 + f2*6144^2 */
-		/* = c0 + c1*256 + c2*256^2 + c3*256^3 */
-		/* c3 <= 10329 = floor(4591*6144^2/2^24) */
-		/* f2 = (4/9)c3 + (1/576)c2 + (1/147456)c1 + (1/37748736)c0 - [0,0.75] */
-		/* claim: 2^19 f2 < x < 2^19(f2+1) */
-		/* where x = 233017 c3 + 910(c2+2) */
-		/* proof: x - 2^19 f2 = 1820 + (1/9)c3 - (2/9)c2 - (32/9)c1 - (1/72)c0 + 2^19[0,0.75] */
-		/* at least 1820 - (2/9)255 - (32/9)255 - (1/72)255 > 0 */
-		/* at most 1820 + (1/9)10329 + 2^19 0.75 < 2^19 */
+		// f0 + f1*6144 + f2*6144^2
+		// = c0 + c1*256 + c2*256^2 + c3*256^3
+		// c3 <= 10329 = floor(4591*6144^2/2^24)
+		// f2 = (4/9)c3 + (1/576)c2 + (1/147456)c1 + (1/37748736)c0 - [0,0.75]
+		// claim: 2^19 f2 < x < 2^19(f2+1)
+		// where x = 233017 c3 + 910(c2+2)
+		// proof: x - 2^19 f2 = 1820 + (1/9)c3 - (2/9)c2 - (32/9)c1 - (1/72)c0 + 2^19[0,0.75]
+		// at least 1820 - (2/9)255 - (32/9)255 - (1/72)255 > 0
+		// at most 1820 + (1/9)10329 + 2^19 0.75 < 2^19
 		f2 = ((233017 * c3) + (910 * (c2 + 2))) >> 19;
 		c2 += c3 << 8;
 		c2 -= (f2 * 9) << 6;
 		c1 += c2 << 8;
 
-		/* f0 + f1*6144 */
-		/* = c0 + c1*256 */
-		/* c1 <= 110184 = floor(4591*6144/2^8) */
-		/* f1 = (1/24)c1 + (1/6144)c0 - (1/6144)f0 */
-		/* claim: 2^19 f1 < x < 2^19(f1+1) */
-		/* where x = 21845(c1+2) + 85 c0 */
-		/* proof: x - 2^19 f1 = 43690 - (1/3)c1 - (1/3)c0 + 2^19 [0,0.75] */
-		/* at least 43690 - (1/3)110184 - (1/3)255 > 0 */
-		/* at most 43690 + 2^19 0.75 < 2^19 */
+		// f0 + f1*6144
+		// = c0 + c1*256
+		// c1 <= 110184 = floor(4591*6144/2^8)
+		// f1 = (1/24)c1 + (1/6144)c0 - (1/6144)f0
+		// claim: 2^19 f1 < x < 2^19(f1+1)
+		// where x = 21845(c1+2) + 85 c0
+		// proof: x - 2^19 f1 = 43690 - (1/3)c1 - (1/3)c0 + 2^19 [0,0.75]
+		// at least 43690 - (1/3)110184 - (1/3)255 > 0
+		// at most 43690 + 2^19 0.75 < 2^19
 		f1 = ((21845 * (c1 + 2)) + (85 * c0)) >> 19;
 		c1 -= (f1 * 3) << 3;
 		c0 += c1 << 8;
@@ -938,17 +938,17 @@ int NTRUSQ4591N761::R3Recip(std::array<int8_t, NTRU_P> &R, const std::array<int8
 
 	while (loop < ITRCNT)
 	{
-		/* e == -1 or d + e + loop <= 2*p */
-		/* f has degree p: i.e., f[p]!=0 */
-		/* f[i]==0 for i < p-d */
-		/* g has degree <=p (so it fits in p+1 coefficients) */
-		/* g[i]==0 for i < p-e */
-		/* u has degree <=loop (so it fits in loop+1 coefficients) */
-		/* u[i]==0 for i < p-d */
-		/* if invertible: u[i]==0 for i < loop-p (so can look at just p+1 coefficients) */
-		/* v has degree <=loop (so it fits in loop+1 coefficients) */
-		/* v[i]==0 for i < p-e */
-		/* v[i]==0 for i < loop-p (so can look at just p+1 coefficients) */
+		// e == -1 or d + e + loop <= 2*p
+		// f has degree p: i.e., f[p]!=0
+		// f[i]==0 for i < p-d
+		// g has degree <=p (so it fits in p+1 coefficients)
+		// g[i]==0 for i < p-e
+		// u has degree <=loop (so it fits in loop+1 coefficients)
+		// u[i]==0 for i < p-d
+		// if invertible: u[i]==0 for i < loop-p (so can look at just p+1 coefficients)
+		// v has degree <=loop (so it fits in loop+1 coefficients)
+		// v[i]==0 for i < p-e
+		// v[i]==0 for i < loop-p (so can look at just p+1 coefficients)
 
 		c = Mod3Quotient(g[NTRU_P], f[NTRU_P]);
 		VectorMod3MinusProduct(g, g, f, c, NTRU_P + 1);
@@ -1037,7 +1037,7 @@ void NTRUSQ4591N761::VectorModqShift(std::vector<int16_t> &Z, size_t ZOffset, si
 {
 	int32_t i;
 
-	for (i = Length - 1; i > 0; --i)
+	for (i = static_cast<int32_t>(Length) - 1; i > 0; --i)
 	{
 		Z[ZOffset + i] = Z[ZOffset + i - 1];
 	}
@@ -1047,12 +1047,10 @@ void NTRUSQ4591N761::VectorModqShift(std::vector<int16_t> &Z, size_t ZOffset, si
 
 int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<int8_t, NTRU_P> &S)
 {
-	/*
-	r = (3s)^(-1) mod m, returning 0, if s is invertible mod m
-	or returning -1 if s is not invertible mod m
-	r,s are polys of degree <p
-	m is x^p-x-1
-	*/
+	// r = (3s)^(-1) mod m, returning 0, if s is invertible mod m
+	// or returning -1 if s is not invertible mod m
+	// r,s are polys of degree <p
+	// m is x^p-x-1
 	const size_t ITRCNT = 2 * NTRU_P + 1;
 
 	std::vector<int16_t> f(NTRU_P + 1);
@@ -1075,8 +1073,8 @@ int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<in
 	f[1] = -1;
 	f[NTRU_P] = 1;
 
-	/* generalization: can initialize f to any polynomial m */
-	/* requirements: m has degree exactly p, nonzero constant coefficient */
+	// generalization: can initialize f to any polynomial m
+	// requirements: m has degree exactly p, nonzero constant coefficient
 	for (i = 0; i < NTRU_P; ++i)
 	{
 		g[i] = 3 * S[i];
@@ -1102,17 +1100,17 @@ int NTRUSQ4591N761::RqRecip3(std::array<int16_t, NTRU_P> &R, const std::array<in
 
 	while (loop < ITRCNT)
 	{
-		/* e == -1 or d + e + loop <= 2*p */
-		/* f has degree p: i.e., f[p]!=0 */
-		/* f[i]==0 for i < p-d */
-		/* g has degree <=p (so it fits in p+1 coefficients) */
-		/* g[i]==0 for i < p-e */
-		/* u has degree <=loop (so it fits in loop+1 coefficients) */
-		/* u[i]==0 for i < p-d */
-		/* if invertible: u[i]==0 for i < loop-p (so can look at just p+1 coefficients) */
-		/* v has degree <=loop (so it fits in loop+1 coefficients) */
-		/* v[i]==0 for i < p-e */
-		/* v[i]==0 for i < loop-p (so can look at just p+1 coefficients) */
+		// e == -1 or d + e + loop <= 2*p
+		// f has degree p: i.e., f[p]!=0
+		// f[i]==0 for i < p-d
+		// g has degree <=p (so it fits in p+1 coefficients)
+		// g[i]==0 for i < p-e
+		// u has degree <=loop (so it fits in loop+1 coefficients)
+		// u[i]==0 for i < p-d
+		// if invertible: u[i]==0 for i < loop-p (so can look at just p+1 coefficients)
+		// v has degree <=loop (so it fits in loop+1 coefficients)
+		// v[i]==0 for i < p-e
+		// v[i]==0 for i < loop-p (so can look at just p+1 coefficients)
 
 		c = ModqQuotient(g[NTRU_P], f[NTRU_P]);
 		VectorModqMinusProduct(g, g, f, NTRU_P + 1, c);

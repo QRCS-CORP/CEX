@@ -761,7 +761,7 @@ bool MPKCM12T62::Decrypt(std::vector<byte> &E, const std::vector<byte> &PrivateK
 
 	// Berlekamp Massey
 	std::array<ulong, MPKC_M> locator;
-	std::memset(&locator[0], byte(0), locator.size() * sizeof(ulong));
+	Utility::MemUtils::Clear(locator, 0, locator.size() * sizeof(ulong));
 	BerlekampMassey(locator, sPriv);
 
 	// additive FFT

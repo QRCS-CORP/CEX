@@ -184,7 +184,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	// generate the shared secret
 	m_rndGenerator->GetBytes(SharedSecret);
 
-	// H(e+d) to key cipher
+	// H(e+dk) to key cipher
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 	gen.Initialize(e, m_domainKey);
 	gen.Generate(key);
@@ -224,7 +224,6 @@ IAsymmetricKeyPair* McEliece::Generate()
 
 	return new Key::Asymmetric::MPKCKeyPair(ask, apk);
 }
-
 
 void McEliece::Initialize(IAsymmetricKey* Key)
 {

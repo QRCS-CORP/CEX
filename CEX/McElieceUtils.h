@@ -36,13 +36,13 @@ public:
 
 	//~~~Public Functions~~~//
 
-	static ushort Diff(ushort A, ushort B);
+	static ushort Diff(ushort X, ushort Y);
 
 	static ushort Invert(ushort X, const size_t Degree);
 
-	static ulong MaskNonZero64(ushort A);
+	static ulong MaskNonZero64(ushort X);
 
-	static ulong MaskLeq64(ushort A, ushort B);
+	static ulong MaskLeq64(ushort X, ushort Y);
 
 	static ushort Multiply(ushort X, ushort Y, const size_t Degree);
 
@@ -51,20 +51,20 @@ public:
 	//~~~Templates~~~//
 
 	template<typename Array>
-	inline static void Add(Array &X, Array &Y)
+	inline static void Add(Array &A, const Array &B)
 	{
-		for (size_t i = 0; i < X.size(); i++)
+		for (size_t i = 0; i < A.size(); i++)
 		{
-			X[i] ^= Y[i];
+			A[i] ^= B[i];
 		}
 	}
 
 	template<typename Array>
-	inline static void Add(Array &Output, Array &X, Array &Y)
+	inline static void Add(Array &Output, const Array &A, const Array &B)
 	{
 		for (size_t i = 0; i < Output.size(); i++)
 		{
-			Output[i] = X[i] ^ Y[i];
+			Output[i] = A[i] ^ B[i];
 		}
 	}
 
@@ -83,7 +83,7 @@ public:
 	}
 
 	template<typename ArrayA, typename ArrayB>
-	static void BenesCompact(ArrayA &Received, ArrayB &Condition, int Reverse)
+	static void BenesCompact(ArrayA &Output, const ArrayB &Condition, int Reverse)
 	{
 		size_t condPos;
 		int inc, low;
@@ -101,35 +101,35 @@ public:
 
 		for (low = 0; low <= 5; low++)
 		{
-			BenesHelp(Received, Condition, condPos, low);
+			BenesHelp(Output, Condition, condPos, low);
 			condPos += inc;
 		}
 
-		TransposeCompact64x64(Received);
+		TransposeCompact64x64(Output);
 
 		for (low = 0; low <= 5; low++)
 		{
-			BenesHelp(Received, Condition, condPos, low);
+			BenesHelp(Output, Condition, condPos, low);
 			condPos += inc;
 		}
 
 		for (low = 4; low >= 0; low--)
 		{
-			BenesHelp(Received, Condition, condPos, low);
+			BenesHelp(Output, Condition, condPos, low);
 			condPos += inc;
 		}
 
-		TransposeCompact64x64(Received);
+		TransposeCompact64x64(Output);
 
 		for (low = 5; low >= 0; low--)
 		{
-			BenesHelp(Received, Condition, condPos, low);
+			BenesHelp(Output, Condition, condPos, low);
 			condPos += inc;
 		}
 	}
 
 	template<typename ArrayA, typename ArrayB>
-	static void BenesHelp(ArrayA &Received, ArrayB &Condition, size_t CondPos, int Low)
+	static void BenesHelp(ArrayA &Output, const ArrayB &Condition, size_t CondOffset, int Low)
 	{
 		int i, j, x, y;
 		int high = 5 - Low;
@@ -142,11 +142,11 @@ public:
 
 			for (i = 0; i < (1 << high); i++)
 			{
-				diff = Received[x] ^ Received[y];
-				diff &= Condition[CondPos];
-				++CondPos;
-				Received[x] ^= diff;
-				Received[y] ^= diff;
+				diff = Output[x] ^ Output[y];
+				diff &= Condition[CondOffset];
+				++CondOffset;
+				Output[x] ^= diff;
+				Output[y] ^= diff;
 				x += (1 << (Low + 1));
 				y += (1 << (Low + 1));
 			}
@@ -154,7 +154,7 @@ public:
 	}
 
 	template<typename ArrayA, typename ArrayB>
-	inline static void CMov(ArrayB &Input, ArrayA &Output, ulong Mask)
+	inline static void CMov(const ArrayB &Input, ArrayA &Output, ulong Mask)
 	{
 		for (size_t i = 0; i < Output.size(); i++)
 		{
@@ -182,7 +182,7 @@ public:
 	}
 
 	template<typename ArrayA, typename ArrayB>
-	static void Multiply(ArrayA &Output, ArrayA &A, const ArrayB &B)
+	static void Multiply(ArrayA &Output, const ArrayA &A, const ArrayB &B)
 	{
 		ulong t1 = A[11] & B[11];
 		ulong t2 = A[11] & B[9];
@@ -442,7 +442,7 @@ public:
 	}
 
 	template<typename Array>
-	static ushort Reduce(Array &Product, const size_t Degree)
+	static ushort Reduce(const Array &Product, const size_t Degree)
 	{
 		ushort ret = 0;
 		int i = static_cast<int>(Degree - 1);
@@ -566,7 +566,7 @@ public:
 	}
 
 	template<typename Array>
-	static int Weight(Array &A)
+	static int Weight(Array &Input)
 	{
 		size_t i;
 		std::array<ulong, 8> state;
@@ -574,7 +574,7 @@ public:
 
 		for (i = 0; i < 64; i++)
 		{
-			AddCarry(state, A[i]);
+			AddCarry(state, Input[i]);
 		}
 
 		Transpose8x64(state);

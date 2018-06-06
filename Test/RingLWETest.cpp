@@ -148,7 +148,6 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-
 			IAsymmetricKeyPair* kp = asyCpr.Generate();
 			RLWEPrivateKey* priK1 = (RLWEPrivateKey*)kp->PrivateKey();
 			skey = priK1->ToBytes();

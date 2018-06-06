@@ -4,9 +4,9 @@ NAMESPACE_MCELIECE
 
 //~~~Public Functions~~~//
 
-ushort McElieceUtils::Diff(ushort A, ushort B)
+ushort McElieceUtils::Diff(ushort X, ushort Y)
 {
-	uint t = static_cast<uint>(A ^ B);
+	uint t = static_cast<uint>(X ^ Y);
 	t = ((t - 1) >> 20) ^ 0xFFF;
 
 	return static_cast<ushort>(t);
@@ -37,9 +37,9 @@ ushort McElieceUtils::Invert(ushort X, const size_t Degree)
 	return Square(out, Degree);
 }
 
-ulong McElieceUtils::MaskNonZero64(ushort A)
+ulong McElieceUtils::MaskNonZero64(ushort X)
 {
-	ulong ret = A;
+	ulong ret = X;
 
 	ret -= 1;
 	ret >>= 63;
@@ -48,10 +48,10 @@ ulong McElieceUtils::MaskNonZero64(ushort A)
 	return ret;
 }
 
-ulong McElieceUtils::MaskLeq64(ushort A, ushort B)
+ulong McElieceUtils::MaskLeq64(ushort X, ushort Y)
 {
-	ulong tmpA = A;
-	ulong tmpB = B;
+	ulong tmpA = X;
+	ulong tmpB = Y;
 	ulong ret = tmpB - tmpA;
 
 	ret >>= 63;

@@ -14,7 +14,7 @@ There are some new ideas, and new technologies, as I intend to push the envelope
 
 This library is being built in two stages; the symmetric cryptography, which consists of ciphers, hash functions, MACs, RNGs, TRNGs etc, preliminary work has been completed as of version v1.0. 
 That work is still evolving however, as improvements and additions to the symmetric cryptography will continue throughout the libraries lifetime.
-The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and this release contains the RingLWE and McEliece asymmetric ciphers.
+The second half will be the addition of asymmetric cryptography, with a strong focus on post-quantum security. This work has begun, and this release contains the NTRU (NTRU Prime), RingLWE (New Hope), ModuleLWE (Kyber) and McEliece (Niederreiter) asymmetric ciphers.
 
 Though efforts have been made towards future compatibility with other platforms, this is currently a Windows-only library. 
 This has been tested on MSVC-2015 and MSVC-2017 in ARM/x86/x64 debug and release modes, using the MSVC and Intel compiler tool-chains, and future efforts will be made to add support for Intel/Clang and GCC compilers once testing begins on other operating systems. This project also requires OpenMP support.
@@ -33,9 +33,10 @@ This is still an early stage in the development of this library, so stay tuned, 
 
 ## Contents
 ### Asymmetric Ciphers
-* The RingLWE asymmetric cipher
+* The NTRU asymmetric cipher (S-Prime and L-Prime)
+* The RingLWE asymmetric cipher (New Hope)
 * The Niederreiter dual form of the McEliece cipher
-* The ModuleLWE asymmetric cipher
+* The ModuleLWE asymmetric cipher (Kyber)
 
 ### Block Ciphers
 Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid

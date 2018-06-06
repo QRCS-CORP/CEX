@@ -3,7 +3,6 @@
 #include "NTRULQ4591N761.h"
 #include "NTRUSQ4591N761.h"
 #include "IntUtils.h"
-#include "MemUtils.h"
 #include "PrngFromName.h"
 #include "SHAKE.h"
 #include "SymmetricKey.h"
@@ -147,7 +146,6 @@ bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &S
 	{
 		CexAssert(CipherText.size() >= NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE, "The cipher-text array is too small");
 
-		// process message from B and return shared secret
 		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->R());
 	}
 	else
@@ -177,7 +175,7 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 
 		CipherText.resize(NTRUSQ4591N761::NTRU_CIPHERTEXT_SIZE);
 
-		// generate B reply and store secret
+		// generate reply and store secret
 		NTRUSQ4591N761::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
 	}
 	else if (m_ntruParameters == NTRUParams::LQ4591N761)
@@ -186,7 +184,6 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 
 		CipherText.resize(NTRULQ4591N761::NTRU_CIPHERTEXT_SIZE);
 
-		// generate B reply and store secret
 		NTRULQ4591N761::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
 	}
 	else

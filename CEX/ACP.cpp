@@ -109,7 +109,7 @@ void ACP::Reset()
 		throw CryptoRandomException("ACP:Reset", "Entropy collection has failed!", std::string(ex.what()));
 	}
 
-	// Note: this provider uses the extended version of rijndael, using 38 rounds for maximum diffusion
+	// Note: this provider uses the extended form of rijndael, using 38 rounds for maximum diffusion
 	// get the iv and hkdf-info from system provider
 	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[0];
 	std::vector<byte> info(keySize.InfoSize());
@@ -118,8 +118,8 @@ void ACP::Reset()
 	pvd.GetBytes(info);
 	pvd.GetBytes(iv);
 	// key the cipher
-	Key::Symmetric::SymmetricKey sk(key, iv, info);
-	m_cipherMode->Initialize(true, sk);
+	Key::Symmetric::SymmetricKey kp(key, iv, info);
+	m_cipherMode->Initialize(true, kp);
 }
 
 //~~~Private Functions~~~//

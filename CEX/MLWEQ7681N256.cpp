@@ -1,5 +1,5 @@
 #include "MLWEQ7681N256.h"
-#include "PolyMath.h"
+#include "MemUtils.h"
 #include "SHAKE.h"
 
 NAMESPACE_MODULELWE
@@ -234,7 +234,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 	size_t pos;
 
 	std::vector<byte> tmpK(Seed.size() + 2);
-	std::memcpy(tmpK.data(), Seed.data(), Seed.size());
+	Utility::MemUtils::Copy(Seed, 0, tmpK, 0, Seed.size());
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE128);
 	std::vector<byte> buf(gen.BlockSize() * 4);
 

@@ -71,48 +71,100 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		NTRU cpr(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		// LPrime
+		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
-		cpr.Initialize(kp->PublicKey());
-		cpr.Encapsulate(cpt, sec1);
+		cpr1.Initialize(kp1->PublicKey());
+		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
 		m_rngPtr->GetBytes(cpt, 0, 4);
 
-		cpr.Initialize(kp->PrivateKey());
+		cpr1.Initialize(kp1->PrivateKey());
 
-		if (cpr.Decapsulate(cpt, sec2))
+		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: Cipher-text integrity test failed!");
+			throw TestException("NTRUTest: L-Prime Cipher-text integrity test failed!");
 		}
 
-		delete kp;
+		delete kp1;
+
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		// SPrime
+		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		cpr2.Initialize(kp2->PublicKey());
+		cpr2.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->GetBytes(cpt, 0, 4);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException("NTRUTest: S-Prime Cipher-text integrity test failed!");
+		}
+
+		delete kp2;
 	}
 
 	void NTRUTest::MessageAuthentication()
 	{
 		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(32);
-		std::vector<byte> sec2(32);
+		std::vector<byte> sec1(64);
+		std::vector<byte> sec2(64);
 
-		NTRU cpr(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		// LPrime
+		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
-		cpr.Initialize(kp->PublicKey());
-		cpr.Encapsulate(cpt, sec1);
+		cpr1.Initialize(kp1->PublicKey());
+		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
 		m_rngPtr->GetBytes(cpt, 0, 4);
 
-		cpr.Initialize(kp->PrivateKey());
+		cpr1.Initialize(kp1->PrivateKey());
 
-		if (cpr.Decapsulate(cpt, sec2))
+		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: Cipher-text integrity test failed!");
+			throw TestException("NTRUTest: L-Prime Cipher-text integrity test failed!");
 		}
 
-		delete kp;
+		delete kp1;
+
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		// SPrime
+		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		cpr2.Initialize(kp2->PublicKey());
+		cpr2.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->GetBytes(cpt, 0, 4);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException("NTRUTest: S-Prime Cipher-text integrity test failed!");
+		}
 	}
 
 	void NTRUTest::PublicKeyIntegrity()
@@ -121,25 +173,54 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		NTRU cpr(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
+		// LPrime
+		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
-		std::vector<byte> p2 = ((NTRUPublicKey*)kp->PublicKey())->P();
-		p2[0] += 1;
-		p2[1] += 1;
-		NTRUPublicKey* pk2 = new NTRUPublicKey(Enumeration::NTRUParams::LQ4591N761, p2);
-		cpr.Initialize(pk2);
-		cpr.Encapsulate(cpt, sec1);
+		std::vector<byte> p1 = ((NTRUPublicKey*)kp1->PublicKey())->P();
+		p1[0] += 1;
+		p1[1] += 1;
+		NTRUPublicKey* pk1 = new NTRUPublicKey(Enumeration::NTRUParams::LQ4591N761, p1);
+		cpr1.Initialize(pk1);
+		cpr1.Encapsulate(cpt, sec1);
 
-		cpr.Initialize(kp->PrivateKey());
+		cpr1.Initialize(kp1->PrivateKey());
 
-		if (cpr.Decapsulate(cpt, sec2))
+		if (cpr1.Decapsulate(cpt, sec2))
 		{
 			throw TestException("NTRUTest: Cipher-text integrity test failed!");
 		}
 
-		delete kp;
+		delete kp1;
+
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		// SPrime
+		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		// alter public key
+		std::vector<byte> p2 = ((NTRUPublicKey*)kp2->PublicKey())->P();
+		p2[0] += 1;
+		p2[1] += 1;
+		NTRUPublicKey* pk2 = new NTRUPublicKey(Enumeration::NTRUParams::SQ4591N761, p2);
+		cpr2.Initialize(pk2);
+		cpr2.Encapsulate(cpt, sec1);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException("NTRUTest: Cipher-text integrity test failed!");
+		}
+
+		delete kp2;
 	}
 
 	void NTRUTest::SerializationCompare()
@@ -149,7 +230,6 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-
 			IAsymmetricKeyPair* kp = cpr.Generate();
 			NTRUPrivateKey* priK1 = (NTRUPrivateKey*)kp->PrivateKey();
 			skey = priK1->ToBytes();
@@ -173,27 +253,50 @@ namespace Test
 
 	void NTRUTest::StressLoop()
 	{
-		// test encapsulate/decapsulate
+		// test encapsulate/decapsulate with LPrime configuration
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
-		NTRU cpr(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
 
-		for (size_t i = 0; i < 100; ++i)
+		// LPrime
+		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+
+		for (size_t i = 0; i < 50; ++i)
 		{
-			IAsymmetricKeyPair* kp = cpr.Generate();
+			IAsymmetricKeyPair* kp = cpr1.Generate();
 
-			cpr.Initialize(kp->PublicKey());
-			cpr.Encapsulate(cpt, sec1);
+			cpr1.Initialize(kp->PublicKey());
+			cpr1.Encapsulate(cpt, sec1);
 
-			cpr.Initialize(kp->PrivateKey());
-			cpr.Decapsulate(cpt, sec2);
+			cpr1.Initialize(kp->PrivateKey());
+			cpr1.Decapsulate(cpt, sec2);
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException("NTRUTest: Stress test has failed!");
+				throw TestException("NTRUTest: L-Prime Stress test has failed!");
+			}
+		}
+
+		// SPrime
+		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+
+		for (size_t i = 0; i < 50; ++i)
+		{
+			IAsymmetricKeyPair* kp = cpr2.Generate();
+
+			cpr2.Initialize(kp->PublicKey());
+			cpr2.Encapsulate(cpt, sec1);
+
+			cpr2.Initialize(kp->PrivateKey());
+			cpr2.Decapsulate(cpt, sec2);
+
+			delete kp;
+
+			if (sec1 != sec2)
+			{
+				throw TestException("NTRUTest: S-PrimeStress test has failed!");
 			}
 		}
 	}

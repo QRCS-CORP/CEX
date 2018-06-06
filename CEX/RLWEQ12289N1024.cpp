@@ -763,7 +763,7 @@ void RLWEQ12289N1024::PolySample(std::array<ushort, RLWE_N> &R, const std::vecto
 	extseed[RLWE_SEED_SIZE] = Nonce;
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 
-	/* Generate noise in blocks of 64 coefficients */
+	// Generate noise in blocks of 64 coefficients
 	for (i = 0; i < RLWE_N / 64; ++i)
 	{
 		extseed[RLWE_SEED_SIZE + 1] = static_cast<uint8_t>(i);
@@ -870,7 +870,7 @@ void RLWEQ12289N1024::PolyUniform(std::array<ushort, RLWE_N> &A, const std::vect
 				val = (buf[j] | ((ushort)buf[j + 1] << 8));
 				if (val < 5 * RLWE_Q)
 				{
-					A[i * 64 + ctr] = val;
+					A[(i * 64) + ctr] = val;
 					ctr++;
 				}
 			}

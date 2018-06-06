@@ -22,47 +22,29 @@ public:
 	/// <summary>
 	/// Constructor: instantiate this class
 	/// </summary>
-	TimeStamp()
-		:
-		m_hasTsc(Utility::SysUtils::HasRdtsc()),
-		m_msCounter(0),
-		m_tmFrequency(m_hasTsc ? Utility::SysUtils::GetRdtscFrequency() : 100)
-	{
-	}
+	TimeStamp();
 
 	/// <summary>
 	/// Returns the number of time units (frequency) elapsed
 	/// </summary>
 	/// 
 	/// <returns>Return elapsed interval</returns>
-	ulong Elapsed()
-	{
-		return Utility::SysUtils::TimeStamp(m_hasTsc) - m_msCounter;
-	}
+	ulong Elapsed();
 
 	/// <summary>
 	/// The timing frequency in ticks
 	/// </summary>
-	ulong Frequency()
-	{
-		return m_tmFrequency;
-	}
+	ulong Frequency();
 
 	/// <summary>
 	/// Reset the counter value to 0
 	/// </summary>
-	void Reset()
-	{
-		m_msCounter = 0;
-	}
+	void Reset();
 
 	/// <summary>
 	/// Store the reference time
 	/// </summary>
-	void Start()
-	{
-		m_msCounter = Utility::SysUtils::TimeStamp(m_hasTsc);
-	}
+	void Start();
 };
 
 NAMESPACE_UTILITYEND
