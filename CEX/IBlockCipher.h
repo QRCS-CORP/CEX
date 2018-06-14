@@ -20,18 +20,19 @@
 #define CEX_IBLOCKCIPHER_H
 
 #include "CexDomain.h"
+#include "BlockCipherExtensions.h"
 #include "BlockCiphers.h"
 #include "CryptoSymmetricCipherException.h"
-#include "IDigest.h"
+#include "IKdf.h"
 #include "ISymmetricKey.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_BLOCK
 
+using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Exception::CryptoSymmetricCipherException;
-using Enumeration::Digests;
-using Digest::IDigest;
+using Kdf::IKdf;
 using Key::Symmetric::ISymmetricKey;
 using Key::Symmetric::SymmetricKeySize;
 
@@ -76,6 +77,11 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
+	/// Read Only: The extended key-schedule KDF generator type
+	/// </summary>
+	virtual const BlockCipherExtensions CipherExtension() = 0;
+
+	/// <summary>
 	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
 	/// <para>Changing this code will create a unique distribution of the cipher.
 	/// Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size.
@@ -108,19 +114,9 @@ public:
 	virtual const bool IsInitialized() = 0;
 
 	/// <summary>
-	/// Read Only: The extended ciphers HKDF digest type
-	/// </summary>
-	virtual const Digests KdfEngine() = 0;
-
-	/// <summary>
 	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	virtual const std::vector<SymmetricKeySize> &LegalKeySizes() = 0;
-
-	/// <summary>
-	/// Read Only: Available transformation round assignments
-	/// </summary>
-	virtual const std::vector<size_t> &LegalRounds() = 0;
 
 	/// <summary>
 	/// Read Only: The block ciphers class name

@@ -8,7 +8,7 @@ NAMESPACE_HELPER
 
 IPadding* PaddingFromName::GetInstance(PaddingModes PaddingType)
 {
-	IPadding* padPtr;
+	IPadding* padPtr = nullptr;
 
 	try
 	{

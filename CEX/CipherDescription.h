@@ -3,68 +3,42 @@
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"
-#include "BlockSizes.h"
+#include "BlockCipherExtensions.h"
 #include "CipherModes.h"
-#include "Digests.h"
 #include "IVSizes.h"
+#include "KeySizes.h"
 #include "MemoryStream.h"
 #include "PaddingModes.h"
-#include "RoundCounts.h"
 
 NAMESPACE_PROCESSING
 
 using Enumeration::BlockCiphers;
-using Enumeration::BlockSizes;
+using Enumeration::BlockCipherExtensions;
 using Enumeration::CipherModes;
-using Enumeration::Digests;
 using Enumeration::IVSizes;
+using Enumeration::KeySizes;
 using Enumeration::PaddingModes;
-using Enumeration::RoundCounts;
 using IO::MemoryStream;
 
 /// <summary>
-/// The CipherDescription structure.
-/// <para>Used in conjunction with the CipherStream class.
-/// Contains all the necessary settings required to recreate a cipher instance.</para>
+/// Contains symmetric cipher configuration information
 /// </summary>
-/// 
-/// <example>
-/// <description>Populating a CipherDescription structure:</description>
-/// <code>
-///    CipherDescription dsc(
-///        Engines.RHX,             // cipher engine
-///        192,                     // key size in bytes
-///        IVSizes.V128,            // cipher iv size
-///        CipherModes.CTR,         // cipher mode
-///        PaddingModes.X923,       // cipher padding mode
-///        BlockSizes.B128,         // block size
-///        RoundCounts.R18,         // transformation rounds
-///        Digests.Skein512);       // kdf digest
-/// </code>
-/// </example>
 class CipherDescription
 {
 private:
 
 	static const uint HDR_SIZE = 9;
 
-	byte m_engineType;
-	short m_keySize;
-	byte m_ivSize;
 	byte m_cipherType;
+	byte m_cipherExtensionType;
+	byte m_cipherModeType;
+	byte m_ivSize;
+	ushort m_keySize;
 	byte m_paddingType;
-	byte m_blockSize;
-	byte m_roundCount;
-	byte m_kdfEngine;
 
 public:
 
 	//~~~Constructor~~~//
-
-	/// <summary>
-	/// Copy operator: copy is restricted, this function has been deleted
-	/// </summary>
-	CipherDescription& operator=(const CipherDescription&) = delete;
 
 	/// <summary>
 	/// Default constructor
@@ -75,16 +49,18 @@ public:
 	/// Initialize a CipherDescription struct with parameters
 	/// </summary>
 	/// 
-	/// <param name="EngineType">The cipher type</param>
+	/// <param name="CipherType">The symmetric cipher type</param>
+	/// <param name="CipherExtensionType">The kdf engine type used to power the key schedule in HX-extended ciphers</param>
+	/// <param name="CipherModeType">The type of symmetric cipher mode</param>
+	/// <param name="PaddingType">The type of symmetric cipher padding mode</param>
 	/// <param name="KeySize">The cipher key size in bytes</param>
-	/// <param name="IvSize">Size of the cipher Initialization Vector</param>
-	/// <param name="CipherType">The type of cipher mode</param>
-	/// <param name="PaddingType">The type of cipher padding mode</param>
-	/// <param name="BlockSize">The cipher block size</param>
-	/// <param name="RoundCount">The number of transformation rounds</param>
-	/// <param name="DigestType">The digest engine used to power the key schedule key derivation Function in HX extended ciphers</param>
-	CipherDescription(BlockCiphers EngineType, short KeySize, IVSizes IvSize, CipherModes CipherType,
-		PaddingModes PaddingType, BlockSizes BlockSize, RoundCounts RoundCount, Digests DigestType = Digests::SHA512);
+	/// <param name="IvSize">Size of the cipher nonce or initialization ector</param>
+	CipherDescription(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType, PaddingModes PaddingType, KeySizes KeySize, IVSizes IvSize);
+
+	/// <summary>
+	/// Copy constructor
+	/// </summary>
+	explicit CipherDescription(CipherDescription* Description);
 
 	/// <summary>
 	/// Initialize the CipherDescription structure using a serialized cipher description stream
@@ -108,121 +84,295 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The Cryptographic Engine type
+	/// Read Only: The symmetric block-cipher type
 	/// </summary>
-	const BlockCiphers EngineType();
+	const BlockCiphers CipherType();
 
 	/// <summary>
-	/// Read Only: The cipher Key Size
+	/// Read Only: The KDF engine used to power the key schedule HX-extended ciphers
 	/// </summary>
-	const short KeySize() const;
+	const BlockCipherExtensions CipherExtensionType();
 
 	/// <summary>
-	/// Read/Write: The cipher Key Size
+	/// Read Only: The type of symmetric cipher mode
 	/// </summary>
-	short &KeySize();
+	const CipherModes CipherModeType();
 
 	/// <summary>
-	/// Read Only: Size of the cipher Initialization Vector
+	/// Read Only: Size of the ciphers nonce or initialization vector
 	/// </summary>
 	const IVSizes IvSize();
 
 	/// <summary>
-	/// Read Only: The type of Cipher Mode
+	/// Read Only: The symmetric ciphers input-key size
 	/// </summary>
-	const CipherModes CipherType();
+	const ushort KeySize() const;
 
 	/// <summary>
-	/// Read Only: The type of cipher Padding Mode
+	/// Read Only: The type of symmetric cipher padding mode
 	/// </summary>
 	const PaddingModes PaddingType();
 
-	/// <summary>
-	/// Read Only: The cipher Block Size
-	/// </summary>
-	const BlockSizes BlockSize();
-
-	/// <summary>
-	/// Read Only: The number of transformation Rounds
-	/// </summary>
-	const RoundCounts RoundCount();
-
-	/// <summary>
-	/// Read Only: The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
-	/// </summary>
-	const Digests KdfEngine();
-
 	//~~~Public Functions~~~//
+
+	//~~~AES~~~//
 
 	/// <summary>
 	/// An AES-128 preset using CBC mode and PKCS7 padding
 	/// </summary>
-	static CipherDescription AES128CBC();
-
-	/// <summary>
-	/// An AES-256 preset using CBC mode and PKCS7 padding
-	/// </summary>
-	static CipherDescription AES256CBC();
-
-	/// <summary>
-	/// An Rijndael-512 HX extended preset using CBC mode, PKCS7 padding, and an SHA256 powered KDF
-	/// </summary>
-	static CipherDescription RHX512CBC();
+	static CipherDescription* AES128CBC();
 
 	/// <summary>
 	/// An AES-128 preset using CTR mode
 	/// </summary>
-	static CipherDescription AES128CTR();
+	static CipherDescription* AES128CTR();
+
+	/// <summary>
+	/// An AES-128 preset using the AEAD GCM mode
+	/// </summary>
+	static CipherDescription* AES128GCM();
+
+	/// <summary>
+	/// An AES-256 preset using CBC mode and PKCS7 padding
+	/// </summary>
+	static CipherDescription* AES256CBC();
 
 	/// <summary>
 	/// An AES-256 preset using CTR mode
 	/// </summary>
-	static CipherDescription AES256CTR();
+	static CipherDescription* AES256CTR();
 
 	/// <summary>
-	/// An Rijndael-512 HX extended preset using CTR mode, and an SHA256 powered KDF
+	/// An AES-256 preset using the AEAD GCM mode
 	/// </summary>
-	static CipherDescription RHX512CTR();
+	static CipherDescription* AES256GCM();
+
+	//~~~RHX~~~//
+
+	/// <summary>
+	/// An Rijndael-256 HX-extended preset using CBC mode, PKCS7 padding, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* RHX256CBC();
+
+	/// <summary>
+	/// An Rijndael-256 HX-extended preset using CTR mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* RHX256CTR();
+
+	/// <summary>
+	/// An Rijndael-256 HX-extended preset using the AEAD GCM mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* RHX256GCM();
+
+	/// <summary>
+	/// An Rijndael-512 HX-extended preset using CBC mode, PKCS7 padding, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* RHX512CBC();
+
+	/// <summary>
+	/// An Rijndael-512 HX-extended preset using CTR mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* RHX512CTR();
+
+	/// <summary>
+	/// An Rijndael-512 HX-extended preset using the AEAD GCM mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* RHX512GCM();
+
+	//~~~RSX~~~//
+
+	/// <summary>
+	/// An Rijndael-256 HX-extended preset using CBC mode, PKCS7 padding, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* RSX256CBC();
+
+	/// <summary>
+	/// An Rijndael-256 HX-extended preset using CTR mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* RSX256CTR();
+
+	/// <summary>
+	/// An Rijndael-256 HX-extended preset using the AEAD GCM mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* RSX256GCM();
+
+	/// <summary>
+	/// An Rijndael-512 HX-extended preset using CBC mode, PKCS7 padding, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* RSX512CBC();
+
+	/// <summary>
+	/// An Rijndael-512 HX-extended preset using CTR mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* RSX512CTR();
+
+	/// <summary>
+	/// An Rijndael-512 HX-extended preset using the AEAD GCM mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* RSX512GCM();
+
+	//~~~Serpent~~~//
 
 	/// <summary>
 	/// An Serpent-256 preset using CBC mode and PKCS7 padding
 	/// </summary>
-	static CipherDescription SERPENT256CBC();
-
-	/// <summary>
-	/// An Serpent-512 HX extended preset using CBC mode, PKCS7 padding, and an SHA256 powered KDF
-	/// </summary>
-	static CipherDescription SHX512CBC();
+	static CipherDescription* SERPENT256CBC();
 
 	/// <summary>
 	/// An Serpent-256 preset using CTR mode
 	/// </summary>
-	static CipherDescription SERPENT256CTR();
+	static CipherDescription* SERPENT256CTR();
 
 	/// <summary>
-	/// An Serpent-512 HX extended preset using CTR mode, and an SHA256 powered KDF
+	/// An Serpent-256 preset using the AEAD GCM mode
 	/// </summary>
-	static CipherDescription SHX512CTR();
+	static CipherDescription* SERPENT256GCM();
+
+	//~~~SHX~~~//
+
+	/// <summary>
+	/// An Serpent-256 HX-extended preset using CBC mode, PKCS7 padding, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* SHX256CBC();
+
+	/// <summary>
+	/// An Serpent-256 HX-extended preset using CTR mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* SHX256CTR();
+
+	/// <summary>
+	/// An Serpent-256 HX-extended preset using the AEAD GCM mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* SHX256GCM();
+
+	/// <summary>
+	/// An Serpent-512 HX-extended preset using CBC mode, PKCS7 padding, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* SHX512CBC();
+
+	/// <summary>
+	/// An Serpent-512 HX-extended preset using CTR mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* SHX512CTR();
+
+	/// <summary>
+	/// An Serpent-512 HX-extended preset using the AEAD GCM mode, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* SHX512GCM();
+
+	//~~~SSX~~~//
+
+	/// <summary>
+	/// An Serpent-256 HX-extended preset using CBC mode, PKCS7 padding, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* SSX256CBC();
+
+	/// <summary>
+	/// An Serpent-256 HX-extended preset using CTR mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* SSX256CTR();
+
+	/// <summary>
+	/// An Serpent-256 HX-extended preset using the AEAD GCM mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* SSX256GCM();
+
+	/// <summary>
+	/// An Serpent-512 HX-extended preset using CBC mode, PKCS7 padding, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* SSX512CBC();
+
+	/// <summary>
+	/// An Serpent-512 HX-extended preset using CTR mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* SSX512CTR();
+
+	/// <summary>
+	/// An Serpent-512 HX-extended preset using the AEAD GCM mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* SSX512GCM();
+
+	//~~~Twofish~~~//
 
 	/// <summary>
 	/// An Twofish-256 preset using CBC mode and PKCS7 padding
 	/// </summary>
-	static CipherDescription TWOFISH256CBC();
-
-	/// <summary>
-	/// An Twofish-512 HX extended preset using CBC mode, PKCS7 padding, and an SHA256 powered KDF
-	/// </summary>
-	static CipherDescription THX512CBC();
+	static CipherDescription* TWOFISH256CBC();
 
 	/// <summary>
 	/// An Twofish-256 preset using CTR mode
 	/// </summary>
-	static CipherDescription TWOFISH256CTR();
+	static CipherDescription* TWOFISH256CTR();
 
 	/// <summary>
-	/// An Twofish-512 HX extended preset using CTR mode, and an SHA256 powered KDF
+	/// An Twofish-256 preset using the AEAD GCM mode
 	/// </summary>
-	static CipherDescription THX512CTR();
+	static CipherDescription* TWOFISH256GCM();
+
+	//~~~THX~~~//
+
+	/// <summary>
+	/// An Twofish-256 HX-extended preset using CBC mode, PKCS7 padding, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* THX256CBC();
+
+	/// <summary>
+	/// An Twofish-256 HX-extended preset using CTR mode, and an HKDF(SHA-256) key schedule
+	/// </summary>
+	static CipherDescription* THX256CTR();
+
+	/// <summary>
+	/// An Twofish-256 HX-extended preset using the AEAD GCM mode, and an HKDF(SHA-256) key schedule
+	/// </summary>
+	static CipherDescription* THX256GCM();
+
+	/// <summary>
+	/// An Twofish-512 HX-extended preset using CBC mode, PKCS7 padding, and an HKDF(SHA256) key schedule
+	/// </summary>
+	static CipherDescription* THX512CBC();
+
+	/// <summary>
+	/// An Twofish-512 HX-extended preset using CTR mode, and an SHA256 powered key schedule
+	/// </summary>
+	static CipherDescription* THX512CTR();
+
+	/// <summary>
+	/// An Twofish-512 HX-extended preset using the AEAD GCM mode, and an SHA256 powered key schedule
+	/// </summary>
+	static CipherDescription* THX512GCM();
+
+	//~~~TSX~~~//
+
+	/// <summary>
+	/// An Twofish-256 HX-extended preset using CBC mode, PKCS7 padding, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* TSX256CBC();
+
+	/// <summary>
+	/// An Twofish-256 HX-extended preset using CTR mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* TSX256CTR();
+
+	/// <summary>
+	/// An Twofish-256 HX-extended preset using the AEAD GCM mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* TSX256GCM();
+
+	/// <summary>
+	/// An Twofish-512 HX-extended preset using CBC mode, PKCS7 padding, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* TSX512CBC();
+
+	/// <summary>
+	/// An Twofish-512 HX-extended preset using CTR mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* TSX512CTR();
+
+	/// <summary>
+	/// An Twofish-512 HX-extended preset using the AEAD GCM mode, and an SHAKE-256 key schedule
+	/// </summary>
+	static CipherDescription* TSX512GCM();
+
 
 	/// <summary>
 	/// Compare this object instance with another

@@ -137,7 +137,7 @@ namespace Test
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: L-Prime Cipher-text integrity test failed!");
+			throw TestException("NTRUTest: L-Prime Message authentication integrity test failed!");
 		}
 
 		delete kp1;
@@ -163,7 +163,7 @@ namespace Test
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: S-Prime Cipher-text integrity test failed!");
+			throw TestException("NTRUTest: S-Prime Message authentication test failed!");
 		}
 	}
 
@@ -189,7 +189,7 @@ namespace Test
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: Cipher-text integrity test failed!");
+			throw TestException("NTRUTest: Public-key integrity test failed!");
 		}
 
 		delete kp1;
@@ -217,7 +217,7 @@ namespace Test
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: Cipher-text integrity test failed!");
+			throw TestException("NTRUTest: Public-key integrity test failed!");
 		}
 
 		delete kp2;
@@ -269,7 +269,11 @@ namespace Test
 			cpr1.Encapsulate(cpt, sec1);
 
 			cpr1.Initialize(kp->PrivateKey());
-			cpr1.Decapsulate(cpt, sec2);
+
+			if (!cpr1.Decapsulate(cpt, sec2))
+			{
+				throw TestException("NTRUTest: Stress test authentication has failed!");
+			}
 
 			delete kp;
 
@@ -290,7 +294,11 @@ namespace Test
 			cpr2.Encapsulate(cpt, sec1);
 
 			cpr2.Initialize(kp->PrivateKey());
-			cpr2.Decapsulate(cpt, sec2);
+
+			if (!cpr2.Decapsulate(cpt, sec2))
+			{
+				throw TestException("NTRUTest: Stress test authentication has failed!");
+			}
 
 			delete kp;
 

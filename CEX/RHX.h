@@ -124,19 +124,16 @@ private:
 	// size of state buffer and lookup tables subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 5120;
 
-	size_t m_cprKeySize;
+	BlockCipherExtensions m_cprExtension;
 	bool m_destroyEngine;
 	std::vector<uint> m_expKey;
 	std::vector<byte> m_kdfInfo;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IDigest> m_kdfEngine;
-	Digests m_kdfEngineType;
+	std::unique_ptr<IKdf> m_kdfGenerator;
 	size_t m_kdfInfoMax;
-	size_t m_kdfKeySize;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::vector<size_t> m_legalRounds;
 	size_t m_rndCount;
 
 public:
@@ -154,31 +151,19 @@ public:
 	RHX& operator=(const RHX&) = delete;
 
 	/// <summary>
-	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
+	/// Instantiate the class with an optional block-cipher extension type
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The Key Schedule HKDF hash-engine; can be any one of the Digest implementations. 
+	/// <param name="CipherExtension">Sets the optional Key Schedule key-expansion engine; valid settings are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
-	/// <param name="Rounds">The number of transformation rounds. 
-	/// <para>The <see cref="LegalRounds"/> property contains available sizes. 
-	/// In default mode (DigestType is set to None), the rounds count is automatically calculated based on the key size in a standard AES implementation.
-	/// If the HKDF digest is specified, the number of rounds can be user-defined to a value from 10 to 38 (mod 2).
-	/// Adding rounds increases diffusion in the ciphertext output, but takes longer to process.</para></param>
-	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	explicit RHX(Digests DigestType = Digests::None, size_t Rounds = 14);
+	RHX(BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
 
 	/// <summary>
-	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
+	/// Instantiate the class with a Key Derivation Function instance
 	/// </summary>
 	///
-	/// <param name="Digest">The Key Schedule KDF hash-engine instance;.
-	/// <para>Can be any one of the message digest implementations.</para></param>
-	/// <param name="Rounds">Number of transformation rounds, the default is 22 rounds (Rijndael-512).
-	/// <para>The <see cref="LegalRounds"/> property contains available sizes.</para></param>
-	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	explicit RHX(IDigest* Digest, size_t Rounds = 22);
+	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
+	RHX(Kdf::IKdf* Kdf);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -193,6 +178,11 @@ public:
 	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The extended key-schedule KDF generator type
+	/// </summary>
+	const BlockCipherExtensions CipherExtension() override;
 
 	/// <summary>
 	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
@@ -227,19 +217,9 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: The extended ciphers HKDF digest type
-	/// </summary>
-	const Digests KdfEngine() override;
-
-	/// <summary>
 	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Read Only: Available transformation round assignments
-	/// </summary>
-	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
 	/// Read Only: The block ciphers class name
@@ -386,7 +366,7 @@ private:
 	void ExpandKey(bool Encryption, const std::vector<byte> &Key);
 	void ExpandRotBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset, size_t RconIndex);
 	void ExpandSubBlock(std::vector<uint> &Key, size_t KeyIndex, size_t KeyOffset);
-	void LoadState(Digests DigestType);
+	void LoadState();
 	void Prefetch();
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);

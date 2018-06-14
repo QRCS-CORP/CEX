@@ -10,7 +10,7 @@ NAMESPACE_HELPER
 
 IProvider* ProviderFromName::GetInstance(Providers ProviderType)
 {
-	IProvider* rndPtr;
+	IProvider* rndPtr = nullptr;
 	Common::CpuDetect detect;
 
 	try

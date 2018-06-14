@@ -19,7 +19,7 @@ BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 	m_pvdType(ProviderType == Providers::None ? Providers::ACP : ProviderType),
 	m_rndSeed(0),
 	m_rngBuffer(0),
-	m_rngGenerator(new Drbg::BCG(CipherType, Enumeration::Digests::SHA256, m_pvdType))
+	m_rngGenerator(new Drbg::BCG(CipherType, Enumeration::BlockCipherExtensions::HKDF256, m_pvdType))
 {
 	Reset();
 }
@@ -35,7 +35,7 @@ BCR::BCR(std::vector<byte> &Seed, BlockCiphers CipherType, bool Parallel)
 	m_rndSeed(Seed.size() < 32 ? Seed :
 		throw CryptoRandomException("BCR:Ctor", "Seed size is too small!")),
 	m_rngBuffer(0),
-	m_rngGenerator(new Drbg::BCG(CipherType, Enumeration::Digests::SHA256, Providers::ACP))
+	m_rngGenerator(new Drbg::BCG(CipherType, Enumeration::BlockCipherExtensions::HKDF256, Providers::ACP))
 {
 	Reset();
 }

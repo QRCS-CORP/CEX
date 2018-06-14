@@ -129,7 +129,7 @@ using Enumeration::Providers;
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
-/// <item><description>This implementation is intended for SHA-2 digest functions, an exception will be thrown if used with the Skein, Blake, or Keccak functions.</description></item>
+/// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
 /// <item><description>The class constructor can either be initialized with message digest and entropy provider instances, or using the Digests and Providers enumeration names.</description></item>
 /// <item><description>Digest and provider instances created using the enumeration constructor, are automatically deleted when the class is destroyed.</description></item>
 /// <item><description>The generator can be initialized with either a SymmetricKey key container class, or with a Seed and optional inputs of Nonce and Info.</description></item>

@@ -1,4 +1,5 @@
 #include "KdfFromName.h"
+#include "Digests.h"
 #include "HKDF.h"
 #include "KDF2.h"
 #include "PBKDF2.h"
@@ -7,37 +8,52 @@
 
 NAMESPACE_HELPER
 
-IKdf* KdfFromName::GetInstance(Kdfs KdfType, Digests DigestType)
+IKdf* KdfFromName::GetInstance(Kdfs KdfType)
 {
-	if (DigestType == Digests::None)
-	{
-		throw CryptoException("KdfFromName:GetInstance", "The digest type can not be set to None!");
-	}
-
-	IKdf* kdfPtr;
+	IKdf* kdfPtr = nullptr;
 
 	try
 	{
 		switch (KdfType)
 		{
-			case Kdfs::HKDF:
+			case Kdfs::HKDF256:
 			{
-				kdfPtr = new Kdf::HKDF(DigestType);
+				kdfPtr = new Kdf::HKDF(Enumeration::Digests::SHA256);
 				break;
 			}
-			case Kdfs::KDF2:
+			case Kdfs::HKDF512:
 			{
-				kdfPtr = new Kdf::KDF2(DigestType);
+				kdfPtr = new Kdf::HKDF(Enumeration::Digests::SHA512);
 				break;
 			}
-			case Kdfs::PBKDF2:
+			case Kdfs::KDF2256:
 			{
-				kdfPtr = new Kdf::PBKDF2(DigestType);
+				kdfPtr = new Kdf::KDF2(Enumeration::Digests::SHA256);
 				break;
 			}
-			case Kdfs::SCRYPT:
+			case Kdfs::KDF2512:
 			{
-				kdfPtr = new Kdf::SCRYPT(DigestType);
+				kdfPtr = new Kdf::KDF2(Enumeration::Digests::SHA512);
+				break;
+			}
+			case Kdfs::PBKDF2256:
+			{
+				kdfPtr = new Kdf::PBKDF2(Enumeration::Digests::SHA256);
+				break;
+			}
+			case Kdfs::PBKDF2512:
+			{
+				kdfPtr = new Kdf::PBKDF2(Enumeration::Digests::SHA512);
+				break;
+			}
+			case Kdfs::SCRYPT256:
+			{
+				kdfPtr = new Kdf::SCRYPT(Enumeration::Digests::SHA256);
+				break;
+			}
+			case Kdfs::SCRYPT512:
+			{
+				kdfPtr = new Kdf::SCRYPT(Enumeration::Digests::SHA512);
 				break;
 			}
 			case Kdfs::SHAKE128:

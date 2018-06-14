@@ -7,7 +7,6 @@
 NAMESPACE_MCELIECE
 
 using Cipher::Symmetric::Block::Mode::IAeadMode;
-using Digest::IDigest;
 using Utility::IntUtils;
 using Utility::MemUtils;
 

@@ -16,7 +16,7 @@ const std::string ECP::CLASS_NAME("ECP");
 
 ECP::ECP()
 	:
-	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::Digests::SHA512, 38))),
+	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256))),
 	m_hasTsc(Utility::SysUtils::HasRdtsc()),
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
 	m_isAvailable(true)

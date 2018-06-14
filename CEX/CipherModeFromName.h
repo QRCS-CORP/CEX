@@ -3,12 +3,14 @@
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"
+#include "BlockCipherExtensions.h"
 #include "CryptoException.h"
 #include "ICipherMode.h"
 
 NAMESPACE_HELPER
 
 using Enumeration::BlockCiphers;
+using Enumeration::BlockCipherExtensions;
 using Enumeration::CipherModes;
 using Exception::CryptoException;
 using Cipher::Symmetric::Block::IBlockCipher;
@@ -26,25 +28,26 @@ public:
 	/// Get an Cipher Mode instance by name using default parameters
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The cipher mode enumeration name</param>
-	/// <param name="EngineType">The block cipher enumeration name</param>
+	/// <param name="CipherType">The block cipher enumeration name</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
+	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// 
-	/// <returns>A block cipher mode instance</returns>
+	/// <returns>An uninitialized block cipher mode instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static ICipherMode* GetInstance(CipherModes CipherType, BlockCiphers EngineType);
+	static ICipherMode* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType);
 
 	/// <summary>
-	/// Get an Cipher Mode instance by name using default parameters
+	/// Get a Cipher Mode instance by name with a block cipher instance
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The cipher mode enumeration name</param>
-	/// <param name="Engine">The block cipher instance</param>
+	/// <param name="Cipher">The block cipher instance</param>
+	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// 
-	/// <returns>A block cipher mode instance</returns>
+	/// <returns>An uninitialized block cipher mode instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static ICipherMode* GetInstance(CipherModes CipherType, IBlockCipher* Engine);
+	static ICipherMode* GetInstance(IBlockCipher* Cipher, CipherModes CipherModeType);
 };
 
 NAMESPACE_HELPEREND

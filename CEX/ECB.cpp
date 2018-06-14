@@ -9,9 +9,9 @@ const std::string ECB::CLASS_NAME("ECB");
 
 //~~~Constructor~~~//
 
-ECB::ECB(BlockCiphers CipherType)
+ECB::ECB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("ECB:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),

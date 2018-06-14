@@ -61,9 +61,19 @@ public:
 	static const size_t MPKC_T = 62; 
 
 	/// <summary>
+	/// The coin size in bytes
+	/// </summary>
+	static const size_t MPKC_COIN_SIZE = 32;
+
+	/// <summary>
 	/// The seed size in bytes
 	/// </summary>
 	static const size_t MPKC_SEED_SIZE = 64;
+
+	/// <summary>
+	/// The tag size in bytes
+	/// </summary>
+	static const size_t MPKC_TAG_SIZE = 16;
 
 	/// <summary>
 	/// The secret size in bytes
@@ -83,12 +93,12 @@ public:
 	/// <summary>
 	/// The byte size of the CCA cipher-text
 	/// </summary>
-	static const size_t MPKC_CCACIPHERTEXT_SIZE = MPKC_CPACIPHERTEXT_SIZE;
+	static const size_t MPKC_CCACIPHERTEXT_SIZE = (MPKC_CPACIPHERTEXT_SIZE + MPKC_TAG_SIZE);
 
 	/// <summary>
 	/// The byte size of the CCA private key polynomial
 	/// </summary>
-	static const size_t MPKC_CCAPRIVATEKEY_SIZE = MPKC_CPAPRIVATEKEY_SIZE;
+	static const size_t MPKC_CCAPRIVATEKEY_SIZE = (MPKC_CPAPRIVATEKEY_SIZE + MPKC_COIN_SIZE);
 
 	/// <summary>
 	/// The byte size of the CCA public key polynomial

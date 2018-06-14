@@ -3,14 +3,12 @@
 
 #include "CexDomain.h"
 #include "CryptoException.h"
-#include "Digests.h"
 #include "IKdf.h"
 #include "Kdfs.h"
 
 NAMESPACE_HELPER
 
 using Exception::CryptoException;
-using Enumeration::Digests;
 using Kdf::IKdf;
 using Enumeration::Kdfs;
 
@@ -27,12 +25,11 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="KdfType">The Kdf generators type name</param>
-	/// <param name="DigestType">The Kdf hash functions type name</param>
 	/// 
 	/// <returns>An uninitialized Kdf generator</returns>
 	/// 
-	/// <exception cref="CryptoProcessingException">Thrown if the Kdf or Digest type is not supported</exception>
-	static IKdf* GetInstance(Kdfs KdfType, Digests DigestType);
+	/// <exception cref="CryptoProcessingException">Thrown if the Kdf is not supported</exception>
+	static IKdf* GetInstance(Kdfs KdfType);
 };
 
 NAMESPACE_HELPEREND

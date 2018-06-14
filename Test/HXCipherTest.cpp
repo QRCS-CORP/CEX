@@ -5,7 +5,6 @@
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
 #include "../CEX/THX.h"
-#include "../CEX/SHA512.h"
 
 namespace Test
 {
@@ -18,12 +17,11 @@ namespace Test
 	HXCipherTest::HXCipherTest()
 		:
 		m_iv(16),
-		m_key(128),
-		m_key2(64),
+		m_key(3),
 		m_progressEvent(),
-		m_rhxExpected(0),
-		m_shxExpected(0),
-		m_thxExpected(0)
+		m_rhxExp(0),
+		m_shxExp(0),
+		m_thxExp(0)
 	{
 	}
 
@@ -51,15 +49,73 @@ namespace Test
 #if defined(__AVX__)
 			if (detect.AESNI())
 			{
-				AHXMonteCarlo();
+				// AES-256
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::None, m_key[0], m_rhxExp[0]);
+				// original vectors: each variation of RHX/RSX with 256, 512, and 1024bit keys
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::HKDF256, m_key[0], m_rhxExp[1]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::HKDF256, m_key[1], m_rhxExp[2]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::HKDF256, m_key[2], m_rhxExp[3]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::HKDF512, m_key[0], m_rhxExp[4]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::HKDF512, m_key[1], m_rhxExp[5]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::HKDF512, m_key[2], m_rhxExp[6]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, m_key[0], m_rhxExp[7]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, m_key[1], m_rhxExp[8]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::SHAKE256, m_key[2], m_rhxExp[9]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::SHAKE512, m_key[0], m_rhxExp[10]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::SHAKE512, m_key[1], m_rhxExp[11]);
+				CipherMonteCarlo(BlockCiphers::AHX, BlockCipherExtensions::SHAKE512, m_key[2], m_rhxExp[12]);
 				OnProgress(std::string("AHX: Passed AES-NI Monte Carlo tests.."));
 			}
 #endif
-			RHXMonteCarlo();
+			// AES-256
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::None, m_key[0], m_rhxExp[0]);
+			// original vectors: each variation of RHX/RSX with 256, 512, and 1024bit keys
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::HKDF256, m_key[0], m_rhxExp[1]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::HKDF256, m_key[1], m_rhxExp[2]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::HKDF256, m_key[2], m_rhxExp[3]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::HKDF512, m_key[0], m_rhxExp[4]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::HKDF512, m_key[1], m_rhxExp[5]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::HKDF512, m_key[2], m_rhxExp[6]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::SHAKE256, m_key[0], m_rhxExp[7]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::SHAKE256, m_key[1], m_rhxExp[8]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::SHAKE256, m_key[2], m_rhxExp[9]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::SHAKE512, m_key[0], m_rhxExp[10]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::SHAKE512, m_key[1], m_rhxExp[11]);
+			CipherMonteCarlo(BlockCiphers::RHX, BlockCipherExtensions::SHAKE512, m_key[2], m_rhxExp[12]);
 			OnProgress(std::string("RHX: Passed RHX Monte Carlo tests.."));
-			SHXMonteCarlo();
+
+			// Serpent-256
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::None, m_key[0], m_shxExp[0]);
+			// original vectors: each variation of SHX/SSX with 256, 512, and 1024bit keys
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::HKDF256, m_key[0], m_shxExp[1]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::HKDF256, m_key[1], m_shxExp[2]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::HKDF256, m_key[2], m_shxExp[3]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::HKDF512, m_key[0], m_shxExp[4]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::HKDF512, m_key[1], m_shxExp[5]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::HKDF512, m_key[2], m_shxExp[6]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE256, m_key[0], m_shxExp[7]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE256, m_key[1], m_shxExp[8]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE256, m_key[2], m_shxExp[9]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, m_key[0], m_shxExp[10]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, m_key[1], m_shxExp[11]);
+			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, m_key[2], m_shxExp[12]);
 			OnProgress(std::string("SHX: Passed SHX Monte Carlo tests.."));
-			THXMonteCarlo();
+
+			// Twofish-256
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::None, m_key[0], m_thxExp[0]);
+			// original vectors: each variation of THX/TSX with 256, 512, and 1024bit keys
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF256, m_key[0], m_thxExp[1]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF256, m_key[1], m_thxExp[2]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF256, m_key[2], m_thxExp[3]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF512, m_key[0], m_thxExp[4]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF512, m_key[1], m_thxExp[5]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF512, m_key[2], m_thxExp[6]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE256, m_key[0], m_thxExp[7]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE256, m_key[1], m_thxExp[8]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE256, m_key[2], m_thxExp[9]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE512, m_key[0], m_thxExp[10]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE512, m_key[1], m_thxExp[11]);
+			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE512, m_key[2], m_thxExp[12]);
 			OnProgress(std::string("THX: Passed THX Monte Carlo tests.."));
 
 			return SUCCESS;
@@ -78,40 +134,79 @@ namespace Test
 	{
 		const std::vector<std::string> rhxexp =
 		{
-			std::string("A36E01F66404B6AF9ED09EA6E4FAAFF2"),	// hkdf extended 14 rounds  old: 2ac5dd436cb2a1c976b25a1edaf1f650
-			std::string("43B4418A1D0B32AEFF34DF0C189556C4"),	// hkdf extended 22 rounds  old: 497bef5ccb4faee957b7946705c3dc10
-			std::string("05E57D29A9F646D840C070ED3A17DA53")		// standard 512 key, 22 rounds  old: same
+			std::string("EC5318C99B2793CA7AAFB87572E89DF7"),	// AES-256, standard
+			std::string("5D9B6A94A84FF1F5E689AA07FD5C1C70"),	// RHX-256, HKDF(SHA2-256)
+			std::string("DB808E5E524C8FDC6D8E01DAE6A6FC71"),	// RHX-512, HKDF(SHA2-256)
+			std::string("C71779C21E3E5FD2046C16E78056120C"),	// RHX-1024, HKDF(SHA2-256)
+			std::string("B58A8E4EACB6B4E49D5B1963B74D2775"),	// RHX-256, HKDF(SHA2-512)
+			std::string("3C46444E9147B06C782EFD5E1EEAD120"),	// RHX-512, HKDF(SHA2-512)
+			std::string("32E1F4B36C32466145577242A204D8FD"),	// RHX-1024, HKDF(SHA2-512)
+			std::string("9379BEF8BB0564D96973DB9DF78AF406"),	// RSX-256, SHAKE-256
+			std::string("71CB91605EC660A6A15CCDBB35C9F687"),	// RSX-512, SHAKE-256
+			std::string("C8D1E9B796CDB3D05042B486ABE3168E"),	// RSX-1024, SHAKE-256
+			std::string("236164000060515719FC1B5546E6AA1F"),	// RSX-256, SHAKE-512
+			std::string("E2336FC624B0F016405CDC51B705ED22"),	// RSX-512, SHAKE-512
+			std::string("58DB186CB703320081804FB45491C9CC")		// RSX-1024, SHAKE-512
 		};
-		HexConverter::Decode(rhxexp, 3, m_rhxExpected);
+		HexConverter::Decode(rhxexp, 13, m_rhxExp);
 
 		// Note: kat change with serpent move from BE to LE format
 		const std::vector<std::string> shxexp =
 		{
-			std::string("B47CC603A10D3C41D93BB98352611635"),	// hkdf extended 32 rounds  old: da87958d7644a9409d39bf8abb1f68a5
-			std::string("EB0942FC83099A30835B479BDE4BCF31"),	// hkdf extended 40 rounds  old: 631cfb750c1dccd2af8509af8eed9ee6
-			std::string("71C6C606B65798621DD19FA0F5E7ACB0")		// standard 512 key, 40 rounds  old: same
+			std::string("5780E642D6775957E708CC7452D13D96"),	// Serpent-256, standard
+			std::string("915174F04D2737CDD6B50C0656947C53"),	// SHX-256, HKDF(SHA2-256)
+			std::string("CB410DFE0FF2B1FCA909226CAC9DCFFB"),	// SHX-512, HKDF(SHA2-256)
+			std::string("C9370CE846BF22EEDF07C00000B7138D"),	// SHX-1024, HKDF(SHA2-256)
+			std::string("2D87BD93CB72180BAE8A87A4D4D4E1A1"),	// SHX-256, HKDF(SHA2-512)
+			std::string("510C8D4A37F63451ADE7ADE065C9A3B9"),	// SHX-512, HKDF(SHA2-512)
+			std::string("462E1C16A76523F72FB26DA55E44BA8B"),	// SHX-1024, HKDF(SHA2-512)
+			std::string("E5DFFAB57E0D5EA8FB681D5E29AAD30E"),	// SSX-256, SHAKE-256
+			std::string("8E942EDD99ECC873266EF7EBBE9205F7"),	// SSX-512, SHAKE-256
+			std::string("DE41CF2FB799AFA26170050A432B327E"),	// SSX-1024, SHAKE-256
+			std::string("54AC04306DD24526A01E2B54FA16A4E9"),	// SSX-256, SHAKE-512
+			std::string("34057F5A6C4F48E284FC977640135787"),	// SSX-512, SHAKE-512
+			std::string("66BA4CFB7419013ABE1B5EB53B6912FE")		// SSX-1024, SHAKE-512
 		};
-		HexConverter::Decode(shxexp, 3, m_shxExpected);
+		HexConverter::Decode(shxexp, 13, m_shxExp);
 
 		const std::vector<std::string> thxexp =
 		{
-			std::string("B8EE1FEC4B6CAF2607A84B52934FD3D3"),	// hkdf extended 16 rounds  old: 0b97de0f11367d25ad45d3293072e2bb
-			std::string("1870B32752892A6857F798751A8CC5FD"),	// hkdf extended 20 rounds  old: e0ec1b5807ed879a88a18244237e8bad
-			std::string("32626075C43A30A56AA4CC5DDBF58179")		// standard 512 key, 20 rounds  old: same
+			std::string("7E8E4F3257D67A34A99116FCB6BDD3E2"),	// Twofish-256, standard
+			std::string("D0AEAF0339D138C24DF4460DCD9D7C57"),	// THX-256, HKDF(SHA2-256)
+			std::string("EE238BF78F970053B7E2DE88D3FAA221"),	// THX-512, HKDF(SHA2-256)
+			std::string("24CA3AA3B108150F6D4D97757EFD2023"),	// THX-1024, HKDF(SHA2-256)
+			std::string("2B89A9913E21E8B37434E094DE8C0B71"),	// THX-256, HKDF(SHA2-512)
+			std::string("83839A97CF5783DE0FC685D382D473E0"),	// THX-512, HKDF(SHA2-512)
+			std::string("61C03FCF9B9B737C7CA0EC7E4398420F"),	// THX-1024, HKDF(SHA2-512)
+			std::string("7459BF875AF01F8F615822CD8B860317"),	// TSX-256, SHAKE-256
+			std::string("F4D5989263867DE77FC687FA2A5FFB0A"),	// TSX-512, SHAKE-256
+			std::string("56BD36E2C96B9ADC0703779E87DE30F6"),	// TSX-1024, SHAKE-256
+			std::string("EC237F8EBB6C8DA93B71A39638EA7AD6"),	// TSX-256, SHAKE-512
+			std::string("5E3D2B5C5D86BB62AE0AF48DEBA590DD"),	// TSX-512, SHAKE-512
+			std::string("E4B33E31903327E201B799717DBBCE28")		// TSX-1024, SHAKE-512
 		};
-		HexConverter::Decode(thxexp, 3, m_thxExpected);
+		HexConverter::Decode(thxexp, 13, m_thxExp);
 
-		for (byte i = 0; i < m_key.size(); i++)
+		m_key[0].resize(32);
+		m_key[1].resize(64);
+		m_key[2].resize(128);
+
+		for (byte i = 0; i < 128; i++)
 		{
-			m_key[i] = i;
-		}
-		for (byte i = 0; i < m_key2.size(); i++)
-		{
-			m_key2[i] = i;
-		}
-		for (byte i = 0; i < m_iv.size(); i++)
-		{
-			m_iv[i] = i;
+			if (i < 16)
+			{
+				m_iv[i] = i;
+			}
+			if (i < 32)
+			{
+				m_key[0][i] = i;
+			}
+			if (i < 64)
+			{
+				m_key[1][i] = i;
+			}
+
+			m_key[2][i] = i;
 		}
 	}
 
@@ -120,432 +215,47 @@ namespace Test
 		m_progressEvent(Data);
 	}
 
-#if defined(__AVX__)
-	void HXCipherTest::AHXMonteCarlo()
+	void HXCipherTest::CipherMonteCarlo(Enumeration::BlockCiphers BlockCipherType, Enumeration::BlockCipherExtensions CipherExtensionType, std::vector<byte> &Key, std::vector<byte> &Expected)
 	{
-		std::vector<byte> inpBytes(16, 0);
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> decBytes(16, 0);
+		std::vector<byte> inp(16, 128);
+		std::vector<byte> otp(16, 0);
+		std::vector<byte> dec(16, 128);
 
-		// AHX, 14 rounds
+		Key::Symmetric::SymmetricKey kp(Key, m_iv);
+		Mode::CTR cpr1(BlockCipherType, CipherExtensionType);
+
+		cpr1.Initialize(true, kp);
+		MonteCarloEncrypt(&cpr1, inp, otp);
+
+		if (otp != Expected)
 		{
-			Digest::SHA512 digest;
-			AHX* eng = new AHX(&digest, 14);
-			//std::vector<byte> info(eng->DistributionCodeMax(), 0);
-			//eng->DistributionCode() = info;
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			cipher.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_rhxExpected[0])
-			{
-				throw TestException("AHX: Failed encryption test!");
-			}
-
-			cipher.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("AHX: Failed decryption test!");
-			}
-		}
-		// AHX, 22 rounds
-		{
-			Digest::SHA512 digest;
-			AHX* eng = new AHX(&digest, 22);
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			cipher.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_rhxExpected[1])
-			{
-				throw TestException("AHX: Failed encryption test!");
-			}
-
-			cipher.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("AHX: Failed decryption test!");
-			}
+			throw TestException("RHX: Failed encryption test!");
 		}
 
-		// AHX, 22 rounds, standard key schedule
+		cpr1.Initialize(false, kp);
+		MonteCarloDecrypt(&cpr1, inp, otp);
+
+		if (otp != dec)
 		{
-			AHX* eng = new AHX();
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
-			cipher.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_rhxExpected[2])
-			{
-				throw TestException("AHX: Failed encryption test!");
-			}
-
-			cipher.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("AHX: Failed decryption test!");
-			}
-		}
-	}
-#endif
-
-	void HXCipherTest::RHXMonteCarlo()
-	{
-		std::vector<byte> inpBytes(16, 0);
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> decBytes(16, 0);
-
-		// RHX, 14 rounds
-		{
-			Digest::SHA512 digest;
-			RHX* eng = new RHX(&digest, 14);
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			cipher.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-			if (outBytes != m_rhxExpected[0])
-			{
-				throw TestException("RHX: Failed encryption test!");
-			}
-
-			cipher.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("RHX: Failed decryption test!");
-			}
-		}
-		// RHX, 22 rounds
-		{
-			Digest::SHA512 digest;
-			RHX* eng = new RHX(&digest, 22);
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			cipher.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_rhxExpected[1])
-			{
-				throw TestException("RHX: Failed encryption test!");
-			}
-
-			cipher.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("RHX: Failed decryption test!");
-			}
-		}
-
-		// RHX, 22 rounds, standard key schedule
-		{
-			RHX* eng = new RHX();
-			Mode::CTR cipher(eng);
-			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
-			cipher.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_rhxExpected[2])
-			{
-				throw TestException("RHX: Failed encryption test!");
-			}
-
-			cipher.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				cipher.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("RHX: Failed decryption test!");
-			}
+			throw TestException("RHX: Failed encryption test!");
 		}
 	}
 
-	void HXCipherTest::SHXMonteCarlo()
+	void HXCipherTest::MonteCarloDecrypt(ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
-		std::vector<byte> inpBytes(16, 0);
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> decBytes(16, 0);
-
-		// SHX, 32 rounds
+		for (size_t i = 0; i < MONTECARLO_ROUNDS; ++i)
 		{
-			Digest::SHA512 digest;
-			SHX* eng = new SHX(&digest, 32);
-			Mode::CTR engine(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			engine.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_shxExpected[0])
-			{
-				throw TestException("SHX: Failed encryption test!");
-			}
-
-			engine.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("SHX: Failed decryption test!");
-			}
-		}
-		// SHX, 40 rounds
-		{
-			Digest::SHA512 digest;
-			SHX* eng = new SHX(&digest, 40);
-			Mode::CTR engine(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			engine.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_shxExpected[1])
-			{
-				throw TestException("SHX: Failed encryption test!");
-			}
-
-			engine.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("SHX: Failed decryption test!");
-			}
-		}
-		// SHX, 32 rounds, standard key schedule
-		{
-			SHX* eng = new SHX();
-			Mode::CTR engine(eng);
-			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
-			engine.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_shxExpected[2])
-			{
-				throw TestException("SHX: Failed encryption test!");
-			}
-
-			engine.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("SHX: Failed decryption test!");
-			}
+			Cipher->Transform(Output, 0, Input, 0, Output.size());
+			std::memcpy(Output.data(), Input.data(), Output.size());
 		}
 	}
 
-	void HXCipherTest::THXMonteCarlo()
+	void HXCipherTest::MonteCarloEncrypt(ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
-		std::vector<byte> inpBytes(16, 0);
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> decBytes(16, 0);
-
-		// THX, 16 rounds
+		for (size_t i = 0; i < MONTECARLO_ROUNDS; ++i)
 		{
-			Digest::SHA512 digest;
-			THX* eng = new THX(&digest, 16);
-			Mode::CTR engine(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			engine.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_thxExpected[0])
-			{
-				throw TestException("THX: Failed encryption test!");
-			}
-
-			engine.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("THX: Failed decryption test!");
-			}
-		}
-		// THX, 20 rounds
-		{
-			Digest::SHA512 digest;
-			THX* eng = new THX(&digest, 20);
-			Mode::CTR engine(eng);
-			Key::Symmetric::SymmetricKey k(m_key, m_iv);
-			engine.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_thxExpected[1])
-			{
-				throw TestException("THX: Failed encryption test!");
-			}
-
-			engine.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("THX: Failed decryption test!");
-			}
-		}
-		// THX, 20 rounds, standard key schedule
-		{
-			THX* eng = new THX(Digests::None, 20);
-			Mode::CTR engine(eng);
-			Key::Symmetric::SymmetricKey k(m_key2, m_iv);
-			engine.Initialize(true, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(inpBytes, 0, outBytes, 0, outBytes.size());
-				std::memcpy(&inpBytes[0], &outBytes[0], outBytes.size());
-			}
-
-			if (outBytes != m_thxExpected[2])
-			{
-				throw TestException("THX: Failed encryption test!");
-			}
-
-			engine.Initialize(false, k);
-
-			for (size_t i = 0; i != 100; i++)
-			{
-				engine.Transform(outBytes, 0, inpBytes, 0, outBytes.size());
-				std::memcpy(&outBytes[0], &inpBytes[0], outBytes.size());
-			}
-			delete eng;
-
-			if (outBytes != decBytes)
-			{
-				throw TestException("THX: Failed decryption test!");
-			}
+			Cipher->Transform(Input, 0, Output, 0, Output.size());
+			std::memcpy(Input.data(), Output.data(), Output.size());
 		}
 	}
 }

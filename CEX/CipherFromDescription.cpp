@@ -6,14 +6,22 @@ NAMESPACE_HELPER
 
 ICipherMode* CipherFromDescription::GetInstance(CipherDescription &Description)
 {
+	IBlockCipher* cprPtr = nullptr;
+
 	try
 	{
-		return Helper::CipherModeFromName::GetInstance(Description.CipherType(),
-			Helper::BlockCipherFromName::GetInstance(Description.EngineType(), Description.KdfEngine(), static_cast<uint>(Description.RoundCount())));
+		cprPtr = BlockCipherFromName::GetInstance(Description.CipherType(), Description.CipherExtensionType());
+
+		return Helper::CipherModeFromName::GetInstance(cprPtr, Description.CipherModeType());
 	}
 	catch (const std::exception &ex)
 	{
-		throw CryptoException("CipherFromDescription:GetInstance", "The symmetric cipher type is unavailable!", std::string(ex.what()));
+		if (cprPtr != nullptr)
+		{
+			delete cprPtr;
+		}
+
+		throw CryptoException("CipherFromDescription:GetInstance", "The symmetric cipher mode is invalid!", std::string(ex.what()));
 	}
 }
 

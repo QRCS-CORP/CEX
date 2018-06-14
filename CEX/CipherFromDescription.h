@@ -25,7 +25,7 @@ public:
 	/// Get an uninitialized block cipher and mode from a description structure
 	/// </summary>
 	/// 
-	/// <param name="Description">The structure describing the symmetric cipher</param>
+	/// <param name="Description">The structure containing the symmetric cipher configuration</param>
 	/// 
 	/// <returns>An uninitialized symmetric cipher mode</returns>
 	/// 

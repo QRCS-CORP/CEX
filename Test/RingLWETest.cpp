@@ -108,7 +108,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("RingLWETest: Cipher-text integrity test failed!");
+			throw TestException("RingLWETest: Message authentication test failed!");
 		}
 
 		delete kp;
@@ -135,7 +135,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("RingLWETest: Cipher-text integrity test failed!");
+			throw TestException("RingLWETest: Public-key integrity test failed!");
 		}
 
 		delete kp;
@@ -176,18 +176,22 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
+		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
 
 		for (size_t i = 0; i < 100; ++i)
 		{
 			m_rngPtr->GetBytes(msg);
-			IAsymmetricKeyPair* kp = cpr1.Generate();
+			IAsymmetricKeyPair* kp = cpr.Generate();
 
-			cpr1.Initialize(kp->PublicKey());
-			cpr1.Encapsulate(cpt, sec1);
+			cpr.Initialize(kp->PublicKey());
+			cpr.Encapsulate(cpt, sec1);
 
-			cpr1.Initialize(kp->PrivateKey());
-			cpr1.Decapsulate(cpt, sec2);
+			cpr.Initialize(kp->PrivateKey());
+
+			if (!cpr.Decapsulate(cpt, sec2))
+			{
+				throw TestException("RingLWETest: Stress test authentication has failed!");
+			}
 
 			delete kp;
 

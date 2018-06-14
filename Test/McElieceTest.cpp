@@ -45,8 +45,8 @@ namespace Test
 			OnProgress(std::string("McElieceTest: Passed cipher-text integrity test.."));
 			MessageAuthentication();
 			OnProgress(std::string("McElieceTest: Passed message authentication test.."));
-			//PublicKeyIntegrity();
-			//OnProgress(std::string("McElieceTest: Passed public key integrity test.."));/**/
+			PublicKeyIntegrity();
+			OnProgress(std::string("McElieceTest: Passed public key integrity test.."));
 			StressLoop();
 			OnProgress(std::string("McElieceTest: Passed encryption and decryption stress tests.."));
 			SerializationCompare();
@@ -108,7 +108,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("McElieceTest: Cipher-text integrity test failed!");
+			throw TestException("McElieceTest: Message authentication test failed!");
 		}
 
 		delete kp;
@@ -136,7 +136,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("McElieceTest: Cipher-text integrity test failed!");
+			throw TestException("McElieceTest: Public-key integrity test failed!");
 		}
 
 		delete kp;
@@ -187,7 +187,11 @@ namespace Test
 			cpr.Encapsulate(cpt, sec1);
 
 			cpr.Initialize(kp->PrivateKey());
-			cpr.Decapsulate(cpt, sec2);
+
+			if (!cpr.Decapsulate(cpt, sec2))
+			{
+				throw TestException("McElieceTest: Stress test authentication has failed!");
+			}
 
 			delete kp;
 

@@ -1,6 +1,6 @@
 #include "BCG.h"
 #include "BlockCipherFromName.h"
-#include "DigestFromName.h"
+#include "KdfFromName.h"
 #include "KDF2.h"
 #include "IntUtils.h"
 #include "ParallelUtils.h"
@@ -13,9 +13,9 @@ const std::string BCG::CLASS_NAME("BCG");
 
 //~~~Constructor~~~//
 
-BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType, bool Parallel)
+BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions ExtensionType, Providers ProviderType, bool Parallel)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, DigestType) : 
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, ExtensionType) :
 		throw CryptoGeneratorException("BCG:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_ctrVector(COUNTER_SIZE),
@@ -25,8 +25,8 @@ BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType, bo
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) : nullptr),
-	m_kdfEngineType(DigestType),
+	m_kdfEngine(ExtensionType != BlockCipherExtensions::None ? Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(ExtensionType)) : nullptr),
+	m_kdfEngineType(ExtensionType),
 	m_kdfInfo(0),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
@@ -42,7 +42,7 @@ BCG::BCG(BlockCiphers CipherType, Digests DigestType, Providers ProviderType, bo
 	m_parallelProfile.IsParallel() = Parallel;
 }
 
-BCG::BCG(IBlockCipher* Cipher, IDigest* Digest, IProvider* Provider, bool Parallel)
+BCG::BCG(IBlockCipher* Cipher, IKdf* Kdf, IProvider* Provider, bool Parallel)
 	:
 	m_blockCipher(Cipher != 0 ? Cipher : 
 		throw CryptoGeneratorException("BCG:CTor", "The Cipher can not be null!")),
@@ -54,8 +54,8 @@ BCG::BCG(IBlockCipher* Cipher, IDigest* Digest, IProvider* Provider, bool Parall
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(Digest),
-	m_kdfEngineType(m_kdfEngine != nullptr ? m_kdfEngine->Enumeral() : Digests::None),
+	m_kdfEngine(Kdf),
+	m_kdfEngineType(m_kdfEngine != nullptr ? static_cast<BlockCipherExtensions>(m_kdfEngine->Enumeral()) : BlockCipherExtensions::None),
 	m_kdfInfo(0),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
@@ -80,7 +80,7 @@ BCG::~BCG()
 		m_distributionCodeMax = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_kdfEngineType = Digests::None;
+		m_kdfEngineType = BlockCipherExtensions::None;
 		m_parallelProfile.Reset();
 		m_prdResistant = false;
 		m_providerType = Providers::None;
@@ -240,7 +240,7 @@ size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 			m_reseedCounter = 0;
 			// use next block of state as seed material
-			std::vector<byte> state(m_kdfEngine->BlockSize());
+			std::vector<byte> state(32);
 			GenerateBlock(state, 0, state.size());
 			// combine with salt from entropy provider, extract, and re-key
 			Derive(state);
@@ -375,15 +375,16 @@ void BCG::Update(const std::vector<byte> &Seed)
 void BCG::Derive(std::vector<byte> &Seed)
 {
 	// size the salt for max unpadded hash size; subtract counter and hash finalizer code lengths
-	size_t saltLen = m_kdfEngine->BlockSize() - (Helper::DigestFromName::GetPaddingSize(m_kdfEngineType) + 4);
+	Kdf::KDF2 gen(Enumeration::Digests::SHA256);
+	SymmetricKeySize ks = gen.LegalKeySizes()[1];
+	size_t saltLen = ks.KeySize();
 	std::vector<byte> salt(saltLen);
 	// pull the rand from provider
 	m_providerSource->GetBytes(salt);
 	// extract the new key+counter
-	Kdf::KDF2 kdf(m_kdfEngine.get());
-	kdf.Initialize(Seed, salt);
+	gen.Initialize(Seed, salt);
 	std::vector<byte> tmpK(m_seedSize);
-	kdf.Generate(tmpK);
+	gen.Generate(tmpK);
 	// reinitialize with the new key and counter
 	Initialize(tmpK);
 }

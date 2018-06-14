@@ -10,6 +10,7 @@
 #include "../CEX/ECP.h"
 #include "../CEX/FileStream.h"
 #include "../CEX/HCG.h"
+#include "../CEX/HKDF.h"
 #include "../CEX/RDP.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SHA512.h"
@@ -83,15 +84,14 @@ namespace Test
 	{
 		using namespace Cipher::Symmetric::Block;
 
-		Digest::SHA512* dgt1 = new Digest::SHA512();
+		Kdf::HKDF* kdf = new Kdf::HKDF(Enumeration::Digests::SHA256);
 #if defined(__AVX__)
-		AHX* cpr = new AHX(dgt1, 22);
+		AHX* cpr = new AHX(BlockCipherExtensions::HKDF256);
 #else
-		RHX* cpr = new RHX(dgt1, 22);
+		RHX* cpr = new RHX(BlockCipherExtensions::HKDF256);
 #endif
-		Digest::SHA512* dgt2 = new Digest::SHA512();
 		Provider::CSP* pvd = new Provider::CSP();
-		Drbg::BCG ctd(cpr, dgt2, pvd);
+		Drbg::BCG ctd(cpr, kdf, pvd);
 
 		std::vector<byte> seed(ctd.LegalKeySizes()[1].KeySize() - ctd.NonceSize());
 		std::vector<byte> nonce(ctd.NonceSize());

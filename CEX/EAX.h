@@ -168,9 +168,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The enumeration name of the block cipher</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid block cipher type is used</exception>
-	explicit EAX(BlockCiphers CipherType);
+	explicit EAX(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

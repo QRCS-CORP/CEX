@@ -141,23 +141,35 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
 {
+	if (m_isInitialized)
+	{
+		Reset();
+	}
+
 	if (Salt.size() != 0)
 	{
 		std::vector<byte> tmp(0);
 		Customize(Salt, tmp);
 	}
 
-	Initialize(Key);
+	FastAbsorb(Key, 0, Key.size());
+	m_isInitialized = true;
 }
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
 {
+	if (m_isInitialized)
+	{
+		Reset();
+	}
+
 	if (Salt.size() != 0)
 	{
 		Customize(Salt, Info);
 	}
 
-	Initialize(Key);
+	FastAbsorb(Key, 0, Key.size());
+	m_isInitialized = true;
 }
 
 void SHAKE::ReSeed(const std::vector<byte> &Seed)

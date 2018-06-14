@@ -128,10 +128,11 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// <param name="RegisterSize">Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used, or the specified register size is invalid</exception>
-	explicit OFB(BlockCiphers CipherType, size_t RegisterSize = 16);
+	explicit OFB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, size_t RegisterSize = 16);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

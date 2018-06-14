@@ -9,27 +9,27 @@
 
 NAMESPACE_HELPER
 
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests DigestType)
+IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtension)
 {
-	IBlockCipher* cprPtr;
+	IBlockCipher* cprPtr = nullptr;
 
 	try
 	{ 
 		Common::CpuDetect detect;
 
-		switch (BlockCipherType)
+		switch (CipherType)
 		{
 			case BlockCiphers::AHX:
 			{
 	#if defined(__AVX__)
 				if (detect.AESNI())
 				{
-					cprPtr = new Cipher::Symmetric::Block::AHX(DigestType, 22);
+					cprPtr = new Cipher::Symmetric::Block::AHX(CipherExtension);
 				}
 				else
 	#endif
 				{
-					cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, 22);
+					cprPtr = new Cipher::Symmetric::Block::RHX(CipherExtension);
 				}
 				break;
 			}
@@ -49,7 +49,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Dig
 			}
 			case BlockCiphers::RHX:
 			{
-				cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, 22);
+				cprPtr = new Cipher::Symmetric::Block::RHX(CipherExtension);
 				break;
 			}
 			case BlockCiphers::Serpent:
@@ -59,7 +59,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Dig
 			}
 			case BlockCiphers::SHX:
 			{
-				cprPtr = new Cipher::Symmetric::Block::SHX(DigestType, 40);
+				cprPtr = new Cipher::Symmetric::Block::SHX(CipherExtension);
 				break;
 			}
 			case BlockCiphers::Twofish:
@@ -69,84 +69,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Dig
 			}
 			case BlockCiphers::THX:
 			{
-				cprPtr = new Cipher::Symmetric::Block::THX(DigestType, 20);
-				break;
-			}
-			default:
-			{
-				throw CryptoException("BlockCipherFromName:GetInstance", "The cipher engine is not supported!");
-			}
-		}
-	}
-	catch (const std::exception &ex)
-	{
-		throw CryptoException("BlockCipherFromName:GetInstance", "The specified block cipher type is unavailable!", std::string(ex.what()));
-	}
-
-	return cprPtr;
-}
-
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers BlockCipherType, Digests DigestType, uint RoundCount)
-{
-	IBlockCipher* cprPtr;
-
-	try
-	{
-		Common::CpuDetect detect;
-
-		switch (BlockCipherType)
-		{
-			case BlockCiphers::AHX:
-			{
-#if defined(__AVX__)
-				if (detect.AESNI())
-				{
-					cprPtr = new Cipher::Symmetric::Block::AHX(DigestType, RoundCount);
-				}
-				else
-#endif
-				{
-					cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, RoundCount);
-				}
-				break;
-			}
-			case BlockCiphers::Rijndael:
-			{
-#if defined(__AVX__)
-				if (detect.AESNI())
-				{
-					cprPtr = new Cipher::Symmetric::Block::AHX();
-				}
-				else
-#endif
-				{
-					cprPtr = new Cipher::Symmetric::Block::RHX();
-				}
-				break;
-			}
-			case BlockCiphers::RHX:
-			{
-				cprPtr = new Cipher::Symmetric::Block::RHX(DigestType, RoundCount);
-				break;
-			}
-			case BlockCiphers::Serpent:
-			{
-				cprPtr = new Cipher::Symmetric::Block::SHX();
-				break;
-			}
-			case BlockCiphers::SHX:
-			{
-				cprPtr = new Cipher::Symmetric::Block::SHX(DigestType, RoundCount);
-				break;
-			}
-			case BlockCiphers::Twofish:
-			{
-				cprPtr = new Cipher::Symmetric::Block::THX();
-				break;
-			}
-			case BlockCiphers::THX:
-			{
-				cprPtr = new Cipher::Symmetric::Block::THX(DigestType, RoundCount);
+				cprPtr = new Cipher::Symmetric::Block::THX(CipherExtension);
 				break;
 			}
 			default:

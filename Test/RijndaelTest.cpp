@@ -61,7 +61,7 @@ namespace Test
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		std::vector<byte> outBytes2(Input.size(), 0);
-		RHX engine(Digests::None, 14);
+		RHX engine;
 		Key::Symmetric::SymmetricKey k(Key);
 
 		engine.Initialize(true, k);

@@ -5,7 +5,6 @@
 #include "../CEX/CipherDescription.h"
 #include "../CEX/ICipherMode.h"
 #include "../CEX/IPadding.h"
-#include "../CEX/IStreamCipher.h"
 
 namespace Test
 {
@@ -74,12 +73,9 @@ namespace Test
 		void MemoryStreamTest();
 		void OnProgress(std::string Data);
 		void ParametersTest();
-		void ProcessStream(Cipher::Symmetric::Stream::IStreamCipher* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 		void OfbModeTest();
 		void SerializeStructTest();
-		void StreamTest();
 		void StreamModesTest(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding);
-		void StreamingTest(Cipher::Symmetric::Stream::IStreamCipher* Cipher);
 	};
 }
 

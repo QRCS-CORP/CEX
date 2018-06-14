@@ -10,8 +10,8 @@ const std::string KDF2::CLASS_NAME("KDF2");
 
 KDF2::KDF2(Digests DigestType)
 	:
-	m_msgDigest(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) :
-		throw CryptoKdfException("KDF2:CTor", "Digest type can not be none!")),
+	m_msgDigest(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? Helper::DigestFromName::GetInstance(DigestType) :
+		throw CryptoKdfException("KDF2:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_msgDigest->BlockSize()),
 	m_destroyEngine(true),
 	m_hashSize(m_msgDigest->DigestSize()),
@@ -28,8 +28,8 @@ KDF2::KDF2(Digests DigestType)
 
 KDF2::KDF2(Digest::IDigest* Digest)
 	:
-	m_msgDigest(Digest != nullptr ? Digest :
-		throw CryptoKdfException("KDF2:CTor", "The Digest can not be null!")),
+	m_msgDigest(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? Digest :
+		throw CryptoKdfException("KDF2:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_msgDigest->BlockSize()),
 	m_destroyEngine(false),
 	m_hashSize(m_msgDigest->DigestSize()),
@@ -82,7 +82,7 @@ KDF2::~KDF2()
 
 const Kdfs KDF2::Enumeral()
 { 
-	return Kdfs::KDF2; 
+	return Kdfs::KDF2256; 
 }
 
 const bool KDF2::IsInitialized() 

@@ -115,10 +115,10 @@ NAMESPACE_MODE
 /// <item><description>Additional data can be added using the SetAssociatedData(Input, Offset, Length) call.</description></item>
 /// <item><description>Calling the Finalize(Output, Offset, Length) function writes the MAC code to the output array in either encryption or decryption operation mode.</description></item>
 /// <item><description>The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle.</description></item>
-/// <item><description>Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded.</description></item>
+/// <item><description>Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and optionally multi-threaded.</description></item>
 /// <item><description>If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized.</description></item>
-/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
-/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() property</description></item>
+/// <item><description>ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size and available threads, this property can be user defined, and must be evenly divisible by ParallelMinimumSize().</description></item>
+/// <item><description>The ParallelBlockSize() can be changed through the ParallelProfile() accessor property</description></item>
 /// <item><description>Parallel block calculation ex. <c>ParallelBlockSize = N - (N % ParallelMinimumSize);</c></description></item>
 /// </list>
 /// 
@@ -185,9 +185,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The enumeration name of the block cipher</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an invalid block cipher type is selected</exception>
-	explicit GCM(BlockCiphers CipherType);
+	explicit GCM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance
@@ -345,7 +346,7 @@ public:
 	void EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset) override;
 
 	/// <summary>
-	/// Calculate the MAC code (Tag) and copy it to the Output array.   
+	/// Calculate the MAC code (Tag) and copy it to the Output array.
 	/// <para>The output array must be of sufficient length to receive the MAC code.
 	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
 	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>

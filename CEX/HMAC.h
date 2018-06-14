@@ -66,6 +66,7 @@ using Common::ParallelOptions;
 ///
 /// <description>Implementation Notes:</description>
 /// <list type="bullet">
+/// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
 /// <item><description>This implementation can utilize a parallelized digest instance for multi-threaded Mac calculations.</description></item>
 /// <item><description>If the Parallel parameter of the constructor is set to true, or a parallelized digest instance is loaded, passing an input block of ParallelBlockSize bytes will be processed in parallel.</description></item>
 /// <item><description>Sequential mode block size is the underlying hash functions internal block size in bytes.</description></item>

@@ -9,7 +9,7 @@ NAMESPACE_ENUMERATION
 /// Common key bit sizes.
 /// <para> Can be cast as Key byte size integers, i.e. (uint sz = KeySizes.K256) is equal to 32.</para>
 /// </summary>
-enum class KeySizes : short
+enum class KeySizes : ushort
 {
 	/// <summary>
 	/// No key size is specified

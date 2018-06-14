@@ -11,8 +11,8 @@ const std::string PBKDF2::CLASS_NAME("PBKDF2");
 
 PBKDF2::PBKDF2(Digests DigestType, size_t Iterations)
 	:
-	m_macGenerator(DigestType != Digests::None ? new HMAC(DigestType) :
-		throw CryptoKdfException("PBKDF2:CTor", "Digest type can not be none!")),
+	m_macGenerator(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? new HMAC(DigestType) :
+		throw CryptoKdfException("PBKDF2:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -31,8 +31,8 @@ PBKDF2::PBKDF2(Digests DigestType, size_t Iterations)
 
 PBKDF2::PBKDF2(IDigest* Digest, size_t Iterations)
 	:
-	m_macGenerator(Digest != nullptr ? new HMAC(Digest) : 
-		throw CryptoKdfException("PBKDF2:CTor", "Digest instance can not be null!")),
+	m_macGenerator(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? new HMAC(Digest) :
+		throw CryptoKdfException("PBKDF2:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
@@ -108,7 +108,7 @@ PBKDF2::~PBKDF2()
 
 const Kdfs PBKDF2::Enumeral() 
 {
-	return Kdfs::PBKDF2;
+	return Kdfs::PBKDF2256;
 }
 
 const bool PBKDF2::IsInitialized() 

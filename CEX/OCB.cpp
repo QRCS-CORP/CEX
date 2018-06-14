@@ -11,13 +11,13 @@ const std::string OCB::CLASS_NAME("OCB");
 
 //~~~Constructor~~~//
 
-OCB::OCB(BlockCiphers CipherType)
+OCB::OCB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_aadData(BLOCK_SIZE),
 	m_aadLoaded(false),
 	m_aadPreserve(false),
 	m_autoIncrement(false),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("OCB:CTor", "The Cipher type can not be none!")),
 	m_checkSum(BLOCK_SIZE),
 	m_cipherType(CipherType),

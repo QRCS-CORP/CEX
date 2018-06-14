@@ -9,9 +9,9 @@ const std::string ICM::CLASS_NAME("ICM");
 
 //~~~Constructor~~~//
 
-ICM::ICM(BlockCiphers CipherType)
+ICM::ICM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("ICM:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_ctrVector(2),

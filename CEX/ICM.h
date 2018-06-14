@@ -146,9 +146,10 @@ public:
 	/// </summary>
 	///
 	/// <param name="CipherType">The formal enumeration name of a block cipher</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if an undefined block cipher type name is used</exception>
-	explicit ICM(BlockCiphers CipherType);
+	explicit ICM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
 	/// Initialize the Cipher Mode using a block cipher instance

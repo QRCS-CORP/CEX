@@ -41,8 +41,8 @@ CSG::CSG(ShakeModes ShakeMode, Providers ProviderType, bool Parallel)
 	m_reseedThreshold(m_blockSize * 10000),
 	m_secStrength((ShakeMode == ShakeModes::SHAKE128) ? 128 : (ShakeMode == ShakeModes::SHAKE256) ? 256 : (ShakeMode == ShakeModes::SHAKE512) ? 512 : 1024),
 	m_seedSize(0),
-	m_shakeMode(ShakeMode != ShakeModes::None ? ShakeMode :
-		throw CryptoGeneratorException("CSG:Ctor", "The SHAKE mode type can not ne none!")),
+	m_shakeMode(ShakeMode == ShakeModes::SHAKE128 || ShakeMode == ShakeModes::SHAKE256 || ShakeMode == ShakeModes::SHAKE512 || ShakeMode == ShakeModes::SHAKE1024 ? ShakeMode :
+		throw CryptoGeneratorException("CSG:Ctor", "The SHAKE mode type is invalid!")),
 	m_stateSize(STATE_SIZE)
 {
 	Scope();

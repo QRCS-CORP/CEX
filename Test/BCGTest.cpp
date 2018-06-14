@@ -4,8 +4,7 @@
 #include "../CEX/SymmetricKey.h"
 #include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
-#include "../CEX/SHA256.h"
-#include "../CEX/SHA512.h"
+#include "../CEX/HKDF.h"
 #include "../CEX/FileStream.h"
 #include "../CEX/IntUtils.h"
 
@@ -68,7 +67,7 @@ namespace Test
 		try
 		{
 			// test enumeration instantiation
-			Drbg::BCG ctd(BlockCiphers::Rijndael, Digests::SHA256);
+			Drbg::BCG ctd(BlockCiphers::Rijndael, BlockCipherExtensions::HKDF256);
 			output.resize(ctd.ParallelBlockSize());
 			// test seed + nonce + info init
 			ctd.Initialize(key, nonce, info);
@@ -116,14 +115,14 @@ namespace Test
 		try
 		{
 			// test primitive instantiation
-			Digest::SHA256* dgt = new Digest::SHA256;
+			Kdf::HKDF* gen = new Kdf::HKDF(Enumeration::Digests::SHA256);
 			RHX* cpr = new RHX;
-			Drbg::BCG ctd2(cpr, dgt);
+			Drbg::BCG ctd2(cpr, gen);
 			output.resize(ctd2.ParallelBlockSize());
 			ctd2.Initialize(key);
 			ctd2.Generate(output);
 			delete cpr;
-			delete dgt;
+			delete gen;
 
 			if (OrderedRuns(output))
 			{
@@ -145,7 +144,7 @@ namespace Test
 		std::vector<byte> key(32, 0x02);
 		std::vector<byte> output1(SAMPLE_SIZE);
 
-		Drbg::BCG ctd(BlockCiphers::Rijndael, Digests::None, Providers::None);
+		Drbg::BCG ctd(BlockCiphers::Rijndael, BlockCipherExtensions::None, Providers::None);
 		ctd.Initialize(key, iv);
 		ctd.Generate(output1);
 

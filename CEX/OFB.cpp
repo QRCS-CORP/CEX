@@ -8,9 +8,9 @@ const std::string OFB::CLASS_NAME("OFB");
 
 //~~~Constructor~~~//
 
-OFB::OFB(BlockCiphers CipherType, size_t RegisterSize)
+OFB::OFB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, size_t RegisterSize)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("OFB:CTor", "The Cipher type can not be none!")),
 	m_blockSize((RegisterSize != 0 && RegisterSize <= m_blockCipher->BlockSize()) ? RegisterSize :
 		throw CryptoCipherModeException("OFB:CTor", "The register size is invalid!")),

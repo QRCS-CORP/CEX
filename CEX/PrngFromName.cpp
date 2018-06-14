@@ -21,7 +21,7 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests
 		CryptoException("PrngFromName:GetPrng", "Digest type can not be none when using Digest or HMAC based rng!");
 	}
 
-	IPrng* rngPtr;
+	IPrng* rngPtr = nullptr;
 
 	try
 	{

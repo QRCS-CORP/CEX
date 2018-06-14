@@ -6,7 +6,7 @@ NAMESPACE_HELPER
 
 IMac* MacFromDescription::GetInstance(MacDescription &Description)
 {
-	IMac* macPtr;
+	IMac* macPtr = nullptr;
 
 	try
 	{

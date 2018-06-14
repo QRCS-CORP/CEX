@@ -9,9 +9,9 @@ const std::string EAX::CLASS_NAME("EAX");
 
 //~~~Constructor~~~//
 
-EAX::EAX(BlockCiphers CipherType)
+EAX::EAX(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
+	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("EAX:CTor", "The Cipher type can not be none!")),
 	m_aadData(m_cipherMode->BlockSize()),
 	m_aadLoaded(false),
@@ -278,7 +278,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	m_macGenerator->Initialize(kp);
 
 	// hx extended ciphers
-	if (KeyParams.Info().size() != 0 && m_cipherMode->Engine()->KdfEngine() != Digests::None)
+	if (KeyParams.Info().size() != 0 && m_cipherMode->Engine()->CipherExtension() != BlockCipherExtensions::None)
 	{
 		m_cipherMode->Initialize(Encryption, Key::Symmetric::SymmetricKey(m_cipherKey, m_eaxVector, KeyParams.Info()));
 	}

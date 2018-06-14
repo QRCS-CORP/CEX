@@ -128,12 +128,13 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 	std::vector<byte> e(0);
 	std::vector<byte> key(32);
 	std::vector<byte> iv(16);
+	std::vector<byte> coins(2 * MPKCM12T62::MPKC_COIN_SIZE);
+	std::vector<byte> tag(MPKCM12T62::MPKC_TAG_SIZE);
 	bool status;
 
-	// decrypt with McEliece, more fft configurations to be added
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		CexAssert(CipherText.size() >= MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, "The cipher-text array is too small");
+		CexAssert(CipherText.size() >= MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
 
 		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
 
@@ -144,18 +145,27 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 		throw CryptoAsymmetricException("McEliece:Decrypt", "The parameter type is invalid!");
 	}
 
-	// H(e+d) to key cipher
+	// copy hash of pk to coin 1
+	Utility::MemUtils::Copy(m_privateKey->S(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
+
+	// hash ct to coin 2
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(e, m_domainKey);
+	gen.Initialize(CipherText, 0, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
+	gen.Generate(coins, MPKCM12T62::MPKC_COIN_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
+
+	// H(e+cn+dk) to key GCM
+	gen.Initialize(e, coins, m_domainKey);
 	gen.Generate(key);
 	gen.Generate(iv);
 
 	// decrypt the secret
-	SharedSecret.resize(CipherText.size() - MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
+	SharedSecret.resize(CipherText.size() - MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE);
 	Cipher::Symmetric::Block::Mode::GCM cpr(Enumeration::BlockCiphers::Rijndael);
 	Key::Symmetric::SymmetricKey kp(key, iv);
 	cpr.Initialize(false, kp);
 	cpr.Transform(CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret, 0, SharedSecret.size());
+	// verify the mac
+	status &= cpr.Verify(CipherText, CipherText.size() - MPKCM12T62::MPKC_TAG_SIZE, MPKCM12T62::MPKC_TAG_SIZE);
 
 	return status;
 }
@@ -169,11 +179,12 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	std::vector<byte> e(0);
 	std::vector<byte> key(32);
 	std::vector<byte> iv(16);
+	std::vector<byte> coins(2 * MPKCM12T62::MPKC_COIN_SIZE);
 
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
 		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
-		CipherText.resize(MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE + SharedSecret.size());
+		CipherText.resize(MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE + SharedSecret.size());
 		MPKCM12T62::Encrypt(CipherText, e, m_publicKey->P(), m_rndGenerator);
 	}
 	else
@@ -181,20 +192,29 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 		throw CryptoAsymmetricException("McEliece:Decrypt", "The parameter type is invalid!");
 	}
 
-	// generate the shared secret
-	m_rndGenerator->GetBytes(SharedSecret);
-
-	// H(e+dk) to key cipher
+	// hash pk to coin 1
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(e, m_domainKey);
+	gen.Initialize(m_publicKey->P());
+	gen.Generate(coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
+	// hash ct to coin 2
+	gen.Initialize(CipherText, 0, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE);
+	gen.Generate(coins, MPKCM12T62::MPKC_COIN_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
+
+	// H(e+cn+dk) to key GCM
+	gen.Initialize(e, coins, m_domainKey);
 	gen.Generate(key);
 	gen.Generate(iv);
+
+	// generate the shared secret
+	m_rndGenerator->GetBytes(SharedSecret);
 
 	// encrypt the secret and add to ct
 	Cipher::Symmetric::Block::Mode::GCM cpr(Enumeration::BlockCiphers::Rijndael);
 	Key::Symmetric::SymmetricKey kp(key, iv);
 	cpr.Initialize(true, kp);
 	cpr.Transform(SharedSecret, 0, CipherText, MPKCM12T62::MPKC_CPACIPHERTEXT_SIZE, SharedSecret.size());
+	// add the mac code
+	cpr.Finalize(CipherText, CipherText.size() - MPKCM12T62::MPKC_TAG_SIZE, MPKCM12T62::MPKC_TAG_SIZE);
 }
 
 IAsymmetricKeyPair* McEliece::Generate()
@@ -206,13 +226,18 @@ IAsymmetricKeyPair* McEliece::Generate()
 
 	if (m_mpkcParameters == MPKCParams::M12T62)
 	{
-		pk.resize(MPKCM12T62::MPKC_CPAPUBLICKEY_SIZE);
-		sk.resize(MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE);
+		pk.resize(MPKCM12T62::MPKC_CCAPUBLICKEY_SIZE);
+		sk.resize(MPKCM12T62::MPKC_CCAPRIVATEKEY_SIZE);
 
 		if (!MPKCM12T62::Generate(pk, sk, m_rndGenerator))
 		{
 			throw CryptoAsymmetricException("McEliece:Generate", "Key generation max retries failure!");
 		}
+
+		// add H(pk) to private key
+		Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+		gen.Initialize(pk);
+		gen.Generate(sk, MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
 	}
 	else
 	{

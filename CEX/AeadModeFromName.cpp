@@ -6,27 +6,27 @@
 
 NAMESPACE_HELPER
 
-IAeadMode* AeadModeFromName::GetInstance(AeadModes CipherType, IBlockCipher* Engine)
+IAeadMode* AeadModeFromName::GetInstance(IBlockCipher* Cipher, AeadModes CipherModeType)
 {
-	IAeadMode* aeadPtr;
+	IAeadMode* aeadPtr = nullptr;
 
 	try
 	{
-		switch (CipherType)
+		switch (CipherModeType)
 		{
 			case Enumeration::AeadModes::EAX:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::EAX(Engine);
+				aeadPtr = new Cipher::Symmetric::Block::Mode::EAX(Cipher);
 				break;
 			}
 			case Enumeration::AeadModes::GCM:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::GCM(Engine);
+				aeadPtr = new Cipher::Symmetric::Block::Mode::GCM(Cipher);
 				break;
 			}
 			case Enumeration::AeadModes::OCB:
 			{
-				aeadPtr = new Cipher::Symmetric::Block::Mode::OCB(Engine);
+				aeadPtr = new Cipher::Symmetric::Block::Mode::OCB(Cipher);
 				break;
 			}
 			default:
@@ -43,14 +43,16 @@ IAeadMode* AeadModeFromName::GetInstance(AeadModes CipherType, IBlockCipher* Eng
 	return aeadPtr;
 }
 
-IAeadMode* AeadModeFromName::GetInstance(AeadModes CipherType, BlockCiphers EngineType)
+IAeadMode* AeadModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, AeadModes CipherModeType)
 {
-	IAeadMode* aeadPtr;
-	IBlockCipher* cprPtr = BlockCipherFromName::GetInstance(EngineType);
+	IAeadMode* aeadPtr = nullptr;
+	IBlockCipher* cprPtr = nullptr;
 
 	try
 	{
-		switch (CipherType)
+		BlockCipherFromName::GetInstance(CipherType, CipherExtensionType);
+
+		switch (CipherModeType)
 		{
 			case Enumeration::AeadModes::EAX:
 			{

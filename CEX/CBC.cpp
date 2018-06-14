@@ -9,9 +9,9 @@ const std::string CBC::CLASS_NAME("CBC");
 
 //~~~Constructor~~~//
 
-CBC::CBC(BlockCiphers CipherType)
+CBC::CBC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) : 
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("CBC:CTor", "The Cipher type can not be none!")),
 	m_cbcVector(BLOCK_SIZE),
 	m_cipherType(CipherType),

@@ -29,18 +29,19 @@
 #define CEX_BCG_H
 
 #include "IDrbg.h"
+#include "BlockCipherExtensions.h"
 #include "BlockCiphers.h"
 #include "Digests.h"
 #include "IBlockCipher.h"
-#include "IDigest.h"
+#include "IKdf.h"
 #include "ParallelOptions.h"
 
 NAMESPACE_DRBG
 
 using Enumeration::BlockCiphers;
-using Enumeration::Digests;
+using Enumeration::BlockCipherExtensions;
 using Cipher::Symmetric::Block::IBlockCipher;
-using Digest::IDigest;
+using Kdf::IKdf;
 using Common::ParallelOptions;
 
 /// <summary>
@@ -143,8 +144,8 @@ private:
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IDigest> m_kdfEngine;
-	Digests m_kdfEngineType;
+	std::unique_ptr<IKdf> m_kdfEngine;
+	BlockCipherExtensions m_kdfEngineType;
 	std::vector<byte> m_kdfInfo;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ParallelOptions m_parallelProfile;
@@ -185,7 +186,7 @@ public:
 	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	///
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized block cipher type name is used</exception>
-	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, Digests DigestType = Digests::SHA256, Providers ProviderType = Providers::None, bool Parallel = false);
+	explicit BCG(BlockCiphers CipherType = BlockCiphers::AHX, BlockCipherExtensions ExtensionType = BlockCipherExtensions::HKDF256, Providers ProviderType = Providers::None, bool Parallel = false);
 
 	/// <summary>
 	/// Instantiate the class using a block cipher instance and an optional entropy source
@@ -200,7 +201,7 @@ public:
 	/// <para>Parallel processing configuration can be tuned via the ParallelProfile accessor function.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null block cipher is used</exception>
-	explicit BCG(IBlockCipher* Cipher, IDigest* Digest = nullptr, IProvider* Provider = nullptr, bool Parallel = false);
+	explicit BCG(IBlockCipher* Cipher, IKdf* Kdf = nullptr, IProvider* Provider = nullptr, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class

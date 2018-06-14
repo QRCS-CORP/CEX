@@ -17,9 +17,9 @@ SCRYPT::SCRYPT(Digests DigestType, size_t CpuCost, size_t Parallelization)
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_kdfDigest(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType) :
-		throw CryptoKdfException("SCRYPT:CTor", "Digest type can not be none!")),
-	m_kdfDigestType(DigestType),
+	m_msgDigest(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? Helper::DigestFromName::GetInstance(DigestType) :
+		throw CryptoKdfException("SCRYPT:Ctor", "The digest type is not supported!")),
+	m_msgDigestType(DigestType),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0),
@@ -39,9 +39,9 @@ SCRYPT::SCRYPT(IDigest* Digest, size_t CpuCost, size_t Parallelization)
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_kdfDigest(Digest != nullptr ? Digest :
-		throw CryptoKdfException("SCRYPT:CTor", "Digest instance can not be null!")),
-	m_kdfDigestType(m_kdfDigest->Enumeral()),
+	m_msgDigest(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? Digest :
+		throw CryptoKdfException("SCRYPT:Ctor", "The digest type is not supported!")),
+	m_msgDigestType(m_msgDigest->Enumeral()),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0),
@@ -62,7 +62,7 @@ SCRYPT::~SCRYPT()
 	{
 		m_isDestroyed = true;
 		m_isInitialized = false;
-		m_kdfDigestType = Digests::None;
+		m_msgDigestType = Digests::None;
 		m_parallelProfile.Reset();
 		m_scryptParameters.Reset();
 
@@ -74,16 +74,16 @@ SCRYPT::~SCRYPT()
 		{
 			m_destroyEngine = false;
 
-			if (m_kdfDigest != nullptr)
+			if (m_msgDigest != nullptr)
 			{
-				m_kdfDigest.reset(nullptr);
+				m_msgDigest.reset(nullptr);
 			}
 		}
 		else
 		{
-			if (m_kdfDigest != nullptr)
+			if (m_msgDigest != nullptr)
 			{
-				m_kdfDigest.release();
+				m_msgDigest.release();
 			}
 		}
 	}
@@ -93,7 +93,7 @@ SCRYPT::~SCRYPT()
 
 const Kdfs SCRYPT::Enumeral()
 {
-	return Kdfs::SCRYPT;
+	return Kdfs::SCRYPT256;
 }
 
 const bool SCRYPT::IsInitialized()
@@ -118,7 +118,7 @@ std::vector<SymmetricKeySize> SCRYPT::LegalKeySizes() const
 
 const std::string SCRYPT::Name() 
 { 
-	return CLASS_NAME + "-" + m_kdfDigest->Name();
+	return CLASS_NAME + "-" + m_msgDigest->Name();
 }
 
 ParallelOptions &SCRYPT::ParallelProfile() 
@@ -361,7 +361,7 @@ size_t SCRYPT::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length
 
 void SCRYPT::Extract(std::vector<byte> &Output, size_t OutOffset, std::vector<byte> &Key, std::vector<byte> &Salt, size_t Length)
 {
-	Kdf::PBKDF2 kdf(m_kdfDigest.get(), 1);
+	Kdf::PBKDF2 kdf(m_msgDigest.get(), 1);
 	kdf.Initialize(Key::Symmetric::SymmetricKey(Key, Salt));
 	kdf.Generate(Output, OutOffset, Length);
 }
@@ -521,11 +521,11 @@ void SCRYPT::Scope()
 	// this is the recommended size: 
 	// ideally, salt should be passphrase len - (4 bytes of pbkdf counter + digest finalizer code)
 	// you want to fill one complete block, and avoid hmac compression on > block-size
-	m_legalKeySizes[0] = SymmetricKeySize(0, m_kdfDigest->DigestSize(), 0);
+	m_legalKeySizes[0] = SymmetricKeySize(0, m_msgDigest->DigestSize(), 0);
 	// 2nd recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(0, m_kdfDigest->BlockSize(), 0);
+	m_legalKeySizes[1] = SymmetricKeySize(0, m_msgDigest->BlockSize(), 0);
 	// max recommended
-	m_legalKeySizes[2] = SymmetricKeySize(0, m_kdfDigest->BlockSize() * 2, 0);
+	m_legalKeySizes[2] = SymmetricKeySize(0, m_msgDigest->BlockSize() * 2, 0);
 }
 
 void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)

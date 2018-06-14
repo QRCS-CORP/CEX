@@ -6,7 +6,7 @@ NAMESPACE_HELPER
 
 IStreamCipher* StreamCipherFromName::GetInstance(StreamCiphers StreamCipherType, size_t RoundCount)
 {
-	IStreamCipher* cprPtr;
+	IStreamCipher* cprPtr = nullptr;
 
 	try
 	{

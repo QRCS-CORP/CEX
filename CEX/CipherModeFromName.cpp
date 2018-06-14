@@ -8,39 +8,39 @@
 
 NAMESPACE_HELPER
 
-ICipherMode* CipherModeFromName::GetInstance(CipherModes CipherType, IBlockCipher* Engine)
+ICipherMode* CipherModeFromName::GetInstance(IBlockCipher* Cipher, CipherModes CipherModeType)
 {
 	using namespace Cipher::Symmetric::Block::Mode;
 
-	ICipherMode* mdePtr;
+	ICipherMode* mdePtr = nullptr;
 
 	try
 	{
-		switch (CipherType)
+		switch (CipherModeType)
 		{
 			case Enumeration::CipherModes::CTR:
 			{
-				mdePtr = new CTR(Engine);
+				mdePtr = new CTR(Cipher);
 				break;
 			}
 			case Enumeration::CipherModes::CBC:
 			{
-				mdePtr = new CBC(Engine);
+				mdePtr = new CBC(Cipher);
 				break;
 			}
 			case Enumeration::CipherModes::CFB:
 			{
-				mdePtr = new CFB(Engine);
+				mdePtr = new CFB(Cipher);
 				break;
 			}
 			case Enumeration::CipherModes::ICM:
 			{
-				mdePtr = new ICM(Engine);
+				mdePtr = new ICM(Cipher);
 				break;
 			}
 			case Enumeration::CipherModes::OFB:
 			{
-				mdePtr = new OFB(Engine);
+				mdePtr = new OFB(Cipher);
 				break;
 			}
 			default:
@@ -57,16 +57,18 @@ ICipherMode* CipherModeFromName::GetInstance(CipherModes CipherType, IBlockCiphe
 	return mdePtr;
 }
 
-ICipherMode* CipherModeFromName::GetInstance(CipherModes CipherType, BlockCiphers EngineType)
+ICipherMode* CipherModeFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType)
 {
 	using namespace Cipher::Symmetric::Block::Mode;
 
-	ICipherMode* mdePtr;
-	IBlockCipher* cprPtr = BlockCipherFromName::GetInstance(EngineType);
+	ICipherMode* mdePtr = nullptr;
+	IBlockCipher* cprPtr = nullptr;
 
 	try
 	{
-		switch (CipherType)
+		cprPtr = BlockCipherFromName::GetInstance(CipherType, CipherExtensionType);
+
+		switch (CipherModeType)
 		{
 			case Enumeration::CipherModes::CTR:
 			{

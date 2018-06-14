@@ -118,30 +118,27 @@ class AHX final : public IBlockCipher
 {
 private:
 
+	static const size_t AES256_ROUNDS = 14;
+	static const size_t AES512_ROUNDS = 22;
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string CIPHER_NAME;
 	static const std::string CLASS_NAME;
 	static const std::string DEF_DSTINFO;
-	static const size_t AES256_ROUNDS = 14;
 	static const size_t MAX_ROUNDS = 38;
 	static const size_t MIN_ROUNDS = 10;
 	// size of state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	size_t m_blockSize;
-	size_t m_cprKeySize;
+	BlockCipherExtensions m_cprExtension;
 	bool m_destroyEngine;
 	std::vector<__m128i> m_expKey;
-	std::unique_ptr<IDigest> m_kdfEngine;
-	Digests m_kdfEngineType;
 	std::vector<byte> m_kdfInfo;
-	size_t m_kdfInfoMax;
-	size_t m_kdfKeySize;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
+	std::unique_ptr<IKdf> m_kdfGenerator;
+	size_t m_kdfInfoMax;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::vector<size_t> m_legalRounds;
 	size_t m_rndCount;
 
 public:
@@ -159,31 +156,19 @@ public:
 	AHX& operator=(const AHX&) = delete;
 
 	/// <summary>
-	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
+	/// Instantiate the class with an optional block-cipher extension type
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The Key Schedule HKDF hash-engine; can be any one of the Digest implementations. 
+	/// <param name="CipherExtension">Sets the optional Key Schedule key-expansion engine; valid settings are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
-	/// <param name="Rounds">The number of transformation rounds. 
-	/// <para>The <see cref="LegalRounds"/> property contains available sizes. 
-	/// In default mode (DigestType is set to None), the rounds count is automatically calculated based on the key size in a standard AES implementation.
-	/// If the HKDF digest is specified, the number of rounds can be user-defined to a value from 10 to 38 (mod 2).
-	/// Adding rounds increases diffusion in the ciphertext output, but takes longer to process.</para></param>
-	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	explicit AHX(Digests DigestType = Digests::None, size_t Rounds = 14);
+	AHX(BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
 
 	/// <summary>
-	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
+	/// Instantiate the class with a Key Derivation Function instance
 	/// </summary>
 	///
-	/// <param name="Digest">The Key Schedule KDF hash-engine instance.
-	/// <para>Can be any one of the message digest implementations.</para></param>
-	/// <param name="Rounds">Number of transformation rounds. 
-	/// <para>The <see cref="LegalRounds"/> property contains available sizes. The default is 14 rounds (AES-256).</para></param>
-	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid block size or invalid rounds count are used</exception>
-	explicit AHX(IDigest* Digest, size_t Rounds = 14);
+	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
+	AHX(Kdf::IKdf* Kdf);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -198,6 +183,11 @@ public:
 	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The extended key-schedule KDF generator type
+	/// </summary>
+	const BlockCipherExtensions CipherExtension() override;
 
 	/// <summary>
 	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
@@ -232,19 +222,9 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: The extended ciphers HKDF digest type
-	/// </summary>
-	const Digests KdfEngine() override;
-
-	/// <summary>
 	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Read Only: Available transformation round assignments
-	/// </summary>
-	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
 	/// Read Only: The block ciphers class name
@@ -392,7 +372,7 @@ private:
 	void ExpandRotBlock(std::vector<__m128i> &Key, __m128i* K1, __m128i* K2, __m128i KR, size_t Offset);
 	void ExpandRotBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
 	void ExpandSubBlock(std::vector<__m128i> &Key, const size_t Index, const size_t Offset);
-	void LoadState(Digests DigestType);
+	void LoadState();
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 };

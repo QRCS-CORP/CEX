@@ -1,7 +1,6 @@
 #include "AHX.h"
 #if defined(__AVX__)
-#	include "DigestFromName.h"
-#	include "HKDF.h"
+#	include "KdfFromName.h"
 #	include "IntUtils.h"
 #	include "MemUtils.h"
 #	include "UInt128.h"
@@ -16,49 +15,39 @@ const std::string AHX::CLASS_NAME("AHX");
 const std::string AHX::DEF_DSTINFO("information string RHX version 1");
 
 //~~~Constructor~~~//
-
-AHX::AHX(Digests DigestType, size_t Rounds)
+AHX::AHX(BlockCipherExtensions CipherExtension)
 	:
-	m_blockSize(BLOCK_SIZE),
-	m_cprKeySize(0),
+	m_cprExtension(CipherExtension),
 	m_destroyEngine(true),
 	m_expKey(0),
-	m_kdfEngine(DigestType == Digests::None ? nullptr : Helper::DigestFromName::GetInstance(DigestType)),
-	m_kdfEngineType(DigestType),
+	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!") :
+		Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtension))),
 	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
-		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38."))
+	m_legalKeySizes(0)
 {
-	LoadState(m_kdfEngineType);
+	LoadState();
 }
 
-AHX::AHX(IDigest* Digest, size_t Rounds)
+AHX::AHX(Kdf::IKdf* Kdf)
 	:
-	m_blockSize(BLOCK_SIZE),
-	m_cprKeySize(0),
+	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),
 	m_expKey(0),
-	m_kdfEngine(Digest),
-	m_kdfEngineType(Digest == nullptr ? Digests::None : Digest->Enumeral()),
+	m_kdfGenerator(Kdf != nullptr ? Kdf :
+		throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!")),
 	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
-		throw CryptoSymmetricCipherException("AHX:CTor", "Invalid rounds size! Sizes supported are even numbers between 10 and 38."))
+	m_legalKeySizes(0)
 {
-	LoadState(m_kdfEngineType);
+	LoadState();
 }
 
 AHX::~AHX()
@@ -66,11 +55,7 @@ AHX::~AHX()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_blockSize = 0;
-		m_cprKeySize = 0;
-		m_kdfEngineType = Digests::None;
 		m_kdfInfoMax = 0;
-		m_kdfKeySize = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_rndCount = 0;
@@ -78,22 +63,21 @@ AHX::~AHX()
 		Utility::IntUtils::ClearVector(m_expKey);
 		Utility::IntUtils::ClearVector(m_kdfInfo);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_legalRounds);
 
 		if (m_destroyEngine)
 		{
 			m_destroyEngine = false;
 
-			if (m_kdfEngine != nullptr)
+			if (m_kdfGenerator != nullptr)
 			{
-				m_kdfEngine.reset(nullptr);
+				m_kdfGenerator.reset(nullptr);
 			}
 		}
 		else
 		{
-			if (m_kdfEngine != nullptr)
+			if (m_kdfGenerator != nullptr)
 			{
-				m_kdfEngine.release();
+				m_kdfGenerator.release();
 			}
 		}
 	}
@@ -104,6 +88,11 @@ AHX::~AHX()
 const size_t AHX::BlockSize()
 {
 	return BLOCK_SIZE;
+}
+
+const BlockCipherExtensions AHX::CipherExtension()
+{
+	return m_cprExtension;
 }
 
 std::vector<byte> &AHX::DistributionCode()
@@ -118,7 +107,7 @@ const size_t AHX::DistributionCodeMax()
 
 const BlockCiphers AHX::Enumeral()
 {
-	return (m_kdfEngineType == Digests::None) ? BlockCiphers::Rijndael : BlockCiphers::AHX;
+	return (m_cprExtension == BlockCipherExtensions::None) ? BlockCiphers::Rijndael : BlockCiphers::AHX;
 }
 
 const bool AHX::IsEncryption()
@@ -131,32 +120,34 @@ const bool AHX::IsInitialized()
 	return m_isInitialized;
 }
 
-const Digests AHX::KdfEngine()
-{
-	return m_kdfEngineType;
-}
-
 const std::vector<SymmetricKeySize> &AHX::LegalKeySizes()
 {
 	return m_legalKeySizes;
-}
-
-const std::vector<size_t> &AHX::LegalRounds()
-{
-	return m_legalRounds;
 }
 
 const std::string AHX::Name()
 {
 	std::string txtName = "";
 
-	if (m_kdfEngineType == Digests::None)
+	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 	{
-		txtName = CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+		txtName = CIPHER_NAME + std::string("-SHAKE-256");
+	}
+	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
+	{
+		txtName = CLASS_NAME + std::string("-SHAKE512-");
+	}
+	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
+	{
+		txtName = CLASS_NAME + std::string("-HKDF-SHA2-256");
+	}
+	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
+	{
+		txtName = CLASS_NAME + std::string("-HKDF-SHA2-512");
 	}
 	else
 	{
-		txtName = CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+		txtName = CIPHER_NAME;
 	}
 
 	return txtName;
@@ -200,7 +191,7 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	{
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 	}
-	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
+	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_kdfInfoMax)
 	{
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 	}
@@ -211,7 +202,6 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 
 	m_isEncryption = Encryption;
-	m_cprKeySize = KeyParams.Key().size() * 8;
 	// expand the key
 	ExpandKey(Encryption, KeyParams.Key());
 	// ready to transform data
@@ -282,7 +272,7 @@ void AHX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, s
 
 void AHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 {
-	if (m_kdfEngineType != Digests::None)
+	if (m_cprExtension != BlockCipherExtensions::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
@@ -314,39 +304,20 @@ void AHX::ExpandKey(bool Encryption, const std::vector<byte> &Key)
 
 void AHX::SecureExpand(const std::vector<byte> &Key)
 {
-	// block and key in 32 bit words
-	size_t blkWords = 4;
-	// expanded key size
-	size_t keySize = (blkWords * (m_rndCount + 1)) / 4;
-	// HKDF generator expands array 
-	Kdf::HKDF gen(m_kdfEngine.get());
+	// rounds: k256=22, k512=30, k1024=38
+	m_rndCount = Key.size() != 128 ? (Key.size() / 4) + 14 : 38;
+	// round-key array size
+	size_t keySize = ((BLOCK_SIZE / sizeof(uint)) * (m_rndCount + 1)) / 4;
+	std::vector<byte> rawKey(keySize * sizeof(__m128i));
+	// salt is not used
+	std::vector<byte> salt(0);
+	// initialize the generator
+	m_kdfGenerator->Initialize(Key, salt, m_kdfInfo);
+	// generate the keying material
+	m_kdfGenerator->Generate(rawKey);
+	// initialize round-key array
+	m_expKey.resize(keySize);
 
-	// change 1.2: use extract only on an oversized key
-	if (Key.size() > m_kdfEngine->BlockSize())
-	{
-		// seperate salt and key
-		m_kdfKeySize = m_kdfEngine->BlockSize();
-		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		Utility::MemUtils::Copy(Key, 0, kdfKey, 0, m_kdfKeySize);
-		size_t saltSize = Key.size() - m_kdfKeySize;
-		std::vector<byte> kdfSalt(saltSize, 0);
-		Utility::MemUtils::Copy(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
-		// info can be null
-		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
-	}
-	else
-	{
-		if (m_kdfInfo.size() != 0)
-		{
-			gen.Info() = m_kdfInfo;
-		}
-
-		gen.Initialize(Key);
-	}
-
-	// generate the round keys
-	std::vector<byte> rawKey(keySize * 16, 0);
-	gen.Generate(rawKey);
 	// initialize working key
 	m_expKey.resize(keySize);
 
@@ -367,13 +338,13 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 void AHX::StandardExpand(const std::vector<byte> &Key)
 {
 	// block in 32 bit words
-	size_t blkWords = m_blockSize / 4;
+	size_t blkWords = BLOCK_SIZE / sizeof(uint);
 	// key in 32 bit words
-	size_t keyWords = Key.size() / 4;
+	size_t keyWords = Key.size() / sizeof(uint);;
 	// rounds calculation, 512 gets 22 rounds
 	m_rndCount = keyWords + 6;
 	// setup expanded key
-	m_expKey.resize((blkWords * (m_rndCount + 1)) / 4);
+	m_expKey.resize((blkWords * (m_rndCount + 1)) / sizeof(uint));
 
 	if (keyWords == 16)
 	{
@@ -670,34 +641,44 @@ void AHX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 //~~~Helpers~~~//
 
-void AHX::LoadState(Digests DigestType)
+void AHX::LoadState()
 {
-	if (m_kdfEngineType == Digests::None)
+	if (m_cprExtension == BlockCipherExtensions::None)
 	{
-		m_legalRounds.resize(4);
-		m_legalRounds = { 10, 12, 14, 22 };
 		m_legalKeySizes.resize(4);
-		m_legalKeySizes[0] = SymmetricKeySize(16, 16, 0);
-		m_legalKeySizes[1] = SymmetricKeySize(24, 16, 0);
-		m_legalKeySizes[2] = SymmetricKeySize(32, 16, 0);
-		m_legalKeySizes[3] = SymmetricKeySize(64, 16, 0);
+		m_legalKeySizes[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
+		m_legalKeySizes[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
+		m_legalKeySizes[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
+		m_legalKeySizes[3] = SymmetricKeySize(64, BLOCK_SIZE, 0);
 	}
 	else
 	{
-		// allowable transformation rounds
-		m_legalRounds.resize(15);
-		m_legalRounds = { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38 };
-		// change: default at ideal size, a full block to key HMAC
-		m_kdfKeySize = Helper::DigestFromName::GetBlockSize(m_kdfEngineType);
-		// calculate max saturation of entropy when distribution code is used as key extension; subtract hash finalizer code + 1 byte HKDF counter
-		m_kdfInfoMax = m_kdfKeySize - (Helper::DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
 		m_legalKeySizes.resize(3);
-		// min allowable HMAC key
-		m_legalKeySizes[0] = SymmetricKeySize(Helper::DigestFromName::GetDigestSize(m_kdfEngineType), m_blockSize, m_kdfInfoMax);
-		// best size, no ipad/opad zero byte post-compressed mix in HMAC
-		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, m_blockSize, m_kdfInfoMax);
-		// triggers HKDF Extract
-		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, m_blockSize, m_kdfInfoMax);
+
+		if (m_cprExtension == BlockCipherExtensions::SHAKE256)
+		{
+			// sha3-256 blocksize
+			m_kdfInfoMax = 136;
+		}
+		else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
+		{
+			// sha3-512 blocksize
+			m_kdfInfoMax = 72;
+		}
+		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
+		{
+			// sha2-512 blocksize - padding + hkdf counter
+			m_kdfInfoMax = 128 - (17 + 1);
+		}
+		else
+		{
+			// sha2-256 blocksize - padding + hkdf counter
+			m_kdfInfoMax = 64 - (9 + 1);
+		}
+
+		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_kdfInfoMax);
+		m_legalKeySizes[1] = SymmetricKeySize(64, BLOCK_SIZE, m_kdfInfoMax);
+		m_legalKeySizes[2] = SymmetricKeySize(128, BLOCK_SIZE, m_kdfInfoMax);
 	}
 }
 

@@ -8,7 +8,7 @@ const std::string GCM::CLASS_NAME("GCM");
 
 //~~~Constructor~~~//
 
-GCM::GCM(BlockCiphers CipherType)
+GCM::GCM(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_aadData(0),
 	m_aadLoaded(false),
@@ -16,7 +16,7 @@ GCM::GCM(BlockCiphers CipherType)
 	m_aadSize(0),
 	m_autoIncrement(false),
 	m_checkSum(BLOCK_SIZE),
-	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType) :
+	m_cipherMode(CipherType != BlockCiphers::None ? new CTR(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("GCM:Ctor", "The cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),

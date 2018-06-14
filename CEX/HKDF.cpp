@@ -11,8 +11,8 @@ const std::string HKDF::CLASS_NAME("HKDF");
 
 HKDF::HKDF(Digests DigestType)
 	:
-	m_macGenerator(DigestType != Digests::None ? new HMAC(DigestType) :
-		throw CryptoKdfException("HKDF:CTor", "The Digest type can not be none!")),
+	m_macGenerator(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? new HMAC(DigestType) :
+		throw CryptoKdfException("HKDF:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
@@ -29,8 +29,8 @@ HKDF::HKDF(Digests DigestType)
 
 HKDF::HKDF(IDigest* Digest)
 	:
-	m_macGenerator(Digest != nullptr ? new HMAC(Digest) : 
-		throw CryptoKdfException("HKDF:CTor", "The Digest can not be null!")),
+	m_macGenerator(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? new HMAC(Digest) :
+		throw CryptoKdfException("HKDF:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
@@ -100,7 +100,7 @@ HKDF::~HKDF()
 
 const Kdfs HKDF::Enumeral() 
 { 
-	return Kdfs::HKDF; 
+	return Kdfs::HKDF256; 
 }
 
 std::vector<byte> &HKDF::Info() 
@@ -241,10 +241,19 @@ void HKDF::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 		Reset();
 	}
 
-	std::vector<byte> prk(m_macSize);
-	Extract(Key, Salt, prk);
-	Key::Symmetric::SymmetricKey kp(prk);
-	m_macGenerator->Initialize(kp);
+	if (Salt.size() != 0)
+	{
+		std::vector<byte> prk(m_macSize);
+		Extract(Key, Salt, prk);
+		Key::Symmetric::SymmetricKey kp(prk);
+		m_macGenerator->Initialize(kp);
+	}
+	else
+	{
+		Key::Symmetric::SymmetricKey kp(Key);
+		m_macGenerator->Initialize(kp);
+	}
+
 	m_kdfInfo = Info;
 	m_isInitialized = true;
 }

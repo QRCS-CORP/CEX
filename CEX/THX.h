@@ -123,7 +123,7 @@ private:
 	static const uint GF256_FDBK = 0x169;
 	static const uint GF256_FDBK_2 = GF256_FDBK / 2;
 	static const uint GF256_FDBK_4 = GF256_FDBK / 4;
-	static const uint KEY_BITS = 256;
+	static const uint SBKEY_BITS = 256;
 	static const size_t MAX_ROUNDS = 32;
 	static const size_t MIN_ROUNDS = 16;
 	static const uint RS_GF_FDBK = 0x14D;
@@ -134,19 +134,16 @@ private:
 	// size of state buffer and sbox subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048 + 4096;
 
-	size_t m_cprKeySize;
+	BlockCipherExtensions m_cprExtension;
 	bool m_destroyEngine;
 	std::vector<uint> m_expKey;
+	std::vector<byte> m_kdfInfo;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	std::unique_ptr<IDigest> m_kdfEngine;
-	Digests m_kdfEngineType;
-	std::vector<byte> m_kdfInfo;
+	std::unique_ptr<IKdf> m_kdfGenerator;
 	size_t m_kdfInfoMax;
-	size_t m_kdfKeySize;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::vector<size_t> m_legalRounds;
 	size_t m_rndCount;
 	std::vector<uint> m_sBox;
 
@@ -165,26 +162,19 @@ public:
 	THX& operator=(const THX&) = delete;
 
 	/// <summary>
-	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
+	/// Instantiate the class with an optional block-cipher extension type
 	/// </summary>
 	/// 
-	/// <param name="DigestType">The Key Schedule KDF digest engine; can be any one of the Digest implementations. 
-	/// The default engine is None, which invokes the standard key schedule mechanism.</param>
-	/// <param name="Rounds">Number of transformation rounds. The <see cref="LegalRounds"/> property contains available sizes. 
-	/// Default is 16 rounds, defining rounds requires HKDF extended mode.</param>
-	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	explicit THX(Digests DigestType = Digests::None, uint Rounds = 16);
+	/// <param name="CipherExtension">Sets the optional Key Schedule key-expansion engine; valid settings are cSHAKE, HKDF, or None for standard mode. 
+	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
+	THX(BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
 
 	/// <summary>
-	/// Instantiate the class with a Digest instance (HKDF extended mode), and with optional transformation rounds count
+	/// Instantiate the class with a Key Derivation Function instance
 	/// </summary>
-	/// 
-	/// <param name="Digest">The Key Schedule HKDF digest engine instance; can be any one of the Digest implementations.</param>
-	/// <param name="Rounds">Number of transformation rounds; the <see cref="LegalRounds"/> property contains available sizes, default is 20 rounds.</param>
-	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	explicit THX(IDigest* Digest, size_t Rounds = 20);
+	///
+	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
+	THX(Kdf::IKdf* Kdf);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -199,6 +189,11 @@ public:
 	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The extended key-schedule KDF generator type
+	/// </summary>
+	const BlockCipherExtensions CipherExtension() override;
 
 	/// <summary>
 	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
@@ -233,19 +228,9 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: The extended ciphers HKDF digest type
-	/// </summary>
-	const Digests KdfEngine() override;
-
-	/// <summary>
 	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Read Only: Available transformation round assignments
-	/// </summary>
-	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
 	/// Read Only: The block ciphers class name
@@ -390,10 +375,10 @@ private:
 	void Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(const std::vector<byte> &Key);
-	void LoadState(Digests DigestType);
+	void LoadState();
 	uint MdsEncode(uint K0, uint K1);
-	uint Mix4(const uint X, const std::vector<uint> &Key, const size_t Count);
-	void Mix16(const uint X, const std::vector<byte> &Key, const size_t Count, std::vector<uint> &Output);
+	uint Mix4(const uint X, const std::vector<uint> &SubKey);
+	void Mix16(const uint X, const std::vector<byte> &SubKey, std::array<uint, 4> &Output);
 	void Prefetch();
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);

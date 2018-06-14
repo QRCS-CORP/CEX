@@ -129,19 +129,16 @@ private:
 	// size of state buffer subtracted parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	size_t m_cprKeySize;
+	BlockCipherExtensions m_cprExtension;
 	bool m_destroyEngine;
 	std::vector<uint> m_expKey;
-	std::unique_ptr<IDigest> m_kdfEngine;
-	Digests m_kdfEngineType;
 	std::vector<byte> m_kdfInfo;
-	size_t m_kdfInfoMax;
-	size_t m_kdfKeySize;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
+	std::unique_ptr<IKdf> m_kdfGenerator;
+	size_t m_kdfInfoMax;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::vector<size_t> m_legalRounds;
 	size_t m_rndCount;
 
 public:
@@ -159,26 +156,19 @@ public:
 	SHX& operator=(const SHX&) = delete;
 
 	/// <summary>
-	/// Instantiate the class with optional transformation rounds, and KDF engine type settings
+	/// Instantiate the class with an optional block-cipher extension type
 	/// </summary>
-	///
-	/// <param name="DigestType">The Key Schedule KDF digest engine; can be any one of the Digest implementations. 
-	/// The default engine is None, which invokes the standard key schedule mechanism.</param>
-	/// <param name="Rounds">Number of transformation rounds. The <see cref="LegalRounds"/> property contains available sizes. 
-	/// Default is 32 rounds with a 128-256 bit key, 40 rounds with a 512 bit key.</param>
 	/// 
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	explicit SHX(Digests DigestType = Digests::None, size_t Rounds = 32);
+	/// <param name="CipherExtension">Sets the optional Key Schedule key-expansion engine; valid settings are cSHAKE, HKDF, or None for standard mode. 
+	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
+	SHX(BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
 
 	/// <summary>
-	/// Instantiate the class with a Digest instance (HKDF mode), and with optional transformation rounds settings
+	/// Instantiate the class with a Key Derivation Function instance
 	/// </summary>
 	///
-	/// <param name="Digest">The Key Schedule HKDF digest engine instance; can be any one of the message Digest implementations.</param>
-	/// <param name="Rounds">Number of transformation rounds. The <see cref="LegalRounds"/> property contains available sizes. Default is 40 rounds.</param>
-	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
-	explicit SHX(IDigest* Digest, size_t Rounds = 40);
+	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>
+	SHX(Kdf::IKdf* Kdf);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -193,6 +183,11 @@ public:
 	/// Value set in class constructor.</para>
 	/// </summary>
 	const size_t BlockSize() override;
+
+	/// <summary>
+	/// Read Only: The extended key-schedule KDF generator type
+	/// </summary>
+	const BlockCipherExtensions CipherExtension() override;
 
 	/// <summary>
 	/// Read/Write: Reads or Sets the Info (personalization string) value in the HKDF initialization parameters.
@@ -227,19 +222,9 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
-	/// Read Only: The extended ciphers HKDF digest type
-	/// </summary>
-	const Digests KdfEngine() override;
-
-	/// <summary>
 	/// Read Only: Available Encryption Key Sizes in bytes
 	/// </summary>
 	const std::vector<SymmetricKeySize> &LegalKeySizes() override;
-
-	/// <summary>
-	/// Read Only: Available transformation round assignments
-	/// </summary>
-	const std::vector<size_t> &LegalRounds() override;
 
 	/// <summary>
 	/// Read Only: The block ciphers class name
@@ -384,7 +369,7 @@ private:
 	void Encrypt1024(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std::vector<byte> &Output, const size_t OutOffset);
 	void ExpandKey(const std::vector<byte> &Key);
-	void LoadState(Digests DigestType);
+	void LoadState();
 	void SecureExpand(const std::vector<byte> &Key);
 	void StandardExpand(const std::vector<byte> &Key);
 };

@@ -21,6 +21,7 @@
 
 #include "CexDomain.h"
 #include "BlockCiphers.h"
+#include "BlockCipherExtensions.h"
 #include "CipherModes.h"
 #include "CryptoCipherModeException.h"
 #include "IBlockCipher.h"
@@ -30,6 +31,7 @@
 NAMESPACE_MODE
 
 using Enumeration::BlockCiphers;
+using Enumeration::BlockCipherExtensions;
 using Enumeration::CipherModes; 
 using Exception::CryptoCipherModeException;
 using Block::IBlockCipher;

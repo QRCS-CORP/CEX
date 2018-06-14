@@ -2,27 +2,30 @@
 #define CEXTEST_HXCIPHERTEST_H
 
 #include "ITest.h"
+#include "../CEX/ICipherMode.h"
 
 namespace Test
 {
+	using namespace Cipher::Symmetric::Block::Mode;
+
 	/// <summary>
-	/// HX Cipher Known Answer Monte Carlo Tests.
-	/// <para>Vectors generated from the CEX .Net version.</para>
+	/// HX Cipher monte carlo KAT tests; tests every extended form of each cipher.
+	/// <para>Original vectors generated with the CEX++ library.</para>
 	/// </summary>
 	class HXCipherTest final : public ITest
 	{
 	private:
 
+		const size_t MONTECARLO_ROUNDS = 100;
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
 
 		std::vector<byte> m_iv;
-		std::vector<byte> m_key;
-		std::vector<byte> m_key2;
-		std::vector<std::vector<byte>> m_rhxExpected;
-		std::vector<std::vector<byte>> m_shxExpected;
-		std::vector<std::vector<byte>> m_thxExpected;
+		std::vector<std::vector<byte>> m_key;
+		std::vector<std::vector<byte>> m_rhxExp;
+		std::vector<std::vector<byte>> m_shxExp;
+		std::vector<std::vector<byte>> m_thxExp;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -55,13 +58,10 @@ namespace Test
 	private:
 
 		void Initialize();
+		void MonteCarloDecrypt(ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output);
+		void MonteCarloEncrypt(ICipherMode* Cipher, std::vector<byte> &Input, std::vector<byte> &Output);
 		void OnProgress(std::string Data);
-#if defined(__AVX__)
-		void AHXMonteCarlo();
-#endif
-		void RHXMonteCarlo();
-		void SHXMonteCarlo();
-		void THXMonteCarlo();
+		void CipherMonteCarlo(Enumeration::BlockCiphers BlockCipherType, Enumeration::BlockCipherExtensions CipherExtensionType, std::vector<byte> &Key, std::vector<byte> &Expected);
 	};
 }
 

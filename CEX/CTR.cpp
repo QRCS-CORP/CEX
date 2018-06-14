@@ -9,9 +9,9 @@ const std::string CTR::CLASS_NAME("CTR");
 
 //~~~Constructor~~~//
 
-CTR::CTR(BlockCiphers CipherType)
+CTR::CTR(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("CTR:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_ctrVector(BLOCK_SIZE),

@@ -75,6 +75,7 @@ using Mac::HMAC;
 ///
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
+/// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
 /// <item><description>This class can be instantiated with a message digest or HMAC instance, or by using a digests enumeration type name.</description></item>
 /// <item><description>The generator must be initialized with a key using one of the Initialize() functions before output can be generated.</description></item>
 /// <item><description>The Initialize() function can use a SymmetricKey key container class, or input arrays of Key, and optional Salt and Info.</description></item>

@@ -26,14 +26,14 @@
 #define CEX_CIPHERSTREAM_H
 
 #include "CexDomain.h"
-#include "CryptoProcessingException.h"
+#include "BlockCipherExtensions.h"
 #include "CipherDescription.h"
+#include "CryptoProcessingException.h"
 #include "Event.h"
 #include "IBlockCipher.h"
 #include "IByteStream.h"
 #include "ICipherMode.h"
 #include "IPadding.h"
-#include "IStreamCipher.h"
 #include "ParallelOptions.h"
 #include "SymmetricKeySize.h"
 #include "SymmetricEngines.h"
@@ -41,19 +41,17 @@
 NAMESPACE_PROCESSING
 
 using Enumeration::BlockCiphers;
+using Enumeration::BlockCipherExtensions;
 using Exception::CryptoProcessingException;
 using Enumeration::CipherModes;
-using Enumeration::Digests;
 using Routing::Event;
 using Cipher::Symmetric::Block::IBlockCipher;
 using IO::IByteStream;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
 using Cipher::Symmetric::Block::Padding::IPadding;
-using Cipher::Symmetric::Stream::IStreamCipher;
 using Key::Symmetric::ISymmetricKey;
 using Enumeration::PaddingModes;
 using Common::ParallelOptions;
-using Enumeration::StreamCiphers;
 using Enumeration::SymmetricEngines;
 using Key::Symmetric::SymmetricKeySize;
 
@@ -159,9 +157,7 @@ private:
 	bool m_isEncryption;
 	bool m_isInitialized;
 	bool m_isParallel;
-	bool m_isStreamCipher;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	std::unique_ptr<IStreamCipher> m_streamCipher;
 
 public:
 
@@ -183,44 +179,26 @@ public:
 	CipherStream& operator=(const CipherStream&) = delete;
 
 	/// <summary>
-	/// Default constructor: default is restricted, this function has been deleted
+	/// Initialize this class with block cipher description.
 	/// </summary>
-	CipherStream() = delete;
+	/// 
+	/// <param name="Description">The block cipher configuration parameters</param>
+	/// 
+	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
+	CipherStream(CipherDescription* Description);
 
 	/// <summary>
 	/// Initialize this class with block cipher enumeration parameters.
-	/// <para>The default parameters are an HX extended Rijndael cipher with 22 transformation rounds, wrapped in a parallel CTR mode.</para>
+	/// <para>The default parameters are AES-256, using a parallel CTR mode.</para>
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block cipher enumeration name</param>
-	/// <param name="DigestType">The extended HX ciphers key schedule engine; can be 'None'</param>
-	/// <param name="RoundCount">The number of transformation rounds</param>
-	/// <param name="ModeType">The cipher mode enumeration name</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
+	/// <param name="CipherModeType">The cipher mode enumeration name</param>
 	/// <param name="PaddingType">The padding mode enumeration name</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
-	CipherStream(BlockCiphers CipherType = BlockCiphers::RHX, Digests DigestType = Digests::SHA256, int RoundCount = 22, CipherModes ModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
-
-	/// <summary>
-	/// Initialize this class with stream cipher enumeration parameters.
-	/// <para>The default round count for Salsa and ChaCha is the standard 20 rounds.</para>
-	/// </summary>
-	/// 
-	/// <param name="CipherType">The stream cipher enumeration name</param>
-	/// <param name="RoundCount">The number of transformation rounds; the default for Salsa and ChaCha is 20 rounds</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an invalid cipher type or rounds count is used</exception>
-	explicit CipherStream(StreamCiphers CipherType, size_t RoundCount = 20);
-
-	/// <summary>
-	/// Initialize the class with a CipherDescription Structure; containing the cipher implementation details.
-	/// <para>This constructor creates and configures cryptographic instances based on the cipher description contained in a CipherDescription.</para>
-	/// </summary>
-	/// 
-	/// <param name="Header">A CipherDescription structure</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if an invalid CipherDescription is used</exception>
-	explicit CipherStream(CipherDescription* Header);
+	CipherStream(BlockCiphers CipherType = BlockCiphers::Rijndael, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None, CipherModes CipherModeType = CipherModes::CTR, PaddingModes PaddingType = PaddingModes::None);
 
 	/// <summary>
 	/// Initialize the class with a block cipher mode and (optional) padding instances.
@@ -233,16 +211,6 @@ public:
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null cipher mode is used</exception>
 	explicit CipherStream(ICipherMode* Cipher, IPadding* Padding = 0);
-
-	/// <summary>
-	/// Initialize the class with a stream cipher instance.
-	/// <para>This constructor requires a non-null uninitialized IStreamCipher instance.</para>
-	/// </summary>
-	/// 
-	/// <param name="Cipher">The stream cipher instance</param>
-	/// 
-	/// <exception cref="Exception::CryptoProcessingException">Thrown if a null stream cipher is used</exception>
-	explicit CipherStream(IStreamCipher* Cipher);
 
 	/// <summary>
 	/// Destroy this class
@@ -328,11 +296,8 @@ private:
 	void BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
 	void BlockTransform(IByteStream* InStream, IByteStream* OutStream);
 	void CalculateProgress(size_t Length, size_t Processed);
-	ICipherMode* GetCipherMode(CipherModes ModeType, BlockCiphers CipherType, int BlockSize, int RoundCount, Digests DigestType);
-	IPadding* GetPaddingMode(PaddingModes PaddingType);
-	IStreamCipher* GetStreamCipher(StreamCiphers CipherType, size_t RoundCount);
-	void StreamTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset);
-	void StreamTransform(IByteStream* InStream, IByteStream* OutStream);
+	static ICipherMode* GetCipherMode(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, CipherModes CipherModeType);
+	static IPadding* GetPaddingMode(PaddingModes PaddingType);
 	void Scope();
 };
 

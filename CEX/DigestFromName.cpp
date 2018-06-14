@@ -14,7 +14,7 @@ NAMESPACE_HELPER
 
 IDigest* DigestFromName::GetInstance(Digests DigestType, bool Parallel)
 {
-	IDigest* dgtPtr;
+	IDigest* dgtPtr = nullptr;
 
 	try
 	{

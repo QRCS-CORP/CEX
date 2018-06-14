@@ -9,9 +9,9 @@ const std::string CFB::CLASS_NAME("CFB");
 
 //~~~Constructor~~~//
 
-CFB::CFB(BlockCiphers CipherType, size_t RegisterSize)
+CFB::CFB(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, size_t RegisterSize)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoCipherModeException("CFB:CTor", "The Cipher type can not be none!")),
 	m_blockSize((RegisterSize != 0 && RegisterSize <= m_blockCipher->BlockSize()) ? RegisterSize :
 		throw CryptoCipherModeException("CFB:CTor", "The register size is invalid!")),

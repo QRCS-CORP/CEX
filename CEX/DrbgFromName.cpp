@@ -7,7 +7,7 @@ NAMESPACE_HELPER
 
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 {
-	IDrbg* drbgPtr;
+	IDrbg* drbgPtr = nullptr;
 
 	try
 	{
@@ -44,7 +44,7 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers ProviderType)
 {
-	IDrbg* drbgPtr;
+	IDrbg* drbgPtr = nullptr;
 
 	try
 	{
@@ -52,7 +52,27 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 		{
 			case Drbgs::BCG:
 			{
-				drbgPtr = new Drbg::BCG(BlockCiphers::AHX, DigestType, ProviderType);
+				if (DigestType == Digests::SHA256)
+				{
+					drbgPtr = new Drbg::BCG(BlockCiphers::AHX, Enumeration::BlockCipherExtensions::HKDF256, ProviderType);
+				}
+				else if (DigestType == Digests::SHAKE256)
+				{
+					drbgPtr = new Drbg::BCG(BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256, ProviderType);
+				}
+				else if (DigestType == Digests::SHA512)
+				{
+					drbgPtr = new Drbg::BCG(BlockCiphers::AHX, Enumeration::BlockCipherExtensions::HKDF512, ProviderType);
+				}
+				else if (DigestType == Digests::SHAKE512)
+				{
+					drbgPtr = new Drbg::BCG(BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE512, ProviderType);
+				}
+				else
+				{
+					throw CryptoException("DrbgFromName:GetInstance", "The digest configuration is invalid!");
+				}
+
 				break;
 			}
 			case Drbgs::CSG:

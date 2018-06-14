@@ -101,7 +101,6 @@ class McEliece final : public IAsymmetricCipher
 private:
 
 	static const std::string CLASS_NAME;
-	static const size_t TAG_SIZE = 16;
 
 	bool m_destroyEngine;
 	std::vector<byte> m_domainKey;

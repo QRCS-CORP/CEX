@@ -101,28 +101,11 @@ namespace Test
 			}
 		}
 
-		SymmetricKeyGenerator keyGen2(Digests::Blake512, Providers::CSP);
+		SymmetricKeyGenerator keyGen2(Digests::SHA512, Providers::CSP);
 		SymmetricKey* symKey2 = keyGen2.GetSymmetricKey(keySize);
 		if (!IsValidKey(*symKey2))
 		{
 			throw TestException("CheckInit: Key generation has failed!");
-		}
-
-		SymmetricKeyGenerator keyGen3(Digests::Keccak256, Providers::ECP);
-		SymmetricKey* symKey3 = keyGen3.GetSymmetricKey(keySize);
-		if (!IsValidKey(*symKey3))
-		{
-			throw TestException("CheckInit: Key generation has failed!");
-		}
-
-		if (detect.RDRAND() && detect.RDSEED())
-		{
-			SymmetricKeyGenerator keyGen4(Digests::Skein512, Providers::RDP);
-			SymmetricKey* symKey4 = keyGen4.GetSymmetricKey(keySize);
-			if (!IsValidKey(*symKey4))
-			{
-				throw TestException("CheckInit: Key generation has failed!");
-			}
 		}
 	}
 

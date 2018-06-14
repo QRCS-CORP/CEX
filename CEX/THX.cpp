@@ -1,8 +1,8 @@
 #include "THX.h"
 #include "Twofish.h"
-#include "DigestFromName.h"
-#include "HKDF.h"
 #include "IntUtils.h"
+#include "KdfFromName.h"
+
 #if defined(CEX_COMPILER_MSC)
 #	if defined(__AVX512__)
 #		include "UInt512.h"
@@ -21,83 +21,72 @@ const std::string THX::DEF_DSTINFO("THX version 1 information string");
 
 //~~~Constructor~~~//
 
-THX::THX(Digests DigestType, uint Rounds)
+THX::THX(BlockCipherExtensions CipherExtension)
 	:
-	m_cprKeySize(0),
+	m_cprExtension(CipherExtension),
 	m_destroyEngine(true),
 	m_expKey(0),
+	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("THX:CTor", "The Kdf can not be null!") :
+		Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtension))),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_kdfInfoMax(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(DigestType == Digests::None ? nullptr : Helper::DigestFromName::GetInstance(DigestType)),
-	m_kdfEngineType(DigestType),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
 	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
-		throw CryptoSymmetricCipherException("THX:CTor", "Invalid rounds count! Sizes supported are even numbers between 16 and 32")),
 	m_sBox(SBOX_SIZE, 0)
 {
-	LoadState(DigestType);
+	LoadState();
 }
 
-THX::THX(IDigest* Digest, size_t Rounds)
+THX::THX(Kdf::IKdf* Kdf)
 	:
-	m_cprKeySize(0),
+	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),
 	m_expKey(0),
+	m_kdfGenerator(Kdf != nullptr ? Kdf :
+		throw CryptoSymmetricCipherException("THX:CTor", "The Kdf can not be null!")),
+	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_kdfInfoMax(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(Digest),
-	m_kdfEngineType(Digest == nullptr ? Digests::None : Digest->Enumeral()),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
-	m_kdfKeySize(0),
 	m_legalKeySizes(0),
-	m_legalRounds(0),
-	m_rndCount(((Rounds <= MAX_ROUNDS) && (Rounds >= MIN_ROUNDS) && (Rounds % 2 == 0)) ? Rounds :
-		throw CryptoSymmetricCipherException("THX:CTor", "Sizes supported are even numbers between 16 and 32")),
 	m_sBox(SBOX_SIZE, 0)
 {
-	LoadState(m_kdfEngineType);
+	LoadState();
 }
 
 THX::~THX()
 {
 	if (!m_isDestroyed)
 	{
-		m_isDestroyed = true;
-		m_cprKeySize = 0;
+		m_cprExtension = BlockCipherExtensions::None;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_kdfEngineType = Digests::None;
 		m_kdfInfoMax = 0;
-		m_kdfKeySize = 0;
 		m_rndCount = 0;
 
 		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_sBox);
 		Utility::IntUtils::ClearVector(m_kdfInfo);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearVector(m_legalRounds);
+		Utility::IntUtils::ClearVector(m_sBox);
 
 		if (m_destroyEngine)
 		{
 			m_destroyEngine = false;
 
-			if (m_kdfEngine != nullptr)
+			if (m_kdfGenerator != nullptr)
 			{
-				m_kdfEngine.reset(nullptr);
+				m_kdfGenerator.reset(nullptr);
 			}
 		}
 		else
 		{
-			if (m_kdfEngine != nullptr)
+			if (m_kdfGenerator != nullptr)
 			{
-				m_kdfEngine.release();
+				m_kdfGenerator.release();
 			}
 		}
 	}
@@ -108,6 +97,11 @@ THX::~THX()
 const size_t THX::BlockSize()
 {
 	return BLOCK_SIZE;
+}
+
+const BlockCipherExtensions THX::CipherExtension()
+{
+	return m_cprExtension;
 }
 
 std::vector<byte> &THX::DistributionCode()
@@ -122,7 +116,7 @@ const size_t THX::DistributionCodeMax()
 
 const BlockCiphers THX::Enumeral()
 {
-	return (m_kdfEngineType == Digests::None) ? BlockCiphers::Twofish : BlockCiphers::THX;
+	return (m_cprExtension == BlockCipherExtensions::None) ? BlockCiphers::Twofish : BlockCiphers::THX;
 }
 
 const bool THX::IsEncryption()
@@ -135,32 +129,34 @@ const bool THX::IsInitialized()
 	return m_isInitialized;
 }
 
-const Digests THX::KdfEngine()
-{
-	return m_kdfEngineType;
-}
-
 const std::vector<SymmetricKeySize> &THX::LegalKeySizes()
 {
 	return m_legalKeySizes;
-}
-
-const std::vector<size_t> &THX::LegalRounds()
-{
-	return m_legalRounds;
 }
 
 const std::string THX::Name()
 {
 	std::string txtName = "";
 
-	if (m_kdfEngineType == Digests::None)
+	if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 	{
-		txtName = CIPHER_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+		txtName = CIPHER_NAME + std::string("-SHAKE-256");
+	}
+	else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
+	{
+		txtName = CLASS_NAME + std::string("-SHAKE512-");
+	}
+	else if (m_cprExtension == BlockCipherExtensions::HKDF256)
+	{
+		txtName = CLASS_NAME + std::string("-HKDF-SHA2-256");
+	}
+	else if (m_cprExtension == BlockCipherExtensions::HKDF512)
+	{
+		txtName = CLASS_NAME + std::string("-HKDF-SHA2-512");
 	}
 	else
 	{
-		txtName = CLASS_NAME + (m_cprKeySize != 0 ? Utility::IntUtils::ToString(m_cprKeySize) : "");
+		txtName = CIPHER_NAME;
 	}
 
 	return txtName;
@@ -204,7 +200,7 @@ void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	{
 		throw CryptoSymmetricCipherException("THX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 	}
-	if (m_kdfEngineType != Enumeration::Digests::None && KeyParams.Info().size() > m_kdfInfoMax)
+	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_kdfInfoMax)
 	{
 		throw CryptoSymmetricCipherException("THX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 	}
@@ -215,7 +211,6 @@ void THX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 
 	m_isEncryption = Encryption;
-	m_cprKeySize = KeyParams.Key().size() * 8;
 	// expand the key
 	ExpandKey(KeyParams.Key());
 
@@ -291,7 +286,7 @@ void THX::Transform2048(const std::vector<byte> &Input, const size_t InOffset, s
 
 void THX::ExpandKey(const std::vector<byte> &Key)
 {
-	if (m_kdfEngineType != Enumeration::Digests::None)
+	if (m_cprExtension != BlockCipherExtensions::None)
 	{
 		// hkdf key expansion
 		SecureExpand(Key);
@@ -305,139 +300,116 @@ void THX::ExpandKey(const std::vector<byte> &Key)
 
 void THX::SecureExpand(const std::vector<byte> &Key)
 {
-	// ToDo: look into some changes
-	// 1) Pull the sbox key directly from the kdf and remove(?) sbox premix stage
-	// 2) Store sbox key and calculate sbox member on the fly when sse/avx enabled(?) test performance
-	// 3) If (2) is a significant gain, sbox becomes fallback when intrinsics are not available
+	// rounds: k256=40, k512=48, k1024=64
+	m_rndCount = Key.size() == 32 ? 20 : Key.size() == 64 ? 24 : 32;
 
-	size_t k64Cnt = 4;
-	size_t keyCtr = 0;
-	size_t keySize = m_rndCount * 2 + 8;
-	size_t keyBytes = keySize * 4;
-	std::vector<byte> sbKey(16, 0);
-	std::vector<uint> eKm(k64Cnt, 0);
-	std::vector<uint> oKm(k64Cnt, 0);
-	std::vector<uint> wK(keySize, 0);
-	// HKDF generator expands array 
-	Kdf::HKDF gen(m_kdfEngine.get());
+	const size_t EXKSZE = (m_rndCount * 2) + 8;
+	const size_t SKMSZE = (Key.size() / 8);
 
-	// change 1.2: use extract only on an oversized key
-	if (Key.size() > m_kdfEngine->BlockSize())
+	std::vector<uint> eKm(SKMSZE);
+	std::vector<uint> oKm(SKMSZE);
+	std::vector<byte> rawKey(EXKSZE * sizeof(uint));
+	std::vector<byte> sbKey(Key.size() / 2);
+	size_t keyPos;
+
+	// salt is not used
+	std::vector<byte> salt(0);
+	// initialize the generator
+	m_kdfGenerator->Initialize(Key, salt, m_kdfInfo);
+	// generate the keying material
+	m_kdfGenerator->Generate(rawKey);
+	// initialize round-key array
+	m_expKey.resize(EXKSZE, 0);
+
+	// copy bytes to round keys
+	for (size_t i = 0; i < m_expKey.size(); ++i)
 	{
-		// seperate salt and key
-		m_kdfKeySize = m_kdfEngine->BlockSize();
-		std::vector<byte> kdfKey(m_kdfKeySize, 0);
-		Utility::MemUtils::Copy(Key, 0, kdfKey, 0, m_kdfKeySize);
-
-		size_t saltSize = Key.size() - m_kdfKeySize;
-		std::vector<byte> kdfSalt(saltSize, 0);
-		Utility::MemUtils::Copy(Key, m_kdfKeySize, kdfSalt, 0, saltSize);
-		// info can be null
-		gen.Initialize(kdfKey, kdfSalt, m_kdfInfo);
-	}
-	else
-	{
-		if (m_kdfInfo.size() != 0)
-		{
-			gen.Info() = m_kdfInfo;
-		}
-
-		gen.Initialize(Key);
-	}
-
-	std::vector<byte> rawKey(keyBytes, 0);
-	// expand the round keys
-	gen.Generate(rawKey);
-	// initialize working key
-	m_expKey.resize(keySize, 0);
-
-	// copy bytes to working key
-	for (size_t i = 0; i < wK.size(); ++i)
-	{
-		wK[i] = Utility::IntUtils::LeBytesTo32(rawKey, i * sizeof(uint));
+		m_expKey[i] = Utility::IntUtils::LeBytesTo32(rawKey, i * sizeof(uint));
 	}
 
 	// sbox encoding steps
-	for (uint i = 0; i < k64Cnt; i++)
+	keyPos = 0;
+	for (uint i = 0; i < SKMSZE; i++)
 	{
-		// round key material
-		eKm[i] = Utility::IntUtils::LeBytesTo32(rawKey, keyCtr);
-		keyCtr += 4;
-		oKm[i] = Utility::IntUtils::LeBytesTo32(rawKey, keyCtr);
-		keyCtr += 4;
-		// sbox key material
-		Utility::IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		// split
+		eKm[i] = Utility::IntUtils::LeBytesTo32(rawKey, keyPos);
+		keyPos += 4;
+		oKm[i] = Utility::IntUtils::LeBytesTo32(rawKey, keyPos);
+		keyPos += 4;
+		// encode and add to sbox key
+		Utility::IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((SKMSZE * 4) - 4) - (i * 4));
 	}
 
-	keyCtr = 0;
-	std::vector<uint> sMix(4);
+	keyPos = 0;
+	std::array<uint, 4> sbMix;
 
-	while (keyCtr != KEY_BITS)
+	while (keyPos != SBKEY_BITS)
 	{
-		Mix16(static_cast<uint>(keyCtr), sbKey, Key.size(), sMix);
-		m_sBox[keyCtr * 2] = sMix[0];
-		m_sBox[keyCtr * 2 + 1] = sMix[1];
-		m_sBox[keyCtr * 2 + 0x200] = sMix[2];
-		m_sBox[keyCtr * 2 + 0x201] = sMix[3];
-		++keyCtr;
+		Mix16(static_cast<uint>(keyPos), sbKey, sbMix);
+		m_sBox[keyPos * 2] = sbMix[0];
+		m_sBox[keyPos * 2 + 1] = sbMix[1];
+		m_sBox[keyPos * 2 + 0x200] = sbMix[2];
+		m_sBox[keyPos * 2 + 0x201] = sbMix[3];
+		++keyPos;
 	}
-
-	m_expKey = wK;
 }
 
 void THX::StandardExpand(const std::vector<byte> &Key)
 {
-	size_t k64Cnt = (Key.size() / 8);
-	size_t kmLen = k64Cnt > 4 ? 8 : 4;
-	size_t keyCtr = 0;
-	uint A, B, Q;
-	std::vector<uint> eKm(kmLen, 0);
-	std::vector<uint> oKm(kmLen, 0);
-	std::vector<byte> sbKey(Key.size() == 64 ? 32 : 16, 0);
-	std::vector<uint> wK(m_rndCount * 2 + 8, 0);
-
-	// CHANGE: 512 key gets 4 extra rounds
+	// k512 gets 20 rounds
 	m_rndCount = (Key.size() == 64) ? 20 : DEF_ROUNDS;
 
-	for (size_t i = 0; i < k64Cnt; ++i)
+	const size_t EXKSZE = (m_rndCount * 2) + 8;
+	const size_t SKMSZE = (Key.size() / 8);
+
+	std::vector<uint> eKm(SKMSZE);
+	std::vector<uint> oKm(SKMSZE);
+	std::vector<byte> sbKey(Key.size() / 2);
+	uint keyPos;
+	uint A;
+	uint B;
+	uint Q;
+
+	keyPos = 0;
+
+	for (size_t i = 0; i < SKMSZE; ++i)
 	{
 		// round key material
-		eKm[i] = Utility::IntUtils::LeBytesTo32(Key, keyCtr);
-		keyCtr += 4;
-		oKm[i] = Utility::IntUtils::LeBytesTo32(Key, keyCtr);
-		keyCtr += 4;
+		eKm[i] = Utility::IntUtils::LeBytesTo32(Key, keyPos);
+		keyPos += 4;
+		oKm[i] = Utility::IntUtils::LeBytesTo32(Key, keyPos);
+		keyPos += 4;
 		// sbox key material
-		Utility::IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((k64Cnt * 4) - 4) - (i * 4));
+		Utility::IntUtils::Le32ToBytes(MdsEncode(eKm[i], oKm[i]), sbKey, ((SKMSZE * 4) - 4) - (i * 4));
 	}
 
 	// gen s-box members
-	keyCtr = 0;
-	std::vector<uint> sMix(4);
+	keyPos = 0;
+	std::array<uint, 4> sbMix;
+	m_expKey.resize(EXKSZE);
 
-	while (keyCtr != KEY_BITS)
+	while (keyPos != SBKEY_BITS)
 	{
 		// create the expanded key
-		if (keyCtr < (wK.size() / 2))
+		if (keyPos < (m_expKey.size() / 2))
 		{
-			Q = static_cast<uint>(keyCtr * SK_STEP);
-			A = Mix4(Q, eKm, k64Cnt);
-			B = Mix4(Q + SK_BUMP, oKm, k64Cnt);
+			Q = keyPos * SK_STEP;
+			A = Mix4(Q, eKm);
+			B = Mix4(Q + SK_BUMP, oKm);
 			B = B << 8 | static_cast<uint>(B >> 24);
 			A += B;
-			wK[keyCtr * 2] = A;
+			m_expKey[keyPos * 2] = A;
 			A += B;
-			wK[(keyCtr * 2) + 1] = static_cast<uint>(A << SK_ROTL) | static_cast<uint>(A >> (32 - SK_ROTL));
+			m_expKey[(keyPos * 2) + 1] = static_cast<uint>(A << SK_ROTL) | static_cast<uint>(A >> (32 - SK_ROTL));
 		}
 
-		Mix16(static_cast<uint>(keyCtr), sbKey, Key.size(), sMix);
-		m_sBox[keyCtr * 2] = sMix[0];
-		m_sBox[keyCtr * 2 + 1] = sMix[1];
-		m_sBox[keyCtr * 2 + 0x200] = sMix[2];
-		m_sBox[keyCtr * 2 + 0x201] = sMix[3];
-		++keyCtr;
+		Mix16(keyPos, sbKey, sbMix);
+		m_sBox[keyPos * 2] = sbMix[0];
+		m_sBox[keyPos * 2 + 1] = sbMix[1];
+		m_sBox[keyPos * 2 + 0x200] = sbMix[2];
+		m_sBox[keyPos * 2 + 0x201] = sbMix[3];
+		++keyPos;
 	}
-
-	m_expKey = wK;
 }
 
 //~~~Rounds Processing~~~//
@@ -647,183 +619,299 @@ void THX::Encrypt2048(const std::vector<byte> &Input, const size_t InOffset, std
 
 //~~~Helpers~~~//
 
-void THX::LoadState(Digests ExtractorType)
+void THX::LoadState()
 {
-	if (ExtractorType == Digests::None)
+	if (m_cprExtension == BlockCipherExtensions::None)
 	{
-		m_legalRounds.resize(2);
-		m_legalRounds = { 16, 20 };
-
 		m_legalKeySizes.resize(4);
-		m_legalKeySizes[0] = SymmetricKeySize(16, 16, 0);
-		m_legalKeySizes[1] = SymmetricKeySize(24, 16, 0);
-		m_legalKeySizes[2] = SymmetricKeySize(32, 16, 0);
-		m_legalKeySizes[3] = SymmetricKeySize(64, 16, 0);
+		m_legalKeySizes[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
+		m_legalKeySizes[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
+		m_legalKeySizes[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
+		m_legalKeySizes[3] = SymmetricKeySize(64, BLOCK_SIZE, 0);
 	}
 	else
 	{
-		m_legalRounds.resize(9);
-		m_legalRounds = { 16, 18, 20, 22, 24, 26, 28, 30, 32 };
-
-		// change: default at ideal size, a full block to key HMAC
-		m_kdfKeySize = Helper::DigestFromName::GetBlockSize(m_kdfEngineType);
-		// calculate max saturation of entropy when distribution code is used as key extension; subtract hash finalizer code + 1 byte HKDF counter
-		m_kdfInfoMax = m_kdfKeySize - (Helper::DigestFromName::GetPaddingSize(m_kdfEngineType) + 1);
 		m_legalKeySizes.resize(3);
-		// min allowable HMAC key
-		m_legalKeySizes[0] = SymmetricKeySize(Helper::DigestFromName::GetDigestSize(m_kdfEngineType), BLOCK_SIZE, m_kdfInfoMax);
-		// best size, no ipad/opad zero-byte mix in HMAC
-		m_legalKeySizes[1] = SymmetricKeySize(m_kdfKeySize, BLOCK_SIZE, m_kdfInfoMax);
-		// triggers HKDF Extract
-		m_legalKeySizes[2] = SymmetricKeySize(m_kdfKeySize * 2, BLOCK_SIZE, m_kdfInfoMax);
+
+		if (m_cprExtension == BlockCipherExtensions::SHAKE256)
+		{
+			// sha3-256 blocksize
+			m_kdfInfoMax = 136;
+		}
+		else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
+		{
+			// sha3-512 blocksize
+			m_kdfInfoMax = 72;
+		}
+		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
+		{
+			// sha2-512 blocksize - padding + hkdf counter
+			m_kdfInfoMax = 128 - (17 + 1);
+		}
+		else
+		{
+			// sha2-256 blocksize - padding + hkdf counter
+			m_kdfInfoMax = 64 - (9 + 1);
+		}
+
+		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_kdfInfoMax);
+		m_legalKeySizes[1] = SymmetricKeySize(64, BLOCK_SIZE, m_kdfInfoMax);
+		m_legalKeySizes[2] = SymmetricKeySize(128, BLOCK_SIZE, m_kdfInfoMax);
 	}
 }
 
 uint THX::MdsEncode(uint K0, uint K1)
 {
-	uint B = ((K1 >> 24) & 0xFF);
-	uint G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	uint G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	uint temp = ((K1 << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	uint B;
+	uint G2;
+	uint G3;
+	uint sum;
 
-	B = ((temp >> 24) & 0xFF);
+	B = ((K1 >> 24) & 0xFF);
 	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
 	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
-	B = ((temp >> 24) & 0xFF);
-	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
-	B = ((temp >> 24) & 0xFF);
-	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
-	temp ^= K0;
-	B = ((temp >> 24) & 0xFF);
-	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
-	B = ((temp >> 24) & 0xFF);
-	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
-	B = ((temp >> 24) & 0xFF);
-	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
-	B = ((temp >> 24) & 0xFF);
-	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
-	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
-	temp = ((temp << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	sum = ((K1 << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
 
-	return temp;
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+	sum ^= K0;
+
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+
+	B = ((sum >> 24) & 0xFF);
+	G2 = ((B << 1) ^ ((B & 0x80) != 0 ? RS_GF_FDBK : 0)) & 0xFF;
+	G3 = ((B >> 1) ^ ((B & 0x01) != 0 ? (RS_GF_FDBK >> 1) : 0)) ^ G2;
+	sum = ((sum << 8) ^ (G3 << 24) ^ (G2 << 16) ^ (G3 << 8) ^ B);
+
+	return sum;
 }
 
-uint THX::Mix4(const uint X, const std::vector<uint> &Key, const size_t Count)
+uint THX::Mix4(const uint X, const std::vector<uint> &SubKey)
 {
-	uint Y0 = static_cast<byte>(X);
-	uint Y1 = static_cast<byte>(X >> 8);
-	uint Y2 = static_cast<byte>(X >> 16);
-	uint Y3 = static_cast<byte>(X >> 24);
+	uint Y0;
+	uint Y1;
+	uint Y2;
+	uint Y3;
 
-	// 512 key
-	if (Count == 8)
+	Y0 = static_cast<byte>(X);
+	Y1 = static_cast<byte>(X >> 8);
+	Y2 = static_cast<byte>(X >> 16);
+	Y3 = static_cast<byte>(X >> 24);
+
+	if (SubKey.size() > 8)
 	{
-		Y0 = static_cast<byte>(Q1[Y0]) ^ static_cast<byte>(Key[7]);
-		Y1 = static_cast<byte>(Q0[Y1]) ^ static_cast<byte>(Key[7] >> 8);
-		Y2 = static_cast<byte>(Q0[Y2]) ^ static_cast<byte>(Key[7] >> 16);
-		Y3 = static_cast<byte>(Q1[Y3]) ^ static_cast<byte>(Key[7] >> 24);
-
-		Y0 = static_cast<byte>(Q1[Y0]) ^ static_cast<byte>(Key[6]);
-		Y1 = static_cast<byte>(Q1[Y1]) ^ static_cast<byte>(Key[6] >> 8);
-		Y2 = static_cast<byte>(Q0[Y2]) ^ static_cast<byte>(Key[6] >> 16);
-		Y3 = static_cast<byte>(Q0[Y3]) ^ static_cast<byte>(Key[6] >> 24);
-
-		Y0 = static_cast<byte>(Q0[Y0]) ^ static_cast<byte>(Key[5]);
-		Y1 = static_cast<byte>(Q1[Y1]) ^ static_cast<byte>(Key[5] >> 8);
-		Y2 = static_cast<byte>(Q1[Y2]) ^ static_cast<byte>(Key[5] >> 16);
-		Y3 = static_cast<byte>(Q0[Y3]) ^ static_cast<byte>(Key[5] >> 24);
-
-		Y0 = static_cast<byte>(Q0[Y0]) ^ static_cast<byte>(Key[4]);
-		Y1 = static_cast<byte>(Q0[Y1]) ^ static_cast<byte>(Key[4] >> 8);
-		Y2 = static_cast<byte>(Q1[Y2]) ^ static_cast<byte>(Key[4] >> 16);
-		Y3 = static_cast<byte>(Q1[Y3]) ^ static_cast<byte>(Key[4] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[15]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[15] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[15] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[15] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[14]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[14] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[14] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[14] >> 24);
+		Y0 = Q0[Y0] ^ static_cast<byte>(SubKey[13]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[13] >> 8);
+		Y2 = Q1[Y2] ^ static_cast<byte>(SubKey[13] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[13] >> 24);
+		Y0 = Q0[Y0] ^ static_cast<byte>(SubKey[12]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[12] >> 8);
+		Y2 = Q1[Y2] ^ static_cast<byte>(SubKey[12] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[12] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[11]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[11] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[11] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[11] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[10]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[10] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[10] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[10] >> 24);
+		Y0 = Q0[Y0] ^ static_cast<byte>(SubKey[9]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[9] >> 8);
+		Y2 = Q1[Y2] ^ static_cast<byte>(SubKey[9] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[9] >> 24);
+		Y0 = Q0[Y0] ^ static_cast<byte>(SubKey[8]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[8] >> 8);
+		Y2 = Q1[Y2] ^ static_cast<byte>(SubKey[8] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[8] >> 24);
 	}
-	// 256 bit key
-	if (Count > 3)
+	if (SubKey.size() > 4)
 	{
-		Y0 = static_cast<byte>(Q1[Y0]) ^ static_cast<byte>(Key[3]);
-		Y1 = static_cast<byte>(Q0[Y1]) ^ static_cast<byte>(Key[3] >> 8);
-		Y2 = static_cast<byte>(Q0[Y2]) ^ static_cast<byte>(Key[3] >> 16);
-		Y3 = static_cast<byte>(Q1[Y3]) ^ static_cast<byte>(Key[3] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[7]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[7] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[7] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[7] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[6]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[6] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[6] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[6] >> 24);
+		Y0 = Q0[Y0] ^ static_cast<byte>(SubKey[5]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[5] >> 8);
+		Y2 = Q1[Y2] ^ static_cast<byte>(SubKey[5] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[5] >> 24);
+		Y0 = Q0[Y0] ^ static_cast<byte>(SubKey[4]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[4] >> 8);
+		Y2 = Q1[Y2] ^ static_cast<byte>(SubKey[4] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[4] >> 24);
 	}
-	// 192 bit key
-	if (Count > 2)
+	if (SubKey.size() > 3)
 	{
-		Y0 = static_cast<byte>(Q1[Y0]) ^ static_cast<byte>(Key[2]);
-		Y1 = static_cast<byte>(Q1[Y1]) ^ static_cast<byte>(Key[2] >> 8);
-		Y2 = static_cast<byte>(Q0[Y2]) ^ static_cast<byte>(Key[2] >> 16);
-		Y3 = static_cast<byte>(Q0[Y3]) ^ static_cast<byte>(Key[2] >> 24);
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[3]);
+		Y1 = Q0[Y1] ^ static_cast<byte>(SubKey[3] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[3] >> 16);
+		Y3 = Q1[Y3] ^ static_cast<byte>(SubKey[3] >> 24);
+	}
+	if (SubKey.size() > 2)
+	{
+		Y0 = Q1[Y0] ^ static_cast<byte>(SubKey[2]);
+		Y1 = Q1[Y1] ^ static_cast<byte>(SubKey[2] >> 8);
+		Y2 = Q0[Y2] ^ static_cast<byte>(SubKey[2] >> 16);
+		Y3 = Q0[Y3] ^ static_cast<byte>(SubKey[2] >> 24);
 	}
 
 	// return the MDS matrix multiply
-	return M0[static_cast<byte>(Q0[static_cast<byte>(Q0[Y0]) ^ static_cast<byte>(Key[1])] ^ static_cast<byte>(Key[0]))] ^
-		M1[static_cast<byte>(Q0[static_cast<byte>(Q1[Y1]) ^ static_cast<byte>(Key[1] >> 8)] ^ static_cast<byte>(Key[0] >> 8))] ^
-		M2[static_cast<byte>(Q1[static_cast<byte>(Q0[Y2]) ^ static_cast<byte>(Key[1] >> 16)] ^ static_cast<byte>(Key[0] >> 16))] ^
-		M3[static_cast<byte>(Q1[static_cast<byte>(Q1[Y3]) ^ static_cast<byte>(Key[1] >> 24)] ^ static_cast<byte>(Key[0] >> 24))];
+	return (
+		M0[Q0[Q0[Y0] ^ 
+		static_cast<byte>(SubKey[1])] ^ 
+		static_cast<byte>(SubKey[0])] ^
+		M1[Q0[Q1[Y1] ^ 
+		static_cast<byte>(SubKey[1] >> 8)] ^ 
+		static_cast<byte>(SubKey[0] >> 8)] ^
+		M2[Q1[Q0[Y2] ^ 
+		static_cast<byte>(SubKey[1] >> 16)] ^ 
+		static_cast<byte>(SubKey[0] >> 16)] ^
+		M3[Q1[Q1[Y3] ^ 
+		static_cast<byte>(SubKey[1] >> 24)] ^ 
+		static_cast<byte>(SubKey[0] >> 24)]
+		);
 }
 
-void THX::Mix16(const uint X, const std::vector<byte> &Key, const size_t Count, std::vector<uint> &Output)
+void THX::Mix16(const uint X, const std::vector<byte> &SubKey, std::array<uint, 4> &Output)
 {
-	uint Y0, Y1, Y2, Y3;
-	Y0 = Y1 = Y2 = Y3 = X;
+	uint Y0; 
+	uint Y1;
+	uint Y2;
+	uint Y3;
 
-	if (Count == 64)
+	Y0 = X;
+	Y1 = X;
+	Y2 = X;
+	Y3 = X;
+
+	if (SubKey.size() > 32)
 	{
-		Y0 = static_cast<byte>(Q1[Y0] ^ Key[28]);
-		Y1 = static_cast<byte>(Q0[Y1] ^ Key[29]);
-		Y2 = static_cast<byte>(Q0[Y2] ^ Key[30]);
-		Y3 = static_cast<byte>(Q1[Y3] ^ Key[31]);
-
-		Y0 = static_cast<byte>(Q1[Y0] ^ Key[24]);
-		Y1 = static_cast<byte>(Q1[Y1] ^ Key[25]);
-		Y2 = static_cast<byte>(Q0[Y2] ^ Key[26]);
-		Y3 = static_cast<byte>(Q0[Y3] ^ Key[27]);
-
-		Y0 = static_cast<byte>(Q0[Y0] ^ Key[20]);
-		Y1 = static_cast<byte>(Q1[Y1] ^ Key[21]);
-		Y2 = static_cast<byte>(Q1[Y2] ^ Key[22]);
-		Y3 = static_cast<byte>(Q0[Y3] ^ Key[23]);
-
-		Y0 = static_cast<byte>(Q0[Y0] ^ Key[16]);
-		Y1 = static_cast<byte>(Q0[Y1] ^ Key[17]);
-		Y2 = static_cast<byte>(Q1[Y2] ^ Key[18]);
-		Y3 = static_cast<byte>(Q1[Y3] ^ Key[19]);
+		Y0 = Q1[Y0] ^ SubKey[60];
+		Y1 = Q0[Y1] ^ SubKey[61];
+		Y2 = Q0[Y2] ^ SubKey[62];
+		Y3 = Q1[Y3] ^ SubKey[63];
+		Y0 = Q1[Y0] ^ SubKey[56];
+		Y1 = Q1[Y1] ^ SubKey[57];
+		Y2 = Q0[Y2] ^ SubKey[58];
+		Y3 = Q0[Y3] ^ SubKey[59];
+		Y0 = Q0[Y0] ^ SubKey[52];
+		Y1 = Q1[Y1] ^ SubKey[53];
+		Y2 = Q1[Y2] ^ SubKey[54];
+		Y3 = Q0[Y3] ^ SubKey[55];
+		Y0 = Q0[Y0] ^ SubKey[48];
+		Y1 = Q0[Y1] ^ SubKey[49];
+		Y2 = Q1[Y2] ^ SubKey[50];
+		Y3 = Q1[Y3] ^ SubKey[51];
+		Y0 = Q1[Y0] ^ SubKey[44];
+		Y1 = Q0[Y1] ^ SubKey[45];
+		Y2 = Q0[Y2] ^ SubKey[46];
+		Y3 = Q1[Y3] ^ SubKey[47];
+		Y0 = Q1[Y0] ^ SubKey[40];
+		Y1 = Q1[Y1] ^ SubKey[41];
+		Y2 = Q0[Y2] ^ SubKey[42];
+		Y3 = Q0[Y3] ^ SubKey[43];
+		Y0 = Q0[Y0] ^ SubKey[36];
+		Y1 = Q1[Y1] ^ SubKey[37];
+		Y2 = Q1[Y2] ^ SubKey[38];
+		Y3 = Q0[Y3] ^ SubKey[39];
+		Y0 = Q0[Y0] ^ SubKey[32];
+		Y1 = Q0[Y1] ^ SubKey[33];
+		Y2 = Q1[Y2] ^ SubKey[34];
+		Y3 = Q1[Y3] ^ SubKey[35];
+		Y0 = Q1[Y0] ^ SubKey[28];
+		Y1 = Q0[Y1] ^ SubKey[29];
+		Y2 = Q0[Y2] ^ SubKey[30];
+		Y3 = Q1[Y3] ^ SubKey[31];
+		Y0 = Q1[Y0] ^ SubKey[24];
+		Y1 = Q1[Y1] ^ SubKey[25];
+		Y2 = Q0[Y2] ^ SubKey[26];
+		Y3 = Q0[Y3] ^ SubKey[27];
+		Y0 = Q0[Y0] ^ SubKey[20];
+		Y1 = Q1[Y1] ^ SubKey[21];
+		Y2 = Q1[Y2] ^ SubKey[22];
+		Y3 = Q0[Y3] ^ SubKey[23];
+		Y0 = Q0[Y0] ^ SubKey[16];
+		Y1 = Q0[Y1] ^ SubKey[17];
+		Y2 = Q1[Y2] ^ SubKey[18];
+		Y3 = Q1[Y3] ^ SubKey[19];
 	}
-	if (Count > 24)
+	if (SubKey.size() > 16)
 	{
-		Y0 = static_cast<byte>(Q1[Y0] ^ Key[12]);
-		Y1 = static_cast<byte>(Q0[Y1] ^ Key[13]);
-		Y2 = static_cast<byte>(Q0[Y2] ^ Key[14]);
-		Y3 = static_cast<byte>(Q1[Y3] ^ Key[15]);
+		Y0 = Q1[Y0] ^ SubKey[28];
+		Y1 = Q0[Y1] ^ SubKey[29];
+		Y2 = Q0[Y2] ^ SubKey[30];
+		Y3 = Q1[Y3] ^ SubKey[31];
+		Y0 = Q1[Y0] ^ SubKey[24];
+		Y1 = Q1[Y1] ^ SubKey[25];
+		Y2 = Q0[Y2] ^ SubKey[26];
+		Y3 = Q0[Y3] ^ SubKey[27];
+		Y0 = Q0[Y0] ^ SubKey[20];
+		Y1 = Q1[Y1] ^ SubKey[21];
+		Y2 = Q1[Y2] ^ SubKey[22];
+		Y3 = Q0[Y3] ^ SubKey[23];
+		Y0 = Q0[Y0] ^ SubKey[16];
+		Y1 = Q0[Y1] ^ SubKey[17];
+		Y2 = Q1[Y2] ^ SubKey[18];
+		Y3 = Q1[Y3] ^ SubKey[19];
 	}
-	if (Count > 16)
+	if (SubKey.size() > 12)
 	{
-		Y0 = static_cast<byte>(Q1[Y0] ^ Key[8]);
-		Y1 = static_cast<byte>(Q1[Y1] ^ Key[9]);
-		Y2 = static_cast<byte>(Q0[Y2] ^ Key[10]);
-		Y3 = static_cast<byte>(Q0[Y3] ^ Key[11]);
+		Y0 = Q1[Y0] ^ SubKey[12];
+		Y1 = Q0[Y1] ^ SubKey[13];
+		Y2 = Q0[Y2] ^ SubKey[14];
+		Y3 = Q1[Y3] ^ SubKey[15];
+	}
+	if (SubKey.size() > 8)
+	{
+		Y0 = Q1[Y0] ^ SubKey[8];
+		Y1 = Q1[Y1] ^ SubKey[9];
+		Y2 = Q0[Y2] ^ SubKey[10];
+		Y3 = Q0[Y3] ^ SubKey[11];
 	}
 
-	std::vector<uint> tmp 
-	{
-		M0[Q0[Q0[Y0] ^ Key[4]] ^ Key[0]],
-		M1[Q0[Q1[Y1] ^ Key[5]] ^ Key[1]],
-		M2[Q1[Q0[Y2] ^ Key[6]] ^ Key[2]],
-		M3[Q1[Q1[Y3] ^ Key[7]] ^ Key[3]]
+	Output = {
+		M0[Q0[Q0[Y0] ^ SubKey[4]] ^ SubKey[0]],
+		M1[Q0[Q1[Y1] ^ SubKey[5]] ^ SubKey[1]],
+		M2[Q1[Q0[Y2] ^ SubKey[6]] ^ SubKey[2]],
+		M3[Q1[Q1[Y3] ^ SubKey[7]] ^ SubKey[3]]
 	};
-
-	Output = tmp;
 }
 
 CEX_OPTIMIZE_IGNORE

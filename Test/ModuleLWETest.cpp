@@ -109,7 +109,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("ModuleLWETest: Cipher-text integrity test failed!");
+			throw TestException("ModuleLWETest: Message authentication test failed!");
 		}
 
 		delete kp;
@@ -136,7 +136,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("ModuleLWETest: Cipher-text integrity test failed!");
+			throw TestException("ModuleLWETest: Public-key integrity test failed!");
 		}
 
 		delete kp;
@@ -186,7 +186,11 @@ namespace Test
 			cpr.Encapsulate(cpt, sec1);
 
 			cpr.Initialize(kp->PrivateKey());
-			cpr.Decapsulate(cpt, sec2);
+
+			if (!cpr.Decapsulate(cpt, sec2))
+			{
+				throw TestException("ModuleLWETest: Stress test authentication has failed!");
+			}
 
 			delete kp;
 

@@ -71,6 +71,7 @@ using Common::ParallelOptions;
 ///
 /// <description><B>Implementation Notes:</B></description>
 /// <list type="bullet">
+/// <item><description>This implementation only supports the SHA2-256 and SHA2-512 message digests.</description></item>
 /// <item><description>Class can be initialized with a message digest instance, or by using a digests enumeration type name.</description></item>
 /// <item><description>The minimum key size is the size the digests return array in bytes, a key equal to the digests block size is recommended.</description></item>
 /// <item><description>The use of a salt value can strongly mitigate some attack vectors targeting the key, and is highly recommended with SCRYPT.</description></item>
@@ -113,11 +114,11 @@ private:
 	static const size_t MIN_PASSLEN = 6;
 	static const size_t MIN_SALTLEN = 4;
 
-	std::unique_ptr<IDigest> m_kdfDigest;
+	std::unique_ptr<IDigest> m_msgDigest;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	Digests m_kdfDigestType;
+	Digests m_msgDigestType;
 	std::vector<byte> m_kdfKey;
 	std::vector<byte> m_kdfSalt;
 	std::vector<SymmetricKeySize> m_legalKeySizes;

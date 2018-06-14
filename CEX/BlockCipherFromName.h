@@ -4,12 +4,13 @@
 #include "CexDomain.h"
 #include "CryptoException.h"
 #include "IBlockCipher.h"
+#include "BlockCipherExtensions.h"
 
 NAMESPACE_HELPER
 
+using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Exception::CryptoException;
-using Enumeration::Digests;
 using Cipher::Symmetric::Block::IBlockCipher;
 
 /// <summary>
@@ -21,31 +22,16 @@ public:
 
 	/// <summary>
 	/// Get a symmetric block cipher instance.
-	/// <para>If an extended (AHX/RHX, SHX, or THX) block cipher type is selected, the default key-schedule hash engine is SHA2-256.
-	/// Selecting a root cipher type (Rijndael, Serpent, or Twofish), will return a standard cipher configuration.</para>
+	/// <para>If an extended (AHX/RHX, SHX, or THX) block cipher type is selected, the default key-schedule hash engine is None which involes the standard cipher.</para>
 	/// </summary>
 	/// 
-	/// <param name="BlockCipherType">The block cipher enumeration name</param>
-	/// <param name="DigestType">The [optional] (HX) extended ciphers HKDF hash engine; the default is SHA256.</param>
+	/// <param name="CipherType">The block cipher enumeration name</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 
 	/// <returns>A symmetric block cipher instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* GetInstance(BlockCiphers BlockCipherType, Digests DigestType = Digests::SHA256);
-
-	/// <summary>
-	/// Get a symmetric block cipher instance with initialization parameters.
-	/// <para>Selecting a root cipher type (Rijndael, Serpent, or Twofish), will return a standard cipher configuration.</para>
-	/// </summary>
-	/// 
-	/// <param name="BlockCipherType">The symmetric block ciphers enumeration type name</param>
-	/// <param name="RoundCount">The symmetric ciphers transformation rounds count; requires DigestType set to a supported digest type</param>
-	/// <param name="DigestType">The extended (HX) ciphers HKDF key expansion digest engine type; set to None for standard key schedule, select a digest for secure key expansion mode</param>
-	/// 
-	/// <returns>A symmetric block cipher instance</returns>
-	/// 
-	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* GetInstance(BlockCiphers BlockCipherType, Digests DigestType, uint RoundCount);
+	static IBlockCipher* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
 };
 
 NAMESPACE_HELPEREND

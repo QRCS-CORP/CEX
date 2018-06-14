@@ -10,8 +10,8 @@ const std::string HMAC::CLASS_NAME("HMAC");
 
 HMAC::HMAC(Digests DigestType, bool Parallel)
 	:
-	m_msgDigest(DigestType != Digests::None ? Helper::DigestFromName::GetInstance(DigestType, Parallel) :
-		throw CryptoMacException("HMAC:Ctor", "The digest type can not be none!")),
+	m_msgDigest(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? Helper::DigestFromName::GetInstance(DigestType, Parallel) :
+		throw CryptoMacException("HMAC:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(true),
 	m_inputPad(m_msgDigest->BlockSize()),
 	m_isDestroyed(false),
@@ -25,8 +25,8 @@ HMAC::HMAC(Digests DigestType, bool Parallel)
 
 HMAC::HMAC(IDigest* Digest)
 	:
-	m_msgDigest(Digest != nullptr ? Digest : 
-		throw CryptoMacException("HMAC:Ctor", "The digest can not be null!")),
+	m_msgDigest(Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() == Digests::SHA512 ? Digest :
+		throw CryptoMacException("HMAC:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(false),
 	m_inputPad(m_msgDigest->BlockSize()),
 	m_isDestroyed(false),

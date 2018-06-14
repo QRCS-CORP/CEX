@@ -18,7 +18,7 @@ const std::string ACP::CLASS_NAME("ACP");
 
 ACP::ACP()
 	:
-	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::Digests::SHA512, 38))),
+	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::HKDF256))),
 	m_hasRdrand(false),
 	m_hasTsc(false),
 	m_isAvailable(true)
@@ -111,7 +111,7 @@ void ACP::Reset()
 
 	// Note: this provider uses the extended form of rijndael, using 38 rounds for maximum diffusion
 	// get the iv and hkdf-info from system provider
-	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[0];
+	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[1];
 	std::vector<byte> info(keySize.InfoSize());
 	std::vector<byte> iv(keySize.NonceSize());
 	CSP pvd;
