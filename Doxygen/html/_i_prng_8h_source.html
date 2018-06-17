@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/IPrng.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/IPrng.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -128,41 +128,34 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#ad147ed0b30f3b3c52452d9c5e43bef0f">Fill</a>(std::vector&lt;ushort&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Elements) = 0;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">virtual</span> std::vector&lt;byte&gt; <a class="code" href="class_i_prng.html#a5df111052f7e41bbcc50e8c80456eb0c">Generate</a>(<span class="keywordtype">size_t</span> Length) = 0;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#ad147ed0b30f3b3c52452d9c5e43bef0f">Fill</a>(std::vector&lt;uint&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Elements) = 0;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#a5df111052f7e41bbcc50e8c80456eb0c">Generate</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) = 0;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#ad147ed0b30f3b3c52452d9c5e43bef0f">Fill</a>(std::vector&lt;ulong&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Elements) = 0;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">virtual</span> std::vector&lt;byte&gt; <a class="code" href="class_i_prng.html#af310ce843ff1ba4041065d17cee8a4e2">GetBytes</a>(<span class="keywordtype">size_t</span> Length) = 0;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#af310ce843ff1ba4041065d17cee8a4e2">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) = 0;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#af310ce843ff1ba4041065d17cee8a4e2">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output) = 0;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#a5df111052f7e41bbcc50e8c80456eb0c">Generate</a>(std::vector&lt;byte&gt; &amp;Output) = 0;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keyword">virtual</span> ushort <a class="code" href="class_i_prng.html#a40e6a6e9cc7df88e3e3d5e1383eb2fb4">NextUInt16</a>() = 0;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keyword">virtual</span> uint <a class="code" href="class_i_prng.html#a91c3bf20648e26c9e4c77aa568661e86">NextUInt32</a>() = 0;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keyword">virtual</span> ulong <a class="code" href="class_i_prng.html#aff2e92c9a51ed321c7c67f82447d8a72">NextUInt64</a>() = 0;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#a993a3d4147ac7447f8d03c4c85bc7027">Reset</a>() = 0;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;};</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keyword">virtual</span> ushort <a class="code" href="class_i_prng.html#a40e6a6e9cc7df88e3e3d5e1383eb2fb4">NextUInt16</a>() = 0;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">virtual</span> uint <a class="code" href="class_i_prng.html#a91c3bf20648e26c9e4c77aa568661e86">NextUInt32</a>() = 0;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keyword">virtual</span> ulong <a class="code" href="class_i_prng.html#aff2e92c9a51ed321c7c67f82447d8a72">NextUInt64</a>() = 0;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_prng.html#a993a3d4147ac7447f8d03c4c85bc7027">Reset</a>() = 0;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;};</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;NAMESPACE_PRNGEND</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_i_prng_html_af310ce843ff1ba4041065d17cee8a4e2"><div class="ttname"><a href="class_i_prng.html#af310ce843ff1ba4041065d17cee8a4e2">IPrng::GetBytes</a></div><div class="ttdeci">virtual std::vector&lt; byte &gt; GetBytes(size_t Length)=0</div><div class="ttdoc">Return an array filled with pseudo random bytes </div></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;NAMESPACE_PRNGEND</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="class_i_prng_html_acb061e57ed4545076593b39fa8de21ea"><div class="ttname"><a href="class_i_prng.html#acb061e57ed4545076593b39fa8de21ea">IPrng::IPrng</a></div><div class="ttdeci">IPrng()</div><div class="ttdoc">Initialize this class </div><div class="ttdef"><b>Definition:</b> IPrng.h:34</div></div>
 <div class="ttc" id="class_i_prng_html_a23de9c77d2bf436cbb489c4a5148b698"><div class="ttname"><a href="class_i_prng.html#a23de9c77d2bf436cbb489c4a5148b698">IPrng::operator=</a></div><div class="ttdeci">IPrng &amp; operator=(const IPrng &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
-<div class="ttc" id="class_i_prng_html"><div class="ttname"><a href="class_i_prng.html">IPrng</a></div><div class="ttdoc">Psuedo Random Number Generator interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:458</div></div>
+<div class="ttc" id="class_i_prng_html"><div class="ttname"><a href="class_i_prng.html">IPrng</a></div><div class="ttdoc">Psuedo Random Number Generator interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:477</div></div>
 <div class="ttc" id="class_i_prng_html_a7ceda6d8e0b4cdd97d85f0701e6d97b7"><div class="ttname"><a href="class_i_prng.html#a7ceda6d8e0b4cdd97d85f0701e6d97b7">IPrng::Enumeral</a></div><div class="ttdeci">virtual const Prngs Enumeral()=0</div><div class="ttdoc">Read Only: The random generators type name </div></div>
 <div class="ttc" id="class_i_prng_html_aff2e92c9a51ed321c7c67f82447d8a72"><div class="ttname"><a href="class_i_prng.html#aff2e92c9a51ed321c7c67f82447d8a72">IPrng::NextUInt64</a></div><div class="ttdeci">virtual ulong NextUInt64()=0</div><div class="ttdoc">Get a pseudo random unsigned 64bit integer </div></div>
 <div class="ttc" id="class_i_prng_html_a3b6165164be5bad6e7dbc3f2a980a6c4"><div class="ttname"><a href="class_i_prng.html#a3b6165164be5bad6e7dbc3f2a980a6c4">IPrng::~IPrng</a></div><div class="ttdeci">virtual ~IPrng() noexcept</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> IPrng.h:41</div></div>
 <div class="ttc" id="class_i_prng_html_a8ac0175756935abf86d7e3fd18481838"><div class="ttname"><a href="class_i_prng.html#a8ac0175756935abf86d7e3fd18481838">IPrng::Name</a></div><div class="ttdeci">virtual const std::string Name()=0</div><div class="ttdoc">Read Only: The random generators class name </div></div>
 <div class="ttc" id="class_i_prng_html_a40e6a6e9cc7df88e3e3d5e1383eb2fb4"><div class="ttname"><a href="class_i_prng.html#a40e6a6e9cc7df88e3e3d5e1383eb2fb4">IPrng::NextUInt16</a></div><div class="ttdeci">virtual ushort NextUInt16()=0</div><div class="ttdoc">Get a pseudo random unsigned 16bit integer </div></div>
-<div class="ttc" id="group___enumeration_html_gaf3e3948cf00ae35f8c4646efd5de36a7"><div class="ttname"><a href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a></div><div class="ttdeci">Prngs</div><div class="ttdef"><b>Definition:</b> Documentation.h:298</div></div>
+<div class="ttc" id="group___enumeration_html_gaf3e3948cf00ae35f8c4646efd5de36a7"><div class="ttname"><a href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a></div><div class="ttdeci">Prngs</div><div class="ttdef"><b>Definition:</b> Documentation.h:316</div></div>
 <div class="ttc" id="class_i_prng_html_a993a3d4147ac7447f8d03c4c85bc7027"><div class="ttname"><a href="class_i_prng.html#a993a3d4147ac7447f8d03c4c85bc7027">IPrng::Reset</a></div><div class="ttdeci">virtual void Reset()=0</div><div class="ttdoc">Reset the generator instance </div></div>
-<div class="ttc" id="class_i_prng_html_ad147ed0b30f3b3c52452d9c5e43bef0f"><div class="ttname"><a href="class_i_prng.html#ad147ed0b30f3b3c52452d9c5e43bef0f">IPrng::Fill</a></div><div class="ttdeci">virtual void Fill(std::vector&lt; ushort &gt; &amp;Output, size_t Offset, size_t Elements)=0</div><div class="ttdoc">Fill an array of uint16 with pseudo-random </div></div>
+<div class="ttc" id="class_i_prng_html_a5df111052f7e41bbcc50e8c80456eb0c"><div class="ttname"><a href="class_i_prng.html#a5df111052f7e41bbcc50e8c80456eb0c">IPrng::Generate</a></div><div class="ttdeci">virtual std::vector&lt; byte &gt; Generate(size_t Length)=0</div><div class="ttdoc">Return an array filled with pseudo random bytes </div></div>
 <div class="ttc" id="class_i_prng_html_a91c3bf20648e26c9e4c77aa568661e86"><div class="ttname"><a href="class_i_prng.html#a91c3bf20648e26c9e4c77aa568661e86">IPrng::NextUInt32</a></div><div class="ttdeci">virtual uint NextUInt32()=0</div><div class="ttdoc">Get a pseudo random unsigned 32bit integer </div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

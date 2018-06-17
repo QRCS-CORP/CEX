@@ -116,7 +116,7 @@ namespace Test
 			prlSze -= (prlSze % PRLMIN);
 			// set to parallel, but block will be too small.. processed with alternate
 			std::vector<byte> input(prlSze);
-			rnd.GetBytes(input);
+			rnd.Generate(input);
 
 			Dgt1->Update(input, 0, input.size());
 			Dgt1->Finalize(hash1, 0);

@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -125,6 +125,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3615468a600346879f07a5e5833b6d0a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a3615468a600346879f07a5e5833b6d0a">~McEliece</a> () override</td></tr>
 <tr class="memdesc:a3615468a600346879f07a5e5833b6d0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a3615468a600346879f07a5e5833b6d0a">More...</a><br /></td></tr>
 <tr class="separator:a3615468a600346879f07a5e5833b6d0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c1f872e6d8f908a852db126231c2eb3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">DomainKey</a> ()</td></tr>
+<tr class="memdesc:a7c1f872e6d8f908a852db126231c2eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.  <a href="#a7c1f872e6d8f908a852db126231c2eb3">More...</a><br /></td></tr>
+<tr class="separator:a7c1f872e6d8f908a852db126231c2eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09fb33cc7ffe435b9ad4467b13b3537e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a09fb33cc7ffe435b9ad4467b13b3537e">Enumeral</a> () override</td></tr>
 <tr class="memdesc:a09fb33cc7ffe435b9ad4467b13b3537e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher type-name  <a href="#a09fb33cc7ffe435b9ad4467b13b3537e">More...</a><br /></td></tr>
 <tr class="separator:a09fb33cc7ffe435b9ad4467b13b3537e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,24 +143,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4049ab3a29b53c627bea0664439f8fa0"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#gab6f4e91cbab697f96b4436f4d711361a">MPKCParams</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a4049ab3a29b53c627bea0664439f8fa0">Parameters</a> ()</td></tr>
 <tr class="memdesc:a4049ab3a29b53c627bea0664439f8fa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#a4049ab3a29b53c627bea0664439f8fa0">More...</a><br /></td></tr>
 <tr class="separator:a4049ab3a29b53c627bea0664439f8fa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c892ca6309e1b16cb936ae64c5f75b7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a2c892ca6309e1b16cb936ae64c5f75b7">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
-<tr class="memdesc:a2c892ca6309e1b16cb936ae64c5f75b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret  <a href="#a2c892ca6309e1b16cb936ae64c5f75b7">More...</a><br /></td></tr>
-<tr class="separator:a2c892ca6309e1b16cb936ae64c5f75b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a057079568ae36600dccfe9fd888cf2ab"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a057079568ae36600dccfe9fd888cf2ab">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
+<tr class="memdesc:a057079568ae36600dccfe9fd888cf2ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret  <a href="#a057079568ae36600dccfe9fd888cf2ab">More...</a><br /></td></tr>
+<tr class="separator:a057079568ae36600dccfe9fd888cf2ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f6861fd1351a04d62b0495355bd99f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">Encapsulate</a> (std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
 <tr class="memdesc:a4f6861fd1351a04d62b0495355bd99f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a shared secret and ciphertext  <a href="#a4f6861fd1351a04d62b0495355bd99f1">More...</a><br /></td></tr>
 <tr class="separator:a4f6861fd1351a04d62b0495355bd99f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d298ab408ba95bffab8a0493fe3a9e1"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a2d298ab408ba95bffab8a0493fe3a9e1">Decrypt</a> (const std::vector&lt; byte &gt; &amp;CipherText) override</td></tr>
-<tr class="memdesc:a2d298ab408ba95bffab8a0493fe3a9e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt an encrypted cipher-text and return the shared secret  <a href="#a2d298ab408ba95bffab8a0493fe3a9e1">More...</a><br /></td></tr>
-<tr class="separator:a2d298ab408ba95bffab8a0493fe3a9e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d889b96fc28fb99eaf17894b96352f8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a7d889b96fc28fb99eaf17894b96352f8">Encrypt</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>) override</td></tr>
-<tr class="memdesc:a7d889b96fc28fb99eaf17894b96352f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a shared secret and return the encrypted message  <a href="#a7d889b96fc28fb99eaf17894b96352f8">More...</a><br /></td></tr>
-<tr class="separator:a7d889b96fc28fb99eaf17894b96352f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a545e1dbcddef9b454e3d3b3d80fecd31"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a545e1dbcddef9b454e3d3b3d80fecd31">Generate</a> () override</td></tr>
 <tr class="memdesc:a545e1dbcddef9b454e3d3b3d80fecd31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a545e1dbcddef9b454e3d3b3d80fecd31">More...</a><br /></td></tr>
 <tr class="separator:a545e1dbcddef9b454e3d3b3d80fecd31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a435daf9f066e1b35bc43f444e60a819f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#a435daf9f066e1b35bc43f444e60a819f">Initialize</a> (bool Encryption, <a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
-<tr class="memdesc:a435daf9f066e1b35bc43f444e60a819f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher for encryption or decryption  <a href="#a435daf9f066e1b35bc43f444e60a819f">More...</a><br /></td></tr>
-<tr class="separator:a435daf9f066e1b35bc43f444e60a819f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa65bd68345b3aac9258990166d60243a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_mc_eliece.html#aa65bd68345b3aac9258990166d60243a">Initialize</a> (<a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
+<tr class="memdesc:aa65bd68345b3aac9258990166d60243a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher  <a href="#aa65bd68345b3aac9258990166d60243a">More...</a><br /></td></tr>
+<tr class="separator:aa65bd68345b3aac9258990166d60243a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_asymmetric_cipher"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_asymmetric_cipher')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a></td></tr>
 <tr class="memitem:abdaf113807adcd7c9d42525ddf059384 inherit pub_methods_class_i_asymmetric_cipher"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#abdaf113807adcd7c9d42525ddf059384">IAsymmetricCipher</a> (const <a class="el" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a> &amp;)=delete</td></tr>
 <tr class="memdesc:abdaf113807adcd7c9d42525ddf059384 inherit pub_methods_class_i_asymmetric_cipher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="#abdaf113807adcd7c9d42525ddf059384">More...</a><br /></td></tr>
@@ -182,15 +179,15 @@ Public Member Functions</h2></td></tr>
 </div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line">create the shared secret</div>
 <div class="line">std:vector&lt;byte&gt; msg(64);</div>
 <div class="line">Prng::IPrng* rng = Helper::PrngFromName::GetInstance(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);</div>
-<div class="line">rng-&gt;GetBytes(msg);</div>
+<div class="line">rng-&gt;Generate(msg);</div>
 <div class="line"><span class="comment">// initialize the cipher</span></div>
 <div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggab6f4e91cbab697f96b4436f4d711361aa71336c669268cc237a6e3bd88955ca2a">MPKCParams::M12T62</a>, [PrngType], [CipherType]);</div>
-<div class="line">cpr.Initialize(<span class="keyword">true</span>, kp);</div>
+<div class="line">cpr.Initialize(kp);</div>
 <div class="line"><span class="comment">// encrypt the secret</span></div>
 <div class="line">std:vector&lt;byte&gt; enc = cpr.Encrypt(msg);</div>
 </div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line"><span class="comment">// initialize the cipher</span></div>
 <div class="line"><a class="code" href="class_mc_eliece.html">McEliece</a> cpr(<a class="code" href="group___enumeration.html#ggab6f4e91cbab697f96b4436f4d711361aa71336c669268cc237a6e3bd88955ca2a">MPKCParams::M12T62</a>, [PrngType], [CipherType]);</div>
-<div class="line">cpr.Initialize(<span class="keyword">false</span>, kp);</div>
+<div class="line">cpr.Initialize(kp);</div>
 <div class="line"><span class="comment">// decrypt the secret</span></div>
 <div class="line">std:vector&lt;byte&gt; msg = cpr.Decrypt(enc);</div>
 </div><!-- fragment --> <p>Implementation Notes: </p>
@@ -198,8 +195,10 @@ Public Member Functions</h2></td></tr>
 <p>This implementation is based on the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/.">'McBits'</a>. <br />
 The MPKCParams enumeration member is passed to the constructor along with either an optional Prng and block-cipher enum type values, or uninitialized instances of a Prng and a block cipher. <br />
 The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key tag byte array. <br />
-The Initialize(bool, *IAsymmetricKeyPair) function takes a boolean indicating initialization type (encryption/decryption), and a pointer to an IAsymmetricKeyPair, (only the required key type need be populated, public or private key). The encryption method a standard encryption interface: CipherText = Encrypt(Message), the decryption method uses the inverse: Message = Decrypt(CipherText).</p>
+The encryption method a standard encryption interface: CipherText = Encrypt(Message), the decryption method uses the inverse: Message = Decrypt(CipherText).</p>
 <ul>
+<li>
+The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption. </li>
 <li>
 The M12T62 parameter set is the default cipher configuration; as of (1.0.0.4), this is currently the only parameter set, but a modular construction is used anticipating future expansion </li>
 <li>
@@ -213,7 +212,7 @@ The internal seed authentication engine is fixed as a GCM mode, which can use an
 </ul>
 <p>Guiding Publications:// </p><ol>
 <li>
-the Niederreiter dual form of the McEliece: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography. </li>
+the Niederreiter dual form of the McEliece cipher: <a href="https://eprint.iacr.org/2015/610.pdf">McBits</a> a fast constant-time code based cryptography. </li>
 <li>
 McEliece and <a href="https://www.iacr.org/archive/crypto2011/68410758/68410758.pdf">Niederreiter</a> Cryptosystems That Resist Quantum Fourier Sampling Attacks. </li>
 <li>
@@ -356,7 +355,7 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a2c892ca6309e1b16cb936ae64c5f75b7"></a>
+<a class="anchor" id="a057079568ae36600dccfe9fd888cf2ab"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -364,7 +363,7 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void McEliece::Decapsulate </td>
+          <td class="memname">bool McEliece::Decapsulate </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>CipherText</em>, </td>
@@ -396,12 +395,13 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if decryption is sucesssful</dd></dl>
 
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6eb502f376a775848df3e3390ef0a034">IAsymmetricCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a81ad8df798e4333c2eb97b563a839574">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a2d298ab408ba95bffab8a0493fe3a9e1"></a>
+<a class="anchor" id="a7c1f872e6d8f908a852db126231c2eb3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -409,37 +409,23 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; McEliece::Decrypt </td>
+          <td class="memname">std::vector&lt; byte &gt; &amp; McEliece::DomainKey </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>CipherText</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decrypt an encrypted cipher-text and return the shared secret </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">CipherText</td><td>The input cipher-text</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The decrypted message</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Fails on invalid input or configuration</td></tr>
-    <tr><td class="paramname">Exception::CryptoAuthenticationFailure</td><td>Thrown if the message has failed authentication</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret. </p>
+<p>Changing this code will create a unique distribution of the cipher. The domain key can be used as a secondary secret shared between hosts in an authenticated domain. The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation. For best security, the key should be random, secret, and shared only between hosts within a secure domain. This property is used by the Shared Trust Model secure communications protocol.</p>
 
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#acde4e242a6c49cb0ccef64636f366581">IAsymmetricCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a8e384604c560a05d36d2473589a9a145">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
@@ -485,47 +471,6 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 </dl>
 
 <p>Implements <a class="el" href="class_i_asymmetric_cipher.html#aa410f2bccefb25ee4ab06dc999206009">IAsymmetricCipher</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a7d889b96fc28fb99eaf17894b96352f8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; byte &gt; McEliece::Encrypt </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Message</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Encrypt a shared secret and return the encrypted message </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Message</td><td>The shared secret array</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The encrypted message</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Fails on invalid input or configuration</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#aae8f8ef818642dc76452b9ba099b6c83">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
@@ -590,7 +535,7 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 
 </div>
 </div>
-<a class="anchor" id="a435daf9f066e1b35bc43f444e60a819f"></a>
+<a class="anchor" id="aa65bd68345b3aac9258990166d60243a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -600,19 +545,9 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
         <tr>
           <td class="memname">void McEliece::Initialize </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>Encryption</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *&#160;</td>
-          <td class="paramname"><em>Key</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -622,11 +557,10 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the cipher for encryption or decryption </p>
+<p>Initialize the cipher </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Encryption</td><td>Initialize the cipher for encryption or decryption</td></tr>
-    <tr><td class="paramname">Key</td><td>The <a class="el" href="class_i_asymmetric_key.html" title="The Asymmetric key interface ">IAsymmetricKey</a> containing the Public (encrypt) and/or Private (decryption) key</td></tr>
+    <tr><td class="paramname">Key</td><td>The asymmetric public or private key</td></tr>
   </table>
   </dd>
 </dl>
@@ -637,7 +571,7 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6d5bccd14a72c615c6e57e3cd44743fe">IAsymmetricCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a80881e7b0de58883cf6ca4f2930ebfbd">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
@@ -766,9 +700,9 @@ Attacking and defending the <a href="https://eprint.iacr.org/2008/318.pdf">McEli
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_mc_eliece_8h_source.html">McEliece.h</a></li>
-<li>CEX/McEliece.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_mc_eliece_8h_source.html">McEliece.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/McEliece.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

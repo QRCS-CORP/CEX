@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -117,10 +117,18 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ad5cac45df47e968e5c3b9ac9a0de092d"><td class="memTemplItemLeft" align="right" valign="top">CEX_OPTIMIZE_RESUME static CEX_OPTIMIZE_IGNORE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#ad5cac45df47e968e5c3b9ac9a0de092d">ClearVector</a> (std::vector&lt; T &gt; &amp;Input)</td></tr>
 <tr class="memdesc:ad5cac45df47e968e5c3b9ac9a0de092d"><td class="mdescLeft">&#160;</td><td class="mdescRight">cond PRIVATE  <a href="#ad5cac45df47e968e5c3b9ac9a0de092d">More...</a><br /></td></tr>
 <tr class="separator:ad5cac45df47e968e5c3b9ac9a0de092d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d7fa4c3fc69fb5b7de319c066807111"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a8d7fa4c3fc69fb5b7de319c066807111"><td class="memTemplItemLeft" align="right" valign="top">static CEX_OPTIMIZE_RESUME byte&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a8d7fa4c3fc69fb5b7de319c066807111">GetByte</a> (T Value, size_t Index)</td></tr>
-<tr class="memdesc:a8d7fa4c3fc69fb5b7de319c066807111"><td class="mdescLeft">&#160;</td><td class="mdescRight">cond PRIVATE  <a href="#a8d7fa4c3fc69fb5b7de319c066807111">More...</a><br /></td></tr>
-<tr class="separator:a8d7fa4c3fc69fb5b7de319c066807111"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebabe463d5f9397748f4ce674ef98be4"><td class="memTemplParams" colspan="2">template&lt;typename Array , typename Random &gt; </td></tr>
+<tr class="memitem:aebabe463d5f9397748f4ce674ef98be4"><td class="memTemplItemLeft" align="right" valign="top">static CEX_OPTIMIZE_RESUME void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#aebabe463d5f9397748f4ce674ef98be4">Fill</a> (Array &amp;Output, size_t Offset, size_t Elements, Random &amp;Rng)</td></tr>
+<tr class="memdesc:aebabe463d5f9397748f4ce674ef98be4"><td class="mdescLeft">&#160;</td><td class="mdescRight">cond PRIVATE  <a href="#aebabe463d5f9397748f4ce674ef98be4">More...</a><br /></td></tr>
+<tr class="separator:aebabe463d5f9397748f4ce674ef98be4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c46c1f32ca47b3515ce00cdd6c9a06e"><td class="memTemplParams" colspan="2">template&lt;typename Array , typename Random &gt; </td></tr>
+<tr class="memitem:a5c46c1f32ca47b3515ce00cdd6c9a06e"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a5c46c1f32ca47b3515ce00cdd6c9a06e">Fill</a> (Array &amp;Output, size_t Offset, size_t Elements, Random *Rng)</td></tr>
+<tr class="memdesc:a5c46c1f32ca47b3515ce00cdd6c9a06e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills an array of any type with random elements.  <a href="#a5c46c1f32ca47b3515ce00cdd6c9a06e">More...</a><br /></td></tr>
+<tr class="separator:a5c46c1f32ca47b3515ce00cdd6c9a06e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e5a454af2fd50014d84d0f35906b0ae"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a3e5a454af2fd50014d84d0f35906b0ae"><td class="memTemplItemLeft" align="right" valign="top">static byte&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a3e5a454af2fd50014d84d0f35906b0ae">GetByte</a> (T Value, size_t Index)</td></tr>
+<tr class="memdesc:a3e5a454af2fd50014d84d0f35906b0ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract an 8bit integer from a larger integer  <a href="#a3e5a454af2fd50014d84d0f35906b0ae">More...</a><br /></td></tr>
+<tr class="separator:a3e5a454af2fd50014d84d0f35906b0ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a3c13948de6e7ddcbb707b9b3931542"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a0a3c13948de6e7ddcbb707b9b3931542"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a0a3c13948de6e7ddcbb707b9b3931542">Abs</a> (T A, T B)</td></tr>
 <tr class="memdesc:a0a3c13948de6e7ddcbb707b9b3931542"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the absolute positive value difference between two integers  <a href="#a0a3c13948de6e7ddcbb707b9b3931542">More...</a><br /></td></tr>
@@ -216,6 +224,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a93d362099f18b2f0391703ba78fe6e0c"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a93d362099f18b2f0391703ba78fe6e0c">BeIncrement8</a> (Array &amp;Output)</td></tr>
 <tr class="memdesc:a93d362099f18b2f0391703ba78fe6e0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats a byte array as a large Big Endian integer, incrementing the total value by one  <a href="#a93d362099f18b2f0391703ba78fe6e0c">More...</a><br /></td></tr>
 <tr class="separator:a93d362099f18b2f0391703ba78fe6e0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d7a51009b91ed1493d08bfb0ec75968"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:a1d7a51009b91ed1493d08bfb0ec75968"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a1d7a51009b91ed1493d08bfb0ec75968">BeIncrease8</a> (Array &amp;Output, const size_t Length)</td></tr>
+<tr class="memdesc:a1d7a51009b91ed1493d08bfb0ec75968"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length  <a href="#a1d7a51009b91ed1493d08bfb0ec75968">More...</a><br /></td></tr>
+<tr class="separator:a1d7a51009b91ed1493d08bfb0ec75968"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d414fee0f98d10647f1af2cec0581ea"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
 <tr class="memitem:a2d414fee0f98d10647f1af2cec0581ea"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a2d414fee0f98d10647f1af2cec0581ea">BeIncrease8</a> (const Array &amp;Input, Array &amp;Output, const size_t Length)</td></tr>
 <tr class="memdesc:a2d414fee0f98d10647f1af2cec0581ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length  <a href="#a2d414fee0f98d10647f1af2cec0581ea">More...</a><br /></td></tr>
@@ -303,6 +315,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a9ec2f28b06ce0b953dc497c6503c6587"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#a9ec2f28b06ce0b953dc497c6503c6587">CMax</a> (T A, T B)</td></tr>
 <tr class="memdesc:a9ec2f28b06ce0b953dc497c6503c6587"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time return the larger value of the two integers  <a href="#a9ec2f28b06ce0b953dc497c6503c6587">More...</a><br /></td></tr>
 <tr class="separator:a9ec2f28b06ce0b953dc497c6503c6587"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadc265447827978135861054148cf6f5"><td class="memTemplParams" colspan="2">template&lt;typename Array &gt; </td></tr>
+<tr class="memitem:aadc265447827978135861054148cf6f5"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#aadc265447827978135861054148cf6f5">CMov</a> (Array &amp;R, size_t ROffset, const Array &amp;X, size_t XOffset, size_t Length, byte Condition)</td></tr>
+<tr class="memdesc:aadc265447827978135861054148cf6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time conditional move  <a href="#aadc265447827978135861054148cf6f5">More...</a><br /></td></tr>
+<tr class="separator:aadc265447827978135861054148cf6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1ea95f7d40cb0bb16d089ae570c7261"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ab1ea95f7d40cb0bb16d089ae570c7261"><td class="memTemplItemLeft" align="right" valign="top">static T&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_int_utils.html#ab1ea95f7d40cb0bb16d089ae570c7261">CMin</a> (T A, T B)</td></tr>
 <tr class="memdesc:ab1ea95f7d40cb0bb16d089ae570c7261"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constant time return the lesser value of the two integers  <a href="#ab1ea95f7d40cb0bb16d089ae570c7261">More...</a><br /></td></tr>
@@ -720,6 +736,51 @@ template&lt;typename Array &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A 64 bit integer in Big Endian format</dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1d7a51009b91ed1493d08bfb0ec75968"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntUtils::BeIncrease8 </td>
+          <td>(</td>
+          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Treats an 8bit integer array as a large Big Endian integer, incrementing the total value by the specified length </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The modified output byte array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number to increase by</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -1361,6 +1422,79 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="aadc265447827978135861054148cf6f5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntUtils::CMov </td>
+          <td>(</td>
+          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramname"><em>R</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>ROffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Array &amp;&#160;</td>
+          <td class="paramname"><em>X</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>XOffset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">byte&#160;</td>
+          <td class="paramname"><em>Condition</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constant time conditional move </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">R</td><td>The destination array</td></tr>
+    <tr><td class="paramname">ROffset</td><td>The starting index in the destination array</td></tr>
+    <tr><td class="paramname">X</td><td>The source array</td></tr>
+    <tr><td class="paramname">XOffset</td><td>The starting index in the source array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of elements to copy</td></tr>
+    <tr><td class="paramname">Condition</td><td>The condition</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="acdd597db68ebafaf1ff7692a83a5ae5b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1660,6 +1794,128 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="aebabe463d5f9397748f4ce674ef98be4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array , typename Random &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static CEX_OPTIMIZE_RESUME void IntUtils::Fill </td>
+          <td>(</td>
+          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Elements</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Random &amp;&#160;</td>
+          <td class="paramname"><em>Rng</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>cond PRIVATE </p>
+<p>endcond </p>
+<p>Fills an array of any type with random elements. </p>
+<p>The random source can be any of the Prngs, Drbgs, or entropy Providers</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output array receiving random integers</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the output array</td></tr>
+    <tr><td class="paramname">Elements</td><td>The number of elements to generate</td></tr>
+    <tr><td class="paramname">Rng</td><td>The random provider source</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a5c46c1f32ca47b3515ce00cdd6c9a06e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Array , typename Random &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void IntUtils::Fill </td>
+          <td>(</td>
+          <td class="paramtype">Array &amp;&#160;</td>
+          <td class="paramname"><em>Output</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Elements</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Random *&#160;</td>
+          <td class="paramname"><em>Rng</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fills an array of any type with random elements. </p>
+<p>The random source can be any of the Prngs, Drbgs, or entropy Providers</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Output</td><td>The output array receiving random integers</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the output array</td></tr>
+    <tr><td class="paramname">Elements</td><td>The number of elements to generate</td></tr>
+    <tr><td class="paramname">Rng</td><td>A pointer to the random provider source</td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a4bc014d9216b79b2822339f774bb0122"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1738,7 +1994,7 @@ template&lt;typename T &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a8d7fa4c3fc69fb5b7de319c066807111"></a>
+<a class="anchor" id="a3e5a454af2fd50014d84d0f35906b0ae"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -1748,7 +2004,7 @@ template&lt;typename T &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static CEX_OPTIMIZE_RESUME byte IntUtils::GetByte </td>
+          <td class="memname">static byte IntUtils::GetByte </td>
           <td>(</td>
           <td class="paramtype">T&#160;</td>
           <td class="paramname"><em>Value</em>, </td>
@@ -1772,8 +2028,6 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>cond PRIVATE </p>
-<p>endcond </p>
 <p>Extract an 8bit integer from a larger integer </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -3843,8 +4097,8 @@ template&lt;typename P , typename V &gt; </div>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_int_utils_8h_source.html">IntUtils.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_int_utils_8h_source.html">IntUtils.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

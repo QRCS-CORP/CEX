@@ -1,10 +1,9 @@
 #include "ECP.h"
 #include "ArrayUtils.h"
 #include "BlockCipherFromName.h"
-#include "CTR.h"
 #include "CpuDetect.h"
 #include "CSP.h"
-#include "Keccak512.h"
+#include "SHAKE.h"
 #include "SymmetricKey.h"
 #include "SysUtils.h"
 
@@ -16,7 +15,7 @@ const std::string ECP::CLASS_NAME("ECP");
 
 ECP::ECP()
 	:
-	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::SHAKE256))),
+	m_kdfGenerator(new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE512)),
 	m_hasTsc(Utility::SysUtils::HasRdtsc()),
 #if defined(CEX_OS_WINDOWS) || defined(CEX_OS_POSIX)
 	m_isAvailable(true)
@@ -32,9 +31,9 @@ ECP::~ECP()
 	m_hasTsc = false;
 	m_isAvailable = false;
 
-	if (m_cipherMode != nullptr)
+	if (m_kdfGenerator != nullptr)
 	{
-		m_cipherMode.reset(nullptr);
+		m_kdfGenerator.reset(nullptr);
 	}
 }
 
@@ -57,40 +56,53 @@ const std::string ECP::Name()
 
 //~~~Public Functions~~~//
 
-void ECP::GetBytes(std::vector<byte> &Output)
+void ECP::Generate(std::vector<byte> &Output)
 {
-	GetBytes(Output, 0, Output.size());
+	Generate(Output, 0, Output.size());
 }
 
-void ECP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
 	{
-		throw CryptoRandomException("ECP:GetBytes", "Random provider is not available!");
+		throw CryptoRandomException("ECP:Generate", "Random provider is not available!");
 	}
 
-	std::vector<byte> rnd(Length);
-	m_cipherMode->Transform(rnd, 0, Output, Offset, Length);
+	m_kdfGenerator->Generate(Output, Offset, Length);
 }
 
-std::vector<byte> ECP::GetBytes(size_t Length)
+std::vector<byte> ECP::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd, 0, rnd.size());
+	Generate(rnd, 0, rnd.size());
 
 	return rnd;
 }
 
-uint ECP::Next()
+ushort ECP::NextUInt16()
 {
-	uint num;
-	std::vector<byte> rnd(sizeof(uint));
-	GetBytes(rnd, 0, rnd.size());
-	Utility::MemUtils::CopyToValue(rnd, 0, num, sizeof(uint));
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
-	return num;
+	return x;
+}
+
+uint ECP::NextUInt32()
+{
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+
+	return x;
+}
+
+ulong ECP::NextUInt64()
+{
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+
+	return x;
 }
 
 void ECP::Reset()
@@ -99,38 +111,26 @@ void ECP::Reset()
 
 	try
 	{
-		// collect entropy, filter, and compress
-		key = Collect();
+		// initialize the kdf
+		Collect();
 	}
 	catch (std::exception &ex)
 	{
 		throw CryptoRandomException("ECP:Reset", "Entropy collection has failed!", std::string(ex.what()));
 	}
-
-	// Note: this provider uses the extended version of rijndael, using 38 rounds for maximum diffusion
-	// get the iv and hkdf info from system provider
-	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[0];
-	std::vector<byte> info(keySize.InfoSize());
-	std::vector<byte> iv(keySize.NonceSize());
-	CSP pvd;
-	pvd.GetBytes(info);
-	pvd.GetBytes(iv);
-	Key::Symmetric::SymmetricKey sk(key, iv, info);
-	// initialize the cipher
-	m_cipherMode->Initialize(true, sk);
 }
 
 //~~~Private Functions~~~//
 
-std::vector<byte> ECP::Collect()
+void ECP::Collect()
 {
-	const size_t KEYLEN = 72;
+	const size_t KBLOCK = 72;
 	std::vector<byte> state(0);
-	std::vector<byte> buffer(KEYLEN);
+	std::vector<byte> buffer(KBLOCK);
 	ulong ts = Utility::SysUtils::TimeStamp(m_hasTsc);
 
 	CSP pvd;
-	pvd.GetBytes(buffer);
+	pvd.Generate(buffer);
 	// first block is system provider
 	Utility::ArrayUtils::Append(buffer, state);
 	// get the first timestamp
@@ -157,27 +157,21 @@ std::vector<byte> ECP::Collect()
 	Filter(state);
 
 	// size last block
-	size_t padLen = ((state.size() % KEYLEN) == 0) ? KEYLEN : KEYLEN - (state.size() % KEYLEN);
-	if (padLen < KEYLEN / 2)
+	size_t padLen = ((state.size() % KBLOCK) == 0) ? KBLOCK : KBLOCK - (state.size() % KBLOCK);
+	if (padLen < KBLOCK / 2)
 	{
-		padLen += KEYLEN;
+		padLen += KBLOCK;
 	}
 
 	// forward padding
 	buffer.resize(padLen);
-	pvd.GetBytes(buffer);
+	pvd.Generate(buffer);
 	Utility::ArrayUtils::Append(buffer, state);
 
-	return Compress(state);
-}
-
-std::vector<byte> ECP::Compress(std::vector<byte> &State)
-{
-	Digest::Keccak512 dgt;
-	std::vector<byte> outKey(dgt.DigestSize());
-	dgt.Compute(State, outKey);
-
-	return outKey;
+	// initialize cSHAKE-512
+	std::vector<byte> cust(72);
+	pvd.Generate(cust);
+	m_kdfGenerator->Initialize(state, cust);
 }
 
 void ECP::Filter(std::vector<byte> &State)

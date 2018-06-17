@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/KdfFromName.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/KdfFromName.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -96,31 +96,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;CexDomain.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;CryptoException.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;Digests.h&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;IKdf.h&quot;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;Kdfs.h&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;NAMESPACE_HELPER</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">using</span> Exception::CryptoException;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Enumeration::Digests</a>;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">using</span> Kdf::IKdf;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Enumeration::Kdfs</a>;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">class </span><a class="code" href="class_kdf_from_name.html">KdfFromName</a></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;{</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_i_kdf.html">IKdf</a>* <a class="code" href="class_kdf_from_name.html#a7966625b685be5825bd48ef8c2cd223c">GetInstance</a>(<a class="code" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> KdfType, Digests DigestType);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;NAMESPACE_HELPEREND</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_kdf_from_name_html_a7966625b685be5825bd48ef8c2cd223c"><div class="ttname"><a href="class_kdf_from_name.html#a7966625b685be5825bd48ef8c2cd223c">KdfFromName::GetInstance</a></div><div class="ttdeci">static IKdf * GetInstance(Kdfs KdfType, Digests DigestType)</div><div class="ttdoc">Instantiate an uninitialized KDF generator from its enunmeration type name </div><div class="ttdef"><b>Definition:</b> KdfFromName.cpp:10</div></div>
-<div class="ttc" id="class_kdf_from_name_html"><div class="ttname"><a href="class_kdf_from_name.html">KdfFromName</a></div><div class="ttdoc">Get an uninitialized Key Derivation Function from a type name. </div><div class="ttdef"><b>Definition:</b> Documentation.h:340</div></div>
-<div class="ttc" id="group___enumeration_html_ga1aa7dfa4a9bea8d343229bf5c0433b1d"><div class="ttname"><a href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a></div><div class="ttdeci">Kdfs</div><div class="ttdef"><b>Definition:</b> Documentation.h:293</div></div>
-<div class="ttc" id="class_i_kdf_html"><div class="ttname"><a href="class_i_kdf.html">IKdf</a></div><div class="ttdoc">Key Derivation Function (KDF) interface class </div><div class="ttdef"><b>Definition:</b> Documentation.h:373</div></div>
-<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:290</div></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;IKdf.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;Kdfs.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;NAMESPACE_HELPER</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">using</span> Exception::CryptoException;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">using</span> Kdf::IKdf;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Enumeration::Kdfs</a>;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">class </span><a class="code" href="class_kdf_from_name.html">KdfFromName</a></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_i_kdf.html">IKdf</a>* <a class="code" href="class_kdf_from_name.html#a4bc5a93ebe08a0e39df05beb5787a2e3">GetInstance</a>(<a class="code" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> KdfType);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;};</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;NAMESPACE_HELPEREND</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="class_kdf_from_name_html"><div class="ttname"><a href="class_kdf_from_name.html">KdfFromName</a></div><div class="ttdoc">Get an uninitialized Key Derivation Function from a type name. </div><div class="ttdef"><b>Definition:</b> Documentation.h:359</div></div>
+<div class="ttc" id="class_kdf_from_name_html_a4bc5a93ebe08a0e39df05beb5787a2e3"><div class="ttname"><a href="class_kdf_from_name.html#a4bc5a93ebe08a0e39df05beb5787a2e3">KdfFromName::GetInstance</a></div><div class="ttdeci">static IKdf * GetInstance(Kdfs KdfType)</div><div class="ttdoc">Instantiate an uninitialized KDF generator from its enunmeration type name </div><div class="ttdef"><b>Definition:</b> KdfFromName.cpp:11</div></div>
+<div class="ttc" id="group___enumeration_html_ga1aa7dfa4a9bea8d343229bf5c0433b1d"><div class="ttname"><a href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a></div><div class="ttdeci">Kdfs</div><div class="ttdef"><b>Definition:</b> Documentation.h:311</div></div>
+<div class="ttc" id="class_i_kdf_html"><div class="ttname"><a href="class_i_kdf.html">IKdf</a></div><div class="ttdoc">Key Derivation Function (KDF) interface class </div><div class="ttdef"><b>Definition:</b> Documentation.h:392</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/Kdfs.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/Kdfs.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -101,28 +101,30 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">enum class</span> <a class="code" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> : byte</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;{</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da6adf97f83acf6453d4a6a4b1070f3754">None</a> = 0,</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <a class="code" href="class_h_k_d_f.html">HKDF</a> = 1,</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <a class="code" href="class_k_d_f2.html">KDF2</a> = 2,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="class_p_b_k_d_f2.html">PBKDF2</a> = 3,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="class_s_c_r_y_p_t.html">SCRYPT</a> = 4,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da180641b033cbd68d85704235973acdc7">SHAKE128</a> = 5,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da514cc564ac1b237d4129b7543308ce0a">SHAKE256</a> = 6,</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5705d645a9d102aa73ead3488b669c34">SHAKE512</a> = 7,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da85f77e16d8e61c80f784e548d8aa1de4">SHAKE1024</a> = 8</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;NAMESPACE_ENUMERATIONEND</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da5705d645a9d102aa73ead3488b669c34"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5705d645a9d102aa73ead3488b669c34">Kdfs::SHAKE512</a></div><div class="ttdoc">An implementation of the SHAKE-512 XOF function </div></div>
-<div class="ttc" id="class_h_k_d_f_html"><div class="ttname"><a href="class_h_k_d_f.html">HKDF</a></div><div class="ttdoc">An implementation of an Hash based Key Derivation Function (HKDF) </div><div class="ttdef"><b>Definition:</b> Documentation.h:372</div></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    HKDF256 = 1,</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    HKDF512 = 2,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da014262da35450dbb37274571e235d35c">KDF2256</a> = 3,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da02cbd7be882b817b785bf36bf920f94d">KDF2512</a> = 4,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5b51e49fbd425e5c027eb07750aaf8c4">PBKDF2256</a> = 5,</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1daf5daf47236538c7d89fe23f1ed256208">PBKDF2512</a> = 6,</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1dad04483ba9eeb790b54bd8fa30e3b5987">SCRYPT256</a> = 7,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <a class="code" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5f8674e54efd0034c87a0d86471944ea">SCRYPT512</a> = 8,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    SHAKE128 = 9,</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    SHAKE256 = 10,</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    SHAKE512 = 11,</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    SHAKE1024 = 12</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;};</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;NAMESPACE_ENUMERATIONEND</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da02cbd7be882b817b785bf36bf920f94d"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da02cbd7be882b817b785bf36bf920f94d">Kdfs::KDF2512</a></div><div class="ttdoc">An implementation of the Hash based Key Derivation Function: KDF2(SHA2-512) </div></div>
+<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da5f8674e54efd0034c87a0d86471944ea"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5f8674e54efd0034c87a0d86471944ea">Kdfs::SCRYPT512</a></div><div class="ttdoc">An implementation of the SCRYPT(SHA2-512) </div></div>
 <div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da6adf97f83acf6453d4a6a4b1070f3754"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da6adf97f83acf6453d4a6a4b1070f3754">Kdfs::None</a></div><div class="ttdoc">No kdf is specified </div></div>
-<div class="ttc" id="class_s_c_r_y_p_t_html"><div class="ttname"><a href="class_s_c_r_y_p_t.html">SCRYPT</a></div><div class="ttdoc">An implementation of the Key Derivation Function: SCRYPT </div><div class="ttdef"><b>Definition:</b> Documentation.h:376</div></div>
-<div class="ttc" id="class_k_d_f2_html"><div class="ttname"><a href="class_k_d_f2.html">KDF2</a></div><div class="ttdoc">An implementation of the Key Derivation Function Version 2 (KDF2) </div><div class="ttdef"><b>Definition:</b> Documentation.h:374</div></div>
-<div class="ttc" id="class_p_b_k_d_f2_html"><div class="ttname"><a href="class_p_b_k_d_f2.html">PBKDF2</a></div><div class="ttdoc">An implementation of the Passphrase Based Key Derivation Version 2 (PBKDF2) </div><div class="ttdef"><b>Definition:</b> Documentation.h:375</div></div>
-<div class="ttc" id="group___enumeration_html_ga1aa7dfa4a9bea8d343229bf5c0433b1d"><div class="ttname"><a href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a></div><div class="ttdeci">Kdfs</div><div class="ttdef"><b>Definition:</b> Documentation.h:293</div></div>
-<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da85f77e16d8e61c80f784e548d8aa1de4"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da85f77e16d8e61c80f784e548d8aa1de4">Kdfs::SHAKE1024</a></div><div class="ttdoc">An implementation of the SHAKE-1024 XOF function </div></div>
-<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da180641b033cbd68d85704235973acdc7"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da180641b033cbd68d85704235973acdc7">Kdfs::SHAKE128</a></div><div class="ttdoc">An implementation of the SHAKE-128 XOF function </div></div>
-<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da514cc564ac1b237d4129b7543308ce0a"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da514cc564ac1b237d4129b7543308ce0a">Kdfs::SHAKE256</a></div><div class="ttdoc">An implementation of the SHAKE-256 XOF function </div></div>
+<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da5b51e49fbd425e5c027eb07750aaf8c4"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5b51e49fbd425e5c027eb07750aaf8c4">Kdfs::PBKDF2256</a></div><div class="ttdoc">An implementation of a Passphrase Based KDF: PBKDF2(SHA2-256) </div></div>
+<div class="ttc" id="group___enumeration_html_ga1aa7dfa4a9bea8d343229bf5c0433b1d"><div class="ttname"><a href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a></div><div class="ttdeci">Kdfs</div><div class="ttdef"><b>Definition:</b> Documentation.h:311</div></div>
+<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1da014262da35450dbb37274571e235d35c"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da014262da35450dbb37274571e235d35c">Kdfs::KDF2256</a></div><div class="ttdoc">An implementation of the Hash based Key Derivation Function: KDF2(SHA2-256) </div></div>
+<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1daf5daf47236538c7d89fe23f1ed256208"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1daf5daf47236538c7d89fe23f1ed256208">Kdfs::PBKDF2512</a></div><div class="ttdoc">An implementation of a Passphrase Based KDF: PBKDF2(SHA2-512) </div></div>
+<div class="ttc" id="group___enumeration_html_gga1aa7dfa4a9bea8d343229bf5c0433b1dad04483ba9eeb790b54bd8fa30e3b5987"><div class="ttname"><a href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1dad04483ba9eeb790b54bd8fa30e3b5987">Kdfs::SCRYPT256</a></div><div class="ttdoc">An implementation of the SCRYPT(SHA2-256) </div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

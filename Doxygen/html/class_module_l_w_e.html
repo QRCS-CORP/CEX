@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -125,6 +125,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a196980bffb1533b19ccfd3508c4cd5f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a196980bffb1533b19ccfd3508c4cd5f0">~ModuleLWE</a> ()</td></tr>
 <tr class="memdesc:a196980bffb1533b19ccfd3508c4cd5f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a196980bffb1533b19ccfd3508c4cd5f0">More...</a><br /></td></tr>
 <tr class="separator:a196980bffb1533b19ccfd3508c4cd5f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4181a2c2ea05e46e014d4551ad5dfeca"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a4181a2c2ea05e46e014d4551ad5dfeca">DomainKey</a> ()</td></tr>
+<tr class="memdesc:a4181a2c2ea05e46e014d4551ad5dfeca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret.  <a href="#a4181a2c2ea05e46e014d4551ad5dfeca">More...</a><br /></td></tr>
+<tr class="separator:a4181a2c2ea05e46e014d4551ad5dfeca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94897a5c502a07061e60737db5b62e3f"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a94897a5c502a07061e60737db5b62e3f">Enumeral</a> () override</td></tr>
 <tr class="memdesc:a94897a5c502a07061e60737db5b62e3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher type-name  <a href="#a94897a5c502a07061e60737db5b62e3f">More...</a><br /></td></tr>
 <tr class="separator:a94897a5c502a07061e60737db5b62e3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,24 +143,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a81f27513238d11f6f35bb7f71513a8de"><td class="memItemLeft" align="right" valign="top">const MLWEParams&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a81f27513238d11f6f35bb7f71513a8de">Parameters</a> ()</td></tr>
 <tr class="memdesc:a81f27513238d11f6f35bb7f71513a8de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers parameters enumeration name  <a href="#a81f27513238d11f6f35bb7f71513a8de">More...</a><br /></td></tr>
 <tr class="separator:a81f27513238d11f6f35bb7f71513a8de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4119eb0be1b6ba3a544c388f656f5ac2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a4119eb0be1b6ba3a544c388f656f5ac2">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
-<tr class="memdesc:a4119eb0be1b6ba3a544c388f656f5ac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret  <a href="#a4119eb0be1b6ba3a544c388f656f5ac2">More...</a><br /></td></tr>
-<tr class="separator:a4119eb0be1b6ba3a544c388f656f5ac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa08db36c2ee150018de5754d1dc635ba"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#aa08db36c2ee150018de5754d1dc635ba">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
+<tr class="memdesc:aa08db36c2ee150018de5754d1dc635ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret.  <a href="#aa08db36c2ee150018de5754d1dc635ba">More...</a><br /></td></tr>
+<tr class="separator:aa08db36c2ee150018de5754d1dc635ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac191f0e7a41a9982d6b4f6988471b45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#aac191f0e7a41a9982d6b4f6988471b45">Encapsulate</a> (std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret) override</td></tr>
-<tr class="memdesc:aac191f0e7a41a9982d6b4f6988471b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a shared secret and ciphertext  <a href="#aac191f0e7a41a9982d6b4f6988471b45">More...</a><br /></td></tr>
+<tr class="memdesc:aac191f0e7a41a9982d6b4f6988471b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a shared secret and ciphertext.  <a href="#aac191f0e7a41a9982d6b4f6988471b45">More...</a><br /></td></tr>
 <tr class="separator:aac191f0e7a41a9982d6b4f6988471b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48e2a92abbd1672a16d48877c9fe2c75"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a48e2a92abbd1672a16d48877c9fe2c75">Decrypt</a> (const std::vector&lt; byte &gt; &amp;CipherText) override</td></tr>
-<tr class="memdesc:a48e2a92abbd1672a16d48877c9fe2c75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt an encrypted cipher-text and return the shared secret  <a href="#a48e2a92abbd1672a16d48877c9fe2c75">More...</a><br /></td></tr>
-<tr class="separator:a48e2a92abbd1672a16d48877c9fe2c75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13c383d2c763e540e25c362b650bba9b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a13c383d2c763e540e25c362b650bba9b">Encrypt</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>) override</td></tr>
-<tr class="memdesc:a13c383d2c763e540e25c362b650bba9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a secret and return the encrypted message  <a href="#a13c383d2c763e540e25c362b650bba9b">More...</a><br /></td></tr>
-<tr class="separator:a13c383d2c763e540e25c362b650bba9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bf93a00599239211c7e883bc8681c22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a7bf93a00599239211c7e883bc8681c22">Generate</a> () override</td></tr>
 <tr class="memdesc:a7bf93a00599239211c7e883bc8681c22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a7bf93a00599239211c7e883bc8681c22">More...</a><br /></td></tr>
 <tr class="separator:a7bf93a00599239211c7e883bc8681c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a117972b392bac4af81d7138995755a18"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a117972b392bac4af81d7138995755a18">Initialize</a> (bool Encryption, <a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
-<tr class="memdesc:a117972b392bac4af81d7138995755a18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher for encryption or decryption  <a href="#a117972b392bac4af81d7138995755a18">More...</a><br /></td></tr>
-<tr class="separator:a117972b392bac4af81d7138995755a18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32658c361824a395e8f12339002c03f0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_module_l_w_e.html#a32658c361824a395e8f12339002c03f0">Initialize</a> (<a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
+<tr class="memdesc:a32658c361824a395e8f12339002c03f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher  <a href="#a32658c361824a395e8f12339002c03f0">More...</a><br /></td></tr>
+<tr class="separator:a32658c361824a395e8f12339002c03f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_i_asymmetric_cipher"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_i_asymmetric_cipher')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a></td></tr>
 <tr class="memitem:abdaf113807adcd7c9d42525ddf059384 inherit pub_methods_class_i_asymmetric_cipher"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#abdaf113807adcd7c9d42525ddf059384">IAsymmetricCipher</a> (const <a class="el" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a> &amp;)=delete</td></tr>
 <tr class="memdesc:abdaf113807adcd7c9d42525ddf059384 inherit pub_methods_class_i_asymmetric_cipher"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor: copy is restricted, this function has been deleted  <a href="#abdaf113807adcd7c9d42525ddf059384">More...</a><br /></td></tr>
@@ -174,48 +171,51 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of the Module Learning With Errors asymmetric cipher (ModuleLWE) </p>
-<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> asycpr(MLWEParams::Q12289N1024);</div>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> asycpr(MLWEParams::Q7681N256K3);</div>
 <div class="line"><a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* kp = asycpr.Generate();</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// serialize the public key</span></div>
 <div class="line"><a class="code" href="class_m_l_w_e_public_key.html">MLWEPublicKey</a>* pubK1 = (<a class="code" href="class_m_l_w_e_public_key.html">MLWEPublicKey</a>*)kp-&gt;<a class="code" href="class_i_asymmetric_key_pair.html#a51aa55d084611cd2d695eb4ea4bbfdb4">PublicKey</a>();</div>
-<div class="line">std:vector&lt;byte&gt; skey = pubK1-&gt;<a class="code" href="class_m_l_w_e_public_key.html#a2a447430bba454d32ac35e821dfa7287">ToBytes</a>();</div>
-</div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> asycpr(Enumeration::MLWEParams::Q12289N1024);</div>
-<div class="line">asycpr.Initialize(<span class="keyword">true</span>, kp);</div>
+<div class="line">std:vector&lt;byte&gt; pk = pubK1-&gt;<a class="code" href="class_m_l_w_e_public_key.html#a2a447430bba454d32ac35e821dfa7287">ToBytes</a>();</div>
+</div><!-- fragment --><p>Encryption: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> asycpr(MLWEParams::Q7681N256K3);</div>
+<div class="line">asycpr.Initialize(pk);</div>
 <div class="line"></div>
-<div class="line">std:vector&lt;byte&gt; cpt = asycpr.Encrypt(msg);</div>
-</div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> asycpr(Enumeration::MLWEParams::Q12289N1024);</div>
-<div class="line">asycpr.Initialize(<span class="keyword">false</span>, kp);</div>
+<div class="line">std:vector&lt;byte&gt; cpt;</div>
+<div class="line">std:vector&lt;byte&gt; secret(32);</div>
+<div class="line"><span class="comment">// generate the ciphertext and shared secret</span></div>
+<div class="line">asycpr.Encapsulate(cpt, secret);</div>
+</div><!-- fragment --><p>Decryption: </p><div class="fragment"><div class="line"><a class="code" href="class_module_l_w_e.html">ModuleLWE</a> asycpr(MLWEParams::Q7681N256K3);</div>
+<div class="line">asycpr.Initialize(sk);</div>
+<div class="line">std:vector&lt;byte&gt; secret(32);</div>
 <div class="line"></div>
 <div class="line"><span class="keywordflow">try</span></div>
 <div class="line">{</div>
-<div class="line">    std:vector&lt;byte&gt; msg = asycpr.Decrypt(cpt);</div>
+<div class="line"><span class="comment">// decrypt the ciphertext and output the shared secret</span></div>
+<div class="line">    asycpr.Decapsulate(cpt, secret);</div>
 <div class="line">}</div>
 <div class="line"><span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a> &amp;ex)</div>
 <div class="line">{</div>
 <div class="line">    <span class="comment">// handle the authentication failure</span></div>
 <div class="line">}</div>
 </div><!-- fragment --> <p>Implementation Notes: </p>
-<p>Module learning with errors (MLWE) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial rings over finite fields. <br />
-An important feature of the ring LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. <br />
+<p>Module learning with errors (MLWE) is the Learning With Errors problem (a generalization of the parity learning problem), specialized to polynomial arrays over finite fields. <br />
+An important feature of the LWE problem is that the solution may be reducible to the NP-Hard Shortest Vector Problem (SVP) in a Lattice. <br />
 This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.</p>
-<p>This implementation of ModuleLWE uses the NewHope reconcilliation method, whereby the shared seed is generated by the receiver, and encrypted using a combination of the senders public key and the receivers public key, and then shared between hosts. <br />
-That seed is compressed with a Keccak digest and used to key the GCM AEAD mode which encrypts and authenticates the message.</p>
 <ul>
+<li>
+The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption. </li>
 <li>
 The Q12289/N1024 parameter set is the default cipher configuration; as of (1.0.0.3), this is currently the only parameter set, but a modular construction is used anticipating future expansion </li>
 <li>
 The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng </li>
 <li>
-The message digest used to condition the seed bytes is set automatically; Keccak512 for standard ciphers, Keccak1024 for extended ciphers </li>
-<li>
-The secondary prng used to generate the public key (BCR), is an AES128/CTR-BE construction, (changed from Shake128 in the new hope version) </li>
+The secondary prng used to generate the public key (BCR), is an AES128/CTR-BE construction, (changed from SHAKE in the Kyber version) </li>
 <li>
 The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure </li>
 </ul>
 <p>Guiding Publications: </p><ol>
 <li>
-The NewHope: <a href="https://eprint.iacr.org/2015/1092">key exchange</a> from the ring learning with errors problem. </li>
+Crystals <a href="https://eprint.iacr.org/2017/634.pdf">Kyber</a> a CCA-secure module-lattice-based KEM. </li>
 <li>
 A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exchange</a> Scheme Based on the Learning with Errors Problem. </li>
 </ol>
@@ -346,7 +346,7 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a4119eb0be1b6ba3a544c388f656f5ac2"></a>
+<a class="anchor" id="aa08db36c2ee150018de5754d1dc635ba"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -354,7 +354,7 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void ModuleLWE::Decapsulate </td>
+          <td class="memname">bool ModuleLWE::Decapsulate </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>CipherText</em>, </td>
@@ -378,7 +378,8 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </table>
 </div><div class="memdoc">
 
-<p>Decrypt a ciphertext and return the shared secret </p>
+<p>Decrypt a ciphertext and return the shared secret. </p>
+<p>Uses the Kyber CCA secure key encapsulation method. The size of the shared secret is determined by the caller and output through cSHAKE.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherText</td><td>The input cipher-text</td></tr>
@@ -386,12 +387,13 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if decryption is sucesssful</dd></dl>
 
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6eb502f376a775848df3e3390ef0a034">IAsymmetricCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a81ad8df798e4333c2eb97b563a839574">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a48e2a92abbd1672a16d48877c9fe2c75"></a>
+<a class="anchor" id="a4181a2c2ea05e46e014d4551ad5dfeca"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -399,37 +401,23 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; ModuleLWE::Decrypt </td>
+          <td class="memname">std::vector&lt; byte &gt; &amp; ModuleLWE::DomainKey </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>CipherText</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decrypt an encrypted cipher-text and return the shared secret </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">CipherText</td><td>The input cipher-text</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The decrypted message</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Fails on invalid input or configuration</td></tr>
-    <tr><td class="paramname">Exception::CryptoAuthenticationFailure</td><td>Thrown if the message has failed authentication, or the configuration is invalid</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Read/Write: Reads or Sets the Domain Key used as a customization string by cSHAKE to generate the shared secret. </p>
+<p>Changing this code will create a unique distribution of the cipher. The domain key can be used as a secondary secret shared between hosts in an authenticated domain. The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation. For best security, the key should be random, secret, and shared only between hosts within a secure domain. This property is used by the Shared Trust Model secure communications protocol.</p>
 
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#acde4e242a6c49cb0ccef64636f366581">IAsymmetricCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a8e384604c560a05d36d2473589a9a145">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
@@ -465,7 +453,8 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </table>
 </div><div class="memdoc">
 
-<p>Generate a shared secret and ciphertext </p>
+<p>Generate a shared secret and ciphertext. </p>
+<p>Uses the Kyber CCA secure key encapsulation method. The size of the shared secret is determined by the caller and output through cSHAKE.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherText</td><td>The output cipher-text</td></tr>
@@ -475,47 +464,6 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </dl>
 
 <p>Implements <a class="el" href="class_i_asymmetric_cipher.html#aa410f2bccefb25ee4ab06dc999206009">IAsymmetricCipher</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a13c383d2c763e540e25c362b650bba9b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; byte &gt; ModuleLWE::Encrypt </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Message</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Encrypt a secret and return the encrypted message </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Message</td><td>The shared secret array</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The encrypted message</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Fails on invalid input or configuration</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#aae8f8ef818642dc76452b9ba099b6c83">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
@@ -580,7 +528,7 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 
 </div>
 </div>
-<a class="anchor" id="a117972b392bac4af81d7138995755a18"></a>
+<a class="anchor" id="a32658c361824a395e8f12339002c03f0"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -590,19 +538,9 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
         <tr>
           <td class="memname">void ModuleLWE::Initialize </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>Encryption</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *&#160;</td>
-          <td class="paramname"><em>Key</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -612,11 +550,10 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the cipher for encryption or decryption </p>
+<p>Initialize the cipher </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Encryption</td><td>Initialize the cipher for encryption or decryption</td></tr>
-    <tr><td class="paramname">Key</td><td>The <a class="el" href="class_i_asymmetric_key.html" title="The Asymmetric key interface ">IAsymmetricKey</a> containing the Public (encrypt) and/or Private (decryption) key</td></tr>
+    <tr><td class="paramname">Key</td><td>The asymmetric public or private key</td></tr>
   </table>
   </dd>
 </dl>
@@ -627,7 +564,7 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a6d5bccd14a72c615c6e57e3cd44743fe">IAsymmetricCipher</a>.</p>
+<p>Implements <a class="el" href="class_i_asymmetric_cipher.html#a80881e7b0de58883cf6ca4f2930ebfbd">IAsymmetricCipher</a>.</p>
 
 </div>
 </div>
@@ -756,9 +693,9 @@ A Simple, Provably <a href="http://eprint.iacr.org/2012/688.pdf">Secure Key Exch
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_module_l_w_e_8h_source.html">ModuleLWE.h</a></li>
-<li>CEX/ModuleLWE.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_module_l_w_e_8h_source.html">ModuleLWE.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/ModuleLWE.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

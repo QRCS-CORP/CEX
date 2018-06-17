@@ -54,7 +54,7 @@ namespace Test
 		{
 			// converges slowly, needs 1mb or more
 			std::vector<byte> rnd(SampleSize);
-			Rng->GetBytes(rnd);
+			Rng->Generate(rnd);
 			double x = TestUtils::ChiSquare(rnd) * 100;
 			std::string status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
 
@@ -104,7 +104,7 @@ namespace Test
 		{
 			// 100kb sample
 			std::vector<byte> rnd(SampleSize);
-			Rng->GetBytes(rnd);
+			Rng->Generate(rnd);
 			double x = TestUtils::MeanValue(rnd);
 			std::string status = (std::string("Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
 

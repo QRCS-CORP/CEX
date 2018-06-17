@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/CJP.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/CJP.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -191,52 +191,58 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">GetBytes</a>(<span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(<span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    uint <a class="code" href="class_c_j_p.html#a41543aab0315f677c497de960f36d06a">Next</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">Reset</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keywordtype">void</span> AccessMemory();</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    ulong DebiasBit();</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keywordtype">void</span> Detect();</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordtype">void</span> FoldTime(ulong <a class="code" href="class_time_stamp.html">TimeStamp</a>, ulong &amp;Folded);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordtype">size_t</span> Generate(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length);</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keywordtype">void</span> Generate64();</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    ulong GetTimeStamp();</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    ulong MeasureJitter();</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordtype">void</span> Prime();</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordtype">size_t</span> ShuffleLoop(uint LowBits, uint MinShift);</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="keywordtype">void</span> StirPool();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordtype">void</span> StuckCheck(ulong CurrentDelta);</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordtype">bool</span> TimerCheck();</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;};</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;NAMESPACE_PROVIDEREND</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    ushort <a class="code" href="class_c_j_p.html#aade465b490b9462ecbe197d4c73c3a61">NextUInt16</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    uint <a class="code" href="class_c_j_p.html#aefe5f87da005fd7151a152394b6fdd36">NextUInt32</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    ulong <a class="code" href="class_c_j_p.html#aa8c27859ec0a55bbbd61873de8d0737e">NextUInt64</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">Reset</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordtype">void</span> AccessMemory();</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    ulong DebiasBit();</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="keywordtype">void</span> Detect();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="keywordtype">void</span> FoldTime(ulong <a class="code" href="class_time_stamp.html">TimeStamp</a>, ulong &amp;Folded);</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordtype">void</span> Generate64();</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    ulong GetTimeStamp();</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    ulong MeasureJitter();</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordtype">void</span> Prime();</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordtype">size_t</span> Process(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length);</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordtype">size_t</span> ShuffleLoop(uint LowBits, uint MinShift);</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordtype">void</span> StirPool();</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="keywordtype">void</span> StuckCheck(ulong CurrentDelta);</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="keywordtype">bool</span> TimerCheck();</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;};</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;NAMESPACE_PROVIDEREND</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="class_c_j_p_html_a9d221e68a5aa2114aa73ed66efdae9af"><div class="ttname"><a href="class_c_j_p.html#a9d221e68a5aa2114aa73ed66efdae9af">CJP::operator=</a></div><div class="ttdeci">CJP &amp; operator=(const CJP &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
-<div class="ttc" id="class_i_provider_html"><div class="ttname"><a href="class_i_provider.html">IProvider</a></div><div class="ttdoc">Entropy source collectors and concentrators interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:487</div></div>
-<div class="ttc" id="class_c_j_p_html_af64b6032cf12ac20afa6229c9dc1bf42"><div class="ttname"><a href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">CJP::GetBytes</a></div><div class="ttdeci">void GetBytes(std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Fill a buffer with pseudo-random bytes </div><div class="ttdef"><b>Definition:</b> CJP.cpp:103</div></div>
+<div class="ttc" id="class_i_provider_html"><div class="ttname"><a href="class_i_provider.html">IProvider</a></div><div class="ttdoc">Entropy source collectors and concentrators interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:506</div></div>
 <div class="ttc" id="class_c_j_p_html_ac45c0eff2bc6cf21415639dabec368cf"><div class="ttname"><a href="class_c_j_p.html#ac45c0eff2bc6cf21415639dabec368cf">CJP::CJP</a></div><div class="ttdeci">CJP()</div><div class="ttdoc">Constructor: instantiate this class </div><div class="ttdef"><b>Definition:</b> CJP.cpp:12</div></div>
 <div class="ttc" id="class_c_j_p_html_a5854a8a526bbd6b55f8a428f008c0703"><div class="ttname"><a href="class_c_j_p.html#a5854a8a526bbd6b55f8a428f008c0703">CJP::EnableAccess</a></div><div class="ttdeci">bool &amp; EnableAccess()</div><div class="ttdoc">Read/Write: Enable the memory access noise source. </div><div class="ttdef"><b>Definition:</b> CJP.cpp:66</div></div>
 <div class="ttc" id="class_c_j_p_html"><div class="ttname"><a href="class_c_j_p.html">CJP</a></div><div class="ttdoc">The CPU Jitter entropy Provider </div><div class="ttdef"><b>Definition:</b> CJP.h:61</div></div>
 <div class="ttc" id="class_c_j_p_html_ae196683ea0d8ee9f52c9c6d34f64a730"><div class="ttname"><a href="class_c_j_p.html#ae196683ea0d8ee9f52c9c6d34f64a730">CJP::Name</a></div><div class="ttdeci">const std::string Name() override</div><div class="ttdoc">Read Only: provider class name </div><div class="ttdef"><b>Definition:</b> CJP.cpp:86</div></div>
 <div class="ttc" id="class_c_j_p_html_af91d38ac06ef0ab2a9e97c6066226619"><div class="ttname"><a href="class_c_j_p.html#af91d38ac06ef0ab2a9e97c6066226619">CJP::IsAvailable</a></div><div class="ttdeci">const bool IsAvailable() override</div><div class="ttdoc">Read Only: The entropy provider is available on this system. </div><div class="ttdef"><b>Definition:</b> CJP.cpp:81</div></div>
+<div class="ttc" id="class_c_j_p_html_aa8c27859ec0a55bbbd61873de8d0737e"><div class="ttname"><a href="class_c_j_p.html#aa8c27859ec0a55bbbd61873de8d0737e">CJP::NextUInt64</a></div><div class="ttdeci">ulong NextUInt64() override</div><div class="ttdoc">Get a pseudo random unsigned 64bit integer </div><div class="ttdef"><b>Definition:</b> CJP.cpp:154</div></div>
 <div class="ttc" id="class_c_j_p_html_a74a3747a1f0c1d17ae3ea35ccb95f80c"><div class="ttname"><a href="class_c_j_p.html#a74a3747a1f0c1d17ae3ea35ccb95f80c">CJP::EnableDebias</a></div><div class="ttdeci">bool &amp; EnableDebias()</div><div class="ttdoc">Read/Write: Enable the Von Neumann debiasing extractor. </div><div class="ttdef"><b>Definition:</b> CJP.cpp:71</div></div>
-<div class="ttc" id="class_c_j_p_html_a41543aab0315f677c497de960f36d06a"><div class="ttname"><a href="class_c_j_p.html#a41543aab0315f677c497de960f36d06a">CJP::Next</a></div><div class="ttdeci">uint Next() override</div><div class="ttdoc">Returns a pseudo-random unsigned 32bit integer </div><div class="ttdef"><b>Definition:</b> CJP.cpp:138</div></div>
+<div class="ttc" id="class_c_j_p_html_aefe5f87da005fd7151a152394b6fdd36"><div class="ttname"><a href="class_c_j_p.html#aefe5f87da005fd7151a152394b6fdd36">CJP::NextUInt32</a></div><div class="ttdeci">uint NextUInt32() override</div><div class="ttdoc">Get a pseudo random unsigned 32bit integer </div><div class="ttdef"><b>Definition:</b> CJP.cpp:146</div></div>
+<div class="ttc" id="class_c_j_p_html_a4a45fbe68f3f13631eaa9fd395d02dcf"><div class="ttname"><a href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">CJP::Generate</a></div><div class="ttdeci">void Generate(std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Fill a buffer with pseudo-random bytes </div><div class="ttdef"><b>Definition:</b> CJP.cpp:103</div></div>
 <div class="ttc" id="class_c_j_p_html_a89d88ba2fc35e4cffc014eaa32165e11"><div class="ttname"><a href="class_c_j_p.html#a89d88ba2fc35e4cffc014eaa32165e11">CJP::OverSampleRate</a></div><div class="ttdeci">uint &amp; OverSampleRate()</div><div class="ttdoc">Read/Write: The number of overlapping passes through the jitter entropy collector. </div><div class="ttdef"><b>Definition:</b> CJP.cpp:91</div></div>
-<div class="ttc" id="class_c_j_p_html_ab5b49834966cc875efd8ceab9045fa48"><div class="ttname"><a href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">CJP::Reset</a></div><div class="ttdeci">void Reset() override</div><div class="ttdoc">Reset the internal state </div><div class="ttdef"><b>Definition:</b> CJP.cpp:153</div></div>
+<div class="ttc" id="class_c_j_p_html_aade465b490b9462ecbe197d4c73c3a61"><div class="ttname"><a href="class_c_j_p.html#aade465b490b9462ecbe197d4c73c3a61">CJP::NextUInt16</a></div><div class="ttdeci">ushort NextUInt16() override</div><div class="ttdoc">Get a pseudo random unsigned 16bit integer </div><div class="ttdef"><b>Definition:</b> CJP.cpp:138</div></div>
+<div class="ttc" id="class_c_j_p_html_ab5b49834966cc875efd8ceab9045fa48"><div class="ttname"><a href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">CJP::Reset</a></div><div class="ttdeci">void Reset() override</div><div class="ttdoc">Reset the internal state </div><div class="ttdef"><b>Definition:</b> CJP.cpp:162</div></div>
 <div class="ttc" id="class_c_j_p_html_a9f0f46c7ea7982b7a29e14d591e05ec1"><div class="ttname"><a href="class_c_j_p.html#a9f0f46c7ea7982b7a29e14d591e05ec1">CJP::~CJP</a></div><div class="ttdeci">~CJP() override</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> CJP.cpp:42</div></div>
 <div class="ttc" id="class_time_stamp_html"><div class="ttname"><a href="class_time_stamp.html">TimeStamp</a></div><div class="ttdoc">Wraps the highest available system time stamp </div><div class="ttdef"><b>Definition:</b> TimeStamp.h:12</div></div>
 <div class="ttc" id="class_c_j_p_html_a21286d8c61cd62cd0119f82684f6faf9"><div class="ttname"><a href="class_c_j_p.html#a21286d8c61cd62cd0119f82684f6faf9">CJP::Enumeral</a></div><div class="ttdeci">const Providers Enumeral() override</div><div class="ttdoc">Read Only: The providers type name </div><div class="ttdef"><b>Definition:</b> CJP.cpp:76</div></div>
 <div class="ttc" id="class_c_j_p_html_a136d1c681be018ea2a22fa9f543f76ee"><div class="ttname"><a href="class_c_j_p.html#a136d1c681be018ea2a22fa9f543f76ee">CJP::SecureCache</a></div><div class="ttdeci">bool &amp; SecureCache()</div><div class="ttdoc">Read/Write: Populate the random cache with an unused value after each generation cycle ...</div><div class="ttdef"><b>Definition:</b> CJP.cpp:96</div></div>
-<div class="ttc" id="group___enumeration_html_ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><div class="ttname"><a href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a></div><div class="ttdeci">Providers</div><div class="ttdef"><b>Definition:</b> Documentation.h:299</div></div>
+<div class="ttc" id="group___enumeration_html_ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><div class="ttname"><a href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a></div><div class="ttdeci">Providers</div><div class="ttdef"><b>Definition:</b> Documentation.h:317</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

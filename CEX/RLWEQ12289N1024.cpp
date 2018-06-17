@@ -430,8 +430,8 @@ void RLWEQ12289N1024::Generate(std::vector<byte> &PublicKey, std::vector<byte> &
 	std::vector<byte> publicseed(RLWE_SEED_SIZE);
 	std::vector<byte>  noiseseed(RLWE_SEED_SIZE);
 
-	Rng->GetBytes(publicseed);
-	Rng->GetBytes(noiseseed);
+	Rng->Generate(publicseed);
+	Rng->Generate(noiseseed);
 
 	PolyUniform(ahat, publicseed);
 

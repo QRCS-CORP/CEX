@@ -62,11 +62,11 @@ namespace Test
 	{
 		Provider::CSP rng;
 		std::vector<byte> key(32);
-		rng.GetBytes(key);
+		rng.Generate(key);
 		std::vector<byte> iv(8);
-		rng.GetBytes(iv);
+		rng.Generate(iv);
 		std::vector<byte> data(10240);
-		rng.GetBytes(data);
+		rng.Generate(data);
 		std::vector<byte> enc(10240, 0);
 		std::vector<byte> dec(10240, 0);
 		std::vector<byte> enc2(10240, 0);

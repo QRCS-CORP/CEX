@@ -74,10 +74,10 @@ class MacStream
 {
 private:
 
-	std::unique_ptr<IMac> m_macEngine;
 	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
+	std::unique_ptr<IMac> m_macEngine;
 	size_t m_progressInterval;
 
 public:

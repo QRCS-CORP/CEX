@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/BlockCipherFromName.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/BlockCipherFromName.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -97,30 +97,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;CexDomain.h&quot;</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;CryptoException.h&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;IBlockCipher.h&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;NAMESPACE_HELPER</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">Enumeration::BlockCiphers</a>;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">using</span> Exception::CryptoException;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Enumeration::Digests</a>;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">using</span> Cipher::Symmetric::Block::IBlockCipher;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="class_block_cipher_from_name.html">   18</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_block_cipher_from_name.html">BlockCipherFromName</a></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;{</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_i_block_cipher.html">IBlockCipher</a>* <a class="code" href="class_block_cipher_from_name.html#afce566102143eb1a5a14643c37f6fbc3">GetInstance</a>(BlockCiphers BlockCipherType, Digests DigestType = Digests::SHA256);</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_i_block_cipher.html">IBlockCipher</a>* <a class="code" href="class_block_cipher_from_name.html#afce566102143eb1a5a14643c37f6fbc3">GetInstance</a>(BlockCiphers BlockCipherType, Digests DigestType, uint RoundCount);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;};</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;NAMESPACE_HELPEREND</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_i_block_cipher_html"><div class="ttname"><a href="class_i_block_cipher.html">IBlockCipher</a></div><div class="ttdoc">The Block Cipher Interface class </div><div class="ttdef"><b>Definition:</b> Documentation.h:169</div></div>
-<div class="ttc" id="class_block_cipher_from_name_html_afce566102143eb1a5a14643c37f6fbc3"><div class="ttname"><a href="class_block_cipher_from_name.html#afce566102143eb1a5a14643c37f6fbc3">BlockCipherFromName::GetInstance</a></div><div class="ttdeci">static IBlockCipher * GetInstance(BlockCiphers BlockCipherType, Digests DigestType=Digests::SHA256)</div><div class="ttdoc">Get a symmetric block cipher instance. </div><div class="ttdef"><b>Definition:</b> BlockCipherFromName.cpp:12</div></div>
-<div class="ttc" id="group___enumeration_html_gaa7f8226ec43fe26b57b18e6821c90ffd"><div class="ttname"><a href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a></div><div class="ttdeci">BlockCiphers</div><div class="ttdef"><b>Definition:</b> Documentation.h:287</div></div>
-<div class="ttc" id="class_block_cipher_from_name_html"><div class="ttname"><a href="class_block_cipher_from_name.html">BlockCipherFromName</a></div><div class="ttdoc">Get a Block Cipher instance from it&#39;s enumeration name. </div><div class="ttdef"><b>Definition:</b> BlockCipherFromName.h:18</div></div>
-<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:290</div></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;BlockCipherExtensions.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;NAMESPACE_HELPER</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">Enumeration::BlockCipherExtensions</a>;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">Enumeration::BlockCiphers</a>;</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">using</span> Exception::CryptoException;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">using</span> Cipher::Symmetric::Block::IBlockCipher;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="class_block_cipher_from_name.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_block_cipher_from_name.html">BlockCipherFromName</a></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_i_block_cipher.html">IBlockCipher</a>* <a class="code" href="class_block_cipher_from_name.html#a16d5d3d86f7959d96c082956d2c6a651">GetInstance</a>(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;};</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;NAMESPACE_HELPEREND</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="group___enumeration_html_ga0c1bf76428835ed873d6b250df55b6cd"><div class="ttname"><a href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a></div><div class="ttdeci">BlockCipherExtensions</div><div class="ttdef"><b>Definition:</b> Documentation.h:304</div></div>
+<div class="ttc" id="class_i_block_cipher_html"><div class="ttname"><a href="class_i_block_cipher.html">IBlockCipher</a></div><div class="ttdoc">The Block Cipher Interface class </div><div class="ttdef"><b>Definition:</b> Documentation.h:186</div></div>
+<div class="ttc" id="class_block_cipher_from_name_html_a16d5d3d86f7959d96c082956d2c6a651"><div class="ttname"><a href="class_block_cipher_from_name.html#a16d5d3d86f7959d96c082956d2c6a651">BlockCipherFromName::GetInstance</a></div><div class="ttdeci">static IBlockCipher * GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType=BlockCipherExtensions::None)</div><div class="ttdoc">Get a symmetric block cipher instance. </div><div class="ttdef"><b>Definition:</b> BlockCipherFromName.cpp:12</div></div>
+<div class="ttc" id="group___enumeration_html_gaa7f8226ec43fe26b57b18e6821c90ffd"><div class="ttname"><a href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a></div><div class="ttdeci">BlockCiphers</div><div class="ttdef"><b>Definition:</b> Documentation.h:305</div></div>
+<div class="ttc" id="class_block_cipher_from_name_html"><div class="ttname"><a href="class_block_cipher_from_name.html">BlockCipherFromName</a></div><div class="ttdoc">Get a Block Cipher instance from it&#39;s enumeration name. </div><div class="ttdef"><b>Definition:</b> BlockCipherFromName.h:19</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

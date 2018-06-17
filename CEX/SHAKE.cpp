@@ -8,17 +8,17 @@ const std::string SHAKE::CLASS_NAME("SHAKE");
 
 //~~~Constructor~~~//
 
-SHAKE::SHAKE(ShakeModes ShakeMode)
+SHAKE::SHAKE(ShakeModes ShakeModeType)
 	:
-	m_blockSize((ShakeMode == ShakeModes::SHAKE128) ? 168 : (ShakeMode == ShakeModes::SHAKE256) ? 136 : 72),
+	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_domainCode(SHAKE_DOMAIN),
-	m_hashSize((ShakeMode == ShakeModes::SHAKE128) ? 16 : (ShakeMode == ShakeModes::SHAKE256) ? 32 : 
-		(ShakeMode == ShakeModes::SHAKE512) ? 64 : 128),
+	m_hashSize((ShakeModeType == ShakeModes::SHAKE128) ? 16 : (ShakeModeType == ShakeModes::SHAKE256) ? 32 : 
+		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_kdfState(),
 	m_legalKeySizes(0),
-	m_shakeMode(ShakeMode != ShakeModes::None ? ShakeMode :
+	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
 		throw CryptoKdfException("SHAKE:Ctor", "The SHAKE mode type can not ne none!"))
 {
 	LoadState();

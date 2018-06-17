@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -107,7 +107,8 @@ Inheritance diagram for IMac:</div>
 <area href="class_c_m_a_c.html" title="An implementation of a symmetric Cipher based Message Authentication Code generator ..." alt="CMAC" shape="rect" coords="0,56,65,80"/>
 <area href="class_g_m_a_c.html" title="An implementation of a Galois/Counter Message Authentication Code generator " alt="GMAC" shape="rect" coords="75,56,140,80"/>
 <area href="class_h_m_a_c.html" title="An implementation of a Hash based Message Authentication Code generator " alt="HMAC" shape="rect" coords="150,56,215,80"/>
-<area href="class_poly1305.html" title="An implementation of the Poly1305 Message Authentication Code generator " alt="Poly1305" shape="rect" coords="225,56,290,80"/>
+<area href="class_k_m_a_c.html" title="An implementation of the Keccak based Message Authentication Code generator " alt="KMAC" shape="rect" coords="225,56,290,80"/>
+<area href="class_poly1305.html" title="An implementation of the Poly1305 Message Authentication Code generator " alt="Poly1305" shape="rect" coords="300,56,365,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -265,7 +266,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The Digests internal blocksize in bytes </p>
 
-<p>Implemented in <a class="el" href="class_poly1305.html#a12c68faf0a5ab7bfc472f866155a5818">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#ad8de02fdf57e1ee6526d27c84efd215a">CMAC</a>, <a class="el" href="class_g_m_a_c.html#ada51f49bf78269e0a82d9e5290f60cb2">GMAC</a>, and <a class="el" href="class_h_m_a_c.html#aca629df7790212269a2a14b071aaa9aa">HMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_poly1305.html#a12c68faf0a5ab7bfc472f866155a5818">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#ad8de02fdf57e1ee6526d27c84efd215a">CMAC</a>, <a class="el" href="class_g_m_a_c.html#ada51f49bf78269e0a82d9e5290f60cb2">GMAC</a>, <a class="el" href="class_h_m_a_c.html#aca629df7790212269a2a14b071aaa9aa">HMAC</a>, and <a class="el" href="class_k_m_a_c.html#afb977931261df53bccce39d965e4531a">KMAC</a>.</p>
 
 </div>
 </div>
@@ -310,7 +311,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_m_a_c.html#a8df21817266ef0f360e82d947365c9a6">HMAC</a>, <a class="el" href="class_poly1305.html#a1c6329cc261f6bdfba6e26e1c974e4bd">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#adb070bd1b721b080d098114b02205434">CMAC</a>, and <a class="el" href="class_g_m_a_c.html#a7bf6fc7fc63a549f90e226a859db8866">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_h_m_a_c.html#a8df21817266ef0f360e82d947365c9a6">HMAC</a>, <a class="el" href="class_poly1305.html#a1c6329cc261f6bdfba6e26e1c974e4bd">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#adb070bd1b721b080d098114b02205434">CMAC</a>, <a class="el" href="class_g_m_a_c.html#a7bf6fc7fc63a549f90e226a859db8866">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#afc5e07e96f2cd1824bfdf6da26d4cee3">KMAC</a>.</p>
 
 </div>
 </div>
@@ -337,7 +338,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The Mac generators type name </p>
 
-<p>Implemented in <a class="el" href="class_c_m_a_c.html#a7d931407681fafdbfdcc9db21630af5b">CMAC</a>, <a class="el" href="class_poly1305.html#a709eb9115ac4e156d43d6fab753680e5">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a416e6aed4be4d2a0347d6d861d336111">GMAC</a>, and <a class="el" href="class_h_m_a_c.html#aabffb72edf47e7acc4d7cabd83b3aba3">HMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_c_m_a_c.html#a7d931407681fafdbfdcc9db21630af5b">CMAC</a>, <a class="el" href="class_poly1305.html#a709eb9115ac4e156d43d6fab753680e5">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a416e6aed4be4d2a0347d6d861d336111">GMAC</a>, <a class="el" href="class_h_m_a_c.html#aabffb72edf47e7acc4d7cabd83b3aba3">HMAC</a>, and <a class="el" href="class_k_m_a_c.html#a3c80ca00fa303cd0a7ae22b15750fcc9">KMAC</a>.</p>
 
 </div>
 </div>
@@ -383,7 +384,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes processed</dd></dl>
 
-<p>Implemented in <a class="el" href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">HMAC</a>, <a class="el" href="class_poly1305.html#aad23ca206dbe3f188a3c1d571bb1be62">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#a115a4227c484d78746089753ed190d28">CMAC</a>, and <a class="el" href="class_g_m_a_c.html#a4803cf68cac990de07454568cbc4c53e">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">HMAC</a>, <a class="el" href="class_poly1305.html#aad23ca206dbe3f188a3c1d571bb1be62">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#a115a4227c484d78746089753ed190d28">CMAC</a>, <a class="el" href="class_g_m_a_c.html#a4803cf68cac990de07454568cbc4c53e">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#a5005107887cbd31b600bd6801944306a">KMAC</a>.</p>
 
 </div>
 </div>
@@ -418,7 +419,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">HMAC</a>, <a class="el" href="class_poly1305.html#aed3213c006585d2c1def4a24dd830207">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#a7d8f9fe1053702489ef49c105836b043">CMAC</a>, and <a class="el" href="class_g_m_a_c.html#a549d43d5b31f3373565628d7a07d619f">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_poly1305.html#aed3213c006585d2c1def4a24dd830207">Poly1305</a>, <a class="el" href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">HMAC</a>, <a class="el" href="class_c_m_a_c.html#a7d8f9fe1053702489ef49c105836b043">CMAC</a>, <a class="el" href="class_g_m_a_c.html#a549d43d5b31f3373565628d7a07d619f">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#a501867932ba99da2f805d8b97506e299">KMAC</a>.</p>
 
 </div>
 </div>
@@ -445,7 +446,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Mac is ready to digest data </p>
 
-<p>Implemented in <a class="el" href="class_c_m_a_c.html#a2959be3ad9e000e785040de93109a0d1">CMAC</a>, <a class="el" href="class_poly1305.html#a8093000137092b2ed2f3278ea38261b1">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a61bdb90ecd1ed35667e5281a23b04cc0">GMAC</a>, and <a class="el" href="class_h_m_a_c.html#adc9ffe014421a253677a8e8647e5152f">HMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_c_m_a_c.html#a2959be3ad9e000e785040de93109a0d1">CMAC</a>, <a class="el" href="class_poly1305.html#a8093000137092b2ed2f3278ea38261b1">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a61bdb90ecd1ed35667e5281a23b04cc0">GMAC</a>, <a class="el" href="class_h_m_a_c.html#adc9ffe014421a253677a8e8647e5152f">HMAC</a>, and <a class="el" href="class_k_m_a_c.html#abcd6fd347494b1abf461bdd4d381e346">KMAC</a>.</p>
 
 </div>
 </div>
@@ -472,7 +473,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Recommended Mac key sizes in a SymmetricKeySize array </p>
 
-<p>Implemented in <a class="el" href="class_c_m_a_c.html#a62fafe764a87d88c86d54299252527c0">CMAC</a>, <a class="el" href="class_poly1305.html#a3652006407a3906d74d1525df6696ca6">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a8144d1542d2aa83df32ce4b7ea3a961c">GMAC</a>, and <a class="el" href="class_h_m_a_c.html#af7e386c0e7474077d02dcfbeaf3845a2">HMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_c_m_a_c.html#a62fafe764a87d88c86d54299252527c0">CMAC</a>, <a class="el" href="class_poly1305.html#a3652006407a3906d74d1525df6696ca6">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a8144d1542d2aa83df32ce4b7ea3a961c">GMAC</a>, <a class="el" href="class_h_m_a_c.html#af7e386c0e7474077d02dcfbeaf3845a2">HMAC</a>, and <a class="el" href="class_k_m_a_c.html#ad2235e1372c661b296274dd0ad436625">KMAC</a>.</p>
 
 </div>
 </div>
@@ -499,7 +500,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Size of returned mac in bytes </p>
 
-<p>Implemented in <a class="el" href="class_c_m_a_c.html#a9a42810e7f0762a2ff086e3bf91739b8">CMAC</a>, <a class="el" href="class_poly1305.html#aeee2737bf4836d6a409d40a46c78adb9">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a4444348e527373506d861ce237e1881b">GMAC</a>, and <a class="el" href="class_h_m_a_c.html#aa565550cb7221edfc5bf089592bc75db">HMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_c_m_a_c.html#a9a42810e7f0762a2ff086e3bf91739b8">CMAC</a>, <a class="el" href="class_poly1305.html#aeee2737bf4836d6a409d40a46c78adb9">Poly1305</a>, <a class="el" href="class_g_m_a_c.html#a4444348e527373506d861ce237e1881b">GMAC</a>, <a class="el" href="class_h_m_a_c.html#aa565550cb7221edfc5bf089592bc75db">HMAC</a>, and <a class="el" href="class_k_m_a_c.html#a780b2efe173410520383a6d75250004d">KMAC</a>.</p>
 
 </div>
 </div>
@@ -526,7 +527,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Mac generators class name </p>
 
-<p>Implemented in <a class="el" href="class_c_m_a_c.html#a00866bfac9fe507bcb49cef5eb708fc8">CMAC</a>, <a class="el" href="class_poly1305.html#a18f95fc9a6ca8476afd249e6ed559ca4">Poly1305</a>, <a class="el" href="class_h_m_a_c.html#ab2ad10a2ac74f4d6dc0179247007bc9a">HMAC</a>, and <a class="el" href="class_g_m_a_c.html#ab10c9ee022fededc47334a62d59f8026">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_c_m_a_c.html#a00866bfac9fe507bcb49cef5eb708fc8">CMAC</a>, <a class="el" href="class_poly1305.html#a18f95fc9a6ca8476afd249e6ed559ca4">Poly1305</a>, <a class="el" href="class_h_m_a_c.html#ab2ad10a2ac74f4d6dc0179247007bc9a">HMAC</a>, <a class="el" href="class_g_m_a_c.html#ab10c9ee022fededc47334a62d59f8026">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#a481a1045aaa76e6265c9564958b05eb9">KMAC</a>.</p>
 
 </div>
 </div>
@@ -579,7 +580,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Reset to the default state; Mac code and buffer are zeroised, but key is still loaded </p>
 
-<p>Implemented in <a class="el" href="class_h_m_a_c.html#a4f04c3961229372027f8e37e45d960e9">HMAC</a>, <a class="el" href="class_poly1305.html#aa615d8508f51ddce76823eda2a376e33">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#aa9cf42dca35e0b6f3d9e8c58e38d2d69">CMAC</a>, and <a class="el" href="class_g_m_a_c.html#a820e5b27503d9324ce98df179535a08e">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_poly1305.html#aa615d8508f51ddce76823eda2a376e33">Poly1305</a>, <a class="el" href="class_h_m_a_c.html#a4f04c3961229372027f8e37e45d960e9">HMAC</a>, <a class="el" href="class_c_m_a_c.html#aa9cf42dca35e0b6f3d9e8c58e38d2d69">CMAC</a>, <a class="el" href="class_g_m_a_c.html#a820e5b27503d9324ce98df179535a08e">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#a27ed7db881c81ffc32b49b9486e47322">KMAC</a>.</p>
 
 </div>
 </div>
@@ -613,7 +614,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">HMAC</a>, <a class="el" href="class_poly1305.html#a67a53c36ef02e5bbafc99be349e6186b">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#ac9045512b64109bd6111318820dff997">CMAC</a>, and <a class="el" href="class_g_m_a_c.html#ad9d0e40e4406a527ed4a11735df47061">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_poly1305.html#a67a53c36ef02e5bbafc99be349e6186b">Poly1305</a>, <a class="el" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">HMAC</a>, <a class="el" href="class_c_m_a_c.html#ac9045512b64109bd6111318820dff997">CMAC</a>, <a class="el" href="class_g_m_a_c.html#ad9d0e40e4406a527ed4a11735df47061">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#abc867713bafa8f1040722aaeff8d0960">KMAC</a>.</p>
 
 </div>
 </div>
@@ -665,13 +666,13 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_m_a_c.html#ac231327530d351fc9209188cd96c9f89">HMAC</a>, <a class="el" href="class_poly1305.html#a6880f4a68f51c2239260e92cf0c17e4e">Poly1305</a>, <a class="el" href="class_c_m_a_c.html#a19d265080d95204061a75640a585a197">CMAC</a>, and <a class="el" href="class_g_m_a_c.html#addcbe64d63d775f6572058fe35da54f5">GMAC</a>.</p>
+<p>Implemented in <a class="el" href="class_poly1305.html#a6880f4a68f51c2239260e92cf0c17e4e">Poly1305</a>, <a class="el" href="class_h_m_a_c.html#ac231327530d351fc9209188cd96c9f89">HMAC</a>, <a class="el" href="class_c_m_a_c.html#a19d265080d95204061a75640a585a197">CMAC</a>, <a class="el" href="class_g_m_a_c.html#addcbe64d63d775f6572058fe35da54f5">GMAC</a>, and <a class="el" href="class_k_m_a_c.html#af143de0b09ea014e0a54067e9b5ef85d">KMAC</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_i_mac_8h_source.html">IMac.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_i_mac_8h_source.html">IMac.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

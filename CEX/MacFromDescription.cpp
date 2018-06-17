@@ -1,6 +1,9 @@
 #include "MacFromDescription.h"
 #include "CMAC.h"
 #include "HMAC.h"
+#include "GMAC.h"
+#include "KMAC.h"
+#include "Poly1305.h"
 
 NAMESPACE_HELPER
 
@@ -14,12 +17,27 @@ IMac* MacFromDescription::GetInstance(MacDescription &Description)
 		{
 			case Enumeration::Macs::CMAC:
 			{
-				macPtr = new Mac::CMAC(Description.EngineType());
+				macPtr = new Mac::CMAC(Description.CipherType(), Description.CipherExtension());
 				break;
 			}
 			case Enumeration::Macs::HMAC:
 			{
-				macPtr = new Mac::HMAC(Description.HmacEngine());
+				macPtr = new Mac::HMAC(Description.MacDigest());
+				break;
+			}
+			case Enumeration::Macs::GMAC:
+			{
+				macPtr = new Mac::GMAC(Description.CipherType(), Description.CipherExtension());
+				break;
+			}
+			case Enumeration::Macs::KMAC:
+			{
+				macPtr = new Mac::KMAC;
+				break;
+			}
+			case Enumeration::Macs::Poly1305:
+			{
+				macPtr = new Mac::Poly1305(Description.CipherType(), Description.CipherExtension());
 				break;
 			}
 			default:

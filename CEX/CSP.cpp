@@ -60,11 +60,11 @@ CSP::~CSP()
 
 //~~~Public Functions~~~//
 
-void CSP::GetBytes(std::vector<byte> &Output)
+void CSP::Generate(std::vector<byte> &Output)
 {
 	if (!m_isAvailable)
 	{
-		throw CryptoRandomException("CSP:GetBytes", "Random provider is not available!");
+		throw CryptoRandomException("CSP:Generate", "Random provider is not available!");
 	}
 
 	size_t prcLen = Output.size();
@@ -75,7 +75,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 	HCRYPTPROV hProvider = NULL;
 	if (!::CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
 	{
-		throw CryptoRandomException("CSP:GetBytes", "Call to CryptAcquireContext failed; random provider is not available!");
+		throw CryptoRandomException("CSP:Generate", "Call to CryptAcquireContext failed; random provider is not available!");
 	}
 
 	if (hProvider != NULL)
@@ -85,7 +85,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 		{
 			::CryptReleaseContext(hProvider, 0);
 			hProvider = NULL;
-			throw CryptoRandomException("CSP:GetBytes", "Call to CryptGenRandom failed; random provider is not available!");
+			throw CryptoRandomException("CSP:Generate", "Call to CryptGenRandom failed; random provider is not available!");
 		}
 	}
 
@@ -111,7 +111,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 	}
 	catch (std::exception&)
 	{
-		throw CryptoRandomException("CSP:GetBytes", "Call to arc4random failed; random provider is not available!");
+		throw CryptoRandomException("CSP:Generate", "Call to arc4random failed; random provider is not available!");
 	}
 
 #else
@@ -120,7 +120,7 @@ void CSP::GetBytes(std::vector<byte> &Output)
 
 	if (fdHandle <= 0)
 	{
-		throw CryptoRandomException("CSP:GetBytes", "System RNG failed to open RNG device!");
+		throw CryptoRandomException("CSP:Generate", "System RNG failed to open RNG device!");
 	}
 
 	do
@@ -135,12 +135,12 @@ void CSP::GetBytes(std::vector<byte> &Output)
 			}
 			else
 			{
-				throw CryptoRandomException("CSP:GetBytes", "System RNG read failed error!");
+				throw CryptoRandomException("CSP:Generate", "System RNG read failed error!");
 			}
 		}
 		else if (rndLen == 0)
 		{
-			throw CryptoRandomException("CSP:GetBytes", "System RNG EOF on device!");
+			throw CryptoRandomException("CSP:Generate", "System RNG EOF on device!");
 		}
 
 		prcOffset += rndLen;
@@ -157,31 +157,45 @@ void CSP::GetBytes(std::vector<byte> &Output)
 #endif
 }
 
-void CSP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd);
+	Generate(rnd);
 	Utility::MemUtils::Copy(rnd, 0, Output, Offset, rnd.size());
 }
 
-std::vector<byte> CSP::GetBytes(size_t Length)
+std::vector<byte> CSP::Generate(size_t Length)
 {
 	std::vector<byte> data(Length);
-	GetBytes(data);
+	Generate(data);
 
 	return data;
 }
 
-uint CSP::Next()
+ushort CSP::NextUInt16()
 {
-	uint rndNum = 0;
-	std::vector<byte> rndData(sizeof(uint));
-	GetBytes(rndData);
-	Utility::MemUtils::CopyToValue(rndData, 0, rndNum, sizeof(uint));
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
-	return rndNum;
+	return x;
+}
+
+uint CSP::NextUInt32()
+{
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+
+	return x;
+}
+
+ulong CSP::NextUInt64()
+{
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+
+	return x;
 }
 
 void CSP::Reset()

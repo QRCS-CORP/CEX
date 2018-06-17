@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -120,9 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5f546b1158a30108acbd24b038ea6e35"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_c_b.html#a5f546b1158a30108acbd24b038ea6e35">OCB</a> ()=delete</td></tr>
 <tr class="memdesc:a5f546b1158a30108acbd24b038ea6e35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#a5f546b1158a30108acbd24b038ea6e35">More...</a><br /></td></tr>
 <tr class="separator:a5f546b1158a30108acbd24b038ea6e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b9f2577bcd8d1e2454e84b1697c410b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_c_b.html#a5b9f2577bcd8d1e2454e84b1697c410b">OCB</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_o_c_b.html#afd829803c32eb77aee606ad892081794">CipherType</a>)</td></tr>
-<tr class="memdesc:a5b9f2577bcd8d1e2454e84b1697c410b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#a5b9f2577bcd8d1e2454e84b1697c410b">More...</a><br /></td></tr>
-<tr class="separator:a5b9f2577bcd8d1e2454e84b1697c410b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3470b4aea0a1a8a34780d3ca660b6a1a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_c_b.html#a3470b4aea0a1a8a34780d3ca660b6a1a">OCB</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_o_c_b.html#afd829803c32eb77aee606ad892081794">CipherType</a>, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None)</td></tr>
+<tr class="memdesc:a3470b4aea0a1a8a34780d3ca660b6a1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#a3470b4aea0a1a8a34780d3ca660b6a1a">More...</a><br /></td></tr>
+<tr class="separator:a3470b4aea0a1a8a34780d3ca660b6a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9056aa777b1328aa340e67b1beed24ba"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_c_b.html#a9056aa777b1328aa340e67b1beed24ba">OCB</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher)</td></tr>
 <tr class="memdesc:a9056aa777b1328aa340e67b1beed24ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher instance  <a href="#a9056aa777b1328aa340e67b1beed24ba">More...</a><br /></td></tr>
 <tr class="separator:a9056aa777b1328aa340e67b1beed24ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -356,7 +356,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 
 </div>
 </div>
-<a class="anchor" id="a5b9f2577bcd8d1e2454e84b1697c410b"></a>
+<a class="anchor" id="a3470b4aea0a1a8a34780d3ca660b6a1a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -367,8 +367,18 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
           <td class="memname">OCB::OCB </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em></td><td>)</td>
+          <td class="paramname"><em>CipherType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -382,6 +392,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherType</td><td>The formal enumeration name of a block cipher</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
   </table>
   </dd>
 </dl>
@@ -1474,9 +1485,9 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_o_c_b_8h_source.html">OCB.h</a></li>
-<li>CEX/OCB.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_o_c_b_8h_source.html">OCB.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/OCB.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

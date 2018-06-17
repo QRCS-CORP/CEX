@@ -2,28 +2,20 @@
 #define CEX_MACDESCRIPTION_H
 
 #include "CexDomain.h"
+#include "BlockCipherExtensions.h"
 #include "BlockCiphers.h"
-#include "BlockSizes.h"
-#include "CipherModes.h"
 #include "Digests.h"
-#include "IVSizes.h"
-#include "KeySizes.h"
 #include "Macs.h"
 #include "MemoryStream.h"
-#include "PaddingModes.h"
-#include "RoundCounts.h"
+
 
 NAMESPACE_PROCESSING
 
+using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
-using Enumeration::BlockSizes;
-using Enumeration::CipherModes;
 using Enumeration::Digests;
-using Enumeration::IVSizes;
-using Enumeration::KeySizes;
 using Enumeration::Macs;
-using Enumeration::PaddingModes;
-using Enumeration::RoundCounts;
+
 using IO::MemoryStream;
 
 /// <summary>
@@ -35,25 +27,19 @@ using IO::MemoryStream;
 /// <example>
 /// <description>Populating a MacDescription for an Hmac:</description>
 /// <code>
-///    MacDescription md(
-///        Digests.SHA512,	// hmac engine
-///        128);			// key size in bytes
+///    MacDescription md(Macs::HMAC, Digests.SHA512);			// key size in bytes
 /// </code>
 /// </example>
 class MacDescription
 {
 private:
 
-	static const uint MACHDR_SIZE = 9;
+	static const uint MACHDR_SIZE = 4;
 
 	byte m_macType;
-	short m_keySize;
-	byte m_ivSize;
-	byte m_hmacEngine;
-	byte m_engineType;
-	byte m_blockSize;
-	byte m_roundCount;
-	byte m_kdfEngine;
+	byte m_macDigest;
+	byte m_blockCipher;
+	byte m_cipherExtension;
 
 public:
 
@@ -70,40 +56,21 @@ public:
 	MacDescription();
 
 	/// <summary>
-	/// Initialize the structure with parameters for any supported type of Mac generator
+	/// Initialize the structure with parameters for a block-cipher based generator
 	/// </summary>
 	/// 
-	/// <param name="MacType">The type of Mac generator; Cmac, Hmac, or Vmac</param>
-	/// <param name="KeySize">The mac/cipher key size in bytes</param>
-	/// <param name="IvSize">Size of the Mac Initialization Vector</param>
-	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
-	/// <param name="EngineType">The symmetric block cipher Engine type</param>
-	/// <param name="BlockSize">The cipher Block Size</param>
-	/// <param name="RoundCount">The number of transformation Rounds</param>
-	/// <param name="DigestType">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine = Digests::SHA512, BlockCiphers EngineType = BlockCiphers::RHX,
-		BlockSizes BlockSize = BlockSizes::B128, RoundCounts RoundCount = RoundCounts::R14, Digests DigestType = Digests::SHA512);
+	/// <param name="MacType">The type of Mac generator</param>
+	/// <param name="CipherType">The symmetric block cipher Engine type</param>
+	/// <param name="CipherExtensionType">The KDF used in exdtended HX ciphers</param>
+	MacDescription(Macs MacType, BlockCiphers CipherType = BlockCiphers::RHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
-	/// Initialize the structure with parameters for an HMAC generator
+	/// Initialize the structure with parameters for a hash based generator
 	/// </summary>
 	/// 
-	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="HmacEngine">The Digest engine used in the Hmac</param>
-	MacDescription(uint KeySize, Digests HmacEngine);
-
-	/// <summary>
-	/// Initialize the structure with parameters for an CMAC generator
-	/// </summary>
-	/// 
-	/// <param name="KeySize">The Mac key size in bytes</param>
-	/// <param name="EngineType">The symmetric block cipher Engine type</param>
-	/// <param name="IvSize">Size of the cipher Initialization Vector</param>
-	/// <param name="BlockSize">The cipher Block Size</param>
-	/// <param name="RoundCount">The number of transformation Rounds</param>
-	/// <param name="DigestType">The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers</param>
-	MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize = BlockSizes::B128,
-		RoundCounts RoundCount = RoundCounts::R14, Digests DigestType = Digests::SHA512);
+	/// <param name="MacType">The type of Mac generator</param>
+	/// <param name="MacDigestType">The hash-digest used by the Mac</param>
+	MacDescription(Macs MacType, Digests MacDigestType);
 
 	/// <summary>
 	/// Initialize the MacDescription structure using a serialized mac description stream
@@ -122,61 +89,24 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The cipher internal Block Size
+	/// Read Only: The block-cipher extension type
 	/// </summary>
-	const BlockSizes BlockSize();
+	const BlockCipherExtensions CipherExtension();
 
 	/// <summary>
-	/// Read Only: The symmetric block cipher Engine type
+	/// Read Only: The symmetric block-cipher type
 	/// </summary>
-	const BlockCiphers EngineType();
+	const BlockCiphers CipherType();
 
 	/// <summary>
-	/// Read Only: The HMAC Digest engine used to authenticate a message file encrypted with this key
+	/// Read Only: The MAC digest type
 	/// </summary>
-	const Digests HmacEngine();
+	const Digests MacDigest();
 
 	/// <summary>
-	/// Read Only: Size of the cipher Initialization Vector
-	/// </summary>
-	const IVSizes IvSize();
-
-	/// <summary>
-	/// Read Only: The Digest engine used to power the key schedule Key Derivation Function in HX and M series ciphers
-	/// </summary>
-	const Digests KdfEngine();
-
-	/// <summary>
-	/// Read Only: The cipher Key Size
-	/// </summary>
-	const short KeySize();
-
-	/// <summary>
-	/// Read Only: The type of Mac engine to use; CMac, Hmac, or Vmac.
+	/// Read Only: The Mac configuration type
 	/// </summary>
 	const Macs MacType();
-
-	/// <summary>
-	/// Read Only: The number of cipher transformation Rounds
-	/// </summary>
-	const RoundCounts RoundCount();
-
-	//~~~Presets~~~//
-
-	/// <summary>
-	/// An HMAC SHA-256 preset
-	/// </summary>
-	static MacDescription HMACSHA256();
-
-	/// <summary>
-	/// An HMAC SHA-512 preset
-	/// </summary>
-	static MacDescription HMACSHA512();
-
-	/// <summary>
-	/// An CMAC AES-256 preset
-	/// </summary>
-	static MacDescription CMACAES256();
 
 	//~~~Public Functions~~~//
 

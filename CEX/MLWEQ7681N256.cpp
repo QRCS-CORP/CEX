@@ -184,8 +184,8 @@ void MLWEQ7681N256::Generate(std::vector<byte> &PublicKey, std::vector<byte> &Pr
 	size_t eta;
 	size_t i;
 
-	Rng->GetBytes(seed);
-	Rng->GetBytes(noise);
+	Rng->Generate(seed);
+	Rng->Generate(noise);
 
 	GenerateMatrix(a, seed, false);
 
@@ -284,7 +284,7 @@ void MLWEQ7681N256::GenerateMatrix(std::vector<std::vector<std::array<ushort, ML
 void MLWEQ7681N256::GetNoise(std::array<ushort, MLWE_N> &R, size_t Eta, std::unique_ptr<Prng::IPrng> &Rng)
 {
 	std::vector<byte> buf((Eta * MLWE_N) / 4);
-	Rng->GetBytes(buf);
+	Rng->Generate(buf);
 
 	Cbd(R, buf, Eta);
 }

@@ -177,7 +177,6 @@ size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	CexAssert(m_isInitialized, "The generator must be initialized before use!");
 	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-	//CexAssert(Length <= MAX_REQUEST, "The maximum request size is 32768 bytes!");
 
 	GenerateBlock(Output, OutOffset, Length);
 
@@ -255,7 +254,7 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 		throw CryptoGeneratorException("HCG:Initialize", "Nonce size is invalid! Check the NonceSize property for accepted value.");
 	}
 
-	// added: nonce becomes the initial state counter value
+	// nonce becomes the initial state counter value
 	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 	Initialize(Seed);
 }
@@ -348,7 +347,7 @@ void HCG::Derive(const std::vector<byte> &Seed)
 	// 7) generate the states initial entropy
 	if (m_prdResistant)
 	{
-		m_providerSource->GetBytes(m_hmacState);
+		m_providerSource->Generate(m_hmacState);
 	}
 }
 
@@ -421,7 +420,7 @@ void HCG::RandomPad(size_t BlockOffset)
 	// adjust for finalizer code (Merkle–Damgård constructions)
 	padLen -= Helper::DigestFromName::GetPaddingSize(m_digestType);
 	std::vector<byte> tmpV(padLen);
-	m_providerSource->GetBytes(tmpV);
+	m_providerSource->Generate(tmpV);
 	// digest processes full blocks by padding with entropy from provider
 	m_hmacEngine.Update(tmpV, 0, tmpV.size());
 }

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/MacDescription.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/MacDescription.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -95,139 +95,94 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define CEX_MACDESCRIPTION_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;CexDomain.h&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;BlockCiphers.h&quot;</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;BlockSizes.h&quot;</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;CipherModes.h&quot;</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;Digests.h&quot;</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;IVSizes.h&quot;</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;KeySizes.h&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;Macs.h&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;MemoryStream.h&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;PaddingModes.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;RoundCounts.h&quot;</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;NAMESPACE_PROCESSING</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">Enumeration::BlockCiphers</a>;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga0b719e8975de3f49f23188044fc4856f">Enumeration::BlockSizes</a>;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga1d4ccc36db403dcb914cd7c4bac557a1">Enumeration::CipherModes</a>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Enumeration::Digests</a>;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga5ab637dfadac08fd2e5fe52510ab7050">Enumeration::IVSizes</a>;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gad5a44f29b2761cedc42be229ee8709ad">Enumeration::KeySizes</a>;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Enumeration::Macs</a>;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga2da315b4e41c3a75fd478a5d60c4d685">Enumeration::PaddingModes</a>;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447">Enumeration::RoundCounts</a>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">using</span> IO::MemoryStream;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">class </span><a class="code" href="class_mac_description.html">MacDescription</a></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint MACHDR_SIZE = 9;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    byte m_macType;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">short</span> m_keySize;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    byte m_ivSize;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    byte m_hmacEngine;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    byte m_engineType;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    byte m_blockSize;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    byte m_roundCount;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    byte m_kdfEngine;</div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;BlockCipherExtensions.h&quot;</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#include &quot;BlockCiphers.h&quot;</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#include &quot;Digests.h&quot;</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;Macs.h&quot;</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;MemoryStream.h&quot;</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;NAMESPACE_PROCESSING</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">Enumeration::BlockCipherExtensions</a>;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">Enumeration::BlockCiphers</a>;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Enumeration::Digests</a>;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Enumeration::Macs</a>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">using</span> IO::MemoryStream;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">class </span><a class="code" href="class_mac_description.html">MacDescription</a></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;{</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint MACHDR_SIZE = 4;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    byte m_macType;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    byte m_macDigest;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    byte m_blockCipher;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    byte m_cipherExtension;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="comment">//~~~Constructor~~~//</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <a class="code" href="class_mac_description.html">MacDescription</a>&amp; <a class="code" href="class_mac_description.html#ab0b06a0320d830c051dea8fac6e3be2f">operator=</a>(<span class="keyword">const</span> <a class="code" href="class_mac_description.html">MacDescription</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>();</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">//~~~Constructor~~~//</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="class_mac_description.html">MacDescription</a>&amp; <a class="code" href="class_mac_description.html#ab0b06a0320d830c051dea8fac6e3be2f">operator=</a>(<span class="keyword">const</span> <a class="code" href="class_mac_description.html">MacDescription</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacType</a>, BlockCiphers <a class="code" href="class_mac_description.html#a037e6cf945fd6b28accc885c06d05cd2">CipherType</a> = BlockCiphers::RHX, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>();</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacType</a>, <span class="keywordtype">short</span> <a class="code" href="class_mac_description.html#a608c2952990f32547104fbdb9f70efc5">KeySize</a>, byte <a class="code" href="class_mac_description.html#a8633d66f5ebe3e044e76ff96a26cd9e6">IvSize</a>, Digests <a class="code" href="class_mac_description.html#a15dbe98c636f0c9b0dfee84388b827f3">HmacEngine</a> = Digests::SHA512, BlockCiphers <a class="code" href="class_mac_description.html#a43bff16a2b3541b3e608493ebed75679">EngineType</a> = BlockCiphers::RHX,</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        BlockSizes <a class="code" href="class_mac_description.html#af91ebad4c9a9c264ccd2feff07823bcd">BlockSize</a> = BlockSizes::B128, <a class="code" href="group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447">RoundCounts</a> <a class="code" href="class_mac_description.html#ad674b3c57cb2f02d5f0dea692e40e117">RoundCount</a> = <a class="code" href="group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a05e151e78b54177fc4d64d35b94429bf">RoundCounts::R14</a>, Digests DigestType = Digests::SHA512);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(uint <a class="code" href="class_mac_description.html#a608c2952990f32547104fbdb9f70efc5">KeySize</a>, Digests <a class="code" href="class_mac_description.html#a15dbe98c636f0c9b0dfee84388b827f3">HmacEngine</a>);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<span class="keywordtype">short</span> <a class="code" href="class_mac_description.html#a608c2952990f32547104fbdb9f70efc5">KeySize</a>, BlockCiphers <a class="code" href="class_mac_description.html#a43bff16a2b3541b3e608493ebed75679">EngineType</a>, <a class="code" href="group___enumeration.html#ga5ab637dfadac08fd2e5fe52510ab7050">IVSizes</a> <a class="code" href="class_mac_description.html#a8633d66f5ebe3e044e76ff96a26cd9e6">IvSize</a>, BlockSizes <a class="code" href="class_mac_description.html#af91ebad4c9a9c264ccd2feff07823bcd">BlockSize</a> = BlockSizes::B128,</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <a class="code" href="group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447">RoundCounts</a> <a class="code" href="class_mac_description.html#ad674b3c57cb2f02d5f0dea692e40e117">RoundCount</a> = <a class="code" href="group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a05e151e78b54177fc4d64d35b94429bf">RoundCounts::R14</a>, Digests DigestType = Digests::SHA512);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<span class="keyword">const</span> <a class="code" href="class_memory_stream.html">MemoryStream</a> &amp;DescriptionStream);</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;DescriptionArray);</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacType</a>, Digests MacDigestType);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<span class="keyword">const</span> <a class="code" href="class_memory_stream.html">MemoryStream</a> &amp;DescriptionStream);</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;DescriptionArray);</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">//~~~Accessors~~~//</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">const</span> BlockCipherExtensions <a class="code" href="class_mac_description.html#a33cdb83298407c808fbf837e3351dbbc">CipherExtension</a>();</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">const</span> BlockCiphers <a class="code" href="class_mac_description.html#a037e6cf945fd6b28accc885c06d05cd2">CipherType</a>();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="keyword">const</span> Digests <a class="code" href="class_mac_description.html#a53308fd472084b8ee76227698f6bebf5">MacDigest</a>();</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keyword">const</span> <a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacType</a>();</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_mac_description.html#a51187ef64f41ce08a34c88d6f1de5247">Equals</a>(<a class="code" href="class_mac_description.html">MacDescription</a> &amp;Input);</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">//~~~Accessors~~~//</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keyword">const</span> BlockSizes <a class="code" href="class_mac_description.html#af91ebad4c9a9c264ccd2feff07823bcd">BlockSize</a>();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="class_mac_description.html#a888f44752179b1605c7ba812e2426c6c">GetHashCode</a>();</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">const</span> BlockCiphers <a class="code" href="class_mac_description.html#a43bff16a2b3541b3e608493ebed75679">EngineType</a>();</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keyword">const</span> Digests <a class="code" href="class_mac_description.html#a15dbe98c636f0c9b0dfee84388b827f3">HmacEngine</a>();</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keyword">const</span> <a class="code" href="group___enumeration.html#ga5ab637dfadac08fd2e5fe52510ab7050">IVSizes</a> <a class="code" href="class_mac_description.html#a8633d66f5ebe3e044e76ff96a26cd9e6">IvSize</a>();</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keyword">const</span> Digests <a class="code" href="class_mac_description.html#ad9f774e510e0d98db1062249e8cb5529">KdfEngine</a>();</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">short</span> <a class="code" href="class_mac_description.html#a608c2952990f32547104fbdb9f70efc5">KeySize</a>();</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">const</span> <a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacType</a>();</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">const</span> <a class="code" href="group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447">RoundCounts</a> <a class="code" href="class_mac_description.html#ad674b3c57cb2f02d5f0dea692e40e117">RoundCount</a>();</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="comment">//~~~Presets~~~//</span></div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_mac_description.html">MacDescription</a> <a class="code" href="class_mac_description.html#a2ad0a0a6a4d63ff3b4541e2653f84bd2">HMACSHA256</a>();</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_mac_description.html">MacDescription</a> <a class="code" href="class_mac_description.html#a8c42289ed0ada382e1ac2e90cdf3b22a">HMACSHA512</a>();</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keyword">static</span> <a class="code" href="class_mac_description.html">MacDescription</a> <a class="code" href="class_mac_description.html#a4902890af2952e7af2babc49ebe8cec4">CMACAES256</a>();</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_mac_description.html#a51187ef64f41ce08a34c88d6f1de5247">Equals</a>(<a class="code" href="class_mac_description.html">MacDescription</a> &amp;Input);</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="class_mac_description.html#a888f44752179b1605c7ba812e2426c6c">GetHashCode</a>();</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="class_mac_description.html#a29e214b172f4acef86795d689c574beb">GetHeaderSize</a>();</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_mac_description.html#a555231500a24334ce05d32fbf830e9e6">Reset</a>();</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_mac_description.html#a4d652ff4d62ea5c4e1436c759c6acc7d">ToBytes</a>();</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <a class="code" href="class_memory_stream.html">MemoryStream</a>* <a class="code" href="class_mac_description.html#a0c5c816ef7b809d0385cabccff57ec70">ToStream</a>();</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;};</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;NAMESPACE_PROCESSINGEND</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="group___enumeration_html_ga1d4ccc36db403dcb914cd7c4bac557a1"><div class="ttname"><a href="group___enumeration.html#ga1d4ccc36db403dcb914cd7c4bac557a1">CipherModes</a></div><div class="ttdeci">CipherModes</div><div class="ttdef"><b>Definition:</b> Documentation.h:289</div></div>
-<div class="ttc" id="group___enumeration_html_gad5a44f29b2761cedc42be229ee8709ad"><div class="ttname"><a href="group___enumeration.html#gad5a44f29b2761cedc42be229ee8709ad">KeySizes</a></div><div class="ttdeci">KeySizes</div><div class="ttdef"><b>Definition:</b> Documentation.h:294</div></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code" href="class_mac_description.html#a29e214b172f4acef86795d689c574beb">GetHeaderSize</a>();</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_mac_description.html#a555231500a24334ce05d32fbf830e9e6">Reset</a>();</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_mac_description.html#a4d652ff4d62ea5c4e1436c759c6acc7d">ToBytes</a>();</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <a class="code" href="class_memory_stream.html">MemoryStream</a>* <a class="code" href="class_mac_description.html#a0c5c816ef7b809d0385cabccff57ec70">ToStream</a>();</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;};</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;NAMESPACE_PROCESSINGEND</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="class_mac_description_html_ab0b06a0320d830c051dea8fac6e3be2f"><div class="ttname"><a href="class_mac_description.html#ab0b06a0320d830c051dea8fac6e3be2f">MacDescription::operator=</a></div><div class="ttdeci">MacDescription &amp; operator=(const MacDescription &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
-<div class="ttc" id="class_mac_description_html_a8633d66f5ebe3e044e76ff96a26cd9e6"><div class="ttname"><a href="class_mac_description.html#a8633d66f5ebe3e044e76ff96a26cd9e6">MacDescription::IvSize</a></div><div class="ttdeci">const IVSizes IvSize()</div><div class="ttdoc">Read Only: Size of the cipher Initialization Vector </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:105</div></div>
-<div class="ttc" id="group___enumeration_html_ga0b719e8975de3f49f23188044fc4856f"><div class="ttname"><a href="group___enumeration.html#ga0b719e8975de3f49f23188044fc4856f">BlockSizes</a></div><div class="ttdeci">BlockSizes</div><div class="ttdef"><b>Definition:</b> Documentation.h:288</div></div>
-<div class="ttc" id="class_mac_description_html"><div class="ttname"><a href="class_mac_description.html">MacDescription</a></div><div class="ttdoc">The MacDescription structure. </div><div class="ttdef"><b>Definition:</b> Documentation.h:473</div></div>
-<div class="ttc" id="class_mac_description_html_a4902890af2952e7af2babc49ebe8cec4"><div class="ttname"><a href="class_mac_description.html#a4902890af2952e7af2babc49ebe8cec4">MacDescription::CMACAES256</a></div><div class="ttdeci">static MacDescription CMACAES256()</div><div class="ttdoc">An CMAC AES-256 preset </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:142</div></div>
-<div class="ttc" id="class_mac_description_html_a608c2952990f32547104fbdb9f70efc5"><div class="ttname"><a href="class_mac_description.html#a608c2952990f32547104fbdb9f70efc5">MacDescription::KeySize</a></div><div class="ttdeci">const short KeySize()</div><div class="ttdoc">Read Only: The cipher Key Size </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:115</div></div>
-<div class="ttc" id="class_mac_description_html_af91ebad4c9a9c264ccd2feff07823bcd"><div class="ttname"><a href="class_mac_description.html#af91ebad4c9a9c264ccd2feff07823bcd">MacDescription::BlockSize</a></div><div class="ttdeci">const BlockSizes BlockSize()</div><div class="ttdoc">Read Only: The cipher internal Block Size </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:90</div></div>
+<div class="ttc" id="class_mac_description_html"><div class="ttname"><a href="class_mac_description.html">MacDescription</a></div><div class="ttdoc">The MacDescription structure. </div><div class="ttdef"><b>Definition:</b> Documentation.h:492</div></div>
+<div class="ttc" id="group___enumeration_html_ga0c1bf76428835ed873d6b250df55b6cd"><div class="ttname"><a href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a></div><div class="ttdeci">BlockCipherExtensions</div><div class="ttdef"><b>Definition:</b> Documentation.h:304</div></div>
 <div class="ttc" id="class_mac_description_html_aee392035210bf747de8eb676daaf10a8"><div class="ttname"><a href="class_mac_description.html#aee392035210bf747de8eb676daaf10a8">MacDescription::MacDescription</a></div><div class="ttdeci">MacDescription()</div><div class="ttdoc">Default constructor </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:9</div></div>
-<div class="ttc" id="class_mac_description_html_a4d652ff4d62ea5c4e1436c759c6acc7d"><div class="ttname"><a href="class_mac_description.html#a4d652ff4d62ea5c4e1436c759c6acc7d">MacDescription::ToBytes</a></div><div class="ttdeci">std::vector&lt; byte &gt; ToBytes()</div><div class="ttdoc">Convert the MacDescription structure as a byte array </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:185</div></div>
-<div class="ttc" id="group___enumeration_html_ga5ab637dfadac08fd2e5fe52510ab7050"><div class="ttname"><a href="group___enumeration.html#ga5ab637dfadac08fd2e5fe52510ab7050">IVSizes</a></div><div class="ttdeci">IVSizes</div><div class="ttdef"><b>Definition:</b> Documentation.h:292</div></div>
-<div class="ttc" id="class_mac_description_html_a29e214b172f4acef86795d689c574beb"><div class="ttname"><a href="class_mac_description.html#a29e214b172f4acef86795d689c574beb">MacDescription::GetHeaderSize</a></div><div class="ttdeci">static int GetHeaderSize()</div><div class="ttdoc">Get the header size in bytes </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:147</div></div>
-<div class="ttc" id="class_mac_description_html_a555231500a24334ce05d32fbf830e9e6"><div class="ttname"><a href="class_mac_description.html#a555231500a24334ce05d32fbf830e9e6">MacDescription::Reset</a></div><div class="ttdeci">void Reset()</div><div class="ttdoc">Reset all struct members </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:173</div></div>
-<div class="ttc" id="class_mac_description_html_a2ad0a0a6a4d63ff3b4541e2653f84bd2"><div class="ttname"><a href="class_mac_description.html#a2ad0a0a6a4d63ff3b4541e2653f84bd2">MacDescription::HMACSHA256</a></div><div class="ttdeci">static MacDescription HMACSHA256()</div><div class="ttdoc">An HMAC SHA-256 preset </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:132</div></div>
-<div class="ttc" id="class_mac_description_html_ad674b3c57cb2f02d5f0dea692e40e117"><div class="ttname"><a href="class_mac_description.html#ad674b3c57cb2f02d5f0dea692e40e117">MacDescription::RoundCount</a></div><div class="ttdeci">const RoundCounts RoundCount()</div><div class="ttdoc">Read Only: The number of cipher transformation Rounds </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:125</div></div>
-<div class="ttc" id="class_memory_stream_html"><div class="ttname"><a href="class_memory_stream.html">MemoryStream</a></div><div class="ttdoc">A memory stream container. </div><div class="ttdef"><b>Definition:</b> Documentation.h:358</div></div>
-<div class="ttc" id="class_mac_description_html_a15dbe98c636f0c9b0dfee84388b827f3"><div class="ttname"><a href="class_mac_description.html#a15dbe98c636f0c9b0dfee84388b827f3">MacDescription::HmacEngine</a></div><div class="ttdeci">const Digests HmacEngine()</div><div class="ttdoc">Read Only: The HMAC Digest engine used to authenticate a message file encrypted with this key ...</div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:100</div></div>
-<div class="ttc" id="class_mac_description_html_a766739b0ad39417557dcefd812459a91"><div class="ttname"><a href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacDescription::MacType</a></div><div class="ttdeci">const Macs MacType()</div><div class="ttdoc">Read Only: The type of Mac engine to use; CMac, Hmac, or Vmac. </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:120</div></div>
-<div class="ttc" id="class_mac_description_html_a51187ef64f41ce08a34c88d6f1de5247"><div class="ttname"><a href="class_mac_description.html#a51187ef64f41ce08a34c88d6f1de5247">MacDescription::Equals</a></div><div class="ttdeci">bool Equals(MacDescription &amp;Input)</div><div class="ttdoc">Compare this object instance with another </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:154</div></div>
-<div class="ttc" id="group___enumeration_html_ggad57696fdbcdac43c18f9ba4dada98447a05e151e78b54177fc4d64d35b94429bf"><div class="ttname"><a href="group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a05e151e78b54177fc4d64d35b94429bf">RoundCounts::R14</a></div><div class="ttdoc">14 Rounds: ChaCha20, RHX </div></div>
-<div class="ttc" id="group___enumeration_html_gad1c1c84ec8d7f4f165d4973062130aa3"><div class="ttname"><a href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a></div><div class="ttdeci">Macs</div><div class="ttdef"><b>Definition:</b> Documentation.h:295</div></div>
-<div class="ttc" id="class_mac_description_html_a888f44752179b1605c7ba812e2426c6c"><div class="ttname"><a href="class_mac_description.html#a888f44752179b1605c7ba812e2426c6c">MacDescription::GetHashCode</a></div><div class="ttdeci">int GetHashCode()</div><div class="ttdoc">Get the hash code for this object </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:159</div></div>
-<div class="ttc" id="group___enumeration_html_ga2da315b4e41c3a75fd478a5d60c4d685"><div class="ttname"><a href="group___enumeration.html#ga2da315b4e41c3a75fd478a5d60c4d685">PaddingModes</a></div><div class="ttdeci">PaddingModes</div><div class="ttdef"><b>Definition:</b> Documentation.h:297</div></div>
-<div class="ttc" id="group___enumeration_html_gaa7f8226ec43fe26b57b18e6821c90ffd"><div class="ttname"><a href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a></div><div class="ttdeci">BlockCiphers</div><div class="ttdef"><b>Definition:</b> Documentation.h:287</div></div>
-<div class="ttc" id="class_mac_description_html_a43bff16a2b3541b3e608493ebed75679"><div class="ttname"><a href="class_mac_description.html#a43bff16a2b3541b3e608493ebed75679">MacDescription::EngineType</a></div><div class="ttdeci">const BlockCiphers EngineType()</div><div class="ttdoc">Read Only: The symmetric block cipher Engine type </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:95</div></div>
-<div class="ttc" id="class_mac_description_html_a0c5c816ef7b809d0385cabccff57ec70"><div class="ttname"><a href="class_mac_description.html#a0c5c816ef7b809d0385cabccff57ec70">MacDescription::ToStream</a></div><div class="ttdeci">MemoryStream * ToStream()</div><div class="ttdoc">Convert the MacDescription structure to a MemoryStream </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:201</div></div>
-<div class="ttc" id="class_mac_description_html_a8c42289ed0ada382e1ac2e90cdf3b22a"><div class="ttname"><a href="class_mac_description.html#a8c42289ed0ada382e1ac2e90cdf3b22a">MacDescription::HMACSHA512</a></div><div class="ttdeci">static MacDescription HMACSHA512()</div><div class="ttdoc">An HMAC SHA-512 preset </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:137</div></div>
-<div class="ttc" id="group___enumeration_html_gad57696fdbcdac43c18f9ba4dada98447"><div class="ttname"><a href="group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447">RoundCounts</a></div><div class="ttdeci">RoundCounts</div><div class="ttdef"><b>Definition:</b> Documentation.h:301</div></div>
-<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:290</div></div>
-<div class="ttc" id="class_mac_description_html_ad9f774e510e0d98db1062249e8cb5529"><div class="ttname"><a href="class_mac_description.html#ad9f774e510e0d98db1062249e8cb5529">MacDescription::KdfEngine</a></div><div class="ttdeci">const Digests KdfEngine()</div><div class="ttdoc">Read Only: The Digest engine used to power the key schedule Key Derivation Function in HX and M serie...</div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:110</div></div>
+<div class="ttc" id="class_mac_description_html_a4d652ff4d62ea5c4e1436c759c6acc7d"><div class="ttname"><a href="class_mac_description.html#a4d652ff4d62ea5c4e1436c759c6acc7d">MacDescription::ToBytes</a></div><div class="ttdeci">std::vector&lt; byte &gt; ToBytes()</div><div class="ttdoc">Convert the MacDescription structure as a byte array </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:111</div></div>
+<div class="ttc" id="class_mac_description_html_a29e214b172f4acef86795d689c574beb"><div class="ttname"><a href="class_mac_description.html#a29e214b172f4acef86795d689c574beb">MacDescription::GetHeaderSize</a></div><div class="ttdeci">static int GetHeaderSize()</div><div class="ttdoc">Get the header size in bytes </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:81</div></div>
+<div class="ttc" id="class_mac_description_html_a555231500a24334ce05d32fbf830e9e6"><div class="ttname"><a href="class_mac_description.html#a555231500a24334ce05d32fbf830e9e6">MacDescription::Reset</a></div><div class="ttdeci">void Reset()</div><div class="ttdoc">Reset all struct members </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:103</div></div>
+<div class="ttc" id="class_mac_description_html_a53308fd472084b8ee76227698f6bebf5"><div class="ttname"><a href="class_mac_description.html#a53308fd472084b8ee76227698f6bebf5">MacDescription::MacDigest</a></div><div class="ttdeci">const Digests MacDigest()</div><div class="ttdoc">Read Only: The MAC digest type </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:69</div></div>
+<div class="ttc" id="class_memory_stream_html"><div class="ttname"><a href="class_memory_stream.html">MemoryStream</a></div><div class="ttdoc">A memory stream container. </div><div class="ttdef"><b>Definition:</b> Documentation.h:377</div></div>
+<div class="ttc" id="class_mac_description_html_a766739b0ad39417557dcefd812459a91"><div class="ttname"><a href="class_mac_description.html#a766739b0ad39417557dcefd812459a91">MacDescription::MacType</a></div><div class="ttdeci">const Macs MacType()</div><div class="ttdoc">Read Only: The Mac configuration type </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:74</div></div>
+<div class="ttc" id="class_mac_description_html_a33cdb83298407c808fbf837e3351dbbc"><div class="ttname"><a href="class_mac_description.html#a33cdb83298407c808fbf837e3351dbbc">MacDescription::CipherExtension</a></div><div class="ttdeci">const BlockCipherExtensions CipherExtension()</div><div class="ttdoc">Read Only: The block-cipher extension type </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:59</div></div>
+<div class="ttc" id="class_mac_description_html_a51187ef64f41ce08a34c88d6f1de5247"><div class="ttname"><a href="class_mac_description.html#a51187ef64f41ce08a34c88d6f1de5247">MacDescription::Equals</a></div><div class="ttdeci">bool Equals(MacDescription &amp;Input)</div><div class="ttdoc">Compare this object instance with another </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:88</div></div>
+<div class="ttc" id="group___enumeration_html_gad1c1c84ec8d7f4f165d4973062130aa3"><div class="ttname"><a href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a></div><div class="ttdeci">Macs</div><div class="ttdef"><b>Definition:</b> Documentation.h:313</div></div>
+<div class="ttc" id="class_mac_description_html_a888f44752179b1605c7ba812e2426c6c"><div class="ttname"><a href="class_mac_description.html#a888f44752179b1605c7ba812e2426c6c">MacDescription::GetHashCode</a></div><div class="ttdeci">int GetHashCode()</div><div class="ttdoc">Get the hash code for this object </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:93</div></div>
+<div class="ttc" id="group___enumeration_html_gaa7f8226ec43fe26b57b18e6821c90ffd"><div class="ttname"><a href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a></div><div class="ttdeci">BlockCiphers</div><div class="ttdef"><b>Definition:</b> Documentation.h:305</div></div>
+<div class="ttc" id="class_mac_description_html_a037e6cf945fd6b28accc885c06d05cd2"><div class="ttname"><a href="class_mac_description.html#a037e6cf945fd6b28accc885c06d05cd2">MacDescription::CipherType</a></div><div class="ttdeci">const BlockCiphers CipherType()</div><div class="ttdoc">Read Only: The symmetric block-cipher type </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:64</div></div>
+<div class="ttc" id="class_mac_description_html_a0c5c816ef7b809d0385cabccff57ec70"><div class="ttname"><a href="class_mac_description.html#a0c5c816ef7b809d0385cabccff57ec70">MacDescription::ToStream</a></div><div class="ttdeci">MemoryStream * ToStream()</div><div class="ttdoc">Convert the MacDescription structure to a MemoryStream </div><div class="ttdef"><b>Definition:</b> MacDescription.cpp:123</div></div>
+<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:308</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

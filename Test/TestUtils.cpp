@@ -122,8 +122,8 @@ namespace Test
 		CSP rng;
 		std::vector<byte> key(KeySize, 0);
 		std::vector<byte> iv(IvSize, 0);
-		rng.GetBytes(key);
-		rng.GetBytes(iv);
+		rng.Generate(key);
+		rng.Generate(iv);
 
 		return new SymmetricKey(key, iv);
 	}
@@ -131,7 +131,7 @@ namespace Test
 	void TestUtils::GetRandom(std::vector<byte> &Data)
 	{
 		CSP rng;
-		rng.GetBytes(Data);
+		rng.Generate(Data);
 	}
 
 	double TestUtils::MeanValue(std::vector<byte> &Input)

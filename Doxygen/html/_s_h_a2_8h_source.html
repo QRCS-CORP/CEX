@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/SHA2.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/SHA2.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -525,7 +525,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        S0 = _mm_blend_epi16(TMP, S1, 0xF0); <span class="comment">// DCBA</span></div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        S1 = _mm_alignr_epi8(S1, TMP, 8);    <span class="comment">// ABEF</span></div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;                                             <span class="comment">// Save state</span></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        <span class="comment">// Save state</span></div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        _mm_storeu_si128(reinterpret_cast&lt;__m128i*&gt;(&amp;Output.H[0]), S0);</div>
 <div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;        _mm_storeu_si128(reinterpret_cast&lt;__m128i*&gt;(&amp;Output.H[4]), S1);</div>
 <div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;</div>
@@ -728,8 +728,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;</div>
 <div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;NAMESPACE_DIGESTEND</div>
 <div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_int_utils_html_ac4f031677a5f3659f2a26ed95d933505"><div class="ttname"><a href="class_int_utils.html#ac4f031677a5f3659f2a26ed95d933505">IntUtils::BeBytesTo32</a></div><div class="ttdeci">static uint BeBytesTo32(const Array &amp;Input, size_t InOffset)</div><div class="ttdoc">Convert a byte array to a Big Endian 32 bit word </div><div class="ttdef"><b>Definition:</b> IntUtils.h:610</div></div>
-<div class="ttc" id="class_int_utils_html_ad2b68be18c7b1f970bf5d4159328a713"><div class="ttname"><a href="class_int_utils.html#ad2b68be18c7b1f970bf5d4159328a713">IntUtils::BeBytesTo64</a></div><div class="ttdeci">static ulong BeBytesTo64(const Array &amp;Input, size_t InOffset)</div><div class="ttdoc">Convert a byte array to a Big Endian 64 bit dword </div><div class="ttdef"><b>Definition:</b> IntUtils.h:637</div></div>
+<div class="ttc" id="class_int_utils_html_ac4f031677a5f3659f2a26ed95d933505"><div class="ttname"><a href="class_int_utils.html#ac4f031677a5f3659f2a26ed95d933505">IntUtils::BeBytesTo32</a></div><div class="ttdeci">static uint BeBytesTo32(const Array &amp;Input, size_t InOffset)</div><div class="ttdoc">Convert a byte array to a Big Endian 32 bit word </div><div class="ttdef"><b>Definition:</b> IntUtils.h:650</div></div>
+<div class="ttc" id="class_int_utils_html_ad2b68be18c7b1f970bf5d4159328a713"><div class="ttname"><a href="class_int_utils.html#ad2b68be18c7b1f970bf5d4159328a713">IntUtils::BeBytesTo64</a></div><div class="ttdeci">static ulong BeBytesTo64(const Array &amp;Input, size_t InOffset)</div><div class="ttdoc">Convert a byte array to a Big Endian 64 bit dword </div><div class="ttdef"><b>Definition:</b> IntUtils.h:677</div></div>
 <div class="ttc" id="struct_s_h_a2_html"><div class="ttname"><a href="struct_s_h_a2.html">SHA2</a></div><div class="ttdoc">The SHA2 configuration parameters structure </div><div class="ttdef"><b>Definition:</b> DigestParams.h:37</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

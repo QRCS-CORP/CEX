@@ -9,27 +9,27 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.4 (A4).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.6 (A6).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.4</B> (A4 version), which are the major, minor, patch, and release codes. \n
+The current version is <B>1.0.0.6</B> (A6 version), which are the major, minor, patch, and release codes. \n
 \brief
 
 \author    John Underhill
-\version   1.0.0.3
-\date      July 04, 2017
+\version   1.0.0.6
+\date      June 17, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.5 (A5 version), which are the major, minor, patch, and release codes. \n \n
+The current version is 1.0.0.6 (A6 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release 1.0.0.5 (version A4):</B> \n
-The ModuleLWE asymmetric cipher \n
-The SHAKE XOF function \n
+<B>Current Release 1.0.0.6 (version A6):</B> \n
+The NTRU asymmetric cipher \n
+The RSX symmetric cipher \n
 Full MISRA C++2014 compliant \n \n
 
 <B>Planned Release 1.1.0.1</B> \n
@@ -37,6 +37,8 @@ RingLWE \n
 McEliece \n
 ModuleLWE \n
 NTRU \n
+RSA \n
+RSA-SIG \n
 Picnic \n
 SPHINCS+ \n \n
 
@@ -47,6 +49,11 @@ Android/iOS/Linux Compatability \n
 DLL API \n \n
 
 <B>History</B> \n \n
+
+<B>Version 1.0.0.6, June 17, 2018</B> \n
+Added the NTRU Prime asymmetric cipher \n
+Added the RSX symmetric cipher \n
+Asymmetric ciphers updated to the NIST PQ Round 1 versions \n \n
 
 <B>Version 1.0.0.5, February 22, 2018</B> \n
 Added the ModuleLWE asymmetric cipher \n
@@ -137,6 +144,16 @@ NAMESPACE_ROOT
 			NAMESPACE_MODULELWE
 				class ModuleLWE {};
 			NAMESPACE_MODULELWEEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup RingLWE
+			*  @{
+			*  @brief The RingLWE Cipher Namespace
+			*/
+			NAMESPACE_NTRU
+				class NTRU {};
+			NAMESPACE_NTRUEND
 			/*! @} */
 
 			/*!
@@ -271,7 +288,7 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_DRBG
 		class BCG {};
-		class DCG {};
+		class CSG {};
 		class IDrbg {};
 		class HCG {};
 	NAMESPACE_DRBGEND
@@ -284,6 +301,7 @@ NAMESPACE_ROOT
 	*/
 	NAMESPACE_ENUMERATION
 		enum class AsymmetricEngines {};
+		enum class BlockCipherExtensions {};
 		enum class BlockCiphers {};
 		enum class BlockSizes {};
 		enum class CipherModes {};
@@ -299,6 +317,7 @@ NAMESPACE_ROOT
 		enum class Providers {};
 		enum class RLWEParams {};
 		enum class RoundCounts {};
+		enum class ShakeModes {};
 		enum class SimdProfiles {};
 		enum class StreamCiphers {};
 		enum class StreamModes {};

@@ -174,8 +174,8 @@ namespace Test
 		enc1.reserve(MAX_ALLOC);
 		enc2.reserve(MAX_ALLOC);
 
-		GetBytes(32, key);
-		GetBytes(16, iv);
+		Generate(32, key);
+		Generate(16, iv);
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 		const size_t blkSze = Cipher->BlockSize();
 
@@ -185,7 +185,7 @@ namespace Test
 			smpSze -= (smpSze % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(smpSze);
-			rng.GetBytes(data);
+			rng.Generate(data);
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
 			enc2.resize(smpSze);
@@ -343,9 +343,9 @@ namespace Test
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
 			enc2.resize(smpSze);
-			rng.GetBytes(data);
-			GetBytes(32, key);
-			GetBytes(16, iv);
+			rng.Generate(data);
+			Generate(32, key);
+			Generate(16, iv);
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
 
 			cpr1.ParallelProfile().ParallelBlockSize() = cpr1.ParallelProfile().ParallelMinimumSize() * cpr1.ParallelProfile().ProcessorCount();
@@ -378,9 +378,9 @@ namespace Test
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
 			enc2.resize(smpSze);
-			rng.GetBytes(data);
-			GetBytes(32, key);
-			GetBytes(16, iv);
+			rng.Generate(data);
+			Generate(32, key);
+			Generate(16, iv);
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
 
 			cpr3.Initialize(true, keyParam);
@@ -489,9 +489,9 @@ namespace Test
 			enc2.resize(smpSze);
 
 #if !defined STAT_INP
-			rng.GetBytes(data);
-			GetBytes(32, key);
-			GetBytes(16, iv);
+			rng.Generate(data);
+			Generate(32, key);
+			Generate(16, iv);
 #endif
 			Key::Symmetric::SymmetricKey keyParam(key, iv);
 			Mode::CTR cipher(Engine);
@@ -555,8 +555,8 @@ namespace Test
 		data.reserve(MAX_ALLOC);
 		dec1.reserve(MAX_ALLOC);
 		dec2.reserve(MAX_ALLOC);
-		GetBytes(32, key);
-		GetBytes(16, iv);
+		Generate(32, key);
+		Generate(16, iv);
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 #endif
 
@@ -572,7 +572,7 @@ namespace Test
 			data.resize(smpSze);
 			dec1.resize(smpSze);
 			dec2.resize(smpSze);
-			rng.GetBytes(data);
+			rng.Generate(data);
 
 			// standard mode
 			cipher1.Initialize(false, keyParam);
@@ -599,7 +599,7 @@ namespace Test
 			data.resize(smpSze);
 			dec1.resize(smpSze);
 			dec2.resize(smpSze);
-			rng.GetBytes(data);
+			rng.Generate(data);
 
 			// standard mode encrypt
 			cipher1.Initialize(true, keyParam);
@@ -629,8 +629,8 @@ namespace Test
 		std::vector<byte> key(32);
 		std::vector<byte> iv(16);
 
-		rng.GetBytes(iv);
-		rng.GetBytes(key);
+		rng.Generate(iv);
+		rng.Generate(key);
 		Key::Symmetric::SymmetricKey kp(key, iv);
 
 		// CTR
@@ -647,7 +647,7 @@ namespace Test
 				enc2.resize(smpSze);
 				dec1.resize(smpSze);
 				data.resize(smpSze);
-				rng.GetBytes(data);
+				rng.Generate(data);
 
 				cipher.Initialize(true, kp);
 				BlockCTR(&cipher, data, 0, enc1, 0);
@@ -692,7 +692,7 @@ namespace Test
 				enc2.resize(smpSze);
 				dec1.resize(smpSze);
 				data.resize(smpSze);
-				rng.GetBytes(data);
+				rng.Generate(data);
 
 				cipher.Initialize(true, kp);
 				BlockCTR(&cipher, data, 0, enc1, 0);
@@ -739,7 +739,7 @@ namespace Test
 				enc1.resize(smpSze);
 				dec1.resize(smpSze);
 				data.resize(smpSze);
-				rng.GetBytes(data);
+				rng.Generate(data);
 
 				// encrypt the array locally
 				cipher.Initialize(true, kp);
@@ -771,7 +771,7 @@ namespace Test
 				enc1.resize(smpSze);
 				dec1.resize(smpSze);
 				data.resize(smpSze);
-				rng.GetBytes(data);
+				rng.Generate(data);
 
 				// encrypt the array locally
 				cipher.Initialize(true, kp);
@@ -803,9 +803,9 @@ namespace Test
 		std::vector<byte> iv;
 		size_t blockSize;
 
-		GetBytes(32, key);
-		GetBytes(16, iv);
-		GetBytes(2048, data);
+		Generate(32, key);
+		Generate(16, iv);
+		Generate(2048, data);
 
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 
@@ -1241,9 +1241,9 @@ namespace Test
 			dec.resize(smpSze);
 			enc1.resize(smpSze);
 			enc2.resize(smpSze);
-			rng.GetBytes(data);
-			GetBytes(32, key);
-			GetBytes(8, iv);
+			rng.Generate(data);
+			Generate(32, key);
+			Generate(8, iv);
 #else
 			size_t smpSze = MIN_ALLOC * 8;
 			data.resize(smpSze);
@@ -1290,8 +1290,8 @@ namespace Test
 		std::vector<byte> iv(16);
 		Prng::SecureRandom rng;
 
-		rng.GetBytes(key);
-		rng.GetBytes(iv);
+		rng.Generate(key);
+		rng.Generate(iv);
 		Key::Symmetric::SymmetricKey keyParam(key, iv);
 		Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize() * Cipher->ParallelProfile().ProcessorCount();
 		Cipher->ParallelProfile().IsParallel() = true;
@@ -1309,7 +1309,7 @@ namespace Test
 			data.resize(smpSze);
 			dec.resize(data.size(), 0);
 			enc.resize(data.size(), 0);
-			rng.GetBytes(data);
+			rng.Generate(data);
 
 			Cipher->Initialize(true, keyParam);
 			Cipher->Transform(data, 0, enc, 0, data.size());
@@ -1400,11 +1400,11 @@ namespace Test
 		}
 	}
 
-	void ParallelModeTest::GetBytes(size_t Size, std::vector<byte> &Output)
+	void ParallelModeTest::Generate(size_t Size, std::vector<byte> &Output)
 	{
 		Output.resize(Size, 0);
 		CEX::Provider::CSP rng;
-		rng.GetBytes(Output);
+		rng.Generate(Output);
 	}
 
 	void ParallelModeTest::Initialize()

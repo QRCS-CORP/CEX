@@ -76,7 +76,9 @@ std::vector<byte> DigestStream::Compute(const std::vector<byte> &Input, size_t I
 
 void DigestStream::CalculateInterval(size_t Length)
 {
-	size_t interval = Length / 100;
+	size_t interval;
+
+	interval = Length / 100;
 
 	if (interval < m_digestEngine->BlockSize())
 	{
@@ -150,9 +152,14 @@ void DigestStream::Destroy()
 
 std::vector<byte> DigestStream::Process(IByteStream* InStream, size_t Length)
 {
-	size_t prcLen = 0;
-	size_t prcRead = 0;
+	const size_t BLKLEN = m_digestEngine->BlockSize();
+	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
+	size_t prcLen;
+	size_t prcRead;
 	std::vector<byte> inpBuffer(0);
+
+	prcLen = 0;
+	prcRead = 0;
 
 	if (m_isParallel)
 	{
@@ -172,8 +179,6 @@ std::vector<byte> DigestStream::Process(IByteStream* InStream, size_t Length)
 		}
 	}
 
-	const size_t BLKLEN = m_digestEngine->BlockSize();
-	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
 	inpBuffer.resize(BLKLEN);
 
 	while (prcLen != ALNLEN)
@@ -204,7 +209,12 @@ std::vector<byte> DigestStream::Process(IByteStream* InStream, size_t Length)
 
 std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	size_t prcLen = 0;
+	const size_t BLKLEN = m_digestEngine->BlockSize();
+	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
+
+	size_t prcLen;
+
+	prcLen = 0;
 
 	if (m_isParallel)
 	{
@@ -222,9 +232,6 @@ std::vector<byte> DigestStream::Process(const std::vector<byte> &Input, size_t I
 			}
 		}
 	}
-
-	const size_t BLKLEN = m_digestEngine->BlockSize();
-	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
 
 	while (prcLen != ALNLEN)
 	{

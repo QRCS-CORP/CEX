@@ -189,7 +189,7 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 
 	CipherText.resize(RLWEQ12289N1024::RLWE_CCACIPHERTEXT_SIZE);
 
-	m_rndGenerator->GetBytes(sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	m_rndGenerator->Generate(sec, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 	// don't release system RNG output
 	Utility::MemUtils::Copy(sec, 0, coin, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
@@ -237,7 +237,7 @@ IAsymmetricKeyPair* RingLWE::Generate()
 	shk256.Initialize(pk);
 	shk256.Generate(buff, 0, RLWEQ12289N1024::RLWE_SEED_SIZE);
 	// value z for pseudo-random output on reject
-	m_rndGenerator->GetBytes(buff, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
+	m_rndGenerator->Generate(buff, RLWEQ12289N1024::RLWE_SEED_SIZE, RLWEQ12289N1024::RLWE_SEED_SIZE);
 
 	// copy the puplic key + H(pk)
 	Utility::MemUtils::Copy(pk, 0, sk, RLWEQ12289N1024::RLWE_CPAPRIVATEKEY_SIZE, RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);

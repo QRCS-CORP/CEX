@@ -77,7 +77,7 @@ namespace Test
 		cpr.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(cpt, 0, 4);
+		m_rngPtr->Generate(cpt, 0, 4);
 
 		cpr.Initialize(kp->PrivateKey());
 
@@ -102,7 +102,7 @@ namespace Test
 		cpr.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(cpt, 0, 4);
+		m_rngPtr->Generate(cpt, 0, 4);
 
 		cpr.Initialize(kp->PrivateKey());
 
@@ -180,7 +180,7 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			m_rngPtr->GetBytes(msg);
+			m_rngPtr->Generate(msg);
 			IAsymmetricKeyPair* kp = cpr.Generate();
 
 			cpr.Initialize(kp->PublicKey());

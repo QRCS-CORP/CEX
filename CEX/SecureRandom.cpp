@@ -9,18 +9,18 @@ NAMESPACE_PRNG
 
 //~~~Constructor~~~//
 
-SecureRandom::SecureRandom(Prngs EngineType, Providers ProviderType, Digests DigestType, size_t BufferSize)
+SecureRandom::SecureRandom(Prngs RngType, Providers ProviderType, Digests DigestType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize < 32 ? DEF_BUFLEN : BufferSize),
-	m_digestType((DigestType == Digests::None && EngineType != Prngs::BCR) ? Digests::SHA256 : DigestType),
+	m_digestType((DigestType == Digests::None && RngType != Prngs::BCR) ? Digests::SHA256 : DigestType),
 	m_isDestroyed(false),
 	m_providerType(ProviderType != Providers::None ? ProviderType : 
 		throw CryptoRandomException("SecureRandom:CTor", "The provider type can not be none!")),
 	m_rndBuffer(m_bufferSize),
-	m_rndEngineType(EngineType != Prngs::None ? EngineType :
+	m_rngGeneratorType(RngType != Prngs::None ? RngType :
 		throw CryptoRandomException("SecureRandom:CTor", "The engine type can not be none!")),
-	m_rngEngine(Helper::PrngFromName::GetInstance(m_rndEngineType, m_providerType, m_digestType))
+	m_rngEngine(Helper::PrngFromName::GetInstance(m_rngGeneratorType, m_providerType, m_digestType))
 {
 	Reset();
 }
@@ -34,7 +34,7 @@ SecureRandom::~SecureRandom()
 		m_digestType = Digests::None;
 		m_isDestroyed = true;
 		m_providerType = Providers::None;
-		m_rndEngineType = Prngs::None;
+		m_rngGeneratorType = Prngs::None;
 
 		Utility::IntUtils::ClearVector(m_rndBuffer);
 
@@ -53,7 +53,7 @@ void SecureRandom::Fill(std::vector<ushort> &Output, size_t Offset, size_t Eleme
 
 	const size_t BUFLEN = Elements * sizeof(ushort);
 	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
+	Generate(buf);
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
@@ -63,7 +63,7 @@ void SecureRandom::Fill(std::vector<uint> &Output, size_t Offset, size_t Element
 
 	const size_t BUFLEN = Elements * sizeof(uint);
 	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
+	Generate(buf);
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
@@ -73,27 +73,27 @@ void SecureRandom::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elemen
 
 	const size_t BUFLEN = Elements * sizeof(ulong);
 	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
+	Generate(buf);
 	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
 }
 
-std::vector<byte> SecureRandom::GetBytes(size_t Length)
+std::vector<byte> SecureRandom::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd);
+	Generate(rnd);
 
 	return rnd;
 }
 
-void SecureRandom::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void SecureRandom::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
-	std::vector<byte> rnd = GetBytes(Length);
+	std::vector<byte> rnd = Generate(Length);
 	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
 }
 
-void SecureRandom::GetBytes(std::vector<byte> &Output)
+void SecureRandom::Generate(std::vector<byte> &Output)
 {
 	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
 
@@ -111,7 +111,7 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 		while (rmd > 0)
 		{
 			// fill buffer
-			m_rngEngine->GetBytes(m_rndBuffer);
+			m_rngEngine->Generate(m_rndBuffer);
 
 			if (rmd > m_rndBuffer.size())
 			{
@@ -136,24 +136,24 @@ void SecureRandom::GetBytes(std::vector<byte> &Output)
 
 char SecureRandom::NextChar()
 {
-	return IO::BitConverter::ToChar(GetBytes(sizeof(char)), 0);
+	return IO::BitConverter::ToChar(Generate(sizeof(char)), 0);
 }
 
 unsigned char SecureRandom::NextUChar()
 {
-	return IO::BitConverter::ToUChar(GetBytes(sizeof(unsigned char)), 0);
+	return IO::BitConverter::ToUChar(Generate(sizeof(unsigned char)), 0);
 }
 
 double SecureRandom::NextDouble()
 {
 	int sze = sizeof(double);
-	return IO::BitConverter::ToDouble(GetBytes(sizeof(double)), 0);
+	return IO::BitConverter::ToDouble(Generate(sizeof(double)), 0);
 }
 
 short SecureRandom::NextInt16()
 {
 	short x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(short)), 0, x, sizeof(short));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(short)), 0, x, sizeof(short));
 
 	return x;
 }
@@ -208,7 +208,7 @@ short SecureRandom::NextInt16(short Maximum, short Minimum)
 ushort SecureRandom::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ushort)), 0, x, sizeof(ushort));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -263,7 +263,7 @@ ushort SecureRandom::NextUInt16(ushort Maximum, ushort Minimum)
 int SecureRandom::NextInt32()
 {
 	int x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(int)), 0, x, sizeof(int));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(int)), 0, x, sizeof(int));
 
 	return x;
 }
@@ -318,7 +318,7 @@ int SecureRandom::NextInt32(int Maximum, int Minimum)
 uint SecureRandom::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(uint)), 0, x, sizeof(uint));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -375,7 +375,7 @@ uint SecureRandom::NextUInt32(uint Maximum, uint Minimum)
 long SecureRandom::NextInt64()
 {
 	long x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(long)), 0, x, sizeof(long));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(long)), 0, x, sizeof(long));
 
 	return x;
 }
@@ -430,7 +430,7 @@ long SecureRandom::NextInt64(long Maximum, long Minimum)
 ulong SecureRandom::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ulong)), 0, x, sizeof(ulong));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
@@ -484,7 +484,7 @@ ulong SecureRandom::NextUInt64(ulong Maximum, ulong Minimum)
 
 void SecureRandom::Reset()
 {
-	m_rngEngine->GetBytes(m_rndBuffer);
+	m_rngEngine->Generate(m_rndBuffer);
 	m_bufferIndex = 0;
 }
 

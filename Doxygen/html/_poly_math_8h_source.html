@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/PolyMath.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/PolyMath.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -173,15 +173,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keyword">const</span> T VN(5);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVSZE = T::size() / <span class="keyword">sizeof</span>(uint);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        std::array&lt;uint, ULVSZE&gt; tmpR;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVLEN = T::size() / <span class="keyword">sizeof</span>(uint);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        std::array&lt;uint, ULVLEN&gt; tmpR;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keyword">const</span> T NQ(Q);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        T tmpA, tmpB;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVSZE = 1;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVLEN = 1;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; R.size(); i += ULVSZE)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; R.size(); i += ULVLEN)</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        {</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)</span></div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">#   if defined(__AVX512__)</span></div>
@@ -201,7 +201,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            VF -= VU;</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            VF.Store(tmpR, 0);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; ULVSZE; ++j)</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; ULVLEN; ++j)</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            {</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;                R[j + i] = <span class="keyword">static_cast&lt;</span>ushort<span class="keyword">&gt;</span>(tmpR[j]);</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;            }</div>
@@ -237,14 +237,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> Mul(Array &amp;R, <span class="keyword">const</span> Array &amp;Factors, <span class="keywordtype">int</span> Q, uint QInv, uint RLog)</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    {</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="preprocessor">#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)</span></div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVSZE = T::size() / <span class="keyword">sizeof</span>(uint);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        std::array&lt;uint, ULVSZE&gt; tmpR;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVLEN = T::size() / <span class="keyword">sizeof</span>(uint);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        std::array&lt;uint, ULVLEN&gt; tmpR;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        T tmpP, tmpF;</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVSZE = 1;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ULVLEN = 1;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; R.size(); i += ULVSZE)</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; R.size(); i += ULVLEN)</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        {</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)</span></div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="preprocessor">#   if defined(__AVX512__)</span></div>
@@ -266,7 +266,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            a &gt;&gt;= 18;</div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;            a.Store(tmpR, 0);</div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; ULVSZE; ++j)</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> j = 0; j &lt; ULVLEN; ++j)</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;            {</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;                R[j + i] = <span class="keyword">static_cast&lt;</span>ushort<span class="keyword">&gt;</span>(tmpR[j]);</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            }</div>

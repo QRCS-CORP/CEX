@@ -13,9 +13,9 @@ const std::string BCG::CLASS_NAME("BCG");
 
 //~~~Constructor~~~//
 
-BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions ExtensionType, Providers ProviderType, bool Parallel)
+BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, Providers ProviderType, bool Parallel)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, ExtensionType) :
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoGeneratorException("BCG:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_ctrVector(COUNTER_SIZE),
@@ -25,8 +25,8 @@ BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions ExtensionType, Providers
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_kdfEngine(ExtensionType != BlockCipherExtensions::None ? Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(ExtensionType)) : nullptr),
-	m_kdfEngineType(ExtensionType),
+	m_kdfEngine(CipherExtensionType != BlockCipherExtensions::None ? Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtensionType)) : nullptr),
+	m_kdfEngineType(CipherExtensionType),
 	m_kdfInfo(0),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
@@ -380,7 +380,7 @@ void BCG::Derive(std::vector<byte> &Seed)
 	size_t saltLen = ks.KeySize();
 	std::vector<byte> salt(saltLen);
 	// pull the rand from provider
-	m_providerSource->GetBytes(salt);
+	m_providerSource->Generate(salt);
 	// extract the new key+counter
 	gen.Initialize(Seed, salt);
 	std::vector<byte> tmpK(m_seedSize);

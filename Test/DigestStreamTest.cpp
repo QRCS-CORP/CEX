@@ -44,7 +44,7 @@ namespace Test
 	{
 		Prng::SecureRandom rnd;
 		std::vector<byte> data(rnd.NextUInt32(1000, 100));
-		rnd.GetBytes(data);
+		rnd.Generate(data);
 
 		// digest instance for baseline
 		Digest::IDigest* eng = Helper::DigestFromName::GetInstance(Engine);

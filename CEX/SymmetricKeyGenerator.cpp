@@ -103,35 +103,35 @@ SymmetricSecureKey* SymmetricKeyGenerator::GetSecureKey(SymmetricKeySize KeySize
 	}
 }
 
-void SymmetricKeyGenerator::GetBytes(std::vector<byte> &Output)
+void SymmetricKeyGenerator::Generate(std::vector<byte> &Output)
 {
-	std::vector<byte> rnd = Generate(Output.size());
+	std::vector<byte> rnd = Process(Output.size());
 	Utility::MemUtils::Copy(rnd, 0, Output, 0, rnd.size());
 }
 
-std::vector<byte> SymmetricKeyGenerator::GetBytes(size_t Size)
+std::vector<byte> SymmetricKeyGenerator::Generate(size_t Length)
 {
-	return Generate(Size);
+	return Process(Length);
 }
 
 //~~~Private Functions~~~//
 
-std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
+std::vector<byte> SymmetricKeyGenerator::Process(size_t Length)
 {
-	std::vector<byte> key(KeySize);
+	std::vector<byte> key(Length);
 
-	if (KeySize == 0)
+	if (Length == 0)
 	{
 		key.resize(0);
 	}
 	else
 	{
-		size_t keyLen = KeySize;
+		size_t keyLen = Length;
 		size_t blkOff = 0;
 
 		do
 		{
-			std::vector<byte> rnd = GenerateBlock();
+			std::vector<byte> rnd = ProcessBlock();
 			size_t alnLen = Utility::IntUtils::Min(keyLen, rnd.size());
 			Utility::MemUtils::Copy(rnd, 0, key, blkOff, alnLen);
 			keyLen -= alnLen;
@@ -143,7 +143,7 @@ std::vector<byte> SymmetricKeyGenerator::Generate(size_t KeySize)
 	return key;
 }
 
-std::vector<byte> SymmetricKeyGenerator::GenerateBlock()
+std::vector<byte> SymmetricKeyGenerator::ProcessBlock()
 {
 	// seed size is 2x mac input block size less finalizer padding
 	const size_t BLKLEN = Helper::DigestFromName::GetBlockSize(m_dgtType);
@@ -151,12 +151,12 @@ std::vector<byte> SymmetricKeyGenerator::GenerateBlock()
 	std::vector<byte> seed(seedLen);
 
 	// generate the seed
-	m_pvdEngine->GetBytes(seed);
+	m_pvdEngine->Generate(seed);
 
 	// get the hmac key from system entropy provider
 	std::vector<byte> key(BLKLEN);
 	Provider::CSP pvd;
-	pvd.GetBytes(key);
+	pvd.Generate(key);
 
 	// condition random bytes with an hmac
 	Mac::HMAC mac(m_dgtType);

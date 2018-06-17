@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -161,6 +161,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a01ddf82ce09b2b6f5ead8788ec3e8253"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a01ddf82ce09b2b6f5ead8788ec3e8253">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
 <tr class="memdesc:a01ddf82ce09b2b6f5ead8788ec3e8253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key.  <a href="#a01ddf82ce09b2b6f5ead8788ec3e8253">More...</a><br /></td></tr>
 <tr class="separator:a01ddf82ce09b2b6f5ead8788ec3e8253"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75e2af53666b1519275e3bc43be37485"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a75e2af53666b1519275e3bc43be37485">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a75e2af53666b1519275e3bc43be37485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, using length and offset arguments  <a href="#a75e2af53666b1519275e3bc43be37485">More...</a><br /></td></tr>
+<tr class="separator:a75e2af53666b1519275e3bc43be37485"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a593dee1a486a1442e1ea25862b13c72f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_c_r_y_p_t.html#a593dee1a486a1442e1ea25862b13c72f">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt) override</td></tr>
 <tr class="memdesc:a593dee1a486a1442e1ea25862b13c72f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays  <a href="#a593dee1a486a1442e1ea25862b13c72f">More...</a><br /></td></tr>
 <tr class="separator:a593dee1a486a1442e1ea25862b13c72f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -210,6 +213,8 @@ It is recommended that a salt value is added along with the key.</p>
 2) for i = 0 to p - 1 do: B[i] = scryptROMix(r, B[i], N) <br />
 3) DK = PBKDF2 - HMAC - SHA256(P, B[0] || B[1] || ... || B[p - 1], 1, dkLen)</p>
 <p><b>Implementation Notes:</b> </p><ul>
+<li>
+This implementation only supports the SHA2-256 and SHA2-512 message digests. </li>
 <li>
 Class can be initialized with a message digest instance, or by using a digests enumeration type name. </li>
 <li>
@@ -630,6 +635,64 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 
 </div>
 </div>
+<a class="anchor" id="a75e2af53666b1519275e3bc43be37485"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SCRYPT::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the generator with a key, using length and offset arguments </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">IKdf</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a593dee1a486a1442e1ea25862b13c72f"></a>
 <div class="memitem">
 <div class="memproto">
@@ -978,9 +1041,9 @@ Scrypt is <a href="http://eprint.iacr.org/2016/989.pdf">Maximally Memory-Hard</a
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_s_c_r_y_p_t_8h_source.html">SCRYPT.h</a></li>
-<li>CEX/SCRYPT.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_s_c_r_y_p_t_8h_source.html">SCRYPT.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/SCRYPT.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

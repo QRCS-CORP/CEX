@@ -4,9 +4,8 @@
 #include "CpuDetect.h"
 #include "CJP.h"
 #include "CSP.h"
-#include "CTR.h"
-#include "Keccak512.h"
 #include "RDP.h"
+#include "SHAKE.h"
 #include "SymmetricKey.h"
 #include "SysUtils.h"
 
@@ -18,7 +17,7 @@ const std::string ACP::CLASS_NAME("ACP");
 
 ACP::ACP()
 	:
-	m_cipherMode(new Cipher::Symmetric::Block::Mode::CTR(Helper::BlockCipherFromName::GetInstance(Enumeration::BlockCiphers::AHX, Enumeration::BlockCipherExtensions::HKDF256))),
+	m_kdfGenerator(new Kdf::SHAKE(Enumeration::ShakeModes::SHAKE512)),
 	m_hasRdrand(false),
 	m_hasTsc(false),
 	m_isAvailable(true)
@@ -33,9 +32,9 @@ ACP::~ACP()
 	m_hasRdrand = false;
 	m_isAvailable = false;
 
-	if (m_cipherMode != nullptr)
+	if (m_kdfGenerator != nullptr)
 	{
-		m_cipherMode.reset(nullptr);
+		m_kdfGenerator.reset(nullptr);
 	}
 }
 
@@ -58,41 +57,53 @@ const std::string ACP::Name()
 
 //~~~Public Functions~~~//
 
-void ACP::GetBytes(std::vector<byte> &Output)
+void ACP::Generate(std::vector<byte> &Output)
 {
-	GetBytes(Output, 0, Output.size());
+	Generate(Output, 0, Output.size());
 }
 
-void ACP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void ACP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
 	{
-		throw CryptoRandomException("ACP:GetBytes", "Random provider is not available!");
+		throw CryptoRandomException("ACP:Generate", "Random provider is not available!");
 	}
 
-	std::vector<byte> rnd(Length);
-	m_cipherMode->Transform(rnd, 0, Output, Offset, Length);
+	m_kdfGenerator->Generate(Output, Offset, Length);
 }
 
-std::vector<byte> ACP::GetBytes(size_t Length)
+std::vector<byte> ACP::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd, 0, rnd.size());
+	Generate(rnd, 0, rnd.size());
 
 	return rnd;
 }
 
-uint ACP::Next()
+ushort ACP::NextUInt16()
 {
-	uint num;
-	std::vector<byte> rnd(sizeof(uint));
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
-	GetBytes(rnd);
-	Utility::MemUtils::CopyToValue(rnd, 0, num, sizeof(uint));
+	return x;
+}
 
-	return num;
+uint ACP::NextUInt32()
+{
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+
+	return x;
+}
+
+ulong ACP::NextUInt64()
+{
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+
+	return x;
 }
 
 void ACP::Reset()
@@ -101,35 +112,23 @@ void ACP::Reset()
 
 	try
 	{
-		// collect entropy, filter, and compress
-		key = Collect();
+		// initialize the kdf
+		Collect();
 	}
 	catch (std::exception &ex)
 	{
 		throw CryptoRandomException("ACP:Reset", "Entropy collection has failed!", std::string(ex.what()));
 	}
-
-	// Note: this provider uses the extended form of rijndael, using 38 rounds for maximum diffusion
-	// get the iv and hkdf-info from system provider
-	Key::Symmetric::SymmetricKeySize keySize = m_cipherMode->LegalKeySizes()[1];
-	std::vector<byte> info(keySize.InfoSize());
-	std::vector<byte> iv(keySize.NonceSize());
-	CSP pvd;
-	pvd.GetBytes(info);
-	pvd.GetBytes(iv);
-	// key the cipher
-	Key::Symmetric::SymmetricKey kp(key, iv, info);
-	m_cipherMode->Initialize(true, kp);
 }
 
 //~~~Private Functions~~~//
 
-std::vector<byte> ACP::Collect()
+void ACP::Collect()
 {
-	const size_t KBLK = 72;
+	const size_t KBLOCK = 72;
 
 	std::vector<byte> state(0);
-	std::vector<byte> buffer(KBLK);
+	std::vector<byte> buffer(KBLOCK);
 	ulong ts = Utility::SysUtils::TimeStamp(m_hasTsc);
 	// add the first timestamp
 	Utility::ArrayUtils::Append(ts, state);
@@ -149,7 +148,7 @@ std::vector<byte> ACP::Collect()
 	if (m_hasRdrand)
 	{
 		RDP rpv;
-		rpv.GetBytes(buffer);
+		rpv.Generate(buffer);
 		Utility::ArrayUtils::Append(buffer, state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
 	}
@@ -159,36 +158,29 @@ std::vector<byte> ACP::Collect()
 	if (m_hasTsc)
 	{
 		CJP jpv;
-		jpv.GetBytes(buffer);
+		jpv.Generate(buffer);
 		Utility::ArrayUtils::Append(buffer, state);
 		Utility::ArrayUtils::Append(Utility::SysUtils::TimeStamp(m_hasTsc) - ts, state);
 	}
 #endif
 
 	// last block size
-	size_t padLen = ((state.size() % KBLK) == 0) ? KBLK : KBLK - (state.size() % KBLK);
-	if (padLen < KBLK / 2)
+	size_t padLen = ((state.size() % KBLOCK) == 0) ? KBLOCK : KBLOCK - (state.size() % KBLOCK);
+	if (padLen < KBLOCK / 2)
 	{
-		padLen += KBLK;
+		padLen += KBLOCK;
 	}
 
 	// forward padding
 	CSP cvd;
 	buffer.resize(padLen);
-	cvd.GetBytes(buffer);
+	cvd.Generate(buffer);
 	Utility::ArrayUtils::Append(buffer, state);
 
-	// return compressed state
-	return Compress(state);
-}
-
-std::vector<byte> ACP::Compress(std::vector<byte> &State)
-{
-	Digest::Keccak512 dgt;
-	std::vector<byte> outKey(dgt.DigestSize());
-	dgt.Compute(State, outKey);
-
-	return outKey;
+	// initialize cSHAKE-512
+	std::vector<byte> cust(72);
+	cvd.Generate(cust);
+	m_kdfGenerator->Initialize(state, cust);
 }
 
 void ACP::Filter(std::vector<byte> &State)

@@ -52,7 +52,7 @@ using Key::Asymmetric::MPKCPublicKey;
 /// create the shared secret
 /// std:vector&lt;byte&gt; msg(64);
 /// Prng::IPrng* rng = Helper::PrngFromName::GetInstance(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
-/// rng->GetBytes(msg);
+/// rng->Generate(msg);
 /// // initialize the cipher
 /// McEliece cpr(MPKCParams::M12T62, [PrngType], [CipherType]);
 /// cpr.Initialize(kp);
@@ -221,7 +221,7 @@ public:
 	/// Initialize the cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Initialize the cipher with a key</param>
+	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
 	void Initialize(IAsymmetricKey* Key) override;

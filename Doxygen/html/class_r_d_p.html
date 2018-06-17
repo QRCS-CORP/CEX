@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a74780e80e84ca936d00193b69d3dd3de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_r_d_p.html">RDP</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a74780e80e84ca936d00193b69d3dd3de">operator=</a> (const <a class="el" href="class_r_d_p.html">RDP</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a74780e80e84ca936d00193b69d3dd3de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#a74780e80e84ca936d00193b69d3dd3de">More...</a><br /></td></tr>
 <tr class="separator:a74780e80e84ca936d00193b69d3dd3de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbf1cff82a4324f21a2c057bd10c512c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#adbf1cff82a4324f21a2c057bd10c512c">RDP</a> (<a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RdEngines</a> RdEngine=RdEngines::RdRand)</td></tr>
-<tr class="memdesc:adbf1cff82a4324f21a2c057bd10c512c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with parameters  <a href="#adbf1cff82a4324f21a2c057bd10c512c">More...</a><br /></td></tr>
-<tr class="separator:adbf1cff82a4324f21a2c057bd10c512c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a670c982130b30b4db50aa11fee15bc2e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a670c982130b30b4db50aa11fee15bc2e">RDP</a> (<a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RdEngines</a> RdEngineType=RdEngines::RdRand)</td></tr>
+<tr class="memdesc:a670c982130b30b4db50aa11fee15bc2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class with parameters  <a href="#a670c982130b30b4db50aa11fee15bc2e">More...</a><br /></td></tr>
+<tr class="separator:a670c982130b30b4db50aa11fee15bc2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dfb0f2798b94673eb2a1ee14acbc4a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a8dfb0f2798b94673eb2a1ee14acbc4a2">~RDP</a> () override</td></tr>
 <tr class="memdesc:a8dfb0f2798b94673eb2a1ee14acbc4a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a8dfb0f2798b94673eb2a1ee14acbc4a2">More...</a><br /></td></tr>
 <tr class="separator:a8dfb0f2798b94673eb2a1ee14acbc4a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -141,18 +141,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a49a2c886fd790d415f39b8aec5620c48"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a49a2c886fd790d415f39b8aec5620c48">Name</a> () override</td></tr>
 <tr class="memdesc:a49a2c886fd790d415f39b8aec5620c48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The provider class name  <a href="#a49a2c886fd790d415f39b8aec5620c48">More...</a><br /></td></tr>
 <tr class="separator:a49a2c886fd790d415f39b8aec5620c48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af83372e124b1ad4b1bdba47153406be3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#af83372e124b1ad4b1bdba47153406be3">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:af83372e124b1ad4b1bdba47153406be3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#af83372e124b1ad4b1bdba47153406be3">More...</a><br /></td></tr>
-<tr class="separator:af83372e124b1ad4b1bdba47153406be3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89b3c8aa5a3fe69c7efddc4d589ea2f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a89b3c8aa5a3fe69c7efddc4d589ea2f4">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:a89b3c8aa5a3fe69c7efddc4d589ea2f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a89b3c8aa5a3fe69c7efddc4d589ea2f4">More...</a><br /></td></tr>
-<tr class="separator:a89b3c8aa5a3fe69c7efddc4d589ea2f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65d7bdcd030647530423c535f88951db"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a65d7bdcd030647530423c535f88951db">GetBytes</a> (size_t Length) override</td></tr>
-<tr class="memdesc:a65d7bdcd030647530423c535f88951db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a65d7bdcd030647530423c535f88951db">More...</a><br /></td></tr>
-<tr class="separator:a65d7bdcd030647530423c535f88951db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6be0ac8a34fd138edeafb1cb62123c72"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a6be0ac8a34fd138edeafb1cb62123c72">Next</a> () override</td></tr>
-<tr class="memdesc:a6be0ac8a34fd138edeafb1cb62123c72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pseudo-random unsigned 32bit integer  <a href="#a6be0ac8a34fd138edeafb1cb62123c72">More...</a><br /></td></tr>
-<tr class="separator:a6be0ac8a34fd138edeafb1cb62123c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac061a75b41aa89dde7534d558da84885"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#ac061a75b41aa89dde7534d558da84885">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:ac061a75b41aa89dde7534d558da84885"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#ac061a75b41aa89dde7534d558da84885">More...</a><br /></td></tr>
+<tr class="separator:ac061a75b41aa89dde7534d558da84885"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6292275469b6e2b0de73b438c1cb4354"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a6292275469b6e2b0de73b438c1cb4354">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a6292275469b6e2b0de73b438c1cb4354"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a6292275469b6e2b0de73b438c1cb4354">More...</a><br /></td></tr>
+<tr class="separator:a6292275469b6e2b0de73b438c1cb4354"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a414b616c94b7f8dcb0a1d96d5ec86903"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a414b616c94b7f8dcb0a1d96d5ec86903">Generate</a> (size_t Length) override</td></tr>
+<tr class="memdesc:a414b616c94b7f8dcb0a1d96d5ec86903"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a414b616c94b7f8dcb0a1d96d5ec86903">More...</a><br /></td></tr>
+<tr class="separator:a414b616c94b7f8dcb0a1d96d5ec86903"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8cda6bc36c168df67362b84522aa739"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#ad8cda6bc36c168df67362b84522aa739">NextUInt16</a> () override</td></tr>
+<tr class="memdesc:ad8cda6bc36c168df67362b84522aa739"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#ad8cda6bc36c168df67362b84522aa739">More...</a><br /></td></tr>
+<tr class="separator:ad8cda6bc36c168df67362b84522aa739"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bc62609e18952e3861ac46caa4824d4"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a4bc62609e18952e3861ac46caa4824d4">NextUInt32</a> () override</td></tr>
+<tr class="memdesc:a4bc62609e18952e3861ac46caa4824d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 32bit integer  <a href="#a4bc62609e18952e3861ac46caa4824d4">More...</a><br /></td></tr>
+<tr class="separator:a4bc62609e18952e3861ac46caa4824d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6ec0174dc8a927b9acc5b10bc8466e5"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#aa6ec0174dc8a927b9acc5b10bc8466e5">NextUInt64</a> () override</td></tr>
+<tr class="memdesc:aa6ec0174dc8a927b9acc5b10bc8466e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 64bit integer  <a href="#aa6ec0174dc8a927b9acc5b10bc8466e5">More...</a><br /></td></tr>
+<tr class="separator:aa6ec0174dc8a927b9acc5b10bc8466e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1afb103e3a23bae629ac197a16d12ea6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_r_d_p.html#a1afb103e3a23bae629ac197a16d12ea6">Reset</a> () override</td></tr>
 <tr class="memdesc:a1afb103e3a23bae629ac197a16d12ea6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#a1afb103e3a23bae629ac197a16d12ea6">More...</a><br /></td></tr>
 <tr class="separator:a1afb103e3a23bae629ac197a16d12ea6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,7 +180,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>An implementation of the Intel RdRand digital random number generator </p>
 <p>Example of getting a seed value: </p><div class="fragment"><div class="line">std:vector&lt;byte&gt; output(32);</div>
 <div class="line"><a class="code" href="class_r_d_p.html">RDP</a> gen;</div>
-<div class="line">gen.<a class="code" href="class_r_d_p.html#af83372e124b1ad4b1bdba47153406be3">GetBytes</a>(output);</div>
+<div class="line">gen.<a class="code" href="class_r_d_p.html#ac061a75b41aa89dde7534d558da84885">Generate</a>(output);</div>
 </div><!-- fragment --> <p>The RdRand DRNG uses thermal noise to generate random bits that are buffered into a shift register, then fed into a CBC-MAC to condition the bytes. The output from the CBC-MAC is obtained using the RDSEED api. <br />
 To accommodate large sampling, the system has a built in CTR_DRBG, (as specified in SP800-90), which is continuously reseeded with the output from RDSEED. The output from the CTR Drbg is obtained using the RDRAND api. <br />
 There is some controversy surrounding the security of this mechanism, though the design appears to be sound, and has been reviewed by external auditors, it is still a proprietary closed system. <br />
@@ -247,7 +253,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 
 </div>
 </div>
-<a class="anchor" id="adbf1cff82a4324f21a2c057bd10c512c"></a>
+<a class="anchor" id="a670c982130b30b4db50aa11fee15bc2e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -255,7 +261,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
           <td class="memname">RDP::RDP </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9">RdEngines</a>&#160;</td>
-          <td class="paramname"><em>RdEngine</em> = <code>RdEngines::RdRand</code></td><td>)</td>
+          <td class="paramname"><em>RdEngineType</em> = <code>RdEngines::RdRand</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -264,7 +270,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 <p>Constructor: instantiate this class with parameters </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">RdEngine</td><td>The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</td></tr>
+    <tr><td class="paramname">RdEngineType</td><td>The providers random output engine configuration type; RdRand (post processed by CTR_DRBG), or RdSeed (conditioned seed value)</td></tr>
   </table>
   </dd>
 </dl>
@@ -324,7 +330,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 
 </div>
 </div>
-<a class="anchor" id="af83372e124b1ad4b1bdba47153406be3"></a>
+<a class="anchor" id="ac061a75b41aa89dde7534d558da84885"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -332,7 +338,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void RDP::GetBytes </td>
+          <td class="memname">void RDP::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -360,11 +366,11 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#a163a0e0ec3e495eca12171945075f420">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ab60fe67b92050cea64a2c2b4c2b8e315">IProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a89b3c8aa5a3fe69c7efddc4d589ea2f4"></a>
+<a class="anchor" id="a6292275469b6e2b0de73b438c1cb4354"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -372,7 +378,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void RDP::GetBytes </td>
+          <td class="memname">void RDP::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -418,11 +424,11 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#a928d988a126cb4e15d845c2f23131764">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#aa3319763559f1ae3bd8aca8d3f5782b8">IProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a65d7bdcd030647530423c535f88951db"></a>
+<a class="anchor" id="a414b616c94b7f8dcb0a1d96d5ec86903"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -430,7 +436,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; RDP::GetBytes </td>
+          <td class="memname">std::vector&lt; byte &gt; RDP::Generate </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em></td><td>)</td>
@@ -459,7 +465,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#aa71f74af38ff2d7c7dbc0d3236ff1e71">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ac6803538a8832d5abeee53b877367b81">IProvider</a>.</p>
 
 </div>
 </div>
@@ -517,7 +523,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 
 </div>
 </div>
-<a class="anchor" id="a6be0ac8a34fd138edeafb1cb62123c72"></a>
+<a class="anchor" id="ad8cda6bc36c168df67362b84522aa739"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -525,7 +531,7 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint RDP::Next </td>
+          <td class="memname">ushort RDP::NextUInt16 </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -538,15 +544,66 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 </table>
 </div><div class="memdoc">
 
-<p>Returns a pseudo-random unsigned 32bit integer </p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Get a pseudo random unsigned 16bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#ae209d1e49b9b9a2c1cfe891760f591da">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#a9ace43d5ae44743fe8a517e6cae41054">IProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4bc62609e18952e3861ac46caa4824d4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint RDP::NextUInt32 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 32bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random 32bit integer</dd></dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#ab79ff514e55dcca60234fb81f27c2b93">IProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa6ec0174dc8a927b9acc5b10bc8466e5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ulong RDP::NextUInt64 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 64bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random 64bit integer</dd></dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#a022543661edfbea4a44f456fd9be134f">IProvider</a>.</p>
 
 </div>
 </div>
@@ -604,9 +661,9 @@ A Provable Security Analysis of Intel's <a href="http://terashima.us/rdrand-ec20
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_r_d_p_8h_source.html">RDP.h</a></li>
-<li>CEX/RDP.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_r_d_p_8h_source.html">RDP.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/RDP.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

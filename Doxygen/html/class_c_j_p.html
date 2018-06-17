@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -143,18 +143,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a136d1c681be018ea2a22fa9f543f76ee"><td class="memItemLeft" align="right" valign="top">bool &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a136d1c681be018ea2a22fa9f543f76ee">SecureCache</a> ()</td></tr>
 <tr class="memdesc:a136d1c681be018ea2a22fa9f543f76ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Populate the random cache with an unused value after each generation cycle  <a href="#a136d1c681be018ea2a22fa9f543f76ee">More...</a><br /></td></tr>
 <tr class="separator:a136d1c681be018ea2a22fa9f543f76ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af64b6032cf12ac20afa6229c9dc1bf42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:af64b6032cf12ac20afa6229c9dc1bf42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#af64b6032cf12ac20afa6229c9dc1bf42">More...</a><br /></td></tr>
-<tr class="separator:af64b6032cf12ac20afa6229c9dc1bf42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17653027dd9b6563565146ca91f7a552"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a17653027dd9b6563565146ca91f7a552">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:a17653027dd9b6563565146ca91f7a552"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a17653027dd9b6563565146ca91f7a552">More...</a><br /></td></tr>
-<tr class="separator:a17653027dd9b6563565146ca91f7a552"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac822c86760f3ee5ebd45e12588eec83c"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#ac822c86760f3ee5ebd45e12588eec83c">GetBytes</a> (size_t Length) override</td></tr>
-<tr class="memdesc:ac822c86760f3ee5ebd45e12588eec83c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#ac822c86760f3ee5ebd45e12588eec83c">More...</a><br /></td></tr>
-<tr class="separator:ac822c86760f3ee5ebd45e12588eec83c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41543aab0315f677c497de960f36d06a"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a41543aab0315f677c497de960f36d06a">Next</a> () override</td></tr>
-<tr class="memdesc:a41543aab0315f677c497de960f36d06a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pseudo-random unsigned 32bit integer  <a href="#a41543aab0315f677c497de960f36d06a">More...</a><br /></td></tr>
-<tr class="separator:a41543aab0315f677c497de960f36d06a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#a4a45fbe68f3f13631eaa9fd395d02dcf">More...</a><br /></td></tr>
+<tr class="separator:a4a45fbe68f3f13631eaa9fd395d02dcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72623809622dc786872111a79e02fcc5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a72623809622dc786872111a79e02fcc5">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a72623809622dc786872111a79e02fcc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a72623809622dc786872111a79e02fcc5">More...</a><br /></td></tr>
+<tr class="separator:a72623809622dc786872111a79e02fcc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a637693b5e6ab79f44c1a048e03d442f8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#a637693b5e6ab79f44c1a048e03d442f8">Generate</a> (size_t Length) override</td></tr>
+<tr class="memdesc:a637693b5e6ab79f44c1a048e03d442f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a637693b5e6ab79f44c1a048e03d442f8">More...</a><br /></td></tr>
+<tr class="separator:a637693b5e6ab79f44c1a048e03d442f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aade465b490b9462ecbe197d4c73c3a61"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#aade465b490b9462ecbe197d4c73c3a61">NextUInt16</a> () override</td></tr>
+<tr class="memdesc:aade465b490b9462ecbe197d4c73c3a61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#aade465b490b9462ecbe197d4c73c3a61">More...</a><br /></td></tr>
+<tr class="separator:aade465b490b9462ecbe197d4c73c3a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefe5f87da005fd7151a152394b6fdd36"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#aefe5f87da005fd7151a152394b6fdd36">NextUInt32</a> () override</td></tr>
+<tr class="memdesc:aefe5f87da005fd7151a152394b6fdd36"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 32bit integer  <a href="#aefe5f87da005fd7151a152394b6fdd36">More...</a><br /></td></tr>
+<tr class="separator:aefe5f87da005fd7151a152394b6fdd36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8c27859ec0a55bbbd61873de8d0737e"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#aa8c27859ec0a55bbbd61873de8d0737e">NextUInt64</a> () override</td></tr>
+<tr class="memdesc:aa8c27859ec0a55bbbd61873de8d0737e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 64bit integer  <a href="#aa8c27859ec0a55bbbd61873de8d0737e">More...</a><br /></td></tr>
+<tr class="separator:aa8c27859ec0a55bbbd61873de8d0737e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5b49834966cc875efd8ceab9045fa48"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">Reset</a> () override</td></tr>
 <tr class="memdesc:ab5b49834966cc875efd8ceab9045fa48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#ab5b49834966cc875efd8ceab9045fa48">More...</a><br /></td></tr>
 <tr class="separator:ab5b49834966cc875efd8ceab9045fa48"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -176,7 +182,7 @@ Public Member Functions</h2></td></tr>
 <div class="textblock"><p>The CPU Jitter entropy Provider </p>
 <p>Example of getting a seed value: </p><div class="fragment"><div class="line">std:vector&lt;byte&gt; output(32);</div>
 <div class="line"><a class="code" href="class_c_j_p.html">CJP</a> gen;</div>
-<div class="line">gen.<a class="code" href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">GetBytes</a>(output);</div>
+<div class="line">gen.<a class="code" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">Generate</a>(output);</div>
 </div><!-- fragment --> <p>The jitter based entropy provider measures discreet timing differences in the nanosecond range of memory access requests and CPU execution time. Because the CPU and cache memory are continuously being accessed by various operating system and application processes, small timing differences can be observed and measured using a high-resolution timestamp. Delays caused by events like external thread execution, branching, cache misses, and memory movement through the processor cache levels are measured, and these small differences are collected and concentrated to produce the providers output. The CJP provider should not be used as the sole source of entropy for secret keys, but should be combined with other sources and concentrated to produce a key.</p>
 <p>Guiding Publications:: </p><ol>
 <li>
@@ -321,7 +327,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 
 </div>
 </div>
-<a class="anchor" id="af64b6032cf12ac20afa6229c9dc1bf42"></a>
+<a class="anchor" id="a4a45fbe68f3f13631eaa9fd395d02dcf"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -329,7 +335,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void CJP::GetBytes </td>
+          <td class="memname">void CJP::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -357,11 +363,11 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#a163a0e0ec3e495eca12171945075f420">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ab60fe67b92050cea64a2c2b4c2b8e315">IProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a17653027dd9b6563565146ca91f7a552"></a>
+<a class="anchor" id="a72623809622dc786872111a79e02fcc5"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -369,7 +375,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void CJP::GetBytes </td>
+          <td class="memname">void CJP::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -415,11 +421,11 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#a928d988a126cb4e15d845c2f23131764">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#aa3319763559f1ae3bd8aca8d3f5782b8">IProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac822c86760f3ee5ebd45e12588eec83c"></a>
+<a class="anchor" id="a637693b5e6ab79f44c1a048e03d442f8"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -427,7 +433,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; CJP::GetBytes </td>
+          <td class="memname">std::vector&lt; byte &gt; CJP::Generate </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em></td><td>)</td>
@@ -456,7 +462,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#aa71f74af38ff2d7c7dbc0d3236ff1e71">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ac6803538a8832d5abeee53b877367b81">IProvider</a>.</p>
 
 </div>
 </div>
@@ -515,7 +521,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 
 </div>
 </div>
-<a class="anchor" id="a41543aab0315f677c497de960f36d06a"></a>
+<a class="anchor" id="aade465b490b9462ecbe197d4c73c3a61"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -523,7 +529,7 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint CJP::Next </td>
+          <td class="memname">ushort CJP::NextUInt16 </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -536,16 +542,66 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 </table>
 </div><div class="memdoc">
 
-<p>Returns a pseudo-random unsigned 32bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>A pseudo random 32bit unsigned integer</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Get a pseudo random unsigned 16bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#ae209d1e49b9b9a2c1cfe891760f591da">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#a9ace43d5ae44743fe8a517e6cae41054">IProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aefe5f87da005fd7151a152394b6fdd36"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint CJP::NextUInt32 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 32bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random 32bit integer</dd></dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#ab79ff514e55dcca60234fb81f27c2b93">IProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa8c27859ec0a55bbbd61873de8d0737e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ulong CJP::NextUInt64 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 64bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random 64bit integer</dd></dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#a022543661edfbea4a44f456fd9be134f">IProvider</a>.</p>
 
 </div>
 </div>
@@ -645,8 +701,8 @@ RFC <a href="http://www.ietf.org/rfc/rfc4086.txt">4086</a>: Randomness Requireme
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_c_j_p_8h_source.html">CJP.h</a></li>
-<li>CEX/CJP.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_c_j_p_8h_source.html">CJP.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/CJP.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -73,7 +73,7 @@ private:
 	bool m_isDestroyed;
 	Providers m_providerType;
 	std::vector<byte> m_rndBuffer;
-	Prngs m_rndEngineType;
+	Prngs m_rngGeneratorType;
 	std::unique_ptr<IPrng> m_rngEngine;
 
 public:
@@ -96,13 +96,13 @@ public:
 	/// The default configuration is the Block cipher Counter Rng (BCR), using an AES-256 CTR cipher, seeded with the Auto Collection seed Provider (ACP)</para>
 	/// </summary>
 	/// 
-	/// <param name="EngineType">The base random bytes generator (PRNG) used to power this wrapper; default is block cipher counter</param>
+	/// <param name="PrngType">The base random bytes generator (PRNG) used to power this wrapper; default is block cipher counter</param>
 	/// <param name="ProviderType">The entropy provider type used to initialize the prng</param>
 	/// <param name="DigestType">The message digest function used by the drbg as either the base PRF for that function (HCR or DCR), or to invoke the extended cipher configuration when using BCR</param>
 	/// <param name="BufferSize">The byte size of the internal buffer; default is 4096</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the selected parameters are invalid</exception>
-	explicit SecureRandom(Prngs EngineType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None, size_t BufferSize = 4096);
+	explicit SecureRandom(Prngs PrngType = Prngs::BCR, Providers ProviderType = Providers::ACP, Digests DigestType = Digests::None, size_t BufferSize = 4096);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -147,7 +147,7 @@ public:
 	/// <param name="Length">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	std::vector<byte> GetBytes(size_t Length);
+	std::vector<byte> Generate(size_t Length);
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes using offsets
@@ -156,14 +156,14 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
-	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length);
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	void GetBytes(std::vector<byte> &Output);
+	void Generate(std::vector<byte> &Output);
 
 	//~~~Char~~~//
 

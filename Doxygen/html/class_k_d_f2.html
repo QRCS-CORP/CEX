@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -155,6 +155,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a36237799279532d7b9056f0a893fddcc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_d_f2.html#a36237799279532d7b9056f0a893fddcc">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
 <tr class="memdesc:a36237799279532d7b9056f0a893fddcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key.  <a href="#a36237799279532d7b9056f0a893fddcc">More...</a><br /></td></tr>
 <tr class="separator:a36237799279532d7b9056f0a893fddcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c18f65ef1077bd62817c01ef5971a2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_d_f2.html#a7c18f65ef1077bd62817c01ef5971a2e">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a7c18f65ef1077bd62817c01ef5971a2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, using length and offset arguments  <a href="#a7c18f65ef1077bd62817c01ef5971a2e">More...</a><br /></td></tr>
+<tr class="separator:a7c18f65ef1077bd62817c01ef5971a2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0d1d9e7ba0f763faf3474d4f56f75d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_k_d_f2.html#af0d1d9e7ba0f763faf3474d4f56f75d4">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt) override</td></tr>
 <tr class="memdesc:af0d1d9e7ba0f763faf3474d4f56f75d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays  <a href="#af0d1d9e7ba0f763faf3474d4f56f75d4">More...</a><br /></td></tr>
 <tr class="separator:af0d1d9e7ba0f763faf3474d4f56f75d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -205,6 +208,8 @@ It is recommended that a salt value is added along with the key, this mitigates 
  T = T || Hash(Z || C || [OtherInfo]). <br />
 4) Output the first kLen bytes of T as K.</p>
 <p><b>Implementation Notes:</b> </p><ul>
+<li>
+This implementation only supports the SHA2-256 and SHA2-512 message digests. </li>
 <li>
 Class can be initialized with a message digest instance, or by using a digests enumeration type name. </li>
 <li>
@@ -587,6 +592,64 @@ NIST SP80056A: Recommendation for Pair-Wise Key Establishment Schemes: <a href="
 
 </div>
 </div>
+<a class="anchor" id="a7c18f65ef1077bd62817c01ef5971a2e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void KDF2::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the generator with a key, using length and offset arguments </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">IKdf</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="af0d1d9e7ba0f763faf3474d4f56f75d4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -899,9 +962,9 @@ NIST SP80056A: Recommendation for Pair-Wise Key Establishment Schemes: <a href="
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_k_d_f2_8h_source.html">KDF2.h</a></li>
-<li>CEX/KDF2.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_k_d_f2_8h_source.html">KDF2.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/KDF2.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

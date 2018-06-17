@@ -57,7 +57,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = rng.NextUInt32(10000, 100);
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::Copy(input, 0, output, 0, inpSze);
 
@@ -71,7 +71,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 16;
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::COPY128(input, 0, output, 0);
 
@@ -85,7 +85,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 32;
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::COPY256(input, 0, output, 0);
 
@@ -99,7 +99,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 64;
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::COPY512(input, 0, output, 0);
 
@@ -129,7 +129,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = rng.NextUInt32(10000, 100);
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::Clear(input, 0, inpSze);
 
@@ -144,7 +144,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 16;
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::CLEAR128(input, 0);
 
@@ -158,7 +158,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 32;
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::CLEAR256(input, 0);
 
@@ -172,7 +172,7 @@ namespace Test
 		for (size_t i = 0; i < 100; ++i)
 		{
 			uint inpSze = 64;
-			std::vector<byte> input = rng.GetBytes(inpSze);
+			std::vector<byte> input = rng.Generate(inpSze);
 			std::vector<byte> output(input.size());
 			MemUtils::CLEAR512(input, 0);
 

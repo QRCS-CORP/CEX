@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -101,18 +101,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a92d94cd964a2f4605fd33d25e022afa9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_aead_mode.html">IAeadMode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_aead_mode_from_name.html#a92d94cd964a2f4605fd33d25e022afa9">GetInstance</a> (AeadModes CipherType, <a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> EngineType)</td></tr>
-<tr class="memdesc:a92d94cd964a2f4605fd33d25e022afa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an Cipher Mode instance by name using default parameters  <a href="#a92d94cd964a2f4605fd33d25e022afa9">More...</a><br /></td></tr>
-<tr class="separator:a92d94cd964a2f4605fd33d25e022afa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4307002a84306f714d2e6b76cd665ba"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_aead_mode.html">IAeadMode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_aead_mode_from_name.html#ab4307002a84306f714d2e6b76cd665ba">GetInstance</a> (AeadModes CipherType, <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Engine)</td></tr>
-<tr class="memdesc:ab4307002a84306f714d2e6b76cd665ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an Cipher Mode instance by name using default parameters  <a href="#ab4307002a84306f714d2e6b76cd665ba">More...</a><br /></td></tr>
-<tr class="separator:ab4307002a84306f714d2e6b76cd665ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad95e158d01707cf9318f9acd20c01693"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_aead_mode.html">IAeadMode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_aead_mode_from_name.html#ad95e158d01707cf9318f9acd20c01693">GetInstance</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType, AeadModes CipherModeType)</td></tr>
+<tr class="memdesc:ad95e158d01707cf9318f9acd20c01693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an uninitialized AEAD mode instance by name  <a href="#ad95e158d01707cf9318f9acd20c01693">More...</a><br /></td></tr>
+<tr class="separator:ad95e158d01707cf9318f9acd20c01693"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae366395ffcea9e64ac8f253396a0b039"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_aead_mode.html">IAeadMode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_aead_mode_from_name.html#ae366395ffcea9e64ac8f253396a0b039">GetInstance</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher, AeadModes CipherModeType)</td></tr>
+<tr class="memdesc:ae366395ffcea9e64ac8f253396a0b039"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an uninitialized AEAD mode instance by name and a block-cipher pointer  <a href="#ae366395ffcea9e64ac8f253396a0b039">More...</a><br /></td></tr>
+<tr class="separator:ae366395ffcea9e64ac8f253396a0b039"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get a Cipher Mode instance from it's enumeration name. </p>
 <p>The Cipher modes Initialize function must be called before it can be used.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a92d94cd964a2f4605fd33d25e022afa9"></a>
+<a class="anchor" id="ad95e158d01707cf9318f9acd20c01693"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -122,14 +122,20 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="class_i_aead_mode.html">IAeadMode</a> * AeadModeFromName::GetInstance </td>
           <td>(</td>
-          <td class="paramtype">AeadModes&#160;</td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
           <td class="paramname"><em>CipherType</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>EngineType</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">AeadModes&#160;</td>
+          <td class="paramname"><em>CipherModeType</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -144,15 +150,16 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get an Cipher Mode instance by name using default parameters </p>
+<p>Get an uninitialized AEAD mode instance by name </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherType</td><td>The AEAD cipher mode enumeration name</td></tr>
-    <tr><td class="paramname">EngineType</td><td>The block cipher enumeration name</td></tr>
+    <tr><td class="paramname">CipherType</td><td>The block-cipher enumeration name</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
+    <tr><td class="paramname">CipherModeType</td><td>The AEAD cipher-mode enumeration name</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A block cipher mode instance</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An uninitialized AEAD block-cipher mode instance</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
@@ -162,7 +169,7 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab4307002a84306f714d2e6b76cd665ba"></a>
+<a class="anchor" id="ae366395ffcea9e64ac8f253396a0b039"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -172,14 +179,14 @@ Static Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_aead_mode.html">IAeadMode</a> * AeadModeFromName::GetInstance </td>
           <td>(</td>
-          <td class="paramtype">AeadModes&#160;</td>
-          <td class="paramname"><em>CipherType</em>, </td>
+          <td class="paramtype"><a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td>
+          <td class="paramname"><em>Cipher</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td>
-          <td class="paramname"><em>Engine</em>&#160;</td>
+          <td class="paramtype">AeadModes&#160;</td>
+          <td class="paramname"><em>CipherModeType</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -194,15 +201,15 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get an Cipher Mode instance by name using default parameters </p>
+<p>Get an uninitialized AEAD mode instance by name and a block-cipher pointer </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">CipherType</td><td>The AEAD cipher mode enumeration name</td></tr>
-    <tr><td class="paramname">Engine</td><td>The block cipher instance</td></tr>
+    <tr><td class="paramname">Cipher</td><td>The block-cipher instance</td></tr>
+    <tr><td class="paramname">CipherModeType</td><td>The AEAD cipher-mode enumeration name</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A block cipher mode instance</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>An uninitialized AEAD block-cipher mode instance</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
@@ -213,8 +220,8 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_aead_mode_from_name_8h_source.html">AeadModeFromName.h</a></li>
-<li>CEX/AeadModeFromName.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_aead_mode_from_name_8h_source.html">AeadModeFromName.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/AeadModeFromName.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

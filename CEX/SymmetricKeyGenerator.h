@@ -97,28 +97,28 @@ public:
 	/// Create a populated SymmetricKey class
 	/// </summary>
 	/// 
-	/// <param name="KeySize">The key, nonce and info sizes in bytes to generate</param>
+	/// <param name="Length">The key, nonce, and info sizes in bytes to generate</param>
 	/// 
 	/// <returns>A populated SymmetricSecureKey class</returns>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if the key size is zero length</exception>
-	SymmetricSecureKey* GetSecureKey(SymmetricKeySize KeySize);
+	SymmetricSecureKey* GetSecureKey(SymmetricKeySize Length);
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
 	/// </summary>
 	/// 
 	/// <param name="Output">Array to fill with random bytes</param>
-	void GetBytes(std::vector<byte> &Output);
+	void Generate(std::vector<byte> &Output);
 
 	/// <summary>
 	/// Return an array filled with pseudo random bytes
 	/// </summary>
 	/// 
-	/// <param name="Size">Size of requested byte array</param>
+	/// <param name="Length">Size of requested byte array</param>
 	/// 
 	/// <returns>Pseudo random byte array</returns>
-	std::vector<byte> GetBytes(size_t Size);
+	std::vector<byte> Generate(size_t Length);
 
 	/// <summary>
 	/// Reset the seed Seed Generators and the Digest engine
@@ -128,8 +128,8 @@ public:
 private:
 
 	void Destroy();
-	std::vector<byte> Generate(size_t KeySize);
-	std::vector<byte> GenerateBlock();
+	std::vector<byte> Process(size_t KeySize);
+	std::vector<byte> ProcessBlock();
 };
 
 NAMESPACE_SYMMETRICKEYEND

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/ACP.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/ACP.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="preprocessor">#define CEX_ACP_H</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="preprocessor">#include &quot;IProvider.h&quot;</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;ICipherMode.h&quot;</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#include &quot;IKdf.h&quot;</span></div>
 <div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;NAMESPACE_PROVIDER</div>
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
@@ -106,7 +106,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> std::string CLASS_NAME;</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> DEF_STATECAP = 1024;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::unique_ptr&lt;Cipher::Symmetric::Block::Mode::ICipherMode&gt; m_cipherMode;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    std::unique_ptr&lt;Kdf::IKdf&gt; m_kdfGenerator;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">bool</span> m_hasTsc;</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">bool</span> m_hasRdrand;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">bool</span> m_isAvailable;</div>
@@ -133,42 +133,47 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_a_c_p.html#a5fbdd4c4836f0a241c166ab2bacacb21">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_a_c_p.html#ae0bdd9d52a4b9ffeb8e61b6b3d7da315">Generate</a>(std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_a_c_p.html#a5fbdd4c4836f0a241c166ab2bacacb21">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_a_c_p.html#ae0bdd9d52a4b9ffeb8e61b6b3d7da315">Generate</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_a_c_p.html#a5fbdd4c4836f0a241c166ab2bacacb21">GetBytes</a>(<span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_a_c_p.html#ae0bdd9d52a4b9ffeb8e61b6b3d7da315">Generate</a>(<span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    uint <a class="code" href="class_a_c_p.html#a31f21e1f0a5a9e89fedad93296bf9dab">Next</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_a_c_p.html#aa321d3c4d04bc1947fad76e3457d02ac">Reset</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    std::vector&lt;byte&gt; Collect();</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    std::vector&lt;byte&gt; Compress(std::vector&lt;byte&gt; &amp;State);</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordtype">void</span> Filter(std::vector&lt;byte&gt; &amp;State);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    std::vector&lt;byte&gt; MemoryInfo();</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    std::vector&lt;byte&gt; ProcessInfo();</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordtype">void</span> Scope();</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    std::vector&lt;byte&gt; SystemInfo();</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    std::vector&lt;byte&gt; TimeInfo();</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;};</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    ushort <a class="code" href="class_a_c_p.html#a5b3ab260d08dc056e096bcbde5a06829">NextUInt16</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    uint <a class="code" href="class_a_c_p.html#aad93838c9bd4d2995c0a3ec4b520596a">NextUInt32</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    ulong <a class="code" href="class_a_c_p.html#afb1fe09654b2c37bc490ffecd0b21bea">NextUInt64</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_a_c_p.html#aa321d3c4d04bc1947fad76e3457d02ac">Reset</a>() <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;NAMESPACE_PROVIDEREND</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_i_provider_html"><div class="ttname"><a href="class_i_provider.html">IProvider</a></div><div class="ttdoc">Entropy source collectors and concentrators interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:487</div></div>
-<div class="ttc" id="class_a_c_p_html_a7651eb0535313ac5f37194d0263112ad"><div class="ttname"><a href="class_a_c_p.html#a7651eb0535313ac5f37194d0263112ad">ACP::Enumeral</a></div><div class="ttdeci">const Providers Enumeral() override</div><div class="ttdoc">Read Only: The providers type name </div><div class="ttdef"><b>Definition:</b> ACP.cpp:44</div></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordtype">void</span> Collect();</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">void</span> Filter(std::vector&lt;byte&gt; &amp;State);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    std::vector&lt;byte&gt; MemoryInfo();</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    std::vector&lt;byte&gt; ProcessInfo();</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordtype">void</span> Scope();</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    std::vector&lt;byte&gt; SystemInfo();</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    std::vector&lt;byte&gt; TimeInfo();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;};</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;NAMESPACE_PROVIDEREND</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="class_a_c_p_html_a5b3ab260d08dc056e096bcbde5a06829"><div class="ttname"><a href="class_a_c_p.html#a5b3ab260d08dc056e096bcbde5a06829">ACP::NextUInt16</a></div><div class="ttdeci">ushort NextUInt16() override</div><div class="ttdoc">Get a pseudo random unsigned 16bit integer </div><div class="ttdef"><b>Definition:</b> ACP.cpp:85</div></div>
+<div class="ttc" id="class_i_provider_html"><div class="ttname"><a href="class_i_provider.html">IProvider</a></div><div class="ttdoc">Entropy source collectors and concentrators interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:506</div></div>
+<div class="ttc" id="class_a_c_p_html_aad93838c9bd4d2995c0a3ec4b520596a"><div class="ttname"><a href="class_a_c_p.html#aad93838c9bd4d2995c0a3ec4b520596a">ACP::NextUInt32</a></div><div class="ttdeci">uint NextUInt32() override</div><div class="ttdoc">Get a pseudo random unsigned 32bit integer </div><div class="ttdef"><b>Definition:</b> ACP.cpp:93</div></div>
+<div class="ttc" id="class_a_c_p_html_a7651eb0535313ac5f37194d0263112ad"><div class="ttname"><a href="class_a_c_p.html#a7651eb0535313ac5f37194d0263112ad">ACP::Enumeral</a></div><div class="ttdeci">const Providers Enumeral() override</div><div class="ttdoc">Read Only: The providers type name </div><div class="ttdef"><b>Definition:</b> ACP.cpp:43</div></div>
 <div class="ttc" id="class_a_c_p_html"><div class="ttname"><a href="class_a_c_p.html">ACP</a></div><div class="ttdoc">An implementation of an Auto Collection seed Provider </div><div class="ttdef"><b>Definition:</b> ACP.h:40</div></div>
-<div class="ttc" id="class_a_c_p_html_a31f21e1f0a5a9e89fedad93296bf9dab"><div class="ttname"><a href="class_a_c_p.html#a31f21e1f0a5a9e89fedad93296bf9dab">ACP::Next</a></div><div class="ttdeci">uint Next() override</div><div class="ttdoc">Returns a pseudo-random unsigned 32bit integer </div><div class="ttdef"><b>Definition:</b> ACP.cpp:87</div></div>
-<div class="ttc" id="class_a_c_p_html_aa321d3c4d04bc1947fad76e3457d02ac"><div class="ttname"><a href="class_a_c_p.html#aa321d3c4d04bc1947fad76e3457d02ac">ACP::Reset</a></div><div class="ttdeci">void Reset() override</div><div class="ttdoc">Reset the internal state </div><div class="ttdef"><b>Definition:</b> ACP.cpp:98</div></div>
-<div class="ttc" id="class_a_c_p_html_ae41c00d3a93e7af606e57b27035253df"><div class="ttname"><a href="class_a_c_p.html#ae41c00d3a93e7af606e57b27035253df">ACP::~ACP</a></div><div class="ttdeci">~ACP() override</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> ACP.cpp:30</div></div>
-<div class="ttc" id="class_a_c_p_html_a5fbdd4c4836f0a241c166ab2bacacb21"><div class="ttname"><a href="class_a_c_p.html#a5fbdd4c4836f0a241c166ab2bacacb21">ACP::GetBytes</a></div><div class="ttdeci">void GetBytes(std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Fill a buffer with pseudo-random bytes </div><div class="ttdef"><b>Definition:</b> ACP.cpp:61</div></div>
+<div class="ttc" id="class_a_c_p_html_aa321d3c4d04bc1947fad76e3457d02ac"><div class="ttname"><a href="class_a_c_p.html#aa321d3c4d04bc1947fad76e3457d02ac">ACP::Reset</a></div><div class="ttdeci">void Reset() override</div><div class="ttdoc">Reset the internal state </div><div class="ttdef"><b>Definition:</b> ACP.cpp:109</div></div>
+<div class="ttc" id="class_a_c_p_html_ae41c00d3a93e7af606e57b27035253df"><div class="ttname"><a href="class_a_c_p.html#ae41c00d3a93e7af606e57b27035253df">ACP::~ACP</a></div><div class="ttdeci">~ACP() override</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> ACP.cpp:29</div></div>
 <div class="ttc" id="class_a_c_p_html_accaecb4938070e758c316a7446762e1f"><div class="ttname"><a href="class_a_c_p.html#accaecb4938070e758c316a7446762e1f">ACP::operator=</a></div><div class="ttdeci">ACP &amp; operator=(const ACP &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
-<div class="ttc" id="class_a_c_p_html_ad869a589dfbdd441c07208d742a3db28"><div class="ttname"><a href="class_a_c_p.html#ad869a589dfbdd441c07208d742a3db28">ACP::Name</a></div><div class="ttdeci">const std::string Name() override</div><div class="ttdoc">Read Only: The provider class name </div><div class="ttdef"><b>Definition:</b> ACP.cpp:54</div></div>
-<div class="ttc" id="class_a_c_p_html_a45b569f6ce25b41c3d2f29657c8e0150"><div class="ttname"><a href="class_a_c_p.html#a45b569f6ce25b41c3d2f29657c8e0150">ACP::IsAvailable</a></div><div class="ttdeci">const bool IsAvailable() override</div><div class="ttdoc">Read Only: The entropy provider is available on this system </div><div class="ttdef"><b>Definition:</b> ACP.cpp:49</div></div>
-<div class="ttc" id="class_a_c_p_html_ab785a09de9bade8012c3d60789a169d5"><div class="ttname"><a href="class_a_c_p.html#ab785a09de9bade8012c3d60789a169d5">ACP::ACP</a></div><div class="ttdeci">ACP()</div><div class="ttdoc">Constructor: instantiate this class </div><div class="ttdef"><b>Definition:</b> ACP.cpp:19</div></div>
-<div class="ttc" id="group___enumeration_html_ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><div class="ttname"><a href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a></div><div class="ttdeci">Providers</div><div class="ttdef"><b>Definition:</b> Documentation.h:299</div></div>
+<div class="ttc" id="class_a_c_p_html_ae0bdd9d52a4b9ffeb8e61b6b3d7da315"><div class="ttname"><a href="class_a_c_p.html#ae0bdd9d52a4b9ffeb8e61b6b3d7da315">ACP::Generate</a></div><div class="ttdeci">void Generate(std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Fill a buffer with pseudo-random bytes </div><div class="ttdef"><b>Definition:</b> ACP.cpp:60</div></div>
+<div class="ttc" id="class_a_c_p_html_ad869a589dfbdd441c07208d742a3db28"><div class="ttname"><a href="class_a_c_p.html#ad869a589dfbdd441c07208d742a3db28">ACP::Name</a></div><div class="ttdeci">const std::string Name() override</div><div class="ttdoc">Read Only: The provider class name </div><div class="ttdef"><b>Definition:</b> ACP.cpp:53</div></div>
+<div class="ttc" id="class_a_c_p_html_a45b569f6ce25b41c3d2f29657c8e0150"><div class="ttname"><a href="class_a_c_p.html#a45b569f6ce25b41c3d2f29657c8e0150">ACP::IsAvailable</a></div><div class="ttdeci">const bool IsAvailable() override</div><div class="ttdoc">Read Only: The entropy provider is available on this system </div><div class="ttdef"><b>Definition:</b> ACP.cpp:48</div></div>
+<div class="ttc" id="class_a_c_p_html_ab785a09de9bade8012c3d60789a169d5"><div class="ttname"><a href="class_a_c_p.html#ab785a09de9bade8012c3d60789a169d5">ACP::ACP</a></div><div class="ttdeci">ACP()</div><div class="ttdoc">Constructor: instantiate this class </div><div class="ttdef"><b>Definition:</b> ACP.cpp:18</div></div>
+<div class="ttc" id="group___enumeration_html_ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><div class="ttname"><a href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a></div><div class="ttdeci">Providers</div><div class="ttdef"><b>Definition:</b> Documentation.h:317</div></div>
+<div class="ttc" id="class_a_c_p_html_afb1fe09654b2c37bc490ffecd0b21bea"><div class="ttname"><a href="class_a_c_p.html#afb1fe09654b2c37bc490ffecd0b21bea">ACP::NextUInt64</a></div><div class="ttdeci">ulong NextUInt64() override</div><div class="ttdoc">Get a pseudo random unsigned 64bit integer </div><div class="ttdef"><b>Definition:</b> ACP.cpp:101</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

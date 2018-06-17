@@ -1,5 +1,11 @@
 // HISTORY
 //
+// ### CEX 1.0.0.6 ###
+// Current Release 1.0.0.6 (version A6)
+// The NTRU Prime asymmetric cipher
+// The RSX symmetric cipher
+// Asymmetric ciphers updated to the NIST PQ Round 1 versions
+//
 // ### CEX 1.0.0.5 ###
 // Current Release 1.0.0.5 (version A5)
 // The ModuleLWE asymmetric cipher
@@ -71,19 +77,27 @@
 
 // TRAJECTORY
 //
+// ### SCHEDULE FOR 1.0.0.7 RELEASE ###
+// ## ETA is August 1, 2018 ##
+// 
+// Add RSA asymmetric cipher
+// Add RSA signature scheme
+// Add vectorized hash functions (AVX2/AVX512) for future expansion
+// Add 'stitched' implementations of AHX-CBC/CTR/GCM
+// Add 'stitched' implementation of ChaCha/Poly1305
+//
 // ### SCHEDULE FOR 1.0.0.6 RELEASE ###
 // ## ETA is April 30, 2018 ##
 // 
 // Add cSHAKE 128/256/512/1024 DRBG -done
 // Add KMAC Message Authentication Code generator -done
-// Add multi-threaded Drbgs (remove DCG?)
-// Security and performance review of DRBGs and MACs
-// Add vectorized hash functions (AVX2/AVX512) for future expansion
-// Add 'stitched' implementations of AHX-CBC/CTR/GCM..
-// Add 'stitched' implementation of ChaCha/Poly1305
-// Multi-threaded/vectorized CMAC?
-// Rewrite ACP/ECP (change to cSHAKE generator)
-// Add NTRU Prime asymmetric cipher
+// Security and performance review of DRBGs and MACs -done
+// Add vectorized hash functions (AVX2/AVX512) for future expansion -ongoing by 1.0.0.7
+// Add 'stitched' implementations of AHX-CBC/CTR/GCM -deferred to 1.0.0.7
+// Add 'stitched' implementation of ChaCha/Poly1305 -deferred to 1.0.0.7
+// Multi-threaded/vectorized CMAC? -no
+// Rewrite ACP/ECP (change to cSHAKE generator) -done
+// Add NTRU Prime asymmetric cipher -done
 //
 //
 // ### Planned Release 1.1.0.1 ###
@@ -92,7 +106,9 @@
 // RingLWE					-added
 // McEliece					-added
 // ModuleLWE				-added
-// NTRU
+// NTRU						-added
+// RSA
+// RSA-Sig
 // SPHINCS+
 // Picnic
 //
@@ -241,14 +257,14 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 
 void PrintTitle()
 {
-	ConsoleUtils::WriteLine("**********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.5: CEX Library in C++  *");
-	ConsoleUtils::WriteLine("*                                            *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.5 (A5)                   *");
-	ConsoleUtils::WriteLine("* License:   GPLv3                           *");
-	ConsoleUtils::WriteLine("* Date:      March 16, 2018                  *");
-	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com               *");
-	ConsoleUtils::WriteLine("**********************************************");
+	ConsoleUtils::WriteLine("***********************************************");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.6: CEX Library in C++   *");
+	ConsoleUtils::WriteLine("*                                             *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.6 (A6)                    *");
+	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
+	ConsoleUtils::WriteLine("* Date:      June 17, 2018                    *");
+	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
+	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
 }
 
@@ -300,7 +316,7 @@ int main()
 {
 	bool hasAes;
 	bool hasAvs;
-	bool hasAvs2;
+	bool hasAvx2;
 	bool isx86emu;
 	bool is64;
 
@@ -337,7 +353,7 @@ int main()
 
 	hasAes = false;
 	hasAvs = false;
-	hasAvs2 = false;
+	hasAvx2 = false;
 	isx86emu = false;
 	is64 = false;
 
@@ -347,7 +363,7 @@ int main()
 
 		hasAes = detect.AESNI();
 		hasAvs = detect.AVX();
-		hasAvs2 = detect.AVX2();
+		hasAvx2 = detect.AVX2();
 		isx86emu = detect.IsX86Emulation();
 		is64 = detect.IsX64();
 	}
@@ -381,7 +397,7 @@ int main()
 	}
 	PrintHeader("", "");
 
-	if (hasAvs2)
+	if (hasAvx2)
 	{
 #if !defined(__AVX2__)
 		PrintHeader("Warning! AVX2 support was detected! Set the enhanced instruction set to arch:AVX2 for best performance.");

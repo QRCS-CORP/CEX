@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/IAsymmetricCipher.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/IAsymmetricCipher.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -115,92 +115,83 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;CexDomain.h&quot;</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;CryptoAsymmetricException.h&quot;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;CryptoAuthenticationFailure.h&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;Digests.h&quot;</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;IAsymmetricKey.h&quot;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;IAsymmetricKeyPair.h&quot;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;IDigest.h&quot;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;IPrng.h&quot;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;Prngs.h&quot;</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;IAsymmetricKey.h&quot;</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &quot;IAsymmetricKeyPair.h&quot;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &quot;IPrng.h&quot;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &quot;Prngs.h&quot;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;NAMESPACE_ASYMMETRIC</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;NAMESPACE_ASYMMETRIC</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">Enumeration::AsymmetricEngines</a>;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">using</span> Exception::CryptoAsymmetricException;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">using</span> Exception::CryptoAuthenticationFailure;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Enumeration::Digests</a>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">using</span> Key::Asymmetric::IAsymmetricKey;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">using</span> Key::Asymmetric::IAsymmetricKeyPair;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">using</span> Digest::IDigest;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">using</span> Prng::IPrng;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Enumeration::Prngs</a>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="class_i_asymmetric_cipher.html">   47</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;{</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">//~~~Constructor~~~//</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">IAsymmetricCipher</a>(<span class="keyword">const</span> <a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a>&amp; <a class="code" href="class_i_asymmetric_cipher.html#a7f6d8dace156dfdb3852c9e786c190a9">operator=</a>(<span class="keyword">const</span> <a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">   66</a></span>&#160;    <a class="code" href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">IAsymmetricCipher</a>() </div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    {</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">   73</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">~IAsymmetricCipher</a>() noexcept </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="comment">//~~~Accessors~~~//</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> AsymmetricEngines <a class="code" href="class_i_asymmetric_cipher.html#a2cc9fb942903331f5cffce0d9559cbc5">Enumeral</a>() = 0;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">Enumeration::AsymmetricEngines</a>;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">using</span> Exception::CryptoAsymmetricException;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">using</span> Exception::CryptoAuthenticationFailure;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">using</span> Key::Asymmetric::IAsymmetricKey;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">using</span> Key::Asymmetric::IAsymmetricKeyPair;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">using</span> Prng::IPrng;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">using</span> <a class="code" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Enumeration::Prngs</a>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="class_i_asymmetric_cipher.html">   43</a></span>&#160;<span class="keyword">class </span><a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;{</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="comment">//~~~Constructor~~~//</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <a class="code" href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">IAsymmetricCipher</a>(<span class="keyword">const</span> <a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a>&amp; <a class="code" href="class_i_asymmetric_cipher.html#a7f6d8dace156dfdb3852c9e786c190a9">operator=</a>(<span class="keyword">const</span> <a class="code" href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">   62</a></span>&#160;    <a class="code" href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">IAsymmetricCipher</a>() </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    {</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">   69</a></span>&#160;    <span class="keyword">virtual</span> <a class="code" href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">~IAsymmetricCipher</a>() noexcept </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">//~~~Accessors~~~//</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">virtual</span> std::vector&lt;byte&gt; &amp;<a class="code" href="class_i_asymmetric_cipher.html#a8e384604c560a05d36d2473589a9a145">DomainKey</a>() = 0;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_i_asymmetric_cipher.html#a7a222cf8f34954d63914dd292baaec76">IsEncryption</a>() = 0;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> AsymmetricEngines <a class="code" href="class_i_asymmetric_cipher.html#a2cc9fb942903331f5cffce0d9559cbc5">Enumeral</a>() = 0;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_i_asymmetric_cipher.html#a01959076fd9ec583cd23ac8bc8bcd7c1">IsInitialized</a>() = 0;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_i_asymmetric_cipher.html#a7a222cf8f34954d63914dd292baaec76">IsEncryption</a>() = 0;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> std::string <a class="code" href="class_i_asymmetric_cipher.html#a8dd58db657c1fb29b7bae9217c62ed42">Name</a>() = 0;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_i_asymmetric_cipher.html#a01959076fd9ec583cd23ac8bc8bcd7c1">IsInitialized</a>() = 0;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_asymmetric_cipher.html#a6eb502f376a775848df3e3390ef0a034">Decapsulate</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;CipherText, std::vector&lt;byte&gt; &amp;SharedSecret) = 0;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_asymmetric_cipher.html#aa410f2bccefb25ee4ab06dc999206009">Encapsulate</a>(std::vector&lt;byte&gt; &amp;CipherText, std::vector&lt;byte&gt; &amp;SharedSecret) = 0;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">virtual</span> std::vector&lt;byte&gt; <a class="code" href="class_i_asymmetric_cipher.html#acde4e242a6c49cb0ccef64636f366581">Decrypt</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;CipherText) = 0;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keyword">virtual</span> std::vector&lt;byte&gt; <a class="code" href="class_i_asymmetric_cipher.html#aae8f8ef818642dc76452b9ba099b6c83">Encrypt</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>) = 0;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* <a class="code" href="class_i_asymmetric_cipher.html#a787ff32e48a6edf2ef18b0670fc7dace">Generate</a>() = 0;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_asymmetric_cipher.html#a6d5bccd14a72c615c6e57e3cd44743fe">Initialize</a>(<span class="keywordtype">bool</span> Encryption, <a class="code" href="class_i_asymmetric_key.html">IAsymmetricKey</a>* <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) = 0;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;};</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;NAMESPACE_ASYMMETRICEND</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="ttc" id="group___enumeration_html_ga29d0f9dca8992bfdc1e8f55c6b4c13f1"><div class="ttname"><a href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a></div><div class="ttdeci">AsymmetricEngines</div><div class="ttdef"><b>Definition:</b> Documentation.h:286</div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html_a6d5bccd14a72c615c6e57e3cd44743fe"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a6d5bccd14a72c615c6e57e3cd44743fe">IAsymmetricCipher::Initialize</a></div><div class="ttdeci">virtual void Initialize(bool Encryption, IAsymmetricKey *Key)=0</div><div class="ttdoc">Initialize the cipher for encryption or decryption </div></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> std::string <a class="code" href="class_i_asymmetric_cipher.html#a8dd58db657c1fb29b7bae9217c62ed42">Name</a>() = 0;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="class_i_asymmetric_cipher.html#a81ad8df798e4333c2eb97b563a839574">Decapsulate</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;CipherText, std::vector&lt;byte&gt; &amp;SharedSecret) = 0;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_asymmetric_cipher.html#aa410f2bccefb25ee4ab06dc999206009">Encapsulate</a>(std::vector&lt;byte&gt; &amp;CipherText, std::vector&lt;byte&gt; &amp;SharedSecret) = 0;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* <a class="code" href="class_i_asymmetric_cipher.html#a787ff32e48a6edf2ef18b0670fc7dace">Generate</a>() = 0;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="class_i_asymmetric_cipher.html#a80881e7b0de58883cf6ca4f2930ebfbd">Initialize</a>(<a class="code" href="class_i_asymmetric_key.html">IAsymmetricKey</a>* <a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) = 0;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;};</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;NAMESPACE_ASYMMETRICEND</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
+<div class="ttc" id="class_i_asymmetric_cipher_html_a8e384604c560a05d36d2473589a9a145"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a8e384604c560a05d36d2473589a9a145">IAsymmetricCipher::DomainKey</a></div><div class="ttdeci">virtual std::vector&lt; byte &gt; &amp; DomainKey()=0</div><div class="ttdoc">Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret. </div></div>
+<div class="ttc" id="group___enumeration_html_ga29d0f9dca8992bfdc1e8f55c6b4c13f1"><div class="ttname"><a href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a></div><div class="ttdeci">AsymmetricEngines</div><div class="ttdef"><b>Definition:</b> Documentation.h:303</div></div>
 <div class="ttc" id="group___digest_html_gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba"><div class="ttname"><a href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">SkeinUbiType::Key</a></div><div class="ttdoc">A key that turns Skein into a MAC or KDF function. </div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html_a6eb502f376a775848df3e3390ef0a034"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a6eb502f376a775848df3e3390ef0a034">IAsymmetricCipher::Decapsulate</a></div><div class="ttdeci">virtual void Decapsulate(const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</div><div class="ttdoc">Decrypt a ciphertext and return the shared secret </div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html_a97a138a5407f8e8cf9c0a65c8549e4c5"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">IAsymmetricCipher::~IAsymmetricCipher</a></div><div class="ttdeci">virtual ~IAsymmetricCipher() noexcept</div><div class="ttdoc">Finalizer: destroys the containers objects </div><div class="ttdef"><b>Definition:</b> IAsymmetricCipher.h:73</div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html_aae8f8ef818642dc76452b9ba099b6c83"><div class="ttname"><a href="class_i_asymmetric_cipher.html#aae8f8ef818642dc76452b9ba099b6c83">IAsymmetricCipher::Encrypt</a></div><div class="ttdeci">virtual std::vector&lt; byte &gt; Encrypt(const std::vector&lt; byte &gt; &amp;Message)=0</div><div class="ttdoc">Encrypt a shared secret and return the encrypted message. </div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html"><div class="ttname"><a href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a></div><div class="ttdoc">The Asymmetric cipher interface </div><div class="ttdef"><b>Definition:</b> IAsymmetricCipher.h:47</div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html_ab5c8aa702a2a11d8b3df539b3d310722"><div class="ttname"><a href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">IAsymmetricCipher::IAsymmetricCipher</a></div><div class="ttdeci">IAsymmetricCipher()</div><div class="ttdoc">Constructor: Instantiate this class </div><div class="ttdef"><b>Definition:</b> IAsymmetricCipher.h:66</div></div>
+<div class="ttc" id="class_i_asymmetric_cipher_html_a97a138a5407f8e8cf9c0a65c8549e4c5"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">IAsymmetricCipher::~IAsymmetricCipher</a></div><div class="ttdeci">virtual ~IAsymmetricCipher() noexcept</div><div class="ttdoc">Finalizer: destroys the containers objects </div><div class="ttdef"><b>Definition:</b> IAsymmetricCipher.h:69</div></div>
+<div class="ttc" id="class_i_asymmetric_cipher_html"><div class="ttname"><a href="class_i_asymmetric_cipher.html">IAsymmetricCipher</a></div><div class="ttdoc">The Asymmetric cipher interface </div><div class="ttdef"><b>Definition:</b> IAsymmetricCipher.h:43</div></div>
+<div class="ttc" id="class_i_asymmetric_cipher_html_a81ad8df798e4333c2eb97b563a839574"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a81ad8df798e4333c2eb97b563a839574">IAsymmetricCipher::Decapsulate</a></div><div class="ttdeci">virtual bool Decapsulate(const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</div><div class="ttdoc">Decrypt a ciphertext and return the shared secret </div></div>
+<div class="ttc" id="class_i_asymmetric_cipher_html_ab5c8aa702a2a11d8b3df539b3d310722"><div class="ttname"><a href="class_i_asymmetric_cipher.html#ab5c8aa702a2a11d8b3df539b3d310722">IAsymmetricCipher::IAsymmetricCipher</a></div><div class="ttdeci">IAsymmetricCipher()</div><div class="ttdoc">Constructor: Instantiate this class </div><div class="ttdef"><b>Definition:</b> IAsymmetricCipher.h:62</div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_a787ff32e48a6edf2ef18b0670fc7dace"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a787ff32e48a6edf2ef18b0670fc7dace">IAsymmetricCipher::Generate</a></div><div class="ttdeci">virtual IAsymmetricKeyPair * Generate()=0</div><div class="ttdoc">Generate a public/private key-pair </div></div>
-<div class="ttc" id="group___digest_html_gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4"><div class="ttname"><a href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">SkeinUbiType::Message</a></div><div class="ttdoc">The normal message input of the hash function. </div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_aa410f2bccefb25ee4ab06dc999206009"><div class="ttname"><a href="class_i_asymmetric_cipher.html#aa410f2bccefb25ee4ab06dc999206009">IAsymmetricCipher::Encapsulate</a></div><div class="ttdeci">virtual void Encapsulate(std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</div><div class="ttdoc">Generate a shared secret and ciphertext </div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_a01959076fd9ec583cd23ac8bc8bcd7c1"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a01959076fd9ec583cd23ac8bc8bcd7c1">IAsymmetricCipher::IsInitialized</a></div><div class="ttdeci">virtual const bool IsInitialized()=0</div><div class="ttdoc">Read Only: The cipher has been initialized with a key </div></div>
-<div class="ttc" id="group___enumeration_html_gaf3e3948cf00ae35f8c4646efd5de36a7"><div class="ttname"><a href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a></div><div class="ttdeci">Prngs</div><div class="ttdef"><b>Definition:</b> Documentation.h:298</div></div>
+<div class="ttc" id="group___enumeration_html_gaf3e3948cf00ae35f8c4646efd5de36a7"><div class="ttname"><a href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a></div><div class="ttdeci">Prngs</div><div class="ttdef"><b>Definition:</b> Documentation.h:316</div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_a2cc9fb942903331f5cffce0d9559cbc5"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a2cc9fb942903331f5cffce0d9559cbc5">IAsymmetricCipher::Enumeral</a></div><div class="ttdeci">virtual const AsymmetricEngines Enumeral()=0</div><div class="ttdoc">Read Only: The cipher type-name </div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_a8dd58db657c1fb29b7bae9217c62ed42"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a8dd58db657c1fb29b7bae9217c62ed42">IAsymmetricCipher::Name</a></div><div class="ttdeci">virtual const std::string Name()=0</div><div class="ttdoc">Read Only: The ciphers name </div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_a7a222cf8f34954d63914dd292baaec76"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a7a222cf8f34954d63914dd292baaec76">IAsymmetricCipher::IsEncryption</a></div><div class="ttdeci">virtual const bool IsEncryption()=0</div><div class="ttdoc">Read Only: The cipher is initialized for encryption </div></div>
 <div class="ttc" id="class_i_asymmetric_cipher_html_a7f6d8dace156dfdb3852c9e786c190a9"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a7f6d8dace156dfdb3852c9e786c190a9">IAsymmetricCipher::operator=</a></div><div class="ttdeci">IAsymmetricCipher &amp; operator=(const IAsymmetricCipher &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
-<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:290</div></div>
-<div class="ttc" id="class_i_asymmetric_key_html"><div class="ttname"><a href="class_i_asymmetric_key.html">IAsymmetricKey</a></div><div class="ttdoc">The Asymmetric key interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:393</div></div>
-<div class="ttc" id="class_i_asymmetric_cipher_html_acde4e242a6c49cb0ccef64636f366581"><div class="ttname"><a href="class_i_asymmetric_cipher.html#acde4e242a6c49cb0ccef64636f366581">IAsymmetricCipher::Decrypt</a></div><div class="ttdeci">virtual std::vector&lt; byte &gt; Decrypt(const std::vector&lt; byte &gt; &amp;CipherText)=0</div><div class="ttdoc">Decrypt an encrypted cipher-text and return the message key. </div></div>
-<div class="ttc" id="class_i_asymmetric_key_pair_html"><div class="ttname"><a href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a></div><div class="ttdoc">The Asymmetric key-pair container interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:394</div></div>
+<div class="ttc" id="class_i_asymmetric_cipher_html_a80881e7b0de58883cf6ca4f2930ebfbd"><div class="ttname"><a href="class_i_asymmetric_cipher.html#a80881e7b0de58883cf6ca4f2930ebfbd">IAsymmetricCipher::Initialize</a></div><div class="ttdeci">virtual void Initialize(IAsymmetricKey *Key)=0</div><div class="ttdoc">Initialize the cipher </div></div>
+<div class="ttc" id="class_i_asymmetric_key_html"><div class="ttname"><a href="class_i_asymmetric_key.html">IAsymmetricKey</a></div><div class="ttdoc">The Asymmetric key interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:412</div></div>
+<div class="ttc" id="class_i_asymmetric_key_pair_html"><div class="ttname"><a href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a></div><div class="ttdoc">The Asymmetric key-pair container interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:413</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

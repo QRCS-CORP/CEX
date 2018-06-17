@@ -31,6 +31,7 @@
 
 NAMESPACE_MAC
 
+using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Cipher::Symmetric::Block::IBlockCipher;
 
@@ -137,10 +138,12 @@ public:
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
+	///
 	/// <param name="BlockCipherType">The block cipher enumeration name</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
-	Poly1305(BlockCiphers BlockCipherType = BlockCiphers::None);
+	Poly1305(BlockCiphers BlockCipherType = BlockCiphers::None, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
 	/// Initialize the class with the block cipher enumeration name

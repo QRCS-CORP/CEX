@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/HMAC.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/HMAC.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -129,95 +129,95 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">using</span> Digest::IDigest;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">using</span> Common::ParallelOptions;</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">class </span><a class="code" href="class_h_m_a_c.html">HMAC</a> final : <span class="keyword">public</span> <a class="code" href="class_i_mac.html">IMac</a></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;{</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> std::string CLASS_NAME;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> byte IPAD = 0x36;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> byte OPAD = 0x5C;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    std::unique_ptr&lt;IDigest&gt; m_msgDigest;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">bool</span> m_destroyEngine;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">bool</span> m_isDestroyed;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">bool</span> m_isInitialized;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    std::vector&lt;byte&gt; m_inputPad;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    std::vector&lt;SymmetricKeySize&gt; m_legalKeySizes;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    Digests m_msgDigestType;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    std::vector&lt;byte&gt; m_outputPad;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="comment">//~~~Constructor~~~//</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>(<span class="keyword">const</span> <a class="code" href="class_h_m_a_c.html">HMAC</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="class_h_m_a_c.html">HMAC</a>&amp; <a class="code" href="class_h_m_a_c.html#a47b2c4a2a8788e0825e61555c486235d">operator=</a>(<span class="keyword">const</span> <a class="code" href="class_h_m_a_c.html">HMAC</a>&amp;) = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>() = <span class="keyword">delete</span>;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>(Digests <a class="code" href="class_h_m_a_c.html#a0ce352c5d2cb05d8e1da6770d0a436c1">DigestType</a>, <span class="keywordtype">bool</span> Parallel = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>(<a class="code" href="class_i_digest.html">IDigest</a>* Digest);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <a class="code" href="class_h_m_a_c.html#a8393a4cc7283239741c90431a9a5e0aa">~HMAC</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">//~~~Accessors~~~//</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#aca629df7790212269a2a14b071aaa9aa">BlockSize</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">const</span> Digests <a class="code" href="class_h_m_a_c.html#a0ce352c5d2cb05d8e1da6770d0a436c1">DigestType</a>();</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keyword">const</span> <a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_h_m_a_c.html#aabffb72edf47e7acc4d7cabd83b3aba3">Enumeral</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#aa565550cb7221edfc5bf089592bc75db">MacSize</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_h_m_a_c.html#adc9ffe014421a253677a8e8647e5152f">IsInitialized</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    std::vector&lt;SymmetricKeySize&gt; <a class="code" href="class_h_m_a_c.html#af7e386c0e7474077d02dcfbeaf3845a2">LegalKeySizes</a>() <span class="keyword">const override</span>;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_h_m_a_c.html#a4fefffffb061cb22ec3112e4b6ee8265">IsParallel</a>();</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keyword">const</span> std::string <a class="code" href="class_h_m_a_c.html#ab2ad10a2ac74f4d6dc0179247007bc9a">Name</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#aa57c781b35cc70feaff0958c596ebdf8">ParallelBlockSize</a>();</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <a class="code" href="class_parallel_options.html">ParallelOptions</a> &amp;<a class="code" href="class_h_m_a_c.html#a96e97c6d468c249dbc5298aec2b1098b">ParallelProfile</a>();</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a8df21817266ef0f360e82d947365c9a6">Compute</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;Input, std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">Finalize</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> OutOffset) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">Initialize</a>(<a class="code" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a439865e2a6af2fd1bea91858f2f9264b">ParallelMaxDegree</a>(<span class="keywordtype">size_t</span> Degree);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a4f04c3961229372027f8e37e45d960e9">Reset</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">Update</a>(byte Input) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">Update</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;Input, <span class="keywordtype">size_t</span> InOffset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordtype">void</span> Scope();</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordtype">void</span> XorPad(std::vector&lt;byte&gt; &amp;A, byte N);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;};</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;NAMESPACE_MACEND</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_i_symmetric_key_html"><div class="ttname"><a href="class_i_symmetric_key.html">ISymmetricKey</a></div><div class="ttdoc">Symmetric Key virtual interface class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:410</div></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">class </span><a class="code" href="class_h_m_a_c.html">HMAC</a> final : <span class="keyword">public</span> <a class="code" href="class_i_mac.html">IMac</a></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;{</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> std::string CLASS_NAME;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> byte IPAD = 0x36;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> byte OPAD = 0x5C;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    std::unique_ptr&lt;IDigest&gt; m_msgDigest;</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">bool</span> m_destroyEngine;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">bool</span> m_isDestroyed;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">bool</span> m_isInitialized;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    std::vector&lt;byte&gt; m_inputPad;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    std::vector&lt;SymmetricKeySize&gt; m_legalKeySizes;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    Digests m_msgDigestType;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    std::vector&lt;byte&gt; m_outputPad;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="comment">//~~~Constructor~~~//</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>(<span class="keyword">const</span> <a class="code" href="class_h_m_a_c.html">HMAC</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="class_h_m_a_c.html">HMAC</a>&amp; <a class="code" href="class_h_m_a_c.html#a47b2c4a2a8788e0825e61555c486235d">operator=</a>(<span class="keyword">const</span> <a class="code" href="class_h_m_a_c.html">HMAC</a>&amp;) = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>() = <span class="keyword">delete</span>;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>(Digests <a class="code" href="class_h_m_a_c.html#a0ce352c5d2cb05d8e1da6770d0a436c1">DigestType</a>, <span class="keywordtype">bool</span> Parallel = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC</a>(<a class="code" href="class_i_digest.html">IDigest</a>* Digest);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <a class="code" href="class_h_m_a_c.html#a8393a4cc7283239741c90431a9a5e0aa">~HMAC</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">//~~~Accessors~~~//</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#aca629df7790212269a2a14b071aaa9aa">BlockSize</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keyword">const</span> Digests <a class="code" href="class_h_m_a_c.html#a0ce352c5d2cb05d8e1da6770d0a436c1">DigestType</a>();</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keyword">const</span> <a class="code" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> <a class="code" href="class_h_m_a_c.html#aabffb72edf47e7acc4d7cabd83b3aba3">Enumeral</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#aa565550cb7221edfc5bf089592bc75db">MacSize</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_h_m_a_c.html#adc9ffe014421a253677a8e8647e5152f">IsInitialized</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    std::vector&lt;SymmetricKeySize&gt; <a class="code" href="class_h_m_a_c.html#af7e386c0e7474077d02dcfbeaf3845a2">LegalKeySizes</a>() <span class="keyword">const override</span>;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code" href="class_h_m_a_c.html#a4fefffffb061cb22ec3112e4b6ee8265">IsParallel</a>();</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keyword">const</span> std::string <a class="code" href="class_h_m_a_c.html#ab2ad10a2ac74f4d6dc0179247007bc9a">Name</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#aa57c781b35cc70feaff0958c596ebdf8">ParallelBlockSize</a>();</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <a class="code" href="class_parallel_options.html">ParallelOptions</a> &amp;<a class="code" href="class_h_m_a_c.html#a96e97c6d468c249dbc5298aec2b1098b">ParallelProfile</a>();</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a8df21817266ef0f360e82d947365c9a6">Compute</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;Input, std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">Finalize</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> OutOffset) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">Initialize</a>(<a class="code" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;KeyParams) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a439865e2a6af2fd1bea91858f2f9264b">ParallelMaxDegree</a>(<span class="keywordtype">size_t</span> Degree);</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a4f04c3961229372027f8e37e45d960e9">Reset</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">Update</a>(byte Input) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">Update</a>(<span class="keyword">const</span> std::vector&lt;byte&gt; &amp;Input, <span class="keywordtype">size_t</span> InOffset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordtype">void</span> Scope();</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordtype">void</span> XorPad(std::vector&lt;byte&gt; &amp;A, byte N);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;};</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;NAMESPACE_MACEND</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="class_i_symmetric_key_html"><div class="ttname"><a href="class_i_symmetric_key.html">ISymmetricKey</a></div><div class="ttdoc">Symmetric Key virtual interface class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:429</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a8df21817266ef0f360e82d947365c9a6"><div class="ttname"><a href="class_h_m_a_c.html#a8df21817266ef0f360e82d947365c9a6">HMAC::Compute</a></div><div class="ttdeci">void Compute(const std::vector&lt; byte &gt; &amp;Input, std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Process an input array and return the Mac code in the output array. </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:125</div></div>
-<div class="ttc" id="class_parallel_options_html"><div class="ttname"><a href="class_parallel_options.html">ParallelOptions</a></div><div class="ttdoc">The ParallelOptions class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:237</div></div>
+<div class="ttc" id="class_parallel_options_html"><div class="ttname"><a href="class_parallel_options.html">ParallelOptions</a></div><div class="ttdoc">The ParallelOptions class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:254</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a068f02e5336dbd12595bd7f9983f459e"><div class="ttname"><a href="class_h_m_a_c.html#a068f02e5336dbd12595bd7f9983f459e">HMAC::Update</a></div><div class="ttdeci">void Update(byte Input) override</div><div class="ttdoc">Update the Mac with a single byte </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:218</div></div>
-<div class="ttc" id="class_i_mac_html"><div class="ttname"><a href="class_i_mac.html">IMac</a></div><div class="ttdoc">Message Authentication Code (MAC) Interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:430</div></div>
+<div class="ttc" id="class_i_mac_html"><div class="ttname"><a href="class_i_mac.html">IMac</a></div><div class="ttdoc">Message Authentication Code (MAC) Interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:449</div></div>
 <div class="ttc" id="class_h_m_a_c_html_aa565550cb7221edfc5bf089592bc75db"><div class="ttname"><a href="class_h_m_a_c.html#aa565550cb7221edfc5bf089592bc75db">HMAC::MacSize</a></div><div class="ttdeci">const size_t MacSize() override</div><div class="ttdoc">Read Only: Size of returned mac in bytes </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:88</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a0ce352c5d2cb05d8e1da6770d0a436c1"><div class="ttname"><a href="class_h_m_a_c.html#a0ce352c5d2cb05d8e1da6770d0a436c1">HMAC::DigestType</a></div><div class="ttdeci">const Digests DigestType()</div><div class="ttdoc">Read Only: The message digest engine type </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:78</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a134fce299837da79ed312be1d9d81d07"><div class="ttname"><a href="class_h_m_a_c.html#a134fce299837da79ed312be1d9d81d07">HMAC::Initialize</a></div><div class="ttdeci">void Initialize(ISymmetricKey &amp;KeyParams) override</div><div class="ttdoc">Initialize the MAC generator with a SymmetricKey key container. </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:154</div></div>
 <div class="ttc" id="class_h_m_a_c_html_afed75e57ce7bd44b5e19e19071eab845"><div class="ttname"><a href="class_h_m_a_c.html#afed75e57ce7bd44b5e19e19071eab845">HMAC::Finalize</a></div><div class="ttdeci">size_t Finalize(std::vector&lt; byte &gt; &amp;Output, size_t OutOffset) override</div><div class="ttdoc">Process the data and return a Mac code </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:138</div></div>
-<div class="ttc" id="class_i_digest_html"><div class="ttname"><a href="class_i_digest.html">IDigest</a></div><div class="ttdoc">Hash Digest Interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:250</div></div>
+<div class="ttc" id="class_i_digest_html"><div class="ttname"><a href="class_i_digest.html">IDigest</a></div><div class="ttdoc">Hash Digest Interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:267</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a4a450a2859cc42fe7e63ba802d79c530"><div class="ttname"><a href="class_h_m_a_c.html#a4a450a2859cc42fe7e63ba802d79c530">HMAC::HMAC</a></div><div class="ttdeci">HMAC()=delete</div><div class="ttdoc">Default constructor: default is restricted, this function has been deleted </div></div>
 <div class="ttc" id="class_h_m_a_c_html_aa57c781b35cc70feaff0958c596ebdf8"><div class="ttname"><a href="class_h_m_a_c.html#aa57c781b35cc70feaff0958c596ebdf8">HMAC::ParallelBlockSize</a></div><div class="ttdeci">const size_t ParallelBlockSize()</div><div class="ttdoc">Read Only: Parallel block size; the byte-size of the input data array passed to the Update function t...</div><div class="ttdef"><b>Definition:</b> HMAC.cpp:113</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a47b2c4a2a8788e0825e61555c486235d"><div class="ttname"><a href="class_h_m_a_c.html#a47b2c4a2a8788e0825e61555c486235d">HMAC::operator=</a></div><div class="ttdeci">HMAC &amp; operator=(const HMAC &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
@@ -227,11 +227,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_h_m_a_c_html_a4fefffffb061cb22ec3112e4b6ee8265"><div class="ttname"><a href="class_h_m_a_c.html#a4fefffffb061cb22ec3112e4b6ee8265">HMAC::IsParallel</a></div><div class="ttdeci">const bool IsParallel()</div><div class="ttdoc">Read Only: Processor parallelization availability. </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:103</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a96e97c6d468c249dbc5298aec2b1098b"><div class="ttname"><a href="class_h_m_a_c.html#a96e97c6d468c249dbc5298aec2b1098b">HMAC::ParallelProfile</a></div><div class="ttdeci">ParallelOptions &amp; ParallelProfile()</div><div class="ttdoc">Read/Write: Contains parallel settings and SIMD capability flags in a ParallelOptions structure...</div><div class="ttdef"><b>Definition:</b> HMAC.cpp:118</div></div>
 <div class="ttc" id="class_h_m_a_c_html_ab2ad10a2ac74f4d6dc0179247007bc9a"><div class="ttname"><a href="class_h_m_a_c.html#ab2ad10a2ac74f4d6dc0179247007bc9a">HMAC::Name</a></div><div class="ttdeci">const std::string Name() override</div><div class="ttdoc">Read Only: Mac generators class name </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:108</div></div>
-<div class="ttc" id="group___enumeration_html_gad1c1c84ec8d7f4f165d4973062130aa3"><div class="ttname"><a href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a></div><div class="ttdeci">Macs</div><div class="ttdef"><b>Definition:</b> Documentation.h:295</div></div>
-<div class="ttc" id="class_h_m_a_c_html"><div class="ttname"><a href="class_h_m_a_c.html">HMAC</a></div><div class="ttdoc">An implementation of a Hash based Message Authentication Code generator </div><div class="ttdef"><b>Definition:</b> Documentation.h:429</div></div>
+<div class="ttc" id="group___enumeration_html_gad1c1c84ec8d7f4f165d4973062130aa3"><div class="ttname"><a href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a></div><div class="ttdeci">Macs</div><div class="ttdef"><b>Definition:</b> Documentation.h:313</div></div>
+<div class="ttc" id="class_h_m_a_c_html"><div class="ttname"><a href="class_h_m_a_c.html">HMAC</a></div><div class="ttdoc">An implementation of a Hash based Message Authentication Code generator </div><div class="ttdef"><b>Definition:</b> Documentation.h:448</div></div>
 <div class="ttc" id="class_h_m_a_c_html_a8393a4cc7283239741c90431a9a5e0aa"><div class="ttname"><a href="class_h_m_a_c.html#a8393a4cc7283239741c90431a9a5e0aa">HMAC::~HMAC</a></div><div class="ttdeci">~HMAC() override</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:41</div></div>
 <div class="ttc" id="class_h_m_a_c_html_af7e386c0e7474077d02dcfbeaf3845a2"><div class="ttname"><a href="class_h_m_a_c.html#af7e386c0e7474077d02dcfbeaf3845a2">HMAC::LegalKeySizes</a></div><div class="ttdeci">std::vector&lt; SymmetricKeySize &gt; LegalKeySizes() const override</div><div class="ttdoc">Read Only: Recommended Mac key sizes in a SymmetricKeySize array </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:98</div></div>
-<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:290</div></div>
+<div class="ttc" id="group___enumeration_html_gab52dd4d279d842e68f46a2a0499c10c3"><div class="ttname"><a href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a></div><div class="ttdeci">Digests</div><div class="ttdef"><b>Definition:</b> Documentation.h:308</div></div>
 <div class="ttc" id="class_h_m_a_c_html_adc9ffe014421a253677a8e8647e5152f"><div class="ttname"><a href="class_h_m_a_c.html#adc9ffe014421a253677a8e8647e5152f">HMAC::IsInitialized</a></div><div class="ttdeci">const bool IsInitialized() override</div><div class="ttdoc">Read Only: Mac is ready to digest data </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:93</div></div>
 <div class="ttc" id="class_h_m_a_c_html_aca629df7790212269a2a14b071aaa9aa"><div class="ttname"><a href="class_h_m_a_c.html#aca629df7790212269a2a14b071aaa9aa">HMAC::BlockSize</a></div><div class="ttdeci">const size_t BlockSize() override</div><div class="ttdoc">Read Only: The Digests internal blocksize in bytes </div><div class="ttdef"><b>Definition:</b> HMAC.cpp:73</div></div>
 </div><!-- fragment --></div><!-- contents -->

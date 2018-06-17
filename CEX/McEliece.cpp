@@ -206,7 +206,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	gen.Generate(iv);
 
 	// generate the shared secret
-	m_rndGenerator->GetBytes(SharedSecret);
+	m_rndGenerator->Generate(SharedSecret);
 
 	// encrypt the secret and add to ct
 	Cipher::Symmetric::Block::Mode::GCM cpr(Enumeration::BlockCiphers::Rijndael);

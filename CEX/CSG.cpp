@@ -14,14 +14,14 @@ const std::string CSG::CLASS_NAME("CSG");
 
 //~~~Constructor~~~//
 
-CSG::CSG(ShakeModes ShakeMode, Providers ProviderType, bool Parallel)
+CSG::CSG(ShakeModes ShakeModeType, Providers ProviderType, bool Parallel)
 	:
 #if !defined(__AVX2__) && !defined(__AVX512__)
 	m_avxEnabled(false),
 #else
 	m_avxEnabled(Parallel),
 #endif
-	m_blockSize((ShakeMode == ShakeModes::SHAKE128) ? 168 : (ShakeMode == ShakeModes::SHAKE256) ? 136 : 72),
+	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_bufferIndex(0),
 	m_customNonce(0),
 	m_destroyEngine(true),
@@ -39,23 +39,23 @@ CSG::CSG(ShakeModes ShakeMode, Providers ProviderType, bool Parallel)
 	m_reseedCounter(0),
 	m_reseedRequests(0),
 	m_reseedThreshold(m_blockSize * 10000),
-	m_secStrength((ShakeMode == ShakeModes::SHAKE128) ? 128 : (ShakeMode == ShakeModes::SHAKE256) ? 256 : (ShakeMode == ShakeModes::SHAKE512) ? 512 : 1024),
+	m_secStrength((ShakeModeType == ShakeModes::SHAKE128) ? 128 : (ShakeModeType == ShakeModes::SHAKE256) ? 256 : (ShakeModeType == ShakeModes::SHAKE512) ? 512 : 1024),
 	m_seedSize(0),
-	m_shakeMode(ShakeMode == ShakeModes::SHAKE128 || ShakeMode == ShakeModes::SHAKE256 || ShakeMode == ShakeModes::SHAKE512 || ShakeMode == ShakeModes::SHAKE1024 ? ShakeMode :
+	m_shakeMode(ShakeModeType == ShakeModes::SHAKE128 || ShakeModeType == ShakeModes::SHAKE256 || ShakeModeType == ShakeModes::SHAKE512 || ShakeModeType == ShakeModes::SHAKE1024 ? ShakeModeType :
 		throw CryptoGeneratorException("CSG:Ctor", "The SHAKE mode type is invalid!")),
 	m_stateSize(STATE_SIZE)
 {
 	Scope();
 }
 
-CSG::CSG(ShakeModes ShakeMode, IProvider* Provider, bool Parallel)
+CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 	:
 #if !defined(__AVX2__) && !defined(__AVX512__)
 	m_avxEnabled(false),
 #else
 	m_avxEnabled(Parallel),
 #endif
-	m_blockSize((ShakeMode == ShakeModes::SHAKE128) ? 168 : (ShakeMode == ShakeModes::SHAKE256) ? 136 : 72),
+	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_bufferIndex(0),
 	m_customNonce(0),
 	m_destroyEngine(false),
@@ -73,9 +73,9 @@ CSG::CSG(ShakeModes ShakeMode, IProvider* Provider, bool Parallel)
 	m_reseedCounter(0),
 	m_reseedRequests(0),
 	m_reseedThreshold(m_blockSize * 10000),
-	m_secStrength((ShakeMode == ShakeModes::SHAKE128) ? 128 : (ShakeMode == ShakeModes::SHAKE256) ? 256 : 512),
+	m_secStrength((ShakeModeType == ShakeModes::SHAKE128) ? 128 : (ShakeModeType == ShakeModes::SHAKE256) ? 256 : 512),
 	m_seedSize(0),
-	m_shakeMode(ShakeMode != ShakeModes::None ? ShakeMode :
+	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
 		throw CryptoGeneratorException("CSG:Ctor", "The SHAKE mode type can not ne none!")),
 	m_stateSize(STATE_SIZE)
 {
@@ -410,7 +410,7 @@ void CSG::Derive()
 	// add new entropy equal to original key size to the state
 	for (size_t i = 0; i < m_drbgState.size(); ++i)
 	{
-		m_providerSource->GetBytes(seed);
+		m_providerSource->Generate(seed);
 		FastAbsorb(seed, 0, seed.size(), m_drbgState[i]);
 	}
 

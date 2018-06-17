@@ -25,7 +25,7 @@ namespace Test
 
 			while (ctr < Length)
 			{
-				rnd.GetBytes(fill);
+				rnd.Generate(fill);
 
 				if (fill[0] > 31 && fill[0] < 123 && (fill[0] != 39 || fill[0] != 40 || fill[0] != 41))
 				{

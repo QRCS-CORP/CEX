@@ -225,7 +225,7 @@ public:
 	/// Initialize the cipher
 	/// </summary>
 	/// 
-	/// <param name="Encryption">Initialize the cipher with a key</param>
+	/// <param name="Key">The asymmetric public or private key</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Fails on invalid key or configuration error</exception>
 	void Initialize(IAsymmetricKey* Key) override;

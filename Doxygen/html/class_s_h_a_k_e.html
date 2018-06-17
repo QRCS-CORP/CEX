@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -94,7 +94,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>An implementation of the SHAKE-128/256/512/1024 XOF function  
+<p>An implementation of the SHAKE and cSHAKE 128/256/512/1024 XOF functions  
  <a href="class_s_h_a_k_e.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_s_h_a_k_e_8h_source.html">SHAKE.h</a>&gt;</code></p>
@@ -116,18 +116,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae19e969fc69bb7cf6db73efc842b6daf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_s_h_a_k_e.html">SHAKE</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#ae19e969fc69bb7cf6db73efc842b6daf">operator=</a> (const <a class="el" href="class_s_h_a_k_e.html">SHAKE</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ae19e969fc69bb7cf6db73efc842b6daf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#ae19e969fc69bb7cf6db73efc842b6daf">More...</a><br /></td></tr>
 <tr class="separator:ae19e969fc69bb7cf6db73efc842b6daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa09650d38d0dd7457379457144990abf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#aa09650d38d0dd7457379457144990abf">SHAKE</a> (ShakeModes ShakeMode=ShakeModes::SHAKE256)</td></tr>
-<tr class="memdesc:aa09650d38d0dd7457379457144990abf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates a SHAKE generator using a message digest type name.  <a href="#aa09650d38d0dd7457379457144990abf">More...</a><br /></td></tr>
-<tr class="separator:aa09650d38d0dd7457379457144990abf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a067e89e6e74c09483635780ef511c2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a4a067e89e6e74c09483635780ef511c2">SHAKE</a> (<a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a> ShakeModeType=<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a>)</td></tr>
+<tr class="memdesc:a4a067e89e6e74c09483635780ef511c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiates a SHAKE generator using a message digest type name.  <a href="#a4a067e89e6e74c09483635780ef511c2">More...</a><br /></td></tr>
+<tr class="separator:a4a067e89e6e74c09483635780ef511c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94f70dea9b61a832daf76686c6783557"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a94f70dea9b61a832daf76686c6783557">~SHAKE</a> () override</td></tr>
 <tr class="memdesc:a94f70dea9b61a832daf76686c6783557"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#a94f70dea9b61a832daf76686c6783557">More...</a><br /></td></tr>
 <tr class="separator:a94f70dea9b61a832daf76686c6783557"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37eb49e8d8eeec0a07605c359d897b93"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a37eb49e8d8eeec0a07605c359d897b93">BlockSize</a> ()</td></tr>
 <tr class="memdesc:a37eb49e8d8eeec0a07605c359d897b93"><td class="mdescLeft">&#160;</td><td class="mdescRight">The internal block size in bytes  <a href="#a37eb49e8d8eeec0a07605c359d897b93">More...</a><br /></td></tr>
 <tr class="separator:a37eb49e8d8eeec0a07605c359d897b93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a261537ab4fe5ba26e29342c76091d1ab"><td class="memItemLeft" align="right" valign="top">byte &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a261537ab4fe5ba26e29342c76091d1ab">DomainCode</a> ()</td></tr>
-<tr class="memdesc:a261537ab4fe5ba26e29342c76091d1ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: The Keccak function-domain separator code.  <a href="#a261537ab4fe5ba26e29342c76091d1ab">More...</a><br /></td></tr>
-<tr class="separator:a261537ab4fe5ba26e29342c76091d1ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9e90e521cc1957aabd8700efec8ad76"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#ab9e90e521cc1957aabd8700efec8ad76">Enumeral</a> () override</td></tr>
 <tr class="memdesc:ab9e90e521cc1957aabd8700efec8ad76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The Kdf generators type name  <a href="#ab9e90e521cc1957aabd8700efec8ad76">More...</a><br /></td></tr>
 <tr class="separator:ab9e90e521cc1957aabd8700efec8ad76"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -146,9 +143,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a15a6dbf89bb3e8b8f362e1ae23164ab3"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a15a6dbf89bb3e8b8f362e1ae23164ab3">Rate</a> ()</td></tr>
 <tr class="memdesc:a15a6dbf89bb3e8b8f362e1ae23164ab3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The absorbtion rate; input size in bytes of one block  <a href="#a15a6dbf89bb3e8b8f362e1ae23164ab3">More...</a><br /></td></tr>
 <tr class="separator:a15a6dbf89bb3e8b8f362e1ae23164ab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa94b8fdad20519dc93f9c30fe0059091"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#aa94b8fdad20519dc93f9c30fe0059091">DomainString</a> (std::vector&lt; byte &gt; &amp;Input)</td></tr>
-<tr class="memdesc:aa94b8fdad20519dc93f9c30fe0059091"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the internal state with a custom domain string.  <a href="#aa94b8fdad20519dc93f9c30fe0059091">More...</a><br /></td></tr>
-<tr class="separator:aa94b8fdad20519dc93f9c30fe0059091"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5e67cc17f3edb0597b1efb57ff500214"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a5e67cc17f3edb0597b1efb57ff500214">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
 <tr class="memdesc:a5e67cc17f3edb0597b1efb57ff500214"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a block of pseudo random bytes  <a href="#a5e67cc17f3edb0597b1efb57ff500214">More...</a><br /></td></tr>
 <tr class="separator:a5e67cc17f3edb0597b1efb57ff500214"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,14 +152,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abf99b02d8310c6e78842932ea2838452"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#abf99b02d8310c6e78842932ea2838452">Initialize</a> (<a class="el" href="class_i_symmetric_key.html">ISymmetricKey</a> &amp;GenParam) override</td></tr>
 <tr class="memdesc:abf99b02d8310c6e78842932ea2838452"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a SymmetricKey structure containing the key, and optional salt, and info string.  <a href="#abf99b02d8310c6e78842932ea2838452">More...</a><br /></td></tr>
 <tr class="separator:abf99b02d8310c6e78842932ea2838452"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa81cac68b0466700cd176074d02428ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#aa81cac68b0466700cd176074d02428ef">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:aa81cac68b0466700cd176074d02428ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SHAKE generator with a key, using length and offset arguments  <a href="#aa81cac68b0466700cd176074d02428ef">More...</a><br /></td></tr>
+<tr class="separator:aa81cac68b0466700cd176074d02428ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9609c0dc67502cca9d54a56d6538e444"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a9609c0dc67502cca9d54a56d6538e444">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
-<tr class="memdesc:a9609c0dc67502cca9d54a56d6538e444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key  <a href="#a9609c0dc67502cca9d54a56d6538e444">More...</a><br /></td></tr>
+<tr class="memdesc:a9609c0dc67502cca9d54a56d6538e444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SHAKE generator with a key  <a href="#a9609c0dc67502cca9d54a56d6538e444">More...</a><br /></td></tr>
 <tr class="separator:a9609c0dc67502cca9d54a56d6538e444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0e7ec38d90b4d89bab896c5c90c9c73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#af0e7ec38d90b4d89bab896c5c90c9c73">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt) override</td></tr>
-<tr class="memdesc:af0e7ec38d90b4d89bab896c5c90c9c73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays.  <a href="#af0e7ec38d90b4d89bab896c5c90c9c73">More...</a><br /></td></tr>
+<tr class="memdesc:af0e7ec38d90b4d89bab896c5c90c9c73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cSHAKE generator with key and salt arrays.  <a href="#af0e7ec38d90b4d89bab896c5c90c9c73">More...</a><br /></td></tr>
 <tr class="separator:af0e7ec38d90b4d89bab896c5c90c9c73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a687334746d70e6012e52dcf93096d163"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#a687334746d70e6012e52dcf93096d163">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt, const std::vector&lt; byte &gt; &amp;Info) override</td></tr>
-<tr class="memdesc:a687334746d70e6012e52dcf93096d163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, a salt array, and an information string or nonce.  <a href="#a687334746d70e6012e52dcf93096d163">More...</a><br /></td></tr>
+<tr class="memdesc:a687334746d70e6012e52dcf93096d163"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cSHAKE generator with a key, a salt array, and an information string.  <a href="#a687334746d70e6012e52dcf93096d163">More...</a><br /></td></tr>
 <tr class="separator:a687334746d70e6012e52dcf93096d163"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5eebd9ca56714bb59bf1685356155b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_h_a_k_e.html#ab5eebd9ca56714bb59bf1685356155b0">ReSeed</a> (const std::vector&lt; byte &gt; &amp;Seed) override</td></tr>
 <tr class="memdesc:ab5eebd9ca56714bb59bf1685356155b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the generators keying material  <a href="#ab5eebd9ca56714bb59bf1685356155b0">More...</a><br /></td></tr>
@@ -188,20 +185,22 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a876724abf356243c9dc09cee318f6b38 inherit pub_methods_class_i_kdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An implementation of the SHAKE-128/256/512/1024 XOF function </p>
-<p>Generate an array of pseudo random bytes: </p><div class="fragment"><div class="line"><span class="comment">// initialize with a shake mode type</span></div>
-<div class="line"><a class="code" href="class_s_h_a_k_e.html">SHAKE</a> kdf(ShakeModes::SHAKE128);</div>
-<div class="line"><span class="comment">// initialize</span></div>
+<div class="textblock"><p>An implementation of the SHAKE and cSHAKE 128/256/512/1024 XOF functions </p>
+<p>Generate an array of pseudo random bytes: </p><div class="fragment"><div class="line"><span class="comment">// initialize with a 256bit shake mode-rate</span></div>
+<div class="line"><a class="code" href="class_s_h_a_k_e.html">SHAKE</a> kdf(<a class="code" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a>);</div>
+<div class="line"><span class="comment">// initialize with a key for shake, or use salt and info for cshake</span></div>
 <div class="line">kdf.Initialize(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, [Salt], [Info]);</div>
 <div class="line"><span class="comment">// generate bytes</span></div>
 <div class="line">kdf.Generate(Output, [Offset], [Size]);</div>
 </div><!-- fragment --> <p><b>Overview:</b> </p>
-<p>The SHAKE XOF (Extended Output Function) variants use the Keccak sponge and permutation functions to generate a pseudo-random output. <br />
-Typically SHAKE has been implemented as a message digest function, as an alternative to SHA-3, but in this implementation it is used to generate keing material like a traditional KDF. <br />
-The SHAKE128 and SHAKE256 modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental.</p>
+<p>The SHAKE/cSHAKE family of XOF (Extended Output Function) functions use the Keccak sponge and permutation functions to generate a pseudo-random output. <br />
+Typically SHAKE has been implemented as a message digest function, as an alternative to SHA-3, but in this implementation it is used to generate keying material like a traditional KDF. <br />
+The cSHAKE/SHAKE 128 and 256 bit modes are standard implementations, the SHAKE512 and SHAKE1024 modes are original constructs, and should be considered experimental.</p>
 <p><b>Implementation Notes:</b> </p><ul>
 <li>
 The SHAKE512 and SHAKE1024 versions are unofficial variants, and should be considered as only for experimental use. </li>
+<li>
+Initialize the Kdf using only a key for SHAKE, or use salt and info secret-keys to enable the custom [cSHAKE] variant of the function. </li>
 <li>
 This class can be instantiated with a Keccak mode type name (SHAKE128/256/512/1024), the default is SHAKE256. </li>
 <li>
@@ -252,7 +251,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
-<a class="anchor" id="aa09650d38d0dd7457379457144990abf"></a>
+<a class="anchor" id="a4a067e89e6e74c09483635780ef511c2"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -262,8 +261,8 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
         <tr>
           <td class="memname">SHAKE::SHAKE </td>
           <td>(</td>
-          <td class="paramtype">ShakeModes&#160;</td>
-          <td class="paramname"><em>ShakeMode</em> = <code>ShakeModes::SHAKE256</code></td><td>)</td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a>&#160;</td>
+          <td class="paramname"><em>ShakeModeType</em> = <code><a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a></code></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -278,7 +277,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 <p>The default is the SHAKE256 mode.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ShakeMode</td><td>The SHAKE mode type</td></tr>
+    <tr><td class="paramname">ShakeModeType</td><td>The SHAKE mode type</td></tr>
   </table>
   </dd>
 </dl>
@@ -331,49 +330,6 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </div><div class="memdoc">
 
 <p>The internal block size in bytes </p>
-
-</div>
-</div>
-<a class="anchor" id="a261537ab4fe5ba26e29342c76091d1ab"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">byte &amp; SHAKE::DomainCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Read/Write: The Keccak function-domain separator code. </p>
-<p>This code differentiates Keccak function types, the default code is 0x1F (SHAKE)</p>
-
-</div>
-</div>
-<a class="anchor" id="aa94b8fdad20519dc93f9c30fe0059091"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void SHAKE::DomainString </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Input</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialize the internal state with a custom domain string. </p>
-<p>Adds one permutation cycle (simplified cSHAKE). The domain string must be set before initialization, and must be less than 196 bytes in length.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Input</td><td>The custom domain string byte array</td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -545,6 +501,64 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 
 </div>
 </div>
+<a class="anchor" id="aa81cac68b0466700cd176074d02428ef"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SHAKE::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the SHAKE generator with a key, using length and offset arguments </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">IKdf</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a9609c0dc67502cca9d54a56d6538e444"></a>
 <div class="memitem">
 <div class="memproto">
@@ -567,7 +581,7 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with a key </p>
+<p>Initialize the SHAKE generator with a key </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
@@ -617,12 +631,12 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with key and salt arrays. </p>
-<p>This method initiatialzes SHAKE using the Salt array postfixed to the key array.</p>
+<p>Initialize the cSHAKE generator with key and salt arrays. </p>
+<p>This method initiatialzes cSHAKE using the Salt array as the customization parameter.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Salt</td><td>The salt value containing an additional source of entropy</td></tr>
+    <tr><td class="paramname">Salt</td><td>The salt value used as a customization string</td></tr>
   </table>
   </dd>
 </dl>
@@ -675,13 +689,13 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the generator with a key, a salt array, and an information string or nonce. </p>
-<p>This method initiatialzes SHAKE using the Salt and Info arrays postfixed to the key array.</p>
+<p>Initialize the cSHAKE generator with a key, a salt array, and an information string. </p>
+<p>This method initiatialzes cSHAKE using the Salt array as the customization parameter, and the Info as the name parameter.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
-    <tr><td class="paramname">Salt</td><td>The salt value used as an additional source of entropy</td></tr>
-    <tr><td class="paramname">Info</td><td>The information string which contains the domain separator code</td></tr>
+    <tr><td class="paramname">Salt</td><td>The salt array used as a customization string</td></tr>
+    <tr><td class="paramname">Info</td><td>The Info array used as a name string</td></tr>
   </table>
   </dd>
 </dl>
@@ -916,9 +930,9 @@ Team Keccak <a href="https://keccak.team/index.html">Homepage</a>. </li>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_s_h_a_k_e_8h_source.html">SHAKE.h</a></li>
-<li>CEX/SHAKE.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_s_h_a_k_e_8h_source.html">SHAKE.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/SHAKE.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -10,9 +10,9 @@ const std::string CMAC::CLASS_NAME("CMAC");
 
 //~~~Constructor~~~//
 
-CMAC::CMAC(BlockCiphers CipherType)
+CMAC::CMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_cipherMode(CipherType != BlockCiphers::None ? new Cipher::Symmetric::Block::Mode::CBC(CipherType) :
+	m_cipherMode(CipherType != BlockCiphers::None ? new Cipher::Symmetric::Block::Mode::CBC(CipherType, CipherExtensionType) :
 		throw CryptoMacException("CMAC:Finalize", "The cipher type can not be none!")),
 	m_cipherKey(0),
 	m_cipherType(CipherType),

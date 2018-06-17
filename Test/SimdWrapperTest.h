@@ -98,9 +98,9 @@ namespace Test
 
 			for (size_t i = 0; i < 100; ++i)
 			{
-				tmpR1 = rnd.GetBytes(A.size());
+				tmpR1 = rnd.Generate(A.size());
 				tmpA = Convert(tmpR1);
-				tmpR2 = rnd.GetBytes(B.size());
+				tmpR2 = rnd.Generate(B.size());
 				tmpB = Convert(tmpR2);
 
 				A = T(tmpA, 0);

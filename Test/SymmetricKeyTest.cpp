@@ -58,9 +58,9 @@ namespace Test
 	void SymmetricKeyTest::CheckAccess()
 	{
 		Provider::CSP rnd;
-		std::vector<byte> key = rnd.GetBytes(32);
-		std::vector<byte> iv = rnd.GetBytes(16);
-		std::vector<byte> info = rnd.GetBytes(64);
+		std::vector<byte> key = rnd.Generate(32);
+		std::vector<byte> iv = rnd.Generate(16);
+		std::vector<byte> info = rnd.Generate(64);
 
 		// test symmetric key properties
 		SymmetricKey symKey(key, iv, info);
@@ -98,9 +98,9 @@ namespace Test
 	void SymmetricKeyTest::CheckInit()
 	{
 		Provider::CSP rnd;
-		std::vector<byte> key = rnd.GetBytes(32);
-		std::vector<byte> iv = rnd.GetBytes(16);
-		std::vector<byte> info = rnd.GetBytes(64);
+		std::vector<byte> key = rnd.Generate(32);
+		std::vector<byte> iv = rnd.Generate(16);
+		std::vector<byte> info = rnd.Generate(64);
 
 		// test symmetric key constructors
 		SymmetricKey symKey1(key, iv, info);

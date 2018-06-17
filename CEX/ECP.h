@@ -2,11 +2,9 @@
 #define CEX_ECP_H
 
 #include "IProvider.h"
-#include "ICipherMode.h"
+#include "IKdf.h"
 
 NAMESPACE_PROVIDER
-
-using Cipher::Symmetric::Block::Mode::ICipherMode;
 
 /// <summary>
 /// An implementation of a system Entropy Collector Provider.
@@ -18,7 +16,7 @@ using Cipher::Symmetric::Block::Mode::ICipherMode;
 /// <code>
 /// std:vector&lt;byte&gt; output(32);
 /// ECP gen;
-/// gen.GetBytes(output);
+/// gen.Generate(output);
 /// </code>
 /// </example>
 /// 
@@ -47,7 +45,7 @@ private:
 	static const std::string CLASS_NAME;
 	static const size_t DEF_STATECAP = 1024;
 
-	std::unique_ptr<ICipherMode> m_cipherMode;
+	std::unique_ptr<Kdf::IKdf> m_kdfGenerator;
 	bool m_hasTsc;
 	bool m_isAvailable;
 
@@ -101,7 +99,7 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	void GetBytes(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes using offsets
@@ -112,7 +110,7 @@ public:
 	/// <param name="Length">The number of bytes to write to the Output array</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Return an array with pseudo-random bytes
@@ -123,16 +121,28 @@ public:
 	/// <returns>An array of pseudo-random of bytes</returns>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	std::vector<byte> GetBytes(size_t Length) override;
+	std::vector<byte> Generate(size_t Length) override;
 
 	/// <summary>
-	/// Returns a pseudo-random unsigned 32bit integer
+	/// Get a pseudo random unsigned 16bit integer
 	/// </summary>
 	/// 
-	/// <returns>A pseudo random 32bit unsigned integer</returns>
+	/// <returns>Random UInt16</returns>
+	ushort NextUInt16() override;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 32bit integer
+	/// </summary>
 	/// 
-	/// <exception cref="Exception::CryptoRandomException">Thrown if the random provider is not available</exception>
-	uint Next() override;
+	/// <returns>Random 32bit integer</returns>
+	uint NextUInt32() override;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 64bit integer
+	/// </summary>
+	/// 
+	/// <returns>Random 64bit integer</returns>
+	ulong NextUInt64() override;
 
 	/// <summary>
 	/// Reset the internal state
@@ -143,8 +153,7 @@ public:
 
 private:
 
-	std::vector<byte> Collect();
-	std::vector<byte> ECP::Compress(std::vector<byte> &State);
+	void Collect();
 	void Filter(std::vector<byte> &State);
 	std::vector<byte> DriveInfo();
 	std::vector<byte> MemoryInfo();

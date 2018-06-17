@@ -376,7 +376,7 @@ std::vector<byte> CipherDescription::ToBytes()
 	writer.Write<ushort>(m_keySize);
 	writer.Write(m_paddingType);
 
-	return writer.GetBytes();
+	return writer.Generate();
 }
 
 IO::MemoryStream* CipherDescription::ToStream()

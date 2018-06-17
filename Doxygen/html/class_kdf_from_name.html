@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -101,15 +101,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a7966625b685be5825bd48ef8c2cd223c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_kdf.html">IKdf</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_from_name.html#a7966625b685be5825bd48ef8c2cd223c">GetInstance</a> (<a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> KdfType, <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType)</td></tr>
-<tr class="memdesc:a7966625b685be5825bd48ef8c2cd223c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate an uninitialized KDF generator from its enunmeration type name  <a href="#a7966625b685be5825bd48ef8c2cd223c">More...</a><br /></td></tr>
-<tr class="separator:a7966625b685be5825bd48ef8c2cd223c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bc5a93ebe08a0e39df05beb5787a2e3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_kdf.html">IKdf</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_kdf_from_name.html#a4bc5a93ebe08a0e39df05beb5787a2e3">GetInstance</a> (<a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> KdfType)</td></tr>
+<tr class="memdesc:a4bc5a93ebe08a0e39df05beb5787a2e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate an uninitialized KDF generator from its enunmeration type name  <a href="#a4bc5a93ebe08a0e39df05beb5787a2e3">More...</a><br /></td></tr>
+<tr class="separator:a4bc5a93ebe08a0e39df05beb5787a2e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get an uninitialized Key Derivation Function from a type name. </p>
 <p>The KDFs Initialize function must be called before Generate can be called.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a7966625b685be5825bd48ef8c2cd223c"></a>
+<a class="anchor" id="a4bc5a93ebe08a0e39df05beb5787a2e3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -120,18 +120,8 @@ Static Public Member Functions</h2></td></tr>
           <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_kdf.html">IKdf</a> * KdfFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a>&#160;</td>
-          <td class="paramname"><em>KdfType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>KdfType</em></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td>
-          <td class="paramname"><em>DigestType</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -145,14 +135,13 @@ Static Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">KdfType</td><td>The Kdf generators type name</td></tr>
-    <tr><td class="paramname">DigestType</td><td>The Kdf hash functions type name</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An uninitialized Kdf generator</dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the Kdf or Digest type is not supported</td></tr>
+    <tr><td class="paramname">CryptoProcessingException</td><td>Thrown if the Kdf is not supported</td></tr>
   </table>
   </dd>
 </dl>
@@ -160,9 +149,9 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_kdf_from_name_8h_source.html">KdfFromName.h</a></li>
-<li>CEX/KdfFromName.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_kdf_from_name_8h_source.html">KdfFromName.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/KdfFromName.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -60,7 +60,7 @@ namespace Test
 		// test integer conversions
 		std::vector<byte>bbe16(2);
 		std::vector<byte>rbe16(2);
-		rnd.GetBytes(bbe16);
+		rnd.Generate(bbe16);
 		ushort be16 = IntUtils::BeBytesTo16(bbe16, 0);
 		IntUtils::Be16ToBytes(be16, rbe16, 0);
 
@@ -71,7 +71,7 @@ namespace Test
 
 		std::vector<byte>bbe32(4);
 		std::vector<byte>rbe32(4);
-		rnd.GetBytes(bbe32);
+		rnd.Generate(bbe32);
 		uint be32 = IntUtils::BeBytesTo32(bbe32, 0);
 		IntUtils::Be32ToBytes(be32, rbe32, 0);
 
@@ -82,7 +82,7 @@ namespace Test
 
 		std::vector<byte>bbe64(8);
 		std::vector<byte>rbe64(8);
-		rnd.GetBytes(bbe64);
+		rnd.Generate(bbe64);
 		ulong be64 = IntUtils::BeBytesTo64(bbe64, 0);
 		IntUtils::Be64ToBytes(be64, rbe64, 0);
 
@@ -93,7 +93,7 @@ namespace Test
 
 		std::vector<byte>ble16(2);
 		std::vector<byte>rle16(2);
-		rnd.GetBytes(ble16);
+		rnd.Generate(ble16);
 		ushort le16 = IntUtils::LeBytesTo16(ble16, 0);
 		IntUtils::Le16ToBytes(le16, rle16, 0);
 
@@ -104,7 +104,7 @@ namespace Test
 
 		std::vector<byte>ble32(4);
 		std::vector<byte>rle32(4);
-		rnd.GetBytes(ble32);
+		rnd.Generate(ble32);
 		uint le32 = IntUtils::LeBytesTo32(ble32, 0);
 		IntUtils::Le32ToBytes(le32, rle32, 0);
 
@@ -115,7 +115,7 @@ namespace Test
 
 		std::vector<byte>ble64(8);
 		std::vector<byte>rle64(8);
-		rnd.GetBytes(ble64);
+		rnd.Generate(ble64);
 		ulong le64 = IntUtils::LeBytesTo64(ble64, 0);
 		IntUtils::Le64ToBytes(le64, rle64, 0);
 

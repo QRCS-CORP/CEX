@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -161,6 +161,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:accfc62def4dcdc7e31050eef91445288"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#accfc62def4dcdc7e31050eef91445288">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
 <tr class="memdesc:accfc62def4dcdc7e31050eef91445288"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key.  <a href="#accfc62def4dcdc7e31050eef91445288">More...</a><br /></td></tr>
 <tr class="separator:accfc62def4dcdc7e31050eef91445288"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a599776f4959dd996f4ea64e2b04f41a9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#a599776f4959dd996f4ea64e2b04f41a9">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a599776f4959dd996f4ea64e2b04f41a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the SHAKE generator with a key, using length and offset arguments  <a href="#a599776f4959dd996f4ea64e2b04f41a9">More...</a><br /></td></tr>
+<tr class="separator:a599776f4959dd996f4ea64e2b04f41a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0c3ef3a05767be158c363b8ac04895c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_k_d_f.html#ad0c3ef3a05767be158c363b8ac04895c">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt) override</td></tr>
 <tr class="memdesc:ad0c3ef3a05767be158c363b8ac04895c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays.  <a href="#ad0c3ef3a05767be158c363b8ac04895c">More...</a><br /></td></tr>
 <tr class="separator:ad0c3ef3a05767be158c363b8ac04895c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -223,6 +226,8 @@ T(N) = HMAC-Hash(PRK, T(N) | info | N) <br />
 ... <br />
 The constant concatenated to the end of each T(n) is a single octet counter.</p>
 <p><b>Implementation Notes:</b> </p><ul>
+<li>
+This implementation only supports the SHA2-256 and SHA2-512 message digests. </li>
 <li>
 This class can be instantiated with a message digest or HMAC instance, or by using a digests enumeration type name. </li>
 <li>
@@ -665,6 +670,64 @@ Cryptographic Extraction and Key Derivation: <a href="http://eprint.iacr.org/201
 
 </div>
 </div>
+<a class="anchor" id="a599776f4959dd996f4ea64e2b04f41a9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void HKDF::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the SHAKE generator with a key, using length and offset arguments </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">IKdf</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="ad0c3ef3a05767be158c363b8ac04895c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -979,9 +1042,9 @@ Cryptographic Extraction and Key Derivation: <a href="http://eprint.iacr.org/201
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_h_k_d_f_8h_source.html">HKDF.h</a></li>
-<li>CEX/HKDF.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_h_k_d_f_8h_source.html">HKDF.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/HKDF.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

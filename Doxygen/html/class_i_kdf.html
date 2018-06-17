@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -108,7 +108,7 @@ Inheritance diagram for IKdf:</div>
 <area href="class_k_d_f2.html" title="An implementation of the Key Derivation Function Version 2 (KDF2) " alt="KDF2" shape="rect" coords="71,56,132,80"/>
 <area href="class_p_b_k_d_f2.html" title="An implementation of the Passphrase Based Key Derivation Version 2 (PBKDF2) " alt="PBKDF2" shape="rect" coords="142,56,203,80"/>
 <area href="class_s_c_r_y_p_t.html" title="An implementation of the Key Derivation Function: SCRYPT " alt="SCRYPT" shape="rect" coords="213,56,274,80"/>
-<area href="class_s_h_a_k_e.html" title="An implementation of the SHAKE-128/256/512/1024 XOF function " alt="SHAKE" shape="rect" coords="284,56,345,80"/>
+<area href="class_s_h_a_k_e.html" title="An implementation of the SHAKE and cSHAKE 128/256/512/1024 XOF functions " alt="SHAKE" shape="rect" coords="284,56,345,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -153,6 +153,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a32badd58a069f9d363e5ba62c9df7734"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_kdf.html#a32badd58a069f9d363e5ba62c9df7734">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
 <tr class="memdesc:a32badd58a069f9d363e5ba62c9df7734"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key  <a href="#a32badd58a069f9d363e5ba62c9df7734">More...</a><br /></td></tr>
 <tr class="separator:a32badd58a069f9d363e5ba62c9df7734"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6979e54c8e654607b107d40dd621f4de"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a6979e54c8e654607b107d40dd621f4de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, using length and offset arguments  <a href="#a6979e54c8e654607b107d40dd621f4de">More...</a><br /></td></tr>
+<tr class="separator:a6979e54c8e654607b107d40dd621f4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bbbec9b4c467530a278d3d4f6a5aaba"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_kdf.html#a2bbbec9b4c467530a278d3d4f6a5aaba">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt)=0</td></tr>
 <tr class="memdesc:a2bbbec9b4c467530a278d3d4f6a5aaba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays  <a href="#a2bbbec9b4c467530a278d3d4f6a5aaba">More...</a><br /></td></tr>
 <tr class="separator:a2bbbec9b4c467530a278d3d4f6a5aaba"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -304,7 +307,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 
-<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#ad482860c7d9a52461043da6cc59be53d">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a978be4fcf2f9cd3ab1e744be360d108d">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#ab98180a0200aa3383061cd4f00260d49">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#a5e67cc17f3edb0597b1efb57ff500214">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#af271ce86fa2da7b442ca95f008b7450b">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#ad482860c7d9a52461043da6cc59be53d">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a978be4fcf2f9cd3ab1e744be360d108d">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#ab98180a0200aa3383061cd4f00260d49">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#af271ce86fa2da7b442ca95f008b7450b">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#a5e67cc17f3edb0597b1efb57ff500214">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -357,7 +360,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 
-<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a602e700ace6ce980ab416533df40d250">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a0cbabab799709d1d2bff96cb4c3a1572">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#a7f621e6440f20f7ff82848cc1736a146">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#a4bcf91dd579ff0ef27af5d7adfd160be">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#a2c40144e9719e96fcd8b6b138118c283">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a602e700ace6ce980ab416533df40d250">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a0cbabab799709d1d2bff96cb4c3a1572">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#a7f621e6440f20f7ff82848cc1736a146">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#a2c40144e9719e96fcd8b6b138118c283">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#a4bcf91dd579ff0ef27af5d7adfd160be">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -391,7 +394,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#ad022ec2d12351abe3114aa6a772ed026">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a28277ff62ccfa9877328d95f848369fb">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#ac4b3024db15bc33aa85789624ed0b6cb">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#abf99b02d8310c6e78842932ea2838452">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#a8aa4fc2e1bf50fbb2181c933f1cd3786">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#ad022ec2d12351abe3114aa6a772ed026">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a28277ff62ccfa9877328d95f848369fb">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#ac4b3024db15bc33aa85789624ed0b6cb">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#a8aa4fc2e1bf50fbb2181c933f1cd3786">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#abf99b02d8310c6e78842932ea2838452">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -425,7 +428,65 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a01ddf82ce09b2b6f5ead8788ec3e8253">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#accfc62def4dcdc7e31050eef91445288">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#a773dcf5eb6631142955efc6db0174989">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#a9609c0dc67502cca9d54a56d6538e444">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#a36237799279532d7b9056f0a893fddcc">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a01ddf82ce09b2b6f5ead8788ec3e8253">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#accfc62def4dcdc7e31050eef91445288">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#a773dcf5eb6631142955efc6db0174989">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#a36237799279532d7b9056f0a893fddcc">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#a9609c0dc67502cca9d54a56d6538e444">SHAKE</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a6979e54c8e654607b107d40dd621f4de"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void IKdf::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the generator with a key, using length and offset arguments </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a75e2af53666b1519275e3bc43be37485">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#a599776f4959dd996f4ea64e2b04f41a9">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#a13e10a57695f0b34d94fe2e62635b635">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#a7c18f65ef1077bd62817c01ef5971a2e">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#aa81cac68b0466700cd176074d02428ef">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -470,7 +531,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a593dee1a486a1442e1ea25862b13c72f">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#ad0c3ef3a05767be158c363b8ac04895c">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#af092a0d17f1d8bcd673eb683597cae4a">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#af0e7ec38d90b4d89bab896c5c90c9c73">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#af0d1d9e7ba0f763faf3474d4f56f75d4">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_s_c_r_y_p_t.html#a593dee1a486a1442e1ea25862b13c72f">SCRYPT</a>, <a class="el" href="class_h_k_d_f.html#ad0c3ef3a05767be158c363b8ac04895c">HKDF</a>, <a class="el" href="class_p_b_k_d_f2.html#af092a0d17f1d8bcd673eb683597cae4a">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#af0d1d9e7ba0f763faf3474d4f56f75d4">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#af0e7ec38d90b4d89bab896c5c90c9c73">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -522,7 +583,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_k_d_f.html#a4a225c09ecd0838b10c5f2ca652febd3">HKDF</a>, <a class="el" href="class_s_c_r_y_p_t.html#a58535b668bc4f231a2cc269c3e86d328">SCRYPT</a>, <a class="el" href="class_p_b_k_d_f2.html#acd30932efc16bd32cc0f721c5c5c0d34">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#a687334746d70e6012e52dcf93096d163">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#af3d6fd6a30626f69eac37b0af23c62cb">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_h_k_d_f.html#a4a225c09ecd0838b10c5f2ca652febd3">HKDF</a>, <a class="el" href="class_s_c_r_y_p_t.html#a58535b668bc4f231a2cc269c3e86d328">SCRYPT</a>, <a class="el" href="class_p_b_k_d_f2.html#acd30932efc16bd32cc0f721c5c5c0d34">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#af3d6fd6a30626f69eac37b0af23c62cb">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#a687334746d70e6012e52dcf93096d163">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -691,7 +752,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_k_d_f.html#abb3c25b9a9d801ede315bc57769bcb13">HKDF</a>, <a class="el" href="class_s_c_r_y_p_t.html#ab8e4d358664c6ed9dfb21a44a7e9f660">SCRYPT</a>, <a class="el" href="class_p_b_k_d_f2.html#a28fdbecefc3a6637164c2f570da9152c">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#ab5eebd9ca56714bb59bf1685356155b0">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#a4b200dca2cc11a3b82cd747931866cee">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_h_k_d_f.html#abb3c25b9a9d801ede315bc57769bcb13">HKDF</a>, <a class="el" href="class_s_c_r_y_p_t.html#ab8e4d358664c6ed9dfb21a44a7e9f660">SCRYPT</a>, <a class="el" href="class_p_b_k_d_f2.html#a28fdbecefc3a6637164c2f570da9152c">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#a4b200dca2cc11a3b82cd747931866cee">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#ab5eebd9ca56714bb59bf1685356155b0">SHAKE</a>.</p>
 
 </div>
 </div>
@@ -718,13 +779,13 @@ Public Member Functions</h2></td></tr>
 
 <p>Reset the internal state; Kdf must be re-initialized before it can be used again </p>
 
-<p>Implemented in <a class="el" href="class_h_k_d_f.html#af6e99c5f13c561722f3e21740b40dfd6">HKDF</a>, <a class="el" href="class_s_c_r_y_p_t.html#a19767a300b429430aab1884dd6d91933">SCRYPT</a>, <a class="el" href="class_p_b_k_d_f2.html#a9276717c835ded930129371db98c2908">PBKDF2</a>, <a class="el" href="class_s_h_a_k_e.html#a6d2be8c3a156aa3b535023d91f8cf166">SHAKE</a>, and <a class="el" href="class_k_d_f2.html#af714594a3c28bcde64598108db233478">KDF2</a>.</p>
+<p>Implemented in <a class="el" href="class_h_k_d_f.html#af6e99c5f13c561722f3e21740b40dfd6">HKDF</a>, <a class="el" href="class_s_c_r_y_p_t.html#a19767a300b429430aab1884dd6d91933">SCRYPT</a>, <a class="el" href="class_p_b_k_d_f2.html#a9276717c835ded930129371db98c2908">PBKDF2</a>, <a class="el" href="class_k_d_f2.html#af714594a3c28bcde64598108db233478">KDF2</a>, and <a class="el" href="class_s_h_a_k_e.html#a6d2be8c3a156aa3b535023d91f8cf166">SHAKE</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_i_kdf_8h_source.html">IKdf.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_i_kdf_8h_source.html">IKdf.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

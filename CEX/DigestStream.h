@@ -102,11 +102,11 @@ public:
 	/// Initialize the class with a digest enumeration
 	/// </summary>
 	/// 
-	/// <param name="Digest">The digest enumeration member</param>
+	/// <param name="DigestType">The digest enumeration member</param>
 	/// <param name="Parallel">Instantiates the multi-threaded implementation of the digest</param>
 	/// 
 	/// <exception cref="Exception::CryptoProcessingException">Thrown if invalid parameters are used</exception>
-	explicit DigestStream(Digests Digest, bool Parallel = false);
+	explicit DigestStream(Digests DigestType, bool Parallel = false);
 
 	/// <summary>
 	/// Initialize the class with a digest instance

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/ArrayUtils.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/ArrayUtils.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -126,20 +126,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="class_array_utils.html#a1e22bc27707b2913c474bd9ada1e8f98">   45</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">size_t</span> <a class="code" href="class_array_utils.html#a1e22bc27707b2913c474bd9ada1e8f98">Append</a>(T Value, std::vector&lt;byte&gt; &amp;Output)</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    {</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> VARSZE = <span class="keyword">sizeof</span>(T);</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ARRSZE = Output.size();</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> VARLEN = <span class="keyword">sizeof</span>(T);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ARRLEN = Output.size();</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        Output.resize(Output.size() + VARSZE);</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        std::memcpy(&amp;Output[ARRSZE], &amp;Value, VARSZE);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        Output.resize(Output.size() + VARLEN);</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        std::memcpy(&amp;Output[ARRLEN], &amp;Value, VARLEN);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">return</span> VARSZE;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">return</span> VARLEN;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    }</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Array&gt;</div>
 <div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="class_array_utils.html#ae64b927f0ec750e841f6f60ff926e266">   65</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">size_t</span> <a class="code" href="class_array_utils.html#ae64b927f0ec750e841f6f60ff926e266">AppendString</a>(std::string &amp;Value, Array &amp;Output)</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> STRSZE = Value.size();</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ELMSZE = <span class="keyword">sizeof</span>(Array::value_type);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> STRLEN = Value.size();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ELMLEN = <span class="keyword">sizeof</span>(Array::value_type);</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        std::vector&lt;byte&gt; tmp(0);</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        std::transform(std::begin(Value), std::end(Value), std::back_inserter(tmp), [](<span class="keywordtype">char</span> c)</div>
@@ -148,29 +148,29 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        });</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordtype">size_t</span> pos = Output.size();</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        Output.resize(pos + (tmp.size() / ELMSZE));</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        Output.resize(pos + (tmp.size() / ELMLEN));</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <span class="keywordflow">if</span> (tmp.size() != 0)</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        {</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            std::memcpy(&amp;Output[pos], &amp;tmp[0], tmp.size());</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        }</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> STRSZE;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> STRLEN;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    }</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> ArrayA, <span class="keyword">typename</span> ArrayB&gt;</div>
 <div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="class_array_utils.html#a8049c3bf32bd08390d79725e9e5230e6">   96</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">size_t</span> <a class="code" href="class_array_utils.html#a8049c3bf32bd08390d79725e9e5230e6">Append</a>(<span class="keyword">const</span> ArrayA &amp;Input, ArrayB &amp;Output)</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> VARSZE = <span class="keyword">sizeof</span>(ArrayA::value_type) * Input.size();</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ARRSZE = <span class="keyword">sizeof</span>(ArrayB::value_type) * Output.size();</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> VARLEN = <span class="keyword">sizeof</span>(ArrayA::value_type) * Input.size();</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ARRLEN = <span class="keyword">sizeof</span>(ArrayB::value_type) * Output.size();</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordflow">if</span> (Input.size() != 0)</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        {</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            Output.resize(VARSZE + ARRSZE);</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            std::memcpy(&amp;Output[ARRSZE], &amp;Input[0], VARSZE);</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            Output.resize(VARLEN + ARRLEN);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            std::memcpy(&amp;Output[ARRLEN], &amp;Input[0], VARLEN);</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        }</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="keywordflow">return</span> VARSZE;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="keywordflow">return</span> VARLEN;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    }</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="class_array_utils.html#ae66e17f2d709e1f299b10f50a4de2593">Contains</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* Container, <span class="keywordtype">char</span> Value);</div>
@@ -223,13 +223,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00210"></a><span class="lineno"><a class="line" href="class_array_utils.html#a4962aff02aeb0e7e72d7bf9a602a50f3">  210</a></span>&#160;    <span class="keyword">static</span> std::vector&lt;byte&gt; <a class="code" href="class_array_utils.html#a4962aff02aeb0e7e72d7bf9a602a50f3">ToByteArray</a>(T* Input, <span class="keywordtype">size_t</span> Length)</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    {</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ELMSZE = <span class="keyword">sizeof</span>(Input[0]);</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> RETSZE = Length * ELMSZE;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        std::vector&lt;byte&gt; elems(RETSZE);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> ELMLEN = <span class="keyword">sizeof</span>(Input[0]);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> RETLEN = Length * ELMLEN;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        std::vector&lt;byte&gt; elems(RETLEN);</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">if</span> (Length != 0)</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;        {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            std::memcpy(&amp;elems[0], &amp;Input[0], RETSZE);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;            std::memcpy(&amp;elems[0], &amp;Input[0], RETLEN);</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        }</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        <span class="keywordflow">return</span> elems;</div>

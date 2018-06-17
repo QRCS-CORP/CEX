@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -105,7 +105,7 @@ Inheritance diagram for IDrbg:</div>
   <img src="class_i_drbg.png" usemap="#IDrbg_map" alt=""/>
   <map id="IDrbg_map" name="IDrbg_map">
 <area href="class_b_c_g.html" title="An implementation of a Block cipher Counter mode Generator DRBG " alt="BCG" shape="rect" coords="0,56,43,80"/>
-<area href="class_d_c_g.html" title="An implementation of a message Digest Counter Generator DRBG " alt="DCG" shape="rect" coords="53,56,96,80"/>
+<area href="class_c_s_g.html" title="An implementation of an cSHAKE Generator DRBG " alt="CSG" shape="rect" coords="53,56,96,80"/>
 <area href="class_h_c_g.html" title="An implementation of an HMAC Counter Generator DRBG " alt="HCG" shape="rect" coords="106,56,149,80"/>
 </map>
  </div></div>
@@ -286,7 +286,7 @@ Public Member Functions</h2></td></tr>
 <p>Read/Write: Reads or Sets the personalization string value in the KDF initialization parameters. </p>
 <p>Must be set before Initialize(ISymmetricKey) is called. Changing this code will create a unique distribution of the generator. Code can be sized as either a zero byte array, or any length up to the DistributionCodeMax size. For best security, the distribution code should be random, secret, and equal in length to the DistributionCodeMax() size.</p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#ac3ed79900da0b8e70a011a7c475608d4">HCG</a>, <a class="el" href="class_d_c_g.html#afd0729c66cb93f57b301d8269ad5db4a">DCG</a>, and <a class="el" href="class_b_c_g.html#aa19356b045fd0b80202c17d1c37e0051">BCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#ac3ed79900da0b8e70a011a7c475608d4">HCG</a>, <a class="el" href="class_b_c_g.html#aa19356b045fd0b80202c17d1c37e0051">BCG</a>, and <a class="el" href="class_c_s_g.html#ad934a92f8abdaa0fd501a87e0a11ef8f">CSG</a>.</p>
 
 </div>
 </div>
@@ -314,7 +314,7 @@ Public Member Functions</h2></td></tr>
 <p>Read Only: The maximum size of the distribution code in bytes. </p>
 <p>The distribution code can be used as a secondary source of entropy (secret) in the KDF key expansion phase. For best security, the distribution code should be random, secret, and equal in size to this value.</p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a9209933dfea7d1b73a866cc5ed4f5852">HCG</a>, <a class="el" href="class_d_c_g.html#ab60f0efd0f4829b761f2f0310f549233">DCG</a>, and <a class="el" href="class_b_c_g.html#a84683455a705ff8535e6fd87bd555266">BCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a9209933dfea7d1b73a866cc5ed4f5852">HCG</a>, <a class="el" href="class_b_c_g.html#a84683455a705ff8535e6fd87bd555266">BCG</a>, and <a class="el" href="class_c_s_g.html#a3f034874640c065973c5264d8cb40913">CSG</a>.</p>
 
 </div>
 </div>
@@ -341,7 +341,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The Drbg generators type name </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a5db71c7ad66838a208f713cb5f16afc6">HCG</a>, <a class="el" href="class_d_c_g.html#a499807345d08e1adf69035871f3b36cb">DCG</a>, and <a class="el" href="class_b_c_g.html#ac8b1b6417d79539914e9cdac8b71da62">BCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a5db71c7ad66838a208f713cb5f16afc6">HCG</a>, <a class="el" href="class_b_c_g.html#ac8b1b6417d79539914e9cdac8b71da62">BCG</a>, and <a class="el" href="class_c_s_g.html#a0810fef95925643e2d81a09aacf7b5d3">CSG</a>.</p>
 
 </div>
 </div>
@@ -376,7 +376,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">HCG</a>, <a class="el" href="class_b_c_g.html#ab4b8402a1d7074fb413d9dc39f9f5a1c">BCG</a>, and <a class="el" href="class_d_c_g.html#ae465e401401b12251f175485431436d0">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#ab4b8402a1d7074fb413d9dc39f9f5a1c">BCG</a>, <a class="el" href="class_h_c_g.html#a7679e06f54695aaa3a407304babbc597">HCG</a>, and <a class="el" href="class_c_s_g.html#a6f2588ea9cbe89cdd9b24f3b0b45753a">CSG</a>.</p>
 
 </div>
 </div>
@@ -429,7 +429,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of bytes generated</dd></dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a6096c3b466e866315d411873f1a7c55f">HCG</a>, <a class="el" href="class_b_c_g.html#acbf7733acc9eda08b57b1183655473d3">BCG</a>, and <a class="el" href="class_d_c_g.html#a6d52150af1c2027a36bf6228965682c3">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a6096c3b466e866315d411873f1a7c55f">HCG</a>, <a class="el" href="class_b_c_g.html#acbf7733acc9eda08b57b1183655473d3">BCG</a>, and <a class="el" href="class_c_s_g.html#a9f1ab82907b467f70d63a421be0876cd">CSG</a>.</p>
 
 </div>
 </div>
@@ -463,7 +463,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">HCG</a>, <a class="el" href="class_b_c_g.html#a27a0028a85ef9242435f4b7358be9913">BCG</a>, and <a class="el" href="class_d_c_g.html#a6df66e0afa414a272bb7e208224a3ef8">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a2fd26876fccbfd4dbf9f55eb5b43ff36">HCG</a>, <a class="el" href="class_b_c_g.html#a27a0028a85ef9242435f4b7358be9913">BCG</a>, and <a class="el" href="class_c_s_g.html#a0d09dedea4d890771dfbce25247a8ead">CSG</a>.</p>
 
 </div>
 </div>
@@ -497,7 +497,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#aea34d96e4fd6af3fb02d9f5c026e7999">HCG</a>, <a class="el" href="class_b_c_g.html#af1b0813b84fe782553043d8ee0998c86">BCG</a>, and <a class="el" href="class_d_c_g.html#afe545d8af2e346f065178d821890b85b">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#aea34d96e4fd6af3fb02d9f5c026e7999">HCG</a>, <a class="el" href="class_b_c_g.html#af1b0813b84fe782553043d8ee0998c86">BCG</a>, and <a class="el" href="class_c_s_g.html#afcbad0c5e86f83b47c8eafe9b2ed5b28">CSG</a>.</p>
 
 </div>
 </div>
@@ -542,7 +542,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#ad140f22333acfecfeb52aef49a907311">HCG</a>, <a class="el" href="class_b_c_g.html#ac5c615a061033480d4791cd700734e39">BCG</a>, and <a class="el" href="class_d_c_g.html#a9ad79f95ae6749e8a94a3cbfbe265d4f">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#ad140f22333acfecfeb52aef49a907311">HCG</a>, <a class="el" href="class_b_c_g.html#ac5c615a061033480d4791cd700734e39">BCG</a>, and <a class="el" href="class_c_s_g.html#a91f0bc20e73c30c31f993f9791f10473">CSG</a>.</p>
 
 </div>
 </div>
@@ -594,7 +594,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a1e88de3578969c6e77a6ef9b4ea0ac7e">HCG</a>, <a class="el" href="class_b_c_g.html#a199c22aa6dd078e3e381444b63e1c9b0">BCG</a>, and <a class="el" href="class_d_c_g.html#a348a033291319c0921b8e681db6cd529">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#a199c22aa6dd078e3e381444b63e1c9b0">BCG</a>, <a class="el" href="class_h_c_g.html#a1e88de3578969c6e77a6ef9b4ea0ac7e">HCG</a>, and <a class="el" href="class_c_s_g.html#ac4cb7ae47cb8eeb414680b5225ecaada">CSG</a>.</p>
 
 </div>
 </div>
@@ -621,7 +621,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: Generator is ready to produce random </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a3b2791a3f33ef2724b35fab1a91b5232">HCG</a>, <a class="el" href="class_d_c_g.html#a73e3d6bad2bb4c8ee5d677a45765b1da">DCG</a>, and <a class="el" href="class_b_c_g.html#ab9ce1a986bf78705d34c264b387ab79e">BCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a3b2791a3f33ef2724b35fab1a91b5232">HCG</a>, <a class="el" href="class_b_c_g.html#ab9ce1a986bf78705d34c264b387ab79e">BCG</a>, and <a class="el" href="class_c_s_g.html#a248c445764626fed65a9185d9f30f2e9">CSG</a>.</p>
 
 </div>
 </div>
@@ -648,7 +648,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: List of available legal key sizes </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a136714e25b6094e19ff5a07a60ed7c24">HCG</a>, <a class="el" href="class_b_c_g.html#adbf9ea291f7841e4f375ef2cb8ef28d2">BCG</a>, and <a class="el" href="class_d_c_g.html#a6cd232011496c08bd2845960afd40d53">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a136714e25b6094e19ff5a07a60ed7c24">HCG</a>, <a class="el" href="class_b_c_g.html#adbf9ea291f7841e4f375ef2cb8ef28d2">BCG</a>, and <a class="el" href="class_c_s_g.html#afc5f7363de36a5501c0e0e60b2dfb585">CSG</a>.</p>
 
 </div>
 </div>
@@ -675,7 +675,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum number of bytes that can be generated with a generator instance </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#abbce042e2e273d37aff7e4c1dd831e4a">HCG</a>, <a class="el" href="class_b_c_g.html#a951d5dfab9aab716a95ba874de3d9d65">BCG</a>, and <a class="el" href="class_d_c_g.html#a373e3f3e2f6f0a428ffb762cb3e71935">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#abbce042e2e273d37aff7e4c1dd831e4a">HCG</a>, <a class="el" href="class_b_c_g.html#a951d5dfab9aab716a95ba874de3d9d65">BCG</a>, and <a class="el" href="class_c_s_g.html#aae62f743107bb1b48071653a3636bd06">CSG</a>.</p>
 
 </div>
 </div>
@@ -702,7 +702,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum number of bytes that can be generated in a single request </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a3b78dbe55ff531cc2717f0e54b18cec1">HCG</a>, <a class="el" href="class_b_c_g.html#abdfc9eee9b9276d67b20e697ad9b04f0">BCG</a>, and <a class="el" href="class_d_c_g.html#acecd4a84c21bf0922877bb486e4f8b0d">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a3b78dbe55ff531cc2717f0e54b18cec1">HCG</a>, <a class="el" href="class_b_c_g.html#abdfc9eee9b9276d67b20e697ad9b04f0">BCG</a>, and <a class="el" href="class_c_s_g.html#a7bf2e146ffc9b1d752333093dc177cc4">CSG</a>.</p>
 
 </div>
 </div>
@@ -729,7 +729,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The maximum number of times the generator can be reseeded </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a89b315b1b7a31743e6efd7b6cefa5a31">HCG</a>, <a class="el" href="class_b_c_g.html#a53ff8cfd7e65a8d1875ad85f84b815fe">BCG</a>, and <a class="el" href="class_d_c_g.html#a306a8fbcec27da0c75ae25325efc6161">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a89b315b1b7a31743e6efd7b6cefa5a31">HCG</a>, <a class="el" href="class_b_c_g.html#a53ff8cfd7e65a8d1875ad85f84b815fe">BCG</a>, and <a class="el" href="class_c_s_g.html#a93d817a5f1309678d8995b7cd56e0851">CSG</a>.</p>
 
 </div>
 </div>
@@ -756,7 +756,7 @@ Public Member Functions</h2></td></tr>
 
 <p>The Drbg generators class name </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a5ba84de2fbf39e146197db4d7ed42458">HCG</a>, <a class="el" href="class_b_c_g.html#a2f5139fb9e5ef0ab20daf3ae70b53d49">BCG</a>, and <a class="el" href="class_d_c_g.html#a85b896a62a6dacaa9d6a594c48eafd17">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a5ba84de2fbf39e146197db4d7ed42458">HCG</a>, <a class="el" href="class_b_c_g.html#a2f5139fb9e5ef0ab20daf3ae70b53d49">BCG</a>, and <a class="el" href="class_c_s_g.html#a6cf1f9572a3a2c5e50993b3533053565">CSG</a>.</p>
 
 </div>
 </div>
@@ -783,7 +783,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The size of the nonce counter value in bytes </p>
 
-<p>Implemented in <a class="el" href="class_h_c_g.html#a481d211d575a0cfed45bfc19dc3e3386">HCG</a>, <a class="el" href="class_b_c_g.html#aacac515a419c94695c0f73e5fe365b27">BCG</a>, and <a class="el" href="class_d_c_g.html#a5d8d800f6d03a0463adc8257b1c5f069">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_h_c_g.html#a481d211d575a0cfed45bfc19dc3e3386">HCG</a>, <a class="el" href="class_b_c_g.html#aacac515a419c94695c0f73e5fe365b27">BCG</a>, and <a class="el" href="class_c_s_g.html#aae673e286baae3cb496c3dec19db1468">CSG</a>.</p>
 
 </div>
 </div>
@@ -836,7 +836,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read/Write: The maximum output generated between seed recycling </p>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#ac04f934fb7c792f758ddee26a0195546">BCG</a>, <a class="el" href="class_h_c_g.html#a73d80a05fdc6923db4f0755acbb62392">HCG</a>, and <a class="el" href="class_d_c_g.html#aaa672ba6d7c82a0118fe4b4800704ceb">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#ac04f934fb7c792f758ddee26a0195546">BCG</a>, <a class="el" href="class_h_c_g.html#a73d80a05fdc6923db4f0755acbb62392">HCG</a>, and <a class="el" href="class_c_s_g.html#a11d758c403896a184e272f077d7a451b">CSG</a>.</p>
 
 </div>
 </div>
@@ -863,7 +863,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The security strength in bits </p>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#a668962a434759e4e2a30a397a04147f2">BCG</a>, <a class="el" href="class_h_c_g.html#aa15826f52a9c991b6628348bd651f5fe">HCG</a>, and <a class="el" href="class_d_c_g.html#a48749a77177d9115898b6d5f4fc7d0eb">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#a668962a434759e4e2a30a397a04147f2">BCG</a>, <a class="el" href="class_h_c_g.html#aa15826f52a9c991b6628348bd651f5fe">HCG</a>, and <a class="el" href="class_c_s_g.html#aed0767df96614998c72a14f708c0fdad">CSG</a>.</p>
 
 </div>
 </div>
@@ -897,13 +897,13 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_b_c_g.html#a0bdc41d7400fb371414ac14b4be01120">BCG</a>, <a class="el" href="class_h_c_g.html#af2aa30ee3c58b54b6048cc8ab0dd4dd7">HCG</a>, and <a class="el" href="class_d_c_g.html#a0fcff56bffc9c92817f99bd2b29cc69c">DCG</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_g.html#a0bdc41d7400fb371414ac14b4be01120">BCG</a>, <a class="el" href="class_h_c_g.html#af2aa30ee3c58b54b6048cc8ab0dd4dd7">HCG</a>, and <a class="el" href="class_c_s_g.html#ad810921127280d5db5a108efae8e1e61">CSG</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_i_drbg_8h_source.html">IDrbg.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_i_drbg_8h_source.html">IDrbg.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

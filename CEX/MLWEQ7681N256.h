@@ -28,6 +28,10 @@
 
 NAMESPACE_MODULELWE
 
+/// 
+/// internal
+/// 
+
 /// <summary>
 /// The ModuleLWE FFT using a modulus of 12289 with 1024 coefficients
 /// </summary>
@@ -69,7 +73,6 @@ public:
 	/// <param name="Secret">The shared secret</param>
 	/// <param name="CipherText">The received ciphertext</param>
 	/// <param name="PrivateKey">The private asymmetric key</param>
-	/// <param name="K">The coefficient dimension parameter K</param>
 	static void Decrypt(std::vector<byte> &Secret, const std::vector<byte> &CipherText, const std::vector<byte> &PrivateKey);
 
 	/// <summary>
@@ -79,8 +82,7 @@ public:
 	/// <param name="CipherText">The cipher-text output</param>
 	/// <param name="Message">The secret message</param>
 	/// <param name="PublicKey">The asymmetric public key</param>
-	/// <param name="Rng">The random provider</param>
-	/// <param name="K">The coefficient dimension parameter K</param>
+	/// <param name="Seed">The random seed</param>
 	static void Encrypt(std::vector<byte> &CipherText, const std::vector<byte> &Message, const std::vector<byte> &PublicKey, const std::vector<byte> &Seed);
 
 	/// <summary>
@@ -90,7 +92,6 @@ public:
 	/// <param name="PublicKey">The public asymmetric key</param>
 	/// <param name="PrivateKey">The private asymmetric key</param>
 	/// <param name="Rng">The random provider</param>
-	/// <param name="K">The coefficient dimension parameter K</param>
 	static void Generate(std::vector<byte> &PublicKey, std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 private:

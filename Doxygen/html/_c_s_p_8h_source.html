@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/CSP.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/CSP.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -128,31 +128,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_s_p.html#a56e8680cef57401046b052c762da83ca">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">Generate</a>(std::vector&lt;byte&gt; &amp;Output) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_s_p.html#a56e8680cef57401046b052c762da83ca">GetBytes</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">Generate</a>(std::vector&lt;byte&gt; &amp;Output, <span class="keywordtype">size_t</span> Offset, <span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_c_s_p.html#a56e8680cef57401046b052c762da83ca">GetBytes</a>(<span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    std::vector&lt;byte&gt; <a class="code" href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">Generate</a>(<span class="keywordtype">size_t</span> Length) <span class="keyword">override</span>;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    uint <a class="code" href="class_c_s_p.html#ad189e04ec1f0d6aeb09dc7e65c13d63d">Next</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_s_p.html#a4bbcd7b959ff265310b4e7a064b1b819">Reset</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;};</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;NAMESPACE_PROVIDEREND</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="class_i_provider_html"><div class="ttname"><a href="class_i_provider.html">IProvider</a></div><div class="ttdoc">Entropy source collectors and concentrators interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:487</div></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    ushort <a class="code" href="class_c_s_p.html#aea45203ba3a8d14eda5dad5d90937c34">NextUInt16</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    uint <a class="code" href="class_c_s_p.html#aa369f8220ce6df5f11ba3a519df3df73">NextUInt32</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    ulong <a class="code" href="class_c_s_p.html#ac5a1f625144f756c88cbee895c90652d">NextUInt64</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="class_c_s_p.html#a4bbcd7b959ff265310b4e7a064b1b819">Reset</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;};</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;NAMESPACE_PROVIDEREND</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="class_i_provider_html"><div class="ttname"><a href="class_i_provider.html">IProvider</a></div><div class="ttdoc">Entropy source collectors and concentrators interface </div><div class="ttdef"><b>Definition:</b> Documentation.h:506</div></div>
 <div class="ttc" id="class_c_s_p_html_a0daa754be5c125829f5dbf87f198aa94"><div class="ttname"><a href="class_c_s_p.html#a0daa754be5c125829f5dbf87f198aa94">CSP::~CSP</a></div><div class="ttdeci">~CSP() override</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> CSP.cpp:56</div></div>
 <div class="ttc" id="class_c_s_p_html"><div class="ttname"><a href="class_c_s_p.html">CSP</a></div><div class="ttdoc">An implementation of an entropy source provider using the system secure random generator. </div><div class="ttdef"><b>Definition:</b> CSP.h:33</div></div>
 <div class="ttc" id="class_c_s_p_html_a410e2b02f53456c817d38dad862c5a7a"><div class="ttname"><a href="class_c_s_p.html#a410e2b02f53456c817d38dad862c5a7a">CSP::Name</a></div><div class="ttdeci">const std::string Name() override</div><div class="ttdoc">Read Only: Cipher name </div><div class="ttdef"><b>Definition:</b> CSP.cpp:39</div></div>
 <div class="ttc" id="class_c_s_p_html_a2545ae4e096fcb29bff045840f84512d"><div class="ttname"><a href="class_c_s_p.html#a2545ae4e096fcb29bff045840f84512d">CSP::Enumeral</a></div><div class="ttdeci">const Providers Enumeral() override</div><div class="ttdoc">Read Only: The providers type name </div><div class="ttdef"><b>Definition:</b> CSP.cpp:29</div></div>
+<div class="ttc" id="class_c_s_p_html_aea45203ba3a8d14eda5dad5d90937c34"><div class="ttname"><a href="class_c_s_p.html#aea45203ba3a8d14eda5dad5d90937c34">CSP::NextUInt16</a></div><div class="ttdeci">ushort NextUInt16() override</div><div class="ttdoc">Get a pseudo random unsigned 16bit integer </div><div class="ttdef"><b>Definition:</b> CSP.cpp:177</div></div>
+<div class="ttc" id="class_c_s_p_html_aaa19560b3f98e8781459f20cfbe7a515"><div class="ttname"><a href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">CSP::Generate</a></div><div class="ttdeci">void Generate(std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Fill a buffer with pseudo-random bytes </div><div class="ttdef"><b>Definition:</b> CSP.cpp:63</div></div>
+<div class="ttc" id="class_c_s_p_html_ac5a1f625144f756c88cbee895c90652d"><div class="ttname"><a href="class_c_s_p.html#ac5a1f625144f756c88cbee895c90652d">CSP::NextUInt64</a></div><div class="ttdeci">ulong NextUInt64() override</div><div class="ttdoc">Get a pseudo random unsigned 64bit integer </div><div class="ttdef"><b>Definition:</b> CSP.cpp:193</div></div>
+<div class="ttc" id="class_c_s_p_html_aa369f8220ce6df5f11ba3a519df3df73"><div class="ttname"><a href="class_c_s_p.html#aa369f8220ce6df5f11ba3a519df3df73">CSP::NextUInt32</a></div><div class="ttdeci">uint NextUInt32() override</div><div class="ttdoc">Get a pseudo random unsigned 32bit integer </div><div class="ttdef"><b>Definition:</b> CSP.cpp:185</div></div>
 <div class="ttc" id="class_c_s_p_html_a4a53a4707340364f92dcf526decd4dc7"><div class="ttname"><a href="class_c_s_p.html#a4a53a4707340364f92dcf526decd4dc7">CSP::operator=</a></div><div class="ttdeci">CSP &amp; operator=(const CSP &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
-<div class="ttc" id="class_c_s_p_html_a4bbcd7b959ff265310b4e7a064b1b819"><div class="ttname"><a href="class_c_s_p.html#a4bbcd7b959ff265310b4e7a064b1b819">CSP::Reset</a></div><div class="ttdeci">void Reset() override</div><div class="ttdoc">Reset the internal state </div><div class="ttdef"><b>Definition:</b> CSP.cpp:187</div></div>
+<div class="ttc" id="class_c_s_p_html_a4bbcd7b959ff265310b4e7a064b1b819"><div class="ttname"><a href="class_c_s_p.html#a4bbcd7b959ff265310b4e7a064b1b819">CSP::Reset</a></div><div class="ttdeci">void Reset() override</div><div class="ttdoc">Reset the internal state </div><div class="ttdef"><b>Definition:</b> CSP.cpp:201</div></div>
 <div class="ttc" id="class_c_s_p_html_a7a1abcc12579434e5bca8368caff8942"><div class="ttname"><a href="class_c_s_p.html#a7a1abcc12579434e5bca8368caff8942">CSP::CSP</a></div><div class="ttdeci">CSP()</div><div class="ttdoc">Constructor: instantiate this class </div><div class="ttdef"><b>Definition:</b> CSP.cpp:46</div></div>
-<div class="ttc" id="group___enumeration_html_ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><div class="ttname"><a href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a></div><div class="ttdeci">Providers</div><div class="ttdef"><b>Definition:</b> Documentation.h:299</div></div>
+<div class="ttc" id="group___enumeration_html_ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><div class="ttname"><a href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a></div><div class="ttdeci">Providers</div><div class="ttdef"><b>Definition:</b> Documentation.h:317</div></div>
 <div class="ttc" id="class_c_s_p_html_aee64b00b392945655f8a3bb146ccc9e6"><div class="ttname"><a href="class_c_s_p.html#aee64b00b392945655f8a3bb146ccc9e6">CSP::IsAvailable</a></div><div class="ttdeci">const bool IsAvailable() override</div><div class="ttdoc">Read Only: The entropy provider is available on this system </div><div class="ttdef"><b>Definition:</b> CSP.cpp:34</div></div>
-<div class="ttc" id="class_c_s_p_html_a56e8680cef57401046b052c762da83ca"><div class="ttname"><a href="class_c_s_p.html#a56e8680cef57401046b052c762da83ca">CSP::GetBytes</a></div><div class="ttdeci">void GetBytes(std::vector&lt; byte &gt; &amp;Output) override</div><div class="ttdoc">Fill a buffer with pseudo-random bytes </div><div class="ttdef"><b>Definition:</b> CSP.cpp:63</div></div>
-<div class="ttc" id="class_c_s_p_html_ad189e04ec1f0d6aeb09dc7e65c13d63d"><div class="ttname"><a href="class_c_s_p.html#ad189e04ec1f0d6aeb09dc7e65c13d63d">CSP::Next</a></div><div class="ttdeci">uint Next() override</div><div class="ttdoc">Returns a pseudo-random unsigned 32bit integer </div><div class="ttdef"><b>Definition:</b> CSP.cpp:177</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

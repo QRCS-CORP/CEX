@@ -20,14 +20,14 @@ const std::string HCR::Name()
 
 //~~~Constructor~~~//
 
-HCR::HCR(Digests DigestEngine, Providers SeedEngine, size_t BufferSize)
+HCR::HCR(Digests DigestType, Providers ProviderType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
-	m_digestType(DigestEngine != Digests::None ? DigestEngine :
+	m_digestType(DigestType != Digests::None ? DigestType :
 		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
-	m_pvdType(SeedEngine),
+	m_pvdType(ProviderType),
 	m_rndSeed(0),
 	m_rngBuffer(BufferSize),
 	m_rngGenerator(new Drbg::HCG(m_digestType))
@@ -35,15 +35,15 @@ HCR::HCR(Digests DigestEngine, Providers SeedEngine, size_t BufferSize)
 	Reset();
 }
 
-HCR::HCR(std::vector<byte> Seed, Digests DigestEngine, size_t BufferSize)
+HCR::HCR(std::vector<byte> Seed, Digests DigestType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
-	m_digestType(DigestEngine != Digests::None ? DigestEngine :
+	m_digestType(DigestType != Digests::None ? DigestType :
 		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
 	m_pvdType(Providers::ACP),
-	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestEngine) ? Seed :
+	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestType) ? Seed :
 		throw CryptoRandomException("HCR:Ctor", "The seed is too small!")),
 	m_rngBuffer(BufferSize),
 	m_rngGenerator(new Drbg::HCG(m_digestType))
@@ -73,83 +73,23 @@ HCR::~HCR()
 
 //~~~Public Functions~~~//
 
-void HCR::Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(int16_t);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void HCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(ushort);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void HCR::Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(int32_t);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void HCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(uint);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void HCR::Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(int64_t);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void HCR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(ulong);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-std::vector<byte> HCR::GetBytes(size_t Length)
+std::vector<byte> HCR::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd);
+	Generate(rnd);
 
 	return rnd;
 }
 
-void HCR::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void HCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
-	std::vector<byte> rnd = GetBytes(Length);
+	std::vector<byte> rnd = Generate(Length);
 	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
 }
 
-void HCR::GetBytes(std::vector<byte> &Output)
+void HCR::Generate(std::vector<byte> &Output)
 {
 	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
 
@@ -194,7 +134,7 @@ void HCR::GetBytes(std::vector<byte> &Output)
 ushort HCR::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ushort)), 0, x, sizeof(ushort));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -202,7 +142,7 @@ ushort HCR::NextUInt16()
 uint HCR::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(uint)), 0, x, sizeof(uint));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -210,7 +150,7 @@ uint HCR::NextUInt32()
 ulong HCR::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ulong)), 0, x, sizeof(ulong));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
@@ -225,7 +165,7 @@ void HCR::Reset()
 	{
 		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType == Providers::None ? Providers::CSP : m_pvdType);
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
-		seedGen->GetBytes(seed);
+		seedGen->Generate(seed);
 		delete seedGen;
 		m_rngGenerator->Initialize(seed);
 	}

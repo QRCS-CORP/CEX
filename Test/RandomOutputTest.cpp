@@ -98,9 +98,9 @@ namespace Test
 		std::vector<byte> info(ctd.DistributionCodeMax());
 		std::vector<byte> output(ctd.ParallelBlockSize());
 
-		pvd->GetBytes(seed);
-		pvd->GetBytes(nonce);
-		pvd->GetBytes(info);
+		pvd->Generate(seed);
+		pvd->Generate(nonce);
+		pvd->Generate(info);
 		ctd.ParallelProfile().IsParallel() = true;
 		ctd.Initialize(seed, nonce, info);
 
@@ -134,9 +134,9 @@ namespace Test
 		std::vector<byte> info(ctd.DistributionCodeMax());
 		std::vector<byte> output(ctd.MaxRequestSize());
 
-		pvd->GetBytes(seed);
-		pvd->GetBytes(nonce);
-		pvd->GetBytes(info);
+		pvd->Generate(seed);
+		pvd->Generate(nonce);
+		pvd->Generate(info);
 		ctd.Initialize(seed, nonce, info);
 
 		size_t prcLen = FileSize;
@@ -166,7 +166,7 @@ namespace Test
 
 		do
 		{
-			pvd->GetBytes(output);
+			pvd->Generate(output);
 			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
@@ -188,7 +188,7 @@ namespace Test
 
 		do
 		{
-			pvd->GetBytes(output);
+			pvd->Generate(output);
 			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
@@ -210,7 +210,7 @@ namespace Test
 
 		do
 		{
-			pvd->GetBytes(output);
+			pvd->Generate(output);
 			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;
@@ -232,7 +232,7 @@ namespace Test
 
 		do
 		{
-			pvd->GetBytes(output);
+			pvd->Generate(output);
 			size_t rmd = Utility::IntUtils::Min(output.size(), prcLen);
 			fs.Write(output, 0, rmd);
 			prcLen -= rmd;

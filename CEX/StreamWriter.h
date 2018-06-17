@@ -68,7 +68,7 @@ public:
 	/// Read/Write: Returns the entire array of raw bytes from the stream
 	/// </summary>
 	/// <returns>The array of bytes</returns>
-	std::vector<byte> &GetBytes();
+	std::vector<byte> &Generate();
 
 	/// <summary>
 	/// Read/Write: Returns the base MemoryStream object

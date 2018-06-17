@@ -130,6 +130,46 @@ public:
 	/// endcond
 
 	/// <summary>
+	/// Fills an array of any type with random elements.
+	/// <para>The random source can be any of the Prngs, Drbgs, or entropy Providers</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output array receiving random integers</param>
+	/// <param name="Offset">The starting position within the output array</param>
+	/// <param name="Elements">The number of elements to generate</param>
+	/// <param name="Rng">The random provider source</param>
+	template <typename Array, typename Random>
+	inline static void Fill(Array &Output, size_t Offset, size_t Elements, Random &Rng)
+	{
+		CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+		const size_t BUFLEN = Elements * sizeof(Array::value_type);
+		std::vector<byte> buf(BUFLEN);
+		Rng.Generate(buf);
+		Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+	}
+
+	/// <summary>
+	/// Fills an array of any type with random elements.
+	/// <para>The random source can be any of the Prngs, Drbgs, or entropy Providers</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output array receiving random integers</param>
+	/// <param name="Offset">The starting position within the output array</param>
+	/// <param name="Elements">The number of elements to generate</param>
+	/// <param name="Rng">A pointer to the random provider source</param>
+	template <typename Array, typename Random>
+	inline static void Fill(Array &Output, size_t Offset, size_t Elements, Random* Rng)
+	{
+		CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
+
+		const size_t BUFLEN = Elements * sizeof(Array::value_type);
+		std::vector<byte> buf(BUFLEN);
+		Rng->Generate(buf);
+		Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
+	}
+
+	/// <summary>
 	/// Extract an 8bit integer from a larger integer
 	/// </summary>
 	/// 

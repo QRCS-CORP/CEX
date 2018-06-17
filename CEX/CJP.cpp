@@ -100,54 +100,63 @@ bool &CJP::SecureCache()
 
 //~~~Public Functions~~~//
 
-void CJP::GetBytes(std::vector<byte> &Output)
+void CJP::Generate(std::vector<byte> &Output)
 {
 	if (!m_isAvailable)
 	{
-		throw CryptoRandomException("CJP:GetBytes", "High resolution timer not available or too coarse for RNG!");
+		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");
 	}
 
-	Generate(Output, 0, Output.size());
+	Process(Output, 0, Output.size());
 }
 
-void CJP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (!m_isAvailable)
 	{
-		throw CryptoRandomException("CJP:GetBytes", "High resolution timer not available or too coarse for RNG!");
+		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");
 	}
 
-	Generate(Output, Offset, Length);
+	Process(Output, Offset, Length);
 }
 
-std::vector<byte> CJP::GetBytes(size_t Length)
+std::vector<byte> CJP::Generate(size_t Length)
 {
 	if (!m_isAvailable)
 	{
-		throw CryptoRandomException("CJP:GetBytes", "High resolution timer not available or too coarse for RNG!");
+		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");
 	}
 
 	std::vector<byte> rnd(Length);
-	Generate(rnd, 0, rnd.size());
+	Process(rnd, 0, rnd.size());
 
 	return rnd;
 }
 
-uint CJP::Next()
+ushort CJP::NextUInt16()
 {
-	if (!m_isAvailable)
-	{
-		throw CryptoRandomException("CJP:Next", "High resolution timer not available or too coarse for RNG!");
-	}
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
-	std::vector<byte> rnd(sizeof(uint));
-	Generate(rnd, 0, rnd.size());
-	uint rnd32 = 0;
-	Utility::MemUtils::CopyToValue(rnd, 0, rnd32, sizeof(uint));
+	return x;
+}
 
-	return rnd32;
+uint CJP::NextUInt32()
+{
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+
+	return x;
+}
+
+ulong CJP::NextUInt64()
+{
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+
+	return x;
 }
 
 void CJP::Reset()
@@ -260,35 +269,6 @@ void CJP::FoldTime(ulong TimeStamp, ulong &Folded)
 }
 CEX_OPTIMIZE_RESUME
 
-size_t CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
-{
-	const size_t RNDLEN = sizeof(ulong);
-
-	do
-	{
-		size_t rmdLen = (Length < RNDLEN) ? Length : RNDLEN;
-		Generate64();
-		Utility::MemUtils::CopyFromValue(m_rndState, Output, Offset, rmdLen);
-		Length -= rmdLen;
-		Offset += rmdLen;
-	} 
-	while (Length != 0);
-
-	// To be on the safe side, we generate one more round of entropy which we do not give out to the caller. 
-	// That round shall ensure that in case the calling application crashes, memory dumps, pages out, 
-	// or due to the CPU Jitter RNG lingering in memory for a long time without being moved and an attacker cracks the application,
-	// all he reads in the entropy pool is a value that is never to be used. 
-	// Thus, he does NOT see the previous value that was returned to the caller for cryptographic purposes.
-	// If we use secured memory, do not use this precaution as the secure memory protects the entropy pool. 
-	// Moreover, note that using this call reduces the speed of the RNG by up to half
-	if (m_secureCache)
-	{
-		Generate64();
-	}
-
-	return Length;
-}
-
 void CJP::Generate64()
 {
 	// priming of the m_prevTime value
@@ -391,6 +371,34 @@ void CJP::Prime()
 
 	// fill the state with non-zero values
 	Generate64();
+}
+
+size_t CJP::Process(std::vector<byte> &Output, size_t Offset, size_t Length)
+{
+	const size_t RNDLEN = sizeof(ulong);
+
+	do
+	{
+		size_t rmdLen = (Length < RNDLEN) ? Length : RNDLEN;
+		Generate64();
+		Utility::MemUtils::CopyFromValue(m_rndState, Output, Offset, rmdLen);
+		Length -= rmdLen;
+		Offset += rmdLen;
+	} while (Length != 0);
+
+	// To be on the safe side, we generate one more round of entropy which we do not give out to the caller. 
+	// That round shall ensure that in case the calling application crashes, memory dumps, pages out, 
+	// or due to the CPU Jitter RNG lingering in memory for a long time without being moved and an attacker cracks the application,
+	// all he reads in the entropy pool is a value that is never to be used. 
+	// Thus, he does NOT see the previous value that was returned to the caller for cryptographic purposes.
+	// If we use secured memory, do not use this precaution as the secure memory protects the entropy pool. 
+	// Moreover, note that using this call reduces the speed of the RNG by up to half
+	if (m_secureCache)
+	{
+		Generate64();
+	}
+
+	return Length;
 }
 
 size_t CJP::ShuffleLoop(uint LowBits, uint MinShift)

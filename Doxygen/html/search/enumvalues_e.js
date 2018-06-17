@@ -1,5 +1,28 @@
 var searchData=
 [
-  ['q12289n1024',['Q12289N1024',['../group___enumeration.html#gga4889e7cc5000c12f232b3f14eb4ba58ea1d6f043e417cbe571008801095b9d3b2',1,'Documentation.h']]],
-  ['q12289n512',['Q12289N512',['../group___enumeration.html#gga4889e7cc5000c12f232b3f14eb4ba58eafdb9df3df40ea514285c340fa0cbdbd8',1,'Documentation.h']]]
+  ['r10',['R10',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a33df7d5541bc0941336b1513815da7a5',1,'Documentation.h']]],
+  ['r12',['R12',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a1688316d15ac9218146e0f4ba5fc8d4f',1,'Documentation.h']]],
+  ['r14',['R14',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a05e151e78b54177fc4d64d35b94429bf',1,'Documentation.h']]],
+  ['r16',['R16',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a9a486e1a3c543c7c58e1cc8086dc4239',1,'Documentation.h']]],
+  ['r18',['R18',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447aea7e6c5a5f673669f0d56d8f39056eae',1,'Documentation.h']]],
+  ['r20',['R20',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a0060f8a913e77c54ede4b306b2711304',1,'Documentation.h']]],
+  ['r22',['R22',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447ad008211ffa394caafc8878d8c731ebc3',1,'Documentation.h']]],
+  ['r24',['R24',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a5f4006a2f7952e9f9cd6773bb01c31bb',1,'Documentation.h']]],
+  ['r26',['R26',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a1a2af55009b823a69019dbbf729913c5',1,'Documentation.h']]],
+  ['r28',['R28',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a9b4e8ac4d9f908b8ca85737410ebcf1d',1,'Documentation.h']]],
+  ['r30',['R30',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a52ed10488a972535593efa61303446b5',1,'Documentation.h']]],
+  ['r32',['R32',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a1b5c31a494189e0415d5623f8b92a419',1,'Documentation.h']]],
+  ['r34',['R34',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a7c33b065c7fcac2dc179deabecd8c55b',1,'Documentation.h']]],
+  ['r38',['R38',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a7a5de5482eb3813281b987ab7808fb65',1,'Documentation.h']]],
+  ['r40',['R40',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447ab8a1bf525d7d37af6db8001cb28f7f0b',1,'Documentation.h']]],
+  ['r48',['R48',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447abbe25186e174b74f1d9ac547efe50acf',1,'Documentation.h']]],
+  ['r56',['R56',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a096b8e912aff7b51dc10ad2a420534ce',1,'Documentation.h']]],
+  ['r64',['R64',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447a95c866efff64ea784eb901abfcd1d99b',1,'Documentation.h']]],
+  ['r8',['R8',['../group___enumeration.html#ggad57696fdbcdac43c18f9ba4dada98447acfff813d86d447fa2a9c858650ebbb90',1,'Documentation.h']]],
+  ['rdp',['RDP',['../group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0aa66d0b3ece299ba53eafac86750cfb4a',1,'Documentation.h']]],
+  ['rdrand',['RdRand',['../class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9a4925ed3d5c4528f6039241992b8c5af5',1,'RDP']]],
+  ['rdseed',['RdSeed',['../class_r_d_p.html#a93838aea02719f0275474a4b0123cbb9a4356c0ae842465a2b5e5577f57dc4e0e',1,'RDP']]],
+  ['rhx',['RHX',['../group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffda4641fa9c43756b35b616ec7d3456d995',1,'RHX():&#160;Documentation.h'],['../group___enumeration.html#ggaa9520d8e4fd72264d0e7842c76b7f586a4641fa9c43756b35b616ec7d3456d995',1,'RHX():&#160;Documentation.h']]],
+  ['rijndael',['Rijndael',['../group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffdaf92201fd9c879328a6b24fa434b845f2',1,'Rijndael():&#160;Documentation.h'],['../group___enumeration.html#ggaa9520d8e4fd72264d0e7842c76b7f586af92201fd9c879328a6b24fa434b845f2',1,'Rijndael():&#160;Documentation.h']]],
+  ['ringlwe',['RingLWE',['../group___enumeration.html#gga29d0f9dca8992bfdc1e8f55c6b4c13f1aeec43cb050676d2a993b2ce9cbb0c436',1,'Documentation.h']]]
 ];

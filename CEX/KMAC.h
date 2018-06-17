@@ -109,10 +109,10 @@ public:
 	/// Constructor: instantiate this class using the digest enumeration name
 	/// </summary>
 	/// 
-	/// <param name="ShakeMode">The underlying SHAKE implementation mode</param>
+	/// <param name="ShakeModeType">The underlying SHAKE implementation mode</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid SHAKE mode is selected</exception>
-	explicit KMAC(ShakeModes ShakeMode = ShakeModes::SHAKE256);
+	explicit KMAC(ShakeModes ShakeModeType = ShakeModes::SHAKE256);
 
 	/// <summary>
 	/// Destructor: finalize this class

@@ -61,7 +61,7 @@ namespace Test
 		for (size_t i = 0; i < 10; ++i)
 		{
 			cnt = rnd.NextUInt32(4000, 40);
-			data = rnd.GetBytes(cnt);
+			data = rnd.Generate(cnt);
 
 			// add array via constructor
 			SecureStream secStm1(data);
@@ -131,7 +131,7 @@ namespace Test
 	void SecureStreamTest::CompareSerial()
 	{
 		Prng::SecureRandom rnd;
-		std::vector<byte> data = rnd.GetBytes(1023);
+		std::vector<byte> data = rnd.Generate(1023);
 		SecureStream secStm1(data);
 
 		MemoryStream memStm;

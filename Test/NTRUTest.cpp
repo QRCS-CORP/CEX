@@ -79,7 +79,7 @@ namespace Test
 		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(cpt, 0, 4);
+		m_rngPtr->Generate(cpt, 0, 4);
 
 		cpr1.Initialize(kp1->PrivateKey());
 
@@ -105,7 +105,7 @@ namespace Test
 		cpr2.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(cpt, 0, 4);
+		m_rngPtr->Generate(cpt, 0, 4);
 
 		cpr2.Initialize(kp2->PrivateKey());
 
@@ -131,7 +131,7 @@ namespace Test
 		cpr1.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(cpt, 0, 4);
+		m_rngPtr->Generate(cpt, 0, 4);
 
 		cpr1.Initialize(kp1->PrivateKey());
 
@@ -157,7 +157,7 @@ namespace Test
 		cpr2.Encapsulate(cpt, sec1);
 
 		// alter ciphertext
-		m_rngPtr->GetBytes(cpt, 0, 4);
+		m_rngPtr->Generate(cpt, 0, 4);
 
 		cpr2.Initialize(kp2->PrivateKey());
 

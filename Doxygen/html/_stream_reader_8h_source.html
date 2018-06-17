@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/StreamReader.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/StreamReader.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -133,31 +133,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> Array&gt;</div>
 <div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="class_stream_reader.html#af2bb075cf290f60b1314f30dc09f4fd1">   81</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="class_stream_reader.html#af2bb075cf290f60b1314f30dc09f4fd1">Read</a>(<span class="keyword">const</span> Array &amp;Output, <span class="keywordtype">size_t</span> OutOffset, <span class="keywordtype">size_t</span> Elements)</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    {</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> OTPSZE = (m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + (<span class="keyword">sizeof</span>(Array::value_type) * Elements)) &gt; m_streamData.size() ?</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> OTPLEN = (m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + (<span class="keyword">sizeof</span>(Array::value_type) * Elements)) &gt; m_streamData.size() ?</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            (m_streamData.size() - m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() - ()) :</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            <span class="keyword">sizeof</span>(Array::value_type) * Elements;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordflow">if</span> (<span class="keyword">sizeof</span>(Array::value_type) &gt; 1)</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            Utility::IntUtils::BlockToLe(m_streamData.<a class="code" href="class_memory_stream.html#a491e39a3c61499630701b38d357cfae0">ToArray</a>(), m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>(), Output, OutOffset, OTPSZE);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            Utility::IntUtils::BlockToLe(m_streamData.<a class="code" href="class_memory_stream.html#a491e39a3c61499630701b38d357cfae0">ToArray</a>(), m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>(), Output, OutOffset, OTPLEN);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            Utility::MemUtils::Copy(m_streamData.<a class="code" href="class_memory_stream.html#a491e39a3c61499630701b38d357cfae0">ToArray</a>(), m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>(), val, OTPSZE);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            Utility::MemUtils::Copy(m_streamData.<a class="code" href="class_memory_stream.html#a491e39a3c61499630701b38d357cfae0">ToArray</a>(), m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>(), val, OTPLEN);</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        }</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        m_streamData.<a class="code" href="class_memory_stream.html#a4f7f8db7a432811611ebb4c88f2d717d">Seek</a>(m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + OTPSZE, <a class="code" href="group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a1a06729125544cab7cee73195fc044f0">SeekOrigin::Begin</a>);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;        m_streamData.<a class="code" href="class_memory_stream.html#a4f7f8db7a432811611ebb4c88f2d717d">Seek</a>(m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + OTPLEN, <a class="code" href="group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a1a06729125544cab7cee73195fc044f0">SeekOrigin::Begin</a>);</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    }</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="class_stream_reader.html#aee95a33d52a26cc3f2955ad3a7338551">  102</a></span>&#160;    T <a class="code" href="class_stream_reader.html#aee95a33d52a26cc3f2955ad3a7338551">ReadInt</a>()</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> VALSZE = <span class="keyword">sizeof</span>(T);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> VALLEN = <span class="keyword">sizeof</span>(T);</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        CexAssert(m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + VALSZE &lt;= m_streamData.<a class="code" href="class_memory_stream.html#ad521d64540067daa8f5d4dc0a4f9850a">Length</a>(), <span class="stringliteral">&quot;Stream length exceeded&quot;</span>);</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        CexAssert(m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + VALLEN &lt;= m_streamData.<a class="code" href="class_memory_stream.html#ad521d64540067daa8f5d4dc0a4f9850a">Length</a>(), <span class="stringliteral">&quot;Stream length exceeded&quot;</span>);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        T val = 0;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">switch</span> (VALSZE)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">switch</span> (VALLEN)</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        {</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            <span class="keywordflow">case</span> 8:</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            {</div>
@@ -176,11 +176,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            }</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <span class="keywordflow">default</span>:</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            {</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;                Utility::MemUtils::CopyToValue(m_streamData.<a class="code" href="class_memory_stream.html#a491e39a3c61499630701b38d357cfae0">ToArray</a>(), m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>(), val, VALSZE);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;                Utility::MemUtils::CopyToValue(m_streamData.<a class="code" href="class_memory_stream.html#a491e39a3c61499630701b38d357cfae0">ToArray</a>(), m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>(), val, VALLEN);</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            }</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        }</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        m_streamData.<a class="code" href="class_memory_stream.html#a4f7f8db7a432811611ebb4c88f2d717d">Seek</a>(m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + VALSZE, <a class="code" href="group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a1a06729125544cab7cee73195fc044f0">SeekOrigin::Begin</a>);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        m_streamData.<a class="code" href="class_memory_stream.html#a4f7f8db7a432811611ebb4c88f2d717d">Seek</a>(m_streamData.<a class="code" href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">Position</a>() + VALLEN, <a class="code" href="group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a1a06729125544cab7cee73195fc044f0">SeekOrigin::Begin</a>);</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordflow">return</span> val;</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
@@ -197,13 +197,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="group___i_o_html_ggab40796a2fafb5d9d3fda7510d7aea5b0a1a06729125544cab7cee73195fc044f0"><div class="ttname"><a href="group___i_o.html#ggab40796a2fafb5d9d3fda7510d7aea5b0a1a06729125544cab7cee73195fc044f0">SeekOrigin::Begin</a></div><div class="ttdoc">Start at the beginning of the stream </div></div>
 <div class="ttc" id="class_stream_reader_html_af2bb075cf290f60b1314f30dc09f4fd1"><div class="ttname"><a href="class_stream_reader.html#af2bb075cf290f60b1314f30dc09f4fd1">StreamReader::Read</a></div><div class="ttdeci">size_t Read(const Array &amp;Output, size_t OutOffset, size_t Elements)</div><div class="ttdoc">Read elements from the base stream into an array of T </div><div class="ttdef"><b>Definition:</b> StreamReader.h:81</div></div>
 <div class="ttc" id="class_memory_stream_html_a0446e567524ccd88aa92a9b23df665d4"><div class="ttname"><a href="class_memory_stream.html#a0446e567524ccd88aa92a9b23df665d4">MemoryStream::Position</a></div><div class="ttdeci">const ulong Position() override</div><div class="ttdoc">Read Only: The streams current position </div><div class="ttdef"><b>Definition:</b> MemoryStream.cpp:91</div></div>
-<div class="ttc" id="class_memory_stream_html"><div class="ttname"><a href="class_memory_stream.html">MemoryStream</a></div><div class="ttdoc">A memory stream container. </div><div class="ttdef"><b>Definition:</b> Documentation.h:358</div></div>
+<div class="ttc" id="class_memory_stream_html"><div class="ttname"><a href="class_memory_stream.html">MemoryStream</a></div><div class="ttdoc">A memory stream container. </div><div class="ttdef"><b>Definition:</b> Documentation.h:377</div></div>
 <div class="ttc" id="class_stream_reader_html_a33b83a0826d429386587c969b3926d4b"><div class="ttname"><a href="class_stream_reader.html#a33b83a0826d429386587c969b3926d4b">StreamReader::ReadByte</a></div><div class="ttdeci">byte ReadByte()</div><div class="ttdoc">Read a single byte from the stream </div><div class="ttdef"><b>Definition:</b> StreamReader.cpp:31</div></div>
 <div class="ttc" id="class_stream_reader_html_a032ec5673c7e22717838a2138459422e"><div class="ttname"><a href="class_stream_reader.html#a032ec5673c7e22717838a2138459422e">StreamReader::ReadBytes</a></div><div class="ttdeci">std::vector&lt; byte &gt; ReadBytes(size_t Length)</div><div class="ttdoc">Reads a portion of the stream into the buffer </div><div class="ttdef"><b>Definition:</b> StreamReader.cpp:40</div></div>
 <div class="ttc" id="class_stream_reader_html_ab6f46360e3247094213e1e73e369cdf7"><div class="ttname"><a href="class_stream_reader.html#ab6f46360e3247094213e1e73e369cdf7">StreamReader::Length</a></div><div class="ttdeci">const size_t Length()</div><div class="ttdoc">The length of the data </div><div class="ttdef"><b>Definition:</b> StreamReader.cpp:19</div></div>
 <div class="ttc" id="class_stream_reader_html_a86fe62dd7e8e223e7f8fe8907a4455d8"><div class="ttname"><a href="class_stream_reader.html#a86fe62dd7e8e223e7f8fe8907a4455d8">StreamReader::operator=</a></div><div class="ttdeci">StreamReader &amp; operator=(const StreamReader &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
 <div class="ttc" id="class_stream_reader_html_a6c7ae2c27b76238f6427bbba128858d7"><div class="ttname"><a href="class_stream_reader.html#a6c7ae2c27b76238f6427bbba128858d7">StreamReader::~StreamReader</a></div><div class="ttdeci">~StreamReader()</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> StreamReader.cpp:13</div></div>
-<div class="ttc" id="class_stream_reader_html"><div class="ttname"><a href="class_stream_reader.html">StreamReader</a></div><div class="ttdoc">Methods for reading integer types from a binary stream </div><div class="ttdef"><b>Definition:</b> Documentation.h:361</div></div>
+<div class="ttc" id="class_stream_reader_html"><div class="ttname"><a href="class_stream_reader.html">StreamReader</a></div><div class="ttdoc">Methods for reading integer types from a binary stream </div><div class="ttdef"><b>Definition:</b> Documentation.h:380</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -241,10 +241,10 @@ namespace Test
 			Cipher->ParallelProfile().ParallelBlockSize() = dataLen - (dataLen % Cipher->ParallelProfile().ParallelMinimumSize());
 
 			data.resize(dataLen);
-			rng.GetBytes(data);
-			rng.GetBytes(nonce);
-			rng.GetBytes(key);
-			rng.GetBytes(assoc);
+			rng.Generate(data);
+			rng.Generate(nonce);
+			rng.Generate(key);
+			rng.Generate(assoc);
 			Key::Symmetric::SymmetricKey kp(key, nonce);
 
 			// parallel encryption mode
@@ -319,10 +319,10 @@ namespace Test
 		{
 			size_t dataLen = rng.NextUInt32(1000, 100);
 			data.resize(dataLen);
-			rng.GetBytes(data);
-			rng.GetBytes(nonce);
-			rng.GetBytes(key);
-			rng.GetBytes(assoc);
+			rng.Generate(data);
+			rng.Generate(nonce);
+			rng.Generate(key);
+			rng.Generate(assoc);
 			Key::Symmetric::SymmetricKey kp(key, nonce);
 
 			encData.resize(dataLen + Cipher->MaxTagSize());

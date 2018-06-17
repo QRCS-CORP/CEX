@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -119,9 +119,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa8422f702d1802d55524b30b20ac4ee4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_f_b.html#aa8422f702d1802d55524b30b20ac4ee4">OFB</a> ()=delete</td></tr>
 <tr class="memdesc:aa8422f702d1802d55524b30b20ac4ee4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#aa8422f702d1802d55524b30b20ac4ee4">More...</a><br /></td></tr>
 <tr class="separator:aa8422f702d1802d55524b30b20ac4ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f294d73c0fbd452ca27e9c8926be86b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_f_b.html#a4f294d73c0fbd452ca27e9c8926be86b">OFB</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_o_f_b.html#a145e723ece45fd4c753864f42a6df67a">CipherType</a>, size_t RegisterSize=16)</td></tr>
-<tr class="memdesc:a4f294d73c0fbd452ca27e9c8926be86b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#a4f294d73c0fbd452ca27e9c8926be86b">More...</a><br /></td></tr>
-<tr class="separator:a4f294d73c0fbd452ca27e9c8926be86b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74881b49be5302e4a058c480dea9785f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_f_b.html#a74881b49be5302e4a058c480dea9785f">OFB</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_o_f_b.html#a145e723ece45fd4c753864f42a6df67a">CipherType</a>, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None, size_t RegisterSize=16)</td></tr>
+<tr class="memdesc:a74881b49be5302e4a058c480dea9785f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#a74881b49be5302e4a058c480dea9785f">More...</a><br /></td></tr>
+<tr class="separator:a74881b49be5302e4a058c480dea9785f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7321554371828481a792e0ebe1509b04"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_o_f_b.html#a7321554371828481a792e0ebe1509b04">OFB</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher, size_t RegisterSize=16)</td></tr>
 <tr class="memdesc:a7321554371828481a792e0ebe1509b04"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher instance  <a href="#a7321554371828481a792e0ebe1509b04">More...</a><br /></td></tr>
 <tr class="separator:a7321554371828481a792e0ebe1509b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,7 +297,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 
 </div>
 </div>
-<a class="anchor" id="a4f294d73c0fbd452ca27e9c8926be86b"></a>
+<a class="anchor" id="a74881b49be5302e4a058c480dea9785f"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -309,6 +309,12 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
           <td class="paramname"><em>CipherType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -333,6 +339,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherType</td><td>The formal enumeration name of a block cipher</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
     <tr><td class="paramname">RegisterSize</td><td>Register size in bytes; minimum is 1 byte, maximum is the Block Ciphers internal block size</td></tr>
   </table>
   </dd>
@@ -1112,9 +1119,9 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_o_f_b_8h_source.html">OFB.h</a></li>
-<li>CEX/OFB.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_o_f_b_8h_source.html">OFB.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/OFB.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

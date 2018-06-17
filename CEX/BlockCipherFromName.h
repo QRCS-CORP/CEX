@@ -31,7 +31,7 @@ public:
 	/// <returns>A symmetric block cipher instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
-	static IBlockCipher* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
+	static IBlockCipher* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 };
 
 NAMESPACE_HELPEREND

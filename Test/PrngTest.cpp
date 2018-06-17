@@ -89,7 +89,7 @@ namespace Test
 			HCG* hcg = new HCG(Digests::SHA256);
 			auto ksh = hcg->LegalKeySizes()[0];
 			seed.resize(ksh.KeySize());
-			rng.GetBytes(seed);
+			rng.Generate(seed);
 			OnProgress(ChiSquareG(hcg, seed));
 			OnProgress(MeanValueG(hcg, seed));
 			delete hcg;
@@ -103,7 +103,7 @@ namespace Test
 			OnProgress(MeanValue(acp));
 			delete acp;
 
-			// too slow for debug, but passes tests in every config
+			// too slow for debug, but passes tests
 #if defined(CEX_NO_DEBUG)
 			OnProgress(std::string("Testing the Cpu/Memory Jitter Provider (CJP):"));
 			CJP* cjp = new CJP();

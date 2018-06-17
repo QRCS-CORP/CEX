@@ -60,7 +60,7 @@ namespace Test
 	{
 		CEX::Provider::CSP rng;
 		std::vector<byte> fill(16);
-		rng.GetBytes(fill);
+		rng.Generate(fill);
 		const size_t BLOCK = 16;
 
 		for (size_t i = 0; i < BLOCK; i++)

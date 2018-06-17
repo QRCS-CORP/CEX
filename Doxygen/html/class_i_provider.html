@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -135,18 +135,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aab058ee3c107920a7ed4a0a1c1147ef7"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#aab058ee3c107920a7ed4a0a1c1147ef7">Name</a> ()=0</td></tr>
 <tr class="memdesc:aab058ee3c107920a7ed4a0a1c1147ef7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The provider class name  <a href="#aab058ee3c107920a7ed4a0a1c1147ef7">More...</a><br /></td></tr>
 <tr class="separator:aab058ee3c107920a7ed4a0a1c1147ef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a163a0e0ec3e495eca12171945075f420"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#a163a0e0ec3e495eca12171945075f420">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
-<tr class="memdesc:a163a0e0ec3e495eca12171945075f420"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#a163a0e0ec3e495eca12171945075f420">More...</a><br /></td></tr>
-<tr class="separator:a163a0e0ec3e495eca12171945075f420"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a928d988a126cb4e15d845c2f23131764"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#a928d988a126cb4e15d845c2f23131764">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length)=0</td></tr>
-<tr class="memdesc:a928d988a126cb4e15d845c2f23131764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a928d988a126cb4e15d845c2f23131764">More...</a><br /></td></tr>
-<tr class="separator:a928d988a126cb4e15d845c2f23131764"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa71f74af38ff2d7c7dbc0d3236ff1e71"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#aa71f74af38ff2d7c7dbc0d3236ff1e71">GetBytes</a> (size_t Length)=0</td></tr>
-<tr class="memdesc:aa71f74af38ff2d7c7dbc0d3236ff1e71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#aa71f74af38ff2d7c7dbc0d3236ff1e71">More...</a><br /></td></tr>
-<tr class="separator:aa71f74af38ff2d7c7dbc0d3236ff1e71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae209d1e49b9b9a2c1cfe891760f591da"><td class="memItemLeft" align="right" valign="top">virtual uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ae209d1e49b9b9a2c1cfe891760f591da">Next</a> ()=0</td></tr>
-<tr class="memdesc:ae209d1e49b9b9a2c1cfe891760f591da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pseudo-random unsigned 32bit integer  <a href="#ae209d1e49b9b9a2c1cfe891760f591da">More...</a><br /></td></tr>
-<tr class="separator:ae209d1e49b9b9a2c1cfe891760f591da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab60fe67b92050cea64a2c2b4c2b8e315"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ab60fe67b92050cea64a2c2b4c2b8e315">Generate</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
+<tr class="memdesc:ab60fe67b92050cea64a2c2b4c2b8e315"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#ab60fe67b92050cea64a2c2b4c2b8e315">More...</a><br /></td></tr>
+<tr class="separator:ab60fe67b92050cea64a2c2b4c2b8e315"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3319763559f1ae3bd8aca8d3f5782b8"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#aa3319763559f1ae3bd8aca8d3f5782b8">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:aa3319763559f1ae3bd8aca8d3f5782b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#aa3319763559f1ae3bd8aca8d3f5782b8">More...</a><br /></td></tr>
+<tr class="separator:aa3319763559f1ae3bd8aca8d3f5782b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6803538a8832d5abeee53b877367b81"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ac6803538a8832d5abeee53b877367b81">Generate</a> (size_t Length)=0</td></tr>
+<tr class="memdesc:ac6803538a8832d5abeee53b877367b81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#ac6803538a8832d5abeee53b877367b81">More...</a><br /></td></tr>
+<tr class="separator:ac6803538a8832d5abeee53b877367b81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ace43d5ae44743fe8a517e6cae41054"><td class="memItemLeft" align="right" valign="top">virtual ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#a9ace43d5ae44743fe8a517e6cae41054">NextUInt16</a> ()=0</td></tr>
+<tr class="memdesc:a9ace43d5ae44743fe8a517e6cae41054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#a9ace43d5ae44743fe8a517e6cae41054">More...</a><br /></td></tr>
+<tr class="separator:a9ace43d5ae44743fe8a517e6cae41054"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab79ff514e55dcca60234fb81f27c2b93"><td class="memItemLeft" align="right" valign="top">virtual uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ab79ff514e55dcca60234fb81f27c2b93">NextUInt32</a> ()=0</td></tr>
+<tr class="memdesc:ab79ff514e55dcca60234fb81f27c2b93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 32bit integer  <a href="#ab79ff514e55dcca60234fb81f27c2b93">More...</a><br /></td></tr>
+<tr class="separator:ab79ff514e55dcca60234fb81f27c2b93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a022543661edfbea4a44f456fd9be134f"><td class="memItemLeft" align="right" valign="top">virtual ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#a022543661edfbea4a44f456fd9be134f">NextUInt64</a> ()=0</td></tr>
+<tr class="memdesc:a022543661edfbea4a44f456fd9be134f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 64bit integer  <a href="#a022543661edfbea4a44f456fd9be134f">More...</a><br /></td></tr>
+<tr class="separator:a022543661edfbea4a44f456fd9be134f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3ca1f38de229ec045951b2c9c363047"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_provider.html#ad3ca1f38de229ec045951b2c9c363047">Reset</a> ()=0</td></tr>
 <tr class="memdesc:ad3ca1f38de229ec045951b2c9c363047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#ad3ca1f38de229ec045951b2c9c363047">More...</a><br /></td></tr>
 <tr class="separator:ad3ca1f38de229ec045951b2c9c363047"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -254,11 +260,11 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The providers type name </p>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#a21286d8c61cd62cd0119f82684f6faf9">CJP</a>, <a class="el" href="class_r_d_p.html#a0a098ce88d27d67484171442c76dbb19">RDP</a>, <a class="el" href="class_e_c_p.html#a1e06c9e0947d4a1955a4c03e557358a5">ECP</a>, <a class="el" href="class_a_c_p.html#a7651eb0535313ac5f37194d0263112ad">ACP</a>, and <a class="el" href="class_c_s_p.html#a2545ae4e096fcb29bff045840f84512d">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#a21286d8c61cd62cd0119f82684f6faf9">CJP</a>, <a class="el" href="class_r_d_p.html#a0a098ce88d27d67484171442c76dbb19">RDP</a>, <a class="el" href="class_a_c_p.html#a7651eb0535313ac5f37194d0263112ad">ACP</a>, <a class="el" href="class_e_c_p.html#a1e06c9e0947d4a1955a4c03e557358a5">ECP</a>, and <a class="el" href="class_c_s_p.html#a2545ae4e096fcb29bff045840f84512d">CSP</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a163a0e0ec3e495eca12171945075f420"></a>
+<a class="anchor" id="ab60fe67b92050cea64a2c2b4c2b8e315"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -266,7 +272,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IProvider::GetBytes </td>
+          <td class="memname">virtual void IProvider::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -288,11 +294,11 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#af64b6032cf12ac20afa6229c9dc1bf42">CJP</a>, <a class="el" href="class_r_d_p.html#af83372e124b1ad4b1bdba47153406be3">RDP</a>, <a class="el" href="class_e_c_p.html#a7e32afdac419a9135b244ed53016a3d4">ECP</a>, <a class="el" href="class_a_c_p.html#a5fbdd4c4836f0a241c166ab2bacacb21">ACP</a>, and <a class="el" href="class_c_s_p.html#a56e8680cef57401046b052c762da83ca">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#a4a45fbe68f3f13631eaa9fd395d02dcf">CJP</a>, <a class="el" href="class_r_d_p.html#ac061a75b41aa89dde7534d558da84885">RDP</a>, <a class="el" href="class_a_c_p.html#ae0bdd9d52a4b9ffeb8e61b6b3d7da315">ACP</a>, <a class="el" href="class_e_c_p.html#ab21b946d8f235fbe1fc81acac8b0fb30">ECP</a>, and <a class="el" href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">CSP</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a928d988a126cb4e15d845c2f23131764"></a>
+<a class="anchor" id="aa3319763559f1ae3bd8aca8d3f5782b8"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -300,7 +306,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IProvider::GetBytes </td>
+          <td class="memname">virtual void IProvider::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -340,11 +346,11 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#a17653027dd9b6563565146ca91f7a552">CJP</a>, <a class="el" href="class_r_d_p.html#a89b3c8aa5a3fe69c7efddc4d589ea2f4">RDP</a>, <a class="el" href="class_e_c_p.html#a3115213c97314699a8aba48251db11a2">ECP</a>, <a class="el" href="class_a_c_p.html#ac36a35bdf70c89dd219ab0c98ff76e36">ACP</a>, and <a class="el" href="class_c_s_p.html#a69a06851268c3a6208faab919c670c74">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#a72623809622dc786872111a79e02fcc5">CJP</a>, <a class="el" href="class_r_d_p.html#a6292275469b6e2b0de73b438c1cb4354">RDP</a>, <a class="el" href="class_a_c_p.html#a9c43ea362fd84966e8a68410e33f6242">ACP</a>, <a class="el" href="class_e_c_p.html#a0e52cbb31b783e97b403902b2158fab3">ECP</a>, and <a class="el" href="class_c_s_p.html#af8951dbe07368548f31e19065b06c6fc">CSP</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa71f74af38ff2d7c7dbc0d3236ff1e71"></a>
+<a class="anchor" id="ac6803538a8832d5abeee53b877367b81"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -352,7 +358,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt;byte&gt; IProvider::GetBytes </td>
+          <td class="memname">virtual std::vector&lt;byte&gt; IProvider::Generate </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em></td><td>)</td>
@@ -375,7 +381,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An array of pseudo-random of bytes</dd></dl>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#ac822c86760f3ee5ebd45e12588eec83c">CJP</a>, <a class="el" href="class_r_d_p.html#a65d7bdcd030647530423c535f88951db">RDP</a>, <a class="el" href="class_e_c_p.html#a7fb24c48fd0948e377bd0a316b447eb3">ECP</a>, <a class="el" href="class_a_c_p.html#ab0f81ad3830dc8992120dc32678999ee">ACP</a>, and <a class="el" href="class_c_s_p.html#a8b48e435e95086329cad33f1cae9a865">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#a637693b5e6ab79f44c1a048e03d442f8">CJP</a>, <a class="el" href="class_r_d_p.html#a414b616c94b7f8dcb0a1d96d5ec86903">RDP</a>, <a class="el" href="class_a_c_p.html#a117ac8a9943f01843ccd12e88f95faeb">ACP</a>, <a class="el" href="class_e_c_p.html#a38a9727ab889e6d056ed1add5c153397">ECP</a>, and <a class="el" href="class_c_s_p.html#a08f4a8af08449387310ade7471119ca9">CSP</a>.</p>
 
 </div>
 </div>
@@ -402,7 +408,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The entropy provider is available on this system </p>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#af91d38ac06ef0ab2a9e97c6066226619">CJP</a>, <a class="el" href="class_r_d_p.html#a35e8b55930cc3450fe3dba2de3f82b1c">RDP</a>, <a class="el" href="class_e_c_p.html#af38b0182df9d634e2c21212a11ed45ef">ECP</a>, <a class="el" href="class_a_c_p.html#a45b569f6ce25b41c3d2f29657c8e0150">ACP</a>, and <a class="el" href="class_c_s_p.html#aee64b00b392945655f8a3bb146ccc9e6">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#af91d38ac06ef0ab2a9e97c6066226619">CJP</a>, <a class="el" href="class_r_d_p.html#a35e8b55930cc3450fe3dba2de3f82b1c">RDP</a>, <a class="el" href="class_a_c_p.html#a45b569f6ce25b41c3d2f29657c8e0150">ACP</a>, <a class="el" href="class_e_c_p.html#af38b0182df9d634e2c21212a11ed45ef">ECP</a>, and <a class="el" href="class_c_s_p.html#aee64b00b392945655f8a3bb146ccc9e6">CSP</a>.</p>
 
 </div>
 </div>
@@ -429,11 +435,11 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The provider class name </p>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#ae196683ea0d8ee9f52c9c6d34f64a730">CJP</a>, <a class="el" href="class_r_d_p.html#a49a2c886fd790d415f39b8aec5620c48">RDP</a>, <a class="el" href="class_e_c_p.html#ac0e7e1820540a1b6c7e346e6248c9d97">ECP</a>, <a class="el" href="class_a_c_p.html#ad869a589dfbdd441c07208d742a3db28">ACP</a>, and <a class="el" href="class_c_s_p.html#a410e2b02f53456c817d38dad862c5a7a">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#ae196683ea0d8ee9f52c9c6d34f64a730">CJP</a>, <a class="el" href="class_r_d_p.html#a49a2c886fd790d415f39b8aec5620c48">RDP</a>, <a class="el" href="class_a_c_p.html#ad869a589dfbdd441c07208d742a3db28">ACP</a>, <a class="el" href="class_e_c_p.html#ac0e7e1820540a1b6c7e346e6248c9d97">ECP</a>, and <a class="el" href="class_c_s_p.html#a410e2b02f53456c817d38dad862c5a7a">CSP</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ae209d1e49b9b9a2c1cfe891760f591da"></a>
+<a class="anchor" id="a9ace43d5ae44743fe8a517e6cae41054"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -441,7 +447,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual uint IProvider::Next </td>
+          <td class="memname">virtual ushort IProvider::NextUInt16 </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -454,9 +460,66 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns a pseudo-random unsigned 32bit integer </p>
+<p>Get a pseudo random unsigned 16bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#a41543aab0315f677c497de960f36d06a">CJP</a>, <a class="el" href="class_r_d_p.html#a6be0ac8a34fd138edeafb1cb62123c72">RDP</a>, <a class="el" href="class_e_c_p.html#ad90f83ded5718e79944ec827cbb8af09">ECP</a>, <a class="el" href="class_a_c_p.html#a31f21e1f0a5a9e89fedad93296bf9dab">ACP</a>, and <a class="el" href="class_c_s_p.html#ad189e04ec1f0d6aeb09dc7e65c13d63d">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#aade465b490b9462ecbe197d4c73c3a61">CJP</a>, <a class="el" href="class_r_d_p.html#ad8cda6bc36c168df67362b84522aa739">RDP</a>, <a class="el" href="class_a_c_p.html#a5b3ab260d08dc056e096bcbde5a06829">ACP</a>, <a class="el" href="class_e_c_p.html#ad02031ad0ef68064f79b61ccacc7ecd5">ECP</a>, and <a class="el" href="class_c_s_p.html#aea45203ba3a8d14eda5dad5d90937c34">CSP</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab79ff514e55dcca60234fb81f27c2b93"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual uint IProvider::NextUInt32 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 32bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random UInt32</dd></dl>
+
+<p>Implemented in <a class="el" href="class_c_j_p.html#aefe5f87da005fd7151a152394b6fdd36">CJP</a>, <a class="el" href="class_r_d_p.html#a4bc62609e18952e3861ac46caa4824d4">RDP</a>, <a class="el" href="class_a_c_p.html#aad93838c9bd4d2995c0a3ec4b520596a">ACP</a>, <a class="el" href="class_e_c_p.html#abf3505f50612965ff27bf2c7e09c2dba">ECP</a>, and <a class="el" href="class_c_s_p.html#aa369f8220ce6df5f11ba3a519df3df73">CSP</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a022543661edfbea4a44f456fd9be134f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual ulong IProvider::NextUInt64 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 64bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random UInt64</dd></dl>
+
+<p>Implemented in <a class="el" href="class_c_j_p.html#aa8c27859ec0a55bbbd61873de8d0737e">CJP</a>, <a class="el" href="class_r_d_p.html#aa6ec0174dc8a927b9acc5b10bc8466e5">RDP</a>, <a class="el" href="class_a_c_p.html#afb1fe09654b2c37bc490ffecd0b21bea">ACP</a>, <a class="el" href="class_e_c_p.html#a9b684d342b6c4673cc1a03b6bb24edc8">ECP</a>, and <a class="el" href="class_c_s_p.html#ac5a1f625144f756c88cbee895c90652d">CSP</a>.</p>
 
 </div>
 </div>
@@ -509,13 +572,13 @@ Public Member Functions</h2></td></tr>
 
 <p>Reset the internal state </p>
 
-<p>Implemented in <a class="el" href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">CJP</a>, <a class="el" href="class_r_d_p.html#a1afb103e3a23bae629ac197a16d12ea6">RDP</a>, <a class="el" href="class_e_c_p.html#ad46933ce3810f225806f589747e83fa8">ECP</a>, <a class="el" href="class_a_c_p.html#aa321d3c4d04bc1947fad76e3457d02ac">ACP</a>, and <a class="el" href="class_c_s_p.html#a4bbcd7b959ff265310b4e7a064b1b819">CSP</a>.</p>
+<p>Implemented in <a class="el" href="class_c_j_p.html#ab5b49834966cc875efd8ceab9045fa48">CJP</a>, <a class="el" href="class_r_d_p.html#a1afb103e3a23bae629ac197a16d12ea6">RDP</a>, <a class="el" href="class_a_c_p.html#aa321d3c4d04bc1947fad76e3457d02ac">ACP</a>, <a class="el" href="class_e_c_p.html#ad46933ce3810f225806f589747e83fa8">ECP</a>, and <a class="el" href="class_c_s_p.html#a4bbcd7b959ff265310b4e7a064b1b819">CSP</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_i_provider_8h_source.html">IProvider.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_i_provider_8h_source.html">IProvider.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

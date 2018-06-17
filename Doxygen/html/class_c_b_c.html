@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -119,9 +119,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a23ab526f8f574fa59f8c732ed8207114"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_b_c.html#a23ab526f8f574fa59f8c732ed8207114">CBC</a> ()=delete</td></tr>
 <tr class="memdesc:a23ab526f8f574fa59f8c732ed8207114"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#a23ab526f8f574fa59f8c732ed8207114">More...</a><br /></td></tr>
 <tr class="separator:a23ab526f8f574fa59f8c732ed8207114"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a004d177d9602ce236614b4af2664f1dc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_b_c.html#a004d177d9602ce236614b4af2664f1dc">CBC</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_c_b_c.html#a647d15a6bb420fa6413c695c47c470ed">CipherType</a>)</td></tr>
-<tr class="memdesc:a004d177d9602ce236614b4af2664f1dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#a004d177d9602ce236614b4af2664f1dc">More...</a><br /></td></tr>
-<tr class="separator:a004d177d9602ce236614b4af2664f1dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca6af1ae78df7c875612c84484ee456d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_b_c.html#aca6af1ae78df7c875612c84484ee456d">CBC</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_c_b_c.html#a647d15a6bb420fa6413c695c47c470ed">CipherType</a>, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None)</td></tr>
+<tr class="memdesc:aca6af1ae78df7c875612c84484ee456d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name  <a href="#aca6af1ae78df7c875612c84484ee456d">More...</a><br /></td></tr>
+<tr class="separator:aca6af1ae78df7c875612c84484ee456d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd573518bef89cb1f33772478c355c8f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_b_c.html#afd573518bef89cb1f33772478c355c8f">CBC</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher)</td></tr>
 <tr class="memdesc:afd573518bef89cb1f33772478c355c8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher instance  <a href="#afd573518bef89cb1f33772478c355c8f">More...</a><br /></td></tr>
 <tr class="separator:afd573518bef89cb1f33772478c355c8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -301,7 +301,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 
 </div>
 </div>
-<a class="anchor" id="a004d177d9602ce236614b4af2664f1dc"></a>
+<a class="anchor" id="aca6af1ae78df7c875612c84484ee456d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -312,8 +312,18 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
           <td class="memname">CBC::CBC </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em></td><td>)</td>
+          <td class="paramname"><em>CipherType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -327,6 +337,7 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherType</td><td>The formal enumeration name of a block cipher</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
   </table>
   </dd>
 </dl>
@@ -1111,8 +1122,8 @@ Handbook of Applied Cryptography <a href="http://cacr.uwaterloo.ca/hac/about/cha
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_c_b_c_8h_source.html">CBC.h</a></li>
-<li>CEX/CBC.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_c_b_c_8h_source.html">CBC.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/CBC.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

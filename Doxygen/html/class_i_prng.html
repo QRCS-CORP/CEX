@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -105,7 +105,7 @@ Inheritance diagram for IPrng:</div>
   <img src="class_i_prng.png" usemap="#IPrng_map" alt=""/>
   <map id="IPrng_map" name="IPrng_map">
 <area href="class_b_c_r.html" title="An implementation of a Block cipher Counter mode PRNG. " alt="BCR" shape="rect" coords="0,56,42,80"/>
-<area href="class_d_c_r.html" title="An implementation of a Digest Counter PRNG. " alt="DCR" shape="rect" coords="52,56,94,80"/>
+<area href="class_c_s_r.html" title="An implementation of an cSHAKE based PRNG. " alt="CSR" shape="rect" coords="52,56,94,80"/>
 <area href="class_h_c_r.html" title="An implementation of an HMAC Counter PRNG. " alt="HCR" shape="rect" coords="104,56,146,80"/>
 <area href="class_p_b_r.html" title="An implementation of a Passphrase Based PRNG. " alt="PBR" shape="rect" coords="156,56,198,80"/>
 </map>
@@ -131,24 +131,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8ac0175756935abf86d7e3fd18481838"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a8ac0175756935abf86d7e3fd18481838">Name</a> ()=0</td></tr>
 <tr class="memdesc:a8ac0175756935abf86d7e3fd18481838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The random generators class name  <a href="#a8ac0175756935abf86d7e3fd18481838">More...</a><br /></td></tr>
 <tr class="separator:a8ac0175756935abf86d7e3fd18481838"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad147ed0b30f3b3c52452d9c5e43bef0f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#ad147ed0b30f3b3c52452d9c5e43bef0f">Fill</a> (std::vector&lt; ushort &gt; &amp;Output, size_t Offset, size_t Elements)=0</td></tr>
-<tr class="memdesc:ad147ed0b30f3b3c52452d9c5e43bef0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array of uint16 with pseudo-random  <a href="#ad147ed0b30f3b3c52452d9c5e43bef0f">More...</a><br /></td></tr>
-<tr class="separator:ad147ed0b30f3b3c52452d9c5e43bef0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cdec122657c78e1107e45f68f965b93"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a4cdec122657c78e1107e45f68f965b93">Fill</a> (std::vector&lt; uint &gt; &amp;Output, size_t Offset, size_t Elements)=0</td></tr>
-<tr class="memdesc:a4cdec122657c78e1107e45f68f965b93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array of uint32 with pseudo-random  <a href="#a4cdec122657c78e1107e45f68f965b93">More...</a><br /></td></tr>
-<tr class="separator:a4cdec122657c78e1107e45f68f965b93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb87f9bea8f19ca15b28a8681057a557"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#acb87f9bea8f19ca15b28a8681057a557">Fill</a> (std::vector&lt; ulong &gt; &amp;Output, size_t Offset, size_t Elements)=0</td></tr>
-<tr class="memdesc:acb87f9bea8f19ca15b28a8681057a557"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array of uint64 with pseudo-random  <a href="#acb87f9bea8f19ca15b28a8681057a557">More...</a><br /></td></tr>
-<tr class="separator:acb87f9bea8f19ca15b28a8681057a557"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af310ce843ff1ba4041065d17cee8a4e2"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#af310ce843ff1ba4041065d17cee8a4e2">GetBytes</a> (size_t Length)=0</td></tr>
-<tr class="memdesc:af310ce843ff1ba4041065d17cee8a4e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array filled with pseudo random bytes  <a href="#af310ce843ff1ba4041065d17cee8a4e2">More...</a><br /></td></tr>
-<tr class="separator:af310ce843ff1ba4041065d17cee8a4e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1aecdfb79b16960739a5015e21008cc"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#aa1aecdfb79b16960739a5015e21008cc">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length)=0</td></tr>
-<tr class="memdesc:aa1aecdfb79b16960739a5015e21008cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#aa1aecdfb79b16960739a5015e21008cc">More...</a><br /></td></tr>
-<tr class="separator:aa1aecdfb79b16960739a5015e21008cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69f7140540620a5bf037c048a42edc8b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a69f7140540620a5bf037c048a42edc8b">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
-<tr class="memdesc:a69f7140540620a5bf037c048a42edc8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array with pseudo random bytes  <a href="#a69f7140540620a5bf037c048a42edc8b">More...</a><br /></td></tr>
-<tr class="separator:a69f7140540620a5bf037c048a42edc8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5df111052f7e41bbcc50e8c80456eb0c"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a5df111052f7e41bbcc50e8c80456eb0c">Generate</a> (size_t Length)=0</td></tr>
+<tr class="memdesc:a5df111052f7e41bbcc50e8c80456eb0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array filled with pseudo random bytes  <a href="#a5df111052f7e41bbcc50e8c80456eb0c">More...</a><br /></td></tr>
+<tr class="separator:a5df111052f7e41bbcc50e8c80456eb0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a625ed948e4a1e1fa37c0f720064833a7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a625ed948e4a1e1fa37c0f720064833a7">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length)=0</td></tr>
+<tr class="memdesc:a625ed948e4a1e1fa37c0f720064833a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a625ed948e4a1e1fa37c0f720064833a7">More...</a><br /></td></tr>
+<tr class="separator:a625ed948e4a1e1fa37c0f720064833a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5088592f5c8eb69d16e7a21a9cf33307"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a5088592f5c8eb69d16e7a21a9cf33307">Generate</a> (std::vector&lt; byte &gt; &amp;Output)=0</td></tr>
+<tr class="memdesc:a5088592f5c8eb69d16e7a21a9cf33307"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill an array with pseudo random bytes  <a href="#a5088592f5c8eb69d16e7a21a9cf33307">More...</a><br /></td></tr>
+<tr class="separator:a5088592f5c8eb69d16e7a21a9cf33307"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40e6a6e9cc7df88e3e3d5e1383eb2fb4"><td class="memItemLeft" align="right" valign="top">virtual ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_prng.html#a40e6a6e9cc7df88e3e3d5e1383eb2fb4">NextUInt16</a> ()=0</td></tr>
 <tr class="memdesc:a40e6a6e9cc7df88e3e3d5e1383eb2fb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#a40e6a6e9cc7df88e3e3d5e1383eb2fb4">More...</a><br /></td></tr>
 <tr class="separator:a40e6a6e9cc7df88e3e3d5e1383eb2fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,11 +256,11 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The random generators type name </p>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#abf9f2b00434e7f45e0cc3f5d42b0ddbd">BCR</a>, <a class="el" href="class_d_c_r.html#a317a8d5359e792cf01aa817263a05251">DCR</a>, <a class="el" href="class_h_c_r.html#a98370b604762da070f857808df3e00f1">HCR</a>, and <a class="el" href="class_p_b_r.html#a4fdf4d9217e72efe7daad164758a01d0">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#abf9f2b00434e7f45e0cc3f5d42b0ddbd">BCR</a>, <a class="el" href="class_h_c_r.html#a98370b604762da070f857808df3e00f1">HCR</a>, <a class="el" href="class_c_s_r.html#a2f8be57e4f877180b3f41a4bdbe7cbc1">CSR</a>, and <a class="el" href="class_p_b_r.html#a4fdf4d9217e72efe7daad164758a01d0">PBR</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ad147ed0b30f3b3c52452d9c5e43bef0f"></a>
+<a class="anchor" id="a5df111052f7e41bbcc50e8c80456eb0c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -277,163 +268,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IPrng::Fill </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; ushort &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Elements</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Fill an array of uint16 with pseudo-random </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The uint16 output array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting index within the Output array</td></tr>
-    <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_b_c_r.html#a2617592e5e691184a5db661c9c80722b">BCR</a>, <a class="el" href="class_d_c_r.html#a54719573b5f7f0434d6558b6f97044bb">DCR</a>, <a class="el" href="class_h_c_r.html#a6d92def74c244e782cf398eda590d9eb">HCR</a>, and <a class="el" href="class_p_b_r.html#aea2baf8aadb3832c021564ea12a8f047">PBR</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a4cdec122657c78e1107e45f68f965b93"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void IPrng::Fill </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; uint &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Elements</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Fill an array of uint32 with pseudo-random </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The uint32 output array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting index within the Output array</td></tr>
-    <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_b_c_r.html#afa84b132bb79e32bdf550d01735e0b9c">BCR</a>, <a class="el" href="class_d_c_r.html#a87ba51ff5b956a166c82eaa3d4552f1f">DCR</a>, <a class="el" href="class_h_c_r.html#a9b58b2368898763a19d22e77a38f08b4">HCR</a>, and <a class="el" href="class_p_b_r.html#a7079ed935dd80df7ea4fa926c541ea29">PBR</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="acb87f9bea8f19ca15b28a8681057a557"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void IPrng::Fill </td>
-          <td>(</td>
-          <td class="paramtype">std::vector&lt; ulong &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Output</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Offset</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>Elements</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Fill an array of uint64 with pseudo-random </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Output</td><td>The uint64 output array</td></tr>
-    <tr><td class="paramname">Offset</td><td>The starting index within the Output array</td></tr>
-    <tr><td class="paramname">Elements</td><td>The number of array elements to fill</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_b_c_r.html#a5d577e1abf6aca8e85885ffbb857caa1">BCR</a>, <a class="el" href="class_d_c_r.html#a72bdcf2e600f09c155ac1c9c2e631f21">DCR</a>, <a class="el" href="class_h_c_r.html#ad4e65cfb2f89b7504e3700762a60de6b">HCR</a>, and <a class="el" href="class_p_b_r.html#a61211e6060048f0fb8b8b302bf4a006b">PBR</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="af310ce843ff1ba4041065d17cee8a4e2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::vector&lt;byte&gt; IPrng::GetBytes </td>
+          <td class="memname">virtual std::vector&lt;byte&gt; IPrng::Generate </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em></td><td>)</td>
@@ -456,11 +291,11 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Random byte array</dd></dl>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#ad939f21ae02c27308697e66d8022f12f">BCR</a>, <a class="el" href="class_d_c_r.html#a4fd859132bcb442e0daa75e0952e27a9">DCR</a>, <a class="el" href="class_h_c_r.html#a376b65f91aca5198e8a77588938e3231">HCR</a>, and <a class="el" href="class_p_b_r.html#a0bb779e53f945d4b4911499f644235f1">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#a3adb8f2f14e3fee534f7b3dc5afdc5ee">BCR</a>, <a class="el" href="class_h_c_r.html#afaf4f661ad7af411520d6a6db29ea0be">HCR</a>, <a class="el" href="class_c_s_r.html#a239e870500e86cda50639ab337f92dd5">CSR</a>, and <a class="el" href="class_p_b_r.html#abdefbcd669a17378a9ca63872985b1fd">PBR</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aa1aecdfb79b16960739a5015e21008cc"></a>
+<a class="anchor" id="a625ed948e4a1e1fa37c0f720064833a7"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -468,7 +303,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IPrng::GetBytes </td>
+          <td class="memname">virtual void IPrng::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -508,11 +343,11 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#af0bdd34455f093083d07901fa89f7bf3">BCR</a>, <a class="el" href="class_d_c_r.html#a2e75392da6049045eef25ba28bb4ae67">DCR</a>, <a class="el" href="class_h_c_r.html#a6f1d8041f990276f3a34bec5a81c2950">HCR</a>, and <a class="el" href="class_p_b_r.html#aad5fc6d687fb21aef102001cdd005dce">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#a1b7a043fffe0f9fe69c8438bac5eeeec">BCR</a>, <a class="el" href="class_h_c_r.html#a125eb719106cb7e0649d06600ec33ec3">HCR</a>, <a class="el" href="class_c_s_r.html#ac951321f1b8991a63ca12a4c2a0f8e88">CSR</a>, and <a class="el" href="class_p_b_r.html#a2e5782bbfecad282bfa8f1d8dee5e018">PBR</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a69f7140540620a5bf037c048a42edc8b"></a>
+<a class="anchor" id="a5088592f5c8eb69d16e7a21a9cf33307"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -520,7 +355,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IPrng::GetBytes </td>
+          <td class="memname">virtual void IPrng::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -542,7 +377,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#a5309d49440b465731c4ee9526d25f987">BCR</a>, <a class="el" href="class_d_c_r.html#a9278df6edc875304beba7e1cd5653815">DCR</a>, <a class="el" href="class_h_c_r.html#ad43e6dd44e85353a62d651bf240c24e5">HCR</a>, and <a class="el" href="class_p_b_r.html#a1b5f6ebb033701eb6cace104a39eea3e">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#a4a432254d98f648c5ebd4c24ba2e2661">BCR</a>, <a class="el" href="class_h_c_r.html#acaf790e6af8dc083e73a079724efab10">HCR</a>, <a class="el" href="class_c_s_r.html#ad5a3f86b73dd2f1d4ca5adf5266caa99">CSR</a>, and <a class="el" href="class_p_b_r.html#a31b55e0ae09a5e1f89fef0ac51dfd18a">PBR</a>.</p>
 
 </div>
 </div>
@@ -569,7 +404,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The random generators class name </p>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#a490f8e03cb54400742ca9bb1c36d6fb3">BCR</a>, <a class="el" href="class_d_c_r.html#a573a48e2dd7888d77a6ca40d5de03fe3">DCR</a>, <a class="el" href="class_h_c_r.html#a1a3506096dca44237bf4cb670e1e74c5">HCR</a>, and <a class="el" href="class_p_b_r.html#aac65759bed398ad92e33bf395a6a3907">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#a490f8e03cb54400742ca9bb1c36d6fb3">BCR</a>, <a class="el" href="class_h_c_r.html#a1a3506096dca44237bf4cb670e1e74c5">HCR</a>, <a class="el" href="class_c_s_r.html#af523b61805caacddcc7efeb0d4de4bab">CSR</a>, and <a class="el" href="class_p_b_r.html#aac65759bed398ad92e33bf395a6a3907">PBR</a>.</p>
 
 </div>
 </div>
@@ -597,7 +432,7 @@ Public Member Functions</h2></td></tr>
 <p>Get a pseudo random unsigned 16bit integer </p>
 <dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#acbcdb9f8fb9d0970a2e131c46a00c0da">BCR</a>, <a class="el" href="class_d_c_r.html#a902e30bc2ab84b5de40cf9b11bbdddd1">DCR</a>, <a class="el" href="class_h_c_r.html#aa146e7d970a29cd0114d57398116c2ae">HCR</a>, and <a class="el" href="class_p_b_r.html#a127a65d3b44a06f5dc9de40f549c7b6e">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#acbcdb9f8fb9d0970a2e131c46a00c0da">BCR</a>, <a class="el" href="class_h_c_r.html#aa146e7d970a29cd0114d57398116c2ae">HCR</a>, <a class="el" href="class_c_s_r.html#aff31d16f95315e54f5af0b68b423a10c">CSR</a>, and <a class="el" href="class_p_b_r.html#a127a65d3b44a06f5dc9de40f549c7b6e">PBR</a>.</p>
 
 </div>
 </div>
@@ -625,7 +460,7 @@ Public Member Functions</h2></td></tr>
 <p>Get a pseudo random unsigned 32bit integer </p>
 <dl class="section return"><dt>Returns</dt><dd>Random UInt32</dd></dl>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#a5db27e4fb7a093cdea3627d971dc3f4e">BCR</a>, <a class="el" href="class_d_c_r.html#a94c467a91aad074428a5facc9c88a5dd">DCR</a>, <a class="el" href="class_h_c_r.html#aacc051cd6d86752fd462ec365c900b06">HCR</a>, and <a class="el" href="class_p_b_r.html#a8c2b3c25cd68ef694e2d69c9f2245793">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#a5db27e4fb7a093cdea3627d971dc3f4e">BCR</a>, <a class="el" href="class_h_c_r.html#aacc051cd6d86752fd462ec365c900b06">HCR</a>, <a class="el" href="class_c_s_r.html#ab9bdaf46d6070e366915f553725baab4">CSR</a>, and <a class="el" href="class_p_b_r.html#a8c2b3c25cd68ef694e2d69c9f2245793">PBR</a>.</p>
 
 </div>
 </div>
@@ -653,7 +488,7 @@ Public Member Functions</h2></td></tr>
 <p>Get a pseudo random unsigned 64bit integer </p>
 <dl class="section return"><dt>Returns</dt><dd>Random UInt64</dd></dl>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#aa60e7d9181c4aa6e0c89abfd6ee5c47e">BCR</a>, <a class="el" href="class_d_c_r.html#a3dafeadf9cc0f3a3a278922701db18b9">DCR</a>, <a class="el" href="class_h_c_r.html#a3925dfc2c3b1f249e1426fdd1db1e064">HCR</a>, and <a class="el" href="class_p_b_r.html#a4026a5f66f3b658e4f2dc3f7bfc8ab2a">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#aa60e7d9181c4aa6e0c89abfd6ee5c47e">BCR</a>, <a class="el" href="class_h_c_r.html#a3925dfc2c3b1f249e1426fdd1db1e064">HCR</a>, <a class="el" href="class_c_s_r.html#a0c743185923042f8bf5ad56a2eacf361">CSR</a>, and <a class="el" href="class_p_b_r.html#a4026a5f66f3b658e4f2dc3f7bfc8ab2a">PBR</a>.</p>
 
 </div>
 </div>
@@ -706,13 +541,13 @@ Public Member Functions</h2></td></tr>
 
 <p>Reset the generator instance </p>
 
-<p>Implemented in <a class="el" href="class_b_c_r.html#ad5cf2f00bac0c17d0533bd452c44196a">BCR</a>, <a class="el" href="class_d_c_r.html#aa9a5232e1fae8b971f7a1ddc0dfec9ed">DCR</a>, <a class="el" href="class_h_c_r.html#a136f141498fc370930150144071716bf">HCR</a>, and <a class="el" href="class_p_b_r.html#aab91a208b09996bc5bcded32e3de0bdf">PBR</a>.</p>
+<p>Implemented in <a class="el" href="class_b_c_r.html#ad5cf2f00bac0c17d0533bd452c44196a">BCR</a>, <a class="el" href="class_h_c_r.html#a136f141498fc370930150144071716bf">HCR</a>, <a class="el" href="class_c_s_r.html#a26f1a9442de3490a05b65c28e4d3e286">CSR</a>, and <a class="el" href="class_p_b_r.html#aab91a208b09996bc5bcded32e3de0bdf">PBR</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_i_prng_8h_source.html">IPrng.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_i_prng_8h_source.html">IPrng.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

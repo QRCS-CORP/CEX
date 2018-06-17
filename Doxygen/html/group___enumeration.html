@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -103,6 +103,17 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:ga29d0f9dca8992bfdc1e8f55c6b4c13f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0c1bf76428835ed873d6b250df55b6cd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> { <br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda6adf97f83acf6453d4a6a4b1070f3754">BlockCipherExtensions::None</a> = 0, 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda4484af85c975af92f5887ba9be983e59">BlockCipherExtensions::HKDF256</a> = 1, 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda2e4a5e5ad9cdce79dbe7a0aa64cecad4">BlockCipherExtensions::HKDF512</a> = 2, 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda514cc564ac1b237d4129b7543308ce0a">BlockCipherExtensions::SHAKE256</a> = 10, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda5705d645a9d102aa73ead3488b669c34">BlockCipherExtensions::SHAKE512</a> = 11, 
+<a class="el" href="group___enumeration.html#gga0c1bf76428835ed873d6b250df55b6cda90589c47f06eb971d548591f23c285af">BlockCipherExtensions::Custom</a> = 99
+<br />
+ }</td></tr>
+<tr class="separator:ga0c1bf76428835ed873d6b250df55b6cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaa7f8226ec43fe26b57b18e6821c90ffd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffda6adf97f83acf6453d4a6a4b1070f3754">BlockCiphers::None</a> = 0, 
 <a class="el" href="group___enumeration.html#ggaa7f8226ec43fe26b57b18e6821c90ffdaf92201fd9c879328a6b24fa434b845f2">BlockCiphers::Rijndael</a> = 1, 
@@ -153,15 +164,20 @@ Enumerations</h2></td></tr>
 <a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3ab505df5aa812b4f320420b8a952f20e5">Digests::SHA256</a> = 6, 
 <a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3adb6c5a350bb792ef07a62a1750962737">Digests::SHA512</a> = 7, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3acf0eeb991062f766c37e1551d1a02c0a">Digests::Skein256</a> = 8, 
-<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3ac7ded0f97d4810cd3ea63b92bcb1c163">Digests::Skein512</a> = 9, 
-<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a8156318455e118f8b0cb6272973292a2">Digests::Skein1024</a> = 10
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a180641b033cbd68d85704235973acdc7">Digests::SHAKE128</a> = 8, 
+<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a514cc564ac1b237d4129b7543308ce0a">Digests::SHAKE256</a> = 9, 
+<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a5705d645a9d102aa73ead3488b669c34">Digests::SHAKE512</a> = 10, 
+<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a85f77e16d8e61c80f784e548d8aa1de4">Digests::SHAKE1024</a> = 11, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3acf0eeb991062f766c37e1551d1a02c0a">Digests::Skein256</a> = 12, 
+<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3ac7ded0f97d4810cd3ea63b92bcb1c163">Digests::Skein512</a> = 13, 
+<a class="el" href="group___enumeration.html#ggab52dd4d279d842e68f46a2a0499c10c3a8156318455e118f8b0cb6272973292a2">Digests::Skein1024</a> = 14
 <br />
  }</td></tr>
 <tr class="separator:gab52dd4d279d842e68f46a2a0499c10c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8889084a5726d1d32ee6b0a6066cdaae"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga8889084a5726d1d32ee6b0a6066cdaae">Drbgs</a> { <a class="el" href="group___enumeration.html#gga8889084a5726d1d32ee6b0a6066cdaaea6adf97f83acf6453d4a6a4b1070f3754">Drbgs::None</a> = 0, 
 <a class="el" href="group___enumeration.html#gga8889084a5726d1d32ee6b0a6066cdaaea50e4648f3bfd8d45c92d0b4b87e88de5">Drbgs::BCG</a> = 1, 
-<a class="el" href="group___enumeration.html#gga8889084a5726d1d32ee6b0a6066cdaaeafdd14800b03068c10f70b2a702227f84">Drbgs::DCG</a> = 2, 
+<a class="el" href="group___enumeration.html#gga8889084a5726d1d32ee6b0a6066cdaaeaddf86b0b94e34566c486fd076b9686a6">Drbgs::CSG</a> = 2, 
 <a class="el" href="group___enumeration.html#gga8889084a5726d1d32ee6b0a6066cdaaeaa25aac589968997350e1124a96a89f47">Drbgs::HCG</a> = 3
  }</td></tr>
 <tr class="separator:ga8889084a5726d1d32ee6b0a6066cdaae"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,16 +189,21 @@ Enumerations</h2></td></tr>
 <tr class="separator:ga5ab637dfadac08fd2e5fe52510ab7050"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1aa7dfa4a9bea8d343229bf5c0433b1d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga1aa7dfa4a9bea8d343229bf5c0433b1d">Kdfs</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da6adf97f83acf6453d4a6a4b1070f3754">Kdfs::None</a> = 0, 
-<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1daa2c8b9288c1696e7d35c5918aec6247f">Kdfs::HKDF</a> = 1, 
-<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1dac85b8ca07973d037d257269d9b9f1dcc">Kdfs::KDF2</a> = 2, 
-<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da855e7ec34d6bf5ef38a04f3b00200d86">Kdfs::PBKDF2</a> = 3, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da4484af85c975af92f5887ba9be983e59">Kdfs::HKDF256</a> = 1, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da2e4a5e5ad9cdce79dbe7a0aa64cecad4">Kdfs::HKDF512</a> = 2, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da014262da35450dbb37274571e235d35c">Kdfs::KDF2256</a> = 3, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1dab1721204ae2a3addbf2d282e99fa7bea">Kdfs::SCRYPT</a> = 4, 
-<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da180641b033cbd68d85704235973acdc7">Kdfs::SHAKE128</a> = 5, 
-<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da514cc564ac1b237d4129b7543308ce0a">Kdfs::SHAKE256</a> = 6, 
-<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5705d645a9d102aa73ead3488b669c34">Kdfs::SHAKE512</a> = 7, 
+&#160;&#160;<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da02cbd7be882b817b785bf36bf920f94d">Kdfs::KDF2512</a> = 4, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5b51e49fbd425e5c027eb07750aaf8c4">Kdfs::PBKDF2256</a> = 5, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1daf5daf47236538c7d89fe23f1ed256208">Kdfs::PBKDF2512</a> = 6, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1dad04483ba9eeb790b54bd8fa30e3b5987">Kdfs::SCRYPT256</a> = 7, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da85f77e16d8e61c80f784e548d8aa1de4">Kdfs::SHAKE1024</a> = 8
+&#160;&#160;<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5f8674e54efd0034c87a0d86471944ea">Kdfs::SCRYPT512</a> = 8, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da180641b033cbd68d85704235973acdc7">Kdfs::SHAKE128</a> = 9, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da514cc564ac1b237d4129b7543308ce0a">Kdfs::SHAKE256</a> = 10, 
+<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da5705d645a9d102aa73ead3488b669c34">Kdfs::SHAKE512</a> = 11, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga1aa7dfa4a9bea8d343229bf5c0433b1da85f77e16d8e61c80f784e548d8aa1de4">Kdfs::SHAKE1024</a> = 12
 <br />
  }</td></tr>
 <tr class="separator:ga1aa7dfa4a9bea8d343229bf5c0433b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,10 +230,11 @@ Enumerations</h2></td></tr>
 <tr class="memitem:gad1c1c84ec8d7f4f165d4973062130aa3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gad1c1c84ec8d7f4f165d4973062130aa3">Macs</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a6adf97f83acf6453d4a6a4b1070f3754">Macs::None</a> = 0, 
 <a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a49cd74c73d9ceec0d43e3bbf52030609">Macs::CMAC</a> = 1, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad90d710b6a4618188f5dc2a19a8cdcf9">Macs::HMAC</a> = 2, 
-<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7">Macs::GMAC</a> = 3, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7">Macs::GMAC</a> = 2, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ad90d710b6a4618188f5dc2a19a8cdcf9">Macs::HMAC</a> = 3, 
 <br />
-&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ab6fd733868a97b1057243c9e9e381074">Macs::Poly1305</a> = 4
+&#160;&#160;<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3a50e707d6ba503699aac321f009fd94e8">Macs::KMAC</a> = 4, 
+<a class="el" href="group___enumeration.html#ggad1c1c84ec8d7f4f165d4973062130aa3ab6fd733868a97b1057243c9e9e381074">Macs::Poly1305</a> = 5
 <br />
  }</td></tr>
 <tr class="separator:gad1c1c84ec8d7f4f165d4973062130aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,7 +255,7 @@ Enumerations</h2></td></tr>
 <tr class="memitem:gaf3e3948cf00ae35f8c4646efd5de36a7"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> { <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a6adf97f83acf6453d4a6a4b1070f3754">Prngs::None</a> = 0, 
 <a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a> = 1, 
-<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7af3f8600400373910980a32058be68665">Prngs::DCR</a> = 2, 
+<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a9dbebbc8de3ea0e81606b05de0fff36d">Prngs::CSR</a> = 2, 
 <a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a94124276d46b4f592444d33779b20f20">Prngs::HCR</a> = 3, 
 <br />
 &#160;&#160;<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7af8357427a3733ebed1a8647f3d5fa31b">Prngs::PBR</a> = 4
@@ -252,8 +274,7 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="separator:ga1ec0d2ca9981dcdfec5108ea9c38a9d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga4889e7cc5000c12f232b3f14eb4ba58e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga4889e7cc5000c12f232b3f14eb4ba58e">RLWEParams</a> { <a class="el" href="group___enumeration.html#gga4889e7cc5000c12f232b3f14eb4ba58ea6adf97f83acf6453d4a6a4b1070f3754">RLWEParams::None</a> = 0, 
-<a class="el" href="group___enumeration.html#gga4889e7cc5000c12f232b3f14eb4ba58ea1d6f043e417cbe571008801095b9d3b2">RLWEParams::Q12289N1024</a> = 1, 
-<a class="el" href="group___enumeration.html#gga4889e7cc5000c12f232b3f14eb4ba58eafdb9df3df40ea514285c340fa0cbdbd8">RLWEParams::Q12289N512</a> = 1
+<a class="el" href="group___enumeration.html#gga4889e7cc5000c12f232b3f14eb4ba58ea1d6f043e417cbe571008801095b9d3b2">RLWEParams::Q12289N1024</a> = 1
  }</td></tr>
 <tr class="separator:ga4889e7cc5000c12f232b3f14eb4ba58e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gad57696fdbcdac43c18f9ba4dada98447"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gad57696fdbcdac43c18f9ba4dada98447">RoundCounts</a> { <br />
@@ -284,6 +305,16 @@ Enumerations</h2></td></tr>
 <br />
  }</td></tr>
 <tr class="separator:gad57696fdbcdac43c18f9ba4dada98447"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga28cc9721f2d40df0b609ba25b5da9706"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a> { <br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a6adf97f83acf6453d4a6a4b1070f3754">ShakeModes::None</a> = 0, 
+<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a180641b033cbd68d85704235973acdc7">ShakeModes::SHAKE128</a> = 8, 
+<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a">ShakeModes::SHAKE256</a> = 9, 
+<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a5705d645a9d102aa73ead3488b669c34">ShakeModes::SHAKE512</a> = 10, 
+<br />
+&#160;&#160;<a class="el" href="group___enumeration.html#gga28cc9721f2d40df0b609ba25b5da9706a85f77e16d8e61c80f784e548d8aa1de4">ShakeModes::SHAKE1024</a> = 11
+<br />
+ }</td></tr>
+<tr class="separator:ga28cc9721f2d40df0b609ba25b5da9706"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac08b67f68acd326d0eb4708d72c3753c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___enumeration.html#gac08b67f68acd326d0eb4708d72c3753c">SimdProfiles</a> { <a class="el" href="group___enumeration.html#ggac08b67f68acd326d0eb4708d72c3753ca6adf97f83acf6453d4a6a4b1070f3754">SimdProfiles::None</a> = 0, 
 <a class="el" href="group___enumeration.html#ggac08b67f68acd326d0eb4708d72c3753ca2095d5b105cd3d5f9eaccc9d9a2076b5">SimdProfiles::Simd128</a> = 1, 
 <a class="el" href="group___enumeration.html#ggac08b67f68acd326d0eb4708d72c3753caf24b4d010843958e0f01037d50a13a0c">SimdProfiles::Simd256</a> = 2, 
@@ -362,6 +393,46 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="gga29d0f9dca8992bfdc1e8f55c6b4c13f1aeec43cb050676d2a993b2ce9cbb0c436"></a>RingLWE&#160;</td><td class="fielddoc">
 <p>A Ring-LWE cipher implementation </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="ga0c1bf76428835ed873d6b250df55b6cd"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum BlockCipherExtensions</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="gga0c1bf76428835ed873d6b250df55b6cda6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc">
+<p>Use the standard form of the block cipher </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga0c1bf76428835ed873d6b250df55b6cda4484af85c975af92f5887ba9be983e59"></a>HKDF256&#160;</td><td class="fielddoc">
+<p>A Hash based Key Derivation Function: HKDF(SHA2-256) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga0c1bf76428835ed873d6b250df55b6cda2e4a5e5ad9cdce79dbe7a0aa64cecad4"></a>HKDF512&#160;</td><td class="fielddoc">
+<p>A Hash based Key Derivation Function: HKDF(SHA2-512) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga0c1bf76428835ed873d6b250df55b6cda514cc564ac1b237d4129b7543308ce0a"></a>SHAKE256&#160;</td><td class="fielddoc">
+<p>An implementation of the SHAKE-256 XOF function </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga0c1bf76428835ed873d6b250df55b6cda5705d645a9d102aa73ead3488b669c34"></a>SHAKE512&#160;</td><td class="fielddoc">
+<p>An implementation of the SHAKE-512 XOF function </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga0c1bf76428835ed873d6b250df55b6cda90589c47f06eb971d548591f23c285af"></a>Custom&#160;</td><td class="fielddoc">
+<p>User defined derivation function </p>
 </td></tr>
 </table>
 
@@ -544,6 +615,18 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggab52dd4d279d842e68f46a2a0499c10c3adb6c5a350bb792ef07a62a1750962737"></a>SHA512&#160;</td><td class="fielddoc">
 <p>The SHA-2 digest with a 512 bit return size </p>
 </td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggab52dd4d279d842e68f46a2a0499c10c3a180641b033cbd68d85704235973acdc7"></a>SHAKE128&#160;</td><td class="fielddoc">
+<p>The SHAKE-128 digest with a 128 bit return size </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggab52dd4d279d842e68f46a2a0499c10c3a514cc564ac1b237d4129b7543308ce0a"></a>SHAKE256&#160;</td><td class="fielddoc">
+<p>The SHAKE-256 digest with a 256 bit return size </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggab52dd4d279d842e68f46a2a0499c10c3a5705d645a9d102aa73ead3488b669c34"></a>SHAKE512&#160;</td><td class="fielddoc">
+<p>The SHAKE-512 digest with a 512 bit return size </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggab52dd4d279d842e68f46a2a0499c10c3a85f77e16d8e61c80f784e548d8aa1de4"></a>SHAKE1024&#160;</td><td class="fielddoc">
+<p>The SHAKE-1024 digest with a 1024 bit return size </p>
+</td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggab52dd4d279d842e68f46a2a0499c10c3acf0eeb991062f766c37e1551d1a02c0a"></a>Skein256&#160;</td><td class="fielddoc">
 <p>The Skein digest with a 256 bit return size </p>
 </td></tr>
@@ -579,13 +662,13 @@ Enumerations</h2></td></tr>
 <p>No generator is specified </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="gga8889084a5726d1d32ee6b0a6066cdaaea50e4648f3bfd8d45c92d0b4b87e88de5"></a>BCG&#160;</td><td class="fielddoc">
-<p>An implementation of a Block Counter mode Generator </p>
+<p>A Block-cipher Counter mode Deterministic Random Bit Generator </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="gga8889084a5726d1d32ee6b0a6066cdaaeafdd14800b03068c10f70b2a702227f84"></a>DCG&#160;</td><td class="fielddoc">
-<p>An implementation of a Digest Counter Generator </p>
+<tr><td class="fieldname"><a class="anchor" id="gga8889084a5726d1d32ee6b0a6066cdaaeaddf86b0b94e34566c486fd076b9686a6"></a>CSG&#160;</td><td class="fielddoc">
+<p>A cSHAKE Deterministic Random Bit Generator </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="gga8889084a5726d1d32ee6b0a6066cdaaeaa25aac589968997350e1124a96a89f47"></a>HCG&#160;</td><td class="fielddoc">
-<p>An implementation of an HMAC Counter Generator </p>
+<p>A HMAC Counter Deterministic Random Bit Generator </p>
 </td></tr>
 </table>
 
@@ -646,17 +729,29 @@ Enumerations</h2></td></tr>
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc">
 <p>No kdf is specified </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1daa2c8b9288c1696e7d35c5918aec6247f"></a>HKDF&#160;</td><td class="fielddoc">
-<p>A Hash based Key Derivation Function: HKDF </p>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da4484af85c975af92f5887ba9be983e59"></a>HKDF256&#160;</td><td class="fielddoc">
+<p>A Hash based Key Derivation Function: HKDF(SHA2-256) </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1dac85b8ca07973d037d257269d9b9f1dcc"></a>KDF2&#160;</td><td class="fielddoc">
-<p>An implementation of the Hash based Key Derivation Function: KDF2 </p>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da2e4a5e5ad9cdce79dbe7a0aa64cecad4"></a>HKDF512&#160;</td><td class="fielddoc">
+<p>A Hash based Key Derivation Function: HKDF(SHA2-512) </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da855e7ec34d6bf5ef38a04f3b00200d86"></a>PBKDF2&#160;</td><td class="fielddoc">
-<p>An implementation of a Passphrase Based KDF: PBKDF2 </p>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da014262da35450dbb37274571e235d35c"></a>KDF2256&#160;</td><td class="fielddoc">
+<p>An implementation of the Hash based Key Derivation Function: KDF2(SHA2-256) </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1dab1721204ae2a3addbf2d282e99fa7bea"></a>SCRYPT&#160;</td><td class="fielddoc">
-<p>An implementation of the SCRYPT KDF </p>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da02cbd7be882b817b785bf36bf920f94d"></a>KDF2512&#160;</td><td class="fielddoc">
+<p>An implementation of the Hash based Key Derivation Function: KDF2(SHA2-512) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da5b51e49fbd425e5c027eb07750aaf8c4"></a>PBKDF2256&#160;</td><td class="fielddoc">
+<p>An implementation of a Passphrase Based KDF: PBKDF2(SHA2-256) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1daf5daf47236538c7d89fe23f1ed256208"></a>PBKDF2512&#160;</td><td class="fielddoc">
+<p>An implementation of a Passphrase Based KDF: PBKDF2(SHA2-512) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1dad04483ba9eeb790b54bd8fa30e3b5987"></a>SCRYPT256&#160;</td><td class="fielddoc">
+<p>An implementation of the SCRYPT(SHA2-256) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da5f8674e54efd0034c87a0d86471944ea"></a>SCRYPT512&#160;</td><td class="fielddoc">
+<p>An implementation of the SCRYPT(SHA2-512) </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="gga1aa7dfa4a9bea8d343229bf5c0433b1da180641b033cbd68d85704235973acdc7"></a>SHAKE128&#160;</td><td class="fielddoc">
 <p>An implementation of the SHAKE-128 XOF function </p>
@@ -759,11 +854,14 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggad1c1c84ec8d7f4f165d4973062130aa3a49cd74c73d9ceec0d43e3bbf52030609"></a>CMAC&#160;</td><td class="fielddoc">
 <p>A Cipher based Message Authentication Code generator (CMAC) </p>
 </td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7"></a>GMAC&#160;</td><td class="fielddoc">
+<p>A Cipher based Message Authentication Code generator (GMAC) </p>
+</td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggad1c1c84ec8d7f4f165d4973062130aa3ad90d710b6a4618188f5dc2a19a8cdcf9"></a>HMAC&#160;</td><td class="fielddoc">
 <p>A Hash based Message Authentication Code generator (HMAC) </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="ggad1c1c84ec8d7f4f165d4973062130aa3a3e0183491d539503ff440a0b7e5c26b7"></a>GMAC&#160;</td><td class="fielddoc">
-<p>A Cipher based Message Authentication Code generator (GMAC) </p>
+<tr><td class="fieldname"><a class="anchor" id="ggad1c1c84ec8d7f4f165d4973062130aa3a50e707d6ba503699aac321f009fd94e8"></a>KMAC&#160;</td><td class="fielddoc">
+<p>The Keccak based Message Authentication Code generator (KMAC) </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggad1c1c84ec8d7f4f165d4973062130aa3ab6fd733868a97b1057243c9e9e381074"></a>Poly1305&#160;</td><td class="fielddoc">
 <p>The Poly1305 Message Authentication Code generator </p>
@@ -861,8 +959,8 @@ Enumerations</h2></td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4"></a>BCR&#160;</td><td class="fielddoc">
 <p>A Symmetric Cipher Counter mode random number generator </p>
 </td></tr>
-<tr><td class="fieldname"><a class="anchor" id="ggaf3e3948cf00ae35f8c4646efd5de36a7af3f8600400373910980a32058be68665"></a>DCR&#160;</td><td class="fielddoc">
-<p>A Digest Counter mode random number generator </p>
+<tr><td class="fieldname"><a class="anchor" id="ggaf3e3948cf00ae35f8c4646efd5de36a7a9dbebbc8de3ea0e81606b05de0fff36d"></a>CSR&#160;</td><td class="fielddoc">
+<p>A cSHAKE based random number generator </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggaf3e3948cf00ae35f8c4646efd5de36a7a94124276d46b4f592444d33779b20f20"></a>HCR&#160;</td><td class="fielddoc">
 <p>An HMAC based random number generator </p>
@@ -937,9 +1035,6 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="gga4889e7cc5000c12f232b3f14eb4ba58ea1d6f043e417cbe571008801095b9d3b2"></a>Q12289N1024&#160;</td><td class="fielddoc">
 <p>A modulus of 12289 with 1024 coefficients </p>
-</td></tr>
-<tr><td class="fieldname"><a class="anchor" id="gga4889e7cc5000c12f232b3f14eb4ba58eafdb9df3df40ea514285c340fa0cbdbd8"></a>Q12289N512&#160;</td><td class="fielddoc">
-<p>A modulus of 12289 with 512 coefficients </p>
 </td></tr>
 </table>
 
@@ -1022,6 +1117,43 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="ggad57696fdbcdac43c18f9ba4dada98447a95c866efff64ea784eb901abfcd1d99b"></a>R64&#160;</td><td class="fielddoc">
 <p>64 Rounds: SHX </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="ga28cc9721f2d40df0b609ba25b5da9706"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group___enumeration.html#ga28cc9721f2d40df0b609ba25b5da9706">ShakeModes</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="gga28cc9721f2d40df0b609ba25b5da9706a6adf97f83acf6453d4a6a4b1070f3754"></a>None&#160;</td><td class="fielddoc">
+<p>No SHAKE mode is selected </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga28cc9721f2d40df0b609ba25b5da9706a180641b033cbd68d85704235973acdc7"></a>SHAKE128&#160;</td><td class="fielddoc">
+<p>The SHAKE128 XOF function </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga28cc9721f2d40df0b609ba25b5da9706a514cc564ac1b237d4129b7543308ce0a"></a>SHAKE256&#160;</td><td class="fielddoc">
+<p>The SHAKE256 XOF function </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga28cc9721f2d40df0b609ba25b5da9706a5705d645a9d102aa73ead3488b669c34"></a>SHAKE512&#160;</td><td class="fielddoc">
+<p>The SHAKE512 XOF function </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga28cc9721f2d40df0b609ba25b5da9706a85f77e16d8e61c80f784e548d8aa1de4"></a>SHAKE1024&#160;</td><td class="fielddoc">
+<p>The SHAKE1024 XOF function </p>
 </td></tr>
 </table>
 

@@ -9,9 +9,9 @@ const std::string RDP::CLASS_NAME("RDP");
 
 //~~~Constructor~~~//
 
-RDP::RDP(RdEngines RdEngine)
+RDP::RDP(RdEngines RdEngineType)
 	:
-	m_engineType(RdEngine)
+	m_engineType(RdEngineType)
 {
 	Reset();
 }
@@ -40,17 +40,17 @@ const std::string RDP::Name()
 
 //~~~Public Functions~~~//
 
-void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
 	if (m_engineType == RdEngines::None)
 	{
-		throw CryptoRandomException("RDP:GetBytes", "Random provider is not available!");
+		throw CryptoRandomException("RDP:Generate", "Random provider is not available!");
 	}
 	if (m_engineType == RdEngines::RdSeed && Output.size() > SEED_MAX)
 	{
-		throw CryptoRandomException("RDP:GetBytes", "The seed providers maximum output is 64MB per request!");
+		throw CryptoRandomException("RDP:Generate", "The seed providers maximum output is 64MB per request!");
 	}
 
 	int res = 0;
@@ -94,35 +94,49 @@ void RDP::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
 
 			if ((m_engineType == RdEngines::RdRand && failCtr >= RDR_RETRY) || failCtr >= RDS_RETRY)
 			{
-				throw CryptoRandomException("RDP:GetBytes", "Exceeded the maximum number of retries!");
+				throw CryptoRandomException("RDP:Generate", "Exceeded the maximum number of retries!");
 			}
 		}
 	}
 }
 
-void RDP::GetBytes(std::vector<byte> &Output)
+void RDP::Generate(std::vector<byte> &Output)
 {
 	std::vector<byte> rnd(Output.size());
-	GetBytes(rnd, 0, rnd.size());
+	Generate(rnd, 0, rnd.size());
 	Utility::MemUtils::Copy(rnd, 0, Output, 0, rnd.size());
 }
 
-std::vector<byte> RDP::GetBytes(size_t Length)
+std::vector<byte> RDP::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd, 0, rnd.size());
+	Generate(rnd, 0, rnd.size());
 
 	return rnd;
 }
 
-uint RDP::Next()
+ushort RDP::NextUInt16()
 {
-	std::vector<byte> rnd(sizeof(uint));
-	GetBytes(rnd);
-	uint val = 0;
-	Utility::MemUtils::CopyToValue(rnd, 0, val, sizeof(uint));
+	ushort x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
-	return val;
+	return x;
+}
+
+uint RDP::NextUInt32()
+{
+	uint x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
+
+	return x;
+}
+
+ulong RDP::NextUInt64()
+{
+	ulong x = 0;
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
+
+	return x;
 }
 
 void RDP::Reset()

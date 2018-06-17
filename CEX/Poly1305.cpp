@@ -10,10 +10,10 @@ const std::string Poly1305::CLASS_NAME("Poly1305");
 
 //~~~Constructor~~~//
 
-Poly1305::Poly1305(BlockCiphers CipherType)
+Poly1305::Poly1305(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
 	m_autoClamp(true),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) : nullptr),
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) : nullptr),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),

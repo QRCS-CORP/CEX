@@ -150,23 +150,23 @@ public:
 	/// Instantiate the class using a block cipher type name, and an optional entropy source type
 	/// </summary>
 	///
-	/// <param name="ShakeMode">The underlying SHAKE implementation mode</param>
+	/// <param name="ShakeModeType">The underlying SHAKE implementation mode</param>
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	///
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
-	CSG(ShakeModes ShakeMode = ShakeModes::SHAKE256, Providers ProviderType = Providers::ACP, bool Parallel = false);
+	CSG(ShakeModes ShakeModeType = ShakeModes::SHAKE256, Providers ProviderType = Providers::ACP, bool Parallel = false);
 
 	/// <summary>
 	/// Instantiate the class using a digest instance, and an optional entropy source 
 	/// </summary>
 	/// 
-	/// <param name="ShakeMode">The underlying shake implementation mode</param>
+	/// <param name="ShakeModeType">The underlying shake implementation mode</param>
 	/// <param name="Provider">Provides an entropy source; enables predictive resistance, can be null</param>
 	/// <param name="Parallel">If supported, enables vectorized multi-lane generation using the highest supported instruction set AVX512/AVX2</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if a null digest is used</exception>
-	explicit CSG(ShakeModes ShakeMode, IProvider* Provider = 0, bool Parallel = false);
+	explicit CSG(ShakeModes ShakeModeType, IProvider* Provider = 0, bool Parallel = false);
 
 	/// <summary>
 	/// Destructor: finalize this class

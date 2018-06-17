@@ -9,7 +9,7 @@
 
 NAMESPACE_HELPER
 
-IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtension)
+IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 {
 	IBlockCipher* cprPtr = nullptr;
 
@@ -24,12 +24,12 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCip
 	#if defined(__AVX__)
 				if (detect.AESNI())
 				{
-					cprPtr = new Cipher::Symmetric::Block::AHX(CipherExtension);
+					cprPtr = new Cipher::Symmetric::Block::AHX(CipherExtensionType);
 				}
 				else
 	#endif
 				{
-					cprPtr = new Cipher::Symmetric::Block::RHX(CipherExtension);
+					cprPtr = new Cipher::Symmetric::Block::RHX(CipherExtensionType);
 				}
 				break;
 			}
@@ -49,7 +49,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCip
 			}
 			case BlockCiphers::RHX:
 			{
-				cprPtr = new Cipher::Symmetric::Block::RHX(CipherExtension);
+				cprPtr = new Cipher::Symmetric::Block::RHX(CipherExtensionType);
 				break;
 			}
 			case BlockCiphers::Serpent:
@@ -59,7 +59,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCip
 			}
 			case BlockCiphers::SHX:
 			{
-				cprPtr = new Cipher::Symmetric::Block::SHX(CipherExtension);
+				cprPtr = new Cipher::Symmetric::Block::SHX(CipherExtensionType);
 				break;
 			}
 			case BlockCiphers::Twofish:
@@ -69,7 +69,7 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCip
 			}
 			case BlockCiphers::THX:
 			{
-				cprPtr = new Cipher::Symmetric::Block::THX(CipherExtension);
+				cprPtr = new Cipher::Symmetric::Block::THX(CipherExtensionType);
 				break;
 			}
 			default:

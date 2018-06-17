@@ -140,7 +140,6 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 	const size_t CPTSZE = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
 	const size_t PUBSZE = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
 	const size_t PRISZE = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
-	bool status;
 
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
 	CexAssert(CipherText.size() >= CPTSZE, "The cipher-text array is too small");
@@ -201,7 +200,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 	CipherText.resize(CPTSZE);
 
-	m_rndGenerator->GetBytes(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
+	m_rndGenerator->Generate(sec, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// don't release system RNG output
 	Utility::MemUtils::Copy(sec, 0, coin, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 	Kdf::SHAKE shk256(Enumeration::ShakeModes::SHAKE256);
@@ -249,7 +248,7 @@ IAsymmetricKeyPair* ModuleLWE::Generate()
 	shk256.Generate(buff, 0, MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	// value z for pseudo-random output on reject
-	m_rndGenerator->GetBytes(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
+	m_rndGenerator->Generate(buff, MLWEQ7681N256::MLWE_SEED_SIZE, MLWEQ7681N256::MLWE_SEED_SIZE);
 	// copy H(p) and random coin
 	Utility::MemUtils::Copy(buff, 0, sk, PUBSZE + PRISZE, 2 * MLWEQ7681N256::MLWE_SEED_SIZE);
 

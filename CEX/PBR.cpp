@@ -8,17 +8,17 @@ const std::string PBR::CLASS_NAME("PBR");
 
 //~~~Constructor~~~//
 
-PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestEngine, size_t BufferSize)
+PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize :
 		throw CryptoRandomException("PBR:Ctor", "BufferSize must be at least 64 bytes!")),
 	m_digestIterations(Iterations != 0 ? Iterations : 
 		throw CryptoRandomException("PBR:Ctor", "Iterations can not be zero; at least 1 iteration is required!")),
-	m_digestType(DigestEngine != Digests::None ? DigestEngine :
+	m_digestType(DigestType != Digests::None ? DigestType :
 		throw CryptoRandomException("PBR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
-	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestEngine) ? Seed :
+	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestType) ? Seed :
 		throw CryptoRandomException("PBR:Ctor", "The seed is too small!")),
 	m_rngBuffer(BufferSize),
 	m_rngGenerator(new Kdf::PBKDF2(m_digestType, m_digestIterations))
@@ -60,83 +60,23 @@ const std::string PBR::Name()
 
 //~~~Public Functions~~~//
 
-void PBR::Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(int16_t);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void PBR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(ushort);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void PBR::Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(int32_t);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void PBR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(uint);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void PBR::Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(int64_t);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-void PBR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	size_t bufLen = Elements * sizeof(ulong);
-	std::vector<byte> buf(bufLen);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, bufLen);
-}
-
-std::vector<byte> PBR::GetBytes(size_t Length)
+std::vector<byte> PBR::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd);
+	Generate(rnd);
 
 	return rnd;
 }
 
-void PBR::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void PBR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
-	std::vector<byte> rnd = GetBytes(Length);
+	std::vector<byte> rnd = Generate(Length);
 	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
 }
 
-void PBR::GetBytes(std::vector<byte> &Output)
+void PBR::Generate(std::vector<byte> &Output)
 {
 	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
 
@@ -181,7 +121,7 @@ void PBR::GetBytes(std::vector<byte> &Output)
 ushort PBR::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ushort)), 0, x, sizeof(ushort));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -189,7 +129,7 @@ ushort PBR::NextUInt16()
 uint PBR::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(uint)), 0, x, sizeof(uint));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -197,7 +137,7 @@ uint PBR::NextUInt32()
 ulong PBR::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ulong)), 0, x, sizeof(ulong));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }

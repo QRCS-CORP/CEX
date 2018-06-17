@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/McElieceUtils.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/McElieceUtils.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -124,13 +124,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">//~~~Public Functions~~~//</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">static</span> ushort Diff(ushort A, ushort B);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">static</span> ushort Diff(ushort X, ushort Y);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">static</span> ushort Invert(ushort X, <span class="keyword">const</span> <span class="keywordtype">size_t</span> Degree);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">static</span> ulong MaskNonZero64(ushort A);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">static</span> ulong MaskNonZero64(ushort X);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">static</span> ulong MaskLeq64(ushort A, ushort B);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">static</span> ulong MaskLeq64(ushort X, ushort Y);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">static</span> ushort Multiply(ushort X, ushort Y, <span class="keyword">const</span> <span class="keywordtype">size_t</span> Degree);</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
@@ -139,20 +139,20 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">//~~~Templates~~~//</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Array&gt;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> Add(Array &amp;X, Array &amp;Y)</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> Add(Array &amp;A, <span class="keyword">const</span> Array &amp;B)</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    {</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; X.size(); i++)</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; A.size(); i++)</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            X[i] ^= Y[i];</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            A[i] ^= B[i];</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    }</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Array&gt;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> Add(Array &amp;Output, Array &amp;X, Array &amp;Y)</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> Add(Array &amp;Output, <span class="keyword">const</span> Array &amp;A, <span class="keyword">const</span> Array &amp;B)</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    {</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; Output.size(); i++)</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            Output[i] = X[i] ^ Y[i];</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            Output[i] = A[i] ^ B[i];</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    }</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
@@ -171,7 +171,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ArrayA, <span class="keyword">typename</span> ArrayB&gt;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> BenesCompact(ArrayA &amp;Received, ArrayB &amp;Condition, <span class="keywordtype">int</span> Reverse)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> BenesCompact(ArrayA &amp;Output, <span class="keyword">const</span> ArrayB &amp;Condition, <span class="keywordtype">int</span> Reverse)</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    {</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordtype">size_t</span> condPos;</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">int</span> inc, low;</div>
@@ -189,35 +189,35 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">for</span> (low = 0; low &lt;= 5; low++)</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        {</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            BenesHelp(Received, Condition, condPos, low);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            BenesHelp(Output, Condition, condPos, low);</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            condPos += inc;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        TransposeCompact64x64(Received);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        TransposeCompact64x64(Output);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">for</span> (low = 0; low &lt;= 5; low++)</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            BenesHelp(Received, Condition, condPos, low);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            BenesHelp(Output, Condition, condPos, low);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            condPos += inc;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        }</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">for</span> (low = 4; low &gt;= 0; low--)</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        {</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            BenesHelp(Received, Condition, condPos, low);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            BenesHelp(Output, Condition, condPos, low);</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;            condPos += inc;</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        }</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        TransposeCompact64x64(Received);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        TransposeCompact64x64(Output);</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">for</span> (low = 5; low &gt;= 0; low--)</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        {</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            BenesHelp(Received, Condition, condPos, low);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            BenesHelp(Output, Condition, condPos, low);</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            condPos += inc;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        }</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    }</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ArrayA, <span class="keyword">typename</span> ArrayB&gt;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> BenesHelp(ArrayA &amp;Received, ArrayB &amp;Condition, <span class="keywordtype">size_t</span> CondPos, <span class="keywordtype">int</span> Low)</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> BenesHelp(ArrayA &amp;Output, <span class="keyword">const</span> ArrayB &amp;Condition, <span class="keywordtype">size_t</span> CondOffset, <span class="keywordtype">int</span> Low)</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    {</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordtype">int</span> i, j, x, y;</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordtype">int</span> high = 5 - Low;</div>
@@ -230,11 +230,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            <span class="keywordflow">for</span> (i = 0; i &lt; (1 &lt;&lt; high); i++)</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            {</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                diff = Received[x] ^ Received[y];</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                diff &amp;= Condition[CondPos];</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                ++CondPos;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                Received[x] ^= diff;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                Received[y] ^= diff;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                diff = Output[x] ^ Output[y];</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                diff &amp;= Condition[CondOffset];</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                ++CondOffset;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;                Output[x] ^= diff;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;                Output[y] ^= diff;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;                x += (1 &lt;&lt; (Low + 1));</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;                y += (1 &lt;&lt; (Low + 1));</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;            }</div>
@@ -242,7 +242,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    }</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ArrayA, <span class="keyword">typename</span> ArrayB&gt;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> CMov(ArrayB &amp;Input, ArrayA &amp;Output, ulong Mask)</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keyword">inline</span> <span class="keyword">static</span> <span class="keywordtype">void</span> CMov(<span class="keyword">const</span> ArrayB &amp;Input, ArrayA &amp;Output, ulong Mask)</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    {</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; Output.size(); i++)</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        {</div>
@@ -270,7 +270,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    }</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
 <div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> ArrayA, <span class="keyword">typename</span> ArrayB&gt;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Multiply(ArrayA &amp;Output, ArrayA &amp;A, <span class="keyword">const</span> ArrayB &amp;B)</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Multiply(ArrayA &amp;Output, <span class="keyword">const</span> ArrayA &amp;A, <span class="keyword">const</span> ArrayB &amp;B)</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    {</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        ulong t1 = A[11] &amp; B[11];</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        ulong t2 = A[11] &amp; B[9];</div>
@@ -481,8 +481,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        ulong t207 = t196 ^ t155;</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        ulong t208 = t197 ^ t143;</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> OUTSZE = Output.size();</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        std::vector&lt;ulong&gt; sum(2 * OUTSZE - 1);</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> OUTLEN = Output.size();</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;        std::vector&lt;ulong&gt; sum(2 * OUTLEN - 1);</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;        sum[0] = t48;</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        sum[1] = t49;</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        sum[2] = t51;</div>
@@ -507,13 +507,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        sum[21] = t13;</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        sum[22] = t1;</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 2 * OUTSZE - 2; i &gt;= OUTSZE; i--)</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 2 * OUTLEN - 2; i &gt;= OUTLEN; i--)</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        {</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;            sum[i - 9] ^= sum[i];</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;            sum[i - OUTSZE] ^= sum[i];</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;            sum[i - OUTLEN] ^= sum[i];</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;        }</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        std::memcpy(&amp;Output[0], &amp;sum[0], OUTSZE * <span class="keyword">sizeof</span>(ulong));</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        std::memcpy(&amp;Output[0], &amp;sum[0], OUTLEN * <span class="keyword">sizeof</span>(ulong));</div>
 <div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    }</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Array&gt;</div>
@@ -530,7 +530,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    }</div>
 <div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;</div>
 <div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Array&gt;</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keyword">static</span> ushort Reduce(Array &amp;Product, <span class="keyword">const</span> <span class="keywordtype">size_t</span> Degree)</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keyword">static</span> ushort Reduce(<span class="keyword">const</span> Array &amp;Product, <span class="keyword">const</span> <span class="keywordtype">size_t</span> Degree)</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    {</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;        ushort ret = 0;</div>
 <div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <span class="keywordtype">int</span> i = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(Degree - 1);</div>
@@ -654,7 +654,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;    }</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Array&gt;</div>
-<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> Weight(Array &amp;A)</div>
+<div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> Weight(Array &amp;Input)</div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    {</div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;        <span class="keywordtype">size_t</span> i;</div>
 <div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;        std::array&lt;ulong, 8&gt; state;</div>
@@ -662,7 +662,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;</div>
 <div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        <span class="keywordflow">for</span> (i = 0; i &lt; 64; i++)</div>
 <div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;        {</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;            AddCarry(state, A[i]);</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;            AddCarry(state, Input[i]);</div>
 <div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;        }</div>
 <div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;</div>
 <div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        Transpose8x64(state);</div>

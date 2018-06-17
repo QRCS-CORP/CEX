@@ -56,7 +56,7 @@ void NTRULQ4591N761::Encrypt(std::vector<byte> &Secret, std::vector<byte> &Ciphe
 {
 	std::vector<byte> r(NTRU_SEED_SIZE);
 
-	Rng->GetBytes(r);
+	Rng->Generate(r);
 	Hide(CipherText, Secret, PublicKey, 0, r);
 }
 
@@ -68,8 +68,8 @@ void NTRULQ4591N761::Generate(std::vector<byte> &PublicKey, std::vector<byte> &P
 	std::vector<byte> k1(NTRU_SEED_SIZE);
 	std::vector<byte> k2(NTRU_SEED_SIZE);
 
-	Rng->GetBytes(k1);
-	Rng->GetBytes(k2);
+	Rng->Generate(k1);
+	Rng->Generate(k2);
 
 	RqFromSeed(G, k1, 0);
 	SeededWeightW(a, k2);
@@ -366,7 +366,7 @@ void NTRULQ4591N761::SeededWeightW(std::array<int8_t, NTRU_P> &F, const std::vec
 	Utility::MemUtils::Copy(K, 0, tmpK, 0, NTRU_SEED_SIZE);
 	
 	Prng::CSR rng(tmpK);
-	rng.GetBytes(tmpR);
+	rng.Generate(tmpR);
 	Utility::MemUtils::Copy(tmpR, 0, r, 0, tmpR.size());
 
 	for (i = 0; i < NTRU_P; ++i)

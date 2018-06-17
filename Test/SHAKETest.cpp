@@ -119,6 +119,7 @@ namespace Test
 
 	void SHAKETest::Initialize()
 	{
+		/*lint -save -e417 */
 		/*lint -save -e146 */
 		HexConverter::Decode(std::string("456D61696C205369676E6174757265"), m_custom);
 

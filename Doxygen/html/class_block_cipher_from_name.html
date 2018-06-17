@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -101,17 +101,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:afce566102143eb1a5a14643c37f6fbc3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_block_cipher_from_name.html#afce566102143eb1a5a14643c37f6fbc3">GetInstance</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> BlockCipherType, <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType=Digests::SHA256)</td></tr>
-<tr class="memdesc:afce566102143eb1a5a14643c37f6fbc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a symmetric block cipher instance.  <a href="#afce566102143eb1a5a14643c37f6fbc3">More...</a><br /></td></tr>
-<tr class="separator:afce566102143eb1a5a14643c37f6fbc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae01e78af2519b230678e9f12b6e7c778"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_block_cipher_from_name.html#ae01e78af2519b230678e9f12b6e7c778">GetInstance</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> BlockCipherType, <a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType, uint RoundCount)</td></tr>
-<tr class="memdesc:ae01e78af2519b230678e9f12b6e7c778"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a symmetric block cipher instance with initialization parameters.  <a href="#ae01e78af2519b230678e9f12b6e7c778">More...</a><br /></td></tr>
-<tr class="separator:ae01e78af2519b230678e9f12b6e7c778"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16d5d3d86f7959d96c082956d2c6a651"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_block_cipher_from_name.html#a16d5d3d86f7959d96c082956d2c6a651">GetInstance</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> CipherType, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None)</td></tr>
+<tr class="memdesc:a16d5d3d86f7959d96c082956d2c6a651"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a symmetric block cipher instance.  <a href="#a16d5d3d86f7959d96c082956d2c6a651">More...</a><br /></td></tr>
+<tr class="separator:a16d5d3d86f7959d96c082956d2c6a651"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Get a Block Cipher instance from it's enumeration name. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="afce566102143eb1a5a14643c37f6fbc3"></a>
+<a class="anchor" id="a16d5d3d86f7959d96c082956d2c6a651"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -122,13 +119,13 @@ Static Public Member Functions</h2></td></tr>
           <td class="memname">NAMESPACE_HELPER <a class="el" href="class_i_block_cipher.html">IBlockCipher</a> * BlockCipherFromName::GetInstance </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>BlockCipherType</em>, </td>
+          <td class="paramname"><em>CipherType</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td>
-          <td class="paramname"><em>DigestType</em> = <code>Digests::SHA256</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -144,69 +141,11 @@ Static Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get a symmetric block cipher instance. </p>
-<p>If an extended (AHX/RHX, SHX, or THX) block cipher type is selected, the default key-schedule hash engine is SHA2-256. Selecting a root cipher type (Rijndael, Serpent, or Twofish), will return a standard cipher configuration.</p>
+<p>If an extended (AHX/RHX, SHX, or THX) block cipher type is selected, the default key-schedule hash engine is None which involes the standard cipher.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">BlockCipherType</td><td>The block cipher enumeration name</td></tr>
-    <tr><td class="paramname">DigestType</td><td>The [optional] (HX) extended ciphers HKDF hash engine; the default is SHA256.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A symmetric block cipher instance</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoException</td><td>Thrown if the enumeration name is not supported</td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="ae01e78af2519b230678e9f12b6e7c778"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_i_block_cipher.html">IBlockCipher</a> * BlockCipherFromName::GetInstance </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>BlockCipherType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a>&#160;</td>
-          <td class="paramname"><em>DigestType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint&#160;</td>
-          <td class="paramname"><em>RoundCount</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Get a symmetric block cipher instance with initialization parameters. </p>
-<p>Selecting a root cipher type (Rijndael, Serpent, or Twofish), will return a standard cipher configuration.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">BlockCipherType</td><td>The symmetric block ciphers enumeration type name</td></tr>
-    <tr><td class="paramname">RoundCount</td><td>The symmetric ciphers transformation rounds count; requires DigestType set to a supported digest type</td></tr>
-    <tr><td class="paramname">DigestType</td><td>The extended (HX) ciphers HKDF key expansion digest engine type; set to None for standard key schedule, select a digest for secure key expansion mode</td></tr>
+    <tr><td class="paramname">CipherType</td><td>The block cipher enumeration name</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
   </table>
   </dd>
 </dl>
@@ -221,8 +160,8 @@ Static Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_block_cipher_from_name_8h_source.html">BlockCipherFromName.h</a></li>
-<li>CEX/BlockCipherFromName.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_block_cipher_from_name_8h_source.html">BlockCipherFromName.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/BlockCipherFromName.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

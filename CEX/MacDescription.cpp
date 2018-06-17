@@ -8,66 +8,39 @@ NAMESPACE_PROCESSING
 
 MacDescription::MacDescription()
 	:
-	m_macType(0),
-	m_keySize(0),
-	m_ivSize(0),
-	m_hmacEngine(0),
-	m_engineType(0),
-	m_blockSize(0),
-	m_roundCount(0),
-	m_kdfEngine(0)
+	m_blockCipher(0),
+	m_cipherExtension(0),
+	m_macDigest(0),
+	m_macType(0)
 {
 }
 
-MacDescription::MacDescription(Macs MacType, short KeySize, byte IvSize, Digests HmacEngine, BlockCiphers EngineType, 
-	BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
+MacDescription::MacDescription(Macs MacType, BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
+	:
+	m_blockCipher(static_cast<byte>(CipherType)),
+	m_cipherExtension(static_cast<byte>(CipherExtensionType)),
+	m_macDigest(0),
+	m_macType(static_cast<byte>(MacType))
 {
-	m_macType = static_cast<byte>(MacType);
-	m_keySize = KeySize;
-	m_ivSize = IvSize;
-	m_hmacEngine = static_cast<byte>(HmacEngine);
-	m_engineType = static_cast<byte>(EngineType);
-	m_blockSize = static_cast<byte>(BlockSize);
-	m_roundCount = static_cast<byte>(RoundCount);
-	m_kdfEngine = static_cast<byte>(KdfEngine);
 }
 
-MacDescription::MacDescription(uint KeySize, Digests HmacEngine)
+MacDescription::MacDescription(Macs MacType, Digests MacDigestType)
+	:
+	m_blockCipher(0),
+	m_cipherExtension(0),
+	m_macDigest(static_cast<byte>(MacDigestType)),
+	m_macType(static_cast<byte>(MacType))
 {
-	m_macType = static_cast<byte>(Macs::HMAC);
-	m_keySize = KeySize;
-	m_hmacEngine = static_cast<byte>(HmacEngine);
-	m_ivSize = 0;
-	m_engineType = 0;
-	m_blockSize = 0;
-	m_roundCount = 0;
-	m_kdfEngine = 0;
-}
-
-MacDescription::MacDescription(short KeySize, BlockCiphers EngineType, IVSizes IvSize, BlockSizes BlockSize, RoundCounts RoundCount, Digests KdfEngine)
-{
-	m_macType = static_cast<byte>(Macs::CMAC);
-	m_keySize = KeySize;
-	m_ivSize = static_cast<byte>(IvSize);
-	m_hmacEngine = 0;
-	m_engineType = static_cast<byte>(EngineType);
-	m_blockSize = static_cast<byte>(BlockSize);
-	m_roundCount = static_cast<byte>(RoundCount);
-	m_kdfEngine = static_cast<byte>(KdfEngine);
 }
 
 MacDescription::MacDescription(const MemoryStream &DescriptionStream)
 {
 	IO::StreamReader reader(DescriptionStream);
 
+	m_blockCipher = reader.ReadByte();
+	m_cipherExtension = reader.ReadByte();
+	m_macDigest = reader.ReadByte();
 	m_macType = reader.ReadByte();
-	m_keySize = reader.ReadInt<short>();
-	m_ivSize = reader.ReadByte();
-	m_hmacEngine = reader.ReadByte();
-	m_engineType = reader.ReadByte();
-	m_blockSize = reader.ReadByte();
-	m_roundCount = reader.ReadByte();
-	m_kdfEngine = reader.ReadByte();
 }
 
 MacDescription::MacDescription(const std::vector<byte> &DescriptionArray)
@@ -75,46 +48,27 @@ MacDescription::MacDescription(const std::vector<byte> &DescriptionArray)
 	MemoryStream ms(DescriptionArray);
 	IO::StreamReader reader(ms);
 
+	m_blockCipher = reader.ReadByte();
+	m_cipherExtension = reader.ReadByte();
+	m_macDigest = reader.ReadByte();
 	m_macType = reader.ReadByte();
-	m_keySize = reader.ReadInt<short>();
-	m_ivSize = reader.ReadByte();
-	m_hmacEngine = reader.ReadByte();
-	m_engineType = reader.ReadByte();
-	m_blockSize = reader.ReadByte();
-	m_roundCount = reader.ReadByte();
-	m_kdfEngine = reader.ReadByte();
 }
 
 //~~~Accessors~~~//
 
-const BlockSizes MacDescription::BlockSize() 
+const BlockCipherExtensions MacDescription::CipherExtension()
 {
-	return static_cast<BlockSizes>(m_blockSize);
+	return static_cast<BlockCipherExtensions>(m_cipherExtension);
 }
 
-const BlockCiphers MacDescription::EngineType() 
+const BlockCiphers MacDescription::CipherType() 
 { 
-	return static_cast<BlockCiphers>(m_engineType); 
+	return static_cast<BlockCiphers>(m_blockCipher);
 }
 
-const Digests MacDescription::HmacEngine() 
+const Digests MacDescription::MacDigest() 
 { 
-	return static_cast<Digests>(m_hmacEngine); 
-}
-
-const IVSizes MacDescription::IvSize() 
-{ 
-	return static_cast<IVSizes>(m_ivSize); 
-}
-
-const Digests MacDescription::KdfEngine()
-{
-	return static_cast<Digests>(m_kdfEngine);
-}
-
-const short MacDescription::KeySize() 
-{ 
-	return m_keySize;
+	return static_cast<Digests>(m_macDigest);
 }
 
 const Macs MacDescription::MacType()
@@ -122,27 +76,7 @@ const Macs MacDescription::MacType()
 	return static_cast<Macs>(m_macType);
 }
 
-const RoundCounts MacDescription::RoundCount() 
-{ 
-	return static_cast<RoundCounts>(m_roundCount);
-}
-
 //~~~Presets~~~//
-
-MacDescription MacDescription::HMACSHA256()
-{
-	return MacDescription(64, Digests::SHA256);
-}
-
-MacDescription MacDescription::HMACSHA512()
-{
-	return MacDescription(128, Digests::SHA512);
-}
-
-MacDescription MacDescription::CMACAES256()
-{
-	return MacDescription(32, BlockCiphers::Rijndael, IVSizes::V128);
-}
 
 int MacDescription::GetHeaderSize()
 {
@@ -158,58 +92,42 @@ bool MacDescription::Equals(MacDescription &Input)
 
 int MacDescription::GetHashCode()
 {
-	int hash = 31 * m_macType;
-	hash += 31 * m_keySize;
-	hash += 31 * m_ivSize;
-	hash += 31 * m_hmacEngine;
-	hash += 31 * m_engineType;
-	hash += 31 * m_blockSize;
-	hash += 31 * m_roundCount;
-	hash += 31 * m_kdfEngine;
+	int hash = 31 * m_blockCipher;
+	hash += 31 * m_cipherExtension;
+	hash += 31 * m_macDigest;
+	hash += 31 * m_macType;
 
 	return hash;
 }
 
 void MacDescription::Reset()
 {
+	m_blockCipher = 0;
+	m_cipherExtension = 0;
+	m_macDigest = 0;
 	m_macType = 0;
-	m_keySize = 0;
-	m_ivSize = 0;
-	m_hmacEngine = 0;
-	m_engineType = 0;
-	m_blockSize = 0;
-	m_roundCount = 0;
-	m_kdfEngine = 0;
 }
 
 std::vector<byte> MacDescription::ToBytes()
 {
 	IO::StreamWriter writer(GetHeaderSize());
 
+	writer.Write(m_blockCipher);
+	writer.Write(m_cipherExtension);
+	writer.Write(m_macDigest);
 	writer.Write(m_macType);
-	writer.Write<short>(m_keySize);
-	writer.Write(m_ivSize);
-	writer.Write(m_hmacEngine);
-	writer.Write(m_engineType);
-	writer.Write(m_blockSize);
-	writer.Write(m_roundCount);
-	writer.Write(m_kdfEngine);
 
-	return writer.GetBytes();
+	return writer.Generate();
 }
 
 IO::MemoryStream* MacDescription::ToStream()
 {
 	IO::StreamWriter writer(GetHeaderSize());
 
+	writer.Write(m_blockCipher);
+	writer.Write(m_cipherExtension);
+	writer.Write(m_macDigest);
 	writer.Write(m_macType);
-	writer.Write<short>(m_keySize);
-	writer.Write(m_ivSize);
-	writer.Write(m_hmacEngine);
-	writer.Write(m_engineType);
-	writer.Write(m_blockSize);
-	writer.Write(m_roundCount);
-	writer.Write(m_kdfEngine);
 
 	return writer.GetStream();
 }

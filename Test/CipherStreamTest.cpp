@@ -1013,7 +1013,7 @@ namespace Test
 			Data.resize(blkSze);
 		}
 
-		rng.GetBytes(Data);
+		rng.Generate(Data);
 		return (int)Data.size();
 	}
 

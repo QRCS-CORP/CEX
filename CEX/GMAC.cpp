@@ -9,9 +9,9 @@ const std::string GMAC::CLASS_NAME("GMAC");
 
 //~~~Constructor~~~//
 
-GMAC::GMAC(BlockCiphers CipherType)
+GMAC::GMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
 	:
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType) : 
+	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) :
 		throw CryptoMacException("GMAC:CTor", "The Cipher type can not be none!")),
 	m_cipherType(CipherType),
 	m_destroyEngine(true),

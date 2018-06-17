@@ -67,7 +67,7 @@ public:
 	/// </summary>
 	///
 	/// <param name="Output">The output array to fill</param>
-	virtual void GetBytes(std::vector<byte> &Output) = 0;
+	virtual void Generate(std::vector<byte> &Output) = 0;
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes using offsets
@@ -76,7 +76,7 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
-	virtual void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
+	virtual void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) = 0;
 
 	/// <summary>
 	/// Return an array with pseudo-random bytes
@@ -85,12 +85,28 @@ public:
 	/// <param name="Length">The size of the expected array returned</param>
 	/// 
 	/// <returns>An array of pseudo-random of bytes</returns>
-	virtual std::vector<byte> GetBytes(size_t Length) = 0;
+	virtual std::vector<byte> Generate(size_t Length) = 0;
 
 	/// <summary>
-	/// Returns a pseudo-random unsigned 32bit integer
+	/// Get a pseudo random unsigned 16bit integer
 	/// </summary>
-	virtual uint Next() = 0;
+	/// 
+	/// <returns>Random UInt16</returns>
+	virtual ushort NextUInt16() = 0;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 32bit integer
+	/// </summary>
+	/// 
+	/// <returns>Random UInt32</returns>
+	virtual uint NextUInt32() = 0;
+
+	/// <summary>
+	/// Get a pseudo random unsigned 64bit integer
+	/// </summary>
+	/// 
+	/// <returns>Random UInt64</returns>
+	virtual ulong NextUInt64() = 0;
 
 	/// <summary>
 	/// Reset the internal state

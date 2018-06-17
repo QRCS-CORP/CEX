@@ -130,7 +130,6 @@ void CipherStream::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 
 	try
 	{
-
 		m_cipherEngine->ParallelProfile().IsParallel() = m_isParallel;
 		m_cipherEngine->Initialize(Encryption, KeyParams);
 
@@ -181,7 +180,9 @@ void CipherStream::Write(const std::vector<byte> &Input, size_t InOffset, std::v
 void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 {
 	const size_t INPLEN = Input.size() - InOffset;
-	size_t prcLen = 0;
+	size_t prcLen;
+
+	prcLen = 0;
 
 	if (m_isParallel)
 	{
@@ -269,10 +270,13 @@ void CipherStream::BlockTransform(const std::vector<byte> &Input, size_t InOffse
 void CipherStream::BlockTransform(IByteStream* InStream, IByteStream* OutStream)
 {
 	const size_t INPLEN = InStream->Length() - InStream->Position();
-	size_t prcLen = 0;
-	size_t prcRead = 0;
+	size_t prcLen;
+	size_t prcRead;
 	std::vector<byte> inpBuffer(0);
 	std::vector<byte> outBuffer(0);
+
+	prcLen = 0;
+	prcRead = 0;
 
 	if (m_isParallel)
 	{

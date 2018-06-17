@@ -11,17 +11,17 @@ const std::string KMAC::CLASS_NAME("KMAC");
 
 //~~~Constructor~~~//
 
-KMAC::KMAC(ShakeModes ShakeMode)
+KMAC::KMAC(ShakeModes ShakeModeType)
 	:
-	m_blockSize((ShakeMode == ShakeModes::SHAKE128) ? 168 : (ShakeMode == ShakeModes::SHAKE256) ? 136 : 72),
+	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_distributionCode { 0x4B, 0x4D, 0x41, 0x43 },
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
-	m_macSize((ShakeMode == ShakeModes::SHAKE128) ? 16 : (ShakeMode == ShakeModes::SHAKE256) ? 32 :
-		(ShakeMode == ShakeModes::SHAKE512) ? 64 : 128),
+	m_macSize((ShakeModeType == ShakeModes::SHAKE128) ? 16 : (ShakeModeType == ShakeModes::SHAKE256) ? 32 :
+		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
 	m_msgLength(0),
-	m_shakeMode(ShakeMode != ShakeModes::None ? ShakeMode :
+	m_shakeMode(ShakeModeType != ShakeModes::None ? ShakeModeType :
 		throw CryptoMacException("KMAC:Ctor", "The SHAKE mode type can not ne none!"))
 {
 	Scope();

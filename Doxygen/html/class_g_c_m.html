@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -120,9 +120,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad78b469a8e030a2c7a7354b7200b5a7b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#ad78b469a8e030a2c7a7354b7200b5a7b">GCM</a> ()=delete</td></tr>
 <tr class="memdesc:ad78b469a8e030a2c7a7354b7200b5a7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#ad78b469a8e030a2c7a7354b7200b5a7b">More...</a><br /></td></tr>
 <tr class="separator:ad78b469a8e030a2c7a7354b7200b5a7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9915fb4b61c46bf690e83c714e3d6a63"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#a9915fb4b61c46bf690e83c714e3d6a63">GCM</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_g_c_m.html#a55575bab59f504bff61044b7a2c07ab0">CipherType</a>)</td></tr>
-<tr class="memdesc:a9915fb4b61c46bf690e83c714e3d6a63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name.  <a href="#a9915fb4b61c46bf690e83c714e3d6a63">More...</a><br /></td></tr>
-<tr class="separator:a9915fb4b61c46bf690e83c714e3d6a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73ed6cdc8cff880e0f6f627b7a174674"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#a73ed6cdc8cff880e0f6f627b7a174674">GCM</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_g_c_m.html#a55575bab59f504bff61044b7a2c07ab0">CipherType</a>, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None)</td></tr>
+<tr class="memdesc:a73ed6cdc8cff880e0f6f627b7a174674"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher type name.  <a href="#a73ed6cdc8cff880e0f6f627b7a174674">More...</a><br /></td></tr>
+<tr class="separator:a73ed6cdc8cff880e0f6f627b7a174674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c84bd241ea07dc40a313001a18ff876"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_g_c_m.html#a1c84bd241ea07dc40a313001a18ff876">GCM</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher)</td></tr>
 <tr class="memdesc:a1c84bd241ea07dc40a313001a18ff876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the Cipher Mode using a block cipher instance  <a href="#a1c84bd241ea07dc40a313001a18ff876">More...</a><br /></td></tr>
 <tr class="separator:a1c84bd241ea07dc40a313001a18ff876"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -292,13 +292,13 @@ Calling the Finalize(Output, Offset, Length) function writes the MAC code to the
 <li>
 The Verify(Input, Offset, Length) function can be used to compare the MAC code embedded with the cipher-text to the internal MAC code generated after a Decryption cycle. </li>
 <li>
-Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and multi-threaded. </li>
+Encryption and decryption can both be pipelined (SSE3-128 or AVX-256), and optionally multi-threaded. </li>
 <li>
 If the system supports Parallel processing, and IsParallel() is set to true; passing an input block of ParallelBlockSize() to the transform will be auto parallelized. </li>
 <li>
-ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
+ParallelBlockSize() is calculated automatically based on the processor(s) L1 data cache size and available threads, this property can be user defined, and must be evenly divisible by ParallelMinimumSize(). </li>
 <li>
-The ParallelBlockSize() can be changed through the ParallelProfile() property </li>
+The ParallelBlockSize() can be changed through the ParallelProfile() accessor property </li>
 <li>
 Parallel block calculation ex. <code>ParallelBlockSize = N - (N % ParallelMinimumSize);</code> </li>
 </ul>
@@ -362,7 +362,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 
 </div>
 </div>
-<a class="anchor" id="a9915fb4b61c46bf690e83c714e3d6a63"></a>
+<a class="anchor" id="a73ed6cdc8cff880e0f6f627b7a174674"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -373,8 +373,18 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
           <td class="memname">GCM::GCM </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em></td><td>)</td>
+          <td class="paramname"><em>CipherType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -389,6 +399,7 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherType</td><td>The enumeration name of the block cipher</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
   </table>
   </dd>
 </dl>
@@ -1481,9 +1492,9 @@ RFC 5116: <a href="https://tools.ietf.org/html/rfc5116">An Interface and Algorit
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_g_c_m_8h_source.html">GCM.h</a></li>
-<li>CEX/GCM.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_g_c_m_8h_source.html">GCM.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/GCM.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

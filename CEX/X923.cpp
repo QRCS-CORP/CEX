@@ -38,7 +38,7 @@ size_t X923::AddPadding(std::vector<byte> &Input, size_t Offset)
 	{
 		std::vector<byte> data(INPLEN);
 		Provider::CSP rnd;
-		rnd.GetBytes(data);
+		rnd.Generate(data);
 		Utility::MemUtils::Copy(data, 0, Input, Offset, INPLEN);
 	}
 

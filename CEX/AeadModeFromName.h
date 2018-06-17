@@ -24,26 +24,26 @@ class AeadModeFromName
 {
 public:
 	/// <summary>
-	/// Get an Cipher Mode instance by name using default parameters
+	/// Get an uninitialized AEAD mode instance by name
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The block cipher enumeration name</param>
+	/// <param name="CipherType">The block-cipher enumeration name</param>
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
-	/// <param name="CipherModeType">The cipher mode enumeration name</param>
+	/// <param name="CipherModeType">The AEAD cipher-mode enumeration name</param>
 	/// 
-	/// <returns>An uninitialized block cipher mode instance</returns>
+	/// <returns>An uninitialized AEAD block-cipher mode instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
 	static IAeadMode* GetInstance(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, AeadModes CipherModeType);
 
 	/// <summary>
-	/// Get an Cipher Mode instance by name using default parameters
+	/// Get an uninitialized AEAD mode instance by name and a block-cipher pointer
 	/// </summary>
 	/// 
-	/// <param name="CipherType">The AEAD cipher mode enumeration name</param>
-	/// <param name="Engine">The block cipher instance</param>
+	/// <param name="Cipher">The block-cipher instance</param>
+	/// <param name="CipherModeType">The AEAD cipher-mode enumeration name</param>
 	/// 
-	/// <returns>A block cipher mode instance</returns>
+	/// <returns>An uninitialized AEAD block-cipher mode instance</returns>
 	/// 
 	/// <exception cref="Exception::CryptoException">Thrown if the enumeration name is not supported</exception>
 	static IAeadMode* GetInstance(IBlockCipher* Cipher, AeadModes CipherModeType);

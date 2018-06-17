@@ -99,7 +99,7 @@ public:
 	/// <param name="Secret">The shared secret message output</param>
 	/// <param name="CipherText">The ciphertext output</param>
 	/// <param name="PublicKey">The public asymmetric key</param>
-	/// <param name="Coin">The random provider</param>
+	/// <param name="Rng">The random provider</param>
 	static void Encrypt(std::vector<byte> &Secret, std::vector<byte> &CipherText, const std::vector<byte> &PublicKey, std::unique_ptr<Prng::IPrng> &Rng);
 
 	/// <summary>

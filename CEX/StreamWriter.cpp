@@ -45,7 +45,7 @@ const size_t StreamWriter::Position()
 
 //~~~Public Functions~~~//
 
-std::vector<byte> &StreamWriter::GetBytes()
+std::vector<byte> &StreamWriter::Generate()
 {
 	return m_streamState;
 }

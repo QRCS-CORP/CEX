@@ -38,7 +38,7 @@ PROJECT_NAME           = CEX++
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 1.0.0.5
+PROJECT_NUMBER         = 1.0.0.6
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -58,7 +58,7 @@ PROJECT_LOGO           = C:/Users/John/Documents/Websites/Websites/VTDev/CEX-Plu
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = Doxygen
+OUTPUT_DIRECTORY       = .
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -768,7 +768,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = CEX
+INPUT                  = ../CEX
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1143,7 +1143,7 @@ HTML_FOOTER            =
 # obsolete.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_STYLESHEET        = ../../../../Websites/Websites/VTDev/CEX-Plus/doxygen.css
+HTML_STYLESHEET        = ../../../../../../Websites/Websites/VTDev/CEX-Plus/doxygen.css
 
 # The HTML_EXTRA_STYLESHEET tag can be used to specify additional user-defined
 # cascading style sheets that are included after the standard style sheets
@@ -1170,7 +1170,8 @@ HTML_EXTRA_FILES       = ../../../../Websites/Websites/VTDev/CEX-Plus/tab_a.png 
                          ../../../../Websites/Websites/VTDev/CEX-Plus/tab_b.png \
                          ../../../../Websites/Websites/VTDev/CEX-Plus/tab_h.png \
                          ../../../../Websites/Websites/VTDev/CEX-Plus/tab_s.png \
-                         ../../../../Websites/Websites/VTDev/CEX-Plus/tabs.css
+                         ../../../../Websites/Websites/VTDev/CEX-Plus/tabs.css \
+                         ../../../../../../Websites/Websites/VTDev/CEX-Plus/tab_a.png
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to

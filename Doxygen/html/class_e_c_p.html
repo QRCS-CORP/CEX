@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -131,18 +131,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac0e7e1820540a1b6c7e346e6248c9d97"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#ac0e7e1820540a1b6c7e346e6248c9d97">Name</a> () override</td></tr>
 <tr class="memdesc:ac0e7e1820540a1b6c7e346e6248c9d97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The provider class name  <a href="#ac0e7e1820540a1b6c7e346e6248c9d97">More...</a><br /></td></tr>
 <tr class="separator:ac0e7e1820540a1b6c7e346e6248c9d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e32afdac419a9135b244ed53016a3d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#a7e32afdac419a9135b244ed53016a3d4">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
-<tr class="memdesc:a7e32afdac419a9135b244ed53016a3d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#a7e32afdac419a9135b244ed53016a3d4">More...</a><br /></td></tr>
-<tr class="separator:a7e32afdac419a9135b244ed53016a3d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3115213c97314699a8aba48251db11a2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#a3115213c97314699a8aba48251db11a2">GetBytes</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
-<tr class="memdesc:a3115213c97314699a8aba48251db11a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a3115213c97314699a8aba48251db11a2">More...</a><br /></td></tr>
-<tr class="separator:a3115213c97314699a8aba48251db11a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7fb24c48fd0948e377bd0a316b447eb3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#a7fb24c48fd0948e377bd0a316b447eb3">GetBytes</a> (size_t Length) override</td></tr>
-<tr class="memdesc:a7fb24c48fd0948e377bd0a316b447eb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a7fb24c48fd0948e377bd0a316b447eb3">More...</a><br /></td></tr>
-<tr class="separator:a7fb24c48fd0948e377bd0a316b447eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad90f83ded5718e79944ec827cbb8af09"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#ad90f83ded5718e79944ec827cbb8af09">Next</a> () override</td></tr>
-<tr class="memdesc:ad90f83ded5718e79944ec827cbb8af09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pseudo-random unsigned 32bit integer  <a href="#ad90f83ded5718e79944ec827cbb8af09">More...</a><br /></td></tr>
-<tr class="separator:ad90f83ded5718e79944ec827cbb8af09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab21b946d8f235fbe1fc81acac8b0fb30"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#ab21b946d8f235fbe1fc81acac8b0fb30">Generate</a> (std::vector&lt; byte &gt; &amp;Output) override</td></tr>
+<tr class="memdesc:ab21b946d8f235fbe1fc81acac8b0fb30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a buffer with pseudo-random bytes  <a href="#ab21b946d8f235fbe1fc81acac8b0fb30">More...</a><br /></td></tr>
+<tr class="separator:ab21b946d8f235fbe1fc81acac8b0fb30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e52cbb31b783e97b403902b2158fab3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#a0e52cbb31b783e97b403902b2158fab3">Generate</a> (std::vector&lt; byte &gt; &amp;Output, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a0e52cbb31b783e97b403902b2158fab3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the buffer with pseudo-random bytes using offsets  <a href="#a0e52cbb31b783e97b403902b2158fab3">More...</a><br /></td></tr>
+<tr class="separator:a0e52cbb31b783e97b403902b2158fab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38a9727ab889e6d056ed1add5c153397"><td class="memItemLeft" align="right" valign="top">std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#a38a9727ab889e6d056ed1add5c153397">Generate</a> (size_t Length) override</td></tr>
+<tr class="memdesc:a38a9727ab889e6d056ed1add5c153397"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an array with pseudo-random bytes  <a href="#a38a9727ab889e6d056ed1add5c153397">More...</a><br /></td></tr>
+<tr class="separator:a38a9727ab889e6d056ed1add5c153397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad02031ad0ef68064f79b61ccacc7ecd5"><td class="memItemLeft" align="right" valign="top">ushort&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#ad02031ad0ef68064f79b61ccacc7ecd5">NextUInt16</a> () override</td></tr>
+<tr class="memdesc:ad02031ad0ef68064f79b61ccacc7ecd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 16bit integer  <a href="#ad02031ad0ef68064f79b61ccacc7ecd5">More...</a><br /></td></tr>
+<tr class="separator:ad02031ad0ef68064f79b61ccacc7ecd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf3505f50612965ff27bf2c7e09c2dba"><td class="memItemLeft" align="right" valign="top">uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#abf3505f50612965ff27bf2c7e09c2dba">NextUInt32</a> () override</td></tr>
+<tr class="memdesc:abf3505f50612965ff27bf2c7e09c2dba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 32bit integer  <a href="#abf3505f50612965ff27bf2c7e09c2dba">More...</a><br /></td></tr>
+<tr class="separator:abf3505f50612965ff27bf2c7e09c2dba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b684d342b6c4673cc1a03b6bb24edc8"><td class="memItemLeft" align="right" valign="top">ulong&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#a9b684d342b6c4673cc1a03b6bb24edc8">NextUInt64</a> () override</td></tr>
+<tr class="memdesc:a9b684d342b6c4673cc1a03b6bb24edc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a pseudo random unsigned 64bit integer  <a href="#a9b684d342b6c4673cc1a03b6bb24edc8">More...</a><br /></td></tr>
+<tr class="separator:a9b684d342b6c4673cc1a03b6bb24edc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad46933ce3810f225806f589747e83fa8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_e_c_p.html#ad46933ce3810f225806f589747e83fa8">Reset</a> () override</td></tr>
 <tr class="memdesc:ad46933ce3810f225806f589747e83fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal state  <a href="#ad46933ce3810f225806f589747e83fa8">More...</a><br /></td></tr>
 <tr class="separator:ad46933ce3810f225806f589747e83fa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -165,7 +171,7 @@ Public Member Functions</h2></td></tr>
 <p>Note* This class has only been tested in Windows, other operating systems currently have limited support.</p>
 <p>Example of getting a seed value: </p><div class="fragment"><div class="line">std:vector&lt;byte&gt; output(32);</div>
 <div class="line"><a class="code" href="class_e_c_p.html">ECP</a> gen;</div>
-<div class="line">gen.<a class="code" href="class_e_c_p.html#a7e32afdac419a9135b244ed53016a3d4">GetBytes</a>(output);</div>
+<div class="line">gen.<a class="code" href="class_e_c_p.html#ab21b946d8f235fbe1fc81acac8b0fb30">Generate</a>(output);</div>
 </div><!-- fragment --> <p>The Entropy Collection Provider is a two stage entropy provider; it first collects system sources of entropy, and then uses them to initialize a block cipher CTR generator. <br />
  The first stage collects numerous caches of low entropy states; high-resolution timers, process and thread ids, the system random provider, and statistics for various hardware devices and system operations. <br />
 These sources of entropy are compressed using Keccak to create a 512 bit cipher key. The key initializes an (HX extended) instance of Rijndael using 38 rounds and an HKDF(SHA512) key schedule. <br />
@@ -280,7 +286,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
 
 </div>
 </div>
-<a class="anchor" id="a7e32afdac419a9135b244ed53016a3d4"></a>
+<a class="anchor" id="ab21b946d8f235fbe1fc81acac8b0fb30"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -288,7 +294,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void ECP::GetBytes </td>
+          <td class="memname">void ECP::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em></td><td>)</td>
@@ -316,11 +322,11 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#a163a0e0ec3e495eca12171945075f420">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ab60fe67b92050cea64a2c2b4c2b8e315">IProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3115213c97314699a8aba48251db11a2"></a>
+<a class="anchor" id="a0e52cbb31b783e97b403902b2158fab3"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -328,7 +334,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void ECP::GetBytes </td>
+          <td class="memname">void ECP::Generate </td>
           <td>(</td>
           <td class="paramtype">std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>Output</em>, </td>
@@ -374,11 +380,11 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#a928d988a126cb4e15d845c2f23131764">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#aa3319763559f1ae3bd8aca8d3f5782b8">IProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a7fb24c48fd0948e377bd0a316b447eb3"></a>
+<a class="anchor" id="a38a9727ab889e6d056ed1add5c153397"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -386,7 +392,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; byte &gt; ECP::GetBytes </td>
+          <td class="memname">std::vector&lt; byte &gt; ECP::Generate </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>Length</em></td><td>)</td>
@@ -415,7 +421,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#aa71f74af38ff2d7c7dbc0d3236ff1e71">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#ac6803538a8832d5abeee53b877367b81">IProvider</a>.</p>
 
 </div>
 </div>
@@ -473,7 +479,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
 
 </div>
 </div>
-<a class="anchor" id="ad90f83ded5718e79944ec827cbb8af09"></a>
+<a class="anchor" id="ad02031ad0ef68064f79b61ccacc7ecd5"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -481,7 +487,7 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">uint ECP::Next </td>
+          <td class="memname">ushort ECP::NextUInt16 </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -494,16 +500,66 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
 </table>
 </div><div class="memdoc">
 
-<p>Returns a pseudo-random unsigned 32bit integer </p>
-<dl class="section return"><dt>Returns</dt><dd>A pseudo random 32bit unsigned integer</dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Exception::CryptoRandomException</td><td>Thrown if the random provider is not available</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Get a pseudo random unsigned 16bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random UInt16</dd></dl>
 
-<p>Implements <a class="el" href="class_i_provider.html#ae209d1e49b9b9a2c1cfe891760f591da">IProvider</a>.</p>
+<p>Implements <a class="el" href="class_i_provider.html#a9ace43d5ae44743fe8a517e6cae41054">IProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abf3505f50612965ff27bf2c7e09c2dba"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint ECP::NextUInt32 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 32bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random 32bit integer</dd></dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#ab79ff514e55dcca60234fb81f27c2b93">IProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a9b684d342b6c4673cc1a03b6bb24edc8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ulong ECP::NextUInt64 </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a pseudo random unsigned 64bit integer </p>
+<dl class="section return"><dt>Returns</dt><dd>Random 64bit integer</dd></dl>
+
+<p>Implements <a class="el" href="class_i_provider.html#a022543661edfbea4a44f456fd9be134f">IProvider</a>.</p>
 
 </div>
 </div>
@@ -567,9 +623,9 @@ ANSI <a href="http://csrc.nist.gov/groups/ST/toolkit/documents/rng/EntropySource
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_e_c_p_8h_source.html">ECP.h</a></li>
-<li>CEX/ECP.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_e_c_p_8h_source.html">ECP.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/ECP.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

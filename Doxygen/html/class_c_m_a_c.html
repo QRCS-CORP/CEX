@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -119,9 +119,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4e393458265d95bd8bee6fb43c74aac7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_m_a_c.html#a4e393458265d95bd8bee6fb43c74aac7">CMAC</a> ()=delete</td></tr>
 <tr class="memdesc:a4e393458265d95bd8bee6fb43c74aac7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor: default is restricted, this function has been deleted  <a href="#a4e393458265d95bd8bee6fb43c74aac7">More...</a><br /></td></tr>
 <tr class="separator:a4e393458265d95bd8bee6fb43c74aac7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8189c7f187296d9e5811512d302673b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_m_a_c.html#ab8189c7f187296d9e5811512d302673b">CMAC</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_c_m_a_c.html#ae6a83ddf05e5a97f211f1a5640843929">CipherType</a>)</td></tr>
-<tr class="memdesc:ab8189c7f187296d9e5811512d302673b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the class with the block cipher enumeration name  <a href="#ab8189c7f187296d9e5811512d302673b">More...</a><br /></td></tr>
-<tr class="separator:ab8189c7f187296d9e5811512d302673b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab25a6338203314449e282672b6f72b27"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_m_a_c.html#ab25a6338203314449e282672b6f72b27">CMAC</a> (<a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a> <a class="el" href="class_c_m_a_c.html#ae6a83ddf05e5a97f211f1a5640843929">CipherType</a>, <a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a> CipherExtensionType=BlockCipherExtensions::None)</td></tr>
+<tr class="memdesc:ab25a6338203314449e282672b6f72b27"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the class with the block cipher enumeration name  <a href="#ab25a6338203314449e282672b6f72b27">More...</a><br /></td></tr>
+<tr class="separator:ab25a6338203314449e282672b6f72b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf24c579f537965afa50a56fefe40a41"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_c_m_a_c.html#abf24c579f537965afa50a56fefe40a41">CMAC</a> (<a class="el" href="class_i_block_cipher.html">IBlockCipher</a> *Cipher)</td></tr>
 <tr class="memdesc:abf24c579f537965afa50a56fefe40a41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize this class with a block cipher instance  <a href="#abf24c579f537965afa50a56fefe40a41">More...</a><br /></td></tr>
 <tr class="separator:abf24c579f537965afa50a56fefe40a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -283,7 +283,7 @@ NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">R
 
 </div>
 </div>
-<a class="anchor" id="ab8189c7f187296d9e5811512d302673b"></a>
+<a class="anchor" id="ab25a6338203314449e282672b6f72b27"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -294,8 +294,18 @@ NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">R
           <td class="memname">CMAC::CMAC </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group___enumeration.html#gaa7f8226ec43fe26b57b18e6821c90ffd">BlockCiphers</a>&#160;</td>
-          <td class="paramname"><em>CipherType</em></td><td>)</td>
+          <td class="paramname"><em>CipherType</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#ga0c1bf76428835ed873d6b250df55b6cd">BlockCipherExtensions</a>&#160;</td>
+          <td class="paramname"><em>CipherExtensionType</em> = <code>BlockCipherExtensions::None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -309,6 +319,7 @@ NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">R
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">CipherType</td><td>The block cipher enumeration name</td></tr>
+    <tr><td class="paramname">CipherExtensionType</td><td>The extended HX ciphers key schedule KDF</td></tr>
   </table>
   </dd>
 </dl>
@@ -346,7 +357,7 @@ NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">R
 <p>Initialize this class with a block cipher instance </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Cipher</td><td>Instance of the block cipher</td></tr>
+    <tr><td class="paramname">Cipher</td><td>An uninitialized instance of the block-cipher</td></tr>
   </table>
   </dd>
 </dl>
@@ -838,8 +849,8 @@ NIST <a href="http://csrc.nist.gov/archive/aes/rijndael/Rijndael-ammended.pdf">R
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_c_m_a_c_8h_source.html">CMAC.h</a></li>
-<li>CEX/CMAC.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_c_m_a_c_8h_source.html">CMAC.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/CMAC.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

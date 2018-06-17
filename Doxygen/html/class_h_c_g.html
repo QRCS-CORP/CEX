@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -119,9 +119,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a0d844d50ce85362d3803e26b44ff19a2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a0d844d50ce85362d3803e26b44ff19a2">HCG</a> (<a class="el" href="group___enumeration.html#gab52dd4d279d842e68f46a2a0499c10c3">Digests</a> DigestType=Digests::SHA512, <a class="el" href="group___enumeration.html#ga1ec0d2ca9981dcdfec5108ea9c38a9d0">Providers</a> ProviderType=<a class="el" href="group___enumeration.html#gga1ec0d2ca9981dcdfec5108ea9c38a9d0a036578329f4509e4a7be59eb39666009">Providers::ACP</a>)</td></tr>
 <tr class="memdesc:a0d844d50ce85362d3803e26b44ff19a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the class using a block cipher type name, and an optional entropy source type  <a href="#a0d844d50ce85362d3803e26b44ff19a2">More...</a><br /></td></tr>
 <tr class="separator:a0d844d50ce85362d3803e26b44ff19a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae6472300e829ddc4995bba8e7b56a26"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aae6472300e829ddc4995bba8e7b56a26">HCG</a> (<a class="el" href="class_i_digest.html">IDigest</a> *Digest, <a class="el" href="class_i_provider.html">IProvider</a> *Provider=0)</td></tr>
-<tr class="memdesc:aae6472300e829ddc4995bba8e7b56a26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the class using a digest instance, and an optional entropy source  <a href="#aae6472300e829ddc4995bba8e7b56a26">More...</a><br /></td></tr>
-<tr class="separator:aae6472300e829ddc4995bba8e7b56a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47832b2e236e7de63b58e7aa0c11410c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#a47832b2e236e7de63b58e7aa0c11410c">HCG</a> (<a class="el" href="class_i_digest.html">IDigest</a> *Digest, <a class="el" href="class_i_provider.html">IProvider</a> *Provider=nullptr)</td></tr>
+<tr class="memdesc:a47832b2e236e7de63b58e7aa0c11410c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the class using a digest instance, and an optional entropy source  <a href="#a47832b2e236e7de63b58e7aa0c11410c">More...</a><br /></td></tr>
+<tr class="separator:a47832b2e236e7de63b58e7aa0c11410c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa23b56aa189b636d3cfe73b9de38ee03"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_h_c_g.html#aa23b56aa189b636d3cfe73b9de38ee03">~HCG</a> () override</td></tr>
 <tr class="memdesc:aa23b56aa189b636d3cfe73b9de38ee03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor: finalize this class  <a href="#aa23b56aa189b636d3cfe73b9de38ee03">More...</a><br /></td></tr>
 <tr class="separator:aa23b56aa189b636d3cfe73b9de38ee03"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -256,6 +256,8 @@ The default interval at which this reseeding occurs is 1000 times the digest out
  Predictive resistance is strongly recommended when producing large amounts of pseudo-random (10kb or greater).</p>
 <p>Implementation Notes: </p><ul>
 <li>
+This implementation only supports the SHA2-256 and SHA2-512 message digests. </li>
+<li>
 The class constructor can either be initialized with message digest and entropy provider instances, or using the Digests and Providers enumeration names. </li>
 <li>
 Digest and provider instances created using the enumeration constructor, are automatically deleted when the class is destroyed. </li>
@@ -366,7 +368,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 
 </div>
 </div>
-<a class="anchor" id="aae6472300e829ddc4995bba8e7b56a26"></a>
+<a class="anchor" id="a47832b2e236e7de63b58e7aa0c11410c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -383,7 +385,7 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="class_i_provider.html">IProvider</a> *&#160;</td>
-          <td class="paramname"><em>Provider</em> = <code>0</code>&#160;</td>
+          <td class="paramname"><em>Provider</em> = <code>nullptr</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1124,9 +1126,9 @@ NIST <a href="http://eprint.iacr.org/2006/379.pdf">Security Bounds</a> for the C
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_h_c_g_8h_source.html">HCG.h</a></li>
-<li>CEX/HCG.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_h_c_g_8h_source.html">HCG.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/HCG.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

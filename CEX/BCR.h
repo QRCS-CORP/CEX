@@ -76,7 +76,7 @@ private:
 	static const std::string CLASS_NAME;
 
 	size_t m_bufferIndex;
-	BlockCiphers m_engineType;
+	BlockCiphers m_rngGeneratorType;
 	bool m_isDestroyed;
 	bool m_isParallel;
 	Providers m_pvdType;
@@ -140,67 +140,13 @@ public:
 	//~~~Public Functions~~~//
 
 	/// <summary>
-	/// Fill an array of int16 with pseudo-random
-	/// </summary>
-	///
-	/// <param name="Output">The int16 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
-	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements) override;
-
-	/// <summary>
-	/// Fill an array of uint16 with pseudo-random
-	/// </summary>
-	///
-	/// <param name="Output">The uint16 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
-	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements) override;
-
-	/// <summary>
-	/// Fill an array of int32 with pseudo-random
-	/// </summary>
-	///
-	/// <param name="Output">The int32 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
-	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements) override;
-
-	/// <summary>
-	/// Fill an array of uint32 with pseudo-random
-	/// </summary>
-	///
-	/// <param name="Output">The uint32 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
-	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<uint> &Output, size_t Offset, size_t Elements) override;
-
-	/// <summary>
-	/// Fill an array of int64 with pseudo-random
-	/// </summary>
-	///
-	/// <param name="Output">The int64 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
-	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements) override;
-
-	/// <summary>
-	/// Fill an array of uint64 with pseudo-random
-	/// </summary>
-	///
-	/// <param name="Output">The uint64 output array</param>
-	/// <param name="Offset">The starting index within the Output array</param>
-	/// <param name="Elements">The number of array elements to fill</param>
-	void Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements) override;
-
-	/// <summary>
 	/// Return an array filled with pseudo random bytes
 	/// </summary>
 	/// 
 	/// <param name="Length">Size of requested byte array</param>
 	/// 
 	/// <returns>Random byte array</returns>
-	std::vector<byte> GetBytes(size_t Length) override;
+	std::vector<byte> Generate(size_t Length) override;
 
 	/// <summary>
 	/// Fill the buffer with pseudo-random bytes using offsets
@@ -209,14 +155,14 @@ public:
 	/// <param name="Output">The output array to fill</param>
 	/// <param name="Offset">The starting position within the Output array</param>
 	/// <param name="Length">The number of bytes to write to the Output array</param>
-	void GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length) override;
+	void Generate(std::vector<byte> &Output, size_t Offset, size_t Length) override;
 
 	/// <summary>
 	/// Fill an array with pseudo random bytes
 	/// </summary>
 	///
 	/// <param name="Output">Output array</param>
-	void GetBytes(std::vector<byte> &Output) override;
+	void Generate(std::vector<byte> &Output) override;
 
 	/// <summary>
 	/// Get a pseudo random unsigned 16bit integer

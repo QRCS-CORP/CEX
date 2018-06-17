@@ -32,6 +32,7 @@
 
 NAMESPACE_MAC
 
+using Enumeration::BlockCipherExtensions;
 using Enumeration::BlockCiphers;
 using Cipher::Symmetric::Block::IBlockCipher;
 using Cipher::Symmetric::Block::Mode::ICipherMode;
@@ -139,15 +140,16 @@ public:
 	/// Initialize the class with the block cipher enumeration name
 	/// </summary>
 	/// <param name="CipherType">The block cipher enumeration name</param>
+	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
-	explicit CMAC(BlockCiphers CipherType);
+	explicit CMAC(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
 	/// Initialize this class with a block cipher instance
 	/// </summary>
 	///
-	/// <param name="Cipher">Instance of the block cipher</param>
+	/// <param name="Cipher">An uninitialized instance of the block-cipher</param>
 	/// 
 	/// <exception cref="Exception::CryptoMacException">Thrown if the block cipher is null</exception>
 	explicit CMAC(IBlockCipher* Cipher);

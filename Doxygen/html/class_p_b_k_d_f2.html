@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -158,6 +158,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a773dcf5eb6631142955efc6db0174989"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#a773dcf5eb6631142955efc6db0174989">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
 <tr class="memdesc:a773dcf5eb6631142955efc6db0174989"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key (password).  <a href="#a773dcf5eb6631142955efc6db0174989">More...</a><br /></td></tr>
 <tr class="separator:a773dcf5eb6631142955efc6db0174989"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13e10a57695f0b34d94fe2e62635b635"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#a13e10a57695f0b34d94fe2e62635b635">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, size_t Offset, size_t Length) override</td></tr>
+<tr class="memdesc:a13e10a57695f0b34d94fe2e62635b635"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with a key, using length and offset arguments  <a href="#a13e10a57695f0b34d94fe2e62635b635">More...</a><br /></td></tr>
+<tr class="separator:a13e10a57695f0b34d94fe2e62635b635"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af092a0d17f1d8bcd673eb683597cae4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_p_b_k_d_f2.html#af092a0d17f1d8bcd673eb683597cae4a">Initialize</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>, const std::vector&lt; byte &gt; &amp;Salt) override</td></tr>
 <tr class="memdesc:af092a0d17f1d8bcd673eb683597cae4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the generator with key and salt arrays  <a href="#af092a0d17f1d8bcd673eb683597cae4a">More...</a><br /></td></tr>
 <tr class="separator:af092a0d17f1d8bcd673eb683597cae4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +212,8 @@ Ti = F(Password, Salt, c, i) <br />
 Subsequent iterations use the passphrase as the key and the output of the previous computation as the salt. <br />
 U2 = PRF(Password, U1), U3 = PRF(Password, U2) ... Uc = PRF(Password, Uc-1).</p>
 <p><b>Implementation Notes:</b> </p><ul>
+<li>
+This implementation only supports the SHA2-256 and SHA2-512 message digests. </li>
 <li>
 This class can be instantiated with a message digest or HMAC instance, or by using a digests enumeration type name. </li>
 <li>
@@ -633,6 +638,64 @@ NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
 
 </div>
 </div>
+<a class="anchor" id="a13e10a57695f0b34d94fe2e62635b635"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void PBKDF2::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
+          <td class="paramname"><em>Key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>Length</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the generator with a key, using length and offset arguments </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Key</td><td>The primary key array used to seed the generator</td></tr>
+    <tr><td class="paramname">Offset</td><td>The starting position within the key array</td></tr>
+    <tr><td class="paramname">Length</td><td>The number of key bytes to use</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoKdfException</td><td>Thrown if the key is too small</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_kdf.html#a6979e54c8e654607b107d40dd621f4de">IKdf</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="af092a0d17f1d8bcd673eb683597cae4a"></a>
 <div class="memitem">
 <div class="memproto">
@@ -945,9 +1008,9 @@ NIST SP800-132: <a href="http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialp
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
-<li>CEX/<a class="el" href="_p_b_k_d_f2_8h_source.html">PBKDF2.h</a></li>
-<li>CEX/PBKDF2.cpp</li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_p_b_k_d_f2_8h_source.html">PBKDF2.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/PBKDF2.cpp</li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

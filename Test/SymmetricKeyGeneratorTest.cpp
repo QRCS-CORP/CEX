@@ -71,13 +71,13 @@ namespace Test
 		}
 
 		std::vector<byte> data(128);
-		keyGen.GetBytes(data);
+		keyGen.Generate(data);
 		if (!IsGoodRun(data))
 		{
 			throw TestException("CheckAccess: The key is invalid!");
 		}
 
-		data = keyGen.GetBytes(data.size());
+		data = keyGen.Generate(data.size());
 		if (!IsGoodRun(data))
 		{
 			throw TestException("CheckAccess: The key is invalid!");

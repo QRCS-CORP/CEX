@@ -154,9 +154,9 @@ public:
 	/// Instantiate the class with an optional block-cipher extension type
 	/// </summary>
 	/// 
-	/// <param name="CipherExtension">Sets the optional Key Schedule key-expansion engine; valid settings are cSHAKE, HKDF, or None for standard mode. 
+	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. 
 	/// <para>The default engine is None, which invokes the standard key schedule mechanism.</para></param>
-	RHX(BlockCipherExtensions CipherExtension = BlockCipherExtensions::None);
+	RHX(BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
 	/// Instantiate the class with a Key Derivation Function instance

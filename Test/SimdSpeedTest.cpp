@@ -83,22 +83,6 @@ namespace Test
 #endif
 			OnProgress(std::string(""));
 
-			// Internal benchmarking tests..
-
-			/*OnProgress(std::string("***Testing UInt256 Operator Speeds***"));
-			for (size_t i = 0; i < 10; i++)
-			{
-				AVX2ULOperatorSpeed(10000000000);
-			}
-			OnProgress(std::string(""));*/
-
-			/*OnProgress(std::string("***Testing ULong256 Operator Speeds***"));
-			for (size_t i = 0; i < 10; i++)
-			{
-				AVX2ULLOperatorSpeed(10000000000);
-				OnProgress(std::string(""));
-			}*/
-
 			OnProgress(std::string("***Testing Large Block Clear Functions***"));
 			ClearBlockSpeed(SMPLEN, 10);
 

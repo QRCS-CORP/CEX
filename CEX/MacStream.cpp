@@ -7,22 +7,22 @@ NAMESPACE_PROCESSING
 
 MacStream::MacStream(MacDescription &Description)
 	:
-	m_macEngine(Description.MacType() != Macs::GMAC ? Helper::MacFromDescription::GetInstance(Description) :
-		throw CryptoProcessingException("MacStream:CTor", "GMAC is not supported!")),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isInitialized(false),
+	m_macEngine(Description.MacType() != Macs::GMAC ? Helper::MacFromDescription::GetInstance(Description) :
+		throw CryptoProcessingException("MacStream:CTor", "GMAC is not supported!")),
 	m_progressInterval(0)
 {
 }
 
 MacStream::MacStream(IMac* Mac)
 	:
-	m_macEngine(Mac != nullptr && Mac->Enumeral() != Macs::GMAC ? Mac :
-		throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!")),
 	m_destroyEngine(false),
 	m_isDestroyed(false),
 	m_isInitialized(false),
+	m_macEngine(Mac != nullptr && Mac->Enumeral() != Macs::GMAC ? Mac :
+		throw CryptoProcessingException("MacStream:CTor", "The Mac can not be null!")),
 	m_progressInterval(0)
 {
 }
@@ -47,7 +47,9 @@ std::vector<byte> MacStream::Compute(IByteStream* InStream)
 	CexAssert(InStream->Length() - InStream->Position() > 0, "the input stream is too short");
 	CexAssert(InStream->CanRead(), "the input stream is set to write only!");
 
-	size_t dataLen = InStream->Length() - InStream->Position();
+	size_t dataLen;
+
+	dataLen = InStream->Length() - InStream->Position();
 	CalculateInterval(dataLen);
 
 	return Process(InStream, dataLen);
@@ -58,7 +60,9 @@ std::vector<byte> MacStream::Compute(const std::vector<byte> &Input, size_t InOf
 	CexAssert(m_isInitialized, "the mac has not been initialized");
 	CexAssert((Input.size() - InOffset) > 0 && Length + InOffset <= Input.size(), "the input array is too short");
 
-	size_t dataLen = Length - InOffset;
+	size_t dataLen;
+
+	dataLen = Length - InOffset;
 	CalculateInterval(dataLen);
 
 	return Process(Input, InOffset, Length);
@@ -86,7 +90,9 @@ void MacStream::Initialize(ISymmetricKey &KeyParams)
 
 void MacStream::CalculateInterval(size_t Length)
 {
-	size_t interval = Length / 100;
+	size_t interval;
+
+	interval = Length / 100;
 
 	if (interval < m_macEngine->BlockSize())
 	{
@@ -154,13 +160,15 @@ void MacStream::Destroy()
 
 std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 {
-	size_t prcLen = 0;
-	size_t prcRead = 0;
-	std::vector<byte> inpBuffer(0);
-
 	const size_t BLKLEN = m_macEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
-	inpBuffer.resize(BLKLEN);
+	size_t prcLen;
+	size_t prcRead;
+
+	std::vector<byte> inpBuffer(BLKLEN);
+
+	prcLen = 0;
+	prcRead = 0;
 
 	while (prcLen != ALNLEN)
 	{
@@ -190,11 +198,12 @@ std::vector<byte> MacStream::Process(IByteStream* InStream, size_t Length)
 
 std::vector<byte> MacStream::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	size_t prcLen = 0;
-	std::vector<byte> inpBuffer(0);
+	size_t prcLen;
 
 	const size_t BLKLEN = m_macEngine->BlockSize();
 	const size_t ALNLEN = (Length / BLKLEN) * BLKLEN;
+
+	prcLen = 0;
 
 	while (prcLen != ALNLEN)
 	{

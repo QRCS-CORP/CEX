@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>CEX++: CEX/IAeadMode.h Source File</title>
+<title>CEX++: C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/IAeadMode.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -164,7 +164,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_i_aead_mode_html_a945fb5422ae3a0b5821ca6ab7d4dcef1"><div class="ttname"><a href="class_i_aead_mode.html#a945fb5422ae3a0b5821ca6ab7d4dcef1">IAeadMode::AutoIncrement</a></div><div class="ttdeci">virtual bool &amp; AutoIncrement()=0</div><div class="ttdoc">Read/Write: Enable auto-incrementing of the input nonce, each time the Finalize method is called...</div></div>
 <div class="ttc" id="class_i_aead_mode_html_a78b9f3137d60c26fd4a8a3776ee2880e"><div class="ttname"><a href="class_i_aead_mode.html#a78b9f3137d60c26fd4a8a3776ee2880e">IAeadMode::MaxTagSize</a></div><div class="ttdeci">virtual const size_t MaxTagSize()=0</div><div class="ttdoc">Read Only: The maximum legal tag length in bytes </div></div>
 <div class="ttc" id="class_i_aead_mode_html_ad19fd97a58a68c9f8f02bc366135abf8"><div class="ttname"><a href="class_i_aead_mode.html#ad19fd97a58a68c9f8f02bc366135abf8">IAeadMode::Tag</a></div><div class="ttdeci">virtual const std::vector&lt; byte &gt; Tag()=0</div><div class="ttdoc">Read Only: Returns the full finalized MAC code value array </div></div>
-<div class="ttc" id="class_i_cipher_mode_html"><div class="ttname"><a href="class_i_cipher_mode.html">ICipherMode</a></div><div class="ttdoc">Block Cipher standard Mode virtual interface class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:187</div></div>
+<div class="ttc" id="class_i_cipher_mode_html"><div class="ttname"><a href="class_i_cipher_mode.html">ICipherMode</a></div><div class="ttdoc">Block Cipher standard Mode virtual interface class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:204</div></div>
 <div class="ttc" id="class_i_aead_mode_html_affc499278bec892d22da47a3d7905527"><div class="ttname"><a href="class_i_aead_mode.html#affc499278bec892d22da47a3d7905527">IAeadMode::Verify</a></div><div class="ttdeci">virtual bool Verify(const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length)=0</div><div class="ttdoc">Generate the internal MAC code and compare it with the tag contained in the Input array...</div></div>
 <div class="ttc" id="class_i_aead_mode_html_a0b8b2abeb522b923e87faa0e956de47a"><div class="ttname"><a href="class_i_aead_mode.html#a0b8b2abeb522b923e87faa0e956de47a">IAeadMode::operator=</a></div><div class="ttdeci">IAeadMode &amp; operator=(const IAeadMode &amp;)=delete</div><div class="ttdoc">Copy operator: copy is restricted, this function has been deleted </div></div>
 <div class="ttc" id="class_i_aead_mode_html_ae0a604354f048e6dbbb8f6bc34d24d88"><div class="ttname"><a href="class_i_aead_mode.html#ae0a604354f048e6dbbb8f6bc34d24d88">IAeadMode::SetAssociatedData</a></div><div class="ttdeci">virtual void SetAssociatedData(const std::vector&lt; byte &gt; &amp;Input, const size_t Offset, const size_t Length)=0</div><div class="ttdoc">Add additional data to the authentication generator. </div></div>
@@ -172,7 +172,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_i_aead_mode_html_a99fa6d52d3cb43703d3c0bc0f9adb6c1"><div class="ttname"><a href="class_i_aead_mode.html#a99fa6d52d3cb43703d3c0bc0f9adb6c1">IAeadMode::PreserveAD</a></div><div class="ttdeci">virtual bool &amp; PreserveAD()=0</div><div class="ttdoc">Read/Write: Persist a one-time associated data for the entire session. </div></div>
 <div class="ttc" id="class_i_aead_mode_html_a26f02f52967fd0cdc00311f69ac0f239"><div class="ttname"><a href="class_i_aead_mode.html#a26f02f52967fd0cdc00311f69ac0f239">IAeadMode::~IAeadMode</a></div><div class="ttdeci">virtual ~IAeadMode() noexcept</div><div class="ttdoc">Destructor: finalize this class </div><div class="ttdef"><b>Definition:</b> IAeadMode.h:60</div></div>
 <div class="ttc" id="class_i_aead_mode_html_a2681463ce01ff59ebc09672664dd0b02"><div class="ttname"><a href="class_i_aead_mode.html#a2681463ce01ff59ebc09672664dd0b02">IAeadMode::Finalize</a></div><div class="ttdeci">virtual void Finalize(std::vector&lt; byte &gt; &amp;Output, const size_t Offset, const size_t Length)=0</div><div class="ttdoc">Calculate the MAC code (Tag) and copy it to the Output array. </div></div>
-<div class="ttc" id="class_i_aead_mode_html"><div class="ttname"><a href="class_i_aead_mode.html">IAeadMode</a></div><div class="ttdoc">An AEAD Cipher Mode virtual interface class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:186</div></div>
+<div class="ttc" id="class_i_aead_mode_html"><div class="ttname"><a href="class_i_aead_mode.html">IAeadMode</a></div><div class="ttdoc">An AEAD Cipher Mode virtual interface class. </div><div class="ttdef"><b>Definition:</b> Documentation.h:203</div></div>
 <div class="ttc" id="class_i_aead_mode_html_a4db2790e9218e806bd34046bf3aac04a"><div class="ttname"><a href="class_i_aead_mode.html#a4db2790e9218e806bd34046bf3aac04a">IAeadMode::IAeadMode</a></div><div class="ttdeci">IAeadMode()</div><div class="ttdoc">Initialize the IAeadMode virtual interface class </div><div class="ttdef"><b>Definition:</b> IAeadMode.h:53</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

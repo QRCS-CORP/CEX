@@ -12,7 +12,7 @@ const std::string BCR::CLASS_NAME("BCR");
 BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 	:
 	m_bufferIndex(0),
-	m_engineType(CipherType != BlockCiphers::None ? CipherType :
+	m_rngGeneratorType(CipherType != BlockCiphers::None ? CipherType :
 		throw CryptoRandomException("BCR:Ctor", "Cipher type can not be none!")),
 	m_isDestroyed(false),
 	m_isParallel(Parallel),
@@ -27,7 +27,7 @@ BCR::BCR(BlockCiphers CipherType, Providers ProviderType, bool Parallel)
 BCR::BCR(std::vector<byte> &Seed, BlockCiphers CipherType, bool Parallel)
 	:
 	m_bufferIndex(0),
-	m_engineType(CipherType != BlockCiphers::None ? CipherType :
+	m_rngGeneratorType(CipherType != BlockCiphers::None ? CipherType :
 		throw CryptoRandomException("BCR:Ctor", "Cipher type can not be none!")),
 	m_isDestroyed(false),
 	m_isParallel(Parallel),
@@ -45,7 +45,7 @@ BCR::~BCR()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_engineType = BlockCiphers::None;
+		m_rngGeneratorType = BlockCiphers::None;
 		m_pvdType = Providers::None;
 		m_bufferIndex = 0;
 		m_isParallel = false;
@@ -74,83 +74,23 @@ const std::string BCR::Name()
 
 //~~~Public Functions~~~//
 
-void BCR::Fill(std::vector<int16_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	const size_t BUFLEN = Elements * sizeof(int16_t);
-	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
-}
-
-void BCR::Fill(std::vector<ushort> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	const size_t BUFLEN = Elements * sizeof(ushort);
-	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
-}
-
-void BCR::Fill(std::vector<int32_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	const size_t BUFLEN = Elements * sizeof(int32_t);
-	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
-}
-
-void BCR::Fill(std::vector<uint> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	const size_t BUFLEN = Elements * sizeof(uint);
-	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
-}
-
-void BCR::Fill(std::vector<int64_t> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	const size_t BUFLEN = Elements * sizeof(int64_t);
-	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
-}
-
-void BCR::Fill(std::vector<ulong> &Output, size_t Offset, size_t Elements)
-{
-	CexAssert(Output.size() - Offset <= Elements, "the output array is too short");
-
-	const size_t BUFLEN = Elements * sizeof(ulong);
-	std::vector<byte> buf(BUFLEN);
-	GetBytes(buf);
-	Utility::MemUtils::Copy(buf, 0, Output, Offset, BUFLEN);
-}
-
-std::vector<byte> BCR::GetBytes(size_t Length)
+std::vector<byte> BCR::Generate(size_t Length)
 {
 	std::vector<byte> rnd(Length);
-	GetBytes(rnd);
+	Generate(rnd);
 
 	return rnd;
 }
 
-void BCR::GetBytes(std::vector<byte> &Output, size_t Offset, size_t Length)
+void BCR::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
 	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
 
-	std::vector<byte> rnd = GetBytes(Length);
+	std::vector<byte> rnd = Generate(Length);
 	Utility::MemUtils::Copy(rnd, 0, Output, Offset, Length);
 }
 
-void BCR::GetBytes(std::vector<byte> &Output)
+void BCR::Generate(std::vector<byte> &Output)
 {
 	CexAssert(Output.size() != 0, "buffer size must be at least 1 in length");
 
@@ -195,7 +135,7 @@ void BCR::GetBytes(std::vector<byte> &Output)
 ushort BCR::NextUInt16()
 {
 	ushort x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ushort)), 0, x, sizeof(ushort));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ushort)), 0, x, sizeof(ushort));
 
 	return x;
 }
@@ -203,7 +143,7 @@ ushort BCR::NextUInt16()
 uint BCR::NextUInt32()
 {
 	uint x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(uint)), 0, x, sizeof(uint));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(uint)), 0, x, sizeof(uint));
 
 	return x;
 }
@@ -211,7 +151,7 @@ uint BCR::NextUInt32()
 ulong BCR::NextUInt64()
 {
 	ulong x = 0;
-	Utility::MemUtils::CopyToValue(GetBytes(sizeof(ulong)), 0, x, sizeof(ulong));
+	Utility::MemUtils::CopyToValue(Generate(sizeof(ulong)), 0, x, sizeof(ulong));
 
 	return x;
 }
@@ -234,8 +174,8 @@ void BCR::Reset()
 		std::vector<byte> seed(m_rngGenerator->LegalKeySizes()[1].KeySize());
 		std::vector<byte> nonce(m_rngGenerator->LegalKeySizes()[1].NonceSize());
 		Provider::IProvider* seedGen = Helper::ProviderFromName::GetInstance(m_pvdType == Providers::None ? Providers::CSP : m_pvdType);
-		seedGen->GetBytes(seed);
-		seedGen->GetBytes(nonce);
+		seedGen->Generate(seed);
+		seedGen->Generate(nonce);
 		delete seedGen;
 		Key::Symmetric::SymmetricKey kp(seed, nonce);
 		m_rngGenerator->Initialize(kp);

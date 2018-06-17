@@ -1089,7 +1089,7 @@ void MPKCM12T62::GenE(std::vector<byte> &E, std::unique_ptr<IPrng> &Rng)
 
 	while (1)
 	{
-		Rng->Fill(ind, 0, ind.size());
+		Utility::IntUtils::Fill(ind, 0, ind.size(), Rng.get());
 
 		for (i = 0; i < MPKC_T; i++) 
 		{
@@ -1279,7 +1279,7 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 
 	while (1)
 	{
-		Rng->Fill(f, 0, f.size());
+		Utility::IntUtils::Fill(f, 0, f.size(), Rng.get());
 
 		for (i = 0; i < MPKC_T; i++) 
 		{
@@ -1306,7 +1306,7 @@ void MPKCM12T62::SkGen(std::vector<byte> &PrivateKey, std::unique_ptr<Prng::IPrn
 	}
 
 	std::vector<ulong> cond(MPKC_CND_SIZE / 8);
-	Rng->Fill(cond, 0, cond.size());
+	Utility::IntUtils::Fill(cond, 0, cond.size(), Rng.get());
 
 	for (i = 0; i < MPKC_CND_SIZE / 8; i++)
 	{

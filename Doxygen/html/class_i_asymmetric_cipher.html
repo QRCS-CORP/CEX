@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="cexlogo.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">CEX++
-   &#160;<span id="projectnumber">1.0.0.5</span>
+   &#160;<span id="projectnumber">1.0.0.6</span>
    </div>
    <div id="projectbrief">The CEX Cryptographic Library in C++</div>
   </td>
@@ -106,7 +106,8 @@ Inheritance diagram for IAsymmetricCipher:</div>
   <map id="IAsymmetricCipher_map" name="IAsymmetricCipher_map">
 <area href="class_mc_eliece.html" title="An implementation of the Niederreiter dual form of the McEliece public key crypto-system ..." alt="McEliece" shape="rect" coords="0,56,118,80"/>
 <area href="class_module_l_w_e.html" title="An implementation of the Module Learning With Errors asymmetric cipher (ModuleLWE) ..." alt="ModuleLWE" shape="rect" coords="128,56,246,80"/>
-<area href="class_ring_l_w_e.html" title="An implementation of the Ring Learning With Errors asymmetric cipher (RingLWE) " alt="RingLWE" shape="rect" coords="256,56,374,80"/>
+<area href="class_n_t_r_u.html" title="An implementation of the NTRU Prime asymmetric cipher (NTRU) " alt="NTRU" shape="rect" coords="256,56,374,80"/>
+<area href="class_ring_l_w_e.html" title="An implementation of the Ring Learning With Errors asymmetric cipher (RingLWE) " alt="RingLWE" shape="rect" coords="384,56,502,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -124,6 +125,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a97a138a5407f8e8cf9c0a65c8549e4c5"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a97a138a5407f8e8cf9c0a65c8549e4c5">~IAsymmetricCipher</a> () noexcept</td></tr>
 <tr class="memdesc:a97a138a5407f8e8cf9c0a65c8549e4c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizer: destroys the containers objects  <a href="#a97a138a5407f8e8cf9c0a65c8549e4c5">More...</a><br /></td></tr>
 <tr class="separator:a97a138a5407f8e8cf9c0a65c8549e4c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e384604c560a05d36d2473589a9a145"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a8e384604c560a05d36d2473589a9a145">DomainKey</a> ()=0</td></tr>
+<tr class="memdesc:a8e384604c560a05d36d2473589a9a145"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret.  <a href="#a8e384604c560a05d36d2473589a9a145">More...</a><br /></td></tr>
+<tr class="separator:a8e384604c560a05d36d2473589a9a145"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cc9fb942903331f5cffce0d9559cbc5"><td class="memItemLeft" align="right" valign="top">virtual const <a class="el" href="group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1">AsymmetricEngines</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a2cc9fb942903331f5cffce0d9559cbc5">Enumeral</a> ()=0</td></tr>
 <tr class="memdesc:a2cc9fb942903331f5cffce0d9559cbc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The cipher type-name  <a href="#a2cc9fb942903331f5cffce0d9559cbc5">More...</a><br /></td></tr>
 <tr class="separator:a2cc9fb942903331f5cffce0d9559cbc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,24 +140,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8dd58db657c1fb29b7bae9217c62ed42"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a8dd58db657c1fb29b7bae9217c62ed42">Name</a> ()=0</td></tr>
 <tr class="memdesc:a8dd58db657c1fb29b7bae9217c62ed42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The ciphers name  <a href="#a8dd58db657c1fb29b7bae9217c62ed42">More...</a><br /></td></tr>
 <tr class="separator:a8dd58db657c1fb29b7bae9217c62ed42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6eb502f376a775848df3e3390ef0a034"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a6eb502f376a775848df3e3390ef0a034">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</td></tr>
-<tr class="memdesc:a6eb502f376a775848df3e3390ef0a034"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret  <a href="#a6eb502f376a775848df3e3390ef0a034">More...</a><br /></td></tr>
-<tr class="separator:a6eb502f376a775848df3e3390ef0a034"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81ad8df798e4333c2eb97b563a839574"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a81ad8df798e4333c2eb97b563a839574">Decapsulate</a> (const std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</td></tr>
+<tr class="memdesc:a81ad8df798e4333c2eb97b563a839574"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt a ciphertext and return the shared secret  <a href="#a81ad8df798e4333c2eb97b563a839574">More...</a><br /></td></tr>
+<tr class="separator:a81ad8df798e4333c2eb97b563a839574"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa410f2bccefb25ee4ab06dc999206009"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#aa410f2bccefb25ee4ab06dc999206009">Encapsulate</a> (std::vector&lt; byte &gt; &amp;CipherText, std::vector&lt; byte &gt; &amp;SharedSecret)=0</td></tr>
 <tr class="memdesc:aa410f2bccefb25ee4ab06dc999206009"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a shared secret and ciphertext  <a href="#aa410f2bccefb25ee4ab06dc999206009">More...</a><br /></td></tr>
 <tr class="separator:aa410f2bccefb25ee4ab06dc999206009"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acde4e242a6c49cb0ccef64636f366581"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#acde4e242a6c49cb0ccef64636f366581">Decrypt</a> (const std::vector&lt; byte &gt; &amp;CipherText)=0</td></tr>
-<tr class="memdesc:acde4e242a6c49cb0ccef64636f366581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypt an encrypted cipher-text and return the message key.  <a href="#acde4e242a6c49cb0ccef64636f366581">More...</a><br /></td></tr>
-<tr class="separator:acde4e242a6c49cb0ccef64636f366581"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae8f8ef818642dc76452b9ba099b6c83"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; byte &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#aae8f8ef818642dc76452b9ba099b6c83">Encrypt</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>)=0</td></tr>
-<tr class="memdesc:aae8f8ef818642dc76452b9ba099b6c83"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypt a shared secret and return the encrypted message.  <a href="#aae8f8ef818642dc76452b9ba099b6c83">More...</a><br /></td></tr>
-<tr class="separator:aae8f8ef818642dc76452b9ba099b6c83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a787ff32e48a6edf2ef18b0670fc7dace"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a787ff32e48a6edf2ef18b0670fc7dace">Generate</a> ()=0</td></tr>
 <tr class="memdesc:a787ff32e48a6edf2ef18b0670fc7dace"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a787ff32e48a6edf2ef18b0670fc7dace">More...</a><br /></td></tr>
 <tr class="separator:a787ff32e48a6edf2ef18b0670fc7dace"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d5bccd14a72c615c6e57e3cd44743fe"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a6d5bccd14a72c615c6e57e3cd44743fe">Initialize</a> (bool Encryption, <a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
-<tr class="memdesc:a6d5bccd14a72c615c6e57e3cd44743fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher for encryption or decryption  <a href="#a6d5bccd14a72c615c6e57e3cd44743fe">More...</a><br /></td></tr>
-<tr class="separator:a6d5bccd14a72c615c6e57e3cd44743fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80881e7b0de58883cf6ca4f2930ebfbd"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_cipher.html#a80881e7b0de58883cf6ca4f2930ebfbd">Initialize</a> (<a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>)=0</td></tr>
+<tr class="memdesc:a80881e7b0de58883cf6ca4f2930ebfbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the cipher  <a href="#a80881e7b0de58883cf6ca4f2930ebfbd">More...</a><br /></td></tr>
+<tr class="separator:a80881e7b0de58883cf6ca4f2930ebfbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The Asymmetric cipher interface </p>
@@ -235,7 +233,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a6eb502f376a775848df3e3390ef0a034"></a>
+<a class="anchor" id="a81ad8df798e4333c2eb97b563a839574"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -243,7 +241,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void IAsymmetricCipher::Decapsulate </td>
+          <td class="memname">virtual bool IAsymmetricCipher::Decapsulate </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
           <td class="paramname"><em>CipherText</em>, </td>
@@ -275,12 +273,13 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if decryption is sucesssful</dd></dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a2c892ca6309e1b16cb936ae64c5f75b7">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#acd71532371dc0116481d146c00739c65">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#a4119eb0be1b6ba3a544c388f656f5ac2">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#a166c01d8fc455250eb87929d4d04342e">RingLWE</a>, <a class="el" href="class_module_l_w_e.html#aa08db36c2ee150018de5754d1dc635ba">ModuleLWE</a>, <a class="el" href="class_n_t_r_u.html#aaf55426b803534071cb120820ea709cb">NTRU</a>, and <a class="el" href="class_mc_eliece.html#a057079568ae36600dccfe9fd888cf2ab">McEliece</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="acde4e242a6c49cb0ccef64636f366581"></a>
+<a class="anchor" id="a8e384604c560a05d36d2473589a9a145"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -288,10 +287,9 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt;byte&gt; IAsymmetricCipher::Decrypt </td>
+          <td class="memname">virtual std::vector&lt;byte&gt;&amp; IAsymmetricCipher::DomainKey </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>CipherText</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -302,16 +300,10 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decrypt an encrypted cipher-text and return the message key. </p>
-<p>This is a CPA-secure transformation function</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">CipherText</td><td>The input cipher-text</td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Read/Write: Reads or Sets the Domain Key used by cSHAKE to generate the shared secret. </p>
+<p>Changing this code will create a unique distribution of the cipher. The domain key can be used as a secondary secret shared between hosts in an authenticated domain. The key is used as a customization string to pre-initialize a custom SHAKE function, that conditions the SharedSecret in Encapsulation/Decapsulation. For best security, the key should be random, secret, and shared only between hosts within a secure domain.</p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a2d298ab408ba95bffab8a0493fe3a9e1">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#ada1eb494a14027902b73ae81c17e7c3f">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#a48e2a92abbd1672a16d48877c9fe2c75">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#a27a2788f999a472bc723539ad507a39f">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#aa77e831e1eb6a317f955df67ed5e517d">NTRU</a>, <a class="el" href="class_module_l_w_e.html#a4181a2c2ea05e46e014d4551ad5dfeca">ModuleLWE</a>, and <a class="el" href="class_mc_eliece.html#a7c1f872e6d8f908a852db126231c2eb3">McEliece</a>.</p>
 
 </div>
 </div>
@@ -356,42 +348,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#ac844374e285f3f3551741a871a1993b1">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#aac191f0e7a41a9982d6b4f6988471b45">ModuleLWE</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aae8f8ef818642dc76452b9ba099b6c83"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::vector&lt;byte&gt; IAsymmetricCipher::Encrypt </td>
-          <td>(</td>
-          <td class="paramtype">const std::vector&lt; byte &gt; &amp;&#160;</td>
-          <td class="paramname"><em>Message</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Encrypt a shared secret and return the encrypted message. </p>
-<p>This is a CPA-secure transformation function</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">Message</td><td>The shared secret array</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7d889b96fc28fb99eaf17894b96352f8">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a59f8a5350532e8ba7194be4af2bee142">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#a13c383d2c763e540e25c362b650bba9b">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#ac844374e285f3f3551741a871a1993b1">RingLWE</a>, <a class="el" href="class_module_l_w_e.html#aac191f0e7a41a9982d6b4f6988471b45">ModuleLWE</a>, <a class="el" href="class_n_t_r_u.html#a2c92594b841f74c29502e69a38468f1b">NTRU</a>, and <a class="el" href="class_mc_eliece.html#a4f6861fd1351a04d62b0495355bd99f1">McEliece</a>.</p>
 
 </div>
 </div>
@@ -418,7 +375,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher type-name </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a09fb33cc7ffe435b9ad4467b13b3537e">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#ae397a8916e35e14db1aa880170ffc637">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#a94897a5c502a07061e60737db5b62e3f">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#ae397a8916e35e14db1aa880170ffc637">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a6fb71f8a06054b43594c980e55373648">NTRU</a>, <a class="el" href="class_module_l_w_e.html#a94897a5c502a07061e60737db5b62e3f">ModuleLWE</a>, and <a class="el" href="class_mc_eliece.html#a09fb33cc7ffe435b9ad4467b13b3537e">McEliece</a>.</p>
 
 </div>
 </div>
@@ -445,11 +402,11 @@ Public Member Functions</h2></td></tr>
 
 <p>Generate a public/private key-pair </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a545e1dbcddef9b454e3d3b3d80fecd31">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#aa861b402cf1f3c5150565d21776949c7">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#a7bf93a00599239211c7e883bc8681c22">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#aa861b402cf1f3c5150565d21776949c7">RingLWE</a>, <a class="el" href="class_module_l_w_e.html#a7bf93a00599239211c7e883bc8681c22">ModuleLWE</a>, <a class="el" href="class_n_t_r_u.html#a4a5ce32f09326316b2b2027dc457e8c2">NTRU</a>, and <a class="el" href="class_mc_eliece.html#a545e1dbcddef9b454e3d3b3d80fecd31">McEliece</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6d5bccd14a72c615c6e57e3cd44743fe"></a>
+<a class="anchor" id="a80881e7b0de58883cf6ca4f2930ebfbd"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -459,19 +416,9 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual void IAsymmetricCipher::Initialize </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>Encryption</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *&#160;</td>
-          <td class="paramname"><em>Key</em>&#160;</td>
-        </tr>
-        <tr>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -481,11 +428,10 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Initialize the cipher for encryption or decryption </p>
+<p>Initialize the cipher </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">Encryption</td><td>Initialize the cipher for encryption or decryption</td></tr>
-    <tr><td class="paramname">Key</td><td>The <a class="el" href="class_i_asymmetric_key.html" title="The Asymmetric key interface ">IAsymmetricKey</a> containing the Public (encrypt) and/or Private (decryption) key</td></tr>
+    <tr><td class="paramname">Key</td><td>The asymmetric public or private key</td></tr>
   </table>
   </dd>
 </dl>
@@ -496,7 +442,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a435daf9f066e1b35bc43f444e60a819f">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#abf87e33ba473c28daa8d4c73c51cc54a">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#a117972b392bac4af81d7138995755a18">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#af1419c9b2bc923983cdb127890ce0960">RingLWE</a>, <a class="el" href="class_module_l_w_e.html#a32658c361824a395e8f12339002c03f0">ModuleLWE</a>, <a class="el" href="class_n_t_r_u.html#a509e0ab617a030e29eb13b12e825fc18">NTRU</a>, and <a class="el" href="class_mc_eliece.html#aa65bd68345b3aac9258990166d60243a">McEliece</a>.</p>
 
 </div>
 </div>
@@ -523,7 +469,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher is initialized for encryption </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a0b8b55a26615c8ae6271b6bef39f4272">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#af079a2b3792e9107c9b06fc956eddeff">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#a0b8b55a26615c8ae6271b6bef39f4272">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#abe688c056b55203a5d41ea790806fd83">NTRU</a>, <a class="el" href="class_module_l_w_e.html#af079a2b3792e9107c9b06fc956eddeff">ModuleLWE</a>, and <a class="el" href="class_mc_eliece.html#ac1ec03bf88cf09a030dd89ba324b06b7">McEliece</a>.</p>
 
 </div>
 </div>
@@ -550,7 +496,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The cipher has been initialized with a key </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#aafd54e9639e9cc0dc2b6300fc24eb61e">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#aa8d9020c00294cb01298dcddff1f5b7e">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#aafd54e9639e9cc0dc2b6300fc24eb61e">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#afe62c34970cf8b334098d8996636ef01">NTRU</a>, <a class="el" href="class_module_l_w_e.html#aa8d9020c00294cb01298dcddff1f5b7e">ModuleLWE</a>, and <a class="el" href="class_mc_eliece.html#a7f4a707111b95f3fe985db967e941ca5">McEliece</a>.</p>
 
 </div>
 </div>
@@ -577,7 +523,7 @@ Public Member Functions</h2></td></tr>
 
 <p>Read Only: The ciphers name </p>
 
-<p>Implemented in <a class="el" href="class_mc_eliece.html#a0c96e14e00fb46fa1798af3b628f1293">McEliece</a>, <a class="el" href="class_ring_l_w_e.html#a8a8de02edc94fcc5809215d9cc64cdfc">RingLWE</a>, and <a class="el" href="class_module_l_w_e.html#aec361dc87bf4a64eed1b8bb1e1a3c1ec">ModuleLWE</a>.</p>
+<p>Implemented in <a class="el" href="class_ring_l_w_e.html#a8a8de02edc94fcc5809215d9cc64cdfc">RingLWE</a>, <a class="el" href="class_n_t_r_u.html#a50490f9ec5a32e75f71435047e45d0ca">NTRU</a>, <a class="el" href="class_module_l_w_e.html#aec361dc87bf4a64eed1b8bb1e1a3c1ec">ModuleLWE</a>, and <a class="el" href="class_mc_eliece.html#a0c96e14e00fb46fa1798af3b628f1293">McEliece</a>.</p>
 
 </div>
 </div>
@@ -608,7 +554,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>CEX/<a class="el" href="_i_asymmetric_cipher_8h_source.html">IAsymmetricCipher.h</a></li>
+<li>C:/Users/John/Documents/Visual Studio 2015/Projects/Cryptography/C++ Projects/CEX++/CEX/<a class="el" href="_i_asymmetric_cipher_8h_source.html">IAsymmetricCipher.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
