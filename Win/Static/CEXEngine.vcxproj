@@ -325,8 +325,8 @@
     <ClInclude Include="..\..\CEX\SHA2Params.h" />
     <ClInclude Include="..\..\CEX\SHA512.h" />
     <ClInclude Include="..\..\CEX\SHAKE.h" />
-    <ClInclude Include="..\..\CEX\SHAKE2.h" />
     <ClInclude Include="..\..\CEX\ShakeModes.h" />
+    <ClInclude Include="..\..\CEX\SimdIntegers.h" />
     <ClInclude Include="..\..\CEX\SimdProfiles.h" />
     <ClInclude Include="..\..\CEX\Skein1024.h" />
     <ClInclude Include="..\..\CEX\Skein256.h" />
@@ -400,6 +400,7 @@
     <ClCompile Include="..\..\CEX\AHX.cpp" />
     <ClCompile Include="..\..\CEX\ArrayUtils.cpp" />
     <ClCompile Include="..\..\CEX\BitConverter.cpp" />
+    <ClCompile Include="..\..\CEX\Blake2.cpp" />
     <ClCompile Include="..\..\CEX\Blake256.cpp" />
     <ClCompile Include="..\..\CEX\Blake512.cpp" />
     <ClCompile Include="..\..\CEX\BlakeParams.cpp" />
@@ -438,6 +439,7 @@
     <ClCompile Include="..\..\CEX\EAX.cpp" />
     <ClCompile Include="..\..\CEX\ECB.cpp" />
     <ClCompile Include="..\..\CEX\ECP.cpp" />
+    <ClCompile Include="..\..\CEX\Keccak.cpp" />
     <ClCompile Include="..\..\CEX\MPKCM12T62.cpp" />
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
@@ -483,6 +485,7 @@
     <ClCompile Include="..\..\CEX\RLWEPublicKey.cpp" />
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
+    <ClCompile Include="..\..\CEX\SHA.cpp" />
     <ClCompile Include="..\..\CEX\SHA256.cpp" />
     <ClCompile Include="..\..\CEX\SHA2Params.cpp" />
     <ClCompile Include="..\..\CEX\SHA512.cpp" />

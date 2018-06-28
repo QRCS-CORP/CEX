@@ -29,7 +29,7 @@ If running the executable, the Win\Test\Vectors folder containing the cipher KAT
 
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
-This is still an early stage in the development of this library, so stay tuned, be patient..
+This is still an early stage in the development of this library, so stay tuned, be patient.. (eta is the end of 2018).
 
 ## Contents
 ### Asymmetric Ciphers
@@ -39,11 +39,11 @@ This is still an early stage in the development of this library, so stay tuned, 
 * The ModuleLWE asymmetric cipher (Kyber)
 
 ### Block Ciphers
-Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid
-* The AES-NI HKDF eXtended cipher (AHX)
-* The Rijndael HKDF eXtended cipher (RHX)
-* The Serpent HKDF eXtended cipher (SHX)
-* The Twofish HKDF eXtended cipher (THX)
+Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid using cSHAKE or HKDF(SHA2) key expansion
+* The AES-NI Hash eXtended cipher (AHX)
+* The Rijndael Hash eXtended cipher (RHX)
+* The Serpent Hash eXtended cipher (SHX)
+* The Twofish Hash eXtended cipher (THX)
 
 ### Block Cipher Modes
 * Encrypt and Authenticate AEAD block cipher mode (EAX) 
@@ -108,11 +108,11 @@ Note: Every message digest implementation has both parallel and sequential modes
 ## Trajectory
 The current version is <B>1.0.0.5</B> (A5 version), which are the major, minor, patch, and release codes.
   
-### Current Release 1.0.0.5 (version A5):
-* The ModuleLWE asymmetric cipher
-* The SHAKE Key Derivation Function
-* Addition of asymmetric cipher Encapsulate/Decapsulate api
-* The library is now Misra C++ 2014 compliant
+### Current Release 1.0.0.6 (version A6):
+* The NTRU Prime asymmetric cipher
+* The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
+* Update of all asymmetric ciphers to match NIST PQ entries
+* Message digests updated for performance and security
 
 ### Planned Release 1.1.0.1
 * RingLWE
@@ -129,8 +129,14 @@ The current version is <B>1.0.0.5</B> (A5 version), which are the major, minor, 
 * DLL API
 
 ## History
+  
+### Version 1.0.0.6, June 28, 2018
+* The NTRU Prime asymmetric cipher
+* The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
+* Update of all asymmetric ciphers to match NIST PQ entries
+* Message digests updated for performance and security
 
-### Current Release 1.0.0.5, March 16, 2018
+### Version 1.0.0.5, March 16, 2018
 * The library is now Misra C++ 2014 compliant
 * Added the ModuleLWE asymmetric cipher
 * Added the SHAKE Key Derivation Function
@@ -240,6 +246,11 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
 ##### API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html 
 ##### Introduction to CEX++ 1.0: http://www.vtdev.com/CEX-Plus/CEX_1.0.pdf
 ##### CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
+
+## Donation
+If you can afford to donate to this project..
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TZQQCUQ52FDYU)
 
 ## Disclaimer
 This project contains strong cryptography, before downloading the source files, 

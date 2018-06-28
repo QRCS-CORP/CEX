@@ -9,6 +9,33 @@ using Utility::IntUtils;
 
 const std::string Skein512::CLASS_NAME("Skein512");
 
+struct Skein512::Skein512State
+{
+	// state
+	std::array<ulong, 8> S;
+	// tweak
+	std::array<ulong, 2> T;
+	// config
+	std::array<ulong, 8> V;
+
+	Skein512State()
+	{
+		Reset();
+	}
+
+	void Increase(size_t Length)
+	{
+		T[0] += Length;
+	}
+
+	void Reset()
+	{
+		Utility::MemUtils::Clear(S, 0, S.size() * sizeof(ulong));
+		Utility::MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
+		Utility::MemUtils::Clear(V, 0, V.size() * sizeof(ulong));
+	}
+};
+
 //~~~Constructor~~~//
 
 Skein512::Skein512(bool Parallel)
@@ -363,7 +390,7 @@ void Skein512::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	// encrypt block
 	std::array<ulong, 8> block;
 	IntUtils::LeBytesToULL512(Input, InOffset, block, 0);
-	Skein::Compress512(block, 0, State[StateOffset]);
+	Skein::Transform512(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
 	Utility::MemUtils::XOR512(block, 0, State[StateOffset].S, 0);
@@ -403,7 +430,7 @@ void Skein512::Initialize()
 			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
 			m_dgtState[i].Increase(32); 
 			// compress previous state
-			Skein::Compress512(m_dgtState[i - 1].V, 0, m_dgtState[i]);
+			Skein::Transform512(m_dgtState[i - 1].V, 0, m_dgtState[i]);
 			// store the new state in V for reset
 			Utility::MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
@@ -420,7 +447,7 @@ void Skein512::LoadState(Skein512State &State, std::vector<ulong> &Config)
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	State.Increase(32);
-	Skein::Compress512(Config, 0, State);
+	Skein::Transform512(Config, 0, State);
 	// store the initial state for reset
 	Utility::MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string

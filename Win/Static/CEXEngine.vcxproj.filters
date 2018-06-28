@@ -852,9 +852,6 @@
     <ClInclude Include="..\..\CEX\SHA2.h">
       <Filter>Header Files\Digest\Support</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\SHAKE2.h">
-      <Filter>Header Files\Digest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SCRYPT.h">
       <Filter>Header Files\Kdf</Filter>
     </ClInclude>
@@ -916,6 +913,9 @@
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE\Support</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\SHA2Digests.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SimdIntegers.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1294,6 +1294,15 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\TimeStamp.cpp">
       <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Keccak.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Blake2.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

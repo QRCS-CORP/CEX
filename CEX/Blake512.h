@@ -124,26 +124,7 @@ private:
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	struct Blake2bState
-	{
-		std::array<ulong, 2> F;
-		std::array<ulong, 8> H;
-		std::array<ulong, 2> T;
-
-		Blake2bState()
-		{
-			Reset();
-		}
-
-		void Reset()
-		{
-			std::memset(&F[0], 0, F.size() * sizeof(ulong));
-			std::memset(&H[0], 0, H.size() * sizeof(ulong));
-			std::memset(&T[0], 0, T.size() * sizeof(ulong));
-		}
-	};
-
-	std::vector<ulong> m_cIV;
+	struct Blake2bState;
 	std::vector<Blake2bState> m_dgtState;
 	bool m_isDestroyed;
 	uint m_leafSize;
@@ -311,8 +292,8 @@ public:
 
 private:
 
-	void Compress(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length);
 	void LoadState(Blake2bState &State);
+	void Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, ulong Length);
 };
 

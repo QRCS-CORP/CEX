@@ -192,7 +192,7 @@ size_t SHA256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
 			{
-				Compress(m_msgBuffer, i * BLOCK_SIZE, rootState);
+				Permute(m_msgBuffer, i * BLOCK_SIZE, rootState);
 			}
 
 			m_msgLength -= BLKRMD;
@@ -242,7 +242,7 @@ void SHA256::Reset()
 		if (m_parallelProfile.IsParallel())
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
-			Compress(m_treeParams.ToBytes(), 0, m_dgtState[i]);
+			Permute(m_treeParams.ToBytes(), 0, m_dgtState[i]);
 		}
 	}
 }
@@ -273,7 +273,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				// empty the message buffer
 				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
-					Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
+					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
 				});
 
 				m_msgLength = 0;
@@ -319,7 +319,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				Compress(m_msgBuffer, 0, m_dgtState[0]);
+				Permute(m_msgBuffer, 0, m_dgtState[0]);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
 				Length -= RMDLEN;
@@ -328,7 +328,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			// sequential loop through blocks
 			while (Length > BLOCK_SIZE)
 			{
-				Compress(Input, InOffset, m_dgtState[0]);
+				Permute(Input, InOffset, m_dgtState[0]);
 				InOffset += BLOCK_SIZE;
 				Length -= BLOCK_SIZE;
 			}
@@ -345,18 +345,6 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 
 //~~~Private Functions~~~//
 
-void SHA256::Compress(const std::vector<byte> &Input, size_t InOffset, SHA256State &State)
-{
-	if (m_parallelProfile.HasSHA2())
-	{
-		SHA2::Compress64W(Input, InOffset, State);
-	}
-	else
-	{
-		SHA2::Compress64(Input, InOffset, State);
-	}
-}
-
 void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA256State &State)
 {
 	State.T += Length;
@@ -364,7 +352,7 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 
 	if (Length == BLOCK_SIZE)
 	{
-		Compress(Input, InOffset, State);
+		Permute(Input, InOffset, State);
 		Length = 0;
 	}
 
@@ -379,21 +367,39 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 
 	if (Length > 56)
 	{
-		Compress(Input, InOffset, State);
+		Permute(Input, InOffset, State);
 		Utility::MemUtils::Clear(Input, 0, BLOCK_SIZE);
 	}
 
 	// finalize state with counter and last compression
 	IntUtils::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitLen) >> 32), Input, InOffset + 56);
 	IntUtils::Be32ToBytes(static_cast<uint>(static_cast<ulong>(bitLen)), Input, InOffset + 60);
-	Compress(Input, InOffset, State);
+	Permute(Input, InOffset, State);
+}
+
+void SHA256::Permute(const std::vector<byte> &Input, size_t InOffset, SHA256State &State)
+{
+	if (m_parallelProfile.HasSHA2())
+	{
+		SHA2::PermuteR64P512V(Input, InOffset, State.H);
+	}
+	else
+	{
+#if defined(CEX_DIGEST_COMPACT)
+		SHA2::PermuteR64P512C(Input, InOffset, State.H);
+#else
+		SHA2::PermuteR64P512U(Input, InOffset, State.H);
+#endif
+	}
+
+	State.Increase(BLOCK_SIZE);
 }
 
 void SHA256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA256State &State, ulong Length)
 {
 	do
 	{
-		Compress(Input, InOffset, State);
+		Permute(Input, InOffset, State);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 

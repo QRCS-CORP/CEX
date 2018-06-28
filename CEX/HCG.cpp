@@ -16,8 +16,8 @@ HCG::HCG(Digests DigestType, Providers ProviderType)
 		throw CryptoGeneratorException("HCG:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(true),
 	m_digestType(DigestType),
-	m_distributionCode(0),
-	m_distributionCodeMax(0),
+	m_distCode(0),
+	m_distCodeMax(0),
 	m_hmacKey(m_hmacEngine.BlockSize()),
 	m_hmacState(m_hmacEngine.MacSize(), 0x01),
 	m_isDestroyed(false),
@@ -33,7 +33,6 @@ HCG::HCG(Digests DigestType, Providers ProviderType)
 	m_seedCtr(SEEDCTR_SIZE),
 	m_stateCtr(STATECTR_SIZE)
 {
-
 	Scope();
 }
 
@@ -43,8 +42,8 @@ HCG::HCG(IDigest* Digest, IProvider* Provider)
 		throw CryptoGeneratorException("HCG:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(false),
 	m_digestType(Digest->Enumeral()),
-	m_distributionCode(0),
-	m_distributionCodeMax(0),
+	m_distCode(0),
+	m_distCodeMax(0),
 	m_hmacKey(m_hmacEngine.BlockSize()),
 	m_hmacState(m_hmacEngine.MacSize(), 0x01),
 	m_isDestroyed(false),
@@ -69,7 +68,7 @@ HCG::~HCG()
 	{
 		m_isDestroyed = true;
 		m_digestType = Digests::None;
-		m_distributionCodeMax = 0;
+		m_distCodeMax = 0;
 		m_isInitialized = false;
 		m_prdResistant = false;
 		m_providerType = Providers::None;
@@ -78,7 +77,7 @@ HCG::~HCG()
 		m_reseedThreshold = 0;
 		m_secStrength = 0;
 
-		Utility::IntUtils::ClearVector(m_distributionCode);
+		Utility::IntUtils::ClearVector(m_distCode);
 		Utility::IntUtils::ClearVector(m_hmacKey);
 		Utility::IntUtils::ClearVector(m_hmacState);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
@@ -108,12 +107,12 @@ HCG::~HCG()
 
 std::vector<byte> &HCG::DistributionCode() 
 {
-	return m_distributionCode; 
+	return m_distCode; 
 }
 
 const size_t HCG::DistributionCodeMax() 
 { 
-	return m_distributionCodeMax; 
+	return m_distCodeMax; 
 }
 
 const Drbgs HCG::Enumeral() 
@@ -271,16 +270,16 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 	// info can be a secret salt or domain identifier; added to derivation function input
 	// for best security, info should be secret, random, and DistributionCodeMax size
-	if (Info.size() <= m_distributionCodeMax)
+	if (Info.size() <= m_distCodeMax)
 	{
-		m_distributionCode = Info;
+		m_distCode = Info;
 	}
 	else
 	{
 		// info is too large; size to optimal max, ignore remainder
-		std::vector<byte> tmpInfo(m_distributionCodeMax);
+		std::vector<byte> tmpInfo(m_distCodeMax);
 		Utility::MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
-		m_distributionCode = tmpInfo;
+		m_distCode = tmpInfo;
 	}
 
 	Initialize(Seed);
@@ -363,9 +362,9 @@ void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 		// 3) process the current state
 		m_hmacEngine.Update(m_hmacState, 0, m_hmacState.size());
 		// 4) optional personalization string
-		if (m_distributionCode.size() != 0)
+		if (m_distCode.size() != 0)
 		{
-			m_hmacEngine.Update(m_distributionCode, 0, m_distributionCode.size());
+			m_hmacEngine.Update(m_distCode, 0, m_distCode.size());
 		}
 		// 5) output the state
 		m_hmacEngine.Finalize(m_hmacState, 0);
@@ -396,15 +395,15 @@ void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 
 void HCG::Scope()
 {
-	m_distributionCodeMax = m_hmacEngine.BlockSize() + (m_hmacEngine.BlockSize() - (m_stateCtr.size() + m_hmacState.size() + Helper::DigestFromName::GetPaddingSize(m_digestType)));
+	m_distCodeMax = m_hmacEngine.BlockSize() + (m_hmacEngine.BlockSize() - (m_stateCtr.size() + m_hmacState.size() + Helper::DigestFromName::GetPaddingSize(m_digestType)));
 
 	m_legalKeySizes.resize(3);
 	// minimum seed size
 	m_legalKeySizes[0] = SymmetricKeySize(m_hmacEngine.BlockSize() - Helper::DigestFromName::GetPaddingSize(m_digestType), 0, 0);
 	// recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(m_legalKeySizes[0].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distributionCodeMax);
+	m_legalKeySizes[1] = SymmetricKeySize(m_legalKeySizes[0].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distCodeMax);
 	// maximum security
-	m_legalKeySizes[2] = SymmetricKeySize(m_legalKeySizes[1].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distributionCodeMax);
+	m_legalKeySizes[2] = SymmetricKeySize(m_legalKeySizes[1].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distCodeMax);
 }
 
 void HCG::RandomPad(size_t BlockOffset)

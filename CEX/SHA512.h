@@ -285,6 +285,7 @@ private:
 
 	void Destroy();
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA512State &State);
+	void Permute(const std::vector<byte> &Input, size_t InOffset, SHA512State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA512State &State, ulong Length);
 };
 

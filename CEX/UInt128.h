@@ -20,11 +20,15 @@
 #define CEX_UINT128_H
 
 #include "CexDomain.h"
+#include "SimdIntegers.h"
+
 #	if defined(__AVX__)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
+
+using Enumeration::SimdIntegers;
 
 /// <summary>
 /// An AVX 128bit SIMD intrinsics wrapper.
@@ -111,6 +115,14 @@ public:
 	explicit UInt128(uint X)
 	{
 		xmm = _mm_set1_epi32(X);
+	}
+
+	/// <summary>
+	/// Read Only: The SIMD wrappers type name
+	/// </summary>
+	const SimdIntegers Enumeral()
+	{
+		return SimdIntegers::UInt128;
 	}
 
 	//~~~ Load and Store~~~//
@@ -780,6 +792,16 @@ public:
 	inline UInt128 operator ~ () const
 	{
 		return UInt128(_mm_xor_si128(xmm, _mm_set1_epi32(0xFFFFFFFF)));
+	}
+
+	/// <summary>
+	/// Equals assignment operator
+	/// </summary>
+	///
+	/// <param name="X">The value to assign</param>
+	inline void operator = (const UInt128 &X)
+	{
+		xmm = X.xmm;
 	}
 
 	/// <summary>

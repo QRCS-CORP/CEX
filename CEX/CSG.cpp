@@ -5,10 +5,13 @@
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
+#include "ULong256.h"
+
 NAMESPACE_DRBG
 
 using Utility::IntUtils;
 using Utility::MemUtils;
+using Numeric::ULong256;
 
 const std::string CSG::CLASS_NAME("CSG");
 
@@ -25,8 +28,8 @@ CSG::CSG(ShakeModes ShakeModeType, Providers ProviderType, bool Parallel)
 	m_bufferIndex(0),
 	m_customNonce(0),
 	m_destroyEngine(true),
-	m_distributionCode(0),
-	m_distributionCodeMax(0),
+	m_distCode(0),
+	m_distCodeMax(0),
 	m_domainCode(SHAKE_DOMAIN),
 	m_drbgBuffer(m_blockSize),
 	m_drbgState(1),
@@ -59,8 +62,8 @@ CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 	m_bufferIndex(0),
 	m_customNonce(0),
 	m_destroyEngine(false),
-	m_distributionCode(0),
-	m_distributionCodeMax(0),
+	m_distCode(0),
+	m_distCodeMax(0),
 	m_domainCode(SHAKE_DOMAIN),
 	m_drbgBuffer(m_blockSize),
 	m_drbgState(1),
@@ -90,7 +93,7 @@ CSG::~CSG()
 		m_avxEnabled = false;
 		m_blockSize = 0;
 		m_bufferIndex = 0;
-		m_distributionCodeMax = 0;
+		m_distCodeMax = 0;
 		m_isInitialized = false;
 		m_prdResistant = false;
 		m_providerType = Providers::None;
@@ -110,7 +113,7 @@ CSG::~CSG()
 		IntUtils::ClearVector(m_drbgBuffer);
 		IntUtils::ClearVector(m_drbgState);
 		IntUtils::ClearVector(m_customNonce);
-		IntUtils::ClearVector(m_distributionCode);
+		IntUtils::ClearVector(m_distCode);
 		IntUtils::ClearVector(m_legalKeySizes);
 
 		if (m_destroyEngine)
@@ -136,12 +139,12 @@ CSG::~CSG()
 
 std::vector<byte> &CSG::DistributionCode()
 {
-	return m_distributionCode;
+	return m_distCode;
 }
 
 const size_t CSG::DistributionCodeMax()
 {
-	return m_distributionCodeMax;
+	return m_distCodeMax;
 }
 
 const Drbgs CSG::Enumeral()
@@ -181,7 +184,7 @@ const std::string CSG::Name()
 
 const size_t CSG::NonceSize()
 {
-	return m_distributionCodeMax / 2;
+	return m_distCodeMax / 2;
 }
 
 size_t &CSG::ReseedThreshold()
@@ -261,7 +264,7 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 
 	if (!m_avxEnabled)
 	{
-		Customize(m_customNonce, m_distributionCode, m_drbgState[0]);
+		Customize(m_customNonce, m_distCode, m_drbgState[0]);
 		Permute(m_drbgState[0]);
 		FastAbsorb(Seed, 0, Seed.size(), m_drbgState[0]);
 		Fill();
@@ -280,7 +283,7 @@ void CSG::Initialize(const std::vector<byte> &Seed)
 		for (size_t i = 0; i < m_drbgState.size(); ++i)
 		{
 			IntUtils::BeIncrease8(ctr, CTRIVL * (i + 1));
-			Customize(ctr, m_distributionCode, m_drbgState[i]);
+			Customize(ctr, m_distCode, m_drbgState[i]);
 		}
 
 		// permute customizations
@@ -320,7 +323,7 @@ void CSG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	}
 
 	m_customNonce = Nonce;
-	m_distributionCode = Info;
+	m_distCode = Info;
 
 	Initialize(Seed);
 }
@@ -515,11 +518,12 @@ void CSG::Permute(std::array<ulong, STATE_SIZE> &State)
 {
 	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
-		Digest::Keccak::PermuteR24P1600(State);
+		// rng uses the unrolled timing-neutral permutation
+		Digest::Keccak::PermuteR24P1600U(State);
 	}
 	else
 	{
-		Digest::Keccak::PermuteR48P1600(State);
+		Digest::Keccak::PermuteR48P1600U(State);
 	}
 }
 
@@ -528,17 +532,63 @@ void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
 	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
 #if defined(__AVX512__)
-		Digest::Keccak::PermuteR24P12800(State);
+		std::vector<ULong512> tmpW(25);
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
+		}
+
+		Digest::Keccak::PermuteR24P12800H(tmpW);
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
+		}
+
 #elif defined(__AVX2__)
-		Digest::Keccak::PermuteR24P6400(State);
+		std::vector<ULong256> tmpW(25);
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
+		}
+
+		Digest::Keccak::PermuteR24P6400H(tmpW);
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
+		}
 #endif
 	}
 	else
 	{
 #if defined(__AVX512__)
-		Digest::Keccak::PermuteR48P12800(State);
+		std::vector<ULong512> tmpW(25);
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
+		}
+
+		Digest::Keccak::PermuteR48P12800H(tmpW);
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
+		}
+
 #elif defined(__AVX2__)
-		Digest::Keccak::PermuteR48P6400(State);
+		std::vector<ULong256> tmpW(25);
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
+		}
+
+		Digest::Keccak::PermuteR48P6400H(tmpW);
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			tmpW[i].Store(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
+		}
 #endif
 	}
 }
@@ -571,14 +621,14 @@ void CSG::Scope()
 
 	Reset();
 
-	m_distributionCodeMax = m_blockSize;
+	m_distCodeMax = m_blockSize;
 	m_legalKeySizes.resize(3);
 	// minimum seed size
 	m_legalKeySizes[0] = SymmetricKeySize(32, 0, 0);
 	// recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(64, m_distributionCodeMax / 2, m_distributionCodeMax / 2);
+	m_legalKeySizes[1] = SymmetricKeySize(64, m_distCodeMax / 2, m_distCodeMax / 2);
 	// maximum security
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, m_distributionCodeMax / 2, m_distributionCodeMax / 2);
+	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, m_distCodeMax / 2, m_distCodeMax / 2);
 }
 
 NAMESPACE_DRBGEND

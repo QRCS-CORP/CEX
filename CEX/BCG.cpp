@@ -20,14 +20,13 @@ BCG::BCG(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType, Pro
 	m_cipherType(CipherType),
 	m_ctrVector(COUNTER_SIZE),
 	m_destroyEngine(true),
-	m_distributionCode(0),
-	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
+	m_distCode(0),
+	m_distCodeMax(m_blockCipher->DistributionCodeMax()),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_kdfEngine(CipherExtensionType != BlockCipherExtensions::None ? Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtensionType)) : nullptr),
 	m_kdfEngineType(CipherExtensionType),
-	m_kdfInfo(0),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
 	m_prdResistant(ProviderType != Providers::None),
@@ -49,14 +48,13 @@ BCG::BCG(IBlockCipher* Cipher, IKdf* Kdf, IProvider* Provider, bool Parallel)
 	m_cipherType(m_blockCipher->Enumeral()),
 	m_ctrVector(COUNTER_SIZE),
 	m_destroyEngine(false),
-	m_distributionCode(0),
-	m_distributionCodeMax(m_blockCipher->DistributionCodeMax()),
+	m_distCode(0),
+	m_distCodeMax(m_blockCipher->DistributionCodeMax()),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
 	m_kdfEngine(Kdf),
 	m_kdfEngineType(m_kdfEngine != nullptr ? static_cast<BlockCipherExtensions>(m_kdfEngine->Enumeral()) : BlockCipherExtensions::None),
-	m_kdfInfo(0),
 	m_legalKeySizes(m_blockCipher->LegalKeySizes()),
 	m_parallelProfile(BLOCK_SIZE, true, m_blockCipher->StateCacheSize(), false),
 	m_prdResistant(Provider != nullptr),
@@ -77,7 +75,7 @@ BCG::~BCG()
 	{
 		m_isDestroyed = true;
 		m_cipherType = BlockCiphers::None;
-		m_distributionCodeMax = 0;
+		m_distCodeMax = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_kdfEngineType = BlockCipherExtensions::None;
@@ -91,8 +89,8 @@ BCG::~BCG()
 		m_seedSize = 0;
 
 		Utility::IntUtils::ClearVector(m_ctrVector);
-		Utility::IntUtils::ClearVector(m_distributionCode);
-		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_distCode);
+		Utility::IntUtils::ClearVector(m_distCode);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
 
 		if (m_destroyEngine)
@@ -138,12 +136,12 @@ BCG::~BCG()
 
 std::vector<byte> &BCG::DistributionCode() 
 {
-	return m_distributionCode; 
+	return m_distCode; 
 }
 
 const size_t BCG::DistributionCodeMax()
 { 
-	return m_distributionCodeMax; 
+	return m_distCodeMax; 
 }
 
 const Drbgs BCG::Enumeral() 
@@ -334,16 +332,16 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 			// for best security, info should be secret, random, and DistributionCodeMax size
 			if (Info.size() <= m_blockCipher->DistributionCodeMax())
 			{
-				m_distributionCode = Info;
-				m_blockCipher->DistributionCode() = m_distributionCode;
+				m_distCode = Info;
+				m_blockCipher->DistributionCode() = m_distCode;
 			}
 			else
 			{
 				// info is too large; size to optimal max, ignore remainder
 				std::vector<byte> tmpInfo(m_blockCipher->DistributionCodeMax());
 				Utility::MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
-				m_distributionCode = tmpInfo;
-				m_blockCipher->DistributionCode() = m_distributionCode;
+				m_distCode = tmpInfo;
+				m_blockCipher->DistributionCode() = m_distCode;
 			}
 		}
 	}

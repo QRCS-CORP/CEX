@@ -20,11 +20,15 @@
 #define CEX_USHORT128_H
 
 #include "CexDomain.h"
+#include "SimdIntegers.h"
+
 #if defined(__AVX__)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
+
+using Enumeration::SimdIntegers;
 
 /// <summary>
 /// An AVX 128bit intrinsics wrapper.
@@ -115,6 +119,14 @@ public:
 	explicit UShort128(ushort X)
 	{
 		xmm = _mm_set1_epi16(X);
+	}
+
+	/// <summary>
+	/// Read Only: The SIMD wrappers type name
+	/// </summary>
+	const SimdIntegers Enumeral()
+	{
+		return SimdIntegers::UShort128;
 	}
 
 	//~~~ Load and Store~~~//
@@ -649,6 +661,16 @@ public:
 	inline UShort128 operator ~ () const
 	{
 		return UShort128(_mm_xor_si128(xmm, _mm_set1_epi32(0xFFFFFFFF)));
+	}
+
+	/// <summary>
+	/// Equals assignment operator
+	/// </summary>
+	///
+	/// <param name="X">The value to assign</param>
+	inline void operator = (const UShort128 &X)
+	{
+		xmm = X.xmm;
 	}
 
 	/// <summary>

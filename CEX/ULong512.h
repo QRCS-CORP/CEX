@@ -20,11 +20,15 @@
 #define CEX_ULONG512_H
 
 #include "CexDomain.h"
+#include "SimdIntegers.h"
+
 #if defined(__AVX512__)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
+
+using Enumeration::SimdIntegers;
 
 // TODO: None of this is tested!
 
@@ -117,6 +121,14 @@ public:
 	explicit ULong512(ulong X)
 	{
 		zmm = _mm512_set1_epi64(X);
+	}
+
+	/// <summary>
+	/// Read Only: The SIMD wrappers type name
+	/// </summary>
+	const SimdIntegers Enumeral()
+	{
+		return SimdIntegers::ULong512;
 	}
 
 	//~~~ Load and Store~~~//
@@ -685,6 +697,16 @@ public:
 	inline ULong512 operator <= (ULong512 const &X) const
 	{
 		return X >= ULong512(zmm);
+	}
+
+	/// <summary>
+	/// Equals assignment operator
+	/// </summary>
+	///
+	/// <param name="X">The value to assign</param>
+	inline void operator = (const ULong512 &X)
+	{
+		zmm = X.zmm;
 	}
 
 	/// <summary>

@@ -308,11 +308,12 @@ void SHAKE::Permute(std::array<ulong, STATE_SIZE> &State)
 {
 	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
-		Digest::Keccak::PermuteR24P1600(State);
+		// rng uses the unrolled timing-neutral permutation
+		Digest::Keccak::PermuteR24P1600U(State);
 	}
 	else
 	{
-		Digest::Keccak::PermuteR48P1600(State);
+		Digest::Keccak::PermuteR48P1600U(State);
 	}
 }
 

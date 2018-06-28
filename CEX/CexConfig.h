@@ -174,7 +174,7 @@
 // define endianess of CPU
 #if (!defined(CEX_IS_LITTLE_ENDIAN))
 #	if defined(__sparc) || defined(__sparc__) || defined(__hppa__) || defined(__PPC__) || defined(__mips__) || defined(__MWERKS__) && (!defined(__INTEL__))
-#		define IS_BIG_ENDIAN
+#		define CEX_IS_BIG_ENDIAN
 #	else
 #		if !defined(CEX_IS_LITTLE_ENDIAN)
 #			define CEX_IS_LITTLE_ENDIAN
@@ -369,8 +369,9 @@ inline static void CexAssert(bool Condition, const T Message)
 #endif
 }
 
-// enables RingLWE parallel processing
-//#define CEX_RLWE_PARALLEL
+// enables the compact form for all digest permutations, used for performance and small code-cache cases
+// the digests will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
+#define CEX_DIGEST_COMPACT
 
 // enables/disables OS rotation intrinsics
 #if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)

@@ -139,14 +139,13 @@ private:
 	BlockCiphers m_cipherType;
 	std::vector<byte> m_ctrVector;
 	bool m_destroyEngine;
-	std::vector<byte> m_distributionCode;
-	size_t m_distributionCodeMax;
+	std::vector<byte> m_distCode;
+	size_t m_distCodeMax;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::unique_ptr<IKdf> m_kdfEngine;
 	BlockCipherExtensions m_kdfEngineType;
-	std::vector<byte> m_kdfInfo;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	ParallelOptions m_parallelProfile;
 	bool m_prdResistant;

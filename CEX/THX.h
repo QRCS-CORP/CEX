@@ -136,13 +136,13 @@ private:
 
 	BlockCipherExtensions m_cprExtension;
 	bool m_destroyEngine;
+	std::vector<byte> m_distCode;
+	size_t m_distCodeMax;
 	std::vector<uint> m_expKey;
-	std::vector<byte> m_kdfInfo;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::unique_ptr<IKdf> m_kdfGenerator;
-	size_t m_kdfInfoMax;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	size_t m_rndCount;
 	std::vector<uint> m_sBox;

@@ -188,7 +188,7 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 			for (size_t i = 0; i < BLKRMD / BLOCK_SIZE; ++i)
 			{
 				Absorb(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, rootState);
-				Keccak::PermuteR24P1600(rootState.H);
+				Permute(rootState.H);
 			}
 
 			m_msgLength -= BLKRMD;
@@ -238,7 +238,7 @@ void Keccak256::Reset()
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
 			Absorb(m_treeParams.ToBytes(), 0, BLOCK_SIZE, m_dgtState[i]);
-			Keccak::PermuteR24P1600(m_dgtState[i].H);
+			Permute(m_dgtState[i].H);
 		}
 	}
 }
@@ -270,7 +270,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
 					Absorb(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, m_dgtState[i]);
-					Keccak::PermuteR24P1600(m_dgtState[i].H);
+					Permute(m_dgtState[i].H);
 				});
 
 				m_msgLength = 0;
@@ -317,7 +317,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				}
 
 				Absorb(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0]);
-				Keccak::PermuteR24P1600(m_dgtState[0].H);
+				Permute(m_dgtState[0].H);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
 				Length -= RMDLEN;
@@ -327,7 +327,7 @@ void Keccak256::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			while (Length >= BLOCK_SIZE)
 			{
 				Absorb(Input, InOffset, BLOCK_SIZE, m_dgtState[0]);
-				Keccak::PermuteR24P1600(m_dgtState[0].H);
+				Permute(m_dgtState[0].H);
 				InOffset += BLOCK_SIZE;
 				Length -= BLOCK_SIZE;
 			}
@@ -352,12 +352,21 @@ void Keccak256::Absorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 	}
 }
 
+void Keccak256::Permute(std::array<ulong, 25> &Hash)
+{
+#if defined(CEX_DIGEST_COMPACT)
+	Keccak::PermuteR24P1600C(Hash);
+#else
+	Keccak::PermuteR24P1600U(Hash);
+#endif
+}
+
 void Keccak256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State)
 {
 	Input[InOffset + Length] = DOMAIN_CODE;
 	Input[InOffset + BLOCK_SIZE - 1] |= 128;
 	Absorb(Input, InOffset, BLOCK_SIZE, State);
-	Keccak::PermuteR24P1600(State.H);
+	Permute(State.H);
 }
 
 void Keccak256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length)
@@ -365,7 +374,7 @@ void Keccak256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Kec
 	do
 	{
 		Absorb(Input, InOffset, BLOCK_SIZE, State);
-		Keccak::PermuteR24P1600(State.H);
+		Permute(State.H);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 

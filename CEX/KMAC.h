@@ -81,7 +81,7 @@ private:
 	static const size_t STATE_SIZE = 25;
 
 	size_t m_blockSize;
-	std::vector<byte> m_distributionCode;
+	std::vector<byte> m_distCode;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::array<ulong, STATE_SIZE> m_kdfState;

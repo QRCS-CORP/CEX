@@ -113,8 +113,8 @@ private:
 	size_t m_bufferIndex;
 	std::vector<byte> m_customNonce;
 	bool m_destroyEngine;
-	std::vector<byte> m_distributionCode;
-	size_t m_distributionCodeMax;
+	std::vector<byte> m_distCode;
+	size_t m_distCodeMax;
 	byte m_domainCode;
 	std::vector<byte> m_drbgBuffer;
 	std::vector<std::array<ulong, STATE_SIZE>> m_drbgState;

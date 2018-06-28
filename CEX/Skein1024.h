@@ -104,33 +104,7 @@ private:
 	// size of reserved state buffer subtracted from parallel size calculations
 	static const size_t STATE_PRECACHED = 2048;
 
-	struct Skein1024State
-	{
-		// state
-		std::array<ulong, 16> S;
-		// tweak
-		std::array<ulong, 2> T;
-		// config
-		std::array<ulong, 16> V;
-
-		Skein1024State()
-		{
-			Reset();
-		}
-
-		void Increase(size_t Length)
-		{
-			T[0] += Length;
-		}
-
-		void Reset()
-		{
-			std::memset(&S[0], 0, S.size() * sizeof(ulong));
-			std::memset(&T[0], 0, T.size() * sizeof(ulong));
-			std::memset(&V[0], 0, V.size() * sizeof(ulong));
-		}
-	};
-
+	struct Skein1024State;
 	std::vector<Skein1024State> m_dgtState;
 	bool m_isDestroyed;
 	bool m_isInitialized;

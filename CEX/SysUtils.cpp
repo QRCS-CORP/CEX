@@ -107,9 +107,9 @@ ulong SysUtils::GetRdtscFrequency()
 {
 	if (HasRdtsc())
 	{
-		uint64_t first = __rdtsc();
+		ulong first = __rdtsc();
 		Sleep(10);
-		uint64_t second = __rdtsc();
+		ulong second = __rdtsc();
 
 		return (second - first) * 100;
 	}

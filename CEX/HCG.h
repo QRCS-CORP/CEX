@@ -168,8 +168,8 @@ private:
 	Mac::HMAC m_hmacEngine;
 	bool m_destroyEngine;
 	Digests m_digestType;
-	std::vector<byte> m_distributionCode;
-	size_t m_distributionCodeMax;
+	std::vector<byte> m_distCode;
+	size_t m_distCodeMax;
 	std::vector<byte> m_hmacKey;
 	std::vector<byte> m_hmacState;
 	bool m_isDestroyed;

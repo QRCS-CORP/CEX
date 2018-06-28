@@ -237,6 +237,7 @@ private:
 
 	void Absorb(const std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, KeccakState &State);
+	void Permute(std::array<ulong, 25> &Hash);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, KeccakState &State, ulong Length);
 };
 

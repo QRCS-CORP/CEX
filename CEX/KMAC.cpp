@@ -14,7 +14,7 @@ const std::string KMAC::CLASS_NAME("KMAC");
 KMAC::KMAC(ShakeModes ShakeModeType)
 	:
 	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
-	m_distributionCode { 0x4B, 0x4D, 0x41, 0x43 },
+	m_distCode { 0x4B, 0x4D, 0x41, 0x43 },
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
@@ -38,7 +38,7 @@ KMAC::~KMAC()
 		m_msgLength = 0;
 		m_shakeMode = ShakeModes::None;
 
-		Utility::IntUtils::ClearVector(m_distributionCode);
+		Utility::IntUtils::ClearVector(m_distCode);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
 		Utility::IntUtils::ClearArray(m_msgBuffer);
 	}
@@ -53,7 +53,7 @@ const size_t KMAC::BlockSize()
 
 std::vector<byte> &KMAC::DistributionCode()
 {
-	return m_distributionCode;
+	return m_distCode;
 }
 
 const size_t KMAC::DistributionCodeMax()
@@ -150,10 +150,10 @@ void KMAC::Initialize(ISymmetricKey &KeyParams)
 
 	if (KeyParams.Info().size() > 0)
 	{
-		m_distributionCode = KeyParams.Info();
+		m_distCode = KeyParams.Info();
 	}
 
-	Customize(KeyParams.Nonce(), m_distributionCode);
+	Customize(KeyParams.Nonce(), m_distCode);
 	LoadKey(KeyParams.Key());
 
 	m_isInitialized = true;
@@ -329,11 +329,11 @@ void KMAC::Permute(std::array<ulong, 25> &State)
 {
 	if (m_shakeMode != ShakeModes::SHAKE1024)
 	{
-		Digest::Keccak::PermuteR24P1600(State);
+		Digest::Keccak::PermuteR24P1600U(State);
 	}
 	else
 	{
-		Digest::Keccak::PermuteR48P1600(State);
+		Digest::Keccak::PermuteR48P1600U(State);
 	}
 }
 

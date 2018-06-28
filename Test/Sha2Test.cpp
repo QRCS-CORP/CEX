@@ -44,9 +44,7 @@ namespace Test
 			CompareVector(sha256, m_message[2], m_exp256[2]);
 			CompareVector(sha256, m_message[3], m_exp256[3]);
 			delete sha256;
-			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));
-
-			// TODO: add parallel tests
+			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));/**/
 
 			SHA512* sha512 = new SHA512();
 			CompareVector(sha512, m_message[0], m_exp512[0]);
@@ -80,7 +78,10 @@ namespace Test
 			throw TestException("SHA2: Expected hash is not equal!");
 		}
 
+		hash.clear();
+		hash.resize(Digest->DigestSize());
 		Digest->Compute(Input, hash);
+
 		if (Expected != hash)
 		{
 			throw TestException("SHA2: Expected hash is not equal!");

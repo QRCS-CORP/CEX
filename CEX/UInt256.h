@@ -20,11 +20,15 @@
 #define CEX_UINT256_H
 
 #include "CexDomain.h"
+#include "SimdIntegers.h"
+
 #if defined(__AVX2__)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
+
+using Enumeration::SimdIntegers;
 
 /// <summary>
 /// An AVX2 256bit SIMD intrinsics wrapper.
@@ -115,6 +119,14 @@ public:
 	explicit UInt256(uint X)
 	{
 		ymm = _mm256_set1_epi32(X);
+	}
+
+	/// <summary>
+	/// Read Only: The SIMD wrappers type name
+	/// </summary>
+	const SimdIntegers Enumeral()
+	{
+		return SimdIntegers::UInt256;
 	}
 
 	//~~~ Load and Store~~~//
@@ -794,6 +806,16 @@ public:
 	inline UInt256 operator <= (UInt256 const &X) const
 	{
 		return X >= UInt256(ymm);
+	}
+
+	/// <summary>
+	/// Equals assignment operator
+	/// </summary>
+	///
+	/// <param name="X">The value to assign</param>
+	inline void operator = (const UInt256 &X)
+	{
+		ymm = X.ymm;
 	}
 
 	/// <summary>

@@ -9,6 +9,33 @@ using Utility::IntUtils;
 
 const std::string Skein256::CLASS_NAME("Skein256");
 
+struct Skein256::Skein256State
+{
+	// state
+	std::array<ulong, 4> S;
+	// tweak
+	std::array<ulong, 2> T;
+	// config
+	std::array<ulong, 4> V;
+
+	Skein256State()
+	{
+		Reset();
+	}
+
+	void Increase(size_t Length)
+	{
+		T[0] += Length;
+	}
+
+	void Reset()
+	{
+		Utility::MemUtils::Clear(S, 0, S.size() * sizeof(ulong));
+		Utility::MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
+		Utility::MemUtils::Clear(V, 0, V.size() * sizeof(ulong));
+	}
+};
+
 //~~~Constructor~~~//
 
 Skein256::Skein256(bool Parallel)
@@ -376,7 +403,7 @@ void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	// encrypt block
 	std::array<ulong, 4> block;
 	IntUtils::LeBytesToULL256(Input, InOffset, block, 0);
-	Skein::Compress256(block, 0, State[StateOffset]);
+	Skein::Transform256(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
 	Utility::MemUtils::XOR256(block, 0, State[StateOffset].S, 0);
@@ -416,7 +443,7 @@ void Skein256::Initialize()
 			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
 			m_dgtState[i].Increase(32);
 			// compress previous state
-			Skein::Compress256(m_dgtState[i - 1].V, 0, m_dgtState[i]);
+			Skein::Transform256(m_dgtState[i - 1].V, 0, m_dgtState[i]);
 			// store the new state in V for reset
 			Utility::MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
@@ -433,7 +460,7 @@ void Skein256::LoadState(Skein256State &State, std::vector<ulong> &Config)
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	State.Increase(32);
-	Skein::Compress256(Config, 0, State);
+	Skein::Transform256(Config, 0, State);
 	// store the initial state for reset
 	Utility::MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string

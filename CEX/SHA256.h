@@ -278,8 +278,8 @@ public:
 
 private:
 
-	void Compress(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, SHA256State &State);
+	void Permute(const std::vector<byte> &Input, size_t InOffset, SHA256State &State);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, SHA256State &State, ulong Length);
 };
 

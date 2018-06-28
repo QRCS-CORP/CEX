@@ -97,7 +97,7 @@ public:
 	//~~~Public Functions~~~//
 
 	template <typename Array, typename State>
-	static void Compress256(Array &Input, size_t InOffset, State &Output)
+	static void Transform256(Array &Input, size_t InOffset, State &Output)
 	{
 		// Cache the block, key, and tweak
 		ulong b0 = Input[0];
@@ -268,7 +268,7 @@ public:
 #if defined(__AVX2__)
 
 	template <typename Array, typename State>
-	static void Compress512(Array &Input, size_t InOffset, State &Output)
+	static void Transform512(Array &Input, size_t InOffset, State &Output)
 	{
 		__m256i R0 = _mm256_set_epi64x(0, 0, 0, 0);
 		const __m256i R1 = _mm256_set_epi64x(37, 19, 36, 46);
@@ -445,7 +445,7 @@ public:
 #else
 
 	template <typename Array, typename State>
-	static void Compress512(Array &Input, size_t InOffset, State &Output)
+	static void Transform512(Array &Input, size_t InOffset, State &Output)
 	{
 		// cache the block, key, and tweak
 		ulong B0 = Input[0];
@@ -772,7 +772,7 @@ public:
 #endif
 
 	template <typename Array, typename State>
-	static void Compress1024(Array &Input, size_t InOffset, State &Output)
+	static void Transform1024(Array &Input, size_t InOffset, State &Output)
 	{
 		// cache the block, key, and tweak
 		ulong B0 = Input[0];

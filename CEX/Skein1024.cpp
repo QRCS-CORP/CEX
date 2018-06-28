@@ -9,6 +9,33 @@ using Utility::IntUtils;
 
 const std::string Skein1024::CLASS_NAME("Skein1024");
 
+struct Skein1024::Skein1024State
+{
+	// state
+	std::array<ulong, 16> S;
+	// tweak
+	std::array<ulong, 2> T;
+	// config
+	std::array<ulong, 16> V;
+
+	Skein1024State()
+	{
+		Reset();
+	}
+
+	void Increase(size_t Length)
+	{
+		T[0] += Length;
+	}
+
+	void Reset()
+	{
+		Utility::MemUtils::Clear(S, 0, S.size() * sizeof(ulong));
+		Utility::MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
+		Utility::MemUtils::Clear(V, 0, V.size() * sizeof(ulong));
+	}
+};
+
 //~~~Constructor~~~//
 
 Skein1024::Skein1024(bool Parallel)
@@ -362,7 +389,7 @@ void Skein1024::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, st
 	// encrypt block
 	std::array<ulong, 16> block;
 	IntUtils::LeBytesToULL1024(Input, InOffset, block, 0);
-	Skein::Compress1024(block, 0, State[StateOffset]);
+	Skein::Transform1024(block, 0, State[StateOffset]);
 
 	// feed-forward input with state
 	Utility::MemUtils::XOR1024(block, 0, State[StateOffset].S, 0);
@@ -402,7 +429,7 @@ void Skein1024::Initialize()
 			SkeinUbiTweak::IsFinalBlock(m_dgtState[i].T, true);
 			m_dgtState[i].Increase(32);
 			// compress previous state
-			Skein::Compress1024(m_dgtState[i - 1].V, 0, m_dgtState[i]);
+			Skein::Transform1024(m_dgtState[i - 1].V, 0, m_dgtState[i]);
 			// store the new state in V for reset
 			Utility::MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
@@ -419,7 +446,7 @@ void Skein1024::LoadState(Skein1024State &State, std::vector<ulong> &Config)
 	SkeinUbiTweak::StartNewBlockType(State.T, SkeinUbiType::Config);
 	SkeinUbiTweak::IsFinalBlock(State.T, true);
 	State.Increase(32);
-	Skein::Compress1024(Config, 0, State);
+	Skein::Transform1024(Config, 0, State);
 	// store the initial state for reset
 	Utility::MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string

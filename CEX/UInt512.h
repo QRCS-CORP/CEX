@@ -20,11 +20,15 @@
 #define CEX_UINT512_H
 
 #include "CexDomain.h"
+#include "SimdIntegers.h"
+
 #if defined(__AVX512__)
 #	include "Intrinsics.h"
 #endif
 
 NAMESPACE_NUMERIC
+
+using Enumeration::SimdIntegers;
 
 // TODO: None of this is tested!
 
@@ -126,6 +130,14 @@ public:
 	explicit UInt512(uint X)
 	{
 		zmm = _mm512_set1_epi32(X);
+	}
+
+	/// <summary>
+	/// Read Only: The SIMD wrappers type name
+	/// </summary>
+	const SimdIntegers Enumeral()
+	{
+		return SimdIntegers::UInt512;
 	}
 
 	//~~~ Load and Store~~~//
@@ -847,6 +859,16 @@ public:
 	inline UInt512 operator <= (UInt512 const &X) const
 	{
 		return X >= UInt512(zmm);
+	}
+
+	/// <summary>
+	/// Equals assignment operator
+	/// </summary>
+	///
+	/// <param name="X">The value to assign</param>
+	inline void operator = (const UInt512 &X)
+	{
+		zmm = X.zmm;
 	}
 
 	/// <summary>

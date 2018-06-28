@@ -19,12 +19,12 @@ AHX::AHX(BlockCipherExtensions CipherExtension)
 	:
 	m_cprExtension(CipherExtension),
 	m_destroyEngine(true),
+	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
 		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!") :
 		Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtension))),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -37,11 +37,11 @@ AHX::AHX(Kdf::IKdf* Kdf)
 	:
 	m_cprExtension(BlockCipherExtensions::Custom),
 	m_destroyEngine(false),
+	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
+	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(Kdf != nullptr ? Kdf :
 		throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!")),
-	m_kdfInfo(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
-	m_kdfInfoMax(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -55,13 +55,13 @@ AHX::~AHX()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_kdfInfoMax = 0;
+		m_distCodeMax = 0;
 		m_isEncryption = false;
 		m_isInitialized = false;
 		m_rndCount = 0;
 
 		Utility::IntUtils::ClearVector(m_expKey);
-		Utility::IntUtils::ClearVector(m_kdfInfo);
+		Utility::IntUtils::ClearVector(m_distCode);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
 
 		if (m_destroyEngine)
@@ -97,12 +97,12 @@ const BlockCipherExtensions AHX::CipherExtension()
 
 std::vector<byte> &AHX::DistributionCode()
 {
-	return m_kdfInfo;
+	return m_distCode;
 }
 
 const size_t AHX::DistributionCodeMax()
 {
-	return m_kdfInfoMax;
+	return m_distCodeMax;
 }
 
 const BlockCiphers AHX::Enumeral()
@@ -191,14 +191,14 @@ void AHX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	{
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 	}
-	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_kdfInfoMax)
+	if (m_cprExtension != BlockCipherExtensions::None && KeyParams.Info().size() > m_distCodeMax)
 	{
 		throw CryptoSymmetricCipherException("AHX:Initialize", "Invalid info size! Info parameter must be no longer than DistributionCodeMax size.");
 	}
 
 	if (KeyParams.Info().size() > 0)
 	{
-		m_kdfInfo = KeyParams.Info();
+		m_distCode = KeyParams.Info();
 	}
 
 	m_isEncryption = Encryption;
@@ -312,7 +312,7 @@ void AHX::SecureExpand(const std::vector<byte> &Key)
 	// salt is not used
 	std::vector<byte> salt(0);
 	// initialize the generator
-	m_kdfGenerator->Initialize(Key, salt, m_kdfInfo);
+	m_kdfGenerator->Initialize(Key, salt, m_distCode);
 	// generate the keying material
 	m_kdfGenerator->Generate(rawKey);
 	// initialize round-key array
@@ -658,27 +658,27 @@ void AHX::LoadState()
 		if (m_cprExtension == BlockCipherExtensions::SHAKE256)
 		{
 			// sha3-256 blocksize
-			m_kdfInfoMax = 136;
+			m_distCodeMax = 136;
 		}
 		else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
 		{
 			// sha3-512 blocksize
-			m_kdfInfoMax = 72;
+			m_distCodeMax = 72;
 		}
 		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 		{
 			// sha2-512 blocksize - padding + hkdf counter
-			m_kdfInfoMax = 128 - (17 + 1);
+			m_distCodeMax = 128 - (17 + 1);
 		}
 		else
 		{
 			// sha2-256 blocksize - padding + hkdf counter
-			m_kdfInfoMax = 64 - (9 + 1);
+			m_distCodeMax = 64 - (9 + 1);
 		}
 
-		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_kdfInfoMax);
-		m_legalKeySizes[1] = SymmetricKeySize(64, BLOCK_SIZE, m_kdfInfoMax);
-		m_legalKeySizes[2] = SymmetricKeySize(128, BLOCK_SIZE, m_kdfInfoMax);
+		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_distCodeMax);
+		m_legalKeySizes[1] = SymmetricKeySize(64, BLOCK_SIZE, m_distCodeMax);
+		m_legalKeySizes[2] = SymmetricKeySize(128, BLOCK_SIZE, m_distCodeMax);
 	}
 }
 

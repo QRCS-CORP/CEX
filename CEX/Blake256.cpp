@@ -7,25 +7,29 @@ NAMESPACE_DIGEST
 
 using Utility::IntUtils;
 
-const std::vector<uint> SCIV = 
-{ 
-	0x6A09E667UL, 
-	0xBB67AE85UL,
-	0x3C6EF372UL, 
-	0xA54FF53AUL, 
-	0x510E527FUL, 
-	0x9B05688CUL,
-	0x1F83D9ABUL,
-	0x5BE0CD19UL 
-};
-
 const std::string Blake256::CLASS_NAME("Blake256");
 
+struct Blake256::Blake2sState
+{
+	std::array<uint, 2> F;
+	std::array<uint, 8> H;
+	std::array<uint, 2> T;
+
+	Blake2sState()
+	{
+	}
+
+	void Reset()
+	{
+		Utility::MemUtils::Clear(F, 0, F.size() * sizeof(uint));
+		Utility::MemUtils::Clear(H, 0, H.size() * sizeof(uint));
+		Utility::MemUtils::Clear(T, 0, T.size() * sizeof(uint));
+	}
+};
 //~~~Constructor~~~//
 
 Blake256::Blake256(bool Parallel)
 	:
-	m_cIV(SCIV),
 	m_dgtState(Parallel ? 8 : 1),
 	m_isDestroyed(false),
 	m_leafSize(Parallel ? DEF_LEAFSIZE : BLOCK_SIZE),
@@ -60,7 +64,6 @@ Blake256::Blake256(bool Parallel)
 
 Blake256::Blake256(BlakeParams &Params)
 	:
-	m_cIV(SCIV),
 	m_dgtState(Params.FanOut() > 0 ? Params.FanOut() : 1),
 	m_isDestroyed(false),
 	m_leafSize(BLOCK_SIZE),
@@ -108,7 +111,6 @@ Blake256::~Blake256()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		IntUtils::ClearVector(m_cIV);
 		IntUtils::ClearVector(m_msgBuffer);
 		IntUtils::ClearVector(m_treeConfig);
 		m_leafSize = 0;
@@ -211,7 +213,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			for (size_t i = 0; i < blkCount; ++i)
 			{
 				// process partial block set
-				Compress(m_msgBuffer, (i * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
+				Permute(m_msgBuffer, (i * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
 				Utility::MemUtils::Copy(m_msgBuffer, m_parallelProfile.ParallelMinimumSize() + (i * BLOCK_SIZE), m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE);
 				m_msgLength -= BLOCK_SIZE;
 			}
@@ -252,7 +254,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 				Utility::MemUtils::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
 			}
 
-			Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], blkLen);
+			Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], blkLen);
 			m_msgLength -= BLOCK_SIZE;
 
 			IntUtils::LeUL256ToBlock(m_dgtState[i].H, 0, hashCodes, i * DIGEST_SIZE);
@@ -274,14 +276,14 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// compress all but last block
 		for (size_t i = 0; i < hashCodes.size() - BLOCK_SIZE; i += BLOCK_SIZE)
 		{
-			Compress(m_msgBuffer, i, m_dgtState[0], BLOCK_SIZE);
+			Permute(m_msgBuffer, i, m_dgtState[0], BLOCK_SIZE);
 		}
 
 		// apply f0 and f1 flags
 		m_dgtState[0].F[0] = 0xFFFFFFFFUL;
 		m_dgtState[0].F[1] = 0xFFFFFFFFUL;
 		// last compression
-		Compress(m_msgBuffer, m_msgLength - BLOCK_SIZE, m_dgtState[0], BLOCK_SIZE);
+		Permute(m_msgBuffer, m_msgLength - BLOCK_SIZE, m_dgtState[0], BLOCK_SIZE);
 		// output the code
 		IntUtils::LeUL256ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}
@@ -294,7 +296,7 @@ size_t Blake256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		}
 
 		m_dgtState[0].F[0] = 0xFFFFFFFFUL;
-		Compress(m_msgBuffer, 0, m_dgtState[0], m_msgLength);
+		Permute(m_msgBuffer, 0, m_dgtState[0], m_msgLength);
 		IntUtils::LeUL256ToBlock(m_dgtState[0].H, 0, Output, OutOffset);
 	}
 
@@ -437,8 +439,8 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				// empty the entire message buffer
 				Utility::ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 				{
-					Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
-					Compress(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.FanOut() * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
+					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
+					Permute(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.FanOut() * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
 				});
 
 				// loop in the remainder (no buffering)
@@ -480,7 +482,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				// process first half of buffer
 				Utility::ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 				{
-					Compress(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
+					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
 				});
 
 				// left rotate the buffer
@@ -499,7 +501,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
-				Compress(m_msgBuffer, 0, m_dgtState[0], BLOCK_SIZE);
+				Permute(m_msgBuffer, 0, m_dgtState[0], BLOCK_SIZE);
 				m_msgLength = 0;
 				InOffset += RMDLEN;
 				Length -= RMDLEN;
@@ -508,7 +510,7 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			// loop until last block
 			while (Length > BLOCK_SIZE)
 			{
-				Compress(Input, InOffset, m_dgtState[0], BLOCK_SIZE);
+				Permute(Input, InOffset, m_dgtState[0], BLOCK_SIZE);
 				InOffset += BLOCK_SIZE;
 				Length -= BLOCK_SIZE;
 			}
@@ -525,28 +527,46 @@ void Blake256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Blake256::Compress(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length)
-{
-	IntUtils::LeIncreaseW(State.T, State.T, Length);
-	Blake2::Compress512(Input, InOffset, State, m_cIV);
-}
-
 void Blake256::LoadState(Blake2sState &State)
 {
 	Utility::MemUtils::Clear(State.T, 0, COUNTER_SIZE * sizeof(uint));
 	Utility::MemUtils::Clear(State.F, 0, FLAG_SIZE * sizeof(uint));
-	Utility::MemUtils::Clear(State.F, 0, FLAG_SIZE * sizeof(uint));
-	Utility::MemUtils::Copy(m_cIV, 0, State.H, 0, CHAIN_SIZE * sizeof(uint));
+	Utility::MemUtils::Copy(Blake2::IV256, 0, State.H, 0, CHAIN_SIZE * sizeof(uint));
 
 	m_treeParams.GetConfig<uint>(m_treeConfig);
 	Utility::MemUtils::XOR256(m_treeConfig, 0, State.H, 0);
+}
+
+void Blake256::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length)
+{
+	IntUtils::LeIncreaseW(State.T, State.T, Length);
+
+	std::array<uint, 8> iv{
+		Blake2::IV256[0],
+		Blake2::IV256[1],
+		Blake2::IV256[2],
+		Blake2::IV256[3],
+		Blake2::IV256[4] ^ State.T[0],
+		Blake2::IV256[5] ^ State.T[1],
+		Blake2::IV256[6] ^ State.F[0],
+		Blake2::IV256[7] ^ State.F[1] };
+
+#if defined(__AVX__)
+	Blake2::PermuteR10P512V(Input, InOffset, State.H, iv);
+#else
+#	if defined(CEX_DIGEST_COMPACT)
+		Blake2::PermuteR10P512C(Input, InOffset, State.H, iv);
+#	else
+		Blake2::PermuteR10P512U(Input, InOffset, State.H, iv);
+#	endif
+#endif
 }
 
 void Blake256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length)
 {
 	do
 	{
-		Compress(Input, InOffset, State, BLOCK_SIZE);
+		Permute(Input, InOffset, State, BLOCK_SIZE);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
 	} 
