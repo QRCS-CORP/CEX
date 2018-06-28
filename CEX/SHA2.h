@@ -46,10 +46,10 @@ using Utility::IntUtils;
 
 /// <summary>
 /// Contains the SHA2-256 and 512bit permutation functions.
-/// <para>The compact forms of the permutations have the suffix C, and are optimized for low memory consumption 
+/// <para>The compact forms of the permutations have the suffix C, and are optimized for performance and low memory consumption 
 /// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
 /// The Unrolled forms are optimized for speed (suffix U), and the vertically vectorized functions have the V suffix. \n
-/// The H suffix denotes functions that take an SIMD wrapper class as the state values, and process message blocks in parallel.</para>
+/// The H suffix denotes functions that take an SIMD wrapper class as the state values, and process state in parallel.</para>
 /// <para>This class contains wide forms of the functions; PermuteR64P4096H and PermuteR80P4096H uses AVX2. \n
 /// Experimental functions using AVX512 instructions are also implemented; PermuteR64P8192H and PermuteR80P8192H. \n
 /// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitely declared.</para>
@@ -105,6 +105,8 @@ private:
 	static void Round512(ulong A, ulong B, ulong C, ulong &D, ulong E, ulong F, ulong G, ulong &H, ulong M, ulong P);
 
 public:
+
+	//~~~SHA2-256~~~//
 
 	/// <summary>
 	/// The compact form of the SHA2-256 permutation function.
@@ -165,6 +167,8 @@ public:
 	static void PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State);
 
 #endif
+
+	//~~~SHA2-512~~~//
 
 	/// <summary>
 	/// The compact form of the SHA2-512 permutation function.

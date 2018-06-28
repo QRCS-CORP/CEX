@@ -32,6 +32,8 @@ const std::vector<ulong> SHA2::K512
 
 //~~~Public Functions~~~//
 
+//~~~SHA2-256~~~//
+
 void SHA2::PermuteR64P512C(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State)
 {
 	std::array<uint, 8> A;
@@ -571,6 +573,7 @@ void SHA2::PermuteR64P4096H(const std::vector<byte> &Input, size_t InOffset, std
 {
 	std::array<UInt256, 8> A;
 	std::array<UInt256, 64> W;
+	UInt256 K;
 	size_t i;
 	size_t j;
 
@@ -601,22 +604,23 @@ void SHA2::PermuteR64P4096H(const std::vector<byte> &Input, size_t InOffset, std
 	j = 0;
 	for (i = 0; i < 8; ++i)
 	{
-		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], UInt256(K256[j]), W[j]);
-		++j;
-		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], UInt256(K256[j]), W[j]);
-		++j;
+		K.Load(K256[j]);
+		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
+		K.Load(K256[j + 1]);
+		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
+		K.Load(K256[j + 2]);
+		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
+		K.Load(K256[j + 3]);
+		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
+		K.Load(K256[j + 4]);
+		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
+		K.Load(K256[j + 5]);
+		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
+		K.Load(K256[j + 6]);
+		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
+		K.Load(K256[j + 7]);
+		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
+		j += 8;
 	}
 
 	State[0] += A[0];
@@ -637,6 +641,7 @@ void SHA2::PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std
 {
 	std::array<UInt512, 8> A;
 	std::array<UInt512, 64> W;
+	UInt512 K;
 	size_t i;
 	size_t j;
 
@@ -675,22 +680,23 @@ void SHA2::PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std
 	j = 0;
 	for (i = 0; i < 8; ++i)
 	{
-		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], UInt512(K256[j]), W[j]);
-		++j;
-		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], UInt512(K256[j]), W[j]);
-		++j;
+		K.Load(K256[j]);
+		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
+		K.Load(K256[j + 1]);
+		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
+		K.Load(K256[j + 2]);
+		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
+		K.Load(K256[j + 3]);
+		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
+		K.Load(K256[j + 4]);
+		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
+		K.Load(K256[j + 5]);
+		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
+		K.Load(K256[j + 6]);
+		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
+		K.Load(K256[j + 7]);
+		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
+		j += 8;
 	}
 
 	State[0] += A[0];
@@ -704,6 +710,8 @@ void SHA2::PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std
 }
 
 #endif
+
+//~~~SHA2-512~~~//
 
 void SHA2::PermuteR80P1024C(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State)
 {
@@ -1138,6 +1146,7 @@ void SHA2::PermuteR80P4096H(const std::vector<byte> &Input, size_t InOffset, std
 {
 	std::array<ULong256, 8> A;
 	std::array<ULong256, 80> W;
+	ULong256 K;
 	size_t i;
 	size_t j;
 
@@ -1164,22 +1173,23 @@ void SHA2::PermuteR80P4096H(const std::vector<byte> &Input, size_t InOffset, std
 	j = 0;
 	for (i = 0; i < 10; ++i)
 	{
-		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], ULong256(K512[j]), W[j]);
-		++j;
-		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], ULong256(K512[j]), W[j]);
-		++j;
+		K.Load(K512[j]);
+		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
+		K.Load(K512[j + 1]);
+		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
+		K.Load(K512[j + 2]);
+		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
+		K.Load(K512[j + 3]);
+		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
+		K.Load(K512[j + 4]);
+		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
+		K.Load(K512[j + 5]);
+		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
+		K.Load(K512[j + 6]);
+		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
+		K.Load(K512[j + 7]);
+		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
+		j += 8;
 	}
 
 	State[0] += A[0];
@@ -1200,6 +1210,7 @@ void SHA2::PermuteR80P8192H(const std::vector<byte> &Input, size_t InOffset, std
 {
 	std::array<ULong512, 8> A;
 	std::array<ULong512, 80> W;
+	ULong512 K;
 	size_t i;
 	size_t j;
 
@@ -1230,22 +1241,23 @@ void SHA2::PermuteR80P8192H(const std::vector<byte> &Input, size_t InOffset, std
 	j = 0;
 	for (i = 0; i < 10; ++i)
 	{
-		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], ULong512(K512[j]), W[j]);
-		++j;
-		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], ULong512(K512[j]), W[j]);
-		++j;
+		K.Load(K512[j]);
+		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
+		K.Load(K512[j + 1)];
+		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
+		K.Load(K512[j + 2)];
+		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
+		K.Load(K512[j + 3)];
+		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
+		K.Load(K512[j + 4)];
+		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
+		K.Load(K512[j + 5)];
+		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
+		K.Load(K512[j + 6)];
+		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
+		K.Load(K512[j + 7)];
+		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
+		j += 8;
 	}
 
 	State[0] += A[0];
