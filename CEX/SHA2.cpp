@@ -1,6 +1,9 @@
 #include "SHA2.h"
+#include "IntUtils.h"
 
 NAMESPACE_DIGEST
+
+using Utility::IntUtils;
 
 //~~~SHA2 K Constants~~~//
 
@@ -583,14 +586,14 @@ void SHA2::PermuteR64P4096H(const std::vector<byte> &Input, size_t InOffset, std
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4)),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 64),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 128),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 196),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 256),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 320),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 384),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 448));
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448));
 	}
 #else
 	Utility::MemUtils::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt256));
@@ -606,21 +609,28 @@ void SHA2::PermuteR64P4096H(const std::vector<byte> &Input, size_t InOffset, std
 	{
 		K.Load(K256[j]);
 		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
-		K.Load(K256[j + 1]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
-		K.Load(K256[j + 2]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
-		K.Load(K256[j + 3]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
-		K.Load(K256[j + 4]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
-		K.Load(K256[j + 5]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
-		K.Load(K256[j + 6]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
-		K.Load(K256[j + 7]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
-		j += 8;
+		++j;
 	}
 
 	State[0] += A[0];
@@ -651,22 +661,22 @@ void SHA2::PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4)),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 64),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 128),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 196),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 256),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 320),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 384),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 448),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 512),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 576),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 640),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 704),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 768),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 832),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 896),
-			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * 4) + 960));
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint))),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 64),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 128),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 196),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 256),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 320),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 384),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 448),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 512),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 576),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 640),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 704),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 768),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 832),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 896),
+			Utility::IntUtils::BeBytesTo32(Input, InOffset + (i * sizeof(uint)) + 960));
 	}
 #else
 	Utility::MemUtils::Copy(Input, InOffset, W, 0, A.size() * sizeof(UInt512));
@@ -682,21 +692,28 @@ void SHA2::PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std
 	{
 		K.Load(K256[j]);
 		Round256W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
-		K.Load(K256[j + 1]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
-		K.Load(K256[j + 2]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
-		K.Load(K256[j + 3]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
-		K.Load(K256[j + 4]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
-		K.Load(K256[j + 5]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
-		K.Load(K256[j + 6]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
-		K.Load(K256[j + 7]);
+		++j;
+		K.Load(K256[j]);
 		Round256W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
-		j += 8;
+		++j;
 	}
 
 	State[0] += A[0];
@@ -1156,10 +1173,10 @@ void SHA2::PermuteR80P4096H(const std::vector<byte> &Input, size_t InOffset, std
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8)),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 128),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 256),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 384));
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384));
 	}
 #else
 	Utility::MemUtils::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong256));
@@ -1175,21 +1192,28 @@ void SHA2::PermuteR80P4096H(const std::vector<byte> &Input, size_t InOffset, std
 	{
 		K.Load(K512[j]);
 		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
-		K.Load(K512[j + 1]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
-		K.Load(K512[j + 2]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
-		K.Load(K512[j + 3]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
-		K.Load(K512[j + 4]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
-		K.Load(K512[j + 5]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
-		K.Load(K512[j + 6]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
-		K.Load(K512[j + 7]);
+		++j;
+		K.Load(K512[j]);
 		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
-		j += 8;
+		++j;
 	}
 
 	State[0] += A[0];
@@ -1220,14 +1244,14 @@ void SHA2::PermuteR80P8192H(const std::vector<byte> &Input, size_t InOffset, std
 	for (i = 0; i < 16; ++i)
 	{
 		W[i].Load(
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8)),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 128),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 256),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 384),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 512),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 640),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 768),
-			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * 8) + 896));
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong))),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 128),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 256),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 384),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 512),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 640),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 768),
+			Utility::IntUtils::BeBytesTo64(Input, InOffset + (i * sizeof(ulong)) + 896));
 	}
 #else
 	Utility::MemUtils::Copy(Input, InOffset, W, 0, A.size() * sizeof(ULong512));
@@ -1243,21 +1267,28 @@ void SHA2::PermuteR80P8192H(const std::vector<byte> &Input, size_t InOffset, std
 	{
 		K.Load(K512[j]);
 		Round512W(A[0], A[1], A[2], A[3], A[4], A[5], A[6], A[7], K, W[j]);
-		K.Load(K512[j + 1)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[7], A[0], A[1], A[2], A[3], A[4], A[5], A[6], K, W[j]);
-		K.Load(K512[j + 2)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[6], A[7], A[0], A[1], A[2], A[3], A[4], A[5], K, W[j]);
-		K.Load(K512[j + 3)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[5], A[6], A[7], A[0], A[1], A[2], A[3], A[4], K, W[j]);
-		K.Load(K512[j + 4)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[4], A[5], A[6], A[7], A[0], A[1], A[2], A[3], K, W[j]);
-		K.Load(K512[j + 5)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[3], A[4], A[5], A[6], A[7], A[0], A[1], A[2], K, W[j]);
-		K.Load(K512[j + 6)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[2], A[3], A[4], A[5], A[6], A[7], A[0], A[1], K, W[j]);
-		K.Load(K512[j + 7)];
+		++j;
+		K.Load(K512[j];
 		Round512W(A[1], A[2], A[3], A[4], A[5], A[6], A[7], A[0], K, W[j]);
-		j += 8;
+		++j;
 	}
 
 	State[0] += A[0];

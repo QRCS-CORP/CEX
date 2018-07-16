@@ -58,6 +58,8 @@ namespace Test
 		void Blake2BPTest();
 		void Blake2STest();
 		void Blake2SPTest();
+		void ComparePermutation256();
+		void ComparePermutation512();
 		void MacParamsTest();
 		void TreeParamsTest();
 		void OnProgress(std::string Data);

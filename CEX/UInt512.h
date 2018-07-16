@@ -143,6 +143,16 @@ public:
 	//~~~ Load and Store~~~//
 
 	/// <summary>
+	/// Load with 1 * 32bit unsigned integer; copied to every register
+	/// </summary>
+	///
+	/// <param name="X">Set all uint32 integers to this value</param>
+	inline void Load(uint X)
+	{
+		zmm = _mm512_set1_epi32(X);
+	}
+
+	/// <summary>
 	/// Load an array into a register
 	/// </summary>
 	///

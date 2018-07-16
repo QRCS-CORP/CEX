@@ -1,10 +1,14 @@
 #include "Keccak512.h"
 #include "Keccak.h"
+#include "IntUtils.h"
+#include "MemUtils.h"
 #include "ParallelUtils.h"
 
 NAMESPACE_DIGEST
 
 using Utility::IntUtils;
+using Utility::MemUtils;
+using Utility::ParallelUtils;
 
 const std::string Keccak512::CLASS_NAME("Keccak512");
 
@@ -152,7 +156,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// process buffer
@@ -204,7 +208,7 @@ size_t Keccak512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		if (m_msgLength != m_msgBuffer.size())
 		{
-			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		HashFinal(m_msgBuffer, 0, m_msgLength, m_dgtState[0]);
@@ -228,7 +232,7 @@ void Keccak512::ParallelMaxDegree(size_t Degree)
 
 void Keccak512::Reset()
 {
-	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -264,11 +268,11 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
 					Absorb(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE, m_dgtState[i]);
 					Permute(m_dgtState[i].H);
@@ -285,7 +289,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 				// process large blocks
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
 				});
@@ -298,7 +302,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 			{
 				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
 
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
 				});
@@ -314,7 +318,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				Absorb(m_msgBuffer, 0, BLOCK_SIZE, m_dgtState[0]);
@@ -337,7 +341,7 @@ void Keccak512::Update(const std::vector<byte> &Input, size_t InOffset, size_t L
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}

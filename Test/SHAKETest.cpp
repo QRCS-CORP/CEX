@@ -42,42 +42,42 @@ namespace Test
 
 			for (i = 0; i < 5; ++i)
 			{
-				CompareVector(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE128);
+				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE128);
 			}
 			OnProgress(std::string("SHAKETest: Passed SHAKE128 tests.."));
 
 			for (i = 5; i < 10; ++i)
 			{
-				CompareVector(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE256);
+				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE256);
 			}
 			OnProgress(std::string("SHAKETest: Passed SHAKE256 tests.."));
 
 			for (i = 10; i < 15; ++i)
 			{
-				CompareVector(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE512);
+				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE512);
 			}
 			OnProgress(std::string("SHAKETest: Passed SHAKE512 tests.."));/**/
 
 			for (i = 15; i < 20; ++i)
 			{
-				CompareVector(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE1024);
+				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE1024);
 			}
 			OnProgress(std::string("SHAKETest: Passed SHAKE1024 tests.."));
 
 			OnProgress(std::string("cSHAKE: Testing the custom SHAKE implementations.."));
 
-			CompareVector(m_key[20], m_output[20], Enumeration::ShakeModes::SHAKE128, true);
-			CompareVector(m_key[21], m_output[21], Enumeration::ShakeModes::SHAKE128, true);
+			CompareOutput(m_key[20], m_output[20], Enumeration::ShakeModes::SHAKE128, true);
+			CompareOutput(m_key[21], m_output[21], Enumeration::ShakeModes::SHAKE128, true);
 			OnProgress(std::string("cSHAKE: Passed SP800-185 cSHAKE-128 KAT tests.."));
 
-			CompareVector(m_key[20], m_output[22], Enumeration::ShakeModes::SHAKE256, true);
-			CompareVector(m_key[21], m_output[23], Enumeration::ShakeModes::SHAKE256, true);
+			CompareOutput(m_key[20], m_output[22], Enumeration::ShakeModes::SHAKE256, true);
+			CompareOutput(m_key[21], m_output[23], Enumeration::ShakeModes::SHAKE256, true);
 			OnProgress(std::string("cSHAKE: Passed SP800-185 cSHAKE-256 KAT tests.."));
 
-			CompareVector(m_key[21], m_output[24], Enumeration::ShakeModes::SHAKE512, true);
+			CompareOutput(m_key[21], m_output[24], Enumeration::ShakeModes::SHAKE512, true);
 			OnProgress(std::string("cSHAKE: Passed customized cSHAKE-512 KAT test.."));
 
-			CompareVector(m_key[20], m_output[25], Enumeration::ShakeModes::SHAKE1024, true);
+			CompareOutput(m_key[20], m_output[25], Enumeration::ShakeModes::SHAKE1024, true);
 			OnProgress(std::string("cSHAKE: Passed customized cSHAKE-1024 KAT test.."));
 
 			OnProgress(std::string("SHAKETest: Passed vector comparison tests.."));
@@ -94,7 +94,7 @@ namespace Test
 		}
 	}
 
-	void SHAKETest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Expected, ShakeModes Mode, bool Custom)
+	void SHAKETest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Expected, ShakeModes Mode, bool Custom)
 	{
 		std::vector<byte> outBytes(Expected.size());
 		Kdf::SHAKE gen(Mode);

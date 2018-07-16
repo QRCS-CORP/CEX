@@ -53,7 +53,9 @@ namespace Test
         
     private:
 
-		void CompareVector(Digest::IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void CompareOutput(Digest::IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void ComparePermutation256();
+		void ComparePermutation512();
 		void Initialize();
 		void OnProgress(std::string Data);
 		void TreeParamsTest();

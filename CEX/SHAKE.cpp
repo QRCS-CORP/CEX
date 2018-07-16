@@ -1,8 +1,13 @@
 #include "SHAKE.h"
+#include "IntUtils.h"
 #include "Keccak.h"
+#include "MemUtils.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_KDF
+
+using Utility::IntUtils;
+using Utility::MemUtils;
 
 const std::string SHAKE::CLASS_NAME("SHAKE");
 
@@ -34,8 +39,8 @@ SHAKE::~SHAKE()
 		m_isInitialized = false;
 		m_shakeMode = ShakeModes::None;
 
-		Utility::IntUtils::ClearArray(m_kdfState);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearArray(m_kdfState);
+		IntUtils::ClearVector(m_legalKeySizes);
 	}
 }
 
@@ -73,7 +78,7 @@ size_t SHAKE::MinKeySize()
 
 const std::string SHAKE::Name()
 {
-	return CLASS_NAME + "-" + Utility::IntUtils::ToString(m_hashSize * 8);
+	return CLASS_NAME + "-" + IntUtils::ToString(m_hashSize * 8);
 }
 
 //~~~Public Functions~~~//
@@ -124,7 +129,7 @@ void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Lengt
 
 	std::vector<byte> tmpK(Length);
 
-	Utility::MemUtils::Copy(Key, Offset, tmpK, 0, Length);
+	MemUtils::Copy(Key, Offset, tmpK, 0, Length);
 	Initialize(tmpK);
 }
 
@@ -179,7 +184,7 @@ void SHAKE::ReSeed(const std::vector<byte> &Seed)
 
 void SHAKE::Reset()
 {
-	Utility::MemUtils::Clear(m_kdfState, 0, m_kdfState.size() * sizeof(ulong));
+	MemUtils::Clear(m_kdfState, 0, m_kdfState.size() * sizeof(ulong));
 	m_isInitialized = false;
 }
 
@@ -233,12 +238,12 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		}
 	}
 
-	Utility::MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
+	MemUtils::Clear(pad, offset, BUFFER_SIZE - offset);
 	offset = (offset % sizeof(ulong) == 0) ? offset : offset + (sizeof(ulong) - (offset % sizeof(ulong)));
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		m_kdfState[i / 8] ^= Utility::IntUtils::LeBytesTo64(pad, i);
+		m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 	}
 
 	Permute(m_kdfState);
@@ -248,8 +253,8 @@ void SHAKE::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	while (Length != 0)
 	{
-		const size_t BLKLEN = Utility::IntUtils::Min(m_blockSize, Length);
-		Utility::MemUtils::Copy(m_kdfState, 0, Output, OutOffset, BLKLEN);
+		const size_t BLKLEN = IntUtils::Min(m_blockSize, Length);
+		MemUtils::Copy(m_kdfState, 0, Output, OutOffset, BLKLEN);
 		Permute(m_kdfState);
 		Length -= BLKLEN;
 		OutOffset += BLKLEN;
@@ -276,13 +281,13 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, msg, 0, Length);
+			MemUtils::Copy(Input, InOffset, msg, 0, Length);
 		}
 
 		msg[Length] = m_domainCode;
 		++Length;
 
-		Utility::MemUtils::Clear(msg, Length, m_blockSize - Length);
+		MemUtils::Clear(msg, Length, m_blockSize - Length);
 		msg[m_blockSize - 1] |= 0x80;
 		AbsorbBlock(msg, 0, m_blockSize, m_kdfState);
 

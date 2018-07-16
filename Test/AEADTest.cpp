@@ -47,7 +47,7 @@ namespace Test
 
 			for (size_t i = 0; i < EAX_TESTSIZE; ++i)
 			{
-				CompareVector(cipher1, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
+				CompareOutput(cipher1, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 			}
 			OnProgress(std::string("AEADTest: Passed EAX known answer comparison tests.."));
 
@@ -66,7 +66,7 @@ namespace Test
 
 			for (size_t i = EAX_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE; ++i)
 			{
-				CompareVector(cipher2, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
+				CompareOutput(cipher2, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 			}
 			OnProgress(std::string("AEADTest: Passed OCB known answer comparison tests.."));
 
@@ -85,7 +85,7 @@ namespace Test
 
 			for (size_t i = EAX_TESTSIZE + OCB_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE + GCM_TESTSIZE; ++i)
 			{
-				CompareVector(cipher3, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
+				CompareOutput(cipher3, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 			}
 			StressTest(cipher3);
 			OnProgress(std::string("AEADTest: Passed GCM stress tests.."));
@@ -110,7 +110,7 @@ namespace Test
 		}
 	}
 
-	void AEADTest::CompareVector(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
+	void AEADTest::CompareOutput(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
 		std::vector<byte> &CipherText, std::vector<byte> &MacCode)
 	{
 		Key::Symmetric::SymmetricKey kp(Key, Nonce);

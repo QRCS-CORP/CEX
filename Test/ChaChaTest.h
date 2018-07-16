@@ -54,7 +54,7 @@ namespace Test
 	private:
 
 		void CompareParallel();
-		void CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output);
+		void CompareOutput(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output);
 		void Initialize();
 		void OnProgress(std::string Data);
 	};

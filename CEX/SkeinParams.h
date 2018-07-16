@@ -29,7 +29,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// The Skein configuration parameters structure
+/// The parallel Skein configuration parameters structure
 /// </summary> 
 struct SkeinParams
 {

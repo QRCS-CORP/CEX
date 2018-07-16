@@ -35,7 +35,7 @@ namespace Test
 		{
 			TestInit();
 			OnProgress(std::string("KDF2Test: Passed initialization tests.."));
-			CompareVector(m_key, m_output);
+			CompareOutput(m_key, m_output);
 			OnProgress(std::string("KDF2Test: Passed 256 bit vectors test.."));
 
 			return SUCCESS;
@@ -50,7 +50,7 @@ namespace Test
 		}
 	}
 
-	void KDF2Test::CompareVector(std::vector<byte> &Key, std::vector<byte> &Expected)
+	void KDF2Test::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Expected)
 	{
 		std::vector<byte> output(Expected.size());
 		Digest::SHA256* dgt = new Digest::SHA256();

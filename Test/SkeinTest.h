@@ -58,8 +58,11 @@ namespace Test
 
 	private:
 
+		void CompareOutput(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void CompareParallel(IDigest* Dgt1, IDigest* Dgt2);
-		void CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void ComparePermutation256();
+		void ComparePermutation512();
+		void ComparePermutation1024();
 		void Initialize();
 		void OnProgress(std::string Data);
 		void TreeParamsTest();

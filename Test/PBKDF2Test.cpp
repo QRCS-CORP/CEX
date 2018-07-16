@@ -40,10 +40,10 @@ namespace Test
 		{
 			TestInit();
 			OnProgress(std::string("PBKDF2Test: Passed initialization tests.."));
-			CompareVector(32, 1, m_key[0],m_salt[0],  m_output[0]);
-			CompareVector(32, 2, m_key[0], m_salt[0], m_output[1]);
-			CompareVector(32, 4096, m_key[0], m_salt[0], m_output[2]);
-			CompareVector(40, 4096, m_key[1], m_salt[1], m_output[3]);
+			CompareOutput(32, 1, m_key[0],m_salt[0],  m_output[0]);
+			CompareOutput(32, 2, m_key[0], m_salt[0], m_output[1]);
+			CompareOutput(32, 4096, m_key[0], m_salt[0], m_output[2]);
+			CompareOutput(40, 4096, m_key[1], m_salt[1], m_output[3]);
 			OnProgress(std::string("PBKDF2Test: Passed SHA256 KAT vector tests.."));
 
 			return SUCCESS;
@@ -58,7 +58,7 @@ namespace Test
 		}
 	}
 
-	void PBKDF2Test::CompareVector(size_t Size, size_t Iterations, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected)
+	void PBKDF2Test::CompareOutput(size_t Size, size_t Iterations, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected)
 	{
 		std::vector<byte> outBytes(Size);
 		Digest::SHA256* eng256 = new Digest::SHA256();

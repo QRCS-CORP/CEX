@@ -50,7 +50,7 @@ namespace Test
 
 	private:
 
-		void CompareVector(std::vector<byte> &Salt, std::vector<byte> &Expected);
+		void CompareOutput(std::vector<byte> &Salt, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);
 		void TestInit();

@@ -107,7 +107,7 @@ namespace Test
 				}
 
 				// vector comparison
-				CompareVector(key, pln, cip);
+				CompareOutput(key, pln, cip);
 			}
 			
 			rcnt = TestUtils::ToString(rcount);
@@ -170,7 +170,7 @@ namespace Test
 				}
 
 				// vector comparison
-				CompareVector(key, pln, cip);
+				CompareOutput(key, pln, cip);
 			}
 
 			rcnt = TestUtils::ToString(rcount);
@@ -234,7 +234,7 @@ namespace Test
 				}
 
 				// vector comparison
-				CompareVector(key, pln, cip);
+				CompareOutput(key, pln, cip);
 			}
 
 			rcnt = TestUtils::ToString(rcount);
@@ -310,7 +310,7 @@ namespace Test
 		}
 	}
 
-	void SerpentTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	void SerpentTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> expBytes(16, 0);
 		std::vector<byte> outBytes(16, 0);

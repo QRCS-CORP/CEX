@@ -64,7 +64,7 @@ NAMESPACE_MODE
 /// 
 /// <remarks>
 /// <description><B>Overview:</B></description>
-/// <para>The ICM Counter mode generates a key-stream by encrypting successive values of an incrementing Little Endian ordered 64bit integer counter array. \n
+/// <para>The ICM Counter mode generates a key-stream by encrypting successive values of an incrementing Little Endian ordered, 64bit integer counter array. \n
 /// The key-stream is then XOR'd with the input message block creating a type of stream cipher. \n
 /// The ICM counter mode differs from the standard CTR mode by using a little endian byte ordered counter, allowing the use of 64 bit integers in the counter array on an LE based architecture (e.g AMD, Intel). \n
 /// The trend in processors is moving towards little endian format, and with devices that use this bit ordering, ICM can be significantly faster then the standard big endian CTR implementation. \n

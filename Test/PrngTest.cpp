@@ -65,7 +65,7 @@ namespace Test
 			delete bcr;
 
 			OnProgress(std::string(""));
-			OnProgress(std::string("### Deterministic Pseujdo-Random Generator Output Tests ###"));
+			OnProgress(std::string("### Deterministic Pseudo-Random Generator Output Tests ###"));
 			std::vector<byte> seed(0);
 			CSP rng;
 

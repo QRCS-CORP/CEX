@@ -485,11 +485,12 @@
     <ClCompile Include="..\..\CEX\RLWEPublicKey.cpp" />
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
-    <ClCompile Include="..\..\CEX\SHA.cpp" />
+    <ClCompile Include="..\..\CEX\SHA2.cpp" />
     <ClCompile Include="..\..\CEX\SHA256.cpp" />
     <ClCompile Include="..\..\CEX\SHA2Params.cpp" />
     <ClCompile Include="..\..\CEX\SHA512.cpp" />
     <ClCompile Include="..\..\CEX\SHAKE.cpp" />
+    <ClCompile Include="..\..\CEX\Skein.cpp" />
     <ClCompile Include="..\..\CEX\Skein1024.cpp" />
     <ClCompile Include="..\..\CEX\Skein256.cpp" />
     <ClCompile Include="..\..\CEX\Skein512.cpp" />

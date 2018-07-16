@@ -1,6 +1,7 @@
 #include "SHA256.h"
 #include "SHA2.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ParallelUtils.h"
 #if defined(__AVX__)
 #	include "Intrinsics.h"
@@ -9,6 +10,8 @@
 NAMESPACE_DIGEST
 
 using Utility::IntUtils;
+using Utility::MemUtils;
+using Utility::ParallelUtils;
 
 const std::string SHA256::CLASS_NAME("SHA256");
 
@@ -156,7 +159,7 @@ size_t SHA256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// process buffer
@@ -233,7 +236,7 @@ void SHA256::ParallelMaxDegree(size_t Degree)
 void SHA256::Reset()
 {
 	m_msgLength = 0;
-	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
 	{
@@ -267,11 +270,11 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
 					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i]);
 				});
@@ -287,7 +290,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 				// process large blocks
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRCLEN);
 				});
@@ -300,7 +303,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			{
 				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
 
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState[i], PRMLEN);
 				});
@@ -316,7 +319,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				Permute(m_msgBuffer, 0, m_dgtState[0]);
@@ -337,7 +340,7 @@ void SHA256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -362,13 +365,13 @@ void SHA256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 	// padding
 	if (Length < BLOCK_SIZE)
 	{
-		Utility::MemUtils::Clear(Input, InOffset + Length, BLOCK_SIZE - Length);
+		MemUtils::Clear(Input, InOffset + Length, BLOCK_SIZE - Length);
 	}
 
 	if (Length > 56)
 	{
 		Permute(Input, InOffset, State);
-		Utility::MemUtils::Clear(Input, 0, BLOCK_SIZE);
+		MemUtils::Clear(Input, 0, BLOCK_SIZE);
 	}
 
 	// finalize state with counter and last compression

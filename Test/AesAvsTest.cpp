@@ -66,7 +66,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(key, plainText, cipherText);
+					CompareOutput(key, plainText, cipherText);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit key vectors test.."));
@@ -91,7 +91,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(key, plainText, cipherText);
+					CompareOutput(key, plainText, cipherText);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit key vectors test.."));
@@ -116,7 +116,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(key, plainText, cipherText);
+					CompareOutput(key, plainText, cipherText);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit key vectors test.."));
@@ -142,7 +142,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(key, plainText, cipherText);
+					CompareOutput(key, plainText, cipherText);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 128 bit plain-text vectors test.."));
@@ -168,7 +168,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(key, plainText, cipherText);
+					CompareOutput(key, plainText, cipherText);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 192 bit plain-text vectors test.."));
@@ -194,7 +194,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(key, plainText, cipherText);
+					CompareOutput(key, plainText, cipherText);
 				}
 			}
 			OnProgress(std::string("AesAvsTest: Passed 256 bit plain-text vectors test.. 960/960 vectors passed"));
@@ -211,7 +211,7 @@ namespace Test
 		}
 	}
 
-	void AesAvsTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	void AesAvsTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 

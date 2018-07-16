@@ -59,7 +59,7 @@ namespace Test
 
 	private:
 
-		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Expected, ShakeModes Mode, bool Custom = false);
+		void CompareOutput(std::vector<byte> &Key, std::vector<byte> &Expected, ShakeModes Mode, bool Custom = false);
 		void Initialize();
 		void OnProgress(std::string Data);
 	};

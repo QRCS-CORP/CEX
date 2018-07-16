@@ -1,10 +1,34 @@
 #include "SHA2Test.h"
+#include "../CEX/IntUtils.h"
+#include "../CEX/MemUtils.h"
+#include "../CEX/SHA2.h"
 #include "../CEX/SHA256.h"
 #include "../CEX/SHA512.h"
+
+#if defined(__AVX2__)
+#	include "../CEX/UInt256.h"
+#	include "../CEX/ULong256.h"
+#endif
+
+#if defined(__AVX512__)
+#	include "../CEX/UInt512.h"
+#	include "../CEX/ULong512.h"
+#endif
 
 namespace Test
 {
 	using namespace Digest;
+	using Utility::MemUtils;
+
+#if defined(__AVX2__)
+	using Numeric::UInt256;
+	using Numeric::ULong256;
+#endif
+
+#if defined(__AVX512__)
+	using Numeric::UInt512;
+	using Numeric::ULong512;
+#endif
 
 	const std::string SHA2Test::DESCRIPTION = "Tests SHA-2 256/512 with NIST KAT vectors.";
 	const std::string SHA2Test::FAILURE = "FAILURE! ";
@@ -35,22 +59,27 @@ namespace Test
 	{
 		try
 		{
+			ComparePermutation256();
+			OnProgress(std::string("Passed Sha2-256 permutation variants equivalence test.."));
+			ComparePermutation512();
+			OnProgress(std::string("Passed Sha2-512 permutation variants equivalence test.."));
+
 			TreeParamsTest();
 			OnProgress(std::string("Passed SHA2Params parameter serialization test.."));
 
 			SHA256* sha256 = new SHA256();
-			CompareVector(sha256, m_message[0], m_exp256[0]);
-			CompareVector(sha256, m_message[1], m_exp256[1]);
-			CompareVector(sha256, m_message[2], m_exp256[2]);
-			CompareVector(sha256, m_message[3], m_exp256[3]);
+			CompareOutput(sha256, m_message[0], m_exp256[0]);
+			CompareOutput(sha256, m_message[1], m_exp256[1]);
+			CompareOutput(sha256, m_message[2], m_exp256[2]);
+			CompareOutput(sha256, m_message[3], m_exp256[3]);
 			delete sha256;
 			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));/**/
 
 			SHA512* sha512 = new SHA512();
-			CompareVector(sha512, m_message[0], m_exp512[0]);
-			CompareVector(sha512, m_message[1], m_exp512[1]);
-			CompareVector(sha512, m_message[2], m_exp512[2]);
-			CompareVector(sha512, m_message[3], m_exp512[3]);
+			CompareOutput(sha512, m_message[0], m_exp512[0]);
+			CompareOutput(sha512, m_message[1], m_exp512[1]);
+			CompareOutput(sha512, m_message[2], m_exp512[2]);
+			CompareOutput(sha512, m_message[3], m_exp512[3]);
 			delete sha512;
 			OnProgress(std::string("Sha2Test: Passed SHA-2 512 bit digest vector tests.."));
 
@@ -66,7 +95,7 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::CompareVector(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SHA2Test::CompareOutput(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(Digest->DigestSize(), 0);
 
@@ -86,6 +115,122 @@ namespace Test
 		{
 			throw TestException("SHA2: Expected hash is not equal!");
 		}
+	}
+
+	void SHA2Test::ComparePermutation256()
+	{
+		std::vector<byte> input(64, 128U);
+		std::array<uint, 8> state1;
+		std::array<uint, 8> state2;
+
+		MemUtils::Clear(state1, 0, 8 * sizeof(uint));
+		MemUtils::Clear(state2, 0, 8 * sizeof(uint));
+
+		SHA2::PermuteR64P512C(input, 0, state1);
+		SHA2::PermuteR64P512U(input, 0, state2);
+
+		if (state1 != state2)
+		{
+			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+		}
+
+#if defined(__AVX2__)
+
+		std::vector<byte> input256(512, 128U);
+		std::vector<UInt256> state256(8, UInt256(0));
+
+		SHA2::PermuteR64P4096H(input256, 0, state256);
+
+		std::vector<uint> state256ul(32);
+		MemUtils::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
+
+		for (size_t i = 0; i < 32; ++i)
+		{
+			if (state256ul[i] != state1[i / 8])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::vector<byte> input512(1024, 128U);
+		std::vector<UInt512> state512(8, UInt512(0));
+
+		SHA2::PermuteR64P8192H(input512, 0, state512);
+
+		std::vector<uint> state512ul(64);
+		MemUtils::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
+
+		for (size_t i = 0; i < 64; ++i)
+		{
+			if (state512ul[i] != state1[i / 16])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
+	}
+
+	void SHA2Test::ComparePermutation512()
+	{
+		std::vector<byte> input(128, 128U);
+		std::array<ulong, 8> state1;
+		std::array<ulong, 8> state2;
+
+		std::memset(state1.data(), 0, 8 * sizeof(ulong));
+		std::memset(state2.data(), 0, 8 * sizeof(ulong));
+
+		SHA2::PermuteR80P1024C(input, 0, state1);
+		SHA2::PermuteR80P1024U(input, 0, state2);
+
+		if (state1 != state2)
+		{
+			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+		}
+
+#if defined(__AVX2__)
+
+		std::vector<byte> input256(512, 128U);
+		std::vector<ULong256> state256(8, ULong256(0));
+
+		SHA2::PermuteR80P4096H(input256, 0, state256);
+
+		std::vector<ulong> state256ull(32);
+		MemUtils::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
+
+		for (size_t i = 0; i < 32; ++i)
+		{
+			if (state256ull[i] != state1[i / 4])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::vector<byte> input512(1024, 128U);
+		std::vector<ULong512> state512(8, ULong512(0));
+
+		SHA2::PermuteR80P8192H(input512, 0, state512);
+
+		std::vector<ulong> state512ull(64);
+		MemUtils::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
+
+		for (size_t i = 0; i < 64; ++i)
+		{
+			if (state512ull[i] != state1[i / 8])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
 	}
 
 	void SHA2Test::Initialize()

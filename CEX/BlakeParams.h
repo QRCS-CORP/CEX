@@ -24,7 +24,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// The Blake2 parameters structure
+/// The parallel Blake2 parameters structure
 /// </summary> 
 struct BlakeParams
 {

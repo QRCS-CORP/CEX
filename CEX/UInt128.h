@@ -128,6 +128,16 @@ public:
 	//~~~ Load and Store~~~//
 
 	/// <summary>
+	/// Load with 1 * 32bit unsigned integer; copied to every register
+	/// </summary>
+	///
+	/// <param name="X">Set all uint32 integers to this value</param>
+	inline void Load(uint X)
+	{
+		xmm = _mm_set1_epi32(X);
+	}
+
+	/// <summary>
 	/// Load with 4 * 32bit unsigned integers
 	/// </summary>
 	///

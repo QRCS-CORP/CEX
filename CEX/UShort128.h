@@ -132,6 +132,16 @@ public:
 	//~~~ Load and Store~~~//
 
 	/// <summary>
+	/// Load with 1 * 16bit unsigned integer; copied to every register
+	/// </summary>
+	///
+	/// <param name="X">Set all uint16 integers to this value</param>
+	inline void Load(ushort X)
+	{
+		xmm = _mm_set1_epi16(X);
+	}
+
+	/// <summary>
 	/// Load an array into a register
 	/// </summary>
 	///

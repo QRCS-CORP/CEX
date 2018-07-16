@@ -29,7 +29,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// The Keccak configuration parameters structure
+/// The parallel Keccak configuration parameters structure
 /// </summary> 
 struct KeccakParams
 {

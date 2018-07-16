@@ -55,7 +55,7 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(i, 32), key);
 
 				// vector comparison
-				CompareVector(key, m_plainText, cip);
+				CompareOutput(key, m_plainText, cip);
 			}
 			OnProgress(std::string("TwofishTest: Passed Twofish 128 bit key vector tests.."));
 
@@ -69,7 +69,7 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(j, 48), key);
 
 				// vector comparison
-				CompareVector(key, m_plainText, cip);
+				CompareOutput(key, m_plainText, cip);
 			}
 			OnProgress(std::string("TwofishTest: Passed Twofish 192 bit key vector tests.."));
 
@@ -83,7 +83,7 @@ namespace Test
 				HexConverter::Decode(keyStr.substr(j, 64), key);
 
 				// vector comparison
-				CompareVector(key, m_plainText, cip);
+				CompareOutput(key, m_plainText, cip);
 			}
 			OnProgress(std::string("TwofishTest: Passed Twofish 256 bit key vector tests.."));
 
@@ -160,7 +160,7 @@ namespace Test
 		}
 	}
 
-	void TwofishTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	void TwofishTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		THX tfx;

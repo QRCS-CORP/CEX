@@ -36,14 +36,14 @@ namespace Test
 		try
 		{
 			// test vectors with 8/12/20 rounds and 128/256 keys
-			CompareVector(20, m_key[0], m_iv[0], m_plainText, m_cipherText[0]);
-			CompareVector(20, m_key[1], m_iv[0], m_plainText, m_cipherText[1]);
+			CompareOutput(20, m_key[0], m_iv[0], m_plainText, m_cipherText[0]);
+			CompareOutput(20, m_key[1], m_iv[0], m_plainText, m_cipherText[1]);
 			OnProgress(std::string("ChaChaTest: Passed 20 round vector tests.."));
-			CompareVector(12, m_key[0], m_iv[0], m_plainText, m_cipherText[2]);
-			CompareVector(8, m_key[0], m_iv[0], m_plainText, m_cipherText[3]);
+			CompareOutput(12, m_key[0], m_iv[0], m_plainText, m_cipherText[2]);
+			CompareOutput(8, m_key[0], m_iv[0], m_plainText, m_cipherText[3]);
 			OnProgress(std::string("ChaChaTest: Passed 8 and 12 round vector tests.."));
-			CompareVector(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
-			CompareVector(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
+			CompareOutput(20, m_key[2], m_iv[1], m_plainText, m_cipherText[4]);
+			CompareOutput(20, m_key[3], m_iv[2], m_plainText, m_cipherText[5]);
 			OnProgress(std::string("ChaChaTest: Passed 256 bit key vector tests.."));
 			CompareParallel();
 			OnProgress(std::string("ChaChaTest: Passed parallel/linear equality tests.."));
@@ -90,7 +90,7 @@ namespace Test
 		}
 	}
 
-	void ChaChaTest::CompareVector(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
+	void ChaChaTest::CompareOutput(int Rounds, std::vector<byte> &Key, std::vector<byte> &Vector, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		Key::Symmetric::SymmetricKey k(Key, Vector);

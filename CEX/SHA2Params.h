@@ -29,7 +29,7 @@
 NAMESPACE_DIGEST
 
 /// <summary>
-/// The SHA2 configuration parameters structure
+/// The parallel SHA2 configuration parameters structure
 /// </summary> 
 struct SHA2Params
 {

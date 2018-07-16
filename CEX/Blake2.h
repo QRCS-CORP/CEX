@@ -19,7 +19,7 @@
 #ifndef CEX_BLAKE2_H
 #define CEX_BLAKE2_H
 
-#include "IntUtils.h"
+#include "CexDomain.h"
 
 #if defined(__AVX2__)
 #	include "UInt256.h"
@@ -43,10 +43,11 @@ NAMESPACE_DIGEST
 
 /// <summary>
 /// Contains the Blake2-256 and 512bit permutation functions.
-/// <para>The compact forms of the permutations have the suffix C, and are optimized for low memory consumption 
+/// <para>The function names are in the format; Permute-rounds-bits-suffix, ex. PermuteR10P512C, 10 rounds, permutes 512 bits, using the compact form of the function. \n
+/// The compact forms of the permutations have the suffix C, and are optimized for speed and low memory consumption 
 /// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
-/// The Unrolled forms are optimized for timing-neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
-/// The H suffix denotes functions that take an SIMD wrapper class (AVX2/AVX512) as the state values, and process message blocks in parallel.</para>
+/// The Unrolled forms are optimized for speed and timing-neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
+/// The H suffix denotes functions that take an SIMD wrapper class (AVX2/AVX512) as the state values, and process input in SIMD parallel blocks.</para>
 /// <para>This class contains horizontally vectorized (wide) forms of the functions; PermuteR10P4096H and PermuteR12P4096H use AVX2, and
 /// PermuteR10P8192H and PermuteR12P8192H use the AVX512 instructions. \n
 /// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitely declared.</para>
@@ -202,8 +203,6 @@ public:
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV);
 
-#if defined(__AVX__)
-
 	/// <summary>
 	/// The vertically vectorized form of the Blake2-512 permutation function.
 	/// </summary>
@@ -213,6 +212,8 @@ public:
 	/// <param name="State">The permutations state array</param>
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV);
+
+#if defined(__AVX__)
 
 	/// <summary>
 	/// The horizontally vectorized form of the Blake2-512 permutation function.

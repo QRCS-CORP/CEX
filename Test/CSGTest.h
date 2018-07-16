@@ -54,7 +54,7 @@ namespace Test
 	private:
 
 		void CheckInit();
-		void CompareVector(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected);
+		void CompareOutput(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);
 		bool OrderedRuns(const std::vector<byte> &Input);

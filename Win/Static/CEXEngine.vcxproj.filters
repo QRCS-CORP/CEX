@@ -1295,13 +1295,16 @@
     <ClCompile Include="..\..\CEX\TimeStamp.cpp">
       <Filter>Source Files\Utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\SHA.cpp">
-      <Filter>Source Files\Digest\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\Keccak.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
     <ClCompile Include="..\..\CEX\Blake2.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SHA2.cpp">
+      <Filter>Source Files\Digest\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Skein.cpp">
       <Filter>Source Files\Digest\Support</Filter>
     </ClCompile>
   </ItemGroup>

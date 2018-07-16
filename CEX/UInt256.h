@@ -115,7 +115,7 @@ public:
 	/// Initialize with 1 * 32bit unsigned integer; copied to every register
 	/// </summary>
 	///
-	/// <param name="X">The uint to add</param>
+	/// <param name="X">The uint assignment value</param>
 	explicit UInt256(uint X)
 	{
 		ymm = _mm256_set1_epi32(X);
@@ -141,6 +141,17 @@ public:
 	inline void Load(const Array &Input, size_t Offset)
 	{
 		ymm = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&Input[Offset]));
+	}
+
+	/// <summary>
+	/// Load with 1 * 32bit unsigned integer; copied to every register
+	/// </summary>
+	///
+	/// <param name="X">Set all uint32 integers to this value</param>
+
+	inline void Load(uint X)
+	{
+		ymm = _mm256_set1_epi32(X);
 	}
 
 	/// <summary>

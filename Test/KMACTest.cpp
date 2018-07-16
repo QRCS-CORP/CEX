@@ -37,17 +37,17 @@ namespace Test
 		try
 		{
 			KMAC* gen1 = new KMAC(Enumeration::ShakeModes::SHAKE128);
-			CompareVector(gen1, m_custom[0], m_message[0], m_expected[0]);
-			CompareVector(gen1, m_custom[1], m_message[0], m_expected[1]);
-			CompareVector(gen1, m_custom[1], m_message[1], m_expected[2]);
+			CompareOutput(gen1, m_custom[0], m_message[0], m_expected[0]);
+			CompareOutput(gen1, m_custom[1], m_message[0], m_expected[1]);
+			CompareOutput(gen1, m_custom[1], m_message[1], m_expected[2]);
 			delete gen1;
 
 			OnProgress(std::string("KMACTest: Passed KMAC-128 known answer vector tests.."));
 
 			KMAC* gen2 = new KMAC(Enumeration::ShakeModes::SHAKE256);
-			CompareVector(gen2, m_custom[1], m_message[0], m_expected[3]);
-			CompareVector(gen2, m_custom[0], m_message[1], m_expected[4]);
-			CompareVector(gen2, m_custom[1], m_message[1], m_expected[5]);
+			CompareOutput(gen2, m_custom[1], m_message[0], m_expected[3]);
+			CompareOutput(gen2, m_custom[0], m_message[1], m_expected[4]);
+			CompareOutput(gen2, m_custom[1], m_message[1], m_expected[5]);
 			delete gen2;
 
 			OnProgress(std::string("KMACTest: Passed KMAC-256 known answer vector tests.."));
@@ -64,7 +64,7 @@ namespace Test
 		}
 	}
 
-	void KMACTest::CompareVector(Mac::IMac* Generator, std::vector<byte> &Custom, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void KMACTest::CompareOutput(Mac::IMac* Generator, std::vector<byte> &Custom, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> output(Expected.size());
 		SymmetricKey kp(m_key, Custom);

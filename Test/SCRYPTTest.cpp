@@ -38,11 +38,11 @@ namespace Test
 	{
 		try
 		{
-			CompareVector(m_key[0], m_salt[0], m_output[0], 1024, 16, 64);
-			CompareVector(m_key[1], m_salt[1], m_output[1], 16384, 1, 64);
+			CompareOutput(m_key[0], m_salt[0], m_output[0], 1024, 16, 64);
+			CompareOutput(m_key[1], m_salt[1], m_output[1], 16384, 1, 64);
 			// long test
 #if !defined(_DEBUG)
-			CompareVector(m_key[1], m_salt[1], m_output[2], 1048576, 1, 64);
+			CompareOutput(m_key[1], m_salt[1], m_output[2], 1048576, 1, 64);
 #endif
 			OnProgress(std::string("SCRYPTTest: Passed SHA256 KAT vector tests.."));
 
@@ -58,7 +58,7 @@ namespace Test
 		}
 	}
 
-	void SCRYPTTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t Parallelization, size_t OutputSize)
+	void SCRYPTTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Expected, size_t CpuCost, size_t Parallelization, size_t OutputSize)
 	{
 		std::vector<byte> outBytes(OutputSize);
 

@@ -54,7 +54,7 @@ namespace Test
 
 		void CompareMonteCarlo(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output, size_t Count = 100);
 		void CompareOutput();
-		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
+		void CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void OnProgress(std::string Data);
     };
 }

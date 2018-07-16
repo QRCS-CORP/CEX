@@ -20,1457 +20,212 @@
 #define CEX_THREEFISH_H
 
 #include "CexDomain.h"
-#include "IntUtils.h"
+
+#if defined(__AVX2__)
+#	include "ULong256.h"
+#endif
+#if defined(__AVX512__)
+#	include "ULong512.h"
+#endif
 
 NAMESPACE_DIGEST
 
-/// 
-/// internal
-/// 
+#if defined(__AVX2__)
+	using Numeric::ULong256;
+#endif
+#if defined(__AVX512__)
+	using Numeric::ULong512;
+#endif
+
+	/// <summary>
+	/// Contains the Skein 256, 512, and 1024bit permutation functions.
+	/// <para>The function names are in the format; Permute-rounds-bits-suffix, ex. PemuteR72P256C, 72 rounds, permutes 256 bits, using the compact form of the function. \n
+	/// The compact forms of the permutations have the suffix C, and are optimized for performance and low memory consumption 
+	/// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
+	/// The Unrolled forms are optimized for speed and timing neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
+	/// The H suffix denotes functions that take an SIMD wrapper class (ULongXXX) as the state values, and process state in SIMD parallel blocks.</para>
+	/// <para>This class contains wide forms of the functions; PemuteR72P1024H, PemuteR72P2048H, and PemuteR80P4096H use AVX2 instructions. \n
+	/// Experimental functions using AVX512 instructions are also implemented; PemuteR72P2048H, PemuteR72P4096H, and PemuteR80P8192H. \n
+	/// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitely declared.</para>
+	/// </summary>
 class Skein
 {
-private:
-
-	//~~~Inline Functions~~~//
-
-	template <typename Array>
-	inline static ulong GetParity(const Array &Key)
-	{
-		ulong parity = 0x1BD11BDAA9FC1A22ULL;
-
-		for (size_t i = 0; i < Key.size(); i++)
-		{
-			parity ^= Key[i];
-		}
-
-		return parity;
-	}
-
-	inline static void Mix(ulong &A, ulong &B, uint R)
-	{
-		A += B;
-		B = Utility::IntUtils::RotL64(B, R) ^ A;
-	}
-
-	inline static void Inject(ulong &A, ulong &B, uint R, ulong K0, ulong K1)
-	{
-		B += K1;
-		A += B + K0;
-		B = Utility::IntUtils::RotL64(B, R) ^ A;
-	}
-
-#if defined(__AVX2__)
-
-	inline static void Inject(__m256i &X0, __m256i &X1, __m256i &R0, const __m256i &T0, const __m256i &T1, const __m256i &K0, const __m256i &K1, const __m256i &RFN)
-	{
-		X0 = _mm256_add_epi64(X0, K0);
-		X1 = _mm256_add_epi64(X1, K1);
-		X1 = _mm256_add_epi64(X1, R0);
-		X0 = _mm256_add_epi64(X0, T0);
-		X1 = _mm256_add_epi64(X1, T1);
-		R0 = _mm256_add_epi64(R0, RFN);
-	}
-
-	inline static void Interleave(__m256i &X0, __m256i &X1)
-	{
-		const __m256i T0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(3, 1, 2, 0));
-		const __m256i T1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(3, 1, 2, 0));
-
-		X0 = _mm256_unpacklo_epi64(T0, T1);
-		X1 = _mm256_unpackhi_epi64(T0, T1);
-	}
-
-	inline static void  Round(__m256i &X0, __m256i &X1, const __m256i &SHL)
-	{
-		const __m256i SHR = _mm256_sub_epi64(_mm256_set1_epi64x(64), SHL);
-		X0 = _mm256_add_epi64(X0, X1);
-		X1 = _mm256_or_si256(_mm256_sllv_epi64(X1, SHL), _mm256_srlv_epi64(X1, SHR));
-		X1 = _mm256_xor_si256(X1, X0);
-		X0 = _mm256_permute4x64_epi64(X0, _MM_SHUFFLE(0, 3, 2, 1));
-		X1 = _mm256_permute4x64_epi64(X1, _MM_SHUFFLE(1, 2, 3, 0));
-	}
-
-#endif
-
 public:
 
-	//~~~Public Functions~~~//
+	//~~~Skein-256~~~//
 
-	template <typename Array, typename State>
-	static void Transform256(Array &Input, size_t InOffset, State &Output)
-	{
-		// Cache the block, key, and tweak
-		ulong b0 = Input[0];
-		ulong b1 = Input[1];
-		ulong b2 = Input[2];
-		ulong b3 = Input[3];
-		ulong k0 = Output.S[0];
-		ulong k1 = Output.S[1];
-		ulong k2 = Output.S[2];
-		ulong k3 = Output.S[3];
-		ulong k4 = GetParity(Output.S);
-		ulong t0 = Output.T[0];
-		ulong t1 = Output.T[1];
-		ulong t2 = Output.T[0] ^ Output.T[1];
+	/// <summary>
+	/// The compact form of the Skein-256 permutation function.
+	/// <para>This function has been optimized for a small memory consumption.
+	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P256C(std::array<ulong, 4> &Input, std::array<ulong, 4> &State, std::array<ulong, 2> &Tweak);
 
-		// 72 rounds
-		Inject(b0, b1, 14, k0, k1 + t0);
-		Inject(b2, b3, 16, k2 + t1, k3);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k1, k2 + t1);
-		Inject(b2, b3, 33, k3 + t2, k4 + 1);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k2, k3 + t2);
-		Inject(b2, b3, 16, k4 + t0, k0 + 2);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k3, k4 + t0);
-		Inject(b2, b3, 33, k0 + t1, k1 + 3);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k4, k0 + t1);
-		Inject(b2, b3, 16, k1 + t2, k2 + 4);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k0, k1 + t2);
-		Inject(b2, b3, 33, k2 + t0, k3 + 5);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k1, k2 + t0);
-		Inject(b2, b3, 16, k3 + t1, k4 + 6);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k2, k3 + t1);
-		Inject(b2, b3, 33, k4 + t2, k0 + 7);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k3, k4 + t2);
-		Inject(b2, b3, 16, k0 + t0, k1 + 8);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k4, k0 + t0);
-		Inject(b2, b3, 33, k1 + t1, k2 + 9);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k0, k1 + t1);
-		Inject(b2, b3, 16, k2 + t2, k3 + 10);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k1, k2 + t2);
-		Inject(b2, b3, 33, k3 + t0, k4 + 11);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k2, k3 + t0);
-		Inject(b2, b3, 16, k4 + t1, k0 + 12);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k3, k4 + t1);
-		Inject(b2, b3, 33, k0 + t2, k1 + 13);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k4, k0 + t2);
-		Inject(b2, b3, 16, k1 + t0, k2 + 14);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k0, k1 + t0);
-		Inject(b2, b3, 33, k2 + t1, k3 + 15);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-		Inject(b0, b1, 14, k1, k2 + t1);
-		Inject(b2, b3, 16, k3 + t2, k4 + 16);
-		Mix(b0, b3, 52);
-		Mix(b2, b1, 57);
-		Mix(b0, b1, 23);
-		Mix(b2, b3, 40);
-		Mix(b0, b3, 5);
-		Mix(b2, b1, 37);
-		Inject(b0, b1, 25, k2, k3 + t2);
-		Inject(b2, b3, 33, k4 + t0, k0 + 17);
-		Mix(b0, b3, 46);
-		Mix(b2, b1, 12);
-		Mix(b0, b1, 58);
-		Mix(b2, b3, 22);
-		Mix(b0, b3, 32);
-		Mix(b2, b1, 32);
-
-		Output.S[0] = b0 + k3;
-		Output.S[1] = b1 + k4 + t0;
-		Output.S[2] = b2 + k0 + t1;
-		Output.S[3] = b3 + k1 + 18;
-	}
+	/// <summary>
+	/// The unrolled form of the Skein-256 permutation function.
+	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
+	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P256U(std::array<ulong, 4> &Input, std::array<ulong, 4> &State, std::array<ulong, 2> &Tweak);
 
 #if defined(__AVX2__)
 
-	template <typename Array, typename State>
-	static void Transform512(Array &Input, size_t InOffset, State &Output)
-	{
-		__m256i R0 = _mm256_set_epi64x(0, 0, 0, 0);
-		const __m256i R1 = _mm256_set_epi64x(37, 19, 36, 46);
-		const __m256i R2 = _mm256_set_epi64x(42, 14, 27, 33);
-		const __m256i R3 = _mm256_set_epi64x(39, 36, 49, 17);
-		const __m256i R4 = _mm256_set_epi64x(56, 54, 9, 44);
-		const __m256i R5 = _mm256_set_epi64x(24, 34, 30, 39);
-		const __m256i R6 = _mm256_set_epi64x(17, 10, 50, 13);
-		const __m256i R7 = _mm256_set_epi64x(43, 39, 29, 25);
-		const __m256i R8 = _mm256_set_epi64x(22, 56, 35, 8);
-		const __m256i RFN = _mm256_set_epi64x(1, 0, 0, 0);
-
-		const ulong KS = GetParity(Output.S);
-		const __m256i K0 = _mm256_set_epi64x(Output.S[6], Output.S[4], Output.S[2], Output.S[0]);
-		const __m256i K1 = _mm256_set_epi64x(Output.S[7], Output.S[5], Output.S[3], Output.S[1]);
-		const __m256i K2 = _mm256_set_epi64x(KS, Output.S[6], Output.S[4], Output.S[2]);
-		const __m256i K3 = _mm256_set_epi64x(Output.S[0], Output.S[7], Output.S[5], Output.S[3]);
-		const __m256i K4 = _mm256_set_epi64x(Output.S[1], KS, Output.S[6], Output.S[4]);
-		const __m256i K5 = _mm256_set_epi64x(Output.S[2], Output.S[0], Output.S[7], Output.S[5]);
-		const __m256i K6 = _mm256_set_epi64x(Output.S[3], Output.S[1], KS, Output.S[6]);
-		const __m256i K7 = _mm256_set_epi64x(Output.S[4], Output.S[2], Output.S[0], Output.S[7]);
-		const __m256i K8 = _mm256_set_epi64x(Output.S[5], Output.S[3], Output.S[1], KS);
-		const __m256i TS = _mm256_set_epi64x(Output.T[0], Output.T[1], Output.T[0] ^ Output.T[1], 0);
-
-		__m256i X0 = _mm256_set_epi64x(Input[InOffset + 6], Input[InOffset + 4], Input[InOffset + 2], Input[InOffset]);
-		__m256i X1 = _mm256_set_epi64x(Input[InOffset + 7], Input[InOffset + 5], Input[InOffset + 3], Input[InOffset + 1]);
-		__m256i T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
-		__m256i T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-
-		Inject(X0, X1, R0, T0, T1, K0, K1, RFN);
-
-		// round 0
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K1, K2, RFN);
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K2, K3, RFN);
-		// round 8
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K3, K4, RFN);
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K4, K5, RFN);
-		// round 16
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K5, K6, RFN);
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K6, K7, RFN);
-		// round 24
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K7, K8, RFN);
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K8, K0, RFN);
-		// round 32
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));//t0,t1 
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K0, K1, RFN);//k1,k2
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K1, K2, RFN);
-		// round 40
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));//t0,t1 
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K2, K3, RFN);//k1,k2
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K3, K4, RFN);
-		// round 48
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));//t0,t1 
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K4, K5, RFN);//k1,k2
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K5, K6, RFN);
-		// round 56
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K6, K7, RFN);
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(1, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 2, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K7, K8, RFN);
-		// round 64
-		Round(X0, X1, R1);
-		Round(X0, X1, R2);
-		Round(X0, X1, R3);
-		Round(X0, X1, R4);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(3, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 1, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K8, K0, RFN);//k1,k2
-		Round(X0, X1, R5);
-		Round(X0, X1, R6);
-		Round(X0, X1, R7);
-		Round(X0, X1, R8);
-		T0 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(2, 0, 0, 0));
-		T1 = _mm256_permute4x64_epi64(TS, _MM_SHUFFLE(0, 3, 0, 0));
-		Inject(X0, X1, R0, T0, T1, K0, K1, RFN);
-
-		Interleave(X0, X1);
-
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output.S[0]), X0);
-		_mm256_storeu_si256(reinterpret_cast<__m256i*>(&Output.S[4]), X1);
-	}
-
-#else
-
-	template <typename Array, typename State>
-	static void Transform512(Array &Input, size_t InOffset, State &Output)
-	{
-		// cache the block, key, and tweak
-		ulong B0 = Input[0];
-		ulong B1 = Input[1];
-		ulong B2 = Input[2];
-		ulong B3 = Input[3];
-		ulong B4 = Input[4];
-		ulong B5 = Input[5];
-		ulong B6 = Input[6];
-		ulong B7 = Input[7];
-		ulong K0 = Output.S[0];
-		ulong K1 = Output.S[1];
-		ulong K2 = Output.S[2];
-		ulong K3 = Output.S[3];
-		ulong K4 = Output.S[4];
-		ulong K5 = Output.S[5];
-		ulong K6 = Output.S[6];
-		ulong K7 = Output.S[7];
-		ulong K8 = GetParity(Output.S);
-		ulong T0 = Output.T[0];
-		ulong T1 = Output.T[1];
-		ulong T2 = Output.T[0] ^ Output.T[1];
-
-		// 72 rounds
-		Inject(B0, B1, 46, K0, K1);
-		Inject(B2, B3, 36, K2, K3);
-		Inject(B4, B5, 19, K4, K5 + T0);
-		Inject(B6, B7, 37, K6 + T1, K7);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K1, K2);
-		Inject(B2, B3, 30, K3, K4);
-		Inject(B4, B5, 34, K5, K6 + T1);
-		Inject(B6, B7, 24, K7 + T2, K8 + 1);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K2, K3);
-		Inject(B2, B3, 36, K4, K5);
-		Inject(B4, B5, 19, K6, K7 + T2);
-		Inject(B6, B7, 37, K8 + T0, K0 + 2);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K3, K4);
-		Inject(B2, B3, 30, K5, K6);
-		Inject(B4, B5, 34, K7, K8 + T0);
-		Inject(B6, B7, 24, K0 + T1, K1 + 3);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K4, K5);
-		Inject(B2, B3, 36, K6, K7);
-		Inject(B4, B5, 19, K8, K0 + T1);
-		Inject(B6, B7, 37, K1 + T2, K2 + 4);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K5, K6);
-		Inject(B2, B3, 30, K7, K8);
-		Inject(B4, B5, 34, K0, K1 + T2);
-		Inject(B6, B7, 24, K2 + T0, K3 + 5);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K6, K7);
-		Inject(B2, B3, 36, K8, K0);
-		Inject(B4, B5, 19, K1, K2 + T0);
-		Inject(B6, B7, 37, K3 + T1, K4 + 6);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K7, K8);
-		Inject(B2, B3, 30, K0, K1);
-		Inject(B4, B5, 34, K2, K3 + T1);
-		Inject(B6, B7, 24, K4 + T2, K5 + 7);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K8, K0);
-		Inject(B2, B3, 36, K1, K2);
-		Inject(B4, B5, 19, K3, K4 + T2);
-		Inject(B6, B7, 37, K5 + T0, K6 + 8);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K0, K1);
-		Inject(B2, B3, 30, K2, K3);
-		Inject(B4, B5, 34, K4, K5 + T0);
-		Inject(B6, B7, 24, K6 + T1, K7 + 9);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K1, K2);
-		Inject(B2, B3, 36, K3, K4);
-		Inject(B4, B5, 19, K5, K6 + T1);
-		Inject(B6, B7, 37, K7 + T2, K8 + 10);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K2, K3);
-		Inject(B2, B3, 30, K4, K5);
-		Inject(B4, B5, 34, K6, K7 + T2);
-		Inject(B6, B7, 24, K8 + T0, K0 + 11);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K3, K4);
-		Inject(B2, B3, 36, K5, K6);
-		Inject(B4, B5, 19, K7, K8 + T0);
-		Inject(B6, B7, 37, K0 + T1, K1 + 12);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K4, K5);
-		Inject(B2, B3, 30, K6, K7);
-		Inject(B4, B5, 34, K8, K0 + T1);
-		Inject(B6, B7, 24, K1 + T2, K2 + 13);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K5, K6);
-		Inject(B2, B3, 36, K7, K8);
-		Inject(B4, B5, 19, K0, K1 + T2);
-		Inject(B6, B7, 37, K2 + T0, K3 + 14);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K6, K7);
-		Inject(B2, B3, 30, K8, K0);
-		Inject(B4, B5, 34, K1, K2 + T0);
-		Inject(B6, B7, 24, K3 + T1, K4 + 15);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-		Inject(B0, B1, 46, K7, K8);
-		Inject(B2, B3, 36, K0, K1);
-		Inject(B4, B5, 19, K2, K3 + T1);
-		Inject(B6, B7, 37, K4 + T2, K5 + 16);
-		Mix(B2, B1, 33);
-		Mix(B4, B7, 27);
-		Mix(B6, B5, 14);
-		Mix(B0, B3, 42);
-		Mix(B4, B1, 17);
-		Mix(B6, B3, 49);
-		Mix(B0, B5, 36);
-		Mix(B2, B7, 39);
-		Mix(B6, B1, 44);
-		Mix(B0, B7, 9);
-		Mix(B2, B5, 54);
-		Mix(B4, B3, 56);
-		Inject(B0, B1, 39, K8, K0);
-		Inject(B2, B3, 30, K1, K2);
-		Inject(B4, B5, 34, K3, K4 + T2);
-		Inject(B6, B7, 24, K5 + T0, K6 + 17);
-		Mix(B2, B1, 13);
-		Mix(B4, B7, 50);
-		Mix(B6, B5, 10);
-		Mix(B0, B3, 17);
-		Mix(B4, B1, 25);
-		Mix(B6, B3, 29);
-		Mix(B0, B5, 39);
-		Mix(B2, B7, 43);
-		Mix(B6, B1, 8);
-		Mix(B0, B7, 35);
-		Mix(B2, B5, 56);
-		Mix(B4, B3, 22);
-
-		Output.S[0] = B0 + K0;
-		Output.S[1] = B1 + K1;
-		Output.S[2] = B2 + K2;
-		Output.S[3] = B3 + K3;
-		Output.S[4] = B4 + K4;
-		Output.S[5] = B5 + K5 + T0;
-		Output.S[6] = B6 + K6 + T1;
-		Output.S[7] = B7 + K7 + 18;
-	}
+	/// <summary>
+	/// The horizontally vectorized form of the Skein-256 permutation function.
+	/// <para>This function processes 4*32 blocks of input in parallel using AVX2 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P1024H(std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, std::vector<ULong256> &Tweak);
 
 #endif
 
-	template <typename Array, typename State>
-	static void Transform1024(Array &Input, size_t InOffset, State &Output)
-	{
-		// cache the block, key, and tweak
-		ulong B0 = Input[0];
-		ulong B1 = Input[1];
-		ulong B2 = Input[2];
-		ulong B3 = Input[3];
-		ulong B4 = Input[4];
-		ulong B5 = Input[5];
-		ulong B6 = Input[6];
-		ulong B7 = Input[7];
-		ulong B8 = Input[8];
-		ulong B9 = Input[9];
-		ulong B10 = Input[10];
-		ulong B11 = Input[11];
-		ulong B12 = Input[12];
-		ulong B13 = Input[13];
-		ulong B14 = Input[14];
-		ulong B15 = Input[15];
-		ulong K0 = Output.S[0];
-		ulong K1 = Output.S[1];
-		ulong K2 = Output.S[2];
-		ulong K3 = Output.S[3];
-		ulong K4 = Output.S[4];
-		ulong K5 = Output.S[5];
-		ulong K6 = Output.S[6];
-		ulong K7 = Output.S[7];
-		ulong K8 = Output.S[8];
-		ulong K9 = Output.S[9];
-		ulong K10 = Output.S[10];
-		ulong K11 = Output.S[11];
-		ulong K12 = Output.S[12];
-		ulong K13 = Output.S[13];
-		ulong K14 = Output.S[14];
-		ulong K15 = Output.S[15];
-		ulong K16 = GetParity(Output.S);
-		ulong T0 = Output.T[0];
-		ulong T1 = Output.T[1];
-		ulong T2 = Output.T[0] ^ Output.T[1];
+#if defined(__AVX512__)
 
-		// 80 rounds
-		Inject(B0, B1, 24, K0, K1);
-		Inject(B2, B3, 13, K2, K3);
-		Inject(B4, B5, 8, K4, K5);
-		Inject(B6, B7, 47, K6, K7);
-		Inject(B8, B9, 8, K8, K9);
-		Inject(B10, B11, 17, K10, K11);
-		Inject(B12, B13, 22, K12, K13 + T0);
-		Inject(B14, B15, 37, K14 + T1, K15);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K1, K2);
-		Inject(B2, B3, 9, K3, K4);
-		Inject(B4, B5, 37, K5, K6);
-		Inject(B6, B7, 31, K7, K8);
-		Inject(B8, B9, 12, K9, K10);
-		Inject(B10, B11, 47, K11, K12);
-		Inject(B12, B13, 44, K13, K14 + T1);
-		Inject(B14, B15, 30, K15 + T2, K16 + 1);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K2, K3);
-		Inject(B2, B3, 13, K4, K5);
-		Inject(B4, B5, 8, K6, K7);
-		Inject(B6, B7, 47, K8, K9);
-		Inject(B8, B9, 8, K10, K11);
-		Inject(B10, B11, 17, K12, K13);
-		Inject(B12, B13, 22, K14, K15 + T2);
-		Inject(B14, B15, 37, K16 + T0, K0 + 2);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K3, K4);
-		Inject(B2, B3, 9, K5, K6);
-		Inject(B4, B5, 37, K7, K8);
-		Inject(B6, B7, 31, K9, K10);
-		Inject(B8, B9, 12, K11, K12);
-		Inject(B10, B11, 47, K13, K14);
-		Inject(B12, B13, 44, K15, K16 + T0);
-		Inject(B14, B15, 30, K0 + T1, K1 + 3);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K4, K5);
-		Inject(B2, B3, 13, K6, K7);
-		Inject(B4, B5, 8, K8, K9);
-		Inject(B6, B7, 47, K10, K11);
-		Inject(B8, B9, 8, K12, K13);
-		Inject(B10, B11, 17, K14, K15);
-		Inject(B12, B13, 22, K16, K0 + T1);
-		Inject(B14, B15, 37, K1 + T2, K2 + 4);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K5, K6);
-		Inject(B2, B3, 9, K7, K8);
-		Inject(B4, B5, 37, K9, K10);
-		Inject(B6, B7, 31, K11, K12);
-		Inject(B8, B9, 12, K13, K14);
-		Inject(B10, B11, 47, K15, K16);
-		Inject(B12, B13, 44, K0, K1 + T2);
-		Inject(B14, B15, 30, K2 + T0, K3 + 5);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K6, K7);
-		Inject(B2, B3, 13, K8, K9);
-		Inject(B4, B5, 8, K10, K11);
-		Inject(B6, B7, 47, K12, K13);
-		Inject(B8, B9, 8, K14, K15);
-		Inject(B10, B11, 17, K16, K0);
-		Inject(B12, B13, 22, K1, K2 + T0);
-		Inject(B14, B15, 37, K3 + T1, K4 + 6);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K7, K8);
-		Inject(B2, B3, 9, K9, K10);
-		Inject(B4, B5, 37, K11, K12);
-		Inject(B6, B7, 31, K13, K14);
-		Inject(B8, B9, 12, K15, K16);
-		Inject(B10, B11, 47, K0, K1);
-		Inject(B12, B13, 44, K2, K3 + T1);
-		Inject(B14, B15, 30, K4 + T2, K5 + 7);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K8, K9);
-		Inject(B2, B3, 13, K10, K11);
-		Inject(B4, B5, 8, K12, K13);
-		Inject(B6, B7, 47, K14, K15);
-		Inject(B8, B9, 8, K16, K0);
-		Inject(B10, B11, 17, K1, K2);
-		Inject(B12, B13, 22, K3, K4 + T2);
-		Inject(B14, B15, 37, K5 + T0, K6 + 8);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K9, K10);
-		Inject(B2, B3, 9, K11, K12);
-		Inject(B4, B5, 37, K13, K14);
-		Inject(B6, B7, 31, K15, K16);
-		Inject(B8, B9, 12, K0, K1);
-		Inject(B10, B11, 47, K2, K3);
-		Inject(B12, B13, 44, K4, K5 + T0);
-		Inject(B14, B15, 30, K6 + T1, K7 + 9);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K10, K11);
-		Inject(B2, B3, 13, K12, K13);
-		Inject(B4, B5, 8, K14, K15);
-		Inject(B6, B7, 47, K16, K0);
-		Inject(B8, B9, 8, K1, K2);
-		Inject(B10, B11, 17, K3, K4);
-		Inject(B12, B13, 22, K5, K6 + T1);
-		Inject(B14, B15, 37, K7 + T2, K8 + 10);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K11, K12);
-		Inject(B2, B3, 9, K13, K14);
-		Inject(B4, B5, 37, K15, K16);
-		Inject(B6, B7, 31, K0, K1);
-		Inject(B8, B9, 12, K2, K3);
-		Inject(B10, B11, 47, K4, K5);
-		Inject(B12, B13, 44, K6, K7 + T2);
-		Inject(B14, B15, 30, K8 + T0, K9 + 11);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K12, K13);
-		Inject(B2, B3, 13, K14, K15);
-		Inject(B4, B5, 8, K16, K0);
-		Inject(B6, B7, 47, K1, K2);
-		Inject(B8, B9, 8, K3, K4);
-		Inject(B10, B11, 17, K5, K6);
-		Inject(B12, B13, 22, K7, K8 + T0);
-		Inject(B14, B15, 37, K9 + T1, K10 + 12);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K13, K14);
-		Inject(B2, B3, 9, K15, K16);
-		Inject(B4, B5, 37, K0, K1);
-		Inject(B6, B7, 31, K2, K3);
-		Inject(B8, B9, 12, K4, K5);
-		Inject(B10, B11, 47, K6, K7);
-		Inject(B12, B13, 44, K8, K9 + T1);
-		Inject(B14, B15, 30, K10 + T2, K11 + 13);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K14, K15);
-		Inject(B2, B3, 13, K16, K0);
-		Inject(B4, B5, 8, K1, K2);
-		Inject(B6, B7, 47, K3, K4);
-		Inject(B8, B9, 8, K5, K6);
-		Inject(B10, B11, 17, K7, K8);
-		Inject(B12, B13, 22, K9, K10 + T2);
-		Inject(B14, B15, 37, K11 + T0, K12 + 14);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K15, K16);
-		Inject(B2, B3, 9, K0, K1);
-		Inject(B4, B5, 37, K2, K3);
-		Inject(B6, B7, 31, K4, K5);
-		Inject(B8, B9, 12, K6, K7);
-		Inject(B10, B11, 47, K8, K9);
-		Inject(B12, B13, 44, K10, K11 + T0);
-		Inject(B14, B15, 30, K12 + T1, K13 + 15);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K16, K0);
-		Inject(B2, B3, 13, K1, K2);
-		Inject(B4, B5, 8, K3, K4);
-		Inject(B6, B7, 47, K5, K6);
-		Inject(B8, B9, 8, K7, K8);
-		Inject(B10, B11, 17, K9, K10);
-		Inject(B12, B13, 22, K11, K12 + T1);
-		Inject(B14, B15, 37, K13 + T2, K14 + 16);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K0, K1);
-		Inject(B2, B3, 9, K2, K3);
-		Inject(B4, B5, 37, K4, K5);
-		Inject(B6, B7, 31, K6, K7);
-		Inject(B8, B9, 12, K8, K9);
-		Inject(B10, B11, 47, K10, K11);
-		Inject(B12, B13, 44, K12, K13 + T2);
-		Inject(B14, B15, 30, K14 + T0, K15 + 17);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
-		Inject(B0, B1, 24, K1, K2);
-		Inject(B2, B3, 13, K3, K4);
-		Inject(B4, B5, 8, K5, K6);
-		Inject(B6, B7, 47, K7, K8);
-		Inject(B8, B9, 8, K9, K10);
-		Inject(B10, B11, 17, K11, K12);
-		Inject(B12, B13, 22, K13, K14 + T0);
-		Inject(B14, B15, 37, K15 + T1, K16 + 18);
-		Mix(B0, B9, 38);
-		Mix(B2, B13, 19);
-		Mix(B6, B11, 10);
-		Mix(B4, B15, 55);
-		Mix(B10, B7, 49);
-		Mix(B12, B3, 18);
-		Mix(B14, B5, 23);
-		Mix(B8, B1, 52);
-		Mix(B0, B7, 33);
-		Mix(B2, B5, 4);
-		Mix(B4, B3, 51);
-		Mix(B6, B1, 13);
-		Mix(B12, B15, 34);
-		Mix(B14, B13, 41);
-		Mix(B8, B11, 59);
-		Mix(B10, B9, 17);
-		Mix(B0, B15, 5);
-		Mix(B2, B11, 20);
-		Mix(B6, B13, 48);
-		Mix(B4, B9, 41);
-		Mix(B14, B1, 47);
-		Mix(B8, B5, 28);
-		Mix(B10, B3, 16);
-		Mix(B12, B7, 25);
-		Inject(B0, B1, 41, K2, K3);
-		Inject(B2, B3, 9, K4, K5);
-		Inject(B4, B5, 37, K6, K7);
-		Inject(B6, B7, 31, K8, K9);
-		Inject(B8, B9, 12, K10, K11);
-		Inject(B10, B11, 47, K12, K13);
-		Inject(B12, B13, 44, K14, K15 + T1);
-		Inject(B14, B15, 30, K16 + T2, K0 + 19);
-		Mix(B0, B9, 16);
-		Mix(B2, B13, 34);
-		Mix(B6, B11, 56);
-		Mix(B4, B15, 51);
-		Mix(B10, B7, 4);
-		Mix(B12, B3, 53);
-		Mix(B14, B5, 42);
-		Mix(B8, B1, 41);
-		Mix(B0, B7, 31);
-		Mix(B2, B5, 44);
-		Mix(B4, B3, 47);
-		Mix(B6, B1, 46);
-		Mix(B12, B15, 19);
-		Mix(B14, B13, 42);
-		Mix(B8, B11, 44);
-		Mix(B10, B9, 25);
-		Mix(B0, B15, 9);
-		Mix(B2, B11, 48);
-		Mix(B6, B13, 35);
-		Mix(B4, B9, 52);
-		Mix(B14, B1, 23);
-		Mix(B8, B5, 31);
-		Mix(B10, B3, 37);
-		Mix(B12, B7, 20);
+	/// <summary>
+	/// The horizontally vectorized form of the Skein-256 permutation function.
+	/// <para>This function processes 8*32 blocks of input in parallel using AVX512 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P2048H(std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, std::vector<ULong512> &Tweak);
 
-		Output.S[0] = B0 + K3;
-		Output.S[1] = B1 + K4;
-		Output.S[2] = B2 + K5;
-		Output.S[3] = B3 + K6;
-		Output.S[4] = B4 + K7;
-		Output.S[5] = B5 + K8;
-		Output.S[6] = B6 + K9;
-		Output.S[7] = B7 + K10;
-		Output.S[8] = B8 + K11;
-		Output.S[9] = B9 + K12;
-		Output.S[10] = B10 + K13;
-		Output.S[11] = B11 + K14;
-		Output.S[12] = B12 + K15;
-		Output.S[13] = B13 + K16 + T2;
-		Output.S[14] = B14 + K0 + T0;
-		Output.S[15] = B15 + K1 + 20;
-	}
+#endif
+
+	//~~~Skein-512~~~//
+
+	/// <summary>
+	/// The compact form of the Skein-512 permutation function.
+	/// <para>This function has been optimized for a small memory consumption.
+	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P512C(std::array<ulong, 8> &Input, std::array<ulong, 8> &State, std::array<ulong, 2> &Tweak);
+
+	/// <summary>
+	/// The unrolled form of the Skein-512 permutation function.
+	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
+	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P512U(std::array<ulong, 8> &Input, std::array<ulong, 8> &State, std::array<ulong, 2> &Tweak);
+
+#if defined(__AVX2__)
+
+	/// <summary>
+	/// The vertically vectorized form of the Skein-512 permutation function.
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P512V(std::array<ulong, 8> &Input, std::array<ulong, 8> &State, std::array<ulong, 2> &Tweak);
+
+#endif
+
+#if defined(__AVX2__)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Skein-512 permutation function.
+	/// <para>This function processes 4*64 blocks of input in parallel using AVX2 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P2048H(std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, std::vector<ULong256> &Tweak);
+
+#endif
+
+#if defined(__AVX512__)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Skein-512 permutation function.
+	/// <para>This function processes 8*64 blocks of input in parallel using AVX512 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR72P4096H(std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, std::vector<ULong512> &Tweak);
+
+#endif
+
+	//~~~Skein-1024~~~//
+
+	/// <summary>
+	/// The compact form of the Skein-1024 permutation function.
+	/// <para>This function has been optimized for a small memory consumption.
+	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR80P1024C(std::array<ulong, 16> &Input, std::array<ulong, 16> &State, std::array<ulong, 2> &Tweak);
+
+	/// <summary>
+	/// The unrolled form of the Skein-1024 permutation function.
+	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
+	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR80P1024U(std::array<ulong, 16> &Input, std::array<ulong, 16> &State, std::array<ulong, 2> &Tweak);
+
+#if defined(__AVX2__)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Skein-1024 permutation function.
+	/// <para>This function processes 4*128 blocks of input in parallel using AVX2 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR80P4096H(std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, std::vector<ULong256> &Tweak);
+
+#endif
+
+#if defined(__AVX512__)
+
+	/// <summary>
+	/// The horizontally vectorized form of the Skein-1024 permutation function.
+	/// <para>This function processes 8*128 blocks of input in parallel using AVX512 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="InOffset">The starting offset within the Input array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	static void PemuteR80P8192H(std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, std::vector<ULong512> &Tweak);
+
+#endif
 };
 
 NAMESPACE_DIGESTEND

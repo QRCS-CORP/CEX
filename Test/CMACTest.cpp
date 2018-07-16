@@ -36,20 +36,20 @@ namespace Test
 	{
 		try
 		{
-			CompareVector(m_keys[0], m_input[0], m_expected[0]);
-			CompareVector(m_keys[0], m_input[1], m_expected[1]);
-			CompareVector(m_keys[0], m_input[2], m_expected[2]);
-			CompareVector(m_keys[0], m_input[3], m_expected[3]);
+			CompareOutput(m_keys[0], m_input[0], m_expected[0]);
+			CompareOutput(m_keys[0], m_input[1], m_expected[1]);
+			CompareOutput(m_keys[0], m_input[2], m_expected[2]);
+			CompareOutput(m_keys[0], m_input[3], m_expected[3]);
 			OnProgress(std::string("Passed 128 bit key vector tests.."));
-			CompareVector(m_keys[1], m_input[0], m_expected[4]);
-			CompareVector(m_keys[1], m_input[1], m_expected[5]);
-			CompareVector(m_keys[1], m_input[2], m_expected[6]);
-			CompareVector(m_keys[1], m_input[3], m_expected[7]);
+			CompareOutput(m_keys[1], m_input[0], m_expected[4]);
+			CompareOutput(m_keys[1], m_input[1], m_expected[5]);
+			CompareOutput(m_keys[1], m_input[2], m_expected[6]);
+			CompareOutput(m_keys[1], m_input[3], m_expected[7]);
 			OnProgress(std::string("Passed 192 bit key vector tests.."));
-			CompareVector(m_keys[2], m_input[0], m_expected[8]);
-			CompareVector(m_keys[2], m_input[1], m_expected[9]);
-			CompareVector(m_keys[2], m_input[2], m_expected[10]);
-			CompareVector(m_keys[2], m_input[3], m_expected[11]);
+			CompareOutput(m_keys[2], m_input[0], m_expected[8]);
+			CompareOutput(m_keys[2], m_input[1], m_expected[9]);
+			CompareOutput(m_keys[2], m_input[2], m_expected[10]);
+			CompareOutput(m_keys[2], m_input[3], m_expected[11]);
 			OnProgress(std::string("Passed 256 bit key vector tests.."));
 			CompareAccess(m_keys[2]);
 			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
@@ -89,7 +89,7 @@ namespace Test
 		}
 	}
 
-	void CMACTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void CMACTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash(16);
 		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();

@@ -53,7 +53,7 @@ namespace Test
         
     private:
 
-		void CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
+		void CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void Initialize();
 		void OnProgress(std::string Data);
     };

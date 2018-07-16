@@ -38,8 +38,8 @@ namespace Test
 		{
 			TestInit();
 			OnProgress(std::string("HKDFTest: Passed initialization tests.."));
-			CompareVector(42, m_key[0], m_salt[0], m_info[0], m_output[0]);
-			CompareVector(82, m_key[1], m_salt[1], m_info[1], m_output[1]);
+			CompareOutput(42, m_key[0], m_salt[0], m_info[0], m_output[0]);
+			CompareOutput(82, m_key[1], m_salt[1], m_info[1], m_output[1]);
 			OnProgress(std::string("HKDFTest: Passed SHA256 bit vectors tests.."));
 
 			return SUCCESS;
@@ -54,7 +54,7 @@ namespace Test
 		}
 	}
 
-	void HKDFTest::CompareVector(int Size, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Info, std::vector<byte> &Expected)
+	void HKDFTest::CompareOutput(int Size, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Info, std::vector<byte> &Expected)
 	{
 		std::vector<byte> outBytes(Size, 0);
 

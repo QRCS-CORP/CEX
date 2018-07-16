@@ -128,6 +128,16 @@ public:
 	//~~~Load and Store~~~//
 
 	/// <summary>
+	/// Load with 1 * 64bit unsigned integer; copied to every register
+	/// </summary>
+	///
+	/// <param name="X">Set all uint64 integers to this value</param>
+	inline void Load(ulong X)
+	{
+		ymm = _mm256_set1_epi64x(X);
+	}
+
+	/// <summary>
 	/// Load an array into a register
 	/// </summary>
 	///

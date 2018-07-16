@@ -1,6 +1,10 @@
 #include "Keccak.h"
+#include "IntUtils.h"
 
 NAMESPACE_DIGEST
+
+using Utility::IntUtils;
+using Utility::MemUtils;
 
 //~~~Round Constants~~~//
 
@@ -31,6 +35,197 @@ const std::vector<ulong> Keccak::RC48 =
 };
 
 //~~~Public Functions~~~//
+
+void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
+{
+	std::array<ulong, 25> A;
+	std::array<ulong, 5> C;
+	std::array<ulong, 5> D;
+	std::array<ulong, 25> E;
+	size_t i;
+
+	MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
+
+	for (i = 0; i < 24; i += 2)
+	{
+		// round n
+		C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+		C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+		D[0] = C[4] ^ IntUtils::RotFL64(C[1], 1);
+		D[1] = C[0] ^ IntUtils::RotFL64(C[2], 1);
+		D[2] = C[1] ^ IntUtils::RotFL64(C[3], 1);
+		D[3] = C[2] ^ IntUtils::RotFL64(C[4], 1);
+		D[4] = C[3] ^ IntUtils::RotFL64(C[0], 1);
+		A[0] ^= D[0];
+		C[0] = A[0];
+		A[6] ^= D[1];
+		C[1] = IntUtils::RotFL64(A[6], 44);
+		A[12] ^= D[2];
+		C[2] = IntUtils::RotFL64(A[12], 43);
+		A[18] ^= D[3];
+		C[3] = IntUtils::RotFL64(A[18], 21);
+		A[24] ^= D[4];
+		C[4] = IntUtils::RotFL64(A[24], 14);
+		E[0] = C[0] ^ ((~C[1]) & C[2]);
+		E[0] ^= RC24[i];
+		E[1] = C[1] ^ ((~C[2]) & C[3]);
+		E[2] = C[2] ^ ((~C[3]) & C[4]);
+		E[3] = C[3] ^ ((~C[4]) & C[0]);
+		E[4] = C[4] ^ ((~C[0]) & C[1]);
+		A[3] ^= D[3];
+		C[0] = IntUtils::RotFL64(A[3], 28);
+		A[9] ^= D[4];
+		C[1] = IntUtils::RotFL64(A[9], 20);
+		A[10] ^= D[0];
+		C[2] = IntUtils::RotFL64(A[10], 3);
+		A[16] ^= D[1];
+		C[3] = IntUtils::RotFL64(A[16], 45);
+		A[22] ^= D[2];
+		C[4] = IntUtils::RotFL64(A[22], 61);
+		E[5] = C[0] ^ ((~C[1]) & C[2]);
+		E[6] = C[1] ^ ((~C[2]) & C[3]);
+		E[7] = C[2] ^ ((~C[3]) & C[4]);
+		E[8] = C[3] ^ ((~C[4]) & C[0]);
+		E[9] = C[4] ^ ((~C[0]) & C[1]);
+		A[1] ^= D[1];
+		C[0] = IntUtils::RotFL64(A[1], 1);
+		A[7] ^= D[2];
+		C[1] = IntUtils::RotFL64(A[7], 6);
+		A[13] ^= D[3];
+		C[2] = IntUtils::RotFL64(A[13], 25);
+		A[19] ^= D[4];
+		C[3] = IntUtils::RotFL64(A[19], 8);
+		A[20] ^= D[0];
+		C[4] = IntUtils::RotFL64(A[20], 18);
+		E[10] = C[0] ^ ((~C[1]) & C[2]);
+		E[11] = C[1] ^ ((~C[2]) & C[3]);
+		E[12] = C[2] ^ ((~C[3]) & C[4]);
+		E[13] = C[3] ^ ((~C[4]) & C[0]);
+		E[14] = C[4] ^ ((~C[0]) & C[1]);
+		A[4] ^= D[4];
+		C[0] = IntUtils::RotFL64(A[4], 27);
+		A[5] ^= D[0];
+		C[1] = IntUtils::RotFL64(A[5], 36);
+		A[11] ^= D[1];
+		C[2] = IntUtils::RotFL64(A[11], 10);
+		A[17] ^= D[2];
+		C[3] = IntUtils::RotFL64(A[17], 15);
+		A[23] ^= D[3];
+		C[4] = IntUtils::RotFL64(A[23], 56);
+		E[15] = C[0] ^ ((~C[1]) & C[2]);
+		E[16] = C[1] ^ ((~C[2]) & C[3]);
+		E[17] = C[2] ^ ((~C[3]) & C[4]);
+		E[18] = C[3] ^ ((~C[4]) & C[0]);
+		E[19] = C[4] ^ ((~C[0]) & C[1]);
+		A[2] ^= D[2];
+		C[0] = IntUtils::RotFL64(A[2], 62);
+		A[8] ^= D[3];
+		C[1] = IntUtils::RotFL64(A[8], 55);
+		A[14] ^= D[4];
+		C[2] = IntUtils::RotFL64(A[14], 39);
+		A[15] ^= D[0];
+		C[3] = IntUtils::RotFL64(A[15], 41);
+		A[21] ^= D[1];
+		C[4] = IntUtils::RotFL64(A[21], 2);
+		E[20] = C[0] ^ ((~C[1]) & C[2]);
+		E[21] = C[1] ^ ((~C[2]) & C[3]);
+		E[22] = C[2] ^ ((~C[3]) & C[4]);
+		E[23] = C[3] ^ ((~C[4]) & C[0]);
+		E[24] = C[4] ^ ((~C[0]) & C[1]);
+		// round n + 1
+		C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+		C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+		D[0] = C[4] ^ IntUtils::RotFL64(C[1], 1);
+		D[1] = C[0] ^ IntUtils::RotFL64(C[2], 1);
+		D[2] = C[1] ^ IntUtils::RotFL64(C[3], 1);
+		D[3] = C[2] ^ IntUtils::RotFL64(C[4], 1);
+		D[4] = C[3] ^ IntUtils::RotFL64(C[0], 1);
+		E[0] ^= D[0];
+		C[0] = E[0];
+		E[6] ^= D[1];
+		C[1] = IntUtils::RotFL64(E[6], 44);
+		E[12] ^= D[2];
+		C[2] = IntUtils::RotFL64(E[12], 43);
+		E[18] ^= D[3];
+		C[3] = IntUtils::RotFL64(E[18], 21);
+		E[24] ^= D[4];
+		C[4] = IntUtils::RotFL64(E[24], 14);
+		A[0] = C[0] ^ ((~C[1]) & C[2]);
+		A[0] ^= RC24[i + 1];
+		A[1] = C[1] ^ ((~C[2]) & C[3]);
+		A[2] = C[2] ^ ((~C[3]) & C[4]);
+		A[3] = C[3] ^ ((~C[4]) & C[0]);
+		A[4] = C[4] ^ ((~C[0]) & C[1]);
+		E[3] ^= D[3];
+		C[0] = IntUtils::RotFL64(E[3], 28);
+		E[9] ^= D[4];
+		C[1] = IntUtils::RotFL64(E[9], 20);
+		E[10] ^= D[0];
+		C[2] = IntUtils::RotFL64(E[10], 3);
+		E[16] ^= D[1];
+		C[3] = IntUtils::RotFL64(E[16], 45);
+		E[22] ^= D[2];
+		C[4] = IntUtils::RotFL64(E[22], 61);
+		A[5] = C[0] ^ ((~C[1]) & C[2]);
+		A[6] = C[1] ^ ((~C[2]) & C[3]);
+		A[7] = C[2] ^ ((~C[3]) & C[4]);
+		A[8] = C[3] ^ ((~C[4]) & C[0]);
+		A[9] = C[4] ^ ((~C[0]) & C[1]);
+		E[1] ^= D[1];
+		C[0] = IntUtils::RotFL64(E[1], 1);
+		E[7] ^= D[2];
+		C[1] = IntUtils::RotFL64(E[7], 6);
+		E[13] ^= D[3];
+		C[2] = IntUtils::RotFL64(E[13], 25);
+		E[19] ^= D[4];
+		C[3] = IntUtils::RotFL64(E[19], 8);
+		E[20] ^= D[0];
+		C[4] = IntUtils::RotFL64(E[20], 18);
+		A[10] = C[0] ^ ((~C[1]) & C[2]);
+		A[11] = C[1] ^ ((~C[2]) & C[3]);
+		A[12] = C[2] ^ ((~C[3]) & C[4]);
+		A[13] = C[3] ^ ((~C[4]) & C[0]);
+		A[14] = C[4] ^ ((~C[0]) & C[1]);
+		E[4] ^= D[4];
+		C[0] = IntUtils::RotFL64(E[4], 27);
+		E[5] ^= D[0];
+		C[1] = IntUtils::RotFL64(E[5], 36);
+		E[11] ^= D[1];
+		C[2] = IntUtils::RotFL64(E[11], 10);
+		E[17] ^= D[2];
+		C[3] = IntUtils::RotFL64(E[17], 15);
+		E[23] ^= D[3];
+		C[4] = IntUtils::RotFL64(E[23], 56);
+		A[15] = C[0] ^ ((~C[1]) & C[2]);
+		A[16] = C[1] ^ ((~C[2]) & C[3]);
+		A[17] = C[2] ^ ((~C[3]) & C[4]);
+		A[18] = C[3] ^ ((~C[4]) & C[0]);
+		A[19] = C[4] ^ ((~C[0]) & C[1]);
+		E[2] ^= D[2];
+		C[0] = IntUtils::RotFL64(E[2], 62);
+		E[8] ^= D[3];
+		C[1] = IntUtils::RotFL64(E[8], 55);
+		E[14] ^= D[4];
+		C[2] = IntUtils::RotFL64(E[14], 39);
+		E[15] ^= D[0];
+		C[3] = IntUtils::RotFL64(E[15], 41);
+		E[21] ^= D[1];
+		C[4] = IntUtils::RotFL64(E[21], 2);
+		A[20] = C[0] ^ ((~C[1]) & C[2]);
+		A[21] = C[1] ^ ((~C[2]) & C[3]);
+		A[22] = C[2] ^ ((~C[3]) & C[4]);
+		A[23] = C[3] ^ ((~C[4]) & C[0]);
+		A[24] = C[4] ^ ((~C[0]) & C[1]);
+	}
+
+	MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
+}
 
 void Keccak::PermuteR24P1600U(std::array<ulong, 25> &State)
 {
@@ -2237,15 +2432,17 @@ void Keccak::PermuteR24P1600U(std::array<ulong, 25> &State)
 	State[24] = Asu;
 }
 
-void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
+#if defined(__AVX2__)
+
+void Keccak::PermuteR24P6400H(std::vector<ULong256> &State)
 {
-	std::array<ulong, 25> A;
-	std::array<ulong, 5> C;
-	std::array<ulong, 5> D;
-	std::array<ulong, 25> E;
+	std::array<ULong256, 25> A;
+	std::array<ULong256, 5> C;
+	std::array<ULong256, 5> D;
+	std::array<ULong256, 25> E;
 	size_t i;
 
-	Utility::MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
+	MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
 
 	for (i = 0; i < 24; i += 2)
 	{
@@ -2255,82 +2452,82 @@ void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
 		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
 		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
 		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
-		D[0] = C[4] ^ IntUtils::RotFL64(C[1], 1);
-		D[1] = C[0] ^ IntUtils::RotFL64(C[2], 1);
-		D[2] = C[1] ^ IntUtils::RotFL64(C[3], 1);
-		D[3] = C[2] ^ IntUtils::RotFL64(C[4], 1);
-		D[4] = C[3] ^ IntUtils::RotFL64(C[0], 1);
+		D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
+		D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
+		D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
+		D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
+		D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
 		A[0] ^= D[0];
 		C[0] = A[0];
 		A[6] ^= D[1];
-		C[1] = IntUtils::RotFL64(A[6], 44);
+		C[1] = ULong256::RotL64(A[6], 44);
 		A[12] ^= D[2];
-		C[2] = IntUtils::RotFL64(A[12], 43);
+		C[2] = ULong256::RotL64(A[12], 43);
 		A[18] ^= D[3];
-		C[3] = IntUtils::RotFL64(A[18], 21);
+		C[3] = ULong256::RotL64(A[18], 21);
 		A[24] ^= D[4];
-		C[4] = IntUtils::RotFL64(A[24], 14);
+		C[4] = ULong256::RotL64(A[24], 14);
 		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= RC24[i];
+		E[0] ^= ULong256(RC24[i]);
 		E[1] = C[1] ^ ((~C[2]) & C[3]);
 		E[2] = C[2] ^ ((~C[3]) & C[4]);
 		E[3] = C[3] ^ ((~C[4]) & C[0]);
 		E[4] = C[4] ^ ((~C[0]) & C[1]);
 		A[3] ^= D[3];
-		C[0] = IntUtils::RotFL64(A[3], 28);
+		C[0] = ULong256::RotL64(A[3], 28);
 		A[9] ^= D[4];
-		C[1] = IntUtils::RotFL64(A[9], 20);
+		C[1] = ULong256::RotL64(A[9], 20);
 		A[10] ^= D[0];
-		C[2] = IntUtils::RotFL64(A[10], 3);
+		C[2] = ULong256::RotL64(A[10], 3);
 		A[16] ^= D[1];
-		C[3] = IntUtils::RotFL64(A[16], 45);
+		C[3] = ULong256::RotL64(A[16], 45);
 		A[22] ^= D[2];
-		C[4] = IntUtils::RotFL64(A[22], 61);
+		C[4] = ULong256::RotL64(A[22], 61);
 		E[5] = C[0] ^ ((~C[1]) & C[2]);
 		E[6] = C[1] ^ ((~C[2]) & C[3]);
 		E[7] = C[2] ^ ((~C[3]) & C[4]);
 		E[8] = C[3] ^ ((~C[4]) & C[0]);
 		E[9] = C[4] ^ ((~C[0]) & C[1]);
 		A[1] ^= D[1];
-		C[0] = IntUtils::RotFL64(A[1], 1);
+		C[0] = ULong256::RotL64(A[1], 1);
 		A[7] ^= D[2];
-		C[1] = IntUtils::RotFL64(A[7], 6);
+		C[1] = ULong256::RotL64(A[7], 6);
 		A[13] ^= D[3];
-		C[2] = IntUtils::RotFL64(A[13], 25);
+		C[2] = ULong256::RotL64(A[13], 25);
 		A[19] ^= D[4];
-		C[3] = IntUtils::RotFL64(A[19], 8);
+		C[3] = ULong256::RotL64(A[19], 8);
 		A[20] ^= D[0];
-		C[4] = IntUtils::RotFL64(A[20], 18);
+		C[4] = ULong256::RotL64(A[20], 18);
 		E[10] = C[0] ^ ((~C[1]) & C[2]);
 		E[11] = C[1] ^ ((~C[2]) & C[3]);
 		E[12] = C[2] ^ ((~C[3]) & C[4]);
 		E[13] = C[3] ^ ((~C[4]) & C[0]);
 		E[14] = C[4] ^ ((~C[0]) & C[1]);
 		A[4] ^= D[4];
-		C[0] = IntUtils::RotFL64(A[4], 27);
+		C[0] = ULong256::RotL64(A[4], 27);
 		A[5] ^= D[0];
-		C[1] = IntUtils::RotFL64(A[5], 36);
+		C[1] = ULong256::RotL64(A[5], 36);
 		A[11] ^= D[1];
-		C[2] = IntUtils::RotFL64(A[11], 10);
+		C[2] = ULong256::RotL64(A[11], 10);
 		A[17] ^= D[2];
-		C[3] = IntUtils::RotFL64(A[17], 15);
+		C[3] = ULong256::RotL64(A[17], 15);
 		A[23] ^= D[3];
-		C[4] = IntUtils::RotFL64(A[23], 56);
+		C[4] = ULong256::RotL64(A[23], 56);
 		E[15] = C[0] ^ ((~C[1]) & C[2]);
 		E[16] = C[1] ^ ((~C[2]) & C[3]);
 		E[17] = C[2] ^ ((~C[3]) & C[4]);
 		E[18] = C[3] ^ ((~C[4]) & C[0]);
 		E[19] = C[4] ^ ((~C[0]) & C[1]);
 		A[2] ^= D[2];
-		C[0] = IntUtils::RotFL64(A[2], 62);
+		C[0] = ULong256::RotL64(A[2], 62);
 		A[8] ^= D[3];
-		C[1] = IntUtils::RotFL64(A[8], 55);
+		C[1] = ULong256::RotL64(A[8], 55);
 		A[14] ^= D[4];
-		C[2] = IntUtils::RotFL64(A[14], 39);
+		C[2] = ULong256::RotL64(A[14], 39);
 		A[15] ^= D[0];
-		C[3] = IntUtils::RotFL64(A[15], 41);
+		C[3] = ULong256::RotL64(A[15], 41);
 		A[21] ^= D[1];
-		C[4] = IntUtils::RotFL64(A[21], 2);
+		C[4] = ULong256::RotL64(A[21], 2);
 		E[20] = C[0] ^ ((~C[1]) & C[2]);
 		E[21] = C[1] ^ ((~C[2]) & C[3]);
 		E[22] = C[2] ^ ((~C[3]) & C[4]);
@@ -2342,82 +2539,82 @@ void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
 		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
 		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
 		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
-		D[0] = C[4] ^ IntUtils::RotFL64(C[1], 1);
-		D[1] = C[0] ^ IntUtils::RotFL64(C[2], 1);
-		D[2] = C[1] ^ IntUtils::RotFL64(C[3], 1);
-		D[3] = C[2] ^ IntUtils::RotFL64(C[4], 1);
-		D[4] = C[3] ^ IntUtils::RotFL64(C[0], 1);
+		D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
+		D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
+		D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
+		D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
+		D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
 		E[0] ^= D[0];
 		C[0] = E[0];
 		E[6] ^= D[1];
-		C[1] = IntUtils::RotFL64(E[6], 44);
+		C[1] = ULong256::RotL64(E[6], 44);
 		E[12] ^= D[2];
-		C[2] = IntUtils::RotFL64(E[12], 43);
+		C[2] = ULong256::RotL64(E[12], 43);
 		E[18] ^= D[3];
-		C[3] = IntUtils::RotFL64(E[18], 21);
+		C[3] = ULong256::RotL64(E[18], 21);
 		E[24] ^= D[4];
-		C[4] = IntUtils::RotFL64(E[24], 14);
+		C[4] = ULong256::RotL64(E[24], 14);
 		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= RC24[i + 1];
+		A[0] ^= ULong256(RC24[i + 1]);
 		A[1] = C[1] ^ ((~C[2]) & C[3]);
 		A[2] = C[2] ^ ((~C[3]) & C[4]);
 		A[3] = C[3] ^ ((~C[4]) & C[0]);
 		A[4] = C[4] ^ ((~C[0]) & C[1]);
 		E[3] ^= D[3];
-		C[0] = IntUtils::RotFL64(E[3], 28);
+		C[0] = ULong256::RotL64(E[3], 28);
 		E[9] ^= D[4];
-		C[1] = IntUtils::RotFL64(E[9], 20);
+		C[1] = ULong256::RotL64(E[9], 20);
 		E[10] ^= D[0];
-		C[2] = IntUtils::RotFL64(E[10], 3);
+		C[2] = ULong256::RotL64(E[10], 3);
 		E[16] ^= D[1];
-		C[3] = IntUtils::RotFL64(E[16], 45);
+		C[3] = ULong256::RotL64(E[16], 45);
 		E[22] ^= D[2];
-		C[4] = IntUtils::RotFL64(E[22], 61);
+		C[4] = ULong256::RotL64(E[22], 61);
 		A[5] = C[0] ^ ((~C[1]) & C[2]);
 		A[6] = C[1] ^ ((~C[2]) & C[3]);
 		A[7] = C[2] ^ ((~C[3]) & C[4]);
 		A[8] = C[3] ^ ((~C[4]) & C[0]);
 		A[9] = C[4] ^ ((~C[0]) & C[1]);
 		E[1] ^= D[1];
-		C[0] = IntUtils::RotFL64(E[1], 1);
+		C[0] = ULong256::RotL64(E[1], 1);
 		E[7] ^= D[2];
-		C[1] = IntUtils::RotFL64(E[7], 6);
+		C[1] = ULong256::RotL64(E[7], 6);
 		E[13] ^= D[3];
-		C[2] = IntUtils::RotFL64(E[13], 25);
+		C[2] = ULong256::RotL64(E[13], 25);
 		E[19] ^= D[4];
-		C[3] = IntUtils::RotFL64(E[19], 8);
+		C[3] = ULong256::RotL64(E[19], 8);
 		E[20] ^= D[0];
-		C[4] = IntUtils::RotFL64(E[20], 18);
+		C[4] = ULong256::RotL64(E[20], 18);
 		A[10] = C[0] ^ ((~C[1]) & C[2]);
 		A[11] = C[1] ^ ((~C[2]) & C[3]);
 		A[12] = C[2] ^ ((~C[3]) & C[4]);
 		A[13] = C[3] ^ ((~C[4]) & C[0]);
 		A[14] = C[4] ^ ((~C[0]) & C[1]);
 		E[4] ^= D[4];
-		C[0] = IntUtils::RotFL64(E[4], 27);
+		C[0] = ULong256::RotL64(E[4], 27);
 		E[5] ^= D[0];
-		C[1] = IntUtils::RotFL64(E[5], 36);
+		C[1] = ULong256::RotL64(E[5], 36);
 		E[11] ^= D[1];
-		C[2] = IntUtils::RotFL64(E[11], 10);
+		C[2] = ULong256::RotL64(E[11], 10);
 		E[17] ^= D[2];
-		C[3] = IntUtils::RotFL64(E[17], 15);
+		C[3] = ULong256::RotL64(E[17], 15);
 		E[23] ^= D[3];
-		C[4] = IntUtils::RotFL64(E[23], 56);
+		C[4] = ULong256::RotL64(E[23], 56);
 		A[15] = C[0] ^ ((~C[1]) & C[2]);
 		A[16] = C[1] ^ ((~C[2]) & C[3]);
 		A[17] = C[2] ^ ((~C[3]) & C[4]);
 		A[18] = C[3] ^ ((~C[4]) & C[0]);
 		A[19] = C[4] ^ ((~C[0]) & C[1]);
 		E[2] ^= D[2];
-		C[0] = IntUtils::RotFL64(E[2], 62);
+		C[0] = ULong256::RotL64(E[2], 62);
 		E[8] ^= D[3];
-		C[1] = IntUtils::RotFL64(E[8], 55);
+		C[1] = ULong256::RotL64(E[8], 55);
 		E[14] ^= D[4];
-		C[2] = IntUtils::RotFL64(E[14], 39);
+		C[2] = ULong256::RotL64(E[14], 39);
 		E[15] ^= D[0];
-		C[3] = IntUtils::RotFL64(E[15], 41);
+		C[3] = ULong256::RotL64(E[15], 41);
 		E[21] ^= D[1];
-		C[4] = IntUtils::RotFL64(E[21], 2);
+		C[4] = ULong256::RotL64(E[21], 2);
 		A[20] = C[0] ^ ((~C[1]) & C[2]);
 		A[21] = C[1] ^ ((~C[2]) & C[3]);
 		A[22] = C[2] ^ ((~C[3]) & C[4]);
@@ -2425,8 +2622,205 @@ void Keccak::PermuteR24P1600C(std::array<ulong, 25> &State)
 		A[24] = C[4] ^ ((~C[0]) & C[1]);
 	}
 
-	Utility::MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
+	MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong256));
 }
+
+#endif
+
+#if defined(__AVX512__)
+
+void Keccak::PermuteR24P12800H(std::vector<ULong512> &State)
+{
+	std::array<ULong512, 25> A;
+	std::array<ULong512, 5> C;
+	std::array<ULong512, 5> D;
+	std::array<ULong512, 25> E;
+	size_t i;
+
+	MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
+
+	for (i = 0; i < 24; i += 2)
+	{
+		// round n
+		C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+		C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+		A[0] ^= D[0];
+		C[0] = A[0];
+		A[6] ^= D[1];
+		C[1] = ULong512::RotL64(A[6], 44);
+		A[12] ^= D[2];
+		C[2] = ULong512::RotL64(A[12], 43);
+		A[18] ^= D[3];
+		C[3] = ULong512::RotL64(A[18], 21);
+		A[24] ^= D[4];
+		C[4] = ULong512::RotL64(A[24], 14);
+		E[0] = C[0] ^ ((~C[1]) & C[2]);
+		E[0] ^= ULong512(RC24[i]);
+		E[1] = C[1] ^ ((~C[2]) & C[3]);
+		E[2] = C[2] ^ ((~C[3]) & C[4]);
+		E[3] = C[3] ^ ((~C[4]) & C[0]);
+		E[4] = C[4] ^ ((~C[0]) & C[1]);
+		A[3] ^= D[3];
+		C[0] = ULong512::RotL64(A[3], 28);
+		A[9] ^= D[4];
+		C[1] = ULong512::RotL64(A[9], 20);
+		A[10] ^= D[0];
+		C[2] = ULong512::RotL64(A[10], 3);
+		A[16] ^= D[1];
+		C[3] = ULong512::RotL64(A[16], 45);
+		A[22] ^= D[2];
+		C[4] = ULong512::RotL64(A[22], 61);
+		E[5] = C[0] ^ ((~C[1]) & C[2]);
+		E[6] = C[1] ^ ((~C[2]) & C[3]);
+		E[7] = C[2] ^ ((~C[3]) & C[4]);
+		E[8] = C[3] ^ ((~C[4]) & C[0]);
+		E[9] = C[4] ^ ((~C[0]) & C[1]);
+		A[1] ^= D[1];
+		C[0] = ULong512::RotL64(A[1], 1);
+		A[7] ^= D[2];
+		C[1] = ULong512::RotL64(A[7], 6);
+		A[13] ^= D[3];
+		C[2] = ULong512::RotL64(A[13], 25);
+		A[19] ^= D[4];
+		C[3] = ULong512::RotL64(A[19], 8);
+		A[20] ^= D[0];
+		C[4] = ULong512::RotL64(A[20], 18);
+		E[10] = C[0] ^ ((~C[1]) & C[2]);
+		E[11] = C[1] ^ ((~C[2]) & C[3]);
+		E[12] = C[2] ^ ((~C[3]) & C[4]);
+		E[13] = C[3] ^ ((~C[4]) & C[0]);
+		E[14] = C[4] ^ ((~C[0]) & C[1]);
+		A[4] ^= D[4];
+		C[0] = ULong512::RotL64(A[4], 27);
+		A[5] ^= D[0];
+		C[1] = ULong512::RotL64(A[5], 36);
+		A[11] ^= D[1];
+		C[2] = ULong512::RotL64(A[11], 10);
+		A[17] ^= D[2];
+		C[3] = ULong512::RotL64(A[17], 15);
+		A[23] ^= D[3];
+		C[4] = ULong512::RotL64(A[23], 56);
+		E[15] = C[0] ^ ((~C[1]) & C[2]);
+		E[16] = C[1] ^ ((~C[2]) & C[3]);
+		E[17] = C[2] ^ ((~C[3]) & C[4]);
+		E[18] = C[3] ^ ((~C[4]) & C[0]);
+		E[19] = C[4] ^ ((~C[0]) & C[1]);
+		A[2] ^= D[2];
+		C[0] = ULong512::RotL64(A[2], 62);
+		A[8] ^= D[3];
+		C[1] = ULong512::RotL64(A[8], 55);
+		A[14] ^= D[4];
+		C[2] = ULong512::RotL64(A[14], 39);
+		A[15] ^= D[0];
+		C[3] = ULong512::RotL64(A[15], 41);
+		A[21] ^= D[1];
+		C[4] = ULong512::RotL64(A[21], 2);
+		E[20] = C[0] ^ ((~C[1]) & C[2]);
+		E[21] = C[1] ^ ((~C[2]) & C[3]);
+		E[22] = C[2] ^ ((~C[3]) & C[4]);
+		E[23] = C[3] ^ ((~C[4]) & C[0]);
+		E[24] = C[4] ^ ((~C[0]) & C[1]);
+		// round n + 1
+		C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+		C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+		E[0] ^= D[0];
+		C[0] = E[0];
+		E[6] ^= D[1];
+		C[1] = ULong512::RotL64(E[6], 44);
+		E[12] ^= D[2];
+		C[2] = ULong512::RotL64(E[12], 43);
+		E[18] ^= D[3];
+		C[3] = ULong512::RotL64(E[18], 21);
+		E[24] ^= D[4];
+		C[4] = ULong512::RotL64(E[24], 14);
+		A[0] = C[0] ^ ((~C[1]) & C[2]);
+		A[0] ^= ULong512(RC24[i + 1]);
+		A[1] = C[1] ^ ((~C[2]) & C[3]);
+		A[2] = C[2] ^ ((~C[3]) & C[4]);
+		A[3] = C[3] ^ ((~C[4]) & C[0]);
+		A[4] = C[4] ^ ((~C[0]) & C[1]);
+		E[3] ^= D[3];
+		C[0] = ULong512::RotL64(E[3], 28);
+		E[9] ^= D[4];
+		C[1] = ULong512::RotL64(E[9], 20);
+		E[10] ^= D[0];
+		C[2] = ULong512::RotL64(E[10], 3);
+		E[16] ^= D[1];
+		C[3] = ULong512::RotL64(E[16], 45);
+		E[22] ^= D[2];
+		C[4] = ULong512::RotL64(E[22], 61);
+		A[5] = C[0] ^ ((~C[1]) & C[2]);
+		A[6] = C[1] ^ ((~C[2]) & C[3]);
+		A[7] = C[2] ^ ((~C[3]) & C[4]);
+		A[8] = C[3] ^ ((~C[4]) & C[0]);
+		A[9] = C[4] ^ ((~C[0]) & C[1]);
+		E[1] ^= D[1];
+		C[0] = ULong512::RotL64(E[1], 1);
+		E[7] ^= D[2];
+		C[1] = ULong512::RotL64(E[7], 6);
+		E[13] ^= D[3];
+		C[2] = ULong512::RotL64(E[13], 25);
+		E[19] ^= D[4];
+		C[3] = ULong512::RotL64(E[19], 8);
+		E[20] ^= D[0];
+		C[4] = ULong512::RotL64(E[20], 18);
+		A[10] = C[0] ^ ((~C[1]) & C[2]);
+		A[11] = C[1] ^ ((~C[2]) & C[3]);
+		A[12] = C[2] ^ ((~C[3]) & C[4]);
+		A[13] = C[3] ^ ((~C[4]) & C[0]);
+		A[14] = C[4] ^ ((~C[0]) & C[1]);
+		E[4] ^= D[4];
+		C[0] = ULong512::RotL64(E[4], 27);
+		E[5] ^= D[0];
+		C[1] = ULong512::RotL64(E[5], 36);
+		E[11] ^= D[1];
+		C[2] = ULong512::RotL64(E[11], 10);
+		E[17] ^= D[2];
+		C[3] = ULong512::RotL64(E[17], 15);
+		E[23] ^= D[3];
+		C[4] = ULong512::RotL64(E[23], 56);
+		A[15] = C[0] ^ ((~C[1]) & C[2]);
+		A[16] = C[1] ^ ((~C[2]) & C[3]);
+		A[17] = C[2] ^ ((~C[3]) & C[4]);
+		A[18] = C[3] ^ ((~C[4]) & C[0]);
+		A[19] = C[4] ^ ((~C[0]) & C[1]);
+		E[2] ^= D[2];
+		C[0] = ULong512::RotL64(E[2], 62);
+		E[8] ^= D[3];
+		C[1] = ULong512::RotL64(E[8], 55);
+		E[14] ^= D[4];
+		C[2] = ULong512::RotL64(E[14], 39);
+		E[15] ^= D[0];
+		C[3] = ULong512::RotL64(E[15], 41);
+		E[21] ^= D[1];
+		C[4] = ULong512::RotL64(E[21], 2);
+		A[20] = C[0] ^ ((~C[1]) & C[2]);
+		A[21] = C[1] ^ ((~C[2]) & C[3]);
+		A[22] = C[2] ^ ((~C[3]) & C[4]);
+		A[23] = C[3] ^ ((~C[4]) & C[0]);
+		A[24] = C[4] ^ ((~C[0]) & C[1]);
+	}
+
+	MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong512));
+}
+
+#endif
 
 void Keccak::PermuteR48P1600U(std::array<ulong, 25> &State)
 {
@@ -6729,7 +7123,7 @@ void Keccak::PermuteR48P1600C(std::array<ulong, 25> &State)
 	std::array<ulong, 25> E;
 	size_t i;
 
-	Utility::MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
+	MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ulong));
 
 	for (i = 0; i < 48; i += 2)
 	{
@@ -6909,587 +7303,10 @@ void Keccak::PermuteR48P1600C(std::array<ulong, 25> &State)
 		A[24] = C[4] ^ ((~C[0]) & C[1]);
 	}
 
-	Utility::MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
+	MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ulong));
 }
-
-#if defined(__AVX512__)
-
-void Keccak::PermuteR24P12800H(std::vector<ULong512> &State)
-{
-	std::array<ULong512, 25> A;
-	std::array<ULong512, 5> C;
-	std::array<ULong512, 5> D;
-	std::array<ULong512, 25> E;
-	size_t i;
-
-	Utility::MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
-
-	for (i = 0; i < 24; i += 2)
-	{
-		// round n
-		C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
-		C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
-		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
-		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
-		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
-		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
-		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
-		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
-		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
-		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
-		A[0] ^= D[0];
-		C[0] = A[0];
-		A[6] ^= D[1];
-		C[1] = ULong512::RotL64(A[6], 44);
-		A[12] ^= D[2];
-		C[2] = ULong512::RotL64(A[12], 43);
-		A[18] ^= D[3];
-		C[3] = ULong512::RotL64(A[18], 21);
-		A[24] ^= D[4];
-		C[4] = ULong512::RotL64(A[24], 14);
-		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong512(RC24[i]);
-		E[1] = C[1] ^ ((~C[2]) & C[3]);
-		E[2] = C[2] ^ ((~C[3]) & C[4]);
-		E[3] = C[3] ^ ((~C[4]) & C[0]);
-		E[4] = C[4] ^ ((~C[0]) & C[1]);
-		A[3] ^= D[3];
-		C[0] = ULong512::RotL64(A[3], 28);
-		A[9] ^= D[4];
-		C[1] = ULong512::RotL64(A[9], 20);
-		A[10] ^= D[0];
-		C[2] = ULong512::RotL64(A[10], 3);
-		A[16] ^= D[1];
-		C[3] = ULong512::RotL64(A[16], 45);
-		A[22] ^= D[2];
-		C[4] = ULong512::RotL64(A[22], 61);
-		E[5] = C[0] ^ ((~C[1]) & C[2]);
-		E[6] = C[1] ^ ((~C[2]) & C[3]);
-		E[7] = C[2] ^ ((~C[3]) & C[4]);
-		E[8] = C[3] ^ ((~C[4]) & C[0]);
-		E[9] = C[4] ^ ((~C[0]) & C[1]);
-		A[1] ^= D[1];
-		C[0] = ULong512::RotL64(A[1], 1);
-		A[7] ^= D[2];
-		C[1] = ULong512::RotL64(A[7], 6);
-		A[13] ^= D[3];
-		C[2] = ULong512::RotL64(A[13], 25);
-		A[19] ^= D[4];
-		C[3] = ULong512::RotL64(A[19], 8);
-		A[20] ^= D[0];
-		C[4] = ULong512::RotL64(A[20], 18);
-		E[10] = C[0] ^ ((~C[1]) & C[2]);
-		E[11] = C[1] ^ ((~C[2]) & C[3]);
-		E[12] = C[2] ^ ((~C[3]) & C[4]);
-		E[13] = C[3] ^ ((~C[4]) & C[0]);
-		E[14] = C[4] ^ ((~C[0]) & C[1]);
-		A[4] ^= D[4];
-		C[0] = ULong512::RotL64(A[4], 27);
-		A[5] ^= D[0];
-		C[1] = ULong512::RotL64(A[5], 36);
-		A[11] ^= D[1];
-		C[2] = ULong512::RotL64(A[11], 10);
-		A[17] ^= D[2];
-		C[3] = ULong512::RotL64(A[17], 15);
-		A[23] ^= D[3];
-		C[4] = ULong512::RotL64(A[23], 56);
-		E[15] = C[0] ^ ((~C[1]) & C[2]);
-		E[16] = C[1] ^ ((~C[2]) & C[3]);
-		E[17] = C[2] ^ ((~C[3]) & C[4]);
-		E[18] = C[3] ^ ((~C[4]) & C[0]);
-		E[19] = C[4] ^ ((~C[0]) & C[1]);
-		A[2] ^= D[2];
-		C[0] = ULong512::RotL64(A[2], 62);
-		A[8] ^= D[3];
-		C[1] = ULong512::RotL64(A[8], 55);
-		A[14] ^= D[4];
-		C[2] = ULong512::RotL64(A[14], 39);
-		A[15] ^= D[0];
-		C[3] = ULong512::RotL64(A[15], 41);
-		A[21] ^= D[1];
-		C[4] = ULong512::RotL64(A[21], 2);
-		E[20] = C[0] ^ ((~C[1]) & C[2]);
-		E[21] = C[1] ^ ((~C[2]) & C[3]);
-		E[22] = C[2] ^ ((~C[3]) & C[4]);
-		E[23] = C[3] ^ ((~C[4]) & C[0]);
-		E[24] = C[4] ^ ((~C[0]) & C[1]);
-		// round n + 1
-		C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
-		C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
-		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
-		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
-		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
-		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
-		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
-		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
-		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
-		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
-		E[0] ^= D[0];
-		C[0] = E[0];
-		E[6] ^= D[1];
-		C[1] = ULong512::RotL64(E[6], 44);
-		E[12] ^= D[2];
-		C[2] = ULong512::RotL64(E[12], 43);
-		E[18] ^= D[3];
-		C[3] = ULong512::RotL64(E[18], 21);
-		E[24] ^= D[4];
-		C[4] = ULong512::RotL64(E[24], 14);
-		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong512(RC24[i + 1]);
-		A[1] = C[1] ^ ((~C[2]) & C[3]);
-		A[2] = C[2] ^ ((~C[3]) & C[4]);
-		A[3] = C[3] ^ ((~C[4]) & C[0]);
-		A[4] = C[4] ^ ((~C[0]) & C[1]);
-		E[3] ^= D[3];
-		C[0] = ULong512::RotL64(E[3], 28);
-		E[9] ^= D[4];
-		C[1] = ULong512::RotL64(E[9], 20);
-		E[10] ^= D[0];
-		C[2] = ULong512::RotL64(E[10], 3);
-		E[16] ^= D[1];
-		C[3] = ULong512::RotL64(E[16], 45);
-		E[22] ^= D[2];
-		C[4] = ULong512::RotL64(E[22], 61);
-		A[5] = C[0] ^ ((~C[1]) & C[2]);
-		A[6] = C[1] ^ ((~C[2]) & C[3]);
-		A[7] = C[2] ^ ((~C[3]) & C[4]);
-		A[8] = C[3] ^ ((~C[4]) & C[0]);
-		A[9] = C[4] ^ ((~C[0]) & C[1]);
-		E[1] ^= D[1];
-		C[0] = ULong512::RotL64(E[1], 1);
-		E[7] ^= D[2];
-		C[1] = ULong512::RotL64(E[7], 6);
-		E[13] ^= D[3];
-		C[2] = ULong512::RotL64(E[13], 25);
-		E[19] ^= D[4];
-		C[3] = ULong512::RotL64(E[19], 8);
-		E[20] ^= D[0];
-		C[4] = ULong512::RotL64(E[20], 18);
-		A[10] = C[0] ^ ((~C[1]) & C[2]);
-		A[11] = C[1] ^ ((~C[2]) & C[3]);
-		A[12] = C[2] ^ ((~C[3]) & C[4]);
-		A[13] = C[3] ^ ((~C[4]) & C[0]);
-		A[14] = C[4] ^ ((~C[0]) & C[1]);
-		E[4] ^= D[4];
-		C[0] = ULong512::RotL64(E[4], 27);
-		E[5] ^= D[0];
-		C[1] = ULong512::RotL64(E[5], 36);
-		E[11] ^= D[1];
-		C[2] = ULong512::RotL64(E[11], 10);
-		E[17] ^= D[2];
-		C[3] = ULong512::RotL64(E[17], 15);
-		E[23] ^= D[3];
-		C[4] = ULong512::RotL64(E[23], 56);
-		A[15] = C[0] ^ ((~C[1]) & C[2]);
-		A[16] = C[1] ^ ((~C[2]) & C[3]);
-		A[17] = C[2] ^ ((~C[3]) & C[4]);
-		A[18] = C[3] ^ ((~C[4]) & C[0]);
-		A[19] = C[4] ^ ((~C[0]) & C[1]);
-		E[2] ^= D[2];
-		C[0] = ULong512::RotL64(E[2], 62);
-		E[8] ^= D[3];
-		C[1] = ULong512::RotL64(E[8], 55);
-		E[14] ^= D[4];
-		C[2] = ULong512::RotL64(E[14], 39);
-		E[15] ^= D[0];
-		C[3] = ULong512::RotL64(E[15], 41);
-		E[21] ^= D[1];
-		C[4] = ULong512::RotL64(E[21], 2);
-		A[20] = C[0] ^ ((~C[1]) & C[2]);
-		A[21] = C[1] ^ ((~C[2]) & C[3]);
-		A[22] = C[2] ^ ((~C[3]) & C[4]);
-		A[23] = C[3] ^ ((~C[4]) & C[0]);
-		A[24] = C[4] ^ ((~C[0]) & C[1]);
-	}
-
-	Utility::MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong512));
-}
-
-void Keccak::PermuteR48P12800H(std::vector<ULong512> &State)
-{
-	std::array<ULong512, 25> A;
-	std::array<ULong512, 5> C;
-	std::array<ULong512, 5> D;
-	std::array<ULong512, 25> E;
-	size_t i;
-
-	Utility::MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
-
-	for (i = 0; i < 48; i += 2)
-	{
-		// round n
-		C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
-		C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
-		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
-		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
-		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
-		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
-		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
-		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
-		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
-		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
-		A[0] ^= D[0];
-		C[0] = A[0];
-		A[6] ^= D[1];
-		C[1] = ULong512::RotL64(A[6], 44);
-		A[12] ^= D[2];
-		C[2] = ULong512::RotL64(A[12], 43);
-		A[18] ^= D[3];
-		C[3] = ULong512::RotL64(A[18], 21);
-		A[24] ^= D[4];
-		C[4] = ULong512::RotL64(A[24], 14);
-		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong512(RC48[i]);
-		E[1] = C[1] ^ ((~C[2]) & C[3]);
-		E[2] = C[2] ^ ((~C[3]) & C[4]);
-		E[3] = C[3] ^ ((~C[4]) & C[0]);
-		E[4] = C[4] ^ ((~C[0]) & C[1]);
-		A[3] ^= D[3];
-		C[0] = ULong512::RotL64(A[3], 28);
-		A[9] ^= D[4];
-		C[1] = ULong512::RotL64(A[9], 20);
-		A[10] ^= D[0];
-		C[2] = ULong512::RotL64(A[10], 3);
-		A[16] ^= D[1];
-		C[3] = ULong512::RotL64(A[16], 45);
-		A[22] ^= D[2];
-		C[4] = ULong512::RotL64(A[22], 61);
-		E[5] = C[0] ^ ((~C[1]) & C[2]);
-		E[6] = C[1] ^ ((~C[2]) & C[3]);
-		E[7] = C[2] ^ ((~C[3]) & C[4]);
-		E[8] = C[3] ^ ((~C[4]) & C[0]);
-		E[9] = C[4] ^ ((~C[0]) & C[1]);
-		A[1] ^= D[1];
-		C[0] = ULong512::RotL64(A[1], 1);
-		A[7] ^= D[2];
-		C[1] = ULong512::RotL64(A[7], 6);
-		A[13] ^= D[3];
-		C[2] = ULong512::RotL64(A[13], 25);
-		A[19] ^= D[4];
-		C[3] = ULong512::RotL64(A[19], 8);
-		A[20] ^= D[0];
-		C[4] = ULong512::RotL64(A[20], 18);
-		E[10] = C[0] ^ ((~C[1]) & C[2]);
-		E[11] = C[1] ^ ((~C[2]) & C[3]);
-		E[12] = C[2] ^ ((~C[3]) & C[4]);
-		E[13] = C[3] ^ ((~C[4]) & C[0]);
-		E[14] = C[4] ^ ((~C[0]) & C[1]);
-		A[4] ^= D[4];
-		C[0] = ULong512::RotL64(A[4], 27);
-		A[5] ^= D[0];
-		C[1] = ULong512::RotL64(A[5], 36);
-		A[11] ^= D[1];
-		C[2] = ULong512::RotL64(A[11], 10);
-		A[17] ^= D[2];
-		C[3] = ULong512::RotL64(A[17], 15);
-		A[23] ^= D[3];
-		C[4] = ULong512::RotL64(A[23], 56);
-		E[15] = C[0] ^ ((~C[1]) & C[2]);
-		E[16] = C[1] ^ ((~C[2]) & C[3]);
-		E[17] = C[2] ^ ((~C[3]) & C[4]);
-		E[18] = C[3] ^ ((~C[4]) & C[0]);
-		E[19] = C[4] ^ ((~C[0]) & C[1]);
-		A[2] ^= D[2];
-		C[0] = ULong512::RotL64(A[2], 62);
-		A[8] ^= D[3];
-		C[1] = ULong512::RotL64(A[8], 55);
-		A[14] ^= D[4];
-		C[2] = ULong512::RotL64(A[14], 39);
-		A[15] ^= D[0];
-		C[3] = ULong512::RotL64(A[15], 41);
-		A[21] ^= D[1];
-		C[4] = ULong512::RotL64(A[21], 2);
-		E[20] = C[0] ^ ((~C[1]) & C[2]);
-		E[21] = C[1] ^ ((~C[2]) & C[3]);
-		E[22] = C[2] ^ ((~C[3]) & C[4]);
-		E[23] = C[3] ^ ((~C[4]) & C[0]);
-		E[24] = C[4] ^ ((~C[0]) & C[1]);
-		// round n + 1
-		C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
-		C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
-		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
-		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
-		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
-		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
-		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
-		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
-		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
-		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
-		E[0] ^= D[0];
-		C[0] = E[0];
-		E[6] ^= D[1];
-		C[1] = ULong512::RotL64(E[6], 44);
-		E[12] ^= D[2];
-		C[2] = ULong512::RotL64(E[12], 43);
-		E[18] ^= D[3];
-		C[3] = ULong512::RotL64(E[18], 21);
-		E[24] ^= D[4];
-		C[4] = ULong512::RotL64(E[24], 14);
-		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong512(RC48[i + 1]);
-		A[1] = C[1] ^ ((~C[2]) & C[3]);
-		A[2] = C[2] ^ ((~C[3]) & C[4]);
-		A[3] = C[3] ^ ((~C[4]) & C[0]);
-		A[4] = C[4] ^ ((~C[0]) & C[1]);
-		E[3] ^= D[3];
-		C[0] = ULong512::RotL64(E[3], 28);
-		E[9] ^= D[4];
-		C[1] = ULong512::RotL64(E[9], 20);
-		E[10] ^= D[0];
-		C[2] = ULong512::RotL64(E[10], 3);
-		E[16] ^= D[1];
-		C[3] = ULong512::RotL64(E[16], 45);
-		E[22] ^= D[2];
-		C[4] = ULong512::RotL64(E[22], 61);
-		A[5] = C[0] ^ ((~C[1]) & C[2]);
-		A[6] = C[1] ^ ((~C[2]) & C[3]);
-		A[7] = C[2] ^ ((~C[3]) & C[4]);
-		A[8] = C[3] ^ ((~C[4]) & C[0]);
-		A[9] = C[4] ^ ((~C[0]) & C[1]);
-		E[1] ^= D[1];
-		C[0] = ULong512::RotL64(E[1], 1);
-		E[7] ^= D[2];
-		C[1] = ULong512::RotL64(E[7], 6);
-		E[13] ^= D[3];
-		C[2] = ULong512::RotL64(E[13], 25);
-		E[19] ^= D[4];
-		C[3] = ULong512::RotL64(E[19], 8);
-		E[20] ^= D[0];
-		C[4] = ULong512::RotL64(E[20], 18);
-		A[10] = C[0] ^ ((~C[1]) & C[2]);
-		A[11] = C[1] ^ ((~C[2]) & C[3]);
-		A[12] = C[2] ^ ((~C[3]) & C[4]);
-		A[13] = C[3] ^ ((~C[4]) & C[0]);
-		A[14] = C[4] ^ ((~C[0]) & C[1]);
-		E[4] ^= D[4];
-		C[0] = ULong512::RotL64(E[4], 27);
-		E[5] ^= D[0];
-		C[1] = ULong512::RotL64(E[5], 36);
-		E[11] ^= D[1];
-		C[2] = ULong512::RotL64(E[11], 10);
-		E[17] ^= D[2];
-		C[3] = ULong512::RotL64(E[17], 15);
-		E[23] ^= D[3];
-		C[4] = ULong512::RotL64(E[23], 56);
-		A[15] = C[0] ^ ((~C[1]) & C[2]);
-		A[16] = C[1] ^ ((~C[2]) & C[3]);
-		A[17] = C[2] ^ ((~C[3]) & C[4]);
-		A[18] = C[3] ^ ((~C[4]) & C[0]);
-		A[19] = C[4] ^ ((~C[0]) & C[1]);
-		E[2] ^= D[2];
-		C[0] = ULong512::RotL64(E[2], 62);
-		E[8] ^= D[3];
-		C[1] = ULong512::RotL64(E[8], 55);
-		E[14] ^= D[4];
-		C[2] = ULong512::RotL64(E[14], 39);
-		E[15] ^= D[0];
-		C[3] = ULong512::RotL64(E[15], 41);
-		E[21] ^= D[1];
-		C[4] = ULong512::RotL64(E[21], 2);
-		A[20] = C[0] ^ ((~C[1]) & C[2]);
-		A[21] = C[1] ^ ((~C[2]) & C[3]);
-		A[22] = C[2] ^ ((~C[3]) & C[4]);
-		A[23] = C[3] ^ ((~C[4]) & C[0]);
-		A[24] = C[4] ^ ((~C[0]) & C[1]);
-	}
-
-	Utility::MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong512));
-}
-
-#endif
 
 #if defined(__AVX2__)
-
-void Keccak::PermuteR24P6400H(std::vector<ULong256> &State)
-{
-	std::array<ULong256, 25> A;
-	std::array<ULong256, 5> C;
-	std::array<ULong256, 5> D;
-	std::array<ULong256, 25> E;
-	size_t i;
-
-	Utility::MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
-
-	for (i = 0; i < 24; i += 2)
-	{
-		// round n
-		C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
-		C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
-		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
-		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
-		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
-		D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
-		D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
-		D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
-		D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
-		D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
-		A[0] ^= D[0];
-		C[0] = A[0];
-		A[6] ^= D[1];
-		C[1] = ULong256::RotL64(A[6], 44);
-		A[12] ^= D[2];
-		C[2] = ULong256::RotL64(A[12], 43);
-		A[18] ^= D[3];
-		C[3] = ULong256::RotL64(A[18], 21);
-		A[24] ^= D[4];
-		C[4] = ULong256::RotL64(A[24], 14);
-		E[0] = C[0] ^ ((~C[1]) & C[2]);
-		E[0] ^= ULong256(RC24[i]);
-		E[1] = C[1] ^ ((~C[2]) & C[3]);
-		E[2] = C[2] ^ ((~C[3]) & C[4]);
-		E[3] = C[3] ^ ((~C[4]) & C[0]);
-		E[4] = C[4] ^ ((~C[0]) & C[1]);
-		A[3] ^= D[3];
-		C[0] = ULong256::RotL64(A[3], 28);
-		A[9] ^= D[4];
-		C[1] = ULong256::RotL64(A[9], 20);
-		A[10] ^= D[0];
-		C[2] = ULong256::RotL64(A[10], 3);
-		A[16] ^= D[1];
-		C[3] = ULong256::RotL64(A[16], 45);
-		A[22] ^= D[2];
-		C[4] = ULong256::RotL64(A[22], 61);
-		E[5] = C[0] ^ ((~C[1]) & C[2]);
-		E[6] = C[1] ^ ((~C[2]) & C[3]);
-		E[7] = C[2] ^ ((~C[3]) & C[4]);
-		E[8] = C[3] ^ ((~C[4]) & C[0]);
-		E[9] = C[4] ^ ((~C[0]) & C[1]);
-		A[1] ^= D[1];
-		C[0] = ULong256::RotL64(A[1], 1);
-		A[7] ^= D[2];
-		C[1] = ULong256::RotL64(A[7], 6);
-		A[13] ^= D[3];
-		C[2] = ULong256::RotL64(A[13], 25);
-		A[19] ^= D[4];
-		C[3] = ULong256::RotL64(A[19], 8);
-		A[20] ^= D[0];
-		C[4] = ULong256::RotL64(A[20], 18);
-		E[10] = C[0] ^ ((~C[1]) & C[2]);
-		E[11] = C[1] ^ ((~C[2]) & C[3]);
-		E[12] = C[2] ^ ((~C[3]) & C[4]);
-		E[13] = C[3] ^ ((~C[4]) & C[0]);
-		E[14] = C[4] ^ ((~C[0]) & C[1]);
-		A[4] ^= D[4];
-		C[0] = ULong256::RotL64(A[4], 27);
-		A[5] ^= D[0];
-		C[1] = ULong256::RotL64(A[5], 36);
-		A[11] ^= D[1];
-		C[2] = ULong256::RotL64(A[11], 10);
-		A[17] ^= D[2];
-		C[3] = ULong256::RotL64(A[17], 15);
-		A[23] ^= D[3];
-		C[4] = ULong256::RotL64(A[23], 56);
-		E[15] = C[0] ^ ((~C[1]) & C[2]);
-		E[16] = C[1] ^ ((~C[2]) & C[3]);
-		E[17] = C[2] ^ ((~C[3]) & C[4]);
-		E[18] = C[3] ^ ((~C[4]) & C[0]);
-		E[19] = C[4] ^ ((~C[0]) & C[1]);
-		A[2] ^= D[2];
-		C[0] = ULong256::RotL64(A[2], 62);
-		A[8] ^= D[3];
-		C[1] = ULong256::RotL64(A[8], 55);
-		A[14] ^= D[4];
-		C[2] = ULong256::RotL64(A[14], 39);
-		A[15] ^= D[0];
-		C[3] = ULong256::RotL64(A[15], 41);
-		A[21] ^= D[1];
-		C[4] = ULong256::RotL64(A[21], 2);
-		E[20] = C[0] ^ ((~C[1]) & C[2]);
-		E[21] = C[1] ^ ((~C[2]) & C[3]);
-		E[22] = C[2] ^ ((~C[3]) & C[4]);
-		E[23] = C[3] ^ ((~C[4]) & C[0]);
-		E[24] = C[4] ^ ((~C[0]) & C[1]);
-		// round n + 1
-		C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
-		C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
-		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
-		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
-		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
-		D[0] = C[4] ^ ULong256::RotL64(C[1], 1);
-		D[1] = C[0] ^ ULong256::RotL64(C[2], 1);
-		D[2] = C[1] ^ ULong256::RotL64(C[3], 1);
-		D[3] = C[2] ^ ULong256::RotL64(C[4], 1);
-		D[4] = C[3] ^ ULong256::RotL64(C[0], 1);
-		E[0] ^= D[0];
-		C[0] = E[0];
-		E[6] ^= D[1];
-		C[1] = ULong256::RotL64(E[6], 44);
-		E[12] ^= D[2];
-		C[2] = ULong256::RotL64(E[12], 43);
-		E[18] ^= D[3];
-		C[3] = ULong256::RotL64(E[18], 21);
-		E[24] ^= D[4];
-		C[4] = ULong256::RotL64(E[24], 14);
-		A[0] = C[0] ^ ((~C[1]) & C[2]);
-		A[0] ^= ULong256(RC24[i + 1]);
-		A[1] = C[1] ^ ((~C[2]) & C[3]);
-		A[2] = C[2] ^ ((~C[3]) & C[4]);
-		A[3] = C[3] ^ ((~C[4]) & C[0]);
-		A[4] = C[4] ^ ((~C[0]) & C[1]);
-		E[3] ^= D[3];
-		C[0] = ULong256::RotL64(E[3], 28);
-		E[9] ^= D[4];
-		C[1] = ULong256::RotL64(E[9], 20);
-		E[10] ^= D[0];
-		C[2] = ULong256::RotL64(E[10], 3);
-		E[16] ^= D[1];
-		C[3] = ULong256::RotL64(E[16], 45);
-		E[22] ^= D[2];
-		C[4] = ULong256::RotL64(E[22], 61);
-		A[5] = C[0] ^ ((~C[1]) & C[2]);
-		A[6] = C[1] ^ ((~C[2]) & C[3]);
-		A[7] = C[2] ^ ((~C[3]) & C[4]);
-		A[8] = C[3] ^ ((~C[4]) & C[0]);
-		A[9] = C[4] ^ ((~C[0]) & C[1]);
-		E[1] ^= D[1];
-		C[0] = ULong256::RotL64(E[1], 1);
-		E[7] ^= D[2];
-		C[1] = ULong256::RotL64(E[7], 6);
-		E[13] ^= D[3];
-		C[2] = ULong256::RotL64(E[13], 25);
-		E[19] ^= D[4];
-		C[3] = ULong256::RotL64(E[19], 8);
-		E[20] ^= D[0];
-		C[4] = ULong256::RotL64(E[20], 18);
-		A[10] = C[0] ^ ((~C[1]) & C[2]);
-		A[11] = C[1] ^ ((~C[2]) & C[3]);
-		A[12] = C[2] ^ ((~C[3]) & C[4]);
-		A[13] = C[3] ^ ((~C[4]) & C[0]);
-		A[14] = C[4] ^ ((~C[0]) & C[1]);
-		E[4] ^= D[4];
-		C[0] = ULong256::RotL64(E[4], 27);
-		E[5] ^= D[0];
-		C[1] = ULong256::RotL64(E[5], 36);
-		E[11] ^= D[1];
-		C[2] = ULong256::RotL64(E[11], 10);
-		E[17] ^= D[2];
-		C[3] = ULong256::RotL64(E[17], 15);
-		E[23] ^= D[3];
-		C[4] = ULong256::RotL64(E[23], 56);
-		A[15] = C[0] ^ ((~C[1]) & C[2]);
-		A[16] = C[1] ^ ((~C[2]) & C[3]);
-		A[17] = C[2] ^ ((~C[3]) & C[4]);
-		A[18] = C[3] ^ ((~C[4]) & C[0]);
-		A[19] = C[4] ^ ((~C[0]) & C[1]);
-		E[2] ^= D[2];
-		C[0] = ULong256::RotL64(E[2], 62);
-		E[8] ^= D[3];
-		C[1] = ULong256::RotL64(E[8], 55);
-		E[14] ^= D[4];
-		C[2] = ULong256::RotL64(E[14], 39);
-		E[15] ^= D[0];
-		C[3] = ULong256::RotL64(E[15], 41);
-		E[21] ^= D[1];
-		C[4] = ULong256::RotL64(E[21], 2);
-		A[20] = C[0] ^ ((~C[1]) & C[2]);
-		A[21] = C[1] ^ ((~C[2]) & C[3]);
-		A[22] = C[2] ^ ((~C[3]) & C[4]);
-		A[23] = C[3] ^ ((~C[4]) & C[0]);
-		A[24] = C[4] ^ ((~C[0]) & C[1]);
-	}
-
-	Utility::MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong256));
-}
 
 void Keccak::PermuteR48P6400H(std::vector<ULong256> &State)
 {
@@ -7499,7 +7316,7 @@ void Keccak::PermuteR48P6400H(std::vector<ULong256> &State)
 	std::array<ULong256, 25> E;
 	size_t i;
 
-	Utility::MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
+	MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong256));
 
 	for (i = 0; i < 48; i += 2)
 	{
@@ -7679,7 +7496,202 @@ void Keccak::PermuteR48P6400H(std::vector<ULong256> &State)
 		A[24] = C[4] ^ ((~C[0]) & C[1]);
 	}
 
-	Utility::MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong256));
+	MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong256));
+}
+
+#endif
+
+#if defined(__AVX512__)
+
+void Keccak::PermuteR48P12800H(std::vector<ULong512> &State)
+{
+	std::array<ULong512, 25> A;
+	std::array<ULong512, 5> C;
+	std::array<ULong512, 5> D;
+	std::array<ULong512, 25> E;
+	size_t i;
+
+	MemUtils::Copy(State, 0, A, 0, A.size() * sizeof(ULong512));
+
+	for (i = 0; i < 48; i += 2)
+	{
+		// round n
+		C[0] = A[0] ^ A[5] ^ A[10] ^ A[15] ^ A[20];
+		C[1] = A[1] ^ A[6] ^ A[11] ^ A[16] ^ A[21];
+		C[2] = A[2] ^ A[7] ^ A[12] ^ A[17] ^ A[22];
+		C[3] = A[3] ^ A[8] ^ A[13] ^ A[18] ^ A[23];
+		C[4] = A[4] ^ A[9] ^ A[14] ^ A[19] ^ A[24];
+		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+		A[0] ^= D[0];
+		C[0] = A[0];
+		A[6] ^= D[1];
+		C[1] = ULong512::RotL64(A[6], 44);
+		A[12] ^= D[2];
+		C[2] = ULong512::RotL64(A[12], 43);
+		A[18] ^= D[3];
+		C[3] = ULong512::RotL64(A[18], 21);
+		A[24] ^= D[4];
+		C[4] = ULong512::RotL64(A[24], 14);
+		E[0] = C[0] ^ ((~C[1]) & C[2]);
+		E[0] ^= ULong512(RC48[i]);
+		E[1] = C[1] ^ ((~C[2]) & C[3]);
+		E[2] = C[2] ^ ((~C[3]) & C[4]);
+		E[3] = C[3] ^ ((~C[4]) & C[0]);
+		E[4] = C[4] ^ ((~C[0]) & C[1]);
+		A[3] ^= D[3];
+		C[0] = ULong512::RotL64(A[3], 28);
+		A[9] ^= D[4];
+		C[1] = ULong512::RotL64(A[9], 20);
+		A[10] ^= D[0];
+		C[2] = ULong512::RotL64(A[10], 3);
+		A[16] ^= D[1];
+		C[3] = ULong512::RotL64(A[16], 45);
+		A[22] ^= D[2];
+		C[4] = ULong512::RotL64(A[22], 61);
+		E[5] = C[0] ^ ((~C[1]) & C[2]);
+		E[6] = C[1] ^ ((~C[2]) & C[3]);
+		E[7] = C[2] ^ ((~C[3]) & C[4]);
+		E[8] = C[3] ^ ((~C[4]) & C[0]);
+		E[9] = C[4] ^ ((~C[0]) & C[1]);
+		A[1] ^= D[1];
+		C[0] = ULong512::RotL64(A[1], 1);
+		A[7] ^= D[2];
+		C[1] = ULong512::RotL64(A[7], 6);
+		A[13] ^= D[3];
+		C[2] = ULong512::RotL64(A[13], 25);
+		A[19] ^= D[4];
+		C[3] = ULong512::RotL64(A[19], 8);
+		A[20] ^= D[0];
+		C[4] = ULong512::RotL64(A[20], 18);
+		E[10] = C[0] ^ ((~C[1]) & C[2]);
+		E[11] = C[1] ^ ((~C[2]) & C[3]);
+		E[12] = C[2] ^ ((~C[3]) & C[4]);
+		E[13] = C[3] ^ ((~C[4]) & C[0]);
+		E[14] = C[4] ^ ((~C[0]) & C[1]);
+		A[4] ^= D[4];
+		C[0] = ULong512::RotL64(A[4], 27);
+		A[5] ^= D[0];
+		C[1] = ULong512::RotL64(A[5], 36);
+		A[11] ^= D[1];
+		C[2] = ULong512::RotL64(A[11], 10);
+		A[17] ^= D[2];
+		C[3] = ULong512::RotL64(A[17], 15);
+		A[23] ^= D[3];
+		C[4] = ULong512::RotL64(A[23], 56);
+		E[15] = C[0] ^ ((~C[1]) & C[2]);
+		E[16] = C[1] ^ ((~C[2]) & C[3]);
+		E[17] = C[2] ^ ((~C[3]) & C[4]);
+		E[18] = C[3] ^ ((~C[4]) & C[0]);
+		E[19] = C[4] ^ ((~C[0]) & C[1]);
+		A[2] ^= D[2];
+		C[0] = ULong512::RotL64(A[2], 62);
+		A[8] ^= D[3];
+		C[1] = ULong512::RotL64(A[8], 55);
+		A[14] ^= D[4];
+		C[2] = ULong512::RotL64(A[14], 39);
+		A[15] ^= D[0];
+		C[3] = ULong512::RotL64(A[15], 41);
+		A[21] ^= D[1];
+		C[4] = ULong512::RotL64(A[21], 2);
+		E[20] = C[0] ^ ((~C[1]) & C[2]);
+		E[21] = C[1] ^ ((~C[2]) & C[3]);
+		E[22] = C[2] ^ ((~C[3]) & C[4]);
+		E[23] = C[3] ^ ((~C[4]) & C[0]);
+		E[24] = C[4] ^ ((~C[0]) & C[1]);
+		// round n + 1
+		C[0] = E[0] ^ E[5] ^ E[10] ^ E[15] ^ E[20];
+		C[1] = E[1] ^ E[6] ^ E[11] ^ E[16] ^ E[21];
+		C[2] = E[2] ^ E[7] ^ E[12] ^ E[17] ^ E[22];
+		C[3] = E[3] ^ E[8] ^ E[13] ^ E[18] ^ E[23];
+		C[4] = E[4] ^ E[9] ^ E[14] ^ E[19] ^ E[24];
+		D[0] = C[4] ^ ULong512::RotL64(C[1], 1);
+		D[1] = C[0] ^ ULong512::RotL64(C[2], 1);
+		D[2] = C[1] ^ ULong512::RotL64(C[3], 1);
+		D[3] = C[2] ^ ULong512::RotL64(C[4], 1);
+		D[4] = C[3] ^ ULong512::RotL64(C[0], 1);
+		E[0] ^= D[0];
+		C[0] = E[0];
+		E[6] ^= D[1];
+		C[1] = ULong512::RotL64(E[6], 44);
+		E[12] ^= D[2];
+		C[2] = ULong512::RotL64(E[12], 43);
+		E[18] ^= D[3];
+		C[3] = ULong512::RotL64(E[18], 21);
+		E[24] ^= D[4];
+		C[4] = ULong512::RotL64(E[24], 14);
+		A[0] = C[0] ^ ((~C[1]) & C[2]);
+		A[0] ^= ULong512(RC48[i + 1]);
+		A[1] = C[1] ^ ((~C[2]) & C[3]);
+		A[2] = C[2] ^ ((~C[3]) & C[4]);
+		A[3] = C[3] ^ ((~C[4]) & C[0]);
+		A[4] = C[4] ^ ((~C[0]) & C[1]);
+		E[3] ^= D[3];
+		C[0] = ULong512::RotL64(E[3], 28);
+		E[9] ^= D[4];
+		C[1] = ULong512::RotL64(E[9], 20);
+		E[10] ^= D[0];
+		C[2] = ULong512::RotL64(E[10], 3);
+		E[16] ^= D[1];
+		C[3] = ULong512::RotL64(E[16], 45);
+		E[22] ^= D[2];
+		C[4] = ULong512::RotL64(E[22], 61);
+		A[5] = C[0] ^ ((~C[1]) & C[2]);
+		A[6] = C[1] ^ ((~C[2]) & C[3]);
+		A[7] = C[2] ^ ((~C[3]) & C[4]);
+		A[8] = C[3] ^ ((~C[4]) & C[0]);
+		A[9] = C[4] ^ ((~C[0]) & C[1]);
+		E[1] ^= D[1];
+		C[0] = ULong512::RotL64(E[1], 1);
+		E[7] ^= D[2];
+		C[1] = ULong512::RotL64(E[7], 6);
+		E[13] ^= D[3];
+		C[2] = ULong512::RotL64(E[13], 25);
+		E[19] ^= D[4];
+		C[3] = ULong512::RotL64(E[19], 8);
+		E[20] ^= D[0];
+		C[4] = ULong512::RotL64(E[20], 18);
+		A[10] = C[0] ^ ((~C[1]) & C[2]);
+		A[11] = C[1] ^ ((~C[2]) & C[3]);
+		A[12] = C[2] ^ ((~C[3]) & C[4]);
+		A[13] = C[3] ^ ((~C[4]) & C[0]);
+		A[14] = C[4] ^ ((~C[0]) & C[1]);
+		E[4] ^= D[4];
+		C[0] = ULong512::RotL64(E[4], 27);
+		E[5] ^= D[0];
+		C[1] = ULong512::RotL64(E[5], 36);
+		E[11] ^= D[1];
+		C[2] = ULong512::RotL64(E[11], 10);
+		E[17] ^= D[2];
+		C[3] = ULong512::RotL64(E[17], 15);
+		E[23] ^= D[3];
+		C[4] = ULong512::RotL64(E[23], 56);
+		A[15] = C[0] ^ ((~C[1]) & C[2]);
+		A[16] = C[1] ^ ((~C[2]) & C[3]);
+		A[17] = C[2] ^ ((~C[3]) & C[4]);
+		A[18] = C[3] ^ ((~C[4]) & C[0]);
+		A[19] = C[4] ^ ((~C[0]) & C[1]);
+		E[2] ^= D[2];
+		C[0] = ULong512::RotL64(E[2], 62);
+		E[8] ^= D[3];
+		C[1] = ULong512::RotL64(E[8], 55);
+		E[14] ^= D[4];
+		C[2] = ULong512::RotL64(E[14], 39);
+		E[15] ^= D[0];
+		C[3] = ULong512::RotL64(E[15], 41);
+		E[21] ^= D[1];
+		C[4] = ULong512::RotL64(E[21], 2);
+		A[20] = C[0] ^ ((~C[1]) & C[2]);
+		A[21] = C[1] ^ ((~C[2]) & C[3]);
+		A[22] = C[2] ^ ((~C[3]) & C[4]);
+		A[23] = C[3] ^ ((~C[4]) & C[0]);
+		A[24] = C[4] ^ ((~C[0]) & C[1]);
+	}
+
+	MemUtils::Copy(A, 0, State, 0, A.size() * sizeof(ULong512));
 }
 
 #endif

@@ -56,7 +56,7 @@ namespace Test
 
 	private:
 
-		void CompareVector(Mac::IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void CompareOutput(Mac::IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);
 	};

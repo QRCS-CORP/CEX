@@ -44,27 +44,27 @@ namespace Test
 			OnProgress(std::string("CSG: Passed initialization tests.."));
 
 			Drbg::CSG* gen128 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE128, Enumeration::Providers::None);
-			CompareVector(gen128, m_seed[0], m_expected[0]);
-			CompareVector(gen128, m_seed[1], m_expected[1]);
+			CompareOutput(gen128, m_seed[0], m_expected[0]);
+			CompareOutput(gen128, m_seed[1], m_expected[1]);
 			delete gen128;
 
 			OnProgress(std::string("CSG: Passed SP800-185 cSHAKE-128 KAT tests.."));
 
 			Drbg::CSG* gen256 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE256, Enumeration::Providers::None);
-			CompareVector(gen256, m_seed[0], m_expected[2]);
-			CompareVector(gen256, m_seed[1], m_expected[3]);
+			CompareOutput(gen256, m_seed[0], m_expected[2]);
+			CompareOutput(gen256, m_seed[1], m_expected[3]);
 			delete gen256;
 
 			OnProgress(std::string("CSG: Passed SP800-185 cSHAKE-256 KAT tests.."));
 
 			Drbg::CSG* gen512 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE512, Enumeration::Providers::None);
-			CompareVector(gen512, m_seed[1], m_expected[4]);
+			CompareOutput(gen512, m_seed[1], m_expected[4]);
 			delete gen512;
 
 			OnProgress(std::string("CSG: Passed customized cSHAKE-512 KAT test.."));
 
 			Drbg::CSG* gen1024 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE1024, Enumeration::Providers::None);
-			CompareVector(gen1024, m_seed[0], m_expected[5]);
+			CompareOutput(gen1024, m_seed[0], m_expected[5]);
 			delete gen1024;
 
 			OnProgress(std::string("CSG: Passed customized cSHAKE-1024 KAT test.."));
@@ -72,7 +72,7 @@ namespace Test
 #if defined(__AVX2__)
 
 			Drbg::CSG* gen512w = new Drbg::CSG(Enumeration::ShakeModes::SHAKE512, Enumeration::Providers::None, true);
-			CompareVector(gen512w, m_seed[0], m_expected[6]);
+			CompareOutput(gen512w, m_seed[0], m_expected[6]);
 			delete gen512w;
 
 			OnProgress(std::string("CSG: Passed customized cSHAKEW-512 KAT test.."));
@@ -141,7 +141,7 @@ namespace Test
 		return state;
 	}
 
-	void CSGTest::CompareVector(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected)
+	void CSGTest::CompareOutput(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected)
 	{
 		std::vector<byte> name(0);
 		std::vector<byte> output(Expected.size());

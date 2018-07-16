@@ -52,7 +52,7 @@ namespace Test
 				else
 #endif
 				{
-					CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
+					CompareOutput(m_keys[i], m_plainText[i], m_cipherText[i]);
 				}
 			}
 
@@ -86,7 +86,7 @@ namespace Test
 		}
 	}
 
-	void AesFipsTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	void AesFipsTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		RHX engine;

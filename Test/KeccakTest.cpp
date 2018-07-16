@@ -1,12 +1,31 @@
 #include "KeccakTest.h"
+#include "../CEX/MemUtils.h"
+#include "../CEX/Keccak.h"
 #include "../CEX/Keccak256.h"
 #include "../CEX/Keccak512.h"
 #include "../CEX/Keccak1024.h"
 
+#if defined(__AVX2__)
+#	include "../CEX/ULong256.h"
+#endif
+
+#if defined(__AVX512__)
+#	include "../CEX/ULong512.h"
+#endif
+
 namespace Test
 {
 	using namespace Digest;
-	using CEX::Key::Symmetric::SymmetricKey;
+	using Key::Symmetric::SymmetricKey;
+	using Utility::MemUtils;
+
+#if defined(__AVX2__)
+	using Numeric::ULong256;
+#endif
+
+#if defined(__AVX512__)
+	using Numeric::ULong512;
+#endif
 
 	const std::string KeccakTest::DESCRIPTION = "SHA-3 Vector KATs; tests the 256, 512, and 1024 versions of Keccak.";
 	const std::string KeccakTest::FAILURE = "FAILURE! ";
@@ -37,13 +56,16 @@ namespace Test
 	{
 		try
 		{
-			SHA3256KatTest();
+			ComparePermutationR24();
+			OnProgress(std::string("Passed Keccak 24-round permutation variants equivalence test.."));
+			ComparePermutationR48();
+			OnProgress(std::string("Passed Keccak 48-round permutation variants equivalence test.."));
+
+			CompareOutput256();
 			OnProgress(std::string("KeccakTest: Passed SHA3 256 bit digest vector tests.."));
-
-			SHA3512KatTest();
+			CompareOutput512();
 			OnProgress(std::string("KeccakTest: Passed SHA3 512 bit digest vector tests.."));
-
-			Keccak1024KatTest();
+			CompareOutput1024();
 			OnProgress(std::string("KeccakTest: Passed Keccak 1024 bit digest vector tests.."));
 
 			TreeParamsTest();
@@ -61,7 +83,7 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::SHA3256KatTest()
+	void KeccakTest::CompareOutput256()
 	{
 		std::vector<byte> output(32);
 		Keccak256 dgt(false);
@@ -97,7 +119,7 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::SHA3512KatTest()
+	void KeccakTest::CompareOutput512()
 	{
 		std::vector<byte> output(64);
 		Keccak512 dgt(false);
@@ -133,7 +155,7 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::Keccak1024KatTest()
+	void KeccakTest::CompareOutput1024()
 	{
 		std::vector<byte> output(128);
 		Keccak1024 dgt(false);
@@ -167,6 +189,116 @@ namespace Test
 		{
 			throw TestException("Keccak: Expected hash is not equal!");
 		}
+	}
+
+	void KeccakTest::ComparePermutationR24()
+	{
+		std::array<ulong, 25> state1;
+		std::array<ulong, 25> state2;
+
+		MemUtils::Clear(state1, 0, 25 * sizeof(ulong));
+		MemUtils::Clear(state2, 0, 25 * sizeof(ulong));
+
+		Keccak::PermuteR24P1600U(state1);
+		Keccak::PermuteR24P1600C(state2);
+
+		if (state1 != state2)
+		{
+			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+		}
+
+#if defined(__AVX2__)
+
+		std::vector<ULong256> state256(25, ULong256(0));
+
+		Keccak::PermuteR24P6400H(state256);
+
+		std::vector<ulong> state256ull(100);
+		MemUtils::Copy(state256, 0, state256ull, 0, 100 * sizeof(ulong));
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			if (state256ull[i] != state1[i / 4])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::vector<ULong512> state512(25, ULong512(0));
+
+		Keccak::PermuteR24P12800H(state512);
+
+		std::vector<ulong> state512ull(100);
+		MemUtils::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			if (state512ull[i] != state1[i / 8])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
+	}
+
+	void KeccakTest::ComparePermutationR48()
+	{
+		std::array<ulong, 25> state1;
+		std::array<ulong, 25> state2;
+
+		MemUtils::Clear(state1, 0, 25 * sizeof(ulong));
+		MemUtils::Clear(state2, 0, 25 * sizeof(ulong));
+
+		Keccak::PermuteR48P1600U(state1);
+		Keccak::PermuteR48P1600C(state2);
+
+		if (state1 != state2)
+		{
+			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+		}
+
+#if defined(__AVX2__)
+
+		std::vector<ULong256> state256(25, ULong256(0));
+
+		Keccak::PermuteR48P6400H(state256);
+
+		std::vector<ulong> state256ull(100);
+		MemUtils::Copy(state256, 0, state256ull, 0, 100 * sizeof(ulong));
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			if (state256ull[i] != state1[i / 4])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::vector<ULong512> state512(25, ULong512(0));
+
+		Keccak::PermuteR48P12800H(state512);
+
+		std::vector<ulong> state512ull(100);
+		MemUtils::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
+
+		for (size_t i = 0; i < 25; ++i)
+		{
+			if (state512ull[i] != state1[i / 8])
+			{
+				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			}
+		}
+
+#endif
 	}
 
 	void KeccakTest::Initialize()

@@ -40,7 +40,7 @@ namespace Test
 
 			for (size_t i = 0; i < m_plainText.size(); ++i)
 			{
-				CompareVector(m_keys[i], m_plainText[i], m_cipherText[i]);
+				CompareOutput(m_keys[i], m_plainText[i], m_cipherText[i]);
 			}
 
 			OnProgress(std::string("RijndaelTest : Passed Gladman 128bit block Rijndael tests.."));
@@ -57,7 +57,7 @@ namespace Test
 		}
 	}
 
-	void RijndaelTest::CompareVector(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
+	void RijndaelTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output)
 	{
 		std::vector<byte> outBytes(Input.size(), 0);
 		std::vector<byte> outBytes2(Input.size(), 0);

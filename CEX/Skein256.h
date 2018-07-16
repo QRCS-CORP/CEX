@@ -22,8 +22,7 @@
 // Implementation Details:
 // An implementation of the Skein digest with a 256 bit digest size. 
 // Written by John Underhill, January 13, 2015
-// Updated March 11, 2017
-// Updated April 18, 2017
+// Updated July 2, 2018
 // Contact: develop@vtdev.commo
 
 
@@ -258,7 +257,8 @@ private:
 
 	void HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<Skein256State> &State, size_t StateOffset);
 	void Initialize();
-	void LoadState(Skein256State &State, std::vector<ulong> &Config);
+	void LoadState(Skein256State &State, std::array<ulong, 4> &Config);
+	void Permute(std::array<ulong, 4> &Message, Skein256State &State);
 	void ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, size_t Length = BLOCK_SIZE);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, ulong Length);
 };

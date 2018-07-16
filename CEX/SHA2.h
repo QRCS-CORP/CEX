@@ -20,7 +20,6 @@
 #define CEX_SHA2_H
 
 #include "CexDomain.h"
-#include "IntUtils.h"
 
 #if defined(__AVX2__)
 #	include "UInt256.h"
@@ -33,8 +32,6 @@
 
 NAMESPACE_DIGEST
 
-using Utility::IntUtils;
-
 #if defined(__AVX2__)
 	using Numeric::UInt256;
 	using Numeric::ULong256;
@@ -46,10 +43,11 @@ using Utility::IntUtils;
 
 /// <summary>
 /// Contains the SHA2-256 and 512bit permutation functions.
-/// <para>The compact forms of the permutations have the suffix C, and are optimized for performance and low memory consumption 
+/// <para>The function names are in the format; Permute-rounds-bits-suffix, ex. PermuteR64P512C, 64 rounds, permutes 512 bits, using the compact form of the function. \n
+/// The compact forms of the permutations have the suffix C, and are optimized for performance and low memory consumption 
 /// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
-/// The Unrolled forms are optimized for speed (suffix U), and the vertically vectorized functions have the V suffix. \n
-/// The H suffix denotes functions that take an SIMD wrapper class as the state values, and process state in parallel.</para>
+/// The Unrolled forms are optimized for speed and timing neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
+/// The H suffix denotes functions that take an SIMD wrapper class (ULongXXX) as the state values, and process state in SIMD parallel blocks.</para>
 /// <para>This class contains wide forms of the functions; PermuteR64P4096H and PermuteR80P4096H uses AVX2. \n
 /// Experimental functions using AVX512 instructions are also implemented; PermuteR64P8192H and PermuteR80P8192H. \n
 /// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitely declared.</para>
