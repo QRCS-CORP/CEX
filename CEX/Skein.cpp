@@ -29,16 +29,16 @@ void Skein::PemuteR72P256C(std::array<ulong, 4> &Input, std::array<ulong, 4> &St
 
 	for (i = 0; i < 9; ++i)
 	{
-		// 8 rounds, inject k
+		// round n+8+8, inject k
 		B[1] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 4;
+		x != 0 ? x -= 1 : x += 4;
 		B[0] += B[1] + K[x];
 		B[1] = Utility::IntUtils::RotL64(B[1], 14) ^ B[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
 		B[3] += K[x] + (i * 2);
-		x > 0 ? x -= 1 : x = 4;
-		y != 2 ? ++y : y = 0;
+		x > 0 ? x -= 1 : x += 4;
+		y != 2 ? y += 1 : y -= 2;
 		B[2] += B[3] + K[x] + T[y];
 		B[3] = Utility::IntUtils::RotL64(B[3], 16) ^ B[2];
 		B[0] += B[3];
@@ -55,14 +55,14 @@ void Skein::PemuteR72P256C(std::array<ulong, 4> &Input, std::array<ulong, 4> &St
 		B[1] = Utility::IntUtils::RotL64(B[1], 37) ^ B[2];
 		// inject
 		B[1] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 4;
+		x != 0 ? x -= 1 : x += 4;
 		B[0] += B[1] + K[x];
 		B[1] = Utility::IntUtils::RotL64(B[1], 25) ^ B[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
 		B[3] += K[x] + (i * 2) + 1;
-		x != 0 ? x -= 1 : x = 4;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 4;
+		y != 2 ? y += 1 : y -= 2;
 		B[2] += B[3] + K[x] + T[y];
 		B[3] = Utility::IntUtils::RotL64(B[3], 33) ^ B[2];
 		B[0] += B[3];
@@ -467,16 +467,16 @@ void Skein::PemuteR72P1024H(std::vector<byte> &Input, size_t InOffset, std::vect
 
 	for (i = 0; i < 9; ++i)
 	{
-		// 8 rounds, inject k
+		// round n+8+8, inject k
 		B[1] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 4;
+		x != 0 ? x -= 1 : x += 4;
 		B[0] += B[1] + K[x];
 		B[1] = ULong256::RotL64(B[1], 14) ^ B[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
 		B[3] += K[x] + ULong256(i * 2);
-		x > 0 ? x -= 1 : x = 4;
-		y != 2 ? ++y : y = 0;
+		x > 0 ? x -= 1 : x += 4;
+		y != 2 ? y += 1 : y -= 2;
 		B[2] += B[3] + K[x] + T[y];
 		B[3] = ULong256::RotL64(B[3], 16) ^ B[2];
 		B[0] += B[3];
@@ -493,14 +493,14 @@ void Skein::PemuteR72P1024H(std::vector<byte> &Input, size_t InOffset, std::vect
 		B[1] = ULong256::RotL64(B[1], 37) ^ B[2];
 		// inject
 		B[1] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 4;
+		x != 0 ? x -= 1 : x += 4;
 		B[0] += B[1] + K[x];
 		B[1] = ULong256::RotL64(B[1], 25) ^ B[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
 		B[3] += K[x] + ULong256((i * 2) + 1);
-		x != 0 ? x -= 1 : x = 4;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 4;
+		y != 2 ? y += 1 : y -= 2;
 		B[2] += B[3] + K[x] + T[y];
 		B[3] = ULong256::RotL64(B[3], 33) ^ B[2];
 		B[0] += B[3];
@@ -549,16 +549,16 @@ void Skein::PemuteR72P2048H(std::vector<byte> &Input, size_t InOffset, std::vect
 
 	for (i = 0; i < 9; ++i)
 	{
-		// 8 rounds, inject k
+		// round n+8+8, inject k
 		B[1] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 4;
+		x != 0 ? x -= 1 : x += 4;
 		B[0] += B[1] + K[x];
 		B[1] = ULong512::RotL64(B[1], 14) ^ B[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
 		B[3] += K[x] + ULong512(i * 2);
-		x > 0 ? x -= 1 : x = 4;
-		y != 2 ? ++y : y = 0;
+		x > 0 ? x -= 1 : x += 4;
+		y != 2 ? y += 1 : y -= 2;
 		B[2] += B[3] + K[x] + T[y];
 		B[3] = ULong512::RotL64(B[3], 16) ^ B[2];
 		B[0] += B[3];
@@ -575,14 +575,14 @@ void Skein::PemuteR72P2048H(std::vector<byte> &Input, size_t InOffset, std::vect
 		B[1] = ULong512::RotL64(B[1], 37) ^ B[2];
 		// inject
 		B[1] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 4;
+		x != 0 ? x -= 1 : x += 4;
 		B[0] += B[1] + K[x];
 		B[1] = ULong512::RotL64(B[1], 25) ^ B[0];
 		// mix
 		x > 1 ? x -= 2 : x += 3;
 		B[3] += K[x] + ULong512((i * 2) + 1);
-		x != 0 ? x -= 1 : x = 4;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 4;
+		y != 2 ? y += 1 : y -= 2;
 		B[2] += B[3] + K[x] + T[y];
 		B[3] = ULong512::RotL64(B[3], 33) ^ B[2];
 		B[0] += B[3];
@@ -631,26 +631,26 @@ void Skein::PemuteR72P512C(std::array<ulong, 8> &Input, std::array<ulong, 8> &St
 
 	for (i = 0; i < 9; ++i)
 	{
-		// rounds 0-7, inject k
+		// round n+8+8, inject k
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[0] += B[1] + K[x];
 		B[1] = Utility::IntUtils::RotL64(B[1], 46) ^ B[0];
 		x < 6 ? x += 3 : x -= 6;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[2] += B[3] + K[x];
 		B[3] = Utility::IntUtils::RotL64(B[3], 36) ^ B[2];
 		x < 6 ? x += 3 : x -= 6;
 		B[5] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[4] += B[5] + K[x];
 		B[5] = Utility::IntUtils::RotL64(B[5], 19) ^ B[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
 		B[7] += K[x] + (i * 2);
-		x != 0 ? x -= 1 : x = 8;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 8;
+		y != 2 ? y += 1 : y -= 2;
 		B[6] += B[7] + K[x] + T[y];
 		B[7] = Utility::IntUtils::RotL64(B[7], 37) ^ B[6];
 		B[2] += B[1];
@@ -680,24 +680,24 @@ void Skein::PemuteR72P512C(std::array<ulong, 8> &Input, std::array<ulong, 8> &St
 		// inject
 		x > 3 ? x -= 4 : x += 5;
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[0] += B[1] + K[x];
 		B[1] = Utility::IntUtils::RotL64(B[1], 39) ^ B[0];
 		x < 6 ? x += 3 : x -= 6;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[2] += B[3] + K[x];
 		B[3] = Utility::IntUtils::RotL64(B[3], 30) ^ B[2];
 		x < 6 ? x += 3 : x -= 6;
 		B[5] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[4] += B[5] + K[x];
 		B[5] = Utility::IntUtils::RotL64(B[5], 34) ^ B[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
 		B[7] += K[x] + (i * 2) + 1;
-		x != 0 ? x -= 1 : x = 8;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 8;
+		y != 2 ? y += 1 : y -= 2;
 		B[6] += B[7] + K[x] + T[y];
 		B[7] = Utility::IntUtils::RotL64(B[7], 24) ^ B[6];
 		B[2] += B[1];
@@ -2088,26 +2088,26 @@ void Skein::PemuteR72P2048H(std::vector<byte> &Input, size_t InOffset, std::vect
 
 	for (i = 0; i < 9; ++i)
 	{
-		// rounds 0-7, inject k
+		// round n+8+8, inject k
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[0] += B[1] + K[x];
 		B[1] = ULong256::RotL64(B[1], 46) ^ B[0];
 		x < 6 ? x += 3 : x -= 6;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[2] += B[3] + K[x];
 		B[3] = ULong256::RotL64(B[3], 36) ^ B[2];
 		x < 6 ? x += 3 : x -= 6;
 		B[5] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[4] += B[5] + K[x];
 		B[5] = ULong256::RotL64(B[5], 19) ^ B[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
 		B[7] += K[x] + ULong256(i * 2);
-		x != 0 ? x -= 1 : x = 8;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 8;
+		y != 2 ? y += 1 : y -= 2;
 		B[6] += B[7] + K[x] + T[y];
 		B[7] = ULong256::RotL64(B[7], 37) ^ B[6];
 		B[2] += B[1];
@@ -2137,24 +2137,24 @@ void Skein::PemuteR72P2048H(std::vector<byte> &Input, size_t InOffset, std::vect
 		// inject
 		x > 3 ? x -= 4 : x += 5;
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[0] += B[1] + K[x];
 		B[1] = ULong256::RotL64(B[1], 39) ^ B[0];
 		x < 6 ? x += 3 : x -= 6;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[2] += B[3] + K[x];
 		B[3] = ULong256::RotL64(B[3], 30) ^ B[2];
 		x < 6 ? x += 3 : x -= 6;
 		B[5] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[4] += B[5] + K[x];
 		B[5] = ULong256::RotL64(B[5], 34) ^ B[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
 		B[7] += K[x] + ULong256((i * 2) + 1);
-		x != 0 ? x -= 1 : x = 8;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 8;
+		y != 2 ? y += 1 : y -= 2;
 		B[6] += B[7] + K[x] + T[y];
 		B[7] = ULong256::RotL64(B[7], 24) ^ B[6];
 		B[2] += B[1];
@@ -2218,26 +2218,26 @@ void Skein::PemuteR72P4096H(std::vector<byte> &Input, size_t InOffset, std::vect
 
 	for (i = 0; i < 9; ++i)
 	{
-		// rounds 0-7, inject k
+		// round n+8+8, inject k
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[0] += B[1] + K[x];
 		B[1] = ULong512::RotL64(B[1], 46) ^ B[0];
 		x < 6 ? x += 3 : x -= 6;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[2] += B[3] + K[x];
 		B[3] = ULong512::RotL64(B[3], 36) ^ B[2];
 		x < 6 ? x += 3 : x -= 6;
 		B[5] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[4] += B[5] + K[x];
 		B[5] = ULong512::RotL64(B[5], 19) ^ B[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
 		B[7] += K[x] + ULong512(i * 2);
-		x != 0 ? x -= 1 : x = 8;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 8;
+		y != 2 ? y += 1 : y -= 2;
 		B[6] += B[7] + K[x] + T[y];
 		B[7] = ULong512::RotL64(B[7], 37) ^ B[6];
 		B[2] += B[1];
@@ -2267,24 +2267,24 @@ void Skein::PemuteR72P4096H(std::vector<byte> &Input, size_t InOffset, std::vect
 		// inject
 		x > 3 ? x -= 4 : x += 5;
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[0] += B[1] + K[x];
 		B[1] = ULong512::RotL64(B[1], 39) ^ B[0];
 		x < 6 ? x += 3 : x -= 6;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[2] += B[3] + K[x];
 		B[3] = ULong512::RotL64(B[3], 30) ^ B[2];
 		x < 6 ? x += 3 : x -= 6;
 		B[5] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 8;
+		x != 0 ? x -= 1 : x += 8;
 		B[4] += B[5] + K[x];
 		B[5] = ULong512::RotL64(B[5], 34) ^ B[4];
 		// mix
 		x < 6 ? x += 3 : x -= 6;
 		B[7] += K[x] + ULong512((i * 2) + 1);
-		x != 0 ? x -= 1 : x = 8;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 8;
+		y != 2 ? y += 1 : y -= 2;
 		B[6] += B[7] + K[x] + T[y];
 		B[7] = ULong512::RotL64(B[7], 24) ^ B[6];
 		B[2] += B[1];
@@ -2348,46 +2348,46 @@ void Skein::PemuteR80P1024C(std::array<ulong, 16> &Input, std::array<ulong, 16> 
 
 	for (i = 0; i < 10; ++i)
 	{
-		// rounds 0-7, inject k
+		// round n+8+8, inject k
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[0] += B[1] + K[x];
 		B[1] = Utility::IntUtils::RotL64(B[1], 24) ^ B[0];
 		x < 14 ? x += 3 : x -= 14;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[2] += B[3] + K[x];
 		B[3] = Utility::IntUtils::RotL64(B[3], 13) ^ B[2];
 		x < 14 ? x += 3 : x -= 14;
 		B[5] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[4] += B[5] + K[x];
 		B[5] = Utility::IntUtils::RotL64(B[5], 8) ^ B[4];
 		x < 14 ? x += 3 : x -= 14;
 		B[7] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[6] += B[7] + K[x];
 		B[7] = Utility::IntUtils::RotL64(B[7], 47) ^ B[6];
 		x < 14 ? x += 3 : x -= 14;
 		B[9] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[8] += B[9] + K[x];
 		B[9] = Utility::IntUtils::RotL64(B[9], 8) ^ B[8];
 		x < 14 ? x += 3 : x -= 14;
 		B[11] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[10] += B[11] + K[x];
 		B[11] = Utility::IntUtils::RotL64(B[11], 17) ^ B[10];
 		x < 14 ? x += 3 : x -= 14;
 		B[13] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[12] += B[13] + K[x];
 		B[13] = Utility::IntUtils::RotL64(B[13], 22) ^ B[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
 		B[15] += K[x] + (i * 2);
-		x != 0 ? x -= 1 : x = 16;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 16;
+		y != 2 ? y += 1 : y -= 2;
 		B[14] += B[15] + K[x] + T[y];
 		B[15] = Utility::IntUtils::RotL64(B[15], 37) ^ B[14];
 		B[0] += B[9];
@@ -2441,44 +2441,44 @@ void Skein::PemuteR80P1024C(std::array<ulong, 16> &Input, std::array<ulong, 16> 
 		// inject
 		x > 11 ? x -= 12 : x += 5;
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[0] += B[1] + K[x];
 		B[1] = Utility::IntUtils::RotL64(B[1], 41) ^ B[0];
 		x < 14 ? x += 3 : x -= 14;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[2] += B[3] + K[x];
 		B[3] = Utility::IntUtils::RotL64(B[3], 9) ^ B[2];
 		x < 14 ? x += 3 : x -= 14;
 		B[5] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[4] += B[5] + K[x];
 		B[5] = Utility::IntUtils::RotL64(B[5], 37) ^ B[4];
 		x < 14 ? x += 3 : x -= 14;
 		B[7] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[6] += B[7] + K[x];
 		B[7] = Utility::IntUtils::RotL64(B[7], 31) ^ B[6];
 		x < 14 ? x += 3 : x -= 14;
 		B[9] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[8] += B[9] + K[x];
 		B[9] = Utility::IntUtils::RotL64(B[9], 12) ^ B[8];
 		x < 14 ? x += 3 : x -= 14;
 		B[11] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[10] += B[11] + K[x];
 		B[11] = Utility::IntUtils::RotL64(B[11], 47) ^ B[10];
 		x < 14 ? x += 3 : x -= 14;
 		B[13] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[12] += B[13] + K[x];
 		B[13] = Utility::IntUtils::RotL64(B[13], 44) ^ B[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
 		B[15] += K[x] + (i * 2) + 1;
-		x != 0 ? x -= 1 : x = 16;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 16;
+		y != 2 ? y += 1 : y -= 2;
 		B[14] += B[15] + K[x] + T[y];
 		B[15] = Utility::IntUtils::RotL64(B[15], 30) ^ B[14];
 		B[0] += B[9];
@@ -4083,46 +4083,46 @@ void Skein::PemuteR80P4096H(std::vector<byte> &Input, size_t InOffset, std::vect
 
 	for (i = 0; i < 10; ++i)
 	{
-		// rounds 0-7, inject k
+		// round n+8+8, inject k
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[0] += B[1] + K[x];
 		B[1] = ULong256::RotL64(B[1], 24) ^ B[0];
 		x < 14 ? x += 3 : x -= 14;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[2] += B[3] + K[x];
 		B[3] = ULong256::RotL64(B[3], 13) ^ B[2];
 		x < 14 ? x += 3 : x -= 14;
 		B[5] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[4] += B[5] + K[x];
 		B[5] = ULong256::RotL64(B[5], 8) ^ B[4];
 		x < 14 ? x += 3 : x -= 14;
 		B[7] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[6] += B[7] + K[x];
 		B[7] = ULong256::RotL64(B[7], 47) ^ B[6];
 		x < 14 ? x += 3 : x -= 14;
 		B[9] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[8] += B[9] + K[x];
 		B[9] = ULong256::RotL64(B[9], 8) ^ B[8];
 		x < 14 ? x += 3 : x -= 14;
 		B[11] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[10] += B[11] + K[x];
 		B[11] = ULong256::RotL64(B[11], 17) ^ B[10];
 		x < 14 ? x += 3 : x -= 14;
 		B[13] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[12] += B[13] + K[x];
 		B[13] = ULong256::RotL64(B[13], 22) ^ B[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
 		B[15] += K[x] + ULong256(i * 2);
-		x != 0 ? x -= 1 : x = 16;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 16;
+		y != 2 ? y += 1 : y -= 2;
 		B[14] += B[15] + K[x] + T[y];
 		B[15] = ULong256::RotL64(B[15], 37) ^ B[14];
 		B[0] += B[9];
@@ -4176,44 +4176,44 @@ void Skein::PemuteR80P4096H(std::vector<byte> &Input, size_t InOffset, std::vect
 		// inject
 		x > 11 ? x -= 12 : x += 5;
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[0] += B[1] + K[x];
 		B[1] = ULong256::RotL64(B[1], 41) ^ B[0];
 		x < 14 ? x += 3 : x -= 14;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[2] += B[3] + K[x];
 		B[3] = ULong256::RotL64(B[3], 9) ^ B[2];
 		x < 14 ? x += 3 : x -= 14;
 		B[5] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[4] += B[5] + K[x];
 		B[5] = ULong256::RotL64(B[5], 37) ^ B[4];
 		x < 14 ? x += 3 : x -= 14;
 		B[7] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[6] += B[7] + K[x];
 		B[7] = ULong256::RotL64(B[7], 31) ^ B[6];
 		x < 14 ? x += 3 : x -= 14;
 		B[9] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[8] += B[9] + K[x];
 		B[9] = ULong256::RotL64(B[9], 12) ^ B[8];
 		x < 14 ? x += 3 : x -= 14;
 		B[11] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[10] += B[11] + K[x];
 		B[11] = ULong256::RotL64(B[11], 47) ^ B[10];
 		x < 14 ? x += 3 : x -= 14;
 		B[13] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[12] += B[13] + K[x];
 		B[13] = ULong256::RotL64(B[13], 44) ^ B[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
 		B[15] += K[x] + ULong256((i * 2) + 1);
-		x != 0 ? x -= 1 : x = 16;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 16;
+		y != 2 ? y += 1 : y -= 2;
 		B[14] += B[15] + K[x] + T[y];
 		B[15] = ULong256::RotL64(B[15], 30) ^ B[14];
 		B[0] += B[9];
@@ -4309,46 +4309,46 @@ void Skein::PemuteR80P8192H(std::vector<byte> &Input, size_t InOffset, std::vect
 
 	for (i = 0; i < 10; ++i)
 	{
-		// rounds 0-7, inject k
+		// round n+8+8, inject k
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[0] += B[1] + K[x];
 		B[1] = ULong512::RotL64(B[1], 24) ^ B[0];
 		x < 14 ? x += 3 : x -= 14;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[2] += B[3] + K[x];
 		B[3] = ULong512::RotL64(B[3], 13) ^ B[2];
 		x < 14 ? x += 3 : x -= 14;
 		B[5] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[4] += B[5] + K[x];
 		B[5] = ULong512::RotL64(B[5], 8) ^ B[4];
 		x < 14 ? x += 3 : x -= 14;
 		B[7] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[6] += B[7] + K[x];
 		B[7] = ULong512::RotL64(B[7], 47) ^ B[6];
 		x < 14 ? x += 3 : x -= 14;
 		B[9] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[8] += B[9] + K[x];
 		B[9] = ULong512::RotL64(B[9], 8) ^ B[8];
 		x < 14 ? x += 3 : x -= 14;
 		B[11] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[10] += B[11] + K[x];
 		B[11] = ULong512::RotL64(B[11], 17) ^ B[10];
 		x < 14 ? x += 3 : x -= 14;
 		B[13] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[12] += B[13] + K[x];
 		B[13] = ULong512::RotL64(B[13], 22) ^ B[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
 		B[15] += K[x] + ULong512(i * 2);
-		x != 0 ? x -= 1 : x = 16;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 16;
+		y != 2 ? y += 1 : y -= 2;
 		B[14] += B[15] + K[x] + T[y];
 		B[15] = ULong512::RotL64(B[15], 37) ^ B[14];
 		B[0] += B[9];
@@ -4402,44 +4402,44 @@ void Skein::PemuteR80P8192H(std::vector<byte> &Input, size_t InOffset, std::vect
 		// inject
 		x > 11 ? x -= 12 : x += 5;
 		B[1] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[0] += B[1] + K[x];
 		B[1] = ULong512::RotL64(B[1], 41) ^ B[0];
 		x < 14 ? x += 3 : x -= 14;
 		B[3] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[2] += B[3] + K[x];
 		B[3] = ULong512::RotL64(B[3], 9) ^ B[2];
 		x < 14 ? x += 3 : x -= 14;
 		B[5] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[4] += B[5] + K[x];
 		B[5] = ULong512::RotL64(B[5], 37) ^ B[4];
 		x < 14 ? x += 3 : x -= 14;
 		B[7] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[6] += B[7] + K[x];
 		B[7] = ULong512::RotL64(B[7], 31) ^ B[6];
 		x < 14 ? x += 3 : x -= 14;
 		B[9] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[8] += B[9] + K[x];
 		B[9] = ULong512::RotL64(B[9], 12) ^ B[8];
 		x < 14 ? x += 3 : x -= 14;
 		B[11] += K[x];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[10] += B[11] + K[x];
 		B[11] = ULong512::RotL64(B[11], 47) ^ B[10];
 		x < 14 ? x += 3 : x -= 14;
 		B[13] += K[x] + T[y];
-		x != 0 ? x -= 1 : x = 16;
+		x != 0 ? x -= 1 : x += 16;
 		B[12] += B[13] + K[x];
 		B[13] = ULong512::RotL64(B[13], 44) ^ B[12];
 		// mix
 		x < 14 ? x += 3 : x -= 14;
 		B[15] += K[x] + ULong512((i * 2) + 1);
-		x != 0 ? x -= 1 : x = 16;
-		y != 2 ? ++y : y = 0;
+		x != 0 ? x -= 1 : x += 16;
+		y != 2 ? y += 1 : y -= 2;
 		B[14] += B[15] + K[x] + T[y];
 		B[15] = ULong512::RotL64(B[15], 30) ^ B[14];
 		B[0] += B[9];
