@@ -15,13 +15,29 @@ enum class StreamCiphers : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An implementation of the ChaCha Stream Cipher
+	/// The ChaChaPoly20 stream cipher
 	/// </summary>
-	ChaCha20 = 64,
+	ChaCha256 = 64,
 	/// <summary>
-	/// A Salsa20 Stream Cipher
+	/// The ChaChaPoly80 stream cipher
 	/// </summary>
-	Salsa20 = 65
+	ChaCha512 = 65,
+	/// <summary>
+	/// A Salsa20 stream cipher
+	/// </summary>
+	Salsa20 = 99,
+	/// <summary>
+	/// The Threefish 256-bit stream cipher
+	/// </summary>
+	Threefish256 = 66,
+	/// <summary>
+	/// The Threefish 512-bit stream cipher
+	/// </summary>
+	Threefish512 = 67,
+	/// <summary>
+	/// The Threefish 1024-bit stream cipher
+	/// </summary>
+	Threefish1024 = 68
 };
 
 NAMESPACE_ENUMERATIONEND

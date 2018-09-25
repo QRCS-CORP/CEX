@@ -1,7 +1,6 @@
 #ifndef CEXTEST_TESTUTILS_H
 #define CEXTEST_TESTUTILS_H
 
-#include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -16,7 +15,7 @@ namespace Test
 	{
 	public:
 
-		static std::string RandomReadableString(size_t Length, bool Uppercase = false)
+		static std::string RandomReadableString(size_t Length)
 		{
 			std::vector<byte> fill(1);
 			CEX::Prng::SecureRandom rnd;
@@ -33,11 +32,6 @@ namespace Test
 					rtxt += static_cast<unsigned char>(fill[0]);
 					++ctr;
 				}
-			}
-
-			if (Uppercase)
-			{
-				transform(rtxt.begin(), rtxt.end(), rtxt.begin(), ::toupper);
 			}
 
 			return rtxt;

@@ -325,8 +325,7 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	{
 		// info maps to HX ciphers HKDF Info parameter, value is ignored on a standard cipher
 		if (m_cipherType != BlockCiphers::Rijndael &&
-			m_cipherType != BlockCiphers::Serpent &&
-			m_cipherType != BlockCiphers::Twofish)
+			m_cipherType != BlockCiphers::Serpent)
 		{
 			// extended cipher; sets info as HX cipher distribution code.
 			// for best security, info should be secret, random, and DistributionCodeMax size

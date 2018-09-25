@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -225,84 +225,6 @@ public:
 		X1.Store(Output, Offset + (16 / sizeof(Output[0])));
 		X2.Store(Output, Offset + (32 / sizeof(Output[0])));
 		X3.Store(Output, Offset + (48 / sizeof(Output[0])));
-	}
-
-	/// <summary>
-	/// Transposes and stores 16 * UInt128 to a byte array
-	/// </summary>
-	///
-	/// <param name="Output">The destination integer array; must be at least 2048 bits in length</param>
-	/// <param name="Offset">The starting offset within the Output array</param>
-	/// <param name="X0">Operand 0</param>
-	/// <param name="X1">Operand 1</param>
-	/// <param name="X2">Operand 2</param>
-	/// <param name="X3">Operand 3</param>
-	/// <param name="X4">Operand 4</param>
-	/// <param name="X5">Operand 5</param>
-	/// <param name="X6">Operand 6</param>
-	/// <param name="X7">Operand 7</param>
-	/// <param name="X8">Operand 8</param>
-	/// <param name="X9">Operand 9</param>
-	/// <param name="X10">Operand 10</param>
-	/// <param name="X11">Operand 11</param>
-	/// <param name="X12">Operand 12</param>
-	/// <param name="X13">Operand 13</param>
-	/// <param name="X14">Operand 14</param>
-	/// <param name="X15">Operand 15</param>
-	template <typename Array>
-	inline static void Store16(Array &Output, size_t Offset, UInt128 &X0, UInt128 &X1, UInt128 &X2, UInt128 &X3, UInt128 &X4, UInt128 &X5,
-		UInt128 &X6, UInt128 &X7, UInt128 &X8, UInt128 &X9, UInt128 &X10, UInt128 &X11, UInt128 &X12, UInt128 &X13, UInt128 &X14, UInt128 &X15)
-	{
-		__m128i T0 = _mm_unpacklo_epi32(X0.xmm, X1.xmm);
-		__m128i T1 = _mm_unpacklo_epi32(X2.xmm, X3.xmm);
-		__m128i T2 = _mm_unpacklo_epi32(X4.xmm, X5.xmm);
-		__m128i T3 = _mm_unpacklo_epi32(X6.xmm, X7.xmm);
-		__m128i T4 = _mm_unpacklo_epi32(X8.xmm, X9.xmm);
-		__m128i T5 = _mm_unpacklo_epi32(X10.xmm, X11.xmm);
-		__m128i T6 = _mm_unpacklo_epi32(X12.xmm, X13.xmm);
-		__m128i T7 = _mm_unpacklo_epi32(X14.xmm, X15.xmm);
-		__m128i T8 = _mm_unpackhi_epi32(X0.xmm, X1.xmm);
-		__m128i T9 = _mm_unpackhi_epi32(X2.xmm, X3.xmm);
-		__m128i T10 = _mm_unpackhi_epi32(X4.xmm, X5.xmm);
-		__m128i T11 = _mm_unpackhi_epi32(X6.xmm, X7.xmm);
-		__m128i T12 = _mm_unpackhi_epi32(X8.xmm, X9.xmm);
-		__m128i T13 = _mm_unpackhi_epi32(X10.xmm, X11.xmm);
-		__m128i T14 = _mm_unpackhi_epi32(X12.xmm, X13.xmm);
-		__m128i T15 = _mm_unpackhi_epi32(X14.xmm, X15.xmm);
-
-		X0.xmm = _mm_unpacklo_epi64(T0, T1);
-		X1.xmm = _mm_unpacklo_epi64(T2, T3);
-		X2.xmm = _mm_unpacklo_epi64(T4, T5);
-		X3.xmm = _mm_unpacklo_epi64(T6, T7);
-		X4.xmm = _mm_unpackhi_epi64(T0, T1);
-		X5.xmm = _mm_unpackhi_epi64(T2, T3);
-		X6.xmm = _mm_unpackhi_epi64(T4, T5);
-		X7.xmm = _mm_unpackhi_epi64(T6, T7);
-		X8.xmm = _mm_unpacklo_epi64(T8, T9);
-		X9.xmm = _mm_unpacklo_epi64(T10, T11);
-		X10.xmm = _mm_unpacklo_epi64(T12, T13);
-		X11.xmm = _mm_unpacklo_epi64(T14, T15);
-		X12.xmm = _mm_unpackhi_epi64(T8, T9);
-		X13.xmm = _mm_unpackhi_epi64(T10, T11);
-		X14.xmm = _mm_unpackhi_epi64(T12, T13);
-		X15.xmm = _mm_unpackhi_epi64(T14, T15);
-
-		X0.Store(Output, Offset);
-		X1.Store(Output, Offset + (16 / sizeof(Output[0])));
-		X2.Store(Output, Offset + (32 / sizeof(Output[0])));
-		X3.Store(Output, Offset + (48 / sizeof(Output[0])));
-		X4.Store(Output, Offset + (64 / sizeof(Output[0])));
-		X5.Store(Output, Offset + (80 / sizeof(Output[0])));
-		X6.Store(Output, Offset + (96 / sizeof(Output[0])));
-		X7.Store(Output, Offset + (112 / sizeof(Output[0])));
-		X8.Store(Output, Offset + (128 / sizeof(Output[0])));
-		X9.Store(Output, Offset + (144 / sizeof(Output[0])));
-		X10.Store(Output, Offset + (160 / sizeof(Output[0])));
-		X11.Store(Output, Offset + (176 / sizeof(Output[0])));
-		X12.Store(Output, Offset + (192 / sizeof(Output[0])));
-		X13.Store(Output, Offset + (208 / sizeof(Output[0])));
-		X14.Store(Output, Offset + (224 / sizeof(Output[0])));
-		X15.Store(Output, Offset + (240 / sizeof(Output[0])));
 	}
 
 	//~~~ Methods~~~//

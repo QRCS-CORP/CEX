@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -35,7 +35,6 @@ class RLWEQ12289N1024
 {
 private:
 
-	static const std::array<ushort, 1024> BitrevTable;
 	static const std::array<ushort, 512> OmegasMontgomery;
 	static const std::array<ushort, 512> OmegasInvMontgomery;
 	static const std::array<ushort, 1024> PsisBitrevMontgomery;
@@ -44,7 +43,6 @@ private:
 
 	static const uint RLWE_QINV = 12287;
 	static const uint RLWE_RLOG = 18;
-
 
 public:
 
@@ -196,7 +194,6 @@ private:
 	static void PolyTomessage(std::vector<byte> &Message, const std::array<ushort, RLWE_N> &X);
 
 	static void PolyUniform(std::array<ushort, RLWE_N> &A, const std::vector<byte> &Seed);
-
 };
 
 NAMESPACE_RINGLWEEND

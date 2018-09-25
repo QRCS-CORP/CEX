@@ -139,7 +139,7 @@ namespace Test
 		std::vector<byte> input256(512, 128U);
 		std::vector<UInt256> state256(8, UInt256(0));
 
-		SHA2::PermuteR64P4096H(input256, 0, state256);
+		SHA2::PermuteR64P8x512H(input256, 0, state256);
 
 		std::vector<uint> state256ul(32);
 		MemUtils::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
@@ -159,7 +159,7 @@ namespace Test
 		std::vector<byte> input512(1024, 128U);
 		std::vector<UInt512> state512(8, UInt512(0));
 
-		SHA2::PermuteR64P8192H(input512, 0, state512);
+		SHA2::PermuteR64P16x512H(input512, 0, state512);
 
 		std::vector<uint> state512ul(64);
 		MemUtils::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
@@ -197,7 +197,7 @@ namespace Test
 		std::vector<byte> input256(512, 128U);
 		std::vector<ULong256> state256(8, ULong256(0));
 
-		SHA2::PermuteR80P4096H(input256, 0, state256);
+		SHA2::PermuteR80P4x1024H(input256, 0, state256);
 
 		std::vector<ulong> state256ull(32);
 		MemUtils::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
@@ -217,7 +217,7 @@ namespace Test
 		std::vector<byte> input512(1024, 128U);
 		std::vector<ULong512> state512(8, ULong512(0));
 
-		SHA2::PermuteR80P8192H(input512, 0, state512);
+		SHA2::PermuteR80P8x1024H(input512, 0, state512);
 
 		std::vector<ulong> state512ull(64);
 		MemUtils::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));

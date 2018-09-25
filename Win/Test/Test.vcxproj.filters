@@ -278,9 +278,6 @@
     <ClInclude Include="..\..\Test\RijndaelTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\SalsaTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\SerpentTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
@@ -292,9 +289,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\SkeinTest.h">
       <Filter>Header Files\Test\DigestTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\TwofishTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\HexConverter.h">
       <Filter>Header Files\Common</Filter>
@@ -428,6 +422,9 @@
     <ClInclude Include="..\..\Test\NTRUTest.h">
       <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\ThreefishTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -472,9 +469,6 @@
     <ClCompile Include="..\..\Test\KeccakTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\SalsaTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\SerpentTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
@@ -483,9 +477,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\SkeinTest.cpp">
       <Filter>Source Files\Test\DigestTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\TwofishTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
@@ -585,6 +576,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\NTRUTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ThreefishTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

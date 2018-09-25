@@ -278,7 +278,7 @@ void SHX::ExpandKey(const std::vector<byte> &Key)
 {
 	if (m_cprExtension != BlockCipherExtensions::None)
 	{
-		// hkdf key expansion
+		// kdf key expansion
 		SecureExpand(Key);
 	}
 	else
@@ -728,13 +728,13 @@ void SHX::LoadState()
 		}
 		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 		{
-			// sha2-512 blocksize - padding + hkdf counter
-			m_distCodeMax = 128 - (17 + 1);
+			// hmac(sha2-512) mac size
+			m_distCodeMax = 64;
 		}
 		else
 		{
-			// sha2-256 blocksize - padding + hkdf counter
-			m_distCodeMax = 64 - (9 + 1);
+			// hmac(sha2-256) mac size
+			m_distCodeMax = 32;
 		}
 
 		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_distCodeMax);

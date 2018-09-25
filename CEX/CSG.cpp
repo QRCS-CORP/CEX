@@ -538,7 +538,7 @@ void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
 			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
 		}
 
-		Digest::Keccak::PermuteR24P12800H(tmpW);
+		Digest::Keccak::PermuteR24P8x1600H(tmpW);
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -552,7 +552,7 @@ void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
 			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
 		}
 
-		Digest::Keccak::PermuteR24P6400H(tmpW);
+		Digest::Keccak::PermuteR24P4x1600H(tmpW);
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -569,7 +569,7 @@ void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
 			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i], m_drbgState[4][i], m_drbgState[5][i], m_drbgState[6][i], m_drbgState[7][i]);
 		}
 
-		Digest::Keccak::PermuteR48P12800H(tmpW);
+		Digest::Keccak::PermuteR48P8x1600H(tmpW);
 
 		for (size_t i = 0; i < 25; ++i)
 		{
@@ -583,7 +583,7 @@ void CSG::PermuteW(std::vector<std::array<ulong, STATE_SIZE>> &State)
 			tmpW[i].Load(m_drbgState[0][i], m_drbgState[1][i], m_drbgState[2][i], m_drbgState[3][i]);
 		}
 
-		Digest::Keccak::PermuteR48P6400H(tmpW);
+		Digest::Keccak::PermuteR48P4x1600H(tmpW);
 
 		for (size_t i = 0; i < 25; ++i)
 		{

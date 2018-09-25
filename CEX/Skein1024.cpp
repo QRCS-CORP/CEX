@@ -386,51 +386,10 @@ void Skein1024::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Leng
 	ProcessBlock(tmp, 0, State, StateOffset, 8);
 }
 
-void Skein1024::Permute(std::array<ulong, 16> &Message, Skein1024State &State)
-{
-#if defined(CEX_DIGEST_COMPACT)
-	Skein::PemuteR80P1024C(Message, State.S, State.T);
-#else
-	Skein::PemuteR80P1024U(Message, State.S, State.T);
-#endif
-}
-
-void Skein1024::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein1024State> &State, size_t StateOffset, size_t Length)
-{
-	// update length
-	State[StateOffset].Increase(Length);
-	// encrypt block
-	std::array<ulong, 16> msg;
-	IntUtils::LeBytesToULL1024(Input, InOffset, msg, 0);
-	Permute(msg, State[StateOffset]);
-
-	// feed-forward input with state
-	MemUtils::XOR1024(msg, 0, State[StateOffset].S, 0);
-
-	// clear first flag
-	if (!m_isInitialized && StateOffset == 0)
-	{
-		SkeinUbiTweak::IsFirstBlock(m_dgtState[0].T, false);
-		m_isInitialized = true;
-	}
-}
-
-void Skein1024::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein1024State> &State, size_t StateOffset, ulong Length)
-{
-	do
-	{
-		// process message offset by lane size
-		ProcessBlock(Input, InOffset, State, StateOffset);
-		InOffset += m_parallelProfile.ParallelMinimumSize();
-		Length -= m_parallelProfile.ParallelMinimumSize();
-	}
-	while (Length > 0);
-}
-
 void Skein1024::Initialize()
 {
 	std::vector<ulong> tmp = m_treeParams.GetConfig();
-	std::array<ulong, 16> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], tmp[9], tmp[10], tmp[11], tmp[12], tmp[13], tmp[14], tmp[15]};
+	std::array<ulong, 16> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], tmp[9], tmp[10], tmp[11], tmp[12], tmp[13], tmp[14], tmp[15] };
 
 	LoadState(m_dgtState[0], cfg);
 
@@ -465,6 +424,47 @@ void Skein1024::LoadState(Skein1024State &State, std::array<ulong, 16> &Config)
 	MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
 	// add the config string
 	MemUtils::XOR1024(Config, 0, State.V, 0);
+}
+
+void Skein1024::Permute(std::array<ulong, 16> &Message, Skein1024State &State)
+{
+#if defined(CEX_DIGEST_COMPACT)
+	Skein::PemuteP1024C(Message, State.T, State.S, 80);
+#else
+	Skein::PemuteR80P1024U(Message, State.T, State.S);
+#endif
+}
+
+void Skein1024::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein1024State> &State, size_t StateOffset, size_t Length)
+{
+	// update length
+	State[StateOffset].Increase(Length);
+	// encrypt block
+	std::array<ulong, 16> msg;
+	IntUtils::LeBytesToULL1024(Input, InOffset, msg, 0);
+	Permute(msg, State[StateOffset]);
+
+	// feed-forward input with state
+	MemUtils::XOR1024(msg, 0, State[StateOffset].S, 0);
+
+	// clear first flag
+	if (!m_isInitialized && StateOffset == 0)
+	{
+		SkeinUbiTweak::IsFirstBlock(m_dgtState[0].T, false);
+		m_isInitialized = true;
+	}
+}
+
+void Skein1024::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein1024State> &State, size_t StateOffset, ulong Length)
+{
+	do
+	{
+		// process message offset by lane size
+		ProcessBlock(Input, InOffset, State, StateOffset);
+		InOffset += m_parallelProfile.ParallelMinimumSize();
+		Length -= m_parallelProfile.ParallelMinimumSize();
+	}
+	while (Length > 0);
 }
 
 NAMESPACE_DIGESTEND

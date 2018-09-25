@@ -31,6 +31,8 @@ namespace Test
 
 	public:
 
+		//~~~Constructor~~~//
+
 		/// <summary>
 		/// Known answer tests for the 256, 512, and 1024 bit versions of Skein
 		/// </summary>
@@ -40,6 +42,8 @@ namespace Test
 		/// Destructor
 		/// </summary>
 		~SkeinTest();
+
+		//~~~Accessors~~~//
 
 		/// <summary>
 		/// Get: The test description
@@ -56,16 +60,45 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		//~~~Public Functions~~~//
+
+		/// <summary>
+		/// Compare known answer test vectors to digest output
+		/// </summary>
+		/// 
+		/// <param name="Digest">The digest instance pointer</param>
+		/// <param name="Input">The input test message</param>
+		/// <param name="Expected">The expected output vector</param>
+		void CompareVectorSkein(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Tests inner and outer parallel loop variances in the update function
+		/// </summary>
+		/// 
+		/// <param name="Digest1">The primary digest instance pointer</param>
+		/// <param name="Digest2">The comparison digest instance pointer</param>
+		void EvaluateParallelSkein(IDigest* Digest1, IDigest* Digest2);
+
+		/// <summary>
+		/// Compare Skein-256 compact and unrolled permutation functions for equivalence.
+		/// </summary>
+		void EvaluatePermutationSkein256();
+
+		/// <summary>
+		/// Compare Skein-512 compact and unrolled permutation functions for equivalence.
+		/// </summary>
+		void EvaluatePermutationSkein512();
+
+		/// <summary>
+		/// Compare Skein-1024 compact and unrolled permutation functions for equivalence.
+		/// </summary>
+		void EvaluatePermutationSkein1024();
+
 	private:
 
-		void CompareOutput(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
-		void CompareParallel(IDigest* Dgt1, IDigest* Dgt2);
-		void ComparePermutation256();
-		void ComparePermutation512();
-		void ComparePermutation1024();
 		void Initialize();
 		void OnProgress(std::string Data);
-		void TreeParamsTest();
+		void EvaluateTreeParams();
 	};
 }
 

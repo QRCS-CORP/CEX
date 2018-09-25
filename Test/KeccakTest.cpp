@@ -211,7 +211,7 @@ namespace Test
 
 		std::vector<ULong256> state256(25, ULong256(0));
 
-		Keccak::PermuteR24P6400H(state256);
+		Keccak::PermuteR24P4x1600H(state256);
 
 		std::vector<ulong> state256ull(100);
 		MemUtils::Copy(state256, 0, state256ull, 0, 100 * sizeof(ulong));
@@ -230,7 +230,7 @@ namespace Test
 
 		std::vector<ULong512> state512(25, ULong512(0));
 
-		Keccak::PermuteR24P12800H(state512);
+		Keccak::PermuteR24P8x1600H(state512);
 
 		std::vector<ulong> state512ull(100);
 		MemUtils::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));
@@ -266,7 +266,7 @@ namespace Test
 
 		std::vector<ULong256> state256(25, ULong256(0));
 
-		Keccak::PermuteR48P6400H(state256);
+		Keccak::PermuteR48P4x1600H(state256);
 
 		std::vector<ulong> state256ull(100);
 		MemUtils::Copy(state256, 0, state256ull, 0, 100 * sizeof(ulong));
@@ -285,7 +285,7 @@ namespace Test
 
 		std::vector<ULong512> state512(25, ULong512(0));
 
-		Keccak::PermuteR48P12800H(state512);
+		Keccak::PermuteR48P8x1600H(state512);
 
 		std::vector<ulong> state512ull(100);
 		MemUtils::Copy(state512, 0, state512ull, 0, 200 * sizeof(ulong));

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -20,250 +20,164 @@
 #define CEX_CHACHA_H
 
 #include "CexDomain.h"
-#include "IntUtils.h"
 
 NAMESPACE_STREAM
 
-///
-/// internal
-///
+/// <summary>
+/// Contains the ChaCha permutation functions.
+/// <para>The function names are in the format; Permute-bits-suffix, ex. PermuteP512C, variable rounds, permutes 512 bits, using the compact form of the function. \n
+/// The compact forms of the permutations have the suffix C, and are optimized for performance and low memory consumption 
+/// (enabled in the cipher functions by adding the CEX_CIPHER_COMPACT to the CexConfig file). \n
+/// The Unrolled forms are optimized for speed and timing neutrality (suffix U). \n
+/// The H suffix denotes functions that take an SIMD wrapper class (UIntXXX) to process state in SIMD parallel blocks.</para>
+/// <para>This class contains wide forms of the functions; PermuteP4x512H and PermuteP8x512H, which use the AVX and AVX2 instruction sets. \n
+/// An experimental function using AVX512 instructions is also implemented; PermuteP16x512H. \n
+/// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX__, __AVX2__ or __AVX512__) is explicitly declared.</para>
+/// </summary>
 class ChaCha
 {
+private:
+
+	template<typename T>
+	static void Store4xUL512(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	{
+		std::array<uint, 4> tmp;
+		size_t i;
+
+		for (i = 0; i < 16; ++i)
+		{
+			State[i].Store(tmp, 0);
+			IntUtils::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
+			IntUtils::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
+			IntUtils::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
+			IntUtils::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
+		}
+	}
+
+	template<typename T>
+	static void Store8xUL512(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	{
+		std::array<uint, 8> tmp;
+		size_t i;
+
+		for (i = 0; i < 16; ++i)
+		{
+			State[i].Store(tmp, 0);
+			IntUtils::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
+			IntUtils::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
+			IntUtils::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
+			IntUtils::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
+			IntUtils::Le32ToBytes(tmp[4], Output, OutOffset + (i * 4) + 256);
+			IntUtils::Le32ToBytes(tmp[5], Output, OutOffset + (i * 4) + 320);
+			IntUtils::Le32ToBytes(tmp[6], Output, OutOffset + (i * 4) + 384);
+			IntUtils::Le32ToBytes(tmp[7], Output, OutOffset + (i * 4) + 448);
+		}
+	}
+
+	template<typename T>
+	static void Store16xUL512(std::array<T, 16> &State, std::vector<byte> &Output, size_t OutOffset)
+	{
+		std::array<uint, 16> tmp;
+		size_t i;
+
+		for (i = 0; i < 16; ++i)
+		{
+			State[i].Store(tmp, 0);
+			IntUtils::Le32ToBytes(tmp[0], Output, OutOffset + (i * 4));
+			IntUtils::Le32ToBytes(tmp[1], Output, OutOffset + (i * 4) + 64);
+			IntUtils::Le32ToBytes(tmp[2], Output, OutOffset + (i * 4) + 128);
+			IntUtils::Le32ToBytes(tmp[3], Output, OutOffset + (i * 4) + 192);
+			IntUtils::Le32ToBytes(tmp[4], Output, OutOffset + (i * 4) + 256);
+			IntUtils::Le32ToBytes(tmp[5], Output, OutOffset + (i * 4) + 320);
+			IntUtils::Le32ToBytes(tmp[6], Output, OutOffset + (i * 4) + 384);
+			IntUtils::Le32ToBytes(tmp[7], Output, OutOffset + (i * 4) + 448);
+			IntUtils::Le32ToBytes(tmp[8], Output, OutOffset + (i * 4) + 512);
+			IntUtils::Le32ToBytes(tmp[9], Output, OutOffset + (i * 4) + 576);
+			IntUtils::Le32ToBytes(tmp[10], Output, OutOffset + (i * 4) + 640);
+			IntUtils::Le32ToBytes(tmp[11], Output, OutOffset + (i * 4) + 704);
+			IntUtils::Le32ToBytes(tmp[12], Output, OutOffset + (i * 4) + 768);
+			IntUtils::Le32ToBytes(tmp[13], Output, OutOffset + (i * 4) + 832);
+			IntUtils::Le32ToBytes(tmp[14], Output, OutOffset + (i * 4) + 896);
+			IntUtils::Le32ToBytes(tmp[15], Output, OutOffset + (i * 4) + 960);
+		}
+	}
+
 public:
 
-#if defined(__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+	struct ChaChaState;
 
-	template<class Vector>
-	static void TransformW(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
-	{
-		Vector X0(State[0]);
-		Vector X1(State[1]);
-		Vector X2(State[2]);
-		Vector X3(State[3]);
-		Vector X4(State[4]);
-		Vector X5(State[5]);
-		Vector X6(State[6]);
-		Vector X7(State[7]);
-		Vector X8(State[8]);
-		Vector X9(State[9]);
-		Vector X10(State[10]);
-		Vector X11(State[11]);
-		Vector X12(Counter, 0);
+	/// <summary>
+	/// The compact form of the ChaCha permutation function.
+	/// <para>This function has been optimized for a small memory consumption.
+	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input message array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Tweak">The cipher tweak array</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
+	static void PermuteP512C(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 2> &Counter, std::array<uint, 14> &State, size_t Rounds);
+
+	/// <summary>
+	/// The unrolled form of the ChaChaPoly20 permutation function.
+	/// <para>This function (the default) has been optimized for speed, and timing neutrality.
+	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output message array</param>
+	/// <param name="OutOffset">The starting offset within the Output array</param>
+	/// <param name="Counter">The cipher counter array</param>
+	/// <param name="State">The permutations state array</param>
+	static void PermuteR20P512U(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 2> &Counter, std::array<uint, 14> &State);
+
+#if defined(__AVX__)
+
+	/// <summary>
+	/// The horizontally vectorized form of the ChaCha permutation function.
+	/// <para>This function processes 4*64 blocks of input in parallel using AVX instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output message array</param>
+	/// <param name="OutOffset">The starting offset within the Output array</param>
+	/// <param name="Counter">The cipher counter array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 20</param>
+	static void PermuteP4x512H(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 8> &Counter, std::array<uint, 14> &State, size_t Rounds);
+
+#endif
+
+#if defined(__AVX2__)
+
+	/// <summary>
+	/// The horizontally vectorized form of the ChaCha permutation function.
+	/// <para>This function processes 8*64 blocks of input in parallel using AVX2 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output message array</param>
+	/// <param name="OutOffset">The starting offset within the Output array</param>
+	/// <param name="Counter">The cipher counter array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 20</param>
+	static void PermuteP8x512H(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 16> &Counter, std::array<uint, 14> &State, size_t Rounds);
+
+#endif
+
 #if defined(__AVX512__)
-		Vector X13(Counter, 16);
-#elif defined(__AVX2__)
-		Vector X13(Counter, 8);
-#else
-		Vector X13(Counter, 4);
-#endif
-		Vector X14(State[12]);
-		Vector X15(State[13]);
 
-		size_t stateCtr = Rounds;
-		while (stateCtr != 0)
-		{
-			X0 += X4;
-			X12 = Vector::RotL32(X12 ^ X0, 16);
-			X8 += X12;
-			X4 = Vector::RotL32(X4 ^ X8, 12);
-			X0 += X4;
-			X12 = Vector::RotL32(X12 ^ X0, 8);
-			X8 += X12;
-			X4 = Vector::RotL32(X4 ^ X8, 7);
-			X1 += X5;
-			X13 = Vector::RotL32(X13 ^ X1, 16);
-			X9 += X13;
-			X5 = Vector::RotL32(X5 ^ X9, 12);
-			X1 += X5;
-			X13 = Vector::RotL32(X13 ^ X1, 8);
-			X9 += X13;
-			X5 = Vector::RotL32(X5 ^ X9, 7);
-			X2 += X6;
-			X14 = Vector::RotL32(X14 ^ X2, 16);
-			X10 += X14;
-			X6 = Vector::RotL32(X6 ^ X10, 12);
-			X2 += X6;
-			X14 = Vector::RotL32(X14 ^ X2, 8);
-			X10 += X14;
-			X6 = Vector::RotL32(X6 ^ X10, 7);
-			X3 += X7;
-			X15 = Vector::RotL32(X15 ^ X3, 16);
-			X11 += X15;
-			X7 = Vector::RotL32(X7 ^ X11, 12);
-			X3 += X7;
-			X15 = Vector::RotL32(X15 ^ X3, 8);
-			X11 += X15;
-			X7 = Vector::RotL32(X7 ^ X11, 7);
-			X0 += X5;
-			X15 = Vector::RotL32(X15 ^ X0, 16);
-			X10 += X15;
-			X5 = Vector::RotL32(X5 ^ X10, 12);
-			X0 += X5;
-			X15 = Vector::RotL32(X15 ^ X0, 8);
-			X10 += X15;
-			X5 = Vector::RotL32(X5 ^ X10, 7);
-			X1 += X6;
-			X12 = Vector::RotL32(X12 ^ X1, 16);
-			X11 += X12;
-			X6 = Vector::RotL32(X6 ^ X11, 12);
-			X1 += X6;
-			X12 = Vector::RotL32(X12 ^ X1, 8);
-			X11 += X12;
-			X6 = Vector::RotL32(X6 ^ X11, 7);
-			X2 += X7;
-			X13 = Vector::RotL32(X13 ^ X2, 16);
-			X8 += X13;
-			X7 = Vector::RotL32(X7 ^ X8, 12);
-			X2 += X7;
-			X13 = Vector::RotL32(X13 ^ X2, 8);
-			X8 += X13;
-			X7 = Vector::RotL32(X7 ^ X8, 7);
-			X3 += X4;
-			X14 = Vector::RotL32(X14 ^ X3, 16);
-			X9 += X14;
-			X4 = Vector::RotL32(X4 ^ X9, 12);
-			X3 += X4;
-			X14 = Vector::RotL32(X14 ^ X3, 8);
-			X9 += X14;
-			X4 = Vector::RotL32(X4 ^ X9, 7);
-			stateCtr -= 2;
-		}
-
-		// last round
-		X0 += Vector(State[0]);
-		X1 += Vector(State[1]);
-		X2 += Vector(State[2]);
-		X3 += Vector(State[3]);
-		X4 += Vector(State[4]);
-		X5 += Vector(State[5]);
-		X6 += Vector(State[6]);
-		X7 += Vector(State[7]);
-		X8 += Vector(State[8]);
-		X9 += Vector(State[9]);
-		X10 += Vector(State[10]);
-		X11 += Vector(State[11]);
-		X12 += Vector(Counter, 0);
-#if defined(__AVX512__)
-		X13 += Vector(Counter, 16);
-#elif defined(__AVX2__)
-		X13 += Vector(Counter, 8);
-#else
-		X13 += Vector(Counter, 4);
-#endif
-		X14 += Vector(State[12]);
-		X15 += Vector(State[13]);
-
-		Vector::Store16(Output, OutOffset, X0, X1, X2, X3, X4, X5, X6, X7, X8, X9, X10, X11, X12, X13, X14, X15);
-	}
+	/// <summary>
+	/// The horizontally vectorized form of the ChaCha permutation function.
+	/// <para>This function processes 16*64 blocks of input in parallel using AVX512 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output message array</param>
+	/// <param name="OutOffset">The starting offset within the Output array</param>
+	/// <param name="Counter">The cipher counter array</param>
+	/// <param name="State">The permutations state array</param>
+	/// <param name="Rounds">The number of mixing rounds; the default is 20</param>
+	static void PermuteP16x512H(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 32> &Counter, std::array<uint, 14> &State, size_t Rounds);
 
 #endif
 
-	static void Transform(std::vector<byte> &Output, size_t OutOffset, std::vector<uint> &Counter, std::vector<uint> &State, size_t Rounds)
-	{
-		uint X0 = State[0];
-		uint X1 = State[1];
-		uint X2 = State[2];
-		uint X3 = State[3];
-		uint X4 = State[4];
-		uint X5 = State[5];
-		uint X6 = State[6];
-		uint X7 = State[7];
-		uint X8 = State[8];
-		uint X9 = State[9];
-		uint X10 = State[10];
-		uint X11 = State[11];
-		uint X12 = Counter[0];
-		uint X13 = Counter[1];
-		uint X14 = State[12];
-		uint X15 = State[13];
-
-		size_t stateCtr = Rounds;
-		while (stateCtr != 0)
-		{
-			X0 += X4;
-			X12 = Utility::IntUtils::RotFL32(X12 ^ X0, 16);
-			X8 += X12;
-			X4 = Utility::IntUtils::RotFL32(X4 ^ X8, 12);
-			X0 += X4;
-			X12 = Utility::IntUtils::RotFL32(X12 ^ X0, 8);
-			X8 += X12;
-			X4 = Utility::IntUtils::RotFL32(X4 ^ X8, 7);
-			X1 += X5;
-			X13 = Utility::IntUtils::RotFL32(X13 ^ X1, 16);
-			X9 += X13;
-			X5 = Utility::IntUtils::RotFL32(X5 ^ X9, 12);
-			X1 += X5;
-			X13 = Utility::IntUtils::RotFL32(X13 ^ X1, 8);
-			X9 += X13;
-			X5 = Utility::IntUtils::RotFL32(X5 ^ X9, 7);
-			X2 += X6;
-			X14 = Utility::IntUtils::RotFL32(X14 ^ X2, 16);
-			X10 += X14;
-			X6 = Utility::IntUtils::RotFL32(X6 ^ X10, 12);
-			X2 += X6;
-			X14 = Utility::IntUtils::RotFL32(X14 ^ X2, 8);
-			X10 += X14;
-			X6 = Utility::IntUtils::RotFL32(X6 ^ X10, 7);
-			X3 += X7;
-			X15 = Utility::IntUtils::RotFL32(X15 ^ X3, 16);
-			X11 += X15;
-			X7 = Utility::IntUtils::RotFL32(X7 ^ X11, 12);
-			X3 += X7;
-			X15 = Utility::IntUtils::RotFL32(X15 ^ X3, 8);
-			X11 += X15;
-			X7 = Utility::IntUtils::RotFL32(X7 ^ X11, 7);
-			X0 += X5;
-			X15 = Utility::IntUtils::RotFL32(X15 ^ X0, 16);
-			X10 += X15;
-			X5 = Utility::IntUtils::RotFL32(X5 ^ X10, 12);
-			X0 += X5;
-			X15 = Utility::IntUtils::RotFL32(X15 ^ X0, 8);
-			X10 += X15;
-			X5 = Utility::IntUtils::RotFL32(X5 ^ X10, 7);
-			X1 += X6;
-			X12 = Utility::IntUtils::RotFL32(X12 ^ X1, 16);
-			X11 += X12;
-			X6 = Utility::IntUtils::RotFL32(X6 ^ X11, 12);
-			X1 += X6;
-			X12 = Utility::IntUtils::RotFL32(X12 ^ X1, 8);
-			X11 += X12;
-			X6 = Utility::IntUtils::RotFL32(X6 ^ X11, 7);
-			X2 += X7;
-			X13 = Utility::IntUtils::RotFL32(X13 ^ X2, 16);
-			X8 += X13;
-			X7 = Utility::IntUtils::RotFL32(X7 ^ X8, 12);
-			X2 += X7;
-			X13 = Utility::IntUtils::RotFL32(X13 ^ X2, 8);
-			X8 += X13;
-			X7 = Utility::IntUtils::RotFL32(X7 ^ X8, 7);
-			X3 += X4;
-			X14 = Utility::IntUtils::RotFL32(X14 ^ X3, 16);
-			X9 += X14;
-			X4 = Utility::IntUtils::RotFL32(X4 ^ X9, 12);
-			X3 += X4;
-			X14 = Utility::IntUtils::RotFL32(X14 ^ X3, 8);
-			X9 += X14;
-			X4 = Utility::IntUtils::RotFL32(X4 ^ X9, 7);
-			stateCtr -= 2;
-		}
-
-		Utility::IntUtils::Le32ToBytes(X0 + State[0], Output, OutOffset);
-		Utility::IntUtils::Le32ToBytes(X1 + State[1], Output, OutOffset + 4);
-		Utility::IntUtils::Le32ToBytes(X2 + State[2], Output, OutOffset + 8);
-		Utility::IntUtils::Le32ToBytes(X3 + State[3], Output, OutOffset + 12);
-		Utility::IntUtils::Le32ToBytes(X4 + State[4], Output, OutOffset + 16);
-		Utility::IntUtils::Le32ToBytes(X5 + State[5], Output, OutOffset + 20);
-		Utility::IntUtils::Le32ToBytes(X6 + State[6], Output, OutOffset + 24);
-		Utility::IntUtils::Le32ToBytes(X7 + State[7], Output, OutOffset + 28);
-		Utility::IntUtils::Le32ToBytes(X8 + State[8], Output, OutOffset + 32);
-		Utility::IntUtils::Le32ToBytes(X9 + State[9], Output, OutOffset + 36);
-		Utility::IntUtils::Le32ToBytes(X10 + State[10], Output, OutOffset + 40);
-		Utility::IntUtils::Le32ToBytes(X11 + State[11], Output, OutOffset + 44);
-		Utility::IntUtils::Le32ToBytes(X12 + Counter[0], Output, OutOffset + 48);
-		Utility::IntUtils::Le32ToBytes(X13 + Counter[1], Output, OutOffset + 52);
-		Utility::IntUtils::Le32ToBytes(X14 + State[12], Output, OutOffset + 56);
-		Utility::IntUtils::Le32ToBytes(X15 + State[13], Output, OutOffset + 60);
-	}
 };
 
 NAMESPACE_STREAMEND

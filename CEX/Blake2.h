@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -48,9 +48,9 @@ NAMESPACE_DIGEST
 /// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
 /// The Unrolled forms are optimized for speed and timing-neutrality (suffix U), and the vertically vectorized functions have the V suffix. \n
 /// The H suffix denotes functions that take an SIMD wrapper class (AVX2/AVX512) as the state values, and process input in SIMD parallel blocks.</para>
-/// <para>This class contains horizontally vectorized (wide) forms of the functions; PermuteR10P4096H and PermuteR12P4096H use AVX2, and
-/// PermuteR10P8192H and PermuteR12P8192H use the AVX512 instructions. \n
-/// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitely declared.</para>
+/// <para>This class contains horizontally vectorized (wide) forms of the functions; PermuteR10P8x512H and PermuteR12P4x1024H use AVX2, and
+/// PermuteR10P16x512H and PermuteR12P8x1024H use the AVX512 instructions. \n
+/// These functions are not visible until run-time on some compiler platforms unless the compiler flag (__AVX2__ or __AVX512__) is explicitly declared.</para>
 /// </summary>
 class Blake2
 {
@@ -151,6 +151,10 @@ public:
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV);
 
+#endif
+
+#if defined(__AVX__)
+
 	/// <summary>
 	/// The horizontally vectorized form of the Blake2-256 permutation function.
 	/// <para>This function processes 8*64 blocks of input in parallel using AVX2 instructions.</para>
@@ -160,7 +164,7 @@ public:
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="State">The permutations UInt256 state array</param>
 	/// <param name="IV">The permutations IV array</param>
-	static void PermuteR10P4096H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV);
+	static void PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV);
 
 #endif
 
@@ -175,7 +179,7 @@ public:
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="State">The permutations UInt512 state array</param>
 	/// <param name="IV">The permutations IV array</param>
-	static void PermuteR10P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State, const std::vector<UInt512> &IV);
+	static void PermuteR10P16x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State, const std::vector<UInt512> &IV);
 
 #endif
 
@@ -203,6 +207,8 @@ public:
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV);
 
+#if defined(__AVX__)
+
 	/// <summary>
 	/// The vertically vectorized form of the Blake2-512 permutation function.
 	/// </summary>
@@ -212,6 +218,8 @@ public:
 	/// <param name="State">The permutations state array</param>
 	/// <param name="IV">The permutations IV array</param>
 	static void PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV);
+
+#endif
 
 #if defined(__AVX__)
 
@@ -224,7 +232,7 @@ public:
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="State">The permutations state array</param>
 	/// <param name="IV">The permutations IV array</param>
-	static void PermuteR12P4096H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV);
+	static void PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV);
 
 #endif
 
@@ -239,7 +247,7 @@ public:
 	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="State">The permutations UInt512 state array</param>
 	/// <param name="IV">The permutations IV array</param>
-	static void PermuteR12P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, const std::vector<ULong512> &IV);
+	static void PermuteR12P8x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, const std::vector<ULong512> &IV);
 
 #endif
 };

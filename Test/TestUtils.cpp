@@ -120,12 +120,20 @@ namespace Test
 	SymmetricKey* TestUtils::GetRandomKey(size_t KeySize, size_t IvSize)
 	{
 		CSP rng;
-		std::vector<byte> key(KeySize, 0);
-		std::vector<byte> iv(IvSize, 0);
-		rng.Generate(key);
-		rng.Generate(iv);
 
-		return new SymmetricKey(key, iv);
+		std::vector<byte> key(KeySize, 0);
+		rng.Generate(key);
+
+		if (IvSize > 0)
+		{
+			std::vector<byte> iv(IvSize, 0);
+			rng.Generate(iv);
+			return new SymmetricKey(key, iv);
+		}
+		else
+		{
+			return new SymmetricKey(key);
+		}
 	}
 
 	void TestUtils::GetRandom(std::vector<byte> &Data)

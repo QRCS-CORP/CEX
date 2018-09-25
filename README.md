@@ -62,9 +62,11 @@ Note: Each cipher can be deployed as either the standard form (AES, Serpent, Two
 * The Trailing Bit Compliment Padding Scheme (TBC)
 * The X.923 Padding Scheme
 
-### Stream Ciphers
-* ChaCha20 stream cipher
-* Salsa20 stream cipher
+### Stream Ciphers 
+* Added a a built-in authentication option to every stream cipher
+* ChaCha256-P20 stream cipher
+* ChaCha512-P80 stream cipher
+* Threefish 256/512/1024 stream ciphers
 
 ### Message Digests
 Note: Every message digest implementation has both parallel and sequential modes of operation
@@ -90,6 +92,7 @@ Note: Every message digest implementation has both parallel and sequential modes
 * Galois/Counter Message Authentication Code generator (GMAC)
 * Hash based Message Authentication Code generator (HMAC)
 * The Poly1305 Message Authentication Code generator (Poly1305)
+* Keccak based Message Authentication Code generator (KMAC)
 
 ### PRNGs
 * The auto-seeded Block cipher Counter mode Rng (BCR)
@@ -131,11 +134,15 @@ The next planned release (1.0.0.7) will be in October 2018.
 
 ## History
   
-### Version 1.0.0.6, June 28, 2018
+### Version 1.0.0.6d, June 28, 2018
 * The NTRU Prime asymmetric cipher
 * The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
 * Update of all asymmetric ciphers to match NIST PQ entries
 * Message digests updated for performance and security
+* Added a a built-in authentication option to every stream cipher
+* ChaCha256-P20 stream cipher
+* ChaCha512-P80 stream cipher
+* Threefish 256/512/1024 stream ciphers
 
 ### Version 1.0.0.5, March 16, 2018
 * The library is now Misra C++ 2014 compliant

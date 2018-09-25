@@ -22,7 +22,7 @@ public:
 
 	/// <summary>
 	/// Get a symmetric block cipher instance.
-	/// <para>If an extended (AHX/RHX, SHX, or THX) block cipher type is selected, the default key-schedule hash engine is None which involes the standard cipher.</para>
+	/// <para>If an extended (AHX/RHX or SHX) block cipher type is selected, the default key-schedule hash engine is None which involes the standard cipher.</para>
 	/// </summary>
 	/// 
 	/// <param name="CipherType">The block cipher enumeration name</param>

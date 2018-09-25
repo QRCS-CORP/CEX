@@ -24,10 +24,6 @@ enum class BlockCiphers : byte
 	/// </summary>
 	Serpent = 2,
 	/// <summary>
-	/// An implementation based on the Twofish Block Cipher
-	/// </summary>
-	Twofish = 3,
-	/// <summary>
 	/// An AES-NI implementation based on the 128-bit Rijndael Block Cipher extended with an HKDF key schedule
 	/// </summary>
 	AHX = 32,
@@ -38,13 +34,7 @@ enum class BlockCiphers : byte
 	/// <summary>
 	/// An implementation based on the Serpent Block Cipher extended with an HKDF key schedule
 	/// </summary>
-	SHX = 34,
-	/// <summary>
-	/// An implementation based on the Twofish Block Cipher extended with an HKDF key schedule
-	/// </summary>
-	THX = 35
-
-
+	SHX = 34
 };
 
 NAMESPACE_ENUMERATIONEND

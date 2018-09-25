@@ -1,6 +1,7 @@
 #include "CipherStream.h"
 #include "BlockCipherFromName.h"
 #include "CipherModeFromName.h"
+#include "IntUtils.h"
 #include "PaddingFromName.h"
 #include "StreamCipherFromName.h"
 

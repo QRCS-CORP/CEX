@@ -62,61 +62,61 @@ namespace Test
 	{
 		try
 		{
-			ComparePermutation256();
+			EvaluatePermutationSkein256();
 			OnProgress(std::string("Passed Skein-256 permutation variants equivalence test.."));
 
-			ComparePermutation512();
+			EvaluatePermutationSkein512();
 			OnProgress(std::string("Passed Skein-512 permutation variants equivalence test.."));
 
-			ComparePermutation1024();
+			EvaluatePermutationSkein1024();
 			OnProgress(std::string("Passed Skein-1024 permutation variants equivalence test.."));
 
-			TreeParamsTest();
+			EvaluateTreeParams();
 			OnProgress(std::string("Passed SkeinParams parameter serialization test.."));
 
 			Skein256* sk256 = new Skein256();
-			CompareOutput(sk256, m_message256[0], m_expected256[0]);
-			CompareOutput(sk256, m_message256[1], m_expected256[1]);
-			CompareOutput(sk256, m_message256[2], m_expected256[2]);
+			CompareVectorSkein(sk256, m_message256[0], m_expected256[0]);
+			CompareVectorSkein(sk256, m_message256[1], m_expected256[1]);
+			CompareVectorSkein(sk256, m_message256[2], m_expected256[2]);
 			delete sk256;
 			OnProgress(std::string("Passed Skein 256 bit digest vector tests.."));
 
 			Skein512* sk512 = new Skein512();
-			CompareOutput(sk512, m_message512[0], m_expected512[0]);
-			CompareOutput(sk512, m_message512[1], m_expected512[1]);
-			CompareOutput(sk512, m_message512[2], m_expected512[2]);
+			CompareVectorSkein(sk512, m_message512[0], m_expected512[0]);
+			CompareVectorSkein(sk512, m_message512[1], m_expected512[1]);
+			CompareVectorSkein(sk512, m_message512[2], m_expected512[2]);
 			delete sk512;
 			OnProgress(std::string("Passed Skein 512 bit digest vector tests.."));/**/
 
 			Skein1024* sk1024 = new Skein1024();
-			CompareOutput(sk1024, m_message1024[0], m_expected1024[0]);
-			CompareOutput(sk1024, m_message1024[1], m_expected1024[1]);
-			CompareOutput(sk1024, m_message1024[2], m_expected1024[2]);
+			CompareVectorSkein(sk1024, m_message1024[0], m_expected1024[0]);
+			CompareVectorSkein(sk1024, m_message1024[1], m_expected1024[1]);
+			CompareVectorSkein(sk1024, m_message1024[2], m_expected1024[2]);
 			delete sk1024;
 			OnProgress(std::string("Passed Skein 1024 bit digest vector tests.."));
 
-			Skein256* sks2 = new Skein256(true);
+			Skein256* sks1 = new Skein256(true);
 			SkeinParams sp1(32, 32, 8);
-			Skein256* sks3 = new Skein256(sp1);
-			CompareParallel(sks2, sks3);
+			Skein256* sks2 = new Skein256(sp1);
+			EvaluateParallelSkein(sks1, sks2);
+			delete sks1;
 			delete sks2;
-			delete sks3;
 			OnProgress(std::string("Passed Skein 256 parallelization tests.."));
 
-			Skein512* skm2 = new Skein512(true);
+			Skein512* skm1 = new Skein512(true);
 			SkeinParams sp2(64, 64, 8);
-			Skein512* skm3 = new Skein512(sp2);
-			CompareParallel(skm2, skm3);
+			Skein512* skm2 = new Skein512(sp2);
+			EvaluateParallelSkein(skm1, skm2);
+			delete skm1;
 			delete skm2;
-			delete skm3;
 			OnProgress(std::string("Passed Skein 512 parallelization tests.."));
 
-			Skein1024* skl2 = new Skein1024(true);
+			Skein1024* skl1 = new Skein1024(true);
 			SkeinParams sp3(128, 128, 8);
-			Skein1024* skl3 = new Skein1024(sp3);
-			CompareParallel(skl2, skl3);
+			Skein1024* skl2 = new Skein1024(sp3);
+			EvaluateParallelSkein(skl1, skl2);
+			delete skl1;
 			delete skl2;
-			delete skl3;
 			OnProgress(std::string("Passed Skein 1024 parallelization tests.."));
 
 			return SUCCESS;
@@ -131,7 +131,7 @@ namespace Test
 		}
 	}
 
-	void SkeinTest::CompareOutput(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SkeinTest::CompareVectorSkein(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
 	{
 		std::vector<byte> hash1(Digest->DigestSize(), 0);
 		std::vector<byte> hash2(Digest->DigestSize(), 0);
@@ -139,43 +139,44 @@ namespace Test
 		Digest->Update(Input, 0, Input.size());
 		Digest->Finalize(hash1, 0);
 
-		if (Expected != hash1)
+		if (hash1 != Expected)
 		{
 			throw TestException("SKein Vector: Expected hash is not equal!");
 		}
 
 		Digest->Compute(Input, hash2);
 
-		if (Expected != hash2)
+		if (hash2 != Expected)
 		{
 			throw TestException("SKein Vector: Expected hash is not equal!");
 		}
 	}
 
-	void SkeinTest::CompareParallel(IDigest* Dgt1, IDigest* Dgt2)
+	void SkeinTest::EvaluateParallelSkein(IDigest* Digest1, IDigest* Digest2)
 	{
-		std::vector<byte> hash1(Dgt1->DigestSize(), 0);
-		std::vector<byte> hash2(Dgt1->DigestSize(), 0);
-		const size_t PRLBLK = Dgt1->ParallelBlockSize();
-		const size_t PRLMIN = Dgt1->ParallelProfile().ParallelMinimumSize();
+		std::vector<byte> hash1(Digest1->DigestSize(), 0);
+		std::vector<byte> hash2(Digest1->DigestSize(), 0);
+		const uint PRLBLK = static_cast<uint>(Digest1->ParallelBlockSize());
+		const uint PRLMIN = static_cast<uint>(Digest1->ParallelProfile().ParallelMinimumSize());
 		CEX::Prng::SecureRandom rnd;
-		Dgt1->ParallelProfile().ParallelBlockSize() = PRLBLK;
-		Dgt2->ParallelProfile().ParallelBlockSize() = PRLMIN;
+
+		Digest1->ParallelProfile().ParallelBlockSize() = PRLBLK;
+		Digest2->ParallelProfile().ParallelBlockSize() = PRLMIN;
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t prlSze = (size_t)rnd.NextUInt32((uint)(PRLMIN * 8), (uint)(PRLMIN * 2));
-			prlSze -= (prlSze % PRLMIN);
-			// set to parallel, but block will be too small.. processed with alternate
-			std::vector<byte> input(prlSze);
+			uint prlSize = rnd.NextUInt32(PRLMIN * 8, PRLMIN * 2);
+			prlSize -= (prlSize % PRLMIN);
+			std::vector<byte> input(static_cast<size_t>(prlSize));
 			rnd.Generate(input);
 
-			Dgt1->Update(input, 0, input.size());
-			Dgt1->Finalize(hash1, 0);
+			// set to parallel, but block will be too small.. processed with secondary parallel loop
+			Digest1->Update(input, 0, input.size());
+			Digest1->Finalize(hash1, 0);
 
-			// this will run in parallel
-			Dgt2->Update(input, 0, input.size());
-			Dgt2->Finalize(hash2, 0);
+			// this will run in large-block parallel, processed by primary loop
+			Digest2->Update(input, 0, input.size());
+			Digest2->Finalize(hash2, 0);
 
 			if (hash1 != hash2)
 			{
@@ -183,11 +184,11 @@ namespace Test
 			}
 
 			// test partial block-size and compute method
-			input.resize(input.size() + rnd.NextUInt32(200, 1), (byte)199);
-			Dgt1->Compute(input, hash1);
+			input.resize(input.size() + rnd.NextUInt32(200, 1), 0xC7);
+			Digest1->Compute(input, hash1);
 
-			Dgt2->Update(input, 0, input.size());
-			Dgt2->Finalize(hash2, 0);
+			Digest2->Update(input, 0, input.size());
+			Digest2->Finalize(hash2, 0);
 
 			if (hash1 != hash2)
 			{
@@ -196,7 +197,7 @@ namespace Test
 		}
 	}
 
-	void SkeinTest::ComparePermutation256()
+	void SkeinTest::EvaluatePermutationSkein256()
 	{
 		std::array<ulong, 4> input{ 0, 1, 2, 3 };
 		std::array<ulong, 2> tweak{ 0, 1 };
@@ -206,8 +207,27 @@ namespace Test
 		MemUtils::Clear(state1, 0, 4 * sizeof(ulong));
 		MemUtils::Clear(state2, 0, 4 * sizeof(ulong));
 
-		Skein::PemuteR72P256C(input, state1, tweak);
-		Skein::PemuteR72P256U(input, state2, tweak);
+		Skein::PemuteP256C(input, tweak, state1, 72);
+		Skein::PemuteR72P256U(input, tweak, state2);
+
+		if (state1 != state2)
+		{
+			throw TestException("SKein Permutation: Permutation output is not equal!");
+		}
+	}
+
+	void SkeinTest::EvaluatePermutationSkein512()
+	{
+		std::array<ulong, 8> input{ 0, 1, 2, 3, 4, 5, 6, 7 };
+		std::array<ulong, 2> tweak{ 0, 1 };
+		std::array<ulong, 8> state1;
+		std::array<ulong, 8> state2;
+
+		MemUtils::Clear(state1, 0, 8 * sizeof(ulong));
+		MemUtils::Clear(state2, 0, 8 * sizeof(ulong));
+
+		Skein::PemuteP512C(input, tweak, state1, 72);
+		Skein::PemuteR72P512U(input, tweak, state2);
 
 		if (state1 != state2)
 		{
@@ -215,77 +235,11 @@ namespace Test
 		}
 
 #if defined(__AVX2__)
-		 
-		std::vector<ulong> tmp256{ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3 };
-		std::vector<ULong256> tweak256{ ULong256(0), ULong256(1) };
-		std::vector<ULong256> state256(4, ULong256(0));
-		std::vector<byte> input256(128);
 
-		for (size_t i = 0; i < 16; ++i)
-		{
-			IntUtils::Le64ToBytes(tmp256[i], input256, i * 8);
-		}
-
-		Skein::PemuteR72P1024H(input256, 0, state256, tweak256);
-
-		std::vector<ulong> state256ull(16);
-		MemUtils::Copy(state256, 0, state256ull, 0, 16 * sizeof(ulong));
-
-		for (size_t i = 0; i < 16; ++i)
-		{
-			if (state256ull[i] != state1[i / 4])
-			{
-				throw TestException("SKein Permutation: Permutation output is not equal!");
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::vector<ulong> tmp512{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3 };
-		std::vector<ULong512> tweak512{ ULong512(0), ULong512(1) };
-		std::vector<ULong512> state512(4, ULong512(0));
-		std::vector<byte> input512(256);
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			IntUtils::Le64ToBytes(tmp512[i], input512, i * 8);
-		}
-
-		Skein::PemuteR72P2048H(input512, 0, state512, tweak512);
-
-		std::vector<ulong> state512ull(32);
-		MemUtils::Copy(state512, 0, state512ull, 0, 32 * sizeof(ulong));
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			if (state512ull[i] != state1[i / 8])
-			{
-				throw TestException("SKein Permutation: Permutation output is not equal!");
-			}
-		}
-
-#endif
-	}
-
-	void SkeinTest::ComparePermutation512()
-	{
-		std::array<ulong, 8> input{ 0, 1, 2, 3, 4, 5, 6, 7 };
-		std::array<ulong, 2> tweak{ 0, 1 };
-		std::array<ulong, 8> state1;
-		std::array<ulong, 8> state2;
 		std::array<ulong, 8> state3;
 
-		MemUtils::Clear(state1, 0, 8 * sizeof(ulong));
-		MemUtils::Clear(state2, 0, 8 * sizeof(ulong));
 		MemUtils::Clear(state3, 0, 8 * sizeof(ulong));
-
-		Skein::PemuteR72P512C(input, state1, tweak);
-		Skein::PemuteR72P512U(input, state2, tweak);
-
-#if defined(__AVX2__)
-		Skein::PemuteR72P512V(input, state3, tweak);
+		Skein::PemuteR72P512V(input, tweak, state3);
 
 		if (state1 != state3)
 		{
@@ -293,139 +247,28 @@ namespace Test
 		}
 #endif
 
-		if (state1 != state2)
-		{
-			throw TestException("SKein Permutation: Permutation output is not equal!");
-		}
-
-#if defined(__AVX2__)
-
-		std::vector<ulong> tmp256{ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7 };
-		std::vector<ULong256> tweak256{ ULong256(0), ULong256(1) };
-		std::vector<ULong256> state256(8, ULong256(0));
-		std::vector<byte> input256(256);
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			IntUtils::Le64ToBytes(tmp256[i], input256, i * 8);
-		}
-
-		Skein::PemuteR72P2048H(input256, 0, state256, tweak256);
-
-		std::vector<ulong> state256ull(32);
-		MemUtils::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
-
-		for (size_t i = 0; i < 32; ++i)
-		{
-			if (state256ull[i] != state1[i / 4])
-			{
-				throw TestException("SKein Permutation: Permutation output is not equal!");
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::vector<ulong> tmp512{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7 };
-		std::vector<ULong512> tweak512{ ULong512(0), ULong512(1) };
-		std::vector<ULong512> state512(8, ULong512(0));
-		std::vector<byte> input512(512);
-
-		for (size_t i = 0; i < 64; ++i)
-		{
-			IntUtils::Le64ToBytes(tmp512[i], input512, i * 8);
-		}
-
-		Skein::PemuteR72P4096H(input512, 0, state512, tweak512);
-
-		std::vector<ulong> state512ull(64);
-		MemUtils::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));
-
-		for (size_t i = 0; i < 64; ++i)
-		{
-			if (state512ull[i] != state1[i / 8])
-			{
-				throw TestException("SKein Permutation: Permutation output is not equal!");
-			}
-		}
-
-#endif
-
 	}
 
-	void SkeinTest::ComparePermutation1024()
+	void SkeinTest::EvaluatePermutationSkein1024()
 	{
-		std::array<ulong, 16> input{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-		std::array<ulong, 2> tweak{ 0, 1 };
+		std::array<ulong, 16> input;
+		std::array<ulong, 2> tweak;
 		std::array<ulong, 16> state1;
 		std::array<ulong, 16> state2;
+		Prng::SecureRandom rnd;
 
+		IntUtils::Fill(input, 0, 16, rnd);
+		IntUtils::Fill(tweak, 0, 2, rnd);
 		MemUtils::Clear(state1, 0, 16 * sizeof(ulong));
 		MemUtils::Clear(state2, 0, 16 * sizeof(ulong));
 
-		Skein::PemuteR80P1024C(input, state1, tweak);
-		Skein::PemuteR80P1024U(input, state2, tweak);
+		Skein::PemuteP1024C(input, tweak, state1, 80);
+		Skein::PemuteR80P1024U(input, tweak, state2);
 
 		if (state1 != state2)
 		{
 			throw TestException("SKein Permutation: Permutation output is not equal!");
 		}
-
-#if defined(__AVX2__)
-
-		std::vector<ulong> tmp256{ 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 13, 14, 14, 14, 14, 15, 15, 15, 15 };
-		std::vector<ULong256> tweak256{ ULong256(0), ULong256(1) };
-		std::vector<ULong256> state256(16, ULong256(0));
-		std::vector<byte> input256(512);
-
-		for (size_t i = 0; i < 64; ++i)
-		{
-			IntUtils::Le64ToBytes(tmp256[i], input256, i * 8);
-		}
-
-		Skein::PemuteR80P4096H(input256, 0, state256, tweak256);
-
-		std::vector<ulong> state256ull(64);
-		MemUtils::Copy(state256, 0, state256ull, 0, 64 * sizeof(ulong));
-
-		for (size_t i = 0; i < 64; ++i)
-		{
-			if (state256ull[i] != state1[i / 4])
-			{
-				throw TestException("SKein Permutation: Permutation output is not equal!");
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::vector<ulong> tmp512{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 11, 11, 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15 };
-		std::vector<ULong512> tweak512{ ULong512(0), ULong512(1) };
-		std::vector<ULong512> state512(16 ULong512(0));
-		std::vector<byte> input512(1024);
-
-		for (size_t i = 0; i < 128; ++i)
-		{
-			IntUtils::Le64ToBytes(tmp512[i], input512, i * 8);
-		}
-
-		Skein::PemuteR72P8192H(input512, 0, state512, tweak512);
-
-		std::vector<ulong> state512ull(128);
-		MemUtils::Copy(state512, 0, state512ull, 0, 128 * sizeof(ulong));
-
-		for (size_t i = 0; i < 128; ++i)
-		{
-			if (state512ull[i] != state1[i / 8])
-			{
-				throw TestException("SKein Permutation: Permutation output is not equal!");
-			}
-		}
-
-#endif
-
 	}
 
 	void SkeinTest::Initialize()
@@ -481,7 +324,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void SkeinTest::TreeParamsTest()
+	void SkeinTest::EvaluateTreeParams()
 	{
 		std::vector<byte> code1(8, 7);
 

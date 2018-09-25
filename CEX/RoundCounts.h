@@ -16,55 +16,55 @@ enum class RoundCounts : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// 8 Rounds: ChaCha20
+	/// 8 Rounds: ChaCha256
 	/// </summary>
 	R8 = 8,
 	/// <summary>
-	/// 10 Rounds: ChaCha20, RHX
+	/// 10 Rounds: ChaCha256, RHX
 	/// </summary>
 	R10 = 10,
 	/// <summary>
-	/// 12 Rounds: ChaCha20, RHX
+	/// 12 Rounds: ChaCha256, RHX
 	/// </summary>
 	R12 = 12,
 	/// <summary>
-	/// 14 Rounds: ChaCha20, RHX
+	/// 14 Rounds: ChaCha256, RHX
 	/// </summary>
 	R14 = 14,
 	/// <summary>
-	/// 16 Rounds: ChaCha20, RHX, THX
+	/// 16 Rounds: ChaCha256, RHX
 	/// </summary>
 	R16 = 16,
 	/// <summary>
-	/// 18 Rounds: ChaCha20, RHX, THX
+	/// 18 Rounds: ChaCha256, RHX
 	/// </summary>
 	R18 = 18,
 	/// <summary>
-	/// 20 Rounds: ChaCha20, RHX, THX
+	/// 20 Rounds: ChaCha256, RHX
 	/// </summary>
 	R20 = 20,
 	/// <summary>
-	/// 22 Rounds: ChaCha20, RHX, THX
+	/// 22 Rounds: ChaCha256, RHX
 	/// </summary>
 	R22 = 22,
 	/// <summary>
-	/// 24 Rounds: ChaCha20, RHX, THX
+	/// 24 Rounds: ChaCha256, RHX
 	/// </summary>
 	R24 = 24,
 	/// <summary>
-	/// 26 Rounds: ChaCha20, RHX, THX
+	/// 26 Rounds: ChaCha256, RHX
 	/// </summary>
 	R26 = 26,
 	/// <summary>
-	/// 28 Rounds: ChaCha20, RHX, THX
+	/// 28 Rounds: ChaCha256, RHX
 	/// </summary>
 	R28 = 28,
 	/// <summary>
-	/// 30 Rounds: ChaCha20, RHX, THX
+	/// 30 Rounds: ChaCha256, RHX
 	/// </summary>
 	R30 = 30,
 	/// <summary>
-	/// 32 Rounds: RHX, SHX, THX
+	/// 32 Rounds: RHX, SHX
 	/// </summary>
 	R32 = 32,
 	/// <summary>

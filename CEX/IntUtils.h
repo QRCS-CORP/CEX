@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -1263,20 +1263,38 @@ public:
 	}
 
 	/// <summary>
-	/// Treats an integer array as a large Little Endian integer, incrementing the total value by a defined length.
+	/// Treats an integer array as a large Little Endian integer, increasing the total value by a defined length.
 	/// <para>Uses only unsigned integer types; signed types are UB.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The initial array of bytes</param>
-	/// <param name="Output">The modified output array</param>
+	/// <param name="Output">The counter array to increment</param>
+	/// <param name="Length">The number to increase by</param>
+	template <typename Array>
+	inline static void LeIncreaseW(Array &Output, const size_t Length)
+	{
+		Output[0] += Length;
+
+		if (Output[0] < Length)
+		{
+			Output[1] += 1;
+		}
+	}
+
+	/// <summary>
+	/// Treats an integer array as a large Little Endian integer, increasing the total value by a defined length.
+	/// <para>Uses only unsigned integer types; signed types are UB.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The initial array to clone</param>
+	/// <param name="Output">The incremented output array</param>
 	/// <param name="Length">The number to increase by</param>
 	template <typename Array>
 	inline static void LeIncreaseW(const Array &Input, Array &Output, const size_t Length)
 	{
 		CexAssert(!std::is_signed<Array::value_type>::value, "Input must be an unsigned integer array");
 
-		std::memcpy(&Output[0], &Input[0], Input.size() * sizeof(Array::value_type));
-		Output[0] += static_cast<uint>(Length);
+		MemUtils::Copy(Input, 0, Output, 0, Input.size() * sizeof(Array::value_type));
+		Output[0] += static_cast<Array::value_type>(Length);
 
 		if (Output[0] < Input[0])
 		{

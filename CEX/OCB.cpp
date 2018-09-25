@@ -236,18 +236,19 @@ void OCB::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 	Encrypt128(Input, InOffset, Output, OutOffset);
 }
 
-void OCB::Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length)
+void OCB::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length)
 {
 	CexAssert(m_isInitialized, "The cipher mode has not been initialized");
 	CexAssert(Length >= MIN_TAGSIZE || Length <= BLOCK_SIZE, "The cipher mode has not been initialized");
 
 	CalculateMac();
-	Utility::MemUtils::Copy(m_msgTag, 0, Output, Offset, Length);
+	Utility::MemUtils::Copy(m_msgTag, 0, Output, OutOffset, Length);
 }
 
 void OCB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	Scope();
+	Reset();
 
 	if (KeyParams.Key().size() == 0)
 	{

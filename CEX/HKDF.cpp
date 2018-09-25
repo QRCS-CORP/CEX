@@ -284,12 +284,14 @@ size_t HKDF::Expand(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 		{
 			m_macGenerator->Update(m_kdfState, 0, m_kdfState.size());
 		}
+
 		if (m_kdfInfo.size() != 0)
 		{
 			m_macGenerator->Update(m_kdfInfo, 0, m_kdfInfo.size());
 		}
 
-		m_macGenerator->Update(++m_kdfCounter);
+		++m_kdfCounter;
+		m_macGenerator->Update(m_kdfCounter);
 		m_macGenerator->Finalize(m_kdfState, 0);
 
 		const size_t RMDLEN = Utility::IntUtils::Min(m_macSize, Length - prcLen);
@@ -323,8 +325,8 @@ void HKDF::Extract(const std::vector<byte> &Key, const std::vector<byte> &Salt, 
 
 void HKDF::LoadState()
 {
-	// best info size; hash finalizer code and counter length adjusted
-	size_t infoLen = m_blockSize - (m_macSize + Helper::DigestFromName::GetPaddingSize(m_kdfDigestType) + 1);
+	// best info size is half of block size
+	size_t infoLen = m_macSize;
 	m_legalKeySizes.resize(3);
 	// minimum security is the digest output size
 	m_legalKeySizes[0] = SymmetricKeySize(m_macSize, 0, 0);

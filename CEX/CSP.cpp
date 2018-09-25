@@ -3,8 +3,6 @@
 
 #if defined(CEX_OS_WINDOWS)
 #	include <Windows.h>
-#	pragma comment(lib, "advapi32.lib")
-	HCRYPTPROV m_hProvider = 0;
 #elif defined (CEX_OS_ANDROID)
 #	include <sys/types.h>
 #	include <thread>
@@ -14,13 +12,19 @@
 #	include <fcntl.h>
 #	include <unistd.h>
 #	include <errno.h>
-#	ifndef O_NOCTTY
+#endif
+
+NAMESPACE_PROVIDER
+
+#if defined(CEX_OS_WINDOWS)
+#	pragma comment(lib, "advapi32.lib")
+	HCRYPTPROV m_hProvider = 0;
+#elif defined (CEX_OS_POSIX)
+#	if !defined(O_NOCTTY)
 #		define O_NOCTTY 0
 #	endif
 #	define CEX_SYSTEM_RNG_DEVICE "/dev/urandom"
 #endif
-
-NAMESPACE_PROVIDER
 
 const std::string CSP::CLASS_NAME("CSP");
 
@@ -73,7 +77,7 @@ void CSP::Generate(std::vector<byte> &Output)
 #if defined(CEX_OS_WINDOWS)
 
 	HCRYPTPROV hProvider = NULL;
-	if (!::CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
+	if (!CryptAcquireContextW(&hProvider, 0, 0, PROV_RSA_FULL, (CRYPT_VERIFYCONTEXT | CRYPT_SILENT)))
 	{
 		throw CryptoRandomException("CSP:Generate", "Call to CryptAcquireContext failed; random provider is not available!");
 	}
@@ -83,7 +87,7 @@ void CSP::Generate(std::vector<byte> &Output)
 		BYTE* ptr = (BYTE*)&Output[0];
 		if (!::CryptGenRandom(hProvider, (DWORD)prcLen, ptr))
 		{
-			::CryptReleaseContext(hProvider, 0);
+			CryptReleaseContext(hProvider, 0);
 			hProvider = NULL;
 			throw CryptoRandomException("CSP:Generate", "Call to CryptGenRandom failed; random provider is not available!");
 		}

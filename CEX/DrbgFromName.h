@@ -27,7 +27,7 @@ class DrbgFromName
 public:
 
 	/// <summary>
-	/// Instantiate an uninitialized DRBG generator from its enunmeration type name.
+	/// Instantiate an uninitialized DRBG generator from its enumeration type name.
 	/// <para>Initializes the generator with the default parameters.</para>
 	/// </summary>
 	/// 

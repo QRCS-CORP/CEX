@@ -101,7 +101,7 @@ namespace Test
 		void ParallelStreamLoop(T* Cipher, size_t KeySize, size_t IvSize, size_t Loops, TestEventHandler &Handler)
 		{
 			Key::Symmetric::SymmetricKey* keyParam = TestUtils::GetRandomKey(KeySize, IvSize);
-			Cipher->Initialize(*keyParam);
+			Cipher->Initialize(true, *keyParam);
 			Cipher->ParallelProfile().IsParallel() = true;
 			std::vector<byte> buffer1(Cipher->ParallelBlockSize(), 0);
 			std::vector<byte> buffer2(Cipher->ParallelBlockSize(), 0);
@@ -121,6 +121,7 @@ namespace Test
 				Handler(const_cast<char*>(calc.c_str()));
 			}
 
+			delete keyParam;
 			uint64_t dur = TestUtils::GetTimeMs64() - start;
 			uint64_t len = Loops * DATA_SIZE;
 			uint64_t rate = GetBytesPerSecond(dur, len);
@@ -137,7 +138,11 @@ namespace Test
 		void CBCSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CFBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void CTRSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
-		void ChaChaSpeedTest();
+		void ChaCha256SpeedTest();
+		void ChaCha512SpeedTest();
+		void Threefish256SpeedTest();
+		void Threefish512SpeedTest();
+		void Threefish1024SpeedTest();
 		void CounterSpeedTest();
 		void EAXSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void GCMSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
@@ -148,9 +153,7 @@ namespace Test
 		void OFBSpeedTest(Cipher::Symmetric::Block::IBlockCipher* Engine, bool Encrypt, bool Parallel);
 		void OnProgress(std::string Data);
 		void RHXSpeedTest(size_t KeySize = 32);
-		void SalsaSpeedTest();
 		void SHXSpeedTest(size_t KeySize = 32);
-		void THXSpeedTest(size_t KeySize = 32);
 	};
 }
 

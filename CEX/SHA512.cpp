@@ -377,7 +377,9 @@ void SHA512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Length,
 
 	// padding
 	if (Length < BLOCK_SIZE)
+	{
 		MemUtils::Clear(Input, InOffset + Length, BLOCK_SIZE - Length);
+	}
 
 	if (Length > 112)
 	{

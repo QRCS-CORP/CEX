@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -256,120 +256,6 @@ public:
 		X1.Store(Output, Offset + (64 / sizeof(Output[0])));
 		X2.Store(Output, Offset + (128 / sizeof(Output[0])));
 		X3.Store(Output, Offset + (192 / sizeof(Output[0])));
-	}
-
-	/// <summary>
-	/// Transposes and stores 16 * UInt512 to an integer array
-	/// </summary>
-	///
-	/// <param name="Output">The destination integer array; must be at least 8192 bits in length</param>
-	/// <param name="Offset">The starting offset within the Output array</param>
-	/// <param name="X0">Operand 0</param>
-	/// <param name="X1">Operand 1</param>
-	/// <param name="X2">Operand 2</param>
-	/// <param name="X3">Operand 3</param>
-	/// <param name="X4">Operand 4</param>
-	/// <param name="X5">Operand 5</param>
-	/// <param name="X6">Operand 6</param>
-	/// <param name="X7">Operand 7</param>
-	/// <param name="X8">Operand 8</param>
-	/// <param name="X9">Operand 9</param>
-	/// <param name="X10">Operand 10</param>
-	/// <param name="X11">Operand 11</param>
-	/// <param name="X12">Operand 12</param>
-	/// <param name="X13">Operand 13</param>
-	/// <param name="X14">Operand 14</param>
-	/// <param name="X15">Operand 15</param>
-	template <typename Array>
-	inline static void Store16(Array &Output, size_t Offset, UInt512 &X0, UInt512 &X1, UInt512 &X2, UInt512 &X3, UInt512 &X4, UInt512 &X5,
-		UInt512 &X6, UInt512 &X7, UInt512 &X8, UInt512 &X9, UInt512 &X10, UInt512 &X11, UInt512 &X12, UInt512 &X13, UInt512 &X14, UInt512 &X15)
-	{
-		__m512i T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15;
-
-		T0 = _mm512_unpacklo_epi32(X0, X1);
-		T1 = _mm512_unpackhi_epi32(X0, X1);
-		T2 = _mm512_unpacklo_epi32(X2, X3);
-		T3 = _mm512_unpackhi_epi32(X2, X3);
-		T4 = _mm512_unpacklo_epi32(X4, X5);
-		T5 = _mm512_unpackhi_epi32(X4, X5);
-		T6 = _mm512_unpacklo_epi32(X6, X7);
-		T7 = _mm512_unpackhi_epi32(X6, X7);
-		T8 = _mm512_unpacklo_epi32(X8, X9);
-		T9 = _mm512_unpackhi_epi32(X8, X9);
-		T10 = _mm512_unpacklo_epi32(X10, X11);
-		T11 = _mm512_unpackhi_epi32(X10, X11);
-		T12 = _mm512_unpacklo_epi32(X12, X13);
-		T13 = _mm512_unpackhi_epi32(X12, X13);
-		T14 = _mm512_unpacklo_epi32(X14, X15);
-		T15 = _mm512_unpackhi_epi32(X14, X15);
-
-		X0 = _mm512_unpacklo_epi64(T0, T2);
-		X1 = _mm512_unpackhi_epi64(T0, T2);
-		X2 = _mm512_unpacklo_epi64(T1, T3);
-		X3 = _mm512_unpackhi_epi64(T1, T3);
-		X4 = _mm512_unpacklo_epi64(T4, T6);
-		X5 = _mm512_unpackhi_epi64(T4, T6);
-		X6 = _mm512_unpacklo_epi64(T5, T7);
-		X7 = _mm512_unpackhi_epi64(T5, T7);
-		X8 = _mm512_unpacklo_epi64(T8, T10);
-		X9 = _mm512_unpackhi_epi64(T8, T10);
-		X10 = _mm512_unpacklo_epi64(T9, T11);
-		X11 = _mm512_unpackhi_epi64(T9, T11);
-		X12 = _mm512_unpacklo_epi64(T12, T14);
-		X13 = _mm512_unpackhi_epi64(T12, T14);
-		X14 = _mm512_unpacklo_epi64(T13, T15);
-		X15 = _mm512_unpackhi_epi64(T13, T15);
-
-		T0 = _mm512_shuffle_i32x4(X0, X4, 0x88);
-		T1 = _mm512_shuffle_i32x4(X1, X5, 0x88);
-		T2 = _mm512_shuffle_i32x4(X2, X6, 0x88);
-		T3 = _mm512_shuffle_i32x4(X3, X7, 0x88);
-		T4 = _mm512_shuffle_i32x4(X0, X4, 0xDD);
-		T5 = _mm512_shuffle_i32x4(X1, X5, 0xDD);
-		T6 = _mm512_shuffle_i32x4(X2, X6, 0xDD);
-		T7 = _mm512_shuffle_i32x4(X3, X7, 0xDD);
-		T8 = _mm512_shuffle_i32x4(X8, X12, 0x88);
-		T9 = _mm512_shuffle_i32x4(X9, X13, 0x88);
-		T10 = _mm512_shuffle_i32x4(X10, X14, 0x88);
-		T11 = _mm512_shuffle_i32x4(X11, X15, 0x88);
-		T12 = _mm512_shuffle_i32x4(X8, X12, 0xDD);
-		T13 = _mm512_shuffle_i32x4(X9, X13, 0xDD);
-		T14 = _mm512_shuffle_i32x4(X10, X14, 0xDD);
-		T15 = _mm512_shuffle_i32x4(X11, X15, 0xDD);
-
-		X0 = _mm512_shuffle_i32x4(T0, T8, 0x88);
-		X1 = _mm512_shuffle_i32x4(T1, T9, 0x88);
-		X2 = _mm512_shuffle_i32x4(T2, T10, 0x88);
-		X3 = _mm512_shuffle_i32x4(T3, T11, 0x88);
-		X4 = _mm512_shuffle_i32x4(T4, T12, 0x88);
-		X5 = _mm512_shuffle_i32x4(T5, T13, 0x88);
-		X6 = _mm512_shuffle_i32x4(T6, T14, 0x88);
-		X7 = _mm512_shuffle_i32x4(T7, T15, 0x88);
-		X8 = _mm512_shuffle_i32x4(T0, T8, 0xDD);
-		X9 = _mm512_shuffle_i32x4(T1, T9, 0xDD);
-		X10 = _mm512_shuffle_i32x4(T2, T10, 0xDD);
-		X11 = _mm512_shuffle_i32x4(T3, T11, 0xDD);
-		X12 = _mm512_shuffle_i32x4(T4, T12, 0xDD);
-		X13 = _mm512_shuffle_i32x4(T5, T13, 0xDD);
-		X14 = _mm512_shuffle_i32x4(T6, T14, 0xDD);
-		X15 = _mm512_shuffle_i32x4(T7, T15, 0xDD);
-
-		X0.Store(Output, Offset);
-		X1.Store(Output, Offset + (64 / sizeof(Output[0])));
-		X2.Store(Output, Offset + (128 / sizeof(Output[0])));
-		X3.Store(Output, Offset + (192 / sizeof(Output[0])));
-		X4.Store(Output, Offset + (256 / sizeof(Output[0])));
-		X5.Store(Output, Offset + (320 / sizeof(Output[0])));
-		X6.Store(Output, Offset + (384 / sizeof(Output[0])));
-		X7.Store(Output, Offset + (448 / sizeof(Output[0])));
-		X8.Store(Output, Offset + (512 / sizeof(Output[0])));
-		X9.Store(Output, Offset + (576 / sizeof(Output[0])));
-		X10.Store(Output, Offset + (640 / sizeof(Output[0])));
-		X11.Store(Output, Offset + (704 / sizeof(Output[0])));
-		X12.Store(Output, Offset + (768 / sizeof(Output[0])));
-		X13.Store(Output, Offset + (832 / sizeof(Output[0])));
-		X14.Store(Output, Offset + (896 / sizeof(Output[0])));
-		X15.Store(Output, Offset + (960 / sizeof(Output[0])));
 	}
 
 	//~~~ Methods~~~//

@@ -145,6 +145,8 @@
 #		if defined(__sparc64__)
 #			define CEX_ARCH_SPARC64
 #		endif
+#	elif defined(__alpha)
+#		define CEX_ARCH_ALPHA
 #	endif
 #endif
 
@@ -197,6 +199,62 @@ typedef unsigned char byte;
 	typedef unsigned short ushort;
 	typedef unsigned int uint;
 	typedef unsigned long ulong;
+#endif
+
+// 128 bit unsigned integer support
+#if defined(__SIZEOF_INT128__) && defined(CEX_IS_X64) && !defined(__xlc__)
+#define CEX_NATIVE_UINT128
+
+	// Prefer TI mode over __int128 as GCC rejects the latter in pedantic mode
+#if defined(__GNUG__)
+	typedef unsigned int uint128_t __attribute__((mode(TI)));
+#else
+	typedef unsigned __int128 uint128_t;
+#endif
+#endif
+
+#if defined(CEX_NATIVE_UINT128)
+// functions 'borrowed' from Botan ;)
+#	define CEX_FAST_64X64_MUL(X,Y,Low,High)					\
+	do {													\
+      const uint128_t r = static_cast<uint128_t>(X) * Y;	\
+      *High = (r >> 64) & 0xFFFFFFFFFFFFFFFFULL;			\
+      *Low = (r) & 0xFFFFFFFFFFFFFFFFULL;					\
+	} while(0)
+
+#elif defined(CEX_COMPILER_MSC) && defined(CEX_IS_X64)
+#	include <intrin.h>
+#	pragma intrinsic(_umul128)
+#	define CEX_FAST_64X64_MUL(X,Y,Low,High)					\
+	do {													\
+		*Low = _umul128(X, Y, High);						\
+	} while(0)
+
+#elif defined(CEX_COMPILER_GCC)
+#	if defined(CEX_ARCH_X86_X64)
+#		define CEX_FAST_64X64_MUL(X,Y,Low,High)									\
+		do {																	\
+		asm("mulq %3" : "=d" (*High), "=X" (*Low) : "X" (X), "rm" (Y) : "cc");	\
+		} while(0)
+#	elif defined(CEX_ARCH_ALPHA)
+#		define CEX_FAST_64X64_MUL(X,Y,Low,High)									\
+		do {																	\
+		asm("umulh %1,%2,%0" : "=r" (*High) : "r" (X), "r" (Y));				\
+		*Low = X * Y;															\
+		} while(0)
+#	elif defined(CEX_ARCH_IA64)
+#		define CEX_FAST_64X64_MUL(X,Y,Low,High)									\
+		do {																	\
+		asm("xmpy.hu %0=%1,%2" : "=f" (*High) : "f" (X), "f" (Y));				\
+		*Low = X * Y;															\
+		} while(0)
+#	elif defined(CEX_ARCH_PPC)
+#		define CEX_FAST_64X64_MUL(X,Y,Low,High)									\
+		do {																	\
+		asm("mulhdu %0,%1,%2" : "=r" (*High) : "r" (X), "r" (Y) : "cc");		\
+		*Low = X * Y;															\
+		} while(0)
+#	endif
 #endif
 
 // OS intrinsics flags
@@ -316,7 +374,7 @@ typedef unsigned char byte;
 #if defined(CEX_COMPILER_MSC)
 #	define CEX_OPTIMIZE_IGNORE __pragma(optimize("", off))
 #elif defined(CEX_COMPILER_GCC) || defined(CEX_COMPILER_MINGW)
-//	_Pragma(CEX_TO_STRING(GCC optimize("O0")))
+	_Pragma(CEX_TO_STRING(GCC optimize("O0")))
 #	define CEX_OPTIMIZE_IGNORE #pragma GCC optimize ("O0"), #pragma GCC optimize ("O0")
 #elif defined(CEX_COMPILER_CLANG)
 #	define CEX_OPTIMIZE_IGNORE __attribute__((optnone))
@@ -357,6 +415,12 @@ typedef unsigned char byte;
 // enabling this value will set asserts to throw in both debug and release modes
 //#define CEX_THROW_ASSERTIONS
 
+/// <summary>
+/// The global assertion handler template
+/// </summary>
+///
+/// <param name="Condition">The condition, must evaluate to true or assert is invoked</param>
+/// <param name="Message">The error message</param>
 template<typename T>
 inline static void CexAssert(bool Condition, const T Message)
 {
@@ -369,9 +433,17 @@ inline static void CexAssert(bool Condition, const T Message)
 #endif
 }
 
+// toggles ChaCha512 from 40 to 80 rounds of mixing
+#define CEX_CHACHA512_STRONG
+
 // enables the compact form for all digest permutations, used for performance and small code-cache cases
 // the digests will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
 #define CEX_DIGEST_COMPACT
+
+// enables the compact form for all stream cipher permutations, used for performance and small code-cache cases
+// the ciphers will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
+// Note, that this may cause cache evictions on CPUs with a small code-cache, timing should be tested on the target CPU before implementing
+#define CEX_CIPHER_COMPACT
 
 // enables/disables OS rotation intrinsics
 #if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)
@@ -383,7 +455,6 @@ inline static void CexAssert(bool Condition, const T Message)
 
 // pre-loads tables in rhx and thx into L1 for performance and as a timing attack counter measure
 #define CEX_PREFETCH_RHX_TABLES
-#define CEX_PREFETCH_THX_TABLES
 
 // enabling this value will add cpu jitter to the ACP entropy collector (slightly stronger, but much slower)
 //#define CEX_ACP_JITTER

@@ -3,7 +3,6 @@
 
 #include "CexDomain.h"
 #include "Delegate.h"
-#include <algorithm>
 
 NAMESPACE_ROUTING
 

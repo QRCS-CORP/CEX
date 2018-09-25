@@ -6,7 +6,6 @@
 #endif
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
-#include "../CEX/THX.h"
 #include "../CEX/CTR.h"
 #include "../CEX/CBC.h"
 #include "../CEX/CFB.h"
@@ -16,8 +15,11 @@
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
 #include "../CEX/OCB.h"
-#include "../CEX/ChaCha20.h"
-#include "../CEX/Salsa20.h"
+#include "../CEX/ChaCha256.h"
+#include "../CEX/ChaCha512.h"
+#include "../CEX/Threefish256.h"
+#include "../CEX/Threefish512.h"
+#include "../CEX/Threefish1024.h"
 #include "../CEX/SHA512.h"
 
 namespace Test
@@ -79,10 +81,6 @@ namespace Test
 
 			OnProgress(std::string("***SHX/ECB: (Serpent) Monte Carlo test (K=256; R=32)***"));
 			SHXSpeedTest();
-
-			OnProgress(std::string("***THX/ECB: (Twofish) Monte Carlo test (K=256; R=16)***"));
-			THXSpeedTest();
-
 
 			OnProgress(std::string("### CIPHER MODE TESTS ###"));
 			OnProgress(std::string("### Tests speeds of AES cipher mode implementations"));
@@ -153,11 +151,21 @@ namespace Test
 			OnProgress(std::string("### Tests speeds of Salsa and ChaCha stream ciphers"));
 			OnProgress(std::string("### Uses default of 20 rounds, 256 bit key"));
 			OnProgress(std::string(""));
+			OnProgress(std::string("***ChaCha256: Monte Carlo test (K=256; R=20)***"));
+			ChaCha256SpeedTest();
+#if defined(CEX_CHACHA512_STRONG)
+			OnProgress(std::string("***ChaCha512: Monte Carlo test (K=512; R=80)***"));
+#else
+			OnProgress(std::string("***ChaCha512: Monte Carlo test (K=512; R=40)***"));
+#endif
+			ChaCha512SpeedTest();
 
-			OnProgress(std::string("***Salsa20: Monte Carlo test (K=256; R=20)***"));
-			SalsaSpeedTest();
-			OnProgress(std::string("***ChaCha20: Monte Carlo test (K=256; R=20)***"));
-			ChaChaSpeedTest();
+			OnProgress(std::string("***Threefish256: Monte Carlo test (K=256; R=72)***"));
+			Threefish256SpeedTest();
+			OnProgress(std::string("***Threefish512: Monte Carlo test (K=512; R=96)***"));
+			Threefish512SpeedTest();
+			OnProgress(std::string("***Threefish1024: Monte Carlo test (K=1024; R=120)***"));
+			Threefish1024SpeedTest();
 
 			return MESSAGE;
 		}
@@ -196,15 +204,6 @@ namespace Test
 	void CipherSpeedTest::SHXSpeedTest(size_t KeySize)
 	{
 		SHX* engine = new SHX();
-		Mode::ECB* cipher = new Mode::ECB(engine);
-		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
-		delete cipher;
-		delete engine;
-	}
-
-	void CipherSpeedTest::THXSpeedTest(size_t KeySize)
-	{
-		THX* engine = new THX();
 		Mode::ECB* cipher = new Mode::ECB(engine);
 		ParallelBlockLoop(cipher, true, true, MB100, KeySize, 16, 20, m_progressEvent);
 		delete cipher;
@@ -273,17 +272,38 @@ namespace Test
 
 	//*** Stream Cipher Tests ***//
 
-	void CipherSpeedTest::ChaChaSpeedTest()
+	void CipherSpeedTest::ChaCha256SpeedTest()
 	{
-		ChaCha20* cipher = new ChaCha20();
+		ChaCha256* cipher = new ChaCha256();
 		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
 		delete cipher;
 	}
 
-	void CipherSpeedTest::SalsaSpeedTest()
+	void CipherSpeedTest::ChaCha512SpeedTest()
 	{
-		Salsa20* cipher = new Salsa20();
-		ParallelStreamLoop(cipher, 32, 8, 10, m_progressEvent);
+		ChaCha512* cipher = new ChaCha512();
+		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
+		delete cipher;
+	}
+
+	void CipherSpeedTest::Threefish256SpeedTest()
+	{
+		Threefish256* cipher = new Threefish256();
+		ParallelStreamLoop(cipher, 32, 0, 10, m_progressEvent);
+		delete cipher;
+	}
+
+	void CipherSpeedTest::Threefish512SpeedTest()
+	{
+		Threefish512* cipher = new Threefish512();
+		ParallelStreamLoop(cipher, 64, 0, 10, m_progressEvent);
+		delete cipher;
+	}
+
+	void CipherSpeedTest::Threefish1024SpeedTest()
+	{
+		Threefish1024* cipher = new Threefish1024();
+		ParallelStreamLoop(cipher, 128, 0, 10, m_progressEvent);
 		delete cipher;
 	}
 

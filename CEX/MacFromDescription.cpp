@@ -37,7 +37,7 @@ IMac* MacFromDescription::GetInstance(MacDescription &Description)
 			}
 			case Enumeration::Macs::Poly1305:
 			{
-				macPtr = new Mac::Poly1305(Description.CipherType(), Description.CipherExtension());
+				macPtr = new Mac::Poly1305;
 				break;
 			}
 			default:

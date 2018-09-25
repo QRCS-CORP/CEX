@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -47,9 +47,9 @@ NAMESPACE_DIGEST
 /// (enabled in the hash function by adding the CEX_DIGEST_COMPACT to the CexConfig file). \n
 /// The Unrolled forms are optimized for speed and timing neutrality have the U suffix. \n
 /// The H suffix denotes functions that take an SIMD wrapper class as the state values, and process message blocks in SIMD parallel blocks.</para>
-/// <para>This class contains wide forms of the functions; PermuteR24P6400H and PermuteR48P12800H use AVX2. \n
-/// Experimental functions using AVX512 instructions are also implemented; PermuteR24P6400H and PermuteR48P12800H. \n
-/// These extended functions are only visible at run-time on some development platforms (VS..), if the __AVX2__ or __AVX512__ compiler flags are declared explicitely.</para>
+/// <para>This class contains wide forms of the functions; PermuteR24P4x1600H and PermuteR48P4x1600H use AVX2. \n
+/// Experimental functions using AVX512 instructions are also implemented; PermuteR24P8x1600H and PermuteR48P8x1600H. \n
+/// These extended functions are only visible at run-time on some development platforms (VS..), if the __AVX2__ or __AVX512__ compiler flags are declared explicitly.</para>
 /// </summary>
 class Keccak
 {
@@ -121,26 +121,6 @@ public:
 	/// <param name="State">The permutations uint64 state array</param>
 	static void PermuteR48P1600U(std::array<ulong, 25> &State);
 
-#if defined(__AVX512__)
-
-	/// <summary>
-	/// The horizontally vectorized 24 round (standard) form of the SHA3 permutation function.
-	/// <para>This function processes 8*25 blocks of state in parallel using AVX512 instructions.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations ULong512 state array</param>
-	static void PermuteR24P12800H(std::vector<ULong512> &State);
-
-	/// <summary>
-	/// The horizontally vectorized 48 round (extended) form of the SHA3 permutation function.
-	/// <para>This function processes 8*25 blocks of state in parallel using AVX512 instructions.</para>
-	/// </summary>
-	/// 
-	/// <param name="State">The permutations ULong512 state array</param>
-	static void PermuteR48P12800H(std::vector<ULong512> &State);
-
-#endif
-
 #if defined(__AVX2__)
 
 	/// <summary>
@@ -149,7 +129,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations ULong256 state array</param>
-	static void PermuteR24P6400H(std::vector<ULong256> &State);
+	static void PermuteR24P4x1600H(std::vector<ULong256> &State);
 
 	/// <summary>
 	/// The horizontally vectorized 48 round form (extended) of the SHA3 permutation function.
@@ -157,7 +137,27 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="State">The permutations ULong256 state array</param>
-	static void PermuteR48P6400H(std::vector<ULong256> &State);
+	static void PermuteR48P4x1600H(std::vector<ULong256> &State);
+
+#endif
+
+#if defined(__AVX512__)
+
+	/// <summary>
+	/// The horizontally vectorized 24 round (standard) form of the SHA3 permutation function.
+	/// <para>This function processes 8*25 blocks of state in parallel using AVX512 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations ULong512 state array</param>
+	static void PermuteR24P8x1600H(std::vector<ULong512> &State);
+
+	/// <summary>
+	/// The horizontally vectorized 48 round (extended) form of the SHA3 permutation function.
+	/// <para>This function processes 8*25 blocks of state in parallel using AVX512 instructions.</para>
+	/// </summary>
+	/// 
+	/// <param name="State">The permutations ULong512 state array</param>
+	static void PermuteR48P8x1600H(std::vector<ULong512> &State);
 
 #endif
 

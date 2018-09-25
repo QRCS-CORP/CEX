@@ -180,8 +180,7 @@ void CMAC::Initialize(ISymmetricKey &KeyParams)
 
 	if (KeyParams.Info().size() != 0 &&
 		m_cipherType != BlockCiphers::Rijndael &&
-		m_cipherType != BlockCiphers::Serpent &&
-		m_cipherType != BlockCiphers::Twofish)
+		m_cipherType != BlockCiphers::Serpent)
 	{
 		if (KeyParams.Info().size() <= m_cipherMode->Engine()->DistributionCodeMax())
 		{

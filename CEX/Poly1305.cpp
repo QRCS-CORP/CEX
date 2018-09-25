@@ -1,50 +1,25 @@
 #include "Poly1305.h"
-#include "BlockCipherFromName.h"
+#include "Donna128.h"
 #include "IntUtils.h"
 
 NAMESPACE_MAC
 
+using Numeric::Donna128;
 using Utility::IntUtils;
+using Utility::MemUtils;
 
 const std::string Poly1305::CLASS_NAME("Poly1305");
 
 //~~~Constructor~~~//
 
-Poly1305::Poly1305(BlockCiphers CipherType, BlockCipherExtensions CipherExtensionType)
+Poly1305::Poly1305()
 	:
-	m_autoClamp(true),
-	m_blockCipher(CipherType != BlockCiphers::None ? Helper::BlockCipherFromName::GetInstance(CipherType, CipherExtensionType) : nullptr),
-	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, 0, 0), SymmetricKeySize(KEY_SIZE, BLOCK_SIZE, 0) },
-	m_macState(),
+	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, 0, 0) },
 	m_msgBuffer(BLOCK_SIZE),
 	m_msgLength(0)
 {
-	if (static_cast<byte>(CipherType) > static_cast<byte>(BlockCiphers::Twofish))
-	{
-		throw CryptoMacException("Poly1305:Ctor", "HX ciphers are not supported with Poly1305!");
-	}
-}
-
-Poly1305::Poly1305(IBlockCipher* Cipher)
-	:
-	m_autoClamp(true),
-	m_blockCipher(Cipher != nullptr ? Cipher : 
-		throw CryptoMacException("Poly1305:Ctor", "The block cipher instance can not be null!")),
-	m_destroyEngine(false),
-	m_isDestroyed(false),
-	m_isInitialized(false),
-	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, 0, 0), SymmetricKeySize(KEY_SIZE, BLOCK_SIZE, 0) },
-	m_macState(),
-	m_msgBuffer(BLOCK_SIZE),
-	m_msgLength(0)
-{
-	if (static_cast<byte>(m_blockCipher->Enumeral()) > static_cast<byte>(BlockCiphers::Twofish))
-	{
-		throw CryptoMacException("Poly1305:Ctor", "HX ciphers are not supported with Poly1305!");
-	}
 }
 
 Poly1305::~Poly1305()
@@ -54,35 +29,14 @@ Poly1305::~Poly1305()
 		m_isDestroyed = true;
 		m_isInitialized = false;
 		m_msgLength = 0;
-		m_macState.Reset();
+		Utility::IntUtils::ClearArray(m_macState);
 		Utility::IntUtils::ClearVector(m_legalKeySizes);
 		Utility::IntUtils::ClearVector(m_msgBuffer);
 
-		if (m_destroyEngine)
-		{
-			m_destroyEngine = false;
-
-			if (m_blockCipher != nullptr)
-			{
-				m_blockCipher.reset(nullptr);
-			}
-		}
-		else
-		{
-			if (m_blockCipher != nullptr)
-			{
-				m_blockCipher.release();
-			}
-		}
 	}
 }
 
 //~~~Accessors~~~//
-
-bool &Poly1305::AutoClamp()
-{
-	return m_autoClamp;
-}
 
 const size_t Poly1305::BlockSize()
 {
@@ -92,11 +46,6 @@ const size_t Poly1305::BlockSize()
 const Macs Poly1305::Enumeral()
 {
 	return Macs::Poly1305;
-}
-
-const size_t Poly1305::MacSize()
-{
-	return BLOCK_SIZE;
 }
 
 const bool Poly1305::IsInitialized()
@@ -109,30 +58,28 @@ std::vector<SymmetricKeySize> Poly1305::LegalKeySizes() const
 	return m_legalKeySizes;
 };
 
+const size_t Poly1305::MacSize()
+{
+	return BLOCK_SIZE;
+}
+
 const std::string Poly1305::Name()
 {
-	return (m_blockCipher != nullptr) ? (CLASS_NAME + "-" + m_blockCipher->Name()) : CLASS_NAME;
+	return CLASS_NAME;
 }
 
 //~~~Public Functions~~~//
 
-void Poly1305::Clamp(std::vector<byte> &Key)
-{
-	// r3, r7, r11, r15 have top four bits clear (0,1,... 15)
-	Key[3] &= R_MASK_HIGH_4;
-	Key[7] &= R_MASK_HIGH_4;
-	Key[11] &= R_MASK_HIGH_4;
-	Key[15] &= R_MASK_HIGH_4;
-
-	// r4, r8, r12 have bottom two bits clear (0,4,8,... 252)
-	Key[4] &= R_MASK_LOW_2;
-	Key[8] &= R_MASK_LOW_2;
-	Key[12] &= R_MASK_LOW_2;
-}
-
 void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("Poly1305:Compute", "The MAC has not been initialized!");
+	}
+	if (Output.size() < BLOCK_SIZE)
+	{
+		throw CryptoMacException("Poly1305:Compute", "The Output buffer is too short!");
+	}
 
 	if (Output.size() != BLOCK_SIZE)
 	{
@@ -145,64 +92,94 @@ void Poly1305::Compute(const std::vector<byte> &Input, std::vector<byte> &Output
 
 size_t Poly1305::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
-	CexAssert((Output.size() - OutOffset) >= BLOCK_SIZE, "The Output buffer is too short");
-
-	if (m_msgLength > 0)
+	if (!m_isInitialized)
 	{
-		ProcessBlock(m_msgBuffer, 0, m_msgLength);
+		throw CryptoMacException("Poly1305:Finalize", "The MAC has not been initialized!");
+	}
+	if ((Output.size() - OutOffset) < BLOCK_SIZE)
+	{
+		throw CryptoMacException("Poly1305:Finalize", "The Output buffer is too short!");
 	}
 
-	uint b = m_macState.H[0] >> 26;
-	m_macState.H[0] = m_macState.H[0] & 0x3FFFFFFUL;
-	m_macState.H[1] += b;
-	b = m_macState.H[1] >> 26; 
-	m_macState.H[1] = m_macState.H[1] & 0x3FFFFFFUL;
-	m_macState.H[2] += b; 
-	b = m_macState.H[2] >> 26;
-	m_macState.H[2] = m_macState.H[2] & 0x3FFFFFFUL;
-	m_macState.H[3] += b;
-	b = m_macState.H[3] >> 26; 
-	m_macState.H[3] = m_macState.H[3] & 0x3FFFFFFUL;
-	m_macState.H[4] += b; 
-	b = m_macState.H[4] >> 26; 
-	m_macState.H[4] = m_macState.H[4] & 0x3FFFFFFUL;
-	m_macState.H[0] += b * 5;
+	ulong c;
+	ulong g0;
+	ulong g1;
+	ulong g2;
+	ulong h0;
+	ulong h1;
+	ulong h2;
 
-	uint g0 = m_macState.H[0] + 5;
-	b = g0 >> 26;
-	g0 &= 0x3FFFFFFUL;
-	uint g1 = m_macState.H[1] + b;
-	b = g1 >> 26; 
-	g1 &= 0x3FFFFFFUL;
-	uint g2 = m_macState.H[2] + b;
-	b = g2 >> 26;
-	g2 &= 0x3FFFFFFUL;
-	uint g3 = m_macState.H[3] + b;
-	b = g3 >> 26; 
-	g3 &= 0x3FFFFFFUL;
-	uint g4 = m_macState.H[4] + b - (1 << 26);
+	if (m_msgLength != 0)
+	{
+		m_msgBuffer[m_msgLength] = 1;
+		const size_t RMDLEN = m_msgBuffer.size() - m_msgLength - 1;
 
-	b = (g4 >> 31) - 1;
-	uint nb = ~b;
-	m_macState.H[0] = (m_macState.H[0] & nb) | (g0 & b);
-	m_macState.H[1] = (m_macState.H[1] & nb) | (g1 & b);
-	m_macState.H[2] = (m_macState.H[2] & nb) | (g2 & b);
-	m_macState.H[3] = (m_macState.H[3] & nb) | (g3 & b);
-	m_macState.H[4] = (m_macState.H[4] & nb) | (g4 & b);
+		if (RMDLEN > 0)
+		{
+			MemUtils::Clear(m_msgBuffer, m_msgLength + 1, RMDLEN);
+		}
 
-	ulong f0 = (m_macState.H[0] | (m_macState.H[1] << 26)) + static_cast<ulong>(m_macState.K[0]);
-	ulong f1 = ((m_macState.H[1] >> 6) | (m_macState.H[2] << 20)) + static_cast<ulong>(m_macState.K[1]);
-	ulong f2 = ((m_macState.H[2] >> 12) | (m_macState.H[3] << 14)) + static_cast<ulong>(m_macState.K[2]);
-	ulong f3 = ((m_macState.H[3] >> 18) | (m_macState.H[4] << 8)) + static_cast<ulong>(m_macState.K[3]);
+		Process(m_msgBuffer, 0, BLOCK_SIZE, true);
+	}
 
-	IntUtils::Le32ToBytes((uint)f0, Output, OutOffset);
-	f1 += (f0 >> 32);
-	IntUtils::Le32ToBytes((uint)f1, Output, OutOffset + 4);
-	f2 += (f1 >> 32);
-	IntUtils::Le32ToBytes((uint)f2, Output, OutOffset + 8);
-	f3 += (f2 >> 32);
-	IntUtils::Le32ToBytes((uint)f3, Output, OutOffset + 12);
+	h0 = m_macState[3];
+	h1 = m_macState[4];
+	h2 = m_macState[5];
+
+	c = (h1 >> 44);
+	h1 &= 0xFFFFFFFFFFFULL;
+	h2 += c;  
+	c = (h2 >> 42);
+	h2 &= 0x3FFFFFFFFFFULL;
+	h0 += c * 5;
+	c = (h0 >> 44);
+	h0 &= 0xFFFFFFFFFFFULL;
+	h1 += c;
+	c = (h1 >> 44);
+	h1 &= 0xFFFFFFFFFFFULL;
+	h2 += c;
+	c = (h2 >> 42);
+	h2 &= 0x3FFFFFFFFFFULL;
+	h0 += c * 5;
+	c = (h0 >> 44);
+	h0 &= 0xFFFFFFFFFFFULL;
+	h1 += c;
+	// compute h + -p
+	g0 = h0 + 5;
+	c = (g0 >> 44);
+	g0 &= 0xFFFFFFFFFFFULL;
+	g1 = h1 + c;
+	c = (g1 >> 44);
+	g1 &= 0xFFFFFFFFFFFULL;
+	g2 = h2 + (c - (static_cast<ulong>(1) << 42));
+	// select h if h < p, or h + -p if h >= p
+	c = (g2 >> ((sizeof(ulong) * 8) - 1)) - 1;
+	g0 &= c;
+	g1 &= c;
+	g2 &= c;
+	c = ~c;
+	h0 = (h0 & c) | g0;
+	h1 = (h1 & c) | g1;
+	h2 = (h2 & c) | g2;
+
+	// h = h + pad
+	const ulong T0 = m_macState[6];
+	const ulong T1 = m_macState[7];
+	h0 += (T0 & 0xFFFFFFFFFFFULL);
+	c = (h0 >> 44);
+	h0 &= 0xFFFFFFFFFFFULL;
+	h1 += (((T0 >> 44) | (T1 << 20)) & 0xFFFFFFFFFFFULL) + c;
+	c = (h1 >> 44);
+	h1 &= 0xFFFFFFFFFFF;
+	h2 += (((T1 >> 24)) & 0x3FFFFFFFFFFULL) + c;
+	h2 &= 0x3FFFFFFFFFFULL;
+	// mac = h % 2^128
+	h0 = ((h0) | (h1 << 44));
+	h1 = ((h1 >> 20) | (h2 << 24));
+
+	IntUtils::Le64ToBytes(h0, Output, OutOffset);
+	IntUtils::Le64ToBytes(h1, Output, OutOffset + sizeof(ulong));
+
 	Reset();
 
 	return BLOCK_SIZE;
@@ -214,85 +191,34 @@ void Poly1305::Initialize(ISymmetricKey &KeyParams)
 	{
 		throw CryptoMacException("Poly1305:Initialize", "Key size is invalid; must be a legal key size!");
 	}
-	if (!m_autoClamp && m_blockCipher != nullptr && KeyParams.Nonce().size() == BLOCK_SIZE && !IsClamped(KeyParams.Key()))
-	{
-		throw CryptoMacException("Poly1305:Initialize", "The key is invalid; must be clamped before initialized!");
-	}
 
 	if (m_isInitialized)
 	{
 		Reset();
 	}
 
-	std::vector<byte> tmpR(BLOCK_SIZE);
-	std::memcpy(&tmpR[0], &KeyParams.Key()[0], BLOCK_SIZE);
+	const ulong T0 = IntUtils::LeBytesTo64(KeyParams.Key(), 0);
+	const ulong T1 = IntUtils::LeBytesTo64(KeyParams.Key(), 1 * sizeof(ulong));
 
-	// with the Poly1305-AES version, if the input key has not been pre-conditioned and autoclamp is set, 
-	// clamp the R portion of the key automatically rather than throw an exception
-	if (m_autoClamp && m_blockCipher != nullptr && KeyParams.Nonce().size() == BLOCK_SIZE && !IsClamped(tmpR))
-	{
-		Clamp(tmpR);
-	}
-
-	uint t0 = IntUtils::LeBytesTo32(tmpR, 0);
-	uint t1 = IntUtils::LeBytesTo32(tmpR, 4);
-	uint t2 = IntUtils::LeBytesTo32(tmpR, 8);
-	uint t3 = IntUtils::LeBytesTo32(tmpR, 12);
-
-	// clamping
-	m_macState.R[0] = t0 & 0x03FFFFFFUL;
-	m_macState.R[1] = ((t0 >> 26) | (t1 << 6)) & 0x03FFFF03UL;
-	m_macState.R[2] = ((t1 >> 20) | (t2 << 12)) & 0x03FFC0FFUL;
-	m_macState.R[3] = ((t2 >> 14) | (t3 << 18)) & 0x03F03FFFUL;
-	m_macState.R[4] = (t3 >> 8) & 0x000FFFFFUL;
-
-	// precompute multipliers
-	m_macState.S[0] = m_macState.R[1] * 5;
-	m_macState.S[1] = m_macState.R[2] * 5;
-	m_macState.S[2] = m_macState.R[3] * 5;
-	m_macState.S[3] = m_macState.R[4] * 5;
-
-	std::vector<byte> tmpK(0);
-	size_t kOff;
-
-	if (m_blockCipher != nullptr && KeyParams.Nonce().size() == BLOCK_SIZE)
-	{
-		// use encrypted nonce
-		tmpK.resize(BLOCK_SIZE);
-		kOff = 0;
-		std::vector<byte> cprK(BLOCK_SIZE);
-		std::memcpy(&cprK[0], &KeyParams.Key()[BLOCK_SIZE], BLOCK_SIZE);
-		m_blockCipher->Initialize(true, Key::Symmetric::SymmetricKey(cprK));
-		m_blockCipher->EncryptBlock(KeyParams.Nonce(), 0, tmpK, 0);
-	}
-	else
-	{
-		tmpK = KeyParams.Key();
-		kOff = BLOCK_SIZE;
-	}
-
-	m_macState.K[0] = IntUtils::LeBytesTo32(tmpK, kOff + 0);
-	m_macState.K[1] = IntUtils::LeBytesTo32(tmpK, kOff + 4);
-	m_macState.K[2] = IntUtils::LeBytesTo32(tmpK, kOff + 8);
-	m_macState.K[3] = IntUtils::LeBytesTo32(tmpK, kOff + 12);
+	m_macState[0] = T0 & 0xFFC0FFFFFFFULL;
+	m_macState[1] = ((T0 >> 44) | (T1 << 20)) & 0xFFFFFC0FFFFULL;
+	m_macState[2] = ((T1 >> 24)) & 0x00FFFFFFC0FULL;
+	// h = 0
+	m_macState[3] = 0;
+	m_macState[4] = 0;
+	m_macState[5] = 0;
+	// store pad
+	m_macState[6] = IntUtils::LeBytesTo64(KeyParams.Key(), 2 * sizeof(ulong));
+	m_macState[7] = IntUtils::LeBytesTo64(KeyParams.Key(), 3 * sizeof(ulong));
 
 	m_isInitialized = true;
 }
 
-bool Poly1305::IsClamped(const std::vector<byte> &Key)
-{
-	std::vector<byte> tmpK(Key.size());
-	std::memcpy(&tmpK[0], &Key[0], Key.size());
-	Clamp(tmpK);
-
-	return (Key == tmpK);
-}
-
 void Poly1305::Reset()
 {
+	Utility::MemUtils::Clear(m_macState, 0, m_macState.size());
 	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
 	m_msgLength = 0;
-	m_macState.Reset();
 	m_isInitialized = false;
 }
 
@@ -302,7 +228,7 @@ void Poly1305::Update(byte Input)
 
 	if (m_msgLength == m_msgBuffer.size())
 	{
-		ProcessBlock(m_msgBuffer, 0, BLOCK_SIZE);
+		Process(m_msgBuffer, 0, BLOCK_SIZE, false);
 		m_msgLength = 0;
 	}
 
@@ -325,23 +251,20 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
-			ProcessBlock(m_msgBuffer, 0, BLOCK_SIZE);
+			Process(m_msgBuffer, 0, BLOCK_SIZE, false);
 			m_msgLength = 0;
 			InOffset += RMDLEN;
 			Length -= RMDLEN;
 		}
 
-		// loop through blocks
-		while (Length >= BLOCK_SIZE)
-		{
-			ProcessBlock(Input, InOffset, BLOCK_SIZE);
-			Length -= BLOCK_SIZE;
-			InOffset += BLOCK_SIZE;
-		}
+		const size_t ALNLEN = (Length / BLOCK_SIZE) * BLOCK_SIZE;
+		Process(Input, InOffset, ALNLEN, false);
+		Length -= ALNLEN;
+		InOffset += ALNLEN;
 
 		if (Length > 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -349,71 +272,66 @@ void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-ulong Poly1305::CMul(uint A, uint B)
+void Poly1305::Process(const std::vector<byte> &Input, size_t InOffset, size_t Length, bool IsFinal)
 {
-	return static_cast<ulong>(A) * B;
-}
+#if !defined(CEX_NATIVE_UINT128)
+	typedef Numeric::Donna128 uint128_t;
+#endif
 
-void Poly1305::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, size_t Length)
-{
-	ulong t0;
-	ulong t1;
-	ulong t2;
-	ulong t3;
+	const ulong HIBIT = IsFinal ? 0 : (static_cast<ulong>(1) << 40);
+	const ulong R0 = m_macState[0];
+	const ulong R1 = m_macState[1];
+	const ulong R2 = m_macState[2];
+	const ulong S1 = R1 * (5 << 2);
+	const ulong S2 = R2 * (5 << 2);
 
-	if (Length >= BLOCK_SIZE)
+	uint128_t d0;
+	uint128_t d1;
+	uint128_t d2;
+	size_t blkCtr;
+	ulong c;
+	ulong h0;
+	ulong h1;
+	ulong h2;
+
+	blkCtr = Length / BLOCK_SIZE;
+	h0 = m_macState[3];
+	h1 = m_macState[4];
+	h2 = m_macState[5];
+
+	while (blkCtr != 0)
 	{
-		t0 = IntUtils::LeBytesTo32(Input, InOffset);
-		t1 = IntUtils::LeBytesTo32(Input, InOffset + 4);
-		t2 = IntUtils::LeBytesTo32(Input, InOffset + 8);
-		t3 = IntUtils::LeBytesTo32(Input, InOffset + 12);
+		// h += m[i]
+		const ulong T0 = IntUtils::LeBytesTo64(Input, InOffset);
+		const ulong T1 = IntUtils::LeBytesTo64(Input, InOffset + sizeof(ulong));
+		h0 += T0 & 0xFFFFFFFFFFFULL;
+		h1 += ((T0 >> 44) | (T1 << 20)) & 0xFFFFFFFFFFFULL;
+		h2 += (((T1 >> 24)) & 0x3FFFFFFFFFFULL) | HIBIT;
+		// h *= r
+		d0 = (uint128_t(h0) * R0) + (uint128_t(h1) * S2) + (uint128_t(h2) * S1);
+		d1 = (uint128_t(h0) * R1) + (uint128_t(h1) * R0) + (uint128_t(h2) * S2);
+		d2 = (uint128_t(h0) * R2) + (uint128_t(h1) * R1) + (uint128_t(h2) * R0);
+		// partial h %= p
+		c = Donna128::CarryShift(d0, 44);
+		h0 = d0 & 0xFFFFFFFFFFFULL;
+		d1 += c;
+		c = Donna128::CarryShift(d1, 44);
+		h1 = d1 & 0xFFFFFFFFFFFULL;
+		d2 += c;
+		c = Donna128::CarryShift(d2, 42);
+		h2 = d2 & 0x3FFFFFFFFFFULL;
+		h0 += c * 5;
+		c = Donna128::CarryShift(h0, 44);
+		h0 = h0 & 0xFFFFFFFFFFFULL;
+		h1 += c;
+
+		InOffset += BLOCK_SIZE;
+		--blkCtr;
 	}
-	else
-	{
-		std::array<byte, BLOCK_SIZE> buffer;
-		std::memset(&buffer[Length], 0, BLOCK_SIZE - Length);
-		std::memcpy(&buffer[0], &Input[InOffset], Length);
-		buffer[Length] = 1;
 
-		t0 = IntUtils::LeBytesTo32(buffer, 0);
-		t1 = IntUtils::LeBytesTo32(buffer, 4);
-		t2 = IntUtils::LeBytesTo32(buffer, 8);
-		t3 = IntUtils::LeBytesTo32(buffer, 12);
-	}
-
-	m_macState.H[0] += static_cast<uint>(t0 & 0x3FFFFFFUL);
-	m_macState.H[1] += static_cast<uint>((((t1 << 32) | t0) >> 26) & 0x3FFFFFFUL);
-	m_macState.H[2] += static_cast<uint>((((t2 << 32) | t1) >> 20) & 0x3FFFFFFUL);
-	m_macState.H[3] += static_cast<uint>((((t3 << 32) | t2) >> 14) & 0x3FFFFFFUL);
-	m_macState.H[4] += static_cast<uint>(t3 >> 8);
-
-	if (Length == BLOCK_SIZE)
-	{
-		m_macState.H[4] += (1 << 24);
-	}
-
-	ulong tp0 = CMul(m_macState.H[0], m_macState.R[0]) + CMul(m_macState.H[1], m_macState.S[3]) + CMul(m_macState.H[2], m_macState.S[2]) + CMul(m_macState.H[3], m_macState.S[1]) + CMul(m_macState.H[4], m_macState.S[0]);
-	ulong tp1 = CMul(m_macState.H[0], m_macState.R[1]) + CMul(m_macState.H[1], m_macState.R[0]) + CMul(m_macState.H[2], m_macState.S[3]) + CMul(m_macState.H[3], m_macState.S[2]) + CMul(m_macState.H[4], m_macState.S[1]);
-	ulong tp2 = CMul(m_macState.H[0], m_macState.R[2]) + CMul(m_macState.H[1], m_macState.R[1]) + CMul(m_macState.H[2], m_macState.R[0]) + CMul(m_macState.H[3], m_macState.S[3]) + CMul(m_macState.H[4], m_macState.S[2]);
-	ulong tp3 = CMul(m_macState.H[0], m_macState.R[3]) + CMul(m_macState.H[1], m_macState.R[2]) + CMul(m_macState.H[2], m_macState.R[1]) + CMul(m_macState.H[3], m_macState.R[0]) + CMul(m_macState.H[4], m_macState.S[3]);
-	ulong tp4 = CMul(m_macState.H[0], m_macState.R[4]) + CMul(m_macState.H[1], m_macState.R[3]) + CMul(m_macState.H[2], m_macState.R[2]) + CMul(m_macState.H[3], m_macState.R[1]) + CMul(m_macState.H[4], m_macState.R[0]);
-
-	ulong b;
-	m_macState.H[0] = static_cast<uint>(tp0 & 0x3FFFFFFUL);
-	b = (tp0 >> 26);
-	tp1 += b; 
-	m_macState.H[1] = static_cast<uint>(tp1 & 0x3FFFFFFUL);
-	b = (tp1 >> 26);
-	tp2 += b;
-	m_macState.H[2] = static_cast<uint>(tp2 & 0x3FFFFFFUL);
-	b = (tp2 >> 26);
-	tp3 += b;
-	m_macState.H[3] = static_cast<uint>(tp3 & 0x3FFFFFFUL);
-	b = (tp3 >> 26);
-	tp4 += b;
-	m_macState.H[4] = static_cast<uint>(tp4 & 0x3FFFFFFUL);
-	b = (tp4 >> 26);
-	m_macState.H[0] += static_cast<uint>(b * 5);
+	m_macState[3] = h0;
+	m_macState[4] = h1;
+	m_macState[5] = h2;
 }
 
 NAMESPACE_MACEND

@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -21,19 +21,21 @@
 
 #include "CexDomain.h"
 #include "CryptoSymmetricCipherException.h"
-#include "IntUtils.h"
+#include "IMac.h"
 #include "ISymmetricKey.h"
 #include "ParallelOptions.h"
 #include "ParallelUtils.h"
+#include "StreamAuthenticators.h"
 #include "StreamCiphers.h"
 #include "SymmetricKeySize.h"
 
 NAMESPACE_STREAM
 
 using Exception::CryptoSymmetricCipherException;
-using Utility::IntUtils;
+using Mac::IMac;
 using Key::Symmetric::ISymmetricKey;
 using Common::ParallelOptions;
+using Enumeration::StreamAuthenticators;
 using Enumeration::StreamCiphers;
 using Key::Symmetric::SymmetricKeySize;
 
@@ -90,6 +92,12 @@ public:
 	virtual const std::vector<byte> &DistributionCode() = 0;
 
 	/// <summary>
+	/// Read Only: The maximum size of the distribution code in bytes.
+	/// <para>The distribution code can be used as a secondary domain key.</para>
+	/// </summary>
+	virtual const size_t DistributionCodeMax() = 0;
+
+	/// <summary>
 	/// Read Only: The stream ciphers type name
 	/// </summary>
 	virtual const StreamCiphers Enumeral() = 0;
@@ -140,14 +148,35 @@ public:
 	/// </summary>
 	virtual const size_t Rounds() = 0;
 
+	/// <summary>
+	/// Read Only: The legal tag length in bytes
+	/// </summary>
+	virtual const size_t TagSize() = 0;
+
 	//~~~Public Functions~~~//
+
+	/// <summary>
+	/// Calculate the MAC code (Tag) and copy it to the Output array.   
+	/// <para>The output array must be of sufficient length to receive the MAC code.
+	/// This function finalizes the Encryption/Decryption cycle, all data must be processed before this function is called.
+	/// Initialize(bool, ISymmetricKey) must be called before the cipher can be re-used.</para>
+	/// </summary>
+	/// 
+	/// <param name="Output">The output array that receives the authentication code</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
+	/// <param name="Length">The number of MAC code bytes to write to the output array.
+	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
+	virtual void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) = 0;
 
 	/// <summary>
 	/// Initialize the cipher
 	/// </summary>
 	/// 
 	/// <param name="KeyParams">Cipher key container. The LegalKeySizes property contains valid sizes</param>
-	virtual void Initialize(ISymmetricKey &KeyParams) = 0;
+	/// <param name="Encryption">Using Encryption or Decryption mode</param>
+	virtual void Initialize(bool Encryption, ISymmetricKey &KeyParams) = 0;
 
 	/// <summary>
 	/// Set the maximum number of threads allocated when using multi-threaded processing.

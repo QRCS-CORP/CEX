@@ -390,7 +390,7 @@ void Skein512::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Lengt
 void Skein512::Initialize()
 {
 	std::vector<ulong> tmp = m_treeParams.GetConfig();
-	std::array<ulong, 8> cfg{tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
+	std::array<ulong, 8> cfg{ tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7] };
 	LoadState(m_dgtState[0], cfg);
 
 	if (m_parallelProfile.IsParallel())
@@ -429,12 +429,12 @@ void Skein512::LoadState(Skein512State &State, std::array<ulong, 8> &Config)
 void Skein512::Permute(std::array<ulong, 8> &Message, Skein512State &State)
 {
 #if defined(__AVX2__)
-	Skein::PemuteR72P512V(Message, State.S, State.T);
+	Skein::PemuteR72P512V(Message, State.T, State.S);
 #else
 #	if defined(CEX_DIGEST_COMPACT)
-		Skein::PemuteR72P512C(Message, State.S, State.T);
+		Skein::PemuteP512C(Message, State.T, State.S, 72);
 #	else
-		Skein::PemuteR72P512U(Message, State.S, State.T);
+		Skein::PemuteR72P512U(Message, State.T, State.S);
 #	endif
 #endif
 }

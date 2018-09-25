@@ -39,13 +39,9 @@ enum class SymmetricEngines : byte
 	/// </summary>
 	SHX = 34,
 	/// <summary>
-	/// An implementation based on the Twofish Block Cipher extended with an HKDF key schedule
-	/// </summary>
-	THX = 35,
-	/// <summary>
 	/// An implementation of the ChaCha stream cipher
 	/// </summary>
-	ChaCha20 = 64,
+	ChaCha256 = 64,
 	/// <summary>
 	/// An implementation of the Salsa stream cipher
 	/// </summary>

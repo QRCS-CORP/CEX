@@ -4,7 +4,6 @@
 #include "../CEX/AHX.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
-#include "../CEX/THX.h"
 
 namespace Test
 {
@@ -20,8 +19,7 @@ namespace Test
 		m_key(3),
 		m_progressEvent(),
 		m_rhxExp(0),
-		m_shxExp(0),
-		m_thxExp(0)
+		m_shxExp(0)
 	{
 	}
 
@@ -101,23 +99,6 @@ namespace Test
 			CipherMonteCarlo(BlockCiphers::SHX, BlockCipherExtensions::SHAKE512, m_key[2], m_shxExp[12]);
 			OnProgress(std::string("SHX: Passed SHX Monte Carlo tests.."));
 
-			// Twofish-256
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::None, m_key[0], m_thxExp[0]);
-			// original vectors: each variation of THX/TSX with 256, 512, and 1024bit keys
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF256, m_key[0], m_thxExp[1]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF256, m_key[1], m_thxExp[2]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF256, m_key[2], m_thxExp[3]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF512, m_key[0], m_thxExp[4]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF512, m_key[1], m_thxExp[5]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::HKDF512, m_key[2], m_thxExp[6]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE256, m_key[0], m_thxExp[7]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE256, m_key[1], m_thxExp[8]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE256, m_key[2], m_thxExp[9]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE512, m_key[0], m_thxExp[10]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE512, m_key[1], m_thxExp[11]);
-			CipherMonteCarlo(BlockCiphers::THX, BlockCipherExtensions::SHAKE512, m_key[2], m_thxExp[12]);
-			OnProgress(std::string("THX: Passed THX Monte Carlo tests.."));
-
 			return SUCCESS;
 		}
 		catch (TestException const &ex)
@@ -168,24 +149,6 @@ namespace Test
 			std::string("66BA4CFB7419013ABE1B5EB53B6912FE")		// SSX-1024, SHAKE-512
 		};
 		HexConverter::Decode(shxexp, 13, m_shxExp);
-
-		const std::vector<std::string> thxexp =
-		{
-			std::string("7E8E4F3257D67A34A99116FCB6BDD3E2"),	// Twofish-256, standard
-			std::string("D0AEAF0339D138C24DF4460DCD9D7C57"),	// THX-256, HKDF(SHA2-256)
-			std::string("EE238BF78F970053B7E2DE88D3FAA221"),	// THX-512, HKDF(SHA2-256)
-			std::string("24CA3AA3B108150F6D4D97757EFD2023"),	// THX-1024, HKDF(SHA2-256)
-			std::string("2B89A9913E21E8B37434E094DE8C0B71"),	// THX-256, HKDF(SHA2-512)
-			std::string("83839A97CF5783DE0FC685D382D473E0"),	// THX-512, HKDF(SHA2-512)
-			std::string("61C03FCF9B9B737C7CA0EC7E4398420F"),	// THX-1024, HKDF(SHA2-512)
-			std::string("7459BF875AF01F8F615822CD8B860317"),	// TSX-256, SHAKE-256
-			std::string("F4D5989263867DE77FC687FA2A5FFB0A"),	// TSX-512, SHAKE-256
-			std::string("56BD36E2C96B9ADC0703779E87DE30F6"),	// TSX-1024, SHAKE-256
-			std::string("EC237F8EBB6C8DA93B71A39638EA7AD6"),	// TSX-256, SHAKE-512
-			std::string("5E3D2B5C5D86BB62AE0AF48DEBA590DD"),	// TSX-512, SHAKE-512
-			std::string("E4B33E31903327E201B799717DBBCE28")		// TSX-1024, SHAKE-512
-		};
-		HexConverter::Decode(thxexp, 13, m_thxExp);
 
 		m_key[0].resize(32);
 		m_key[1].resize(64);

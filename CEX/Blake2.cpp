@@ -1307,7 +1307,6 @@ void Blake2::PermuteR10P512U(const std::vector<byte> &Input, size_t InOffset, st
 
 void Blake2::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, std::array<uint, 8> &State, const std::array<uint, 8> &IV)
 {
-#if defined(__AVX__)
 
 	__m128i R1, R2, R3, R4;
 	__m128i B1, B2, B3, B4;
@@ -1856,12 +1855,13 @@ void Blake2::PermuteR10P512V(const std::vector<byte> &Input, size_t InOffset, st
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[0]), _mm_xor_si128(FF0, _mm_xor_si128(R1, R3)));
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[4]), _mm_xor_si128(FF1, _mm_xor_si128(R2, R4)));
 
-#else
-	PermuteR10P512U(Input, InOffset, State, IV);
-#endif
 }
 
-void Blake2::PermuteR10P4096H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV)
+#endif
+
+#if defined(__AVX__)
+
+void Blake2::PermuteR10P8x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State, const std::vector<UInt256> &IV)
 {
 	std::array<UInt256, 16> M;
 	std::array<UInt256, 16> R{
@@ -2022,7 +2022,7 @@ void Blake2::PermuteR10P4096H(const std::vector<byte> &Input, size_t InOffset, s
 
 #if defined(__AVX512__)
 
-void Blake2::PermuteR10P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State, const std::vector<UInt512> &IV)
+void Blake2::PermuteR10P16x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State, const std::vector<UInt512> &IV)
 {
 	std::array<UInt512, 16> M;
 	std::array<UInt512, 16> R{
@@ -3636,11 +3636,10 @@ void Blake2::PermuteR12P1024U(const std::vector<byte> &Input, size_t InOffset, s
 	State[7] ^= R7 ^ R15;
 }
 
+#if defined(__AVX__)
 
 void Blake2::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, std::array<ulong, 8> &State, const std::array<ulong, 8> &IV)
 {
-#if defined(__AVX__)
-
 	const __m128i M0 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset]));
 	const __m128i M1 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 16]));
 	const __m128i M2 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&Input[InOffset + 32]));
@@ -4457,15 +4456,13 @@ void Blake2::PermuteR12P1024V(const std::vector<byte> &Input, size_t InOffset, s
 	RH2 = _mm_xor_si128(RH4, RH2);
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[4]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[4])), RL2));
 	_mm_storeu_si128(reinterpret_cast<__m128i*>(&State[6]), _mm_xor_si128(_mm_loadu_si128(reinterpret_cast<const __m128i*>(&State[6])), RH2));
-
-#else
-	PermuteR12P1024U(Input, InOffset, State, IV);
-#endif
 }
+
+#endif
 
 #if defined(__AVX__)
 
-void Blake2::PermuteR12P4096H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV)
+void Blake2::PermuteR12P4x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State, const std::vector<ULong256> &IV)
 {
 	std::array<ULong256, 16> M;
 	std::array<ULong256, 16> R{
@@ -4486,7 +4483,6 @@ void Blake2::PermuteR12P4096H(const std::vector<byte> &Input, size_t InOffset, s
 		IV[6],
 		IV[7] };
 	size_t i;
-
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	MemUtils::Copy(Input, InOffset, M, 0, M.size() * sizeof(ULong256));
@@ -4623,7 +4619,7 @@ void Blake2::PermuteR12P4096H(const std::vector<byte> &Input, size_t InOffset, s
 
 #if defined(__AVX512__)
 
-void Blake2::PermuteR12P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, const std::vector<ULong512> &IV)
+void Blake2::PermuteR12P8x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State, const std::vector<ULong512> &IV)
 {
 	std::array<ULong512, 16> M;
 	std::array<ULong512, 16> R{
@@ -4644,7 +4640,6 @@ void Blake2::PermuteR12P8192H(const std::vector<byte> &Input, size_t InOffset, s
 		IV[6],
 		IV[7] };
 	size_t i;
-
 
 #if defined(CEX_IS_LITTLE_ENDIAN)
 	MemUtils::Copy(Input, InOffset, M, 0, M.size() * sizeof(ULong512));
@@ -4782,4 +4777,5 @@ void Blake2::PermuteR12P8192H(const std::vector<byte> &Input, size_t InOffset, s
 }
 
 #endif
+
 NAMESPACE_DIGESTEND

@@ -11,7 +11,7 @@ NAMESPACE_ENUMERATION
 enum class Macs : byte
 {
 	/// <summary>
-	/// No kdf is specified
+	/// No MAC is specified
 	/// </summary>
 	None = 0,
 	/// <summary>

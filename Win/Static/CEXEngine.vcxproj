@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -22,33 +22,33 @@
     <ProjectGuid>{FF7AB9CB-BF7B-4E0E-A3EF-F4141810B24A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CEX</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
     <ProjectName>CEX</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -212,7 +212,8 @@
     <ClInclude Include="..\..\CEX\CBC.h" />
     <ClInclude Include="..\..\CEX\CFB.h" />
     <ClInclude Include="..\..\CEX\ChaCha.h" />
-    <ClInclude Include="..\..\CEX\ChaCha20.h" />
+    <ClInclude Include="..\..\CEX\ChaCha256.h" />
+    <ClInclude Include="..\..\CEX\ChaCha512.h" />
     <ClInclude Include="..\..\CEX\CipherDescription.h" />
     <ClInclude Include="..\..\CEX\CipherFromDescription.h" />
     <ClInclude Include="..\..\CEX\CipherModeFromName.h" />
@@ -247,10 +248,12 @@
     <ClInclude Include="..\..\CEX\Digests.h" />
     <ClInclude Include="..\..\CEX\DigestStream.h" />
     <ClInclude Include="..\..\CEX\Documentation.h" />
+    <ClInclude Include="..\..\CEX\Donna128.h" />
     <ClInclude Include="..\..\CEX\DrbgFromName.h" />
     <ClInclude Include="..\..\CEX\ECB.h" />
     <ClInclude Include="..\..\CEX\ECP.h" />
     <ClInclude Include="..\..\CEX\Event.h" />
+    <ClInclude Include="..\..\CEX\MacFromName.h" />
     <ClInclude Include="..\..\CEX\MPKCM12T62.h" />
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h" />
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
@@ -317,6 +320,7 @@
     <ClInclude Include="..\..\CEX\RLWEParams.h" />
     <ClInclude Include="..\..\CEX\RLWEPrivateKey.h" />
     <ClInclude Include="..\..\CEX\RLWEPublicKey.h" />
+    <ClInclude Include="..\..\CEX\RLWEQ12289N2048.h" />
     <ClInclude Include="..\..\CEX\SCRYPT.h" />
     <ClInclude Include="..\..\CEX\SecureStream.h" />
     <ClInclude Include="..\..\CEX\SHA2.h" />
@@ -333,6 +337,7 @@
     <ClInclude Include="..\..\CEX\Skein512.h" />
     <ClInclude Include="..\..\CEX\SkeinParams.h" />
     <ClInclude Include="..\..\CEX\SkeinUbiTweak.h" />
+    <ClInclude Include="..\..\CEX\StreamAuthenticators.h" />
     <ClInclude Include="..\..\CEX\StreamModes.h" />
     <ClInclude Include="..\..\CEX\SymmetricKeySize.h" />
     <ClInclude Include="..\..\CEX\MacDescription.h" />
@@ -343,6 +348,11 @@
     <ClInclude Include="..\..\CEX\SymmetricSecureKey.h" />
     <ClInclude Include="..\..\CEX\SysUtils.h" />
     <ClInclude Include="..\..\CEX\Skein.h" />
+    <ClInclude Include="..\..\CEX\Threefish.h" />
+    <ClInclude Include="..\..\CEX\Threefish1024.h" />
+    <ClInclude Include="..\..\CEX\Threefish256.h" />
+    <ClInclude Include="..\..\CEX\Threefish512.h" />
+    <ClInclude Include="..\..\CEX\ThreefishModes.h" />
     <ClInclude Include="..\..\CEX\TimeStamp.h" />
     <ClInclude Include="..\..\CEX\UInt128.h" />
     <ClInclude Include="..\..\CEX\Intrinsics.h" />
@@ -371,7 +381,6 @@
     <ClInclude Include="..\..\CEX\RHX.h" />
     <ClInclude Include="..\..\CEX\Rijndael.h" />
     <ClInclude Include="..\..\CEX\RoundCounts.h" />
-    <ClInclude Include="..\..\CEX\Salsa20.h" />
     <ClInclude Include="..\..\CEX\SecureRandom.h" />
     <ClInclude Include="..\..\CEX\ProviderFromName.h" />
     <ClInclude Include="..\..\CEX\Providers.h" />
@@ -384,8 +393,6 @@
     <ClInclude Include="..\..\CEX\StreamWriter.h" />
     <ClInclude Include="..\..\CEX\SymmetricEngines.h" />
     <ClInclude Include="..\..\CEX\TBC.h" />
-    <ClInclude Include="..\..\CEX\THX.h" />
-    <ClInclude Include="..\..\CEX\Twofish.h" />
     <ClInclude Include="..\..\CEX\UInt256.h" />
     <ClInclude Include="..\..\CEX\UInt512.h" />
     <ClInclude Include="..\..\CEX\ULong256.h" />
@@ -407,7 +414,9 @@
     <ClCompile Include="..\..\CEX\BlockCipherFromName.cpp" />
     <ClCompile Include="..\..\CEX\CBC.cpp" />
     <ClCompile Include="..\..\CEX\CFB.cpp" />
-    <ClCompile Include="..\..\CEX\ChaCha20.cpp" />
+    <ClCompile Include="..\..\CEX\ChaCha.cpp" />
+    <ClCompile Include="..\..\CEX\ChaCha256.cpp" />
+    <ClCompile Include="..\..\CEX\ChaCha512.cpp" />
     <ClCompile Include="..\..\CEX\CipherDescription.cpp" />
     <ClCompile Include="..\..\CEX\CipherFromDescription.cpp" />
     <ClCompile Include="..\..\CEX\CipherModeFromName.cpp" />
@@ -440,6 +449,7 @@
     <ClCompile Include="..\..\CEX\ECB.cpp" />
     <ClCompile Include="..\..\CEX\ECP.cpp" />
     <ClCompile Include="..\..\CEX\Keccak.cpp" />
+    <ClCompile Include="..\..\CEX\MacFromName.cpp" />
     <ClCompile Include="..\..\CEX\MPKCM12T62.cpp" />
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
@@ -483,6 +493,7 @@
     <ClCompile Include="..\..\CEX\RLWEKeyPair.cpp" />
     <ClCompile Include="..\..\CEX\RLWEPrivateKey.cpp" />
     <ClCompile Include="..\..\CEX\RLWEPublicKey.cpp" />
+    <ClCompile Include="..\..\CEX\RLWEQ12289N2048.cpp" />
     <ClCompile Include="..\..\CEX\SCRYPT.cpp" />
     <ClCompile Include="..\..\CEX\SecureStream.cpp" />
     <ClCompile Include="..\..\CEX\SHA2.cpp" />
@@ -508,7 +519,6 @@
     <ClCompile Include="..\..\CEX\PrngFromName.cpp" />
     <ClCompile Include="..\..\CEX\RDP.cpp" />
     <ClCompile Include="..\..\CEX\RHX.cpp" />
-    <ClCompile Include="..\..\CEX\Salsa20.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricKeySize.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricSecureKey.cpp" />
     <ClCompile Include="..\..\CEX\SecureRandom.cpp" />
@@ -520,7 +530,10 @@
     <ClCompile Include="..\..\CEX\SymmetricKey.cpp" />
     <ClCompile Include="..\..\CEX\SysUtils.cpp" />
     <ClCompile Include="..\..\CEX\TBC.cpp" />
-    <ClCompile Include="..\..\CEX\THX.cpp" />
+    <ClCompile Include="..\..\CEX\Threefish.cpp" />
+    <ClCompile Include="..\..\CEX\Threefish1024.cpp" />
+    <ClCompile Include="..\..\CEX\Threefish256.cpp" />
+    <ClCompile Include="..\..\CEX\Threefish512.cpp" />
     <ClCompile Include="..\..\CEX\TimeStamp.cpp" />
     <ClCompile Include="..\..\CEX\X923.cpp" />
     <ClCompile Include="..\..\CEX\ZeroPad.cpp" />

@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -353,12 +353,12 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Output">The output array that receives the authentication code</param>
-	/// <param name="Offset">Starting offset within the output array</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
-	/// <para>Must be no greater then the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
+	/// <para>Must be no greater than the MAC functions output size, and no less than the minimum Tag size of 12 bytes.</para></param>
 	///
 	/// <exception cref="Exception::CryptoCipherModeException">Thrown if the cipher is not initialized, or output array is too small</exception>
-	void Finalize(std::vector<byte> &Output, const size_t Offset, const size_t Length) override;
+	void Finalize(std::vector<byte> &Output, const size_t OutOffset, const size_t Length) override;
 
 	/// <summary>
 	/// Initialize the Cipher instance.
@@ -420,7 +420,7 @@ public:
 	/// <param name="Input">The input array containing the expected authentication code</param>
 	/// <param name="Offset">Starting offset within the input array</param>
 	/// <param name="Length">The number of bytes to compare.
-	/// <para>Must be no greater then the MAC functions output size, and no less than the MinTagSize() size.</para></param>
+	/// <para>Must be no greater than the MAC functions output size, and no less than the MinTagSize() size.</para></param>
 	/// 
 	/// <returns>Returns false if the MAC code does not match</returns>
 	///

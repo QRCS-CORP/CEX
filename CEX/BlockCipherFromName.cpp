@@ -5,7 +5,6 @@
 #endif
 #include "RHX.h"
 #include "SHX.h"
-#include "THX.h"
 
 NAMESPACE_HELPER
 
@@ -60,16 +59,6 @@ IBlockCipher* BlockCipherFromName::GetInstance(BlockCiphers CipherType, BlockCip
 			case BlockCiphers::SHX:
 			{
 				cprPtr = new Cipher::Symmetric::Block::SHX(CipherExtensionType);
-				break;
-			}
-			case BlockCiphers::Twofish:
-			{
-				cprPtr = new Cipher::Symmetric::Block::THX();
-				break;
-			}
-			case BlockCiphers::THX:
-			{
-				cprPtr = new Cipher::Symmetric::Block::THX(CipherExtensionType);
 				break;
 			}
 			default:

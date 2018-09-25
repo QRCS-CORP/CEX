@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -235,80 +235,6 @@ public:
 		X1.Store(Output, Offset + (32 / sizeof(Output[0])));
 		X2.Store(Output, Offset + (64 / sizeof(Output[0])));
 		X3.Store(Output, Offset + (96 / sizeof(Output[0])));
-	}
-
-	/// <summary>
-	/// Transposes and stores 16 * UInt256 to an array
-	/// </summary>
-	///
-	/// <param name="Output">The destination integer array; must be at least 4096 bits in length</param>
-	/// <param name="Offset">The starting offset within the Output array</param>
-	/// <param name="X0">Operand 0</param>
-	/// <param name="X1">Operand 1</param>
-	/// <param name="X2">Operand 2</param>
-	/// <param name="X3">Operand 3</param>
-	/// <param name="X4">Operand 4</param>
-	/// <param name="X5">Operand 5</param>
-	/// <param name="X6">Operand 6</param>
-	/// <param name="X7">Operand 7</param>
-	/// <param name="X8">Operand 8</param>
-	/// <param name="X9">Operand 9</param>
-	/// <param name="X10">Operand 10</param>
-	/// <param name="X11">Operand 11</param>
-	/// <param name="X12">Operand 12</param>
-	/// <param name="X13">Operand 13</param>
-	/// <param name="X14">Operand 14</param>
-	/// <param name="X15">Operand 15</param>
-	template <typename Array>
-	inline static void Store16(Array &Output, size_t Offset, UInt256 &X0, UInt256 &X1, UInt256 &X2, UInt256 &X3, UInt256 &X4, UInt256 &X5,
-		UInt256 &X6, UInt256 &X7, UInt256 &X8, UInt256 &X9, UInt256 &X10, UInt256 &X11, UInt256 &X12, UInt256 &X13, UInt256 &X14, UInt256 &X15)
-	{
-		__m256i W0, W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12, W13, W14, W15;
-		__m256i Y0, Y1, Y2, Y3, Y4, Y5, Y6, Y7, Y8, Y9, Y10, Y11, Y12, Y13, Y14, Y15;
-
-		_mm256_merge_epi32(X0.ymm, X1.ymm, W0, W1);
-		_mm256_merge_epi32(X2.ymm, X3.ymm, W2, W3);
-		_mm256_merge_epi32(X4.ymm, X5.ymm, W4, W5);
-		_mm256_merge_epi32(X6.ymm, X7.ymm, W6, W7);
-		_mm256_merge_epi32(X8.ymm, X9.ymm, W8, W9);
-		_mm256_merge_epi32(X10.ymm, X11.ymm, W10, W11);
-		_mm256_merge_epi32(X12.ymm, X13.ymm, W12, W13);
-		_mm256_merge_epi32(X14.ymm, X15.ymm, W14, W15);
-
-		_mm256_merge_epi64(W0, W2, Y0, Y1);
-		_mm256_merge_epi64(W4, W6, Y2, Y3);
-		_mm256_merge_epi64(W8, W10, Y4, Y5);
-		_mm256_merge_epi64(W12, W14, Y6, Y7);
-		_mm256_merge_epi64(W1, W3, Y8, Y9);
-		_mm256_merge_epi64(W5, W7, Y10, Y11);
-		_mm256_merge_epi64(W9, W11, Y12, Y13);
-		_mm256_merge_epi64(W13, W15, Y14, Y15);
-
-		_mm256_merge_si128(Y0, Y2, X0.ymm, X1.ymm);
-		_mm256_merge_si128(Y1, Y3, X2.ymm, X3.ymm);
-		_mm256_merge_si128(Y8, Y10, X4.ymm, X5.ymm);
-		_mm256_merge_si128(Y9, Y11, X6.ymm, X7.ymm);
-		_mm256_merge_si128(Y4, Y6, X8.ymm, X9.ymm);
-		_mm256_merge_si128(Y5, Y7, X10.ymm, X11.ymm);
-		_mm256_merge_si128(Y12, Y14, X12.ymm, X13.ymm);
-		_mm256_merge_si128(Y13, Y15, X14.ymm, X15.ymm);
-
-		X0.Store(Output, Offset);
-		X8.Store(Output, Offset + (32 / sizeof(Output[0])));
-		X1.Store(Output, Offset + (64 / sizeof(Output[0])));
-		X9.Store(Output, Offset + (96 / sizeof(Output[0])));
-		X2.Store(Output, Offset + (128 / sizeof(Output[0])));
-		X10.Store(Output, Offset + (160 / sizeof(Output[0])));
-		X3.Store(Output, Offset + (192 / sizeof(Output[0])));
-		X11.Store(Output, Offset + (224 / sizeof(Output[0])));
-		X4.Store(Output, Offset + (256 / sizeof(Output[0])));
-		X12.Store(Output, Offset + (288 / sizeof(Output[0])));
-		X5.Store(Output, Offset + (320 / sizeof(Output[0])));
-		X13.Store(Output, Offset + (352 / sizeof(Output[0])));
-		X6.Store(Output, Offset + (384 / sizeof(Output[0])));
-		X14.Store(Output, Offset + (416 / sizeof(Output[0])));
-		X7.Store(Output, Offset + (448 / sizeof(Output[0])));
-		X15.Store(Output, Offset + (480 / sizeof(Output[0])));
 	}
 
 	//~~~ Methods~~~//

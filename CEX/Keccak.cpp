@@ -2434,7 +2434,7 @@ void Keccak::PermuteR24P1600U(std::array<ulong, 25> &State)
 
 #if defined(__AVX2__)
 
-void Keccak::PermuteR24P6400H(std::vector<ULong256> &State)
+void Keccak::PermuteR24P4x1600H(std::vector<ULong256> &State)
 {
 	std::array<ULong256, 25> A;
 	std::array<ULong256, 5> C;
@@ -2629,7 +2629,7 @@ void Keccak::PermuteR24P6400H(std::vector<ULong256> &State)
 
 #if defined(__AVX512__)
 
-void Keccak::PermuteR24P12800H(std::vector<ULong512> &State)
+void Keccak::PermuteR24P8x1600H(std::vector<ULong512> &State)
 {
 	std::array<ULong512, 25> A;
 	std::array<ULong512, 5> C;
@@ -7308,7 +7308,7 @@ void Keccak::PermuteR48P1600C(std::array<ulong, 25> &State)
 
 #if defined(__AVX2__)
 
-void Keccak::PermuteR48P6400H(std::vector<ULong256> &State)
+void Keccak::PermuteR48P4x1600H(std::vector<ULong256> &State)
 {
 	std::array<ULong256, 25> A;
 	std::array<ULong256, 5> C;
@@ -7503,7 +7503,7 @@ void Keccak::PermuteR48P6400H(std::vector<ULong256> &State)
 
 #if defined(__AVX512__)
 
-void Keccak::PermuteR48P12800H(std::vector<ULong512> &State)
+void Keccak::PermuteR48P8x1600H(std::vector<ULong512> &State)
 {
 	std::array<ULong512, 25> A;
 	std::array<ULong512, 5> C;

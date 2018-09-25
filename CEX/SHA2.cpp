@@ -572,7 +572,7 @@ void SHA2::PermuteR64P512V(const std::vector<byte> &Input, size_t InOffset, std:
 
 #if defined(__AVX2__)
 
-void SHA2::PermuteR64P4096H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State)
+void SHA2::PermuteR64P8x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt256> &State)
 {
 	std::array<UInt256, 8> A;
 	std::array<UInt256, 64> W;
@@ -647,7 +647,7 @@ void SHA2::PermuteR64P4096H(const std::vector<byte> &Input, size_t InOffset, std
 
 #if defined(__AVX512__)
 
-void SHA2::PermuteR64P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State)
+void SHA2::PermuteR64P16x512H(const std::vector<byte> &Input, size_t InOffset, std::vector<UInt512> &State)
 {
 	std::array<UInt512, 8> A;
 	std::array<UInt512, 64> W;
@@ -1159,7 +1159,7 @@ void SHA2::PermuteR80P1024U(const std::vector<byte> &Input, size_t InOffset, std
 
 #if defined(__AVX2__)
 
-void SHA2::PermuteR80P4096H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State)
+void SHA2::PermuteR80P4x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong256> &State)
 {
 	std::array<ULong256, 8> A;
 	std::array<ULong256, 80> W;
@@ -1230,7 +1230,7 @@ void SHA2::PermuteR80P4096H(const std::vector<byte> &Input, size_t InOffset, std
 
 #if defined(__AVX512__)
 
-void SHA2::PermuteR80P8192H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State)
+void SHA2::PermuteR80P8x1024H(const std::vector<byte> &Input, size_t InOffset, std::vector<ULong512> &State)
 {
 	std::array<ULong512, 8> A;
 	std::array<ULong512, 80> W;

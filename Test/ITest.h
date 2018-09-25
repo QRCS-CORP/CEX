@@ -4,6 +4,24 @@
 #include "TestCommon.h"
 #include "TestEventHandler.h"
 
+// New Test Naming convention:
+// object -> specifier
+// Object Words:
+// equality, exception, permutation, stress, vector
+// Domain Specifiers:
+// domain generic/specific name
+//
+// ex. 1) compare permutation skein256 => Permutation256() 
+// ex. 2) evaluate vector sha256 => Vector256()
+// ex. 3) stress-test blake256 => Stress256()
+//
+// Common Names:
+// Equalityxxx -> test variations of a function for equivalence
+// Exception -> test classes exception handling
+// Parallel -> test parallel to synchronous operations for equivalence
+// Stress -> test the function under stress
+// Vector -> KAT test naming
+
 namespace Test
 {
 	using namespace CEX;

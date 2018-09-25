@@ -131,12 +131,12 @@
 // class constant: All Caps, a total of two words, ex. CLASS_CONSTANT
 // function constant: Two capitalized and abbreviated 3 letter words with no underscore divider, ex. FNCCST
 
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <time.h>
 #include "../CEX/CpuDetect.h"
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
@@ -177,7 +177,6 @@
 #include "../Test/RandomOutputTest.h"
 #include "../Test/RijndaelTest.h"
 #include "../Test/RingLWETest.h"
-#include "../Test/SalsaTest.h"
 #include "../Test/SCRYPTTest.h"
 #include "../Test/SecureStreamTest.h"
 #include "../Test/SerpentTest.h"
@@ -188,10 +187,18 @@
 #include "../Test/SkeinTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
-#include "../Test/TwofishTest.h"
+#include "../Test/ThreefishTest.h"
 #include "../Test/UtilityTest.h"
 
 using namespace Test;
+
+std::string GetRandomString(size_t Length)
+{
+	std::string res;
+	res = TestUtils::RandomReadableString(Length);
+
+	return res;
+}
 
 void CpuCheck()
 {
@@ -233,6 +240,15 @@ std::string GetResponse()
 	return resp;
 }
 
+std::string GetTime()
+{
+	time_t res = time(nullptr);
+	char str[26];
+	ctime_s(str, sizeof(str), &res);
+
+	return std::string(str);
+}
+
 bool CanTest(std::string Message)
 {
 	ConsoleUtils::WriteLine(Message);
@@ -255,14 +271,27 @@ void PrintHeader(std::string Data, std::string Decoration = "***")
 	ConsoleUtils::WriteLine(Decoration + Data + Decoration);
 }
 
+void PrintRandom(size_t Lines)
+{
+	std::string sample;
+
+	for (size_t i = 0; i < Lines; ++i)
+	{
+		sample = GetRandomString(120);
+		ConsoleUtils::WriteLine(sample);
+	}
+
+	ConsoleUtils::WriteLine("");
+}
+
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.6: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("*                                             *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.6 (A6)                    *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.6d (A6)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      June 17, 2018                    *");
+	ConsoleUtils::WriteLine("* Date:      September 25, 2018               *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -290,12 +319,22 @@ void RunTest(Test::ITest* Test)
 	}
 	catch (TestException &ex)
 	{
-		ConsoleUtils::WriteLine("An error has occured!");
+		ConsoleUtils::WriteLine("");
+		ConsoleUtils::WriteLine("*** ERROR CONDITION ***");
 
-		if (ex.Message().size() != 0)
+
+		if (ex.Origin().size() != 0)
 		{
-			ConsoleUtils::WriteLine(ex.Message());
+			ConsoleUtils::WriteLine(std::string("Origin: ") + ex.Origin());
+			ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
 		}
+		else if (ex.Message().size() != 0)
+		{
+			ConsoleUtils::WriteLine(std::string("Message: ") + ex.Message());
+		}
+
+		ConsoleUtils::WriteLine(std::string("Time: ") + GetTime());
+		ConsoleUtils::WriteLine("");
 
 		ConsoleUtils::WriteLine("");
 		ConsoleUtils::WriteLine("Continue Testing? Press 'Y' to continue, all other keys abort..");
@@ -303,8 +342,8 @@ void RunTest(Test::ITest* Test)
 		std::string resp;
 		std::getline(std::cin, resp);
 		std::transform(resp.begin(), resp.end(), resp.begin(), ::toupper);
-
 		const std::string CONTINUE = "Y";
+
 		if (resp.find(CONTINUE) == std::string::npos)
 		{
 			CloseApp();
@@ -332,6 +371,7 @@ int main()
 #endif
 
 	std::string data("");
+
 	try
 	{
 		TestUtils::Read(TestFiles::AESAVS::AESAVSKEY128, data);
@@ -437,8 +477,10 @@ int main()
 				PrintHeader("Testing the AES-NI implementation (AHX)");
 				RunTest(new AesAvsTest(true));
 			}
+
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesAvsTest());
+
 			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
@@ -448,8 +490,8 @@ int main()
 			PrintHeader("Testing the AES software implementation (RHX)");
 			RunTest(new AesFipsTest());
 			RunTest(new RijndaelTest());
+			PrintHeader("Testing the Serpent software implementation (SHX)");
 			RunTest(new SerpentTest());
-			RunTest(new TwofishTest());
 			PrintHeader("TESTING HX EXTENDED CIPHERS");
 			RunTest(new HXCipherTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
@@ -462,7 +504,7 @@ int main()
 			RunTest(new PaddingTest());
 			PrintHeader("TESTING SYMMETRIC STREAM CIPHERS");
 			RunTest(new ChaChaTest());
-			RunTest(new SalsaTest());
+			RunTest(new ThreefishTest());
 			PrintHeader("TESTING CRYPTOGRAPHIC STREAM PROCESSORS");
 			RunTest(new CipherStreamTest());
 			RunTest(new DigestStreamTest());

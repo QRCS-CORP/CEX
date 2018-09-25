@@ -158,7 +158,7 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 		throw CryptoMacException("HMAC:Initialize", "Key size is too small; should be a minimum of digest output size!");
 	}
 
-	size_t keyLen = KeyParams.Key().size();
+	size_t keyLen;
 
 	if (!m_isInitialized)
 	{
@@ -168,6 +168,8 @@ void HMAC::Initialize(ISymmetricKey &KeyParams)
 	{
 		Reset();
 	}
+
+	keyLen = KeyParams.Key().size();
 
 	if (keyLen > m_msgDigest->BlockSize())
 	{
@@ -234,13 +236,11 @@ void HMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 
 void HMAC::Scope()
 {
-	m_legalKeySizes.resize(3);
+	m_legalKeySizes.resize(2);
 	// minimum seed size
 	m_legalKeySizes[0] = SymmetricKeySize(m_msgDigest->DigestSize(), 0, 0);
 	// recommended size
 	m_legalKeySizes[1] = SymmetricKeySize(m_msgDigest->BlockSize(), 0, 0);
-	// hashes to create ipad/opad state
-	m_legalKeySizes[2] = SymmetricKeySize(m_msgDigest->BlockSize() * 2, 0, 0);
 }
 
 void HMAC::XorPad(std::vector<byte> &A, byte N)

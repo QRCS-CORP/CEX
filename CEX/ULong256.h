@@ -1,6 +1,6 @@
 // The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -164,13 +164,13 @@ public:
 
 	/// <summary>
 	/// Load an array of integers into a register.
-	/// <para>Integers are loaded as 32bit integers regardless the natural size of T; but T must be less than or equal to 32bits in size</para>
+	/// <para>Integers are loaded as 64bit integers regardless the natural size of T; but T must be less than or equal to 64bits in size</para>
 	/// </summary>
 	///
 	/// <param name="Input">The source integer array; must be at least 256 bits long</param>
 	/// <param name="Offset">The starting offset within the Input array</param>
 	template<typename Array>
-	inline void LoadUL(const Array &Input, size_t Offset)
+	inline void LoadULL(const Array &Input, size_t Offset)
 	{
 		CexAssert(sizeof(uint) <= sizeof(Array::value_type), "the input array integer size must be less or equal to uint32");
 

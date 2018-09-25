@@ -1,5 +1,4 @@
 #include "CpuDetect.h"
-#include <algorithm>
 #include <thread>
 #if defined(CEX_ARCH_X86_X64)
 #	if defined(CEX_COMPILER_MSC)

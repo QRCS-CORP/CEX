@@ -25,7 +25,6 @@ namespace Test
 		std::vector<std::vector<byte>> m_key;
 		std::vector<std::vector<byte>> m_rhxExp;
 		std::vector<std::vector<byte>> m_shxExp;
-		std::vector<std::vector<byte>> m_thxExp;
 		TestEventHandler m_progressEvent;
 
 	public:

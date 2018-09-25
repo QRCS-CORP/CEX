@@ -21,7 +21,7 @@ class KdfFromName
 public:
 
 	/// <summary>
-	/// Instantiate an uninitialized KDF generator from its enunmeration type name
+	/// Instantiate an uninitialized KDF generator from its enumeration type name
 	/// </summary>
 	/// 
 	/// <param name="KdfType">The Kdf generators type name</param>

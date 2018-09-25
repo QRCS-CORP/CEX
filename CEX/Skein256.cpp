@@ -13,10 +13,10 @@ struct Skein256::Skein256State
 {
 	// state
 	std::array<ulong, 4> S;
-	// tweak
-	std::array<ulong, 2> T;
 	// config
 	std::array<ulong, 4> V;
+	// tweak
+	std::array<ulong, 2> T;
 
 	Skein256State()
 	{
@@ -397,37 +397,6 @@ void Skein256::HashFinal(std::vector<byte> &Input, size_t InOffset, size_t Lengt
 	ProcessBlock(tmp, 0, State, StateOffset, 8);
 }
 
-void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, size_t Length)
-{
-	// update length
-	State[StateOffset].Increase(Length);
-	// encrypt block
-	std::array<ulong, 4> msg;
-	IntUtils::LeBytesToULL256(Input, InOffset, msg, 0);
-	Permute(msg, State[StateOffset]);
-	// feed-forward input with state
-	Utility::MemUtils::XOR256(msg, 0, State[StateOffset].S, 0);
-
-	// clear first flag
-	if (!m_isInitialized && StateOffset == 0)
-	{
-		SkeinUbiTweak::IsFirstBlock(m_dgtState[0].T, false);
-		m_isInitialized = true;
-	}
-}
-
-void Skein256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, ulong Length)
-{
-	do
-	{
-		// process message offset by lane size
-		ProcessBlock(Input, InOffset, State, StateOffset);
-		InOffset += m_parallelProfile.ParallelMinimumSize();
-		Length -= m_parallelProfile.ParallelMinimumSize();
-	} 
-	while (Length > 0);
-}
-
 void Skein256::Initialize()
 {
 	std::vector<ulong> tmp = m_treeParams.GetConfig();
@@ -468,12 +437,43 @@ void Skein256::LoadState(Skein256State &State, std::array<ulong, 4> &Config)
 	Utility::MemUtils::XOR256(Config, 0, State.V, 0);
 }
 
+void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, size_t Length)
+{
+	// update length
+	State[StateOffset].Increase(Length);
+	// encrypt block
+	std::array<ulong, 4> msg;
+	IntUtils::LeBytesToULL256(Input, InOffset, msg, 0);
+	Permute(msg, State[StateOffset]);
+	// feed-forward input with state
+	Utility::MemUtils::XOR256(msg, 0, State[StateOffset].S, 0);
+
+	// clear first flag
+	if (!m_isInitialized && StateOffset == 0)
+	{
+		SkeinUbiTweak::IsFirstBlock(m_dgtState[0].T, false);
+		m_isInitialized = true;
+	}
+}
+
+void Skein256::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, ulong Length)
+{
+	do
+	{
+		// process message offset by lane size
+		ProcessBlock(Input, InOffset, State, StateOffset);
+		InOffset += m_parallelProfile.ParallelMinimumSize();
+		Length -= m_parallelProfile.ParallelMinimumSize();
+	} 
+	while (Length > 0);
+}
+
 void Skein256::Permute(std::array<ulong, 4> &Message, Skein256State &State)
 {
 #if defined(CEX_DIGEST_COMPACT)
-	Skein::PemuteR72P256C(Message, State.S, State.T);
+	Skein::PemuteP256C(Message, State.T, State.S, 72);
 #else
-	Skein::PemuteR72P256U(Message, State.S, State.T);
+	Skein::PemuteR72P256U(Message, State.T, State.S);
 #endif
 }
 

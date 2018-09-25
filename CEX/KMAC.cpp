@@ -341,13 +341,11 @@ void KMAC::Scope()
 {
 	Reset();
 
-	m_legalKeySizes.resize(3);
+	m_legalKeySizes.resize(2);
 	// minimum seed size
 	m_legalKeySizes[0] = SymmetricKeySize(m_macSize, 0, 0);
 	// recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(m_macSize * 2, 0, 0);
-	// maximum security
-	m_legalKeySizes[2] = SymmetricKeySize(m_blockSize, 0, 0);
+	m_legalKeySizes[1] = SymmetricKeySize(m_blockSize, 0, 0);
 }
 
 void KMAC::Squeeze(std::array<ulong, 25> &State, std::vector<byte> &Output, size_t OutOffset, size_t Length)

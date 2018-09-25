@@ -370,7 +370,7 @@ namespace Test
 		std::vector<UInt256> iv256{ UInt256(0), UInt256(1), UInt256(2), UInt256(3), UInt256(4), UInt256(5), UInt256(6), UInt256(7) };
 		std::vector<UInt256> state256(8, UInt256(0));
 
-		Blake2::PermuteR10P4096H(input256, 0, state256, iv256);
+		Blake2::PermuteR10P8x512H(input256, 0, state256, iv256);
 
 		std::vector<uint> state256ul(32);
 		MemUtils::Copy(state256, 0, state256ul, 0, 32 * sizeof(uint));
@@ -391,7 +391,7 @@ namespace Test
 		std::vector<UInt512> iv512{ UInt512(0), UInt512(1), UInt512(2), UInt512(3), UInt512(4), UInt512(5), UInt512(6), UInt512(7) };
 		std::vector<UInt512> state512(8, UInt512(0));
 
-		Blake2::PermuteR10P8192H(input512, 0, state512, iv512);
+		Blake2::PermuteR10P16x512H(input512, 0, state512, iv512);
 
 		std::vector<uint> state512ul(64);
 		MemUtils::Copy(state512, 0, state512ul, 0, 64 * sizeof(uint));
@@ -444,7 +444,7 @@ namespace Test
 		std::vector<ULong256> iv256{ ULong256(0), ULong256(1), ULong256(2), ULong256(3), ULong256(4), ULong256(5), ULong256(6), ULong256(7) };
 		std::vector<ULong256> state256(8, ULong256(0));
 
-		Blake2::PermuteR12P4096H(input256, 0, state256, iv256);
+		Blake2::PermuteR12P4x1024H(input256, 0, state256, iv256);
 
 		std::vector<ulong> state256ull(32);
 		MemUtils::Copy(state256, 0, state256ull, 0, 32 * sizeof(ulong));
@@ -465,7 +465,7 @@ namespace Test
 		std::vector<ULong512> iv512{ ULong512(0), ULong512(1), ULong512(2), ULong512(3), ULong512(4), ULong512(5), ULong512(6), ULong512(7) };
 		std::vector<ULong512> state512(8, ULong512(0));
 
-		Blake2::PermuteR12P8192H(input512, 0, state512, iv512);
+		Blake2::PermuteR12P8x1024H(input512, 0, state512, iv512);
 
 		std::vector<ulong> state512ull(64);
 		MemUtils::Copy(state512, 0, state512ull, 0, 64 * sizeof(ulong));

@@ -15,9 +15,7 @@
 #include "../CEX/ParallelUtils.h"
 #include "../CEX/RHX.h"
 #include "../CEX/SHX.h"
-#include "../CEX/THX.h"
-#include "../CEX/ChaCha20.h"
-#include "../CEX/Salsa20.h"
+#include "../CEX/ChaCha256.h"
 
 namespace Test
 {
@@ -124,12 +122,6 @@ namespace Test
 			DescriptionTest(&cd);
 			OnProgress(std::string("Passed CipherDescription stream test.."));
 			OnProgress(std::string(""));
-
-			OnProgress(std::string("***Testing Block Ciphers***"));
-			Cipher::Symmetric::Block::THX* tfx = new Cipher::Symmetric::Block::THX();
-			StreamModesTest(new CBC(tfx), new ISO7816());
-			delete tfx;
-			OnProgress(std::string("Passed THX CipherStream test.."));
 			Cipher::Symmetric::Block::SHX* spx = new Cipher::Symmetric::Block::SHX();
 			StreamModesTest(new CBC(spx), new ISO7816());
 			delete spx;
@@ -149,11 +141,6 @@ namespace Test
 			Cipher::Symmetric::Block::SHX* shx = new Cipher::Symmetric::Block::SHX();
 			StreamModesTest(new CBC(shx), new ISO7816());
 			delete shx;
-			OnProgress(std::string("Passed SHX extended CipherStream test.."));
-			Cipher::Symmetric::Block::THX* thx = new Cipher::Symmetric::Block::THX();
-			StreamModesTest(new CBC(thx), new ISO7816());
-			delete thx;
-			OnProgress(std::string("Passed THX extended CipherStream test.."));
 			OnProgress(std::string(""));
 
 			return SUCCESS;
@@ -609,9 +596,8 @@ namespace Test
 		IO::MemoryStream mIn(m_plnText);
 		IO::MemoryStream mOut;
 		IO::MemoryStream mRes;
-		Processing::CipherDescription* cd = Processing::CipherDescription::AES256CTR();
 
-		Processing::CipherStream cs(cd);
+		Processing::CipherStream cs(Description);
 		cs.Initialize(true, kp);
 		cs.Write(&mIn, &mOut);
 
@@ -1019,33 +1005,33 @@ namespace Test
 
 	void CipherStreamTest::BlockCTR(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t INPSZE = Input.size() - InOffset;
-		Cipher->Transform(Input, InOffset, Output, OutOffset, INPSZE);
+		const size_t INPLEN = Input.size() - InOffset;
+		Cipher->Transform(Input, InOffset, Output, OutOffset, INPLEN);
 	}
 
 	void CipherStreamTest::BlockDecrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t BLKSZE = Cipher->BlockSize();
-		const size_t INPSZE = Input.size() - InOffset;
-		const size_t ALNSZE = (INPSZE < BLKSZE) ? 0 : ((INPSZE / BLKSZE) * BLKSZE) - BLKSZE;
+		const size_t BLKLEN = Cipher->BlockSize();
+		const size_t INPLEN = Input.size() - InOffset;
+		const size_t ALNLEN = (INPLEN < BLKLEN) ? 0 : ((INPLEN / BLKLEN) * BLKLEN) - BLKLEN;
 
-		if (INPSZE > BLKSZE)
+		if (INPLEN > BLKLEN)
 		{
 			Cipher->ParallelProfile().IsParallel() = false;
-			Cipher->Transform(Input, InOffset, Output, OutOffset, ALNSZE);
-			InOffset += ALNSZE;
-			OutOffset += ALNSZE;
+			Cipher->Transform(Input, InOffset, Output, OutOffset, ALNLEN);
+			InOffset += ALNLEN;
+			OutOffset += ALNLEN;
 		}
 
 		// last block
-		std::vector<byte> inpBuffer(BLKSZE);
-		std::memcpy(&inpBuffer[0], &Input[InOffset], BLKSZE);
-		std::vector<byte> outBuffer(BLKSZE);
+		std::vector<byte> inpBuffer(BLKLEN);
+		std::memcpy(&inpBuffer[0], &Input[InOffset], BLKLEN);
+		std::vector<byte> outBuffer(BLKLEN);
 		Cipher->DecryptBlock(inpBuffer, 0, outBuffer, 0);
 		const size_t PADLEN = Padding->GetPaddingLength(outBuffer, 0);
-		const size_t FNLSZE = (PADLEN == 0) ? BLKSZE : BLKSZE - PADLEN;
-		std::memcpy(&Output[OutOffset], &outBuffer[0], FNLSZE);
-		OutOffset += FNLSZE;
+		const size_t FNLLEN = (PADLEN == 0) ? BLKLEN : BLKLEN - PADLEN;
+		std::memcpy(&Output[OutOffset], &outBuffer[0], FNLLEN);
+		OutOffset += FNLLEN;
 
 		if (Output.size() != OutOffset)
 		{
@@ -1055,35 +1041,35 @@ namespace Test
 
 	void CipherStreamTest::BlockEncrypt(Cipher::Symmetric::Block::Mode::ICipherMode* Cipher, Cipher::Symmetric::Block::Padding::IPadding* Padding, const std::vector<byte> &Input, size_t InOffset, std::vector<byte> &Output, size_t OutOffset)
 	{
-		const size_t BLKSZE = Cipher->BlockSize();
-		const size_t INPSZE = Input.size() - InOffset;
-		const size_t ALNSZE = (INPSZE < BLKSZE) ? 0 : INPSZE - (INPSZE % BLKSZE);
+		const size_t BLKLEN = Cipher->BlockSize();
+		const size_t INPLEN = Input.size() - InOffset;
+		const size_t ALNLEN = (INPLEN < BLKLEN) ? 0 : INPLEN - (INPLEN % BLKLEN);
 
-		if (INPSZE > BLKSZE)
+		if (INPLEN > BLKLEN)
 		{
 			Cipher->ParallelProfile().IsParallel() = false;
-			Cipher->Transform(Input, InOffset, Output, OutOffset, ALNSZE);
-			InOffset += ALNSZE;
-			OutOffset += ALNSZE;
+			Cipher->Transform(Input, InOffset, Output, OutOffset, ALNLEN);
+			InOffset += ALNLEN;
+			OutOffset += ALNLEN;
 		}
 
 		// partial
-		if (ALNSZE != INPSZE)
+		if (ALNLEN != INPLEN)
 		{
-			size_t FNLSZE = INPSZE - ALNSZE;
-			std::vector<byte> inpBuffer(BLKSZE);
-			std::memcpy(&inpBuffer[0], &Input[InOffset], FNLSZE);
-			if (FNLSZE != BLKSZE)
+			size_t FNLLEN = INPLEN - ALNLEN;
+			std::vector<byte> inpBuffer(BLKLEN);
+			std::memcpy(&inpBuffer[0], &Input[InOffset], FNLLEN);
+			if (FNLLEN != BLKLEN)
 			{
-				Padding->AddPadding(inpBuffer, FNLSZE);
+				Padding->AddPadding(inpBuffer, FNLLEN);
 			}
-			std::vector<byte> outBuffer(BLKSZE);
+			std::vector<byte> outBuffer(BLKLEN);
 			Cipher->EncryptBlock(inpBuffer, 0, outBuffer, 0);
-			if (Output.size() != OutOffset + BLKSZE)
+			if (Output.size() != OutOffset + BLKLEN)
 			{
-				Output.resize(OutOffset + BLKSZE);
+				Output.resize(OutOffset + BLKLEN);
 			}
-			std::memcpy(&Output[OutOffset], &outBuffer[0], BLKSZE);
+			std::memcpy(&Output[OutOffset], &outBuffer[0], BLKLEN);
 		}
 	}
 

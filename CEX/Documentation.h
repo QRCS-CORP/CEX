@@ -15,17 +15,17 @@ CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.6</B> (A6 version), which are the major, minor, patch, and release codes. \n
+The current version is <B>1.0.0.6d</B> (A6 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   1.0.0.6
-\date      June 17, 2018
+\version   1.0.0.6d
+\date      September 25, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.6 (A6 version), which are the major, minor, patch, and release codes. \n \n
+The current version is 1.0.0.6d (A6 version), which are the major, minor, patch, and release codes. \n \n
 
 <B>Current Release 1.0.0.6 (version A6):</B> \n
 The NTRU asymmetric cipher \n
@@ -50,9 +50,11 @@ DLL API \n \n
 
 <B>History</B> \n \n
 
-<B>Version 1.0.0.6, June 17, 2018</B> \n
+<B>Version 1.0.0.6, June 17, 2018 (with partial 1.0.0.7 release, Sept 27)</B> \n
 Added the NTRU Prime asymmetric cipher \n
 Added the RSX symmetric cipher \n
+Added the Threefish 256/512/1024 symmetric ciphers \n
+Added ChaCha512-P80 symmetric cipher \n
 Asymmetric ciphers updated to the NIST PQ Round 1 versions \n \n
 
 <B>Version 1.0.0.5, February 22, 2018</B> \n
@@ -186,7 +188,6 @@ NAMESPACE_ROOT
 			class IBlockCipher {};
 			class RHX {};
 			class SHX {};
-			class THX {};
 
 			/*!
 			*  \addtogroup Mode
@@ -233,8 +234,10 @@ NAMESPACE_ROOT
 		*/
 		NAMESPACE_STREAM
 			class IStreamCipher {};
-			class ChaCha20 {};
-			class Salsa20 {};
+			class ChaCha256 {};
+			class ChaCha512 {};
+			class Threefish256 {};
+			class Threefish512 {};
 		NAMESPACE_STREAMEND
 		/*! @} */
 

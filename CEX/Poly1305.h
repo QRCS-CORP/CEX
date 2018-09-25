@@ -1,6 +1,6 @@
 ﻿// The GPL version 3 License (GPLv3)
 // 
-// Copyright (c) 2017 vtdev.com
+// Copyright (c) 2018 vtdev.com
 // This file is part of the CEX Cryptographic library.
 // 
 // This program is free software : you can redistribute it and / or modify
@@ -26,14 +26,9 @@
 #define CEX_POLY1305_H
 
 #include "IMac.h"
-#include "IBlockCipher.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_MAC
-
-using Enumeration::BlockCipherExtensions;
-using Enumeration::BlockCiphers;
-using Cipher::Symmetric::Block::IBlockCipher;
 
 /// <summary>
 /// An implementation of the Poly1305 Message Authentication Code generator
@@ -87,37 +82,11 @@ private:
 	static const size_t BLOCK_SIZE = 16;
 	static const std::string CLASS_NAME;
 	static const size_t KEY_SIZE = 32;
-	static const byte R_MASK_LOW_2 = 0xFC;
-	static const byte R_MASK_HIGH_4 = 0x0F;
 
-	struct Poly1305State
-	{
-		std::array<uint, 5> H;
-		std::array<uint, 4> K;
-		std::array<uint, 5> R;
-		std::array<uint, 4> S;
-
-		Poly1305State()
-		{
-			Reset();
-		}
-
-		void Reset()
-		{
-			std::memset(&H[0], 0, H.size() * sizeof(uint));
-			std::memset(&K[0], 0, K.size() * sizeof(uint));
-			std::memset(&R[0], 0, R.size() * sizeof(uint));
-			std::memset(&S[0], 0, S.size() * sizeof(uint));
-		}
-	};
-
-	bool m_autoClamp;
-	std::unique_ptr<IBlockCipher> m_blockCipher;
-	bool m_destroyEngine;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	Poly1305State m_macState;
+	std::array<uint64_t, 8> m_macState;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 
@@ -143,15 +112,7 @@ public:
 	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
-	Poly1305(BlockCiphers BlockCipherType = BlockCiphers::None, BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
-
-	/// <summary>
-	/// Initialize the class with the block cipher enumeration name
-	/// </summary>
-	/// <param name="Cipher">The uninitialized block cipher instance; can not be null</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
-	Poly1305(IBlockCipher* Cipher);
+	Poly1305();
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -159,11 +120,6 @@ public:
 	~Poly1305() override;
 
 	//~~~Accessors~~~//
-
-	/// <summary>
-	/// Read/Write: [Default=true] Automatically clamp the key in the Initialize() function
-	/// </summary>
-	bool &AutoClamp();
 
 	/// <summary>
 	/// Read Only: The Macs internal blocksize in bytes
@@ -176,11 +132,6 @@ public:
 	const Macs Enumeral() override;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t MacSize() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
@@ -191,20 +142,16 @@ public:
 	std::vector<SymmetricKeySize> LegalKeySizes() const override;
 
 	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	const size_t MacSize() override;
+
+	/// <summary>
 	/// Read Only: Mac generators class name
 	/// </summary>
 	const std::string Name() override;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// [Optional] Modifies an existing 32 byte key to comply with the requirements of Poly1305-AES. 
-	/// <para>The Initialize(&ISymmetricKey) function tests the key for pre-conditioning, and if required, will clamp the key automatically.
-	/// The key is pre-conditioned to speed up multiplication by clearing required bits in the R portion of the key (first 16 bytes).</para>
-	/// </summary>
-	///
-	/// <param name="Key">A secret 32 byte vector</param>
-	static void Poly1305::Clamp(std::vector<byte> &Key);
 
 	/// <summary>
 	/// Process an input array and return the Mac code in the output array.
@@ -239,18 +186,6 @@ public:
 	void Initialize(ISymmetricKey &KeyParams) override;
 
 	/// <summary>
-	/// Tests if the R portion of the Key has been pre-conditioned for Poly1305-AES.
-	/// <para>The Mac key must be pre-processed for use with Poly1305-AES. 
-	/// The Initialize(&ISymmetricKey) function tests the key for pre-conditioning, and if required, will clamp the key automatically.
-	/// Optionally use the Clamp(&Key) function to clamp the key before use by Initialize(&ISymmetricKey).</para>
-	/// </summary>
-	/// 
-	/// <param name="Key">The secret key byte array</param>
-	/// 
-	/// <returns>Returns true if the key has been clamped</returns>
-	bool IsClamped(const std::vector<byte> &Key);
-
-	/// <summary>
 	/// Reset to the default state; Mac code and buffer are zeroised, but key is still loaded
 	/// </summary>
 	void Reset() override;
@@ -273,8 +208,7 @@ public:
 
 private:
 
-	static ulong CMul(uint A, uint B);
-	void ProcessBlock(const std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void Process(const std::vector<byte> &Output, size_t OutOffset, size_t Length, bool IsFinal);
 };
 
 NAMESPACE_MACEND
