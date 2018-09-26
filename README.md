@@ -63,7 +63,7 @@ Note: Each cipher can be deployed as either the standard form (AES, Serpent, Two
 * The X.923 Padding Scheme
 
 ### Stream Ciphers 
-* Added a a built-in authentication option to every stream cipher
+* Added a built-in authentication option to every stream cipher
 * ChaCha256-P20 stream cipher
 * ChaCha512-P80 stream cipher
 * Threefish 256/512/1024 stream ciphers
@@ -127,7 +127,7 @@ The next planned release (1.0.0.7) will be in October 2018.
 * SPHINCS+
 
 ### Planned Release 1.2.0.1
-* TLS
+* PQ-TLS
 * STM-KEX
 * Android/iOS/Linux compatibility
 * DLL API
