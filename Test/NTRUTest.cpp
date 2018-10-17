@@ -5,6 +5,7 @@
 #include "../CEX/NTRUKeyPair.h"
 #include "../CEX/NTRUPrivateKey.h"
 #include "../CEX/NTRUPublicKey.h"
+#include "../CEX/RingLWE.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
@@ -42,16 +43,17 @@ namespace Test
 	{
 		try
 		{
-			CipherTextIntegrity();
-			OnProgress(std::string("NTRUTest: Passed cipher-text integrity test.."));
-			MessageAuthentication();
+			Authentication();
 			OnProgress(std::string("NTRUTest: Passed message authentication test.."));
-			PublicKeyIntegrity();
+			CipherText();
+			OnProgress(std::string("NTRUTest: Passed cipher-text integrity test.."));
+
+			PublicKey();
 			OnProgress(std::string("NTRUTest: Passed public key integrity test.."));
-			StressLoop();
-			OnProgress(std::string("NTRUTest: Passed encryption and decryption stress tests.."));
-			SerializationCompare();
+			Serialization();
 			OnProgress(std::string("NTRUTest: Passed key serialization tests.."));
+			Stress();
+			OnProgress(std::string("NTRUTest: Passed encryption and decryption stress tests.."));
 
 			return SUCCESS;
 		}
@@ -65,7 +67,7 @@ namespace Test
 		}
 	}
 
-	void NTRUTest::CipherTextIntegrity()
+	void NTRUTest::Authentication()
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
@@ -85,7 +87,7 @@ namespace Test
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: L-Prime Cipher-text integrity test failed!");
+			throw TestException(std::string("NTRUTest: L-Prime Message authentication integrity test failed!"));
 		}
 
 		delete kp1;
@@ -111,63 +113,114 @@ namespace Test
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: S-Prime Cipher-text integrity test failed!");
+			throw TestException(std::string("NTRUTest: S-Prime Message authentication test failed!"));
+		}
+	}
+
+	void NTRUTest::CipherText()
+	{
+		std::vector<byte> cpt(0);
+		std::vector<byte> sec1(64);
+		std::vector<byte> sec2(64);
+
+		// LPrime
+		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp1 = cpr1.Generate();
+
+		cpr1.Initialize(kp1->PublicKey());
+		cpr1.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr1.Initialize(kp1->PrivateKey());
+
+		if (cpr1.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("NTRUTest: L-Prime Cipher-text integrity test failed!"));
+		}
+
+		delete kp1;
+
+		cpt.clear();
+		sec1.clear();
+		sec2.clear();
+		cpt.resize(0);
+		sec1.resize(64);
+		sec2.resize(64);
+
+		// SPrime
+		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		IAsymmetricKeyPair* kp2 = cpr2.Generate();
+
+		cpr2.Initialize(kp2->PublicKey());
+		cpr2.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr2.Initialize(kp2->PrivateKey());
+
+		if (cpr2.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("NTRUTest: S-Prime Cipher-text integrity test failed!"));
 		}
 
 		delete kp2;
 	}
 
-	void NTRUTest::MessageAuthentication()
+	void NTRUTest::Exception()
 	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(64);
-		std::vector<byte> sec2(64);
-
-		// LPrime
-		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp1 = cpr1.Generate();
-
-		cpr1.Initialize(kp1->PublicKey());
-		cpr1.Encapsulate(cpt, sec1);
-
-		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
-
-		cpr1.Initialize(kp1->PrivateKey());
-
-		if (cpr1.Decapsulate(cpt, sec2))
+		// test invalid constructor parameters
+		try
 		{
-			throw TestException("NTRUTest: L-Prime Message authentication integrity test failed!");
+			NTRU cpr(Enumeration::NTRUParams::None, m_rngPtr);
+
+			throw TestException(std::string("NTRU"), std::string("Exception: Exception handling failure! -TE1"));
+		}
+		catch (CryptoAsymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 
-		delete kp1;
-
-		cpt.clear();
-		sec1.clear();
-		sec2.clear();
-		cpt.resize(0);
-		sec1.resize(64);
-		sec2.resize(64);
-
-		// SPrime
-		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
-		IAsymmetricKeyPair* kp2 = cpr2.Generate();
-
-		cpr2.Initialize(kp2->PublicKey());
-		cpr2.Encapsulate(cpt, sec1);
-
-		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
-
-		cpr2.Initialize(kp2->PrivateKey());
-
-		if (cpr2.Decapsulate(cpt, sec2))
+		try
 		{
-			throw TestException("NTRUTest: S-Prime Message authentication test failed!");
+			NTRU cpr(Enumeration::NTRUParams::None, Enumeration::Prngs::None);
+
+			throw TestException(std::string("NTRU"), std::string("Exception: Exception handling failure! -TE2"));
+		}
+		catch (CryptoAsymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization
+		try
+		{
+			NTRU cpra(Enumeration::NTRUParams::None, Enumeration::Prngs::BCR);
+			Cipher::Asymmetric::RLWE::RingLWE cprb;
+			// create an invalid key set
+			IAsymmetricKeyPair* kp = cprb.Generate();
+			cpra.Initialize(kp->PrivateKey());
+
+			throw TestException(std::string("NTRU"), std::string("Exception: Exception handling failure! -TE3"));
+		}
+		catch (CryptoAsymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 	}
 
-	void NTRUTest::PublicKeyIntegrity()
+	void NTRUTest::PublicKey()
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
@@ -189,7 +242,7 @@ namespace Test
 
 		if (cpr1.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: Public-key integrity test failed!");
+			throw TestException(std::string("NTRUTest: Public-key integrity test failed!"));
 		}
 
 		delete kp1;
@@ -217,13 +270,13 @@ namespace Test
 
 		if (cpr2.Decapsulate(cpt, sec2))
 		{
-			throw TestException("NTRUTest: Public-key integrity test failed!");
+			throw TestException(std::string("NTRUTest: Public-key integrity test failed!"));
 		}
 
 		delete kp2;
 	}
 
-	void NTRUTest::SerializationCompare()
+	void NTRUTest::Serialization()
 	{
 		std::vector<byte> skey;
 		NTRU cpr(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
@@ -237,7 +290,7 @@ namespace Test
 
 			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
 			{
-				throw TestException("NTRUTest: Private key serialization test has failed!");
+				throw TestException(std::string("NTRUTest: Private key serialization test has failed!"));
 			}
 
 			NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
@@ -246,12 +299,12 @@ namespace Test
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
-				throw TestException("NTRUTest: Public key serialization test has failed!");
+				throw TestException(std::string("NTRUTest: Public key serialization test has failed!"));
 			}
 		}
 	}
 
-	void NTRUTest::StressLoop()
+	void NTRUTest::Stress()
 	{
 		// test encapsulate/decapsulate with LPrime configuration
 		std::vector<byte> cpt(0);
@@ -263,6 +316,7 @@ namespace Test
 
 		for (size_t i = 0; i < 50; ++i)
 		{
+			m_rngPtr->Generate(sec1);
 			IAsymmetricKeyPair* kp = cpr1.Generate();
 
 			cpr1.Initialize(kp->PublicKey());
@@ -272,14 +326,14 @@ namespace Test
 
 			if (!cpr1.Decapsulate(cpt, sec2))
 			{
-				throw TestException("NTRUTest: Stress test authentication has failed!");
+				throw TestException(std::string("NTRUTest: Stress test authentication has failed!"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException("NTRUTest: L-Prime Stress test has failed!");
+				throw TestException(std::string("NTRUTest: L-Prime Stress test has failed!"));
 			}
 		}
 
@@ -288,6 +342,7 @@ namespace Test
 
 		for (size_t i = 0; i < 50; ++i)
 		{
+			m_rngPtr->Generate(sec1);
 			IAsymmetricKeyPair* kp = cpr2.Generate();
 
 			cpr2.Initialize(kp->PublicKey());
@@ -297,14 +352,14 @@ namespace Test
 
 			if (!cpr2.Decapsulate(cpt, sec2))
 			{
-				throw TestException("NTRUTest: Stress test authentication has failed!");
+				throw TestException(std::string("NTRUTest: Stress test authentication has failed!"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException("NTRUTest: S-PrimeStress test has failed!");
+				throw TestException(std::string("NTRUTest: S-PrimeStress test has failed!"));
 			}
 		}
 	}

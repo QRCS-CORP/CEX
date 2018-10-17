@@ -9,9 +9,9 @@ NAMESPACE_SYMMETRICKEY
 
 //~~~Constructor~~~//
 
-SymmetricKeyGenerator::SymmetricKeyGenerator(Digests DigestType, Providers ProviderType)
+SymmetricKeyGenerator::SymmetricKeyGenerator(SHA2Digests DigestType, Providers ProviderType)
 	:
-	m_dgtType(DigestType != Digests::None ? DigestType :
+	m_dgtType(DigestType != SHA2Digests::None ? DigestType :
 		throw CryptoGeneratorException("SymmetricKeyGenerator::Ctor", "The digest type can not be none!")),
 	m_isDestroyed(false),
 	m_pvdEngine(ProviderType != Providers::None ? Helper::ProviderFromName::GetInstance(m_pvdType) : 
@@ -32,7 +32,7 @@ void SymmetricKeyGenerator::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_dgtType = Digests::None;
+		m_dgtType = SHA2Digests::None;
 		m_pvdType = Providers::None;
 
 		if (m_pvdEngine != 0)
@@ -146,8 +146,8 @@ std::vector<byte> SymmetricKeyGenerator::Process(size_t Length)
 std::vector<byte> SymmetricKeyGenerator::ProcessBlock()
 {
 	// seed size is 2x mac input block size less finalizer padding
-	const size_t BLKLEN = Helper::DigestFromName::GetBlockSize(m_dgtType);
-	size_t seedLen = (BLKLEN * 2) - Helper::DigestFromName::GetPaddingSize(m_dgtType);
+	const size_t BLKLEN = Helper::DigestFromName::GetBlockSize(static_cast<Digests>(m_dgtType));
+	size_t seedLen = (BLKLEN * 2) - Helper::DigestFromName::GetPaddingSize(static_cast<Digests>(m_dgtType));
 	std::vector<byte> seed(seedLen);
 
 	// generate the seed

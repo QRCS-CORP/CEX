@@ -63,7 +63,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -77,7 +77,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -120,7 +120,7 @@ namespace Test
 
 			if (cmpVal != inpVal)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -150,7 +150,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -164,7 +164,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -178,7 +178,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -209,7 +209,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -224,7 +224,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 
@@ -239,7 +239,7 @@ namespace Test
 
 			if (input != output)
 			{
-				throw TestException("CompareOutput: byte comparison failed!");
+				throw TestException(std::string("CompareOutput: byte comparison failed!"));
 			}
 		}
 	}

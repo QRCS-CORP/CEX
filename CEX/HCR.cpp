@@ -4,6 +4,8 @@
 
 NAMESPACE_PRNG
 
+using Enumeration::SHA2Digests;
+
 const std::string HCR::CLASS_NAME("HCR");
 
 //~~~Accessors~~~//
@@ -20,33 +22,33 @@ const std::string HCR::Name()
 
 //~~~Constructor~~~//
 
-HCR::HCR(Digests DigestType, Providers ProviderType, size_t BufferSize)
+HCR::HCR(SHA2Digests DigestType, Providers ProviderType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
-	m_digestType(DigestType != Digests::None ? DigestType :
+	m_digestType(DigestType != SHA2Digests::None ? DigestType :
 		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
 	m_pvdType(ProviderType),
 	m_rndSeed(0),
 	m_rngBuffer(BufferSize),
-	m_rngGenerator(new Drbg::HCG(m_digestType))
+	m_rngGenerator(new Drbg::HCG(static_cast<SHA2Digests>(DigestType)))
 {
 	Reset();
 }
 
-HCR::HCR(std::vector<byte> Seed, Digests DigestType, size_t BufferSize)
+HCR::HCR(std::vector<byte> Seed, SHA2Digests DigestType, size_t BufferSize)
 	:
 	m_bufferIndex(0),
 	m_bufferSize(BufferSize >= MIN_BUFLEN ? BufferSize : MIN_BUFLEN),
-	m_digestType(DigestType != Digests::None ? DigestType :
+	m_digestType(DigestType != SHA2Digests::None ? DigestType :
 		throw CryptoRandomException("HCR:Ctor", "Digest type can not be none!")),
 	m_isDestroyed(false),
 	m_pvdType(Providers::ACP),
 	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestType) ? Seed :
 		throw CryptoRandomException("HCR:Ctor", "The seed is too small!")),
 	m_rngBuffer(BufferSize),
-	m_rngGenerator(new Drbg::HCG(m_digestType))
+	m_rngGenerator(new Drbg::HCG(DigestType))
 {
 	Reset();
 }
@@ -58,7 +60,7 @@ HCR::~HCR()
 		m_isDestroyed = true;
 		m_bufferIndex = 0;
 		m_bufferSize = 0;
-		m_digestType = Digests::None;
+		m_digestType = SHA2Digests::None;
 		m_pvdType = Providers::None;
 
 		Utility::IntUtils::ClearVector(m_rndSeed);
@@ -174,40 +176,20 @@ void HCR::Reset()
 	m_bufferIndex = 0;
 }
 
-uint HCR::GetMinimumSeedSize(Digests RngEngine)
+uint HCR::GetMinimumSeedSize(SHA2Digests RngEngine)
 {
 	uint seedSize = 0;
 
 	switch (RngEngine)
 	{
-		case Digests::Keccak256:
-		{
-			seedSize = 136;
-			break;
-		}
-		case Digests::Keccak512:
-		case Digests::Keccak1024:
-		{
-			seedSize = 72;
-			break;
-		}
-		case Digests::Blake256:
-		case Digests::SHA256:
-		case Digests::Skein512:
+		case SHA2Digests::SHA256:
 		{
 			seedSize = 64;
 			break;
 		}
-		case Digests::Blake512:
-		case Digests::SHA512:
-		case Digests::Skein1024:
+		case SHA2Digests::SHA512:
 		{
 			seedSize = 128;
-			break;
-		}
-		case Digests::Skein256:
-		{
-			seedSize = 32;
 			break;
 		}
 		default:

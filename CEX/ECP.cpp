@@ -63,8 +63,10 @@ void ECP::Generate(std::vector<byte> &Output)
 
 void ECP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
-
+	if ((Output.size() - Offset) < Length)
+	{
+		throw CryptoRandomException("ECP:Generate", "The output buffer is too small!");
+	}
 	if (!m_isAvailable)
 	{
 		throw CryptoRandomException("ECP:Generate", "Random provider is not available!");

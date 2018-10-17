@@ -16,7 +16,8 @@ Poly1305::Poly1305()
 	:
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, 0, 0) },
+	// Note: redundant key necessary for automation alignment
+	m_legalKeySizes{ SymmetricKeySize(KEY_SIZE, 0, 0), SymmetricKeySize(KEY_SIZE, 0, 0) },
 	m_msgBuffer(BLOCK_SIZE),
 	m_msgLength(0)
 {
@@ -224,7 +225,10 @@ void Poly1305::Reset()
 
 void Poly1305::Update(byte Input)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("Poly1305:Update", "The generator has not been initialized!");
+	}
 
 	if (m_msgLength == m_msgBuffer.size())
 	{
@@ -238,8 +242,14 @@ void Poly1305::Update(byte Input)
 
 void Poly1305::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
-	CexAssert((InOffset + Length) <= Input.size(), "The Mac is not initialized");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("Poly1305:Update", "The generator has not been initialized!");
+	}
+	if ((Input.size() - InOffset) < Length)
+	{
+		throw CryptoMacException("Poly1305:Update", "The Input buffer is too short!");
+	}
 
 	if (Length != 0)
 	{

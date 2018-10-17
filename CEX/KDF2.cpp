@@ -8,9 +8,9 @@ const std::string KDF2::CLASS_NAME("KDF2");
 
 //~~~Constructor~~~//
 
-KDF2::KDF2(Digests DigestType)
+KDF2::KDF2(SHA2Digests DigestType)
 	:
-	m_msgDigest(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? Helper::DigestFromName::GetInstance(DigestType) :
+	m_msgDigest(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType)) :
 		throw CryptoKdfException("KDF2:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_msgDigest->BlockSize()),
 	m_destroyEngine(true),
@@ -18,7 +18,7 @@ KDF2::KDF2(Digests DigestType)
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_kdfCounter(1),
-	m_kdfDigestType(DigestType),
+	m_kdfDigestType(static_cast<Digests>(DigestType)),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0)
@@ -90,7 +90,7 @@ const bool KDF2::IsInitialized()
 	return m_isInitialized; 
 }
 
-size_t KDF2::MinKeySize() 
+const size_t KDF2::MinKeySize() 
 { 
 	return m_blockSize;
 }
@@ -109,9 +109,10 @@ const std::string KDF2::Name()
 
 size_t KDF2::Generate(std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
-
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("HKDF:Generate", "The generator has not been initialized!");
+	}
 	if (m_kdfCounter + (Output.size() / m_hashSize) > 255)
 	{
 		throw CryptoKdfException("KDF2:Generate", "KDF2 may only be used for 255 * HashLen bytes of output");
@@ -122,9 +123,14 @@ size_t KDF2::Generate(std::vector<byte> &Output)
 
 size_t KDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
-
+	if (Output.size() - OutOffset < Length)
+	{
+		throw CryptoKdfException("HKDF:Generate", "The generator has not been initialized!");
+	}
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("HKDF:Generate", "The generator has not been initialized!");
+	}
 	if (m_kdfCounter + (Length / m_hashSize) > 255)
 	{
 		throw CryptoKdfException("KDF2:Generate", "KDF2 may only be used for 255 * HashLen bytes of output");
@@ -154,19 +160,21 @@ void KDF2::Initialize(ISymmetricKey &GenParam)
 
 void KDF2::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
-	CexAssert(Key.size() >= Length + Offset, "The key is too small");
+	if (Key.size() < MIN_KEYLEN)
+	{
+		throw CryptoKdfException("KDF2:Initialize", "Key value is too small, must be at least 16 bytes in length!");
+	}
 
 	std::vector<byte> tmpK(Length);
-
 	Utility::MemUtils::Copy(Key, Offset, tmpK, 0, Length);
 	Initialize(tmpK);
 }
 
 void KDF2::Initialize(const std::vector<byte> &Key)
 {
-	if (Key.size() < m_hashSize)
+	if (Key.size() < MIN_KEYLEN)
 	{
-		throw CryptoKdfException("KDF2:Initialize", "Salt size is too small; must be a minumum of digest return size!");
+		throw CryptoKdfException("KDF2:Initialize", "Key value is too small, must be at least 16 bytes in length!");
 	}
 
 	if (m_isInitialized)
@@ -194,9 +202,9 @@ void KDF2::Initialize(const std::vector<byte> &Key)
 
 void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
 {
-	if (Key.size() < m_hashSize)
+	if (Key.size() < MIN_KEYLEN)
 	{
-		throw CryptoKdfException("KDF2:Initialize", "Key size is too small; must be a minumum of digest return size!");
+		throw CryptoKdfException("KDF2:Initialize", "Key value is too small, must be at least 16 bytes in length!");
 	}
 	if (Salt.size() < MIN_SALTLEN)
 	{
@@ -222,9 +230,9 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 
 void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
 {
-	if (Key.size() < m_hashSize)
+	if (Key.size() < MIN_KEYLEN)
 	{
-		throw CryptoKdfException("KDF2:Initialize", "Key size is too small; must be a minumum of digest return size!");
+		throw CryptoKdfException("KDF2:Initialize", "Key value is too small, must be at least 16 bytes in length!");
 	}
 	if (Salt.size() < MIN_SALTLEN)
 	{
@@ -256,9 +264,9 @@ void KDF2::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sal
 
 void KDF2::ReSeed(const std::vector<byte> &Seed)
 {
-	if (Seed.size() < m_hashSize)
+	if (Seed.size() < MIN_KEYLEN)
 	{
-		throw CryptoKdfException("KDF2:Update", "Seed is too small!");
+		throw CryptoKdfException("KDF2:ReSeed", "Key value is too small, must be at least 16 bytes in length!");
 	}
 
 	Initialize(Seed);

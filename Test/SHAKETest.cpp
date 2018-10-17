@@ -2,16 +2,25 @@
 #include "../CEX/SHAKE.h"
 #include "../CEX/IDigest.h"
 #include "../CEX/IntUtils.h"
-#include "../CEX/SymmetricKey.h"
+#include "../CEX/SecureRandom.h"
+#include "../CEX/SymmetricKeySize.h"
 
 namespace Test
 {
+	using Exception::CryptoKdfException;
+	using Utility::IntUtils;
+	using Prng::SecureRandom;
+	using Kdf::SHAKE;
+	using Key::Symmetric::SymmetricKeySize;
+
 	const std::string SHAKETest::DESCRIPTION = "SHAKE XOF Known Answer Tests";
 	const std::string SHAKETest::FAILURE = "FAILURE! ";
 	const std::string SHAKETest::SUCCESS = "SUCCESS! All SHAKE tests have executed succesfully.";
 
 	SHAKETest::SHAKETest()
 		:
+		m_expected(0),
+		m_key(0),
 		m_progressEvent()
 	{
 		Initialize();
@@ -19,6 +28,8 @@ namespace Test
 
 	SHAKETest::~SHAKETest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_key);
 	}
 
 	const std::string SHAKETest::Description()
@@ -33,54 +44,70 @@ namespace Test
 
 	std::string SHAKETest::Run()
 	{
-		size_t i;
-
 		try
 		{
+			Exception();
+			OnProgress(std::string("SHAKETest: Passed SHAKE exception handling tests.."));
 
-			OnProgress(std::string("SHAKE: Testing the SHAKE implementations.."));
+			OnProgress(std::string("cSHAKE: Testing the SHAKE implementations.."));
 
-			for (i = 0; i < 5; ++i)
-			{
-				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE128);
-			}
-			OnProgress(std::string("SHAKETest: Passed SHAKE128 tests.."));
+			SHAKE* gen1 = new SHAKE(ShakeModes::SHAKE128);
+			Kat(gen1, m_key[0], m_expected[0]);
+			Kat(gen1, m_key[1], m_expected[1]);
+			Kat(gen1, m_key[2], m_expected[2]);
+			Kat(gen1, m_key[3], m_expected[3]);
+			Kat(gen1, m_key[4], m_expected[4]);
+			OnProgress(std::string("SHAKETest: Passed SHAKE128 KAT tests.."));
 
-			for (i = 5; i < 10; ++i)
-			{
-				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE256);
-			}
-			OnProgress(std::string("SHAKETest: Passed SHAKE256 tests.."));
+			SHAKE* gen2 = new SHAKE(ShakeModes::SHAKE256);
+			Kat(gen2, m_key[5], m_expected[5]);
+			Kat(gen2, m_key[6], m_expected[6]);
+			Kat(gen2, m_key[7], m_expected[7]);
+			Kat(gen2, m_key[8], m_expected[8]);
+			Kat(gen2, m_key[9], m_expected[9]);
+			OnProgress(std::string("SHAKETest: Passed SHAKE256 KAT tests.."));
 
-			for (i = 10; i < 15; ++i)
-			{
-				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE512);
-			}
-			OnProgress(std::string("SHAKETest: Passed SHAKE512 tests.."));/**/
+			SHAKE* gen3 = new SHAKE(ShakeModes::SHAKE512);
+			Kat(gen3, m_key[10], m_expected[10]);
+			Kat(gen3, m_key[11], m_expected[11]);
+			Kat(gen3, m_key[12], m_expected[12]);
+			Kat(gen3, m_key[13], m_expected[13]);
+			Kat(gen3, m_key[14], m_expected[14]);
+			OnProgress(std::string("SHAKETest: Passed SHAKE512 KAT tests.."));
 
-			for (i = 15; i < 20; ++i)
-			{
-				CompareOutput(m_key[i], m_output[i], Enumeration::ShakeModes::SHAKE1024);
-			}
-			OnProgress(std::string("SHAKETest: Passed SHAKE1024 tests.."));
+			SHAKE* gen4 = new SHAKE(ShakeModes::SHAKE1024);
+			Kat(gen4, m_key[15], m_expected[15]);
+			Kat(gen4, m_key[16], m_expected[16]);
+			Kat(gen4, m_key[17], m_expected[17]);
+			Kat(gen4, m_key[18], m_expected[18]);
+			Kat(gen4, m_key[19], m_expected[19]);
+			OnProgress(std::string("SHAKETest: Passed SHAKE1024 KAT tests.."));
 
 			OnProgress(std::string("cSHAKE: Testing the custom SHAKE implementations.."));
-
-			CompareOutput(m_key[20], m_output[20], Enumeration::ShakeModes::SHAKE128, true);
-			CompareOutput(m_key[21], m_output[21], Enumeration::ShakeModes::SHAKE128, true);
+			Kat(gen1, m_key[20], m_expected[20], true);
+			Kat(gen1, m_key[21], m_expected[21], true);
 			OnProgress(std::string("cSHAKE: Passed SP800-185 cSHAKE-128 KAT tests.."));
 
-			CompareOutput(m_key[20], m_output[22], Enumeration::ShakeModes::SHAKE256, true);
-			CompareOutput(m_key[21], m_output[23], Enumeration::ShakeModes::SHAKE256, true);
+			Kat(gen2, m_key[20], m_expected[22], true);
+			Kat(gen2, m_key[21], m_expected[23], true);
 			OnProgress(std::string("cSHAKE: Passed SP800-185 cSHAKE-256 KAT tests.."));
 
-			CompareOutput(m_key[21], m_output[24], Enumeration::ShakeModes::SHAKE512, true);
+			Kat(gen3, m_key[21], m_expected[24], true);
 			OnProgress(std::string("cSHAKE: Passed customized cSHAKE-512 KAT test.."));
 
-			CompareOutput(m_key[20], m_output[25], Enumeration::ShakeModes::SHAKE1024, true);
+			Kat(gen4, m_key[20], m_expected[25], true);
 			OnProgress(std::string("cSHAKE: Passed customized cSHAKE-1024 KAT test.."));
 
-			OnProgress(std::string("SHAKETest: Passed vector comparison tests.."));
+			Params(gen1);
+			Params(gen2);
+			OnProgress(std::string("SCRYPTTest: Passed initialization tests.."));
+
+			Stress(gen1);
+			Stress(gen2);
+			OnProgress(std::string("SCRYPTTest: Passed stress tests.."));
+
+			delete gen1;
+			delete gen2;
 
 			return SUCCESS;
 		}
@@ -94,26 +121,102 @@ namespace Test
 		}
 	}
 
-	void SHAKETest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Expected, ShakeModes Mode, bool Custom)
+	void SHAKETest::Exception()
 	{
-		std::vector<byte> outBytes(Expected.size());
-		Kdf::SHAKE gen(Mode);
+		// test constructor
+		try
+		{
+			// invalid digest choice
+			SHAKE kdf(ShakeModes::None);
+
+			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE1"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization
+		try
+		{
+			SHAKE kdf(ShakeModes::SHAKE128);
+			// invalid key size
+			std::vector<byte> key(1);
+			kdf.Initialize(key);
+
+			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE2"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generator state -1
+		try
+		{
+			SHAKE kdf(ShakeModes::SHAKE128);
+			std::vector<byte> otp(32);
+			// generator was not initialized
+			kdf.Generate(otp);
+
+			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE3"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generator state -2
+		try
+		{
+			SHAKE kdf(ShakeModes::SHAKE128);
+			Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> otp(32);
+
+			kdf.Initialize(key);
+			// array too small
+			kdf.Generate(otp, 0, otp.size() + 1);
+
+			throw TestException(std::string("SHAKE"), std::string("Exception: Exception handling failure! -SE4"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+	}
+
+	void SHAKETest::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected, bool Custom)
+	{
+		std::vector<byte> otp(Expected.size());
 
 		if (Custom)
 		{
 			std::vector<byte> name(0);
-			gen.Initialize(Key, m_custom, name);
+			Generator->Initialize(Key, m_custom, name);
 		}
 		else
 		{
-			gen.Initialize(Key);
+			Generator->Initialize(Key);
 		}
 
-		gen.Generate(outBytes, 0, outBytes.size());
+		Generator->Generate(otp);
 
-		if (outBytes != Expected)
+		if (otp != Expected)
 		{
-			throw TestException("SHAKETest: Values are not equal!");
+			throw TestException(std::string("Kat: Output does not match the known answer! -SK1"));
 		}
 	}
 
@@ -270,7 +373,7 @@ namespace Test
 		};
 		HexConverter::Decode(keys, 22, m_key);
 
-		const std::vector<std::string> output =
+		const std::vector<std::string> expected =
 		{
 			// shake128: official vectors
 			std::string("3A0FACA70C9D2B81D1064D429EA3B05AD27366F64985379DDD75BC73D6A8381045C2AE2E9C723462EE09EFBB1C2A8ED7A0729D0D9B20F03BBCF55A86859ECBE80C8CAB60BAB4C5D063DEA224E825E386421"
@@ -386,12 +489,75 @@ namespace Test
 			// shake1024 new implementation vector
 			std::string("58606D16D768FF3AADCE55BB2E8FB409FFE1AF198DC21C07477E15CB09B9CBFD8554B0784613E164605E11DEE383B6190AFFA0BB91EEAD668271DB455E79BA28")
 		};
-		HexConverter::Decode(output, 26, m_output);
+		HexConverter::Decode(expected, 26, m_expected);
 		/*lint -restore */
 	}
 
 	void SHAKETest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
+	}
+
+	void SHAKETest::Params(IKdf* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> otp1;
+		std::vector<byte> otp2;
+		std::vector<byte> key(ks.KeySize());
+		SecureRandom rnd;
+		size_t i;
+
+		otp1.reserve(MAXM_ALLOC);
+		otp2.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+			otp1.resize(OTPLEN);
+			otp2.resize(OTPLEN);
+			IntUtils::Fill(key, 0, key.size(), rnd);
+
+			// generate with the kdf
+			Generator->Initialize(key);
+			Generator->Generate(otp1, 0, OTPLEN);
+			Generator->Reset();
+			Generator->Initialize(key);
+			Generator->Generate(otp2, 0, OTPLEN);
+
+			if (otp1 != otp2)
+			{
+				throw TestException(std::string("Reset: Returns a different array after reset! -HR1"));
+			}
+		}
+	}
+
+	void SHAKETest::Stress(IKdf* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> key(ks.KeySize());
+		std::vector<byte> otp;
+		SecureRandom rnd;
+		size_t i;
+
+		otp.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			try
+			{
+				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+				otp.resize(OTPLEN);
+				IntUtils::Fill(key, 0, key.size(), rnd);
+
+				// generate with the kdf
+				Generator->Initialize(key);
+				Generator->Generate(otp, 0, OTPLEN);
+				Generator->Reset();
+			}
+			catch (...)
+			{
+				throw TestException(std::string("Stress: The generator has thrown an exception! -HS1"));
+			}
+		}
 	}
 }

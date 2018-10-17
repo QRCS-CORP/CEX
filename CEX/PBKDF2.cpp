@@ -9,16 +9,16 @@ const std::string PBKDF2::CLASS_NAME("PBKDF2");
 
 //~~~Constructor~~~//
 
-PBKDF2::PBKDF2(Digests DigestType, size_t Iterations)
+PBKDF2::PBKDF2(SHA2Digests DigestType, size_t Iterations)
 	:
-	m_macGenerator(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? new HMAC(DigestType) :
+	m_macGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
 		throw CryptoKdfException("PBKDF2:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_kdfCounter(1),
-	m_kdfDigestType(DigestType),
+	m_kdfDigestType(static_cast<Digests>(DigestType)),
 	m_kdfIterations(Iterations != 0 ? Iterations : 
 		throw CryptoKdfException("PBKDF2:CTor", "Iterations count can not be zero!")),
 	m_kdfKey(0),
@@ -113,7 +113,12 @@ const Kdfs PBKDF2::Enumeral()
 
 const bool PBKDF2::IsInitialized() 
 { 
-	return m_isInitialized; 
+	return m_isInitialized;
+}
+
+size_t &PBKDF2::Iterations()
+{
+	return m_kdfIterations;
 }
 
 std::vector<SymmetricKeySize> PBKDF2::LegalKeySizes() const
@@ -121,7 +126,7 @@ std::vector<SymmetricKeySize> PBKDF2::LegalKeySizes() const
 	return m_legalKeySizes; 
 };
 
-size_t PBKDF2::MinKeySize() 
+const size_t PBKDF2::MinKeySize() 
 { 
 	return m_macSize; 
 }
@@ -135,16 +140,24 @@ const std::string PBKDF2::Name()
 
 size_t PBKDF2::Generate(std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("PBKDF2:Generate", "The generator has not been initialized!");
+	}
 
 	return Expand(Output, 0, Output.size());
 }
 
 size_t PBKDF2::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("PBKDF2:Generate", "The generator has not been initialized!");
+	}
+	if (Output.size() - OutOffset < Length)
+	{
+		throw CryptoKdfException("PBKDF2:Generate", "The output buffer is too short!");
+	}
 
 	return Expand(Output, OutOffset, Length);
 }
@@ -192,10 +205,12 @@ void PBKDF2::Initialize(const std::vector<byte> &Key)
 
 void PBKDF2::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
-	CexAssert(Key.size() >= Length + Offset, "The key is too small");
+	if (Key.size() < MIN_PASSLEN)
+	{
+		throw CryptoKdfException("PBKDF2:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+	}
 
 	std::vector<byte> tmpK(Length);
-
 	Utility::MemUtils::Copy(Key, Offset, tmpK, 0, Length);
 	Initialize(tmpK);
 }
@@ -347,11 +362,11 @@ void PBKDF2::LoadState()
 	// this is the recommended size: 
 	// ideally, salt should be passphrase len - (4 bytes of counter + digest finalizer code)
 	// you want to fill one complete block, and avoid hmac compression on > block-size
-	m_legalKeySizes[0] = SymmetricKeySize(0, m_macGenerator->MacSize(), 0);
+	m_legalKeySizes[0] = SymmetricKeySize(m_macGenerator->MacSize(), 0, 0);
 	// 2nd recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(0, m_macGenerator->MacSize(), 0);
+	m_legalKeySizes[1] = SymmetricKeySize(m_macGenerator->MacSize(), m_macGenerator->MacSize(), 0);
 	// max recommended
-	m_legalKeySizes[2] = SymmetricKeySize(0, m_macGenerator->MacSize() * 2, 0);
+	m_legalKeySizes[2] = SymmetricKeySize(m_macGenerator->MacSize() * 2, m_macGenerator->MacSize(), 0);
 }
 
 NAMESPACE_KDFEND

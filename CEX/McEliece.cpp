@@ -19,7 +19,7 @@ McEliece::McEliece(MPKCParams Parameters, Prngs PrngType)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mpkcParameters(Parameters != MPKCParams::None ? Parameters : 
+	m_mpkcParameters(Parameters != MPKCParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParams::M12T62) ? Parameters :
 		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The prng type can not be none!"))
@@ -33,7 +33,7 @@ McEliece::McEliece(MPKCParams Parameters, IPrng* Prng)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mpkcParameters(Parameters != MPKCParams::None ? Parameters : 
+	m_mpkcParameters(Parameters != MPKCParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParams::M12T62) ? Parameters :
 		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The prng can not be null!"))
@@ -140,10 +140,6 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 
 		status = MPKCM12T62::Decrypt(e, m_privateKey->S(), CipherText);
 	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Decrypt", "The parameter type is invalid!");
-	}
 
 	// copy hash of pk to coin 1
 	Utility::MemUtils::Copy(m_privateKey->S(), MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, coins, 0, MPKCM12T62::MPKC_COIN_SIZE);
@@ -187,10 +183,6 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 		CipherText.resize(MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE + SharedSecret.size());
 		MPKCM12T62::Encrypt(CipherText, e, m_publicKey->P(), m_rndGenerator);
 	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Decrypt", "The parameter type is invalid!");
-	}
 
 	// hash pk to coin 1
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
@@ -219,8 +211,6 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 
 IAsymmetricKeyPair* McEliece::Generate()
 {
-	CexAssert(m_mpkcParameters != MPKCParams::None, "The parameter setting is invalid");
-
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
@@ -238,10 +228,6 @@ IAsymmetricKeyPair* McEliece::Generate()
 		Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 		gen.Initialize(pk);
 		gen.Generate(sk, MPKCM12T62::MPKC_CPAPRIVATEKEY_SIZE, MPKCM12T62::MPKC_COIN_SIZE);
-	}
-	else
-	{
-		throw CryptoAsymmetricException("McEliece:Generate", "The parameter type is invalid!");
 	}
 
 	Key::Asymmetric::MPKCPublicKey* apk = new Key::Asymmetric::MPKCPublicKey(m_mpkcParameters, pk);

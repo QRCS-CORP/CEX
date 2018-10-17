@@ -52,6 +52,10 @@ SHA512::SHA512(SHA2Params &Params)
 	{
 		throw CryptoDigestException("SHA512::Ctor", "Cpu does not support parallel processing!");
 	}
+	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
+	{
+		throw CryptoDigestException("SHA512::Ctor", "The tree parameters are invalid!");
+	}
 
 	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
 	{
@@ -203,7 +207,7 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// compress full blocks
 		size_t blkOff = 0;
-		if (m_msgLength > BLOCK_SIZE)
+		if (m_msgLength >= BLOCK_SIZE)
 		{
 			const size_t BLKRMD = m_msgLength - (m_msgLength % BLOCK_SIZE);
 
@@ -234,23 +238,24 @@ size_t SHA512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 void SHA512::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoDigestException("SHA512::ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
-	m_dgtState.clear();
-	m_dgtState.resize(Degree);
-	m_msgBuffer.clear();
-	m_msgBuffer.resize(Degree * BLOCK_SIZE);
 
 	Reset();
 }
 
 void SHA512::Reset()
 {
+	m_dgtState.clear();
+	m_dgtState.resize(m_parallelProfile.ParallelMaxDegree());
+	m_msgBuffer.clear();
+	m_msgBuffer.resize(m_parallelProfile.ParallelMaxDegree() * BLOCK_SIZE);
 	m_msgLength = 0;
-	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	std::vector<byte> params(BLOCK_SIZE, 0x1F);
 
 	for (size_t i = 0; i < m_dgtState.size(); ++i)
 	{
@@ -259,7 +264,8 @@ void SHA512::Reset()
 		if (m_parallelProfile.IsParallel())
 		{
 			m_treeParams.NodeOffset() = static_cast<uint>(i);
-			Permute(m_treeParams.ToBytes(), 0, m_dgtState[i]);
+			MemUtils::Copy(m_treeParams.ToBytes(), 0, params, 0, m_treeParams.GetHeaderSize());
+			Permute(params, 0, m_dgtState[i]);
 		}
 	}
 }
@@ -342,7 +348,7 @@ void SHA512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Leng
 			}
 
 			// sequential loop through blocks
-			while (Length > BLOCK_SIZE)
+			while (Length >= BLOCK_SIZE)
 			{
 				Permute(Input, InOffset, m_dgtState[0]);
 				InOffset += BLOCK_SIZE;

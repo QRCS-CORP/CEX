@@ -1,11 +1,18 @@
 #include "CMACTest.h"
 #include "../CEX/CMAC.h"
-#include "../CEX/RHX.h"
+#include "../CEX/IntUtils.h"
+#include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	using Enumeration::BlockCiphers;
+	using Exception::CryptoMacException;
+	using Mac::CMAC;
+	using Utility::IntUtils;
+	using Prng::SecureRandom;
 	using Key::Symmetric::SymmetricKey;
+	using Key::Symmetric::SymmetricKeySize;
 
 	const std::string CMACTest::DESCRIPTION = "CMAC Known Answer Test Vectors for 128/192/256 bit Keys.";
 	const std::string CMACTest::FAILURE = "FAILURE! ";
@@ -13,6 +20,9 @@ namespace Test
 
 	CMACTest::CMACTest()
 		:
+		m_expected(0),
+		m_key(0),
+		m_message(0),
 		m_progressEvent()
 	{
 		Initialize();
@@ -20,6 +30,9 @@ namespace Test
 
 	CMACTest::~CMACTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_key);
+		IntUtils::ClearVector(m_message);
 	}
 
 	const std::string CMACTest::Description()
@@ -36,23 +49,36 @@ namespace Test
 	{
 		try
 		{
-			CompareOutput(m_keys[0], m_input[0], m_expected[0]);
-			CompareOutput(m_keys[0], m_input[1], m_expected[1]);
-			CompareOutput(m_keys[0], m_input[2], m_expected[2]);
-			CompareOutput(m_keys[0], m_input[3], m_expected[3]);
-			OnProgress(std::string("Passed 128 bit key vector tests.."));
-			CompareOutput(m_keys[1], m_input[0], m_expected[4]);
-			CompareOutput(m_keys[1], m_input[1], m_expected[5]);
-			CompareOutput(m_keys[1], m_input[2], m_expected[6]);
-			CompareOutput(m_keys[1], m_input[3], m_expected[7]);
-			OnProgress(std::string("Passed 192 bit key vector tests.."));
-			CompareOutput(m_keys[2], m_input[0], m_expected[8]);
-			CompareOutput(m_keys[2], m_input[1], m_expected[9]);
-			CompareOutput(m_keys[2], m_input[2], m_expected[10]);
-			CompareOutput(m_keys[2], m_input[3], m_expected[11]);
-			OnProgress(std::string("Passed 256 bit key vector tests.."));
-			CompareAccess(m_keys[2]);
-			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
+			Exception();
+			OnProgress(std::string("CMACTest: Passed CMAC exception handling tests.."));
+
+			CMAC* gen = new CMAC(BlockCiphers::Rijndael);
+
+			Kat(gen, m_key[0], m_message[0], m_expected[0]);
+			Kat(gen, m_key[0], m_message[1], m_expected[1]);
+			Kat(gen, m_key[0], m_message[2], m_expected[2]);
+			Kat(gen, m_key[0], m_message[3], m_expected[3]);
+			OnProgress(std::string("CMACTest: Passed CMAC 128 bit key vector tests.."));
+
+			Kat(gen, m_key[1], m_message[0], m_expected[4]);
+			Kat(gen, m_key[1], m_message[1], m_expected[5]);
+			Kat(gen, m_key[1], m_message[2], m_expected[6]);
+			Kat(gen, m_key[1], m_message[3], m_expected[7]);
+			OnProgress(std::string("CMACTest: Passed CMAC 192 bit key vector tests.."));
+
+			Kat(gen, m_key[2], m_message[0], m_expected[8]);
+			Kat(gen, m_key[2], m_message[1], m_expected[9]);
+			Kat(gen, m_key[2], m_message[2], m_expected[10]);
+			Kat(gen, m_key[2], m_message[3], m_expected[11]);
+			OnProgress(std::string("CMACTest: Passed CMAC 256 bit key vector tests.."));
+
+			Params(gen);
+			OnProgress(std::string("CMACTest: Passed CMAC initialization parameters tests.."));
+
+			Stress(gen);
+			OnProgress(std::string("CMACTest: Passed CMAC stress tests.."));
+
+			delete gen;
 
 			return SUCCESS;
 		}
@@ -66,45 +92,74 @@ namespace Test
 		}
 	}
 
-	void CMACTest::CompareAccess(std::vector<byte> &Key)
+	void CMACTest::Exception()
 	{
-		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-		Mac::CMAC mac(eng);
-		SymmetricKey kp(Key);
-
-		mac.Initialize(kp);
-		std::vector<byte> input(64);
-		mac.Update(input, 0, input.size());
-		std::vector<byte> hash1(16);
-		mac.Finalize(hash1, 0);
-		std::vector<byte> hash2(16);
-		// must reinitialize after a finalizer call
-		mac.Initialize(kp);
-		mac.Compute(input, hash2);
-		delete eng;
-
-		if (hash1 != hash2)
+		// test constructor -1
+		try
 		{
-			throw TestException("CMAC is not equal!");
+			// invalid cipher choice
+			CMAC mac(BlockCiphers::None);
+
+			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE1"));
 		}
-	}
-
-	void CMACTest::CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
-	{
-		std::vector<byte> hash(16);
-		Cipher::Symmetric::Block::RHX* eng = new Cipher::Symmetric::Block::RHX();
-		SymmetricKey kp(Key);
-
-		Mac::CMAC mac(eng);
-		mac.Initialize(kp);
-		mac.Update(Input, 0, Input.size());
-		mac.Finalize(hash, 0);
-
-		delete eng;
-
-		if (Expected != hash)
+		catch (CryptoMacException const &)
 		{
-			throw TestException("CMAC is not equal!");
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+		// test constructor -2
+		try
+		{
+			// invalid cipher choice
+			CMAC mac(nullptr);
+
+			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE2"));
+		}
+		catch (CryptoMacException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization
+		try
+		{
+			CMAC mac(BlockCiphers::Rijndael);
+			// invalid key size
+			std::vector<byte> k(1);
+			SymmetricKey kp(k);
+			mac.Initialize(kp);
+
+			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE3"));
+		}
+		catch (CryptoMacException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test finalize state -1
+		try
+		{
+			CMAC mac(BlockCiphers::Rijndael);
+			std::vector<byte> code(16);
+			// generator was not initialized
+			mac.Finalize(code, 0);
+
+			throw TestException(std::string("CMAC"), std::string("Exception: Exception handling failure! -CE4"));
+		}
+		catch (CryptoMacException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 	}
 
@@ -116,16 +171,16 @@ namespace Test
 			std::string("8E73B0F7DA0E6452C810F32B809079E562F8EAD2522C6B7B"),
 			std::string("603DEB1015CA71BE2B73AEF0857D77811F352C073B6108D72D9810A30914DFF4")
 		};
-		HexConverter::Decode(keys, 3, m_keys);
+		HexConverter::Decode(keys, 3, m_key);
 
-		const std::vector<std::string> input =
+		const std::vector<std::string> message =
 		{
 			std::string(""),
 			std::string("6BC1BEE22E409F96E93D7E117393172A"),
 			std::string("6BC1BEE22E409F96E93D7E117393172AAE2D8A571E03AC9C9EB76FAC45AF8E5130C81C46A35CE411"),
 			std::string("6BC1BEE22E409F96E93D7E117393172AAE2D8A571E03AC9C9EB76FAC45AF8E5130C81C46A35CE411E5FBC1191A0A52EFF69F2445DF4F9B17AD2B417BE66C3710")
 		};
-		HexConverter::Decode(input, 4, m_input);
+		HexConverter::Decode(message, 4, m_message);
 
 		const std::vector<std::string> expected =
 		{
@@ -145,8 +200,90 @@ namespace Test
 		HexConverter::Decode(expected, 12, m_expected);
 	}
 
+	void CMACTest::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	{
+		std::vector<byte> code(16);
+		SymmetricKey kp(Key);
+
+		Generator->Initialize(kp);
+		Generator->Update(Message, 0, Message.size());
+		Generator->Finalize(code, 0);
+
+		if (Expected != code)
+		{
+			throw TestException(std::string("CMAC"), std::string("KAT: Expected values don't match! -CK1"));
+		}
+	}
+
 	void CMACTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
+	}
+
+	void CMACTest::Params(IMac* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> key(ks.KeySize());
+		std::vector<byte> msg;
+		std::vector<byte> otp1(Generator->MacSize());
+		std::vector<byte> otp2(Generator->MacSize());
+		SecureRandom rnd;
+		size_t i;
+
+		msg.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+			msg.resize(MSGLEN);
+			IntUtils::Fill(key, 0, key.size(), rnd);
+			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			SymmetricKey kp(key);
+
+			// generate the mac
+			Generator->Initialize(kp);
+			Generator->Compute(msg, otp1);
+			Generator->Reset();
+			Generator->Initialize(kp);
+			Generator->Compute(msg, otp2);
+
+			if (otp1 != otp2)
+			{
+				throw TestException(std::string("CMAC"), std::string("Reset: Returns a different array after reset! -CP1"));
+			}
+		}
+	}
+
+	void CMACTest::Stress(IMac* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> msg;
+		std::vector<byte> otp(Generator->MacSize());
+		std::vector<byte> key(ks.KeySize());
+		SecureRandom rnd;
+		size_t i;
+
+		msg.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			try
+			{
+				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+				msg.resize(MSGLEN);
+				IntUtils::Fill(key, 0, key.size(), rnd);
+				IntUtils::Fill(msg, 0, msg.size(), rnd);
+				SymmetricKey kp(key);
+
+				// generate with the kdf
+				Generator->Initialize(kp);
+				Generator->Compute(msg, otp);
+				Generator->Reset();
+			}
+			catch (...)
+			{
+				throw TestException(std::string("CMAC"), std::string("Stress: The generator has thrown an exception! -CS1"));
+			}
+		}
 	}
 }

@@ -22,9 +22,9 @@ AHX::AHX(BlockCipherExtensions CipherExtension)
 	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_distCodeMax(0),
 	m_expKey(0),
-	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
+	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr : 
 		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!") :
-		Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtension))),
+		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -40,7 +40,7 @@ AHX::AHX(Kdf::IKdf* Kdf)
 	m_distCode(DEF_DSTINFO.begin(), DEF_DSTINFO.end()),
 	m_distCodeMax(0),
 	m_expKey(0),
-	m_kdfGenerator(Kdf != nullptr ? Kdf :
+	m_kdfGenerator(Kdf != nullptr ? Kdf : 
 		throw CryptoSymmetricCipherException("AHX:CTor", "The Kdf can not be null!")),
 	m_isDestroyed(false),
 	m_isEncryption(false),

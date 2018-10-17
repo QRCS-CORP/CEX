@@ -2,10 +2,20 @@
 #include "../CEX/CSG.h"
 #include "../CEX/CSP.h"
 #include "../CEX/IntUtils.h"
+#include "../CEX/Providers.h"
+#include "../CEX/SecureRandom.h"
+#include "../CEX/SHAKE.h"
+#include "../CEX/ShakeModes.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	using namespace Drbg;
+	using Utility::IntUtils;
+	using Prng::SecureRandom;
+	using Kdf::SHAKE;
+	using Enumeration::ShakeModes;
+
 	const std::string CSGTest::DESCRIPTION = "CSG implementations vector comparison tests.";
 	const std::string CSGTest::FAILURE = "FAILURE! ";
 	const std::string CSGTest::SUCCESS = "SUCCESS! All CSG tests have executed succesfully.";
@@ -15,12 +25,16 @@ namespace Test
 		m_custom(0),
 		m_expected(0),
 		m_progressEvent(),
-		m_seed(0)
+		m_key(0)
 	{
+		Initialize();
 	} 
 
 	CSGTest::~CSGTest()
 	{
+		IntUtils::ClearVector(m_custom);
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_key);
 	}
 
 	const std::string CSGTest::Description()
@@ -37,46 +51,45 @@ namespace Test
 	{
 		try
 		{
-			Initialize();
+			Exception();
+			OnProgress(std::string("CSGTest: Passed cSHAKE Generator exception handling tests.."));
 
-			CheckInit();
+			Stress();
+			OnProgress(std::string("CSGTest: Passed cSHAKE Generator stress tests.."));
 
-			OnProgress(std::string("CSG: Passed initialization tests.."));
-
-			Drbg::CSG* gen128 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE128, Enumeration::Providers::None);
-			CompareOutput(gen128, m_seed[0], m_expected[0]);
-			CompareOutput(gen128, m_seed[1], m_expected[1]);
-			delete gen128;
-
-			OnProgress(std::string("CSG: Passed SP800-185 cSHAKE-128 KAT tests.."));
-
-			Drbg::CSG* gen256 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE256, Enumeration::Providers::None);
-			CompareOutput(gen256, m_seed[0], m_expected[2]);
-			CompareOutput(gen256, m_seed[1], m_expected[3]);
-			delete gen256;
-
-			OnProgress(std::string("CSG: Passed SP800-185 cSHAKE-256 KAT tests.."));
-
-			Drbg::CSG* gen512 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE512, Enumeration::Providers::None);
-			CompareOutput(gen512, m_seed[1], m_expected[4]);
-			delete gen512;
-
-			OnProgress(std::string("CSG: Passed customized cSHAKE-512 KAT test.."));
-
-			Drbg::CSG* gen1024 = new Drbg::CSG(Enumeration::ShakeModes::SHAKE1024, Enumeration::Providers::None);
-			CompareOutput(gen1024, m_seed[0], m_expected[5]);
-			delete gen1024;
-
-			OnProgress(std::string("CSG: Passed customized cSHAKE-1024 KAT test.."));
+			CSG* gen128 = new CSG(Enumeration::ShakeModes::SHAKE128, Enumeration::Providers::None);
+			Kat(gen128, m_key[0], m_expected[0]);
+			Kat(gen128, m_key[1], m_expected[1]);
+			CSG* gen256 = new CSG(Enumeration::ShakeModes::SHAKE256, Enumeration::Providers::None);
+			Kat(gen256, m_key[0], m_expected[2]);
+			Kat(gen256, m_key[1], m_expected[3]);
+			CSG* gen512 = new CSG(Enumeration::ShakeModes::SHAKE512, Enumeration::Providers::None);
+			Kat(gen512, m_key[1], m_expected[4]);
+			CSG* gen1024 = new CSG(Enumeration::ShakeModes::SHAKE1024, Enumeration::Providers::None);
+			Kat(gen1024, m_key[0], m_expected[5]);
+			OnProgress(std::string("CSGTest: Passed customized cSHAKE 128/256/512/1024 KAT test.."));
 
 #if defined(__AVX2__)
-
-			Drbg::CSG* gen512w = new Drbg::CSG(Enumeration::ShakeModes::SHAKE512, Enumeration::Providers::None, true);
-			CompareOutput(gen512w, m_seed[0], m_expected[6]);
-			delete gen512w;
-
+			CSG* gen512w = new CSG(Enumeration::ShakeModes::SHAKE512, Enumeration::Providers::None, true);
+			Kat(gen512w, m_key[0], m_expected[6]);
 			OnProgress(std::string("CSG: Passed customized cSHAKEW-512 KAT test.."));
 #endif
+
+			OnProgress(std::string(""));
+			OnProgress(std::string("CSGTest: Evaluate random qualities using ChiSquare, Mean, and Ordered Runs for each generator variant"));
+			Evaluate(gen128);
+			Evaluate(gen256);
+			Evaluate(gen512);
+			Evaluate(gen1024);
+			delete gen128;
+			delete gen256;
+			delete gen512;
+			delete gen1024;
+#if defined(__AVX2__)
+			Evaluate(gen512w);
+			delete gen512w;
+#endif
+			OnProgress(std::string("CSGTest: Passed cSHAKE Generator random evaluation tests.."));
 
 			return SUCCESS;
 		}
@@ -90,68 +103,179 @@ namespace Test
 		}
 	}
 
-	void CSGTest::CheckInit()
+	void CSGTest::Evaluate(IDrbg* Rng)
 	{
-		std::vector<byte> info(3203);
-		std::vector<byte> nonce(802);
-		std::vector<byte> output(1024);
-		std::vector<byte> seed(3201);
+		std::vector<byte> otp(SAMPLE_SIZE);
+		Key::Symmetric::SymmetricKeySize ks = Rng->LegalKeySizes()[1];
+		std::vector<byte> key(ks.KeySize());
+		std::vector<byte> iv(ks.NonceSize());
+		SecureRandom rnd;
+		double x;
+		std::string status;
 
+		IntUtils::Fill(key, 0, key.size(), rnd);
+		IntUtils::Fill(iv, 0, iv.size(), rnd);
+		SymmetricKey kp(key, iv);
+
+		Rng->Initialize(kp);
+		Rng->Generate(otp);
+
+		// mean value test
+		x = TestUtils::MeanValue(otp);
+
+		status = (Rng->Name() + std::string(": Mean distribution value is ") + TestUtils::ToString(x) + std::string(" % (127.5 is optimal)"));
+
+		if (x < 122.5 || x > 132.5)
+		{
+			status += std::string("(FAIL)");
+		}
+		else if (x < 125.0 || x > 130.0)
+		{
+			status += std::string("(WARN)");
+		}
+		else
+		{
+			status += std::string("(PASS)");
+		}
+
+		OnProgress(std::string(status));
+
+		// ChiSquare
+		x = TestUtils::ChiSquare(otp) * 100;
+		status = (std::string("ChiSquare: random would exceed this value ") + TestUtils::ToString(x) + std::string(" percent of the time "));
+
+		if (x < 1.0 || x > 99.0)
+		{
+			status += std::string("(FAIL)");
+		}
+		else if (x < 5.0 || x > 95.0)
+		{
+			status += std::string("(WARN)");
+		}
+		else
+		{
+			status += std::string("(PASS)");
+		}
+		OnProgress(std::string(status));
+
+		// ordered runs
+		if (TestUtils::OrderedRuns(otp))
+		{
+			throw TestException(std::string("CSG"), std::string("Exception: Ordered runs test failure! -CE1"));
+		}
+
+		// succesive zeroes
+		if (TestUtils::SuccesiveZeros(otp))
+		{
+			throw TestException(std::string("CSG"), std::string("Exception: Succesive zeroes test failure! -CE2"));
+		}
+	}
+
+	void CSGTest::Exception()
+	{
+		// test constructor -1
 		try
 		{
-			Provider::CSP* pvd = new Provider::CSP();
+			// invalid shake choice
+			CSG drbg(ShakeModes::None, Providers::None);
 
-			// test primitive instantiation
-			Drbg::CSG ctd(Enumeration::ShakeModes::SHAKE128, pvd);
-			// first legal key size
-			size_t seedLen = ctd.LegalKeySizes()[0].KeySize();
-			seed.resize(seedLen);
-			ctd.Initialize(seed);
-			ctd.Generate(output);
-
-			delete pvd;
-
-			if (OrderedRuns(output))
-			{
-				throw TestException("CSGTest: Failed duplication test!");
-			}
+			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE3"));
 		}
-		catch (...)
+		catch (CryptoGeneratorException const &)
 		{
-			throw TestException("CSGTest: Failed primitive instantiation test!");
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test constructor -2
+		try
+		{
+			// invalid null provider instance
+			CSG drbg(ShakeModes::SHAKE128, nullptr);
+
+			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE4"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization
+		try
+		{
+			CSG drbg(ShakeModes::SHAKE128, Providers::CSP);
+			// invalid key size
+			std::vector<byte> k(1);
+			drbg.Initialize(k);
+
+			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE5"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test invalid generator state -1
+		try
+		{
+			CSG drbg(ShakeModes::SHAKE128, Providers::CSP);
+			std::vector<byte> m(16);
+			// cipher was not initialized
+			drbg.Generate(m);
+
+			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE6"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test invalid generator state -2
+		try
+		{
+			CSG drbg(ShakeModes::SHAKE128, Providers::CSP);
+			SymmetricKeySize ks = drbg.LegalKeySizes()[0];
+			std::vector<byte> k(ks.KeySize());
+			drbg.Initialize(k);
+			std::vector<byte> m(16);
+			// array is too small
+			drbg.Generate(m, 0, m.size() + 1);
+
+			throw TestException(std::string("CSG"), std::string("Exception: Exception handling failure! -CE7"));
+		}
+		catch (CryptoGeneratorException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 	}
 
-	bool CSGTest::OrderedRuns(const std::vector<byte> &Input)
+	void CSGTest::Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected)
 	{
-		bool state = false;
-
-		// indicates zeroed output or bad run
-		for (size_t i = 0; i < Input.size() - 4; i += 4)
-		{
-			if (Input[i] == Input[i + 1] &&
-				Input[i + 1] == Input[i + 2] &&
-				Input[i + 2] == Input[i + 3])
-			{
-				state = true;
-				break;
-			}
-		}
-
-		return state;
-	}
-
-	void CSGTest::CompareOutput(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected)
-	{
+		const size_t EXPLEN = Expected.size();
+		std::vector<byte> exp(EXPLEN);
 		std::vector<byte> name(0);
-		std::vector<byte> output(Expected.size());
 
-		Generator->Initialize(Seed, m_custom, name);
-		Generator->Generate(output);
+		// generate
+		Rng->Initialize(Key, m_custom, name);
+		Rng->Generate(exp, 0, EXPLEN);
 
-		if (output != Expected)
+		if (exp != Expected)
 		{
-			throw TestException("CSGTest: Genertated arrays are not equal!");
+			throw TestException(std::string("Kat: Output does not match the known answer! -CK1"));
 		}
 	}
 
@@ -180,7 +304,7 @@ namespace Test
 		};
 		HexConverter::Decode(expected, 7, m_expected);
 
-		const std::vector<std::string> seed =
+		const std::vector<std::string> key =
 		{
 			std::string("00010203"),
 			std::string("000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F"
@@ -188,12 +312,48 @@ namespace Test
 				"808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6B7B8B9BABBBCBDBEBF"
 				"C0C1C2C3C4C5C6C7")
 		};
-		HexConverter::Decode(seed, 2, m_seed);
+		HexConverter::Decode(key, 2, m_key);
 		/*lint -restore */
 	}
 
 	void CSGTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
+	}
+
+	void CSGTest::Stress()
+	{
+		SHAKE kdf(ShakeModes::SHAKE256);
+		CSG drbg(ShakeModes::SHAKE256, Providers::None);
+		Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+		std::vector<byte> name(0);
+		std::vector<byte> otp1;
+		std::vector<byte> otp2;
+		std::vector<byte> key(ks.KeySize());
+		SecureRandom rnd;
+		size_t i;
+
+		otp1.reserve(MAXM_ALLOC);
+		otp2.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+			otp1.resize(INPLEN);
+			otp2.resize(INPLEN);
+			IntUtils::Fill(key, 0, key.size(), rnd);
+
+			// generate with the kdf
+			kdf.Initialize(key, m_custom, name);
+			kdf.Generate(otp1, 0, INPLEN);
+			// generate with the drbg
+			drbg.Initialize(key, m_custom, name);
+			drbg.Generate(otp2, 0, INPLEN);
+
+			if (otp1 != otp2)
+			{
+				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
+			}
+		}
 	}
 }

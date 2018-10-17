@@ -31,12 +31,14 @@
 #include "Digests.h"
 #include "IDigest.h"
 #include "HMAC.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
 using Digest::IDigest;
 using Mac::HMAC;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of the Passphrase Based Key Derivation Version 2 (PBKDF2)
@@ -141,7 +143,7 @@ public:
 	/// <param name="Iterations">The number of compression cycles used to produce output; the default is 5000</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name or iterations count is used</exception>
-	PBKDF2(Digests DigestType, size_t Iterations = 5000);
+	PBKDF2(SHA2Digests DigestType, size_t Iterations = 5000);
 
 	/// <summary>
 	/// Instantiates a PBKDF2 generator using a message digest instance
@@ -181,6 +183,11 @@ public:
 	const bool IsInitialized() override;
 
 	/// <summary>
+	/// The number of compression cycles used to produce output; must be more than zero, 10,000 recommended
+	/// </summary>
+	size_t &Iterations();
+
+	/// <summary>
 	/// Read Only: Available Kdf Key Sizes in bytes
 	/// </summary>
 	std::vector<SymmetricKeySize> LegalKeySizes() const override;
@@ -189,7 +196,7 @@ public:
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	size_t MinKeySize() override;
+	const size_t MinKeySize() override;
 
 	/// <summary>
 	/// Read Only: The Kdf generators class name

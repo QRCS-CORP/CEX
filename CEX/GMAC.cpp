@@ -130,7 +130,10 @@ const std::string GMAC::Name()
 
 void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized!");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("GMAC:Compute", "The generator has not been initialized!");
+	}
 
 	if (Output.size() != BLOCK_SIZE)
 	{
@@ -143,8 +146,14 @@ void GMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t GMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized!");
-	CexAssert((Output.size() - OutOffset) >= BLOCK_SIZE, "The Input buffer is too short!");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("GMAC:Finalize", "The generator has not been initialized!");
+	}
+	if ((Output.size() - OutOffset) < BLOCK_SIZE)
+	{
+		throw CryptoMacException("GMAC:Finalize", "The Output buffer is too short!");
+	}
 
 	m_gmacHash->FinalizeBlock(m_msgCode, m_msgCounter, 0);
 	Utility::MemUtils::XorBlock(m_gmacNonce, 0, m_msgCode, 0, BLOCK_SIZE);
@@ -210,8 +219,9 @@ void GMAC::Initialize(ISymmetricKey &KeyParams)
 void GMAC::Reset()
 {
 	Utility::MemUtils::Clear(m_gmacNonce, 0, m_gmacNonce.size());
-	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
 	Utility::MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	Utility::MemUtils::Clear(m_msgCode, 0, m_msgCode.size());
+	m_gmacHash->Reset();
 	m_msgCounter = 0;
 	m_msgOffset = 0;
 }

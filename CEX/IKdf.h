@@ -62,7 +62,7 @@ public:
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	virtual size_t MinKeySize() = 0;
+	virtual const size_t MinKeySize() = 0;
 
 	/// <summary>
 	/// Read Only: List of available legal key sizes

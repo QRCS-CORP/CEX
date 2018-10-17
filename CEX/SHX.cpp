@@ -28,7 +28,7 @@ SHX::SHX(BlockCipherExtensions CipherExtension)
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
 		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("SHX:CTor", "The Kdf can not be null!") :
-		Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtension))),
+		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),

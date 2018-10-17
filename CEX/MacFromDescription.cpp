@@ -4,6 +4,7 @@
 #include "GMAC.h"
 #include "KMAC.h"
 #include "Poly1305.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_HELPER
 
@@ -22,7 +23,7 @@ IMac* MacFromDescription::GetInstance(MacDescription &Description)
 			}
 			case Enumeration::Macs::HMAC:
 			{
-				macPtr = new Mac::HMAC(Description.MacDigest());
+				macPtr = new Mac::HMAC(static_cast<Enumeration::SHA2Digests>(Description.MacDigest()));
 				break;
 			}
 			case Enumeration::Macs::GMAC:

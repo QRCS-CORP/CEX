@@ -67,15 +67,15 @@ namespace Test
 
 		if (symKey.Key() != key)
 		{
-			throw TestException("CheckAccess: The symmetric key is invalid!");
+			throw TestException(std::string("CheckAccess: The symmetric key is invalid!"));
 		}
 		if (symKey.Nonce() != iv)
 		{
-			throw TestException("CheckAccess: The symmetric nonce is invalid!");
+			throw TestException(std::string("CheckAccess: The symmetric nonce is invalid!"));
 		}
 		if (symKey.Info() != info)
 		{
-			throw TestException("CheckAccess: The symmetric info is invalid!");
+			throw TestException(std::string("CheckAccess: The symmetric info is invalid!"));
 		}
 
 		// test secure key properties
@@ -83,15 +83,15 @@ namespace Test
 
 		if (secKey.Key() != key)
 		{
-			throw TestException("CheckAccess: The secure key is invalid!");
+			throw TestException(std::string("CheckAccess: The secure key is invalid!"));
 		}
 		if (secKey.Nonce() != iv)
 		{
-			throw TestException("CheckAccess: The secure nonce is invalid!");
+			throw TestException(std::string("CheckAccess: The secure nonce is invalid!"));
 		}
 		if (secKey.Info() != info)
 		{
-			throw TestException("CheckAccess: The secure info is invalid!");
+			throw TestException(std::string("CheckAccess: The secure info is invalid!"));
 		}
 	}
 
@@ -106,62 +106,62 @@ namespace Test
 		SymmetricKey symKey1(key, iv, info);
 		if (symKey1.Key() != key)
 		{
-			throw TestException("CheckInit: The symmetric key is invalid!");
+			throw TestException(std::string("CheckInit: The symmetric key is invalid!"));
 		}
 		if (symKey1.Nonce() != iv)
 		{
-			throw TestException("CheckInit: The symmetric nonce is invalid!");
+			throw TestException(std::string("CheckInit: The symmetric nonce is invalid!"));
 		}
 		if (symKey1.Info() != info)
 		{
-			throw TestException("CheckInit: The symmetric info is invalid!");
+			throw TestException(std::string("CheckInit: The symmetric info is invalid!"));
 		}
 		// 2 params
 		SymmetricKey symKey2(key, iv);
 		if (symKey2.Key() != key)
 		{
-			throw TestException("CheckInit: The symmetric key is invalid!");
+			throw TestException(std::string("CheckInit: The symmetric key is invalid!"));
 		}
 		if (symKey2.Nonce() != iv)
 		{
-			throw TestException("CheckInit: The symmetric nonce is invalid!");
+			throw TestException(std::string("CheckInit: The symmetric nonce is invalid!"));
 		}
 		// key only
 		SymmetricKey symKey3(key);
 		if (symKey3.Key() != key)
 		{
-			throw TestException("CheckInit: The symmetric key is invalid!");
+			throw TestException(std::string("CheckInit: The symmetric key is invalid!"));
 		}
 
 		// test secure key constructors
 		SymmetricSecureKey secKey1(key, iv, info);
 		if (secKey1.Key() != key)
 		{
-			throw TestException("CheckInit: The secure key is invalid!");
+			throw TestException(std::string("CheckInit: The secure key is invalid!"));
 		}
 		if (secKey1.Nonce() != iv)
 		{
-			throw TestException("CheckInit: The secure nonce is invalid!");
+			throw TestException(std::string("CheckInit: The secure nonce is invalid!"));
 		}
 		if (secKey1.Info() != info)
 		{
-			throw TestException("CheckInit: The secure info is invalid!");
+			throw TestException(std::string("CheckInit: The secure info is invalid!"));
 		}
 		// 2 params
 		SymmetricSecureKey secKey2(key, iv);
 		if (secKey2.Key() != key)
 		{
-			throw TestException("CheckInit: The secure key is invalid!");
+			throw TestException(std::string("CheckInit: The secure key is invalid!"));
 		}
 		if (secKey2.Nonce() != iv)
 		{
-			throw TestException("CheckInit: The secure nonce is invalid!");
+			throw TestException(std::string("CheckInit: The secure nonce is invalid!"));
 		}
 		// key only
 		SymmetricSecureKey secKey3(key);
 		if (secKey3.Key() != key)
 		{
-			throw TestException("CheckInit: The secure key is invalid!");
+			throw TestException(std::string("CheckInit: The secure key is invalid!"));
 		}
 	}
 
@@ -176,7 +176,7 @@ namespace Test
 		SymmetricKey* symKey2 = SymmetricKey::DeSerialize(*keyStr);
 		if (!symKey1->Equals(*symKey2))
 		{
-			throw TestException("CompareSerial: The symmetric key serialization has failed!");
+			throw TestException(std::string("CompareSerial: The symmetric key serialization has failed!"));
 		}
 
 		// test secure key serialization
@@ -185,7 +185,7 @@ namespace Test
 		SymmetricSecureKey* secKey2 = SymmetricSecureKey::DeSerialize(*secStr);
 		if (!secKey1->Equals(*secKey2))
 		{
-			throw TestException("CompareSerial: The secure key serialization has failed!");
+			throw TestException(std::string("CompareSerial: The secure key serialization has failed!"));
 		}
 	}
 

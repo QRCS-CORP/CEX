@@ -2,11 +2,14 @@
 #define CEXTEST_CMGTEST_H
 
 #include "ITest.h"
+#include "../CEX/IDrbg.h"
 
 namespace Test
 {
+	using Drbg::IDrbg;
+
 	/// <summary>
-	/// BCG output comparison test.
+	/// Tests the Block Cipher Counter mode Generator (BCG) implementation using exception handling, parameter checks, stress and KAT tests.
 	/// <para>Compares drbg output with CTR mode encrypting all zeroes input.</para>
 	/// </summary>
 	class BCGTest final : public ITest
@@ -16,8 +19,13 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
-		static const size_t SAMPLE_SIZE = 1024;
+		static const size_t MAXM_ALLOC = 262140;
+		static const size_t SAMPLE_SIZE = 1024000;
+		static const size_t TEST_CYCLES = 100;
 
+		std::vector <std::vector<byte>> m_expected;
+		std::vector <std::vector<byte>> m_key;
+		std::vector <std::vector<byte>> m_nonce;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -47,12 +55,35 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		///  Test drbg output using chisquare, mean value, and ordered runs tests
+		/// </summary>
+		void Evaluate(IDrbg* Rng);
+
+		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
+		/// Compare known answer test vectors to drbg output
+		/// </summary>
+		/// 
+		/// <param name="Rng">The drbg instance</param>
+		/// <param name="Key">The input key</param>
+		/// <param name="Nonce">The input nonce</param>
+		/// <param name="Expected">The expected output</param>
+		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
+		/// </summary>
+		void Stress();
+
 	private:
 
-		void CheckInit();
-		void CompareOutput();
+		void Initialize();
 		void OnProgress(std::string Data);
-		bool OrderedRuns(const std::vector<byte> &Input);
 	};
 }
 

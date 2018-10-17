@@ -2,8 +2,12 @@
 #include "BCG.h"
 #include "CSG.h"
 #include "HCG.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_HELPER
+
+using Enumeration::SHA2Digests;
+using Enumeration::ShakeModes;
 
 IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType)
 {
@@ -78,12 +82,12 @@ IDrbg* DrbgFromName::GetInstance(Drbgs DrbgType, Digests DigestType, Providers P
 			case Drbgs::CSG:
 			{
 
-				drbgPtr = new Drbg::CSG(static_cast<Enumeration::ShakeModes>(DigestType), ProviderType);
+				drbgPtr = new Drbg::CSG(static_cast<ShakeModes>(DigestType), ProviderType);
 				break;
 			}
 			case Drbgs::HCG:
 			{
-				drbgPtr = new Drbg::HCG(DigestType, ProviderType);
+				drbgPtr = new Drbg::HCG(static_cast<SHA2Digests>(DigestType), ProviderType);
 				break;
 			}
 			default:

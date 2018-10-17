@@ -1,19 +1,28 @@
 #include "HMACTest.h"
 #include "../CEX/HMAC.h"
-#include "../CEX/SHA256.h"
-#include "../CEX/SHA512.h"
+#include "../CEX/IntUtils.h"
+#include "../CEX/SecureRandom.h"
 #include "../CEX/SymmetricKey.h"
 
 namespace Test
 {
+	using Exception::CryptoMacException;
+	using Mac::HMAC;
+	using Utility::IntUtils;
+	using Prng::SecureRandom;
+	using Enumeration::SHA2Digests;
 	using Key::Symmetric::SymmetricKey;
+	using Key::Symmetric::SymmetricKeySize;
 
-	const std::string HMACTest::DESCRIPTION = "RFC 4321 Test Vectors for HMAC SHA224, SHA256, SHA384, and SHA512.";
+	const std::string HMACTest::DESCRIPTION = "RFC 4321 test vectors for HMAC SHA256, and SHA512.";
 	const std::string HMACTest::FAILURE = "FAILURE! ";
 	const std::string HMACTest::SUCCESS = "SUCCESS! All HMAC tests have executed succesfully.";
 
 	HMACTest::HMACTest()
 		:
+		m_expected(0),
+		m_key(0),
+		m_message(0),
 		m_progressEvent()
 	{
 		Initialize();
@@ -21,6 +30,9 @@ namespace Test
 
 	HMACTest::~HMACTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_key);
+		IntUtils::ClearVector(m_message);
 	}
 
 	const std::string HMACTest::Description()
@@ -37,26 +49,39 @@ namespace Test
 	{
 		try
 		{
-			CompareVector256(m_keys[0], m_input[0], m_exp256[0]);
-			CompareVector256(m_keys[1], m_input[1], m_exp256[1]);
-			CompareVector256(m_keys[2], m_input[2], m_exp256[2]);
-			CompareVector256(m_keys[3], m_input[3], m_exp256[3]);
-			CompareVector256(m_keys[4], m_input[4], m_exp256[4]);
-			CompareVector256(m_keys[5], m_input[5], m_exp256[5]);
-			CompareVector256(m_keys[6], m_input[6], m_exp256[6]);
-			OnProgress(std::string("HMACTest: Passed SHA-2 256 bit known answer vector tests.."));
+			Exception();
+			OnProgress(std::string("HMACTest: Passed HMAC exception handling tests.."));
 
-			CompareVector512(m_keys[0], m_input[0], m_exp512[0]);
-			CompareVector512(m_keys[1], m_input[1], m_exp512[1]);
-			CompareVector512(m_keys[2], m_input[2], m_exp512[2]);
-			CompareVector512(m_keys[3], m_input[3], m_exp512[3]);
-			CompareVector512(m_keys[4], m_input[4], m_exp512[4]);
-			CompareVector512(m_keys[5], m_input[5], m_exp512[5]);
-			CompareVector512(m_keys[6], m_input[6], m_exp512[6]);
-			OnProgress(std::string("HMACTest: Passed SHA-2 512 bit known answer vector tests.."));
+			HMAC* gen1 = new HMAC(SHA2Digests::SHA256);
+			Kat(gen1, m_key[0], m_message[0], m_expected[0]);
+			Kat(gen1, m_key[1], m_message[1], m_expected[1]);
+			Kat(gen1, m_key[2], m_message[2], m_expected[2]);
+			Kat(gen1, m_key[3], m_message[3], m_expected[3]);
+			Kat(gen1, m_key[4], m_message[4], m_expected[4]);
+			Kat(gen1, m_key[5], m_message[5], m_expected[5]);
+			Kat(gen1, m_key[6], m_message[6], m_expected[6]);
+			OnProgress(std::string("HMACTest: Passed HMAC SHA256 bit known answer vector tests.."));
 
-			CompareAccess(m_keys[3]);
-			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
+			HMAC* gen2 = new HMAC(SHA2Digests::SHA512);
+			Kat(gen2, m_key[0], m_message[0], m_expected[7]);
+			Kat(gen2, m_key[1], m_message[1], m_expected[8]);
+			Kat(gen2, m_key[2], m_message[2], m_expected[9]);
+			Kat(gen2, m_key[3], m_message[3], m_expected[10]);
+			Kat(gen2, m_key[4], m_message[4], m_expected[11]);
+			Kat(gen2, m_key[5], m_message[5], m_expected[12]);
+			Kat(gen2, m_key[6], m_message[6], m_expected[13]);
+			OnProgress(std::string("HMACTest: Passed HMAC SHA512 bit known answer vector tests.."));
+
+			Params(gen1);
+			Params(gen2);
+			OnProgress(std::string("HMACTest: Passed HMAC SHA256/SHA512 initialization parameters tests.."));
+
+			Stress(gen1);
+			Stress(gen2);
+			OnProgress(std::string("HMACTest: Passed HMAC SHA256/SHA512 stress tests.."));
+
+			delete gen1;
+			delete gen2;
 
 			return SUCCESS;
 		}
@@ -70,97 +95,75 @@ namespace Test
 		}
 	}
 
-	void HMACTest::CompareAccess(std::vector<byte> &Key)
+	void HMACTest::Exception()
 	{
-		std::vector<byte> hash1(32);
-		Digest::SHA256* eng = new Digest::SHA256();
-		Mac::HMAC mac(eng);
-		SymmetricKey kp(Key);
-
-		mac.Initialize(kp);
-
-		std::vector<byte> input(256);
-		for (size_t i = 0; i < input.size(); ++i)
+		// test constructor -1
+		try
 		{
-			input[i] = (byte)i;
+			// invalid cipher choice
+			HMAC mac(SHA2Digests::None);
+
+			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE1"));
+		}
+		catch (CryptoMacException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 
-		mac.Compute(input, hash1);
-
-		std::vector<byte> hash2(32);
-		mac.Update(input, 0, 128);
-		mac.Update(input, 128, 128);
-		mac.Finalize(hash2, 0);
-		delete eng;
-
-		if (hash1 != hash2)
+		// test constructor -2
+		try
 		{
-			throw TestException("HMACTest: MAC is not equal!");
+			// invalid cipher choice
+			HMAC mac(nullptr);
+
+			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE2"));
 		}
-	}
-
-	void HMACTest::CompareVector256(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
-	{
-		std::vector<byte> hash(32, 0);
-		Digest::SHA256* eng = new Digest::SHA256();
-		Mac::HMAC mac(eng);
-		SymmetricKey kp(Key);
-
-		mac.Initialize(kp);
-		mac.Compute(Input, hash);
-
-		delete eng;
-
-		// truncated output, test case #5
-		if (Expected.size() != 32)
+		catch (CryptoMacException const &)
 		{
-			std::vector<byte> tmph;
-			tmph.resize(Expected.size(), 0);
-			std::memcpy(&tmph[0], &hash[0], Expected.size());
-
-			if (Expected != tmph)
-			{
-				throw TestException("HMACTest: return code is not equal!");
-			}
 		}
-		else
+		catch (TestException const &)
 		{
-			if (Expected != hash)
-			{
-				throw TestException("HMACTest: return code is not equal!");
-			}
+			throw;
 		}
-	}
 
-	void HMACTest::CompareVector512(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Expected)
-	{
-		std::vector<byte> hash(32, 0);
-		Digest::SHA512* eng = new Digest::SHA512();
-		Mac::HMAC mac(eng);
-		SymmetricKey kp(Key);
-
-		mac.Initialize(kp);
-		mac.Compute(Input, hash);
-
-		delete eng;
-
-		if (Expected.size() != 64)
+		// test initialization
+		try
 		{
-			std::vector<byte> tmph;
-			tmph.resize(Expected.size(), 0);
-			std::memcpy(&tmph[0], &hash[0], Expected.size());
+			HMAC mac(SHA2Digests::SHA256);
+			// invalid key size
+			std::vector<byte> k(1);
+			SymmetricKey kp(k);
+			mac.Initialize(kp);
 
-			if (Expected != tmph)
-			{
-				throw TestException("HMACTest: return code is not equal!");
-			}
+			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE3"));
 		}
-		else
+		catch (CryptoMacException const &)
 		{
-			if (Expected != hash)
-			{
-				throw TestException("HMACTest: return code is not equal!");
-			}
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test finalize state -1
+		try
+		{
+			HMAC mac(SHA2Digests::SHA256);
+			std::vector<byte> code(mac.MacSize());
+			// generator was not initialized
+			mac.Finalize(code, 0);
+
+			throw TestException(std::string("HMAC"), std::string("Exception: Exception handling failure! -HE4"));
+		}
+		catch (CryptoMacException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 	}
 
@@ -169,23 +172,19 @@ namespace Test
 		/*lint -save -e122 */
 		/*lint -save -e146 */
 		/*lint -save -e417 */
-		const std::vector<std::string> keys =
+		const std::vector<std::string> key =
 		{
 			std::string("0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B0B"),
 			std::string("4A656665"),
 			std::string("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
 			std::string("0102030405060708090A0B0C0D0E0F10111213141516171819"),
 			std::string("0C0C0C0C0C0C0C0C0C0C0C0C0C0C0C0C0C0C0C0C"),
-			std::string("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" \
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" \
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
-			std::string("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" \
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" \
-				"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+			std::string("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+			std::string("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 		};
-		HexConverter::Decode(keys, 7, m_keys);
+		HexConverter::Decode(key, 7, m_key);
 
-		const std::vector<std::string> input =
+		const std::vector<std::string> message =
 		{
 			std::string("4869205468657265"),
 			std::string("7768617420646F2079612077616E7420666F72206E6F7468696E673F"),
@@ -193,13 +192,11 @@ namespace Test
 			std::string("CDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCDCD"),
 			std::string("546573742057697468205472756E636174696F6E"),
 			std::string("54657374205573696E67204C6172676572205468616E20426C6F636B2D53697A65204B6579202D2048617368204B6579204669727374"),
-			std::string("5468697320697320612074657374207573696E672061206C6172676572207468616E20626C6F636B2D73697A65206B657920616E642061206C61726765722074"
-				"68616E20626C6F636B2D73697A6520646174612E20546865206B6579206E6565647320746F20626520686173686564206265666F7265206265696E6720757365"
-				"642062792074686520484D414320616C676F726974686D2E")
+			std::string("5468697320697320612074657374207573696E672061206C6172676572207468616E20626C6F636B2D73697A65206B657920616E642061206C6172676572207468616E20626C6F636B2D73697A6520646174612E20546865206B6579206E6565647320746F20626520686173686564206265666F7265206265696E6720757365642062792074686520484D414320616C676F726974686D2E")
 		};
-		HexConverter::Decode(input, 7, m_input);
+		HexConverter::Decode(message, 7, m_message);
 
-		const std::vector<std::string> exp256 =
+		const std::vector<std::string> expected =
 		{
 			std::string("B0344C61D8DB38535CA8AFCEAF0BF12B881DC200C9833DA726E9376C2E32CFF7"),
 			std::string("5BDCC146BF60754E6A042426089575C75A003F089D2739839DEC58B964EC3843"),
@@ -207,12 +204,7 @@ namespace Test
 			std::string("82558A389A443C0EA4CC819899F2083A85F0FAA3E578F8077A2E3FF46729665B"),
 			std::string("A3B6167473100EE06E0C796C2955552B"),
 			std::string("60E431591EE0B67F0D8A26AACBF5B77F8E0BC6213728C5140546040F0EE37F54"),
-			std::string("9B09FFA71B942FCB27635FBCD5B0E944BFDC63644F0713938A7F51535C3A35E2")
-		};
-		HexConverter::Decode(exp256, 7, m_exp256);
-
-		const std::vector<std::string> exp512 =
-		{
+			std::string("9B09FFA71B942FCB27635FBCD5B0E944BFDC63644F0713938A7F51535C3A35E2"),
 			std::string("87AA7CDEA5EF619D4FF0B4241A1D6CB02379F4E2CE4EC2787AD0B30545E17CDEDAA833B7D6B8A702038B274EAEA3F4E4BE9D914EEB61F1702E696C203A126854"),
 			std::string("164B7A7BFCF819E2E395FBE73B56E0A387BD64222E831FD610270CD7EA2505549758BF75C05A994A6D034F65F8F0E6FDCAEAB1A34D4A6B4B636E070A38BCE737"),
 			std::string("FA73B0089D56A284EFB0F0756C890BE9B1B5DBDD8EE81A3655F83E33B2279D39BF3E848279A722C806B485A47E67C807B946A337BEE8942674278859E13292FB"),
@@ -221,12 +213,95 @@ namespace Test
 			std::string("80B24263C7C1A3EBB71493C1DD7BE8B49B46D1F41B4AEEC1121B013783F8F3526B56D037E05F2598BD0FD2215D6A1E5295E64F73F63F0AEC8B915A985D786598"),
 			std::string("E37B6A775DC87DBAA4DFA9F96E5E3FFDDEBD71F8867289865DF5A32D20CDC944B6022CAC3C4982B10D5EEB55C3E4DE15134676FB6DE0446065C97440FA8C6A58")
 		};
-		HexConverter::Decode(exp512, 7, m_exp512);
+		HexConverter::Decode(expected, 14, m_expected);
 		/*lint -restore */
+	}
+
+	void HMACTest::Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected)
+	{
+		std::vector<byte> code(Generator->MacSize());
+		SymmetricKey kp(Key);
+
+		Generator->Initialize(kp);
+		Generator->Update(Message, 0, Message.size());
+		Generator->Finalize(code, 0);
+		code.resize(Expected.size());
+
+		if (Expected != code)
+		{
+			throw TestException(std::string("HMAC"), std::string("KAT: Expected values don't match! -HK1"));
+		}
 	}
 
 	void HMACTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
+	}
+
+	void HMACTest::Params(IMac* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> key(ks.KeySize());
+		std::vector<byte> msg;
+		std::vector<byte> otp1(Generator->MacSize());
+		std::vector<byte> otp2(Generator->MacSize());
+		SecureRandom rnd;
+		size_t i;
+
+		msg.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+			msg.resize(MSGLEN);
+			IntUtils::Fill(key, 0, key.size(), rnd);
+			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			SymmetricKey kp(key);
+
+			// generate the mac
+			Generator->Initialize(kp);
+			Generator->Compute(msg, otp1);
+			Generator->Reset();
+			Generator->Initialize(kp);
+			Generator->Compute(msg, otp2);
+
+			if (otp1 != otp2)
+			{
+				throw TestException(std::string("HMAC"), std::string("Reset: Returns a different array after reset! -HP1"));
+			}
+		}
+	}
+
+	void HMACTest::Stress(IMac* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> msg;
+		std::vector<byte> otp(Generator->MacSize());
+		std::vector<byte> key(ks.KeySize());
+		SecureRandom rnd;
+		size_t i;
+
+		msg.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			try
+			{
+				const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+				msg.resize(MSGLEN);
+				IntUtils::Fill(key, 0, key.size(), rnd);
+				IntUtils::Fill(msg, 0, msg.size(), rnd);
+				SymmetricKey kp(key);
+
+				// generate with the kdf
+				Generator->Initialize(kp);
+				Generator->Compute(msg, otp);
+				Generator->Reset();
+			}
+			catch (...)
+			{
+				throw TestException(std::string("HMAC"), std::string("Stress: The generator has thrown an exception! -HS1"));
+			}
+		}
 	}
 }

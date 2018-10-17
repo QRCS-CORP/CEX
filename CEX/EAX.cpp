@@ -184,7 +184,7 @@ const size_t EAX::ParallelBlockSize()
 
 ParallelOptions &EAX::ParallelProfile()
 {
-	return m_cipherMode->ParallelProfile(); 
+	return m_parallelProfile;
 }
 
 bool &EAX::PreserveAD()
@@ -233,7 +233,6 @@ void EAX::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
 	// recheck params
-	Scope();
 	Reset();
 
 	if (KeyParams.Key().size() == 0)
@@ -253,6 +252,7 @@ void EAX::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		{
 			throw CryptoSymmetricCipherException("EAX:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() in length.");
 		}
+
 		m_cipherKey = KeyParams.Key();
 	}
 
@@ -402,6 +402,7 @@ void EAX::Reset()
 		Utility::MemUtils::Clear(m_aadData, 0, m_aadData.size());
 	}
 
+	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 	m_isInitialized = false;
 	m_macGenerator->Reset();
 	Utility::MemUtils::Clear(m_eaxVector, 0, m_eaxVector.size());
@@ -415,11 +416,6 @@ void EAX::Scope()
 	for (size_t i = 0; i < m_legalKeySizes.size(); i++)
 	{
 		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), keySizes[i].NonceSize(), keySizes[i].NonceSize());
-	}
-
-	if (!m_cipherMode->ParallelProfile().IsDefault())
-	{
-		m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(), m_cipherMode->ParallelProfile().ParallelMaxDegree());
 	}
 }
 

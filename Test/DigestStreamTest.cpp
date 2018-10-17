@@ -7,7 +7,6 @@
 
 namespace Test
 {
-
 	const std::string DigestStreamTest::Description()
 	{
 		return DESCRIPTION;
@@ -61,7 +60,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("DigestStreamTest: Expected hash is not equal!");
+			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
 		}
 
 		// test byte access method
@@ -69,7 +68,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("DigestStreamTest: Expected hash is not equal!");
+			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
 		}
 	}
 

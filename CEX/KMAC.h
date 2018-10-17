@@ -75,9 +75,10 @@ class KMAC final : public IMac
 {
 private:
 
-	static const size_t BUFFER_SIZE = 168;
+	static const size_t BUFFER_SIZE = 200;
 	static const std::string CLASS_NAME;
 	static const size_t DOMAIN_CODE = 0x04;
+	static const size_t MIN_KEYSIZE = 4;
 	static const size_t STATE_SIZE = 25;
 
 	size_t m_blockSize;
@@ -148,11 +149,6 @@ public:
 	const Macs Enumeral() override;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t MacSize() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
@@ -161,6 +157,11 @@ public:
 	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
 	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	const size_t MacSize() override;
 
 	/// <summary>
 	/// Read Only: Mac generators class name
@@ -244,7 +245,9 @@ private:
 		size_t n;
 		size_t v;
 
-		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8)
+		{
+		}
 
 		if (n == 0)
 		{
@@ -253,10 +256,10 @@ private:
 
 		for (i = 1; i <= n; ++i)
 		{
-			Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
+			Buffer[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
 		}
 
-		Buffer[Offset] = (uint8_t)n;
+		Buffer[Offset] = static_cast<uint8_t>(n);
 
 		return (n + 1);
 	}
@@ -268,7 +271,9 @@ private:
 		size_t n;
 		size_t v;
 
-		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8)
+		{
+		}
 
 		if (n == 0)
 		{
@@ -277,10 +282,10 @@ private:
 
 		for (i = 1; i <= n; ++i)
 		{
-			Buffer[Offset + (i - 1)] = (uint8_t)(Value >> (8 * (n - i)));
+			Buffer[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
 		}
 
-		Buffer[Offset + n] = (uint8_t)n;
+		Buffer[Offset + n] = static_cast<uint8_t>(n);
 
 		return n + 1;
 	}

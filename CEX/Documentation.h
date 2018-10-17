@@ -15,17 +15,17 @@ CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.6d</B> (A6 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>1.0.0.6f</B> (A6 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   1.0.0.6d
-\date      September 25, 2018
+\version   1.0.0.6f
+\date      October 17, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.6d (A6 version), which are the major, minor, patch, and release codes. \n \n
+The current version is 1.0.0.6f (A6 version), which are the major, minor, patch, and release codes. \n \n
 
 <B>Current Release 1.0.0.6 (version A6):</B> \n
 The NTRU asymmetric cipher \n

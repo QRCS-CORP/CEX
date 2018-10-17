@@ -27,13 +27,15 @@
 #ifndef CEX_KDF2_H
 #define CEX_KDF2_H
 
-#include "IKdf.h"
 #include "IDigest.h"
+#include "IKdf.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
 using Digest::IDigest;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of the Key Derivation Function Version 2 (KDF2)
@@ -90,6 +92,7 @@ class KDF2 final : public IKdf
 private:
 
 	static const std::string CLASS_NAME;
+	static const size_t MIN_KEYLEN = 16;
 	static const size_t MIN_SALTLEN = 4;
 
 	std::unique_ptr<IDigest> m_msgDigest;
@@ -130,7 +133,7 @@ public:
 	/// <param name="DigestType">The hash functions type-name enumeral</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest type is used</exception>
-	explicit KDF2(Digests DigestType);
+	explicit KDF2(SHA2Digests DigestType);
 
 	/// <summary>
 	/// Instantiates a KDF2 generator using a message digest instance
@@ -162,7 +165,7 @@ public:
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	size_t MinKeySize() override;
+	size_t const MinKeySize() override;
 
 	/// <summary>
 	/// Read Only: Available Kdf Key Sizes in bytes

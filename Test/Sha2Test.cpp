@@ -1,4 +1,5 @@
 #include "SHA2Test.h"
+#include "../CEX/CpuDetect.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/MemUtils.h"
 #include "../CEX/SHA2.h"
@@ -17,25 +18,31 @@
 
 namespace Test
 {
-	using namespace Digest;
+	using Exception::CryptoDigestException;
+	using Utility::IntUtils;
 	using Utility::MemUtils;
-
+	using Prng::SecureRandom;
 #if defined(__AVX2__)
 	using Numeric::UInt256;
 	using Numeric::ULong256;
 #endif
-
 #if defined(__AVX512__)
 	using Numeric::UInt512;
 	using Numeric::ULong512;
 #endif
+	using namespace Digest;
 
 	const std::string SHA2Test::DESCRIPTION = "Tests SHA-2 256/512 with NIST KAT vectors.";
 	const std::string SHA2Test::FAILURE = "FAILURE! ";
 	const std::string SHA2Test::SUCCESS = "SUCCESS! All SHA-2 tests have executed succesfully.";
 
+	//~~~Constructor~~~//
+
 	SHA2Test::SHA2Test()
 		:
+		m_exp256(0),
+		m_exp512(0),
+		m_message(0),
 		m_progressEvent()
 	{
 		Initialize();
@@ -43,7 +50,12 @@ namespace Test
 
 	SHA2Test::~SHA2Test()
 	{
+		IntUtils::ClearVector(m_exp256);
+		IntUtils::ClearVector(m_exp512);
+		(m_message);
 	}
+
+	//~~~Accessors~~~//
 
 	const std::string SHA2Test::Description()
 	{
@@ -55,33 +67,65 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string SHA2Test::Run()
 	{
 		try
 		{
-			ComparePermutation256();
-			OnProgress(std::string("Passed Sha2-256 permutation variants equivalence test.."));
-			ComparePermutation512();
-			OnProgress(std::string("Passed Sha2-512 permutation variants equivalence test.."));
+			Common::CpuDetect detect;
 
-			TreeParamsTest();
-			OnProgress(std::string("Passed SHA2Params parameter serialization test.."));
+			Exception();
+			OnProgress(std::string("SHA2Test: Passed SHA2-256/512 exception handling tests.."));
 
-			SHA256* sha256 = new SHA256();
-			CompareOutput(sha256, m_message[0], m_exp256[0]);
-			CompareOutput(sha256, m_message[1], m_exp256[1]);
-			CompareOutput(sha256, m_message[2], m_exp256[2]);
-			CompareOutput(sha256, m_message[3], m_exp256[3]);
-			delete sha256;
-			OnProgress(std::string("Sha2Test: Passed SHA-2 256 bit digest vector tests.."));/**/
+			SHA256* dgt256s = new SHA256();
+			Kat(dgt256s, m_message[0], m_exp256[0]);
+			Kat(dgt256s, m_message[1], m_exp256[1]);
+			Kat(dgt256s, m_message[2], m_exp256[2]);
+			Kat(dgt256s, m_message[3], m_exp256[3]);
+			OnProgress(std::string("SHA2Test: Passed SHA-256 bit digest vector tests.."));/**/
 
-			SHA512* sha512 = new SHA512();
-			CompareOutput(sha512, m_message[0], m_exp512[0]);
-			CompareOutput(sha512, m_message[1], m_exp512[1]);
-			CompareOutput(sha512, m_message[2], m_exp512[2]);
-			CompareOutput(sha512, m_message[3], m_exp512[3]);
-			delete sha512;
-			OnProgress(std::string("Sha2Test: Passed SHA-2 512 bit digest vector tests.."));
+			SHA512* dgt512s = new SHA512();
+			Kat(dgt512s, m_message[0], m_exp512[0]);
+			Kat(dgt512s, m_message[1], m_exp512[1]);
+			Kat(dgt512s, m_message[2], m_exp512[2]);
+			Kat(dgt512s, m_message[3], m_exp512[3]);
+			OnProgress(std::string("SHA2Test: Passed SHA-512 bit digest vector tests.."));
+
+			Stress(dgt256s);
+			delete dgt256s;
+			OnProgress(std::string("SHA2Test: Passed SHA-256 sequential stress tests.."));
+
+			Stress(dgt512s);
+			delete dgt512s;
+			OnProgress(std::string("SHA2Test: Passed SHA-512 sequential stress tests.."));
+
+			if (detect.VirtualCores() >= 2)
+			{
+				SHA256* dgt256p = new SHA256(true);
+				Stress(dgt256p);
+				OnProgress(std::string("SHA2Test: Passed SHA-256 parallel stress tests.."));
+
+				SHA512* dgt512p = new SHA512(true);
+				Stress(dgt256p);
+				OnProgress(std::string("SHA2Test: Passed SHA-512 parallel stress tests.."));
+
+				Parallel(dgt256p);
+				delete dgt256p;
+				OnProgress(std::string("SHA2Test: Passed SHA-256 parallel integrity tests.."));
+
+				Parallel(dgt512p);
+				delete dgt512p;
+				OnProgress(std::string("SHA2Test: Passed SHA-512 parallel integrity tests.."));
+			}
+
+			PermutationR64();
+			OnProgress(std::string("SHA2Test: Passed Sha2-256 permutation variants equivalence test.."));
+			PermutationR80();
+			OnProgress(std::string("SHA2Test: Passed Sha2-512 permutation variants equivalence test.."));
+
+			TreeParams();
+			OnProgress(std::string("SHA2Test: Passed SHA2Params parameter serialization test.."));
 
 			return SUCCESS;
 		}
@@ -95,29 +139,145 @@ namespace Test
 		}
 	}
 
-	void SHA2Test::CompareOutput(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	void SHA2Test::Exception()
 	{
-		std::vector<byte> hash(Digest->DigestSize(), 0);
-
-		Digest->Update(Input, 0, Input.size());
-		Digest->Finalize(hash, 0);
-
-		if (Expected != hash)
+		// test params constructor SHA256
+		try
 		{
-			throw TestException("SHA2: Expected hash is not equal!");
+			// invalid fan out -99
+			SHA2Params params(32, 32, 99);
+			SHA256 dgt(params);
+
+			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE1"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 
-		hash.clear();
-		hash.resize(Digest->DigestSize());
-		Digest->Compute(Input, hash);
-
-		if (Expected != hash)
+		// test params constructor SHA512
+		try
 		{
-			throw TestException("SHA2: Expected hash is not equal!");
+			// invalid fan out -99
+			SHA2Params params(64, 64, 99);
+			SHA512 dgt(params);
+
+			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE2"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test parallel max-degree SHA256
+		try
+		{
+			SHA256 dgt;
+			// set max degree to invalid -99
+			dgt.ParallelMaxDegree(99);
+
+			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE3"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test parallel max-degree SHA512
+		try
+		{
+			SHA512 dgt;
+			// set max degree to invalid -99
+			dgt.ParallelMaxDegree(99);
+
+			throw TestException(std::string("SHA2"), std::string("Exception: Exception handling failure! -SE4"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
 		}
 	}
 
-	void SHA2Test::ComparePermutation256()
+	void SHA2Test::Kat(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected)
+	{
+		std::vector<byte> code(Digest->DigestSize(), 0);
+
+		Digest->Update(Input, 0, Input.size());
+		Digest->Finalize(code, 0);
+
+		if (Expected != code)
+		{
+			throw TestException(std::string("SHA2: Expected hash is not equal!"));
+		}
+
+		code.clear();
+		code.resize(Digest->DigestSize());
+		Digest->Compute(Input, code);
+
+		if (Expected != code)
+		{
+			throw TestException(std::string("SHA2: Expected hash is not equal!"));
+		}
+	}
+
+	void SHA2Test::Parallel(IDigest* Digest)
+	{
+		const size_t MINSMP = 2048;
+		const size_t MAXSMP = 16384;
+		const size_t PRLLEN = Digest->ParallelProfile().ParallelBlockSize();
+		const size_t PRLDGR = Digest->ParallelProfile().ParallelMaxDegree();
+		std::vector<byte> msg;
+		std::vector<byte> code(Digest->DigestSize());
+		Prng::SecureRandom rnd;
+		bool reduce;
+
+		msg.reserve(MAXSMP);
+
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
+			msg.resize(INPLEN);
+			IntUtils::Fill(msg, 0, msg.size(), rnd);
+
+			try
+			{
+				reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
+
+				while (reduce)
+				{
+					Digest->Compute(msg, code);
+					reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
+
+					if (reduce)
+					{
+						Digest->ParallelMaxDegree(Digest->ParallelProfile().ParallelMaxDegree() - 2);
+					}
+				}
+
+				// restore parallel degree and block size
+				Digest->ParallelMaxDegree(PRLDGR);
+				Digest->ParallelProfile().ParallelBlockSize() = PRLLEN;
+			}
+			catch (...)
+			{
+				throw TestException(std::string("Parallel: Parallel integrity test has failed! -BP1"));
+			}
+		}
+	}
+
+	void SHA2Test::PermutationR64()
 	{
 		std::vector<byte> input(64, 128U);
 		std::array<uint, 8> state1;
@@ -131,7 +291,7 @@ namespace Test
 
 		if (state1 != state2)
 		{
-			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 		}
 
 #if defined(__AVX2__)
@@ -148,7 +308,7 @@ namespace Test
 		{
 			if (state256ul[i] != state1[i / 8])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 			}
 		}
 
@@ -168,14 +328,14 @@ namespace Test
 		{
 			if (state512ul[i] != state1[i / 16])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 			}
 		}
 
 #endif
 	}
 
-	void SHA2Test::ComparePermutation512()
+	void SHA2Test::PermutationR80()
 	{
 		std::vector<byte> input(128, 128U);
 		std::array<ulong, 8> state1;
@@ -189,7 +349,7 @@ namespace Test
 
 		if (state1 != state2)
 		{
-			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			throw TestException(std::string("Sha2 Permutation: Permutation output is not equal! -SP1"));
 		}
 
 #if defined(__AVX2__)
@@ -206,7 +366,7 @@ namespace Test
 		{
 			if (state256ull[i] != state1[i / 4])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal! -SP2"));
 			}
 		}
 
@@ -226,12 +386,78 @@ namespace Test
 		{
 			if (state512ull[i] != state1[i / 8])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal! -SP3"));
 			}
 		}
 
 #endif
 	}
+
+	void SHA2Test::Stress(IDigest* Digest)
+	{
+		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelMinimumSize());
+		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
+
+		std::vector<byte> code1(Digest->DigestSize());
+		std::vector<byte> code2(Digest->DigestSize());
+		std::vector<byte> msg;
+		SecureRandom rnd;
+		size_t i;
+
+		msg.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
+			msg.resize(INPLEN);
+			IntUtils::Fill(msg, 0, msg.size(), rnd);
+
+			try
+			{
+				// simplified access
+				Digest->Compute(msg, code1);
+				// update/finalize
+				Digest->Update(msg, 0, msg.size());
+				Digest->Finalize(code2, 0);
+			}
+			catch (...)
+			{
+				throw TestException(std::string("Stress: The digest has thrown an exception! -SS1"));
+			}
+
+			if (code1 != code2)
+			{
+				throw TestException(std::string("Stress: Hash output is not equal! -SS2"));
+			}
+		}
+	}
+
+	void SHA2Test::TreeParams()
+	{
+		std::vector<byte> code1(8, 7);
+
+		SHA2Params tree1(32, 32, 8);
+		tree1.DistributionCode() = code1;
+		std::vector<byte> tres = tree1.ToBytes();
+		SHA2Params tree2(tres);
+
+		if (!tree1.Equals(tree2))
+		{
+			throw std::string(std::string("SHA2Test: Tree parameters test failed! -ST1"));
+		}
+
+		std::vector<byte> code2(20, 7);
+		SHA2Params tree3(0, 64, 1, 128, 8, 1, code2);
+		tres = tree3.ToBytes();
+		SHA2Params tree4(tres);
+
+		if (!tree3.Equals(tree4))
+		{
+			throw std::string("SHA2Test: Tree parameters test failed! -ST2");
+		}
+	}
+
+	//~~~Private Functions~~~//
 
 	void SHA2Test::Initialize()
 	{
@@ -268,30 +494,5 @@ namespace Test
 	void SHA2Test::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
-	}
-
-	void SHA2Test::TreeParamsTest()
-	{
-		std::vector<byte> code1(8, 7);
-
-		SHA2Params tree1(32, 32, 8);
-		tree1.DistributionCode() = code1;
-		std::vector<byte> tres = tree1.ToBytes();
-		SHA2Params tree2(tres);
-
-		if (!tree1.Equals(tree2))
-		{
-			throw std::string("SHA2Test: Tree parameters test failed!");
-		}
-
-		std::vector<byte> code2(20, 7);
-		SHA2Params tree3(0, 64, 1, 128, 8, 1, code2);
-		tres = tree3.ToBytes();
-		SHA2Params tree4(tres);
-
-		if (!tree3.Equals(tree4))
-		{
-			throw std::string("SHA2Test: Tree parameters test failed!");
-		}
 	}
 }

@@ -127,7 +127,10 @@ const std::string CMAC::Name()
 
 void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("CMAC:Compute", "The generator has not been initialized!");
+	}
 
 	if (Output.size() != m_macSize)
 	{
@@ -140,8 +143,14 @@ void CMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t CMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
-	CexAssert((Output.size() - OutOffset) >= m_macSize, "The Output buffer is too short");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("CMAC:Compute", "The generator has not been initialized!");
+	}
+	if ((Output.size() - OutOffset) < m_macSize)
+	{
+		throw CryptoMacException("CMAC:Compute", "The Output buffer is too short!");
+	}
 
 	if (m_msgLength != m_cipherMode->BlockSize())
 	{
@@ -216,7 +225,10 @@ void CMAC::Reset()
 
 void CMAC::Update(byte Input)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("CMAC:Update", "The generator has not been initialized!");
+	}
 
 	if (m_msgLength == m_msgBuffer.size())
 	{
@@ -230,8 +242,14 @@ void CMAC::Update(byte Input)
 
 void CMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized");
-	CexAssert((InOffset + Length) <= Input.size(), "The Mac is not initialized");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("CMAC:Update", "The generator has not been initialized!");
+	}
+	if ((InOffset + Length) > Input.size())
+	{
+		throw CryptoMacException("CMAC:Update", "The input buffer is too short!");
+	}
 
 	if (Length != 0)
 	{

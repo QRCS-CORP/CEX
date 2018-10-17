@@ -252,6 +252,7 @@
     <ClInclude Include="..\..\CEX\DrbgFromName.h" />
     <ClInclude Include="..\..\CEX\ECB.h" />
     <ClInclude Include="..\..\CEX\ECP.h" />
+    <ClInclude Include="..\..\CEX\ErrorCodes.h" />
     <ClInclude Include="..\..\CEX\Event.h" />
     <ClInclude Include="..\..\CEX\MacFromName.h" />
     <ClInclude Include="..\..\CEX\MPKCM12T62.h" />

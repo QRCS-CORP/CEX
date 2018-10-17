@@ -1,102 +1,121 @@
-#include "AEADTest.h"
+#include "AeadTest.h"
 #include "../CEX/EAX.h"
 #include "../CEX/GCM.h"
-#include "../CEX/GMAC.h"
+#include "../CEX/IntUtils.h"
 #include "../CEX/OCB.h"
-#include "../CEX/RHX.h"
 #include "../CEX/SecureRandom.h"
 
 namespace Test
 {
+	using Cipher::Symmetric::Block::IBlockCipher;
 	using Cipher::Symmetric::Block::Mode::EAX;
 	using Cipher::Symmetric::Block::Mode::GCM;
 	using Cipher::Symmetric::Block::Mode::OCB;
-	using Cipher::Symmetric::Block::RHX;
-	using Cipher::Symmetric::Block::IBlockCipher;
+	using Utility::IntUtils;
 
-	const std::string AEADTest::DESCRIPTION = "Authenticate Encrypt and Associated Data (AEAD) Cipher Mode Tests.";
-	const std::string AEADTest::FAILURE = "FAILURE! ";
-	const std::string AEADTest::SUCCESS = "SUCCESS! AEAD tests have executed succesfully.";
+	const std::string AeadTest::DESCRIPTION = "Authenticate Encrypt and Associated Data (AEAD) Cipher Mode Tests.";
+	const std::string AeadTest::FAILURE = "FAILURE! ";
+	const std::string AeadTest::SUCCESS = "SUCCESS! AEAD tests have executed succesfully.";
 
-	AEADTest::AEADTest()
+	//~~~Constructor~~~//
+
+	AeadTest::AeadTest()
 		:
+		m_associatedText(0),
+		m_cipherText(0),
+		m_expectedCode(0),
+		m_key(0),
+		m_nonce(0),
+		m_plainText(0),
 		m_progressEvent()
 	{
 		Initialize();
 	}
 
-	AEADTest::~AEADTest()
+	AeadTest::~AeadTest()
 	{
+		IntUtils::ClearVector(m_associatedText);
+		IntUtils::ClearVector(m_cipherText);
+		IntUtils::ClearVector(m_expectedCode);
+		IntUtils::ClearVector(m_key);
+		IntUtils::ClearVector(m_nonce);
+		IntUtils::ClearVector(m_plainText);
 	}
 
-	const std::string AEADTest::Description()
+	//~~~Accessors~~~//
+
+	const std::string AeadTest::Description()
 	{
 		return DESCRIPTION;
 	}
 
-	TestEventHandler &AEADTest::Progress()
+	TestEventHandler &AeadTest::Progress()
 	{
 		return m_progressEvent;
 	}
 
-	std::string AEADTest::Run()
+	//~~~Public Functions~~~//
+
+	std::string AeadTest::Run()
 	{
 		try
 		{
-			EAX* cipher1 = new EAX(Enumeration::BlockCiphers::Rijndael);
+			EAX* cpr1 = new EAX(Enumeration::BlockCiphers::Rijndael);
 
 			for (size_t i = 0; i < EAX_TESTSIZE; ++i)
 			{
-				CompareOutput(cipher1, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
+				Kat(cpr1, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 			}
-			OnProgress(std::string("AEADTest: Passed EAX known answer comparison tests.."));
+			OnProgress(std::string("AeadTest: Passed EAX known answer comparison tests.."));
 
-			StressTest(cipher1);
-			OnProgress(std::string("AEADTest: Passed EAX stress tests.."));
+			Stress(cpr1);
+			OnProgress(std::string("AeadTest: Passed EAX stress tests.."));
 
-			ParallelTest(cipher1);
-			OnProgress(std::string("AEADTest: Passed EAX parallel tests.."));
+			Parallel(cpr1);
+			OnProgress(std::string("AeadTest: Passed EAX parallel tests.."));
 
-			IncrementalCheck(cipher1);
-			OnProgress(std::string("AEADTest: Passed EAX auto incrementing tests.."));
+			Incremental(cpr1);
+			OnProgress(std::string("AeadTest: Passed EAX auto incrementing tests.."));
 
-			delete cipher1;
+			delete cpr1;
 
-			OCB* cipher2 = new OCB(Enumeration::BlockCiphers::Rijndael);
+			OCB* cpr2 = new OCB(Enumeration::BlockCiphers::Rijndael);
 
 			for (size_t i = EAX_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE; ++i)
 			{
-				CompareOutput(cipher2, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
+				Kat(cpr2, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 			}
-			OnProgress(std::string("AEADTest: Passed OCB known answer comparison tests.."));
+			OnProgress(std::string("AeadTest: Passed OCB known answer comparison tests.."));
 
-			StressTest(cipher2);
-			OnProgress(std::string("AEADTest: Passed OCB stress tests.."));
+			Stress(cpr2);
+			OnProgress(std::string("AeadTest: Passed OCB stress tests.."));
 
-			ParallelTest(cipher2);
-			OnProgress(std::string("AEADTest: Passed OCB parallel tests.."));
+			Parallel(cpr2);
+			OnProgress(std::string("AeadTest: Passed OCB parallel tests.."));
 
-			IncrementalCheck(cipher2);
-			OnProgress(std::string("AEADTest: Passed OCB auto incrementing tests.."));
+			Incremental(cpr2);
+			OnProgress(std::string("AeadTest: Passed OCB auto incrementing tests.."));
 
-			delete cipher2;
+			delete cpr2;
 
-			GCM* cipher3 = new GCM(Enumeration::BlockCiphers::Rijndael);
+			GCM* cpr3 = new GCM(Enumeration::BlockCiphers::Rijndael);
 
 			for (size_t i = EAX_TESTSIZE + OCB_TESTSIZE; i < EAX_TESTSIZE + OCB_TESTSIZE + GCM_TESTSIZE; ++i)
 			{
-				CompareOutput(cipher3, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
+				Kat(cpr3, m_key[i], m_nonce[i], m_associatedText[i], m_plainText[i], m_cipherText[i], m_expectedCode[i]);
 			}
-			StressTest(cipher3);
-			OnProgress(std::string("AEADTest: Passed GCM stress tests.."));
+			OnProgress(std::string("AeadTest: Passed GCM known answer comparison tests.."));
 
-			ParallelTest(cipher3);
-			OnProgress(std::string("AEADTest: Passed GCM parallel tests.."));
+			Stress(cpr3);
+			OnProgress(std::string("AeadTest: Passed GCM stress tests.."));
 
-			IncrementalCheck(cipher3);
-			OnProgress(std::string("AEADTest: Passed GCM auto incrementing tests.."));
+			Parallel(cpr3);
+			OnProgress(std::string("AeadTest: Passed GCM parallel tests.."));
 
-			delete cipher3;
+			Incremental(cpr3);
+			OnProgress(std::string("AeadTest: Passed GCM auto incrementing tests.."));
+
+			delete cpr3;
 
 			return SUCCESS;
 		}
@@ -110,7 +129,7 @@ namespace Test
 		}
 	}
 
-	void AEADTest::CompareOutput(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
+	void AeadTest::Kat(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText,
 		std::vector<byte> &CipherText, std::vector<byte> &MacCode)
 	{
 		Key::Symmetric::SymmetricKey kp(Key, Nonce);
@@ -122,13 +141,13 @@ namespace Test
 		}
 
 		// test encryption
-		std::vector<byte> encData(CipherText.size());
-		Cipher->Transform(PlainText, 0, encData, 0, PlainText.size());
-		Cipher->Finalize(encData, PlainText.size(), 16);
+		std::vector<byte> enc(CipherText.size());
+		Cipher->Transform(PlainText, 0, enc, 0, PlainText.size());
+		Cipher->Finalize(enc, PlainText.size(), 16);
 
-		if (CipherText != encData)
+		if (CipherText != enc)
 		{
-			throw TestException("AEADTest: Encrypted output is not equal!");
+			throw TestException(std::string("AeadTest: Encrypted output is not equal! -AK1"));
 		}
 
 		// decryption
@@ -138,58 +157,53 @@ namespace Test
 		{
 			Cipher->SetAssociatedData(AssociatedText, 0, AssociatedText.size());
 		}
-		std::vector<byte> tmpData(CipherText.size());
-		const size_t dataLen = (encData.size() >= 16) ? encData.size() - Cipher->BlockSize() : 0;
-		Cipher->Transform(encData, 0, tmpData, 0, dataLen);
+		std::vector<byte> tmp(CipherText.size());
+		const size_t dlen = (enc.size() >= 16) ? enc.size() - Cipher->BlockSize() : 0;
+		Cipher->Transform(enc, 0, tmp, 0, dlen);
 
-		std::vector<byte> macCode(16);
-		Cipher->Finalize(macCode, 0, 16);
+		std::vector<byte> mac(16);
+		Cipher->Finalize(mac, 0, 16);
 
 		// Finalizer can be skipped if Verify called
-		if (!Cipher->Verify(encData, dataLen, 16))
+		if (!Cipher->Verify(enc, dlen, 16))
 		{
-			throw TestException("AEADTest: Tags do not match!");
+			throw TestException(std::string("AeadTest: Tags do not match! -AK2"));
 		}
 
-		std::vector<byte> decData(dataLen);
-		if (dataLen != 0)
+		std::vector<byte> dec(dlen);
+		if (dlen != 0)
 		{
-			std::memcpy(&decData[0], &tmpData[0], dataLen);
+			std::memcpy(&dec[0], &tmp[0], dlen);
 		}
-		if (PlainText != decData)
+		if (PlainText != dec)
 		{
-			throw TestException("AEADTest: Decrypted output is not equal!");
+			throw TestException(std::string("AeadTest: Decrypted output is not equal! -AK3"));
 		}
-		if (MacCode != macCode || MacCode != Cipher->Tag())
+		if (MacCode != mac || MacCode != Cipher->Tag())
 		{
-			throw TestException("AEADTest: Tags do not match!");
+			throw TestException(std::string("AeadTest: Tags do not match! -AK4"));
 		}
 	}
 
-	void AEADTest::IncrementalCheck(IAeadMode* Cipher)
+	void AeadTest::Incremental(IAeadMode* Cipher)
 	{
-		size_t nLen = 12;
-		if (Cipher->Enumeral() == Enumeration::CipherModes::EAX)
-		{
-			nLen = 16;
-		}
-		std::vector<byte> adData1(10, (byte)16);
-		std::vector<byte> nonce(nLen, (byte)17);
-		std::vector<byte> key(16, (byte)5);
-		std::vector<byte> decData(64, (byte)7);
-		std::vector<byte> encData1(80);
+		std::vector<byte> ad(10, 0x10);
+		std::vector<byte> nonce(Cipher->Enumeral() == Enumeration::CipherModes::EAX ? 16 : 12, 0x11);
+		std::vector<byte> key(16, 0x05);
+		std::vector<byte> dec(64, 0x07);
+		std::vector<byte> enc1(80);
 
 		// get base value
 		Key::Symmetric::SymmetricKey kp1(key, nonce);
 		Cipher->Initialize(true, kp1);
 		// test persisted ad
 		Cipher->PreserveAD() = true;
-		Cipher->SetAssociatedData(adData1, 0, adData1.size());
-		Cipher->Transform(decData, 0, encData1, 0, decData.size());
-		Cipher->Finalize(encData1, decData.size(), 16);
+		Cipher->SetAssociatedData(ad, 0, ad.size());
+		Cipher->Transform(dec, 0, enc1, 0, dec.size());
+		Cipher->Finalize(enc1, dec.size(), 16);
 
 		// 10* finalize on decremented nonce
-		std::vector<byte> encData2(80);
+		std::vector<byte> enc2(80);
 		// decrement counter by 10
 		nonce[nonce.size() - 1] -= 10;
 		Key::Symmetric::SymmetricKey kp2(key, nonce);
@@ -197,37 +211,37 @@ namespace Test
 		Cipher->AutoIncrement() = true;
 		Cipher->Initialize(true, kp2);
 
-		// run 10 loops, last iteration should be equivalent to test run
+		// run 10 loops, +1 iteration should be equivalent to test run
 		for (size_t i = 0; i < 10; ++i)
 		{
-			Cipher->Transform(decData, 0, encData2, 0, decData.size());
-			Cipher->Finalize(encData2, decData.size(), 16);
+			Cipher->Transform(dec, 0, enc2, 0, dec.size());
+			Cipher->Finalize(enc2, dec.size(), 16);
 		}
 		Cipher->AutoIncrement() = false;
 
-		// this output should be different because of decremented nonce
-		if (encData1 == encData2)
+		// this output should be different because of nonce -1
+		if (enc1 == enc2)
 		{
-			throw TestException("AEADTest: Output does not match!");
+			throw TestException(std::string("AeadTest: Output does not match! -AI1"));
 		}
 
-		// get the code after incrementing nonce
-		Cipher->Transform(decData, 0, encData2, 0, decData.size());
-		Cipher->Finalize(encData2, decData.size(), 16);
+		// get the code after incrementing nonce one last time
+		Cipher->Transform(dec, 0, enc2, 0, dec.size());
+		Cipher->Finalize(enc2, dec.size(), 16);
 
-		if (encData1 != encData2)
+		if (enc1 != enc2)
 		{
-			throw TestException("AEADTest: Output does not match!");
+			throw TestException(std::string("AeadTest: Output does not match! -AI2"));
 		}
 	}
 
-	void AEADTest::ParallelTest(IAeadMode* Cipher)
+	void AeadTest::Parallel(IAeadMode* Cipher)
 	{
 		std::vector<byte> data;
-		std::vector<byte> decData1;
-		std::vector<byte> decData2;
-		std::vector<byte> encData1;
-		std::vector<byte> encData2;
+		std::vector<byte> dec1;
+		std::vector<byte> dec2;
+		std::vector<byte> enc1;
+		std::vector<byte> enc2;
 		std::vector<byte> key(32);
 		std::vector<Key::Symmetric::SymmetricKeySize> keySizes = Cipher->LegalKeySizes();
 		std::vector<byte> nonce(keySizes[0].NonceSize());
@@ -236,11 +250,11 @@ namespace Test
 
 		for (size_t i = 0; i < 100; ++i)
 		{
-			uint32_t dataLen = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2));
+			uint32_t dlen = rng.NextUInt32(static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 10), static_cast<uint32_t>(Cipher->ParallelProfile().ParallelMinimumSize() * 2));
 			// important! if manually sizing parallel block, make it evenly divisible by parallel minimum size
-			Cipher->ParallelProfile().ParallelBlockSize() = dataLen - (dataLen % Cipher->ParallelProfile().ParallelMinimumSize());
+			const size_t PRLBLK = dlen - (dlen % Cipher->ParallelProfile().ParallelMinimumSize());
 
-			data.resize(dataLen);
+			data.resize(dlen);
 			rng.Generate(data);
 			rng.Generate(nonce);
 			rng.Generate(key);
@@ -248,102 +262,106 @@ namespace Test
 			Key::Symmetric::SymmetricKey kp(key, nonce);
 
 			// parallel encryption mode
-			encData1.resize(dataLen + Cipher->MaxTagSize());
-			// note: changes to parallel processing must be made before Initialize()
+			enc1.resize(dlen + Cipher->MaxTagSize());
 			Cipher->ParallelProfile().IsParallel() = true;
+			// note: changes to parallel block-size must be set before every Initialize() call
+			Cipher->ParallelProfile().ParallelBlockSize() = PRLBLK;
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
-			Cipher->Transform(data, 0, encData1, 0, data.size());
-			Cipher->Finalize(encData1, dataLen, Cipher->MaxTagSize());
+			Cipher->Transform(data, 0, enc1, 0, data.size());
+			Cipher->Finalize(enc1, dlen, Cipher->MaxTagSize());
 
 			// sequential mode
-			encData2.resize(dataLen + Cipher->MaxTagSize());
+			enc2.resize(dlen + Cipher->MaxTagSize());
 			Cipher->ParallelProfile().IsParallel() = false;
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
-			Cipher->Transform(data, 0, encData2, 0, data.size());
-			Cipher->Finalize(encData2, dataLen, Cipher->MaxTagSize());
+			Cipher->Transform(data, 0, enc2, 0, data.size());
+			Cipher->Finalize(enc2, dlen, Cipher->MaxTagSize());
 
-			if (encData1 != encData2)
+			if (enc1 != enc2)
 			{
-				throw TestException("AEADTest: Encrypted output is not equal!");
+				throw TestException(std::string("AeadTest: Encrypted output is not equal! -AP1"));
 			}
 
 			// parallel decryption mode
-			decData1.resize(dataLen);
+			dec1.resize(dlen);
 			Cipher->ParallelProfile().IsParallel() = true;
+			Cipher->ParallelProfile().ParallelBlockSize() = PRLBLK;
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
-			Cipher->Transform(encData1, 0, decData1, 0, encData1.size() - Cipher->MaxTagSize());
-			Cipher->Finalize(encData1, dataLen, Cipher->MaxTagSize());
+			Cipher->Transform(enc1, 0, dec1, 0, enc1.size() - Cipher->MaxTagSize());
+			Cipher->Finalize(enc1, dlen, Cipher->MaxTagSize());
 
 			// sequential decryption mode
-			decData2.resize(dataLen);
+			dec2.resize(dlen);
 			Cipher->ParallelProfile().IsParallel() = false;
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
-			Cipher->Transform(encData2, 0, decData2, 0, encData2.size() - Cipher->MaxTagSize());
-			Cipher->Finalize(encData2, dataLen, Cipher->MaxTagSize());
+			Cipher->Transform(enc2, 0, dec2, 0, enc2.size() - Cipher->MaxTagSize());
+			Cipher->Finalize(enc2, dlen, Cipher->MaxTagSize());
 
-			if (decData1 != decData2)
+			if (dec1 != dec2)
 			{
-				throw TestException("AEADTest: Decrypted output is not equal!");
+				throw TestException(std::string("AeadTest: Decrypted output is not equal! -AP2"));
 			}
-			if (decData1 != data)
+			if (dec1 != data)
 			{
-				throw TestException("AEADTest: Decrypted output is not equal!");
+				throw TestException(std::string("AeadTest: Decrypted output is not equal! -AP3"));
 			}
-			if (!Cipher->Verify(encData1, dataLen, Cipher->MaxTagSize()))
+			if (!Cipher->Verify(enc1, dlen, Cipher->MaxTagSize()))
 			{
-				throw TestException("AEADTest: Tags do not match!");
+				throw TestException(std::string("AeadTest: Tags do not match! -AP4"));
 			}
 		}
 	}
 
-	void AEADTest::StressTest(IAeadMode* Cipher)
+	void AeadTest::Stress(IAeadMode* Cipher)
 	{
 		Key::Symmetric::SymmetricKeySize keySize = Cipher->LegalKeySizes()[0];
 		std::vector<byte> data;
-		std::vector<byte> decData;
-		std::vector<byte> encData;
+		std::vector<byte> dec;
+		std::vector<byte> enc;
 		std::vector<byte> key(32);
 		std::vector<byte> nonce(keySize.NonceSize());
 		std::vector<byte> assoc(16);
 
 		Prng::SecureRandom rng;
 		data.reserve(MAX_ALLOC);
-		decData.reserve(MAX_ALLOC);
-		encData.reserve(MAX_ALLOC);
-		//815
+		dec.reserve(MAX_ALLOC);
+		enc.reserve(MAX_ALLOC);
+
 		for (size_t i = 0; i < 100; ++i)
 		{
-			size_t dataLen = rng.NextUInt32(1000, 100);
-			data.resize(dataLen);
+			size_t dlen = rng.NextUInt32(10000, 100);
+			data.resize(dlen);
 			rng.Generate(data);
 			rng.Generate(nonce);
 			rng.Generate(key);
 			rng.Generate(assoc);
 			Key::Symmetric::SymmetricKey kp(key, nonce);
 
-			encData.resize(dataLen + Cipher->MaxTagSize());
+			enc.resize(dlen + Cipher->MaxTagSize());
 			Cipher->Initialize(true, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
-			Cipher->Transform(data, 0, encData, 0, data.size());
-			Cipher->Finalize(encData, dataLen, Cipher->MaxTagSize());
+			Cipher->Transform(data, 0, enc, 0, data.size());
+			Cipher->Finalize(enc, dlen, Cipher->MaxTagSize());
 
-			decData.resize(dataLen);
+			dec.resize(dlen);
 			Cipher->Initialize(false, kp);
 			Cipher->SetAssociatedData(assoc, 0, assoc.size());
-			Cipher->Transform(encData, 0, decData, 0, encData.size() - Cipher->MaxTagSize());
+			Cipher->Transform(enc, 0, dec, 0, enc.size() - Cipher->MaxTagSize());
 
-			if (!Cipher->Verify(encData, dataLen, Cipher->MaxTagSize()))
+			if (!Cipher->Verify(enc, dlen, Cipher->MaxTagSize()))
 			{
-				throw TestException("AEADTest: Tags do not match!!");
+				throw TestException(std::string("AeadTest: Tags do not match! -AS1"));
 			}
 		}
 	}
 
-	void AEADTest::Initialize()
+	//~~~Private Functions~~~//
+
+	void AeadTest::Initialize()
 	{
 		/*lint -save -e417 */
 		const std::vector<std::string> key =
@@ -660,7 +678,7 @@ namespace Test
 		/*lint -restore */
 	}
 
-	void AEADTest::OnProgress(std::string Data)
+	void AeadTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
 	}

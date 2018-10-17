@@ -108,11 +108,23 @@ namespace Test
 		return (Value == '\n' || Value == '\r' || Value == '\t' || Value == ' ');
 	}
 
+	std::string HexConverter::ToString(const std::vector<byte> &Input)
+	{
+		std::vector<byte> enc;
+		std::string otp = "";
+
+		Encode(Input, 0, Input.size(), enc);
+		otp.assign((char*)&enc[0], enc.size());
+
+		return otp;
+	}
+
 	void HexConverter::ToString(const std::vector<byte> &Input, std::string &Output)
 	{
-		std::vector<byte> encoded;
-		Encode(Input, 0, Input.size(), encoded);
-		Output.assign((char*)&encoded[0], encoded.size());
+		std::vector<byte> enc;
+
+		Encode(Input, 0, Input.size(), enc);
+		Output.assign((char*)&enc[0], enc.size());
 	}
 
 	std::vector<byte> HexConverter::GetEncodingTable()

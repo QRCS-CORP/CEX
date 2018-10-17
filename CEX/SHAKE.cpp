@@ -17,8 +17,8 @@ SHAKE::SHAKE(ShakeModes ShakeModeType)
 	:
 	m_blockSize((ShakeModeType == ShakeModes::SHAKE128) ? 168 : (ShakeModeType == ShakeModes::SHAKE256) ? 136 : 72),
 	m_domainCode(SHAKE_DOMAIN),
-	m_hashSize((ShakeModeType == ShakeModes::SHAKE128) ? 16 : (ShakeModeType == ShakeModes::SHAKE256) ? 32 : 
-		(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
+	m_hashSize((ShakeModeType == ShakeModes::SHAKE128) ? 16 : (ShakeModeType == ShakeModes::SHAKE256) ? 32 :
+	(ShakeModeType == ShakeModes::SHAKE512) ? 64 : 128),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_kdfState(),
@@ -71,7 +71,7 @@ std::vector<SymmetricKeySize> SHAKE::LegalKeySizes() const
 	return m_legalKeySizes;
 };
 
-size_t SHAKE::MinKeySize()
+const size_t SHAKE::MinKeySize()
 {
 	return m_hashSize;
 }
@@ -92,11 +92,13 @@ size_t SHAKE::Generate(std::vector<byte> &Output)
 
 size_t SHAKE::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(Output.size() != 0, "the output buffer too small");
-
 	if (!m_isInitialized)
 	{
-		throw CryptoKdfException("SHAKE:Initialize", "The generator has been reset, or was not initialized!");
+		throw CryptoKdfException("SHAKE:Generate", "The generator has not been initialized!");
+	}
+	if (Output.size() - OutOffset < Length)
+	{
+		throw CryptoKdfException("SHAKE:Generate", "The output buffer is too short!");
 	}
 
 	Expand(Output, OutOffset, Length);
@@ -135,6 +137,11 @@ void SHAKE::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Lengt
 
 void SHAKE::Initialize(const std::vector<byte> &Key)
 {
+	if (Key.size() < MIN_KEYLEN)
+	{
+		throw CryptoKdfException("SHAKE:Initialize", "Key value is too small, must be at least 16 bytes in length!");
+	}
+
 	if (m_isInitialized)
 	{
 		Reset();
@@ -146,6 +153,11 @@ void SHAKE::Initialize(const std::vector<byte> &Key)
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt)
 {
+	if (Key.size() < MIN_KEYLEN)
+	{
+		throw CryptoKdfException("SHAKE:Initialize", "Key value is too small, must be at least 16 bytes in length!");
+	}
+
 	if (m_isInitialized)
 	{
 		Reset();
@@ -163,6 +175,11 @@ void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Sa
 
 void SHAKE::Initialize(const std::vector<byte> &Key, const std::vector<byte> &Salt, const std::vector<byte> &Info)
 {
+	if (Key.size() < MIN_KEYLEN)
+	{
+		throw CryptoKdfException("SHAKE:Initialize", "Key value is too small, must be at least 16 bytes in length!");
+	}
+
 	if (m_isInitialized)
 	{
 		Reset();

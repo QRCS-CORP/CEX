@@ -59,7 +59,7 @@ namespace Test
 			IPrng* rngPtr = Helper::PrngFromName::GetInstance(Prngs::BCR, Providers::CSP);
 
 			OnProgress(std::string("### Asymmetric Cipher Speed Tests in sequential and parallel modes:"));
-			OnProgress("");
+			OnProgress(std::string(""));
 
 			// RingLWE
 			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using RingLWE Q12289N1024***"));

@@ -163,7 +163,10 @@ void CSP::Generate(std::vector<byte> &Output)
 
 void CSP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
+	if ((Output.size() - Offset) < Length)
+	{
+		throw CryptoRandomException("CSP:Generate", "The output buffer is too small!");
+	}
 
 	std::vector<byte> rnd(Length);
 	Generate(rnd);

@@ -112,8 +112,10 @@ void CJP::Generate(std::vector<byte> &Output)
 
 void CJP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
-
+	if ((Output.size() - Offset) < Length)
+	{
+		throw CryptoRandomException("CJP:Generate", "The output buffer is too small!");
+	}
 	if (!m_isAvailable)
 	{
 		throw CryptoRandomException("CJP:Generate", "High resolution timer not available or too coarse for RNG!");

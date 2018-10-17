@@ -118,7 +118,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException("SimdMathCheck: addition test failed!");
+					throw TestException(std::string("SimdMathCheck: addition test failed!"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -133,7 +133,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException("SimdMathCheck: multiplication test failed!");
+					throw TestException(std::string("SimdMathCheck: multiplication test failed!"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -148,7 +148,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException("SimdMathCheck: subtraction test failed!");
+					throw TestException(std::string("SimdMathCheck: subtraction test failed!"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -163,7 +163,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException("SimdMathCheck: division test failed!");
+					throw TestException(std::string("SimdMathCheck: division test failed!"));
 				}
 
 				for (size_t j = 0; j < tmpA.size(); ++j)
@@ -178,7 +178,7 @@ namespace Test
 
 				if (!SimdEquals(C, Q) || !SimdEquals(D, Q))
 				{
-					throw TestException("SimdMathCheck: modulus test failed!");
+					throw TestException(std::string("SimdMathCheck: modulus test failed!"));
 				}
 			}
 		}

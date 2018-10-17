@@ -3,19 +3,27 @@
 #include "../CEX/CFB.h"
 #include "../CEX/CTR.h"
 #include "../CEX/ECB.h"
+#include "../CEX/IntUtils.h"
 #include "../CEX/OFB.h"
 #include "../CEX/RHX.h"
 
 namespace Test
 {
+	using Utility::IntUtils;
 	using namespace Cipher::Symmetric::Block;
 
 	const std::string CipherModeTest::DESCRIPTION = "NIST SP800-38A KATs testing CBC, CFB, CTR, ECB, and OFB modes.";
 	const std::string CipherModeTest::FAILURE = "FAILURE! ";
 	const std::string CipherModeTest::SUCCESS = "SUCCESS! Cipher Mode tests have executed succesfully.";
 
+	//~~~Constructor~~~//
+
 	CipherModeTest::CipherModeTest()
 		:
+		m_expected(0),
+		m_keys(0),
+		m_message(0),
+		m_nonce(0),
 		m_progressEvent()
 	{
 		Initialize();
@@ -23,7 +31,13 @@ namespace Test
 
 	CipherModeTest::~CipherModeTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_keys);
+		IntUtils::ClearVector(m_message);
+		IntUtils::ClearVector(m_nonce);
 	}
+
+	//~~~Accessors~~~//
 
 	const std::string CipherModeTest::Description()
 	{
@@ -35,35 +49,77 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string CipherModeTest::Run()
 	{
+		// test modes with each key (128/192/256)
 		try
 		{
-			// test modes with each key (128/192/256)
-			CompareCBC(m_keys[0], m_input, m_output);
-			CompareCBC(m_keys[1], m_input, m_output);
-			CompareCBC(m_keys[2], m_input, m_output);
-			OnProgress(std::string("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests.."));
-
-			CompareCFB(m_keys[0], m_input, m_output);
-			CompareCFB(m_keys[1], m_input, m_output);
-			CompareCFB(m_keys[2], m_input, m_output);
-			OnProgress(std::string("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests.."));
-
-			CompareCTR(m_keys[0], m_input, m_output);
-			CompareCTR(m_keys[1], m_input, m_output);
-			CompareCTR(m_keys[2], m_input, m_output);
-			OnProgress(std::string("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests.."));
-
-			CompareECB(m_keys[0], m_input, m_output);
-			CompareECB(m_keys[1], m_input, m_output);
-			CompareECB(m_keys[2], m_input, m_output);
+			// ECB 128bit key
+			Mode::ECB* cpr1 = new Mode::ECB(BlockCiphers::Rijndael);
+			Kat(cpr1, m_keys[0], m_nonce[2], m_message[0], m_expected[0], true);
+			Kat(cpr1, m_keys[0], m_nonce[2], m_message[1], m_expected[1], false);
+			// 192bit
+			Kat(cpr1, m_keys[1], m_nonce[2], m_message[2], m_expected[2], true);
+			Kat(cpr1, m_keys[1], m_nonce[2], m_message[3], m_expected[3], false);
+			// 256bit
+			Kat(cpr1, m_keys[2], m_nonce[2], m_message[4], m_expected[4], true);
+			Kat(cpr1, m_keys[2], m_nonce[2], m_message[5], m_expected[5], false);
+			delete cpr1;
 			OnProgress(std::string("CipherModeTest: Passed ECB 128/192/256 bit key encryption/decryption tests.."));
 
-			CompareOFB(m_keys[0], m_input, m_output);
-			CompareOFB(m_keys[1], m_input, m_output);
-			CompareOFB(m_keys[2], m_input, m_output);
+			// CBC 128bit key
+			Mode::CBC* cpr2 = new Mode::CBC(BlockCiphers::Rijndael);
+			Kat(cpr2, m_keys[0], m_nonce[0], m_message[6], m_expected[6], true);
+			Kat(cpr2, m_keys[0], m_nonce[0], m_message[7], m_expected[7], false);
+			// 192bit
+			Kat(cpr2, m_keys[1], m_nonce[0], m_message[8], m_expected[8], true);
+			Kat(cpr2, m_keys[1], m_nonce[0], m_message[9], m_expected[9], false);
+			// 256bit
+			Kat(cpr2, m_keys[2], m_nonce[0], m_message[10], m_expected[10], true);
+			Kat(cpr2, m_keys[2], m_nonce[0], m_message[11], m_expected[11], false);
+			delete cpr2;
+			OnProgress(std::string("CipherModeTest: Passed CBC 128/192/256 bit key encryption/decryption tests.."));
+
+			// CFB 128bit key
+			Mode::CFB* cpr3 = new Mode::CFB(BlockCiphers::Rijndael);
+			Kat(cpr3, m_keys[0], m_nonce[0], m_message[12], m_expected[12], true);
+			Kat(cpr3, m_keys[0], m_nonce[0], m_message[13], m_expected[13], false);
+			// 192bit
+			Kat(cpr3, m_keys[1], m_nonce[0], m_message[14], m_expected[14], true);
+			Kat(cpr3, m_keys[1], m_nonce[0], m_message[15], m_expected[15], false);
+			// 256bit
+			Kat(cpr3, m_keys[2], m_nonce[0], m_message[16], m_expected[16], true);
+			Kat(cpr3, m_keys[2], m_nonce[0], m_message[17], m_expected[17], false);
+			delete cpr3;
+			OnProgress(std::string("CipherModeTest: Passed CFB 128/192/256 bit key encryption/decryption tests.."));
+
+			// OFB 128bit key
+			Mode::OFB* cpr4 = new Mode::OFB(BlockCiphers::Rijndael);
+			Kat(cpr4, m_keys[0], m_nonce[0], m_message[18], m_expected[18], true);
+			Kat(cpr4, m_keys[0], m_nonce[0], m_message[19], m_expected[19], false);
+			// 192bit
+			Kat(cpr4, m_keys[1], m_nonce[0], m_message[20], m_expected[20], true);
+			Kat(cpr4, m_keys[1], m_nonce[0], m_message[21], m_expected[21], false);
+			// 256bit
+			Kat(cpr4, m_keys[2], m_nonce[0], m_message[22], m_expected[22], true);
+			Kat(cpr4, m_keys[2], m_nonce[0], m_message[23], m_expected[23], false);
+			delete cpr4;
 			OnProgress(std::string("CipherModeTest: Passed OFB 128/192/256 bit key encryption/decryption tests.."));
+
+			// CTR 128bit key
+			Mode::CTR* cpr5 = new Mode::CTR(BlockCiphers::Rijndael);
+			Kat(cpr5, m_keys[0], m_nonce[1], m_message[24], m_expected[24], true);
+			Kat(cpr5, m_keys[0], m_nonce[1], m_message[25], m_expected[25], false);
+			// 192bit
+			Kat(cpr5, m_keys[1], m_nonce[1], m_message[26], m_expected[26], true);
+			Kat(cpr5, m_keys[1], m_nonce[1], m_message[27], m_expected[27], false);
+			// 256bit
+			Kat(cpr5, m_keys[2], m_nonce[1], m_message[28], m_expected[28], true);
+			Kat(cpr5, m_keys[2], m_nonce[1], m_message[29], m_expected[29], false);
+			delete cpr5;
+			OnProgress(std::string("CipherModeTest: Passed CTR 128/192/256 bit key encryption/decryption tests.."));
 
 			return SUCCESS;
 		}
@@ -77,273 +133,25 @@ namespace Test
 		}
 	}
 
-	void CipherModeTest::CompareCBC(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
+	void CipherModeTest::Kat(ICipherMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<std::vector<byte>> &Message, std::vector<std::vector<byte>> &Expected, bool Encryption)
 	{
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = m_vectors[0];
-		int index = 6;
+		std::vector<byte> otp(16);
+		Key::Symmetric::SymmetricKey kp(Key, Nonce);
 
-		if (Key.size() == 24)
-		{
-			index = 8;
-		}
-		else if (Key.size() == 32)
-		{
-			index = 10;
-		}
+		Cipher->Initialize(Encryption, kp);
 
+		for (size_t i = 0; i < 4; ++i)
 		{
-			RHX* eng = new RHX();
-			Mode::CBC mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(true, k);
+			Cipher->Transform(Message[i], 0, otp, 0, otp.size());
 
-			for (size_t i = 0; i < 4; i++)
+			if (otp != Expected[i])
 			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != Output[index][i])
-				{
-					throw TestException("CBC Mode: Encrypted arrays are not equal!");
-				}
+				throw TestException(Cipher->Name() + " Mode: Encrypted arrays are not equal!");
 			}
-			delete eng;
-		}
-
-		index++;
-
-		{
-			RHX* eng = new RHX();
-			Mode::CBC mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(false, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != m_output[index][i])
-				{
-					throw TestException("CBC Mode: Decrypted arrays are not equal!");
-				}
-			}
-			delete eng;
 		}
 	}
 
-	void CipherModeTest::CompareCFB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
-	{
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = m_vectors[0];
-		int index = 12;
-
-		if (Key.size() == 24)
-		{
-			index = 14;
-		}
-		else if (Key.size() == 32)
-		{
-			index = 16;
-		}
-
-		{
-			RHX* eng = new RHX();
-			Mode::CFB mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(true, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != Output[index][i])
-				{
-					throw TestException("CFB Mode: Encrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-
-		index++;
-
-		{
-			RHX* eng = new RHX();
-			Mode::CFB mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(false, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != m_output[index][i])
-				{
-					throw TestException("CFB Mode: Decrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-	}
-
-	void CipherModeTest::CompareCTR(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
-	{
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = m_vectors[1];
-		int index = 24;
-
-		if (Key.size() == 24)
-		{
-			index = 26;
-		}
-		else if (Key.size() == 32)
-		{
-			index = 28;
-		}
-
-		{
-			RHX* eng = new RHX();
-			Mode::CTR mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(true, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != Output[index][i])
-				{
-					throw TestException("CTR Mode: Encrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-
-		index++;
-		{
-			RHX* eng = new RHX();
-			Mode::CTR mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(false, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != m_output[index][i])
-				{
-					throw TestException("CTR Mode: Decrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-	}
-
-	void CipherModeTest::CompareECB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
-	{
-		std::vector<byte> outBytes(16, 0);
-		int index = 0;
-
-		if (Key.size() == 24)
-		{
-			index = 2;
-		}
-		else if (Key.size() == 32)
-		{
-			index = 4;
-		}
-
-		{
-			RHX* eng = new RHX();
-			Mode::ECB mode(eng);
-			Key::Symmetric::SymmetricKey k(Key);
-			mode.Initialize(true, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != Output[index][i])
-				{
-					throw TestException("ECB Mode: Encrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-
-		index++;
-
-		{
-			RHX* eng = new RHX();
-			Mode::ECB mode(eng);
-			Key::Symmetric::SymmetricKey k(Key);
-			mode.Initialize(false, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != m_output[index][i])
-				{
-					throw TestException("ECB Mode: Decrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-	}
-
-	void CipherModeTest::CompareOFB(std::vector<byte> &Key, std::vector<std::vector<std::vector<byte>>> &Input, std::vector<std::vector<std::vector<byte>>> &Output)
-	{
-		std::vector<byte> outBytes(16, 0);
-		std::vector<byte> &iv = m_vectors[0];
-		int index = 18;
-
-		if (Key.size() == 24)
-		{
-			index = 20;
-		}
-		else if (Key.size() == 32)
-		{
-			index = 22;
-		}
-
-		{
-			RHX* eng = new RHX();
-			Mode::OFB mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(true, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != Output[index][i])
-				{
-					throw TestException("OFB Mode: Encrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-
-		index++;
-
-		{
-			RHX* eng = new RHX();
-			Mode::OFB mode(eng);
-			Key::Symmetric::SymmetricKey k(Key, iv);
-			mode.Initialize(true, k);
-
-			for (size_t i = 0; i < 4; i++)
-			{
-				mode.Transform(Input[index][i], 0, outBytes, 0, outBytes.size());
-
-				if (outBytes != m_output[index][i])
-				{
-					throw TestException("OFB Mode: Decrypted arrays are not equal!");
-				}
-			}
-			delete eng;
-		}
-	}
+	//~~~Private Functions~~~//
 
 	void CipherModeTest::Initialize()
 	{
@@ -358,9 +166,10 @@ namespace Test
 		const std::vector<std::string> vectors =
 		{
 			std::string("000102030405060708090A0B0C0D0E0F"),//F.1/F.2/F.3
-			std::string("F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF")//F.5
+			std::string("F0F1F2F3F4F5F6F7F8F9FAFBFCFDFEFF"),//F.5
+			std::string("")
 		};
-		HexConverter::Decode(vectors, 2, m_vectors);
+		HexConverter::Decode(vectors, 3, m_nonce);
 
 		const std::vector<std::vector<std::string>> input =
 		{
@@ -551,11 +360,11 @@ namespace Test
 			}
 		};
 
-		m_input.resize(input.size());
+		m_message.resize(input.size());
 
 		for (size_t i = 0; i < input.size(); ++i)
 		{
-			HexConverter::Decode(input[i], 4, m_input[i]);
+			HexConverter::Decode(input[i], 4, m_message[i]);
 		}
 
 		const std::vector<std::vector<std::string>> output =
@@ -747,11 +556,11 @@ namespace Test
 			}
 		};
 
-		m_output.resize(output.size());
+		m_expected.resize(output.size());
 
 		for (size_t i = 0; i < output.size(); ++i)
 		{
-			HexConverter::Decode(output[i], 4, m_output[i]);
+			HexConverter::Decode(output[i], 4, m_expected[i]);
 		}
 	}
 

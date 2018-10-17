@@ -18,9 +18,11 @@ namespace Test
 	using Key::Symmetric::SymmetricKey;
 	using Key::Symmetric::SymmetricKeySize;
 
-	const std::string ParallelModeTest::DESCRIPTION = "Compares output from parallel and linear modes for equality.";
+	const std::string ParallelModeTest::DESCRIPTION = "Stress test compares output from parallel and linear modes for equality.";
 	const std::string ParallelModeTest::FAILURE = "FAILURE! ";
-	const std::string ParallelModeTest::SUCCESS = "SUCCESS! Parallel tests have executed succesfully.";
+	const std::string ParallelModeTest::SUCCESS = "SUCCESS! Parallel stress tests have executed succesfully.";
+
+	//~~~Constructor~~~//
 
 	ParallelModeTest::ParallelModeTest()
 		:
@@ -32,6 +34,8 @@ namespace Test
 	{
 	}
 
+	//~~~Accessors~~~//
+
 	const std::string ParallelModeTest::Description()
 	{
 		return DESCRIPTION;
@@ -42,44 +46,46 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string ParallelModeTest::Run()
 	{
 		try
 		{
-			CBC* cipher1 = new CBC(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher1, false);
-			OnProgress(std::string("Passed CBC parallel to sequential equivalence test.."));
-			delete cipher1;
+			CBC* cpr1 = new CBC(Enumeration::BlockCiphers::RHX);
+			Stress(cpr1, false);
+			OnProgress(std::string("ParallelModeTest: Passed CBC parallel to sequential equivalence test.."));
+			delete cpr1;
 
-			CTR* cipher2 = new CTR(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher2, true);
-			OnProgress(std::string("Passed CTR parallel to sequential equivalence test.."));
-			delete cipher2;
+			CTR* cpr2 = new CTR(Enumeration::BlockCiphers::RHX);
+			Stress(cpr2, true);
+			OnProgress(std::string("ParallelModeTest: Passed CTR parallel to sequential equivalence test.."));
+			delete cpr2;
 
-			ECB* cipher3 = new ECB(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher3, true);
-			OnProgress(std::string("Passed ECB parallel to sequential equivalence test.."));
-			delete cipher3;
+			ECB* cpr3 = new ECB(Enumeration::BlockCiphers::RHX);
+			Stress(cpr3, true);
+			OnProgress(std::string("ParallelModeTest: Passed ECB parallel to sequential equivalence test.."));
+			delete cpr3;
 
-			ICM* cipher4 = new ICM(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher4, true);
-			OnProgress(std::string("Passed ICM parallel to sequential equivalence test.."));
-			delete cipher4;
+			ICM* cpr4 = new ICM(Enumeration::BlockCiphers::RHX);
+			Stress(cpr4, true);
+			OnProgress(std::string("ParallelModeTest: Passed ICM parallel to sequential equivalence test.."));
+			delete cpr4;
 
-			EAX* cipher5 = new EAX(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher5, true);
-			OnProgress(std::string("Passed EAX parallel to sequential equivalence test.."));
-			delete cipher5;
+			EAX* cpr5 = new EAX(Enumeration::BlockCiphers::RHX);
+			Stress(cpr5, true);
+			OnProgress(std::string("ParallelModeTest: Passed EAX parallel to sequential equivalence test.."));
+			delete cpr5;
 
-			GCM* cipher6 = new GCM(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher6, true);
-			OnProgress(std::string("Passed GCM parallel to sequential equivalence test.."));
-			delete cipher6;
+			GCM* cpr6 = new GCM(Enumeration::BlockCiphers::RHX);
+			Stress(cpr6, true);
+			OnProgress(std::string("ParallelModeTest: Passed GCM parallel to sequential equivalence test.."));
+			delete cpr6;
 
-			OCB* cipher7 = new OCB(Enumeration::BlockCiphers::RHX);
-			Parallel(cipher7, true);
-			OnProgress(std::string("Passed OCB parallel to sequential equivalence test.."));
-			delete cipher7;
+			OCB* cpr7 = new OCB(Enumeration::BlockCiphers::RHX);
+			Stress(cpr7, true);
+			OnProgress(std::string("ParallelModeTest: Passed OCB parallel to sequential equivalence test.."));
+			delete cpr7;
 
 			return SUCCESS;
 		}
@@ -93,12 +99,7 @@ namespace Test
 		}
 	}
 
-	void ParallelModeTest::OnProgress(std::string Data)
-	{
-		m_progressEvent(Data);
-	}
-
-	void ParallelModeTest::Parallel(ICipherMode* Cipher, bool Encryption)
+	void ParallelModeTest::Stress(ICipherMode* Cipher, bool Encryption)
 	{
 		const size_t MINSMP = 2048;
 		const size_t MAXSMP = 16384;
@@ -162,7 +163,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException("Parallel: Cipher output is not equal! -TP1");
+				throw TestException(std::string("Stress: Cipher output is not equal! -TP1"));
 			}
 
 			if (Encryption)
@@ -174,9 +175,16 @@ namespace Test
 
 				if (otp != inp)
 				{
-					throw TestException("Parallel: Cipher output is not equal! -TP2");
+					throw TestException(std::string("Stress: Cipher output is not equal! -TP2"));
 				}
 			}
 		}
+	}
+
+	//~~~Private Functions~~~//
+
+	void ParallelModeTest::OnProgress(std::string Data)
+	{
+		m_progressEvent(Data);
 	}
 }

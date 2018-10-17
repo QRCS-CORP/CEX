@@ -66,7 +66,7 @@ namespace Test
 
 		if (bbe16 != rbe16)
 		{
-			throw TestException("UtilityTest: BE16 Integer to array conversion has failed!");
+			throw TestException(std::string("UtilityTest: BE16 Integer to array conversion has failed!"));
 		}
 
 		std::vector<byte>bbe32(4);
@@ -77,7 +77,7 @@ namespace Test
 
 		if (bbe32 != rbe32)
 		{
-			throw TestException("UtilityTest: BE32 Integer to array conversion has failed!");
+			throw TestException(std::string("UtilityTest: BE32 Integer to array conversion has failed!"));
 		}
 
 		std::vector<byte>bbe64(8);
@@ -88,7 +88,7 @@ namespace Test
 
 		if (bbe64 != rbe64)
 		{
-			throw TestException("UtilityTest: BE64 Integer to array conversion has failed!");
+			throw TestException(std::string("UtilityTest: BE64 Integer to array conversion has failed!"));
 		}
 
 		std::vector<byte>ble16(2);
@@ -99,7 +99,7 @@ namespace Test
 
 		if (ble16 != rle16)
 		{
-			throw TestException("UtilityTest: LE16 Integer to array conversion has failed!");
+			throw TestException(std::string("UtilityTest: LE16 Integer to array conversion has failed!"));
 		}
 
 		std::vector<byte>ble32(4);
@@ -110,7 +110,7 @@ namespace Test
 
 		if (ble32 != rle32)
 		{
-			throw TestException("UtilityTest: LE32 Integer to array conversion has failed!");
+			throw TestException(std::string("UtilityTest: LE32 Integer to array conversion has failed!"));
 		}
 
 		std::vector<byte>ble64(8);
@@ -121,7 +121,7 @@ namespace Test
 
 		if (ble64 != rle64)
 		{
-			throw TestException("UtilityTest: LE64 Integer to array conversion has failed!");
+			throw TestException(std::string("UtilityTest: LE64 Integer to array conversion has failed!"));
 		}
 
 		// test block conversions
@@ -136,7 +136,7 @@ namespace Test
 
 		if (ret16 != inp16)
 		{
-			throw TestException("UtilityTest: BE16 block conversion has failed!");
+			throw TestException(std::string("UtilityTest: BE16 block conversion has failed!"));
 		}
 
 		otp16.clear();
@@ -149,7 +149,7 @@ namespace Test
 
 		if (ret16 != inp16)
 		{
-			throw TestException("UtilityTest: LE16 block conversion has failed!");
+			throw TestException(std::string("UtilityTest: LE16 block conversion has failed!"));
 		}
 
 		std::vector<uint>inp32(128);
@@ -162,7 +162,7 @@ namespace Test
 
 		if (ret32 != inp32)
 		{
-			throw TestException("UtilityTest: BE32 block conversion has failed!");
+			throw TestException(std::string("UtilityTest: BE32 block conversion has failed!"));
 		}
 
 		otp32.clear();
@@ -175,7 +175,7 @@ namespace Test
 
 		if (ret32 != inp32)
 		{
-			throw TestException("UtilityTest: LE32 block conversion has failed!");
+			throw TestException(std::string("UtilityTest: LE32 block conversion has failed!"));
 		}
 
 		std::vector<ulong>inp64(64);
@@ -188,7 +188,7 @@ namespace Test
 
 		if (ret64 != inp64)
 		{
-			throw TestException("UtilityTest: BE64 block conversion has failed!");
+			throw TestException(std::string("UtilityTest: BE64 block conversion has failed!"));
 		}
 
 		otp64.clear();
@@ -201,7 +201,7 @@ namespace Test
 
 		if (ret64 != inp64)
 		{
-			throw TestException("UtilityTest: LE64 block conversion has failed!");
+			throw TestException(std::string("UtilityTest: LE64 block conversion has failed!"));
 		}
 	}
 
@@ -222,7 +222,7 @@ namespace Test
 
 			if (y != z)
 			{
-				throw TestException("UtilityTest: 32bit left rotation has failed!");
+				throw TestException(std::string("UtilityTest: 32bit left rotation has failed!"));
 			}
 		}
 
@@ -233,7 +233,7 @@ namespace Test
 
 			if (y != z)
 			{
-				throw TestException("UtilityTest: 32bit right rotation has failed!");
+				throw TestException(std::string("UtilityTest: 32bit right rotation has failed!"));
 			}
 		}
 
@@ -246,7 +246,7 @@ namespace Test
 
 			if (y != z)
 			{
-				throw TestException("UtilityTest: 64bit left rotation has failed!");
+				throw TestException(std::string("UtilityTest: 64bit left rotation has failed!"));
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace Test
 
 			if (y != z)
 			{
-				throw TestException("UtilityTest: 64bit right rotation has failed!");
+				throw TestException(std::string("UtilityTest: 64bit right rotation has failed!"));
 			}
 		}
 	}

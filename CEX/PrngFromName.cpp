@@ -3,6 +3,7 @@
 #include "BCR.h"
 #include "CpuDetect.h"
 #include "HCR.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_HELPER
 
@@ -45,7 +46,7 @@ IPrng* PrngFromName::GetInstance(Prngs PrngType, Providers ProviderType, Digests
 			}
 			case Prngs::HCR:
 			{
-				rngPtr = new Prng::HCR(DigestType, ProviderType);
+				rngPtr = new Prng::HCR(static_cast<Enumeration::SHA2Digests>(DigestType), ProviderType);
 				break;
 			}
 			default:

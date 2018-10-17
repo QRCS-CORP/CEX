@@ -11,6 +11,8 @@ namespace Test
 	const std::string PaddingTest::FAILURE = "FAILURE! ";
 	const std::string PaddingTest::SUCCESS = "SUCCESS! Cipher Padding tests have executed succesfully.";
 
+	//~~~Constructor~~~//
+
 	PaddingTest::PaddingTest()
 		:
 		m_progressEvent()
@@ -20,6 +22,8 @@ namespace Test
 	PaddingTest::~PaddingTest()
 	{
 	}
+
+	//~~~Accessors~~~//
 
 	const std::string PaddingTest::Description()
 	{
@@ -31,17 +35,32 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string PaddingTest::Run()
 	{
+		using namespace Padding;
+
 		try
 		{
-			CompareOutput(new Padding::ISO7816());
+			ISO7816* pad1 = new ISO7816();
+			Compare(pad1);
+			delete pad1;
 			OnProgress(std::string("PaddingTest: Passed ISO7816 comparison tests.."));
-			CompareOutput(new Padding::PKCS7());
+
+			PKCS7* pad2 = new PKCS7();
+			Compare(pad2);
+			delete pad2;
 			OnProgress(std::string("PaddingTest: Passed PKCS7 comparison tests.."));
-			CompareOutput(new Padding::TBC());
+
+			TBC* pad3 = new TBC();
+			Compare(pad3);
+			delete pad3;
 			OnProgress(std::string("PaddingTest: Passed TBC comparison tests.."));
-			CompareOutput(new Padding::X923());
+
+			X923* pad4 = new X923();
+			Compare(pad4);
+			delete pad4;
 			OnProgress(std::string("PaddingTest: Passed X923 comparison tests.."));
 
 			return SUCCESS;
@@ -56,54 +75,55 @@ namespace Test
 		}
 	}
 
-	void PaddingTest::CompareOutput(Padding::IPadding* Padding)
+	void PaddingTest::Compare(Padding::IPadding* Padding)
 	{
+		const size_t MSGBLK = 16;
+		std::vector<byte> fill(MSGBLK);
 		CEX::Provider::CSP rng;
-		std::vector<byte> fill(16);
-		rng.Generate(fill);
-		const size_t BLOCK = 16;
 
-		for (size_t i = 0; i < BLOCK; i++)
+		rng.Generate(fill);
+
+		for (size_t i = 0; i < MSGBLK; i++)
 		{
-			std::vector<byte> data(BLOCK);
+			std::vector<byte> msg(MSGBLK);
 			// fill with rand
 			if (i > 0)
 			{
-				std::memcpy(&data[0], &fill[0], BLOCK - i);
+				std::memcpy(msg.data(), fill.data(), MSGBLK - i);
 			}
 
 			// pad array
-			Padding->AddPadding(data, i);
+			Padding->AddPadding(msg, i);
 			// verify length
-			size_t len = Padding->GetPaddingLength(data);
+			size_t len = Padding->GetPaddingLength(msg);
 
 			if (len == 0 && i != 0)
 			{
-				throw TestException("PaddingTest: Failed the padding value return check!");
+				throw TestException(std::string("PaddingTest: Failed the padding value return check! -PC1"));
 			}
-			else if (i != 0 && len != BLOCK - i)
+			else if (i != 0 && len != MSGBLK - i)
 			{
-				throw TestException("PaddingTest: Failed the padding value return check!");
+				throw TestException(std::string("PaddingTest: Failed the padding value return check! -PC2"));
 			}
 
 			// test offset method
-			if (i > 0 && i < 15)
+			if (i > 0 && i < MSGBLK - 1)
 			{
-				len = Padding->GetPaddingLength(data, i);
+				len = Padding->GetPaddingLength(msg, i);
 
 				if (len == 0 && i != 0)
 				{
-					throw TestException("PaddingTest: Failed the padding value return check!");
+					throw TestException(std::string("PaddingTest: Failed the padding value return check! -PC3"));
 				}
-				else if (i != 0 && len != BLOCK - i)
+				else if (i != 0 && len != MSGBLK - i)
 				{
-					throw TestException("PaddingTest: Failed the offset padding value return check!");
+					throw TestException(std::string("PaddingTest: Failed the offset padding value return check! -PC4"));
 				}
 			}
 		}
-
-		delete Padding;
 	}
+
+	//~~~Private Functions~~~//
 
 	void PaddingTest::OnProgress(std::string Data)
 	{

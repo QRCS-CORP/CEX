@@ -1,35 +1,34 @@
 #include "HCG.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "ProviderFromName.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_DRBG
 
+using Utility::MemUtils;
+
 const std::string HCG::CLASS_NAME("HCG");
 
 //~~~Constructor~~~//
 
-HCG::HCG(Digests DigestType, Providers ProviderType)
+HCG::HCG(SHA2Digests DigestType, Providers ProviderType)
 	:
-	m_hmacEngine(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? DigestType :
+	m_dgtMac(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
 		throw CryptoGeneratorException("HCG:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(true),
-	m_digestType(DigestType),
 	m_distCode(0),
 	m_distCodeMax(0),
-	m_hmacKey(m_hmacEngine.BlockSize()),
-	m_hmacState(m_hmacEngine.MacSize(), 0x01),
+	m_entProvider(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
+	m_hmacKey(0),
+	m_hmacState(m_dgtMac->MacSize(), 0x01),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
-	m_prdResistant(ProviderType != Providers::None),
-	m_providerSource(ProviderType == Providers::None ? nullptr : Helper::ProviderFromName::GetInstance(ProviderType)),
-	m_providerType(ProviderType),
 	m_reseedCounter(0),
 	m_reseedRequests(0),
-	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
-	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
+	m_reseedThreshold(m_dgtMac->MacSize() * 1000),
 	m_seedCtr(SEEDCTR_SIZE),
 	m_stateCtr(STATECTR_SIZE)
 {
@@ -38,24 +37,20 @@ HCG::HCG(Digests DigestType, Providers ProviderType)
 
 HCG::HCG(IDigest* Digest, IProvider* Provider)
 	:
-	m_hmacEngine(Digest != nullptr && Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() != Digests::SHA512 ? Digest :
+	m_dgtMac(Digest != nullptr && (Digest->Enumeral() == Digests::SHA256 || Digest->Enumeral() != Digests::SHA512) ? new HMAC(Digest) :
 		throw CryptoGeneratorException("HCG:Ctor", "The digest type is not supported!")),
 	m_destroyEngine(false),
-	m_digestType(Digest->Enumeral()),
 	m_distCode(0),
 	m_distCodeMax(0),
-	m_hmacKey(m_hmacEngine.BlockSize()),
-	m_hmacState(m_hmacEngine.MacSize(), 0x01),
+	m_entProvider(Provider),
+	m_hmacKey(0),
+	m_hmacState(m_dgtMac->MacSize(), 0x01),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_legalKeySizes(0),
-	m_prdResistant(m_providerSource != nullptr),
-	m_providerSource(Provider),
-	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
 	m_reseedCounter(0),
 	m_reseedRequests(0),
-	m_reseedThreshold(m_hmacEngine.MacSize() * 1000),
-	m_secStrength((m_hmacEngine.MacSize() * 8) / 2),
+	m_reseedThreshold(m_dgtMac->MacSize() * 1000),
 	m_seedCtr(SEEDCTR_SIZE),
 	m_stateCtr(STATECTR_SIZE)
 {
@@ -67,15 +62,11 @@ HCG::~HCG()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_digestType = Digests::None;
 		m_distCodeMax = 0;
 		m_isInitialized = false;
-		m_prdResistant = false;
-		m_providerType = Providers::None;
 		m_reseedCounter = 0;
 		m_reseedRequests = 0;
 		m_reseedThreshold = 0;
-		m_secStrength = 0;
 
 		Utility::IntUtils::ClearVector(m_distCode);
 		Utility::IntUtils::ClearVector(m_hmacKey);
@@ -88,16 +79,24 @@ HCG::~HCG()
 		{
 			m_destroyEngine = false;
 
-			if (m_providerSource != nullptr)
+			if (m_dgtMac != nullptr)
 			{
-				m_providerSource.reset(nullptr);
+				m_dgtMac.reset(nullptr);
+			}
+			if (m_entProvider != nullptr)
+			{
+				m_entProvider.reset(nullptr);
 			}
 		}
 		else
 		{
-			if (m_providerSource != nullptr)
+			if (m_dgtMac != nullptr)
 			{
-				m_providerSource.release();
+				m_dgtMac.release();
+			}
+			if (m_entProvider != nullptr)
+			{
+				m_entProvider.release();
 			}
 		}
 	}
@@ -147,7 +146,7 @@ const size_t HCG::MaxReseedCount()
 
 const std::string HCG::Name()
 {
-	return CLASS_NAME + "-" + m_hmacEngine.Name();
+	return CLASS_NAME + "-" + m_dgtMac->Name();
 }
 
 const size_t HCG::NonceSize() 
@@ -162,7 +161,7 @@ size_t &HCG::ReseedThreshold()
 
 const size_t HCG::SecurityStrength()
 {
-	return m_secStrength;
+	return (m_dgtMac->MacSize() * 8) / 2;
 }
 
 //~~~Public Functions~~~//
@@ -174,12 +173,22 @@ size_t HCG::Generate(std::vector<byte> &Output)
 
 size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "The generator must be initialized before use!");
-	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	if (!m_isInitialized)
+	{
+		throw CryptoGeneratorException("HCG:Generate", "The generator must be initialized before use!");
+	}
+	if ((Output.size() - OutOffset) < Length)
+	{
+		throw CryptoGeneratorException("HCG:Generate", "The output buffer is too small!");
+	}
+	if (Length > MAX_REQUEST)
+	{
+		throw CryptoGeneratorException("HCG:Generate", "The output buffer is too large, max request is 64kb!");
+	}
 
-	GenerateBlock(Output, OutOffset, Length);
+	Fill(Output, OutOffset, Length);
 
-	if (m_prdResistant)
+	if (m_entProvider != nullptr)
 	{
 		m_reseedCounter += Length;
 
@@ -194,10 +203,10 @@ size_t HCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 
 			m_reseedCounter = 0;
 			// use next block of state as seed material
-			std::vector<byte> state(m_hmacEngine.BlockSize());
+			std::vector<byte> state(m_dgtMac->BlockSize());
 			Generate(state, 0, state.size());
 			// combine with salt from provider, extract, and re-key
-			Derive(state);
+			Extract(state);
 		}
 	}
 
@@ -231,17 +240,12 @@ void HCG::Initialize(const std::vector<byte> &Seed)
 	}
 
 	// pre-initialize the HMAC
-	m_hmacKey = Seed;
+	m_hmacKey.resize(Seed.size());
+	MemUtils::Copy(Seed, 0, m_hmacKey, 0, m_hmacKey.size());
 	Key::Symmetric::SymmetricKey kp(m_hmacKey);
-	m_hmacEngine.Initialize(kp);
+	m_dgtMac->Initialize(kp);
 	// add entropy and re-mix before first output call
-	Derive(m_hmacKey);
-
-	size_t secLen = Seed.size();
-	if (secLen < m_hmacEngine.MacSize())
-	{
-		m_secStrength = (secLen * 8) / 2;
-	}
+	Extract(m_hmacKey);
 
 	m_isInitialized = true;
 }
@@ -254,7 +258,8 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	}
 
 	// nonce becomes the initial state counter value
-	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	// initialize the seed
 	Initialize(Seed);
 }
 
@@ -266,7 +271,7 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	}
 
 	// copy nonce to state counter
-	Utility::MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
+	MemUtils::Copy(Nonce, 0, m_stateCtr, 0, Utility::IntUtils::Min(Nonce.size(), m_stateCtr.size()));
 
 	// info can be a secret salt or domain identifier; added to derivation function input
 	// for best security, info should be secret, random, and DistributionCodeMax size
@@ -278,7 +283,7 @@ void HCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 	{
 		// info is too large; size to optimal max, ignore remainder
 		std::vector<byte> tmpInfo(m_distCodeMax);
-		Utility::MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
+		MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
 		m_distCode = tmpInfo;
 	}
 
@@ -292,25 +297,29 @@ void HCG::Update(const std::vector<byte> &Seed)
 		throw CryptoGeneratorException("HCG:Update", "Seed size is invalid! Check LegalKeySizes for accepted values.");
 	}
 
-	Derive(Seed);
+	Extract(Seed);
 }
 
 //~~~Private Functions~~~//
 
-void HCG::Derive(const std::vector<byte> &Seed)
+void HCG::Extract(const std::vector<byte> &Seed)
 {
 	// key expansion/strengthening function
-	size_t blkOffset = m_seedCtr.size() + Seed.size();
-	size_t keyLen = m_hmacEngine.BlockSize();
-	size_t keyOffset = 0;
-	std::vector<byte> macCode(m_hmacEngine.MacSize());
-	std::vector<byte> tmpKey(keyLen);
+	size_t blkOff;
+	size_t keyLen;
+	size_t keyOff;
+	std::vector<byte> macCode(m_dgtMac->MacSize());
+	std::vector<byte> tmpKey(m_dgtMac->BlockSize());
+
+	blkOff = m_seedCtr.size() + Seed.size();
+	keyLen = m_dgtMac->BlockSize();
+	keyOff = 0;
 
 	// preserve some initial entropy
 	if (m_isInitialized)
 	{
-		m_hmacEngine.Update(m_hmacKey, 0, m_hmacKey.size());
-		blkOffset += m_hmacKey.size();
+		m_dgtMac->Update(m_hmacKey, 0, m_hmacKey.size());
+		blkOff += m_hmacKey.size();
 	}
 
 	do
@@ -319,38 +328,40 @@ void HCG::Derive(const std::vector<byte> &Seed)
 		// 1) increment seed counter by key-bytes copied
 		Increase(m_seedCtr, static_cast<uint>(keyRmd));
 		// 2) process the seed counter
-		m_hmacEngine.Update(m_seedCtr, 0, m_seedCtr.size());
+		m_dgtMac->Update(m_seedCtr, 0, m_seedCtr.size());
 		// 3) process the seed
-		m_hmacEngine.Update(Seed, 0, Seed.size());
+		m_dgtMac->Update(Seed, 0, Seed.size());
 
 		// 4) pad with new entropy
-		if (m_prdResistant)
+		if (m_entProvider != nullptr)
 		{
-			RandomPad(blkOffset);
+			RandomPad(blkOff);
 		}
 
 		// 5) compress and add to HMAC key
-		m_hmacEngine.Finalize(macCode, 0);
-		Utility::MemUtils::Copy(macCode, 0, tmpKey, keyOffset, keyRmd);
+		m_dgtMac->Finalize(macCode, 0);
+		MemUtils::Copy(macCode, 0, tmpKey, keyOff, keyRmd);
 		keyLen -= keyRmd;
-		keyOffset += keyRmd;
+		keyOff += keyRmd;
 	} 
 	while (keyLen != 0);
 
 	// store the new key
-	m_hmacKey = tmpKey;
+	MemUtils::Clear(m_hmacKey, 0, m_hmacKey.size());
+	m_hmacKey.resize(tmpKey.size());
+	MemUtils::Copy(tmpKey, 0, m_hmacKey, 0, m_hmacKey.size());
 	// 6) rekey the HMAC
 	Key::Symmetric::SymmetricKey kp(m_hmacKey);
-	m_hmacEngine.Initialize(kp);
+	m_dgtMac->Initialize(kp);
 
 	// 7) generate the states initial entropy
-	if (m_prdResistant)
+	if (m_entProvider != nullptr)
 	{
-		m_providerSource->Generate(m_hmacState);
+		m_entProvider->Generate(m_hmacState);
 	}
 }
 
-void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length)
+void HCG::Fill(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
 	do
 	{
@@ -358,17 +369,17 @@ void HCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 		// 1) increase state counter by output-bytes generated
 		Increase(m_stateCtr, static_cast<uint>(RMDLEN));
 		// 2) process the state counter
-		m_hmacEngine.Update(m_stateCtr, 0, m_stateCtr.size());
+		m_dgtMac->Update(m_stateCtr, 0, m_stateCtr.size());
 		// 3) process the current state
-		m_hmacEngine.Update(m_hmacState, 0, m_hmacState.size());
+		m_dgtMac->Update(m_hmacState, 0, m_hmacState.size());
 		// 4) optional personalization string
 		if (m_distCode.size() != 0)
 		{
-			m_hmacEngine.Update(m_distCode, 0, m_distCode.size());
+			m_dgtMac->Update(m_distCode, 0, m_distCode.size());
 		}
 		// 5) output the state
-		m_hmacEngine.Finalize(m_hmacState, 0);
-		Utility::MemUtils::Copy(m_hmacState, 0, Output, OutOffset, RMDLEN);
+		m_dgtMac->Finalize(m_hmacState, 0);
+		MemUtils::Copy(m_hmacState, 0, Output, OutOffset, RMDLEN);
 
 		Length -= RMDLEN;
 		OutOffset += RMDLEN;
@@ -380,8 +391,10 @@ void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 {
 	const size_t CTRLEN = Counter.size() - 1;
 	std::vector<byte> ctrInc(sizeof(uint));
+	byte carry;
+
+	carry = 0;
 	Utility::IntUtils::Le32ToBytes(Length, ctrInc, 0);
-	byte carry = 0;
 
 	for (size_t i = CTRLEN; i > 0; --i)
 	{
@@ -395,33 +408,35 @@ void HCG::Increase(std::vector<byte> &Counter, const uint Length)
 
 void HCG::Scope()
 {
-	m_distCodeMax = m_hmacEngine.BlockSize() + (m_hmacEngine.BlockSize() - (m_stateCtr.size() + m_hmacState.size() + Helper::DigestFromName::GetPaddingSize(m_digestType)));
+	const size_t  PADLEN = Helper::DigestFromName::GetPaddingSize(m_dgtMac->DigestType());
+	m_distCodeMax = m_dgtMac->BlockSize() + (m_dgtMac->BlockSize() - (m_stateCtr.size() + m_hmacState.size() + PADLEN));
 
 	m_legalKeySizes.resize(3);
 	// minimum seed size
-	m_legalKeySizes[0] = SymmetricKeySize(m_hmacEngine.BlockSize() - Helper::DigestFromName::GetPaddingSize(m_digestType), 0, 0);
+	m_legalKeySizes[0] = SymmetricKeySize(m_dgtMac->BlockSize() - PADLEN, 0, 0);
 	// recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(m_legalKeySizes[0].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distCodeMax);
+	m_legalKeySizes[1] = SymmetricKeySize(m_legalKeySizes[0].KeySize() + m_dgtMac->BlockSize(), STATECTR_SIZE, m_distCodeMax);
 	// maximum security
-	m_legalKeySizes[2] = SymmetricKeySize(m_legalKeySizes[1].KeySize() + m_hmacEngine.BlockSize(), STATECTR_SIZE, m_distCodeMax);
+	m_legalKeySizes[2] = SymmetricKeySize(m_legalKeySizes[1].KeySize() + m_dgtMac->BlockSize(), STATECTR_SIZE, m_distCodeMax);
 }
 
 void HCG::RandomPad(size_t BlockOffset)
 {
-	size_t padLen = (BlockOffset > m_hmacEngine.BlockSize()) ? m_hmacEngine.BlockSize() - (BlockOffset % m_hmacEngine.BlockSize()) : m_hmacEngine.BlockSize() - BlockOffset;
+	std::vector<byte> tmpV(0);
+	size_t padLen;
+
+	padLen = (BlockOffset > m_dgtMac->BlockSize()) ? m_dgtMac->BlockSize() - (BlockOffset % m_dgtMac->BlockSize()) : m_dgtMac->BlockSize() - BlockOffset;
 
 	// if less than security size, add a full block
-	if (padLen < m_hmacEngine.MacSize())
+	if (padLen < m_dgtMac->MacSize())
 	{
-		padLen += m_hmacEngine.BlockSize();
+		padLen += m_dgtMac->BlockSize();
 	}
 
-	// adjust for finalizer code (Merkle–Damgård constructions)
-	padLen -= Helper::DigestFromName::GetPaddingSize(m_digestType);
-	std::vector<byte> tmpV(padLen);
-	m_providerSource->Generate(tmpV);
+	tmpV.resize(padLen);
+	m_entProvider->Generate(tmpV);
 	// digest processes full blocks by padding with entropy from provider
-	m_hmacEngine.Update(tmpV, 0, tmpV.size());
+	m_dgtMac->Update(tmpV, 0, tmpV.size());
 }
 
 NAMESPACE_DRBGEND

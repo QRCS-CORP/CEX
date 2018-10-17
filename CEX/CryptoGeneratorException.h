@@ -2,8 +2,11 @@
 #define CEX_CRYPTOGENERATOREXCEPTION_H
 
 #include "CexDomain.h"
+#include "ErrorCodes.h"
 
 NAMESPACE_EXCEPTION
+
+using Enumeration::ErrorCodes;
 
 /// <summary>
 /// Wraps exceptions thrown within Random Generator operations
@@ -13,6 +16,7 @@ struct CryptoGeneratorException : std::exception
 private:
 
 	std::string m_details;
+	ErrorCodes m_error;
 	std::string m_message;
 	std::string m_origin;
 
@@ -46,6 +50,15 @@ public:
 	CryptoGeneratorException(const std::string &Origin, const std::string &Message);
 
 	/// <summary>
+	/// Constructor: instantiate this class with an origin and message
+	/// </summary>
+	///
+	/// <param name="Origin">The origin of the exception</param>
+	/// <param name="Message">A custom message or error data</param>
+	/// <param name="ErrorCode">The error code enumeral</param>
+	CryptoGeneratorException(const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode);
+
+	/// <summary>
 	/// Constructor: instantiate this class with an origin, message and inner exception
 	/// </summary>
 	///
@@ -53,6 +66,16 @@ public:
 	/// <param name="Message">A custom message or error data</param>
 	/// <param name="Detail">The inner exception string</param>
 	CryptoGeneratorException(const std::string &Origin, const std::string &Message, const std::string &Detail);
+
+	/// <summary>
+	/// Constructor: instantiate this class with an origin, message and inner exception
+	/// </summary>
+	///
+	/// <param name="Origin">The origin of the exception</param>
+	/// <param name="Message">A custom message or error data</param>
+	/// <param name="Detail">The inner exception string</param>
+	/// <param name="ErrorCode">The error code enumeral</param>
+	CryptoGeneratorException(const std::string &Origin, const std::string &Message, const std::string &Detail, ErrorCodes ErrorCode);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -65,6 +88,11 @@ public:
 	/// Read/Write: The inner exception string
 	/// </summary>
 	std::string &Details();
+
+	/// <summary>
+	/// Read/Write: The exception eror code
+	/// </summary>
+	ErrorCodes &ErrorCode();
 
 	/// <summary>
 	/// Read/Write: The message associated with the error

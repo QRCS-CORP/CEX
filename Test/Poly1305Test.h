@@ -28,6 +28,8 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+		static const size_t MAXM_ALLOC = 64 * 255;
+		static const size_t MINM_ALLOC = 1024;
 		static const size_t TEST_CYCLES = 100;
 
 		std::vector<std::vector<byte>> m_expected;
@@ -71,21 +73,28 @@ namespace Test
 		/// Compare known answer test vectors to Poly1305 output
 		/// </summary>
 		/// 
-		/// <param name="Key">The MAC key</param>
+		/// <param name="Generator">The mac generator instance</param>
+		/// <param name="Key">The mac key</param>
 		/// <param name="Message">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void Kat(std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+		void Kat(IMac* Generator, std::vector<byte> &Key, std::vector<byte> &Message, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Test the different initialization options
+		/// </summary>
+		/// 
+		/// <param name="Generator">The mac generator instance</param>
+		void Params(IMac* Generator);
 
 		/// <summary>
 		/// Compare output between access functions Compute and Update/Finalize in a looping [TEST_CYCLES] stress-test
 		/// </summary>
-		void Stress();
+		void Stress(IMac* Generator);
 
 	private:
 
 		void Initialize();
 		void OnProgress(std::string Data);
-
 	};
 }
 

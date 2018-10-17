@@ -25,6 +25,8 @@ namespace Test
 
     public:
 
+		//~~~Constructor~~~//
+
 		/// <remarks>
 		/// Compares output between sequential and parallel cipher modes for equivalence
 		/// </remarks>
@@ -35,6 +37,8 @@ namespace Test
 		/// </summary>
 		~ParallelModeTest();
 
+		//~~~Accessors~~~//
+
 		/// <summary>
 		/// Get: The test description
 		/// </summary>
@@ -44,6 +48,8 @@ namespace Test
 		/// Progress return event callback
 		/// </summary>
 		TestEventHandler &Progress() override;
+
+		//~~~Public Functions~~~//
 
 		/// <summary>
 		/// Start the tests
@@ -56,7 +62,7 @@ namespace Test
 		/// 
 		/// <param name="Cipher">The cipher instance pointer</param>
 		/// <param name="Encryption">Test encryption or decryption output</param>
-		void Parallel(ICipherMode* Cipher, bool Encryption);
+		void Stress(ICipherMode* Cipher, bool Encryption);
 
 	private:
 

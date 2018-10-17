@@ -81,6 +81,10 @@ Skein1024::Skein1024(SkeinParams &Params)
 	{
 		throw CryptoDigestException("Skein1024::Ctor", "Cpu does not support parallel processing!");
 	}
+	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
+	{
+		throw CryptoDigestException("Skein1024::Ctor", "The tree parameters are invalid!");
+	}
 
 	if (m_treeParams.FanOut() > 1)
 	{
@@ -121,27 +125,27 @@ Skein1024::~Skein1024()
 
 //~~~Accessors~~~//
 
-size_t Skein1024::BlockSize() 
+size_t Skein1024::BlockSize()
 {
-	return BLOCK_SIZE; 
+	return BLOCK_SIZE;
 }
 
-size_t Skein1024::DigestSize() 
-{ 
-	return DIGEST_SIZE; 
+size_t Skein1024::DigestSize()
+{
+	return DIGEST_SIZE;
 }
 
-const Digests Skein1024::Enumeral() 
-{ 
-	return Digests::Skein1024; 
+const Digests Skein1024::Enumeral()
+{
+	return Digests::Skein1024;
 }
 
 const bool Skein1024::IsParallel()
-{ 
+{
 	return m_parallelProfile.IsParallel();
 }
 
-const std::string Skein1024::Name() 
+const std::string Skein1024::Name()
 {
 	std::string txtName = "";
 
@@ -157,9 +161,9 @@ const std::string Skein1024::Name()
 	return txtName;
 }
 
-const size_t Skein1024::ParallelBlockSize() 
-{ 
-	return m_parallelProfile.ParallelBlockSize(); 
+const size_t Skein1024::ParallelBlockSize()
+{
+	return m_parallelProfile.ParallelBlockSize();
 }
 
 ParallelOptions &Skein1024::ParallelProfile()
@@ -239,25 +243,12 @@ size_t Skein1024::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	return DIGEST_SIZE;
 }
 
-void Skein1024::Reset()
-{
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
-	{
-		// copy the configuration value to the state
-		m_dgtState[i].S = m_dgtState[i].V;
-		SkeinUbiTweak::StartNewBlockType(m_dgtState[i].T, SkeinUbiType::Message);
-	}
-
-	m_isInitialized = false;
-	// reset bytes filled
-	m_msgLength = 0;
-}
-
 void Skein1024::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoDigestException("Skein1024::ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	m_dgtState.clear();
@@ -267,6 +258,21 @@ void Skein1024::ParallelMaxDegree(size_t Degree)
 	m_treeParams = { DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), static_cast<byte>(Degree) };
 
 	Initialize();
+}
+
+void Skein1024::Reset()
+{
+	for (size_t i = 0; i < m_dgtState.size(); ++i)
+	{
+		// copy the configuration value to the state
+		m_dgtState[i].S = m_dgtState[i].V;
+		SkeinUbiTweak::StartNewBlockType(m_dgtState[i].T, SkeinUbiType::Message);
+	}
+
+	// reset bytes filled
+	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	m_msgLength = 0;
+	m_isInitialized = false;
 }
 
 void Skein1024::Update(byte Input)
@@ -421,7 +427,7 @@ void Skein1024::LoadState(Skein1024State &State, std::array<ulong, 16> &Config)
 	State.Increase(32);
 	Permute(Config, State);
 	// store the initial state for reset
-	MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
+	MemUtils::Copy(State.S, 0, State.V, 0, State.V.size() * sizeof(ulong));
 	// add the config string
 	MemUtils::XOR1024(Config, 0, State.V, 0);
 }
@@ -463,7 +469,7 @@ void Skein1024::ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, std
 		ProcessBlock(Input, InOffset, State, StateOffset);
 		InOffset += m_parallelProfile.ParallelMinimumSize();
 		Length -= m_parallelProfile.ParallelMinimumSize();
-	}
+	} 
 	while (Length > 0);
 }
 

@@ -4,6 +4,7 @@
 #include "../CEX/MPKCKeyPair.h"
 #include "../CEX/MPKCPrivateKey.h"
 #include "../CEX/MPKCPublicKey.h"
+#include "../CEX/RingLWE.h"
 #include "../CEX/RHX.h"
 
 namespace Test
@@ -41,16 +42,18 @@ namespace Test
 	{
 		try
 		{
-			CipherTextIntegrity();
-			OnProgress(std::string("McElieceTest: Passed cipher-text integrity test.."));
-			MessageAuthentication();
+			Authentication();
 			OnProgress(std::string("McElieceTest: Passed message authentication test.."));
-			PublicKeyIntegrity();
+			CipherText();
+			OnProgress(std::string("McElieceTest: Passed cipher-text integrity test.."));
+			Exception();
+			OnProgress(std::string("McElieceTest: Passed exception handling test.."));
+			PublicKey();
 			OnProgress(std::string("McElieceTest: Passed public key integrity test.."));
-			StressLoop();
-			OnProgress(std::string("McElieceTest: Passed encryption and decryption stress tests.."));
-			SerializationCompare();
+			Serialization();
 			OnProgress(std::string("McElieceTest: Passed key serialization tests.."));
+			Stress();
+			OnProgress(std::string("McElieceTest: Passed encryption and decryption stress tests.."));
 
 			return SUCCESS;
 		}
@@ -64,32 +67,7 @@ namespace Test
 		}
 	}
 
-	void McElieceTest::CipherTextIntegrity()
-	{
-		std::vector<byte> cpt(0);
-		std::vector<byte> sec1(64);
-		std::vector<byte> sec2(64);
-
-		McEliece cpr(Enumeration::MPKCParams::M12T62, m_rngPtr);
-		IAsymmetricKeyPair* kp = cpr.Generate();
-
-		cpr.Initialize(kp->PublicKey());
-		cpr.Encapsulate(cpt, sec1);
-
-		// alter ciphertext
-		m_rngPtr->Generate(cpt, 0, 4);
-
-		cpr.Initialize(kp->PrivateKey());
-
-		if (cpr.Decapsulate(cpt, sec2))
-		{
-			throw TestException("McElieceTest: Cipher-text integrity test failed!");
-		}
-			
-		delete kp;
-	}
-
-	void McElieceTest::MessageAuthentication()
+	void McElieceTest::Authentication()
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
@@ -108,13 +86,89 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("McElieceTest: Message authentication test failed!");
+			throw TestException(std::string("McElieceTest: Message authentication test failed!"));
 		}
 
 		delete kp;
 	}
 
-	void McElieceTest::PublicKeyIntegrity()
+	void McElieceTest::CipherText()
+	{
+		std::vector<byte> cpt(0);
+		std::vector<byte> sec1(64);
+		std::vector<byte> sec2(64);
+
+		McEliece cpr(Enumeration::MPKCParams::M12T62, m_rngPtr);
+		IAsymmetricKeyPair* kp = cpr.Generate();
+
+		cpr.Initialize(kp->PublicKey());
+		cpr.Encapsulate(cpt, sec1);
+
+		// alter ciphertext
+		m_rngPtr->Generate(cpt, 0, 4);
+
+		cpr.Initialize(kp->PrivateKey());
+
+		if (cpr.Decapsulate(cpt, sec2))
+		{
+			throw TestException(std::string("McElieceTest: Cipher-text integrity test failed!"));
+		}
+			
+		delete kp;
+	}
+
+	void McElieceTest::Exception()
+	{
+		// test invalid constructor parameters
+		try
+		{
+			McEliece cpr(Enumeration::MPKCParams::None, m_rngPtr);
+
+			throw TestException(std::string("McEliece"), std::string("Exception: Exception handling failure! -TE1"));
+		}
+		catch (CryptoAsymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		try
+		{
+			McEliece cpr(Enumeration::MPKCParams::M12T62, Enumeration::Prngs::None);
+
+			throw TestException(std::string("McEliece"), std::string("Exception: Exception handling failure! -TE2"));
+		}
+		catch (CryptoAsymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization
+		try
+		{
+			McEliece cpra(Enumeration::MPKCParams::M12T62, Enumeration::Prngs::BCR);
+			Cipher::Asymmetric::RLWE::RingLWE cprb;
+			// create an invalid key set
+			IAsymmetricKeyPair* kp = cprb.Generate();
+			cpra.Initialize(kp->PrivateKey());
+
+			throw TestException(std::string("McEliece"), std::string("Exception: Exception handling failure! -TE3"));
+		}
+		catch (CryptoAsymmetricException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+	}
+
+	void McElieceTest::PublicKey()
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
@@ -136,13 +190,13 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException("McElieceTest: Public-key integrity test failed!");
+			throw TestException(std::string("McElieceTest: Public-key integrity test failed!"));
 		}
 
 		delete kp;
 	}
 
-	void McElieceTest::SerializationCompare()
+	void McElieceTest::Serialization()
 	{
 		std::vector<byte> pkey;
 		std::vector<byte> skey;
@@ -155,7 +209,7 @@ namespace Test
 
 		if (priK1->S() != priK2.S() || priK1->Parameters() != priK2.Parameters())
 		{
-			throw TestException("McElieceTest: Private key serialization test has failed!");
+			throw TestException(std::string("McElieceTest: Private key serialization test has failed!"));
 		}
 
 		MPKCPublicKey* pubK1 = (MPKCPublicKey*)kp->PublicKey();
@@ -164,7 +218,7 @@ namespace Test
 
 		if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 		{
-			throw TestException("McElieceTest: Public key serialization test has failed!");
+			throw TestException(std::string("McElieceTest: Public key serialization test has failed!"));
 		}
 
 		delete kp;
@@ -172,7 +226,7 @@ namespace Test
 		delete pubK1;
 	}
 
-	void McElieceTest::StressLoop()
+	void McElieceTest::Stress()
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(64);
@@ -181,8 +235,8 @@ namespace Test
 
 		for (size_t i = 0; i < 10; ++i)
 		{
+			m_rngPtr->Generate(sec1);
 			IAsymmetricKeyPair* kp = cpr.Generate();
-
 			cpr.Initialize(kp->PublicKey());
 			cpr.Encapsulate(cpt, sec1);
 
@@ -190,14 +244,14 @@ namespace Test
 
 			if (!cpr.Decapsulate(cpt, sec2))
 			{
-				throw TestException("McElieceTest: Stress test authentication has failed!");
+				throw TestException(std::string("McElieceTest: Stress test authentication has failed!"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException("McElieceTest: Stress test has failed!");
+				throw TestException(std::string("McElieceTest: Stress test has failed!"));
 			}
 		}
 	}

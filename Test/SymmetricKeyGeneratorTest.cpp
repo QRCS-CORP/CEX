@@ -61,26 +61,26 @@ namespace Test
 		SymmetricKey* symKey = keyGen.GetSymmetricKey(keySize);
 		if (!IsValidKey(*symKey))
 		{
-			throw TestException("CheckAccess: The key is invalid!");
+			throw TestException(std::string("CheckAccess: The key is invalid!"));
 		}
 
 		SymmetricSecureKey* secKey = keyGen.GetSecureKey(keySize);
 		if (!IsValidKey(*secKey))
 		{
-			throw TestException("CheckAccess: The key is invalid!");
+			throw TestException(std::string("CheckAccess: The key is invalid!"));
 		}
 
 		std::vector<byte> data(128);
 		keyGen.Generate(data);
 		if (!IsGoodRun(data))
 		{
-			throw TestException("CheckAccess: The key is invalid!");
+			throw TestException(std::string("CheckAccess: The key is invalid!"));
 		}
 
 		data = keyGen.Generate(data.size());
 		if (!IsGoodRun(data))
 		{
-			throw TestException("CheckAccess: The key is invalid!");
+			throw TestException(std::string("CheckAccess: The key is invalid!"));
 		}
 	}
 
@@ -93,19 +93,19 @@ namespace Test
 		// check for rdtscp
 		if (detect.RDTSCP())
 		{
-			SymmetricKeyGenerator keyGen1(Digests::SHA256, Providers::CJP);
+			SymmetricKeyGenerator keyGen1(SHA2Digests::SHA256, Providers::CJP);
 			SymmetricKey* symKey1 = keyGen1.GetSymmetricKey(keySize);
 			if (!IsValidKey(*symKey1))
 			{
-				throw TestException("CheckInit: Key generation has failed!");
+				throw TestException(std::string("CheckInit: Key generation has failed!"));
 			}
 		}
 
-		SymmetricKeyGenerator keyGen2(Digests::SHA512, Providers::CSP);
+		SymmetricKeyGenerator keyGen2(SHA2Digests::SHA512, Providers::CSP);
 		SymmetricKey* symKey2 = keyGen2.GetSymmetricKey(keySize);
 		if (!IsValidKey(*symKey2))
 		{
-			throw TestException("CheckInit: Key generation has failed!");
+			throw TestException(std::string("CheckInit: Key generation has failed!"));
 		}
 	}
 

@@ -168,11 +168,6 @@ public:
 	const Macs Enumeral() override;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t MacSize() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
@@ -181,6 +176,11 @@ public:
 	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
 	std::vector<SymmetricKeySize> LegalKeySizes() const override;
+
+	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	const size_t MacSize() override;
 
 	/// <summary>
 	/// Read Only: Mac generators class name

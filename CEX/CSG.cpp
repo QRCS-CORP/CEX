@@ -71,7 +71,8 @@ CSG::CSG(ShakeModes ShakeModeType, IProvider* Provider, bool Parallel)
 	m_isInitialized(false),
 	m_legalKeySizes(0),
 	m_prdResistant(Provider != nullptr),
-	m_providerSource(Provider),
+	m_providerSource(Provider != nullptr ? Provider : 
+		throw CryptoGeneratorException("CSG:Ctor", "The provider can not be null!")),
 	m_providerType(m_providerSource != nullptr ? m_providerSource->Enumeral() : Providers::None),
 	m_reseedCounter(0),
 	m_reseedRequests(0),
@@ -206,11 +207,13 @@ size_t CSG::Generate(std::vector<byte> &Output)
 
 size_t CSG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
-
 	if (!m_isInitialized)
 	{
-		throw CryptoGeneratorException("CSG:Generate", "The generator has been reset, or was not initialized!");
+		throw CryptoGeneratorException("CSG:Generate", "The generator must be initialized before use!");
+	}
+	if ((Output.size() - OutOffset) < Length)
+	{
+		throw CryptoGeneratorException("CSG:Generate", "The output buffer is too small!");
 	}
 
 	Extract(Output, OutOffset, Length);
@@ -257,6 +260,11 @@ void CSG::Initialize(ISymmetricKey &GenParam)
 
 void CSG::Initialize(const std::vector<byte> &Seed)
 {
+	if (Seed.size() < MIN_KEYSIZE)
+	{
+		throw CryptoGeneratorException("CSG:Initialize", "Seed size is invalid! Check LegalKeySizes for accepted values.");
+	}
+
 	if (m_isInitialized)
 	{
 		Reset();

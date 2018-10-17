@@ -6,6 +6,7 @@
 #include "Digests.h"
 #include "IProvider.h"
 #include "Providers.h"
+#include "SHA2Digests.h"
 #include "SymmetricKey.h"
 #include "SymmetricKeySize.h"
 #include "SymmetricSecureKey.h"
@@ -15,6 +16,7 @@ NAMESPACE_SYMMETRICKEY
 using Exception::CryptoGeneratorException;
 using Enumeration::Digests;
 using Enumeration::Providers;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// A helper class for generating cryptographically strong keying material.
@@ -45,7 +47,7 @@ class SymmetricKeyGenerator
 {
 private:
 
-	Digests m_dgtType;
+	SHA2Digests m_dgtType;
 	bool m_isDestroyed;
 	Providers m_pvdType;
 	std::unique_ptr<Provider::IProvider> m_pvdEngine;
@@ -73,7 +75,7 @@ public:
 	/// <param name="ProviderType">The entropy provider that supplies the seed material for the key compression cycle</param>
 	/// 
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an invalid parameter is used</exception>
-	explicit SymmetricKeyGenerator(Digests DigestType = Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP);
+	explicit SymmetricKeyGenerator(SHA2Digests DigestType = SHA2Digests::SHA512, Providers ProviderType = Enumeration::Providers::CSP);
 
 	/// <summary>
 	/// Destructor: finalize this class

@@ -35,12 +35,14 @@
 #include "Digests.h"
 #include "IDigest.h"
 #include "HMAC.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
 using Digest::IDigest;
 using Mac::HMAC;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of an Hash based Key Derivation Function (HKDF)
@@ -154,7 +156,7 @@ public:
 	/// <param name="DigestType">The hash functions type name enumeral</param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name is used</exception>
-	explicit HKDF(Digests DigestType);
+	explicit HKDF(SHA2Digests DigestType);
 
 	/// <summary>
 	/// Instantiates an HKDF generator using a message digest instance
@@ -207,7 +209,7 @@ public:
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	size_t MinKeySize() override;
+	const size_t MinKeySize() override;
 
 	/// <summary>
 	/// Read Only: The Kdf generators class name

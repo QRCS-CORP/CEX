@@ -9,9 +9,10 @@ namespace Test
 	using Cipher::Symmetric::Block::Mode::IAeadMode;
 
 	/// <summary>
-	/// Tests the AEAD cipher modes; EAX, OCB and GCM
+	/// Tests the AEAD cipher modes; EAX, OCB and GCM.
+	/// <para>Tests each AEAD mode for correct operation, including KAT, parallel-mode, auto-increment, and stress tests.</para>
 	/// </summary>
-	class AEADTest final : public ITest
+	class AeadTest final : public ITest
 	{
 	private:
 
@@ -38,15 +39,19 @@ namespace Test
 
 	public:
 
+		//~~~Constructor~~~//
+
 		/// <summary>
 		/// Compares known answer AEAD vectors for equality
 		/// </summary>
-		AEADTest();
+		AeadTest();
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
-		~AEADTest();
+		~AeadTest();
+
+		//~~~Accessors~~~//
 
 		/// <summary>
 		/// Get: The test description
@@ -58,19 +63,52 @@ namespace Test
 		/// </summary>
 		TestEventHandler &Progress() override;
 
+		//~~~Public Functions~~~//
+
 		/// <summary>
 		/// Start the tests
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		/// Compare output with known answer vectors
+		/// </summary>
+		///
+		/// <param name="Cipher">The cipher instance</param>
+		/// <param name="Key">The cipher input-key</param>
+		/// <param name="Nonce">The nonce array</param>
+		/// <param name="AssociatedText">The associated text array</param>
+		/// <param name="PlainText">The plain-text array</param>
+		/// <param name="CipherText">The cipher-text array</param>
+		/// <param name="MacCode">The expected cipher authentication code</param>
+		void Kat(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, 
+			std::vector<byte> &PlainText, std::vector<byte> &CipherText, std::vector<byte> &MacCode);
+		
+		/// <summary>
+		/// Test incremental and auto incrementing updates
+		/// </summary>
+		///
+		/// <param name="Cipher">The cipher instance</param>
+		void Incremental(IAeadMode* Cipher);
+		
+		/// <summary>
+		/// Compare parallel to sequential operation modes for equivalence
+		/// </summary>
+		///
+		/// <param name="Cipher">The cipher instance</param>
+		void Parallel(IAeadMode* Cipher);
+		
+		/// <summary>
+		/// Test operations in a looping stress test
+		/// </summary>
+		///
+		/// <param name="Cipher">The cipher instance</param>
+		void Stress(IAeadMode* Cipher);
+
 	private:
 
-		void CompareOutput(IAeadMode* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &AssociatedText, std::vector<byte> &PlainText, std::vector<byte> &CipherText, std::vector<byte> &MacCode);
-		void IncrementalCheck(IAeadMode* Cipher);
 		void Initialize();
 		void OnProgress(std::string Data);
-		void ParallelTest(IAeadMode* Cipher);
-		void StressTest(IAeadMode* Cipher);
 	};
 }
 

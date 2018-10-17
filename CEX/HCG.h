@@ -30,13 +30,16 @@
 #include "IDigest.h"
 #include "IProvider.h"
 #include "HMAC.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_DRBG
 
 using Enumeration::Digests;
 using Digest::IDigest;
+using Mac::HMAC;
 using Provider::IProvider;
 using Enumeration::Providers;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of an HMAC Counter Generator DRBG
@@ -165,23 +168,20 @@ private:
 	static const size_t SEEDCTR_SIZE = 4;
 	static const size_t STATECTR_SIZE = 8;
 
-	Mac::HMAC m_hmacEngine;
+	std::unique_ptr<HMAC> m_dgtMac;
 	bool m_destroyEngine;
-	Digests m_digestType;
+	//Digests m_digestType;
 	std::vector<byte> m_distCode;
 	size_t m_distCodeMax;
+	std::unique_ptr<IProvider> m_entProvider;
 	std::vector<byte> m_hmacKey;
 	std::vector<byte> m_hmacState;
 	bool m_isDestroyed;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
-	bool m_prdResistant;
-	std::unique_ptr<IProvider> m_providerSource;
-	Providers m_providerType;
 	size_t m_reseedCounter;
 	size_t m_reseedRequests;
 	size_t m_reseedThreshold;
-	size_t m_secStrength;
 	std::vector<byte> m_seedCtr;
 	std::vector<byte> m_stateCtr;
 
@@ -207,7 +207,7 @@ public:
 	/// <param name="ProviderType">The enumeration type name of an entropy source; enables predictive resistance</param>
 	///
 	/// <exception cref="Exception::CryptoGeneratorException">Thrown if an unrecognized digest type name is used</exception>
-	explicit HCG(Digests DigestType = Digests::SHA512, Providers ProviderType = Providers::ACP);
+	explicit HCG(SHA2Digests DigestType = SHA2Digests::SHA512, Providers ProviderType = Providers::ACP);
 
 	/// <summary>
 	/// Instantiate the class using a digest instance, and an optional entropy source 
@@ -371,8 +371,8 @@ public:
 
 private:
 
-	void Derive(const std::vector<byte> &Seed);
-	void GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Length);
+	void Extract(const std::vector<byte> &Seed);
+	void Fill(std::vector<byte> &Output, size_t OutOffset, size_t Length);
 	void Increase(std::vector<byte> &Counter, const uint Length);
 	void RandomPad(size_t BlockOffset);
 	void Scope();

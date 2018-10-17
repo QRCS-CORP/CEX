@@ -105,6 +105,7 @@ private:
 	static const ulong MAX_OUTPUT = 35184372088832;
 	static const size_t MAX_REQUEST = 65536;
 	static const size_t MAX_RESEED = 536870912;
+	static const size_t MIN_KEYSIZE = 4;
 	static const size_t STATE_SIZE = 25;
 	static const byte SHAKE_DOMAIN = 0x1F;
 

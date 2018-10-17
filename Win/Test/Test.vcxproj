@@ -293,9 +293,15 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Test\AEADTest.h" />
+    <ClInclude Include="..\..\Test\ACPTest.h" />
+    <ClInclude Include="..\..\Test\AeadTest.h" />
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
-    <ClInclude Include="..\..\Test\AesFipsTest.h" />
+    <ClInclude Include="..\..\Test\CJPTest.h" />
+    <ClInclude Include="..\..\Test\CSPTest.h" />
+    <ClInclude Include="..\..\Test\ECPTest.h" />
+    <ClInclude Include="..\..\Test\RandomUtils.h" />
+    <ClInclude Include="..\..\Test\RDPTest.h" />
+    <ClInclude Include="..\..\Test\RijndaelTest.h" />
     <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h" />
     <ClInclude Include="..\..\Test\Blake2Test.h" />
     <ClInclude Include="..\..\Test\ChaChaTest.h" />
@@ -308,7 +314,7 @@
     <ClInclude Include="..\..\Test\GMACTest.h" />
     <ClInclude Include="..\..\Test\HKDFTest.h" />
     <ClInclude Include="..\..\Test\HMACTest.h" />
-    <ClInclude Include="..\..\Test\HMGTest.h" />
+    <ClInclude Include="..\..\Test\HCGTest.h" />
     <ClInclude Include="..\..\Test\KMACTest.h" />
     <ClInclude Include="..\..\Test\MacStreamTest.h" />
     <ClInclude Include="..\..\Test\McElieceTest.h" />
@@ -330,14 +336,11 @@
     <ClInclude Include="..\..\Test\TestEventHandler.h" />
     <ClInclude Include="..\..\Test\TestEvent.h" />
     <ClInclude Include="..\..\Test\HexConverter.h" />
-    <ClInclude Include="..\..\Test\HXCipherTest.h" />
     <ClInclude Include="..\..\Test\ITest.h" />
     <ClInclude Include="..\..\Test\KDF2Test.h" />
     <ClInclude Include="..\..\Test\KeccakTest.h" />
     <ClInclude Include="..\..\Test\ParallelModeTest.h" />
     <ClInclude Include="..\..\Test\PBKDF2Test.h" />
-    <ClInclude Include="..\..\Test\PrngTest.h" />
-    <ClInclude Include="..\..\Test\RijndaelTest.h" />
     <ClInclude Include="..\..\Test\SerpentTest.h" />
     <ClInclude Include="..\..\Test\Sha2Test.h" />
     <ClInclude Include="..\..\Test\SkeinTest.h" />
@@ -351,9 +354,14 @@
     <ClInclude Include="..\..\Test\UtilityTest.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Test\AEADTest.cpp" />
+    <ClCompile Include="..\..\Test\ACPTest.cpp" />
+    <ClCompile Include="..\..\Test\AeadTest.cpp" />
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
-    <ClCompile Include="..\..\Test\AesFipsTest.cpp" />
+    <ClCompile Include="..\..\Test\CJPTest.cpp" />
+    <ClCompile Include="..\..\Test\CSPTest.cpp" />
+    <ClCompile Include="..\..\Test\ECPTest.cpp" />
+    <ClCompile Include="..\..\Test\RDPTest.cpp" />
+    <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp" />
     <ClCompile Include="..\..\Test\Blake2Test.cpp" />
     <ClCompile Include="..\..\Test\ChaChaTest.cpp" />
@@ -369,8 +377,7 @@
     <ClCompile Include="..\..\Test\HexConverter.cpp" />
     <ClCompile Include="..\..\Test\HKDFTest.cpp" />
     <ClCompile Include="..\..\Test\HMACTest.cpp" />
-    <ClCompile Include="..\..\Test\HMGTest.cpp" />
-    <ClCompile Include="..\..\Test\HXCipherTest.cpp" />
+    <ClCompile Include="..\..\Test\HCGTest.cpp" />
     <ClCompile Include="..\..\Test\KDF2Test.cpp" />
     <ClCompile Include="..\..\Test\KeccakTest.cpp" />
     <ClCompile Include="..\..\Test\KMACTest.cpp" />
@@ -384,8 +391,6 @@
     <ClCompile Include="..\..\Test\PBKDF2Test.cpp" />
     <ClCompile Include="..\..\Test\Poly1305Test.cpp" />
     <ClCompile Include="..\..\Test\RandomOutputTest.cpp" />
-    <ClCompile Include="..\..\Test\PrngTest.cpp" />
-    <ClCompile Include="..\..\Test\RijndaelTest.cpp" />
     <ClCompile Include="..\..\Test\RingLWETest.cpp" />
     <ClCompile Include="..\..\Test\SCRYPTTest.cpp" />
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp" />

@@ -942,6 +942,9 @@
     <ClInclude Include="..\..\CEX\Threefish1024.h">
       <Filter>Header Files\Cipher\Symmetric\Stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\ErrorCodes.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">

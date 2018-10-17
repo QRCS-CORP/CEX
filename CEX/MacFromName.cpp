@@ -4,6 +4,7 @@
 #include "GMAC.h"
 #include "KMAC.h"
 #include "Poly1305.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_HELPER
 
@@ -22,7 +23,7 @@ IMac* MacFromName::GetInstance(Macs MacType)
 			}
 			case Macs::HMAC:
 			{
-				macPtr = new Mac::HMAC(Enumeration::Digests::SHA256);
+				macPtr = new Mac::HMAC(Enumeration::SHA2Digests::SHA256);
 				break;
 			}
 			case Macs::GMAC:
@@ -64,12 +65,12 @@ IMac* MacFromName::GetInstance(StreamAuthenticators AuthenticatorType)
 		{
 		case StreamAuthenticators::HMACSHA256:
 		{
-			macPtr = new Mac::HMAC(Enumeration::Digests::SHA256);
+			macPtr = new Mac::HMAC(Enumeration::SHA2Digests::SHA256);
 			break;
 		}
 		case StreamAuthenticators::HMACSHA512:
 		{
-			macPtr = new Mac::HMAC(Enumeration::Digests::SHA512);
+			macPtr = new Mac::HMAC(Enumeration::SHA2Digests::SHA512);
 			break;
 		}
 		case Enumeration::StreamAuthenticators::KMAC256:

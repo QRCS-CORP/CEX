@@ -72,9 +72,23 @@ namespace Test
 		/// Tests the the cipher transformation using each supported authentication mode
 		/// </summary>
 		/// 
-		/// <param name="Cipher1">The authenticated cipher instance pointer</param>
-		/// <param name="Cipher2">The unauthenticated cipher instance used for transformation comparison</param>
+		/// <param name="Cipher">The authenticated cipher instance pointer</param>
 		void Authentication(IStreamCipher* Cipher);
+
+		/// <summary>
+		/// Compare Threefish-256 vectorized, compact, and unrolled permutation functions for equivalence
+		/// </summary>
+		void CompareP256();
+
+		/// <summary>
+		/// Compare Threefish-512 vectorized, compact, and unrolled permutation functions for equivalence
+		/// </summary>
+		void CompareP512();
+
+		/// <summary>
+		/// Compare Threefish-1024 vectorized, compact, and unrolled permutation functions for equivalence
+		/// </summary>
+		void Compare1024();
 
 		/// <summary>
 		/// Test exception handlers for correct execution
@@ -88,9 +102,9 @@ namespace Test
 		/// </summary>
 		/// 
 		/// <param name="Cipher">The cipher instance pointer</param>
-		/// <param name="Input">The input test message</param>
+		/// <param name="Message">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void Kat(IStreamCipher* Cipher, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Expected);
 
 		/// <summary>
 		/// Compares synchronous to parallel processed random-sized, pseudo-random array transformations and their inverse in a looping [TEST_CYCLES] stress-test
@@ -98,21 +112,6 @@ namespace Test
 		/// 
 		/// <param name="Cipher">The cipher instance pointer</param>
 		void Parallel(IStreamCipher* Cipher);
-
-		/// <summary>
-		/// Compare Threefish-256 compact and unrolled permutation functions for equivalence
-		/// </summary>
-		void Permutation256();
-
-		/// <summary>
-		/// Compare Threefish-512 compact and unrolled permutation functions for equivalence
-		/// </summary>
-		void Permutation512();
-
-		/// <summary>
-		/// Compare Threefish-1024 compact and unrolled permutation functions for equivalence
-		/// </summary>
-		void Permutation1024();
 
 		/// <summary>
 		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test

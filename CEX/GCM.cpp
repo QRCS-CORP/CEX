@@ -184,7 +184,7 @@ const size_t GCM::ParallelBlockSize()
 
 ParallelOptions &GCM::ParallelProfile()
 {
-	return m_cipherMode->ParallelProfile();
+	return m_parallelProfile;
 }
 
 bool &GCM::PreserveAD()
@@ -232,7 +232,6 @@ void GCM::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 
 void GCM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	Scope();
 	Reset();
 
 	if (KeyParams.Nonce().size() < 8)
@@ -425,6 +424,7 @@ void GCM::Reset()
 		m_aadSize = 0;
 	}
 
+	m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_parallelProfile.ParallelBlockSize(), m_parallelProfile.ParallelMaxDegree());
 	m_gcmHash->Reset();
 	m_isInitialized = false;
 	Utility::MemUtils::Clear(m_gcmVector, 0, m_gcmVector.size());
@@ -440,11 +440,6 @@ void GCM::Scope()
 	for (size_t i = 0; i < m_legalKeySizes.size(); i++)
 	{	
 		m_legalKeySizes[i] = SymmetricKeySize(keySizes[i].KeySize(), keySizes[i].NonceSize(), keySizes[i].NonceSize());
-	}
-
-	if (!m_cipherMode->ParallelProfile().IsDefault())
-	{
-		m_cipherMode->ParallelProfile().Calculate(m_parallelProfile.IsParallel(), m_cipherMode->ParallelProfile().ParallelBlockSize(), m_cipherMode->ParallelProfile().ParallelMaxDegree());
 	}
 }
 

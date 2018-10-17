@@ -20,7 +20,7 @@ NTRU::NTRU(NTRUParams Parameters, Prngs PrngType)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_ntruParameters(Parameters != NTRUParams::None ? Parameters :
+	m_ntruParameters(Parameters != NTRUParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(NTRUParams::SQ4591N761) ? Parameters :
 		throw CryptoAsymmetricException("NTRU:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("NTRU:CTor", "The prng type can not be none!"))
@@ -34,7 +34,7 @@ NTRU::NTRU(NTRUParams Parameters, IPrng* Prng)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_ntruParameters(Parameters != NTRUParams::None ? Parameters :
+	m_ntruParameters(Parameters != NTRUParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(NTRUParams::SQ4591N761) ? Parameters :
 		throw CryptoAsymmetricException("NTRU:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("NTRU:CTor", "The prng can not be null!"))
@@ -148,10 +148,6 @@ bool NTRU::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &S
 
 		result = NTRULQ4591N761::Decrypt(secret, CipherText, m_privateKey->R());
 	}
-	else
-	{
-		throw CryptoAsymmetricException("RingLWE:Decrypt", "The parameter type is invalid!");
-	}
 
 	// hash the message to create the shared secret
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
@@ -186,10 +182,6 @@ void NTRU::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedS
 
 		NTRULQ4591N761::Encrypt(secret, CipherText, m_publicKey->P(), m_rndGenerator);
 	}
-	else
-	{
-		throw CryptoAsymmetricException("RingLWE:Encrypt", "The parameter type is invalid!");
-	}
 
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
 	gen.Initialize(secret, m_domainKey);
@@ -216,11 +208,6 @@ IAsymmetricKeyPair* NTRU::Generate()
 		sk.resize(NTRULQ4591N761::NTRU_PRIVATEKEY_SIZE);
 
 		NTRULQ4591N761::Generate(pk, sk, m_rndGenerator);
-	}
-
-	else
-	{
-		throw CryptoAsymmetricException("NTRULWE:Generate", "The parameter type is invalid!");
 	}
 
 	Key::Asymmetric::NTRUPublicKey* apk = new Key::Asymmetric::NTRUPublicKey(m_ntruParameters, pk);

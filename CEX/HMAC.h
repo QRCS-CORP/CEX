@@ -29,12 +29,14 @@
 #include "IMac.h"
 #include "IDigest.h"
 #include "Digests.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_MAC
 
 using Enumeration::Digests;
 using Digest::IDigest;
 using Common::ParallelOptions;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of a Hash based Message Authentication Code generator
@@ -92,12 +94,13 @@ private:
 	static const std::string CLASS_NAME;
 	static const byte IPAD = 0x36;
 	static const byte OPAD = 0x5C;
+	static const size_t MIN_KEYSIZE = 4;
 
-	std::unique_ptr<IDigest> m_msgDigest;
 	bool m_destroyEngine;
+	std::unique_ptr<IDigest> m_dgtEngine;
+	std::vector<byte> m_inputPad;
 	bool m_isDestroyed;
 	bool m_isInitialized;
-	std::vector<byte> m_inputPad;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	Digests m_msgDigestType;
 	std::vector<byte> m_outputPad;
@@ -129,7 +132,7 @@ public:
 	/// <param name="Parallel">Initialize the parallelized form of the message digest</param>
 	/// 
 	/// <exception cref="CryptoMacException">Thrown if an invalid digest type is selected</exception>
-	explicit HMAC(Digests DigestType, bool Parallel = false);
+	explicit HMAC(SHA2Digests DigestType, bool Parallel = false);
 
 	/// <summary>
 	/// Initialize the class with a digest instance
@@ -163,11 +166,6 @@ public:
 	const Macs Enumeral() override;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	const size_t MacSize() override;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	const bool IsInitialized() override;
@@ -183,6 +181,11 @@ public:
 	/// If parallel capable, input data array passed to the Update function must be ParallelBlockSize in bytes to trigger parallelization.</para>
 	/// </summary>
 	const bool IsParallel();
+
+	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	const size_t MacSize() override;
 
 	/// <summary>
 	/// Read Only: Mac generators class name

@@ -1,9 +1,12 @@
 #include "KeccakTest.h"
-#include "../CEX/MemUtils.h"
+#include "../CEX/CpuDetect.h"
+#include "../CEX/IntUtils.h"
 #include "../CEX/Keccak.h"
 #include "../CEX/Keccak256.h"
 #include "../CEX/Keccak512.h"
 #include "../CEX/Keccak1024.h"
+#include "../CEX/MemUtils.h"
+#include "../CEX/SecureRandom.h"
 
 #if defined(__AVX2__)
 #	include "../CEX/ULong256.h"
@@ -15,9 +18,12 @@
 
 namespace Test
 {
-	using namespace Digest;
-	using Key::Symmetric::SymmetricKey;
+	using Exception::CryptoDigestException;
+	using Utility::IntUtils;
 	using Utility::MemUtils;
+	using Prng::SecureRandom;
+	using Key::Symmetric::SymmetricKey;
+	using namespace Digest;
 
 #if defined(__AVX2__)
 	using Numeric::ULong256;
@@ -31,8 +37,12 @@ namespace Test
 	const std::string KeccakTest::FAILURE = "FAILURE! ";
 	const std::string KeccakTest::SUCCESS = "SUCCESS! All Keccak tests have executed succesfully.";
 
+	//~~~Constructor~~~//
+
 	KeccakTest::KeccakTest()
 		:
+		m_expected(0),
+		m_message(0),
 		m_progressEvent()
 	{
 		Initialize();
@@ -40,7 +50,11 @@ namespace Test
 
 	KeccakTest::~KeccakTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_message);
 	}
+
+	//~~~Accessors~~~//
 
 	const std::string KeccakTest::Description()
 	{
@@ -52,23 +66,81 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string KeccakTest::Run()
 	{
 		try
 		{
-			ComparePermutationR24();
-			OnProgress(std::string("Passed Keccak 24-round permutation variants equivalence test.."));
-			ComparePermutationR48();
-			OnProgress(std::string("Passed Keccak 48-round permutation variants equivalence test.."));
+			Common::CpuDetect detect;
 
-			CompareOutput256();
-			OnProgress(std::string("KeccakTest: Passed SHA3 256 bit digest vector tests.."));
-			CompareOutput512();
-			OnProgress(std::string("KeccakTest: Passed SHA3 512 bit digest vector tests.."));
-			CompareOutput1024();
-			OnProgress(std::string("KeccakTest: Passed Keccak 1024 bit digest vector tests.."));
+			Exception();
+			OnProgress(std::string("KeccakTest: Passed Keccak-256/512/1024 exception handling tests.."));
 
-			TreeParamsTest();
+			PermutationR24();
+			OnProgress(std::string("KeccakTest: Passed Keccak 24-round permutation variants equivalence test.."));
+			PermutationR48();
+			OnProgress(std::string("KeccakTest: Passed Keccak 48-round permutation variants equivalence test.."));
+
+			Kat256(m_message[0], m_expected[0]);
+			Kat256(m_message[1], m_expected[1]);
+			Kat256(m_message[2], m_expected[2]);
+			Kat256(m_message[3], m_expected[3]);
+			OnProgress(std::string("KeccakTest: Passed SHA3-256 bit digest vector tests.."));
+			Kat512(m_message[0], m_expected[4]);
+			Kat512(m_message[1], m_expected[5]);
+			Kat512(m_message[2], m_expected[6]);
+			Kat512(m_message[3], m_expected[7]);
+			OnProgress(std::string("KeccakTest: Passed SHA3-512 bit digest vector tests.."));
+			Kat1024(m_message[0], m_expected[8]);
+			Kat1024(m_message[1], m_expected[9]);
+			Kat1024(m_message[2], m_expected[10]);
+			Kat1024(m_message[3], m_expected[11]);
+			OnProgress(std::string("KeccakTest: Passed Keccak-1024 bit digest vector tests.."));
+
+			Keccak256* dgt256s = new Keccak256(false);
+			Stress(dgt256s);
+			delete dgt256s;
+			OnProgress(std::string("KeccakTest: Passed Keccak-256 sequential stress tests.."));
+
+			Keccak512* dgt512s = new Keccak512(false);
+			Stress(dgt512s);
+			delete dgt512s;
+			OnProgress(std::string("KeccakTest: Passed Keccak-512 sequential stress tests.."));
+
+			Keccak1024* dgt1024s = new Keccak1024(false);
+			Stress(dgt1024s);
+			delete dgt1024s;
+			OnProgress(std::string("KeccakTest: Passed Keccak-1024 sequential stress tests.."));
+
+			if (detect.VirtualCores() >= 2)
+			{
+				Keccak256* dgt256p = new Keccak256(true);
+				Stress(dgt256p);
+				OnProgress(std::string("KeccakTest: Passed Keccak-256 parallel stress tests.."));
+
+				Keccak512* dgt512p = new Keccak512(true);
+				Stress(dgt512p);
+				OnProgress(std::string("KeccakTest: Passed Keccak-512 parallel stress tests.."));
+
+				Keccak1024* dgt1024p = new Keccak1024(true);
+				Stress(dgt1024p);
+				OnProgress(std::string("KeccakTest: Passed Keccak-1024 parallel stress tests.."));
+
+				Parallel(dgt256p);
+				delete dgt256p;
+				OnProgress(std::string("KeccakTest: Passed Keccak-256 parallel tests.."));
+
+				Parallel(dgt512p);
+				delete dgt512p;
+				OnProgress(std::string("KeccakTest: Passed Keccak-512 parallel tests.."));
+
+				Parallel(dgt1024p);
+				delete dgt1024p;
+				OnProgress(std::string("KeccakTest: Passed Keccak-1024 parallel tests.."));
+			}
+
+			TreeParams();
 			OnProgress(std::string("KeccakTest: Passed KeccakParams parameter serialization test.."));
 
 			return SUCCESS;
@@ -83,115 +155,199 @@ namespace Test
 		}
 	}
 
-	void KeccakTest::CompareOutput256()
+	void KeccakTest::Exception()
 	{
-		std::vector<byte> output(32);
+		// test params constructor Keccak256
+		try
+		{
+			// invalid fan out -99
+			KeccakParams params(32, 32, 99);
+			Keccak256 dgt(params);
+
+			throw TestException(std::string("Keccak"), std::string("Exception: Exception handling failure! -KE1"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test params constructor Keccak512
+		try
+		{
+			// invalid fan out -99
+			KeccakParams params(64, 64, 99);
+			Keccak512 dgt(params);
+
+			throw TestException(std::string("Keccak"), std::string("Exception: Exception handling failure! -KE2"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test params constructor Keccak1024
+		try
+		{
+			// invalid fan out -99
+			KeccakParams params(128, 128, 99);
+			Keccak1024 dgt(params);
+
+			throw TestException(std::string("Keccak"), std::string("Exception: Exception handling failure! -KE3"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test parallel max-degree Keccak256
+		try
+		{
+			Keccak256 dgt;
+			// set max degree to invalid -99
+			dgt.ParallelMaxDegree(99);
+
+			throw TestException(std::string("Keccak"), std::string("Exception: Exception handling failure! -KE4"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test parallel max-degree Keccak512
+		try
+		{
+			Keccak512 dgt;
+			// set max degree to invalid -99
+			dgt.ParallelMaxDegree(99);
+
+			throw TestException(std::string("Keccak"), std::string("Exception: Exception handling failure! -KE5"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test parallel max-degree Keccak1024
+		try
+		{
+			Keccak1024 dgt;
+			// set max degree to invalid -99
+			dgt.ParallelMaxDegree(99);
+
+			throw TestException(std::string("Keccak"), std::string("Exception: Exception handling failure! -KE6"));
+		}
+		catch (CryptoDigestException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+	}
+
+	void KeccakTest::Kat256(std::vector<byte> &Message, std::vector<byte> &Expected)
+	{
+		std::vector<byte> otp(32);
 		Keccak256 dgt(false);
 
-		dgt.Update(m_message[0], 0, m_message[0].size());
-		dgt.Finalize(output, 0);
+		dgt.Update(Message, 0, Message.size());
+		dgt.Finalize(otp, 0);
 
-		if (output != m_exp256[0])
+		if (otp != Expected)
 		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Update(m_message[1], 0, m_message[1].size());
-		dgt.Finalize(output, 0);
-
-		if (output != m_exp256[1])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Compute(m_message[2], output);
-
-		if (output != m_exp256[2])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Compute(m_message[3], output);
-
-		if (output != m_exp256[3])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
+			throw TestException(std::string("Keccak-256: Expected hash is not equal! -KK1"));
 		}
 	}
 
-	void KeccakTest::CompareOutput512()
+	void KeccakTest::Kat512(std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
-		std::vector<byte> output(64);
+		std::vector<byte> otp(64);
 		Keccak512 dgt(false);
 
-		dgt.Update(m_message[0], 0, m_message[0].size());
-		dgt.Finalize(output, 0);
+		dgt.Update(Message, 0, Message.size());
+		dgt.Finalize(otp, 0);
 
-		if (output != m_exp512[0])
+		if (otp != Expected)
 		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Update(m_message[1], 0, m_message[1].size());
-		dgt.Finalize(output, 0);
-
-		if (output != m_exp512[1])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Compute(m_message[2], output);
-
-		if (output != m_exp512[2])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Compute(m_message[3], output);
-
-		if (output != m_exp512[3])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
+			throw TestException(std::string("Keccak-512: Expected hash is not equal! -KK2"));
 		}
 	}
 
-	void KeccakTest::CompareOutput1024()
+	void KeccakTest::Kat1024(std::vector<byte> &Message, std::vector<byte> &Expected)
 	{
-		std::vector<byte> output(128);
+		std::vector<byte> otp(128);
 		Keccak1024 dgt(false);
 
-		dgt.Update(m_message[0], 0, m_message[0].size());
-		dgt.Finalize(output, 0);
+		dgt.Update(Message, 0, Message.size());
+		dgt.Finalize(otp, 0);
 
-		if (output != m_exp1024[0])
+		if (otp != Expected)
 		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Update(m_message[1], 0, m_message[1].size());
-		dgt.Finalize(output, 0);
-
-		if (output != m_exp1024[1])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Compute(m_message[2], output);
-
-		if (output != m_exp1024[2])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
-		}
-
-		dgt.Compute(m_message[3], output);
-
-		if (output != m_exp1024[3])
-		{
-			throw TestException("Keccak: Expected hash is not equal!");
+			throw TestException(std::string("Keccak-512: Expected hash is not equal! -KK3"));
 		}
 	}
 
-	void KeccakTest::ComparePermutationR24()
+	void KeccakTest::Parallel(IDigest* Digest)
+	{
+		const size_t MINSMP = 2048;
+		const size_t MAXSMP = 16384;
+		const size_t PRLLEN = Digest->ParallelProfile().ParallelBlockSize();
+		const size_t PRLDGR = Digest->ParallelProfile().ParallelMaxDegree();
+		std::vector<byte> msg;
+		std::vector<byte> code(Digest->DigestSize());
+		Prng::SecureRandom rnd;
+		bool reduce;
+
+		msg.reserve(MAXSMP);
+		reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
+
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
+			msg.resize(INPLEN);
+			IntUtils::Fill(msg, 0, msg.size(), rnd);
+			reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
+
+			try
+			{
+				while (reduce)
+				{
+					Digest->Compute(msg, code);
+					reduce = Digest->ParallelProfile().ParallelMaxDegree() >= 4;
+
+					if (reduce)
+					{
+						Digest->ParallelMaxDegree(Digest->ParallelProfile().ParallelMaxDegree() - 2);
+					}
+				}
+
+				// restore parallel degree and block size
+				Digest->ParallelMaxDegree(PRLDGR);
+				Digest->ParallelProfile().ParallelBlockSize() = PRLLEN;
+			}
+			catch (...)
+			{
+				throw TestException(std::string("Parallel: Parallel integrity test has failed! -BP1"));
+			}
+		}
+	}
+
+	void KeccakTest::PermutationR24()
 	{
 		std::array<ulong, 25> state1;
 		std::array<ulong, 25> state2;
@@ -204,7 +360,7 @@ namespace Test
 
 		if (state1 != state2)
 		{
-			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 		}
 
 #if defined(__AVX2__)
@@ -220,7 +376,7 @@ namespace Test
 		{
 			if (state256ull[i] != state1[i / 4])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 			}
 		}
 
@@ -239,14 +395,14 @@ namespace Test
 		{
 			if (state512ull[i] != state1[i / 8])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 			}
 		}
 
 #endif
 	}
 
-	void KeccakTest::ComparePermutationR48()
+	void KeccakTest::PermutationR48()
 	{
 		std::array<ulong, 25> state1;
 		std::array<ulong, 25> state2;
@@ -259,7 +415,7 @@ namespace Test
 
 		if (state1 != state2)
 		{
-			throw TestException("Sha2 Permutation: Permutation output is not equal!");
+			throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 		}
 
 #if defined(__AVX2__)
@@ -275,7 +431,7 @@ namespace Test
 		{
 			if (state256ull[i] != state1[i / 4])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 			}
 		}
 
@@ -294,27 +450,88 @@ namespace Test
 		{
 			if (state512ull[i] != state1[i / 8])
 			{
-				throw TestException("Sha2 Permutation: Permutation output is not equal!");
+				throw TestException(std::string("Sha2 Permutation: Permutation output is not equal!"));
 			}
 		}
 
 #endif
 	}
 
+	void KeccakTest::Stress(IDigest* Digest)
+	{
+		const uint MINPRL = static_cast<uint>(Digest->ParallelProfile().ParallelMinimumSize());
+		const uint MAXPRL = static_cast<uint>(Digest->ParallelProfile().ParallelBlockSize());
+
+		std::vector<byte> code1(Digest->DigestSize());
+		std::vector<byte> code2(Digest->DigestSize());
+		std::vector<byte> msg;
+		SecureRandom rnd;
+		size_t i;
+
+		msg.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
+		{
+			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
+			msg.resize(INPLEN);
+			IntUtils::Fill(msg, 0, msg.size(), rnd);
+
+			try
+			{
+				// simplified access
+				Digest->Compute(msg, code1);
+				// update/finalize
+				Digest->Update(msg, 0, msg.size());
+				Digest->Finalize(code2, 0);
+			}
+			catch (...)
+			{
+				throw TestException(std::string("Stress: The digest has thrown an exception! -KS1"));
+			}
+
+			if (code1 != code2)
+			{
+				throw TestException(std::string("Stress: Hash output is not equal! -KS2"));
+			}
+		}
+	}
+
+	void KeccakTest::TreeParams()
+	{
+		std::vector<byte> code1(8, 7);
+
+		KeccakParams tree1(32, 32, 8);
+		tree1.DistributionCode() = code1;
+		std::vector<byte> tres = tree1.ToBytes();
+		KeccakParams tree2(tres);
+
+		if (!tree1.Equals(tree2))
+		{
+			throw std::string(std::string("KeccakTest: Tree parameters test failed! -KT1"));
+		}
+
+		std::vector<byte> code2(20, 7);
+		KeccakParams tree3(0, 64, 1, 128, 8, 1, code2);
+		tres = tree3.ToBytes();
+		KeccakParams tree4(tres);
+
+		if (!tree3.Equals(tree4))
+		{
+			throw std::string(std::string("KeccakTest: Tree parameters test failed! -KT2"));
+		}
+	}
+
+	//~~~Private Functions~~~//
+
 	void KeccakTest::Initialize()
 	{
 		/*lint -save -e417 */
-		const std::vector<std::string> exp256 =
+		const std::vector<std::string> expected =
 		{
 			std::string("A7FFC6F8BF1ED76651C14756A061D662F580FF4DE43B49FA82D80A4B80F8434A"),
 			std::string("3A985DA74FE225B2045C172D6BD390BD855F086E3E9D525B46BFE24511431532"),
 			std::string("41C0DBA2A9D6240849100376A8235E2C82E1B9998A999E21DB32DD97496D3376"),
-			std::string("79F38ADEC5C20307A98EF76E8324AFBFD46CFD81B22E3973C65FA1BD9DE31787")
-		};
-		HexConverter::Decode(exp256, 4, m_exp256);
-
-		const std::vector<std::string> exp512 =
-		{
+			std::string("79F38ADEC5C20307A98EF76E8324AFBFD46CFD81B22E3973C65FA1BD9DE31787"),
 			std::string("A69F73CCA23A9AC5C8B567DC185A756E97C982164FE25859E0D1DCC1475C80A6"
 				"15B2123AF1F5F94C11E3E9402C3AC558F500199D95B6D3E301758586281DCD26"),
 			std::string("B751850B1A57168A5693CD924B6B096E08F621827444F70D884F5D0240D2712E"
@@ -322,12 +539,7 @@ namespace Test
 			std::string("04A371E84ECFB5B8B77CB48610FCA8182DD457CE6F326A0FD3D7EC2F1E91636D"
 				"EE691FBE0C985302BA1B0D8DC78C086346B533B49C030D99A27DAF1139D6E75E"),
 			std::string("E76DFAD22084A8B1467FCF2FFA58361BEC7628EDF5F3FDC0E4805DC48CAEECA8"
-				"1B7C13C30ADF52A3659584739A2DF46BE589C51CA1A4A8416DF6545A1CE8BA00")
-		};
-		HexConverter::Decode(exp512, 4, m_exp512);
-
-		const std::vector<std::string> exp1024 =
-		{
+				"1B7C13C30ADF52A3659584739A2DF46BE589C51CA1A4A8416DF6545A1CE8BA00"),
 			std::string("8865E419509F0CFBB8366F0AE6742BCB2B519FB490E2D0B65E553BBFAF109631"
 				"4F85EA9D571963ADF4FE178C62402AE4C19D890C58547A12A5EA54EE256B9295"
 				"4F20257829A51A3F4AE039D699CA7DD280849DE3CD0EFDF53CC4306D22D98172"
@@ -345,7 +557,7 @@ namespace Test
 				"7ECE1F528B7BF214F0168BA89DDD91880A1EFEFF29AFB7EAFF3E62D5BCE43D24"
 				"BA3A2659C2843D22D6A183C68E7432F28C34DC2597B958D80452B22F21AA9D40")
 		};
-		HexConverter::Decode(exp1024, 4, m_exp1024);
+		HexConverter::Decode(expected, 12, m_expected);
 
 		const std::vector<std::string> message =
 		{
@@ -363,30 +575,5 @@ namespace Test
 	void KeccakTest::OnProgress(std::string Data)
 	{
 		m_progressEvent(Data);
-	}
-
-	void KeccakTest::TreeParamsTest()
-	{
-		std::vector<byte> code1(8, 7);
-
-		KeccakParams tree1(32, 32, 8);
-		tree1.DistributionCode() = code1;
-		std::vector<byte> tres = tree1.ToBytes();
-		KeccakParams tree2(tres);
-
-		if (!tree1.Equals(tree2))
-		{
-			throw std::string("KeccakTest: Tree parameters test failed!");
-		}
-
-		std::vector<byte> code2(20, 7);
-		KeccakParams tree3(0, 64, 1, 128, 8, 1, code2);
-		tres = tree3.ToBytes();
-		KeccakParams tree4(tres);
-
-		if (!tree3.Equals(tree4))
-		{
-			throw std::string("KeccakTest: Tree parameters test failed!");
-		}
 	}
 }

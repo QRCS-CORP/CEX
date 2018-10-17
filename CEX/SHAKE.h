@@ -84,6 +84,7 @@ private:
 	static const size_t BUFFER_SIZE = 168;
 	static const std::string CLASS_NAME;
 	static const byte CSHAKE_DOMAIN = 0x04;
+	static const size_t MIN_KEYLEN = 4;
 	static const byte SHAKE_DOMAIN = 0x1F;
 	static const size_t STATE_SIZE = 25;
 
@@ -151,7 +152,7 @@ public:
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	size_t MinKeySize() override;
+	const size_t MinKeySize() override;
 
 	/// <summary>
 	/// Read Only: The Kdf generators class name

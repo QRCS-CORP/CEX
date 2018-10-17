@@ -23,11 +23,14 @@
 #include "HCG.h"
 #include "Digests.h"
 #include "Providers.h"
+#include "Providers.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_PRNG
 
 using Enumeration::Digests;
 using Enumeration::Providers;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of an HMAC Counter PRNG.
@@ -70,7 +73,7 @@ private:
 
 	size_t m_bufferIndex;
 	size_t m_bufferSize;
-	Digests m_digestType;
+	SHA2Digests m_digestType;
 	bool m_isDestroyed;
 	Providers m_pvdType;
 	std::vector<byte> m_rndSeed;
@@ -100,7 +103,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the buffer size is too small (min. 64)</exception>
-	HCR(Digests DigestType = Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
+	HCR(SHA2Digests DigestType = SHA2Digests::SHA512, Providers SeedEngine = Providers::ACP, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Initialize the class with a Seed; note: the same seed will produce the same random output
@@ -111,7 +114,7 @@ public:
 	/// <param name="BufferSize">The size of the internal state buffer in bytes; must be at least 64 bytes size (default is 1024)</param>
 	/// 
 	/// <exception cref="Exception::CryptoRandomException">Thrown if the seed is null or buffer size is too small; (min. seed = digest blocksize + 8)</exception>
-	explicit HCR(std::vector<byte> Seed, Digests DigestType = Digests::SHA512, size_t BufferSize = 1024);
+	explicit HCR(std::vector<byte> Seed, SHA2Digests DigestType = SHA2Digests::SHA512, size_t BufferSize = 1024);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -185,7 +188,7 @@ public:
 
 private:
 
-	uint GetMinimumSeedSize(Digests RngEngine);
+	uint GetMinimumSeedSize(SHA2Digests RngEngine);
 };
 
 NAMESPACE_PRNGEND

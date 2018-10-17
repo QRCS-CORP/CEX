@@ -31,7 +31,6 @@
 // Updated April 18, 2017
 // Contact: develop@vtdev.com
 
-
 #ifndef CEX_BLAKE512_H
 #define CEX_BLAKE512_H
 
@@ -127,11 +126,9 @@ private:
 	struct Blake2bState;
 	std::vector<Blake2bState> m_dgtState;
 	bool m_isDestroyed;
-	uint m_leafSize;
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	std::vector<ulong> m_treeConfig;
 	bool m_treeDestroy;
 	BlakeParams m_treeParams;
 
@@ -292,7 +289,7 @@ public:
 
 private:
 
-	void LoadState(Blake2bState &State);
+	void LoadState(Blake2bState &State, BlakeParams &Params, std::vector<ulong> &Config);
 	void Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, ulong Length);
 };

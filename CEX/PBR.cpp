@@ -1,6 +1,7 @@
 #include "PBR.h"
 #include "DigestFromName.h"
 #include "IntUtils.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_PRNG
 
@@ -21,7 +22,7 @@ PBR::PBR(std::vector<byte> &Seed, int Iterations, Digests DigestType, size_t Buf
 	m_rndSeed(Seed.size() >= GetMinimumSeedSize(DigestType) ? Seed :
 		throw CryptoRandomException("PBR:Ctor", "The seed is too small!")),
 	m_rngBuffer(BufferSize),
-	m_rngGenerator(new Kdf::PBKDF2(m_digestType, m_digestIterations))
+	m_rngGenerator(new Kdf::PBKDF2(static_cast<Enumeration::SHA2Digests>(DigestType), m_digestIterations))
 {
 	Reset();
 }

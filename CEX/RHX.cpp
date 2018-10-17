@@ -19,8 +19,8 @@ RHX::RHX(BlockCipherExtensions CipherExtension)
 	m_distCodeMax(0),
 	m_expKey(0),
 	m_kdfGenerator(CipherExtension == BlockCipherExtensions::None ? nullptr :
-		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("RHX:CTor", "The Kdf can not be null!") :
-		Helper::KdfFromName::GetInstance(static_cast<Enumeration::Kdfs>(CipherExtension))),
+		CipherExtension == BlockCipherExtensions::Custom ? throw CryptoSymmetricCipherException("RHX:CTor", "The Kdf type is invalid!") :
+		Helper::KdfFromName::GetInstance(CipherExtension)),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),

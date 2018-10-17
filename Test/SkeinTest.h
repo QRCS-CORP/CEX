@@ -9,7 +9,7 @@ namespace Test
 	using Digest::IDigest;
 
 	/// <summary>
-	/// Tests the Skein digest implementation using vector comparisons.
+	/// Tests the Skein implementations using exception handling, parameter checks, stress and KAT tests.
 	/// <para>Tests the 256, 512, and 1024 bit versions of Skein against known test vectors from the skein 1.3 document, appendix C:
     /// <see href="http://www.skein-hash.info/sites/default/files/skein1.3.pdf"/></para>
 	/// </summary>
@@ -20,13 +20,11 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+		static const size_t MAXM_ALLOC = 262140;
+		static const size_t TEST_CYCLES = 25;
 
-		std::vector<std::vector<byte>> m_expected256;
-		std::vector<std::vector<byte>> m_expected512;
-		std::vector<std::vector<byte>> m_expected1024;
-		std::vector<std::vector<byte>> m_message256;
-		std::vector<std::vector<byte>> m_message512;
-		std::vector<std::vector<byte>> m_message1024;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<byte>> m_message;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -63,42 +61,52 @@ namespace Test
 		//~~~Public Functions~~~//
 
 		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
 		/// Compare known answer test vectors to digest output
 		/// </summary>
 		/// 
 		/// <param name="Digest">The digest instance pointer</param>
 		/// <param name="Input">The input test message</param>
 		/// <param name="Expected">The expected output vector</param>
-		void CompareVectorSkein(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
+		void Kat(IDigest* Digest, std::vector<byte> &Input, std::vector<byte> &Expected);
 
 		/// <summary>
-		/// Tests inner and outer parallel loop variances in the update function
+		/// Compares synchronous to parallel random-sized, pseudo-random arrays in a looping [TEST_CYCLES] stress-test
 		/// </summary>
 		/// 
-		/// <param name="Digest1">The primary digest instance pointer</param>
-		/// <param name="Digest2">The comparison digest instance pointer</param>
-		void EvaluateParallelSkein(IDigest* Digest1, IDigest* Digest2);
+		/// <param name="Digest">The digest instance pointer</param>
+		void Parallel(IDigest* Digest);
 
 		/// <summary>
 		/// Compare Skein-256 compact and unrolled permutation functions for equivalence.
 		/// </summary>
-		void EvaluatePermutationSkein256();
+		void PermutationR72();
 
 		/// <summary>
 		/// Compare Skein-512 compact and unrolled permutation functions for equivalence.
 		/// </summary>
-		void EvaluatePermutationSkein512();
+		void PermutationR80();
 
 		/// <summary>
-		/// Compare Skein-1024 compact and unrolled permutation functions for equivalence.
+		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
 		/// </summary>
-		void EvaluatePermutationSkein1024();
+		/// 
+		/// <param name="Digest">The digest instance pointer</param>
+		void Stress(IDigest* Digest);
+
+		/// <summary>
+		/// Test Skein TreeParams construction and serialization
+		/// </summary>
+		void TreeParams();
 
 	private:
 
 		void Initialize();
 		void OnProgress(std::string Data);
-		void EvaluateTreeParams();
 	};
 }
 

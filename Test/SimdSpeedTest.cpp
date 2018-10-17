@@ -140,7 +140,7 @@ namespace Test
 
 		glen = "SpeedTest: BLOCK CLEAR " + TESTSIZE;
 		// sequential clear: 512 byte buffers
-		OnProgress(std::string(glen + " using 512 byte buffers with sequential clear "));
+		OnProgress(glen + std::string(" using 512 byte buffers with sequential clear "));
 		buffer1.resize(B512, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -158,7 +158,7 @@ namespace Test
 
 		// highest available simd clear
 		glen = "SpeedTest: CLEAR " + TESTSIZE;
-		OnProgress(std::string(glen + " using 512 byte buffers with SIMD vectorized clear "));
+		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized clear "));
 		buffer2.resize(B512, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -190,7 +190,7 @@ namespace Test
 
 		// sequential memset: 64 byte buffers
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
-		OnProgress(std::string(glen + " using 64 byte buffers with sequential clear "))
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential clear "))
 		buffer1.resize(64, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -208,7 +208,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Cleared "));
 
 		// simd256 memset
-		OnProgress(std::string(glen + " using 64 byte buffers with AVX512 vectorized clear "));
+		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized clear "));
 		buffer2.resize(64, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -227,7 +227,7 @@ namespace Test
 #elif defined(__AVX2__)
 		// sequential clear: 32 byte buffers
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
-		OnProgress(std::string(glen + " using 32 byte buffers with sequential clear "));
+		OnProgress(glen + std::string(" using 32 byte buffers with sequential clear "));
 		buffer1.resize(32, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -245,7 +245,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Cleared "));
 
 		// simd256 clear
-		OnProgress(std::string(glen + " using 32 byte buffers with AVX2 vectorized clear "));
+		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized clear "));
 		buffer2.resize(32, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -265,7 +265,7 @@ namespace Test
 #elif defined(__AVX__)
 		glen = "SpeedTest: VECTOR CLEAR " + TESTSIZE;
 		// sequential memset: 16 byte buffers
-		OnProgress(std::string(glen + " using 16 byte buffers with sequential clear "));
+		OnProgress(glen + std::string(" using 16 byte buffers with sequential clear "));
 		buffer1.resize(16, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -283,7 +283,7 @@ namespace Test
 
 		// simd128 clear
 		glen = "SpeedTest: simd128 clear " + TESTSIZE;
-		OnProgress(std::string(glen + " using 16 byte buffers with AVX vectorized clear "));
+		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized clear "));
 		buffer2.resize(16, (byte)0xff);
 		start = TestUtils::GetTimeMs64();
 
@@ -316,7 +316,7 @@ namespace Test
 		// Large Block Copy
 #if defined(__AVX__)
 		// sequential copy: 1KB byte buffers
-		OnProgress(std::string(glen + " using 512 byte buffers with sequential memcpy: "));
+		OnProgress(glen + std::string(" using 512 byte buffers with sequential memcpy: "));
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -333,7 +333,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// highest available simd copy
-		OnProgress(std::string(glen + " using 512 byte buffers with SIMD vectorized memcpy "));
+		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized memcpy "));
 		start = TestUtils::GetTimeMs64();
 
 		for (size_t i = 0; i < Loops; ++i)
@@ -364,7 +364,7 @@ namespace Test
 
 		// Vector Aligned Copy
 #if defined(__AVX512__)
-		OnProgress(std::string(glen + " using 64 byte buffers with sequential copy "));
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential copy "));
 		// sequential copy: 64 byte buffers
 		buffer1.resize(64, (byte)0xff);
 		buffer2.resize(64);
@@ -384,7 +384,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// simd512 memcpy
-		OnProgress(std::string(glen + " using 64 byte buffers with AVX512 vectorized copy "));
+		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized copy "));
 		buffer3.resize(64, (byte)0xff);
 		buffer4.resize(64);
 		start = TestUtils::GetTimeMs64();
@@ -403,7 +403,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 #elif defined(__AVX2__)
-		OnProgress(std::string(glen + " using 32 byte buffers with sequential copy "));
+		OnProgress(glen + std::string(" using 32 byte buffers with sequential copy "));
 		// sequential copy: 32 byte buffers
 		buffer1.resize(32, (byte)0xff);
 		buffer2.resize(32);
@@ -423,7 +423,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// simd256 memcpy
-		OnProgress(std::string(glen + " using 32 byte buffers with AVX2 vectorized memcpy "));
+		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized memcpy "));
 		buffer3.resize(32, (byte)0xff);
 		buffer4.resize(32);
 		start = TestUtils::GetTimeMs64();
@@ -442,7 +442,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 #elif defined(__AVX__)
-		OnProgress(std::string(glen + " using 16 byte buffers with sequential memcpy: "));
+		OnProgress(glen + std::string(" using 16 byte buffers with sequential memcpy: "));
 		// sequential copy: 16 byte buffers
 		buffer1.resize(16, (byte)0xff);
 		buffer2.resize(16);
@@ -462,7 +462,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Copied "));
 
 		// simd128
-		OnProgress(std::string(glen + " using 16 byte buffers with AVX vectorized memcpy "));
+		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized memcpy "));
 		blkCtr = 0;
 		buffer3.resize(16, (byte)0xff);
 		buffer4.resize(16);
@@ -492,7 +492,7 @@ namespace Test
 		uint B1 = 22222222;
 		uint C1 = 0;
 
-		OnProgress("***Multiplication***");
+		OnProgress(std::string("***Multiplication***"));
 		Utility::TimeStamp ts;
 
 		ts.Start();
@@ -500,7 +500,7 @@ namespace Test
 		{
 			C1 = A1 * B1;
 		}
-		OnProgress("SEQM1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQM1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -508,7 +508,7 @@ namespace Test
 		{
 			A1 *= B1;
 		}
-		OnProgress("SEQM2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQM2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -522,7 +522,7 @@ namespace Test
 		{
 			C2 = A2 * B2;
 		}
-		OnProgress("PRLM1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLM1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -530,12 +530,12 @@ namespace Test
 		{
 			A2 *= B2;
 		}
-		OnProgress("PRLM2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLM2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***Addition***");
+		OnProgress(std::string("***Addition***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -545,7 +545,7 @@ namespace Test
 		{
 			C1 = A1 + B1;
 		}
-		OnProgress("SEQA1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQA1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -553,7 +553,7 @@ namespace Test
 		{
 			A1 += B1;
 		}
-		OnProgress("SEQA2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQA2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -567,7 +567,7 @@ namespace Test
 		{
 			C2 = A2 + B2;
 		}
-		OnProgress("PRLA1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLA1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -575,12 +575,12 @@ namespace Test
 		{
 			A2 += B2;
 		}
-		OnProgress("PRLA2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLA2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***Subtraction***");
+		OnProgress(std::string("***Subtraction***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -590,7 +590,7 @@ namespace Test
 		{
 			C1 = B1 - A1;
 		}
-		OnProgress("SEQS1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQS1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -598,7 +598,7 @@ namespace Test
 		{
 			B1 -= 1;
 		}
-		OnProgress("SEQS2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQS2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -612,7 +612,7 @@ namespace Test
 		{
 			C2 = B2 - A2;
 		}
-		OnProgress("PRLS1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLS1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		C2.Load(1, 1, 1, 1, 1, 1, 1, 1);
@@ -621,12 +621,12 @@ namespace Test
 		{
 			B2 -= C2;
 		}
-		OnProgress("PRLS2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLS2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***XOR***");
+		OnProgress(std::string("***XOR***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -636,7 +636,7 @@ namespace Test
 		{
 			C1 = B1 ^ A1;
 		}
-		OnProgress("SEQX1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQX1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -644,7 +644,7 @@ namespace Test
 		{
 			B1 ^= A1;
 		}
-		OnProgress("SEQX2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQX2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -658,7 +658,7 @@ namespace Test
 		{
 			C2 = B2 ^ A2;
 		}
-		OnProgress("PRLX1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLX1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -666,12 +666,12 @@ namespace Test
 		{
 			B2 ^= A2;
 		}
-		OnProgress("PRLX2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLX2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***Rotate***");
+		OnProgress(std::string("***Rotate***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -681,7 +681,7 @@ namespace Test
 		{
 			IntUtils::RotFL32(A1, 3);
 		}
-		OnProgress("SEQRL: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQRL: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -689,7 +689,7 @@ namespace Test
 		{
 			IntUtils::RotFR32(A1, 3);
 		}
-		OnProgress("SEQRR: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQRR: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -703,7 +703,7 @@ namespace Test
 		{
 			Numeric::UInt256::RotL32(A2, 3);
 		}
-		OnProgress("PRLRL: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLRL: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -711,12 +711,12 @@ namespace Test
 		{
 			Numeric::UInt256::RotR32(A2, 3);
 		}
-		OnProgress("PRLRR: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLRR: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***OR***");
+		OnProgress(std::string("***OR***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -726,7 +726,7 @@ namespace Test
 		{
 			C1 = B1 | A1;
 		}
-		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -734,7 +734,7 @@ namespace Test
 		{
 			B1 |= A1;
 		}
-		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -748,7 +748,7 @@ namespace Test
 		{
 			C2 = B2 | A2;
 		}
-		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -756,12 +756,12 @@ namespace Test
 		{
 			B2 |= A2;
 		}
-		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***AND***");
+		OnProgress(std::string("***AND***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -771,7 +771,7 @@ namespace Test
 		{
 			C1 = B1 & A1;
 		}
-		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -779,7 +779,7 @@ namespace Test
 		{
 			B1 &= A1;
 		}
-		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -793,7 +793,7 @@ namespace Test
 		{
 			C2 = B2 & A2;
 		}
-		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -801,7 +801,7 @@ namespace Test
 		{
 			B2 &= A2;
 		}
-		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
@@ -816,7 +816,7 @@ namespace Test
 		ulong B1 = 22222222;
 		ulong C1 = 0;
 
-		OnProgress("***Multiplication***");
+		OnProgress(std::string("***Multiplication***"));
 		Utility::TimeStamp ts;
 
 		ts.Start();
@@ -824,7 +824,7 @@ namespace Test
 		{
 			C1 = A1 * B1;
 		}
-		OnProgress("SEQM1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQM1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -832,7 +832,7 @@ namespace Test
 		{
 			A1 *= B1;
 		}
-		OnProgress("SEQM2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQM2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -846,7 +846,7 @@ namespace Test
 		{
 			C2 = A2 * B2;
 		}
-		OnProgress("PRLM1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLM1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -854,12 +854,12 @@ namespace Test
 		{
 			A2 *= B2;
 		}
-		OnProgress("PRLM2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLM2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***Addition***");
+		OnProgress(std::string("***Addition***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -869,7 +869,7 @@ namespace Test
 		{
 			C1 = A1 + B1;
 		}
-		OnProgress("SEQA1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQA1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -877,7 +877,7 @@ namespace Test
 		{
 			A1 += B1;
 		}
-		OnProgress("SEQA2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQA2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -891,7 +891,7 @@ namespace Test
 		{
 			C2 = A2 + B2;
 		}
-		OnProgress("PRLA1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLA1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -899,12 +899,12 @@ namespace Test
 		{
 			A2 += B2;
 		}
-		OnProgress("PRLA2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLA2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***Subtraction***");
+		OnProgress(std::string("***Subtraction***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -914,7 +914,7 @@ namespace Test
 		{
 			C1 = B1 - A1;
 		}
-		OnProgress("SEQS1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQS1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -922,7 +922,7 @@ namespace Test
 		{
 			B1 -= 1;
 		}
-		OnProgress("SEQS2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQS2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -936,7 +936,7 @@ namespace Test
 		{
 			C2 = B2 - A2;
 		}
-		OnProgress("PRLS1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLS1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		C2.Load(1, 1, 1, 1);
@@ -945,12 +945,12 @@ namespace Test
 		{
 			B2 -= C2;
 		}
-		OnProgress("PRLS2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLS2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***XOR***");
+		OnProgress(std::string("***XOR***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -960,7 +960,7 @@ namespace Test
 		{
 			C1 = B1 ^ A1;
 		}
-		OnProgress("SEQX1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQX1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -968,7 +968,7 @@ namespace Test
 		{
 			B1 ^= A1;
 		}
-		OnProgress("SEQX2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQX2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -982,7 +982,7 @@ namespace Test
 		{
 			C2 = B2 ^ A2;
 		}
-		OnProgress("PRLX1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLX1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		C2.Load(1, 1, 1, 1);
@@ -991,12 +991,12 @@ namespace Test
 		{
 			B2 ^= A2;
 		}
-		OnProgress("PRLX2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLX2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***Rotate***");
+		OnProgress(std::string("***Rotate***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -1006,7 +1006,7 @@ namespace Test
 		{
 			IntUtils::RotFL64(A1, 3);
 		}
-		OnProgress("SEQRL: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQRL: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -1014,7 +1014,7 @@ namespace Test
 		{
 			IntUtils::RotFR64(A1, 3);
 		}
-		OnProgress("SEQRR: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQRR: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -1028,7 +1028,7 @@ namespace Test
 		{
 			Numeric::ULong256::RotL64(A2, 3);
 		}
-		OnProgress("PRLRL: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLRL: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		C2.Load(1, 1, 1, 1);
@@ -1037,12 +1037,12 @@ namespace Test
 		{
 			Numeric::ULong256::RotR64(A2, 3);
 		}
-		OnProgress("PRLRR: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLRR: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***OR***");
+		OnProgress(std::string("***OR***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -1052,7 +1052,7 @@ namespace Test
 		{
 			C1 = B1 | A1;
 		}
-		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -1060,7 +1060,7 @@ namespace Test
 		{
 			B1 |= A1;
 		}
-		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -1074,7 +1074,7 @@ namespace Test
 		{
 			C2 = B2 | A2;
 		}
-		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		C2.Load(1, 1, 1, 1);
@@ -1083,12 +1083,12 @@ namespace Test
 		{
 			B2 |= A2;
 		}
-		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
 
-		OnProgress("***AND***");
+		OnProgress(std::string("***AND***"));
 		A1 = 11111111;
 		B1 = 22222222;
 		C1 = 0;
@@ -1098,7 +1098,7 @@ namespace Test
 		{
 			C1 = B1 & A1;
 		}
-		OnProgress("SEQO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		ts.Start();
@@ -1106,7 +1106,7 @@ namespace Test
 		{
 			B1 &= A1;
 		}
-		OnProgress("SEQO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("SEQO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #if defined(__AVX2__)
@@ -1120,7 +1120,7 @@ namespace Test
 		{
 			C2 = B2 & A2;
 		}
-		OnProgress("PRLO1: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO1: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 		C2.Load(1, 1, 1, 1);
@@ -1129,7 +1129,7 @@ namespace Test
 		{
 			B2 &= A2;
 		}
-		OnProgress("PRLO2: " + IntUtils::ToString(ts.Elapsed()));
+		OnProgress(std::string("PRLO2: ") + IntUtils::ToString(ts.Elapsed()));
 		ts.Reset();
 
 #endif
@@ -1146,7 +1146,7 @@ namespace Test
 
 		// Large Block Memset
 #if defined(__AVX__)
-		OnProgress(std::string(glen + " using 512 byte buffers with sequential memset "));
+		OnProgress(glen + std::string(" using 512 byte buffers with sequential memset "));
 		// sequential memset: 512 byte buffers
 		buffer1.resize(B512);
 		start = TestUtils::GetTimeMs64();
@@ -1165,7 +1165,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 		// highest available simd memset
-		OnProgress(std::string(glen + " using 512 byte buffers with SIMD vectorized memset "));
+		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized memset "));
 		buffer2.resize(B512);
 		start = TestUtils::GetTimeMs64();
 
@@ -1196,7 +1196,7 @@ namespace Test
 		// Vector Aligned Memset
 #if defined(__AVX512__)
 		// sequential memset: 64 byte buffers
-		OnProgress(std::string(glen + " using 64 byte buffers with sequential memset "))
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential memset "))
 		buffer1.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -1214,7 +1214,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 		// simd512 memset
-		OnProgress(std::string(glen + " using 64 byte buffers with AVX512 vectorized memset "));
+		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized memset "));
 		buffer2.resize(64);
 		start = TestUtils::GetTimeMs64();
 
@@ -1233,7 +1233,7 @@ namespace Test
 
 #elif defined(__AVX2__)
 		// sequential memset: 32 byte buffers
-		OnProgress(std::string(glen + " using 32 byte buffers with sequential memset "));
+		OnProgress(glen + std::string(" using 32 byte buffers with sequential memset "));
 		buffer1.resize(32);
 		start = TestUtils::GetTimeMs64();
 
@@ -1251,7 +1251,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("Set "));
 
 		// simd256 memset
-		OnProgress(std::string(glen + " using 32 byte buffers with AVX2 vectorized memset "));
+		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized memset "));
 		buffer2.resize(32);
 		start = TestUtils::GetTimeMs64();
 
@@ -1270,7 +1270,7 @@ namespace Test
 
 #elif defined(__AVX__)
 		// sequential memset: 16 byte buffers
-		OnProgress(std::string(glen + " using 16 byte buffers with sequential memset "));
+		OnProgress(glen + std::string(" using 16 byte buffers with sequential memset "));
 		buffer1.resize(16);
 		start = TestUtils::GetTimeMs64();
 
@@ -1288,7 +1288,7 @@ namespace Test
 
 		// simd128 memset
 		glen = "SpeedTest: memset " + TESTSIZE;
-		OnProgress(std::string(glen + " using 16 byte buffers with AVX vectorized memset "));
+		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized memset "));
 		buffer2.resize(16);
 		start = TestUtils::GetTimeMs64();
 
@@ -1321,7 +1321,7 @@ namespace Test
 		// Large Block XOR
 #if defined(__AVX__)
 		// sequential memset: 512 byte buffers
-		OnProgress(std::string(glen + " using 512 byte buffers with sequential XOR "));
+		OnProgress(glen + std::string(" using 512 byte buffers with sequential XOR "));
 		buffer1.resize(B512, (byte)0x7);
 		buffer2.resize(B512, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1343,7 +1343,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// highest available simd xor
-		OnProgress(std::string(glen + " using 512 byte buffers with SIMD vectorized XOR "));
+		OnProgress(glen + std::string(" using 512 byte buffers with SIMD vectorized XOR "));
 		buffer3.resize(B512, (byte)0x7);
 		buffer4.resize(B512, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1378,7 +1378,7 @@ namespace Test
 #if defined(__AVX512__)
 
 		// sequential xor: 64 byte buffers
-		OnProgress(std::string(glen + " using 64 byte buffers with sequential XOR "))
+		OnProgress(glen + std::string(" using 64 byte buffers with sequential XOR "))
 		buffer1.resize(64, (byte)0x7);
 		buffer2.resize(64, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1400,7 +1400,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// simd256 xor
-		OnProgress(std::string(glen + " using 64 byte buffers with AVX512 vectorized XOR "));
+		OnProgress(glen + std::string(" using 64 byte buffers with AVX512 vectorized XOR "));
 		buffer3.resize(64, (byte)0x7);
 		buffer4.resize(64, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1420,7 +1420,7 @@ namespace Test
 
 #elif defined(__AVX2__)
 		// sequential xor: 32 byte buffers
-		OnProgress(std::string(glen + " using 32 byte buffers with sequential XOR "));
+		OnProgress(glen + std::string(" using 32 byte buffers with sequential XOR "));
 		buffer1.resize(32, (byte)0x7);
 		buffer2.resize(32, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1441,7 +1441,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// simd256 xor
-		OnProgress(std::string(glen + " using 32 byte buffers with AVX2 vectorized XOR "));
+		OnProgress(glen + std::string(" using 32 byte buffers with AVX2 vectorized XOR "));
 		buffer3.resize(32, (byte)0x7);
 		buffer4.resize(32, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1460,7 +1460,7 @@ namespace Test
 
 #elif defined(__AVX__)
 		// sequential memset: 16 byte buffers
-		OnProgress(std::string(glen + " using 16 byte buffers with sequential XOR "));
+		OnProgress(glen + std::string(" using 16 byte buffers with sequential XOR "));
 		buffer1.resize(16, (byte)0x7);
 		buffer2.resize(16, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1483,7 +1483,7 @@ namespace Test
 		PostPerfResult(dur, Length, std::string("XOR "));
 
 		// simd128 memset: 16 byte buffers
-		OnProgress(std::string(glen + " using 16 byte buffers with AVX vectorized XOR "));
+		OnProgress(glen + std::string(" using 16 byte buffers with AVX vectorized XOR "));
 		buffer3.resize(16, (byte)0x7);
 		buffer4.resize(16, (byte)0x11);
 		start = TestUtils::GetTimeMs64();
@@ -1508,7 +1508,7 @@ namespace Test
 		uint64_t rate = GetBytesPerSecond(Duration, Length);
 		std::string mbps = TestUtils::ToString((rate / MB1));
 		std::string secs = TestUtils::ToString((double)Duration / 1000.0);
-		std::string resp = std::string(Message + TESTSIZE + " of data in " + secs + " seconds, avg. " + mbps + " MB per Second");
+		std::string resp = std::string(Message + TESTSIZE + std::string(" of data in ") + secs + std::string(" seconds, avg. ") + mbps + std::string(" MB per Second"));
 
 		OnProgress(resp);
 	}

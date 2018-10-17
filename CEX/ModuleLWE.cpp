@@ -20,7 +20,7 @@ ModuleLWE::ModuleLWE(MLWEParams Parameters, Prngs PrngType)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mlweParameters(Parameters != MLWEParams::None ? Parameters :
+	m_mlweParameters(Parameters != MLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParams::Q7681N256K4) ? Parameters :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The prng type can not be none!"))
@@ -34,7 +34,7 @@ ModuleLWE::ModuleLWE(MLWEParams Parameters, IPrng* Prng)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mlweParameters(Parameters != MLWEParams::None ? Parameters :
+	m_mlweParameters(Parameters != MLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParams::Q7681N256K4) ? Parameters :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The prng can not be null!"))
@@ -233,8 +233,6 @@ IAsymmetricKeyPair* ModuleLWE::Generate()
 	const size_t PUBLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
 	const size_t PRILEN = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
 	const size_t CCAPRI = PUBLEN + PRILEN + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
-
-	CexAssert(m_mlweParameters != MLWEParams::None, "The parameter setting is invalid");
 
 	std::vector<byte> pk(PUBLEN);
 	std::vector<byte> sk(CCAPRI);

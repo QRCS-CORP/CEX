@@ -117,6 +117,12 @@ namespace Test
 #endif
 	}
 
+	void TestUtils::GetRandom(std::vector<byte> &Data)
+	{
+		CSP rng;
+		rng.Generate(Data);
+	}
+
 	SymmetricKey* TestUtils::GetRandomKey(size_t KeySize, size_t IvSize)
 	{
 		CSP rng;
@@ -136,12 +142,6 @@ namespace Test
 		}
 	}
 
-	void TestUtils::GetRandom(std::vector<byte> &Data)
-	{
-		CSP rng;
-		rng.Generate(Data);
-	}
-
 	double TestUtils::MeanValue(std::vector<byte> &Input)
 	{
 		double ret = 0;
@@ -152,6 +152,39 @@ namespace Test
 		}
 
 		return ret / Input.size();
+	}
+
+	bool TestUtils::OrderedRuns(const std::vector<byte> &Input, size_t Threshold)
+	{
+		size_t c;
+		size_t i;
+		byte val;
+		bool state;
+
+		state = false;
+		c = 0;
+		val = Input[0];
+
+		// indicates zeroed output or bad run
+		for (i = 1; i < Input.size(); ++i)
+		{
+			if (Input[i] == val)
+			{
+				++c;
+				if (c >= Threshold)
+				{
+					state = true;
+					break;
+				}
+			}
+			else
+			{
+				val = Input[i];
+				c = 0;
+			}
+		}
+
+		return state;
 	}
 
 	double TestUtils::Poz(const double Z)
@@ -260,6 +293,28 @@ namespace Test
 		}
 	}
 
+	std::string TestUtils::RandomReadableString(size_t Length)
+	{
+		std::vector<byte> fill(1);
+		CEX::Prng::SecureRandom rnd;
+		std::string rtxt = "";
+		size_t ctr = 0;
+
+		while (ctr < Length)
+		{
+			rnd.Generate(fill);
+
+			if (fill[0] > 31 && fill[0] < 123 && (fill[0] != 39 || fill[0] != 40 || fill[0] != 41))
+			{
+
+				rtxt += static_cast<unsigned char>(fill[0]);
+				++ctr;
+			}
+		}
+
+		return rtxt;
+	}
+
 	bool TestUtils::Read(const std::string &FilePath, std::string &Contents)
 	{
 		bool status = false;
@@ -267,7 +322,7 @@ namespace Test
 
 		if (!ifs || !ifs.is_open())
 		{
-			throw TestException("Could not open the KAT file!");
+			throw TestException(std::string("Could not open the KAT file!"));
 		}
 		else
 		{
@@ -285,7 +340,7 @@ namespace Test
 			}
 			else
 			{
-				throw TestException("The KAT file is empty!");
+				throw TestException(std::string("The KAT file is empty!"));
 			}
 		}
 
@@ -308,5 +363,34 @@ namespace Test
 	void TestUtils::Reverse(std::vector<byte> &Data)
 	{
 		std::reverse(Data.begin(), Data.end());
+	}
+
+	bool TestUtils::SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold)
+	{
+		size_t c;
+		size_t i;
+		bool state;
+
+		state = false;
+		c = 0;
+
+		for (i = 0; i < Input.size(); ++i)
+		{
+			if (Input[i] == 0x00)
+			{
+				++c;
+				if (c >= Threshold)
+				{
+					state = true;
+					break;
+				}
+			}
+			else
+			{
+				c = 0;
+			}
+		}
+
+		return state;
 	}
 }

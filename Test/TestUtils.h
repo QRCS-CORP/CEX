@@ -15,43 +15,6 @@ namespace Test
 	{
 	public:
 
-		static std::string RandomReadableString(size_t Length)
-		{
-			std::vector<byte> fill(1);
-			CEX::Prng::SecureRandom rnd;
-			std::string rtxt = "";
-			size_t ctr = 0;
-
-			while (ctr < Length)
-			{
-				rnd.Generate(fill);
-
-				if (fill[0] > 31 && fill[0] < 123 && (fill[0] != 39 || fill[0] != 40 || fill[0] != 41))
-				{
-
-					rtxt += static_cast<unsigned char>(fill[0]);
-					++ctr;
-				}
-			}
-
-			return rtxt;
-		}
-
-		/// <summary>
-		/// Convert an integer to a string
-		/// </summary>
-		/// 
-		/// <param name="Value">The integer value</param>
-		/// 
-		/// <returns>The string representation</returns>
-		template<typename T>
-		static std::string ToString(const T &Value)
-		{
-			std::ostringstream oss;
-			oss << Value;
-			return oss.str();
-		}
-
 		/// <summary>
 		/// Outputs a formatted hex integer array to console
 		/// </summary>
@@ -194,19 +157,37 @@ namespace Test
 			return ret;
 		}
 
-		static double MeanValue(std::vector<byte> &Input);
+		/// <summary>
+		/// Convert an integer to a string
+		/// </summary>
+		/// 
+		/// <param name="Value">The integer value</param>
+		/// 
+		/// <returns>The string representation</returns>
+		template<typename T>
+		static std::string ToString(const T &Value)
+		{
+			std::ostringstream oss;
+			oss << Value;
+			return oss.str();
+		}
+
 		static double ChiSquare(std::vector<byte> &Input);
 		static void CopyVector(const std::vector<int> &SrcArray, size_t SrcIndex, std::vector<int> &DstArray, size_t DstIndex, size_t Length);
 		static bool IsEqual(std::vector<byte> &A, std::vector<byte> &B);
 		static uint64_t GetTimeMs64();
 		static SymmetricKey* GetRandomKey(size_t KeySize, size_t IvSize);
 		static void GetRandom(std::vector<byte> &Data);
-
+		static double MeanValue(std::vector<byte> &Input);
+		static bool OrderedRuns(const std::vector<byte> &Input, size_t Threshold = 4);
+		static std::string RandomReadableString(size_t Length);
 		static bool Read(const std::string &FilePath, std::string &Contents);
 		static std::vector<byte> Reduce(std::vector<byte> Seed);
 		static void Reverse(std::vector<byte> &Data);
+		static bool SuccesiveZeros(const std::vector<byte> &Input, size_t Threshold = 4);
 
 	private:
+
 		// maximum meaningful z value
 		const static double Z_MAX;
 		// log (sqrt (pi))

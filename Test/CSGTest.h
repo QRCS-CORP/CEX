@@ -6,8 +6,10 @@
 
 namespace Test
 {
+	using Drbg::IDrbg;
+
 	/// <summary>
-	/// CSG output comparison test.
+	/// Tests the CSHAKE Generator (CSG) implementation using exception handling, parameter checks, stress and KAT tests.
 	/// <para>Test using the official NIST references contained in:
 	/// NIST cSHAKE KATs: <a href="https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Standards-and-Guidelines/documents/examples/cSHAKE_samples.pdf">cSHAKE example values</a>
 	/// SP800-185: <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SHA-3 Derived Functions</a></para>
@@ -18,10 +20,14 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+		static const size_t MAXM_ALLOC = 262140;
+		static const size_t MINM_ALLOC = 1024;
+		static const size_t SAMPLE_SIZE = 1024000;
+		static const size_t TEST_CYCLES = 100;
 
 		std::vector<byte> m_custom;
 		std::vector<std::vector<byte>> m_expected;
-		std::vector<std::vector<byte>> m_seed;
+		std::vector<std::vector<byte>> m_key;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -51,13 +57,34 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		///  Test drbg output using chisquare, mean value, and ordered runs tests
+		/// </summary>
+		void Evaluate(IDrbg* Rng);
+
+		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
+		/// Compare known answer test vectors to drbg output
+		/// </summary>
+		/// 
+		/// <param name="Rng">The drbg instance</param>
+		/// <param name="Key">The input key</param>
+		/// <param name="Expected">The expected output</param>
+		void Kat(IDrbg* Rng, std::vector<byte> &Key, std::vector<byte> &Expected);
+
+		/// <summary>
+		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
+		/// </summary>
+		void Stress();
+
 	private:
 
-		void CheckInit();
-		void CompareOutput(Drbg::IDrbg* Generator, std::vector<byte> &Seed, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);
-		bool OrderedRuns(const std::vector<byte> &Input);
 	};
 }
 

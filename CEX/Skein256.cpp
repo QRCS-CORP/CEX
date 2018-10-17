@@ -6,6 +6,8 @@
 NAMESPACE_DIGEST
 
 using Utility::IntUtils;
+using Utility::MemUtils;
+using Utility::ParallelUtils;
 
 const std::string Skein256::CLASS_NAME("Skein256");
 
@@ -30,9 +32,9 @@ struct Skein256::Skein256State
 
 	void Reset()
 	{
-		Utility::MemUtils::Clear(S, 0, S.size() * sizeof(ulong));
-		Utility::MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
-		Utility::MemUtils::Clear(V, 0, V.size() * sizeof(ulong));
+		MemUtils::Clear(S, 0, S.size() * sizeof(ulong));
+		MemUtils::Clear(T, 0, T.size() * sizeof(ulong));
+		MemUtils::Clear(V, 0, V.size() * sizeof(ulong));
 	}
 };
 
@@ -78,6 +80,10 @@ Skein256::Skein256(SkeinParams &Params)
 	{
 		throw CryptoDigestException("Skein256::Ctor", "Cpu does not support parallel processing!");
 	}
+	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
+	{
+		throw CryptoDigestException("Skein256::Ctor", "The tree parameters are invalid!");
+	}
 
 	if (m_treeParams.FanOut() > 1)
 	{
@@ -119,28 +125,28 @@ Skein256::~Skein256()
 
 //~~~Accessors~~~//
 
-size_t Skein256::BlockSize() 
-{ 
-	return BLOCK_SIZE; 
+size_t Skein256::BlockSize()
+{
+	return BLOCK_SIZE;
 }
 
 size_t Skein256::DigestSize()
-{ 
-	return DIGEST_SIZE; 
+{
+	return DIGEST_SIZE;
 }
 
-const Digests Skein256::Enumeral() 
-{ 
-	return Digests::Skein256; 
+const Digests Skein256::Enumeral()
+{
+	return Digests::Skein256;
 }
 
-const bool Skein256::IsParallel() 
-{ 
-	return m_parallelProfile.IsParallel(); 
+const bool Skein256::IsParallel()
+{
+	return m_parallelProfile.IsParallel();
 }
 
-const std::string Skein256::Name() 
-{ 
+const std::string Skein256::Name()
+{
 	std::string txtName = "";
 
 	if (m_parallelProfile.IsParallel())
@@ -155,14 +161,14 @@ const std::string Skein256::Name()
 	return txtName;
 }
 
-const size_t Skein256::ParallelBlockSize() 
-{ 
-	return m_parallelProfile.ParallelBlockSize(); 
+const size_t Skein256::ParallelBlockSize()
+{
+	return m_parallelProfile.ParallelBlockSize();
 }
 
 ParallelOptions &Skein256::ParallelProfile()
-{ 
-	return m_parallelProfile; 
+{
+	return m_parallelProfile;
 }
 
 //~~~Public Functions~~~//
@@ -183,7 +189,7 @@ size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// process buffer
@@ -224,7 +230,7 @@ size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 		// pad buffer with zeros
 		if (m_msgLength < m_msgBuffer.size())
 		{
-			Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+			MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 		}
 
 		// finalize and store
@@ -237,25 +243,12 @@ size_t Skein256::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 	return DIGEST_SIZE;
 }
 
-void Skein256::Reset()
-{
-	for (size_t i = 0; i < m_dgtState.size(); ++i)
-	{
-		// copy the configuration value to the state
-		m_dgtState[i].S = m_dgtState[i].V;
-		SkeinUbiTweak::StartNewBlockType(m_dgtState[i].T, SkeinUbiType::Message);
-	}
-
-	m_isInitialized = false;
-	// reset bytes filled
-	m_msgLength = 0;
-}
-
 void Skein256::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoDigestException("Skein256::ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
 	m_dgtState.clear();
@@ -265,6 +258,21 @@ void Skein256::ParallelMaxDegree(size_t Degree)
 	m_treeParams = { DIGEST_SIZE, static_cast<byte>(BLOCK_SIZE), static_cast<byte>(Degree) };
 
 	Initialize();
+}
+
+void Skein256::Reset()
+{
+	for (size_t i = 0; i < m_dgtState.size(); ++i)
+	{
+		// copy the configuration value to the state
+		m_dgtState[i].S = m_dgtState[i].V;
+		SkeinUbiTweak::StartNewBlockType(m_dgtState[i].T, SkeinUbiType::Message);
+	}
+
+	// reset bytes filled
+	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	m_msgLength = 0;
+	m_isInitialized = false;
 }
 
 void Skein256::Update(byte Input)
@@ -287,11 +295,11 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t RMDLEN = m_msgBuffer.size() - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				// empty the message buffer
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset](size_t i)
 				{
 					ProcessBlock(m_msgBuffer, i * BLOCK_SIZE, m_dgtState, i);
 				});
@@ -307,7 +315,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t PRCLEN = Length - (Length % m_parallelProfile.ParallelBlockSize());
 
 				// process large blocks
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRCLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRCLEN);
 				});
@@ -320,7 +328,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 			{
 				const size_t PRMLEN = Length - (Length % m_parallelProfile.ParallelMinimumSize());
 
-				Utility::ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
+				ParallelUtils::ParallelFor(0, m_parallelProfile.ParallelMaxDegree(), [this, &Input, InOffset, PRMLEN](size_t i)
 				{
 					ProcessLeaf(Input, InOffset + (i * BLOCK_SIZE), m_dgtState, i, PRMLEN);
 				});
@@ -349,7 +357,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				const size_t RMDLEN = BLOCK_SIZE - m_msgLength;
 				if (RMDLEN != 0)
 				{
-					Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+					MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 				}
 
 				ProcessBlock(m_msgBuffer, 0, m_dgtState, 0);
@@ -370,7 +378,7 @@ void Skein256::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -415,9 +423,9 @@ void Skein256::Initialize()
 			// compress previous state
 			Permute(m_dgtState[i - 1].V, m_dgtState[i]);
 			// store the new state in V for reset
-			Utility::MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
+			MemUtils::Copy(m_dgtState[i].S, 0, m_dgtState[i].V, 0, m_dgtState[i].V.size() * sizeof(ulong));
 			// mix config with state
-			Utility::MemUtils::XOR256(cfg, 0, m_dgtState[i].V, 0);
+			MemUtils::XOR256(cfg, 0, m_dgtState[i].V, 0);
 		}
 	}
 
@@ -432,9 +440,9 @@ void Skein256::LoadState(Skein256State &State, std::array<ulong, 4> &Config)
 	State.Increase(32);
 	Permute(Config, State);
 	// store the initial state for reset
-	Utility::MemUtils::Copy(m_dgtState[0].S, 0, m_dgtState[0].V, 0, m_dgtState[0].V.size() * sizeof(ulong));
+	MemUtils::Copy(m_dgtState[0].S, 0, State.V, 0, State.V.size() * sizeof(ulong));
 	// add the config string
-	Utility::MemUtils::XOR256(Config, 0, State.V, 0);
+	MemUtils::XOR256(Config, 0, State.V, 0);
 }
 
 void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std::vector<Skein256State> &State, size_t StateOffset, size_t Length)
@@ -446,7 +454,7 @@ void Skein256::ProcessBlock(const std::vector<byte> &Input, size_t InOffset, std
 	IntUtils::LeBytesToULL256(Input, InOffset, msg, 0);
 	Permute(msg, State[StateOffset]);
 	// feed-forward input with state
-	Utility::MemUtils::XOR256(msg, 0, State[StateOffset].S, 0);
+	MemUtils::XOR256(msg, 0, State[StateOffset].S, 0);
 
 	// clear first flag
 	if (!m_isInitialized && StateOffset == 0)

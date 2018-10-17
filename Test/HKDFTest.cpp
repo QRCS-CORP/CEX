@@ -1,25 +1,43 @@
 #include "HKDFTest.h"
 #include "../CEX/HKDF.h"
 #include "../CEX/HMAC.h"
-#include "../CEX/IDigest.h"
-#include "../CEX/SymmetricKey.h"
+#include "../CEX/IntUtils.h"
+#include "../CEX/SecureRandom.h"
 #include "../CEX/SHA256.h"
+#include "../CEX/SymmetricKeySize.h"
 
 namespace Test
 {
+	using Exception::CryptoKdfException;
+	using Kdf::HKDF;
+	using Mac::HMAC;
+	using Utility::IntUtils;
+	using Prng::SecureRandom;
+	using Digest::SHA256;
+	using Enumeration::SHA2Digests;
+	using Key::Symmetric::SymmetricKeySize;
+
 	const std::string HKDFTest::DESCRIPTION = "HKDF RFC 5869 SHA-2 test vectors.";
 	const std::string HKDFTest::FAILURE = "FAILURE! ";
 	const std::string HKDFTest::SUCCESS = "SUCCESS! All HKDF tests have executed succesfully.";
 
 	HKDFTest::HKDFTest()
 		: 
-		m_progressEvent()
+		m_expected(0),
+		m_info(0),
+		m_key(0),
+		m_progressEvent(),
+		m_salt(0)
 	{
 		Initialize();
 	}
 
 	HKDFTest::~HKDFTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_info);
+		IntUtils::ClearVector(m_key);
+		IntUtils::ClearVector(m_salt);
 	}
 
 	const std::string HKDFTest::Description()
@@ -36,11 +54,29 @@ namespace Test
 	{
 		try
 		{
-			TestInit();
-			OnProgress(std::string("HKDFTest: Passed initialization tests.."));
-			CompareOutput(42, m_key[0], m_salt[0], m_info[0], m_output[0]);
-			CompareOutput(82, m_key[1], m_salt[1], m_info[1], m_output[1]);
-			OnProgress(std::string("HKDFTest: Passed SHA256 bit vectors tests.."));
+			Exception();
+			OnProgress(std::string("HKDFTest: Passed HKDF exception handling tests.."));
+
+			HKDF* gen1 = new HKDF(SHA2Digests::SHA256);
+			Kat(gen1, m_key[0], m_salt[0], m_info[0], m_expected[0]);
+			Kat(gen1, m_key[1], m_salt[1], m_info[1], m_expected[1]);
+			OnProgress(std::string("HKDFTest: Passed HKDF SHA2-256 known answer tests.."));
+
+			HKDF* gen2 = new HKDF(SHA2Digests::SHA256);
+			Kat(gen2, m_key[0], m_salt[0], m_info[0], m_expected[2]);
+			Kat(gen2, m_key[1], m_salt[1], m_info[1], m_expected[3]);
+			OnProgress(std::string("HKDFTest: Passed HKDF SHA2-512 known answer tests.."));
+
+			Params(gen1);
+			Params(gen2);
+			OnProgress(std::string("HKDFTest: Passed initialization parameters tests.."));
+
+			Stress(gen1);
+			Stress(gen2);
+			OnProgress(std::string("HKDFTest: Passed stress tests.."));
+
+			delete gen1;
+			delete gen2;
 
 			return SUCCESS;
 		}
@@ -54,19 +90,115 @@ namespace Test
 		}
 	}
 
-	void HKDFTest::CompareOutput(int Size, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Info, std::vector<byte> &Expected)
+	void HKDFTest::Exception()
 	{
-		std::vector<byte> outBytes(Size, 0);
-
-		Digest::SHA256 sha256;
-		Mac::HMAC hmac(&sha256);
-		Kdf::HKDF gen(&hmac);
-		gen.Initialize(Key, Salt, Info);
-		gen.Generate(outBytes, 0, Size);
-
-		if (outBytes != Expected)
+		// test constructor
+		try
 		{
-			throw TestException("HKDF: Values are not equal!");
+			// invalid digest choice
+			HKDF kdf(SHA2Digests::None);
+
+			throw TestException(std::string("HKDF"), std::string("Exception: Exception handling failure! -HE1"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test initialization
+		try
+		{
+			HKDF kdf(SHA2Digests::SHA256);
+			// invalid key size
+			std::vector<byte> key(1);
+			kdf.Initialize(key);
+
+			throw TestException(std::string("HKDF"), std::string("Exception: Exception handling failure! -HE2"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generator state -1
+		try
+		{
+			HKDF kdf(SHA2Digests::SHA256);
+			std::vector<byte> otp(32);
+			// generator was not initialized
+			kdf.Generate(otp);
+
+			throw TestException(std::string("HKDF"), std::string("Exception: Exception handling failure! -HE3"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generator state -2
+		try
+		{
+			HKDF kdf(SHA2Digests::SHA256);
+			Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+			std::vector<byte> key(ks.KeySize());
+			std::vector<byte> otp(32);
+
+			kdf.Initialize(key);
+			// array too small
+			kdf.Generate(otp, 0, otp.size() + 1);
+
+			throw TestException(std::string("HKDF"), std::string("Exception: Exception handling failure! -HE4"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+
+		// test generator state -3
+		try
+		{
+			HKDF kdf(SHA2Digests::SHA256);
+			Key::Symmetric::SymmetricKeySize ks = kdf.LegalKeySizes()[1];
+			std::vector<byte> key(ks.KeySize());
+			// output exceeds maximum
+			std::vector<byte> otp(256 * 32);
+
+			kdf.Initialize(key);
+			kdf.Generate(otp, 0, otp.size());
+
+			throw TestException(std::string("HKDF"), std::string("Exception: Exception handling failure! -HE5"));
+		}
+		catch (CryptoKdfException const &)
+		{
+		}
+		catch (TestException const &)
+		{
+			throw;
+		}
+	}
+
+	void HKDFTest::Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Salt, std::vector<byte> &Info, std::vector<byte> &Expected)
+	{
+		std::vector<byte> otp(Expected.size());
+
+		Generator->Initialize(Key, Salt, Info);
+		Generator->Generate(otp);
+
+		if (otp != Expected)
+		{
+			throw TestException(std::string("Kat: Output does not match the known answer! -HK1"));
 		}
 	}
 
@@ -96,12 +228,16 @@ namespace Test
 		};
 		HexConverter::Decode(info, 2, m_info);
 
-		const std::vector<std::string> output =
+		const std::vector<std::string> expected =
 		{
+			// official vectors
 			std::string("3CB25F25FAACD57A90434F64D0362F2A2D2D0A90CF1A5A4C5DB02D56ECC4C5BF34007208D5B887185865"),
-			std::string("B11E398DC80327A1C8E7F78C596A49344F012EDA2D4EFAD8A050CC4C19AFA97C59045A99CAC7827271CB41C65E590E09DA3275600C2F09B8367793A9ACA3DB71CC30C58179EC3E87C14C01D5C1F3434F1D87")
+			std::string("B11E398DC80327A1C8E7F78C596A49344F012EDA2D4EFAD8A050CC4C19AFA97C59045A99CAC7827271CB41C65E590E09DA3275600C2F09B8367793A9ACA3DB71CC30C58179EC3E87C14C01D5C1F3434F1D87"),
+			// sha512 original vectors
+			std::string("3CB25F25FAACD57A90434F64D0362F2A2D2D0A90CF1A5A4C5DB02D56ECC4C5BF34007208D5B887185865B4B0A85A993B89B9B65683D60F0106D28FFF039D0B6F"),
+			std::string("B11E398DC80327A1C8E7F78C596A49344F012EDA2D4EFAD8A050CC4C19AFA97C59045A99CAC7827271CB41C65E590E09DA3275600C2F09B8367793A9ACA3DB71CC30C58179EC3E87C14C01D5C1F3434F1D8783C7310A8770344B9D6050FE8772CE16AFE7DBB994F8FB72F5DF08C703099E1E3D594A326836564CF64914338F0D")
 		};
-		HexConverter::Decode(output, 2, m_output);
+		HexConverter::Decode(expected, 4, m_expected);
 		/*lint -restore */
 	}
 
@@ -110,47 +246,66 @@ namespace Test
 		m_progressEvent(Data);
 	}
 
-	void HKDFTest::TestInit()
+	void HKDFTest::Params(IKdf* Generator)
 	{
-		std::vector<byte> outBytes(82, 0);
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> otp1;
+		std::vector<byte> otp2;
+		std::vector<byte> key(ks.KeySize());
+		SecureRandom rnd;
+		size_t i;
 
-		// enum access
-		Kdf::HKDF gen1(Enumeration::Digests::SHA256);
-		gen1.Initialize(m_key[1], m_salt[1], m_info[1]);
-		gen1.Generate(outBytes, 0, outBytes.size());
-		if (outBytes != m_output[1])
+		otp1.reserve(MAXM_ALLOC);
+		otp2.reserve(MAXM_ALLOC);
+
+		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			throw TestException("HKDF: Initialization test failed!");
+			const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+			otp1.resize(OTPLEN);
+			otp2.resize(OTPLEN);
+			IntUtils::Fill(key, 0, key.size(), rnd);
+
+			// generate with the kdf
+			Generator->Initialize(key);
+			Generator->Generate(otp1, 0, OTPLEN);
+			Generator->Reset();
+			Generator->Initialize(key);
+			Generator->Generate(otp2, 0, OTPLEN);
+
+			if (otp1 != otp2)
+			{
+				throw TestException(std::string("Reset: Returns a different array after reset! -HR1"));
+			}
 		}
+	}
 
-		// digest instance
-		Digest::SHA256* dgt = new Digest::SHA256();
-		Kdf::HKDF gen2(dgt);
-		gen2.Initialize(m_key[1], m_salt[1], m_info[1]);
-		gen2.Generate(outBytes, 0, outBytes.size());
-		delete dgt;
-		if (outBytes != m_output[1])
-		{
-			throw TestException("HKDF: Initialization test failed!");
-		}
+	void HKDFTest::Stress(IKdf* Generator)
+	{
+		SymmetricKeySize ks = Generator->LegalKeySizes()[1];
+		std::vector<byte> otp;
+		std::vector<byte> key(ks.KeySize());
+		SecureRandom rnd;
+		size_t i;
 
-		// hmac instance
-		Mac::HMAC hmac(Enumeration::Digests::SHA256);
-		Kdf::HKDF gen3(&hmac);
-		gen3.Initialize(m_key[1], m_salt[1], m_info[1]);
-		gen3.Generate(outBytes, 0, outBytes.size());
-		if (outBytes != m_output[1])
-		{
-			throw TestException("HKDF: Initialization test failed!");
-		}
+		otp.reserve(MAXM_ALLOC);
 
-		// test reset
-		gen1.Reset();
-		gen1.Initialize(m_key[1], m_salt[1], m_info[1]);
-		gen1.Generate(outBytes, 0, outBytes.size());
-		if (outBytes != m_output[1])
+		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			throw TestException("HKDF: Initialization test failed!");
+			try
+			{
+				const size_t OTPLEN = static_cast<size_t>(rnd.NextUInt32(MAXM_ALLOC, MINM_ALLOC));
+				otp.resize(OTPLEN);
+				IntUtils::Fill(key, 0, key.size(), rnd);
+
+				// generate with the kdf
+				Generator->Initialize(key);
+				Generator->Generate(otp, 0, OTPLEN);
+				Generator->Reset();
+			}
+			catch (...)
+			{
+				throw TestException(std::string("Stress: The generator has thrown an exception! -HS1"));
+			}
 		}
 	}
 }

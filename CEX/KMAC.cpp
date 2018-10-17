@@ -38,9 +38,9 @@ KMAC::~KMAC()
 		m_msgLength = 0;
 		m_shakeMode = ShakeModes::None;
 
-		Utility::IntUtils::ClearVector(m_distCode);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
-		Utility::IntUtils::ClearArray(m_msgBuffer);
+		IntUtils::ClearVector(m_distCode);
+		IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearArray(m_msgBuffer);
 	}
 }
 
@@ -95,7 +95,10 @@ const ShakeModes KMAC::ShakeMode()
 
 void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized!");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("KMAC:Compute", "The generator has not been initialized!");
+	}
 
 	Update(Input, 0, Input.size());
 	Finalize(Output, 0);
@@ -103,17 +106,23 @@ void KMAC::Compute(const std::vector<byte> &Input, std::vector<byte> &Output)
 
 size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized!");
-	CexAssert((Output.size() - OutOffset) >= m_macSize, "The Output buffer is too short!");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("KMAC:Finalize", "The generator has not been initialized!");
+	}
+	if ((Output.size() - OutOffset) < MacSize())
+	{
+		throw CryptoMacException("KMAC:Finalize", "The Output buffer is too short!");
+	}
 
 	std::vector<byte> buf(sizeof(size_t) + 1);
 	size_t i;
-	size_t outLen;
 	size_t outBits;
+	size_t outLen;
 
 	if (m_msgLength != m_msgBuffer.size())
 	{
-		Utility::MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
+		MemUtils::Clear(m_msgBuffer, m_msgLength, m_msgBuffer.size() - m_msgLength);
 	}
 
 	outLen = Output.size() - OutOffset;
@@ -136,9 +145,13 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 void KMAC::Initialize(ISymmetricKey &KeyParams)
 {
-	if (KeyParams.Key().size() == 0)
+	if (KeyParams.Key().size() < MIN_KEYSIZE)
 	{
 		throw CryptoMacException("KMAC:Initialize", "Key size is too small; should be a minimum of digest output size!");
+	}
+	if (KeyParams.Info().size() > m_blockSize)
+	{
+		throw CryptoMacException("KMAC:Initialize", "The customization string must be less than or equal to the blocksize!");
 	}
 
 	size_t keyLen = KeyParams.Key().size();
@@ -164,7 +177,6 @@ void KMAC::Reset()
 	MemUtils::Clear(m_kdfState, 0, STATE_SIZE * sizeof(ulong));
 	MemUtils::Clear(m_msgBuffer, 0, BUFFER_SIZE);
 	m_msgLength = 0;
-
 	m_isInitialized = false;
 }
 
@@ -176,8 +188,14 @@ void KMAC::Update(byte Input)
 
 void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "The Mac is not initialized!");
-	CexAssert((InOffset + Length) <= Input.size(), "The Input buffer is too short!");
+	if (!m_isInitialized)
+	{
+		throw CryptoMacException("KMAC:Update", "The generator has not been initialized!");
+	}
+	if ((Input.size() - InOffset) < Length)
+	{
+		throw CryptoMacException("KMAC:Update", "The Input buffer is too short!");
+	}
 
 	if (Length != 0)
 	{
@@ -186,7 +204,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 			const size_t RMDLEN = m_blockSize - m_msgLength;
 			if (RMDLEN != 0)
 			{
-				Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
+				MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
 			AbsorbBlock(m_msgBuffer, 0, m_blockSize, m_kdfState);
@@ -208,7 +226,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 		// store unaligned bytes
 		if (Length != 0)
 		{
-			Utility::MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
+			MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, Length);
 			m_msgLength += Length;
 		}
 	}
@@ -237,7 +255,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
+					m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 				}
 
 				Permute(m_kdfState);
@@ -253,13 +271,13 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 
 	if (Customization.size() != 0)
 	{
-		for (i = 0; i < Customization.size(); i++)
+		for (i = 0; i < Customization.size(); ++i)
 		{
 			if (offset == m_blockSize)
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
+					m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 				}
 
 				Permute(m_kdfState);
@@ -302,7 +320,7 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 			{
 				for (size_t i = 0; i < BUFFER_SIZE; i += 8)
 				{
-					m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
+					m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 				}
 
 				Permute(m_kdfState);

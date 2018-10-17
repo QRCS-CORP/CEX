@@ -2,9 +2,12 @@
 #define CEXTEST_AESAVSTEST_H
 
 #include "ITest.h"
+#include "../CEX/IBlockCipher.h"
 
 namespace Test
 {
+	using Cipher::Symmetric::Block::IBlockCipher;
+
     /// <summary>
     /// Tests the Rijndael implementation using the NIST AESAVS vectors.
     /// <para>Using vector sets from: AESAVS certification package: <see href="http://csrc.nist.gov/groups/STM/cavp/documents/aes/AESAVS.pdf"/></para>
@@ -22,15 +25,19 @@ namespace Test
 
     public:
 
+		//~~~Constructor~~~//
+
 		/// <summary>
 		/// NIST AESAVS known answer vector tests
 		/// </summary>
-		explicit AesAvsTest(bool TestNI = false);
+		explicit AesAvsTest(bool TestAesNi = false);
 
 		/// <summary>
 		/// Destructor
 		/// </summary>
 		~AesAvsTest();
+
+		//~~~Accessors~~~//
 
 		/// <summary>
 		/// Get: The test description
@@ -49,10 +56,7 @@ namespace Test
         
     private:
 
-		void CompareOutput(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
-#if defined(__AVX__)
-		void CompareVectorNI(std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
-#endif
+		void Compare(IBlockCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Input, std::vector<byte> &Output);
 		void OnProgress(std::string Data);
     };
 }

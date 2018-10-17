@@ -18,9 +18,28 @@ CryptoException::CryptoException(const std::string &Origin, const std::string &M
 {
 }
 
+CryptoException::CryptoException(const std::string &Origin, const std::string &Message, ErrorCodes ErrorCode)
+	:
+	m_details(""),
+	m_error(ErrorCode),
+	m_message(Message),
+	m_origin(Origin)
+{
+}
+
 CryptoException::CryptoException(const std::string &Origin, const std::string &Message, const std::string &Detail)
 	:
 	m_details(Detail),
+	m_error(ErrorCodes::None),
+	m_message(Message),
+	m_origin(Origin)
+{
+}
+
+CryptoException::CryptoException(const std::string &Origin, const std::string &Message, const std::string &Detail, ErrorCodes ErrorCode)
+	:
+	m_details(Detail),
+	m_error(ErrorCode),
 	m_message(Message),
 	m_origin(Origin)
 {
@@ -29,6 +48,7 @@ CryptoException::CryptoException(const std::string &Origin, const std::string &M
 CryptoException::~CryptoException()
 {
 	m_details.clear();
+	m_error = ErrorCodes::None;
 	m_message.clear();
 	m_origin.clear();
 }
@@ -36,6 +56,11 @@ CryptoException::~CryptoException()
 std::string &CryptoException::Details()
 {
 	return m_details;
+}
+
+ErrorCodes &CryptoException::ErrorCode()
+{
+	return m_error;
 }
 
 std::string &CryptoException::Message()

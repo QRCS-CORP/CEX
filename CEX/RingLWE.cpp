@@ -18,7 +18,7 @@ RingLWE::RingLWE(RLWEParams Parameters, Prngs PrngType)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_rlweParameters(Parameters != RLWEParams::None ? Parameters :
+	m_rlweParameters(Parameters != RLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(RLWEParams::Q12289N2048) ? Parameters :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The prng type can not be none!"))
@@ -32,7 +32,7 @@ RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng)
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_rlweParameters(Parameters != RLWEParams::None ? Parameters :
+	m_rlweParameters(Parameters != RLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(RLWEParams::Q12289N2048) ? Parameters :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The prng can not be null!"))
@@ -109,9 +109,9 @@ const std::string RingLWE::Name()
 	{
 		ret += "Q12289N1024";
 	}
-	else
+	else if (m_rlweParameters == RLWEParams::Q12289N2048)
 	{
-		ret += "UNKNOWN";
+		ret += "Q12289N2048";
 	}
 
 	return ret;

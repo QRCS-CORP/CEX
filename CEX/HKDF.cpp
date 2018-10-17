@@ -9,16 +9,16 @@ const std::string HKDF::CLASS_NAME("HKDF");
 
 //~~~Constructor~~~//
 
-HKDF::HKDF(Digests DigestType)
+HKDF::HKDF(SHA2Digests DigestType)
 	:
-	m_macGenerator(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? new HMAC(DigestType) :
+	m_macGenerator(DigestType != SHA2Digests::None ? new HMAC(DigestType) :
 		throw CryptoKdfException("HKDF:Ctor", "The digest type is not supported!")),
 	m_blockSize(m_macGenerator->BlockSize()),
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),
 	m_kdfCounter(0),
-	m_kdfDigestType(DigestType),
+	m_kdfDigestType(static_cast<Digests>(DigestType)),
 	m_kdfInfo(0),
 	m_kdfState(m_macGenerator->MacSize()),
 	m_legalKeySizes(0),
@@ -118,7 +118,7 @@ std::vector<SymmetricKeySize> HKDF::LegalKeySizes() const
 	return m_legalKeySizes; 
 };
 
-size_t HKDF::MinKeySize() 
+const size_t HKDF::MinKeySize() 
 {
 	return m_macSize; 
 }
@@ -132,9 +132,10 @@ const std::string HKDF::Name()
 
 size_t HKDF::Generate(std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
-
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("HKDF:Generate", "The generator has not been initialized!");
+	}
 	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
 	{
 		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
@@ -145,10 +146,15 @@ size_t HKDF::Generate(std::vector<byte> &Output)
 
 size_t HKDF::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
-
-	if (m_kdfCounter + (Length / m_macSize) > 255)
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("HKDF:Generate", "The generator has not been initialized!");
+	}
+	if (Output.size() - OutOffset < Length)
+	{
+		throw CryptoKdfException("HKDF:Generate", "The output buffer is too short!");
+	}
+	if (m_kdfCounter + (Output.size() / m_macSize) > 255)
 	{
 		throw CryptoKdfException("HKDF:Generate", "HKDF may only be used for 255 * HashLen bytes of output");
 	}

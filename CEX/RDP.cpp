@@ -42,8 +42,10 @@ const std::string RDP::Name()
 
 void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 {
-	CexAssert(Offset + Length <= Output.size(), "the array is too small to fulfill this request");
-
+	if ((Output.size() - Offset) < Length)
+	{
+		throw CryptoRandomException("RDP:Generate", "The output buffer is too small!");
+	}
 	if (m_engineType == RdEngines::None)
 	{
 		throw CryptoRandomException("RDP:Generate", "Random provider is not available!");
@@ -52,7 +54,7 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException("RDP:Generate", "The seed providers maximum output is 64MB per request!");
 	}
-
+	 
 	int res = 0;
 	size_t failCtr = 0;
 

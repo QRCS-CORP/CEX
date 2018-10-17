@@ -52,18 +52,17 @@ namespace Test
 			// providers
 			//CJPGenerateFile(FILEPATH + "cjp_10mb.txt", FILESIZE); // can take an hour or more!
 			//OnProgress(std::string("CPU Jitter Provider completed.."));
-			CSPGenerateFile(FILEPATH + "csp_10mb.txt", FILESIZE);
+			CSPGenerateFile(FILEPATH + std::string("csp_10mb.txt"), FILESIZE);
 			OnProgress(std::string("System Crypto Service Provider completed.."));
-			ECPGenerateFile(FILEPATH + "ecp_10mb.txt", FILESIZE);
+			ECPGenerateFile(FILEPATH + std::string("ecp_10mb.txt"), FILESIZE);
 			OnProgress(std::string("Entropy Collection Provider completed.."));
-			RDPGenerateFile(FILEPATH + "rdp_10mb.txt", FILESIZE);
+			RDPGenerateFile(FILEPATH + std::string("rdp_10mb.txt"), FILESIZE);
 			OnProgress(std::string("RDSeed Provider completed.."));
-
 			// drbg's
-			CMGGenerateFile(FILEPATH + "cmg_10mb.txt", FILESIZE);
+			CMGGenerateFile(FILEPATH + std::string("cmg_10mb.txt"), FILESIZE);
 			OnProgress(std::string("Counter Mode Generator completed.."));
 			OnProgress(std::string("Digest Counter Generator completed.."));
-			HMGGenerateFile(FILEPATH + "hmg_10mb.txt", FILESIZE);
+			HMGGenerateFile(FILEPATH + std::string("hmg_10mb.txt"), FILESIZE);
 			OnProgress(std::string("Hash based Mac Generator completed.."));
 
 			OnProgress(std::string("Passed Finalize/Compute methods output comparison.."));
@@ -84,7 +83,7 @@ namespace Test
 	{
 		using namespace Cipher::Symmetric::Block;
 
-		Kdf::HKDF* kdf = new Kdf::HKDF(Enumeration::Digests::SHA256);
+		Kdf::HKDF* kdf = new Kdf::HKDF(Enumeration::SHA2Digests::SHA256);
 #if defined(__AVX__)
 		AHX* cpr = new AHX(BlockCipherExtensions::HKDF256);
 #else

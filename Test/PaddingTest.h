@@ -23,6 +23,8 @@ namespace Test
 
 	public:
 
+		//~~~Constructor~~~//
+
 		/// <summary>
 		/// Compares padding modes for valid output
 		/// </summary>
@@ -32,6 +34,8 @@ namespace Test
 		/// Destructor
 		/// </summary>
 		~PaddingTest();
+
+		//~~~Accessors~~~//
 
 		/// <summary>
 		/// Get: The test description
@@ -43,6 +47,8 @@ namespace Test
 		/// </summary>
 		TestEventHandler &Progress() override;
 
+		//~~~Public Functions~~~//
+
 		/// <summary>
 		/// Start the tests
 		/// </summary>
@@ -50,7 +56,7 @@ namespace Test
 
 	private:
 
-		void CompareOutput(Padding::IPadding* Padding);
+		void Compare(Padding::IPadding* Padding);
 		void OnProgress(std::string Data);
 	};
 }

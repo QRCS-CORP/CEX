@@ -52,6 +52,10 @@ Keccak256::Keccak256(KeccakParams &Params)
 	{
 		throw CryptoDigestException("Keccak256::Ctor", "Cpu does not support parallel processing!");
 	}
+	if (m_parallelProfile.IsParallel() && m_treeParams.FanOut() > m_parallelProfile.ParallelMaxDegree())
+	{
+		throw CryptoDigestException("Keccak256::Ctor", "The tree parameters are invalid!");
+	}
 
 	if (m_treeParams.FanOut() > 1 && m_parallelProfile.IsParallel())
 	{
@@ -221,11 +225,13 @@ size_t Keccak256::Finalize(std::vector<byte> &Output, size_t OutOffset)
 
 void Keccak256::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoDigestException("Keccak256::ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
+
 	Reset();
 }
 

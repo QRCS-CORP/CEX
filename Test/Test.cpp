@@ -140,9 +140,10 @@
 #include "../CEX/CpuDetect.h"
 #include "../Test/TestFiles.h"
 #include "../Test/TestUtils.h"
-#include "../Test/AEADTest.h"
+#include "../Test/ACPTest.h"
+#include "../Test/AeadTest.h"
 #include "../Test/AesAvsTest.h"
-#include "../Test/AesFipsTest.h"
+#include "../Test/RijndaelTest.h"
 #include "../Test/AsymmetricSpeedTest.h"
 #include "../Test/BCGTest.h"
 #include "../Test/Blake2Test.h"
@@ -150,19 +151,21 @@
 #include "../Test/CipherModeTest.h"
 #include "../Test/CipherSpeedTest.h"
 #include "../Test/CipherStreamTest.h"
+#include "../Test/CJPTest.h"
 #include "../Test/CMACTest.h"
 #include "../Test/ConsoleUtils.h"
 #include "../Test/CSGTest.h"
+#include "../Test/CSPTest.h"
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
+#include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/KDF2Test.h"
 #include "../Test/KeccakTest.h"
 #include "../Test/KMACTest.h"
 #include "../Test/HKDFTest.h"
 #include "../Test/HMACTest.h"
-#include "../Test/HMGTest.h"
-#include "../Test/HXCipherTest.h"
+#include "../Test/HCGTest.h"
 #include "../Test/ITest.h"
 #include "../Test/MacStreamTest.h"
 #include "../Test/McElieceTest.h"
@@ -173,9 +176,8 @@
 #include "../Test/ParallelModeTest.h"
 #include "../Test/PBKDF2Test.h"
 #include "../Test/Poly1305Test.h"
-#include "../Test/PrngTest.h"
 #include "../Test/RandomOutputTest.h"
-#include "../Test/RijndaelTest.h"
+#include "../Test/RDPTest.h"
 #include "../Test/RingLWETest.h"
 #include "../Test/SCRYPTTest.h"
 #include "../Test/SecureStreamTest.h"
@@ -253,12 +255,12 @@ bool CanTest(std::string Message)
 {
 	ConsoleUtils::WriteLine(Message);
 	std::string resp = GetResponse();
-	std::transform(resp.begin(), resp.end(), resp.begin(), ::toupper);
 
-	const std::string CONFIRM = "Y";
+	const std::string CONFIRM = "y";
+	const std::string CONFIRML = "Y";
 	bool state = false;
 
-	if (resp.find(CONFIRM) != std::string::npos)
+	if (resp.find(CONFIRM) != std::string::npos || resp.find(CONFIRML) != std::string::npos)
 	{
 		state = true;
 	}
@@ -289,9 +291,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.6: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("*                                             *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.6d (A6)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.6f (A6)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      September 25, 2018               *");
+	ConsoleUtils::WriteLine("* Date:      October 17, 2018                 *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -304,7 +306,7 @@ void CloseApp()
 	exit(0);
 }
 
-void RunTest(Test::ITest* Test)
+void RunTest(ITest* Test)
 {
 	try
 	{
@@ -341,10 +343,8 @@ void RunTest(Test::ITest* Test)
 
 		std::string resp;
 		std::getline(std::cin, resp);
-		std::transform(resp.begin(), resp.end(), resp.begin(), ::toupper);
-		const std::string CONTINUE = "Y";
 
-		if (resp.find(CONTINUE) == std::string::npos)
+		if (CanTest(resp))
 		{
 			CloseApp();
 		}
@@ -354,7 +354,7 @@ void RunTest(Test::ITest* Test)
 int main()
 {
 	bool hasAes;
-	bool hasAvs;
+	bool hasAvx;
 	bool hasAvx2;
 	bool isx86emu;
 	bool is64;
@@ -392,7 +392,7 @@ int main()
 	}
 
 	hasAes = false;
-	hasAvs = false;
+	hasAvx = false;
 	hasAvx2 = false;
 	isx86emu = false;
 	is64 = false;
@@ -402,7 +402,7 @@ int main()
 		Common::CpuDetect detect;
 
 		hasAes = detect.AESNI();
-		hasAvs = detect.AVX();
+		hasAvx = detect.AVX();
 		hasAvx2 = detect.AVX2();
 		isx86emu = detect.IsX86Emulation();
 		is64 = detect.IsX64();
@@ -445,7 +445,7 @@ int main()
 		PrintHeader("AVX2 intrinsics support has been enabled.");
 #endif
 	}
-	else if (hasAvs)
+	else if (hasAvx)
 	{
 #if defined(__AVX2__)
 		PrintHeader("AVX2 is not supported on this system! AVX intrinsics support is available, set enable enhanced instruction set to arch:AVX");
@@ -484,20 +484,17 @@ int main()
 			if (hasAes)
 			{
 				PrintHeader("Testing the AES-NI implementation (AHX)");
-				RunTest(new AesFipsTest(true));
+				RunTest(new RijndaelTest(true));
 			}
 
 			PrintHeader("Testing the AES software implementation (RHX)");
-			RunTest(new AesFipsTest());
 			RunTest(new RijndaelTest());
 			PrintHeader("Testing the Serpent software implementation (SHX)");
 			RunTest(new SerpentTest());
-			PrintHeader("TESTING HX EXTENDED CIPHERS");
-			RunTest(new HXCipherTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER MODES");
 			RunTest(new CipherModeTest());
 			PrintHeader("TESTING SYMMETRIC CIPHER AEAD MODES");
-			RunTest(new AEADTest());
+			RunTest(new AeadTest());
 			PrintHeader("TESTING PARALLEL CIPHER MODES");
 			RunTest(new ParallelModeTest());
 			PrintHeader("TESTING CIPHER PADDING MODES");
@@ -521,7 +518,11 @@ int main()
 			RunTest(new KMACTest());
 			RunTest(new Poly1305Test());
 			PrintHeader("TESTING PSEUDO RANDOM NUMBER GENERATORS");
-			RunTest(new PrngTest());
+			RunTest(new ACPTest());
+			RunTest(new CJPTest());
+			RunTest(new CSPTest());
+			RunTest(new ECPTest());
+			RunTest(new RDPTest());
 			PrintHeader("TESTING KEY DERIVATION FUNCTIONS");
 			RunTest(new HKDFTest());
 			RunTest(new KDF2Test());
@@ -531,7 +532,7 @@ int main()
 			PrintHeader("TESTING DETERMINISTIC RANDOM BYTE GENERATORS");
 			RunTest(new BCGTest());
 			RunTest(new CSGTest());
-			RunTest(new HMGTest());
+			RunTest(new HCGTest());
 			PrintHeader("TESTING KEY GENERATOR AND SECURE KEYS");
 			RunTest(new SymmetricKeyGeneratorTest());
 			RunTest(new SecureStreamTest());

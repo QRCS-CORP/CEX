@@ -5,9 +5,13 @@
 #include "IntUtils.h"
 #include "ParallelUtils.h"
 #include "ProviderFromName.h"
+#include "SHA2Digests.h"
 #include "SymmetricKey.h"
 
 NAMESPACE_DRBG
+
+using Utility::IntUtils;
+using Utility::MemUtils;
 
 const std::string BCG::CLASS_NAME("BCG");
 
@@ -88,10 +92,10 @@ BCG::~BCG()
 		m_secStrength = 0;
 		m_seedSize = 0;
 
-		Utility::IntUtils::ClearVector(m_ctrVector);
-		Utility::IntUtils::ClearVector(m_distCode);
-		Utility::IntUtils::ClearVector(m_distCode);
-		Utility::IntUtils::ClearVector(m_legalKeySizes);
+		IntUtils::ClearVector(m_ctrVector);
+		IntUtils::ClearVector(m_distCode);
+		IntUtils::ClearVector(m_distCode);
+		IntUtils::ClearVector(m_legalKeySizes);
 
 		if (m_destroyEngine)
 		{
@@ -218,8 +222,14 @@ size_t BCG::Generate(std::vector<byte> &Output)
 
 size_t BCG::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "The generator must be initialized before use!");
-	CexAssert((Output.size() - Length) >= OutOffset, "Output buffer too small!");
+	if (!m_isInitialized)
+	{
+		throw CryptoGeneratorException("BCG:Generate", "The generator must be initialized before use!");
+	}
+	if ((Output.size() - OutOffset) < Length)
+	{
+		throw CryptoGeneratorException("BCG:Generate", "The output buffer is too small!");
+	}
 
 	GenerateBlock(Output, OutOffset, Length);
 
@@ -280,13 +290,13 @@ void BCG::Initialize(const std::vector<byte> &Seed)
 	}
 
 	// counter is always left-most bytes
-	Utility::MemUtils::Copy(Seed, 0, m_ctrVector, 0, BLOCK_SIZE);
+	MemUtils::Copy(Seed, 0, m_ctrVector, 0, BLOCK_SIZE);
 	// initialize the block cipher
 	size_t keyLen = Seed.size() - BLOCK_SIZE;
 	// security upper bound is 256, could actually be more depending on cipher configuration
 	m_secStrength = (keyLen >= 32) ? 256 : keyLen * 8;
 	std::vector<byte> key(keyLen);
-	Utility::MemUtils::Copy(Seed, BLOCK_SIZE, key, 0, keyLen);
+	MemUtils::Copy(Seed, BLOCK_SIZE, key, 0, keyLen);
 	m_blockCipher->Initialize(true, Key::Symmetric::SymmetricKey(key));
 	m_isInitialized = true;
 }
@@ -297,11 +307,11 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 	if (Nonce.size() > 0)
 	{
-		Utility::MemUtils::Copy(Nonce, 0, key, 0, Nonce.size());
+		MemUtils::Copy(Nonce, 0, key, 0, Nonce.size());
 	}
 	if (Seed.size() > 0)
 	{
-		Utility::MemUtils::Copy(Seed, 0, key, Nonce.size(), Seed.size());
+		MemUtils::Copy(Seed, 0, key, Nonce.size(), Seed.size());
 	}
 
 	Initialize(key);
@@ -313,12 +323,12 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 	if (Nonce.size() > 0)
 	{
-		Utility::MemUtils::Copy(Nonce, 0, key, 0, Nonce.size());
+		MemUtils::Copy(Nonce, 0, key, 0, Nonce.size());
 	}
 
 	if (Seed.size() > 0)
 	{
-		Utility::MemUtils::Copy(Seed, 0, key, Nonce.size(), Seed.size());
+		MemUtils::Copy(Seed, 0, key, Nonce.size(), Seed.size());
 	}
 
 	if (Info.size() > 0)
@@ -338,7 +348,7 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 			{
 				// info is too large; size to optimal max, ignore remainder
 				std::vector<byte> tmpInfo(m_blockCipher->DistributionCodeMax());
-				Utility::MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
+				MemUtils::Copy(Info, 0, tmpInfo, 0, tmpInfo.size());
 				m_distCode = tmpInfo;
 				m_blockCipher->DistributionCode() = m_distCode;
 			}
@@ -350,9 +360,10 @@ void BCG::Initialize(const std::vector<byte> &Seed, const std::vector<byte> &Non
 
 void BCG::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed profile processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoGeneratorException("BCG::ParallelMaxDegree", "Degree setting is invalid!");
+	}
 
 	m_parallelProfile.SetMaxDegree(Degree);
 }
@@ -372,7 +383,7 @@ void BCG::Update(const std::vector<byte> &Seed)
 void BCG::Derive(std::vector<byte> &Seed)
 {
 	// size the salt for max unpadded hash size; subtract counter and hash finalizer code lengths
-	Kdf::KDF2 gen(Enumeration::Digests::SHA256);
+	Kdf::KDF2 gen(Enumeration::SHA2Digests::SHA256);
 	SymmetricKeySize ks = gen.LegalKeySizes()[1];
 	size_t saltLen = ks.KeySize();
 	std::vector<byte> salt(saltLen);
@@ -405,18 +416,18 @@ void BCG::GenerateBlock(std::vector<byte> &Output, size_t OutOffset, size_t Leng
 			// thread level counter
 			std::vector<byte> thdCtr(m_ctrVector.size());
 			// offset counter by chunk size / block size  
-			Utility::IntUtils::BeIncrease8(m_ctrVector, thdCtr, CTRLEN * i);
+			IntUtils::BeIncrease8(m_ctrVector, thdCtr, CTRLEN * i);
 			// generate random at output offset
 			this->Transform(Output, OutOffset + (i * CNKLEN), CNKLEN, thdCtr);
 			// store last counter
 			if (i == m_parallelProfile.ParallelMaxDegree() - 1)
 			{
-				Utility::MemUtils::Copy(thdCtr, 0, tmpCtr, 0, tmpCtr.size());
+				MemUtils::Copy(thdCtr, 0, tmpCtr, 0, tmpCtr.size());
 			}
 		});
 
 		// copy last counter to class variable
-		Utility::MemUtils::Copy(tmpCtr, 0, m_ctrVector, 0, m_ctrVector.size());
+		MemUtils::Copy(tmpCtr, 0, m_ctrVector, 0, m_ctrVector.size());
 		// last block processing
 		const size_t ALNLEN = CNKLEN * m_parallelProfile.ParallelMaxDegree();
 
@@ -442,38 +453,38 @@ void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		// stagger counters and process 8 blocks with avx
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 16);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 32);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 48);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 64);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 80);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 96);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 112);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 128);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 144);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 160);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 176);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 192);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 208);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 224);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 240);
-			Utility::IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 0);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 16);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 32);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 48);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 64);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 80);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 96);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 112);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 128);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 144);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 160);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 176);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 192);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 208);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 224);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 240);
+			IntUtils::BeIncrement8(Counter);
 			m_blockCipher->Transform2048(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX512BLK;
 		}
@@ -488,22 +499,22 @@ void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		// stagger counters and process 8 blocks with avx
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 16);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 32);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 48);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 64);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 80);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 96);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 112);
-			Utility::IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 0);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 16);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 32);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 48);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 64);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 80);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 96);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 112);
+			IntUtils::BeIncrement8(Counter);
 			m_blockCipher->Transform1024(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVX2BLK;
 		}
@@ -518,14 +529,14 @@ void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		// 4 blocks with sse
 		while (blkCtr != PBKALN)
 		{
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 0);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 16);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 32);
-			Utility::IntUtils::BeIncrement8(Counter);
-			Utility::MemUtils::COPY128(Counter, 0, ctrBlk, 48);
-			Utility::IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 0);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 16);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 32);
+			IntUtils::BeIncrement8(Counter);
+			MemUtils::COPY128(Counter, 0, ctrBlk, 48);
+			IntUtils::BeIncrement8(Counter);
 			m_blockCipher->Transform512(ctrBlk, 0, Output, OutOffset + blkCtr);
 			blkCtr += AVXBLK;
 		}
@@ -536,7 +547,7 @@ void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 	while (blkCtr != BLKALN)
 	{
 		m_blockCipher->EncryptBlock(Counter, 0, Output, OutOffset + blkCtr);
-		Utility::IntUtils::BeIncrement8(Counter);
+		IntUtils::BeIncrement8(Counter);
 		blkCtr += BLOCK_SIZE;
 	}
 
@@ -545,8 +556,8 @@ void BCG::Transform(std::vector<byte> &Output, const size_t OutOffset, const siz
 		std::vector<byte> outputBlock(BLOCK_SIZE);
 		m_blockCipher->EncryptBlock(Counter, outputBlock);
 		const size_t FNLLEN = Length % BLOCK_SIZE;
-		Utility::MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
-		Utility::IntUtils::BeIncrement8(Counter);
+		MemUtils::Copy(outputBlock, 0, Output, OutOffset + (Length - FNLLEN), FNLLEN);
+		IntUtils::BeIncrement8(Counter);
 	}
 }
 

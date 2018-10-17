@@ -92,7 +92,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("DigestStreamTest: Expected hash is not equal!");
+			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
 		}
 
 		// test byte access method
@@ -101,7 +101,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("DigestStreamTest: Expected hash is not equal!");
+			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
 		}
 	}
 
@@ -114,7 +114,7 @@ namespace Test
 		SymmetricKey kp(key);
 
 		// digest instance for baseline
-		Mac::HMAC* eng = new Mac::HMAC(Enumeration::Digests::SHA256);
+		Mac::HMAC* eng = new Mac::HMAC(Enumeration::SHA2Digests::SHA256);
 		size_t macSze = eng->MacSize();
 		std::vector<byte> hash1(macSze);
 		eng->Initialize(kp);
@@ -130,7 +130,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("DigestStreamTest: Expected hash is not equal!");
+			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
 		}
 
 		// test byte access method
@@ -139,7 +139,7 @@ namespace Test
 
 		if (hash1 != hash2)
 		{
-			throw TestException("DigestStreamTest: Expected hash is not equal!");
+			throw TestException(std::string("DigestStreamTest: Expected hash is not equal!"));
 		}
 	}
 
@@ -163,7 +163,7 @@ namespace Test
 
 		if (c1 != c2)
 		{
-			throw TestException("MacStreamTest: CMAC code arrays are not equal!");
+			throw TestException(std::string("MacStreamTest: CMAC code arrays are not equal!"));
 		}
 	}
 
@@ -172,7 +172,7 @@ namespace Test
 		Prng::SecureRandom rng;
 		std::vector<byte> data = rng.Generate(rng.NextUInt32(400, 100));
 		std::vector<byte> key = rng.Generate(64);
-		Mac::HMAC mac(Enumeration::Digests::SHA256);
+		Mac::HMAC mac(Enumeration::SHA2Digests::SHA256);
 		SymmetricKey kp(key);
 		mac.Initialize(kp);
 		std::vector<byte> c1(mac.MacSize());
@@ -188,7 +188,7 @@ namespace Test
 
 		if (c1 != c2)
 		{
-			throw TestException("MacStreamTest: HMAC code arrays are not equal!");
+			throw TestException(std::string("MacStreamTest: HMAC code arrays are not equal!"));
 		}
 	}
 

@@ -40,6 +40,8 @@ namespace Test
 	const std::string ThreefishTest::FAILURE = "ThreefishTest: Test Failure!";
 	const std::string ThreefishTest::SUCCESS = "SUCCESS! All Threefish tests have executed succesfully.";
 
+	//~~~Constructor~~~//
+
 	ThreefishTest::ThreefishTest()
 		:
 		m_expected(0),
@@ -51,7 +53,11 @@ namespace Test
 
 	ThreefishTest::~ThreefishTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_message);
 	}
+
+	//~~~Accessors~~~//
 
 	const std::string ThreefishTest::Description()
 	{
@@ -63,6 +69,8 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string ThreefishTest::Run()
 	{
 		try
@@ -71,23 +79,23 @@ namespace Test
 			Threefish256* cpr256b = new Threefish256();
 
 			Authentication(cpr256a);
-			OnProgress(std::string("Passed Threefish-256 MAC authentication tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 MAC authentication tests.."));
 
 			Exception(cpr256b);
-			OnProgress(std::string("Passed Threefish-256 exception handling tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 exception handling tests.."));
 
 			Kat(cpr256a, m_message[0], m_expected[0]);
 			Kat(cpr256b, m_message[0], m_expected[1]);
-			OnProgress(std::string("Passed Threefish-256 known answer tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer tests.."));
 
 			Parallel(cpr256b);
-			OnProgress(std::string("Passed Threefish-256 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 parallel to sequential equivalence test.."));
 
-			Permutation256();
-			OnProgress(std::string("Passed Threefish-256 permutation variants equivalence test.."));
+			CompareP256();
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 permutation variants equivalence test.."));
 
 			Stress(cpr256b);
-			OnProgress(std::string("Passed Threefish-256 stress and fuzz tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256stress tests.."));
 
 			delete cpr256a;
 			delete cpr256b;
@@ -96,23 +104,23 @@ namespace Test
 			Threefish512* cpr512b = new Threefish512();
 
 			Authentication(cpr512a);
-			OnProgress(std::string("Passed Threefish-512 MAC authentication tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 MAC authentication tests.."));
 
 			Exception(cpr512b);
-			OnProgress(std::string("Passed Threefish-512 exception handling tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 exception handling tests.."));
 
 			Kat(cpr512a, m_message[1], m_expected[2]);
 			Kat(cpr512b, m_message[1], m_expected[3]);
-			OnProgress(std::string("Passed Threefish-512 known answer tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer tests.."));
 
 			Parallel(cpr512b);
-			OnProgress(std::string("Passed Threefish-512 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 parallel to sequential equivalence test.."));
 
-			Permutation512();
-			OnProgress(std::string("Passed Threefish-512 permutation variants equivalence test.."));
+			CompareP512();
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 permutation variants equivalence test.."));
 
 			Stress(cpr512b);
-			OnProgress(std::string("Passed Threefish-512 stress and fuzz tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512stress tests.."));
 
 			delete cpr512a;
 			delete cpr512b;
@@ -121,23 +129,23 @@ namespace Test
 			Threefish1024* cpr1024b = new Threefish1024();
 
 			Authentication(cpr1024a);
-			OnProgress(std::string("Passed Threefish-1024 MAC authentication tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 MAC authentication tests.."));
 
 			Exception(cpr1024b);
-			OnProgress(std::string("Passed Threefish-1024 exception handling tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 exception handling tests.."));
 
 			Kat(cpr1024a, m_message[2], m_expected[4]);
 			Kat(cpr1024b, m_message[2], m_expected[5]);
-			OnProgress(std::string("Passed Threefish-1024 known answer tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer tests.."));
 
 			Parallel(cpr1024b);
-			OnProgress(std::string("Passed Threefish-1024 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 parallel to sequential equivalence test.."));
 
-			Permutation1024();
-			OnProgress(std::string("Passed Threefish-1024 permutation variants equivalence test.."));
+			Compare1024();
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 permutation variants equivalence test.."));
 
 			Stress(cpr1024b);
-			OnProgress(std::string("Passed Threefish-1024 stress and fuzz tests.."));
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024stress tests.."));
 
 			delete cpr1024a;
 			delete cpr1024b;
@@ -168,7 +176,6 @@ namespace Test
 		SecureRandom rnd;
 		size_t i;
 		size_t j;
-		size_t k;
 
 		cpt.reserve(MAXSMP + MACLEN);
 		inp.reserve(MAXSMP);
@@ -201,17 +208,220 @@ namespace Test
 			// use constant time IntUtils::Compare to verify mac
 			if (!IntUtils::Compare(mac, 0, cpt, INPLEN, MACLEN))
 			{
-				throw TestException("Authentication: MAC output is not equal! -TA2");
+				throw TestException(std::string("Authentication: MAC output is not equal! -TA2"));
 			}
 
 			for (j = 0; j < INPLEN; ++j)
 			{
 				if (inp[j] != otp[j])
 				{
-					throw TestException("Authentication: MAC output is not equal! -TA3");
+					throw TestException(std::string("Authentication: MAC output is not equal! -TA3"));
 				}
 			}
 		}
+	}
+
+	void ThreefishTest::CompareP256()
+	{
+		std::array<ulong, 2> counter{ 128, 1 };
+		std::array<ulong, 4> key;
+		std::array<ulong, 2> tweak;
+		std::array<ulong, 4> state1;
+		std::array<ulong, 4> state2;
+		SecureRandom rnd;
+
+		IntUtils::Fill(key, 0, 4, rnd);
+		IntUtils::Fill(tweak, 0, 2, rnd);
+		MemUtils::Clear(state1, 0, 4 * sizeof(ulong));
+		MemUtils::Clear(state2, 0, 4 * sizeof(ulong));
+
+		Threefish::PemuteP256C(key, counter, tweak, state1, 72);
+		Threefish::PemuteR72P256U(key, counter, tweak, state2);
+
+		if (state1 != state2)
+		{
+			throw TestException(std::string("Permutation256: Permutation output is not equal! -TP1"));
+		}
+
+#if defined(__AVX2__)
+
+		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::array<ulong, 16> state3;
+
+		MemUtils::Clear(state3, 0, 16 * sizeof(ulong));
+
+		Threefish::PemuteP4x256H(key, counter8, tweak, state3, 72);
+
+		for (size_t i = 0; i < 16; i += 4)
+		{
+			for (size_t j = 0; j < 4; ++j)
+			{
+				if (state3[i + j] != state1[j])
+				{
+					throw TestException(std::string("Permutation256: Permutation output is not equal! -TP2"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<ulong, 32> state4;
+
+		MemUtils::Clear(state4, 0, 32 * sizeof(ulong));
+
+		Threefish::PemuteP4x512H(key, counter16, tweak, state4, 72);
+
+		for (size_t i = 0; i < 32; i += 8)
+		{
+			for (size_t j = 0; j < 8; ++j)
+			{
+				if (state3[i + j] != state1[j])
+				{
+					throw TestException(std::string("Permutation256: Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#endif
+	}
+
+	void ThreefishTest::CompareP512()
+	{
+		std::array<ulong, 2> counter{ 128, 1 };
+		std::array<ulong, 8> key;
+		std::array<ulong, 2> tweak;
+		std::array<ulong, 8> state1;
+		std::array<ulong, 8> state2;
+		SecureRandom rnd;
+
+		IntUtils::Fill(key, 0, 8, rnd);
+		IntUtils::Fill(tweak, 0, 2, rnd);
+		MemUtils::Clear(state1, 0, 8 * sizeof(ulong));
+		MemUtils::Clear(state2, 0, 8 * sizeof(ulong));
+
+		Threefish::PemuteP512C(key, counter, tweak, state1, 96);
+		Threefish::PemuteR96P512U(key, counter, tweak, state2);
+
+		if (state1 != state2)
+		{
+			throw TestException(std::string("Permutation512: Permutation output is not equal! -TP1"));
+		}
+
+#if defined(__AVX2__)
+
+		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::array<ulong, 32> state3;
+
+		MemUtils::Clear(state3, 0, 32 * sizeof(ulong));
+
+		Threefish::PemuteP4x512H(key, counter8, tweak, state3, 96);
+
+		for (size_t i = 0; i < 32; i += 8)
+		{
+			for (size_t j = 0; j < 8; ++j)
+			{
+				if (state3[i + j] != state1[j])
+				{
+					throw TestException(std::string("Permutation512: Permutation output is not equal! -TP2"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<ulong, 64> state4;
+
+		MemUtils::Clear(state4, 0, 64 * sizeof(ulong));
+
+		Threefish::PemuteP8x512H(key, counter16, tweak, state4, 96);
+
+		for (size_t i = 0; i < 64; i += 16)
+		{
+			for (size_t j = 0; j < 16; ++j)
+			{
+				if (state3[i + j] != state1[j])
+				{
+					throw TestException(std::string("Permutation512: Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#endif
+
+	}
+
+	void ThreefishTest::Compare1024()
+	{
+		std::array<ulong, 2> counter{ 128, 1 };
+		std::array<ulong, 16> key;
+		std::array<ulong, 2> tweak;
+		std::array<ulong, 16> state1;
+		std::array<ulong, 16> state2;
+		SecureRandom rnd;
+
+		IntUtils::Fill(key, 0, 16, rnd);
+		IntUtils::Fill(tweak, 0, 2, rnd);
+		MemUtils::Clear(state1, 0, 16 * sizeof(ulong));
+		MemUtils::Clear(state2, 0, 16 * sizeof(ulong));
+
+		Threefish::PemuteR120P1024U(key, counter, tweak, state2);
+		Threefish::PemuteP1024C(key, counter, tweak, state1, 120);
+
+		if (state1 != state2)
+		{
+			throw TestException(std::string("Permutation1024: Permutation output is not equal! -TP1"));
+		}
+
+#if defined(__AVX2__)
+		
+		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::array<ulong, 64> state3;
+
+		MemUtils::Clear(state3, 0, 64 * sizeof(ulong));
+
+		Threefish::PemuteP4x1024H(key, counter8, tweak, state3, 120);
+
+		for (size_t i = 0; i < 64; i += 16)
+		{
+			for (size_t j = 0; j < 16; ++j)
+			{
+				if (state3[i + j] != state1[j])
+				{
+					throw TestException(std::string("Permutation1024: Permutation output is not equal! -TP2"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::array<ulong, 16> counter16{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::array<ulong, 128> state4;
+
+		MemUtils::Clear(state4, 0, 128 * sizeof(ulong));
+
+		Threefish::PemuteP8x1024H(key, counter16, tweak, state4, 120);
+
+		for (size_t i = 0; i < 128; ++i)
+		{
+			for (size_t j = 0; j < 16; ++j)
+			{
+				if (state4[i + j] != state1[j])
+				{
+					throw TestException(std::string("Permutation1024: Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#endif
+
 	}
 
 	void ThreefishTest::Exception(IStreamCipher* Cipher)
@@ -226,7 +436,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE1"));
+			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE1"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -244,7 +454,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE2"));
+			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE2"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -263,7 +473,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE3"));
+			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE3"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -281,7 +491,7 @@ namespace Test
 
 			Cipher->Finalize(mac, 0, 16);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE4"));
+			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE4"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -300,7 +510,7 @@ namespace Test
 			Cipher->Initialize(true, kp);
 			Cipher->ParallelMaxDegree(9999);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE6"));
+			throw TestException(std::string("Threefish"), std::string("Exception: Exception handling failure! -TE5"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -331,11 +541,11 @@ namespace Test
 
 		if (otp != Message)
 		{
-			throw TestException("Kat: Decrypted output does not match the input! -TV1");
+			throw TestException(std::string("Kat: Decrypted output does not match the input! -TV1"));
 		}
 		if (cpt != Expected)
 		{
-			throw TestException("Kat: Output does not match the known answer! -TV2");
+			throw TestException(std::string("Kat: Output does not match the known answer! -TV2"));
 		}
 	}
 
@@ -349,7 +559,6 @@ namespace Test
 		std::vector<byte> inp;
 		std::vector<byte> otp;
 		std::vector<byte> key(ks.KeySize());
-		std::vector<byte> iv(ks.NonceSize());
 		Prng::SecureRandom rnd;
 		size_t prlSize = Cipher->ParallelProfile().ParallelBlockSize();
 
@@ -384,7 +593,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException("Parallel: Cipher output is not equal! -TP1");
+				throw TestException(std::string("Parallel: Cipher output is not equal! -TP1"));
 			}
 
 			// decrypt sequential ciphertext with parallel
@@ -394,215 +603,12 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException("Parallel: Cipher output is not equal! -TP2");
+				throw TestException(std::string("Parallel: Cipher output is not equal! -TP2"));
 			}
 		}
 
 		// restore parallel block size
 		Cipher->ParallelProfile().ParallelBlockSize() = prlSize;
-	}
-
-	void ThreefishTest::Permutation256()
-	{
-		std::array<ulong, 2> counter{ 128, 1 };
-		std::array<ulong, 4> key;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 4> state1;
-		std::array<ulong, 4> state2;
-		SecureRandom rnd;
-
-		IntUtils::Fill(key, 0, 4, rnd);
-		IntUtils::Fill(tweak, 0, 2, rnd);
-		MemUtils::Clear(state1, 0, 4 * sizeof(ulong));
-		MemUtils::Clear(state2, 0, 4 * sizeof(ulong));
-
-		Threefish::PemuteP256C(key, counter, tweak, state1, 72);
-		Threefish::PemuteR72P256U(key, counter, tweak, state2);
-
-		if (state1 != state2)
-		{
-			throw TestException("Permutation256: Permutation output is not equal! -TP1");
-		}
-
-#if defined(__AVX2__)
-
-		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::array<ulong, 16> state3;
-
-		MemUtils::Clear(state3, 0, 16 * sizeof(ulong));
-
-		Threefish::PemuteP4x256H(key, counter8, tweak, state3, 72);
-
-		for (size_t i = 0; i < 16; i += 4)
-		{
-			for (size_t j = 0; j < 4; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException("Permutation256: Permutation output is not equal! -TP2");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 32> state4;
-
-		MemUtils::Clear(state4, 0, 32 * sizeof(ulong));
-
-		Threefish::PemuteP4x512H(key, counter16, tweak, state4, 72);
-
-		for (size_t i = 0; i < 32; i += 8)
-		{
-			for (size_t j = 0; j < 8; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException("Permutation256: Permutation output is not equal! -TP3");
-				}
-			}
-		}
-
-#endif
-	}
-
-	void ThreefishTest::Permutation512()
-	{
-		std::array<ulong, 2> counter{ 128, 1 };
-		std::array<ulong, 8> key;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 8> state1;
-		std::array<ulong, 8> state2;
-		SecureRandom rnd;
-
-		IntUtils::Fill(key, 0, 8, rnd);
-		IntUtils::Fill(tweak, 0, 2, rnd);
-		MemUtils::Clear(state1, 0, 8 * sizeof(ulong));
-		MemUtils::Clear(state2, 0, 8 * sizeof(ulong));
-
-		Threefish::PemuteP512C(key, counter, tweak, state1, 96);
-		Threefish::PemuteR96P512U(key, counter, tweak, state2);
-
-		if (state1 != state2)
-		{
-			throw TestException("Permutation512: Permutation output is not equal! -TP1");
-		}
-
-#if defined(__AVX2__)
-
-		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::array<ulong, 32> state3;
-
-		MemUtils::Clear(state3, 0, 32 * sizeof(ulong));
-
-		Threefish::PemuteP4x512H(key, counter8, tweak, state3, 96);
-
-		for (size_t i = 0; i < 32; i += 8)
-		{
-			for (size_t j = 0; j < 8; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException("Permutation512: Permutation output is not equal! -TP2");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<ulong, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 64> state4;
-
-		MemUtils::Clear(state4, 0, 64 * sizeof(ulong));
-
-		Threefish::PemuteP8x512H(key, counter16, tweak, state4, 96);
-
-		for (size_t i = 0; i < 64; i += 16)
-		{
-			for (size_t j = 0; j < 16; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException("Permutation512: Permutation output is not equal! -TP3");
-				}
-			}
-		}
-
-#endif
-
-	}
-
-	void ThreefishTest::Permutation1024()
-	{
-		std::array<ulong, 2> counter{ 128, 1 };
-		std::array<ulong, 16> key;
-		std::array<ulong, 2> tweak;
-		std::array<ulong, 16> state1;
-		std::array<ulong, 16> state2;
-		SecureRandom rnd;
-
-		IntUtils::Fill(key, 0, 16, rnd);
-		IntUtils::Fill(tweak, 0, 2, rnd);
-		MemUtils::Clear(state1, 0, 16 * sizeof(ulong));
-		MemUtils::Clear(state2, 0, 16 * sizeof(ulong));
-
-		Threefish::PemuteR120P1024U(key, counter, tweak, state2);
-		Threefish::PemuteP1024C(key, counter, tweak, state1, 120);
-
-		if (state1 != state2)
-		{
-			throw TestException("Permutation1024: Permutation output is not equal! -TP1");
-		}
-
-#if defined(__AVX2__)
-		
-		std::array<ulong, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::array<ulong, 64> state3;
-
-		MemUtils::Clear(state3, 0, 64 * sizeof(ulong));
-
-		Threefish::PemuteP4x1024H(key, counter8, tweak, state3, 120);
-
-		for (size_t i = 0; i < 64; i += 16)
-		{
-			for (size_t j = 0; j < 16; ++j)
-			{
-				if (state3[i + j] != state1[j])
-				{
-					throw TestException("Permutation1024: Permutation output is not equal! -TP2");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<ulong, 16> counter16{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::array<ulong, 128> state4;
-
-		MemUtils::Clear(state4, 0, 128 * sizeof(ulong));
-
-		Threefish::PemuteP8x1024H(key, counter16, tweak, state4, 120);
-
-		for (size_t i = 0; i < 128; ++i)
-		{
-			for (size_t j = 0; j < 16; ++j)
-			{
-				if (state4[i + j] != state1[j])
-				{
-					throw TestException("Permutation1024: Permutation output is not equal! -TP3");
-				}
-			}
-		}
-
-#endif
-
 	}
 
 	void ThreefishTest::Stress(IStreamCipher* Cipher)
@@ -643,10 +649,12 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException("Stress: Transformation output is not equal! -TS1");
+				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
 			}
 		}
 	}
+
+	//~~~Private Functions~~~//
 
 	void ThreefishTest::Initialize()
 	{

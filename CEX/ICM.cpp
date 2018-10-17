@@ -152,9 +152,13 @@ void ICM::EncryptBlock(const std::vector<byte> &Input, const size_t InOffset, st
 
 void ICM::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size(), KeyParams.Nonce().size()))
+	if (!SymmetricKeySize::Contains(LegalKeySizes(), KeyParams.Key().size()))
 	{
-		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid key or nonce size! Key and nonce must be one of the LegalKeySizes() members in length.");
+		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid key size! Key must be one of the LegalKeySizes() members in length.");
+	}
+	if (KeyParams.Nonce().size() != BLOCK_SIZE)
+	{
+		throw CryptoSymmetricCipherException("ICM:Initialize", "Invalid nonce size! Nonce must be one of the LegalKeySizes() members in length.");
 	}
 	if (m_parallelProfile.IsParallel() && m_parallelProfile.ParallelBlockSize() < m_parallelProfile.ParallelMinimumSize() || m_parallelProfile.ParallelBlockSize() > m_parallelProfile.ParallelMaximumSize())
 	{

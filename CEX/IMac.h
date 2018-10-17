@@ -59,11 +59,6 @@ public:
 	virtual const size_t BlockSize() = 0;
 
 	/// <summary>
-	/// Read Only: Size of returned mac in bytes
-	/// </summary>
-	virtual const size_t MacSize() = 0;
-
-	/// <summary>
 	/// Read Only: Mac is ready to digest data
 	/// </summary>
 	virtual const bool IsInitialized() = 0;
@@ -72,6 +67,11 @@ public:
 	/// Read Only: Recommended Mac key sizes in a SymmetricKeySize array
 	/// </summary>
 	virtual std::vector<SymmetricKeySize> LegalKeySizes() const = 0;
+
+	/// <summary>
+	/// Read Only: Size of returned mac in bytes
+	/// </summary>
+	virtual const size_t MacSize() = 0;
 
 	/// <summary>
 	/// Read Only: Mac generators class name

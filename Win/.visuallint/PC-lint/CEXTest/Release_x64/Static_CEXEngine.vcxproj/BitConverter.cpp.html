@@ -1,0 +1,394 @@
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<META http-equiv="Content-Type" content="text/html">
+<title>
+          Analysis Results for file BitConverter.cpp</title>
+<style>
+          body             { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10pt; color: #000080; }
+          h1               { font-size: 14pt; font-weight: bold; }
+          table            { font-size: 8pt; }
+          .table_caption   { text-align: left; font-size: 10pt; font-weight: bold; }
+          .caption         { text-align: center; font-size: 10pt; font-weight: bold; text-decoration:none; }
+          .count           { font-size: 8pt; font-style: italic; color: #0000ff; }
+          td.pagetitle     { border-top: blue thin ridge; background: lightblue; border-bottom: blue thin ridge; }
+          p.footer         { font-size: 7pt; }
+        </style><script language="JavaScript">
+
+          function collapsenode(item)
+          {
+          if (item.style.display == '')
+          {
+          item.style.display = 'none';
+          }
+          else
+          {
+          item.style.display = '';
+          }
+          }
+        </script><script language="JavaScript">
+          //
+
+//-----------------------------------------------------------------------------
+// sortTable(id, col, rev)
+//
+//  id  - ID of the TABLE, TBODY, THEAD or TFOOT element to be sorted.
+//  col - Index of the column to sort, 0 = first column, 1 = second column,
+//        etc.
+//  rev - If true, the column is sorted in reverse (descending) order
+//        initially.
+//
+// Note: the first column (index 0) is used as a secondary sort column and
+// always sorted in ascending order.
+//-----------------------------------------------------------------------------
+
+function sortTable(id, col, rev) {
+
+  // Get the table or table section to sort.
+  var tblEl = document.getElementById(id);
+
+  // The first time this function is called for a given table, set up an
+  // array of reverse sort flags.
+  if (tblEl.reverseSort == null) {
+
+    tblEl.reverseSort = new Array();
+
+    // Also, assume the team name column is initially sorted.
+    tblEl.lastColumn = 0;
+  }
+
+  // If this column has not been sorted before, set the initial sort direction.
+  if (tblEl.reverseSort[col] == null)
+    tblEl.reverseSort[col] = rev;
+
+  // If this column was the last one sorted, reverse its sort direction.
+  if (col == tblEl.lastColumn)
+    tblEl.reverseSort[col] = !tblEl.reverseSort[col];
+
+  // Remember this column as the last one sorted.
+  tblEl.lastColumn = col;
+
+  // Set the table display style to "none" - necessary for Netscape 6 browsers.
+
+  var oldDsply = tblEl.style.display;
+  tblEl.style.display = "none";
+
+  // Sort the rows based on the content of the specified column using a
+  // selection sort.
+
+  var tmpEl;
+  var i, j;
+  var minVal, minIdx;
+  var testVal;
+  var cmp;
+
+  for (i = 0; i < tblEl.rows.length - 1; i++) {
+
+    // Assume the current row has the minimum value.
+    minIdx = i;
+    minVal = getTextValue(tblEl.rows[i].cells[col]);
+
+    // Search the rows that follow the current one for a smaller value.
+    for (j = i + 1; j < tblEl.rows.length; j++)
+	{
+      testVal = getTextValue(tblEl.rows[j].cells[col]);
+      cmp = compareValues(minVal, testVal);
+
+      // Negate the comparison result if the reverse sort flag is set.
+
+      if (tblEl.reverseSort[col])
+        cmp = -cmp;
+
+      // Sort by the second column if those values are equal.
+      if (cmp == 0 && col != 0)
+
+        cmp = compareValues(getTextValue(tblEl.rows[minIdx].cells[1]),
+                            getTextValue(tblEl.rows[j].cells[1]));
+
+      // If this row has a smaller value than the current minimum, remember its
+      // position and update the current minimum value.
+
+      if (cmp > 0)
+	  {
+        minIdx = j;
+        minVal = testVal;
+      }
+    }
+
+    // By now, we have the row with the smallest value. Remove it from the
+    // table and insert it before the current row.
+    if (minIdx > i)
+	{
+      tmpEl = tblEl.removeChild(tblEl.rows[minIdx]);
+      tblEl.insertBefore(tmpEl, tblEl.rows[i]);
+    }
+  }
+
+  // Make it look pretty.
+//  makePretty(tblEl, col);
+
+  // Set rankings.
+  setRanks(tblEl, col, rev);
+
+  // Restore the table's display style.
+  tblEl.style.display = oldDsply;
+
+  return false;
+}
+
+//-----------------------------------------------------------------------------
+// Functions to get and compare values during a sort.
+//-----------------------------------------------------------------------------
+
+// This code is necessary for browsers that don't reflect the DOM constants
+// (like IE).
+if (document.ELEMENT_NODE == null)
+{
+  document.ELEMENT_NODE = 1;
+  document.TEXT_NODE = 3;
+}
+
+function getTextValue(el)
+{
+  var i;
+  var s;
+
+  // Find and concatenate the values of all text nodes contained within the element.
+  s = "";
+
+  for (i = 0; i < el.childNodes.length; i++)
+    if (el.childNodes[i].nodeType == document.TEXT_NODE)
+      s += el.childNodes[i].nodeValue;
+    else if (el.childNodes[i].nodeType == document.ELEMENT_NODE &&
+             el.childNodes[i].tagName == "BR")
+      s += " ";
+    else
+      // Use recursion to get text within sub-elements.
+      s += getTextValue(el.childNodes[i]);
+
+  return normalizeString(s);
+}
+
+function compareValues(v1, v2)
+{
+  var f1, f2;
+
+  // If the values are numeric, convert them to floats.
+  f1 = parseFloat(v1);
+  f2 = parseFloat(v2);
+  if (!isNaN(f1) && !isNaN(f2))
+  {
+    v1 = f1;
+    v2 = f2;
+  }
+
+  // Compare the two values.
+  if (v1 == v2)
+    return 0;
+
+  if (v1 > v2)
+    return 1
+
+  return -1;
+}
+
+// Regular expressions for normalizing white space.
+var whtSpEnds = new RegExp("^\\s*|\\s*$", "g");
+var whtSpMult = new RegExp("\\s\\s+", "g");
+
+function normalizeString(s)
+{
+  s = s.replace(whtSpMult, " ");  // Collapse any multiple whites space.
+  s = s.replace(whtSpEnds, "");   // Remove leading or trailing white space.
+
+  return s;
+}
+
+//-----------------------------------------------------------------------------
+// Functions to update the table appearance after a sort.
+//-----------------------------------------------------------------------------
+
+// Style class names.
+var rowClsNm = "alternateRow";
+var colClsNm = "sortedColumn";
+
+// Regular expressions for setting class names.
+var rowTest = new RegExp(rowClsNm, "gi");
+var colTest = new RegExp(colClsNm, "gi");
+
+function setRanks(tblEl, col, rev)
+{
+  // Determine whether to start at the top row of the table and go down or
+  // at the bottom row and work up. This is based on the current sort
+  // direction of the column and its reversed flag.
+  var i    = 0;
+  var incr = 1;
+
+  if (tblEl.reverseSort[col])
+    rev = !rev;
+
+  if (rev)
+  {
+    incr = -1;
+    i = tblEl.rows.length - 1;
+  }
+
+  // Now go through each row in that direction and assign it a rank by
+  // counting 1, 2, 3...
+  var count   = 1;
+  var rank    = count;
+  var curVal;
+  var lastVal = null;
+
+  // Note that this loop is skipped if the table was sorted on the name
+  // column.
+
+  while (col > 0 && i >= 0 && i < tblEl.rows.length)
+  {
+    // Get the value of the sort column in this row.
+    curVal = getTextValue(tblEl.rows[i].cells[col]);
+
+    // On rows after the first, compare the sort value of this row to the
+    // previous one. If they differ, update the rank to match the current row
+    // count. (If they are the same, this row will get the same rank as the
+    // previous one.)
+
+    if (lastVal != null && compareValues(curVal, lastVal) != 0)
+        rank = count;
+
+    // Set the rank for this row.
+    tblEl.rows[i].rank = rank;
+
+    // Save the sort value of the current row for the next time around and bump
+    // the row counter and index.
+
+    lastVal = curVal;
+    count++;
+    i += incr;
+  }
+
+  
+  // Now go through each row (from top to bottom) and display its rank. Note
+  // that when two or more rows are tied, the rank is shown on the first of
+  // those rows only.
+  var rowEl, cellEl;
+  var lastRank = 0;
+
+  // Go through the rows from top to bottom.
+  for (i = 0; i < tblEl.rows.length; i++)
+  {
+    rowEl = tblEl.rows[i];
+    cellEl = rowEl.cells[0];
+  }
+}
+//</script></head>
+<body>
+<table width="100%" border="0">
+<tr>
+<td class="pagetitle" colSpan="2"><br><h1 align="center">
+                Analysis Results for file BitConverter.cpp</h1>
+</td>
+</tr>
+</table>
+<p>
+<font class="table_caption"><a id="DynMessLink" name="summary" href="#" onclick="collapsenode(summary_h1);">Summary</a></font>
+</p>
+<ul id="summary_h1">
+<table border="0">
+<tr>
+<th align="left">Implementation file:</th>
+<td>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BitConverter.cpp</td>
+</tr>
+<tr>
+<th align="left">Project:</th>
+<td>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Static\CEXEngine.vcxproj [configuration: Release|x64]
+              </td>
+</tr>
+<tr>
+<th align="left">Solution:</th>
+<td>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\CEXTest.sln [configuration: Release|x64]
+                </td>
+</tr>
+<tr>
+<th align="left">Analysis Tool</th>
+<td>PC-lint for C/C++ (NT) Vers. 9.00L, Copyright Gimpel Software 1985-2014</td>
+</tr>
+<tr>
+<th align="left">Analysis Status:</th>
+<td>Complete</td>
+</tr>
+<tr>
+<th align="left">Last Analysed:</th>
+<td>Monday, February 19, 2018, 15:28:58</td>
+</tr>
+<tr>
+<th align="left">Total Issues:</th>
+<td>0<br></td>
+</tr>
+<tr>
+<th align="left">
+                      Elective Notes:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Informational:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Warnings:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Errors:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Internal Errors:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">
+                      Fatal Errors:
+                </th>
+<td>0 (0.00%)
+                </td>
+</tr>
+<tr>
+<th align="left">User:</th>
+<td>John</td>
+</tr>
+<tr>
+<th align="left">Computer:</th>
+<td>DCN</td>
+</tr>
+</table><br><br></ul>
+<p>
+<font class="table_caption"><a id="DynMessLink" name="raw_analysis_results" href="#" onclick="collapsenode(raw_analysis_results_h1);">Raw Analysis Results</a></font>
+</p><br><ul id="raw_analysis_results_h1">
+<pre>
+--- Module:   C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\CEX\BitConverter.cpp (C++)
+
+--- Global Wrap-up
+
+ error 900: (Note -- Successful completion, 0 messages produced)
+</pre>
+</ul><br><br><hr>
+<p class="footer">
+          Report produced by <b>Visual Lint Standard Edition</b>, version 6.0.7.289<br>
+            Software licenced to: John Underhill (1 user licence)<br><br><a href="http://www.riverblade.co.uk/products/visual_lint" target="_blank">http://www.riverblade.co.uk/products/visual_lint</a></p>
+</body>
+</html>

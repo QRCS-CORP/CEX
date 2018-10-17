@@ -7,7 +7,8 @@
 namespace Test
 {
 	/// <summary>
-	/// McEliece key generation, encryption, and decryption tests
+	/// The McEliece asymmetric cipher test suite.
+	///  <para>Tests public-key and cipher-text integrity, exception handling, cipher authentication, and a looping stress-test</para>
 	/// </summary>
 	class McElieceTest final : public ITest
 	{
@@ -47,14 +48,39 @@ namespace Test
 		/// </summary>
 		TestEventHandler &Progress() override;
 
+		/// <summary>
+		/// Tests the ciphers authentication mechanism in a looping stress test
+		/// </summary>
+		void Authentication();
+
+		/// <summary>
+		/// Tests the ciphers decryption function for invalid cipher-text in a looping stress test
+		/// </summary>
+		void CipherText();
+
+		/// <summary>
+		/// Tests the ciphers exception handling functions
+		/// </summary>
+		void Exception();
+
+		/// <summary>
+		/// Tests the cipher for invalid public keys in a looping stress test
+		/// </summary>
+		void PublicKey();
+
+		/// <summary>
+		/// Tests the ciphers key serialization function using a looping stress test
+		/// </summary>
+		void Serialization();
+
+		/// <summary>
+		/// Tests the the cipher operations using a looping stress test
+		/// </summary>
+		void Stress();
+
 	private:
 
-		void CipherTextIntegrity();
-		void MessageAuthentication();
-		void PublicKeyIntegrity();
 		void OnProgress(std::string Data);
-		void StressLoop();
-		void SerializationCompare();
 	};
 }
 

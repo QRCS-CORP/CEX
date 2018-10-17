@@ -2,12 +2,14 @@
 #define CEX_KDFFROMNAME_H
 
 #include "CexDomain.h"
+#include "BlockCipherExtensions.h"
 #include "CryptoException.h"
 #include "IKdf.h"
 #include "Kdfs.h"
 
 NAMESPACE_HELPER
 
+using Enumeration::BlockCipherExtensions;
 using Exception::CryptoException;
 using Kdf::IKdf;
 using Enumeration::Kdfs;
@@ -30,6 +32,17 @@ public:
 	/// 
 	/// <exception cref="CryptoProcessingException">Thrown if the Kdf is not supported</exception>
 	static IKdf* GetInstance(Kdfs KdfType);
+
+	/// <summary>
+	/// Instantiate an uninitialized KDF generator from its enumeration type name
+	/// </summary>
+	/// 
+	/// <param name="ExtensionType">The Kdf generators type name</param>
+	/// 
+	/// <returns>An uninitialized Kdf generator</returns>
+	/// 
+	/// <exception cref="CryptoProcessingException">Thrown if the Kdf is not supported</exception>
+	static IKdf* GetInstance(BlockCipherExtensions ExtensionType);
 };
 
 NAMESPACE_HELPEREND

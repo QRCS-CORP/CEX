@@ -38,6 +38,8 @@ namespace Test
 	const std::string ChaChaTest::FAILURE = "ChaChaTest: Test Failure!";
 	const std::string ChaChaTest::SUCCESS = "SUCCESS! All ChaCha tests have executed succesfully.";
 
+	//~~~Constructor~~~//
+
 	ChaChaTest::ChaChaTest()
 		:
 		m_expected(0),
@@ -50,7 +52,12 @@ namespace Test
 
 	ChaChaTest::~ChaChaTest()
 	{
+		IntUtils::ClearVector(m_expected);
+		IntUtils::ClearVector(m_key);
+		IntUtils::ClearVector(m_nonce);
 	}
+
+	//~~~Accessors~~~//
 
 	const std::string ChaChaTest::Description()
 	{
@@ -62,6 +69,8 @@ namespace Test
 		return m_progressEvent;
 	}
 
+	//~~~Public Functions~~~//
+
 	std::string ChaChaTest::Run()
 	{
 		try
@@ -72,25 +81,25 @@ namespace Test
 			ChaCha256* cpr256b = new ChaCha256();
 
 			Authentication(cpr256a);
-			OnProgress(std::string("Passed ChaCha-256 MAC authentication tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 MAC authentication tests.."));
 
 			Exception(cpr256b);
-			OnProgress(std::string("Passed ChaCha-256 exception handling tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 exception handling tests.."));
 
 			Parallel(cpr256b);
-			OnProgress(std::string("Passed ChaCha-256 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 parallel to sequential equivalence test.."));
 
-			Permutation256();
-			OnProgress(std::string("Passed ChaCha-256 permutation variants equivalence test.."));
+			CompareP256();
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 permutation variants equivalence test.."));
 
 			Stress(cpr256b);
-			OnProgress(std::string("Passed ChaCha-256 stress and fuzz tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256stress tests.."));
 
 			Kat(cpr256a, m_key[0], m_nonce[0], m_expected[0]);
 			Kat(cpr256a, m_key[1], m_nonce[1], m_expected[1]);
 			Kat(cpr256b, m_key[0], m_nonce[0], m_expected[2]);
 			Kat(cpr256b, m_key[1], m_nonce[1], m_expected[3]);
-			OnProgress(std::string("Passed ChaCha-256 known answer tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer tests.."));
 
 			delete cpr256a;
 			delete cpr256b;
@@ -101,25 +110,25 @@ namespace Test
 			ChaCha512* cpr512b = new ChaCha512();
 
 			Authentication(cpr512a);
-			OnProgress(std::string("Passed ChaCha-512 MAC authentication tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 MAC authentication tests.."));
 
 			Exception(cpr512b);
-			OnProgress(std::string("Passed ChaCha-512 exception handling tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 exception handling tests.."));
 
 			Parallel(cpr512b);
-			OnProgress(std::string("Passed ChaCha-512 parallel to sequential equivalence test.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 parallel to sequential equivalence test.."));
 
-			Permutation512();
-			OnProgress(std::string("Passed ChaCha-512 permutation variants equivalence test.."));
+			CompareP512();
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 permutation variants equivalence test.."));
 
 			Stress(cpr512b);
-			OnProgress(std::string("Passed ChaCha-512 stress and fuzz tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512stress tests.."));
 
 			Kat(cpr512a, m_key[2], m_nonce[2], m_expected[4]);
 			Kat(cpr512a, m_key[3], m_nonce[3], m_expected[5]);
 			Kat(cpr512b, m_key[2], m_nonce[2], m_expected[6]);
 			Kat(cpr512b, m_key[3], m_nonce[3], m_expected[7]);
-			OnProgress(std::string("Passed ChaCha-512 known answer tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer tests.."));
 
 			delete cpr512a;
 			delete cpr512b;
@@ -187,17 +196,172 @@ namespace Test
 			// use constant time IntUtils::Compare to verify mac
 			if (!IntUtils::Compare(mac, 0, cpt, INPLEN, MACLEN))
 			{
-				throw TestException("Authentication: MAC output is not equal! -TA1");
+				throw TestException(std::string("Authentication: MAC output is not equal! -TA1"));
 			}
 
 			for (j = 0; j < INPLEN; ++j)
 			{
 				if (inp[j] != otp[j])
 				{
-					throw TestException("Authentication: MAC output is not equal! -TA2");
+					throw TestException(std::string("Authentication: MAC output is not equal! -TA2"));
 				}
 			}
 		}
+	}
+
+	void ChaChaTest::CompareP256()
+	{
+		const size_t ROUNDS = 20;
+		std::array<uint, 2> counter{ 128, 1 };
+		std::vector<byte> output1(64);
+		std::vector<byte> output2(64);
+		std::array<uint, 14> state;
+
+		MemUtils::Clear(state, 0, state.size() * sizeof(uint));
+
+		ChaCha::PermuteP512C(output1, 0, counter, state, ROUNDS);
+		ChaCha::PermuteR20P512U(output2, 0, counter, state);
+
+		if (output1 != output2)
+		{
+			throw TestException(std::string("Permutation256: Permutation output is not equal! -TP1"));
+		}
+
+#if defined(__AVX__)
+
+		std::array<uint, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::vector<byte> output3(256);
+
+		ChaCha::PermuteP4x512H(output3, 0, counter8, state, ROUNDS);
+
+		for (size_t i = 0; i < 256; i += 64)
+		{
+			for (size_t j = 0; j < 64; ++j)
+			{
+				if (output3[i + j] != output1[j])
+				{
+					throw TestException(std::string("Permutation256: Permutation output is not equal! -TP2"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX2__)
+
+		std::array<uint, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::vector<byte> output4(512);
+
+		ChaCha::PermuteP8x512H(output4, 0, counter16, state, ROUNDS);
+
+		for (size_t i = 0; i < 512; i += 64)
+		{
+			for (size_t j = 0; j < 64; ++j)
+			{
+				if (output4[i + j] != output1[j])
+				{
+					throw TestException(std::string("Permutation256: Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::array<uint, 32> counter32{ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::vector<byte> output5(1024);
+
+		ChaCha::PermuteP16x512H(output5, 0, counter16, state, ROUNDS);
+
+		for (size_t i = 0; i < 1024; i += 64)
+		{
+			for (size_t j = 0; j < 64; ++j)
+			{
+				if (output5[i + j] != output1[j])
+				{
+					throw TestException(std::string("Permutation256: Permutation output is not equal! -TP4"));
+				}
+			}
+		}
+
+#endif
+	}
+
+	void ChaChaTest::CompareP512()
+	{
+#if defined(CEX_CHACHA512_STRONG)
+		const size_t ROUNDS = 80;
+#else
+		const size_t ROUNDS = 40;
+#endif
+		std::array<uint, 2> counter{ 128, 1 };
+		std::vector<byte> output1(64);
+		std::array<uint, 14> state;
+
+		MemUtils::Clear(state, 0, state.size() * sizeof(uint));
+
+		ChaCha::PermuteP512C(output1, 0, counter, state, ROUNDS);
+
+#if defined(__AVX__)
+
+		std::array<uint, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
+		std::vector<byte> output2(256);
+
+		ChaCha::PermuteP4x512H(output2, 0, counter8, state, ROUNDS);
+
+		for (size_t i = 0; i < 256; i += 64)
+		{
+			for (size_t j = 0; j < 64; ++j)
+			{
+				if (output2[i + j] != output1[j])
+				{
+					throw TestException(std::string("Permutation512: Permutation output is not equal! -TP1"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX2__)
+
+		std::array<uint, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::vector<byte> output3(512);
+
+		ChaCha::PermuteP8x512H(output3, 0, counter16, state, ROUNDS);
+
+		for (size_t i = 0; i < 512; i += 64)
+		{
+			for (size_t j = 0; j < 64; ++j)
+			{
+				if (output3[i + j] != output1[j])
+				{
+					throw TestException(std::string("Permutation512: Permutation output is not equal! -TP2"));
+				}
+			}
+		}
+
+#endif
+
+#if defined(__AVX512__)
+
+		std::array<uint, 32> counter32{ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+		std::vector<byte> output4(1024);
+
+		ChaCha::PermuteP16x512H(output4, 0, counter16, state, ROUNDS);
+
+		for (size_t i = 0; i < 1024; i += 64)
+		{
+			for (size_t j = 0; j < 64; ++j)
+			{
+				if (output4[i + j] != output1[j])
+				{
+					throw TestException(std::string("Permutation512: Permutation output is not equal! -TP3"));
+				}
+			}
+		}
+
+#endif
 	}
 
 	void ChaChaTest::Exception(IStreamCipher* Cipher)
@@ -212,7 +376,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE1"));
+			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -TE1"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -230,7 +394,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE2"));
+			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -TE2"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -249,7 +413,7 @@ namespace Test
 
 			Cipher->Initialize(true, kp);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE3"));
+			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -TE3"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -267,7 +431,7 @@ namespace Test
 
 			Cipher->Finalize(mac, 0, 16);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE4"));
+			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -TE4"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -287,7 +451,7 @@ namespace Test
 			Cipher->Initialize(true, kp);
 			Cipher->ParallelMaxDegree(9999);
 
-			throw TestException(Cipher->Name(), std::string("Exception: Exception handling failure! -TE6"));
+			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -TE6"));
 		}
 		catch (CryptoSymmetricCipherException const &)
 		{
@@ -311,9 +475,6 @@ namespace Test
 		// encrypt
 		Cipher->Initialize(true, kp);
 		Cipher->Transform(msg, 0, cpt, 0, MSGLEN);
-		std::string tmp = "";
-		HexConverter::ToString(cpt, tmp);
-
 
 		// decrypt
 		Cipher->Initialize(false, kp);
@@ -321,11 +482,11 @@ namespace Test
 
 		if (otp != msg)
 		{
-			throw TestException("Kat: Decrypted output does not match the input! -TV1");
+			throw TestException(std::string("Kat: Decrypted output does not match the input! -TV1"));
 		}
 		if (cpt != Expected)
 		{
-			throw TestException("Kat: Output does not match the known answer! -TV2");
+			throw TestException(std::string("Kat: Output does not match the known answer! -TV2"));
 		}
 	}
 
@@ -374,7 +535,7 @@ namespace Test
 
 			if (cpt1 != cpt2)
 			{
-				throw TestException("Parallel: Cipher output is not equal! -TP1");
+				throw TestException(std::string("Parallel: Cipher output is not equal! -TP1"));
 			}
 
 			// decrypt sequential ciphertext with parallel
@@ -384,7 +545,7 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException("Parallel: Cipher output is not equal! -TP2");
+				throw TestException(std::string("Parallel: Cipher output is not equal! -TP2"));
 			}
 		}
 
@@ -392,165 +553,10 @@ namespace Test
 		Cipher->ParallelProfile().ParallelBlockSize() = prlSize;
 	}
 
-	void ChaChaTest::Permutation256()
-	{
-		const size_t ROUNDS = 20;
-		std::array<uint, 2> counter{ 128, 1 };
-		std::vector<byte> output1(64);
-		std::vector<byte> output2(64);
-		std::array<uint, 14> state;
-
-		MemUtils::Clear(state, 0, state.size() * sizeof(uint));
-
-		ChaCha::PermuteP512C(output1, 0, counter, state, ROUNDS);
-		ChaCha::PermuteR20P512U(output2, 0, counter, state);
-
-		if (output1 != output2)
-		{
-			throw TestException("Permutation256: Permutation output is not equal! -TP1");
-		}
-
-#if defined(__AVX__)
-
-		std::array<uint, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::vector<byte> output3(256);
-
-		ChaCha::PermuteP4x512H(output3, 0, counter8, state, ROUNDS);
-
-		for (size_t i = 0; i < 256; i += 64)
-		{
-			for (size_t j = 0; j < 64; ++j)
-			{
-				if (output3[i + j] != output1[j])
-				{
-					throw TestException("Permutation256: Permutation output is not equal! -TP2");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX2__)
-
-		std::array<uint, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::vector<byte> output4(512);
-
-		ChaCha::PermuteP8x512H(output4, 0, counter16, state, ROUNDS);
-
-		for (size_t i = 0; i < 512; i += 64)
-		{
-			for (size_t j = 0; j < 64; ++j)
-			{
-				if (output4[i + j] != output1[j])
-				{
-					throw TestException("Permutation256: Permutation output is not equal! -TP3");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<uint, 32> counter32{ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::vector<byte> output5(1024);
-
-		ChaCha::PermuteP16x512H(output5, 0, counter16, state, ROUNDS);
-
-		for (size_t i = 0; i < 1024; i += 64)
-		{
-			for (size_t j = 0; j < 64; ++j)
-			{
-				if (output5[i + j] != output1[j])
-				{
-					throw TestException("Permutation256: Permutation output is not equal! -TP4");
-				}
-			}
-		}
-
-#endif
-	}
-
-	void ChaChaTest::Permutation512()
-	{
-#if defined(CEX_CHACHA512_STRONG)
-		const size_t ROUNDS = 80;
-#else
-		const size_t ROUNDS = 40;
-#endif
-		std::array<uint, 2> counter{ 128, 1 };
-		std::vector<byte> output1(64);
-		std::array<uint, 14> state;
-
-		MemUtils::Clear(state, 0, state.size() * sizeof(uint));
-
-		ChaCha::PermuteP512C(output1, 0, counter, state, ROUNDS);
-
-#if defined(__AVX__)
-
-		std::array<uint, 8> counter8{ 128, 128, 128, 128, 1, 1, 1, 1 };
-		std::vector<byte> output2(256);
-
-		ChaCha::PermuteP4x512H(output2, 0, counter8, state, ROUNDS);
-
-		for (size_t i = 0; i < 256; i += 64)
-		{
-			for (size_t j = 0; j < 64; ++j)
-			{
-				if (output2[i + j] != output1[j])
-				{
-					throw TestException("Permutation512: Permutation output is not equal! -TP1");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX2__)
-
-		std::array<uint, 16> counter16{ 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::vector<byte> output3(512);
-
-		ChaCha::PermuteP8x512H(output3, 0, counter16, state, ROUNDS);
-
-		for (size_t i = 0; i < 512; i += 64)
-		{
-			for (size_t j = 0; j < 64; ++j)
-			{
-				if (output3[i + j] != output1[j])
-				{
-					throw TestException("Permutation512: Permutation output is not equal! -TP2");
-				}
-			}
-		}
-
-#endif
-
-#if defined(__AVX512__)
-
-		std::array<uint, 32> counter32{ 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-		std::vector<byte> output4(1024);
-
-		ChaCha::PermuteP16x512H(output4, 0, counter16, state, ROUNDS);
-
-		for (size_t i = 0; i < 1024; i += 64)
-		{
-			for (size_t j = 0; j < 64; ++j)
-			{
-				if (output4[i + j] != output1[j])
-				{
-					throw TestException("Permutation512: Permutation output is not equal! -TP3");
-				}
-			}
-		}
-
-#endif
-	}
-
 	void ChaChaTest::Stress(IStreamCipher* Cipher)
 	{
 		const uint MINPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelMinimumSize());
-		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize());
+		const uint MAXPRL = static_cast<uint>(Cipher->ParallelProfile().ParallelBlockSize() * 4);
 
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
@@ -586,10 +592,12 @@ namespace Test
 
 			if (otp != inp)
 			{
-				throw TestException("Stress: Transformation output is not equal! -TS1");
+				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
 			}
 		}
 	}
+
+	//~~~Private Functions~~~//
 
 	void ChaChaTest::Initialize()
 	{

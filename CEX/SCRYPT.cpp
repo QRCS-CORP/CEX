@@ -12,14 +12,14 @@ const std::string SCRYPT::CLASS_NAME("SCRYPT");
 
 //~~~Constructor~~~//
 
-SCRYPT::SCRYPT(Digests DigestType, size_t CpuCost, size_t Parallelization)
+SCRYPT::SCRYPT(SHA2Digests DigestType, size_t CpuCost, size_t Parallelization)
 	:
 	m_destroyEngine(true),
 	m_isDestroyed(false),
 	m_isInitialized(false),
-	m_msgDigest(DigestType == Digests::SHA256 || DigestType == Digests::SHA512 ? Helper::DigestFromName::GetInstance(DigestType) :
+	m_msgDigest(DigestType != SHA2Digests::None ? Helper::DigestFromName::GetInstance(static_cast<Digests>(DigestType)) :
 		throw CryptoKdfException("SCRYPT:Ctor", "The digest type is not supported!")),
-	m_msgDigestType(DigestType),
+	m_msgDigestType(static_cast<Digests>(DigestType)),
 	m_kdfKey(0),
 	m_kdfSalt(0),
 	m_legalKeySizes(0),
@@ -91,6 +91,11 @@ SCRYPT::~SCRYPT()
 
 //~~~Accessors~~~//
 
+size_t &SCRYPT::CpuCost()
+{
+	return m_scryptParameters.CpuCost;
+}
+
 const Kdfs SCRYPT::Enumeral()
 {
 	return Kdfs::SCRYPT256;
@@ -106,7 +111,7 @@ const bool SCRYPT::IsParallel()
 	return m_parallelProfile.IsParallel(); 
 }
 
-size_t SCRYPT::MinKeySize() 
+const size_t SCRYPT::MinKeySize() 
 { 
 	return MIN_PASSLEN; 
 }
@@ -121,6 +126,11 @@ const std::string SCRYPT::Name()
 	return CLASS_NAME + "-" + m_msgDigest->Name();
 }
 
+size_t &SCRYPT::Parallelization()
+{
+	return m_scryptParameters.Parallelization;
+}
+
 ParallelOptions &SCRYPT::ParallelProfile() 
 { 
 	return m_parallelProfile;
@@ -130,16 +140,20 @@ ParallelOptions &SCRYPT::ParallelProfile()
 
 size_t SCRYPT::Generate(std::vector<byte> &Output)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("SCRYPT:Generate", "The generator has not been initialized!");
+	}
 
 	return Expand(Output, 0, Output.size());
 }
 
 size_t SCRYPT::Generate(std::vector<byte> &Output, size_t OutOffset, size_t Length)
 {
-	CexAssert(m_isInitialized, "the generator must be initialized before use");
-	CexAssert(Output.size() != 0, "the output buffer too small");
+	if (!m_isInitialized)
+	{
+		throw CryptoKdfException("SCRYPT:Generate", "The generator has not been initialized!");
+	}
 
 	return Expand(Output, OutOffset, Length);
 }
@@ -182,16 +196,17 @@ void SCRYPT::Initialize(const std::vector<byte> &Key)
 
 	m_kdfKey.resize(Key.size());
 	Utility::MemUtils::Copy(Key, 0, m_kdfKey, 0, m_kdfKey.size());
-
 	m_isInitialized = true;
 }
 
 void SCRYPT::Initialize(const std::vector<byte> &Key, size_t Offset, size_t Length)
 {
-	CexAssert(Key.size() >= Length + Offset, "The key is too small");
+	if (Key.size() < MIN_PASSLEN)
+	{
+		throw CryptoKdfException("SCRYPT:Initialize", "Key size is too small; must be a minumum of 4 bytes!");
+	}
 
 	std::vector<byte> tmpK(Length);
-
 	Utility::MemUtils::Copy(Key, Offset, tmpK, 0, Length);
 	Initialize(tmpK);
 }
@@ -521,11 +536,11 @@ void SCRYPT::Scope()
 	// this is the recommended size: 
 	// ideally, salt should be passphrase len - (4 bytes of pbkdf counter + digest finalizer code)
 	// you want to fill one complete block, and avoid hmac compression on > block-size
-	m_legalKeySizes[0] = SymmetricKeySize(0, m_msgDigest->DigestSize(), 0);
+	m_legalKeySizes[0] = SymmetricKeySize(m_msgDigest->DigestSize(), 0, 0);
 	// 2nd recommended size
-	m_legalKeySizes[1] = SymmetricKeySize(0, m_msgDigest->BlockSize(), 0);
+	m_legalKeySizes[1] = SymmetricKeySize(m_msgDigest->BlockSize(), m_msgDigest->DigestSize(), 0);
 	// max recommended
-	m_legalKeySizes[2] = SymmetricKeySize(0, m_msgDigest->BlockSize() * 2, 0);
+	m_legalKeySizes[2] = SymmetricKeySize(m_msgDigest->BlockSize(), m_msgDigest->BlockSize(), 0);
 }
 
 void SCRYPT::SMix(std::vector<uint> &State, size_t StateOffset, size_t N)

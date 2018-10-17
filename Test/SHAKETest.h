@@ -3,9 +3,11 @@
 
 #include "ITest.h"
 #include "../CEX/ShakeModes.h"
+#include "../CEX/IKdf.h"
 
 namespace Test
 {
+	using Kdf::IKdf;
 	using CEX::Enumeration::ShakeModes;
 
 	/// <summary>
@@ -24,10 +26,13 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+		static const size_t MAXM_ALLOC = 64 * 255;
+		static const size_t MINM_ALLOC = 1024;
+		static const size_t TEST_CYCLES = 10;
 
 		std::vector<byte> m_custom;
 		std::vector<std::vector<byte>> m_key;
-		std::vector<std::vector<byte>> m_output;
+		std::vector<std::vector<byte>> m_expected;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -57,9 +62,35 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
+		/// Compare known answer test vectors to kdf output
+		/// </summary>
+		/// 
+		/// <param name="Generator">The kdf generator instance</param>
+		/// <param name="Salt">The salt array</param>
+		/// <param name="Key">The input key</param>
+		/// <param name="Info">The info array</param>
+		/// <param name="Expected">The expected output</param>
+		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected, bool Custom = false);
+
+		/// <summary>
+		/// Test the different constructor initialization options
+		/// </summary>
+		void Params(IKdf* Generator);
+
+		/// <summary>
+		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
+		/// </summary>
+		void Stress(IKdf* Generator);
+
 	private:
 
-		void CompareOutput(std::vector<byte> &Key, std::vector<byte> &Expected, ShakeModes Mode, bool Custom = false);
+
 		void Initialize();
 		void OnProgress(std::string Data);
 	};

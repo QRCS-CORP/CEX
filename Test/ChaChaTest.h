@@ -77,6 +77,16 @@ namespace Test
 		void Authentication(IStreamCipher* Cipher);
 
 		/// <summary>
+		/// Compare ChaCha-256 vectorized, compact, and unrolled, permutation functions for equivalence
+		/// </summary>
+		void CompareP256();
+
+		/// <summary>
+		/// Compare ChaCha-512 vectorized, compact, and unrolled, permutation functions for equivalence
+		/// </summary>
+		void CompareP512();
+
+		/// <summary>
 		/// Test exception handlers for correct execution
 		/// </summary>
 		/// 
@@ -100,16 +110,6 @@ namespace Test
 		/// 
 		/// <param name="Cipher">The cipher instance pointer</param>
 		void Parallel(IStreamCipher* Cipher);
-
-		/// <summary>
-		/// Compare ChaCha-256 compact and unrolled permutation functions for equivalence
-		/// </summary>
-		void Permutation256();
-
-		/// <summary>
-		/// Compare ChaCha-512 compact and unrolled permutation functions for equivalence
-		/// </summary>
-		void Permutation512();
 
 		/// <summary>
 		/// Test transformation and inverse with random in a looping [TEST_CYCLES] stress-test

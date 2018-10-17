@@ -131,7 +131,7 @@ private:
 	std::vector<byte> m_msgBuffer;
 	size_t m_msgLength;
 	ParallelOptions m_parallelProfile;
-	std::vector<uint> m_treeConfig;
+	//std::vector<uint> m_treeConfig;
 	bool m_treeDestroy;
 	BlakeParams m_treeParams;
 
@@ -292,7 +292,7 @@ public:
 
 private:
 
-	void LoadState(Blake2sState &State);
+	void LoadState(Blake2sState &State, BlakeParams &Params, std::vector<uint> &Config);
 	void Permute(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, size_t Length);
 	void ProcessLeaf(const std::vector<byte> &Input, size_t InOffset, Blake2sState &State, ulong Length);
 };

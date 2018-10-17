@@ -260,22 +260,13 @@
     <ClInclude Include="..\..\Test\AesAvsTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\AesFipsTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\ChaChaTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\CipherModeTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\HXCipherTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\ParallelModeTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\RijndaelTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\SerpentTest.h">
@@ -353,9 +344,6 @@
     <ClInclude Include="..\..\Test\KDF2Test.h">
       <Filter>Header Files\Test\KdfTest</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Test\HMGTest.h">
-      <Filter>Header Files\Test\GeneratorTest</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Test\RandomOutputTest.h">
       <Filter>Header Files\Test\ProviderTest</Filter>
     </ClInclude>
@@ -367,9 +355,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\SymmetricKeyTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\AEADTest.h">
-      <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\GMACTest.h">
       <Filter>Header Files\Test\MacTest</Filter>
@@ -391,9 +376,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Test\AsymmetricSpeedTest.h">
       <Filter>Header Files\Test\ProcessorTest</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Test\PrngTest.h">
-      <Filter>Header Files\Test\PrngTest</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Test\McElieceTest.h">
       <Filter>Header Files\Test\Asymmetric\Cipher</Filter>
@@ -425,12 +407,36 @@
     <ClInclude Include="..\..\Test\ThreefishTest.h">
       <Filter>Header Files\Test\CipherTest</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\AeadTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RijndaelTest.h">
+      <Filter>Header Files\Test\CipherTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\HCGTest.h">
+      <Filter>Header Files\Test\GeneratorTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RandomUtils.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ACPTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CJPTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\CSPTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\ECPTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Test\RDPTest.h">
+      <Filter>Header Files\Test\PrngTest</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\AesFipsTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\ChaChaTest.cpp">
@@ -439,16 +445,10 @@
     <ClCompile Include="..\..\Test\CipherModeTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\HXCipherTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\PaddingTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\ParallelModeTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\RijndaelTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\CMACTest.cpp">
@@ -496,9 +496,6 @@
     <ClCompile Include="..\..\Test\KDF2Test.cpp">
       <Filter>Source Files\Test\KdfTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\HMGTest.cpp">
-      <Filter>Source Files\Test\GeneratorTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\RandomOutputTest.cpp">
       <Filter>Source Files\Test\ProviderTest</Filter>
     </ClCompile>
@@ -510,9 +507,6 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\SecureStreamTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Test\AEADTest.cpp">
-      <Filter>Source Files\Test\CipherTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\GMACTest.cpp">
       <Filter>Source Files\Test\MacTest</Filter>
@@ -547,9 +541,6 @@
     <ClCompile Include="..\..\Test\AsymmetricSpeedTest.cpp">
       <Filter>Source Files\Test\ProcessorTest</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Test\PrngTest.cpp">
-      <Filter>Source Files\Test\PrngTest</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Test\McElieceTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Cipher</Filter>
     </ClCompile>
@@ -579,6 +570,30 @@
     </ClCompile>
     <ClCompile Include="..\..\Test\ThreefishTest.cpp">
       <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\AeadTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RijndaelTest.cpp">
+      <Filter>Source Files\Test\CipherTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\HCGTest.cpp">
+      <Filter>Source Files\Test\GeneratorTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ACPTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CJPTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\CSPTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\ECPTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\RDPTest.cpp">
+      <Filter>Source Files\Test\PrngTest</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

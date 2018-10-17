@@ -2,11 +2,14 @@
 #define CEXTEST_KDF2DRBGTEST_H
 
 #include "ITest.h"
+#include "../CEX/IKDF.h"
 
 namespace Test
 {
+	using Kdf::IKdf;
+
 	/// <summary>
-	/// Tests the KDF2 implementation using vector comparisons.
+	/// Tests the KDF2 implementation using exception handling, parameter checks, stress and KAT tests.
 	/// <para>Using the official Kats from RFC 6070: <see href="https://tools.ietf.org/html/rfc6070"/>.</para>
 	/// </summary>
 	class KDF2Test final : public ITest
@@ -16,9 +19,12 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+		static const size_t MAXM_ALLOC = 32 * 255;
+		static const size_t MINM_ALLOC = 1024;
+		static const size_t TEST_CYCLES = 100;
 
-		std::vector<byte> m_key;
-		std::vector<byte> m_output;
+		std::vector<std::vector<byte>> m_expected;
+		std::vector<std::vector<byte>> m_key;
 		TestEventHandler m_progressEvent;
 
 	public:
@@ -48,12 +54,38 @@ namespace Test
 		/// </summary>
 		std::string Run() override;
 
+		/// <summary>
+		/// Test exception handlers for correct execution
+		/// </summary>
+		void Exception();
+
+		/// <summary>
+		/// Compare known answer test vectors to kdf output
+		/// </summary>
+		///
+		/// <param name="Generator">The kdf generator instance</param>
+		/// <param name="Key">The input key</param>
+		/// <param name="Expected">The expected output</param>
+		void Kat(IKdf* Generator, std::vector<byte> &Key, std::vector<byte> &Expected);
+		
+		/// <summary>
+		/// Test the different initialization options
+		/// </summary>
+		///
+		/// <param name="Generator">The kdf generator instance</param>
+		void Params(IKdf* Generator);
+
+		/// <summary>
+		/// Test behavior parallel and sequential processing in a looping [TEST_CYCLES] stress-test using randomly sized input and data
+		/// </summary>
+		///
+		/// <param name="Generator">The kdf generator instance</param>
+		void Stress(IKdf* Generator);
+
 	private:
 
-		void CompareOutput(std::vector<byte> &Salt, std::vector<byte> &Expected);
 		void Initialize();
 		void OnProgress(std::string Data);
-		void TestInit();
 	};
 }
 

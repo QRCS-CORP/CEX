@@ -37,11 +37,9 @@ Blake512::Blake512(bool Parallel)
 	:
 	m_dgtState(Parallel ? DEF_PRLDEGREE : 1),
 	m_isDestroyed(false),
-	m_leafSize(Parallel ? DEF_LEAFSIZE : BLOCK_SIZE),
 	m_msgBuffer(Parallel ? 2 * DEF_PRLDEGREE * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, DEF_PRLDEGREE),
-	m_treeConfig(8),
 	m_treeDestroy(true),
 	m_treeParams(Parallel ? BlakeParams(static_cast<byte>(DIGEST_SIZE), 2, DEF_PRLDEGREE, 0, static_cast<byte>(DIGEST_SIZE)) : BlakeParams(static_cast<byte>(DIGEST_SIZE), 1, 1, 0, 0))
 {
@@ -51,32 +49,24 @@ Blake512::Blake512(bool Parallel)
 		throw CryptoDigestException("Blake512::Ctor", "Cpu does not support parallel processing!");
 	}
 
-	if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = Parallel;
-	}
+	m_parallelProfile.IsParallel() = m_parallelProfile.IsParallel() ? Parallel : false;
 
 	if (m_parallelProfile.IsParallel())
 	{
-		m_parallelProfile.IsParallel() = Parallel;
-		// initialize the leaf nodes
-		Reset();
+		m_dgtState.resize(m_parallelProfile.ParallelMaxDegree());
+		m_msgBuffer.resize(2 * (m_parallelProfile.ParallelMaxDegree() * BLOCK_SIZE));
 	}
-	else
-	{
-		LoadState(m_dgtState[0]);
-	}
+
+	Reset();
 }
 
 Blake512::Blake512(BlakeParams &Params)
 	:
 	m_dgtState(Params.FanOut() > 0 ? Params.FanOut() : 1),
 	m_isDestroyed(false),
-	m_leafSize(BLOCK_SIZE),
 	m_msgBuffer(Params.FanOut() > 0 ? 2 * Params.FanOut() * BLOCK_SIZE : BLOCK_SIZE),
 	m_msgLength(0),
 	m_parallelProfile(BLOCK_SIZE, false, STATE_PRECACHED, false, Params.FanOut()),
-	m_treeConfig(CHAIN_SIZE),
 	m_treeDestroy(false),
 	m_treeParams(Params)
 {
@@ -85,10 +75,7 @@ Blake512::Blake512(BlakeParams &Params)
 		throw CryptoDigestException("Blake512::Ctor", "Cpu does not support parallel processing!");
 	}
 
-	if (m_parallelProfile.IsParallel())
-	{
-		m_parallelProfile.IsParallel() = m_treeParams.FanOut() > 1;
-	}
+	m_parallelProfile.IsParallel() = m_parallelProfile.IsParallel() ? m_treeParams.FanOut() > 1 : false;
 
 	if (m_parallelProfile.IsParallel())
 	{
@@ -100,17 +87,14 @@ Blake512::Blake512(BlakeParams &Params)
 		{
 			throw CryptoDigestException("BlakeBP512:Ctor", "The FanOut parameter is invalid! Must be an even number greater than 1.");
 		}
-
-		m_leafSize = Params.LeafLength() == 0 ? DEF_LEAFSIZE : Params.LeafLength();
-		// initialize leafs
-		Reset();
 	}
 	else
 	{
 		// fixed at defaults for sequential; depth 1, fanout 1, leaf length unlimited
 		m_treeParams = BlakeParams(static_cast<byte>(DIGEST_SIZE));
-		LoadState(m_dgtState[0]);
 	}
+
+	Reset();
 }
 
 Blake512::~Blake512()
@@ -118,11 +102,9 @@ Blake512::~Blake512()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_leafSize = 0;
 		m_msgLength = 0;
 
 		IntUtils::ClearVector(m_msgBuffer);
-		IntUtils::ClearVector(m_treeConfig);
 		m_parallelProfile.Reset();
 
 		for (size_t i = 0; i < m_dgtState.size(); ++i)
@@ -232,7 +214,7 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 			}
 		}
 
-		// process last 4 blocks
+		// process last blocks
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			// apply f0 bit reversal constant to final blocks
@@ -251,12 +233,7 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 				m_msgLength += BLOCK_SIZE - blkLen;
 				MemUtils::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
 			}
-			else if ((int32_t)m_msgLength < 1)
-			{
-				blkLen = 0;
-				MemUtils::Clear(m_msgBuffer, i * BLOCK_SIZE, BLOCK_SIZE);
-			}
-			else if ((int32_t)m_msgLength < BLOCK_SIZE)
+			else if (m_msgLength < BLOCK_SIZE)
 			{
 				blkLen = m_msgLength;
 				MemUtils::Clear(m_msgBuffer, (i * BLOCK_SIZE) + blkLen, BLOCK_SIZE - blkLen);
@@ -270,10 +247,12 @@ size_t Blake512::Finalize(std::vector<byte> &Output, const size_t OutOffset)
 
 		// set up the root node
 		m_msgLength = 0;
-		m_treeParams.NodeDepth() = 1;
-		m_treeParams.NodeOffset() = 0;
-		m_treeParams.MaxDepth() = 2;
-		LoadState(m_dgtState[0]);
+		BlakeParams rootP = m_treeParams;
+		rootP.NodeDepth() = 1;
+		rootP.NodeOffset() = 0;
+		rootP.MaxDepth() = 2;
+		std::vector<ulong> config(CHAIN_SIZE);
+		LoadState(m_dgtState[0], rootP, config);
 
 		// load blocks
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
@@ -320,6 +299,8 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 		throw Exception::CryptoDigestException("Blake512::Initialize", "Mac Key has invalid length!");
 	}
 
+	std::vector<ulong> config(CHAIN_SIZE);
+
 	if (MacKey.Nonce().size() != 0)
 	{
 		if (MacKey.Nonce().size() != 16)
@@ -327,8 +308,8 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 			throw Exception::CryptoDigestException("Blake512::Initialize", "Salt has invalid length!");
 		}
 
-		m_treeConfig[4] = IntUtils::LeBytesTo64(MacKey.Nonce(), 0);
-		m_treeConfig[5] = IntUtils::LeBytesTo64(MacKey.Nonce(), 8);
+		config[4] = IntUtils::LeBytesTo64(MacKey.Nonce(), 0);
+		config[5] = IntUtils::LeBytesTo64(MacKey.Nonce(), 8);
 	}
 
 	if (MacKey.Info().size() != 0)
@@ -338,8 +319,8 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 			throw Exception::CryptoDigestException("Blake512::Initialize", "Info has invalid length!");
 		}
 
-		m_treeConfig[6] = IntUtils::LeBytesTo64(MacKey.Info(), 0);
-		m_treeConfig[7] = IntUtils::LeBytesTo64(MacKey.Info(), 8);
+		config[6] = IntUtils::LeBytesTo64(MacKey.Info(), 0);
+		config[7] = IntUtils::LeBytesTo64(MacKey.Info(), 8);
 	}
 
 	std::vector<byte> mkey(BLOCK_SIZE, 0);
@@ -353,7 +334,7 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 		{
 			MemUtils::Copy(mkey, 0, m_msgBuffer, i * BLOCK_SIZE, mkey.size());
 			m_treeParams.NodeOffset() = static_cast<byte>(i);
-			LoadState(m_dgtState[i]);
+			LoadState(m_dgtState[i], m_treeParams, config);
 		}
 		m_msgLength = m_parallelProfile.ParallelMinimumSize();
 		m_treeParams.NodeOffset() = 0;
@@ -362,15 +343,22 @@ void Blake512::Initialize(Key::Symmetric::ISymmetricKey &MacKey)
 	{
 		MemUtils::Copy(mkey, 0, m_msgBuffer, 0, mkey.size());
 		m_msgLength = BLOCK_SIZE;
-		LoadState(m_dgtState[0]);
+		LoadState(m_dgtState[0], m_treeParams, config);
 	}
 }
 
 void Blake512::ParallelMaxDegree(size_t Degree)
 {
-	CexAssert(Degree != 0, "parallel degree can not be zero");
-	CexAssert(Degree % 2 == 0, "parallel degree must be an even number");
-	CexAssert(Degree <= m_parallelProfile.ProcessorCount(), "parallel degree can not exceed processor count");
+	if (Degree == 0 || Degree % 2 != 0 || Degree > m_parallelProfile.ProcessorCount())
+	{
+		throw CryptoDigestException("Blake256::ParallelMaxDegree", "Degree setting is invalid!");
+	}
+
+	m_parallelProfile.SetMaxDegree(Degree);
+	m_dgtState.clear();
+	m_dgtState.resize(Degree);
+	m_msgBuffer.clear();
+	m_msgBuffer.resize(Degree * BLOCK_SIZE);
 
 	if (Degree > 1 && m_parallelProfile.ProcessorCount() > 1)
 	{
@@ -390,22 +378,25 @@ void Blake512::ParallelMaxDegree(size_t Degree)
 
 void Blake512::Reset()
 {
-	m_msgLength = 0;
-	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	std::vector<ulong> config(CHAIN_SIZE);
 
 	if (m_parallelProfile.IsParallel())
 	{
 		for (size_t i = 0; i < m_treeParams.FanOut(); ++i)
 		{
 			m_treeParams.NodeOffset() = static_cast<byte>(i);
-			LoadState(m_dgtState[i]);
+			LoadState(m_dgtState[i], m_treeParams, config);
 		}
 		m_treeParams.NodeOffset() = 0;
 	}
 	else
 	{
-		LoadState(m_dgtState[0]);
+		m_treeParams.NodeOffset() = 0;
+		LoadState(m_dgtState[0], m_treeParams, config);
 	}
+
+	MemUtils::Clear(m_msgBuffer, 0, m_msgBuffer.size());
+	m_msgLength = 0;
 }
 
 void Blake512::Update(byte Input)
@@ -442,7 +433,6 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 				ParallelUtils::ParallelFor(0, m_treeParams.FanOut(), [this, &Input, InOffset](size_t i)
 				{
 					Permute(m_msgBuffer, i * BLOCK_SIZE, m_dgtState[i], BLOCK_SIZE);
-					Permute(m_msgBuffer, (i * BLOCK_SIZE) + (m_treeParams.FanOut() * BLOCK_SIZE), m_dgtState[i], BLOCK_SIZE);
 				});
 
 				// loop in the remainder (no buffering)
@@ -529,14 +519,14 @@ void Blake512::Update(const std::vector<byte> &Input, size_t InOffset, size_t Le
 
 //~~~Private Functions~~~//
 
-void Blake512::LoadState(Blake2bState &State)
+void Blake512::LoadState(Blake2bState &State, BlakeParams &Params, std::vector<ulong> &Config)
 {
 	MemUtils::Clear(State.T, 0, COUNTER_SIZE * sizeof(ulong));
 	MemUtils::Clear(State.F, 0, FLAG_SIZE * sizeof(ulong));
 	MemUtils::Copy(Blake2::IV512, 0, State.H, 0, CHAIN_SIZE * sizeof(ulong));
 
-	m_treeParams.GetConfig<ulong>(m_treeConfig);
-	MemUtils::XOR512(m_treeConfig, 0, State.H, 0);
+	Params.GetConfig<ulong>(Config);
+	MemUtils::XOR512(Config, 0, State.H, 0);
 }
 
 void Blake512::Permute(const std::vector<byte> &Input, size_t InOffset, Blake2bState &State, size_t Length)

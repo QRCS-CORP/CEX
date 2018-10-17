@@ -67,7 +67,7 @@ namespace Test
 			SecureStream secStm1(data);
 			if (secStm1.ToArray() != data)
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 
 			// test write method
@@ -75,7 +75,7 @@ namespace Test
 			secStm2.Write(data, 0, data.size());
 			if (secStm2.ToArray() != data)
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 
 			// test read/write
@@ -87,7 +87,7 @@ namespace Test
 			memcpy(&tmp2[0], &data[0], tmpSze);
 			if (tmp1 != tmp2)
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 
 			// read byte from start
@@ -95,7 +95,7 @@ namespace Test
 			byte x = secStm2.ReadByte();
 			if (x != data[1])
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 
 			// read byte from end
@@ -103,7 +103,7 @@ namespace Test
 			byte x1 = secStm2.ReadByte();
 			if (x1 != data[cnt - 1])
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 
 			// prepend byte
@@ -113,7 +113,7 @@ namespace Test
 			byte x2 = secStm2.ReadByte();
 			if (x1 != x2)
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 
 			// append byte
@@ -123,7 +123,7 @@ namespace Test
 			x2 = secStm2.ReadByte();
 			if (x2 != 33)
 			{
-				throw TestException("CheckAccess: The stream is invalid!");
+				throw TestException(std::string("CheckAccess: The stream is invalid!"));
 			}
 		}
 	}
@@ -138,7 +138,7 @@ namespace Test
 		secStm1.CopyTo(&memStm);
 		if (memStm.ToArray() != secStm1.ToArray() || memStm.ToArray() != data)
 		{
-			throw TestException("CompareSerial: The serialized key is invalid!");
+			throw TestException(std::string("CompareSerial: The serialized key is invalid!"));
 		}
 	}
 

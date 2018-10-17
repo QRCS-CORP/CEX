@@ -29,12 +29,14 @@
 #include "Digests.h"
 #include "IDigest.h"
 #include "ParallelOptions.h"
+#include "SHA2Digests.h"
 
 NAMESPACE_KDF
 
 using Enumeration::Digests;
 using Digest::IDigest;
 using Common::ParallelOptions;
+using Enumeration::SHA2Digests;
 
 /// <summary>
 /// An implementation of the Key Derivation Function: SCRYPT
@@ -157,7 +159,7 @@ public:
 	/// Setting this value to 0 will automatically use the number of system processor cores.</para></param>
 	/// 
 	/// <exception cref="Exception::CryptoKdfException">Thrown if an invalid digest name or parameters are used</exception>
-	explicit SCRYPT(Digests DigestType, size_t CpuCost = 16384, size_t Parallelization = 1);
+	explicit SCRYPT(SHA2Digests DigestType, size_t CpuCost = 16384, size_t Parallelization = 1);
 
 	/// <summary>
 	/// Instantiates an SCRYPT generator using a message digest instance
@@ -182,6 +184,13 @@ public:
 	//~~~Accessors~~~//
 
 	/// <summary>
+	/// The CPU cost parameter; increasing this value affects the cpu and memory cost.
+	/// <para>This value must be evenly divisible by 1024, with the minimum legal size of 1024. 
+	/// The minimum recommended size is 16384.</para>
+	/// </summary>
+	size_t &CpuCost();
+
+	/// <summary>
 	/// Read Only: The Kdf generators type name
 	/// </summary>
 	const Kdfs Enumeral() override;
@@ -202,7 +211,7 @@ public:
 	/// Minimum recommended initialization key size in bytes.
 	/// <para>Combined sizes of key, salt, and info should be at least this size.</para>
 	/// </summary>
-	size_t MinKeySize() override;
+	const size_t MinKeySize() override;
 
 	/// <summary>
 	/// Read Only: Available Kdf Key Sizes in bytes
@@ -213,6 +222,13 @@ public:
 	/// Read Only: The Kdf generators class name
 	/// </summary>
 	const std::string Name() override;
+
+	/// <summary>
+	/// The Parallelization parameter; indicates the number of threads used by the generator. 
+	/// <para>Change this value to multiply the cpu cost by this factor, the default value is 1.
+	/// Setting this value to 0 will automatically use the number of system processor cores.</para>
+	/// </summary>
+	size_t &Parallelization();
 
 	/// <summary>
 	/// Read/Write: Parallel and SIMD capability flags and sizes 

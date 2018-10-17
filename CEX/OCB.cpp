@@ -247,7 +247,6 @@ void OCB::Finalize(std::vector<byte> &Output, const size_t OutOffset, const size
 
 void OCB::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 {
-	Scope();
 	Reset();
 
 	if (KeyParams.Key().size() == 0)
@@ -788,6 +787,11 @@ void OCB::Reset()
 		Utility::MemUtils::Clear(m_aadData, 0, m_aadData.size());
 	}
 
+	if (!m_parallelProfile.IsDefault())
+	{
+		m_parallelProfile.Calculate();
+	}
+
 	m_mainBlockCount = 0;
 	Utility::MemUtils::Clear(m_checkSum, 0, m_checkSum.size());
 	Utility::MemUtils::Clear(m_listAsterisk, 0, m_listAsterisk.size());
@@ -813,11 +817,6 @@ void OCB::Scope()
 
 	m_hashList.clear();
 	m_hashList.reserve(PREFETCH_HASH);
-
-	if (!m_parallelProfile.IsDefault())
-	{
-		m_parallelProfile.Calculate();
-	}
 }
 
 NAMESPACE_MODEEND
