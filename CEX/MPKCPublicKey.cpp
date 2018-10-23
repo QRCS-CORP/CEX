@@ -7,8 +7,8 @@ NAMESPACE_ASYMMETRICKEY
 
 MPKCPublicKey::MPKCPublicKey(MPKCParams Params, const std::vector<byte> &P)
 	:
-	m_mpkcParameters(Params),
 	m_isDestroyed(false),
+	m_mpkcParameters(Params),
 	m_pubMat(P)
 {
 }

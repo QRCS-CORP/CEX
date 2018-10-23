@@ -27,8 +27,10 @@
 #define NAMESPACE_TLSEND } } } } }
 #define NAMESPACE_ASYMMETRICSIGN namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign {
 #define NAMESPACE_ASYMMETRICSIGNEND } } } }
-#define NAMESPACE_GMSS namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace GMSS {
-#define NAMESPACE_GMSSEND } } } } }
+#define NAMESPACE_PICNIC namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace Picnic {
+#define NAMESPACE_PICNICEND } } } } }
+#define NAMESPACE_SPHINCS namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace Sphincs {
+#define NAMESPACE_SPHINCSEND } } } } }
 
 #define NAMESPACE_SYMMETRIC namespace CEX { namespace Cipher { namespace Symmetric {
 #define NAMESPACE_SYMMETRICEND } } }

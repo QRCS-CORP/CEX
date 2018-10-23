@@ -100,11 +100,11 @@ namespace Test
 
 			Params(gen1);
 			Params(gen2);
-			OnProgress(std::string("SCRYPTTest: Passed initialization tests.."));
+			OnProgress(std::string("SHAKETest: Passed initialization tests.."));
 
 			Stress(gen1);
 			Stress(gen2);
-			OnProgress(std::string("SCRYPTTest: Passed stress tests.."));
+			OnProgress(std::string("SHAKETest: Passed stress tests.."));
 
 			delete gen1;
 			delete gen2;

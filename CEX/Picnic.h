@@ -16,25 +16,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef CEX_IASYMMETRICSIGN_H
-#define CEX_IASYMMETRICSIGN_H
+#ifndef CEX_PICNIC_H
+#define CEX_PICNIC_H
 
-#include "CexDomain.h"
-#include "CryptoAsymmetricException.h"
-#include "IAsymmetricKey.h"
-#include "IAsymmetricKeyPair.h"
+#include "IAsymmetricSign.h"
 
 NAMESPACE_ASYMMETRICSIGN
-
-using Enumeration::AsymmetricEngines;
-using Exception::CryptoAsymmetricException;
-using Key::Asymmetric::IAsymmetricKey;
-using Key::Asymmetric::IAsymmetricKeyPair;
 
 /// <summary>
 /// The Asymmetric cipher interface
 /// </summary>
-class IAsymmetricSign
+class Picnic final : public IAsymmetricSign
 {
 public:
 
@@ -43,71 +35,58 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	IAsymmetricSign(const IAsymmetricSign&) = delete;
+	Picnic(const Picnic&) = delete;
 
 	/// <summary>
 	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	IAsymmetricSign& operator=(const IAsymmetricSign&) = delete;
+	Picnic& operator=(const Picnic&) = delete;
 
 	/// <summary>
 	/// Constructor: Instantiate this class
 	/// </summary>
-	IAsymmetricSign() 
-	{
-	}
+	Picnic();
 
 	/// <summary>
 	/// Finalizer: destroys the containers objects
 	/// </summary>
-	virtual ~IAsymmetricSign() noexcept 
-	{
-	}
+	virtual ~Picnic() noexcept;
 
 	//~~~Accessors~~~//
 
 	/// <summary>
 	/// Read Only: The signature schemes type-name
 	/// </summary>
-	virtual const AsymmetricEngines Enumeral() = 0;
+	const AsymmetricEngines Enumeral() override;
 
 	/// <summary>
 	/// Read Only: The signature scheme has been initialized with a key
 	/// </summary>
-	virtual const bool IsInitialized() = 0;
+	const bool IsInitialized() override;
 
 	/// <summary>
 	/// Read Only: This class is initialized for Signing with the Private key
 	/// </summary>
-	virtual const bool IsSigner() = 0;
+	const bool IsSigner() override;
 
 	/// <summary>
 	/// Read Only: The signature scheme name
 	/// </summary>
-	virtual const std::string Name() = 0;
+	const std::string Name() override;
 
 	//~~~Public Functions~~~//
-
-	/// <summary>
-	/// Generate a public/private key-pair
-	/// </summary>
-	/// 
-	/// <returns>A public/private key pair</returns>
-	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if the key generation call fails</exception>
-	virtual IAsymmetricKeyPair* Generate() = 0;
 
 	/// <summary>
 	/// Initialize the signature scheme for signing (private key) or verifying (public key)
 	/// </summary>
 	/// 
 	/// <param name="AsymmetricKey">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
-	virtual const void Initialize(IAsymmetricKey &AsymmetricKey) = 0;
+	const void Initialize(IAsymmetricKey &AsymmetricKey) override;
 
 	/// <summary>
 	/// Reset the underlying engine
 	/// </summary>
-	virtual void Reset() = 0;
+	void Reset() override;
 
 	/// <summary>
 	/// Get the signing code for a stream
@@ -120,7 +99,7 @@ public:
 	/// <param name="OutOffset">The starting position within the output array</param>
 	/// 
 	/// <returns>The encrypted hash code</returns>
-	virtual void Sign(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Output, size_t OutOffset) = 0;
+	void Sign(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Output, size_t OutOffset) override;
 
 	/// <summary>
 	/// Compare an input stream to a signed hash
@@ -132,7 +111,7 @@ public:
 	/// <param name="Code">The array containing the signed hash code</param>
 	/// 
 	/// <returns>Returns true if the codes match</returns>
-	virtual bool Verify(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Code) = 0;
+	bool Verify(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Code) override;
 };
 
 NAMESPACE_ASYMMETRICSIGNEND

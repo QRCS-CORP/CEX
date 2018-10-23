@@ -15,33 +15,29 @@ enum class AsymmetricEngines : byte
 	/// </summary>
 	None = 0,
 	/// <summary>
-	/// An Elliptic Curve Diffie Hellman cipher implementation
-	/// </summary>
-	ECDH = 1,
-	/// <summary>
-	/// Elliptic Curve Digital Signature Algorithm
-	/// </summary>
-	ECDSA = 2,
-	/// <summary>
-	/// A Generalized Merkle Signature Scheme implementation
-	/// </summary>
-	GMSS = 3,
-	/// <summary>
 	/// A McEliece cipher implementation
 	/// </summary>
-	McEliece = 4,
+	McEliece = 1,
 	/// <summary>
 	/// A Module-LWE cipher implementation
 	/// </summary>
-	ModuleLWE = 5,
+	ModuleLWE = 2,
 	/// <summary>
 	/// An NTRU cipher implementation
 	/// </summary>
-	NTRU = 6,
+	NTRU = 3,
+	/// <summary>
+	/// The Picnic asymmetric signature scheme
+	/// </summary>
+	Picnic = 4,
 	/// <summary>
 	/// A Ring-LWE cipher implementation
 	/// </summary>
-	RingLWE = 7
+	RingLWE = 5,
+	/// <summary>
+	/// The Sphincs asymmetric signature scheme
+	/// </summary>
+	Sphincs = 6
 };
 
 NAMESPACE_ENUMERATIONEND

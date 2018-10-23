@@ -187,6 +187,7 @@
 #include "../Test/SimdWrapperTest.h"
 #include "../Test/SHAKETest.h"
 #include "../Test/SkeinTest.h"
+#include "../Test/SphincsTest.h"
 #include "../Test/SymmetricKeyGeneratorTest.h"
 #include "../Test/SymmetricKeyTest.h"
 #include "../Test/ThreefishTest.h"
@@ -293,7 +294,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                             *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.6f (A6)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      October 17, 2018                 *");
+	ConsoleUtils::WriteLine("* Date:      October 23, 2018                 *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");

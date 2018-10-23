@@ -221,9 +221,9 @@ void HMAC::Reset()
 	m_dgtEngine->Reset();
 	m_inputPad.clear();
 	m_inputPad.resize(m_dgtEngine->BlockSize());
+	m_isInitialized = false;
 	m_outputPad.clear();
 	m_outputPad.resize(m_dgtEngine->BlockSize());
-	m_isInitialized = false;
 }
 
 void HMAC::Update(byte Input)

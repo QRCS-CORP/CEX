@@ -1,24 +1,24 @@
-#ifndef CEX_NTRUPRIVATEKEY_H
-#define CEX_NTRUPRIVATEKEY_H
+#ifndef CEX_PICNICPUUBLICKEY_H
+#define CEX_PICNICPUUBLICKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "NTRUParams.h"
+#include "PicnicParams.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::NTRUParams;
+using Enumeration::PicnicParams;
 
 /// <summary>
-/// A ModuleLWE Private Key container
+/// A Picnic Public Key container
 /// </summary>
-class NTRUPrivateKey final : public IAsymmetricKey
+class PicnicPublicKey final : public IAsymmetricKey
 {
 private:
 
 	bool m_isDestroyed;
-	std::vector<byte> m_rCoeffs;
-	NTRUParams m_ntruParameters;
+	std::vector<byte> m_pCoeffs;
+	PicnicParams m_picnicParameters;
 
 public:
 
@@ -27,42 +27,42 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey(const NTRUPrivateKey&) = delete;
+	PicnicPublicKey(const PicnicPublicKey&) = delete;
 
 	/// <summary>
-	/// Copy operator: copy is restricted, this function has been deleted
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey& operator=(const NTRUPrivateKey&) = delete;
+	PicnicPublicKey& operator=(const PicnicPublicKey&) = delete;
 
 	/// <summary>
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey() = delete;
+	PicnicPublicKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
-	/// <param name="R">The private key polynomial</param>
-	NTRUPrivateKey(NTRUParams Parameters, std::vector<byte> &R);
+	/// <param name="P">The public keys polynomial</param>
+	PicnicPublicKey(PicnicParams Parameters, std::vector<byte> &P);
 
 	/// <summary>
-	/// Initialize this class with a serialized private key
+	/// Initialize this class with a serialized public key
 	/// </summary>
 	/// 
-	/// <param name="KeyStream">The serialized private key</param>
-	explicit NTRUPrivateKey(const std::vector<byte> &KeyStream);
+	/// <param name="KeyStream">The serialized public key</param>
+	explicit PicnicPublicKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~NTRUPrivateKey() override;
+	~PicnicPublicKey() override;
 
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The private keys cipher type name
+	/// Read Only: The public keys cipher type name
 	/// </summary>
 	const AsymmetricEngines CipherType() override;
 
@@ -74,12 +74,12 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const NTRUParams Parameters();
+	const PicnicParams Parameters();
 
 	/// <summary>
-	/// Read Only: the private key polynomial R
+	/// Read Only: The public keys polynomial
 	/// </summary>
-	const std::vector<byte> &R();
+	const std::vector<byte> &P();
 
 	//~~~Public Functions~~~//
 
@@ -89,7 +89,7 @@ public:
 	void Destroy() override;
 
 	/// <summary>
-	/// Serialize a private key to a byte array
+	/// Serialize a public key to a byte array
 	/// </summary>
 	std::vector<byte> ToBytes() override;
 };

@@ -50,7 +50,7 @@ ChaCha256::ChaCha256(StreamAuthenticators Authenticator)
 	:
 	m_authenticatorType(Authenticator),
 	m_cipherState(new ChaCha256State),
-	m_distCode(INFO_SIZE),
+	m_distributionCode(INFO_SIZE),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
@@ -58,6 +58,7 @@ ChaCha256::ChaCha256(StreamAuthenticators Authenticator)
 	m_legalRounds(ROUND_COUNT),
 	m_macAuthenticator(m_authenticatorType == StreamAuthenticators::None ? nullptr :
 		Helper::MacFromName::GetInstance(Authenticator)),
+	m_macCounter(0),
 	m_macKey(0),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
@@ -70,6 +71,7 @@ ChaCha256::~ChaCha256()
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
+		m_macCounter = 0;
 		m_parallelProfile.Reset();
 
 		if (m_cipherState != nullptr)
@@ -78,7 +80,7 @@ ChaCha256::~ChaCha256()
 			m_cipherState.reset(nullptr);
 		}
 
-		IntUtils::ClearVector(m_distCode);
+		IntUtils::ClearVector(m_distributionCode);
 		IntUtils::ClearVector(m_legalKeySizes);
 		IntUtils::ClearVector(m_legalRounds);
 		IntUtils::ClearVector(m_macKey);
@@ -94,7 +96,7 @@ const size_t ChaCha256::BlockSize()
 
 const std::vector<byte> &ChaCha256::DistributionCode()
 { 
-	return m_distCode; 
+	return m_distributionCode; 
 }
 
 const size_t ChaCha256::DistributionCodeMax()
@@ -169,7 +171,17 @@ void ChaCha256::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	std::vector<byte> code(m_macAuthenticator->MacSize());
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
+
 	// reset the mac generator
+	++m_macCounter;
+	// customization string is CSX256+counter
+	std::vector<byte> cust{ 0x43, 0x53, 0x58, 0x32, 0x35, 0x36, 0, 0, 0, 0, 0, 0, 0, 0 };
+	IntUtils::Le64ToBytes(m_macCounter, cust, 6);
+	// extract the new mac key
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(m_macKey, cust);
+	gen.Generate(m_macKey);
+	// re-initialize the authenticator
 	Key::Symmetric::SymmetricKey s(m_macKey);
 	m_macAuthenticator->Initialize(s);
 }
@@ -203,12 +215,12 @@ void ChaCha256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	if (KeyParams.Info().size() != 0)
 	{
 		// custom code
-		MemUtils::Copy(KeyParams.Info(), 0, m_distCode, 0, (KeyParams.Info().size() > m_distCode.size()) ? m_distCode.size() : KeyParams.Info().size());
+		MemUtils::Copy(KeyParams.Info(), 0, m_distributionCode, 0, (KeyParams.Info().size() > m_distributionCode.size()) ? m_distributionCode.size() : KeyParams.Info().size());
 	}
 	else
 	{
 		// standard
-		m_distCode.assign(SIGMA_INFO.begin(), SIGMA_INFO.end());
+		m_distributionCode.assign(SIGMA_INFO.begin(), SIGMA_INFO.end());
 	}
 
 	if (m_authenticatorType == StreamAuthenticators::None)
@@ -259,6 +271,8 @@ void ChaCha256::ParallelMaxDegree(size_t Degree)
 
 void ChaCha256::Reset()
 {
+	m_macCounter = 0;
+	m_isInitialized = false;
 	m_cipherState->Reset();
 }
 
@@ -281,10 +295,10 @@ void ChaCha256::Transform(const std::vector<byte> &Input, size_t InOffset, std::
 
 void ChaCha256::Expand(const std::vector<byte> &Key, const std::vector<byte> &Iv)
 {
-	m_cipherState->S[0] = IntUtils::LeBytesTo32(m_distCode, 0);
-	m_cipherState->S[1] = IntUtils::LeBytesTo32(m_distCode, 4);
-	m_cipherState->S[2] = IntUtils::LeBytesTo32(m_distCode, 8);
-	m_cipherState->S[3] = IntUtils::LeBytesTo32(m_distCode, 12);
+	m_cipherState->S[0] = IntUtils::LeBytesTo32(m_distributionCode, 0);
+	m_cipherState->S[1] = IntUtils::LeBytesTo32(m_distributionCode, 4);
+	m_cipherState->S[2] = IntUtils::LeBytesTo32(m_distributionCode, 8);
+	m_cipherState->S[3] = IntUtils::LeBytesTo32(m_distributionCode, 12);
 	m_cipherState->S[4] = IntUtils::LeBytesTo32(Key, 0);
 	m_cipherState->S[5] = IntUtils::LeBytesTo32(Key, 4);
 	m_cipherState->S[6] = IntUtils::LeBytesTo32(Key, 8);

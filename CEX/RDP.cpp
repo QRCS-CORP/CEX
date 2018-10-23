@@ -13,6 +13,9 @@ RDP::RDP(RdEngines RdEngineType)
 	:
 	m_engineType(RdEngineType)
 {
+#if !defined(__AVX__) && !defined(__AVX2__) && !defined(__AVX512__)
+	throw CryptoRandomException("RDP:CTor", "RDRAND is not supported on this system!");
+#endif
 	Reset();
 }
 
@@ -54,7 +57,9 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 	{
 		throw CryptoRandomException("RDP:Generate", "The seed providers maximum output is 64MB per request!");
 	}
-	 
+
+#if defined (__AVX__) || defined(__AVX2__) || defined(__AVX512__)
+
 	int res = 0;
 	size_t failCtr = 0;
 
@@ -100,6 +105,7 @@ void RDP::Generate(std::vector<byte> &Output, size_t Offset, size_t Length)
 			}
 		}
 	}
+#endif
 }
 
 void RDP::Generate(std::vector<byte> &Output)

@@ -34,7 +34,8 @@
 NAMESPACE_STREAM
 
 /// <summary>
-/// A parallelized ChaCha stream cipher implementation using a 512bit key and 80 rounds
+/// A parallelized and vectorized ChaCha-512 80-round stream cipher [CSX512] implementation.
+/// <para>Uses an optional authentication mode (HMAC(SHA2) or KMAC set through the constructor) to authenticate the stream.</para>
 /// </summary>
 /// 
 /// <example>
@@ -153,13 +154,14 @@ private:
 
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<ChaCha512State> m_cipherState;
-	std::vector<byte> m_distCode;
+	std::vector<byte> m_distributionCode;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	std::unique_ptr<IMac> m_macAuthenticator;
+	ulong m_macCounter;
 	std::vector<byte> m_macKey;
 	ParallelOptions m_parallelProfile;
 

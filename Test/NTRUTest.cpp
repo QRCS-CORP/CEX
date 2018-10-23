@@ -47,7 +47,6 @@ namespace Test
 			OnProgress(std::string("NTRUTest: Passed message authentication test.."));
 			CipherText();
 			OnProgress(std::string("NTRUTest: Passed cipher-text integrity test.."));
-
 			PublicKey();
 			OnProgress(std::string("NTRUTest: Passed public key integrity test.."));
 			Serialization();

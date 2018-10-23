@@ -37,7 +37,8 @@
 NAMESPACE_STREAM
 
 /// <summary>
-/// A parallelized ChaCha-256 stream cipher implementation using a standard 20 rounds
+/// A parallelized and vectorized ChaCha-256 20-round stream cipher [CSX256] implementation.
+/// <para>Uses an optional authentication mode (HMAC(SHA2) or KMAC set through the constructor) to authenticate the stream.</para>
 /// </summary>
 /// 
 /// <example>
@@ -149,13 +150,14 @@ private:
 
 	StreamAuthenticators m_authenticatorType;
 	std::unique_ptr<ChaCha256State> m_cipherState;
-	std::vector<byte> m_distCode;
+	std::vector<byte> m_distributionCode;
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	std::unique_ptr<IMac> m_macAuthenticator;
+	ulong m_macCounter;
 	std::vector<byte> m_macKey;
 	ParallelOptions m_parallelProfile;
 

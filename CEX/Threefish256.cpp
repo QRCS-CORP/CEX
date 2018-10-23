@@ -61,6 +61,7 @@ Threefish256::Threefish256(StreamAuthenticators Authenticator)
 	m_legalRounds(ROUND_COUNT),
 	m_macAuthenticator(m_authenticatorType == StreamAuthenticators::None ? nullptr :
 		Helper::MacFromName::GetInstance(Authenticator)),
+	m_macCounter(0),
 	m_macKey(0),
 	m_parallelProfile(BLOCK_SIZE, true, STATE_PRECACHED, true)
 {
@@ -73,6 +74,7 @@ Threefish256::~Threefish256()
 		m_isDestroyed = true;
 		m_authenticatorType = StreamAuthenticators::None;
 		m_isInitialized = false;
+		m_macCounter = 0;
 		m_parallelProfile.Reset();
 
 		if (m_cipherState != nullptr)
@@ -183,7 +185,17 @@ void Threefish256::Finalize(std::vector<byte> &Output, const size_t OutOffset, c
 	std::vector<byte> code(m_macAuthenticator->MacSize());
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
+
 	// reset the mac generator
+	++m_macCounter;
+	// customization string is TSX256+counter
+	std::vector<byte> cust{ 0x54, 0x53, 0x58, 0x32, 0x35, 0x36, 0, 0, 0, 0, 0, 0, 0, 0 };
+	IntUtils::Le64ToBytes(m_macCounter, cust, 6);
+	// extract the new mac key
+	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
+	gen.Initialize(m_macKey, cust);
+	gen.Generate(m_macKey);
+	// re-initialize the authenticator
 	Key::Symmetric::SymmetricKey s(m_macKey);
 	m_macAuthenticator->Initialize(s);
 }
@@ -236,7 +248,7 @@ void Threefish256::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 		MemUtils::Copy(OMEGA_INFO, 0, m_cipherState->T, 0, OMEGA_INFO.size());
 	}
 
-	// copy the counter
+	// copy the tweak
 	MemUtils::Copy(m_cipherState->T, 0, m_distributionCode, 0, 16);
 
 
@@ -286,6 +298,8 @@ void Threefish256::ParallelMaxDegree(size_t Degree)
 
 void Threefish256::Reset()
 {
+	m_macCounter = 0;
+	m_isInitialized = false;
 	m_cipherState->Reset();
 }
 

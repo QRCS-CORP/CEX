@@ -1,24 +1,24 @@
-#ifndef CEX_NTRUPRIVATEKEY_H
-#define CEX_NTRUPRIVATEKEY_H
+#ifndef CEX_PICNICPRIVATEKEY_H
+#define CEX_PICNICPRIVATEKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "NTRUParams.h"
+#include "PicnicParams.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::NTRUParams;
+using Enumeration::PicnicParams;
 
 /// <summary>
-/// A ModuleLWE Private Key container
+/// A Picnic Private Key container
 /// </summary>
-class NTRUPrivateKey final : public IAsymmetricKey
+class PicnicPrivateKey final : public IAsymmetricKey
 {
 private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_rCoeffs;
-	NTRUParams m_ntruParameters;
+	PicnicParams m_picnicParameters;
 
 public:
 
@@ -27,17 +27,17 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey(const NTRUPrivateKey&) = delete;
+	PicnicPrivateKey(const PicnicPrivateKey&) = delete;
 
 	/// <summary>
 	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey& operator=(const NTRUPrivateKey&) = delete;
+	PicnicPrivateKey& operator=(const PicnicPrivateKey&) = delete;
 
 	/// <summary>
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey() = delete;
+	PicnicPrivateKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
@@ -45,19 +45,19 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="R">The private key polynomial</param>
-	NTRUPrivateKey(NTRUParams Parameters, std::vector<byte> &R);
+	PicnicPrivateKey(PicnicParams Parameters, std::vector<byte> &R);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The serialized private key</param>
-	explicit NTRUPrivateKey(const std::vector<byte> &KeyStream);
+	explicit PicnicPrivateKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~NTRUPrivateKey() override;
+	~PicnicPrivateKey() override;
 
 	//~~~Accessors~~~//
 
@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const NTRUParams Parameters();
+	const PicnicParams Parameters();
 
 	/// <summary>
 	/// Read Only: the private key polynomial R

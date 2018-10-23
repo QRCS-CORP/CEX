@@ -30,7 +30,8 @@
 NAMESPACE_STREAM
 
 /// <summary>
-/// An [optionally] parallelized Threefish512 stream cipher implementation
+/// A parallelized and vectorized Threefish512 96-round stream cipher [TSX512] implementation.
+/// <para>Uses an optional authentication mode (HMAC(SHA2) or KMAC set through the constructor) to authenticate the stream.</para>
 /// </summary>
 /// 
 /// <example>
@@ -145,6 +146,7 @@ private:
 	std::vector<SymmetricKeySize> m_legalKeySizes;
 	std::vector<size_t> m_legalRounds;
 	std::unique_ptr<IMac> m_macAuthenticator;
+	ulong m_macCounter;
 	std::vector<byte> m_macKey;
 	ParallelOptions m_parallelProfile;
 

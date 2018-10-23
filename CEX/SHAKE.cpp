@@ -216,8 +216,8 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 	size_t offset;
 
 	offset = 0;
-	offset = LeftEncode(pad, 0, m_blockSize);
-	offset += LeftEncode(pad, offset, Name.size() * 8);
+	offset = LeftEncode(pad, 0, static_cast<uint>(m_blockSize));
+	offset += LeftEncode(pad, offset, static_cast<uint>(Name.size() * 8));
 
 	m_domainCode = CSHAKE_DOMAIN;
 
@@ -237,7 +237,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		}
 	}
 
-	offset += LeftEncode(pad, offset, Customization.size() * 8);
+	offset += LeftEncode(pad, offset, static_cast<uint>(Customization.size() * 8));
 
 	if (Customization.size() != 0)
 	{

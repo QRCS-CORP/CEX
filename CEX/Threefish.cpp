@@ -2015,7 +2015,6 @@ void Threefish::PemuteP1024C(const std::array<ulong, 16> &Key, const std::array<
 	size_t r;
 	size_t x;
 	size_t y;
-	volatile size_t z;
 
 	MemUtils::Copy(Counter, 0, C, 0, 2 * sizeof(ulong));
 	MemUtils::SetValue(C, 2, 14 * sizeof(ulong), 0xFF);

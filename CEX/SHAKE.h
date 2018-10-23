@@ -269,13 +269,13 @@ private:
 	}
 
 	template<typename Array>
-	static size_t LeftEncode(Array &Buffer, size_t Offset, size_t Value)
+	static size_t LeftEncode(Array &Buffer, size_t Offset, uint Value)
 	{
 		size_t i;
-		size_t n;
-		size_t v;
+		uint n;
+		uint v;
 
-		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8);
+		for (v = Value, n = 0; v && (n < sizeof(uint)); ++n, v >>= 8);
 
 		if (n == 0)
 		{
@@ -284,10 +284,10 @@ private:
 
 		for (i = 1; i <= n; ++i)
 		{
-			Buffer[Offset + i] = (uint8_t)(Value >> (8 * (n - i)));
+			Buffer[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
 		}
 
-		Buffer[Offset] = (uint8_t)n;
+		Buffer[Offset] = static_cast<uint8_t>(n);
 
 		return (n + 1);
 	}

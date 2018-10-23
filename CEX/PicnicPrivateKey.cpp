@@ -1,25 +1,25 @@
-#include "NTRUPrivateKey.h"
+#include "PicnicPrivateKey.h"
 #include "IntUtils.h"
 
 NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
-NTRUPrivateKey::NTRUPrivateKey(NTRUParams Parameters, std::vector<byte> &R)
+PicnicPrivateKey::PicnicPrivateKey(PicnicParams Parameters, std::vector<byte> &R)
 	:
 	m_isDestroyed(false),
-	m_ntruParameters(Parameters),
+	m_picnicParameters(Parameters),
 	m_rCoeffs(R)
 {
 }
 
-NTRUPrivateKey::NTRUPrivateKey(const std::vector<byte> &KeyStream)
+PicnicPrivateKey::PicnicPrivateKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false),
-	m_ntruParameters(NTRUParams::None),
+	m_picnicParameters(PicnicParams::None),
 	m_rCoeffs(0)
 {
-	m_ntruParameters = static_cast<NTRUParams>(KeyStream[0]);
+	m_picnicParameters = static_cast<PicnicParams>(KeyStream[0]);
 	uint rLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_rCoeffs.resize(rLen);
 
@@ -29,41 +29,41 @@ NTRUPrivateKey::NTRUPrivateKey(const std::vector<byte> &KeyStream)
 	}
 }
 
-NTRUPrivateKey::~NTRUPrivateKey()
+PicnicPrivateKey::~PicnicPrivateKey()
 {
 	Destroy();
 }
 
 //~~~Accessors~~~//
 
-const AsymmetricEngines NTRUPrivateKey::CipherType()
+const AsymmetricEngines PicnicPrivateKey::CipherType()
 {
 	return AsymmetricEngines::NTRU;
 }
 
-const AsymmetricKeyTypes NTRUPrivateKey::KeyType()
+const AsymmetricKeyTypes PicnicPrivateKey::KeyType()
 {
 	return AsymmetricKeyTypes::CipherPrivateKey;
 }
 
-const NTRUParams NTRUPrivateKey::Parameters()
+const PicnicParams PicnicPrivateKey::Parameters()
 {
-	return m_ntruParameters;
+	return m_picnicParameters;
 }
 
-const std::vector<byte> &NTRUPrivateKey::R()
+const std::vector<byte> &PicnicPrivateKey::R()
 {
 	return m_rCoeffs;
 }
 
 //~~~Public Functions~~~//
 
-void NTRUPrivateKey::Destroy()
+void PicnicPrivateKey::Destroy()
 {
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_ntruParameters = NTRUParams::None;
+		m_picnicParameters = PicnicParams::None;
 
 		if (m_rCoeffs.size() > 0)
 		{
@@ -72,11 +72,11 @@ void NTRUPrivateKey::Destroy()
 	}
 }
 
-std::vector<byte> NTRUPrivateKey::ToBytes()
+std::vector<byte> PicnicPrivateKey::ToBytes()
 {
 	uint rLen = static_cast<uint>(m_rCoeffs.size());
 	std::vector<byte> r((rLen * sizeof(ushort)) + 5);
-	r[0] = static_cast<byte>(m_ntruParameters);
+	r[0] = static_cast<byte>(m_picnicParameters);
 	Utility::IntUtils::Le32ToBytes(rLen, r, 1);
 
 	for (size_t i = 0; i < rLen; ++i)

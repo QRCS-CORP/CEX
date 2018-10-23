@@ -1,24 +1,24 @@
-#ifndef CEX_NTRUPRIVATEKEY_H
-#define CEX_NTRUPRIVATEKEY_H
+#ifndef CEX_SPHINCSPUUBLICKEY_H
+#define CEX_SPHINCSPUUBLICKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "NTRUParams.h"
+#include "SphincsParams.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::NTRUParams;
+using Enumeration::SphincsParams;
 
 /// <summary>
-/// A ModuleLWE Private Key container
+/// A Sphincs Public Key container
 /// </summary>
-class NTRUPrivateKey final : public IAsymmetricKey
+class SphincsPublicKey final : public IAsymmetricKey
 {
 private:
 
 	bool m_isDestroyed;
-	std::vector<byte> m_rCoeffs;
-	NTRUParams m_ntruParameters;
+	std::vector<byte> m_pCoeffs;
+	SphincsParams m_sphincsParameters;
 
 public:
 
@@ -27,42 +27,42 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey(const NTRUPrivateKey&) = delete;
+	SphincsPublicKey(const SphincsPublicKey&) = delete;
 
 	/// <summary>
-	/// Copy operator: copy is restricted, this function has been deleted
+	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey& operator=(const NTRUPrivateKey&) = delete;
+	SphincsPublicKey& operator=(const SphincsPublicKey&) = delete;
 
 	/// <summary>
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey() = delete;
+	SphincsPublicKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
 	/// </summary>
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
-	/// <param name="R">The private key polynomial</param>
-	NTRUPrivateKey(NTRUParams Parameters, std::vector<byte> &R);
+	/// <param name="P">The public keys polynomial</param>
+	SphincsPublicKey(SphincsParams Parameters, std::vector<byte> &P);
 
 	/// <summary>
-	/// Initialize this class with a serialized private key
+	/// Initialize this class with a serialized public key
 	/// </summary>
 	/// 
-	/// <param name="KeyStream">The serialized private key</param>
-	explicit NTRUPrivateKey(const std::vector<byte> &KeyStream);
+	/// <param name="KeyStream">The serialized public key</param>
+	explicit SphincsPublicKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~NTRUPrivateKey() override;
+	~SphincsPublicKey() override;
 
 	//~~~Accessors~~~//
 
 	/// <summary>
-	/// Read Only: The private keys cipher type name
+	/// Read Only: The public keys cipher type name
 	/// </summary>
 	const AsymmetricEngines CipherType() override;
 
@@ -74,12 +74,12 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const NTRUParams Parameters();
+	const SphincsParams Parameters();
 
 	/// <summary>
-	/// Read Only: the private key polynomial R
+	/// Read Only: The public keys polynomial
 	/// </summary>
-	const std::vector<byte> &R();
+	const std::vector<byte> &P();
 
 	//~~~Public Functions~~~//
 
@@ -89,7 +89,7 @@ public:
 	void Destroy() override;
 
 	/// <summary>
-	/// Serialize a private key to a byte array
+	/// Serialize a public key to a byte array
 	/// </summary>
 	std::vector<byte> ToBytes() override;
 };

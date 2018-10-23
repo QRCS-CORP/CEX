@@ -1,24 +1,24 @@
-#ifndef CEX_NTRUPRIVATEKEY_H
-#define CEX_NTRUPRIVATEKEY_H
+#ifndef CEX_SPHINCSPRIVATEKEY_H
+#define CEX_SPHINCSPRIVATEKEY_H
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "NTRUParams.h"
+#include "SphincsParams.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::NTRUParams;
+using Enumeration::SphincsParams;
 
 /// <summary>
-/// A ModuleLWE Private Key container
+/// A Sphincs Private Key container
 /// </summary>
-class NTRUPrivateKey final : public IAsymmetricKey
+class SphincsPrivateKey final : public IAsymmetricKey
 {
 private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_rCoeffs;
-	NTRUParams m_ntruParameters;
+	SphincsParams m_sphincsParameters;
 
 public:
 
@@ -27,17 +27,17 @@ public:
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey(const NTRUPrivateKey&) = delete;
+	SphincsPrivateKey(const SphincsPrivateKey&) = delete;
 
 	/// <summary>
 	/// Copy operator: copy is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey& operator=(const NTRUPrivateKey&) = delete;
+	SphincsPrivateKey& operator=(const SphincsPrivateKey&) = delete;
 
 	/// <summary>
 	/// Default constructor: default is restricted, this function has been deleted
 	/// </summary>
-	NTRUPrivateKey() = delete;
+	SphincsPrivateKey() = delete;
 
 	/// <summary>
 	/// Initialize this class with parameters
@@ -45,19 +45,19 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="R">The private key polynomial</param>
-	NTRUPrivateKey(NTRUParams Parameters, std::vector<byte> &R);
+	SphincsPrivateKey(SphincsParams Parameters, std::vector<byte> &R);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
 	/// </summary>
 	/// 
 	/// <param name="KeyStream">The serialized private key</param>
-	explicit NTRUPrivateKey(const std::vector<byte> &KeyStream);
+	explicit SphincsPrivateKey(const std::vector<byte> &KeyStream);
 
 	/// <summary>
 	/// Destructor: finalize this class
 	/// </summary>
-	~NTRUPrivateKey() override;
+	~SphincsPrivateKey() override;
 
 	//~~~Accessors~~~//
 
@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const NTRUParams Parameters();
+	const SphincsParams Parameters();
 
 	/// <summary>
 	/// Read Only: the private key polynomial R

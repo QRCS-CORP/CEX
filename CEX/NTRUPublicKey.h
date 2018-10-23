@@ -18,7 +18,7 @@ private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_pCoeffs;
-	NTRUParams m_rlweParameters;
+	NTRUParams m_ntruParameters;
 
 public:
 

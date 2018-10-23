@@ -18,7 +18,7 @@ private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_pCoeffs;
-	MLWEParams m_rlweParameters;
+	MLWEParams m_mlweParameters;
 
 public:
 

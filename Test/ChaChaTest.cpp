@@ -42,8 +42,10 @@ namespace Test
 
 	ChaChaTest::ChaChaTest()
 		:
+		m_code(0),
 		m_expected(0),
 		m_key(0),
+		m_message(0),
 		m_nonce(0),
 		m_progressEvent()
 	{
@@ -52,8 +54,10 @@ namespace Test
 
 	ChaChaTest::~ChaChaTest()
 	{
+		IntUtils::ClearVector(m_code);
 		IntUtils::ClearVector(m_expected);
 		IntUtils::ClearVector(m_key);
+		IntUtils::ClearVector(m_message);
 		IntUtils::ClearVector(m_nonce);
 	}
 
@@ -75,63 +79,105 @@ namespace Test
 	{
 		try
 		{
-			// Standard ChaChaPoly20
+			// Standard ChaChaPoly20 + authenticator
 
-			ChaCha256* cpr256a = new ChaCha256(Enumeration::StreamAuthenticators::HMACSHA256);
-			ChaCha256* cpr256b = new ChaCha256();
-
-			Authentication(cpr256a);
+			ChaCha256* cpr256h256 = new ChaCha256(Enumeration::StreamAuthenticators::HMACSHA256);
+			ChaCha256* cpr256h512 = new ChaCha256(Enumeration::StreamAuthenticators::HMACSHA512);
+			ChaCha256* cpr256k256 = new ChaCha256(Enumeration::StreamAuthenticators::KMAC256);
+			ChaCha256* cpr256k512 = new ChaCha256(Enumeration::StreamAuthenticators::KMAC512);
+			ChaCha256* cpr256s = new ChaCha256();
+			
+			Authentication(cpr256h256);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 MAC authentication tests.."));
-
-			Exception(cpr256b);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 exception handling tests.."));
-
-			Parallel(cpr256b);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 parallel to sequential equivalence test.."));
 
 			CompareP256();
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 permutation variants equivalence test.."));
 
-			Stress(cpr256b);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-256stress tests.."));
+			Exception(cpr256s);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 exception handling tests.."));
 
-			Kat(cpr256a, m_key[0], m_nonce[0], m_expected[0]);
-			Kat(cpr256a, m_key[1], m_nonce[1], m_expected[1]);
-			Kat(cpr256b, m_key[0], m_nonce[0], m_expected[2]);
-			Kat(cpr256b, m_key[1], m_nonce[1], m_expected[3]);
+			// check each variant for identical cipher-text output
+			Kat(cpr256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(cpr256h256, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(cpr256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(cpr256h512, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(cpr256k256, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(cpr256k512, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			// non-authenticated standard chachapoly20
+			Kat(cpr256s, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
+			Kat(cpr256s, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer tests.."));
 
-			delete cpr256a;
-			delete cpr256b;
+			Parallel(cpr256s);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 parallel to sequential equivalence test.."));
+
+			Stress(cpr256s);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 stress tests.."));
+
+			// original mac vectors
+			Verification(cpr256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
+			Verification(cpr256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1]);
+			//Verification(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
+			//Verification(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer authentication tests.."));
+
+			delete cpr256h256;
+			delete cpr256h512;
+			delete cpr256k256;
+			delete cpr256k512;
+			delete cpr256s;
 
 			// ChaChaPoly80 is the default if CEX_CHACHA512_STRONG is defined in CexConfig, or ChaChaPoly40 as alternate
 
-			ChaCha512* cpr512a = new ChaCha512(Enumeration::StreamAuthenticators::HMACSHA256);
-			ChaCha512* cpr512b = new ChaCha512();
+			ChaCha512* cpr512h256 = new ChaCha512(Enumeration::StreamAuthenticators::HMACSHA256);
+			ChaCha512* cpr512h512 = new ChaCha512(Enumeration::StreamAuthenticators::HMACSHA512);
+			ChaCha512* cpr512k256 = new ChaCha512(Enumeration::StreamAuthenticators::KMAC256);
+			ChaCha512* cpr512k512 = new ChaCha512(Enumeration::StreamAuthenticators::KMAC512);
+			ChaCha512* cpr512s = new ChaCha512();
 
-			Authentication(cpr512a);
+			Authentication(cpr512h256);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 MAC authentication tests.."));
-
-			Exception(cpr512b);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 exception handling tests.."));
-
-			Parallel(cpr512b);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 parallel to sequential equivalence test.."));
 
 			CompareP512();
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 permutation variants equivalence test.."));
 
-			Stress(cpr512b);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-512stress tests.."));
+			Exception(cpr512s);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 exception handling tests.."));
 
-			Kat(cpr512a, m_key[2], m_nonce[2], m_expected[4]);
-			Kat(cpr512a, m_key[3], m_nonce[3], m_expected[5]);
-			Kat(cpr512b, m_key[2], m_nonce[2], m_expected[6]);
-			Kat(cpr512b, m_key[3], m_nonce[3], m_expected[7]);
+			// check each variant for identical cipher-text output
+			Kat(cpr512h256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(cpr512h256, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(cpr512h512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(cpr512h512, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(cpr512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(cpr512k256, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(cpr512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(cpr512k512, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
+			// non-authenticated extended chachapoly80/40
+			Kat(cpr512s, m_message[2], m_key[2], m_nonce[2], m_expected[6]);
+			Kat(cpr512s, m_message[3], m_key[3], m_nonce[3], m_expected[7]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer tests.."));
 
-			delete cpr512a;
-			delete cpr512b;
+			Parallel(cpr512s);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 parallel to sequential equivalence test.."));
+
+			Stress(cpr512s);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 stress tests.."));
+
+			// original mac vectors
+			Verification(cpr512h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[4]);
+			Verification(cpr512h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[5]);
+			//Verification(cpr512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[6]);
+			//Verification(cpr512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[7]);
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer authentication tests.."));
+
+			delete cpr512h256;
+			delete cpr512h512;
+			delete cpr512k256;
+			delete cpr512k512;
+			delete cpr512s;
 
 			return SUCCESS;
 		}
@@ -148,32 +194,32 @@ namespace Test
 	void ChaChaTest::Authentication(IStreamCipher* Cipher)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
-		const size_t MACLEN = Cipher->TagSize();
+		const size_t TAGLEN = Cipher->TagSize();
 		const size_t MINSMP = 64;
 		const size_t MAXSMP = 6400;
 		std::vector<byte> cpt;
 		std::vector<byte> inp;
 		std::vector<byte> key(ks.KeySize());
 		std::vector<byte> nonce(ks.NonceSize());
-		std::vector<byte> mac(MACLEN);
+		std::vector<byte> code(TAGLEN);
 		std::vector<byte> otp;
 		SecureRandom rnd;
 		size_t i;
 		size_t j;
 
-		cpt.reserve(MAXSMP + MACLEN);
+		cpt.reserve(MAXSMP + TAGLEN);
 		inp.reserve(MAXSMP);
 		otp.reserve(MAXSMP);
 
 		// test large random-sized arrays
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
-			cpt.resize(INPLEN + MACLEN);
-			inp.resize(INPLEN);
-			otp.resize(INPLEN);
+			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
+			cpt.resize(MSGLEN + TAGLEN);
+			inp.resize(MSGLEN);
+			otp.resize(MSGLEN);
 
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntUtils::Fill(inp, 0, MSGLEN, rnd);
 			IntUtils::Fill(key, 0, key.size(), rnd);
 			if (nonce.size() > 0)
 			{
@@ -183,23 +229,23 @@ namespace Test
 
 			// encrypt plain-text
 			Cipher->Initialize(true, kp);
-			Cipher->Transform(inp, 0, cpt, 0, INPLEN);
+			Cipher->Transform(inp, 0, cpt, 0, MSGLEN);
 			// write mac to output stream
-			Cipher->Finalize(cpt, INPLEN, MACLEN);
+			Cipher->Finalize(cpt, MSGLEN, TAGLEN);
 
 			// decrypt cipher-text
 			Cipher->Initialize(false, kp);
-			Cipher->Transform(cpt, 0, otp, 0, INPLEN);
+			Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
 			// write mac to temp array
-			Cipher->Finalize(mac, 0, MACLEN);
+			Cipher->Finalize(code, 0, TAGLEN);
 
 			// use constant time IntUtils::Compare to verify mac
-			if (!IntUtils::Compare(mac, 0, cpt, INPLEN, MACLEN))
+			if (!IntUtils::Compare(code, 0, cpt, MSGLEN, TAGLEN))
 			{
 				throw TestException(std::string("Authentication: MAC output is not equal! -TA1"));
 			}
 
-			for (j = 0; j < INPLEN; ++j)
+			for (j = 0; j < MSGLEN; ++j)
 			{
 				if (inp[j] != otp[j])
 				{
@@ -427,9 +473,9 @@ namespace Test
 		try
 		{
 			// not initialized
-			std::vector<byte> mac(16);
+			std::vector<byte> code(16);
 
-			Cipher->Finalize(mac, 0, 16);
+			Cipher->Finalize(code, 0, 16);
 
 			throw TestException(std::string("ChaCha"), std::string("Exception: Exception handling failure! -TE4"));
 		}
@@ -462,25 +508,24 @@ namespace Test
 		}
 	}
 
-	void ChaChaTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	void ChaChaTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
 
-		const size_t MSGLEN = Expected.size();
-		std::vector<byte> msg(MSGLEN);
+		const size_t MSGLEN = Message.size();
 		std::vector<byte> cpt(MSGLEN);
 		std::vector<byte> otp(MSGLEN);
 		SymmetricKey kp(Key, Nonce);
 
 		// encrypt
 		Cipher->Initialize(true, kp);
-		Cipher->Transform(msg, 0, cpt, 0, MSGLEN);
+		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
 
 		// decrypt
 		Cipher->Initialize(false, kp);
 		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
 
-		if (otp != msg)
+		if (otp != Message)
 		{
 			throw TestException(std::string("Kat: Decrypted output does not match the input! -TV1"));
 		}
@@ -511,14 +556,14 @@ namespace Test
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
-			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
-			cpt1.resize(INPLEN);
-			cpt2.resize(INPLEN);
-			inp.resize(INPLEN);
-			otp.resize(INPLEN);
+			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXSMP, MINSMP));
+			cpt1.resize(MSGLEN);
+			cpt2.resize(MSGLEN);
+			inp.resize(MSGLEN);
+			otp.resize(MSGLEN);
 
 			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntUtils::Fill(inp, 0, MSGLEN, rnd);
 			SymmetricKey kp(key, nonce);
 
 			Cipher->ParallelProfile().ParallelBlockSize() = Cipher->ParallelProfile().ParallelMinimumSize();
@@ -526,12 +571,12 @@ namespace Test
 			// sequential
 			Cipher->Initialize(true, kp);
 			Cipher->ParallelProfile().IsParallel() = false;
-			Cipher->Transform(inp, 0, cpt1, 0, INPLEN);
+			Cipher->Transform(inp, 0, cpt1, 0, MSGLEN);
 
 			// parallel
 			Cipher->Initialize(true, kp);
 			Cipher->ParallelProfile().IsParallel() = true;
-			Cipher->Transform(inp, 0, cpt2, 0, INPLEN);
+			Cipher->Transform(inp, 0, cpt2, 0, MSGLEN);
 
 			if (cpt1 != cpt2)
 			{
@@ -541,7 +586,7 @@ namespace Test
 			// decrypt sequential ciphertext with parallel
 			Cipher->Initialize(false, kp);
 			Cipher->ParallelProfile().IsParallel() = true;
-			Cipher->Transform(cpt1, 0, otp, 0, INPLEN);
+			Cipher->Transform(cpt1, 0, otp, 0, MSGLEN);
 
 			if (otp != inp)
 			{
@@ -574,26 +619,62 @@ namespace Test
 
 		for (i = 0; i < TEST_CYCLES; ++i)
 		{
-			const size_t INPLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
-			cpt.resize(INPLEN);
-			inp.resize(INPLEN);
-			otp.resize(INPLEN);
+			const size_t MSGLEN = static_cast<size_t>(rnd.NextUInt32(MAXPRL, MINPRL));
+			cpt.resize(MSGLEN);
+			inp.resize(MSGLEN);
+			otp.resize(MSGLEN);
 
 			IntUtils::Fill(key, 0, key.size(), rnd);
-			IntUtils::Fill(inp, 0, INPLEN, rnd);
+			IntUtils::Fill(inp, 0, MSGLEN, rnd);
 			SymmetricKey kp(key, nonce);
 
 			// encrypt
 			Cipher->Initialize(true, kp);
-			Cipher->Transform(inp, 0, cpt, 0, INPLEN);
+			Cipher->Transform(inp, 0, cpt, 0, MSGLEN);
 			// decrypt
 			Cipher->Initialize(false, kp);
-			Cipher->Transform(cpt, 0, otp, 0, INPLEN);
+			Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
 
 			if (otp != inp)
 			{
 				throw TestException(std::string("Stress: Transformation output is not equal! -TS1"));
 			}
+		}
+	}
+
+	void ChaChaTest::Verification(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &Mac)
+	{
+		const size_t MSGLEN = Message.size();
+		const size_t TAGLEN = Cipher->TagSize();
+		std::vector<byte> code(TAGLEN);
+		std::vector<byte> cpt(MSGLEN + TAGLEN);
+		std::vector<byte> otp(MSGLEN);
+		SymmetricKey kp(Key, Nonce);
+
+		// encrypt
+		Cipher->Initialize(true, kp);
+		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
+		Cipher->Finalize(cpt, MSGLEN, TAGLEN);
+
+		// decrypt
+		Cipher->Initialize(false, kp);
+		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
+		Cipher->Finalize(code, 0, TAGLEN);
+
+		if (otp != Message)
+		{
+			throw TestException(std::string("Kat: Decrypted output does not match the input! -TV1"));
+		}
+
+		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
+		{
+			throw TestException(std::string("Kat: Output does not match the known answer! -TV2"));
+		}
+
+		// use constant time IntUtils::Compare to verify mac
+		if (!IntUtils::Compare(code, 0, Mac, 0, TAGLEN))
+		{
+			throw TestException(std::string("Authentication: MAC output is not equal! -TV3"));
 		}
 	}
 
@@ -603,23 +684,18 @@ namespace Test
 	{
 		/*lint -save -e417 */
 
-		const std::vector<std::string> key =
+		const std::vector<std::string> code =
 		{
-			std::string("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D"),
-			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12"),
-			std::string("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12"),
-			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF120053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D")
+			std::string("326F8E8D42DD10A8BC5C2A196438AE885A1804F38A6B81D26B9482D6CA913A06"),
+			std::string("10B3E7A5373F588EBC8F516247BC9FF585F00E6CCFB2DB4ED71401C12B70D70EDAE1900A0D4084F751A5F0A0051E871C352FD9B9ABB4EDC37C2EB49B27411D0F"),
+			std::string("74E585F7D494AB66401B40C02CC4E7B96CAE217BC05C0D8F376A567E8C49D2B5"),
+			std::string("2FA3B4753FC7CDF77173ADD1F2EC68531A75D1E0AF48A2C12E7962385810190FE0F48FCC27056EA8C8938E87AA7213D722114B9C0694F82280817CE35AA0DC9A"),
+			std::string("5031E34E6B4696A737FC8CAE3A95AE102C3DB756F7CCA6D2E10CEE747573FD91"),
+			std::string("6397A11521133A5831753A8E3A9CBD6056E608BFA852E9D5BC308CF24737491931C655513609322049EDD15A8FB859C6946DD8B2EEA7A921F3210B4F4A83ADAE"),
+			std::string("1DBF3A887DB5804FB9C463C1E5B6B3F539EC9F50841C74FD91B7C864F07E8588"),
+			std::string("1BC5F5A244748A437A44858D2DB9593411603DF69AA589214CC321F91B07C92249A68D2678D8D27B84129D105FA5CA690066C44757AD1F5577CD53DC29A6AC2D")
 		};
-		HexConverter::Decode(key, 4, m_key);
-
-		const std::vector<std::string> nonce =
-		{
-			std::string("0D74DB42A91077DE"),
-			std::string("167DE44BB21980E7"),
-			std::string(""),
-			std::string("0D74DB42A91077DE167DE44BB21980E7"),
-		};
-		HexConverter::Decode(nonce, 4, m_nonce);
+		HexConverter::Decode(code, 8, m_code);
 
 		const std::vector<std::string> expected =
 		{
@@ -640,6 +716,33 @@ namespace Test
 #endif
 		};
 		HexConverter::Decode(expected, 8, m_expected);
+
+		const std::vector<std::string> key =
+		{
+			std::string("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D"),
+			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12"),
+			std::string("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12"),
+			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF120053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D")
+		};
+		HexConverter::Decode(key, 4, m_key);
+
+		const std::vector<std::string> message =
+		{
+			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
+			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+		};
+		HexConverter::Decode(message, 4, m_message);
+
+		const std::vector<std::string> nonce =
+		{
+			std::string("0D74DB42A91077DE"),
+			std::string("167DE44BB21980E7"),
+			std::string(""),
+			std::string("0D74DB42A91077DE167DE44BB21980E7"),
+		};
+		HexConverter::Decode(nonce, 4, m_nonce);
 
 		/*lint -restore */
 	}
