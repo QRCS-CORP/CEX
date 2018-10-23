@@ -183,7 +183,7 @@ void Threefish512::Finalize(std::vector<byte> &Output, const size_t OutOffset, c
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 	// reset the mac generator
-	Key::Symmetric::SymmetricKey s(code);
+	Key::Symmetric::SymmetricKey s(m_macKey);
 	m_macAuthenticator->Initialize(s);
 }
 
