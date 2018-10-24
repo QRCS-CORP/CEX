@@ -294,7 +294,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                             *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.6f (A6)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      October 23, 2018                 *");
+	ConsoleUtils::WriteLine("* Date:      October 24, 2018                 *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -416,11 +416,11 @@ int main()
 		return 0;
 	}
 
-#if ((!defined(_M_X64)) && (!defined(__x86_64__))) && ((defined(__AVX__) || defined(__AVX2__)) && (!defined(_DEBUG)))
+#if (!defined(_M_X64) && !defined(__x86_64__) && !defined(_DEBUG))
 	if (is64 || isx86emu)
 	{
-		PrintHeader("Warning! Compiling x86/Release on a 64bit system using AVX/AVX2 will cause memory alignment errors.", "");
-		PrintHeader("To test x86/Release, compile on a true x86 system, or disable enhanced instruction sets (arch:IA32), or run in x86/Debug mode.", "");
+		PrintHeader("Warning! Compiling x86/Release on a 64bit system will cause memory alignment errors.", "");
+		PrintHeader("To test x86/Release, compile on a true x86 system, or run in x86/Debug mode.", "");
 		PrintHeader("Tests aborted! Press any key to close..", "");
 		GetResponse();
 

@@ -34,6 +34,23 @@ class ArrayUtils
 public:
 
 	/// <summary>
+	/// Absorb a block of 8 bit bytes into a uint64 Little Endian integer array
+	/// </summary>
+	/// 
+	/// <param name="Input">The input 8bit integer array</param>
+	/// <param name="InOffset">The input arrays starting offset</param>
+	/// <param name="Length">The number of bytes to copy</param>
+	/// <param name="State">The output uint64 state array</param>
+	template<typename ArrayA, typename ArrayB>
+	static void AbsorbBlock8to64(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t Length)
+	{
+		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
+		{
+			Output[i] ^= static_cast<ulong>(IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
+		}
+	}
+
+	/// <summary>
 	/// Append an integer value to an 8bit integer array
 	/// </summary>
 	/// 
@@ -132,6 +149,41 @@ public:
 	}
 
 	/// <summary>
+	/// Keccak common function: Left encode a value onto an array
+	/// </summary>
+	/// 
+	/// <param name="Output">The output integer array</param>
+	/// <param name="Offset">The output array starting offest</param>
+	/// <param name="Value">The value to remove</param>
+	/// 
+	/// <returns>The number of encoded bits</returns>
+	template<typename Array>
+	static ulong LeftEncode(Array &Buffer, size_t Offset, ulong Value)
+	{
+		ulong i;
+		ulong n;
+		ulong v;
+
+		for (v = Value, n = 0; v && (n < sizeof(ulong)); ++n, v >>= 8)
+		{
+		}
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Buffer[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
+		}
+
+		Buffer[Offset] = static_cast<uint8_t>(n);
+
+		return (n + 1);
+	}
+
+	/// <summary>
 	/// Shuffle array values to randomly chosen positions
 	/// </summary>
 	/// 
@@ -177,6 +229,41 @@ public:
 		Output = tmp;
 
 		return tmp.size();
+	}
+
+	/// <summary>
+	/// Keccak common function: Right encode a value onto an array
+	/// </summary>
+	/// 
+	/// <param name="Output">The output integer array</param>
+	/// <param name="Offset">The output array starting offest</param>
+	/// <param name="Value">The value to remove</param>
+	/// 
+	/// <returns>The number of encoded bits</returns>
+	template<typename Array>
+	static ulong RightEncode(Array &Buffer, size_t Offset, ulong Value)
+	{
+		ulong i;
+		ulong n;
+		ulong v;
+
+		for (v = Value, n = 0; v && (n < sizeof(ulong)); ++n, v >>= 8)
+		{
+		}
+
+		if (n == 0)
+		{
+			n = 1;
+		}
+
+		for (i = 1; i <= n; ++i)
+		{
+			Buffer[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
+		}
+
+		Buffer[Offset + n] = static_cast<uint8_t>(n);
+
+		return n + 1;
 	}
 
 	/// <summary>

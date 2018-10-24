@@ -119,8 +119,8 @@ namespace Test
 			// original mac vectors
 			Verification(cpr256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
 			Verification(cpr256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1]);
-			//Verification(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
-			//Verification(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
+			Verification(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
+			Verification(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer authentication tests.."));
 
 			delete cpr256h256;
@@ -164,13 +164,13 @@ namespace Test
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 parallel to sequential equivalence test.."));
 
 			Stress(cpr512s);
-			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 stress tests.."));
+			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 stress tests.."));/**/
 
 			// original mac vectors
 			Verification(cpr512h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[4]);
 			Verification(cpr512h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[5]);
-			//Verification(cpr512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[6]);
-			//Verification(cpr512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[7]);
+			Verification(cpr512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[6]);
+			Verification(cpr512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[7]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer authentication tests.."));
 
 			delete cpr512h256;
@@ -688,12 +688,12 @@ namespace Test
 		{
 			std::string("326F8E8D42DD10A8BC5C2A196438AE885A1804F38A6B81D26B9482D6CA913A06"),
 			std::string("10B3E7A5373F588EBC8F516247BC9FF585F00E6CCFB2DB4ED71401C12B70D70EDAE1900A0D4084F751A5F0A0051E871C352FD9B9ABB4EDC37C2EB49B27411D0F"),
-			std::string("74E585F7D494AB66401B40C02CC4E7B96CAE217BC05C0D8F376A567E8C49D2B5"),
-			std::string("2FA3B4753FC7CDF77173ADD1F2EC68531A75D1E0AF48A2C12E7962385810190FE0F48FCC27056EA8C8938E87AA7213D722114B9C0694F82280817CE35AA0DC9A"),
+			std::string("055F946FD7E02C085A6683B163EFBD2046DF313DECD81CB59172A3431FB53C2C"),
+			std::string("16F66F58653EF0590E3F940A3A613781267E8F42F3BE50CCE44334F2B632EAF6F1D81CFA3E558F08B36140902BA17FDCE19AF947D5168528F6C9EB16702C3FF0"),
 			std::string("5031E34E6B4696A737FC8CAE3A95AE102C3DB756F7CCA6D2E10CEE747573FD91"),
 			std::string("6397A11521133A5831753A8E3A9CBD6056E608BFA852E9D5BC308CF24737491931C655513609322049EDD15A8FB859C6946DD8B2EEA7A921F3210B4F4A83ADAE"),
-			std::string("1DBF3A887DB5804FB9C463C1E5B6B3F539EC9F50841C74FD91B7C864F07E8588"),
-			std::string("1BC5F5A244748A437A44858D2DB9593411603DF69AA589214CC321F91B07C92249A68D2678D8D27B84129D105FA5CA690066C44757AD1F5577CD53DC29A6AC2D")
+			std::string("3FEE7D66F7A72AF10738D4E195937E989A1E0BBD5B211454AFE3F8763FB08BD3"),
+			std::string("9A44E8D45B8B9E5916CDA2B54D5182540ECEBF6ABDA0EF11E99E7FD13BCB072E0E8A65EEB15ADF1B67115ADA876F510282AC5C80777720EDA48E7996CEC2FB00")
 		};
 		HexConverter::Decode(code, 8, m_code);
 

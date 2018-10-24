@@ -1,9 +1,12 @@
 #include "KMAC.h"
+#include "ArrayUtils.h"
 #include "IntUtils.h"
+#include "MemUtils.h"
 #include "Keccak.h"
 
 NAMESPACE_MAC
 
+using Utility::ArrayUtils;
 using Utility::IntUtils;
 using Utility::MemUtils;
 
@@ -118,7 +121,7 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	std::vector<byte> buf(sizeof(size_t) + 1);
 	size_t i;
 	size_t outBits;
-	size_t outLen;
+	ulong outLen;
 
 	if (m_msgLength != m_msgBuffer.size())
 	{
@@ -126,7 +129,7 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	}
 
 	outLen = Output.size() - OutOffset;
-	outBits = RightEncode(buf, 0, outLen * 8);
+	outBits = ArrayUtils::RightEncode(buf, 0, outLen * 8);
 
 	for (i = 0; i < outBits; i++)
 	{
@@ -137,8 +140,8 @@ size_t KMAC::Finalize(std::vector<byte> &Output, size_t OutOffset)
 	m_msgBuffer[m_msgLength] = DOMAIN_CODE;
 	m_msgBuffer[m_blockSize - 1] |= 128;
 
-	AbsorbBlock(m_msgBuffer, 0, m_blockSize, m_kdfState);
-	Squeeze(m_kdfState, Output, OutOffset, outLen);
+	ArrayUtils::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
+	Squeeze(m_kdfState, Output, OutOffset, static_cast<size_t>(outLen));
 
 	return outLen;
 }
@@ -207,7 +210,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 				MemUtils::Copy(Input, InOffset, m_msgBuffer, m_msgLength, RMDLEN);
 			}
 
-			AbsorbBlock(m_msgBuffer, 0, m_blockSize, m_kdfState);
+			ArrayUtils::AbsorbBlock8to64(m_msgBuffer, 0, m_kdfState, m_blockSize);
 			Permute(m_kdfState);
 			m_msgLength = 0;
 			InOffset += RMDLEN;
@@ -217,7 +220,7 @@ void KMAC::Update(const std::vector<byte> &Input, size_t InOffset, size_t Length
 		// sequential loop through blocks
 		while (Length >= m_blockSize)
 		{
-			AbsorbBlock(Input, InOffset, m_blockSize, m_kdfState);
+			ArrayUtils::AbsorbBlock8to64(Input, InOffset, m_kdfState, m_blockSize);
 			Permute(m_kdfState);
 			InOffset += m_blockSize;
 			Length -= m_blockSize;
@@ -241,11 +244,11 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
-	size_t offset;
+	ulong offset;
 
-	offset = 0;
-	offset = LeftEncode(pad, 0, m_blockSize);
-	offset += LeftEncode(pad, offset, Name.size() * 8);
+	MemUtils::Clear(pad, 0, pad.size());
+	offset = ArrayUtils::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Name.size() * 8));
 
 	if (Name.size() != 0)
 	{
@@ -267,7 +270,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 		}
 	}
 
-	offset += LeftEncode(pad, offset, Customization.size() * 8);
+	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
 
 	if (Customization.size() != 0)
 	{
@@ -294,7 +297,7 @@ void KMAC::Customize(const std::vector<byte> &Customization, const std::vector<b
 
 	for (size_t i = 0; i < offset; i += 8)
 	{
-		m_kdfState[i / 8] = IntUtils::LeBytesTo64(pad, i);
+		m_kdfState[i / 8] ^= IntUtils::LeBytesTo64(pad, i);
 	}
 
 	Permute(m_kdfState);
@@ -306,11 +309,11 @@ void KMAC::LoadKey(const std::vector<byte> &Key)
 
 	std::array<byte, BUFFER_SIZE> pad;
 	size_t i;
-	size_t offset;
+	ulong offset;
 
-	offset = 0;
-	offset = LeftEncode(pad, 0, m_blockSize);
-	offset += LeftEncode(pad, offset, Key.size() * 8);
+	MemUtils::Clear(pad, 0, pad.size());
+	offset = ArrayUtils::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Key.size() * 8));
 
 	if (Key.size() != 0)
 	{

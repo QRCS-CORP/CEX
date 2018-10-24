@@ -116,8 +116,8 @@ namespace Test
 			// original mac vectors
 			Verification(cpr256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
 			Verification(cpr256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1]);
-			//Verification(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
-			//Verification(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
+			Verification(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
+			Verification(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer authentication tests.."));
 
 			delete cpr256h256;
@@ -161,8 +161,8 @@ namespace Test
 			// original mac vectors
 			Verification(cpr512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[4]);
 			Verification(cpr512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5]);
-			//Verification(cpr512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[6]);
-			//Verification(cpr512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[7]);
+			Verification(cpr512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[6]);
+			Verification(cpr512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[7]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer authentication tests.."));
 
 			delete cpr512h256;
@@ -206,8 +206,8 @@ namespace Test
 			// original mac vectors
 			Verification(cpr1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8]);
 			Verification(cpr1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9]);
-			//Verification(cpr1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10]);
-			//Verification(cpr1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11]);
+			Verification(cpr1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10]);
+			Verification(cpr1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer authentication tests.."));
 
 			delete cpr1024h256;
@@ -765,16 +765,16 @@ namespace Test
 		{
 			std::string("4AE30DF3EA1E2663C3659708742E8C924449C85BBA177B72DFA10D2F1A1C73FC"),
 			std::string("127DAC04B3CE00087A4D3678DDF793EBF858513D02EB72A813250F98C2199E5FCE0B9B311CBE5825348C8559A0F0862AE929E1CEC7DB4043892A8146F3AEB871"),
-			std::string("D425AE54D7294BD893B93328334EEB2A5C3B7E1426E4E9C18AD10698B61C54E8"),
-			std::string("B61CD3B45D9F70CABFDED0D90CAAEF3A96AE55D5F7A3447E6CA7B4D484BDFA41B2036E06557D475F71FE60070DF89A862A10489F7915F65C28FD3BF64162031E"),
+			std::string("596020E86D05510FB55B319D87432F1E74D7B500FBBD02A10544772D4C17DC5B"),
+			std::string("EB0BBFCB2531CFACF807C2737D40042C7CC73B8903ABE7D803F5F8CB96038EA11F568184214C662310DF555B678B1451DC69C98290D12835A6221C30056FE2B8"),
 			std::string("B7E099441476B260A17CBC96E34CDB578CAFB041BE49D826149EB612A3F6C174"),
 			std::string("924966BCABE8F206184016CA62529CEB8D838432DFF8BD7EC986CEE9F038CEAAA3D7E70AD950CD6993A19AF16E1E18B10FAEEE6C70275C5779945C30AC35D000"),
-			std::string("118B0E687655D650BACCC746C410F60B58A3900CB4D88AE7E4D8F52851B1BA9E"),
-			std::string("3E0777607530DD48554C1EFEE9C16E30B84B4C7992B4705EF2290C94F92522671A1A5E3EA0B4B6D4C51424E7567736E320327BCD6B1D028E76A295F7FF8005B3"),
+			std::string("975BC38FE5744A92FD6F8434BB8F752DA462CAE70B28AE42FF3D04D658454E77"),
+			std::string("015AB8DBE63B9A8A670CD6722AA79FE69E72CEFF55710F53E7E22DC66C9F133AE808713F9000D69738966B927483922A23815EDFCFBAD2A539F387DC3747B2C9"),
 			std::string("EBF488F548B411175792FB1503E890149C3B80C60494E86505D77BE8BA71477C"),
 			std::string("4B919284CE53B66C847E43D52A71E7CF4335511C6CC1A7C525D8BCDA606C85CDE43215E359190EE01BD9AB98DAF5B65E3CB7EB7D6A3633CB3FD5B8851BD8C5E6"),
-			std::string("CB7696C9C58A532DC5CD5B368D774AD599B857F2E5C48B9F059F8EBC50CE063C"),
-			std::string("D6DD8B2B2594AF8692441C48B02C688C011EB418E00C8FA44656B8E9339AF1A501DCB7EC1269B33800F250EF0600ADED3ED096FBF1BDB8E8B3ABF5A952B90AE1")
+			std::string("11E101EFB76E79892C6B7BD25D4943CF8C7C5A5D58C170A3441A443139D112B0"),
+			std::string("7C03F567FAEFE7D41804E12B8E4FD326B601620ED598A76CDFB225C460CA060567B6CFAAAE68DF8F22329DDBD730B3E7A377DDF13DC3A4A841FC66B721F05907")
 		};
 		HexConverter::Decode(code, 12, m_code);
 

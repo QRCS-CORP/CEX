@@ -175,8 +175,6 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// reset the mac generator
-	++m_macCounter;
 	// customization string is CSX512+counter
 	std::vector<byte> cust{ 0x43, 0x53, 0x58, 0x35, 0x31, 0x32, 0, 0, 0, 0, 0, 0, 0, 0 };
 	IntUtils::Le64ToBytes(m_macCounter, cust, 6);
@@ -472,6 +470,7 @@ void ChaCha512::Process(const std::vector<byte> &Input, const size_t InOffset, s
 	if (m_authenticatorType != StreamAuthenticators::None && !m_isEncryption)
 	{
 		m_macAuthenticator->Update(Input, InOffset, Length);
+		m_macCounter += Length;
 	}
 
 	if (!m_parallelProfile.IsParallel() || PRCLEN < m_parallelProfile.ParallelMinimumSize())
@@ -539,6 +538,7 @@ void ChaCha512::Process(const std::vector<byte> &Input, const size_t InOffset, s
 	if (m_authenticatorType != StreamAuthenticators::None && m_isEncryption)
 	{
 		m_macAuthenticator->Update(Output, OutOffset, Length);
+		m_macCounter += Length;
 	}
 }
 

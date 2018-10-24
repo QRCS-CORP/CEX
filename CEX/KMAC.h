@@ -229,67 +229,6 @@ public:
 
 private:
 
-	template<typename ArrayA, typename ArrayB>
-	static void AbsorbBlock(const ArrayA &Input, size_t InOffset, size_t Length, ArrayB &State)
-	{
-		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
-		{
-			State[i] ^= static_cast<ulong>(IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong))));
-		}
-	}
-
-	template<typename Array>
-	static size_t LeftEncode(Array &Buffer, size_t Offset, size_t Value)
-	{
-		size_t i;
-		size_t n;
-		size_t v;
-
-		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8)
-		{
-		}
-
-		if (n == 0)
-		{
-			n = 1;
-		}
-
-		for (i = 1; i <= n; ++i)
-		{
-			Buffer[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
-		}
-
-		Buffer[Offset] = static_cast<uint8_t>(n);
-
-		return (n + 1);
-	}
-
-	template<typename Array>
-	size_t RightEncode(Array &Buffer, size_t Offset, size_t Value)
-	{
-		size_t i;
-		size_t n;
-		size_t v;
-
-		for (v = Value, n = 0; v && (n < sizeof(size_t)); ++n, v >>= 8)
-		{
-		}
-
-		if (n == 0)
-		{
-			n = 1;
-		}
-
-		for (i = 1; i <= n; ++i)
-		{
-			Buffer[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
-		}
-
-		Buffer[Offset + n] = static_cast<uint8_t>(n);
-
-		return n + 1;
-	}
-
 	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name);
 	void LoadKey(const std::vector<byte> &Key);
 	void Permute(std::array<ulong, 25> &State);

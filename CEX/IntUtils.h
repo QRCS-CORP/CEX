@@ -342,11 +342,11 @@ public:
 	inline static std::string ToHex(std::vector<T> &Input, size_t Offset, size_t Length)
 	{
 		std::stringstream ss;
-		ss << std::hex << std::uppercase;
+		ss << std::hex << std::uppercase << std::setfill('0');
 
 		for (size_t i = 0; i < Length; ++i)
 		{
-			ss << Input[Offset + i];
+			ss << std::setw(2) << static_cast<unsigned>(Input[Offset + i]);
 		}
 
 		return ss.str();

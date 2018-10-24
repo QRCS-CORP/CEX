@@ -49,8 +49,6 @@ namespace Test
 			Exception();
 			OnProgress(std::string("SHAKETest: Passed SHAKE exception handling tests.."));
 
-			OnProgress(std::string("cSHAKE: Testing the SHAKE implementations.."));
-
 			SHAKE* gen1 = new SHAKE(ShakeModes::SHAKE128);
 			Kat(gen1, m_key[0], m_expected[0]);
 			Kat(gen1, m_key[1], m_expected[1]);
@@ -83,20 +81,20 @@ namespace Test
 			Kat(gen4, m_key[19], m_expected[19]);
 			OnProgress(std::string("SHAKETest: Passed SHAKE1024 KAT tests.."));
 
-			OnProgress(std::string("cSHAKE: Testing the custom SHAKE implementations.."));
+			OnProgress(std::string("SHAKETest: Testing the custom cSHAKE implementations.."));
 			Kat(gen1, m_key[20], m_expected[20], true);
 			Kat(gen1, m_key[21], m_expected[21], true);
-			OnProgress(std::string("cSHAKE: Passed SP800-185 cSHAKE-128 KAT tests.."));
+			OnProgress(std::string("SHAKETest: Passed SP800-185 cSHAKE-128 KAT tests.."));
 
 			Kat(gen2, m_key[20], m_expected[22], true);
 			Kat(gen2, m_key[21], m_expected[23], true);
-			OnProgress(std::string("cSHAKE: Passed SP800-185 cSHAKE-256 KAT tests.."));
+			OnProgress(std::string("SHAKETest: Passed SP800-185 cSHAKE-256 KAT tests.."));
 
 			Kat(gen3, m_key[21], m_expected[24], true);
-			OnProgress(std::string("cSHAKE: Passed customized cSHAKE-512 KAT test.."));
+			OnProgress(std::string("SHAKETest: Passed customized cSHAKE-512 KAT test.."));
 
 			Kat(gen4, m_key[20], m_expected[25], true);
-			OnProgress(std::string("cSHAKE: Passed customized cSHAKE-1024 KAT test.."));
+			OnProgress(std::string("SHAKETest: Passed customized cSHAKE-1024 KAT test.."));
 
 			Params(gen1);
 			Params(gen2);

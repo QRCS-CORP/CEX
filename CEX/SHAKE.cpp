@@ -1,4 +1,5 @@
 #include "SHAKE.h"
+#include "ArrayUtils.h"
 #include "IntUtils.h"
 #include "Keccak.h"
 #include "MemUtils.h"
@@ -6,6 +7,7 @@
 
 NAMESPACE_KDF
 
+using Utility::ArrayUtils;
 using Utility::IntUtils;
 using Utility::MemUtils;
 
@@ -215,9 +217,9 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 	size_t i;
 	size_t offset;
 
-	offset = 0;
-	offset = LeftEncode(pad, 0, static_cast<uint>(m_blockSize));
-	offset += LeftEncode(pad, offset, static_cast<uint>(Name.size() * 8));
+	MemUtils::Clear(pad, 0, pad.size());
+	offset = ArrayUtils::LeftEncode(pad, 0, static_cast<ulong>(m_blockSize));
+	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Name.size() * 8));
 
 	m_domainCode = CSHAKE_DOMAIN;
 
@@ -227,7 +229,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == m_blockSize)
 			{
-				AbsorbBlock(pad, 0, m_blockSize, m_kdfState);
+				ArrayUtils::AbsorbBlock8to64(pad, 0, m_kdfState, m_blockSize);
 				Permute(m_kdfState);
 				offset = 0;
 			}
@@ -237,7 +239,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		}
 	}
 
-	offset += LeftEncode(pad, offset, static_cast<uint>(Customization.size() * 8));
+	offset += ArrayUtils::LeftEncode(pad, offset, static_cast<ulong>(Customization.size() * 8));
 
 	if (Customization.size() != 0)
 	{
@@ -245,7 +247,7 @@ void SHAKE::Customize(const std::vector<byte> &Customization, const std::vector<
 		{
 			if (offset == m_blockSize)
 			{
-				AbsorbBlock(pad, 0, m_blockSize, m_kdfState);
+				ArrayUtils::AbsorbBlock8to64(pad, 0, m_kdfState, m_blockSize);
 				Permute(m_kdfState);
 				offset = 0;
 			}
@@ -289,7 +291,7 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 		// sequential loop through blocks
 		while (Length >= m_blockSize)
 		{
-			AbsorbBlock(Input, InOffset, m_blockSize, m_kdfState);
+			ArrayUtils::AbsorbBlock8to64(Input, InOffset, m_kdfState, m_blockSize);
 			Permute(m_kdfState);
 			InOffset += m_blockSize;
 			Length -= m_blockSize;
@@ -306,7 +308,7 @@ void SHAKE::FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t L
 
 		MemUtils::Clear(msg, Length, m_blockSize - Length);
 		msg[m_blockSize - 1] |= 0x80;
-		AbsorbBlock(msg, 0, m_blockSize, m_kdfState);
+		ArrayUtils::AbsorbBlock8to64(msg, 0, m_kdfState, m_blockSize);
 
 		Permute(m_kdfState);
 	}

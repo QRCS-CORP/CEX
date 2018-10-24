@@ -186,8 +186,6 @@ void Threefish256::Finalize(std::vector<byte> &Output, const size_t OutOffset, c
 	m_macAuthenticator->Finalize(code, 0);
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
-	// reset the mac generator
-	++m_macCounter;
 	// customization string is TSX256+counter
 	std::vector<byte> cust{ 0x54, 0x53, 0x58, 0x32, 0x35, 0x36, 0, 0, 0, 0, 0, 0, 0, 0 };
 	IntUtils::Le64ToBytes(m_macCounter, cust, 6);
@@ -437,6 +435,7 @@ void Threefish256::Process(const std::vector<byte> &Input, const size_t InOffset
 	if (m_authenticatorType != StreamAuthenticators::None && !m_isEncryption)
 	{
 		m_macAuthenticator->Update(Input, InOffset, Length);
+		m_macCounter += Length;
 	}
 
 	if (!m_parallelProfile.IsParallel() || PRCLEN < m_parallelProfile.ParallelMinimumSize())
@@ -504,6 +503,7 @@ void Threefish256::Process(const std::vector<byte> &Input, const size_t InOffset
 	if (m_authenticatorType != StreamAuthenticators::None && m_isEncryption)
 	{
 		m_macAuthenticator->Update(Output, OutOffset, Length);
+		m_macCounter += Length;
 	}
 }
 

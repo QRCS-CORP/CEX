@@ -259,39 +259,6 @@ public:
 
 private:
 
-	template<typename Array>
-	inline static void AbsorbBlock(const Array &Input, size_t InOffset, size_t Length, std::array<ulong, STATE_SIZE> &State)
-	{
-		for (size_t i = 0; i < Length / sizeof(ulong); ++i)
-		{
-			State[i] ^= Utility::IntUtils::LeBytesTo64(Input, InOffset + (i * sizeof(ulong)));
-		}
-	}
-
-	template<typename Array>
-	static size_t LeftEncode(Array &Buffer, size_t Offset, uint Value)
-	{
-		size_t i;
-		uint n;
-		uint v;
-
-		for (v = Value, n = 0; v && (n < sizeof(uint)); ++n, v >>= 8);
-
-		if (n == 0)
-		{
-			n = 1;
-		}
-
-		for (i = 1; i <= n; ++i)
-		{
-			Buffer[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
-		}
-
-		Buffer[Offset] = static_cast<uint8_t>(n);
-
-		return (n + 1);
-	}
-
 	void Customize(const std::vector<byte> &Customization, const std::vector<byte> &Name);
 	void Expand(std::vector<byte> &Output, size_t Offset, size_t Length);
 	void FastAbsorb(const std::vector<byte> &Input, size_t InOffset, size_t Length);
