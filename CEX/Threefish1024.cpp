@@ -20,6 +20,7 @@ using Utility::MemUtils;
 using Utility::ParallelUtils;
 
 const std::string Threefish1024::CLASS_NAME("Threefish1024");
+const std::vector<byte> Threefish1024::CSHAKE_CUST = { 0x54, 0x53, 0x58, 0x31, 0x30, 0x32, 0x34 };
 const std::string Threefish1024::OMEGA_INFO("Threefish1024120");
 
 struct Threefish1024::Threefish1024State
@@ -186,15 +187,18 @@ void Threefish1024::Finalize(std::vector<byte> &Output, const size_t OutOffset, 
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
 	// customization string is TSX1024+counter
-	std::vector<byte> cust{ 0x54, 0x53, 0x58, 0x31, 0x30, 0x32, 0x34, 0, 0, 0, 0, 0, 0, 0, 0 };
-	IntUtils::Le64ToBytes(m_macCounter, cust, 7);
+	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
+	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
+	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+
 	// extract the new mac key
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(m_macKey, cust);
+	gen.Initialize(m_macKey, cst);
 	gen.Generate(m_macKey);
+
 	// re-initialize the authenticator
-	Key::Symmetric::SymmetricKey s(m_macKey);
-	m_macAuthenticator->Initialize(s);
+	Key::Symmetric::SymmetricKey sk(m_macKey);
+	m_macAuthenticator->Initialize(sk);
 }
 
 void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -254,20 +258,30 @@ void Threefish1024::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		// initialize shake
+		// set the initial counter value
+		m_macCounter = 1;
+
+		// create the cSHAKE customization string
+		std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
+		MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
+		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+
+		// initialize cSHAKE
 		Kdf::SHAKE kdf(Enumeration::ShakeModes::SHAKE256);
-		kdf.Initialize(KeyParams.Key());
+		kdf.Initialize(KeyParams.Key(), cst);
 
 		// generate the new cipher key
-		std::vector<byte> k(KEY_SIZE);
-		kdf.Generate(k);
-		MemUtils::Copy(k, 0, m_cipherState->K, 0, KEY_SIZE);
+		std::vector<byte> ck(KEY_SIZE);
+		kdf.Generate(ck);
 
-		// get the mac seed
+		// copy key to state
+		MemUtils::Copy(ck, 0, m_cipherState->K, 0, KEY_SIZE);
+
+		// generate the mac seed
 		m_macKey.resize(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 		kdf.Generate(m_macKey);
-		Key::Symmetric::SymmetricKey s(m_macKey);
-		m_macAuthenticator->Initialize(s);
+		Key::Symmetric::SymmetricKey sk(m_macKey);
+		m_macAuthenticator->Initialize(sk);
 	}
 
 	m_isEncryption = Encryption;

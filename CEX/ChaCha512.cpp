@@ -42,6 +42,7 @@ struct ChaCha512::ChaCha512State
 };
 
 const std::string ChaCha512::CLASS_NAME("ChaCha512");
+const std::vector<byte> ChaCha512::CSHAKE_CUST = { 0x43, 0x53, 0x58, 0x35, 0x31, 0x32 };
 
 //~~~Constructor~~~//
 
@@ -176,15 +177,18 @@ void ChaCha512::Finalize(std::vector<byte> &Output, const size_t OutOffset, cons
 	MemUtils::Copy(code, 0, Output, OutOffset, code.size() < Length ? code.size() : Length);
 
 	// customization string is CSX512+counter
-	std::vector<byte> cust{ 0x43, 0x53, 0x58, 0x35, 0x31, 0x32, 0, 0, 0, 0, 0, 0, 0, 0 };
-	IntUtils::Le64ToBytes(m_macCounter, cust, 6);
+	std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
+	MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
+	IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+
 	// extract the new mac key
 	Kdf::SHAKE gen(Enumeration::ShakeModes::SHAKE256);
-	gen.Initialize(m_macKey, cust);
+	gen.Initialize(m_macKey, cst);
 	gen.Generate(m_macKey);
+
 	// re-initialize the authenticator
-	Key::Symmetric::SymmetricKey s(m_macKey);
-	m_macAuthenticator->Initialize(s);
+	Key::Symmetric::SymmetricKey sk(m_macKey);
+	m_macAuthenticator->Initialize(sk);
 }
 
 void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
@@ -218,29 +222,30 @@ void ChaCha512::Initialize(bool Encryption, ISymmetricKey &KeyParams)
 	}
 	else
 	{
-		Kdf::SHAKE kdf(Enumeration::ShakeModes::SHAKE256);
+		// set the initial counter value
+		m_macCounter = 1;
 
-		if (KeyParams.Nonce().size() > 0)
-		{
-			// initialize cshake
-			kdf.Initialize(KeyParams.Key(), KeyParams.Nonce());
-		}
-		else
-		{
-			// initialize shake
-			kdf.Initialize(KeyParams.Key());
-		}
+		// create the cSHAKE customization string
+		std::vector<byte> cst(CSHAKE_CUST.size() + sizeof(ulong));
+		MemUtils::Copy(CSHAKE_CUST, 0, cst, 0, CSHAKE_CUST.size());
+		IntUtils::Le64ToBytes(m_macCounter, cst, CSHAKE_CUST.size());
+
+		// initialize cSHAKE
+		Kdf::SHAKE kdf(Enumeration::ShakeModes::SHAKE256);
+		kdf.Initialize(KeyParams.Key(), cst);
 
 		// generate the new cipher key
-		std::vector<byte> k(KEY_SIZE);
-		kdf.Generate(k);
-		Expand(k);
+		std::vector<byte> ck(KEY_SIZE);
+		kdf.Generate(ck);
 
-		// get the mac seed
+		// expand round keys
+		Expand(ck);
+
+		// generate the mac seed
 		m_macKey.resize(m_macAuthenticator->LegalKeySizes()[1].KeySize());
 		kdf.Generate(m_macKey);
-		Key::Symmetric::SymmetricKey s(m_macKey);
-		m_macAuthenticator->Initialize(s);
+		Key::Symmetric::SymmetricKey sk(m_macKey);
+		m_macAuthenticator->Initialize(sk);
 	}
 
 	m_isEncryption = Encryption;

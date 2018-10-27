@@ -48,6 +48,7 @@ namespace Test
 		m_expected(0),
 		m_key(0),
 		m_message(0),
+		m_monte(0),
 		m_nonce(0),
 		m_progressEvent()
 	{
@@ -60,6 +61,7 @@ namespace Test
 		IntUtils::ClearVector(m_expected);
 		IntUtils::ClearVector(m_key);
 		IntUtils::ClearVector(m_message);
+		IntUtils::ClearVector(m_monte);
 		IntUtils::ClearVector(m_nonce);
 	}
 
@@ -83,138 +85,184 @@ namespace Test
 		{
 			// threefish256 standard and authenticated variants
 
-			Threefish256* cpr256h256 = new Threefish256(Enumeration::StreamAuthenticators::HMACSHA256);
-			Threefish256* cpr256h512 = new Threefish256(Enumeration::StreamAuthenticators::HMACSHA512);
-			Threefish256* cpr256k256 = new Threefish256(Enumeration::StreamAuthenticators::KMAC256);
-			Threefish256* cpr256k512 = new Threefish256(Enumeration::StreamAuthenticators::KMAC512);
-			Threefish256* cpr256s = new Threefish256();
+			Threefish256* tsx256h256 = new Threefish256(Enumeration::StreamAuthenticators::HMACSHA256);
+			Threefish256* tsx256h512 = new Threefish256(Enumeration::StreamAuthenticators::HMACSHA512);
+			Threefish256* tsx256k256 = new Threefish256(Enumeration::StreamAuthenticators::KMAC256);
+			Threefish256* tsx256k512 = new Threefish256(Enumeration::StreamAuthenticators::KMAC512);
+			Threefish256* tsx256s = new Threefish256();
 
-			Authentication(cpr256h256);
+			Authentication(tsx256h256);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 MAC authentication tests.."));
 
 			CompareP256();
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 permutation variants equivalence test.."));
 
-			Exception(cpr256s);
+			Exception(tsx256s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 exception handling tests.."));
+			
+			Finalization(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0], m_code[12]);
+			Finalization(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1], m_code[13]);
+			Finalization(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2], m_code[14]);
+			Finalization(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3], m_code[15]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer finalization tests."));
 
 			// check each variant for identical cipher-text output
-			Kat(cpr256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(cpr256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
+			Kat(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
 			// non-authenticated threefish256
-			Kat(cpr256s, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer tests.."));
+			Kat(tsx256s, m_message[0], m_key[0], m_nonce[0], m_expected[1]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer cipher tests.."));
 
-			Parallel(cpr256s);
+			// check each variant for identical cipher-text output
+			MonteCarlo(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
+			MonteCarlo(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
+			MonteCarlo(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
+			MonteCarlo(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_monte[0]);
+			// non-authenticated threefish256
+			MonteCarlo(tsx256s, m_message[0], m_key[0], m_nonce[0], m_monte[1]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-256 monte carlo tests.."));
+
+			Parallel(tsx256s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 parallel to sequential equivalence test.."));
 
-			Stress(cpr256s);
+			Stress(tsx256s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 stress tests.."));
 
 			// original mac vectors
-			Verification(cpr256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
-			Verification(cpr256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1]);
-			Verification(cpr256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
-			Verification(cpr256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
+			Verification(tsx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[0]);
+			Verification(tsx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[1]);
+			Verification(tsx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[2]);
+			Verification(tsx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0], m_code[3]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-256 known answer authentication tests.."));
 
-			delete cpr256h256;
-			delete cpr256h512;
-			delete cpr256k256;
-			delete cpr256k512;
-			delete cpr256s;
+			delete tsx256h256;
+			delete tsx256h512;
+			delete tsx256k256;
+			delete tsx256k512;
+			delete tsx256s;
 
 			// threefish512 standard and authenticated variants
 
-			Threefish512* cpr512h256 = new Threefish512(Enumeration::StreamAuthenticators::HMACSHA256);
-			Threefish512* cpr512h512 = new Threefish512(Enumeration::StreamAuthenticators::HMACSHA512);
-			Threefish512* cpr512k256 = new Threefish512(Enumeration::StreamAuthenticators::KMAC256);
-			Threefish512* cpr512k512 = new Threefish512(Enumeration::StreamAuthenticators::KMAC512);
-			Threefish512* cpr512s = new Threefish512();
+			Threefish512* tsx512h256 = new Threefish512(Enumeration::StreamAuthenticators::HMACSHA256);
+			Threefish512* tsx512h512 = new Threefish512(Enumeration::StreamAuthenticators::HMACSHA512);
+			Threefish512* tsx512k256 = new Threefish512(Enumeration::StreamAuthenticators::KMAC256);
+			Threefish512* tsx512k512 = new Threefish512(Enumeration::StreamAuthenticators::KMAC512);
+			Threefish512* tsx512s = new Threefish512();
 
-			Authentication(cpr512h256);
+			Authentication(tsx512h256);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 MAC authentication tests.."));
 
 			CompareP512();
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 permutation variants equivalence test.."));
 
-			Exception(cpr512s);
+			Exception(tsx512s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 exception handling tests.."));
 
 			// check each variant for identical cipher-text output
-			Kat(cpr512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(cpr512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(cpr512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
-			Kat(cpr512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
+			Kat(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
+			Kat(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
+			Kat(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
+			Kat(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2]);
 			// non-authenticated threefish512
-			Kat(cpr512s, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer tests.."));
+			Kat(tsx512s, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer cipher tests.."));
 
-			Parallel(cpr512s);
+			Finalization(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[4], m_code[16]);
+			Finalization(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5], m_code[17]);
+			Finalization(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[6], m_code[18]);
+			Finalization(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[7], m_code[19]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer finalization tests."));
+
+
+			// check each variant for identical cipher-text output
+			MonteCarlo(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
+			MonteCarlo(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
+			MonteCarlo(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
+			MonteCarlo(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_monte[2]);
+			// non-authenticated threefish512
+			MonteCarlo(tsx512s, m_message[1], m_key[1], m_nonce[1], m_monte[3]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-512 monte carlo tests.."));
+
+			Parallel(tsx512s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 parallel to sequential equivalence test.."));
 
-			Stress(cpr512s);
+			Stress(tsx512s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 stress tests.."));
 
 			// original mac vectors
-			Verification(cpr512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[4]);
-			Verification(cpr512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5]);
-			Verification(cpr512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[6]);
-			Verification(cpr512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[7]);
+			Verification(tsx512h256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[4]);
+			Verification(tsx512h512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[5]);
+			Verification(tsx512k256, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[6]);
+			Verification(tsx512k512, m_message[1], m_key[1], m_nonce[1], m_expected[2], m_code[7]);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer authentication tests.."));
 
-			delete cpr512h256;
-			delete cpr512h512;
-			delete cpr512k256;
-			delete cpr512k512;
-			delete cpr512s;
+			delete tsx512h256;
+			delete tsx512h512;
+			delete tsx512k256;
+			delete tsx512k512;
+			delete tsx512s;
 
 			// threefish1024 standard and authenticated variants
 
-			Threefish1024* cpr1024h256 = new Threefish1024(Enumeration::StreamAuthenticators::HMACSHA256);
-			Threefish1024* cpr1024h512 = new Threefish1024(Enumeration::StreamAuthenticators::HMACSHA512);
-			Threefish1024* cpr1024k256 = new Threefish1024(Enumeration::StreamAuthenticators::KMAC256);
-			Threefish1024* cpr1024k512 = new Threefish1024(Enumeration::StreamAuthenticators::KMAC512);
-			Threefish1024* cpr1024s = new Threefish1024();
+			Threefish1024* tsx1024h256 = new Threefish1024(Enumeration::StreamAuthenticators::HMACSHA256);
+			Threefish1024* tsx1024h512 = new Threefish1024(Enumeration::StreamAuthenticators::HMACSHA512);
+			Threefish1024* tsx1024k256 = new Threefish1024(Enumeration::StreamAuthenticators::KMAC256);
+			Threefish1024* tsx1024k512 = new Threefish1024(Enumeration::StreamAuthenticators::KMAC512);
+			Threefish1024* tsx1024s = new Threefish1024();
 
-			Authentication(cpr1024h256);
+			Authentication(tsx1024h256);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 MAC authentication tests.."));
 
-			Compare1024();
+			CompareP1024();
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 permutation variants equivalence test.."));
 
-			Exception(cpr1024s);
+			Exception(tsx1024s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 exception handling tests.."));
 
-			// check each variant for identical cipher-text output
-			Kat(cpr1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(cpr1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(cpr1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(cpr1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			// non-authenticated threefish1024
-			Kat(cpr1024s, m_message[2], m_key[2], m_nonce[2], m_expected[5]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer tests.."));
+			Finalization(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8], m_code[20]);
+			Finalization(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9], m_code[21]);
+			Finalization(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10], m_code[22]);
+			Finalization(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11], m_code[23]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer authentication tests.."));
 
-			Parallel(cpr1024s);
+			// check each variant for identical cipher-text output
+			Kat(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
+			// non-authenticated threefish1024
+			Kat(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_expected[5]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer cipher tests.."));
+
+			// check each variant for identical cipher-text output
+			MonteCarlo(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
+			MonteCarlo(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
+			MonteCarlo(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
+			MonteCarlo(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_monte[4]);
+			// non-authenticated threefish1024
+			MonteCarlo(tsx1024s, m_message[2], m_key[2], m_nonce[2], m_monte[5]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 monte carlo tests.."));
+
+			Parallel(tsx1024s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 parallel to sequential equivalence test.."));
 
-			Stress(cpr1024s);
+			Stress(tsx1024s);
 			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 stress tests.."));
 
 			// original mac vectors
-			Verification(cpr1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8]);
-			Verification(cpr1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9]);
-			Verification(cpr1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10]);
-			Verification(cpr1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11]);
-			OnProgress(std::string("ThreefishTest: Passed Threefish-512 known answer authentication tests.."));
+			Verification(tsx1024h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8]);
+			Verification(tsx1024h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9]);
+			Verification(tsx1024k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10]);
+			Verification(tsx1024k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11]);
+			OnProgress(std::string("ThreefishTest: Passed Threefish-1024 known answer authentication tests.."));
 
-			delete cpr1024h256;
-			delete cpr1024h512;
-			delete cpr1024k256;
-			delete cpr1024k512;
-			delete cpr1024s;
+			delete tsx1024h256;
+			delete tsx1024h512;
+			delete tsx1024k256;
+			delete tsx1024k512;
+			delete tsx1024s;
 
 			return SUCCESS;
 		}
@@ -422,7 +470,7 @@ namespace Test
 
 	}
 
-	void ThreefishTest::Compare1024()
+	void ThreefishTest::CompareP1024()
 	{
 		std::array<ulong, 2> counter{ 128, 1 };
 		std::array<ulong, 16> key;
@@ -587,6 +635,57 @@ namespace Test
 		}
 	}
 
+	void ThreefishTest::Finalization(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected, std::vector<byte> &MacCode1, std::vector<byte> &MacCode2)
+	{
+		const size_t MSGLEN = Message.size();
+		const size_t TAGLEN = Cipher->TagSize();
+		std::vector<byte> code1(TAGLEN);
+		std::vector<byte> code2(TAGLEN);
+		std::vector<byte> cpt((MSGLEN + TAGLEN) * 2);
+		std::vector<byte> otp(MSGLEN * 2);
+		SymmetricKey kp(Key, Nonce);
+
+		// encrypt msg 1
+		Cipher->Initialize(true, kp);
+		Cipher->Transform(Message, 0, cpt, 0, MSGLEN);
+		Cipher->Finalize(cpt, MSGLEN, TAGLEN);
+
+		// encrypt msg 2
+		Cipher->Transform(Message, 0, cpt, MSGLEN + TAGLEN, MSGLEN);
+		Cipher->Finalize(cpt, (MSGLEN * 2) + TAGLEN, TAGLEN);
+
+		// decrypt msg 1
+		Cipher->Initialize(false, kp);
+		Cipher->Transform(cpt, 0, otp, 0, MSGLEN);
+		Cipher->Finalize(code1, 0, TAGLEN);
+
+		// use constant time IntUtils::Compare to verify mac
+		if (!IntUtils::Compare(code1, 0, MacCode1, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF1"));
+		}
+
+		// decrypt msg 2
+		Cipher->Transform(cpt, MSGLEN + TAGLEN, otp, MSGLEN, MSGLEN);
+		Cipher->Finalize(code2, 0, TAGLEN);
+
+		// use constant time IntUtils::Compare to verify mac
+		if (!IntUtils::Compare(code2, 0, MacCode2, 0, TAGLEN))
+		{
+			throw TestException(std::string("Finalization: MAC output is not equal! -TF2"));
+		}
+
+		if (!IntUtils::Compare(otp, 0, Message, 0, MSGLEN) || !IntUtils::Compare(otp, MSGLEN, Message, 0, MSGLEN))
+		{
+			throw TestException(std::string("Finalization: Decrypted output does not match the input! -TF3"));
+		}
+
+		if (!IntUtils::Compare(cpt, 0, Expected, 0, MSGLEN))
+		{
+			throw TestException(std::string("Finalization: Output does not match the known answer! -TF4"));
+		}
+	}
+
 	void ThreefishTest::Kat(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
 	{
 		Key::Symmetric::SymmetricKeySize ks = Cipher->LegalKeySizes()[0];
@@ -611,6 +710,41 @@ namespace Test
 		if (cpt != Expected)
 		{
 			throw TestException(std::string("Kat: Output does not match the known answer! -TV2"));
+		}
+	}
+
+	void ThreefishTest::MonteCarlo(IStreamCipher* Cipher, std::vector<byte> &Message, std::vector<byte> &Key, std::vector<byte> &Nonce, std::vector<byte> &Expected)
+	{
+		const size_t MSGLEN = Message.size();
+		std::vector<byte> msg = Message;
+		std::vector<byte> enc(MSGLEN);
+		std::vector<byte> dec(MSGLEN);
+		Key::Symmetric::SymmetricKey kp(Key, Nonce);
+
+		Cipher->Initialize(true, kp);
+
+		for (size_t i = 0; i != MONTE_CYCLES; i++)
+		{
+			Cipher->Transform(msg, 0, enc, 0, msg.size());
+			msg = enc;
+		}
+
+		if (enc != Expected)
+		{
+			throw TestException(std::string("MonteCarlo: Encrypted output does not match the expected! -TM1"));
+		}
+
+		Cipher->Initialize(false, kp);
+
+		for (size_t i = 0; i != MONTE_CYCLES; i++)
+		{
+			Cipher->Transform(enc, 0, dec, 0, enc.size());
+			enc = dec;
+		}
+
+		if (dec != Message)
+		{
+			throw TestException(std::string("MonteCarlo: Decrypted output does not match the input! -TM2"));
 		}
 	}
 
@@ -761,30 +895,50 @@ namespace Test
 	{
 		/*lint -save -e417 */
 
+		// Note: these are all original vectors and should be considered authoritative
+
 		const std::vector<std::string> code =
 		{
-			std::string("4AE30DF3EA1E2663C3659708742E8C924449C85BBA177B72DFA10D2F1A1C73FC"),
-			std::string("127DAC04B3CE00087A4D3678DDF793EBF858513D02EB72A813250F98C2199E5FCE0B9B311CBE5825348C8559A0F0862AE929E1CEC7DB4043892A8146F3AEB871"),
-			std::string("596020E86D05510FB55B319D87432F1E74D7B500FBBD02A10544772D4C17DC5B"),
-			std::string("EB0BBFCB2531CFACF807C2737D40042C7CC73B8903ABE7D803F5F8CB96038EA11F568184214C662310DF555B678B1451DC69C98290D12835A6221C30056FE2B8"),
-			std::string("B7E099441476B260A17CBC96E34CDB578CAFB041BE49D826149EB612A3F6C174"),
-			std::string("924966BCABE8F206184016CA62529CEB8D838432DFF8BD7EC986CEE9F038CEAAA3D7E70AD950CD6993A19AF16E1E18B10FAEEE6C70275C5779945C30AC35D000"),
-			std::string("975BC38FE5744A92FD6F8434BB8F752DA462CAE70B28AE42FF3D04D658454E77"),
-			std::string("015AB8DBE63B9A8A670CD6722AA79FE69E72CEFF55710F53E7E22DC66C9F133AE808713F9000D69738966B927483922A23815EDFCFBAD2A539F387DC3747B2C9"),
-			std::string("EBF488F548B411175792FB1503E890149C3B80C60494E86505D77BE8BA71477C"),
-			std::string("4B919284CE53B66C847E43D52A71E7CF4335511C6CC1A7C525D8BCDA606C85CDE43215E359190EE01BD9AB98DAF5B65E3CB7EB7D6A3633CB3FD5B8851BD8C5E6"),
-			std::string("11E101EFB76E79892C6B7BD25D4943CF8C7C5A5D58C170A3441A443139D112B0"),
-			std::string("7C03F567FAEFE7D41804E12B8E4FD326B601620ED598A76CDFB225C460CA060567B6CFAAAE68DF8F22329DDBD730B3E7A377DDF13DC3A4A841FC66B721F05907")
+			// tsx256 - verification
+			std::string("509BF34198A8DCE342DF1ABF2644393EDEAB7C5A66FCC05C44DFBAD45C0C33F3"),																	// tsx256h256
+			std::string("DF36D613ACB8AEE9767AE8D76A7555B50CEAED49972FBC98BF6BFF44672A7ECBDB6557B96A8B3FECEBBF89C5CE67040F9AB62FB526970B9D01A17EC6CBA5D281"),	// tsx256h512
+			std::string("D06026F800C9BD6AB49B0C2714D5CEC1A73EAAA22D0E862B58771F70FB5BDE3D"),																	// tsx256k256
+			std::string("58493C980A99827A2B0B683CA43A636BA9B5F2748D9393050756071BD5C4B17EC7EFFE478E3558BB6F82E6CD9D773051AD19A61D761FE3DF8119C0AF6AB6C80F"),	// tsx256k512
+			// tsx512 - verification
+			std::string("157AC462D45D68552AEE015B195FEFAAF3173EC3062356EEE01D80CB8194E5D5"),																	// tsx512h256
+			std::string("68AA4B5FB2C95A6450D16975EEA6A74FC229EAAD7228EDAD160A7D64B97557100435924A3219C9B631F0E8CB2234C0748D9FBE09C77E5A7F5A25BAA98E3867AE"),	// tsx512h512
+			std::string("A39DC64FFD17165903ECBF07027A2EA6E5983E0949FE038CC98BE29BD2E164B2"),																	// tsx512k256
+			std::string("BC147C47B92CA40CF9397AF5D060DE7A20C0580F66FBB782C2CEEB1B106895060CB99032C33F52D82E7827461F490D3CB229C26D542BA1277C179DF17BC35345"),	// tsx512k512
+			// tsx1024- verification
+			std::string("E35D61794B5F3DFDAC1D383DE9B62AD4E3E456FE30A19739936364BBE11252E1"),																	// tsx1024h256
+			std::string("5D709CB41B285C07EA91538E06C651592945BFA66391E20FFD727585904C0EF16DF8A4848A8DCD637B7D2459079772AAAA141F3BCF8E35ACA95E8BDBF7C5EC3E"),	// tsx1024h512
+			std::string("0E53E321F5E7567DECB4EDAA117F251E3A378C78DCB648AC8CD71CE167499F50"),																	// tsx1024k256
+			std::string("7919F16C23478B9B482349E2E09808CA817851D165C5AF5030001C9208F2C25D1F7B4051B2434779DB2C7067E6997FE57631B85D5F68E1B1AD8FCC6F5D65CFAF"),	// tsx1024k512
+			// tsx256 finalization tests: mac-2
+			std::string("655CC3F418B2FF64E1C0AED6FF1B9E6CB0ACCDB6C32ABD74A495D7CA649591BD"),																	// tsx256h256
+			std::string("35ED24F6D0A9E7E0973A550EEB87187EE206E2B8760A0D25C6B3B18E2318FABBEC6B2CEA5B438D56E1B3CF6CFDA72567428A7AC19425CD8A17434DCF39DE8733"),	// tsx256h512
+			std::string("FBC80E8766E5014992C0D727F19CA532DC4EAF9A3AAEB65582E67C1794E82330"),																	// tsx256k256
+			std::string("6A4AA6697AF55897F81C8212344213BA306350D577A31836FFEA9D6473ED2A019D0C2F50CAC8CBBFBC15BDD9A39A854CBE9070FBA27EB799C9E5148473FB3A78"),	// tsx256k512
+			// tsx512 finalization tests: mac-2
+			std::string("806C72BE87D599F0FAEAC9534A952D6DF9F0DD649E41ED0B4354522142AE2080"),																	// tsx512h256
+			std::string("EC19467DBA0A74F7971959CF77D126D9FF7C1F54628650CC26687435AD4B9759733E79A92FD77C66F133DBB1A05DE67022CF7FECFF93DB2F2C3B89A5E9BB539D"),	// tsx512h512
+			std::string("0242990182F81C4A9EE985EFED0F7DDF82976993462DBC10E70FD4B32FF224A9"),																	// tsx512k256
+			std::string("FFA831222934ACAAEC1A1FCBAF75AC06473EB0EE1FAB37E22339451A487C93C2BE7B02E9B63F95F033337F2CBE453EF4D91DEE0CB654ECAA31F6FD0F6D643DBB"),	// tsx512k512
+			// tsx1024 finalization tests: mac-2
+			std::string("F92FE6BD68B4DC03D6CC7DB51899FC978A50E2083C33071B672DF8213E5B2D7D"),																	// tsx1024h256
+			std::string("FD9C1C77819F44C1BAE429C521290F27249142FC1D329311237C1786FA5FE6462202D7479DB969823D913FDB340FC8A4F3BADB43CA269A335C7D5291605F9CA3"),	// tsx1024h512
+			std::string("289FA609EFF62AD871B13710BAB4FE780B283D6E0B9F7937FA9B3090385C62E4"),																	// tsx1024k256
+			std::string("3AFC8C20054DC911B3C47DB3C61EB59E695070B1D7761A51C5A7FB59C0593D2EBF1A8BA0888D7331905D8493EBDEC388F5AF57A812713BD15A1622E0D18B0AEE")		// tsx1024k512
 		};
-		HexConverter::Decode(code, 12, m_code);
+		HexConverter::Decode(code, 24, m_code);
 
 		const std::vector<std::string> expected =
 		{
-			std::string("6FF52D380F98BABAB444D87C00D74FC9F01A8BC92296503C080E6D586D3FB2EE"),
+			std::string("22051C2C7115F2E1343D848ABA02C749C474E7EFB0CE6AA72F2573A3089EF780"),
 			std::string("70EA75CE071C24670A8AB583ED7ADDB64AE83D669BCA9E5E42F5ED70F691166A"),
-			std::string("9B475A7A93DC835330DB1F824F89F7D2529C40FE82DB9EA6C65EEA0120714ADE8B074AC0B960B3512C55139D3EACAEA73E4C91DD00519C212D75C72071702210"),
+			std::string("00D4DB25D39129E24955F3EC2BE0B89F4C571F23401FE0B73D9D12DF4AB7DA9A9DB08E48529BBA253FE995075D85273692E5206BE38114AE4BD087DABE782BBB"),
 			std::string("0F43C172A46F8EAC0E961938B2E56BC128B982CBA28DDE70C88C2DA3EF37BA3DBB457F420390EE146735169E573620C6B0415160284749DDFC72A3D13904557E"),
-			std::string("A5888D5046DE881406F511891F69E70D6ED618B9C0006F2DE2C0842A83FBCFFC76D2A5737384FA65517E85BDC1C1F38F9A731A82C9B26F4F70B38A0C3550D85F687613FDBCEB1475D4B9030FE9A8EFDDC781291FCD024F9BC2EE7B8DDD243C72B6672E2497990B65CFBED6BC4A2F537001945B64C7E63BF670957A7EA6879373"),
+			std::string("E82D7F08695BD89E1BDD58334A342A8D43F5F23CB95D562EE070C52D2419BDB5C376A894FA5D5C3413D46F34D67F824C12D7E6BBB6F47928518D19607A907D9E00BDA5C72F734D88CFBD0D008794839073975394552FAC34AD58B21355AB4D2106F86EBEA1371591DB8C60DB3A3B4538582B05CB541C1E2D86DD44B9E1EF5AC9"),
 			std::string("B3F7134A5977D657479377A1224CA0ACF29C79B4AF0C8A23B269850F6DAEEDB37F8EFCD7F0B65BA7B4F5264E255B459E96AC4D1DD13D7957B6581DB116C7F5848BCD73FA5B588D28B0EE942F8E5F01C85E4E85B743B7CB0EC885B77533D733ABD811B6AB5D2AA25DFADA55138EEB5E3FF150BE937F1AB241DC374DB1F1BA6D09")
 		};
 		HexConverter::Decode(expected, 6, m_expected);
@@ -804,6 +958,17 @@ namespace Test
 			std::string("FFFEFDFCFBFAF9F8F7F6F5F4F3F2F1F0 EFEEEDECEBEAE9E8E7E6E5E4E3E2E1E0DFDEDDDCDBDAD9D8D7D6D5D4D3D2D1D0CFCECDCCCBCAC9C8C7C6C5C4C3C2C1C0BFBEBDBCBBBAB9B8B7B6B5B4B3B2B1B0AFAEADACABAAA9A8A7A6A5A4A3A2A1A09F9E9D9C9B9A999897969594939291908F8E8D8C8B8A89888786858483828180")
 		};
 		HexConverter::Decode(message, 3, m_message);
+
+		const std::vector<std::string> monte =
+		{
+			std::string("2f962d1bbd97223a5a0379b1a4d7af7c86227bffed5362551433155a106207c1"),
+			std::string("963a9eab3ebefcaaf8bd27f68755d00db8269c1ebadd4bd3be75a36a39a31f9f"),
+			std::string("a549d91645d693b797efb25e900ed04c75ea42dbc570ddcd3541986e5fcaa2645db98ad8c9545ddcee81bd93b5376bb835b03d194a089b5cb4551e6d609c64c9"),
+			std::string("39ab0176f64ed6a121d85c78def78d7a548118a89fc5e4c00508f3d5ded5dabc34d0544262ff32bbad7f2bdf2963f10ee796fb7a1a70be4bdc2546a95788849d"),
+			std::string("b5747f5be85b6ac8ac2d97a32cc6a3e961195e81d0017ed2308f658ff9c937b0bef28249407234f7bc5baf0336351bddf1f4edfabd325e4ddbdc64ba6ccbccf2ae3aacb10829cf4bf1c2ceeb6b2929a270addb00ea947cc74abcf3ae905b5cddbda4b46df0b6295ca8cb11d28d5d30ad8ae337130f86652e11c6ab32b71ebefa"),
+			std::string("4fe91078f7c2be5a8aa30d5f53c71c77a421d1a836ea0f08d6aa543415a792cdd9b05bd4a0725501b14e87bf1a13f57a5efe4a50c8d69571401ca74659c06c0dcc8f7b905bfd5e67e7a8ffaf122daeb6e209a6c0c57e6a45380eb24acef0d5e2a0e6a4580043aa1e5a172fd54ca80cfaa87b82adba96ad909034f44daccc5474")
+		};
+		HexConverter::Decode(monte, 6, m_monte);
 
 		const std::vector<std::string> nonce =
 		{

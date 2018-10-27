@@ -319,7 +319,7 @@ namespace Test
 
 		if (enc != Expected)
 		{
-			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal!"));
+			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal! -RM1"));
 		}
 
 		Cipher->Initialize(false, kp);
@@ -332,7 +332,7 @@ namespace Test
 
 		if (dec != Message)
 		{
-			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal!"));
+			throw TestException(std::string("RijndaelTest: AES MonteCarlo: Arrays are not equal! -RM2"));
 		}
 	}
 

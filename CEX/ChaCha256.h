@@ -138,6 +138,7 @@ private:
 
 	static const size_t BLOCK_SIZE = 64;
 	static const std::string CLASS_NAME;
+	static const std::vector<byte> CSHAKE_CUST;
 	static const size_t KEY_SIZE = 32;
 	static const size_t INFO_SIZE = 16;
 	static const size_t NONCE_SIZE = 2;

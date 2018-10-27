@@ -130,6 +130,7 @@ private:
 	static const size_t KEY_SIZE = 32;
 	static const size_t NONCE_SIZE = 2;
 	static const size_t ROUND_COUNT = 72;
+	static const std::vector<byte> CSHAKE_CUST;
 	static const size_t STATE_PRECACHED = 2048;
 	static const size_t STATE_SIZE = 32;
 	static const std::string OMEGA_INFO;

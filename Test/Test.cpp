@@ -294,7 +294,7 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("*                                             *");
 	ConsoleUtils::WriteLine("* Release:   v1.0.0.6f (A6)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      October 24, 2018                 *");
+	ConsoleUtils::WriteLine("* Date:      October 27, 2018                 *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
