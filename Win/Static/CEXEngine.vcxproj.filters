@@ -211,12 +211,6 @@
     <Filter Include="Source Files\Cipher\Asymmetric\Encrypt\McEliece">
       <UniqueIdentifier>{d98aa6ce-c534-49cd-a0bc-b66dd7a4b7b5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Cipher\Asymmetric\Sign\RLWESIG">
-      <UniqueIdentifier>{ef3863fe-b139-419d-ad5b-52fc4e249eca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Cipher\Asymmetric\Sign\GMSS">
-      <UniqueIdentifier>{e1dc5f4f-d16a-4a86-ac41-a86ddb31a63e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Cipher\Asymmetric\KEX">
       <UniqueIdentifier>{e4161a52-a540-4c1b-b504-3ec85defbaca}</UniqueIdentifier>
     </Filter>
@@ -228,12 +222,6 @@
     </Filter>
     <Filter Include="Source Files\Cipher\Asymmetric\Sign">
       <UniqueIdentifier>{f32014fa-8dd3-4458-b9f1-324e4fcb7cae}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Cipher\Asymmetric\Sign\GMSS">
-      <UniqueIdentifier>{aefc1462-8149-4297-845f-2f1ddbdf5381}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Cipher\Asymmetric\Sign\RLWESIG">
-      <UniqueIdentifier>{3f4d3371-6c42-44ef-aafd-c8f3e56f4a32}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Network">
       <UniqueIdentifier>{f4b0f131-58dc-4026-8dbf-9665f6ab0a1e}</UniqueIdentifier>
@@ -315,6 +303,42 @@
     </Filter>
     <Filter Include="Source Files\Cipher\Symmetric\Stream\Support">
       <UniqueIdentifier>{e653f4b9-3335-4ff1-82dd-1c74a54e1248}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign\Sphincs">
+      <UniqueIdentifier>{ef3863fe-b139-419d-ad5b-52fc4e249eca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign\Sphincs">
+      <UniqueIdentifier>{3f4d3371-6c42-44ef-aafd-c8f3e56f4a32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign\Sphincs\Support">
+      <UniqueIdentifier>{081dcdf3-1153-44af-b925-77c528d8f8e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign\Sphincs\Support">
+      <UniqueIdentifier>{ad1e07fb-357c-42b1-886a-07ad5622b0aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key\Asymmetric\Picnic">
+      <UniqueIdentifier>{e698f2b0-e619-4b40-81b2-970dd05cc592}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key\Asymmetric\Sphincs">
+      <UniqueIdentifier>{4bde7456-7e8f-4480-8b6e-a1b94575a1bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Asymmetric\Sphincs">
+      <UniqueIdentifier>{71e28b01-fb25-4e73-ac89-9e26d0b10f3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Asymmetric\Picnic">
+      <UniqueIdentifier>{ac66ef60-13c7-4a0a-bc3d-2ccb07634526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign\Dilithium">
+      <UniqueIdentifier>{e1dc5f4f-d16a-4a86-ac41-a86ddb31a63e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Cipher\Asymmetric\Sign\Dilithium\Support">
+      <UniqueIdentifier>{bc86be5a-45f8-4273-9347-92db387c34ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign\Dilithium">
+      <UniqueIdentifier>{aefc1462-8149-4297-845f-2f1ddbdf5381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Cipher\Asymmetric\Sign\Dilithium\Support">
+      <UniqueIdentifier>{67987ef0-8e01-4d7c-8df1-739c747ca957}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -945,6 +969,42 @@
     <ClInclude Include="..\..\CEX\ErrorCodes.h">
       <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\CEX\Sphincs.h">
+      <Filter>Header Files\Cipher\Asymmetric\Sign\Sphincs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsKeyPair.h">
+      <Filter>Header Files\Key\Asymmetric\Sphincs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsPublicKey.h">
+      <Filter>Header Files\Key\Asymmetric\Sphincs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsPrivateKey.h">
+      <Filter>Header Files\Key\Asymmetric\Sphincs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PicnicKeyPair.h">
+      <Filter>Header Files\Key\Asymmetric\Picnic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PicnicPublicKey.h">
+      <Filter>Header Files\Key\Asymmetric\Picnic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PicnicPrivateKey.h">
+      <Filter>Header Files\Key\Asymmetric\Picnic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\PicnicParams.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsUtils.h">
+      <Filter>Header Files\Cipher\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SphincsParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\SPXF256.h">
+      <Filter>Header Files\Cipher\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\Dilithium.h">
+      <Filter>Header Files\Cipher\Asymmetric\Sign\Dilithium</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\CEX\CBC.cpp">
@@ -1351,6 +1411,36 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Threefish1024.cpp">
       <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PicnicKeyPair.cpp">
+      <Filter>Source Files\Key\Asymmetric\Picnic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PicnicPublicKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\Picnic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\PicnicPrivateKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\Picnic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsKeyPair.cpp">
+      <Filter>Source Files\Key\Asymmetric\Sphincs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsPublicKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\Sphincs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsPrivateKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\Sphincs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Sphincs.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Sign\Sphincs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SPXF256.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\SphincsUtils.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Sign\Sphincs\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\Dilithium.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Sign\Dilithium</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

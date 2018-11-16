@@ -17,6 +17,11 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+#if defined (_DEBUG)
+		static const size_t TEST_CYCLES = 10;
+#else
+		static const size_t TEST_CYCLES = 100;
+#endif
 
 		TestEventHandler m_progressEvent;
 		Prng::BCR* m_rngPtr;

@@ -5,7 +5,7 @@ NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
-SphincsPublicKey::SphincsPublicKey(SphincsParams Parameters, std::vector<byte> &P)
+SphincsPublicKey::SphincsPublicKey(SphincsParameters Parameters, std::vector<byte> &P)
 	:
 	m_isDestroyed(false),
 	m_sphincsParameters(Parameters),
@@ -16,10 +16,10 @@ SphincsPublicKey::SphincsPublicKey(SphincsParams Parameters, std::vector<byte> &
 SphincsPublicKey::SphincsPublicKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false),
-	m_sphincsParameters(SphincsParams::None),
+	m_sphincsParameters(SphincsParameters::None),
 	m_pCoeffs(0)
 {
-	m_sphincsParameters = static_cast<SphincsParams>(KeyStream[0]);
+	m_sphincsParameters = static_cast<SphincsParameters>(KeyStream[0]);
 	uint pLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_pCoeffs.resize(pLen);
 	Utility::MemUtils::Copy(KeyStream, 5, m_pCoeffs, 0, pLen);
@@ -34,7 +34,7 @@ SphincsPublicKey::~SphincsPublicKey()
 
 const AsymmetricEngines SphincsPublicKey::CipherType()
 {
-	return Enumeration::AsymmetricEngines::NTRU;
+	return Enumeration::AsymmetricEngines::Sphincs;
 }
 
 const AsymmetricKeyTypes SphincsPublicKey::KeyType()
@@ -42,7 +42,7 @@ const AsymmetricKeyTypes SphincsPublicKey::KeyType()
 	return AsymmetricKeyTypes::CipherPublicKey;
 }
 
-const SphincsParams SphincsPublicKey::Parameters()
+const SphincsParameters SphincsPublicKey::Parameters()
 {
 	return m_sphincsParameters;
 }
@@ -59,7 +59,7 @@ void SphincsPublicKey::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_sphincsParameters = SphincsParams::None;
+		m_sphincsParameters = SphincsParameters::None;
 
 		if (m_pCoeffs.size() > 0)
 		{

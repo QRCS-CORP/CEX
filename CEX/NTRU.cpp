@@ -210,17 +210,17 @@ IAsymmetricKeyPair* NTRU::Generate()
 		NTRULQ4591N761::Generate(pk, sk, m_rndGenerator);
 	}
 
-	Key::Asymmetric::NTRUPublicKey* apk = new Key::Asymmetric::NTRUPublicKey(m_ntruParameters, pk);
-	Key::Asymmetric::NTRUPrivateKey* ask = new Key::Asymmetric::NTRUPrivateKey(m_ntruParameters, sk);
+	NTRUPublicKey* apk = new NTRUPublicKey(m_ntruParameters, pk);
+	NTRUPrivateKey* ask = new NTRUPrivateKey(m_ntruParameters, sk);
 
-	return new Key::Asymmetric::NTRUKeyPair(ask, apk);
+	return new NTRUKeyPair(ask, apk);
 }
 
 void NTRU::Initialize(IAsymmetricKey* Key)
 {
 	if (Key->CipherType() != AsymmetricEngines::NTRU)
 	{
-		throw CryptoAsymmetricException("NTRU:Initialize", "Encryption requires a valid public key!");
+		throw CryptoAsymmetricException("NTRU:Initialize", "The key base type is invalid!");
 	}
 
 	if (Key->KeyType() == Enumeration::AsymmetricKeyTypes::CipherPublicKey)

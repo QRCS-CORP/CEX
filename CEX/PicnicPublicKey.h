@@ -10,7 +10,7 @@ NAMESPACE_ASYMMETRICKEY
 using Enumeration::PicnicParams;
 
 /// <summary>
-/// A Picnic Public Key container
+/// A Dilithium Public Key container
 /// </summary>
 class PicnicPublicKey final : public IAsymmetricKey
 {

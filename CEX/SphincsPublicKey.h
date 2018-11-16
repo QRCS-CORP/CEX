@@ -3,11 +3,11 @@
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "SphincsParams.h"
+#include "SphincsParameters.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::SphincsParams;
+using Enumeration::SphincsParameters;
 
 /// <summary>
 /// A Sphincs Public Key container
@@ -18,7 +18,7 @@ private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_pCoeffs;
-	SphincsParams m_sphincsParameters;
+	SphincsParameters m_sphincsParameters;
 
 public:
 
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="P">The public keys polynomial</param>
-	SphincsPublicKey(SphincsParams Parameters, std::vector<byte> &P);
+	SphincsPublicKey(SphincsParameters Parameters, std::vector<byte> &P);
 
 	/// <summary>
 	/// Initialize this class with a serialized public key
@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const SphincsParams Parameters();
+	const SphincsParameters Parameters();
 
 	/// <summary>
 	/// Read Only: The public keys polynomial

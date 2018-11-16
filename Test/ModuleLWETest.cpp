@@ -6,7 +6,6 @@
 #include "../CEX/MLWEPrivateKey.h"
 #include "../CEX/MLWEPublicKey.h"
 #include "../CEX/RingLWE.h"
-#include "../CEX/SecureRandom.h"
 
 namespace Test
 {
@@ -87,7 +86,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("ModuleLWETest: Message authentication test failed!"));
+			throw TestException(std::string("ModuleLWE"), std::string("Message authentication test failed! -MA1"));
 		}
 
 		delete kp;
@@ -112,7 +111,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("ModuleLWETest: Cipher-text integrity test failed!"));
+			throw TestException(std::string("ModuleLWE"), std::string("Cipher-text integrity test failed! -MC1"));
 		}
 
 		delete kp;
@@ -125,7 +124,7 @@ namespace Test
 		{
 			ModuleLWE cpr(Enumeration::MLWEParams::None, m_rngPtr);
 
-			throw TestException(std::string("ModuleLWE"), std::string("Exception: Exception handling failure! -ME1"));
+			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME1"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -139,7 +138,7 @@ namespace Test
 		{
 			ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, Enumeration::Prngs::None);
 
-			throw TestException(std::string("ModuleLWE"), std::string("Exception: Exception handling failure! -ME2"));
+			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME2"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -158,7 +157,7 @@ namespace Test
 			IAsymmetricKeyPair* kp = cprb.Generate();
 			cpra.Initialize(kp->PrivateKey());
 
-			throw TestException(std::string("ModuleLWE"), std::string("Exception: Exception handling failure! -ME3"));
+			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME3"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -190,7 +189,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("ModuleLWETest: Public-key integrity test failed!"));
+			throw TestException(std::string("ModuleLWE"), std::string("Public-key integrity test failed! -MP1"));
 		}
 
 		delete kp;
@@ -201,7 +200,7 @@ namespace Test
 		std::vector<byte> skey;
 		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K4, m_rngPtr);
 
-		for (size_t i = 0; i < 100; ++i)
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 
 			IAsymmetricKeyPair* kp = cpr.Generate();
@@ -211,7 +210,7 @@ namespace Test
 
 			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
 			{
-				throw TestException(std::string("ModuleLWETest: Private key serialization test has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Private key serialization test has failed! -MR1"));
 			}
 
 			MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
@@ -220,7 +219,7 @@ namespace Test
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
-				throw TestException(std::string("ModuleLWETest: Public key serialization test has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Public key serialization test has failed! -MR2"));
 			}
 		}
 	}
@@ -233,7 +232,7 @@ namespace Test
 
 		ModuleLWE cpr1(Enumeration::MLWEParams::Q7681N256K2, m_rngPtr);
 
-		for (size_t i = 0; i < 33; ++i)
+		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
 			m_rngPtr->Generate(sec1);
 			IAsymmetricKeyPair* kp = cpr1.Generate();
@@ -245,20 +244,20 @@ namespace Test
 
 			if (!cpr1.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("ModuleLWETest: Stress test authentication has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Stress test authentication has failed! -MT1"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("ModuleLWETest: Stress test has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Stress test has failed! -MT2"));
 			}
 		}
 
 		ModuleLWE cpr2(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
 
-		for (size_t i = 0; i < 33; ++i)
+		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
 			m_rngPtr->Generate(sec1);
 			IAsymmetricKeyPair* kp = cpr2.Generate();
@@ -270,20 +269,20 @@ namespace Test
 
 			if (!cpr2.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("ModuleLWETest: Stress test authentication has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Stress test authentication has failed! -MT3"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("ModuleLWETest: Stress test has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Stress test has failed! -MT4"));
 			}
 		}
 
 		ModuleLWE cpr3(Enumeration::MLWEParams::Q7681N256K4, m_rngPtr);
 
-		for (size_t i = 0; i < 34; ++i)
+		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
 			m_rngPtr->Generate(sec1);
 			IAsymmetricKeyPair* kp = cpr3.Generate();
@@ -295,14 +294,14 @@ namespace Test
 
 			if (!cpr3.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("ModuleLWETest: Stress test authentication has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Stress test authentication has failed! -MT5"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("ModuleLWETest: Stress test has failed!"));
+				throw TestException(std::string("ModuleLWE"), std::string("Stress test has failed! -MT6"));
 			}
 		}
 	}

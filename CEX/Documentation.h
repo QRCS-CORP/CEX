@@ -15,12 +15,12 @@ CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.6f</B> (A6 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>1.0.0.6g</B> (A6 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
 \version   1.0.0.6f
-\date      October 17, 2018
+\date      November 16, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
@@ -28,9 +28,13 @@ The current version is <B>1.0.0.6f</B> (A6 version), which are the major, minor,
 The current version is 1.0.0.6f (A6 version), which are the major, minor, patch, and release codes. \n \n
 
 <B>Current Release 1.0.0.6 (version A6):</B> \n
-The NTRU asymmetric cipher \n
-The RSX symmetric cipher \n
-Full MISRA C++2014 compliant \n \n
+
+The SPHINCS+ asymmetric signature scheme \n
+The NTRU Prime asymmetric cipher \n
+Authenticated Threefish-256/512/1024 stream ciphers \n
+Authenticated ChaCha-256/512 stream ciphers \n
+The cSHAKE option (RSX) integrated into RHX/AHX \n
+Asymmetric ciphers updated to the NIST PQ Round 1 versions \n
 
 <B>Planned Release 1.1.0.1</B> \n
 RingLWE \n
@@ -39,7 +43,7 @@ ModuleLWE \n
 NTRU \n
 RSA \n
 RSA-SIG \n
-Picnic \n
+Dilithium \n
 SPHINCS+ \n \n
 
 <B>Planned Release 1.2.0.1</B> \n

@@ -18,7 +18,7 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
-		static const size_t MAXM_ALLOC = 262140;
+		static const size_t MAXM_ALLOC = 10240;
 		static const size_t MINM_ALLOC = 1024;
 		static const size_t SAMPLE_SIZE = 10240;
 		static const size_t TEST_CYCLES = 2;

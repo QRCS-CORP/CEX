@@ -2,8 +2,11 @@
 //
 // ### CEX 1.0.0.6 ###
 // Current Release 1.0.0.6 (version A6)
+// The SPHINCS+ asymmetric signature scheme
 // The NTRU Prime asymmetric cipher
-// The RSX symmetric cipher
+// Authenticated Threefish-256/512/1024 stream ciphers
+// Authenticated ChaCha-256/512 stream ciphers
+// The cSHAKE option (RSX) integrated into RHX/AHX
 // Asymmetric ciphers updated to the NIST PQ Round 1 versions
 //
 // ### CEX 1.0.0.5 ###
@@ -78,26 +81,10 @@
 // TRAJECTORY
 //
 // ### SCHEDULE FOR 1.0.0.7 RELEASE ###
-// ## ETA is August 1, 2018 ##
+// ## ETA is December 25, 2018 ##
 // 
-// Add RSA asymmetric cipher
-// Add RSA signature scheme
-// Add vectorized hash functions (AVX2/AVX512) for future expansion
-// Add 'stitched' implementations of AHX-CBC/CTR/GCM
-// Add 'stitched' implementation of ChaCha/Poly1305
-//
-// ### SCHEDULE FOR 1.0.0.6 RELEASE ###
-// ## ETA is April 30, 2018 ##
-// 
-// Add cSHAKE 128/256/512/1024 DRBG -done
-// Add KMAC Message Authentication Code generator -done
-// Security and performance review of DRBGs and MACs -done
-// Add vectorized hash functions (AVX2/AVX512) for future expansion -ongoing by 1.0.0.7
-// Add 'stitched' implementations of AHX-CBC/CTR/GCM -deferred to 1.0.0.7
-// Add 'stitched' implementation of ChaCha/Poly1305 -deferred to 1.0.0.7
-// Multi-threaded/vectorized CMAC? -no
-// Rewrite ACP/ECP (change to cSHAKE generator) -done
-// Add NTRU Prime asymmetric cipher -done
+// Add SPHINCS+ signature scheme
+// Add Dilithium signature scheme
 //
 //
 // ### Planned Release 1.1.0.1 ###
@@ -107,13 +94,10 @@
 // McEliece					-added
 // ModuleLWE				-added
 // NTRU						-added
-// RSA
-// RSA-Sig
-// SPHINCS+
-// Picnic
+// SPHINCS+					-added
+// Dilithium				-
 //
 // ### Planned Release 1.2.0.1 ###
-// TLS
 // STM - KEX
 // Android / iOS / Linux compatibility
 // DLL API
@@ -292,9 +276,9 @@ void PrintTitle()
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.6: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("*                                             *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.6f (A6)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.6g (A6)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      October 27, 2018                 *");
+	ConsoleUtils::WriteLine("* Date:      November 16, 2018                *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");
@@ -548,6 +532,8 @@ int main()
 			RunTest(new ModuleLWETest());
 			RunTest(new NTRUTest());
 			RunTest(new RingLWETest());
+			PrintHeader("TESTING ASYMMETRIC SIGNATURE SCHEMES");
+			RunTest(new SphincsTest());
 		}
 		else
 		{

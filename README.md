@@ -38,6 +38,10 @@ This is still an early stage in the development of this library, so stay tuned, 
 * The Niederreiter dual form of the McEliece cipher
 * The ModuleLWE asymmetric cipher (Kyber)
 
+## Contents
+### Asymmetric Signature Schemes
+* The SPHINCS+ 256F-SHAKE128/256 asymmetric signature schemes
+
 ### Block Ciphers
 Note: Each cipher can be deployed as either the standard form (AES, Serpent, Twofish), or the extended hybrid using cSHAKE or HKDF(SHA2) key expansion
 * The AES-NI Hash eXtended cipher (AHX)
@@ -134,7 +138,8 @@ The next planned release (1.0.0.7) will be in October 2018.
 
 ## History
   
-### Version 1.0.0.6d, June 28, 2018
+### Version 1.0.0.6g, November 16, 2018
+* The SPHINCS+ asymmetric signature scheme
 * The NTRU Prime asymmetric cipher
 * The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
 * Update of all asymmetric ciphers to match NIST PQ entries

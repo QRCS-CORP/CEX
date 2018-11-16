@@ -149,11 +149,12 @@
       <DebugInformationFormat>None</DebugInformationFormat>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <OpenMPSupport>true</OpenMPSupport>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -257,6 +258,11 @@
     <ClInclude Include="..\..\CEX\MacFromName.h" />
     <ClInclude Include="..\..\CEX\MPKCM12T62.h" />
     <ClInclude Include="..\..\CEX\NTRUSQ4591N761.h" />
+    <ClInclude Include="..\..\CEX\Dilithium.h" />
+    <ClInclude Include="..\..\CEX\PicnicKeyPair.h" />
+    <ClInclude Include="..\..\CEX\PicnicParams.h" />
+    <ClInclude Include="..\..\CEX\PicnicPrivateKey.h" />
+    <ClInclude Include="..\..\CEX\PicnicPublicKey.h" />
     <ClInclude Include="..\..\CEX\RLWEQ12289N1024.h" />
     <ClInclude Include="..\..\CEX\NTRULQ4591N761.h" />
     <ClInclude Include="..\..\CEX\FileStream.h" />
@@ -330,6 +336,7 @@
     <ClInclude Include="..\..\CEX\SHA2Params.h" />
     <ClInclude Include="..\..\CEX\SHA512.h" />
     <ClInclude Include="..\..\CEX\SHAKE.h" />
+    <ClInclude Include="..\..\CEX\SPXF256.h" />
     <ClInclude Include="..\..\CEX\ShakeModes.h" />
     <ClInclude Include="..\..\CEX\SimdIntegers.h" />
     <ClInclude Include="..\..\CEX\SimdProfiles.h" />
@@ -338,6 +345,12 @@
     <ClInclude Include="..\..\CEX\Skein512.h" />
     <ClInclude Include="..\..\CEX\SkeinParams.h" />
     <ClInclude Include="..\..\CEX\SkeinUbiTweak.h" />
+    <ClInclude Include="..\..\CEX\Sphincs.h" />
+    <ClInclude Include="..\..\CEX\SphincsKeyPair.h" />
+    <ClInclude Include="..\..\CEX\SphincsParameters.h" />
+    <ClInclude Include="..\..\CEX\SphincsPrivateKey.h" />
+    <ClInclude Include="..\..\CEX\SphincsPublicKey.h" />
+    <ClInclude Include="..\..\CEX\SphincsUtils.h" />
     <ClInclude Include="..\..\CEX\StreamAuthenticators.h" />
     <ClInclude Include="..\..\CEX\StreamModes.h" />
     <ClInclude Include="..\..\CEX\SymmetricKeySize.h" />
@@ -453,6 +466,10 @@
     <ClCompile Include="..\..\CEX\MacFromName.cpp" />
     <ClCompile Include="..\..\CEX\MPKCM12T62.cpp" />
     <ClCompile Include="..\..\CEX\NTRUSQ4591N761.cpp" />
+    <ClCompile Include="..\..\CEX\Dilithium.cpp" />
+    <ClCompile Include="..\..\CEX\PicnicKeyPair.cpp" />
+    <ClCompile Include="..\..\CEX\PicnicPrivateKey.cpp" />
+    <ClCompile Include="..\..\CEX\PicnicPublicKey.cpp" />
     <ClCompile Include="..\..\CEX\RLWEQ12289N1024.cpp" />
     <ClCompile Include="..\..\CEX\NTRULQ4591N761.cpp" />
     <ClCompile Include="..\..\CEX\FileStream.cpp" />
@@ -507,6 +524,12 @@
     <ClCompile Include="..\..\CEX\Skein256.cpp" />
     <ClCompile Include="..\..\CEX\Skein512.cpp" />
     <ClCompile Include="..\..\CEX\SkeinParams.cpp" />
+    <ClCompile Include="..\..\CEX\Sphincs.cpp" />
+    <ClCompile Include="..\..\CEX\SphincsKeyPair.cpp" />
+    <ClCompile Include="..\..\CEX\SphincsPrivateKey.cpp" />
+    <ClCompile Include="..\..\CEX\SphincsPublicKey.cpp" />
+    <ClCompile Include="..\..\CEX\SphincsUtils.cpp" />
+    <ClCompile Include="..\..\CEX\SPXF256.cpp" />
     <ClCompile Include="..\..\CEX\SymmetricKeyGenerator.cpp" />
     <ClCompile Include="..\..\CEX\MacDescription.cpp" />
     <ClCompile Include="..\..\CEX\MacFromDescription.cpp" />

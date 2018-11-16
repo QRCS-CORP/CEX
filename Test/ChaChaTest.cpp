@@ -106,16 +106,21 @@ namespace Test
 
 			// check each variant for identical cipher-text output
 			Kat(csx256h256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(csx256h256, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(csx256h256, m_message[0], m_key[1], m_nonce[1], m_expected[1]);
 			Kat(csx256h512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(csx256h512, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(csx256h512, m_message[0], m_key[1], m_nonce[1], m_expected[1]);
 			Kat(csx256k256, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(csx256k256, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(csx256k256, m_message[0], m_key[1], m_nonce[1], m_expected[1]);
 			Kat(csx256k512, m_message[0], m_key[0], m_nonce[0], m_expected[0]);
-			Kat(csx256k512, m_message[1], m_key[1], m_nonce[1], m_expected[1]);
+			Kat(csx256k512, m_message[0], m_key[1], m_nonce[1], m_expected[1]);
 			// non-authenticated standard chachapoly20
 			Kat(csx256s, m_message[0], m_key[0], m_nonce[0], m_expected[2]);
-			Kat(csx256s, m_message[1], m_key[1], m_nonce[1], m_expected[3]);
+			Kat(csx256s, m_message[0], m_key[1], m_nonce[1], m_expected[3]);
+
+			Kat(csx256s, m_message[0], m_key[4], m_nonce[4], m_expected[8]);
+			Kat(csx256s, m_message[0], m_key[5], m_nonce[4], m_expected[9]);
+			Kat(csx256s, m_message[0], m_key[4], m_nonce[5], m_expected[10]);
+			Kat(csx256s, m_message[0], m_key[4], m_nonce[6], m_expected[11]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-256 known answer cipher tests.."));
 			
 			// check each variant for identical cipher-text output
@@ -163,33 +168,33 @@ namespace Test
 			Exception(csx512s);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 exception handling tests.."));
 
-			Finalization(csx512h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8], m_code[12]);
-			Finalization(csx512h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9], m_code[13]);
-			Finalization(csx512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10], m_code[14]);
-			Finalization(csx512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11], m_code[15]);
+			Finalization(csx512h256, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[8], m_code[12]);
+			Finalization(csx512h512, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[9], m_code[13]);
+			Finalization(csx512k256, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[10], m_code[14]);
+			Finalization(csx512k512, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[11], m_code[15]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer finalization tests."));
 
 			// check each authenticated variant for identical cipher-text output
-			Kat(csx512h256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(csx512h256, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
-			Kat(csx512h512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(csx512h512, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
-			Kat(csx512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(csx512k256, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
-			Kat(csx512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4]);
-			Kat(csx512k512, m_message[3], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(csx512h256, m_message[0], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(csx512h256, m_message[0], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(csx512h512, m_message[0], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(csx512h512, m_message[0], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(csx512k256, m_message[0], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(csx512k256, m_message[0], m_key[3], m_nonce[3], m_expected[5]);
+			Kat(csx512k512, m_message[0], m_key[2], m_nonce[2], m_expected[4]);
+			Kat(csx512k512, m_message[0], m_key[3], m_nonce[3], m_expected[5]);
 			// non-authenticated extended chachapoly80/40
-			Kat(csx512s, m_message[2], m_key[2], m_nonce[2], m_expected[6]);
-			Kat(csx512s, m_message[3], m_key[3], m_nonce[3], m_expected[7]);
+			Kat(csx512s, m_message[0], m_key[2], m_nonce[2], m_expected[6]);
+			Kat(csx512s, m_message[0], m_key[3], m_nonce[3], m_expected[7]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer cipher tests.."));
 
 			// check each variant for identical cipher-text output
-			MonteCarlo(csx512h256, m_message[3], m_key[3], m_nonce[3], m_monte[2]);
-			MonteCarlo(csx512h512, m_message[3], m_key[3], m_nonce[3], m_monte[2]);
-			MonteCarlo(csx512k256, m_message[3], m_key[3], m_nonce[3], m_monte[2]);
-			MonteCarlo(csx512k512, m_message[3], m_key[3], m_nonce[3], m_monte[2]);
+			MonteCarlo(csx512h256, m_message[0], m_key[3], m_nonce[3], m_monte[2]);
+			MonteCarlo(csx512h512, m_message[0], m_key[3], m_nonce[3], m_monte[2]);
+			MonteCarlo(csx512k256, m_message[0], m_key[3], m_nonce[3], m_monte[2]);
+			MonteCarlo(csx512k512, m_message[0], m_key[3], m_nonce[3], m_monte[2]);
 			// non-authenticated standard chachapoly20
-			MonteCarlo(csx512s, m_message[3], m_key[3], m_nonce[3], m_monte[3]);
+			MonteCarlo(csx512s, m_message[0], m_key[3], m_nonce[3], m_monte[3]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 monte carlo tests.."));
 
 			Parallel(csx512s);
@@ -199,10 +204,10 @@ namespace Test
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 stress tests.."));
 
 			// original mac vectors
-			Verification(csx512h256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[8]);
-			Verification(csx512h512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[9]);
-			Verification(csx512k256, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[10]);
-			Verification(csx512k512, m_message[2], m_key[2], m_nonce[2], m_expected[4], m_code[11]);
+			Verification(csx512h256, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[8]);
+			Verification(csx512h512, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[9]);
+			Verification(csx512k256, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[10]);
+			Verification(csx512k512, m_message[0], m_key[2], m_nonce[2], m_expected[4], m_code[11]);
 			OnProgress(std::string("ChaChaTest: Passed ChaCha-512 known answer authentication tests..")); 
 
 			delete csx512h256;
@@ -610,11 +615,11 @@ namespace Test
 
 		if (otp != Message)
 		{
-			throw TestException(std::string("Kat: Decrypted output does not match the input! -CV1"));
+			throw TestException(std::string("Kat: Decrypted output does not match the input! -CK1"));
 		}
-		if (cpt != Expected)
+		if (!IntUtils::Compare(cpt, 0, Expected, 0, Expected.size()))
 		{
-			throw TestException(std::string("Kat: Output does not match the known answer! -CV2"));
+			throw TestException(std::string("Kat: Output does not match the known answer! -CK2"));
 		}
 	}
 
@@ -850,37 +855,55 @@ namespace Test
 			std::string("39A1BB6F123B4FE8AF780CEB88FB3226049377ADF8C5F32D3A311697452073C6C7CEE34CC67641DD69F05D6266DE7EEF3DE4C359B4728F6D847454210D5E4C8A"),	//20r-256c
 			std::string("57459975BC46799394788DE80B928387862985A269B9E8E77801DE9D874B3F51AC4610B9F9BEE8CF8CACD8B5AD0BF17D3DDF23FD7424887EB3F81405BD498CC3"),	//20r-256s
 			std::string("92A2508E2C4084567195F2A1005E552B4874EC0504A9CD5E4DAF739AB553D2E783D79C5BA11E0653BEBB5C116651302E8D381CB728CA627B0B246E83942A2B99"),	//20r-256s
+
 #if defined(CEX_CHACHA512_STRONG)
 			std::string("716E1BDC7BDA5FD2F1D7EB84432EF4B1F1BAC4E7A5A905FC24D25521BB3E6F58DC22F791DEDE440583394CF614A371BD6C14D253323B3B4F0BF17506DB08F155"),	//80r-512c
 			std::string("41ABC7B51F100D6D0BAA25F0AAD9C411A2EA4CAF7F5EE70CF4273C7DB83D6C8745314A621805F3C4CE2D4BF61033F7BD2D6BEEA6C82FF70DA96B641A0D0287A5"),	//80r-512c
 			std::string("E8B7594B1C5FFBE43D52318EB1B1E9231E2DD50275C9A6E5CBF33DACED3B2EF4B2FAD30DADD96FC634EBFD4D3897DE8A0DE9D3F846CDE0AA7EA31EA08A2F444F"),	//80r-512s
-			std::string("54B70E75C5B79BBFCCF88DE2B1C356EB385C05C2F3AF91EE803A5AE8396F3DDDAF8D41DF905AA242AD7F27126596A829B890B34621F5E267C1D46DA8A44BEA8B")		//80r-512s
+			std::string("54B70E75C5B79BBFCCF88DE2B1C356EB385C05C2F3AF91EE803A5AE8396F3DDDAF8D41DF905AA242AD7F27126596A829B890B34621F5E267C1D46DA8A44BEA8B"),		//80r-512s
 #else
 			std::string("B04981146EEB2E62EB522345D76886BB49A2CA9327CDA1806668EF52C766FD67B649A45150BB3222932F8E1E579F08ADE4865F1267B6EDF970D4DECC90898E98"),	//40r-512c
 			std::string("EE8C5F81FF6CBAEAEB4FA358883F908070099489EB4728A84A3D9680ECD70DB3984A7C40A22C53914703759261758894EC1EAD2BAC6683DD66873BC3605C325A"),	//40r-512c
 			std::string("87E9E06B911153EEF0291D1C4B5624DCEBE9D64228D30FFD56F940923531A8E8D1A9013F1957D758E0330D92977987ED45A50053B8154586D739F4CDA6D6E6DE"),	//40r-512s
-			std::string("67EB972A7390E2B4971D0BBCB17F9BD8A8C135E83B9D5338B9D66426E4B8495A9B4E02BE2DE52A8FB139BDA519728AC519EEBD8F3AC2495F4088E49A2C54DDB7")		//40r-512s
+			std::string("67EB972A7390E2B4971D0BBCB17F9BD8A8C135E83B9D5338B9D66426E4B8495A9B4E02BE2DE52A8FB139BDA519728AC519EEBD8F3AC2495F4088E49A2C54DDB7"),	//40r-512s
 #endif
+			// IETF chacha-poly1305 for TLS, test vector 1
+			std::string("76B8E0ADA0F13D90405D6AE55386BD28BDD219B8A08DED1AA836EFCC8B770DC7DA41597C5157488D7724E03FB8D84A376A43B8F41518A11CC387B669B2EE6586"),
+			// IETF test vector 2
+			std::string("4540F05A9F1FB296D7736E7B208E3C96EB4FE1834688D2604F450952ED432D41BBE2A0B6EA7566D2A5D1E7E20D42AF2C53D792B1C43FEA817E9AD275AE546963"),
+			// IETF test vector 3
+			std::string("DE9CBA7BF3D69EF5E786DC63973F653A0B49E015ADBFF7134FCB7DF137821031E85A050278A7084527214F73EFC7FA5B5277062EB7A0433E445F41E3"),
+			// IETF test vector 4
+			std::string("EF3FDFD6C61578FBF5CF35BD3DD33B8009631634D21E42AC33960BD138E50D32111E4CAF237EE53CA8AD6426194A88545DDC497A0B466E7D6BBDB0041B2F586B")
 		};
-		HexConverter::Decode(expected, 8, m_expected);
+		HexConverter::Decode(expected, 12, m_expected);
 
 		const std::vector<std::string> key =
 		{
 			std::string("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D"),
 			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12"),
 			std::string("0053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF12"),
-			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF120053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D")
+			std::string("0558ABFE51A4F74A9DF04396E93C8FE23588DB2E81D4277ACD2073C6196CBF120053A6F94C9FF24598EB3E91E4378ADD3083D6297CCF2275C81B6EC11467BA0D"),
+			// TLS chacha20-poly1305 test vector 1
+			std::string("0000000000000000000000000000000000000000000000000000000000000000"),
+			// TLS chacha20-poly1305 test vector 2
+			std::string("0000000000000000000000000000000000000000000000000000000000000001"),
 		};
-		HexConverter::Decode(key, 4, m_key);
+		HexConverter::Decode(key, 6, m_key);
 
 		const std::vector<std::string> message =
 		{
+			// IETF poly1305 test vector 1
 			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"),
-			std::string("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+			// IETF poly1305 test vector 2
+			std::string("416E79207375626D697373696F6E20746F20746865204945544620696E74656E6465642062792074686520436F6E7472696275746F7220666F72207075626C69"
+				"636174696F6E20617320616C6C206F722070617274206F6620616E204945544620496E7465726E65742D4472616674206F722052464320616E6420616E79207374617465"
+				"6D656E74206D6164652077697468696E2074686520636F6E74657874206F6620616E204945544620616374697669747920697320636F6E7369646572656420616E202249"
+				"45544620436F6E747269627574696F6E222E20537563682073746174656D656E747320696E636C756465206F72616C2073746174656D656E747320696E20494554462073"
+				"657373696F6E732C2061732077656C6C206173207772697474656E20616E6420656C656374726F6E696320636F6D6D756E69636174696F6E73206D61646520617420616E"
+				"792074696D65206F7220706C6163652C207768696368206172652061646472657373656420746F")
 		};
-		HexConverter::Decode(message, 4, m_message);
+		HexConverter::Decode(message, 2, m_message);
 
 		const std::vector<std::string> monte =
 		{
@@ -902,8 +925,11 @@ namespace Test
 			std::string("167DE44BB21980E7"),
 			std::string(""),
 			std::string("0D74DB42A91077DE167DE44BB21980E7"),
+			std::string("0000000000000000"),
+			std::string("0000000000000001"),
+			std::string("0100000000000000")
 		};
-		HexConverter::Decode(nonce, 4, m_nonce);
+		HexConverter::Decode(nonce, 7, m_nonce);
 
 		/*lint -restore */
 	}

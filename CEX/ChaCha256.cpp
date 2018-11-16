@@ -287,6 +287,21 @@ void ChaCha256::Reset()
 	m_cipherState->Reset();
 }
 
+void ChaCha256::SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length)
+{
+	if (!m_isInitialized)
+	{
+		throw CryptoSymmetricCipherException("ChaCha256:Finalize", "The cipher has not been initialized!");
+	}
+	if (m_macAuthenticator == nullptr)
+	{
+		throw CryptoSymmetricCipherException("ChaCha256:Finalize", "The cipher has not been configured for authentication!");
+	}
+
+	// update the authenticator
+	m_macAuthenticator->Update(Input, Offset, Length);
+}
+
 void ChaCha256::TransformBlock(const std::vector<byte> &Input, std::vector<byte> &Output)
 {
 	Process(Input, 0, Output, 0, BLOCK_SIZE);

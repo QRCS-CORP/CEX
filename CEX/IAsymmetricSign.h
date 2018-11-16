@@ -23,6 +23,8 @@
 #include "CryptoAsymmetricException.h"
 #include "IAsymmetricKey.h"
 #include "IAsymmetricKeyPair.h"
+#include "IPrng.h"
+#include "Prngs.h"
 
 NAMESPACE_ASYMMETRICSIGN
 
@@ -30,6 +32,8 @@ using Enumeration::AsymmetricEngines;
 using Exception::CryptoAsymmetricException;
 using Key::Asymmetric::IAsymmetricKey;
 using Key::Asymmetric::IAsymmetricKeyPair;
+using Prng::IPrng;
+using Enumeration::Prngs;
 
 /// <summary>
 /// The Asymmetric cipher interface
@@ -102,37 +106,27 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="AsymmetricKey">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
-	virtual const void Initialize(IAsymmetricKey &AsymmetricKey) = 0;
+	virtual const void Initialize(IAsymmetricKey* AsymmetricKey) = 0;
 
 	/// <summary>
-	/// Reset the underlying engine
+	/// Sign a message array and return the message and attached signature
 	/// </summary>
-	virtual void Reset() = 0;
+	/// 
+	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Signature">The output signature array containing the signature and message</param>
+	/// 
+	/// <returns>Returns the size of the signed message</returns>
+	virtual size_t Sign(const std::vector<byte> &Message, std::vector<byte> &Signature) = 0;
 
 	/// <summary>
-	/// Get the signing code for a stream
+	/// Verify a signed message and return the message array
 	/// </summary>
 	/// 
-	/// <param name="Input">The byte array containing the data to process</param>
-	/// <param name="InOffset">The starting position within the input strean</param>
-	/// <param name="Length">The number of bytes to process</param>
-	/// <param name="Output">The output array receiving the signature code</param>
-	/// <param name="OutOffset">The starting position within the output array</param>
+	/// <param name="Signature">The output signature array containing the signature and message</param>
+	/// <param name="Message">The message byte array containing the data to process</param>
 	/// 
-	/// <returns>The encrypted hash code</returns>
-	virtual void Sign(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Output, size_t OutOffset) = 0;
-
-	/// <summary>
-	/// Compare an input stream to a signed hash
-	/// </summary>
-	/// 
-	/// <param name="Input">The byte array containing the data to test</param>
-	/// <param name="InOffset">The starting offset within the input array</param>
-	/// <param name="Length">The number of bytes to process</param>
-	/// <param name="Code">The array containing the signed hash code</param>
-	/// 
-	/// <returns>Returns true if the codes match</returns>
-	virtual bool Verify(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Code) = 0;
+	/// <returns>Returns true if the signature matches</returns>
+	virtual bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) = 0;
 };
 
 NAMESPACE_ASYMMETRICSIGNEND

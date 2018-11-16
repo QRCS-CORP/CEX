@@ -190,6 +190,18 @@ public:
 	virtual void ParallelMaxDegree(size_t Degree) = 0;
 
 	/// <summary>
+	/// Add additional data to the authentication generator.  
+	/// <para>Must be called after Initialize(bool, ISymmetricKey), and before any processing of plaintext or ciphertext input.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of bytes to process</param>
+	/// <param name="Offset">Starting offset within the input array</param>
+	/// <param name="Length">The number of bytes to process</param>
+	///
+	/// <exception cref="Exception::CryptoCipherModeException">Thrown if state has been processed</exception>
+	virtual void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) = 0;
+
+	/// <summary>
 	/// Encrypt/Decrypt one block of bytes
 	/// </summary>
 	/// 

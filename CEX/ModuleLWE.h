@@ -136,7 +136,7 @@ public:
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher type, prng type, or parameter set is specified</exception>
+	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
 	ModuleLWE(MLWEParams Parameters = MLWEParams::Q7681N256K3, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
@@ -146,7 +146,7 @@ public:
 	/// <param name="Parameters">The parameter set enumeration name</param>
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
-	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid block cipher, prng, or parameter set is specified</exception>
+	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
 	ModuleLWE(MLWEParams Parameters, IPrng* Prng);
 
 	/// <summary>

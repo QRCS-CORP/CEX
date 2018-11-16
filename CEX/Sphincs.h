@@ -20,17 +20,41 @@
 #define CEX_SPHINCS_H
 
 #include "IAsymmetricSign.h"
+#include "SHAKE.h"
+#include "SphincsKeyPair.h"
+#include "SphincsParameters.h"
+#include "SphincsPrivateKey.h"
+#include "SphincsPublicKey.h"
 
 NAMESPACE_SPHINCS
+
+using Kdf::IKdf;
+using Key::Asymmetric::SphincsKeyPair;
+using Enumeration::SphincsParameters;
+using Key::Asymmetric::SphincsPrivateKey;
+using Key::Asymmetric::SphincsPublicKey;
 
 /// <summary>
 /// The Asymmetric cipher interface
 /// </summary>
 class Sphincs final : public IAsymmetricSign
 {
-public:
+private:
 
-	//~~~Constructor~~~//
+	static const std::string CLASS_NAME;
+
+	bool m_isDestroyed;
+	bool m_destroyEngine;
+	bool m_isInitialized;
+	bool m_isSigner;
+	std::unique_ptr<IKdf> m_kdfGenerator;
+	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
+	std::unique_ptr<SphincsPrivateKey> m_privateKey;
+	std::unique_ptr<SphincsPublicKey> m_publicKey;
+	std::unique_ptr<IPrng> m_rndGenerator;
+	SphincsParameters m_spxParameters;
+
+public:
 
 	/// <summary>
 	/// Copy constructor: copy is restricted, this function has been deleted
@@ -45,7 +69,21 @@ public:
 	/// <summary>
 	/// Constructor: Instantiate this class
 	/// </summary>
-	Sphincs();
+	/// 
+	/// <param name="Parameters">The SPHINCS+ parameter set; default is SPXF256</param>
+	/// <param name="PrngType">The random prng provider; default is Block-cipher Counter Rng (BCR)</param>
+	Sphincs(SphincsParameters Parameters = SphincsParameters::SphincsSK256F256, Prngs PrngType = Prngs::BCR);
+
+	/// <summary>
+	/// Constructor: instantiate this class using an external Prng instance
+	/// </summary>
+	///
+	/// <param name="Parameters">The parameter set enumeration name</param>
+	/// <param name="Rng">A pointer to the seed Prng function</param>
+	/// <param name="Generator">The internal kdf generator</param>
+	/// 
+	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
+	Sphincs(SphincsParameters Parameters, IPrng* Rng, IKdf* Generator);
 
 	/// <summary>
 	/// Finalizer: destroys the containers objects
@@ -90,39 +128,27 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="AsymmetricKey">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
-	const void Initialize(IAsymmetricKey &AsymmetricKey) override;
+	const void Initialize(IAsymmetricKey* Key) override;
 
 	/// <summary>
-	/// Reset the underlying engine
+	/// Sign a message array and return the message and attached signature
 	/// </summary>
-	void Reset() override;
+	/// 
+	/// <param name="Message">The message byte array containing the data to process</param>
+	/// <param name="Signature">The output signature array containing the signature and message</param>
+	/// 
+	/// <returns>Returns the size of the signed message</returns>
+	size_t Sign(const std::vector<byte> &Message, std::vector<byte> &Signature) override;
 
 	/// <summary>
-	/// Get the signing code for a stream
+	/// Verify a signed message and return the message array
 	/// </summary>
 	/// 
-	/// <param name="Input">The byte array containing the data to process</param>
-	/// <param name="InOffset">The starting position within the input strean</param>
-	/// <param name="Length">The number of bytes to process</param>
-	/// <param name="Output">The output array receiving the signature code</param>
-	/// <param name="OutOffset">The starting position within the output array</param>
+	/// <param name="Signature">The output signature array containing the signature and message</param>
+	/// <param name="Message">The message byte array containing the data to process</param>
 	/// 
-	/// <returns>The encrypted hash code</returns>
-	void Sign(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Output, size_t OutOffset) override;
-
-	/// <summary>
-	/// Compare an input stream to a signed hash
-	/// </summary>
-	/// 
-	/// <param name="Input">The byte array containing the data to test</param>
-	/// <param name="InOffset">The starting offset within the input array</param>
-	/// <param name="Length">The number of bytes to process</param>
-	/// <param name="Code">The array containing the signed hash code</param>
-	/// 
-	/// <returns>Returns true if the codes match</returns>
-	bool Verify(std::vector<byte> &Input, size_t InOffset, size_t Length, std::vector<byte> &Code) override;
-
-	void Test();
+	/// <returns>Returns true if the signature matches</returns>
+	bool Verify(const std::vector<byte> &Signature, std::vector<byte> &Message) override;
 };
 
 NAMESPACE_SPHINCSEND

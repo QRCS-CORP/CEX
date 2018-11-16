@@ -7,7 +7,7 @@ namespace Test
 {
 	/// <summary>
 	/// The Spincs asymmetric cipher test suite.
-	///  <para>Tests public-key and cipher-text integrity, exception handling, cipher authentication, and a looping stress-test</para>
+	///  <para>Tests public-key, private-key and signature integrity, exception handling, cipher authentication, and a looping stress-test</para>
 	/// </summary>
 	class SphincsTest final : public ITest
 	{
@@ -16,6 +16,11 @@ namespace Test
 		static const std::string DESCRIPTION;
 		static const std::string FAILURE;
 		static const std::string SUCCESS;
+#if defined (_DEBUG)
+		static const size_t TEST_CYCLES = 1;
+#else
+		static const size_t TEST_CYCLES = 10;
+#endif
 
 		TestEventHandler m_progressEvent;
 
@@ -47,14 +52,9 @@ namespace Test
 		std::string Run() override;
 
 		/// <summary>
-		/// Tests the ciphers authentication mechanism in a looping stress test
+		/// Tests the authentication mechanism
 		/// </summary>
 		void Authentication();
-
-		/// <summary>
-		/// Tests the ciphers decryption function for invalid cipher-text in a looping stress test
-		/// </summary>
-		void CipherText();
 
 		/// <summary>
 		/// Tests the ciphers exception handling functions
@@ -62,14 +62,24 @@ namespace Test
 		void Exception();
 
 		/// <summary>
-		/// Tests the cipher for invalid public keys in a looping stress test
+		/// Tests the for invalid private keys in a looping stress test
+		/// </summary>
+		void PrivateKey();
+
+		/// <summary>
+		/// Tests the for invalid public keys in a looping stress test
 		/// </summary>
 		void PublicKey();
 
 		/// <summary>
-		/// Tests the ciphers key serialization function using a looping stress test
+		/// Tests the key serialization function using a looping stress test
 		/// </summary>
 		void Serialization();
+
+		/// <summary>
+		/// Tests the for invalid signatures in a looping stress test
+		/// </summary>
+		void Signature();
 
 		/// <summary>
 		/// Tests the the cipher operations using a looping stress test

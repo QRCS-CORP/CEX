@@ -143,7 +143,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\John\Documents\Visual Studio 2015\Projects\Cryptography\CEX++\Win\Test\Vectors;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Engine;C:\Users\John\Documents\Visual Studio 2015\Projects\Crypto\CEX\Test;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
-      <EnableEnhancedInstructionSet>NoExtensions</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -331,6 +331,7 @@
     <ClInclude Include="..\..\Test\SHAKETest.h" />
     <ClInclude Include="..\..\Test\SimdSpeedTest.h" />
     <ClInclude Include="..\..\Test\SimdWrapperTest.h" />
+    <ClInclude Include="..\..\Test\SphincsTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyGeneratorTest.h" />
     <ClInclude Include="..\..\Test\SymmetricKeyTest.h" />
     <ClInclude Include="..\..\Test\TestEventHandler.h" />
@@ -401,6 +402,7 @@
     <ClCompile Include="..\..\Test\SimdWrapperTest.cpp" />
     <ClCompile Include="..\..\Test\SkeinTest.cpp" />
     <ClCompile Include="..\..\Test\CipherSpeedTest.cpp" />
+    <ClCompile Include="..\..\Test\SphincsTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyGeneratorTest.cpp" />
     <ClCompile Include="..\..\Test\SymmetricKeyTest.cpp" />
     <ClCompile Include="..\..\Test\Test.cpp" />

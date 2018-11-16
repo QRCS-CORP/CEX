@@ -27,9 +27,9 @@ enum class AsymmetricEngines : byte
 	/// </summary>
 	NTRU = 3,
 	/// <summary>
-	/// The Picnic asymmetric signature scheme
+	/// The Dilithium asymmetric signature scheme
 	/// </summary>
-	Picnic = 4,
+	Dilithium = 4,
 	/// <summary>
 	/// A Ring-LWE cipher implementation
 	/// </summary>

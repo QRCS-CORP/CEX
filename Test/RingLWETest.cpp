@@ -87,7 +87,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RingLWETest: Message authentication test failed!"));
+			throw TestException(std::string("RLWE"), std::string("Message authentication test failed! -RA1"));
 		}
 
 		delete kp;
@@ -112,7 +112,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RingLWETest: Cipher-text integrity test failed!"));
+			throw TestException(std::string("RLWE"), std::string("Cipher-text integrity test failed! -RC1"));
 		}
 
 		delete kp;
@@ -125,7 +125,7 @@ namespace Test
 		{
 			RingLWE cpr(Enumeration::RLWEParams::None, m_rngPtr);
 
-			throw TestException(std::string("RLWE"), std::string("Exception: Exception handling failure! -TE1"));
+			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE1"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -139,7 +139,7 @@ namespace Test
 		{
 			RingLWE cpr(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::None);
 
-			throw TestException(std::string("RLWE"), std::string("Exception: Exception handling failure! -TE2"));
+			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE2"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -158,7 +158,7 @@ namespace Test
 			IAsymmetricKeyPair* kp = cprb.Generate();
 			cpra.Initialize(kp->PrivateKey());
 
-			throw TestException(std::string("RLWE"), std::string("Exception: Exception handling failure! -TE3"));
+			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE3"));
 		}
 		catch (CryptoAsymmetricException const &)
 		{
@@ -190,7 +190,7 @@ namespace Test
 
 		if (cpr.Decapsulate(cpt, sec2))
 		{
-			throw TestException(std::string("RingLWETest: Public-key integrity test failed!"));
+			throw TestException(std::string("RLWE"), std::string("Public key integrity test failed! -RP1"));
 		}
 
 		delete kp;
@@ -201,7 +201,7 @@ namespace Test
 		std::vector<byte> skey;
 		RingLWE asyCpr(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
 
-		for (size_t i = 0; i < 100; ++i)
+		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
 			IAsymmetricKeyPair* kp = asyCpr.Generate();
 			RLWEPrivateKey* priK1 = (RLWEPrivateKey*)kp->PrivateKey();
@@ -210,7 +210,7 @@ namespace Test
 
 			if (priK1->R() != priK2.R() || priK1->Parameters() != priK2.Parameters())
 			{
-				throw TestException(std::string("RingLWETest: Private key serialization test has failed!"));
+				throw TestException(std::string("RLWE"), std::string("Private key serialization test has failed! -RS1"));
 			}
 
 			RLWEPublicKey* pubK1 = (RLWEPublicKey*)kp->PublicKey();
@@ -219,7 +219,7 @@ namespace Test
 
 			if (pubK1->P() != pubK2.P() || pubK1->Parameters() != pubK2.Parameters())
 			{
-				throw TestException(std::string("RingLWETest: Public key serialization test has failed!"));
+				throw TestException(std::string("RLWE"), std::string("Public key serialization test has failed! -RS2"));
 			}
 		}
 	}
@@ -233,7 +233,7 @@ namespace Test
 
 		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
 
-		for (size_t i = 0; i < 50; ++i)
+		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
 			m_rngPtr->Generate(msg);
 			IAsymmetricKeyPair* kp = cpr1.Generate();
@@ -244,20 +244,20 @@ namespace Test
 
 			if (!cpr1.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("RingLWETest: Stress test authentication has failed!"));
+				throw TestException(std::string("RLWE"), std::string("Stress test authentication has failed! -RR1"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("RingLWETest: Stress test has failed!"));
+				throw TestException(std::string("RLWE"), std::string("Stress test has failed! -RR2"));
 			}
 		}
 
 		RingLWE cpr2(Enumeration::RLWEParams::Q12289N2048, m_rngPtr);
 
-		for (size_t i = 0; i < 50; ++i)
+		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
 			m_rngPtr->Generate(msg);
 			IAsymmetricKeyPair* kp = cpr2.Generate();
@@ -269,14 +269,14 @@ namespace Test
 
 			if (!cpr2.Decapsulate(cpt, sec2))
 			{
-				throw TestException(std::string("RingLWETest: Stress test authentication has failed!"));
+				throw TestException(std::string("RLWE"), std::string("Stress test authentication has failed! -RR3"));
 			}
 
 			delete kp;
 
 			if (sec1 != sec2)
 			{
-				throw TestException(std::string("RingLWETest: Stress test has failed!"));
+				throw TestException(std::string("RLWE"), std::string("Stress test has failed! -RR4"));
 			}
 		}
 	}

@@ -306,6 +306,18 @@ public:
 	void ParallelMaxDegree(size_t Degree) override;
 
 	/// <summary>
+	/// Add additional data to the authentication generator.  
+	/// <para>Must be called after Initialize(bool, ISymmetricKey), and can be called after the processing of a plaintext or ciphertext input.</para>
+	/// </summary>
+	/// 
+	/// <param name="Input">The input array of bytes to process</param>
+	/// <param name="Offset">Starting offset within the input array</param>
+	/// <param name="Length">The number of bytes to process</param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if the cipher is not initialized</exception>
+	void SetAssociatedData(const std::vector<byte> &Input, const size_t Offset, const size_t Length) override;
+
+	/// <summary>
 	/// Encrypt/Decrypt one block of bytes
 	/// </summary>
 	/// 

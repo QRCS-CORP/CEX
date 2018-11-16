@@ -9,7 +9,7 @@
 NAMESPACE_ASYMMETRICKEY
 
 /// <summary>
-/// A Picnic+ public and private key container
+/// A Dilithium+ public and private key container
 /// </summary>
 class PicnicKeyPair final : public IAsymmetricKeyPair
 {

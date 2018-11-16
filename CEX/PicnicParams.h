@@ -6,7 +6,7 @@
 NAMESPACE_ENUMERATION
 
 /// <summary>
-/// The Picnic parameter sets enumeration
+/// The Dilithium parameter sets enumeration
 /// </summary>
 enum class PicnicParams : byte
 {
