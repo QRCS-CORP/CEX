@@ -31,6 +31,10 @@ enum class BlockCipherExtensions : byte
 	/// </summary>
 	SHAKE512 = 11,
 	/// <summary>
+	/// An implementation of the SHAKE-1024 XOF function -experimental
+	/// </summary>
+	SHAKE1024 = 12,
+	/// <summary>
 	/// User defined derivation function
 	/// </summary>
 	Custom = 99

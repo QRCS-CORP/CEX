@@ -122,6 +122,11 @@ IKdf* KdfFromName::GetInstance(BlockCipherExtensions ExtensionType)
 			kdfPtr = new Kdf::SHAKE(ShakeModes::SHAKE512);
 			break;
 		}
+		case BlockCipherExtensions::SHAKE1024:
+		{
+			kdfPtr = new Kdf::SHAKE(ShakeModes::SHAKE1024);
+			break;
+		}
 		default:
 		{
 			throw CryptoException("KdfFromName:GetInstance", "The kdf type is not recognized!");

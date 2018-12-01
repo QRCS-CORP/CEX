@@ -177,8 +177,12 @@ public:
 	ChaCha256& operator=(const ChaCha256&) = delete;
 
 	/// <summary>
-	/// Initialize the class
+	/// Initialize the class with an optional authentication mode
 	/// </summary>
+	/// 
+	/// <param name="Authenticator">The authentication engine, set None for standard operating mode</param>
+	///
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid authentication method is chosen</exception>
 	explicit ChaCha256(StreamAuthenticators Authenticator = StreamAuthenticators::None);
 
 	/// <summary>
@@ -291,6 +295,7 @@ public:
 	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
 	/// </summary>
 	/// 
+	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParams">Cipher key structure, containing cipher key and nonce pair, and optional info array</param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>

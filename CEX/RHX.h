@@ -29,6 +29,7 @@
 // Written by John Underhill, November 11, 2014
 // Updated October 20, 2016
 // Updated April 16, 2017
+// Updated November 30, 2018
 // Contact: develop@vtdev.com
 
 #ifndef CEX_RHX_H
@@ -39,7 +40,7 @@
 NAMESPACE_BLOCK
 
 /// <summary>
-/// A Rijndael Cipher extended with an (optional) HKDF powered Key Schedule
+/// A Rijndael cipher using either standard modes, or extended modes of operation with HKDF(SHA2) or cSHAKE powered key schedule and increased transformation rounds.
 /// </summary> 
 /// 
 /// <example>
@@ -54,48 +55,35 @@ NAMESPACE_BLOCK
 /// </example>
 /// 
 /// <remarks>
+/// <description>Description:</description>
+/// <para>RHX is a Rijndael implementation that can use either a standard configuration with key sizes of 16, 24, and 32 bytes (128, 192, and 256-bits), 
+/// or an extended mode using key sizes of 32, 64, and 128 bytes, (256, 512, and 1024 bits). \n
+/// In extended mode, the number of transformation rounds are set to 22, 30 and 38, corresponding to the 256, 512, and 1024 input cipher key sizes. \n
+/// Increasing the number of transformation rounds processed by the ciphers transformation function creates a more diffused output, making the resulting cipher-text more difficult to cryptanalyze. \n
+/// RHX is capable of processing up to 38 rounds, that is 24 rounds more than a standard implementation of AES-256. 
+/// </para>
+///
 /// <description>Implementation Notes:</description>
-/// <para>The key schedule in RHX is the defining difference between this and a standard version of Rijndael.
-/// The standard Rijndael Key Schedule (128-256 bits), has been extended to accommodate a 512 bit key size. \n
-/// RHX can (optionally) use an HMAC based Key Derivation Function (HKDF) to expand the cipher key to create the internal round key integer array.
-/// This provides better security, and allows for a user assignable number of transformation rounds. \n
-/// When using the HKDF extended mode, the number of transformation rounds can be set by the user (through the class constructor).
-/// RHX can run between 10 and 38 rounds.</para>
-///
-/// <description>Changes to RHX Version 1.2:</description>
-/// <para>Version 1.2 of the cipher has changes to the HKDF powered key schedule, which may make it incompatable with previous versions of the cipher. \n
-/// Previous versions split the key into salt and key arrays, and processed these arrays with the HKDF Extract step, which compresses the key material into a pseudo random key used to initialize the HMAC. \n
-/// The previous versions also added the Info parameter through the HKDF Initialize(key, salt, info) function. \n
-/// The Info parameter is now set through a property added to the HKDF implementation, so using the Initialize function to load the Info string is no longer required. \n
-/// This allows for loading the key into HKDF with the Initialize(key) function, which bypasses the extract step, but can still use the Info parameter to provide additional entropy. \n
-/// The key is used by HKDF to initialize the HMAC. The HMAC key can use up to the hash functions internal block size before a compression cycle is called, reducing the key size to the hash functions output size. \n
-/// The best size for maximum security is to set the HMAC key to the hash functions block size, this initializes the HMAC with a full block of keying material. \n
-/// HKDF cycles it's internal state, a one byte counter, and the Info parameter through the HMAC to generate the expanded key. \n
-/// For best security, it is desirable to have the HMAC process input equal to the hash functions block size, i.e. no zero byte padding is processed by the compression function. \n
-/// The Info parameter can now be used as an additional source of keying material, if sized to the DistributionCodeMax() property, blocks of state+counter+info are equal to the hash functions block size,
-/// this is the best possible security configuration.</para>
-///
-/// <para>When using SHA-2 256, a minimum key size for RHX is 32 bytes, larger lengths of input key can be used so long as it aligns; (n * hash size), ex. 64, 128, 192 bytes.. there is no upper maximum. \n
-/// The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein. \n
-/// Valid key sizes can be determined at runtime using the <see cref="LegalKeySizes"/> property, based on the digest selected.
-/// When using the extended mode, the legal key sizes are determined based on the selected digests hash output size, 
-/// ex. SHA256 the minimum legal key size is 256 bits (32 bytes), the recommended size is 2* the hash size, or 512 bits (64 bytes). \n
-/// The number of transformation rounds processed within the ciphers rounds function can also be defined; adding rounds creates a more diffused cipher output, making the resulting cipher-text more difficult to cryptanalyze. \n
-/// RHX is capable of processing up to 38 rounds, that is twenty-four rounds more than the fourteen rounds used in an implementation of AES-256. \n
-/// Valid rounds assignments can be found in the <see cref="LegalRounds"/> property.</para>
+/// <para>The key schedule in RHX, and the number of transformation rounds processed are the difference between the extended mode operations, and a standard version of AES.
+/// The standard Rijndael Key Schedule processes 128, 192, and 256 bit keys, and a fixed set of transformation rounds of 10, 12, and 14, the extended version of the cipher uses 256, 512, and 1024-bit keys processing 22, 30, and 38 rounds. \n
+/// RHX extended mode can use an HMAC based Key Derivation Function; HKDF(HMAC(SHA2)) or the Keccak XOF function cSHAKE, to expand the input cipher key to create the internal round-key integer array. \n
+/// This provides better security, and allows for an implemetation to safely use an increased number of transformation rounds further strengthening the cipher. \n
+/// The DistributionCode array is a user-definable a cipher-tweak, and can be used to create a unique cipher-text output. \n
+/// This tweak array is set as either the information string for HKDF, or as the cSHAKE customization string.</para>
+/// <para>When using the extended mode of the cipher, the minimum key size is 32 bytes (256 bits), and valid key sizes are 256, 512, and 1024 bits long. \n
+/// RHX is capable of processing up to 38 transformation rounds in extended mode; a 256-bit key uses 22 rounds, a 512-bit key 30 rounds, and a 1024-bit key is set to 38 rounds.</para>
 /// 
 /// <list type="bullet">
-/// <item><description>An input key of up to 64 bytes in length will use a standard key schedule for internal key expansion; greater than 64 bytes implements the HKDF key schedule.</description></item>
-/// <item><description>The Digest that powers HKDF, can be any one of the Hash Digests implemented in the CEX library; Blake2, Keccak, SHA-2 or Skein.</description></item>
-/// <item><description>The HKDF Digest engine is definable through the <see cref="RHX(uint, Digests)">Constructor</see> type enumeration parameter: Digest.</description></item>
-/// <item><description>Minimum HKDF key size is the Digests Hash output size, recommended is 2* the minimum, or increments of (n * hash-size) in bytes.</description></item>
-/// <item><description>The recommended size for maximum security is 2* the digests block size; this calls HKDF Extract using full blocks of key and salt.</description></item>
-/// <item><description>Valid key sizes can be determined at run time using the <see cref="LegalKeySizes"/> property.</description></item>
-/// <item><description>The internal block size is 16 bytes wide.</description></item>
-/// <item><description>Diffusion rounds assignments are 10 to 38, the default is 22 (128-256 bit key), a 512 bit key is automatically assigned 22 rounds.</description></item>
-/// <item><description>Valid rounds assignments can be found in the <see cref="LegalRounds"/> property.</description></item>
+/// <item><description>This cipher should only be used in conjunction with an AEAD or standard cipher mode, or as an component in another construction, ex. CMAC.</item>
+/// <item><description>Valid key sizes can be determined at using the <see cref="LegalKeySizes"/> property.</description> collection.</item>
+/// <item><description>The internal block-size is fixed at 16 bytes (128 bits) wide.</description></item>
+/// <item><description>The cipher can process 128, 192, and 256-bit keys in standard mode, and 256, 512, and 1024-bit keys in extended mode.</description></item>
+/// <item><description>Transformation rounds assignments are 10, 12, and 14 in standard modes, and 22, 30, and 38 rounds with 256, 512, and 1024-bit length keys.</description></item>
+/// <item><description>The DistributionCode array is a user-definable cipher tweak, this can be used to create a unique cipher-text output with a secondary secret.</description></item>
+/// <item><description>Extended mode is set through the constructors BlockCipherExtensions parameter to either None for standard mode, or HKDF(SHA2-256), HKDF(SHA2-512), cSHAKE256, cSHAKE512, or cSHAKE1024 for extended mode operation.</description></item>
+/// <item><description>It is recommended that in extended mode, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or HKDF(SHA2-512) for a 512-bit key, or SHAKE-1024 for a 1024-bit input cipher-key.</description></item>
 /// </list>
-/// 
+///
 /// <description>Guiding Publications:</description>
 /// <list type="number">
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf">AES Fips 197</a>.</description></item>
@@ -104,9 +92,10 @@ NAMESPACE_BLOCK
 /// <item><description>Fips <a href="http://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf">198.1</a>.</description></item>
 /// <item><description>HKDF <a href="http://tools.ietf.org/html/rfc5869">RFC 5869</a>.</description></item>
 /// <item><description>NIST <a href="http://csrc.nist.gov/publications/drafts/800-90/draft-sp800-90b.pdf">SP800-90B</a>.</description></item>
-/// <item><description>SHA3 <a href="https://131002.net/blake/blake.pdf">The Blake digest</a>.</description></item>
 /// <item><description>SHA3 <a href="http://keccak.noekeon.org/Keccak-submission-3.pdf">The Keccak digest</a>.</description></item>
-/// <item><description>SHA3 <a href="http://www.skein-hash.info/sites/default/files/skein1.1.pdf">The Skein digest</a>.</description></item>
+/// <item><description>FIPS 202: <a href="http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.202.pdf">Permutation Based Hash</a> and Extendable Output Functions</description></item>
+/// <item><description>NIST <a href="http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-185.pdf">SP800-185</a> SHA-3 Derived Functions.</description></item>
+/// <item><description>Team Keccak <a href="https://keccak.team/index.html">Homepage</a>.</description></item>
 /// </list>
 /// </remarks>
 class RHX final : public IBlockCipher
@@ -151,7 +140,8 @@ public:
 	RHX& operator=(const RHX&) = delete;
 
 	/// <summary>
-	/// Instantiate the class with an optional block-cipher extension type
+	/// Instantiate the class with an optional block-cipher extension type.
+	/// <para>It is recommended that in extended mode operation, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or, HKDF(SHA2-512) for a 512-bit key.</para>
 	/// </summary>
 	/// 
 	/// <param name="CipherExtensionType">Sets the optional Key Schedule key-expansion engine; valid options are cSHAKE, HKDF, or None for standard mode. 
@@ -159,7 +149,8 @@ public:
 	RHX(BlockCipherExtensions CipherExtensionType = BlockCipherExtensions::None);
 
 	/// <summary>
-	/// Instantiate the class with a Key Derivation Function instance
+	/// Instantiate the class with a Key Derivation Function instance.
+	/// <para>It is recommended that in extended mode operation, the key expansion functions security match the key size used; ex. with a 256-bit key use SHAKE-256, or, HKDF(SHA2-512) for a 512-bit key.</para>
 	/// </summary>
 	///
 	/// <param name="Kdf">The Key Schedule KDF engine instance; can not be null.</param>

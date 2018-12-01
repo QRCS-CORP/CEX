@@ -127,7 +127,7 @@ public:
 	/// Initialize the signature scheme for signing (private key) or verifying (public key)
 	/// </summary>
 	/// 
-	/// <param name="AsymmetricKey">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
+	/// <param name="Key">The <see cref="AsymmetricKey"/> containing the Public (verify) or Private (signing) key</param>
 	const void Initialize(IAsymmetricKey* Key) override;
 
 	/// <summary>

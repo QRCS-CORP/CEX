@@ -338,12 +338,13 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 {
 	// key in 32 bit words
 	size_t keyWords = Key.size() / 4;
-	// rounds calculation, 512 gets 22 rounds
+	// rounds count calculation
 	m_rndCount = keyWords + 6;
 	// setup expanded key
 	m_expKey.resize((BLOCK_SIZE / 4) * (m_rndCount + 1), 0);
 
-	if (keyWords == 16)
+	// Note: removed Nov 30, 2018
+	/*if (keyWords == 16)
 	{
 		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
 		m_expKey[1] = Utility::IntUtils::BeBytesTo32(Key, 4);
@@ -383,7 +384,8 @@ void RHX::StandardExpand(const std::vector<byte> &Key)
 		ExpandSubBlock(m_expKey, 84, 16);
 		ExpandRotBlock(m_expKey, 88, 16, 10);
 	}
-	else if (keyWords == 8)
+	else */
+	if (keyWords == 8)
 	{
 		m_expKey[0] = Utility::IntUtils::BeBytesTo32(Key, 0);
 		m_expKey[1] = Utility::IntUtils::BeBytesTo32(Key, 4);
@@ -649,35 +651,37 @@ void RHX::LoadState()
 {
 	if (m_cprExtension == BlockCipherExtensions::None)
 	{
-		m_legalKeySizes.resize(4);
+		m_legalKeySizes.resize(3);
 		m_legalKeySizes[0] = SymmetricKeySize(16, BLOCK_SIZE, 0);
 		m_legalKeySizes[1] = SymmetricKeySize(24, BLOCK_SIZE, 0);
 		m_legalKeySizes[2] = SymmetricKeySize(32, BLOCK_SIZE, 0);
-		m_legalKeySizes[3] = SymmetricKeySize(64, BLOCK_SIZE, 0);
+		// Note: removed Nov 30, 2018
+		// m_legalKeySizes[3] = SymmetricKeySize(64, BLOCK_SIZE, 0);
 	}
 	else
 	{
-		m_legalKeySizes.resize(3);
+		m_legalKeySizes.resize(4);
 
-		if (m_cprExtension == BlockCipherExtensions::SHAKE256)
+
+		if (m_cprExtension == BlockCipherExtensions::HKDF256)
 		{
-			// sha3-256 blocksize
-			m_distCodeMax = 136;
-		}
-		else if (m_cprExtension == BlockCipherExtensions::SHAKE512)
-		{
-			// sha3-512 blocksize
-			m_distCodeMax = 72;
+			// hmac(sha2-512) mac size
+			m_distCodeMax = 32;
 		}
 		else if (m_cprExtension == BlockCipherExtensions::HKDF512)
 		{
 			// hmac(sha2-512) mac size
 			m_distCodeMax = 64;
 		}
+		else if (m_cprExtension == BlockCipherExtensions::SHAKE256)
+		{
+			// sha3-256 blocksize
+			m_distCodeMax = 136;
+		}
 		else
 		{
-			// hmac(sha2-256) mac size
-			m_distCodeMax = 32;
+			// sha3-512/1024 blocksize
+			m_distCodeMax = 72;
 		}
 
 		m_legalKeySizes[0] = SymmetricKeySize(32, BLOCK_SIZE, m_distCodeMax);

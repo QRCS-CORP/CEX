@@ -184,11 +184,10 @@ public:
 	/// Initialize the class
 	/// </summary>
 	///
-	/// <param name="Rounds">Number of transformation rounds. 
-	/// <para>The LegalRounds property contains available sizes. 
-	/// Default is 20 rounds, minimum is 8, and maximum is 80 rounds.</para></param>
+	/// 
+	/// <param name="Authenticator">The authentication engine, set None for standard operating mode</param>
 	///
-	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid rounds count is chosen</exception>
+	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if an invalid authentication method is chosen</exception>
 	explicit ChaCha512(StreamAuthenticators Authenticator = StreamAuthenticators::None);
 
 	/// <summary>
@@ -303,6 +302,7 @@ public:
 	/// this value is used to initialize cSHAKE, other wise SHAKE-512 is used to expand the key into cipher and MAC keys.</para>
 	/// </summary>
 	/// 
+	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParams">Cipher key structure, containing cipher key and optional nonce and info arrays </param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>

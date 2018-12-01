@@ -173,8 +173,8 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="Key">The input cipher key array</param>
+	/// <param name="Counter">The cipher counter array</param>
 	/// <param name="Tweak">The cipher tweak array</param>
 	/// <param name="State">The permutations state array</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
@@ -186,8 +186,8 @@ public:
 	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="Key">The input cipher key array</param>
+	/// <param name="Counter">The cipher counter array</param>
 	/// <param name="Tweak">The cipher tweak array</param>
 	/// <param name="State">The permutations state array</param>
 	static void PemuteR72P256U(const std::array<ulong, 4> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 4> &State);
@@ -297,8 +297,8 @@ public:
 	/// Note: The rounds count must be at least 72 and evenly divisible by 8.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="Key">The input cipher key array</param>
+	/// <param name="Counter">The cipher counter array</param>
 	/// <param name="Tweak">The cipher tweak array</param>
 	/// <param name="State">The permutations state array</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 128</param>
@@ -310,8 +310,8 @@ public:
 	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset withing the input array</param>
+	/// <param name="Key">The input cipher key array</param>
+	/// <param name="Counter">The cipher counter array</param>
 	/// <param name="Tweak">The cipher tweak array</param>
 	/// <param name="State">The permutations state array</param>
 	static void PemuteR120P1024U(const std::array<ulong, 16> &Key, const std::array<ulong, 2> &Counter, const std::array<ulong, 2> &Tweak, std::array<ulong, 16> &State);

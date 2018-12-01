@@ -39,8 +39,8 @@ public:
 	/// 
 	/// <param name="Input">The input 8bit integer array</param>
 	/// <param name="InOffset">The input arrays starting offset</param>
+	/// <param name="Output">The output uint64 state array</param>
 	/// <param name="Length">The number of bytes to copy</param>
-	/// <param name="State">The output uint64 state array</param>
 	template<typename ArrayA, typename ArrayB>
 	static void AbsorbBlock8to64(const ArrayA &Input, size_t InOffset, ArrayB &Output, size_t Length)
 	{
@@ -158,7 +158,7 @@ public:
 	/// 
 	/// <returns>The number of encoded bits</returns>
 	template<typename Array>
-	static ulong LeftEncode(Array &Buffer, size_t Offset, ulong Value)
+	static ulong LeftEncode(Array &Output, size_t Offset, ulong Value)
 	{
 		ulong i;
 		ulong n;
@@ -175,10 +175,10 @@ public:
 
 		for (i = 1; i <= n; ++i)
 		{
-			Buffer[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
+			Output[Offset + i] = static_cast<uint8_t>(Value >> (8 * (n - i)));
 		}
 
-		Buffer[Offset] = static_cast<uint8_t>(n);
+		Output[Offset] = static_cast<uint8_t>(n);
 
 		return (n + 1);
 	}
@@ -241,7 +241,7 @@ public:
 	/// 
 	/// <returns>The number of encoded bits</returns>
 	template<typename Array>
-	static ulong RightEncode(Array &Buffer, size_t Offset, ulong Value)
+	static ulong RightEncode(Array &Output, size_t Offset, ulong Value)
 	{
 		ulong i;
 		ulong n;
@@ -258,10 +258,10 @@ public:
 
 		for (i = 1; i <= n; ++i)
 		{
-			Buffer[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
+			Output[Offset + (i - 1)] = static_cast<uint8_t>(Value >> (8 * (n - i)));
 		}
 
-		Buffer[Offset + n] = static_cast<uint8_t>(n);
+		Output[Offset + n] = static_cast<uint8_t>(n);
 
 		return n + 1;
 	}

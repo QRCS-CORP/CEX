@@ -270,7 +270,7 @@ public:
 	/// </summary>
 	/// 
 	/// <param name="Output">The output array that receives the authentication code</param>
-	/// <param name="Offset">Starting offset within the output array</param>
+	/// <param name="OutOffset">Starting offset within the output array</param>
 	/// <param name="Length">The number of MAC code bytes to write to the output array.
 	/// <para>Must be no greater than the MAC functions output size.</para></param>
 	///
@@ -284,6 +284,7 @@ public:
 	/// If encryption and authentication are set to true, the MAC code can be appended to the ciphertext array using the Finalize(Output, Offset, Length) function.</para>
 	/// </summary>
 	/// 
+	/// <param name="Encryption">Using Encryption or Decryption mode</param>
 	/// <param name="KeyParams">Cipher key structure, containing cipher key, and optional nonce pair and info arrays</param>
 	///
 	/// <exception cref="Exception::CryptoSymmetricCipherException">Thrown if a null or invalid key is used</exception>

@@ -112,9 +112,10 @@ public:
 	/// To enable this function, add the CEX_DIGEST_COMPACT directive to the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
+	/// <param name="Output">The output message array</param>
+	/// <param name="OutOffset">The output array starting offset</param>
+	/// <param name="Counter">The cipher counter array</param>
 	/// <param name="State">The permutations state array</param>
-	/// <param name="Tweak">The cipher tweak array</param>
 	/// <param name="Rounds">The number of mixing rounds; the default is 72</param>
 	static void PermuteP512C(std::vector<byte> &Output, size_t OutOffset, std::array<uint, 2> &Counter, std::array<uint, 14> &State, size_t Rounds);
 

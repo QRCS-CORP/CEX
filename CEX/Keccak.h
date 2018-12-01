@@ -96,8 +96,6 @@ public:
 	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="State">The permutations uint64 state array</param>
 	static void PermuteR24P1600U(std::array<ulong, 25> &State);
 
@@ -116,8 +114,6 @@ public:
 	/// To enable this function, remove the CEX_DIGEST_COMPACT directive from the CexConfig file.</para>
 	/// </summary>
 	/// 
-	/// <param name="Input">The input message array</param>
-	/// <param name="InOffset">The starting offset within the Input array</param>
 	/// <param name="State">The permutations uint64 state array</param>
 	static void PermuteR48P1600U(std::array<ulong, 25> &State);
 

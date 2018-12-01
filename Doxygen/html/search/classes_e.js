@@ -6,5 +6,6 @@ var searchData=
   ['rlwekeypair',['RLWEKeyPair',['../class_r_l_w_e_key_pair.html',1,'']]],
   ['rlweprivatekey',['RLWEPrivateKey',['../class_r_l_w_e_private_key.html',1,'']]],
   ['rlwepublickey',['RLWEPublicKey',['../class_r_l_w_e_public_key.html',1,'']]],
-  ['rlweq12289n1024',['RLWEQ12289N1024',['../class_r_l_w_e_q12289_n1024.html',1,'']]]
+  ['rlweq12289n1024',['RLWEQ12289N1024',['../class_r_l_w_e_q12289_n1024.html',1,'']]],
+  ['rlweq12289n2048',['RLWEQ12289N2048',['../class_r_l_w_e_q12289_n2048.html',1,'']]]
 ];

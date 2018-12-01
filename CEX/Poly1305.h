@@ -105,13 +105,8 @@ public:
 	Poly1305& operator=(const Poly1305&) = delete;
 
 	/// <summary>
-	/// Initialize the class with the block cipher enumeration name
+	/// Initialize the class
 	/// </summary>
-	///
-	/// <param name="BlockCipherType">The block cipher enumeration name</param>
-	/// <param name="CipherExtensionType">The extended HX ciphers key schedule KDF</param>
-	/// 
-	/// <exception cref="CryptoMacException">Thrown if an invalid block cipher type is selected</exception>
 	Poly1305();
 
 	/// <summary>

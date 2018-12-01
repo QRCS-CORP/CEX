@@ -1,4 +1,4 @@
-/* The standard CSS for doxygen 1.8.11 */
+/* The standard CSS for doxygen 1.8.9.1 */
 
 body, table, div, p, dl {
 	font: 400 14px/22px Roboto,sans-serif;
@@ -42,7 +42,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
-	text-shadow: 0 0 15px white;
+	text-shadow: 0 0 15px cyan;
 }
 
 dt {
@@ -110,7 +110,7 @@ div.navtab {
 /* @group Link Styling */
 
 a {
-	color: #4466C3;
+	color: #484848;
 	font-weight: normal;
 	text-decoration: none;
 }
@@ -175,13 +175,13 @@ pre.fragment {
 div.fragment {
         padding: 4px 6px;
         margin: 4px 8px 4px 2px;
-		background-color: #FBFBFB;
-		border: 1px solid #C7C7C7;
+	background-color: #FBFBFB;
+	border: 1px solid #C7C7C7;
 }
 
 div.line {
 	font-family: monospace, fixed;
-  	font-size: 13px;
+        font-size: 13px;
 	min-height: 13px;
 	line-height: 1.0;
 	text-wrap: unrestricted;
@@ -206,14 +206,9 @@ div.line {
 	transition-duration: 0.5s;
 }
 
-div.line:after {
-    content:"\000A";
-    white-space: pre;
-}
-
 div.line.glow {
-	background-color: 909090;
-	box-shadow: 0 0 10px 909090;
+	background-color: cyan;
+	box-shadow: 0 0 10px cyan;
 }
 
 
@@ -247,7 +242,7 @@ div.ah, span.ah {
 	-webkit-box-shadow: 2px 2px 3px #999;
 	-moz-box-shadow: rgba(0, 0, 0, 0.15) 2px 2px 2px;
 	background-image: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#000),color-stop(0.3, #444));
-	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000 110%);
+	background-image: -moz-linear-gradient(center top, #eee 0%, #444 40%, #000);
 }
 
 div.classindex ul {
@@ -339,7 +334,7 @@ img.footer {
 /* @group Code Colorization */
 
 span.keyword {
-	color: #000080
+	color: #008000
 }
 
 span.keywordtype {
@@ -552,12 +547,12 @@ table.memberdecls {
         border-left: 1px solid #AEAEAE;
         border-right: 1px solid #AEAEAE;
         padding: 6px 0px 6px 0px;
-        color: #000;
+        color: #242424;
         font-weight: bold;
-        /*text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);*/
-        /*background-image:url('nav_f.png');*/
-        /*background-repeat:repeat-x;*/
-        background-color: #E5E5E5;
+        text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
+        background-image:url('nav_f.png');
+        background-repeat:repeat-x;
+        background-color: #E3E3E3;
         /* opera specific markup */
         box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15);
         border-top-right-radius: 4px;
@@ -578,11 +573,11 @@ table.memberdecls {
         border-left: 1px solid #AEAEAE;      
         border-right: 1px solid #AEAEAE; 
         padding: 6px 10px 2px 10px;
-        background-color: #FFFFFF;
+        background-color: #FBFBFB;
         border-top-width: 0;
-        /*background-image:url('nav_g.png');*/
-        /*background-repeat:repeat-x;*/
-        /*background-color: #FFFFFF;*/
+        background-image:url('nav_g.png');
+        background-repeat:repeat-x;
+        background-color: #FFFFFF;
         /* opera specific markup */
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
@@ -615,7 +610,7 @@ dl.reflist dd {
 }
 
 .paramname {
-	color: #030303;
+	color: #602020;
 	white-space: nowrap;
 }
 .paramname em {
@@ -665,11 +660,11 @@ span.mlabels {
 }
 
 span.mlabel {
-	background-color: #808080;
-	border-top:1px solid #686868;
-	border-left:1px solid #686868;
-	border-right:1px solid #C7C7C7;
-	border-bottom:1px solid #C7C7C7;
+        background-color: #808080;
+        border-top:1px solid #686868;
+        border-left:1px solid #686868;
+        border-right:1px solid #C7C7C7;
+        border-bottom:1px solid #C7C7C7;
 	text-shadow: none;
 	color: white;
 	margin-right: 4px;
@@ -837,10 +832,6 @@ address {
 	color: #2C2C2C;
 }
 
-table.doxtable caption {
-	caption-side: top;
-}
-
 table.doxtable {
 	border-collapse:collapse;
         margin-top: 4px;
@@ -942,8 +933,8 @@ table.fieldtable {
 	background-position: 0 -5px;
 	height:30px;
 	line-height:30px;
-	color:#606060;
-	border:solid 1px #303030;
+	color:#949494;
+	border:solid 1px #C5C5C5;
 	overflow:hidden;
 	margin:0px;
 	padding:0px;
@@ -958,7 +949,7 @@ table.fieldtable {
 	background-image:url('bc_s.png');
 	background-repeat:no-repeat;
 	background-position:right;
-	color:#090909;
+	color:#3D3D3D;
 }
 
 .navpath li.navelem a
@@ -967,15 +958,15 @@ table.fieldtable {
 	display:block;
 	text-decoration: none;
 	outline: none;
-	color: #DADADA;
+	color: #292929;
 	font-family: 'Lucida Grande',Geneva,Helvetica,Arial,sans-serif;
-	text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.3);
+	text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.9);
 	text-decoration: none;        
 }
 
 .navpath li.navelem a:hover
 {
-	color:#FFFFFF;
+	color:#787878;
 }
 
 .navpath li.footer
@@ -1006,18 +997,6 @@ div.summary a
 	white-space: nowrap;
 }
 
-table.classindex
-{
-        margin: 10px;
-        white-space: nowrap;
-        margin-left: 3%;
-        margin-right: 3%;
-        width: 94%;
-        border: 0;
-        border-spacing: 0; 
-        padding: 0;
-}
-
 div.ingroups
 {
 	font-size: 8pt;
@@ -1032,8 +1011,8 @@ div.ingroups a
 
 div.header
 {
-	background-image:url('nav_h.png');
-	background-repeat:repeat-x;
+        background-image:url('nav_h.png');
+        background-repeat:repeat-x;
 	background-color: #F9F9F9;
 	margin:  0px;
 	border-bottom: 1px solid #C7C7C7;
@@ -1129,15 +1108,10 @@ dl.section dd {
 	border: 0px none;
 }
  
-#projectalign
-{
-   	vertical-align: middle;
-}
-
 #projectname
 {
 	font: 300% Tahoma, Arial,sans-serif;
-	margin: 4px;
+	margin: 0px;
 	padding: 2px 0px;
 }
     
@@ -1217,12 +1191,12 @@ div.toc {
         border-radius: 7px 7px 7px 7px;
         float: right;
         height: auto;
-        margin: 0 8px 10px 10px;
+        margin: 0 20px 10px 10px;
         width: 200px;
 }
 
 div.toc li {
-        background: url("../CEX-Plus/bdwn.png") no-repeat scroll 0 5px transparent;
+        background: url("bdwn.png") no-repeat scroll 0 5px transparent;
         font: 10px/1.2 Verdana,DejaVu Sans,Geneva,sans-serif;
         margin-top: 5px;
         padding-left: 10px;
