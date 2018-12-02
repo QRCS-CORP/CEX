@@ -47,7 +47,6 @@ Note: Each cipher can be deployed as either the standard form (AES, Serpent, Two
 * The AES-NI Hash eXtended cipher (AHX)
 * The Rijndael Hash eXtended cipher (RHX)
 * The Serpent Hash eXtended cipher (SHX)
-* The Twofish Hash eXtended cipher (THX)
 
 ### Block Cipher Modes
 * Encrypt and Authenticate AEAD block cipher mode (EAX) 
