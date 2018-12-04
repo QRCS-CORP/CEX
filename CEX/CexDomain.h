@@ -27,9 +27,9 @@
 #define NAMESPACE_TLSEND } } } } }
 #define NAMESPACE_ASYMMETRICSIGN namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign {
 #define NAMESPACE_ASYMMETRICSIGNEND } } } }
-#define NAMESPACE_PICNIC namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace Dilithium {
-#define NAMESPACE_PICNICEND } } } } }
-#define NAMESPACE_SPHINCS namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace Sphincs {
+#define NAMESPACE_DILITHIUM namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace DLM {
+#define NAMESPACE_DILITHIUMEND } } } } }
+#define NAMESPACE_SPHINCS namespace CEX { namespace Cipher { namespace Asymmetric { namespace Sign { namespace SPX {
 #define NAMESPACE_SPHINCSEND } } } } }
 
 #define NAMESPACE_SYMMETRIC namespace CEX { namespace Cipher { namespace Symmetric {

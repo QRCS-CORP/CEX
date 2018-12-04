@@ -437,6 +437,9 @@
     <ClInclude Include="..\..\Test\SphincsTest.h">
       <Filter>Header Files\Test\Asymmetric\Sign</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Test\DilithiumTest.h">
+      <Filter>Header Files\Test\Asymmetric\Sign</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Test\AesAvsTest.cpp">
@@ -599,6 +602,9 @@
       <Filter>Source Files\Test\PrngTest</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Test\SphincsTest.cpp">
+      <Filter>Source Files\Test\Asymmetric\Sign</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Test\DilithiumTest.cpp">
       <Filter>Source Files\Test\Asymmetric\Sign</Filter>
     </ClCompile>
   </ItemGroup>

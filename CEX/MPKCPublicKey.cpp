@@ -5,7 +5,7 @@ NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
-MPKCPublicKey::MPKCPublicKey(MPKCParams Params, const std::vector<byte> &P)
+MPKCPublicKey::MPKCPublicKey(MPKCParameters Params, const std::vector<byte> &P)
 	:
 	m_isDestroyed(false),
 	m_mpkcParameters(Params),
@@ -16,10 +16,10 @@ MPKCPublicKey::MPKCPublicKey(MPKCParams Params, const std::vector<byte> &P)
 MPKCPublicKey::MPKCPublicKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false),
-	m_mpkcParameters(MPKCParams::None),
+	m_mpkcParameters(MPKCParameters::None),
 	m_pubMat(0)
 {
-	m_mpkcParameters = static_cast<MPKCParams>(KeyStream[0]);
+	m_mpkcParameters = static_cast<MPKCParameters>(KeyStream[0]);
 	uint pLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_pubMat.resize(pLen);
 	Utility::MemUtils::Copy(KeyStream, 5, m_pubMat, 0, pLen);
@@ -42,7 +42,7 @@ const AsymmetricKeyTypes MPKCPublicKey::KeyType()
 	return AsymmetricKeyTypes::CipherPublicKey;
 }
 
-const MPKCParams MPKCPublicKey::Parameters()
+const MPKCParameters MPKCPublicKey::Parameters()
 {
 	return m_mpkcParameters;
 }
@@ -59,7 +59,7 @@ void MPKCPublicKey::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_mpkcParameters = MPKCParams::None;
+		m_mpkcParameters = MPKCParameters::None;
 
 		if (m_pubMat.size() > 0)
 		{

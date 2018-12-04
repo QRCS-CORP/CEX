@@ -68,11 +68,11 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_sphincs-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Sphincs Class Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
+<div class="title">Sphincs Class Reference<div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___asymmetric.html">Asymmetric</a> &raquo; <a class="el" href="group___asymmetric_sign.html">AsymmetricSign</a> &raquo; <a class="el" href="group___sphincs.html">Sphincs</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>The Asymmetric cipher interface  
+<p>An implementation of the SPHINCS+ asymmetric signature scheme  
  <a href="class_sphincs.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_sphincs_8h_source.html">Sphincs.h</a>&gt;</code></p>
@@ -94,9 +94,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:accb9768f3e854794f53536a148835cb4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_sphincs.html">Sphincs</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#accb9768f3e854794f53536a148835cb4">operator=</a> (const <a class="el" href="class_sphincs.html">Sphincs</a> &amp;)=delete</td></tr>
 <tr class="memdesc:accb9768f3e854794f53536a148835cb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#accb9768f3e854794f53536a148835cb4">More...</a><br /></td></tr>
 <tr class="separator:accb9768f3e854794f53536a148835cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7968de3d760d4e68f9a5f4dfc7f5f351"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a7968de3d760d4e68f9a5f4dfc7f5f351">Sphincs</a> (SphincsParameters Parameters=SphincsParameters::SphincsSK256F256, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
-<tr class="memdesc:a7968de3d760d4e68f9a5f4dfc7f5f351"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: Instantiate this class  <a href="#a7968de3d760d4e68f9a5f4dfc7f5f351">More...</a><br /></td></tr>
-<tr class="separator:a7968de3d760d4e68f9a5f4dfc7f5f351"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76116905bec3982470c0514b81fda416"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a76116905bec3982470c0514b81fda416">Sphincs</a> (SphincsParameters Parameters=SphincsParameters::SPXS256F256, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
+<tr class="memdesc:a76116905bec3982470c0514b81fda416"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: Instantiate this class  <a href="#a76116905bec3982470c0514b81fda416">More...</a><br /></td></tr>
+<tr class="separator:a76116905bec3982470c0514b81fda416"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5299c7b3ff55cc5b0b58cb10ae597fa7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a5299c7b3ff55cc5b0b58cb10ae597fa7">Sphincs</a> (SphincsParameters Parameters, <a class="el" href="class_i_prng.html">IPrng</a> *Rng, <a class="el" href="class_i_kdf.html">IKdf</a> *Generator)</td></tr>
 <tr class="memdesc:a5299c7b3ff55cc5b0b58cb10ae597fa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using an external Prng instance  <a href="#a5299c7b3ff55cc5b0b58cb10ae597fa7">More...</a><br /></td></tr>
 <tr class="separator:a5299c7b3ff55cc5b0b58cb10ae597fa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -115,6 +115,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a61ea39256ea247709d7d72e8fbeb9dcb">Name</a> () override</td></tr>
 <tr class="memdesc:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme name  <a href="#a61ea39256ea247709d7d72e8fbeb9dcb">More...</a><br /></td></tr>
 <tr class="separator:a61ea39256ea247709d7d72e8fbeb9dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08985c961919894c9b69b4388c707a7a"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a08985c961919894c9b69b4388c707a7a">PrivateKeySize</a> () override</td></tr>
+<tr class="memdesc:a08985c961919894c9b69b4388c707a7a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key size in bytes  <a href="#a08985c961919894c9b69b4388c707a7a">More...</a><br /></td></tr>
+<tr class="separator:a08985c961919894c9b69b4388c707a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a384523c49d175414091494c466abc087"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#a384523c49d175414091494c466abc087">PublicKeySize</a> () override</td></tr>
+<tr class="memdesc:a384523c49d175414091494c466abc087"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key size in bytes  <a href="#a384523c49d175414091494c466abc087">More...</a><br /></td></tr>
+<tr class="separator:a384523c49d175414091494c466abc087"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abaaa0fe20de4ca0429f293e5e8fc025c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_sphincs.html#abaaa0fe20de4ca0429f293e5e8fc025c">Generate</a> () override</td></tr>
 <tr class="memdesc:abaaa0fe20de4ca0429f293e5e8fc025c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#abaaa0fe20de4ca0429f293e5e8fc025c">More...</a><br /></td></tr>
 <tr class="separator:abaaa0fe20de4ca0429f293e5e8fc025c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,7 +148,32 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a15d6681f385e01d414ca3523121921d9 inherit pub_methods_class_i_asymmetric_sign"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Asymmetric cipher interface </p>
+<div class="textblock"><p>An implementation of the SPHINCS+ asymmetric signature scheme </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(SphincsParameters::SPXS128F256);</div><div class="line"><a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line"><a class="code" href="class_sphincs_private_key.html">SphincsPrivateKey</a>* prik = (<a class="code" href="class_sphincs_private_key.html">SphincsPrivateKey</a>*)kp-&gt;<a class="code" href="class_i_asymmetric_key_pair.html#abe10c0eb64561c576b3419bf07895deb">PrivateKey</a>();</div><div class="line">std::vector&lt;byte&gt; pk = prik-&gt;<a class="code" href="class_sphincs_private_key.html#a0f27521a50521d60caf5636829084adf">ToBytes</a>();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(SphincsParameters::SPXS128F256);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_sphincs.html">Sphincs</a> sgn(SphincsParameters::SPXS128F256);</div><div class="line">sgn.Initialize(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    <span class="comment">// if authentication fails, this will throw</span></div><div class="line">    sgn.Verify(Signature, msg);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a> &amp;ex)</div><div class="line">{</div><div class="line">    <span class="comment">// handle the authentication failure</span></div><div class="line">}</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>SPHINCS+ is a high-security post-quantum stateless hash-based signature scheme that signs hundreds of messages per second on a modern 4-core 3.5GHz Intel CPU. <br />
+Signatures are 41 KB, public keys are 1 KB, and private keys are 1 KB. <br />
+SPHINCS-256 is designed to provide long-term 2128 security even against attackers equipped with quantum computers. <br />
+Unlike most hash-based signature schemes, SPHINCS-256 is stateless, allowing it to be a drop-in replacement for current signature schemes.</p>
+<ul>
+<li>
+There are three available parameter sets using the 'fast' version of the algorithm dilineated by the core hashing function SHAKE; the SHAKE128 based SPXS128F256, SPXS256F256 using SHAKE256, and the experimental SPXS512F256 using SHAKE512, selectable through the class constructor parameter </li>
+<li>
+The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption. </li>
+<li>
+The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng </li>
+<li>
+The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure </li>
+</ul>
+<p>Guiding Publications: </p><ol>
+<li>
+Software: SPHINCS+<a href="https://sphincs.org/software.html">Software</a> . </li>
+<li>
+Reference Paper : SPHINCS+ <a href="https://sphincs.org/data/sphincs+-specification.pdf">Specification</a>. </li>
+<li>
+Reference: <a href="https://eprint.iacr.org/2014/795.pdf">SPHINCS: practical stateless hash-based signatures</a>. </li>
+<li>
+Website: <a href="https://sphincs.org/">NTRU Prime Website</a>. </li>
+</ol>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a867d50e7b03a8b26682b953ba76dd290"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a867d50e7b03a8b26682b953ba76dd290">&#9670;&nbsp;</a></span>Sphincs() <span class="overload">[1/3]</span></h2>
@@ -172,8 +203,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a7968de3d760d4e68f9a5f4dfc7f5f351"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7968de3d760d4e68f9a5f4dfc7f5f351">&#9670;&nbsp;</a></span>Sphincs() <span class="overload">[2/3]</span></h2>
+<a id="a76116905bec3982470c0514b81fda416"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76116905bec3982470c0514b81fda416">&#9670;&nbsp;</a></span>Sphincs() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -182,7 +213,7 @@ Public Member Functions</h2></td></tr>
           <td class="memname">Sphincs::Sphincs </td>
           <td>(</td>
           <td class="paramtype">SphincsParameters&#160;</td>
-          <td class="paramname"><em>Parameters</em> = <code>SphincsParameters::SphincsSK256F256</code>, </td>
+          <td class="paramname"><em>Parameters</em> = <code>SphincsParameters::SPXS256F256</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -503,6 +534,64 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a08985c961919894c9b69b4388c707a7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08985c961919894c9b69b4388c707a7a">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t Sphincs::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a37029c2531087e3ee90ef1c57a2f0838">IAsymmetricSign</a>.</p>
+
+</div>
+</div>
+<a id="a384523c49d175414091494c466abc087"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a384523c49d175414091494c466abc087">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t Sphincs::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575">IAsymmetricSign</a>.</p>
+
+</div>
+</div>
 <a id="aaa9ddb2a6c9fed9485791bd7008bc129"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aaa9ddb2a6c9fed9485791bd7008bc129">&#9670;&nbsp;</a></span>Sign()</h2>
 
@@ -600,6 +689,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
+<li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_documentation_8h_source.html">Documentation.h</a></li>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/<a class="el" href="_sphincs_8h_source.html">Sphincs.h</a></li>
 <li>C:/Users/John/Documents/GitHub/CEX/CEX/Sphincs.cpp</li>
 </ul>

@@ -75,7 +75,7 @@ NAMESPACE_BLOCK
 /// 
 /// <list type="bullet">
 /// <item><description>This cipher should only be used in conjunction with an AEAD or standard cipher mode, or as an component in another construction, ex. CMAC.</item>
-/// <item><description>Valid key sizes can be determined at using the <see cref="LegalKeySizes"/> property.</description> collection.</item>
+/// <item><description>Valid key sizes can be determined at run-time using the <see cref="LegalKeySizes"/> property.</description> collection.</item>
 /// <item><description>The internal block-size is fixed at 16 bytes (128 bits) wide.</description></item>
 /// <item><description>The cipher can process 128, 192, and 256-bit keys in standard mode, and 256, 512, and 1024-bit keys in extended mode.</description></item>
 /// <item><description>Transformation rounds assignments are 10, 12, and 14 in standard modes, and 22, 30, and 38 rounds with 256, 512, and 1024-bit length keys.</description></item>

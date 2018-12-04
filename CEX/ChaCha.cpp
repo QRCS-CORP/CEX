@@ -41,7 +41,7 @@ struct ChaCha::ChaChaState
 
 	void Increase(size_t Length)
 	{
-		C[0] += Length;
+		C[0] += static_cast<uint>(Length);
 
 		if (C[0] < Length)
 		{

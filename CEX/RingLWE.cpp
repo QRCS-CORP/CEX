@@ -11,28 +11,28 @@ const std::string RingLWE::CLASS_NAME = "RingLWE";
 
 //~~~Constructor~~~//
 
-RingLWE::RingLWE(RLWEParams Parameters, Prngs PrngType)
+RingLWE::RingLWE(RLWEParameters Parameters, Prngs PrngType)
 	:
 	m_destroyEngine(true),
 	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_rlweParameters(Parameters != RLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(RLWEParams::Q12289N2048) ? Parameters :
+	m_rlweParameters(Parameters != RLWEParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(RLWEParameters::RLWES2Q12289N2048) ? Parameters :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The prng type can not be none!"))
 {
 }
 
-RingLWE::RingLWE(RLWEParams Parameters, IPrng* Prng)
+RingLWE::RingLWE(RLWEParameters Parameters, IPrng* Prng)
 	:
 	m_destroyEngine(false),
 	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_rlweParameters(Parameters != RLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(RLWEParams::Q12289N2048) ? Parameters :
+	m_rlweParameters(Parameters != RLWEParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(RLWEParameters::RLWES2Q12289N2048) ? Parameters :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("RingLWE:CTor", "The prng can not be null!"))
@@ -46,7 +46,7 @@ RingLWE::~RingLWE()
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_rlweParameters = RLWEParams::None;
+		m_rlweParameters = RLWEParameters::None;
 		Utility::IntUtils::ClearVector(m_domainKey);
 
 		// release keys
@@ -105,19 +105,19 @@ const std::string RingLWE::Name()
 {
 	std::string ret = CLASS_NAME + "-";
 
-	if (m_rlweParameters == RLWEParams::Q12289N1024)
+	if (m_rlweParameters == RLWEParameters::RLWES1Q12289N1024)
 	{
-		ret += "Q12289N1024";
+		ret += "RLWES1Q12289N1024";
 	}
-	else if (m_rlweParameters == RLWEParams::Q12289N2048)
+	else if (m_rlweParameters == RLWEParameters::RLWES2Q12289N2048)
 	{
-		ret += "Q12289N2048";
+		ret += "RLWES2Q12289N2048";
 	}
 
 	return ret;
 }
 
-const RLWEParams RingLWE::Parameters()
+const RLWEParameters RingLWE::Parameters()
 {
 	return m_rlweParameters;
 }
@@ -224,7 +224,7 @@ void RingLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Shar
 
 IAsymmetricKeyPair* RingLWE::Generate()
 {
-	CexAssert(m_rlweParameters != RLWEParams::None, "The parameter setting is invalid");
+	CexAssert(m_rlweParameters != RLWEParameters::None, "The parameter setting is invalid");
 
 	std::vector<byte> pk(RLWEQ12289N1024::RLWE_CCAPUBLICKEY_SIZE);
 	std::vector<byte> sk(RLWEQ12289N1024::RLWE_CCAPRIVATEKEY_SIZE);

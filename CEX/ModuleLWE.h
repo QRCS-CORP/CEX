@@ -22,14 +22,14 @@
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
 #include "MLWEKeyPair.h"
-#include "MLWEParams.h"
+#include "MLWEParameters.h"
 #include "MLWEPrivateKey.h"
 #include "MLWEPublicKey.h"
 
 NAMESPACE_MODULELWE
 
 using Key::Asymmetric::MLWEKeyPair;
-using Enumeration::MLWEParams;
+using Enumeration::MLWEParameters;
 using Key::Asymmetric::MLWEPrivateKey;
 using Key::Asymmetric::MLWEPublicKey;
 
@@ -40,40 +40,34 @@ using Key::Asymmetric::MLWEPublicKey;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// ModuleLWE asycpr(MLWEParams::Q7681N256K3);
-/// IAsymmetricKeyPair* kp = asycpr.Generate();
+/// ModuleLWE acpr(MLWEParameters::MLWES3Q7681N256);
+/// IAsymmetricKeyPair* kp = acpr.Generate();
 /// 
 /// // serialize the public key
 /// MLWEPublicKey* pubK1 = (MLWEPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; pk = pubK1->ToBytes();
+/// std::vector&lt;byte&gt; pk = pubK1->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// ModuleLWE asycpr(MLWEParams::Q7681N256K3);
-/// asycpr.Initialize(pk);
+/// std::vector&lt;byte&gt; sec(32);
+/// std::vector&lt;byte&gt; cpt(0);
 /// 
-/// std:vector&lt;byte&gt; cpt;
-/// std:vector&lt;byte&gt; secret(32);
+/// ModuleLWE acpr(MLWEParameters::MLWES3Q7681N256);
+/// acpr.Initialize(PublicKey);
 /// // generate the ciphertext and shared secret
-/// asycpr.Encapsulate(cpt, secret);
+/// acpr.Encapsulate(cpt, sec);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// ModuleLWE asycpr(MLWEParams::Q7681N256K3);
-/// asycpr.Initialize(sk);
-/// std:vector&lt;byte&gt; secret(32);
+/// std::vector&lt;byte&gt; sec(32);
+/// bool status;
 /// 
-/// try
-/// {
+/// ModuleLWE acpr(MLWEParameters::MLWES3Q7681N256);
+/// acpr.Initialize(PrivateKey);
 /// // decrypt the ciphertext and output the shared secret
-///		asycpr.Decapsulate(cpt, secret);
-/// }
-/// catch (const CryptoAuthenticationFailure &ex)
-/// {
-///		// handle the authentication failure
-/// }
+///	status = acpr.Decapsulate(cpt, sec);
 /// </code>
 /// </example>
 /// 
@@ -84,8 +78,8 @@ using Key::Asymmetric::MLWEPublicKey;
 /// This makes ModuleLWE a strong asymmetric cipher and resistant to currently known attack methods that could use quantum computers.</para>
 /// 
 /// <list type="bullet">
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The Q12289/N1024 parameter set is the default cipher configuration; as of (1.0.0.3), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MLWEPublicKey, or MLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
+/// <item><description>The high-security MLWES3Q7681N256 parameter set is the default cipher configuration; optional parameters of medium-security MLWES2Q7681N256, and highest-security MLWES4Q7681N256 are also available through the class constructor parameter</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The secondary prng used to generate the public key (BCR), is an AES128/CTR-BE construction, (changed from SHAKE in the Kyber version)</description></item>
 /// <item><description>The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
@@ -112,7 +106,7 @@ private:
 	std::vector<byte> m_keyTag;
 	std::unique_ptr<MLWEPrivateKey> m_privateKey;
 	std::unique_ptr<MLWEPublicKey> m_publicKey;
-	MLWEParams m_mlweParameters;
+	MLWEParameters m_mlweParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -137,7 +131,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	ModuleLWE(MLWEParams Parameters = MLWEParams::Q7681N256K3, Prngs PrngType = Prngs::BCR);
+	ModuleLWE(MLWEParameters Parameters = MLWEParameters::MLWES3Q7681N256, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -147,7 +141,7 @@ public:
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	ModuleLWE(MLWEParams Parameters, IPrng* Prng);
+	ModuleLWE(MLWEParameters Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -189,7 +183,7 @@ public:
 	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
-	const MLWEParams Parameters();
+	const MLWEParameters Parameters();
 
 	//~~~Public Functions~~~//
 

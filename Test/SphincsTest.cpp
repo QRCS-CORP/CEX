@@ -1,5 +1,4 @@
 #include "SphincsTest.h"
-#include "../CEX/Sphincs.h"
 #include "../CEX/IAsymmetricKeyPair.h"
 #include "../CEX/IntUtils.h"
 #include "../CEX/ModuleLWE.h"
@@ -12,7 +11,7 @@
 namespace Test
 {
 	using namespace Key::Asymmetric;
-	using Cipher::Asymmetric::Sign::Sphincs::Sphincs;
+	using Cipher::Asymmetric::Sign::SPX::Sphincs;
 	using Prng::SecureRandom;
 
 	const std::string SphincsTest::DESCRIPTION = "SphincsTest key generation, signature generation, and verification tests..";
@@ -72,13 +71,13 @@ namespace Test
 
 	void SphincsTest::Authentication()
 	{
+		Sphincs sgn1;
+		Sphincs sgn2;
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		SecureRandom rnd;
 		bool ret;
-		Sphincs sgn1;
-		Sphincs sgn2;
 
 		IAsymmetricKeyPair* kp = sgn1.Generate();
 		sgn1.Initialize(kp->PrivateKey());
@@ -88,11 +87,11 @@ namespace Test
 
 		if (msg1 != msg2)
 		{
-			throw TestException(std::string("SphincsTest: Message authentication test failed! -MA1"));
+			throw TestException(std::string("SphincsTest: Message authentication test failed! -SA1"));
 		}
 		if (ret != true)
 		{
-			throw TestException(std::string("SphincsTest: Message authentication test failed! -MA1"));
+			throw TestException(std::string("SphincsTest: Message authentication test failed! -SA1"));
 		}
 	}
 
@@ -116,7 +115,7 @@ namespace Test
 		// invalid prng type
 		try
 		{
-			Sphincs sgn(Enumeration::SphincsParameters::SphincsSK128F256, Enumeration::Prngs::None);
+			Sphincs sgn(Enumeration::SphincsParameters::SPXS128F256, Enumeration::Prngs::None);
 
 			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE2"));
 		}
@@ -131,7 +130,7 @@ namespace Test
 		// null prng and kdf
 		try
 		{
-			Sphincs sgn(Enumeration::SphincsParameters::SphincsSK128F256, nullptr, nullptr);
+			Sphincs sgn(Enumeration::SphincsParameters::SPXS128F256, nullptr, nullptr);
 
 			throw TestException(std::string("SPHINCS+"), std::string("Exception: Exception handling failure! -SE3"));
 		}
@@ -221,18 +220,18 @@ namespace Test
 
 	void SphincsTest::PrivateKey()
 	{
+		SecureRandom gen;
+		Sphincs sgn;
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
-		SecureRandom gen;
-		Sphincs sgn;
 
 		IAsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter private key
 		std::vector<byte> sk1 = ((SphincsPrivateKey*)kp->PrivateKey())->R();
 		gen.Generate(sk1, 0, 16);
-		SphincsPrivateKey* sk2 = new SphincsPrivateKey(SphincsParameters::SphincsSK256F256, sk1);
+		SphincsPrivateKey* sk2 = new SphincsPrivateKey(SphincsParameters::SPXS256F256, sk1);
 
 		sgn.Initialize(sk2);
 		sgn.Sign(msg1, sig);
@@ -247,18 +246,18 @@ namespace Test
 
 	void SphincsTest::PublicKey()
 	{
+		SecureRandom gen;
+		Sphincs sgn;
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
-		SecureRandom gen;
-		Sphincs sgn;
 
 		IAsymmetricKeyPair* kp = sgn.Generate();
 
 		// alter public key
 		std::vector<byte> pk1 = ((SphincsPublicKey*)kp->PublicKey())->P();
 		gen.Generate(pk1, 0, 16);
-		SphincsPublicKey* pk2 = new SphincsPublicKey(SphincsParameters::SphincsSK256F256, pk1);
+		SphincsPublicKey* pk2 = new SphincsPublicKey(SphincsParameters::SPXS256F256, pk1);
 
 		sgn.Initialize(kp->PrivateKey());
 		sgn.Sign(msg1, sig);
@@ -273,8 +272,8 @@ namespace Test
 
 	void SphincsTest::Serialization()
 	{
-		std::vector<byte> skey;
 		Sphincs sgn;
+		std::vector<byte> skey;
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -301,11 +300,11 @@ namespace Test
 
 	void SphincsTest::Signature()
 	{
+		SecureRandom gen;
+		Sphincs sgn;
 		std::vector<byte> msg1(32);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
-		SecureRandom gen;
-		Sphincs sgn;
 
 		IAsymmetricKeyPair* kp = sgn.Generate();
 
@@ -325,13 +324,13 @@ namespace Test
 
 	void SphincsTest::Stress()
 	{
+		SecureRandom gen;
+		Sphincs sgn1(SphincsParameters::SPXS128F256);
+		Sphincs sgn2(SphincsParameters::SPXS256F256);
 		std::vector<byte> msg1(0);
 		std::vector<byte> msg2(0);
 		std::vector<byte> sig(0);
 		size_t msglen;
-		SecureRandom gen;
-		Sphincs sgn1(SphincsParameters::SphincsSK128F256);
-		Sphincs sgn2(SphincsParameters::SphincsSK256F256);
 		bool status;
 		const size_t CYCLES = TEST_CYCLES == 1 ? 1 : TEST_CYCLES / 2;
 

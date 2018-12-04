@@ -44,7 +44,7 @@ NAMESPACE_DIGEST
 /// <description>Example using the Compute method:</description>
 /// <code>
 /// Keccak256 digest;
-/// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
+/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
 /// digest.Compute(Input, hash);
 /// </code>

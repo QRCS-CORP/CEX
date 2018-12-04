@@ -12,28 +12,28 @@ const std::string McEliece::CLASS_NAME = "McEliece";
 
 //~~~Constructor~~~//
 
-McEliece::McEliece(MPKCParams Parameters, Prngs PrngType)
+McEliece::McEliece(MPKCParameters Parameters, Prngs PrngType)
 	:
 	m_destroyEngine(true),
 	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mpkcParameters(Parameters != MPKCParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParams::M12T62) ? Parameters :
+	m_mpkcParameters(Parameters != MPKCParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParameters::MPKCS1M12T62) ? Parameters :
 		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The prng type can not be none!"))
 {
 }
 
-McEliece::McEliece(MPKCParams Parameters, IPrng* Prng)
+McEliece::McEliece(MPKCParameters Parameters, IPrng* Prng)
 	:
 	m_destroyEngine(false),
 	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mpkcParameters(Parameters != MPKCParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParams::M12T62) ? Parameters :
+	m_mpkcParameters(Parameters != MPKCParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MPKCParameters::MPKCS1M12T62) ? Parameters :
 		throw CryptoAsymmetricException("McEliece:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng : 
 		throw CryptoAsymmetricException("McEliece:CTor", "The prng can not be null!"))
@@ -47,7 +47,7 @@ McEliece::~McEliece()
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_mpkcParameters = MPKCParams::None;
+		m_mpkcParameters = MPKCParameters::None;
 		Utility::IntUtils::ClearVector(m_domainKey);
 
 		// release keys
@@ -106,15 +106,15 @@ const std::string McEliece::Name()
 {
 	std::string ret = CLASS_NAME + "-";
 
-	if (m_mpkcParameters == MPKCParams::M12T62)
+	if (m_mpkcParameters == MPKCParameters::MPKCS1M12T62)
 	{
-		ret += "M12T62";
+		ret += "MPKCS1M12T62";
 	}
 
 	return ret;
 }
 
-const MPKCParams McEliece::Parameters()
+const MPKCParameters McEliece::Parameters()
 {
 	return m_mpkcParameters;
 }
@@ -132,7 +132,7 @@ bool McEliece::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte
 	std::vector<byte> tag(MPKCM12T62::MPKC_TAG_SIZE);
 	bool status;
 
-	if (m_mpkcParameters == MPKCParams::M12T62)
+	if (m_mpkcParameters == MPKCParameters::MPKCS1M12T62)
 	{
 		CexAssert(CipherText.size() >= MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE, "The cipher-text array is too small");
 
@@ -177,7 +177,7 @@ void McEliece::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sha
 	std::vector<byte> iv(16);
 	std::vector<byte> coins(2 * MPKCM12T62::MPKC_COIN_SIZE);
 
-	if (m_mpkcParameters == MPKCParams::M12T62)
+	if (m_mpkcParameters == MPKCParameters::MPKCS1M12T62)
 	{
 		e.resize(static_cast<ulong>(1) << (MPKCM12T62::MPKC_M - 3));
 		CipherText.resize(MPKCM12T62::MPKC_CCACIPHERTEXT_SIZE + SharedSecret.size());
@@ -214,7 +214,7 @@ IAsymmetricKeyPair* McEliece::Generate()
 	std::vector<byte> pk(0);
 	std::vector<byte> sk(0);
 
-	if (m_mpkcParameters == MPKCParams::M12T62)
+	if (m_mpkcParameters == MPKCParameters::MPKCS1M12T62)
 	{
 		pk.resize(MPKCM12T62::MPKC_CCAPUBLICKEY_SIZE);
 		sk.resize(MPKCM12T62::MPKC_CCAPRIVATEKEY_SIZE);

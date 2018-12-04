@@ -43,7 +43,7 @@ NAMESPACE_DIGEST
 /// <description>Example using the Update method:</description>
 /// <code>
 /// Skein512 dgt;
-/// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
+/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
 /// dgt.Update(Input, 0, Input.size());
 /// dgt.Finalize(hash, 0);

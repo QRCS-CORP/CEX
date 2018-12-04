@@ -127,7 +127,6 @@
 #include "../Test/ACPTest.h"
 #include "../Test/AeadTest.h"
 #include "../Test/AesAvsTest.h"
-#include "../Test/RijndaelTest.h"
 #include "../Test/AsymmetricSpeedTest.h"
 #include "../Test/BCGTest.h"
 #include "../Test/Blake2Test.h"
@@ -142,6 +141,7 @@
 #include "../Test/CSPTest.h"
 #include "../Test/DigestSpeedTest.h"
 #include "../Test/DigestStreamTest.h"
+#include "../Test/DilithiumTest.h"
 #include "../Test/ECPTest.h"
 #include "../Test/GMACTest.h"
 #include "../Test/KDF2Test.h"
@@ -162,6 +162,7 @@
 #include "../Test/Poly1305Test.h"
 #include "../Test/RandomOutputTest.h"
 #include "../Test/RDPTest.h"
+#include "../Test/RijndaelTest.h"
 #include "../Test/RingLWETest.h"
 #include "../Test/SCRYPTTest.h"
 #include "../Test/SecureStreamTest.h"
@@ -274,11 +275,11 @@ void PrintRandom(size_t Lines)
 void PrintTitle()
 {
 	ConsoleUtils::WriteLine("***********************************************");
-	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.6: CEX Library in C++   *");
+	ConsoleUtils::WriteLine("* CEX++ Version 1.0.0.7: CEX Library in C++   *");
 	ConsoleUtils::WriteLine("*                                             *");
-	ConsoleUtils::WriteLine("* Release:   v1.0.0.6g (A6)                   *");
+	ConsoleUtils::WriteLine("* Release:   v1.0.0.7a (A7)                   *");
 	ConsoleUtils::WriteLine("* License:   GPLv3                            *");
-	ConsoleUtils::WriteLine("* Date:      November 16, 2018                *");
+	ConsoleUtils::WriteLine("* Date:      December 04, 2018                *");
 	ConsoleUtils::WriteLine("* Contact:   develop@vtdev.com                *");
 	ConsoleUtils::WriteLine("***********************************************");
 	ConsoleUtils::WriteLine("");

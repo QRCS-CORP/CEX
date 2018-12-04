@@ -5,7 +5,7 @@ NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
-NTRUPublicKey::NTRUPublicKey(NTRUParams Parameters, std::vector<byte> &P)
+NTRUPublicKey::NTRUPublicKey(NTRUParameters Parameters, std::vector<byte> &P)
 	:
 	m_isDestroyed(false),
 	m_ntruParameters(Parameters),
@@ -16,10 +16,10 @@ NTRUPublicKey::NTRUPublicKey(NTRUParams Parameters, std::vector<byte> &P)
 NTRUPublicKey::NTRUPublicKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false),
-	m_ntruParameters(NTRUParams::None),
+	m_ntruParameters(NTRUParameters::None),
 	m_pCoeffs(0)
 {
-	m_ntruParameters = static_cast<NTRUParams>(KeyStream[0]);
+	m_ntruParameters = static_cast<NTRUParameters>(KeyStream[0]);
 	uint pLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_pCoeffs.resize(pLen);
 	Utility::MemUtils::Copy(KeyStream, 5, m_pCoeffs, 0, pLen);
@@ -42,7 +42,7 @@ const AsymmetricKeyTypes NTRUPublicKey::KeyType()
 	return AsymmetricKeyTypes::CipherPublicKey;
 }
 
-const NTRUParams NTRUPublicKey::Parameters()
+const NTRUParameters NTRUPublicKey::Parameters()
 {
 	return m_ntruParameters;
 }
@@ -59,7 +59,7 @@ void NTRUPublicKey::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_ntruParameters = NTRUParams::None;
+		m_ntruParameters = NTRUParameters::None;
 
 		if (m_pCoeffs.size() > 0)
 		{

@@ -1,6 +1,7 @@
 #include "Sphincs.h"
 #include "PrngFromName.h"
 #include "SecureRandom.h"
+#include "SHAKE.h"
 #include "SPXF256.h"
 
 NAMESPACE_SPHINCS
@@ -14,13 +15,14 @@ Sphincs::Sphincs(SphincsParameters Parameters, Prngs PrngType)
 	m_destroyEngine(true),
 	m_isInitialized(false),
 	m_kdfGenerator(Parameters != SphincsParameters::None ? 
-		new Kdf::SHAKE(Parameters == SphincsParameters::SphincsSK128F256 ? 
+		new Kdf::SHAKE(Parameters == SphincsParameters::SPXS128F256 ? 
 			Enumeration::ShakeModes::SHAKE128 : Enumeration::ShakeModes::SHAKE256) : 
 		throw CryptoAsymmetricException("Sphincs:CTor", "The sphincs parameters can not be none!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("Sphincs:CTor", "The prng type can not be none!")),
 	m_isSigner(false),
-	m_spxParameters(Parameters)
+	m_spxParameters(Parameters != SphincsParameters::None ? Parameters :
+		throw CryptoAsymmetricException("Sphincs:CTor", "The parameter can not be None!"))
 {
 }
 
@@ -33,7 +35,8 @@ Sphincs::Sphincs(SphincsParameters Parameters, IPrng* Rng, IKdf* Generator)
 	m_rndGenerator(Rng != nullptr ? Rng :
 		throw CryptoAsymmetricException("Sphincs:CTor", "The prng can not be null!")),
 	m_isSigner(false),
-	m_spxParameters(Parameters)
+	m_spxParameters(Parameters != SphincsParameters::None ? Parameters :
+		throw CryptoAsymmetricException("Sphincs:CTor", "The parameter can not be None!"))
 {
 }
 
@@ -99,16 +102,26 @@ const std::string Sphincs::Name()
 {
 	std::string ret = CLASS_NAME + "-";
 
-	if (m_spxParameters == SphincsParameters::SphincsSK128F256)
+	if (m_spxParameters == SphincsParameters::SPXS128F256)
 	{
-		ret += "SPXSK128F256";
+		ret += "SPXS128F256";
 	}
-	else if (m_spxParameters == SphincsParameters::SphincsSK256F256)
+	else if (m_spxParameters == SphincsParameters::SPXS256F256)
 	{
-		ret += "SPXSK256F256";
+		ret += "SPXS256F256";
 	}
 
 	return ret;
+}
+
+const size_t Sphincs::PrivateKeySize()
+{
+	return SPXF256::SPHINCS_SECRETKEY_SIZE;
+}
+
+const size_t Sphincs::PublicKeySize()
+{
+	return SPXF256::SPHINCS_PUBLICKEY_SIZE;
 }
 
 IAsymmetricKeyPair* Sphincs::Generate()
@@ -157,6 +170,10 @@ size_t Sphincs::Sign(const std::vector<byte> &Message, std::vector<byte> &Signat
 	{
 		throw CryptoAsymmetricException("Sphincs:Sign", "The signature scheme is not initialized for signing!");
 	}
+	if (Message.size() == 0)
+	{
+		throw CryptoAsymmetricException("Sphincs:Sign", "The message size must be non-zero!");
+	}
 
 	size_t sgnlen;
 
@@ -181,6 +198,23 @@ bool Sphincs::Verify(const std::vector<byte> &Signature, std::vector<byte> &Mess
 	result = SPXF256::Verify(Message, Signature, m_publicKey->P(), m_kdfGenerator);
 
 	return (result == 1);
+}
+
+void Sphincs::Test()
+{
+	Sphincs sgn(SphincsParameters::SPXS128F256);
+	IAsymmetricKeyPair* kp = sgn.Generate();
+	std::vector<byte> msg1(32);
+	std::vector<byte> sig(0);
+	// generate the signature
+	sgn.Initialize(kp->PrivateKey());
+	sgn.Sign(msg1, sig);
+	sgn.Initialize(kp->PublicKey());
+	std::vector<byte> msg2(0);
+
+	// if authentication fails, this will throw
+	sgn.Verify(sig, msg2);
+
 }
 
 NAMESPACE_SPHINCSEND

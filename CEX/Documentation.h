@@ -9,26 +9,27 @@
 /*! \mainpage A programmers guide to the CEX++ Cryptographic library
 
 \section intro_sec Welcome
-Welcome to the CEX++ Cryptographic Library, version 1.0.0.6 (A6).
+Welcome to the CEX++ Cryptographic Library, version 1.0.0.7 (A7).
 \brief
 CEX is a library built for both speed and maximum security.
 This help package contains details on the cryptographic primitives used in the library, their uses, and code examples.
 
 \section road_map Road Map
-The current version is <B>1.0.0.6g</B> (A6 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
+The current version is <B>1.0.0.7a</B> (A7 version), which are the major, minor, patch, and release codes, and the update segment letter. \n
 \brief
 
 \author    John Underhill
-\version   1.0.0.6f
-\date      November 16, 2018
+\version   1.0.0.7a
+\date      December 04, 2018
 \copyright GPL version 3 license (GPLv3)
 
 <B>Trajectory</B> \n \n
 
-The current version is 1.0.0.6f (A6 version), which are the major, minor, patch, and release codes. \n \n
+The current version is 1.0.0.7a (A7 version), which are the major, minor, patch, and release codes. \n \n
 
-<B>Current Release 1.0.0.6 (version A6):</B> \n
+<B>Current Release 1.0.0.7a (version A7):</B> \n
 
+The Dilithium asymmetric signature scheme \n
 The SPHINCS+ asymmetric signature scheme \n
 The NTRU Prime asymmetric cipher \n
 Authenticated Threefish-256/512/1024 stream ciphers \n
@@ -153,9 +154,9 @@ NAMESPACE_ROOT
 			/*! @} */
 
 			/*!
-			*  \addtogroup RingLWE
+			*  \addtogroup NTRU
 			*  @{
-			*  @brief The RingLWE Cipher Namespace
+			*  @brief The NTRU Cipher Namespace
 			*/
 			NAMESPACE_NTRU
 				class NTRU {};
@@ -170,6 +171,36 @@ NAMESPACE_ROOT
 			NAMESPACE_RINGLWE
 				class RingLWE {};
 			NAMESPACE_RINGLWEEND
+			/*! @} */
+
+			/*!
+			*  \addtogroup AsymmetricSign
+			*  @{
+			*  @brief Asymmetric Signature Namespace
+			*/
+			NAMESPACE_ASYMMETRICSIGN
+
+				/*!
+				*  \addtogroup Dilithium
+				*  @{
+				*  @brief The Dilithium asymmetric signature scheme Namespace
+				*/
+				NAMESPACE_DILITHIUM
+					class Dilithium {};
+				NAMESPACE_DILITHIUMEND
+				/*! @} */
+
+				/*!
+				*  \addtogroup Sphincs
+				*  @{
+				*  @brief The SPHINCS+ asymmetric signature scheme Namespace
+				*/
+				NAMESPACE_SPHINCS
+					class Sphincs {};
+				NAMESPACE_SPHINCSEND
+				/*! @} */
+
+			NAMESPACE_ASYMMETRICSIGNEND
 			/*! @} */
 
 		NAMESPACE_ASYMMETRICEND
@@ -318,11 +349,11 @@ NAMESPACE_ROOT
 		enum class Kdfs {};
 		enum class KeySizes {};
 		enum class Macs {};
-		enum class MPKCParams {};
+		enum class MPKCParameters {};
 		enum class PaddingModes {};
 		enum class Prngs {};
 		enum class Providers {};
-		enum class RLWEParams {};
+		enum class RLWEParameters {};
 		enum class RoundCounts {};
 		enum class ShakeModes {};
 		enum class SimdProfiles {};

@@ -22,14 +22,14 @@
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
 #include "RLWEKeyPair.h"
-#include "RLWEParams.h"
+#include "RLWEParameters.h"
 #include "RLWEPrivateKey.h"
 #include "RLWEPublicKey.h"
 
 NAMESPACE_RINGLWE
 
 using Key::Asymmetric::RLWEKeyPair;
-using Enumeration::RLWEParams;
+using Enumeration::RLWEParameters;
 using Key::Asymmetric::RLWEPrivateKey;
 using Key::Asymmetric::RLWEPublicKey;
 
@@ -40,40 +40,37 @@ using Key::Asymmetric::RLWEPublicKey;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// RingLWE asycpr(RLWEParams::Q12289N1024);
-/// IAsymmetricKeyPair* kp = asycpr.Generate();
+/// RingLWE acpr(RLWEParameters::RLWES1Q12289N1024);
+/// IAsymmetricKeyPair* kp = acpr.Generate();
 /// 
 /// // serialize the public key
 /// RLWEPublicKey* pubK1 = (RLWEPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; pk = pubK1->ToBytes();
+/// std::vector&lt;byte&gt; pk = pubK1->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// RingLWE asycpr(RLWEParams::Q12289N1024);
-/// asycpr.Initialize(pk);
-/// 
-/// std:vector&lt;byte&gt; cpt;
-/// std:vector&lt;byte&gt; secret(32);
-/// // generate the ciphertext and shared secret
-/// asycpr.Encapsulate(cpt, secret);
+/// create the shared secret
+/// std::vector&lt;byte&gt; cpt(0);
+/// std::vector&lt;byte&gt; sec(32);
+///
+/// // initialize the cipher
+/// RingLWE acpr(RLWEParameters::RLWES1Q12289N1024);
+/// cpr.Initialize(PublicKey);
+/// // encrypt the secret
+/// status = cpr.Encrypt(cpt, sec);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// RingLWE asycpr(RLWEParams::Q12289N1024);
-/// asycpr.Initialize(sk);
-/// std:vector&lt;byte&gt; secret(32);
-/// 
-/// try
-/// {
-/// // decrypt the ciphertext and output the shared secret
-///		asycpr.Decapsulate(cpt, secret);
-/// }
-/// catch (const CryptoAuthenticationFailure &ex)
-/// {
-///		// handle the authentication failure
-/// }
+/// std::vector&lt;byte&gt; sec(32);
+/// bool status;
+///
+/// // initialize the cipher
+/// RingLWE acpr(RLWEParameters::RLWES1Q12289N1024);
+/// cpr.Initialize(PrivateKey);
+/// // decrypt the secret, status returns authentication outcome, false for failure
+/// status = cpr.Decrypt(cpt, sec);
 /// </code>
 /// </example>
 /// 
@@ -88,8 +85,8 @@ using Key::Asymmetric::RLWEPublicKey;
 /// That seed is compressed with a Keccak digest and used to key the GCM AEAD mode which encrypts and authenticates the message.</para>
 /// 
 /// <list type="bullet">
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The Q12289/N1024 parameter set is the default cipher configuration; as of (1.0.0.3), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: RLWEPublicKey, or RLWEPublicKey), Public for encryption, Private for Decryption.</description></item>
+/// <item><description>The Q12289/N1024 parameter set is the default cipher configuration; an experimental Q12289/N2048 is also implemented</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The message digest used to condition the seed bytes is set automatically; Keccak512 for standard ciphers, Keccak1024 for extended ciphers</description></item>
 /// <item><description>The secondary prng used to generate the public key (BCR), is an AES128/CTR-BE construction, (changed from Shake128 in the new hope version)</description></item>
@@ -118,7 +115,7 @@ private:
 	std::unique_ptr<IAsymmetricKeyPair> m_keyPair;
 	std::unique_ptr<RLWEPrivateKey> m_privateKey;
 	std::unique_ptr<RLWEPublicKey> m_publicKey;
-	RLWEParams m_rlweParameters;
+	RLWEParameters m_rlweParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -143,7 +140,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	RingLWE(RLWEParams Parameters = RLWEParams::Q12289N1024, Prngs PrngType = Prngs::BCR);
+	RingLWE(RLWEParameters Parameters = RLWEParameters::RLWES1Q12289N1024, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using an external Prng instance
@@ -153,7 +150,7 @@ public:
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	RingLWE(RLWEParams Parameters, IPrng* Prng);
+	RingLWE(RLWEParameters Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -195,7 +192,7 @@ public:
 	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
-	const RLWEParams Parameters();
+	const RLWEParameters Parameters();
 
 	//~~~Public Functions~~~//
 

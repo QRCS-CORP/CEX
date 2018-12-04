@@ -74,7 +74,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
-		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
+		RingLWE cpr(Enumeration::RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		cpr.Initialize(kp->PublicKey());
@@ -99,7 +99,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
+		RingLWE cpr(Enumeration::RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		cpr.Initialize(kp->PublicKey());
@@ -123,7 +123,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			RingLWE cpr(Enumeration::RLWEParams::None, m_rngPtr);
+			RingLWE cpr(Enumeration::RLWEParameters::None, m_rngPtr);
 
 			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE1"));
 		}
@@ -137,7 +137,7 @@ namespace Test
 
 		try
 		{
-			RingLWE cpr(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::None);
+			RingLWE cpr(Enumeration::RLWEParameters::RLWES1Q12289N1024, Enumeration::Prngs::None);
 
 			throw TestException(std::string("RLWE"), std::string("Exception handling failure! -RE2"));
 		}
@@ -152,7 +152,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			RingLWE cpra(Enumeration::RLWEParams::Q12289N1024, Enumeration::Prngs::BCR);
+			RingLWE cpra(Enumeration::RLWEParameters::RLWES1Q12289N1024, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::MLWE::ModuleLWE cprb;
 			// create an invalid key set
 			IAsymmetricKeyPair* kp = cprb.Generate();
@@ -175,14 +175,14 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		RingLWE cpr(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
+		RingLWE cpr(Enumeration::RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		// alter public key
 		std::vector<byte> pk1 = ((RLWEPublicKey*)kp->PublicKey())->P();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		RLWEPublicKey* pk2 = new RLWEPublicKey(Enumeration::RLWEParams::Q12289N1024, pk1);
+		RLWEPublicKey* pk2 = new RLWEPublicKey(Enumeration::RLWEParameters::RLWES1Q12289N1024, pk1);
 		cpr.Initialize(pk2);
 		cpr.Encapsulate(cpt, sec1);
 
@@ -199,7 +199,7 @@ namespace Test
 	void RingLWETest::Serialization()
 	{
 		std::vector<byte> skey;
-		RingLWE asyCpr(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
+		RingLWE asyCpr(Enumeration::RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -231,7 +231,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		RingLWE cpr1(Enumeration::RLWEParams::Q12289N1024, m_rngPtr);
+		RingLWE cpr1(Enumeration::RLWEParameters::RLWES1Q12289N1024, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
@@ -255,7 +255,7 @@ namespace Test
 			}
 		}
 
-		RingLWE cpr2(Enumeration::RLWEParams::Q12289N2048, m_rngPtr);
+		RingLWE cpr2(Enumeration::RLWEParameters::RLWES2Q12289N2048, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{

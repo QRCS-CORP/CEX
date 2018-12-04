@@ -45,7 +45,7 @@ NAMESPACE_DIGEST
 /// <description>Using the Compute method:</description>
 /// <code>
 /// SHA512 dgt;
-/// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
+/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
 /// dgt.Update(Input, 0, Input.size());
 /// dgt.Finalize(hash, 0);

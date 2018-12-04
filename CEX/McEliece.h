@@ -22,14 +22,14 @@
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
 #include "MPKCKeyPair.h"
-#include "MPKCParams.h"
+#include "MPKCParameters.h"
 #include "MPKCPrivateKey.h"
 #include "MPKCPublicKey.h"
 
 NAMESPACE_MCELIECE
 
 using Key::Asymmetric::MPKCKeyPair;
-using Enumeration::MPKCParams;
+using Enumeration::MPKCParameters;
 using Key::Asymmetric::MPKCPrivateKey;
 using Key::Asymmetric::MPKCPublicKey;
 
@@ -40,33 +40,36 @@ using Key::Asymmetric::MPKCPublicKey;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// McEliece cpr(MPKCParams::M12T62, [PrngType], [CipherType]);
+/// McEliece cpr(MPKCParameters::MPKCS1M12T62, [PrngType], [CipherType]);
 /// IAsymmetricKeyPair* kp = cpr.Generate();
 /// // serialize the public key
 /// MPKCPublicKey* pubK = (MPKCPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; skey = pubK->ToBytes();
+/// std::vector&lt;byte&gt; skey = pubK->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
 /// create the shared secret
-/// std:vector&lt;byte&gt; msg(64);
-/// Prng::IPrng* rng = Helper::PrngFromName::GetInstance(Enumeration::Prngs::BCR, Enumeration::Providers::CSP);
-/// rng->Generate(msg);
+/// std::vector&lt;byte&gt; cpt(0);
+/// std::vector&lt;byte&gt; sec(32);
+///
 /// // initialize the cipher
-/// McEliece cpr(MPKCParams::M12T62, [PrngType], [CipherType]);
-/// cpr.Initialize(kp);
+/// McEliece cpr(MPKCParameters::MPKCS1M12T62, [PrngType], [CipherType]);
+/// cpr.Initialize(PublicKey);
 /// // encrypt the secret
-/// std:vector&lt;byte&gt; enc = cpr.Encrypt(msg);
+/// cpr.Encrypt(cpt, sec);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
+/// std::vector&lt;byte&gt; sec(32);
+/// bool status;
+///
+/// McEliece cpr(MPKCParameters::MPKCS1M12T62, [PrngType], [CipherType]);
 /// // initialize the cipher
-/// McEliece cpr(MPKCParams::M12T62, [PrngType], [CipherType]);
-/// cpr.Initialize(kp);
-/// // decrypt the secret
-/// std:vector&lt;byte&gt; msg = cpr.Decrypt(enc);
+/// cpr.Initialize(PrivateKey);
+/// // decrypt the secret, status returns authentication outcome, false for failure
+/// status = cpr.Decrypt(cpt, sec);
 /// </code>
 /// </example>
 /// 
@@ -75,13 +78,13 @@ using Key::Asymmetric::MPKCPublicKey;
 /// <para>.</para>
 ///
 /// <para>This implementation is based on the one written by Daniel Bernstien, Tung Chou, and Peter Schwabe: <a href="https://www.win.tue.nl/~tchou/mcbits/."> 'McBits'</a>. \n
-/// The MPKCParams enumeration member is passed to the constructor along with either an optional Prng and block-cipher enum type values, or uninitialized instances of a Prng and a block cipher. \n
+/// The MPKCParameters enumeration member is passed to the constructor along with either an optional Prng and block-cipher enum type values, or uninitialized instances of a Prng and a block cipher. \n
 /// The Generate function returns a pointer to an IAsymmetricKeyPair container, that holds the public and private keys, along with an optional key tag byte array. \n
 /// The encryption method a standard encryption interface: CipherText = Encrypt(Message), the decryption method uses the inverse: Message = Decrypt(CipherText).</para>
 /// 
 /// <list type="bullet">
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
-/// <item><description>The M12T62 parameter set is the default cipher configuration; as of (1.0.0.4), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: MPKCPublicKey, or MPKCPublicKey), Public for encryption, Private for Decryption.</description></item>
+/// <item><description>The MPKCS1M12T62 parameter set is the default cipher configuration; as of (1.0.0.4), this is currently the only parameter set, but a modular construction is used anticipating future expansion</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The primary pseudo-random function (message digest) can be set through the constructor (default is SHA2-256)</description></item>
 /// <item><description>The default prng used to generate the public key and private keys (default is BCR), is an AES256/CTR-BE construction</description></item>
@@ -107,7 +110,7 @@ private:
 	bool m_isDestroyed;
 	bool m_isEncryption;
 	bool m_isInitialized;
-	MPKCParams m_mpkcParameters;
+	MPKCParameters m_mpkcParameters;
 	std::unique_ptr<MPKCPrivateKey> m_privateKey;
 	std::unique_ptr<MPKCPublicKey> m_publicKey;
 	std::unique_ptr<IPrng> m_rndGenerator;
@@ -134,7 +137,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	McEliece(MPKCParams Parameters = MPKCParams::M12T62, Prngs PrngType = Prngs::BCR);
+	McEliece(MPKCParameters Parameters = MPKCParameters::MPKCS1M12T62, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -144,7 +147,7 @@ public:
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	McEliece(MPKCParams Parameters, IPrng* Prng);
+	McEliece(MPKCParameters Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -186,7 +189,7 @@ public:
 	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
-	const MPKCParams Parameters();
+	const MPKCParameters Parameters();
 
 	//~~~Public Functions~~~//
 

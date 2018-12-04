@@ -82,8 +82,8 @@ Inheritance diagram for IAsymmetricSign:</div>
  <div class="center">
   <img src="class_i_asymmetric_sign.png" usemap="#IAsymmetricSign_map" alt=""/>
   <map id="IAsymmetricSign_map" name="IAsymmetricSign_map">
-<area href="class_dilithium.html" title="The Asymmetric cipher interface " alt="Dilithium" shape="rect" coords="0,56,105,80"/>
-<area href="class_sphincs.html" title="The Asymmetric cipher interface " alt="Sphincs" shape="rect" coords="115,56,220,80"/>
+<area href="class_dilithium.html" title="An implementation of the Dilithium asymmetric signature scheme " alt="Dilithium" shape="rect" coords="0,56,105,80"/>
+<area href="class_sphincs.html" title="An implementation of the SPHINCS+ asymmetric signature scheme " alt="Sphincs" shape="rect" coords="115,56,220,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -113,6 +113,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a71d275a877944114879c70462e8aec7d"><td class="memItemLeft" align="right" valign="top">virtual const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a71d275a877944114879c70462e8aec7d">Name</a> ()=0</td></tr>
 <tr class="memdesc:a71d275a877944114879c70462e8aec7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme name  <a href="#a71d275a877944114879c70462e8aec7d">More...</a><br /></td></tr>
 <tr class="separator:a71d275a877944114879c70462e8aec7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37029c2531087e3ee90ef1c57a2f0838"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a37029c2531087e3ee90ef1c57a2f0838">PrivateKeySize</a> ()=0</td></tr>
+<tr class="memdesc:a37029c2531087e3ee90ef1c57a2f0838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key size in bytes  <a href="#a37029c2531087e3ee90ef1c57a2f0838">More...</a><br /></td></tr>
+<tr class="separator:a37029c2531087e3ee90ef1c57a2f0838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95d9971467e4cef79b51f960c4c64575"><td class="memItemLeft" align="right" valign="top">virtual const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575">PublicKeySize</a> ()=0</td></tr>
+<tr class="memdesc:a95d9971467e4cef79b51f960c4c64575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key size in bytes  <a href="#a95d9971467e4cef79b51f960c4c64575">More...</a><br /></td></tr>
+<tr class="separator:a95d9971467e4cef79b51f960c4c64575"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a84ecabcdeed5f7bc611f9c69e5b07b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a5a84ecabcdeed5f7bc611f9c69e5b07b">Generate</a> ()=0</td></tr>
 <tr class="memdesc:a5a84ecabcdeed5f7bc611f9c69e5b07b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a5a84ecabcdeed5f7bc611f9c69e5b07b">More...</a><br /></td></tr>
 <tr class="separator:a5a84ecabcdeed5f7bc611f9c69e5b07b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -273,7 +279,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#abaaa0fe20de4ca0429f293e5e8fc025c">Sphincs</a>.</p>
+<p>Implemented in <a class="el" href="class_sphincs.html#abaaa0fe20de4ca0429f293e5e8fc025c">Sphincs</a>, and <a class="el" href="class_dilithium.html#a9678cdb8e448a01cd43d026d646f7ceb">Dilithium</a>.</p>
 
 </div>
 </div>
@@ -309,7 +315,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="class_sphincs.html#ab81d11344f348905b88a8a896bff3fe0">Sphincs</a>, and <a class="el" href="class_dilithium.html#a5a290a8a3406f7b64045dfb320e5912c">Dilithium</a>.</p>
+<p>Implemented in <a class="el" href="class_sphincs.html#ab81d11344f348905b88a8a896bff3fe0">Sphincs</a>, and <a class="el" href="class_dilithium.html#a69364ad4248ade5306e7869f9a828f5f">Dilithium</a>.</p>
 
 </div>
 </div>
@@ -425,6 +431,64 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Copy operator: copy is restricted, this function has been deleted </p>
+
+</div>
+</div>
+<a id="a37029c2531087e3ee90ef1c57a2f0838"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37029c2531087e3ee90ef1c57a2f0838">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricSign::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key size in bytes </p>
+
+<p>Implemented in <a class="el" href="class_sphincs.html#a08985c961919894c9b69b4388c707a7a">Sphincs</a>, and <a class="el" href="class_dilithium.html#a9e374ef7058b87bd76989fd093cb0f2a">Dilithium</a>.</p>
+
+</div>
+</div>
+<a id="a95d9971467e4cef79b51f960c4c64575"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95d9971467e4cef79b51f960c4c64575">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const size_t IAsymmetricSign::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key size in bytes </p>
+
+<p>Implemented in <a class="el" href="class_sphincs.html#a384523c49d175414091494c466abc087">Sphincs</a>, and <a class="el" href="class_dilithium.html#aa625f481f6b09af524694fdb839c9f13">Dilithium</a>.</p>
 
 </div>
 </div>

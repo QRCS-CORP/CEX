@@ -51,7 +51,7 @@ using Key::Symmetric::ISymmetricKey;
 /// <para>Use the Compute method for small to medium data sizes</para>
 /// <code>
 /// Blake256 dgt;
-/// std:vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
+/// std::vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
 /// // compute a hash
 /// dgt.Compute(input, hash);
 /// </code>
@@ -61,7 +61,7 @@ using Key::Symmetric::ISymmetricKey;
 /// <description>Use the Update method for large data sizes:</description>
 /// <code>
 /// Blake256 dgt;
-/// std:vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
+/// std::vector&lt;byte&gt; hash(dgt.DigestSize(), 0);
 /// int64_t len = (int64_t)input.size();
 ///
 /// // update blocks

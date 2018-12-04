@@ -3,11 +3,11 @@
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "MLWEParams.h"
+#include "MLWEParameters.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::MLWEParams;
+using Enumeration::MLWEParameters;
 
 /// <summary>
 /// A ModuleLWE Private Key container
@@ -18,7 +18,7 @@ private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_rCoeffs;
-	MLWEParams m_mlweParameters;
+	MLWEParameters m_mlweParameters;
 
 public:
 
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="R">The private key polynomial</param>
-	MLWEPrivateKey(MLWEParams Parameters, std::vector<byte> &R);
+	MLWEPrivateKey(MLWEParameters Parameters, std::vector<byte> &R);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const MLWEParams Parameters();
+	const MLWEParameters Parameters();
 
 	/// <summary>
 	/// Read Only: the private key polynomial R

@@ -22,6 +22,7 @@ var searchData=
   ['asymmetric',['Asymmetric',['../group___asymmetric.html',1,'']]],
   ['asymmetricengines',['AsymmetricEngines',['../group___enumeration.html#ga29d0f9dca8992bfdc1e8f55c6b4c13f1',1,'Documentation.h']]],
   ['asymmetrickey',['AsymmetricKey',['../group___asymmetric_key.html',1,'']]],
+  ['asymmetricsign',['AsymmetricSign',['../group___asymmetric_sign.html',1,'']]],
   ['asymmetrictransform',['AsymmetricTransform',['../class_i_asymmetric_parameters.html#afaab0aafdf008b089dca56ad2fbea6f7',1,'IAsymmetricParameters']]],
   ['authenticationengine',['AuthenticationEngine',['../class_i_asymmetric_parameters.html#a4522343017b91ecb7328e60b62e340ca',1,'IAsymmetricParameters']]],
   ['autoincrement',['AutoIncrement',['../class_e_a_x.html#af4498507ab74a60c1726a534c20c6839',1,'EAX::AutoIncrement()'],['../class_g_c_m.html#aba625323147d773ea7516fa4b8a81a38',1,'GCM::AutoIncrement()'],['../class_i_aead_mode.html#a945fb5422ae3a0b5821ca6ab7d4dcef1',1,'IAeadMode::AutoIncrement()'],['../class_o_c_b.html#aa4ee69258e82479618df2dcb01ec3c92',1,'OCB::AutoIncrement()']]],

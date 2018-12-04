@@ -73,7 +73,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
-		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
+		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		cpr.Initialize(kp->PublicKey());
@@ -98,7 +98,7 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K2, m_rngPtr);
+		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		cpr.Initialize(kp->PublicKey());
@@ -122,7 +122,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			ModuleLWE cpr(Enumeration::MLWEParams::None, m_rngPtr);
+			ModuleLWE cpr(Enumeration::MLWEParameters::None, m_rngPtr);
 
 			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME1"));
 		}
@@ -136,7 +136,7 @@ namespace Test
 
 		try
 		{
-			ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, Enumeration::Prngs::None);
+			ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::None);
 
 			throw TestException(std::string("ModuleLWE"), std::string("Exception handling failure! -ME2"));
 		}
@@ -151,7 +151,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			ModuleLWE cpra(Enumeration::MLWEParams::Q7681N256K3, Enumeration::Prngs::BCR);
+			ModuleLWE cpra(Enumeration::MLWEParameters::MLWES3Q7681N256, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::RLWE::RingLWE cprb;
 			// create an invalid key set
 			IAsymmetricKeyPair* kp = cprb.Generate();
@@ -174,14 +174,14 @@ namespace Test
 		std::vector<byte> sec1(64);
 		std::vector<byte> sec2(64);
 
-		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
+		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 		IAsymmetricKeyPair* kp = cpr.Generate();
 
 		// alter public key
 		std::vector<byte> pk1 = ((MLWEPublicKey*)kp->PublicKey())->P();
 		pk1[0] += 1;
 		pk1[1] += 1;
-		MLWEPublicKey* pk2 = new MLWEPublicKey(Enumeration::MLWEParams::Q7681N256K3, pk1);
+		MLWEPublicKey* pk2 = new MLWEPublicKey(Enumeration::MLWEParameters::MLWES3Q7681N256, pk1);
 		cpr.Initialize(pk2);
 		cpr.Encapsulate(cpt, sec1);
 
@@ -198,7 +198,7 @@ namespace Test
 	void ModuleLWETest::Serialization()
 	{
 		std::vector<byte> skey;
-		ModuleLWE cpr(Enumeration::MLWEParams::Q7681N256K4, m_rngPtr);
+		ModuleLWE cpr(Enumeration::MLWEParameters::MLWES4Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -230,7 +230,7 @@ namespace Test
 		std::vector<byte> sec1(32);
 		std::vector<byte> sec2(32);
 
-		ModuleLWE cpr1(Enumeration::MLWEParams::Q7681N256K2, m_rngPtr);
+		ModuleLWE cpr1(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
@@ -255,7 +255,7 @@ namespace Test
 			}
 		}
 
-		ModuleLWE cpr2(Enumeration::MLWEParams::Q7681N256K3, m_rngPtr);
+		ModuleLWE cpr2(Enumeration::MLWEParameters::MLWES3Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{
@@ -280,7 +280,7 @@ namespace Test
 			}
 		}
 
-		ModuleLWE cpr3(Enumeration::MLWEParams::Q7681N256K4, m_rngPtr);
+		ModuleLWE cpr3(Enumeration::MLWEParameters::MLWES4Q7681N256, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 3; ++i)
 		{

@@ -31,7 +31,7 @@ using Prng::IPrng;
 ///
 
 /// <summary>
-/// The McEliece M12T62 FFT
+/// The McEliece MPKCS1M12T62 FFT
 /// </summary>
 class MPKCM12T62
 {

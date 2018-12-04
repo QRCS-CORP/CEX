@@ -22,14 +22,14 @@
 #include "CexDomain.h"
 #include "IAsymmetricCipher.h"
 #include "NTRUKeyPair.h"
-#include "NTRUParams.h"
+#include "NTRUParameters.h"
 #include "NTRUPrivateKey.h"
 #include "NTRUPublicKey.h"
 
 NAMESPACE_NTRU
 
 using Key::Asymmetric::NTRUKeyPair;
-using Enumeration::NTRUParams;
+using Enumeration::NTRUParameters;
 using Key::Asymmetric::NTRUPrivateKey;
 using Key::Asymmetric::NTRUPublicKey;
 
@@ -40,52 +40,52 @@ using Key::Asymmetric::NTRUPublicKey;
 /// <example>
 /// <description>Key generation:</description>
 /// <code>
-/// NTRU asycpr(NTRUParams::LQ4591N761);
-/// IAsymmetricKeyPair* kp = asycpr.Generate();
+/// NTRU acpr(NTRUParameters::NTRUS1LQ4591N761);
+/// IAsymmetricKeyPair* kp = acpr.Generate();
 /// 
 /// // serialize the public key
 /// NTRUPublicKey* pubK1 = (NTRUPublicKey*)kp->PublicKey();
-/// std:vector&lt;byte&gt; pk = pubK1->ToBytes();
+/// std::vector&lt;byte&gt; pk = pubK1->ToBytes();
 /// </code>
 ///
 /// <description>Encryption:</description>
 /// <code>
-/// NTRU asycpr(NTRUParams::LQ4591N761);
-/// asycpr.Initialize(pk);
-/// 
-/// std:vector&lt;byte&gt; cpt;
-/// std:vector&lt;byte&gt; secret(32);
-/// // generate the ciphertext and shared secret
-/// asycpr.Encapsulate(cpt, secret);
+/// create the shared secret
+/// std::vector&lt;byte&gt; cpt(0);
+/// std::vector&lt;byte&gt; sec(32);
+///
+/// // initialize the cipher
+/// NTRU acpr(NTRUParameters::NTRUS1LQ4591N761);
+/// cpr.Initialize(PublicKey);
+/// // encrypt the secret
+/// status = cpr.Encrypt(cpt, sec);
 /// </code>
 ///
 /// <description>Decryption:</description>
 /// <code>
-/// NTRU asycpr(NTRUParams::LQ4591N761);
-/// asycpr.Initialize(sk);
-/// std:vector&lt;byte&gt; secret(32);
-/// 
-/// try
-/// {
-/// // decrypt the ciphertext and output the shared secret
-///		asycpr.Decapsulate(cpt, secret);
-/// }
-/// catch (const CryptoAuthenticationFailure &ex)
-/// {
-///		// handle the authentication failure
-/// }
+/// std::vector&lt;byte&gt; sec(32);
+/// bool status;
+///
+/// // initialize the cipher
+/// NTRU acpr(NTRUParameters::NTRUS1LQ4591N761);
+/// cpr.Initialize(PrivateKey);
+/// // decrypt the secret, status returns authentication outcome, false for failure
+/// status = cpr.Decrypt(cpt, sec);
 /// </code>
 /// </example>
 /// 
 /// <remarks>
 /// <description>Implementation Notes:</description>
-/// <para></para>
+/// <para>Several ideal-lattice-based cryptosystems have been broken by recent attacks that exploit special structures of the rings used in those cryptosystems. \n
+/// The same structures are also used in the leading proposals for post-quantum lattice-based cryptography, including the classic NTRU cryptosystem and typical Ring-LWE-based cryptosystems. \n
+/// NTRU Prime tweaks NTRU to use rings without these structures.Here are two public - key cryptosystems in the NTRU Prime family, both designed for the standard goal of IND - CCA2 security:
+/// Streamlined NTRU Prime is optimized from an implementation perspective. \n
+/// NTRU LPRime (pronounced "ell-prime") is a variant offering different tradeoffs. \n
+/// Streamlined NTRU Prime 4591761 and NTRU LPRime 4591761 are Streamlined NTRU Prime and NTRU LPRime with high-security post-quantum parameters.</para>
 ///
-/// <para></para>
-/// 
 /// <list type="bullet">
-/// <item><description></description></item>
-/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption.</description></item>
+/// <item><description>There are two available high-security parameter sets based upon the two rounding forms, L-Prime: NTRUS1LQ4591N761, and S-Prime NTRUS2SQ4591N761 selectable through the class constructor parameter</description></item>
+/// <item><description>The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: NTRUPublicKey, or NTRUPrivateKey), Public for encryption, Private for Decryption.</description></item>
 /// <item><description>The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng</description></item>
 /// <item><description>The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure</description></item>
 /// </list>
@@ -113,7 +113,7 @@ private:
 	std::vector<byte> m_keyTag;
 	std::unique_ptr<NTRUPrivateKey> m_privateKey;
 	std::unique_ptr<NTRUPublicKey> m_publicKey;
-	NTRUParams m_ntruParameters;
+	NTRUParameters m_ntruParameters;
 	std::unique_ptr<IPrng> m_rndGenerator;
 
 public:
@@ -138,7 +138,7 @@ public:
 	/// <param name="PrngType">The seed prng function type; the default is the BCR generator</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng type, or parameter set is specified</exception>
-	NTRU(NTRUParams Parameters = NTRUParams::LQ4591N761, Prngs PrngType = Prngs::BCR);
+	NTRU(NTRUParameters Parameters = NTRUParameters::NTRUS1LQ4591N761, Prngs PrngType = Prngs::BCR);
 
 	/// <summary>
 	/// Constructor: instantiate this class using external Prng and Digest instances
@@ -148,7 +148,7 @@ public:
 	/// <param name="Prng">A pointer to the seed Prng function</param>
 	/// 
 	/// <exception cref="Exception::CryptoAsymmetricException">Thrown if an invalid prng, or parameter set is specified</exception>
-	NTRU(NTRUParams Parameters, IPrng* Prng);
+	NTRU(NTRUParameters Parameters, IPrng* Prng);
 
 	/// <summary>
 	/// Destructor: finalize this class
@@ -190,7 +190,7 @@ public:
 	/// <summary>
 	/// Read Only: The ciphers parameters enumeration name
 	/// </summary>
-	const NTRUParams Parameters();
+	const NTRUParameters Parameters();
 
 	//~~~Public Functions~~~//
 

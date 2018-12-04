@@ -3,11 +3,11 @@
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "MPKCParams.h"
+#include "MPKCParameters.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::MPKCParams;
+using Enumeration::MPKCParameters;
 
 /// <summary>
 /// A McEliece Private Key container
@@ -17,7 +17,7 @@ class MPKCPrivateKey final : public IAsymmetricKey
 private:
 
 	bool m_isDestroyed;
-	MPKCParams m_mpkcParameters;
+	MPKCParameters m_mpkcParameters;
 	std::vector<byte> m_sCoeffs;
 
 public:
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="S">The private key polynomial</param>
-	explicit MPKCPrivateKey(MPKCParams Parameters, std::vector<byte> &S);
+	explicit MPKCPrivateKey(MPKCParameters Parameters, std::vector<byte> &S);
 
 	/// <summary>
 	/// Initialize this class with a serialized private key
@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const MPKCParams Parameters();
+	const MPKCParameters Parameters();
 
 	/// <summary>
 	/// Read Only: The private key polynomial

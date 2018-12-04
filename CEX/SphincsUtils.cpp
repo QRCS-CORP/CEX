@@ -76,12 +76,12 @@ void SphincsUtils::SetType(std::array<uint, 8> &Address, uint Type)
 	Address[4] = Type;
 }
 
-void SphincsUtils::UllToBytes(std::vector<byte> &Output, size_t Offset, ulong Value, uint32_t Length)
+void SphincsUtils::UllToBytes(std::vector<byte> &Output, size_t Offset, ulong Value, size_t Length)
 {
-	int i;
+	int32_t i;
 
 	// iterate over out in decreasing order, for big-endianness
-	for (i = Length - 1; i >= 0; i--)
+	for (i = static_cast<int32_t>(Length) - 1; i >= 0; i--)
 	{
 		Output[Offset + i] = Value & 0xFF;
 		Value = Value >> 8;

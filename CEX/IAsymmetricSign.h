@@ -20,6 +20,7 @@
 #define CEX_IASYMMETRICSIGN_H
 
 #include "CexDomain.h"
+#include "AsymmetricEngines.h"
 #include "CryptoAsymmetricException.h"
 #include "IAsymmetricKey.h"
 #include "IAsymmetricKeyPair.h"
@@ -89,6 +90,16 @@ public:
 	/// Read Only: The signature scheme name
 	/// </summary>
 	virtual const std::string Name() = 0;
+
+	/// <summary>
+	/// Read Only: The expected Private key size in bytes
+	/// </summary>
+	virtual const size_t PrivateKeySize() = 0;
+
+	/// <summary>
+	/// Read Only: The expected Public key size in bytes
+	/// </summary>
+	virtual const size_t PublicKeySize() = 0;
 
 	//~~~Public Functions~~~//
 

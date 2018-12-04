@@ -438,12 +438,12 @@ inline static void CexAssert(bool Condition, const T Message)
 
 // enables the compact form for all digest permutations, used for performance and small code-cache cases
 // the digests will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
-#define CEX_DIGEST_COMPACT
+//#define CEX_DIGEST_COMPACT
 
 // enables the compact form for all stream cipher permutations, used for performance and small code-cache cases
 // the ciphers will use the unrolled (timing-neutral) form of the permutation function if this constant is removed
 // Note, that this may cause cache evictions on CPUs with a small code-cache, timing should be tested on the target CPU before implementing
-#define CEX_CIPHER_COMPACT
+//#define CEX_CIPHER_COMPACT
 
 // enables/disables OS rotation intrinsics
 #if defined(CEX_FAST_ROTATE) && defined(CEX_HAS_MINSSE)

@@ -62,44 +62,44 @@ namespace Test
 			OnProgress(std::string(""));
 
 			// RingLWE
-			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using RingLWE Q12289N1024***"));
-			RlweGenerateLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using RingLWE RLWES1Q12289N1024***"));
+			RlweGenerateLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using RingLWE Q12289N1024***"));
-			RlweEncryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using RingLWE RLWES1Q12289N1024***"));
+			RlweEncryptLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using RingLWE Q12289N1024***"));
-			RlweDecryptLoop(RLWEParams::Q12289N1024, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using RingLWE RLWES1Q12289N1024***"));
+			RlweDecryptLoop(RLWEParameters::RLWES1Q12289N1024, DEF_TEST_ITER, rngPtr);
 
 			// McEliece
-			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using McEliece M12T62***"));
-			MpkcGenerateLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using McEliece MPKCS1M12T62***"));
+			MpkcGenerateLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using McEliece M12T62***"));
-			MpkcEncryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using McEliece MPKCS1M12T62***"));
+			MpkcEncryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using McEliece M12T62***"));
-			MpkcDecryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using McEliece MPKCS1M12T62***"));
+			MpkcDecryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngPtr);
 
 			// ModuleLWE
-			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using ModuleLWE Q7681N256K3***"));
-			MlweGenerateLoop(MLWEParams::Q7681N256K3, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using ModuleLWE MLWES3Q7681N256***"));
+			MlweGenerateLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using ModuleLWE Q7681N256K3***"));
-			MlweEncryptLoop(MLWEParams::Q7681N256K3, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using ModuleLWE MLWES3Q7681N256***"));
+			MlweEncryptLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using ModuleLWE Q7681N256K3***"));
-			MlweDecryptLoop(MLWEParams::Q7681N256K3, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using ModuleLWE MLWES3Q7681N256***"));
+			MlweDecryptLoop(MLWEParameters::MLWES3Q7681N256, DEF_TEST_ITER, rngPtr);
 
 			// NTRU
-			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using NTRU LQ4591N761***"));
-			MpkcGenerateLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Generating " + itrCnt + " Keypairs using NTRU NTRUS1LQ4591N761***"));
+			MpkcGenerateLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using NTRU LQ4591N761***"));
-			MpkcEncryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Encrypting " + itrCnt + " messages using NTRU NTRUS1LQ4591N761***"));
+			MpkcEncryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngPtr);
 
-			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using NTRU LQ4591N761***"));
-			MpkcDecryptLoop(MPKCParams::M12T62, DEF_TEST_ITER, rngPtr);
+			OnProgress(std::string("***Sequential: Decrypting " + itrCnt + " messages using NTRU NTRUS1LQ4591N761***"));
+			MpkcDecryptLoop(MPKCParameters::MPKCS1M12T62, DEF_TEST_ITER, rngPtr);
 
 			delete rngPtr;
 
@@ -115,7 +115,7 @@ namespace Test
 		}
 	}
 
-	void AsymmetricSpeedTest::MlweDecryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::MlweDecryptLoop(MLWEParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
@@ -148,7 +148,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MlweEncryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::MlweEncryptLoop(MLWEParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
@@ -178,7 +178,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MlweGenerateLoop(MLWEParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::MlweGenerateLoop(MLWEParameters Params, size_t Loops, IPrng* Rng)
 	{
 		ModuleLWE asyCpr(Params, Rng);
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -200,7 +200,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::MpkcDecryptLoop(MPKCParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
@@ -233,7 +233,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::MpkcEncryptLoop(MPKCParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
@@ -263,7 +263,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::MpkcGenerateLoop(MPKCParameters Params, size_t Loops, IPrng* Rng)
 	{
 		McEliece asyCpr(Params, Rng);
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -285,7 +285,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::NtruDecryptLoop(NTRUParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::NtruDecryptLoop(NTRUParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
@@ -318,7 +318,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::NtruEncryptLoop(NTRUParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::NtruEncryptLoop(NTRUParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
@@ -348,7 +348,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::NtruGenerateLoop(NTRUParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::NtruGenerateLoop(NTRUParameters Params, size_t Loops, IPrng* Rng)
 	{
 		NTRU asyCpr(Params, Rng);
 		uint64_t start = TestUtils::GetTimeMs64();
@@ -370,7 +370,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::RlweDecryptLoop(RLWEParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::RlweDecryptLoop(RLWEParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec1(32);
@@ -403,7 +403,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::RlweEncryptLoop(RLWEParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::RlweEncryptLoop(RLWEParameters Params, size_t Loops, IPrng* Rng)
 	{
 		std::vector<byte> cpt(0);
 		std::vector<byte> sec(32);
@@ -433,7 +433,7 @@ namespace Test
 		OnProgress(std::string(""));
 	}
 
-	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParams Params, size_t Loops, IPrng* Rng)
+	void AsymmetricSpeedTest::RlweGenerateLoop(RLWEParameters Params, size_t Loops, IPrng* Rng)
 	{
 		RingLWE asyCpr(Params, Rng);
 		uint64_t start = TestUtils::GetTimeMs64();

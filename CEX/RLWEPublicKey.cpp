@@ -5,7 +5,7 @@ NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
-RLWEPublicKey::RLWEPublicKey(RLWEParams Parameters, std::vector<byte> &P)
+RLWEPublicKey::RLWEPublicKey(RLWEParameters Parameters, std::vector<byte> &P)
 	:
 	m_isDestroyed(false),
 	m_rlweParameters(Parameters),
@@ -16,10 +16,10 @@ RLWEPublicKey::RLWEPublicKey(RLWEParams Parameters, std::vector<byte> &P)
 RLWEPublicKey::RLWEPublicKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false),
-	m_rlweParameters(RLWEParams::None),
+	m_rlweParameters(RLWEParameters::None),
 	m_pCoeffs(0)
 {
-	m_rlweParameters = static_cast<RLWEParams>(KeyStream[0]);
+	m_rlweParameters = static_cast<RLWEParameters>(KeyStream[0]);
 	uint pLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_pCoeffs.resize(pLen);
 	Utility::MemUtils::Copy(KeyStream, 5, m_pCoeffs, 0, pLen);
@@ -42,7 +42,7 @@ const AsymmetricKeyTypes RLWEPublicKey::KeyType()
 	return AsymmetricKeyTypes::CipherPublicKey;
 }
 
-const RLWEParams RLWEPublicKey::Parameters()
+const RLWEParameters RLWEPublicKey::Parameters()
 {
 	return m_rlweParameters;
 }
@@ -59,7 +59,7 @@ void RLWEPublicKey::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_rlweParameters = RLWEParams::None;
+		m_rlweParameters = RLWEParameters::None;
 
 		if (m_pCoeffs.size() > 0)
 		{

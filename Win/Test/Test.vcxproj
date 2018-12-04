@@ -298,6 +298,7 @@
     <ClInclude Include="..\..\Test\AesAvsTest.h" />
     <ClInclude Include="..\..\Test\CJPTest.h" />
     <ClInclude Include="..\..\Test\CSPTest.h" />
+    <ClInclude Include="..\..\Test\DilithiumTest.h" />
     <ClInclude Include="..\..\Test\ECPTest.h" />
     <ClInclude Include="..\..\Test\RandomUtils.h" />
     <ClInclude Include="..\..\Test\RDPTest.h" />
@@ -360,6 +361,7 @@
     <ClCompile Include="..\..\Test\AesAvsTest.cpp" />
     <ClCompile Include="..\..\Test\CJPTest.cpp" />
     <ClCompile Include="..\..\Test\CSPTest.cpp" />
+    <ClCompile Include="..\..\Test\DilithiumTest.cpp" />
     <ClCompile Include="..\..\Test\ECPTest.cpp" />
     <ClCompile Include="..\..\Test\RDPTest.cpp" />
     <ClCompile Include="..\..\Test\RijndaelTest.cpp" />

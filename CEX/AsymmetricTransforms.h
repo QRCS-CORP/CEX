@@ -17,7 +17,7 @@ enum class AsymmetricTransforms : byte
 	/// <summary>
 	/// McEliece transform; a finite field of 12 and an error correction capability of 62
 	/// </summary>
-	M12T62 = 1,
+	MPKCS1M12T62 = 1,
 	/// <summary>
 	/// McEliece transform; a finite field of 13 and an error correction capability of 119
 	/// </summary>
@@ -45,7 +45,7 @@ enum class AsymmetricTransforms : byte
 	/// <summary>
 	/// RingLWE transform; a modulus of 12289 with 1024 coefficients
 	/// </summary>
-	Q12289N1024 = 8,
+	RLWES1Q12289N1024 = 8,
 	/// <summary>
 	/// NTRU transform; a modulus of 12289 with W 250
 	/// </summary>

@@ -19,7 +19,7 @@ NAMESPACE_RINGLWE
 
 //~~~Constant Tables~~~//
 
-const std::string RLWEQ12289N2048::Name = "Q12289N2048";
+const std::string RLWEQ12289N2048::Name = "RLWES2Q12289N2048";
 
 const std::array<ushort, 1024> RLWEQ12289N2048::OmegasMontgomery =
 {

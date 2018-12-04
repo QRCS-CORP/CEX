@@ -56,7 +56,7 @@ public:
 
 	static void SetType(std::array<uint, 8> &Address, uint Type);
 
-	static void UllToBytes(std::vector<byte> &Output, size_t Offset, ulong Value, uint32_t Length);
+	static void UllToBytes(std::vector<byte> &Output, size_t Offset, ulong Value, size_t Length);
 };
 
 NAMESPACE_SPHINCSEND

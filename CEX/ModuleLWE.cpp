@@ -13,28 +13,28 @@ const std::string ModuleLWE::CLASS_NAME = "ModuleLWE";
 
 //~~~Constructor~~~//
 
-ModuleLWE::ModuleLWE(MLWEParams Parameters, Prngs PrngType)
+ModuleLWE::ModuleLWE(MLWEParameters Parameters, Prngs PrngType)
 	:
 	m_destroyEngine(true), 
 	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mlweParameters(Parameters != MLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParams::Q7681N256K4) ? Parameters :
+	m_mlweParameters(Parameters != MLWEParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParameters::MLWES4Q7681N256) ? Parameters :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(PrngType != Prngs::None ? Helper::PrngFromName::GetInstance(PrngType) :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The prng type can not be none!"))
 {
 }
 
-ModuleLWE::ModuleLWE(MLWEParams Parameters, IPrng* Prng)
+ModuleLWE::ModuleLWE(MLWEParameters Parameters, IPrng* Prng)
 	:
 	m_destroyEngine(false),
 	m_domainKey(0),
 	m_isDestroyed(false),
 	m_isEncryption(false),
 	m_isInitialized(false),
-	m_mlweParameters(Parameters != MLWEParams::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParams::Q7681N256K4) ? Parameters :
+	m_mlweParameters(Parameters != MLWEParameters::None && static_cast<byte>(Parameters) <= static_cast<byte>(MLWEParameters::MLWES4Q7681N256) ? Parameters :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The parameter set is invalid!")),
 	m_rndGenerator(Prng != nullptr ? Prng :
 		throw CryptoAsymmetricException("ModuleLWE:CTor", "The prng can not be null!"))
@@ -48,7 +48,7 @@ ModuleLWE::~ModuleLWE()
 		m_isDestroyed = true;
 		m_isEncryption = false;
 		m_isInitialized = false;
-		m_mlweParameters = MLWEParams::None;
+		m_mlweParameters = MLWEParameters::None;
 		Utility::IntUtils::ClearVector(m_domainKey);
 
 		// release keys
@@ -107,17 +107,17 @@ const std::string ModuleLWE::Name()
 {
 	std::string ret = CLASS_NAME + "-";
 
-	if (m_mlweParameters == MLWEParams::Q7681N256K2)
+	if (m_mlweParameters == MLWEParameters::MLWES2Q7681N256)
 	{
-		ret += "Q7681N256K2";
+		ret += "MLWES2Q7681N256";
 	}
-	else if (m_mlweParameters == MLWEParams::Q7681N256K3)
+	else if (m_mlweParameters == MLWEParameters::MLWES3Q7681N256)
 	{
-		ret += "Q7681N256K3";
+		ret += "MLWES3Q7681N256";
 	}
-	else if (m_mlweParameters == MLWEParams::Q7681N256K4)
+	else if (m_mlweParameters == MLWEParameters::MLWES4Q7681N256)
 	{
-		ret += "Q7681N256K4";
+		ret += "MLWES4Q7681N256";
 	}
 	else
 	{
@@ -127,7 +127,7 @@ const std::string ModuleLWE::Name()
 	return ret;
 }
 
-const MLWEParams ModuleLWE::Parameters()
+const MLWEParameters ModuleLWE::Parameters()
 {
 	return m_mlweParameters;
 }
@@ -136,7 +136,7 @@ const MLWEParams ModuleLWE::Parameters()
 
 bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	const size_t K = (m_mlweParameters == MLWEParameters::MLWES3Q7681N256) ? 3 : (m_mlweParameters == MLWEParameters::MLWES4Q7681N256) ? 4 : 2;
 	const size_t CPTLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
 	const size_t PUBLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
 	const size_t PRILEN = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
@@ -187,7 +187,7 @@ bool ModuleLWE::Decapsulate(const std::vector<byte> &CipherText, std::vector<byt
 
 void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &SharedSecret)
 {
-	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	const size_t K = (m_mlweParameters == MLWEParameters::MLWES3Q7681N256) ? 3 : (m_mlweParameters == MLWEParameters::MLWES4Q7681N256) ? 4 : 2;
 	const size_t CPTLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);
 
 	CexAssert(m_isInitialized, "The cipher has not been initialized");
@@ -229,7 +229,7 @@ void ModuleLWE::Encapsulate(std::vector<byte> &CipherText, std::vector<byte> &Sh
 
 IAsymmetricKeyPair* ModuleLWE::Generate()
 {
-	const size_t K = (m_mlweParameters == MLWEParams::Q7681N256K3) ? 3 : (m_mlweParameters == MLWEParams::Q7681N256K4) ? 4 : 2;
+	const size_t K = (m_mlweParameters == MLWEParameters::MLWES3Q7681N256) ? 3 : (m_mlweParameters == MLWEParameters::MLWES4Q7681N256) ? 4 : 2;
 	const size_t PUBLEN = (K * MLWEQ7681N256::MLWE_PUBPOLY_SIZE) + MLWEQ7681N256::MLWE_SEED_SIZE;
 	const size_t PRILEN = (K * MLWEQ7681N256::MLWE_PRIPOLY_SIZE);
 	const size_t CCAPRI = PUBLEN + PRILEN + (3 * MLWEQ7681N256::MLWE_SEED_SIZE);

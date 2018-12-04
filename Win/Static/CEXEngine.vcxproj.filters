@@ -316,9 +316,6 @@
     <Filter Include="Header Files\Cipher\Asymmetric\Sign\Sphincs\Support">
       <UniqueIdentifier>{ad1e07fb-357c-42b1-886a-07ad5622b0aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Key\Asymmetric\Picnic">
-      <UniqueIdentifier>{e698f2b0-e619-4b40-81b2-970dd05cc592}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Key\Asymmetric\Sphincs">
       <UniqueIdentifier>{4bde7456-7e8f-4480-8b6e-a1b94575a1bf}</UniqueIdentifier>
     </Filter>
@@ -339,6 +336,12 @@
     </Filter>
     <Filter Include="Source Files\Cipher\Asymmetric\Sign\Dilithium\Support">
       <UniqueIdentifier>{67987ef0-8e01-4d7c-8df1-739c747ca957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Key\Asymmetric\Dilithium">
+      <UniqueIdentifier>{b696afbd-8eea-44f1-95dd-a2a8dd86a8ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Key\Asymmetric\Dilithium">
+      <UniqueIdentifier>{d8b4aeca-9b92-40eb-8b3e-20f912e1b4cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -759,9 +762,6 @@
     <ClInclude Include="..\..\CEX\RingLWE.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\RingLWE</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\RLWEParams.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\UShort128.h">
       <Filter>Header Files\Numeric</Filter>
     </ClInclude>
@@ -791,9 +791,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\RLWEKeyPair.h">
       <Filter>Header Files\Key\Asymmetric\RingLWE</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MPKCParams.h">
-      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MPKCPublicKey.h">
       <Filter>Header Files\Key\Asymmetric\McEliece</Filter>
@@ -830,9 +827,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Poly1305.h">
       <Filter>Header Files\Mac</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\MLWEParams.h">
-      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\ModuleLWE.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\ModuleLWE</Filter>
@@ -899,9 +893,6 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\NTRUPublicKey.h">
       <Filter>Header Files\Key\Asymmetric\NTRU</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\NTRUParams.h">
-      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
     <ClInclude Include="..\..\CEX\MLWEQ7681N256.h">
       <Filter>Header Files\Cipher\Asymmetric\Encrypt\ModuleLWE\Support</Filter>
@@ -981,18 +972,6 @@
     <ClInclude Include="..\..\CEX\SphincsPrivateKey.h">
       <Filter>Header Files\Key\Asymmetric\Sphincs</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CEX\PicnicKeyPair.h">
-      <Filter>Header Files\Key\Asymmetric\Picnic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PicnicPublicKey.h">
-      <Filter>Header Files\Key\Asymmetric\Picnic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PicnicPrivateKey.h">
-      <Filter>Header Files\Key\Asymmetric\Picnic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CEX\PicnicParams.h">
-      <Filter>Header Files\Enumeration</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\CEX\SphincsUtils.h">
       <Filter>Header Files\Cipher\Asymmetric\Sign\Sphincs\Support</Filter>
     </ClInclude>
@@ -1004,6 +983,33 @@
     </ClInclude>
     <ClInclude Include="..\..\CEX\Dilithium.h">
       <Filter>Header Files\Cipher\Asymmetric\Sign\Dilithium</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DilithiumPublicKey.h">
+      <Filter>Header Files\Key\Asymmetric\Dilithium</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DilithiumPrivateKey.h">
+      <Filter>Header Files\Key\Asymmetric\Dilithium</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DilithiumKeyPair.h">
+      <Filter>Header Files\Key\Asymmetric\Dilithium</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DLMN256Q8380417.h">
+      <Filter>Header Files\Cipher\Asymmetric\Sign\Dilithium\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\DilithiumParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\RLWEParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\NTRUParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MPKCParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\CEX\MLWEParameters.h">
+      <Filter>Header Files\Enumeration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1412,15 +1418,6 @@
     <ClCompile Include="..\..\CEX\Threefish1024.cpp">
       <Filter>Source Files\Cipher\Symmetric\Stream</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CEX\PicnicKeyPair.cpp">
-      <Filter>Source Files\Key\Asymmetric\Picnic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\PicnicPublicKey.cpp">
-      <Filter>Source Files\Key\Asymmetric\Picnic</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CEX\PicnicPrivateKey.cpp">
-      <Filter>Source Files\Key\Asymmetric\Picnic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\CEX\SphincsKeyPair.cpp">
       <Filter>Source Files\Key\Asymmetric\Sphincs</Filter>
     </ClCompile>
@@ -1441,6 +1438,18 @@
     </ClCompile>
     <ClCompile Include="..\..\CEX\Dilithium.cpp">
       <Filter>Source Files\Cipher\Asymmetric\Sign\Dilithium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DilithiumKeyPair.cpp">
+      <Filter>Source Files\Key\Asymmetric\Dilithium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DilithiumPrivateKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\Dilithium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DilithiumPublicKey.cpp">
+      <Filter>Source Files\Key\Asymmetric\Dilithium</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\CEX\DLMN256Q8380417.cpp">
+      <Filter>Source Files\Cipher\Asymmetric\Sign\Dilithium\Support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

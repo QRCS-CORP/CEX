@@ -3,11 +3,11 @@
 
 #include "CexDomain.h"
 #include "IAsymmetricKey.h"
-#include "NTRUParams.h"
+#include "NTRUParameters.h"
 
 NAMESPACE_ASYMMETRICKEY
 
-using Enumeration::NTRUParams;
+using Enumeration::NTRUParameters;
 
 /// <summary>
 /// A ModuleLWE Public Key container
@@ -18,7 +18,7 @@ private:
 
 	bool m_isDestroyed;
 	std::vector<byte> m_pCoeffs;
-	NTRUParams m_ntruParameters;
+	NTRUParameters m_ntruParameters;
 
 public:
 
@@ -45,7 +45,7 @@ public:
 	/// 
 	/// <param name="Parameters">The cipher parameter enumeration name</param>
 	/// <param name="P">The public keys polynomial</param>
-	NTRUPublicKey(NTRUParams Parameters, std::vector<byte> &P);
+	NTRUPublicKey(NTRUParameters Parameters, std::vector<byte> &P);
 
 	/// <summary>
 	/// Initialize this class with a serialized public key
@@ -74,7 +74,7 @@ public:
 	/// <summary>
 	/// Read Only: The cipher parameters enumeration name
 	/// </summary>
-	const NTRUParams Parameters();
+	const NTRUParameters Parameters();
 
 	/// <summary>
 	/// Read Only: The public keys polynomial

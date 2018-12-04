@@ -4,21 +4,21 @@
 #include "ITest.h"
 #include "../CEX/AsymmetricEngines.h"
 #include "../CEX/IBlockCipher.h"
-#include "../CEX/MLWEParams.h"
-#include "../CEX/MPKCParams.h"
-#include "../CEX/NTRUParams.h"
+#include "../CEX/MLWEParameters.h"
+#include "../CEX/MPKCParameters.h"
+#include "../CEX/NTRUParameters.h"
 #include "../CEX/IPrng.h"
-#include "../CEX/RLWEParams.h"
+#include "../CEX/RLWEParameters.h"
 
 namespace Test
 {
 	using Cipher::Symmetric::Block::IBlockCipher;
-	using Enumeration::MLWEParams;
-	using Enumeration::MPKCParams;
-	using Enumeration::NTRUParams;
+	using Enumeration::MLWEParameters;
+	using Enumeration::MPKCParameters;
+	using Enumeration::NTRUParameters;
 	using Prng::IPrng;
 	using Enumeration::BlockCiphers;
-	using Enumeration::RLWEParams;
+	using Enumeration::RLWEParameters;
 
 
 	/// <summary>
@@ -73,18 +73,18 @@ namespace Test
 
 	private:
 
-		void MpkcDecryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng);
-		void MpkcEncryptLoop(MPKCParams Params, size_t Loops, IPrng* Rng);
-		void MpkcGenerateLoop(MPKCParams Params, size_t Loops, IPrng* Rng);
-		void MlweDecryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
-		void MlweEncryptLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
-		void MlweGenerateLoop(MLWEParams Params, size_t Loops, IPrng* Rng);
-		void NtruDecryptLoop(NTRUParams Params, size_t Loops, IPrng* Rng);
-		void NtruEncryptLoop(NTRUParams Params, size_t Loops, IPrng* Rng);
-		void NtruGenerateLoop(NTRUParams Params, size_t Loops, IPrng* Rng);
-		void RlweDecryptLoop(RLWEParams Params, size_t Loops, IPrng* Rng);
-		void RlweEncryptLoop(RLWEParams Params, size_t Loops, IPrng* Rng);
-		void RlweGenerateLoop(RLWEParams Params, size_t Loops, IPrng* Rng);
+		void MpkcDecryptLoop(MPKCParameters Params, size_t Loops, IPrng* Rng);
+		void MpkcEncryptLoop(MPKCParameters Params, size_t Loops, IPrng* Rng);
+		void MpkcGenerateLoop(MPKCParameters Params, size_t Loops, IPrng* Rng);
+		void MlweDecryptLoop(MLWEParameters Params, size_t Loops, IPrng* Rng);
+		void MlweEncryptLoop(MLWEParameters Params, size_t Loops, IPrng* Rng);
+		void MlweGenerateLoop(MLWEParameters Params, size_t Loops, IPrng* Rng);
+		void NtruDecryptLoop(NTRUParameters Params, size_t Loops, IPrng* Rng);
+		void NtruEncryptLoop(NTRUParameters Params, size_t Loops, IPrng* Rng);
+		void NtruGenerateLoop(NTRUParameters Params, size_t Loops, IPrng* Rng);
+		void RlweDecryptLoop(RLWEParameters Params, size_t Loops, IPrng* Rng);
+		void RlweEncryptLoop(RLWEParameters Params, size_t Loops, IPrng* Rng);
+		void RlweGenerateLoop(RLWEParameters Params, size_t Loops, IPrng* Rng);
 		uint64_t GetUnitsPerSecond(uint64_t DurationTicks, uint64_t Count);
 		void OnProgress(std::string Data);
 	};

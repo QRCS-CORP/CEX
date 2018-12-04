@@ -70,7 +70,7 @@ NAMESPACE_STREAM
 /// cipher.Initialize(false, k);
 /// // decrypt the ciphertext
 /// // copy mac to temp for comparison
-/// std:vector&lt;byte&gt; mac(cipher.TagSize(), 0);
+/// std::vector&lt;byte&gt; mac(cipher.TagSize(), 0);
 /// cipher.Finalize(mac, 0, mac.size());
 /// // constant time comparison of mac to embedded  code
 /// IntUtils::Compare(Input, InOffset + Length, mac, 0, mac.size());

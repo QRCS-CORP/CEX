@@ -1212,12 +1212,29 @@ HTML_EXTRA_STYLESHEET  =
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       = Doxygen/html/tab_a.png \
+HTML_EXTRA_FILES       = Doxygen/html/arrowdown.png \
+                         Doxygen/html/arrowright.png \
+                         Doxygen/html/bc_s.png \
+                         Doxygen/html/bdwn.png \
+                         Doxygen/html/cexlogo.png \
+                         Doxygen/html/closed.png \
+                         Doxygen/html/doc.png \
+                         Doxygen/html/doxygen.png \
+                         Doxygen/html/dynsections.js \
+                         Doxygen/html/folderclosed.png \
+                         Doxygen/html/folderopen.png \
+                         Doxygen/html/jquery.js \
+                         Doxygen/html/nav_f.png \
+                         Doxygen/html/nav_g.png \
+                         Doxygen/html/nav_h.png \
+                         Doxygen/html/open.png \
+                         Doxygen/html/splitbar.png \
+                         Doxygen/html/sync_off.png \
+                         Doxygen/html/sync_on.png \
+                         Doxygen/html/tab_a.png \
                          Doxygen/html/tab_b.png \
                          Doxygen/html/tab_h.png \
-                         Doxygen/html/tab_s.png \
-                         Doxygen/html/tabs.css \
-                         Doxygen/html/tab_h.png
+                         Doxygen/html/tab_s.png
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to

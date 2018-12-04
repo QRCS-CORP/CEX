@@ -44,7 +44,7 @@ NAMESPACE_DIGEST
 /// <description>Example using an <c>IDigest</c> interface:</description>
 /// <code>
 /// Keccak512 digest;
-/// std:vector&lt;byte&gt; hash(digest.DigestSize(), 0);
+/// std::vector&lt;byte&gt; hash(digest.DigestSize(), 0);
 /// // compute a hash
 /// digest.Compute(Input, hash);
 /// </code>

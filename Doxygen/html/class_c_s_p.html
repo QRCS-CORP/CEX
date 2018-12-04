@@ -146,7 +146,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>An implementation of an entropy source provider using the system secure random generator. </p>
-<p>Example of getting a seed value: </p><div class="fragment"><div class="line">std:vector&lt;byte&gt; output(32);</div><div class="line"><a class="code" href="class_c_s_p.html">CSP</a> gen;</div><div class="line">gen.<a class="code" href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">Generate</a>(output);</div></div><!-- fragment --> <p>On a windows system, the RNGCryptoServiceProvider CryptGenRandom() function is used to generate output. On Android, the arc4random() function is used. All other systems (Linux, Unix), use dev/random.</p>
+<p>Example of getting a seed value: </p><div class="fragment"><div class="line">std::vector&lt;byte&gt; output(32);</div><div class="line"><a class="code" href="class_c_s_p.html">CSP</a> gen;</div><div class="line">gen.<a class="code" href="class_c_s_p.html#aaa19560b3f98e8781459f20cfbe7a515">Generate</a>(output);</div></div><!-- fragment --> <p>On a windows system, the RNGCryptoServiceProvider CryptGenRandom() function is used to generate output. On Android, the arc4random() function is used. All other systems (Linux, Unix), use dev/random.</p>
 <p>Guiding Publications:: </p><ol>
 <li>
 Microsoft <a href="http://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider.aspx">RNGCryptoServiceProvider</a>: class documentation. </li>

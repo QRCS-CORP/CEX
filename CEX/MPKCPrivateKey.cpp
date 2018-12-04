@@ -5,7 +5,7 @@ NAMESPACE_ASYMMETRICKEY
 
 //~~~Constructor~~~//
 
-MPKCPrivateKey::MPKCPrivateKey(MPKCParams Parameters, std::vector<byte> &S)
+MPKCPrivateKey::MPKCPrivateKey(MPKCParameters Parameters, std::vector<byte> &S)
 	:
 	m_isDestroyed(false),
 	m_mpkcParameters(Parameters),
@@ -17,7 +17,7 @@ MPKCPrivateKey::MPKCPrivateKey(const std::vector<byte> &KeyStream)
 	:
 	m_isDestroyed(false)
 {
-	m_mpkcParameters = static_cast<MPKCParams>(KeyStream[0]);
+	m_mpkcParameters = static_cast<MPKCParameters>(KeyStream[0]);
 	uint sLen = Utility::IntUtils::LeBytesTo32(KeyStream, 1);
 	m_sCoeffs.resize(sLen);
 	Utility::MemUtils::Copy(KeyStream, 5, m_sCoeffs, 0, sLen);
@@ -40,7 +40,7 @@ const AsymmetricKeyTypes MPKCPrivateKey::KeyType()
 	return AsymmetricKeyTypes::CipherPrivateKey;
 }
 
-const MPKCParams MPKCPrivateKey::Parameters()
+const MPKCParameters MPKCPrivateKey::Parameters()
 {
 	return m_mpkcParameters;
 }
@@ -57,7 +57,7 @@ void MPKCPrivateKey::Destroy()
 	if (!m_isDestroyed)
 	{
 		m_isDestroyed = true;
-		m_mpkcParameters = MPKCParams::None;
+		m_mpkcParameters = MPKCParameters::None;
 
 		if (m_sCoeffs.size() > 0)
 		{

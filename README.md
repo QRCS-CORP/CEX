@@ -29,7 +29,7 @@ If running the executable, the Win\Test\Vectors folder containing the cipher KAT
 
 For more information on the current capabilities of the library, read the Introduction to CEX paper, for implementation help, refer to the libraries help pages.
 
-This is still an early stage in the development of this library, so stay tuned, be patient.. (eta is the end of 2018).
+This is still an early stage in the development of this library, so stay tuned, be patient.. (eta is the spring of 2019).
 
 ## Contents
 ### Asymmetric Ciphers
@@ -40,6 +40,7 @@ This is still an early stage in the development of this library, so stay tuned, 
 
 ## Contents
 ### Asymmetric Signature Schemes
+* The Dilithium asymmetric signature schemes
 * The SPHINCS+ 256F-SHAKE128/256 asymmetric signature schemes
 
 ### Block Ciphers
@@ -137,7 +138,8 @@ The next planned release (1.0.0.7) will be in October 2018.
 
 ## History
   
-### Version 1.0.0.6g, November 16, 2018
+### Version 1.0.0.7a, December 04, 2018
+* The Dilithium asymmetric signature scheme
 * The SPHINCS+ asymmetric signature scheme
 * The NTRU Prime asymmetric cipher
 * The cSHAKE KDF integrated as an HX symmetric cipher key expansion option
@@ -258,11 +260,6 @@ https://www.gnu.org/licenses/gpl-3.0.en.html
 ##### API Help: http://www.vtdev.com/CEX-Plus/Help/html/index.html 
 ##### Introduction to CEX++ 1.0: http://www.vtdev.com/CEX-Plus/CEX_1.0.pdf
 ##### CEX .NET Article: http://www.codeproject.com/Articles/828477/Cipher-EX-V
-
-## Donation
-If you can afford to donate to this project..
-
-[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TZQQCUQ52FDYU)
 
 ## Disclaimer
 This project contains strong cryptography, before downloading the source files, 

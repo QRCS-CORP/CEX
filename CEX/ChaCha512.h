@@ -75,7 +75,7 @@ NAMESPACE_STREAM
 /// // decrypt the ciphertext
 /// cipher.Transform(Input, InOffset, Output, OutOffset, Length);
 /// // copy mac to temp for comparison
-/// std:vector&lt;byte&gt; mac(cipher.TagSize(), 0);
+/// std::vector&lt;byte&gt; mac(cipher.TagSize(), 0);
 /// cipher.Finalize(mac, 0, mac.size());
 /// // constant time comparison of mac to embedded  code
 /// IntUtils::Compare(Input, InOffset + Length, mac, 0, mac.size());

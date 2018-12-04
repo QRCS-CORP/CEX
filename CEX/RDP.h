@@ -12,7 +12,7 @@ NAMESPACE_PROVIDER
 /// <example>
 /// <description>Example of getting a seed value:</description>
 /// <code>
-/// std:vector&lt;byte&gt; output(32);
+/// std::vector&lt;byte&gt; output(32);
 /// RDP gen;
 /// gen.Generate(output);
 /// </code>

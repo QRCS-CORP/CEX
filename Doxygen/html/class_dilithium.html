@@ -68,11 +68,11 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="class_dilithium-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Dilithium Class Reference<span class="mlabels"><span class="mlabel">final</span></span></div>  </div>
+<div class="title">Dilithium Class Reference<span class="mlabels"><span class="mlabel">final</span></span><div class="ingroups"><a class="el" href="group___c_e_x.html">CEX</a> &raquo; <a class="el" href="group___cipher.html">Cipher</a> &raquo; <a class="el" href="group___asymmetric.html">Asymmetric</a> &raquo; <a class="el" href="group___asymmetric_sign.html">AsymmetricSign</a> &raquo; <a class="el" href="group___dilithium.html">Dilithium</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>The Asymmetric cipher interface  
+<p>An implementation of the Dilithium asymmetric signature scheme  
  <a href="class_dilithium.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="_dilithium_8h_source.html">Dilithium.h</a>&gt;</code></p>
@@ -94,9 +94,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae84dfe43fb302cce81e84ce61ee2acdc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_dilithium.html">Dilithium</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#ae84dfe43fb302cce81e84ce61ee2acdc">operator=</a> (const <a class="el" href="class_dilithium.html">Dilithium</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ae84dfe43fb302cce81e84ce61ee2acdc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy operator: copy is restricted, this function has been deleted  <a href="#ae84dfe43fb302cce81e84ce61ee2acdc">More...</a><br /></td></tr>
 <tr class="separator:ae84dfe43fb302cce81e84ce61ee2acdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b4c7df95dde1b79c5dec7238177c483"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a3b4c7df95dde1b79c5dec7238177c483">Dilithium</a> ()</td></tr>
-<tr class="memdesc:a3b4c7df95dde1b79c5dec7238177c483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: Instantiate this class  <a href="#a3b4c7df95dde1b79c5dec7238177c483">More...</a><br /></td></tr>
-<tr class="separator:a3b4c7df95dde1b79c5dec7238177c483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0d58039ffe82a85668ea37a9af91b40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#aa0d58039ffe82a85668ea37a9af91b40">Dilithium</a> (DilithiumParameters Parameters=DilithiumParameters::DLMS2N256Q8380417, <a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a> PrngType=<a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a>)</td></tr>
+<tr class="memdesc:aa0d58039ffe82a85668ea37a9af91b40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: Instantiate this class  <a href="#aa0d58039ffe82a85668ea37a9af91b40">More...</a><br /></td></tr>
+<tr class="separator:aa0d58039ffe82a85668ea37a9af91b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af11a84f34797519c310d27b3d5d4c000"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#af11a84f34797519c310d27b3d5d4c000">Dilithium</a> (DilithiumParameters Parameters, <a class="el" href="class_i_prng.html">IPrng</a> *Rng)</td></tr>
+<tr class="memdesc:af11a84f34797519c310d27b3d5d4c000"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor: instantiate this class using an external Prng instance  <a href="#af11a84f34797519c310d27b3d5d4c000">More...</a><br /></td></tr>
+<tr class="separator:af11a84f34797519c310d27b3d5d4c000"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae74f506f012cd426ac176b1b293095ad"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#ae74f506f012cd426ac176b1b293095ad">~Dilithium</a> () noexcept</td></tr>
 <tr class="memdesc:ae74f506f012cd426ac176b1b293095ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizer: destroys the containers objects  <a href="#ae74f506f012cd426ac176b1b293095ad">More...</a><br /></td></tr>
 <tr class="separator:ae74f506f012cd426ac176b1b293095ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,9 +115,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a3a75022e2d83b41747c07aa6fa4d6fec"><td class="memItemLeft" align="right" valign="top">const std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a3a75022e2d83b41747c07aa6fa4d6fec">Name</a> () override</td></tr>
 <tr class="memdesc:a3a75022e2d83b41747c07aa6fa4d6fec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The signature scheme name  <a href="#a3a75022e2d83b41747c07aa6fa4d6fec">More...</a><br /></td></tr>
 <tr class="separator:a3a75022e2d83b41747c07aa6fa4d6fec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a290a8a3406f7b64045dfb320e5912c"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a5a290a8a3406f7b64045dfb320e5912c">Initialize</a> (<a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *AsymmetricKey) override</td></tr>
-<tr class="memdesc:a5a290a8a3406f7b64045dfb320e5912c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the signature scheme for signing (private key) or verifying (public key)  <a href="#a5a290a8a3406f7b64045dfb320e5912c">More...</a><br /></td></tr>
-<tr class="separator:a5a290a8a3406f7b64045dfb320e5912c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e374ef7058b87bd76989fd093cb0f2a"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a9e374ef7058b87bd76989fd093cb0f2a">PrivateKeySize</a> () override</td></tr>
+<tr class="memdesc:a9e374ef7058b87bd76989fd093cb0f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Private key size in bytes  <a href="#a9e374ef7058b87bd76989fd093cb0f2a">More...</a><br /></td></tr>
+<tr class="separator:a9e374ef7058b87bd76989fd093cb0f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa625f481f6b09af524694fdb839c9f13"><td class="memItemLeft" align="right" valign="top">const size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#aa625f481f6b09af524694fdb839c9f13">PublicKeySize</a> () override</td></tr>
+<tr class="memdesc:aa625f481f6b09af524694fdb839c9f13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read Only: The expected Public key size in bytes  <a href="#aa625f481f6b09af524694fdb839c9f13">More...</a><br /></td></tr>
+<tr class="separator:aa625f481f6b09af524694fdb839c9f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9678cdb8e448a01cd43d026d646f7ceb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a9678cdb8e448a01cd43d026d646f7ceb">Generate</a> () override</td></tr>
+<tr class="memdesc:a9678cdb8e448a01cd43d026d646f7ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="#a9678cdb8e448a01cd43d026d646f7ceb">More...</a><br /></td></tr>
+<tr class="separator:a9678cdb8e448a01cd43d026d646f7ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69364ad4248ade5306e7869f9a828f5f"><td class="memItemLeft" align="right" valign="top">const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a69364ad4248ade5306e7869f9a828f5f">Initialize</a> (<a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea897356954c2cd3d41b221e3f24f99bba">Key</a>) override</td></tr>
+<tr class="memdesc:a69364ad4248ade5306e7869f9a828f5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the signature scheme for signing (private key) or verifying (public key)  <a href="#a69364ad4248ade5306e7869f9a828f5f">More...</a><br /></td></tr>
+<tr class="separator:a69364ad4248ade5306e7869f9a828f5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a866323ff7d78fc3cf258a51e897e3ba1"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_dilithium.html#a866323ff7d78fc3cf258a51e897e3ba1">Sign</a> (const std::vector&lt; byte &gt; &amp;<a class="el" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8ea4c2a8fe7eaf24721cc7a9f0175115bd4">Message</a>, std::vector&lt; byte &gt; &amp;Signature) override</td></tr>
 <tr class="memdesc:a866323ff7d78fc3cf258a51e897e3ba1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sign a message array and return the message and attached signature  <a href="#a866323ff7d78fc3cf258a51e897e3ba1">More...</a><br /></td></tr>
 <tr class="separator:a866323ff7d78fc3cf258a51e897e3ba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -134,15 +146,36 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a15d6681f385e01d414ca3523121921d9 inherit pub_methods_class_i_asymmetric_sign"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a15d6681f385e01d414ca3523121921d9">~IAsymmetricSign</a> () noexcept</td></tr>
 <tr class="memdesc:a15d6681f385e01d414ca3523121921d9 inherit pub_methods_class_i_asymmetric_sign"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalizer: destroys the containers objects  <a href="class_i_asymmetric_sign.html#a15d6681f385e01d414ca3523121921d9">More...</a><br /></td></tr>
 <tr class="separator:a15d6681f385e01d414ca3523121921d9 inherit pub_methods_class_i_asymmetric_sign"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a84ecabcdeed5f7bc611f9c69e5b07b inherit pub_methods_class_i_asymmetric_sign"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_i_asymmetric_sign.html#a5a84ecabcdeed5f7bc611f9c69e5b07b">Generate</a> ()=0</td></tr>
-<tr class="memdesc:a5a84ecabcdeed5f7bc611f9c69e5b07b inherit pub_methods_class_i_asymmetric_sign"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a public/private key-pair  <a href="class_i_asymmetric_sign.html#a5a84ecabcdeed5f7bc611f9c69e5b07b">More...</a><br /></td></tr>
-<tr class="separator:a5a84ecabcdeed5f7bc611f9c69e5b07b inherit pub_methods_class_i_asymmetric_sign"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The Asymmetric cipher interface </p>
+<div class="textblock"><p>An implementation of the Dilithium asymmetric signature scheme </p>
+<p>Key generation: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line"><a class="code" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a>* kp = sgn.Generate();</div><div class="line"></div><div class="line"><span class="comment">// serialize the public key</span></div><div class="line"><a class="code" href="class_dilithium_private_key.html">DilithiumPrivateKey</a>* prik = (<a class="code" href="class_dilithium_private_key.html">DilithiumPrivateKey</a>*)kp-&gt;<a class="code" href="class_i_asymmetric_key_pair.html#abe10c0eb64561c576b3419bf07895deb">PrivateKey</a>();</div><div class="line">std::vector&lt;byte&gt; pk = prik-&gt;<a class="code" href="class_dilithium_private_key.html#ae534879a7e3a7714dbf7d759fe793ae9">ToBytes</a>();</div></div><!-- fragment --><p>Sign: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(PrivateKey);</div><div class="line"></div><div class="line">std::vector&lt;byte&gt; msg(32);</div><div class="line">std::vector&lt;byte&gt; sig(0);</div><div class="line"><span class="comment">// generate the signature</span></div><div class="line">sgn.Sign(msg, sig);</div></div><!-- fragment --><p>Verify: </p><div class="fragment"><div class="line"><a class="code" href="class_dilithium.html">Dilithium</a> sgn(DilithiumParameters::DLMS2N256Q8380417);</div><div class="line">sgn.Initialize(<a class="code" href="group___digest.html#gga0275357fcdd6da6fb73a7cb04b0d8f8eaaddbd28a071e14f428d003c79304dd18">PublicKey</a>);</div><div class="line">std::vector&lt;byte&gt; message(0);</div><div class="line"></div><div class="line"><span class="keywordflow">try</span></div><div class="line">{</div><div class="line">    <span class="comment">// if authentication fails, this will throw</span></div><div class="line">    sgn.Verify(Signature, msg);</div><div class="line">}</div><div class="line"><span class="keywordflow">catch</span> (<span class="keyword">const</span> <a class="code" href="struct_crypto_authentication_failure.html">CryptoAuthenticationFailure</a> &amp;ex)</div><div class="line">{</div><div class="line">    <span class="comment">// handle the authentication failure</span></div><div class="line">}</div></div><!-- fragment --> <p>Implementation Notes: </p>
+<p>Dilithium is a digital signature scheme that is strongly secure under chosen message attacks based on the hardness of lattice problems over module lattices. <br />
+The security notion means that an adversary having access to a signing oracle cannot produce a signature of a message whose signature he hasn't yet seen. <br />
+Nor produce a different signature of a message that he already saw signed. </p>
+<ul>
+<li>
+There are three available parameter sets dilineated by security strength; medium security: DLMS1256Q8380417, high security: DLMS2N256Q8380417, highest security: DLMS2N256Q8380417 </li>
+<li>
+The ciphers operating mode (encryption/decryption) is determined by the IAsymmetricKey key-type used to Initialize the cipher (AsymmetricKeyTypes: CipherPublicKey, or CipherPublicKey), Public for encryption, Private for Decryption. </li>
+<li>
+The primary Prng is set through the constructor, as either an prng type-name (default BCR-AES256), which instantiates the function internally, or a pointer to a perisitant external instance of a Prng </li>
+<li>
+The message is authenticated using GCM, and throws CryptoAuthenticationFailure on decryption authentication failure </li>
+</ul>
+<p>Guiding Publications: </p><ol>
+<li>
+Software: <a href="https://pq-crystals.org/dilithium/software.shtml">Dilithium</a> Software. </li>
+<li>
+Reference Paper : <a href="https://pq-crystals.org/dilithium/data/dilithium-specification.pdf">CRYSTALS-Dilithium</a>. </li>
+<li>
+Reference: <a href="https://pq-crystals.org/dilithium/data/dilithium-20180114.pdf">Dilithium</a>: A lattice-Based Digital Signature Scheme. </li>
+<li>
+Website: <a href="https://pq-crystals.org/dilithium/">NTRU Prime Website</a>. </li>
+</ol>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a443a7b2bf9e1d5480486b13c7d55c77f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a443a7b2bf9e1d5480486b13c7d55c77f">&#9670;&nbsp;</a></span>Dilithium() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a443a7b2bf9e1d5480486b13c7d55c77f">&#9670;&nbsp;</a></span>Dilithium() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -169,22 +202,76 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a3b4c7df95dde1b79c5dec7238177c483"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3b4c7df95dde1b79c5dec7238177c483">&#9670;&nbsp;</a></span>Dilithium() <span class="overload">[2/2]</span></h2>
+<a id="aa0d58039ffe82a85668ea37a9af91b40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0d58039ffe82a85668ea37a9af91b40">&#9670;&nbsp;</a></span>Dilithium() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">NAMESPACE_ASYMMETRICSIGN Dilithium::Dilithium </td>
+          <td class="memname">Dilithium::Dilithium </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">DilithiumParameters&#160;</td>
+          <td class="paramname"><em>Parameters</em> = <code>DilithiumParameters::DLMS2N256Q8380417</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="group___enumeration.html#gaf3e3948cf00ae35f8c4646efd5de36a7">Prngs</a>&#160;</td>
+          <td class="paramname"><em>PrngType</em> = <code><a class="el" href="group___enumeration.html#ggaf3e3948cf00ae35f8c4646efd5de36a7a40116901e9d516662539284681835db4">Prngs::BCR</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Constructor: Instantiate this class </p>
+
+</div>
+</div>
+<a id="af11a84f34797519c310d27b3d5d4c000"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af11a84f34797519c310d27b3d5d4c000">&#9670;&nbsp;</a></span>Dilithium() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Dilithium::Dilithium </td>
+          <td>(</td>
+          <td class="paramtype">DilithiumParameters&#160;</td>
+          <td class="paramname"><em>Parameters</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_i_prng.html">IPrng</a> *&#160;</td>
+          <td class="paramname"><em>Rng</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructor: instantiate this class using an external Prng instance </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Parameters</td><td>The parameter set enumeration name</td></tr>
+    <tr><td class="paramname">Rng</td><td>A pointer to the seed Prng function</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Thrown if an invalid prng, or parameter set is specified</td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -245,8 +332,44 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5a290a8a3406f7b64045dfb320e5912c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a290a8a3406f7b64045dfb320e5912c">&#9670;&nbsp;</a></span>Initialize()</h2>
+<a id="a9678cdb8e448a01cd43d026d646f7ceb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9678cdb8e448a01cd43d026d646f7ceb">&#9670;&nbsp;</a></span>Generate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_i_asymmetric_key_pair.html">IAsymmetricKeyPair</a> * Dilithium::Generate </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generate a public/private key-pair </p>
+<dl class="section return"><dt>Returns</dt><dd>A public/private key pair</dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Exception::CryptoAsymmetricException</td><td>Thrown if the key generation call fails</td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a5a84ecabcdeed5f7bc611f9c69e5b07b">IAsymmetricSign</a>.</p>
+
+</div>
+</div>
+<a id="a69364ad4248ade5306e7869f9a828f5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69364ad4248ade5306e7869f9a828f5f">&#9670;&nbsp;</a></span>Initialize()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -258,7 +381,7 @@ Public Member Functions</h2></td></tr>
           <td class="memname">const void Dilithium::Initialize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_i_asymmetric_key.html">IAsymmetricKey</a> *&#160;</td>
-          <td class="paramname"><em>AsymmetricKey</em></td><td>)</td>
+          <td class="paramname"><em>Key</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -272,7 +395,7 @@ Public Member Functions</h2></td></tr>
 <p>Initialize the signature scheme for signing (private key) or verifying (public key) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">AsymmetricKey</td><td>The <a class="el" href="group___asymmetric_key.html" title="Asymmetric Key containers and generator. ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
+    <tr><td class="paramname">Key</td><td>The <a class="el" href="group___asymmetric_key.html" title="Asymmetric Key containers and generator. ">AsymmetricKey</a> containing the Public (verify) or Private (signing) key</td></tr>
   </table>
   </dd>
 </dl>
@@ -393,6 +516,64 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Copy operator: copy is restricted, this function has been deleted </p>
+
+</div>
+</div>
+<a id="a9e374ef7058b87bd76989fd093cb0f2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e374ef7058b87bd76989fd093cb0f2a">&#9670;&nbsp;</a></span>PrivateKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t Dilithium::PrivateKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Private key size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a37029c2531087e3ee90ef1c57a2f0838">IAsymmetricSign</a>.</p>
+
+</div>
+</div>
+<a id="aa625f481f6b09af524694fdb839c9f13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa625f481f6b09af524694fdb839c9f13">&#9670;&nbsp;</a></span>PublicKeySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const size_t Dilithium::PublicKeySize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read Only: The expected Public key size in bytes </p>
+
+<p>Implements <a class="el" href="class_i_asymmetric_sign.html#a95d9971467e4cef79b51f960c4c64575">IAsymmetricSign</a>.</p>
 
 </div>
 </div>

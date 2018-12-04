@@ -73,7 +73,7 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// LPrime
-		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
@@ -99,7 +99,7 @@ namespace Test
 		sec2.resize(64);
 
 		// SPrime
-		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
@@ -123,7 +123,7 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// LPrime
-		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		cpr1.Initialize(kp1->PublicKey());
@@ -149,7 +149,7 @@ namespace Test
 		sec2.resize(64);
 
 		// SPrime
-		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		cpr2.Initialize(kp2->PublicKey());
@@ -173,7 +173,7 @@ namespace Test
 		// test invalid constructor parameters
 		try
 		{
-			NTRU cpr(Enumeration::NTRUParams::None, m_rngPtr);
+			NTRU cpr(Enumeration::NTRUParameters::None, m_rngPtr);
 
 			throw TestException(std::string("NTRU"), std::string("Exception handling failure! -NE1"));
 		}
@@ -187,7 +187,7 @@ namespace Test
 
 		try
 		{
-			NTRU cpr(Enumeration::NTRUParams::None, Enumeration::Prngs::None);
+			NTRU cpr(Enumeration::NTRUParameters::None, Enumeration::Prngs::None);
 
 			throw TestException(std::string("NTRU"), std::string("Exception handling failure! -NE2"));
 		}
@@ -202,7 +202,7 @@ namespace Test
 		// test initialization
 		try
 		{
-			NTRU cpra(Enumeration::NTRUParams::None, Enumeration::Prngs::BCR);
+			NTRU cpra(Enumeration::NTRUParameters::None, Enumeration::Prngs::BCR);
 			Cipher::Asymmetric::RLWE::RingLWE cprb;
 			// create an invalid key set
 			IAsymmetricKeyPair* kp = cprb.Generate();
@@ -226,14 +226,14 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// LPrime
-		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp1 = cpr1.Generate();
 
 		// alter public key
 		std::vector<byte> p1 = ((NTRUPublicKey*)kp1->PublicKey())->P();
 		p1[0] += 1;
 		p1[1] += 1;
-		NTRUPublicKey* pk1 = new NTRUPublicKey(Enumeration::NTRUParams::LQ4591N761, p1);
+		NTRUPublicKey* pk1 = new NTRUPublicKey(Enumeration::NTRUParameters::NTRUS1LQ4591N761, p1);
 		cpr1.Initialize(pk1);
 		cpr1.Encapsulate(cpt, sec1);
 
@@ -254,14 +254,14 @@ namespace Test
 		sec2.resize(64);
 
 		// SPrime
-		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 		IAsymmetricKeyPair* kp2 = cpr2.Generate();
 
 		// alter public key
 		std::vector<byte> p2 = ((NTRUPublicKey*)kp2->PublicKey())->P();
 		p2[0] += 1;
 		p2[1] += 1;
-		NTRUPublicKey* pk2 = new NTRUPublicKey(Enumeration::NTRUParams::SQ4591N761, p2);
+		NTRUPublicKey* pk2 = new NTRUPublicKey(Enumeration::NTRUParameters::NTRUS2SQ4591N761, p2);
 		cpr2.Initialize(pk2);
 		cpr2.Encapsulate(cpt, sec1);
 
@@ -278,7 +278,7 @@ namespace Test
 	void NTRUTest::Serialization()
 	{
 		std::vector<byte> skey;
-		NTRU cpr(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		NTRU cpr(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES; ++i)
 		{
@@ -311,7 +311,7 @@ namespace Test
 		std::vector<byte> sec2(64);
 
 		// LPrime
-		NTRU cpr1(Enumeration::NTRUParams::LQ4591N761, m_rngPtr);
+		NTRU cpr1(Enumeration::NTRUParameters::NTRUS1LQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
@@ -337,7 +337,7 @@ namespace Test
 		}
 
 		// SPrime
-		NTRU cpr2(Enumeration::NTRUParams::SQ4591N761, m_rngPtr);
+		NTRU cpr2(Enumeration::NTRUParameters::NTRUS2SQ4591N761, m_rngPtr);
 
 		for (size_t i = 0; i < TEST_CYCLES / 2; ++i)
 		{
