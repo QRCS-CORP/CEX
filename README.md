@@ -38,7 +38,6 @@ This is still an early stage in the development of this library, so stay tuned, 
 * The Niederreiter dual form of the McEliece cipher
 * The ModuleLWE asymmetric cipher (Kyber)
 
-## Contents
 ### Asymmetric Signature Schemes
 * The Dilithium asymmetric signature schemes
 * The SPHINCS+ 256F-SHAKE128/256 asymmetric signature schemes
